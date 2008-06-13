@@ -47,7 +47,7 @@ $| = 1; # autoflush stdout;
                           # (included below). This is the last version that is
                           # Qt 3 based. Qt 4 merges began immediately after.
 #my $SVNRELEASE = '17190'; # Recent 0-21-fixes
-my $SVNRELEASE = '17189'; # Recent trunk
+my $SVNRELEASE = '17447'; # Recent trunk
 #my $SVNRELEASE = 'HEAD'; # If you are game, go forth and test the latest!
 
 
@@ -727,7 +727,7 @@ set MINGW='.$dosmingw.'
 set PATH=%QTDIR%\bin;%MINGW%\bin;%PATH%
 set QMAKESPEC=win32-g++
 cd %QTDIR%
-goto SMALL
+rem goto SMALL
 
 rem This would do a full build:
 '.$dosmsys.'bin\yes | configure -plugin-sql-mysql -no-sql-sqlite -debug-and-release -fast -no-sql-odbc -no-qdbus
@@ -1036,8 +1036,8 @@ cd '.$unixmythtv.'
 echo copying main QT dlls to build folder...
 # mythtv probably needs the qt3 dlls at runtime:
 cp '.$unixmsys.'qt-3.3.x-p8/lib/*.dll '.$unixmythtv.'build/bin
-# mythtv probably needs the qt4 dlls at runtime:
-cp '.$unixmsys.'qt-win-opensource-4.3.4/lib/*.dll '.$unixmythtv.'build/bin
+# mythtv needs the qt4 dlls at runtime:
+cp '.$unixmsys.'qt-win-opensource-src-4.3.4/lib/*.dll '.$unixmythtv.'build/bin
 # qt mysql connection dll has to exist in a subfolder called sqldrivers:
 echo Creating build-folder Directories...
 # Assumptions
@@ -1051,7 +1051,7 @@ echo Creating build-folder Directories...
 mkdir '.$unixmythtv.'/build/bin/sqldrivers
 echo Copying QT plugin required dlls....
 cp '.$unixmsys.'qt-3.3.x-p8/plugins/sqldrivers/libqsqlmysql.dll '.$unixmythtv.'build/bin/sqldrivers 
-cp '.$unixmsys.'qt-win-opensource-4.3.4/plugins/sqldrivers/qsqlmysql4.dll '.$unixmythtv.'build/bin/sqldrivers 
+cp '.$unixmsys.'qt-win-opensource-src-4.3.4/plugins/sqldrivers/qsqlmysql4.dll '.$unixmythtv.'build/bin/sqldrivers 
 echo Copying ming and msys dlls to build folder.....
 # pthread dlls and mingwm10.dll are copied from here:
 cp /mingw/bin/*.dll '.$unixmythtv.'build/bin
@@ -1059,6 +1059,11 @@ cp /mingw/bin/*.dll '.$unixmythtv.'build/bin
 cp /bin/msys-1.0.dll '.$unixmythtv.'build/bin
 echo copying lib files...
 mv '.$unixmythtv.'build/lib/*.dll '.$unixmythtv.'build/bin/
+mv '.$unixmythtv.'build/lib/mythtv/filters/*.dll '.$unixmythtv.'build/bin/
+
+# because the install process failes to copy the .mak file (needed by the plugins), we copy it manually.
+cp '.$unixmythtv.'mythtv/libs/libmyth/mythconfig.mak '.$unixmythtv.'build//include/mythtv/
+
 touch '.$unixmythtv.'/build/package_flag
 cp '.$unixmythtv.'gdb_*.bat '.$unixmythtv.'build/bin
 cp '.$unixmythtv.'mythtv/contrib/Win32/debug/*.cmd '.$unixmythtv.'build/bin
@@ -1066,7 +1071,7 @@ cp '.$unixmythtv.'mythtv/contrib/Win32/debug/*.cmd '.$unixmythtv.'build/bin
 ],comment => 'write a script to install mythtv to build folder'],
 
 
-# Create file to install myththemes
+# Create file to install mythplugins
 [ always => [], write => [$mythtv.'setup_plugins.sh',
 '#!/bin/bash
 source '.$unixmythtv.'qt'.$qtver.'_env.sh
@@ -1250,7 +1255,7 @@ comment => 'do we already have a Makefile for myth plugins?' ],
 comment => 'hack mythconfig.mak'],
 
 ## make
-[ newer => [$mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll',
+[ newer => [$mythtv.'mythplugins/mythmovies/mythmovies/mythmovies.dll',
             $mythtv.'mythtv/last_build.txt'], 
   shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
             'cd '.$unixmythtv.'mythplugins', $parallelMake], 
@@ -1262,8 +1267,8 @@ comment => 'PLUGINS! redo make if we need to (see the  last_build.txt identifier
 comment => 'make cleanup.pro'],
 
 ## make install
-[ newer => [$mythtv.'build/lib/mythtv/plugins/libmythmovies.dll',
-            $mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll'],
+[ newer => [$mythtv.'build/lib/mythtv/plugins/mythmovies.dll',
+            $mythtv.'mythplugins/mythmovies/mythmovies/mythmovies.dll'],
   shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
             'cd '.$unixmythtv.'mythplugins','make install'],
 comment => 'PLUGINS! make install' ],
