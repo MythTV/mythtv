@@ -108,7 +108,7 @@ static int ConfiguredTunerCards(void)
 /**
  * \brief returns true if the recording completed when exiting.
  */
-bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide, 
+bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
                 bool inPlaylist, bool initByNetworkCommand)
 {
     TV *tv = new TV();
@@ -116,11 +116,11 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
     bool showDialogs = true;
     bool playCompleted = false;
     ProgramInfo *curProgram = NULL;
-    
+
 
     if (tvrec)
         curProgram = new ProgramInfo(*tvrec);
-    
+
     // Initialize TV
     if (!tv->Init())
     {
@@ -168,7 +168,7 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
             reclist = RemoteGetCurrentlyRecordingList();
             if (reclist->empty())
             {
-                VERBOSE(VB_PLAYBACK, LOC_ERR + 
+                VERBOSE(VB_PLAYBACK, LOC_ERR +
                         "Failed to get recording show list");
                 tv->ShowNoRecorderDialog(kNoCurrRec);
                 quitAll = true;
@@ -217,7 +217,7 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
 
         tv->setInPlayList(inPlaylist);
         tv->setUnderNetworkControl(initByNetworkCommand);
-        
+
         // Process Events
         while (tv->GetState() != kState_None)
         {
@@ -229,7 +229,7 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
 
         if (tv->getJumpToProgram())
         {
-            
+
             ProgramInfo *tmpProgram  = tv->getLastProgram();
             ProgramInfo *nextProgram = new ProgramInfo(*tmpProgram);
 
@@ -245,7 +245,7 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
 
             continue;
         }
-        
+
         if (tv->WantsToQuit())
             quitAll = true;
     }
@@ -261,12 +261,12 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
     // check if the show has reached the end.
     if (tvrec && tv->getEndOfRecording())
         playCompleted = true;
-    
+
     bool allowrerecord = tv->getAllowRerecord();
     bool deleterecording = tv->getRequestDelete();
-    
+
     delete tv;
-    
+
     if (curProgram)
     {
         if (deleterecording)
@@ -279,7 +279,7 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
             lastProgramStringList.clear();
             curProgram->ToStringList(lastProgramStringList);
         }
-        
+
         delete curProgram;
     }
 
@@ -312,7 +312,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Frontend", "PLAYBACK", "Play Program", "P");
     REG_KEY("TV Frontend", "TOGGLERECORD", "Toggle recording status of current "
             "program", "R");
-    REG_KEY("TV Frontend", "DAYLEFT", "Page the program guide back one day", 
+    REG_KEY("TV Frontend", "DAYLEFT", "Page the program guide back one day",
             "Home,7");
     REG_KEY("TV Frontend", "DAYRIGHT", "Page the program guide forward one day",
             "End,1");
@@ -370,7 +370,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "SKIPCOMMERCIAL", "Skip Commercial", "Z,End");
     REG_KEY("TV Playback", "SKIPCOMMBACK", "Skip Commercial (Reverse)",
             "Q,Home");
-    REG_KEY("TV Playback", "JUMPSTART", "Jump to the start of the recording.", "Ctrl+B");            
+    REG_KEY("TV Playback", "JUMPSTART", "Jump to the start of the recording.", "Ctrl+B");
     REG_KEY("TV Playback", "TOGGLEBROWSE", "Toggle channel browse mode", "O");
     REG_KEY("TV Playback", "TOGGLERECORD", "Toggle recording status of current "
             "program", "R");
@@ -476,7 +476,7 @@ void TV::InitKeys(void)
     REG_KEY("Teletext Menu", "PREVPAGE",    "Previous Page",         "Up");
     REG_KEY("Teletext Menu", "NEXTSUBPAGE", "Next Subpage",          "Right");
     REG_KEY("Teletext Menu", "PREVSUBPAGE", "Previous Subpage",      "Left");
-    REG_KEY("Teletext Menu", "TOGGLETT",    "Toggle Teletext",       "T"); 
+    REG_KEY("Teletext Menu", "TOGGLETT",    "Toggle Teletext",       "T");
     REG_KEY("Teletext Menu", "MENURED",     "Menu Red",              "F2");
     REG_KEY("Teletext Menu", "MENUGREEN",   "Menu Green",            "F3");
     REG_KEY("Teletext Menu", "MENUYELLOW",  "Menu Yellow",           "F4");
@@ -498,7 +498,7 @@ void TV::InitKeys(void)
   Frontend: <>,.?/
   Editing:  <>,.
 
-  Global:   PgDown, PgUp,  Right, Left, Home, End, Up, Down, 
+  Global:   PgDown, PgUp,  Right, Left, Home, End, Up, Down,
   Playback: PgDown, PgUp,  Right, Left, Home, End, Up, Down, Backspace,
   Frontend:                Right, Left, Home, End
   Editing:  PgDown, PgUp,               Home, End
@@ -533,7 +533,7 @@ void *SpawnDecode(void *param)
 TV::TV(void)
     : QObject(NULL, "TV"),
       // Configuration variables from database
-      baseFilters(""), 
+      baseFilters(""),
       db_channel_format("<num> <sign>"),
       db_time_format("h:mm AP"), db_short_date_format("M/d"),
       db_idle_timeout(0),
@@ -555,7 +555,7 @@ TV::TV(void)
       audiosyncAdjustment(false), audiosyncBaseline(LONG_LONG_MIN),
       editmode(false),     zoomMode(false),
       sigMonMode(false),
-      update_osd_pos(false), endOfRecording(false), 
+      update_osd_pos(false), endOfRecording(false),
       requestDelete(false),  allowRerecord(false),
       doSmartForward(false),
       queuedTranscode(false), getRecorderPlaybackInfo(false),
@@ -570,7 +570,7 @@ TV::TV(void)
       // Fast forward state
       doing_ff_rew(0), ff_rew_index(0), speed_index(0),
       // Time Stretch state
-      normal_speed(1.0f), prev_speed(1.5f), 
+      normal_speed(1.0f), prev_speed(1.5f),
       // Estimated framerate from recorder
       frameRate(30.0f),
       // CC/Teletext input state variables
@@ -828,7 +828,7 @@ TV::~TV(void)
         VERBOSE(VB_IMPORTANT, LOC + "Deleting PiP TV Chain in destructor");
         piptvchain->DestroyChain();
         delete piptvchain;
-    }    
+    }
 
     if (ddMapLoaderRunning)
     {
@@ -836,7 +836,7 @@ TV::~TV(void)
         ddMapLoaderRunning = false;
 
         if (ddMapSourceId)
-        {            
+        {
             int *src = new int;
             *src = ddMapSourceId;
             pthread_create(&ddMapLoader, NULL, load_dd_map_post_thunk, src);
@@ -873,7 +873,7 @@ int TV::LiveTV(bool showDialogs, bool startInGuide)
 {
     requestDelete = false;
     allowRerecord = false;
-    
+
     if (internalState == kState_None && RequestNextRecorder(showDialogs))
     {
         if (tvchain)
@@ -899,7 +899,7 @@ int TV::LiveTV(bool showDialogs, bool startInGuide)
 
         if (startInGuide || gContext->GetNumSetting("WatchTVGuide", 0))
         {
-            MSqlQuery query(MSqlQuery::InitCon()); 
+            MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("SELECT keylist FROM keybindings WHERE "
                           "context = 'TV Playback' AND action = 'GUIDE' AND "
                           "hostname = :HOSTNAME ;");
@@ -913,7 +913,7 @@ int TV::LiveTV(bool showDialogs, bool startInGuide)
 
                 int keynum = keyseq[0];
                 keynum &= ~Qt::UNICODE_ACCEL;
-   
+
                 keyList.prepend(new QKeyEvent(QEvent::KeyPress, keynum, 0, 0));
             }
         }
@@ -960,17 +960,17 @@ bool TV::RequestNextRecorder(bool showDialogs)
 
     if (!testrec)
         return false;
-    
+
     if (!testrec->IsValidRecorder())
     {
         if (showDialogs)
             ShowNoRecorderDialog();
-        
+
         delete testrec;
-        
+
         return false;
     }
-    
+
     activerecorder = recorder = testrec;
     return true;
 }
@@ -1053,7 +1053,7 @@ void TV::UpdateOSDAskAllowDialog(void)
             askAllowPrograms.erase(it);
         }
         it = next;
-    }        
+    }
 
     AskAllowType type      = kAskAllowCancel;
     int          sel       = 0;
@@ -1151,9 +1151,9 @@ void TV::UpdateOSDAskAllowDialog(void)
             .replace("<num>",  (*it).info->chanstr)
             .replace("<sign>", (*it).info->chansign)
             .replace("<name>", (*it).info->channame);
-    
+
         message = single_rec.arg((*it).info->title).arg(channel);
-    
+
         options += record_watch;
         options += let_record1;
         options += ((*it).has_later) ? record_later1 : do_not_record1;
@@ -1307,7 +1307,7 @@ void TV::HandleOSDAskAllowResponse(void)
             case 3:
                 // cancel scheduled recording
                 recorder->CancelNextRecording(true);
-                break;                        
+                break;
         }
     }
     else if (kAskAllowMultiRec == askAllowType)
@@ -1350,7 +1350,7 @@ int TV::Playback(ProgramInfo *rcinfo)
     jumpToProgram = false;
     allowRerecord = false;
     requestDelete = false;
-    
+
     if (internalState != kState_None)
         return 0;
 
@@ -1429,13 +1429,13 @@ int TV::PlayFromRecorder(int recordernum)
 
 bool TV::StateIsRecording(TVState state)
 {
-    return (state == kState_RecordingOnly || 
+    return (state == kState_RecordingOnly ||
             state == kState_WatchingRecording);
 }
 
 bool TV::StateIsPlaying(TVState state)
 {
-    return (state == kState_WatchingPreRecorded || 
+    return (state == kState_WatchingPreRecorded ||
             state == kState_WatchingRecording);
 }
 
@@ -1469,7 +1469,7 @@ TVState TV::RemovePlaying(TVState state)
 #define SET_LAST() do { nextState = internalState; changed = true; } while(0);
 
 /** \fn TV::HandleStateChange(void)
- *  \brief Changes the state to the state on the front of the 
+ *  \brief Changes the state to the state on the front of the
  *         state change queue.
  *
  *   Note: There must exist a state transition from any state we can enter
@@ -1496,7 +1496,7 @@ void TV::HandleStateChange(void)
         stateLock.unlock();
         return;
     }
-    TVState desiredNextState = nextStates.dequeue();    
+    TVState desiredNextState = nextStates.dequeue();
     VERBOSE(VB_GENERAL, LOC + QString("Attempting to change from %1 to %2")
             .arg(StateToString(nextState))
             .arg(StateToString(desiredNextState)));
@@ -1517,7 +1517,7 @@ void TV::HandleStateChange(void)
         lastSignalUIInfo.clear();
         activerecorder = recorder;
         recorder->Setup();
-        
+
         QDateTime timerOffTime = QDateTime::currentDateTime();
         lockTimerOn = false;
 
@@ -1606,7 +1606,7 @@ void TV::HandleStateChange(void)
         if (prbuffer->IsOpen())
         {
             gContext->DisableScreensaver();
-    
+
             if (desiredNextState == kState_WatchingRecording)
             {
                 activerecorder = recorder =
@@ -1625,7 +1625,7 @@ void TV::HandleStateChange(void)
             }
 
             StartPlayer(desiredNextState == kState_WatchingRecording);
-            
+
             SET_NEXT();
             if (!playbackinfo->isVideo)
             {
@@ -1633,7 +1633,7 @@ void TV::HandleStateChange(void)
                 message += playbackinfo->chanid + " " +
                            playbackinfo->recstartts.toString(Qt::ISODate);
                 RemoteSendMessage(message);
-            }                
+            }
         }
         else
         {
@@ -1780,7 +1780,7 @@ bool TV::StartRecorder(RemoteEncoder *rec, int maxWait)
  *  \return true when successful, false otherwise.
  */
 bool TV::StartPlayer(bool isWatchingRecording, int maxWait)
-{ 
+{
     SetupPlayer(isWatchingRecording);
     pthread_create(&decode, NULL, SpawnDecode, nvp);
 
@@ -1830,7 +1830,7 @@ void TV::StartOSD()
 }
 
 /** \fn TV::StopStuff(bool, bool, bool)
- *  \brief Can shut down the ringbuffers, the players, and in LiveTV it can 
+ *  \brief Can shut down the ringbuffers, the players, and in LiveTV it can
  *         shut down the recorders.
  *
  *   The player needs to be partially shutdown before the recorder,
@@ -2007,7 +2007,7 @@ void TV::TeardownPlayer(void)
     if (playbackinfo)
         delete playbackinfo;
     playbackinfo = NULL;
-    pbinfoLock.unlock(); 
+    pbinfoLock.unlock();
 
     DeleteRecorder();
 
@@ -2079,7 +2079,7 @@ void *TV::EventThread(void *param)
 }
 
 void TV::RunTV(void)
-{ 
+{
     paused = false;
 
     doing_ff_rew = 0;
@@ -2093,7 +2093,7 @@ void TV::RunTV(void)
 
     lastLcdUpdate = QDateTime::currentDateTime();
     UpdateLCD();
-    
+
     ClearInputQueues();
 
     switchToRec = NULL;
@@ -2162,7 +2162,7 @@ void TV::RunTV(void)
             if (recorder->IsRecording())
             {
                 recorderPlaybackInfo = recorder->GetRecording();
-                RemoteFillProginfo(recorderPlaybackInfo, 
+                RemoteFillProginfo(recorderPlaybackInfo,
                                    gContext->GetHostName());
             }
 
@@ -2236,7 +2236,7 @@ void TV::RunTV(void)
                 isnearend = true;
             else
                 isnearend = false;
-            
+
             if (isnearend && IsEmbedding() && !paused)
                 DoPause();
         }
@@ -2245,17 +2245,17 @@ void TV::RunTV(void)
         {
             if (jumped_back && !isnearend)
                 jumped_back = false;
-            
+
             if (internalState == kState_WatchingPreRecorded && !inPlaylist &&
-                dialogname == "" && isnearend && !exitPlayer 
+                dialogname == "" && isnearend && !exitPlayer
                 && !underNetworkControl &&
                 (gContext->GetNumSetting("EndOfRecordingExitPrompt") == 1) &&
                 !jumped_back && !editmode && !IsEmbedding() && !paused)
             {
                 PromptDeleteRecording(tr("End Of Recording"));
             }
-            
-                
+
+
             // disable dialog and enable playback after 2 minutes
             if (IsVideoExitDialog() &&
                 dialogboxTimer.elapsed() > (2 * 60 * 1000))
@@ -2270,7 +2270,7 @@ void TV::RunTV(void)
                 wantsToQuit = true;
             }
         }
-        
+
         if (exitPlayer)
         {
             while (GetOSD() && GetOSD()->DialogShowing(dialogname))
@@ -2279,8 +2279,8 @@ void TV::RunTV(void)
                 GetOSD()->TurnDialogOff(dialogname);
                 usleep(1000);
             }
-            
-            
+
+
             if (jumpToProgram && lastProgram)
             {
                 bool fileExists = lastProgram->PathnameExists();
@@ -2329,7 +2329,7 @@ void TV::RunTV(void)
                 TogglePIPView();
         }
 
-        if ((doing_ff_rew || speed_index) && 
+        if ((doing_ff_rew || speed_index) &&
             activenvp && activenvp->AtNormalSpeed())
         {
             speed_index = 0;
@@ -2409,7 +2409,7 @@ void TV::RunTV(void)
         {
             asInputMode = false;
             ClearInputQueues(true);
-        }   
+        }
 
         if (switchToInputId)
         {
@@ -2461,7 +2461,7 @@ void TV::RunTV(void)
             needToJumpMenu = false;
         }
     }
-  
+
     if (!IsErrored() && (GetState() != kState_None))
     {
         ForceNextStateNone();
@@ -2484,8 +2484,8 @@ bool TV::eventFilter(QObject *o, QEvent *e)
         case QEvent::KeyPress:
         {
             QKeyEvent *k = new QKeyEvent(*(QKeyEvent *)e);
-  
-            // can't process these events in the Qt event loop. 
+
+            // can't process these events in the Qt event loop.
             keyListLock.lock();
             keyList.append(k);
             keyListLock.unlock();
@@ -2626,7 +2626,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     }
 
     if (editmode)
-    {   
+    {
         if (!nvp->DoKeypress(e))
             editmode = nvp->GetEditMode();
         if (!editmode)
@@ -2726,12 +2726,12 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (action == "TOGGLEBROWSE" || action == "ESCAPE" ||
                      action == "CLEAROSD")
             {
-                CommitQueuedInput(); 
+                CommitQueuedInput();
                 BrowseEnd(false);
             }
             else if (action == "SELECT")
             {
-                CommitQueuedInput(); 
+                CommitQueuedInput();
                 BrowseEnd(true);
             }
             else if (action == "TOGGLERECORD")
@@ -2815,7 +2815,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             handled = true;
 
             if (action == "UP")
-                GetOSD()->DialogUp(dialogname); 
+                GetOSD()->DialogUp(dialogname);
             else if (action == "DOWN")
                 GetOSD()->DialogDown(dialogname);
             else if (((action == "RWNDSTICKY" || action == "SEEKRWND" ||
@@ -2844,7 +2844,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 exitPlayer    = true;
                 wantsToQuit   = true;
             }
-            else if (action == "SELECT" || action == "ESCAPE" || 
+            else if (action == "SELECT" || action == "ESCAPE" ||
                      action == "CLEAROSD" ||
                      ((arrowAccel) && (action == "LEFT" || action == "RIGHT")))
             {
@@ -2855,7 +2855,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 if (dialogname == "alreadybeingedited")
                 {
                     int result = GetOSD()->GetDialogResponse(dialogname);
-                    if (result == 1) 
+                    if (result == 1)
                     {
                        playbackinfo->SetEditing(false);
                        editmode = nvp->EnableEdit();
@@ -2866,7 +2866,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                         DoPause();
                     }
                 }
-                else if (dialogname == "exitplayoptions") 
+                else if (dialogname == "exitplayoptions")
                 {
                     int result = GetOSD()->GetDialogResponse(dialogname);
 
@@ -2892,7 +2892,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                             dialogname = "";
                             DoPause();
                             PromptDeleteRecording(
-                                tr("Delete this recording?")); 
+                                tr("Delete this recording?"));
                             return;
                         default:
                             exitPlayer = true;
@@ -3003,7 +3003,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 handled = false;
         }
     }
-   
+
     if (stretchAdjustment)
     {
         for (int i = 0; i < actions.size(); i++)
@@ -3025,7 +3025,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 handled = false;
         }
     }
-   
+
     if (audiosyncAdjustment)
     {
         for (int i = 0; i < actions.size(); i++)
@@ -3088,7 +3088,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 return;
        }
     }
-             
+
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
@@ -3110,7 +3110,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             DoQueueTranscode("Low Quality");
         else if (action == "PLAY")
             DoPlay();
-        else if (action == "PAUSE") 
+        else if (action == "PAUSE")
             DoPause();
         else if (action == "SPEEDINC" &&
                  activerbuffer && !activerbuffer->InDVDMenuOrStillFrame())
@@ -3157,7 +3157,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 ccInputModeExpires = QTime::currentTime();
                 ClearInputQueues(false);
                 AddKeyToInputQueue(0);
-            }            
+            }
         }
         else if (action == "SEEKFFWD" &&
                  activerbuffer && !activerbuffer->InDVDMenuOrStillFrame())
@@ -3227,7 +3227,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         else if (action == "JUMPRWND")
         {
             if (activerbuffer->isDVD())
-                DVDJumpBack();       
+                DVDJumpBack();
             else
                 DoSeek(-jumptime * 60, tr("Jump Back"));
         }
@@ -3268,7 +3268,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             EditSchedule(kViewSchedule);
         else if (action == "JUMPREC")
         {
-            if (gContext->GetNumSetting("JumpToProgramOSD", 1) 
+            if (gContext->GetNumSetting("JumpToProgramOSD", 1)
                     && StateIsPlaying(internalState))
             {
                 DisplayJumpMenuSoon();
@@ -3335,7 +3335,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     wantsToQuit = true;
                 }
             }
-            else 
+            else
             {
                 if (nvp &&
                     (5 & gContext->GetNumSetting("PlaybackExitPrompt")) &&
@@ -3371,7 +3371,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             ToggleAdjustFill();
         else if (action == "MENU")
             ShowOSDTreeMenu();
-        else 
+        else
             handled = HandleTrackAction(action);
     }
 
@@ -3483,7 +3483,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             QString action = actions[i];
             handled = true;
-    
+
             if (action == "SELECT")
             {
                 if (!was_doing_ff_rew)
@@ -3493,9 +3493,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
                     if (gContext->GetNumSetting("AltClearSavedPosition", 1)
                         && nvp->GetBookmark())
-                        nvp->ClearBookmark(); 
+                        nvp->ClearBookmark();
                     else
-                        nvp->SetBookmark(); 
+                        nvp->SetBookmark();
                 }
                 else
                     handled = false;
@@ -3504,7 +3504,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 handled = false;
         }
     }
-    
+
     if (StateIsLiveTV(GetState()) && !pseudoLiveTVState[aindx])
     {
         for (int i = 0; i < actions.size() && !handled; i++)
@@ -3568,7 +3568,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             {
                 NormalSpeed();
                 StopFFRew();
-                nvp->SetBookmark(); 
+                nvp->SetBookmark();
                 PromptDeleteRecording(tr("Delete this recording?"));
             }
             else if (action == "JUMPTODVDROOTMENU")
@@ -3583,11 +3583,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 ShowOSDTreeMenu();
             else if (action == "CHANNELUP")
             {
-                if (activerbuffer->isDVD()) 
+                if (activerbuffer->isDVD())
                     DVDJumpBack();
                 else
                     DoSeek(-jumptime * 60, tr("Jump Back"));
-            }    
+            }
             else if (action == "CHANNELDOWN")
             {
                 if (activerbuffer->isDVD())
@@ -3877,7 +3877,7 @@ void TV::TogglePIPView(void)
     if (!pipnvp)
     {
         RemoteEncoder *testrec = RemoteRequestRecorder();
-        
+
         if (!testrec || !testrec->IsValidRecorder())
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "PiP failed to locate recorder");
@@ -4004,7 +4004,7 @@ struct pip_info
 
 void TV::SwapPIP(void)
 {
-    if (!pipnvp || !piptvchain || !tvchain) 
+    if (!pipnvp || !piptvchain || !tvchain)
         return;
 
     bool muted = false;
@@ -4158,7 +4158,7 @@ void TV::DoPause(bool showOSD)
     if (!activenvp)
         return; // TODO remove me as part of next mythtv-vid merge 1/08
 
-    if (activerbuffer && 
+    if (activerbuffer &&
         activerbuffer->InDVDMenuOrStillFrame())
     {
         return;
@@ -4171,7 +4171,7 @@ void TV::DoPause(bool showOSD)
     {
         activenvp->Play(normal_speed, true);
     }
-    else 
+    else
     {
         if (doing_ff_rew)
         {
@@ -4179,7 +4179,7 @@ void TV::DoPause(bool showOSD)
             activenvp->Play(normal_speed, true);
             usleep(1000);
         }
-        
+
         activenvp->Pause();
     }
 
@@ -4212,7 +4212,7 @@ bool TV::DoNVPSeek(float time)
 
     bool muted = false;
 
-    AudioOutput *aud = nvp->getAudioOutput(); 
+    AudioOutput *aud = nvp->getAudioOutput();
     if (aud && !aud->GetMute())
     {
         aud->ToggleMute();
@@ -4230,7 +4230,7 @@ bool TV::DoNVPSeek(float time)
     else if (time < 0.0)
         res = activenvp->Rewind(-time);
 
-    if (muted) 
+    if (muted)
         SetMuteTimer(kMuteTimeout);
 
     return res;
@@ -4456,10 +4456,10 @@ void TV::DoSkipCommercials(int direction)
 {
     NormalSpeed();
     StopFFRew();
-    
+
     if (StateIsLiveTV(GetState()))
         return;
-        
+
     bool muted = false;
 
     AudioOutput *aud = nvp->getAudioOutput();
@@ -4483,7 +4483,7 @@ void TV::DoSkipCommercials(int direction)
     if (activenvp)
         activenvp->SkipCommercials(direction);
 
-    if (muted) 
+    if (muted)
         SetMuteTimer(kMuteTimeout);
 }
 
@@ -4515,7 +4515,7 @@ void TV::SwitchSource(uint source_direction)
         {
             // prefer the current card's input in sources list
             if ((sources.find(inputs[i].sourceid) == sources.end()) ||
-                ((cardid == inputs[i].cardid) && 
+                ((cardid == inputs[i].cardid) &&
                  (cardid != sources[inputs[i].sourceid].cardid)))
             {
                 sources[inputs[i].sourceid] = inputs[i];
@@ -4562,7 +4562,7 @@ void TV::SwitchInputs(uint inputid)
 {
     VERBOSE(VB_PLAYBACK, LOC + QString("SwitchInputd(%1)").arg(inputid));
 
-    if ((uint)activerecorder->GetRecorderNumber() == 
+    if ((uint)activerecorder->GetRecorderNumber() ==
         CardUtil::GetCardID(inputid))
     {
         ToggleInputs(inputid);
@@ -4606,9 +4606,9 @@ void TV::SwitchCards(uint chanid, QString channum, uint inputid)
     if (testrec && testrec->IsValidRecorder())
     {
         // pause the decoder first, so we're not reading to close to the end.
-        prbuffer->IgnoreLiveEOF(true); 
-        prbuffer->StopReads(); 
-        nvp->PauseDecoder(); 
+        prbuffer->IgnoreLiveEOF(true);
+        prbuffer->StopReads();
+        nvp->PauseDecoder();
 
         // shutdown stuff
         prbuffer->Pause();
@@ -4844,7 +4844,7 @@ QString TV::GetQueuedChanNum(void) const
  */
 void TV::ClearInputQueues(bool hideosd)
 {
-    if (hideosd && GetOSD()) 
+    if (hideosd && GetOSD())
         GetOSD()->HideSet("channel_number");
 
     QMutexLocker locker(&queuedInputLock);
@@ -4873,7 +4873,7 @@ void TV::AddKeyToInputQueue(char key)
     {
         commitSmart = ProcessSmartChannel(inputStr);
     }
- 
+
     // Handle OSD...
     inputStr = inputStr.isEmpty() ? "?" : inputStr;
     if (ccInputMode)
@@ -4977,7 +4977,7 @@ bool TV::CommitQueuedInput(void)
 {
     bool commited = false;
 
-    VERBOSE(VB_PLAYBACK, LOC + "CommitQueuedInput() " + 
+    VERBOSE(VB_PLAYBACK, LOC + "CommitQueuedInput() " +
             QString("livetv(%1) qchannum(%2) qchanid(%3)")
             .arg(StateIsLiveTV(GetState()))
             .arg(GetQueuedChanNum())
@@ -5229,7 +5229,7 @@ bool TV::ClearOSD(void)
 }
 
 /** \fn TV::ToggleOSD(bool includeStatus)
- *  \brief Cycle through the available Info OSDs. 
+ *  \brief Cycle through the available Info OSDs.
  */
 void TV::ToggleOSD(bool includeStatusOSD)
 {
@@ -5255,7 +5255,7 @@ void TV::ToggleOSD(bool includeStatusOSD)
             UpdateOSDProgInfo("program_info");
     }
     // If small is displaying, show long if we have it, else hide info
-    else if (osd->IsSetDisplaying("program_info_small")) 
+    else if (osd->IsSetDisplaying("program_info_small"))
     {
         if (osd->HasSet("program_info"))
             UpdateOSDProgInfo("program_info");
@@ -5274,7 +5274,7 @@ void TV::ToggleOSD(bool includeStatusOSD)
     }
     // No status desired? Nothing is up, Display small if we have, else display long
     else
-    {   
+    {
         if (osd->HasSet("program_info_small"))
             UpdateOSDProgInfo("program_info_small");
         else
@@ -5571,7 +5571,7 @@ void TV::ShowLCDChannelInfo(void)
     callsign = playbackinfo->chansign;
     pbinfoLock.unlock();
 
-    if ((callsign != lcdCallsign) || (title != lcdTitle) || 
+    if ((callsign != lcdCallsign) || (title != lcdTitle) ||
         (subtitle != lcdSubtitle))
     {
         lcd->switchToChannel(callsign, title, subtitle);
@@ -5599,31 +5599,31 @@ void TV::ShowLCDDVDInfo(void)
     if (lcd == NULL || activerbuffer == NULL || !activerbuffer->isDVD())
         return;
 
-    DVDRingBufferPriv *dvd = activerbuffer->DVD(); 
+    DVDRingBufferPriv *dvd = activerbuffer->DVD();
     QString dvdName, dvdSerial;
-    QString mainStatus, subStatus; 
+    QString mainStatus, subStatus;
 
     if (!dvd->GetNameAndSerialNum(dvdName, dvdSerial))
     {
         dvdName = tr("DVD");
     }
-    if (dvd->IsInMenu()) 
+    if (dvd->IsInMenu())
         mainStatus = tr("Menu");
     else if (dvd->InStillFrame())
         mainStatus = tr("Still Frame");
     else
     {
         QString timeMins, timeHrsMin;
-        int playingTitle, playingPart, totalParts; 
+        int playingTitle, playingPart, totalParts;
 
         dvd->GetPartAndTitle(playingPart, playingTitle);
         totalParts = dvd->NumPartsInTitle();
-        format_time(dvd->GetTotalTimeOfTitle(), timeMins, timeHrsMin); 
+        format_time(dvd->GetTotalTimeOfTitle(), timeMins, timeHrsMin);
 
         mainStatus = tr("Title: %1 (%2)").arg(playingTitle).arg(timeHrsMin);
         subStatus = tr("Chapter: %1/%2").arg(playingPart).arg(totalParts);
     }
-    if ((dvdName != lcdCallsign) || (mainStatus != lcdTitle) || 
+    if ((dvdName != lcdCallsign) || (mainStatus != lcdTitle) ||
                                     (subStatus != lcdSubtitle))
     {
         lcd->switchToChannel(dvdName, mainStatus, subStatus);
@@ -5642,7 +5642,7 @@ void TV::ShowLCDDVDInfo(void)
  */
 void TV::GetNextProgram(RemoteEncoder *enc, int direction,
                         InfoMap &infoMap)
-{ 
+{
     QString title, subtitle, desc, category, endtime, callsign, iconpath;
     QDateTime begts, endts;
 
@@ -5825,17 +5825,17 @@ void TV::DrawUnusedRects(bool sync)
 }
 
 /**
- * \brief Used by EditSchedule(). Unpauses embedded tv based on whether theme 
+ * \brief Used by EditSchedule(). Unpauses embedded tv based on whether theme
     exists and/or if knob to continued playback is enabled
     \returns true if player should be embedded
  */
 bool TV::VideoThemeCheck(QString str, bool stayPaused)
-{   
+{
     if (StateIsLiveTV(GetState()))
         return true;
 
     bool ret = true;
-    bool allowembed = (nvp && nvp->getVideoOutput() && 
+    bool allowembed = (nvp && nvp->getVideoOutput() &&
                     nvp->getVideoOutput()->AllowPreviewEPG());
 
     long long margin = (long long)(nvp->GetFrameRate() *
@@ -5871,12 +5871,12 @@ void TV::doEditSchedule(int editType)
 
     if (!nvp)
         return;
-    
+
     ClearOSD();
 
     // Resize window to the MythTV GUI size
-    if (nvp && nvp->getVideoOutput()) 
-        nvp->getVideoOutput()->ResizeForGui(); 
+    if (nvp && nvp->getVideoOutput())
+        nvp->getVideoOutput()->ResizeForGui();
     MythMainWindow *mwnd = gContext->GetMainWindow();
     bool using_gui_size_for_tv = gContext->GetNumSetting("GuiSizeForTV", 0);
     if (!using_gui_size_for_tv)
@@ -5911,7 +5911,7 @@ void TV::doEditSchedule(int editType)
                 player = this;
             if (StateIsLiveTV(GetState()))
             {
-                changeChannel = GuideGrid::Run(chanid, channum, false, 
+                changeChannel = GuideGrid::Run(chanid, channum, false,
                                             player, allowsecondary);
             }
             else
@@ -5967,8 +5967,8 @@ void TV::doEditSchedule(int editType)
                           player_bounds.width(), player_bounds.height());
         mwnd->setFixedSize(player_bounds.size());
     }
-    if (nvp && nvp->getVideoOutput()) 
-        nvp->getVideoOutput()->ResizeForVideo(); 
+    if (nvp && nvp->getVideoOutput())
+        nvp->getVideoOutput()->ResizeForVideo();
 
     // If user selected a new channel in the EPG, change to that channel
     if (changeChannel.size())
@@ -5999,7 +5999,7 @@ void TV::ChangeVolume(bool up)
 
     if (up)
         aud->AdjustCurrentVolume(2);
-    else 
+    else
         aud->AdjustCurrentVolume(-2);
 
     int curvol = aud->GetCurrentVolume();
@@ -6007,7 +6007,7 @@ void TV::ChangeVolume(bool up)
 
     if (GetOSD() && !browsemode)
     {
-        GetOSD()->ShowStatus(curvol * 10, true, tr("Adjust Volume"), text, 5, 
+        GetOSD()->ShowStatus(curvol * 10, true, tr("Adjust Volume"), text, 5,
                         kOSDFunctionalType_PictureAdjust);
         update_osd_pos = false;
     }
@@ -6056,7 +6056,7 @@ void TV::ChangeTimeStretch(int dir, bool allowEdit)
         else
         {
             int val = (int)(normal_speed*(1000/kTimeStretchMax));
-            GetOSD()->ShowStatus(val, false, tr("Adjust Time Stretch"), text, 
+            GetOSD()->ShowStatus(val, false, tr("Adjust Time Stretch"), text,
                                  10, kOSDFunctionalType_TimeStretchAdjust);
             update_osd_pos = false;
         }
@@ -6075,18 +6075,18 @@ void TV::ChangeAudioSync(int dir, bool allowEdit)
 
     if (dir == 1000000)
     {
-        newval = activenvp->ResyncAudioTimecodeOffset() - 
+        newval = activenvp->ResyncAudioTimecodeOffset() -
                  audiosyncBaseline;
         audiosyncBaseline = activenvp->GetAudioTimecodeOffset();
     }
     else if (dir == -1000000)
     {
-        newval = activenvp->ResetAudioTimecodeOffset() - 
+        newval = activenvp->ResetAudioTimecodeOffset() -
                  audiosyncBaseline;
         audiosyncBaseline = activenvp->GetAudioTimecodeOffset();
     }
     else
-        newval = activenvp->AdjustAudioTimecodeOffset(dir*10) - 
+        newval = activenvp->AdjustAudioTimecodeOffset(dir*10) -
                  audiosyncBaseline;
 
     if (GetOSD() && !browsemode)
@@ -6119,7 +6119,7 @@ void TV::ToggleMute(void)
     {
         aud->ToggleMute();
         bool muted = aud->GetMute();
-        if (muted) 
+        if (muted)
             mute_status = MUTE_BOTH;
         else
             mute_status = MUTE_OFF;
@@ -6135,7 +6135,7 @@ void TV::ToggleMute(void)
        case MUTE_LEFT: text = tr("Left Channel Muted"); break;
        case MUTE_RIGHT: text = tr("Right Channel Muted"); break;
     }
- 
+
     if (GetOSD() && !browsemode)
         GetOSD()->SetSettingsText(text, 5);
 }
@@ -6145,7 +6145,7 @@ void TV::ToggleSleepTimer(void)
     QString text;
 
     // increment sleep index, cycle through
-    if (++sleep_index == sleep_times.size()) 
+    if (++sleep_index == sleep_times.size())
         sleep_index = 0;
 
     // turn sleep timer off
@@ -6289,7 +6289,7 @@ void TV::ChangeChannel(const DBChanList &options)
             // hide the channel number, activated by certain signal monitors
             if (GetOSD())
                 GetOSD()->HideSet("channel_number");
-            
+
             QMutexLocker locker(&queuedInputLock);
             queuedInput   = Q3DeepCopy<QString>(channum);
             queuedChanNum = Q3DeepCopy<QString>(channum);
@@ -6613,9 +6613,9 @@ void TV::BrowseDispInfo(int direction)
     infoMap["dbstarttime"] = browsestarttime;
     infoMap["channum"]     = browsechannum;
     infoMap["chanid"]      = browsechanid;
-    
+
     GetNextProgram(activerecorder, direction, infoMap);
-    
+
     browsechannum = infoMap["channum"];
     browsechanid  = infoMap["chanid"];
 
@@ -6626,9 +6626,9 @@ void TV::BrowseDispInfo(int direction)
     }
 
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
-    ProgramInfo *program_info = 
+    ProgramInfo *program_info =
         ProgramInfo::GetProgramAtDateTime(browsechanid, startts);
-    
+
     if (program_info)
         program_info->ToMap(infoMap);
 
@@ -6662,7 +6662,7 @@ void TV::SetPseudoLiveTV(uint i, const ProgramInfo *pi, PseudoState new_state)
             .arg(old_rec->title).arg(old_rec->chanstr)
             .arg(old_rec->recstartts.toString())
             .arg(old_rec->recendts.toString());
-        VERBOSE(VB_PLAYBACK, LOC + msg);        
+        VERBOSE(VB_PLAYBACK, LOC + msg);
         delete old_rec;
     }
 }
@@ -6675,7 +6675,7 @@ void TV::ToggleRecord(void)
         QDateTime startts = QDateTime::fromString(
             browsestarttime, Qt::ISODate);
 
-        ProgramInfo *program_info = 
+        ProgramInfo *program_info =
             ProgramInfo::GetProgramAtDateTime(browsechanid, startts);
         program_info->ToggleRecord();
         program_info->ToMap(infoMap);
@@ -6829,7 +6829,7 @@ void TV::DoTogglePictureAttribute(PictureAdjustType type)
 
     update_osd_pos = false;
 }
-   
+
 void TV::DoChangePictureAttribute(
     PictureAdjustType type, PictureAttribute attr, bool up)
 {
@@ -7472,7 +7472,7 @@ void TV::ShowOSDTreeMenu(void)
         OSDListTreeType *tree = GetOSD()->ShowTreeMenu("menu", treeMenu);
         if (tree)
         {
-            connect(tree, SIGNAL(itemSelected(OSDListTreeType *,OSDGenericTree *)), 
+            connect(tree, SIGNAL(itemSelected(OSDListTreeType *,OSDGenericTree *)),
                     this, SLOT(TreeMenuSelected(OSDListTreeType *, OSDGenericTree *)));
 
             connect(tree, SIGNAL(itemEntered(OSDListTreeType *, OSDGenericTree *)),
@@ -7551,7 +7551,7 @@ void TV::BuildOSDTreeMenu(void)
         }
     }
 
-    item = new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"), 
+    item = new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"),
                              "TOGGLEMANUALZOOM");
 
     item = new OSDGenericTree(treeMenu, tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");
@@ -7593,7 +7593,7 @@ void TV::BuildOSDTreeMenu(void)
     if (activenvp)
     {
         scan_type = activenvp->GetScanType();
-        scan_type_locked = activenvp->IsScanTypeLocked();        
+        scan_type_locked = activenvp->IsScanTypeLocked();
         if (!scan_type_locked)
         {
             if (kScan_Interlaced == scan_type)
@@ -7621,7 +7621,7 @@ void TV::BuildOSDTreeMenu(void)
     subitem = new OSDGenericTree(
         item, tr("Interlaced (Reversed)"), "SELECTSCAN_2",
         (scan_type == kScan_Intr2ndField) ? 1 : 0, NULL, "SCANGROUP");
-    
+
     // add sleep items to menu
 
     item = new OSDGenericTree(treeMenu, tr("Sleep"), "TOGGLESLEEPON");
@@ -7693,7 +7693,7 @@ void TV::FillMenuLiveTV(OSDGenericTree *treeMenu)
             {
                 // prefer the current card's input in sources list
                 if ((sources.find(inputs[i].sourceid) == sources.end()) ||
-                    ((cardid == inputs[i].cardid) && 
+                    ((cardid == inputs[i].cardid) &&
                      (cardid != sources[inputs[i].sourceid].cardid)))
                 {
                     sources[inputs[i].sourceid] = inputs[i];
@@ -7820,7 +7820,7 @@ void TV::FillMenuPlaying(OSDGenericTree *treeMenu)
 
     item = new OSDGenericTree(treeMenu, tr("Schedule Recordings"));
     subitem = new OSDGenericTree(item, tr("Program Guide"), "GUIDE");
-    subitem = new OSDGenericTree(item, tr("Upcoming Recordings"), 
+    subitem = new OSDGenericTree(item, tr("Upcoming Recordings"),
                                 "VIEWSCHEDULED");
     subitem = new OSDGenericTree(item, tr("Program Finder"), "FINDER");
     subitem = new OSDGenericTree(item, tr("Edit Recording Schedule"),
@@ -7878,7 +7878,7 @@ bool TV::FillMenuTracks(OSDGenericTree *treeMenu, uint type)
     {
         return false;
     }
-    
+
     const QStringList tracks = activenvp->GetTracks(type);
     if (tracks.empty())
         return false;
@@ -8067,7 +8067,7 @@ void TV::ToggleSleepTimer(const QString time)
             sleepTimer.start();
         }
     }
-               
+
     // display OSD
     if (GetOSD() && !browsemode)
     {
@@ -8165,7 +8165,7 @@ QStringList TV::GetValidRecorderList(uint chanid, const QString &channum)
 void TV::ShowNoRecorderDialog(NoRecorderMsg msgType)
 {
     QString errorText;
- 
+
     switch (msgType)
     {
         case kNoRecorders:
@@ -8369,7 +8369,7 @@ bool TV::LoadExternalSubtitles(NuppelVideoPlayer *nvp,
     QString dirName  = ".";
 
     int dirPos = videoFile.findRev(QChar('/'));
-    if (dirPos > 0) 
+    if (dirPos > 0)
     {
         fileName = videoFile.mid(dirPos + 1);
         dirName = videoFile.left(dirPos);
@@ -8377,7 +8377,7 @@ bool TV::LoadExternalSubtitles(NuppelVideoPlayer *nvp,
 
     QString baseName = fileName;
     int suffixPos = fileName.findRev(QChar('.'));
-    if (suffixPos > 0) 
+    if (suffixPos > 0)
         baseName = fileName.left(suffixPos);
 
     // The dir listing does not work if the filename has the following chars,
@@ -8421,7 +8421,7 @@ void TV::DVDJumpBack(void)
 {
     if (!activerbuffer || !activenvp || !activerbuffer->isDVD())
         return;
-               
+
     if (activerbuffer->InDVDMenuOrStillFrame())
         UpdateOSDSeekMessage(tr("Skip Back Not Allowed"),
                                 osd_general_timeout);
@@ -8512,7 +8512,7 @@ bool TV::BookmarkAllowed(void)
  */
 bool TV::DeleteAllowed(void)
 {
-    if (prbuffer->isDVD() || StateIsLiveTV(GetState()) || 
+    if (prbuffer->isDVD() || StateIsLiveTV(GetState()) ||
         (playbackinfo && playbackinfo->isVideo))
         return false;
     return true;
@@ -8525,7 +8525,7 @@ TV::PromptStopWatchingRecording(void)
 
     if (!paused)
         DoPause(false);
-    
+
     dialogboxTimer.restart();
     QString message;
     QString videotype;
@@ -8541,7 +8541,7 @@ TV::PromptStopWatchingRecording(void)
         videotype = "this recording";
 
     message = tr("You are exiting %1").arg(videotype);
-    
+
     if (playbackinfo && BookmarkAllowed())
     {
         options += tr("Save this position and go to the menu");
@@ -8576,7 +8576,7 @@ void TV::PromptDeleteRecording(QString title)
         DoPause(false);
 
     dialogboxTimer.restart();
-    
+
     if (dialogname == "")
     {
         QMap<QString, QString> infoMap;
@@ -8597,9 +8597,9 @@ void TV::PromptDeleteRecording(QString title)
             options += "Yes, delete it";
             options += "No, keep it, I changed my mind";
         }
-        
+
         dialogname = "askdeleterecording";
-        
+
         if (GetOSD())
             GetOSD()->NewDialogBox(dialogname, message, options, 0, 2);
     }
@@ -8609,7 +8609,7 @@ bool TV::IsVideoExitDialog(void)
 {
     if (dialogname == "")
         return false;
-    
+
     return (dialogname == "askdeleterecording" ||
             dialogname == "exitplayoptions");
 }
@@ -8637,7 +8637,7 @@ bool TV::PromptRecGroupPassword(void)
 {
     if (!lastProgram)
         return false;
-  
+
     bool stayPaused = paused;
     if (!paused)
         DoPause(false);
@@ -8680,70 +8680,70 @@ void TV::DoDisplayJumpMenu(void)
     if (treeMenu)
         delete treeMenu;
 
-     treeMenu = new OSDGenericTree(NULL, "treeMenu"); 
-     OSDGenericTree *item, *subitem; 
-   
-     // Build jumpMenu of recorded program titles 
-        ProgramInfo *p; 
-    progLists.clear(); 
-    vector<ProgramInfo *> *infoList; 
-    infoList = RemoteGetRecordedList(false); 
-   
-    //bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0); 
-    if (infoList) 
-    { 
-        pbinfoLock.lock(); 
-        vector<ProgramInfo *>::iterator i = infoList->begin(); 
-        for ( ; i != infoList->end(); i++) 
-        { 
-            p = *i; 
-            //if (p->recgroup != "LiveTV" || LiveTVInAllPrograms) 
-            if (p->recgroup == playbackinfo->recgroup) 
-                progLists[p->title].prepend(p); 
-        } 
-        pbinfoLock.unlock(); 
-  
-        QMap<QString,ProgramList>::Iterator Iprog; 
-        for (Iprog = progLists.begin(); Iprog != progLists.end(); Iprog++) 
-        { 
-            ProgramList plist = Iprog.data(); 
-            int progIndex = plist.count(); 
-            if (progIndex == 1) 
-            {  
-                item = new OSDGenericTree(treeMenu, tr(Iprog.key()), 
-                    QString("JUMPPROG %1 0").arg(Iprog.key())); 
-            }  
-            else  
-            { 
-                item = new OSDGenericTree(treeMenu, tr(Iprog.key())); 
-                for (int i = 0; i < progIndex; i++) 
-                { 
-                    p = plist.at(i); 
-                    if (p->subtitle != "") 
-                        subitem = new OSDGenericTree(item, tr(p->subtitle),  
-                            QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i)); 
-                    else  
-                        subitem = new OSDGenericTree(item, tr(p->title),  
-                            QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i)); 
-                } 
-            } 
-        } 
-    }  
-       
-    if (GetOSD()) 
-    { 
-        ClearOSD(); 
-    
-        OSDListTreeType *tree = GetOSD()->ShowTreeMenu("menu", treeMenu); 
-        if (tree) 
-        { 
-            connect(tree, SIGNAL(itemSelected(OSDListTreeType *,OSDGenericTree *)),  
-                this, SLOT(TreeMenuSelected(OSDListTreeType *, OSDGenericTree *))); 
+     treeMenu = new OSDGenericTree(NULL, "treeMenu");
+     OSDGenericTree *item, *subitem;
 
-            connect(tree, SIGNAL(itemEntered(OSDListTreeType *, OSDGenericTree *)), 
-                this, SLOT(TreeMenuEntered(OSDListTreeType *, OSDGenericTree *))); 
-        } 
-    }  
+     // Build jumpMenu of recorded program titles
+        ProgramInfo *p;
+    progLists.clear();
+    vector<ProgramInfo *> *infoList;
+    infoList = RemoteGetRecordedList(false);
+
+    //bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
+    if (infoList)
+    {
+        pbinfoLock.lock();
+        vector<ProgramInfo *>::iterator i = infoList->begin();
+        for ( ; i != infoList->end(); i++)
+        {
+            p = *i;
+            //if (p->recgroup != "LiveTV" || LiveTVInAllPrograms)
+            if (p->recgroup == playbackinfo->recgroup)
+                progLists[p->title].prepend(p);
+        }
+        pbinfoLock.unlock();
+
+        QMap<QString,ProgramList>::Iterator Iprog;
+        for (Iprog = progLists.begin(); Iprog != progLists.end(); Iprog++)
+        {
+            ProgramList plist = Iprog.data();
+            int progIndex = plist.count();
+            if (progIndex == 1)
+            {
+                item = new OSDGenericTree(treeMenu, tr(Iprog.key()),
+                    QString("JUMPPROG %1 0").arg(Iprog.key()));
+            }
+            else
+            {
+                item = new OSDGenericTree(treeMenu, tr(Iprog.key()));
+                for (int i = 0; i < progIndex; i++)
+                {
+                    p = plist.at(i);
+                    if (p->subtitle != "")
+                        subitem = new OSDGenericTree(item, tr(p->subtitle),
+                            QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i));
+                    else
+                        subitem = new OSDGenericTree(item, tr(p->title),
+                            QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i));
+                }
+            }
+        }
+    }
+
+    if (GetOSD())
+    {
+        ClearOSD();
+
+        OSDListTreeType *tree = GetOSD()->ShowTreeMenu("menu", treeMenu);
+        if (tree)
+        {
+            connect(tree, SIGNAL(itemSelected(OSDListTreeType *,OSDGenericTree *)),
+                this, SLOT(TreeMenuSelected(OSDListTreeType *, OSDGenericTree *)));
+
+            connect(tree, SIGNAL(itemEntered(OSDListTreeType *, OSDGenericTree *)),
+                this, SLOT(TreeMenuEntered(OSDListTreeType *, OSDGenericTree *)));
+        }
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
