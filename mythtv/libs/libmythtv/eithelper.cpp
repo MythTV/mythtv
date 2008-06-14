@@ -695,6 +695,20 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
 
     // United Kingdom
     fix[ 9018U << 16] = EITFixUp::kFixUK;
+    // UK Freesat
+    fix[ 2013LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2041LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2042LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2044LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2045LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2046LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2047LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2048LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2049LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2050LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2051LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2053LL << 32 | 2U << 16] = EITFixUp::kFixUK;
+    fix[ 2054LL << 32 | 2U << 16] = EITFixUp::kFixUK;
 
     // ComHem Sweden
     fix[40999U << 16       ] = EITFixUp::kFixComHem;
