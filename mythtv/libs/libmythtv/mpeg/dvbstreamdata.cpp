@@ -9,6 +9,7 @@ using namespace std;
 #include "eithelper.h"
 
 #define PREMIERE_ONID 133
+#define FREESAT_EIT_PID 3842
 
 // service_id is synonymous with the MPEG program number in the PMT.
 DVBStreamData::DVBStreamData(uint desired_netid,  uint desired_tsid,
@@ -97,7 +98,7 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
         return false;
 
     bool is_eit = false;
-    if (DVB_EIT_PID == pid)
+    if (DVB_EIT_PID == pid || FREESAT_EIT_PID == pid)
     {
         // Standard Now/Next Event Information Tables for this transport
         is_eit |= TableID::PF_EIT  == table_id;
@@ -130,7 +131,7 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
         return SDToSectionSeen(psip.TableIDExtension(), psip.Section());
     }
 
-    if (DVB_EIT_PID == pid)
+    if (DVB_EIT_PID == pid || FREESAT_EIT_PID == pid)
     {
         // Standard Now/Next Event Information Tables for other transport
         is_eit |= TableID::PF_EITo == table_id;
@@ -327,7 +328,7 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
     }
 
-    if ((DVB_EIT_PID == pid || DVB_DNLONG_EIT_PID == pid) &&
+    if ((DVB_EIT_PID == pid || DVB_DNLONG_EIT_PID == pid || FREESAT_EIT_PID == pid) &&
         DVBEventInformationTable::IsEIT(psip.TableID()))
     {
         QMutexLocker locker(&_listener_lock);
@@ -428,6 +429,12 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
         {
             add_pids.push_back(PREMIERE_EIT_SPORT_PID);
         }
+
+        if (find(cur_pids.begin(), cur_pids.end(),
+                 (uint) FREESAT_EIT_PID) == cur_pids.end())
+        {
+            add_pids.push_back(FREESAT_EIT_PID);
+        }
     }
     else
     {
@@ -456,6 +463,12 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
                  (uint) PREMIERE_EIT_SPORT_PID) != cur_pids.end())
         {
             del_pids.push_back(PREMIERE_EIT_SPORT_PID);
+        }
+
+        if (find(cur_pids.begin(), cur_pids.end(),
+                 (uint) FREESAT_EIT_PID) == cur_pids.end())
+        {
+            del_pids.push_back(FREESAT_EIT_PID);
         }
     }
 
