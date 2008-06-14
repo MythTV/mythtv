@@ -56,6 +56,9 @@ void MythImage::Assign(const QPixmap &pix)
 
 void MythImage::Resize(const QSize &newSize)
 {
+    if (size() == newSize)
+        return;
+
     if (m_isGradient)
     {
         *(QImage *)this = QImage(newSize, QImage::Format_ARGB32);
@@ -64,7 +67,7 @@ void MythImage::Resize(const QSize &newSize)
     }
     else
     {
-        Assign(smoothScale(newSize));
+        Assign(scaled(newSize));
     }
 }
 

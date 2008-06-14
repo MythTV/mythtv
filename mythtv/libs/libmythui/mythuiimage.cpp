@@ -73,6 +73,11 @@ void MythUIImage::Init(void)
     m_reflectShear = 0;
     m_reflectScale = m_reflectLength = 100;
     m_reflectAxis = ReflectVertical;
+
+    m_gradient = false;
+    m_gradientStart = QColor("#505050");
+    m_gradientEnd = QColor("#000000");
+    m_gradientAlpha = 100;
 }
 
 void MythUIImage::SetFilename(const QString &filename)
@@ -116,10 +121,9 @@ void MythUIImage::SetImage(MythImage *img)
 
     if (!m_ForceSize.isNull())
     {
-        int w = (m_ForceSize.width() != -1) ? m_ForceSize.width() : img->width();
-        int h = (m_ForceSize.height() != -1) ? m_ForceSize.height() : img->height();
-
-        img->Assign(img->smoothScale(w, h));
+        int w = (m_ForceSize.width() <= 0) ? img->width() : m_ForceSize.width();
+        int h = (m_ForceSize.height() <= 0) ? img->height() : m_ForceSize.height();
+        img->Resize(QSize(w, h));
     }
 
     m_Images.push_back(img);
@@ -131,6 +135,8 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
 {
     Clear();
 
+    QSize aSize = m_Area.size();
+
     QVector<MythImage *>::iterator it;
     for (it = images.begin(); it != images.end(); ++it)
     {
@@ -139,20 +145,47 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
 
         if (!m_ForceSize.isNull())
         {
-            int w = (m_ForceSize.width() != -1) ? m_ForceSize.width() : im->width();
-            int h = (m_ForceSize.height() != -1) ? m_ForceSize.height() : im->height();
+            int w = (m_ForceSize.width() <= 0) ? im->width() : m_ForceSize.width();
+            int h = (m_ForceSize.height() <= 0) ? im->height() : m_ForceSize.height();
 
-            im->Assign(im->smoothScale(w, h));
+            im->Resize(QSize(w, h));
         }
 
         m_Images.push_back(im);
 
-        QSize aSize = m_Area.size();
         aSize = aSize.expandedTo(im->size());
-        SetSize(aSize);
     }
 
+    SetSize(aSize);
+
     m_CurPos = 0;
+}
+
+void MythUIImage::ForceSize(const QSize &size)
+{
+    if (m_ForceSize == size)
+        return;
+
+    m_ForceSize = size;
+
+    if (size.isEmpty())
+        return;
+
+    QSize aSize = m_Area.size();
+
+    QVector<MythImage *>::iterator it;
+    for (it = m_Images.begin(); it != m_Images.end(); ++it)
+    {
+        MythImage *im = (*it);
+
+        int w = (m_ForceSize.width() <= 0) ? im->width() : m_ForceSize.width();
+        int h = (m_ForceSize.height() <= 0) ? im->height() : m_ForceSize.height();
+
+        im->Resize(QSize(w, h));
+        aSize = aSize.expandedTo(im->size());
+    }
+
+    SetSize(aSize);
 }
 
 void MythUIImage::SetSize(int width, int height)
@@ -177,13 +210,29 @@ bool MythUIImage::Load(void)
 
     for (int i = m_LowNum; i <= m_HighNum; i++)
     {
-        MythImage *image = GetMythPainter()->GetFormatImage();
-        QString filename = m_Filename;
-        if (m_HighNum >= 1)
-            filename = QString(m_Filename).arg(i);
+        MythImage *image = NULL;
 
-        if (!image->Load(filename))
-            return false;
+        if (m_gradient)
+        {
+            QSize gradsize;
+            if (!m_Area.isEmpty())
+                gradsize = m_Area.size();
+            else
+                gradsize = QSize(10, 10);
+
+            image = MythImage::Gradient(gradsize, m_gradientStart,
+                                        m_gradientEnd, m_gradientAlpha);
+        }
+        else
+        {
+            image = GetMythPainter()->GetFormatImage();
+            QString filename = m_Filename;
+            if (m_HighNum >= 1)
+                filename = QString(m_Filename).arg(i);
+
+            if (!image->Load(filename))
+                return false;
+        }
 
         if (m_isReflected)
             image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
@@ -194,7 +243,7 @@ bool MythUIImage::Load(void)
             int w = (m_ForceSize.width() != -1) ? m_ForceSize.width() : image->width();
             int h = (m_ForceSize.height() != -1) ? m_ForceSize.height() : image->height();
 
-            image->Assign(image->smoothScale(w, h));
+            image->Resize(QSize(w, h));
         }
 
         QSize aSize = m_Area.size();
@@ -272,6 +321,13 @@ bool MythUIImage::ParseElement(QDomElement &element)
         tmp = element.attribute("high");
         if (!tmp.isEmpty())
             m_HighNum = tmp.toInt();
+    }
+    else if (element.tagName() == "gradient")
+    {
+        m_gradient = true;
+        m_gradientStart = QColor(element.attribute("start", "#505050"));
+        m_gradientEnd = QColor(element.attribute("end", "#000000"));
+        m_gradientAlpha = element.attribute("alpha", "100").toInt();
     }
     else if (element.tagName() == "area")
     {

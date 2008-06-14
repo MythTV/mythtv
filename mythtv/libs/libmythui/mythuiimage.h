@@ -33,6 +33,7 @@ class MythUIImage : public MythUIType
 
     void SetSize(int width, int height);
     void SetSize(const QSize &size);
+    void ForceSize(const QSize &size);
     void SetCropRect(int x, int y, int width, int height);
 
     void Reset(void);
@@ -58,7 +59,7 @@ class MythUIImage : public MythUIType
     QVector<MythImage *> m_Images;
 
     QRect m_cropRect;
-    QSize  m_ForceSize;
+    QSize m_ForceSize;
 
     int m_Delay;
     int m_LowNum;
@@ -74,6 +75,11 @@ class MythUIImage : public MythUIType
     int  m_reflectShear;
     int  m_reflectScale;
     int  m_reflectLength;
+
+    bool m_gradient;
+    QColor m_gradientStart;
+    QColor m_gradientEnd;
+    uint m_gradientAlpha;
 };
 
 #endif
