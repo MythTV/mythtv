@@ -729,7 +729,7 @@ set MINGW='.$dosmingw.'
 set PATH=%QTDIR%\bin;%MINGW%\bin;%PATH%
 set QMAKESPEC=win32-g++
 cd %QTDIR%
-rem goto SMALL
+goto SMALL
 
 rem This would do a full build:
 '.$dosmsys.'bin\yes | configure -plugin-sql-mysql -no-sql-sqlite -debug-and-release -fast -no-sql-odbc -no-qdbus
@@ -740,7 +740,7 @@ goto END
 rem This cuts out the examples and demos:
 '.$dosmsys.'bin\yes | configure -plugin-sql-mysql -no-sql-sqlite -debug-and-release -fast -no-sql-odbc -no-qdbus
 bin\qmake projects.pro
-mingw32-make -j '.($numCPU + 1).' sub-qt3support-make_default-ordered
+mingw32-make -j '.($numCPU + 1).' sub-plugins-make_default-ordered
 
 :END
 ',
