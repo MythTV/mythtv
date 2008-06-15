@@ -165,6 +165,18 @@ static GlobalSpinBox *HDRingbufferSize()
     return bs;
 }
 
+static GlobalCheckBox *DisableAutomaticBackup()
+{
+    GlobalCheckBox *gc = new GlobalCheckBox("DisableAutomaticBackup");
+    gc->setLabel(QObject::tr("Disable Automatic Database Backup"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("This will prevent Myth from backing up the "
+                                "database before upgrades.  If disabled, "
+                                "you should have your own backup strategy "
+                                "in place."));
+    return gc;
+};
+
 static HostCheckBox *DisableFirewireReset()
 {
     HostCheckBox *hc = new HostCheckBox("DisableFirewireReset");
@@ -723,6 +735,7 @@ BackendSettings::BackendSettings() {
     fm->addChild(HDRingbufferSize());
     group2->addChild(fm);
     group2->addChild(MiscStatusScript());
+    group2->addChild(DisableAutomaticBackup());
     group2->addChild(DisableFirewireReset());
     addChild(group2);
 

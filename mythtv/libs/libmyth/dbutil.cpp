@@ -162,6 +162,13 @@ bool DBUtil::IsBackupInProgress(void)
  */
 bool DBUtil::BackupDB(QString &filename)
 {
+    filename = "";
+    if (gContext->GetNumSetting("DisableAutomaticBackup", 0))
+    {
+        VERBOSE(VB_IMPORTANT, "Database backups disabled.  Skipping backup.");
+        return true;
+    }
+
     bool result = false;
     MSqlQuery query(MSqlQuery::InitCon());
 
