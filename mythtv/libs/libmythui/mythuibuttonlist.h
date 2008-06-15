@@ -154,7 +154,6 @@ class MythUIButtonList : public MythUIType
     void SetPositionArrowStates(void);
 
     /* methods for subclasses to override */
-    virtual QRect CalculateContentsRect() const;
     virtual void CalculateVisibleItems(void);
     virtual QPoint GetButtonPosition(int column, int row) const;
 
