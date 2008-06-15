@@ -14,6 +14,7 @@
 #include "mythuitextedit.h"
 #include "mythuiclock.h"
 #include "mythlistbutton.h"
+#include "mythuibuttonlist.h"
 #include "mythuibutton.h"
 #include "mythuispinbox.h"
 #include "mythuicheckbox.h"
@@ -197,6 +198,7 @@ void XMLParseBase::ParseChildren(QDomElement &element,
                      type == "textedit" ||
                      type == "button" ||
                      type == "buttonlist" ||
+                     type == "buttonlist2" ||
                      type == "spinbox" ||
                      type == "checkbox" ||
                      type == "statetype" ||
@@ -273,6 +275,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         uitype = new MythUIButton(parent, name, needInit);
     else if (type == "buttonlist")
         uitype = new MythListButton(parent, name);
+    else if (type == "buttonlist2")
+        uitype = new MythUIButtonList(parent, name);
     else if (type == "spinbox")
         uitype = new MythUISpinBox(parent, name);
     else if (type == "checkbox")
@@ -330,6 +334,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                      info.tagName() == "textedit" ||
                      info.tagName() == "button" ||
                      info.tagName() == "buttonlist" ||
+                     info.tagName() == "buttonlist2" ||
                      info.tagName() == "spinbox" ||
                      info.tagName() == "checkbox" ||
                      info.tagName() == "statetype" ||
@@ -440,6 +445,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                          type == "textedit" ||
                          type == "button" ||
                          type == "buttonlist" ||
+                         type == "buttonlist2" ||
                          type == "spinbox" ||
                          type == "checkbox" ||
                          type == "statetype" ||

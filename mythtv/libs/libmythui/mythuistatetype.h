@@ -47,6 +47,8 @@ class MythUIStateType : public MythUIType
     MythUIType *m_CurrentState;
 
     bool m_ShowEmpty;
+
+  friend class MythUIButtonList;
 };
 
 #endif
