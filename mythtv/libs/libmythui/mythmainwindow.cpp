@@ -769,6 +769,7 @@ void MythMainWindow::attach(QWidget *child)
         currentWidget()->setEnabled(false);
 
     d->widgetList.push_back(child);
+    child->winId();
     child->raise();
     child->setFocus();
 }
