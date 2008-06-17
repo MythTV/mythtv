@@ -169,11 +169,13 @@ int SSDPCacheEntries::RemoveStale( const TaskTime &ttNow )
     nCount = lstKeys.count();
 
     // ----------------------------------------------------------------------
-    // Iterate through list of keys and remove them.  (This avoids issues when
-    // removing from a QMap while iterating it.
+    // Iterate through list of keys and remove them.
+    // (This avoids issues when removing from a QMap while iterating it)
     // ----------------------------------------------------------------------
 
-    for ( QStringList::Iterator it = lstKeys.begin(); it != lstKeys.end(); ++it ) 
+    for ( QStringList::Iterator it = lstKeys.begin();
+                                it != lstKeys.end();
+                              ++it ) 
         Remove( *it );
 
     return nCount;
@@ -360,7 +362,8 @@ void SSDPCache::Remove( const QString &sURI, const QString &sUSN )
 
     Unlock();
 
-    // -=>TODO: Should this only by notifued if we actually had any entry removed?
+    // -=>TODO:
+    // Should this only by notified if we actually had any entry removed?
 
     NotifyRemove( sURI, sUSN );
 }
@@ -407,11 +410,13 @@ int SSDPCache::RemoveStale()
     nCount = lstKeys.count();
 
     // ----------------------------------------------------------------------
-    // Iterate through list of keys and remove them.  (This avoids issues when
-    // removing from a QMap while iterating it.
+    // Iterate through list of keys and remove them.
+    // (This avoids issues when removing from a QMap while iterating it)
     // ----------------------------------------------------------------------
 
-    for ( QStringList::Iterator itKey = lstKeys.begin(); itKey != lstKeys.end(); ++itKey ) 
+    for ( QStringList::Iterator itKey = lstKeys.begin();
+                                itKey != lstKeys.end();
+                              ++itKey ) 
     {
         SSDPCacheEntriesMap::Iterator it = m_cache.find( *itKey );
 
