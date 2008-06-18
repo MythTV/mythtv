@@ -741,6 +741,24 @@ rem This cuts out the examples and demos:
 '.$dosmsys.'bin\yes | configure -plugin-sql-mysql -no-sql-sqlite -debug-and-release -fast -no-sql-odbc -no-qdbus
 bin\qmake projects.pro
 mingw32-make -j '.($numCPU + 1).' sub-plugins-make_default-ordered
+goto END
+
+:NODEBUGSMALL
+rem This cuts out the examples and demos, and only builds release libs
+'.$dosmsys.'bin\yes | configure -plugin-sql-mysql -no-sql-sqlite -release -fast -no-sql-odbc -no-qdbus
+bin\qmake projects.pro
+mingw32-make -j '.($numCPU + 1).' sub-plugins-make_default-ordered
+rem
+rem Since we omit debug libs, this pretends release is debug:
+cd lib
+copy QtCore4.dll     QtCored4.dll
+copy QtXml4.dll      QtXmld4.dll
+copy QtSql4.dll      QtSqld4.dll
+copy QtGui4.dll      QtGuid4.dll
+copy QtNetwork4.dll  QtNetworkd4.dll
+copy QtOpenGL4.dll   QtOpenGLd4.dll
+copy Qt3Support4.dll Qt3Supportd4.dll
+copy libqtmain.a     libqtmaind.a
 
 :END
 ',
@@ -1277,6 +1295,34 @@ comment => 'PLUGINS! make install' ],
 
 # Copy to build area
 #[ newer => [$mythtv.'build/lib/mythtv/plugins/libmythmovies.dll',$msys.'lib/mythtv/plugins/libmythmovies.dll'], shell => [$unixmythtv.'setup_plugins.sh'], comment => 'Copy mythplugins to ./build folder' ],
+
+# Qt3 can't cope with wildcards in the install targets:
+[ always => '',
+  shell  => ['cd '.$unixmythtv.'mythplugins',
+             'cp mythcontrols/mythcontrols/controls-ui.xml'.
+             '   mythcontrols/images/*.png '.
+             '   mythvideo/theme/default/*.xml'.
+             '   mythvideo/theme/default/images/*.png'.
+             '   mythweather/mythweather/weather-ui.xml'.
+             '   mythweather/mythweather/images/*.png'.
+             ' '.$unixbuild.'/share/mythtv/themes/default',
+             'cp mythmovies/mythmovies/theme-wide/*.xml'.
+             '   mythvideo/theme/default-wide/*.xml'.
+             '   mythvideo/theme/default-wide/images/*.png'.
+             '   mythweather/mythweather/theme-wide/weather-ui.xml'.
+             '   mythweather/mythweather/theme-wide/images/*.png'.
+             ' '.$unixbuild.'/share/mythtv/themes/default-wide',
+             'cp mythweather/mythweather/weather_settings.xml'.
+             ' '.$unixbuild.'/share/mythtv',
+             'mkdir -p '.$unixbuild.'/share/mythtv/mythvideo/scripts',
+             'cp mythvideo/mythvideo/scripts/*'.
+             ' '.$unixbuild.'/share/mythtv/mythvideo/scripts',
+             'mkdir -p '.$unixbuild.'/share/mythtv/mythweather/scripts',
+             'cp mythweather/mythweather/weather-screens.xml'.
+             ' '.$unixbuild.'/share/mythtv/mythweather',
+             'cp -pr mythweather/mythweather/scripts/* '.
+             ' '.$unixbuild.'/share/mythtv/mythweather/scripts']
+]
 ;
 }
 
