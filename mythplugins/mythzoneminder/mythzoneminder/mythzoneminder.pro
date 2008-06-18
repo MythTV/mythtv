@@ -14,8 +14,7 @@ HEADERS += zmsettings.h zmclient.h
 SOURCES += main.cpp zmconsole.cpp zmplayer.cpp zmevents.cpp zmliveplayer.cpp 
 SOURCES += zmsettings.cpp zmclient.cpp
 
-macx {
-    QMAKE_LFLAGS += -flat_namespace -undefined suppress
-}
 
 QT += opengl sql xml qt3support
+
+include ( ../../libs-targetfix.pro )

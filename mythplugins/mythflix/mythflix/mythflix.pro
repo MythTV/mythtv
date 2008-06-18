@@ -22,8 +22,8 @@ HEADERS += newsengine.h dbcheck.h flixutil.h
 SOURCES += main.cpp mythflixqueue.cpp mythflix.cpp mythflixconfig.cpp
 SOURCES += newsengine.cpp dbcheck.cpp flixutil.cpp
 
-macx {
-    QMAKE_LFLAGS += -flat_namespace -undefined suppress
-}
+
 #The following line was inserted by qt3to4
 QT += network xml sql opengl qt3support
+
+include ( ../../libs-targetfix.pro )

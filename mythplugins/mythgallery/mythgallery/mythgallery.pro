@@ -41,10 +41,8 @@ opengl {
     DEFINES += USING_OPENGL
 }
 
-macx {
-    QMAKE_LFLAGS += -flat_namespace -undefined suppress
-}
 
-mingw:DEFINES += USING_MINGW
 #The following line was inserted by qt3to4
 QT += network opengl sql xml qt3support 
+
+include ( ../../libs-targetfix.pro )

@@ -14,8 +14,8 @@ HEADERS += action.h actionid.h mythcontrols.h keybindings.h keygrabber.h
 SOURCES += action.cpp actionset.cpp keybindings.cpp mythcontrols.cpp
 SOURCES += keygrabber.cpp main.cpp 
 
-macx {
-    QMAKE_LFLAGS += -flat_namespace -undefined suppress
-}
+
 #The following line was inserted by qt3to4
 QT += sql xml opengl qt3support
+
+include ( ../../libs-targetfix.pro )

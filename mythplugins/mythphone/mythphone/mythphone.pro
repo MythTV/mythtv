@@ -28,3 +28,5 @@ SOURCES += main.cpp webcam.cpp PhoneSettings.cpp phoneui.cpp sipfsm.cpp director
 
 #The following line was inserted by qt3to4
 QT += xml network opengl sql qt3support
+
+include ( ../../libs-targetfix.pro )

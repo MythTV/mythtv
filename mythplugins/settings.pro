@@ -10,6 +10,7 @@ LIBS *= -L$${PREFIX}/lib
 
 isEmpty(TARGET_OS) : win32 {
     CONFIG += mingw
+    DEFINES += USING_MINGW
     LIBS += -L$${PREFIX}/bin -L/bin -lmyth-0.22 -lmythui-0.22 -lmythtv-0.22
     LIBS += -lmythavformat-0.22 -lmythavcodec-0.22 -lmythavutil-0.22
     # Qt4 creates separate compile directories by default. This disables:

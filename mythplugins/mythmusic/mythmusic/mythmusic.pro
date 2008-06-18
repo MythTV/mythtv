@@ -54,24 +54,19 @@ macx {
     SOURCES -= cddecoder.cpp
     SOURCES += cddecoder-darwin.cpp
 
-    LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION -lmythavutil-$$LIBVERSION
-    LIBS += -lmythavcodec-$$LIBVERSION -lmythavformat-$$LIBVERSION
-    LIBS += -lmythupnp-$$LIBVERSION
-
     QT += network
-
-    #QMAKE_LFLAGS += -flat_namespace -undefined suppress
-    QMAKE_LFLAGS += -flat_namespace -undefined error
 }
 
 mingw {
-    DEFINES += USING_MINGW
-
     HEADERS -= cdrip.h   importmusic.h
     SOURCES -= cdrip.cpp importmusic.cpp cddecoder.cpp
     SOURCES += cddecoder-windows.cpp
 
     LIBS += -logg
 }
+
+
 #The following line was inserted by qt3to4
 QT += xml  sql opengl qt3support 
+
+include ( ../../libs-targetfix.pro )
