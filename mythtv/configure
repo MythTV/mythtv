@@ -1160,7 +1160,6 @@ targetos=$(tolower $(uname -s))
 CONFIG_DEFINES=""
 CONFIG_INCLUDEPATH=""
 PROFILEFLAGS=""
-RUNPREFIX=$PREFIX
 audio_alsa="default"
 audio_alsa_libs="-lasound"
 audio_arts="default"
@@ -2871,6 +2870,9 @@ if test x"$libdir" = x""; then
     libdir="${PREFIX}/${libdir_name}"
 fi
 
+if test x"$RUNPREFIX" = x""; then
+    RUNPREFIX=${PREFIX}
+fi
 
 echo "# Basic Settings"
 echo "Compile type              $compile_type"
