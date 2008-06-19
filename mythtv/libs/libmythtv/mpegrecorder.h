@@ -10,7 +10,8 @@
 struct AVFormatContext;
 struct AVPacket;
 
-class MpegRecorder : public DTVRecorder
+class MpegRecorder : public DTVRecorder,
+                     public MPEGSingleProgramStreamListener
 {
   public:
     MpegRecorder(TVRec*);
@@ -39,6 +40,14 @@ class MpegRecorder : public DTVRecorder
     bool Open(void);
     int GetVideoFd(void) { return chanfd; }
 
+    // TS
+    virtual void SetStreamData(MPEGStreamData*);
+    virtual MPEGStreamData *GetStreamData(void) { return _stream_data; }
+
+    // Implements MPEGSingleProgramStreamListener
+    void HandleSingleProgramPAT(ProgramAssociationTable *pat);
+    void HandleSingleProgramPMT(ProgramMapTable *pmt);
+
   private:
     void ProcessData(unsigned char *buffer, int len);
 
@@ -54,9 +63,12 @@ class MpegRecorder : public DTVRecorder
     uint GetFilteredAudioSampleRate(void) const;
     uint GetFilteredAudioLayer(void) const;
     uint GetFilteredAudioBitRate(uint audio_layer) const;
-    void ProcessPSdata(unsigned char *buffer, uint len);
+    void ProcessDataTS(unsigned char *data, uint len, uint &leftover);
+    bool ProcessTSPacket(const TSPacket &tspacket);
 
     void ResetForNewFile(void);
+
+    inline bool CheckCC(uint pid, uint cc);
 
     bool deviceIsMpegFile;
     int bufferSize;
@@ -94,6 +106,28 @@ class MpegRecorder : public DTVRecorder
     static const char *streamType[];
     static const char *aspectRatio[];
     static const unsigned int kBuildBufferMaxSize;
+
+    // TS
+    MPEGStreamData *_stream_data;
+    unsigned char   _stream_id[0x1fff];
+    unsigned char   _pid_status[0x1fff];
+    unsigned char   _continuity_counter[0x1fff];
+    static const unsigned char kPayloadStartSeen = 0x2;
+
+    // Statistics
+    mutable uint        _continuity_error_count;
+    mutable uint        _stream_overflow_count;
+    mutable uint        _bad_packet_count;
 };
+
+inline bool MpegRecorder::CheckCC(uint pid, uint new_cnt)
+{
+    bool ok = ((((_continuity_counter[pid] + 1) & 0xf) == new_cnt) ||
+               (_continuity_counter[pid] == 0xFF));
+
+    _continuity_counter[pid] = new_cnt & 0xf;
+
+    return ok;
+}
 
 #endif

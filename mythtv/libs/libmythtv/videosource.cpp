@@ -716,6 +716,9 @@ class VideoDevice : public PathSetting, public CaptureCardDBStorage
         uint cnt = 0;
 
         QFileInfoList il = dir.entryInfoList();
+        QRegExp *driverExp = NULL;
+        if (!driver.isEmpty())
+            driverExp = new QRegExp(driver);
 
         for( QFileInfoList::iterator it  = il.begin();
                                      it != il.end();
@@ -753,8 +756,8 @@ class VideoDevice : public PathSetting, public CaptureCardDBStorage
             {
                 QString cn, dn;
                 if (CardUtil::GetV4LInfo(videofd, cn, dn) &&
-                    (driver.isEmpty() || (dn == driver))  &&
-                    (card.isEmpty()   || (cn == card)))
+                    (!driverExp     || (driverExp->exactMatch(dn)))  &&
+                    (card.isEmpty() || (cn == card)))
                 {
                     addSelection(filepath);
                     cnt++;
@@ -1417,7 +1420,7 @@ MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent) :
     input(new TunerCardInput(parent))
 {
     VideoDevice *device =
-        new VideoDevice(parent, 0, 15, QString::null, "ivtv");
+        new VideoDevice(parent, 0, 15, QString::null, "(ivtv|hdpvr)");
 
     cardinfo->setLabel(tr("Probed info"));
 

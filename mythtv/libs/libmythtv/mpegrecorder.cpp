@@ -76,7 +76,6 @@ const char* MpegRecorder::aspectRatio[] =
 MpegRecorder::MpegRecorder(TVRec *rec) : DTVRecorder(rec),
     // Debugging variables
     deviceIsMpegFile(false),
-    bufferSize(4096),
     // Driver info
     card(QString::null),      driver(QString::null),
     version(0),               usingv4l2(false),
@@ -95,7 +94,9 @@ MpegRecorder::MpegRecorder(TVRec *rec) : DTVRecorder(rec),
     audbitratel3(10),
     audvolume(80),            language(0),
     // Input file descriptors
-    chanfd(-1),               readfd(-1)
+    chanfd(-1),               readfd(-1),
+    // TS packet handling
+    _stream_data(NULL)                                   
 {
     SetPositionMapType(MARK_GOP_START);
 }
@@ -327,9 +328,19 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
             requires_special_pause =
                 (version >= IVTV_KERNEL_VERSION(0, 10, 0));
         }
+        else if (driver == "hdpvr")
+        {
+            bufferSize = 1500 * TSPacket::SIZE;
+            usingv4l2 = true;
+            requires_special_pause = true;
+
+            bzero(_stream_id,  sizeof(_stream_id));
+            bzero(_pid_status, sizeof(_pid_status));
+            memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
+        }
         else
         {
-            VERBOSE(VB_IMPORTANT, "\n\nNot ivtv driver??\n\n");
+            VERBOSE(VB_IMPORTANT, "\n\nNot ivtv or hdpvr driver??\n\n");
             usingv4l2 = has_v4l2_vbi = true;
             has_buggy_vbi = requires_special_pause = false;
         }
@@ -340,11 +351,14 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
             .arg(usingv4l2).arg(has_v4l2_vbi).arg(has_buggy_vbi));
 
 
-    if (!SetFormat(chanfd))
+    if ((driver != "hdpvr") && !SetFormat(chanfd))
         return false;
 
-    SetLanguageMode(chanfd);        // we don't care if this fails...
-    SetRecordingVolume(chanfd); // we don't care if this fails...
+    if (driver != "hdpvr")
+        SetLanguageMode(chanfd);        // we don't care if this fails...
+
+    if (driver != "hdpvr")
+        SetRecordingVolume(chanfd); // we don't care if this fails...
 
     bool ok = true;
     if (usingv4l2)
@@ -615,82 +629,107 @@ static int streamtype_ivtv_to_v4l2(int st)
     }
 }
 
+void add_ext_ctrl(vector<struct v4l2_ext_control> &ctrl_list,
+                  uint32_t id, int32_t value)
+{
+    struct v4l2_ext_control tmp_ctrl;
+    bzero(&tmp_ctrl, sizeof(struct v4l2_ext_control));
+    tmp_ctrl.id    = id;
+    tmp_ctrl.value = value;
+    ctrl_list.push_back(tmp_ctrl);
+}
+
 bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
 {
-    static const uint kNumControls = 7;
-    struct v4l2_ext_controls ctrls;
-    struct v4l2_ext_control ext_ctrl[kNumControls];
-    QString control_description[kNumControls] =
-    {
-        "Audio Sampling Frequency",
-        "Video Aspect ratio",
-        "Audio Encoding",
-        "Audio L2 Bitrate",
-        "Video Peak Bitrate",
-        "Video Average Bitrate",
-        "MPEG Stream type",
-    };
+    vector<struct v4l2_ext_control> ext_ctrls;
+
+    QMap<uint32_t,QString> control_description;
+    control_description[V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ] =
+        "Audio Sampling Frequency";
+    control_description[V4L2_CID_MPEG_VIDEO_ASPECT] =
+        "Video Aspect ratio";
+    control_description[V4L2_CID_MPEG_AUDIO_ENCODING] =
+        "Audio Encoding";
+    control_description[V4L2_CID_MPEG_AUDIO_L2_BITRATE] =
+        "Audio L2 Bitrate";
+    control_description[V4L2_CID_MPEG_VIDEO_BITRATE_PEAK] =
+        "Video Peak Bitrate";
+    control_description[V4L2_CID_MPEG_VIDEO_BITRATE] =
+        "Video Average Bitrate";
+    control_description[V4L2_CID_MPEG_STREAM_TYPE] =
+        "MPEG Stream type";
 
     // Set controls
-    bzero(&ctrls,    sizeof(struct v4l2_ext_controls));
-    bzero(&ext_ctrl, sizeof(struct v4l2_ext_control) * kNumControls);
-
-    uint audio_layer = GetFilteredAudioLayer();
-    uint audbitrate  = GetFilteredAudioBitRate(audio_layer);
-
-    ext_ctrl[0].id    = V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ;
-    ext_ctrl[0].value = GetFilteredAudioSampleRate();
-
-    ext_ctrl[1].id    = V4L2_CID_MPEG_VIDEO_ASPECT;
-    ext_ctrl[1].value = aspectratio - 1;
-
-    ext_ctrl[2].id    = V4L2_CID_MPEG_AUDIO_ENCODING;
-    ext_ctrl[2].value = audio_layer - 1;
-
-    ext_ctrl[3].id    = V4L2_CID_MPEG_AUDIO_L2_BITRATE;
-    ext_ctrl[3].value = audbitrate - 1;
-
-    ext_ctrl[4].id    = V4L2_CID_MPEG_VIDEO_BITRATE_PEAK;
-    ext_ctrl[4].value = maxbitrate * 1000;
-
-    ext_ctrl[5].id    = V4L2_CID_MPEG_VIDEO_BITRATE;
-    ext_ctrl[5].value = (bitrate = min(bitrate, maxbitrate)) * 1000;
-
-    ext_ctrl[6].id    = V4L2_CID_MPEG_STREAM_TYPE;
-    ext_ctrl[6].value = streamtype_ivtv_to_v4l2(GetFilteredStreamType());
-
-    for (uint i = 0; i < kNumControls; i++)
+    if (driver != "hdpvr")
     {
-        int value = ext_ctrl[i].value;
+        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ,
+                     GetFilteredAudioSampleRate());
+        
+        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_ASPECT,
+                     aspectratio - 1);
+
+        uint audio_layer = GetFilteredAudioLayer();
+        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_ENCODING,
+                     audio_layer - 1);
+        
+        uint audbitrate  = GetFilteredAudioBitRate(audio_layer);
+        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_L2_BITRATE,
+                     audbitrate - 1);
+
+        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_STREAM_TYPE,
+                     streamtype_ivtv_to_v4l2(GetFilteredStreamType()));
+    }
+
+    add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE_PEAK,
+                 maxbitrate * 1000);
+
+    add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE,
+                 (bitrate = min(bitrate, maxbitrate)) * 1000);
+
+    for (uint i = 0; i < ext_ctrls.size(); i++)
+    {
+        struct v4l2_ext_controls ctrls;
+        bzero(&ctrls, sizeof(struct v4l2_ext_controls));
+
+        int value = ext_ctrls[i].value;
 
         ctrls.ctrl_class  = V4L2_CTRL_CLASS_MPEG;
         ctrls.count       = 1;
-        ctrls.controls    = ext_ctrl + i;
-
+        ctrls.controls    = &ext_ctrls[i];
+            
         if (ioctl(chanfd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("Could not set %1 to %2")
-                    .arg(control_description[i]).arg(value) + ENO);
+                    .arg(control_description[ext_ctrls[i].id]).arg(value) + ENO);
         }
     }
 
-    // Get controls
-    ext_ctrl[0].id    = V4L2_CID_MPEG_VIDEO_GOP_SIZE;
-    ext_ctrl[0].value = 0;
-
-    ctrls.ctrl_class  = V4L2_CTRL_CLASS_MPEG;
-    ctrls.count       = 1;
-    ctrls.controls    = ext_ctrl;
-
-    if (ioctl(chanfd, VIDIOC_G_EXT_CTRLS, &ctrls) < 0)
+    if (driver != "hdpvr")
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to get "
-                "V4L2_CID_MPEG_VIDEO_GOP_SIZE, defaulting to 12" + ENO);
-        ext_ctrl[0].value = 12;
-    }
+        // Get GOP size in frames
+        struct v4l2_ext_control ext_ctrl;
+        struct v4l2_ext_controls ctrls;
 
-    _keyframedist = ext_ctrl[0].value;
+        bzero(&ext_ctrl, sizeof(struct v4l2_ext_control));
+        bzero(&ctrls, sizeof(struct v4l2_ext_controls));
+
+        ext_ctrl.id    = V4L2_CID_MPEG_VIDEO_GOP_SIZE;
+        ext_ctrl.value = 0;
+
+        ctrls.ctrl_class  = V4L2_CTRL_CLASS_MPEG;
+        ctrls.count       = 1;
+        ctrls.controls    = &ext_ctrl;
+
+        if (ioctl(chanfd, VIDIOC_G_EXT_CTRLS, &ctrls) < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to get "
+                    "V4L2_CID_MPEG_VIDEO_GOP_SIZE, defaulting to 12" + ENO);
+            ext_ctrl.value = 12;
+        }
+
+        _keyframedist = ext_ctrl.value;
+    }
 
     return true;
 }
@@ -698,6 +737,9 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
 bool MpegRecorder::SetVBIOptions(int chanfd)
 {
     if (!vbimode)
+        return true;
+
+    if (driver == "hdpvr")
         return true;
 
     if (has_buggy_vbi)
@@ -830,7 +872,30 @@ void MpegRecorder::StartRecording(void)
     _last_gop_seen = 0;
     _frames_written_count = 0;
 
-    SetPositionMapType(MARK_GOP_START);
+    if (driver == "hdpvr")
+    {
+        SetPositionMapType(MARK_GOP_BYFRAME);
+
+        if (_stream_data == NULL)
+        {
+            MPEGStreamData *sd = new MPEGStreamData(1, true);
+            sd->Reset();
+            sd->SetRecordingType(_recording_type);
+            SetStreamData(sd);
+        }
+        else
+            _stream_data->Reset(1);
+
+        // Make sure the first things in the file are a PAT & PMT
+        _wait_for_keyframe_option = false;
+        HandleSingleProgramPAT(_stream_data->PATSingleProgram());
+        HandleSingleProgramPMT(_stream_data->PMTSingleProgram());
+        _wait_for_keyframe_option = true;
+    }
+    else
+    {
+        SetPositionMapType(MARK_GOP_START);
+    }
 
     encoding = true;
     recording = true;
@@ -872,40 +937,58 @@ void MpegRecorder::StartRecording(void)
             continue;
         }
 
-        tv.tv_sec = 5;
-        tv.tv_usec = 0;
-        FD_ZERO(&rdset);
-        FD_SET(readfd, &rdset);
+        bool has_select = true;
 
 #if defined(__FreeBSD__)
         // HACK. FreeBSD PVR150/500 driver doesn't currently support select()
+        has_select = false;
 #else
-        switch (select(readfd + 1, &rdset, NULL, NULL, &tv))
-        {
-            case -1:
-                if (errno == EINTR)
-                    continue;
-
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "Select error" + ENO);
-                continue;
-
-            case 0:
-                VERBOSE(VB_IMPORTANT, LOC_ERR + "select timeout - "
-                        "ivtv driver has stopped responding");
-
-                if (close(readfd) != 0)
-                {
-                    VERBOSE(VB_IMPORTANT, LOC_ERR + "Close error" + ENO);
-                }
-
-                readfd = -1; // Force PVR card to be reopened on next iteration
-                continue;
-
-           default: break;
-        }
+        // HACK. Experimental hdpvr driver doesn't currectly support select()
+        if (driver == "hdpvr")
+            has_select = false;
 #endif
 
+        if (has_select)
+        {
+            tv.tv_sec = 5;
+            tv.tv_usec = 0;
+            FD_ZERO(&rdset);
+            FD_SET(readfd, &rdset);
+
+            switch (select(readfd + 1, &rdset, NULL, NULL, &tv))
+            {
+                case -1:
+                    if (errno == EINTR)
+                        continue;
+
+                    VERBOSE(VB_IMPORTANT, LOC_ERR + "Select error" + ENO);
+                    continue;
+
+                case 0:
+                    VERBOSE(VB_IMPORTANT, LOC_ERR + "select timeout - "
+                            "ivtv driver has stopped responding");
+
+                    if (close(readfd) != 0)
+                    {
+                        VERBOSE(VB_IMPORTANT, LOC_ERR + "Close error" + ENO);
+                    }
+
+                    // Force card to be reopened on next iteration..
+                    readfd = -1;
+
+                    continue;
+                
+                default: break;
+            }
+        }
+
         len = read(readfd, &(buffer[remainder]), bufferSize - remainder);
+
+        if (len < 0 && !has_select)
+        {
+            usleep(25 * 1000);
+            continue;
+        }
 
         if ((len == 0) && (deviceIsMpegFile))
         {
@@ -935,7 +1018,10 @@ void MpegRecorder::StartRecording(void)
         {
             len += remainder;
 
-            FindPSKeyFrames(buffer, len);
+            if (driver == "hdpvr")
+                ProcessDataTS(buffer, len, remainder);
+            else
+                FindPSKeyFrames(buffer, len);
         }
     }
 
@@ -943,6 +1029,135 @@ void MpegRecorder::StartRecording(void)
 
     delete[] buffer;
     recording = false;
+}
+
+void MpegRecorder::ProcessDataTS(
+    unsigned char *buffer, uint len, uint &remainder)
+{
+#if 0
+    VERBOSE(VB_RECORD, LOC + QString("idx: %1, end: %2, remainder: %3, len: %4")
+            .arg(TSPacket::SIZE - remainder).arg(end).arg(remainder).arg(len));
+#endif
+
+    for (uint idx = 0; idx < len; )
+    {
+        uint pos, synced_cnt = 0;
+
+        // Find header
+        for (pos = idx; pos < len; ++pos)
+        {
+            if (buffer[pos] == SYNC_BYTE)
+                break;
+        }
+
+        if (pos == len)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "No TS header.");
+            break;
+        }
+
+        if (pos > idx)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("TS packet at %1 not in sync, after %2")
+                    .arg(pos).arg(synced_cnt));
+            synced_cnt = 0;
+        }
+        else
+        {
+            ++synced_cnt;
+        }
+
+        if ((len - pos) < TSPacket::SIZE)
+        {
+            remainder = len - pos;
+            memmove(buffer, &buffer[pos], remainder);
+
+            VERBOSE(VB_RECORD, LOC_ERR +
+                    QString("TS packet at %1 stradles end of buffer.")
+                    .arg(pos) + "\n\t\t\t" +
+                    QString("remainder: %1, idx: %2, pos: %3")
+                    .arg(remainder).arg(idx).arg(pos));
+
+            return;
+        }
+
+        ProcessTSPacket(* reinterpret_cast<const TSPacket *>(buffer + pos));
+
+        // Next packet
+        idx = pos + TSPacket::SIZE;
+    }
+
+    remainder = 0;
+    return;
+}
+
+bool MpegRecorder::ProcessTSPacket(const TSPacket &tspacket)
+{
+    if (!_stream_data)
+    {
+        VERBOSE(VB_RECORD, "ProcessTSPacket: !_stream_data");
+        return false;
+    }
+
+    if (tspacket.TransportError() || tspacket.ScramplingControl())
+        return false;
+
+    if (tspacket.HasAdaptationField())
+        _stream_data->HandleAdaptationFieldControl(&tspacket);
+
+    if (tspacket.HasPayload())
+    {
+        const unsigned int lpid = tspacket.PID();
+
+        // Pass or reject packets based on PID, and parse info from them
+        if (lpid == _stream_data->VideoPIDSingleProgram())
+        {
+            _buffer_packets = !FindH264Keyframes(&tspacket);
+
+            if (!_seen_sps)
+                return true;
+        }
+        else if (_stream_data->IsAudioPID(lpid))
+        {
+            _buffer_packets = !FindAudioKeyframes(&tspacket);
+        }
+        else if (GetStreamData()->IsListeningPID(lpid))
+            GetStreamData()->HandleTSTables(&tspacket);
+        else if (GetStreamData()->IsWritingPID(lpid))
+            BufferedWrite(tspacket);
+
+        const uint pid = tspacket.PID();
+ 
+        // Check continuity counter
+        if ((pid != 0x1fff) && !CheckCC(pid, tspacket.ContinuityCounter()))
+        {
+            VERBOSE(VB_RECORD, LOC +
+                    QString("PID 0x%1 discontinuity detected").arg(pid,0,16));
+            _continuity_error_count++;
+        }
+ 
+        // Sync recording start to first keyframe
+        if (_wait_for_keyframe_option && _first_keyframe < 0)
+            return true;
+ 
+        // Sync streams to the first Payload Unit Start Indicator
+        // _after_ first keyframe iff _wait_for_keyframe_option is true
+        if (!(_pid_status[pid] & kPayloadStartSeen) && tspacket.HasPayload())
+        {
+            if (!tspacket.PayloadStart())
+                return true; // not payload start - drop packet
+
+            VERBOSE(VB_RECORD,
+                    QString("PID 0x%1 Found Payload Start").arg(pid,0,16));
+     
+            _pid_status[pid] |= kPayloadStartSeen;
+        }
+ 
+        BufferedWrite(tspacket);
+    }
+
+    return true;
 }
 
 void MpegRecorder::StopRecording(void)
@@ -953,6 +1168,10 @@ void MpegRecorder::StopRecording(void)
 void MpegRecorder::ResetForNewFile(void)
 {
     DTVRecorder::ResetForNewFile();
+
+    bzero(_stream_id,  sizeof(_stream_id));
+    bzero(_pid_status, sizeof(_pid_status));
+    memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
 }
 
 void MpegRecorder::Reset(void)
@@ -963,7 +1182,10 @@ void MpegRecorder::Reset(void)
     _start_code = 0xffffffff;
 
     if (curRecording)
-        curRecording->ClearPositionMap(MARK_GOP_START);
+    {
+        curRecording->ClearPositionMap(
+            (driver == "hdpvr") ? MARK_GOP_BYFRAME : MARK_GOP_START);
+    }
 }
 
 void MpegRecorder::Pause(bool clear)
@@ -1010,8 +1232,108 @@ bool MpegRecorder::PauseAndWait(int timeout)
                 command.cmd = V4L2_ENC_CMD_START;
                 ioctl(readfd, VIDIOC_ENCODER_CMD, &command);
             }
+
+            if (_stream_data)
+                _stream_data->Reset(_stream_data->DesiredProgram());
         }
         paused = false;
     }
     return paused;
+}
+
+void MpegRecorder::SetStreamData(MPEGStreamData *data)
+{
+    VERBOSE(VB_RECORD, LOC + "SetStreamData("<<data<<") -- begin");
+
+    if (data == _stream_data)
+    {
+        VERBOSE(VB_RECORD, LOC + "SetStreamData("<<data<<") -- end 0");
+
+        return;
+    }
+
+    MPEGStreamData *old_data = _stream_data;
+    _stream_data = data;
+    if (old_data)
+        delete old_data;
+
+    if (data)
+        data->AddMPEGSPListener(this);
+
+    data->SetDesiredProgram(1);
+
+    VERBOSE(VB_RECORD, LOC + "SetStreamData("<<data<<") -- end 1");
+}
+
+void MpegRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
+{
+    if (!pat)
+    {
+        VERBOSE(VB_RECORD, LOC + "HandleSingleProgramPAT(NULL)");
+        return;
+    }
+
+    if (!ringBuffer)
+        return;
+
+//    uint posA[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
+
+    uint next_cc = (pat->tsheader()->ContinuityCounter()+1)&0xf;
+    pat->tsheader()->SetContinuityCounter(next_cc);
+    DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(pat->tsheader())));
+
+//    uint posB[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
+
+#if 0
+    if (posB[0] + posB[1] * TSPacket::SIZE > 
+        posA[0] + posA[1] * TSPacket::SIZE)
+    {
+        VERBOSE(VB_RECORD, LOC + "Wrote PAT @"
+                << posA[0] << " + " << (posA[1] * TSPacket::SIZE));
+    }
+    else
+    {
+        VERBOSE(VB_RECORD, LOC + "Saw PAT but did not write to disk yet");
+    }
+#endif
+}
+
+void MpegRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
+{
+    if (!pmt)
+{
+        return;
+    }
+
+    // collect stream types for H.264 (MPEG-4 AVC) keyframe detection
+    for (uint i = 0; i < pmt->StreamCount(); i++)
+        _stream_id[pmt->StreamPID(i)] = pmt->StreamType(i);
+
+    if (!ringBuffer)
+        return;
+
+    unsigned char buf[8 * 1024];
+    uint next_cc = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
+    pmt->tsheader()->SetContinuityCounter(next_cc);
+    uint size = pmt->WriteAsTSPackets(buf, next_cc);
+
+    uint posA[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
+
+    for (uint i = 0; i < size ; i += TSPacket::SIZE)
+        DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(&buf[i])));
+
+    uint posB[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
+
+#if 1
+    if (posB[0] + posB[1] * TSPacket::SIZE > 
+        posA[0] + posA[1] * TSPacket::SIZE)
+    {
+        VERBOSE(VB_RECORD, LOC + "Wrote PMT @"
+                << posA[0] << " + " << (posA[1] * TSPacket::SIZE));
+    }
+    else
+    {
+        VERBOSE(VB_RECORD, LOC + "Saw PMT but did not write to disk yet");
+    }
+#endif
 }
