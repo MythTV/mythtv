@@ -3,12 +3,14 @@
 #ifndef MPEGRECORDER_H_
 #define MPEGRECORDER_H_
 
-#include "recorderbase.h"
+#include "dtvrecorder.h"
+#include "tspacket.h"
+#include "mpegstreamdata.h"
 
 struct AVFormatContext;
 struct AVPacket;
 
-class MpegRecorder : public RecorderBase
+class MpegRecorder : public DTVRecorder
 {
   public:
     MpegRecorder(TVRec*);
@@ -33,33 +35,26 @@ class MpegRecorder : public RecorderBase
     bool PauseAndWait(int timeout = 100);
 
     bool IsRecording(void) { return recording; }
-    bool IsErrored(void) { return errored; }
-
-    long long GetFramesWritten(void) { return framesWritten; }
 
     bool Open(void);
     int GetVideoFd(void) { return chanfd; }
 
-    long long GetKeyframePosition(long long desired);
-
-    void SetNextRecording(const ProgramInfo*, RingBuffer*);
-
   private:
-    bool SetupRecording(void);
-    void FinishRecording(void);
-    void HandleKeyframe(void);
-
     void ProcessData(unsigned char *buffer, int len);
 
     bool OpenMpegFileAsInput(void);
     bool OpenV4L2DeviceAsInput(void);
     bool SetIVTVDeviceOptions(int chanfd);
     bool SetV4L2DeviceOptions(int chanfd);
+    bool SetFormat(int chanfd);
+    bool SetLanguageMode(int chanfd);
+    bool SetRecordingVolume(int chanfd);
     bool SetVBIOptions(int chanfd);
     uint GetFilteredStreamType(void) const;
     uint GetFilteredAudioSampleRate(void) const;
     uint GetFilteredAudioLayer(void) const;
     uint GetFilteredAudioBitRate(uint audio_layer) const;
+    void ProcessPSdata(unsigned char *buffer, uint len);
 
     void ResetForNewFile(void);
 
@@ -78,13 +73,9 @@ class MpegRecorder : public RecorderBase
     // State
     bool recording;
     bool encoding;
-    bool errored;
 
     // Pausing state
     bool cleartimeonpause;
-
-    // Number of frames written
-    long long framesWritten;
 
     // Encoding info
     int width, height;
@@ -97,18 +88,6 @@ class MpegRecorder : public RecorderBase
     int chanfd;
     int readfd;
 
-    // Keyframe tracking inforamtion
-    int keyframedist;
-    bool gopset;
-    unsigned int leftovers;
-    long long lastpackheaderpos;
-    long long lastseqstart;
-    long long numgops;
-
-    // buffer used for ...
-    unsigned char *buildbuffer;
-    unsigned int buildbuffersize;
-
     static const int   audRateL1[];
     static const int   audRateL2[];
     static const int   audRateL3[];
@@ -116,4 +95,5 @@ class MpegRecorder : public RecorderBase
     static const char *aspectRatio[];
     static const unsigned int kBuildBufferMaxSize;
 };
+
 #endif

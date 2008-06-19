@@ -73,10 +73,7 @@ const char* MpegRecorder::aspectRatio[] =
     "Square", "4:3", "16:9", "2.21:1", 0
 };
 
-const unsigned int MpegRecorder::kBuildBufferMaxSize = 1024 * 1024;
-
-MpegRecorder::MpegRecorder(TVRec *rec) :
-    RecorderBase(rec),
+MpegRecorder::MpegRecorder(TVRec *rec) : DTVRecorder(rec),
     // Debugging variables
     deviceIsMpegFile(false),
     bufferSize(4096),
@@ -87,11 +84,8 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
     requires_special_pause(false),
     // State
     recording(false),         encoding(false),
-    errored(false),
     // Pausing state
     cleartimeonpause(false),
-    // Number of frames written
-    framesWritten(0),
     // Encoding info
     width(720),               height(480),
     bitrate(4500),            maxbitrate(6000),
@@ -101,14 +95,7 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
     audbitratel3(10),
     audvolume(80),            language(0),
     // Input file descriptors
-    chanfd(-1),               readfd(-1),
-    // Keyframe tracking inforamtion
-    keyframedist(15),         gopset(false),
-    leftovers(0),             lastpackheaderpos(0),
-    lastseqstart(0),          numgops(0),
-    // buffer used for ...
-    buildbuffer(new unsigned char[kBuildBufferMaxSize + 1]),
-    buildbuffersize(0)
+    chanfd(-1),               readfd(-1)
 {
     SetPositionMapType(MARK_GOP_START);
 }
@@ -116,7 +103,6 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
 MpegRecorder::~MpegRecorder()
 {
     TeardownAll();
-    delete [] buildbuffer;
 }
 
 void MpegRecorder::TeardownAll(void)
@@ -334,6 +320,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     {
         if (driver == "ivtv")
         {
+            bufferSize    = 4096;
             usingv4l2     = (version >= IVTV_KERNEL_VERSION(0, 8, 0));
             has_v4l2_vbi  = (version >= IVTV_KERNEL_VERSION(0, 3, 8));
             has_buggy_vbi = true;
@@ -352,6 +339,41 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
                                      "has_buggy_vbi(%3)")
             .arg(usingv4l2).arg(has_v4l2_vbi).arg(has_buggy_vbi));
 
+
+    if (!SetFormat(chanfd))
+        return false;
+
+    SetLanguageMode(chanfd);        // we don't care if this fails...
+    SetRecordingVolume(chanfd); // we don't care if this fails...
+
+    bool ok = true;
+    if (usingv4l2)
+        ok = SetV4L2DeviceOptions(chanfd);
+    else
+    {
+        ok = SetIVTVDeviceOptions(chanfd);
+        if (!ok)
+            usingv4l2 = ok = SetV4L2DeviceOptions(chanfd);
+    }
+
+    if (!ok)
+        return false;
+
+    SetVBIOptions(chanfd);
+
+    readfd = open(videodevice.ascii(), O_RDWR | O_NONBLOCK);
+    if (readfd < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't open video device." + ENO);
+        return false;
+    }
+
+    return true;
+}
+
+
+bool MpegRecorder::SetFormat(int chanfd)
+{
     struct v4l2_format vfmt;
     bzero(&vfmt, sizeof(vfmt));
 
@@ -372,14 +394,18 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         return false;
     }
 
-    // Set audio language mode
-    bool do_audmode_set = true;
+    return true;
+}
+
+/// Set audio language mode
+bool MpegRecorder::SetLanguageMode(int chanfd)
+{
     struct v4l2_tuner vt;
     bzero(&vt, sizeof(struct v4l2_tuner));
     if (ioctl(chanfd, VIDIOC_G_TUNER, &vt) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to get audio mode" + ENO);
-        do_audmode_set = false;
+        return false;
     }
 
     switch (language)
@@ -401,18 +427,26 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     }
 
     int audio_layer = GetFilteredAudioLayer();
-    if (do_audmode_set && (2 == language) && (1 == audio_layer))
+    bool success = true;
+    if ((2 == language) && (1 == audio_layer))
     {
         VERBOSE(VB_GENERAL, "Dual audio mode incompatible with Layer I audio."
                 "\n\t\t\tFalling back to Main Language");
         vt.audmode = V4L2_TUNER_MODE_LANG1;
+        success = false;
     }
 
-    if (do_audmode_set && ioctl(chanfd, VIDIOC_S_TUNER, &vt) < 0)
+    if (ioctl(chanfd, VIDIOC_S_TUNER, &vt) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to set audio mode" + ENO);
+        success = false;
     }
 
+    return success;
+}
+
+bool MpegRecorder::SetRecordingVolume(int chanfd)
+{
     // Get volume min/max values
     struct v4l2_queryctrl qctrl;
     qctrl.id = V4L2_CID_AUDIO_VOLUME;
@@ -440,27 +474,6 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "Unable to set recording volume" + ENO + "\n\t\t\t" +
                 "If you are using an AverMedia M179 card this is normal.");
-    }
-
-    bool ok = true;
-    if (usingv4l2)
-        ok = SetV4L2DeviceOptions(chanfd);
-    else
-    {
-        ok = SetIVTVDeviceOptions(chanfd);
-        if (!ok)
-            usingv4l2 = ok = SetV4L2DeviceOptions(chanfd);
-    }
-
-    if (!ok)
-        return false;
-
-    SetVBIOptions(chanfd);
-
-    readfd = open(videodevice.ascii(), O_RDWR | O_NONBLOCK);
-    if (readfd < 0)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't open video device." + ENO);
         return false;
     }
 
@@ -578,7 +591,7 @@ bool MpegRecorder::SetIVTVDeviceOptions(int chanfd)
         return false;
     }
 
-    keyframedist = (ivtvcodec.framerate) ? 12 : keyframedist;
+    _keyframedist = (ivtvcodec.framerate) ? 12 : _keyframedist;
 
     return true;
 }
@@ -677,7 +690,7 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
         ext_ctrl[0].value = 12;
     }
 
-    keyframedist = ext_ctrl[0].value;
+    _keyframedist = ext_ctrl[0].value;
 
     return true;
 }
@@ -809,21 +822,21 @@ void MpegRecorder::StartRecording(void)
 {
     if (!Open())
     {
-	errored = true;
-	return;
+        _error = true;
+        return;
     }
 
-    if (!SetupRecording())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to setup recording.");
-	errored = true;
-	return;
-    }
+    _start_code = 0xffffffff;
+    _last_gop_seen = 0;
+    _frames_written_count = 0;
+
+    SetPositionMapType(MARK_GOP_START);
 
     encoding = true;
     recording = true;
     unsigned char *buffer = new unsigned char[bufferSize + 1];
-    int ret;
+    int len;
+    uint remainder = 0;
 
     MythTimer elapsedTimer;
     float elapsed;
@@ -839,10 +852,10 @@ void MpegRecorder::StartRecording(void)
         if (PauseAndWait(100))
             continue;
 
-        if ((deviceIsMpegFile) && (framesWritten))
+        if ((deviceIsMpegFile) && (GetFramesWritten()))
         {
             elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
-            while ((framesWritten / elapsed) > 30)
+            while ((GetFramesWritten() / elapsed) > 30)
             {
                 usleep(50000);
                 elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
@@ -892,32 +905,37 @@ void MpegRecorder::StartRecording(void)
         }
 #endif
 
-        ret = read(readfd, buffer, bufferSize);
+        len = read(readfd, &(buffer[remainder]), bufferSize - remainder);
 
-        if ((ret == 0) &&
-            (deviceIsMpegFile))
+        if ((len == 0) && (deviceIsMpegFile))
         {
             close(readfd);
             readfd = open(videodevice.ascii(), O_RDONLY);
 
             if (readfd >= 0)
-                ret = read(readfd, buffer, bufferSize);
-            if (ret <= 0)
+            {
+                len = read(readfd,
+                           &(buffer[remainder]), bufferSize - remainder);
+            }
+
+            if (len <= 0)
             {
                 encoding = false;
                 continue;
             }
         }
-        else if (ret < 0 && errno != EAGAIN)
+        else if (len < 0 && errno != EAGAIN)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + QString("error reading from: %1")
                     .arg(videodevice) + ENO);
 
             continue;
         }
-        else if (ret > 0)
+        else if (len > 0)
         {
-            ProcessData(buffer, ret);
+            len += remainder;
+
+            FindPSKeyFrames(buffer, len);
         }
     }
 
@@ -927,112 +945,6 @@ void MpegRecorder::StartRecording(void)
     recording = false;
 }
 
-bool MpegRecorder::SetupRecording(void)
-{
-    leftovers = 0xFFFFFFFF;
-    numgops = 0;
-    lastseqstart = 0;
-    return true;
-}
-
-void MpegRecorder::FinishRecording(void)
-{
-    ringBuffer->WriterFlush();
-
-    if (curRecording)
-    {
-        curRecording->SetFilesize(ringBuffer->GetRealFileSize());
-        SavePositionMap(true);
-    }
-    positionMapLock.lock();
-    positionMap.clear();
-    positionMapDelta.clear();
-    positionMapLock.unlock();
-}
-
-#define PACK_HEADER   0x000001BA
-#define GOP_START     0x000001B8
-#define SEQ_START     0x000001B3
-#define SLICE_MIN     0x00000101
-#define SLICE_MAX     0x000001af
-
-void MpegRecorder::ProcessData(unsigned char *buffer, int len)
-{
-    unsigned char *bufptr = buffer, *bufstart = buffer;
-    unsigned int state = leftovers, v = 0;
-    int leftlen = len;
-
-    while (bufptr < buffer + len)
-    {
-        v = *bufptr++;
-        if (state == 0x000001)
-        {
-            state = ((state << 8) | v) & 0xFFFFFF;
-            
-            if (state == PACK_HEADER)
-            {
-                long long startpos = ringBuffer->GetWritePosition();
-                startpos += buildbuffersize + bufptr - bufstart - 4;
-                lastpackheaderpos = startpos;
-
-                int curpos = bufptr - bufstart - 4;
-                if (curpos < 0)
-                {
-                    // header was split
-                    buildbuffersize += curpos;
-                    if (buildbuffersize > 0)
-                        ringBuffer->Write(buildbuffer, buildbuffersize);
-
-                    buildbuffersize = 4;
-                    memcpy(buildbuffer, &state, 4);
-
-                    leftlen = leftlen - curpos + 4;
-                    bufstart = bufptr;
-                }
-                else
-                {
-                    // header was entirely in this packet
-                    memcpy(buildbuffer + buildbuffersize, bufstart, curpos);
-                    buildbuffersize += curpos;
-                    bufstart += curpos;
-                    leftlen -= curpos;
-
-                    if (buildbuffersize > 0)
-                        ringBuffer->Write(buildbuffer, buildbuffersize);
-
-                    buildbuffersize = 0;
-                }
-            }
-
-            if (state == SEQ_START)
-            {
-                lastseqstart = lastpackheaderpos;
-            }
-
-            if (state == GOP_START && lastseqstart == lastpackheaderpos)
-            {
-                framesWritten = numgops * keyframedist;
-                numgops++;
-                HandleKeyframe();
-            }
-        }
-        else
-            state = ((state << 8) | v) & 0xFFFFFF;
-    }
-
-    leftovers = state;
-
-    if (buildbuffersize + leftlen > kBuildBufferMaxSize)
-    {
-        ringBuffer->Write(buildbuffer, buildbuffersize);
-        buildbuffersize = 0;
-    }
-
-    // copy remaining..
-    memcpy(buildbuffer + buildbuffersize, bufstart, leftlen);
-    buildbuffersize += leftlen;
-}
-
 void MpegRecorder::StopRecording(void)
 {
     encoding = false;
@@ -1040,21 +952,15 @@ void MpegRecorder::StopRecording(void)
 
 void MpegRecorder::ResetForNewFile(void)
 {
-    errored = false;
-    framesWritten = 0;
-    numgops = 0;
-    lastseqstart = lastpackheaderpos = 0;
-
-    positionMap.clear();
-    positionMapDelta.clear();
+    DTVRecorder::ResetForNewFile();
 }
 
 void MpegRecorder::Reset(void)
 {
+    VERBOSE(VB_RECORD, LOC + "Reset(void)");
     ResetForNewFile();
 
-    leftovers = 0xFFFFFFFF;
-    buildbuffersize = 0;
+    _start_code = 0xffffffff;
 
     if (curRecording)
         curRecording->ClearPositionMap(MARK_GOP_START);
@@ -1109,53 +1015,3 @@ bool MpegRecorder::PauseAndWait(int timeout)
     }
     return paused;
 }
-
-long long MpegRecorder::GetKeyframePosition(long long desired)
-{
-    QMutexLocker locker(&positionMapLock);
-    long long ret = -1;
-
-    if (positionMap.find(desired) != positionMap.end())
-        ret = positionMap[desired];
-
-    return ret;
-}
-
-// documented in recorderbase.h
-void MpegRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
-{
-    // First we do some of the time consuming stuff we can do now
-    SavePositionMap(true);
-    ringBuffer->WriterFlush();
-	if (curRecording)
-        curRecording->SetFilesize(ringBuffer->GetRealFileSize());
-
-    // Then we set the next info
-    {
-        QMutexLocker locker(&nextRingBufferLock);
-        nextRecording = NULL;
-        if (progInf)
-            nextRecording = new ProgramInfo(*progInf);
-        nextRingBuffer = rb;
-    }
-}
-
-/** \fn MpegRecorder::HandleKeyframe(void)
- *  \brief This save the current frame to the position maps
- *         and handles ringbuffer switching.
- */
-void MpegRecorder::HandleKeyframe(void)
-{
-    // Add key frame to position map
-    positionMapLock.lock();
-    if (!positionMap.contains(numgops))
-    {
-        positionMapDelta[numgops] = lastpackheaderpos;
-        positionMap[numgops]      = lastpackheaderpos;
-    }
-    positionMapLock.unlock();
-
-    // Perform ringbuffer switch if needed.
-    CheckForRingBufferSwitch();
-}
-
