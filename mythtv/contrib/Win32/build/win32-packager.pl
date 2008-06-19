@@ -1297,7 +1297,7 @@ comment => 'PLUGINS! make install' ],
 #[ newer => [$mythtv.'build/lib/mythtv/plugins/libmythmovies.dll',$msys.'lib/mythtv/plugins/libmythmovies.dll'], shell => [$unixmythtv.'setup_plugins.sh'], comment => 'Copy mythplugins to ./build folder' ],
 
 # Qt3 can't cope with wildcards in the install targets:
-[ always => '',
+[ file   => $build.'/share/mythtv/videomenu.xml',
   shell  => ['cd '.$unixmythtv.'mythplugins',
              'cp mythcontrols/mythcontrols/controls-ui.xml'.
              '   mythcontrols/images/*.png '.
@@ -1313,6 +1313,7 @@ comment => 'PLUGINS! make install' ],
              '   mythweather/mythweather/theme-wide/images/*.png'.
              ' '.$unixbuild.'/share/mythtv/themes/default-wide',
              'cp mythweather/mythweather/weather_settings.xml'.
+             '   mythvideo/theme/menus/*.xml'.
              ' '.$unixbuild.'/share/mythtv',
              'mkdir -p '.$unixbuild.'/share/mythtv/mythvideo/scripts',
              'cp mythvideo/mythvideo/scripts/*'.
