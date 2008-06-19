@@ -3,8 +3,14 @@
 
 #include <limits.h>
 
+#include <Q3DeepCopy>
+
 #include "atscdescriptors.h"
 #include "dvbdescriptors.h"
+
+QMutex                RegistrationDescriptor::description_map_lock;
+bool                  RegistrationDescriptor::description_map_initialized = false;
+QMap<QString,QString> RegistrationDescriptor::description_map;
 
 desc_list_t MPEGDescriptor::Parse(
     const unsigned char* data, uint len)
@@ -448,19 +454,86 @@ QString MPEGDescriptor::toString() const
     return str;
 }
 
+void RegistrationDescriptor::InitializeDescriptionMap(void)
+{
+    QMutexLocker locker(&description_map_lock);
+    if (description_map_initialized)
+        return;
+
+    description_map["AC-3"] = "ATSC audio stream A/52";
+    description_map["AVSV"] = "China A/V Working Group";
+    description_map["BDC0"] = "Broadcast Data Corporation Software Data Service";
+    description_map["BSSD"] = "SMPTE 302M-1998 Audio data as specified in (AES3)";
+    description_map["CAPO"] = "SMPTE 315M-1999 Camera Positioning Information";
+    description_map["CUEI"] = "SCTE 35 2003, Cable Digital Program Insertion Cueing Message";
+    description_map["DDED"] = "LGEUS Digital Delivery with encryption and decryption";
+    description_map["DISH"] = "EchoStar MPEG streams";
+    description_map["DRA1"] = "Chinese EIS SJ/T11368-2006 DRA digital audio";
+    description_map["DTS1"] = "DTS Frame size of 512 bytes";
+    description_map["DTS2"] = "DTS Frame size of 1024 bytes";
+    description_map["DTS3"] = "DTS Frame size of 2048";
+    description_map["DVDF"] = "DVD compatible MPEG2-TS";
+    description_map["ETV1"] = "CableLabs ETV info is present";
+    description_map["GA94"] = "ATSC program ID A/53";
+    description_map["GWKS"] = "GuideWorks EPG info";
+    description_map["HDMV"] = "Blu-Ray A/V for read-only media (H.264 TS)";
+    description_map["HDMX"] = "Matsushita-TS";
+    description_map["KLVA"] = "SMPTE RP 217-2001 MXF KLV packets present";
+    description_map["LU-A"] = "SMPTE RDD-11 HDSDI HD serial/video data";
+    description_map["MTRM"] = "D-VHS compatible MPEG2-TS";
+    description_map["NMR1"] = "Nielsen content identifier";
+    description_map["PAUX"] = "Philips ES containing low-speed data";
+    description_map["PMSF"] = "MPEG-TS stream modified by STB";
+    description_map["PRMC"] = "Philips ES containing remote control data";
+    description_map["SCTE"] = "SCTE 54 2003 Digital Video Service Multiplex and TS for Cable";
+    description_map["SEN1"] = "ATSC Private Information identifies source of stream";
+    description_map["SESF"] = "Blu-Ray A/V for ReWritable media (H.264 TS)";
+    description_map["SPLC"] = "SMPTE Proposed 312M Splice Point compatible TS";
+    description_map["SVMD"] = "SMPTE Proposed Video Metatdata Dictionary for MPEG2-TS";
+    description_map["SZMI"] = "ATSC Private Info from Building B";
+    description_map["TRIV"] = "ATSC Private Info from Triveni Digital";
+    description_map["TSBV"] = "Toshiba self-encoded H.264 TS";
+    description_map["TSHV"] = "Sony self-encoded MPEG-TS and private data";
+    description_map["TSMV"] = "Sony self-encoded MPEG-TS and private data";
+    description_map["TVG1"] = "TV Guide EPG Data";
+    description_map["TVG2"] = "TV Guide EPG Data";
+    description_map["TVG3"] = "TV Guide EPG Data";
+    description_map["ULE1"] = "IETF RFC4326 compatible MPEG2-TS";
+    description_map["VC-1"] = "SMPTE Draft RP 227 VC-1 Bitstream Transport Encodings";
+
+    for (uint i = 0; i <= 99; i++)
+    {
+        description_map[QString("US%1").arg(i, 2, QLatin1Char('0'))] =
+            "NIMA, Unspecified military application";
+    }
+
+    description_map_initialized = true;
+}
+
+QString RegistrationDescriptor::GetDescription(const QString &fmt)
+{
+    InitializeDescriptionMap();
+
+    QString ret = QString::null;
+    {
+        QMutexLocker locker(&description_map_lock);
+        QMap<QString,QString>::const_iterator it = description_map.find(fmt);
+        if (it != description_map.end())
+            ret = Q3DeepCopy<QString>(*it);
+    }
+
+    return ret;
+}
+
 QString RegistrationDescriptor::toString() const
 {
     QString fmt = FormatIdentifierString();
     QString msg = QString("Registration Descriptor: '%1' ").arg(fmt);
-    QString msg2 = "Unknown";
-    if (fmt == "CUEI")
-        msg2 = "SCTE 35 2003, Cable Digital Program Insertion Cueing Message";
-    else if (fmt == "AC-3")
-        msg2 = "ATSC audio stream A/52";
-    else if (fmt == "GA94")
-        msg2 = "ATSC program ID A/53";
-    else
-        msg2 = "Unknown, see http://www.smpte-ra.org/mpegreg.html";
+
+    QString msg2 = GetDescription(fmt);
+    if (msg2.isEmpty())
+        msg2 = "Unknown, see http://www.smpte-ra.org/mpegreg/mpegreg.html";
+
     return msg + msg2;
 }
 

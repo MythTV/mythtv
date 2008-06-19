@@ -3,7 +3,18 @@
 #ifndef _MPEG_DESCRIPTORS_H_
 #define _MPEG_DESCRIPTORS_H_
 
+// ANSI C headers
 #include <cassert>
+
+// C++ headers
+#include <vector>
+using namespace std;
+
+// Qt headers
+#include <QMutex>
+#include <QString>
+
+// MythTV
 #include "iso639.h"
 
 typedef vector<const unsigned char*> desc_list_t;
@@ -188,6 +199,15 @@ class RegistrationDescriptor : public MPEGDescriptor
             QChar(_data[4]) + QChar(_data[5]);
     }
     QString toString() const;
+
+  private:
+    static void InitializeDescriptionMap(void);
+    static QString GetDescription(const QString &fmt);
+
+  private:
+    static QMutex                description_map_lock;
+    static bool                  description_map_initialized;
+    static QMap<QString,QString> description_map;
 };
 
 class ConditionalAccessDescriptor : public MPEGDescriptor
