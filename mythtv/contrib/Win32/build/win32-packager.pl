@@ -1275,7 +1275,7 @@ comment => 'do we already have a Makefile for myth plugins?' ],
 comment => 'hack mythconfig.mak'],
 
 ## make
-[ newer => [$mythtv.'mythplugins/mythmovies/mythmovies/mythmovies.dll',
+[ newer => [$mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll',
             $mythtv.'mythtv/last_build.txt'], 
   shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
             'cd '.$unixmythtv.'mythplugins', $parallelMake], 
@@ -1287,8 +1287,8 @@ comment => 'PLUGINS! redo make if we need to (see the  last_build.txt identifier
 comment => 'make cleanup.pro'],
 
 ## make install
-[ newer => [$mythtv.'build/lib/mythtv/plugins/mythmovies.dll',
-            $mythtv.'mythplugins/mythmovies/mythmovies/mythmovies.dll'],
+[ newer => [$mythtv.'build/lib/mythtv/plugins/libmythmovies.dll',
+            $mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll'],
   shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
             'cd '.$unixmythtv.'mythplugins','make install'],
 comment => 'PLUGINS! make install' ],
