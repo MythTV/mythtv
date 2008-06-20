@@ -944,10 +944,6 @@ void MpegRecorder::StartRecording(void)
 #if defined(__FreeBSD__)
         // HACK. FreeBSD PVR150/500 driver doesn't currently support select()
         has_select = false;
-#else
-        // HACK. Experimental hdpvr driver doesn't currectly support select()
-        if (driver == "hdpvr")
-            has_select = false;
 #endif
 
         if (has_select)
