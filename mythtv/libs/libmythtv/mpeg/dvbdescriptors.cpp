@@ -1,5 +1,6 @@
 #include "dvbdescriptors.h"
 #include "iso6937tables.h"
+#include "freesat_huffman.h"
 
 #include <unistd.h>
 #include <qtextcodec.h>
@@ -69,6 +70,9 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
 {
     if (!raw_length)
         return "";
+
+    if (src[0] == 0x1f)
+        return freesat_huffman_to_string(src, raw_length);
 
     if ((0x10 < src[0]) && (src[0] < 0x20))
     {
