@@ -1017,16 +1017,19 @@ foreach my $target ( @targets )
 
   if ( $target eq "MythFrontend" )
   {
-     my $mtd = "$PREFIX/bin/mtd";
-     if ( -e $mtd )
-     {
-       &Verbose("Installing $mtd into $target");
-       &Syscall([ 'cp', $mtd, "$finalTarget/Contents/MacOS" ]) or die;
+    foreach my $extra ( 'ignyte', 'mtd' )
+    {
+      if ( -e "$PREFIX/bin/$extra" )
+      {
+        &Verbose("Installing $extra into $target");
+        &Syscall([ 'cp', "$PREFIX/bin/$extra",
+                   "$finalTarget/Contents/MacOS" ]) or die;
 
-       &Verbose("Updating lib paths of $finalTarget/Contents/MacOS/mtd");
-       &Syscall([ @bundler, "$finalTarget/Contents/MacOS/mtd" ]) or die;
-       &AddFakeBinDir($finalTarget);
-     }
+        &Verbose("Updating lib paths of $finalTarget/Contents/MacOS/$extra");
+        &Syscall([ @bundler, "$finalTarget/Contents/MacOS/$extra" ]) or die;
+        &AddFakeBinDir($finalTarget);
+      }
+    }
   }
 }
 
