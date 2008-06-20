@@ -375,10 +375,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
     SetVBIOptions(chanfd);
 
-    if (driver == "hdpvr")
-        readfd = open(videodevice.ascii(), O_RDWR);
-    else
-        readfd = open(videodevice.ascii(), O_RDWR | O_NONBLOCK);
+    readfd = open(videodevice.ascii(), O_RDWR | O_NONBLOCK);
 
     if (readfd < 0)
     {
@@ -1016,8 +1013,14 @@ void MpegRecorder::StartRecording(void)
         {
             len += remainder;
 
-            if (driver == "hdpvr")
+            if (driver == "hdpvr") {
                 remainder = _stream_data->ProcessData(buffer, len);
+                int start_remain = len - remainder;
+                if (start_remain >= remainder)
+                    memcpy(buffer, buffer+start_remain, remainder);
+                else
+                    memmove(buffer, buffer+start_remain, remainder);
+            }
             else
                 FindPSKeyFrames(buffer, len);
         }
