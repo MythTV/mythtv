@@ -375,7 +375,11 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
     SetVBIOptions(chanfd);
 
-    readfd = open(videodevice.ascii(), O_RDWR | O_NONBLOCK);
+    if (driver == "hdpvr")
+        readfd = open(videodevice.ascii(), O_RDWR);
+    else
+        readfd = open(videodevice.ascii(), O_RDWR | O_NONBLOCK);
+
     if (readfd < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't open video device." + ENO);
@@ -876,15 +880,13 @@ void MpegRecorder::StartRecording(void)
     {
         SetPositionMapType(MARK_GOP_BYFRAME);
 
-        if (_stream_data == NULL)
-        {
-            MPEGStreamData *sd = new MPEGStreamData(1, true);
-            sd->Reset();
-            sd->SetRecordingType(_recording_type);
-            SetStreamData(sd);
-        }
-        else
-            _stream_data->Reset(1);
+        int progNum = 1;
+        MPEGStreamData *sd = new MPEGStreamData(progNum, true);
+        sd->SetRecordingType(_recording_type);
+        SetStreamData(sd);
+
+        _stream_data->AddAVListener(this);
+        _stream_data->AddWritingListener(this);
 
         // Make sure the first things in the file are a PAT & PMT
         _wait_for_keyframe_option = false;
@@ -1019,7 +1021,7 @@ void MpegRecorder::StartRecording(void)
             len += remainder;
 
             if (driver == "hdpvr")
-                ProcessDataTS(buffer, len, remainder);
+                remainder = _stream_data->ProcessData(buffer, len);
             else
                 FindPSKeyFrames(buffer, len);
         }
@@ -1028,134 +1030,95 @@ void MpegRecorder::StartRecording(void)
     FinishRecording();
 
     delete[] buffer;
+    SetStreamData(NULL);
     recording = false;
 }
 
-void MpegRecorder::ProcessDataTS(
-    unsigned char *buffer, uint len, uint &remainder)
+bool MpegRecorder::ProcessTSPacket(const TSPacket &tspacket_real)
 {
-#if 0
-    VERBOSE(VB_RECORD, LOC + QString("idx: %1, end: %2, remainder: %3, len: %4")
-            .arg(TSPacket::SIZE - remainder).arg(end).arg(remainder).arg(len));
-#endif
+    const uint pid = tspacket_real.PID();
 
-    for (uint idx = 0; idx < len; )
+    TSPacket *tspacket_fake = NULL;
+    if ((driver == "hdpvr") && (pid == 0x1001)) // PCRPID for HD-PVR
     {
-        uint pos, synced_cnt = 0;
-
-        // Find header
-        for (pos = idx; pos < len; ++pos)
-        {
-            if (buffer[pos] == SYNC_BYTE)
-                break;
-        }
-
-        if (pos == len)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "No TS header.");
-            break;
-        }
-
-        if (pos > idx)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("TS packet at %1 not in sync, after %2")
-                    .arg(pos).arg(synced_cnt));
-            synced_cnt = 0;
-        }
-        else
-        {
-            ++synced_cnt;
-        }
-
-        if ((len - pos) < TSPacket::SIZE)
-        {
-            remainder = len - pos;
-            memmove(buffer, &buffer[pos], remainder);
-
-            VERBOSE(VB_RECORD, LOC_ERR +
-                    QString("TS packet at %1 stradles end of buffer.")
-                    .arg(pos) + "\n\t\t\t" +
-                    QString("remainder: %1, idx: %2, pos: %3")
-                    .arg(remainder).arg(idx).arg(pos));
-
-            return;
-        }
-
-        ProcessTSPacket(* reinterpret_cast<const TSPacket *>(buffer + pos));
-
-        // Next packet
-        idx = pos + TSPacket::SIZE;
+        tspacket_fake = tspacket_real.CreateClone();
+        uint cc = (_continuity_counter[pid] == 0xFF) ?
+            0 : (_continuity_counter[pid] + 1) & 0xf;
+        tspacket_fake->SetContinuityCounter(cc);
     }
 
-    remainder = 0;
-    return;
+    const TSPacket *tspacket = (tspacket_fake) ?
+        tspacket_fake : &tspacket_real;
+
+    // Check continuity counter
+    if ((pid != 0x1fff) && !CheckCC(pid, tspacket->ContinuityCounter()))
+    {
+        VERBOSE(VB_RECORD, LOC +
+                QString("PID 0x%1 discontinuity detected").arg(pid,0,16));
+        _continuity_error_count++;
+    }
+
+    // Only write the packet
+    // if audio/video key-frames have been found
+    if (_wait_for_keyframe_option && _first_keyframe < 0)
+        return true;
+    
+    _buffer_packets = true;
+
+    BufferedWrite(*tspacket);
+
+    if (tspacket_fake)
+        delete tspacket_fake;
+
+    return true;
 }
 
-bool MpegRecorder::ProcessTSPacket(const TSPacket &tspacket)
+bool MpegRecorder::ProcessVideoTSPacket(const TSPacket &tspacket)
 {
-    if (!_stream_data)
+    _buffer_packets = !FindH264Keyframes(&tspacket);
+    if (!_seen_sps)
+        return true;
+
+    return ProcessAVTSPacket(tspacket);
+}
+
+bool MpegRecorder::ProcessAudioTSPacket(const TSPacket &tspacket)
+{
+    _buffer_packets = !FindAudioKeyframes(&tspacket);
+    return ProcessAVTSPacket(tspacket);
+}
+
+/// Common code for processing either audio or video packets
+bool MpegRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
+{
+    const uint pid = tspacket.PID();
+
+    // Check continuity counter
+    if ((pid != 0x1fff) && !CheckCC(pid, tspacket.ContinuityCounter()))
     {
-        VERBOSE(VB_RECORD, "ProcessTSPacket: !_stream_data");
-        return false;
+        VERBOSE(VB_RECORD, LOC +
+                QString("PID 0x%1 discontinuity detected").arg(pid,0,16));
+        _continuity_error_count++;
     }
 
-    if (tspacket.TransportError() || tspacket.ScramplingControl())
-        return false;
+    // Sync recording start to first keyframe
+    if (_wait_for_keyframe_option && _first_keyframe < 0)
+        return true;
 
-    if (tspacket.HasAdaptationField())
-        _stream_data->HandleAdaptationFieldControl(&tspacket);
-
-    if (tspacket.HasPayload())
+    // Sync streams to the first Payload Unit Start Indicator
+    // _after_ first keyframe iff _wait_for_keyframe_option is true
+    if (!(_pid_status[pid] & kPayloadStartSeen) && tspacket.HasPayload())
     {
-        const unsigned int lpid = tspacket.PID();
+        if (!tspacket.PayloadStart())
+            return true; // not payload start - drop packet
 
-        // Pass or reject packets based on PID, and parse info from them
-        if (lpid == _stream_data->VideoPIDSingleProgram())
-        {
-            _buffer_packets = !FindH264Keyframes(&tspacket);
+        VERBOSE(VB_RECORD,
+                QString("PID 0x%1 Found Payload Start").arg(pid,0,16));
 
-            if (!_seen_sps)
-                return true;
-        }
-        else if (_stream_data->IsAudioPID(lpid))
-        {
-            _buffer_packets = !FindAudioKeyframes(&tspacket);
-        }
-        else if (GetStreamData()->IsListeningPID(lpid))
-            GetStreamData()->HandleTSTables(&tspacket);
-        else if (GetStreamData()->IsWritingPID(lpid))
-            BufferedWrite(tspacket);
-
-        const uint pid = tspacket.PID();
- 
-        // Check continuity counter
-        if ((pid != 0x1fff) && !CheckCC(pid, tspacket.ContinuityCounter()))
-        {
-            VERBOSE(VB_RECORD, LOC +
-                    QString("PID 0x%1 discontinuity detected").arg(pid,0,16));
-            _continuity_error_count++;
-        }
- 
-        // Sync recording start to first keyframe
-        if (_wait_for_keyframe_option && _first_keyframe < 0)
-            return true;
- 
-        // Sync streams to the first Payload Unit Start Indicator
-        // _after_ first keyframe iff _wait_for_keyframe_option is true
-        if (!(_pid_status[pid] & kPayloadStartSeen) && tspacket.HasPayload())
-        {
-            if (!tspacket.PayloadStart())
-                return true; // not payload start - drop packet
-
-            VERBOSE(VB_RECORD,
-                    QString("PID 0x%1 Found Payload Start").arg(pid,0,16));
-     
-            _pid_status[pid] |= kPayloadStartSeen;
-        }
- 
-        BufferedWrite(tspacket);
+        _pid_status[pid] |= kPayloadStartSeen;
     }
+
+    BufferedWrite(tspacket);
 
     return true;
 }
@@ -1186,6 +1149,8 @@ void MpegRecorder::Reset(void)
         curRecording->ClearPositionMap(
             (driver == "hdpvr") ? MARK_GOP_BYFRAME : MARK_GOP_START);
     }
+    if (_stream_data)
+        _stream_data->Reset(_stream_data->DesiredProgram());
 }
 
 void MpegRecorder::Pause(bool clear)

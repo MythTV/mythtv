@@ -11,7 +11,9 @@ struct AVFormatContext;
 struct AVPacket;
 
 class MpegRecorder : public DTVRecorder,
-                     public MPEGSingleProgramStreamListener
+                     public MPEGSingleProgramStreamListener,
+                     public TSPacketListener,
+                     public TSPacketListenerAV
 {
   public:
     MpegRecorder(TVRec*);
@@ -44,13 +46,19 @@ class MpegRecorder : public DTVRecorder,
     virtual void SetStreamData(MPEGStreamData*);
     virtual MPEGStreamData *GetStreamData(void) { return _stream_data; }
 
+    // TSPacketListener
+    bool ProcessTSPacket(const TSPacket &tspacket);
+
+    // TSPacketListenerAV
+    bool ProcessVideoTSPacket(const TSPacket &tspacket);
+    bool ProcessAudioTSPacket(const TSPacket &tspacket);
+    bool ProcessAVTSPacket(const TSPacket &tspacket);
+
     // Implements MPEGSingleProgramStreamListener
     void HandleSingleProgramPAT(ProgramAssociationTable *pat);
     void HandleSingleProgramPMT(ProgramMapTable *pmt);
 
   private:
-    void ProcessData(unsigned char *buffer, int len);
-
     bool OpenMpegFileAsInput(void);
     bool OpenV4L2DeviceAsInput(void);
     bool SetIVTVDeviceOptions(int chanfd);
@@ -63,8 +71,6 @@ class MpegRecorder : public DTVRecorder,
     uint GetFilteredAudioSampleRate(void) const;
     uint GetFilteredAudioLayer(void) const;
     uint GetFilteredAudioBitRate(uint audio_layer) const;
-    void ProcessDataTS(unsigned char *data, uint len, uint &leftover);
-    bool ProcessTSPacket(const TSPacket &tspacket);
 
     void ResetForNewFile(void);
 
