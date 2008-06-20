@@ -1258,9 +1258,10 @@ void MpegRecorder::SetStreamData(MPEGStreamData *data)
         delete old_data;
 
     if (data)
+    {
         data->AddMPEGSPListener(this);
-
-    data->SetDesiredProgram(1);
+        data->SetDesiredProgram(1);
+    }
 
     VERBOSE(VB_RECORD, LOC + "SetStreamData("<<data<<") -- end 1");
 }
