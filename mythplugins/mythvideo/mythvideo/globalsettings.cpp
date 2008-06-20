@@ -322,6 +322,8 @@ HostLineEdit *SetDVDDevice()
     gc->setLabel(QObject::tr("Location of DVD device"));
 #ifdef Q_WS_MACX
     gc->setValue("default");
+#elif defined(_WIN32) 
+    gc->setValue("D:\\");
 #else
     gc->setValue("/dev/dvd");
 #endif
