@@ -964,7 +964,7 @@ void MpegRecorder::StartRecording(void)
 
                 case 0:
                     VERBOSE(VB_IMPORTANT, LOC_ERR + "select timeout - "
-                            "ivtv driver has stopped responding");
+                            "driver has stopped responding");
 
                     if (close(readfd) != 0)
                     {
@@ -1163,15 +1163,10 @@ bool MpegRecorder::PauseAndWait(int timeout)
         QMutex waitlock;
         if (!paused)
         {
+            // Some drivers require streaming to be disabled before
+            // an input switch and other channel format setting.
             if (requires_special_pause)
-            {
-                // Some ivtv drivers require streaming to be disabled before
-                // an input switch and other channel format setting.
-                struct v4l2_encoder_cmd command;
-                memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
-                command.cmd = V4L2_ENC_CMD_STOP;
-                ioctl(readfd, VIDIOC_ENCODER_CMD, &command);
-            }
+                StopEncoding(readfd);
 
             paused = true;
             pauseWait.wakeAll();
@@ -1185,14 +1180,10 @@ bool MpegRecorder::PauseAndWait(int timeout)
     {
         if (paused)
         {
+            // Some drivers require streaming to be disabled before
+            // an input switch and other channel format setting.
             if (requires_special_pause)
-            {
-                // Some ivtv drivers require streaming to be disabled before
-                // an input switch and other channel format setting.
-                struct v4l2_encoder_cmd command;
-                command.cmd = V4L2_ENC_CMD_START;
-                ioctl(readfd, VIDIOC_ENCODER_CMD, &command);
-            }
+                StartEncoding(readfd);
 
             if (_stream_data)
                 _stream_data->Reset(_stream_data->DesiredProgram());
@@ -1200,6 +1191,36 @@ bool MpegRecorder::PauseAndWait(int timeout)
         paused = false;
     }
     return paused;
+}
+
+bool MpegRecorder::StartEncoding(int fd)
+{
+    struct v4l2_encoder_cmd command;
+    memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
+    command.cmd = V4L2_ENC_CMD_START;
+
+    if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "StartEncording" + ENO);
+        return false;
+    }
+
+    return true;
+}
+
+bool MpegRecorder::StopEncoding(int fd)
+{
+    struct v4l2_encoder_cmd command;
+    memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
+    command.cmd = V4L2_ENC_CMD_STOP;
+
+    if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "StopEncording" + ENO);
+        return false;
+    }
+
+    return true;
 }
 
 void MpegRecorder::SetStreamData(MPEGStreamData *data)

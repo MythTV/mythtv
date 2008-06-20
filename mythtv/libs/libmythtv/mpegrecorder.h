@@ -72,6 +72,9 @@ class MpegRecorder : public DTVRecorder,
     uint GetFilteredAudioLayer(void) const;
     uint GetFilteredAudioBitRate(uint audio_layer) const;
 
+    bool StartEncoding(int fd);
+    bool StopEncoding(int fd);
+
     void ResetForNewFile(void);
 
     inline bool CheckCC(uint pid, uint cc);
