@@ -181,16 +181,13 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
         is_dvd = true;
         dvdPriv = new DVDRingBufferPriv();
         startreadahead = false;
-        int pathLen = filename.find("/", 4);
-        if (pathLen != -1)
-        {
-            QString tempFilename = filename.right(filename.length() -  pathLen);
 
-            QFile checkFile(tempFilename);
+        filename.remove(0,5);     // MythVideo calls with "dvd:/" + device
+        if (filename.length())
+        {
+            QFile checkFile(filename);
             if (!checkFile.exists())
                 filename = "/dev/dvd";
-            else
-                filename = tempFilename;
         }
         else
         {
