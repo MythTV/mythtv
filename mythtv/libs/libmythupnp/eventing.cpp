@@ -314,7 +314,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
         // Build Message Header 
         // ----------------------------------------------------------------------
 
-        short   nPort = pInfo->qURL.hasPort() ? pInfo->qURL.port() : 80;
+        int   nPort = pInfo->qURL.hasPort() ? pInfo->qURL.port() : 80;
         QString sHost = QString( "%1:%2" ).arg( pInfo->qURL.host() )
                                           .arg( nPort );
 
