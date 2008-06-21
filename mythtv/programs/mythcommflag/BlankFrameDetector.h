@@ -18,7 +18,6 @@ class BlankFrameDetector : public FrameAnalyzer
 public:
     /* Ctor/dtor. */
     BlankFrameDetector(HistogramAnalyzer *ha, QString debugdir);
-    ~BlankFrameDetector(void);
 
     /* FrameAnalyzer interface. */
     const char *name(void) const { return "BlankFrameDetector"; }

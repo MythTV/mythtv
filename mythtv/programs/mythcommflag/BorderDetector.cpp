@@ -17,20 +17,25 @@ using namespace commDetector2;
 BorderDetector::BorderDetector(void)
     : logoFinder(NULL)
     , logo(NULL)
+    , logorow(-1)
+    , logocol(-1)
+    , logowidth(-1)
+    , logoheight(-1)
     , frameno(-1)
+    , row(-1)
+    , col(-1)
+    , width(-1)
+    , height(-1)
     , ismonochromatic(false)
     , debugLevel(0)
     , time_reported(false)
 {
+    bzero(&analyze_time, sizeof(analyze_time));
     debugLevel = gContext->GetNumSetting("BorderDetectorDebugLevel", 0);
 
     if (debugLevel >= 1)
         VERBOSE(VB_COMMFLAG,
             QString("BorderDetector debugLevel %1").arg(debugLevel));
-}
-
-BorderDetector::~BorderDetector(void)
-{
 }
 
 int

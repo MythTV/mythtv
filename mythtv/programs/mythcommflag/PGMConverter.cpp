@@ -25,6 +25,7 @@ PGMConverter::PGMConverter(void)
 #endif /* PGM_CONVERT_GREYSCALE */
 {
     memset(&pgm, 0, sizeof(pgm));
+    memset(&convert_time, 0, sizeof(convert_time));
 }
 
 PGMConverter::~PGMConverter(void)

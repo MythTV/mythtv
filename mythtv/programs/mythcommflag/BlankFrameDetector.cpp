@@ -371,6 +371,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
 BlankFrameDetector::BlankFrameDetector(HistogramAnalyzer *ha, QString debugdir)
     : FrameAnalyzer()
     , histogramAnalyzer(ha)
+    , fps(0.0f)
     , debugLevel(0)
 {
     skipcommblanks = gContext->GetNumSetting("CommSkipAllBlanks", 1) != 0;
@@ -388,10 +389,6 @@ BlankFrameDetector::BlankFrameDetector(HistogramAnalyzer *ha, QString debugdir)
     if (debugLevel >= 1)
         createDebugDirectory(debugdir,
             QString("BlankFrameDetector debugLevel %1").arg(debugLevel));
-}
-
-BlankFrameDetector::~BlankFrameDetector(void)
-{
 }
 
 enum FrameAnalyzer::analyzeFrameResult

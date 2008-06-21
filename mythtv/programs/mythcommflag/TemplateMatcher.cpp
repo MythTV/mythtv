@@ -331,8 +331,13 @@ TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
     , pgmConverter(pgmc)
     , edgeDetector(ed)
     , templateFinder(tf)
+    , tmplrow(-1)
+    , tmplcol(-1)
+    , tmplwidth(-1)
+    , tmplheight(-1)
     , matches(NULL)
     , match(NULL)
+    , fps(0.0f)
     , debugLevel(0)
     , debugdir(debugdir)
 #ifdef PGM_CONVERT_GREYSCALE

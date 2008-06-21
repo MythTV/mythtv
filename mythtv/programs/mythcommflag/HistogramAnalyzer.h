@@ -20,7 +20,7 @@ public:
     /* Ctor/dtor. */
     HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
             QString debugdir);
-    ~HistogramAnalyzer(void);
+    ~HistogramAnalyzer();
 
     enum FrameAnalyzer::analyzeFrameResult nuppelVideoPlayerInited(
             NuppelVideoPlayer *nvp, long long nframes);

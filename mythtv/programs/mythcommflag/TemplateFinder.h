@@ -57,7 +57,6 @@ private:
     EdgeDetector    *edgeDetector;
 
     unsigned int    sampleTime;         /* amount of time to analyze */
-    unsigned int    sampleSpacing;      /* seconds between frames */
     int             frameInterval;      /* analyze every <Interval> frames */
     long long       endFrame;           /* end of logo detection */
     long long       nextFrame;          /* next desired frame */

@@ -137,6 +137,12 @@ HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
     , borderDetector(bd)
     , logoFinder(NULL)
     , logo(NULL)
+    , logowidth(-1)
+    , logoheight(-1)
+    , logorr1(-1)
+    , logocc1(-1)
+    , logorr2(-1)
+    , logocc2(-1)
     , mean(NULL)
     , median(NULL)
     , stddev(NULL)
@@ -157,6 +163,7 @@ HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
     , debug_histval(false)
     , histval_done(false)
 {
+    memset(histval, 0, sizeof(int) * (UCHAR_MAX + 1));
     memset(&analyze_time, 0, sizeof(analyze_time));
 
     /*
@@ -174,7 +181,7 @@ HistogramAnalyzer::HistogramAnalyzer(PGMConverter *pgmc, BorderDetector *bd,
     }
 }
 
-HistogramAnalyzer::~HistogramAnalyzer(void)
+HistogramAnalyzer::~HistogramAnalyzer()
 {
     if (monochromatic)
         delete []monochromatic;
@@ -317,7 +324,7 @@ HistogramAnalyzer::analyzeFrame(const VideoFrame *frame, long long frameno)
     ismonochromatic = borderDetector->getDimensions(pgm, pgmheight, frameno,
             &croprow, &cropcol, &cropwidth, &cropheight) != 0;
 
-    (void)gettimeofday(&start, NULL);
+    gettimeofday(&start, NULL);
 
     frow[frameno] = croprow;
     fcol[frameno] = cropcol;

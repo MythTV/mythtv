@@ -21,7 +21,6 @@ class BorderDetector
 public:
     /* Ctor/dtor. */
     BorderDetector(void);
-    ~BorderDetector(void);
 
     int nuppelVideoPlayerInited(const NuppelVideoPlayer *nvp);
     void setLogoState(TemplateFinder *finder);

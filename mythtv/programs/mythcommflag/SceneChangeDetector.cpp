@@ -99,6 +99,7 @@ SceneChangeDetector::SceneChangeDetector(HistogramAnalyzer *ha,
         QString debugdir)
     : FrameAnalyzer()
     , histogramAnalyzer(ha)
+    , fps(0.0f)
     , scdata(NULL)
     , scdiff(NULL)
     , debugLevel(0)
