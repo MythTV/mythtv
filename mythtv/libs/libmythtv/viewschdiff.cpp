@@ -201,6 +201,9 @@ void ViewScheduleDiff::updateBackground(void)
     QPainter tmp(&bground);
 
     LayerSet *container = theme->GetSet("background");
+    if (!container)
+        return;
+
     container->Draw(&tmp, 0, 0);
 
     tmp.end();
@@ -263,6 +266,8 @@ void ViewScheduleDiff::edit()
 void ViewScheduleDiff::upcoming()
 {
     ProgramInfo *pi = CurrentProgram();
+    if (!pi)
+        return;
 
     ProgLister *pl = new ProgLister(plTitle, pi->title, "",
                                    gContext->GetMainWindow(), "proglist");

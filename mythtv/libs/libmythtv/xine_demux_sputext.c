@@ -523,6 +523,8 @@ static subtitle_t *sub_read_line_ssa(demux_sputext_t *this,subtitle_t *current) 
 		   line3) < 9	    );
   
   line2=strchr(line3, ',');
+  if (!line2)
+    return NULL;
   
   for (comma = 4; comma < max_comma; comma ++)
     {

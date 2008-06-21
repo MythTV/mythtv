@@ -1374,7 +1374,7 @@ void AvFormatDecoder::ScanTeletextCaptions(int av_index)
  */
 void AvFormatDecoder::ScanDSMCCStreams(void)
 {
-    if (!ic->cur_pmt_sect)
+    if (!ic || !ic->cur_pmt_sect)
         return;
 
     if (!itv && ! (itv = GetNVP()->GetInteractiveTV()))
@@ -3548,13 +3548,21 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     if (!allowedquit && (onlyvideo < 0))
                     {
                         uint fill, total;
-                        GetNVP()->GetAudioBufferStatus(fill, total);
-                        total /= 6; // HACK needed for some audio files
-                        allowedquit =
-                            (fill == 0) || (fill > (total>>1)) ||
-                            ((total - fill) < (uint) data_size) ||
-                            (ofill + total_decoded_audio > (total>>2)) ||
-                            ((total - fill) < (uint) data_size * 2);
+                        if (GetNVP()->GetAudioBufferStatus(fill, total))
+                        {
+                            total /= 6; // HACK needed for some audio files
+                            allowedquit =
+                                (fill == 0) || (fill > (total>>1)) ||
+                                ((total - fill) < (uint) data_size) ||
+                                (ofill + total_decoded_audio > (total>>2)) ||
+                                ((total - fill) < (uint) data_size * 2);
+                        }
+                        else
+                        {
+                            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                                    "GetFrame() : Failed to top off "
+                                    "buffers in audio only mode");
+                        }
                     }
 
                     break;

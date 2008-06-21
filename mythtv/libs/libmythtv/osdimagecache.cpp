@@ -171,8 +171,16 @@ OSDImageCacheValue *OSDImageCache::Get(const QString &key, bool useFile)
     }
 
     QDir dir(MythContext::GetConfDir() + "/osdcache/");
-    QFile cacheFile(dir.path() + "/" + key);
-    cacheFile.open(QIODevice::ReadOnly);
+    QString fname = QString("%1/%2").arg(dir.path()).arg(key);
+    QFile cacheFile(fname);
+    if (!cacheFile.open(QIODevice::IO_ReadOnly))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Failed to open read-only cache file '" + fname + "'");
+
+        return NULL;
+    }
+
     uint32_t imwidth  = 0;
     uint32_t imheight = 0;
 

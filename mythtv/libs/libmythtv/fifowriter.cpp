@@ -139,9 +139,10 @@ void FIFOWriter::FIFOWriteThread(void)
         pthread_mutex_unlock(&fifo_lock[id]);
         if (killwr[id])
             break;
-        if (fd == -1)
+        if (fd < 0)
             fd = open(filename[id].ascii(), O_WRONLY| O_SYNC);
-        write(fd, fb_outptr[id]->data, fb_outptr[id]->blksize);
+        if (fd >= 0)
+            write(fd, fb_outptr[id]->data, fb_outptr[id]->blksize);
         pthread_mutex_lock(&fifo_lock[id]);
         fb_outptr[id] = fb_outptr[id]->next;
         pthread_cond_signal(&full_cond[id]);

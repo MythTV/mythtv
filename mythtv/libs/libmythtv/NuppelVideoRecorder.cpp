@@ -3081,6 +3081,13 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
             QMutexLocker locker(&avcodeclock);
             tmp = avcodec_encode_video(mpa_vidctx, (unsigned char *)strm, 
                                        len, &mpa_picture); 
+            if (tmp == -1)
+            {
+                VERBOSE(VB_IMPORTANT,
+                        LOC_ERR + "NuppelVideoRecorder::WriteVideo : "
+                                  "avcodec_encode_video() failed");
+                return;
+            }
         }
     }
     else
