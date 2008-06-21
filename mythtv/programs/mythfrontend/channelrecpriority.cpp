@@ -549,8 +549,6 @@ void ChannelRecPriority::SortList()
         // find recPriorityInfo[i] in cdCopy
         for (j = 0, pit = cdCopy.begin(); j !=recPriorityInfo->cnt; j++, ++pit);
 
-        chanInfo = &(pit.data());
-
         // put back into channelData
         channelData[QString::number(999-i)] = pit.data();
 
