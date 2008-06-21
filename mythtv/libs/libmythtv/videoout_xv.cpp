@@ -531,10 +531,10 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
         float displayAspect = gContext->GetFloatSettingOnHost(
             "XineramaMonitorAspectRatio",
             gContext->GetHostName(), pixel_aspect);
-        int height = display_dim.height();
-        if (height <= 0)
-            display_dim.setHeight(height = 300);
-        display_dim.setWidth((int) round(height * displayAspect));
+        int displayHeight = display_dim.height();
+        if (displayHeight <= 0)
+            display_dim.setHeight(displayHeight = 300);
+        display_dim.setWidth((int) round(displayHeight * displayAspect));
     }
 
     VERBOSE(VB_PLAYBACK, LOC +

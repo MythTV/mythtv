@@ -976,16 +976,17 @@ bool SIScan::ScanTransport(int mplexid)
     while (query.next())
     {
         int sourceid = query.value(0).toInt();
-        int mplexid  = query.value(1).toInt();
+        int queriedMplexid  = query.value(1).toInt();
         QString std  = query.value(2).toString();
         int tsid     = query.value(3).toInt();
 
         QString fn = (tsid) ? QString("Transport ID %1").arg(tsid) :
-            QString("Multiplex #%1").arg(mplexid);
+            QString("Multiplex #%1").arg(queriedMplexid);
         
         VERBOSE(VB_SIPARSER, LOC + "Adding " + fn);
 
-        TransportScanItem item(sourceid, std, fn, mplexid, signalTimeout);
+        TransportScanItem item(
+            sourceid, std, fn, queriedMplexid, signalTimeout);
         scanTransports += item;
     }
 

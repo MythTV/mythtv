@@ -2115,8 +2115,8 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     OSDTypeText *text = NULL;
     do
     {
-        QString name = QString("option%1").arg(availoptions + 1);
-        text = (OSDTypeText *)container->GetType(name);
+        QString optionName = QString("option%1").arg(availoptions + 1);
+        text = (OSDTypeText *)container->GetType(optionName);
         if (text)
             availoptions++;
     }
@@ -2136,11 +2136,11 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
 
     for (int i = 1; i <= numoptions && i <= availoptions; i++)
     {
-        QString name = QString("option%1").arg(offset + i);
-        text = (OSDTypeText *)container->GetType(name);
+        QString optionName = QString("option%1").arg(offset + i);
+        text = (OSDTypeText *)container->GetType(optionName);
         if (!text)
         {
-            VERBOSE(VB_IMPORTANT, "Couldn't find: " << name);
+            VERBOSE(VB_IMPORTANT, "Couldn't find: " << optionName);
             return;
         }
 
