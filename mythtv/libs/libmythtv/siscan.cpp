@@ -1447,17 +1447,21 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
         if (desc && desc->IsDigitalAudio() && ignoreAudioOnlyServices)
         {
             IgnoreAudioOnlyMsg(service_name, sdt->ServiceID(i));
+            delete desc;
             continue;
         }
         else if (desc && !desc->IsDTV() && !desc->IsDigitalAudio() &&
                  ignoreDataServices)
         {
             IgnoreDataOnlyMsg(service_name, sdt->ServiceID(i));
+            delete desc;
             continue;
         }
         else if (ignoreEncryptedServices && sdt->IsEncrypted(i))
         {
             IgnoreEncryptedMsg(service_name, sdt->ServiceID(i));
+            if (desc)
+                delete desc;
             continue;
         }
 
@@ -1477,6 +1481,8 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
         if (!CheckImportedList(channels, sdt->ServiceID(i),
                                service_name, service_name, common_status_info))
         {
+            if (desc)
+                delete desc;
             continue;
         }
 
