@@ -1531,9 +1531,8 @@ int main(int argc, char **argv)
 
     if (priv_thread_created)
     {
-        void *value;
         gContext->addPrivRequest(MythPrivRequest::MythExit, NULL);
-        pthread_join(priv_thread, &value);
+        pthread_join(priv_thread, NULL);
     }
 
     signal(SIGHUP, SIG_DFL);
