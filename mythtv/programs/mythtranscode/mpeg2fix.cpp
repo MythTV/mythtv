@@ -984,9 +984,14 @@ void MPEG2fixup::WriteFrame(const char *filename, AVPacket *pkt)
     mpeg2dec_t *tmp_decoder = mpeg2_init();
     mpeg2_info_t *info = (mpeg2_info_t *)mpeg2_info(tmp_decoder);
 
-    while (! info->display_picture)
+    while (!info->display_picture)
+    {
         if (ProcessVideo(tmpFrame, tmp_decoder))
+        {
+            delete tmpFrame;
             return;
+        }
+    }
 
     WriteYUV(filename, info);
     framePool.enqueue(tmpFrame);
