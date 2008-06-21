@@ -79,6 +79,7 @@ enum
     kTrackTypeCount,
 
     kTrackTypeTeletextMenu,
+    kTrackTypeTextSubtitle,
 };
 QString track_type_to_string(uint type);
 int type_string_to_track_type(const QString &str);

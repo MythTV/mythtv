@@ -1785,6 +1785,33 @@ static HorizontalConfigurationGroup *OSDCC708Fonts(void)
     return grpmain;
 }
 
+static HostComboBox *SubtitleCodec()
+{
+    HostComboBox *gc = new HostComboBox("SubtitleCodec");
+
+    gc->setLabel(QObject::tr("Subtitle Codec"));
+    QList<QByteArray> list = QTextCodec::availableCodecs();
+    for (uint i = 0; i < (uint) list.size(); i++)
+    {
+        QString val = QString(list[i]);
+        gc->addSelection(val, val, val.lower() == "utf-8");
+    }
+
+    return gc;
+}
+
+static HorizontalConfigurationGroup *ExternalSubtitleSettings()
+{
+    HorizontalConfigurationGroup *grpmain =
+        new HorizontalConfigurationGroup(false, true, true, true);
+
+    grpmain->setLabel(QObject::tr("External Subtitle Settings"));
+
+    grpmain->addChild(SubtitleCodec());
+
+    return grpmain;
+}
+
 static HostComboBox *OSDThemeFontSizeType()
 {
     HostComboBox *gc = new HostComboBox("OSDThemeFontSizeType");
@@ -4763,6 +4790,7 @@ OSDSettings::OSDSettings()
 
     addChild(OSDCC708Settings());
     addChild(OSDCC708Fonts());
+    addChild(ExternalSubtitleSettings());
 
 #ifdef CONFIG_DARWIN
     // Any Mac OS-specific OSD stuff would go here.

@@ -104,6 +104,8 @@ QString track_type_to_string(uint type)
         str = QObject::tr("TT CC", "Teletext closed captions");
     else if (kTrackTypeTeletextMenu == type)
         str = QObject::tr("TT Menu", "Teletext Menu");
+    else if (kTrackTypeTextSubtitle == type)
+        str = QObject::tr("TXT File", "Text File");
     return str;
 }
 
@@ -123,6 +125,8 @@ int type_string_to_track_type(const QString &str)
         ret = kTrackTypeTeletextCaptions;
     else if (str.left(3) == "TTM")
         ret = kTrackTypeTeletextMenu;
+    else if (str.left(3) == "TFL")
+        ret = kTrackTypeTextSubtitle;
     return ret;
 }
 
@@ -6839,7 +6843,14 @@ void NuppelVideoPlayer::DisplayTextSubtitles(void)
     }
     else
     {
-        playPos = currentFrame->timecode;
+        // BEGIN HACK
+        // Like frame based subtitles this can get out of sync after
+        // transcoding, using the raw timecode doesn't work either
+        // with DTV broadcasts where the timecode isn't zero on the
+        // first frame, and may roll over during the broadcast.
+        playPos = (uint64_t)
+            ((currentFrame->frameNumber / video_frame_rate) * 1000);
+        // END HACK
     }
 
     if (!textSubtitles.HasSubtitleChanged(playPos)) 
