@@ -1326,6 +1326,8 @@ for opt do
   ;;
   --cc=*) cc="$optval"
   ;;
+  --cxx=*) cxx="$optval"
+  ;;
   --make=*) make="$optval"
   ;;
   --qmake=*) qmake="$optval"
