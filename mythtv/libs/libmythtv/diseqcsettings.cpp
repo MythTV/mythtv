@@ -1398,9 +1398,12 @@ bool convert_diseqc_db(void)
                 root = DiSEqCDevDevice::CreateByType(
                     tree, DiSEqCDevDevice::kTypeSwitch);
                 DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(root);
-                sw->SetType(DiSEqCDevSwitch::kTypeTone);
-                sw->SetNumPorts(2);
-                add_lnbs = 2;
+                if (sw)
+                {
+                    sw->SetType(DiSEqCDevSwitch::kTypeTone);
+                    sw->SetNumPorts(2);
+                    add_lnbs = 2;
+                }
                 break;
             }
 
@@ -1411,9 +1414,12 @@ bool convert_diseqc_db(void)
                 root = DiSEqCDevDevice::CreateByType(
                     tree, DiSEqCDevDevice::kTypeSwitch);
                 DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(root);
-                sw->SetType(DiSEqCDevSwitch::kTypeDiSEqCCommitted);
-                sw->SetNumPorts(2);
-                add_lnbs = 2;
+                if (sw)
+                {
+                    sw->SetType(DiSEqCDevSwitch::kTypeDiSEqCCommitted);
+                    sw->SetNumPorts(2);
+                    add_lnbs = 2;
+                }
                 break;
             }
 
@@ -1424,9 +1430,12 @@ bool convert_diseqc_db(void)
                 root = DiSEqCDevDevice::CreateByType(
                     tree, DiSEqCDevDevice::kTypeSwitch);
                 DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(root);
-                sw->SetType(DiSEqCDevSwitch::kTypeDiSEqCCommitted);
-                sw->SetNumPorts(4);
-                add_lnbs = 4;
+                if (sw)
+                {
+                    sw->SetType(DiSEqCDevSwitch::kTypeDiSEqCCommitted);
+                    sw->SetNumPorts(4);
+                    add_lnbs = 4;
+                }
                 break;
             }
 
@@ -1436,8 +1445,11 @@ bool convert_diseqc_db(void)
                 root = DiSEqCDevDevice::CreateByType(
                     tree, DiSEqCDevDevice::kTypeRotor);
                 DiSEqCDevRotor *rotor = dynamic_cast<DiSEqCDevRotor*>(root);
-                rotor->SetType(DiSEqCDevRotor::kTypeDiSEqC_1_2);
-                add_lnbs = 1;
+                if (rotor)
+                {
+                    rotor->SetType(DiSEqCDevRotor::kTypeDiSEqC_1_2);
+                    add_lnbs = 1;
+                }
                 break;
             }
 
@@ -1447,8 +1459,11 @@ bool convert_diseqc_db(void)
                 root = DiSEqCDevDevice::CreateByType(
                     tree, DiSEqCDevDevice::kTypeRotor);
                 DiSEqCDevRotor *rotor = dynamic_cast<DiSEqCDevRotor*>(root);
-                rotor->SetType(DiSEqCDevRotor::kTypeDiSEqC_1_3);
-                add_lnbs = 1;
+                if (rotor)
+                {
+                    rotor->SetType(DiSEqCDevRotor::kTypeDiSEqC_1_3);
+                    add_lnbs = 1;
+                }
                 break;
             }
 
@@ -1458,9 +1473,12 @@ bool convert_diseqc_db(void)
                 root = DiSEqCDevDevice::CreateByType(
                     tree, DiSEqCDevDevice::kTypeSwitch);
                 DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(root);
-                sw->SetType(DiSEqCDevSwitch::kTypeDiSEqCUncommitted);
-                sw->SetNumPorts(10);
-                add_lnbs = 10;
+                if (sw)
+                {
+                    sw->SetType(DiSEqCDevSwitch::kTypeDiSEqCUncommitted);
+                    sw->SetNumPorts(10);
+                    add_lnbs = 10;
+                }
                 break;
             }
 
@@ -1470,10 +1488,13 @@ bool convert_diseqc_db(void)
                 root = DiSEqCDevDevice::CreateByType(
                     tree, DiSEqCDevDevice::kTypeSwitch);
                 DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(root);
-                sw->SetType(DiSEqCDevSwitch::kTypeLegacySW21);
-                sw->SetNumPorts(2);
-                add_lnbs = 2;
-                lnb_type = DiSEqCDevLNB::kTypeFixed;
+                if (sw)
+                {
+                    sw->SetType(DiSEqCDevSwitch::kTypeLegacySW21);
+                    sw->SetNumPorts(2);
+                    add_lnbs = 2;
+                    lnb_type = DiSEqCDevLNB::kTypeFixed;
+                }
                 break;
             }
 
@@ -1483,10 +1504,13 @@ bool convert_diseqc_db(void)
                 root = DiSEqCDevDevice::CreateByType(
                     tree, DiSEqCDevDevice::kTypeSwitch);
                 DiSEqCDevSwitch *sw = dynamic_cast<DiSEqCDevSwitch*>(root);
-                sw->SetType(DiSEqCDevSwitch::kTypeLegacySW64);
-                sw->SetNumPorts(3);
-                add_lnbs = 3;
-                lnb_type = DiSEqCDevLNB::kTypeFixed;
+                if (sw)
+                {
+                    sw->SetType(DiSEqCDevSwitch::kTypeLegacySW64);
+                    sw->SetNumPorts(3);
+                    add_lnbs = 3;
+                    lnb_type = DiSEqCDevLNB::kTypeFixed;
+                }
                 break;
             }
 
@@ -1509,10 +1533,13 @@ bool convert_diseqc_db(void)
             DiSEqCDevLNB *lnb = dynamic_cast<DiSEqCDevLNB*>
                 (DiSEqCDevDevice::CreateByType(
                     tree, DiSEqCDevDevice::kTypeLNB));
-            lnb->SetType(lnb_type);
-            lnb->SetDescription(QString("LNB #%1").arg(i+1));
-            if (!root->SetChild(i, lnb))
-                delete lnb;
+            if (lnb)
+            {
+                lnb->SetType(lnb_type);
+                lnb->SetDescription(QString("LNB #%1").arg(i+1));
+                if (!root->SetChild(i, lnb))
+                    delete lnb;
+            }
         }
 
         // save the tree to get real device ids
