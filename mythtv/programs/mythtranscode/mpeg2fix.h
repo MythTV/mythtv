@@ -42,20 +42,25 @@ class MPEG2frame
 {
   public:
     MPEG2frame(int size)
+        : isSequence(false), isGop(false), framePos(NULL), gopPos(NULL)
     {
-        pkt.data = (uint8_t *)malloc(size);
-        pkt_memsize = size;
+        av_new_packet(&pkt, size);
+        pkt.priv = NULL;
+        memset(pkt.data, 0, sizeof(uint8_t) * pkt.size);
+        memset(&mpeg2_seq, 0, sizeof(mpeg2_seq));
+        memset(&mpeg2_gop, 0, sizeof(mpeg2_gop));
+        memset(&mpeg2_pic, 0, sizeof(mpeg2_pic));
     }
     ~MPEG2frame()
     {
-        free(pkt.data);
+        av_destruct_packet(&pkt);
     }
     void ensure_size(int size)
     {
-        if (pkt_memsize < size)
+        if (pkt.size < size)
         {
             pkt.data = (uint8_t *)realloc(pkt.data, size);
-            pkt_memsize = size;
+            pkt.size = size;
         }
     }
     void set_pkt(AVPacket *newpkt)
@@ -68,7 +73,6 @@ class MPEG2frame
     }
 
     AVPacket pkt;
-    int pkt_memsize;
     bool isSequence;
     bool isGop;
     uint8_t *framePos;
@@ -108,7 +112,7 @@ class MPEG2replex
     ~MPEG2replex();
     void Start();
     int WaitBuffers();
-    int done;
+    bool done;
     QString outfile;
     int otype;
     ringbuffer vrbuf;
