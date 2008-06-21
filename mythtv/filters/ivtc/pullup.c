@@ -721,6 +721,7 @@ void pullup_pack_frame(struct pullup_context *c, struct pullup_frame *fr)
 		return;
 	}
 	fr->buffer = pullup_get_buffer(c, 2);
+	if (!fr->buffer) return;
 	copy_field(c, fr->buffer, fr->ofields[0], 0);
 	copy_field(c, fr->buffer, fr->ofields[1], 1);
 }

@@ -140,6 +140,9 @@ IvtcFilter (VideoFilter *vf, VideoFrame *frame)
         pullup_pack_frame(c, f);
     }
 
+    if (!f->buffer)
+        return 0;
+
     memcpy_pic(frame->buf + frame->offsets[0], f->buffer->planes[0],
                height,  ypitch, ypitch);
     memcpy_pic(frame->buf + frame->offsets[1], f->buffer->planes[1],
