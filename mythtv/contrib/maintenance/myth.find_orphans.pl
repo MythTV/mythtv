@@ -137,12 +137,12 @@ foreach $d (split(/,/,$opt_dir)) {
 # look in recorded table, make sure we can find every file ..
 #
 
-my $q = "SELECT title, subtitle, starttime, endtime, chanid, basename FROM recorded WHERE hostname=(?) ORDER BY starttime";
+my $q = "SELECT title, subtitle, description, starttime, endtime, chanid, basename FROM recorded WHERE hostname=(?) ORDER BY starttime";
 $sth = $dbh->prepare($q);
 $sth->execute($opt_host) || die "Could not execute ($q): $!\n";
 
 while (my @row=$sth->fetchrow_array) {
-	($title, $subtitle, $starttime, $endtime, $channel, $basename) = @row;
+	($title, $subtitle, $description ,$starttime, $endtime, $channel, $basename) = @row;
 
 	# see if we can find it...
 	$loc = find_file($basename);
@@ -151,6 +151,9 @@ while (my @row=$sth->fetchrow_array) {
 		$missing_recordings++;
 
 		if ($opt_dodbdelete) {
+			my $sql = sprintf "DELETE FROM oldrecorded WHERE title LIKE \"%s\" AND subtitle LIKE \"%s\" AND description LIKE \"%s\" LIMIT 1", $title, $subtitle, $description;
+			printf "unmarking program as recorded: %s\n",$sql;
+			$dbh->do($sql) || die "Could not execute $sql: $!\n";
 			my $sql = sprintf "DELETE FROM recorded WHERE basename LIKE \"%s\" LIMIT 1",$basename;
 			printf "performing database delete: %s\n",$sql;
 			if (!$opt_dryrun) {
