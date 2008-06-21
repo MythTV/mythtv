@@ -1,17 +1,27 @@
-#include <iostream>
+// faad2 library headers
+#define USE_TAGGING /* enables mp4 metadata portion of mp4ff.h */
+#include <mp4ff.h>
+#include <faad.h>
+
+// POSIX headers
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/types.h>
 
+// ANSI C headers
+#include <cstdlib>
+
+// C++ headers
+#include <iostream>
 using namespace std;
 
-#define USE_TAGGING
+// MythTV headers
+#include <mythtv/mythcontext.h>
+
+// MythMusic headers
 #include "metaiomp4.h"
 #include "metadata.h"
-#include <mp4ff.h>
-#include <faad.h>
-#include <mythtv/mythcontext.h>
 
 
 MetaIOMP4::MetaIOMP4(void)

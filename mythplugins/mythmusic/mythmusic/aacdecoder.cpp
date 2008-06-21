@@ -14,19 +14,27 @@
 #define FAAD_MODIFIED
 #endif
 
+// ANSI C headers
+#include <cstdlib>
+
+// C++ headers
 #include <iostream>
 #include <string>
+
+// Qt headers
 #include <qobject.h>
 #include <qiodevice.h>
 #include <qfile.h>
 
+// MythTV headers
+#include <mythtv/audiooutput.h>
+#include <mythtv/mythcontext.h>
+
+// MythMusic headers
 #include "aacdecoder.h"
 #include "constants.h"
-#include <mythtv/audiooutput.h>
 #include "metadata.h"
 #include "metaiomp4.h"
-
-#include <mythtv/mythcontext.h>
 
 //
 //  C style callbacks (jump right back into the aacDecoder object)
