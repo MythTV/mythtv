@@ -355,10 +355,10 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         return false;
 
     if (driver != "hdpvr")
+    {
         SetLanguageMode(chanfd);        // we don't care if this fails...
-
-    if (driver != "hdpvr")
         SetRecordingVolume(chanfd); // we don't care if this fails...
+    }
 
     bool ok = true;
     if (usingv4l2)
@@ -1016,13 +1016,15 @@ void MpegRecorder::StartRecording(void)
             if (driver == "hdpvr") {
                 remainder = _stream_data->ProcessData(buffer, len);
                 int start_remain = len - remainder;
-                if (start_remain >= remainder)
+                if (remainder && (start_remain >= remainder))
                     memcpy(buffer, buffer+start_remain, remainder);
-                else
+                else if (remainder)
                     memmove(buffer, buffer+start_remain, remainder);
             }
             else
+            {
                 FindPSKeyFrames(buffer, len);
+            }
         }
     }
 
@@ -1059,12 +1061,12 @@ bool MpegRecorder::ProcessTSPacket(const TSPacket &tspacket_real)
 
     // Only write the packet
     // if audio/video key-frames have been found
-    if (_wait_for_keyframe_option && _first_keyframe < 0)
-        return true;
-    
-    _buffer_packets = true;
+    if (!(_wait_for_keyframe_option && _first_keyframe < 0))
+    {
+        _buffer_packets = true;
 
-    BufferedWrite(*tspacket);
+        BufferedWrite(*tspacket);
+    }
 
     if (tspacket_fake)
         delete tspacket_fake;
@@ -1202,13 +1204,22 @@ bool MpegRecorder::StartEncoding(int fd)
     memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
     command.cmd = V4L2_ENC_CMD_START;
 
-    if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) < 0)
+    for (int idx = 0; idx < 10; ++idx)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "StartEncording" + ENO);
-        return false;
+        if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
+            return true;
+
+        if (errno != EAGAIN)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "StartEncoding" + ENO);
+            return false;
+        }
+
+        usleep(250 * 1000);
     }
 
-    return true;
+    VERBOSE(VB_IMPORTANT, LOC_ERR + "StartEncoding - giving up" + ENO);
+    return false;
 }
 
 bool MpegRecorder::StopEncoding(int fd)
@@ -1217,13 +1228,23 @@ bool MpegRecorder::StopEncoding(int fd)
     memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
     command.cmd = V4L2_ENC_CMD_STOP;
 
-    if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) < 0)
+    for (int idx = 0; idx < 10; ++idx)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "StopEncording" + ENO);
-        return false;
+
+        if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
+            return true;
+
+        if (errno != EAGAIN)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "StopEncoding" + ENO);
+            return false;
+        }
+
+        usleep(250 * 1000);
     }
 
-    return true;
+    VERBOSE(VB_IMPORTANT, LOC_ERR + "StopEncoding - giving up" + ENO);
+    return false;
 }
 
 void MpegRecorder::SetStreamData(MPEGStreamData *data)
@@ -1310,7 +1331,7 @@ void MpegRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
 
     uint posB[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
 
-#if 1
+#if 0
     if (posB[0] + posB[1] * TSPacket::SIZE > 
         posA[0] + posA[1] * TSPacket::SIZE)
     {
