@@ -679,10 +679,8 @@ void PlaybackBox::updateBackground(void)
     QPainter tmp(&bground);
 
     LayerSet *container = theme->GetSet("background");
-    if (container && type != Delete)
-        container->Draw(&tmp, 0, 0);
-    else
-        container->Draw(&tmp, 0, 1);
+    if (container)
+        container->Draw(&tmp, 0, (type == Delete) ? 1 : 0);
 
     tmp.end();
     paintBackgroundPixmap = bground;
@@ -1036,7 +1034,9 @@ void PlaybackBox::updateVideo(QPainter *p)
         QPixmap pix(drawVideoBounds.size());
         pix.fill(this, drawVideoBounds.topLeft());
         QPainter tmp(&pix);
-        container->Draw(&tmp, 1, 1);
+        if (container)
+            container->Draw(&tmp, 1, 1);
+
         tmp.end();
         p->drawPixmap(drawVideoBounds.topLeft(), pix);
     }
@@ -1538,29 +1538,11 @@ void PlaybackBox::updateShowTitles(QPainter *p)
         lcddev->switchToMenu(&lcdItems, lcdTitle);
 
     // DRAW LAYERS
-    if (container && type != Delete)
+    if (container)
     {
-        container->Draw(&tmp, 0, 0);
-        container->Draw(&tmp, 1, 0);
-        container->Draw(&tmp, 2, 0);
-        container->Draw(&tmp, 3, 0);
-        container->Draw(&tmp, 4, 0);
-        container->Draw(&tmp, 5, 0);
-        container->Draw(&tmp, 6, 0);
-        container->Draw(&tmp, 7, 0);
-        container->Draw(&tmp, 8, 0);
-    }
-    else
-    {
-        container->Draw(&tmp, 0, 1);
-        container->Draw(&tmp, 1, 1);
-        container->Draw(&tmp, 2, 1);
-        container->Draw(&tmp, 3, 1);
-        container->Draw(&tmp, 4, 1);
-        container->Draw(&tmp, 5, 1);
-        container->Draw(&tmp, 6, 1);
-        container->Draw(&tmp, 7, 1);
-        container->Draw(&tmp, 8, 1);
+        int typeIsEqToDel = (type == Delete) ? 1 : 0;
+        for (int i = 0; i < 9; i++)
+            container->Draw(&tmp, i, typeIsEqToDel);
     }
 
     leftRight = false;

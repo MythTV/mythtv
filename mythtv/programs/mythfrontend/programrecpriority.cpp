@@ -1430,13 +1430,13 @@ void ProgramRecPriority::updateList(QPainter *p)
                 else
                     pageDowner = true;
             }
-        }
 
-        ltype->SetDownArrow(pageDowner);
-        if (inData > 0)
-            ltype->SetUpArrow(true);
-        else
-            ltype->SetUpArrow(false);
+            ltype->SetDownArrow(pageDowner);
+            if (inData > 0)
+                ltype->SetUpArrow(true);
+            else
+                ltype->SetUpArrow(false);
+        }
     }
 
     if (programData.count() <= 0)
