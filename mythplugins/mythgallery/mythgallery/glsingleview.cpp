@@ -604,7 +604,8 @@ void GLSingleView::Load(void)
     int a = m_tex1First ? 0 : 1;
     m_texItem[a].SetItem(item, image.size());
     m_texItem[a].ScaleTo(m_screenSize, m_scaleMax);
-    m_texItem[a].Init(convertToGLFormat(image.smoothScale(m_texSize)));
+    m_texItem[a].Init(convertToGLFormat(
+        image.scaled(m_texSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation)));
 
     UpdateLCD(item);
 }

@@ -456,7 +456,8 @@ bool PreviewGenerator::SavePreview(QString filename,
     ppw = max(1.0f, ppw);
     pph = max(1.0f, pph);;
 
-    QImage small_img = img.smoothScale((int) ppw, (int) pph);
+    QImage small_img = img.scaled((int) ppw, (int) pph,
+        Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
     if (small_img.save(filename, "PNG"))
     {

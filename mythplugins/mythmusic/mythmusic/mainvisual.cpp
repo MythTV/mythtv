@@ -410,7 +410,8 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
 
         // draw the albumArt image
         QImage image(albumArt);
-        image = image.smoothScale(width(), height(), Qt::KeepAspectRatio);
+        image = image.scaled(width(), height(), 
+                Qt::KeepAspectRatio, Qt::SmoothTransformation);
         p.drawImage(QPoint(width() / 2 - image.width() / 2, height() / 2 - image.height() / 2), image);
 
         x += displayRect.x();
@@ -428,7 +429,8 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
             // draw the albumArt image
 
             QImage image(albumArt);
-            image = image.smoothScale(height(), height(), Qt::KeepAspectRatio);
+            image = image.scaled(height(), height(), 
+                Qt::KeepAspectRatio, Qt::SmoothTransformation);
             p.drawImage(QPoint(0, 0), image);
             x += height();
         }

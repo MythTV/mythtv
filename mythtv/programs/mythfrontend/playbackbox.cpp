@@ -4818,7 +4818,9 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
             previewPixmap->convertFromImage(*image);
         else
         {
-            QImage tmp2 = image->smoothScale(previewSize);
+            QImage tmp2 = image->scaled(previewSize, 
+                            Qt::IgnoreAspectRatio,
+                            Qt::SmoothTransformation);
             previewPixmap->convertFromImage(tmp2);
         }
     }

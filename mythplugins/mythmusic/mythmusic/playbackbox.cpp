@@ -2072,7 +2072,8 @@ void PlaybackBoxMusic::showAlbumArtImage(Metadata *mdata)
     if (!albumArt.isNull())
     {
        // draw the albumArt image
-       albumArt = albumArt.smoothScale(img_size.width(), img_size.height(), Qt::KeepAspectRatio);
+       albumArt = albumArt.scaled(img_size.width(), img_size.height(), 
+            Qt::KeepAspectRatio, Qt::SmoothTransformation);
        QPixmap img(albumArt);
        albumart_image->SetImage(img);
        albumart_image->refresh();

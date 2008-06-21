@@ -792,7 +792,8 @@ void MythXML::GetChannelIcon( HTTPRequest *pRequest )
     if ( nHeight == 0 )
         nHeight = (int)rint(nWidth / fAspect);
 
-    QImage img = pImage->smoothScale( nWidth, nHeight);
+    QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
+                                Qt::SmoothTransformation);
 
     img.save( sFileName.ascii(), "PNG" );
 
@@ -977,7 +978,8 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
     if ( nHeight == 0 )
         nHeight = (int)rint(nWidth / fAspect);
 
-    QImage img = pImage->smoothScale( nWidth, nHeight);
+    QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
+                                Qt::SmoothTransformation);
 
     img.save( sFileName.ascii(), "PNG" );
 
@@ -1233,7 +1235,8 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
         return;
     }
 
-    QImage img = pImage->smoothScale( nWidth, nHeight);
+    QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
+                                Qt::SmoothTransformation);
 
     img.save( pRequest->m_sFileName.ascii(), "PNG" );
 

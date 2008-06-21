@@ -389,8 +389,10 @@ void UIBarType::SetIcon(int num, QPixmap myIcon)
     {
         QImage scalerImg;
 
-        scalerImg = sourceImg.smoothScale((int)(m_iconsize.x()),
-                                               (int)(m_iconsize.y()));
+        scalerImg = sourceImg.scaled((int)(m_iconsize.x()),
+                                    (int)(m_iconsize.y()),
+                                    Qt::IgnoreAspectRatio,
+                                    Qt::SmoothTransformation);
         iconData[num].convertFromImage(scalerImg);
     }
     else
@@ -436,7 +438,8 @@ void UIBarType::LoadImage(int loc, QString myFile)
         doY = m_iconsize.y();
     }
 
-    scalerImg = sourceImg.smoothScale(doX, doY);
+    scalerImg = sourceImg.scaled(doX, doY, Qt::IgnoreAspectRatio,
+                                Qt::SmoothTransformation);
     if (loc == -1)
         m_image.convertFromImage(scalerImg);
     else
@@ -1433,8 +1436,10 @@ void UIImageType::LoadImage()
                     VERBOSE(VB_GENERAL, "         +Force Y: " << doY);
             }
 
-            scalerImg = sourceImg->smoothScale((int)(doX * m_wmult),
-                                               (int)(doY * m_hmult));
+            scalerImg = sourceImg->scaled((int)(doX * m_wmult),
+                                            (int)(doY * m_hmult),
+                                            Qt::IgnoreAspectRatio,
+                                            Qt::SmoothTransformation);
             m_show = true;
             img.convertFromImage(scalerImg);
             if (m_debug == true)
@@ -1653,8 +1658,10 @@ bool UIAnimatedImageType::LoadImage(int imageNo)
                 doY = m_force_y;
             }
 
-            QImage scalerImg = sourceImg.smoothScale((int)(doX * m_wmult),
-                                               (int)(doY * m_hmult));
+            QImage scalerImg = sourceImg.scaled((int)(doX * m_wmult),
+                                               (int)(doY * m_hmult),
+                                               Qt::IgnoreAspectRatio,
+                                               Qt::SmoothTransformation);
 
             QPixmap *img = new QPixmap();
             img->convertFromImage(scalerImg);
@@ -2433,7 +2440,8 @@ QPixmap *UIImageGridType::createScaledPixmap(QString filename,
         }
         else
         {
-            pixmap = new QPixmap(img->smoothScale(width, height, mode));
+            pixmap = new QPixmap(img->scaled(width, height, mode,
+                                            Qt::SmoothTransformation));
             delete img;
         }
     }
@@ -2460,14 +2468,14 @@ void UIImageGridType::loadCellImages(void)
     int sh = (int) (7 * m_hmult);
 
     normalPixmap = createScaledPixmap(normalImage, imgWidth, imgHeight,
-                                      Qt::ScaleFree);
+                                      Qt::IgnoreAspectRatio);
     highlightedPixmap = createScaledPixmap(highlightedImage, imgWidth, imgHeight,
-                                           Qt::ScaleFree);
+                                           Qt::IgnoreAspectRatio);
     selectedPixmap = createScaledPixmap(selectedImage, imgWidth, imgHeight,
-                                        Qt::ScaleFree);
+                                        Qt::IgnoreAspectRatio);
     defaultPixmap = createScaledPixmap(defaultImage, imgWidth - 2 * sw,
                                        imgHeight - 2 * sh,
-                                       Qt::ScaleMin);
+                                       Qt::KeepAspectRatio);
 }
 
 void UIImageGridType::calculateScreenArea(void)
@@ -4073,7 +4081,11 @@ void UIManagedTreeListType::makeHighlights()
             fontProp *tmpfont = NULL;
             QString a_string = QString("bin%1-active").arg(i);
             tmpfont = &m_fontfcns[m_fonts[a_string]];
-            temp_pixmap->convertFromImage(temp_image.smoothScale(bin_corners[i].width(), QFontMetrics(tmpfont->face).height() + selectPadding));
+            temp_pixmap->convertFromImage(
+                    temp_image.scaled(bin_corners[i].width(), 
+                        QFontMetrics(tmpfont->face).height() + selectPadding,
+                        Qt::IgnoreAspectRatio,
+                        Qt::SmoothTransformation));
             resized_highlight_images.append(temp_pixmap);
             highlight_map[i] = temp_pixmap;
         }
@@ -4094,7 +4106,12 @@ void UIManagedTreeListType::makeHighlights()
         fontProp *tmpfont = NULL;
         QString a_string = QString("bin%1-active").arg(bins);
         tmpfont = &m_fontfcns[m_fonts[a_string]];
-        temp_pixmap->convertFromImage(temp_image.smoothScale(area.width(), QFontMetrics(tmpfont->face).height() + selectPadding ));
+        temp_pixmap->convertFromImage(
+            temp_image.scaled(
+                area.width(), 
+                QFontMetrics(tmpfont->face).height() + selectPadding,
+                Qt::IgnoreAspectRatio,
+                Qt::SmoothTransformation));
         resized_highlight_images.append(temp_pixmap);
         highlight_map[0] = temp_pixmap;
     }

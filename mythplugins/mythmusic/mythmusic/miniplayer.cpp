@@ -456,7 +456,8 @@ void MiniPlayer::updateTrackInfo(Metadata *mdata)
         if (!image.isNull())
         {
             m_coverImage->SetImage(
-                    QPixmap(image.smoothScale(m_coverImage->GetSize(true))));
+                    QPixmap(image.scaled(m_coverImage->GetSize(true), 
+                        Qt::IgnoreAspectRatio, Qt::SmoothTransformation)));
         }
         else
         {

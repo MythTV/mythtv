@@ -1534,7 +1534,8 @@ void OSDTypeImage::Load(const QString &filename, float wmult, float hmult,
     else
         imheight = ((int)(tmpimage.height() * hmult) / 2) * 2;
 
-    QImage tmp2 = tmpimage.smoothScale(imwidth, imheight);
+    QImage tmp2 = tmpimage.scaled(imwidth, imheight,
+        Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
     m_isvalid = true;
     m_filename = filename;

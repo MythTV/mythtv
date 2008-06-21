@@ -3087,8 +3087,10 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
 
             return NULL;
         }
-        QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult),
-                                           (int)(tmpimage.height() * hmult));
+        QImage tmp2 = tmpimage.scaled((int)(tmpimage.width() * wmult),
+                                           (int)(tmpimage.height() * hmult),
+                                           Qt::IgnoreAspectRatio,
+                                           Qt::SmoothTransformation);
         ret = new QImage(tmp2);
     }
     else
@@ -3186,8 +3188,10 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
             delete ret;
             return NULL;
         }
-        QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult),
-                                           (int)(tmpimage.height() * hmult));
+        QImage tmp2 = tmpimage.scaled((int)(tmpimage.width() * wmult),
+                                           (int)(tmpimage.height() * hmult),
+                                           Qt::IgnoreAspectRatio,
+                                           Qt::SmoothTransformation);
         ret->convertFromImage(tmp2);
     }       
     else

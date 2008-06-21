@@ -144,7 +144,8 @@ void ThumbGenerator::run()
                 if (image.isNull())
                     continue; // give up;
 
-                image = image.smoothScale(m_width,m_height,Qt::KeepAspectRatio);
+                image = image.scaled(m_width,m_height,
+                                Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 image.save(cachePath, "JPEG");
 
                 // deep copies all over

@@ -582,9 +582,10 @@ void VideoGallery::LoadIconWindow()
                     QString("Failed to load %1").arg(backgrounds[i].filename));
             exit(-1);
         }
-        *(backgrounds[i].name) = QPixmap(img->smoothScale((int)thumbW,
+        *(backgrounds[i].name) = QPixmap(img->scaled((int)thumbW,
                                                           (int)thumbH,
-                                                          Qt::IgnoreAspectRatio));
+                                                          Qt::IgnoreAspectRatio,
+                                                          Qt::SmoothTransformation));
         delete img;
     }
 }

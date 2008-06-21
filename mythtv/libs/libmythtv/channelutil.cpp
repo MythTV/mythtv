@@ -137,7 +137,8 @@ bool PixmapChannel::LoadChannelIcon(uint size) const
             (tempimage.height() != (int) size))
         {
             QImage tmp2;
-            tmp2 = tempimage.smoothScale(size, size);
+            tmp2 = tempimage.scaled(size, size,
+                    Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
             iconPixmap.convertFromImage(tmp2);
         }
         else

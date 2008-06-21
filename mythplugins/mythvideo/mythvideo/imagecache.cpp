@@ -170,8 +170,8 @@ class ImageCacheImp
                 ret->scale_mode = scale;
                 QImage scale_me(ret->image.convertToImage());
                 ret->scale_image.
-                        convertFromImage(scale_me.smoothScale(width, height,
-                                                              scale));
+                        convertFromImage(scale_me.scaled(width, height,
+                                                scale, Qt::SmoothTransformation));
                 ret->scale_width = width;
                 ret->scale_height = height;
             }

@@ -37,8 +37,10 @@ static QPixmap *pixuncat = NULL;
 static QPixmap *scalePixmap(const char **xpmdata, float wmult, float hmult)
 {
     QImage tmpimage(xpmdata);
-    QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult),
-                                       (int)(tmpimage.height() * hmult));
+    QImage tmp2 = tmpimage.scaled((int)(tmpimage.width() * wmult),
+                                       (int)(tmpimage.height() * hmult),
+                                       Qt::IgnoreAspectRatio,
+                                       Qt::SmoothTransformation);
     QPixmap *ret = new QPixmap();
     ret->convertFromImage(tmp2);
 

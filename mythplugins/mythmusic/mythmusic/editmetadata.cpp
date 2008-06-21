@@ -189,7 +189,8 @@ QPixmap *EditMetadataDialog::createScaledPixmap(QString filename,
         }
         else
         {
-            pixmap = new QPixmap(img->smoothScale(width, height, mode));
+            pixmap = new QPixmap(img->scaled(width, height, 
+                                    mode, Qt::SmoothTransformation));
             delete img;
         }
     }

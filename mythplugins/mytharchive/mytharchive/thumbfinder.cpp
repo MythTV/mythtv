@@ -388,7 +388,7 @@ void ThumbFinder::updateThumb(void)
     if (item->pixmap)
         delete item->pixmap;
     item->pixmap = createScaledPixmap(imageFile, size.width(), size.height(),
-                                      Qt::ScaleFree);
+                                      Qt::IgnoreAspectRatio);
     int64_t pos = (int) ((m_currentPTS - m_startPTS) / m_frameTime);
     thumb->frame = pos - m_offset;
     if (itemNo != 0)
@@ -470,7 +470,7 @@ bool ThumbFinder::getThumbImages()
 
     QPixmap *pixmap = createScaledPixmap(m_frameFile,
                                          size.width(), size.height(),
-                                         Qt::ScaleFree);
+                                         Qt::IgnoreAspectRatio);
 
     ImageGridItem *item = new ImageGridItem(thumb->caption, pixmap, false, NULL);
     m_imageGrid->appendItem(item);
@@ -514,7 +514,7 @@ bool ThumbFinder::getThumbImages()
 
         QPixmap *pixmap = createScaledPixmap(m_frameFile,
                                              size.width(), size.height(),
-                                             Qt::ScaleFree);
+                                             Qt::IgnoreAspectRatio);
 
         ImageGridItem *item = new ImageGridItem(thumb->caption, pixmap, false, NULL);
         m_imageGrid->appendItem(item);
@@ -549,7 +549,7 @@ QPixmap *ThumbFinder::createScaledPixmap(QString filename,
         }
         else
         {
-            pixmap = new QPixmap(img->smoothScale(width, height, mode));
+            pixmap = new QPixmap(img->scaled(width, height, mode, Qt::SmoothTransformation));
             delete img;
         }
     }

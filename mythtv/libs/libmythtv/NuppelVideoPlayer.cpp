@@ -6763,7 +6763,8 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
                 rect->h = (int)(rect->h * vmult);
                 
                 if (hmult < 0.98 || hmult > 1.02 || vmult < 0.98 || hmult > 1.02)
-                    qImage = qImage.smoothScale(rect->w, rect->h);
+                    qImage = qImage.scaled(rect->w, rect->h,
+                            Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
                 OSDTypeImage* image = new OSDTypeImage();
                 image->SetPosition(QPoint(rect->x, rect->y), hmult, vmult);
@@ -7079,7 +7080,7 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
             w    = (int)ceil(w    * hmult);
             h    = (int)ceil(h    * vmult);
 
-            hl_image = hl_image.smoothScale(w, h);
+            hl_image = hl_image.scaled(w, h); // use FastTransformation
         } 
         else 
             hmult = vmult = 1.0;

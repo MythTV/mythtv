@@ -1045,8 +1045,8 @@ void ImageSelectSetting::imageSet(int num)
         return;
 
     QImage temp = *(images[current]);
-    temp = temp.smoothScale((int)(184 * m_hmult), (int)(138 * m_hmult),
-                            Qt::ScaleMin);
+    temp = temp.scaled((int)(184 * m_hmult), (int)(138 * m_hmult),
+                        Qt::KeepAspectRatio);
 
     QPixmap tmppix(temp);
     imagelabel->setPixmap(tmppix);
@@ -1105,8 +1105,8 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
     if (images.size() != 0 && current < images.size() && images[current])
     { 
         QImage temp = *(images[current]);
-        temp = temp.smoothScale((int)(184 * m_hmult), (int)(138 * m_hmult), 
-                                Qt::ScaleMin);
+        temp = temp.scaled((int)(184 * m_hmult), (int)(138 * m_hmult),
+                            Qt::KeepAspectRatio);
  
         QPixmap tmppix(temp);
         imagelabel->setPixmap(tmppix);

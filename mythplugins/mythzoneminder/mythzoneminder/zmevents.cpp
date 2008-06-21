@@ -529,8 +529,9 @@ void ZMEvents::gridItemChanged(ImageGridItem *item)
                     if (!image.isNull())
                     {
                         QSize size = m_eventGrid->getImageItemSize();
-                        QPixmap *pixmap = new QPixmap(image.smoothScale(
-                                size.width(), size.height(), Qt::KeepAspectRatio));
+                        QPixmap *pixmap = new QPixmap(image.scaled(
+                                size.width(), size.height(), 
+                                Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
                         gridItem->pixmap = pixmap;
                     }

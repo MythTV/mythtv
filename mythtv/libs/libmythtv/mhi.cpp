@@ -765,12 +765,14 @@ void MHIContext::DrawImage(int x, int y, const QRect &clipRect,
     {
         // LoadFromQImage seems to have a problem with non-32 bit images.
         // We need to work around that and force 32 bits.
-        QImage scaled =
-            qImage.smoothScale(
+        QImage q_scaled =
+            qImage.scaled(
                 displayRect.width() * GetWidth() / MHIContext::StdDisplayWidth,
                 displayRect.height() *
-                GetHeight() / MHIContext::StdDisplayHeight);
-        AddToDisplay(scaled.convertDepth(32),
+                GetHeight() / MHIContext::StdDisplayHeight,
+                Qt::IgnoreAspectRatio,
+                Qt::SmoothTransformation);
+        AddToDisplay(q_scaled.convertDepth(32),
                      x * GetWidth() / MHIContext::StdDisplayWidth,
                      y * GetHeight() / MHIContext::StdDisplayHeight);
     }
@@ -779,12 +781,14 @@ void MHIContext::DrawImage(int x, int y, const QRect &clipRect,
         QImage clipped = qImage.convertDepth(32)
             .copy(displayRect.x() - x, displayRect.y() - y,
                   displayRect.width(), displayRect.height());
-        QImage scaled =
-            clipped.smoothScale(
+        QImage q_scaled =
+            clipped.scaled(
                 displayRect.width() * GetWidth() / MHIContext::StdDisplayWidth,
                 displayRect.height() *
-                GetHeight() / MHIContext::StdDisplayHeight);
-        AddToDisplay(scaled,
+                GetHeight() / MHIContext::StdDisplayHeight,
+                Qt::IgnoreAspectRatio,
+                Qt::SmoothTransformation);
+        AddToDisplay(q_scaled,
                      displayRect.x() *
                      GetWidth() / MHIContext::StdDisplayWidth,
                      displayRect.y() *
@@ -1545,5 +1549,6 @@ void MHIBitmap::ScaleImage(int newWidth, int newHeight)
         return;
     }
 
-    m_image = m_image.smoothScale(newWidth, newHeight);
+    m_image = m_image.scaled(newWidth, newHeight,
+            Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 }
