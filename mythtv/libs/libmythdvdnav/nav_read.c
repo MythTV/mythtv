@@ -353,6 +353,8 @@ void navRead_DSI(dsi_t *dsi, unsigned char *buffer) {
   /* Asserts */
 
   /* dsi dsi gi */
+#ifdef LOG_DEBUG
   CHECK_VALUE(dsi->dsi_gi.zero1 == 0);
+#endif
 }
 
