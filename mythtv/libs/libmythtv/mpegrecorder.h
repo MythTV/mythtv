@@ -118,9 +118,9 @@ class MpegRecorder : public DTVRecorder,
 
     // TS
     MPEGStreamData *_stream_data;
-    unsigned char   _stream_id[0x1fff];
-    unsigned char   _pid_status[0x1fff];
-    unsigned char   _continuity_counter[0x1fff];
+    unsigned char   _stream_id[0x1fff  + 1];
+    unsigned char   _pid_status[0x1fff + 1];
+    unsigned char   _continuity_counter[0x1fff + 1];
     static const unsigned char kPayloadStartSeen = 0x2;
 
     // Statistics
