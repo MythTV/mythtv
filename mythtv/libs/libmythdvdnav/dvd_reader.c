@@ -951,7 +951,7 @@ static int DVDReadBlocksPath( dvd_file_t *dvd_file, unsigned int offset,
                  * also error from this read will not show in ret. */
 		
 		/* Does the next part exist? If not then return now. */
-		if( !dvd_file->title_devs[ i + 1 ] ) return ret;
+		if( i == 8 || !dvd_file->title_devs[ i + 1 ] ) return ret;
 
                 /* Read part 2 */
                 off = dvdinput_seek( dvd_file->title_devs[ i + 1 ], 0 );
