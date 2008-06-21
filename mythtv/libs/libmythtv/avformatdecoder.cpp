@@ -3978,15 +3978,24 @@ bool AvFormatDecoder::SetupAudioStream(void)
         assert(curstream);
         assert(curstream->codec);
         codec_ctx = curstream->codec;        
-        bool do_ac3_passthru = (allow_ac3_passthru && !transcoding &&
-                                (codec_ctx->codec_id == CODEC_ID_AC3));
-        bool do_dts_passthru = (allow_dts_passthru && !transcoding &&
-                                (codec_ctx->codec_id == CODEC_ID_DTS));
-        using_passthru = do_ac3_passthru || do_dts_passthru;
-        info = AudioInfo(codec_ctx->codec_id,
-                         codec_ctx->sample_rate, codec_ctx->channels,
-                         using_passthru && !disable_passthru);
+        if (codec_ctx)
+        {
+            bool do_ac3_passthru = (allow_ac3_passthru && !transcoding &&
+                                    (codec_ctx->codec_id == CODEC_ID_AC3));
+            bool do_dts_passthru = (allow_dts_passthru && !transcoding &&
+                                    (codec_ctx->codec_id == CODEC_ID_DTS));
+            using_passthru = do_ac3_passthru || do_dts_passthru;
+            info = AudioInfo(codec_ctx->codec_id,
+                             codec_ctx->sample_rate, codec_ctx->channels,
+                             using_passthru && !disable_passthru);
+        }
     }
+
+    if (!codec_ctx)
+    {
+        VERBOSE(VB_IMPORTANT, "No codec context. Returning false");
+        return false;
+    } 
 
     if (info == audioIn)
         return false; // no change
