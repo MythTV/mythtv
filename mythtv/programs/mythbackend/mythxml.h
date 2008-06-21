@@ -186,18 +186,20 @@ class ThreadData : public HttpWorkerData
                     const QString &sStartTime,
                     const QString &sFileName )
         {
-            m_eType      = DT_Recording;
-            m_sChanId    = sChanId;
-            m_sStartTime = sStartTime;
-            m_sFileName  = sFileName;
+            m_eType        = DT_Recording;
+            m_sChanId      = sChanId;
+            m_sStartTime   = sStartTime;
+            m_sFileName    = sFileName;
+            m_nTrackNumber = 0;
         }
 
         ThreadData( const QString &sVideoID,
                     const QString &sFileName )
         {
-            m_eType      = DT_Video;
-            m_sVideoID   = sVideoID;
-            m_sFileName  = sFileName;
+            m_eType        = DT_Video;
+            m_sVideoID     = sVideoID;
+            m_sFileName    = sFileName;
+            m_nTrackNumber = 0;
         }
 
 
