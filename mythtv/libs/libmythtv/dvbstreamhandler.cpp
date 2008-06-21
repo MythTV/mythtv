@@ -189,8 +189,15 @@ void DVBStreamHandler::Start(void)
     if (!IsRunning())
     {
         QMutex is_running_lock;
-        pthread_create(&_reader_thread, NULL,
-                       run_dvb_stream_handler_thunk, this);
+        int rval = pthread_create(&_reader_thread, NULL,
+                                  run_dvb_stream_handler_thunk, this);
+
+        if (0 != rval)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Start: Failed to create thread." + ENO);
+            return;
+        }
 
         while (!IsRunning())
         {

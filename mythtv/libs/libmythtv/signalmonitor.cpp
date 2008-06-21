@@ -205,7 +205,17 @@ void SignalMonitor::Start()
     {
         QMutexLocker locker(&startStopLock);
         if (!running)
-            pthread_create(&monitor_thread, NULL, SpawnMonitorLoop, this);
+        {
+            int rval = pthread_create(
+                &monitor_thread, NULL, SpawnMonitorLoop, this);
+
+            if (0 != rval)
+            {
+                VERBOSE(VB_IMPORTANT, "Failed to create signal monitor thread");
+                return;
+            }
+        }
+
         while (!running)
             usleep(50);
     }
