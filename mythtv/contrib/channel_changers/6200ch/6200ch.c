@@ -34,6 +34,7 @@
 // WARNING: Please update firewiredevice.cpp when adding to this list.
 
 #define DCH3200_VENDOR_ID1 0x00001c11
+#define DCH3200_VENDOR_ID2 0x00001cfb
 #define DCH3200_MODEL_ID1  0x0000d330
 
 #define DCT3412_VENDOR_ID1 0x0000159a
@@ -227,6 +228,7 @@ int main (int argc, char *argv[])
 
       // WARNING: Please update firewiredevice.cpp when adding to this list.
       if ( ((dir.vendor_id == DCH3200_VENDOR_ID1) ||
+            (dir.vendor_id == DCH3200_VENDOR_ID2) ||
             (dir.vendor_id == DCT3412_VENDOR_ID1) || 
             (dir.vendor_id == DCT3416_VENDOR_ID1) || 
             (dir.vendor_id == DCT3416_VENDOR_ID2) || 

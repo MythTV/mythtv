@@ -418,7 +418,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
     const uint64_t motorola_vendor_ids[] =
     {
         /* DCH-3200 */
-        0x1c11,
+        0x1c11,    0x1cfb,
         /* 3416 */
         0x1bdd,
         /* 3412 */
