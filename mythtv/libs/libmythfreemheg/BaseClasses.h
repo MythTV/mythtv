@@ -192,7 +192,7 @@ protected:
 class MHGenericBoolean: public MHGenericBase
 {
 public:
-    MHGenericBoolean() {}
+    MHGenericBoolean() : m_fDirect(false) {}
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     bool GetValue(MHEngine *engine) const; // Return the value, looking up any indirect ref.
@@ -203,7 +203,7 @@ protected:
 class MHGenericInteger: public MHGenericBase
 {
 public:
-    MHGenericInteger() {}
+    MHGenericInteger() : m_nDirect(-1) {}
     void Initialise(MHParseNode *p, MHEngine *engine);
     void PrintMe(FILE *fd, int nTabs) const;
     int GetValue(MHEngine *engine) const; // Return the value, looking up any indirect ref.

@@ -41,7 +41,7 @@ public:
 class MHBooleanVar : public MHVariable  
 {
 public:
-    MHBooleanVar() {}
+    MHBooleanVar(): m_fOriginalValue(false), m_fValue(false) {}
     virtual const char *ClassName() { return "BooleanVariable"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void PrintMe(FILE *fd, int nTabs) const;
@@ -62,7 +62,7 @@ protected:
 class MHIntegerVar : public MHVariable  
 {
 public:
-    MHIntegerVar() {}
+    MHIntegerVar(): m_nOriginalValue(0), m_nValue(0) {}
     virtual const char *ClassName() { return "IntegerVariable"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void PrintMe(FILE *fd, int nTabs) const;
@@ -156,7 +156,7 @@ protected:
 class MHTestVariable: public MHElemAction
 {
 public:
-    MHTestVariable(): MHElemAction(":TestVariable") {}
+    MHTestVariable(): MHElemAction(":TestVariable"), m_nOperator(0) {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
 protected:

@@ -40,6 +40,7 @@
 MHGroup::MHGroup()
 {
     m_nOrigGCPriority = 127; // Default.
+    m_fIsApp = false;
     m_nLastId = 0;
 }
 

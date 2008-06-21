@@ -32,6 +32,7 @@
 MHLink::MHLink()
 {
     m_EventData.m_Type = MHUnion::U_None;
+    m_nEventType = EventIsAvailable;
 }
 
 void MHLink::Initialise(MHParseNode *p, MHEngine *engine)

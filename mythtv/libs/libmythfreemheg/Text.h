@@ -84,7 +84,7 @@ protected:
     MHOctetString   m_Content; // The content as an octet string
 
     MHTextDisplay   *m_pDisplay; // Pointer to the display object.
-    bool            m_NeedsRedraw;
+    bool            m_fNeedsRedraw;
 
     // Create the Unicode content from the character input.
     void CreateContent(const unsigned char *p, int s, MHEngine *engine);

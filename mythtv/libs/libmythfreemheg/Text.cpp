@@ -38,6 +38,7 @@ MHText::MHText()
     m_StartCorner = UpperLeft;
     m_fTextWrap = false;
     m_pDisplay = NULL;
+    m_fNeedsRedraw = false;
 }
 
 MHText::MHText(const MHText &ref): MHVisible(ref) // Copy constructor for cloning.
@@ -53,6 +54,7 @@ MHText::MHText(const MHText &ref): MHVisible(ref) // Copy constructor for clonin
     m_StartCorner = ref.m_StartCorner;
     m_fTextWrap = ref.m_fTextWrap;
     m_pDisplay = NULL;
+    m_fNeedsRedraw = ref.m_fNeedsRedraw;
 }
 
 MHText::~MHText()
@@ -93,7 +95,7 @@ void MHText::Initialise(MHParseNode *p, MHEngine *engine)
     if (pTextWrap) m_fTextWrap = pTextWrap->GetArgN(0)->GetBoolValue();
 
     m_pDisplay = engine->GetContext()->CreateText();
-    m_NeedsRedraw = true;
+    m_fNeedsRedraw = true;
 }
 
 static const char *rchJustification[] =
@@ -175,7 +177,7 @@ void MHText::Preparation(MHEngine *engine)
     MHVisible::Preparation(engine);
 
     m_pDisplay->SetSize(m_nBoxWidth, m_nBoxHeight);
-    m_NeedsRedraw = true;
+    m_fNeedsRedraw = true;
 }
 
 // Content preparation.  If it's included we can set up the content.
@@ -193,7 +195,7 @@ void MHText::ContentArrived(const unsigned char *data, int length, MHEngine *eng
     CreateContent(data, length, engine);
     // Now signal that the content is available.
     engine->EventTriggered(this, EventContentAvailable);
-    m_NeedsRedraw = true;
+    m_fNeedsRedraw = true;
 }
 
 // 
@@ -201,14 +203,14 @@ void MHText::CreateContent(const unsigned char *p, int s, MHEngine *engine)
 {
     m_Content.Copy(MHOctetString((const char *)p, s));
     engine->Redraw(GetVisibleArea()); // Have to redraw if the content has changed.
-    m_NeedsRedraw = true;
+    m_fNeedsRedraw = true;
 //  fprintf(fd, "Text content is now "); m_Content.PrintMe(0); fprintf(fd, "\n");
 }
 
 void MHText::SetTextColour(const MHColour &colour, MHEngine *engine)
 {
     m_textColour.Copy(colour);
-    m_NeedsRedraw = true;
+    m_fNeedsRedraw = true;
     engine->Redraw(GetVisibleArea());
 }
 
@@ -223,7 +225,7 @@ void MHText::SetBackgroundColour(const MHColour &colour, MHEngine *engine)
 void MHText::SetFontAttributes(const MHOctetString &fontAttrs, MHEngine *engine)
 {
     m_fontAttrs.Copy(fontAttrs);
-    m_NeedsRedraw = true;
+    m_fNeedsRedraw = true;
     engine->Redraw(GetVisibleArea());
 }
 
@@ -516,10 +518,10 @@ void MHText::Display(MHEngine *engine)
 {
     if (! m_fRunning || ! m_pDisplay || m_nBoxWidth == 0 || m_nBoxHeight == 0) return; // Can't draw zero sized boxes.
     // We only need to recreate the display if something has changed.
-    if ( m_NeedsRedraw)
+    if ( m_fNeedsRedraw)
     {
         Redraw();
-        m_NeedsRedraw = false;
+        m_fNeedsRedraw = false;
     }
     // Draw the background first, then the text.
     engine->GetContext()->DrawRect(m_nPosX, m_nPosY, m_nBoxWidth, m_nBoxHeight, GetColour(m_bgColour));

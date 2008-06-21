@@ -145,6 +145,7 @@ MHRoot *MHStream::FindByObjectNo(int n)
 
 MHAudio::MHAudio()
 {
+    m_nComponentTag = 0;
     m_nOriginalVol = 0;
     m_fStreamPlaying = false;
 }
@@ -223,6 +224,7 @@ void MHAudio::StopPlaying(MHEngine *engine)
 
 MHVideo::MHVideo()
 {
+    m_nComponentTag = 0;
     m_Termination = VI_Disappear;
     m_nXDecodeOffset = 0;
     m_nYDecodeOffset = 0;

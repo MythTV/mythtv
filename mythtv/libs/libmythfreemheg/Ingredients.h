@@ -120,7 +120,8 @@ protected:
 class MHSetData: public MHElemAction
 {
 public:
-    MHSetData(): MHElemAction(":SetData") {}
+  MHSetData(): MHElemAction(":SetData"), m_fIsIncluded(false),
+        m_fSizePresent(false), m_fCCPriorityPresent(false) {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
     virtual void PrintArgs(FILE *fd, int nTabs) const;

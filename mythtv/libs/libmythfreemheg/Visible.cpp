@@ -35,6 +35,8 @@ MHVisible::MHVisible()
 {
     m_nOriginalBoxWidth = m_nOriginalBoxHeight = -1; // Should always be specified.
     m_nOriginalPosX = m_nOriginalPosY = 0; // Default values.
+    m_nBoxWidth = m_nBoxHeight = 0;
+    m_nPosX = m_nPosY = 0;
 }
 
 // Copy constructor for cloning
@@ -44,6 +46,10 @@ MHVisible::MHVisible(const MHVisible &ref): MHPresentable(ref)
     m_nOriginalBoxHeight = ref.m_nOriginalBoxHeight;
     m_nOriginalPosX = ref.m_nOriginalPosX;
     m_nOriginalPosY = ref.m_nOriginalPosY;
+    m_nBoxWidth = ref.m_nBoxWidth;
+    m_nBoxHeight = ref.m_nBoxHeight;
+    m_nPosX = ref.m_nPosX;
+    m_nPosY = ref.m_nPosY;
     m_OriginalPaletteRef.Copy(ref.m_OriginalPaletteRef);
 }
 
@@ -205,6 +211,8 @@ MHLineArt::MHLineArt()
     m_fBorderedBBox = true;
     m_nOriginalLineWidth = 1;
     m_OriginalLineStyle = LineStyleSolid;
+    m_nLineWidth = 0;
+    m_LineStyle = 0;
     // Colour defaults to empty.
 }
 
@@ -216,6 +224,8 @@ MHLineArt::MHLineArt(const MHLineArt &ref): MHVisible(ref)
     m_OriginalLineStyle = ref.m_OriginalLineStyle;
     m_OrigLineColour = ref.m_OrigLineColour;
     m_OrigFillColour = ref.m_OrigFillColour;
+    m_nLineWidth = ref.m_nLineWidth;
+    m_LineStyle = ref.m_LineStyle;
 }
 
 void MHLineArt::Initialise(MHParseNode *p, MHEngine *engine)

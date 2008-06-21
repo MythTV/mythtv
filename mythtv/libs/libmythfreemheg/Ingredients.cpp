@@ -36,6 +36,8 @@ MHIngredient::MHIngredient()
     m_fShared = false;
     m_nOrigContentSize = 0;
     m_nOrigCCPrio = 127; // Default.
+    m_nContentSize = 0;
+    m_nCCPrio = 0;
     m_ContentType = IN_NoContent;
 }
 
@@ -51,6 +53,8 @@ MHIngredient::MHIngredient(const MHIngredient &ref): MHRoot(ref)
     m_nOrigContentSize = ref.m_nOrigContentSize;
     m_nOrigCCPrio = ref.m_nOrigCCPrio;
     m_fShared = ref.m_fShared;
+    m_nContentSize = ref.m_nContentSize;
+    m_nCCPrio = ref.m_nCCPrio;
 }
 
 

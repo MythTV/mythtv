@@ -157,7 +157,7 @@ public:
 class MHSendEvent: public MHElemAction
 {
 public:
-    MHSendEvent(): MHElemAction(":SendEvent") {}
+    MHSendEvent(): MHElemAction(":SendEvent"), m_EventType(EventIsAvailable) {}
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void Perform(MHEngine *engine);
     virtual void PrintArgs(FILE *fd, int nTabs) const;
