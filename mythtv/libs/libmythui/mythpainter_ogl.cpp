@@ -226,9 +226,9 @@ void MythOpenGLPainter::BindTextureFromCache(MythImage *im,
 
     if (m_ImageExpireList.size() > MAX_GL_ITEMS)
     {
-        MythImage *im = m_ImageExpireList.front();
+        MythImage *expiredIm = m_ImageExpireList.front();
         m_ImageExpireList.pop_front();
-        RemoveImageFromCache(im);
+        RemoveImageFromCache(expiredIm);
     }
 }
 

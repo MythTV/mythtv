@@ -409,44 +409,44 @@ void ViewScheduled::updateList(QPainter *p)
                 if (i + skip >= listCount)
                     break;
 
-                ProgramInfo *p = recList[skip+i];
+                ProgramInfo *pginfo = recList[skip+i];
 
                 QString temp;
 
-                temp = (p->recstartts).toString(dateformat);
-                temp += " " + (p->recstartts).toString(timeformat);
+                temp = (pginfo->recstartts).toString(dateformat);
+                temp += " " + (pginfo->recstartts).toString(timeformat);
                 ltype->SetItemText(i, 1, temp);
 
-                ltype->SetItemText(i, 2, p->ChannelText(channelFormat));
+                ltype->SetItemText(i, 2, pginfo->ChannelText(channelFormat));
 
-                temp = p->title;
-                if ((p->subtitle).stripWhiteSpace().length() > 0)
-                    temp += " - \"" + p->subtitle + "\"";
+                temp = pginfo->title;
+                if ((pginfo->subtitle).stripWhiteSpace().length() > 0)
+                    temp += " - \"" + pginfo->subtitle + "\"";
                 ltype->SetItemText(i, 3, temp);
 
-                temp = p->RecStatusChar();
+                temp = pginfo->RecStatusChar();
                 ltype->SetItemText(i, 4, temp);
 
                 if (i + skip == listPos)
                     ltype->SetItemCurrent(i);
 
-                if (p->recstatus == rsRecording)
+                if (pginfo->recstatus == rsRecording)
                     ltype->EnableForcedFont(i, "recording");
-                else if (p->recstatus == rsConflict ||
-                         p->recstatus == rsOffLine ||
-                         p->recstatus == rsAborted)
+                else if (pginfo->recstatus == rsConflict ||
+                         pginfo->recstatus == rsOffLine ||
+                         pginfo->recstatus == rsAborted)
                     ltype->EnableForcedFont(i, "conflictingrecording");
-                else if (p->recstatus == rsWillRecord)
+                else if (pginfo->recstatus == rsWillRecord)
                     {
                     if ((curcard == 0 && curinput == 0) || 
-                        p->cardid == curcard || p->inputid == curinput)
+                        pginfo->cardid == curcard || pginfo->inputid == curinput)
                         ltype->EnableForcedFont(i, "record");
                     }
-                else if (p->recstatus == rsRepeat ||
-                         p->recstatus == rsOtherShowing ||
-                         p->recstatus == rsNeverRecord ||
-                         (p->recstatus != rsDontRecord &&
-                          p->recstatus <= rsEarlierShowing))
+                else if (pginfo->recstatus == rsRepeat ||
+                         pginfo->recstatus == rsOtherShowing ||
+                         pginfo->recstatus == rsNeverRecord ||
+                         (pginfo->recstatus != rsDontRecord &&
+                          pginfo->recstatus <= rsEarlierShowing))
                     ltype->EnableForcedFont(i, "disabledrecording"); 
             }
         }
@@ -572,10 +572,10 @@ void ViewScheduled::updateInfo(QPainter *p)
     LayerSet *container = theme->GetSet("program_info");
     if (container)
     {
-        ProgramInfo *p = recList[listPos];
-        if (p)
+        ProgramInfo *pginfo = recList[listPos];
+        if (pginfo)
         {
-            p->ToMap(infoMap);
+            pginfo->ToMap(infoMap);
             container->ClearAllText();
             container->SetText(infoMap);
         }
@@ -608,10 +608,10 @@ void ViewScheduled::updateRecStatus(QPainter *p)
     LayerSet *container = theme->GetSet("status_info");
     if (container)
     {
-        ProgramInfo *p = recList[listPos];
-        if (p)
+        ProgramInfo *pginfo = recList[listPos];
+        if (pginfo)
         {
-            p->ToMap(infoMap);
+            pginfo->ToMap(infoMap);
             container->ClearAllText();
             container->SetText(infoMap);
         }
