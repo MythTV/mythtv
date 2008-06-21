@@ -132,6 +132,7 @@ RateTransposer *RateTransposer::newInstance()
 // Constructor
 RateTransposer::RateTransposer() : FIFOProcessor(&outputBuffer)
 {
+    fRate = 1.0f;
     uChannels = 2;
     bUseAAFilter = TRUE;
 

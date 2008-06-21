@@ -185,6 +185,7 @@ FreeSurround::FreeSurround(uint srate, bool moviemode, SurroundMode smode) :
         in_count(0),
         out_count(0),
         processed(true),
+        processed_size(0),
         surround_mode(smode)
 {
     VERBOSE(QString("FreeSurround::FreeSurround rate %1 moviemode %2").arg(srate).arg(moviemode));

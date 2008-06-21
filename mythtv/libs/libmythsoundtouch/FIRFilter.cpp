@@ -58,6 +58,7 @@ using namespace soundtouch;
 FIRFilter::FIRFilter()
 {
     resultDivFactor = 0;
+    resultDivider = 0;
     length = 0;
     lengthDiv8 = 0;
     filterCoeffs = NULL;
