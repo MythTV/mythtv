@@ -114,6 +114,7 @@ ProgramInfo::ProgramInfo(void) :
     recstatus = rsUnknown;
     oldrecstatus = rsUnknown;
     savedrecstatus = rsUnknown;
+    prefinput = 0;
     recpriority2 = 0;
     reactivate = false;
     recordid = 0;

@@ -312,6 +312,7 @@ VideoOutput::VideoOutput() :
     framesPlayed(0), db_scaling_allowed(true),
     supported_attributes(kPictureAttributeSupported_None)
 {
+    bzero(&pip_tmp_image, sizeof(pip_tmp_image));
     db_display_dim = QSize(gContext->GetNumSetting("DisplaySizeWidth",  0),
                            gContext->GetNumSetting("DisplaySizeHeight", 0));
 

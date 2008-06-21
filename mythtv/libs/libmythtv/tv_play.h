@@ -102,7 +102,10 @@ typedef enum
 class AskProgramInfo
 {
   public:
-    AskProgramInfo() : info(NULL) {}
+    AskProgramInfo() :
+        has_rec(false),                has_later(false),
+        is_in_same_input_group(false), is_conflicting(false),
+        info(NULL) {}
     AskProgramInfo(const QDateTime &e, bool r, bool l, ProgramInfo *i) :
         expiry(e), has_rec(r), has_later(l),
         is_in_same_input_group(false), is_conflicting(false),

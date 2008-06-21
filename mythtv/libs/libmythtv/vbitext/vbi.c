@@ -632,7 +632,7 @@ struct vbi *
 vbi_open(const char *vbi_name, struct cache *ca, int fine_tune, int big_buf)
 {
     static int inited = 0;
-    struct vbi *vbi;
+    struct vbi *vbi = 0;
 
     (void)ca;
 

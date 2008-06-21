@@ -127,7 +127,9 @@ class TSPacket : public TSHeader
 {
     friend class PESPacket;
   public:
-    TSPacket() : TSHeader() {}
+    /* note: payload is intenionally left uninitialized */
+    TSPacket() : TSHeader() { }
+
     static TSPacket* CreatePayloadOnlyPacket()
     {
         TSPacket *pkt = new TSPacket();

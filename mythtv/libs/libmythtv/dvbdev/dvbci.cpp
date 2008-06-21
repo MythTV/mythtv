@@ -233,7 +233,7 @@ private:
   uint8_t data[MAX_TPDU_SIZE];
   const uint8_t *GetData(const uint8_t *Data, int &Length);
 public:
-  cTPDU(void) { size = 0; }
+  cTPDU(void) { size = 0; memset(data, 0, sizeof(uint8_t) * MAX_TPDU_SIZE); }
   cTPDU(uint8_t Slot, uint8_t Tcid, uint8_t Tag, int Length = 0, const uint8_t *Data = NULL);
   uint8_t Slot(void) { return data[0]; }
   uint8_t Tcid(void) { return data[1]; }
@@ -904,6 +904,9 @@ cCiApplicationInformation::cCiApplicationInformation(int SessionId, cCiTransport
   dbgprotocol("New Application Information (session id %d)\n", SessionId);
   state = 0;
   creationTime = time(NULL);
+  applicationType = 0;
+  applicationManufacturer = 0;
+  manufacturerCode = 0;
   menuString = NULL;
 }
 
@@ -1326,6 +1329,8 @@ cCiMenu::cCiMenu(cCiMMI *MMI, bool Selectable)
   selectable = Selectable;
   titleText = subTitleText = bottomText = NULL;
   numEntries = 0;
+  for (int i = 0; i < MAX_CIMENU_ENTRIES; i++)
+      entries[i] = NULL;
 }
 
 cCiMenu::~cCiMenu()

@@ -16,8 +16,6 @@
 class XvMCOSD
 {
   public:
-    XvMCOSD() { ; } // dummy
-
     XvMCOSD(Display *XJ_disp, int xv_port,
             int surface_type_id, int xvmc_surf_flags);
 
@@ -38,6 +36,10 @@ class XvMCOSD
     int GetRevision() { return revision; }
     bool NeedFrame();
     bool IsValid();
+
+  private:
+    XvMCOSD(); // dummy, don't use
+
   public:
     // XvMC OSD info
     Display             *XJ_disp;

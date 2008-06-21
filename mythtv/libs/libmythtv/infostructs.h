@@ -13,8 +13,7 @@
 class MPUBLIC ChannelInfo
 {
  public:
-    ChannelInfo() {}
-   ~ChannelInfo() {}
+    ChannelInfo() : chanid(-1), sourceid(-1), favid(-1), iconload(false) {}
 
     void LoadChannelIcon(int width, int height = 0);
     QString Text(QString format);

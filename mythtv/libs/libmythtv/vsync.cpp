@@ -113,10 +113,12 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
 VideoSync::VideoSync(VideoOutput *video_output,
                      int frameint, int refreshint,
                      bool halve_frame_interval) :
-    m_video_output(video_output),
-    m_frame_interval(frameint), m_refresh_interval(refreshint),
-    m_interlaced(halve_frame_interval) 
+    m_video_output(video_output),   m_frame_interval(frameint),
+    m_refresh_interval(refreshint), m_interlaced(halve_frame_interval),
+    m_delay(-1)
 {
+    bzero(&m_nexttrigger, sizeof(m_nexttrigger));
+
     if (m_interlaced && m_refresh_interval > m_frame_interval/2)
         m_interlaced = false; // can't display both fields at 2x rate
 
@@ -359,7 +361,7 @@ const char *nVidiaVideoSync::sm_nvidia_dev = "/dev/nvidia0";
 
 nVidiaVideoSync::nVidiaVideoSync(VideoOutput *vo,
                                  int fi, int ri, bool intr) : 
-    VideoSync(vo, fi, ri, intr)
+    VideoSync(vo, fi, ri, intr), m_nvidia_fd(-1)
 {
 }
 

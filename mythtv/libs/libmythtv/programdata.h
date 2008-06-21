@@ -25,7 +25,9 @@ struct ProgCredit
 class ProgInfo
 {
   public:
-    ProgInfo() { }
+    ProgInfo() :
+        previouslyshown(false), audioproperties(-1),
+        videoproperties(-1),    subtitletype(-1) { }
     ProgInfo(const ProgInfo &other) { channel = other.channel;
                                       startts = other.startts;
                                       endts = other.endts;

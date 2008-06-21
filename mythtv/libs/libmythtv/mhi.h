@@ -257,8 +257,10 @@ class MHIDLA : public MHDLADisplay
   public:
     MHIDLA(MHIContext *parent, bool isBoxed,
            MHRgba lineColour, MHRgba fillColour)
-        : m_parent(parent), m_boxed(isBoxed),
-          m_boxLineColour(lineColour), m_boxFillColour(fillColour) {}
+        : m_parent(parent),            m_width(0),
+          m_height(0),                 m_boxed(isBoxed),
+          m_boxLineColour(lineColour), m_boxFillColour(fillColour),
+          m_lineWidth(0) {}
     /// Draw the completed drawing onto the display.
     virtual void Draw(int x, int y);
     /// Set the box size.  Also clears the drawing.

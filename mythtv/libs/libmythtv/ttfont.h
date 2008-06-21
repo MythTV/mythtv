@@ -69,7 +69,6 @@ class TTFFont
      bool cache_glyph(unsigned short c);
 
      bool         valid;
-     FT_Library   library;
      FT_Face      face;
      QMap<unsigned short, FT_Glyph> glyphs;
      QMap<unsigned short, Raster_Map *> glyphs_cached;
@@ -104,6 +103,9 @@ class TTFFont
      int loadedfontsize;
      float m_wscale;
      float m_hmult;
+
+     static bool have_library;
+     static FT_Library the_library;
 };
 
 #endif

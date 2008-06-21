@@ -124,8 +124,8 @@ ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
     mode(pmode),                         fd(-1),
     // state
     no_writes(false),                    flush(false),
-    in_dtor(false),                      ignore_writes(false),
-    tfw_min_write_size(0),
+    write_is_blocked(false),             in_dtor(false),
+    ignore_writes(false),                tfw_min_write_size(0),
     // buffer position state
     rpos(0),                             wpos(0),
     written(0),

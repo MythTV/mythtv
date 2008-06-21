@@ -101,7 +101,7 @@ const uint k708AttrOpacityTransparent = 3;
 
 CC708Window::CC708Window()
     : priority(0),              visible(0),
-      anchor_point(0),
+      anchor_point(0),          relative_pos(0),
       anchor_vertical(0),       anchor_horizontal(0),
       row_count(0),             column_count(0),
       row_lock(0),              column_lock(0),

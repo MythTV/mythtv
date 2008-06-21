@@ -14,6 +14,8 @@ using namespace std;
 class CC708CharacterAttribute
 {
   public:
+    // Note this is intenionally not initialized in the constructor.
+
     uint pen_size;
     uint offset;
     uint text_tag;
@@ -60,6 +62,7 @@ class CC708CharacterAttribute
 class CC708Pen
 {
   public:
+    CC708Pen() : row(0), column(0) {}
     void SetPenStyle(uint style);
     void SetAttributes(int pen_size,
                        int offset,       int text_tag,  int font_tag,

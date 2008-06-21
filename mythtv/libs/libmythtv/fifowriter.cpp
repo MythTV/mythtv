@@ -26,6 +26,7 @@ FIFOWriter::FIFOWriter(int count, bool sync)
 {
     num_fifos = count;
     usesync = sync;
+    cur_id = -1;
     maxblksize = new long[count];
     killwr = new int[count];
     fbcount = new int[count];

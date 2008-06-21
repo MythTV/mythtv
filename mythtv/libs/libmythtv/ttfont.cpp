@@ -31,8 +31,8 @@ using namespace std;
 #include "osdtypes.h"
 #include "osdsurface.h"
 
-static int          have_library = 0;
-static FT_Library   the_library;
+bool TTFFont::have_library = false;
+FT_Library TTFFont::the_library;
 
 #define FT_VALID(handle) ((handle) && (handle)->clazz != NULL)
 
@@ -547,42 +547,29 @@ void TTFFont::KillFace(void)
 }
 
 TTFFont::TTFFont(char *file, int size, float wscale,
-                 float hmult)
+                 float hmult) :
+    valid(false),            face(0),
+    max_descent(-1),         max_ascent(-1),
+    fontsize(size),          vid_width(-1),
+    vid_height(-1),          use_kerning(false),
+    spacewidth(0),           m_size(size),
+    m_outline(false),        m_shadowxoff(0),
+    m_shadowyoff(0),         m_color_normal_y(255),
+    m_color_normal_u(128),   m_color_normal_v(128),
+    m_color_outline_y(0x40), m_color_outline_u(128),
+    m_color_outline_v(128),  m_color_shadow_y(0x20),
+    m_color_shadow_u(128),   m_color_shadow_v(128),
+    m_file(file),            loadedfontsize(-1),
+    m_wscale(wscale),        m_hmult(hmult)
 {
-   FT_Error            error;
-
-   valid = false;
-   m_size = size;
-   spacewidth = 0;
-
-   m_outline = false;
-   m_shadowxoff = 0;
-   m_shadowyoff = 0;
-
-   m_color_normal_y = 255;
-   m_color_normal_u = m_color_normal_v = 128;
-
-   m_color_outline_y = 0x40;
-   m_color_outline_u = m_color_outline_v = 128;
-
-   m_color_shadow_y = 0x20;
-   m_color_shadow_u = m_color_shadow_v = 128;
-
    if (!have_library)
    {
-	error = FT_Init_FreeType(&the_library);
-	if (error) {
-	   return;
-        }
-        have_library++;
+       FT_Error error = FT_Init_FreeType(&the_library);
+       if (error)
+           return;
+
+       have_library = true;
    }
-
-   fontsize = size;
-   library = the_library;
-
-   m_wscale = wscale;
-   m_file = file;
-   m_hmult = hmult;
 
    Init();
 }
@@ -622,7 +609,7 @@ void TTFFont::Init(void)
    int xdpi = 96, ydpi = 96;
    unsigned short i, n;
 
-   error = FT_New_Face(library, m_file, 0, &face);
+   error = FT_New_Face(the_library, m_file, 0, &face);
    if (error)
    {
 	return;

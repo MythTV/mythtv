@@ -22,13 +22,17 @@ extern "C" XvImage *XvShmCreateImage(Display*, XvPortID, int, char*,
 static inline xvmc_render_state_t *GetRender(VideoFrame *frame);
 
 XvMCOSD::XvMCOSD(Display *disp, int port, int surface_type_id,
-                 int xvmc_surf_flags)
-    : XJ_disp(disp), XJ_width(0), XJ_height(0),
-      xv_port(port), osd_palette(NULL), osd_xv_image(NULL),
-      osd_subpict_mode(NO_SUBPICTURE), osd_subpict_clear_color(0),
-      osd_subpict_alloc(false)
+                 int xvmc_surf_flags) :
+    XJ_disp(disp),                   XJ_width(0),
+    XJ_height(0),                    xv_port(port),
+    osd_palette(NULL),               osd_xv_image(NULL),
+    osd_subpict_mode(NO_SUBPICTURE), osd_subpict_clear_color(0),
+    osd_subpict_alloc(false),        revision(-1)
 {
-    bzero(&osd_subpict, sizeof(osd_subpict));
+    bzero(&osd_subpict,      sizeof(osd_subpict));
+    bzero(&XJ_osd_shm_info,  sizeof(XJ_osd_shm_info));
+    bzero(&osd_subpict_info, sizeof(osd_subpict_info));
+    bzero(&tmpframe,         sizeof(tmpframe));
     // subpicture init
     int num = 0;
     XvImageFormatValues *xvfmv = NULL;
@@ -48,6 +52,19 @@ XvMCOSD::XvMCOSD(Display *disp, int port, int surface_type_id,
 
     if (xvfmv)
         X11S(XFree(xvfmv));
+}
+
+XvMCOSD::XvMCOSD() :
+    XJ_disp(0),                      XJ_width(0),
+    XJ_height(0),                    xv_port(-1),
+    osd_palette(NULL),               osd_xv_image(NULL),
+    osd_subpict_mode(NO_SUBPICTURE), osd_subpict_clear_color(0),
+    osd_subpict_alloc(false),        revision(-1)
+{
+    bzero(&osd_subpict,      sizeof(osd_subpict));
+    bzero(&XJ_osd_shm_info,  sizeof(XJ_osd_shm_info));
+    bzero(&osd_subpict_info, sizeof(osd_subpict_info));
+    bzero(&tmpframe,         sizeof(tmpframe));
 }
 
 void XvMCOSD::CreateBuffer(XvMCContext &xvmc_ctx, int width, int height)

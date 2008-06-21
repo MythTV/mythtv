@@ -814,6 +814,8 @@ MHIText::MHIText(MHIContext *parent): m_parent(parent)
     m_fontsize = 12;
     m_fontItalic = false;
     m_fontBold = false;
+    m_width = 0;
+    m_height = 0;
 }
 
 void MHIText::Draw(int x, int y)

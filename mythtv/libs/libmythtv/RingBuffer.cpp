@@ -528,7 +528,7 @@ void RingBuffer::UpdatePlaySpeed(float play_speed)
  */
 void RingBuffer::CalcReadAheadThresh(void)
 {
-    uint estbitrate;
+    uint estbitrate = 0;
 
     pthread_rwlock_wrlock(&rwlock);
     wantseek       = false;

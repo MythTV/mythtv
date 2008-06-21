@@ -46,7 +46,10 @@ class BiopName
 class BiopTap
 {
   public:
-    BiopTap() { selector_data = NULL; }
+    BiopTap() :
+        id(0),               use(0),
+        assoc_tag(0),        selector_len(0),
+        selector_data(NULL) { }
     ~BiopTap();
 
     int Process(const unsigned char*);
@@ -73,7 +76,9 @@ class BiopConnbinder
 class BiopObjLocation
 {
   public:
-    BiopObjLocation() { }
+    BiopObjLocation() :
+        component_tag(0), component_data_len(0),
+        version_major(0), version_minor(0) { }
     ~BiopObjLocation() { }
 
     int Process(const unsigned char*);
@@ -96,7 +101,9 @@ class ProfileBody
 class ProfileBodyFull: public ProfileBody
 {
   public:
-    ProfileBodyFull() { }
+    ProfileBodyFull() :
+        data_len(0), byte_order(0),
+        lite_components_count(0) { }
     virtual ~ProfileBodyFull() { }
     virtual int Process(const unsigned char *);
     virtual DSMCCCacheReference *GetReference()
@@ -154,7 +161,7 @@ class BiopIor
 class BiopBinding
 {
   public:
-    BiopBinding() : m_objinfo_len(0), m_objinfo(0) {}
+    BiopBinding() : m_binding_type(0), m_objinfo_len(0), m_objinfo(0) {}
     ~BiopBinding();
 
     int Process(const unsigned char *data);
@@ -171,8 +178,13 @@ class ObjCarousel;
 class BiopMessage
 {
   public:
-    BiopMessage() : m_objinfo(NULL), m_objkind(NULL) {}
+    BiopMessage() :
+        m_version_major(0), m_version_minor(0),
+        m_message_size(0),  m_objkind_len(0),
+        m_objinfo_len(0),  m_objinfo(NULL),
+        m_objkind(NULL) {}
     ~BiopMessage();
+
     bool Process(DSMCCCacheModuleData *cachep, DSMCCCache *cache,
                  unsigned char *data, unsigned long *curp);
 

@@ -1,3 +1,4 @@
+// -*- Mode: c++ -*-
 #ifndef SIGNALMONITORVALUES_H
 #define SIGNALMONITORVALUES_H
 
@@ -12,7 +13,7 @@ class SignalMonitorValue
     SignalMonitorValue(const QString& _name, const QString& _noSpaceName,
                        int _threshold, bool _high_threshold,
                        int _min, int _max, int _timeout);
-    virtual ~SignalMonitorValue() { ; }
+    virtual ~SignalMonitorValue() { ; } /* forces class to have vtable */
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Gets  // // // // // // // // // // // // // // // // // // // // //
@@ -121,7 +122,9 @@ class SignalMonitorValue
             .arg( (IsGood()) ? "Is" : "Is NOT" );
     }
   private:
-    SignalMonitorValue() {}
+    SignalMonitorValue() :
+        value(-1), threshold(-1), minval(-1), maxval(-1), timeout(-1),
+        high_threshold(true), set(false) { }
     SignalMonitorValue(const QString& _name, const QString& _noSpaceName,
                        int _value, int _threshold, bool _high_threshold,
                        int _min, int _max, int _timeout, bool _set);

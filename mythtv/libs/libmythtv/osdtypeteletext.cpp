@@ -210,7 +210,7 @@ void OSDTypeTeletext::AddTeletextData(int magazine, int row,
 {
     OSDUpdateLocker locker(&m_lock, this);
 
-    int b1, b2, b3, err;
+    int b1, b2, b3, err = 0;
 
     if (magazine < 1 || magazine > 8)
         return;
