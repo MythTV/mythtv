@@ -24,13 +24,14 @@ using namespace std;
 #undef LoadImage
 #endif
 
-LayerSet::LayerSet(const QString &name)
+LayerSet::LayerSet(const QString &name) :
+    m_debug(false),
+    m_context(-1),
+    m_order(-1),
+    m_name(name),
+    numb_layers(-1),
+    allTypes(new vector<UIType *>)
 {
-    m_name = name;
-    m_context = -1;
-    m_debug = false;
-    numb_layers = -1;
-    allTypes = new vector<UIType *>;
 }
 
 LayerSet::~LayerSet()

@@ -21,19 +21,17 @@ enum CHECKED_STATE {CHECKED = 0, UNCHECKED, NOTCHECKABLE };
 class MPUBLIC LCDMenuItem
 {
   public:
-    LCDMenuItem() {}
     LCDMenuItem(bool item_selected, CHECKED_STATE item_checked,
                 QString item_name, unsigned int item_indent  = 0)
     {
         selected = item_selected;
         checked = item_checked;
         name = item_name;
+        scroll = false;
         indent = item_indent;
         scroll = false;
         scrollPosition = indent;
     }
-
-   ~LCDMenuItem() {}
 
     CHECKED_STATE isChecked() { return checked; }
     bool isSelected() { return selected; }
@@ -64,7 +62,6 @@ enum TEXT_ALIGNMENT {ALIGN_LEFT, ALIGN_RIGHT, ALIGN_CENTERED };
 class MPUBLIC LCDTextItem
 {
   public:
-    LCDTextItem() {}
     LCDTextItem(unsigned int row, TEXT_ALIGNMENT align, QString text,
                 QString screen = "Generic", bool scroll = false,
                 QString widget = "textWidget")
@@ -76,8 +73,6 @@ class MPUBLIC LCDTextItem
         itemWidget = widget;
         itemScrollable = scroll;
     }
-
-   ~LCDTextItem(){};
 
     unsigned int getRow() { return itemRow; }
     TEXT_ALIGNMENT getAlignment() { return itemAlignment; }

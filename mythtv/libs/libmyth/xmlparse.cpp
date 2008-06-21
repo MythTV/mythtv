@@ -19,7 +19,7 @@ using namespace std;
 
 MPUBLIC QMap<QString, fontProp> globalFontMap;
 
-XMLParse::XMLParse(void)
+XMLParse::XMLParse(void) : wmult(0.0), hmult(0.0), usetrans(-1)
 {
     allTypes = new vector<LayerSet *>;
 }

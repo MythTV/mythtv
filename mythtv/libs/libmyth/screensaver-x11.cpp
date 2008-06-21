@@ -149,7 +149,9 @@ class ScreenSaverX11Private
   private:
     struct ScreenSaverState
     {
-        ScreenSaverState() : saved(false) {}
+        ScreenSaverState() :
+            saved(false), timeout(-1), interval(-1),
+            preferblank(-1), allowexposure(-1) {}
         bool saved;
         int timeout;
         int interval;
