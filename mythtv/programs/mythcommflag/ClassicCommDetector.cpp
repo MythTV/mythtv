@@ -789,8 +789,8 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
 
     if (commDetectMethod & COMM_DETECT_BLANKS)
     {
-        memset(&rowMax, 0, sizeof(rowMax));
-        memset(&colMax, 0, sizeof(colMax));
+        memset(rowMax, 0, sizeof(rowMax));
+        memset(colMax, 0, sizeof(colMax));
 
         frameIsBlank = false;
     }
