@@ -186,7 +186,9 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
         if (filename.length())
         {
             QFile checkFile(filename);
-            if (!checkFile.exists())
+            if (checkFile.exists())
+                VERBOSE(VB_PLAYBACK, "OpenFile() trying DVD at " + filename);
+            else
                 filename = "/dev/dvd";
         }
         else
@@ -528,7 +530,7 @@ void RingBuffer::UpdatePlaySpeed(float play_speed)
  */
 void RingBuffer::CalcReadAheadThresh(void)
 {
-    uint estbitrate = 0;
+    uint estbitrate;
 
     pthread_rwlock_wrlock(&rwlock);
     wantseek       = false;
@@ -628,13 +630,7 @@ void RingBuffer::StartupReadAheadThread(void)
     readaheadrunning = false;
 
     readAheadRunningCondLock.lock();
-    int rval = pthread_create(&reader, NULL, StartReader, this);
-    if (0 != rval)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "StartupReadAheadThread: pthread_create failed." + ENO);
-        return;
-    }
+    pthread_create(&reader, NULL, StartReader, this);
     readAheadRunningCond.wait(&readAheadRunningCondLock);
     readAheadRunningCondLock.unlock();
 }
