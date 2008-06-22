@@ -1653,6 +1653,24 @@ static HostComboBox *OSDCCFont()
     return gc;
 }
 
+static HostComboBox __attribute__ ((unused)) *DecodeVBIFormat()
+{
+    QString beVBI = gContext->GetSetting("VbiFormat");
+    QString fmt = beVBI.lower().left(4);
+    int sel = (fmt == "pal ") ? 1 : ((fmt == "ntsc") ? 2 : 0);
+
+    HostComboBox *gc = new HostComboBox("DecodeVBIFormat");
+    gc->setLabel(QObject::tr("Decode VBI format"));
+    gc->addSelection(QObject::tr("None"),                "none",    0 == sel);
+    gc->addSelection(QObject::tr("PAL Teletext"),        "pal_txt", 1 == sel);
+    gc->addSelection(QObject::tr("NTSC Closed Caption"), "ntsc_cc", 2 == sel);
+    gc->setHelpText(
+        QObject::tr("If set, this overrides the mythtv-setup setting "
+                    "used during recording when decoding captions."));
+
+    return gc;
+}
+
 static HostSpinBox *OSDCC708TextZoomPercentage(void)
 {
     HostSpinBox *gs = new HostSpinBox("OSDCC708TextZoom", 50, 200, 5);
@@ -4783,6 +4801,7 @@ OSDSettings::OSDSettings()
     VerticalConfigurationGroup *cc = new VerticalConfigurationGroup(false);
     cc->setLabel(QObject::tr("Analog Closed Captions"));
     cc->addChild(OSDCCFont());
+    //cc->addChild(DecodeVBIFormat());
     cc->addChild(CCBackground());
     cc->addChild(DefaultCCMode());
     cc->addChild(PreferCC708());

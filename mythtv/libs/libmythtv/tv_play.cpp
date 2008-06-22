@@ -673,6 +673,9 @@ bool TV::Init(bool createWindow)
             gContext->GetNumSetting(QString("FFRewSpeed%1").arg(i), def[i]));
 
     vbimode = VBIMode::Parse(gContext->GetSetting("VbiFormat"));
+    QString feVBI = gContext->GetSetting("DecodeVBIFormat", "");
+    if (!feVBI.isEmpty())
+        vbimode = VBIMode::Parse(gContext->GetSetting(feVBI));
 
     if (createWindow)
     {
