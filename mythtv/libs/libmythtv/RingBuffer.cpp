@@ -530,7 +530,7 @@ void RingBuffer::UpdatePlaySpeed(float play_speed)
  */
 void RingBuffer::CalcReadAheadThresh(void)
 {
-    uint estbitrate;
+    uint estbitrate = 0;
 
     pthread_rwlock_wrlock(&rwlock);
     wantseek       = false;
@@ -630,7 +630,13 @@ void RingBuffer::StartupReadAheadThread(void)
     readaheadrunning = false;
 
     readAheadRunningCondLock.lock();
-    pthread_create(&reader, NULL, StartReader, this);
+    int rval = pthread_create(&reader, NULL, StartReader, this);
+    if (0 != rval)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "StartupReadAheadThread: pthread_create failed." + ENO);
+        return;
+    }
     readAheadRunningCond.wait(&readAheadRunningCondLock);
     readAheadRunningCondLock.unlock();
 }
