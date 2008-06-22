@@ -128,16 +128,6 @@ class InstanceCount : public TransSpinBoxSetting
     };
 };
 
-class RecorderOptions : public ConfigurationWizard
-{
-  public:
-    RecorderOptions(CaptureCard& parent);
-    uint GetInstanceCount(void) const { return (uint) count->intValue(); }
-
-  private:
-    InstanceCount *count;
-};
-
 QString VideoSourceDBStorage::whereClause(MSqlBindings& bindings)
 {
     QString sourceidTag(":WHERESOURCEID");
@@ -1624,6 +1614,15 @@ void CaptureCard::save(void)
     }
 }
 
+void CaptureCard::reload(void)
+{
+    if (getCardID() == 0)
+    {
+        save();
+        load();
+    }
+}
+
 CardType::CardType(const CaptureCard &parent) :
     ComboBoxSetting(this),
     CaptureCardDBStorage(this, parent, "cardtype") 
@@ -2861,6 +2860,35 @@ void TunerCardInput::fillSelections(const QString& device)
         addSelection(*i);
 }
 
+class DVBExtra : public ConfigurationWizard
+{
+  public:
+    DVBExtra(DVBConfigurationGroup &parent);
+    uint GetInstanceCount(void) const
+    {
+        return (uint) count->intValue();
+    }
+
+  private:
+    InstanceCount *count;
+};
+
+DVBExtra::DVBExtra(DVBConfigurationGroup &parent)
+    : count(new InstanceCount(parent.parent))
+{
+    VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
+    rec->setLabel(QObject::tr("Recorder Options"));
+    rec->setUseLabel(false);
+
+    rec->addChild(count);
+    rec->addChild(new DVBNoSeqStart(parent.parent));
+    rec->addChild(new DVBOnDemand(parent.parent));
+    rec->addChild(new DVBEITScan(parent.parent));
+    rec->addChild(new DVBTuningDelay(parent.parent));
+
+    addChild(rec);
+}
+
 DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
     VerticalConfigurationGroup(false, true, false, false),
     parent(a_parent),
@@ -2913,7 +2941,7 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
     connect(buttonDiSEqC, SIGNAL(pressed()),
             this,         SLOT(  DiSEqCPanel()));
     connect(buttonRecOpt, SIGNAL(pressed()),
-            &parent,      SLOT(  recorderOptionsPanel()));
+            this,         SLOT(  DVBExtraPanel()));
 }
 
 DVBConfigurationGroup::~DVBConfigurationGroup()
@@ -2949,36 +2977,11 @@ void DVBConfigurationGroup::save()
     trees.InvalidateTrees();
 }
 
-void CaptureCard::reload(void)
+void DVBConfigurationGroup::DVBExtraPanel(void)
 {
-    if (getCardID() == 0)
-    {
-        save();
-        load();
-    }
-}
+    parent.reload(); // ensure card id is valid
 
-void CaptureCard::recorderOptionsPanel()
-{
-    reload();
-
-    RecorderOptions acw(*this);
+    DVBExtra acw(*this);
     acw.exec();
-    instance_count = acw.GetInstanceCount();
-}
-
-RecorderOptions::RecorderOptions(CaptureCard &parent)
-    : count(new InstanceCount(parent))
-{
-    VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
-    rec->setLabel(QObject::tr("Recorder Options"));
-    rec->setUseLabel(false);
-
-    rec->addChild(count);
-    rec->addChild(new DVBNoSeqStart(parent));
-    rec->addChild(new DVBOnDemand(parent));
-    rec->addChild(new DVBEITScan(parent));
-    rec->addChild(new DVBTuningDelay(parent));
-
-    addChild(rec);
+    parent.SetInstanceCount(acw.GetInstanceCount());
 }

@@ -401,20 +401,25 @@ class DVBCardName;
 class DVBCardType;
 class DVBTuningDelay;
 
-class DVBConfigurationGroup: public VerticalConfigurationGroup {
+class DVBConfigurationGroup : public VerticalConfigurationGroup
+{
     Q_OBJECT
-public:
+
+    friend class DVBExtra;
+
+  public:
     DVBConfigurationGroup(CaptureCard& a_parent);
     ~DVBConfigurationGroup();
 
     virtual void load(void);
     virtual void save(void);
     
-public slots:
+  public slots:
     void probeCard(const QString& cardNumber);
     void DiSEqCPanel(void);
-    
-private:
+    void DVBExtraPanel(void);
+
+  private:
     CaptureCard        &parent;
 
     DVBCardNum         *cardnum;
@@ -485,9 +490,7 @@ public:
     virtual void save(void);
 
     uint GetInstanceCount(void) const { return instance_count; }
-
-public slots:
-    void recorderOptionsPanel();
+    void SetInstanceCount(uint cnt) { instance_count = cnt; }
 
 private:
 
