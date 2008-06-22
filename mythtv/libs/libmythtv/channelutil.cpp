@@ -231,43 +231,91 @@ static uint insert_dtv_multiplex(
         // DVB specific
         transport_id,  network_id);
 
+    bool isDVB = (sistandard.lower() == "dvb");
+
     QString updateStr =
         "UPDATE dtv_multiplex "
-        "SET frequency        = :FREQUENCY,     modulation   = :MODULATION, "
-        "    symbolrate       = :SYMBOLRATE,    bandwidth    = :BANDWIDTH, "
-        "    polarity         = :POLARITY,      inversion    = :INVERSION, "
-        "    transmission_mode= :TRANS_MODE,    fec          = :INNER_FEC, "
-        "    constellation    = :CONSTELLATION, hierarchy    = :HIERARCHY, "
-        "    hp_code_rate     = :HP_CODE_RATE,  lp_code_rate = :LP_CODE_RATE, "
-        "    guard_interval   = :GUARD_INTERVAL "
-        "WHERE sourceid    = :SOURCEID     AND "
-        "      sistandard  = :SISTANDARD   AND "
-        "      transportid = :TRANSPORTID  AND "
-        "      networkid   = :NETWORKID ";
+        "SET frequency    = :FREQUENCY, ";
 
-    if (sistandard.lower() != "dvb")
-        updateStr += " AND frequency = :FREQUENCY ";
+    updateStr += (!modulation.isNull()) ?
+        "modulation       = :MODULATION, " : "";
+    updateStr += (symbol_rate >= 0) ?
+        "symbolrate       = :SYMBOLRATE, " : "";
+    updateStr += (bandwidth   >= 0) ?
+        "bandwidth        = :BANDWIDTH, " : "";
+    updateStr += (polarity    >= 0) ?
+        "polarity         = :POLARITY, " : "";
+    updateStr += (inversion   >= 0) ?
+        "inversion        = :INVERSION, " : "";
+    updateStr += (trans_mode  >= 0) ?
+        "transmission_mode= :TRANS_MODE, " : "";
+    updateStr += (!inner_FEC.isNull()) ?
+        "fec              = :INNER_FEC, " : "";
+    updateStr += (!constellation.isNull()) ?
+        "constellation    = :CONSTELLATION, " : "";
+    updateStr += (hierarchy  >= 0) ?
+        "hierarchy        = :HIERARCHY, " : "";
+    updateStr += (!hp_code_rate.isNull()) ?
+        "hp_code_rate     = :HP_CODE_RATE, " : "";
+    updateStr += (!lp_code_rate.isNull()) ?
+        "lp_code_rate     = :LP_CODE_RATE, " : "";
+    updateStr += (!guard_interval.isNull()) ?
+        "guard_interval   = :GUARD_INTERVAL, " : "";
+
+    updateStr = updateStr.left(updateStr.length()-2) + " ";
+
+    updateStr +=
+        "WHERE sourceid    = :SOURCEID     AND "
+        "      sistandard  = :SISTANDARD   AND ";
+    
+    updateStr += (isDVB) ?
+        " transportid = :TRANSPORTID AND networkid   = :NETWORKID " :
+        " frequency = :FREQUENCY ";
 
     QString insertStr =
         "INSERT INTO dtv_multiplex "
-        "  (sourceid,        sistandard,        frequency,  "
-        "   modulation,      transportid,       networkid,  "
-        "   symbolrate,      bandwidth,         polarity,   "
-        "   inversion,       transmission_mode,             "
-        "   fec,             constellation,     hierarchy,  "
-        "   hp_code_rate,    lp_code_rate,      guard_interval) "
+        "  (sourceid,        sistandard,        frequency,  ";
+
+    insertStr += (!modulation.isNull())     ? "modulation, "        : "";
+    insertStr += (isDVB)                    ? "transportid, "       : "";
+    insertStr += (isDVB)                    ? "networkid, "         : "";
+    insertStr += (symbol_rate >= 0)         ? "symbolrate, "        : "";
+    insertStr += (bandwidth   >= 0)         ? "bandwidth, "         : "";
+    insertStr += (polarity    >= 0)         ? "polarity, "          : "";
+    insertStr += (inversion   >= 0)         ? "inversion, "         : "";
+    insertStr += (trans_mode  >= 0)         ? "transmission_mode, " : "";
+    insertStr += (!inner_FEC.isNull())      ? "fec, "               : "";
+    insertStr += (!constellation.isNull())  ? "constellation, "     : "";
+    insertStr += (hierarchy  >= 0)          ? "hierarchy, "         : "";
+    insertStr += (!hp_code_rate.isNull())   ? "hp_code_rate, "      : "";
+    insertStr += (!lp_code_rate.isNull())   ? "lp_code_rate, "      : "";
+    insertStr += (!guard_interval.isNull()) ? "guard_interval, "    : "";
+    insertStr = insertStr.left(insertStr.length()-2) + ") ";
+
+    insertStr +=
         "VALUES "
-        "  (:SOURCEID,       :SISTANDARD,       :FREQUENCY, "
-        "   :MODULATION,     :TRANSPORTID,      :NETWORKID, "
-        "   :SYMBOLRATE,     :BANDWIDTH,        :POLARITY,  "
-        "   :INVERSION,      :TRANS_MODE,                   "
-        "   :INNER_FEC,      :CONSTELLATION,    :HIERARCHY, "
-        "   :HP_CODE_RATE,   :LP_CODE_RATE,     :GUARD_INTERVAL);";
+        "  (:SOURCEID,       :SISTANDARD,       :FREQUENCY, ";
+    insertStr += (!modulation.isNull())     ? ":MODULATION, "       : "";
+    insertStr += (isDVB)                    ? ":TRANSPORTID, "      : "";
+    insertStr += (isDVB)                    ? ":NETWORKID, "        : "";
+    insertStr += (symbol_rate >= 0)         ? ":SYMBOLRATE, "       : "";
+    insertStr += (bandwidth   >= 0)         ? ":BANDWIDTH, "        : "";
+    insertStr += (polarity    >= 0)         ? ":POLARITY, "         : "";
+    insertStr += (inversion   >= 0)         ? ":INVERSION, "        : "";
+    insertStr += (trans_mode  >= 0)         ? ":TRANS_MODE, "       : "";
+    insertStr += (!inner_FEC.isNull())      ? ":INNER_FEC, "        : "";
+    insertStr += (!constellation.isNull())  ? ":CONSTELLATION, "    : "";
+    insertStr += (hierarchy   >= 0)         ? ":HIERARCHY, "        : "";
+    insertStr += (!hp_code_rate.isNull())   ? ":HP_CODE_RATE, "     : "";
+    insertStr += (!lp_code_rate.isNull())   ? ":LP_CODE_RATE, "     : "";
+    insertStr += (!guard_interval.isNull()) ? ":GUARD_INTERVAL, "   : "";
+    insertStr = insertStr.left(insertStr.length()-2) + ");";
 
     query.prepare((mplex) ? updateStr : insertStr);
 
     VERBOSE(VB_SIPARSER, "insert_dtv_multiplex -- "
-            <<((mplex) ? "update" : "insert") << " " << mplex);
+            <<((mplex) ? "update" : "insert") << " " << mplex
+            <<endl<<((mplex) ? updateStr : insertStr)<<endl);
 
     query.bindValue(":SOURCEID",          db_source_id);
     query.bindValue(":SISTANDARD",        sistandard);
@@ -275,11 +323,10 @@ static uint insert_dtv_multiplex(
 
     if (!modulation.isNull())
         query.bindValue(":MODULATION",    modulation);
-    if (sistandard.lower() == "dvb")
-    {
+    if (isDVB)
         query.bindValue(":TRANSPORTID",   transport_id);
+    if (isDVB)
         query.bindValue(":NETWORKID",     network_id);
-    }
     if (symbol_rate >= 0)
         query.bindValue(":SYMBOLRATE",    symbol_rate);
     if (bandwidth >= 0)
@@ -1197,19 +1244,27 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     QString chanNum = (chan_num == "-1") ?
         QString::number(service_id) : chan_num;
 
-    query.prepare(
+    QString qstr =
         "INSERT INTO channel "
-        "  (chanid,        channum,    sourceid,   callsign,  "
-        "   name,          mplexid,    serviceid,             "
-        "   atsc_major_chan,           atsc_minor_chan,       "
-        "   useonairguide, visible,    freqid,     tvformat,  "
+        "  (chanid,        channum,    sourceid,          "
+        "   callsign,      name,       serviceid,         ";
+    qstr += (db_mplexid > 0)    ? "mplexid, " : "";
+    qstr += (!freqid.isEmpty()) ? "freqid, "  : "";
+    qstr +=
+        "   atsc_major_chan,           atsc_minor_chan,   "
+        "   useonairguide, visible,    tvformat,          "
         "   icon,          xmltvid,    default_authority) "
         "VALUES "
-        "  (:CHANID,       :CHANNUM,   :SOURCEID,  :CALLSIGN,  "
-        "   :NAME,         :MPLEXID,   :SERVICEID,             "
-        "   :MAJORCHAN,                :MINORCHAN,             "
-        "   :USEOAG,       :VISIBLE,   :FREQID,    :TVFORMAT,  "
-        "   :ICON,         :XMLTVID,   :AUTHORITY)");
+        "  (:CHANID,       :CHANNUM,   :SOURCEID,         "
+        "   :CALLSIGN,     :NAME,      :SERVICEID,        ";
+    qstr += (db_mplexid > 0)    ? ":MPLEXID, " : "";
+    qstr += (!freqid.isEmpty()) ? ":FREQID, "  : "";
+    qstr +=
+        "   :MAJORCHAN,                :MINORCHAN,        "
+        "   :USEOAG,       :VISIBLE,   :TVFORMAT,         "
+        "   :ICON,         :XMLTVID,   :AUTHORITY)        ";
+
+    query.prepare(qstr);
 
     query.bindValue(":CHANID",    new_channel_id);
     query.bindValue(":CHANNUM",   chanNum);
