@@ -1266,7 +1266,7 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
     (void) force_update;
 
     VERBOSE(VB_SIPARSER, LOC +
-            QString("UpdateVCTinDB(): tsid: 0x%1  mplex: %1")
+            QString("UpdateVCTinDB(): tsid: 0x%1  mplex: %2")
             .arg(vct->TransportStreamID(),0,16).arg(db_mplexid));
 
     int db_source_id   = ChannelUtil::GetSourceID(db_mplexid);
