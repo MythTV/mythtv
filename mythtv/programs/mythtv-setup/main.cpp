@@ -246,7 +246,8 @@ int main(int argc, char *argv[])
     if (!gContext->Init(true))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return -1;
+        delete gContext;
+        return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
     if (geometry != "")
@@ -273,7 +274,8 @@ int main(int argc, char *argv[])
         //     << "Database error was:" << endl
         //     << db->lastError().databaseText() << endl;
 
-        return -1;
+        delete gContext;
+        return GENERIC_EXIT_DB_ERROR;
     }
 
     if ((CompareTVDatabaseSchemaVersion() > 0) &&
@@ -285,12 +287,14 @@ int main(int argc, char *argv[])
                 "ensure that you have selected the proper database server or "
                 "upgrade this and all other frontends and backends to the "
                 "same MythTV version and revision.");
-        return BACKEND_EXIT_DB_OUTOFDATE;
+        delete gContext;
+        return GENERIC_EXIT_DB_OUTOFDATE;
     }
     if (!UpgradeTVDatabaseSchema())
     {
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema.");
-        return BACKEND_EXIT_DB_OUTOFDATE;
+        delete gContext;
+        return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
     gContext->SetSetting("Theme", "G.A.N.T");
@@ -330,7 +334,10 @@ int main(int argc, char *argv[])
             QObject::tr("Exit"), kDialogCodeButton0);
 
         if (kDialogCodeButton1 == val)
-            return 0;
+        {
+            delete gContext;
+            return GENERIC_EXIT_OK;
+        }
     }
 
     REG_KEY("qt", "DELETE", "Delete", "D");
@@ -388,7 +395,7 @@ int main(int argc, char *argv[])
 
     delete gContext;
 
-    return 0;
+    return GENERIC_EXIT_OK;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

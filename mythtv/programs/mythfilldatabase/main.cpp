@@ -496,6 +496,7 @@ int main(int argc, char *argv[])
     if (!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        delete gContext;
         return FILLDB_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -538,7 +539,10 @@ int main(int argc, char *argv[])
         }
 
         if (!fill_data.GrabDataFromFile(fromfile_id, fromfile_name))
+        {
+            delete gContext;
             return FILLDB_EXIT_GRAB_DATA_FAILED;
+        }
 
         query.exec(QString("UPDATE settings SET data ='%1' "
                            "WHERE value='mythfilldatabaseLastRunEnd'")
@@ -632,12 +636,14 @@ int main(int argc, char *argv[])
                                      "Could not find any defined channel "
                                      "sources - did you run the setup "
                                      "program?");
+                  delete gContext;
                   return FILLDB_EXIT_NO_CHAN_SRC;
              }
         }
         else
         {
              MythContext::DBError("loading channel sources", sourcequery);
+             delete gContext;
              return FILLDB_EXIT_DB_ERROR;
         }
 

@@ -189,6 +189,11 @@ MDBManager::~MDBManager()
     while (!m_pool.isEmpty())
         delete m_pool.takeFirst();
     delete m_sem;
+
+    if (m_schedCon)
+        delete m_schedCon;
+    if (m_DDCon)
+        delete m_DDCon;
 }
 
 MSqlDatabase *MDBManager::popConnection()
