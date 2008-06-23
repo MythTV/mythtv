@@ -182,15 +182,13 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
         dvdPriv = new DVDRingBufferPriv();
         startreadahead = false;
 
-        filename.remove(0,5);     // MythVideo calls with "dvd:/" + device
-        if (filename.length())
-        {
-            QFile checkFile(filename);
-            if (checkFile.exists())
-                VERBOSE(VB_PLAYBACK, "OpenFile() trying DVD at " + filename);
-            else
-                filename = "/dev/dvd";
-        }
+        if (filename.left(6) == "dvd://")  // 'Play DVD' sends "dvd:/" + dev
+            filename.remove(0,5);          //             e.g. "dvd://dev/sda"
+        else                               // Less correct URI "dvd:" + path
+            filename.remove(0,4);          //             e.g. "dvd:/videos/ET"
+
+        if (QFile::exists(filename))
+            VERBOSE(VB_PLAYBACK, "OpenFile() trying DVD at " + filename);
         else
         {
             filename = "/dev/dvd";
