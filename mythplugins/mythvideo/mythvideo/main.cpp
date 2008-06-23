@@ -336,7 +336,7 @@ namespace
 #elif USING_MINGW
             QString filename = "dvd:";          // e.g. 'dvd:E\\'
 #else
-            QString filename = "dvd:/"          // e.g. 'dvd://dev/sda'
+            QString filename = "dvd:/";         // e.g. 'dvd://dev/sda'
 #endif
             filename += dvd_device;
 
