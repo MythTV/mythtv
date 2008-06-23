@@ -420,52 +420,28 @@ XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent,
     VerticalConfigurationGroup(false, false, false, false),
     parent(_parent), grabber(_grabber) 
 {
-    TransLabelSetting *label = new TransLabelSetting();
-    label->setLabel(grabber);
-    label->setValue(
-        QObject::tr("Configuration will run in the terminal window"));
-    addChild(label);
+    QString filename = QString("%1/%2.xmltv")
+        .arg(MythContext::GetConfDir()).arg(parent.getSourceName());
+
+    grabberArgs.push_back("--config-file");
+    grabberArgs.push_back(filename);
+    grabberArgs.push_back("--configure");
+
     addChild(new UseEIT(parent));
+
+    TransButtonSetting *config = new TransButtonSetting();
+    config->setLabel(tr("Configure"));
+    config->setHelpText(tr("Run xmltv configure command."));
+
+    addChild(config);
+
+    connect(config, SIGNAL(pressed()), SLOT(RunConfig()));
 }
 
 void XMLTV_generic_config::save()
 {
     VerticalConfigurationGroup::save();
-    QString waitMsg(QObject::tr("Please wait while MythTV retrieves the "
-                                "list of available channels.\nYou "
-                                "might want to check the output as it\n"
-                                "runs by switching to the terminal from "
-                                "which you started\nthis program."));
-    MythProgressDialog *pdlg = new MythProgressDialog(waitMsg, 2);
-    VERBOSE(VB_GENERAL, QString("Please wait while MythTV retrieves the "
-                                "list of available channels"));
-    pdlg->show();
-
-    QString command;
-    QString filename = QString("%1/%2.xmltv")
-        .arg(MythContext::GetConfDir()).arg(parent.getSourceName());
-
-    command = QString("%1 --config-file '%2' --configure")
-        .arg(grabber).arg(filename);
-
-    pdlg->setProgress(1);
-
-    int ret = system(command);
-    if (ret != 0)
-    {
-        VERBOSE(VB_GENERAL, command);
-        VERBOSE(VB_GENERAL, QString("exited with status %1").arg(ret));
-
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                  QObject::tr("Failed to retrieve channel "
-                                              "information."),
-                                  QObject::tr("MythTV was unable to retrieve "
-                                              "channel information for your "
-                                              "provider.\nPlease check the "
-                                              "terminal window for more "
-                                              "information"));
-    }
-
+/*
     QString err_msg = QObject::tr(
         "You MUST run 'mythfilldatabase --manual the first time,\n "
         "instead of just 'mythfilldatabase'.\nYour grabber does not provide "
@@ -477,10 +453,14 @@ void XMLTV_generic_config::save()
         MythPopupBox::showOkPopup(
             gContext->GetMainWindow(), QObject::tr("Warning."), err_msg);
     }
+*/
+}
 
-    pdlg->setProgress( 2 );    
-    pdlg->Close();
-    pdlg->deleteLater();
+void XMLTV_generic_config::RunConfig(void)
+{
+    TerminalWizard *tw = new TerminalWizard(grabber, grabberArgs);
+    tw->exec(false, true);
+    delete tw;
 }
 
 EITOnly_config::EITOnly_config(const VideoSource& _parent) :
@@ -555,7 +535,6 @@ void XMLTVFindGrabbers::run(void)
     QStringList args;
     args += "baseline";
     args += "manualconfig";
-    QProcess find_grabber_proc;
     find_grabber_proc.start("tv_find_grabbers", args);
     bool ok = find_grabber_proc.waitForStarted(250 /* milliseconds */);
     if (!ok)
@@ -612,9 +591,22 @@ XMLTVConfig::XMLTVConfig(const VideoSource &aparent) :
 
     connect(&findGrabbers, SIGNAL(FoundXMLTVGrabbers(QStringList,QStringList)),
             this,          SLOT  (FoundXMLTVGrabbers(QStringList,QStringList)),
-            Qt::QueuedConnection);
+            Qt::BlockingQueuedConnection);
 
     findGrabbers.start();
+}
+
+XMLTVConfig::~XMLTVConfig()
+{
+    Stop();
+}
+
+void XMLTVConfig::Stop(void)
+{
+    findGrabbers.disconnect();
+    findGrabbers.kill();
+    findGrabbers.wait();
+    QMutexLocker locker(&load_lock);
 }
 
 void XMLTVConfig::load(void)
@@ -672,10 +664,8 @@ void XMLTVConfig::FoundXMLTVGrabbers(
     while (!loaded)
         load_wait.wait(&load_lock, 500);
 
-    QString selLabel = grabber->getSelectionLabel();
-    int     selIndex = grabber->findSelection(selLabel);
-    QString selValue = grabber->GetValue(selIndex);
-
+    QString selValue = grabber->getValue();
+    int     selIndex = grabber->getValueIndex(selValue);
     grabber->setValue(0);
 
     QString validValues;
@@ -700,13 +690,9 @@ void XMLTVConfig::FoundXMLTVGrabbers(
     }
 
     if (!selValue.isEmpty())
-    {
-        selIndex = -1;
-        for (uint i = 0; i < grabber->size(); i++)
-            selIndex = (grabber->GetValue(i) == selValue) ? i : selIndex;
-        if (selIndex >= 0)
-            grabber->setValue(selIndex);
-    }
+        selIndex = grabber->getValueIndex(selValue);
+    if (selIndex >= 0)
+        grabber->setValue(selIndex);
 
     repaint();
 }
@@ -731,9 +717,14 @@ VideoSource::VideoSource()
     ConfigurationGroup *group = new VerticalConfigurationGroup(false, false);
     group->setLabel(QObject::tr("Video source setup"));
     group->addChild(name = new Name(*this));
-    group->addChild(new XMLTVConfig(*this));
+    group->addChild(xmltv = new XMLTVConfig(*this));
     group->addChild(new FreqTableSelector(*this));
     addChild(group);
+}
+
+VideoSource::~VideoSource()
+{
+    xmltv->Stop();
 }
 
 bool VideoSourceEditor::cardTypesInclude(const int &sourceID, 

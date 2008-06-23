@@ -15,6 +15,7 @@
 #include "mythdbcon.h"
 #include "mythstorage.h"
 #include "mythconfiggroups.h"
+#include "mythterminal.h"
 
 class MPUBLIC ConfigPopupDialogWidget : public MythPopupBox
 {
@@ -152,6 +153,18 @@ public QObject, public ConfigurationWizard
   protected:
     /// You need to call deleteLater to delete QObject
     virtual ~JumpConfigurationWizard();
+};
+
+class MythTerminal;
+class MPUBLIC TerminalWizard : public ConfigurationWizard
+{
+  public:
+    TerminalWizard(QString program, QStringList args);
+
+    virtual DialogCode exec(bool saveOnExec = false, bool doLoad = false);
+
+  private:
+    MythTerminal *terminal;
 };
 
 #endif // MYTH_CONFIG_DIALOGS_H

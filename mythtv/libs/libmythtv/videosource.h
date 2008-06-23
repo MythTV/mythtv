@@ -163,15 +163,21 @@ class DataDirect_config: public VerticalConfigurationGroup
 
 class XMLTV_generic_config: public VerticalConfigurationGroup 
 {
-public:
+    Q_OBJECT
+
+  public:
     XMLTV_generic_config(const VideoSource& _parent, QString _grabber);
 
     virtual void save();
     virtual void save(QString) { save(); }
 
-protected:
-    const VideoSource& parent;
-    QString grabber;
+  public slots:
+    void RunConfig(void);
+
+  protected:
+    const VideoSource &parent;
+    QString            grabber;
+    QStringList        grabberArgs;
 };
 
 class EITOnly_config: public VerticalConfigurationGroup
@@ -212,11 +218,14 @@ class XMLTVFindGrabbers : public QThread
 
   public:
     virtual void run(void);
+    virtual void kill(void) { find_grabber_proc.kill(); }
 
   signals:
     void FoundXMLTVGrabbers(QStringList,QStringList);
 
   private:
+    QProcess find_grabber_proc;
+
     static QMutex      list_lock;
     static QStringList name_list;
     static QStringList prog_list;
@@ -229,8 +238,12 @@ class XMLTVConfig : public TriggeredConfigurationGroup
 
   public:
     XMLTVConfig(const VideoSource &aparent);
+    ~XMLTVConfig();
+
     virtual void load(void);
     virtual void save(void);
+
+    void Stop(void);
 
   public slots:
     void FoundXMLTVGrabbers(QStringList,QStringList);
@@ -247,6 +260,7 @@ class XMLTVConfig : public TriggeredConfigurationGroup
 class VideoSource : public ConfigurationWizard {
 public:
     VideoSource();
+    ~VideoSource();
         
     int getSourceID(void) const { return id->intValue(); };
 
@@ -293,6 +307,7 @@ public:
 private:
     ID   *id;
     Name *name;
+    XMLTVConfig *xmltv;
 };
 
 class CaptureCardDBStorage : public SimpleDBStorage

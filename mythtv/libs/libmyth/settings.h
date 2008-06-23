@@ -297,6 +297,9 @@ public slots:
     virtual int getValueIndex(QString value);
 
 protected:
+    virtual bool ReplaceLabel(
+        const QString &new_label, const QString &value);
+
     typedef vector<QString> selectionList;
     selectionList labels;
     selectionList values;
@@ -357,7 +360,8 @@ class MPUBLIC ListBoxSetting: public SelectSetting {
     Q_OBJECT
 public:
     ListBoxSetting(Storage *_storage) :
-        SelectSetting(_storage), bxwidget(NULL), widget(NULL),
+        SelectSetting(_storage),
+        bxwidget(NULL), widget(NULL), eventFilter(NULL),
         selectionMode(MythListBox::Single) { }
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
@@ -377,6 +381,10 @@ public:
 
     virtual void setHelpText(const QString &str);
 
+    virtual void SetEventFilter(QObject *filter) { eventFilter = filter; }
+    virtual bool ReplaceLabel(
+        const QString &new_label, const QString &value);
+
 signals:
     void accepted(int);
     void menuButtonPressed(int);
@@ -392,6 +400,7 @@ signals:
 protected:
     QWidget     *bxwidget;
     MythListBox *widget;
+    QObject     *eventFilter;
     MythListBox::SelectionMode selectionMode;
 };
 

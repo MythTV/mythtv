@@ -233,6 +233,16 @@ int SelectSetting::getValueIndex(QString value)
     return -1;
 }
 
+bool SelectSetting::ReplaceLabel(const QString &new_label, const QString &value)
+{
+    int i = getValueIndex(value);
+
+    if (i >= 0)
+        labels[i] = new_label;
+
+    return (i >= 0);
+}
+
 QWidget* LabelSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                     const char* widgetName) {
     (void)cg;
@@ -923,6 +933,20 @@ void ListBoxSetting::addSelection(
     }
 };
 
+bool ListBoxSetting::ReplaceLabel(
+    const QString &new_label, const QString &value)
+{
+    int i = getValueIndex(value);
+
+    if ((i >= 0) && SelectSetting::ReplaceLabel(label, value) && widget)
+    {
+        widget->changeItem(new_label, i);
+        return true;
+    }
+
+    return false;
+}
+
 QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                       const char* widgetName)
 {
@@ -943,6 +967,8 @@ QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     widget = new MythListBox(box);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
     widget->setHelpText(getHelpText());
+    if (eventFilter)
+        widget->installEventFilter(eventFilter);
 
     for(unsigned int i = 0 ; i < labels.size() ; ++i) {
         widget->insertItem(labels[i]);

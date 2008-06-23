@@ -282,3 +282,15 @@ void JumpConfigurationWizard::showPage(QString page)
         return;
     ((MythJumpWizard*)(dialog))->showPage(childwidget[pagenum]);
 }
+
+TerminalWizard::TerminalWizard(QString program, QStringList args) :
+    terminal(new MythTerminal(program, args))
+{
+    addChild(terminal);
+}
+
+DialogCode TerminalWizard::exec(bool saveOnExec, bool doLoad)
+{
+    terminal->Start();
+    return ConfigurationWizard::exec(saveOnExec, doLoad);
+}
