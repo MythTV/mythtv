@@ -242,14 +242,15 @@ uint myth_system(const QString &command, int flags)
     JoystickMenuEventLock joystick_lock(joy_lock_flag && ready_to_lock);
 #endif
 
+    QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(command);
+
 #ifndef USING_MINGW
     pid_t child = fork();
 
     if (child < 0)
     {
         /* Fork failed */
-        VERBOSE(VB_IMPORTANT,
-                QString("myth_system(): Error, fork() failed because %1")
+        VERBOSE(VB_IMPORTANT, (LOC_ERR + "fork() failed because %1")
                 .arg(strerror(errno)));
         return GENERIC_EXIT_NOT_OK;
     }
@@ -271,8 +272,7 @@ uint myth_system(const QString &command, int flags)
         execl("/bin/sh", "sh", "-c", command.toUtf8().constData(), NULL);
         if (errno)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("myth_system(): Error, execl() failed because %1")
+            VERBOSE(VB_IMPORTANT, (LOC_ERR + "execl() failed because %1")
                     .arg(strerror(errno)));
         }
 
@@ -294,7 +294,7 @@ uint myth_system(const QString &command, int flags)
                 if (res == -1)
                 {
                     VERBOSE(VB_IMPORTANT,
-                            QString("myth_system(): Error, waitpid() failed because %1")
+                            (LOC_ERR + "waitpid() failed because %1")
                             .arg(strerror(errno)));
                     return GENERIC_EXIT_NOT_OK;
                 }
@@ -311,8 +311,7 @@ uint myth_system(const QString &command, int flags)
         {
             if (waitpid(child, &status, 0) < 0)
             {
-                VERBOSE(VB_IMPORTANT,
-                        QString("myth_system(): Error, waitpid() failed because %1")
+                VERBOSE(VB_IMPORTANT, (LOC_ERR + "waitpid() failed because %1")
                         .arg(strerror(errno)));
                 return GENERIC_EXIT_NOT_OK;
             }
@@ -329,15 +328,18 @@ uint myth_system(const QString &command, int flags)
     memset(&pi, 0, sizeof(pi));
     si.cb = sizeof(si);
     QString cmd = QString("cmd.exe /c %1").arg(command);
-    if (!::CreateProcessA(NULL, cmd.toUtf8().data(), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi)) {
-        VERBOSE(VB_IMPORTANT,
-                QString("myth_system(): Error, CreateProcess() failed because %1")
+    if (!::CreateProcessA(NULL, cmd.toUtf8().data(), NULL, NULL,
+                          FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
+    {
+        VERBOSE(VB_IMPORTANT, (LOC_ERR + "CreateProcess() failed because %1")
                 .arg(::GetLastError()));
         return MYTHSYSTEM__EXIT__EXECL_ERROR;
-    } else {
+    }
+    else
+    {
         if (::WaitForSingleObject(pi.hProcess, INFINITE) == WAIT_FAILED)
             VERBOSE(VB_IMPORTANT,
-                    QString("myth_system(): Error, WaitForSingleObject() failed because %1")
+                    (LOC_ERR + "WaitForSingleObject() failed because %1")
                     .arg(::GetLastError()));
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
@@ -646,37 +648,39 @@ bool hasUtf8(const char *str)
 #ifdef USING_MINGW
 u_short in_cksum(u_short *addr, int len)
 {
-	register int nleft = len;
-	register u_short *w = addr;
-	register u_short answer;
-	register int sum = 0;
+    register int nleft = len;
+    register u_short *w = addr;
+    register u_short answer;
+    register int sum = 0;
 
-	/*
-	 *  Our algorithm is simple, using a 32 bit accumulator (sum),
-	 *  we add sequential 16 bit words to it, and at the end, fold
-	 *  back all the carry bits from the top 16 bits into the lower
-	 *  16 bits.
-	 */
-	while( nleft > 1 )  {
-		sum += *w++;
-		nleft -= 2;
-	}
+    /*
+     *  Our algorithm is simple, using a 32 bit accumulator (sum),
+     *  we add sequential 16 bit words to it, and at the end, fold
+     *  back all the carry bits from the top 16 bits into the lower
+     *  16 bits.
+     */
+    while( nleft > 1 )
+    {
+        sum += *w++;
+        nleft -= 2;
+    }
 
-	/* mop up an odd byte, if necessary */
-	if( nleft == 1 ) {
-		u_short	u = 0;
+    /* mop up an odd byte, if necessary */
+    if( nleft == 1 )
+    {
+        u_short u = 0;
 
-		*(u_char *)(&u) = *(u_char *)w ;
-		sum += u;
-	}
+        *(u_char *)(&u) = *(u_char *)w ;
+        sum += u;
+    }
 
-	/*
-	 * add back carry outs from top 16 bits to low 16 bits
-	 */
-	sum = (sum >> 16) + (sum & 0xffff);	/* add hi 16 to low 16 */
-	sum += (sum >> 16);			/* add carry */
-	answer = ~sum;				/* truncate to 16 bits */
-	return (answer);
+    /*
+     * add back carry outs from top 16 bits to low 16 bits
+     */
+    sum = (sum >> 16) + (sum & 0xffff);  /* add hi 16 to low 16 */
+    sum += (sum >> 16);                  /* add carry */
+    answer = ~sum;                       /* truncate to 16 bits */
+    return (answer);
 }
 #endif
 
@@ -686,85 +690,91 @@ u_short in_cksum(u_short *addr, int len)
 bool ping(const QString &host, int timeout)
 {
 #ifdef USING_MINGW
-    VERBOSE(VB_SOCKET, QString("Ping: pinging %1 (%2 seconds max)").arg(host).arg(timeout));
-	SOCKET	  rawSocket;
-	LPHOSTENT lpHost;
-	struct    sockaddr_in saDest;
+    VERBOSE(VB_SOCKET, QString("Ping: pinging %1 (%2 seconds max)")
+                       .arg(host).arg(timeout));
+    SOCKET    rawSocket;
+    LPHOSTENT lpHost;
+    struct    sockaddr_in saDest;
 
-    #define ICMP_ECHOREPLY	0
-    #define ICMP_ECHOREQ	8
+    #define ICMP_ECHOREPLY 0
+    #define ICMP_ECHOREQ   8
     struct IPHDR {
-	    u_char  VIHL;			// Version and IHL
-	    u_char	TOS;			// Type Of Service
-	    short	TotLen;			// Total Length
-	    short	ID;				// Identification
-	    short	FlagOff;		// Flags and Fragment Offset
-	    u_char	TTL;			// Time To Live
-	    u_char	Protocol;		// Protocol
-	    u_short	Checksum;		// Checksum
-	    struct	in_addr iaSrc;	// Internet Address - Source
-	    struct	in_addr iaDst;	// Internet Address - Destination
+        u_char         VIHL;     // Version and IHL
+        u_char         TOS;      // Type Of Service
+        short          TotLen;   // Total Length
+        short          ID;       // Identification
+        short          FlagOff;  // Flags and Fragment Offset
+        u_char         TTL;      // Time To Live
+        u_char         Protocol; // Protocol
+        u_short        Checksum; // Checksum
+        struct in_addr iaSrc;    // Internet Address - Source
+        struct in_addr iaDst;    // Internet Address - Destination
     };
     struct ICMPHDR {
-	    u_char	Type;			// Type
-	    u_char	Code;			// Code
-	    u_short	Checksum;		// Checksum
-	    u_short	ID;				// Identification
-	    u_short	Seq;			// Sequence
-	    char	Data;			// Data
+        u_char  Type;            // Type
+        u_char  Code;            // Code
+        u_short Checksum;        // Checksum
+        u_short ID;              // Identification
+        u_short Seq;             // Sequence
+        char    Data;            // Data
     };
 
     struct Request {
-	    ICMPHDR icmpHdr;
-	    DWORD	dwTime;
-	    char	cData[32];
+        ICMPHDR icmpHdr;
+        DWORD   dwTime;
+        char    cData[32];
     };
     struct Reply {
-	    IPHDR	ipHdr;
-	    Request	echoRequest;
-	    char    cFiller[256];
+        IPHDR   ipHdr;
+        Request echoRequest;
+        char    cFiller[256];
     };
 
-    if (INVALID_SOCKET == (rawSocket = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP))) {
+    if (INVALID_SOCKET == (rawSocket = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)))
+    {
         VERBOSE(VB_SOCKET, "Ping: can't create socket");
-    	return false;
+        return false;
     }
 
-	lpHost = gethostbyname(host);
-    if (!lpHost) {
+    lpHost = gethostbyname(host);
+    if (!lpHost)
+    {
         VERBOSE(VB_SOCKET, "Ping: gethostbyname failed");
         closesocket(rawSocket);
-		return false;
+        return false;
     }
 
     saDest.sin_addr.s_addr = *((u_long FAR *) (lpHost->h_addr));
-	saDest.sin_family = AF_INET;
-	saDest.sin_port = 0;
+    saDest.sin_family      = AF_INET;
+    saDest.sin_port        = 0;
 
     Request echoReq;
-	echoReq.icmpHdr.Type		= ICMP_ECHOREQ;
-	echoReq.icmpHdr.Code		= 0;
-	echoReq.icmpHdr.ID			= 123;
-	echoReq.icmpHdr.Seq			= 456;
-	for (unsigned i = 0; i < sizeof(echoReq.cData); i++)
-		echoReq.cData[i] = ' ' + i;
-	echoReq.dwTime				= GetTickCount();
-	echoReq.icmpHdr.Checksum = in_cksum((u_short *)&echoReq, sizeof(Request));
+    echoReq.icmpHdr.Type = ICMP_ECHOREQ;
+    echoReq.icmpHdr.Code = 0;
+    echoReq.icmpHdr.ID   = 123;
+    echoReq.icmpHdr.Seq  = 456;
+    for (unsigned i = 0; i < sizeof(echoReq.cData); i++)
+        echoReq.cData[i] = ' ' + i;
+    echoReq.dwTime = GetTickCount();
+    echoReq.icmpHdr.Checksum = in_cksum((u_short *)&echoReq, sizeof(Request));
 
-    if (SOCKET_ERROR == sendto(rawSocket, (LPSTR)&echoReq, sizeof(Request), 0, (LPSOCKADDR)&saDest, sizeof(SOCKADDR_IN))) {
+    if (SOCKET_ERROR == sendto(rawSocket, (LPSTR)&echoReq, sizeof(Request),
+                               0, (LPSOCKADDR)&saDest, sizeof(SOCKADDR_IN)))
+    {
         VERBOSE(VB_SOCKET, "Ping: send failed");
         closesocket(rawSocket);
         return false;
     }
 
-	struct timeval Timeout;
-	fd_set readfds;
-	readfds.fd_count = 1;
-	readfds.fd_array[0] = rawSocket;
-	Timeout.tv_sec = timeout;
+    struct timeval Timeout;
+    fd_set readfds;
+    readfds.fd_count = 1;
+    readfds.fd_array[0] = rawSocket;
+    Timeout.tv_sec  = timeout;
     Timeout.tv_usec = 0;
 
-    if (SOCKET_ERROR == select(1, &readfds, NULL, NULL, &Timeout)) {
+    if (SOCKET_ERROR == select(1, &readfds, NULL, NULL, &Timeout))
+    {
         VERBOSE(VB_SOCKET, "Ping: timeout expired or select failed");
         closesocket(rawSocket);
         return false;
