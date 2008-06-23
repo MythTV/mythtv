@@ -325,16 +325,20 @@ namespace
         if (dvd_device.isNull())
             dvd_device = MediaMonitor::defaultDVDdevice();
 
-#ifdef Q_OS_MAC
-        // Convert the BSD 'leaf' name to a raw device in /dev
-        dvd_device.prepend("/dev/r");
-#endif
         gContext->addCurrentLocation("playdvd");
 
         if ((command_string.find("internal", 0, false) > -1) ||
             (command_string.length() < 1))
         {
-            QString filename = QString("dvd:/") + dvd_device;
+#ifdef Q_OS_MAC
+            // Convert a BSD 'leaf' name into a raw device path
+            QString filename = "dvd://dev/r";   // e.g. 'dvd://dev/rdisk2'
+#elif USING_MINGW
+            QString filename = "dvd:";          // e.g. 'dvd:E\\'
+#else
+            QString filename = "dvd:/"          // e.g. 'dvd://dev/sda'
+#endif
+            filename += dvd_device;
 
             command_string = "Internal";
             gContext->GetMainWindow()->HandleMedia(command_string, filename);
