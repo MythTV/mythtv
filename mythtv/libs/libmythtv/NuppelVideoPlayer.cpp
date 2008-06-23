@@ -6693,8 +6693,6 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
 
     subtitleLock.lock();
 
-    subtitleOSD = osd->GetSet("subtitles");
-
     // hide the subs if they have been long enough in the screen without
     // new subtitles replacing them
     if (osdHasSubtitles && currentFrame->timecode >= osdSubtitlesExpireAt) 
