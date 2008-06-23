@@ -410,7 +410,6 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
     // Add Miscellaneous information
 
-    // TODO: Add GUI control/setting for info_script
     QString info_script = gContext->GetSetting("MiscStatusScript");
     if ((!info_script.isEmpty()) && (info_script != "none"))
     {
@@ -447,7 +446,6 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
                     unsigned int size = list.size();
                     unsigned int hasAttributes = 0;
 
-                    // TODO: escape XML
                     if ((size > 0) && (!list[0].isEmpty()))
                     {
                         info.setAttribute("display", list[0]);
