@@ -7475,11 +7475,15 @@ void TV::ShowOSDTreeMenu(void)
         OSDListTreeType *tree = GetOSD()->ShowTreeMenu("menu", treeMenu);
         if (tree)
         {
-            connect(tree, SIGNAL(itemSelected(OSDListTreeType *,OSDGenericTree *)),
-                    this, SLOT(TreeMenuSelected(OSDListTreeType *, OSDGenericTree *)));
+            connect(tree,
+                    SIGNAL(itemSelected(OSDListTreeType*,OSDGenericTree*)),
+                    this,
+                    SLOT(TreeMenuSelected(OSDListTreeType*, OSDGenericTree*)));
 
-            connect(tree, SIGNAL(itemEntered(OSDListTreeType *, OSDGenericTree *)),
-                    this, SLOT(TreeMenuEntered(OSDListTreeType *, OSDGenericTree *)));
+            connect(tree,
+                    SIGNAL(itemEntered(OSDListTreeType*, OSDGenericTree*)),
+                    this,
+                    SLOT(TreeMenuEntered(OSDListTreeType*, OSDGenericTree*)));
         }
     }
 }
@@ -7490,7 +7494,6 @@ void TV::BuildOSDTreeMenu(void)
         delete treeMenu;
 
     treeMenu = new OSDGenericTree(NULL, "treeMenu");
-    OSDGenericTree *item, *subitem;
 
     if (StateIsLiveTV(GetState()))
         FillMenuLiveTV(treeMenu);
@@ -7505,15 +7508,16 @@ void TV::BuildOSDTreeMenu(void)
         FillMenuTracks(treeMenu, kTrackTypeCC608);
     else if (VBIMode::PAL_TT == vbimode)
     {
-        item = new OSDGenericTree(treeMenu, tr("Toggle Teletext Captions"),
-                                  "TOGGLETTC");
-        item = new OSDGenericTree(treeMenu, tr("Toggle Teletext Menu"),
-                                  "TOGGLETTM");
+        new OSDGenericTree(
+            treeMenu, tr("Toggle Teletext Captions"), "TOGGLETTC");
+        new OSDGenericTree(
+            treeMenu, tr("Toggle Teletext Menu"), "TOGGLETTM");
         FillMenuTracks(treeMenu, kTrackTypeTeletextCaptions);
     }
 
     AspectOverrideMode aspectoverride = nvp->GetAspectOverride();
-    item = new OSDGenericTree(treeMenu, tr("Change Aspect Ratio"));
+    OSDGenericTree *car_item = new OSDGenericTree(
+        treeMenu, tr("Change Aspect Ratio"));
     for (int j = kAspect_Off; j < kAspect_END; j++)
     {
         // swap 14:9 and 16:9
@@ -7522,72 +7526,73 @@ void TV::BuildOSDTreeMenu(void)
 
         bool sel = (i != kAspect_Off) ? (aspectoverride == i) :
             (aspectoverride <= kAspect_Off) || (aspectoverride >= kAspect_END);
-        subitem = new OSDGenericTree(item, toString((AspectOverrideMode) i),
-                                     QString("TOGGLEASPECT%1").arg(i),
-                                     (sel) ? 1 : 0, NULL, "ASPECTGROUP");
+        new OSDGenericTree(car_item, toString((AspectOverrideMode) i),
+                           QString("TOGGLEASPECT%1").arg(i),
+                           (sel) ? 1 : 0, NULL, "ASPECTGROUP");
     }
 
     AdjustFillMode adjustfill = nvp->GetAdjustFill();
-    item = new OSDGenericTree(treeMenu, tr("Adjust Fill"));
+    OSDGenericTree *af_item = new OSDGenericTree(treeMenu, tr("Adjust Fill"));
     for (int i = kAdjustFill_Off; i < kAdjustFill_END; i++)
     {
         bool sel = (i != kAdjustFill_Off) ? (adjustfill == i) :
             (adjustfill <= kAdjustFill_Off) || (adjustfill >= kAdjustFill_END);
-        subitem = new OSDGenericTree(item, toString((AdjustFillMode) i),
-                                     QString("TOGGLEFILL%1").arg(i),
-                                     (sel) ? 1 : 0, NULL, "ADJUSTFILLGROUP");
+        new OSDGenericTree(af_item, toString((AdjustFillMode) i),
+                           QString("TOGGLEFILL%1").arg(i),
+                           (sel) ? 1 : 0, NULL, "ADJUSTFILLGROUP");
     }
 
     uint sup = kPictureAttributeSupported_None;
     if (nvp && nvp->getVideoOutput())
         sup = nvp->getVideoOutput()->GetSupportedPictureAttributes();
-    item = NULL;
+    OSDGenericTree *ap_item = NULL;
     for (int i = kPictureAttribute_MIN; i < kPictureAttribute_MAX; i++)
     {
         if (toMask((PictureAttribute)i) & sup)
         {
-            if (!item)
-                item = new OSDGenericTree(treeMenu, tr("Adjust Picture"));
-            subitem = new OSDGenericTree(
-                item, toString((PictureAttribute) i),
+            if (!ap_item)
+                ap_item = new OSDGenericTree(treeMenu, tr("Adjust Picture"));
+            new OSDGenericTree(
+                ap_item, toString((PictureAttribute) i),
                 QString("TOGGLEPICCONTROLS%1").arg(i));
         }
     }
 
-    item = new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"),
-                             "TOGGLEMANUALZOOM");
+    new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"), "TOGGLEMANUALZOOM");
 
-    item = new OSDGenericTree(treeMenu, tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");
+    new OSDGenericTree(treeMenu, tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");
 
     int speedX100 = (int)(round(normal_speed * 100));
 
-    item = new OSDGenericTree(treeMenu, tr("Adjust Time Stretch"), "ADJUSTSTRETCH");
-    subitem = new OSDGenericTree(item, tr("Toggle"), "TOGGLESTRETCH");
-    subitem = new OSDGenericTree(item, tr("Adjust"), "ADJUSTSTRETCH");
-    subitem = new OSDGenericTree(item, tr("0.5X"), "ADJUSTSTRETCH0.5",
-                                 (speedX100 == 50) ? 1 : 0, NULL,
-                                 "STRETCHGROUP");
-    subitem = new OSDGenericTree(item, tr("0.9X"), "ADJUSTSTRETCH0.9",
-                                 (speedX100 == 90) ? 1 : 0, NULL,
-                                 "STRETCHGROUP");
-    subitem = new OSDGenericTree(item, tr("1.0X"), "ADJUSTSTRETCH1.0",
-                                 (speedX100 == 100) ? 1 : 0, NULL,
-                                 "STRETCHGROUP");
-    subitem = new OSDGenericTree(item, tr("1.1X"), "ADJUSTSTRETCH1.1",
-                                 (speedX100 == 110) ? 1 : 0, NULL,
-                                 "STRETCHGROUP");
-    subitem = new OSDGenericTree(item, tr("1.2X"), "ADJUSTSTRETCH1.2",
-                                 (speedX100 == 120) ? 1 : 0, NULL,
-                                 "STRETCHGROUP");
-    subitem = new OSDGenericTree(item, tr("1.3X"), "ADJUSTSTRETCH1.3",
-                                 (speedX100 == 130) ? 1 : 0, NULL,
-                                 "STRETCHGROUP");
-    subitem = new OSDGenericTree(item, tr("1.4X"), "ADJUSTSTRETCH1.4",
-                                 (speedX100 == 140) ? 1 : 0, NULL,
-                                 "STRETCHGROUP");
-    subitem = new OSDGenericTree(item, tr("1.5X"), "ADJUSTSTRETCH1.5",
-                                 (speedX100 == 150) ? 1 : 0, NULL,
-                                 "STRETCHGROUP");
+    OSDGenericTree *ats_item = new OSDGenericTree(
+        treeMenu, tr("Adjust Time Stretch"), "ADJUSTSTRETCH");
+
+    new OSDGenericTree(ats_item, tr("Toggle"), "TOGGLESTRETCH");
+    new OSDGenericTree(ats_item, tr("Adjust"), "ADJUSTSTRETCH");
+    new OSDGenericTree(ats_item, tr("0.5X"), "ADJUSTSTRETCH0.5",
+                       (speedX100 == 50) ? 1 : 0, NULL,
+                       "STRETCHGROUP");
+    new OSDGenericTree(ats_item, tr("0.9X"), "ADJUSTSTRETCH0.9",
+                       (speedX100 == 90) ? 1 : 0, NULL,
+                       "STRETCHGROUP");
+    new OSDGenericTree(ats_item, tr("1.0X"), "ADJUSTSTRETCH1.0",
+                       (speedX100 == 100) ? 1 : 0, NULL,
+                       "STRETCHGROUP");
+    new OSDGenericTree(ats_item, tr("1.1X"), "ADJUSTSTRETCH1.1",
+                       (speedX100 == 110) ? 1 : 0, NULL,
+                       "STRETCHGROUP");
+    new OSDGenericTree(ats_item, tr("1.2X"), "ADJUSTSTRETCH1.2",
+                       (speedX100 == 120) ? 1 : 0, NULL,
+                       "STRETCHGROUP");
+    new OSDGenericTree(ats_item, tr("1.3X"), "ADJUSTSTRETCH1.3",
+                       (speedX100 == 130) ? 1 : 0, NULL,
+                       "STRETCHGROUP");
+    new OSDGenericTree(ats_item, tr("1.4X"), "ADJUSTSTRETCH1.4",
+                       (speedX100 == 140) ? 1 : 0, NULL,
+                       "STRETCHGROUP");
+    new OSDGenericTree(ats_item, tr("1.5X"), "ADJUSTSTRETCH1.5",
+                       (speedX100 == 150) ? 1 : 0, NULL,
+                       "STRETCHGROUP");
 
     // add scan mode override settings to menu
     FrameScanType scan_type = kScan_Ignore;
@@ -7610,63 +7615,62 @@ void TV::BuildOSDTreeMenu(void)
         }
     }
 
-    item = new OSDGenericTree(
+    OSDGenericTree *vs_item = new OSDGenericTree(
         treeMenu, tr("Video Scan"), "SCANMODE");
-    subitem = new OSDGenericTree(
-        item, tr("Detect") + cur_mode, "SELECTSCAN_0",
+    new OSDGenericTree(
+        vs_item, tr("Detect") + cur_mode, "SELECTSCAN_0",
         (scan_type == kScan_Detect) ? 1 : 0, NULL, "SCANGROUP");
-    subitem = new OSDGenericTree(
-        item, tr("Progressive"), "SELECTSCAN_3",
+    new OSDGenericTree(
+        vs_item, tr("Progressive"), "SELECTSCAN_3",
         (scan_type == kScan_Progressive) ? 1 : 0, NULL, "SCANGROUP");
-    subitem = new OSDGenericTree(
-        item, tr("Interlaced (Normal)"), "SELECTSCAN_1",
+    new OSDGenericTree(
+        vs_item, tr("Interlaced (Normal)"), "SELECTSCAN_1",
         (scan_type == kScan_Interlaced) ? 1 : 0, NULL, "SCANGROUP");
-    subitem = new OSDGenericTree(
-        item, tr("Interlaced (Reversed)"), "SELECTSCAN_2",
+    new OSDGenericTree(
+        vs_item, tr("Interlaced (Reversed)"), "SELECTSCAN_2",
         (scan_type == kScan_Intr2ndField) ? 1 : 0, NULL, "SCANGROUP");
 
     // add sleep items to menu
 
-    item = new OSDGenericTree(treeMenu, tr("Sleep"), "TOGGLESLEEPON");
+    OSDGenericTree *s_item = new OSDGenericTree(
+        treeMenu, tr("Sleep"), "TOGGLESLEEPON");
     if (sleepTimer.isRunning())
-        subitem = new OSDGenericTree(item, tr("Sleep Off"), "TOGGLESLEEPON");
-    subitem = new OSDGenericTree(item, "30 " + tr("minutes"), "TOGGLESLEEP30");
-    subitem = new OSDGenericTree(item, "60 " + tr("minutes"), "TOGGLESLEEP60");
-    subitem = new OSDGenericTree(item, "90 " + tr("minutes"), "TOGGLESLEEP90");
-    subitem = new OSDGenericTree(item, "120 " + tr("minutes"), "TOGGLESLEEP120");
+        new OSDGenericTree(s_item, tr("Sleep Off"), "TOGGLESLEEPON");
+    new OSDGenericTree(s_item, "30 " + tr("minutes"), "TOGGLESLEEP30");
+    new OSDGenericTree(s_item, "60 " + tr("minutes"), "TOGGLESLEEP60");
+    new OSDGenericTree(s_item, "90 " + tr("minutes"), "TOGGLESLEEP90");
+    new OSDGenericTree(s_item, "120 " + tr("minutes"), "TOGGLESLEEP120");
 }
 
 void TV::FillMenuLiveTV(OSDGenericTree *treeMenu)
 {
-    OSDGenericTree *item, *subitem;
-
     bool freeRecorders = (pipnvp != NULL);
     if (!freeRecorders)
         freeRecorders = RemoteGetFreeRecorderCount();
 
-    item = new OSDGenericTree(treeMenu, tr("Program Guide"), "GUIDE");
+    new OSDGenericTree(treeMenu, tr("Program Guide"), "GUIDE");
 
     if (!gContext->GetNumSetting("JumpToProgramOSD", 1))
     {
-        item = new OSDGenericTree(treeMenu, tr("Jump to Program"));
-        subitem = new OSDGenericTree(item, tr("Recorded Program"), "JUMPREC");
+        OSDGenericTree *jtpo_item =
+            new OSDGenericTree(treeMenu, tr("Jump to Program"));
+        new OSDGenericTree(jtpo_item, tr("Recorded Program"), "JUMPREC");
         if (lastProgram != NULL)
-            subitem = new OSDGenericTree(item, lastProgram->title, "JUMPPREV");
+            new OSDGenericTree(jtpo_item, lastProgram->title, "JUMPPREV");
     }
 
     if (freeRecorders)
     {
         // Picture-in-Picture
-        item = new OSDGenericTree(treeMenu, tr("Picture-in-Picture"));
-        subitem = new OSDGenericTree(item, tr("Enable/Disable"),
-                                     "TOGGLEPIPMODE");
-        subitem = new OSDGenericTree(item, tr("Swap PiP/Main"), "SWAPPIP");
-        subitem = new OSDGenericTree(item, tr("Change Active Window"),
-                                     "TOGGLEPIPWINDOW");
+        OSDGenericTree *pip_item =
+            new OSDGenericTree(treeMenu, tr("Picture-in-Picture"));
+        new OSDGenericTree(pip_item, tr("Enable/Disable"),
+                           "TOGGLEPIPMODE");
+        new OSDGenericTree(pip_item, tr("Swap PiP/Main"), "SWAPPIP");
+        new OSDGenericTree(pip_item, tr("Change Active Window"),
+                           "TOGGLEPIPWINDOW");
 
         // Input switching
-        item = NULL;
-
         QMap<uint,InputInfo> sources;
         vector<uint> cardids = RemoteRequestFreeRecorderList();
         uint         cardid  = activerecorder->GetRecorderNumber();
@@ -7680,6 +7684,7 @@ void TV::FillMenuLiveTV(OSDGenericTree *treeMenu)
         activerecorder->GetChannelInfo(info);
         uint sourceid = info["sourceid"].toUInt();
 
+        OSDGenericTree *si_item = NULL;
         vector<uint>::const_iterator it = cardids.begin();
         for (; it != cardids.end(); ++it)
         {
@@ -7689,8 +7694,8 @@ void TV::FillMenuLiveTV(OSDGenericTree *treeMenu)
             if (inputs.empty())
                 continue;
 
-            if (!item)
-                item = new OSDGenericTree(treeMenu, tr("Switch Input"));
+            if (!si_item)
+                si_item = new OSDGenericTree(treeMenu, tr("Switch Input"));
 
             for (uint i = 0; i < inputs.size(); i++)
             {
@@ -7716,8 +7721,8 @@ void TV::FillMenuLiveTV(OSDGenericTree *treeMenu)
                         tr("I", "Input") + ":" + inputs[i].name;
                 }
 
-                subitem = new OSDGenericTree(
-                    item, name,
+                new OSDGenericTree(
+                    si_item, name,
                     QString("SWITCHTOINPUT_%1").arg(inputs[i].inputid));
             }
         }
@@ -7728,106 +7733,103 @@ void TV::FillMenuLiveTV(OSDGenericTree *treeMenu)
         sources.erase(sourceid);
 
         // create menu if we have any sources left
+        OSDGenericTree *sit_item = NULL;
         QMap<uint,InputInfo>::const_iterator sit = sources.begin();
         if (sit != sources.end())
-            item = new OSDGenericTree(treeMenu, tr("Switch Source"));
+            sit_item = new OSDGenericTree(treeMenu, tr("Switch Source"));
         for (; sit != sources.end(); ++sit)
         {
-            subitem = new OSDGenericTree(
-                item, SourceUtil::GetSourceName((*sit).sourceid),
+            new OSDGenericTree(
+                sit_item, SourceUtil::GetSourceName((*sit).sourceid),
                 QString("SWITCHTOINPUT_%1").arg((*sit).inputid));
         }
     }
 
     if (!persistentbrowsemode)
-    {
-        item = new OSDGenericTree(
-            treeMenu, tr("Enable Browse Mode"), "TOGGLEBROWSE");
-    }
+        new OSDGenericTree(treeMenu, tr("Enable Browse Mode"), "TOGGLEBROWSE");
 
-    item = new OSDGenericTree(treeMenu, tr("Previous Channel"),
-                              "PREVCHAN");
+    new OSDGenericTree(treeMenu, tr("Previous Channel"), "PREVCHAN");
 }
 
 void TV::FillMenuPlaying(OSDGenericTree *treeMenu)
 {
-    OSDGenericTree *item, *subitem;
-
     if (activerbuffer && activerbuffer->isDVD())
     {
-        item = new OSDGenericTree(
-            treeMenu, tr("DVD Root Menu"),    "JUMPTODVDROOTMENU");
-        item = new OSDGenericTree(
-            treeMenu, tr("DVD Chapter Menu"), "JUMPTODVDCHAPTERMENU");
+        new OSDGenericTree(treeMenu, tr("DVD Root Menu"), "JUMPTODVDROOTMENU");
+        new OSDGenericTree(treeMenu,tr("DVD Chapter Menu"),
+                           "JUMPTODVDCHAPTERMENU");
 
         return;
     }
 
-    item = new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
+    new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
 
-    item = new OSDGenericTree(treeMenu, tr("Jump to Program"));
+    OSDGenericTree *jtp_item =
+        new OSDGenericTree(treeMenu, tr("Jump to Program"));
 
-    subitem = new OSDGenericTree(item, tr("Recorded Program"), "JUMPREC");
+    new OSDGenericTree(jtp_item, tr("Recorded Program"), "JUMPREC");
     if (lastProgram != NULL)
-        subitem = new OSDGenericTree(item, lastProgram->title, "JUMPPREV");
+        new OSDGenericTree(jtp_item, lastProgram->title, "JUMPPREV");
 
     pbinfoLock.lock();
 
     if (JobQueue::IsJobQueuedOrRunning(
             JOB_TRANSCODE, playbackinfo->chanid, playbackinfo->startts))
     {
-        item = new OSDGenericTree(treeMenu, tr("Stop Transcoding"),
-                                  "QUEUETRANSCODE");
+        new OSDGenericTree(treeMenu, tr("Stop Transcoding"), "QUEUETRANSCODE");
     }
     else
     {
-        item = new OSDGenericTree(treeMenu, tr("Begin Transcoding"));
-        subitem = new OSDGenericTree(item, tr("Default"),
-                                     "QUEUETRANSCODE");
-        subitem = new OSDGenericTree(item, tr("Autodetect"),
-                                     "QUEUETRANSCODE_AUTO");
-        subitem = new OSDGenericTree(item, tr("High Quality"),
-                                     "QUEUETRANSCODE_HIGH");
-        subitem = new OSDGenericTree(item, tr("Medium Quality"),
-                                     "QUEUETRANSCODE_MEDIUM");
-        subitem = new OSDGenericTree(item, tr("Low Quality"),
-                                     "QUEUETRANSCODE_LOW");
+        OSDGenericTree *bt_item =
+            new OSDGenericTree(treeMenu, tr("Begin Transcoding"));
+        new OSDGenericTree(bt_item, tr("Default"),
+                           "QUEUETRANSCODE");
+        new OSDGenericTree(bt_item, tr("Autodetect"),
+                           "QUEUETRANSCODE_AUTO");
+        new OSDGenericTree(bt_item, tr("High Quality"),
+                           "QUEUETRANSCODE_HIGH");
+        new OSDGenericTree(bt_item, tr("Medium Quality"),
+                           "QUEUETRANSCODE_MEDIUM");
+        new OSDGenericTree(bt_item, tr("Low Quality"),
+                           "QUEUETRANSCODE_LOW");
     }
 
-    item = new OSDGenericTree(treeMenu, tr("Commercial Auto-Skip"));
-    subitem = new OSDGenericTree(item, tr("Auto-Skip OFF"),
-                                 "TOGGLECOMMSKIP0",
-                                 (autoCommercialSkip == 0) ? 1 : 0, NULL,
-                                 "COMMSKIPGROUP");
-    subitem = new OSDGenericTree(item, tr("Auto-Skip Notify"),
-                                 "TOGGLECOMMSKIP2",
-                                 (autoCommercialSkip == 2) ? 1 : 0, NULL,
-                                 "COMMSKIPGROUP");
-    subitem = new OSDGenericTree(item, tr("Auto-Skip ON"),
-                                 "TOGGLECOMMSKIP1",
-                                 (autoCommercialSkip == 1) ? 1 : 0, NULL,
-                                 "COMMSKIPGROUP");
+    OSDGenericTree *cas_item =
+        new OSDGenericTree(treeMenu, tr("Commercial Auto-Skip"));
+    new OSDGenericTree(cas_item, tr("Auto-Skip OFF"),
+                       "TOGGLECOMMSKIP0",
+                       (autoCommercialSkip == 0) ? 1 : 0, NULL,
+                       "COMMSKIPGROUP");
+    new OSDGenericTree(cas_item, tr("Auto-Skip Notify"),
+                       "TOGGLECOMMSKIP2",
+                       (autoCommercialSkip == 2) ? 1 : 0, NULL,
+                       "COMMSKIPGROUP");
+    new OSDGenericTree(cas_item, tr("Auto-Skip ON"),
+                       "TOGGLECOMMSKIP1",
+                       (autoCommercialSkip == 1) ? 1 : 0, NULL,
+                       "COMMSKIPGROUP");
 
     if (playbackinfo->GetAutoExpireFromRecorded())
     {
-        item = new OSDGenericTree(treeMenu, tr("Turn Auto-Expire OFF"),
-                                  "TOGGLEAUTOEXPIRE");
+        new OSDGenericTree(
+            treeMenu, tr("Turn Auto-Expire OFF"), "TOGGLEAUTOEXPIRE");
     }
     else
     {
-        item = new OSDGenericTree(treeMenu, tr("Turn Auto-Expire ON"),
-                                  "TOGGLEAUTOEXPIRE");
+        new OSDGenericTree(
+            treeMenu, tr("Turn Auto-Expire ON"), "TOGGLEAUTOEXPIRE");
     }
 
     pbinfoLock.unlock();
 
-    item = new OSDGenericTree(treeMenu, tr("Schedule Recordings"));
-    subitem = new OSDGenericTree(item, tr("Program Guide"), "GUIDE");
-    subitem = new OSDGenericTree(item, tr("Upcoming Recordings"),
-                                "VIEWSCHEDULED");
-    subitem = new OSDGenericTree(item, tr("Program Finder"), "FINDER");
-    subitem = new OSDGenericTree(item, tr("Edit Recording Schedule"),
-                                 "SCHEDULE");
+    OSDGenericTree *sr_item =
+        new OSDGenericTree(treeMenu, tr("Schedule Recordings"));
+    new OSDGenericTree(sr_item, tr("Program Guide"), "GUIDE");
+    new OSDGenericTree(sr_item, tr("Upcoming Recordings"),
+                       "VIEWSCHEDULED");
+    new OSDGenericTree(sr_item, tr("Program Finder"), "FINDER");
+    new OSDGenericTree(sr_item, tr("Edit Recording Schedule"),
+                       "SCHEDULE");
 }
 
 bool TV::FillMenuTracks(OSDGenericTree *treeMenu, uint type)
@@ -7889,17 +7891,17 @@ bool TV::FillMenuTracks(OSDGenericTree *treeMenu, uint type)
     if ((kTrackTypeAudio == type) && tracks.size() <= 1)
         return false;
 
-    OSDGenericTree *item = new OSDGenericTree(
+    OSDGenericTree *tm_item = new OSDGenericTree(
         treeMenu, mainMsg, "DUMMY" + QString::number(type));
 
     if (kTrackTypeAudio != type)
-        new OSDGenericTree(item, tr("Toggle On/Off"), "TOGGLE"+typeStr);
+        new OSDGenericTree(tm_item, tr("Toggle On/Off"), "TOGGLE"+typeStr);
 
     uint curtrack = (uint) activenvp->GetTrack(type);
     for (uint i = 0; i < (uint)tracks.size(); i++)
     {
         new OSDGenericTree(
-            item, tracks[i], selStr + QString::number(i),
+            tm_item, tracks[i], selStr + QString::number(i),
             (sel && (i == curtrack)) ? 1 : 0, NULL, grpStr);
     }
     return true;
@@ -8683,11 +8685,10 @@ void TV::DoDisplayJumpMenu(void)
     if (treeMenu)
         delete treeMenu;
 
-     treeMenu = new OSDGenericTree(NULL, "treeMenu");
-     OSDGenericTree *item, *subitem;
+    treeMenu = new OSDGenericTree(NULL, "treeMenu");
 
-     // Build jumpMenu of recorded program titles
-        ProgramInfo *p;
+    // Build jumpMenu of recorded program titles
+    ProgramInfo *p;
     progLists.clear();
     vector<ProgramInfo *> *infoList;
     infoList = RemoteGetRecordedList(false);
@@ -8713,20 +8714,23 @@ void TV::DoDisplayJumpMenu(void)
             int progIndex = plist.count();
             if (progIndex == 1)
             {
-                item = new OSDGenericTree(treeMenu, tr(Iprog.key()),
+                new OSDGenericTree(
+                    treeMenu, tr(Iprog.key()),
                     QString("JUMPPROG %1 0").arg(Iprog.key()));
             }
             else
             {
-                item = new OSDGenericTree(treeMenu, tr(Iprog.key()));
+                OSDGenericTree *j_item =
+                    new OSDGenericTree(treeMenu, tr(Iprog.key()));
+
                 for (int i = 0; i < progIndex; i++)
                 {
                     p = plist.at(i);
                     if (p->subtitle != "")
-                        subitem = new OSDGenericTree(item, tr(p->subtitle),
+                        new OSDGenericTree(j_item, tr(p->subtitle),
                             QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i));
                     else
-                        subitem = new OSDGenericTree(item, tr(p->title),
+                        new OSDGenericTree(j_item, tr(p->title),
                             QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i));
                 }
             }
@@ -8740,11 +8744,15 @@ void TV::DoDisplayJumpMenu(void)
         OSDListTreeType *tree = GetOSD()->ShowTreeMenu("menu", treeMenu);
         if (tree)
         {
-            connect(tree, SIGNAL(itemSelected(OSDListTreeType *,OSDGenericTree *)),
-                this, SLOT(TreeMenuSelected(OSDListTreeType *, OSDGenericTree *)));
+            connect(tree,
+                    SIGNAL(itemSelected(OSDListTreeType*, OSDGenericTree*)),
+                    this,
+                    SLOT(TreeMenuSelected(OSDListTreeType*, OSDGenericTree*)));
 
-            connect(tree, SIGNAL(itemEntered(OSDListTreeType *, OSDGenericTree *)),
-                this, SLOT(TreeMenuEntered(OSDListTreeType *, OSDGenericTree *)));
+            connect(tree,
+                    SIGNAL(itemEntered(OSDListTreeType*, OSDGenericTree*)),
+                    this,
+                    SLOT(TreeMenuEntered(OSDListTreeType*, OSDGenericTree*)));
         }
     }
 }
