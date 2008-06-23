@@ -2084,7 +2084,7 @@ if disabled cpu_override && enabled proc_opt; then
        enable small
 # Intel Core2 Duo
    elif expr "$processor" : ".*Genuine.*Intel.*CPU.*2160" > /dev/null ; then
-       ARCHFLAGS="-march=core2"
+       ARCHFLAGS="-march=k8"
 # Reportedly Intel Duo, but we assume 32 bit P4 due to generic name
    elif expr "$processor" : ".*Genuine.*Intel.*CPU" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
