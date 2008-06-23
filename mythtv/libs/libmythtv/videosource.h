@@ -4,6 +4,9 @@
 #include <vector>
 using namespace std;
 
+#include <QThread>
+#include <QWaitCondition>
+
 #include "settings.h"
 #include "datadirect.h"
 
@@ -194,11 +197,51 @@ protected:
     UseEIT *useeit;
 };
 
+class Loading_config: public VerticalConfigurationGroup
+{
+  public:
+    Loading_config(const VideoSource &_parent);
+
+    virtual void save() { }
+    virtual void save(QString) { }
+};
+
+class XMLTVFindGrabbers : public QThread
+{
+    Q_OBJECT
+
+  public:
+    virtual void run(void);
+
+  signals:
+    void FoundXMLTVGrabbers(QStringList,QStringList);
+
+  private:
+    static QMutex      list_lock;
+    static QStringList name_list;
+    static QStringList prog_list;
+};
+
+class XMLTVGrabber;
 class XMLTVConfig : public TriggeredConfigurationGroup
 {
-public:
-    XMLTVConfig(const VideoSource& parent);
+    Q_OBJECT
+
+  public:
+    XMLTVConfig(const VideoSource &aparent);
+    virtual void load(void);
     virtual void save(void);
+
+  public slots:
+    void FoundXMLTVGrabbers(QStringList,QStringList);
+
+  private:
+    const VideoSource &parent;
+    XMLTVGrabber      *grabber;
+    XMLTVFindGrabbers  findGrabbers;
+    QMutex             load_lock;
+    QWaitCondition     load_wait;
+    bool               loaded;
 };
 
 class VideoSource : public ConfigurationWizard {

@@ -231,11 +231,7 @@ class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
     void setTrigger(Configurable *_trigger);
 
   protected slots:
-    virtual void triggerChanged(const QString &value)
-    {
-        if (configStack)
-            configStack->raise(triggerMap[value]);
-    }
+    virtual void triggerChanged(const QString &value);
 
   protected:
     /// You need to call deleteLater to delete QObject

@@ -495,6 +495,25 @@ void TriggeredConfigurationGroup::setTrigger(Configurable *_trigger)
     }
 }
 
+void TriggeredConfigurationGroup::triggerChanged(const QString &value)
+{
+    if (!configStack)
+        return;
+
+    QMap<QString,Configurable*>::iterator it = triggerMap.find(value);
+
+    if (it == triggerMap.end())
+    {
+        VERBOSE(VB_IMPORTANT, QString("TriggeredConfigurationGroup::") +
+                QString("triggerChanged(%1) Error:").arg(value) +
+                "Failed to locate value in triggerMap");
+    }
+    else
+    {
+        configStack->raise(*it);
+    }
+}
+
 /** \fn TriggeredConfigurationGroup::SetVertical(bool)
  *  \brief By default we use a vertical layout, but you can call this
  *         with a false value to use a horizontal layout instead.
@@ -516,16 +535,46 @@ void TriggeredConfigurationGroup::SetVertical(bool vert)
 
 void TriggeredConfigurationGroup::removeTarget(QString triggerValue)
 {
-    HostComboBox *combobox = dynamic_cast<HostComboBox*>(trigger);
+    ComboBoxSetting *combobox = dynamic_cast<ComboBoxSetting*>(trigger);
     if (!combobox)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "TriggeredConfigurationGroup::removeTarget(): "
+                "Failed to cast trigger to ComboBoxSetting -- aborting");
         return;
+    }
 
     QMap<QString,Configurable*>::iterator cit = triggerMap.find(triggerValue);
     if (cit == triggerMap.end())
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("TriggeredConfigurationGroup::removeTarget(): "
+                        "Failed to find desired value(%1) -- aborting")
+                .arg(triggerValue));
         return;
+    }
 
     // remove trigger value from trigger combobox
-    combobox->removeSelection(triggerValue);
+    bool ok = false;
+    for (uint i = 0; i < combobox->size(); i++)
+    {
+        if (combobox->GetValue(i) == triggerValue)
+        {
+            ok = combobox->removeSelection(
+                combobox->GetLabel(i), combobox->GetValue(i));
+            break;
+        }
+    }
+
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString(
+                    "TriggeredConfigurationGroup::removeTarget(): "
+                    "Failed to remove '%1' from combobox -- aborting")
+                .arg(triggerValue));
+        return;
+    }
 
     // actually remove the pane
     configStack->removeChild(*cit);

@@ -276,6 +276,13 @@ class MPUBLIC SelectSetting : public Setting
 
     virtual void fillSelectionsFromDir(const QDir& dir, bool absPath=true);
 
+    virtual uint size(void) const { return labels.size(); }
+
+    virtual QString GetLabel(uint i) const
+        { return (i < labels.size()) ? labels[i] : QString::null; }
+    virtual QString GetValue(uint i) const
+        { return (i < values.size()) ? values[i] : QString::null; }
+
 signals:
     void selectionAdded(const QString& label, QString value);
     void selectionRemoved(const QString &label, const QString &value);
