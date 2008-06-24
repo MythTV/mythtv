@@ -3444,6 +3444,13 @@ fi
 
 echo "#endif /* FFMPEG_CONFIG_H */" >> $TMPH
 
+cat <<EOF >> $MYTH_CONFIG_MAK
+# Remove /usr/lib to prevent finding older binaries.
+# Note: Qt uses QMAKE_INCDIR_QT to build an absolute path for include
+#       directories, it cannot be modified.
+QMAKE_LIBDIR_QT -= /usr/lib
+EOF
+
 diff $TMPH $MYTH_CONFIG_H >/dev/null 2>&1
 if test $? -ne 0 ; then
   mv -f $TMPH $MYTH_CONFIG_H
