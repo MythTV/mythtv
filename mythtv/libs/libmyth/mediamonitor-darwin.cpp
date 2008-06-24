@@ -388,10 +388,9 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
     VERBOSE(VB_MEDIA, msg);
 
     if (isCDorDVD)
-        media = MythCDROM::get(m_Monitor, devName, true,
-                               m_Monitor->m_AllowEject);
+        media = MythCDROM::get(NULL, devName, true, m_Monitor->m_AllowEject);
     else
-        media = MythHDD::Get(m_Monitor, devName, true, false);
+        media = MythHDD::Get(NULL, devName, true, false);
 
     if (!media)
     {
@@ -487,6 +486,8 @@ void MediaMonitorDarwin::StartMonitoring(void)
 
     if (!m_Thread)
         m_Thread = new MonitorThreadDarwin(this, m_MonitorPollingInterval);
+
+    qRegisterMetaType<MediaStatus>("MediaStatus");
 
     VERBOSE(VB_MEDIA, "Starting MediaMonitor");
     m_Active = true;
