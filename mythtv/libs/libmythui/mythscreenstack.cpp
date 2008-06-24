@@ -10,7 +10,7 @@ using namespace std;
 #include <qobject.h>
 #include <qapplication.h>
 
-const int kFadeVal = 10;
+const int kFadeVal = 20;
 
 MythScreenStack::MythScreenStack(MythMainWindow *parent, const char *name, 
                                  bool mainstack)
