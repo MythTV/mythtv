@@ -239,7 +239,7 @@ void MediaMonitor::ChooseAndEjectMedia(void)
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), "eject success",
                                   tr("You may safely remove %1").arg(dev));
     }
-    else if (err == MEDIAERR_FAILED && selected->checkMedia() != MEDIASTAT_OPEN)
+    else if (err == MEDIAERR_FAILED)
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), "eject fail",
                                   tr("Failed to eject %1").arg(dev));
