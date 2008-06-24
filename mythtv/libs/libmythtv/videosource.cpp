@@ -546,7 +546,7 @@ void XMLTVFindGrabbers::run(void)
     }
 
     VERBOSE(VB_GENERAL,
-            loc + "Running tv_find_grabbers" + args.join(" ") + "'.");
+            loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");
 
     ok = find_grabber_proc.waitForFinished(25 * 1000);
     if (!ok)
