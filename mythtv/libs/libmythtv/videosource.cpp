@@ -545,7 +545,8 @@ void XMLTVFindGrabbers::run(void)
         return;
     }
 
-    VERBOSE(VB_GENERAL, loc + "Running tv_find_grabbers.");
+    VERBOSE(VB_GENERAL,
+            loc + "Running tv_find_grabbers" + args.join(" ") + "'.");
 
     ok = find_grabber_proc.waitForFinished(25 * 1000);
     if (!ok)
@@ -570,6 +571,7 @@ void XMLTVFindGrabbers::run(void)
 
         name_list.push_back(grabber_name);
         prog_list.push_back(grabber_file.fileName());
+        VERBOSE(VB_GENERAL+VB_EXTRA, "Found " + grabber_split[0]);
     }
 
     emit FoundXMLTVGrabbers(name_list, prog_list);
