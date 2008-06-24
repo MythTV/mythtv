@@ -206,12 +206,15 @@ class transport_scan_items_it_t
     const TransportScanItem& operator*() const { return *_it; }
     TransportScanItem&       operator*()       { return *_it; }
 
+    QList<TransportScanItem>::iterator iter() { return _it; }
+    QList<TransportScanItem>::const_iterator iter() const { return _it; }
     uint offset() const { return (uint) _offset; }
     transport_scan_items_it_t nextTransport() const
     {
         QList<TransportScanItem>::iterator tmp = _it;
         return transport_scan_items_it_t(++tmp);
     }
+
   private:
     QList<TransportScanItem>::iterator _it;
     int _offset;
@@ -219,6 +222,8 @@ class transport_scan_items_it_t
     friend bool operator==(const transport_scan_items_it_t&,
                            const transport_scan_items_it_t&);
     friend bool operator!=(const transport_scan_items_it_t&,
+                           const transport_scan_items_it_t&);
+    friend bool operator<( const transport_scan_items_it_t&,
                            const transport_scan_items_it_t&);
 
     friend bool operator==(const transport_scan_items_it_t&,
@@ -237,6 +242,11 @@ inline bool operator!=(const transport_scan_items_it_t &A,
     return (A._it != B._it) || (A._offset != B._offset);
 }
 
+inline bool operator<(const transport_scan_items_it_t &A,
+                      const transport_scan_items_it_t &B)
+{
+    return (A._it == B._it) ? A._offset < B._offset : A._it < B._it;
+}
 
 inline bool operator==(const transport_scan_items_it_t& A,
                        const QList<TransportScanItem>::iterator& B)
