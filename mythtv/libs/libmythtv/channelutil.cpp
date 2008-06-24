@@ -941,6 +941,40 @@ bool ChannelUtil::IsOnSameMultiplex(uint srcid,
     return old_mplexid == new_mplexid;
 }
 
+vector<uint> ChannelUtil::GetConflicting(const QString &channum, uint sourceid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    vector<uint> conflicting;
+
+    if (sourceid)
+    {
+        query.prepare(
+            "SELECT chanid from channel "
+            "WHERE sourceid = :SOURCEID AND "
+            "      channum  = :CHANNUM");
+        query.bindValue(":SOURCEID", sourceid);
+    }
+    else
+    {
+        query.prepare(
+            "SELECT chanid from channel "
+            "WHERE channum = :CHANNUM");
+    }
+
+    query.bindValue(":CHANNUM",  channum);
+    if (!query.exec())
+    {
+        MythContext::DBError("IsConflicting", query);
+        conflicting.push_back(0);
+        return conflicting;
+    }
+
+    while (query.next())
+        conflicting.push_back(query.value(0).toUInt());
+
+    return conflicting;
+}
+
 bool ChannelUtil::SetChannelValue(const QString &field_name,
                                   QString        value,
                                   uint           sourceid,

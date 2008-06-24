@@ -190,6 +190,17 @@ class MPUBLIC ChannelUtil
                                      const QString &new_channum,
                                      const QString &old_channum);
 
+    static bool    IsConflicting(const QString &channum,
+                                 uint sourceid = 0, uint excluded_chanid = 0)
+    {
+        vector<uint> cardids = GetConflicting(channum, sourceid);
+        return (cardids.size() > 1) ||
+            ((1 == cardids.size()) && (cardids[0] != excluded_chanid));
+    }
+
+    static vector<uint> GetConflicting(const QString &channum,
+                                       uint sourceid = 0);
+
     /**
      * \brief Returns the channel-number string of the given channel.
      * \param chanid primary key for channel record
