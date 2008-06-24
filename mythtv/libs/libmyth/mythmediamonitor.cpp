@@ -239,7 +239,7 @@ void MediaMonitor::ChooseAndEjectMedia(void)
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), "eject success",
                                   tr("You may safely remove %1").arg(dev));
     }
-    else if (err == MEDIAERR_FAILED)
+    else if (err == MEDIAERR_FAILED && selected->checkMedia() != MEDIASTAT_OPEN)
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), "eject fail",
                                   tr("Failed to eject %1").arg(dev));
@@ -380,6 +380,8 @@ void MediaMonitor::StartMonitoring(void)
 
     if (!m_Thread)
         m_Thread = new MonitorThread(this, m_MonitorPollingInterval);
+
+    qRegisterMetaType<MediaStatus>("MediaStatus");
 
     VERBOSE(VB_MEDIA, "Starting MediaMonitor");
     m_Active = true;
