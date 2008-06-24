@@ -14,7 +14,7 @@
 // MythTV includes
 #include "frequencytables.h"
 #include "streamlisteners.h"
-#include "dvbconfparser.h"
+#include "dtvconfparser.h"
 #include "signalmonitorlistener.h"
 
 class MSqlQuery;

@@ -1,5 +1,4 @@
 /*
- * $Id$
  * vim: set expandtab tabstop=4 shiftwidth=4:
  *
  * Original Project
@@ -37,7 +36,7 @@
 // MythTV headers
 #include "mythcontext.h"
 #include "mythdbcon.h"
-#include "dvbconfparser.h"
+#include "dtvconfparser.h"
 #include "channelutil.h"
 
 #define PARSE_SKIP(VAR) do { \

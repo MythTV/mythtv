@@ -17,7 +17,7 @@ using namespace std;
 #include "dtvchannel.h"
 
 #include "mythexp.h"
-#include "dvbconfparser.h"
+#include "dtvconfparser.h"
 #include "dtvconfparserhelpers.h"
 
 class FrequencyTable;

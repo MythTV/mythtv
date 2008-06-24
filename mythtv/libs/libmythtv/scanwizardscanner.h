@@ -41,7 +41,7 @@
 
 // MythTV headers
 #include "settings.h"
-#include "dvbconfparser.h"
+#include "dtvconfparser.h"
 #include "signalmonitorlistener.h"
 
 class ScanWizard;

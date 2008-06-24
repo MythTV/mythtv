@@ -42,7 +42,7 @@
 #include "channelbase.h"
 #include "dtvsignalmonitor.h"
 #include "siscan.h"
-#include "dvbconfparser.h"
+#include "dtvconfparser.h"
 
 #ifdef USING_V4L
 #include "v4lchannel.h"
