@@ -79,6 +79,7 @@ inc.files += exitcodes.h mythconfig.h mythconfig.mak virtualkeyboard.h
 inc.files += mythevent.h mythobservable.h mythsocket.h
 inc.files += mythexp.h mythpluginapi.h storagegroup.h compat.h
 inc.files += mythstorage.h mythconfigdialogs.h mythconfiggroups.h
+inc.files += mythterminal.h
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmyth
