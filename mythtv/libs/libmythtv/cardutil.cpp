@@ -369,16 +369,16 @@ bool set_on_source(const QString &to_set, uint cardid, uint sourceid,
 
 /** \fn CardUtil::GetCardIDs(const QString&, QString, QString)
  *  \brief Returns all cardids of cards that uses the specified
- *         videodevice, and optionally rawtype and a non-local 
+ *         videodevice if specified, and optionally rawtype and a non-local 
  *         hostname. The result is ordered from smallest to largest.
  *  \param videodevice Video device we want card ids for
  *  \param rawtype     Card type as used in DB or empty string for any type
  *  \param hostname    Host on which device resides, only
  *                     required if said host is not the localhost
  */
-vector<uint> CardUtil::GetCardIDs(const QString &videodevice,
-                                  QString        rawtype,
-                                  QString        hostname)
+vector<uint> CardUtil::GetCardIDs(QString videodevice,
+                                  QString rawtype,
+                                  QString hostname)
 {
     vector<uint> list;
 
@@ -387,6 +387,11 @@ vector<uint> CardUtil::GetCardIDs(const QString &videodevice,
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString qstr = 
+        (videodevice.isEmpty()) ?
+        "SELECT cardid "
+        "FROM capturecard "
+        "WHERE hostname    = :HOSTNAME" :
+
         "SELECT cardid "
         "FROM capturecard "
         "WHERE videodevice = :DEVICE AND "
@@ -399,7 +404,9 @@ vector<uint> CardUtil::GetCardIDs(const QString &videodevice,
 
     query.prepare(qstr);
 
-    query.bindValue(":DEVICE",   videodevice);
+    if (!videodevice.isEmpty())
+        query.bindValue(":DEVICE",   videodevice);
+
     query.bindValue(":HOSTNAME", hostname);
 
     if (!rawtype.isEmpty())
@@ -803,14 +810,24 @@ QStringList CardUtil::GetInputNames(uint cardid, uint sourceid)
 {
     QStringList list;
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT inputname "
-                  "FROM cardinput "
-                  "WHERE sourceid = :SOURCEID AND "
-                  "      cardid   = :CARDID");
-    query.bindValue(":SOURCEID", sourceid);
+
+    if (sourceid)
+    {
+        query.prepare("SELECT inputname "
+                      "FROM cardinput "
+                      "WHERE sourceid = :SOURCEID AND "
+                      "      cardid   = :CARDID");
+        query.bindValue(":SOURCEID", sourceid);
+    }
+    else
+    {
+        query.prepare("SELECT inputname "
+                      "FROM cardinput "
+                      "WHERE cardid   = :CARDID");
+    }
     query.bindValue(":CARDID",   cardid);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
         MythContext::DBError("CardUtil::GetInputNames()", query);
     }
@@ -883,10 +900,10 @@ QString CardUtil::GetDisplayName(uint inputid)
     return QString::null;
 }
 
-QString CardUtil::GetDisplayName(uint cardid, const QString &inputname)
+uint CardUtil::GetInputID(uint cardid, const QString &inputname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT displayname "
+    query.prepare("SELECT inputid "
                   "FROM cardinput "
                   "WHERE inputname = :INPUTNAME AND "
                   "      cardid    = :CARDID");
@@ -894,11 +911,27 @@ QString CardUtil::GetDisplayName(uint cardid, const QString &inputname)
     query.bindValue(":CARDID",    cardid);
 
     if (!query.exec())
-        MythContext::DBError("CardUtil::GetDisplayName(uint,QString)", query);
+        MythContext::DBError("CardUtil::GetInputID(uint,QString)", query);
     else if (query.next())
-        return query.value(0).toString();
+        return query.value(0).toUInt();
 
-    return QString::null;
+    return 0;
+}
+
+uint CardUtil::GetSourceID(uint inputid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT sourceid "
+        "FROM cardinput "
+        "WHERE cardinputid = :INPUTID");
+    query.bindValue(":INPUTID", inputid);
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("CardUtil::GetSourceID()", query);
+    else if (query.next())
+        return query.value(0).toUInt();
+
+    return 0;
 }
 
 vector<uint> CardUtil::GetInputIDs(uint cardid)

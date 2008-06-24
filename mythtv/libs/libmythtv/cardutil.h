@@ -41,18 +41,18 @@ class MPUBLIC CardUtil
     /// \brief all the different capture cards
     enum CARD_TYPES
     {
-        ERROR_OPEN = 0,
-        ERROR_UNKNOWN,
-        ERROR_PROBE,
-        QPSK,
-        QAM,
-        OFDM,
-        ATSC,
-        V4L,
-        MPEG,
-        FIREWIRE,
-        HDHOMERUN,
-        FREEBOX,
+        ERROR_OPEN    = 0,
+        ERROR_UNKNOWN = 1,
+        ERROR_PROBE   = 2,
+        QPSK      = 3,        DVBS      = 3,
+        QAM       = 4,        DVBC      = 4,
+        OFDM      = 5,        DVBT      = 5,
+        ATSC      = 6,
+        V4L       = 7,
+        MPEG      = 8,
+        FIREWIRE  = 9,
+        HDHOMERUN = 10,
+        FREEBOX   = 11,
     };
 
     static enum CARD_TYPES toCardType(const QString &name)
@@ -131,9 +131,9 @@ class MPUBLIC CardUtil
         return list[0];
     }
 
-    static vector<uint> GetCardIDs(const QString &videodevice,
-                                   QString rawtype  = QString::null,
-                                   QString hostname = QString::null);
+    static vector<uint> GetCardIDs(QString videodevice = QString::null,
+                                   QString rawtype     = QString::null,
+                                   QString hostname    = QString::null);
 
     static bool         IsCardTypePresent(const QString &rawtype,
                                           QString hostname = QString::null);
@@ -161,14 +161,17 @@ class MPUBLIC CardUtil
     // Inputs
     static vector<uint> GetCardIDs(uint sourceid);
     static QString      GetDefaultInput(uint cardid);
-    static QStringList  GetInputNames(uint cardid, uint sourceid);
+    static QStringList  GetInputNames(uint cardid, uint sourceid = 0);
     static bool         GetInputInfo(InputInfo &info,
                                      vector<uint> *groupids = NULL);
     static uint         GetCardID(uint inputid);
     static QString      GetInputName(uint inputid);
     static QString      GetDisplayName(uint inputid);
-    static QString      GetDisplayName(uint cardid, const QString &inputname);
+    static QString      GetDisplayName(uint cardid, const QString &inputname)
+        { return GetDisplayName(GetInputID(cardid, inputname)); }
     static vector<uint> GetInputIDs(uint cardid);
+    static uint         GetInputID(uint cardid, const QString &inputname);
+    static uint         GetSourceID(uint inputid);
     static bool         DeleteInput(uint inputid);
     static bool         DeleteOrphanInputs(void);
 
