@@ -26,16 +26,12 @@ inline QString GetBool( bool bVal ) { return( (bVal) ? "1" : "0" ); }
 CDSObject::CDSObject( const QString sId, 
                       const QString sTitle, 
                       const QString sParentId )
+    : m_nUpdateId(1), m_eType(OT_Container)
+    , m_sId(sId), m_sParentId(sParentId)
+    , m_sTitle(sTitle), m_bRestricted(true)
+    , m_bSearchable(false), m_sWriteStatus("PROTECTED")
+    , m_nChildCount(-1)
 {
-    m_sId          = sId;
-    m_sParentId    = sParentId;
-    m_eType        = OT_Container;
-    m_sTitle       = sTitle;
-    m_bRestricted  = true;
-    m_sWriteStatus = "PROTECTED";
-    m_nChildCount  = 0;
-    m_nUpdateId    = 1;
-
     HTTPRequest::Encode( m_sId       );
     HTTPRequest::Encode( m_sParentId );
     HTTPRequest::Encode( m_sTitle    );

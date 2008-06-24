@@ -119,7 +119,7 @@ class UPnp
 
         virtual void Start();
 
-        void CleanUp      ( void );
+        void CleanUp      ();
 
         UPnpDevice *RootDevice() { return &(g_UPnpDeviceDesc.m_rootDevice); }
 

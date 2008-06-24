@@ -31,6 +31,35 @@
 class SubscriberInfo
 {
     public:
+        SubscriberInfo()
+            : nKey( 0 ), nDuration( 0 )
+        {
+            bzero( &ttExpires, sizeof( ttExpires ) );
+            bzero( &ttLastNotified, sizeof( ttLastNotified ) );
+            sUUID          = QUuid::createUuid().toString();
+            sUUID          = sUUID.mid( 1, sUUID.length() - 2);
+        }
+
+        SubscriberInfo( const QString &url, unsigned long duration )
+            : nKey( 0 ), nDuration( duration )
+        {
+            bzero( &ttExpires, sizeof( ttExpires ) );
+            bzero( &ttLastNotified, sizeof( ttLastNotified ) );
+            sUUID          = QUuid::createUuid().toString();
+            sUUID          = sUUID.mid( 1, sUUID.length() - 2);
+            qURL           = url;
+
+            SetExpireTime( nDuration );
+        }
+
+        unsigned long IncrementKey()
+        {
+            // When key wraps around to zero again... must make it a 1. (upnp spec)
+            if ((++nKey) == 0)
+                nKey = 1;
+
+            return nKey;
+        }
 
         TaskTime            ttExpires;
         TaskTime            ttLastNotified;
@@ -39,47 +68,6 @@ class SubscriberInfo
         Q3Url                qURL;
         unsigned short      nKey;
         unsigned long       nDuration;       // Seconds
-
-    public:
-
-        // ------------------------------------------------------------------
-
-        SubscriberInfo()
-        {
-            nKey           = 0;
-            nDuration      = 0;
-            ttLastNotified.tv_sec = 0;
-            sUUID          = QUuid::createUuid().toString();
-            sUUID          = sUUID.mid( 1, sUUID.length() - 2);
-
-
-        }
-
-        // ------------------------------------------------------------------
-
-        SubscriberInfo( const QString &url, unsigned long duration )
-        {
-            nKey           = 0;
-            sUUID          = QUuid::createUuid().toString();
-            sUUID          = sUUID.mid( 1, sUUID.length() - 2);
-            qURL           = url;
-            nDuration      = duration;
-            ttLastNotified.tv_sec = 0;
-
-            SetExpireTime( nDuration );
-        }
-
-        // ------------------------------------------------------------------
-
-        unsigned long IncrementKey()
-        {
-            // When key wraps around to zero again... must make it a 1. (upnp spec)
-
-            if ((++nKey) == 0)
-                nKey = 1;
-
-            return nKey;
-        }
 
     protected:
 

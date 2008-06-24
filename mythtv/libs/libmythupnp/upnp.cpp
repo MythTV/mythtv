@@ -38,6 +38,7 @@ Configuration   *UPnp::g_pConfig        = NULL;
 //////////////////////////////////////////////////////////////////////////////
 
 UPnp::UPnp()
+    : m_pHttpServer(NULL), m_nServicePort(NULL)
 {
     VERBOSE( VB_UPNP, "UPnp - Constructor" );
 }
@@ -157,7 +158,7 @@ void UPnp::Start()
 //
 //////////////////////////////////////////////////////////////////////////////
 
-void UPnp::CleanUp( void )
+void UPnp::CleanUp()
 {
     if (g_pSSDP)
     {

@@ -125,7 +125,7 @@ typedef Q3PtrList < ContainerClass > Classes;
 class CDSObject
 {
     public:
-        short            m_nUpdateId;
+        short           m_nUpdateId;
 
         ObjectTypes     m_eType;
 
