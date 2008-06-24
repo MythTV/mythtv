@@ -15,6 +15,7 @@
 
 // MythTV headers
 #include "dtvconfparserhelpers.h"
+#include "dbchannelinfo.h"
 
 class DTVMultiplex
 {
@@ -22,14 +23,14 @@ class DTVMultiplex
     DTVMultiplex()
         : frequency(0), symbolrate(0), mplex(0), sistandard(QString::null) { }
     DTVMultiplex(const DTVMultiplex &other) { (*this) = other; }
-
     DTVMultiplex &operator=(const DTVMultiplex &other);
+    virtual ~DTVMultiplex() { }
 
     bool operator==(const DTVMultiplex &m) const;
  
     void Clear(void) { DTVMultiplex mux; (*this) = mux; }
 
-    bool FillFromDB(DTVTunerType type, uint mplexid);
+    virtual bool FillFromDB(DTVTunerType type, uint mplexid);
 
     bool IsEqual(DTVTunerType type, const DTVMultiplex& other,
                  uint freq_range = 0) const;
@@ -78,5 +79,24 @@ class DTVMultiplex
     uint             mplex;
     QString          sistandard;
 };
+
+class ScanDTVTransport : public DTVMultiplex
+{
+  public:
+    ScanDTVTransport() :
+        DTVMultiplex(), tuner_type(DTVTunerType::kTunerTypeUnknown) { }
+    ScanDTVTransport(const DTVMultiplex &mplex, DTVTunerType tt, uint cid) :
+        DTVMultiplex(mplex), tuner_type(tt), cardid(cid) { }
+    virtual ~ScanDTVTransport() {}
+
+    virtual bool FillFromDB(DTVTunerType type, uint mplexid);
+    uint SaveScan(uint scanid) const;
+
+  public:
+    DTVTunerType          tuner_type;
+    uint                  cardid;
+    ChannelInsertInfoList channels;
+};
+typedef vector<ScanDTVTransport> ScanDTVTransportList;
 
 #endif // _DTVMULTIPLEX_H_

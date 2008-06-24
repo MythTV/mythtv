@@ -259,3 +259,112 @@ bool DTVMultiplex::FillFromDB(DTVTunerType type, uint mplexid)
         query.value(10).toString(), query.value(11).toString(),
         query.value(12).toString());
 }
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+bool ScanDTVTransport::FillFromDB(DTVTunerType type, uint mplexid)
+{
+    DTVMultiplex::FillFromDB(type, mplexid);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT mplexid,       sourceid,        chanid,          "
+        "       callsign,      name,            channum,         "
+        "       serviceid,     atsc_major_chan, atsc_minor_chan, "
+        "       useonairguide, visible,         freqid,          "
+        "       icon,          tvformat,        xmltvid          "
+        "FROM channel "
+        "WHERE mplexid = :MPLEXID");
+    query.bindValue(":MPLEXID", mplexid);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("ScanDTVTransport::FillFromDB", query);
+        return false;
+    }
+
+    while (query.next())
+    {
+        ChannelInsertInfo chan(
+            query.value(0).toUInt(),     query.value(1).toUInt(),
+            query.value(2).toUInt(),     query.value(3).toString(),
+            query.value(4).toString(),   query.value(5).toString(),
+            query.value(6).toUInt(),
+            query.value(7).toUInt(),     query.value(8).toUInt(),
+            query.value(9).toUInt(),    !query.value(10).toUInt(),
+            false,
+            query.value(11).toString(),  query.value(12).toString(),
+            query.value(13).toString(),  query.value(14).toString(),
+            0, 0, 0, 0, 0, 0,
+            QString::null,
+            false, false, false, false,
+            false, false, false, false,
+            false, false, false, 0);
+
+        channels.push_back(chan);
+    }
+
+    return true;
+}
+
+uint ScanDTVTransport::SaveScan(uint scanid) const
+{
+    uint transportid = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "INSERT INTO channelscan_dtv_multiplex "
+        " (  scanid, "
+        "    mplexid,            frequency,       inversion,  "
+        "    symbolrate,         fec,             polarity,   "
+        "    hp_code_rate,       lp_code_rate,    modulation, "
+        "    transmission_mode,  guard_interval,  hierarchy,  "
+        "    bandwidth,          sistandard,      tuner_type  "
+        " ) "
+        "VALUES "
+        " ( :SCANID, "
+        "   :MPLEXID,           :FREQUENCY,      :INVERSION,  "
+        "   :SYMBOLRATE,        :FEC,            :POLARITY,   "
+        "   :HP_CODE_RATE,      :LP_CODE_RATE,   :MODULATION, "
+        "   :TRANSMISSION_MODE, :GUARD_INTERVAL, :HIERARCHY,  "
+        "   :BANDWIDTH,         :SISTANDARD,     :TUNER_TYPE  "
+        " );");
+
+    query.bindValue(":SCANID", scanid);
+    query.bindValue(":MPLEXID", mplex);
+    query.bindValue(":FREQUENCY", QString::number(frequency));
+    query.bindValue(":INVERSION", inversion.toString());
+    query.bindValue(":SYMBOLRATE", QString::number(symbolrate));
+    query.bindValue(":FEC", fec.toString());
+    query.bindValue(":POLARITY", polarity.toString());
+    query.bindValue(":HP_CODE_RATE", hp_code_rate.toString());
+    query.bindValue(":LP_CODE_RATE", lp_code_rate.toString());
+    query.bindValue(":MODULATION", modulation.toString());
+    query.bindValue(":TRANSMISSION_MODE", trans_mode.toString());
+    query.bindValue(":GUARD_INTERVAL", guard_interval.toString());
+    query.bindValue(":HIERARCHY", hierarchy.toString());
+    query.bindValue(":BANDWIDTH", bandwidth.toString());
+    query.bindValue(":SISTANDARD", sistandard);
+    query.bindValue(":TUNER_TYPE", (uint)tuner_type);
+
+    if (!query.exec())
+    {
+        MythContext::DBError("ScanDTVTransport::SaveScan 1", query);
+        return transportid;
+    }
+
+    query.prepare("SELECT MAX(transportid) FROM channelscan_dtv_multiplex");
+    if (!query.exec())
+        MythContext::DBError("ScanDTVTransport::SaveScan 2", query);
+    else if (query.next())
+        transportid = query.value(0).toUInt();
+
+    if (!transportid)
+        return transportid;
+
+    for (uint i = 0; i < channels.size(); i++)
+        channels[i].SaveScan(scanid, transportid);
+
+    return transportid;
+}
