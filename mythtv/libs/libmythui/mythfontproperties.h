@@ -32,6 +32,8 @@ class MythFontProperties: public XMLParseBase
     static MythFontProperties *ParseFromXml(QDomElement &element,
                                             bool addToGlobal = false);
 
+    void GetOffset(QPoint &offset) const;
+
   private:
     void Freeze(void); // no hash updates
     void Unfreeze(void);
@@ -50,6 +52,8 @@ class MythFontProperties: public XMLParseBase
     QColor  m_outlineColor;
     int     m_outlineSize;
     int     m_outlineAlpha;
+
+    QPoint  m_drawingOffset;
 
     QString m_hash;
 

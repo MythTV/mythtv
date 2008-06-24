@@ -60,6 +60,11 @@ void MythFontProperties::GetOutline(QColor &color, int &size, int &alpha) const
     alpha = m_outlineAlpha;
 }
 
+void MythFontProperties::GetOffset(QPoint &offset) const
+{
+    offset = m_drawingOffset;
+}
+
 void MythFontProperties::CalcHash(void)
 {
     if (m_bFreeze)
@@ -76,6 +81,28 @@ void MythFontProperties::CalcHash(void)
     if (m_hasOutline)
         m_hash += QString("%1%2%3").arg(m_outlineColor.name())
                  .arg(m_outlineSize).arg(m_outlineAlpha);
+
+    m_drawingOffset = QPoint(0, 0);
+
+    if (m_hasOutline)
+    {
+        m_drawingOffset = QPoint(m_outlineSize, m_outlineSize);
+    }
+
+    if (m_hasShadow && !m_hasOutline)
+    {
+        if (m_shadowOffset.x() < 0)
+            m_drawingOffset.setX(-m_shadowOffset.x());
+        if (m_shadowOffset.y() < 0)
+            m_drawingOffset.setY(-m_shadowOffset.y());
+    }
+    if (m_hasShadow && !m_hasOutline)
+    {
+        if (m_shadowOffset.x() < 0 && m_shadowOffset.x() < -m_outlineSize)
+            m_drawingOffset.setX(-m_shadowOffset.x());
+        if (m_shadowOffset.y() < 0 && m_shadowOffset.y() < -m_outlineSize)
+            m_drawingOffset.setY(-m_shadowOffset.y());
+    }
 }
 
 void MythFontProperties::Freeze(void)

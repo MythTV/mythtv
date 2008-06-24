@@ -293,7 +293,8 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
                        QString::number(r.y()) +
                        QString::number(boundRect.width()) +
                        QString::number(boundRect.height()) +
-                       QString::number(flags) + msg;
+                       QString::number(flags) + 
+                       QString::number(font.color().rgba()) + msg;
 
     if (m_StringToImageMap.contains(incoming))
     {
@@ -304,8 +305,6 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
     }
 
     MythImage *im = GetFormatImage();
-
-    qApp->lock();
 
     int w, h;
 
@@ -320,13 +319,79 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
         h = r.height();
     }
 
-    QPixmap pm(QSize(w, h));
-    pm.fill();
+    QPoint drawOffset;
+    font.GetOffset(drawOffset);
+
+    QImage pm(QSize(w, h), QImage::Format_ARGB32);
+    pm.fill(QColor(255, 255, 255, 0).rgba());
 
     QPainter tmp(&pm);
     tmp.setFont(font.face());
-    tmp.setPen(Qt::black);
-    tmp.drawText(0, 0, r.width(), r.height(), flags, msg);
+
+    if (font.hasShadow())
+    {
+        QPoint shadowOffset;
+        QColor shadowColor;
+        int shadowAlpha;
+
+        font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
+
+        QRect a = QRect(0, 0, r.width(), r.height());
+        a.moveBy(shadowOffset.x() + drawOffset.x(), 
+                 shadowOffset.y() + drawOffset.y());
+
+        shadowColor.setAlpha(shadowAlpha);
+        tmp.setPen(shadowColor);
+        tmp.drawText(a, flags, msg);
+    }
+
+    if (font.hasOutline())
+    {
+        QColor outlineColor;
+        int outlineSize, outlineAlpha;
+
+        font.GetOutline(outlineColor, outlineSize, outlineAlpha);
+
+        /* FIXME: use outlineAlpha */
+        int outalpha = 16;
+
+        QRect a = QRect(0, 0, r.width(), r.height());
+        a.moveBy(-outlineSize + drawOffset.x(),
+                 -outlineSize + drawOffset.y());
+
+        outlineColor.setAlpha(outalpha);
+        tmp.setPen(outlineColor); 
+        tmp.drawText(a, flags, msg);
+
+        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
+        {
+            a.moveBy(1, 0);
+            tmp.drawText(a, flags, msg);
+        }
+
+        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
+        {
+            a.moveBy(0, 1);
+            tmp.drawText(a, flags, msg);
+        }
+
+        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
+        {
+            a.moveBy(-1, 0);
+            tmp.drawText(a, flags, msg);
+        }
+
+        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
+        {
+            a.moveBy(0, -1);
+            tmp.drawText(a, flags, msg);
+        }
+    }
+
+    tmp.setPen(font.color());
+    tmp.drawText(drawOffset.x(), drawOffset.y(), r.width(), r.height(), 
+                 flags, msg);
+
     tmp.end();
 
     // If the boundary rect is not the same as the drawing rect
@@ -363,26 +428,12 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
             height = NearestGLTextureSize(height);
         }
 
-        QPixmap newpm(QSize(width,height));
-        newpm = pm.copy(x,y,width,height);
+        QImage newpm(QSize(width,height), QImage::Format_ARGB32);
+        newpm = pm.copy(x, y, width, height);
         pm = newpm;
     }
 
-    im->Assign(pm.convertToImage().convertToFormat(QImage::Format_Indexed8,
-                                                   Qt::MonoOnly |
-                                                   Qt::ThresholdDither |
-                                                   Qt::AvoidDither));
-
-    qApp->unlock();
-
-    QVector<QRgb> colorTable = im->colorTable();
-
-    for (int i = 0; i < colorTable.count(); i++)
-    {
-        int alpha = 255 - qRed(colorTable[i]);
-        colorTable[i] = qRgba(0, 0, 0, alpha);
-    }
-    im->setColorTable(colorTable);
+    im->Assign(pm);
 
     m_StringToImageMap[incoming] = im;
     m_StringExpireList.push_back(incoming);
@@ -405,45 +456,6 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
     return im;
 }
 
-void MythOpenGLPainter::ReallyDrawText(QColor color, const QRect &r, int alpha)
-{
-    double x1, y1, x2, y2;
-
-    glPushAttrib(GL_CURRENT_BIT);
-
-    alpha = CalcAlpha(qAlpha(color.rgb()), alpha);
-
-    glColor4f(color.red() / 255.0, color.green() / 255.0, color.blue() / 255.0,
-              alpha / 255.0);
-    glEnable(q_gl_texture);
-    glEnable(GL_BLEND);
-
-    glBegin(GL_QUADS);
-    {
-        if (!texture_rects)
-        {
-            x1 = y1 = 0;
-            x2 = y2 = 1;
-        }
-        else
-        {
-            x1 = y1 = 0;
-            x2 = r.width();
-            y2 = r.height();
-        }
-
-        glTexCoord2f(x1, y2); glVertex2f(r.x(), r.y());
-        glTexCoord2f(x2, y2); glVertex2f(r.x() + r.width(), r.y());
-        glTexCoord2f(x2, y1); glVertex2f(r.x() + r.width(), r.y() + r.height());
-        glTexCoord2f(x1, y1); glVertex2f(r.x(), r.y()+r.height());
-    }
-    glEnd();
-
-    glDisable(GL_BLEND);
-    glDisable(q_gl_texture);
-    glPopAttrib();
-}
-
 void MythOpenGLPainter::DrawText(const QRect &r, const QString &msg,
                                  int flags, const MythFontProperties &font, 
                                  int alpha, const QRect &boundRect)
@@ -455,71 +467,7 @@ void MythOpenGLPainter::DrawText(const QRect &r, const QString &msg,
     if (!im)
         return;
 
-    // see if we have this pixmap cached as a texture - if not cache it
-    BindTextureFromCache(im, true);
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    QRect newRect = boundRect;
-    newRect.setWidth(im->width());
-    newRect.setHeight(im->height());
-
-    if (font.hasShadow())
-    {
-        QPoint shadowOffset;
-        QColor shadowColor;
-        int shadowAlpha;
-
-        font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
-
-        QRect a = newRect;
-        a.moveBy(shadowOffset.x(), shadowOffset.y());
-
-        ReallyDrawText(shadowColor, a, CalcAlpha(shadowAlpha, alpha));
-    }
-
-    if (font.hasOutline())
-    {
-        QColor outlineColor;
-        int outlineSize, outlineAlpha;
-
-        font.GetOutline(outlineColor, outlineSize, outlineAlpha);
-
-        /* FIXME: use outlineAlpha */
-        int outalpha = alpha;
-        //if (alpha < 255)
-            outalpha /= 16;
-
-        QRect a = newRect;
-        a.moveBy(0 - outlineSize, 0 - outlineSize);
-        ReallyDrawText(outlineColor, a, outalpha);
-
-        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
-        {
-            a.moveBy(1, 0);
-            ReallyDrawText(outlineColor, a, outalpha);
-        }
-
-        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
-        {
-            a.moveBy(0, 1);
-            ReallyDrawText(outlineColor, a, outalpha);
-        }
-
-        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
-        {
-            a.moveBy(-1, 0);
-            ReallyDrawText(outlineColor, a, outalpha);
-        }
-
-        for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
-        {
-            a.moveBy(0, -1);
-            ReallyDrawText(outlineColor, a, outalpha);
-        }
-    }
-
-    ReallyDrawText(font.color(), newRect, alpha);
+    DrawImage(boundRect, im, im->rect(), alpha);
 }
 
 MythImage *MythOpenGLPainter::GetFormatImage()

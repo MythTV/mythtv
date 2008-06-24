@@ -38,9 +38,9 @@ class MythOpenGLPainter : public MythPainter
 
     int NearestGLTextureSize(int v);
 
-    void ReallyDrawText(QColor color, const QRect &r, int alpha);
     MythImage *GetImageFromString(const QString &msg, int flags, const QRect &r,
-                                  const MythFontProperties &font, const QRect &boundRect);
+                                  const MythFontProperties &font, 
+                                  const QRect &boundRect);
 
     QMap<MythImage *, unsigned int> m_ImageIntMap;
     list<MythImage *> m_ImageExpireList;
