@@ -1,16 +1,21 @@
 #ifndef CHANUTIL_H
 #define CHANUTIL_H
 
+// POSIX headers
+#include <stdint.h>
+
+// C++ headers
 #include <vector>
 #include <deque>
 using namespace std;
 
-#include <stdint.h>
-#include <qstring.h>
-#include <qpixmap.h>
+// Qt headers
+#include <QString>
 
+// MythTV headers
 #include "mythexp.h"
 #include "dtvmultiplex.h"
+#include "dbchannelinfo.h"
 
 class NetworkInformationTable;
 
@@ -38,53 +43,6 @@ typedef enum SkipTypes {
 
 MPUBLIC QString SkipTypeToString(int);
 MPUBLIC deque<int> GetPreferredSkipTypeCombinations(void);
-
-class DBChannel
-{
-  public:
-    DBChannel(const DBChannel&);
-    DBChannel(const QString &_channum, const QString &_callsign,
-              uint _chanid, uint _major_chan, uint _minor_chan,
-              uint _favorite, uint _mplexid, bool _visible,
-              const QString &_name, const QString &_icon);
-    DBChannel& operator=(const DBChannel&);
-
-    bool operator == (uint _chanid) const
-        { return chanid == _chanid; }
-
-  public:
-    QString channum;
-    QString callsign;
-    uint    chanid;
-    uint    major_chan;
-    uint    minor_chan;
-    uint    favorite;
-    uint    mplexid;
-    bool    visible;
-    QString name;
-    QString icon;
-};
-typedef vector<DBChannel> DBChanList;
-
-class PixmapChannel : public DBChannel
-{
-  public:
-    PixmapChannel(const PixmapChannel &other) :
-        DBChannel(other),
-        iconPixmap(other.iconPixmap),
-        iconLoaded(other.iconLoaded) { }
-    PixmapChannel(const DBChannel &other) :
-        DBChannel(other),
-        iconLoaded(false) { }
-
-    bool LoadChannelIcon(uint size) const;
-    QString GetFormatted(const QString &format) const;
-
-  public:
-    mutable QPixmap iconPixmap;
-    mutable bool    iconLoaded;
-};
-
 
 /** \class ChannelUtil
  *  \brief Collection of helper utilities for channel DB use

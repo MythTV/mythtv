@@ -206,12 +206,14 @@ SOURCES += mpeg/h264utils.cpp
 DEFINES += USING_H264TOOLS
 
 # Channels, and the multiplexes that transmit them
-HEADERS += frequencies.h
-HEADERS += frequencytables.h        channelutil.h
+HEADERS += frequencies.h            frequencytables.h
+SOURCES += frequencies.c            frequencytables.cpp
+
+HEADERS += channelutil.h            dbchannelinfo.h
+SOURCES += channelutil.cpp          dbchannelinfo.cpp
+
 HEADERS += dtvmultiplex.h
 HEADERS += dtvconfparser.h          dtvconfparserhelpers.h
-SOURCES += frequencies.c
-SOURCES += frequencytables.cpp      channelutil.cpp
 SOURCES += dtvmultiplex.cpp
 SOURCES += dtvconfparser.cpp        dtvconfparserhelpers.cpp
 
