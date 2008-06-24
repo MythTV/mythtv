@@ -6,12 +6,13 @@
 #include "mpegstreamdata.h"
 
 typedef NetworkInformationTable* nit_ptr_t;
-typedef vector<const nit_ptr_t>  nit_vec_t;
-typedef QMap<uint, nit_ptr_t>    nit_cache_t;
+typedef vector<const NetworkInformationTable*>  nit_vec_t;
+typedef QMap<uint, nit_ptr_t>    nit_cache_t; // section->sdts
 
 typedef ServiceDescriptionTable* sdt_ptr_t;
 typedef vector<const ServiceDescriptionTable*>  sdt_vec_t;
-typedef QMap<uint, sdt_ptr_t>    sdt_cache_t;
+typedef QMap<uint, sdt_ptr_t>    sdt_cache_t; // tsid+section->sdts
+typedef QMap<uint, sdt_vec_t>    sdt_map_t;   // tsid->sdts
 
 typedef vector<DVBMainStreamListener*>   dvb_main_listener_vec_t;
 typedef vector<DVBOtherStreamListener*>  dvb_other_listener_vec_t;
@@ -161,12 +162,14 @@ class DVBStreamData : virtual public MPEGStreamData
     bool HasCachedAnySDT(uint tsid, bool current = true) const;
     bool HasCachedAllSDT(uint tsid, bool current = true) const;
     bool HasCachedSDT(bool current = true) const;
+    bool HasCachedAnySDTs(bool current = true) const;
     bool HasCachedAllSDTs(bool current = true) const;
 
     const nit_ptr_t GetCachedNIT(uint section_num, bool current = true) const;
+    const nit_vec_t GetCachedNIT(bool current = true) const;
     const sdt_ptr_t GetCachedSDT(uint tsid, uint section_num,
                                  bool current = true) const;
-    const sdt_vec_t GetAllCachedSDTs(bool current = true) const;
+    const sdt_vec_t GetCachedSDTs(bool current = true) const;
 
     void ReturnCachedSDTTables(sdt_vec_t&) const;
 

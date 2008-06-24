@@ -413,7 +413,7 @@ void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd,
     QString fn      = (*current).FriendlyName;
 
     // Insert Terrestrial VCTs
-    tvct_vec_t tvcts = sd->GetAllCachedTVCTs();
+    tvct_vec_t tvcts = sd->GetCachedTVCTs();
     for (uint i = 0; i < tvcts.size(); i++)
     {
         UpdateVCTinDB(mplexid, fn, freqid, tvcts[i],
@@ -422,7 +422,7 @@ void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd,
     sd->ReturnCachedTVCTTables(tvcts);
 
     // Insert Cable VCTs
-    cvct_vec_t cvcts = sd->GetAllCachedCVCTs();
+    cvct_vec_t cvcts = sd->GetCachedCVCTs();
     for (uint i = 0; i < cvcts.size(); i++)
     {
         UpdateVCTinDB(mplexid, fn, freqid, cvcts[i],
@@ -451,7 +451,7 @@ void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd,
     if (!(*current).mplexid)
         (*current).mplexid = InsertMultiplex(current);
 
-    vector<const ServiceDescriptionTable*> sdts = sd->GetAllCachedSDTs();
+    vector<const ServiceDescriptionTable*> sdts = sd->GetCachedSDTs();
     for (uint i = 0; i < sdts.size(); i++)
     {
         UpdateSDTinDB((*current).mplexid, sdts[i],
@@ -498,8 +498,8 @@ bool SIScan::HandlePostInsertion(void)
         return true;
     }
 
-    const NetworkInformationTable *nit = sd->GetCachedNIT(0);
-    sdt_vec_t sdts = sd->GetAllCachedSDTs();
+    const NetworkInformationTable *nit = sd->GetCachedNIT(0, true);
+    sdt_vec_t sdts = sd->GetCachedSDTs();
     if (nit || sdts.size())
     {
         if (nit)

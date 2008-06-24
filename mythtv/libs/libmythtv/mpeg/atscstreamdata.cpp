@@ -56,8 +56,8 @@ void ATSCStreamData::SetDesiredChannel(int major, int minor)
 {
     bool reset = true;
     const MasterGuideTable *mgt = GetCachedMGT();
-    tvct_vec_t tvcts = GetAllCachedTVCTs();
-    cvct_vec_t cvcts = GetAllCachedCVCTs();
+    tvct_vec_t tvcts = GetCachedTVCTs();
+    cvct_vec_t cvcts = GetCachedCVCTs();
 
     if (mgt && (tvcts.size() || cvcts.size()))
     {
@@ -523,7 +523,7 @@ bool ATSCStreamData::HasChannel(uint major, uint minor) const
     bool hasit = false;
 
     {
-        tvct_vec_t tvct = GetAllCachedTVCTs();
+        tvct_vec_t tvct = GetCachedTVCTs();
         for (uint i = 0; i < tvct.size() && !hasit; i++)
         {
             if (tvct[i]->Find(major, minor) >= 0)
@@ -534,7 +534,7 @@ bool ATSCStreamData::HasChannel(uint major, uint minor) const
 
     if (!hasit)
     {
-        cvct_vec_t cvct = GetAllCachedCVCTs();
+        cvct_vec_t cvct = GetCachedCVCTs();
         for (uint i = 0; i < cvct.size() && !hasit; i++)
         {
             if (cvct[i]->Find(major, minor) >= 0)
@@ -612,6 +612,46 @@ bool ATSCStreamData::HasCachedAllCVCTs(bool current) const
     return ret;
 }
 
+bool ATSCStreamData::HasCachedAnyTVCTs(bool current) const
+{
+    if (!current)
+        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+
+    if (!_cached_mgt)
+        return false;
+
+    _cache_lock.lock();
+    bool ret = false;
+    for (uint i = 0; !ret && (i < _cached_mgt->TableCount()); ++i)
+    {
+        if (TableClass::TVCTc == _cached_mgt->TableClass(i))
+            ret |= HasCachedTVCT(_cached_mgt->TablePID(i));
+    }
+    _cache_lock.unlock();
+
+    return ret;
+}
+
+bool ATSCStreamData::HasCachedAnyCVCTs(bool current) const
+{
+    if (!current)
+        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+
+    if (!_cached_mgt)
+        return false;
+
+    _cache_lock.lock();
+    bool ret = false;
+    for (uint i = 0; !ret && (i < _cached_mgt->TableCount()); ++i)
+    {
+        if (TableClass::CVCTc == _cached_mgt->TableClass(i))
+            ret |= HasCachedCVCT(_cached_mgt->TablePID(i));
+    }
+    _cache_lock.unlock();
+
+    return ret;
+}
+
 const MasterGuideTable *ATSCStreamData::GetCachedMGT(bool current) const
 {
     if (!current)
@@ -657,7 +697,7 @@ const cvct_ptr_t ATSCStreamData::GetCachedCVCT(uint pid, bool current) const
     return cvct;
 }
 
-tvct_vec_t ATSCStreamData::GetAllCachedTVCTs(bool current) const
+tvct_vec_t ATSCStreamData::GetCachedTVCTs(bool current) const
 {
     if (!current)
         VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
@@ -677,7 +717,7 @@ tvct_vec_t ATSCStreamData::GetAllCachedTVCTs(bool current) const
     return tvcts;
 }
 
-cvct_vec_t ATSCStreamData::GetAllCachedCVCTs(bool current) const
+cvct_vec_t ATSCStreamData::GetCachedCVCTs(bool current) const
 {
     if (!current)
         VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");

@@ -74,17 +74,23 @@ class ATSCStreamData : virtual public MPEGStreamData
     bool HasCachedMGT(bool current = true) const;
     bool HasCachedTVCT(uint pid, bool current = true) const;
     bool HasCachedCVCT(uint pid, bool current = true) const;
+
     bool HasCachedAllTVCTs(bool current = true) const;
     bool HasCachedAllCVCTs(bool current = true) const;
-    bool HasCachedAllVCTs(bool current = true) const 
+    bool HasCachedAllVCTs(bool current = true) const
         { return HasCachedAllTVCTs(current) && HasCachedAllCVCTs(current); }
+
+    bool HasCachedAnyTVCTs(bool current = true) const;
+    bool HasCachedAnyCVCTs(bool current = true) const;
+    bool HasCachedAnyVCTs(bool current = true) const
+        { return HasCachedAnyTVCTs(current) || HasCachedAnyCVCTs(current); }
 
     const MasterGuideTable *GetCachedMGT(bool current = true) const;
     const tvct_ptr_t        GetCachedTVCT(uint pid, bool current = true) const;
     const cvct_ptr_t        GetCachedCVCT(uint pid, bool current = true) const;
 
-    tvct_vec_t GetAllCachedTVCTs(bool current = true) const;
-    cvct_vec_t GetAllCachedCVCTs(bool current = true) const;
+    tvct_vec_t GetCachedTVCTs(bool current = true) const;
+    cvct_vec_t GetCachedCVCTs(bool current = true) const;
 
     void ReturnCachedTVCTTables(tvct_vec_t&) const;
     void ReturnCachedCVCTTables(cvct_vec_t&) const;

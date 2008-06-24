@@ -524,8 +524,8 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
         sd = dynamic_cast<ATSCStreamData*>(this);
         if (sd && !MPEGDescriptor::Find(gdesc, DescriptorID::caption_service))
         {
-            tvct = sd->GetAllCachedTVCTs();
-            cvct = sd->GetAllCachedCVCTs();
+            tvct = sd->GetCachedTVCTs();
+            cvct = sd->GetCachedCVCTs();
 
             desc_list_t vdesc = extract_atsc_desc(
                 tvct, cvct, pmt.ProgramNumber());
@@ -1267,6 +1267,21 @@ const pat_ptr_t MPEGStreamData::GetCachedPAT(
         IncrementRefCnt(pat = *it);
 
     return pat;
+}
+
+pat_vec_t MPEGStreamData::GetCachedPATs(uint tsid) const
+{
+    QMutexLocker locker(&_cache_lock);
+    pat_vec_t pats;
+
+    for (uint i=0; i < 256; i++)
+    {
+        ProgramAssociationTable *pat = GetCachedPAT(tsid, i);
+        if (pat)
+            pats.push_back(pat);
+    }
+
+    return pats;
 }
 
 pat_vec_t MPEGStreamData::GetCachedPATs(void) const

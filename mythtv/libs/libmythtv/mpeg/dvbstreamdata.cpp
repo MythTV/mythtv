@@ -699,6 +699,26 @@ bool DVBStreamData::HasCachedSDT(bool current) const
     return false;
 }
 
+bool DVBStreamData::HasCachedAnySDTs(bool current) const
+{
+    QMutexLocker locker(&_cache_lock);
+
+    if (_cached_nit.empty())
+        return false;
+
+    nit_cache_t::const_iterator it = _cached_nit.begin();
+    for (; it != _cached_nit.end(); ++it)
+    {
+        for (uint i = 0; i < (*it)->TransportStreamCount(); i++)
+        {
+            if (HasCachedAnySDT((*it)->TSID(i), current))
+                return true;
+        }
+    }
+
+    return false;
+}
+
 bool DVBStreamData::HasCachedAllSDTs(bool current) const
 {
     QMutexLocker locker(&_cache_lock);
@@ -737,6 +757,22 @@ const nit_ptr_t DVBStreamData::GetCachedNIT(
     return nit;
 }
 
+const nit_vec_t DVBStreamData::GetCachedNIT(bool current) const
+{
+    QMutexLocker locker(&_cache_lock);
+
+    nit_vec_t nits;
+
+    for (uint i = 0; i < 256; i++)
+    {
+        nit_ptr_t nit = GetCachedNIT(i, current);
+        if (nit)
+            nits.push_back(nit);
+    }
+
+    return nits;
+}
+
 const sdt_ptr_t DVBStreamData::GetCachedSDT(
     uint tsid, uint section_num, bool current) const
 {
@@ -755,7 +791,7 @@ const sdt_ptr_t DVBStreamData::GetCachedSDT(
     return sdt;
 }
 
-const sdt_vec_t DVBStreamData::GetAllCachedSDTs(bool current) const
+const sdt_vec_t DVBStreamData::GetCachedSDTs(bool current) const
 {
     QMutexLocker locker(&_cache_lock);
 
