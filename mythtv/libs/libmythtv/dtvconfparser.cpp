@@ -88,7 +88,11 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
             continue;
 
         QStringList list = QStringList::split(":", line);
-        QString str = list[ 0 ];
+
+        if (list.size() < 1)
+            continue;
+
+        QString str = list[0];
         int channelNo = -1;
 
         if (str.at(0) == '@')
@@ -98,7 +102,10 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
             list = QStringList::split(":", line);
         }
 
-        str = *list.at(3);
+        if (list.size() < 4)
+            continue;
+
+        str = list[3];
 
         if ((str == "T") || (str == "C") || (str == "S"))
         {
