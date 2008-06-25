@@ -13,6 +13,9 @@ using namespace std;
 #include "libmyth/util.h"
 #include "libmythtv/inputinfo.h"
 
+#define LOC QString("PlaybackSock: ")
+#define LOC_ERR QString("PlaybackSock, Error: ")
+
 PlaybackSock::PlaybackSock(MainServer *parent, MythSocket *lsock, 
                            QString lhostname, bool wantevents)
 {
@@ -142,7 +145,7 @@ int PlaybackSock::DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataD
     return strlist[0].toInt();
 }
 
-void PlaybackSock::FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost)
+bool PlaybackSock::FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost)
 {
     QStringList strlist( QString("FILL_PROGRAM_INFO") );
     strlist << playbackhost;
@@ -150,7 +153,7 @@ void PlaybackSock::FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost)
 
     SendReceiveStringList(strlist);
 
-    pginfo->FromStringList(strlist, 0);
+    return pginfo->FromStringList(strlist, 0);
 }
 
 QStringList PlaybackSock::GenPreviewPixmap(const ProgramInfo *pginfo)
@@ -226,7 +229,13 @@ bool PlaybackSock::IsBusy(
     if (busy_input)
     {
         it++;
-        busy_input->FromStringList(it, strlist.end());
+        if (!busy_input->FromStringList(it, strlist.end()))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "IsBusy: "
+                    "Failed to parse response to " +
+                    QString("QUERY_REMOTEENCODER %1").arg(capturecardnum));
+            state = false; // pretend it's not busy if we can't parse response
+        }
     }
 
     return state;
@@ -274,7 +283,12 @@ ProgramInfo *PlaybackSock::GetRecording(int capturecardnum)
     SendReceiveStringList(strlist);
 
     ProgramInfo *info = new ProgramInfo();
-    info->FromStringList(strlist, 0);
+    if (!info->FromStringList(strlist, 0))
+    {
+        delete info;
+        info = NULL;
+    }
+
     return info;
 }
 

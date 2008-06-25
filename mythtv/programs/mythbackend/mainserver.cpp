@@ -1338,10 +1338,18 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             {
                 if (proginfo->filesize == 0)
                 {
-                    slave->FillProgramInfo(proginfo, playbackhost);
-
-                    if (proginfo->recendts < QDateTime::currentDateTime())
-                        proginfo->SetFilesize(proginfo->filesize);
+                    if (!slave->FillProgramInfo(proginfo, playbackhost))
+                    {
+                        VERBOSE(VB_IMPORTANT,
+                                "MainServer::HandleQueryRecordings()"
+                                "\n\t\t\tCould not fill program info "
+                                "from backend");
+                    }
+                    else
+                    {
+                        if (proginfo->recendts < QDateTime::currentDateTime())
+                            proginfo->SetFilesize(proginfo->filesize);
+                    }
                 }
                 else
                 {
@@ -2881,8 +2889,16 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "GET_CURRENT_RECORDING")
     {
         ProgramInfo *info = enc->GetRecording();
-        info->ToStringList(retlist);
-        delete info;
+        if (info)
+        {
+            info->ToStringList(retlist);
+            delete info;
+        }
+        else
+        {
+            ProgramInfo dummy;
+            dummy.ToStringList(retlist);
+        }
     }
     else if (command == "GET_KEYFRAME_POS")
     {
@@ -3314,8 +3330,16 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     else if (command == "GET_CURRENT_RECORDING")
     {
         ProgramInfo *info = enc->GetRecording();
-        info->ToStringList(retlist);
-        delete info;
+        if (info)
+        {
+            info->ToStringList(retlist);
+            delete info;
+        }
+        else
+        {
+            ProgramInfo dummy;
+            dummy.ToStringList(retlist);
+        }
     }
     else if (command == "GET_FREE_INPUTS")
     {
@@ -4365,8 +4389,16 @@ void MainServer::reconnectTimeout(void)
         EncoderLink *elink = iter.data();
         elink->CancelNextRecording(true);
         ProgramInfo *pinfo = elink->GetRecording();
-        pinfo->ToStringList(strlist);
-        delete pinfo;
+        if (pinfo)
+        {
+            pinfo->ToStringList(strlist);
+            delete pinfo;
+        }
+        else
+        {
+            ProgramInfo dummy;
+            dummy.ToStringList(strlist);
+        }
     }
 
     masterServerSock->writeStringList(strlist);
