@@ -633,6 +633,9 @@ int vm_get_current_menu(vm_t *vm, int *menuid) {
   int pgcn;
   pgcn = (vm->state).pgcN;
   pgcit = get_PGCIT(vm);
+  if (!pgcit)
+    return 0;
+
   *menuid = pgcit->pgci_srp[pgcn - 1].entry_id & 0xf ;
   return 1;
 }
@@ -1845,11 +1848,12 @@ static pgcit_t* get_MENU_PGCIT(vm_t *vm, ifo_handle_t *h, uint16_t lang) {
 
 /* Uses state to decide what to return */
 static pgcit_t* get_PGCIT(vm_t *vm) {
-  pgcit_t *pgcit;
-  
+  pgcit_t *pgcit = 0;
+
   switch ((vm->state).domain) {
   case VTS_DOMAIN:
-    pgcit = vm->vtsi->vts_pgcit;
+    if (vm->vtsi)
+      pgcit = vm->vtsi->vts_pgcit;
     break;
   case VTSM_DOMAIN:
     pgcit = get_MENU_PGCIT(vm, vm->vtsi, (vm->state).registers.SPRM[0]);
