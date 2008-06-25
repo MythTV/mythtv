@@ -1050,7 +1050,7 @@ void MainServer::HandleDone(MythSocket *socket)
 
 void MainServer::SendResponse(MythSocket *socket, QStringList &commands)
 {
-    if (getPlaybackBySock(socket) || getFileTransferBySock(socket))
+    if (socket && (getPlaybackBySock(socket) || getFileTransferBySock(socket)))
     {
         socket->writeStringList(commands);
     }
