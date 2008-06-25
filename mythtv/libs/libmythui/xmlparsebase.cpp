@@ -301,6 +301,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                                           "match old '%2'")
                                          .arg(name).arg(inherits));
             delete uitype;
+            return NULL;
         }
         uitype->CopyFrom(base);
     }
