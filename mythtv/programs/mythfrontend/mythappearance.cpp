@@ -70,6 +70,13 @@ bool MythAppearance::Create()
     m_changeamount = dynamic_cast<MythUIText *> (GetChild("changeamount"));
     m_offsets = dynamic_cast<MythUIText *> (GetChild("offsets"));
     m_changeamount = dynamic_cast<MythUIText *> (GetChild("changeamount"));
+    if (!m_topleftarrow || !m_bottomrightarrow || !m_size || !m_offsets ||
+        !m_changeamount || !m_offsets || !m_changeamount)
+    {
+        VERBOSE(VB_IMPORTANT, "MythAppearance, Error: "
+                "Could not instantiate, please check appear-ui.xml for errors");
+        return false;
+    }
 
     m_arrowsize_x = m_topleftarrow->GetArea().width();
     m_arrowsize_y = m_topleftarrow->GetArea().height();
