@@ -15,7 +15,7 @@ class MythImage;
 class MythPainter
 {
   public:
-    MythPainter() { }
+    MythPainter() : m_Parent(0) { }
     virtual ~MythPainter() { }
 
     virtual QString GetName(void) = 0;

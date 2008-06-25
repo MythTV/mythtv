@@ -36,8 +36,8 @@ using namespace std;
 #define GL_TEXTURE_RECTANGLE_NV 0x84F5
 #endif
 
-MythOpenGLPainter::MythOpenGLPainter() 
-                 : MythPainter()
+MythOpenGLPainter::MythOpenGLPainter() :
+    MythPainter(), q_gl_texture(-1), texture_rects(false), m_maxTexDim(-1)
 {
 }
 

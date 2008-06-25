@@ -245,23 +245,16 @@ class MythThemedMenuPrivate: public XMLParseBase
 
 /////////////////////////////////////////////////////////////////////////////
 
-MythThemedMenuState::MythThemedMenuState()
+MythThemedMenuState::MythThemedMenuState() :
+    logo(NULL),          buttonnormal(NULL),
+    buttonactive(NULL),  callback(NULL),
+    callbackdata(NULL),  killable(false),
+    balancerows(true),   spreadbuttons(false),
+    buttoncenter(false), buttonBackground(NULL),
+    uparrow(NULL),       downarrow(NULL),
+    allowreorder(true),  maxColumns(20),
+    visiblerowlimit(6),  loaded(false)
 {
-    allowreorder = true;
-    balancerows = true;
-
-    logo = NULL;
-    buttonnormal = NULL;
-    buttonactive = NULL;
-    uparrow = NULL;
-    downarrow = NULL;
-    buttonBackground = NULL;
-
-    loaded = false;
-
-    callback = NULL;
-
-    killable = false;
 }
 
 MythThemedMenuState::~MythThemedMenuState()
@@ -1282,23 +1275,21 @@ bool MythThemedMenuState::parseSettings(
  */
 MythThemedMenuPrivate::MythThemedMenuPrivate(MythThemedMenu *lparent, 
                                              const char *cdir,
-                                             MythThemedMenuState *lstate)
+                                             MythThemedMenuState *lstate) :
+    parent(lparent),     m_state(lstate),
+    allocedstate(false), activebutton(NULL),
+    currentrow(0),       currentcolumn(0),
+    foundtheme(false),   exitModifier(-1),
+    ignorekeys(false),   maxrows(0),
+    visiblerows(0),      columns(0),
+    wantpop(false),      watermark(NULL),
+    uparrow(NULL),       downarrow(NULL)
 {
-    if (!lstate)
+    if (!m_state)
     {
         m_state = new MythThemedMenuState();
         allocedstate = true;
     }
-    else
-    {
-        m_state = lstate;
-        allocedstate = false;
-    }
-
-    parent = lparent;
-    ignorekeys = false;
-    wantpop = false;
-    exitModifier = -1;
 
     m_state->themeDir = cdir;
 }

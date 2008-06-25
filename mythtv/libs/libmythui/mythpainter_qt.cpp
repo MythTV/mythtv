@@ -28,8 +28,9 @@ void MythQtImage::SetChanged(bool change)
     MythImage::SetChanged(change);
 }
 
-MythQtPainter::MythQtPainter()
-             : MythPainter()
+MythQtPainter::MythQtPainter() :
+    MythPainter(),
+    painter(0)
 {
 }
 
