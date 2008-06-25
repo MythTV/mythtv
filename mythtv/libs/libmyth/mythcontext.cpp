@@ -2760,8 +2760,9 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
     }
 
     if (!found)
-        value = d->m_settings->GetSetting(key, defaultval); 
+        return d->m_settings->GetSetting(key, defaultval); 
 
+    // Store the value (only if we have actually found it in the database)
     if (!value.isNull() && d->useSettingsCache)
     {
         d->settingsCacheLock.lock();
