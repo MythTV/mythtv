@@ -212,7 +212,7 @@ int BufferedSocketDevice::ReadBytes()
 
 bool BufferedSocketDevice::ConsumeWriteBuf( Q_ULONG nbytes )
 {
-    if ( nbytes <= 0 || nbytes > m_nWriteSize )
+    if ( !nbytes || ((Q_LONG)nbytes > m_nWriteSize) )
         return FALSE;
 
     m_nWriteSize -= nbytes;
@@ -221,7 +221,7 @@ bool BufferedSocketDevice::ConsumeWriteBuf( Q_ULONG nbytes )
     {
         QByteArray *a = m_bufWrite.first();
 
-        if ( m_nWriteIndex + nbytes >= a->size() ) 
+        if ( m_nWriteIndex + nbytes >= (Q_ULONG)a->size() ) 
         {
             nbytes -= a->size() - m_nWriteIndex;
             m_bufWrite.remove();
@@ -460,7 +460,7 @@ Q_LONG BufferedSocketDevice::ReadBlock( char *data, Q_ULONG maxlen )
 
     ReadBytes();
 
-    if ( maxlen >= m_bufRead.size() )
+    if ( maxlen >= (Q_ULONG)m_bufRead.size() )
         maxlen = m_bufRead.size();
 
     m_bufRead.consumeBytes( maxlen, data );

@@ -38,7 +38,7 @@ Configuration   *UPnp::g_pConfig        = NULL;
 //////////////////////////////////////////////////////////////////////////////
 
 UPnp::UPnp()
-    : m_pHttpServer(NULL), m_nServicePort(NULL)
+    : m_pHttpServer(NULL), m_nServicePort(0)
 {
     VERBOSE( VB_UPNP, "UPnp - Constructor" );
 }

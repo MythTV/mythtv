@@ -4250,7 +4250,8 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
 
     // This should be an impossible keypress we've simulated
     if ((e->key() == Qt::Key_LaunchMedia) &&
-        (e->state() == (Qt::MouseButtonMask | Qt::KeyButtonMask)))
+        (e->state() == (Qt::ButtonState)
+         (Qt::MouseButtonMask | Qt::KeyButtonMask)))
     {
         e->accept();
         ncLock.lock();

@@ -229,7 +229,7 @@ void * RENAME(fast_memcpy)(void * to, const void * from, size_t len)
 	}
 #else
 	// Align destination at BLOCK_SIZE boundary
-	for (; ((int)to & (BLOCK_SIZE-1)) && i>0; i--)
+	for (; ((long)to & (BLOCK_SIZE-1)) && i>0; i--)
 	{
 		__asm__ __volatile__ (
 #ifndef HAVE_ONLY_MMX1

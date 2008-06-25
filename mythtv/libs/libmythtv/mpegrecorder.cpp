@@ -900,7 +900,7 @@ void MpegRecorder::StartRecording(void)
     recording = true;
     unsigned char *buffer = new unsigned char[bufferSize + 1];
     int len;
-    uint remainder = 0;
+    int remainder = 0;
 
     MythTimer elapsedTimer;
     float elapsed;
@@ -1324,23 +1324,6 @@ void MpegRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
     pmt->tsheader()->SetContinuityCounter(next_cc);
     uint size = pmt->WriteAsTSPackets(buf, next_cc);
 
-    uint posA[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
-
     for (uint i = 0; i < size ; i += TSPacket::SIZE)
         DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(&buf[i])));
-
-    uint posB[2] = { ringBuffer->GetWritePosition(), _payload_buffer.size() };
-
-#if 0
-    if (posB[0] + posB[1] * TSPacket::SIZE > 
-        posA[0] + posA[1] * TSPacket::SIZE)
-    {
-        VERBOSE(VB_RECORD, LOC + "Wrote PMT @"
-                << posA[0] << " + " << (posA[1] * TSPacket::SIZE));
-    }
-    else
-    {
-        VERBOSE(VB_RECORD, LOC + "Saw PMT but did not write to disk yet");
-    }
-#endif
 }

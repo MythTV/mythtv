@@ -60,8 +60,10 @@ using namespace std;
 extern "C" {
 #include <X11/extensions/xf86vmode.h>
 #include <X11/extensions/Xinerama.h>
+#ifndef _XSHM_H_
     extern int      XShmQueryExtension(Display*);
     extern int      XShmGetEventBase(Display*);
+#endif // silences warning when these are already defined
     extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*,
                                       int, int, XShmSegmentInfo*);
 }

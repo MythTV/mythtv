@@ -434,7 +434,8 @@ void dummy_print(dummy_buffer *dbuf)
 			      sizeof(uint64_t), i * sizeof(uint64_t));
        ring_peek(&dbuf->data_index,(uint8_t *) &size, 
 			      sizeof(uint32_t), i * sizeof(uint32_t));
-       printf("%d : %llu %u\n", i, rtime, size);
+
+       printf("%d : %llu %u\n", i, (long long unsigned int)rtime, size);
    }
    printf("Used: %d Free: %d data-free: %d\n", avail, 1000-avail, dbuf->size - dbuf->fill);
 }

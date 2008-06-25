@@ -134,7 +134,7 @@ extern MPUBLIC unsigned int print_verbose_messages;
                 printf("%4d-%02d-%02d %2d:%02d:%02d.%03d ",  \
                        1900+tp->tm_year, 1+tp->tm_mon,       \
                        tp->tm_mday, tp->tm_hour, tp->tm_min, \
-                       tp->tm_sec, tv.tv_usec/10000);        \
+                       tp->tm_sec, (int)(tv.tv_usec/10000)); \
             }
         #else
             #define VERBOSEDATE ;

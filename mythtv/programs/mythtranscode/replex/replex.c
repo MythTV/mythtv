@@ -1086,7 +1086,7 @@ ssize_t save_read(struct replex *rx, void *buf, size_t count)
 		if ( (int) count > l) count = l;
 	}
 	while(neof >= 0 && re < count){
-		neof = read(fd, buf+re, count - re);
+		neof = read(fd, ((char*)buf)+re, count - re);
 		if (neof > 0) re += neof;
 		else break;
 	}
@@ -1845,7 +1845,7 @@ void init_replex(struct replex *rx)
 		if ((read_count = save_read(rx, buf, 12)) != 12) {
 			fprintf(stderr,
 				"Error reading in 12 bytes from replex. Read %d bytes\n",
-				read_count);
+				(int)read_count);
 			exit(1);
 		}
 		

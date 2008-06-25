@@ -56,7 +56,8 @@ extern "C" int has_altivec(void);    // in libavcodec/ppc/check_altivec.c
 static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
                            unsigned char *pu, unsigned char *pv,
                            int h_size, int v_size, int rgb_stride,
-                           int y_stride, int uv_stride, int alphaones);
+                           int y_stride, int uv_stride, int alphaones)
+    __attribute__ ((unused)); /* <- suppress compiler warning */
 
 /* CPU_MMXEXT/CPU_MMX adaptation layer */
 
