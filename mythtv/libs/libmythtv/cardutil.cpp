@@ -903,7 +903,7 @@ QString CardUtil::GetDisplayName(uint inputid)
 uint CardUtil::GetInputID(uint cardid, const QString &inputname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT inputid "
+    query.prepare("SELECT cardinputid "
                   "FROM cardinput "
                   "WHERE inputname = :INPUTNAME AND "
                   "      cardid    = :CARDID");
