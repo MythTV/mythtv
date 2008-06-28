@@ -19,6 +19,7 @@ MythImage::MythImage(MythPainter *parent)
     m_RefCount = 0;
 
     m_isGradient = false;
+    m_imageId = 0;
 }
 
 MythImage::~MythImage()

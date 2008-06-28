@@ -31,26 +31,18 @@ class MythOpenGLPainter : public MythPainter
     virtual void DeleteFormatImage(MythImage *im);
 
   protected:
-    void RemoveImageFromCache(MythImage *im);
-    void BindTextureFromCache(MythImage *im, bool alphaonly = false);
-
     inline int CalcAlpha(int alpha1, int alpha2);
-
-    int NearestGLTextureSize(int v);
 
     MythImage *GetImageFromString(const QString &msg, int flags, const QRect &r,
                                   const MythFontProperties &font, 
                                   const QRect &boundRect);
 
-    QMap<MythImage *, unsigned int> m_ImageIntMap;
-    list<MythImage *> m_ImageExpireList;
-
     QMap<QString, MythImage *> m_StringToImageMap;
     list<QString> m_StringExpireList;
 
     int q_gl_texture;
-    bool texture_rects;
-    int m_maxTexDim;
+    int texture_rects;
+    QGLWidget *m_realParent;
 };
 
 #endif

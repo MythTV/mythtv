@@ -45,6 +45,9 @@ class MythImage : public QImage
     static MythImage *Gradient(const QSize & size, const QColor &begin,
                                const QColor &end, uint alpha);
 
+    void SetID(unsigned int id) { m_imageId = id; }
+    unsigned int GetID(void) { return m_imageId; }
+
   protected:
     static void MakeGradient(QImage &image, const QColor &begin,
                              const QColor &end, int alpha,
@@ -62,6 +65,8 @@ class MythImage : public QImage
     QColor m_gradBegin;
     QColor m_gradEnd;
     int m_gradAlpha;
+
+    unsigned int m_imageId;
 };
 
 #endif
