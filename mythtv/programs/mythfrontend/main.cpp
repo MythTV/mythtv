@@ -1508,8 +1508,8 @@ int main(int argc, char **argv)
         if (!RunMenu(themedir))
             break;
 
-	// Setup handler for USR1 signals to reload theme
-	signal(SIGUSR1, &signal_USR1_handler);
+        // Setup handler for USR1 signals to reload theme
+        signal(SIGUSR1, &signal_USR1_handler);
 
         qApp->setMainWidget(mainWindow);
         qApp->exec();
@@ -1543,6 +1543,7 @@ int main(int argc, char **argv)
     DestroyMythMainWindow();
     delete themeBase;
     delete gContext;
+
     // This takes a few seconds, so inform the user:
     VERBOSE(VB_GENERAL, "Deleting UPnP client...");
     delete g_pUPnp;
