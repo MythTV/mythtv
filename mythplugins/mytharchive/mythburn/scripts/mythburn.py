@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20080518-2"
+VERSION="0.1.20080629-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -1871,6 +1871,7 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
     if not doesFileExist(audio2):
         write("Available streams - video and one audio stream")
         result=os.spawnlp(mode, path_mplex[0], path_mplex[1],
+                    '-M',
                     '-f', '8',
                     '-v', '0',
                     '--sync-offset', '%sms' % syncOffset,
@@ -1880,6 +1881,7 @@ def multiplexMPEGStream(video, audio1, audio2, destination, syncOffset):
     else:
         write("Available streams - video and two audio streams")
         result=os.spawnlp(mode, path_mplex[0], path_mplex[1],
+                    '-M',
                     '-f', '8',
                     '-v', '0',
                     '--sync-offset', '%sms' % syncOffset,
