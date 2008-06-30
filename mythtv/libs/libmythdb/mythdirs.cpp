@@ -2,6 +2,7 @@
 #include <iostream>
 #include <QApplication>
 
+#include "mythconfig.h"  // for CONFIG_DARWIN
 #include "mythdirs.h"
 #include "mythverbose.h"
 
