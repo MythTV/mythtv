@@ -33,11 +33,12 @@ LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythmpeg2 -L../libmythdvdnav
 LIBS += -L../libmythfreemheg -L../libmythlivemedia
 LIBS += -L../libmythdb 
-LIBS += -lmythdb-$$LIBVERSION -lmythui-$$LIBVERSION
 LIBS += -lmyth-$$LIBVERSION         -lmythavutil-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION  -lmythavformat-$$LIBVERSION
+LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythmpeg2-$$LIBVERSION    -lmythdvdnav-$$LIBVERSION
 LIBS += -lmythfreemheg-$$LIBVERSION -lmythlivemedia-$$LIBVERSION
+LIBS += -lmythdb-$$LIBVERSION
 LIBS += -lz $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
