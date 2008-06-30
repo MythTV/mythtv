@@ -45,10 +45,10 @@ void InitializeMythDirs(void)
     {
         confdir = QString(tmp_confdir);
         //VERBOSE(VB_IMPORTANT, QString("Read conf dir = %1").arg(dir));
-        confdir.replace("$HOME", QDir::homeDirPath());
+        confdir.replace("$HOME", QDir::homePath());
     }
     else
-        confdir = QDir::homeDirPath() + "/.mythtv";
+        confdir = QDir::homePath() + "/.mythtv";
 
     sharedir = installprefix + "/share/mythtv/";
     libdir = installprefix + "/lib/mythtv/";
@@ -98,7 +98,7 @@ QString GetTranslationsNameFilter(void)
 QString FindTranslation(const QString &translation)
 {
     return GetTranslationsDir()
-           + "mythfrontend_" + translation.lower() + ".qm";
+           + "mythfrontend_" + translation.toLower() + ".qm";
 }
 
 QString GetFontsDir(void)

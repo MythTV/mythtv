@@ -1631,8 +1631,7 @@ void UIListBtnType::Draw(QPainter *p, int order, int context, bool active_on)
             // add max of lcd height menu items either side of the selected item
             // let the lcdserver figure out which ones to display
 
-            Q3PtrList<LCDMenuItem> menuItems;
-            menuItems.setAutoDelete(true);
+            QList<LCDMenuItem> menuItems;
 
             Q3PtrListIterator<UIListBtnTypeItem> it = (*m_selIterator);
             uint count = 0;
@@ -1667,7 +1666,7 @@ void UIListBtnType::Draw(QPainter *p, int order, int context, bool active_on)
                 else
                     selected = false;
 
-                menuItems.append(new LCDMenuItem(selected, checkState, msg));
+                menuItems.append(LCDMenuItem(selected, checkState, msg));
                 ++it;
                 ++count;
             }
@@ -1686,7 +1685,7 @@ void UIListBtnType::Draw(QPainter *p, int order, int context, bool active_on)
 
             if (!menuItems.isEmpty())
             {
-                lcddev->switchToMenu(&menuItems, title);
+                lcddev->switchToMenu(menuItems, title);
             }
         }
     }

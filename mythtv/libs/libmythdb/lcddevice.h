@@ -4,14 +4,12 @@
 #include <iostream>
 using namespace std;
 
-#include <qobject.h>
-#include <qstringlist.h>
-#include <q3valuevector.h>
-#include <q3socket.h>
-#include <qtimer.h>
-#include <qdatetime.h>
-#include <qmutex.h>
-#include <Q3PtrList>
+#include <QObject>
+#include <QStringList>
+#include <QTimer>
+#include <QDateTime>
+#include <QMutex>
+#include <QList>
 
 #include "mythsocket.h"
 #include "mythexp.h"
@@ -33,12 +31,12 @@ class MPUBLIC LCDMenuItem
         scrollPosition = indent;
     }
 
-    CHECKED_STATE isChecked() { return checked; }
-    bool isSelected() { return selected; }
-    QString ItemName() { return name; }
-    bool Scroll() { return scroll; }
-    unsigned int getIndent() { return indent; }
-    unsigned int getScrollPos() { return scrollPosition; }
+    CHECKED_STATE isChecked() const { return checked; } 
+    bool isSelected() const { return selected; } 
+    QString ItemName() const { return name; } 
+    bool Scroll() const { return scroll; } 
+    unsigned int getIndent() const { return indent; } 
+    unsigned int getScrollPos() const { return scrollPosition; }
 
     void setChecked(CHECKED_STATE value) { checked = value; }
     void setSelected(bool value) { selected = value; }
@@ -74,12 +72,12 @@ class MPUBLIC LCDTextItem
         itemScrollable = scroll;
     }
 
-    unsigned int getRow() { return itemRow; }
-    TEXT_ALIGNMENT getAlignment() { return itemAlignment; }
-    QString getText() { return itemText; }
-    QString getScreen() { return itemScreen; }
-    QString getWidget() { return itemWidget; }
-    int getScroll() { return itemScrollable; }
+    unsigned int getRow() const { return itemRow; }
+    TEXT_ALIGNMENT getAlignment() const { return itemAlignment; }
+    QString getText() const { return itemText; }
+    QString getScreen() const { return itemScreen; }
+    QString getWidget() const { return itemWidget; }
+    int getScroll() const { return itemScrollable; }
 
     void setRow(unsigned int value) { itemRow = value; }
     void setAlignment(TEXT_ALIGNMENT value) { itemAlignment = value; }
@@ -160,13 +158,13 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
     // Show the Menu
     // QPtrList is a pointer to a bunch of menu items
     // See mythmusic/databasebox.cpp for an example
-    void switchToMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_name = "",
+    void switchToMenu(QList<LCDMenuItem> &menuItems, QString app_name = "",
                       bool popMenu = true);
 
     // Show the Generic Progress
     // QPtrList contains pointers to LCDTextItem objects which allow you to 
     // define the screen, row, and alignment of the text
-    void switchToGeneric(Q3PtrList<LCDTextItem> *textItems);
+    void switchToGeneric(QList<LCDTextItem> &textItems);
 
     /** \brief Update the generic progress bar.
         \param generic_progress a value between 0 and 1.0

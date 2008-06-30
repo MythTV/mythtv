@@ -6,6 +6,7 @@
 #   include <QString>
 #   include <QTextStream>
 #   include <QMutex>
+#   include <iostream>
 
     using namespace std;
 #else
@@ -109,8 +110,6 @@ extern MPUBLIC unsigned int print_verbose_messages;
   extern MPUBLIC QMutex verbose_mutex;
 #endif
 
-
-// There are three different types of VERBOSE MACRO:
 // 1. A non-locking one, used in C or Objective C src, or standalone libraries,
 // 2. A mutex-locked one, which may deadlock, and
 // 3. A mutex-locked one, which should be deadlock safe.
@@ -121,12 +120,16 @@ extern MPUBLIC unsigned int print_verbose_messages;
 #ifndef MYTHCONTEXT_H_
     #ifdef  __cplusplus
         #define VERBOSE(mask,args...)                        \
-        do { \
+        do {                                                 \
             if ((print_verbose_messages & (mask)) == (mask)) \
-                cout << QDateTime::currentDateTime()         \
-                        .toString("yyyy-MM-dd hh:mm:ss.zzz") \
-                        .toLocal8Bit().constData()           \
-                     << " " << (const char*)(args) << endl;  \
+            {                                                \
+                QDateTime dtmp = QDateTime::currentDateTime(); \
+                QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
+                verbose_mutex.lock(); \
+                cout << dtime.toLocal8Bit().constData() << " " \
+                     << QString(args).toLocal8Bit().constData() << endl; \
+                verbose_mutex.unlock(); \
+            }                                                \
        } while (0)
     #else
         #ifdef HAVE_GETTIMEOFDAY

@@ -3507,8 +3507,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             bool selected;
 
             Q3PtrList<GenericTree> *nodes = parent->getAllChildren(visual_order);
-            Q3PtrList<LCDMenuItem> menuItems;
-            menuItems.setAutoDelete(true);
+            QList<LCDMenuItem> menuItems;
 
             if (pos > (int)lcddev->getLCDHeight())
                 nodes->at(pos - lcddev->getLCDHeight());
@@ -3525,8 +3524,8 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                 else
                     selected = false;
 
-                menuItems.append(new LCDMenuItem(selected, NOTCHECKABLE,
-                                                    lnode->getString()));
+                menuItems.append(LCDMenuItem(selected, NOTCHECKABLE,
+                                             lnode->getString()));
                 nodes->next();
                 ++count;
             }
@@ -3536,7 +3535,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             title += (current_node->childCount () > 0) ? " >> " : "  ";
             if (!menuItems.isEmpty())
             {
-                lcddev->switchToMenu(&menuItems, title);
+                lcddev->switchToMenu(menuItems, title);
             }
         }
     }

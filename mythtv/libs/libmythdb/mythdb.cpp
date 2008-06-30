@@ -1,5 +1,4 @@
 #include <QMutex>
-#include <Q3DeepCopy>
 
 #include "mythdb.h"
 #include "mythdbcon.h"
@@ -52,7 +51,6 @@ class MythDBPrivate
 
     DatabaseParams  m_DBparams;  ///< Current database host & WOL details
     QString m_localhostname;
-    QMutex m_hostnamelock;
     MDBManager m_dbmanager;
 
     Settings *m_settings;
@@ -101,7 +99,7 @@ void MythDB::DBError(const QString &where, const QSqlQuery& query)
 
     str += "Query was:\n";
     str += query.executedQuery() + "\n";
-    str += QString::fromUtf8(DBErrorMessage(query.lastError()));
+    str += DBErrorMessage(query.lastError());
     VERBOSE(VB_IMPORTANT, QString("%1").arg(str));
 }
 
@@ -132,16 +130,12 @@ void MythDB::SetDatabaseParams(const DatabaseParams &params)
 
 void MythDB::SetLocalHostname(QString name)
 {
-    d->m_localhostname = Q3DeepCopy<QString>(name);
+    d->m_localhostname = name;
 }
 
 QString MythDB::GetHostName(void)
 {
-    // The reference counting in QString isn't thread-safe, so we need
-    // take care of it ourselves.
-    d->m_hostnamelock.lock();
-    QString tmp = Q3DeepCopy<QString>(d->m_localhostname);
-    d->m_hostnamelock.unlock();
+    QString tmp = d->m_localhostname;
     return tmp;
 }
 
@@ -453,7 +447,7 @@ void MythDB::GetResolutionSetting(const QString &type,
 
     if ("" != res)
     {
-        QStringList slist = QStringList::split("x", res);
+        QStringList slist = res.split(QString("x"));
         int w = width, h = height;
         if (2 == slist.size())
         {

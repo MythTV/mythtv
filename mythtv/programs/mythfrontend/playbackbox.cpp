@@ -1323,8 +1323,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
     LCD *lcddev = LCD::Get();
     QString tstring, lcdTitle;
-    Q3PtrList<LCDMenuItem> lcdItems;
-    lcdItems.setAutoDelete(true);
+    QList<LCDMenuItem> lcdItems;
 
     container = theme->GetSet("selector");
 
@@ -1373,7 +1372,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
                 ltype->SetItemText(cnt, tstring);
                 if (lcddev && inTitle)
-                    lcdItems.append(new LCDMenuItem(0, NOTCHECKABLE, tstring));
+                    lcdItems.append(LCDMenuItem(0, NOTCHECKABLE, tstring));
 
                 h++;
              }
@@ -1397,7 +1396,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
             {
                 if (inTitle)
                 {
-                    lcdItems.append(new LCDMenuItem(1, NOTCHECKABLE, tstring));
+                    lcdItems.append(LCDMenuItem(1, NOTCHECKABLE, tstring));
                     lcdTitle = "Recordings";
                 }
                 else
@@ -1434,7 +1433,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
                 ltype->SetItemText(cnt, tstring);
                 if (lcddev && inTitle)
-                    lcdItems.append(new LCDMenuItem(0, NOTCHECKABLE, tstring));
+                    lcdItems.append(LCDMenuItem(0, NOTCHECKABLE, tstring));
 
                 h++;
             }
@@ -1498,7 +1497,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                 if (lcddev && !inTitle)
                 {
                     QString lcdSubTitle = tempSubTitle;
-                    lcdItems.append(new LCDMenuItem(skip + cnt == progIndex,
+                    lcdItems.append(LCDMenuItem(skip + cnt == progIndex,
                                     NOTCHECKABLE,
                                     lcdSubTitle.replace('"', "'") +
                                     " " + tempDate));
@@ -1528,7 +1527,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
     }
 
     if (lcddev && !lcdItems.isEmpty())
-        lcddev->switchToMenu(&lcdItems, lcdTitle);
+        lcddev->switchToMenu(lcdItems, lcdTitle);
 
     // DRAW LAYERS
     if (container)

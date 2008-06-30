@@ -121,7 +121,7 @@ bool Settings::LoadSettingsFiles(QString filename, QString prefix,
 
 bool Settings::ReadSettings(QString pszFile)
 {
-    fstream fin(pszFile.ascii(), ios::in);
+    fstream fin(pszFile.toAscii(), ios::in);
     if (!fin.is_open()) return false;
 
     string strLine;

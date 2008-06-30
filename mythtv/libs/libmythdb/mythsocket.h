@@ -6,10 +6,10 @@
 #include <QTextStream>
 #include <QString>
 #include <QStringList>
-#include <Q3SocketDevice>
 #include <QList>
 
 #include "mythexp.h"
+#include "msocketdevice.h"
 
 class QHostAddress;
 class MythSocket;
@@ -24,7 +24,7 @@ class MPUBLIC MythSocketCBs
     virtual void connectionClosed(MythSocket*) = 0;
 };
 
-class MPUBLIC MythSocket : public Q3SocketDevice
+class MPUBLIC MythSocket : public MSocketDevice
 {
     friend void readyReadThread_iffound(MythSocket*);
 
@@ -51,18 +51,18 @@ class MPUBLIC MythSocket : public Q3SocketDevice
     QString errorToString(void) { return errorToString(error()); }
     QString errorToString(const Error error);
 
-    void setSocket(int socket, Type type = Q3SocketDevice::Stream);
+    void setSocket(int socket, Type type = MSocketDevice::Stream);
     void setCallbacks(MythSocketCBs *cb);
 
-    Q_LONG readBlock(char *data, Q_ULONG len);
-    Q_LONG writeBlock(const char *data, Q_ULONG len);
+    qint64 readBlock(char *data, quint64 len);
+    qint64 writeBlock(const char *data, quint64 len);
 
     bool readStringList(QStringList &list, bool quickTimeout = false);
     bool writeStringList(QStringList &list);
-    bool writeData(const char *data, Q_ULONG len);
+    bool writeData(const char *data, quint64 len);
 
-    bool connect(const QHostAddress &addr, Q_UINT16 port);
-    bool connect(const QString &host, Q_UINT16 port);
+    bool connect(const QHostAddress &addr, quint16 port);
+    bool connect(const QString &host, quint16 port);
 
     void Lock();
     void Unlock();
@@ -75,7 +75,7 @@ class MPUBLIC MythSocket : public Q3SocketDevice
     MythSocketCBs  *m_cb;
     State           m_state;
     QHostAddress    m_addr;
-    Q_UINT16        m_port;
+    quint16         m_port;
     int             m_ref_count;
 
     bool            m_notifyread;

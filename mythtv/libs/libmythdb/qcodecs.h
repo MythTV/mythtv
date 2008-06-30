@@ -9,39 +9,37 @@
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
+   You should have received a copy of the GNU Lesser General Public
    License along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-   RFC 1321 "MD5 Message-Digest Algorithm" Copyright (C) 1991-1992.
+   RFC 1321 "MD5 Message-Digest Algorithm" Copyright (C) 1991-1992.             // krazy:exclude=copyright
    RSA Data Security, Inc. Created 1991. All rights reserved.
 
-   The KMD5 class is based on a C++ implementation of
+   The QMD5 class is based on a C++ implementation of
    "RSA Data Security, Inc. MD5 Message-Digest Algorithm" by
-   Mordechai T. Abzug,	Copyright (c) 1995.  This implementation
+   Mordechai T. Abzug,	Copyright (c) 1995.  This implementation                // krazy:exclude=copyright
    passes the test-suite as defined in RFC 1321.
 
    The encoding and decoding utilities in KCodecs with the exception of
    quoted-printable are based on the java implementation in HTTPClient
-   package by Ronald Tschal‰r Copyright (C) 1996-1999.
+   package by Ronald Tschal√§r Copyright (C) 1996-1999.                          // krazy:exclude=copyright
 
    The quoted-printable codec as described in RFC 2045, section 6.7. is by
    Rik Hemsley (C) 2001.
 */
 
-#ifndef _QMDCODEC_H
-#define _QMDCODEC_H
+#ifndef KCODECS_H
+#define KCODECS_H
 
 #define QBase64 QCodecs
 
-#include <qglobal.h>
-#include <qstring.h>
-#include <qiodevice.h>
-#include <Q3CString>
+#include <mythexp.h>
 
-#include "mythexp.h"
+class QByteArray;
+class QIODevice;
 
 /**
  * A wrapper class for the most commonly used encoding and
@@ -49,16 +47,18 @@
  * and decoding input using base64, uu and the quoted-printable
  * specifications.
  *
- * @section usage Usage:
+ * \b Usage:
  *
- * <PRE>
- * QCString input = "Aladdin:open sesame";
- * QCString result = QCodecs::base64Encode(input);
+ * \code
+ * QByteArray input = "Aladdin:open sesame";
+ * QByteArray result = KCodecs::base64Encode(input);
  * cout << "Result: " << result.data() << endl;
+ * \endcode
  *
+ * <pre>
  * Output should be
  * Result: QWxhZGRpbjpvcGVuIHNlc2FtZQ==
- * </PRE>
+ * </pre>
  *
  * The above example makes use of the convenience functions
  * (ones that accept/return null-terminated strings) to encode/decode
@@ -71,10 +71,8 @@
  * @author Dawit Alemayehu <adawit@kde.org>
  * @author Rik Hemsley <rik@kde.org>
  */
-class MPUBLIC QCodecs
+namespace QCodecs
 {
-public:
-
   /**
    * Encodes the given data using the quoted-printable algorithm.
    *
@@ -82,24 +80,9 @@ public:
    * @param useCRLF if true the input data is expected to have
    *                CRLF line breaks and the output will have CRLF line
    *                breaks, too.
-   * @return        quoted-printable encoded data.
+   * @return        quoted-printable encoded string.
    */
-  static Q3CString quotedPrintableEncode(const QByteArray & in,
-                                        bool useCRLF = true);
-
-  /**
-   * @overload
-   *
-   * Same as above except it accepts a null terminated
-   * string instead an array.
-   *
-   * @param str     data to be encoded.
-   * @param useCRLF if true the input data is expected to have
-   *                CRLF line breaks and the output will have CRLF line
-   *                breaks, too.
-   * @return        quoted-printable encoded data.
-   */
-  static Q3CString quotedPrintableEncode(const Q3CString & str,
+  MPUBLIC QByteArray quotedPrintableEncode(const QByteArray & in,
                                         bool useCRLF = true);
 
   /**
@@ -115,35 +98,23 @@ public:
    * output array will be lost.
    *
    * @param in      data to be encoded.
-   * @param out     decoded data.
+   * @param out     encoded data.
    * @param useCRLF if true the input data is expected to have
    *                CRLF line breaks and the output will have CRLF line
    *                breaks, too.
-   * @return        quoted-printable encoded data.
    */
-  static void quotedPrintableEncode(const QByteArray & in, QByteArray& out,
+  MPUBLIC void quotedPrintableEncode(const QByteArray & in, QByteArray& out,
                                     bool useCRLF);
 
   /**
-   * Decodes a quoted-printable encoded string.
+   * Decodes a quoted-printable encoded data.
    *
    * Accepts data with CRLF or standard unix line breaks.
    *
-   * @param in  the data to be decoded.
-   * @return    decoded data.
+   * @param in  data to be decoded.
+   * @return    decoded string.
    */
-  static Q3CString quotedPrintableDecode(const QByteArray & in);
-
-  /**
-   * @overload
-   *
-   * Same as above except it accepts a null terminated
-   * string instead an array.
-   *
-   * @param str  the data to be decoded.
-   * @return     decoded data.
-   */
-  static Q3CString quotedPrintableDecode(const Q3CString & str);
+  MPUBLIC QByteArray quotedPrintableDecode(const QByteArray & in);
 
   /**
    * Decodes a quoted-printable encoded data.
@@ -159,12 +130,10 @@ public:
    * appropriately before use, hence, all data stored in the
    * output array will be lost.
    *
-   * @param in   data to be encoded.
+   * @param in   data to be decoded.
    * @param out  decoded data.
-   *
-   * @return     quoted-printable encoded data.
    */
-  static void quotedPrintableDecode(const QByteArray & in, QByteArray& out);
+  MPUBLIC void quotedPrintableDecode(const QByteArray & in, QByteArray& out);
 
 
   /**
@@ -175,21 +144,10 @@ public:
    * line is longer than 45 octets (60 characters), excluding the
    * line terminator.
    *
-   * @param in   the data to be uuencoded
-   * @return     a uuencoded data.
+   * @param in   data to be uuencoded
+   * @return     uuencoded string.
    */
-  static Q3CString uuencode( const QByteArray& in );
-
-  /**
-   * @overload
-   *
-   * Same as the above functions except it accepts
-   * a null terminated string instead an array.
-   *
-   * @param str   the string to be uuencoded.
-   * @return      the encoded string.
-   */
-  static Q3CString uuencode( const Q3CString& str );
+  MPUBLIC QByteArray uuencode( const QByteArray& in );
 
   /**
    * Encodes the given data using the uuencode algorithm.
@@ -203,33 +161,22 @@ public:
    * appropriately before use, hence, all data stored in the
    * output array will be lost.
    *
-   * @param in   the data to be uuencoded.
-   * @param out  the container for the uudecoded data.
+   * @param in   data to be uuencoded.
+   * @param out  uudecoded data.
    */
-  static void uuencode( const QByteArray& in, QByteArray& out );
+  MPUBLIC void uuencode( const QByteArray& in, QByteArray& out );
 
   /**
-   * Decodes the given data using the uuencode algorithm.
+   * Decodes the given data using the uudecode algorithm.
    *
    * Any 'begin' and 'end' lines like those generated by
    * the utilities in unix and unix-like OS will be
    * automatically ignored.
    *
-   * @param in   the data uuencoded data to be decoded.
-   * @return     a decoded string.
+   * @param in   data to be decoded.
+   * @return     decoded string.
    */
-  static Q3CString uudecode( const QByteArray& in );
-
-  /**
-   * @overload
-   *
-   * Same as the above functions except it accepts
-   * a null terminated string instead an array.
-   *
-   * @param str   the string to be decoded.
-   * @return      a uudecoded string.
-   */
-  static Q3CString uudecode( const Q3CString& str );
+  MPUBLIC QByteArray uudecode( const QByteArray& in );
 
   /**
    * Decodes the given data using the uudecode algorithm.
@@ -247,10 +194,10 @@ public:
    * appropriately before use, hence, all data stored in the
    * output array will be lost.
    *
-   * @param in   the uuencoded-data to be decoded.
-   * @param out  the container for the uudecoded data.
+   * @param in   data to be decoded.
+   * @param out  uudecoded data.
    */
-  static void uudecode( const QByteArray& in, QByteArray& out );
+  MPUBLIC void uudecode( const QByteArray& in, QByteArray& out );
 
 
   /**
@@ -261,24 +208,12 @@ public:
    * as specified by RFC 2045.  If @p insertLFs is true, then
    * there will be 76 characters or less per line.
    *
-   * @param in         the data to be encoded.
+   * @param in         data to be encoded.
    * @param insertLFs  limit the number of characters per line.
    *
-   * @return           a base64 encoded string.
+   * @return           base64 encoded string.
    */
-  static Q3CString base64Encode( const QByteArray& in, bool insertLFs = false);
-
-  /**
-   * @overload
-   *
-   * Same as the above functions except it accepts
-   * a null terminated string instead an array.
-   *
-   * @param str       the string to be encoded.
-   * @param insertLFs limit the number of characters per line.
-   * @return          the decoded string.
-   */
-  static Q3CString base64Encode( const Q3CString& str, bool insertLFs = false );
+  MPUBLIC QByteArray base64Encode( const QByteArray& in, bool insertLFs = false);
 
   /**
    * Encodes the given data using the base64 algorithm.
@@ -297,32 +232,21 @@ public:
    * appropriately before use, hence, all data stored in the
    * output array will be lost.
    *
-   * @param in        the data to be encoded using base64.
-   * @param out       the container for the encoded data.
+   * @param in        data to be encoded.
+   * @param out       encoded data.
    * @param insertLFs limit the number of characters per line.
    */
-  static void base64Encode( const QByteArray& in, QByteArray& out,
+  MPUBLIC void base64Encode( const QByteArray& in, QByteArray& out,
                             bool insertLFs = false );
 
   /**
    * Decodes the given data that was encoded using the
    * base64 algorithm.
    *
-   * @param in   the base64-encoded data to be decoded.
-   * @return     the decoded data.
+   * @param in   data to be decoded.
+   * @return     decoded string.
    */
-  static Q3CString base64Decode( const QByteArray& in );
-
-  /**
-   * @overload
-   *
-   * Same as the above functions except it accepts
-   * a null terminated string instead an array.
-   *
-   * @param str  the base64-encoded string.
-   * @return     the decoded string.
-   */
-  static Q3CString base64Decode( const Q3CString& str );
+  MPUBLIC QByteArray base64Decode( const QByteArray& in );
 
   /**
    * Decodes the given data that was encoded with the base64
@@ -338,28 +262,16 @@ public:
    * appropriately before use, hence, all data stored in the
    * output array will be lost.
    *
-   * @param in   the encoded data to be decoded.
-   * @param out  the container for the decoded data.
+   * @param in   data to be decoded.
+   * @param out  decoded data.
    */
-  static void base64Decode( const QByteArray& in, QByteArray& out );
+  MPUBLIC void base64Decode( const QByteArray& in, QByteArray& out );
 
-
-private:
-  QCodecs();
-
-private:
-  static const char UUEncMap[64];
-  static const char UUDecMap[128];
-  static const char Base64EncMap[64];
-  static const char Base64DecMap[128];
-  static const char hexChars[16];
-  static const unsigned int maxQPLineLength;
-};
+}
 
 class QMD5Private;
 /**
- * Provides an easy to use C++ implementation of RSA's
- * MD5 algorithm.
+ * @short An adapted C++ implementation of RSA Data Securities MD5 algorithm.
  *
  * The default constructor is designed to provide much the same
  * functionality as the most commonly used C-implementation, while
@@ -371,36 +283,35 @@ class QMD5Private;
  * update() as long as you didn't request the digest value yet.
  * After the digest value was requested, the object is "finalized"
  * and you have to call reset() to be able to do another calculation
- * with it.  The reason for this behaviour is that upon requesting
+ * with it.  The reason for this behavior is that upon requesting
  * the message digest QMD5 has to pad the received contents up to a
  * 64 byte boundary to calculate its value. After this operation it
  * is not possible to resume consuming data.
  *
- * @section usage Usage:
+ * \b Usage:
  *
  * A common usage of this class:
  *
- * <PRE>
- *  const char* test1;
- *  QMD5::Digest rawResult;
+ * \code
+ * const char* test1;
+ * QMD5::Digest rawResult;
  *
- *  test1 = "This is a simple test.";
- *  QMD5 context (test1);
- *  cout << "Hex Digest output: " << context.hexDigest().data() << endl;
- * </PRE>
+ * test1 = "This is a simple test.";
+ * QMD5 context (test1);
+ * cout << "Hex Digest output: " << context.hexDigest().data() << endl;
+ * \endcode
  *
  * To cut down on the unnecessary overhead of creating multiple QMD5
- * objects, you can simply invoke @ref reset() to reuse the same object
+ * objects, you can simply invoke reset() to reuse the same object
  * in making another calculation:
  *
- * <PRE>
- *  context.reset ();
- *  context.update ("TWO");
- *  context.update ("THREE");
- *  cout << "Hex Digest output: " << context.hexDigest().data() << endl;
- * </PRE>
+ * \code
+ * context.reset ();
+ * context.update ("TWO");
+ * context.update ("THREE");
+ * cout << "Hex Digest output: " << context.hexDigest().data() << endl;
+ * \endcode
  *
- * @short An adapted C++ implementation of RSA Data Securities MD5 algorithm.
  * @author Dirk Mueller <mueller@kde.org>, Dawit Alemayehu <adawit@kde.org>
  */
 
@@ -411,6 +322,7 @@ public:
   typedef unsigned char Digest[16];
 
   QMD5();
+  ~QMD5();
 
   /**
    * Constructor that updates the digest for the given string.
@@ -420,21 +332,14 @@ public:
    *             strlen on the first parameter, otherwise
    *             it trusts the given length (does not stop on NUL byte).
    */
-  QMD5(const char* in, int len = -1);
+  explicit QMD5(const char* in, int len = -1);
 
   /**
    * @overload
    *
    * Same as above except it accepts a QByteArray as its argument.
    */
-  QMD5(const QByteArray& a );
-
-  /**
-   * @overload
-   *
-   * Same as above except it accepts a QByteArray as its argument.
-   */
-  QMD5(const Q3CString& a );
+  explicit QMD5(const QByteArray& a );
 
   /**
    * Updates the message to be digested. Be sure to add all data
@@ -444,7 +349,7 @@ public:
    * @param in     message to be added to digest
    * @param len    the length of the given message.
    */
-  void update(const char* in, int len = -1) { update(reinterpret_cast<const unsigned char*>(in), len); }
+  void update(const char* in, int len = -1);
 
   /**
    * @overload
@@ -461,20 +366,13 @@ public:
   /**
    * @overload
    *
-   * @param in     message to be added to the digest (QByteArray).
-   */
-  void update(const Q3CString& in );
-
-  /**
-   * @overload
-   *
    * reads the data from an I/O device, i.e. from a file (QFile).
    *
    * NOTE that the file must be open for reading.
    *
    * @param file       a pointer to FILE as returned by calls like f{d,re}open
    *
-   * @returns false if an error occured during reading.
+   * @returns false if an error occurred during reading.
    */
   bool update(QIODevice& file);
 
@@ -488,7 +386,7 @@ public:
   /**
    * @return the raw representation of the digest
    */
-  const Digest& rawDigest ();
+  const Digest& rawDigest (); //krazy:exclude=constref (simple array)
 
   /**
    * Fills the given array with the binary representation of the
@@ -505,18 +403,18 @@ public:
    * Returns the value of the calculated message digest in
    * a hexadecimal representation.
    */
-  Q3CString hexDigest ();
+  QByteArray hexDigest ();
 
   /**
    * @overload
    */
-  void hexDigest(Q3CString&);
+  void hexDigest(QByteArray&);
 
   /**
    * Returns the value of the calculated message digest in
    * a base64-encoded representation.
    */
-  Q3CString base64Digest ();
+  QByteArray base64Digest ();
 
   /**
    * returns true if the calculated digest for the given
@@ -527,7 +425,7 @@ public:
   /**
    * @overload
    */
-  bool verify(const Q3CString&);
+  bool verify(const QByteArray&);
 
 protected:
   /**
@@ -546,30 +444,32 @@ private:
   QMD5& operator=(const QMD5& md);
 
   void init();
-  void encode( unsigned char* output, Q_UINT32 *in, Q_UINT32 len );
-  void decode( Q_UINT32 *output, const unsigned char* in, Q_UINT32 len );
+  void encode( unsigned char* output, quint32 *in, quint32 len );
+  void decode( quint32 *output, const unsigned char* in, quint32 len );
 
-  Q_UINT32 rotate_left( Q_UINT32 x, Q_UINT32 n );
-  Q_UINT32 F( Q_UINT32 x, Q_UINT32 y, Q_UINT32 z );
-  Q_UINT32 G( Q_UINT32 x, Q_UINT32 y, Q_UINT32 z );
-  Q_UINT32 H( Q_UINT32 x, Q_UINT32 y, Q_UINT32 z );
-  Q_UINT32 I( Q_UINT32 x, Q_UINT32 y, Q_UINT32 z );
-  void FF( Q_UINT32& a, Q_UINT32 b, Q_UINT32 c, Q_UINT32 d, Q_UINT32 x,
-               Q_UINT32  s, Q_UINT32 ac );
-  void GG( Q_UINT32& a, Q_UINT32 b, Q_UINT32 c, Q_UINT32 d, Q_UINT32 x,
-                Q_UINT32 s, Q_UINT32 ac );
-  void HH( Q_UINT32& a, Q_UINT32 b, Q_UINT32 c, Q_UINT32 d, Q_UINT32 x,
-                Q_UINT32 s, Q_UINT32 ac );
-  void II( Q_UINT32& a, Q_UINT32 b, Q_UINT32 c, Q_UINT32 d, Q_UINT32 x,
-             Q_UINT32 s, Q_UINT32 ac );
+  quint32 rotate_left( quint32 x, quint32 n );
+  quint32 F( quint32 x, quint32 y, quint32 z );
+  quint32 G( quint32 x, quint32 y, quint32 z );
+  quint32 H( quint32 x, quint32 y, quint32 z );
+  quint32 I( quint32 x, quint32 y, quint32 z );
+  void FF( quint32& a, quint32 b, quint32 c, quint32 d, quint32 x,
+               quint32  s, quint32 ac );
+  void GG( quint32& a, quint32 b, quint32 c, quint32 d, quint32 x,
+                quint32 s, quint32 ac );
+  void HH( quint32& a, quint32 b, quint32 c, quint32 d, quint32 x,
+                quint32 s, quint32 ac );
+  void II( quint32& a, quint32 b, quint32 c, quint32 d, quint32 x,
+             quint32 s, quint32 ac );
 
 private:
-  Q_UINT32 m_state[4];
-  Q_UINT32 m_count[2];
-  Q_UINT8 m_buffer[64];
+  quint32 m_state[4];
+  quint32 m_count[2];
+  quint8 m_buffer[64];
   Digest m_digest;
   bool m_finalized;
 
   QMD5Private* d;
 };
-#endif
+
+
+#endif // KCODECS_H

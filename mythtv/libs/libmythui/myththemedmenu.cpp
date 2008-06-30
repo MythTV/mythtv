@@ -1598,8 +1598,7 @@ void MythThemedMenuPrivate::updateLCD(void)
         return;
 
     // Build a list of the menu items
-    Q3PtrList<LCDMenuItem> menuItems;
-    menuItems.setAutoDelete(true);
+    QList<LCDMenuItem> menuItems;
     bool selected;
 
     for (int r = 0; r < (int)buttonRows.size(); r++)
@@ -1610,12 +1609,12 @@ void MythThemedMenuPrivate::updateLCD(void)
             selected = false;
 
         if (currentcolumn < buttonRows[r].numitems)
-            menuItems.append(new LCDMenuItem(selected, NOTCHECKABLE,
+            menuItems.append(LCDMenuItem(selected, NOTCHECKABLE,
                              buttonRows[r].buttons[currentcolumn]->message));
     }
 
     if (!menuItems.isEmpty())
-        lcddev->switchToMenu(&menuItems, titleText);
+        lcddev->switchToMenu(menuItems, titleText);
 }
 
 /** \brief Create a new MythThemedButton based on the MythThemedMenuState

@@ -889,12 +889,10 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps,
 
     if (class LCD * lcddev = LCD::Get())
     {
-        textItems = new Q3PtrList<LCDTextItem>;
-        textItems->setAutoDelete(true);
+        QList<LCDTextItem> textItems;
 
-        textItems->clear();
-        textItems->append(new LCDTextItem(1, ALIGN_CENTERED, message, "Generic",
-                          false));
+        textItems.append(LCDTextItem(1, ALIGN_CENTERED, message, "Generic",
+                                     false));
         lcddev->switchToGeneric(textItems);
     }
     else 

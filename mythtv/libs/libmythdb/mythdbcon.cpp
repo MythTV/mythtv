@@ -1,15 +1,15 @@
 #include "unistd.h"
 #include "stdlib.h"
 
-#include <Q3ValueVector>
-#include <Q3DeepCopy>
-#include <qsqldriver.h>
+#include <QVector>
+#include <QSqlDriver>
 
+#include "compat.h"
 #include "mythdbcon.h"
 #include "mythdb.h"
 #include "mythverbose.h"
 
-QMutex MSqlQuery::prepareLock(false);
+QMutex MSqlQuery::prepareLock;
 
 MSqlDatabase::MSqlDatabase(const QString &name)
 {
@@ -93,7 +93,7 @@ bool MSqlDatabase::OpenDatabase()
                          "Using WOL to wakeup database server (Try %1 of %2)")
                          .arg(trycount).arg(dbparms.wolRetry));
 
-                system(dbparms.wolCommand);
+                system(qPrintable(dbparms.wolCommand));
                 sleep(dbparms.wolReconnect);
                 connected = m_db.open();
             }
@@ -439,7 +439,7 @@ bool MSqlQuery::prepare(const QString& query)
 
     QMutexLocker lock(&prepareLock);
 
-    m_last_prepared_query = Q3DeepCopy<QString>(query);
+    m_last_prepared_query = query;
     if (query.contains(m_testbindings))
     {
         VERBOSE(VB_IMPORTANT,
@@ -499,7 +499,7 @@ void MSqlQuery::bindValues(MSqlBindings &bindings)
     MSqlBindings::Iterator it;
     for (it = bindings.begin(); it != bindings.end(); ++it)
     {
-        bindValue(it.key(), it.data());
+        bindValue(it.key(), it.value());
     }
 }
 
@@ -516,7 +516,7 @@ void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom)
     MSqlBindings::Iterator it;
     for (it = addfrom.begin(); it != addfrom.end(); ++it)
     {
-        output.insert(it.key(), it.data());
+        output.insert(it.key(), it.value());
     }
 }
 
@@ -539,10 +539,10 @@ void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings)
     QString q = query;
     QRegExp rx(QString::fromLatin1("'[^']*'|:([a-zA-Z0-9_]+)"));
 
-    Q3ValueVector<Holder> holders;
+    QVector<Holder> holders;
 
     int i = 0;
-    while ((i = rx.search(q, i)) != -1) 
+    while ((i = rx.indexIn(q, i)) != -1) 
     {
         if (!rx.cap(1).isEmpty())
             holders.append(Holder(rx.cap(0), i));
@@ -559,12 +559,12 @@ void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings)
         val = bindings[holder];
         QSqlField f("", val.type());
         if (val.isNull())
-            f.setNull();
+            f.clear();
         else
             f.setValue(val);
 
         query = query.replace((uint)holders[(uint)i].holderPos, holder.length(),
-                              result.driver()->formatValue(&f));
+                              result.driver()->formatValue(f));
     }
 }
 

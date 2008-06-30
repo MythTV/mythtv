@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include <Q3CString>
+#include <QByteArray>
 #include <QMutex>
 
 #include "mythtimer.h"
@@ -47,7 +47,7 @@ int MythSocket::m_readyread_pipe[2] = {-1, -1};
 #endif
 
 MythSocket::MythSocket(int socket, MythSocketCBs *cb)
-    : Q3SocketDevice(Q3SocketDevice::Stream),            m_cb(cb),
+    : MSocketDevice(MSocketDevice::Stream),            m_cb(cb),
       m_state(Idle),         m_addr(),                 m_port(0),
       m_ref_count(0),        m_notifyread(0) 
 {
@@ -191,7 +191,7 @@ void MythSocket::setSocket(int socket, Type type)
         close();
     }
 
-    Q3SocketDevice::setSocket(socket, type);
+    MSocketDevice::setSocket(socket, type);
     setBlocking(false);
     setState(Connected);
 }
@@ -199,10 +199,10 @@ void MythSocket::setSocket(int socket, Type type)
 void MythSocket::close(void)
 {
     setState(Idle);
-    Q3SocketDevice::close();
+    MSocketDevice::close();
 }
 
-Q_LONG MythSocket::readBlock(char *data, Q_ULONG len)
+qint64 MythSocket::readBlock(char *data, quint64 len)
 {
     // VERBOSE(VB_SOCKET, LOC + "readBlock called");
     if (state() != Connected)
@@ -214,7 +214,7 @@ Q_LONG MythSocket::readBlock(char *data, Q_ULONG len)
 
     m_notifyread = false;
 
-    Q_LONG rval = Q3SocketDevice::readBlock(data, len);
+    qint64 rval = MSocketDevice::readBlock(data, len);
     if (rval == 0)
     {
         close();
@@ -231,7 +231,7 @@ Q_LONG MythSocket::readBlock(char *data, Q_ULONG len)
  *  \brief Attempt to write 'len' bytes to socket
  *  \return actual bytes written
  */
-Q_LONG MythSocket::writeBlock(const char *data, Q_ULONG len)
+qint64 MythSocket::writeBlock(const char *data, quint64 len)
 {
     //VERBOSE(VB_SOCKET, LOC + "writeBlock called");
     if (state() != Connected)
@@ -241,10 +241,10 @@ Q_LONG MythSocket::writeBlock(const char *data, Q_ULONG len)
         return -1;
     }
 
-    Q_LONG rval = Q3SocketDevice::writeBlock(data, len);
+    qint64 rval = MSocketDevice::writeBlock(data, len);
 
     // see if socket went away
-    if (!isValid() || error() != Q3SocketDevice::NoError)
+    if (!isValid() || error() != MSocketDevice::NoError)
     {
         close();
         if (m_cb)
@@ -281,11 +281,11 @@ bool MythSocket::writeStringList(QStringList &list)
         return false;
     }
 
-    Q3CString utf8 = str.utf8();
+    QByteArray utf8 = str.toUtf8();
     int size = utf8.length();
     int written = 0;
 
-    Q3CString payload;
+    QByteArray payload;
     payload = payload.setNum(size);
     payload += "        ";
     payload.truncate(8);
@@ -321,7 +321,7 @@ bool MythSocket::writeStringList(QStringList &list)
             written += temp;
             size -= temp;
         }
-        else if (temp < 0 && error() != Q3SocketDevice::NoError)
+        else if (temp < 0 && error() != MSocketDevice::NoError)
         {
             VERBOSE(VB_IMPORTANT, LOC +
                     QString("writeStringList: Error, writeBlock failed. (%1)")
@@ -347,7 +347,7 @@ bool MythSocket::writeStringList(QStringList &list)
  *  \brief Write len bytes to data to socket
  *  \return true if entire len of data is written
  */
-bool MythSocket::writeData(const char *data, Q_ULONG len)
+bool MythSocket::writeData(const char *data, quint64 len)
 {
     if (state() != Connected)
     {
@@ -356,14 +356,14 @@ bool MythSocket::writeData(const char *data, Q_ULONG len)
         return false;
     }
 
-    Q_ULONG written = 0;
+    quint64 written = 0;
     uint zerocnt = 0;
 
     while (written < len)
     {
-        Q_LONG btw = len - written >= kSocketBufferSize ?
+        qint64 btw = len - written >= kSocketBufferSize ?
                                        kSocketBufferSize : len - written;
-        Q_LONG sret = writeBlock(data + written, btw);
+        qint64 sret = writeBlock(data + written, btw);
         if (sret > 0)
         {
             zerocnt = 0;
@@ -376,7 +376,7 @@ bool MythSocket::writeData(const char *data, Q_ULONG len)
             close();
             return false;
         }
-        else if (sret < 0 && error() != Q3SocketDevice::NoError)
+        else if (sret < 0 && error() != MSocketDevice::NoError)
         {
             VERBOSE(VB_IMPORTANT, LOC +
                     QString("writeData: Error, writeBlock: %1")
@@ -473,7 +473,7 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
         }
     }
 
-    Q3CString sizestr(8 + 1);
+    QByteArray sizestr(8 + 1, '\0');
     if (readBlock(sizestr.data(), 8) < 0)
     {
         VERBOSE(VB_GENERAL, LOC +
@@ -483,30 +483,30 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
         return false;
     }
 
-    sizestr = sizestr.stripWhiteSpace();
-    Q_LONG btr = sizestr.toInt();
+    QString sizes = sizestr;
+    qint64 btr = sizes.trimmed().toInt();
 
     if (btr < 1)
     {
         int pending = bytesAvailable();
-        Q3CString dump(pending + 1);
+        QByteArray dump(pending + 1, 0);
         readBlock(dump.data(), pending);
         VERBOSE(VB_IMPORTANT, LOC +
                 QString("Protocol error: '%1' is not a valid size " 
                         "prefix. %2 bytes pending.")
-                        .arg((const char *)sizestr).arg((const char *)pending));
+                        .arg(sizestr.data()).arg(pending));
         return false;
     }
 
-    Q3CString utf8(btr + 1);
+    QByteArray utf8(btr + 1, 0);
 
-    Q_LONG read = 0;
+    qint64 read = 0;
     int errmsgtime = 0;
     timer.start();
     
     while (btr > 0)
     {
-        Q_LONG sret = readBlock(utf8.data() + read, btr);
+        qint64 sret = readBlock(utf8.data() + read, btr);
         if (sret > 0)
         {
             read += sret;
@@ -516,7 +516,7 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
                 timer.start();
             }    
         } 
-        else if (sret < 0 && error() != Q3SocketDevice::NoError)
+        else if (sret < 0 && error() != MSocketDevice::NoError)
         {
             VERBOSE(VB_GENERAL, LOC +
                     QString("readStringList: Error, readBlock %1")
@@ -558,7 +558,7 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
 
     QString str = QString::fromUtf8(utf8.data());
 
-    Q3CString payload;
+    QByteArray payload;
     payload = payload.setNum(str.length());
     payload += "        ";
     payload.truncate(8);
@@ -577,7 +577,7 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
         VERBOSE(VB_NETWORK, msg);
     }
 
-    list = QStringList::split("[]:[]", str, true);
+    list = str.split("[]:[]");
 
     m_notifyread = false;
     WakeReadyReadThread();
@@ -600,7 +600,7 @@ void MythSocket::Unlock(void)
  *  \brief connect to host
  *  \return true on success
  */
-bool MythSocket::connect(const QString &host, Q_UINT16 port)
+bool MythSocket::connect(const QString &host, quint16 port)
 {
     QHostAddress hadr;
     hadr.setAddress(host);
@@ -611,7 +611,7 @@ bool MythSocket::connect(const QString &host, Q_UINT16 port)
  *  \brief connect to host
  *  \return true on success
  */
-bool MythSocket::connect(const QHostAddress &addr, Q_UINT16 port)
+bool MythSocket::connect(const QHostAddress &addr, quint16 port)
 {
     if (state() == Connected)
     {
@@ -623,7 +623,7 @@ bool MythSocket::connect(const QHostAddress &addr, Q_UINT16 port)
     VERBOSE(VB_SOCKET, LOC + QString("attempting connect() to (%1:%2)")
             .arg(addr.toString()).arg(port));
 
-    if (!Q3SocketDevice::connect(addr, port))
+    if (!MSocketDevice::connect(addr, port))
     {
         VERBOSE(VB_SOCKET, LOC + QString("connect() failed (%1)")
                 .arg(errorToString()));
@@ -753,6 +753,17 @@ void readyReadThread_iffound(MythSocket *sock)
     }
 }
 
+static bool isLocked(QMutex &mutex)
+{
+    bool isLocked = true;
+    if (mutex.tryLock())
+    {
+        mutex.unlock();
+        isLocked = false;
+    }
+    return isLocked;
+}
+
 void *MythSocket::readyReadThread(void *)
 {
     VERBOSE(VB_SOCKET, "MythSocket: readyread thread start");
@@ -797,7 +808,7 @@ void *MythSocket::readyReadThread(void *)
         {
             sock = m_readyread_list.at(i);
             if (sock->state() == Connected && !sock->m_notifyread &&
-                !sock->m_lock.locked())
+                !isLocked(sock->m_lock))
             {
                 HANDLE hEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
                 if (!hEvent)
@@ -884,7 +895,7 @@ void *MythSocket::readyReadThread(void *)
             sock = *it;
             if (sock->state() == Connected &&
                 sock->m_notifyread == false &&
-                !sock->m_lock.locked())
+                !isLocked(sock->m_lock))
             {
                 FD_SET(sock->socket(), &rfds);
                 maxfd = max(sock->socket(), maxfd);
@@ -906,7 +917,7 @@ void *MythSocket::readyReadThread(void *)
                 sock = *it;
                 if (sock->state() == Connected &&
                     FD_ISSET(sock->socket(), &rfds) &&
-                    !sock->m_lock.locked())
+                    !isLocked(sock->m_lock))
                 {
                     found = true;
                     break;

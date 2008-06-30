@@ -15,11 +15,11 @@
 #include <unistd.h>
 
 // Qt headers
-#include <qapplication.h>
-#include <qregexp.h>
-#include <Q3TextStream>
-#include <Q3CString>
-#include <Q3PtrList>
+#include <QApplication>
+#include <QRegExp>
+#include <QTextStream>
+#include <QTextCodec>
+#include <QByteArray>
 
 // MythTV headers
 #include "lcddevice.h"
@@ -41,8 +41,8 @@
 #define LCD_DEVICE_DEBUG 0
 
 LCD::LCD()
-    : QObject(NULL, "LCD"),
-      socket(NULL),                 socketLock(true),
+    : QObject(),
+      socket(NULL),                 socketLock(QMutex::Recursive),
       hostname("localhost"),        port(6545),
       bConnected(false),
 
@@ -65,6 +65,9 @@ LCD::LCD()
 
       GetLEDMask(NULL)
 {
+
+    setObjectName("LCD");
+
     // Constructor for LCD
     //
     // Note that this does *not* include opening the socket and initiating 
@@ -129,7 +132,6 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 
     // Open communications
     // Store the hostname and port in case we need to reconnect.
-    int timeout = 1000;
     hostname = lhostname;
     port = lport;
 
@@ -149,7 +151,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     if (res == 0)
     {
         // we need to start the mythlcdserver 
-        system(GetInstallPrefix() + "/bin/mythlcdserver -v none&");
+        system(qPrintable(GetInstallPrefix() + "/bin/mythlcdserver -v none&"));
     }
 
     if (!bConnected)
@@ -168,26 +170,16 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
                 socket->DownRef();
             socket = new MythSocket();
             socket->setCallbacks(this);
-            socket->connect(hostname, port);
-
-            timeout = 1000;
-            while (--timeout && socket->state() != MythSocket::Idle)
+            if (socket->connect(hostname, port))
             {
-                qApp->lock();
-                qApp->processEvents();
-                qApp->unlock();
-                usleep(1000);
-
-                if (socket->state() == MythSocket::Connected)
-                {
-                    lcd_ready = true;
-                    bConnected = true;
-
-                    Q3TextStream os(socket);
-                    os << "HELLO\n";
-                    break;
-                }
+                lcd_ready = true;
+                bConnected = true;
+                QTextStream os(socket);
+                os << "HELLO\n";
+                break;
             }
+
+            usleep(1000);
         }
         while (count < 10 && !bConnected);
     }
@@ -215,7 +207,8 @@ void LCD::sendToServer(const QString &someText)
 
         // Ack, connection to server has been severed try to re-establish the 
         // connection
-        retryTimer->start(10000, false);
+        retryTimer->setSingleShot(false);
+        retryTimer->start(10000);
         VERBOSE(VB_IMPORTANT, "lcddevice: Connection to LCDServer died unexpectedly.\n\t\t\t"
                          "Trying to reconnect every 10 seconds. . .");
 
@@ -223,8 +216,8 @@ void LCD::sendToServer(const QString &someText)
         return;
     }
 
-    Q3TextStream os(socket);
-    os.setEncoding(Q3TextStream::Latin1);
+    QTextStream os(socket);
+    os.setCodec(QTextCodec::codecForName("ISO 8859-1"));
 
     last_command = someText;
 
@@ -274,14 +267,14 @@ void LCD::readyRead(MythSocket *sock)
     // back) ignoring it.
 
     int dataSize = socket->bytesAvailable() + 1; 
-    Q3CString data(dataSize);
+    QByteArray data(dataSize + 1, 0);
 
     socket->readBlock(data.data(), dataSize);
 
     lineFromServer = data;
     lineFromServer = lineFromServer.replace( QRegExp("\n"), " " );
     lineFromServer = lineFromServer.replace( QRegExp("\r"), " " );
-    lineFromServer.simplifyWhiteSpace();
+    lineFromServer = lineFromServer.simplified();
 
 #if LCD_DEVICE_DEBUG > 4
     // Make debugging be less noisy
@@ -289,7 +282,7 @@ void LCD::readyRead(MythSocket *sock)
         VERBOSE(VB_IMPORTANT, "lcddevice: Received from server: " << lineFromServer);
 #endif
 
-    aList = QStringList::split(" ", lineFromServer);
+    aList = lineFromServer.split(" ");
     if (aList[0] == "CONNECTED")
     {
         // We got "CONNECTED", which is a response to "HELLO"
@@ -326,7 +319,7 @@ void LCD::readyRead(MythSocket *sock)
         VERBOSE(VB_IMPORTANT, QString("lcddevice: last command: %1").arg( last_command ));
     }
     else if (aList[0] == "KEY")
-        handleKeyPress(aList.last().stripWhiteSpace());
+        handleKeyPress(aList.last().trimmed());
 }
 
 void LCD::handleKeyPress(QString key_pressed)
@@ -347,7 +340,7 @@ void LCD::handleKeyPress(QString key_pressed)
     else if (mykey == lcd_keystring.at(5))
         key = Qt::Key_Escape;
 
-    QApplication::postEvent(QApplication::activeWindow(),
+    QApplication::postEvent((QObject *)(QApplication::activeWindow()),
                             new ExternalKeycodeEvent(key));
 }
 
@@ -471,7 +464,8 @@ void LCD::setupLEDs(int(*LedMaskFunc)(void))
 { 
     GetLEDMask = LedMaskFunc;
     // update LED status every 10 seconds
-    LEDTimer->start(10000, FALSE); 
+    LEDTimer->setSingleShot(false);
+    LEDTimer->start(10000); 
 }
 
 void LCD::outputLEDs()
@@ -525,7 +519,7 @@ void LCD::switchToChannel(QString channum, QString title, QString subtitle)
             + quotedString(subtitle));
 }
 
-void LCD::switchToMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_name,
+void LCD::switchToMenu(QList<LCDMenuItem> &menuItems, QString app_name,
                        bool popMenu)
 {
     if (!lcd_ready || !lcd_showmenu)
@@ -535,7 +529,7 @@ void LCD::switchToMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_name,
     VERBOSE(VB_IMPORTANT, "lcddevice: switchToMenu");
 #endif
 
-    if (menuItems->isEmpty())
+    if (menuItems.isEmpty())
         return;
 
     QString s = "SWITCH_TO_MENU ";
@@ -544,12 +538,12 @@ void LCD::switchToMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_name,
     s += " " + QString(popMenu ? "TRUE" : "FALSE");
 
 
-    Q3PtrListIterator<LCDMenuItem> it(*menuItems);
-    LCDMenuItem *curItem;
+    QListIterator<LCDMenuItem> it(menuItems);
+    const LCDMenuItem *curItem;
 
-    while ((curItem = it.current()) != 0)
+    while (it.hasNext())
     {
-        ++it;
+        curItem = &(it.next());
         s += " " + quotedString(curItem->ItemName());
 
         if (curItem->isChecked() == CHECKED)
@@ -569,7 +563,7 @@ void LCD::switchToMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_name,
     sendToServer(s);
 }
 
-void LCD::switchToGeneric(Q3PtrList<LCDTextItem> *textItems)
+void LCD::switchToGeneric(QList<LCDTextItem> &textItems)
 {
     if (!lcd_ready || !lcd_showgeneric)
         return;
@@ -578,17 +572,18 @@ void LCD::switchToGeneric(Q3PtrList<LCDTextItem> *textItems)
     VERBOSE(VB_IMPORTANT, "lcddevice: switchToGeneric ");
 #endif
 
-    if (textItems->isEmpty())
+    if (textItems.isEmpty())
         return;
 
     QString s = "SWITCH_TO_GENERIC";
 
-    Q3PtrListIterator<LCDTextItem> it(*textItems);
-    LCDTextItem *curItem;
+    QListIterator<LCDTextItem> it(textItems);
+    const LCDTextItem *curItem;
 
-    while ((curItem = it.current()) != 0)
+    while (it.hasNext())
     {
-        ++it;
+        curItem = &(it.next());
+
         QString sRow;
         sRow.setNum(curItem->getRow());
         s += " " + sRow;
