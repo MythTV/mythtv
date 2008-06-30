@@ -20,7 +20,7 @@
 #include	<stdlib.h>
 #include	<string.h>
 
-#include	"../libmyth/mythconfig.h"
+#include	"libmythdb/mythconfig.h"
 
 #include	"samplerate.h"
 #include	"common.h"
