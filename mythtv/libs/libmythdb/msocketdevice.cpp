@@ -42,12 +42,9 @@
 ****************************************************************************/
 
 #include "msocketdevice.h"
-#ifndef QT_NO_NETWORK
 
 #include "qwindowdefs.h"
 #include <string.h>
-
-QT_BEGIN_NAMESPACE
 
 //#define MSOCKETDEVICE_DEBUG
 
@@ -547,6 +544,3 @@ void MSocketDevice::setError( Error err )
     \internal
 */
 
-QT_END_NAMESPACE
-
-#endif //QT_NO_NETWORK

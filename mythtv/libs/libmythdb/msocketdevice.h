@@ -47,12 +47,6 @@
 #include <QtCore/qiodevice.h>
 #include <QtNetwork/qhostaddress.h> // int->QHostAddress conversion
 
-QT_BEGIN_HEADER
-
-QT_BEGIN_NAMESPACE
-
-#ifndef QT_NO_NETWORK
-
 class MSocketDevicePrivate;
 
 class MSocketDevice: public QIODevice
@@ -167,11 +161,5 @@ private:	// Disabled copy constructor and operator=
     MSocketDevice &operator=( const MSocketDevice & );
 #endif
 };
-
-#endif // QT_NO_NETWORK
-
-QT_END_NAMESPACE
-
-QT_END_HEADER
 
 #endif // MSOCKETDEVICE_H
