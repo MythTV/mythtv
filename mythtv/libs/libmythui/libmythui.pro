@@ -75,6 +75,7 @@ macx {
     HEADERS += screensaver-osx.h   DisplayResOSX.h
     SOURCES += screensaver-osx.cpp DisplayResOSX.cpp
 
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
     LIBS           += -framework Carbon -framework OpenGL
 
