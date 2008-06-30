@@ -189,12 +189,11 @@ void DatabaseBox::showWaiting()
         if (class LCD * lcd = LCD::Get())
         {
             // Set Loading Message on the LCD
-            Q3PtrList<LCDTextItem> textItems;
-            textItems.setAutoDelete(true);
+            QList<LCDTextItem> textItems;
 
-            textItems.append(new LCDTextItem(1, ALIGN_CENTERED, 
+            textItems.append(LCDTextItem(1, ALIGN_CENTERED, 
                              tr("Loading Music Data"), "Generic", false));
-            lcd->switchToGeneric(&textItems);
+            lcd->switchToGeneric(textItems);
         }
 
         for (int i = 0; i < numb_wait_dots; i++)

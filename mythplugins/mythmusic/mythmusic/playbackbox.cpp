@@ -143,12 +143,11 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     if (class LCD *lcd = LCD::Get())
     {
         // Set please wait on the LCD
-        Q3PtrList<LCDTextItem> textItems;
-        textItems.setAutoDelete(true);
+        QList<LCDTextItem> textItems;
 
-        textItems.append(new LCDTextItem(1, ALIGN_CENTERED, "Please Wait", 
+        textItems.append(LCDTextItem(1, ALIGN_CENTERED, "Please Wait", 
                          "Generic"));
-        lcd->switchToGeneric(&textItems);
+        lcd->switchToGeneric(textItems);
     }
 
     // We set a timer to load the playlists. We do this for two reasons: 
@@ -1264,11 +1263,10 @@ void PlaybackBoxMusic::showSpeed(bool on_or_off)
         float playSpeed = gPlayer->getSpeed();
         speed_text.sprintf("x%4.2f", playSpeed);
         speed_text = tr("Speed: ") + speed_text;
-        Q3PtrList<LCDTextItem> textItems;
-        textItems.setAutoDelete(true);
-        textItems.append(new LCDTextItem(lcd->getLCDHeight() / 2, ALIGN_CENTERED,
-                                         speed_text, "Generic", false));
-        lcd->switchToGeneric(&textItems);
+        QList<LCDTextItem> textItems;
+        textItems.append(LCDTextItem(lcd->getLCDHeight() / 2, ALIGN_CENTERED,
+                                     speed_text, "Generic", false));
+        lcd->switchToGeneric(textItems);
     }
 }
 

@@ -755,10 +755,9 @@ void MiniPlayer::showSpeed(void)
 
     if (class LCD *lcd = LCD::Get())
     {
-        Q3PtrList<LCDTextItem> textItems;
-        textItems.setAutoDelete(true);
-        textItems.append(new LCDTextItem(lcd->getLCDHeight() / 2, ALIGN_CENTERED,
-                                         msg, "Generic", false));
-        lcd->switchToGeneric(&textItems);
+        QList<LCDTextItem> textItems;
+        textItems.append(LCDTextItem(lcd->getLCDHeight() / 2, ALIGN_CENTERED,
+                                     msg, "Generic", false));
+        lcd->switchToGeneric(textItems);
     }
 }

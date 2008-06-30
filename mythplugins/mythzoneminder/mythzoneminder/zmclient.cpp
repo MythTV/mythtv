@@ -464,7 +464,7 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
                 timer.start();
             }
         }
-        else if (sret < 0 && m_socket->error() != Q3SocketDevice::NoError)
+        else if (sret < 0 && m_socket->error() != MSocketDevice::NoError)
         {
             VERBOSE(VB_GENERAL, QString("readData: Error, readBlock %1")
                             .arg(m_socket->errorToString()));

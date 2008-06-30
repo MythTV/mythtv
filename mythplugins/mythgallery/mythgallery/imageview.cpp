@@ -158,14 +158,13 @@ void ImageView::UpdateLCD(const ThumbItem *item)
     QString desc = QString::number(m_pos + 1) + " / " +
         QString::number(m_itemList.count());
 
-    Q3PtrList<LCDTextItem> textItems;
-    textItems.setAutoDelete(true);
-    textItems.append(new LCDTextItem(
+    QList<LCDTextItem> textItems;
+    textItems.append(LCDTextItem(
                          1, ALIGN_CENTERED, name, "Generic", true));
-    textItems.append(new LCDTextItem(
+    textItems.append(LCDTextItem(
                          2, ALIGN_CENTERED, desc, "Generic", false));
 
-    lcd->switchToGeneric(&textItems);
+    lcd->switchToGeneric(textItems);
 }
 
 QString ImageView::GetDescriptionStatus(void) const

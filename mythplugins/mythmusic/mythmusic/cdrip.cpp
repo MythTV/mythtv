@@ -176,11 +176,10 @@ void CDRipperThread::run(void)
     if (class LCD * lcd = LCD::Get()) 
     {
         QString lcd_tots = QObject::tr("Importing ") + tots;
-        Q3PtrList<LCDTextItem> textItems;
-        textItems.setAutoDelete(true);
-        textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
+        QList<LCDTextItem> textItems;
+        textItems.append(LCDTextItem(1, ALIGN_CENTERED,
                                          lcd_tots, "Generic", false));
-        lcd->switchToGeneric(&textItems);
+        lcd->switchToGeneric(textItems);
     }
 
     Metadata *titleTrack = NULL;
