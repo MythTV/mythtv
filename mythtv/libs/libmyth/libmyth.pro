@@ -103,6 +103,8 @@ cygwin {
 }
 
 mingw {
+    include ( ../libs-windows.pro )
+
     SOURCES += mediamonitor-windows.cpp audiooutputwin.cpp
     HEADERS += mediamonitor-windows.h   audiooutputwin.h
 
@@ -127,8 +129,6 @@ mingw {
 macx {
     HEADERS += audiooutputca.h
     SOURCES += audiooutputca.cpp
-    HEADERS += util-osx.h
-    SOURCES += util-osx.cpp
 
     darwin_da {
         HEADERS += mediamonitor-darwin.h

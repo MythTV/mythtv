@@ -6,7 +6,7 @@ using namespace std;
 #import <IOKit/graphics/IOGraphicsLib.h> // for IODisplayCreateInfoDictionary()
 
 #include "DisplayResOSX.h"
-#include "libmyth/util-osx.h"
+#include "util-osx.h"
 
 CGDirectDisplayID mythtv_display();
 

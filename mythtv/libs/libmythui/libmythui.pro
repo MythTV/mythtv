@@ -72,8 +72,8 @@ using_x11 {
 }
 
 macx {
-    HEADERS += screensaver-osx.h   DisplayResOSX.h
-    SOURCES += screensaver-osx.cpp DisplayResOSX.cpp
+    HEADERS += screensaver-osx.h   DisplayResOSX.h   util-osx.h
+    SOURCES += screensaver-osx.cpp DisplayResOSX.cpp util-osx.cpp
 
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
