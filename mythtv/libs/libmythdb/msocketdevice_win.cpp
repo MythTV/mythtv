@@ -69,8 +69,6 @@
 #  define QT_SS_PAD1SIZE (QT_SS_ALIGNSIZE - sizeof (short))
 #  define QT_SS_PAD2SIZE (QT_SS_MAXSIZE - (sizeof (short) + QT_SS_PAD1SIZE + QT_SS_ALIGNSIZE))
 
-QT_BEGIN_NAMESPACE
-
 struct qt_sockaddr_storage {
       short ss_family;
       char __ss_pad1[QT_SS_PAD1SIZE];
@@ -1066,4 +1064,3 @@ QHostAddress MSocketDevice::peerAddress() const
     return pa;
 }
 
-QT_END_NAMESPACE

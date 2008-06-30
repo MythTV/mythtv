@@ -71,14 +71,10 @@ static inline int qt_socket_socket(int domain, int type, int protocol)
 
 #include "msocketdevice.h"
 
-#ifndef QT_NO_NETWORK
-
 #include "qwindowdefs.h"
 
 #include <errno.h>
 #include <sys/types.h>
-
-QT_BEGIN_NAMESPACE
 
 static inline void qt_socket_getportaddr( struct sockaddr *sa,
 					  quint16 *port, QHostAddress *addr )
@@ -1076,6 +1072,3 @@ QHostAddress MSocketDevice::peerAddress() const
     return pa;
 }
 
-QT_END_NAMESPACE
-
-#endif //QT_NO_NETWORK
