@@ -21,6 +21,7 @@ using namespace std;
 #include "mythpainter_ogl.h"
 #include "mythfontproperties.h"
 
+#define MAX_GL_ITEMS 128
 #define MAX_STRING_ITEMS 48
 
 #ifndef GL_TEXTURE_RECTANGLE_ARB
@@ -36,31 +37,8 @@ using namespace std;
 #endif
 
 MythOpenGLPainter::MythOpenGLPainter() :
-    MythPainter(), q_gl_texture(-1), m_realParent(NULL)
+    MythPainter(), q_gl_texture(-1), texture_rects(false), m_maxTexDim(-1)
 {
-    QString extensions(reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
-  
-    texture_rects = 1;
-    if (extensions.contains("GL_NV_texture_rectangle"))
-    {
-        VERBOSE(VB_GENERAL, "Using NV NPOT texture extension");
-        q_gl_texture = GL_TEXTURE_RECTANGLE_NV;
-    }
-    else if (extensions.contains("GL_ARB_texture_rectangle"))
-    {
-        VERBOSE(VB_GENERAL, "Using ARB NPOT texture extension");
-        q_gl_texture = GL_TEXTURE_RECTANGLE_ARB;
-    }
-    else if (extensions.contains("GL_EXT_texture_rectangle"))
-    {
-        VERBOSE(VB_GENERAL, "Using EXT NPOT texture extension");
-        q_gl_texture = GL_TEXTURE_RECTANGLE_EXT;
-    }
-    else
-    {
-        texture_rects = 0;
-        q_gl_texture = GL_TEXTURE_2D;
-    }
 }
 
 MythOpenGLPainter::~MythOpenGLPainter()
@@ -76,8 +54,6 @@ void MythOpenGLPainter::Begin(QWidget *parent)
     QGLWidget *realParent = dynamic_cast<QGLWidget *>(parent);
     assert(realParent);
 
-    m_realParent = realParent;
-
     realParent->makeCurrent();
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -89,6 +65,12 @@ void MythOpenGLPainter::Begin(QWidget *parent)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     //glTranslatef(0.2, 0.2, 0.0);
+
+    GLint param;
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &param);
+    m_maxTexDim = param;
+    if (m_maxTexDim == 0)
+        m_maxTexDim = 512;
 }
 
 void MythOpenGLPainter::End(void)
@@ -103,19 +85,165 @@ void MythOpenGLPainter::End(void)
     MythPainter::End();
 }
 
+// returns the highest number closest to v, which is a power of 2
+// NB! assumes 32 bit ints
+int MythOpenGLPainter::NearestGLTextureSize(int v)
+{
+    int n = 0, last = 0;
+    int s;
+
+    for (s = 0; s < 32; ++s) 
+    {
+        if (((v >> s) & 1) == 1) 
+        {
+            ++n;
+            last = s;
+        }
+    }
+
+    if (n > 1)
+        s = 1 << (last + 1);
+    else
+        s = 1 << last;
+
+    return min(s, m_maxTexDim);
+}
+
+void MythOpenGLPainter::RemoveImageFromCache(MythImage *im)
+{
+    if (m_ImageIntMap.contains(im))
+    {
+        GLuint textures[1];
+        textures[0] = m_ImageIntMap[im];
+
+        glDeleteTextures(1, textures);
+        m_ImageIntMap.erase(im);
+
+        m_ImageExpireList.remove(im);
+    }
+}
+
+void MythOpenGLPainter::BindTextureFromCache(MythImage *im, 
+                                             bool alphaonly)
+{
+    static bool init_extensions = true;
+    static bool generate_mipmaps = false;
+
+    if (init_extensions)
+    {
+        QString extensions(reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS)));
+
+        texture_rects = true;
+        if (extensions.contains("GL_NV_texture_rectangle"))
+        {
+            VERBOSE(VB_GENERAL, "Using NV NPOT texture extension");
+            q_gl_texture = GL_TEXTURE_RECTANGLE_NV;
+        }
+        else if (extensions.contains("GL_ARB_texture_rectangle"))
+        {
+            VERBOSE(VB_GENERAL, "Using ARB NPOT texture extension");
+            q_gl_texture = GL_TEXTURE_RECTANGLE_ARB;
+        }
+        else if (extensions.contains("GL_EXT_texture_rectangle"))
+        {
+            VERBOSE(VB_GENERAL, "Using EXT NPOT texture extension");
+            q_gl_texture = GL_TEXTURE_RECTANGLE_EXT;
+        }
+        else
+        {
+            texture_rects = false;
+            q_gl_texture = GL_TEXTURE_2D;
+        }
+
+        if (!texture_rects)
+            generate_mipmaps = extensions.contains("GL_SGIS_generate_mipmap");
+        else
+            generate_mipmaps = false;
+
+        init_extensions = false;
+    }
+
+    if (m_ImageIntMap.contains(im))
+    {
+        long val = m_ImageIntMap[im];
+
+        if (!im->IsChanged())
+        {
+            m_ImageExpireList.remove(im);
+            m_ImageExpireList.push_back(im);
+            glBindTexture(q_gl_texture, val);
+            return;
+        }
+        else
+        {
+            RemoveImageFromCache(im);
+        }
+    }
+
+    im->SetChanged(false);
+
+    // Scale the pixmap if needed. GL textures needs to have the
+    // dimensions 2^n+2(border) x 2^m+2(border).
+    QImage tx;
+
+    if (!texture_rects)
+    {
+        // Scale the pixmap if needed. GL textures needs to have the
+        // dimensions 2^n+2(border) x 2^m+2(border).
+        int tx_w = NearestGLTextureSize(im->width());
+        int tx_h = NearestGLTextureSize(im->height());
+        if (tx_w != im->width() || tx_h !=  im->height())
+            tx = QGLWidget::convertToGLFormat(im->scaled(tx_w, tx_h));
+        else
+            tx = QGLWidget::convertToGLFormat(*im);
+    }
+    else
+        tx = QGLWidget::convertToGLFormat(*im);
+
+    GLuint format = GL_RGBA8;
+    if (alphaonly)
+        format = GL_ALPHA;
+
+    GLuint tx_id;
+    glGenTextures(1, &tx_id);
+    glBindTexture(q_gl_texture, tx_id);
+    glTexParameteri(q_gl_texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    if (generate_mipmaps) 
+    {
+        glHint(GL_GENERATE_MIPMAP_HINT_SGIS, GL_NICEST);
+        glTexParameteri(q_gl_texture, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+        glTexParameterf(q_gl_texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    }
+    else
+        glTexParameterf(q_gl_texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    glTexImage2D(q_gl_texture, 0, format, tx.width(), tx.height(), 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, tx.bits());
+
+    m_ImageIntMap[im] = tx_id;
+    m_ImageExpireList.push_back(im);
+
+    if (m_ImageExpireList.size() > MAX_GL_ITEMS)
+    {
+        MythImage *expiredIm = m_ImageExpireList.front();
+        m_ImageExpireList.pop_front();
+        RemoveImageFromCache(expiredIm);
+    }
+}
+
 void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im, 
                                   const QRect &src, int alpha)
 {
-    int imageId;
     double x1, y1, x2, y2;
 
     glClearDepth(1.0f);
 
     // see if we have this pixmap cached as a texture - if not cache it
-    imageId = m_realParent->bindTexture(*im, q_gl_texture);
-    im->SetID(imageId);
+    BindTextureFromCache(im);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     glPushAttrib(GL_CURRENT_BIT);
 
     glColor4f(1.0, 1.0, 1.0, alpha / 255.0);
@@ -178,10 +306,23 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
 
     MythImage *im = GetFormatImage();
 
+    int w, h;
+
+    if (!texture_rects)
+    {
+        w = NearestGLTextureSize(r.width());
+        h = NearestGLTextureSize(r.height());
+    }
+    else
+    {
+        w = r.width();
+        h = r.height();
+    }
+
     QPoint drawOffset;
     font.GetOffset(drawOffset);
 
-    QImage pm(r.size(), QImage::Format_ARGB32);
+    QImage pm(QSize(w, h), QImage::Format_ARGB32);
     pm.fill(QColor(255, 255, 255, 0).rgba());
 
     QPainter tmp(&pm);
@@ -281,6 +422,12 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
             height = boundRect.height()-r.y();
         }
 
+        if (!texture_rects)
+        {
+            width  = NearestGLTextureSize(width);
+            height = NearestGLTextureSize(height);
+        }
+
         QImage newpm(QSize(width,height), QImage::Format_ARGB32);
         newpm = pm.copy(x, y, width, height);
         pm = newpm;
@@ -330,7 +477,6 @@ MythImage *MythOpenGLPainter::GetFormatImage()
 
 void MythOpenGLPainter::DeleteFormatImage(MythImage *im)
 {
-    if (m_realParent && im)
-        m_realParent->deleteTexture(im->GetID());
+    RemoveImageFromCache(im);
 }
 
