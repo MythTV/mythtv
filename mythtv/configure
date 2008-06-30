@@ -1732,7 +1732,12 @@ has_library()
     HAS_IT="no"
     for LIBPATH in $LIBPATHS ; do
         if test x`ls $LIBPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
+            echo "$1  IS at $LIBPATH"
+            expr 1 > /dev/null
+            return
             HAS_IT="yes"
+        else
+            echo "$1 not at $LIBPATH"
         fi
     done
     expr $HAS_IT : "yes" > /dev/null
@@ -3070,6 +3075,7 @@ echo "#define FFMPEG_CONFIGURATION \"$FFMPEG_CONFIGURATION\"" >> $TMPH
 
 echo "RUNPREFIX=$RUNPREFIX" >> $MYTH_CONFIG_MAK
 echo "PREFIX=$PREFIX" >> $MYTH_CONFIG_MAK
+echo "LIBDIRNAME=$libdir_name" >> $MYTH_CONFIG_MAK
 echo "LIBDIR=$libdir" >> $MYTH_CONFIG_MAK
 <<BLOCK_QUOTE
 echo "SHLIBDIR=\$(DESTDIR)$shlibdir" >> config.mak

@@ -226,6 +226,7 @@ class MythContextPrivate
 
     QString   m_installprefix;     ///< Compile-time RUNPREFIX, or generated
                                    ///< from enviroment ($MYTHTVDIR or $cwd)
+    QString   m_libname;           ///< Compile-time LIBDIRNAME
 
     bool      m_gui;               ///< Should this context use GUI elements?
     bool      m_backend;           ///< Is this host any sort of backend?
@@ -313,7 +314,7 @@ class MythContextPrivate
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
     : parent(lparent),
       m_settings(new Settings()), m_qtThemeSettings(new Settings()),
-      m_installprefix(RUNPREFIX),
+      m_installprefix(RUNPREFIX), m_libname(LIBDIRNAME),
       m_gui(false), m_backend(false), m_themeloaded(false),
       m_menuthemepathname(QString::null), m_themepathname(QString::null),
       m_backgroundimage(NULL),
@@ -1926,7 +1927,7 @@ QString MythContext::GetShareDir(void)
 
 QString MythContext::GetLibraryDir(void) 
 { 
-    return d->m_installprefix + "/lib/mythtv/"; 
+    return d->m_installprefix + "/" + d->m_libname + "/mythtv/"; 
 }
 
 QString MythContext::GetThemesParentDir(void) 

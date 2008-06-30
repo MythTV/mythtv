@@ -6,8 +6,11 @@ isEmpty( PREFIX ) {
 isEmpty( RUNPREFIX ) {
     RUNPREFIX = $$PREFIX
 }
+isEmpty( LIBDIRNAME ) {
+    LIBDIRNAME = lib
+}
 isEmpty( LIBDIR ) {
-    LIBDIR = $${RUNPREFIX}/lib
+    LIBDIR = $${RUNPREFIX}/$${LIBDIRNAME}
 }
 
 LIBVERSION = 0.21

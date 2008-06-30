@@ -84,6 +84,8 @@ inc2.files = $${inc.files}
 
 
 DEFINES += RUNPREFIX=\"$${RUNPREFIX}\"
+DEFINES += LIBDIRNAME=\"$${LIBDIRNAME}\"
+
 
 using_oss {
     DEFINES += USING_OSS
