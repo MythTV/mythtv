@@ -2,7 +2,7 @@
 # libmyth is built last, so the other two libraries need to either know,
 # or ignore, the missing symbols that will be defined in libmyth.
 
-macx:QMAKE_LFLAGS_SHLIB += -undefined warning
+#macx:QMAKE_LFLAGS_SHLIB += -undefined warning
 
 mingw {
     # Worked around by building libmyth first,
