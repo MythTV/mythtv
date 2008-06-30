@@ -7,7 +7,7 @@ CONFIG += thread staticlib warn_off
 CONFIG -= qt
 target.path = $${LIBDIR}
 
-INCLUDEPATH += ../ ../../ ../libmyth
+INCLUDEPATH += ../ ../../ ../libmythdb
 
 #build position independent code since the library is linked into a shared library
 QMAKE_CFLAGS += -fPIC -DPIC
