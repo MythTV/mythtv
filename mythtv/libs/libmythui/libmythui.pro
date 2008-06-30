@@ -1,6 +1,5 @@
 include ( ../../config.mak )
 include ( ../../settings.pro )
-include ( ../libs-dephack.pro )
 
 TEMPLATE = lib
 TARGET = mythui-$$LIBVERSION

@@ -103,27 +103,10 @@ cygwin {
 }
 
 mingw {
-    include ( ../libs-windows.pro )
-
     SOURCES += mediamonitor-windows.cpp audiooutputwin.cpp
     HEADERS += mediamonitor-windows.h   audiooutputwin.h
 
     LIBS += -lpthread -lwinmm -lws2_32
-
-    LIBS -= -lmythui-$$LIBVERSION  -lmythupnp-$$LIBVERSION 
-    LIBS += -L. -lmythui-bootstrap -lmythupnp-bootstrap
-    POST_TARGETDEPS += libmythui-bootstrap.a libmythupnp-bootstrap.a
-    implib.target    = libmythui-bootstrap.a
-    implib.depends   = ../libmythui/libmythui.def
-    implib.commands  = dlltool --input-def $$implib.depends   \
-                       --dllname libmythui-$${LIBVERSION}.dll \
-                       --output-lib $$implib.target  -k
-    implib2.target   = libmythupnp-bootstrap.a
-    implib2.depends  = ../libmythupnp/libmythupnp.def
-    implib2.commands = dlltool --input-def $$implib2.depends    \
-                       --dllname libmythupnp-$${LIBVERSION}.dll \
-                       --output-lib $$implib2.target  -k
-    QMAKE_EXTRA_WIN_TARGETS += implib implib2
 }
 
 macx {

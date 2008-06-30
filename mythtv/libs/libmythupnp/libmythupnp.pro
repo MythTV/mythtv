@@ -1,7 +1,6 @@
 include ( ../../config.mak )
 include ( ../../settings.pro )
 include ( ../../version.pro )
-include ( ../libs-dephack.pro )
  
 TEMPLATE = lib
 TARGET = mythupnp-$$LIBVERSION

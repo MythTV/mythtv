@@ -4,6 +4,7 @@
 // C++ headers
 #include <deque>
 #include <vector>
+#include <pthread.h>
 using namespace std;
 
 // Qt headers
