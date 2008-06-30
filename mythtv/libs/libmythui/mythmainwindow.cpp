@@ -262,6 +262,11 @@ MythMainWindow *GetMythMainWindow(void)
     return MythMainWindow::getMainWindow();
 }
 
+bool HasMythMainWindow(void)
+{
+    return (mainWin);
+}
+
 void DestroyMythMainWindow(void)
 {
     MythMainWindow::destroyMainWindow();

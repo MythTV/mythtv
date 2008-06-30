@@ -134,6 +134,7 @@ class MythMainWindow : public QWidget
 };
 
 MythMainWindow *GetMythMainWindow();
+bool HasMythMainWindow();
 void DestroyMythMainWindow();
 
 MythPainter *GetMythPainter();

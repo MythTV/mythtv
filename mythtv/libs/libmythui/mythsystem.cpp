@@ -56,7 +56,7 @@ uint myth_system(const QString &command, int flags)
 {
     (void)flags; /* Kill warning */
 
-    bool ready_to_lock = GetMythMainWindow();
+    bool ready_to_lock = HasMythMainWindow();
 
     (void)ready_to_lock; /* Kill warning */
 #ifdef USE_LIRC
