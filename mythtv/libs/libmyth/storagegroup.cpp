@@ -3,9 +3,9 @@
 #include <qregexp.h>
 
 #include "storagegroup.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/mythdbcon.h"
-#include "libmyth/util.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "util.h"
 
 #define LOC QString("SG(%1): ").arg(m_groupname)
 #define LOC_WARN QString("SG(%1) Warning: ").arg(m_groupname)

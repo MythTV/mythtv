@@ -18,6 +18,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "previewgenerator.h"
 #include "compat.h"
+#include "mythuihelper.h"
 
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")
@@ -429,7 +430,7 @@ QString NetworkControl::processKey(QStringList tokens)
         {
             int keyCode = keyMap[tokens[curToken]];
 
-            gContext->ResetScreensaver();
+            GetMythUI()->ResetScreensaver();
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, 0, Qt::NoButton);
             QApplication::postEvent(keyDest, event);
@@ -473,7 +474,7 @@ QString NetworkControl::processKey(QStringList tokens)
                     buttons = Qt::ShiftButton;
             }
 
-            gContext->ResetScreensaver();
+            GetMythUI()->ResetScreensaver();
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, ch, buttons,
                                   tokens[curToken]);

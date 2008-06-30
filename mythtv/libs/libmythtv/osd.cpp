@@ -25,10 +25,13 @@ using namespace std;
 #include "osdsurface.h"
 #include "mythcontext.h"
 #include "textsubtitleparser.h"
-#include "libmyth/oldsettings.h"
+#include "oldsettings.h"
 #include "udpnotify.h"
 #include "compat.h"
 #include "util.h"
+
+#include "x11colors.h"
+#include "mythdirs.h"
 
 #include "osdtypeteletext.h"
 #include "osdlistbtntype.h"
@@ -613,13 +616,13 @@ void OSD::Reinit(const QRect &totalBounds,   int   frameRate,
 
 QString OSD::FindTheme(QString name)
 {
-    QString testdir = MythContext::GetConfDir() + "/osd/" + name;
+    QString testdir = GetConfDir() + "/osd/" + name;
     
     QDir dir(testdir);
     if (dir.exists())
         return testdir;
 
-    testdir = gContext->GetShareDir() + "themes/" + name;
+    testdir = GetShareDir() + "themes/" + name;
     dir.setPath(testdir);
     if (dir.exists())
         return testdir;
@@ -634,7 +637,7 @@ QString OSD::FindTheme(QString name)
 
 TTFFont *OSD::LoadFont(QString name, int size)
 {
-    QString fullname = MythContext::GetConfDir() + "/" + name;
+    QString fullname = GetConfDir() + "/" + name;
     TTFFont *font = new TTFFont((char *)fullname.ascii(), size,
                                 wscale, hmult*fscale);
 
@@ -642,7 +645,7 @@ TTFFont *OSD::LoadFont(QString name, int size)
         return font;
 
     delete font;
-    fullname = gContext->GetShareDir() + name;
+    fullname = GetShareDir() + name;
 
     font = new TTFFont((char *)fullname.ascii(), size,
                        wscale, hmult*fscale);

@@ -8,10 +8,12 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
-#include "util.h"
+#include <iostream>
+
+#include "mythtimer.h"
 #include "bufferedsocketdevice.h"
 #include "upnputil.h"
-#include "mythcontext.h"  // for VERBOSE
+#include "mythverbose.h"  // for VERBOSE
 
 /////////////////////////////////////////////////////////////////////////////
 //

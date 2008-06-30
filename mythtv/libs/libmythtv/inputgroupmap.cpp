@@ -21,6 +21,7 @@
 
 #include "inputgroupmap.h"
 #include "mythdbcon.h"
+#include "mythcontext.h"
 
 bool InputGroupMap::Build(void)
 {

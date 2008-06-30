@@ -13,40 +13,14 @@ using namespace std;
 #include <time.h>
 
 #include "mythexp.h"
-
-#define MYTH_SYSTEM_DONT_BLOCK_LIRC          0x1 //< myth_system() flag to avoid blocking
-#define MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU 0x2 //< myth_system() flag to avoid blocking
-#define MYTH_SYSTEM_DONT_BLOCK_PARENT        0x4 //< myth_system() flag to avoid blocking
+#include "libmythdb/mythtimer.h"
+#include "libmythui/mythsystem.h"
 
 class QPixmap;
 class QImage;
 class QPainter;
 class QFont;
 class QFile;
-
-class MPUBLIC MythTimer
-{
-  public:
-    MythTimer() : m_running(false) {}
-
-    void start() { m_running = true; m_timer.start(); }
-    int restart() { int ret = elapsed(); 
-                    m_timer.restart(); 
-                    return ret; 
-                  }
-    int elapsed() { int ret = m_timer.elapsed();
-                    if (ret > 86300000) { ret = 0;  m_timer.restart(); }
-                    return ret;
-                  }
-    void stop() { m_running = false; }
-    bool isRunning() const { return m_running; }
-
-    void addMSecs(int ms) { m_timer.addMSecs(ms); }
-
-  private:
-    QTime m_timer;
-    bool  m_running;
-};
 
 MPUBLIC QDateTime mythCurrentDateTime();
 MPUBLIC int calc_utc_offset(void);
@@ -60,9 +34,6 @@ MPUBLIC long long decodeLongLong(QStringList &list, uint offset);
 MPUBLIC long long decodeLongLong(QStringList &list, QStringList::const_iterator &it);
 
 MPUBLIC QRgb blendColors(QRgb source, QRgb add, int alpha);
-MPUBLIC QColor createColor(const QString &color);
-
-MPUBLIC uint myth_system(const QString &command, int flags = 0);
 
 MPUBLIC QString cutDownString(const QString &text, QFont *testFont, uint maxwidth);
 

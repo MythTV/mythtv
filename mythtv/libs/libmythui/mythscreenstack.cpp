@@ -2,6 +2,7 @@
 #include "mythmainwindow.h"
 #include "mythscreentype.h"
 #include "mythpainter.h"
+#include "mythevent.h"
 
 #include <iostream>
 #include <cassert>

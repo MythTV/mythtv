@@ -22,11 +22,12 @@
 #include <Q3PtrList>
 
 // MythTV headers
-#include "libmythui/mythmainwindow.h"
 #include "lcddevice.h"
-#include "mythcontext.h"
-#include "mythdialogs.h"
+#include "mythverbose.h"
 #include "compat.h"
+#include "mythdb.h"
+#include "mythdirs.h"
+#include "mythevent.h"
 
 /*
   LCD_DEVICE_DEBUG control how much debug info we get
@@ -101,9 +102,9 @@ void LCD::SetupLCD (void)
         m_server_unavailable = false;
     }
 
-    lcd_host = gContext->GetSetting("LCDServerHost", "localhost");
-    lcd_port = gContext->GetNumSetting("LCDServerPort", 6545);
-    m_enabled = gContext->GetNumSetting("LCDEnable", 0);
+    lcd_host = GetMythDB()->GetSetting("LCDServerHost", "localhost");
+    lcd_port = GetMythDB()->GetNumSetting("LCDServerPort", 6545);
+    m_enabled = GetMythDB()->GetNumSetting("LCDEnable", 0);
 
     if (m_enabled && lcd_host.length() > 0 && lcd_port > 1024)
     {
@@ -133,7 +134,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     port = lport;
 
     // Don't even try to connect if we're currently disabled.
-    if (!(m_enabled = gContext->GetNumSetting("LCDEnable", 0)))
+    if (!(m_enabled = GetMythDB()->GetNumSetting("LCDEnable", 0)))
     {
         bConnected = false;
         m_server_unavailable = true;
@@ -148,7 +149,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     if (res == 0)
     {
         // we need to start the mythlcdserver 
-        system(gContext->GetInstallPrefix() + "/bin/mythlcdserver -v none&");
+        system(GetInstallPrefix() + "/bin/mythlcdserver -v none&");
     }
 
     if (!bConnected)
@@ -346,7 +347,7 @@ void LCD::handleKeyPress(QString key_pressed)
     else if (mykey == lcd_keystring.at(5))
         key = Qt::Key_Escape;
 
-    QApplication::postEvent(gContext->GetMainWindow(),
+    QApplication::postEvent(QApplication::activeWindow(),
                             new ExternalKeycodeEvent(key));
 }
 
@@ -356,14 +357,14 @@ void LCD::init()
     retryTimer->stop();
 
     // Get LCD settings
-    lcd_showmusic = (gContext->GetSetting("LCDShowMusic", "1") == "1");
-    lcd_showtime = (gContext->GetSetting("LCDShowTime", "1") == "1");
-    lcd_showchannel = (gContext->GetSetting("LCDShowChannel", "1") == "1");
-    lcd_showgeneric = (gContext->GetSetting("LCDShowGeneric", "1") == "1");
-    lcd_showvolume = (gContext->GetSetting("LCDShowVolume", "1") == "1");
-    lcd_showmenu = (gContext->GetSetting("LCDShowMenu", "1") == "1");
-    lcd_showrecstatus = (gContext->GetSetting("LCDShowRecStatus", "1") == "1");
-    lcd_keystring = gContext->GetSetting("LCDKeyString", "ABCDEF");    
+    lcd_showmusic = (GetMythDB()->GetSetting("LCDShowMusic", "1") == "1");
+    lcd_showtime = (GetMythDB()->GetSetting("LCDShowTime", "1") == "1");
+    lcd_showchannel = (GetMythDB()->GetSetting("LCDShowChannel", "1") == "1");
+    lcd_showgeneric = (GetMythDB()->GetSetting("LCDShowGeneric", "1") == "1");
+    lcd_showvolume = (GetMythDB()->GetSetting("LCDShowVolume", "1") == "1");
+    lcd_showmenu = (GetMythDB()->GetSetting("LCDShowMenu", "1") == "1");
+    lcd_showrecstatus = (GetMythDB()->GetSetting("LCDShowRecStatus", "1") == "1");
+    lcd_keystring = GetMythDB()->GetSetting("LCDKeyString", "ABCDEF");    
 
     bConnected = TRUE;
     lcd_ready = true;

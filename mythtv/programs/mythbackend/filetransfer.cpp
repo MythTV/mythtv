@@ -10,8 +10,8 @@ using namespace std;
 #include "filetransfer.h"
 #include "server.h"
 #include "RingBuffer.h"
-#include "libmyth/util.h"
-#include "libmyth/mythsocket.h"
+#include "util.h"
+#include "mythsocket.h"
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            bool usereadahead, int retries) :

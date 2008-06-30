@@ -17,6 +17,7 @@
 // MythTV headers
 #include "mythcontext.h"
 #include "osdimagecache.h"
+#include "mythdirs.h"
 
 // Print statistics of OSD image access in the destructor of OSDImageCache
 //#define PRINT_OSD_IMAGE_CACHE_STATS
@@ -117,7 +118,7 @@ bool OSDImageCache::Contains(const QString &key, bool useFile) const
 bool OSDImageCache::InFileCache(const QString &key) const
 {
     // check if cache file exists
-    QDir dir(MythContext::GetConfDir() + "/osdcache/");
+    QDir dir(GetConfDir() + "/osdcache/");
     QFileInfo cFile(dir.path() + "/" + key);
     if (!cFile.exists() || !cFile.isReadable())
         return false;
@@ -170,7 +171,7 @@ OSDImageCacheValue *OSDImageCache::Get(const QString &key, bool useFile)
         return NULL;
     }
 
-    QDir dir(MythContext::GetConfDir() + "/osdcache/");
+    QDir dir(GetConfDir() + "/osdcache/");
     QString fname = QString("%1/%2").arg(dir.path()).arg(key);
     QFile cacheFile(fname);
     if (!cacheFile.open(QIODevice::IO_ReadOnly))
@@ -250,7 +251,7 @@ void OSDImageCache::SaveToDisk(const OSDImageCacheValue *value)
     if (InFileCache(value->GetKey()))
         return;
 
-    QDir dir(MythContext::GetConfDir() + "/osdcache/");
+    QDir dir(GetConfDir() + "/osdcache/");
     if (!dir.exists() && !dir.mkdir(dir.path()))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Creating osdcache directory failed.");

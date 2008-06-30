@@ -4,6 +4,9 @@
 #include <q3tabdialog.h>
 
 #include "mythconfiggroups.h"
+#include "mythcontext.h"
+
+#include "mythuihelper.h"
 
 static void clear_widgets(vector<Configurable*> &children,
                           vector<QWidget*>      &childwidget)
@@ -30,7 +33,7 @@ ConfigurationGroup::ConfigurationGroup(bool luselabel,   bool luseframe,
     {
         float wmult = 0, hmult = 0;
 
-        gContext->GetScreenSettings(wmult, hmult);
+        GetMythUI()->GetScreenSettings(wmult, hmult);
 
         if (luselabel)
             margin = (int)(28 * hmult);

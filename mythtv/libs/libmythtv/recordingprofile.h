@@ -1,9 +1,9 @@
 #ifndef RECORDINGPROFILE_H
 #define RECORDINGPROFILE_H
 
-#include "libmyth/settings.h"
-#include "libmyth/mythdbcon.h"
-#include "libmyth/mythwidgets.h"
+#include "settings.h"
+#include "mythdbcon.h"
+#include "mythwidgets.h"
 
 const QString availProfiles[] =
       {"Default", "Live TV", "High Quality", "Low Quality", "" };

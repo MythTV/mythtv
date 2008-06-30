@@ -29,6 +29,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "remoteutil.h"
+#include "mythuihelper.h"
 
 // overloaded version of ProgramInfo with additional recording priority
 // values so we can keep everything together and don't
@@ -144,7 +145,7 @@ ProgramRecPriority::ProgramRecPriority(MythMainWindow *parent,
         exit(FRONTEND_BUGGY_EXIT_NO_SELECTOR);
     }
 
-    bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
+    bgTransBackup = GetMythUI()->LoadScalePixmap("trans-backup.png");
     if (!bgTransBackup)
         bgTransBackup = new QPixmap();
 

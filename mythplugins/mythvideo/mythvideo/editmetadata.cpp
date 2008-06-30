@@ -11,6 +11,7 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
+#include <mythtv/mythdirs.h>
 
 #include <algorithm>
 
@@ -407,7 +408,7 @@ void EditMetadataDialog::findCoverArt()
     // using ~/.mythtv/MythVideo
     if (fileprefix.length() == 0)
     {
-        fileprefix = MythContext::GetConfDir() + "/MythVideo";
+        fileprefix = GetConfDir() + "/MythVideo";
     }
 
     MythImageFileDialog *nca =

@@ -15,6 +15,7 @@ using namespace std;
 #include "qdir.h"
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/mythdirs.h>
 
 
 static int counter = 0;
@@ -922,13 +923,13 @@ DirEntry *DirectoryContainer::FindMatchingDirectoryEntry(QString url)
 
 void DirectoryContainer::PutVoicemailInTree(GenericTree *tree_to_write_to)
 {
-    QString dirName = MythContext::GetConfDir() + "/MythPhone/Voicemail";
+    QString dirName = GetConfDir() + "/MythPhone/Voicemail";
     QDir dir(dirName, "*.wav", QDir::Time, QDir::Files);
     if (!dir.exists())
     {
         VERBOSE(VB_IMPORTANT, QString("%1/MythPhone/Voicemail does not exist -- "
                 "its meant to get created earlier so this is wrong")
-                .arg(MythContext::GetConfDir().toLocal8Bit().constData()));
+                .arg(GetConfDir().toLocal8Bit().constData()));
         return;
     }
 
@@ -949,13 +950,13 @@ void DirectoryContainer::PutVoicemailInTree(GenericTree *tree_to_write_to)
 void DirectoryContainer::deleteVoicemail(QString vmailName)
 {
     // Get Voicemail Directory
-    QString dirName = MythContext::GetConfDir() + "/MythPhone/Voicemail";
+    QString dirName = GetConfDir() + "/MythPhone/Voicemail";
     QDir dir(dirName, "*.wav", QDir::Time, QDir::Files);
     if (!dir.exists())
     {
         VERBOSE(VB_IMPORTANT, QString("%1/MythPhone/Voicemail does not exist -- "
                 "its meant to get created earlier so this is wrong")
-                .arg(MythContext::GetConfDir().toLocal8Bit().constData()));
+                .arg(GetConfDir().toLocal8Bit().constData()));
         return;
     }
 
@@ -972,13 +973,13 @@ void DirectoryContainer::deleteVoicemail(QString vmailName)
 void DirectoryContainer::clearAllVoicemail()
 {
     // Get Voicemail Directory
-    QString dirName = MythContext::GetConfDir() + "/MythPhone/Voicemail";
+    QString dirName = GetConfDir() + "/MythPhone/Voicemail";
     QDir dir(dirName, "*.wav", QDir::Time, QDir::Files);
     if (!dir.exists())
     {
         VERBOSE(VB_IMPORTANT, QString("%1/MythPhone/Voicemail does not exist -- "
                 "its meant to get created earlier so this is wrong")
-                .arg(MythContext::GetConfDir().toLocal8Bit().constData()));
+                .arg(GetConfDir().toLocal8Bit().constData()));
         return;
     }
 

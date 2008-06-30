@@ -11,6 +11,8 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/libmythtv/programinfo.h>
+#include <mythtv/libmythui/mythuihelper.h>
+#include <mythtv/mythdirs.h>
 
 // mytharchive
 #include "thumbfinder.h"
@@ -78,7 +80,7 @@ ThumbFinder::~ThumbFinder()
 
 int  ThumbFinder::getChapterCount(const QString &menuTheme)
 {
-    QString filename = gContext->GetShareDir() + "mytharchive/themes/" + 
+    QString filename = GetShareDir() + "mytharchive/themes/" + 
             menuTheme + "/theme.xml";
     QDomDocument doc("mydocument");
     QFile file(filename);
@@ -541,7 +543,7 @@ QPixmap *ThumbFinder::createScaledPixmap(QString filename,
 
     if (filename != "")
     {
-        QImage *img = gContext->LoadScaleImage(filename);
+        QImage *img = GetMythUI()->LoadScaleImage(filename);
         if (!img)
         {
             VERBOSE(VB_IMPORTANT, QString("ThumbFinder: Failed to load image %1").arg(filename));

@@ -18,6 +18,7 @@
 #include "programinfo.h"
 #include "uitypes.h"
 #include "compat.h"
+#include "mythdirs.h"
 
 #include "welcomedialog.h"
 #include "welcomesettings.h"
@@ -39,7 +40,7 @@ WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
 
     gContext->addListener(this);
 
-    m_installDir = gContext->GetInstallPrefix();
+    m_installDir = GetInstallPrefix();
     m_preRollSeconds = gContext->GetNumSetting("RecordPreRoll");
     m_idleWaitForRecordingTime =
                        gContext->GetNumSetting("idleWaitForRecordingTime", 15);

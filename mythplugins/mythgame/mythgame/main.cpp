@@ -16,6 +16,7 @@ using namespace std;
 #include <mythtv/lcddevice.h>
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/mythpluginapi.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 #define LOC_ERR QString("MythGame:MAIN Error: ")
 #define LOC QString("MythGame:MAIN: ")
@@ -55,7 +56,7 @@ void GameCallback(void *data, QString &selection)
 
 void runMenu(QString which_menu)
 {
-    QString themedir = gContext->GetThemeDir();
+    QString themedir = GetMythUI()->GetThemeDir();
 
     MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), which_menu,
                                               GetMythMainWindow()->GetMainStack(), 

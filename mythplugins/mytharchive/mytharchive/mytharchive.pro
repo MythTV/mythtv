@@ -1,5 +1,6 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
+include ( ../../programs-libs.pro )
 include (config.pro)
  
 !exists( config.pro ) {
@@ -60,15 +61,6 @@ createdvd {
     HEADERS += mythburnwizard.h editmetadata.h thumbfinder.h
 
     SOURCES += mythburnwizard.cpp editmetadata.cpp thumbfinder.cpp
-
-#    LIBS += -lmythavutil-$$LIBVERSION
-#    LIBS += -lmythavcodec-$$LIBVERSION
-#    LIBS += -lmythavformat-$$LIBVERSION
-
-#    LIBS += -lavutil
-#    LIBS += -lavcodec
-#    LIBS += -lavformat
-
 }
 
 #######################################

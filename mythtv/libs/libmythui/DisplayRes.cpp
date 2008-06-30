@@ -1,6 +1,9 @@
+#include <iostream>
+
 #include "config.h"
 #include "DisplayRes.h"
-#include "mythcontext.h"
+#include "mythverbose.h"
+#include "mythdb.h"
 
 #ifdef USING_XRANDR
 #include "DisplayResX.h"
@@ -37,15 +40,15 @@ bool DisplayRes::Initialize(void)
     // Initialize GUI mode
     mode[GUI].Init();
     tW = tH = 0;
-    gContext->GetResolutionSetting("GuiVidMode", tW, tH);
+    GetMythDB()->GetResolutionSetting("GuiVidMode", tW, tH);
     GetDisplaySize(tW_mm, tH_mm);
-    gContext->GetResolutionSetting("DisplaySize", tW_mm, tH_mm);
+    GetMythDB()->GetResolutionSetting("DisplaySize", tW_mm, tH_mm);
     mode[GUI] = DisplayResScreen(tW, tH, tW_mm, tH_mm, -1.0, 0);
 
 
     // Initialize default VIDEO mode
     tW = tH = 0;
-    gContext->GetResolutionSetting("TVVidMode", tW, tH, tAspect, tRate);
+    GetMythDB()->GetResolutionSetting("TVVidMode", tW, tH, tAspect, tRate);
     mode[VIDEO] = DisplayResScreen(tW, tH, tW_mm, tH_mm, tAspect, tRate);
 
 
@@ -57,8 +60,8 @@ bool DisplayRes::Initialize(void)
         double iaspect = 0.0, oaspect = 0.0;
         short irate = 0, orate = 0;
 
-        gContext->GetResolutionSetting("VidMode", iw, ih, iaspect, irate, i);
-        gContext->GetResolutionSetting("TVVidMode", ow, oh, oaspect, orate, i);
+        GetMythDB()->GetResolutionSetting("VidMode", iw, ih, iaspect, irate, i);
+        GetMythDB()->GetResolutionSetting("TVVidMode", ow, oh, oaspect, orate, i);
 
         if (!(iw && ih && ow && oh))
             break;

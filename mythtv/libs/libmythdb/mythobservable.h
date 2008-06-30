@@ -2,8 +2,8 @@
 #define MYTHOBSERVABLE_H_
 
 #include <QList>
-#include "mythexp.h"
 #include "mythevent.h"
+#include "mythexp.h"
 
 class QObject;
 

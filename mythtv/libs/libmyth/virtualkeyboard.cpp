@@ -12,6 +12,9 @@ using namespace std;
 #include "mythdialogs.h"
 #include "uitypes.h"
 
+#include "mythfontproperties.h"
+#include "mythuihelper.h"
+
 #define LOC      QString("VirtualKeyboard: ")
 #define LOC_WARN QString("VirtualKeyboard, Warning: ")
 #define LOC_ERR  QString("VirtualKeyboard, Error: ")
@@ -26,7 +29,7 @@ VirtualKeyboard::VirtualKeyboard(MythMainWindow *parent,
     setLineWidth(1);
     m_parentEdit = parentEdit;
 
-    SwitchLayout(gContext->GetLanguageAndVariant());
+    SwitchLayout(GetMythUI()->GetLanguageAndVariant());
 }
 
 void VirtualKeyboard::SwitchLayout(const QString &lang)
@@ -166,7 +169,7 @@ void VirtualKeyboard::SwitchLayout(const QString &lang)
 
         int xbase, width, ybase, height;
         float wmult, hmult;
-        gContext->GetScreenSettings(xbase, width, wmult, ybase, height, hmult);
+        GetMythUI()->GetScreenSettings(xbase, width, wmult, ybase, height, hmult);
         newpos.setX(newpos.x() - xbase);
         newpos.setY(newpos.y() - ybase);
 

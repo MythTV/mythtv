@@ -1,5 +1,6 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/libmythui/mythuihelper.h>
 #include <qdir.h>
 //Added by qt3to4:
 #include <QKeyEvent>
@@ -181,7 +182,7 @@ QPixmap *EditMetadataDialog::createScaledPixmap(QString filename,
 
     if (filename != "")
     {
-        QImage *img = gContext->LoadScaleImage(filename);
+        QImage *img = GetMythUI()->LoadScaleImage(filename);
         if (!img)
         {
             VERBOSE(VB_IMPORTANT, QString("EditMetadataDialog: Failed to load image %1").arg(filename));

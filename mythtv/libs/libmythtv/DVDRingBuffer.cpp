@@ -8,6 +8,7 @@
 
 #include "NuppelVideoPlayer.h"
 #include "compat.h"
+#include "mythuihelper.h"
 
 #define LOC QString("DVDRB: ")
 #define LOC_ERR QString("DVDRB, Error: ")
@@ -334,7 +335,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 menupktpts = 0;
                 if (cellHasStillFrame)
                 {
-                    gContext->DisableScreensaver();
+                    GetMythUI()->DisableScreensaver();
                     VERBOSE(VB_PLAYBACK, LOC + "Leaving DVDNAV_STILL_FRAME");
                 }
                 cellHasStillFrame = false;

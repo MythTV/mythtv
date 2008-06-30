@@ -14,10 +14,10 @@
 #include <ctime>
 #include <cmath>
 
-#include "libmyth/exitcodes.h"
-#include "libmyth/mythcontext.h"
-#include "libmythtv/jobqueue.h"
-#include "libmyth/mythdbcon.h"
+#include "exitcodes.h"
+#include "mythcontext.h"
+#include "jobqueue.h"
+#include "mythdbcon.h"
 
 using namespace std;
 

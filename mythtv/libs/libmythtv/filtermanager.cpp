@@ -16,6 +16,7 @@
 // MythTV headers
 #include "filtermanager.h"
 #include "mythcontext.h"
+#include "mythdirs.h"
 
 #define LOC QString("FilterManager: ")
 #define LOC_WARN QString("FilterManager, Warning: ")
@@ -79,7 +80,7 @@ void FilterChain::deleteItem(Q3PtrCollection::Item d)
 
 FilterManager::FilterManager()
 {
-    QDir FiltDir(gContext->GetFiltersDir());
+    QDir FiltDir(GetFiltersDir());
 
     FiltDir.setFilter(QDir::Files | QDir::Readable);
     if (FiltDir.exists())

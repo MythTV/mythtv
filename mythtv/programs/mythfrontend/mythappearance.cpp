@@ -15,6 +15,7 @@
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 #include "myththemebase.h"
+#include "mythuihelper.h"
 
 using namespace std;
 
@@ -112,7 +113,7 @@ void MythAppearance::setContext(int context)
 void MythAppearance::getSettings()
 {
     float m_wmult = 0, m_hmult = 0;
-    gContext->GetScreenSettings(m_screenwidth, m_wmult, m_screenheight, m_hmult);
+    GetMythUI()->GetScreenSettings(m_screenwidth, m_wmult, m_screenheight, m_hmult);
 }
 
 void MythAppearance::getScreenInfo()

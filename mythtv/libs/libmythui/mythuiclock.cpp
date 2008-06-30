@@ -5,7 +5,8 @@
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 
-#include "mythcontext.h"
+#include "mythverbose.h"
+#include "mythdb.h"
 
 MythUIClock::MythUIClock(MythUIType *parent, const char *name)
            : MythUIText(parent, name)
@@ -14,9 +15,9 @@ MythUIClock::MythUIClock(MythUIType *parent, const char *name)
     m_nextUpdate = m_Time.addSecs(1);
     m_Message = m_Time.toString(m_Format);
 
-    m_DateFormat = gContext->GetSetting("DateFormat", "ddd d MMMM");
-    m_ShortDateFormat = gContext->GetSetting("ShortDateFormat", "ddd d");
-    m_TimeFormat = gContext->GetSetting("TimeFormat", "hh:mm");
+    m_DateFormat = GetMythDB()->GetSetting("DateFormat", "ddd d MMMM");
+    m_ShortDateFormat = GetMythDB()->GetSetting("ShortDateFormat", "ddd d");
+    m_TimeFormat = GetMythDB()->GetSetting("TimeFormat", "hh:mm");
 
     m_Format = QString("%1, %2").arg(m_DateFormat).arg(m_TimeFormat);
 

@@ -17,7 +17,7 @@ using namespace std;
 #include <GL/glext.h>
 #endif
 
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "mythpainter_ogl.h"
 #include "mythfontproperties.h"
 

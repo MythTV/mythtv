@@ -23,6 +23,7 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 #include "metadata.h"
 #include "videogallery.h"
@@ -386,7 +387,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos,
             // prime the cache
             if (!ImageCache::getImageCache().hitTest(icon_file))
             {
-                std::auto_ptr<QImage> image(gContext->
+                std::auto_ptr<QImage> image(GetMythUI()->
                                             LoadScaleImage(icon_file));
                 if (image.get())
                 {
@@ -565,7 +566,7 @@ void VideoGallery::LoadIconWindow()
 
     struct
     {
-        char *filename;
+        const char *filename;
         QPixmap *name;
     } const backgrounds[4] = {
         { "mv_gallery_back_reg.png",   &backRegPix   },
@@ -576,7 +577,7 @@ void VideoGallery::LoadIconWindow()
 
     QImage *img;
     for (unsigned int i = 0; i < 4; i++) {
-        img = gContext->LoadScaleImage(QString(backgrounds[i].filename));
+        img = GetMythUI()->LoadScaleImage(QString(backgrounds[i].filename));
         if (!img) {
             VERBOSE(VB_IMPORTANT,
                     QString("Failed to load %1").arg(backgrounds[i].filename));

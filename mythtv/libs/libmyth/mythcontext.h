@@ -16,13 +16,12 @@
 #include "mythexp.h"
 #include "mythobservable.h"
 #include "mythsocket.h"
-#include "mythverbose.h"
+
+#include "libmythdb/mythverbose.h"
+#include "libmythdb/mythdbparams.h"
+#include "libmythdb/mythversion.h"
 
 using namespace std;
-
-#if (QT_VERSION < 0x040300)
-#error You need Qt version >= 4.3.0 to compile MythTV.
-#endif
 
 class QFont;
 class QImage;
@@ -36,16 +35,9 @@ class MythMainWindow;
 class MythPluginManager;
 class MediaMonitor;
 class MythMediaDevice;
-class DisplayRes;
 class MDBManager;
 class MythContextPrivate;
 class UPnp;
-
-// VERBOSE macros, maps and globals are now in mythverbose.h
-//
-// This is an "extern" for code in mythcontext.cpp
-MPUBLIC int parse_verbose_arg(QString arg);
-
 
 /// These are the database logging priorities used for filterig the logs.
 enum LogPriorities
@@ -59,27 +51,6 @@ enum LogPriorities
     LP_INFO      = 6,
     LP_DEBUG     = 7
 };
-
-/// Structure containing the basic Database parameters
-struct MPUBLIC DatabaseParams
-{
-    QString dbHostName;         ///< database server
-    bool    dbHostPing;         ///< Can we test connectivity using ping?
-    int     dbPort;             ///< database port
-    QString dbUserName;         ///< DB user name 
-    QString dbPassword;         ///< DB password
-    QString dbName;             ///< database name
-    QString dbType;             ///< database type (MySQL, Postgres, etc.)
-    
-    bool    localEnabled;       ///< true if localHostName is not default
-    QString localHostName;      ///< name used for loading/saving settings
-    
-    bool    wolEnabled;         ///< true if wake-on-lan params are used
-    int     wolReconnect;       ///< seconds to wait for reconnect
-    int     wolRetry;           ///< times to retry to reconnect
-    QString wolCommand;         ///< command to use for wake-on-lan
-};
-
 
 /** \class MythPrivRequest
  *  \brief Container for requests that require privledge escalation.
@@ -103,30 +74,6 @@ class MPUBLIC MythPrivRequest
     void *m_data;
 };
 
-/// Update this whenever the plug-in API changes.
-/// Including changes in the libmyth, libmythtv and libmythui class methods
-/// used by plug-ins.
-#define MYTH_BINARY_VERSION "0.22.20080623-2"
-
-/** \brief Increment this whenever the MythTV network protocol changes.
- *
- *   You must also update this value and any corresponding changes to the
- *   ProgramInfo network protocol layout in the following files:
- *
- *   MythWeb
- *       mythplugins/mythweb/includes/mythbackend.php (version number)
- *       mythplugins/mythweb/modules/tv/includes/objects/Program.php (layout)
- *
- *   MythTV Perl Bindings
- *       mythtv/bindings/perl/MythTV.pm (version number)
- *       mythtv/bindings/perl/MythTV/Program.pm (layout)
- *
- *   MythTV Python Bindings
- *       mythtv/bindings/python/MythTV/MythTV.py (version number)
- *       mythtv/bindings/python/MythTV/MythTV.py (layout)
- */
-#define MYTH_PROTO_VERSION "40"
-
 /** \class MythContext
  *  \brief This class contains the runtime context for MythTV.
  *
@@ -146,7 +93,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     virtual ~MythContext();
 
     bool Init(const bool gui = true,
-                    UPnp *UPnPclient = NULL,
+              UPnp *UPnPclient = NULL,
               const bool promptForBackend = false,
               const bool bypassAutoDiscovery = false,
               const bool ignoreDB = false);
@@ -177,55 +124,9 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     void BlockShutdown(void);
     void AllowShutdown(void);
 
-    QString GetInstallPrefix(void);
-    QString GetShareDir(void);
-    QString GetLibraryDir(void);
-    static QString GetConfDir(void);
-
     QString GetFilePrefix(void);
 
-    void LoadQtConfig(void);
-    void UpdateImageCache(void);
-
     void RefreshBackendConfig(void);
-
-    // Note that these give the dimensions for the GUI,
-    // which the user may have set to be different from the raw screen size
-    void GetScreenSettings(float &wmult, float &hmult);
-    void GetScreenSettings(int &width, float &wmult,
-                           int &height, float &hmult);
-    void GetScreenSettings(int &xbase, int &width, float &wmult,
-                           int &ybase, int &height, float &hmult);
-
-    // This returns the raw (drawable) screen size
-    void GetScreenBounds(int &xbase, int &ybase, int &width, int &height);
-
-    // Parse an X11 style command line (-geometry) string
-    bool ParseGeometryOverride(const QString geometry);
-    bool IsGeometryOverridden(void);
-
-    QString FindThemeDir(const QString &themename);
-    QString FindMenuThemeDir(const QString &menuname);
-    QString GetThemeDir(void);
-    QList<QString> GetThemeSearchPath(void);
-
-    QString GetMenuThemeDir(void);
-
-    QString GetThemesParentDir(void);
-
-    QString GetPluginsDir(void);
-    QString GetPluginsNameFilter(void);
-    QString FindPlugin(const QString &plugname);
-
-    QString GetTranslationsDir(void);
-    QString GetTranslationsNameFilter(void);
-    QString FindTranslation(const QString &translation);
-
-    QString GetFontsDir(void);
-    QString GetFontsNameFilter(void);
-    QString FindFont(const QString &fontname);
-
-    QString GetFiltersDir(void);
 
     MDBManager *GetDBManager(void);
     static void DBError(const QString &where, const QSqlQuery &query);
@@ -236,8 +137,6 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     
     void LogEntry(const QString &module, int priority,
                   const QString &message, const QString &details);
-
-    Settings *qtconfig(void);
 
     bool IsDatabaseIgnored(void) const;
 
@@ -265,19 +164,6 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
 
     void SetSetting(const QString &key, const QString &newValue);
 
-    QFont GetBigFont();
-    QFont GetMediumFont();
-    QFont GetSmallFont();
-
-    QString GetLanguage(void);
-    QString GetLanguageAndVariant(void);
-
-    void ThemeWidget(QWidget *widget);
-
-    bool FindThemeFile(QString &filename);
-    QPixmap *LoadScalePixmap(QString filename, bool fromcache = true); 
-    QImage *LoadScaleImage(QString filename, bool fromcache = true);
-
     bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false, 
                                bool block = true);
 
@@ -285,7 +171,8 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
 
     void SetMainWindow(MythMainWindow *mainwin);
     MythMainWindow *GetMainWindow(void);
-    int  NormalizeFontSize(const int pointSize);
+
+    // deprecate
     bool TranslateKeyPress(const QString &context, QKeyEvent *e,
                            QStringList &actions, bool allowJumps = true);
 
@@ -302,22 +189,6 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
 
     bool CheckProtoVersion(MythSocket* socket);
 
-    // event wrappers
-    void DisableScreensaver(void);
-    void RestoreScreensaver(void);
-    // Reset screensaver idle time, for input events that X doesn't see
-    // (e.g., lirc)
-    void ResetScreensaver(void);
-
-    // actually do it
-    void DoDisableScreensaver(void);
-    void DoRestoreScreensaver(void);
-    void DoResetScreensaver(void);
-
-    // get the current status
-    bool GetScreensaverEnabled(void);
-    bool GetScreenIsAsleep(void);
-
     void addPrivRequest(MythPrivRequest::Type t, void *data);
     void waitPrivRequest() const;
     MythPrivRequest popPrivRequest();
@@ -332,22 +203,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     void sendPlaybackStart(void);
     void sendPlaybackEnd(void);
 
-    static void SetX11Display(const QString &display);
-    static QString GetX11Display(void);
-
-    static QMutex verbose_mutex;
-    static QString x11_display;
-
   private:
-    void SetPalette(QWidget *widget);
-    void InitializeScreenSettings(void);
-
-    void ClearOldImageCache(void);
-    void CacheThemeImages(void);
-    void CacheThemeImagesDirectory(const QString &dirname, 
-                                   const QString &subdirname = "");
-    void RemoveCacheDir(const QString &dirname);
-
     void connected(MythSocket *sock);
     void connectionClosed(MythSocket *sock);
     void readyRead(MythSocket *sock);

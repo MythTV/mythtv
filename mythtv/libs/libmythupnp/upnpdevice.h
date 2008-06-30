@@ -20,7 +20,7 @@
 
 #include "upnputil.h"
 #include "refcounted.h"
-#include "mythcontext.h"  // for MYTH_BINARY_VERSION
+#include "mythversion.h"  // for MYTH_BINARY_VERSION
 
 extern const char *myth_source_version;
 

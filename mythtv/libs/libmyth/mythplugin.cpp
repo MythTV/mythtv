@@ -13,6 +13,8 @@
 #include "mythcontext.h"
 #include "langsettings.h"
 
+#include "mythdirs.h"
+
 using namespace std;
 
 MythPlugin::MythPlugin(const QString &libname)
@@ -112,12 +114,12 @@ MythPluginManager::MythPluginManager()
 {
     m_dict.setAutoDelete(true);
 
-    QString pluginprefix = gContext->GetPluginsDir();
+    QString pluginprefix = GetPluginsDir();
 
     QDir filterDir(pluginprefix);
 
     filterDir.setFilter(QDir::Files | QDir::Readable);
-    QString filter = gContext->GetPluginsNameFilter();
+    QString filter = GetPluginsNameFilter();
     filterDir.setNameFilter(filter);
 
     gContext->SetDisableLibraryPopup(true);
@@ -148,7 +150,7 @@ MythPluginManager::MythPluginManager()
 
 bool MythPluginManager::init_plugin(const QString &plugname)
 {
-    QString newname = gContext->FindPlugin(plugname);
+    QString newname = FindPluginName(plugname);
    
     if (m_dict.find(newname) == 0)
     {
@@ -184,7 +186,7 @@ bool MythPluginManager::init_plugin(const QString &plugname)
 
 bool MythPluginManager::run_plugin(const QString &plugname)
 {
-    QString newname = gContext->FindPlugin(plugname);
+    QString newname = FindPluginName(plugname);
 
     if (m_dict.find(newname) == 0 && init_plugin(plugname) == false)
     {
@@ -202,7 +204,7 @@ bool MythPluginManager::run_plugin(const QString &plugname)
 
 bool MythPluginManager::config_plugin(const QString &plugname)
 {
-    QString newname = gContext->FindPlugin(plugname);
+    QString newname = FindPluginName(plugname);
 
     if (m_dict.find(newname) == 0 && init_plugin(plugname) == false)
     {
@@ -220,7 +222,7 @@ bool MythPluginManager::config_plugin(const QString &plugname)
 
 bool MythPluginManager::destroy_plugin(const QString &plugname)
 {
-    QString newname = gContext->FindPlugin(plugname);
+    QString newname = FindPluginName(plugname);
 
     if (m_dict.find(newname) == 0 && init_plugin(plugname) == false)
     {
@@ -236,7 +238,7 @@ bool MythPluginManager::destroy_plugin(const QString &plugname)
 
 MythPlugin *MythPluginManager::GetPlugin(const QString &plugname)
 {
-    QString newname = gContext->FindPlugin(plugname);
+    QString newname = FindPluginName(plugname);
 
     if (moduleMap.find(newname) == moduleMap.end())
         return NULL;
@@ -246,7 +248,7 @@ MythPlugin *MythPluginManager::GetPlugin(const QString &plugname)
 
 MythPlugin *MythPluginManager::GetMenuPlugin(const QString &plugname)
 {
-    QString newname = gContext->FindPlugin(plugname);
+    QString newname = FindPluginName(plugname);
 
     if (menuPluginMap.find(newname) == menuPluginMap.end())
         return NULL;

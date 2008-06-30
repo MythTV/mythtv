@@ -28,6 +28,8 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
 #include <mythtv/lcddevice.h>
+#include <mythtv/mythdirs.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 #include "config.h"
 #include "webcam.h"
@@ -99,7 +101,7 @@ PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
     volume_display_timer = new QTimer(this);
     VolumeMode = VOL_VOLUME;
     volume_icon->SetImage(
-        gContext->FindThemeDir("default") + "/mp_volume_icon.png");
+        GetMythUI()->FindThemeDir("default") + "/mp_volume_icon.png");
     volume_icon->LoadImage();
     connect(volume_display_timer, SIGNAL(timeout()),
             this,                 SLOT(hideVolume()));
@@ -128,7 +130,7 @@ PhoneUIBox::PhoneUIBox(MythMainWindow *parent, QString window_name,
     screenwidth = 0;
     screenheight = 0;
     float wmult = 0, hmult = 0;
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    GetMythUI()->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
     fullScreen = false;
     rxVideoArea = receivedWebcamArea->getScreenArea();
 
@@ -2435,7 +2437,7 @@ void PhoneUIBox::changeVolumeControl(bool up_or_down)
             break;
         }
 
-        QString themepath = gContext->FindThemeDir("default") + "/";
+        QString themepath = GetMythUI()->FindThemeDir("default") + "/";
         switch (VolumeMode)
         {
         default:
@@ -2571,7 +2573,7 @@ void PhoneUIBox::showVolume(bool on_or_off)
             volume_icon->SetOrder(-1);
             volume_icon->refresh();
             volume_icon->SetImage(
-                gContext->FindThemeDir("default") + "/mp_volume_icon.png");
+                GetMythUI()->FindThemeDir("default") + "/mp_volume_icon.png");
             volume_icon->LoadImage();
             volume_setting->SetOrder(-1);
             volume_setting->refresh();
@@ -2702,7 +2704,7 @@ void PhoneUIBox::handleTreeListSignals(int , IntVector *attributes)
     else if (attributes->at(0) == TA_VMAIL_ENTRY)
     {
         GenericTree *node = DirectoryList->getCurrentNode();
-        QString fileName = MythContext::GetConfDir() +
+        QString fileName = GetConfDir() +
             "/MythPhone/Voicemail/" + node->getString() + ".wav";
 
         wavfile *vmailWav = new wavfile();

@@ -4,6 +4,7 @@
 #include <QString>
 #include <QStringList>
 #include <QEvent>
+#include "mythexp.h"
 
 /** \class MythEvent
     \brief This class is used as a container for messages.
@@ -52,6 +53,27 @@ class MPUBLIC MythEvent : public QEvent
   private:
     QString message;
     QStringList extradata;
+};
+
+const int kExternalKeycodeEventType = 33213;
+const int kExitToMainMenuEventType = 33214;
+
+class ExternalKeycodeEvent : public QEvent
+{
+  public:
+    ExternalKeycodeEvent(const int key)
+           : QEvent((QEvent::Type)kExternalKeycodeEventType), keycode(key) {}
+
+    int getKeycode() { return keycode; }
+
+  private:
+    int keycode;
+};
+
+class ExitToMainMenuEvent : public QEvent
+{
+  public:
+    ExitToMainMenuEvent(void) : QEvent((QEvent::Type)kExitToMainMenuEventType) {}
 };
 
 #endif /* MYTHEVENT_H */

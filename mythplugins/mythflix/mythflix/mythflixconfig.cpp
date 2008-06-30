@@ -31,6 +31,7 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/libmythui/mythmainwindow.h>
+#include <mythtv/mythdirs.h>
 
 // MythFlix headers
 #include "mythflixconfig.h"
@@ -114,7 +115,7 @@ MythFlixConfig::~MythFlixConfig()
 
 void MythFlixConfig::populateSites()
 {
-    QString filename = gContext->GetShareDir()
+    QString filename = GetShareDir()
                        + "mythflix/netflix-rss.xml";
     QFile xmlFile(filename);
 

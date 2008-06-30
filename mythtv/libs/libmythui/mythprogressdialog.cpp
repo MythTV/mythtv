@@ -1,7 +1,8 @@
+#include <iostream>
 
 // MythTV headers
 #include "mythprogressdialog.h"
-#include "mythcontext.h"
+#include "mythverbose.h"
 
 MythUIBusyDialog::MythUIBusyDialog(const QString &message,
                              MythScreenStack *parent, const char *name) 

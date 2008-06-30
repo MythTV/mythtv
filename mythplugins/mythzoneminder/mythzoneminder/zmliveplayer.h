@@ -93,7 +93,6 @@ public:
     void updateFrame(void);
     void updateMonitorStatus(void);
     void initMonitorLayout(void);
-    void receivedLiveFrame(int minitorID, QString& status, const uchar* buffer, int frameSize);
     void getMonitorList(void);
 
   private:

@@ -39,6 +39,7 @@
 #include <mythtv/httpcomms.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/mythdirs.h>
 
 // MythNews headers
 #include "mythnews.h"
@@ -54,7 +55,7 @@ MythNews::MythNews(MythScreenStack *parent, const char *name)
 {
     // Setup cache directory
 
-    QString fileprefix = MythContext::GetConfDir();
+    QString fileprefix = GetConfDir();
 
     QDir dir(fileprefix);
     if (!dir.exists())
@@ -66,7 +67,7 @@ MythNews::MythNews(MythScreenStack *parent, const char *name)
 
     zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
     browser = gContext->GetSetting("WebBrowserCommand",
-                                   gContext->GetInstallPrefix() +
+                                   GetInstallPrefix() +
                                       "/bin/mythbrowser");
 
     // Initialize variables
@@ -249,7 +250,7 @@ void MythNews::updateInfoView(MythListButtonItem* selected)
 
             if (!article->thumbnail().isEmpty())
             {
-                QString fileprefix = MythContext::GetConfDir();
+                QString fileprefix = GetConfDir();
 
                 QDir dir(fileprefix);
                 if (!dir.exists())
@@ -282,7 +283,7 @@ void MythNews::updateInfoView(MythListButtonItem* selected)
             {
                 if (!site->imageURL().isEmpty())
                 {
-                    QString fileprefix = MythContext::GetConfDir();
+                    QString fileprefix = GetConfDir();
 
                     QDir dir(fileprefix);
                     if (!dir.exists())
@@ -352,7 +353,7 @@ void MythNews::updateInfoView(MythListButtonItem* selected)
 
             if (!site->imageURL().isEmpty())
             {
-                QString fileprefix = MythContext::GetConfDir();
+                QString fileprefix = GetConfDir();
 
                 QDir dir(fileprefix);
                 if (!dir.exists())
@@ -716,7 +717,7 @@ void MythNews::slotViewArticle(MythListButtonItem *articlesListItem)
                     }
                 }
 
-                QString fileprefix = MythContext::GetConfDir();
+                QString fileprefix = GetConfDir();
 
                 QDir dir(fileprefix);
                 if (!dir.exists())

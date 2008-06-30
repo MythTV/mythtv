@@ -31,10 +31,12 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include "mythcontext.h"
+#include "mythverbose.h"
 
 #include <iostream>
 using namespace std;
+
+#include <QTextStream>
 
 #include <linux/joystick.h>
 

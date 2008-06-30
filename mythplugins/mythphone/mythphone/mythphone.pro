@@ -1,5 +1,6 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
+include ( ../../programs-libs.pro )
 include ( config.pro )
 
 !exists( config.pro ) {

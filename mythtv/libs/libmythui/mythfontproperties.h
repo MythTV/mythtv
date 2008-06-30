@@ -7,6 +7,7 @@
 #include <qmap.h>
 
 #include "xmlparsebase.h"
+#include "mythexp.h"
 
 class MythFontProperties: public XMLParseBase
 {
@@ -80,5 +81,15 @@ class FontMap
 };
 
 FontMap *GetGlobalFontMap(void);
+
+
+// FIXME: remove legacy crap
+struct fontProp {
+    QFont face;
+    QPoint shadowOffset;
+    QColor color;
+    QColor dropColor;
+};
+extern MPUBLIC QMap<QString, fontProp> globalFontMap;
 
 #endif

@@ -4,6 +4,7 @@
 
 // libmyth headers
 #include "mythcontext.h"
+#include "mythdirs.h"
 
 // filldata headers
 #include "fillutil.h"
@@ -34,7 +35,7 @@ bool dash_open(QFile &file, const QString &filename, int m, FILE *handle)
 
 QString SetupIconCacheDirectory(void)
 {
-    QString fileprefix = MythContext::GetConfDir();
+    QString fileprefix = GetConfDir();
 
     QDir dir(fileprefix);
     if (!dir.exists())

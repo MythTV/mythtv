@@ -1,11 +1,11 @@
-//#define QT_CLEAN_NAMESPACE // no qt 1.x compatability, INT32 conflicts with X
+#include <iostream>
 
 #include <QTimer>
 #include <QX11Info>
 
-#include "mythcontext.h"
-#include "util.h"
-
+#include "mythsystem.h"
+#include "mythverbose.h"
+#include "mythdb.h"
 
 #include "screensaver-x11.h"
 
@@ -87,8 +87,8 @@ class ScreenSaverX11Private
 
         if (m_timeoutInterval == -1)
         {
-            m_timeoutInterval = gContext->GetNumSettingOnHost(
-                "xscreensaverInterval", gContext->GetHostName(), 50) * 1000;
+            m_timeoutInterval = GetMythDB()->GetNumSettingOnHost(
+                "xscreensaverInterval", GetMythDB()->GetHostName(), 50) * 1000;
         }
 
         if (m_timeoutInterval > 0)

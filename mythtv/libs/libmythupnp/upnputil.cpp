@@ -11,6 +11,7 @@
 // POSIX headers
 #include <sys/types.h>
 #include <sys/time.h>
+#include <cerrno>
 
 // Qt headers
 #include <quuid.h>
@@ -78,7 +79,7 @@ long GetIPAddressList(QStringList &sStrList)
 
     if (getifaddrs(&list) == -1)
     {
-        VERBOSE(VB_UPNP, "GetIPAddressList() - getifaddrs failed: " << strerror(errno));
+        VERBOSE(VB_UPNP, QString("GetIPAddressList() - getifaddrs failed: %s").arg(strerror(errno)));
         return 0;
     }
 
@@ -100,7 +101,7 @@ long GetIPAddressList(QStringList &sStrList)
                       &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr,
                       address, sizeof(address)) == NULL)
         {
-            VERBOSE(VB_UPNP, "GetIPAddressList() - inet_ntop failed: " << strerror(errno));
+            VERBOSE(VB_UPNP, QString("GetIPAddressList() - inet_ntop failed: %s").arg(strerror(errno)));
             continue;
         }
 

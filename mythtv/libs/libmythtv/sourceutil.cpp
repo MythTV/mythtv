@@ -4,6 +4,7 @@
 #include <qregexp.h>
 
 // MythTV headers
+#include "mythcontext.h"
 #include "sourceutil.h"
 #include "cardutil.h"
 #include "mythdbcon.h"

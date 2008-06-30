@@ -2,11 +2,12 @@
 #include <cstdlib>
 using namespace std;
 
+#include "mythverbose.h"
+
 #include "mythuiimage.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 
-#include "mythcontext.h"
 #include "mythscreentype.h"
 
 MythUIImage::MythUIImage(const QString &filepattern,

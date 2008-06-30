@@ -79,7 +79,6 @@ private slots:
 
     void slotSiteSelected(MythListButtonItem *item);
     void slotShowNetFlixPage();
-    void slotCancelPopup();
 };
 
 #endif /* MYTHFLIX_H */

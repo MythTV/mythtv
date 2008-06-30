@@ -13,6 +13,7 @@
 #include "httpcomms.h"
 
 #include <unistd.h>
+#include <cerrno>
 
 #include <qfile.h>
 

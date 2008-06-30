@@ -8,9 +8,9 @@
 
 #include <qstring.h>
 #include <qdir.h>
-#include "libmyth/mythdbcon.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/util.h"
+#include "mythdbcon.h"
+#include "mythcontext.h"
+#include "util.h"
 
 /// Check that a directory path exists and is writable
 

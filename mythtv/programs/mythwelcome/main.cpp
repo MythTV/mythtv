@@ -6,12 +6,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/settings.h"
-#include "libmyth/langsettings.h"
-#include "libmyth/mythdbcon.h"
-#include "libmyth/exitcodes.h"
-#include "libmyth/compat.h"
+#include "mythcontext.h"
+#include "settings.h"
+#include "langsettings.h"
+#include "mythdbcon.h"
+#include "exitcodes.h"
+#include "compat.h"
+#include "mythuihelper.h"
 
 #include "libmythtv/tv.h"
 
@@ -122,7 +123,7 @@ int main(int argc, char **argv)
 
     LanguageSettings::load("mythfrontend");
 
-    gContext->LoadQtConfig();
+    GetMythUI()->LoadQtConfig();
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();

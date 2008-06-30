@@ -22,6 +22,7 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 #include "videoselected.h"
 
@@ -46,7 +47,7 @@ VideoSelected::VideoSelected(const VideoList *video_list,
     theme->LoadTheme(xmldata, "selected", "video-");
     LoadWindow(xmldata);
 
-    bgTransBackup.reset(gContext->LoadScalePixmap("trans-backup.png"));
+    bgTransBackup.reset(GetMythUI()->LoadScalePixmap("trans-backup.png"));
     if (!bgTransBackup.get())
         bgTransBackup.reset(new QPixmap());
 

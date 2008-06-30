@@ -1,11 +1,12 @@
+#include <iostream>
 #include <qapplication.h>
 
-#include "mythcontext.h"
+#include "mythverbose.h"
+#include "mythdb.h"
+
+#include "mythuihelper.h"
 #include "mythfontproperties.h"
 #include "mythmainwindow.h"
-
-//FIXME remove, old crap
-#include "uitypes.h"
 
 MythFontProperties::MythFontProperties() :
     m_color(QColor(Qt::white)), m_hasShadow(false), m_shadowAlpha(255),
@@ -120,7 +121,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
                                                      bool addToGlobal)
 {
     // Crappy, but cached.  Move to GlobalFontMap?
-    QString fontSizeType = gContext->GetSetting("ThemeFontSizeType", "default");
+    QString fontSizeType = GetMythDB()->GetSetting("ThemeFontSizeType", "default");
 
     bool fromBase = false;
     MythFontProperties *newFont = new MythFontProperties();
@@ -290,7 +291,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
 static FontMap *gFontMap = NULL;
 
 // FIXME: remove
-extern QMap<QString, fontProp> globalFontMap;
+QMap<QString, fontProp> globalFontMap;
 
 MythFontProperties *FontMap::GetFont(const QString &text)
 {

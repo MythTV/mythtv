@@ -1,8 +1,10 @@
+#include <iostream>
+
 #include <qfile.h>
 #include <qdir.h>
 
 #include "themeinfo.h"
-#include "mythcontext.h"
+#include "mythverbose.h"
 
 ThemeInfo::ThemeInfo(QString theme)
 {

@@ -12,8 +12,6 @@
 #include "upnpcds.h"
 #include "upnputil.h"
 
-#include "util.h"
-
 #include <q3textstream.h>
 #include <math.h>
 #include <qregexp.h>

@@ -8,11 +8,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include "mythcontext.h"
+#include "mythverbose.h"
+#include "mythdb.h"
+#include "mythsystem.h"
 
 #include "lirc.h"
 #include "lircevent.h"
-#include "util.h"
 
 /** \class LircClient
  *  \brief Interface between mythtv and lircd
@@ -52,7 +53,7 @@ int LircClient::Init(const QString &config_file, const QString &program,
     }
 
     if (!ignoreExtApp)
-        external_app = gContext->GetSetting("LircKeyPressedApp", "");
+        external_app = GetMythDB()->GetSetting("LircKeyPressedApp", "");
 
     VERBOSE(VB_GENERAL,
             QString("lirc init success using configuration file: %1")

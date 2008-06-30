@@ -29,6 +29,7 @@ using namespace std;
 #include "mythwidgets.h"
 #include "mythcontext.h"
 #include "DisplayRes.h"
+#include "mythuihelper.h"
 
 /** \class Configurable
  *  \brief Configurable is the root of all the database aware widgets.
@@ -1084,7 +1085,7 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
 {
     int width = 0, height = 0;
 
-    gContext->GetScreenSettings(width, m_wmult, height, m_hmult);
+    GetMythUI()->GetScreenSettings(width, m_wmult, height, m_hmult);
 
     Q3HBox* box;
     if (labelAboveWidget) 

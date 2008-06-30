@@ -12,6 +12,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/libmythui/mythprogressdialog.h>
+#include <mythtv/mythdirs.h>
 
 // MythWeather headers
 #include "weatherScreen.h"
@@ -75,7 +76,7 @@ bool SourceManager::findScriptsDB()
 
 bool SourceManager::findScripts()
 {
-    QString path =  gContext->GetShareDir() + "mythweather/scripts/";
+    QString path = GetShareDir() + "mythweather/scripts/";
     QDir dir(path);
     dir.setFilter(QDir::Executable | QDir::Files | QDir::Dirs);
 

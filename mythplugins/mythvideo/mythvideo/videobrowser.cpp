@@ -7,6 +7,7 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 #include "metadata.h"
 #include "videobrowser.h"
@@ -34,7 +35,7 @@ VideoBrowser::VideoBrowser(MythMainWindow *lparent, const QString &lname,
 
     setFileBrowser(gContext->GetNumSetting("VideoBrowserNoDB", 0));
     loadWindow(xmldata);
-    bgTransBackup.reset(gContext->LoadScalePixmap("trans-backup.png"));
+    bgTransBackup.reset(GetMythUI()->LoadScalePixmap("trans-backup.png"));
 
     if (!bgTransBackup.get())
         bgTransBackup.reset(new QPixmap());

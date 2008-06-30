@@ -10,6 +10,7 @@
 #include <mythtv/mythpluginapi.h>
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/libmythui/mythmainwindow.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 // MythWeather headers
 #include "weather.h"
@@ -104,7 +105,7 @@ void WeatherCallback(void *data, QString &selection)
 int mythplugin_config()
 {
     MythThemedMenu *menu =
-            new MythThemedMenu(gContext->GetThemeDir().ascii(),
+            new MythThemedMenu(GetMythUI()->GetThemeDir().ascii(),
                                "weather_settings.xml",
                                gContext->GetMainWindow()->GetMainStack(),
                                "weather menu");

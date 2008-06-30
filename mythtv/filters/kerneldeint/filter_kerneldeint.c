@@ -13,10 +13,10 @@
 #include "libmythtv/filter.h"
 #include "libmythtv/frame.h"
 
-#include "libmyth/mythconfig.h"
+#include "libmythdb/mythconfig.h"
 #include "libavcodec/dsputil.h"
 
-#include "libmyth/mythverbose.h"
+#include "libmythdb/mythverbose.h"
 
 #undef ABS
 #define ABS(A) ( (A) > 0 ? (A) : -(A) )

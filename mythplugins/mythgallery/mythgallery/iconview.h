@@ -60,8 +60,6 @@ class IconView : public MythScreenType
 
     void LoadDirectory(const QString &dir);
 
-    void UpdateText(void);
-
     bool HandleEscape(void);
     bool HandleMediaEscape(MediaMonitor*);
     bool HandleSubDirEscape(const QString &parent);
@@ -122,7 +120,6 @@ class IconView : public MythScreenType
   public slots:
     void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice *pMedia);
     void HandleItemSelect(MythListButtonItem *);
-    void HandleMenuButtonPress(MythListButtonItem *);
     void UpdateText(MythListButtonItem *);
 };
 

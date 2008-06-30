@@ -48,6 +48,7 @@ using namespace std;
 #include "cardutil.h"
 #include "util-osx-cocoa.h"
 #include "compat.h"
+#include "mythuihelper.h"
 
 #ifndef HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -690,8 +691,8 @@ bool TV::Init(bool createWindow)
         {
             int xbase, width, ybase, height;
             float wmult, hmult;
-            gContext->GetScreenSettings(xbase, width, wmult,
-                                        ybase, height, hmult);
+            GetMythUI()->GetScreenSettings(xbase, width, wmult,
+                                           ybase, height, hmult);
             if ((abs(saved_gui_bounds.x()-xbase) < 3) &&
                 (abs(saved_gui_bounds.y()-ybase) < 3))
             {
@@ -712,7 +713,7 @@ bool TV::Init(bool createWindow)
         if (fullscreen)
         {
             int xbase, width, ybase, height;
-            gContext->GetScreenBounds(xbase, ybase, width, height);
+            GetMythUI()->GetScreenBounds(xbase, ybase, width, height);
             player_bounds = QRect(xbase, ybase, width, height);
         }
 
@@ -1534,7 +1535,7 @@ void TV::HandleStateChange(void)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "LiveTV not successfully started");
-            gContext->RestoreScreensaver();
+            GetMythUI()->RestoreScreensaver();
             DeleteRecorder();
 
             SET_LAST();
@@ -1551,7 +1552,7 @@ void TV::HandleStateChange(void)
             prbuffer->SetLiveMode(tvchain);
         }
 
-        gContext->DisableScreensaver();
+        GetMythUI()->DisableScreensaver();
 
         bool ok = false;
         if (playbackinfo && StartRecorder(recorder,-1))
@@ -1565,7 +1566,7 @@ void TV::HandleStateChange(void)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "LiveTV not successfully started");
-            gContext->RestoreScreensaver();
+            GetMythUI()->RestoreScreensaver();
             DeleteRecorder();
 
             SET_LAST();
@@ -1588,7 +1589,7 @@ void TV::HandleStateChange(void)
         playbackinfo = NULL;
         pbinfoLock.unlock();
 
-        gContext->RestoreScreensaver();
+        GetMythUI()->RestoreScreensaver();
     }
     else if (TRANSITION(kState_WatchingRecording, kState_WatchingPreRecorded))
     {
@@ -1608,7 +1609,7 @@ void TV::HandleStateChange(void)
         prbuffer = new RingBuffer(playbackURL, false);
         if (prbuffer->IsOpen())
         {
-            gContext->DisableScreensaver();
+            GetMythUI()->DisableScreensaver();
 
             if (desiredNextState == kState_WatchingRecording)
             {
@@ -1650,7 +1651,7 @@ void TV::HandleStateChange(void)
         SET_NEXT();
 
         StopStuff(true, true, false);
-        gContext->RestoreScreensaver();
+        GetMythUI()->RestoreScreensaver();
     }
     else if (TRANSITION(kState_None, kState_None))
     {
@@ -4134,7 +4135,7 @@ void TV::DoPlay(void)
     DoNVPSeek(time);
     UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
 
-    gContext->DisableScreensaver();
+    GetMythUI()->DisableScreensaver();
 }
 
 QString TV::PlayMesg()
@@ -4197,14 +4198,14 @@ void TV::DoPause(bool showOSD)
         DoNVPSeek(time);
         if (showOSD)
             UpdateOSDSeekMessage(tr("Paused"), -1);
-        gContext->RestoreScreensaver();
+        GetMythUI()->RestoreScreensaver();
     }
     else
     {
         DoNVPSeek(time);
         if (showOSD)
             UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
-        gContext->DisableScreensaver();
+        GetMythUI()->DisableScreensaver();
     }
 }
 
@@ -4651,7 +4652,7 @@ void TV::SwitchCards(uint chanid, QString channum, uint inputid)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "LiveTV not successfully restarted");
-            gContext->RestoreScreensaver();
+            GetMythUI()->RestoreScreensaver();
             DeleteRecorder();
 
             exitPlayer = true;
@@ -4678,7 +4679,7 @@ void TV::SwitchCards(uint chanid, QString channum, uint inputid)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "LiveTV not successfully started");
-            gContext->RestoreScreensaver();
+            GetMythUI()->RestoreScreensaver();
             DeleteRecorder();
 
             exitPlayer = true;
@@ -4713,7 +4714,7 @@ void TV::ToggleInputs(uint inputid)
     {
         if (GetOSD())
             GetOSD()->EndStatus();
-        gContext->DisableScreensaver();
+        GetMythUI()->DisableScreensaver();
         paused = false;
     }
 
@@ -4782,7 +4783,7 @@ void TV::ChangeChannel(int direction)
     {
         if (GetOSD())
             GetOSD()->EndStatus();
-        gContext->DisableScreensaver();
+        GetMythUI()->DisableScreensaver();
         paused = false;
     }
 
@@ -5115,7 +5116,7 @@ void TV::ChangeChannel(uint chanid, const QString &chan)
     if (nvp && (activenvp == nvp) && paused && GetOSD())
     {
         GetOSD()->EndStatus();
-        gContext->DisableScreensaver();
+        GetMythUI()->DisableScreensaver();
         paused = false;
     }
 

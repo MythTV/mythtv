@@ -3,6 +3,7 @@
 
 #include "iso639.h"
 #include "mythcontext.h"
+#include "mythuihelper.h"
 
 QMap<int, QString>    _iso639_key_to_english_name;
 static QMap<int, int> _iso639_key2_to_key3;
@@ -41,7 +42,7 @@ QStringList iso639_get_language_list(void)
         }
         if (_languages.empty())
         {
-            QString s3 = iso639_str2_to_str3(gContext->GetLanguage().lower());
+            QString s3 = iso639_str2_to_str3(GetMythUI()->GetLanguage().lower());
             if (!s3.isEmpty())
                 _languages << s3;
         }

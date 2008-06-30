@@ -50,6 +50,8 @@ using namespace std;
 #include "playgroup.h"
 #include "customedit.h"
 #include "util.h"
+#include "x11colors.h"
+#include "mythuihelper.h"
 
 #define LOC QString("PlaybackBox: ")
 #define LOC_ERR QString("PlaybackBox Error: ")
@@ -242,7 +244,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       // Theme parsing
       theme(new XMLParse()),
       // Non-volatile drawing variables
-      drawTransPixmap(NULL),            drawPopupSolid(true),
+      drawPopupSolid(true),
       drawPopupFgColor(Qt::white),      drawPopupBgColor(Qt::black),
       drawPopupSelColor(Qt::green),
       drawTotalBounds(0, 0, size().width(), size().height()),
@@ -309,9 +311,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         previewPixmapEnabled=gContext->GetNumSetting("GeneratePreviewPixmaps");
     }
     previewFromBookmark= gContext->GetNumSetting("PreviewFromBookmark");
-    drawTransPixmap    = gContext->LoadScalePixmap("trans-backup.png");
-    if (!drawTransPixmap)
-        drawTransPixmap = new QPixmap();
 
     bool displayCat  = gContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
 
@@ -460,12 +459,6 @@ PlaybackBox::~PlaybackBox(void)
     {
         delete theme;
         theme = NULL;
-    }
-
-    if (drawTransPixmap)
-    {
-        delete drawTransPixmap;
-        drawTransPixmap = NULL;
     }
 
     if (curitem)
@@ -4746,9 +4739,9 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     int screenheight = 0, screenwidth = 0;
     float wmult = 0, hmult = 0;
 
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    GetMythUI()->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    previewPixmap = gContext->LoadScalePixmap(filename, true /*fromcache*/);
+    previewPixmap = GetMythUI()->LoadScalePixmap(filename, true /*fromcache*/);
     if (previewPixmap)
     {
         previewStartts = pginfo->recstartts;

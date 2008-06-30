@@ -53,6 +53,7 @@ using namespace std;
 // MythTV OpenGL headers
 #include "openglcontext.h"
 #include "openglvideo.h"
+#include "mythuihelper.h"
 
 #define LOC QString("VideoOutputXv: ")
 #define LOC_ERR QString("VideoOutputXv Error: ")
@@ -494,14 +495,14 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
 
     // Fetch pixel width and height of the display
     int xbase, ybase, w, h;
-    gContext->GetScreenBounds(xbase, ybase, w, h);
+    GetMythUI()->GetScreenBounds(xbase, ybase, w, h);
 
     // Determine window dimensions in pixels
     int window_w = w, window_h = h;
     if (gContext->GetNumSetting("GuiSizeForTV", 0))
         gContext->GetResolutionSetting("Gui", window_w,  window_h);
     else
-        gContext->GetScreenBounds(xbase, ybase, window_w, window_h);
+        GetMythUI()->GetScreenBounds(xbase, ybase, window_w, window_h);
     window_w = (window_w) ? window_w : w;
     window_h = (window_h) ? window_h : h;
     float pixel_aspect = ((float)w) / ((float)h);

@@ -3,6 +3,8 @@
 #include <QString>
 #include <QStringList>
 
+#include <mythtv/mythdirs.h>
+
 // MythWeather headers
 #include "weatherUtils.h"
 
@@ -11,7 +13,7 @@ ScreenListMap loadScreens()
     ScreenListMap screens;
     QDomDocument doc;
 
-    QFile f(gContext->GetShareDir() + "mythweather/weather-screens.xml");
+    QFile f(GetShareDir() + "mythweather/weather-screens.xml");
 
     if (!f.open(QIODevice::ReadOnly))
     {

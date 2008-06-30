@@ -966,4 +966,4 @@ echo "SUBDIRS += cleanup " >> ./config.pro
 
 echo ""
 
-${qmake} QMAKE=$(which ${qmake}) mythplugins.pro
+echo ${qmake} QMAKE=$(which ${qmake}) mythplugins.pro

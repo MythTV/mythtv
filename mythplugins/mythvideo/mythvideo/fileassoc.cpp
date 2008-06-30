@@ -13,6 +13,7 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 #include "fileassoc.h"
 #include "dbaccess.h"
@@ -368,7 +369,7 @@ void FileAssocDialog::makeNewExtension()
 
     new_extension_popup = new MythPopupBox(gContext->GetMainWindow(),
                                            "new extension popup");
-    gContext->ThemeWidget(new_extension_popup);
+    GetMythUI()->ThemeWidget(new_extension_popup);
 
     new_extension_popup->addLabel("");
     new_extension_popup->addLabel(tr("Please enter the new extension:"));

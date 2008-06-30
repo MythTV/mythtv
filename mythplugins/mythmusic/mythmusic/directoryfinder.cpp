@@ -10,6 +10,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/uitypes.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 // mythmusic
 #include "directoryfinder.h"
@@ -178,7 +179,7 @@ void DirectoryFinder::wireUpTheme()
     }
 
     // load pixmaps
-    m_directoryPixmap = gContext->LoadScalePixmap("mm_folder.png");
+    m_directoryPixmap = GetMythUI()->LoadScalePixmap("mm_folder.png");
 
     buildFocusList();
     assignFirstFocus();

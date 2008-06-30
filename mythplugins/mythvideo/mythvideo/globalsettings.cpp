@@ -4,6 +4,7 @@
 #include <QDir>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdirs.h>
 
 #include "globalsettings.h"
 #include "globals.h"
@@ -210,7 +211,7 @@ HostLineEdit *SearchListingsCommand()
 {
     HostLineEdit *gc = new HostLineEdit("MovieListCommandLine");
     gc->setLabel(QObject::tr("Command to search for movie listings"));
-    gc->setValue(gContext->GetShareDir() + "mythvideo/scripts/imdb.pl " +
+    gc->setValue(GetShareDir() + "mythvideo/scripts/imdb.pl " +
                  "-M tv=no;video=no");
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
@@ -221,7 +222,7 @@ HostLineEdit *GetPostersCommand()
 {
     HostLineEdit *gc = new HostLineEdit("MoviePosterCommandLine");
     gc->setLabel(QObject::tr("Command to search for movie posters"));
-    gc->setValue(gContext->GetShareDir() + "mythvideo/scripts/imdb.pl -P");
+    gc->setValue(GetShareDir() + "mythvideo/scripts/imdb.pl -P");
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     return gc;
@@ -231,7 +232,7 @@ HostLineEdit *GetDataCommand()
 {
     HostLineEdit *gc = new HostLineEdit("MovieDataCommandLine");
     gc->setLabel(QObject::tr("Command to extract data for movies"));
-    gc->setValue(gContext->GetShareDir() + "mythvideo/scripts/imdb.pl -D");
+    gc->setValue(GetShareDir() + "mythvideo/scripts/imdb.pl -D");
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     return gc;
@@ -252,7 +253,7 @@ HostLineEdit *VideoArtworkDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("VideoArtworkDir");
     gc->setLabel(QObject::tr("Directory that holds movie posters"));
-    gc->setValue(MythContext::GetConfDir() + "/MythVideo");
+    gc->setValue(GetConfDir() + "/MythVideo");
     gc->setHelpText(QObject::tr("This directory must exist, and the user "
                     "running MythVideo needs to have read/write permission "
                     "to the directory."));

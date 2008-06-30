@@ -1,5 +1,6 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
+include ( ../../programs-libs.pro )
 
 TEMPLATE = lib
 CONFIG += plugin thread

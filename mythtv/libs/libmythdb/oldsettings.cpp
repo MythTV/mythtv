@@ -10,7 +10,7 @@
 
 
 #include "oldsettings.h"
-#include "mythcontext.h"
+
 #include <qstring.h>
 #include <fstream>
 #include <cstdlib>
@@ -109,11 +109,12 @@ void Settings::SetSetting(QString strSetting, float fNewVal)
     (*m_pSettings)[strSetting] = tmp;
 }
 
-bool Settings::LoadSettingsFiles(QString filename, QString prefix)
+bool Settings::LoadSettingsFiles(QString filename, QString prefix,
+                                 QString confdir)
 {
     int result = ReadSettings(prefix + "/share/mythtv/" + filename);
     result += ReadSettings(prefix + "/etc/mythtv/" + filename);
-    result += ReadSettings(MythContext::GetConfDir() + "/" + filename);
+    result += ReadSettings(confdir + "/" + filename);
     result += ReadSettings("./" + filename);
     return result;
 }
@@ -122,8 +123,6 @@ bool Settings::ReadSettings(QString pszFile)
 {
     fstream fin(pszFile.ascii(), ios::in);
     if (!fin.is_open()) return false;
-
-    VERBOSE(VB_FILE, "Settings::ReadSettings() - parsing " + pszFile);
 
     string strLine;
     QString strKey;

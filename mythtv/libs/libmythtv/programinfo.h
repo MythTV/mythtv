@@ -9,6 +9,7 @@
 #include <qmap.h>
 #include <Q3GridLayout>
 #include <Q3PtrList>
+#include <QStringList>
 
 #include <qregexp.h>
 #include <vector>

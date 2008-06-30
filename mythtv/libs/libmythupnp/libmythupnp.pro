@@ -31,14 +31,9 @@ SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp bufferedsocketdevice.cp
 SOURCES += eventing.cpp upnpcmgr.cpp upnpmsrr.cpp upnptaskevent.cpp ssdpcache.cpp
 SOURCES += configuration.cpp soapclient.cpp mythxmlclient.cpp
 
-INCLUDEPATH += ../libmyth
-INCLUDEPATH += ../..
-DEPENDPATH += ../libmyth
-
-# There is a circular dependency here, and this lib may not be built yet:
-#LIBS += -L../libmyth
-#LIBS += -lmyth-$$LIBVERSION
-#TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
+INCLUDEPATH += ../libmythdb
+DEPENDPATH += ../libmythdb
+LIBS += -L../libmythdb -lmythdb-$$LIBVERSION
 
 LIBS += $$EXTRA_LIBS
 

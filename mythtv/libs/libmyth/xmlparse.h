@@ -8,6 +8,7 @@
 #include <qlabel.h>
 #include <qdom.h>
 
+class MythUIHelper;
 
 class MPUBLIC XMLParse
 {
@@ -66,6 +67,8 @@ class MPUBLIC XMLParse
     int usetrans;
     
     QString fontSizeType;
+
+    MythUIHelper *ui;
 };
 
 #endif

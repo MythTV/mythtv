@@ -37,6 +37,7 @@ using namespace std;
 // MythTV plugin headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/util.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 // MythGallery headers
 #include "glsingleview.h"
@@ -129,7 +130,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
     {
         m_slideshow_running = true;
         m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
-        gContext->DisableScreensaver();
+        GetMythUI()->DisableScreensaver();
     }
 }
 
@@ -254,7 +255,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
     bool wasRunning = m_slideshow_running;
     m_slideshow_timer->stop();
     m_slideshow_running = false;
-    gContext->RestoreScreensaver();
+    GetMythUI()->RestoreScreensaver();
     m_effect_running = false;
     m_slideshow_frame_delay_state = m_slideshow_frame_delay * 1000;
 
@@ -446,7 +447,7 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
 
     if (m_slideshow_running)
     {
-        gContext->DisableScreensaver();
+        GetMythUI()->DisableScreensaver();
     }
 
     updateGL();

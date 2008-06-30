@@ -2,6 +2,9 @@
 
 #include "mythconfigdialogs.h"
 #include "mythwizard.h"
+#include "mythcontext.h"
+
+#include "mythuihelper.h"
 
 #include <q3hbox.h>
 
@@ -137,7 +140,7 @@ MythDialog* ConfigurationDialog::dialogWidget(MythMainWindow *parent,
 
     float wmult = 0, hmult = 0;
 
-    gContext->GetScreenSettings(wmult, hmult);
+    GetMythUI()->GetScreenSettings(wmult, hmult);
 
     QVBoxLayout *layout = new QVBoxLayout(dialog, (int)(20 * hmult));
 

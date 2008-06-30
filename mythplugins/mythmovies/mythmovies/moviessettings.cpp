@@ -1,5 +1,7 @@
 #include "moviessettings.h"
 
+#include <mythtv/mythdirs.h>
+
 static HostLineEdit *ZipCode()
 {
     HostLineEdit *gc = new HostLineEdit("MythMovies.ZipCode");
@@ -24,7 +26,7 @@ static HostLineEdit *Grabber()
 {
     HostLineEdit *gc = new HostLineEdit("MythMovies.Grabber");
     gc->setLabel("Grabber:");
-    gc->setValue(QString("%1/bin/ignyte --zip %z --radius %r").arg(gContext->GetInstallPrefix()));
+    gc->setValue(QString("%1/bin/ignyte --zip %z --radius %r").arg(GetInstallPrefix()));
     gc->setHelpText("This is the path to the data grabber to use."
                     "If you are in the United States, the default grabber "
                     "should be fine. If you are elsewhere, you'll need a "

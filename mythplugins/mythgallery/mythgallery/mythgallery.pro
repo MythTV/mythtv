@@ -1,5 +1,6 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
+include ( ../../programs-libs.pro )
 
 include (config.pro)
 
@@ -12,8 +13,8 @@ CONFIG += plugin thread
 TARGET = mythgallery
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
+
 LIBS += -ltiff
-LIBS *= $$LOCAL_LIBDIR_X11
 
 INCLUDEPATH += $${PREFIX}/include/mythtv
 

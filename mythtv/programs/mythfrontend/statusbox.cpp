@@ -27,6 +27,7 @@ using namespace std;
 #include "util.h"
 #include "mythdbcon.h"
 #include "cardutil.h"
+#include "mythuihelper.h"
 
 #define REC_CAN_BE_DELETED(rec) \
     ((((rec)->programflags & FL_INUSEPLAYING) == 0) && \
@@ -253,7 +254,7 @@ void StatusBox::LoadTheme()
     int screenheight = 0, screenwidth = 0;
     float wmult = 0, hmult = 0;
 
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    GetMythUI()->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     theme = new XMLParse();
     theme->SetWMult(wmult);

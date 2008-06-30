@@ -17,6 +17,7 @@
 #include <mythtv/mythmediamonitor.h>
 #include <mythtv/uitypes.h>
 #include <mythtv/compat.h>
+#include <mythtv/mythdirs.h>
 
 #include "dvdripbox.h"
 #include "titledialog.h"
@@ -256,7 +257,7 @@ void DVDRipBox::connectToMtd(bool try_to_run_mtd)
         //
         //  it should daemonize itself and then return
         //
-        system(QString("%1/bin/mtd -d").arg(gContext->GetInstallPrefix()));
+        system(QString("%1/bin/mtd -d").arg(GetInstallPrefix()));
 
         //
         //  but we need to wait a wee bit for the

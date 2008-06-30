@@ -1,7 +1,7 @@
 #include "recordingprofile.h"
 #include "cardutil.h"
 #include "libmyth/mythcontext.h"
-#include "libmyth/mythdbcon.h"
+#include "mythdbcon.h"
 #include "libmyth/mythwizard.h"
 #include <qsqldatabase.h>
 #include <q3header.h>

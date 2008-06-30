@@ -38,6 +38,7 @@
 #include <mythtv/httpcomms.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/libmythui/mythmainwindow.h>
+#include <mythtv/mythdirs.h>
 
 #include "mythflixqueue.h"
 #include "flixutil.h"
@@ -49,7 +50,7 @@ MythFlixQueue::MythFlixQueue(MythScreenStack *parent, const char *name)
 
     // Setup cache directory
 
-    QString fileprefix = MythContext::GetConfDir();
+    QString fileprefix = GetConfDir();
 
     QDir dir(fileprefix);
     if (!dir.exists())
@@ -63,7 +64,7 @@ MythFlixQueue::MythFlixQueue(MythScreenStack *parent, const char *name)
     zoom = QString("-z %1")
                    .arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
     browser = gContext->GetSetting("WebBrowserCommand",
-                                   gContext->GetInstallPrefix() +
+                                   GetInstallPrefix() +
                                       "/bin/mythbrowser");
     m_articlesList = NULL;
 
@@ -192,7 +193,7 @@ MythImage* MythFlixQueue::LoadPosterImage(QString location)
     int index = imageLoc.findRev("/");
     imageLoc = imageLoc.mid(index,length) + ".jpg";
 
-    QString fileprefix = MythContext::GetConfDir();
+    QString fileprefix = GetConfDir();
 
     QDir dir(fileprefix);
     if (!dir.exists())
@@ -349,7 +350,7 @@ void MythFlixQueue::slotMoveToTop()
         if(article)
         {
 
-            QStringList args(gContext->GetShareDir() +
+            QStringList args(GetShareDir() +
                              "mythflix/scripts/netflix.pl");
 
             QString movieID(article->articleURL());
@@ -386,7 +387,7 @@ void MythFlixQueue::slotRemoveFromQueue()
         if(article)
         {
 
-            QStringList args(gContext->GetShareDir() +
+            QStringList args(GetShareDir() +
                              "mythflix/scripts/netflix.pl");
 
             QString movieID(article->articleURL());
@@ -434,7 +435,7 @@ void MythFlixQueue::slotMoveToQueue()
                 return;
             }
 
-            QStringList base(gContext->GetShareDir() +
+            QStringList base(GetShareDir() +
                              "mythflix/scripts/netflix.pl");
 
             QString movieID(article->articleURL());

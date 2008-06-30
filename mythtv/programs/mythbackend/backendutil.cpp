@@ -15,10 +15,10 @@
 #include "backendutil.h"
 #include "remoteutil.h"
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/mythdbcon.h"
-#include "libmyth/util.h"
-#include "libmyth/compat.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "util.h"
+#include "compat.h"
 
 static QMap<int, int> fsID_cache;
 static QMutex cache_lock;

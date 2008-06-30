@@ -7,13 +7,13 @@
 #include <iostream>
 using namespace std;
 
-#include "gametree.h"
-#include "gamehandler.h"
-
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythwidgets.h>
 #include <mythtv/uitypes.h>
+
+#include "gametree.h"
+#include "gamehandler.h"
 
 #define LOC_ERR QString("MythGame:GAMETREE Error: ")
 #define LOC QString("MythGame:GAMETREE: ")

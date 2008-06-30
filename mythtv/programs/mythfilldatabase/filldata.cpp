@@ -24,6 +24,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "compat.h"
 #include "util.h"
+#include "mythdirs.h"
 
 // libmythtv headers
 #include "videosource.h" // for is_grabber..
@@ -342,8 +343,8 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     QString filename = QString(tempfilename);
 
     QString home = QDir::homeDirPath();
-    QString configfile = QString("%1/%2.xmltv").arg(MythContext::GetConfDir())
-                                                       .arg(source.name);
+    QString configfile = QString("%1/%2.xmltv").arg(GetConfDir())
+                                               .arg(source.name);
 
     QString command  = QString("nice %1 --config-file '%2' --output %3")
                             .arg(xmltv_grabber.ascii())

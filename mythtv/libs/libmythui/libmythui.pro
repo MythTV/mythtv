@@ -8,27 +8,26 @@ CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
-INCLUDEPATH += ../libmyth
+INCLUDEPATH += ../libmythdb
 INCLUDEPATH += ../.. ../
 
-DEPENDPATH += ../libmyth .
-
-# There is a circular dependency here, and this lib may not be built yet:
-#LIBS += -L../libmyth -lmyth-$$LIBVERSION
+LIBS += -L../libmythdb -lmythdb-$$LIBVERSION
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
 HEADERS  = mythmainwindow.h mythpainter.h mythimage.h myththemebase.h
-HEADERS += mythpainter_qt.h mythmainwindow_internal.h
+HEADERS += mythpainter_qt.h mythmainwindow_internal.h mythuihelper.h
 HEADERS += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h 
 HEADERS += mythuitext.h mythuistatetype.h mythgesture.h xmlparsebase.h
 HEADERS += mythuibutton.h mythlistbutton.h myththemedmenu.h mythdialogbox.h
 HEADERS += mythuiclock.h mythuitextedit.h mythprogressdialog.h mythuispinbox.h
 HEADERS += mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
+HEADERS += screensaver.h screensaver-null.h mythsystem.h x11colors.h
+HEADERS += themeinfo.h util-x11.h DisplayRes.h DisplayResScreen.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp myththemebase.cpp
-SOURCES += mythpainter_qt.cpp xmlparsebase.cpp
+SOURCES += mythpainter_qt.cpp xmlparsebase.cpp mythuihelper.cpp
 SOURCES += mythscreenstack.cpp mythscreentype.cpp mythgesture.cpp
 SOURCES += mythuitype.cpp mythuiimage.cpp mythuitext.cpp
 SOURCES += mythuistatetype.cpp mythlistbutton.cpp mythfontproperties.cpp
@@ -36,16 +35,19 @@ SOURCES += mythuibutton.cpp myththemedmenu.cpp mythdialogbox.cpp
 SOURCES += mythuiclock.cpp mythuitextedit.cpp mythprogressdialog.cpp
 SOURCES += mythuispinbox.cpp mythuicheckbox.cpp mythuibuttonlist.cpp
 SOURCES += mythuigroup.cpp
+SOURCES += screensaver.cpp screensaver-null.cpp mythsystem.cpp x11colors.cpp
+SOURCES += themeinfo.cpp util-x11.cpp DisplayRes.cpp DisplayResScreen.cpp
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
 
 inc.files  = mythmainwindow.h mythpainter.h mythimage.h myththemebase.h
-inc.files += mythpainter_qt.h mythuistatetype.h
+inc.files += mythpainter_qt.h mythuistatetype.h mythuihelper.h
 inc.files += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h 
 inc.files += mythuitext.h mythuibutton.h mythlistbutton.h xmlparsebase.h
 inc.files += myththemedmenu.h mythdialogbox.h mythfontproperties.h
 inc.files += mythuiclock.h mythgesture.h mythuitextedit.h mythprogressdialog.h
 inc.files += mythuispinbox.h mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
+inc.files += mythsystem.h x11colors.h
 
 INSTALLS += inc
 
@@ -62,19 +64,47 @@ using_x11:using_opengl {
     LIBS += $$EXTRA_LIBS
 }
 
+using_x11 {
+    DEFINES += USING_X11
+    HEADERS += screensaver-x11.h
+    SOURCES += screensaver-x11.cpp
+    LIBS += $$EXTRA_LIBS
+}
+
 macx {
+    HEADERS += screensaver-osx.h   DisplayResOSX.h
+    SOURCES += screensaver-osx.cpp DisplayResOSX.cpp
+
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
     LIBS           += -framework Carbon -framework OpenGL
+
+    using_appleremote {
+        HEADERS += AppleRemote.h   AppleRemoteListener.h
+        SOURCES += AppleRemote.cpp AppleRemoteListener.cpp
+        !using_lirc: HEADERS += lircevent.h
+        !using_lirc: SOURCES += lircevent.cpp
+    }
 
     QMAKE_LFLAGS_SHLIB += -flat_namespace
 }
 
 using_joystick_menu {
     DEFINES += USE_JOYSTICK_MENU
+    HEADERS += jsmenu.h jsmenuevent.h
+    SOURCES += jsmenu.cpp jsmenuevent.cpp
 }
 
 using_lirc {
     DEFINES += USE_LIRC
+    HEADERS += lirc.h lircevent.h
+    SOURCES += lirc.cpp lircevent.cpp
+    LIBS += $$LIRC_LIBS
+}
+
+using_xrandr {
+    DEFINES += USING_XRANDR
+    HEADERS += DisplayResX.h
+    SOURCES += DisplayResX.cpp
 }
 
 cygwin:DEFINES += _WIN32

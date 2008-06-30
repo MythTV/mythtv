@@ -7,7 +7,7 @@
 
 #include "mythimage.h"
 #include "mythmainwindow.h"
-#include "mythcontext.h"
+#include "mythuihelper.h"
 
 MythImage::MythImage(MythPainter *parent)
 {
@@ -75,7 +75,7 @@ void MythImage::Resize(const QSize &newSize)
 void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length)
 {
     QImage mirrorImage;
-    FillDirection fillDirection;
+    FillDirection fillDirection = FillTopToBottom;
     if (axis == ReflectVertical)
     {
         mirrorImage = mirrored(false,true);
@@ -168,7 +168,7 @@ MythImage *MythImage::FromQImage(QImage **img)
 // FIXME: Get rid of LoadScaleImage
 bool MythImage::Load(const QString &filename)
 {
-    QImage *im = gContext->LoadScaleImage(filename);
+    QImage *im = GetMythUI()->LoadScaleImage(filename);
     if (im)
     {
         Assign(*im);

@@ -29,6 +29,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/libmythui/mythmainwindow.h>
+#include <mythtv/mythdirs.h>
 
 // MythNews headers
 #include "mythnewsconfig.h"
@@ -95,7 +96,7 @@ MythNewsConfig::~MythNewsConfig()
 
 void MythNewsConfig::populateSites()
 {
-    QString filename = gContext->GetShareDir()
+    QString filename = GetShareDir()
                        + "mythnews/news-sites.xml";
     QFile xmlFile(filename);
 

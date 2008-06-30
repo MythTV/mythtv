@@ -20,6 +20,10 @@ using namespace std;
 #include "lcddevice.h"
 #include "util.h"
 
+#include "mythfontproperties.h"
+#include "mythuihelper.h"
+#include "x11colors.h"
+
 #ifdef USING_MINGW
 #undef LoadImage
 #endif
@@ -417,7 +421,7 @@ void UIBarType::LoadImage(int loc, QString myFile)
         filename = myFile;
 
     QString file = filename;
-    if (!gContext->FindThemeFile(file))
+    if (!GetMythUI()->FindThemeFile(file))
         goto error;
 
     if (!sourceImg.load(file))
@@ -903,10 +907,10 @@ void UIGuideType::SetCategoryColors(const QMap<QString, QString> &catC)
 
 void UIGuideType::LoadImage(int recType, const QString &file)
 {
-    QString themeDir = gContext->GetThemeDir();
+    QString themeDir = GetMythUI()->GetThemeDir();
     QString filename = themeDir + file;
 
-    QPixmap *pix = gContext->LoadScalePixmap(filename);
+    QPixmap *pix = GetMythUI()->LoadScalePixmap(filename);
 
     if (pix)
     {
@@ -917,10 +921,10 @@ void UIGuideType::LoadImage(int recType, const QString &file)
 
 void UIGuideType::SetArrow(int direction, const QString &file)
 {
-    QString themeDir = gContext->GetThemeDir();
+    QString themeDir = GetMythUI()->GetThemeDir();
     QString filename = themeDir + file;
 
-    QPixmap *pix = gContext->LoadScalePixmap(filename);
+    QPixmap *pix = GetMythUI()->LoadScalePixmap(filename);
 
     if (pix)
     {
@@ -1381,11 +1385,11 @@ void UIImageType::LoadImage()
             m_filename.replace(pathStart, 1, "/" + flexprefix);
     }
 
-    QString filename = gContext->GetThemeDir() + m_filename;
+    QString filename = GetMythUI()->GetThemeDir() + m_filename;
 
     if (m_force_x == -1 && m_force_y == -1)
     {
-        QPixmap *tmppix = gContext->LoadScalePixmap(filename);
+        QPixmap *tmppix = GetMythUI()->LoadScalePixmap(filename);
         if (tmppix)
         {
             img = *tmppix;
@@ -1400,7 +1404,7 @@ void UIImageType::LoadImage()
 
     file = m_filename;
 
-    if (!gContext->FindThemeFile(file))
+    if (!GetMythUI()->FindThemeFile(file))
     {
         VERBOSE(VB_IMPORTANT, "UIImageType::LoadImage() - Cannot find image: "
                 << m_filename);
@@ -1616,13 +1620,13 @@ bool UIAnimatedImageType::LoadImage(int imageNo)
         return false;
 
     QString filename = m_filename.arg(imageNo);
-    if (!gContext->FindThemeFile(filename))
+    if (!GetMythUI()->FindThemeFile(filename))
          return true;
 
     bool bSuccess = false;
     if (m_force_x == -1 && m_force_y == -1)
     {
-        QPixmap *tmppix = gContext->LoadScalePixmap(filename);
+        QPixmap *tmppix = GetMythUI()->LoadScalePixmap(filename);
         if (tmppix)
         {
             imageList->push_back(tmppix);
@@ -2433,7 +2437,7 @@ QPixmap *UIImageGridType::createScaledPixmap(QString filename,
 
     if (filename != "")
     {
-        QImage *img = gContext->LoadScaleImage(filename);
+        QImage *img = GetMythUI()->LoadScaleImage(filename);
         if (!img)
         {
             cout << "Failed to load image" << (const char *)filename << endl;
@@ -2452,13 +2456,14 @@ QPixmap *UIImageGridType::createScaledPixmap(QString filename,
 
 void UIImageGridType::loadImages(void)
 {
-    checkNonPixmap = gContext->LoadScalePixmap("lb-check-empty.png");
-    checkHalfPixmap = gContext->LoadScalePixmap("lb-check-half.png");
-    checkFullPixmap = gContext->LoadScalePixmap("lb-check-full.png");
-    upArrowRegPixmap = gContext->LoadScalePixmap("lb-uparrow-reg.png");
-    upArrowActPixmap = gContext->LoadScalePixmap("lb-uparrow-sel.png");
-    dnArrowRegPixmap = gContext->LoadScalePixmap("lb-dnarrow-reg.png");
-    dnArrowActPixmap = gContext->LoadScalePixmap("lb-dnarrow-sel.png");
+    MythUIHelper *ui = GetMythUI();
+    checkNonPixmap = ui->LoadScalePixmap("lb-check-empty.png");
+    checkHalfPixmap = ui->LoadScalePixmap("lb-check-half.png");
+    checkFullPixmap = ui->LoadScalePixmap("lb-check-full.png");
+    upArrowRegPixmap = ui->LoadScalePixmap("lb-uparrow-reg.png");
+    upArrowActPixmap = ui->LoadScalePixmap("lb-uparrow-sel.png");
+    dnArrowRegPixmap = ui->LoadScalePixmap("lb-dnarrow-reg.png");
+    dnArrowActPixmap = ui->LoadScalePixmap("lb-dnarrow-sel.png");
 }
 
 void UIImageGridType::loadCellImages(void)
@@ -2696,7 +2701,7 @@ void UIRichTextType::loadBackgroundImg(bool &changed)
             if (m_backgroundImage) 
                 delete m_backgroundImage;
 
-            m_backgroundImage = gContext->LoadScaleImage(file, true);
+            m_backgroundImage = GetMythUI()->LoadScaleImage(file, true);
             m_backgroundFile = file;
             changed = true;
         }

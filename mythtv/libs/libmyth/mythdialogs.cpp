@@ -47,6 +47,9 @@ using namespace std;
 #include "screensaver.h"
 #include "mythdbcon.h"
 
+#include "mythfontproperties.h"
+#include "mythuihelper.h"
+
 #ifdef USING_MINGW
 #undef LoadImage
 #endif
@@ -65,13 +68,14 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
     }
 
     in_loop = false;
+    MythUIHelper *ui = GetMythUI();
 
-    gContext->GetScreenSettings(xbase, screenwidth, wmult,
-                                ybase, screenheight, hmult);
+    ui->GetScreenSettings(xbase, screenwidth, wmult,
+                          ybase, screenheight, hmult);
 
-    defaultBigFont = gContext->GetBigFont();
-    defaultMediumFont = gContext->GetMediumFont();
-    defaultSmallFont = gContext->GetSmallFont();
+    defaultBigFont = ui->GetBigFont();
+    defaultMediumFont = ui->GetMediumFont();
+    defaultSmallFont = ui->GetSmallFont();
 
     setFont(defaultMediumFont);
 
@@ -79,7 +83,7 @@ MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
     {
         move(0, 0);
         setFixedSize(QSize(screenwidth, screenheight));
-        gContext->ThemeWidget(this);
+        GetMythUI()->ThemeWidget(this);
     }
 
     setAutoFillBackground(true);
@@ -275,7 +279,7 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
     else
         arrowAccel = false;
 
-    gContext->GetScreenSettings(wmult, hmult);
+    GetMythUI()->GetScreenSettings(wmult, hmult);
 
     setLineWidth(3);
     setMidLineWidth(3);
@@ -305,7 +309,7 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
     else
         arrowAccel = false;
 
-    gContext->GetScreenSettings(wmult, hmult);
+    GetMythUI()->GetScreenSettings(wmult, hmult);
 
     setLineWidth(3);
     setMidLineWidth(3);
@@ -323,7 +327,7 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
     if (!graphicPopup)
         setPaletteBackgroundColor(popupBackground);
     else
-        gContext->ThemeWidget(this);
+        GetMythUI()->ThemeWidget(this);
     setPaletteForegroundColor(popupHighlight);
 
     popupForegroundColor = popupForeground;
@@ -841,11 +845,11 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps,
     int screenwidth, screenheight;
     float wmult, hmult;
 
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    GetMythUI()->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    setFont(gContext->GetMediumFont());
+    setFont(GetMythUI()->GetMediumFont());
 
-    gContext->ThemeWidget(this);
+    GetMythUI()->ThemeWidget(this);
 
     int yoff = screenheight / 3;
     int xoff = screenwidth / 10;
@@ -1747,7 +1751,7 @@ MythPasswordDialog::MythPasswordDialog(QString message,
     success_flag = success;
     target_text = target;
 
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    GetMythUI()->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
     this->setGeometry((screenwidth - 250 ) / 2,
                       (screenheight - 50 ) / 2,
                       totalWidth,50);
@@ -2275,12 +2279,13 @@ MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
     m_resCode    = kDialogCodeRejected;
     m_inLoop     = false;
     
-    gContext->GetScreenSettings(m_xbase, m_screenWidth, m_wmult,
-                                m_ybase, m_screenHeight, m_hmult);
+    MythUIHelper *ui = GetMythUI();
+    ui->GetScreenSettings(m_xbase, m_screenWidth, m_wmult,
+                          m_ybase, m_screenHeight, m_hmult);
 
-    m_defaultBigFont = gContext->GetBigFont();
-    m_defaultMediumFont = gContext->GetMediumFont();
-    m_defaultSmallFont = gContext->GetSmallFont();
+    m_defaultBigFont = ui->GetBigFont();
+    m_defaultMediumFont = ui->GetMediumFont();
+    m_defaultSmallFont = ui->GetSmallFont();
 
     setFont(m_defaultMediumFont);
     setCursor(QCursor(Qt::ArrowCursor));
@@ -2290,7 +2295,7 @@ MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
     setVScrollBarMode(Q3ScrollView::AlwaysOff);
     setFixedSize(QSize(m_screenWidth, m_screenHeight));
 
-    gContext->ThemeWidget(viewport());
+    ui->ThemeWidget(viewport());
     if (viewport()->paletteBackgroundPixmap())
         m_bgPixmap = new QPixmap(*(viewport()->paletteBackgroundPixmap()));
     else {
@@ -2299,10 +2304,10 @@ MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
     }
     viewport()->setBackgroundMode(Qt::NoBackground);
 
-    m_upArrowPix = gContext->LoadScalePixmap("scrollarrow-up.png");
-    m_dnArrowPix = gContext->LoadScalePixmap("scrollarrow-dn.png");
-    m_ltArrowPix = gContext->LoadScalePixmap("scrollarrow-left.png");
-    m_rtArrowPix = gContext->LoadScalePixmap("scrollarrow-right.png");
+    m_upArrowPix = ui->LoadScalePixmap("scrollarrow-up.png");
+    m_dnArrowPix = ui->LoadScalePixmap("scrollarrow-dn.png");
+    m_ltArrowPix = ui->LoadScalePixmap("scrollarrow-left.png");
+    m_rtArrowPix = ui->LoadScalePixmap("scrollarrow-right.png");
 
     int wmargin = (int)(20*m_wmult);
     int hmargin = (int)(20*m_hmult);

@@ -4,6 +4,7 @@
 
 #include "mhi.h"
 #include "osd.h"
+#include "mythdirs.h"
 
 static bool       ft_loaded = false;
 static FT_Library ft_library;
@@ -59,17 +60,17 @@ MHIContext::MHIContext(InteractiveTV *parent)
 // Load the font.  Copied, generally, from OSD::LoadFont.
 bool MHIContext::LoadFont(QString name)
 {
-    QString fullname = MythContext::GetConfDir() + "/" + name;
+    QString fullname = GetConfDir() + "/" + name;
     FT_Error error = FT_New_Face(ft_library, fullname.ascii(), 0, &m_face);
     if (!error)
         return true;
 
-    fullname = gContext->GetShareDir() + name;
+    fullname = GetShareDir() + name;
     error = FT_New_Face(ft_library, fullname.ascii(), 0, &m_face);
     if (!error)
         return true;
 
-    fullname = gContext->GetShareDir() + "themes/" + name;
+    fullname = GetShareDir() + "themes/" + name;
     error = FT_New_Face(ft_library, fullname.ascii(), 0, &m_face);
     if (!error)
         return true;

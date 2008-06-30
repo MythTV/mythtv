@@ -13,49 +13,48 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 HEADERS += audiooutput.h audiooutputbase.h audiooutputnull.h
 HEADERS += audiooutputdigitalencoder.h audiosettings.cpp
 HEADERS += backendselect.h dbsettings.h dialogbox.h
-HEADERS += DisplayRes.h DisplayResScreen.h exitcodes.h
-HEADERS += generictree.h httpcomms.h langsettings.h lcddevice.h
+HEADERS += generictree.h langsettings.h
 HEADERS += managedlist.h mythconfigdialogs.h mythconfiggroups.h
-HEADERS += mythcontext.h mythdbcon.h mythdeque.h mythdialogs.h
+HEADERS += mythcontext.h mythdeque.h mythdialogs.h
 HEADERS += mythevent.h mythexp.h mythmedia.h mythmediamonitor.h
-HEADERS += mythobservable.h mythplugin.h mythpluginapi.h mythsocket.h
+HEADERS += mythplugin.h mythpluginapi.h 
 HEADERS += mythstorage.h mythwidgets.h mythwizard.h
-HEADERS += oldsettings.h output.h qmdcodec.h remotefile.h
-HEADERS += screensaver.h screensaver-null.h settings.h themeinfo.h
-HEADERS += uilistbtntype.h uitypes.h util.h util-x11.h
+HEADERS += output.h remotefile.h
+HEADERS += settings.h 
+HEADERS += uilistbtntype.h uitypes.h util.h
 HEADERS += volumebase.h virtualkeyboard.h visual.h xmlparse.h
 HEADERS += mythhdd.h mythcdrom.h storagegroup.h dbutil.h
-HEADERS += compat.h mythcommandlineparser.h mythterminal.h
+HEADERS += mythcommandlineparser.h mythterminal.h
 
 SOURCES += audiooutput.cpp audiooutputbase.cpp audiooutputnull.cpp
 SOURCES += audiooutputdigitalencoder.cpp audiosettings.cpp
 SOURCES += backendselect.cpp dbsettings.cpp dialogbox.cpp
-SOURCES += DisplayRes.cpp DisplayResScreen.cpp
-SOURCES += generictree.cpp httpcomms.cpp langsettings.cpp lcddevice.cpp
+SOURCES += generictree.cpp langsettings.cpp
 SOURCES += managedlist.cpp mythconfigdialogs.cpp mythconfiggroups.cpp
-SOURCES += mythcontext.cpp mythdbcon.cpp mythdialogs.cpp
+SOURCES += mythcontext.cpp mythdialogs.cpp
 SOURCES += mythmedia.cpp mythmediamonitor.cpp
-SOURCES += mythobservable.cpp mythplugin.cpp mythsocket.cpp
+SOURCES += mythplugin.cpp 
 SOURCES += mythstorage.cpp mythwidgets.cpp mythwizard.cpp
-SOURCES += oldsettings.cpp output.cpp qmdcodec.cpp remotefile.cpp
-SOURCES += screensaver.cpp screensaver-null.cpp settings.cpp themeinfo.cpp
-SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp util-x11.cpp
+SOURCES += output.cpp remotefile.cpp
+SOURCES += settings.cpp
+SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp
 SOURCES += volumebase.cpp virtualkeyboard.cpp xmlparse.cpp
 SOURCES += mythhdd.cpp mythcdrom.cpp storagegroup.cpp dbutil.cpp
 SOURCES += mythcommandlineparser.cpp mythterminal.cpp
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
-INCLUDEPATH += ../libavcodec ../libavutil
-INCLUDEPATH += ../.. ../ ./
+INCLUDEPATH += ../libavcodec ../libavutil ../libmythdb
+INCLUDEPATH += ../.. ../ ./ ../libmythupnp ../libmythui
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
 DEPENDPATH += ../libmythfreesurround
 DEPENDPATH += ../libavcodec ../libavutil
-DEPENDPATH += ../ ../libmythui
+DEPENDPATH += ../ ../libmythui ../libmythdb
 DEPENDPATH += ../libmythupnp
 
 
 LIBS += -L../libmythsamplerate   -lmythsamplerate-$${LIBVERSION}
 LIBS += -L../libmythsoundtouch   -lmythsoundtouch-$${LIBVERSION}
+LIBS += -L../libmythdb           -lmythdb-$${LIBVERSION}
 LIBS += -L../libmythui           -lmythui-$${LIBVERSION}
 LIBS += -L../libmythupnp         -lmythupnp-$${LIBVERSION}
 LIBS += -L../libmythfreesurround -lmythfreesurround-$${LIBVERSION}
@@ -68,16 +67,15 @@ TARGETDEPS += ../libmythfreesurround/libmythfreesurround-$${MYTH_LIB_EXT}
 
 # Install headers so that plugins can compile independently
 inc.path = $${PREFIX}/include/mythtv/
-inc.files  = dialogbox.h lcddevice.h mythcontext.h mythdbcon.h mythverbose.h
-inc.files += mythwidgets.h remotefile.h util.h oldsettings.h volumecontrol.h
+inc.files  = dialogbox.h mythcontext.h
+inc.files += mythwidgets.h remotefile.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
-inc.files += audiooutput.h audiosettings.h
-inc.files += inetcomms.h httpcomms.h mythmedia.h mythwizard.h
+inc.files += audiooutput.h audiosettings.h util.h
+inc.files += inetcomms.h mythmedia.h mythwizard.h
 inc.files += uilistbtntype.h generictree.h managedlist.h mythmediamonitor.h
-inc.files += visual.h volumebase.h output.h langsettings.h qmdcodec.h
-inc.files += exitcodes.h mythconfig.h mythconfig.mak virtualkeyboard.h
-inc.files += mythevent.h mythobservable.h mythsocket.h
-inc.files += mythexp.h mythpluginapi.h storagegroup.h compat.h
+inc.files += visual.h volumebase.h output.h langsettings.h
+inc.files += virtualkeyboard.h
+inc.files += mythexp.h mythpluginapi.h storagegroup.h
 inc.files += mythstorage.h mythconfigdialogs.h mythconfiggroups.h
 inc.files += mythterminal.h
 
@@ -85,13 +83,11 @@ inc.files += mythterminal.h
 inc2.path  = $${PREFIX}/include/mythtv/libmyth
 inc2.files = $${inc.files}
 
-
-DEFINES += RUNPREFIX=\\\"$${RUNPREFIX}\\\"
- 
 using_oss {
     DEFINES += USING_OSS
     SOURCES += audiooutputoss.cpp
     HEADERS += audiooutputoss.h
+    LIBS += $$OSS_LIBS
 }
 
 unix:!cygwin {
@@ -129,8 +125,8 @@ mingw {
 }
 
 macx {
-    HEADERS += audiooutputca.h   screensaver-osx.h   DisplayResOSX.h
-    SOURCES += audiooutputca.cpp screensaver-osx.cpp DisplayResOSX.cpp
+    HEADERS += audiooutputca.h
+    SOURCES += audiooutputca.cpp
     HEADERS += util-osx.h
     SOURCES += util-osx.cpp
 
@@ -138,13 +134,6 @@ macx {
         HEADERS += mediamonitor-darwin.h
         SOURCES += mediamonitor-darwin.cpp
         DEFINES += USING_DARWIN_DA
-    }
-
-    using_appleremote {
-        HEADERS += AppleRemote.h   AppleRemoteListener.h
-        SOURCES += AppleRemote.cpp AppleRemoteListener.cpp
-        !using_lirc: HEADERS += lircevent.h
-        !using_lirc: SOURCES += lircevent.cpp
     }
 
     # Mac OS X Frameworks
@@ -182,19 +171,6 @@ using_alsa {
     LIBS += $$ALSA_LIBS
 }
 
-using_joystick_menu {
-    DEFINES += USE_JOYSTICK_MENU
-    HEADERS += jsmenu.h jsmenuevent.h
-    SOURCES += jsmenu.cpp jsmenuevent.cpp
-}
-
-using_lirc {
-    DEFINES += USE_LIRC
-    HEADERS += lirc.h lircevent.h
-    SOURCES += lirc.cpp lircevent.cpp
-    LIBS += $$LIRC_LIBS
-}
-
 using_arts {
     DEFINES += USE_ARTS
     HEADERS += audiooutputarts.h
@@ -213,19 +189,6 @@ using_directx {
     DEFINES += USING_DIRECTX
     HEADERS += audiooutputdx.h
     SOURCES += audiooutputdx.cpp
-}
-
-using_x11 {
-    DEFINES += USING_X11
-    HEADERS += screensaver-x11.h
-    SOURCES += screensaver-x11.cpp
-    LIBS += $$EXTRA_LIBS
-}
-
-using_xrandr {
-    DEFINES += USING_XRANDR
-    HEADERS += DisplayResX.h
-    SOURCES += DisplayResX.cpp
 }
 
 contains( HAVE_MMX, yes ) {

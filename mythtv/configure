@@ -3076,8 +3076,8 @@ echo "bindings_perl             ${bindings_perl-no}"
 echo "bindings_python           ${bindings_python-no}"
 echo ""
 
-MYTH_CONFIG_H=libs/libmyth/mythconfig.h
-MYTH_CONFIG_MAK=libs/libmyth/mythconfig.mak
+MYTH_CONFIG_H=libs/libmythdb/mythconfig.h
+MYTH_CONFIG_MAK=libs/libmythdb/mythconfig.mak
 echo "Creating $MYTH_CONFIG_H and $MYTH_CONFIG_MAK"
 
 date >> config.log

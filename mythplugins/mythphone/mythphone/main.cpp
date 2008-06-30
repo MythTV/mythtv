@@ -26,6 +26,7 @@ using namespace std;
 #include <mythtv/dialogbox.h>
 #include <mythtv/util.h>
 #include <mythtv/mythpluginapi.h>
+#include <mythtv/mythdirs.h>
 
 #include "config.h"
 #include "dbcheck.h"
@@ -257,7 +258,7 @@ int mythplugin_init(const char *libversion)
     mpSettings.save();
 
     // Make sure all the required directories exist
-    QString dirName = MythContext::GetConfDir();
+    QString dirName = GetConfDir();
     QDir dir(dirName);
     if (!dir.exists())
         dir.mkdir(dirName);

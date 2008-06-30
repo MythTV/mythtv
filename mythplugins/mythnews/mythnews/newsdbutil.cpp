@@ -1,4 +1,4 @@
-
+#include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 
 #include "newsdbutil.h"

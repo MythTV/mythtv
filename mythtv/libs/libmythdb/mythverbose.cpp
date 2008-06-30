@@ -1,0 +1,113 @@
+#include <QMutex>
+#include <QStringList>
+#include <iostream>
+
+#include "mythverbose.h"
+
+#define GENERIC_EXIT_OK                             0
+#define GENERIC_EXIT_INVALID_CMDLINE              252
+
+QMutex verbose_mutex(true);
+unsigned int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
+QString verboseString = QString(" important general");
+
+int parse_verbose_arg(QString arg)
+{
+    QString option;
+    bool reverseOption;
+
+    if (arg.startsWith("-"))
+    {
+        cerr << "Invalid or missing argument to -v/--verbose option\n";
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+    else
+    {
+        QStringList verboseOpts = QStringList::split(',', arg);
+        for (QStringList::Iterator it = verboseOpts.begin();
+             it != verboseOpts.end(); ++it )
+        {
+            option = *it;
+            reverseOption = false;
+
+            if (option != "none" && option.left(2) == "no")
+            {
+                reverseOption = true;
+                option = option.right(option.length() - 2);
+            }
+
+            if (!strcmp(option,"help"))
+            {
+                QString m_verbose = verboseString;
+                m_verbose.replace(QRegExp(" "), ",");
+                m_verbose.replace(QRegExp("^,"), "");
+                cerr <<
+                  "Verbose debug levels.\n" <<
+                  "Accepts any combination (separated by comma) of:\n\n" <<
+
+#define VERBOSE_ARG_HELP(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
+                (const char *)QString("  %1").arg(ARG_STR).leftJustify(15, ' ', true) << \
+                " - " << ARG_HELP << "\n" <<
+
+                  VERBOSE_MAP(VERBOSE_ARG_HELP)
+
+                  "\n" <<
+                  "The default for this program appears to be: '-v " <<
+                  (const char *)m_verbose << "'\n\n" <<
+                  "Most options are additive except for none, all, and important.\n" <<
+                  "These three are semi-exclusive and take precedence over any\n" <<
+                  "prior options given.  You can however use something like\n" <<
+                  "'-v none,jobqueue' to get only JobQueue related messages\n" <<
+                  "and override the default verbosity level.\n" <<
+                  "\n" <<
+                  "The additive options may also be subtracted from 'all' by \n" <<
+                  "prefixing them with 'no', so you may use '-v all,nodatabase'\n" <<
+                  "to view all but database debug messages.\n" <<
+                  "\n" <<
+                  "Some debug levels may not apply to this program.\n" <<
+                  endl;
+                return GENERIC_EXIT_INVALID_CMDLINE;
+            }
+
+#define VERBOSE_ARG_CHECKS(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
+            else if (option == ARG_STR) \
+            { \
+                if (reverseOption) \
+                { \
+                    print_verbose_messages &= ~(ARG_VALUE); \
+                    verboseString = verboseString + " no" + ARG_STR; \
+                } \
+                else \
+                { \
+                    if (ARG_ADDITIVE) \
+                    { \
+                        print_verbose_messages |= ARG_VALUE; \
+                        verboseString = verboseString + " " + ARG_STR; \
+                    } \
+                    else \
+                    { \
+                        print_verbose_messages = ARG_VALUE; \
+                        verboseString = ARG_STR; \
+                    } \
+                } \
+            }
+
+            VERBOSE_MAP(VERBOSE_ARG_CHECKS)
+
+            else
+            {
+                cerr << "Unknown argument for -v/--verbose: "
+                     << (const char *)option << endl;;
+            }
+        }
+    }
+
+    return GENERIC_EXIT_OK;
+}
+
+// Verbose helper function for ENO macro
+QString safe_eno_to_string(int errnum)
+{
+    return QString("%1 (%2)").arg(strerror(errnum)).arg(errnum);
+}
+

@@ -24,6 +24,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>
 #include <mythtv/compat.h>
+#include <mythtv/mythdirs.h>
 
 #include "globals.h"
 #include "videomanager.h"
@@ -1624,7 +1625,7 @@ namespace mythvideo_videomanager
             m_item = item;
 
             QString def_cmd = QDir::cleanDirPath(QString("%1/%2")
-                    .arg(gContext->GetShareDir())
+                    .arg(GetShareDir())
                     .arg("mythvideo/scripts/imdb.pl -M tv=no;video=no"));
 
             QString cmd = gContext->GetSetting("MovieListCommandLine", def_cmd);
@@ -1682,7 +1683,7 @@ namespace mythvideo_videomanager
             m_video_uid = video_uid;
 
             const QString def_cmd = QDir::cleanDirPath(QString("%1/%2")
-                    .arg(gContext->GetShareDir())
+                    .arg(GetShareDir())
                     .arg("mythvideo/scripts/imdb.pl -D"));
             const QString cmd = gContext->GetSetting("MovieDataCommandLine",
                                                      def_cmd);
@@ -1726,7 +1727,7 @@ namespace mythvideo_videomanager
 
             const QString default_cmd =
                     QDir::cleanDirPath(QString("%1/%2")
-                                       .arg(gContext->GetShareDir())
+                                       .arg(GetShareDir())
                                        .arg("mythvideo/scripts/imdb.pl -P"));
             const QString cmd = gContext->GetSetting("MoviePosterCommandLine",
                                                      default_cmd);
@@ -2426,7 +2427,7 @@ namespace mythvideo_videomanager
                 // using ~/.mythtv/MythVideo
                 if (fileprefix.length() == 0)
                 {
-                    fileprefix = MythContext::GetConfDir();
+                    fileprefix = GetConfDir();
 
                     dir.setPath(fileprefix);
                     if (!dir.exists())

@@ -2,12 +2,15 @@
 #include <qpainter.h>
 #include <qpixmap.h>
 
+#include <iostream>
 #include <cassert>
 
-#include "mythcontext.h"
+#include "compat.h"
+#include "mythuihelper.h"
+#include "mythverbose.h"
+
 #include "mythlistbutton.h"
 #include "mythmainwindow.h"
-#include "mythcontext.h"
 #include "mythfontproperties.h"
 #include "mythuistatetype.h"
 #include "mythuibutton.h"
@@ -913,7 +916,7 @@ void MythListButton::LoadPixmap(MythImage **pix, QDomElement &element)
     QString filename = element.attribute("filename");
     if (!filename.isEmpty())
     {
-        QImage *p = gContext->LoadScaleImage(filename);
+        QImage *p = GetMythUI()->LoadScaleImage(filename);
         *pix = MythImage::FromQImage(&p);
         return;
     }

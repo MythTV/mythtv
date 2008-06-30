@@ -20,22 +20,24 @@
 #include <qimage.h>
 
 // MythTV headers
-#include "libmyth/mythconfig.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/mythdbcon.h"
-#include "libmyth/dbsettings.h"
-#include "libmyth/langsettings.h"
+#include "mythconfig.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "dbsettings.h"
+#include "langsettings.h"
 #include "libmythtv/mpeg/iso639.h"
 #include "playbackbox.h"
 #include "globalsettings.h"
 #include "libmythtv/recordingprofile.h"
 #include "libmythtv/scheduledrecording.h"
-#include "libmyth/util-x11.h"
-#include "libmyth/DisplayRes.h"
-#include "libmyth/uitypes.h"
+#include "util-x11.h"
+#include "DisplayRes.h"
+#include "uitypes.h"
 #include "libmythtv/cardutil.h"
-#include "libmyth/themeinfo.h"
-#include "libmyth/mythconfig.h"
+#include "themeinfo.h"
+#include "mythconfig.h"
+#include "mythdirs.h"
+#include "mythuihelper.h"
 
 static HostComboBox *AudioOutputDevice()
 {
@@ -1610,7 +1612,7 @@ static HostComboBox *MenuTheme()
     HostComboBox *gc = new HostComboBox("MenuTheme");
     gc->setLabel(QObject::tr("Menu theme"));
 
-    QDir themes(gContext->GetThemesParentDir());
+    QDir themes(GetThemesParentDir());
     themes.setFilter(QDir::Dirs);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
     gc->addSelection(QObject::tr("Default"), "default");
@@ -1636,7 +1638,7 @@ static HostComboBox *OSDFont()
 {
     HostComboBox *gc = new HostComboBox("OSDFont");
     gc->setLabel(QObject::tr("OSD font"));
-    QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
+    QDir ttf(GetFontsDir(), GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
 
     return gc;
@@ -1646,7 +1648,7 @@ static HostComboBox *OSDCCFont()
 {
     HostComboBox *gc = new HostComboBox("OSDCCFont");
     gc->setLabel(QObject::tr("CC font"));
-    QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
+    QDir ttf(GetFontsDir(), GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
     gc->setHelpText(QObject::tr("Closed Caption font"));
 
@@ -1738,7 +1740,7 @@ static HostComboBox *OSDCC708Font(
         QString("OSDCC708%1Font").arg(subtype));
 
     gc->setLabel(subtypeName);
-    QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
+    QDir ttf(GetFontsDir(), GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
     gc->setHelpText(
         QObject::tr("ATSC %1 closed caption font.").arg(subtypeNameForHelp));
@@ -2835,7 +2837,7 @@ ThemeSelector::ThemeSelector(QString label):
         setLabel(QObject::tr("Menu Theme"));
     }
 
-    QDir themes(gContext->GetThemesParentDir());
+    QDir themes(GetThemesParentDir());
     themes.setFilter(QDir::Dirs);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
 
@@ -3436,7 +3438,7 @@ static void ISO639_fill_selections(SelectSetting *widget, uint i)
     if ((lang.isEmpty() || lang == "aar") && 
         !gContext->GetSetting("Language", "").isEmpty())
     {
-        lang = iso639_str2_to_str3(gContext->GetLanguage().lower());
+        lang = iso639_str2_to_str3(GetMythUI()->GetLanguage().lower());
     }
 
     QMap<int,QString>::iterator it  = _iso639_key_to_english_name.begin();

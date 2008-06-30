@@ -34,6 +34,7 @@
 #include <mythtv/httpcomms.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/libmythui/mythmainwindow.h>
+#include <mythtv/mythdirs.h>
 
 // MythFlix headers
 #include "mythflix.h"
@@ -48,7 +49,7 @@ MythFlix::MythFlix(MythScreenStack *parent, const char *name)
 {
     // Setup cache directory
 
-    QString fileprefix = MythContext::GetConfDir();
+    QString fileprefix = GetConfDir();
 
     QDir dir(fileprefix);
     if (!dir.exists())
@@ -62,7 +63,7 @@ MythFlix::MythFlix(MythScreenStack *parent, const char *name)
     // Initialize variables
     zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
     browser = gContext->GetSetting("WebBrowserCommand",
-                                   gContext->GetInstallPrefix() +
+                                   GetInstallPrefix() +
                                       "/bin/mythbrowser");
 
     m_sitesList = m_articlesList = NULL;
@@ -196,7 +197,7 @@ void MythFlix::updateInfoView(MythListButtonItem* selected)
             int index = imageLoc.findRev("/");
             imageLoc = imageLoc.mid(index,length) + ".jpg";
 
-            QString fileprefix = MythContext::GetConfDir();
+            QString fileprefix = GetConfDir();
 
             QDir dir(fileprefix);
             if (!dir.exists())
@@ -370,7 +371,7 @@ void MythFlix::InsertMovieIntoQueue(QString queueName, bool atTop)
     if(!article)
         return;
 
-    QStringList args(gContext->GetShareDir() + "mythflix/scripts/netflix.pl");
+    QStringList args(GetShareDir() + "mythflix/scripts/netflix.pl");
 
     if (!queueName.isEmpty())
     {
@@ -391,7 +392,7 @@ void MythFlix::InsertMovieIntoQueue(QString queueName, bool atTop)
     if (atTop)
     {
         // Move to top of queue as well
-        args = QStringList(gContext->GetShareDir() +
+        args = QStringList(GetShareDir() +
                            "mythflix/scripts/netflix.pl");
 
         if (!queueName.isEmpty())

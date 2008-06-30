@@ -37,7 +37,7 @@ using namespace std;
 #include "diseqcsettings.h"
 #include "firewiredevice.h"
 #include "compat.h"
-
+#include "mythdirs.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
@@ -421,7 +421,7 @@ XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent,
     parent(_parent), grabber(_grabber) 
 {
     QString filename = QString("%1/%2.xmltv")
-        .arg(MythContext::GetConfDir()).arg(parent.getSourceName());
+        .arg(GetConfDir()).arg(parent.getSourceName());
 
     grabberArgs.push_back("--config-file");
     grabberArgs.push_back(filename);

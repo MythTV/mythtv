@@ -53,7 +53,7 @@ class MPUBLIC MythTerminalKeyFilter : public QObject
     Q_OBJECT
 
   signals:
-    void KeyPress(QKeyEvent *e);
+    void KeyPressd(QKeyEvent *e);
 
   protected:
     bool eventFilter(QObject *obj, QEvent *event);

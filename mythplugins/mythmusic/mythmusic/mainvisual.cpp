@@ -28,6 +28,7 @@
 #include <mythtv/audiooutput.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 // mythmusic
 #include "visualize.h"
@@ -46,7 +47,7 @@ VisualBase::VisualBase(bool screensaverenable)
     : xscreensaverenable(screensaverenable)
 {
     if (!xscreensaverenable)
-        gContext->DoDisableScreensaver();
+        GetMythUI()->DoDisableScreensaver();
 }
 
 VisualBase::~VisualBase()
@@ -57,14 +58,14 @@ VisualBase::~VisualBase()
     //    can destruct properly
     //
     if (!xscreensaverenable)
-        gContext->DoRestoreScreensaver();
+        GetMythUI()->DoRestoreScreensaver();
 }
 
 void VisualBase::drawWarning(QPainter *p, const QColor &back, const QSize &size, QString warning)
 {
     p->fillRect(0, 0, size.width(), size.height(), back);
     p->setPen(Qt::white);
-    p->setFont(gContext->GetMediumFont());
+    p->setFont(GetMythUI()->GetMediumFont());
 
     QFontMetrics fm(p->font());
     int width = fm.width(warning);
@@ -86,11 +87,11 @@ MainVisual::MainVisual(QWidget *parent, const char *name)
     int screenwidth = 0, screenheight = 0;
     float wmult = 0, hmult = 0;
 
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    GetMythUI()->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, parent->width(), parent->height());
 
-    setFont(gContext->GetBigFont());
+    setFont(GetMythUI()->GetBigFont());
     setCursor(QCursor(Qt::BlankCursor));
 
     info_widget = new InfoWidget(this);
@@ -396,7 +397,7 @@ void InfoWidget::showMetadata(Metadata *mdata, bool fullScreen, int visMode)
 
     int indent = int(info_pixmap.width() * 0.02);
 
-    p.setFont(gContext->GetMediumFont());
+    p.setFont(GetMythUI()->GetMediumFont());
 
     QFontMetrics fm(p.font());
     int textWidth = fm.width(info);
@@ -475,7 +476,7 @@ void InfoWidget::showInformation(const QString &text)
 
     int indent = int(info_pixmap.width() * 0.02);
 
-    p.setFont(gContext->GetMediumFont());
+    p.setFont(GetMythUI()->GetMediumFont());
 
     QFontMetrics fm(p.font());
     int textWidth = fm.width(info);

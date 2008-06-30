@@ -25,6 +25,7 @@ using namespace std;
 #include <mythtv/util.h>
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/mythpluginapi.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 // mytharchive
 #include "archivesettings.h"
@@ -423,7 +424,7 @@ void SelectorCallback(void *data, QString &selection)
 
 void runSelectMenu(QString which_menu)
 {
-    QString themedir = gContext->GetThemeDir();
+    QString themedir = GetMythUI()->GetThemeDir();
     MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), which_menu, 
                                       GetMythMainWindow()->GetMainStack(),
                                       "select menu");
@@ -456,7 +457,7 @@ void FormatCallback(void *data, QString &selection)
 
 void runFormatMenu(QString which_menu)
 {
-    QString themedir = gContext->GetThemeDir();
+    QString themedir = GetMythUI()->GetThemeDir();
     MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), which_menu, 
                                               GetMythMainWindow()->GetMainStack(),
                                               "format menu");
@@ -496,7 +497,7 @@ void ArchiveCallback(void *data, QString &selection)
 
 void runMenu(QString which_menu)
 {
-    QString themedir = gContext->GetThemeDir();
+    QString themedir = GetMythUI()->GetThemeDir();
 
     MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), which_menu, 
                                       GetMythMainWindow()->GetMainStack(),

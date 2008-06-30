@@ -12,6 +12,7 @@
 #include "httprequest.h"
 #include <qfileinfo.h>
 #include <limits.h>
+#include "mythcontext.h"
 
 /*
    Music                            Music

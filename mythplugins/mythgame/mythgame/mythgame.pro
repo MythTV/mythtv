@@ -1,5 +1,6 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
+include ( ../../programs-libs.pro )
 
 TEMPLATE = lib
 CONFIG += plugin thread
@@ -17,6 +18,8 @@ SOURCES += gamesettings.cpp dbcheck.cpp rom_metadata.cpp romedit.cpp
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
+
+LIBS += -lz
 
 #The following line was inserted by qt3to4
 QT += xml sql opengl qt3support 

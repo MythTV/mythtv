@@ -8,11 +8,15 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include <iostream>
+
 #include <QDir>
 #include <QFile>
 
 #include "configuration.h"
-#include "mythcontext.h"  // for VERBOSE and GetConfDir()
+#include "mythverbose.h"  // for VERBOSE and GetConfDir()
+#include "mythdb.h"
+#include "mythdirs.h"
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -20,7 +24,7 @@
 
 XmlConfiguration::XmlConfiguration( const QString &sFileName )
 {
-    m_sPath     = MythContext::GetConfDir();
+    m_sPath     = GetConfDir();
     m_sFileName = sFileName;
     
     Load();
@@ -289,7 +293,7 @@ bool DBConfiguration::Save( void )
 
 int DBConfiguration::GetValue( const QString &sSetting, int nDefault )
 {
-    return gContext->GetNumSetting( sSetting, nDefault );
+    return GetMythDB()->GetNumSetting( sSetting, nDefault );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -298,7 +302,7 @@ int DBConfiguration::GetValue( const QString &sSetting, int nDefault )
 
 QString DBConfiguration::GetValue( const QString &sSetting, QString sDefault ) 
 {
-    return gContext->GetSetting( sSetting, sDefault );
+    return GetMythDB()->GetSetting( sSetting, sDefault );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -307,7 +311,7 @@ QString DBConfiguration::GetValue( const QString &sSetting, QString sDefault )
 
 void DBConfiguration::SetValue( const QString &sSetting, int nValue ) 
 {
-    gContext->SaveSetting( sSetting, nValue );
+    GetMythDB()->SaveSetting( sSetting, nValue );
 
 }
 
@@ -317,5 +321,5 @@ void DBConfiguration::SetValue( const QString &sSetting, int nValue )
 
 void DBConfiguration::SetValue( const QString &sSetting, QString sValue ) 
 {
-    gContext->SaveSetting( sSetting, sValue );
+    GetMythDB()->SaveSetting( sSetting, sValue );
 }

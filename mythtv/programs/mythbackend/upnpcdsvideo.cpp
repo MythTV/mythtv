@@ -14,6 +14,7 @@
 #include <qdir.h>
 #include <limits.h>
 #include "util.h"
+#include "mythcontext.h"
 
 #define LOC QString("UPnpCDSVideo: ")
 #define LOC_WARN QString("UPnpCDSVideo, Warning: ")

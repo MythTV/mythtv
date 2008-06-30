@@ -6,6 +6,7 @@
 
 // myth
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdirs.h>
 
 // mytharchive
 #include "archivesettings.h"
@@ -25,7 +26,7 @@ static HostLineEdit *MythArchiveShareDir()
 {
     HostLineEdit *gc = new HostLineEdit("MythArchiveShareDir");
     gc->setLabel(QObject::tr("Myth Archive Share Directory"));
-    gc->setValue(gContext->GetShareDir() + "mytharchive/");
+    gc->setValue(GetShareDir() + "mytharchive/");
     gc->setHelpText(QObject::tr("Location where MythArchive stores its scripts, "
             "intro movies and theme files"));
     return gc;

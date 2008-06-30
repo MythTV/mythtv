@@ -36,8 +36,10 @@
 
 using namespace std;
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/mythdbcon.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "mythuihelper.h"
+#include "mythdirs.h"
 
 void RunProgramFind(bool thread, bool ggActive)
 {
@@ -49,10 +51,10 @@ void RunProgramFind(bool thread, bool ggActive)
     // Language specific progfinder, if needed
 
     ProgFinder *programFind = NULL;
-    if (gContext->GetLanguage() == "ja")
+    if (GetMythUI()->GetLanguage() == "ja")
         programFind = new JaProgFinder(gContext->GetMainWindow(),
                                        "program finder", ggActive);
-    else if (gContext->GetLanguage() == "he")
+    else if (GetMythUI()->GetLanguage() == "he")
         programFind = new HeProgFinder(gContext->GetMainWindow(),
                                      "program finder", ggActive);
     else // default
@@ -99,7 +101,7 @@ void ProgFinder::Initialize(void)
     inFill = false;
     needFill = false;
 
-    baseDir = gContext->GetInstallPrefix();
+    baseDir = GetInstallPrefix();
 
     listRect = QRect(0, 0, 0, 0);
     infoRect = QRect(0, 0, 0, 0);

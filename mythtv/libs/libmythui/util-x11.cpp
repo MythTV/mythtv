@@ -1,10 +1,11 @@
 /** This file is intended to hold X11 specific utility functions */
 #include <map>
 #include <vector>
+#include <iostream>
 using namespace std;
 
 #include "config.h" // for CONFIG_DARWIN
-#include "mythcontext.h"
+#include "mythverbose.h"
 
 QMutex x11_lock;
 
@@ -19,6 +20,9 @@ typedef vector<XErrorEvent>       XErrorVectorType;
 #include <qapplication.h>
 #include <qdesktopwidget.h>
 #endif // USING_X11
+
+#include <QMutex>
+#include "mythuihelper.h"
 
 #ifdef USING_X11
 map<Display*, XErrorVectorType>   error_map;
@@ -56,7 +60,7 @@ int GetNumberOfXineramaScreens(void)
 #ifdef USING_X11
 Display *MythXOpenDisplay(void)
 {
-    QString dispStr = MythContext::GetX11Display();
+    QString dispStr = GetMythUI()->GetX11Display();
     const char *dispCStr = NULL;
     if (!dispStr.isEmpty())
         dispCStr = dispStr.ascii();
@@ -93,14 +97,21 @@ void PrintXErrors(Display *d, const vector<XErrorEvent>& events)
     {
         char buf[200];
         X11S(XGetErrorText(d, events[i].error_code, buf, sizeof(buf)));
-	VERBOSE(VB_IMPORTANT, endl
-                <<"XError type: "<<events[i].type<<endl
-                <<"    display: "<<events[i].display<<endl
-                <<"  serial no: "<<events[i].serial<<endl
-                <<"   err code: "<<events[i].error_code<<" ("<<buf<<")"<<endl
-                <<"   req code: "<<events[i].request_code<<endl
-                <<" minor code: "<<events[i].minor_code<<endl
-                <<"resource id: "<<events[i].resourceid);
+	VERBOSE(VB_IMPORTANT, QString("\n"
+                  "XError type: %1\n"
+                  //"    display: %2\n"
+                  "  serial no: %2\n"
+                  "   err code: %3 (%4)\n"
+                  "   req code: %5\n"
+                  " minor code: %6\n"
+                  "resource id: %7\n")
+                  .arg(events[i].type)
+                  //.arg(events[i].display)
+                  .arg(events[i].serial)
+                  .arg(events[i].error_code).arg(buf)
+                  .arg(events[i].request_code)
+                  .arg(events[i].minor_code)
+                  .arg(events[i].resourceid));  
     }
 }
 

@@ -39,6 +39,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdialogs.h"
 #include "osdlistbtntype.h"
+#include "mythdirs.h"
 
 #define LOC QString("OSDListTreeType: ")
 #define LOC_ERR QString("OSDListTreeType, Error: ")
@@ -717,7 +718,7 @@ void OSDListBtnType::InitItem(
 
 void OSDListBtnType::LoadPixmap(OSDTypeImage& pix, const QString& fileName)
 {
-    QString path = gContext->GetThemesParentDir() + "default/lb-";
+    QString path = GetThemesParentDir() + "default/lb-";
     pix.Load(path + fileName + ".png", m_wmult, m_hmult);
 }
 

@@ -58,7 +58,6 @@ class ExportNativeWizard : public MythThemedDialog
     void handleAddVideo(void);
 
     void titleChanged(UIListBtnTypeItem *item);
-    void toggleUseCutlist(bool state);
     void showMenu(void);
     void closePopupMenu(void);
     void removeItem(void);

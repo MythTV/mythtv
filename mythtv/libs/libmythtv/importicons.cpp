@@ -5,6 +5,8 @@
 #include <qfileinfo.h>
 
 #include "mythwizard.h"
+#include "mythcontext.h"
+#include "mythdirs.h"
 #include "httpcomms.h"
 #include "importicons.h"
 #include "util.h"
@@ -30,7 +32,7 @@ MythDialog *ImportIconsWizard::dialogWidget(MythMainWindow *parent,
 
 int ImportIconsWizard::exec()
 {
-    QString dirpath = MythContext::GetConfDir();
+    QString dirpath = GetConfDir();
     QDir configDir(dirpath);
     if (!configDir.exists())
     {

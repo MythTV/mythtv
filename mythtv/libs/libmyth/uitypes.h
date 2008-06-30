@@ -23,6 +23,7 @@
 #include "mythdialogs.h"
 #include "generictree.h"
 #include "mythwidgets.h"
+#include "libmythui/mythfontproperties.h"
 
 #ifdef USING_MINGW
 #undef LoadImage
@@ -33,13 +34,6 @@ using namespace std;
 class UIType;
 class MythDialog;
 class MythThemedDialog;
-
-struct fontProp {
-    QFont face;
-    QPoint shadowOffset;
-    QColor color;
-    QColor dropColor;
-};
 
 class MPUBLIC LayerSet
 {

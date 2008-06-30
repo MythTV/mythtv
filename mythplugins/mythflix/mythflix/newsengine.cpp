@@ -33,6 +33,7 @@ extern "C" {
 
 #include "newsengine.h"
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdirs.h>
 
 using namespace std;
 
@@ -72,7 +73,7 @@ NewsSite::NewsSite(const QString& name,
     m_updated = updated;
     m_state   = NewsSite::Success;
 
-    m_destDir  = MythContext::GetConfDir();
+    m_destDir  = GetConfDir();
     m_destDir += "/MythFlix";
 
     m_articleList.setAutoDelete(true);
@@ -321,3 +322,4 @@ void NewsSite::StripHtml(QString &text)
     text.remove((const QRegExp&) removeHTML);
     text = text.trimmed();
 }
+

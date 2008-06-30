@@ -39,10 +39,10 @@ using namespace std;
 #  endif // USING_MINGW
 #endif // !__linux__
 
-#include "libmyth/exitcodes.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/util.h"
-#include "libmyth/mythdbcon.h"
+#include "exitcodes.h"
+#include "mythcontext.h"
+#include "util.h"
+#include "mythdbcon.h"
 
 #include "mainserver.h"
 #include "scheduler.h"

@@ -9,6 +9,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/compat.h>
+#include <mythtv/mythdirs.h>
 
 // MythWeather headers
 #include "weatherScreen.h"
@@ -323,7 +324,7 @@ WeatherSource::WeatherSource(ScriptInfo *info)
     m_info = info;
     m_connectCnt = 0;
 
-    QDir dir(MythContext::GetConfDir());
+    QDir dir(GetConfDir());
     if (!dir.exists("MythWeather"))
         dir.mkdir("MythWeather");
     dir.cd("MythWeather");
@@ -340,7 +341,7 @@ WeatherSource::WeatherSource(ScriptInfo *info)
     connect( m_updateTimer, SIGNAL(timeout()),
             this, SLOT(updateTimeout()));
     m_proc = new Q3Process(info->file->absFilePath());
-    m_proc->setWorkingDirectory(QDir(gContext->GetShareDir() +
+    m_proc->setWorkingDirectory(QDir(GetShareDir() +
                                      "mythweather/scripts/"));
     connect(this, SIGNAL(killProcess()), m_proc, SLOT(kill()));
 }
@@ -366,7 +367,7 @@ WeatherSource::WeatherSource(const QString &filename)
     if (info)
     {
         m_proc = new Q3Process(filename);
-        m_proc->setWorkingDirectory(QDir(gContext->GetShareDir() +
+        m_proc->setWorkingDirectory(QDir(GetShareDir() +
                                          "mythweather/scripts/"));
         connect(this, SIGNAL(killProcess()),
                 m_proc, SLOT(kill()));

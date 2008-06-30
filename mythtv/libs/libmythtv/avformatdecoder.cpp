@@ -27,6 +27,7 @@ using namespace std;
 #include "interactivetv.h"
 #include "DVDRingBuffer.h"
 #include "videodisplayprofile.h"
+#include "mythuihelper.h"
 
 #include "videoout_dvdv.h"    // AvFormatDecoderPrivate has DVDV ptr
 #include "videoout_quartz.h"  // For VOQ::GetBestSupportedCodec()
@@ -3171,7 +3172,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             if (!decodeStillFrame && inDVDStill)
             {
                 decodeStillFrame = true;
-                gContext->RestoreScreensaver();
+                GetMythUI()->RestoreScreensaver();
                 d->ResetMPEG2();
             }
             

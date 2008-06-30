@@ -83,18 +83,13 @@ public:
 
 private slots:
     void updateInfoView(MythListButtonItem*);
-    void slotViewArticle();
     void slotRetrieveNews();
     void slotNewsRetrieved(NewsSite* site);
-
-    void slotSiteSelected(NewsSite*);
 
     void slotMoveToTop();
     void slotRemoveFromQueue();
     void slotMoveToQueue();
     void slotShowNetFlixPage();
-    void slotCancelPopup();
-
 };
 
 #endif /* MYTHFLIXQUEUE_H */

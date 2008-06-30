@@ -29,6 +29,7 @@ using namespace std;
 #include <mythtv/exitcodes.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/libmythtv/programinfo.h>
+#include <mythtv/mythdirs.h>
 extern "C" {
 #include <mythtv/ffmpeg/avcodec.h>
 #include <mythtv/ffmpeg/avformat.h>
@@ -2299,7 +2300,7 @@ int getDBParamters(QString outFile)
     t << params.dbPassword << endl;
     t << params.dbName << endl;
     t << gContext->GetHostName() << endl;
-    t << gContext->GetInstallPrefix() << endl;
+    t << GetInstallPrefix() << endl;
     f.close();
 
     return 0;

@@ -1,7 +1,7 @@
 #include <qapplication.h>
 #include <qstring.h>
-#include "mythcontext.h"
 
+#include "mythmainwindow.h"
 #include "lircevent.h"
 
 LircEventLock::LircEventLock(bool lock_events) 
@@ -19,9 +19,7 @@ LircEventLock::~LircEventLock()
 
 void LircEventLock::lock()
 {
-    if (!gContext)
-        return;
-    MythMainWindow *mw = gContext->GetMainWindow();
+    MythMainWindow *mw = GetMythMainWindow();
     if (mw)
     {
         events_locked = true;
@@ -32,7 +30,7 @@ void LircEventLock::lock()
 
 void LircEventLock::unlock()
 {
-    MythMainWindow *mw = gContext->GetMainWindow();
+    MythMainWindow *mw = GetMythMainWindow();
     if (mw)
     {
         events_locked = false;

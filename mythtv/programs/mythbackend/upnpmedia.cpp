@@ -10,6 +10,7 @@
 #include <cstdlib>
 
 #include "upnpmedia.h"
+#include "mythcontext.h"
 
 #define LOC QString("UPnpMedia: ")
 

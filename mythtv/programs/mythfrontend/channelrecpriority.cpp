@@ -28,6 +28,7 @@ using namespace std;
 #include "scheduledrecording.h"
 #include "proglist.h"
 #include "infostructs.h"
+#include "mythuihelper.h"
 
 ChannelRecPriority::ChannelRecPriority(MythMainWindow *parent, const char *name)
                   : MythDialog(parent, name)
@@ -83,7 +84,7 @@ ChannelRecPriority::ChannelRecPriority(MythMainWindow *parent, const char *name)
         exit(FRONTEND_BUGGY_EXIT_NO_SELECTOR);
     }
 
-    bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
+    bgTransBackup = GetMythUI()->LoadScalePixmap("trans-backup.png");
     if (!bgTransBackup)
         bgTransBackup = new QPixmap();
 

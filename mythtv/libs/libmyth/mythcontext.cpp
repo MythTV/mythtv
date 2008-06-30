@@ -7,6 +7,7 @@
 #include <qfileinfo.h>
 #include <qdesktopwidget.h>
 #include <qpainter.h>
+#include <QDebug>
 
 #include <cmath>
 #include <queue>
@@ -21,8 +22,6 @@
 #include "dialogbox.h"
 #include "mythdialogs.h"
 #include "mythplugin.h"
-#include "screensaver.h"
-#include "DisplayRes.h"
 #include "backendselect.h"
 #include "dbsettings.h"
 #include "langsettings.h"
@@ -31,7 +30,10 @@
 #include "mythsocket.h"
 #include "themeinfo.h"
 
+#include "libmythdb/mythdb.h"
+#include "libmythdb/mythdirs.h"
 #include "libmythui/mythmainwindow.h"
+#include "libmythui/mythuihelper.h"
 #include "libmythupnp/mythxmlclient.h"
 #include "libmythupnp/upnp.h"
 
@@ -41,26 +43,7 @@
 #include "compat.h"
 #endif
 
-// These defines provide portability for different
-// plugin file names.
-#ifdef CONFIG_DARWIN
-const QString kPluginLibPrefix = "lib";
-const QString kPluginLibSuffix = ".dylib";
-#elif USING_MINGW
-const QString kPluginLibPrefix = "lib";
-const QString kPluginLibSuffix = ".dll";
-#else
-const QString kPluginLibPrefix = "lib";
-const QString kPluginLibSuffix = ".so";
-#endif
-
 MythContext *gContext = NULL;
-QMutex MythContext::verbose_mutex(true);
-QString MythContext::x11_display = QString::null;
-
-unsigned int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
-QString verboseString = QString(" important general");
-
 QMutex avcodeclock(true);
 
 // Some common UPnP search and XML value strings
@@ -68,108 +51,6 @@ const QString gBackendURI = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
 const QString kDefaultBE  = "UPnP/MythFrontend/DefaultBackend/";
 const QString kDefaultPIN = kDefaultBE + "SecurityPin";
 const QString kDefaultUSN = kDefaultBE + "USN";
-
-
-int parse_verbose_arg(QString arg)
-{
-    QString option;
-    bool reverseOption;
-
-    if (arg.startsWith("-"))
-    {
-        cerr << "Invalid or missing argument to -v/--verbose option\n";
-        return GENERIC_EXIT_INVALID_CMDLINE;
-    }
-    else
-    {
-        QStringList verboseOpts = QStringList::split(',', arg);
-        for (QStringList::Iterator it = verboseOpts.begin(); 
-             it != verboseOpts.end(); ++it )
-        {
-            option = *it;
-            reverseOption = false;
-
-            if (option != "none" && option.left(2) == "no")
-            {
-                reverseOption = true;
-                option = option.right(option.length() - 2);
-            }
-
-            if (!strcmp(option,"help"))
-            {
-                QString m_verbose = verboseString;
-                m_verbose.replace(QRegExp(" "), ",");
-                m_verbose.replace(QRegExp("^,"), "");
-                cerr <<
-                  "Verbose debug levels.\n" <<
-                  "Accepts any combination (separated by comma) of:\n\n" <<
-
-#define VERBOSE_ARG_HELP(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
-                (const char *)QString("  %1").arg(ARG_STR).leftJustify(15, ' ', true) << \
-                " - " << ARG_HELP << "\n" <<
-
-                  VERBOSE_MAP(VERBOSE_ARG_HELP)
-
-                  "\n" <<
-                  "The default for this program appears to be: '-v " <<
-                  (const char *)m_verbose << "'\n\n" <<
-                  "Most options are additive except for none, all, and important.\n" <<
-                  "These three are semi-exclusive and take precedence over any\n" <<
-                  "prior options given.  You can however use something like\n" <<
-                  "'-v none,jobqueue' to get only JobQueue related messages\n" <<
-                  "and override the default verbosity level.\n" <<
-                  "\n" <<
-                  "The additive options may also be subtracted from 'all' by \n" <<
-                  "prefixing them with 'no', so you may use '-v all,nodatabase'\n" <<
-                  "to view all but database debug messages.\n" <<
-                  "\n" <<
-                  "Some debug levels may not apply to this program.\n" <<
-                  endl;
-                return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-#define VERBOSE_ARG_CHECKS(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
-            else if (option == ARG_STR) \
-            { \
-                if (reverseOption) \
-                { \
-                    print_verbose_messages &= ~(ARG_VALUE); \
-                    verboseString = verboseString + " no" + ARG_STR; \
-                } \
-                else \
-                { \
-                    if (ARG_ADDITIVE) \
-                    { \
-                        print_verbose_messages |= ARG_VALUE; \
-                        verboseString = verboseString + " " + ARG_STR; \
-                    } \
-                    else \
-                    { \
-                        print_verbose_messages = ARG_VALUE; \
-                        verboseString = ARG_STR; \
-                    } \
-                } \
-            }
-
-            VERBOSE_MAP(VERBOSE_ARG_CHECKS)
-
-            else
-            {
-                cerr << "Unknown argument for -v/--verbose: "
-                     << (const char *)option << endl;;
-            }
-        }
-    }
-
-    return GENERIC_EXIT_OK;
-}
-
-// Verbose helper function for ENO macro
-QString safe_eno_to_string(int errnum)
-{
-    return QString("%1 (%2)").arg(strerror(errnum)).arg(errnum);
-}
-
 
 class MythContextPrivate
 {
@@ -182,16 +63,8 @@ class MythContextPrivate
                       const bool ignoreDB);
     bool FindDatabase(const bool prompt, const bool noPrompt);
 
-    bool IsWideMode() const {return (m_baseWidth == 1280);}
-    void SetWideMode() {m_baseWidth = 1280; m_baseHeight = 720;}
-    bool IsSquareMode() const {return (m_baseWidth == 800);}
-    void SetSquareMode() {m_baseWidth = 800; m_baseHeight = 600;}
-
     void TempMainWindow(bool languagePrompt = true);
     void EndTempWindow(void);
-
-    void GetScreenBounds(void);
-    void StoreGUIsettings(void);
 
     void LoadLogSettings(void);
     void LoadDatabaseSettings(void);
@@ -218,31 +91,9 @@ class MythContextPrivate
 
     MythContext *parent;
 
-    Settings *m_settings;          ///< connection stuff, theme, button style
-    Settings *m_qtThemeSettings;   ///< everything else theme-related
-
-    QString   m_installprefix;     ///< Compile-time RUNPREFIX, or generated
-                                   ///< from enviroment ($MYTHTVDIR or $cwd)
-
     bool      m_gui;               ///< Should this context use GUI elements?
     bool      m_backend;           ///< Is this host any sort of backend?
 
-    bool      m_themeloaded;       ///< To we have a palette and pixmap to use?
-    QString   m_menuthemepathname;
-    QString   m_themepathname;
-    QPixmap  *m_backgroundimage;   ///< Large or tiled image
-    QPalette  m_palette;           ///< Colour scheme
-
-
-    // Drawable area of the full screen. May cover several screens,
-    // or exclude windowing system fixtures (like Mac menu bar)
-    int m_xbase, m_ybase;
-    int m_height, m_width;
-
-    // Dimensions of the theme
-    int m_baseWidth, m_baseHeight;
-
-    
     QMutex  m_hostnamelock;      ///< Locking for thread-safe copying of:
     QString m_localhostname;     ///< hostname from mysql.txt or gethostname()
 
@@ -256,30 +107,7 @@ class MythContextPrivate
     QMutex serverSockLock;
     bool attemptingToConnect;
 
-    MDBManager m_dbmanager;
-    
-    QMap<QString, QImage> imageCache;
-
-    QString language;
-
     MythMainWindow *mainWindow;
-
-    float m_wmult, m_hmult;
-
-    // The part of the screen(s) allocated for the GUI. Unless
-    // overridden by the user, defaults to drawable area above.
-    int m_screenxbase, m_screenybase;
-    int m_screenwidth, m_screenheight;
-
-    // Command-line GUI size, which overrides both the above sets of sizes
-    int m_geometry_x, m_geometry_y;
-    int m_geometry_w, m_geometry_h;
-
-    bool m_geometryOverridden;
-
-    QString themecachedir;
-
-    int bigfontsize, mediumfontsize, smallfontsize;
 
     MythSocket *serverSock;
     MythSocket *eventSock;
@@ -288,96 +116,119 @@ class MythContextPrivate
 
     MythPluginManager *pluginmanager;
 
-    ScreenSaverControl *screensaver;
-
     int m_logenable, m_logmaxcount, m_logprintlevel;
     QMap<QString,int> lastLogCounts;
     QMap<QString,QString> lastLogStrings;
-
-    bool screensaverEnabled;
-
-    DisplayRes *display_res;
 
     QMutex m_priv_mutex;
     queue<MythPrivRequest> m_priv_requests;
     QWaitCondition m_priv_queued;
 
-    bool ignoreDatabase;
-    bool useSettingsCache;
-    QMutex settingsCacheLock;
-    QMap <QString, QString> settingsCache;      // permanent settings in the DB
-    QMap <QString, QString> overriddenSettings; // overridden this session only
+    MythDB *m_database;
+    MythUIHelper *m_ui;
 };
 
+static void exec_program_cb(const QString &cmd)
+{
+    myth_system(cmd);
+}
+
+static void exec_program_tv_cb(const QString &cmd)
+{
+    QString s = cmd;
+    QStringList strlist("LOCK_TUNER");
+    gContext->SendReceiveStringList(strlist);
+    int cardid = strlist[0].toInt();
+
+    if (cardid >= 0)
+    {
+        s = s.sprintf(qPrintable(s),
+                      qPrintable(strlist[1]),
+                      qPrintable(strlist[2]),
+                      qPrintable(strlist[3]));
+
+        myth_system(s);
+
+        strlist = QStringList(QString("FREE_TUNER %1").arg(cardid));
+        gContext->SendReceiveStringList(strlist);
+        QString ret = strlist[0];
+    }
+    else
+    {
+        if (cardid == -2)
+            VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Card %1 is "
+                                          "already locked").arg(cardid));
+
+#if 0
+        DialogBox *error_dialog = new DialogBox(gContext->GetMainWindow(),
+            "\n\nAll tuners are currently in use. If you want to watch "
+            "TV, you can cancel one of the in-progress recordings from "
+            "the delete menu");
+        error_dialog->AddButton("OK");
+        error_dialog->exec();
+        delete error_dialog;
+#endif
+    }
+}
+
+static void configplugin_cb(const QString &cmd)
+{
+    MythPluginManager *pmanager = gContext->getPluginManager();
+    if (pmanager)
+        pmanager->config_plugin(cmd.stripWhiteSpace());
+}
+
+static void plugin_cb(const QString &cmd)
+{
+    MythPluginManager *pmanager = gContext->getPluginManager();
+    if (pmanager)
+        pmanager->run_plugin(cmd.stripWhiteSpace());
+}
+
+static void eject_cb(void)
+{
+    myth_eject();
+}
+
+static bool password_dialog_cb(const QString &text, const QString &password)
+{
+    bool ok = false;
+    MythPasswordDialog *pd = new MythPasswordDialog(text, &ok, password,
+                                                    gContext->GetMainWindow());
+    pd->exec();
+    pd->deleteLater();
+
+    return ok;
+}
 
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
     : parent(lparent),
-      m_settings(new Settings()), m_qtThemeSettings(new Settings()),
-      m_installprefix(RUNPREFIX),
-      m_gui(false), m_backend(false), m_themeloaded(false),
-      m_menuthemepathname(QString::null), m_themepathname(QString::null),
-      m_backgroundimage(NULL),
-      m_xbase(0), m_ybase(0), m_height(0), m_width(0),
-      m_baseWidth(800), m_baseHeight(600),
+      m_gui(false), m_backend(false),
       m_localhostname(QString::null),
       m_UPnP(NULL), m_XML(NULL), m_HTTP(NULL),
       serverSockLock(false),
       attemptingToConnect(false),
-      language(""),
       mainWindow(NULL),
-      m_wmult(1.0), m_hmult(1.0),
-      m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
-      m_geometry_x(0), m_geometry_y(0), m_geometry_w(0), m_geometry_h(0),
-      m_geometryOverridden(false),
-      themecachedir(QString::null),
-      bigfontsize(0), mediumfontsize(0), smallfontsize(0),
       serverSock(NULL), eventSock(NULL),
       disablelibrarypopup(false),
       pluginmanager(NULL),
-      screensaver(NULL),
       m_logenable(-1), m_logmaxcount(-1), m_logprintlevel(-1),
-      screensaverEnabled(false),
-      display_res(NULL),
-      ignoreDatabase(false),
-      useSettingsCache(false)
+      m_database(GetMythDB()), m_ui(NULL)
 {
-    char *tmp_installprefix = getenv("MYTHTVDIR");
-    if (tmp_installprefix)
-        m_installprefix = tmp_installprefix;
-
-    QDir prefixDir = qApp->applicationDirPath();
-
-    if (QDir(m_installprefix).isRelative())
-    {
-        // If the PREFIX is relative, evaluate it relative to our
-        // executable directory. This can be fragile on Unix, so
-        // use relative PREFIX values with care.
-
-        VERBOSE(VB_IMPORTANT+VB_EXTRA,
-                "Relative PREFIX! (" + m_installprefix +
-                ")\n\t\tappDir=" + prefixDir.canonicalPath());
-        prefixDir.cd(m_installprefix);
-        m_installprefix = prefixDir.canonicalPath();
-    }
-
-    VERBOSE(VB_IMPORTANT, "Using runtime prefix = " + m_installprefix);
+    InitializeMythDirs();
 }
 
 MythContextPrivate::~MythContextPrivate()
 {
-    imageCache.clear();
-
     DeleteUPnP();
-    if (m_settings)
-        delete m_settings;
-    if (m_qtThemeSettings)
-        delete m_qtThemeSettings;
     if (serverSock)
         serverSock->DownRef();
     if (eventSock)
         eventSock->DownRef();
-    if (screensaver)
-        delete screensaver;
+    if (m_database)
+        DestroyMythDB();
+    if (m_ui)
+        DestroyMythUI();
 }
 
 /**
@@ -406,14 +257,15 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
     {
         m_DBhostCp = m_DBparams.dbHostName;
         m_DBparams.dbHostName = "";
+        m_database->SetDatabaseParams(m_DBparams);
     }
 
-    m_settings->SetSetting("Theme", "blue");
+    m_database->SetSetting("Theme", "blue");
 #ifdef Q_WS_MACX
     // Myth looks horrible in default Mac style for Qt
-    m_settings->SetSetting("Style", "Windows");
+    m_database->SetSetting("Style", "Windows");
 #endif
-    parent->LoadQtConfig();
+    m_ui->LoadQtConfig();
 
     MythMainWindow *mainWindow = MythMainWindow::getMainWindow(false);
     mainWindow->Init();
@@ -433,108 +285,12 @@ void MythContextPrivate::EndTempWindow(void)
     DestroyMythMainWindow();
 }
 
-/**
- * \brief Get screen size from Qt, respecting for user's multiple screen prefs
- *
- * If the windowing system environment has multiple screens
- * (%e.g. Xinerama or Mac OS X), QApplication::desktop()->%width() will span
- * all of them, so we usually need to get the geometry of a specific screen.
- */
-void MythContextPrivate::GetScreenBounds()
-{
-    if (m_geometryOverridden)
-    {
-        // Geometry on the command-line overrides everything
-        m_xbase  = m_geometry_x;
-        m_ybase  = m_geometry_y;
-        m_width  = m_geometry_w;
-        m_height = m_geometry_h;
-        return;
-    }
-
-    QDesktopWidget * desktop = QApplication::desktop();
-    bool             hasXinerama = GetNumberOfXineramaScreens() > 1;
-    int              numScreens  = desktop->numScreens();
-    int              screen;
-
-    if (hasXinerama)
-        VERBOSE(VB_GENERAL+VB_EXTRA,
-                QString("Total desktop dim: %1x%2, over %3 screen[s].")
-                .arg(desktop->width()).arg(desktop->height()).arg(numScreens));
-    if (numScreens > 1)
-        for (screen = 0; screen < numScreens; ++screen)
-        {
-            QRect dim = desktop->screenGeometry(screen);
-            VERBOSE(VB_GENERAL+VB_EXTRA,
-                    QString("Screen %1 dim: %2x%3.")
-                    .arg(screen).arg(dim.width()).arg(dim.height()));
-        }
-
-    screen = desktop->primaryScreen();
-    VERBOSE(VB_GENERAL, QString("Primary screen: %1.").arg(screen));
-
-    if (hasXinerama)
-        screen = parent->GetNumSetting("XineramaScreen", screen);
-
-    if (screen == -1)       // Special case - span all screens
-    {
-        VERBOSE(VB_GENERAL+VB_EXTRA, QString("Using all %1 screens.")
-                                     .arg(numScreens));
-        m_xbase  = 0;
-        m_ybase  = 0;
-        m_width  = desktop->width();
-        m_height = desktop->height();
-
-        VERBOSE(VB_GENERAL, QString("Total width = %1, height = %2")
-                            .arg(m_width).arg(m_height));
-        return;
-    }
-
-    if (hasXinerama)        // User specified a single screen
-    {
-        if (screen < 0 || screen >= numScreens)
-        {
-            VERBOSE(VB_IMPORTANT, QString(
-                        "Xinerama screen %1 was specified,"
-                        " but only %2 available, so using screen 0.")
-                    .arg(screen).arg(numScreens));
-            screen = 0;
-        }
-    }
-
-
-    {
-        QRect bounds;
-
-        bool inWindow = parent->GetNumSetting("RunFrontendInWindow", 0);
-
-        if (inWindow)
-            VERBOSE(VB_IMPORTANT, QString("Running in a window"));
-
-        if (inWindow)
-            // This doesn't include the area occupied by the
-            // Windows taskbar, or the Mac OS X menu bar and Dock
-            bounds = desktop->availableGeometry(screen);
-        else
-            bounds = desktop->screenGeometry(screen);
-
-        m_xbase  = bounds.x();
-        m_ybase  = bounds.y();
-        m_width  = bounds.width();
-        m_height = bounds.height();
-
-        VERBOSE(VB_GENERAL, QString("Using screen %1, %2x%3 at %4,%5")
-                            .arg(screen).arg(m_width).arg(m_height)
-                            .arg(m_xbase).arg(m_ybase));
-    }
-}
-
 bool MythContextPrivate::Init(const bool gui, UPnp *UPnPclient,
                               const bool promptForBackend,
                               const bool noPrompt,
                               const bool ignoreDB)
 {
-    ignoreDatabase = ignoreDB;
+    m_database->IgnoreDatabase(ignoreDB);
     m_gui = gui;
     if (UPnPclient)
     {
@@ -546,7 +302,7 @@ bool MythContextPrivate::Init(const bool gui, UPnp *UPnPclient,
 
     // Creates screen saver control if we will have a GUI
     if (gui)
-        screensaver = ScreenSaverControl::get();
+        m_ui = GetMythUI();
 
     // ---- database connection stuff ----
 
@@ -557,8 +313,15 @@ bool MythContextPrivate::Init(const bool gui, UPnp *UPnPclient,
 
     if (gui)
     {
-        GetScreenBounds();
-        StoreGUIsettings();
+        MythUIMenuCallbacks cbs;
+        cbs.exec_program = exec_program_cb;
+        cbs.exec_program_tv = exec_program_tv_cb;
+        cbs.configplugin = configplugin_cb;
+        cbs.plugin = plugin_cb;
+        cbs.eject = eject_cb;
+        cbs.password_dialog = password_dialog_cb;
+
+        m_ui->Init(cbs);
     }
 
     return true;
@@ -687,71 +450,6 @@ NoDBfound:
     return false;
 }
 
-/**
- * Apply any user overrides to the screen geometry
- */
-void MythContextPrivate::StoreGUIsettings()
-{
-    if (m_geometryOverridden)
-    {
-        // Geometry on the command-line overrides everything
-        m_screenxbase  = m_geometry_x;
-        m_screenybase  = m_geometry_y;
-        m_screenwidth  = m_geometry_w;
-        m_screenheight = m_geometry_h;
-    }
-    else
-    {
-        m_screenxbase  = parent->GetNumSetting("GuiOffsetX");
-        m_screenybase  = parent->GetNumSetting("GuiOffsetY");
-        m_screenwidth = m_screenheight = 0;
-        parent->GetResolutionSetting("Gui", m_screenwidth, m_screenheight);
-    }
-
-    // If any of these was _not_ set by the user,
-    // (i.e. they are 0) use the whole-screen defaults
-
-    if (!m_screenxbase)
-        m_screenxbase = m_xbase;
-    if (!m_screenybase)
-        m_screenybase = m_ybase;
-    if (!m_screenwidth)
-        m_screenwidth = m_width;
-    if (!m_screenheight)
-        m_screenheight = m_height;
-
-    if (m_screenheight < 160 || m_screenwidth < 160)
-    {
-        VERBOSE(VB_IMPORTANT, "Somehow, your screen size settings are bad.");
-        VERBOSE(VB_IMPORTANT, QString("GuiResolution: %1")
-                        .arg(parent->GetSetting("GuiResolution")));
-        VERBOSE(VB_IMPORTANT, QString("  old GuiWidth: %1")
-                        .arg(parent->GetNumSetting("GuiWidth")));
-        VERBOSE(VB_IMPORTANT, QString("  old GuiHeight: %1")
-                        .arg(parent->GetNumSetting("GuiHeight")));
-        VERBOSE(VB_IMPORTANT, QString("m_width: %1").arg(m_width));
-        VERBOSE(VB_IMPORTANT, QString("m_height: %1").arg(m_height));
-        VERBOSE(VB_IMPORTANT, "Falling back to 640x480");
-
-        m_screenwidth  = 640;
-        m_screenheight = 480;
-    }
-
-    m_wmult = m_screenwidth  / (float)m_baseWidth;
-    m_hmult = m_screenheight / (float)m_baseHeight;
-
-    QFont font = QFont("Arial");
-    if (!font.exactMatch())
-        font = QFont();
-    font.setStyleHint(QFont::SansSerif, QFont::PreferAntialias);
-    font.setPointSize((int)floor(14 * m_hmult));
-
-    QApplication::setFont(font);
-    
-    //VERBOSE(VB_IMPORTANT, QString("GUI multipliers are: width %1, height %2").arg(m_wmult).arg(m_hmult));
-}
-
-
 void MythContextPrivate::LoadLogSettings(void)
 {
     m_logenable = parent->GetNumSetting("LogEnabled", 0);
@@ -784,6 +482,7 @@ void MythContextPrivate::LoadDatabaseSettings(void)
         m_DBparams.wolReconnect  = 0;
         m_DBparams.wolRetry      = 5;
         m_DBparams.wolCommand    = "echo 'WOLsqlServerCommand not set'";
+        m_database->SetDatabaseParams(m_DBparams);
     }
 
     // Even if we have loaded the settings file, it may be incomplete,
@@ -807,6 +506,7 @@ void MythContextPrivate::LoadDatabaseSettings(void)
 
     VERBOSE(VB_GENERAL, QString("Using localhost value of %1")
             .arg(m_localhostname));
+    m_database->SetLocalHostname(m_localhostname);
 }
 
 /**
@@ -814,26 +514,30 @@ void MythContextPrivate::LoadDatabaseSettings(void)
  */
 bool MythContextPrivate::LoadSettingsFile(void)
 {
-    if (!m_settings->LoadSettingsFiles("mysql.txt", m_installprefix))
+    Settings *oldsettings = m_database->GetOldSettings();
+
+    if (!oldsettings->LoadSettingsFiles("mysql.txt", GetInstallPrefix(),
+                                        GetConfDir()))
         return false;
 
-    m_DBparams.dbHostName = m_settings->GetSetting("DBHostName");
-    m_DBparams.dbHostPing = m_settings->GetSetting("DBHostPing") != "no";
-    m_DBparams.dbPort     = m_settings->GetNumSetting("DBPort");
-    m_DBparams.dbUserName = m_settings->GetSetting("DBUserName");
-    m_DBparams.dbPassword = m_settings->GetSetting("DBPassword");
-    m_DBparams.dbName     = m_settings->GetSetting("DBName");
-    m_DBparams.dbType     = m_settings->GetSetting("DBType");
+    m_DBparams.dbHostName = oldsettings->GetSetting("DBHostName");
+    m_DBparams.dbHostPing = oldsettings->GetSetting("DBHostPing") != "no";
+    m_DBparams.dbPort     = oldsettings->GetNumSetting("DBPort");
+    m_DBparams.dbUserName = oldsettings->GetSetting("DBUserName");
+    m_DBparams.dbPassword = oldsettings->GetSetting("DBPassword");
+    m_DBparams.dbName     = oldsettings->GetSetting("DBName");
+    m_DBparams.dbType     = oldsettings->GetSetting("DBType");
 
-    m_DBparams.localHostName = m_settings->GetSetting("LocalHostName");
+    m_DBparams.localHostName = oldsettings->GetSetting("LocalHostName");
     m_DBparams.localEnabled  = m_DBparams.localHostName.length() > 0;
 
     m_DBparams.wolReconnect
-        = m_settings->GetNumSetting("WOLsqlReconnectWaitTime");
+        = oldsettings->GetNumSetting("WOLsqlReconnectWaitTime");
     m_DBparams.wolEnabled = m_DBparams.wolReconnect > 0;
 
-    m_DBparams.wolRetry   = m_settings->GetNumSetting("WOLsqlConnectRetry");
-    m_DBparams.wolCommand = m_settings->GetSetting("WOLsqlCommand");
+    m_DBparams.wolRetry   = oldsettings->GetNumSetting("WOLsqlConnectRetry");
+    m_DBparams.wolCommand = oldsettings->GetSetting("WOLsqlCommand");
+    m_database->SetDatabaseParams(m_DBparams);
 
     return true;
 }
@@ -841,7 +545,7 @@ bool MythContextPrivate::LoadSettingsFile(void)
 bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
                                            bool overwrite)
 {
-    QString path = MythContext::GetConfDir() + "/mysql.txt";
+    QString path = GetConfDir() + "/mysql.txt";
     QFile   * f  = new QFile(path);
     
     if (!overwrite && f->exists())
@@ -849,7 +553,7 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
         return false;
     }
 
-    QString dirpath = MythContext::GetConfDir();
+    QString dirpath = GetConfDir();
     QDir createDir(dirpath);
 
     if (!createDir.exists())
@@ -967,6 +671,7 @@ bool MythContextPrivate::FindSettingsProbs(void)
         problems = true;
         VERBOSE(VB_IMPORTANT, "DBName is not set in mysql.txt");
     }
+    m_database->SetDatabaseParams(m_DBparams);
     return problems;
 }
 
@@ -1100,7 +805,7 @@ QString MythContextPrivate::TestDBconnection(void)
     QString host   = m_DBparams.dbHostName;
     int     port   = m_DBparams.dbPort;
 
-    if (ignoreDatabase)
+    if (m_database->IsDatabaseIgnored())
         return err;
 
     // 1. Check the supplied host or IP address, to prevent the app
@@ -1181,7 +886,7 @@ QString MythContextPrivate::TestDBconnection(void)
  */
 void MythContextPrivate::ResetDatabase(void)
 {
-    m_dbmanager.CloseDatabases();
+    m_database->GetDBManager()->CloseDatabases();
     parent->ClearSettingsCache();
 }
 
@@ -1453,6 +1158,7 @@ bool MythContextPrivate::DefaultUPnP(QString &error)
         {
             m_DBparams.localHostName = localHostName;
             m_DBparams.localEnabled  = true;
+            m_database->SetDatabaseParams(m_DBparams);
         }
 
         return true;
@@ -1490,6 +1196,8 @@ bool MythContextPrivate::UPnPconnect(const DeviceLocation *backend,
             VERBOSE(VB_UPNP, LOC + error);
             return false;
     }
+
+    m_database->SetDatabaseParams(m_DBparams);
 
     QString DBhost = m_DBparams.dbHostName;
     VERBOSE(VB_UPNP, LOC + QString("Got database hostname: %1").arg(DBhost));
@@ -1642,7 +1350,7 @@ MythSocket *MythContext::ConnectServer(MythSocket *eventSock,
                     "You probably should modify the Master Server \n\t\t\t"
                     "settings in the setup program and set the    \n\t\t\t"
                     "proper IP address.");
-                if (d->m_gui && d->m_height && d->m_width)
+                if (d->m_ui && d->m_ui->IsScreenSetup())
                 {
                     bool manageLock = false;
                     if (!blockingClient && d->serverSockLock.locked())
@@ -1855,31 +1563,12 @@ QString MythContext::GetMasterHostPrefix(void)
 
 void MythContext::ClearSettingsCache(QString myKey, QString newVal)
 {
-    d->settingsCacheLock.lock();
-    if (myKey != "" && d->settingsCache.contains(myKey))
-    {
-        VERBOSE(VB_DATABASE, QString("Clearing Settings Cache for '%1'.")
-                                    .arg(myKey));
-        d->settingsCache.remove(myKey);
-        d->settingsCache[myKey] = newVal;
-    }
-    else
-    {
-        VERBOSE(VB_DATABASE, "Clearing Settings Cache.");
-        d->settingsCache.clear();
-    }
-    d->settingsCacheLock.unlock();
+    d->m_database->ClearSettingsCache(myKey, newVal);
 }
 
 void MythContext::ActivateSettingsCache(bool activate)
 {
-    if (activate)
-        VERBOSE(VB_DATABASE, "Enabling Settings Cache.");
-    else
-        VERBOSE(VB_DATABASE, "Disabling Settings Cache.");
-
-    d->useSettingsCache = activate;
-    ClearSettingsCache();
+    d->m_database->ActivateSettingsCache(activate);
 }
 
 QString MythContext::GetHostName(void)
@@ -1897,410 +1586,9 @@ QString MythContext::GetFilePrefix(void)
     return GetSetting("RecordFilePrefix");
 }
 
-QString MythContext::GetInstallPrefix(void) 
-{ 
-    return d->m_installprefix; 
-}
-
-QString MythContext::GetConfDir(void)
-{
-    char *tmp_confdir = getenv("MYTHCONFDIR");
-    QString dir;
-    if (tmp_confdir)
-    {
-        dir = QString(tmp_confdir);
-        //VERBOSE(VB_IMPORTANT, QString("Read conf dir = %1").arg(dir));
-        dir.replace("$HOME", QDir::homeDirPath());
-    }
-    else
-        dir = QDir::homeDirPath() + "/.mythtv";
-
-    //VERBOSE(VB_IMPORTANT, QString("Using conf dir = %1").arg(dir));
-    return dir;
-}
-
-QString MythContext::GetShareDir(void) 
-{ 
-    return d->m_installprefix + "/share/mythtv/"; 
-}
-
-QString MythContext::GetLibraryDir(void) 
-{ 
-    return d->m_installprefix + "/lib/mythtv/"; 
-}
-
-QString MythContext::GetThemesParentDir(void) 
-{ 
-    return GetShareDir() + "themes/"; 
-}
-
-QString MythContext::GetPluginsDir(void) 
-{ 
-    return GetLibraryDir() + "plugins/"; 
-}
-
-QString MythContext::GetPluginsNameFilter(void) 
-{ 
-    return kPluginLibPrefix + "*" + kPluginLibSuffix; 
-}
-
-QString MythContext::FindPlugin(const QString &plugname) 
-{ 
-    return GetPluginsDir() + kPluginLibPrefix + plugname + kPluginLibSuffix; 
-}
-
-QString MythContext::GetTranslationsDir(void) 
-{ 
-    return GetShareDir() + "i18n/"; 
-}
-
-QString MythContext::GetTranslationsNameFilter(void) 
-{ 
-    return "mythfrontend_*.qm"; 
-}
-
-QString MythContext::FindTranslation(const QString &translation) 
-{ 
-    return GetTranslationsDir()
-           + "mythfrontend_" + translation.lower() + ".qm"; 
-}
-
-QString MythContext::GetFontsDir(void) 
-{ 
-    return GetShareDir();
-}
-
-QString MythContext::GetFontsNameFilter(void) 
-{ 
-    return "*ttf"; 
-}
-
-QString MythContext::FindFont(const QString &fontname) 
-{ 
-    return GetFontsDir() + fontname + ".ttf"; 
-}
-
-QString MythContext::GetFiltersDir(void) 
-{ 
-    return GetLibraryDir() + "filters/"; 
-}
-
-
-void MythContext::LoadQtConfig(void)
-{
-    d->language = "";
-    d->themecachedir = "";
-
-    DisplayRes *dispRes = DisplayRes::GetDisplayRes(); // create singleton
-    if (dispRes && GetNumSetting("UseVideoModes", 0))
-    {
-        d->display_res = dispRes;
-        // Make sure DisplayRes has current context info
-        d->display_res->Initialize();
-
-        // Switch to desired GUI resolution
-        d->display_res->SwitchToGUI();
-    }
-
-    // Note the possibly changed screen settings
-    d->GetScreenBounds();
-
-
-    if (d->m_qtThemeSettings)
-        delete d->m_qtThemeSettings;
-
-    d->m_qtThemeSettings = new Settings;
-
-    QString style = GetSetting("Style", "");
-    if (style != "")
-        qApp->setStyle(style);
-
-    QString themename = GetSetting("Theme");    
-    QString themedir = FindThemeDir(themename);
-
-    ThemeInfo *themeinfo = new ThemeInfo(themedir);
-
-    if (themeinfo && themeinfo->IsWide())
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Switching to wide mode (%1)").arg(themename));
-        d->SetWideMode();
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Switching to square mode (%1)").arg(themename));
-        d->SetSquareMode();
-    }
-
-    if (themeinfo)
-        delete themeinfo;
-    
-    // Recalculate GUI dimensions
-    d->StoreGUIsettings();
-        
-    d->m_themepathname = themedir + "/";
-    
-    themedir += "/qtlook.txt";
-    d->m_qtThemeSettings->ReadSettings(themedir);
-    d->m_themeloaded = false;
-
-    if (d->m_backgroundimage)
-        delete d->m_backgroundimage;
-    d->m_backgroundimage = NULL;
-
-    themename = GetSetting("MenuTheme");
-    d->m_menuthemepathname = FindMenuThemeDir(themename) +"/";
-
-    d->bigfontsize    = GetNumSetting("QtFontBig",    25);
-    d->mediumfontsize = GetNumSetting("QtFontMedium", 16);
-    d->smallfontsize  = GetNumSetting("QtFontSmall",  12);
-}
-
 void MythContext::RefreshBackendConfig(void)
 {
     d->LoadLogSettings();
-}
-
-void MythContext::UpdateImageCache(void)
-{
-    d->imageCache.clear();
-
-    ClearOldImageCache();
-    CacheThemeImages();
-}
-
-void MythContext::ClearOldImageCache(void)
-{
-    QString cachedirname = MythContext::GetConfDir() + "/themecache/";
-
-    d->themecachedir = cachedirname + GetSetting("Theme") + "." + 
-                       QString::number(d->m_screenwidth) + "." + 
-                       QString::number(d->m_screenheight);
-
-    QDir dir(cachedirname);
-
-    if (!dir.exists())
-        dir.mkdir(cachedirname);
-
-    QString themecachedir = d->themecachedir;
-
-    d->themecachedir += "/";
-
-    dir.setPath(themecachedir);
-    if (!dir.exists())
-        dir.mkdir(themecachedir);
-
-    dir.setPath(cachedirname);
-
-    QFileInfoList list = dir.entryInfoList();
-
-    QFileInfoList::const_iterator it = list.begin();
-    QMap<QDateTime, QString> dirtimes;
-    const QFileInfo *fi;
-
-    while (it != list.end())
-    {
-        fi = &(*it++);
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
-        if (fi->isDir() && !fi->isSymLink())
-        {
-            if (fi->absFilePath() == themecachedir)
-                continue;
-            dirtimes[fi->lastModified()] = fi->absFilePath();
-        }
-    }
-
-    const size_t max_cached = GetNumSetting("ThemeCacheSize", 1);
-    while ((size_t)dirtimes.size() >= max_cached)
-    {
-        VERBOSE(VB_FILE, QString("Removing cache dir: %1")
-                .arg(dirtimes.begin().data()));
-        RemoveCacheDir(dirtimes.begin().data());
-        dirtimes.erase(dirtimes.begin());
-    }
-
-    QMap<QDateTime, QString>::const_iterator dit = dirtimes.begin();
-    for (; dit != dirtimes.end(); ++dit)
-    {
-        VERBOSE(VB_FILE, QString("Keeping cache dir: %1")
-                .arg(*dit));
-    }
-}
-
-void MythContext::RemoveCacheDir(const QString &dirname)
-{
-    QString cachedirname = MythContext::GetConfDir() + "/themecache/";
-
-    if (!dirname.startsWith(cachedirname))
-        return;
-
-    VERBOSE(VB_IMPORTANT,
-            QString("Removing stale cache dir: %1").arg(dirname));
-
-    QDir dir(dirname);
-
-    if (!dir.exists())
-        return;
-
-    QFileInfoList list = dir.entryInfoList();
-    QFileInfoList::const_iterator it = list.begin();
-    const QFileInfo *fi;
-
-    while (it != list.end())
-    {
-        fi = &(*it++);
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
-        if (fi->isFile() && !fi->isSymLink())
-        {
-            QFile file(fi->absFilePath());
-            file.remove();
-        }
-        else if (fi->isDir() && !fi->isSymLink())
-        {
-            RemoveCacheDir(fi->absFilePath());
-        }
-    }
-
-    dir.rmdir(dirname);
-}
-    
-void MythContext::CacheThemeImages(void)
-{
-    if (d->m_screenwidth == d->m_baseWidth &&
-        d->m_screenheight == d->m_baseHeight)
-        return;
-
-    CacheThemeImagesDirectory(d->m_themepathname);
-    if (d->IsWideMode())
-        CacheThemeImagesDirectory(GetThemesParentDir() + "default-wide/");
-    CacheThemeImagesDirectory(GetThemesParentDir() + "default/");
-}
-
-void MythContext::CacheThemeImagesDirectory(const QString &dirname,
-                                            const QString &subdirname)
-{
-    QDir dir(dirname);
-    
-    if (!dir.exists())
-        return;
-
-    MythProgressDialog *caching = NULL;
-    QFileInfoList list = dir.entryInfoList();
-
-    if (subdirname.length() == 0)
-        caching = new MythProgressDialog(QObject::tr("Pre-scaling theme images"),
-                                         list.count());
-    int progress = 0;
-
-    QString destdir = d->themecachedir;
-    if (subdirname.length() > 0)
-        destdir += subdirname + "/";
-
-    QFileInfoList::const_iterator it = list.begin();
-    const QFileInfo *fi;
-
-    while (it != list.end())
-    {
-        fi = &(*it++);
-        if (caching)
-            caching->setProgress(progress);
-        progress++;
-
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
-
-        if (fi->isDir() && subdirname.length() == 0)
-        {
-            QString newdirname = fi->fileName();
-            QDir newsubdir(d->themecachedir + newdirname);
-            if (!newsubdir.exists())
-                newsubdir.mkdir(d->themecachedir + newdirname);
-
-            CacheThemeImagesDirectory(dirname + "/" + newdirname,
-                                      newdirname);
-            continue;
-        }
-        else if (fi->isDir())
-            continue;
-
-        if (fi->extension().lower() != "png" && 
-            fi->extension().lower() != "jpg" &&
-            fi->extension().lower() != "gif" &&
-            fi->extension().lower() != "jpeg")
-            continue;
-
-        QString filename = fi->fileName();
-        QFileInfo cacheinfo(destdir + filename);
-
-        if (!cacheinfo.exists() ||
-            (cacheinfo.lastModified() < fi->lastModified()))
-        {
-            VERBOSE(VB_FILE, QString("generating cache image for: %1")
-                    .arg(fi->absFilePath()));
-
-            QImage *tmpimage = LoadScaleImage(fi->absFilePath(), false);
-
-            if (tmpimage && tmpimage->width() > 0 && tmpimage->height() > 0)
-            {
-                if (!tmpimage->save(destdir + filename, "PNG"))
-                {
-                    VERBOSE(VB_IMPORTANT,
-                            QString("Failed to save cached image: %1")
-                            .arg(d->themecachedir + filename));
-                }
-             
-                delete tmpimage;
-            }
-        }
-    }
-
-    if (caching)
-    {
-        caching->Close();
-        caching->deleteLater();        
-    }
-}
-
-void MythContext::GetScreenBounds(int &xbase, int &ybase,
-                                  int &width, int &height)
-{
-    xbase  = d->m_xbase;
-    ybase  = d->m_ybase;
-    
-    width  = d->m_width;
-    height = d->m_height;
-}
-
-void MythContext::GetScreenSettings(float &wmult, float &hmult)
-{
-    wmult = d->m_wmult;
-    hmult = d->m_hmult;
-}
-
-void MythContext::GetScreenSettings(int &width, float &wmult, 
-                                    int &height, float &hmult)
-{
-    height = d->m_screenheight;
-    width = d->m_screenwidth;
-
-    wmult = d->m_wmult;
-    hmult = d->m_hmult;
-}
-
-void MythContext::GetScreenSettings(int &xbase, int &width, float &wmult, 
-                                    int &ybase, int &height, float &hmult)
-{
-    xbase  = d->m_screenxbase;
-    ybase  = d->m_screenybase;
-    
-    height = d->m_screenheight;
-    width = d->m_screenwidth;
-
-    wmult = d->m_wmult;
-    hmult = d->m_hmult;
 }
 
 void MythContext::GetResolutionSetting(const QString &type,
@@ -2309,294 +1597,28 @@ void MythContext::GetResolutionSetting(const QString &type,
                                        short &refresh_rate, 
                                        int index)
 {
-    bool ok = false, ok0 = false, ok1 = false;
-    QString sRes =    QString("%1Resolution").arg(type);
-    QString sRR =     QString("%1RefreshRate").arg(type);
-    QString sAspect = QString("%1ForceAspect").arg(type);
-    QString sWidth =  QString("%1Width").arg(type);
-    QString sHeight = QString("%1Height").arg(type);
-    if (index >= 0)
-    {
-        sRes =    QString("%1Resolution%2").arg(type).arg(index);
-        sRR =     QString("%1RefreshRate%2").arg(type).arg(index);
-        sAspect = QString("%1ForceAspect%2").arg(type).arg(index);
-        sWidth =  QString("%1Width%2").arg(type).arg(index);
-        sHeight = QString("%1Height%2").arg(type).arg(index);
-    }
-
-    QString res = GetSetting(sRes);
-
-    if ("" != res)
-    {
-        QStringList slist = QStringList::split("x", res);
-        int w = width, h = height;
-        if (2 == slist.size())
-        {
-            w = slist[0].toInt(&ok0);
-            h = slist[1].toInt(&ok1);
-        }
-        bool ok = ok0 && ok1;
-        if (ok)
-        {
-            width = w;
-            height = h;
-            refresh_rate = GetNumSetting(sRR);
-            forced_aspect = GetFloatSetting(sAspect);
-        }
-    }
-    else
-
-    if (!ok)
-    {
-        int tmpWidth = GetNumSetting(sWidth, width);
-        if (tmpWidth)
-            width = tmpWidth;
-
-        int tmpHeight = GetNumSetting(sHeight, height);
-        if (tmpHeight)
-            height = tmpHeight;
-
-        refresh_rate = 0;
-        forced_aspect = 0.0;
-        //SetSetting(sRes, QString("%1x%2").arg(width).arg(height));
-    }
+    d->m_database->GetResolutionSetting(type, width, height, forced_aspect,
+                                        refresh_rate, index);
 }
 
 void MythContext::GetResolutionSetting(const QString &t, int &w, int &h, int i)
 {
-    double forced_aspect = 0;
-    short refresh_rate = 0;
-    GetResolutionSetting(t, w, h, forced_aspect, refresh_rate, i);
-}
-
-/**
- * \brief Parse an X11 style command line geometry string
- *
- * Accepts strings like
- *  -geometry 800x600
- * or
- *  -geometry 800x600+112+22
- * to override the fullscreen and user default screen dimensions
- */
-bool MythContext::ParseGeometryOverride(const QString geometry)
-{
-    QRegExp     sre("^(\\d+)x(\\d+)$");
-    QRegExp     lre("^(\\d+)x(\\d+)([+-]\\d+)([+-]\\d+)$");
-    QStringList geo;
-    bool        longForm = false;
-
-    if (sre.exactMatch(geometry))
-    {
-        sre.search(geometry);
-        geo = sre.capturedTexts();
-    }
-    else if (lre.exactMatch(geometry))
-    {
-        lre.search(geometry);
-        geo = lre.capturedTexts();
-        longForm = true;
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, "Geometry does not match either form -");
-        VERBOSE(VB_IMPORTANT, "WIDTHxHEIGHT or WIDTHxHEIGHT+XOFF+YOFF");
-        return false;
-    }
-
-    bool parsed;
-
-    d->m_geometry_w = geo[1].toInt(&parsed);
-    if (!parsed)
-    {
-        VERBOSE(VB_IMPORTANT, "Could not parse width of geometry override");
-        return false;
-    }
-
-    d->m_geometry_h = geo[2].toInt(&parsed);
-    if (!parsed)
-    {
-        VERBOSE(VB_IMPORTANT, "Could not parse height of geometry override");
-        return false;
-    }
-
-    if (longForm)
-    {
-        d->m_geometry_x = geo[3].toInt(&parsed);
-        if (!parsed)
-        {
-            VERBOSE(VB_IMPORTANT,
-                    "Could not parse horizontal offset of geometry override");
-            return false;
-        }
-
-        d->m_geometry_y = geo[4].toInt(&parsed);
-        if (!parsed)
-        {
-            VERBOSE(VB_IMPORTANT,
-                    "Could not parse vertical offset of geometry override");
-            return false;
-        }
-    }
-
-    VERBOSE(VB_IMPORTANT, QString("Overriding GUI, width=%1,"
-                                  " height=%2 at %3,%4")
-                          .arg(d->m_geometry_w).arg(d->m_geometry_h)
-                          .arg(d->m_geometry_x).arg(d->m_geometry_y));
-
-    d->m_geometryOverridden = true;
-
-    return true;
-}
-
-bool MythContext::IsGeometryOverridden(void)
-{
-    return d->m_geometryOverridden;
-}
-
-/** \fn FindThemeDir(const QString &themename)
- *  \brief Returns the full path to the theme denoted by themename
- *
- *   If the theme cannot be found falls back to the G.A.N.T theme.
- *   If the G.A.N.T theme doesn't exist then returns an empty string.
- *  \param themename The theme name.
- *  \return Path to theme or empty string.
- */
-QString MythContext::FindThemeDir(const QString &themename)
-{
-    QString testdir = MythContext::GetConfDir() + "/themes/" + themename;
-
-    QDir dir(testdir);
-    if (dir.exists())
-        return testdir;
-    else
-        VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " + dir.absolutePath());
-
-    testdir = GetThemesParentDir() + themename;
-    dir.setPath(testdir);
-    if (dir.exists())
-        return testdir;
-    else
-        VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " + dir.absolutePath());
-
-    testdir = GetThemesParentDir() + "G.A.N.T";
-    dir.setPath(testdir);
-    if (dir.exists())
-    {
-        VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1 - "
-                "Switching to G.A.N.T").arg(themename));
-        SaveSetting("Theme", "G.A.N.T");
-        return testdir;
-    }
-    else
-        VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " + dir.absolutePath());
-
-    VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1").arg(themename));
-    return "";
-}
-
-/** \fn FindMenuThemeDir(const QString &menuname)
- *  \brief Returns the full path to the menu theme denoted by menuname
- *
- *   If the theme cannot be found falls back to the default menu.
- *   If the default menu theme doesn't exist then returns an empty string.
- *  \param menuname The menutheme name.
- *  \return Path to theme or empty string.
- */
-QString MythContext::FindMenuThemeDir(const QString &menuname)
-{
-    QString testdir;
-    QDir dir;
-
-    if (menuname == "default")
-    {
-        testdir = GetShareDir();
-        dir.setPath(testdir);
-        if (dir.exists())
-            return testdir;
-    }
-
-    testdir = MythContext::GetConfDir() + "/themes/" + menuname;
-
-    dir.setPath(testdir);
-    if (dir.exists())
-        return testdir;
-
-    testdir = GetThemesParentDir() + menuname;
-    dir.setPath(testdir);
-    if (dir.exists())
-        return testdir;
-
-    testdir = GetShareDir();
-    dir.setPath(testdir);
-    if (dir.exists())
-    {
-        VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1 - "
-                "Switching to default").arg(menuname));
-        SaveSetting("MenuTheme", "default");
-        return testdir;
-    }
-    else {
-        VERBOSE(VB_IMPORTANT, QString("Could not find menu theme: %1 - Fallback to default failed.").arg(menuname));
-    }
-
-    return "";
-}
-
-QString MythContext::GetMenuThemeDir(void)
-{
-    return d->m_menuthemepathname;
-}
-
-QString MythContext::GetThemeDir(void)
-{
-    return d->m_themepathname;
-}
-
-QList<QString> MythContext::GetThemeSearchPath(void)
-{
-    QList<QString> searchpath;
-
-    searchpath.append(GetThemeDir());
-    if (d->IsWideMode())
-        searchpath.append(GetThemesParentDir() + "default-wide/");
-    searchpath.append(GetThemesParentDir() + "default/");
-    searchpath.append("/tmp/");
-    return searchpath;
+    d->m_database->GetResolutionSetting(t, w, h, i);
 }
 
 MDBManager *MythContext::GetDBManager(void)
 {
-    return &d->m_dbmanager;
+    return d->m_database->GetDBManager();
 }
 
-void MythContext::DBError(const QString &where, const QSqlQuery& query) 
+void MythContext::DBError(const QString &where, const QSqlQuery& query)
 {
-    QString str = QString("DB Error (%1):\n").arg(where);
-
-    str += "Query was:\n";
-    str += query.executedQuery() + "\n";
-    str += QString::fromUtf8(DBErrorMessage(query.lastError()));
-    VERBOSE(VB_IMPORTANT, QString("%1").arg(str));
+    MythDB::DBError(where, query);
 }
 
-QString MythContext::DBErrorMessage(const QSqlError& err)
+QString MythContext::DBErrorMessage(const QSqlError &err)
 {
-    if (!err.type())
-        return "No error type from QSqlError?  Strange...";
-
-    return QString("Driver error was [%1/%2]:\n"
-                   "%3\n"
-                   "Database error was:\n"
-                   "%4\n")
-        .arg(err.type())
-        .arg(err.number())
-        .arg(err.driverText())
-        .arg(err.databaseText());
-}
-
-Settings *MythContext::qtconfig(void)
-{
-    return d->m_qtThemeSettings;
+    return MythDB::DBErrorMessage(err);
 }
 
 /** /brief Returns true if database is being ignored.
@@ -2607,607 +1629,57 @@ Settings *MythContext::qtconfig(void)
  */
 bool MythContext::IsDatabaseIgnored(void) const
 {
-    return d->ignoreDatabase;
+    return d->m_database->IsDatabaseIgnored();
 }
 
 void MythContext::SaveSetting(const QString &key, int newValue)
 {
-    (void) SaveSettingOnHost(key,
-                             QString::number(newValue), d->m_localhostname);
+    d->m_database->SaveSetting(key, newValue);
 }
 
 void MythContext::SaveSetting(const QString &key, const QString &newValue)
 {
-    (void) SaveSettingOnHost(key, newValue, d->m_localhostname);
+    d->m_database->SaveSetting(key, newValue);
 }
 
 bool MythContext::SaveSettingOnHost(const QString &key,
                                     const QString &newValue,
                                     const QString &host)
 {
-    QString LOC  = QString("SaveSettingOnHost('%1') ").arg(key);
-    bool success = false;
-
-    if (d->ignoreDatabase)
-    {
-        ClearSettingsCache(key, newValue);
-        ClearSettingsCache(host + " " + key, newValue);
-        return true;
-    }
-
-    if (d->m_DBparams.dbHostName.isEmpty())  // Bootstrapping without database?
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "- No database yet");
-        return false;
-    }
-
-    if (key.isEmpty())
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "- Illegal null key");
-        return false;
-    }
-
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    if (query.isConnected())
-    {
-
-        if (!host.isEmpty())
-            query.prepare("DELETE FROM settings WHERE value = :KEY "
-                          "AND hostname = :HOSTNAME ;");
-        else
-            query.prepare("DELETE FROM settings WHERE value = :KEY "
-                          "AND hostname is NULL;");
-
-        query.bindValue(":KEY", key);
-        if (!host.isEmpty())
-            query.bindValue(":HOSTNAME", host);
-
-        if (!query.exec() || !query.isActive())
-            MythContext::DBError("Clear setting", query);
-
-        if (!host.isEmpty())
-            query.prepare("INSERT INTO settings (value,data,hostname) "
-                          "VALUES ( :VALUE, :DATA, :HOSTNAME );");
-        else
-            query.prepare("INSERT INTO settings (value,data ) "
-                          "VALUES ( :VALUE, :DATA );");
-
-        query.bindValue(":VALUE", key);
-        query.bindValue(":DATA", newValue);
-        if (!host.isEmpty())
-            query.bindValue(":HOSTNAME", host);
-
-        if (!query.exec() || !query.isActive())
-            MythContext::DBError(LOC + "- query failure: ", query);
-        else
-            success = true;
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "- database not open");
-    }
-
-    ClearSettingsCache(key, newValue);
-    ClearSettingsCache(host + " " + key, newValue);
-
-    return success;
+    return d->m_database->SaveSettingOnHost(key, newValue, host);
 }
 
 QString MythContext::GetSetting(const QString &key, const QString &defaultval)
 {
-    bool found = false;
-    QString value;
-
-    if (d->overriddenSettings.contains(key)) {
-        value = d->overriddenSettings[key];
-        return value;
-    }
-
-    if (d->useSettingsCache)
-    {
-        d->settingsCacheLock.lock();
-        if (d->settingsCache.contains(key))
-        {
-            value = d->settingsCache[key];
-            d->settingsCacheLock.unlock();
-            return value;
-        }
-        d->settingsCacheLock.unlock();
-    }
-
-
-    if (!d->ignoreDatabase)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        if (query.isConnected())
-        {
-            query.prepare("SELECT data FROM settings WHERE value "
-                          "= :KEY AND hostname = :HOSTNAME ;");
-            query.bindValue(":KEY", key);
-            query.bindValue(":HOSTNAME", d->m_localhostname);
-            query.exec();
-
-            if (query.isActive() && query.size() > 0)
-            {
-                query.next();
-                value = query.value(0).toString();
-                found = true;
-            }
-            else
-            {
-                query.prepare("SELECT data FROM settings "
-                              "WHERE value = :KEY AND "
-                              "hostname IS NULL;");
-                query.bindValue(":KEY", key);
-                query.exec();
-
-                if (query.isActive() && query.size() > 0)
-                {
-                    query.next();
-                    value = query.value(0).toString();
-                    found = true;
-                }
-            }
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, 
-                    QString("Database not open while trying to "
-                            "load setting: %1")
-                    .arg(key));
-        }
-    }
-
-    if (!found)
-        return d->m_settings->GetSetting(key, defaultval); 
-
-    // Store the value (only if we have actually found it in the database)
-    if (!value.isNull() && d->useSettingsCache)
-    {
-        d->settingsCacheLock.lock();
-        d->settingsCache[key] = value;
-        d->settingsCacheLock.unlock();
-    }
-
-    return value;
+    return d->m_database->GetSetting(key, defaultval);
 }
 
 int MythContext::GetNumSetting(const QString &key, int defaultval)
 {
-    QString val = QString::number(defaultval);
-    QString retval = GetSetting(key, val);
-
-    return retval.toInt();
+    return d->m_database->GetNumSetting(key, defaultval);
 }
 
 double MythContext::GetFloatSetting(const QString &key, double defaultval)
 {
-    QString val = QString::number(defaultval);
-    QString retval = GetSetting(key, val);
-
-    return retval.toDouble();
+    return d->m_database->GetFloatSetting(key, defaultval);
 }
 
 QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
                                       const QString &defaultval)
 {
-    bool found = false;
-    QString value = defaultval;
-    QString myKey = host + " " + key;
-
-    if (d->overriddenSettings.contains(myKey))
-    {
-        value = d->overriddenSettings[myKey];
-        return value;
-    }
-
-    if ((host == d->m_localhostname) &&
-        (d->overriddenSettings.contains(key)))
-    {
-        value = d->overriddenSettings[key];
-        return value;
-    }
-
-    if (d->useSettingsCache)
-    {
-        d->settingsCacheLock.lock();
-        if (d->settingsCache.contains(myKey))
-        {
-            value = d->settingsCache[myKey];
-            d->settingsCacheLock.unlock();
-            return value;
-        }
-        d->settingsCacheLock.unlock();
-    }
-
-    if (!d->ignoreDatabase)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        if (query.isConnected())
-        {
-            query.prepare("SELECT data FROM settings WHERE value = :VALUE "
-                          "AND hostname = :HOSTNAME ;");
-            query.bindValue(":VALUE", key);
-            query.bindValue(":HOSTNAME", host);
-
-            if (query.exec() && query.isActive() && query.size() > 0)
-            {
-                query.next();
-                value = query.value(0).toString();
-                found = true;
-            }
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, 
-                    QString("Database not open while trying to "
-                            "load setting: %1")
-                    .arg(key));
-        }
-    }
-
-    if (found && d->useSettingsCache)
-    {
-        d->settingsCacheLock.lock();
-        d->settingsCache[host + " " + key] = value;
-        d->settingsCacheLock.unlock();
-    }
-
-    return value;
+    return d->m_database->GetSettingOnHost(key, host, defaultval);
 }
 
 int MythContext::GetNumSettingOnHost(const QString &key, const QString &host,
                                      int defaultval)
 {
-    QString val = QString::number(defaultval);
-    QString retval = GetSettingOnHost(key, host, val);
-
-    return retval.toInt();
+    return d->m_database->GetNumSettingOnHost(key, host, defaultval);
 }
 
 double MythContext::GetFloatSettingOnHost(
     const QString &key, const QString &host, double defaultval)
 {
-    QString val = QString::number(defaultval);
-    QString retval = GetSettingOnHost(key, host, val);
-
-    return retval.toDouble();
-}
-
-void MythContext::SetPalette(QWidget *widget)
-{
-    QPalette pal = widget->palette();
-
-    QColorGroup active = pal.active();
-    QColorGroup disabled = pal.disabled();
-    QColorGroup inactive = pal.inactive();
-
-    const QString names[] = { "Foreground", "Button", "Light", "Midlight",  
-                              "Dark", "Mid", "Text", "BrightText", "ButtonText",
-                              "Base", "Background", "Shadow", "Highlight",
-                              "HighlightedText" };
-
-    QString type = "Active";
-    for (int i = 0; i < 13; i++)
-    {
-        QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
-        if (color != "")
-            pal.setColor(QPalette::Active, (QColorGroup::ColorRole) i,
-                         createColor(color));
-    }
-
-    type = "Disabled";
-    for (int i = 0; i < 13; i++)
-    {
-        QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
-        if (color != "")
-            pal.setColor(QPalette::Disabled, (QColorGroup::ColorRole) i,
-                         createColor(color));
-    }
-
-    type = "Inactive";
-    for (int i = 0; i < 13; i++)
-    {
-        QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
-        if (color != "")
-            pal.setColor(QPalette::Inactive, (QColorGroup::ColorRole) i,
-                         createColor(color));
-    }
-
-    widget->setPalette(pal);
-}
-
-void MythContext::ThemeWidget(QWidget *widget)
-{
-    if (d->m_themeloaded)
-    {
-        widget->setPalette(d->m_palette);
-        if (d->m_backgroundimage && d->m_backgroundimage->width() > 0)
-        {
-            widget->setPaletteBackgroundPixmap(*(d->m_backgroundimage));
-        }
-        return;
-    }
-
-    SetPalette(widget);
-    d->m_palette = widget->palette();
-
-    QPixmap *bgpixmap = NULL;
-
-    if (d->m_qtThemeSettings->GetSetting("BackgroundPixmap") != "")
-    {
-        QString pmapname = d->m_themepathname +
-                           d->m_qtThemeSettings->GetSetting("BackgroundPixmap");
- 
-        bgpixmap = LoadScalePixmap(pmapname);
-        if (bgpixmap)
-        {
-            widget->setBackgroundOrigin(QWidget::AncestorOrigin);
-            widget->setPaletteBackgroundPixmap(*bgpixmap);
-            d->m_backgroundimage = new QPixmap(*bgpixmap);
-        }
-    }
-    else if (d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap") != "")
-    {
-        QString pmapname = d->m_themepathname +
-                      d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap");
-
-        int width, height;
-        float wmult, hmult;
-
-        GetScreenSettings(width, wmult, height, hmult);
-
-        bgpixmap = LoadScalePixmap(pmapname);
-        if (bgpixmap)
-        {
-            QPixmap background(width, height);
-            QPainter tmp(&background);
-
-            tmp.drawTiledPixmap(0, 0, width, height, *bgpixmap);
-            tmp.end();
-
-            d->m_backgroundimage = new QPixmap(background);
-            widget->setBackgroundOrigin(QWidget::AncestorOrigin);
-            widget->setPaletteBackgroundPixmap(background);
-        }
-    }
-
-    d->m_themeloaded = true;
-
-    if (bgpixmap)
-        delete bgpixmap;
-}
-
-bool MythContext::FindThemeFile(QString &filename)
-{
-    // Given a full path, or in current working directory?
-    if (QFile::exists(filename))
-        return true;
-
-    int pathStart = filename.findRev('/');
-    QString basename;
-    if (pathStart > 0)
-        basename = filename.mid(pathStart + 1);
-
-    QString file;
-    QList<QString> searchpath = GetThemeSearchPath();
-    for (QList<QString>::const_iterator ii = searchpath.begin();
-        ii != searchpath.end(); ii++)
-    {
-        if (QFile::exists((file = *ii + filename)))
-            goto found;
-        if (pathStart > 0 && QFile::exists((file = *ii + basename)))
-            goto found;
-    }
-
-    return false;
-
-found:
-    filename = file;
-    return true;
-}
-
-QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
-{
-    if (filename.left(5) == "myth:" || filename.isEmpty())
-        return NULL;
-
-    if (!d->themecachedir.isEmpty() && fromcache)
-    {
-        QString cachefilepath;
-        bool bFound = false;
-
-        // Is absolute path in theme directory.
-        if (!bFound)
-        {
-            if (!d->m_themepathname.isEmpty() &&
-                !strcmp(filename.left(d->m_themepathname.length()),
-                        d->m_themepathname))
-            {
-                QString tmpfilename = filename;
-                tmpfilename.remove(0, d->m_themepathname.length());
-                cachefilepath = d->themecachedir + tmpfilename;
-                QFile cachecheck(cachefilepath);
-                if (cachecheck.exists())
-                    bFound = true;
-            }
-        }
-
-        // Is relative path in theme directory.
-        if (!bFound)
-        {
-            cachefilepath = d->themecachedir + filename;
-            QFile cachecheck(cachefilepath);
-            if (cachecheck.exists())
-                bFound = true;
-        }
-
-        // Is in top level cache directory.
-        if (!bFound)
-        {
-            QFileInfo fi(filename);
-            cachefilepath = d->themecachedir + fi.fileName();
-            QFile cachecheck(cachefilepath);
-            if (cachecheck.exists())
-                bFound = true;
-        }
-
-        if (bFound)
-        {
-            QImage *ret = new QImage(cachefilepath);
-            if (ret)
-                return ret;
-        }
-    }
-
-
-    if (!FindThemeFile(filename))
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Unable to find image file: %1").arg(filename));
-
-        return NULL;
-    }
-
-    QImage *ret = NULL;
-
-    int width, height;
-    float wmult, hmult;
-
-    GetScreenSettings(width, wmult, height, hmult);
-
-    if (width != d->m_baseWidth || height != d->m_baseHeight)
-    {
-        QImage tmpimage;
-
-        if (!tmpimage.load(filename))
-        {
-            VERBOSE(VB_IMPORTANT,
-                    "Error loading image to scale, from file: " + filename);
-
-            return NULL;
-        }
-        QImage tmp2 = tmpimage.scaled((int)(tmpimage.width() * wmult),
-                                           (int)(tmpimage.height() * hmult),
-                                           Qt::IgnoreAspectRatio,
-                                           Qt::SmoothTransformation);
-        ret = new QImage(tmp2);
-    }
-    else
-    {
-        ret = new QImage(filename);
-        if (ret->width() == 0)
-        {
-            VERBOSE(VB_IMPORTANT, "Error loading image from file: "
-                                  + filename + " - QImage->width()=0");
-
-            delete ret;
-            return NULL;
-        }
-    }
-
-    return ret;
-}
-
-QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache) 
-{
-    if (filename.left(5) == "myth:")
-        return NULL;
-
-    if (d->themecachedir != "" && fromcache)
-    {
-        QString cachefilepath;
-        bool bFound = false;
-
-        // Is absolute path in theme directory.
-        if (!bFound)
-        {
-            if (!strcmp(filename.left(d->m_themepathname.length()),
-                        d->m_themepathname))
-            {
-                QString tmpfilename = filename;
-                tmpfilename.remove(0, d->m_themepathname.length());
-                cachefilepath = d->themecachedir + tmpfilename;
-                QFile cachecheck(cachefilepath);
-                if (cachecheck.exists())
-                    bFound = true;
-            }
-        }
-
-        // Is relative path in theme directory.
-        if (!bFound)
-        {
-            cachefilepath = d->themecachedir + filename;
-            QFile cachecheck(cachefilepath);
-            if (cachecheck.exists())
-                bFound = true;
-        }
-
-        // Is in top level cache directory.
-        if (!bFound)
-        {
-            QFileInfo fi(filename);
-            cachefilepath = d->themecachedir + fi.fileName();
-            QFile cachecheck(cachefilepath);
-            if (cachecheck.exists())
-                bFound = true;
-        }
-
-        if (bFound)
-        {
-            QPixmap *ret = new QPixmap(cachefilepath);
-            if (ret)
-                return ret;
-        }
-    }
-
-    if (!FindThemeFile(filename))
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Unable to find image file: %1").arg(filename));
-
-        return NULL;
-    }
-
-    QPixmap *ret = new QPixmap();
-
-    int width, height;
-    float wmult, hmult;
-
-    GetScreenSettings(width, wmult, height, hmult);
-
-    if (width != d->m_baseWidth || height != d->m_baseHeight)
-    {
-        QImage tmpimage;
-
-        if (!tmpimage.load(filename))
-        {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Error loading image file: %1").arg(filename));
-
-            delete ret;
-            return NULL;
-        }
-        QImage tmp2 = tmpimage.scaled((int)(tmpimage.width() * wmult),
-                                           (int)(tmpimage.height() * hmult),
-                                           Qt::IgnoreAspectRatio,
-                                           Qt::SmoothTransformation);
-        ret->convertFromImage(tmp2);
-    }       
-    else
-    {
-        if (!ret->load(filename))
-        {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Error loading image file: %1").arg(filename));
-
-            delete ret;
-            return NULL;
-        }
-    }
-
-    return ret;
+    return d->m_database->GetFloatSettingOnHost(key, host, defaultval);
 }
 
 QImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
@@ -3215,9 +1687,11 @@ QImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
     Q3Url qurl = url;
     if (qurl.host() == "")
         return NULL;
- 
-    if ((d->imageCache.contains(url)) && (reCache == false))
-        return &(d->imageCache[url]);
+
+    QImage *im;
+
+    if (!reCache && ((im = d->m_ui->GetImageFromCache(url))))
+        return im;
 
     RemoteFile *rf = new RemoteFile(url, false, 0);
 
@@ -3230,10 +1704,7 @@ QImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
     {
         QImage image(data);
         if (image.width() > 0)
-        {
-            d->imageCache[url] = image;
-            return &(d->imageCache[url]);
-        }
+            return d->m_ui->CacheImage(url, image);
     }
     
     return NULL;
@@ -3241,8 +1712,7 @@ QImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
 
 void MythContext::SetSetting(const QString &key, const QString &newValue)
 {
-    d->m_settings->SetSetting(key, newValue);
-    ClearSettingsCache(key, newValue);
+    d->m_database->SetSetting(key, newValue);
 }
 
 /**
@@ -3254,7 +1724,7 @@ void MythContext::SetSetting(const QString &key, const QString &newValue)
 void MythContext::OverrideSettingForSession(const QString &key, 
                                             const QString &value)
 {
-    d->overriddenSettings[key] = value;
+    d->m_database->OverrideSettingForSession(key, value);
 }
 
 bool MythContext::SendReceiveStringList(QStringList &strlist,
@@ -3318,7 +1788,7 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
                 d->serverSockLock.unlock();
             VERBOSE(VB_IMPORTANT,
                     QString("Reconnection to backend server failed"));
-            if (d->m_height && d->m_width)
+            if (d->m_ui && d->m_ui->IsScreenSetup())
                 MythPopupBox::showOkPopup(d->mainWindow, "connection failure",
                              tr("The connection to the master backend "
                                 "server has gone away for some reason.. "
@@ -3395,7 +1865,7 @@ bool MythContext::CheckProtoVersion(MythSocket* socket)
                                     "backend=%2)\n")
                                     .arg(MYTH_PROTO_VERSION).arg(strlist[1]));
 
-        if (d->m_height && d->m_width)
+        if (d->m_ui && d->m_ui->IsScreenSetup())
         {
             qApp->lock();
             MythPopupBox::showOkPopup(d->mainWindow, 
@@ -3453,57 +1923,6 @@ void MythContext::connectionClosed(MythSocket *sock)
     d->serverSockLock.unlock();
 }
 
-QFont MythContext::GetBigFont(void)
-{
-    QFont font = QApplication::font();
-    font.setPointSize(NormalizeFontSize(d->bigfontsize));
-    font.setWeight(QFont::Bold);
-
-    return font;
-}
-
-QFont MythContext::GetMediumFont(void)
-{
-    QFont font = QApplication::font();
-    font.setPointSize(NormalizeFontSize(d->mediumfontsize));
-    font.setWeight(QFont::Bold);
-
-    return font;
-}
-
-QFont MythContext::GetSmallFont(void)
-{
-    QFont font = QApplication::font();
-    font.setPointSize(NormalizeFontSize(d->smallfontsize));
-    font.setWeight(QFont::Bold);
-
-    return font;
-}
-
-/** \fn MythContext::GetLanguage()
- *  \brief Returns two character ISO-639 language descriptor for UI language.
- *  \sa iso639_get_language_list()
- */
-QString MythContext::GetLanguage(void)
-{
-    return GetLanguageAndVariant().left(2);
-}
-
-/** \fn MythContext::GetLanguageAndVariant()
- *  \brief Returns the user-set language and variant.
- *
- *   The string has the form ll or ll_vv, where ll is the two character
- *   ISO-639 language code, and vv (which may not exist) is the variant.
- *   Examples include en_AU, en_CA, en_GB, en_US, fr_CH, fr_DE, pt_BR, pt_PT.
- */
-QString MythContext::GetLanguageAndVariant(void)
-{
-    if (d->language == QString::null || d->language == "")
-        d->language = GetSetting("Language", "EN").lower();
-
-    return d->language;
-}
-
 void MythContext::SetMainWindow(MythMainWindow *mainwin)
 {
     d->mainWindow = mainwin;
@@ -3512,21 +1931,6 @@ void MythContext::SetMainWindow(MythMainWindow *mainwin)
 MythMainWindow *MythContext::GetMainWindow(void)
 {
     return d->mainWindow;
-}
-
-/*
- * Convenience method, so that we don't have to do:
- *   size = GetMainWindow()->NormalizeFontSize(size));
- */
-int MythContext::NormalizeFontSize(const int pointSize)
-{
-    if (!d->mainWindow)
-    {
-        VERBOSE(VB_IMPORTANT, "MC::NormalizeFontSize() called, but no window");
-        return pointSize;
-    }
-
-    return d->mainWindow->NormalizeFontSize(pointSize);
 }
 
 /*
@@ -3817,65 +2221,13 @@ MythPluginManager *MythContext::getPluginManager(void)
     return d->pluginmanager;
 }
 
-
-void MythContext::DisableScreensaver(void)
-{
-    QApplication::postEvent(GetMainWindow(),
-            new ScreenSaverEvent(ScreenSaverEvent::ssetDisable));
-}
-
-void MythContext::RestoreScreensaver(void)
-{
-    QApplication::postEvent(GetMainWindow(),
-            new ScreenSaverEvent(ScreenSaverEvent::ssetRestore));
-}
-
-void MythContext::ResetScreensaver(void)
-{
-    QApplication::postEvent(GetMainWindow(),
-            new ScreenSaverEvent(ScreenSaverEvent::ssetReset));
-}
-
-void MythContext::DoDisableScreensaver(void)
-{
-    if (d->screensaver)
-    {
-        d->screensaver->Disable();
-        d->screensaverEnabled = false;
-    }
-}
-
-void MythContext::DoRestoreScreensaver(void)
-{
-    if (d->screensaver)
-    {
-        d->screensaver->Restore();
-        d->screensaverEnabled = true;
-    }
-}
-
-void MythContext::DoResetScreensaver(void)
-{
-    if (d->screensaver)
-    {
-        d->screensaver->Reset();
-        d->screensaverEnabled = false;
-    }
-}
-
-bool MythContext::GetScreensaverEnabled(void)
-{
-    return d->screensaverEnabled;
-}
-
-
 void MythContext::LogEntry(const QString &module, int priority,
                            const QString &message, const QString &details)
 {
     unsigned int logid;
     int howmany;
 
-    if (d->ignoreDatabase)
+    if (d->m_database->IsDatabaseIgnored())
         return;
 
     if (d->m_logenable == -1) // Haven't grabbed the settings yet
@@ -3922,7 +2274,7 @@ void MythContext::LogEntry(const QString &module, int priority,
         query.bindValue(":DETAILS", details);
 
         if (!query.exec() || !query.isActive())
-            MythContext::DBError("LogEntry", query);
+            MythDB::DBError("LogEntry", query);
 
         if (d->m_logmaxcount > 0)
         {
@@ -3931,7 +2283,7 @@ void MythContext::LogEntry(const QString &module, int priority,
             query.bindValue(":MODULE", module);
             if (!query.exec() || !query.isActive())
             {
-                MythContext::DBError("DelLogEntry#1", query);
+                MythDB::DBError("DelLogEntry#1", query);
             }
             else
             {
@@ -3949,7 +2301,7 @@ void MythContext::LogEntry(const QString &module, int priority,
                         
                         if (!delquery.exec() || !delquery.isActive())
                         {
-                            MythContext::DBError("DelLogEntry#2", delquery);
+                            MythDB::DBError("DelLogEntry#2", delquery);
                         }
                         howmany--;
                     }
@@ -4023,6 +2375,7 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
         {
             // Save the new settings:
             d->m_DBparams = params;
+            d->m_database->SetDatabaseParams(d->m_DBparams);
 
             // If database has changed, force its use:
             d->ResetDatabase();
@@ -4056,25 +2409,6 @@ QString MythContext::getCurrentLocation(void)
         return QString("UNKNOWN");
 
     return currentLocation.last();
-}
-
-bool MythContext::GetScreenIsAsleep(void)
-{
-    if (!d->screensaver)
-        return false;
-    return d->screensaver->Asleep();
-}
-
-/// This needs to be set before MythContext is initialized so
-/// that the MythContext::Init() can detect Xinerama setups.
-void MythContext::SetX11Display(const QString &display)
-{
-    x11_display = Q3DeepCopy<QString>(display);
-}
-
-QString MythContext::GetX11Display(void)
-{
-    return Q3DeepCopy<QString>(x11_display);
 }
 
 void MythContext::dispatch(MythEvent &event)

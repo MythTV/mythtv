@@ -12,7 +12,7 @@
 
 #include "soapclient.h"
 
-#include "mythcontext.h"  // for VERBOSE
+#include "mythverbose.h"
 #include "httprequest.h"
 
 /////////////////////////////////////////////////////////////////////////////

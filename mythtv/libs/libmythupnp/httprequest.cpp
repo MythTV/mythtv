@@ -30,13 +30,13 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <cerrno>
 
 #ifndef USING_MINGW
 #include <netinet/tcp.h>
 #endif
 
-#include "util.h"
-#include "mythcontext.h"  // for VERBOSE
+#include "mythverbose.h"
 #include "upnp.h"
 #include "compat.h"
 

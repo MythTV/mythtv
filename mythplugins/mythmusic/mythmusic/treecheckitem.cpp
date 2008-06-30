@@ -10,6 +10,7 @@ using namespace std;
 #include "playlist.h"
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 #include "res/album_pix.xpm"
 #include "res/artist_pix.xpm"
@@ -52,7 +53,7 @@ static void setupPixmaps(void)
     int screenheight = 0, screenwidth = 0;
     float wmult = 0, hmult = 0;
 
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    GetMythUI()->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     if (screenheight != 600 || screenwidth != 800)
     {

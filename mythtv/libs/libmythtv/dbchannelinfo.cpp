@@ -6,6 +6,7 @@
 
 // MythTV headers
 #include "dbchannelinfo.h"
+#include "mythcontext.h"
 #include "mythdbcon.h"
 
 DBChannel::DBChannel(const DBChannel &other)

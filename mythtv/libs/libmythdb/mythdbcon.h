@@ -11,9 +11,12 @@ using namespace std;
 #include <qsemaphore.h>
 #include <qsqlerror.h>
 #include <qsqlfield.h>
+#include <QRegExp>
+#include <QDateTime>
+#include <QMutex>
 #include <QList>
 
-#include "mythcontext.h"
+#include "mythexp.h"
 
 /// \brief QSqlDatabase wrapper, used by MSqlQuery. Do not use directly.
 class MPUBLIC MSqlDatabase

@@ -22,6 +22,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/util.h>
+#include <mythtv/mythdirs.h>
 
 #include "config.h"
 #include "constants.h"
@@ -367,7 +368,7 @@ bool GalleryUtil::Rename(const QString &currDir, const QString &oldName,
     }
 
     int prefixLen = gContext->GetSetting("GalleryDir").length();
-    QString path = gContext->GetConfDir() + "/MythGallery";
+    QString path = GetConfDir() + "/MythGallery";
     path += currDir.right(currDir.length() - prefixLen);
     path += QString("/.thumbcache/");
     if (QFile::exists(path + oldName))
@@ -531,7 +532,7 @@ bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName
 
     // also look in HOME directory for any thumbnails
     int prefixLen = gContext->GetSetting("GalleryDir").length();
-    QString path = gContext->GetConfDir() + "/MythGallery";
+    QString path = GetConfDir() + "/MythGallery";
     path += currDir.right(currDir.length() - prefixLen) + '/';
     if (QFile::exists(path + oldName))
     {

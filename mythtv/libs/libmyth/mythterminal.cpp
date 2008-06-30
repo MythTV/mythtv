@@ -20,6 +20,7 @@
 
 // MythTV headers
 #include "mythterminal.h"
+#include "mythcontext.h"
 
 MythTerminal::MythTerminal(QString _program, QStringList _arguments) :
     lock(true), running(false),
@@ -35,7 +36,7 @@ MythTerminal::MythTerminal(QString _program, QStringList _arguments) :
     connect(process, SIGNAL(finished(int, QProcess::ExitStatus)),
             this,    SLOT(  ProcessFinished(int, QProcess::ExitStatus)));
 
-    connect(filter,  SIGNAL(KeyPress(QKeyEvent*)),
+    connect(filter,  SIGNAL(KeyPressd(QKeyEvent*)),
             this,    SLOT(  ProcessSendKeyPress(QKeyEvent*)));
     SetEventFilter(filter);
 }
@@ -169,14 +170,14 @@ bool MythTerminalKeyFilter::eventFilter(QObject *obj, QEvent *event)
             }
             else
             {
-                emit KeyPress(e);
+                emit KeyPressd(e);
                 e->accept();
                 return true;
             }
         }
         else
         {
-            emit KeyPress(e);
+            emit KeyPressd(e);
             e->accept();
             return true;
         }
@@ -186,3 +187,4 @@ bool MythTerminalKeyFilter::eventFilter(QObject *obj, QEvent *event)
         return QObject::eventFilter(obj, event);
     }
 }
+

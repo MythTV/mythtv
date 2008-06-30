@@ -8,6 +8,7 @@
 #include "backendselect.h"
 #include "mythdialogs.h"
 #include "mythconfigdialogs.h"
+#include "mythcontext.h"
 
 #include "libmythupnp/mythxmlclient.h"
 

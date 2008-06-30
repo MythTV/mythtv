@@ -33,6 +33,8 @@
 #include "config.h"
 #endif
 
+#include <mythtv/mythdirs.h>
+
 #ifdef WIN32
 #include <winsock2.h>
 #include "gcontext.h"
@@ -291,7 +293,7 @@ void SipThread::SipThreadWorker()
 
     // Open a file for writing debug info into
 #ifndef WIN32
-    QString debugFileName = MythContext::GetConfDir() + "/MythPhone/siplog.txt";
+    QString debugFileName = GetConfDir() + "/MythPhone/siplog.txt";
     debugFile = new QFile(debugFileName);
     if (debugFile->open(QIODevice::WriteOnly))
         debugStream = new Q3TextStream (debugFile);

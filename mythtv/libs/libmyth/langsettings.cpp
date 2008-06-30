@@ -7,7 +7,7 @@ using namespace std;
 #include "langsettings.h"
 #include "settings.h"
 #include "mythcontext.h"
-
+#include "mythdirs.h"
 
 // LangEditor provides the GUI for the prompt() routine.
 
@@ -79,7 +79,7 @@ void LanguageSettings::load(QString module_name)
         
         // install translator
         QTranslator *trans = new QTranslator(0);
-        trans->load(gContext->GetTranslationsDir() +
+        trans->load(GetTranslationsDir() +
                     module_name + QString("_") +
                     d.m_language.lower() + QString(".qm"), ".");
         qApp->installTranslator(trans);

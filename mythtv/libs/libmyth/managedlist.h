@@ -11,8 +11,6 @@ using namespace std;
 #include "mythwidgets.h"
 #include "settings.h"
 
-
-
 enum ManagedListItemStates{MLS_NORMAL, MLS_BOLD, MLS_USER};
 
 class ManagedList;

@@ -5,7 +5,7 @@
 **--------------------------------------------------------------------------*/
 #include <qapplication.h>
 #include <qstring.h>
-#include "mythcontext.h"
+#include "mythmainwindow.h"
 
 #include "jsmenuevent.h"
 
@@ -24,9 +24,7 @@ JoystickMenuEventLock::~JoystickMenuEventLock()
 
 void JoystickMenuEventLock::lock()
 {
-    if (!gContext)
-        return;
-    MythMainWindow *mw = gContext->GetMainWindow();
+    MythMainWindow *mw = GetMythMainWindow();
     if (mw)
     {
         events_locked = true;
@@ -37,7 +35,7 @@ void JoystickMenuEventLock::lock()
 
 void JoystickMenuEventLock::unlock()
 {
-    MythMainWindow *mw = gContext->GetMainWindow();
+    MythMainWindow *mw = GetMythMainWindow();
     if (mw)
     {
         events_locked = false;

@@ -3,7 +3,7 @@
 using namespace std;
 
 #include "server.h"
-#include "libmyth/mythsocket.h"
+#include "mythsocket.h"
 
 MythServer::MythServer(int port, QObject *parent)
           : Q3ServerSocket(port, 1, parent)

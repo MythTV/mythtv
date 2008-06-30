@@ -9,11 +9,12 @@
 #include "tv_play.h"
 #include "programinfo.h"
 
-#include "libmyth/exitcodes.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/mythdbcon.h"
-#include "libmyth/mythdialogs.h"
-#include "libmyth/compat.h"
+#include "exitcodes.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "mythdialogs.h"
+#include "compat.h"
+#include "mythuihelper.h"
 
 #include <iostream>
 using namespace std;
@@ -197,7 +198,7 @@ int main(int argc, char *argv[])
 
     if (!display.isEmpty())
     {
-        gContext->SetX11Display(display);
+        MythUIHelper::SetX11Display(display);
     }
 
     gContext = NULL;
@@ -208,7 +209,7 @@ int main(int argc, char *argv[])
         return TV_EXIT_NO_MYTHCONTEXT;
     }
 
-    if (!geometry.isEmpty() && !gContext->ParseGeometryOverride(geometry))
+    if (!geometry.isEmpty() && !GetMythUI()->ParseGeometryOverride(geometry))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Illegal -geometry argument '%1' (ignored)")
@@ -240,7 +241,7 @@ int main(int argc, char *argv[])
     setuid(getuid());
 
     QString themename = gContext->GetSetting("Theme");
-    QString themedir = gContext->FindThemeDir(themename);
+    QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir == "")
     {   
         QString msg = QString("Fatal Error: Couldn't find theme '%1'.")
@@ -249,7 +250,7 @@ int main(int argc, char *argv[])
         return TV_EXIT_NO_THEME;
     }
     
-    gContext->LoadQtConfig();
+    GetMythUI()->LoadQtConfig();
 
 #if defined(Q_OS_MACX)
     // Mac OS X doesn't define the AudioOutputDevice setting

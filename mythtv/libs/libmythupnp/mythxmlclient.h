@@ -16,6 +16,7 @@
 
 #include "httpcomms.h"
 
+#include "mythdbparams.h"
 #include "upnp.h"
 #include "soapclient.h"
 

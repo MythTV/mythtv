@@ -5,6 +5,7 @@
 #   include <QDateTime>
 #   include <QString>
 #   include <QTextStream>
+#   include <QMutex>
 
     using namespace std;
 #else
@@ -104,13 +105,15 @@ enum VerboseMask
 /// This global variable is set at startup with the flags 
 /// of the verbose messages we want to see.
 extern MPUBLIC unsigned int print_verbose_messages;
-
+#ifdef __cplusplus
+  extern MPUBLIC QMutex verbose_mutex;
+#endif
 
 
 // There are three different types of VERBOSE MACRO:
 // 1. A non-locking one, used in C or Objective C src, or standalone libraries,
-// 2. A MythContext mutex-locked one, which may deadlock, and
-// 3. A MythContext mutex-locked one, which should be deadlock safe.
+// 2. A mutex-locked one, which may deadlock, and
+// 3. A mutex-locked one, which should be deadlock safe.
 // If MYTHCONTEXT_H_ is not defined, we assume the first type,
 // otherwise DEBUG determines the second or third
 
@@ -118,11 +121,13 @@ extern MPUBLIC unsigned int print_verbose_messages;
 #ifndef MYTHCONTEXT_H_
     #ifdef  __cplusplus
         #define VERBOSE(mask,args...)                        \
+        do { \
             if ((print_verbose_messages & (mask)) == (mask)) \
                 cout << QDateTime::currentDateTime()         \
                         .toString("yyyy-MM-dd hh:mm:ss.zzz") \
                         .toLocal8Bit().constData()           \
-                     << " " << (const char*)(args) << endl;
+                     << " " << (const char*)(args) << endl;  \
+       } while (0)
     #else
         #ifdef HAVE_GETTIMEOFDAY
             #define VERBOSEDATE                              \
@@ -140,12 +145,14 @@ extern MPUBLIC unsigned int print_verbose_messages;
             #define VERBOSEDATE ;
         #endif
         #define VERBOSE(mask,args...)                        \
+        do { \
             if ((print_verbose_messages & (mask)) == (mask)) \
             {                                                \
                 VERBOSEDATE                                  \
                 printf(args);                                \
                 putchar('\n');                               \
-            }
+            } \
+        } while (0)
     #endif
 
 #elif defined(DEBUG) // && MYTHCONTEXT_H_
@@ -162,10 +169,10 @@ extern MPUBLIC unsigned int print_verbose_messages;
             { \
                 QDateTime dtmp = QDateTime::currentDateTime(); \
                 QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
-                MythContext::verbose_mutex.lock(); \
+                verbose_mutex.lock(); \
                 cout << dtime.toLocal8Bit().constData() << " " \
                      << QString(args).toLocal8Bit().constData() << endl; \
-                MythContext::verbose_mutex.unlock(); \
+                verbose_mutex.unlock(); \
             } \
         } while (0)
 
@@ -181,9 +188,9 @@ extern MPUBLIC unsigned int print_verbose_messages;
                 QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
                 QTextStream ssMsg(&dtime);                  \
                 ssMsg << " " << args;                                   \
-                MythContext::verbose_mutex.lock();                      \
+                verbose_mutex.lock();                      \
                 cout << ssMsg.string()->toLocal8Bit().constData() << endl; \
-                MythContext::verbose_mutex.unlock();                    \
+                verbose_mutex.unlock();                    \
             } \
         } while (0)
 
@@ -196,6 +203,7 @@ extern MPUBLIC unsigned int print_verbose_messages;
 
     extern MPUBLIC QString verboseString;
 
+    MPUBLIC int parse_verbose_arg(QString arg);
 
     /// This can be appended to the VERBOSE args with either
     /// "+" (with QStrings) or "<<" (with c strings). It uses

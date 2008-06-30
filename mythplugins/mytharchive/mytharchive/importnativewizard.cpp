@@ -9,6 +9,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/uitypes.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 // mytharchive
 #include "importnativewizard.h"
@@ -266,7 +267,7 @@ void ImportNativeWizard::wireUpTheme()
     }
 
     // load pixmaps
-    m_directoryPixmap = gContext->LoadScalePixmap("ma_folder.png");
+    m_directoryPixmap = GetMythUI()->LoadScalePixmap("ma_folder.png");
 
     buildFocusList();
     assignFirstFocus();

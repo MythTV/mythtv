@@ -17,6 +17,7 @@
 #include <mythtv/mythpluginapi.h>
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/compat.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 // MythMusic headers
 #include "decoder.h"
@@ -285,7 +286,7 @@ void MusicCallback(void *data, QString &selection)
 
 void runMenu(QString which_menu)
 {
-    QString themedir = gContext->GetThemeDir();
+    QString themedir = GetMythUI()->GetThemeDir();
 
     MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), which_menu,
                                               GetMythMainWindow()->GetMainStack(),
@@ -454,7 +455,7 @@ static void preMusic()
     //  Load all available info about songs (once!)
     QString startdir = gContext->GetSetting("MusicLocation");
     startdir = QDir::cleanDirPath(startdir);
-    if (!startdir.endsWith("/"));
+    if (!startdir.endsWith("/"))
         startdir += "/";
 
     Metadata::SetStartdir(startdir);

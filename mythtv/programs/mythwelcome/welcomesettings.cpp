@@ -3,6 +3,7 @@
 #include <unistd.h>
 
 #include "welcomesettings.h"
+#include "mythdirs.h"
 
 ///////////////////////////////////////////////////////////////////
 //  daily wakeup/shutdown settings
@@ -181,7 +182,7 @@ static HostLineEdit *MythShutdownStartFECmd()
 {
     HostLineEdit *gc = new HostLineEdit("MythWelcomeStartFECmd");
     gc->setLabel(QObject::tr("Command to run to start the Frontend"));
-    gc->setValue(gContext->GetInstallPrefix() + "/bin/mythfrontend");
+    gc->setValue(GetInstallPrefix() + "/bin/mythfrontend");
     gc->setHelpText(QObject::tr("Command to start mythfrontend.")); 
     return gc;
 };

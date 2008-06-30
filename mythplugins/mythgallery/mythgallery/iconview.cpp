@@ -1245,6 +1245,6 @@ void IconView::mediaStatusChanged(MediaStatus oldStatus,
     {
         HandleShowDevices();
 
-        UpdateText();
+        // UpdateText();
     }
 }

@@ -6,7 +6,7 @@
 #include <q3socket.h>
 #include <qstring.h>
 
-#include "mythdialogs.h"
+#include "mythexp.h"
 
 class MPUBLIC LircClient : public QObject
 {

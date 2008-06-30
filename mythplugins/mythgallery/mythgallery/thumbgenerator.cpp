@@ -30,6 +30,8 @@
 #include "config.h"
 #include "mythtv/mythcontext.h"
 #include "mythtv/util.h"
+#include <mythtv/libmythui/mythuihelper.h>
+#include <mythtv/mythdirs.h>
 
 #include "thumbgenerator.h"
 #include "constants.h"
@@ -294,7 +296,7 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 
         if (!thumbnailCreated)
         {
-            QImage *img = gContext->LoadScaleImage("gallery-moviethumb.png");
+            QImage *img = GetMythUI()->LoadScaleImage("gallery-moviethumb.png");
             if (img)
             {
                 image = *img;
@@ -342,7 +344,7 @@ QString ThumbGenerator::getThumbcacheDir(const QString& inDir)
         // Arrive here if storing thumbs in home dir, 
         // OR failed to create thumb dir in gallery pics location
         int prefixLen = gContext->GetSetting("GalleryDir").length();
-        aPath = gContext->GetConfDir() + "/MythGallery";
+        aPath = GetConfDir() + "/MythGallery";
         aPath += inDir.right(inDir.length() - prefixLen);
         aPath += QString("/.thumbcache/");
         mkpath(aPath);

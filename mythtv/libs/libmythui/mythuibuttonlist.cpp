@@ -7,8 +7,6 @@
 
 using namespace std;
 
-#include "mythcontext.h"
-
 #include "mythuibuttonlist.h"
 #include "mythuigroup.h"
 #include "mythmainwindow.h"

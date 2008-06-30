@@ -114,6 +114,7 @@ a variable before you overwrite it; deletion before overwriting is automatic.
 #include <cstdlib>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdirs.h>
 
 using namespace std;
 
@@ -817,7 +818,7 @@ void vxmlParser::PlayWav(QString wavFile)
 
 void vxmlParser::SaveWav(short *buffer, int Samples)
 {
-    QString fileName = MythContext::GetConfDir() + "/MythPhone/Voicemail/" +  
+    QString fileName = GetConfDir() + "/MythPhone/Voicemail/" +  
                        QDateTime::currentDateTime().toString() + " " + callerName + ".wav";
 
     // Check if the file exists & delete it. It should NOT exist, the naming convention should

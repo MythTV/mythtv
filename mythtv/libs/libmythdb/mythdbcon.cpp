@@ -6,8 +6,8 @@
 #include <qsqldriver.h>
 
 #include "mythdbcon.h"
-
-#include "compat.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 
 QMutex MSqlQuery::prepareLock(false);
 
@@ -63,7 +63,7 @@ bool MSqlDatabase::OpenDatabase()
     
     if (!m_db.isOpen())
     {
-        DatabaseParams dbparms = gContext->GetDatabaseParams();
+        DatabaseParams dbparms = GetMythDB()->GetDatabaseParams();
         m_db.setDatabaseName(dbparms.dbName);
         m_db.setUserName(dbparms.dbUserName);
         m_db.setPassword(dbparms.dbPassword);
@@ -114,7 +114,7 @@ bool MSqlDatabase::OpenDatabase()
     if (!connected)
     {
         VERBOSE(VB_IMPORTANT, "Unable to connect to database!");
-        VERBOSE(VB_IMPORTANT, MythContext::DBErrorMessage(m_db.lastError()));
+        VERBOSE(VB_IMPORTANT, MythDB::DBErrorMessage(m_db.lastError()));
     }
 
     return connected;
@@ -161,7 +161,7 @@ bool MSqlDatabase::KickDatabase()
             m_db.open();
         }
         else
-            MythContext::DBError("KickDatabase", result);
+            MythDB::DBError("KickDatabase", result);
     }
 
     m_lastDBKick = QDateTime::currentDateTime().addSecs(-60);
@@ -302,7 +302,7 @@ MSqlQuery::MSqlQuery(const MSqlQueryInfo &qi) : QSqlQuery(QString::null, qi.qsql
 
 MSqlQuery::~MSqlQuery()
 {
-    if (!gContext)
+    if (!GetMythDB())
     {
         VERBOSE(VB_IMPORTANT, "~MSqlQuery::gContext null");
         return;
@@ -310,7 +310,7 @@ MSqlQuery::~MSqlQuery()
 
     if (m_returnConnection)
     {
-        MDBManager *dbmanager = gContext->GetDBManager();
+        MDBManager *dbmanager = GetMythDB()->GetDBManager();
         if (dbmanager && m_db)
         {
             dbmanager->pushConnection(m_db);
@@ -323,9 +323,9 @@ MSqlQueryInfo MSqlQuery::InitCon()
     MSqlQueryInfo qi;
     InitMSqlQueryInfo(qi);
 
-    if (gContext)
+    if (GetMythDB())
     {
-        MSqlDatabase *db = gContext->GetDBManager()->popConnection();
+        MSqlDatabase *db = GetMythDB()->GetDBManager()->popConnection();
         if (db)
         {
             qi.db = db;
@@ -348,9 +348,9 @@ MSqlQueryInfo MSqlQuery::SchedCon()
     InitMSqlQueryInfo(qi);
     qi.returnConnection = false;
 
-    if (gContext)
+    if (GetMythDB())
     {
-        MSqlDatabase *db = gContext->GetDBManager()->getSchedCon();
+        MSqlDatabase *db = GetMythDB()->GetDBManager()->getSchedCon();
         if (db)
         {
             qi.db = db;
@@ -373,9 +373,9 @@ MSqlQueryInfo MSqlQuery::DDCon()
     InitMSqlQueryInfo(qi);
     qi.returnConnection = false;
 
-    if (gContext)
+    if (GetMythDB())
     {
-        MSqlDatabase *db = gContext->GetDBManager()->getDDCon();
+        MSqlDatabase *db = GetMythDB()->GetDBManager()->getDDCon();
         if (db)
         {
             qi.db = db;

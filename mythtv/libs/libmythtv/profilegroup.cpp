@@ -1,8 +1,9 @@
 #include "recordingprofile.h"
 #include "videosource.h"
 #include "profilegroup.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/mythdbcon.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "mythuihelper.h"
 #include <qsqldatabase.h>
 #include <q3header.h>
 #include <qcursor.h>
@@ -263,7 +264,7 @@ DialogCode ProfileGroupEditor::exec(void)
 
         int   width = 0,    height = 0;
         float wmult = 0.0f, hmult  = 0.0f;
-        gContext->GetScreenSettings(width, wmult, height, hmult);
+        GetMythUI()->GetScreenSettings(width, wmult, height, hmult);
 
         Q3VBoxLayout *layout = new Q3VBoxLayout(dialog, (int)(20 * hmult));
         layout->addWidget(listbox->configWidget(NULL, dialog));

@@ -2,6 +2,7 @@
 
 // Myth headers
 #include "mythstorage.h"
+#include "mythcontext.h"
 #include "settings.h"
 
 void SimpleDBStorage::load(void)

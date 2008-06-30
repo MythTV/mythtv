@@ -16,16 +16,18 @@
 
 #include <iostream>
 
-#include "libmyth/mythconfig.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/mythdbcon.h"
-#include "libmyth/langsettings.h"
-#include "libmyth/dialogbox.h"
-#include "libmyth/exitcodes.h"
-#include "libmyth/util.h"
-#include "libmyth/storagegroup.h"
-#include "libmythui/myththemedmenu.h"
-#include "libmythui/myththemebase.h"
+#include "mythconfig.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "langsettings.h"
+#include "dialogbox.h"
+#include "exitcodes.h"
+#include "util.h"
+#include "storagegroup.h"
+#include "myththemedmenu.h"
+#include "myththemebase.h"
+#include "mythuihelper.h"
+#include "mythdirs.h"
 
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/videosource.h"
@@ -78,7 +80,7 @@ void SetupMenu(MythMainWindow *win)
 {
     QString theme = gContext->GetSetting("Theme", "blue");
 
-    MythThemedMenu* menu = new MythThemedMenu(gContext->FindThemeDir(theme),
+    MythThemedMenu* menu = new MythThemedMenu(GetMythUI()->FindThemeDir(theme),
                                               "setup.xml", win->GetMainStack(),
                                               "mainmenu", false);
 
@@ -237,7 +239,7 @@ int main(int argc, char *argv[])
 
     if (!display.isEmpty())
     {
-        MythContext::SetX11Display(display);
+        MythUIHelper::SetX11Display(display);
     }
 
     gContext = NULL;
@@ -251,7 +253,7 @@ int main(int argc, char *argv[])
     }
 
     if (geometry != "")
-        if (!gContext->ParseGeometryOverride(geometry))
+        if (!GetMythUI()->ParseGeometryOverride(geometry))
             cerr << "Illegal -geometry argument '"
                  << (const char *)geometry << "' (ignored)\n";
 
@@ -298,9 +300,9 @@ int main(int argc, char *argv[])
     }
 
     gContext->SetSetting("Theme", "G.A.N.T");
-    gContext->LoadQtConfig();
+    GetMythUI()->LoadQtConfig();
 
-    QString fileprefix = MythContext::GetConfDir();
+    QString fileprefix = GetConfDir();
 
     QDir dir(fileprefix);
     if (!dir.exists())
@@ -311,7 +313,7 @@ int main(int argc, char *argv[])
     gContext->SetMainWindow(mainWindow);
     mainWindow->setWindowTitle(QObject::tr("MythTV Setup"));
 
-    gContext->UpdateImageCache();
+    GetMythUI()->UpdateImageCache();
     MythThemeBase *themeBase = new MythThemeBase();
     (void) themeBase;
 

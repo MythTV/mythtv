@@ -29,14 +29,14 @@ using namespace std;
 #include "yuv2rgb.h"
 #include "manualschedule.h"
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/mythdbcon.h"
-#include "libmyth/dialogbox.h"
-#include "libmythtv/programinfo.h"
-#include "libmythtv/scheduledrecording.h"
-#include "libmythtv/recordingtypes.h"
-#include "libmythtv/remoteutil.h"
-#include "libmythtv/channelutil.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "dialogbox.h"
+#include "programinfo.h"
+#include "scheduledrecording.h"
+#include "recordingtypes.h"
+#include "remoteutil.h"
+#include "channelutil.h"
 
 ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
               : MythDialog(parent, name)

@@ -19,6 +19,7 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qsqlerror.h>
+#include <QObject>
 
 // myth
 #include <mythtv/mythcontext.h>
@@ -26,6 +27,7 @@
 #include <mythtv/mythplugin.h>
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/mythpluginapi.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 //zone minder
 #include "zmconsole.h"
@@ -127,7 +129,7 @@ void ZoneMinderCallback(void *data, QString &selection)
 
 void runMenu(QString which_menu)
 {
-    QString themedir = gContext->GetThemeDir();
+    QString themedir = GetMythUI()->GetThemeDir();
 
     MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), which_menu, 
                                               GetMythMainWindow()->GetMainStack(),

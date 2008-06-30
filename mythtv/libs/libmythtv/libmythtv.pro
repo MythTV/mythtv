@@ -14,9 +14,10 @@ INCLUDEPATH += ../libmythlivemedia/BasicUsageEnvironment/include
 INCLUDEPATH += ../libmythlivemedia/groupsock/include
 INCLUDEPATH += ../libmythlivemedia/liveMedia/include
 INCLUDEPATH += ../libmythlivemedia/UsageEnvironment/include
+INCLUDEPATH += ../libmythdb ../libmythui
 
 DEPENDPATH  += ../libmyth ../libavcodec ../libavformat ../libavutil
-DEPENDPATH  += ../libmythmpeg2 ../libmythdvdnav
+DEPENDPATH  += ../libmythmpeg2 ../libmythdvdnav ../libmythdb
 DEPENDPATH  += ./dvbdev ./mpeg ./hdhomerun ./iptv
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment
@@ -31,12 +32,13 @@ LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat
 LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythmpeg2 -L../libmythdvdnav
 LIBS += -L../libmythfreemheg -L../libmythlivemedia
+LIBS += -L../libmythdb 
+LIBS += -lmythdb-$$LIBVERSION -lmythui-$$LIBVERSION
 LIBS += -lmyth-$$LIBVERSION         -lmythavutil-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION  -lmythavformat-$$LIBVERSION
-LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythmpeg2-$$LIBVERSION    -lmythdvdnav-$$LIBVERSION
 LIBS += -lmythfreemheg-$$LIBVERSION -lmythlivemedia-$$LIBVERSION
-LIBS += -lz $$EXTRA_LIBS
+LIBS += -lz $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libavutil/libmythavutil-$${MYTH_SHLIB_EXT}

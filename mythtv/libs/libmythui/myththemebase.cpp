@@ -5,8 +5,8 @@
 #include "xmlparsebase.h"
 #include "mythfontproperties.h"
 
-#include "mythcontext.h"
 #include "oldsettings.h"
+#include "mythuihelper.h"
 
 class MythThemeBasePrivate
 {
@@ -46,9 +46,9 @@ void MythThemeBase::Reload(void)
     if (!XMLParseBase::CopyWindowFromBase("backgroundwindow",
                                           d->backgroundscreen))
     {
-        QString backgroundname = gContext->qtconfig()->GetSetting("BackgroundPixmap"
+        QString backgroundname = GetMythUI()->qtconfig()->GetSetting("BackgroundPixmap"
 );
-        backgroundname = gContext->GetThemeDir() + backgroundname;
+        backgroundname = GetMythUI()->GetThemeDir() + backgroundname;
 
         d->backimg = new MythUIImage(backgroundname, d->backgroundscreen,
                                      "backimg");
@@ -74,9 +74,9 @@ void MythThemeBase::Init(void)
     if (!XMLParseBase::CopyWindowFromBase("backgroundwindow", 
                                           d->backgroundscreen))
     {
-        QString backgroundname = gContext->qtconfig()->GetSetting("BackgroundPixmap"
+        QString backgroundname = GetMythUI()->qtconfig()->GetSetting("BackgroundPixmap"
 );
-        backgroundname = gContext->GetThemeDir() + backgroundname;
+        backgroundname = GetMythUI()->GetThemeDir() + backgroundname;
 
         d->backimg = new MythUIImage(backgroundname, d->backgroundscreen,
                                      "backimg");

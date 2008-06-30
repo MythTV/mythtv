@@ -30,6 +30,9 @@
 
 #include "uilistbtntype.h"
 
+#include "mythfontproperties.h"
+#include "mythuihelper.h"
+
 UIListGenericTree::UIListGenericTree(UIListGenericTree *parent, 
                                      const QString &name, const QString &action,
                                      int check, QPixmap *image)
@@ -1900,7 +1903,7 @@ void UIListBtnType::LoadPixmap(QPixmap& pix, const QString& fileName)
 {
     QString file = "lb-" + fileName + ".png";
     
-    QPixmap *p = gContext->LoadScalePixmap(file);
+    QPixmap *p = GetMythUI()->LoadScalePixmap(file);
     if (p) 
     {
         pix = *p;

@@ -30,6 +30,7 @@
 #include "upnputil.h"
 #include "upnp.h" // only needed for Config... remove once config is moved.
 #include "compat.h"
+#include "mythdirs.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -74,7 +75,7 @@ HttpServer::HttpServer( int nPort )
     // Initialize Share Path
     // ----------------------------------------------------------------------
 
-    m_sSharePath = gContext->GetShareDir();
+    m_sSharePath = GetShareDir();
     VERBOSE( VB_UPNP, QString( "HttpServer( %1 ) - SharePath = %2" )
                       .arg( nPort ).arg( m_sSharePath ));
 

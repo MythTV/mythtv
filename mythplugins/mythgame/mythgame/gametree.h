@@ -9,6 +9,7 @@
 #include <QSqlQuery>
 #include <QKeyEvent>
 
+#include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/uitypes.h>

@@ -6,6 +6,7 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 #include "parentalcontrols.h"
 
@@ -184,7 +185,7 @@ MythMultiPasswordDialog::MythMultiPasswordDialog(const QString &message,
     int textWidth = fontMetrics().width(message);
     int totalWidth = textWidth + 175;
 
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    GetMythUI()->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
     setGeometry((screenwidth - 250) / 2,
                 (screenheight - 50) / 2, totalWidth, 50);
 

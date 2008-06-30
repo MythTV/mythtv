@@ -26,6 +26,7 @@
 
 // myth
 #include "mythtv/mythcontext.h"
+#include <mythtv/libmythui/mythuihelper.h>
 
 // zoneminder
 #include "zmliveplayer.h"
@@ -52,7 +53,7 @@ ZMLivePlayer::ZMLivePlayer(int monitorID, int eventID, MythMainWindow *parent,
     m_monitors = NULL;
     m_monitorLayout = 1;
 
-    gContext->DoDisableScreensaver();
+    GetMythUI()->DoDisableScreensaver();
 
     m_frameTimer = new QTimer(this);
     connect(m_frameTimer, SIGNAL(timeout()), this,
@@ -89,7 +90,7 @@ ZMLivePlayer::~ZMLivePlayer()
 {
     gContext->SaveSetting("ZoneMinderLiveLayout", m_monitorLayout);
 
-    gContext->DoRestoreScreensaver();
+    GetMythUI()->DoRestoreScreensaver();
 
     if (m_players)
     {
@@ -454,7 +455,7 @@ bool Player::startPlayerGL(Monitor *mon, Window winID)
 
     Window parent = winID;
 
-    m_dis = XOpenDisplay(gContext->GetX11Display());
+    m_dis = XOpenDisplay(GetMythUI()->GetX11Display());
     if (m_dis == NULL)
     {
         VERBOSE(VB_IMPORTANT, "MythZoneMinder: Unable to open display\n");
@@ -547,7 +548,7 @@ bool Player::startPlayerXv(Monitor *mon, Window winID)
 
     Window parent = winID;
 
-    m_dis = XOpenDisplay(gContext->GetX11Display());
+    m_dis = XOpenDisplay(GetMythUI()->GetX11Display());
     if (m_dis == NULL)
     {
         VERBOSE(VB_IMPORTANT, "MythZoneMinder: Unable to open display\n");

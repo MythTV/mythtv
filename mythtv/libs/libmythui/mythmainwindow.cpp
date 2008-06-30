@@ -44,21 +44,24 @@ using namespace std;
 #include "mythpainter_ogl.h"
 #endif
 #include "mythpainter_qt.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
 #include "mythgesture.h"
+#include "mythuihelper.h"
+
+/* from libmythdb */
+#include "mythdb.h"
+#include "mythverbose.h"
+#include "mythevent.h"
+#include "mythdirs.h"
 
 /* from libmyth */
 #include "screensaver.h"
-#include "mythdialogs.h"
-#include "mythmediamonitor.h"
 
 #define GESTURE_TIMEOUT 1000
 
 #ifdef USE_LIRC
 static void *SpawnLirc(void *param)
 {
-    QString config_file = MythContext::GetConfDir() + "/lircrc";
+    QString config_file = GetConfDir() + "/lircrc";
     if (!QFile::exists(config_file))
         config_file = QDir::homeDirPath() + "/.lircrc";
 
@@ -74,7 +77,7 @@ static void *SpawnLirc(void *param)
 static void *SpawnJoystickMenu(void *param)
 {
     MythMainWindow *main_window = (MythMainWindow *)param;
-    QString config_file = MythContext::GetConfDir() + "/joystickmenurc";
+    QString config_file = GetConfDir() + "/joystickmenurc";
     JoystickMenuClient *js = new JoystickMenuClient(main_window);
     if (!js->Init(config_file))
         js->Process();
@@ -309,7 +312,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
     // This prevents database errors from RegisterKey() when there is no DB:
     d->m_useDB = useDB;
 
-    QString painter = gContext->GetSetting("ThemePainter", "qt");
+    QString painter = GetMythDB()->GetSetting("ThemePainter", "qt");
 #ifdef USE_OPENGL_PAINTER
     if (painter == "opengl")
     {
@@ -608,7 +611,7 @@ bool MythMainWindow::screenShot(QString fname, int x, int y,
 
 bool MythMainWindow::screenShot(int x, int y, int x2, int y2)
 {
-    QString fPath = gContext->GetSetting("ScreenShotPath","/tmp/");
+    QString fPath = GetMythDB()->GetSetting("ScreenShotPath","/tmp/");
     QString fName = QString("/%1/myth-screenshot-%2.png")
                     .arg(fPath)
                     .arg(QDateTime::currentDateTime()
@@ -658,14 +661,14 @@ bool MythMainWindow::event(QEvent* e)
 
 void MythMainWindow::Init(void)
 {
-    fonTweak = gContext->GetNumSetting("QtFonTweak", 0);
+    fonTweak = GetMythDB()->GetNumSetting("QtFonTweak", 0);
 
-    bool hideCursor = gContext->GetNumSetting("HideMouseCursor", 1);
+    bool hideCursor = GetMythDB()->GetNumSetting("HideMouseCursor", 1);
 #ifdef QWS
     QWSServer::setCursorVisible(!hideCursor);
 #endif
 
-    if (gContext->GetNumSetting("RunFrontendInWindow", 0))
+    if (GetMythDB()->GetNumSetting("RunFrontendInWindow", 0))
         d->does_fill_screen = false;
     else
         d->does_fill_screen = true;
@@ -675,7 +678,7 @@ void MythMainWindow::Init(void)
 
     if (d->does_fill_screen)
     {
-        if (gContext->IsGeometryOverridden())
+        if (GetMythUI()->IsGeometryOverridden())
             flags |= Qt::FramelessWindowHint;
         else
             setWindowState(Qt::WindowFullScreen);
@@ -695,8 +698,8 @@ void MythMainWindow::Init(void)
 
     setWindowFlags(flags);
 
-    gContext->GetScreenSettings(d->xbase, d->screenwidth, d->wmult,
-                                d->ybase, d->screenheight, d->hmult);
+    GetMythUI()->GetScreenSettings(d->xbase, d->screenwidth, d->wmult,
+                                   d->ybase, d->screenheight, d->hmult);
 
     d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     d->uiScreenRect = QRect(0, 0, d->screenwidth, d->screenheight);
@@ -705,8 +708,8 @@ void MythMainWindow::Init(void)
     setFixedSize(QSize(d->screenwidth, d->screenheight));
 
     /* FIXME these two lines should go away */
-    setFont(gContext->GetMediumFont());
-    gContext->ThemeWidget(this);
+    setFont(GetMythUI()->GetMediumFont());
+    GetMythUI()->ThemeWidget(this);
 
     Show();
 
@@ -828,6 +831,7 @@ void MythMainWindow::ExitToMainMenu(void)
                 MythEvent *me = new MythEvent("EXIT_TO_MENU");
                 QApplication::postEvent(current, me);
             }
+#if 0
             else if (MythDialog *dial = dynamic_cast<MythDialog*>(current))
             {
                 (void)dial;
@@ -836,6 +840,7 @@ void MythMainWindow::ExitToMainMenu(void)
                 QObject *key_target = getTarget(*key);
                 QApplication::postEvent(key_target, key);
             }
+#endif
             return;
         }
         else
@@ -1009,7 +1014,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
                       "hostname = :HOSTNAME ;");
         query.bindValue(":CONTEXT", context);
         query.bindValue(":ACTION", action);
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
+        query.bindValue(":HOSTNAME", GetMythDB()->GetHostName());
 
         bool ok = query.exec() && query.isActive();
 
@@ -1032,11 +1037,11 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
                 query.bindValue(":DESCRIPTION", description);
                 query.bindValue(":CONTEXT",     context);
                 query.bindValue(":ACTION",      action);
-                query.bindValue(":HOSTNAME",    gContext->GetHostName());
+                query.bindValue(":HOSTNAME",    GetMythDB()->GetHostName());
 
                 if (!query.exec())
                 {
-                    MythContext::DBError("Update Keybinding", query);
+                    MythDB::DBError("Update Keybinding", query);
                 }
             }
         }
@@ -1052,11 +1057,11 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
             query.bindValue(":ACTION", action);
             query.bindValue(":DESCRIPTION", description);
             query.bindValue(":KEYLIST", inskey);
-            query.bindValue(":HOSTNAME", gContext->GetHostName());
+            query.bindValue(":HOSTNAME", GetMythDB()->GetHostName());
 
             if (!query.exec() || !query.isActive())
             {
-                MythContext::DBError("Insert Keybinding", query);
+                MythDB::DBError("Insert Keybinding", query);
             }
         }
     }
@@ -1078,7 +1083,7 @@ QString MythMainWindow::GetKey(const QString &context,
                   "      hostname = :HOSTNAME");
     query.bindValue(":CONTEXT", context);
     query.bindValue(":ACTION", action);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", GetMythDB()->GetHostName());
 
     if (!query.exec() || !query.isActive() || !query.next())
         return "?";
@@ -1154,7 +1159,7 @@ void MythMainWindow::RegisterJump(const QString &destination,
         query.prepare("SELECT keylist FROM jumppoints WHERE "
                       "destination = :DEST and hostname = :HOST ;");
         query.bindValue(":DEST", destination);
-        query.bindValue(":HOST", gContext->GetHostName());
+        query.bindValue(":HOST", GetMythDB()->GetHostName());
 
         if (query.exec() && query.isActive() && query.size() > 0)
         {
@@ -1171,11 +1176,11 @@ void MythMainWindow::RegisterJump(const QString &destination,
             query.bindValue(":DEST", destination);
             query.bindValue(":DESC", description);
             query.bindValue(":KEYLIST", inskey);
-            query.bindValue(":HOST", gContext->GetHostName());
+            query.bindValue(":HOST", GetMythDB()->GetHostName());
 
             if (!query.exec() || !query.isActive())
             {
-                MythContext::DBError("Insert Jump Point", query);
+                MythDB::DBError("Insert Jump Point", query);
             }
         }
     }
@@ -1214,6 +1219,7 @@ void MythMainWindow::RegisterMediaHandler(const QString &destination,
                                           const QString &extensions)
 {
 #ifndef _WIN32
+#if 0
     if (d->mediaHandlerMap.count(destination) == 0) 
     {
         MHData mhd = { callback, mediaType, destination, description };
@@ -1235,6 +1241,7 @@ void MythMainWindow::RegisterMediaHandler(const QString &destination,
        VERBOSE(VB_GENERAL, QString("%1 is already registered as a media "
                                    "handler.").arg(destination));
     }
+#endif
 #endif // !_WIN32
 }
 
@@ -1476,6 +1483,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             QApplication::sendEvent(key_target, &key);
     }
 #ifndef _WIN32
+#if 0
     else if (ce->type() == kMediaEventType) 
     {
         MediaEvent *media_event = (MediaEvent*)ce;
@@ -1539,6 +1547,7 @@ void MythMainWindow::customEvent(QEvent *ce)
                 mon->Unlock(pDev);
         }
     }
+#endif
 #endif // !_WIN32
 
 #if defined(USE_LIRC) || defined(USING_APPLEREMOTE)
@@ -1549,8 +1558,8 @@ void MythMainWindow::customEvent(QEvent *ce)
 
         if (keycode) 
         {
-            gContext->ResetScreensaver();
-            if (gContext->GetScreenIsAsleep())
+            GetMythUI()->ResetScreensaver();
+            if (GetMythUI()->GetScreenIsAsleep())
                 return;
 
             int mod = keycode & Qt::MODIFIER_MASK;
@@ -1600,8 +1609,8 @@ void MythMainWindow::customEvent(QEvent *ce)
 
         if (keycode)
         {
-            gContext->ResetScreensaver();
-            if (gContext->GetScreenIsAsleep())
+            GetMythUI()->ResetScreensaver();
+            if (GetMythUI()->GetScreenIsAsleep())
                 return;
 
             int mod = keycode & Qt::MODIFIER_MASK;
@@ -1645,17 +1654,17 @@ void MythMainWindow::customEvent(QEvent *ce)
         {
             case ScreenSaverEvent::ssetDisable:
             {
-                gContext->DoDisableScreensaver();
+                GetMythUI()->DoDisableScreensaver();
                 break;
             }
             case ScreenSaverEvent::ssetRestore:
             {
-                gContext->DoRestoreScreensaver();
+                GetMythUI()->DoRestoreScreensaver();
                 break;
             }
             case ScreenSaverEvent::ssetReset:
             {
-                gContext->DoResetScreensaver();
+                GetMythUI()->DoResetScreensaver();
                 break;
             }
             default:

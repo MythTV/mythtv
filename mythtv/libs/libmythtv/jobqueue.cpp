@@ -24,6 +24,8 @@ using namespace std;
 #include "previewgenerator.h"
 #include "compat.h"
 
+#include "mythdirs.h"
+
 #define LOC     QString("JobQueue: ")
 #define LOC_ERR QString("JobQueue Error: ")
 
@@ -1869,7 +1871,7 @@ void JobQueue::DoTranscodeThread(void)
 
     if (runningJobCommands[key] == "mythtranscode")
     {
-        path = gContext->GetInstallPrefix() + "/bin/mythtranscode";
+        path = GetInstallPrefix() + "/bin/mythtranscode";
         command = QString("%1 -j %2 -V %3 -p %4 %5")
                           .arg(path).arg(jobID).arg(print_verbose_messages)
                           .arg(profilearg.ascii()).arg(useCutlist ? "-l" : "");
@@ -2118,7 +2120,7 @@ void JobQueue::DoFlagCommercialsThread(void)
 
     if (runningJobCommands[key] == "mythcommflag")
     {
-        path = gContext->GetInstallPrefix() + "/bin/mythcommflag";
+        path = GetInstallPrefix() + "/bin/mythcommflag";
         command = QString("%1 -j %2 -V %3")
                           .arg(path).arg(jobID).arg(print_verbose_messages);
     }

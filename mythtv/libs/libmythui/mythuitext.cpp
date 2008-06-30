@@ -1,11 +1,14 @@
+#include <iostream>
 #include <qapplication.h>
 
+#include "mythverbose.h"
+
+#include "mythuihelper.h"
 #include "mythuitext.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 
-#include "mythcontext.h"
 #include "compat.h"
 
 MythUIText::MythUIText(MythUIType *parent, const char *name)
@@ -258,12 +261,12 @@ bool MythUIText::ParseElement(QDomElement &element)
             m_Message = qApp->translate("ThemeUI", getFirstText(element));
         }
         else if (element.attribute("lang","").toLower() ==
-                 gContext->GetLanguageAndVariant())
+                 GetMythUI()->GetLanguageAndVariant())
         {
             m_Message = getFirstText(element);
         }
         else if (element.attribute("lang","").toLower() ==
-                 gContext->GetLanguage())
+                 GetMythUI()->GetLanguage())
         {
             m_Message = getFirstText(element);
         }

@@ -61,7 +61,6 @@ class PhoneUIBox : public MythThemedDialog
     void InfoButtonPushed(void);
     void LoopbackButtonPushed(void);
     void handleTreeListSignals(int, IntVector*);
-    void TransmitLocalWebcamImage(uchar *yuvBuffer, int w, int h);
     void OnScreenClockTick(void);
     void closeUrlPopup(void);
     void dialUrlVideo(void);
@@ -80,9 +79,6 @@ class PhoneUIBox : public MythThemedDialog
     void outcallSendIMSelected(void);
     void menuCallUrl(void);
     void menuAddContact(void);
-    void menuDirAdd(void);
-    void menuDirDel(void);
-    void menuDirRen(void);
     void menuSpeedDialRemove(void);
     void menuHistorySave(void);
     void menuHistoryClear(void);
@@ -102,8 +98,6 @@ class PhoneUIBox : public MythThemedDialog
     void hideVolume(){showVolume(false);}
     void showVolume(bool on_or_off);
     void DisplayMicSpkPower(void);
-    void statsIncreaseAudioPlayout(void);
-    void statsDecreaseAudioPlayout(void);
 
   protected:
     virtual void paintEvent(QPaintEvent *event);

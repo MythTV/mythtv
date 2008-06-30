@@ -1,3 +1,4 @@
+#include <iostream>
 #include <qapplication.h>
 #include <qregexp.h>
 #include <QChar>
@@ -7,7 +8,8 @@
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 
-#include "mythcontext.h"
+#include "mythverbose.h"
+#include "mythuihelper.h"
 
 MythUITextEdit::MythUITextEdit(MythUIType *parent, const char *name, bool doInit)
            : MythUIType(parent, name)
@@ -102,12 +104,12 @@ bool MythUITextEdit::ParseElement(QDomElement &element)
             m_Message = qApp->translate("ThemeUI", getFirstText(element));
         }
         else if (element.attribute("lang","").toLower() ==
-                 gContext->GetLanguageAndVariant())
+                 GetMythUI()->GetLanguageAndVariant())
         {
             m_Message = getFirstText(element);
         }
         else if (element.attribute("lang","").toLower() ==
-                 gContext->GetLanguage())
+                 GetMythUI()->GetLanguage())
         {
             m_Message = getFirstText(element);
         }

@@ -19,6 +19,7 @@
 #include <mythtv/mythpluginapi.h>
 #include <mythtv/mythmediamonitor.h>
 #include <mythtv/util.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 #include "videomanager.h"
 #include "videobrowser.h"
@@ -564,7 +565,7 @@ namespace
 
     void runMenu(const QString &menuname)
     {
-        QString themedir = gContext->GetThemeDir();
+        QString themedir = GetMythUI()->GetThemeDir();
 
         MythThemedMenu *diag =
                 new MythThemedMenu(themedir.ascii(), menuname,

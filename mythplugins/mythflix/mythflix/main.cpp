@@ -31,6 +31,7 @@
 #include <mythtv/mythpluginapi.h>
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/libmythui/mythmainwindow.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 // MythFlix headers
 #include "mythflix.h"
@@ -92,7 +93,7 @@ void NetFlixCallback(void *data, QString &selection)
 
 void runMenu()
 {
-    QString themedir = gContext->GetThemeDir();
+    QString themedir = GetMythUI()->GetThemeDir();
 
     MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), 
                                               "netflix_menu.xml", 

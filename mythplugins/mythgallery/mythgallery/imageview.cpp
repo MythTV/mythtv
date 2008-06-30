@@ -24,6 +24,7 @@
 // MythTV plugin headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/lcddevice.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 // MythGallery headers
 #include "imageview.h"
@@ -60,7 +61,7 @@ ImageView::ImageView(const ThumbList &itemList,
 {
 
     int xbase, ybase, screenwidth, screenheight;
-    gContext->GetScreenSettings(xbase, screenwidth,  m_wmult,
+    GetMythUI()->GetScreenSettings(xbase, screenwidth,  m_wmult,
                                 ybase, screenheight, m_hmult);
     m_screenSize = QSize(screenwidth, screenheight);
 

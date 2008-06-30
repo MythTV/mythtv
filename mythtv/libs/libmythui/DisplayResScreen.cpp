@@ -1,5 +1,6 @@
+#include <QStringList>
+
 #include "DisplayResScreen.h"
-#include "mythcontext.h"
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
                                    double aspectRatio, short refreshRate)

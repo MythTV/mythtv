@@ -17,6 +17,8 @@
 #include <mythtv/mythwidgets.h>
 #include <mythtv/libmythtv/remoteutil.h>
 #include <mythtv/libmythtv/programinfo.h>
+#include <mythtv/mythdirs.h>
+#include <mythtv/libmythui/mythuihelper.h>
 
 // mytharchive
 #include "archiveutil.h"
@@ -38,7 +40,7 @@ MythburnWizard::MythburnWizard(MythMainWindow *parent, QString window_name,
                                QString theme_filename, const char *name)
                 : MythThemedDialog(parent, window_name, theme_filename, name, true)
 {
-    themeDir = gContext->GetShareDir() + "mytharchive/themes/";
+    themeDir = GetShareDir() + "mytharchive/themes/";
 
     // remove any old thumb images
     QString thumbDir = getTempDirectory() + "/config/thumbs";
@@ -343,7 +345,7 @@ void MythburnWizard::updateSizeBar(void)
 void MythburnWizard::wireUpTheme()
 {
     // load pixmap
-    movePixmap = gContext->LoadScalePixmap("ma_updown.png");
+    movePixmap = GetMythUI()->LoadScalePixmap("ma_updown.png");
 
     // make iso image checkbox
     createISO_check = getUICheckBoxType("makeisoimage_check");
@@ -537,7 +539,7 @@ void MythburnWizard::loadEncoderProfiles()
 
     // find the encoding profiles
     // first look in the ConfDir (~/.mythtv)
-    QString filename = MythContext::GetConfDir() + 
+    QString filename = GetConfDir() + 
             "/MythArchive/ffmpeg_dvd_" + 
             ((gContext->GetSetting("MythArchiveVideoFormat", "pal")
                 .lower() == "ntsc") ? "ntsc" : "pal") + ".xml";
@@ -545,7 +547,7 @@ void MythburnWizard::loadEncoderProfiles()
     if (!QFile::exists(filename))
     {
         // not found yet so use the default profiles
-        filename = gContext->GetShareDir() + 
+        filename = GetShareDir() + 
             "mytharchive/encoder_profiles/ffmpeg_dvd_" + 
             ((gContext->GetSetting("MythArchiveVideoFormat", "pal")
                 .lower() == "ntsc") ? "ntsc" : "pal") + ".xml";
@@ -1537,7 +1539,7 @@ void MythburnWizard::runScript()
         QFile::remove(logDir + "/mythburncancel.lck");
 
     createConfigFile(configDir + "/mydata.xml");
-    commandline = "python " + gContext->GetShareDir() + "mytharchive/scripts/mythburn.py";
+    commandline = "python " + GetShareDir() + "mytharchive/scripts/mythburn.py";
     commandline += " -j " + configDir + "/mydata.xml";             // job file
     commandline += " -l " + logDir + "/progress.log";              // progress log
     commandline += " > "  + logDir + "/mythburn.log 2>&1 &";       //Logs

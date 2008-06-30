@@ -394,7 +394,6 @@ class PlaybackBox : public MythDialog
     QDomElement         xmldata;
 
     // Non-volatile drawing variables /////////////////////////////////////////
-    QPixmap            *drawTransPixmap;
     bool                drawPopupSolid;
     QColor              drawPopupFgColor;
     QColor              drawPopupBgColor;

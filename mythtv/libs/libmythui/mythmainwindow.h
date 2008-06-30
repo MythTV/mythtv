@@ -6,31 +6,12 @@
 #include <qwidget.h>
 #include <qgl.h>
 
+#include "mythexp.h"
+
 #include "mythuitype.h"
 #include "mythscreenstack.h"
 
 class MythMediaDevice;
-
-const int kExternalKeycodeEventType = 33213;
-const int kExitToMainMenuEventType = 33214;
-
-class ExternalKeycodeEvent : public QEvent
-{
-  public:
-    ExternalKeycodeEvent(const int key) 
-           : QEvent((QEvent::Type)kExternalKeycodeEventType), keycode(key) {}
-
-    int getKeycode() { return keycode; }
-
-  private:
-    int keycode;
-};
-
-class ExitToMainMenuEvent : public QEvent
-{
-  public:
-    ExitToMainMenuEvent(void) : QEvent((QEvent::Type)kExitToMainMenuEventType) {}
-};
 
 #define REG_KEY(a, b, c, d) GetMythMainWindow()->RegisterKey(a, b, c, d)
 #define GET_KEY(a, b) GetMythMainWindow()->GetKey(a, b)

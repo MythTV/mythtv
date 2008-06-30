@@ -10,6 +10,7 @@
 
 #include "mediaserver.h"
 #include "mythxml.h"
+#include "mythdirs.h"
 
 #include "upnpcdstv.h"
 #include "upnpcdsmusic.h"
@@ -64,7 +65,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
         return;
     }
 
-    m_sSharePath = gContext->GetShareDir();
+    m_sSharePath = GetShareDir();
     m_pHttpServer->m_sSharePath = m_sSharePath;
 
     QString sFileName = g_pConfig->GetValue( "upnpDescXmlPath",

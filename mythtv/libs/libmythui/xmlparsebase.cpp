@@ -1,11 +1,13 @@
+#include <iostream>
 #include <typeinfo>
 
 #include <qfile.h>
 
 #include "xmlparsebase.h"
 #include "mythmainwindow.h"
+#include "mythuihelper.h"
 
-#include "mythcontext.h"
+#include "mythverbose.h"
 
 /* ui type includes */
 #include "mythscreentype.h"
@@ -354,7 +356,7 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
                                      const QString &windowname,
                                      MythUIType *parent)
 {
-    QList<QString> searchpath = gContext->GetThemeSearchPath();
+    QList<QString> searchpath = GetMythUI()->GetThemeSearchPath();
     QList<QString>::iterator i;
     for (i = searchpath.begin(); i != searchpath.end(); i++)
     {
@@ -467,7 +469,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
 
 bool XMLParseBase::LoadBaseTheme(void)
 {
-    QList<QString> searchpath = gContext->GetThemeSearchPath();
+    QList<QString> searchpath = GetMythUI()->GetThemeSearchPath();
     QList<QString>::iterator i;
     for (i = searchpath.begin(); i != searchpath.end(); i++)
     {

@@ -6,6 +6,8 @@
 
 #include "libmythupnp/upnpdevice.h"
 
+class DatabaseParams;
+
 class ListBoxDevice : public Q3ListBoxText
 {
     public:

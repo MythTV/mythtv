@@ -11,9 +11,9 @@
 #include "mythxml.h"
 #include "backendutil.h"
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/util.h"
-#include "libmyth/mythdbcon.h"
+#include "mythcontext.h"
+#include "util.h"
+#include "mythdbcon.h"
 
 #include <q3textstream.h>
 #include "previewgenerator.h"

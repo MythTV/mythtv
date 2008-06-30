@@ -38,7 +38,7 @@ using namespace std;
 #include "networkcontrol.h"
 #include "DVDRingBuffer.h"
 
-#include "libmyth/compat.h"  // For SIG* on MinGW
+#include "compat.h"  // For SIG* on MinGW
 #include "exitcodes.h"
 #include "programinfo.h"
 #include "mythcontext.h"
@@ -62,6 +62,8 @@ using namespace std;
 #include "mythscreenstack.h"
 #include "mythmainwindow.h"
 #include "mythappearance.h"
+#include "mythuihelper.h"
+#include "mythdirs.h"
 
 #define NO_EXIT  0
 #define QUIT     1
@@ -653,7 +655,7 @@ void WriteDefaults()
 
 QString RandTheme(QString &themename)
 {
-    QDir themes(gContext->GetThemesParentDir());
+    QDir themes(GetThemesParentDir());
     themes.setFilter(QDir::Dirs);
 
     QStringList themelist;
@@ -800,9 +802,9 @@ void reloadTheme(void)
 {
     LanguageSettings::reload();
 
-    gContext->LoadQtConfig();
-    gContext->GetMainWindow()->Init();
-    gContext->UpdateImageCache();
+    GetMythUI()->LoadQtConfig();
+    GetMythMainWindow()->Init();
+    GetMythUI()->UpdateImageCache();
 
     themeBase->Reload();
     menu->ReloadTheme();
@@ -1189,7 +1191,7 @@ int main(int argc, char **argv)
 
     if (!display.isEmpty())
     {
-        MythContext::SetX11Display(display);
+        MythUIHelper::SetX11Display(display);
     }
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
@@ -1331,7 +1333,7 @@ int main(int argc, char **argv)
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         cerr << "Unable to ignore SIGPIPE\n";
 
-    QString fileprefix = MythContext::GetConfDir();
+    QString fileprefix = GetConfDir();
 
     QDir dir(fileprefix);
     if (!dir.exists())
@@ -1351,7 +1353,7 @@ int main(int argc, char **argv)
        return FRONTEND_EXIT_OK;
     }
 
-    if (!geometry.isEmpty() && !gContext->ParseGeometryOverride(geometry))
+    if (!geometry.isEmpty() && !GetMythUI()->ParseGeometryOverride(geometry))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Illegal -geometry argument '%1' (ignored)")
@@ -1407,21 +1409,21 @@ int main(int argc, char **argv)
     if (randomtheme)
         themename = RandTheme(themename);
 
-    QString themedir = gContext->FindThemeDir(themename);
+    QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir == "")
     {
         cerr << "Couldn't find theme " << (const char *)themename << endl;
         return FRONTEND_EXIT_NO_THEME;
     }
 
-    gContext->LoadQtConfig();
+    GetMythUI()->LoadQtConfig();
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
     mainWindow->setWindowTitle(QObject::tr("MythTV Frontend"));
 
-    gContext->UpdateImageCache();
+    GetMythUI()->UpdateImageCache();
     themeBase = new MythThemeBase();
 
     LanguageSettings::prompt();
@@ -1498,7 +1500,7 @@ int main(int argc, char **argv)
     do
     {
         themename = gContext->GetSetting("Theme", "blue");
-        themedir = gContext->FindThemeDir(themename);
+        themedir = GetMythUI()->FindThemeDir(themename);
         if (themedir == "")
         {
             cerr << "Couldn't find theme " << (const char *)themename << endl;

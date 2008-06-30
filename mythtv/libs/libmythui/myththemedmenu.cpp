@@ -9,17 +9,11 @@
 #include <cstdlib>
 using namespace std;
 
-#include "exitcodes.h"
 #include "myththemedmenu.h"
-#include "mythcontext.h"
-#include "util.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 #include "mythimage.h"
 #include "mythdialogbox.h"
-
-#include "lcddevice.h"
-#include "mythplugin.h"
 
 #include "mythgesture.h"
 #include "mythuiimage.h"
@@ -27,8 +21,12 @@ using namespace std;
 #include "mythuistatetype.h"
 #include "xmlparsebase.h"
 
-// from libmyth
-#include "mythdialogs.h"
+#include "mythverbose.h"
+#include "mythuihelper.h"
+
+#include "mythdb.h"
+#include "mythdirs.h"
+#include "lcddevice.h"
 
 struct TextAttributes
 {
@@ -348,7 +346,7 @@ void MythThemedMenuState::parseBackground(
                 if (info.hasAttribute("background"))
                 {
                     QString bPath = dir + info.attribute("background");
-                    QImage *image = gContext->LoadScaleImage(bPath);
+                    QImage *image = GetMythUI()->LoadScaleImage(bPath);
                     buttonBackground = MythImage::FromQImage(&image);
                 }
             }
@@ -404,7 +402,7 @@ void MythThemedMenuState::parseShadow(TextAttributes &attributes,
 {
     QPoint offset;
     QColor color;
-    int alpha;
+    int alpha = 255;
 
     bool hascolor = false;
     bool hasoffset = false;
@@ -583,7 +581,7 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
             {
                 if (getFirstText(info) == "yes")
                 {
-                    if (gContext->GetLanguage() == "ja")
+                    if (GetMythUI()->GetLanguage() == "ja")
                     {
                         attributes.textflags = Qt::AlignVCenter | 
                                                Qt::AlignHCenter |
@@ -603,7 +601,7 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
                 if (getFirstText(info) == "center")
                 {
                     // Apparently Japanese is drawn along a _center_ line //
-                    if (gContext->GetLanguage() == "ja")
+                    if (GetMythUI()->GetLanguage() == "ja")
                     {
                         attributes.textflags = attributes.textflags &
                                     ~Qt::AlignHorizontal_Mask |
@@ -715,7 +713,7 @@ void MythThemedMenuState::parseButtonDefinition(const QString &dir,
             if (info.tagName() == "normal")
             {
                 setting = dir + getFirstText(info);
-                tmp = gContext->LoadScaleImage(setting);
+                tmp = GetMythUI()->LoadScaleImage(setting);
                 if (tmp)
                 {
                     buttonnormal = MythImage::FromQImage(&tmp);
@@ -725,7 +723,7 @@ void MythThemedMenuState::parseButtonDefinition(const QString &dir,
             else if (info.tagName() == "active")
             {
                 setting = dir + getFirstText(info);
-                tmp = gContext->LoadScaleImage(setting);
+                tmp = GetMythUI()->LoadScaleImage(setting);
                 if (tmp)
                 {
                     buttonactive = MythImage::FromQImage(&tmp);
@@ -808,7 +806,7 @@ void MythThemedMenuState::parseLogo(const QString &dir, QDomElement &element)
             if (info.tagName() == "image")
             {
                 QString logopath = dir + getFirstText(info);
-                QImage *tmp = gContext->LoadScaleImage(logopath); 
+                QImage *tmp = GetMythUI()->LoadScaleImage(logopath); 
                 if (tmp)
                 {
                     logo = MythImage::FromQImage(&tmp);
@@ -879,7 +877,7 @@ void MythThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
                     }
                     else
                     {
-                        tmppix = gContext->LoadScaleImage(titlepath);
+                        tmppix = GetMythUI()->LoadScaleImage(titlepath);
 
                         if (!tmppix)
                             continue;
@@ -950,7 +948,7 @@ void MythThemedMenuState::parseArrow(const QString &dir, QDomElement &element,
             if (info.tagName() == "image")
             {
                 QString arrowpath = dir + getFirstText(info);
-                pix = gContext->LoadScaleImage(arrowpath);
+                pix = GetMythUI()->LoadScaleImage(arrowpath);
                 if (pix)
                     hasimage = true;
             }
@@ -1034,7 +1032,7 @@ void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
                 }
                 else
                 {
-                    tmpimg = gContext->LoadScaleImage(imagepath);
+                    tmpimg = GetMythUI()->LoadScaleImage(imagepath);
                     image = MythImage::FromQImage(&tmpimg);
                     m_loadedImages.insert(imagepath, image);
                 }
@@ -1053,7 +1051,7 @@ void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
                 }
                 else
                 {
-                    tmpimg = gContext->LoadScaleImage(imagepath);
+                    tmpimg = GetMythUI()->LoadScaleImage(imagepath);
                     activeimage = MythImage::FromQImage(&tmpimg);
                     m_loadedImages.insert(imagepath, activeimage);
                 }
@@ -1074,7 +1072,7 @@ void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
                 }
                 else
                 {
-                    tmpimg = gContext->LoadScaleImage(imagepath);
+                    tmpimg = GetMythUI()->LoadScaleImage(imagepath);
                     watermark = MythImage::FromQImage(&tmpimg);
                     m_loadedImages.insert(imagepath, watermark);
                 }
@@ -1332,12 +1330,12 @@ void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
                     text = getFirstText(info);
                 }
                 else if (info.attribute("lang","").toLower() == 
-                         gContext->GetLanguageAndVariant())
+                         GetMythUI()->GetLanguageAndVariant())
                 {
                     text = getFirstText(info);
                 }
                 else if (info.attribute("lang","").toLower() == 
-                         gContext->GetLanguage())
+                         GetMythUI()->GetLanguage())
                 {
                     text = getFirstText(info);
                 }
@@ -1350,12 +1348,12 @@ void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
                     alttext = getFirstText(info);
                 }
                 else if (info.attribute("lang","").toLower() == 
-                         gContext->GetLanguageAndVariant())
+                         GetMythUI()->GetLanguageAndVariant())
                 {
                     alttext = getFirstText(info);
                 }
                 else if (info.attribute("lang","").toLower() ==
-                         gContext->GetLanguage())
+                         GetMythUI()->GetLanguage())
                 {
                     alttext = getFirstText(info);
                 }
@@ -1370,7 +1368,7 @@ void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "dependssetting")
             {
-                addit = gContext->GetNumSetting(getFirstText(info));
+                addit = GetMythDB()->GetNumSetting(getFirstText(info));
             }
             else if (info.tagName() == "dependjumppoint")
             {
@@ -1952,7 +1950,7 @@ bool MythThemedMenuPrivate::ReloadTheme(void)
 
     parent->DeleteAllChildren();
  
-    QString themedir = gContext->GetThemeDir();
+    QString themedir = GetMythUI()->GetThemeDir();
     bool ok = m_state->parseSettings(themedir, "theme.xml");
     if (!ok)
         return ok;
@@ -2095,10 +2093,6 @@ bool MythThemedMenuPrivate::keyHandler(QStringList &actions,
             }
             lastbutton = NULL;
         }
-        else if (action == "EJECT")
-        {
-            myth_eject();
-        }
         else
             handled = false;
     }
@@ -2195,23 +2189,23 @@ bool MythThemedMenuPrivate::gestureEvent(MythUIType *origtype,
  */
 QString MythThemedMenuPrivate::findMenuFile(const QString &menuname)
 {
-    QString testdir = MythContext::GetConfDir() + "/" + menuname;
+    QString testdir = GetConfDir() + "/" + menuname;
     QFile file(testdir);
     if (file.exists())
         return testdir;
 
-    testdir = gContext->GetMenuThemeDir() + "/" + menuname;
+    testdir = GetMythUI()->GetMenuThemeDir() + "/" + menuname;
     file.setName(testdir);
     if (file.exists())
         return testdir;
 
         
-    testdir = gContext->GetThemeDir() + "/" + menuname;
+    testdir = GetMythUI()->GetThemeDir() + "/" + menuname;
     file.setName(testdir);
     if (file.exists())
         return testdir;
         
-    testdir = gContext->GetShareDir() + menuname;
+    testdir = GetShareDir() + menuname;
     file.setName(testdir);
     if (file.exists())
         return testdir;
@@ -2231,56 +2225,28 @@ QString MythThemedMenuPrivate::findMenuFile(const QString &menuname)
  */
 bool MythThemedMenuPrivate::handleAction(const QString &action)
 {
+    MythUIMenuCallbacks *cbs = GetMythUI()->GetMenuCBs();
+
     if (action.left(5) == "EXEC ")
     {
         QString rest = action.right(action.length() - 5);
-        myth_system(rest);
-
+        if (cbs && cbs->exec_program)
+            cbs->exec_program(rest);
+        
         return false;
     }
     else if (action.left(7) == "EXECTV ")
     {
         QString rest = action.right(action.length() - 7).stripWhiteSpace();
-        QStringList strlist("LOCK_TUNER");
-        gContext->SendReceiveStringList(strlist);
-        int cardid = strlist[0].toInt();
-
-        if (cardid >= 0)
-        {
-            rest = rest.sprintf(rest,
-                                (const char*)strlist[1],
-                                (const char*)strlist[2],
-                                (const char*)strlist[3]);
-
-            myth_system(rest);
-
-            strlist = QStringList(QString("FREE_TUNER %1").arg(cardid));
-            gContext->SendReceiveStringList(strlist);
-            QString ret = strlist[0];
-        }
-        else
-        {
-            if (cardid == -2)
-                VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Card %1 is "
-                                              "already locked").arg(cardid));
-           
-#if 0 
-            DialogBox *error_dialog = new DialogBox(gContext->GetMainWindow(),
-                    "\n\nAll tuners are currently in use. If you want to watch "
-                    "TV, you can cancel one of the in-progress recordings from "
-                    "the delete menu");
-            error_dialog->AddButton("OK");
-            error_dialog->exec();
-            delete error_dialog;
-#endif
-        }
+        if (cbs && cbs->exec_program_tv)
+            cbs->exec_program_tv(rest);
     }
     else if (action.left(5) == "MENU ")
     {
         QString rest = action.right(action.length() - 5);
 
         if (rest == "main_settings.xml" && 
-            gContext->GetNumSetting("SetupPinCodeRequired", 0) &&
+            GetMythDB()->GetNumSetting("SetupPinCodeRequired", 0) &&
             !checkPinCode("SetupPinCodeTime", "SetupPinCode", "Setup Pin:"))
         {
             return true;
@@ -2301,16 +2267,14 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
     else if (action.left(12) == "CONFIGPLUGIN")
     {
         QString rest = action.right(action.length() - 13);
-        MythPluginManager *pmanager = gContext->getPluginManager();
-        if (pmanager)
-            pmanager->config_plugin(rest.stripWhiteSpace());
+        if (cbs && cbs->configplugin)
+            cbs->configplugin(rest);
     }
     else if (action.left(6) == "PLUGIN")
     {
         QString rest = action.right(action.length() - 7);
-        MythPluginManager *pmanager = gContext->getPluginManager();
-        if (pmanager)
-            pmanager->run_plugin(rest.stripWhiteSpace());
+        if (cbs && cbs->plugin)
+            cbs->plugin(rest);
     }
     else if (action.left(8) == "SHUTDOWN")
     {
@@ -2321,7 +2285,8 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
     }
     else if (action.left(5) == "EJECT")
     {
-        myth_eject();
+        if (cbs && cbs->eject)
+            cbs->eject();
     }
     else if (action.left(5) == "JUMP ")
     {
@@ -2344,13 +2309,13 @@ bool MythThemedMenuPrivate::findDepends(const QString &fileList)
     QStringList files = QStringList::split(" ", fileList);
     QString filename;
 
-    for ( QStringList::Iterator it = files.begin(); it != files.end(); ++it ) 
+    for (QStringList::Iterator it = files.begin(); it != files.end(); ++it ) 
     {
         QString filename = findMenuFile(*it);
         if (filename != "" && filename.endsWith(".xml"))
             return true;
 
-        QString newname = gContext->FindPlugin(*it);
+        QString newname = FindPluginName(*it);
 
         QFile checkFile(newname);
         if (checkFile.exists())
@@ -2373,8 +2338,8 @@ bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
                                          const QString &text)
 {
     QDateTime curr_time = QDateTime::currentDateTime();
-    QString last_time_stamp = gContext->GetSetting(timestamp_setting);
-    QString password = gContext->GetSetting(password_setting);
+    QString last_time_stamp = GetMythDB()->GetSetting(timestamp_setting);
+    QString password = GetMythDB()->GetSetting(password_setting);
 
     if (password.length() < 1)
         return true;
@@ -2392,8 +2357,8 @@ bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
         if (last_time.secsTo(curr_time) < 120)
         {
             last_time_stamp = curr_time.toString(Qt::TextDate);
-            gContext->SetSetting(timestamp_setting, last_time_stamp);
-            gContext->SaveSetting(timestamp_setting, last_time_stamp);
+            GetMythDB()->SetSetting(timestamp_setting, last_time_stamp);
+            GetMythDB()->SaveSetting(timestamp_setting, last_time_stamp);
             return true;
         }
     }
@@ -2401,16 +2366,16 @@ bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
     if (password.length() > 0)
     {
         bool ok = false;
-        MythPasswordDialog *pwd = new MythPasswordDialog(text, &ok, password,
-                                                     gContext->GetMainWindow());
-        pwd->exec();
-        pwd->deleteLater();
+        MythUIMenuCallbacks *cbs;
+
+        if ((cbs = GetMythUI()->GetMenuCBs()) && cbs->password_dialog)
+            ok = cbs->password_dialog(text, password);
 
         if (ok)
         {
             last_time_stamp = curr_time.toString(Qt::TextDate);
-            gContext->SetSetting(timestamp_setting, last_time_stamp);
-            gContext->SaveSetting(timestamp_setting, last_time_stamp);
+            GetMythDB()->SetSetting(timestamp_setting, last_time_stamp);
+            GetMythDB()->SaveSetting(timestamp_setting, last_time_stamp);
             return true;
         }
     }
@@ -2512,7 +2477,7 @@ QString MythThemedMenu::getSelection(void)
  */
 void MythThemedMenu::ReloadExitKey(void)
 {
-    int allowsd = gContext->GetNumSetting("AllowQuitShutdown");
+    int allowsd = GetMythDB()->GetNumSetting("AllowQuitShutdown");
 
     if (allowsd == 1)
         d->exitModifier = Qt::ControlButton;

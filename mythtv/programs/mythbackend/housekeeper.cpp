@@ -15,10 +15,11 @@ using namespace std;
 #include "housekeeper.h"
 #include "jobqueue.h"
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/mythdbcon.h"
-#include "libmyth/util.h"
-#include "libmyth/compat.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "util.h"
+#include "compat.h"
+#include "mythdirs.h"
 
 #include "programinfo.h"
 
@@ -303,7 +304,7 @@ void HouseKeeper::RunMFD(void)
                                          "/var/log/mythfilldatabase.log");
 
     if (mfpath == "mythfilldatabase")
-        mfpath = gContext->GetInstallPrefix() + "/bin/mythfilldatabase";
+        mfpath = GetInstallPrefix() + "/bin/mythfilldatabase";
 
     QString command = QString("%1 %2").arg(mfpath).arg(mfarg);
 

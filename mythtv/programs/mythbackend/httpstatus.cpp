@@ -12,14 +12,10 @@
 #include "backendutil.h"
 #include "mythxml.h"
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/util.h"
-#include "libmyth/mythdbcon.h"
-#include "libmyth/compat.h"
-
-
-
-
+#include "mythcontext.h"
+#include "util.h"
+#include "mythdbcon.h"
+#include "compat.h"
 
 #include <qregexp.h>
 #include <qlocale.h>
