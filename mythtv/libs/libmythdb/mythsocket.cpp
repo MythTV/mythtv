@@ -7,6 +7,7 @@
 
 #include <QByteArray>
 #include <QMutex>
+#include <QHostInfo>
 
 #include "mythtimer.h"
 #include "mythsocket.h"
@@ -603,7 +604,21 @@ void MythSocket::Unlock(void)
 bool MythSocket::connect(const QString &host, quint16 port)
 {
     QHostAddress hadr;
-    hadr.setAddress(host);
+    if (!hadr.setAddress(host))
+    {
+        QHostInfo info = QHostInfo::fromName(host);
+        if (!info.addresses().isEmpty())
+        {
+            hadr = info.addresses().first();
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC + QString("Unable to lookup: %1")
+                    .arg(host));
+            return false;
+        }
+    }
+
     return MythSocket::connect(hadr, port);
 }
 
