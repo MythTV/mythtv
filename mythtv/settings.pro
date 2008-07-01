@@ -1,13 +1,20 @@
 CONFIG += $$CCONFIG
 
+# Where binaries, includes and runtime assets are installed by 'make install'
 isEmpty( PREFIX ) {
     PREFIX = /usr/local
 }
+# Where the binaries actually locate the assets/filters/plugins at runtime
 isEmpty( RUNPREFIX ) {
     RUNPREFIX = $$PREFIX
 }
+# Alternate library dir for OSes and packagers (e.g. lib64)
+isEmpty( LIBDIRNAME ) {
+    LIBDIRNAME = lib
+}
+# Where libraries, plugins and filters are installed
 isEmpty( LIBDIR ) {
-    LIBDIR = $${RUNPREFIX}/lib
+    LIBDIR = $${RUNPREFIX}/$${LIBDIRNAME}
 }
 
 LIBVERSION = 0.22

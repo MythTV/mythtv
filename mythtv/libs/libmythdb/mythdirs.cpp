@@ -53,7 +53,7 @@ void InitializeMythDirs(void)
         confdir = QDir::homePath() + "/.mythtv";
 
     sharedir = installprefix + "/share/mythtv/";
-    libdir = installprefix + "/lib/mythtv/";
+    libdir = installprefix + "/" + QString(LIBDIRNAME) + "/mythtv/";
     themedir = sharedir + "themes/";
     pluginsdir = libdir + "plugins/";
     translationsdir = sharedir + "i18n/";
