@@ -3,10 +3,10 @@
 
 using namespace std;
 
-#include <qapplication.h>
-#include <qpixmap.h>
-#include <qpainter.h>
-#include <qgl.h>
+#include <QApplication>
+#include <QPixmap>
+#include <QPainter>
+#include <QGLWidget>
 
 #include "config.h"
 #ifdef CONFIG_DARWIN
@@ -117,7 +117,7 @@ void MythOpenGLPainter::RemoveImageFromCache(MythImage *im)
         textures[0] = m_ImageIntMap[im];
 
         glDeleteTextures(1, textures);
-        m_ImageIntMap.erase(im);
+        m_ImageIntMap.remove(im);
 
         m_ImageExpireList.remove(im);
     }
@@ -337,8 +337,8 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
         font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
 
         QRect a = QRect(0, 0, r.width(), r.height());
-        a.moveBy(shadowOffset.x() + drawOffset.x(), 
-                 shadowOffset.y() + drawOffset.y());
+        a.translate(shadowOffset.x() + drawOffset.x(), 
+                    shadowOffset.y() + drawOffset.y());
 
         shadowColor.setAlpha(shadowAlpha);
         tmp.setPen(shadowColor);
@@ -356,8 +356,8 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
         int outalpha = 16;
 
         QRect a = QRect(0, 0, r.width(), r.height());
-        a.moveBy(-outlineSize + drawOffset.x(),
-                 -outlineSize + drawOffset.y());
+        a.translate(-outlineSize + drawOffset.x(),
+                    -outlineSize + drawOffset.y());
 
         outlineColor.setAlpha(outalpha);
         tmp.setPen(outlineColor); 
@@ -365,25 +365,25 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
 
         for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
         {
-            a.moveBy(1, 0);
+            a.translate(1, 0);
             tmp.drawText(a, flags, msg);
         }
 
         for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
         {
-            a.moveBy(0, 1);
+            a.translate(0, 1);
             tmp.drawText(a, flags, msg);
         }
 
         for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
         {
-            a.moveBy(-1, 0);
+            a.translate(-1, 0);
             tmp.drawText(a, flags, msg);
         }
 
         for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
         {
-            a.moveBy(0, -1);
+            a.translate(0, -1);
             tmp.drawText(a, flags, msg);
         }
     }
@@ -447,7 +447,7 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
         if (m_StringToImageMap.contains(oldmsg))
             oldim = m_StringToImageMap[oldmsg];
 
-        m_StringToImageMap.erase(oldmsg);
+        m_StringToImageMap.remove(oldmsg);
 
         if (oldim)
             oldim->DownRef();

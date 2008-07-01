@@ -1,7 +1,7 @@
 #ifndef MYTH_SCREENSAVER_X11_H
 #define MYTH_SCREENSAVER_X11_H
 
-#include <qobject.h>
+#include <QObject>
 
 #include "screensaver.h"
 

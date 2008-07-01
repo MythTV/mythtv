@@ -1,7 +1,8 @@
 #include <iostream>
 
-#include <qfile.h>
-#include <qdir.h>
+#include <QFile>
+#include <QDir>
+#include <QDomElement>
 
 #include "themeinfo.h"
 #include "mythverbose.h"
@@ -31,7 +32,7 @@ ThemeInfo::ThemeInfo(QString theme)
         else
             m_aspect = "4:3";
 
-        if (QFile::exists(m_theme->absFilePath() + "/theme.xml"))
+        if (QFile::exists(m_theme->absoluteFilePath() + "/theme.xml"))
         {
             m_type |= THEME_UI;
 
@@ -45,16 +46,16 @@ ThemeInfo::ThemeInfo(QString theme)
             }
         }
 
-        if (QFile::exists(m_theme->absFilePath() + "/osd.xml"))
+        if (QFile::exists(m_theme->absoluteFilePath() + "/osd.xml"))
         {
             m_type |= THEME_OSD;
             m_baseres = QSize(640, 480);
         }
 
-        if (QFile::exists(m_theme->absFilePath() + "/mainmenu.xml"))
+        if (QFile::exists(m_theme->absoluteFilePath() + "/mainmenu.xml"))
             m_type |= THEME_MENU;
 
-        m_previewpath = m_theme->absFilePath() + "/preview.jpg";
+        m_previewpath = m_theme->absoluteFilePath() + "/preview.jpg";
     }
 }
 
@@ -71,12 +72,12 @@ bool ThemeInfo::parseThemeInfo()
 
     QDomDocument doc;
 
-    QFile f(m_theme->absFilePath() + "/themeinfo.xml");
+    QFile f(m_theme->absoluteFilePath() + "/themeinfo.xml");
 
     if (!f.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_FILE, QString("Unable to open themeinfo.xml "
-                                      "for %1").arg(m_theme->absFilePath()));
+                                      "for %1").arg(m_theme->absoluteFilePath()));
         return false;
     }
 
@@ -180,7 +181,7 @@ bool ThemeInfo::parseThemeInfo()
                             {
                                 QString thumbnail = ce.firstChild().toText()
                                                                     .data();
-                                m_previewpath = m_theme->absFilePath() + "/"
+                                m_previewpath = m_theme->absoluteFilePath() + "/"
                                                     + thumbnail;
                             }
                         }

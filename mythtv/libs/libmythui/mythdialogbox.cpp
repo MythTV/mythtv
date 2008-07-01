@@ -1,5 +1,4 @@
-#include <qapplication.h>
-#include <QKeyEvent>
+#include <QApplication>
 
 #include "mythdialogbox.h"
 #include "mythlistbutton.h"

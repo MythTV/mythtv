@@ -8,16 +8,17 @@
 #include <cassert>
 using namespace std;
 
-#include <qobject.h>
-#include <qapplication.h>
+#include <QApplication>
 
 const int kFadeVal = 20;
 
-MythScreenStack::MythScreenStack(MythMainWindow *parent, const char *name, 
+MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name, 
                                  bool mainstack)
-               : QObject(parent, name)
+               : QObject(parent)
 {
     assert(parent);
+
+    setObjectName(name);
 
     parent->AddScreenStack(this, mainstack);
 
@@ -43,7 +44,7 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
     if (!screen)
         return;
 
-    qApp->lock();
+    //qApp->lock();
 
     MythScreenType *old = topScreen; 
     if (old)
@@ -66,7 +67,7 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
 
     topScreen = screen;
 
-    qApp->unlock();
+    //qApp->unlock();
 }
 
 void MythScreenStack::PopScreen(bool allowFade, bool deleteScreen)
@@ -81,7 +82,7 @@ void MythScreenStack::PopScreen(bool allowFade, bool deleteScreen)
 
     MythMainWindow *mainwindow = GetMythMainWindow();
 
-    qApp->lock();
+    //qApp->lock();
 
     top->setParent(0);
     if (allowFade && m_DoTransitions && !mainwindow->IsExitingToMain())
@@ -136,7 +137,7 @@ void MythScreenStack::PopScreen(bool allowFade, bool deleteScreen)
     if (topScreen)
         topScreen->SetRedraw();
 
-    qApp->unlock();
+    //qApp->unlock();
 }
 
 MythScreenType *MythScreenStack::GetTopScreen(void)

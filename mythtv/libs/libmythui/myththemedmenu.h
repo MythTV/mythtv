@@ -14,8 +14,8 @@ class MythThemedMenu : public MythScreenType
 {
     Q_OBJECT
   public:
-    MythThemedMenu(const char *cdir, const char *menufile,
-                   MythScreenStack *parent, const char *name, 
+    MythThemedMenu(const QString &cdir, const QString &menufile,
+                   MythScreenStack *parent, const QString &name, 
                    bool allowreorder = true, MythThemedMenuState *state = NULL);
    ~MythThemedMenu();
 
@@ -35,7 +35,7 @@ class MythThemedMenu : public MythScreenType
     virtual void gestureEvent(MythUIType *origtype, MythGestureEvent *ge);
 
   private:
-    void Init(const char *cdir, const char *menufile);
+    void Init(const QString &cdir, const QString &menufile);
 
     MythThemedMenuPrivate *d;
 };

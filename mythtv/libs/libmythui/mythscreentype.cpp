@@ -8,7 +8,7 @@ using namespace std;
 #include "mythscreenstack.h"
 #include "mythmainwindow.h"
 
-MythScreenType::MythScreenType(MythScreenStack *parent, const char *name,
+MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
                                bool fullscreen)
               : MythUIType(parent, name)
 {
@@ -24,7 +24,7 @@ MythScreenType::MythScreenType(MythScreenStack *parent, const char *name,
     m_Area = GetMythMainWindow()->GetUIScreenRect();
 }
 
-MythScreenType::MythScreenType(MythUIType *parent, const char *name,
+MythScreenType::MythScreenType(MythUIType *parent, const QString &name,
                                bool fullscreen)
               : MythUIType(parent, name)
 {

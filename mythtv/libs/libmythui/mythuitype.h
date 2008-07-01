@@ -1,12 +1,11 @@
 #ifndef MYTHUI_TYPES_H_
 #define MYTHUI_TYPES_H_
 
-#include <qobject.h>
-#include <qimage.h>
-#include <qobject.h>
-#include <qlist.h>
-#include <qvector.h>
-#include <qfont.h>
+#include <QObject>
+#include <QImage>
+#include <QList>
+#include <QVector>
+#include <QFont>
 #include <QEvent>
 #include <QKeyEvent>
 
@@ -26,12 +25,11 @@ class MythUIType : public QObject, public XMLParseBase
     Q_OBJECT
 
   public:
-    MythUIType(QObject *parent, const char *name);
+    MythUIType(QObject *parent, const QString &name);
     virtual ~MythUIType();
 
     void AddChild(MythUIType *child);
-    MythUIType *GetChild(const char *name, const char *inherits = 0,
-                         const bool recurse = false);
+    MythUIType *GetChild(const QString &name);
     MythUIType *GetChildAt(const QPoint &p);
     QVector<MythUIType *> *GetAllChildren(void);
 

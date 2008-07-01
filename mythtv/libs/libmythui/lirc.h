@@ -2,9 +2,8 @@
 #define LIRC_H_
 
 #include <lirc/lirc_client.h>
-#include <qobject.h>
-#include <q3socket.h>
-#include <qstring.h>
+#include <QObject>
+#include <QString>
 
 #include "mythexp.h"
 

@@ -1,5 +1,5 @@
 #include <iostream>
-#include <qapplication.h>
+#include <QApplication>
 
 #include "mythverbose.h"
 
@@ -11,7 +11,7 @@
 
 #include "compat.h"
 
-MythUIText::MythUIText(MythUIType *parent, const char *name)
+MythUIText::MythUIText(MythUIType *parent, const QString &name)
           : MythUIType(parent, name)
 {
     m_Message = m_DefaultMessage = "";
@@ -30,7 +30,7 @@ MythUIText::MythUIText(MythUIType *parent, const char *name)
 
 MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
                        QRect displayRect, QRect altDisplayRect,
-                       MythUIType *parent, const char *name)
+                       MythUIType *parent, const QString &name)
           : MythUIType(parent, name)
 {
     m_Message = text;
@@ -149,15 +149,15 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect)
 {
     QRect area = m_Area;
-    area.moveBy(xoffset, yoffset);
+    area.translate(xoffset, yoffset);
     QRect drawrect = m_drawRect;
-    drawrect.moveBy(xoffset, yoffset);
+    drawrect.translate(xoffset, yoffset);
 
     int alpha = CalcAlpha(alphaMod);
 
     if (m_CutMessage == "")
     {
-        bool multiline = (m_Justification & Qt::WordBreak);
+        bool multiline = (m_Justification & Qt::TextWordWrap);
 
         if (m_Cutdown)
         {
@@ -258,7 +258,7 @@ bool MythUIText::ParseElement(QDomElement &element)
     {
         if (element.attribute("lang","").isEmpty())
         {
-            m_Message = qApp->translate("ThemeUI", getFirstText(element));
+            m_Message = qApp->translate("ThemeUI", qPrintable(getFirstText(element)));
         }
         else if (element.attribute("lang","").toLower() ==
                  GetMythUI()->GetLanguageAndVariant())
@@ -278,16 +278,16 @@ bool MythUIText::ParseElement(QDomElement &element)
     else if (element.tagName() == "multiline")
     {
         if (parseBool(element))
-            m_Justification |= Qt::WordBreak;
+            m_Justification |= Qt::TextWordWrap;
         else
-            m_Justification &= ~Qt::WordBreak;
+            m_Justification &= ~Qt::TextWordWrap;
     }
     else if (element.tagName() == "align")
     {
         QString align = getFirstText(element).toLower();
 
         // preserve the wordbreak attribute, drop everything else
-        m_Justification = m_Justification & Qt::WordBreak;
+        m_Justification = m_Justification & Qt::TextWordWrap;
 
         m_Justification |= parseAlignment(align);
     }

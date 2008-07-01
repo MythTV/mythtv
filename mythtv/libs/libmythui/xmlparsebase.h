@@ -1,10 +1,10 @@
 #ifndef XMLPARSEBASE_H_
 #define XMLPARSEBASE_H_
 
-#include <qdom.h>
-#include <qpoint.h>
-#include <qrect.h>
-#include <qstring.h>
+#include <QDomElement>
+#include <QPoint>
+#include <QRect>
+#include <QString>
 
 class MythUIType;
 class MythScreenType;

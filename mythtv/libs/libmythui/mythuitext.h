@@ -3,7 +3,7 @@
 
 #include "mythuitype.h"
 
-#include <qimage.h>
+#include <QImage>
 #include <QColor>
 
 #include "mythuitype.h"
@@ -13,10 +13,10 @@ class MythFontProperties;
 class MythUIText : public MythUIType
 {
   public:
-    MythUIText(MythUIType *parent, const char *name);
+    MythUIText(MythUIType *parent, const QString &name);
     MythUIText(const QString &text, const MythFontProperties &font,
                QRect displayRect, QRect altDisplayRect,
-               MythUIType *parent, const char *name);
+               MythUIType *parent, const QString &name);
     ~MythUIText();
 
     void SetText(const QString &text);

@@ -4,7 +4,7 @@ using namespace std;
 #include "mythuibutton.h"
 #include "mythmainwindow.h"
 
-MythUIButton::MythUIButton(MythUIType *parent, const char *name, bool doInit)
+MythUIButton::MythUIButton(MythUIType *parent, const QString &name, bool doInit)
             : MythUIType(parent, name)
 {
     m_State = None;
@@ -123,9 +123,9 @@ bool MythUIButton::ParseElement(QDomElement &element)
     else if (element.tagName() == "multiline")
     {
         if (parseBool(element))
-            m_textFlags |= Qt::WordBreak;
+            m_textFlags |= Qt::TextWordWrap;
         else
-            m_textFlags &= ~Qt::WordBreak;
+            m_textFlags &= ~Qt::TextWordWrap;
 
         m_Text->SetJustification(m_textFlags);
     }
@@ -133,7 +133,7 @@ bool MythUIButton::ParseElement(QDomElement &element)
     {
         QString align = getFirstText(element).toLower();
 
-        m_textFlags = m_textFlags & Qt::WordBreak;
+        m_textFlags = m_textFlags & Qt::TextWordWrap;
 
         m_textFlags |= parseAlignment(align);
 

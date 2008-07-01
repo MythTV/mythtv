@@ -1,5 +1,4 @@
-#include <iostream>
-#include <qapplication.h>
+#include <QApplication>
 
 #include "mythverbose.h"
 #include "mythdb.h"

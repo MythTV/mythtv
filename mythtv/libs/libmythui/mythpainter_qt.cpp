@@ -1,7 +1,6 @@
 #include <cassert>
-#include <qpainter.h>
-#include <qpixmap.h>
-#include <qvector.h>
+#include <QPainter>
+#include <QPixmap>
 
 #include "mythpainter_qt.h"
 #include "mythfontproperties.h"
@@ -23,7 +22,7 @@ class MythQtImage : public MythImage
 void MythQtImage::SetChanged(bool change)
 {
     if (change)
-        m_Pixmap.convertFromImage(*((QImage *)this));
+        m_Pixmap = QPixmap::fromImage(*((QImage *)this));
 
     MythImage::SetChanged(change);
 }
@@ -62,7 +61,7 @@ void MythQtPainter::SetClipRect(const QRect &clipRect)
     if (!clipRect.isEmpty())
     {
         painter->setClipping(true);
-        if (clipRegion.isNull() || clipRegion.isEmpty())
+        if (clipRegion.isEmpty())
             clipRegion = QRegion(clipRect);
         else
             clipRegion = clipRegion.unite(clipRect);
@@ -100,7 +99,7 @@ void MythQtPainter::DrawText(const QRect &r, const QString &msg,
         font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
 
         QRect a = r;
-        a.moveBy(shadowOffset.x(), shadowOffset.y());
+        a.translate(shadowOffset.x(), shadowOffset.y());
 
         painter->setPen(shadowColor);
         painter->drawText(a, flags, msg);
@@ -119,30 +118,30 @@ void MythQtPainter::DrawText(const QRect &r, const QString &msg,
         painter->setPen(outlineColor);
 
         QRect a = r;
-        a.moveBy(0 - outlineSize, 0 - outlineSize);
+        a.translate(0 - outlineSize, 0 - outlineSize);
         painter->drawText(a, flags, msg);
 
         for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
         {
-            a.moveBy(1, 0);
+            a.translate(1, 0);
             painter->drawText(a, flags, msg);
         }
 
         for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
         {
-            a.moveBy(0, 1);
+            a.translate(0, 1);
             painter->drawText(a, flags, msg);
         }
 
         for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
         {
-            a.moveBy(-1, 0);
+            a.translate(-1, 0);
             painter->drawText(a, flags, msg);
         }
 
         for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
         {
-            a.moveBy(0, -1);
+            a.translate(0, -1);
             painter->drawText(a, flags, msg);
         }
     }

@@ -4,11 +4,11 @@
 
 #include <algorithm>
 
-#include <qgl.h>
-#include <qapplication.h>
-#include <qtimer.h>
-#include <qdesktopwidget.h>
-#include <qhash.h>
+#include <QGLWidget>
+#include <QApplication>
+#include <QTimer>
+#include <QDesktopWidget>
+#include <QHash>
 #include <QFile>
 #include <QDir>
 
@@ -63,7 +63,7 @@ static void *SpawnLirc(void *param)
 {
     QString config_file = GetConfDir() + "/lircrc";
     if (!QFile::exists(config_file))
-        config_file = QDir::homeDirPath() + "/.lircrc";
+        config_file = QDir::homePath() + "/.lircrc";
 
     LircClient *cl = new LircClient((MythMainWindow *)param);
     if (!cl->Init(config_file, "mythtv"))
@@ -209,15 +209,15 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
     if (keynum != Qt::Key_Escape &&
         (keynum <  Qt::Key_Shift || keynum > Qt::Key_ScrollLock))
     {
-        Qt::ButtonState modifiers;
+        Qt::KeyboardModifiers modifiers;
         // if modifiers have been pressed, rebuild keynum
-        if ((modifiers = e->state()) != 0)
+        if ((modifiers = e->modifiers()) != Qt::NoModifier)
         {
-            int modnum = (((modifiers & Qt::ShiftButton) &&
+            int modnum = (((modifiers & Qt::ShiftModifier) &&
                            keynum > 0x7f) ? Qt::SHIFT : 0) |
-                         ((modifiers & Qt::ControlButton) ? Qt::CTRL : 0) |
-                         ((modifiers & Qt::MetaButton) ? Qt::META : 0) |
-                         ((modifiers & Qt::AltButton) ? Qt::ALT : 0);
+                         ((modifiers & Qt::ControlModifier) ? Qt::CTRL : 0) |
+                         ((modifiers & Qt::MetaModifier) ? Qt::META : 0) |
+                         ((modifiers & Qt::AltModifier) ? Qt::ALT : 0);
             modnum &= ~Qt::UNICODE_ACCEL;
             return (keynum |= modnum);
         }
@@ -308,9 +308,11 @@ void MythPainterWindowQt::paintEvent(QPaintEvent *pe)
 }
 
 MythMainWindow::MythMainWindow(const bool useDB)
-              : QWidget(NULL, "mainwindow")
+              : QWidget(NULL)
 {
     d = new MythMainWindowPrivate;
+
+    setObjectName("mainwindow");
 
     d->AllowInput = false;
 
@@ -584,7 +586,7 @@ bool MythMainWindow::screenShot(QString fname, int x, int y,
     QPixmap p;
     p = QPixmap::grabWindow( QApplication::desktop()->winId(), x, y, x2, y2);
 
-    QImage img = p.convertToImage();
+    QImage img = p.toImage();
 
     if ( w == 0 )
         w = img.width();
@@ -600,7 +602,7 @@ bool MythMainWindow::screenShot(QString fname, int x, int y,
 
     img = img.scaled(w, h, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         
-    if (img.save(fname ,extension,100))
+    if (img.save(fname, extension.toAscii(), 100))
     {
         VERBOSE(VB_GENERAL, "MythMainWindow::screenShot succeeded");
         ret = true;
@@ -627,16 +629,26 @@ bool MythMainWindow::screenShot(int x, int y, int x2, int y2)
 
 bool MythMainWindow::screenShot(QString fname, int w, int h)
 {
-    QRect sLoc = qApp->mainWidget()->geometry();
-    return screenShot(fname, sLoc.left(),sLoc.top(),
-                      sLoc.width(), sLoc.height(), w, h);
+    QWidget *active = QApplication::activeWindow();
+    if (active)
+    {
+        QRect sLoc = active->geometry();
+        return screenShot(fname, sLoc.left(),sLoc.top(),
+                          sLoc.width(), sLoc.height(), w, h);
+    }
+    return false;
 }
 
 
 bool MythMainWindow::screenShot(void)
 {
-    QRect sLoc = qApp->mainWidget()->geometry();
-    return screenShot(sLoc.left(),sLoc.top(), sLoc.width(), sLoc.height());
+    QWidget *active = QApplication::activeWindow();
+    if (active)
+    {
+        QRect sLoc = active->geometry();
+        return screenShot(sLoc.left(),sLoc.top(), sLoc.width(), sLoc.height());
+    }
+    return false;
 }
 
 #ifdef USING_APPLEREMOTE
@@ -751,7 +763,7 @@ void MythMainWindow::Show(void)
         ShowMenuBar();
 #endif
 
-    setActiveWindow();
+    activateWindow();
     raise();
 
     //-=>TODO: The following method does not exist in Qt4
@@ -866,7 +878,7 @@ void MythMainWindow::ExitToMainMenu(void)
             else
             {
                 QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, d->escapekey,
-                                               0, Qt::NoButton);
+                                               Qt::NoModifier);
                 QApplication::postEvent(this, key);
             }
             return;
@@ -951,26 +963,15 @@ void MythMainWindow::ClearKey(const QString &context, const QString &action)
     KeyContext * keycontext = d->keyContexts.value(context);
     if (keycontext == NULL) return;
 
-    QMap<int,QStringList>::Iterator it;
-    for (it = keycontext->actionMap.begin();
-         it != keycontext->actionMap.end();
-         it++)
+    QMutableMapIterator<int, QStringList> it(keycontext->actionMap);
+    while (it.hasNext())
     {
+        it.next();
+        QStringList list = it.value();
 
-        /* find a pair with the action we are looking for */
-        QStringList::iterator at = it.data().find(action);
-
-        /* until the end of actions is reached check for keys */
-        while (at != it.data().end())
-        {
-            /* the key should never contain duplicate actions */
-            at = it.data().remove(at);
-            /* but just in case, look again */
-            at = it.data().find(at, action);
-        }
-
-        /* dont keep unbound keys in the map */
-        if (it.data().isEmpty()) keycontext->actionMap.erase(it);
+        list.removeAll(action);
+        if (list.isEmpty())
+            it.remove();
     }
 }
 
@@ -1105,13 +1106,13 @@ void MythMainWindow::ClearJump(const QString &destination)
        return;
     }
 
-    QMap<int, JumpData*>::Iterator it;
-    for (it = d->jumpMap.begin(); it != d->jumpMap.end(); ++it)
+    QMutableMapIterator<int, JumpData*> it(d->jumpMap);
+    while (it.hasNext())
     {
-
-       JumpData *jd = it.data();
-       if (jd->destination == destination)
-           d->jumpMap.remove(it);
+        it.next();
+        JumpData *jd = it.value();
+        if (jd->destination == destination)
+            it.remove();
     }
 }
 
@@ -1425,8 +1426,8 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
             if (delta>0)
             {
                 qmw->accept();
-                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Up, 0,
-                                               Qt::NoButton);
+                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Up,
+                                               Qt::NoModifier);
                 QObject *key_target = getTarget(*key);
                 if (!key_target)
                     QApplication::postEvent(this, key);
@@ -1437,7 +1438,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
             {
                 qmw->accept();
                 QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Down,
-                                               0, Qt::NoButton);
+                                               Qt::NoModifier);
                 QObject *key_target = getTarget(*key);
                 if (!key_target)
                     QApplication::postEvent(this, key);
@@ -1467,7 +1468,7 @@ void MythMainWindow::customEvent(QEvent *ce)
                 if (screen)
                     screen->gestureEvent(NULL, ge);
             }
-            cout << "Gesture: " << QString(*ge).local8Bit().constData() << endl;
+            cout << "Gesture: " << QString(*ge).toLocal8Bit().constData() << endl;
         }
     }
     else if (ce->type() == kExitToMainMenuEventType && d->exitingtomain)
@@ -1479,7 +1480,7 @@ void MythMainWindow::customEvent(QEvent *ce)
         ExternalKeycodeEvent *eke = (ExternalKeycodeEvent *)ce;
         int keycode = eke->getKeycode();
 
-        QKeyEvent key(QEvent::KeyPress, keycode, 0, Qt::NoButton);
+        QKeyEvent key(QEvent::KeyPress, keycode, Qt::NoModifier);
 
         QObject *key_target = getTarget(key);
         if (!key_target)
@@ -1567,25 +1568,23 @@ void MythMainWindow::customEvent(QEvent *ce)
             if (GetMythUI()->GetScreenIsAsleep())
                 return;
 
-            int mod = keycode & Qt::MODIFIER_MASK;
+            Qt::KeyboardModifiers mod = (Qt::KeyboardModifiers)(keycode & Qt::MODIFIER_MASK);
             int k = keycode & ~Qt::MODIFIER_MASK; /* trim off the mod */
-            int ascii = 0;
             QString text;
 
             if (k & Qt::UNICODE_ACCEL)
             {
                 QChar c(k & ~Qt::UNICODE_ACCEL);
-                ascii = c.latin1();
                 text = QString(c);
             }
 
-            mod = ((mod & Qt::CTRL) ? Qt::ControlModifier : 0) |
-                  ((mod & Qt::META) ? Qt::MetaModifier : 0) |
-                  ((mod & Qt::ALT) ? Qt::AltModifier : 0) |
-                  ((mod & Qt::SHIFT) ? Qt::ShiftModifier : 0);
+            mod = ((mod & Qt::CTRL) ? Qt::ControlModifier : Qt::NoModifier) |
+                  ((mod & Qt::META) ? Qt::MetaModifier : Qt::NoModifier) |
+                  ((mod & Qt::ALT) ? Qt::AltModifier : Qt::NoModifier) |
+                  ((mod & Qt::SHIFT) ? Qt::ShiftModifier : Qt::NoModifier);
 
             QKeyEvent key(lke->isKeyDown() ? QEvent::KeyPress :
-                          QEvent::KeyRelease, k, ascii, mod, text);
+                          QEvent::KeyRelease, k, mod, text);
 
             QObject *key_target = getTarget(key);
             if (!key_target)
@@ -1596,7 +1595,7 @@ void MythMainWindow::customEvent(QEvent *ce)
         else
         {
             cerr << "LircClient warning: attempt to convert '"
-                 << lke->getLircText().local8Bit().constData()
+                 << lke->getLircText().toLocal8Bit().constData()
                  << "' to a key sequence failed. Fix your key mappings.\n";
         }
     }
@@ -1618,20 +1617,18 @@ void MythMainWindow::customEvent(QEvent *ce)
             if (GetMythUI()->GetScreenIsAsleep())
                 return;
 
-            int mod = keycode & Qt::MODIFIER_MASK;
-            int k = keycode & ~Qt::MODIFIER_MASK; /* trim off the mod */
-            int ascii = 0;
+            Qt::KeyboardModifiers mod = Qt::KeyboardModifiers(keycode & Qt::MODIFIER_MASK);
+            int k = (keycode & ~Qt::MODIFIER_MASK); /* trim off the mod */
             QString text;
 
             if (k & Qt::UNICODE_ACCEL)
             {
                 QChar c(k & ~Qt::UNICODE_ACCEL);
-                ascii = c.latin1();
                 text = QString(c);
             }
 
             QKeyEvent key(jke->isKeyDown() ? QEvent::KeyPress :
-                          QEvent::KeyRelease, k, ascii, mod, text);
+                          QEvent::KeyRelease, k, mod, text);
 
             QObject *key_target = getTarget(key);
             if (!key_target)
@@ -1642,7 +1639,7 @@ void MythMainWindow::customEvent(QEvent *ce)
         else
         {
             cerr << "JoystickMenuClient warning: attempt to convert '"
-                 << jke->getJoystickMenuText().local8Bit().constData()
+                 << jke->getJoystickMenuText().toLocal8Bit().constData()
                  << "' to a key sequence failed. Fix your key mappings.\n";
         }
     }
@@ -1760,7 +1757,7 @@ QRect MythMainWindow::NormRect(const QRect &rect)
     ret.setHeight((int)(rect.height() * d->hmult));
     ret.moveTopLeft(QPoint((int)(rect.x() * d->wmult),
                            (int)(rect.y() * d->hmult)));
-    ret = ret.normalize();
+    ret = ret.normalized();
 
     return ret;
 }

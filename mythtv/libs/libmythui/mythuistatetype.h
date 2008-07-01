@@ -1,9 +1,9 @@
 #ifndef MYTHUI_STATETYPE_H_
 #define MYTHUI_STATETYPE_H_
 
-#include <qstring.h>
-#include <qdatetime.h>
-#include <qvector.h>
+#include <QString>
+#include <QDateTime>
+#include <QMap>
 
 #include "mythuitype.h"
 #include "mythimage.h"
@@ -15,7 +15,7 @@ class MythUIStateType : public MythUIType
   public:
     enum StateType { None = 0, Off, Half, Full }; // Can be used for tri-state checks, two state toggles, etc.
 
-    MythUIStateType(MythUIType *parent, const char *name);
+    MythUIStateType(MythUIType *parent, const QString &name);
    ~MythUIStateType();
 
     void SetShowEmpty(bool showempty) { m_ShowEmpty = showempty; }

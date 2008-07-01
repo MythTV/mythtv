@@ -5,7 +5,7 @@
 
 #include "mythpainter.h"
 
-#include <qimage.h>
+#include <QImage>
 #include <QPixmap>
 
 enum ReflectAxis {ReflectHorizontal, ReflectVertical};

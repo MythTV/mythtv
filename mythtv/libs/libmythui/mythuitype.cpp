@@ -8,9 +8,11 @@ using namespace std;
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 
-MythUIType::MythUIType(QObject *parent, const char *name)
-          : QObject(parent, name)
+MythUIType::MythUIType(QObject *parent, const QString &name)
+          : QObject(parent)
 {
+    setObjectName(name);
+
     m_Visible = true;
     m_CanHaveFocus = m_HasFocus = false;
     m_Area = QRect(0, 0, 0, 0);
@@ -50,12 +52,37 @@ void MythUIType::AddChild(MythUIType *child)
     m_ChildrenList.push_back(child);
 }
 
-MythUIType *MythUIType::GetChild(const char *name, const char *inherits,
-                                 const bool recurse)
+static QObject *qChildHelper(const char *objName, const char *inheritsClass,
+                             bool recursiveSearch, const QObjectList &children)
 {
-    QObject *ret = child(name, inherits, recurse);
+    if (children.isEmpty())
+        return 0;
+
+    bool onlyWidgets = (inheritsClass && qstrcmp(inheritsClass, "QWidget") == 0)
+;
+    const QLatin1String oName(objName);
+    for (int i = 0; i < children.size(); ++i) {
+        QObject *obj = children.at(i);
+        if (onlyWidgets) {
+            if (obj->isWidgetType() && (!objName || obj->objectName() == oName))
+                return obj;
+        } else if ((!inheritsClass || obj->inherits(inheritsClass))
+                   && (!objName || obj->objectName() == oName))
+            return obj;
+        if (recursiveSearch && (obj = qChildHelper(objName, inheritsClass,
+                                                   recursiveSearch, 
+                                                   obj->children())))
+            return obj;
+    }
+    return 0;
+}
+
+MythUIType *MythUIType::GetChild(const QString &name)
+{
+    QObject *ret = qChildHelper(name.toAscii().constData(), NULL, false, children());
     if (ret)
         return dynamic_cast<MythUIType *>(ret);
+
     return NULL;
 }
 
@@ -261,7 +288,7 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
         return;
 
     QRect realArea = m_Area;
-    realArea.moveBy(xoffset, yoffset);
+    realArea.translate(xoffset, yoffset);
 
     if (!realArea.intersects(clipRect))
         return;
@@ -362,7 +389,7 @@ QString MythUIType::cutDown(const QString &data, QFont *font,
     if (overload_height != -1)
         maxheight = overload_height;
 
-    int justification = Qt::AlignLeft | Qt::WordBreak;
+    int justification = Qt::AlignLeft | Qt::TextWordWrap;
     QFontMetrics fm(*font);
 
     int margin = length - 1;

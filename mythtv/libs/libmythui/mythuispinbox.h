@@ -16,7 +16,7 @@ class MythUISpinBox : public MythListButton
 {
     Q_OBJECT
   public:
-    MythUISpinBox(MythUIType *parent, const char *name);
+    MythUISpinBox(MythUIType *parent, const QString &name);
     ~MythUISpinBox();
 
     void SetRange(int low, int high, int step);

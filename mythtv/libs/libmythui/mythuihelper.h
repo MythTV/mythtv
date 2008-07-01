@@ -2,6 +2,7 @@
 #define MYTHUIHELPERS_H_
 
 #include <QString>
+#include <QFont>
 
 #include "mythexp.h"
 
@@ -9,6 +10,7 @@ class MythUIHelperPrivate;
 class QImage;
 class QWidget;
 class Settings;
+class QPixmap;
 
 struct MPUBLIC MythUIMenuCallbacks
 {

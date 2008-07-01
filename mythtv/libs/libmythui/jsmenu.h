@@ -9,8 +9,8 @@
 #include <vector>
 using namespace std;
 
-#include <qobject.h>
-#include <qstring.h>
+#include <QObject>
+#include <QString>
 
 #include "mythexp.h"
 

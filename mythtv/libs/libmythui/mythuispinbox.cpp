@@ -1,7 +1,7 @@
 
 #include "mythuispinbox.h"
 
-MythUISpinBox::MythUISpinBox(MythUIType *parent, const char *name)
+MythUISpinBox::MythUISpinBox(MythUIType *parent, const QString &name)
               : MythListButton(parent, name)
 {
 }

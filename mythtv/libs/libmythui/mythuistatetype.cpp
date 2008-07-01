@@ -5,7 +5,7 @@
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 
-MythUIStateType::MythUIStateType(MythUIType *parent, const char *name)
+MythUIStateType::MythUIStateType(MythUIType *parent, const QString &name)
                 : MythUIType(parent, name)
 {
     m_CurrentState = NULL;
@@ -78,7 +78,7 @@ bool MythUIStateType::DisplayState(const QString &name)
 
     QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name.toLower());
     if (i != m_ObjectsByName.end())
-        m_CurrentState = i.data();
+        m_CurrentState = i.value();
     else
         m_CurrentState = NULL;
 
@@ -102,7 +102,7 @@ bool MythUIStateType::DisplayState(StateType type)
 
     QMap<int, MythUIType *>::Iterator i = m_ObjectsByState.find((int)type);
     if (i != m_ObjectsByState.end())
-        m_CurrentState = i.data();
+        m_CurrentState = i.value();
     else
         m_CurrentState = NULL;
 
@@ -125,13 +125,13 @@ void MythUIStateType::ClearMaps()
     QMap<QString, MythUIType *>::Iterator i;
     for (i = m_ObjectsByName.begin(); i != m_ObjectsByName.end(); ++i)
     {
-        delete i.data();
+        delete i.value();
     }
 
     QMap<int, MythUIType *>::Iterator j;
     for (j = m_ObjectsByState.begin(); j != m_ObjectsByState.end(); ++j)
     {
-        delete j.data();
+        delete j.value();
     }
 
     m_ObjectsByName.clear();
@@ -180,7 +180,7 @@ bool MythUIStateType::ParseElement(QDomElement &element)
             if (uitype && m_ObjectsByState.contains((int)stype))
             {
                 delete m_ObjectsByState[(int)stype];
-                m_ObjectsByState.erase((int)stype);
+                m_ObjectsByState.remove((int)stype);
             }
             AddObject(stype, uitype);
         }
@@ -189,7 +189,7 @@ bool MythUIStateType::ParseElement(QDomElement &element)
             if (uitype && m_ObjectsByName.contains(name))
             {
                 delete m_ObjectsByName[name];
-                m_ObjectsByName.erase(name);
+                m_ObjectsByName.remove(name);
             }
             AddObject(name, uitype);
         }
@@ -215,7 +215,7 @@ void MythUIStateType::CopyFrom(MythUIType *base)
     QMap<QString, MythUIType *>::iterator i;
     for (i = st->m_ObjectsByName.begin(); i != st->m_ObjectsByName.end(); ++i)
     {
-        MythUIType *other = i.data();
+        MythUIType *other = i.value();
         QString key = i.key();
 
         MythUIType *newtype = GetChild(other->objectName());
@@ -226,7 +226,7 @@ void MythUIStateType::CopyFrom(MythUIType *base)
     QMap<int, MythUIType *>::iterator j;
     for (j = st->m_ObjectsByState.begin(); j != st->m_ObjectsByState.end(); ++j)
     {
-        MythUIType *other = j.data();
+        MythUIType *other = j.value();
         int key = j.key();
 
         MythUIType *newtype = GetChild(other->objectName());

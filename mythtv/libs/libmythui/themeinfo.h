@@ -1,10 +1,8 @@
 #ifndef THEMEINFO_H
 #define THEMEINFO_H
 
-#include <qobject.h>
-#include <qstring.h>
-#include <qdom.h>
-#include <qsize.h>
+#include <QString>
+#include <QSize>
 
 #include "mythexp.h"
 

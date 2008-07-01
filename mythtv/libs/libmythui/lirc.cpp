@@ -1,6 +1,7 @@
-#include <qapplication.h>
-#include <qevent.h>
-#include <qkeysequence.h>
+#include <QApplication>
+#include <QEvent>
+#include <QKeySequence>
+
 #include <cstdio>
 #include <cerrno>
 #include <sys/wait.h>
@@ -33,7 +34,7 @@ int LircClient::Init(const QString &config_file, const QString &program,
     int fd;
 
     /* Connect the unix socket */
-    fd = lirc_init((char *)program.latin1(), 1);
+    fd = lirc_init((char *)qPrintable(program), 1);
     if (fd == -1)
     {
         VERBOSE(VB_IMPORTANT,
@@ -43,7 +44,7 @@ int LircClient::Init(const QString &config_file, const QString &program,
     }
 
     /* parse the config file */
-    if (lirc_readconfig((char *)config_file.latin1(), &lircConfig, NULL))
+    if (lirc_readconfig((char *)qPrintable(config_file), &lircConfig, NULL))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Failed to read lirc config %1 for %2")

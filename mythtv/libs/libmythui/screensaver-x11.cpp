@@ -78,7 +78,10 @@ class ScreenSaverX11Private
     void StartTimer()
     {
         if (m_resetTimer)
-            m_resetTimer->start(m_timeoutInterval, FALSE);
+        {
+            m_resetTimer->setSingleShot(false);
+            m_resetTimer->start(m_timeoutInterval);
+        }
     }
 
     void ResetTimer()

@@ -1,7 +1,7 @@
 #ifndef MYTHUI_TEXTEDIT_H_
 #define MYTHUI_TEXTEDIT_H_
 
-#include <qstring.h>
+#include <QString>
 
 #include "mythuitype.h"
 #include "mythuitext.h"
@@ -19,7 +19,7 @@ class MythUITextEdit : public MythUIType
     Q_OBJECT
 
   public:
-    MythUITextEdit(MythUIType *parent, const char *name, bool doInit = true);
+    MythUITextEdit(MythUIType *parent, const QString &name, bool doInit = true);
    ~MythUITextEdit();
 
     virtual void Pulse(void);

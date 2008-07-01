@@ -52,7 +52,7 @@ void MythImage::Assign(const QImage &img)
 
 void MythImage::Assign(const QPixmap &pix)
 {
-    Assign(pix.convertToImage());
+    Assign(pix.toImage());
 }
 
 void MythImage::Resize(const QSize &newSize)

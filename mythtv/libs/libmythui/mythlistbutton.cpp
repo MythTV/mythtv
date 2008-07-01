@@ -1,6 +1,6 @@
-#include <qapplication.h>
-#include <qpainter.h>
-#include <qpixmap.h>
+#include <QApplication>
+#include <QPainter>
+#include <QPixmap>
 
 #include <iostream>
 #include <cassert>
@@ -15,7 +15,7 @@
 #include "mythuistatetype.h"
 #include "mythuibutton.h"
 
-MythListButton::MythListButton(MythUIType *parent, const char *name)
+MythListButton::MythListButton(MythUIType *parent, const QString &name)
               : MythUIType(parent, name)
 {
     m_showArrow = true;
@@ -24,7 +24,7 @@ MythListButton::MythListButton(MythUIType *parent, const char *name)
     Const();
 }
 
-MythListButton::MythListButton(MythUIType *parent, const char *name,
+MythListButton::MythListButton(MythUIType *parent, const QString &name,
                                const QRect& area, bool showArrow,
                                bool showScrollArrows)
               : MythUIType(parent, name)
@@ -682,7 +682,7 @@ void MythListButton::Init()
     QSize sz1 = fm.size(Qt::TextSingleLine, "XXXXX");
     fm = QFontMetrics(m_fontInactive->face());
     QSize sz2 = fm.size(Qt::TextSingleLine, "XXXXX");
-    m_itemHeight = QMAX(sz1.height(), sz2.height()) + (int)(2 * m_itemMarginY);
+    m_itemHeight = max(sz1.height(), sz2.height()) + (int)(2 * m_itemMarginY);
     m_itemWidth = m_contentsRect.width();
 
     // If we have a background image and it's not a gradient,
@@ -1096,15 +1096,15 @@ bool MythListButton::ParseElement(QDomElement &element)
     else if (element.tagName() == "multiline")
     {
         if (parseBool(element))
-            m_textFlags |= Qt::WordBreak;
+            m_textFlags |= Qt::TextWordWrap;
         else
-            m_textFlags &= ~Qt::WordBreak;
+            m_textFlags &= ~Qt::TextWordWrap;
     }
     else if (element.tagName() == "textflags" || element.tagName() == "align")
     {
         QString align = getFirstText(element).toLower();
 
-        m_textFlags = m_textFlags & Qt::WordBreak;
+        m_textFlags = m_textFlags & Qt::TextWordWrap;
 
         m_textFlags |= parseAlignment(align);
     }

@@ -8,7 +8,6 @@
 #include <QMap>
 #include <QDir>
 #include <QFileInfo>
-#include <Q3DeepCopy>
 #include <QApplication>
 #include <QPainter>
 #include <QDesktopWidget>
@@ -82,7 +81,6 @@ class MythUIHelperPrivate
     bool      m_themeloaded;       ///< To we have a palette and pixmap to use?
     QString   m_menuthemepathname;
     QString   m_themepathname;
-    QPixmap  *m_backgroundimage;   ///< Large or tiled image
     QPalette  m_palette;           ///< Colour scheme
 
     QString language;
@@ -129,7 +127,7 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
     : m_qtThemeSettings(new Settings()),
       m_themeloaded(false), 
       m_menuthemepathname(QString::null), m_themepathname(QString::null),
-      m_backgroundimage(NULL), language(""),
+      language(""),
       m_wmult(1.0), m_hmult(1.0),
       m_xbase(0), m_ybase(0), m_height(0), m_width(0),
       m_baseWidth(800), m_baseHeight(600),
@@ -406,10 +404,6 @@ void MythUIHelper::LoadQtConfig(void)
     d->m_qtThemeSettings->ReadSettings(themedir);
     d->m_themeloaded = false;
 
-    if (d->m_backgroundimage)
-        delete d->m_backgroundimage;
-    d->m_backgroundimage = NULL;
-
     themename = GetMythDB()->GetSetting("MenuTheme");
     d->m_menuthemepathname = FindMenuThemeDir(themename) +"/";
 
@@ -480,9 +474,9 @@ void MythUIHelper::ClearOldImageCache(void)
             continue;
         if (fi->isDir() && !fi->isSymLink())
         {
-            if (fi->absFilePath() == themecachedir)
+            if (fi->absoluteFilePath() == themecachedir)
                 continue;
-            dirtimes[fi->lastModified()] = fi->absFilePath();
+            dirtimes[fi->lastModified()] = fi->absoluteFilePath();
         }
     }
 
@@ -490,8 +484,8 @@ void MythUIHelper::ClearOldImageCache(void)
     while ((size_t)dirtimes.size() >= max_cached)
     {
         VERBOSE(VB_FILE, QString("Removing cache dir: %1")
-                .arg(dirtimes.begin().data()));
-        RemoveCacheDir(dirtimes.begin().data());
+                .arg(dirtimes.begin().value()));
+        RemoveCacheDir(dirtimes.begin().value());
         dirtimes.erase(dirtimes.begin());
     }
 
@@ -529,12 +523,12 @@ void MythUIHelper::RemoveCacheDir(const QString &dirname)
             continue;
         if (fi->isFile() && !fi->isSymLink())
         {
-            QFile file(fi->absFilePath());
+            QFile file(fi->absoluteFilePath());
             file.remove();
         }
         else if (fi->isDir() && !fi->isSymLink())
         {
-            RemoveCacheDir(fi->absFilePath());
+            RemoveCacheDir(fi->absoluteFilePath());
         }
     }
 
@@ -600,10 +594,10 @@ void MythUIHelper::CacheThemeImagesDirectory(const QString &dirname,
         else if (fi->isDir())
             continue;
 
-        if (fi->extension().lower() != "png" &&
-            fi->extension().lower() != "jpg" &&
-            fi->extension().lower() != "gif" &&
-            fi->extension().lower() != "jpeg")
+        if (fi->completeSuffix().toLower() != "png" &&
+            fi->completeSuffix().toLower() != "jpg" &&
+            fi->completeSuffix().toLower() != "gif" &&
+            fi->completeSuffix().toLower() != "jpeg")
             continue;
 
         QString filename = fi->fileName();
@@ -613,9 +607,9 @@ void MythUIHelper::CacheThemeImagesDirectory(const QString &dirname,
             (cacheinfo.lastModified() < fi->lastModified()))
         {
             VERBOSE(VB_FILE, QString("generating cache image for: %1")
-                    .arg(fi->absFilePath()));
+                    .arg(fi->absoluteFilePath()));
 
-            QImage *tmpimage = LoadScaleImage(fi->absFilePath(), false);
+            QImage *tmpimage = LoadScaleImage(fi->absoluteFilePath(), false);
 
             if (tmpimage && tmpimage->width() > 0 && tmpimage->height() > 0)
             {
@@ -695,12 +689,12 @@ bool MythUIHelper::ParseGeometryOverride(const QString geometry)
 
     if (sre.exactMatch(geometry))
     {
-        sre.search(geometry);
+        sre.indexIn(geometry);
         geo = sre.capturedTexts();
     }
     else if (lre.exactMatch(geometry))
     {
-        lre.search(geometry);
+        lre.indexIn(geometry);
         geo = lre.capturedTexts();
         longForm = true;
     }
@@ -876,10 +870,6 @@ void MythUIHelper::SetPalette(QWidget *widget)
 {
     QPalette pal = widget->palette();
 
-    QColorGroup active = pal.active();
-    QColorGroup disabled = pal.disabled();
-    QColorGroup inactive = pal.inactive();
-
     const QString names[] = { "Foreground", "Button", "Light", "Midlight",
                               "Dark", "Mid", "Text", "BrightText", "ButtonText",
                               "Base", "Background", "Shadow", "Highlight",
@@ -890,7 +880,7 @@ void MythUIHelper::SetPalette(QWidget *widget)
     {
         QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
         if (color != "")
-            pal.setColor(QPalette::Active, (QColorGroup::ColorRole) i,
+            pal.setColor(QPalette::Active, (QPalette::ColorRole) i,
                          createColor(color));
     }
 
@@ -899,7 +889,7 @@ void MythUIHelper::SetPalette(QWidget *widget)
     {
         QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
         if (color != "")
-            pal.setColor(QPalette::Disabled, (QColorGroup::ColorRole) i,
+            pal.setColor(QPalette::Disabled, (QPalette::ColorRole) i,
                          createColor(color));
     }
 
@@ -908,7 +898,7 @@ void MythUIHelper::SetPalette(QWidget *widget)
     {
         QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
         if (color != "")
-            pal.setColor(QPalette::Inactive, (QColorGroup::ColorRole) i,
+            pal.setColor(QPalette::Inactive, (QPalette::ColorRole) i,
                          createColor(color));
     }
 
@@ -920,10 +910,6 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
     if (d->m_themeloaded)
     {
         widget->setPalette(d->m_palette);
-        if (d->m_backgroundimage && d->m_backgroundimage->width() > 0)
-        {
-            widget->setPaletteBackgroundPixmap(*(d->m_backgroundimage));
-        }
         return;
     }
 
@@ -940,9 +926,8 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
         bgpixmap = LoadScalePixmap(pmapname);
         if (bgpixmap)
         {
-            widget->setBackgroundOrigin(QWidget::AncestorOrigin);
-            widget->setPaletteBackgroundPixmap(*bgpixmap);
-            d->m_backgroundimage = new QPixmap(*bgpixmap);
+            d->m_palette.setBrush(widget->backgroundRole(), QBrush(*bgpixmap));
+            widget->setPalette(d->m_palette);
         }
     }
     else if (d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap") != "")
@@ -964,9 +949,8 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
             tmp.drawTiledPixmap(0, 0, width, height, *bgpixmap);
             tmp.end();
 
-            d->m_backgroundimage = new QPixmap(background);
-            widget->setBackgroundOrigin(QWidget::AncestorOrigin);
-            widget->setPaletteBackgroundPixmap(background);
+            d->m_palette.setBrush(widget->backgroundRole(), QBrush(background));
+            widget->setPalette(d->m_palette);
         }
     }
 
@@ -982,7 +966,7 @@ bool MythUIHelper::FindThemeFile(QString &filename)
     if (QFile::exists(filename))
         return true;
 
-    int pathStart = filename.findRev('/');
+    int pathStart = filename.lastIndexOf('/');
     QString basename;
     if (pathStart > 0)
         basename = filename.mid(pathStart + 1);
@@ -1019,8 +1003,8 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
         if (!bFound)
         {
             if (!d->m_themepathname.isEmpty() &&
-                !strcmp(filename.left(d->m_themepathname.length()),
-                        d->m_themepathname))
+                    filename.left(d->m_themepathname.length()) ==
+                        d->m_themepathname)
             {
                 QString tmpfilename = filename;
                 tmpfilename.remove(0, d->m_themepathname.length());
@@ -1120,8 +1104,8 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
         // Is absolute path in theme directory.
         if (!bFound)
         {
-            if (!strcmp(filename.left(d->m_themepathname.length()),
-                        d->m_themepathname))
+            if (filename.left(d->m_themepathname.length()) == 
+                d->m_themepathname)
             {
                 QString tmpfilename = filename;
                 tmpfilename.remove(0, d->m_themepathname.length());
@@ -1167,7 +1151,7 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
         return NULL;
     }
 
-    QPixmap *ret = new QPixmap();
+    QPixmap *ret = NULL;
 
     int width, height;
     float wmult, hmult;
@@ -1183,17 +1167,17 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
             VERBOSE(VB_IMPORTANT,
                     QString("Error loading image file: %1").arg(filename));
 
-            delete ret;
             return NULL;
         }
         QImage tmp2 = tmpimage.scaled((int)(tmpimage.width() * wmult),
                                            (int)(tmpimage.height() * hmult),
                                            Qt::IgnoreAspectRatio,
                                            Qt::SmoothTransformation);
-        ret->convertFromImage(tmp2);
+        ret = new QPixmap(QPixmap::fromImage(tmp2));
     }
     else
     {
+        ret = new QPixmap();
         if (!ret->load(filename))
         {
             VERBOSE(VB_IMPORTANT,
@@ -1253,7 +1237,7 @@ QString MythUIHelper::GetLanguage(void)
 QString MythUIHelper::GetLanguageAndVariant(void)
 {
     if (d->language == QString::null || d->language == "")
-        d->language = GetMythDB()->GetSetting("Language", "EN").lower();
+        d->language = GetMythDB()->GetSetting("Language", "EN").toLower();
 
     return d->language;
 }
@@ -1319,11 +1303,14 @@ bool MythUIHelper::GetScreenIsAsleep(void)
 /// that the MythUIHelper::Init() can detect Xinerama setups.
 void MythUIHelper::SetX11Display(const QString &display)
 {
-    x11_display = Q3DeepCopy<QString>(display);
+    x11_display = display;
+    x11_display.detach();
 }
 
 QString MythUIHelper::GetX11Display(void)
 {
-    return Q3DeepCopy<QString>(x11_display);
+    QString ret = x11_display;
+    ret.detach();
+    return ret;
 }
 

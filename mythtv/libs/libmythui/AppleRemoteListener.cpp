@@ -1,5 +1,5 @@
-#include <qapplication.h>
-#include <qkeysequence.h>
+#include <QApplication>
+#include <QKeySequence>
 #include "lircevent.h"
 
 #include "AppleRemoteListener.h"

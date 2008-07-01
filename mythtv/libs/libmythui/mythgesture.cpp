@@ -32,8 +32,8 @@
 #include <cmath>
 #include <algorithm>
 
-#include <qmutex.h>
-#include <qmap.h>
+#include <QMutex>
+#include <QMap>
 
 #include "mythgesture.h"
 

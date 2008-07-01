@@ -1,5 +1,5 @@
-#include <qapplication.h>
-#include <qstring.h>
+#include <QApplication>
+#include <QString>
 
 #include "mythmainwindow.h"
 #include "lircevent.h"

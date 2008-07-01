@@ -33,9 +33,9 @@ DisplayResScreen::DisplayResScreen(const QString &str)
     : width(0), height(0), width_mm(0), height_mm(0), aspect(-1.0)
 {
     refreshRates.clear();
-    QStringList slist = QStringList::split(":", str);
+    QStringList slist = str.split(":");
     if (slist.size()<4)
-        slist = QStringList::split(",", str); // for backward compatibility
+        slist = str.split(","); // for backward compatibility
     if (slist.size() >= 4)
     {
         width = slist[0].toInt();

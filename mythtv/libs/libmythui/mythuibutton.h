@@ -1,7 +1,7 @@
 #ifndef MYTHUI_BUTTON_H_
 #define MYTHUI_BUTTON_H_
 
-#include <qstring.h>
+#include <QString>
 
 #include "mythuitype.h"
 #include "mythuistatetype.h"
@@ -25,7 +25,7 @@ class MythUIButton : public MythUIType
     enum StateType { None = 0, Normal, Disabled, Active, Selected, 
                      SelectedInactive };
 
-    MythUIButton(MythUIType *parent, const char *name, bool doInit = true);
+    MythUIButton(MythUIType *parent, const QString &name, bool doInit = true);
    ~MythUIButton();
 
     virtual void gestureEvent(MythUIType *uitype, MythGestureEvent *event);

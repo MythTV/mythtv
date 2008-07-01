@@ -1,7 +1,7 @@
 #ifndef MYTHDIALOGBOX_H_
 #define MYTHDIALOGBOX_H_
 
-#include "qevent.h"
+#include <QEvent>
 #include <QKeyEvent>
 
 #include "mythscreentype.h"

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <typeinfo>
 
-#include <qfile.h>
+#include <QFile>
 
 #include "xmlparsebase.h"
 #include "mythmainwindow.h"
@@ -113,14 +113,14 @@ int XMLParseBase::parseAlignment(const QString &text)
 {
     int alignment = 0;
 
-    QStringList values = QStringList::split(",", text);
+    QStringList values = text.split(",");
 
     QStringList::Iterator it;
     for ( it = values.begin(); it != values.end(); ++it )
     {
 
         QString align = *it;
-        align = align.stripWhiteSpace();
+        align = align.trimmed();
         align = align.toLower();
 
         if (align == "center" || align == "allcenter")
@@ -394,9 +394,9 @@ bool XMLParseBase::doLoad(const QString &windowname,
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        cerr << "Error parsing: " << (const char *)filename << endl;
+        cerr << "Error parsing: " << qPrintable(filename) << endl;
         cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
-        cerr << (const char *)errorMsg << endl;
+        cerr << qPrintable(errorMsg) << endl;
         f.close();
         return false;
     }

@@ -1,6 +1,6 @@
-#include <qapplication.h>
-#include <qpainter.h>
-#include <qpixmap.h>
+#include <QApplication>
+#include <QPainter>
+#include <QPixmap>
 
 #include <cassert>
 #include <iostream>
@@ -13,7 +13,7 @@ using namespace std;
 #include "mythfontproperties.h"
 #include "mythuistatetype.h"
 
-MythUIButtonList::MythUIButtonList(MythUIType *parent, const char *name)
+MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name)
               : MythUIType(parent, name)
 {
     m_showArrow = true;
@@ -22,7 +22,7 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const char *name)
     Const();
 }
 
-MythUIButtonList::MythUIButtonList(MythUIType *parent, const char *name,
+MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
                                const QRect& area, bool showArrow,
                                bool showScrollArrows)
               : MythUIType(parent, name)

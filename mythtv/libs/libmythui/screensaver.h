@@ -1,7 +1,7 @@
 #ifndef MYTH_SCREENSAVER_H
 #define MYTH_SCREENSAVER_H
 
-#include <qevent.h>
+#include <QEvent>
 
 class ScreenSaverEvent : public QEvent
 {

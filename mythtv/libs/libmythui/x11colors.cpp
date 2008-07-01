@@ -767,9 +767,9 @@ QColor createColor(const QString &color)
         x11colormap["lightgreen"] = QColor(144, 238, 144);
     }
 
-    QMap<QString,QColor>::const_iterator it = x11colormap.find(color.lower());
+    QMap<QString,QColor>::const_iterator it = x11colormap.find(color.toLower());
     if (it != x11colormap.end())
-        return *it;
+        return it.value();
 
     return QColor(color);
 }

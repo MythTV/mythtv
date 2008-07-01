@@ -1,6 +1,6 @@
 #include <iostream>
-#include <qapplication.h>
-#include <qregexp.h>
+#include <QApplication>
+#include <QRegExp>
 #include <QChar>
 
 #include "mythuitextedit.h"
@@ -11,7 +11,8 @@
 #include "mythverbose.h"
 #include "mythuihelper.h"
 
-MythUITextEdit::MythUITextEdit(MythUIType *parent, const char *name, bool doInit)
+MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name, 
+                               bool doInit)
            : MythUIType(parent, name)
 {
     m_Message = "";
@@ -101,7 +102,7 @@ bool MythUITextEdit::ParseElement(QDomElement &element)
     {
         if (element.attribute("lang","").isEmpty())
         {
-            m_Message = qApp->translate("ThemeUI", getFirstText(element));
+            m_Message = qApp->translate("ThemeUI", qPrintable(getFirstText(element)));
         }
         else if (element.attribute("lang","").toLower() ==
                  GetMythUI()->GetLanguageAndVariant())
@@ -117,9 +118,9 @@ bool MythUITextEdit::ParseElement(QDomElement &element)
     else if (element.tagName() == "multiline")
     {
         if (parseBool(element))
-            m_Justification |= Qt::WordBreak;
+            m_Justification |= Qt::TextWordWrap;
         else
-            m_Justification &= ~Qt::WordBreak;
+            m_Justification &= ~Qt::TextWordWrap;
 
         m_Text->SetJustification(m_Justification);
     }
@@ -128,7 +129,7 @@ bool MythUITextEdit::ParseElement(QDomElement &element)
         QString align = getFirstText(element).toLower();
 
         // preserve the wordbreak attribute, drop everything else
-        m_Justification = m_Justification & Qt::WordBreak;
+        m_Justification = m_Justification & Qt::TextWordWrap;
 
         m_Justification |= parseAlignment(align);
 

@@ -3,7 +3,7 @@
 #include "mythuicheckbox.h"
 #include "mythmainwindow.h"
 
-MythUICheckBox::MythUICheckBox(MythUIType *parent, const char *name,
+MythUICheckBox::MythUICheckBox(MythUIType *parent, const QString &name,
                                bool doInit)
             : MythUIButton(parent, name, doInit)
 {

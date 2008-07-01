@@ -1,8 +1,8 @@
 #ifndef MYTHSCREEN_STACK_H_
 #define MYTHSCREEN_STACK_H_
 
-#include <qvector.h>
-#include <qobject.h>
+#include <QVector>
+#include <QObject>
 
 class MythScreenType;
 class MythMainWindow;
@@ -10,7 +10,7 @@ class MythMainWindow;
 class MythScreenStack : public QObject
 {
   public:
-    MythScreenStack(MythMainWindow *parent, const char *name,
+    MythScreenStack(MythMainWindow *parent, const QString &name,
                     bool main = false);
     virtual ~MythScreenStack();
 

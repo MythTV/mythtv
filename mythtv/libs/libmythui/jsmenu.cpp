@@ -21,9 +21,12 @@
 ** 
 **--------------------------------------------------------------------------*/
 
-#include <qapplication.h>
-#include <qevent.h>
-#include <qkeysequence.h>
+#include <QApplication>
+#include <QEvent>
+#include <QKeySequence>
+#include <QTextStream>
+#include <QStringList>
+
 #include <cstdio>
 #include <cerrno>
 #include <sys/wait.h>
@@ -35,8 +38,6 @@
 
 #include <iostream>
 using namespace std;
-
-#include <QTextStream>
 
 #include <linux/joystick.h>
 
@@ -104,7 +105,7 @@ int JoystickMenuClient::Init(QString &config_file)
     /*------------------------------------------------------------------------
     ** Open the joystick device, retrieve basic info
     **----------------------------------------------------------------------*/
-    fd = open((const char *) devicename, O_RDONLY);
+    fd = open(qPrintable(devicename), O_RDONLY);
     if (fd == -1)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERROR + QString("Joystick disabled - Failed to open device %1")
@@ -157,23 +158,23 @@ int JoystickMenuClient::ReadConfig(QString config_file)
 {
     FILE *fp;
 
-    fp = fopen((const char *) config_file, "r");
+    fp = fopen(qPrintable(config_file), "r");
     if (!fp)
         return(-1);
 
-    QTextIStream istream(fp);
+    QTextStream istream(fp);
     for (int line = 1; ! istream.atEnd(); line++)
     {
         QString rawline = istream.readLine();
-        QString simple_line = rawline.simplifyWhiteSpace(); 
+        QString simple_line = rawline.simplified(); 
         if (simple_line.isEmpty() || simple_line.startsWith("#"))
             continue;
 
-        QStringList tokens = QStringList::split(" ", simple_line);
+        QStringList tokens = simple_line.split(" ");
         if (tokens.count() < 1)
             continue;
 
-        QString firstTok = tokens[0].lower();
+        QString firstTok = tokens[0].toLower();
 
         if (firstTok.startsWith("devicename") && tokens.count() == 2)
             devicename = tokens[1];

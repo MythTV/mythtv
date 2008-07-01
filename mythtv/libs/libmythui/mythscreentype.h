@@ -14,7 +14,7 @@ class MythScreenType : public MythUIType
     Q_OBJECT
 
   public:
-    MythScreenType(MythScreenStack *parent, const char *name, 
+    MythScreenType(MythScreenStack *parent, const QString &name, 
                    bool fullscreen = true);
     virtual ~MythScreenType();
 
@@ -43,7 +43,7 @@ class MythScreenType : public MythUIType
 
   protected:
     // for the global store..
-    MythScreenType(MythUIType *parent, const char *name, 
+    MythScreenType(MythUIType *parent, const QString &name, 
                    bool fullscreen = true);
 
     virtual void CopyFrom(MythUIType *base);

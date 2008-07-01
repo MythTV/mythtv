@@ -12,7 +12,7 @@ using namespace std;
 
 MythUIImage::MythUIImage(const QString &filepattern,
                          int low, int high, int delayms,
-                         MythUIType *parent, const char *name)
+                         MythUIType *parent, const QString &name)
            : MythUIType(parent, name)
 {
     m_Filename = filepattern;
@@ -25,7 +25,7 @@ MythUIImage::MythUIImage(const QString &filepattern,
 }
 
 MythUIImage::MythUIImage(const QString &filename, MythUIType *parent, 
-                         const char *name)
+                         const QString &name)
            : MythUIType(parent, name)
 {
     m_Filename = filename;
@@ -38,7 +38,7 @@ MythUIImage::MythUIImage(const QString &filename, MythUIType *parent,
     Init();
 }
 
-MythUIImage::MythUIImage(MythUIType *parent, const char *name)
+MythUIImage::MythUIImage(MythUIType *parent, const QString &name)
            : MythUIType(parent, name)
 {
     m_LowNum = 0;
@@ -295,7 +295,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             m_CurPos = 0;
 
         QRect area = m_Area;
-        area.moveBy(xoffset, yoffset);
+        area.translate(xoffset, yoffset);
 
         int alpha = CalcAlpha(alphaMod); 
 

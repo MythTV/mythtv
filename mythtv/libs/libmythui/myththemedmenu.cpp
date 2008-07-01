@@ -1,8 +1,7 @@
-#include <qapplication.h>
-#include <qimage.h>
-#include <qdir.h>
+#include <QApplication>
+#include <QImage>
+#include <QDir>
 #include <QKeyEvent>
-#include <Q3PtrList>
 
 #include <iostream>
 #include <cmath>
@@ -48,7 +47,7 @@ struct ButtonIcon
 class ThemedButton : public MythUIType
 {
   public:
-    ThemedButton(MythUIType *parent, const char *name)
+    ThemedButton(MythUIType *parent, const QString &name)
         : MythUIType(parent, name),
           background(NULL), icon(NULL), text(NULL),
           row(0), col(0)
@@ -173,8 +172,8 @@ bool MythThemedMenuState::parseFonts = true;
 class MythThemedMenuPrivate: public XMLParseBase
 {
   public:
-    MythThemedMenuPrivate(MythThemedMenu *lparent, const char *cdir, 
-                      MythThemedMenuState *lstate);
+    MythThemedMenuPrivate(MythThemedMenu *lparent, const QString &cdir, 
+                          MythThemedMenuState *lstate);
    ~MythThemedMenuPrivate();
 
     bool keyPressHandler(QKeyEvent *e);
@@ -286,19 +285,19 @@ void MythThemedMenuState::Reset(void)
     QMap<QString, ButtonIcon>::Iterator it;
     for (it = allButtonIcons.begin(); it != allButtonIcons.end(); ++it)
     {
-        if (it.data().icon)
-            it.data().icon->DownRef();
-        if (it.data().activeicon)
-            it.data().activeicon->DownRef();
-        if (it.data().watermark)
-            it.data().watermark->DownRef();
+        if (it.value().icon)
+            it.value().icon->DownRef();
+        if (it.value().activeicon)
+            it.value().activeicon->DownRef();
+        if (it.value().watermark)
+            it.value().watermark->DownRef();
     }
     allButtonIcons.clear();
 
     QMap<QString, MythImage *>::Iterator jt;
     for (jt = titleIcons.begin(); jt != titleIcons.end(); ++jt)
     {
-        jt.data()->DownRef();
+        jt.value()->DownRef();
     }
     titleIcons.clear();
     m_loadedImages.clear();
@@ -376,7 +375,7 @@ void MythThemedMenuState::parseBackground(
             }
             else if (info.tagName() == "visiblerowlimit")
             {
-                visiblerowlimit = atoi(getFirstText(info).ascii());
+                visiblerowlimit = getFirstText(info).toInt();
             }
             else
             {
@@ -429,7 +428,7 @@ void MythThemedMenuState::parseShadow(TextAttributes &attributes,
             }
             else if (info.tagName() == "alpha")
             {
-                alpha = atoi(getFirstText(info).ascii());
+                alpha = getFirstText(info).toInt();
                 hasalpha = true;
             }
             else
@@ -491,7 +490,7 @@ void MythThemedMenuState::parseOutline(TextAttributes &attributes,
             }
             else if (info.tagName() == "size")
             {
-                int lsize = atoi(getFirstText(info).ascii());
+                int lsize = getFirstText(info).toInt();
                 size = GetMythMainWindow()->NormY(lsize);
                 hassize = true;
             }
@@ -534,7 +533,7 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
     QString fontname = "Arial";
     bool italic = false;
 
-    attributes.textflags = Qt::WordBreak;
+    attributes.textflags = Qt::TextWordWrap;
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -556,7 +555,7 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
             }
             else if (info.tagName() == "fontsize")
             {
-                fontsize = atoi(getFirstText(info).ascii());
+                fontsize = getFirstText(info).toInt();
             }
             else if (info.tagName() == "fontname")
             { 
@@ -586,13 +585,13 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
                     {
                         attributes.textflags = Qt::AlignVCenter | 
                                                Qt::AlignHCenter |
-                                               Qt::WordBreak;
+                                               Qt::TextWordWrap;
                     }
                     else
                     {
                         attributes.textflags = Qt::AlignTop | 
                                                Qt::AlignHCenter |
-                                               Qt::WordBreak;
+                                               Qt::TextWordWrap;
                     }
                 }
             } 
@@ -620,14 +619,14 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
                     attributes.textflags = attributes.textflags &
                                 ~Qt::AlignHorizontal_Mask |
                             Qt::AlignLeft |
-                            Qt::WordBreak;
+                            Qt::TextWordWrap;
                 }
                 else if (getFirstText(info) == "right")
                 {
                     attributes.textflags = attributes.textflags &
                                 ~Qt::AlignHorizontal_Mask |
                             Qt::AlignRight |
-                            Qt::WordBreak;
+                            Qt::TextWordWrap;
                 }
                 else
                 {
@@ -1139,8 +1138,8 @@ void MythThemedMenuState::setDefaults(void)
     buttonnormal = buttonactive = NULL;
     balancerows = true;
 
-    normalAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | Qt::WordBreak;
-    activeAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | Qt::WordBreak;
+    normalAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | Qt::TextWordWrap;
+    activeAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | Qt::TextWordWrap;
 
     titleIcons.clear();
     titleText = "";
@@ -1273,7 +1272,7 @@ bool MythThemedMenuState::parseSettings(
  *  \param lstate  corresponding settings of the theme
  */
 MythThemedMenuPrivate::MythThemedMenuPrivate(MythThemedMenu *lparent, 
-                                             const char *cdir,
+                                             const QString &cdir,
                                              MythThemedMenuState *lstate) :
     parent(lparent),     m_state(lstate),
     allocedstate(false), activebutton(NULL),
@@ -1563,7 +1562,7 @@ void MythThemedMenuPrivate::SetupUITypes(void)
     QMap<QString, ButtonIcon>::Iterator it = m_state->allButtonIcons.begin();
     for (; it != m_state->allButtonIcons.end(); ++it)
     {
-        ButtonIcon *icon = &(it.data());
+        ButtonIcon *icon = &(it.value());
         if (icon->watermark)
             watermark->AddImage(icon->name, icon->watermark);
     }
@@ -1630,7 +1629,7 @@ void MythThemedMenuPrivate::addButton(const QString &type, const QString &text,
                                       const QString &alttext, 
                                       const QStringList &action)
 {
-    ThemedButton *newbutton = new ThemedButton(parent, type.ascii());
+    ThemedButton *newbutton = new ThemedButton(parent, type);
 
     newbutton->type = type;
     newbutton->action = action;
@@ -1967,7 +1966,7 @@ bool MythThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
     QStringList actions;
     GetMythMainWindow()->TranslateKeyPress("menu", e, actions);
 
-    return keyHandler(actions, e->state() == exitModifier);
+    return keyHandler(actions, e->modifiers() == exitModifier);
 }
 
 /** \brief Interpret key presses on the menu into the appropriate actions
@@ -2195,23 +2194,23 @@ QString MythThemedMenuPrivate::findMenuFile(const QString &menuname)
         return testdir;
 
     testdir = GetMythUI()->GetMenuThemeDir() + "/" + menuname;
-    file.setName(testdir);
+    file.setFileName(testdir);
     if (file.exists())
         return testdir;
 
         
     testdir = GetMythUI()->GetThemeDir() + "/" + menuname;
-    file.setName(testdir);
+    file.setFileName(testdir);
     if (file.exists())
         return testdir;
         
     testdir = GetShareDir() + menuname;
-    file.setName(testdir);
+    file.setFileName(testdir);
     if (file.exists())
         return testdir;
         
     testdir = "../mythfrontend/" + menuname;
-    file.setName(testdir);
+    file.setFileName(testdir);
     if (file.exists())
         return testdir;
         
@@ -2237,7 +2236,7 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
     }
     else if (action.left(7) == "EXECTV ")
     {
-        QString rest = action.right(action.length() - 7).stripWhiteSpace();
+        QString rest = action.right(action.length() - 7).trimmed();
         if (cbs && cbs->exec_program_tv)
             cbs->exec_program_tv(rest);
     }
@@ -2254,7 +2253,7 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
 
         MythScreenStack *stack = parent->GetScreenStack();
 
-        MythThemedMenu *newmenu = new MythThemedMenu(m_state->themeDir.local8Bit(),
+        MythThemedMenu *newmenu = new MythThemedMenu(m_state->themeDir,
                                                      rest, stack, rest, 
                                                      m_state->allowreorder, 
                                                      m_state);
@@ -2306,7 +2305,7 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
 
 bool MythThemedMenuPrivate::findDepends(const QString &fileList)
 {
-    QStringList files = QStringList::split(" ", fileList);
+    QStringList files = fileList.split(" ");
     QString filename;
 
     for (QStringList::Iterator it = files.begin(); it != files.end(); ++it ) 
@@ -2398,8 +2397,8 @@ bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
  *  \param allowreorder will buttons be inserted into new rows or pushed back
  *  \param state        theme state associated with this menu
  */
-MythThemedMenu::MythThemedMenu(const char *cdir, const char *menufile,
-                               MythScreenStack *parent, const char *name,
+MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
+                               MythScreenStack *parent, const QString &name,
                                bool allowreorder, MythThemedMenuState *state)
               : MythScreenType(parent, name)
 {
@@ -2420,7 +2419,7 @@ MythThemedMenu::MythThemedMenu(const char *cdir, const char *menufile,
  *  \param cdir directory where theme.xml is stored
  *  \param menufile name of menu item xml file
  */
-void MythThemedMenu::Init(const char *cdir, const char *menufile)
+void MythThemedMenu::Init(const QString &cdir, const QString &menufile)
 {
     QString dir = QString(cdir) + "/";
     QString filename = dir + "theme.xml";
@@ -2480,11 +2479,11 @@ void MythThemedMenu::ReloadExitKey(void)
     int allowsd = GetMythDB()->GetNumSetting("AllowQuitShutdown");
 
     if (allowsd == 1)
-        d->exitModifier = Qt::ControlButton;
+        d->exitModifier = Qt::ControlModifier;
     else if (allowsd == 2)
-        d->exitModifier = Qt::MetaButton;
+        d->exitModifier = Qt::MetaModifier;
     else if (allowsd == 3)
-        d->exitModifier = Qt::AltButton;
+        d->exitModifier = Qt::AltModifier;
     else if (allowsd == 4)
         d->exitModifier = 0;
     else

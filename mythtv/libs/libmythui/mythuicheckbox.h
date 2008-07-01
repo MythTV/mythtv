@@ -12,7 +12,7 @@
 class MythUICheckBox : public MythUIButton
 {
   public:
-    MythUICheckBox(MythUIType *parent, const char *name, bool doInit = true);
+    MythUICheckBox(MythUIType *parent, const QString &name, bool doInit = true);
    ~MythUICheckBox();
 
     virtual void gestureEvent(MythUIType *uitype, MythGestureEvent *event);

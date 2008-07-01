@@ -1,8 +1,8 @@
 #ifndef MYTHUI_CLOCK_H_
 #define MYTHUI_CLOCK_H_
 
-#include <qstring.h>
-#include <qdatetime.h>
+#include <QString>
+#include <QDateTime>
 
 #include "mythuitype.h"
 #include "mythuitext.h"
@@ -26,7 +26,7 @@ class MythFontProperties;
 class MythUIClock : public MythUIText
 {
   public:
-    MythUIClock(MythUIType *parent, const char *name);
+    MythUIClock(MythUIType *parent, const QString &name);
    ~MythUIClock();
 
     virtual void Pulse(void);

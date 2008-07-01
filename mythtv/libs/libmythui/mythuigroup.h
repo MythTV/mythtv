@@ -12,7 +12,7 @@ class MythUIGroup : public MythUIType
 {
 
   public:
-    MythUIGroup(MythUIType *parent, const char *name);
+    MythUIGroup(MythUIType *parent, const QString &name);
    ~MythUIGroup();
 
   protected:

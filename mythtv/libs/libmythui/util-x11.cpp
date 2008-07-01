@@ -17,8 +17,8 @@ extern "C" {
 typedef int (*XErrorCallbackType)(Display *, XErrorEvent *);
 typedef vector<XErrorEvent>       XErrorVectorType;
 #else
-#include <qapplication.h>
-#include <qdesktopwidget.h>
+#include <QApplication>
+#include <QDesktopWidget>
 #endif // USING_X11
 
 #include <QMutex>
@@ -63,7 +63,7 @@ Display *MythXOpenDisplay(void)
     QString dispStr = GetMythUI()->GetX11Display();
     const char *dispCStr = NULL;
     if (!dispStr.isEmpty())
-        dispCStr = dispStr.ascii();
+        dispCStr = dispStr.toAscii().constData();
 
     X11L;
     Display *disp = XOpenDisplay(dispCStr);

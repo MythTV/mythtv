@@ -3,8 +3,8 @@
 **  GPL license; Original copyright 2004 Jeremy White <jwhite@whitesen.org>
 **     although this is largely a derivative of lircevent.cpp
 **--------------------------------------------------------------------------*/
-#include <qapplication.h>
-#include <qstring.h>
+#include <QApplication>
+#include <QString>
 #include "mythmainwindow.h"
 
 #include "jsmenuevent.h"

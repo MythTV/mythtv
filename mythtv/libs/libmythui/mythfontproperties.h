@@ -1,10 +1,10 @@
 #ifndef MYTHFONTPROPERTIES_H_
 #define MYTHFONTPROPERTIES_H_
 
-#include <qfont.h>
-#include <qcolor.h>
-#include <qpoint.h>
-#include <qmap.h>
+#include <QFont>
+#include <QColor>
+#include <QPoint>
+#include <QMap>
 
 #include "xmlparsebase.h"
 #include "mythexp.h"

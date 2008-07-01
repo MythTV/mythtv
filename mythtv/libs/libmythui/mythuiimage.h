@@ -1,8 +1,7 @@
 #ifndef MYTHUI_IMAGE_H_
 #define MYTHUI_IMAGE_H_
 
-#include <qstring.h>
-#include <qdatetime.h>
+#include <QDateTime>
 
 #include "mythuitype.h"
 #include "mythimage.h"
@@ -13,9 +12,9 @@ class MythUIImage : public MythUIType
 {
   public:
     MythUIImage(const QString &filepattern, int low, int high, int delayms,
-                MythUIType *parent, const char *name);
-    MythUIImage(const QString &filename, MythUIType *parent, const char *name);
-    MythUIImage(MythUIType *parent, const char *name);
+                MythUIType *parent, const QString &name);
+    MythUIImage(const QString &filename, MythUIType *parent, const QString &name);
+    MythUIImage(MythUIType *parent, const QString &name);
    ~MythUIImage();
 
     // doesn't load

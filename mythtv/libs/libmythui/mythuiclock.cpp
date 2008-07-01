@@ -1,4 +1,4 @@
-#include <qapplication.h>
+#include <QApplication>
 
 #include "mythuiclock.h"
 #include "mythpainter.h"
@@ -8,7 +8,7 @@
 #include "mythverbose.h"
 #include "mythdb.h"
 
-MythUIClock::MythUIClock(MythUIType *parent, const char *name)
+MythUIClock::MythUIClock(MythUIType *parent, const QString &name)
            : MythUIText(parent, name)
 {
     m_Time = QDateTime::currentDateTime();
@@ -74,9 +74,9 @@ bool MythUIClock::ParseElement(QDomElement &element)
     if (element.tagName() == "format")
     {
         QString format = getFirstText(element);
-        format.replace("%TIME%", m_TimeFormat, false);
-        format.replace("%DATE%", m_DateFormat, false);
-        format.replace("%SHORTDATE%", m_ShortDateFormat, false);
+        format.replace("%TIME%", m_TimeFormat, Qt::CaseInsensitive);
+        format.replace("%DATE%", m_DateFormat, Qt::CaseInsensitive);
+        format.replace("%SHORTDATE%", m_ShortDateFormat, Qt::CaseInsensitive);
         m_Format=format;
     }
     else if (element.tagName() == "secondflash")

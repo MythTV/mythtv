@@ -1,10 +1,9 @@
 #ifndef MYTHMAINWINDOW_H_
 #define MYTHMAINWINDOW_H_
 
-#include <qevent.h>
-#include <qobject.h>
-#include <qwidget.h>
-#include <qgl.h>
+#include <QEvent>
+#include <QObject>
+#include <QWidget>
 
 #include "mythexp.h"
 

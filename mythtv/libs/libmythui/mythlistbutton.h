@@ -71,8 +71,8 @@ class MythListButton : public MythUIType
 {
     Q_OBJECT
   public:
-    MythListButton(MythUIType *parent, const char *name);
-    MythListButton(MythUIType *parent, const char *name, 
+    MythListButton(MythUIType *parent, const QString &name);
+    MythListButton(MythUIType *parent, const QString &name, 
                    const QRect &area, bool showArrow = true, 
                    bool showScrollArrows = false);
     ~MythListButton();

@@ -3,11 +3,10 @@
 #ifndef __UTIL_X11_H__
 #define __UTIL_X11_H__
 
-#include <qmutex.h>
+#include <QMutex>
 
 #ifdef USING_X11
-#include <qsize.h>
-#include <qwindowdefs.h>
+#include <QSize>
 #include <X11/Xlib.h>
 #include <vector>
 
