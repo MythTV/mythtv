@@ -1,5 +1,7 @@
-#include <QDir>
 #include <iostream>
+#include <cstdlib>
+
+#include <QDir>
 #include <QApplication>
 
 #include "mythconfig.h"  // for CONFIG_DARWIN
@@ -19,7 +21,7 @@ void InitializeMythDirs(void)
 {
     installprefix = QString(RUNPREFIX);
 
-    char *tmp_installprefix = getenv("MYTHTVDIR");
+    char *tmp_installprefix = std::getenv("MYTHTVDIR");
     if (tmp_installprefix)
         installprefix = tmp_installprefix;
 
@@ -40,7 +42,7 @@ void InitializeMythDirs(void)
 
     VERBOSE(VB_IMPORTANT, "Using runtime prefix = " + installprefix);
 
-    char *tmp_confdir = getenv("MYTHCONFDIR");
+    char *tmp_confdir = std::getenv("MYTHCONFDIR");
     if (tmp_confdir)
     {
         confdir = QString(tmp_confdir);
