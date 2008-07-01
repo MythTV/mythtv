@@ -858,7 +858,7 @@ void *MythSocket::readyReadThread(void *)
             {
                 rval = idx[rval];
                 sock = m_readyread_list.at(rval);
-                found = (sock->state() == Connected) && !sock->m_lock.locked();
+                found = (sock->state() == Connected) && !isLocked(sock->m_lock);
             }
             else
             {
