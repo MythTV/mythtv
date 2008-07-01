@@ -205,6 +205,11 @@ void MythUIImage::SetCropRect(int x, int y, int width, int height)
     m_cropRect = QRect(x, y, width, height);
 }
 
+void MythUIImage::SetCropRect(QRect rect)
+{
+    SetCropRect(rect.x(), rect.y(), rect.width(), rect.height());
+}
+
 bool MythUIImage::Load(void)
 {
     Clear();

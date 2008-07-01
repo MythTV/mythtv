@@ -34,9 +34,12 @@ class MythUIImage : public MythUIType
     void SetSize(const QSize &size);
     void ForceSize(const QSize &size);
     void SetCropRect(int x, int y, int width, int height);
+    void SetCropRect(QRect rect);
 
     void Reset(void);
     bool Load(void);
+
+    bool IsGradient(void) { return m_gradient; }
 
     virtual void Pulse(void);
 
