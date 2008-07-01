@@ -523,4 +523,22 @@ inc.files = programinfo.h remoteutil.h recordingtypes.h
 
 INSTALLS += inc
 
+unix {
+    SOURCES-=dbcheck.cpp
+    OBJECTS+=dbcheck.o
+    gcc431_workaround.target=dbcheck.o
+    gcc431_workaround.commands=$(CXX) -c $(CXXFLAGS) -O0 $(INCPATH) -o dbcheck.o dbcheck.cpp
+    gcc431_workaround.depends=dbcheck.h dbcheck.cpp
+    gcc431_workaround.depends+=datadirect.h videodisplayprofile.h
+    gcc431_workaround.depends+=../libmyth/mythcontext.h
+    gcc431_workaround.depends+=../libmyth/mythdbcon.h
+    gcc431_workaround.depends+=../libmyth/dbutil.h
+    gcc431_workaround.depends+=../libmyth/mythexp.h
+    gcc431_workaround.depends+=../libmyth/mythobservable.h
+    gcc431_workaround.depends+=../libmyth/mythsocket.h
+    gcc431_workaround.depends+=../libmyth/mythverbose.h
+    gcc431_workaround.depends+=../libmyth/mythevent.h
+    QMAKE_EXTRA_UNIX_TARGETS+=gcc431_workaround
+}
+
 include ( ../libs-targetfix.pro )
