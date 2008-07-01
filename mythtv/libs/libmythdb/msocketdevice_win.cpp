@@ -96,13 +96,11 @@ typedef struct {
 #endif
 
 #ifndef NO_ERRNO_H
-QT_BEGIN_INCLUDE_NAMESPACE
 #  if defined(Q_OS_WINCE)
 #     include "qfunctions_wince.h"
 #  else
 #     include <errno.h>
 #  endif
-QT_END_INCLUDE_NAMESPACE
 #endif
 
 
