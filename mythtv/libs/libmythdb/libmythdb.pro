@@ -47,7 +47,8 @@ use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden
 }
 
+mingw:LIBS += -lpthread -lws2_32
+
 QT += sql network
 
 include ( ../libs-targetfix.pro )
-
