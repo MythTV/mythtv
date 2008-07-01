@@ -75,7 +75,7 @@ class MythUIButtonList : public MythUIType
   public:
     MythUIButtonList(MythUIType *parent, const QString &name);
     MythUIButtonList(MythUIType *parent, const QString &name,
-                   const QRect &area, bool showArrow = true, 
+                   const QRect &area, bool showArrow = true,
                    bool showScrollArrows = false);
     ~MythUIButtonList();
 
@@ -167,8 +167,6 @@ class MythUIButtonList : public MythUIType
     LayoutType m_layout;
     ScrollStyle m_scrollStyle;
 
-    int m_order;
-    QRect m_rect;
     QRect m_contentsRect;
 
     int m_itemWidth;

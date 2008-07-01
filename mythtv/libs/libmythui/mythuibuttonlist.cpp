@@ -37,6 +37,8 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
 
 void MythUIButtonList::Const(void)
 {
+    m_contentsRect = QRect(0,0,0,0);
+
     m_layout      = LayoutVertical;
     m_scrollStyle = ScrollFree;
 
@@ -855,9 +857,7 @@ void MythUIButtonList::CalculateVisibleItems(void)
 
 bool MythUIButtonList::ParseElement(QDomElement &element)
 {
-    if (element.tagName() == "area")
-        m_Area = parseRect(element);
-    else if (element.tagName() == "buttonarea")
+    if (element.tagName() == "buttonarea")
         m_contentsRect = parseRect(element);
     else if (element.tagName() == "layout")
     {
@@ -921,8 +921,7 @@ void MythUIButtonList::CopyFrom(MythUIType *base)
         return;
 
     m_layout = lb->m_layout;
-    m_order = lb->m_order;
-    m_rect = lb->m_rect;
+
     m_contentsRect = lb->m_contentsRect;
 
     m_itemHeight = lb->m_itemHeight;
@@ -1115,7 +1114,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
 
     MythUIImage *buttonbackground = dynamic_cast<MythUIImage *>
                                         (buttonstate->GetChild("buttonbackground"));
-    if (buttonbackground)
+    if (buttonbackground && buttonbackground->IsGradient())
         buttonbackground->ForceSize(buttonstate->GetArea().size());
 
     MythUIText *buttontext = dynamic_cast<MythUIText *>
