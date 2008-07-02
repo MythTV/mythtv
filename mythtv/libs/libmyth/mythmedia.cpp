@@ -9,7 +9,6 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QFileInfoList>
-#include <Q3TextStream>
 
 // MythTV headers
 #include "mythmedia.h"
@@ -339,9 +338,9 @@ bool MythMediaDevice::isMounted(bool Verify)
         return false;
 
     QString     debug;
-    Q3TextStream stream(&mountFile);
+    QTextStream stream(&mountFile);
 
-    while (!stream.eof()) 
+    for (;;)
     {
         QString mountPoint;
         QString deviceName;
@@ -350,6 +349,9 @@ bool MythMediaDevice::isMounted(bool Verify)
         // Extract the mount point and device name.
         stream >> deviceName >> mountPoint;
         stream.readLine(); // skip the rest of the line
+
+        if (deviceName.isNull())
+            break;
 
         if (deviceName.isEmpty())
             continue;
