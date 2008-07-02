@@ -417,19 +417,9 @@ bool MSqlQuery::exec(const QString &query)
     if (m_db->m_db.hostName().isEmpty())  // Bootstrapping without a database?
         return true;                      // Pretend success, to reduce errors
 
-    bool result = QSqlQuery::exec(query);
+    VERBOSE(VB_DATABASE, "MSqlQuery::exec(\"" + query + "\")");
 
-    if (print_verbose_messages & VB_DATABASE)
-    {
-        QString str = "";
-
-        str += "MSqlQuery: ";
-        str += executedQuery();
-
-        VERBOSE(VB_DATABASE, str);
-    }
-
-    return result;
+    return QSqlQuery::exec(query);
 }
 
 bool MSqlQuery::prepare(const QString& query)
