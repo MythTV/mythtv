@@ -848,16 +848,13 @@ void MythMainWindow::ExitToMainMenu(void)
                 MythEvent *me = new MythEvent("EXIT_TO_MENU");
                 QApplication::postEvent(current, me);
             }
-#if 0
-            else if (MythDialog *dial = dynamic_cast<MythDialog*>(current))
+            else if (current->inherits("MythDialog"))
             {
-                (void)dial;
                 QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, d->escapekey, 
-                                               0, Qt::NoButton);
+                                               Qt::NoModifier);
                 QObject *key_target = getTarget(*key);
                 QApplication::postEvent(key_target, key);
             }
-#endif
             return;
         }
         else
