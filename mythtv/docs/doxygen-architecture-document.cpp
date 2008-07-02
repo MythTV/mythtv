@@ -47,25 +47,34 @@ to documentation on the code itself.
 %MythTV is divided up into eleven libraries:
 <dl>
   <dt>libmyth                <dd>Core %MythTV library. Used by the Plugins.
-      The \ref database_subsystem "database",
+      The
       \ref audio_subsystem "audio",
+      language support,
+      \ref plugin_arch "plugin manager",
+      \ref myth_media "media manager",
+      and some UI widgets are implemented by libmyth.
+  <dt>libmythdb              <dd>Low-level %MythTV library. Contains the
+      \ref database_subsystem "database",
       \ref lcd_subsystem "LCD",
-      \ref osd_subsystem "OSD",
-      \ref lirc_subsystem "LIRC", and the
-      \ref myth_network_protocol "myth network protocol" are supported by libmyth.
+      and network support code
+      (used by the \ref myth_network_protocol "myth network protocol").
   <dt>libmythtv              <dd>%MythTV %TV functionality library.
       The 
+      \ref osd_subsystem "OSD",
       \ref recorder_subsystem "recorders", \ref video_subsystem "video" and 
       \ref av_player_subsystem "A/V players" are supported by libmythtv.
-  <dt>libmythui              <dd>Main user interface rendering library
+  <dt>libmythui              <dd>Main user interface rendering library.
+      The mouse/touchscreen gesture, remote control
+      (\ref lirc_subsystem "LIRC" and AppleRemote)
+      and screen saver control code are also contained in this library.
   <dt>libavcodec/libavformat/libavutil
-      <dd>This is the ffmpeg A/V decoding library (aka avlib).
+      <dd>This is the FFmpeg A/V decoding library (aka avlib).
       <a href="http://ffmpeg.mplayerhq.hu/documentation.html">Documented Externally</a>.
   <dt>libmythmpeg2           <dd>Alternate MPEG-1/2 A/V decoding library.
       <a href="http://libmpeg2.sourceforge.net/">External Website</a>.
   <dt>libmythsamplerate      <dd>Audio resampling library
       <a href="http://www.mega-nerd.com/SRC/api.html">Documented Externally</a>.
-      We use this to support a different output sample rates than the sample
+      We use this to support different output sample rates than the sample
       rate used in the audio streams we play.
   <dt>libmythsoundtouch      <dd>Pitch preserving audio resampling library.
       <a href="http://www.surina.net/soundtouch/">External Website</a>.
@@ -94,10 +103,10 @@ The database schema is documented here \ref db_schema.
           for viewing programs and using the %MythTV plugins.
   <dt>mythtv-setup     <dd>This is the program which sets up the database
                            to use a machine as a backend server.
-  <dt>mythtv           <dd>This was an "External Player" used to play videos
-                           from within mythfrontend. Setting the player command
-                           to "internal" does the same thing now. This is handy
-                           for testing the audio and videoout code, though.
+  <dt>mythtv
+      <dd>For testing audio and video playback. Was once an "External Player"
+          used to play video files from within mythfrontend. %Setting the
+          player command to "internal" achieves the same thing now.
   <dt>mythtvosd
       <dd>This is used externally by programs that want to pop-up an
           <i>on screen display</i> in %MythTV while one is watching a recording.
@@ -493,7 +502,7 @@ For a full understanding of all the commands, either read the source code
 
  */
 
-/** \defgroup myth_startup Myth startup sequence
+/** \defgroup myth_startup Myth Startup Sequence
 This line is filler that is ignored by Doxygen.
 
 Most MythTV programs follow a common sequence:
@@ -523,10 +532,10 @@ The "runtime assets" mentioned above are stored in a number of well-known
 locations. The following methods in MythContext allow programs and plugins
 to access these assets:
 <ol>
-  <li>GetInstallPrefix() returns the value of MCP's m_installprefix variable,
-      which is either the runtime env. var. $MYTHTVDIR or the compile-time var.
-      RUNPREFIX. If these are relative paths, it is initialised relative to the
-      binary location. The value is used thus:
+  <li>GetInstallPrefix() returns either the runtime env. var. $MYTHTVDIR
+      or the compile-time var. RUNPREFIX. If these are relative paths,
+      it is initialised relative to the application's location.
+      The value is used thus:
   <ul>
     <li>GetInstallPrefix() + /share/mythtv/ = GetShareDir(), GetFontsDir()</li>
     <li>GetInstallPrefix() + /share/mythtv/themes/ = GetThemesParentDir()</li>
@@ -542,13 +551,13 @@ to access these assets:
     <li>GetInstallPrefix() + /bin/ignyte</li>
     <li>GetInstallPrefix() + /bin/mythfilldatabase</li>
     <li>GetInstallPrefix() + /bin/mtd</li>
-    <li>GetInstallPrefix() + /lib/mythtv/ = GetLibraryDir()</li>
-    <li>GetInstallPrefix() + /lib/mythtv/plugins/ = GetPluginsDir()</li>
-    <li>GetInstallPrefix() + /lib/mythtv/filters/ = GetFiltersDir()</li>
+    <li>GetInstallPrefix() + LIBDIRNAME + /mythtv/ = GetLibraryDir()</li>
+    <li>GetLibraryDir() + /plugins/ = GetPluginsDir()</li>
+    <li>GetLibraryDir() + /filters/ = GetFiltersDir()</li>
   </ul></li>
 
   <li>GetConfDir() returns the value of the runtime env. var. $MYTHCONFDIR,
-      or $HOME/.mythtv.</li>
+      or $HOME/.mythtv</li>
 
   <li>mysql.txt is loaded from GetShareDir(), GetInstallPrefix() + /etc/mythtv,
       GetConfDir(), and the current directory. Later files override the values
