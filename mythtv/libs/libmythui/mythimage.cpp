@@ -19,6 +19,10 @@ MythImage::MythImage(MythPainter *parent)
     m_RefCount = 0;
 
     m_isGradient = false;
+    m_gradBegin = QColor("#000000");
+    m_gradEnd = QColor("#FFFFFF");
+    m_gradAlpha = 255;
+    m_gradDirection = FillTopToBottom;
     m_imageId = 0;
 }
 
@@ -63,7 +67,7 @@ void MythImage::Resize(const QSize &newSize)
     if (m_isGradient)
     {
         *(QImage *)this = QImage(newSize, QImage::Format_ARGB32);
-        MakeGradient(*this, m_gradBegin, m_gradEnd, m_gradAlpha);
+        MakeGradient(*this, m_gradBegin, m_gradEnd, m_gradAlpha, m_gradDirection);
         SetChanged();
     }
     else
@@ -223,11 +227,12 @@ void MythImage::MakeGradient(QImage &image, const QColor &begin,
 }
 
 MythImage *MythImage::Gradient(const QSize & size, const QColor &begin,
-                               const QColor &end, uint alpha)
+                               const QColor &end, uint alpha,
+                               FillDirection direction)
 {
     QImage img(size.width(), size.height(), QImage::Format_ARGB32);
 
-    MakeGradient(img, begin, end, alpha);
+    MakeGradient(img, begin, end, alpha, true, direction);
 
     MythImage *ret = GetMythPainter()->GetFormatImage();
     ret->Assign(img);
@@ -235,5 +240,6 @@ MythImage *MythImage::Gradient(const QSize & size, const QColor &begin,
     ret->m_gradBegin = begin;
     ret->m_gradEnd = end;
     ret->m_gradAlpha = alpha;
+    ret->m_gradDirection = direction;
     return ret;
 }

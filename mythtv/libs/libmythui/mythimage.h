@@ -43,7 +43,8 @@ class MythImage : public QImage
      * @return A MythImage filled with a gradient.
      */
     static MythImage *Gradient(const QSize & size, const QColor &begin,
-                               const QColor &end, uint alpha);
+                               const QColor &end, uint alpha,
+                               FillDirection direction = FillTopToBottom);
 
     void SetID(unsigned int id) { m_imageId = id; }
     unsigned int GetID(void) { return m_imageId; }
@@ -65,6 +66,7 @@ class MythImage : public QImage
     QColor m_gradBegin;
     QColor m_gradEnd;
     int m_gradAlpha;
+    FillDirection m_gradDirection;
 
     unsigned int m_imageId;
 };
