@@ -262,9 +262,9 @@ void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im,
         else
         {
             x1 = src.x();
-            x2 = src.width();
+            x2 = x1 + src.width();
             y1 = src.y();
-            y2 = src.height();
+            y2 = y1 + src.height();
         }
 
         int width = min(src.width(), r.width());
