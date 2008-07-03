@@ -40,7 +40,7 @@ class MPUBLIC MSqlDatabase
 };
 
 /// \brief DB connection pool, used by MSqlQuery. Do not use directly.
-class MDBManager
+class MPUBLIC MDBManager
 {
   friend class MSqlQuery;
   public:

@@ -47,9 +47,11 @@
 #include <QtCore/qiodevice.h>
 #include <QtNetwork/qhostaddress.h> // int->QHostAddress conversion
 
+#include "mythexp.h"
+
 class MSocketDevicePrivate;
 
-class MSocketDevice: public QIODevice
+class MPUBLIC MSocketDevice: public QIODevice
 {
 public:
     enum Type { Stream, Datagram };
