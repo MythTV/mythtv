@@ -401,12 +401,20 @@ bool MSqlQuery::exec()
 
     if (print_verbose_messages & VB_DATABASE)
     {
-        QString str = "";
+        QString str = lastQuery();
 
-        str += "MSqlQuery: ";
-        str += executedQuery();
+        // Sadly, neither executedQuery() nor lastQuery() display
+        // the values in bound queries against a MySQL5 database.
+        // So, replace the named placeholders with their values.
 
-        VERBOSE(VB_DATABASE, str);
+        QMapIterator<QString, QVariant> b = boundValues();
+        while (b.hasNext())
+        {
+            b.next();
+            str.replace(b.key(), "'" + b.value().toString() + "'");
+        }
+
+        VERBOSE(VB_DATABASE, "MSqlQuery::exec() \"" + str + "\"");
     }
 
     return result;
