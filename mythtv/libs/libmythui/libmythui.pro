@@ -22,6 +22,7 @@ HEADERS += mythuitext.h mythuistatetype.h mythgesture.h xmlparsebase.h
 HEADERS += mythuibutton.h mythlistbutton.h myththemedmenu.h mythdialogbox.h
 HEADERS += mythuiclock.h mythuitextedit.h mythprogressdialog.h mythuispinbox.h
 HEADERS += mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
+HEADERS += mythuiprogressbar.h
 HEADERS += screensaver.h screensaver-null.h mythsystem.h x11colors.h
 HEADERS += themeinfo.h util-x11.h DisplayRes.h DisplayResScreen.h
 
@@ -33,7 +34,7 @@ SOURCES += mythuistatetype.cpp mythlistbutton.cpp mythfontproperties.cpp
 SOURCES += mythuibutton.cpp myththemedmenu.cpp mythdialogbox.cpp
 SOURCES += mythuiclock.cpp mythuitextedit.cpp mythprogressdialog.cpp
 SOURCES += mythuispinbox.cpp mythuicheckbox.cpp mythuibuttonlist.cpp
-SOURCES += mythuigroup.cpp
+SOURCES += mythuigroup.cpp mythuiprogressbar.cpp
 SOURCES += screensaver.cpp screensaver-null.cpp mythsystem.cpp x11colors.cpp
 SOURCES += themeinfo.cpp util-x11.cpp DisplayRes.cpp DisplayResScreen.cpp
 
@@ -46,6 +47,7 @@ inc.files += mythuitext.h mythuibutton.h mythlistbutton.h xmlparsebase.h
 inc.files += myththemedmenu.h mythdialogbox.h mythfontproperties.h
 inc.files += mythuiclock.h mythgesture.h mythuitextedit.h mythprogressdialog.h
 inc.files += mythuispinbox.h mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
+inc.files += mythuiprogressbar.h
 inc.files += mythsystem.h x11colors.h
 
 INSTALLS += inc

@@ -20,6 +20,7 @@
 #include "mythuibutton.h"
 #include "mythuispinbox.h"
 #include "mythuicheckbox.h"
+#include "mythuiprogressbar.h"
 #include "mythuigroup.h"
 
 QString XMLParseBase::getFirstText(QDomElement &element)
@@ -204,7 +205,8 @@ void XMLParseBase::ParseChildren(QDomElement &element,
                      type == "spinbox" ||
                      type == "checkbox" ||
                      type == "statetype" ||
-                     type == "clock")
+                     type == "clock" ||
+                     type == "progressbar")
             {
                 ParseUIType(info, type, parent);
             }
@@ -239,7 +241,6 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
     MythUIType *uitype = NULL;
     MythUIType *base = NULL;
     bool needInit = true;
-
 
     QString inherits = element.attribute("from", "");
     if (!inherits.isEmpty())
@@ -285,10 +286,12 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         uitype = new MythUICheckBox(parent, name, needInit);
     else if (type == "statetype")
         uitype = new MythUIStateType(parent, name);
-    else if (type == "window" && parent == GetGlobalObjectStore())
-        uitype = new MythScreenType(parent, name);
     else if (type == "clock")
         uitype = new MythUIClock(parent, name);
+    else if (type == "progressbar")
+        uitype = new MythUIProgressBar(parent, name);
+    else if (type == "window" && parent == GetGlobalObjectStore())
+        uitype = new MythScreenType(parent, name);
     else
     {
         VERBOSE(VB_IMPORTANT, QString("Unknown widget type: %1").arg(type));
@@ -341,7 +344,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                      info.tagName() == "spinbox" ||
                      info.tagName() == "checkbox" ||
                      info.tagName() == "statetype" ||
-                     info.tagName() == "clock")
+                     info.tagName() == "clock" ||
+                     info.tagName() == "progressbar")
             {
                 ParseUIType(info, info.tagName(), uitype, screen);
             }
@@ -453,7 +457,8 @@ bool XMLParseBase::doLoad(const QString &windowname,
                          type == "checkbox" ||
                          type == "statetype" ||
                          type == "window" ||
-                         type == "clock")
+                         type == "clock" ||
+                         type == "progressbar")
                 {
                     ParseUIType(e, type, parent);
                 }
