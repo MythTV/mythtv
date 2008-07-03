@@ -128,7 +128,7 @@ void MythUIProgressBar::CalculatePosition(void)
         break;
     }
 
-    progressImage->SetClipRect(x,y,width,height);
+    progressImage->SetCropRect(x,y,width,height);
     SetRedraw();
     qApp->processEvents();
 }
