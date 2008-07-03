@@ -79,6 +79,7 @@ void MythUIImage::Init(void)
     m_gradientStart = QColor("#505050");
     m_gradientEnd = QColor("#000000");
     m_gradientAlpha = 100;
+    m_gradientDirection = FillTopToBottom;
 }
 
 void MythUIImage::SetFilename(const QString &filename)
@@ -203,11 +204,7 @@ void MythUIImage::SetSize(const QSize &size)
 void MythUIImage::SetCropRect(int x, int y, int width, int height)
 {
     m_cropRect = QRect(x, y, width, height);
-}
-
-void MythUIImage::SetCropRect(QRect rect)
-{
-    SetCropRect(rect.x(), rect.y(), rect.width(), rect.height());
+    SetRedraw();
 }
 
 bool MythUIImage::Load(void)
@@ -227,7 +224,8 @@ bool MythUIImage::Load(void)
                 gradsize = QSize(10, 10);
 
             image = MythImage::Gradient(gradsize, m_gradientStart,
-                                        m_gradientEnd, m_gradientAlpha);
+                                        m_gradientEnd, m_gradientAlpha,
+                                        m_gradientDirection);
         }
         else
         {
@@ -334,6 +332,11 @@ bool MythUIImage::ParseElement(QDomElement &element)
         m_gradientStart = QColor(element.attribute("start", "#505050"));
         m_gradientEnd = QColor(element.attribute("end", "#000000"));
         m_gradientAlpha = element.attribute("alpha", "100").toInt();
+        QString direction = element.attribute("direction", "vertical");
+        if (direction == "vertical")
+            m_gradientDirection = FillTopToBottom;
+        else
+            m_gradientDirection = FillLeftToRight;
     }
     else if (element.tagName() == "area")
     {
@@ -406,6 +409,12 @@ void MythUIImage::CopyFrom(MythUIType *base)
     m_reflectScale = im->m_reflectScale;
     m_reflectLength = im->m_reflectLength;
 
+    m_gradient = im->m_gradient;
+    m_gradientStart = im->m_gradientStart;
+    m_gradientEnd = im->m_gradientEnd;
+    m_gradientAlpha = im->m_gradientAlpha;
+    m_gradientDirection = im->m_gradientDirection;
+
     SetImages(im->m_Images);
 
     MythUIType::CopyFrom(base);
@@ -424,4 +433,3 @@ void MythUIImage::Finalize(void)
 
     MythUIType::Finalize();
 }
-  

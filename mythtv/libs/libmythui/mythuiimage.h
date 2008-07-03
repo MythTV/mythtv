@@ -34,7 +34,6 @@ class MythUIImage : public MythUIType
     void SetSize(const QSize &size);
     void ForceSize(const QSize &size);
     void SetCropRect(int x, int y, int width, int height);
-    void SetCropRect(QRect rect);
 
     void Reset(void);
     bool Load(void);
@@ -82,6 +81,7 @@ class MythUIImage : public MythUIType
     QColor m_gradientStart;
     QColor m_gradientEnd;
     uint m_gradientAlpha;
+    FillDirection m_gradientDirection;
 };
 
 #endif
