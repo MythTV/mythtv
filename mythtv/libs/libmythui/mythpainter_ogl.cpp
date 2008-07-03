@@ -267,10 +267,13 @@ void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im,
             y2 = src.height();
         }
 
+        int width = min(src.width(), r.width());
+        int height = min(src.height(), r.height());
+
         glTexCoord2f(x1, y2); glVertex2f(r.x(), r.y());
-        glTexCoord2f(x2, y2); glVertex2f(r.x() + r.width(), r.y());
-        glTexCoord2f(x2, y1); glVertex2f(r.x() + r.width(), r.y() + r.height());
-        glTexCoord2f(x1, y1); glVertex2f(r.x(), r.y()+r.height());
+        glTexCoord2f(x2, y2); glVertex2f(r.x() + width, r.y());
+        glTexCoord2f(x2, y1); glVertex2f(r.x() + width, r.y() + height);
+        glTexCoord2f(x1, y1); glVertex2f(r.x(), r.y()+height);
     }
     glEnd();
 
