@@ -4,6 +4,7 @@
 #include "mythscreentype.h"
 #include "mythmainwindow.h"
 #include "mythuitext.h"
+#include "mythuiprogressbar.h"
 
 class MythUIBusyDialog : public MythScreenType
 {
@@ -46,7 +47,7 @@ class MythUIProgressDialog : public MythScreenType
 
     MythUIText *m_messageText;
     MythUIText *m_progressText;
-//    MythUIProgressBar *m_progressBar;
+    MythUIProgressBar *m_progressBar;
 };
 
 #endif

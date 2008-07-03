@@ -30,7 +30,7 @@ bool MythUIBusyDialog::Create(void)
 
 bool MythUIBusyDialog::keyPressEvent(QKeyEvent *event)
 {
-    // We don't want to handle any keypresses, including Escape in the base
+    // We want to handle any keypresses, including Escape in the base
     // class
     return false;
 }
@@ -58,7 +58,7 @@ bool MythUIProgressDialog::Create(void)
 
     m_messageText = dynamic_cast<MythUIText *>(GetChild("message"));
     m_progressText = dynamic_cast<MythUIText *>(GetChild("progresstext"));
-//    m_progressBar = dynamic_cast<MythUIProgressBar *>(GetChild("progressbar"));
+    m_progressBar = dynamic_cast<MythUIProgressBar *>(GetChild("progressbar"));
 
     if (m_messageText)
         m_messageText->SetText(m_message);
@@ -66,9 +66,14 @@ bool MythUIProgressDialog::Create(void)
     return true;
 }
 
+void MythUIProgressDialog::Close(void)
+{
+    GetScreenStack()->PopScreen();
+}
+
 bool MythUIProgressDialog::keyPressEvent(QKeyEvent *event)
 {
-    // We don't want to handle any keypresses, including Escape in the base
+    // We want to handle any keypresses, including Escape in the base
     // class
     return false;
 }
@@ -99,11 +104,11 @@ void MythUIProgressDialog::UpdateProgress()
         return;
     }
 
-//     if (m_progressBar)
-//     {
-//         m_progressBar->SetTotal(total);
-//         m_progressBar->SetCount(count);
-//     }
+     if (m_progressBar)
+     {
+         m_progressBar->SetTotal(m_total);
+         m_progressBar->SetUsed(m_count);
+     }
 
     uint percentage = (uint)(((float)m_count/(float)m_total) * 100.0);
 
