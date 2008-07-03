@@ -157,7 +157,7 @@
         <align>left</align>
     </textarea>
 
-    <!-- Base definition of a textarea -->
+    <!-- Base definition of a textedit -->
     <textedit name="basetextedit">
         <area>0,0,375,50</area>
         <font>basesmallblack</font>
@@ -165,6 +165,19 @@
         <margin>12</margin>
         <background filename="textedit_background.png" />
     </textedit>
+
+    <!-- Base definition of a progressbar -->
+    <progressbar name="baseprogressbar">
+        <area>0,0,10,10</area>
+        <layout>horizontal</layout>
+        <style>reveal</style>
+        <imagetype name="background">
+            <filename>progressbar_background.png</filename>
+        </imagetype>
+        <imagetype name="progressimage">
+            <filename>progressbar_fill.png</filename>
+        </imagetype>
+    </progressbar>
 
     <!-- Popup Dialogue Box -->
     <window name="MythDialogBox">
@@ -191,13 +204,31 @@
     <window name="MythBusyDialog">
         <area>305,205,191,191</area>
         <imagetype name="backimg">
-            <filename>mythdialogbox-background.png</filename>
             <filepattern low="0" high="24">busyimages/%1.png</filepattern>
             <delay>250</delay>
         </imagetype>
         <textarea name="message" from="basetextarea">
             <area>0,0,191,191</area>
             <align>center</align>
+        </textarea>
+    </window>
+
+    <window name="MythProgressDialog">
+        <area>110,217,580,165</area>
+        <imagetype name="backimg">
+            <filename>mythprogressdialog-background.png</filename>
+        </imagetype>
+        <textarea name="message" from="basetextarea">
+            <area>20,20,540,60</area>
+            <align>center</align>
+        </textarea>
+        <progressbar name="progressbar" from="baseprogressbar">
+            <position>22,90</position>
+        </progressbar>
+        <textarea name="progresstext" from="basetextarea">
+            <area>30,130,200,20</area>
+            <align>left,top</align>
+            <value>0%</value>
         </textarea>
     </window>
 
