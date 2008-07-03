@@ -70,19 +70,20 @@ Source: configuremysql.vbs; DestDir: {app}
 #endif
 
 [Icons]
-Name: {group}\Myth Frontend; Filename: {app}\mythfrontend.exe; WorkingDir: {app}
-Name: {group}\Myth Backend; Filename: {app}\mythbackend.exe; WorkingDir: {app}
-Name: {group}\Setup; Filename: {app}\mythtv-setup.exe; WorkingDir: {app}
+Name: {group}\Myth Frontend; Filename: {app}\bin\mythfrontend.exe; WorkingDir: {app}\bin
+Name: {group}\Myth Backend; Filename: {app}\bin\mythbackend.exe; WorkingDir: {app}\bin
+Name: {group}\Setup; Filename: {app}\bin\mythtv-setup.exe; WorkingDir: {app}\bin
 Name: {group}\Readme; Filename: {app}\readme.txt; WorkingDir: {app}
 Name: {group}\Uninstall {#MyAppName}; Filename: {app}\UninsHs.exe; Parameters: /u0={#MyAppName}
-Name: {group}\Utilities\MythCommFlag; Filename: {app}\mythcommflag.exe; WorkingDir: {app}
-Name: {group}\Utilities\MythFillDatabase; Filename: {app}\MythFillDatabase.exe; WorkingDir: {app}
-Name: {group}\Utilities\Mythtvosd; Filename: {app}\Mythtvosd.exe; WorkingDir: {app}
-Name: {group}\Utilities\MythWelcome; Filename: {app}\MythWelcome.exe; WorkingDir: {app}
+Name: {group}\Utilities\MythCommFlag; Filename: {app}\bin\mythcommflag.exe; WorkingDir: {app}\bin
+Name: {group}\Utilities\MythFillDatabase; Filename: {app}\bin\MythFillDatabase.exe; WorkingDir: {app}\bin
+Name: {group}\Utilities\Mythtvosd; Filename: {app}\bin\Mythtvosd.exe; WorkingDir: {app}\bin
+Name: {group}\Utilities\MythWelcome; Filename: {app}\bin\MythWelcome.exe; WorkingDir: {app}\bin
 
 [Dirs]
 Name: {app}\sqldrivers
 Name: {app}\share
+Name: {app}\bin
 Name: {app}\share\mythtv
 Name: {app}\share\mythtv\themes
 Name: {app}\share\mythtv\mythweather
@@ -113,6 +114,7 @@ Name: {app}\package_flag; Type: files
 
 Name: {app}\package_flag; Type: files
 Name: {app}\lib; Type: filesandordirs
+Name: {app}\bin; Type: filesandordirs
 Name: {app}\mythtv; Type: filesandordirs
 Name: {app}\share; Type: filesandordirs
 Name: {app}\sqldrivers; Type: filesandordirs
