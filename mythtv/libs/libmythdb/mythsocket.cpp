@@ -14,8 +14,6 @@
 #include "mythverbose.h"
 #include "compat.h"
 
-#include <pthread.h>
-
 #ifdef USING_MINGW
 #include <winsock2.h>
 #else
@@ -29,23 +27,7 @@
 
 const uint MythSocket::kSocketBufferSize = 128000;
 
-#ifndef USING_MINGW
-pthread_t MythSocket::m_readyread_thread = (pthread_t)0;
-#else
-pthread_t MythSocket::m_readyread_thread = {0, 0};
-#endif
-
-bool MythSocket::m_readyread_run = false;
-QMutex MythSocket::m_readyread_lock;
-QList<MythSocket*> MythSocket::m_readyread_list;
-QList<MythSocket*> MythSocket::m_readyread_dellist;
-QList<MythSocket*> MythSocket::m_readyread_addlist;
-
-#ifdef USING_MINGW
-HANDLE readyreadevent = NULL;
-#else
-int MythSocket::m_readyread_pipe[2] = {-1, -1};
-#endif
+MythSocketThread MythSocket::m_readyread_thread;
 
 MythSocket::MythSocket(int socket, MythSocketCBs *cb)
     : MSocketDevice(MSocketDevice::Stream),            m_cb(cb),
@@ -57,7 +39,7 @@ MythSocket::MythSocket(int socket, MythSocketCBs *cb)
         setSocket(socket);
 
     if (m_cb)
-        AddToReadyRead(this);
+        m_readyread_thread.AddToReadyRead(this);
 }
 
 MythSocket::~MythSocket()
@@ -77,9 +59,9 @@ void MythSocket::setCallbacks(MythSocketCBs *cb)
     m_cb = cb;
 
     if (m_cb)
-        AddToReadyRead(this);
+        m_readyread_thread.AddToReadyRead(this);
     else
-        RemoveFromReadyRead(this);
+        m_readyread_thread.RemoveFromReadyRead(this);
 }
 
 void MythSocket::UpRef(void)
@@ -101,7 +83,7 @@ bool MythSocket::DownRef(void)
     if (m_cb && ref == 0)
     {
         m_cb = NULL;
-        RemoveFromReadyRead(this);
+        m_readyread_thread.RemoveFromReadyRead(this);
         // thread will downref & delete obj
         return true;
     } 
@@ -581,20 +563,20 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
     list = str.split("[]:[]");
 
     m_notifyread = false;
-    WakeReadyReadThread();
+    m_readyread_thread.WakeReadyReadThread();
     return true;
 }
 
 void MythSocket::Lock(void)
 {
     m_lock.lock();
-    WakeReadyReadThread();
+    m_readyread_thread.WakeReadyReadThread();
 }
 
 void MythSocket::Unlock(void)
 {
     m_lock.unlock();
-    WakeReadyReadThread();
+    m_readyread_thread.WakeReadyReadThread();
 }
 
 /**
@@ -655,7 +637,7 @@ bool MythSocket::connect(const QHostAddress &addr, quint16 port)
         {
             VERBOSE(VB_SOCKET, LOC + "cb->connected()");
             m_cb->connected(this);
-            WakeReadyReadThread();
+            m_readyread_thread.WakeReadyReadThread();
         }
     }
     else
@@ -666,11 +648,16 @@ bool MythSocket::connect(const QHostAddress &addr, quint16 port)
     return true;
 }
 
-void MythSocket::ShutdownReadyReadThread(void)
+void ShutdownRRT(void)
+{
+    MythSocket::m_readyread_thread.ShutdownReadyReadThread();
+}
+
+void MythSocketThread::ShutdownReadyReadThread(void)
 {
     m_readyread_run = false;
     WakeReadyReadThread();
-    pthread_join(m_readyread_thread, NULL);
+    wait();
 
 #ifdef USING_MINGW
     if (readyreadevent) {
@@ -683,7 +670,7 @@ void MythSocket::ShutdownReadyReadThread(void)
 #endif
 }
 
-void MythSocket::StartReadyReadThread(void)
+void MythSocketThread::StartReadyReadThread(void)
 {
     if (m_readyread_run == false)
     {
@@ -700,14 +687,14 @@ void MythSocket::StartReadyReadThread(void)
 #endif
 
             m_readyread_run = true;
-            pthread_create(&m_readyread_thread, NULL, readyReadThread, NULL);
+            start();
 
-            atexit(ShutdownReadyReadThread);
+            atexit(ShutdownRRT);
         }
     }   
 }
 
-void MythSocket::AddToReadyRead(MythSocket *sock)
+void MythSocketThread::AddToReadyRead(MythSocket *sock)
 {
     if (sock->socket() == -1)
     {
@@ -724,7 +711,7 @@ void MythSocket::AddToReadyRead(MythSocket *sock)
     WakeReadyReadThread();
 }
 
-void MythSocket::RemoveFromReadyRead(MythSocket *sock)
+void MythSocketThread::RemoveFromReadyRead(MythSocket *sock)
 {
     m_readyread_lock.lock();
     m_readyread_dellist.append(sock);
@@ -733,7 +720,7 @@ void MythSocket::RemoveFromReadyRead(MythSocket *sock)
     WakeReadyReadThread();
 }
 
-void MythSocket::WakeReadyReadThread(void)
+void MythSocketThread::WakeReadyReadThread(void)
 {
 #ifdef USING_MINGW
     if (readyreadevent) ::SetEvent(readyreadevent);
@@ -746,7 +733,7 @@ void MythSocket::WakeReadyReadThread(void)
 #endif
 }
 
-void readyReadThread_iffound(MythSocket *sock)
+void MythSocketThread::iffound(MythSocket *sock)
 {
     VERBOSE(VB_SOCKET, SLOC(sock) + "socket is readable");
     if (sock->bytesAvailable() == 0)
@@ -768,7 +755,7 @@ void readyReadThread_iffound(MythSocket *sock)
     }
 }
 
-static bool isLocked(QMutex &mutex)
+bool MythSocketThread::isLocked(QMutex &mutex)
 {
     bool isLocked = true;
     if (mutex.tryLock())
@@ -779,9 +766,10 @@ static bool isLocked(QMutex &mutex)
     return isLocked;
 }
 
-void *MythSocket::readyReadThread(void *)
+void MythSocketThread::run(void)
 {
     VERBOSE(VB_SOCKET, "MythSocket: readyread thread start");
+
     fd_set rfds;
     MythSocket *sock;
     int maxfd;
@@ -883,7 +871,7 @@ void *MythSocket::readyReadThread(void *)
             delete[] idx;
 
             if (found)
-                readyReadThread_iffound(sock);
+                iffound(sock);
 
             ::ResetEvent(readyreadevent);
         }
@@ -908,7 +896,7 @@ void *MythSocket::readyReadThread(void *)
         while (it != m_readyread_list.end())
         {
             sock = *it;
-            if (sock->state() == Connected &&
+            if (sock->state() == MythSocket::Connected &&
                 sock->m_notifyread == false &&
                 !isLocked(sock->m_lock))
             {
@@ -930,7 +918,7 @@ void *MythSocket::readyReadThread(void *)
             while (it != m_readyread_list.end())
             {
                 sock = *it;
-                if (sock->state() == Connected &&
+                if (sock->state() == MythSocket::Connected &&
                     FD_ISSET(sock->socket(), &rfds) &&
                     !isLocked(sock->m_lock))
                 {
@@ -941,7 +929,7 @@ void *MythSocket::readyReadThread(void *)
             }
 
             if (found)
-                readyReadThread_iffound(sock);
+                iffound(sock);
 
             if (FD_ISSET(m_readyread_pipe[0], &rfds))
             {
@@ -959,7 +947,5 @@ void *MythSocket::readyReadThread(void *)
     }
 
     VERBOSE(VB_SOCKET, "MythSocket: readyread thread exit");
-
-    return NULL;
 }
 

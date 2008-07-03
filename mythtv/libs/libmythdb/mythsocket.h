@@ -1,12 +1,11 @@
 #ifndef MYTHSOCKET_H
 #define MYTHSOCKET_H
 
-#include <pthread.h>
-
 #include <QTextStream>
 #include <QString>
 #include <QStringList>
 #include <QList>
+#include <QThread>
 
 #include "mythexp.h"
 #include "msocketdevice.h"
@@ -24,9 +23,41 @@ class MPUBLIC MythSocketCBs
     virtual void connectionClosed(MythSocket*) = 0;
 };
 
+class MPUBLIC MythSocketThread : public QThread
+{
+  public:
+    MythSocketThread() : QThread(), m_readyread_run(false) {}
+
+    virtual void run();
+
+    void StartReadyReadThread(void);
+    void WakeReadyReadThread(void);
+    void ShutdownReadyReadThread(void);
+
+    void AddToReadyRead(MythSocket *sock);
+    void RemoveFromReadyRead(MythSocket *sock);
+
+  private:
+    void iffound(MythSocket *sock);
+    bool isLocked(QMutex &mutex);
+
+    bool m_readyread_run;
+    QMutex m_readyread_lock;
+    QList<MythSocket*> m_readyread_list;
+    QList<MythSocket*> m_readyread_dellist;
+    QList<MythSocket*> m_readyread_addlist;
+#ifdef USING_MINGW
+    HANDLE readyreadevent;
+#else
+    int m_readyread_pipe[2];
+#endif
+};
+
+
 class MPUBLIC MythSocket : public MSocketDevice
 {
-    friend void readyReadThread_iffound(MythSocket*);
+    friend class MythSocketThread;
+    friend void ShutdownRRT(void);
 
   public:
     MythSocket(int socket = -1, MythSocketCBs *cb = NULL);
@@ -85,21 +116,7 @@ class MPUBLIC MythSocket : public MSocketDevice
     QMutex          m_ref_lock;
     QMutex          m_lock;
 
-    static pthread_t            m_readyread_thread;
-    static bool                 m_readyread_run;
-    static QMutex               m_readyread_lock;
-    static QList<MythSocket*>   m_readyread_list;
-    static QList<MythSocket*>   m_readyread_dellist;
-    static QList<MythSocket*>   m_readyread_addlist;
-    static int                  m_readyread_pipe[2];
-
-    static void StartReadyReadThread(void);
-    static void *readyReadThread(void *);
-
-    static void AddToReadyRead(MythSocket *sock);
-    static void RemoveFromReadyRead(MythSocket *sock);
-    static void WakeReadyReadThread(void);
-    static void ShutdownReadyReadThread(void);
+    static MythSocketThread m_readyread_thread;
 
     friend class QList<MythSocket*>;
 };
