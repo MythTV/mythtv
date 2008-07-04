@@ -10,6 +10,10 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdialogs.h>
 
+// MythUI headers
+#include <mythtv/libmythui/mythscreenstack.h>
+#include <mythtv/libmythui/mythprogressdialog.h>
+
 // MythMusic headers
 #include "decoder.h"
 #include "maddecoder.h"
@@ -313,11 +317,25 @@ void FileScanner::AddFileToDB(const QString &filename)
  */
 void FileScanner::cleanDB()
 {
-    MythProgressDialog *clean_progress;
-    clean_progress = new MythProgressDialog(
-        QObject::tr("Cleaning music database"), 4);
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    int counter = 0;
+    QString message = QObject::tr("Cleaning music database");
+    MythUIProgressDialog *clean_progress = new MythUIProgressDialog(message,
+                                                    popupStack,
+                                                    "cleaningprogressdialog");
+
+    if (clean_progress->Create())
+    {
+        popupStack->AddScreen(clean_progress, false);
+        clean_progress->SetTotal(4);
+    }
+    else
+    {
+        delete clean_progress;
+        clean_progress = NULL;
+    }
+
+    uint counter = 0;
 
     MSqlQuery query(MSqlQuery::InitCon());
     MSqlQuery deletequery(MSqlQuery::InitCon());
@@ -331,7 +349,9 @@ void FileScanner::cleanDB()
         deletequery.bindValue(":GENREID", genreid);
         deletequery.exec();
     }
-    clean_progress->setProgress(++counter);
+
+    if (clean_progress)
+        clean_progress->SetCount(++counter);
 
     query.exec("SELECT a.album_id FROM music_albums a LEFT JOIN music_songs s "
                "ON a.album_id=s.album_id WHERE s.album_id IS NULL;");
@@ -342,7 +362,9 @@ void FileScanner::cleanDB()
         deletequery.bindValue(":ALBUMID", albumid);
         deletequery.exec();
     }
-    clean_progress->setProgress(++counter);
+
+    if (clean_progress)
+        clean_progress->SetCount(++counter);
 
     query.exec("SELECT a.artist_id FROM music_artists a "
                "LEFT JOIN music_songs s ON a.artist_id=s.artist_id "
@@ -355,7 +377,9 @@ void FileScanner::cleanDB()
         deletequery.bindValue(":ARTISTID", artistid);
         deletequery.exec();
     }
-    clean_progress->setProgress(++counter);
+
+    if (clean_progress)
+        clean_progress->SetCount(++counter);
 
     query.exec("SELECT a.albumart_id FROM music_albumart a LEFT JOIN "
                "music_songs s ON a.song_id=s.song_id WHERE "
@@ -367,10 +391,12 @@ void FileScanner::cleanDB()
         deletequery.bindValue(":ALBUMARTID", albumartid);
         deletequery.exec();
     }
-    clean_progress->setProgress(++counter);
 
-    clean_progress->Close();
-    clean_progress->deleteLater();
+    if (clean_progress)
+    {
+        clean_progress->SetCount(++counter);
+        clean_progress->Close();
+    }
 }
 
 /*!
@@ -501,19 +527,41 @@ void FileScanner::SearchDir(QString &directory)
     MusicLoadedMap music_files;
     MusicLoadedMap::Iterator iter;
 
-    MythBusyDialog *busy = new MythBusyDialog(
-        QObject::tr("Searching for music files"));
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    busy->start();
+    QString message = QObject::tr("Searching for music files");
+
+    MythUIBusyDialog *busy = new MythUIBusyDialog(message, popupStack,
+                                                  "musicscanbusydialog");
+
+    if (busy->Create())
+        popupStack->AddScreen(busy, false);
+    else
+        busy = NULL;
+
     BuildFileList(m_startdir, music_files, 0);
-    busy->Close();
-    busy->deleteLater();
+
+    if (busy)
+        busy->Close();
 
     ScanMusic(music_files);
     ScanArtwork(music_files);
 
-    MythProgressDialog *file_checking = new MythProgressDialog(
-        QObject::tr("Updating music database"), music_files.size());
+    message = QObject::tr("Updating music database");
+    MythUIProgressDialog *file_checking = new MythUIProgressDialog(message,
+                                                    popupStack,
+                                                    "scalingprogressdialog");
+
+    if (file_checking->Create())
+    {
+        popupStack->AddScreen(file_checking, false);
+        file_checking->SetTotal(music_files.size());
+    }
+    else
+    {
+        delete file_checking;
+        file_checking = NULL;
+    }
 
      /*
        This can be optimised quite a bit by consolidating all commands
@@ -528,7 +576,7 @@ void FileScanner::SearchDir(QString &directory)
        3) UpdateFileInDB, same as 1.
      */
 
-    int counter = 0;
+    uint counter = 0;
     for (iter = music_files.begin(); iter != music_files.end(); iter++)
     {
         if (*iter == kFileSystem)
@@ -538,10 +586,11 @@ void FileScanner::SearchDir(QString &directory)
         else if (*iter == kNeedUpdate)
             UpdateFileInDB(iter.key());
 
-        file_checking->setProgress(++counter);
+        if (file_checking)
+            file_checking->SetCount(++counter);
     }
-    file_checking->Close();
-    file_checking->deleteLater();
+    if (file_checking)
+        file_checking->Close();
 
     // Cleanup orphaned entries from the database
     cleanDB();
@@ -564,11 +613,25 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
                "ON music_songs.directory_id=music_directories.directory_id "
                "WHERE filename NOT LIKE ('%://%')");
 
-    int counter = 0;
+    uint counter = 0;
 
-    MythProgressDialog *file_checking;
-    file_checking = new MythProgressDialog(
-        QObject::tr("Scanning music files"), query.size());
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    QString message = QObject::tr("Scanning music files");
+    MythUIProgressDialog *file_checking = new MythUIProgressDialog(message,
+                                                    popupStack,
+                                                    "scalingprogressdialog");
+
+    if (file_checking->Create())
+    {
+        popupStack->AddScreen(file_checking, false);
+        file_checking->SetTotal(query.size());
+    }
+    else
+    {
+        delete file_checking;
+        file_checking = NULL;
+    }
 
     QString name;
 
@@ -584,7 +647,7 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
                 {
                     if (music_files[name] == kDatabase)
                     {
-                        file_checking->setProgress(++counter);
+                        file_checking->SetCount(++counter);
                         continue;
                     }
                     else if (HasFileChanged(name, query.value(1).toString()))
@@ -597,12 +660,11 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
                     music_files[name] = kDatabase;
                 }
             }
-            file_checking->setProgress(++counter);
+            file_checking->SetCount(++counter);
         }
     }
 
     file_checking->Close();
-    file_checking->deleteLater();
 }
 
 /*!
@@ -622,11 +684,25 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
                "ON music_albumart.directory_id=music_directories.directory_id "
                "WHERE music_albumart.embedded=0");
 
-    int counter = 0;
+    uint counter = 0;
 
-    MythProgressDialog *file_checking;
-    file_checking = new MythProgressDialog(
-        QObject::tr("Scanning Album Artwork"), query.size());
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    QString message = QObject::tr("Scanning Album Artwork");
+    MythUIProgressDialog *file_checking = new MythUIProgressDialog(message,
+                                                    popupStack,
+                                                    "albumprogressdialog");
+
+    if (file_checking->Create())
+    {
+        popupStack->AddScreen(file_checking, false);
+        file_checking->SetTotal(query.size());
+    }
+    else
+    {
+        delete file_checking;
+        file_checking = NULL;
+    }
 
     if (query.isActive() && query.size() > 0)
     {
@@ -642,7 +718,8 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
                 {
                     if (music_files[name] == kDatabase)
                     {
-                        file_checking->setProgress(++counter);
+                        if (file_checking)
+                            file_checking->SetCount(++counter);
                         continue;
                     }
                     else
@@ -653,10 +730,11 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
                     music_files[name] = kDatabase;
                 }
             }
-            file_checking->setProgress(++counter);
+            if (file_checking)
+                file_checking->SetCount(++counter);
         }
     }
 
-    file_checking->Close();
-    file_checking->deleteLater();
+    if (file_checking)
+        file_checking->Close();
 }
