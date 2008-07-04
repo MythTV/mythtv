@@ -804,9 +804,10 @@ void reloadTheme(void)
 
     GetMythUI()->LoadQtConfig();
     GetMythMainWindow()->Init();
-    GetMythUI()->UpdateImageCache();
 
     themeBase->Reload();
+    GetMythUI()->UpdateImageCache();
+
     menu->ReloadTheme();
 
     if (!menu->foundTheme())
@@ -1423,8 +1424,8 @@ int main(int argc, char **argv)
     gContext->SetMainWindow(mainWindow);
     mainWindow->setWindowTitle(QObject::tr("MythTV Frontend"));
 
-    GetMythUI()->UpdateImageCache();
     themeBase = new MythThemeBase();
+    GetMythUI()->UpdateImageCache();
 
     LanguageSettings::prompt();
 

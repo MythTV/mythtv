@@ -23,6 +23,7 @@
 #include "x11colors.h"
 #include "util-x11.h"
 #include "DisplayRes.h"
+#include "mythprogressdialog.h"
 
 static MythUIHelper *mythui = NULL;
 static QMutex uiLock;
@@ -555,13 +556,29 @@ void MythUIHelper::CacheThemeImagesDirectory(const QString &dirname,
     if (!dir.exists())
         return;
 
-    //MythProgressDialog *caching = NULL;
+    MythUIProgressDialog *caching = NULL;
     QFileInfoList list = dir.entryInfoList();
 
-    //if (subdirname.length() == 0)
-    //    caching = new MythProgressDialog(QObject::tr("Pre-scaling theme images"),
-    //                                     list.count());
-    int progress = 0;
+    if (subdirname.length() == 0)
+    {
+        MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+        QString message = QObject::tr("Pre-scaling theme images");
+        caching = new MythUIProgressDialog(message, popupStack,
+                                                    "scalingprogressdialog");
+
+        if (caching->Create())
+        {
+            popupStack->AddScreen(caching, false);
+            caching->SetTotal(list.count());
+        }
+        else
+        {
+            delete caching;
+            caching = NULL;
+        }
+    }
+    uint progress = 0;
 
     QString destdir = d->themecachedir;
     if (subdirname.length() > 0)
@@ -573,8 +590,9 @@ void MythUIHelper::CacheThemeImagesDirectory(const QString &dirname,
     while (it != list.end())
     {
         fi = &(*it++);
-        //if (caching)
-        //    caching->setProgress(progress);
+        if (caching)
+            caching->SetCount(progress);
+        qApp->processEvents();
         progress++;
 
         if (fi->fileName() == "." || fi->fileName() == "..")
@@ -625,11 +643,8 @@ void MythUIHelper::CacheThemeImagesDirectory(const QString &dirname,
         }
     }
 
-    //if (caching)
-    //{
-    //    caching->Close();
-    //    caching->deleteLater();
-    //}
+    if (caching)
+        caching->Close();
 }
 
 void MythUIHelper::GetScreenBounds(int &xbase, int &ybase,

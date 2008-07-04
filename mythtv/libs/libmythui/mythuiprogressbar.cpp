@@ -84,11 +84,11 @@ void MythUIProgressBar::CalculatePosition(void)
     int current = m_current-m_start;
     float percentage = 0.0;
 
-    if (total > 0 && current < total)
-    {
-        percentage = (float)current / (float)total;
-        progressImage->SetVisible(true);
-    }
+    if (total <= 0 || current <= 0 || current > total)
+        return;
+
+    percentage = (float)current / (float)total;
+    progressImage->SetVisible(true);
 
     QRect fillArea = progressImage->GetArea();
 
@@ -130,7 +130,6 @@ void MythUIProgressBar::CalculatePosition(void)
 
     progressImage->SetCropRect(x,y,width,height);
     SetRedraw();
-    qApp->processEvents();
 }
 
 void MythUIProgressBar::CopyFrom(MythUIType *base)
