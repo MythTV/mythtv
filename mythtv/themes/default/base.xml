@@ -202,14 +202,18 @@
     </window>
 
     <window name="MythBusyDialog">
-        <area>305,205,191,191</area>
+        <area>110,217,580,165</area>
         <imagetype name="backimg">
+            <filename>mythprogressdialog-background.png</filename>
+        </imagetype>
+        <imagetype name="animation">
+            <position>35,30</position>
             <filepattern low="0" high="24">busyimages/%1.png</filepattern>
             <delay>250</delay>
         </imagetype>
         <textarea name="message" from="basetextarea">
-            <area>0,0,191,191</area>
-            <align>center</align>
+            <area>170,20,390,125</area>
+            <align>allcenter</align>
         </textarea>
     </window>
 
@@ -220,7 +224,7 @@
         </imagetype>
         <textarea name="message" from="basetextarea">
             <area>20,20,540,60</area>
-            <align>center</align>
+            <align>allcenter</align>
         </textarea>
         <progressbar name="progressbar" from="baseprogressbar">
             <position>22,80</position>
