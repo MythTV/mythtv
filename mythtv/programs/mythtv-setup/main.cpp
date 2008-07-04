@@ -313,8 +313,8 @@ int main(int argc, char *argv[])
     gContext->SetMainWindow(mainWindow);
     mainWindow->setWindowTitle(QObject::tr("MythTV Setup"));
 
-    GetMythUI()->UpdateImageCache();
     MythThemeBase *themeBase = new MythThemeBase();
+    GetMythUI()->UpdateImageCache();
     (void) themeBase;
 
     LanguageSettings::prompt();
