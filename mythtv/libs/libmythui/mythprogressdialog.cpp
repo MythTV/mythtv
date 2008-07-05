@@ -84,7 +84,7 @@ void MythUIProgressDialog::SetTotal(uint total)
     UpdateProgress();
 }
 
-void MythUIProgressDialog::SetCount(uint count)
+void MythUIProgressDialog::SetProgress(uint count)
 {
     m_count = count;
     UpdateProgress();

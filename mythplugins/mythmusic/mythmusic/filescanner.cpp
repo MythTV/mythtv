@@ -351,7 +351,7 @@ void FileScanner::cleanDB()
     }
 
     if (clean_progress)
-        clean_progress->SetCount(++counter);
+        clean_progress->SetProgress(++counter);
 
     query.exec("SELECT a.album_id FROM music_albums a LEFT JOIN music_songs s "
                "ON a.album_id=s.album_id WHERE s.album_id IS NULL;");
@@ -364,7 +364,7 @@ void FileScanner::cleanDB()
     }
 
     if (clean_progress)
-        clean_progress->SetCount(++counter);
+        clean_progress->SetProgress(++counter);
 
     query.exec("SELECT a.artist_id FROM music_artists a "
                "LEFT JOIN music_songs s ON a.artist_id=s.artist_id "
@@ -379,7 +379,7 @@ void FileScanner::cleanDB()
     }
 
     if (clean_progress)
-        clean_progress->SetCount(++counter);
+        clean_progress->SetProgress(++counter);
 
     query.exec("SELECT a.albumart_id FROM music_albumart a LEFT JOIN "
                "music_songs s ON a.song_id=s.song_id WHERE "
@@ -394,7 +394,7 @@ void FileScanner::cleanDB()
 
     if (clean_progress)
     {
-        clean_progress->SetCount(++counter);
+        clean_progress->SetProgress(++counter);
         clean_progress->Close();
     }
 }
@@ -587,7 +587,7 @@ void FileScanner::SearchDir(QString &directory)
             UpdateFileInDB(iter.key());
 
         if (file_checking)
-            file_checking->SetCount(++counter);
+            file_checking->SetProgress(++counter);
     }
     if (file_checking)
         file_checking->Close();
@@ -647,7 +647,7 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
                 {
                     if (music_files[name] == kDatabase)
                     {
-                        file_checking->SetCount(++counter);
+                        file_checking->SetProgress(++counter);
                         continue;
                     }
                     else if (HasFileChanged(name, query.value(1).toString()))
@@ -660,7 +660,7 @@ void FileScanner::ScanMusic(MusicLoadedMap &music_files)
                     music_files[name] = kDatabase;
                 }
             }
-            file_checking->SetCount(++counter);
+            file_checking->SetProgress(++counter);
         }
     }
 
@@ -719,7 +719,7 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
                     if (music_files[name] == kDatabase)
                     {
                         if (file_checking)
-                            file_checking->SetCount(++counter);
+                            file_checking->SetProgress(++counter);
                         continue;
                     }
                     else
@@ -731,7 +731,7 @@ void FileScanner::ScanArtwork(MusicLoadedMap &music_files)
                 }
             }
             if (file_checking)
-                file_checking->SetCount(++counter);
+                file_checking->SetProgress(++counter);
         }
     }
 

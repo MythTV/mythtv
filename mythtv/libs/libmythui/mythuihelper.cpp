@@ -591,7 +591,7 @@ void MythUIHelper::CacheThemeImagesDirectory(const QString &dirname,
     {
         fi = &(*it++);
         if (caching)
-            caching->SetCount(progress);
+            caching->SetProgress(progress);
         qApp->processEvents();
         progress++;
 
