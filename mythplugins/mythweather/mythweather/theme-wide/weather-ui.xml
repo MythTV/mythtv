@@ -26,7 +26,7 @@
             <dropcolor>#000000</dropcolor>
             <size>14</size>
             <shadow>1,1</shadow>
-            <bold>yes</bold>
+            <bold>no</bold>
         </font>
         
         <font name="weatherdata" face="Bitstream Vera Sans">
@@ -103,16 +103,6 @@
         </font>
         
         <container name="background">
-            <image name="backup" draworder="0">
-                <filename>mw-background.png</filename>
-                <position>22,175</position>
-            </image>
-            
-            <image name="lines" draworder="0">
-                <filename>mw-lines.png</filename>
-                <position>22,175</position>
-            </image>
-            
             <image name="logo" draworder="0">
                 <filename>logo.png</filename>
                 <position>25,25</position>
@@ -127,21 +117,18 @@
                 <filename>trans-backup.png</filename>
                 <position>0,0</position>
             </image>
-            
             <image name="logo" draworder="0">
                 <filename>logo.png</filename>
-                <position>400,200</position>
+                <position>520,200</position>
             </image>
-            
             <textarea name="loading" align="right">
                 <font>header</font>
-                <area>30,170,400,50</area>
+                <area>130,170,400,50</area>
                 <value>loading...</value>
             </textarea>
-            
             <textarea name="retrieve" align="center">
                 <font>header</font>
-                <area>0,480,800,42</area>
+                <area>0,480,1280,42</area>
                 <value>[ retrieving weather data ... ]</value>
             </textarea>
         </container>
@@ -149,97 +136,102 @@
         <container name="Current Conditions">
             <area>0,0,1280,720</area>
             
-            <textarea name="*currentdatetime" draworder="2" align="right">
-                <font>timedate</font>
-                <area>830,185,360,40</area>
-            </textarea>
-            <textarea name="+cclocation" draworder="5">
-                <area>39,181,700,35</area>
-                <font>footer</font>
-            </textarea>
-            <textarea name="*pause_text" draworder="5" align="right">
-                <area>60,181,700,35</area>
-                <font>footer</font>
-            </textarea>
+            <image name="backup" draworder="0">
+                <filename>mw-background.png</filename>
+                <position>37,175</position>
+            </image>
+            <image name="lines" draworder="0">
+                <filename>mw-lines.png</filename>
+                <position>37,175</position>
+            </image>
             <textarea name="header" draworder="5" align="center">
                 <area>0,18,1280,45</area>
                 <font>header</font>
                 <value>Current Conditions</value>
+            </textarea>            
+            <textarea name="*currentdatetime" draworder="2" align="left">
+                <font>timedate</font>
+                <area>40,625,360,40</area>
+            </textarea>
+            <textarea name="+cclocation" draworder="5" align="center">
+                <area>0,181,1280,35</area>
+                <font>footer</font>
+            </textarea>
+            <textarea name="*pause_text" draworder="5" align="center">
+                <area>0,60,1280,35</area>
+                <font>footer</font>
             </textarea>
             <textarea name="humiditylbl" draworder="5">
-                <area>40,240,245,32</area>
+                <area>290,240,245,32</area>
                 <font>weatherdata</font>
                 <value>Humidity</value>
             </textarea>
             <textarea name="+relative_humidity" draworder="5" align="right">
-                <area>230,240,300,32</area>
+                <area>480,240,300,32</area>
                 <font>weatherdata</font>
             </textarea>
             <textarea name="pressurelbl" draworder="5">
-                <area>40,288,245,32</area>
+                <area>290,288,245,32</area>
                 <font>weatherdata</font>
                 <value>Pressure</value>
             </textarea>
             <textarea name="+pressure" draworder="5" align="right">
-                <area>230,288,300,32</area>
+                <area>480,288,300,32</area>
                 <font>weatherdata</font>
             </textarea>
             <textarea name="windlbl" draworder="5">
-                <area>40,336,245,32</area>
+                <area>290,336,245,32</area>
                 <font>weatherdata</font>
                 <value>Wind(Gust)</value>
             </textarea>
-            
             <textarea name="+wind_spdgst" draworder="5" align="right">
-                <area>230,336,300,32</area>
+                <area>480,336,300,32</area>
                 <font>weatherdata</font>
             </textarea>
-            
             <textarea name="dirlbl" draworder="5">
-                <area>40,384,245,32</area>
+                <area>290,384,245,32</area>
                 <font>weatherdata</font>
                 <value>Wind Direction</value>
             </textarea>
             <textarea name="+wind_dir" draworder="5" align="right">
-                <area>230,384,300,32</area>
+                <area>480,384,300,32</area>
                 <font>weatherdata</font>
             </textarea>
             <textarea name="visilbl" draworder="5">
-                <area>40,432,245,32</area>
+                <area>290,432,245,32</area>
                 <font>weatherdata</font>
                 <value>Visibility</value>
             </textarea>
             <textarea name="+visibility" draworder="5" align="right">
-                <area>230,432,300,32</area>
+                <area>480,432,300,32</area>
                 <font>weatherdata</font>
             </textarea>
             <textarea name="apptlbl" draworder="5">
-                <area>40,480,245,32</area>
+                <area>290,480,245,32</area>
                 <font>weatherdata</font>
                 <value>Feels Like</value>
             </textarea>
             <textarea name="+appt" draworder="5" align="right">
-                <area>230,480,300,32</area>
+                <area>480,480,300,32</area>
                 <font>weatherdata</font>
             </textarea>
             <textarea name="+temp" draworder="5" align="allcenter">
                 <cutdown>no</cutdown>
-                <area>545,437,227,70</area>
+                <area>795,437,227,70</area>
                 <font>temp</font>
             </textarea>
             <textarea name="+weather" draworder="5" align="allcenter">
-                <area>545,370,227,78</area>
+                <area>795,370,227,78</area>
                 <font>weatherdata</font>
                 <multiline>yes</multiline>
             </textarea>
             <image name="+weather_icon" draworder="3">
-                <position>555,226</position>
+                <position>805,226</position>
                 <filename>unknown.png</filename>
                 <staticsize>200,150</staticsize>
             </image>
-            
-            <textarea name="+observation_time" draworder="5">
-                <area>39,540,450,35</area>
+            <textarea name="+observation_time" draworder="5" align="center">
+                <area>0,540,1280,35</area>
                 <font>footer</font>
             </textarea>
         </container>
@@ -247,303 +239,309 @@
         <container name="Three Day Forecast">
             <area>0,0,1280,720</area>
             
-            <textarea name="+3dlocation" draworder="5" align="left">
-                <area>39,181,450,70</area>
+            <image name="backup" draworder="0">
+                <filename>mw-background.png</filename>
+                <position>37,175</position>
+            </image>
+            <image name="lines" draworder="0">
+                <filename>mw-lines.png</filename>
+                <position>37,175</position>
+            </image>            
+            <textarea name="+3dlocation" draworder="5" align="center">
+                <area>0,181,1280,35</area>
                 <font>location</font>
                 <multiline>yes</multiline>
             </textarea>
-            <textarea name="*currentdatetime" draworder="2" align="right">
+            <textarea name="*currentdatetime" draworder="2" align="left">
                 <font>timedate</font>
-                <area>830,185,360,40</area>
+                <area>40,625,360,40</area>
             </textarea>
-            
-            <textarea name="*pause_text" draworder="5" align="right">
-                <area>60,540,700,35</area>
+            <textarea name="*pause_text" draworder="5" align="center">
+                <area>0,60,1280,35</area>
                 <font>footer</font>
             </textarea>
-            
             <textarea name="header" draworder="5" align="center">
                 <area>0,18,1280,45</area>
                 <font>header</font>
                 <value>Three Day Forecast</value>
             </textarea>
             <textarea name="+date-0" draworder="5" align="center">
-                <area>40,230,230,32</area>
+                <area>60,230,230,32</area>
                 <font>weatherdata</font>
             </textarea>
             <image name="+icon-0" draworder="6">
-                <position>55,265</position>
+                <position>75,265</position>
                 <staticsize>200,150</staticsize>
             </image>
-            
             <textarea name="lolbl0" draworder="5" align="center">
-                <area>50,465,100,32</area>
+                <area>70,465,100,32</area>
                 <font>lohifont</font>
                 <value>Low</value>
             </textarea>
             <textarea name="hilbl0" draworder="5" align="center">
-                <area>50,420,100,32</area>
+                <area>70,420,100,32</area>
                 <font>lohifont</font>
                 <value>High</value>
             </textarea>
             <textarea name="+low-0" draworder="5" align="center">
-                <area>160,465,100,32</area>
+                <area>180,465,100,32</area>
                 <cutdown>no</cutdown>
                 <font>tempdata</font>
             </textarea>
             <textarea name="+high-0" draworder="5" align="center">
-                <area>160,420,100,32</area>
+                <area>180,420,100,32</area>
                 <cutdown>no</cutdown>
                 <font>tempdata</font>
             </textarea>
             <textarea name="+date-1" draworder="5" align="center">
-                <area>500,230,235,32</area>
+                <area>520,230,235,32</area>
                 <font>weatherdata</font>
             </textarea>
             <image name="+icon-1" draworder="6">
-                <position>520,265</position>
+                <position>540,265</position>
                 <staticsize>200,150</staticsize>
             </image>
-            
             <textarea name="lolbl1" draworder="5" align="center">
-                <area>520,465,100,32</area>
+                <area>540,465,100,32</area>
                 <font>lohifont</font>
                 <value>Low</value>
             </textarea>
             <textarea name="hilbl1" draworder="5" align="center">
-                <area>520,420,100,32</area>
+                <area>540,420,100,32</area>
                 <font>lohifont</font>
                 <value>High</value>
             </textarea>
             <textarea name="+low-1" draworder="5" align="center">
-                <area>620,465,100,32</area>
+                <area>640,465,100,32</area>
                 <font>tempdata</font>
                 <cutdown>no</cutdown>
             </textarea>
             <textarea name="+high-1" draworder="5" align="center">
-                <area>620,420,100,32</area>
+                <area>640,420,100,32</area>
                 <font>tempdata</font>
                 <cutdown>no</cutdown>
             </textarea>
             <textarea name="+date-2" draworder="5" align="center">
-                <area>930,230,235,32</area>
+                <area>990,230,235,32</area>
                 <font>weatherdata</font>
             </textarea>
             <image name="+icon-2" draworder="6">
-                <position>945,265</position>
+                <position>1005,265</position>
                 <staticsize>200,150</staticsize>
             </image>
-            
             <textarea name="lolbl2" draworder="5" align="center">
-                <area>940,465,100,32</area>
+                <area>1000,465,100,32</area>
                 <font>lohifont</font>
                 <value>Low</value>
             </textarea>
             <textarea name="hilbl2" draworder="5" align="center">
-                <area>940,420,100,32</area>
+                <area>1000,420,100,32</area>
                 <font>lohifont</font>
                 <value>High</value>
             </textarea>
             <textarea name="+low-2" draworder="5" align="center">
-                <area>1050,465,100,32</area>
+                <area>1110,465,100,32</area>
                 <font>tempdata</font>
                 <cutdown>no</cutdown>
             </textarea>
             <textarea name="+high-2" draworder="5" align="center">
-                <area>1050,420,100,32</area>
+                <area>1110,420,100,32</area>
                 <font>tempdata</font>
                 <cutdown>no</cutdown>
             </textarea>
-            <textarea name="+updatetime" draworder="5">
-                <area>39,540,700,35</area>
+            <textarea name="+updatetime" draworder="5" align="center">
+                <area>0,540,1280,35</area>
                 <font>footer</font>
             </textarea>
         </container>
         
         <container name="Six Day Forecast">
             <area>0,0,1280,720</area>
-            
+
+            <image name="backup" draworder="0">
+                <filename>mw-background.png</filename>
+                <position>37,175</position>
+            </image>
+            <image name="lines" draworder="0">
+                <filename>mw-lines.png</filename>
+                <position>37,175</position>
+            </image>           
             <textarea name="+6dlocation" draworder="5" align="center">
-                <area>175,80,450,70</area>
+                <area>0,181,1280,35</area>
                 <font>location</font>
                 <multiline>yes</multiline>
             </textarea>
-            <textarea name="*currentdatetime" draworder="2" align="right">
+            <textarea name="*currentdatetime" draworder="2" align="left">
                 <font>timedate</font>
-                <area>630,12,160,40</area>
+                <area>40,625,360,40</area>
             </textarea>
-            <textarea name="*pause_text" draworder="5" align="right">
-                <area>60,540,700,35</area>
+            <textarea name="*pause_text" draworder="5" align="center">
+                <area>0,60,1280,35</area>
                 <font>footer</font>
             </textarea>
-
             <textarea name="header" draworder="5" align="center">
-                <area>0,18,800,45</area>
+                <area>0,18,1280,45</area>
                 <font>header</font>
                 <value>Six Day Forecast</value>
             </textarea>
-
             <textarea name="+date-0" draworder="5" align="center">
-                <area>40,140,233,25</area>
+                <area>70,250,140,25</area>
                 <font>label</font>
             </textarea>
             <textarea name="+date-1" draworder="5" align="center">
-                <area>283,140,233,25</area>
+                <area>270,250,140,25</area>
                 <font>label</font>
             </textarea>
             <textarea name="+date-2" draworder="5" align="center">
-                <area>526,140,233,25</area>
+                <area>470,250,140,25</area>
                 <font>label</font>
             </textarea>
             <textarea name="+date-3" draworder="5" align="center">
-                <area>40,340,233,25</area>
+                <area>670,250,140,25</area>
                 <font>label</font>
             </textarea>
             <textarea name="+date-4" draworder="5" align="center">
-                <area>283,340,233,25</area>
+                <area>870,250,140,25</area>
                 <font>label</font>
             </textarea>
             <textarea name="+date-5" draworder="5" align="center">
-                <area>526,340,233,25</area>
+                <area>1070,250,140,25</area>
                 <font>label</font>
             </textarea>
             <image name="+icon-0" draworder="6">
-                <position>73,165</position>
+                <position>60,285</position>
                 <staticsize>167,125</staticsize>
             </image>
             <image name="+icon-1" draworder="6">
-                <position>316,165</position>
+                <position>260,285</position>
                 <staticsize>167,125</staticsize>
             </image>
             <image name="+icon-2" draworder="6">
-                <position>559,165</position>
+                <position>460,285</position>
                 <staticsize>167,125</staticsize>
             </image>
             <image name="+icon-3" draworder="6">
-                <position>73,365</position>
+                <position>660,285</position>
                 <staticsize>167,125</staticsize>
             </image>
             <image name="+icon-4" draworder="6">
-                <position>316,365</position>
+                <position>860,285</position>
                 <staticsize>167,125</staticsize>
             </image>
             <image name="+icon-5" draworder="6">
-                <position>559,365</position>
+                <position>1060,285</position>
                 <staticsize>167,125</staticsize>
             </image>
-            
-            <textarea name="hilbl0" draworder="5" align="left">
-                <area>70,297,100,30</area>
+            <textarea name="hilbl0" draworder="5" align="center">
+                <area>60,435,100,30</area>
                 <font>lohifont2</font>
                 <value>High</value>
             </textarea>
-            <textarea name="hilbl1" draworder="5" align="left">
-                <area>313,297,100,30</area>
+            <textarea name="hilbl1" draworder="5" align="center">
+                <area>260,435,100,30</area>
                 <font>lohifont2</font>
                 <value>High</value>
             </textarea>
-            <textarea name="hilbl2" draworder="5" align="left">
-                <area>556,297,100,30</area>
+            <textarea name="hilbl2" draworder="5" align="center">
+                <area>460,435,100,30</area>
                 <font>lohifont2</font>
                 <value>High</value>
             </textarea>
-            <textarea name="hilbl3" draworder="5" align="left">
-                <area>70,497,100,30</area>
+            <textarea name="hilbl3" draworder="5" align="center">
+                <area>660,435,100,30</area>
                 <font>lohifont2</font>
                 <value>High</value>
             </textarea>
-            <textarea name="hilbl4" draworder="5" align="left">
-                <area>313,497,100,30</area>
+            <textarea name="hilbl4" draworder="5" align="center">
+                <area>860,435,100,30</area>
                 <font>lohifont2</font>
                 <value>High</value>
             </textarea>
-            <textarea name="hilbl5" draworder="5" align="left">
-                <area>556,497,100,30</area>
+            <textarea name="hilbl5" draworder="5" align="center">
+                <area>1060,435,100,30</area>
                 <font>lohifont2</font>
                 <value>High</value>
             </textarea>
-            <textarea name="lolbl0" draworder="5" align="left">
-                <area>170,297,100,30</area>
+            <textarea name="lolbl0" draworder="5" align="center">
+                <area>60,470,100,30</area>
                 <font>lohifont2</font>
                 <value>Low</value>
             </textarea>
-            <textarea name="lolbl1" draworder="5" align="left">
-                <area>413,297,100,30</area>
+            <textarea name="lolbl1" draworder="5" align="center">
+                <area>260,470,100,30</area>
                 <font>lohifont2</font>
                 <value>Low</value>
             </textarea>
-            <textarea name="lolbl2" draworder="5" align="left">
-                <area>656,297,100,30</area>
+            <textarea name="lolbl2" draworder="5" align="center">
+                <area>460,470,100,30</area>
                 <font>lohifont2</font>
                 <value>Low</value>
             </textarea>
-            <textarea name="lolbl3" draworder="5" align="left">
-                <area>170,497,100,30</area>
+            <textarea name="lolbl3" draworder="5" align="center">
+                <area>660,470,100,30</area>
                 <font>lohifont2</font>
                 <value>Low</value>
             </textarea>
-            <textarea name="lolbl4" draworder="5" align="left">
-                <area>413,497,100,30</area>
+            <textarea name="lolbl4" draworder="5" align="center">
+                <area>860,470,100,30</area>
                 <font>lohifont2</font>
                 <value>Low</value>
             </textarea>
-            <textarea name="lolbl5" draworder="5" align="left">
-                <area>656,497,100,30</area>
+            <textarea name="lolbl5" draworder="5" align="center">
+                <area>1060,470,100,30</area>
                 <font>lohifont2</font>
                 <value>Low</value>
             </textarea>
-            
-            <textarea name="+high-0" draworder="5" align="left">
-                <area>120,297,40,20</area>
+            <textarea name="+high-0" draworder="5" align="center">
+                <area>145,435,80,30</area>
                 <font>tempdata2</font>
             </textarea>
-            <textarea name="+high-1" draworder="5" align="left">
-                <area>363,297,40,20</area>
+            <textarea name="+high-1" draworder="5" align="center">
+                <area>345,435,80,30</area>
                 <font>tempdata2</font>
             </textarea>
-            <textarea name="+high-2" draworder="5" align="left">
-                <area>606,297,40,20</area>
+            <textarea name="+high-2" draworder="5" align="center">
+                <area>545,435,80,30</area>
                 <font>tempdata2</font>
             </textarea>
-            <textarea name="+high-3" draworder="5" align="left">
-                <area>120,497,40,20</area>
+            <textarea name="+high-3" draworder="5" align="center">
+                <area>745,435,80,30</area>
                 <font>tempdata2</font>
             </textarea>
-            <textarea name="+high-4" draworder="5" align="left">
-                <area>363,497,40,20</area>
+            <textarea name="+high-4" draworder="5" align="center">
+                <area>945,435,80,30</area>
                 <font>tempdata2</font>
             </textarea>
-            <textarea name="+high-5" draworder="5" align="left">
-                <area>606,497,40,20</area>
+            <textarea name="+high-5" draworder="5" align="center">
+                <area>1145,435,80,30</area>
                 <font>tempdata2</font>
             </textarea>
-            <textarea name="+low-0" draworder="5" align="left">
-                <area>220,297,40,20</area>
+            <textarea name="+low-0" draworder="5" align="center">
+                <area>145,470,80,30</area>
                 <font>tempdata2</font>
             </textarea>
-            <textarea name="+low-1" draworder="5" align="left">
-                <area>463,297,40,20</area>
+            <textarea name="+low-1" draworder="5" align="center">
+                <area>345,470,80,30</area>
                 <font>tempdata2</font>
             </textarea>
-            <textarea name="+low-2" draworder="5" align="left">
-                <area>706,297,40,20</area>
+            <textarea name="+low-2" draworder="5" align="center">
+                <area>545,470,80,30</area>
                 <font>tempdata2</font>
             </textarea>
-            <textarea name="+low-3" draworder="5" align="left">
-                <area>220,497,40,20</area>
+            <textarea name="+low-3" draworder="5" align="center">
+                <area>745,470,80,30</area>
                 <font>tempdata2</font>
             </textarea>
-            <textarea name="+low-4" draworder="5" align="left">
-                <area>463,497,40,20</area>
+            <textarea name="+low-4" draworder="5" align="center">
+                <area>945,470,80,30</area>
                 <font>tempdata2</font>
             </textarea>
-            <textarea name="+low-5" draworder="5" align="left">
-                <area>706,497,40,20</area>
+            <textarea name="+low-5" draworder="5" align="center">
+                <area>1145,470,80,30</area>
                 <font>tempdata2</font>
             </textarea>
-            
-            <textarea name="+updatetime" draworder="5">
-                <area>39,540,700,35</area>
+            <textarea name="+updatetime" draworder="5" align="center">
+                <area>0,540,1280,35</area>
                 <font>footer</font>
             </textarea>
         </container>
@@ -554,26 +552,24 @@
             <blackhole name="nounits" draworder="0">
                 <area>0,0,0,0</area>
             </blackhole>
-            
-            <textarea name="*currentdatetime" draworder="2" align="right">
+            <textarea name="*currentdatetime" draworder="2" align="left">
                 <font>timedate</font>
-                <area>630,12,160,40</area>
+                <area>40,625,360,40</area>
             </textarea>
-            <textarea name="*pause_text" draworder="5" align="right">
-                <area>60,70,700,35</area>
+            <textarea name="*pause_text" draworder="5" align="center">
+                <area>0,60,1280,35</area>
                 <font>footer</font>
             </textarea>
-            
             <textarea name="+smdesc" draworder="5" align="center">
-                <area>0,18,800,45</area>
+                <area>0,18,1280,45</area>
                 <font>header</font>
             </textarea>
-            <textarea name="+updatetime" draworder="5">
-                <area>39,560,700,35</area>
+            <textarea name="+updatetime" draworder="5" align="center">
+                <area>0,570,1280,35</area>
                 <font>footer</font>
             </textarea>
             <image name="+map" draworder="0" >
-                <position>35,100</position>
+                <position>285,115</position>
                 <staticsize>730,450</staticsize>
             </image>
         </container>
@@ -585,25 +581,25 @@
                 <area>0,0,0,0</area>
             </blackhole>
             
-            <textarea name="*currentdatetime" draworder="2" align="right">
+            <textarea name="*currentdatetime" draworder="2" align="left">
                 <font>timedate</font>
-                <area>630,12,160,40</area>
+                <area>40,625,360,40</area>
             </textarea>
-            <textarea name="*pause_text" draworder="5" align="right">
-                <area>60,70,700,35</area>
+            <textarea name="*pause_text" draworder="5" align="center">
+                <area>0,60,1280,35</area>
                 <font>footer</font>
             </textarea>
             
             <textarea name="+amdesc" draworder="5" align="center">
-                <area>0,18,800,45</area>
+                <area>0,18,1280,45</area>
                 <font>header</font>
             </textarea>
-            <textarea name="+updatetime" draworder="5">
-                <area>39,560,700,35</area>
+            <textarea name="+updatetime" draworder="5" align="center">
+                <area>0,570,1280,35</area>
                 <font>footer</font>
             </textarea>
             <animatedimage name="+animatedimage" draworder="6">
-                <position>35,100</position>
+                <position>285,115</position>
                 <staticsize>730,450</staticsize>
                 <interval>200</interval>
                 <startinterval>1000</startinterval>
@@ -612,32 +608,38 @@
         
         <container name="Severe Weather Alerts">
             <area>0,0,1280,720</area>
-            
-            <blackhole name="nounits" draworder="0">
-                <area>0,0,0,0</area>
-            </blackhole>
-            
-            <textarea name="+swlocation" draworder="5">
-                <area>39,181,700,35</area>
-                <font>footer</font>
-            </textarea>
-            <textarea name="*currentdatetime" draworder="2" align="right">
-                <font>timedate</font>
-                <area>630,12,160,40</area>
-            </textarea>
-            <textarea name="*pause_text" draworder="5" align="right">
-                <area>60,540,700,35</area>
-                <font>footer</font>
-            </textarea>
-            
+
             <textarea name="header" draworder="5" align="center">
-                <area>0,18,800,45</area>
+                <area>0,18,1280,45</area>
                 <font>header</font>
                 <value>Severe Weather Alerts</value>
             </textarea>
+            <image name="backup" draworder="0">
+                <filename>mw-background.png</filename>
+                <position>37,175</position>
+            </image>
+            <image name="lines" draworder="0">
+                <filename>mw-lines.png</filename>
+                <position>37,175</position>
+            </image>
+            <blackhole name="nounits" draworder="0">
+                <area>0,0,0,0</area>
+            </blackhole>
+            <textarea name="+swlocation" draworder="5" align="center">
+                <area>0,181,1280,35</area>
+                <font>footer</font>
+            </textarea>
+            <textarea name="*currentdatetime" draworder="2" align="left">
+                <font>timedate</font>
+                <area>40,625,360,40</area>
+            </textarea>
+            <textarea name="*pause_text" draworder="5" align="center">
+                <area>0,60,1280,35</area>
+                <font>footer</font>
+            </textarea>
             <richtextarea name="+alerts" draworder="5" align="left">
-                <area>40,230,700,300</area>
-                <textarea>40,230,680,300</textarea>
+                <area>45,230,700,300</area>
+                <textarea>45,230,680,300</textarea>
                 <font>alerttext</font>
                 <value>Weather Alerts</value>
                 <image function="uparrow-reg" filename="blank.png" location="750,230"></image>
@@ -647,221 +649,199 @@
                 <backgroundreg>mw_shading.png</backgroundreg>
                 <backgroundsel>mw_shading.png</backgroundsel>
             </richtextarea>
-            <textarea name="*updatetime" draworder="5">
-                <area>39,540,700,35</area>
+            <textarea name="*updatetime" draworder="5" align="center">
+                <area>0,540,1280,35</area>
                 <font>footer</font>
             </textarea>
         </container>
         
         <container name="18 Hour Forecast">
             <area>0,0,1280,720</area>
-            
+
+            <image name="backup" draworder="0">
+                <filename>mw-background.png</filename>
+                <position>37,175</position>
+            </image>
+            <image name="lines" draworder="0">
+                <filename>mw-lines.png</filename>
+                <position>37,175</position>
+            </image>           
             <textarea name="+18hrlocation" draworder="5" align="center">
-                <area>175,80,450,70</area>
+                <area>0,181,1280,35</area>
                 <font>location</font>
                 <multiline>yes</multiline>
             </textarea>
-            <textarea name="*currentdatetime" draworder="2" align="right">
+            <textarea name="*currentdatetime" draworder="2" align="left">
                 <font>timedate</font>
-                <area>630,12,160,40</area>
+                <area>40,625,360,40</area>
             </textarea>
-            <textarea name="*pause_text" draworder="5" align="right">
-                <area>60,540,700,35</area>
+            <textarea name="*pause_text" draworder="5" align="center">
+                <area>0,60,1280,35</area>
                 <font>footer</font>
             </textarea>
             <textarea name="header" draworder="5" align="center">
-                <area>0,18,800,45</area>
+                <area>0,18,1280,45</area>
                 <font>header</font>
                 <value>18 Hour Forecast</value>
             </textarea>
-            <image name="background-0" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>40,135</position>
-                <staticsize>233,190</staticsize>
-            </image>
-            <image name="background-1" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>283,135</position>
-                <staticsize>233,190</staticsize>
-            </image>
-            <image name="background-2" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>526,135</position>
-                <staticsize>233,190</staticsize>
-            </image>
-            <image name="background-3" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>40,335</position>
-                <staticsize>233,190</staticsize>
-            </image>
-            <image name="background-4" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>283,335</position>
-                <staticsize>233,190</staticsize>
-            </image>
-            <image name="background-5" draworder="0">
-                <filename>mw_shading.png</filename>
-                <position>526,335</position>
-                <staticsize>233,190</staticsize>
-            </image>
             <textarea name="+time-0" draworder="5" align="center">
-                <area>40,140,233,25</area>
+                <area>70,250,140,25</area>
                 <font>label</font>
             </textarea>
             <textarea name="+time-1" draworder="5" align="center">
-                <area>283,140,233,25</area>
+                <area>270,250,140,25</area>
                 <font>label</font>
             </textarea>
             <textarea name="+time-2" draworder="5" align="center">
-                <area>526,140,233,25</area>
+                <area>470,250,140,25</area>
                 <font>label</font>
             </textarea>
             <textarea name="+time-3" draworder="5" align="center">
-                <area>40,340,233,25</area>
+                <area>670,250,140,25</area>
                 <font>label</font>
             </textarea>
             <textarea name="+time-4" draworder="5" align="center">
-                <area>283,340,233,25</area>
+                <area>870,250,140,25</area>
                 <font>label</font>
             </textarea>
             <textarea name="+time-5" draworder="5" align="center">
-                <area>526,340,233,25</area>
+                <area>1070,250,140,25</area>
                 <font>label</font>
             </textarea>
             <image name="+18icon-0" draworder="6">
-                <position>73,165</position>
+                <position>60,285</position>
                 <staticsize>167,125</staticsize>
             </image>
             <image name="+18icon-1" draworder="6">
-                <position>316,165</position>
+                <position>260,285</position>
                 <staticsize>167,125</staticsize>
             </image>
             <image name="+18icon-2" draworder="6">
-                <position>559,165</position>
+                <position>460,285</position>
                 <staticsize>167,125</staticsize>
             </image>
             <image name="+18icon-3" draworder="6">
-                <position>73,365</position>
+                <position>660,285</position>
                 <staticsize>167,125</staticsize>
             </image>
             <image name="+18icon-4" draworder="6">
-                <position>316,365</position>
+                <position>860,285</position>
                 <staticsize>167,125</staticsize>
             </image>
             <image name="+18icon-5" draworder="6">
-                <position>559,365</position>
+                <position>1060,285</position>
                 <staticsize>167,125</staticsize>
             </image>
             <textarea name="tmplbl0" draworder="5" align="left">
-                <area>70,297,100,30</area>
+                <area>60,435,100,30</area>
                 <font>lohifont2</font>
                 <value>Temp</value>
             </textarea>
             <textarea name="tmplbl1" draworder="5" align="left">
-                <area>313,297,100,30</area>
+                <area>260,435,100,30</area>
                 <font>lohifont2</font>
                 <value>Temp</value>
             </textarea>
             <textarea name="tmplbl2" draworder="5" align="left">
-                <area>556,297,100,30</area>
+                <area>460,435,100,30</area>
                 <font>lohifont2</font>
                 <value>Temp</value>
             </textarea>
             <textarea name="tmplbl3" draworder="5" align="left">
-                <area>70,497,100,30</area>
+                <area>660,435,100,30</area>
                 <font>lohifont2</font>
                 <value>Temp</value>
             </textarea>
             <textarea name="tmplbl4" draworder="5" align="left">
-                <area>313,497,100,30</area>
+                <area>860,435,100,30</area>
                 <font>lohifont2</font>
                 <value>Temp</value>
             </textarea>
             <textarea name="tmplbl5" draworder="5" align="left">
-                <area>556,497,100,30</area>
+                <area>1060,435,100,30</area>
                 <font>lohifont2</font>
                 <value>Temp</value>
             </textarea>
             <textarea name="poplbl0" draworder="5" align="left">
-                <area>160,297,100,30</area>
+                <area>60,470,100,30</area>
                 <font>lohifont2</font>
                 <value>Precip</value>
             </textarea>
             <textarea name="poplbl1" draworder="5" align="left">
-                <area>403,297,100,30</area>
+                <area>260,470,100,30</area>
                 <font>lohifont2</font>
                 <value>Precip</value>
             </textarea>
             <textarea name="poplbl2" draworder="5" align="left">
-                <area>646,297,100,30</area>
+                <area>460,470,100,30</area>
                 <font>lohifont2</font>
                 <value>Precip</value>
             </textarea>
             <textarea name="poplbl3" draworder="5" align="left">
-                <area>160,497,100,30</area>
+                <area>660,470,100,30</area>
                 <font>lohifont2</font>
                 <value>Precip</value>
             </textarea>
             <textarea name="poplbl4" draworder="5" align="left">
-                <area>403,497,100,30</area>
+                <area>860,470,100,30</area>
                 <font>lohifont2</font>
                 <value>Precip</value>
             </textarea>
             <textarea name="poplbl5" draworder="5" align="left">
-                <area>646,497,100,30</area>
+                <area>1060,470,100,30</area>
                 <font>lohifont2</font>
                 <value>Precip</value>
             </textarea>
             <textarea name="+temp-0" draworder="5" align="left">
-                <area>120,297,40,20</area>
+                <area>145,435,80,30</area>
                 <font>tempdata2</font>
             </textarea>
             <textarea name="+temp-1" draworder="5" align="left">
-                <area>363,297,40,20</area>
+                <area>345,435,80,30</area>
                 <font>tempdata2</font>
             </textarea>
             <textarea name="+temp-2" draworder="5" align="left">
-                <area>606,297,40,20</area>
+                <area>545,435,80,30</area>
                 <font>tempdata2</font>
             </textarea>
             <textarea name="+temp-3" draworder="5" align="left">
-                <area>120,497,40,20</area>
+                <area>745,435,80,30</area>
                 <font>tempdata2</font>
             </textarea>
             <textarea name="+temp-4" draworder="5" align="left">
-                <area>363,497,40,20</area>
+                <area>945,435,80,30</area>
                 <font>tempdata2</font>
             </textarea>
             <textarea name="+temp-5" draworder="5" align="left">
-                <area>606,497,40,20</area>
+                <area>1145,435,80,30</area>
                 <font>tempdata2</font>
             </textarea>
             <textarea name="+pop-0" draworder="5" align="left">
-                <area>220,297,40,20</area>
+                <area>145,470,80,30</area>
                 <font>tempdata2</font>
             </textarea>
             <textarea name="+pop-1" draworder="5" align="left">
-                <area>463,297,40,20</area>
+                <area>345,470,80,30</area>
                 <font>tempdata2</font>
             </textarea>
             <textarea name="+pop-2" draworder="5" align="left">
-                <area>706,297,40,20</area>
+                <area>545,470,80,30</area>
                 <font>tempdata2</font>
             </textarea>
             <textarea name="+pop-3" draworder="5" align="left">
-                <area>220,497,40,20</area>
+                <area>745,470,80,30</area>
                 <font>tempdata2</font>
             </textarea>
             <textarea name="+pop-4" draworder="5" align="left">
-                <area>463,497,40,20</area>
+                <area>945,470,80,30</area>
                 <font>tempdata2</font>
             </textarea>
             <textarea name="+pop-5" draworder="5" align="left">
-                <area>706,497,40,20</area>
+                <area>1145,470,80,30</area>
                 <font>tempdata2</font>
             </textarea>
-            <textarea name="+updatetime" draworder="5">
-                <area>39,540,700,35</area>
+            <textarea name="+updatetime" draworder="5" align="center">
+                <area>0,540,1280,35</area>
                 <font>footer</font>
             </textarea>
         </container>
@@ -916,7 +896,7 @@
         </container>
 
         <container name="global-setup">
-            <area>0,100,1280,620</area>
+            <area>270,120,1010,600</area>
             <!-- Context 0 - Global Setup (screens and timeouts) -->
 
             <textarea name="timeout_text" draworder="0">
@@ -972,7 +952,7 @@
             </checkbox> -->
 
             <textbutton name="finishbutton" draworder="0">
-                <position>950,580</position>
+                <position>257,495</position>
                 <font>button</font>
                 <image function="on" filename="text_button_on.png"/>
                 <image function="off" filename="text_button_off.png"/>
@@ -1036,12 +1016,14 @@
             <area>0,60,1280,640</area>
 
             <textarea name="inactivehdr" draworder="0" align="center">
-                <area>50,25,500,30</area>
+                <area>50,20,500,30</area>
                 <font>active</font>
             </textarea>
 
             <listbtnarea name="inactivelist" draworder="0">
-                <area>50,60,500,350</area>
+                <area>50,55,500,350</area>
+<!--            <gradient type="selected" start="#336EEB" end="#2E61D4" alpha="255">
+                </gradient>  -->
                 <fcnfont name="active" function="active"></fcnfont>
                 <fcnfont name="inactive" function="inactive"></fcnfont>
                 <showscrollarrows>yes</showscrollarrows>
@@ -1049,12 +1031,14 @@
             </listbtnarea>
 
             <textarea name="activehdr" draworder="0" align="center">
-                <area>650,25,500,30</area>
+                <area>725,20,500,30</area>
                 <font>active</font>
             </textarea>
 
             <listbtnarea name="activelist" draworder="0">
-                <area>650,60,500,350</area>
+                <area>725,55,500,350</area>
+<!--            <gradient type="selected" start="#336EEB" end="#2E61D4" alpha="255">
+                </gradient>  -->
                 <fcnfont name="active" function="active"></fcnfont>
                 <fcnfont name="inactive" function="inactive"></fcnfont>
                 <showscrollarrows>yes</showscrollarrows>
@@ -1086,7 +1070,7 @@
             </textarea>
 
             <textbutton name="finishbutton" draworder="0">
-                <position>950,580</position>
+                <position>525,555</position>
                 <font>button</font>
                 <image function="on" filename="text_button_on.png"/>
                 <image function="off" filename="text_button_off.png"/>
@@ -1145,51 +1129,53 @@
         </container>
 
         <container name="global-setup">
-            <area>0,50,1280,670</area>
+            <area>140,50,1280,670</area>
 
             <listbtnarea name="srclist" draworder="0">
-                <area>30,65,320,448</area>
+                <area>30,70,400,448</area>
+<!--                <gradient type="selected" start="#336EEB" end="#2E61D4" alpha="255">
+                </gradient>  -->
                 <fcnfont name="active" function="active"></fcnfont>
                 <fcnfont name="inactive" function="inactive"></fcnfont>
                 <showscrollarrows>yes</showscrollarrows>
             </listbtnarea>
 
             <image name="srclines" draworder="0">
-                <position>385,65</position>
+                <position>465,65</position>
                 <filename>cr-lines.png</filename>
                 <staticsize>500,370</staticsize>
             </image>
 
             <textarea name="updatetxt" draworder="0">
-                <area>410,100,300,60</area>
+                <area>490,100,300,60</area>
                 <font>label</font>
                 <multiline>yes</multiline>
                 <value>Source Update Timeout (seconds):</value>
             </textarea>
 
             <textarea name="retrievetxt" draworder="0">
-                <area>410,180,300,60</area>
+                <area>490,180,300,60</area>
                 <font>label</font>
                 <multiline>yes</multiline>
                 <value>Data Retrieval Interval (minutes):</value>
             </textarea>
 
             <blackhole name="update_spinbox" draworder="0">
-                <area>720,95,70,30</area>
+                <area>800,95,70,30</area>
             </blackhole>
 
             <blackhole name="retrieve_spinbox" draworder="0">
-                <area>720,175,70,30</area>
+                <area>800,175,70,30</area>
             </blackhole>
 
             <textarea name="srcinfo" draworder="0" align="left">
-                <area>410,310,450,90</area>
+                <area>490,310,450,90</area>
                 <multiline>yes</multiline>
                 <font>help</font>
             </textarea>
 
             <textbutton name="finishbutton" draworder="0">
-                <position>950,580</position>
+                <position>385,565</position>
                 <font>button</font>
                 <image function="on" filename="text_button_on.png"/>
                 <image function="off" filename="text_button_off.png"/>
@@ -1232,14 +1218,14 @@
             <bold>yes</bold>
         </font>
         <container name="search">
-            <area>0,0,1200,720</area>
+            <area>0,0,1280,720</area>
             <textarea name="header" draworder="0" align="center">
-                <area>0,15,1200,40</area>
+                <area>0,15,1280,40</area>
                 <value>Location Search</value>
                 <font>header</font>
             </textarea>
             <textarea name="helptxt" draworder="0" align="center">
-                <area>0,50,1200,60</area>
+                <area>0,50,1280,60</area>
                 <font>label</font>
                 <value>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</value>
                 <multiline>yes</multiline>
@@ -1254,25 +1240,25 @@
                 <font>edit</font>
             </remoteedit>
             <textbutton name="searchbtn" draworder="0">
-                <position>550,150</position>
+                <position>520,150</position>
                 <font>button</font>
                 <image function="on" filename="text_button_on.png"/>
                 <image function="off" filename="text_button_off.png"/>
                 <image function="pushed" filename="text_button_pushed.png"/>
             </textbutton>
             <listbtnarea name="results" draworder="0">
-                <area>25,205,1100,465</area>
+                <area>25,205,1230,465</area>
                 <fcnfont name="active" function="active"></fcnfont>
                 <fcnfont name="inactive" function="inactive"></fcnfont>
                 <showscrollarrows>yes</showscrollarrows>
                 <showarrow>no</showarrow>
             </listbtnarea>
             <textarea name="numresults" draworder="0" align="center">
-                <area>400,680,400,40</area>
+                <area>440,670,400,40</area>
                 <font>label</font>
             </textarea>
             <textarea name="source" draworder="0" align="center">
-                <area>800,680,400,40</area>
+                <area>840,670,400,40</area>
                 <font>label</font>
             </textarea>
         </container>
