@@ -4080,9 +4080,6 @@ void PlaybackBox::togglePlayListTitle(void)
         if (p && (p->availableStatus == asAvailable))
             togglePlayListItem(p);
     }
-
-    if (inTitle)
-        cursorRight();
 }
 
 void PlaybackBox::togglePlayListItem(void)
