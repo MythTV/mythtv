@@ -140,7 +140,7 @@ void MythUIStateType::ClearMaps()
     m_CurrentState = NULL;
 }
 
-void MythUIStateType::ClearImages()
+void MythUIStateType::Reset()
 {
     ClearMaps();
     SetRedraw();

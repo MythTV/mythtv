@@ -31,7 +31,7 @@ class MythUIStateType : public MythUIType
 
     MythUIType* GetCurrentState() { return m_CurrentState; }
 
-    void ClearImages();
+    void Reset();
 
   protected:
     void ClearMaps();
