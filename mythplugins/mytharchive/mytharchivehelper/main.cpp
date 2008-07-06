@@ -2070,6 +2070,7 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
     root.appendChild(streams);
     streams.setAttribute("count", inputFC->nb_streams);
     int ffmpegIndex = 0;
+    uint duration = 0;
 
     for (uint i = 0; i < inputFC->nb_streams; i++)
     {
@@ -2126,56 +2127,60 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
                 streams.appendChild(stream);
 
-                uint duration = 0;
-
-                switch (lenMethod)
+                // TODO: probably should add a better way to choose which
+                // video stream we use to calc the duration 
+                if (duration == 0)
                 {
-                    case 0:
+                    switch (lenMethod)
                     {
-                        // use duration guess from avformat
-                        if (inputFC->duration != (uint) AV_NOPTS_VALUE)
+                        case 0:
                         {
-                            duration = (uint) (inputFC->duration / AV_TIME_BASE);
-                            root.setAttribute("duration", duration);
-                            VERBOSE(VB_JOBQUEUE, QString("duration = %1")
-                                    .arg(duration));
+                            // use duration guess from avformat
+                            if (inputFC->duration != (uint) AV_NOPTS_VALUE)
+                            {
+                                duration = (uint) (inputFC->duration / AV_TIME_BASE);
+                                root.setAttribute("duration", duration);
+                                VERBOSE(VB_JOBQUEUE, QString("duration = %1")
+                                        .arg(duration));
+                            }
+                            else
+                                root.setAttribute("duration", "N/A");
+                            break;
                         }
-                        else
+                        case 1:
+                        {
+                            // calc duration of the file by counting the video frames
+                            long long frames = getFrameCount(inputFC, i);
+                            VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(frames));
+                            duration = (uint)(frames / fps);
+                            VERBOSE(VB_JOBQUEUE, QString("duration = %1").arg(duration));
+                            root.setAttribute("duration", duration);
+                            break;
+                        }
+                        case 2:
+                        {
+                            // use info from pos map in db 
+                            // (only useful if the file is a myth recording)
+                            long long frames = getFrameCount(inFile, fps);
+                            VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(frames));
+                            duration = (uint)(frames / fps);
+                            VERBOSE(VB_JOBQUEUE, QString("duration = %1").arg(duration));
+                            root.setAttribute("duration", duration);
+                            break;
+                        }
+                        default:
                             root.setAttribute("duration", "N/A");
-                        break;
+                            VERBOSE(VB_JOBQUEUE, QString("Unknown lenMethod (%1)").arg(lenMethod));
                     }
-                    case 1:
-                    {
-                        // calc duration of the file by counting the video frames
-                        long long frames = getFrameCount(inputFC, i);
-                        VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(frames));
-                        duration = (uint)(frames / fps);
-                        VERBOSE(VB_JOBQUEUE, QString("duration = %1").arg(duration));
-                        root.setAttribute("duration", duration);
-                        break;
-                    }
-                    case 2:
-                    {
-                        // use info from pos map in db 
-                        // (only useful if the file is a myth recording)
-                        long long frames = getFrameCount(inFile, fps);
-                        VERBOSE(VB_JOBQUEUE, QString("frames = %1").arg(frames));
-                        duration = (uint)(frames / fps);
-                        VERBOSE(VB_JOBQUEUE, QString("duration = %1").arg(duration));
-                        root.setAttribute("duration", duration);
-                        break;
-                    }
-                    default:
-                        root.setAttribute("duration", "N/A");
-                        VERBOSE(VB_JOBQUEUE, QString("Unknown lenMethod (%1)").arg(lenMethod));
+
+                    // add duration after all cuts are removed
+                    long long frames = getCutFrames(inFile);
+                    VERBOSE(VB_JOBQUEUE, QString("cutframes = %1").arg(frames));
+                    int cutduration = (int)(frames / fps);
+                    VERBOSE(VB_JOBQUEUE, QString("cutduration = %1").arg(cutduration));
+                    root.setAttribute("cutduration", duration - cutduration);
                 }
 
-                // add duration after all cuts are removed
-                long long frames = getCutFrames(inFile);
-                VERBOSE(VB_JOBQUEUE, QString("cutframes = %1").arg(frames));
-                int cutduration = (int)(frames / fps);
-                VERBOSE(VB_JOBQUEUE, QString("cutduration = %1").arg(cutduration));
-                root.setAttribute("cutduration", duration - cutduration);
                 break;
             }
 
