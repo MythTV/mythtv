@@ -392,7 +392,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "DELETE_RECORDING")
     {
-        HandleDeleteRecording(listline, pbs, false);
+        if (tokens.size() == 3)
+            HandleDeleteRecording(tokens[1], tokens[2], pbs, false);
+        else
+            HandleDeleteRecording(listline, pbs, false);
     }
     else if (command == "FORCE_DELETE_RECORDING")
     {
@@ -1971,6 +1974,27 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     }
 
     delete pginfo;
+}
+
+void MainServer::HandleDeleteRecording(QString &chanid, QString &starttime,
+                                       PlaybackSock *pbs,
+                                       bool forceMetadataDelete)
+{
+    ProgramInfo *pginfo =
+        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+
+    if (!pginfo)
+    {
+        MythSocket *pbssock = NULL;
+        if (pbs)
+            pbssock = pbs->getSocket();
+
+        QStringList outputlist( QString::number(0) );
+
+        SendResponse(pbssock, outputlist);
+    }
+
+    DoHandleDeleteRecording(pginfo, pbs, forceMetadataDelete);
 }
 
 void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,

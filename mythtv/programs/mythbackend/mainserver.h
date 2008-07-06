@@ -80,6 +80,8 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleQueryRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleStopRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
+    void HandleDeleteRecording(QString &chanid, QString &starttime,
+                               PlaybackSock *pbs, bool forceMetadataDelete);
     void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
                                bool forceMetadataDelete);
     void DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
