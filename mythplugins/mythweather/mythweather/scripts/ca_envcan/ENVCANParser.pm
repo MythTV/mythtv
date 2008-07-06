@@ -11,7 +11,7 @@ use strict;
 use POSIX;
 use XML::Simple;
 
-our $VERSION = 0.3;
+our $VERSION = 0.4;
 
 my %results;
 my %directions = (  N  => "North",      NNE => "North Northeast",
@@ -137,19 +137,19 @@ sub doParse {
             $results{"date-$i"} = $day;
             $results{"icon-$i"} = getIcon($condition);
 
-            if ($high_low =~ /high (\w*) (\d*)/i) {
+            if ($high_low =~ /high ([a-z]*)\s?(\d*)/i) {
                 $temp = $2;
                 if ($1 =~ /minus/i) { $temp = ($temp * -1); }
                 $results{"high-$i"} = $temp;
             }
 
-            if ($high_low =~ /steady near (\w*) (\d*)/i) {
+            if ($high_low =~ /steady near ([a-z]*)\s?(\d*)/i) {
                 $temp = $2;
                 if ($1 =~ /minus/i) { $temp = ($temp * -1); }
                 $results{"high-$i"} = $temp;
             }
 
-            if ($high_low =~ /low (\w*) (\d*)/i) {
+            if ($high_low =~ /low ([a-z]*)\s?(\d*)/i) {
                 $temp = $2;
                 if ($1    =~ /minus/i) { $temp = ($temp * -1); }
                 $results{"low-$i"} = $temp;
