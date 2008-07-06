@@ -702,6 +702,7 @@ void MainServer::customEvent(QEvent *e)
             }
 
             m_sched->GetNextLiveTVDir(tokens[1].toInt());
+            return;
         }
 
         if ((me->Message().left(16) == "DELETE_RECORDING") ||
