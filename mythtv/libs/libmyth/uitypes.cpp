@@ -4585,12 +4585,13 @@ void UIManagedTreeListType::calculateScreenArea()
 
 // ********************************************************************
 
-UIPushButtonType::UIPushButtonType(const QString &name, QPixmap on, QPixmap off, QPixmap pushed)
+UIPushButtonType::UIPushButtonType(const QString &name, QPixmap on, QPixmap off, QPixmap pushed, QPixmap pushedon)
                      : UIType(name)
 {
     on_pixmap = on;
     off_pixmap = off;
     pushed_pixmap = pushed;
+    pushedon_pixmap = pushedon;
     currently_pushed = false;
     takes_focus = true;
     m_lockOn = false;
@@ -4619,7 +4620,14 @@ void UIPushButtonType::Draw(QPainter *p, int drawlayer, int context)
 
     if (currently_pushed)
     {
-        p->drawPixmap(m_displaypos.x(), m_displaypos.y(), pushed_pixmap);
+        if (has_focus && !pushedon_pixmap.isNull())
+        {
+            p->drawPixmap(m_displaypos.x(), m_displaypos.y(), pushedon_pixmap);
+        }
+        else
+        {
+            p->drawPixmap(m_displaypos.x(), m_displaypos.y(), pushed_pixmap);
+        }
     }
     else
     {
@@ -4686,6 +4694,10 @@ void UIPushButtonType::calculateScreenArea()
     {
         width = pushed_pixmap.width();
     }
+    if (pushedon_pixmap.width() > width)
+    {
+        width = pushedon_pixmap.width();
+    }
 
     height = off_pixmap.height();
     if (on_pixmap.height() > height)
@@ -4695,6 +4707,10 @@ void UIPushButtonType::calculateScreenArea()
     if (pushed_pixmap.height() > height)
     {
         height = pushed_pixmap.height();
+    }
+    if (pushedon_pixmap.height() > height)
+    {
+        height = pushedon_pixmap.height();
     }
 
     screen_area = QRect(x, y, width, height);

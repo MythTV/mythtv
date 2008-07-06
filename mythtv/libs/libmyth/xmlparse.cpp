@@ -2813,6 +2813,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
     QPixmap *image_on = NULL;
     QPixmap *image_off = NULL;
     QPixmap *image_pushed = NULL;
+    QPixmap *image_pushedon = NULL;
 
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -2887,6 +2888,14 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
+                if (imgname.lower() == "pushedon")
+                {
+                    image_pushedon = ui->LoadScalePixmap(file);
+                    if (!image_pushedon)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                    }
+                }
             }
             else
             {
@@ -2902,13 +2911,17 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
         image_off = new QPixmap();
     if (!image_pushed)
         image_pushed = new QPixmap();
+    if (!image_pushedon)
+        image_pushedon = new QPixmap();
 
     UIPushButtonType *pbt = new UIPushButtonType(name, *image_on, *image_off,
-                                                 *image_pushed);
+                                                 *image_pushed,
+                                                 *image_pushedon);
 
     delete image_on;
     delete image_off;
     delete image_pushed;
+    delete image_pushedon;
 
     pbt->SetScreen(wmult, hmult);
     pbt->setPosition(pos);

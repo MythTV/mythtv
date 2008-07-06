@@ -1110,8 +1110,8 @@ class MPUBLIC UIPushButtonType : public UIType
 
   public:
 
-    UIPushButtonType(const QString &name, QPixmap on, QPixmap off, QPixmap pushed);
-
+    UIPushButtonType(const QString &name, QPixmap on, QPixmap off, QPixmap pushed, QPixmap pushedon=QPixmap());
+    
     virtual void Draw(QPainter *, int drawlayer, int context);
     void    setPosition(QPoint pos){m_displaypos = pos;}
     virtual void calculateScreenArea();
@@ -1134,6 +1134,7 @@ class MPUBLIC UIPushButtonType : public UIType
     QPixmap on_pixmap;
     QPixmap off_pixmap;
     QPixmap pushed_pixmap;
+    QPixmap pushedon_pixmap;
     bool    currently_pushed;
     QTimer  push_timer;
     bool    m_lockOn;
