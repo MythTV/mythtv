@@ -398,6 +398,9 @@ void StorageGroupEditor::open(QString name)
         if (result == SGPopup_CANCEL)
             return;
 
+        if (name == "")
+            return;
+
         if (name.right(1) != "/")
             name.append("/");
 
