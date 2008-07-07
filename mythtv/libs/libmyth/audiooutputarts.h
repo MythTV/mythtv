@@ -1,8 +1,6 @@
 #ifndef AUDIOOUTPUTARTS
 #define AUDIOOUTPUTARTS
 
-#include <qstring.h>
-
 #define ARTS_PCM_NEW_HW_PARAMS_API
 #define ARTS_PCM_NEW_SW_PARAMS_API
 #include <artsc.h>

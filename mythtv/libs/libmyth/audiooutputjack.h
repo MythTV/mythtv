@@ -1,10 +1,6 @@
 #ifndef AUDIOOUTPUTJACK
 #define AUDIOOUTPUTJACK
 
-#include <vector>
-#include <qstring.h>
-#include <qmutex.h>
-
 #include "audiooutputbase.h"
 
 using namespace std;

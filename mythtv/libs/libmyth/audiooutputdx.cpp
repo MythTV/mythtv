@@ -310,7 +310,7 @@ void AudioOutputDX::Pause(bool pause)
     paused = pause;
 }
 
-int AudioOutputDX::GetAudiotime(void) const
+int AudioOutputDX::GetAudiotime(void)
 {
     DWORD play_pos;
     HRESULT dsresult;

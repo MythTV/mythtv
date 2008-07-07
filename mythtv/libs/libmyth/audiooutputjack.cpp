@@ -8,7 +8,6 @@
 #include <cstring>
 
 #include <iostream>
-#include <qdatetime.h>
 
 using namespace std;
 

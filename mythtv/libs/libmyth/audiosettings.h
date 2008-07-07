@@ -8,7 +8,7 @@
 #ifndef _AUDIO_SETTINGS_H_
 #define _AUDIO_SETTINGS_H_
 
-#include <qstring.h>
+#include <QString>
 
 #include "mythexp.h"
 

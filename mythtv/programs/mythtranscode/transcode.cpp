@@ -167,7 +167,7 @@ class AudioReencodeBuffer : public AudioOutput
         return;
     }
 
-    virtual int GetAudiotime(void) const
+    virtual int GetAudiotime(void)
     {
         return last_audiotime;
     }

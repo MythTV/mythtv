@@ -25,18 +25,7 @@
 #endif
 
 #include <iostream>
-#include <pthread.h>
 using namespace std;
-
-#ifdef USE_LIRC
-#include "lirc.h"
-#include "lircevent.h"
-#endif
-
-#ifdef USE_JOYSTICK_MENU
-#include "jsmenu.h"
-#include "jsmenuevent.h"
-#endif
 
 #include "uitypes.h"
 #include "uilistbtntype.h"

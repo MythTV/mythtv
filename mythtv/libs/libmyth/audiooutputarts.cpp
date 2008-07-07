@@ -1,7 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-
 using namespace std;
 
 #include "mythcontext.h"

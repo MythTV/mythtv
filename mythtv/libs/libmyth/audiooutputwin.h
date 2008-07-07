@@ -1,9 +1,6 @@
 #ifndef AUDIOOUTPUTWIN
 #define AUDIOOUTPUTWIN
 
-// Qt headers
-#include <qstring.h>
-
 // MythTV headers
 #include "audiooutputbase.h"
 

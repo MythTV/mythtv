@@ -1,7 +1,7 @@
 #ifndef AUDIOOUTPUT
 #define AUDIOOUTPUT
 
-#include <qstring.h>
+#include <QString>
 
 #include "audiosettings.h"
 #include "mythcontext.h"
@@ -51,17 +51,17 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     // Wait for all data to finish playing
     virtual void Drain(void) = 0;
 
-    virtual int GetAudiotime(void) const = 0;
+    virtual int GetAudiotime(void) = 0;
 
     /// report amount of audio buffered in milliseconds.
-    virtual int GetAudioBufferedTime(void) const { return 0; }
+    virtual int GetAudioBufferedTime(void) { return 0; }
 
     virtual void SetSourceBitrate(int ) { }
 
     QString GetError(void)   const { return lastError; }
     QString GetWarning(void) const { return lastWarn; }
 
-    virtual void GetBufferStatus(uint &fill, uint &total) const
+    virtual void GetBufferStatus(uint &fill, uint &total)
         { fill = total = 0; }
 
     //  Only really used by the AudioOutputNULL object

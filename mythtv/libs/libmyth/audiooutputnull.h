@@ -1,9 +1,6 @@
 #ifndef AUDIOOUTPUTNULL
 #define AUDIOOUTPUTNULL
 
-#include <qmutex.h>
-#include <pthread.h>
-
 #include "audiooutputbase.h"
 
 #define NULLAUDIO_OUTPUT_BUFFER_SIZE 32768

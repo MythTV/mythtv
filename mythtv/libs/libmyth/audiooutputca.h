@@ -1,9 +1,6 @@
 #ifndef AUDIOOUTPUTCA
 #define AUDIOOUTPUTCA
 
-#include <vector>
-#include <qstring.h>
-
 #include "audiooutputbase.h"
 
 using namespace std;
@@ -21,7 +18,7 @@ public:
     AudioOutputCA(const AudioSettings &settings);
     virtual ~AudioOutputCA();
     
-    virtual int GetAudiotime(void) const;
+    virtual int GetAudiotime(void);
     void        SetAudiotime(void);
 
     // callback for delivering audio to output device

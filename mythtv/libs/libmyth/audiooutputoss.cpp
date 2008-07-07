@@ -10,7 +10,6 @@
 #include <cstring>
 
 #include <iostream>
-#include <qdatetime.h>
 #include "config.h"
 
 #ifdef HAVE_SYS_SOUNDCARD_H

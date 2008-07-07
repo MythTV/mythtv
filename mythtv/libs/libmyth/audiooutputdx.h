@@ -8,9 +8,6 @@
 #include <windows.h> // HACK HACK HACK
 #include <dsound.h>  // HACK HACK HACK
 
-// Qt headers
-#include <qstring.h>
-
 // MythTV headers
 #include "audiooutputbase.h"
 
@@ -43,7 +40,7 @@ public:
 
     virtual void Drain(void);
 
-    virtual int GetAudiotime(void) const;
+    virtual int GetAudiotime(void);
 
     // Volume control
     virtual int GetVolumeChannel(int channel) const; // Returns 0-100

@@ -322,9 +322,9 @@ int AudioOutputCA::GetBufferedOnSoundcard(void) const
 }
 
 /** Reimplement the base class's version of GetAudiotime()
- *  so that we don't use gettimeofday or pthread mutexes.
+ *  so that we don't use gettimeofday or Qt mutexes.
  */
-int AudioOutputCA::GetAudiotime(void) const
+int AudioOutputCA::GetAudiotime(void)
 {
     int ret;
 
@@ -340,7 +340,7 @@ int AudioOutputCA::GetAudiotime(void) const
 }
 
 /** Reimplement base's SetAudiotime()
- *  without gettimeofday() or pthread mutexes.
+ *  without gettimeofday() or Qt mutexes.
  */
 void AudioOutputCA::SetAudiotime(void)
 {

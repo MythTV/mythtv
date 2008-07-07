@@ -1,8 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include <Q3DeepCopy>
-
 using namespace std;
 
 #include "mythconfig.h"
@@ -124,13 +122,15 @@ void AudioOutput::SetStretchFactor(float /*factor*/)
 
 void AudioOutput::Error(const QString &msg)
 {
-    lastError = Q3DeepCopy<QString>(msg);
+    lastError = msg;
+    lastError.detach();
     VERBOSE(VB_IMPORTANT, "AudioOutput Error: " + lastError);
 }
 
 void AudioOutput::Warn(const QString &msg)
 {
-    lastWarn = Q3DeepCopy<QString>(msg);
+    lastWarn = msg;
+    lastWarn.detach();
     VERBOSE(VB_IMPORTANT, "AudioOutput Warning: " + lastWarn);
 }
 

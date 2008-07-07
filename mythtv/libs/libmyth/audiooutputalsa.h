@@ -1,10 +1,6 @@
 #ifndef AUDIOOUTPUTALSA
 #define AUDIOOUTPUTALSA
 
-#include <vector>
-#include <qstring.h>
-#include <qmutex.h>
-
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #define ALSA_PCM_NEW_SW_PARAMS_API
 #include <alsa/asoundlib.h>
@@ -90,8 +86,8 @@ class AudioOutputALSA : public AudioOutputBase
     QMutex       killAudioLock;
     snd_mixer_t *mixer_handle;
     QString      mixer_control; // e.g. "PCM"
-    snd_pcm_sframes_t (*pcm_write_func)(
-        snd_pcm_t*, const void*, snd_pcm_uframes_t);
+    snd_pcm_sframes_t (*pcm_write_func)(snd_pcm_t*, const void*, 
+                                        snd_pcm_uframes_t);
 };
 
 #endif

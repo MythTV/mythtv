@@ -5,8 +5,6 @@
  * Licensed under the GPL v2 or a later version at your choosing.
  */
 
-#include <q3deepcopy.h>
-
 #include "audiosettings.h"
 
 AudioSettings::AudioSettings() :
@@ -89,11 +87,15 @@ void AudioSettings::TrimDeviceType(void)
 
 QString AudioSettings::GetMainDevice(void) const
 {
-    return Q3DeepCopy<QString>(main_device);
+    QString ret = main_device;
+    ret.detach();
+    return ret;
 }
 
 QString AudioSettings::GetPassthruDevice(void) const
 {
-    return Q3DeepCopy<QString>(passthru_device);
+    QString ret = passthru_device;
+    ret.detach();
+    return ret;
 }
 

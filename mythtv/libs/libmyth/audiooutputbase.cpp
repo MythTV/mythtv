@@ -2,14 +2,11 @@
 #include <cmath>
 
 // POSIX headers
-#include <pthread.h>
 #include <unistd.h>
 #include <sys/time.h>
 
 // Qt headers
-#include <qdatetime.h>
-#include <qstring.h>
-#include <q3deepcopy.h>
+#include <QMutexLocker>
 
 // MythTV headers
 #include "compat.h"
@@ -74,10 +71,6 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     memory_corruption_test3(0xdeadbeef),
     memory_corruption_test4(0xdeadbeef)
 {
-    pthread_mutex_init(&audio_buflock, NULL);
-    pthread_mutex_init(&avsync_lock, NULL);
-    pthread_cond_init(&audio_bufsig, NULL);
-
     // The following are not bzero() because MS Windows doesn't like it.
     memset(&src_data,          0, sizeof(SRC_DATA));
     memset(src_in,             0, sizeof(float) * kAudioSourceInputSize);
@@ -100,10 +93,6 @@ AudioOutputBase::~AudioOutputBase()
                 "Programmer Error: "
                 "~AudioOutputBase called, but KillAudio has not been called!");
     }
-
-    pthread_mutex_destroy(&audio_buflock);
-    pthread_mutex_destroy(&avsync_lock);
-    pthread_cond_destroy(&audio_bufsig);
 
     assert(memory_corruption_test0 == 0xdeadbeef);
     assert(memory_corruption_test1 == 0xdeadbeef);
@@ -185,9 +174,8 @@ void AudioOutputBase::SetStretchFactorLocked(float laudio_stretchfactor)
 
 void AudioOutputBase::SetStretchFactor(float laudio_stretchfactor)
 {
-    pthread_mutex_lock(&audio_buflock);
+    QMutexLocker lock(&audio_buflock);
     SetStretchFactorLocked(laudio_stretchfactor);
-    pthread_mutex_unlock(&audio_buflock);
 }
 
 float AudioOutputBase::GetStretchFactor(void) const
@@ -256,8 +244,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     KillAudio();
 
-    pthread_mutex_lock(&audio_buflock);
-    pthread_mutex_lock(&avsync_lock);
+    QMutexLocker lock1(&audio_buflock);
+    QMutexLocker lock2(&avsync_lock);
 
     lastaudiolen = 0;
     waud = raud = 0;
@@ -274,8 +262,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     if (audio_bits != 8 && audio_bits != 16)
     {
-        pthread_mutex_unlock(&avsync_lock);
-        pthread_mutex_unlock(&audio_buflock);
         Error("AudioOutput only supports 8 or 16bit audio.");
         return;
     }
@@ -298,8 +284,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     if (!OpenDevice())
     {
         VERBOSE(VB_AUDIO, LOC_ERR + "Aborting reconfigure");
-        pthread_mutex_unlock(&avsync_lock);
-        pthread_mutex_unlock(&audio_buflock);
         if (GetError().isEmpty())
             Error("Aborting reconfigure");
         VERBOSE(VB_AUDIO, "Aborting reconfigure");
@@ -337,8 +321,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         {
             Error(QString("Error creating resampler, the error was: %1")
                   .arg(src_strerror(error)) );
-            pthread_mutex_unlock(&avsync_lock);
-            pthread_mutex_unlock(&audio_buflock);
             return;
         }
         src_data.src_ratio = (double) audio_samplerate / settings.samplerate;
@@ -423,8 +405,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     prepareVisuals();
 
     StartOutputThread();
-    pthread_mutex_unlock(&avsync_lock);
-    pthread_mutex_unlock(&audio_buflock);
     VERBOSE(VB_AUDIO, LOC + "Ending reconfigure");
 }
 
@@ -433,15 +413,7 @@ bool AudioOutputBase::StartOutputThread(void)
     if (audio_thread_exists)
         return true;
 
-    int status = pthread_create(
-        &audio_thread, NULL, kickoffOutputAudioLoop, this);
-
-    if (status)
-    {
-        Error("Failed to create audio thread" + ENO);
-        return false;
-    }
-
+    start();
     audio_thread_exists = true;
 
     return true;
@@ -452,7 +424,7 @@ void AudioOutputBase::StopOutputThread(void)
 {
     if (audio_thread_exists)
     {
-        pthread_join(audio_thread, NULL);
+        wait();
         audio_thread_exists = false;
     }
 }
@@ -504,8 +476,8 @@ void AudioOutputBase::Pause(bool paused)
 
 void AudioOutputBase::Reset()
 {
-    pthread_mutex_lock(&audio_buflock);
-    pthread_mutex_lock(&avsync_lock);
+    QMutexLocker lock1(&audio_buflock);
+    QMutexLocker lock2(&avsync_lock);
 
     raud = waud = 0;
     audbuf_timecode = 0;
@@ -518,17 +490,13 @@ void AudioOutputBase::Reset()
     prepareVisuals();
 
     gettimeofday(&audiotime_updated, NULL);
-
-    pthread_mutex_unlock(&avsync_lock);
-    pthread_mutex_unlock(&audio_buflock);
 }
 
 void AudioOutputBase::SetTimecode(long long timecode)
 {
-    pthread_mutex_lock(&audio_buflock);
+    QMutexLocker locker(&audio_buflock);
     audbuf_timecode = timecode;
     samples_buffered = (long long)((timecode * effdsp) / 100000.0);
-    pthread_mutex_unlock(&audio_buflock);
 }
 
 void AudioOutputBase::SetEffDsp(int dsprate)
@@ -543,13 +511,13 @@ void AudioOutputBase::SetBlocking(bool blocking)
     this->blocking = blocking;
 }
 
-int AudioOutputBase::audiolen(bool use_lock) const
+int AudioOutputBase::audiolen(bool use_lock)
 {
     /* Thread safe, returns the number of valid bytes in the audio buffer */
     int ret;
 
     if (use_lock)
-        pthread_mutex_lock(&audio_buflock);
+        audio_buflock.lock();
 
     if (waud >= raud)
         ret = waud - raud;
@@ -557,12 +525,12 @@ int AudioOutputBase::audiolen(bool use_lock) const
         ret = kAudioRingBufferSize - (raud - waud);
 
     if (use_lock)
-        pthread_mutex_unlock(&audio_buflock);
+        audio_buflock.unlock();
 
     return ret;
 }
 
-int AudioOutputBase::audiofree(bool use_lock) const
+int AudioOutputBase::audiofree(bool use_lock)
 {
     return kAudioRingBufferSize - audiolen(use_lock) - 1;
     /* There is one wasted byte in the buffer. The case where waud = raud is
@@ -570,7 +538,7 @@ int AudioOutputBase::audiofree(bool use_lock) const
        be is kAudioRingBufferSize - 1. */
 }
 
-int AudioOutputBase::GetAudiotime(void) const
+int AudioOutputBase::GetAudiotime(void)
 {
     /* Returns the current timecode of audio leaving the soundcard, based
        on the 'audiotime' computed earlier, and the delay since it was computed.
@@ -586,7 +554,7 @@ int AudioOutputBase::GetAudiotime(void) const
     if (audiotime == 0)
         return 0;
 
-    pthread_mutex_lock(&avsync_lock);
+    QMutexLocker lock(&avsync_lock);
 
     gettimeofday(&now, NULL);
 
@@ -607,7 +575,6 @@ int AudioOutputBase::GetAudiotime(void) const
 
     ret += audiotime;
 
-    pthread_mutex_unlock(&avsync_lock);
     return (int)ret;
 }
 
@@ -636,8 +603,8 @@ void AudioOutputBase::SetAudiotime(void)
        'ms/byte' is given by '25000/effdsp'...
      */
 
-    pthread_mutex_lock(&audio_buflock);
-    pthread_mutex_lock(&avsync_lock);
+    QMutexLocker lock1(&audio_buflock);
+    QMutexLocker lock2(&avsync_lock);
 
     soundcard_buffer = GetBufferedOnSoundcard(); // bytes
     totalbuffer = audiolen(false) + soundcard_buffer;
@@ -676,12 +643,9 @@ void AudioOutputBase::SetAudiotime(void)
             .arg(audio_bytes_per_sample)
             .arg(audio_stretchfactor));
 #endif
-
-    pthread_mutex_unlock(&avsync_lock);
-    pthread_mutex_unlock(&audio_buflock);
 }
 
-int AudioOutputBase::GetAudioBufferedTime(void) const
+int AudioOutputBase::GetAudioBufferedTime(void)
 {
      return audbuf_timecode - GetAudiotime();
 }
@@ -831,7 +795,7 @@ int AudioOutputBase::WaitForFreeSpace(int samples)
                     QString("(need %1, available %2)").arg(len).arg(afree));
 
             // wait for more space
-            pthread_cond_wait(&audio_bufsig, &audio_buflock);
+            audio_bufsig.wait(&audio_buflock);
             afree = audiofree(false);
         }
         else
@@ -857,7 +821,7 @@ int AudioOutputBase::WaitForFreeSpace(int samples)
 void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
                                   long long timecode)
 {
-    pthread_mutex_lock(&audio_buflock);
+    audio_buflock.lock();
 
     int len; // = samples * audio_bytes_per_sample;
     int audio_bytes = audio_bits / 8;
@@ -885,7 +849,7 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
         {
             // just in case it does a processing cycle, release the lock
             // to allow the output loop to do output
-            pthread_mutex_unlock(&audio_buflock);
+            audio_buflock.unlock();
             if (audio_bytes == 2)
             {
                 itemp += upmixer->putSamples(
@@ -902,7 +866,7 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
                     source_audio_channels,
                     (interleaved) ? 0 : samples);
             }
-            pthread_mutex_lock(&audio_buflock);
+            audio_buflock.lock();
 
             int copy_samples = upmixer->numSamples();
             if (copy_samples)
@@ -1103,7 +1067,7 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
         }
     }
 
-    pthread_mutex_unlock(&audio_buflock);
+    audio_buflock.unlock();
 }
 
 void AudioOutputBase::Status()
@@ -1128,7 +1092,7 @@ void AudioOutputBase::Status()
     }
 }
 
-void AudioOutputBase::GetBufferStatus(uint &fill, uint &total) const
+void AudioOutputBase::GetBufferStatus(uint &fill, uint &total)
 {
     fill = kAudioRingBufferSize - audiofree(true);
     total = kAudioRingBufferSize;
@@ -1221,9 +1185,9 @@ void AudioOutputBase::OutputAudioLoop(void)
 
             //VERBOSE(VB_AUDIO+VB_TIMESTAMP,
             //LOC + "Broadcasting free space avail");
-            pthread_mutex_lock(&audio_buflock);
-            pthread_cond_broadcast(&audio_bufsig);
-            pthread_mutex_unlock(&audio_buflock);
+            audio_buflock.lock();
+            audio_bufsig.wakeAll();
+            audio_buflock.unlock();
 
             usleep(2000);
             continue;
@@ -1267,7 +1231,7 @@ void AudioOutputBase::OutputAudioLoop(void)
 
 int AudioOutputBase::GetAudioData(unsigned char *buffer, int buf_size, bool full_buffer)
 {
-    pthread_mutex_lock(&audio_buflock); // begin critical section
+    audio_buflock.lock(); // begin critical section
 
     // re-check audiolen() in case things changed.
     // for example, ClearAfterSeek() might have run
@@ -1297,11 +1261,11 @@ int AudioOutputBase::GetAudioData(unsigned char *buffer, int buf_size, bool full
         /* update raud */
         raud = (raud + fragment_size) % kAudioRingBufferSize;
         VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC + "Broadcasting free space avail");
-        pthread_cond_broadcast(&audio_bufsig);
+        audio_bufsig.wakeAll();
 
         written_size = fragment_size;
     }
-    pthread_mutex_unlock(&audio_buflock); // end critical section
+    audio_buflock.unlock();
 
     // Mute individual channels through mono->stereo duplication
     kMuteState mute_state = GetMute();
@@ -1337,13 +1301,12 @@ void AudioOutputBase::Drain()
     }
 }
 
-void *AudioOutputBase::kickoffOutputAudioLoop(void *player)
+void AudioOutputBase::run(void)
 {
     VERBOSE(VB_AUDIO, LOC + QString("kickoffOutputAudioLoop: pid = %1")
                                     .arg(getpid()));
-    ((AudioOutputBase *)player)->OutputAudioLoop();
+    OutputAudioLoop();
     VERBOSE(VB_AUDIO, LOC + "kickoffOutputAudioLoop exiting");
-    return NULL;
 }
 
 int AudioOutputBase::readOutputData(unsigned char*, int)

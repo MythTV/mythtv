@@ -2,7 +2,6 @@
 #define AUDIOOUTPUTBASE
 
 // POSIX headers
-#include <pthread.h>
 #include <sys/time.h> // for struct timeval
 
 // C++ headers
@@ -10,8 +9,10 @@
 using namespace std;
 
 // Qt headers
-#include <qstring.h>
-#include <qmutex.h>
+#include <QString>
+#include <QMutex>
+#include <QWaitCondition>
+#include <QThread>
 
 // MythTV headers
 #include "audiooutput.h"
@@ -24,7 +25,7 @@ class FreeSurround;
 class AudioOutputDigitalEncoder;
 struct AVCodecContext;
 
-class AudioOutputBase : public AudioOutput
+class AudioOutputBase : public AudioOutput, public QThread
 {
  public:
     AudioOutputBase(const AudioSettings &settings);
@@ -55,15 +56,15 @@ class AudioOutputBase : public AudioOutput
     // Wait for all data to finish playing
     virtual void Drain(void);
 
-    virtual int GetAudiotime(void) const;
-    virtual int GetAudioBufferedTime(void) const;
+    virtual int GetAudiotime(void);
+    virtual int GetAudioBufferedTime(void);
 
     // Send output events showing current progress
     virtual void Status(void);
 
     virtual void SetSourceBitrate(int rate);
 
-    virtual void GetBufferStatus(uint &fill, uint &total) const;
+    virtual void GetBufferStatus(uint &fill, uint &total);
 
     //  Only really used by the AudioOutputNULL object
 
@@ -95,12 +96,15 @@ class AudioOutputBase : public AudioOutput
     void _AddSamples(void *buffer, bool interleaved, int samples, long long timecode);
 
     void OutputAudioLoop(void);
-    static void *kickoffOutputAudioLoop(void *player);
+
+    virtual void run();
+    //static void *kickoffOutputAudioLoop(void *player);
+
     void SetAudiotime(void);
     int WaitForFreeSpace(int len);
 
-    int audiolen(bool use_lock) const; // number of valid bytes in audio buffer
-    int audiofree(bool use_lock) const; // number of free bytes in audio buffer
+    int audiolen(bool use_lock); // number of valid bytes in audio buffer
+    int audiofree(bool use_lock); // number of free bytes in audio buffer
 
     void UpdateVolume(void);
 
@@ -161,19 +165,18 @@ class AudioOutputBase : public AudioOutput
     long long samples_buffered;
 
     bool audio_thread_exists;
-    pthread_t audio_thread;
 
     /** adjustments to audiotimecode, waud, and raud can only be made
         while holding this lock */
-    mutable pthread_mutex_t audio_buflock;
+    QMutex audio_buflock;
 
     /** condition is signaled when the buffer gets more free space.
         Must be holding audio_buflock to use. */
-    pthread_cond_t audio_bufsig;
+    QWaitCondition audio_bufsig;
 
     /** must hold avsync_lock to read or write 'audiotime' and
         'audiotime_updated' */
-    mutable pthread_mutex_t avsync_lock;
+    QMutex avsync_lock;
 
     /// timecode of audio leaving the soundcard (same units as timecodes)
     long long audiotime;
