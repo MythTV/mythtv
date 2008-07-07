@@ -49,8 +49,6 @@ static void mpegts_cleanup_streams(MpegTSContext *ts);
 static int is_desired_stream(int type);
 static int find_in_list(const int *pids, int pid);
 
-extern pthread_mutex_t avcodeclock;
-
 enum MpegTSFilterType {
     MPEGTS_PES,
     MPEGTS_SECTION,
