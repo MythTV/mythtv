@@ -271,7 +271,6 @@ class MPUBLIC MythProgressDialog: public MythDialog
     void pressed();
 
   protected:
-    void Teardown(void);
     ~MythProgressDialog(); // use deleteLater() instead for thread safety
     Q3ProgressBar *progress;
     QLabel *msglabel;
@@ -280,7 +279,6 @@ class MPUBLIC MythProgressDialog: public MythDialog
     void setTotalSteps(int totalSteps);
     int steps;
     int m_totalSteps;
-    Q3PtrList<class LCDTextItem> * textItems;
 };
 
 /** MythDialog box that displays a busy spinner-style dialog box to

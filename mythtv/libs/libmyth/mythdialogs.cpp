@@ -884,8 +884,6 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps,
                                      false));
         lcddev->switchToGeneric(textItems);
     }
-    else 
-        textItems = NULL;
 
     show();
 
@@ -894,23 +892,12 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps,
 
 MythProgressDialog::~MythProgressDialog()
 {
-    Teardown();
 }
 
 void MythProgressDialog::deleteLater(void)
 {
     hide();
-    Teardown();
     MythDialog::deleteLater();
-}
-
-void MythProgressDialog::Teardown(void)
-{
-    if (textItems)
-    {
-        delete textItems;
-        textItems = NULL;
-    }
 }
 
 void MythProgressDialog::Close(void)
