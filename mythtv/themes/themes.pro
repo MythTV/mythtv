@@ -7,9 +7,11 @@ TEMPLATE = app
 CONFIG -= moc qt
 
 QMAKE_COPY_DIR = sh ./cpsvndir
+win32:QMAKE_COPY_DIR = sh ./cpsimple
 
 themes.path = $${PREFIX}/share/mythtv/themes/
 themes.files = blue defaultosd blueosd default default-wide G.A.N.T classic DVR
+themes.files += green-wide MidnightCode isthmus
 
 fonts.path = $${PREFIX}/share/mythtv
 fonts.files = FreeSans.ttf FreeSansBold.ttf FreeMono.ttf
