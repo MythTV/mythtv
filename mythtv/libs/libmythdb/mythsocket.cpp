@@ -810,8 +810,8 @@ void MythSocketThread::run(void)
         for (unsigned i = 0; i < m_readyread_list.count(); i++)
         {
             sock = m_readyread_list.at(i);
-            if (sock->state() == Connected && !sock->m_notifyread &&
-                !isLocked(sock->m_lock))
+            if (sock->state() == MythSocket::Connected
+                && !sock->m_notifyread && !isLocked(sock->m_lock))
             {
                 HANDLE hEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
                 if (!hEvent)
@@ -861,7 +861,8 @@ void MythSocketThread::run(void)
             {
                 rval = idx[rval];
                 sock = m_readyread_list.at(rval);
-                found = (sock->state() == Connected) && !isLocked(sock->m_lock);
+                found = (sock->state() == MythSocket::Connected)
+                            && !isLocked(sock->m_lock);
             }
             else
             {

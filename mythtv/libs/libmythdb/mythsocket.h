@@ -7,6 +7,7 @@
 #include <QList>
 #include <QThread>
 
+#include "compat.h"   /// for HANDLE
 #include "mythexp.h"
 #include "msocketdevice.h"
 
