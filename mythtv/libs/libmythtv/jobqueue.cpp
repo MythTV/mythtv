@@ -1123,14 +1123,14 @@ bool JobQueue::InJobRunWindow(int orStartsWithinMins)
             QString("Currently set to run new jobs from %1 to %2")
                     .arg(queueStartTimeStr).arg(queueEndTimeStr));
 
-    queueStartTime = QTime::fromString(queueStartTimeStr);
+    queueStartTime = QTime::fromString(queueStartTimeStr, "hh:mm");
     if (!queueStartTime.isValid())
     {
         VERBOSE(VB_IMPORTANT, "Invalid JobQueueWindowStart time, using 00:00");
         queueStartTime = QTime(0, 0);
     }
 
-    queueEndTime = QTime::fromString(queueEndTimeStr);
+    queueEndTime = QTime::fromString(queueEndTimeStr, "hh:mm");
     if (!queueEndTime.isValid())
     {
         VERBOSE(VB_IMPORTANT, "Invalid JobQueueWindowEnd time, using 23:59");

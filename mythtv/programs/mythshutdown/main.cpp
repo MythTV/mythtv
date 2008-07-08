@@ -174,7 +174,7 @@ bool isRunning(QString program)
 QDateTime getDailyWakeupTime(QString sPeriod)
 {
     QString sTime = getGlobalSetting(sPeriod, "00:00");
-    QTime tTime = QTime::fromString(sTime);
+    QTime tTime = QTime::fromString(sTime, "hh:mm");
     QDateTime dtDateTime = QDateTime(QDate::currentDate(), tTime);
 
     return dtDateTime;
