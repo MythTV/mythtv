@@ -19,8 +19,8 @@ using namespace std;
 const QString currentDatabaseVersion = "1221";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
-static bool performActualUpdate(const QString updates[], QString version,
-                                QString &dbver);
+static bool performActualUpdate(
+    const char **updates, const char *version, QString &dbver);
 static bool InitializeDatabase(void);
 static bool doUpgradeTVDatabaseSchema(void);
 bool convert_diseqc_db(void);
@@ -391,26 +391,26 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
     return true;
 }
 
-/** \fn performActualUpdate(const QString updates[], QString, QString&)
+/** \fn performActualUpdate(const char **, const char*, QString&)
  *  \brief Runs a number of SQL commands, and updates the schema version.
  *
- *  \param updates  array of SQL commands to issue, terminated by a "" string.
+ *  \param updates  array of SQL commands to issue, terminated by a NULL string.
  *  \param version  version we are updating db to.
  *  \param dbver    the database version at the end of the function is returned
  *                  in this parameter, if things go well this will be 'version'.
  *  \return true on success, false on failure
  */
-static bool performActualUpdate(const QString updates[], QString version,
-                                QString &dbver)
+static bool performActualUpdate(
+    const char **updates, const char *version, QString &dbver)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
     VERBOSE(VB_IMPORTANT, QString("Upgrading to schema version ") + version);
 
     int counter = 0;
-    QString thequery = updates[counter];
+    const char *thequery = updates[counter];
 
-    while (thequery != "")
+    while (thequery != NULL)
     {
         query.exec(thequery);
 
@@ -623,7 +623,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1027")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS dvb_signal_quality ("
 "    id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,"
 "    sampletime TIMESTAMP NOT NULL,"
@@ -639,14 +639,14 @@ static bool doUpgradeTVDatabaseSchema(void)
 "    INDEX (sampletime,cardid)"
 ");",
 "ALTER TABLE capturecard ADD skipbtaudio TINYINT(1) DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1028", dbver))
             return false;
     }
 
     if (dbver == "1028") {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE channel ADD COLUMN commfree TINYINT NOT NULL default '0';",
 "ALTER TABLE record ADD COLUMN recgroup VARCHAR(32) default 'Default';",
 "ALTER TABLE record ADD COLUMN dupmethod INT NOT NULL DEFAULT 6;",
@@ -661,7 +661,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "  password VARCHAR(10) NOT NULL, "
 "  UNIQUE(recgroup)"
 ");",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1029", dbver))
             return false;
@@ -669,10 +669,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1029")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE record CHANGE preroll startoffset INT DEFAULT 0 NOT NULL;",
 "ALTER TABLE record CHANGE postroll endoffset INT DEFAULT 0 NOT NULL;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1030", dbver))
             return false;
@@ -680,19 +680,19 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1030")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE channel ADD COLUMN visible TINYINT(1) NOT NULL default '1';",
 "UPDATE channel SET visible = 1;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1031", dbver))
             return false;
     }
 
     if (dbver == "1031") {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE capturecard ADD dvb_on_demand TINYINT NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1032", dbver))
             return false;
@@ -700,9 +700,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1032")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE record SET dupmethod = 6 WHERE dupmethod = 22;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1033", dbver))
             return false;
@@ -710,10 +710,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1033")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE program ADD title_pronounce VARCHAR(128) NULL;",
 "ALTER TABLE program ADD INDEX (title_pronounce);",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1034", dbver))
             return false;
@@ -721,7 +721,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1034")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE mythlog ("
 "  logid int(10) unsigned PRIMARY KEY NOT NULL auto_increment,"
 "  module char(32) NOT NULL,"
@@ -736,7 +736,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "  tag varchar(64) PRIMARY KEY NOT NULL,"
 "  lastrun datetime"
 ");",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1035", dbver))
             return false;
@@ -744,10 +744,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1035")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE dvb_sat CHANGE pos pos FLOAT;",
 "ALTER TABLE dvb_sat ADD diseqc_pos SMALLINT DEFAULT 0 AFTER diseqc_port;",
-""
+NULL
 };
         if (!performActualUpdate(updates,"1036", dbver))
             return false;
@@ -755,11 +755,11 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1036")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE channel SET callsign=chanid WHERE callsign IS NULL OR callsign='';",
 "ALTER TABLE record ADD COLUMN station VARCHAR(20) NOT NULL DEFAULT '';",
 "ALTER TABLE recordoverride ADD COLUMN station VARCHAR(20) NOT NULL DEFAULT '';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1037", dbver))
             return false;
@@ -767,7 +767,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1037")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE videosource ADD lineupid VARCHAR(64) NULL;",
 "ALTER TABLE videosource ADD password VARCHAR(64) NULL;",
 "ALTER TABLE program ADD ( "
@@ -797,7 +797,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "    genre char(30), "
 "    PRIMARY KEY (chanid, starttime, relevance) "
 ");",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1038", dbver))
             return false;
@@ -805,7 +805,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1038")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS programgenres ( "
 "    chanid int unsigned NOT NULL, "
 "    starttime timestamp NOT NULL, "
@@ -813,7 +813,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "    genre char(30), "
 "    PRIMARY KEY (chanid, starttime, relevance) "
 ");",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1039", dbver))
             return false;
@@ -821,9 +821,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1039")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE channel CHANGE name name VARCHAR(64);",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1040", dbver))
             return false;
@@ -831,9 +831,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1040")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE channel ADD outputfilters VARCHAR(255) NULL",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1041", dbver))
             return false;
@@ -841,7 +841,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1041")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE record ADD seriesid varchar(12) NULL;",
 "ALTER TABLE record ADD programid varchar(12) NULL;",
 "ALTER TABLE recorded ADD seriesid varchar(12) NULL;",
@@ -856,7 +856,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "ALTER TABLE recorded ADD INDEX (programid);",
 "ALTER TABLE oldrecorded ADD INDEX (seriesid);",
 "ALTER TABLE oldrecorded ADD INDEX (programid);",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1042", dbver))
             return false;
@@ -864,9 +864,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1042")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "INSERT INTO settings SET value=\"DataDirectMessage\";",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1043", dbver))
             return false;
@@ -874,7 +874,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1043")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE program CHANGE title title VARCHAR(128) NOT NULL DEFAULT '';",
 "ALTER TABLE program CHANGE subtitle subtitle VARCHAR(128) NOT NULL DEFAULT '';",
 "ALTER TABLE program CHANGE description description TEXT NOT NULL DEFAULT '';",
@@ -920,7 +920,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "ALTER TABLE oldrecorded CHANGE category category VARCHAR(64) NOT NULL DEFAULT '';",
 "ALTER TABLE oldrecorded CHANGE seriesid seriesid VARCHAR(12) NOT NULL DEFAULT '';",
 "ALTER TABLE oldrecorded CHANGE programid programid VARCHAR(12) NOT NULL DEFAULT '';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1044", dbver))
             return false;
@@ -928,12 +928,12 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1044")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE channel SET icon = 'none' WHERE icon = '';",
 "UPDATE record SET profile = 'Default' WHERE profile = '';",
 "UPDATE record SET recgroup = 'Default' WHERE recgroup = '';",
 "UPDATE recorded SET recgroup = 'Default', starttime = starttime WHERE recgroup = '';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1045", dbver))
             return false;
@@ -941,9 +941,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1045")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE recorded SET recgroup = 'Default', starttime = starttime WHERE recgroup = '';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1046", dbver))
             return false;
@@ -951,10 +951,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1046")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE record ADD COLUMN search INT UNSIGNED NOT NULL DEFAULT 0;",
 "UPDATE record SET search = 0 WHERE search IS NULL;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1047", dbver))
             return false;
@@ -962,7 +962,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1047")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE networkiconmap ("
 "    id INTEGER NOT NULL AUTO_INCREMENT,"
 "    network VARCHAR(20) NOT NULL UNIQUE,"
@@ -975,7 +975,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "    network VARCHAR(20) NOT NULL,"
 "    PRIMARY KEY(id)"
 ");",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1048", dbver))
             return false;
@@ -983,10 +983,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1048")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE cardinput CHANGE preference preference INT NOT NULL DEFAULT 0;",
 "UPDATE cardinput SET preference = 0 WHERE preference IS NULL;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1049", dbver))
             return false;
@@ -994,12 +994,12 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1049")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE keyword ADD COLUMN searchtype INT UNSIGNED NOT NULL DEFAULT 3;",
 "ALTER TABLE keyword DROP INDEX phrase;",
 "ALTER TABLE keyword DROP PRIMARY KEY;",
 "ALTER TABLE keyword ADD UNIQUE(phrase,searchtype);",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1050", dbver))
             return false;
@@ -1008,7 +1008,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1050")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recorded CHANGE starttime starttime DATETIME NOT NULL;",
 "ALTER TABLE recorded CHANGE endtime endtime DATETIME NOT NULL;",
 "ALTER TABLE recorded ADD COLUMN lastmodified TIMESTAMP NOT NULL;",
@@ -1025,7 +1025,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "ALTER TABLE recordoverride CHANGE starttime starttime DATETIME NOT NULL;",
 "ALTER TABLE recordoverride CHANGE endtime endtime DATETIME NOT NULL;",
 "ALTER TABLE transcoding CHANGE starttime starttime DATETIME NOT NULL;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1051", dbver))
             return false;
@@ -1033,10 +1033,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1051")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "update record set dupmethod = 6 where dupmethod = 0;",
 "update record set dupin = 15 where dupin = 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1052", dbver))
             return false;
@@ -1044,12 +1044,12 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1052")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recorded ADD COLUMN stars FLOAT NOT NULL DEFAULT 0;",
 "ALTER TABLE recorded ADD COLUMN previouslyshown TINYINT(1) DEFAULT 0;",
 "ALTER TABLE recorded ADD COLUMN originalairdate DATE;",
 "INSERT INTO settings VALUES ('HaveRepeats', '0', NULL);",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1053", dbver))
             return false;
@@ -1057,9 +1057,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1053")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE channel CHANGE freqid freqid VARCHAR(10);",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1054", dbver))
             return false;
@@ -1067,10 +1067,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1054")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE program ADD INDEX id_start_end (chanid,starttime,endtime);",
 "ALTER TABLE channel ADD INDEX channel_src (channum,sourceid);",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1055", dbver))
             return false;
@@ -1078,9 +1078,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1055")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE record SET dupmethod=6, dupin=4 WHERE dupmethod=8;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1056", dbver))
             return false;
@@ -1088,7 +1088,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1056")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE jobqueue ("
 "    id INTEGER NOT NULL AUTO_INCREMENT,"
 "    chanid INTEGER(10) NOT NULL,"
@@ -1111,7 +1111,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "ALTER TABLE record ADD COLUMN autouserjob2 TINYINT(1) NOT NULL DEFAULT 0;",
 "ALTER TABLE record ADD COLUMN autouserjob3 TINYINT(1) NOT NULL DEFAULT 0;",
 "ALTER TABLE record ADD COLUMN autouserjob4 TINYINT(1) NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1057", dbver))
             return false;
@@ -1125,9 +1125,9 @@ static bool doUpgradeTVDatabaseSchema(void)
     }
     if (dbver == "1057")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "DROP TABLE IF EXISTS transcoding;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1058", dbver))
             return false;
@@ -1135,9 +1135,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1058")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE program SET category_type='series' WHERE showtype LIKE '%series%';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1059", dbver))
             return false;
@@ -1145,9 +1145,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1059")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recorded ADD COLUMN preserve TINYINT(1) NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1060", dbver))
             return false;
@@ -1155,14 +1155,14 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1060")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 
 "ALTER TABLE record ADD COLUMN record.findday TINYINT NOT NULL DEFAULT 0;",
 "ALTER TABLE record ADD COLUMN record.findtime TIME NOT NULL DEFAULT '00:00:00';",
 "ALTER TABLE record ADD COLUMN record.findid INT NOT NULL DEFAULT 0;",
 "ALTER TABLE recorded ADD COLUMN recorded.findid INT NOT NULL DEFAULT 0;",
 "ALTER TABLE oldrecorded ADD COLUMN oldrecorded.findid INT NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1061", dbver))
             return false;
@@ -1170,9 +1170,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1061")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE record ADD COLUMN inactive TINYINT(1) NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1062", dbver))
             return false;
@@ -1180,7 +1180,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1062")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE cardinput ADD COLUMN freetoaironly TINYINT(1) DEFAULT 1;",
 "ALTER TABLE channel ADD COLUMN useonairguide TINYINT(1) DEFAULT 0;",
 "ALTER TABLE capturecard ADD COLUMN dvb_diseqc_type SMALLINT(6);",
@@ -1272,7 +1272,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',94,'tv_types','1,128');",
 //# WUNC Guide
 "INSERT into dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('atsc',1793,'guide_fixup','3');",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1063", dbver))
             return false;
@@ -1280,10 +1280,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1063")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS recordmatch (recordid int unsigned, "
 "chanid int unsigned, starttime datetime, INDEX (recordid));",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1064", dbver))
             return false;
@@ -1291,7 +1291,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1064")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE program CHANGE stereo stereo TINYINT( 1 ) DEFAULT '0' NOT NULL;",
 "ALTER TABLE program CHANGE subtitled subtitled TINYINT( 1 ) DEFAULT '0' NOT NULL;",
 "ALTER TABLE program CHANGE hdtv hdtv TINYINT( 1 ) DEFAULT '0' NOT NULL;",
@@ -1302,7 +1302,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "ALTER TABLE oldrecorded CHANGE programid programid VARCHAR( 20 ) NOT NULL;",
 "ALTER TABLE recorded CHANGE programid programid VARCHAR( 20 ) NOT NULL;",
 "ALTER TABLE record CHANGE programid programid VARCHAR( 20 ) NOT NULL;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1065", dbver))
             return false;
@@ -1310,13 +1310,13 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1065")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "INSERT INTO profilegroups SET name = 'FireWire Input', cardtype = 'FIREWIRE', is_default = 1;",
 "ALTER TABLE capturecard ADD COLUMN firewire_port INT UNSIGNED NOT NULL DEFAULT 0;",
 "ALTER TABLE capturecard ADD COLUMN firewire_node INT UNSIGNED NOT NULL DEFAULT 2;",
 "ALTER TABLE capturecard ADD COLUMN firewire_speed INT UNSIGNED NOT NULL DEFAULT 0;",
 "ALTER TABLE capturecard ADD COLUMN firewire_model varchar(32) NULL;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1066", dbver))
             return false;
@@ -1324,9 +1324,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1066")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES('dvb', '40999', 'guide_fixup', '4');",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1067", dbver))
             return false;
@@ -1334,7 +1334,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1067")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',70,'force_guide_present','yes');",
 "INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',70,'guide_ranges','80,80,96,96');",
 "INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4112,'channel_numbers','131');",
@@ -1343,7 +1343,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',12802,'channel_numbers','131');",
 "INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',12803,'channel_numbers','131');",
 "INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',12829,'channel_numbers','131');",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1068", dbver))
             return false;
@@ -1351,9 +1351,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1068")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recorded ADD COLUMN deletepending TINYINT(1) NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1069", dbver))
             return false;
@@ -1361,10 +1361,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1069")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE jumppoints SET description = 'Weather forecasts' "
     "WHERE description = 'Weather forcasts';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1070", dbver))
             return false;
@@ -1372,9 +1372,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1070")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE recorded SET bookmark = NULL WHERE bookmark = 'NULL';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1071", dbver))
             return false;
@@ -1382,12 +1382,12 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1071")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE program ADD COLUMN manualid INT UNSIGNED NOT NULL DEFAULT 0;",
 "ALTER TABLE program DROP PRIMARY KEY;",
 "ALTER TABLE program ADD PRIMARY KEY (chanid, starttime, manualid);",
 "ALTER TABLE recordmatch ADD COLUMN manualid INT UNSIGNED;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1072", dbver))
             return false;
@@ -1395,9 +1395,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1072")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recorded ADD INDEX (title);",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1073", dbver))
             return false;
@@ -1405,9 +1405,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1073")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE capturecard ADD COLUMN firewire_connection INT UNSIGNED NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1074", dbver))
             return false;
@@ -1415,13 +1415,13 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1074")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "INSERT INTO profilegroups SET name = \"USB Mpeg-4 Encoder (Plextor ConvertX, etc)\", cardtype = 'GO7007', is_default = 1;",
 "INSERT INTO recordingprofiles SET name = \"Default\", profilegroup = 8;",
 "INSERT INTO recordingprofiles SET name = \"Live TV\", profilegroup = 8;",
 "INSERT INTO recordingprofiles SET name = \"High Quality\", profilegroup = 8;",
 "INSERT INTO recordingprofiles SET name = \"Low Quality\", profilegroup = 8;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1075", dbver))
             return false;
@@ -1429,7 +1429,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1075")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS recordedprogram ("
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
@@ -1480,8 +1480,8 @@ static bool doUpgradeTVDatabaseSchema(void)
 "  UNIQUE KEY chanid (chanid,starttime,system,rating),"
 "  KEY starttime (starttime,system)"
 ");",
-""
-       };
+NULL
+};
 
         if (!performActualUpdate(updates, "1076", dbver))
             return false;
@@ -1489,32 +1489,32 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1076")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE channel MODIFY COLUMN serviceid mediumint unsigned;",
-""
-        };
+NULL
+};
         if (!performActualUpdate(updates, "1077", dbver))
             return false;
     }
 
     if (dbver == "1077")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "INSERT INTO dtv_privatetypes "
 "(sitype,networkid,private_type,private_value) VALUES "
 "('dvb',40999,'parse_subtitle_list',"
 "'1070,1049,1041,1039,1038,1030,1016,1131,1068,1069');",
-""
-        };
+NULL
+};
         if (!performActualUpdate(updates, "1078", dbver))
             return false;
     }
 
     if (dbver == "1078")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE capturecard ADD COLUMN dvb_hw_decoder INT DEFAULT '0';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1079", dbver))
             return false;
@@ -1522,9 +1522,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1079")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE oldrecorded ADD COLUMN recordid INT NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1080", dbver))
             return false;
@@ -1532,10 +1532,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1080")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER table recorded ADD INDEX (recordid);",
 "ALTER table oldrecorded ADD INDEX (recordid);",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1081", dbver))
             return false;
@@ -1543,14 +1543,14 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1081")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS oldfind ("
 "recordid INT NOT NULL DEFAULT 0,"
 "findid INT NOT NULL DEFAULT 0,"
 "PRIMARY KEY (recordid, findid)"
 ");",
 "ALTER TABLE record ADD COLUMN parentid INT NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1082", dbver))
             return false;
@@ -1558,13 +1558,13 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1082")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS videobookmarks ("
 "  filename varchar(255) NOT NULL,"
 "  bookmark varchar(128) default NULL,"
 "  PRIMARY KEY (filename)"
 ");",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1083", dbver))
             return false;
@@ -1572,9 +1572,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1083")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "DELETE FROM settings where value = 'UseCategoriesAsRecGroups';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1084", dbver))
             return false;
@@ -1582,14 +1582,14 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1084")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "INSERT INTO recordingprofiles SET name = 'High Quality', profilegroup = 6;",
 "INSERT INTO recordingprofiles SET name = 'Medium Quality', profilegroup = 6;",
 "INSERT INTO recordingprofiles SET name = 'Low Quality', profilegroup = 6;",
 "REPLACE INTO settings SET value = 'DefaultTranscoder', data = '0';",
 "ALTER TABLE record ADD COLUMN transcoder INT NOT NULL DEFAULT 0;",
 "ALTER TABLE recorded ADD COLUMN transcoder INT NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1085", dbver))
             return false;
@@ -1618,7 +1618,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1085")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "DROP TABLE IF EXISTS pidcache;",
 "CREATE TABLE IF NOT EXISTS pidcache ("
 "  chanid smallint(6) NOT NULL default '0',"
@@ -1626,7 +1626,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "  tableid int(11) NOT NULL default '-1',"
 "  INDEX(chanid)"
 ");",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1086", dbver))
             return false;
@@ -1634,7 +1634,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1086")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS xvmc_buffer_settings ( "
 "  id int(11) NOT NULL auto_increment, "
 "  description varchar(255) NOT NULL default '',"
@@ -1647,7 +1647,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "  PRIMARY KEY  (id) );",
 "INSERT INTO xvmc_buffer_settings VALUES (1,'Default / nVidia',2,2,8,16,8,1);",
 "INSERT INTO xvmc_buffer_settings VALUES (2,'VLD (More decode buffers)',2,2,8,16,16,1);",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1087", dbver))
@@ -1656,12 +1656,12 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1087")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE record ADD COLUMN tsdefault FLOAT NOT NULL DEFAULT 1.0;",
 "ALTER TABLE recorded ADD COLUMN timestretch FLOAT NOT NULL DEFAULT 1.0;",
 "UPDATE record SET tsdefault = 1.0;", // we've had the default not take before
 "UPDATE recorded SET timestretch = 1.0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1088", dbver))
             return false;
@@ -1669,7 +1669,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1088")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE oldrecorded ADD COLUMN station VARCHAR(20) NOT NULL DEFAULT '';",
 "UPDATE oldrecorded SET station=chanid;",
 "ALTER TABLE oldrecorded ADD rectype INT(10) UNSIGNED NOT NULL DEFAULT 0;",
@@ -1680,7 +1680,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "UPDATE oldrecorded SET recstatus=-3;",
 "ALTER TABLE oldrecorded DROP PRIMARY KEY;",
 "ALTER TABLE oldrecorded ADD PRIMARY KEY (station,starttime,title);",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1089", dbver))
@@ -1689,12 +1689,12 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1089")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "INSERT INTO profilegroups SET name = 'DBOX2 Input', cardtype = 'DBOX2', is_default = 1;",
 "ALTER TABLE capturecard ADD COLUMN dbox2_port INT UNSIGNED NOT NULL DEFAULT 31338;",
 "ALTER TABLE capturecard ADD COLUMN dbox2_httpport INT UNSIGNED NOT NULL DEFAULT 80;",
 "ALTER TABLE capturecard ADD COLUMN dbox2_host varchar(32) NULL;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1090", dbver))
@@ -1703,10 +1703,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1090")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "DELETE FROM dtv_privatetypes WHERE sitype='dvb' AND networkid=40999 AND private_type='parse_subtitle_list';",
 "INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',40999,'parse_subtitle_list','1070,1308,1041,1306,1307,1030,1016,1131,1068,1069');",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1091", dbver))
@@ -1715,10 +1715,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1091")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE capturecard CHANGE dvb_recordts dvb_recordts INT DEFAULT '1';",
 "UPDATE capturecard SET dvb_recordts=1;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1092", dbver))
@@ -1727,9 +1727,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1092")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recorded ADD COLUMN recpriority INT NOT NULL DEFAULT 0;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1093", dbver))
@@ -1765,10 +1765,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1094")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recorded ADD COLUMN basename varchar(128) NOT NULL DEFAULT '';",
 "UPDATE recorded SET basename = CONCAT(chanid, '_', DATE_FORMAT(starttime, '%Y%m%d%H%i00'), '_', DATE_FORMAT(endtime, '%Y%m%d%H%i00'), '.nuv');",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1095", dbver))
@@ -1777,12 +1777,12 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1095")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recorded ADD COLUMN progstart DATETIME NOT NULL;",
 "UPDATE recorded SET progstart = starttime;",
 "ALTER TABLE recorded ADD COLUMN progend DATETIME NOT NULL;",
 "UPDATE recorded SET progend = endtime;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1096", dbver))
@@ -1791,7 +1791,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1096")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE capturecard ADD COLUMN signal_timeout int NOT NULL default '1000';",
 "ALTER TABLE capturecard ADD COLUMN channel_timeout int NOT NULL default '3000';",
 "DROP TABLE IF EXISTS dvb_signal_quality;",
@@ -1799,7 +1799,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "DROP TABLE IF EXISTS dvb_channel;",
 "DROP TABLE IF EXISTS dvb_pids;",
 "DROP TABLE IF EXISTS dvb_sat;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1097", dbver))
@@ -1808,9 +1808,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1097")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE oldrecorded ADD COLUMN reactivate SMALLINT NOT NULL DEFAULT 0;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1098", dbver))
@@ -1819,9 +1819,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1098")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE record SET findid=TO_DAYS(startdate) WHERE type=6;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1099", dbver))
@@ -1830,9 +1830,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1099")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE videosource ADD COLUMN useeit SMALLINT NOT NULL DEFAULT 0;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1100", dbver))
@@ -1841,7 +1841,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1100")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS tvchain ("
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
@@ -1851,7 +1851,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "  watching int(10) NOT NULL default '0',"
 "  PRIMARY KEY  (chanid,starttime)"
 ");",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1101", dbver))
@@ -1860,9 +1860,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1101")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE tvchain ADD COLUMN hostprefix VARCHAR(128) NOT NULL DEFAULT '';",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1102", dbver))
@@ -1871,9 +1871,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1102")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE tvchain ADD COLUMN cardtype VARCHAR(32) NOT NULL DEFAULT 'V4L';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1103", dbver))
             return false;
@@ -1881,7 +1881,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1103")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS inuseprograms ("
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
@@ -1889,7 +1889,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "  lastupdatetime datetime NOT NULL default '0000-00-00 00:00:00',"
 "  INDEX (chanid,starttime)"
 ");",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1104", dbver))
@@ -1898,10 +1898,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1104")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE tvchain ADD COLUMN input VARCHAR(32) NOT NULL DEFAULT '';",
 "ALTER TABLE tvchain ADD COLUMN channame VARCHAR(32) NOT NULL DEFAULT '';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1105", dbver))
             return false;
@@ -1909,10 +1909,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1105")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE settings SET data = '1' WHERE value = 'AutoExpireMethod' "
       " AND data = '0';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1106", dbver))
             return false;
@@ -1920,10 +1920,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1106")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE inuseprograms ADD COLUMN hostname VARCHAR(255) NOT NULL DEFAULT '';",
 "ALTER TABLE inuseprograms CHANGE playid recusage VARCHAR(128) NOT NULL DEFAULT '';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1107", dbver))
             return false;
@@ -1931,7 +1931,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1107")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE record ADD COLUMN playgroup VARCHAR(32) NOT NULL DEFAULT 'Default'; ",
 "UPDATE record SET playgroup = 'Default'; ",
 "ALTER TABLE recorded ADD COLUMN playgroup VARCHAR(32) NOT NULL DEFAULT 'Default'; ",
@@ -1945,7 +1945,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 ");",
 "INSERT INTO playgroup (name,skipahead,skipback,timestretch) "
 "            VALUES ('Default',30,5,100);",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1108", dbver))
@@ -1954,14 +1954,14 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1108")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE oldrecorded ADD COLUMN generic TINYINT(1) DEFAULT 0;",
 "ALTER TABLE program ADD COLUMN generic TINYINT(1) DEFAULT 0;",
 "UPDATE program SET generic = 1 WHERE "
 "  ((programid = '' AND subtitle = '' AND description = '') OR "
 "   (programid <> '' AND category_type = 'series' AND "
 "    program.programid LIKE '%0000'));",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1109", dbver))
@@ -1970,9 +1970,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1109")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recordedprogram ADD COLUMN generic TINYINT(1) DEFAULT 0;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1110", dbver))
@@ -1981,9 +1981,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1110")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recorded ADD COLUMN profile VARCHAR(32) NOT NULL DEFAULT '';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1111", dbver))
             return false;
@@ -1991,12 +1991,12 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1111")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "DROP TABLE IF EXISTS conflictresolutionany;",
 "DROP TABLE IF EXISTS conflictresolutionoverride;",
 "DROP TABLE IF EXISTS conflictresolutionsingle;",
 "DROP TABLE IF EXISTS recordoverride;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1112", dbver))
             return false;
@@ -2004,9 +2004,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1112")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "DELETE from settings WHERE value LIKE 'DailyWakeup%';",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1113", dbver))
@@ -2015,10 +2015,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1113")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "INSERT INTO settings VALUES ('NextSuggestedMythfilldatabaseRun',NULL,NULL);",
 "INSERT INTO settings VALUES ('HonorGrabberNextSuggestedMythfilldatabaseRunTime','1',NULL);",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1114", dbver))
@@ -2027,9 +2027,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1114")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE tvchain ADD COLUMN endtime DATETIME NOT NULL default '0000-00-00 00:00:00';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1115", dbver))
             return false;
@@ -2037,10 +2037,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1115")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "DELETE FROM keybindings WHERE context = 'Music' AND action LIKE 'JUMP%';",
 "DELETE FROM keybindings WHERE context = 'Game' AND action LIKE 'JUMP%';",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1116", dbver))
@@ -2049,9 +2049,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1116")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE capturecard ADD COLUMN displayname VARCHAR(32) NOT NULL DEFAULT '';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1117", dbver))
             return false;
@@ -2059,10 +2059,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1117")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE capturecard DROP COLUMN displayname;",
 "ALTER TABLE cardinput ADD COLUMN displayname VARCHAR(64) NOT NULL DEFAULT '';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1118", dbver))
             return false;
@@ -2070,13 +2070,13 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1118")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE settings SET value = 'MythFillGrabberSuggestsTime' "
     "WHERE value = 'HonorGrabberNextSuggestedMythfilldatabaseRunTime';",
 "UPDATE settings SET value = 'MythFillSuggestedRunTime', "
     "    data = '1970-01-01T00:00:00' "
     "WHERE value = 'NextSuggestedMythfilldatabaseRun';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1119", dbver))
             return false;
@@ -2084,7 +2084,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1119")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 // "UPDATE playgroup, settings set playgroup.skipahead = settings.data"
 // " WHERE settings.value = 'FastForwardAmount' AND playgroup.name = 'Default';",
 // "UPDATE playgroup, settings set playgroup.skipback = settings.data"
@@ -2092,7 +2092,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "ALTER TABLE playgroup ADD COLUMN jump INT NOT NULL DEFAULT 0;",
 // "UPDATE playgroup, settings set playgroup.jump = settings.data"
 // " WHERE settings.value = 'JumpAmount' AND playgroup.name = 'Default';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1120", dbver))
             return false;
@@ -2100,10 +2100,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1120")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE keybindings SET action = 'ADJUSTSTRETCH' "
 "       WHERE action = 'TOGGLESTRETCH';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1121", dbver))
             return false;
@@ -2111,9 +2111,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1121")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE channel CHANGE channum channum VARCHAR(10) NOT NULL DEFAULT '';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1122", dbver))
             return false;
@@ -2121,10 +2121,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1122")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recorded ADD duplicate TINYINT(1) NOT NULL DEFAULT 0;",
 "UPDATE recorded SET duplicate=1;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1123", dbver))
@@ -2133,9 +2133,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1123")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE cardinput ADD COLUMN radioservices TINYINT(1) DEFAULT 1;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1124", dbver))
             return false;
@@ -2143,10 +2143,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1124")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE capturecard ADD parentid int(10) NOT NULL DEFAULT 0;",
 "ALTER TABLE cardinput ADD childcardid int(10) NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1125", dbver))
             return false;
@@ -2154,9 +2154,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1125")
     {
-       const QString updates[] = {
+       const char *updates[] = {
 "ALTER TABLE recorded ADD COLUMN transcoded TINYINT(1) NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1126", dbver))
             return false;
@@ -2164,11 +2164,11 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1126")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "DROP TABLE IF EXISTS xvmc_buffer_settings;",
 "ALTER TABLE capturecard DROP COLUMN dvb_dmx_buf_size;",
 "ALTER TABLE capturecard DROP COLUMN dvb_pkt_buf_size;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1127", dbver))
             return false;
@@ -2176,9 +2176,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if(dbver == "1127")
     {
-       const QString updates[] = {
+       const char *updates[] = {
 "ALTER TABLE cardinput ADD COLUMN dishnet_eit TINYINT(1) NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1128", dbver))
             return false;
@@ -2224,14 +2224,14 @@ static bool doUpgradeTVDatabaseSchema(void)
             }
         }
 
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE recorded SET bookmark='0' WHERE bookmark IS NULL",
 "INSERT INTO recordedmarkup (chanid, starttime, type, mark) SELECT"
 " chanid, starttime, '2', bookmark FROM recorded WHERE bookmark <> 0;",
 "ALTER TABLE recorded CHANGE cutlist cutlist TINYINT(1) NOT NULL DEFAULT 0",
 "UPDATE recorded SET bookmark='1' WHERE bookmark > 0",
 "ALTER TABLE recorded CHANGE bookmark bookmark TINYINT(1) NOT NULL DEFAULT 0",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1129", dbver))
             return false;
@@ -2239,10 +2239,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1129")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "INSERT INTO dtv_privatetypes (sitype, networkid, private_type, private_value) "
 "       VALUES                ('dvb',  4096,     'guide_fixup', '5');",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1130", dbver))
             return false;
@@ -2250,10 +2250,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1130")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE cardinput ADD COLUMN recpriority INT NOT NULL DEFAULT 0;",
 "UPDATE cardinput SET recpriority = preference;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1131", dbver))
             return false;
@@ -2261,9 +2261,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1131")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE capturecard ADD COLUMN dvb_tuning_delay INT UNSIGNED NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1132", dbver))
             return false;
@@ -2271,9 +2271,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1132")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE channel ADD COLUMN tmoffset INT NOT NULL default '0';",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1133", dbver))
@@ -2282,9 +2282,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1133")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE capturecard SET defaultinput='DVBInput' WHERE defaultinput='Television' AND cardtype = 'DVB';",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1134", dbver))
@@ -2293,10 +2293,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1134")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE jumppoints CHANGE keylist keylist VARCHAR(128);",
 "ALTER TABLE keybindings CHANGE keylist keylist VARCHAR(128);",
-""
+NULL
 };
 
        if (!performActualUpdate(updates, "1135", dbver))
@@ -2305,9 +2305,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1135")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE program ADD listingsource INT NOT NULL default '0';",
-"",
+NULL
 };
 
        if (!performActualUpdate(updates, "1136", dbver))
@@ -2316,9 +2316,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1136")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recordedprogram ADD listingsource INT NOT NULL default '0';",
-"",
+NULL
 };
 
        if (!performActualUpdate(updates, "1137", dbver))
@@ -2327,9 +2327,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1137")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE dtv_multiplex SET networkid='0' WHERE sistandard='atsc';",
-"",
+NULL
 };
 
        if (!performActualUpdate(updates, "1138", dbver))
@@ -2338,12 +2338,12 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1138")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE capturecard ADD contrast   INT NOT NULL default '0';",
 "ALTER TABLE capturecard ADD brightness INT NOT NULL default '0';",
 "ALTER TABLE capturecard ADD colour     INT NOT NULL default '0';",
 "ALTER TABLE capturecard ADD hue        INT NOT NULL default '0';",
-"",
+NULL
 };
 
        if (!performActualUpdate(updates, "1139", dbver))
@@ -2352,9 +2352,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1139")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE dtv_multiplex set modulation = '8psk' WHERE modulation = 'qpsk_8';",
-"",
+NULL
 };
 
        if (!performActualUpdate(updates, "1140", dbver))
@@ -2363,10 +2363,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1140")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE oldrecorded ADD INDEX (recstatus,programid,seriesid);",
 "ALTER TABLE oldrecorded ADD INDEX (recstatus,title,subtitle);",
-"",
+NULL
 };
 
        if (!performActualUpdate(updates, "1141", dbver))
@@ -2375,13 +2375,13 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1141")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS customexample ("
 "  rulename VARCHAR(64) NOT NULL PRIMARY KEY, "
 "  fromclause text NOT NULL, "
 "  whereclause text NOT NULL "
 ");",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1142", dbver))
             return false;
@@ -2389,9 +2389,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1142")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE record ADD COLUMN prefinput int(10) NOT NULL DEFAULT 0;",
-"",
+NULL
 };
 
        if (!performActualUpdate(updates, "1143", dbver))
@@ -2400,9 +2400,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1143")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE settings SET data=0 WHERE value='PlaybackHue' AND (data >= 45 AND data <= 55);",
-""
+NULL
 };
 
        if (!performActualUpdate(updates, "1144", dbver))
@@ -2411,7 +2411,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1144")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS eit_cache ("
 "  chanid  INT(10) NOT NULL, "
 "  eventid SMALLINT UNSIGNED NOT NULL, "
@@ -2420,7 +2420,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "  endtime INT UNSIGNED NOT NULL, "
 "  PRIMARY KEY (chanid, eventid) "
 ");",
-"",
+NULL
 };
 
        if (!performActualUpdate(updates, "1145", dbver))
@@ -2429,9 +2429,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1145")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "INSERT INTO profilegroups SET name = 'Freebox Input', cardtype = 'Freebox', is_default = 1;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1146", dbver))
@@ -2440,10 +2440,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1146")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE program ADD first TINYINT(1) NOT NULL DEFAULT 0;",
 "ALTER TABLE program ADD last  TINYINT(1) NOT NULL DEFAULT 0;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1147", dbver))
@@ -2452,10 +2452,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1147")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recordedprogram ADD first TINYINT(1) NOT NULL DEFAULT 0;",
 "ALTER TABLE recordedprogram ADD last  TINYINT(1) NOT NULL DEFAULT 0;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1148", dbver))
@@ -2464,7 +2464,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1148")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "INSERT INTO recordingprofiles SET name = 'Default',      profilegroup = 10;",
 "INSERT INTO recordingprofiles SET name = 'Live TV',      profilegroup = 10;",
 "INSERT INTO recordingprofiles SET name = 'High Quality', profilegroup = 10;",
@@ -2483,7 +2483,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "INSERT INTO recordingprofiles SET name = 'Live TV',      profilegroup = 12;",
 "INSERT INTO recordingprofiles SET name = 'High Quality', profilegroup = 12;",
 "INSERT INTO recordingprofiles SET name = 'Low Quality',  profilegroup = 12;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1149", dbver))
@@ -2492,9 +2492,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1149")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE settings SET data='channum' WHERE value='ChannelOrdering' AND data!='callsign';",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1150", dbver))
@@ -2503,7 +2503,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1150")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE channel ADD atsc_major_chan INT UNSIGNED NOT NULL default '0';",
 "ALTER TABLE channel ADD atsc_minor_chan INT UNSIGNED NOT NULL default '0';",
 /* the updates were split in two for mysql 3.23 compatibility. */
@@ -2511,7 +2511,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "UPDATE channel SET atsc_major_chan = atsc_major_chan / 256;",
 "UPDATE channel SET atsc_minor_chan = atscsrcid;",
 "UPDATE channel SET atsc_minor_chan = atsc_minor_chan % 256;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1151", dbver))
@@ -2520,9 +2520,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1151")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE programgenres ADD INDEX (genre);",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1152", dbver))
@@ -2531,7 +2531,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1152")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recordedmarkup DROP PRIMARY KEY, ADD PRIMARY KEY (chanid,starttime,type,mark);",
 "CREATE TABLE IF NOT EXISTS recordedseek ("
 "  chanid int(10) unsigned NOT NULL default '0',"
@@ -2543,7 +2543,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "INSERT IGNORE INTO recordedseek (chanid, starttime, mark, offset, type) SELECT"
 " chanid, starttime, mark, offset, type FROM recordedmarkup WHERE type in (6, 7, 9);",
 "DELETE FROM recordedmarkup WHERE type in (6, 7, 9);",
-"",
+NULL
 };
 
        if (!performActualUpdate(updates, "1153", dbver))
@@ -2552,7 +2552,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1153")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS diseqc_config "
 " ( cardinputid INT(10) UNSIGNED NOT NULL, "
 "   diseqcid    INT(10) UNSIGNED NOT NULL, "
@@ -2574,7 +2574,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "   lnb_lof_lo      INT(10) NOT NULL default 0, "
 "   PRIMARY KEY (diseqcid), KEY parentid (parentid) );",
 "ALTER TABLE capturecard ADD diseqcid INT(10) UNSIGNED default NULL;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1154", dbver))
@@ -2585,10 +2585,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1154")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE cardinput CHANGE startchan startchan VARCHAR(10);",
 "ALTER TABLE cardinput CHANGE tunechan  tunechan  VARCHAR(10);",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1155", dbver))
@@ -2597,9 +2597,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1155")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE `diseqc_tree` ADD `cmd_repeat` INT NOT NULL DEFAULT '1';",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1156", dbver))
@@ -2608,9 +2608,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1156")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE codecparams SET value='0' WHERE name='mpeg4optionidct' OR name='mpeg4optionime';",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1157", dbver))
@@ -2619,11 +2619,11 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1157")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE record ADD COLUMN next_record DATETIME NOT NULL;",
 "ALTER TABLE record ADD COLUMN last_record DATETIME NOT NULL;",
 "ALTER TABLE record ADD COLUMN last_delete DATETIME NOT NULL;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1158", dbver))
@@ -2632,9 +2632,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1158")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recorded ADD COLUMN watched TINYINT NOT NULL DEFAULT '0';",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1159", dbver))
@@ -2661,16 +2661,16 @@ static bool doUpgradeTVDatabaseSchema(void)
             }
         }
 
-        const QString updates[] = { "" };
+        const char *updates[] = { NULL };
         if (!performActualUpdate(updates, "1160", dbver))
             return false;
     }
 
     if (dbver == "1160")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE diseqc_tree ADD COLUMN lnb_pol_inv TINYINT NOT NULL DEFAULT '0';",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1161", dbver))
@@ -2679,9 +2679,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1161")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE settings SET data='Auto' WHERE value='EITTimeOffset';",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1162", dbver))
@@ -2720,17 +2720,17 @@ static bool doUpgradeTVDatabaseSchema(void)
             }
         }
 
-        const QString updates[] = { "" };
+        const char *updates[] = { NULL };
         if (!performActualUpdate(updates, "1163", dbver))
             return false;
     }
 
     if (dbver == "1163")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE capturecard DROP COLUMN dvb_recordts;",
 "ALTER TABLE capturecard DROP COLUMN dvb_hw_decoder;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1164", dbver))
@@ -2739,9 +2739,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1164")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE INDEX program_manualid ON program (manualid);",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1165", dbver))
@@ -2750,10 +2750,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1165")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recordedrating CHANGE rating rating CHAR(16);",
 "ALTER TABLE programrating CHANGE rating rating CHAR(16);",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1166", dbver))
@@ -2762,9 +2762,9 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1166")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "DELETE FROM keybindings where action = 'VIEWVIDEOSOURCE';",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1167", dbver))
@@ -2773,7 +2773,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1167")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS dvdbookmark ("
 "   serialid varchar(16) NOT NULL default '',"
 "   name varchar(32) default NULL,"
@@ -2783,7 +2783,7 @@ static bool doUpgradeTVDatabaseSchema(void)
 "   framenum bigint(20) NOT NULL default 0,"
 "   timestamp timestamp NOT NULL, "
 "   PRIMARY KEY (serialid));",
-"",
+NULL
 };
 
         if (!performActualUpdate(updates, "1168", dbver))
@@ -2792,10 +2792,10 @@ static bool doUpgradeTVDatabaseSchema(void)
 
     if (dbver == "1168")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE dtv_multiplex SET sistandard='mpeg', networkid=NULL, transportid=NULL "
 "WHERE sistandard = 'dvb' AND networkid IS NULL OR networkid < 1;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1169", dbver))
@@ -2841,9 +2841,10 @@ static bool doUpgradeTVDatabaseSchema(void)
                 "WHERE mplexid IN " + in + ")";
         }
 
-        const QString updates[] = {
+        const char *updates[] = {
 thequery,
-""};
+NULL
+};
 
         if (!performActualUpdate(updates, "1170", dbver))
             return false;
@@ -2851,7 +2852,7 @@ thequery,
 
     if (dbver == "1170")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS storagegroup ( "
 "    id           INT(11) NOT NULL auto_increment, "
 "    groupname    VARCHAR(32) NOT NULL, "
@@ -2870,7 +2871,7 @@ thequery,
 "ALTER TABLE record   ADD storagegroup VARCHAR(32) NOT NULL DEFAULT 'Default';",
 "ALTER TABLE inuseprograms ADD rechost VARCHAR(64) NOT NULL;",
 "ALTER TABLE inuseprograms ADD recdir VARCHAR(255) NOT NULL DEFAULT '';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1171", dbver))
             return false;
@@ -2879,7 +2880,7 @@ thequery,
     if (dbver == "1171")
     {
         // Add Firewire and DBox2 default recording profiles..
-        const QString updates[] = {
+        const char *updates[] = {
 "INSERT INTO recordingprofiles SET name = \"Default\",      profilegroup = 7;",
 "INSERT INTO recordingprofiles SET name = \"Live TV\",      profilegroup = 7;",
 "INSERT INTO recordingprofiles SET name = \"High Quality\", profilegroup = 7;",
@@ -2888,7 +2889,7 @@ thequery,
 "INSERT INTO recordingprofiles SET name = \"Live TV\",      profilegroup = 9;",
 "INSERT INTO recordingprofiles SET name = \"High Quality\", profilegroup = 9;",
 "INSERT INTO recordingprofiles SET name = \"Low Quality\",  profilegroup = 9;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1172", dbver))
             return false;
@@ -2896,9 +2897,9 @@ thequery,
 
     if (dbver == "1172")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE channel ADD COLUMN last_record DATETIME NOT NULL;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1173", dbver))
             return false;
@@ -2906,10 +2907,10 @@ thequery,
 
     if (dbver == "1173")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE settings SET data = CONCAT(data, \" --settime $time\") "
 "WHERE value = \"MythShutdownNvramCmd\";",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1174", dbver))
             return false;
@@ -2917,9 +2918,9 @@ thequery,
 
     if (dbver == "1174")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE record SET dupin = 31 WHERE dupin = 4;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1175", dbver))
             return false;
@@ -2960,10 +2961,10 @@ thequery,
                 "WHERE cardid IN " + in + ")";
         }
 
-        const QString updates[] = {
+        const char *updates[] = {
 "DELETE FROM capturecard WHERE cardtype = 'FIREWIRE';",
 thequery,
-""
+NULL
 };
         if (!performActualUpdate(updates, "1176", dbver))
             return false;
@@ -2971,9 +2972,9 @@ thequery,
 
     if (dbver == "1176")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE cardinput ADD COLUMN quicktune TINYINT NOT NULL default '0';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1177", dbver))
             return false;
@@ -2981,7 +2982,7 @@ thequery,
 
     if (dbver == "1177")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE channel           ADD INDEX (sourceid, xmltvid, chanid);",
 "ALTER TABLE channel           ADD INDEX (visible);",
 "ALTER TABLE inuseprograms     ADD INDEX (recusage, lastupdatetime);",
@@ -2998,7 +2999,7 @@ thequery,
 "ALTER TABLE recorded          ADD INDEX (recgroup, endtime);",
 "ALTER TABLE recordingprofiles ADD INDEX (profilegroup);",
 "ALTER TABLE storagegroup      ADD INDEX (hostname);",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1178", dbver))
             return false;
@@ -3006,7 +3007,7 @@ thequery,
 
     if (dbver == "1178")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE program         CHANGE seriesid  seriesid  VARCHAR(40) NOT NULL DEFAULT '';",
 "ALTER TABLE program         CHANGE programid programid VARCHAR(40) NOT NULL DEFAULT '';",
 "ALTER TABLE record          CHANGE seriesid  seriesid  VARCHAR(40) NOT NULL DEFAULT '';",
@@ -3018,7 +3019,7 @@ thequery,
 "ALTER TABLE oldrecorded     CHANGE seriesid  seriesid  VARCHAR(40) NOT NULL DEFAULT '';",
 "ALTER TABLE oldrecorded     CHANGE programid programid VARCHAR(40) NOT NULL DEFAULT '';",
 "ALTER TABLE channel ADD COLUMN default_authority VARCHAR(32) NOT NULL DEFAULT '';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1179", dbver))
             return false;
@@ -3026,10 +3027,10 @@ thequery,
 
     if (dbver == "1179")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE eit_cache ADD COLUMN status TINYINT NOT NULL default '0';",
 "ALTER TABLE eit_cache DROP PRIMARY KEY, ADD PRIMARY KEY (chanid,eventid,status);",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1180", dbver))
             return false;
@@ -3037,13 +3038,13 @@ thequery,
 
     if (dbver == "1180")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recordedmarkup MODIFY mark MEDIUMINT UNSIGNED NOT NULL DEFAULT 0, "
                            "MODIFY type TINYINT NOT NULL DEFAULT 0;",
 "ALTER TABLE recordedseek MODIFY mark MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,"
                          "MODIFY offset BIGINT UNSIGNED NOT NULL,"
                          "MODIFY type TINYINT NOT NULL DEFAULT 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1181", dbver))
             return false;
@@ -3083,9 +3084,9 @@ thequery,
 
     if (dbver == "1182")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE jobqueue ADD schedruntime datetime NOT NULL default '2007-01-01 00:00:00';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1183", dbver))
             return false;
@@ -3093,10 +3094,10 @@ thequery,
 
     if (dbver == "1183")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE channel ADD COLUMN commmethod INT NOT NULL default '-1';",
 "UPDATE channel SET commmethod = -2 WHERE commfree = 1;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1184", dbver))
             return false;
@@ -3104,13 +3105,13 @@ thequery,
 
     if (dbver == "1184")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS powerpriority ("
 "  priorityname VARCHAR(64) NOT NULL PRIMARY KEY, "
 "  recpriority int(10) NOT NULL default '0',"
 "  selectclause text NOT NULL "
 ");",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1185", dbver))
             return false;
@@ -3153,9 +3154,9 @@ thequery,
 
     if (dbver == "1186")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE eit_cache MODIFY eventid INT UNSIGNED NOT NULL default 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1187", dbver))
             return false;
@@ -3163,12 +3164,12 @@ thequery,
 
     if (dbver == "1187")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE keybindings SET keylist=REPLACE(keylist, '\\\\\\\\', '\\\\');",
 "UPDATE keybindings SET keylist=REPLACE(keylist, '\\\\\\\"', '\"');",
 "UPDATE jumppoints SET keylist=REPLACE(keylist, '\\\\\\\\', '\\\\');",
 "UPDATE jumppoints SET keylist=REPLACE(keylist, '\\\\\\\"', '\"');",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1188", dbver))
             return false;
@@ -3176,13 +3177,13 @@ thequery,
 
     if (dbver == "1188")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE customexample ADD COLUMN search TINYINT NOT NULL default '0';",
 "REPLACE INTO customexample VALUES('New Flix', '', "
 "'program.category_type = ''movie'' AND program.airdate >= \n"
 "     YEAR(DATE_SUB(NOW(), INTERVAL 1 YEAR)) \n"
 "AND program.stars > 0.5 ', 1);",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1189", dbver))
             return false;
@@ -3190,13 +3191,13 @@ thequery,
 
     if (dbver == "1189")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TEMPORARY TABLE tmpcodecparams AS "
     "SELECT * FROM codecparams WHERE name = 'mpeg4scalebitrate';",
 "UPDATE tmpcodecparams SET name = 'scalebitrate';",
 "INSERT codecparams SELECT * FROM tmpcodecparams;",
 "DROP TABLE tmpcodecparams;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1190", dbver))
             return false;
@@ -3204,7 +3205,7 @@ thequery,
 
     if (dbver == "1190")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "DROP TABLE IF EXISTS recordedfile;",
 "CREATE TABLE recordedfile ("
 "    chanid                  INT(10) UNSIGNED  NOT NULL DEFAULT 0,"
@@ -3224,7 +3225,7 @@ thequery,
 "    PRIMARY KEY (chanid, starttime),"
 "    INDEX       (basename)"
 ");",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1191", dbver))
             return false;
@@ -3232,7 +3233,7 @@ thequery,
 
     if (dbver == "1191")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "DROP TABLE IF EXISTS displayprofilegroups;",
 "DROP TABLE IF EXISTS displayprofiles;",
 "CREATE TABLE IF NOT EXISTS displayprofilegroups ("
@@ -3252,7 +3253,7 @@ thequery,
 "  KEY (profileid,value),"
 "  INDEX (profileid)"
 ");",
-"",
+NULL
 };
        if (!performActualUpdate(updates, "1192", dbver))
             return false;
@@ -3260,9 +3261,9 @@ thequery,
 
     if (dbver == "1192")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE record ADD COLUMN avg_delay INT NOT NULL default 100;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1193", dbver))
             return false;
@@ -3270,13 +3271,13 @@ thequery,
 
     if (dbver == "1193")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS inputgroup ("
 "  cardinputid int(10) unsigned NOT NULL, "
 "  inputgroupid int(10) unsigned NOT NULL, "
 "  inputgroupname varchar(32) NOT NULL "
 ");",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1194", dbver))
             return false;
@@ -3284,9 +3285,9 @@ thequery,
 
     if (dbver == "1194")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE settings SET data='G.A.N.T' WHERE value='Theme' AND data='G.A.N.T.';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1195", dbver))
             return false;
@@ -3294,10 +3295,10 @@ thequery,
 
     if (dbver == "1195")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE settings SET data=REPLACE(data, '--no-delete', '')"
 " WHERE value='MythFillDatabaseArgs';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1196", dbver))
             return false;
@@ -3305,11 +3306,11 @@ thequery,
 
     if (dbver == "1196")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE videosource "
 "SET xmltvgrabber='schedulesdirect1', userid='', password=NULL "
 "WHERE xmltvgrabber='datadirect' OR xmltvgrabber='technovera';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1197", dbver))
             return false;
@@ -3350,10 +3351,10 @@ thequery,
                 "WHERE cardid IN " + in + ")";
         }
 
-        const QString updates[] = {
+        const char *updates[] = {
 "DELETE FROM capturecard WHERE cardtype = 'HDTV';",
 thequery,
-""
+NULL
 };
         if (!performActualUpdate(updates, "1198", dbver))
             return false;
@@ -3361,10 +3362,10 @@ thequery,
 
     if (dbver == "1198")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "DELETE FROM keybindings "
 "WHERE context = 'TV PLAYBACK' AND action = 'TOGGLEASPECT';",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1199", dbver))
             return false;
@@ -3372,10 +3373,10 @@ thequery,
 
     if (dbver == "1199")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE codecparams SET value = 1 "
 "WHERE name='mpeg4maxquality' AND value = 0;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1200", dbver))
             return false;
@@ -3394,11 +3395,13 @@ thequery,
                 in += "'" + query.value(0).toString() + "',";
         }
         in = (in.isEmpty()) ? "'5','6','7','8'" : in.left(in.length()-1);
-        const QString updates[] = {
-            QString("UPDATE codecparams "
-                    "SET value=48000 "
-                    "WHERE name='samplerate' AND profile IN (%1);").arg(in),
-            ""
+        QString tmp = QString(
+            "UPDATE codecparams "
+            "SET value=48000 "
+            "WHERE name='samplerate' AND profile IN (%1);").arg(in);
+        const char *updates[] = {
+            tmp.ascii(),
+            NULL
         };
 
         if (!performActualUpdate(updates, "1201", dbver))
@@ -3407,12 +3410,12 @@ thequery,
 
     if (dbver == "1201")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recordmatch ADD oldrecduplicate TINYINT(1); ",
 "ALTER TABLE recordmatch ADD recduplicate TINYINT(1); ",
 "ALTER TABLE recordmatch ADD findduplicate TINYINT(1); ",
 "ALTER TABLE recordmatch ADD oldrecstatus INT(11); ",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1202", dbver))
             return false;
@@ -3420,7 +3423,7 @@ thequery,
 
     if (dbver == "1202")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE upnpmedia ("
 "intid int(10) unsigned NOT NULL default '0',"
 "class varchar(64) NOT NULL default '',"
@@ -3435,7 +3438,7 @@ thequery,
 "KEY filepath (filepath),"
 "KEY parentid (parentid)"
 ");",
-""
+NULL
 };
        if (!performActualUpdate(updates, "1203", dbver))
            return false;
@@ -3443,14 +3446,14 @@ thequery,
 
     if (dbver == "1203")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE keybindings SET keylist = '[,{,F10,Volume Down' "
 "WHERE action = 'VOLUMEDOWN' AND keylist = '[,{,F10';",
 "UPDATE keybindings SET keylist = '],},F11,Volume Up' "
 "WHERE action = 'VOLUMEUP' AND keylist = '],},F11';",
 "UPDATE keybindings SET keylist = '|,\\\\,F9,Volume Mute' "
 "WHERE action = 'MUTE' AND keylist = '|,\\\\,F9';",
-""
+NULL
 };
        if (!performActualUpdate(updates, "1204", dbver))
            return false;
@@ -3458,9 +3461,9 @@ thequery,
 
     if (dbver == "1204")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE upnpmedia ADD coverart varchar(512) NOT NULL default ''; ",
-""
+NULL
 };
     if (!performActualUpdate(updates, "1205", dbver))
             return false;
@@ -3469,11 +3472,11 @@ thequery,
     // Until we merge to the trunk this must be done manually...
     if (dbver == "1205")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "DELETE FROM keybindings "
 "WHERE context = 'TV PLAYBACK' AND "
 "      (action = 'TOGGLEINPUTS' OR action = 'SWITCHCARDS');",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1206", dbver))
             return false;
@@ -3481,10 +3484,10 @@ thequery,
 
     if (dbver == "1206")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE capturecard DROP parentid;",
 "ALTER TABLE cardinput DROP childcardid;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1207", dbver))
             return false;
@@ -3492,9 +3495,9 @@ thequery,
 
     if (dbver == "1207")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE recorded MODIFY basename VARCHAR(255) NOT NULL;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1208", dbver))
             return false;
@@ -3502,9 +3505,9 @@ thequery,
 
     if (dbver == "1208")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE capturecard ADD dvb_eitscan tinyint(1) NOT NULL default '1'; ",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1209", dbver))
 	    return false;
@@ -3512,7 +3515,7 @@ thequery,
 
     if (dbver == "1209")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE program ADD audioprop     tinyint(3) unsigned NOT NULL; ",
 "ALTER TABLE program ADD subtitletypes tinyint(3) unsigned NOT NULL; ",
 "ALTER TABLE program ADD videoprop     tinyint(3) unsigned NOT NULL; ",
@@ -3525,7 +3528,7 @@ thequery,
 "UPDATE recordedprogram SET audioprop     = stereo;",
 "UPDATE recordedprogram SET subtitletypes = closecaptioned | (subtitled << 1);",
 "UPDATE recordedprogram SET videoprop     = hdtv;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1210", dbver))
 	    return false;
@@ -3533,7 +3536,7 @@ thequery,
 
     if (dbver == "1210")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE program CHANGE COLUMN audioprop audioprop "
 "    SET('STEREO', 'MONO', 'SURROUND', 'DOLBY', 'HARDHEAR', 'VISUALIMPAIR') NOT NULL; ",
 "ALTER TABLE program CHANGE COLUMN videoprop videoprop "
@@ -3547,7 +3550,7 @@ thequery,
 "    SET('HDTV', 'WIDESCREEN', 'AVC') NOT NULL; ",
 "ALTER TABLE recordedprogram CHANGE COLUMN subtitletypes subtitletypes "
 "    SET('HARDHEAR', 'NORMAL', 'ONSCREEN', 'SIGNED') NOT NULL; ",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1211", dbver))
 	    return false;
@@ -3555,7 +3558,7 @@ thequery,
 
     if (dbver == "1211")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TEMPORARY TABLE tmpdisplayprofiles AS "
 "    SELECT * FROM displayprofiles WHERE value = 'pref_osdfade';",
 "UPDATE tmpdisplayprofiles SET value = 'pref_max_cpus', data = '1';",
@@ -3563,7 +3566,7 @@ thequery,
 "    (SELECT profileid FROM displayprofiles WHERE value = 'pref_max_cpus');",
 "INSERT displayprofiles SELECT * FROM tmpdisplayprofiles;",
 "DROP TABLE tmpdisplayprofiles;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1212", dbver))
@@ -3572,13 +3575,13 @@ thequery,
 
     if (dbver == "1212")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "DELETE FROM keybindings WHERE action LIKE 'MENU%' AND context='TV Playback';",
 "DELETE FROM keybindings WHERE action='TEXTEXIT' AND context='TV Playback';",
 "DELETE FROM keybindings WHERE action='SIGNALMON' AND context='TV Playback' "
 "   AND keylist='F7';",
 "UPDATE keybindings SET context='TV Playback' WHERE context='ITV Menu';",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1213", dbver))
@@ -3614,16 +3617,16 @@ thequery,
             }
         }
 
-        const QString updates[] = { "" };
+        const char *updates[] = { NULL };
         if (!performActualUpdate(updates, "1214", dbver))
             return false;
     }
 
     if (dbver == "1214")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE capturecard SET audioratelimit = NULL;",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1215", dbver))
             return false;
@@ -3631,7 +3634,7 @@ thequery,
 
     if (dbver == "1215")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;").arg(gContext->GetDatabaseParams().dbName),
 "ALTER TABLE callsignnetworkmap"
 "  MODIFY callsign varbinary(20) NOT NULL default '',"
@@ -3859,8 +3862,8 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;").arg(gContext->GetData
 "  MODIFY freqtable varbinary(16) NOT NULL default 'default',"
 "  MODIFY lineupid varbinary(64) default NULL,"
 "  MODIFY password varbinary(64) default NULL;",
-""
-        };
+NULL
+};
 
         if (!performActualUpdate(updates, "1216", dbver))
             return false;
@@ -3868,7 +3871,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;").arg(gContext->GetData
 
     if (dbver == "1216")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;").arg(gContext->GetDatabaseParams().dbName),
 "ALTER TABLE callsignnetworkmap"
 "  DEFAULT CHARACTER SET default,"
@@ -4156,8 +4159,8 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 "  MODIFY freqtable varchar(16) CHARACTER SET utf8 NOT NULL default 'default',"
 "  MODIFY lineupid varchar(64) CHARACTER SET utf8 default NULL,"
 "  MODIFY password varchar(64) CHARACTER SET utf8 default NULL;",
-""
-        };
+NULL
+};
 
         if (!performActualUpdate(updates, "1217", dbver))
             return false;
@@ -4165,9 +4168,9 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 
     if (dbver == "1217")
     {
-        const QString updates[] = {
+        const char *updates[] = {
             "DROP TABLE IF EXISTS videobookmarks;",
-            ""
+            NULL
         };
 
         if (!performActualUpdate(updates, "1218", dbver))
@@ -4176,7 +4179,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 
     if (dbver == "1218")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "ALTER TABLE cardinput"
 "  DROP COLUMN preference,"
 "  DROP COLUMN diseqc_port,"
@@ -4191,7 +4194,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 "  DROP COLUMN atscsrcid,"
 "  DROP COLUMN commfree;",
 "ALTER TABLE recordedmarkup DROP COLUMN offset;",
-""
+NULL
 };
 
         if (!performActualUpdate(updates, "1219", dbver))
@@ -4200,7 +4203,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 
     if (dbver == "1219")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "CREATE TABLE IF NOT EXISTS channelscan ("
 "  scanid       int(3)           UNSIGNED NOT NULL AUTO_INCREMENT,"
 "  cardid       int(3)           UNSIGNED NOT NULL,"
@@ -4268,7 +4271,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 "  could_be_opencable tinyint(1) UNSIGNED NOT NULL default '0',"
 "  decryption_status smallint(2) UNSIGNED NOT NULL default '0'"
 ");",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1220", dbver))
             return false;
@@ -4276,19 +4279,18 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 
     if (dbver == "1220")
     {
-        const QString updates[] = {
+        const char *updates[] = {
 "UPDATE settings SET data='7' "
 "  WHERE value='CommercialSkipMethod' AND data='255'",
 "UPDATE settings SET data='261' "
 "  WHERE value='CommercialSkipMethod' AND data='511'",
 "UPDATE channel SET commmethod='7' WHERE commmethod='255'",
 "UPDATE channel SET commmethod='261' WHERE commmethod='511'",
-""
+NULL
 };
         if (!performActualUpdate(updates, "1221", dbver))
             return false;
     }
-
 
     return true;
 }
@@ -4313,7 +4315,7 @@ bool InitializeDatabase(void)
 
     VERBOSE(VB_IMPORTANT, "Inserting MythTV initial database information.");
 
-    const QString updates[] = {
+    const char *updates[] = {
 QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;").arg(gContext->GetDatabaseParams().dbName),
 "CREATE TABLE IF NOT EXISTS callsignnetworkmap ("
 "  id int(11) NOT NULL auto_increment,"
@@ -4955,7 +4957,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;").arg(gContext->GetData
 "                                             2,2,8,16,8,1);",
 "INSERT INTO xvmc_buffer_settings VALUES (2,'VLD (More decode buffers)',"
 "                                             2,2,8,16,16,1);",
-""
+NULL
 };
 
     QString dbver = "";

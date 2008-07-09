@@ -525,24 +525,6 @@ inc.files = programinfo.h remoteutil.h recordingtypes.h
 
 INSTALLS += inc
 
-# Workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=36687
-unix {
-    SOURCES-=dbcheck.cpp
-    OBJECTS+=dbcheck.o
-    gcc431_workaround.target=dbcheck.o
-    gcc431_workaround.commands="$(CXX) -c $(CXXFLAGS) -O0 $(INCPATH) -o dbcheck.o dbcheck.cpp"
-    gcc431_workaround.depends=dbcheck.cpp dbcheck.h
-    gcc431_workaround.depends+=datadirect.h videodisplayprofile.h
-    gcc431_workaround.depends+=../libmyth/mythcontext.h
-    gcc431_workaround.depends+=../libmyth/dbutil.h
-    gcc431_workaround.depends+=../libmythdb/mythexp.h
-    gcc431_workaround.depends+=../libmythdb/mythobservable.h
-    gcc431_workaround.depends+=../libmythdb/mythevent.h
-    gcc431_workaround.depends+=../libmythdb/mythsocket.h
-    gcc431_workaround.depends+=../libmythdb/mythdbcon.h
-    QMAKE_EXTRA_UNIX_TARGETS+=gcc431_workaround
-}
-
 #The following line was inserted by qt3to4
 QT += network xml  sql opengl qt3support
 
