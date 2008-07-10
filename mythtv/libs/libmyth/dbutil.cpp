@@ -460,4 +460,47 @@ bool DBUtil::ParseDBMSVersion()
     return m_versionMajor > -1;
 }
 
+/**
+ * Estimate the number of MythTV programs using the database
+ */
+int DBUtil::CountClients(void)
+{
+    DatabaseParams DB    = gContext->GetDatabaseParams();
+    int            count = 0;
+
+    // QSqlQuery doesn't know how to parse the results of "SHOW PROCESSLIST",
+    // so instead of a nice query.next loop, we have to do it in a hacky way
+
+    QString     cmd = "mysql";
+    QStringList params;
+    QProcess    proc;
+
+    params << "-h" << DB.dbHostName;
+    params << "-u" << DB.dbUserName;
+    params << "-p" + DB.dbPassword;
+    params << "-e" << "SHOW PROCESSLIST";
+
+    proc.start(cmd, params);
+    if (!proc.waitForStarted(1000) ||
+        !proc.waitForFinished(3000))
+    {
+        proc.kill();
+        return 0;
+    }
+
+    while (proc.canReadLine())
+        if (proc.readLine().contains(DB.dbName.ascii()))
+            ++count;
+
+
+    // On average, each myth program has 4 database connections,
+    // but we round up just in case a new program is loading:
+    count = (count + 3)/4; 
+
+    VERBOSE(VB_GENERAL+VB_EXTRA,
+            QString("DBUtil::CountClients() found %1").arg(count));
+
+    return count;
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

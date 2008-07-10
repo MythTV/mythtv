@@ -31,8 +31,10 @@ class MPUBLIC DBUtil
 
     static QMap<QString,bool> GetTableMap(void);
     static bool IsBackupInProgress(void);
+    static int  CountClients(void);
 
     static const int kUnknownVersionNumber;
+
 
   private:
     bool QueryDBMSVersion(void);
