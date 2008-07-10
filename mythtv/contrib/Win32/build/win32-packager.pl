@@ -141,8 +141,7 @@ print "\tSVN location is: $svnlocation\n\tSVN revision is: $SVNRELEASE\n\n";
 print "Press [enter] to continue, or [ctrl]-c to exit now....\n";
 getc();
 
-# TODO -  use this list to define the components to build - only the first of 
-#         these currently works well.
+# this list defines the components to build , to build everything, leave as-is
 my @components = ( 'mythtv', 'myththemes', 'mythplugins' );
 
 
@@ -153,7 +152,7 @@ my @components = ( 'mythtv', 'myththemes', 'mythplugins' );
 #  my $sources = $ENV{SOURCES};
 # TODO - although theoretically possible to change these paths,
 #        it has NOT been tested much, and will with HIGH PROBABILITY fail somewhere. 
-# TODO - Only $mingw is tested and most likely is safe to change.
+#      - Only $mingw is tested and most likely is safe to change.
 
 # Perl compatible paths. DOS style, but forward slashes, and must end in slash:
 my $msys    = 'C:/MSys/1.0/';
@@ -195,6 +194,10 @@ my $unixmythtv  = perl2unix($mythtv);
 my $unixhome    = perl2unix($home);
 my $unixbuild   = perl2unix($build);
 
+# The installer for MinGW:
+my $MinGWinstaller = 'MinGW-5.1.4.exe';
+my $installMinGW   = $dossources.$MinGWinstaller;
+
 
 #NOTE: IT'S IMPORTANT that the PATHS use the correct SLASH-ing method for
 #the type of action:
@@ -214,11 +217,11 @@ my $unixbuild   = perl2unix($build);
 #        an event/action.
 #        There are a number of different actions that can be taken.
 #
-# eg: [ dir  => "c:/MinGW", exec => $dossources.'MinGW-5.1.3.exe' ],
+# eg: [ dir  => "c:/MinGW", exec => $dossources.'MinGW-5.1.4.exe' ],
 #
 # means: expect there to be a dir called "c:/MinGW", and if there isn't
-# execute the file MinGW-5.1.3.exe. (clearly there needs to be a file
-# MinGW-5.1.3.exe on disk for that to work, so there is an earlier
+# execute the file MinGW-5.1.4.exe. (clearly there needs to be a file
+# MinGW-5.1.4.exe on disk for that to work, so there is an earlier
 # declaration to 'fetch' it)
 
 
@@ -255,9 +258,12 @@ my $unixbuild   = perl2unix($build);
 #  copy a new version of a file, set mtime to the original           [copy] 
 
 #TODO:
-#  copy a set of files (path/filespec,  destination)                 not-yet-impl.  use exec => 'copy /Y xxx.* yyy'
-#  apply a diff                                                      not-yet-impl   use shell => 'patch -p0 < blah.patch'
-#  search-replace text in a file                                     not-yet-impl   use grep => ['pattern',subject], exec => shell 'patch < etc to replace it'
+#  copy a set of files (path/filespec,  destination)                 not-yet-impl.
+#   =>  use exec => 'copy /Y xxx.* yyy'
+#  apply a diff                                                      not-yet-impl
+#   =>   use shell => 'patch -p0 < blah.patch'
+#  search-replace text in a file                                     not-yet-impl
+#   =>   use grep => ['pattern',subject], exec => shell 'patch < etc to replace it'
 
 
 # NOTES on specific actions: 
@@ -286,18 +292,18 @@ push @{$expect},
   comment => 'We download all the files from the web, and save them here:'],
 
 
-[ archive => $sources.'MinGW-5.1.3.exe', 
-  'fetch' => 'http://'.$sourceforge.'/sourceforge/mingw/MinGW-5.1.3.exe',
+[ archive => $sources.$MinGWinstaller, 
+  'fetch' => 'http://'.$sourceforge.'/sourceforge/mingw/'.$MinGWinstaller,
   comment => 'Get mingw and addons first, or we cant do [shell] requests!' ],
 [ archive => $sources.'mingw-utils-0.3.tar.gz', 
   'fetch' => 'http://'.$sourceforge.'/sourceforge/mingw/mingw-utils-0.3.tar.gz' ],
 
 
 [ dir     => $mingw, 
-  exec    => $dossources.'MinGW-5.1.3.exe',
+  exec    => $installMinGW,
   comment => 'install MinGW (be sure to install g++, g77 and ming make too. Leave the default directory at c:\mingw ) - it will require user interaction, but once completed, will return control to us....' ], # interactive, supposed to install g++ and ming make too, but people forget to select them? 
 [ file    => $mingw."bin/gcc.exe", 
-  exec    => $dossources.'MinGW-5.1.3.exe',
+  exec    => $installMinGW,
   comment => 'unable to find a gcc.exe where expected, rerunning MinGW installer!' ], # interactive, supposed to install g++ and ming make too, but people forget to select them? 
 
 [ archive => $sources.'MSYS-1.0.10.exe', 
@@ -325,13 +331,13 @@ push @{$expect},
 # if you did a default-install of MingW, then you need to try again, as we
 # really need g++ and mingw32-make, and g77 is needed for fftw
 [ file    => $mingw.'bin/mingw32-make.exe',  
-  exec    => $dossources.'MinGW-5.1.3.exe',
+  exec    => $installMinGW,
   comment => 'Seriously?  You must have done a default install of MinGW.  go try again! You MUST choose the custom installed and select the mingw make, g++ and g77 optional packages.' ],
 [ file    => $mingw.'bin/g++.exe', 
-  exec    => $dossources.'MinGW-5.1.3.exe',
+  exec    => $installMinGW,
   comment => 'Seriously?  You must have done a default install of MinGW.  go try again! You MUST choose the custom installed and select the mingw make, g++ and g77 optional packages.' ],
 [ file    => $mingw.'bin/g77.exe', 
-  exec    => $dossources.'MinGW-5.1.3.exe',
+  exec    => $installMinGW,
   comment => 'Seriously?  You must have done a default install of MinGW.  go try again! You MUST choose the custom installed and select the mingw make, g++ and g77 optional packages.' ],
 
 #[ file => 'C:/MinGW/bin/mingw32-make.exe',  extract =>
@@ -426,6 +432,14 @@ push @{$expect},
 [ file     => $mingw.'include/mysql.h'  ,   
   exec     => 'copy /Y "c:\Program Files\MySQL\MySQL Server 5.0\include\*" '.$dosmingw."include" ],
   
+  
+# make sure that /mingw is mounted in MSYS properly before trying to use the /mingw folder
+# this is supposed to happen as part of the MSYS post-install, but doesnt always work.
+[ file    => $msys.'etc/fstab', 
+  write   => [$msys.'etc/fstab',
+"$mingw /mingw
+" ],comment => 'correct a MinGW bug that prevents the /etc/fstab from existing'],
+
 #
 # TIP: we use a special file (with two extra _'s )
 #      as a marker to say this acton is already done! 
@@ -1154,41 +1168,43 @@ push @{$expect},
 #[ filesame => [$mythtv.'mythtv/15541_undo.patch',$sources."15541_undo.patch"], copy => [''=>'',comment => 'XXXX'] ],
 #[ grep  => ['\#include \"compat.h\"',$mythtv.'mythtv/libs/libmythui/mythpainter.cpp'], shell => ["cd ".$unixmythtv."mythtv/libs/libmyth/","patch -p2 < ".$unixmythtv."mythtv/15541_undo.patch"] , comment => 'currently need this patch too, equivalemnt of: svn merge -r 15541:15540 .'],
 
+# Ticket 4984
+#[ archive => $sources.'4984_mythcontext.patch6' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4984/mythcontext.patch6', comment => 'Applying Ticket 4984'],
+#[ filesame => [$mythtv.'mythtv/4984_mythcontext.patch6',$sources."4984_mythcontext.patch6"], copy => [''=>'',comment => 'XXXX'] ],
+#[ grep  => ['MYTHLIBDIR',$mythtv.'mythtv/libs/libmyth/mythcontext.cpp'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < ".$unixmythtv."mythtv/4984_mythcontext.patch6"] , comment => ' 4984'],
+
+
+# Ticket 4699
+#[ archive => $sources.'4699_win32_fs.patch', 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4699/win32_fs.patch', comment => 'win32_fs.patch'],
+#[ filesame => [$mythtv.'mythtv/4699_win32_fs.patch',$sources."4699_win32_fs.patch"], copy => [''=>'',comment => 'XXXX'] ],
+#[ grep  => ['setCaption',$mythtv.'mythtv/libs/libmythui/mythmainwindow.cpp'], shell => ["cd ".$unixmythtv."mythtv","patch -p0 < ".$unixmythtv."mythtv/4699_win32_fs.patch"] , comment => ' 4699'],
+
+#  4718
+#[ archive => $sources.'4718_undo.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4718/dvd_playback.patch', comment => 'Ticket 4718 dvdplayer.patch'],
+#[ filesame => [$mythtv.'mythtv/4718_undo.patch',$sources."4718_undo.patch"], copy => [''=>'',comment => 'XXXX'] ],
+#[ grep  => ['filename.right(filename.length() -  4)',$mythtv.'mythtv/libs/libmythtv/RingBuffer.cpp'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < ".$unixmythtv."mythtv/4718_undo.patch"] , comment => ' .'],
+#[ archive => $sources.'4718_playback.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4718/dvd_playback_plugin.patch', comment => 'dvdplayer.patch - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'],
+#[ filesame => [$mythtv.'mythtv/4718_playback.patch',$sources."4718_playback.patch"], copy => [''=>'',comment => 'XXXX'] ],
+#[ grep  => ['gc->setValue\("D:',$mythtv.'mythplugins/mythvideo/mythvideo/globalsettings.cpp'], shell => ["cd ".$unixmythtv."mythplugins/mythvideo","patch -p0 < ".$unixmythtv."mythtv/4718_undo.patch"] , comment => ' .'],
+#[ grep  => ['\"dvd:\/\"',$mythtv.'mythplugins/mythvideo/mythvideo/main.cpp'], shell => ["cd ".$unixmythtv."mythplugins/mythvideo","patch -p1 < ".$unixmythtv."mythtv/4718_undo.patch"] , comment => ' 4718'],
+
+# Ticket 15831 
+#[ archive => $sources.'15831_win32_fs.patch', 'fetch' => 'http://svn.mythtv.org/trac/changeset/15831?format=diff&new=15831', comment => 'win32_fs.patch - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'],
+#[ filesame => [$mythtv.'mythtv/15831_win32_fs.patch',$sources."15831_win32_fs.patch"], copy => [''=>'',comment => 'XXXX'] ],
+#[ grep  =>  ['\+', $mythtv.'mythtv/15831_win32_fs.patch'], shell => ["cd ".$unixmythtv."mythtv","dos2unix 15831_win32_fs.patch"], comment => ' .'],
+#[ grep  => ['LOCALAPPDATA',$mythtv.'mythtv/libs/libmyth/mythcontext.cpp'], shell => ["cd ".$unixmythtv."mythtv","patch -p0 < ".$unixmythtv."mythtv/15831_win32_fs.patch"] , comment => ' 15831'],
+
 ; 
 #
 if ($tickets == 1) {
  push @{$expect}, 
-# Ticket 4984
-[ archive => $sources.'4984_mythcontext.patch6' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4984/mythcontext.patch6', comment => 'Applying Ticket 4984'],
-[ filesame => [$mythtv.'mythtv/4984_mythcontext.patch6',$sources."4984_mythcontext.patch6"], copy => [''=>'',comment => 'XXXX'] ],
-[ grep  => ['MYTHLIBDIR',$mythtv.'mythtv/libs/libmyth/mythcontext.cpp'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < ".$unixmythtv."mythtv/4984_mythcontext.patch6"] , comment => ' .'],
-
-# Ticket 4699
-[ archive => $sources.'4699_win32_fs.patch', 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4699/win32_fs.patch', comment => 'win32_fs.patch'],
-[ filesame => [$mythtv.'mythtv/4699_win32_fs.patch',$sources."4699_win32_fs.patch"], copy => [''=>'',comment => 'XXXX'] ],
-[ grep  => ['setCaption',$mythtv.'mythtv/libs/libmythui/mythmainwindow.cpp'], shell => ["cd ".$unixmythtv."mythtv","patch -p0 < ".$unixmythtv."mythtv/4699_win32_fs.patch"] , comment => ' .'],
 
 # Ticket 4702
 [ archive => $sources.'4702_mingw.patch', 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4702/mingw.patch', comment => 'mingw.patch - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'],
 [ filesame => [$mythtv.'mythtv/4702_mingw.patch',$sources."4702_mingw.patch"], copy => [''=>'',comment => 'XXXX'] ],
-[ grep  => ['\$\$\{PREFIX\}\/bin',$mythtv.'mythtv/libs/libmythui/libmythui.pro'], shell => ["cd ".$unixmythtv."mythtv","patch -p0 < ".$unixmythtv."mythtv/4702_mingw.patch"] , comment => ' .'],
-
-# Ticket 4718
-[ archive => $sources.'4718_undo.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4718/dvd_playback.patch', comment => 'Ticket 4718 dvdplayer.patch'],
-[ filesame => [$mythtv.'mythtv/4718_undo.patch',$sources."4718_undo.patch"], copy => [''=>'',comment => 'XXXX'] ],
-[ grep  => ['filename.right(filename.length() -  4)',$mythtv.'mythtv/libs/libmythtv/RingBuffer.cpp'], shell => ["cd ".$unixmythtv."mythtv/","patch -p0 < ".$unixmythtv."mythtv/4718_undo.patch"] , comment => ' .'],
-[ archive => $sources.'4718_playback.patch' , 'fetch' => 'http://svn.mythtv.org/trac/raw-attachment/ticket/4718/dvd_playback_plugin.patch', comment => 'dvdplayer.patch - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'],
-[ filesame => [$mythtv.'mythtv/4718_playback.patch',$sources."4718_playback.patch"], copy => [''=>'',comment => 'XXXX'] ],
-[ grep  => ['gc->setValue("D:',$mythtv.'mythplugins/mythvideo/mythvideo/globalsettings.cpp'], shell => ["cd ".$unixmythtv."mythplugins/mythvideo","patch -p0 < ".$unixmythtv."mythtv/4718_undo.patch"] , comment => ' .'],
-[ grep  => ['\"dvd:\/\"',$mythtv.'mythplugins/mythvideo/mythvideo/main.cpp'], shell => ["cd ".$unixmythtv."mythplugins/mythvideo","patch -p1 < ".$unixmythtv."mythtv/4718_undo.patch"] , comment => ' .'],
+[ grep  => ['\$\$\{PREFIX\}\/bin',$mythtv.'mythtv/libs/libmythui/libmythui.pro'], shell => ["cd ".$unixmythtv."mythtv","patch -p0 < ".$unixmythtv."mythtv/4702_mingw.patch"] , comment => ' 4702'],
 
 
-# Ticket 15831
-
-[ archive => $sources.'15831_win32_fs.patch', 'fetch' => 'http://svn.mythtv.org/trac/changeset/15831?format=diff&new=15831', comment => 'win32_fs.patch - apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN'],
-[ filesame => [$mythtv.'mythtv/15831_win32_fs.patch',$sources."15831_win32_fs.patch"], copy => [''=>'',comment => 'XXXX'] ],
-[ grep  =>  ['\+', $mythtv.'mythtv/15831_win32_fs.patch'], shell => ["cd ".$unixmythtv."mythtv","dos2unix 15831_win32_fs.patch"], comment => ' .'],
-[ grep  => ['LOCALAPPDATA',$mythtv.'mythtv/libs/libmyth/mythcontext.cpp'], shell => ["cd ".$unixmythtv."mythtv","patch -p0 < ".$unixmythtv."mythtv/15831_win32_fs.patch"] , comment => ' .'],
 ;
 
 } # End if for $ticket
@@ -1302,7 +1318,7 @@ cp '.$unixmsys.'qt-win-opensource-src-4.4.0/lib/*.dll '.$unixmythtv.'build/bin
 echo Creating build-folder Directories...
 # Assumptions
 # <installprefix> = ./mythtv
-# themese go into <installprefix>/share/mythtv/themes
+# themes go into <installprefix>/share/mythtv/themes
 # fonts go into <installprefix>/share/mythtv
 # libraries go into installlibdir/mythtv
 # plugins go into installlibdir/mythtv/plugins
@@ -1350,19 +1366,6 @@ cp -ur /usr/lib/mythtv/* ./build/lib/mythtv
 '
 ],comment => 'write a script to install plugins to build folder'],
 
-# Create file to install myththemes
-[ always => [], 
-  write => [$mythtv.'setup_themes.sh',
-'#!/bin/bash
-source '.$unixmythtv.'qt'.$qtver.'_env.sh
-cd '.$unixmythtv.'
-echo Copying themes ...
-cp -ur /usr/share/mythtv/themes ./build/share/mythtv/
-cp /usr/share/mythtv/mythweather/* ./build/share/mythtv/mythweather
-echo Copying international files....
-cp /usr/share/mythtv/i18n/* ./build/share/mythtv/i18n
-'
-],comment => 'write a script that will install themes to build folder'],
 
 # chmod the shell scripts, everytime
 [ always  => [],
@@ -1621,9 +1624,7 @@ push @{$expect},
   shell   => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
               'cd '.$unixmythtv.'myththemes','make', 'make install'], 
   comment => 'THEMES! redo make if we need to (see the  last_build.txt identifier)' ],
-
-# Copy to build area
-#[ filesame => [$mythtv.'build/share/mythtv/themes/Retro/theme.xml',$dosmsys.'/share/mythtv/themes/Retro/theme.xml'], shell => ['source '.$unixmythtv.'setup_themes.sh'], comment => 'Copy new themes to a build directory' ],
+  
 
 # Get any extra Themes
 #
@@ -1643,6 +1644,14 @@ push @{$expect},
             'find '.$unixmythtv.'build/share/mythtv/themes/ -name "*.ttf"'.
             ' | xargs -n1 -i__ cp __ '.$unixmythtv.'build/share/mythtv'],
   comment => 'move ttf files'],
+  
+  
+# install fixup for redundant themes folders/folders/folders:
+[ always => '',
+  shell => [ 'cd /c/mythtv/build/share/mythtv/themes',
+             'for f in *; do mv $f/$f/* ./$f; done' ],
+  comment => 'relocate badly installed THEMES! ' ],
+
 ;
 }
 
@@ -1657,7 +1666,7 @@ push @{$expect},
 'README for Win32 Installation of MythTV version: '.$version.' svn '.$SVNRELEASE.'
 =============================================================
 The current installation very basic:
- - All exe and dlls are %PROGRAMFILES%\mythtv
+ - All exe and dlls are %PROGRAMFILES%\mythtv\bin
  - share/mythtv is copied to %PROGRAMFILES%\mythtv\share\mythtv
  - lib/mythtv is copied to %PROGRAMFILES%\mythtv\lib\mythtv
  - mysql.txt and user configuration files are set to %APPDATA%\mythtv
@@ -1674,7 +1683,8 @@ MYTHCONFDIR = defaulting to %APPDATA%\mythtv
 MYTHLIBDIR  = defaulting to %PROGRAMFILES%\mythv\lib
 MYTHTVDIR   = defaulting to %APPDATA%\mythtv
 ','nocheck'],comment => ''],
-[ file => $mythtv.'build/readme.txt_', shell => ['unix2dos '.$unixmythtv.'build/readme.txt', 'nocheck'],comment => '' ],
+[ file => $mythtv.'build/readme.txt_', 
+  shell => ['unix2dos '.$unixmythtv.'build/readme.txt', 'nocheck'],comment => '' ],
 ;
 
 if ($package == 1) {
