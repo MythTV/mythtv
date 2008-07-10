@@ -34,6 +34,7 @@ class MythUIType : public QObject, public XMLParseBase
     QVector<MythUIType *> *GetAllChildren(void);
 
     void DeleteChild(const QString &name);
+    void DeleteChild(MythUIType *child);
     void DeleteAllChildren(void);
 
     // Check set dirty status

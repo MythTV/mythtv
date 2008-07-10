@@ -225,6 +225,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         return NULL;
     }
 
+    MythUIType *olduitype = NULL;
+
     // check for name in immediate parent as siblings cannot share names
     if (parent && parent->GetChild(name))
     {
@@ -233,10 +235,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         if (parent == GetGlobalObjectStore())
             return NULL;
 
-//         VERBOSE(VB_IMPORTANT, QString("duplicate name: %1 in parent %2")
-//                                      .arg(name).arg(parent->objectName()));
-        // Delete the existing child, it will be replaced by the second
-        parent->DeleteChild(name);
+        // Reuse the existing child and reparse
+        olduitype = parent->GetChild(name);
     }
 
     MythUIType *uitype = NULL;
@@ -299,6 +299,21 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         return NULL;
     }
 
+    if (olduitype)
+    {
+        if (typeid(olduitype) != typeid(uitype))
+        {
+            VERBOSE(VB_IMPORTANT, QString("Duplicate name: %1 in parent %2")
+                                        .arg(name).arg(parent->objectName()));
+            parent->DeleteChild(olduitype);
+        }
+        else
+        {
+            parent->DeleteChild(uitype);
+            uitype = olduitype;
+        }
+    }
+
     if (base)
     {
         if (typeid(base) != typeid(uitype))
@@ -306,10 +321,11 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
             VERBOSE(VB_IMPORTANT, QString("Type of new object '%1' doesn't "
                                           "match old '%2'")
                                          .arg(name).arg(inherits));
-            delete uitype;
+            parent->DeleteChild(uitype);
             return NULL;
         }
-        uitype->CopyFrom(base);
+        else
+            uitype->CopyFrom(base);
     }
 
     for (QDomNode child = element.firstChild(); !child.isNull();
