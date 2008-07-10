@@ -1124,7 +1124,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
 
     MythUIImage *buttonimage = dynamic_cast<MythUIImage *>
                                         (buttonstate->GetChild("buttonimage"));
-    if (buttonimage && m_image)
+    if (buttonimage)
         buttonimage->SetImage(m_image);
 
     MythUIImage *buttonarrow = dynamic_cast<MythUIImage *>

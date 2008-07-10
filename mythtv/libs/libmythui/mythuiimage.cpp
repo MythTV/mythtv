@@ -24,7 +24,7 @@ MythUIImage::MythUIImage(const QString &filepattern,
     Init();
 }
 
-MythUIImage::MythUIImage(const QString &filename, MythUIType *parent, 
+MythUIImage::MythUIImage(const QString &filename, MythUIType *parent,
                          const QString &name)
            : MythUIType(parent, name)
 {
@@ -118,6 +118,9 @@ void MythUIImage::SetImage(MythImage *img)
 {
     Clear();
     m_Delay = -1;
+
+    if (!img)
+        return;
 
     img->UpRef();
 
@@ -289,7 +292,7 @@ void MythUIImage::Pulse(void)
     MythUIType::Pulse();
 }
 
-void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
+void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                            int alphaMod, QRect clipRect)
 {
     if (m_Images.size() > 0)
@@ -300,7 +303,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         QRect area = m_Area;
         area.translate(xoffset, yoffset);
 
-        int alpha = CalcAlpha(alphaMod); 
+        int alpha = CalcAlpha(alphaMod);
 
         QRect srcRect;
         if (!m_cropRect.isEmpty())
