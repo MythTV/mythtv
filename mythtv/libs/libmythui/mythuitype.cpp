@@ -88,13 +88,14 @@ MythUIType *MythUIType::GetChild(const QString &name)
 
 void MythUIType::DeleteChild(const QString &name)
 {
-    for (int i = 0; i < m_ChildrenList.size(); ++i)
-    {
-        MythUIType *type = m_ChildrenList.at(i);
+    QMutableVectorIterator<MythUIType *> it(m_ChildrenList);
+    while (it.hasNext()) {
+        it.next();
+        MythUIType *type = it.value();
         if (type->objectName() == name)
         {
             type->deleteLater();
-            m_ChildrenList.remove(i);
+            it.remove();
             return;
         }
     }
