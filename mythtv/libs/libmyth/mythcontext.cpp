@@ -29,6 +29,7 @@
 #include "util-x11.h"
 #include "mythsocket.h"
 #include "themeinfo.h"
+#include "dbutil.h"
 
 #include "libmythdb/mythdb.h"
 #include "libmythdb/mythdirs.h"
@@ -1992,10 +1993,7 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
         default: break;
     }
 
-
-    // FIXME: Don't know how to determine this
-    //if (getActiveConnections() > 1)
-    //    connections = true;
+    connections = DBUtil::CountClients() > 1;
 
 
     // Deal with the trivial case first (No user prompting required)
