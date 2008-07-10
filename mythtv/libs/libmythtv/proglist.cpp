@@ -1542,14 +1542,13 @@ void ProgLister::fillItemList(void)
 
     MSqlBindings bindings;
     bindings[":PGILSTART"] = startstr;
-    bindings[":PGILPHRASE"] = qphrase;
-    bindings[":PGILLIKEPHRASE"] = QString("%") + qphrase + "%";
 
     if (type == plTitle) // per title listings
     {
         where = "WHERE channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART "
-                "  AND program.title = :PGILPHRASE ";
+                "  AND program.title = :PGILPHRASE0 ";
+        bindings[":PGILPHRASE0"] = qphrase;
     }
     else if (type == plNewListings) // what's new list
     {
@@ -1593,24 +1592,29 @@ void ProgLister::fillItemList(void)
     {
         where = "WHERE channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART "
-                "  AND program.title LIKE :PGILLIKEPHRASE ";
+                "  AND program.title LIKE :PGILLIKEPHRASE0 ";
+        bindings[":PGILLIKEPHRASE0"] = QString("%") + qphrase + "%";
     }
     else if (type == plKeywordSearch) // keyword search
     {
         where = "WHERE channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART "
-                "  AND (program.title LIKE :PGILLIKEPHRASE "
-                "    OR program.subtitle LIKE :PGILLIKEPHRASE "
-                "    OR program.description LIKE :PGILLIKEPHRASE ) ";
+                "  AND (program.title LIKE :PGILLIKEPHRASE1 "
+                "    OR program.subtitle LIKE :PGILLIKEPHRASE2 "
+                "    OR program.description LIKE :PGILLIKEPHRASE3 ) ";
+        bindings[":PGILLIKEPHRASE1"] = QString("%") + qphrase + "%";
+        bindings[":PGILLIKEPHRASE2"] = QString("%") + qphrase + "%";
+        bindings[":PGILLIKEPHRASE3"] = QString("%") + qphrase + "%";
     }
     else if (type == plPeopleSearch) // people search
     {
         where = ", people, credits WHERE channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART "
-                "  AND people.name LIKE :PGILPHRASE "
+                "  AND people.name LIKE :PGILPHRASE1 "
                 "  AND credits.person = people.person "
                 "  AND program.chanid = credits.chanid "
                 "  AND program.starttime = credits.starttime";
+        bindings[":PGILPHRASE1"] = qphrase;
     }
     else if (type == plPowerSearch) // complex search
     {
@@ -1646,7 +1650,8 @@ void ProgLister::fillItemList(void)
         oneChanid = true;
         where = "WHERE channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART "
-                "  AND channel.chanid = :PGILPHRASE ";
+                "  AND channel.chanid = :PGILPHRASE2 ";
+        bindings[":PGILPHRASE2"] = qphrase;
     }
     else if (type == plCategory) // list by category
     {
@@ -1654,16 +1659,18 @@ void ProgLister::fillItemList(void)
         {
             where = "WHERE channel.visible = 1 "
                     "  AND program.endtime > :PGILSTART "
-                    "  AND program.category = :PGILPHRASE ";
+                    "  AND program.category = :PGILPHRASE3 ";
+            bindings[":PGILPHRASE3"] = qphrase;
         }
         else if (viewList[curView].find(":/:") < 0)
         {
             where = "JOIN programgenres g ON "
                     "  program.chanid = g.chanid AND "
                     "  program.starttime = g.starttime AND "
-                    "  genre = :PGILPHRASE "
+                    "  genre = :PGILPHRASE4 "
                     "WHERE channel.visible = 1 "
                     "  AND program.endtime > :PGILSTART ";
+            bindings[":PGILPHRASE4"] = qphrase;
         }
         else
         {
@@ -1704,7 +1711,8 @@ void ProgLister::fillItemList(void)
                 "  AND program.chanid = recordmatch.chanid) "
                 "WHERE channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART "
-                "  AND recordmatch.recordid = :PGILPHRASE ";
+                "  AND recordmatch.recordid = :PGILPHRASE5 ";
+        bindings[":PGILPHRASE5"] = qphrase;
     }
     else if (type == plStoredSearch) // stored search
     {
