@@ -4,6 +4,7 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "mythuihelper.h"
+#include "cardutil.h"
 #include <qsqldatabase.h>
 #include <q3header.h>
 #include <qcursor.h>
@@ -69,51 +70,47 @@ void ProfileGroup::loadByID(int profileId) {
     load();
 }
 
-void ProfileGroup::fillSelections(SelectSetting* setting) {
-    QStringList cardtypes;
-    QString transcodeID;
+void ProfileGroup::fillSelections(SelectSetting* setting)
+{
+    QStringList cardtypes = CardUtil::GetCardTypes();
+    QString     tid       = QString::null;
 
     MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare(
+        "SELECT name, id, hostname, is_default, cardtype "
+        "FROM profilegroups");
 
-    result.prepare("SELECT DISTINCT cardtype FROM capturecard;");
-
-    if (result.exec() && result.isActive() && result.size() > 0)
+    if (!result.exec())
     {
-        while (result.next())
+        MythContext::DBError("ProfileGroup::fillSelections", result);
+        return;
+    }
+
+    while (result.next())
+    {
+        QString name       = result.value(0).toString();
+        QString id         = result.value(1).toString();
+        QString hostname   = result.value(2).toString();
+        bool    is_default = (bool) result.value(3).toInt();
+        QString cardtype   = result.value(4).toString();
+
+        // Only show default profiles that match installed cards
+        bool have_cardtype = cardtypes.contains(cardtype);
+        if (is_default && (cardtype == "TRANSCODE") && !have_cardtype)
         {
-            cardtypes.append(result.value(0).toString());
+            tid = id;
+        }
+        else if (have_cardtype)
+        {
+            if (!hostname.isEmpty())
+                name += QString(" (%1)").arg(result.value(2).toString());
+
+            setting->addSelection(name, id);
         }
     }
 
-    result.prepare("SELECT name,id,hostname,is_default,cardtype "
-                      "FROM profilegroups;");
-
-    if (result.exec() && result.isActive() && result.size() > 0)
-        while (result.next())
-        {
-            // Only show default profiles that match installed cards
-            if (result.value(3).toInt())
-            {
-               bool match = false;
-               for(QStringList::Iterator it = cardtypes.begin();
-                         it != cardtypes.end(); it++)
-                   if (result.value(4).toString() == *it)
-                       match = true;
-
-               if (! match)
-               {
-                   if (result.value(4).toString() == "TRANSCODE")
-                       transcodeID = result.value(1).toString();
-                   continue;
-               }
-            }
-            QString value = result.value(0).toString();
-            if (!result.value(2).toString().isEmpty())
-                value += QString(" (%1)").arg(result.value(2).toString());
-            setting->addSelection(value, result.value(1).toString());
-        }
-    if (! transcodeID.isNull())
-        setting->addSelection(QObject::tr("Transcoders"), transcodeID);
+    if (!tid.isEmpty())
+        setting->addSelection(QObject::tr("Transcoders"), tid);
 }
 
 QString ProfileGroup::getName(int group)

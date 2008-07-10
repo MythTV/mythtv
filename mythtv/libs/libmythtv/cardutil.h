@@ -137,6 +137,8 @@ class MPUBLIC CardUtil
 
     static bool         IsCardTypePresent(const QString &rawtype,
                                           QString hostname = QString::null);
+    static QStringList  GetCardTypes(void); // card types on ALL hosts
+
     static QStringVec   GetVideoDevices(const QString &rawtype,
                                         QString hostname = QString::null);
 

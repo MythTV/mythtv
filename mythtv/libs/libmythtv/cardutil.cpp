@@ -114,6 +114,28 @@ bool CardUtil::IsCardTypePresent(const QString &rawtype, QString hostname)
     return count > 0;
 }
 
+QStringList CardUtil::GetCardTypes(void)
+{
+    QStringList cardtypes;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT DISTINCT cardtype "
+                  "FROM capturecard "
+                  "ORDER BY cardtype");
+
+    if (!query.exec())
+    {
+        MythContext::DBError("CardUtil::GetCardTypes()", query);
+    }
+    else
+    {
+        while (query.next())
+            cardtypes.push_back(query.value(0).toString());
+    }
+
+    return cardtypes;
+}
+
 /** \fn CardUtil::GetVideoDevices(const QString&, QString)
  *  \brief Returns the videodevices of the matching cards, duplicates removed
  *  \param rawtype  Card type as used in DB or empty string for all cardids
