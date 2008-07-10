@@ -678,17 +678,19 @@ bool FillData::Run(SourceList &sourcelist)
                         grabber_method_proc.readLineStdout();
                 }
                 else {
-                    VERBOSE(VB_IMPORTANT, "%1  --preferredmethod failed or we "
+                    VERBOSE(VB_IMPORTANT, xmltv_grabber +
+                    " --preferredmethod failed or we "
                     "timed out waiting. You may need to upgrade your "
                     "xmltv grabber");
                 }
 
-                VERBOSE(VB_GENERAL, QString("Grabber prefers method: %1")
-                .arg((*it).xmltvgrabber_prefmethod));
+                VERBOSE(VB_GENERAL, "Grabber prefers method: " +
+                                    (*it).xmltvgrabber_prefmethod);
             }
             else {
                 QString error = grabber_method_proc.readLineStdout();
-                VERBOSE(VB_IMPORTANT, QString("Failed to run %1 --preferredmethod")
+                VERBOSE(VB_IMPORTANT,
+                        QString("Failed to run %1 --preferredmethod")
                         .arg(xmltv_grabber));
             }
         }
