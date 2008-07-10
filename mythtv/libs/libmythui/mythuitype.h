@@ -33,6 +33,7 @@ class MythUIType : public QObject, public XMLParseBase
     MythUIType *GetChildAt(const QPoint &p);
     QVector<MythUIType *> *GetAllChildren(void);
 
+    void DeleteChild(const QString &name);
     void DeleteAllChildren(void);
 
     // Check set dirty status
@@ -58,6 +59,7 @@ class MythUIType : public QObject, public XMLParseBase
     virtual void SetArea(const QRect &rect);
     virtual QRect GetArea(void) const;
     void ExpandArea(const QRect &rect);
+    virtual void Rescale(const float hscale, const float vscale);
 
     virtual QRegion GetDirtyArea(void) const;
 
@@ -142,7 +144,7 @@ class MythUIType : public QObject, public XMLParseBase
     int m_AlphaMin;
     int m_AlphaMax;
 
-    bool m_Moving; 
+    bool m_Moving;
     QPoint m_XYDestination;
     QPoint m_XYSpeed;
 

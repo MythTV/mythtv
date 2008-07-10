@@ -70,7 +70,7 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
                    && (!objName || obj->objectName() == oName))
             return obj;
         if (recursiveSearch && (obj = qChildHelper(objName, inheritsClass,
-                                                   recursiveSearch, 
+                                                   recursiveSearch,
                                                    obj->children())))
             return obj;
     }
@@ -84,6 +84,20 @@ MythUIType *MythUIType::GetChild(const QString &name)
         return dynamic_cast<MythUIType *>(ret);
 
     return NULL;
+}
+
+void MythUIType::DeleteChild(const QString &name)
+{
+    QVector<MythUIType*>::iterator it;
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+    {
+        if ((*it)->objectName() == name)
+        {
+            (*it)->deleteLater();
+            m_ChildrenList.remove(it);
+            return;
+        }
+    }
 }
 
 QVector<MythUIType *> *MythUIType::GetAllChildren(void)
@@ -111,11 +125,11 @@ void MythUIType::DeleteAllChildren(void)
  */
 MythUIType *MythUIType::GetChildAt(const QPoint &p)
 {
-    if (GetArea().contains(p)) 
+    if (GetArea().contains(p))
     {
         /* assumes no selectible ui type will contain another
          * selectible ui type. */
-        if (CanTakeFocus() && IsVisible()) 
+        if (CanTakeFocus() && IsVisible())
             return this;
 
         if (m_ChildrenList.isEmpty())
@@ -298,7 +312,7 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
     QVector<MythUIType *>::Iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
     {
-        (*it)->Draw(p, xoffset + m_Area.x(), yoffset + m_Area.y(), 
+        (*it)->Draw(p, xoffset + m_Area.x(), yoffset + m_Area.y(),
                     CalcAlpha(alphaMod), clipRect);
     }
 }
@@ -595,7 +609,7 @@ void MythUIType::CopyFrom(MythUIType *base)
     m_XYSpeed = base->m_XYSpeed;
 
     QVector<MythUIType *>::Iterator it;
-    for (it = base->m_ChildrenList.begin(); it != base->m_ChildrenList.end(); 
+    for (it = base->m_ChildrenList.begin(); it != base->m_ChildrenList.end();
          ++it)
     {
         (*it)->CreateCopy(this);
@@ -650,3 +664,18 @@ bool MythUIType::AddFont(const QString &text, MythFontProperties *fontProp)
     return m_Fonts->AddFont(text, fontProp);
 }
 
+void MythUIType::Rescale(const float hscale, const float vscale)
+{
+    int width = m_Area.width() * vscale;
+    int height = m_Area.height() * hscale;
+    int x = m_Area.x() * vscale;
+    int y = m_Area.y() * hscale;
+
+    SetArea(QRect(x,y,width,height));
+
+    QVector<MythUIType*>::iterator it;
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+    {
+        (*it)->Rescale(hscale, vscale);
+    }
+}

@@ -77,7 +77,7 @@ QSize XMLParseBase::parseSize(const QString &text, bool normalize)
             y = uiSize.height();
             normalize = false;
         }
-        
+
         retval = QSize(x, y);
     }
 
@@ -215,7 +215,7 @@ void XMLParseBase::ParseChildren(QDomElement &element,
 }
 
 MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
-                                      MythUIType *parent, 
+                                      MythUIType *parent,
                                       MythScreenType *screen)
 {
     QString name = element.attribute("name", "");
@@ -233,9 +233,10 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         if (parent == GetGlobalObjectStore())
             return NULL;
 
-        VERBOSE(VB_IMPORTANT, QString("duplicate name: %1 in parent %2")
-                                     .arg(name).arg(parent->objectName()));
-        return NULL;
+//         VERBOSE(VB_IMPORTANT, QString("duplicate name: %1 in parent %2")
+//                                      .arg(name).arg(parent->objectName()));
+        // Delete the existing child, it will be replaced by the second
+        parent->DeleteChild(name);
     }
 
     MythUIType *uitype = NULL;
@@ -379,7 +380,7 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
 }
 
 bool XMLParseBase::doLoad(const QString &windowname,
-                          MythUIType *parent, 
+                          MythUIType *parent,
                           const QString &filename,
                           bool onlywindows)
 {
