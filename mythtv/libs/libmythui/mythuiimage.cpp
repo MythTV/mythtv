@@ -80,6 +80,8 @@ void MythUIImage::Init(void)
     m_gradientEnd = QColor("#000000");
     m_gradientAlpha = 100;
     m_gradientDirection = FillTopToBottom;
+
+    m_preserveAspect = false;
 }
 
 void MythUIImage::SetFilename(const QString &filename)
@@ -128,7 +130,7 @@ void MythUIImage::SetImage(MythImage *img)
     {
         int w = (m_ForceSize.width() <= 0) ? img->width() : m_ForceSize.width();
         int h = (m_ForceSize.height() <= 0) ? img->height() : m_ForceSize.height();
-        img->Resize(QSize(w, h));
+        img->Resize(QSize(w, h), m_preserveAspect);
     }
 
     m_Images.push_back(img);
@@ -153,7 +155,7 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
             int w = (m_ForceSize.width() <= 0) ? im->width() : m_ForceSize.width();
             int h = (m_ForceSize.height() <= 0) ? im->height() : m_ForceSize.height();
 
-            im->Resize(QSize(w, h));
+            im->Resize(QSize(w, h), m_preserveAspect);
         }
 
         m_Images.push_back(im);
@@ -186,7 +188,7 @@ void MythUIImage::ForceSize(const QSize &size)
         int w = (m_ForceSize.width() <= 0) ? im->width() : m_ForceSize.width();
         int h = (m_ForceSize.height() <= 0) ? im->height() : m_ForceSize.height();
 
-        im->Resize(QSize(w, h));
+        im->Resize(QSize(w, h), m_preserveAspect);
         aSize = aSize.expandedTo(im->size());
     }
 
@@ -352,6 +354,8 @@ bool MythUIImage::ParseElement(QDomElement &element)
         QSize forceSize = parseSize(element);
         SetSize(forceSize);
     }
+    else if (element.tagName() == "preserveaspect")
+        m_preserveAspect = parseBool(element);
     else if (element.tagName() == "crop")
         m_cropRect = parseRect(element);
     else if (element.tagName() == "delay")
@@ -417,6 +421,8 @@ void MythUIImage::CopyFrom(MythUIType *base)
     m_gradientEnd = im->m_gradientEnd;
     m_gradientAlpha = im->m_gradientAlpha;
     m_gradientDirection = im->m_gradientDirection;
+
+    m_preserveAspect = im->m_preserveAspect;
 
     SetImages(im->m_Images);
 

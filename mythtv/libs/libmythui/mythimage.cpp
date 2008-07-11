@@ -59,7 +59,7 @@ void MythImage::Assign(const QPixmap &pix)
     Assign(pix.toImage());
 }
 
-void MythImage::Resize(const QSize &newSize)
+void MythImage::Resize(const QSize &newSize, bool preserveAspect)
 {
     if (size() == newSize)
         return;
@@ -72,7 +72,11 @@ void MythImage::Resize(const QSize &newSize)
     }
     else
     {
-        Assign(scaled(newSize));
+        Qt::AspectRatioMode mode = Qt::IgnoreAspectRatio;
+        if (preserveAspect)
+            mode = Qt::KeepAspectRatio;
+
+        Assign(scaled(newSize, mode));
     }
 }
 

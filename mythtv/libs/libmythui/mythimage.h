@@ -32,7 +32,7 @@ class MythImage : public QImage
 
     bool Load(const QString &filename);
 
-    void Resize(const QSize &newSize);
+    void Resize(const QSize &newSize, bool preserveAspect = false);
     void Reflect(ReflectAxis axis, int shear, int scale, int length);
 
     /**

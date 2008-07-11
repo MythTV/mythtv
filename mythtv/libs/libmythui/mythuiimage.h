@@ -43,7 +43,7 @@ class MythUIImage : public MythUIType
     virtual void Pulse(void);
 
   protected:
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset, 
+    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect);
 
     void Init(void);
@@ -82,6 +82,8 @@ class MythUIImage : public MythUIType
     QColor m_gradientEnd;
     uint m_gradientAlpha;
     FillDirection m_gradientDirection;
+
+    bool m_preserveAspect;
 };
 
 #endif
