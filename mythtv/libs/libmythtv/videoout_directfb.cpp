@@ -306,7 +306,7 @@ int VideoOutputDirectfb::GetRefreshRate(void)
     double vrate;
     long htotal;
     long vtotal;
-    char *fb_dev_name = NULL;
+    const char *fb_dev_name = NULL;
     if (!(fb_dev_name = getenv("FRAMEBUFFER")))
         fb_dev_name = "/dev/fb0";
 

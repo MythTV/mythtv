@@ -2696,7 +2696,8 @@ bool AvFormatDecoder::SetAudioByComponentTag(int tag)
         AVStream *s  = ic->streams[tracks[kTrackTypeAudio][i].av_stream_index];
         if (s)
         {
-            if (s->component_tag == tag || tag <= 0 && s->component_tag <= 0)
+            if ((s->component_tag == tag) ||
+                ((tag <= 0) && s->component_tag <= 0))
             {
                 return SetTrack(kTrackTypeAudio, i);
             }

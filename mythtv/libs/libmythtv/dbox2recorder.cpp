@@ -711,7 +711,7 @@ void DBox2Recorder::updatePMTSectionID(unsigned char *buffer, int pmtPID)
             // Advance by pid
             p += 2;
             // Advance by es info length + 2
-            p += ((pmt[p] & 0x0F) << 8) | (pmt[p+1] & 0xFF) + 2;
+            p += (((pmt[p] & 0x0F) << 8) | (pmt[p+1] & 0xFF)) + 2;
         }
     }
     int len = pmt[2];

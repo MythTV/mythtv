@@ -135,9 +135,9 @@ int64_t PTSOffsetQueue::Get(int idx, AVPacket *pkt)
     while (offset[idx].count() > 1 && !done)
     {
         it = ++offset[idx].begin();
-        if ((*it).type == 0 && pkt->pts >= (*it).pos_pts //PTS type
-         || (*it).type == 1 &&                           //Pos type
-            (pkt->pos >= (*it).pos_pts || pkt->duration > (*it).framenum))
+        if ((((*it).type == 0) && (pkt->pts >= (*it).pos_pts) /* PTS type */) ||
+            (((*it).type == 1) /* Pos type */ &&
+             ((pkt->pos >= (*it).pos_pts) || (pkt->duration > (*it).framenum))))
         {
             offset[idx].pop_front();
             value = offset[idx].first().newPTS;
@@ -1483,7 +1483,7 @@ void MPEG2fixup::RenumberFrames(int start_pos, int delta)
 
     it+= start_pos;
 
-    while (! it.atLast() || it.atFirst() && (*it)->isSequence)
+    while (!it.atLast() || (it.atFirst() && (*it)->isSequence))
     {
         SetFrameNum((*it)->framePos,
                       GetFrameNum((*it)) + delta);
@@ -2054,9 +2054,9 @@ int MPEG2fixup::Start()
                         //Rebuild when 'B' frame, or completing a cut, and the marked
                         //frame is a 'P' frame.
                         //After conversion, frames will be in linear order.
-                        if (GetFrameTypeT(curFrame) == 'B' ||
-                                ! new_discard_state &&
-                                GetFrameTypeT(curFrame) == 'P')
+                        if ((GetFrameTypeT(curFrame) == 'B') ||
+                            (!new_discard_state &&
+                             (GetFrameTypeT(curFrame) == 'P')))
                         {
                             if (ConvertToI(&Lreorder, frame_pos))
                                 return TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR;
@@ -2331,9 +2331,10 @@ int MPEG2fixup::Start()
                 nextPTS = add2x33(af->first()->pkt.pts,
                            90000LL * (int64_t)CC->frame_size / CC->sample_rate);
 
-                if (cutState[it.key()] == 1 && cmp2x33(nextPTS, cutStartPTS) > 0
-                    || cutState[it.key()] == 2 && 
-                                 cmp2x33(af->first()->pkt.pts, cutEndPTS) < 0)
+                if ((cutState[it.key()] == 1 &&
+                     cmp2x33(nextPTS, cutStartPTS) > 0) ||
+                    (cutState[it.key()] == 2 && 
+                     cmp2x33(af->first()->pkt.pts, cutEndPTS) < 0))
                 {
 #ifdef DEBUG_AUDIO
                     VERBOSE(MPF_PROCESS, QString("Aud in cutpoint:\n"

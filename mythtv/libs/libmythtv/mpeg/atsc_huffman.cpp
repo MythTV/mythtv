@@ -72,7 +72,7 @@ QString atsc_huffman1_to_string(const unsigned char *compressed,
                 for (int i = 0 ; i < 7 ; i++)
                 {
                     val2 |=
-                        huffman1_get_bit(compressed, bit + i + 2) << 6 - i;
+                        huffman1_get_bit(compressed, bit + i + 2) << (6 - i);
                 }
                 retval += QChar(val2);
                 bit += 8;

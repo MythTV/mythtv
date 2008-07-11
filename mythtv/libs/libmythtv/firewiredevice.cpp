@@ -238,7 +238,7 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
             cmd.push_back(kAVCControlCommand);
             cmd.push_back(kAVCSubunitTypePanel | m_subunitid);
             cmd.push_back(kAVCPanelPassThrough);
-            cmd.push_back(kAVCPanelKey0 + digit[i] | kAVCPanelKeyPress);
+            cmd.push_back((kAVCPanelKey0 + digit[i]) | kAVCPanelKeyPress);
             cmd.push_back(0x00);
             cmd.push_back(0x00);
             cmd.push_back(0x00);

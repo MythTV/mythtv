@@ -66,7 +66,7 @@ class TableClass
         ETTe    =  7,
         DCCT    =  8,
         RRT     =  9,
-    };
+    } kTableTypes;
 };
 
 /** \class MasterGuideTable

@@ -358,11 +358,11 @@ void CC608Decoder::FormatCCField(int tc, int field, int data)
 
                             // flush if there is text or need to scroll
                             // TODO:  decode ITV (WebTV) link in TXT2
-                            if (len ||
-                                row[mode] != 0 &&
-                                !linecont[mode] &&
-                                (!newtxtmode || row[mode] >= 16))
+                            if (len || (row[mode] != 0 && !linecont[mode] &&
+                                        (!newtxtmode || row[mode] >= 16)))
+                            {
                                 BufferCC(mode, len, 0);
+                            }
 
                             if (newtxtmode)
                             {

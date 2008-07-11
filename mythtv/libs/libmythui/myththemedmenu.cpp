@@ -603,30 +603,28 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
                     // Apparently Japanese is drawn along a _center_ line //
                     if (GetMythUI()->GetLanguage() == "ja")
                     {
-                        attributes.textflags = attributes.textflags &
-                                    ~Qt::AlignHorizontal_Mask |
-                                Qt::AlignCenter;
+                        attributes.textflags =
+                            (attributes.textflags & ~Qt::AlignHorizontal_Mask) |
+                            Qt::AlignCenter;
                     }
                     else
                     {
-                        attributes.textflags = attributes.textflags &
-                                    ~Qt::AlignHorizontal_Mask |
-                                Qt::AlignHCenter;
+                        attributes.textflags =
+                            (attributes.textflags & ~Qt::AlignHorizontal_Mask) |
+                            Qt::AlignHCenter;
                     }
                 }
                 else if (getFirstText(info) == "left")
                 {
-                    attributes.textflags = attributes.textflags &
-                                ~Qt::AlignHorizontal_Mask |
-                            Qt::AlignLeft |
-                            Qt::TextWordWrap;
+                    attributes.textflags =
+                        (attributes.textflags & ~Qt::AlignHorizontal_Mask) |
+                        Qt::AlignLeft | Qt::TextWordWrap;
                 }
                 else if (getFirstText(info) == "right")
                 {
-                    attributes.textflags = attributes.textflags &
-                                ~Qt::AlignHorizontal_Mask |
-                            Qt::AlignRight |
-                            Qt::TextWordWrap;
+                    attributes.textflags =
+                        (attributes.textflags & ~Qt::AlignHorizontal_Mask) |
+                        Qt::AlignRight | Qt::TextWordWrap;
                 }
                 else
                 {
@@ -640,21 +638,21 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
             {
                 if (getFirstText(info) == "center")
                 {
-                    attributes.textflags = attributes.textflags &
-                                ~Qt::AlignVertical_Mask |
-                            Qt::AlignVCenter;
+                    attributes.textflags =
+                        (attributes.textflags & ~Qt::AlignVertical_Mask) |
+                        Qt::AlignVCenter;
                 }
                 else if (getFirstText(info) == "top")
                 {
-                    attributes.textflags = attributes.textflags &
-                                ~Qt::AlignVertical_Mask |
-                            Qt::AlignTop;
+                    attributes.textflags =
+                        (attributes.textflags & ~Qt::AlignVertical_Mask) |
+                        Qt::AlignTop;
                 }
                 else if (getFirstText(info) == "bottom")
                 {
-                    attributes.textflags = attributes.textflags &
-                                ~Qt::AlignVertical_Mask |
-                            Qt::AlignBottom;
+                    attributes.textflags =
+                        (attributes.textflags & ~Qt::AlignVertical_Mask) |
+                        Qt::AlignBottom;
                 }
                 else
                 {

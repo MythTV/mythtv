@@ -479,7 +479,7 @@ typedef struct RecPriorityInfo
 {
     ChannelInfo *chan;
     int cnt;
-};
+} RecPriorityInfo;
 
 class channelSort 
 {

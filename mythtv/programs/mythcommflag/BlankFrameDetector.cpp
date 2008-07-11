@@ -24,7 +24,8 @@ bool
 isBlank(unsigned char median, float stddev, unsigned char maxmedian,
         float maxstddev)
 {
-    return median < maxmedian || median == maxmedian && stddev <= maxstddev;
+    return ((median < maxmedian) ||
+            ((median == maxmedian) && (stddev <= maxstddev)));
 }
 
 int

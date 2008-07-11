@@ -2104,7 +2104,8 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
     if (!fileExists) 
     {
         QFile checkFileUTF8(QString::fromUtf8(filename));
-        if (fileExists = checkFileUTF8.exists())
+        fileExists = checkFileUTF8.exists();
+        if (fileExists)
             filename = QString::fromUtf8(filename);
     }
 

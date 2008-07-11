@@ -2608,6 +2608,7 @@ check_cflags -Wdisabled-optimization
 check_cflags -Wpointer-arith
 check_cflags -Wredundant-decls
 check_cflags -Wno-pointer-sign
+check_cflags -funit-at-a-time
 enabled extra_warnings && check_cflags -Winline
 # C++ Flags
 check_cppflags -Wall
@@ -2615,6 +2616,7 @@ check_cppflags -Wno-switch
 check_cppflags -Wpointer-arith
 check_cppflags -Wredundant-decls
 check_cppflags -Wno-non-virtual-dtor
+check_cppflags -funit-at-a-time
 #needed for INT64_C in libs/libavformat under g++
 check_cppflags -D__STDC_CONSTANT_MACROS
 

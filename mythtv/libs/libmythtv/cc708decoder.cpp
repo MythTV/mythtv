@@ -21,7 +21,7 @@ typedef enum
     NTSC_CC_f2         = 1,
     DTVCC_PACKET_DATA  = 2,
     DTVCC_PACKET_START = 3,
-};
+} kCCTypes;
 
 const char* cc_types[4] =
 {

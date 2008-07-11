@@ -641,10 +641,10 @@ bool CommDetector2::go(void)
             nextFrame = processFrame(&(*currentPass), &finishedAnalyzers,
                     &deadAnalyzers, currentFrame, currentFrameNumber);
 
-            if (currentFrameNumber >= 1 &&
-                    nextFrame * 10 / nframes !=
-                    currentFrameNumber * 10 / nframes ||
-                    nextFrame >= nframes)
+            if (((currentFrameNumber >= 1) &&
+                 (((nextFrame * 10) / nframes) !=
+                  ((currentFrameNumber * 10) / nframes))) ||
+                (nextFrame >= nframes))
             {
                 /* Log something every 10%. */
                 int elapsed = clock.restart();

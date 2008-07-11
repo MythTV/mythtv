@@ -952,11 +952,11 @@ void ProgramRecPriority::countMatches()
     }
 }
 
-typedef struct RecPriorityInfo 
+typedef struct RecPriorityInfo
 {
     ProgramRecPriorityInfo *prog;
     int cnt;
-};
+} RecPriorityInfo;
 
 class titleSort 
 {

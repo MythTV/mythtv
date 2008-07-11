@@ -1523,8 +1523,8 @@ bool DiSEqCDevSwitch::ExecuteDiseqc(const DiSEqCDevSettings &settings,
     }
 
     // check number of ports
-    if ((kTypeDiSEqCCommitted   == m_type) && (m_num_ports > 4) ||
-        (kTypeDiSEqCUncommitted == m_type) && (m_num_ports > 16))
+    if (((kTypeDiSEqCCommitted   == m_type) && (m_num_ports > 4)) ||
+        ((kTypeDiSEqCUncommitted == m_type) && (m_num_ports > 16)))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Invalid number of ports for DiSEqC 1.x Switch (%1)")

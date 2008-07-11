@@ -943,8 +943,8 @@ void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
         if (videoResize && filter->outputBuffer == kDefaultBuffer)
             CalculateResize(vleft, vtop, vright, vbot);
 
-        if (invertVideo &&
-            ((type == kGLFilterYUV2RGB) || (type == kGLFilterYUV2RGBA)) ||
+        if ((invertVideo &&
+             ((type == kGLFilterYUV2RGB) || (type == kGLFilterYUV2RGBA))) ||
             ((type == kGLFilterResize) && (numfilters == 1)))
         {
             float temp = vtop;

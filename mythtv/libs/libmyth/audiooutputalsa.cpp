@@ -13,6 +13,11 @@ using namespace std;
 #define LOC_WARN QString("ALSA, Warning: ")
 #define LOC_ERR QString("ALSA, Error: ")
 
+// redefine assert as no-op to quiet some compiler warnings
+// about assert always evaluating true in alsa headers.
+#undef assert
+#define assert(x)
+
 AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     AudioOutputBase(settings),
     pcm_handle(NULL),             numbadioctls(0),

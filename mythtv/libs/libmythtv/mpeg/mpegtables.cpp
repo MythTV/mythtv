@@ -239,7 +239,7 @@ bool PSIPTable::VerifyPSIP(bool verify_crc) const
                             "past end of buffer").arg(i));
                 return false;
             }
-            pos += 5 + ((ptr[3] << 8) | ptr[4]) & 0x0fff;
+            pos += 5 + (((ptr[3] << 8) | ptr[4]) & 0x0fff);
         }
         if (pos > bufend)
         {

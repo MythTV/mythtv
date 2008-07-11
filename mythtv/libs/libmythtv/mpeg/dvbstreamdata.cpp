@@ -153,8 +153,8 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
         return EITSectionSeen(table_id, service_id, psip.Section());
     }
 
-    if (PREMIERE_EIT_DIREKT_PID == pid || PREMIERE_EIT_SPORT_PID == pid
-        && TableID::PREMIERE_CIT == table_id)
+    if (((PREMIERE_EIT_DIREKT_PID == pid) || (PREMIERE_EIT_SPORT_PID == pid)) &&
+        TableID::PREMIERE_CIT == table_id)
     {
         uint content_id = PremiereContentInformationTable(psip).ContentID();
         if (VersionCIT(content_id) != version)

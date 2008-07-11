@@ -567,8 +567,8 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     if (rectype != kNotRecording)
     {
         QString tmp_rec;
-        if (recendts > timeNow && recstatus <= rsWillRecord || 
-            recstatus == rsConflict || recstatus == rsLaterShowing)
+        if (((recendts > timeNow) && (recstatus <= rsWillRecord)) || 
+            (recstatus == rsConflict) || (recstatus == rsLaterShowing))
         {
             tmp_rec += QString().sprintf(" %+d", recpriority);
             if (recpriority2)

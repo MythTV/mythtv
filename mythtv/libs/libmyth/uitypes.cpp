@@ -2302,55 +2302,70 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
     {
         return;
     }
-  if (m_context == context || m_context == -1)
-    if (drawlayer == m_order)
+    if (m_context == context || m_context == -1)
     {
-        bool m_multi = false;
-        if ((m_justification & Qt::WordBreak) > 0)
-            m_multi = true;
-        QPoint fontdrop = m_font->shadowOffset;
-        QString msg = m_message;
-        dr->setFont(m_font->face);
-        if (m_cutdown == true)
-            msg = cutDown(msg, &(m_font->face), m_multi, m_displaysize.width(), m_displaysize.height());
-        if (m_cutdown == true && m_debug == true)
-            cerr << "    +UITextType::CutDown Called.\n";
-
-        if (drawFontShadow && (fontdrop.x() != 0 || fontdrop.y() != 0))
+        if (drawlayer == m_order)
         {
-            if (m_debug == true)
-                cerr << "    +UITextType::Drawing shadow @ ("
-                     << (int)(m_displaysize.left() + fontdrop.x()) << ", "
-                     << (int)(m_displaysize.top() + fontdrop.y()) << ")" << endl;
-            dr->setBrush(m_font->dropColor);
-            dr->setPen(QPen(m_font->dropColor, (int)(2 * m_wmult)));
-            dr->drawText((int)(m_displaysize.left() + fontdrop.x()),
-                           (int)(m_displaysize.top() + fontdrop.y()),
-                           m_displaysize.width(),
-                           m_displaysize.height(), m_justification, msg);
-        }
+            bool m_multi = false;
+            if ((m_justification & Qt::WordBreak) > 0)
+                m_multi = true;
+            QPoint fontdrop = m_font->shadowOffset;
+            QString msg = m_message;
+            dr->setFont(m_font->face);
+            if (m_cutdown)
+            {
+                msg = cutDown(msg, &(m_font->face), m_multi,
+                              m_displaysize.width(), m_displaysize.height());
+            }
+            if (m_cutdown && m_debug)
+                cerr << "    +UITextType::CutDown Called.\n";
 
-        dr->setBrush(m_font->color);
-        dr->setPen(QPen(m_font->color, (int)(2 * m_wmult)));
-        if (m_debug == true)
+            if (drawFontShadow && (fontdrop.x() != 0 || fontdrop.y() != 0))
+            {
+                if (m_debug)
+                {
+                    cerr << "    +UITextType::Drawing shadow @ ("
+                         << (int)(m_displaysize.left() + fontdrop.x()) << ", "
+                         << (int)(m_displaysize.top() + fontdrop.y())
+                         << ")" << endl;
+                }
+
+                dr->setBrush(m_font->dropColor);
+                dr->setPen(QPen(m_font->dropColor, (int)(2 * m_wmult)));
+                dr->drawText((int)(m_displaysize.left() + fontdrop.x()),
+                             (int)(m_displaysize.top() + fontdrop.y()),
+                             m_displaysize.width(),
+                             m_displaysize.height(), m_justification, msg);
+            }
+
+            dr->setBrush(m_font->color);
+            dr->setPen(QPen(m_font->color, (int)(2 * m_wmult)));
+
+            if (m_debug)
+            {
                 cerr << "    +UITextType::Drawing @ ("
-                     << (int)(m_displaysize.left()) << ", " << (int)(m_displaysize.top())
-                     << ")" << endl;
-        dr->drawText(m_displaysize.left(), m_displaysize.top(),
-                      m_displaysize.width(), m_displaysize.height(), m_justification, msg);
-        if (m_debug == true)
+                     << (int)(m_displaysize.left()) << ", "
+                     << (int)(m_displaysize.top()) << ")" << endl;
+            }
+
+            dr->drawText(m_displaysize.left(), m_displaysize.top(),
+                         m_displaysize.width(), m_displaysize.height(),
+                         m_justification, msg);
+
+            if (m_debug)
+            {
+                cerr << "   +UITextType::Draw() <- inside Layer\n";
+                cerr << "       -Message: " << (const char *)m_message
+                     << " (cut: "
+                     << (const char *)msg << ")" <<  endl;
+            }
+        }
+        else if (m_debug)
         {
-            cerr << "   +UITextType::Draw() <- inside Layer\n";
-            cerr << "       -Message: " << (const char *)m_message << " (cut: "
-                 << (const char *)msg << ")" <<  endl;
+            cerr << "   +UITextType::Draw() <- outside (layer = " << drawlayer
+                 << ", widget layer = " << m_order << "\n";
         }
     }
-    else
-        if (m_debug == true)
-        {
-             cerr << "   +UITextType::Draw() <- outside (layer = " << drawlayer
-                  << ", widget layer = " << m_order << "\n";
-        }
 }
 
 void UITextType::calculateScreenArea()

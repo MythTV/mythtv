@@ -113,7 +113,7 @@ uint PESPacket::WriteAsTSPackets(unsigned char *buf, uint &cc) const
     }
 
     memcpy(buf, _fullbuffer, TSPacket::SIZE);
-    INCR_CC(cc);  buf[3] = buf[3] & 0xf0 | cc;
+    INCR_CC(cc);  buf[3] = (buf[3] & 0xf0) | cc;
     if (size <= TSPacket::SIZE)
         return TSPacket::SIZE;
 
