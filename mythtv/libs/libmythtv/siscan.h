@@ -3,6 +3,8 @@
 #ifndef SISCAN_H
 #define SISCAN_H
 
+#include <pthread.h>
+
 // Qt includes
 #include <qobject.h>
 #include <qstring.h>
