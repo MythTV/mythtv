@@ -227,16 +227,29 @@ bool setupTVs(bool ismaster, bool &error)
 
 void cleanup(void) 
 {
-    delete gContext;
-
     if (sched)
+    {
         delete sched;
+        sched = NULL;
+    }
 
     if (g_pUPnp)
+    {
         delete g_pUPnp;
+        g_pUPnp = NULL;
+    }
 
-    if (pidfile != "")
+    if (gContext)
+    {
+        delete gContext;
+        gContext = NULL;
+    }
+
+    if (!pidfile.isEmpty())
+    {
         unlink(pidfile.ascii());
+        pidfile = "";
+    }
 
     signal(SIGHUP, SIG_DFL);
     signal(SIGUSR1, SIG_DFL);
@@ -764,6 +777,7 @@ int main(int argc, char **argv)
         UPnpMedia *rebuildit = new UPnpMedia(false,false);
         rebuildit->BuildMediaMap();
 
+        cleanup();
         return BACKEND_EXIT_OK;
     }
 
@@ -773,12 +787,14 @@ int main(int argc, char **argv)
         {
             RemoteSendMessage("CLEAR_SETTINGS_CACHE");
             VERBOSE(VB_IMPORTANT, "Sent CLEAR_SETTINGS_CACHE message");
+            cleanup();
             return BACKEND_EXIT_OK;
         }
         else
         {
             VERBOSE(VB_IMPORTANT, "Unable to connect to backend, settings "
                     "cache will not be cleared.");
+            cleanup();
             return BACKEND_EXIT_NO_CONNECT;
         }
     }
@@ -804,11 +820,13 @@ int main(int argc, char **argv)
                 "ensure that you have selected the proper database server or "
                 "upgrade this and all other frontends and backends to the "
                 "same MythTV version and revision.");
+        cleanup();
         return BACKEND_EXIT_DB_OUTOFDATE;
     }
     if (!UpgradeTVDatabaseSchema())
     {
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema");
+        cleanup();
         return BACKEND_EXIT_DB_OUTOFDATE;
     }    
     gContext->ActivateSettingsCache(true);
@@ -866,10 +884,12 @@ int main(int argc, char **argv)
 
     if ((previewFrameNumber >= -1) || (previewSeconds >= -1))
     {
-        return preview_helper(
+        int ret = preview_helper(
             chanid, starttime,
             previewFrameNumber, previewSeconds, previewSize,
             infile, outfile);
+        cleanup();
+        return ret;
     }
 
     int port = gContext->GetNumSetting("BackendServerPort", 6543);
@@ -880,6 +900,7 @@ int main(int argc, char **argv)
         cerr << "No setting found for this machine's BackendServerIP.\n"
              << "Please run setup on this machine and modify the first page\n"
              << "of the general settings.\n";
+        cleanup();
         return BACKEND_EXIT_NO_IP_ADDRESS;
     }
 
@@ -915,7 +936,10 @@ int main(int argc, char **argv)
     bool fatal_error = false;
     bool runsched = setupTVs(ismaster, fatal_error);
     if (fatal_error)
+    {
+        cleanup();
         return BACKEND_EXIT_CAP_CARD_SETUP_ERROR;
+    }
 
     if (ismaster && runsched)
     {
