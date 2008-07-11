@@ -81,7 +81,7 @@ private:
 
     bool           abortHttp;
 
-    MythUIBusyDialog *m_busyPopup;
+    MythUIProgressDialog *m_progressPopup;
     HttpComms      *httpGrabber;
 
     MythListButton *m_sitesList;

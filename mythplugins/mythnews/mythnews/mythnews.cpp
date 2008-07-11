@@ -76,7 +76,7 @@ MythNews::MythNews(MythScreenStack *parent, const char *name)
     m_updatedText = m_titleText = m_descText = NULL;
     m_thumbnailImage = m_downloadImage = m_enclosureImage = NULL;
     m_menuPopup = NULL;
-    m_busyPopup = NULL;
+    m_progressPopup = NULL;
 
     m_TimerTimeout = 10*60*1000;
     httpGrabber = NULL;
@@ -466,10 +466,10 @@ bool MythNews::keyPressEvent(QKeyEvent *event)
             ShowMenu();
         else if (action == "ESCAPE")
         {
-            if (m_busyPopup)
+            if (m_progressPopup)
             {
-                m_busyPopup->Close();
-                m_busyPopup = NULL;
+                m_progressPopup->Close();
+                m_progressPopup = NULL;
             }
 
             m_RetrieveTimer->stop();
@@ -581,17 +581,18 @@ void MythNews::slotProgressCancelled()
 
 void MythNews::createProgress(QString title)
 {
-    if (m_busyPopup)
+    if (m_progressPopup)
         return;
 
     QString message = title;
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    m_busyPopup = new MythUIBusyDialog(message, popupStack, "mythnewsbusydialog");
+    m_progressPopup = new MythUIProgressDialog(message, popupStack,
+                                               "mythnewsprogressdialog");
 
-    if (m_busyPopup->Create())
-        popupStack->AddScreen(m_busyPopup, false);
+    if (m_progressPopup->Create())
+        popupStack->AddScreen(m_progressPopup, false);
 }
 
 bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
@@ -623,11 +624,10 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
 
         while ((!httpGrabber->isDone()) && (!abortHttp))
         {
-            qApp->processEvents();
-            usleep(100000);
-
-            int progress = httpGrabber->getProgress();
             int total = httpGrabber->getTotal();
+            m_progressPopup->SetTotal(total);
+            int progress = httpGrabber->getProgress();
+            m_progressPopup->SetProgress(progress);
             if ((progress > 0) && (total > 0) && (progress < total))
             {
                 float fProgress = (float)progress/total;
@@ -637,6 +637,8 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
                         .arg(floor(fProgress*100));
                 m_updatedText->SetText(text);
             }
+            qApp->processEvents();
+            usleep(100000);
         }
 
         if (abortHttp)
@@ -669,10 +671,10 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
         break;
     }
 
-    if (m_busyPopup)
+    if (m_progressPopup)
     {
-        m_busyPopup->Close();
-        m_busyPopup = NULL;
+        m_progressPopup->Close();
+        m_progressPopup = NULL;
     }
 
     delete httpGrabber;
