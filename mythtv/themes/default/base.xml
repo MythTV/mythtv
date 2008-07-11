@@ -207,7 +207,7 @@
             <filename>mythprogressdialog-background.png</filename>
         </imagetype>
         <imagetype name="animation">
-            <position>35,30</position>
+            <position>40,40</position>
             <filepattern low="0" high="24">busyimages/%1.png</filepattern>
             <delay>250</delay>
         </imagetype>
