@@ -1204,7 +1204,6 @@ void ProgramRecPriority::SortList()
     vector<RecPriorityInfo> sortedList;
     QMap<QString, ProgramRecPriorityInfo>::Iterator pit;
     vector<RecPriorityInfo>::iterator sit;
-    ProgramRecPriorityInfo *progInfo;
     RecPriorityInfo *recPriorityInfo;
     QMap<QString, ProgramRecPriorityInfo> pdCopy;
 
@@ -1212,7 +1211,7 @@ void ProgramRecPriority::SortList()
     // of programData in pdCopy
     for (i = 0, pit = programData.begin(); pit != programData.end(); ++pit, i++)
     {
-        progInfo = &(pit.data());
+        ProgramRecPriorityInfo *progInfo = &(pit.data());
         RecPriorityInfo tmp = {progInfo, i};
         sortedList.push_back(tmp);
         pdCopy[pit.key()] = pit.data();
@@ -1287,8 +1286,6 @@ void ProgramRecPriority::SortList()
 
         // find recPriorityInfo[i] in pdCopy 
         for (j = 0,pit = pdCopy.begin(); j != recPriorityInfo->cnt; j++, ++pit);
-
-        progInfo = &(pit.data());
 
         // put back into programData
         programData[QString::number(999-i)] = pit.data();
