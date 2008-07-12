@@ -84,7 +84,8 @@ class ScanDTVTransport : public DTVMultiplex
 {
   public:
     ScanDTVTransport() :
-        DTVMultiplex(), tuner_type(DTVTunerType::kTunerTypeUnknown) { }
+        DTVMultiplex(), tuner_type(DTVTunerType::kTunerTypeUnknown),
+        cardid(0) { }
     ScanDTVTransport(const DTVMultiplex &mplex, DTVTunerType tt, uint cid) :
         DTVMultiplex(mplex), tuner_type(tt), cardid(cid) { }
     virtual ~ScanDTVTransport() {}
