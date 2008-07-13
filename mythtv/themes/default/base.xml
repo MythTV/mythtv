@@ -36,6 +36,18 @@
         <color>#000000</color>
     </font>
 
+    <font name="smallyellow" from="basesmall">
+        <color>#FFFF33</color>
+    </font>
+
+    <font name="smallgreen" from="basesmall">
+        <color>#33CC33</color>
+    </font>
+
+    <font name="smallred" from="basesmall">
+        <color>#DD3333</color>
+    </font>
+
     <font name="basemediumgrey" from="basemedium">
         <color>#666666</color>
     </font>
