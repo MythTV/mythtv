@@ -1,12 +1,18 @@
-#include <QApplication>
-#include <QPainter>
-#include <QPixmap>
-
+// C++ headers
 #include <cassert>
 #include <iostream>
 
 using namespace std;
 
+// QT headers
+#include <QApplication>
+#include <QPainter>
+#include <QPixmap>
+
+// libmyth headers
+#include "mythverbose.h"
+
+// mythui headers
 #include "mythuibuttonlist.h"
 #include "mythuigroup.h"
 #include "mythmainwindow.h"
@@ -620,8 +626,15 @@ void MythUIButtonList::Init()
     MythUIStateType *buttontemplate = dynamic_cast<MythUIStateType *>
                                                 (GetChild("buttonitem"));
 
-    buttontemplate->SetVisible(false);
+    if (!buttontemplate)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Statetype buttonitem is required in "
+                                      "mythuibuttonlist: %1")
+                                      .arg(objectName()));
+        return;
+    }
 
+    buttontemplate->SetVisible(false);
     QRect buttonItemArea = buttontemplate->GetArea();
 
     if (buttonItemArea.height() > 0)
