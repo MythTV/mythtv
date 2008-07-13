@@ -90,9 +90,6 @@ class MythUIButtonList : public MythUIType
     void SetTextFlags(int flags);
 
     void SetSpacing(int spacing);
-    void SetMargin(int marginX, int marginY = 0);
-    int  GetMarginX() { return m_itemMarginX; }
-    int  GetMarginY() { return m_itemMarginY; }
     void SetDrawFromBottom(bool draw);
 
     void SetActive(bool active);
@@ -173,8 +170,6 @@ class MythUIButtonList : public MythUIType
     int m_itemHeight;
     int m_itemHorizSpacing;
     int m_itemVertSpacing;
-    int m_itemMarginX;
-    int m_itemMarginY;
     uint m_itemsVisible;
     int m_rows;
     int m_columns;

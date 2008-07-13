@@ -62,6 +62,7 @@ void MythUIButtonList::Const(void)
     m_itemHorizSpacing = 0;
     m_itemVertSpacing  = 0;
     m_itemHeight       = 0;
+    m_itemWidth       = 0;
     m_itemsVisible     = 0;
     m_columns          = 0;
     m_rows             = 0;
@@ -827,10 +828,12 @@ MythUIType *MythUIButtonList::GetChildAtPoint(const QPoint &p)
 
 QPoint MythUIButtonList::GetButtonPosition(int column, int row) const
 {
-    QPoint position = QPoint((column - 1) * (ItemWidth() + m_itemHorizSpacing),
-                             (row - 1) * (m_itemHeight + m_itemVertSpacing));
+    int x = m_contentsRect.x() +
+                            ((column - 1) * (ItemWidth() + m_itemHorizSpacing));
+    int y = m_contentsRect.y() +
+                            ((row - 1) * (m_itemHeight + m_itemVertSpacing));
 
-    return position;
+    return QPoint(x,y);
 }
 
 void MythUIButtonList::CalculateVisibleItems(void)
