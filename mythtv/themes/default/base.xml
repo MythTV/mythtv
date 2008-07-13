@@ -19,7 +19,7 @@
         <bold>yes</bold>
     </font>
 
-    <font name="basefontextralarge" from="basesmall">
+    <font name="baseextralarge" from="basesmall">
         <size>24</size>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
