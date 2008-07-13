@@ -301,7 +301,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
 
     if (olduitype)
     {
-        if (typeid(olduitype) != typeid(uitype))
+        if (typeid(*olduitype) != typeid(*uitype))
         {
             VERBOSE(VB_IMPORTANT, QString("Duplicate name: %1 in parent %2")
                                         .arg(name).arg(parent->objectName()));
@@ -316,7 +316,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
 
     if (base)
     {
-        if (typeid(base) != typeid(uitype))
+        if (typeid(*base) != typeid(*uitype))
         {
             VERBOSE(VB_IMPORTANT, QString("Type of new object '%1' doesn't "
                                           "match old '%2'")
