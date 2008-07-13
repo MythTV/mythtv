@@ -4,7 +4,7 @@
     <!-- Base Font Definitions -->
     <font name="basesmall" face="Bitstream Vera Sans">
         <size>16</size>
-        <color>white</color>
+        <color>#FFFFFF</color>
     </font>
 
     <font name="basemedium" from="basesmall">
@@ -13,7 +13,7 @@
 
     <font name="baselarge" from="basesmall">
         <size>20</size>
-        <shadowcolor>black</shadowcolor>
+        <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
         <bold>yes</bold>
@@ -21,7 +21,7 @@
 
     <font name="basefontextralarge" from="basesmall">
         <size>24</size>
-        <shadowcolor>black</shadowcolor>
+        <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
         <bold>yes</bold>
@@ -29,15 +29,15 @@
 
     <!-- Colour variations on base fonts -->
     <font name="basesmallgrey" from="basesmall">
-        <color>grey</color>
+        <color>#666666</color>
     </font>
 
     <font name="basesmallblack" from="basesmall">
-        <color>black</color>
+        <color>#000000</color>
     </font>
 
     <font name="basemediumgrey" from="basemedium">
-        <color>grey</color>
+        <color>#666666</color>
     </font>
 
     <!-- Base definition of a buttonlist -->
