@@ -326,7 +326,18 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
     font.GetOffset(drawOffset);
 
     QImage pm(QSize(w, h), QImage::Format_ARGB32);
-    pm.fill(QColor(255, 255, 255, 0).rgba());
+    QColor fillcolor = font.color();
+    if (font.hasOutline())
+    {
+        QColor outlineColor;
+        int outlineSize, outlineAlpha;
+
+        font.GetOutline(outlineColor, outlineSize, outlineAlpha);
+
+        fillcolor = outlineColor;
+    }
+    fillcolor.setAlpha(0);
+    pm.fill(fillcolor.rgba());
 
     QPainter tmp(&pm);
     tmp.setFont(font.face());
