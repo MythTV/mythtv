@@ -3,7 +3,7 @@
 # Configure script for mythplugins
 #
 
-# 
+#
 #    default parameters for all plugins
 #
 
@@ -199,7 +199,7 @@ for opt do
   ;;
   --disable-mythphone) phone="no"
   ;;
-#  --enable-mythbrowser) 
+#  --enable-mythbrowser)
 #      echo "mythbrowser won't build with qt4 until it is ported to kde4 or QtWebKit"
 #      #browser="yes"
 #  ;;
@@ -254,7 +254,7 @@ for opt do
   ;;
   --disable-festival) festival="no"
   ;;
-  --enable-all)  music="yes"; 
+  --enable-all)  music="yes";
                  video="yes";
                  weather="yes";
                  gallery="yes";
@@ -278,11 +278,11 @@ for opt do
                  createarchive="yes";
                  encodevideo="yes";
   ;;
-  --disable-all) music="no";  
-                 video="no";  
-                 weather="no";  
-                 gallery="no";  
-                 game="no";  
+  --disable-all) music="no";
+                 video="no";
+                 weather="no";
+                 gallery="no";
+                 game="no";
                  news="no";
                  phone="no";
                  browser="no";
@@ -290,11 +290,11 @@ for opt do
                  controls="no";
                  flix="no";
                  movies="no";
-                 sdl="no";  
-                 opengl="no"; 
-                 visual="no"; 
-                 fftw_lib="no"; 
-                 aac="no"; 
+                 sdl="no";
+                 opengl="no";
+                 visual="no";
+                 fftw_lib="no";
+                 aac="no";
                  exif="no";
                  festival="no";
                  archive="no";
@@ -369,7 +369,7 @@ is_qmake4()
 {
     $1 --version 2>&1 | grep -q "Qt version 4"
 }
- 
+
 if ! is_qmake4 $qmake; then
     if is_qmake4 qmake-qt4; then
         qmake=qmake-qt4
@@ -453,7 +453,7 @@ if test "$music" != "no" ; then
         mad="yes"
     else
         echo "MythMusic requires libmad."
-    fi 
+    fi
 
     vorbis="no"
     if has_header ogg/ogg.h && has_header vorbis/vorbisenc.h && has_header vorbis/vorbisfile.h && has_header vorbis/codec.h && has_library libogg && has_library libvorbisfile && has_library libvorbisenc && has_library libvorbis ; then
@@ -506,7 +506,7 @@ if test "$music" != "no" ; then
         taglib="yes"
     else
         echo "MythMusic requires taglib 1.4 or later."
-    fi 
+    fi
 
     if test "$targetos" != "Darwin" -a "`echo ${targetos} | cut -c1-5`" != "MINGW" ; then
         if test "$cdaudio" = "no" -o "$paranoia" = "no" ; then
@@ -517,15 +517,6 @@ if test "$music" != "no" ; then
     if test "$mad" = "no" -o "$vorbis" = "no" -o "$flac" = "no" -o "$mp3lame" = "no" -o "$taglib" = "no" -o "$cdlibs" = "no" ; then
         echo "Disabling MythMusic due to missing dependencies."
         music="no"
-    fi 
-fi
-
-if test "$gallery" != "no" ; then
-    if has_library libtiff && has_header tiffio.h ; then
-        echo -n ""
-    else
-        echo "Disabling MythGallery due to missing libtiff."
-        gallery="no"
     fi
 fi
 
@@ -533,7 +524,7 @@ if test "$archive" != "no" ; then
     if test "$createdvd" = "no" -a "$createarchive" = "no" -a "$encodevideo" = "no" ; then
         echo "Disabling MythArchive. You need to enable at least one archive format."
         archive="no"
-    fi 
+    fi
 
 fi
 
@@ -557,10 +548,6 @@ if test "$phone" != "no" ; then
     if test "$targetos" = "OpenBSD" ; then
         echo "Disabling MythPhone on this platform"
         phone="no"
-    fi
-
-    if has_library libtiff && has_header tiffio.h ; then
-        echo -n ""
     fi
 fi
 

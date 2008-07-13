@@ -8,7 +8,6 @@
 #include "iconview.h"
 #include "gallerysettings.h"
 #include "dbcheck.h"
-//#include "qtiffio.h"
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
@@ -46,7 +45,7 @@ void setupKeys(void)
     REG_JUMP("MythGallery", "Image viewer / slideshow", "", runGallery);
 
     REG_KEY("Gallery", "PLAY", "Start/Stop Slideshow", "P");
-    REG_KEY("Gallery", "HOME", "Go to the first image in thumbnail view", 
+    REG_KEY("Gallery", "HOME", "Go to the first image in thumbnail view",
             "Home");
     REG_KEY("Gallery", "END", "Go to the last image in thumbnail view", "End");
     REG_KEY("Gallery", "MENU", "Toggle activating menu in thumbnail view", "M");
@@ -79,11 +78,9 @@ void setupKeys(void)
 
 int mythplugin_init(const char *libversion)
 {
-    if (!gContext->TestPopupVersion("mythgallery", libversion, 
+    if (!gContext->TestPopupVersion("mythgallery", libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
-
-    //qInitTiffIO();
 
     gContext->ActivateSettingsCache(false);
     UpgradeGalleryDatabaseSchema();
