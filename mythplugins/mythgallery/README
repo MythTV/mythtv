@@ -14,30 +14,28 @@ Requirements:
 need MythTV's database stuff setup properly.  If you don't have that
 done, don't even bother with this, as it won't work.
 
-2) libtiff development package (for loading TIFF images)
-
 Compiling:
 ----------
 
-Ok, on to compiling. 
+Ok, on to compiling.
 
 1) Configure the package by typing ./configure in the main
 distribution directory. You can enable OpenGL support using
-./configure --enable-opengl 
+./configure --enable-opengl
 (make sure you have OpenGL support for your graphics card available
 and enabled if you choose this option. You can check this under X11
 using xdpyinfo or glxinfo. Also ensure that QT has been built with
 OpenGL support)
 
 You can also enable EXIF support using
-./configure --enable-exif 
+./configure --enable-exif
 This requires you have the libexif headers/libraries installed and in your
 include/lib path when compiling.  An install of the libexif/libexif-devel
 packages from your favorite package repository usually provides this.
 Current, EXIF support only consists of auto-rotating images if the camera
 sets the orientation tag (My Canon S400 does)
 
-2) Next type 'qmake mythgallery.pro' then 'make' in the 
+2) Next type 'qmake mythgallery.pro' then 'make' in the
 main distribution directory.
 
 Compiling note:  If you get an error on building this, that says something
@@ -84,7 +82,7 @@ P      - Start SlideShow
 Home   - Go to the first image in thumbnail view
 End    - Go to the last image in thumbnail view
 Enter/SpaceBar     - Open a Directory/View an image.
-Left,Right,Up,Down - Navigate through images/directories 
+Left,Right,Up,Down - Navigate through images/directories
 
 Image View Keys:
 
@@ -113,7 +111,7 @@ Linux documentation for info on how to use automount systems).  If the
 item is an executable file, it will be executed with 1 argument
 consisting of the name of the new subdirectory.  This way, import from
 a removable device can be accomplished without the use of an automount
-system. 
+system.
 
 Feel free to subscribe to the development mailing list at:
 http://www.mythtv.org/mailman/listinfo/mythtv-dev
