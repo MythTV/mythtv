@@ -656,7 +656,7 @@ dvdnav_status_t dvdnav_time_search_within_cell(dvdnav_t *this,
     return DVDNAV_STATUS_ERR;
   }
 
-  uint32_t cur_vobu, new_vobu, start, offset;
+  uint32_t cur_vobu, new_vobu = 0, start, offset;
   uint32_t first_cell_nr, last_cell_nr, cell_nr;
   cell_playback_t *cell;
   int i, length, scan_admap;
@@ -711,9 +711,7 @@ dvdnav_status_t dvdnav_time_search_within_cell(dvdnav_t *this,
           if (offset >> 31) {
             new_vobu = cur_vobu - (offset & 0xffff);
           } else {
-            if (cell_nr == first_cell_nr) {
-              new_vobu = 0;
-            } else {
+            if (cell_nr != first_cell_nr) {
               cell_nr--;
               offset = state->pgc->cell_playback[cell_nr].last_sector;
               scan_admap = 1;
