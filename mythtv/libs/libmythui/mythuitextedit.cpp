@@ -11,7 +11,7 @@
 #include "mythverbose.h"
 #include "mythuihelper.h"
 
-MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name, 
+MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name,
                                bool doInit)
            : MythUIType(parent, name)
 {
@@ -30,6 +30,9 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name,
 
     m_PaddingMargin = 0;
     m_maxLength = 0;
+
+    m_backgroundImage = m_cursorImage = NULL;
+    m_Text = NULL;
 
     if (doInit)
         Init();
