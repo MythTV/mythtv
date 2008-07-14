@@ -10,17 +10,16 @@ class ProfileGroup;
 class ProfileGroupStorage : public SimpleDBStorage
 {
   protected:
-    ProfileGroupStorage(Setting            *_setting,
+    ProfileGroupStorage(StorageUser        *_user,
                         const ProfileGroup &_parentProfile,
                         QString             _name) :
-        SimpleDBStorage(_setting, "profilegroups", _name),
+        SimpleDBStorage(_user, "profilegroups", _name),
         parent(_parentProfile)
     {
-        _setting->setName(_name);
     }
 
-    virtual QString setClause(MSqlBindings& bindings);
-    virtual QString whereClause(MSqlBindings& bindings);
+    virtual QString GetSetClause(MSqlBindings &bindings) const;
+    virtual QString GetWhereClause(MSqlBindings &bindings) const;
     const ProfileGroup& parent;
 };
 
@@ -120,8 +119,9 @@ class MPUBLIC ProfileGroupEditor :
         { addChild(listbox); }
 
     virtual DialogCode exec(void);
-    virtual void load();
-    virtual void save() {};
+
+    virtual void Load(void);
+    virtual void Save(void) {}
 
   protected slots:
     void open(int id);

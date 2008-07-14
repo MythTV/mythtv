@@ -55,16 +55,15 @@ static inline bool is_grabber_labs(const QString &grabber)
 class VideoSourceDBStorage : public SimpleDBStorage
 {
   protected:
-    VideoSourceDBStorage(Setting *_setting,
+    VideoSourceDBStorage(StorageUser       *_user,
                          const VideoSource &_parent,
-                         QString name) :
-        SimpleDBStorage(_setting, "videosource", name), parent(_parent)
+                         const QString     &name) :
+        SimpleDBStorage(_user, "videosource", name), parent(_parent)
     {
-        setting->setName(name);
     }
 
-    virtual QString setClause(MSqlBindings& bindings);
-    virtual QString whereClause(MSqlBindings& bindings);
+    virtual QString GetSetClause(MSqlBindings &bindings) const;
+    virtual QString GetWhereClause(MSqlBindings &bindings) const;
 
     const VideoSource& parent;
 };
@@ -78,7 +77,7 @@ class VideoSourceSelector : public ComboBoxSetting, public TransientStorage
                         const QString &_card_types,
                         bool           _must_have_mplexid);
 
-    virtual void load(void);
+    virtual void Load(void);
 
     uint GetSourceID(void) const { return getValue().toUInt(); }
 
@@ -103,8 +102,8 @@ class TransFreqTableSelector : public ComboBoxSetting, public TransientStorage
   public:
     TransFreqTableSelector(uint _sourceid);
 
-    virtual void load(void);
-    virtual void save(void);
+    virtual void Load(void);
+    virtual void Save(void);
 
     void SetSourceID(uint _sourceid);
 
@@ -143,7 +142,7 @@ class DataDirect_config: public VerticalConfigurationGroup
   public:
     DataDirect_config(const VideoSource& _parent, int _ddsource); 
 
-    virtual void load(void);
+    virtual void Load(void);
 
     QString getLineupID(void) const { return lineupselector->getValue(); };
 
@@ -168,8 +167,8 @@ class XMLTV_generic_config: public VerticalConfigurationGroup
   public:
     XMLTV_generic_config(const VideoSource& _parent, QString _grabber);
 
-    virtual void save();
-    virtual void save(QString) { save(); }
+    virtual void Save(void);
+    virtual void Save(QString) { Save(); }
 
   public slots:
     void RunConfig(void);
@@ -184,8 +183,8 @@ class EITOnly_config: public VerticalConfigurationGroup
 {
 public:
     EITOnly_config(const VideoSource& _parent);
-    virtual void save();
-    virtual void save(QString) { save(); }
+    virtual void Save();
+    virtual void Save(QString) { Save(); }
 
 protected:
     UseEIT *useeit;
@@ -196,8 +195,8 @@ class NoGrabber_config: public VerticalConfigurationGroup
 public:
     NoGrabber_config(const VideoSource& _parent);
 
-    virtual void save();
-    virtual void save(QString) { save(); }
+    virtual void Save(void);
+    virtual void Save(QString) { Save(); }
 
 protected:
     UseEIT *useeit;
@@ -208,8 +207,8 @@ class Loading_config: public VerticalConfigurationGroup
   public:
     Loading_config(const VideoSource &_parent);
 
-    virtual void save() { }
-    virtual void save(QString) { }
+    virtual void Save(void) { }
+    virtual void Save(QString) { }
 };
 
 class XMLTVFindGrabbers : public QThread
@@ -240,8 +239,8 @@ class XMLTVConfig : public TriggeredConfigurationGroup
     XMLTVConfig(const VideoSource &aparent);
     ~XMLTVConfig();
 
-    virtual void load(void);
-    virtual void save(void);
+    virtual void Load(void);
+    virtual void Save(void);
 
     void Stop(void);
 
@@ -271,16 +270,16 @@ public:
 
     QString getSourceName(void) const { return name->getValue(); };
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         if (name)
-            ConfigurationWizard::save();
+            ConfigurationWizard::Save();
     }
 
-    virtual void save(QString destination)
+    virtual void Save(QString destination)
     {
         if (name)
-            ConfigurationWizard::save(destination);
+            ConfigurationWizard::Save(destination);
     }
 
   private:
@@ -313,19 +312,18 @@ private:
 class CaptureCardDBStorage : public SimpleDBStorage
 {
   protected:
-    CaptureCardDBStorage(Setting           *_setting,
+    CaptureCardDBStorage(StorageUser       *_user,
                          const CaptureCard &_parent,
-                         QString            _name) :
-        SimpleDBStorage(_setting, "capturecard", _name), parent(_parent)
+                         const QString     &_name) :
+        SimpleDBStorage(_user, "capturecard", _name), parent(_parent)
     {
-        setting->setName(_name);
     }
 
     int getCardID(void) const;
 
 protected:
-    virtual QString setClause(MSqlBindings& bindings);
-    virtual QString whereClause(MSqlBindings& bindings);
+    virtual QString GetSetClause(MSqlBindings &bindings) const;
+    virtual QString GetWhereClause(MSqlBindings &bindings) const;
 private:
     const CaptureCard& parent;
 };
@@ -378,16 +376,18 @@ class DVBAudioDevice : public LineEditSetting, public CaptureCardDBStorage
         setVisible(false);
     }
 
-    void save() {
+    void Save(void)
+    {
         changed = true;
         settingValue = "";
-        SimpleDBStorage::save();
-    };
-    void save(QString destination) {
+        SimpleDBStorage::Save();
+    }
+    void Save(QString destination)
+    {
         changed = true;
         settingValue = "";
-        SimpleDBStorage::save(destination);
-    };
+        SimpleDBStorage::Save(destination);
+    }
 };
 
 class DVBVbiDevice : public LineEditSetting, public CaptureCardDBStorage
@@ -401,16 +401,18 @@ class DVBVbiDevice : public LineEditSetting, public CaptureCardDBStorage
     {
         setVisible(false);
     };
-    void save() {
+    void Save(void)
+    {
         changed = true;
         settingValue = "";
-        SimpleDBStorage::save();
-    };
-    void save(QString destination) {
+        SimpleDBStorage::Save();
+    }
+    void Save(QString destination)
+    {
         changed = true;
         settingValue = "";
-        SimpleDBStorage::save(destination);
-    };
+        SimpleDBStorage::Save(destination);
+    }
 };
 
 class CardType : public ComboBoxSetting, public CaptureCardDBStorage
@@ -469,8 +471,8 @@ class DVBConfigurationGroup : public VerticalConfigurationGroup
     DVBConfigurationGroup(CaptureCard& a_parent);
     ~DVBConfigurationGroup();
 
-    virtual void load(void);
-    virtual void save(void);
+    virtual void Load(void);
+    virtual void Save(void);
     
   public slots:
     void probeCard(const QString& cardNumber);
@@ -545,7 +547,7 @@ public:
 
     void reload(void);
 
-    virtual void save(void);
+    virtual void Save(void);
 
     uint GetInstanceCount(void) const { return instance_count; }
     void SetInstanceCount(uint cnt) { instance_count = cnt; }
@@ -577,12 +579,11 @@ private:
 class CardInputDBStorage : public SimpleDBStorage
 {
   protected:
-    CardInputDBStorage(Setting         *_setting,
+    CardInputDBStorage(StorageUser     *_user,
                        const CardInput &_parent,
                        QString          _name) :
-        SimpleDBStorage(_setting, "cardinput", _name), parent(_parent)
+        SimpleDBStorage(_user, "cardinput", _name), parent(_parent)
     {
-        _setting->setName(_name);
     }
 
     int getInputID(void) const;
@@ -590,8 +591,8 @@ class CardInputDBStorage : public SimpleDBStorage
     void fillSelections();
 
 protected:
-    virtual QString setClause(MSqlBindings& bindings);
-    virtual QString whereClause(MSqlBindings& bindings);
+    virtual QString GetSetClause(MSqlBindings &bindings) const;
+    virtual QString GetWhereClause(MSqlBindings &bindings) const;
 private:
     const CardInput& parent;
 };
@@ -606,8 +607,8 @@ class MPUBLIC CaptureCardEditor : public QObject, public ConfigurationDialog
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
                                      const char* widgetName=0);
     virtual DialogCode exec(void);
-    virtual void load();
-    virtual void save() { };
+    virtual void Load(void);
+    virtual void Save(void) { }
 
   public slots:
     void menu(void);
@@ -632,8 +633,8 @@ class MPUBLIC VideoSourceEditor : public QObject, public ConfigurationDialog
                           const QString& thecardtype);
 
     virtual DialogCode exec(void);
-    virtual void load();
-    virtual void save() { };
+    virtual void Load(void);
+    virtual void Save(void) { }
 
   public slots:
     void menu(void);
@@ -652,8 +653,8 @@ class MPUBLIC CardInputEditor : public QObject, public ConfigurationDialog
     CardInputEditor();
 
     virtual DialogCode exec(void);
-    virtual void load();
-    virtual void save() { };
+    virtual void Load(void);
+    virtual void Save(void) { }
 
   private:
     vector<CardInput*>  cardinputs;
@@ -692,8 +693,8 @@ class CardInput : public QObject, public ConfigurationWizard
     void loadByInput(int cardid, QString input);
     QString getSourceName(void) const;
 
-    virtual void save();
-    virtual void save(QString /*destination*/) { save(); }
+    virtual void Save(void);
+    virtual void Save(QString /*destination*/) { Save(); }
 
   public slots:
     void CreateNewInputGroup();

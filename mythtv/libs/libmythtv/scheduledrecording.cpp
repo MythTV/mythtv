@@ -113,11 +113,11 @@ ScheduledRecording::~ScheduledRecording()
 {
 }
 
-void ScheduledRecording::load()
+void ScheduledRecording::Load(void)
 {
     if (getRecordID())
     {
-        ConfigurationGroup::load();
+        ConfigurationGroup::Load();
         
         QString tmpType = type->getValue();
         type->clearSelections();
@@ -390,7 +390,7 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
 
 void ScheduledRecording::loadByID(int recordID) {
     id->setValue(recordID);
-    load();
+    Load();
 }
 
 RecordingType ScheduledRecording::getRecordingType(void) const {
@@ -458,7 +458,7 @@ bool ScheduledRecording::GetMaxNewest(void) const {
     return(maxnewest->getValue().toInt());
 }
 
-void ScheduledRecording::save(void)
+void ScheduledRecording::Save(void)
 {
     // NOTE: we can not use a default value for send(bool) because
     // anyone calling save on a parent type pointer will then not 
@@ -474,7 +474,7 @@ void ScheduledRecording::save(bool sendSig)
     }
     else
     {
-        ConfigurationGroup::save();
+        ConfigurationGroup::Save();
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(
@@ -494,7 +494,7 @@ void ScheduledRecording::save(bool sendSig)
         signalChange(getRecordID());
 }
 
-void ScheduledRecording::save(QString destination) 
+void ScheduledRecording::Save(QString destination)
 {
     if (type->isChanged() && getRecordingType() == kNotRecording)
     {
@@ -502,7 +502,7 @@ void ScheduledRecording::save(QString destination)
     }
     else
     {
-        ConfigurationGroup::save(destination);
+        ConfigurationGroup::Save(destination);
     }
 }
 
@@ -715,7 +715,7 @@ MythDialog *ScheduledRecordingDialog::dialogWidget(
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ScheduledRecordingEditor::load(void) 
+void ScheduledRecordingEditor::Load(void)
 {
     listbox->clearSelections();
     ScheduledRecording::fillSelections(listbox);
@@ -737,7 +737,7 @@ void ScheduledRecordingEditor::open(int id) {
         sr->loadByID(id);
 
     if (sr->exec() == QDialog::Accepted)
-        sr->save();
+        sr->Save();
 
     sr->deleteLater();
 }
@@ -1026,7 +1026,7 @@ ScheduledRecording::testRecording()
         else
             id->setValue(100000);
     }
-    save(ttable);
+    Save(ttable);
 
     ViewScheduleDiff vsd(gContext->GetMainWindow(), "Preview Schedule Changes",
                          ttable, getRecordID(), title->getValue());

@@ -631,26 +631,26 @@ bool RunMenu(QString themedir)
 void WriteDefaults() 
 {
     PlaybackSettings ps;
-    ps.load();
-    ps.save();
+    ps.Load();
+    ps.Save();
     OSDSettings os;
-    os.load();
-    os.save();
+    os.Load();
+    os.Save();
     GeneralSettings gs;
-    gs.load();
-    gs.save();
+    gs.Load();
+    gs.Save();
     EPGSettings es;
-    es.load();
-    es.save();
+    es.Load();
+    es.Save();
     AppearanceSettings as;
-    as.load();
-    as.save();
+    as.Load();
+    as.Save();
     MainGeneralSettings mgs;
-    mgs.load();
-    mgs.save();
+    mgs.Load();
+    mgs.Save();
     GeneralRecPrioritiesSettings grs;
-    grs.load();
-    grs.save();
+    grs.Load();
+    grs.Save();
 }
 
 QString RandTheme(QString &themename)
@@ -1343,7 +1343,7 @@ int main(int argc, char **argv)
     if (ResetSettings)
     {
        AppearanceSettings as;
-       as.save();
+       as.Save();
 
        MSqlQuery query(MSqlQuery::InitCon());
        query.prepare("update settings set data='EN' "

@@ -480,14 +480,15 @@ void StorageGroupEditor::doDelete(void)
 
         int lastIndex = listbox->getValueIndex(name);
         lastValue = "";
-        load();
+        Load();
         listbox->setValue(lastIndex);
     }
 
     listbox->setFocus();
 }
 
-void StorageGroupEditor::load(void) {
+void StorageGroupEditor::Load(void)
+{
     listbox->clearSelections();
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -618,14 +619,14 @@ void StorageGroupListEditor::doDelete(void)
 
         int lastIndex = listbox->getValueIndex(name);
         lastValue = "";
-        load();
+        Load();
         listbox->setValue(lastIndex);
     }
 
     listbox->setFocus();
 }
 
-void StorageGroupListEditor::load(void)
+void StorageGroupListEditor::Load(void)
 {
     QStringList names;
     QStringList masterNames;
@@ -641,7 +642,7 @@ void StorageGroupListEditor::load(void)
                   "ORDER BY groupname;");
     query.bindValue(":HOSTNAME", gContext->GetHostName());
     if (!query.exec())
-        MythContext::DBError("StorageGroup::load getting local group names",
+        MythContext::DBError("StorageGroup::Load getting local group names",
                              query);
     else
     {
@@ -653,7 +654,7 @@ void StorageGroupListEditor::load(void)
                   "FROM storagegroup "
                   "ORDER BY groupname;");
     if (!query.exec())
-        MythContext::DBError("StorageGroup::load getting all group names",
+        MythContext::DBError("StorageGroup::Load getting all group names",
                              query);
     else
     {

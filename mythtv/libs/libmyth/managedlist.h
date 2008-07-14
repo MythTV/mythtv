@@ -444,8 +444,9 @@ class MPUBLIC ManagedListSetting : public Setting, public SimpleDBStorage
 
     public:
 
-        virtual void load() {
-            SimpleDBStorage::load();
+        virtual void Load(void)
+        {
+            SimpleDBStorage::Load();
             syncItemFromDB();
         }
 

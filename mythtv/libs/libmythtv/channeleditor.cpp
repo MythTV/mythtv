@@ -211,7 +211,7 @@ class SourceSetting : public ComboBoxSetting, public Storage
         addSelection(QObject::tr("(All)"),"All");
     };
 
-    void load() 
+    void Load() 
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT name, sourceid FROM videosource");
@@ -226,8 +226,8 @@ class SourceSetting : public ComboBoxSetting, public Storage
         } 
         addSelection(QObject::tr("(Unassigned)"),"Unassigned");
     }
-    void save(void) { }
-    void save(QString /*destination*/) { }
+    void Save(void) { }
+    void Save(QString /*destination*/) { }
 };
 
 class SortMode : public ComboBoxSetting, public TransientStorage

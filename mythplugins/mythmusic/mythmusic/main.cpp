@@ -412,16 +412,16 @@ int mythplugin_init(const char *libversion)
     gContext->ActivateSettingsCache(true);
 
     MusicGeneralSettings general;
-    general.load();
-    general.save();
+    general.Load();
+    general.Save();
 
     MusicPlayerSettings settings;
-    settings.load();
-    settings.save();
+    settings.Load();
+    settings.Save();
 
     MusicRipperSettings ripper;
-    ripper.load();
-    ripper.save();
+    ripper.Load();
+    ripper.Save();
 
     setupKeys();
 

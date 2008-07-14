@@ -27,8 +27,8 @@ class ChannelID : public IntegerSetting, public TransientStorage
         return NULL;
     };
 
-    void load() { };
-    void save(QString table) 
+    void Load() { };
+    void Save(QString table)
     {
         if (intValue() == 0) {
             setValue(findHighest());
@@ -56,9 +56,9 @@ class ChannelID : public IntegerSetting, public TransientStorage
                 cerr << "ChannelID:Failed to insert into: " << (const char *)table << endl;
         }
     }
-    void save() 
+    void Save(void)
     {
-        save(table);
+        Save(table);
     }
 
     int findHighest(int floor = 1000)
@@ -95,14 +95,11 @@ protected:
 class ChannelDBStorage : public SimpleDBStorage
 {
   protected:
-    ChannelDBStorage(Setting *_setting, const ChannelID &_id, QString _name) :
-        SimpleDBStorage(_setting, "channel", _name), id(_id)
-    {
-        _setting->setName(_name);
-    }
+    ChannelDBStorage(StorageUser *_user, const ChannelID &_id, QString _name) :
+        SimpleDBStorage(_user, "channel", _name), id(_id) { }
 
-    virtual QString setClause(MSqlBindings& bindings);
-    virtual QString whereClause(MSqlBindings& bindings);
+    virtual QString GetSetClause(MSqlBindings &bindings) const;
+    virtual QString GetWhereClause(MSqlBindings &bindings) const;
 
     const ChannelID& id;
 };
@@ -116,7 +113,7 @@ class ChannelOptionsCommon: public VerticalConfigurationGroup
 
   public:
     ChannelOptionsCommon(const ChannelID &id, uint default_sourceid);
-    void load(void);
+    void Load(void);
 
   public slots:
     void onAirGuideChanged(bool);

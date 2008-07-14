@@ -100,16 +100,17 @@ class MPUBLIC ConfigurationDialog : public Storage
     // Show a dialogWidget, and save if accepted
     virtual DialogCode exec(bool saveOnExec = true, bool doLoad = true);
 
-    virtual void load(void) { cfgGrp->load(); }
-    virtual void save(void) { cfgGrp->save(); }
-    virtual void save(QString destination) { cfgGrp->save(destination); }
-
     virtual void addChild(Configurable *child);
 
     virtual Setting *byName(const QString &settingName)
         { return cfgGrp->byName(settingName); }
 
     void setLabel(const QString &label);
+
+    // Storage
+    virtual void Load(void) { cfgGrp->Load(); }
+    virtual void Save(void) { cfgGrp->Save(); }
+    virtual void Save(QString destination) { cfgGrp->Save(destination); }
 
   protected:
     typedef vector<Configurable*> ChildList;

@@ -87,8 +87,8 @@ int mythplugin_init(const char *libversion)
     gContext->ActivateSettingsCache(true);
 
     GallerySettings settings;
-    settings.load();
-    settings.save();
+    settings.Load();
+    settings.Save();
 
     setupKeys();
 

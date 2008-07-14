@@ -9,27 +9,26 @@
 class ROMDBStorage : public SimpleDBStorage
 {
   public:
-    ROMDBStorage(Setting *_setting, QString _name, QString _romname) :
-        SimpleDBStorage(_setting, "gamemetadata", _name), romname(_romname)
+    ROMDBStorage(StorageUser *_user, QString _name, QString _romname) :
+        SimpleDBStorage(_user, "gamemetadata", _name), romname(_romname)
     {
-        _setting->setName(romname);
     }
 
-    virtual QString setClause(MSqlBindings &bindings)
+    virtual QString GetSetClause(MSqlBindings &bindings) const
     {
         QString romTag(":SETROMNAME");
-        QString colTag(":SET" + getColumn().upper());
+        QString colTag(":SET" + GetColumnName().upper());
 
         QString query("romname = " + romTag + ", " +
-                      getColumn() + " = " + colTag);
+                      GetColumnName() + " = " + colTag);
 
         bindings.insert(romTag, romname);
-        bindings.insert(colTag, setting->getValue());
+        bindings.insert(colTag, user->GetValue());
 
         return query;
     }
 
-    virtual QString whereClause(MSqlBindings &bindings)
+    virtual QString GetWhereClause(MSqlBindings &bindings) const
     {
         QString romTag(":ROMNAME");
 
@@ -43,7 +42,7 @@ class ROMDBStorage : public SimpleDBStorage
     QString romname;
 };
 
-class GameEditDialog : public QObject, public ConfigurationWizard
+class GameEditDialog : public ConfigurationWizard
 {
   public:
     GameEditDialog(const QString &romname);

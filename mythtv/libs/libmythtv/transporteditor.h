@@ -49,7 +49,7 @@ class TransportList : public ListBoxSetting, public TransientStorage
   public:
     TransportList() : ListBoxSetting(this), sourceid(0) { }
 
-    virtual void load(void) { fillSelections(); }
+    virtual void Load(void) { fillSelections(); }
     virtual void fillSelections(void);
 
     void SetSourceID(uint _sourceid);

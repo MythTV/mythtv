@@ -540,9 +540,9 @@ int mythplugin_init(const char *libversion)
     }
     gContext->ActivateSettingsCache(false);
 
-    ArchiveSettings mpSettings;
-    mpSettings.load();
-    mpSettings.save();
+    ArchiveSettings settings;
+    settings.Load();
+    settings.Save();
 
     initKeys();
 

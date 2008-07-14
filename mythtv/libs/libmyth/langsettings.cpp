@@ -19,17 +19,19 @@ class LangEditorSetting : public ListBoxSetting, public Storage
         setLabel(QObject::tr("Select your preferred language"));
     };
     
-    virtual void load() {
+    virtual void Load(void)
+    {
         LanguageSettings::fillSelections(this);
-    };
+    }
     
-    virtual void save() {
+    virtual void Save(void)
+    {
         gContext->SetSetting("Language", getValue());
         gContext->SaveSetting("Language", getValue());
         LanguageSettings::reload();
-    };
+    }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 };
 
 // LanguageSettingsPrivate holds our persistent data.

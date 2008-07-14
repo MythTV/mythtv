@@ -11,7 +11,8 @@
 
 #include "managedlist.h"
 
-QString RecordingProfileStorage::whereClause(MSqlBindings& bindings) {
+QString RecordingProfileStorage::GetWhereClause(MSqlBindings &bindings) const
+{
     QString idTag(":WHEREID");
     QString query("id = " + idTag);
 
@@ -23,22 +24,22 @@ QString RecordingProfileStorage::whereClause(MSqlBindings& bindings) {
 class CodecParamStorage : public SimpleDBStorage
 {
   protected:
-    CodecParamStorage(Setting *_setting,
+    CodecParamStorage(StorageUser *_setting,
                       const RecordingProfile &parentProfile,
                       QString name) :
         SimpleDBStorage(_setting, "codecparams", "value"),
-        parent(parentProfile)
+        parent(parentProfile), codecname(name)
     {
-        _setting->setName(name);
     }
 
-    virtual QString setClause(MSqlBindings& bindings);
-    virtual QString whereClause(MSqlBindings& bindings);
+    virtual QString GetSetClause(MSqlBindings &bindings) const;
+    virtual QString GetWhereClause(MSqlBindings &bindings) const;
 
     const RecordingProfile &parent;
+    QString codecname;
 };
 
-QString CodecParamStorage::setClause(MSqlBindings &bindings)
+QString CodecParamStorage::GetSetClause(MSqlBindings &bindings) const
 {
     QString profileTag(":SETPROFILE");
     QString nameTag(":SETNAME");
@@ -48,13 +49,13 @@ QString CodecParamStorage::setClause(MSqlBindings &bindings)
             + ", value = " + valueTag);
 
     bindings.insert(profileTag, parent.getProfileNum());
-    bindings.insert(nameTag, setting->getName());
-    bindings.insert(valueTag, setting->getValue());
+    bindings.insert(nameTag, codecname);
+    bindings.insert(valueTag, user->GetValue());
 
     return query;
 }
 
-QString CodecParamStorage::whereClause(MSqlBindings &bindings)
+QString CodecParamStorage::GetWhereClause(MSqlBindings &bindings) const
 {
     QString profileTag(":WHEREPROFILE");
     QString nameTag(":WHERENAME");
@@ -62,7 +63,7 @@ QString CodecParamStorage::whereClause(MSqlBindings &bindings)
     QString query("profile = " + profileTag + " AND name = " + nameTag);
 
     bindings.insert(profileTag, parent.getProfileNum());
-    bindings.insert(nameTag, setting->getName());
+    bindings.insert(nameTag, codecname);
 
     return query;
 }
@@ -127,9 +128,9 @@ class SampleRate : public ComboBoxSetting, public CodecParamStorage
 
     };
 
-    void load(void)
+    void Load(void)
     {
-        CodecParamStorage::load();
+        CodecParamStorage::Load();
         QString val = getValue();
 
         clearSelections();
@@ -196,9 +197,9 @@ class MPEG2audType : public ComboBoxSetting, public CodecParamStorage
         setHelpText(QObject::tr("Sets the audio type"));
     }
 
-    void load(void)
+    void Load(void)
     {
-        CodecParamStorage::load();
+        CodecParamStorage::Load();
         QString val = getValue();
 
         if ((val == "Layer I") && !allow_layer1)
@@ -1234,7 +1235,7 @@ void RecordingProfile::loadByID(int profileId)
     }
 
     id->setValue(profileId);
-    load();
+    Load();
 }
 
 void RecordingProfile::FiltersChanged(const QString &val)
@@ -1355,7 +1356,7 @@ void RecordingProfileEditor::open(int id)
         profile->setCodecTypes();
 
         if (profile->exec() == QDialog::Accepted)
-            profile->save();
+            profile->Save();
         delete profile;
     }
     else
@@ -1407,7 +1408,7 @@ RecordingProfileEditor::RecordingProfileEditor(int id, QString profName) :
     addChild(listbox);
 }
 
-void RecordingProfileEditor::load(void)
+void RecordingProfileEditor::Load(void)
 {
     listbox->clearSelections();
     listbox->addSelection("(Create new profile)", "0");

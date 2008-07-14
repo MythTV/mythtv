@@ -254,8 +254,8 @@ int mythplugin_init(const char *libversion)
     gContext->ActivateSettingsCache(true);
 
     MythPhoneSettings mpSettings;
-    mpSettings.load();
-    mpSettings.save();
+    mpSettings.Load();
+    mpSettings.Save();
 
     // Make sure all the required directories exist
     QString dirName = GetConfDir();

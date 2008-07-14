@@ -84,7 +84,7 @@ void ConfigurationPopupDialog::setLabel(QString str)
 
 DialogCode ConfigurationPopupDialog::exec(bool saveOnAccept)
 {
-    storage->load();
+    storage->Load();
 
     dialog = (ConfigPopupDialogWidget*)
         dialogWidget(gContext->GetMainWindow(), "ConfigurationPopupDialog");
@@ -93,7 +93,7 @@ DialogCode ConfigurationPopupDialog::exec(bool saveOnAccept)
     DialogCode ret = dialog->exec();
 
     if ((QDialog::Accepted == ret) && saveOnAccept)
-        storage->save();
+        storage->Save();
 
     return ret;
 }
@@ -162,7 +162,7 @@ MythDialog* ConfigurationDialog::dialogWidget(MythMainWindow *parent,
 DialogCode ConfigurationDialog::exec(bool saveOnAccept, bool doLoad)
 {
     if (doLoad)
-        load();
+        Load();
 
     MythDialog *dialog = dialogWidget(
         gContext->GetMainWindow(), "Configuration Dialog");
@@ -172,7 +172,7 @@ DialogCode ConfigurationDialog::exec(bool saveOnAccept, bool doLoad)
     DialogCode ret = dialog->exec();
 
     if ((QDialog::Accepted == ret) && saveOnAccept)
-        save();
+        Save();
 
     clear_widgets(cfgChildren, childwidget);
 

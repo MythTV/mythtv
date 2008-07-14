@@ -1145,7 +1145,7 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
     if (newstate == kOverrideRecord || newstate == kDontRecord)
         record->makeOverride();
     record->setRecordingType(newstate);
-    record->save();
+    record->Save();
 }
 
 /** \fn ProgramInfo::ApplyRecordRecPriorityChange(int)
@@ -1157,7 +1157,7 @@ void ProgramInfo::ApplyRecordRecPriorityChange(int newrecpriority)
 {
     GetProgramRecordingStatus();
     record->setRecPriority(newrecpriority);
-    record->save();
+    record->Save();
 }
 
 /** \fn ProgramInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)

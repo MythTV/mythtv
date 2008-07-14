@@ -70,8 +70,8 @@ class PlaybackProfileItemConfig : public QObject, public ConfigurationWizard
   public:
     PlaybackProfileItemConfig(ProfileItem &_item);
 
-    virtual void load(void);
-    virtual void save(void);
+    virtual void Load(void);
+    virtual void Save(void);
 
   private slots:
     void decoderChanged(const QString &dec);
@@ -103,8 +103,8 @@ class PlaybackProfileConfig : public VerticalConfigurationGroup
     PlaybackProfileConfig(const QString &profilename);
     virtual ~PlaybackProfileConfig();
 
-    virtual void load(void);
-    virtual void save(void);
+    virtual void Load(void);
+    virtual void Save(void);
 
     void swap(int indexA, int intexB);
 

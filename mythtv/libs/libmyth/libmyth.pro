@@ -18,7 +18,7 @@ HEADERS += managedlist.h mythconfigdialogs.h mythconfiggroups.h
 HEADERS += mythcontext.h mythdeque.h mythdialogs.h
 HEADERS += mythevent.h mythexp.h mythmedia.h mythmediamonitor.h
 HEADERS += mythplugin.h mythpluginapi.h 
-HEADERS += mythstorage.h mythwidgets.h mythwizard.h
+HEADERS += mythwidgets.h mythwizard.h
 HEADERS += output.h remotefile.h
 HEADERS += settings.h 
 HEADERS += uilistbtntype.h uitypes.h util.h
@@ -34,7 +34,7 @@ SOURCES += managedlist.cpp mythconfigdialogs.cpp mythconfiggroups.cpp
 SOURCES += mythcontext.cpp mythdialogs.cpp
 SOURCES += mythmedia.cpp mythmediamonitor.cpp
 SOURCES += mythplugin.cpp 
-SOURCES += mythstorage.cpp mythwidgets.cpp mythwizard.cpp
+SOURCES += mythwidgets.cpp mythwizard.cpp
 SOURCES += output.cpp remotefile.cpp
 SOURCES += settings.cpp
 SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp
@@ -77,7 +77,7 @@ inc.files += uilistbtntype.h generictree.h managedlist.h mythmediamonitor.h
 inc.files += visual.h volumebase.h output.h langsettings.h
 inc.files += virtualkeyboard.h
 inc.files += mythexp.h mythpluginapi.h storagegroup.h
-inc.files += mythstorage.h mythconfigdialogs.h mythconfiggroups.h
+inc.files += mythconfigdialogs.h mythconfiggroups.h
 inc.files += mythterminal.h
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>

@@ -61,9 +61,9 @@ public:
         currentHideMode = false;
     };
 
-    void load(void) { fillSelections(); }
-    void save(void) { }
-    void save(QString /*destination*/) { }
+    void Load(void) { fillSelections(); }
+    void Save(void) { }
+    void Save(QString /*destination*/) { }
 
     QString getSourceID() { return currentSourceID; };
     QString getSortMode() { return currentSortMode; };

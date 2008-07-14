@@ -99,7 +99,7 @@ MythGameGeneralSettings::MythGameGeneralSettings()
 }
 
 // Player Settings
-QString GameDBStorage::whereClause(MSqlBindings &bindings)
+QString GameDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
     QString playerId(":PLAYERID");
     QString query("gameplayerid = " + playerId);
@@ -109,16 +109,16 @@ QString GameDBStorage::whereClause(MSqlBindings &bindings)
     return query;
 }
 
-QString GameDBStorage::setClause(MSqlBindings &bindings)
+QString GameDBStorage::GetSetClause(MSqlBindings &bindings) const
 {
     QString playerID(":SETPLAYERID");
-    QString colTag(":SET" + getColumn().upper());
+    QString colTag(":SET" + GetColumnName().upper());
 
     QString query("gameplayerid = " + playerID + ", " +
-                  getColumn() + " = " + colTag);
+                  GetColumnName() + " = " + colTag);
 
     bindings.insert(playerID, parent.getGamePlayerID());
-    bindings.insert(colTag, setting->getValue());
+    bindings.insert(colTag, user->GetValue());
 
     return query;
 }
@@ -242,7 +242,7 @@ void MythGamePlayerSettings::fillSelections(SelectSetting* setting)
 void MythGamePlayerSettings::loadByID(int sourceid)
 {
     id->setValue(sourceid);
-    load();
+    Load();
 }
 
 MythGamePlayerEditor::MythGamePlayerEditor() : listbox(new ListBoxSetting(this))
@@ -259,7 +259,7 @@ DialogCode MythGamePlayerEditor::exec(void)
     return kDialogCodeRejected;
 }
 
-void MythGamePlayerEditor::load(void)
+void MythGamePlayerEditor::Load(void)
 {
     listbox->clearSelections();
     listbox->addSelection(QObject::tr("(New Game Player)"), "0");
@@ -327,7 +327,7 @@ void MythGamePlayerEditor::del(void)
         if (!query.exec() || !query.isActive())
             MythContext::DBError("Deleting MythGamePlayerSettings:", query);
 
-        load(); 
+        Load(); 
     }
 }
 

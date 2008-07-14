@@ -67,8 +67,6 @@ class MPUBLIC ScheduledRecording : public ConfigurationGroup
 
     void deleteLater();
 
-    virtual void load();
-    
     void makeOverride(void);
     const ProgramInfo* getProgramInfo() const { return m_pginfo; }
     QPointer<RootSRGroup> getRootGroup(void) { return rootGroup; }
@@ -97,10 +95,11 @@ class MPUBLIC ScheduledRecording : public ConfigurationGroup
     void setStorageGroup(const QString& newstoragegroup);
     void setPlayGroup(const QString& newplaygroup);
 
-    virtual void save(void);
-    virtual void save(bool send_reschedule_signal);
-    virtual void save(QString);
+    virtual void Load(void);
+    virtual void Save(void);
+    virtual void Save(QString);
 
+    virtual void save(bool send_reschedule_signal);
     virtual void loadByID(int id);
     virtual void loadByProgram(const ProgramInfo* proginfo);
     virtual void loadBySearch(RecSearchType lsearch,
@@ -277,8 +276,8 @@ class ScheduledRecordingEditor :
         { addChild(listbox); }
 
     virtual DialogCode exec(void);
-    virtual void load();
-    virtual void save() { };
+    virtual void Load(void);
+    virtual void Save(void) { }
 
   protected slots:
     void open(int id);

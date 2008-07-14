@@ -46,9 +46,9 @@ class MPUBLIC StorageGroupEditor :
   public:
     StorageGroupEditor(QString group);
     virtual DialogCode exec(void);
-    virtual void load(void);
-    virtual void save(void) { };
-    virtual void save(QString) { };
+    virtual void Load(void);
+    virtual void Save(void) { }
+    virtual void Save(QString) { }
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
                                      const char* widgetname=0);
 
@@ -69,9 +69,9 @@ class MPUBLIC StorageGroupListEditor :
   public:
     StorageGroupListEditor(void);
     virtual DialogCode exec(void);
-    virtual void load(void);
-    virtual void save(void) { };
-    virtual void save(QString) { };
+    virtual void Load(void);
+    virtual void Save(void) { }
+    virtual void Save(QString) { }
     virtual MythDialog* dialogWidget(MythMainWindow* parent,
                                      const char* widgetname=0);
 

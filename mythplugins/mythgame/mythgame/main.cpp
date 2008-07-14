@@ -113,8 +113,8 @@ int mythplugin_init(const char *libversion)
     gContext->ActivateSettingsCache(true);
 
     MythGamePlayerSettings settings;
-//    settings.load();
-//    settings.save();
+//    settings.Load();
+//    settings.Save();
 
     setupKeys();
 

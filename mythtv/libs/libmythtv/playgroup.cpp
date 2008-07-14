@@ -20,12 +20,12 @@ class PlayGroupDBStorage : public SimpleDBStorage
         _setting->setName(_name);
     }
 
-    virtual QString whereClause(MSqlBindings& bindings);
+    virtual QString GetWhereClause(MSqlBindings &bindings) const;
 
     const PlayGroup &parent;
 };
 
-QString PlayGroupDBStorage::whereClause(MSqlBindings& bindings)
+QString PlayGroupDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
     QString nameTag(":WHERENAME");
     QString query("name = " + nameTag);
@@ -106,16 +106,18 @@ class TimeStretch : public SpinBoxSetting, public PlayGroupDBStorage
                                 "and 200 for double speed."));
     };
 
-    virtual void load(void) {
-        PlayGroupDBStorage::load();
+    virtual void Load(void)
+    {
+        PlayGroupDBStorage::Load();
         if (intValue() < 50 || intValue() > 200)
             setValue(45);
-    };
+    }
 
-    virtual void save(void) {
+    virtual void Save(void)
+    {
         if (intValue() < 50 || intValue() > 200)
             setValue(0);
-        PlayGroupDBStorage::save();
+        PlayGroupDBStorage::Save();
     }
 };
 
@@ -142,7 +144,7 @@ int PlayGroup::GetCount(void)
     query.prepare("SELECT COUNT(name) FROM playgroup "
                   "WHERE name <> 'Default' ORDER BY name;");
     if (!query.exec())
-        MythContext::DBError("PlayGroupEditor::load", query);
+        MythContext::DBError("PlayGroup::GetCount()", query);
     else if (query.next())
         names = query.value(0).toInt();
 
@@ -157,7 +159,7 @@ QStringList PlayGroup::GetNames(void)
     query.prepare("SELECT name FROM playgroup "
                   "WHERE name <> 'Default' ORDER BY name;");
     if (!query.exec())
-        MythContext::DBError("PlayGroupEditor::load", query);
+        MythContext::DBError("PlayGroup::GetNames()", query);
     else
     {
         while (query.next())
@@ -279,14 +281,14 @@ void PlayGroupEditor::doDelete(void)
 
         int lastIndex = listbox->getValueIndex(name);
         lastValue = "";
-        load();
+        Load();
         listbox->setValue(lastIndex);
     }
 
     listbox->setFocus();
 }
 
-void PlayGroupEditor::load(void)
+void PlayGroupEditor::Load(void)
 {
     listbox->clearSelections();
 

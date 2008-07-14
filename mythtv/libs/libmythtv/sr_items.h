@@ -20,21 +20,21 @@ class SimpleSRStorage : public SimpleDBStorage
         _setting->setName(name);
     }
 
-        virtual QString setClause(MSqlBindings& bindings)
+        virtual QString GetSetClause(MSqlBindings &bindings) const
         {
             QString recordidTag(":SETRECORDID");
-            QString colTag(":SET" + getColumn().upper());
+            QString colTag(":SET" + GetColumnName().upper());
 
             QString query("recordid = " + recordidTag + ", " + 
-                    getColumn() + " = " + colTag);
+                    GetColumnName() + " = " + colTag);
 
             bindings.insert(recordidTag, parent->getRecordID());
-            bindings.insert(colTag, setting->getValue());
+            bindings.insert(colTag, user->GetValue());
 
             return query;
         }
 
-        virtual QString whereClause(MSqlBindings& bindings)
+        virtual QString GetWhereClause(MSqlBindings &bindings) const
         {
             QString recordidTag(":WHERERECORDID");
             QString query("recordid = " + recordidTag);
@@ -59,13 +59,13 @@ class SRSetting: public ManagedListSetting
             setName(name);
         }
 
-        virtual QString setClause(MSqlBindings& bindings)
+        virtual QString GetSetClause(MSqlBindings &bindings) const
         {
             QString recordidTag(":SETRECORDID");
-            QString colTag(":SET" + getColumn().upper());
+            QString colTag(":SET" + GetColumnName().upper());
 
             QString query("recordid = " + recordidTag + ", " + 
-                    getColumn() + " = " + colTag);
+                    GetColumnName() + " = " + colTag);
 
             bindings.insert(recordidTag, parent->getRecordID());
             bindings.insert(colTag, getValue());
@@ -73,7 +73,7 @@ class SRSetting: public ManagedListSetting
             return query;
         }
 
-        virtual QString whereClause(MSqlBindings& bindings)
+        virtual QString GetWhereClause(MSqlBindings &bindings) const
         {
             QString recordidTag(":WHERERECORDID");
             
@@ -101,13 +101,13 @@ class SRSelectSetting : public SelectManagedListSetting
             setName(_column);
         }
 
-        virtual QString setClause(MSqlBindings& bindings)
+        virtual QString GetSetClause(MSqlBindings& bindings) const
         {
             QString recordidTag(":SETRECORDID");
-            QString colTag(":SET" + getColumn().upper());
+            QString colTag(":SET" + GetColumnName().upper());
 
             QString query("recordid = " + recordidTag + ", " + 
-                    getColumn() + " = " + colTag);
+                    GetColumnName() + " = " + colTag);
 
             bindings.insert(recordidTag, parent->getRecordID());
             bindings.insert(colTag, getValue());
@@ -115,7 +115,7 @@ class SRSelectSetting : public SelectManagedListSetting
             return query;
         }
 
-        virtual QString whereClause(MSqlBindings& bindings)
+        virtual QString GetWhereClause(MSqlBindings& bindings) const
         {
             QString recordidTag(":WHERERECORDID");
             
@@ -142,12 +142,12 @@ class SRBoolSetting : public BoolManagedListSetting
             setName(_column);
         }
 
-        virtual QString setClause(MSqlBindings& bindings)
+        virtual QString GetSetClause(MSqlBindings &bindings) const
         {
             QString recordidTag(":SETRECORDID");
-            QString colTag(":SET" + getColumn().upper());
+            QString colTag(":SET" + GetColumnName().upper());
 
-            QString query("recordid = " + recordidTag + ", " + getColumn()
+            QString query("recordid = " + recordidTag + ", " + GetColumnName()
                     + " = " + colTag);
 
             bindings.insert(recordidTag, parent->getRecordID());
@@ -156,7 +156,7 @@ class SRBoolSetting : public BoolManagedListSetting
             return query;
         }
 
-        virtual QString whereClause(MSqlBindings& bindings)
+        virtual QString GetWhereClause(MSqlBindings &bindings) const
         {
             QString recordidTag(":WHERERECORDID");
             
@@ -186,13 +186,13 @@ class SRBoundedIntegerSetting : public BoundedIntegerManagedListSetting
             setName(_column);
         }
 
-        virtual QString setClause(MSqlBindings& bindings)
+        virtual QString GetSetClause(MSqlBindings &bindings) const
         {
             QString recordidTag(":SETRECORDID");
-            QString colTag(":SET" + getColumn().upper());
+            QString colTag(":SET" + GetColumnName().upper());
 
             QString query("recordid = " + recordidTag + ", " + 
-                    getColumn() + " = " + colTag);
+                    GetColumnName() + " = " + colTag);
 
             bindings.insert(recordidTag, parent->getRecordID());
             bindings.insert(colTag, getValue());
@@ -200,7 +200,7 @@ class SRBoundedIntegerSetting : public BoundedIntegerManagedListSetting
             return query;
         }
 
-        virtual QString whereClause(MSqlBindings& bindings)
+        virtual QString GetWhereClause(MSqlBindings &bindings) const
         {
             QString recordidTag(":WHERERECORDID");
             
@@ -360,9 +360,10 @@ class SRProfileSelector : public SRSelectSetting
         }
 
 
-        virtual void load() {
+        virtual void Load(void)
+        {
             fillSelections();
-            SRSelectSetting::load();
+            SRSelectSetting::Load();
         }
 
         virtual void fillSelections() {
@@ -621,9 +622,10 @@ class SRTranscoderSelector: public SRSelectSetting {
         }
 
 
-        virtual void load() {
+        virtual void Load(void)
+        {
             fillSelections();
-            SRSelectSetting::load();
+            SRSelectSetting::Load();
         }
 
         virtual void fillSelections() {
@@ -793,9 +795,10 @@ class SRRecGroup: public SRSelectSetting
         }
 
 
-        virtual void load() {
+        virtual void Load(void)
+        {
             fillSelections();
-            SRSelectSetting::load();
+            SRSelectSetting::Load();
         }
 
         virtual QString getValue(void) const {
@@ -886,9 +889,10 @@ class SRStorageGroup: public SRSelectSetting
         }
 
 
-        virtual void load() {
+        virtual void Load(void)
+        {
             fillSelections();
-            SRSelectSetting::load();
+            SRSelectSetting::Load();
         }
 
         virtual QString getValue(void) const {
@@ -946,9 +950,10 @@ class SRPlayGroup: public SRSelectSetting
             _parent->setPlayGroupObj(this);
         }
 
-        virtual void load() {
+        virtual void Load(void)
+        {
             fillSelections();
-            SRSelectSetting::load();
+            SRSelectSetting::Load();
         }
 
         virtual QString getValue(void) const {
@@ -972,9 +977,10 @@ class SRInput: public SRSelectSetting
             _parent->setInputObj(this);
         }
 
-        virtual void load() {
+        virtual void Load(void)
+        {
             fillSelections();
-            SRSelectSetting::load();
+            SRSelectSetting::Load();
         }
 
         virtual QString getValue(void) const {

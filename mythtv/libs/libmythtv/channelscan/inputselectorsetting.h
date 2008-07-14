@@ -39,7 +39,7 @@ class InputSelector : public ComboBoxSetting, public TransientStorage
   public:
     InputSelector(uint _default_cardid, const QString &_default_inputname);
 
-    virtual void load(void);
+    virtual void Load(void);
 
     uint GetCardID(void) const;
 

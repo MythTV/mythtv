@@ -8,8 +8,8 @@ class MythDbSettings1: public VerticalConfigurationGroup {
 public:
     MythDbSettings1(const QString &DBhostOverride = QString::null);
 
-    void load();
-    void save();
+    void Load(void);
+    void Save(void);
 
 protected:
     TransLabelSetting    *info;
@@ -28,8 +28,8 @@ class MythDbSettings2: public VerticalConfigurationGroup {
 public:
     MythDbSettings2();
 
-    void load();
-    void save();
+    void Load(void);
+    void Save(void);
 
 protected:
     TransCheckBoxSetting *localEnabled;
@@ -229,7 +229,7 @@ MythDbSettings2::MythDbSettings2(void) :
     addChild(sub4);
 }
 
-void MythDbSettings1::load()
+void MythDbSettings1::Load(void)
 {
     DatabaseParams params = gContext->GetDatabaseParams();
 
@@ -270,7 +270,7 @@ void MythDbSettings1::load()
 //         dbType->setValue(1);
 }
 
-void MythDbSettings2::load()
+void MythDbSettings2::Load(void)
 {
     DatabaseParams params = gContext->GetDatabaseParams();
 
@@ -283,7 +283,7 @@ void MythDbSettings2::load()
     wolCommand->setValue(params.wolCommand);
 }
 
-void MythDbSettings1::save()
+void MythDbSettings1::Save(void)
 {
     DatabaseParams params = gContext->GetDatabaseParams();
 
@@ -299,7 +299,7 @@ void MythDbSettings1::save()
     gContext->SaveDatabaseParams(params);
 }
 
-void MythDbSettings2::save()
+void MythDbSettings2::Save(void)
 {
     DatabaseParams params = gContext->GetDatabaseParams();
 

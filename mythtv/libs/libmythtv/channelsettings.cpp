@@ -2,7 +2,7 @@
 #include "cardutil.h"
 #include "channelutil.h"
 
-QString ChannelDBStorage::whereClause(MSqlBindings &bindings)
+QString ChannelDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
     QString fieldTag = (":WHERE" + id.getField().upper());
     QString query(id.getField() + " = " + fieldTag);
@@ -12,16 +12,16 @@ QString ChannelDBStorage::whereClause(MSqlBindings &bindings)
     return query;
 }
 
-QString ChannelDBStorage::setClause(MSqlBindings &bindings)
+QString ChannelDBStorage::GetSetClause(MSqlBindings &bindings) const
 {
     QString fieldTag = (":SET" + id.getField().upper());
-    QString nameTag = (":SET" + setting->getName().upper());
+    QString nameTag = (":SET" + GetColumnName().upper());
 
     QString query(id.getField() + " = " + fieldTag + ", " +
-                  setting->getName() + " = " + nameTag);
+                  GetColumnName() + " = " + nameTag);
 
     bindings.insert(fieldTag, id.getValue());
-    bindings.insert(nameTag, setting->getValue());
+    bindings.insert(nameTag, user->GetValue());
 
     return query;
 }
@@ -60,10 +60,10 @@ class Source : public ComboBoxSetting, public ChannelDBStorage
         setLabel(QObject::tr("Video Source"));
     }
 
-    void load(void)
+    void Load(void)
     {
         fillSelections();
-        ChannelDBStorage::load();
+        ChannelDBStorage::Load();
 
         if (default_sourceid && !getValue().toUInt())
         {
@@ -407,9 +407,9 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
             this,       SLOT(  sourceChanged(const QString&)));
 };
 
-void ChannelOptionsCommon::load()
+void ChannelOptionsCommon::Load(void)
 {
-    VerticalConfigurationGroup::load();
+    VerticalConfigurationGroup::Load();
 }
 
 void ChannelOptionsCommon::onAirGuideChanged(bool fValue)

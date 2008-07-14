@@ -160,7 +160,7 @@ class MultiplexSetting : public ComboBoxSetting, public TransientStorage
     MultiplexSetting() : ComboBoxSetting(this), sourceid(0)
         { setLabel(tr("Transport")); }
 
-    virtual void load(void);
+    virtual void Load(void);
 
     void SetSourceID(uint _sourceid);
 
@@ -188,7 +188,7 @@ class InputSelector : public ComboBoxSetting, public TransientStorage
   public:
     InputSelector(uint _default_cardid, const QString &_default_inputname);
 
-    virtual void load(void);
+    virtual void Load(void);
 
     uint GetCardID(void) const;
 

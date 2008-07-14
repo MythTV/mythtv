@@ -27,7 +27,7 @@ class RecordingProfileStorage : public SimpleDBStorage
         _setting->setName(name);
     }
 
-    virtual QString whereClause(MSqlBindings& bindings);
+    virtual QString GetWhereClause(MSqlBindings &bindings) const;
 
     const RecordingProfile &parent;
 };
@@ -139,9 +139,9 @@ class RecordingProfileEditor :
     RecordingProfileEditor(int id, QString profName);
 
     virtual DialogCode exec(void);
-    virtual void load();
-    virtual void save() { };
-    virtual void save(QString /*destination*/) { }
+    virtual void Load(void);
+    virtual void Save(void) { }
+    virtual void Save(QString /*destination*/) { }
 
   protected slots:
     void open(int id);

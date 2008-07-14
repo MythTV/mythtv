@@ -860,13 +860,13 @@ void CheckBoxSetting::setHelpText(const QString &str)
     BooleanSetting::setHelpText(str);
 }
 
-void AutoIncrementDBSetting::save(QString table)
+void AutoIncrementDBSetting::Save(QString table)
 {
     if (intValue() == 0) 
     {
         // Generate a new, unique ID
         QString querystr = QString("INSERT INTO " + table + " (" 
-                + column + ") VALUES (0);");
+                + GetColumnName() + ") VALUES (0);");
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.exec(querystr);
@@ -889,7 +889,7 @@ void AutoIncrementDBSetting::save(QString table)
             setValue(var.toInt());
         else
         {
-            querystr = QString("SELECT MAX(" + column + ") FROM " + table + ";");
+            querystr = QString("SELECT MAX(" + GetColumnName() + ") FROM " + table + ";");
             if (query.exec(querystr) && query.next())
             {
                 int lii = query.value(0).toInt();
@@ -904,9 +904,9 @@ void AutoIncrementDBSetting::save(QString table)
     }
 }
 
-void AutoIncrementDBSetting::save() 
+void AutoIncrementDBSetting::Save(void)
 {
-    save(table);
+    Save(GetTableName());
 }
 
 void ListBoxSetting::setEnabled(bool b)

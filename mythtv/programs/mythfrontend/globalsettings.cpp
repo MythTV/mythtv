@@ -948,7 +948,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
             this,    SLOT(deint1Changed(const QString&)));
 }
 
-void PlaybackProfileItemConfig::load(void)
+void PlaybackProfileItemConfig::Load(void)
 {
     for (uint i = 0; i < 2; i++)
     {
@@ -1011,7 +1011,7 @@ void PlaybackProfileItemConfig::load(void)
         filters->setValue(pfilter);
 }
 
-void PlaybackProfileItemConfig::save(void)
+void PlaybackProfileItemConfig::Save(void)
 {
     for (uint i = 0; i < 2; i++)
     {
@@ -1231,12 +1231,12 @@ void PlaybackProfileConfig::InitUI(void)
     last_main = main;
 }
 
-void PlaybackProfileConfig::load(void)
+void PlaybackProfileConfig::Load(void)
 {
     // Already loaded data in constructor...
 }
 
-void PlaybackProfileConfig::save(void)
+void PlaybackProfileConfig::Save(void)
 {
     if (!needs_save)
         return; // nothing to do..
@@ -1245,7 +1245,7 @@ void PlaybackProfileConfig::save(void)
     if (!ok)
     {
         VERBOSE(VB_IMPORTANT,
-                "PlaybackProfileConfig::save() -- failed to delete items");
+                "PlaybackProfileConfig::Save() -- failed to delete items");
         return;
     }
 
@@ -1253,7 +1253,7 @@ void PlaybackProfileConfig::save(void)
     if (!ok)
     {
         VERBOSE(VB_IMPORTANT,
-                "PlaybackProfileConfig::save() -- failed to save items");
+                "PlaybackProfileConfig::Save() -- failed to save items");
         return;
     }
 }
@@ -2927,9 +2927,10 @@ public:
             addSelection(*iter);
     };
 
-    void load() {
+    void Load(void)
+    {
         fillSelections();
-        HostComboBox::load();
+        HostComboBox::Load();
     };
 };
 

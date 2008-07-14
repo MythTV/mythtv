@@ -603,16 +603,16 @@ int mythplugin_init(const char *libversion)
     gContext->ActivateSettingsCache(true);
 
     VideoGeneralSettings general;
-    general.load();
-    general.save();
+    general.Load();
+    general.Save();
 
     VideoPlayerSettings settings;
-    settings.load();
-    settings.save();
+    settings.Load();
+    settings.Save();
 
     DVDRipperSettings rsettings;
-    rsettings.load();
-    rsettings.save();
+    rsettings.Load();
+    rsettings.Save();
 
     setupKeys();
 

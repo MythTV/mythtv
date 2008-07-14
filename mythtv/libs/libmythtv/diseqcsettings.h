@@ -37,9 +37,9 @@ class RotorPosMap : public ListBoxSetting, public Storage
   public:
     RotorPosMap(DiSEqCDevRotor &rotor);
 
-    virtual void load(void);
-    virtual void save(void);
-    virtual void save(QString /*destination*/) {}
+    virtual void Load(void);
+    virtual void Save(void);
+    virtual void Save(QString /*destination*/) {}
 
   public slots:
     void edit(void);
@@ -101,9 +101,9 @@ class DeviceTree : public ListBoxSetting, public Storage
   public:
     DeviceTree(DiSEqCDevTree &tree);
 
-    virtual void load(void);
-    virtual void save(void);
-    virtual void save(QString /*destination*/) { }
+    virtual void Load(void);
+    virtual void Save(void);
+    virtual void Save(QString /*destination*/) { }
 
   protected:
     bool EditNodeDialog(uint nodeid);

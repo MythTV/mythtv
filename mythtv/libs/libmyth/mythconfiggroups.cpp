@@ -83,28 +83,28 @@ Setting *ConfigurationGroup::byName(const QString &name)
     return tmp;
 }
 
-void ConfigurationGroup::load(void)
+void ConfigurationGroup::Load(void)
 {
     childList::iterator it = children.begin();
     for (; it != children.end() ; ++it)
         if (*it && (*it)->GetStorage())
-            (*it)->GetStorage()->load();
+            (*it)->GetStorage()->Load();
 }
 
-void ConfigurationGroup::save(void)
+void ConfigurationGroup::Save(void)
 {
     childList::iterator it = children.begin();
     for (; it != children.end() ; ++it)
         if (*it && (*it)->GetStorage())
-            (*it)->GetStorage()->save();
+            (*it)->GetStorage()->Save();
 }
 
-void ConfigurationGroup::save(QString destination)
+void ConfigurationGroup::Save(QString destination)
 {
     childList::iterator it = children.begin();
     for (; it != children.end() ; ++it)
         if (*it && (*it)->GetStorage())
-            (*it)->GetStorage()->save(destination);
+            (*it)->GetStorage()->Save(destination);
 }
 
 QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg, 
@@ -392,20 +392,20 @@ void StackedConfigurationGroup::raise(Configurable* child)
             <<QString("on setting %1/%2").arg(getName()).arg(getLabel()));
 }
 
-void StackedConfigurationGroup::save(void)
+void StackedConfigurationGroup::Save(void)
 {
     if (saveAll)
-        ConfigurationGroup::save();
+        ConfigurationGroup::Save();
     else if (top < children.size())
-        children[top]->GetStorage()->save();
+        children[top]->GetStorage()->Save();
 }
 
-void StackedConfigurationGroup::save(QString destination)
+void StackedConfigurationGroup::Save(QString destination)
 {
     if (saveAll)
-        ConfigurationGroup::save(destination);
+        ConfigurationGroup::Save(destination);
     else if (top < children.size())
-        children[top]->GetStorage()->save(destination);
+        children[top]->GetStorage()->Save(destination);
 }
 
 void TriggeredConfigurationGroup::addChild(Configurable* child)
@@ -444,34 +444,34 @@ Setting *TriggeredConfigurationGroup::byName(const QString &settingName)
     return setting;
 }
 
-void TriggeredConfigurationGroup::load(void)
+void TriggeredConfigurationGroup::Load(void)
 {
     VerifyLayout();
 
-    configLayout->load();
+    configLayout->Load();
 
     if (!widget && configStack)
-        configStack->load();
+        configStack->Load();
 }
 
-void TriggeredConfigurationGroup::save(void)
+void TriggeredConfigurationGroup::Save(void)
 {
     VerifyLayout();
 
-    configLayout->save();
+    configLayout->Save();
 
     if (!widget)
-        configStack->save();
+        configStack->Save();
 }
 
-void TriggeredConfigurationGroup::save(QString destination)
+void TriggeredConfigurationGroup::Save(QString destination)
 {
     VerifyLayout();
 
-    configLayout->save(destination);
+    configLayout->Save(destination);
 
     if (!widget)
-        configStack->save(destination);
+        configStack->Save(destination);
 }
 
 void TriggeredConfigurationGroup::repaint(void)

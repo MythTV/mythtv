@@ -28,11 +28,6 @@ class MPUBLIC ConfigurationGroup : public Setting, public Storage
 
     virtual Setting *byName(const QString &name);
 
-    virtual void load();
-
-    virtual void save();
-    virtual void save(QString destination);
-
     void setUseLabel(bool useit) { uselabel = useit; }
     void setUseFrame(bool useit) { useframe = useit; }
 
@@ -42,6 +37,11 @@ class MPUBLIC ConfigurationGroup : public Setting, public Storage
         uselabel = luselabel; useframe = luseframe;
         zeroMargin = lzeroMargin; zeroSpace = lzeroSpace;
     }
+
+    // Storage
+    virtual void Load(void);
+    virtual void Save(void);
+    virtual void Save(QString destination);
 
   signals:
     void changeHelpText(QString);
@@ -154,8 +154,8 @@ class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
     virtual void widgetInvalid(QObject *obj);
 
     void raise(Configurable *child);
-    virtual void save(void);
-    virtual void save(QString destination);
+    virtual void Save(void);
+    virtual void Save(QString destination);
 
     // save all children, or only the top?
     void setSaveAll(bool b) { saveAll = b; };
@@ -211,9 +211,9 @@ class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
 
     virtual Setting *byName(const QString &settingName);
 
-    virtual void load(void);
-    virtual void save(void);
-    virtual void save(QString destination);
+    virtual void Load(void);
+    virtual void Save(void);
+    virtual void Save(QString destination);
 
     void repaint(void);
 

@@ -53,19 +53,19 @@ class DeviceTypeSetting : public ComboBoxSetting, public Storage
                      QString::number((uint) DiSEqCDevDevice::kTypeLNB));
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         QString tmp = QString::number((uint) m_device.GetDeviceType());
         setValue(getValueIndex(tmp));
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_device.SetDeviceType(
             (DiSEqCDevDevice::dvbdev_t) getValue().toUInt());
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevDevice &m_device;
@@ -86,17 +86,17 @@ class DeviceDescrSetting : public LineEditSetting, public Storage
         setHelpText(help);
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         setValue(m_device.GetDescription());
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_device.SetDescription(getValue());
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevDevice &m_device;
@@ -118,17 +118,17 @@ class DeviceRepeatSetting : public SpinBoxSetting, public Storage
         setHelpText(help);
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         setValue(m_device.GetRepeatCount());
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_device.SetRepeatCount(getValue().toUInt());
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevDevice &m_device;
@@ -165,18 +165,18 @@ class SwitchTypeSetting : public ComboBoxSetting, public Storage
                      QString::number((uint) DiSEqCDevSwitch::kTypeLegacySW64));
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         setValue(getValueIndex(QString::number((uint) m_switch.GetType())));
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_switch.SetType((DiSEqCDevSwitch::dvbdev_switch_t)
                          getValue().toUInt());
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevSwitch &m_switch;
@@ -194,17 +194,17 @@ class SwitchPortsSetting : public LineEditSetting, public Storage
         setHelpText(DeviceTree::tr("The number of ports this switch has."));
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         setValue(QString::number(m_switch.GetNumPorts()));
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_switch.SetNumPorts(getValue().toUInt());
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevSwitch &m_switch;
@@ -270,17 +270,17 @@ class RotorTypeSetting : public ComboBoxSetting, public Storage
                      QString::number((uint) DiSEqCDevRotor::kTypeDiSEqC_1_3));
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         setValue(getValueIndex(QString::number((uint)m_rotor.GetType())));
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_rotor.SetType((DiSEqCDevRotor::dvbdev_rotor_t)getValue().toUInt());
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevRotor &m_rotor;
@@ -301,17 +301,17 @@ class RotorLoSpeedSetting : public LineEditSetting, public Storage
         setHelpText(help);
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         setValue(QString::number(m_rotor.GetLoSpeed()));
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_rotor.SetLoSpeed(getValue().toDouble());
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevRotor &m_rotor;
@@ -332,17 +332,17 @@ class RotorHiSpeedSetting : public LineEditSetting, public Storage
         setHelpText(help);
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         setValue(QString::number(m_rotor.GetHiSpeed()));
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_rotor.SetHiSpeed(getValue().toDouble());
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevRotor &m_rotor;
@@ -405,13 +405,13 @@ RotorPosMap::RotorPosMap(DiSEqCDevRotor &rotor) :
     connect(this, SIGNAL(accepted(int)),            SLOT(edit(void)));
 }
 
-void RotorPosMap::load(void)
+void RotorPosMap::Load(void)
 {
     m_posmap = m_rotor.GetPosMap();
     PopulateList();
 }
 
-void RotorPosMap::save(void)
+void RotorPosMap::Save(void)
 {
     m_rotor.SetPosMap(m_posmap);
 }
@@ -521,7 +521,7 @@ void RotorConfig::RunRotorPositionsDialog(void)
 {
     RotorPosConfig config(m_rotor);
     config.exec();
-    config.save();
+    config.Save();
 }
 
 //////////////////////////////////////// LnbPresetSetting
@@ -598,16 +598,16 @@ class LNBPresetSetting : public ComboBoxSetting, public Storage
         addSelection(DeviceTree::tr("Custom"), QString::number(i));
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         setValue(FindPreset(m_lnb));
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
     }
 
-    virtual void save(QString /*destination*/)
+    virtual void Save(QString /*destination*/)
     {
     }
 
@@ -636,17 +636,17 @@ class LNBTypeSetting : public ComboBoxSetting, public Storage
                      QString::number((uint) DiSEqCDevLNB::kTypeBandstacked));
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         setValue(getValueIndex(QString::number((uint) m_lnb.GetType())));
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_lnb.SetType((DiSEqCDevLNB::dvbdev_lnb_t) getValue().toUInt());
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevLNB &m_lnb;
@@ -666,17 +666,17 @@ class LNBLOFSwitchSetting : public LineEditSetting, public Storage
         setHelpText(help);
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         setValue(QString::number(m_lnb.GetLOFSwitch() / 1000));
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_lnb.SetLOFSwitch(getValue().toUInt() * 1000);
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevLNB &m_lnb;
@@ -697,17 +697,17 @@ class LNBLOFLowSetting : public LineEditSetting, public Storage
         setHelpText(help);
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         setValue(QString::number(m_lnb.GetLOFLow() / 1000));
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_lnb.SetLOFLow(getValue().toUInt() * 1000);
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevLNB &m_lnb;
@@ -728,17 +728,17 @@ class LNBLOFHighSetting : public LineEditSetting, public Storage
         setHelpText(help);
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         setValue(QString::number(m_lnb.GetLOFHigh() / 1000));
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_lnb.SetLOFHigh(getValue().toUInt() * 1000);
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevLNB &m_lnb;
@@ -759,17 +759,17 @@ class LNBPolarityInvertedSetting : public CheckBoxSetting, public Storage
         setHelpText(help);
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         setValue(m_lnb.IsPolarityInverted());
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_lnb.SetPolarityInverted(boolValue());
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevLNB &m_lnb;
@@ -870,12 +870,12 @@ DeviceTree::DeviceTree(DiSEqCDevTree &tree) :
     connect(this, SIGNAL(accepted(int)),            SLOT(edit(void)));
 }
 
-void DeviceTree::load(void)
+void DeviceTree::Load(void)
 {
     PopulateTree();
 }
 
-void DeviceTree::save(void)
+void DeviceTree::Save(void)
 {
 }
 
@@ -1119,18 +1119,18 @@ class SwitchSetting : public ComboBoxSetting, public Storage
         }
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         double value = m_settings.GetValue(m_node.GetDeviceID());
         setValue((uint)value);
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_settings.SetValue(m_node.GetDeviceID(), getValue().toDouble());
     }
 
-    virtual void save(QString /*destination*/) {}
+    virtual void Save(QString /*destination*/) {}
 
   private:
     DiSEqCDevDevice   &m_node;
@@ -1153,7 +1153,7 @@ class RotorSetting : public ComboBoxSetting, public Storage
             m_posmap = rotor->GetPosMap();
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         clearSelections();
 
@@ -1165,12 +1165,12 @@ class RotorSetting : public ComboBoxSetting, public Storage
         setValue(getValueIndex(QString::number(angle)));
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         m_settings.SetValue(m_node.GetDeviceID(), getValue().toDouble());
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     DiSEqCDevDevice   &m_node;
@@ -1206,7 +1206,7 @@ class USALSRotorSetting : public HorizontalConfigurationGroup
         addChild(hemisphere);
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         double  val  = m_settings.GetValue(m_node.GetDeviceID());
         QString hemi = QString::null;
@@ -1215,14 +1215,14 @@ class USALSRotorSetting : public HorizontalConfigurationGroup
         hemisphere->setValue(hemisphere->getValueIndex(hemi));
     }
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         QString val = QString::number(numeric->getValue().toDouble());
         val += hemisphere->getValue();
         m_settings.SetValue(m_node.GetDeviceID(), AngleToFloat(val, false));
     }
 
-    virtual void save(QString /*destination*/) { }
+    virtual void Save(QString /*destination*/) { }
 
   private:
     TransLineEditSetting *numeric;

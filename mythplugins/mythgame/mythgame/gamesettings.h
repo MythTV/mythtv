@@ -41,18 +41,17 @@ class MythGamePlayerEditor;
 class GameDBStorage : public SimpleDBStorage
 {
   protected:
-    GameDBStorage(Setting                      *_setting,
+    GameDBStorage(StorageUser                  *_user,
                   const MythGamePlayerSettings &_parent,
                   const QString                &_name) :
-        SimpleDBStorage(_setting, "gameplayers", _name), parent(_parent)
+        SimpleDBStorage(_user, "gameplayers", _name), parent(_parent)
     {
-        _setting->setName(_name);
     }
 
-    virtual QString setClause(MSqlBindings &bindings);
-    virtual QString whereClause(MSqlBindings &bindings);
+    virtual QString GetSetClause(MSqlBindings &bindings) const;
+    virtual QString GetWhereClause(MSqlBindings &bindings) const;
 
-    const MythGamePlayerSettings& parent;
+    const MythGamePlayerSettings &parent;
 };
 
 class MythGameGeneralSettings : public ConfigurationWizard
@@ -77,9 +76,10 @@ class MythGamePlayerSettings : public QObject, public ConfigurationWizard
 
     QString getSourceName(void) const { return name->getValue(); };
 
-    virtual void save() {
+    virtual void Save(void)
+    {
         if (name)
-            ConfigurationWizard::save();
+            ConfigurationWizard::Save();
     };
 
   private:
@@ -122,8 +122,9 @@ class MPUBLIC MythGamePlayerEditor : public QObject, public ConfigurationDialog
                                      const char     *widgetName=0);
 
     virtual DialogCode exec(void);
-    virtual void load();
-    virtual void save() { };
+
+    virtual void Load(void);
+    virtual void Save(void) { }
 
 public slots:
     void menu();

@@ -250,7 +250,7 @@ void post_event(QObject *dest, ScannerEvent::TYPE type, int val,
     QApplication::postEvent(dest, e);
 }
 
-void MultiplexSetting::load(void)
+void MultiplexSetting::Load(void)
 {
     clearSelections();
 
@@ -305,7 +305,7 @@ void MultiplexSetting::load(void)
 void MultiplexSetting::SetSourceID(uint _sourceid)
 {
     sourceid = _sourceid;
-    load();
+    Load();
 }
 
 InputSelector::InputSelector(
@@ -316,7 +316,7 @@ InputSelector::InputSelector(
     setLabel(tr("Input"));
 }
 
-void InputSelector::load(void)
+void InputSelector::Load(void)
 {
     clearSelections();
 
@@ -337,7 +337,7 @@ void InputSelector::load(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("InputSelector::load()", query);
+        MythContext::DBError("InputSelector::Load()", query);
         return;
     }
 
@@ -368,7 +368,7 @@ void InputSelector::SetSourceID(const QString &_sourceid)
     if (sourceid != _sourceid.toUInt())
     {
         sourceid = _sourceid.toUInt();
-        load();
+        Load();
     }
 }
 

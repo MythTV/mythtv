@@ -38,7 +38,7 @@ InputSelector::InputSelector(
     setLabel(tr("Input"));
 }
 
-void InputSelector::load(void)
+void InputSelector::Load(void)
 {
     clearSelections();
 

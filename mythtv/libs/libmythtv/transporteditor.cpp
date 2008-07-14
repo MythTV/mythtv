@@ -52,7 +52,7 @@ class MultiplexID : public AutoIncrementDBSetting
     }
 
   public:
-    QString getColumn(void) const { return DBStorage::getColumn(); }
+    QString GetColumnName(void) const { return DBStorage::GetColumnName(); }
 };
 
 class TransportWizard : public ConfigurationWizard
@@ -367,36 +367,35 @@ class MuxDBStorage : public SimpleDBStorage
     MuxDBStorage(Setting *_setting, const MultiplexID *_id, QString _name) :
         SimpleDBStorage(_setting, "dtv_multiplex", _name), mplexid(_id)
     {
-        _setting->setName(_name);
     }
 
-    virtual QString setClause(MSqlBindings &bindings);
-    virtual QString whereClause(MSqlBindings &bindings);
+    virtual QString GetSetClause(MSqlBindings &bindings) const;
+    virtual QString GetWhereClause(MSqlBindings &bindings) const;
 
     const MultiplexID *mplexid;
 };
 
-QString MuxDBStorage::whereClause(MSqlBindings &bindings)
+QString MuxDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
-    QString muxTag = ":WHERE" + mplexid->getColumn().upper();
+    QString muxTag = ":WHERE" + mplexid->GetColumnName().upper();
 
     bindings.insert(muxTag, mplexid->getValue());
 
     // return query
-    return mplexid->getColumn() + " = " + muxTag;
+    return mplexid->GetColumnName() + " = " + muxTag;
 }
 
-QString MuxDBStorage::setClause(MSqlBindings &bindings)
+QString MuxDBStorage::GetSetClause(MSqlBindings &bindings) const
 {
-    QString muxTag  = ":SET" + mplexid->getColumn().upper();
-    QString nameTag = ":SET" + setting->getName().upper();
+    QString muxTag  = ":SET" + mplexid->GetColumnName().upper();
+    QString nameTag = ":SET" + GetColumnName().upper();
 
     bindings.insert(muxTag,  mplexid->getValue());
-    bindings.insert(nameTag, setting->getValue());
+    bindings.insert(nameTag, user->GetValue());
 
     // return query
-    return (mplexid->getColumn() + " = " + muxTag + ", " +
-            setting->getName()   + " = " + nameTag);
+    return (mplexid->GetColumnName() + " = " + muxTag + ", " +
+            GetColumnName()   + " = " + nameTag);
 }
 
 

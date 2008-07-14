@@ -92,7 +92,7 @@ class MPUBLIC Configurable : public QObject
     bool visible;
 };
 
-class MPUBLIC Setting : public Configurable
+class MPUBLIC Setting : public Configurable, public StorageUser
 {
     Q_OBJECT
 
@@ -110,6 +110,9 @@ class MPUBLIC Setting : public Configurable
     void setUnchanged(void) { SetChanged(false); }
     void setChanged(void)   { SetChanged(true);  }
 
+    // StorageUser
+    void SetValue(QString &val) { setValue(val); }
+    QString GetValue(void) const { return getValue(); }
   public slots:
     virtual void setValue(const QString &newValue);
 
@@ -560,9 +563,9 @@ class MPUBLIC AutoIncrementDBSetting :
         setValue(0);
     }
 
-    virtual void load() { };
-    virtual void save();
-    virtual void save(QString destination);
+    virtual void Load(void) { }
+    virtual void Save(void);
+    virtual void Save(QString destination);
 };
 
 class MPUBLIC ButtonSetting: public Setting

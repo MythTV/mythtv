@@ -62,7 +62,7 @@ VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
     setLabel(tr("Video Source"));
 }
 
-void VideoSourceSelector::load(void)
+void VideoSourceSelector::Load(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     
@@ -132,7 +132,7 @@ class InstanceCount : public TransSpinBoxSetting
     };
 };
 
-QString VideoSourceDBStorage::whereClause(MSqlBindings& bindings)
+QString VideoSourceDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
     QString sourceidTag(":WHERESOURCEID");
     
@@ -143,21 +143,21 @@ QString VideoSourceDBStorage::whereClause(MSqlBindings& bindings)
     return query;
 }
 
-QString VideoSourceDBStorage::setClause(MSqlBindings& bindings)
+QString VideoSourceDBStorage::GetSetClause(MSqlBindings& bindings) const
 {
     QString sourceidTag(":SETSOURCEID");
-    QString colTag(":SET" + getColumn().upper());
+    QString colTag(":SET" + GetColumnName().upper());
 
     QString query("sourceid = " + sourceidTag + ", " + 
-            getColumn() + " = " + colTag);
+            GetColumnName() + " = " + colTag);
 
     bindings.insert(sourceidTag, parent.getSourceID());
-    bindings.insert(colTag, setting->getValue());
+    bindings.insert(colTag, user->GetValue());
 
     return query;
 }
 
-QString CaptureCardDBStorage::whereClause(MSqlBindings& bindings)
+QString CaptureCardDBStorage::GetWhereClause(MSqlBindings& bindings) const
 {
     QString cardidTag(":WHERECARDID");
     
@@ -168,16 +168,16 @@ QString CaptureCardDBStorage::whereClause(MSqlBindings& bindings)
     return query;
 }
 
-QString CaptureCardDBStorage::setClause(MSqlBindings& bindings)
+QString CaptureCardDBStorage::GetSetClause(MSqlBindings& bindings) const
 {
     QString cardidTag(":SETCARDID");
-    QString colTag(":SET" + getColumn().upper());
+    QString colTag(":SET" + GetColumnName().upper());
 
     QString query("cardid = " + cardidTag + ", " +
-            getColumn() + " = " + colTag);
+            GetColumnName() + " = " + colTag);
 
     bindings.insert(cardidTag, parent.getCardID());
-    bindings.insert(colTag, setting->getValue());
+    bindings.insert(colTag, user->GetValue());
 
     return query;
 }
@@ -216,7 +216,7 @@ TransFreqTableSelector::TransFreqTableSelector(uint _sourceid) :
         addSelection(chanlists[i].name);
 }
 
-void TransFreqTableSelector::load(void)
+void TransFreqTableSelector::Load(void)
 {
     int idx = getValueIndex(gContext->GetSetting("FreqTable"));
     if (idx >= 0)
@@ -253,9 +253,9 @@ void TransFreqTableSelector::load(void)
     }
 }
 
-void TransFreqTableSelector::save(void)
+void TransFreqTableSelector::Save(void)
 {
-    VERBOSE(VB_IMPORTANT, "TransFreqTableSelector::save(void)");
+    VERBOSE(VB_IMPORTANT, "TransFreqTableSelector::Save(void)");
 
     if ((loaded_freq_table == getValue()) ||
         ((loaded_freq_table.lower() == "default") &&
@@ -283,7 +283,7 @@ void TransFreqTableSelector::save(void)
 void TransFreqTableSelector::SetSourceID(uint _sourceid)
 {
     sourceid = _sourceid;
-    load();
+    Load();
 }
 
 class UseEIT : public CheckBoxSetting, public VideoSourceDBStorage
@@ -366,9 +366,9 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
 #endif // USING_BACKEND
 }
 
-void DataDirect_config::load() 
+void DataDirect_config::Load() 
 {
-    VerticalConfigurationGroup::load();
+    VerticalConfigurationGroup::Load();
     bool is_sd_userid = userid->getValue().contains("@") > 0;
     bool match = ((is_sd_userid  && (source == DD_SCHEDULES_DIRECT)) ||
                   (!is_sd_userid && (source == DD_ZAP2IT)));
@@ -438,9 +438,9 @@ XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent,
     connect(config, SIGNAL(pressed()), SLOT(RunConfig()));
 }
 
-void XMLTV_generic_config::save()
+void XMLTV_generic_config::Save()
 {
-    VerticalConfigurationGroup::save();
+    VerticalConfigurationGroup::Save();
 /*
     QString err_msg = QObject::tr(
         "You MUST run 'mythfilldatabase --manual the first time,\n "
@@ -485,11 +485,11 @@ EITOnly_config::EITOnly_config(const VideoSource& _parent) :
     addChild(label);
 }
 
-void EITOnly_config::save()
+void EITOnly_config::Save(void)
 {
     // Force this value on
     useeit->setValue(true);
-    useeit->save();
+    useeit->Save();
 }
 
 NoGrabber_config::NoGrabber_config(const VideoSource& _parent) :
@@ -505,10 +505,10 @@ NoGrabber_config::NoGrabber_config(const VideoSource& _parent) :
     addChild(label);
 }
 
-void NoGrabber_config::save()
+void NoGrabber_config::Save(void)
 {
     useeit->setValue(false);
-    useeit->save();
+    useeit->Save();
 }
 
 Loading_config::Loading_config(const VideoSource& _parent) :
@@ -611,7 +611,7 @@ void XMLTVConfig::Stop(void)
     QMutexLocker locker(&load_lock);
 }
 
-void XMLTVConfig::load(void)
+void XMLTVConfig::Load(void)
 {
     QMutexLocker locker(&load_lock);
 
@@ -648,7 +648,7 @@ void XMLTVConfig::load(void)
     addTarget("LOADING", new Loading_config(parent));
     grabber->addSelection(QObject::tr("Loading..."), "LOADING");
 
-    TriggeredConfigurationGroup::load();
+    TriggeredConfigurationGroup::Load();
 
     loaded = true;
     load_wait.wakeAll();
@@ -699,9 +699,9 @@ void XMLTVConfig::FoundXMLTVGrabbers(
     repaint();
 }
 
-void XMLTVConfig::save(void)
+void XMLTVConfig::Save(void)
 {
-    TriggeredConfigurationGroup::save();
+    TriggeredConfigurationGroup::Save();
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "UPDATE videosource "
@@ -771,7 +771,7 @@ void VideoSource::fillSelections(SelectSetting* setting)
 void VideoSource::loadByID(int sourceid) 
 {
     id->setValue(sourceid);
-    load();
+    Load();
 }
 
 class VideoDevice : public PathSetting, public CaptureCardDBStorage
@@ -1097,12 +1097,12 @@ class DVBCardNum : public ComboBoxSetting, public CaptureCardDBStorage
         }
     }
 
-    virtual void load(void)
+    virtual void Load(void)
     {
         clearSelections();
         addSelection("-1");
 
-        CaptureCardDBStorage::load();
+        CaptureCardDBStorage::Load();
 
         bool ok;
         int intval = getValue().toInt(&ok);
@@ -1645,7 +1645,7 @@ void CaptureCard::fillSelections(SelectSetting *setting)
 void CaptureCard::loadByID(int cardid) 
 {
     id->setValue(cardid);
-    load();
+    Load();
 
     // Update instance count for cloned cards.
     uint new_cnt = 0;
@@ -1662,7 +1662,7 @@ void CaptureCard::loadByID(int cardid)
     instance_count = new_cnt;
 }
 
-void CaptureCard::save(void)
+void CaptureCard::Save(void)
 {
     uint init_cardid = getCardID();
 
@@ -1672,7 +1672,7 @@ void CaptureCard::save(void)
 
     ////////
 
-    ConfigurationWizard::save();
+    ConfigurationWizard::Save();
 
     ////////
 
@@ -1729,8 +1729,8 @@ void CaptureCard::reload(void)
 {
     if (getCardID() == 0)
     {
-        save();
-        load();
+        Save();
+        Load();
     }
 }
 
@@ -1797,9 +1797,10 @@ class CardID : public SelectLabelSetting, public CardInputDBStorage
         setLabel(QObject::tr("Capture device"));
     };
 
-    virtual void load() {
+    virtual void Load(void)
+    {
         fillSelections();
-        CardInputDBStorage::load();
+        CardInputDBStorage::Load();
     };
 
     void fillSelections() {
@@ -1833,9 +1834,10 @@ class SourceID : public ComboBoxSetting, public CardInputDBStorage
         addSelection(QObject::tr("(None)"), "0");
     };
 
-    virtual void load() {
+    virtual void Load(void)
+    {
         fillSelections();
-        CardInputDBStorage::load();
+        CardInputDBStorage::Load();
     };
 
     void fillSelections() {
@@ -1870,9 +1872,9 @@ class InputGroup : public TransComboBoxSetting
                         "group will be allowed to record at any given time."));
     }
 
-    virtual void load(void);
+    virtual void Load(void);
 
-    virtual void save(void)
+    virtual void Save(void)
     {
         uint inputid     = cardinput.getInputID();
         uint new_groupid = getValue().toUInt();
@@ -1893,11 +1895,11 @@ class InputGroup : public TransComboBoxSetting
     uint             groupid;
 };
 
-void InputGroup::load(void)
+void InputGroup::Load(void)
 {
 #if 0
     VERBOSE(VB_IMPORTANT,
-            QString("InputGroup::load() %1 %2")
+            QString("InputGroup::Load() %1 %2")
             .arg(groupnum).arg(cardinput.getInputID()));
 #endif
 
@@ -1919,7 +1921,7 @@ void InputGroup::load(void)
 
     if (!query.exec())
     {
-        MythContext::DBError("InputGroup::load()", query);
+        MythContext::DBError("InputGroup::Load()", query);
     }
     else
     {
@@ -2266,8 +2268,8 @@ void CardInput::CreateNewInputGroup(void)
     QString new_name = QString::null;
     QString tmp_name = QString::null;
 
-    inputgrp0->save();
-    inputgrp1->save();
+    inputgrp0->Save();
+    inputgrp1->Save();
 
     while (true)
     {
@@ -2315,8 +2317,8 @@ void CardInput::CreateNewInputGroup(void)
 
     uint inputgroupid = CardUtil::CreateInputGroup(new_name);
 
-    inputgrp0->load();
-    inputgrp1->load();
+    inputgrp0->Load();
+    inputgrp1->Load();
 
     if (!inputgrp0->getValue().toUInt())
     {
@@ -2339,7 +2341,7 @@ void CardInput::channelScanner(void)
 #ifdef USING_BACKEND
     uint num_channels_before = SourceUtil::GetChannelCount(srcid);
 
-    save(); // save info for scanner.
+    Save(); // save info for scanner.
 
     QString cardtype = CardUtil::GetRawCardType(crdid);
     if (CardUtil::IsUnscanable(cardtype))
@@ -2357,8 +2359,8 @@ void CardInput::channelScanner(void)
         startchan->SetSourceID(QString::number(srcid));        
     if (num_channels_before)
     {
-        startchan->load();
-        startchan->save();
+        startchan->Load();
+        startchan->Save();
     }
 #else
     VERBOSE(VB_IMPORTANT, "You must compile the backend "
@@ -2376,7 +2378,7 @@ void CardInput::sourceFetch(void)
 
     if (crdid && srcid)
     {
-        save(); // save info for fetch..
+        Save(); // save info for fetch..
 
         QString cardtype = CardUtil::GetRawCardType(crdid);
 
@@ -2396,12 +2398,12 @@ void CardInput::sourceFetch(void)
         startchan->SetSourceID(QString::number(srcid));        
     if (num_channels_before)
     {
-        startchan->load();
-        startchan->save();
+        startchan->Load();
+        startchan->Save();
     }
 }
 
-QString CardInputDBStorage::whereClause(MSqlBindings& bindings) 
+QString CardInputDBStorage::GetWhereClause(MSqlBindings &bindings) const 
 {
     QString cardinputidTag(":WHERECARDINPUTID");
     
@@ -2412,16 +2414,16 @@ QString CardInputDBStorage::whereClause(MSqlBindings& bindings)
     return query;
 }
 
-QString CardInputDBStorage::setClause(MSqlBindings& bindings) 
+QString CardInputDBStorage::GetSetClause(MSqlBindings &bindings) const 
 {
     QString cardinputidTag(":SETCARDINPUTID");
-    QString colTag(":SET" + getColumn().upper());
+    QString colTag(":SET" + GetColumnName().upper());
 
     QString query("cardinputid = " + cardinputidTag + ", " + 
-            getColumn() + " = " + colTag);
+            GetColumnName() + " = " + colTag);
 
     bindings.insert(cardinputidTag, parent.getInputID());
-    bindings.insert(colTag, setting->getValue());
+    bindings.insert(colTag, user->GetValue());
 
     return query;
 }
@@ -2430,7 +2432,7 @@ void CardInput::loadByID(int inputid)
 {
     id->setValue(inputid);
     externalInputSettings->Load(inputid);
-    ConfigurationWizard::load();
+    ConfigurationWizard::Load();
 }
 
 void CardInput::loadByInput(int _cardid, QString _inputname) 
@@ -2447,13 +2449,13 @@ void CardInput::loadByInput(int _cardid, QString _inputname)
     } 
     else 
     { // create new input connection
-        load();
+        Load();
         cardid->setValue(QString::number(_cardid));
         inputname->setValue(_inputname);
     }
 }
 
-void CardInput::save(void)
+void CardInput::Save(void)
 {
 
     if (sourceid->getValue() == "0")
@@ -2466,7 +2468,7 @@ void CardInput::save(void)
     }
     else
     {
-        ConfigurationWizard::save();
+        ConfigurationWizard::Save();
         externalInputSettings->Store(getInputID());
     }
 
@@ -2513,7 +2515,7 @@ DialogCode CaptureCardEditor::exec(void)
     return kDialogCodeRejected;
 }
 
-void CaptureCardEditor::load(void)
+void CaptureCardEditor::Load(void)
 {
     listbox->clearSelections();
     listbox->addSelection(QObject::tr("(New capture card)"), "0");
@@ -2607,7 +2609,7 @@ void CaptureCardEditor::edit(void)
         if (kDialogCodeButton0 == val)
         {
             CardUtil::DeleteAllCards();
-            load();
+            Load();
         }
     }
     else
@@ -2630,7 +2632,7 @@ void CaptureCardEditor::del(void)
     if (kDialogCodeButton0 == val)
     {
         CardUtil::DeleteCard(listbox->getValue().toUInt());
-        load();
+        Load();
     }
 }
 
@@ -2658,7 +2660,7 @@ DialogCode VideoSourceEditor::exec(void)
     return kDialogCodeRejected;
 }
 
-void VideoSourceEditor::load(void)
+void VideoSourceEditor::Load(void)
 {
     listbox->clearSelections();
     listbox->addSelection(QObject::tr("(New video source)"), "0");
@@ -2705,7 +2707,7 @@ void VideoSourceEditor::edit(void)
         if (kDialogCodeButton0 == val)
         {
             SourceUtil::DeleteAllSources();
-            load();
+            Load();
         }
     }
     else
@@ -2730,7 +2732,7 @@ void VideoSourceEditor::del()
     if (kDialogCodeButton0 == val)
     {
         SourceUtil::DeleteSource(listbox->getValue().toUInt());
-        load();
+        Load();
     }
 }
 
@@ -2748,7 +2750,7 @@ DialogCode CardInputEditor::exec(void)
     return kDialogCodeRejected;
 }
 
-void CardInputEditor::load() 
+void CardInputEditor::Load(void) 
 {
     cardinputs.clear();
     listbox->clearSelections();
@@ -3073,16 +3075,16 @@ void DVBConfigurationGroup::DiSEqCPanel()
     defaultinput->fillSelections(diseqc_tree->IsInNeedOfConf());
 }
 
-void DVBConfigurationGroup::load()
+void DVBConfigurationGroup::Load(void)
 {
-    VerticalConfigurationGroup::load();
+    VerticalConfigurationGroup::Load();
     diseqc_tree->Load(parent.getCardID());
     defaultinput->fillSelections(diseqc_tree->IsInNeedOfConf());
 }
 
-void DVBConfigurationGroup::save()
+void DVBConfigurationGroup::Save(void)
 {
-    VerticalConfigurationGroup::save();
+    VerticalConfigurationGroup::Save();
     diseqc_tree->Store(parent.getCardID());
     DiSEqCDev trees;
     trees.InvalidateTrees();

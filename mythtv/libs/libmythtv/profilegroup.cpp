@@ -14,7 +14,7 @@
 #include <iostream>
 #include <q3accel.h>
 
-QString ProfileGroupStorage::whereClause(MSqlBindings &bindings)
+QString ProfileGroupStorage::GetWhereClause(MSqlBindings &bindings) const
 {
     QString idTag(":WHEREID");
     QString query("id = " + idTag);
@@ -24,16 +24,16 @@ QString ProfileGroupStorage::whereClause(MSqlBindings &bindings)
     return query;
 }
 
-QString ProfileGroupStorage::setClause(MSqlBindings &bindings)
+QString ProfileGroupStorage::GetSetClause(MSqlBindings &bindings) const
 {
     QString idTag(":SETID");
-    QString colTag(":SET" + getColumn().upper());
+    QString colTag(":SET" + GetColumnName().upper());
 
     QString query("id = " + idTag + ", " + 
-            getColumn() + " = " + colTag);
+            GetColumnName() + " = " + colTag);
 
     bindings.insert(idTag, parent.getProfileNum());
-    bindings.insert(colTag, setting->getValue());
+    bindings.insert(colTag, user->GetValue());
 
     return query;
 }
@@ -67,7 +67,7 @@ ProfileGroup::ProfileGroup()
 
 void ProfileGroup::loadByID(int profileId) {
     id->setValue(profileId);
-    load();
+    Load();
 }
 
 void ProfileGroup::fillSelections(SelectSetting* setting)
@@ -186,7 +186,7 @@ void ProfileGroupEditor::open(int id) {
         if (profilegroup->exec(false) == QDialog::Accepted &&
             profilegroup->allowedGroupName())
         {
-            profilegroup->save();
+            profilegroup->Save();
             profileID = profilegroup->getProfileNum();
             Q3ValueList <int> found;
             
@@ -236,7 +236,7 @@ void ProfileGroupEditor::open(int id) {
     delete profilegroup;
 };
 
-void ProfileGroupEditor::load(void) 
+void ProfileGroupEditor::Load(void) 
 {
     listbox->clearSelections();
     ProfileGroup::fillSelections(listbox);
@@ -252,7 +252,7 @@ DialogCode ProfileGroupEditor::exec(void)
     {
         redraw = false;
 
-        load();
+        Load();
 
         dialog = new ConfigurationDialogWidget(gContext->GetMainWindow(),
                                                "ProfileGroupEditor");
