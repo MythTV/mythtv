@@ -197,16 +197,19 @@ void MythUIButton::SetTextRect(const QRect &textRect)
 void MythUIButton::SetBackgroundImage(StateType state, MythImage *image)
 {
     QString num = QString::number((int)state);
-    m_BackgroundImage->AddImage(num, image);
 
-    QSize aSize = m_Area.size();
-    aSize = aSize.expandedTo(image->size());
-    m_Area.setSize(aSize);
+    if (m_Area.isValid())
+    {
+        QSize aSize = m_Area.size();
+        image->Resize(aSize);
+    }
+
+    m_BackgroundImage->AddImage(num, image);
 
     SetupPlacement();
 }
 
-void MythUIButton::SetCheckImage(MythUIStateType::StateType state, 
+void MythUIButton::SetCheckImage(MythUIStateType::StateType state,
                                  MythImage *image)
 {
     m_CheckImage->AddImage(state, image);
@@ -330,7 +333,7 @@ void MythUIButton::SetupPlacement(void)
         imagex += tmp;
         textwidth -= tmp;
 
-        m_CheckImage->SetPosition(m_PaddingMarginX, 
+        m_CheckImage->SetPosition(m_PaddingMarginX,
                                   (height - checkRect.height()) / 2);
     }
 
