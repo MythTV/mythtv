@@ -14,7 +14,7 @@ const int kMythDialogBoxCompletionEventType = 34111;
 
 class DialogCompletionEvent : public QEvent
 {
-  public: 
+  public:
     DialogCompletionEvent(const QString &id, int result, QString text, void *data)
         : QEvent((QEvent::Type)kMythDialogBoxCompletionEventType),
           m_id(id), m_result(result), m_resultText(text), m_resultData(data) { }
@@ -44,6 +44,7 @@ class MythDialogBox : public MythScreenType
     void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
 
     void AddButton(const QString &title, void *data = 0);
+    void AddButton(const QString &title, const char *slot);
 
     virtual bool keyPressEvent(QKeyEvent *event);
 
@@ -51,7 +52,7 @@ class MythDialogBox : public MythScreenType
     void Select(MythListButtonItem* item);
 
   signals:
-    void Selected(int selection);
+    void Selected();
 
   protected:
     void SendEvent(int res, QString text = "", void *data = 0);
@@ -60,6 +61,7 @@ class MythDialogBox : public MythScreenType
     MythListButton *m_buttonList;
     MythScreenType *m_retScreen;
     QString m_id;
+    bool    m_useSlots;
 
     QString m_text;
 };

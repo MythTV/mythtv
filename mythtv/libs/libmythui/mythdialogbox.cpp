@@ -6,7 +6,7 @@
 #include "mythfontproperties.h"
 
 MythDialogBox::MythDialogBox(const QString &text,
-                             MythScreenStack *parent, const char *name) 
+                             MythScreenStack *parent, const char *name)
          : MythScreenType(parent, name, false)
 {
     m_id = "";
@@ -14,6 +14,8 @@ MythDialogBox::MythDialogBox(const QString &text,
     m_text = text;
     m_textarea = NULL;
     m_buttonList = NULL;
+
+    m_useSlots = false;
 }
 
 bool MythDialogBox::Create(void)
@@ -38,11 +40,19 @@ bool MythDialogBox::Create(void)
 
 void MythDialogBox::Select(MythListButtonItem* item)
 {
-    SendEvent(m_buttonList->GetItemPos(item), item->text(), item->getData());
+    if (m_useSlots)
+    {
+        const char *slot = (const char *)item->getData();
+        connect(this, SIGNAL(Selected()),
+                m_retScreen, slot);
+        emit Selected();
+    }
+    else
+        SendEvent(m_buttonList->GetItemPos(item), item->text(), item->getData());
     m_ScreenStack->PopScreen();
 }
 
-void MythDialogBox::SetReturnEvent(MythScreenType *retscreen, 
+void MythDialogBox::SetReturnEvent(MythScreenType *retscreen,
                                const QString &resultid)
 {
     m_retScreen = retscreen;
@@ -54,6 +64,16 @@ void MythDialogBox::AddButton(const QString &title, void *data)
     MythListButtonItem *button = new MythListButtonItem(m_buttonList, title);
     if (data)
         button->setData(data);
+}
+
+void MythDialogBox::AddButton(const QString &title, const char *slot)
+{
+    MythListButtonItem *button = new MythListButtonItem(m_buttonList, title);
+
+    m_useSlots = true;
+
+    if (slot)
+        button->setData(const_cast<char*>(slot));
 }
 
 bool MythDialogBox::keyPressEvent(QKeyEvent *event)
