@@ -71,18 +71,40 @@ using namespace std;
 #define REBOOT   3
 
 static MythThemedMenu *menu;
-static MythThemeBase *themeBase;
+static MythThemeBase  *themeBase = NULL;
 
-XBox *xbox = NULL;
-QString logfile = "";
+XBox                  *xbox      = NULL;
+QString                logfile   = "";
+MediaRenderer         *g_pUPnp   = NULL;
 
-MediaRenderer   *g_pUPnp       = NULL;
+void cleanup(void)
+{
+    //signal(SIGHUP, SIG_DFL); ???
+
+    if (themeBase)
+        delete themeBase;
+
+    if (g_pUPnp)
+    {
+        // This takes a few seconds, so inform the user:
+        VERBOSE(VB_GENERAL, "Deleting UPnP client...");
+        delete g_pUPnp;
+        g_pUPnp = NULL;
+    }
+
+    if (gContext)
+    {
+        delete gContext;
+        gContext = NULL;
+    }
+}
 
 void startAppearWiz(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    MythAppearance *mythappearance = new MythAppearance(mainStack, "mythappearance");
+    MythAppearance *mythappearance = new MythAppearance(mainStack,
+                                                        "mythappearance");
 
     if (mythappearance->Create())
         mainStack->AddScreen(mythappearance);
@@ -858,7 +880,7 @@ void InitJumpPoints(void)
 
 
 void signal_USR1_handler(int){
-      VERBOSE(VB_GENERAL, "SIG USR1 received, reloading theme");	
+      VERBOSE(VB_GENERAL, "SIG USR1 received, reloading theme");
       RemoteSendMessage("CLEAR_SETTINGS_CACHE");
       gContext->ActivateSettingsCache(false);
       qApp->processEvents();
@@ -1201,6 +1223,7 @@ int main(int argc, char **argv)
     if (!gContext->Init(true, g_pUPnp, bPromptForBackend, bBypassAutoDiscovery))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        cleanup();
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -1215,6 +1238,7 @@ int main(int argc, char **argv)
                 if (logfile.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -l/--logfile option\n";
+                    cleanup();
                     return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
                 else
@@ -1225,6 +1249,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -l/--logfile option\n";
+                cleanup();
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         } else if (!strcmp(a.argv()[argpos],"-v") ||
@@ -1247,6 +1272,7 @@ int main(int argc, char **argv)
                 if (tmpArg.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -G/--get-setting option\n";
+                    cleanup();
                     return FRONTEND_EXIT_INVALID_CMDLINE;
                 } 
  
@@ -1258,11 +1284,13 @@ int main(int argc, char **argv)
                     cout << "\tSettings Value : " << (const char *)pairs[index];
                     cout <<  " = " << (const char *)value << endl;
                 }
+                cleanup();
                 return FRONTEND_EXIT_OK;
             }
             else
             {
                 cerr << "Invalid or missing argument to -G/--get-setting option\n";
+                cleanup();
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
 
@@ -1277,6 +1305,7 @@ int main(int argc, char **argv)
                 if (geometry.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -geometry option\n";
+                    cleanup();
                     return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
                 else
@@ -1285,6 +1314,7 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -geometry option\n";
+                cleanup();
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         }
@@ -1304,7 +1334,10 @@ int main(int argc, char **argv)
         else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
         {
             if (cmdline_err)
+            {
+                cleanup();
                 return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
         }
         else if ((argpos + 1 == a.argc()) &&
                     !QString(a.argv()[argpos]).startsWith("-"))
@@ -1318,6 +1351,7 @@ int main(int argc, char **argv)
                 !strcmp(a.argv()[argpos],"--usage")))
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
             PrintHelp(cmdline);
+            cleanup();
             return FRONTEND_EXIT_INVALID_CMDLINE;
         }
     }
@@ -1342,16 +1376,17 @@ int main(int argc, char **argv)
 
     if (ResetSettings)
     {
-       AppearanceSettings as;
-       as.Save();
+        AppearanceSettings as;
+        as.Save();
 
-       MSqlQuery query(MSqlQuery::InitCon());
-       query.prepare("update settings set data='EN' "
-                     "WHERE hostname = :HOSTNAME and value='Language' ;");
-       query.bindValue(":HOSTNAME", gContext->GetHostName());
-       query.exec();
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("update settings set data='EN' "
+                      "WHERE hostname = :HOSTNAME and value='Language' ;");
+        query.bindValue(":HOSTNAME", gContext->GetHostName());
+        query.exec();
 
-       return FRONTEND_EXIT_OK;
+        cleanup();
+        return FRONTEND_EXIT_OK;
     }
 
     if (!geometry.isEmpty() && !GetMythUI()->ParseGeometryOverride(geometry))
@@ -1394,7 +1429,8 @@ int main(int argc, char **argv)
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));
 
-    VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));
+    VERBOSE(VB_IMPORTANT,
+            QString("Enabled verbose msgs: %1").arg(verboseString));
 
     LCD::SetupLCD();
     if (LCD *lcd = LCD::Get())
@@ -1414,6 +1450,7 @@ int main(int argc, char **argv)
     if (themedir == "")
     {
         cerr << "Couldn't find theme " << (const char *)themename << endl;
+        cleanup();
         return FRONTEND_EXIT_NO_THEME;
     }
 
@@ -1461,6 +1498,7 @@ int main(int argc, char **argv)
             qApp->exec();
 
             qApp->unlock();
+            cleanup();
             return FRONTEND_EXIT_OK;
         }
         else 
@@ -1472,6 +1510,7 @@ int main(int argc, char **argv)
                 qApp->exec();
 
                 qApp->unlock();
+                cleanup();
                 return FRONTEND_EXIT_OK;
             }
         }
@@ -1505,6 +1544,7 @@ int main(int argc, char **argv)
         if (themedir == "")
         {
             cerr << "Couldn't find theme " << (const char *)themename << endl;
+            cleanup();
             return FRONTEND_EXIT_NO_THEME;
         }
 
@@ -1544,12 +1584,7 @@ int main(int argc, char **argv)
         delete networkControl;
 
     DestroyMythMainWindow();
-    delete themeBase;
-    delete gContext;
-
-    // This takes a few seconds, so inform the user:
-    VERBOSE(VB_GENERAL, "Deleting UPnP client...");
-    delete g_pUPnp;
+    cleanup();
 
     return FRONTEND_EXIT_OK;
 
