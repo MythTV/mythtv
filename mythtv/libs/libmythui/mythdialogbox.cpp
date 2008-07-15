@@ -44,7 +44,8 @@ void MythDialogBox::Select(MythListButtonItem* item)
     if (m_useSlots && slot)
     {
         const char *slot = (const char *)item->getData();
-        connect(this, SIGNAL(Selected()), m_retScreen, slot);
+        connect(this, SIGNAL(Selected()), m_retScreen, slot,
+                Qt::QueuedConnection);
         emit Selected();
     }
 
