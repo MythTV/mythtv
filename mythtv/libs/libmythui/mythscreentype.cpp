@@ -181,6 +181,11 @@ bool MythScreenType::Create(void)
     return true;
 }
 
+void MythScreenType::Close(void)
+{
+    GetScreenStack()->PopScreen();
+}
+
 bool MythScreenType::keyPressEvent(QKeyEvent *event)
 {
     if (m_CurrentFocusWidget && m_CurrentFocusWidget->keyPressEvent(event))

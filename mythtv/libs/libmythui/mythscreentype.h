@@ -38,6 +38,9 @@ class MythScreenType : public MythUIType
     bool IsDeleting(void);
     void SetDeleting(bool deleting);
 
+  public slots:
+    void Close();
+
   signals:
     void Exiting();
 

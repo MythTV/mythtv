@@ -16,8 +16,6 @@ class MythUIBusyDialog : public MythScreenType
     bool Create(void);
     bool keyPressEvent(QKeyEvent *event);
 
-    void Close();
-
   protected:
     QString m_message;
 
@@ -36,7 +34,6 @@ class MythUIProgressDialog : public MythScreenType
 
     void SetTotal(uint total);
     void SetProgress(uint count);
-    void Close();
 
   protected:
     void UpdateProgress(void);

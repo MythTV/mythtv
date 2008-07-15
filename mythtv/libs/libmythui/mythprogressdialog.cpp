@@ -5,7 +5,7 @@
 #include "mythverbose.h"
 
 MythUIBusyDialog::MythUIBusyDialog(const QString &message,
-                             MythScreenStack *parent, const char *name) 
+                             MythScreenStack *parent, const char *name)
          : MythScreenType(parent, name, false)
 {
     if (!message.isEmpty())
@@ -35,15 +35,10 @@ bool MythUIBusyDialog::keyPressEvent(QKeyEvent *event)
     return false;
 }
 
-void MythUIBusyDialog::Close(void)
-{
-    GetScreenStack()->PopScreen();
-}
-
 //---------------------------------------------------------
 
 MythUIProgressDialog::MythUIProgressDialog(const QString &message,
-                             MythScreenStack *parent, const char *name) 
+                             MythScreenStack *parent, const char *name)
          : MythScreenType(parent, name, false)
 {
     m_count = m_total = 0;
@@ -64,11 +59,6 @@ bool MythUIProgressDialog::Create(void)
         m_messageText->SetText(m_message);
 
     return true;
-}
-
-void MythUIProgressDialog::Close(void)
-{
-    GetScreenStack()->PopScreen();
 }
 
 bool MythUIProgressDialog::keyPressEvent(QKeyEvent *event)
