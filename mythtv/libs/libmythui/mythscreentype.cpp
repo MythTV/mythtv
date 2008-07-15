@@ -148,7 +148,10 @@ bool MythScreenType::BuildFocusList(void)
     AddFocusableChildrenToList(m_FocusWidgetList);
 
     if (m_FocusWidgetList.size() > 0)
+    {
+        SetFocusWidget(*(m_FocusWidgetList.begin()));
         return true;
+    }
 
     return false;
 }
