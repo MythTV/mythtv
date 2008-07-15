@@ -46,6 +46,7 @@ class MythUIType : public QObject, public XMLParseBase
     // Check set if this can take focus
     bool CanTakeFocus(void);
     void SetCanTakeFocus(bool set = true);
+    void SetFocusOrder(int);
 
     // Called each draw pulse.  Will redraw automatically if dirty afterwards
     virtual void Pulse(void);
@@ -110,7 +111,7 @@ class MythUIType : public QObject, public XMLParseBase
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRegion);
 
-    void AddFocusableChildrenToList(QList<MythUIType *> &focusList);
+    void AddFocusableChildrenToList(QMap<int, MythUIType *> &focusList);
     void HandleAlphaPulse();
     void HandleMovementPulse();
 
@@ -133,6 +134,8 @@ class MythUIType : public QObject, public XMLParseBase
     bool m_Visible;
     bool m_HasFocus;
     bool m_CanHaveFocus;
+
+    int m_focusOrder;
 
     QRect m_Area;
 

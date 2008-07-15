@@ -35,6 +35,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
     m_DirtyRegion = QRegion(QRect(0, 0, 0, 0));
 
     m_Fonts = new FontMap();
+    m_focusOrder = 0;
 }
 
 MythUIType::~MythUIType()
@@ -572,13 +573,13 @@ void MythUIType::Show(void)
     emit Showing();
 }
 
-void MythUIType::AddFocusableChildrenToList(QList<MythUIType *> &focusList)
+void MythUIType::AddFocusableChildrenToList(QMap<int, MythUIType *> &focusList)
 {
     if (m_CanHaveFocus)
-        focusList.append(this);
+        focusList.insertMulti(m_focusOrder, this);
 
     QVector<MythUIType *>::Iterator it;
-    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+    for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; --it)
         (*it)->AddFocusableChildrenToList(focusList);
 }
 
@@ -612,6 +613,7 @@ void MythUIType::CopyFrom(MythUIType *base)
 {
     m_Visible = base->m_Visible;
     m_CanHaveFocus = base->m_CanHaveFocus;
+    m_focusOrder = base->m_focusOrder;
 
     SetArea(base->m_Area);
     m_Alpha = base->m_Alpha;
@@ -656,6 +658,11 @@ bool MythUIType::ParseElement(QDomElement &element)
         m_AlphaMax = element.attribute("max", "255").toInt();
         m_AlphaChange = element.attribute("change", "5").toInt();
     }
+    else if (element.tagName() == "focusorder")
+    {
+        int order = getFirstText(element).toInt();
+        SetFocusOrder(order);
+    }
     else
         return false;
 
@@ -695,3 +702,9 @@ void MythUIType::Rescale(const float hscale, const float vscale)
         (*it)->Rescale(hscale, vscale);
     }
 }
+
+void MythUIType::SetFocusOrder(int order)
+{
+    m_focusOrder = order;
+}
+

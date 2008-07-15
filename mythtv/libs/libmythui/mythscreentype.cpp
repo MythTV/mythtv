@@ -61,7 +61,7 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
 {
     if (!widget)
     {
-        QList<MythUIType *>::iterator it = m_FocusWidgetList.begin();
+        QMap<int, MythUIType *>::iterator it = m_FocusWidgetList.begin();
         MythUIType *current;
 
         while (it != m_FocusWidgetList.end())
@@ -95,7 +95,7 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
 
     bool reachedCurrent = false;
 
-    QList<MythUIType *>::iterator it = m_FocusWidgetList.begin();
+    QMap<int, MythUIType *>::iterator it = m_FocusWidgetList.begin();
     MythUIType *current;
 
     // There is probably a more efficient way to do this, but the list
@@ -230,7 +230,7 @@ bool MythScreenType::ParseElement(QDomElement &element)
     }
     else
         return false;
-    
+
     return true;
 }
 
@@ -249,7 +249,7 @@ void MythScreenType::CopyFrom(MythUIType *base)
     MythUIType::CopyFrom(base);
 
     BuildFocusList();
-    SetFocusWidget(NULL);    
+    SetFocusWidget(NULL);
 };
 
 void MythScreenType::CreateCopy(MythUIType *)

@@ -14,7 +14,7 @@ class MythScreenType : public MythUIType
     Q_OBJECT
 
   public:
-    MythScreenType(MythScreenStack *parent, const QString &name, 
+    MythScreenType(MythScreenStack *parent, const QString &name,
                    bool fullscreen = true);
     virtual ~MythScreenType();
 
@@ -43,7 +43,7 @@ class MythScreenType : public MythUIType
 
   protected:
     // for the global store..
-    MythScreenType(MythUIType *parent, const QString &name, 
+    MythScreenType(MythUIType *parent, const QString &name,
                    bool fullscreen = true);
 
     virtual void CopyFrom(MythUIType *base);
@@ -54,7 +54,10 @@ class MythScreenType : public MythUIType
     bool m_IsDeleting;
 
     MythUIType *m_CurrentFocusWidget;
-    QList<MythUIType *> m_FocusWidgetList;
+    //TODO We are currently dependant on the internal sorting of QMap for
+    //     entries to be iterated in the correct order, this should probably
+    //     be changed.
+    QMap<int, MythUIType *> m_FocusWidgetList;
 
     MythScreenStack *m_ScreenStack;
 
