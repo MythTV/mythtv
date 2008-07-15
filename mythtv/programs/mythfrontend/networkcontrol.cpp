@@ -930,7 +930,7 @@ QString NetworkControl::listSchedule(const QString& chanID) const
     bool appendCRLF = true;
     QString queryStr("SELECT chanid, starttime, endtime, title, subtitle "
                          "FROM program "
-                         "WHERE starttime < :NOW AND endtime > :NOW ");
+                         "WHERE starttime < :START AND endtime > :END ");
 
     if(chanID != "")
     {
@@ -941,7 +941,8 @@ QString NetworkControl::listSchedule(const QString& chanID) const
     queryStr += " ORDER BY starttime, endtime, chanid";
 
     query.prepare(queryStr);
-    query.bindValue(":NOW", QDateTime::currentDateTime());
+    query.bindValue(":START", QDateTime::currentDateTime());
+    query.bindValue(":END", QDateTime::currentDateTime());
     query.bindValue(":CHANID", chanID);
 
     if (query.exec() && query.isActive() && query.size() > 0)
