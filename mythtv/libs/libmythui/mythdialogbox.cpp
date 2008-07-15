@@ -40,11 +40,11 @@ bool MythDialogBox::Create(void)
 
 void MythDialogBox::Select(MythListButtonItem* item)
 {
-    if (m_useSlots)
+    const char *slot = (const char *)item->getData();
+    if (m_useSlots && slot)
     {
         const char *slot = (const char *)item->getData();
-        connect(this, SIGNAL(Selected()),
-                m_retScreen, slot);
+        connect(this, SIGNAL(Selected()), m_retScreen, slot);
         emit Selected();
     }
 
