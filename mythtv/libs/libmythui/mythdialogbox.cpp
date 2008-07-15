@@ -49,7 +49,7 @@ void MythDialogBox::Select(MythListButtonItem* item)
     }
 
     SendEvent(m_buttonList->GetItemPos(item), item->text(), item->getData());
-    m_ScreenStack->PopScreen();
+    m_ScreenStack->PopScreen(false);
 }
 
 void MythDialogBox::SetReturnEvent(MythScreenType *retscreen,
