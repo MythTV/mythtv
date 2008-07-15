@@ -58,50 +58,6 @@ using namespace std;
 
 #define GESTURE_TIMEOUT 1000
 
-#ifdef USE_LIRC
-static void *SpawnLirc(void *param)
-{
-    QString config_file = GetConfDir() + "/lircrc";
-    if (!QFile::exists(config_file))
-        config_file = QDir::homePath() + "/.lircrc";
-
-    LircClient *cl = new LircClient((MythMainWindow *)param);
-    if (!cl->Init(config_file, "mythtv"))
-        cl->Process();
-
-    return NULL;
-}
-#endif
-
-#ifdef USE_JOYSTICK_MENU
-static void *SpawnJoystickMenu(void *param)
-{
-    MythMainWindow *main_window = (MythMainWindow *)param;
-    QString config_file = GetConfDir() + "/joystickmenurc";
-    JoystickMenuClient *js = new JoystickMenuClient(main_window);
-    if (!js->Init(config_file))
-        js->Process();
-
-    return NULL;
-}
-#endif
-
-#ifdef USING_APPLEREMOTE
-static void* SpawnAppleRemote(void* param)
-{
-    MythMainWindow      *main_window = (MythMainWindow *)param;
-    AppleRemoteListener *arl = new AppleRemoteListener(main_window);
-    AppleRemote         &remote(AppleRemote::instance());
-
-    remote.setListener(arl);
-    remote.startListening();
-    if (!remote.isListeningToRemote())
-        return NULL;
-
-    remote.runLoop();
-    return NULL;
-}
-#endif
 
 class KeyContext
 {
@@ -350,33 +306,32 @@ MythMainWindow::MythMainWindow(const bool useDB)
     installEventFilter(this);
 
 #ifdef USE_LIRC
-    pthread_t lirc_tid;
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    pthread_create(&lirc_tid, &attr, SpawnLirc, this);
-    pthread_attr_destroy(&attr);
+    QString config_file = GetConfDir() + "/lircrc";
+    if (!QFile::exists(config_file))
+        config_file = QDir::homePath() + "/.lircrc";
+
+    LircThread *lircThread = new LircThread(this);
+    if (!lircThread->Init(config_file, "mythtv"))
+        lircThread->start();
 #endif
 
 #ifdef USE_JOYSTICK_MENU
     d->ignore_joystick_keys = false;
-    pthread_t js_tid;
 
-    pthread_attr_t attr2;
-    pthread_attr_init(&attr2);
-    pthread_attr_setdetachstate(&attr2, PTHREAD_CREATE_DETACHED);
-    pthread_create(&js_tid, &attr2, SpawnJoystickMenu, this);
-    pthread_attr_destroy(&attr2);
+    QString joy_config_file = GetConfDir() + "/joystickmenurc";
+    JoystickMenuThread *js = new JoystickMenuThread(this);
+    if (!js->Init(joy_config_file))
+        js->start();
 #endif
 
 #ifdef USING_APPLEREMOTE
-    pthread_t appleremote_tid;
+    AppleRemoteListener *arl = new AppleRemoteListener(this);
+    AppleRemote         &remote(AppleRemote::instance());
 
-    pthread_attr_t attr3;
-    pthread_attr_init(&attr3);
-    pthread_attr_setdetachstate(&attr3, PTHREAD_CREATE_DETACHED);
-    pthread_create(&appleremote_tid, &attr3, SpawnAppleRemote, this);
-    pthread_attr_destroy(&attr3);
+    remote.setListener(arl);
+    remote.startListening();
+    if (remote.isListeningToRemote())
+        remote.start();
 #endif
 
     RegisterKey("Global", "UP", "Up Arrow", "Up");

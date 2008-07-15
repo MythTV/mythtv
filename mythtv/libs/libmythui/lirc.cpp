@@ -16,19 +16,20 @@
 #include "lirc.h"
 #include "lircevent.h"
 
-/** \class LircClient
+/** \class LircThread
  *  \brief Interface between mythtv and lircd
  *
  *   Create connection to the lircd daemon and translate remote keypresses
  *   into custom events which are posted to the mainwindow.
  */
 
-LircClient::LircClient(QObject *main_window)
+LircThread::LircThread(QObject *main_window)
+          : QThread()
 {
     mainWindow = main_window;
 }
 
-int LircClient::Init(const QString &config_file, const QString &program,
+int LircThread::Init(const QString &config_file, const QString &program,
                         bool ignoreExtApp)
 {
     int fd;
@@ -63,13 +64,13 @@ int LircClient::Init(const QString &config_file, const QString &program,
     return 0;
 }
 
-LircClient::~LircClient()
+LircThread::~LircThread()
 {
     lirc_deinit();
     lirc_freeconfig(lircConfig);
 }
 
-void LircClient::Process(void)
+void LircThread::run(void)
 {
     char *code = 0;
     char *ir = 0;
@@ -111,10 +112,14 @@ void LircClient::Process(void)
         if (ret == -1)
             break;
     }
+
+    if (errno != 0)
+        VERBOSE(VB_IMPORTANT, QString("LircThread has exited! - last error was: %1")
+                .arg(errno));
 }
 
 
-void LircClient::SpawnApp(void)
+void LircThread::SpawnApp(void)
 {
     // Spawn app to illuminate led (or what ever the user has picked if
     // anything) to give positive feedback that a key was received

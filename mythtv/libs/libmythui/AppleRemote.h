@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <QThread>
 
 #include <IOKit/IOKitLib.h>
 #include <IOKit/IOCFPlugIn.h>
@@ -11,7 +12,7 @@
 #include <IOKit/hid/IOHIDKeys.h>
 #include <CoreFoundation/CoreFoundation.h>
 
-class AppleRemote
+class AppleRemote : public QThread
 {
 public:
     enum Event {
@@ -44,7 +45,7 @@ public:
     bool      isOpenInExclusiveMode()         { return openInExclusiveMode; };
     void      startListening();
     void      stopListening();
-    void      runLoop();
+    void      run();
 
 protected:
     AppleRemote(); // will be a singleton class

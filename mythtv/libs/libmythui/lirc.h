@@ -3,21 +3,22 @@
 
 #include <lirc/lirc_client.h>
 #include <QObject>
+#include <QThread>
 #include <QString>
 
 #include "mythexp.h"
 
-class MPUBLIC LircClient : public QObject
+class MPUBLIC LircThread : public QThread
 {
     Q_OBJECT
   public:
-    LircClient(QObject *main_window);
-    ~LircClient();
+    LircThread(QObject *main_window);
+    ~LircThread();
     int Init(const QString &config_file, const QString &program,
                 bool ignoreExtApp=false);
-    void Process(void);
 
   private:
+    void run(void);
     void SpawnApp(void);
 
     struct lirc_config *lircConfig;

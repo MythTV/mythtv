@@ -44,26 +44,26 @@ using namespace std;
 #include "jsmenu.h"
 #include "jsmenuevent.h"
 
-#define LOC QString("JoystickMenuClient: ")
-#define LOC_ERROR QString("JoystickMenuClient Error: ")
+#define LOC QString("JoystickMenuThread: ")
+#define LOC_ERROR QString("JoystickMenuThread Error: ")
 
 /*----------------------------------------------------------------------------
-** JoystickMenuClient Constructor
+** JoystickMenuThread Constructor
 **--------------------------------------------------------------------------*/
-JoystickMenuClient::JoystickMenuClient(QObject *main_window)
+JoystickMenuThread::JoystickMenuThread(QObject *main_window)
+                  : QThread()
 {
     mainWindow = main_window;
 
     fd = -1;
     axes = NULL;
     buttons = NULL;
-
 }
 
 /*----------------------------------------------------------------------------
-** JoystickMenuClient Destructor
+** JoystickMenuThread Destructor
 **--------------------------------------------------------------------------*/
-JoystickMenuClient::~JoystickMenuClient()
+JoystickMenuThread::~JoystickMenuThread()
 {
     if (fd != -1)
     {
@@ -87,7 +87,7 @@ JoystickMenuClient::~JoystickMenuClient()
 /*----------------------------------------------------------------------------
 ** Init
 **--------------------------------------------------------------------------*/
-int JoystickMenuClient::Init(QString &config_file)
+int JoystickMenuThread::Init(QString &config_file)
 {
     int rc;
 
@@ -154,7 +154,7 @@ int JoystickMenuClient::Init(QString &config_file)
 **                                    move that axis into the range and the
 **                                    keystring is sent
 **--------------------------------------------------------------------------*/
-int JoystickMenuClient::ReadConfig(QString config_file)
+int JoystickMenuThread::ReadConfig(QString config_file)
 {
     FILE *fp;
 
@@ -198,12 +198,12 @@ int JoystickMenuClient::ReadConfig(QString config_file)
 
 
 /*----------------------------------------------------------------------------
-** Process
+** run
 **  This function is intended to run as the mainline of a thread which
 ** looks for Joystick input and translates it into key stroke events
 ** for MythTv.
 **--------------------------------------------------------------------------*/
-void JoystickMenuClient::Process(void)
+void JoystickMenuThread::run(void)
 {
     int rc;
 
@@ -296,7 +296,7 @@ void JoystickMenuClient::Process(void)
 **  Send an event to the main UI loop with the appropriate keycode
 **  (looking up the string using QT)
 **--------------------------------------------------------------------------*/
-void JoystickMenuClient::EmitKey(QString code)
+void JoystickMenuThread::EmitKey(QString code)
 {
     QKeySequence a(code);
 
@@ -328,7 +328,7 @@ void JoystickMenuClient::EmitKey(QString code)
 ** the support for 'chords'; holding down a button and pushing down
 ** another can create one type of event.
 **--------------------------------------------------------------------------*/
-void JoystickMenuClient::ButtonUp(int button)
+void JoystickMenuThread::ButtonUp(int button)
 {
     vector<button_map_type>::iterator bmap;
 
@@ -355,7 +355,7 @@ void JoystickMenuClient::ButtonUp(int button)
 ** AxisChange
 **  Handle a registerd change in a joystick axis
 **--------------------------------------------------------------------------*/
-void JoystickMenuClient::AxisChange(int axis, int value)
+void JoystickMenuThread::AxisChange(int axis, int value)
 {
     vector<axis_map_type>::iterator amap;
     for (amap = map.axis_map.begin(); amap < map.axis_map.end(); amap++)

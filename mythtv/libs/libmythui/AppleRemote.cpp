@@ -97,7 +97,7 @@ AppleRemote::stopListening()
 }
 
 void 
-AppleRemote::runLoop()
+AppleRemote::run()
 {
     CFRunLoopRun();
 }

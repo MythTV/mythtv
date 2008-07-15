@@ -11,7 +11,7 @@ using namespace std;
 
 #include <QObject>
 #include <QString>
-
+#include <QThread>
 #include "mythexp.h"
 
 /*----------------------------------------------------------------------------
@@ -63,27 +63,26 @@ class JoystickMap
 };
 
 /*----------------------------------------------------------------------------
-** JoystickMenuClient
+** JoystickMenuThread
 **  Main object for injecting key strokes based on joystick movements
 **--------------------------------------------------------------------------*/
-class MPUBLIC JoystickMenuClient : public QObject
+class MPUBLIC JoystickMenuThread : public QThread
 {
-    Q_OBJECT
   public:
-    JoystickMenuClient(QObject *main_window);
-    ~JoystickMenuClient();
+    JoystickMenuThread(QObject *main_window);
+    ~JoystickMenuThread();
     int Init(QString &config_file);
 
-    void Process(void);
-    
     void ButtonUp(int button);
     void AxisChange(int axis, int value);
     void EmitKey(QString code);
     int  ReadConfig(QString config_file);
 
   private:
+    void run(void);
+
     QObject *mainWindow;
-    
+
     QString devicename;
 
     int fd;
