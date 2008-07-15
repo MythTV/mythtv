@@ -13,6 +13,7 @@
 #include "exitcodes.h"
 #include "compat.h"
 #include "mythuihelper.h"
+#include "lcddevice.h"
 
 #include "libmythtv/tv.h"
 
@@ -120,6 +121,11 @@ int main(int argc, char **argv)
         else
             signal(SIGHUP, &log_rotate_handler);
     }
+
+    LCD::SetupLCD();
+
+    if (class LCD *lcd = LCD::Get())
+        lcd->switchToTime();
 
     LanguageSettings::load("mythfrontend");
 

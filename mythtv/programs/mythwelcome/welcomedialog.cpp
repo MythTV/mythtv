@@ -33,11 +33,6 @@ WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
                                  const char* name)
                 :MythThemedDialog(parent, window_name, theme_filename, name)
 {
-    LCD::SetupLCD();
-
-    if (class LCD *lcd = LCD::Get())
-        lcd->switchToTime();
-
     gContext->addListener(this);
 
     m_installDir = GetInstallPrefix();
