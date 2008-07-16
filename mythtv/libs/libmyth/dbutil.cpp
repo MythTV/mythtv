@@ -70,7 +70,20 @@ int DBUtil::CompareDBMSVersion(int major, int minor, int point)
     return result;
 }
 
-/** \fn DBUtil::BackupInProgress(void)
+/** \fn DBUtil::IsNewDatabase(void)
+ *  \brief Returns true for a new (empty) database.
+ */
+bool DBUtil::IsNewDatabase(void)
+{
+    const QStringList tables = GetTables();
+    const int size = tables.size();
+    // Usually there will be a single table called schemalock, but check for
+    // no tables, also, just in case.
+    return (((size == 1) && (tables.at(0) == "schemalock")) ||
+            (size == 0));
+}
+
+/** \fn DBUtil::IsBackupInProgress(void)
  *  \brief Test to see if a DB backup is in progress
  *
  */
@@ -166,6 +179,13 @@ bool DBUtil::BackupDB(QString &filename)
     if (gContext->GetNumSetting("DisableAutomaticBackup", 0))
     {
         VERBOSE(VB_IMPORTANT, "Database backups disabled.  Skipping backup.");
+        return true;
+    }
+
+    filename = "";
+    if (IsNewDatabase())
+    {
+        VERBOSE(VB_IMPORTANT, "New database detected.  Skipping backup.");
         return true;
     }
 

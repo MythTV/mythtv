@@ -30,6 +30,7 @@ class MPUBLIC DBUtil
     bool BackupDB(QString &filename);
 
     static QMap<QString,bool> GetTableMap(void);
+    static bool IsNewDatabase(void);
     static bool IsBackupInProgress(void);
     static int  CountClients(void);
 

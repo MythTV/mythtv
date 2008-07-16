@@ -555,20 +555,16 @@ bool UpgradeTVDatabaseSchema(void)
 
     QString backupResult = "";
 #ifndef USING_MINGW
-    if (dbver != "0")
         dbutil.BackupDB(backupResult);
 #endif
 
-    if (dbver != "0")
+    switch (gContext->PromptForSchemaUpgrade(
+                dbver, currentDatabaseVersion, backupResult))
     {
-        switch (gContext->PromptForSchemaUpgrade(
-                    dbver, currentDatabaseVersion, backupResult))
-        {
-            case MYTH_SCHEMA_USE_EXISTING: return true;  // Don't upgrade
-            case MYTH_SCHEMA_ERROR:
-            case MYTH_SCHEMA_EXIT:         return false;
-            case MYTH_SCHEMA_UPGRADE:      break;
-        }
+        case MYTH_SCHEMA_USE_EXISTING: return true;  // Don't upgrade
+        case MYTH_SCHEMA_ERROR:
+        case MYTH_SCHEMA_EXIT:         return false;
+        case MYTH_SCHEMA_UPGRADE:      break;
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -614,11 +610,18 @@ static bool doUpgradeTVDatabaseSchema(void)
         return true;
     }
 
-    if (dbver == "")
+    if (DBUtil::IsNewDatabase())
     {
         if (!InitializeDatabase())
             return false;
         dbver = "1112";
+    }
+
+    if (dbver.isEmpty() || dbver.toInt() <  1027)
+    {
+        VERBOSE(VB_IMPORTANT, "Unrecognized database schema version. "
+                              "Unable to upgrade database.");
+        return false;
     }
 
     if (dbver == "1027")
@@ -3634,8 +3637,11 @@ NULL
 
     if (dbver == "1215")
     {
+        QString tmp = QString(
+            "ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
+            .arg(gContext->GetDatabaseParams().dbName);
         const char *updates[] = {
-QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;").arg(gContext->GetDatabaseParams().dbName),
+tmp.ascii(),
 "ALTER TABLE callsignnetworkmap"
 "  MODIFY callsign varbinary(20) NOT NULL default '',"
 "  MODIFY network varbinary(20) NOT NULL default '';",
@@ -3871,8 +3877,12 @@ NULL
 
     if (dbver == "1216")
     {
+        QString tmp = QString(
+            "ALTER DATABASE %1 DEFAULT CHARACTER SET "
+            "utf8 COLLATE utf8_general_ci;")
+            .arg(gContext->GetDatabaseParams().dbName);
         const char *updates[] = {
-QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;").arg(gContext->GetDatabaseParams().dbName),
+tmp.ascii(),
 "ALTER TABLE callsignnetworkmap"
 "  DEFAULT CHARACTER SET default,"
 "  MODIFY callsign varchar(20) CHARACTER SET utf8 NOT NULL default '',"
@@ -4315,8 +4325,11 @@ bool InitializeDatabase(void)
 
     VERBOSE(VB_IMPORTANT, "Inserting MythTV initial database information.");
 
+    QString tmp = QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
+        .arg(gContext->GetDatabaseParams().dbName);
+
     const char *updates[] = {
-QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;").arg(gContext->GetDatabaseParams().dbName),
+tmp.ascii(),
 "CREATE TABLE IF NOT EXISTS callsignnetworkmap ("
 "  id int(11) NOT NULL auto_increment,"
 "  callsign varchar(20) NOT NULL default '',"

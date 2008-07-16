@@ -1976,7 +1976,7 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
 
 
     // No current DBSchemaVer? Empty database, so upgrade to create tables
-    if (dbver.isEmpty() || dbver == "0")
+    if (DBUtil::IsNewDatabase())
     {
         VERBOSE(VB_GENERAL, "No current database version. Auto upgrading");
         return MYTH_SCHEMA_UPGRADE;
