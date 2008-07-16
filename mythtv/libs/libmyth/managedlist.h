@@ -33,10 +33,10 @@ class MPUBLIC ManagedListItem : public QObject
         virtual bool hasLeft(){ return false; }
         virtual bool hasRight(){ return false; }
 
-        const int getState() const { return curState; }
+        int getState(void) const { return curState; }
         void setState(int val) { curState = val; emit changed(this); }
 
-        const bool getEnabled() const { return enabled; }
+        bool getEnabled(void) const { return enabled; }
         virtual void setEnabled(bool val) { enabled = val; }
 
         ManagedList* getParentList() { return parentList; }
@@ -179,7 +179,7 @@ class MPUBLIC ManagedListGroup : public ManagedListItem
         const Q3PtrList<ManagedListItem>* getItems() const { return &itemList;}
         bool addItem(ManagedListItem* item, int where = -1);
 
-        const int getItemCount() const { return itemCount;}
+        int getItemCount(void) const { return itemCount; }
 
         virtual bool hasLeft(){ return false; }
         virtual bool hasRight(){ return (itemCount > 0); }
