@@ -24,12 +24,13 @@ QString RecordingProfileStorage::GetWhereClause(MSqlBindings &bindings) const
 class CodecParamStorage : public SimpleDBStorage
 {
   protected:
-    CodecParamStorage(StorageUser *_setting,
+    CodecParamStorage(Setting *_setting,
                       const RecordingProfile &parentProfile,
                       QString name) :
         SimpleDBStorage(_setting, "codecparams", "value"),
         parent(parentProfile), codecname(name)
     {
+        _setting->setName(name);
     }
 
     virtual QString GetSetClause(MSqlBindings &bindings) const;
@@ -1198,7 +1199,7 @@ void RecordingProfile::loadByID(int profileId)
     result.bindValue(":PROFILEID", profileId);
 
     QString type = "";
-    if (!result.exec() || !result.isActive())
+    if (!result.exec())
         MythContext::DBError("RecordingProfile::loadByID -- cardtype", result);
     else if (result.next())
     {
@@ -1503,13 +1504,17 @@ void RecordingProfile::fillSelections(SelectManagedListItem *setting,
         "ORDER BY id");
     result.bindValue(":GROUP", group);
 
-    if (!result.exec() || !result.isActive())
+    if (!result.exec())
     {
         MythContext::DBError("RecordingProfile::fillSelections 2", result);
         return;
     }
-    else if (!result.size())
+    else if (!result.next())
+    {
+        VERBOSE(VB_GENERAL, "RecordingProfile::fillselections, Warning: "
+                "Failed to locate recording id for recording group.");
         return;
+    }
 
     if (group == RecordingProfile::TranscoderGroup)
     {
@@ -1517,7 +1522,7 @@ void RecordingProfile::fillSelections(SelectManagedListItem *setting,
         setting->addSelection(QObject::tr("Transcode using Autodetect"), id);
     }
 
-    while (result.next())
+    do
     {
         QString name = result.value(0).toString();
         QString id   = result.value(1).toString();
@@ -1535,7 +1540,7 @@ void RecordingProfile::fillSelections(SelectManagedListItem *setting,
 
         QString lbl = QObject::tr("Record using the \"%1\" profile").arg(name);
         setting->addSelection(lbl, result.value(1).toString(), false);
-    }
+    } while (result.next());
 }
 
 QString RecordingProfile::groupType(void) const
