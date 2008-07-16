@@ -91,6 +91,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     cycle_visualizer = gContext->GetNumSetting("VisualCycleOnSongChange", 0);
     show_album_art = gContext->GetNumSetting("VisualAlbumArtOnSongChange", 0);
     random_visualizer = gContext->GetNumSetting("VisualRandomize", 0);
+    exit_action = gContext->GetSetting("MusicExitAction", "prompt");
 
     m_pushedButton = NULL;
 
@@ -383,20 +384,37 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
         {
             if (!gPlayer->isPlaying() || m_parent->IsExitingToMain())
             {
-                gPlayer->savePosition();
-                stopAll();
-                done(kDialogCodeAccepted);
+                if (exit_action == "play")
+                {
+                    gPlayer->setListener(NULL);
+                    gPlayer->setVisual(NULL);
+                    done(kDialogCodeAccepted);
+                }
+                else
+                {
+                    gPlayer->savePosition();
+                    stopAll();
+                    done(kDialogCodeAccepted);
+                };
             }
             else
             {
-                DialogBox *dialog = new DialogBox(gContext->GetMainWindow(),
-                                tr("Exiting Music Player\n"
-                                    "Do you want to continue playing in the background?"));
-                dialog->AddButton(tr("No - Exit, Stop Playing"));
-                dialog->AddButton(tr("Yes - Exit, Continue Playing"));
-                dialog->AddButton(tr("Cancel"));
-                int res = dialog->exec();
-                dialog->deleteLater();
+                int res;
+                if (exit_action == "stop")
+                    res = kDialogCodeButton0;
+                else if (exit_action == "play")
+                    res = kDialogCodeButton1;
+                else
+                {
+                        DialogBox *dialog = new DialogBox(gContext->GetMainWindow(),
+                                    tr("Exiting Music Player\n"
+                                        "Do you want to continue playing in the background?"));
+                        dialog->AddButton(tr("No - Exit, Stop Playing"));
+                        dialog->AddButton(tr("Yes - Exit, Continue Playing"));
+                        dialog->AddButton(tr("Cancel"));
+                        res = dialog->exec();
+                        dialog->deleteLater();
+                };
 
                 if (res == kDialogCodeButton0)
                 {

@@ -174,6 +174,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     bool keyboard_accelerators;
     bool volume_control;
 
+    QString exit_action;
+
     MythPopupBox *playlist_popup;
 
     //

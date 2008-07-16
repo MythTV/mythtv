@@ -383,6 +383,17 @@ static HostComboBox *ResumeMode()
     return gc;
 };
 
+static HostComboBox *ExitAction()
+{
+    HostComboBox *gc = new HostComboBox("MusicExitAction");
+    gc->setLabel(QObject::tr("Action on exit"));
+    gc->addSelection(QObject::tr("Prompt"), "prompt");
+    gc->addSelection(QObject::tr("Stop Playing"), "stop");
+    gc->addSelection(QObject::tr("Keep Playing"), "play");
+    gc->setHelpText(QObject::tr("Specify what action to take when exiting mythmusic plugin."));
+    return gc;
+};
+
 static HostSlider *VisualModeDelay()
 {
     HostSlider *gc = new HostSlider("VisualModeDelay", 0, 100, 1);
@@ -643,6 +654,7 @@ MusicPlayerSettings::MusicPlayerSettings(void)
     playersettings->setLabel(QObject::tr("Playback Settings"));
     playersettings->addChild(PlayMode());
     playersettings->addChild(ResumeMode());
+    playersettings->addChild(ExitAction());
     playersettings->addChild(SetSearchMaxResultsReturned());
     playersettings->addChild(UseShowRatings());
     playersettings->addChild(UseShowWholeTree());
