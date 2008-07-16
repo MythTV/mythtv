@@ -51,7 +51,7 @@ class DTVRecorder: public RecorderBase
     void FinishRecording(void);
     void ResetForNewFile(void);
 
-    void HandleKeyframe();
+    void HandleKeyframe(uint64_t extra = 0);
 
     void BufferedWrite(const TSPacket &tspacket);
 
@@ -66,8 +66,7 @@ class DTVRecorder: public RecorderBase
     void HandleH264Keyframe(void);
 
     // MPEG2 PS support (Hauppauge PVR-x50/PVR-500)
-    void HandlePSKeyframe(void);
-    bool FindPSKeyFrames(unsigned char *buffer, int len);
+    void FindPSKeyFrames(const uint8_t *buffer, uint len);
 
     // For handling other (non audio/video) packets
     bool FindOtherKeyframes(const TSPacket *tspacket);
@@ -96,9 +95,6 @@ class DTVRecorder: public RecorderBase
     bool _wait_for_keyframe_option;
 
     bool _has_written_other_keyframe;
-
-    /// Used for PVR-150/250/500 which have a fixed keyframe distance of 12 or 15
-    int _keyframedist;
 
     // state tracking variables
     /// True iff recording is actually being performed

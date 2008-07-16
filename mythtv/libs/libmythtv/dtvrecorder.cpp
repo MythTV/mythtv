@@ -46,7 +46,6 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     _request_recording(false),
     _wait_for_keyframe_option(true),
     _has_written_other_keyframe(false),
-    _keyframedist(15),
     // state
     _recording(false),
     _error(false),
@@ -396,11 +395,11 @@ void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
     nextRingBufferLock.unlock();
 }
 
-/** \fn DTVRecorder::HandleKeyframe(void)
+/** \fn DTVRecorder::HandleKeyframe(uint64_t)
  *  \brief This save the current frame to the position maps
  *         and handles ringbuffer switching.
  */
-void DTVRecorder::HandleKeyframe(void)
+void DTVRecorder::HandleKeyframe(uint64_t extra)
 {
     if (!ringBuffer)
         return;
@@ -415,7 +414,7 @@ void DTVRecorder::HandleKeyframe(void)
     {
         long long startpos = ringBuffer->GetWritePosition();
         // FIXME: handle keyframes with start code spanning over two ts packets
-        startpos += _payload_buffer.size();
+        startpos += _payload_buffer.size() + extra;
         positionMapDelta[frameNum] = startpos;
         positionMap[frameNum]      = startpos;
     }
@@ -577,108 +576,92 @@ void DTVRecorder::HandleH264Keyframe(void)
     CheckForRingBufferSwitch();
 }
 
-/** \fn DTVRecorder::HandlePSKeyframe(void)
- *  \brief This save the current frame to the position maps
- *         and handles ringbuffer switching.
- */
-void DTVRecorder::HandlePSKeyframe(void)
+void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
 {
-    if (!ringBuffer)
-        return;
+    const uint maxKFD = kMaxKeyFrameDistance;
 
-    unsigned long long frameNum = _last_gop_seen;
+    const uint8_t *bufstart = buffer;
+    const uint8_t *bufptr   = buffer;
+    const uint8_t *bufend   = buffer + len;
 
-    _first_keyframe = (_first_keyframe < 0) ? frameNum : _first_keyframe;
-
-    // Add key frame to position map
-    positionMapLock.lock();
-    if (!positionMap.contains(frameNum))
+    while (bufptr < bufend)
     {
-        long long startpos = ringBuffer->GetWritePosition();
-        // FIXME: handle keyframes with start code spanning over two ts packets
-        startpos += _payload_buffer.size();
-        positionMapDelta[frameNum] = startpos;
-        positionMap[frameNum]      = startpos;
-    }
-    positionMapLock.unlock();
+        bool hasFrame     = false;
+        bool hasKeyFrame  = false;
 
-    // Perform ringbuffer switch if needed.
-    CheckForRingBufferSwitch();
-}
+        bufptr = ff_find_start_code(bufptr, bufend, &_start_code);
+        if ((_start_code & 0xffffff00) != 0x00000100)
+            continue;
 
-
-bool DTVRecorder::FindPSKeyFrames(unsigned char *buffer, int len)
-{
-    unsigned char *bufptr = buffer, *bufstart = buffer;
-    uint v = 0;
-    int leftlen = len;
-    bool hasKeyFrame = false;
-
-    while (bufptr < buffer + len)
-    {
-        v = *bufptr++;
-        if (_start_code == 0x000001)
+        const int stream_id = _start_code & 0x000000ff;
+        if (PESStreamID::PictureStartCode == stream_id)
         {
-            _start_code = ((_start_code << 8) | v) & 0xFFFFFF;
-            const int stream_id = _start_code & 0x000000ff;
-
-            if (stream_id == PESStreamID::PackHeader)
-            {
-                _last_keyframe_seen = ringBuffer->GetWritePosition() +
-                                      _payload_buffer.size();
-
-                int curpos = bufptr - bufstart - 4;
-                if (curpos < 0)
-                {
-                    // header was split
-                    if (_payload_buffer.size() + curpos > 0)
-                        ringBuffer->Write(&_payload_buffer[0],
-                                          _payload_buffer.size() + curpos);
-
-                    _payload_buffer.resize(4);
-                    memcpy(&_payload_buffer[0], &_start_code, 4);
-
-                    leftlen = leftlen - curpos + 4;
-                    bufstart = bufptr;
-                }
-                else
-                {
-                    // header was entirely in this packet
-                    int idx = _payload_buffer.size();
-                    _payload_buffer.resize(idx + curpos);
-                    memcpy(&_payload_buffer[idx], bufstart, curpos);
-
-                    bufstart += curpos;
-                    leftlen -= curpos;
-
-                    if (_payload_buffer.size() > 0)
-                        ringBuffer->Write(&_payload_buffer[0],
-                                          _payload_buffer.size());
-                    _payload_buffer.clear();
-                }
-                _frames_seen_count++;
-            }
-            else if (stream_id == PESStreamID::SequenceStartCode)
-            {
-                _last_seq_seen = _last_keyframe_seen;
-            }
-            else if (stream_id == PESStreamID::GOPStartCode &&
-                     _last_seq_seen == _last_keyframe_seen)
-            {
-                _frames_written_count = _last_gop_seen * _keyframedist;
-                _last_gop_seen++;
-                HandlePSKeyframe();
-            }
+            hasFrame = true;
         }
-        else
-            _start_code = ((_start_code << 8) | v) & 0xFFFFFF;
+        else if (PESStreamID::GOPStartCode == stream_id)
+        {
+            _last_gop_seen  = _frames_seen_count;
+            hasKeyFrame    |= true;
+        }
+        else if (PESStreamID::SequenceStartCode == stream_id)
+        {
+            _last_seq_seen  = _frames_seen_count;
+            hasKeyFrame    |= (_last_gop_seen + maxKFD)<_frames_seen_count;
+        }
+        else if (PESStreamID::PackHeader == stream_id)
+        {
+            _start_code = 0xffffffff;
+        }
+
+        if (hasFrame && !hasKeyFrame)
+        {
+            // If we have seen kMaxKeyFrameDistance frames since the
+            // last GOP or SEQ stream_id, then pretend this picture
+            // is a keyframe. We may get artifacts but at least
+            // we will be able to skip frames.
+            hasKeyFrame = !(_frames_seen_count & 0xf);
+            hasKeyFrame &= (_last_gop_seen + maxKFD) < _frames_seen_count;
+            hasKeyFrame &= (_last_seq_seen + maxKFD) < _frames_seen_count;
+        }
+
+        if (hasKeyFrame)
+        {
+            _last_keyframe_seen = _frames_seen_count;
+            HandleKeyframe(bufstart - bufptr);
+        }
+
+        if (hasFrame)
+        {
+            _frames_seen_count++;
+            if (!_wait_for_keyframe_option || _first_keyframe>=0)
+                _frames_written_count++;
+        }
+
+        if (hasKeyFrame || hasFrame)
+        {
+            // We are free to write the packet, but if we have
+            // buffered packet[s] we have to write them first...
+            if (!_payload_buffer.empty())
+            {
+                if (ringBuffer)
+                {
+                    ringBuffer->Write(
+                        &_payload_buffer[0], _payload_buffer.size());
+                }
+                _payload_buffer.clear();
+            }
+
+            if (ringBuffer)
+                ringBuffer->Write(bufstart, (bufptr - bufstart));
+
+            bufstart = bufptr;
+        }
     }
 
-    int idx = _payload_buffer.size();
-    _payload_buffer.resize(idx + leftlen);
-    memcpy(&_payload_buffer[idx], bufstart, leftlen);
-
-    return hasKeyFrame;
+    uint64_t idx = _payload_buffer.size();
+    uint64_t rem = (bufend - bufstart);
+    _payload_buffer.resize(idx + rem);
+    memcpy(&_payload_buffer[idx], bufstart, rem);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

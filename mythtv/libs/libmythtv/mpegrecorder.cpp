@@ -98,7 +98,6 @@ MpegRecorder::MpegRecorder(TVRec *rec) : DTVRecorder(rec),
     // TS packet handling
     _stream_data(NULL)                                   
 {
-    SetPositionMapType(MARK_GOP_START);
 }
 
 MpegRecorder::~MpegRecorder()
@@ -606,8 +605,6 @@ bool MpegRecorder::SetIVTVDeviceOptions(int chanfd)
         return false;
     }
 
-    _keyframedist = (ivtvcodec.framerate) ? 12 : _keyframedist;
-
     return true;
 }
 
@@ -704,32 +701,6 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
                     QString("Could not set %1 to %2")
                     .arg(control_description[ext_ctrls[i].id]).arg(value) + ENO);
         }
-    }
-
-    if (driver != "hdpvr")
-    {
-        // Get GOP size in frames
-        struct v4l2_ext_control ext_ctrl;
-        struct v4l2_ext_controls ctrls;
-
-        bzero(&ext_ctrl, sizeof(struct v4l2_ext_control));
-        bzero(&ctrls, sizeof(struct v4l2_ext_controls));
-
-        ext_ctrl.id    = V4L2_CID_MPEG_VIDEO_GOP_SIZE;
-        ext_ctrl.value = 0;
-
-        ctrls.ctrl_class  = V4L2_CTRL_CLASS_MPEG;
-        ctrls.count       = 1;
-        ctrls.controls    = &ext_ctrl;
-
-        if (ioctl(chanfd, VIDIOC_G_EXT_CTRLS, &ctrls) < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to get "
-                    "V4L2_CID_MPEG_VIDEO_GOP_SIZE, defaulting to 12" + ENO);
-            ext_ctrl.value = 12;
-        }
-
-        _keyframedist = ext_ctrl.value;
     }
 
     return true;
@@ -875,8 +846,6 @@ void MpegRecorder::StartRecording(void)
 
     if (driver == "hdpvr")
     {
-        SetPositionMapType(MARK_GOP_BYFRAME);
-
         int progNum = 1;
         MPEGStreamData *sd = new MPEGStreamData(progNum, true);
         sd->SetRecordingType(_recording_type);
@@ -890,10 +859,6 @@ void MpegRecorder::StartRecording(void)
         HandleSingleProgramPAT(_stream_data->PATSingleProgram());
         HandleSingleProgramPMT(_stream_data->PMTSingleProgram());
         _wait_for_keyframe_option = true;
-    }
-    else
-    {
-        SetPositionMapType(MARK_GOP_START);
     }
 
     encoding = true;
@@ -1147,8 +1112,7 @@ void MpegRecorder::Reset(void)
 
     if (curRecording)
     {
-        curRecording->ClearPositionMap(
-            (driver == "hdpvr") ? MARK_GOP_BYFRAME : MARK_GOP_START);
+        curRecording->ClearPositionMap(MARK_GOP_BYFRAME);
     }
     if (_stream_data)
         _stream_data->Reset(_stream_data->DesiredProgram());
