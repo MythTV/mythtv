@@ -420,7 +420,7 @@ void RecordingSelector::getRecordingList(void)
                 VERBOSE(VB_IMPORTANT,
                         QString("MythArchive cannot handle this file because it isn't available locally - %1")
                                 .arg(p->GetPlaybackURL(false, true)));
-                recordingList->erase(i);
+                i = recordingList->erase(i);
                 i--;
                 continue;
             }
@@ -428,7 +428,7 @@ void RecordingSelector::getRecordingList(void)
             // ignore live tv and deleted recordings
             if (p->recgroup == "LiveTV" || p->recgroup == "Deleted")
             {
-                recordingList->erase(i);
+                i = recordingList->erase(i);
                 i--;
                 continue;
             }

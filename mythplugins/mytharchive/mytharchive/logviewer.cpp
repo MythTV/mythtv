@@ -77,7 +77,7 @@ LogViewer::LogViewer(MythMainWindow *parent, const char *name)
     hbox->addWidget(m_listbox);
 
 
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
+    new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     //  cancel Button
     hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));

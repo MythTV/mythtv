@@ -51,11 +51,17 @@ bool checkProcess(const QString &lockFile)
     // read the PID from the lock file
     QFile file(lockFile);
     
-    file.open(QIODevice::ReadOnly);
+    bool bOK = file.open(QIODevice::ReadOnly);
+
+    if (!bOK)
+    {
+        VERBOSE(VB_GENERAL, QString("Unable to open file %1").arg(lockFile));
+
+        return true;
+    }
 
     QString line(file.readLine(100));
 
-    bool bOK = false;
     pid_t pid = line.toInt(&bOK);
 
     if (!bOK)

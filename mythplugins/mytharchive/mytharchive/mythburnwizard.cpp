@@ -279,7 +279,9 @@ void MythburnWizard::updateSizeBar(void)
     {
         maxsize_text->show();
         minsize_text->show();
-        size_bar->show();
+        if (size_bar)
+            size_bar->show();
+
         currentsize_error_text->show();
         currentsize_text->show();
     }
@@ -287,7 +289,9 @@ void MythburnWizard::updateSizeBar(void)
     {
         maxsize_text->hide();
         minsize_text->hide();
-        size_bar->hide();
+        if (size_bar)
+            size_bar->hide();
+
         currentsize_error_text->hide();
         currentsize_text->hide();
     }
@@ -336,7 +340,8 @@ void MythburnWizard::updateSizeBar(void)
             currentsize_text->show();
     }
 
-    size_bar->refresh();
+    if (size_bar)
+        size_bar->refresh();
 
     if (show)
         selectedChanged(selected_list->GetItemCurrent());

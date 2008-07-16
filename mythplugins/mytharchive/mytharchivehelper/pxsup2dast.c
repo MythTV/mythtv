@@ -367,6 +367,7 @@ static void ifopalette(const char * filename,
     /* seek to palette */
     xfseek0(fh, pgc + 0xa4);
     xxfread(fh, buf, 16 * 4);
+    fclose(fh);
     for (i = 0; i < 16; i++) 
     {
         eu8 * p = buf + i * 4 + 1;
@@ -862,6 +863,9 @@ int sup2dast(const char *supfile, const char *ifofile ,int delay_ms)
 
         bool createpics;
         FILE * fh;
+
+        memset(yuvpalette, 0, sizeof(yuvpalette));
+        memset(rgbpalette, 0, sizeof(rgbpalette));
 
         write(1, "\n", 1);
         if (sizeof (char) != 1 || sizeof (int) < 2) /* very unlikely */

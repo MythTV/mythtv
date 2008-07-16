@@ -847,8 +847,8 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
         img_convert(&retbuf, PIX_FMT_RGBA32, 
                         (AVPicture*) m_frame, m_codecCtx->pix_fmt, m_frameWidth, m_frameHeight);
 
-        QImage img(m_outputbuf, m_frameWidth, m_frameHeight, 32, NULL,
-                    65536 * 65536, QImage::LittleEndian);
+        QImage img(m_outputbuf, m_frameWidth, m_frameHeight,
+                   QImage::Format_RGB32);
 
         if (!img.save(m_frameFile.ascii(), "JPEG"))
         {

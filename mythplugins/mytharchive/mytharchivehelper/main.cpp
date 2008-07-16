@@ -752,7 +752,7 @@ int NativeArchive::exportVideo(QDomElement &itemNode, const QString &saveDirecto
     QString title = "", filename = "";
     bool doDelete = false;
     QString dbVersion = gContext->GetSetting("DBSchemaVer", "");
-    int intID, categoryID = 0;
+    int intID = 0, categoryID = 0;
     QString coverFile = "";
 
     title = itemNode.attribute("title");
@@ -1842,8 +1842,8 @@ int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameC
                         img_convert(&retbuf, PIX_FMT_RGBA32, 
                                     (AVPicture*) frame, codecCtx->pix_fmt, width, height);
 
-                        QImage img(outputbuf, width, height, 32, NULL,
-                                65536 * 65536, QImage::LittleEndian);
+                        QImage img(outputbuf, width, height,
+                                   QImage::Format_RGB32);
 
                         if (!img.save(filename.ascii(), saveFormat))
                         {
