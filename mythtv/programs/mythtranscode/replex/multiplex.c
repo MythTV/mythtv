@@ -33,7 +33,7 @@ static int which_ext(extdata_t *ext, int *aok, int n)
 	int i;
 	int started = 0;
 	int pos = -1;
-	uint64_t tmppts = 0;
+	uint64_t tmppts;
 	for(i=0; i < n; i++)
 		if(aok[i]){
 			if(! started){

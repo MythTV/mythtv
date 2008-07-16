@@ -214,7 +214,7 @@ MPEG2fixup::MPEG2fixup(const char *inf, const char *outf,
 
     infile = inf;
     rx.outfile = outf;
-    rx.done = false;
+    rx.done = 0;
     format = fmt;
     no_repeat = norp;
     fix_PTS = fixPTS;
@@ -447,17 +447,13 @@ int fill_buffers(void *r, int finish)
     return (rx->WaitBuffers());
 }
 
-MPEG2replex::MPEG2replex() :
-    done(false), otype(-1), ext_count(0), mplex(NULL)
+MPEG2replex::MPEG2replex()
 {
     memset(&vrbuf, 0, sizeof(ringbuffer));
     memset(&index_vrbuf, 0, sizeof(ringbuffer));
-    memset(extrbuf, 0, sizeof(ringbuffer) * N_AUDIO);
-    memset(index_extrbuf, 0, sizeof(ringbuffer) * N_AUDIO);
-    memset(exttype, 0, sizeof(int) * N_AUDIO);
-    memset(exttypcnt, 0, sizeof(int) * N_AUDIO);
-    memset(extframe, 0, sizeof(audio_frame_t) * N_AUDIO);
-    memset(&seq_head, 0, sizeof(seq_head));
+    memset(&extrbuf, 0, sizeof(ringbuffer) * N_AUDIO);
+    memset(&index_extrbuf, 0, sizeof(ringbuffer) * N_AUDIO);
+    ext_count = 0;
 }
 
 MPEG2replex::~MPEG2replex()
@@ -2388,7 +2384,7 @@ int MPEG2fixup::Start()
             break;
     }
 
-    rx.done = true;
+    rx.done = 1;
     pthread_mutex_lock( &rx.mutex );
     pthread_cond_signal(&rx.cond);
     pthread_mutex_unlock( &rx.mutex );
