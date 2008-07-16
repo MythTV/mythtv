@@ -119,6 +119,19 @@ class MythMainWindowPrivate
     bool ignore_lirc_keys;
     bool ignore_joystick_keys;
 
+#ifdef USE_LIRC
+    LircThread *lircThread;
+#endif
+
+#ifdef USE_JOYSTICK_MENU
+    JoystickMenuThread *joystickThread;
+#endif
+
+#ifdef USING_APPLEREMOTE
+    AppleRemoteListener *appleRemoteListener;
+    AppleRemote         &appleRemote;
+#endif
+
     bool exitingtomain;
     bool popwindows;
 
@@ -310,28 +323,32 @@ MythMainWindow::MythMainWindow(const bool useDB)
     if (!QFile::exists(config_file))
         config_file = QDir::homePath() + "/.lircrc";
 
-    LircThread *lircThread = new LircThread(this);
-    if (!lircThread->Init(config_file, "mythtv"))
-        lircThread->start();
+    d->lircThread = NULL;
+    d->lircThread = new LircThread(this);
+    if (!d->lircThread->Init(config_file, "mythtv"))
+        d->lircThread->start();
 #endif
 
 #ifdef USE_JOYSTICK_MENU
     d->ignore_joystick_keys = false;
 
     QString joy_config_file = GetConfDir() + "/joystickmenurc";
-    JoystickMenuThread *js = new JoystickMenuThread(this);
-    if (!js->Init(joy_config_file))
-        js->start();
+
+    d->joystickThread = NULL;
+    d->joystickThread = new JoystickMenuThread(this);
+    if (!d->joystickThread->Init(joy_config_file))
+        d->joystickThread->start();
 #endif
 
 #ifdef USING_APPLEREMOTE
-    AppleRemoteListener *arl = new AppleRemoteListener(this);
-    AppleRemote         &remote(AppleRemote::instance());
+    d->appleRemoteListener = NULL;
+    d->appleRemoteListener = new AppleRemoteListener(this);
+    d->appleRemote = AppleRemote(AppleRemote::instance());
 
-    remote.setListener(arl);
-    remote.startListening();
-    if (remote.isListeningToRemote())
-        remote.start();
+    d->appleRemote.setListener(d->appleRemoteListener);
+    d->appleRemote.startListening();
+    if (d->appleRemote.isListeningToRemote())
+        d->appleRemote.start();
 #endif
 
     RegisterKey("Global", "UP", "Up Arrow", "Up");
@@ -389,6 +406,47 @@ MythMainWindow::~MythMainWindow()
         d->keyContexts.erase(d->keyContexts.begin());
         delete context;
     }
+
+#ifdef USE_LIRC
+    if (d->lircThread)
+    {
+        if (d->lircThread->isRunning())
+        {
+            d->lircThread->Stop();
+            d->lircThread->wait();
+        }
+
+        delete d->lircThread;
+        d->lircThread = NULL;
+    }
+#endif
+
+#ifdef USE_JOYSTICK_MENU
+    if (d->joystickThread)
+    {
+        if (d->joystickThread->isRunning())
+        {
+            d->joystickThread->Stop();
+            d->joystickThread->wait();
+        }
+
+        delete d->joystickThread;
+        d->joystickThread = NULL;
+    }
+#endif
+
+#ifdef USING_APPLEREMOTE
+    if (d->AppleRemote.isRunning())
+    {
+        d->AppleRemote.stopListening();
+        //d->AppleRemote.terminate();
+        //d->AppleRemote.wait();
+    }
+
+    delete d->appleRemoteListener;
+    d->appleRemoteListener = NULL;
+#endif
+
 
     delete d;
 }

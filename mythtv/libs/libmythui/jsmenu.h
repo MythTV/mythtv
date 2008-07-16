@@ -77,6 +77,7 @@ class MPUBLIC JoystickMenuThread : public QThread
     void AxisChange(int axis, int value);
     void EmitKey(QString code);
     int  ReadConfig(QString config_file);
+    void Stop(void) { bStop = true; }
 
   private:
     void run(void);
@@ -99,6 +100,7 @@ class MPUBLIC JoystickMenuThread : public QThread
     int *buttons;
     int *axes;
 
+    volatile bool bStop;
 };
 
 #endif

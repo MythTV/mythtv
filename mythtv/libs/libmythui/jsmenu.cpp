@@ -58,6 +58,7 @@ JoystickMenuThread::JoystickMenuThread(QObject *main_window)
     fd = -1;
     axes = NULL;
     buttons = NULL;
+    bStop = false;
 }
 
 /*----------------------------------------------------------------------------
@@ -209,8 +210,9 @@ void JoystickMenuThread::run(void)
 
     fd_set readfds;
     struct js_event js;
+    struct timeval timeout;
 
-    while (1)
+    while (!bStop)
     {
 
         /*--------------------------------------------------------------------
@@ -220,7 +222,11 @@ void JoystickMenuThread::run(void)
         FD_ZERO(&readfds);
         FD_SET(fd, &readfds);
 
-        rc = select(fd + 1, &readfds, NULL, NULL, NULL);
+        // the maximum time select() should wait
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 100000;
+
+        rc = select(fd + 1, &readfds, NULL, NULL, &timeout);
         if (rc == -1)
         {
             /*----------------------------------------------------------------

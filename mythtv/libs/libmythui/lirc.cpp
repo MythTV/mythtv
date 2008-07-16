@@ -27,13 +27,12 @@ LircThread::LircThread(QObject *main_window)
           : QThread()
 {
     mainWindow = main_window;
+    bStop = false;
 }
 
 int LircThread::Init(const QString &config_file, const QString &program,
                         bool ignoreExtApp)
 {
-    int fd;
-
     /* Connect the unix socket */
     fd = lirc_init((char *)qPrintable(program), 1);
     if (fd == -1)
@@ -75,47 +74,77 @@ void LircThread::run(void)
     char *code = 0;
     char *ir = 0;
     int ret;
+    fd_set readfds;
+    struct timeval timeout;
 
     /* Process all events read */
-    while (lirc_nextcode(&ir) == 0)
+    while (!bStop)
     {
-        if (!ir)
+        FD_ZERO(&readfds);
+        FD_SET(fd, &readfds);
+
+        // the maximum time select() should wait
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 100000;
+
+        ret = select(fd + 1, &readfds, NULL, NULL, &timeout);
+
+        if (ret == 0)
             continue;
-        while ((ret = lirc_code2char(lircConfig, ir, &code)) == 0 &&
-               code != NULL)
+
+        if (ret == -1)
         {
-            QKeySequence a(code);
-
-            int keycode = 0;
-
-            // Send a dummy keycode if we couldn't convert the key sequence.
-            // This is done so the main code can output a warning for bad
-            // mappings.
-            if (!a.count())
-                QApplication::postEvent(mainWindow, new LircKeycodeEvent(code, 
-                                        keycode, true));
-
-            for (unsigned int i = 0; i < a.count(); i++)
-            {
-                keycode = a[i];
-
-                QApplication::postEvent(mainWindow, new LircKeycodeEvent(code, 
-                                        keycode, true));
-                QApplication::postEvent(mainWindow, new LircKeycodeEvent(code, 
-                                        keycode, false));
-
-                SpawnApp();
-            }
+            perror("LircThread - select");
+            return;
         }
 
-        free(ir);
-        if (ret == -1)
-            break;
-    }
+        if (ret == 1)
+        {
+            ret = lirc_nextcode(&ir);
 
-    if (errno != 0)
-        VERBOSE(VB_IMPORTANT, QString("LircThread has exited! - last error was: %1")
-                .arg(errno));
+            if (ret == -1)
+            {
+                if (errno != 0)
+                    VERBOSE(VB_IMPORTANT, QString("LircThread: lirc_nextcode failed"
+                                                  "last error was: %1").arg(errno));
+                return;
+            }
+
+            if (!ir)
+                continue;
+
+            while ((ret = lirc_code2char(lircConfig, ir, &code)) == 0 &&
+                code != NULL)
+            {
+                QKeySequence a(code);
+
+                int keycode = 0;
+
+                // Send a dummy keycode if we couldn't convert the key sequence.
+                // This is done so the main code can output a warning for bad
+                // mappings.
+                if (!a.count())
+                    QApplication::postEvent(mainWindow, new LircKeycodeEvent(code, 
+                                            keycode, true));
+
+                for (unsigned int i = 0; i < a.count(); i++)
+                {
+                    keycode = a[i];
+
+                    QApplication::postEvent(mainWindow, new LircKeycodeEvent(code, 
+                                            keycode, true));
+                    QApplication::postEvent(mainWindow, new LircKeycodeEvent(code, 
+                                            keycode, false));
+
+                    SpawnApp();
+                }
+            }
+
+            free(ir);
+            if (ret == -1)
+                break;
+        }
+    }
 }
 
 
