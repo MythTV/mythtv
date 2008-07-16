@@ -2448,7 +2448,14 @@ void Scheduler::UpdateMatches(int recordid) {
         gettimeofday(&dbstart, NULL);
         MSqlQuery result(dbConn);
         result.prepare(query);
-        result.bindValues(bindings);
+
+        MSqlBindings::const_iterator it;
+        for (it = bindings.begin(); it != bindings.end(); ++it)
+        {
+            if (query.contains(it.key()))
+                result.bindValue(it.key(), it.value());
+        }
+
         result.exec();
         gettimeofday(&dbend, NULL);
 
