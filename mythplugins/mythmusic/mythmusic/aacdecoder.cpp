@@ -19,6 +19,7 @@
 #include <qobject.h>
 #include <qiodevice.h>
 #include <qfile.h>
+#include <stdlib.h>
 
 #include "aacdecoder.h"
 #include "constants.h"
