@@ -177,21 +177,13 @@ bool MythUIStateType::ParseElement(QDomElement &element)
             else if (type == "full")
                 stype = Full;
 
-            if (uitype && m_ObjectsByState.contains((int)stype))
-            {
-                delete m_ObjectsByState[(int)stype];
-                m_ObjectsByState.remove((int)stype);
-            }
-            AddObject(stype, uitype);
+            if (uitype && !m_ObjectsByState.contains((int)stype))
+                AddObject(stype, uitype);
         }
         else if (!name.isEmpty())
         {
-            if (uitype && m_ObjectsByName.contains(name))
-            {
-                delete m_ObjectsByName[name];
-                m_ObjectsByName.remove(name);
-            }
-            AddObject(name, uitype);
+            if (uitype && !m_ObjectsByName.contains(name))
+                AddObject(name, uitype);
         }
     }
     else
