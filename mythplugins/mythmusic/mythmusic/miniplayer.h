@@ -52,6 +52,7 @@ class MPUBLIC MiniPlayer : public MythThemedDialog
 
     QTimer       *m_displayTimer;
     QTimer       *m_infoTimer;
+    int           m_showTime;
 
     bool          m_showingInfo;
 

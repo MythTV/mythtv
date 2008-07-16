@@ -72,6 +72,7 @@ MiniPlayer::~MiniPlayer(void)
 
 void MiniPlayer::showPlayer(int showTime)
 {
+    m_showTime = showTime;
     m_displayTimer->start(showTime * 1000, true);
     exec();
 }
@@ -294,6 +295,10 @@ void MiniPlayer::keyPressEvent(QKeyEvent *e)
             else
                 handled = false;
         }
+
+        // restart the display timer on any keypress if it is active
+        if (m_displayTimer->isActive())
+            m_displayTimer->start(m_showTime * 1000, true);
     }
 }
 
