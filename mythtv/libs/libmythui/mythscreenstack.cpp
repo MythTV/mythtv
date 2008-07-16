@@ -12,7 +12,7 @@ using namespace std;
 
 const int kFadeVal = 20;
 
-MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name, 
+MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name,
                                  bool mainstack)
                : QObject(parent)
 {
@@ -25,7 +25,7 @@ MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name,
     newTop = NULL;
     topScreen = NULL;
 
-    m_DoTransitions = (GetMythPainter()->SupportsAlpha() && 
+    m_DoTransitions = (GetMythPainter()->SupportsAlpha() &&
                        GetMythPainter()->SupportsAnimation());
     m_InNewTransition = false;
 }
@@ -46,7 +46,7 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
 
     //qApp->lock();
 
-    MythScreenType *old = topScreen; 
+    MythScreenType *old = topScreen;
     if (old)
         old->aboutToHide();
 
@@ -136,6 +136,14 @@ void MythScreenStack::PopScreen(bool allowFade, bool deleteScreen)
 
     if (topScreen)
         topScreen->SetRedraw();
+    else
+    {
+        // Screen still needs to be redrawn if we have popped the last screen
+        // off the popup stack, or similar
+        MythScreenType *mainscreen = mainwindow->GetMainStack()->GetTopScreen();
+        if (mainscreen)
+            mainscreen->SetRedraw();
+    }
 
     //qApp->unlock();
 }
@@ -205,7 +213,7 @@ void MythScreenStack::DoNewFadeTransition(void)
     else
         RecalculateDrawOrder();
 }
- 
+
 void MythScreenStack::CheckNewFadeTransition(void)
 {
     if (!newTop)
