@@ -28,7 +28,7 @@ typedef QMap<const DVBChannel*,bool> IsOpenMap;
 class DVBChannel : public DTVChannel
 {
   public:
-    DVBChannel(int cardnum, TVRec *parent = NULL);
+    DVBChannel(const QString &device, TVRec *parent = NULL);
     ~DVBChannel();
 
     bool Open(void) { return Open(this); }
@@ -47,9 +47,9 @@ class DVBChannel : public DTVChannel
     int  GetFd(void)                    const { return fd_frontend; }
     bool IsTuningParamsProbeSupported(void) const;
 
-    QString GetDevice(void) const { return QString::number(GetCardNum()); }
+    QString GetDevice(void)             const { return device; }
     /// Returns DVB device number, used to construct filenames for DVB devices
-    int     GetCardNum(void)            const { return cardnum; };
+    QString GetCardNum(void)            const { return device; };
     /// Returns frontend name as reported by driver
     QString GetFrontendName(void)       const;
     DTVTunerType GetCardType(void)      const { return card_type; }
@@ -139,7 +139,7 @@ class DVBChannel : public DTVChannel
 
     // Other State
     int               fd_frontend; ///< File descriptor for tuning hardware
-    int               cardnum;     ///< DVB Card number
+    QString           device;      ///< DVB Device
     bool              has_crc_bug; ///< true iff our driver munges PMT
     int               nextInputID; ///< Signal an input change
 };

@@ -400,7 +400,7 @@ void ScanWizardScanner::Scan(
 
             ok = !device.isEmpty();
             if (ok)
-                sub_type = CardUtil::ProbeDVBType(device.toUInt()).upper();
+                sub_type = CardUtil::ProbeDVBType(device).upper();
         }
 
         if (ok)
@@ -486,7 +486,7 @@ void ScanWizardScanner::PreScanCommon(int scantype,
 
     if ("DVB" == card_type)
     {
-        QString sub_type = CardUtil::ProbeDVBType(device.toUInt()).upper();
+        QString sub_type = CardUtil::ProbeDVBType(device).upper();
         bool need_nit = (("QAM"  == sub_type) ||
                          ("QPSK" == sub_type) ||
                          ("OFDM" == sub_type));
@@ -506,7 +506,7 @@ void ScanWizardScanner::PreScanCommon(int scantype,
 
 #ifdef USING_DVB
     if ("DVB" == card_type)
-        channel = new DVBChannel(device.toInt());
+        channel = new DVBChannel(device);
 #endif
 
 #ifdef USING_V4L

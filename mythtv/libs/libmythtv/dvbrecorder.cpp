@@ -86,16 +86,14 @@ const unsigned char DVBRecorder::kPayloadStartSeen;
 #define DUMMY_VIDEO_PID     VIDEO_PID(0x20)
 
 #define LOC      QString("DVBRec(%1:%2): ") \
-                 .arg(tvrec->GetCaptureCardNum()).arg(_card_number_option)
+                 .arg(tvrec->GetCaptureCardNum()).arg(videodevice)
 #define LOC_WARN QString("DVBRec(%1:%2) Warning: ") \
-                 .arg(tvrec->GetCaptureCardNum()).arg(_card_number_option)
+                 .arg(tvrec->GetCaptureCardNum()).arg(videodevice)
 #define LOC_ERR  QString("DVBRec(%1:%2) Error: ") \
-                 .arg(tvrec->GetCaptureCardNum()).arg(_card_number_option)
+                 .arg(tvrec->GetCaptureCardNum()).arg(videodevice)
 
 DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
     : DTVRecorder(rec),
-      // Options set in SetOption()
-      _card_number_option(0),
       // DVB stuff
       dvbchannel(advbchannel),
       _stream_handler(NULL),
@@ -107,6 +105,8 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       // Statistics
       _continuity_error_count(0), _stream_overflow_count(0)
 {
+    videodevice = QString::null;
+
     _buffer_size = (1024*1024 / TSPacket::SIZE) * TSPacket::SIZE;
 
     _buffer = new unsigned char[_buffer_size];
@@ -145,22 +145,11 @@ void DVBRecorder::TeardownAll(void)
     }
 }
 
-void DVBRecorder::SetOption(const QString &name, int value)
-{
-    if (name == "cardnum")
-    {
-        _card_number_option = value;
-        videodevice = QString::number(value);
-    }
-    else
-        DTVRecorder::SetOption(name, value);
-}
-
 void DVBRecorder::SetOptionsFromProfile(RecordingProfile *profile, 
                                         const QString &videodev,
                                         const QString&, const QString&)
 {
-    SetOption("cardnum", videodev.toInt());
+    SetOption("videodevice", videodev);
     DTVRecorder::SetOption("tvformat", gContext->GetSetting("TVFormat"));
     SetStrOption(profile,  "recordingtype");
 }
@@ -318,14 +307,14 @@ bool DVBRecorder::Open(void)
         return true;
     }
 
-    if (_card_number_option < 0)
+    if (videodevice.isEmpty())
         return false;
 
     bzero(_stream_id,  sizeof(_stream_id));
     bzero(_pid_status, sizeof(_pid_status));
     memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
 
-    _stream_handler = DVBStreamHandler::Get(_card_number_option);
+    _stream_handler = DVBStreamHandler::Get(videodevice);
 
     VERBOSE(VB_RECORD, LOC + QString("Card opened successfully fd(%1)")
             .arg(_stream_fd));

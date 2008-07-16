@@ -17,7 +17,7 @@ typedef QMap<const ChannelBase*, ProgramMapTable*> pmt_list_t;
 class DVBCam
 {
   public:
-    DVBCam(int cardnum);
+    DVBCam(const QString &device);
     ~DVBCam();
 
     bool Start();
@@ -34,7 +34,7 @@ class DVBCam
 
     void SendPMT(const ProgramMapTable &pmt, uint cplm);
 
-    int             cardnum;
+    QString         device;
     int             numslots;
     cCiHandler     *ciHandler;
 

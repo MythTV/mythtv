@@ -16,7 +16,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1221";
+const QString currentDatabaseVersion = "1222";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -4301,6 +4301,58 @@ NULL
         if (!performActualUpdate(updates, "1221", dbver))
             return false;
     }
+
+    if (dbver == "1221")
+    {
+        bool ok = true;
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+            "SELECT cardid, videodevice "
+            "FROM capturecard "
+            "WHERE cardtype = 'DVB'");
+
+        if (!query.exec())
+        {
+            MythContext::DBError(
+                "Could not perform select for update to '1222'", query);
+            ok = false;
+        }
+        else
+        {
+            MSqlQuery query2(MSqlQuery::InitCon());
+            while (query.next())
+            {
+                bool conv_ok;
+                uint dvbnum = query.value(1).toString().toUInt(&conv_ok);
+                if (!conv_ok)
+                    continue;
+
+                QString videodevice =
+                    QString("/dev/dvb/adapter%1/frontend0").arg(dvbnum);
+
+                query2.prepare(
+                    "UPDATE capturecard "
+                    "SET videodevice = :VIDEODEV "
+                    "WHERE cardid = :CARDID");
+                query2.bindValue(":VIDEODEV", videodevice);
+                query2.bindValue(":CARDID",   query.value(0).toUInt());
+                if (!query2.exec())
+                {
+                    MythContext::DBError(
+                        "Could not perform update for '1222'", query2);
+                    ok = false;
+                }
+            }
+        }
+
+        if (!ok)
+            return false;
+
+        const char *updates[] = { NULL };
+        if (!performActualUpdate(updates, "1222", dbver))
+            return false;
+    }
+
 
     return true;
 }

@@ -49,8 +49,6 @@ class DVBRecorder :
     DVBRecorder(TVRec *rec, DVBChannel* dvbchannel);
    ~DVBRecorder();
 
-    void SetOption(const QString &name, int value);
-
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
                                const QString &audiodev,
@@ -107,9 +105,6 @@ class DVBRecorder :
     bool PauseAndWait(int timeout = 100);
 
   private:
-    // Options set in SetOption()
-    int             _card_number_option;
-
     // DVB stuff
     DVBChannel       *dvbchannel;
     DVBStreamHandler *_stream_handler;

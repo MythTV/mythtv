@@ -1046,53 +1046,48 @@ class DVBCardNum : public ComboBoxSetting, public CaptureCardDBStorage
                         "should change to the name and type of your card. "
                         "If the card cannot be opened, an error message "
                         "will be displayed."));
-        fillSelections(-1);
+        fillSelections(QString::null);
     };
 
     /// \brief Adds all available cards to list
     /// If current is >= 0 it will be considered available even
     /// if no device exists for it in /dev/dvb/adapter*
-    void fillSelections(int current)
+    void fillSelections(const QString &current)
     {
         clearSelections();
 
         // Get devices from filesystem
         vector<QString> sdevs = CardUtil::ProbeVideoDevices("DVB");
-        vector<uint>    devs;
-        for (uint i = 0; i < sdevs.size(); i++)
-            devs.push_back(sdevs[i].toUInt());
 
         // Add current if needed
-        if ((current >= 0) &&
-            (find(devs.begin(), devs.end(), (uint)current) == devs.end()))
+        if (!current.isEmpty() && (find(sdevs.begin(), sdevs.end(), current) == sdevs.end()))
         {
-            devs.push_back(current);
-            stable_sort(devs.begin(), devs.end());
+            stable_sort(sdevs.begin(), sdevs.end());
         }
 
         vector<QString> db = CardUtil::GetVideoDevices("DVB");
 
-        QMap<uint,bool> in_use;
-        QString sel = (current >= 0) ? QString::number(current) : "";
-        for (uint i = 0; i < devs.size(); i++)
+        QMap<QString,bool> in_use;
+        QString sel = current;
+        for (uint i = 0; i < sdevs.size(); i++)
         {
-            const QString dev = QString::number(devs[i]);
-            in_use[devs[i]] = find(db.begin(), db.end(), dev) != db.end();
-            if (sel.isEmpty() && !in_use[devs[i]])
+            const QString dev = sdevs[i];
+            in_use[sdevs[i]] = find(db.begin(), db.end(), dev) != db.end();
+            if (sel.isEmpty() && !in_use[sdevs[i]])
                 sel = dev;
         }
 
-        if (sel.isEmpty() && devs.size())
-            sel = devs[0];
+        if (sel.isEmpty() && sdevs.size())
+            sel = sdevs[0];
  
         QString usestr = QString(" -- ");
         usestr += QObject::tr("Warning: already in use");
 
-        for (uint i = 0; i < devs.size(); i++)
+        for (uint i = 0; i < sdevs.size(); i++)
         {
-            const QString dev = QString::number(devs[i]);
-            QString desc = dev + (in_use[devs[i]] ? usestr : "");
-            desc = ((uint)current == devs[i]) ? dev : desc;
+            const QString dev = sdevs[i];
+            QString desc = dev + (in_use[sdevs[i]] ? usestr : "");
+            desc = (current == sdevs[i]) ? dev : desc;
             addSelection(desc, dev, dev == sel);
         }
     }
@@ -1100,15 +1095,12 @@ class DVBCardNum : public ComboBoxSetting, public CaptureCardDBStorage
     virtual void Load(void)
     {
         clearSelections();
-        addSelection("-1");
+        addSelection(QString::null);
 
         CaptureCardDBStorage::Load();
 
-        bool ok;
-        int intval = getValue().toInt(&ok);
-        intval = (ok) ? intval : -1;
-
-        fillSelections(intval);
+        QString dev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, getValue());
+        fillSelections(dev);
     }
 };
 
@@ -2847,12 +2839,11 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
     (void) videodevice;
 
 #ifdef USING_DVB
-    uint dvbdev = videodevice.toUInt();
-    QString frontend_name = CardUtil::ProbeDVBFrontendName(dvbdev);
-    QString subtype       = CardUtil::ProbeDVBType(dvbdev);
+    QString frontend_name = CardUtil::ProbeDVBFrontendName(videodevice);
+    QString subtype       = CardUtil::ProbeDVBType(videodevice);
 
-    QString err_open  = tr("Could not open card #%1").arg(dvbdev);
-    QString err_other = tr("Could not get card info for card #%1").arg(dvbdev);
+    QString err_open  = tr("Could not open card %1").arg(videodevice);
+    QString err_other = tr("Could not get card info for card %1").arg(videodevice);
 
     switch (CardUtil::toCardType(subtype))
     {

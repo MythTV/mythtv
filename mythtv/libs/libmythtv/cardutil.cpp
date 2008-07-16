@@ -190,33 +190,24 @@ QStringVec CardUtil::ProbeVideoDevices(const QString &rawtype)
 
     if (rawtype.upper() == "DVB")
     {
-        QDir dir("/dev/dvb", "adapter*", QDir::Name, QDir::All);
+        QDir dir("/dev/dvb", "adapter*", QDir::Name, QDir::Dirs);
         const QFileInfoList il = dir.entryInfoList();
         if (il.isEmpty())
             return devs;
         
-        vector<uint> list;
-        QMap<uint,bool> dups;
         QFileInfoList::const_iterator it = il.begin();
 
         for (; it != il.end(); ++it)
         {
-            if (it->fileName().left(7).lower() != "adapter")
+            QDir subdir(it->filePath(), "frontend*", QDir::Name, QDir::Files | QDir::System);
+            const QFileInfoList subil = subdir.entryInfoList();
+            if (subil.isEmpty())
                 continue;
 
-            bool ok;
-            uint num = it->fileName().mid(7).toUInt(&ok);
-            if (!ok || dups[num])
-                continue;
-
-            list.push_back(num);
-            dups[num] = true;
+            QFileInfoList::const_iterator subit = subil.begin();
+            for (; subit != subil.end(); ++subit)
+                devs.push_back(subit->filePath());
         }
-
-        stable_sort(list.begin(), list.end());
-
-        for (uint i = 0; i < list.size(); i++)
-            devs.push_back(QString::number(list[i]));
     }
     else
     {
@@ -227,7 +218,7 @@ QStringVec CardUtil::ProbeVideoDevices(const QString &rawtype)
     return devs;
 }
 
-QString CardUtil::ProbeDVBType(uint device)
+QString CardUtil::ProbeDVBType(const QString &device)
 {
     QString ret = "ERROR_UNKNOWN";
     (void) device;
@@ -258,10 +249,10 @@ QString CardUtil::ProbeDVBType(uint device)
     return ret;
 }
 
-/** \fn CardUtil::ProbeDVBFrontendName(uint)
+/** \fn CardUtil::ProbeDVBFrontendName(const QString &)
  *  \brief Returns the card type from the video device
  */
-QString CardUtil::ProbeDVBFrontendName(uint device)
+QString CardUtil::ProbeDVBFrontendName(const QString &device)
 {
     QString ret = "ERROR_UNKNOWN";
     (void) device;
@@ -288,7 +279,7 @@ QString CardUtil::ProbeDVBFrontendName(uint device)
     return ret;
 }
 
-/** \fn CardUtil::HasDVBCRCBug(uint)
+/** \fn CardUtil::HasDVBCRCBug(const QString &)
  *  \brief Returns true if and only if the device munges 
  *         PAT/PMT tables, and then doesn't fix the CRC.
  *
@@ -305,14 +296,14 @@ QString CardUtil::ProbeDVBFrontendName(uint device)
  *  \param device Open DVB frontend device file descriptor to be checked
  *  \return true iff the device munges tables, so that they fail a CRC check.
  */
-bool CardUtil::HasDVBCRCBug(uint device)
+bool CardUtil::HasDVBCRCBug(const QString &device)
 {
     QString name = ProbeDVBFrontendName(device);
     return ((name == "VLSI VES1x93 DVB-S")      || // munges PMT
             (name == "ST STV0299 DVB-S"));         // munges PAT
 }
 
-uint CardUtil::GetMinSignalMonitoringDelay(uint device)
+uint CardUtil::GetMinSignalMonitoringDelay(const QString &device)
 {
     QString name = ProbeDVBFrontendName(device);
     if (name.find("DVB-S") >= 0)
@@ -333,7 +324,7 @@ QString CardUtil::ProbeSubTypeName(uint cardid)
     if (device.isEmpty())
         return "ERROR_OPEN";
 
-    return ProbeDVBType(device.toUInt());
+    return ProbeDVBType(device);
 }
 
 /** \fn CardUtil::IsDVBCardType(const QString)
@@ -1789,20 +1780,22 @@ vector<uint> CardUtil::GetCardList(void)
 }
 
 
-QString CardUtil::GetDeviceName(dvb_dev_type_t type, uint cardnum)
+QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
 {
+    QString devname = QString(device);
+
     if (DVB_DEV_FRONTEND == type)
-        return QString("/dev/dvb/adapter%1/frontend0").arg(cardnum);
+        return devname;
     else if (DVB_DEV_DVR == type)
-        return QString("/dev/dvb/adapter%1/dvr0").arg(cardnum);
+        return devname.replace(devname.find("frontend"), 8, "dvr");
     else if (DVB_DEV_DEMUX == type)
-        return QString("/dev/dvb/adapter%1/demux0").arg(cardnum);
+        return devname.replace(devname.find("frontend"), 8, "demux");
     else if (DVB_DEV_CA == type)
-        return QString("/dev/dvb/adapter%1/ca0").arg(cardnum);
+        return devname.replace(devname.find("frontend"), 8, "ca");
     else if (DVB_DEV_AUDIO == type)
-        return QString("/dev/dvb/adapter%1/audio0").arg(cardnum);
+        return devname.replace(devname.find("frontend"), 8, "audio");
     else if (DVB_DEV_VIDEO == type)
-        return QString("/dev/dvb/adapter%1/video0").arg(cardnum);
+        return devname.replace(devname.find("frontend"), 8, "video");
 
     return "";
 }

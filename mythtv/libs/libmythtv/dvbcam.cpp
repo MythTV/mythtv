@@ -58,17 +58,17 @@ using namespace std;
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
 
-#define LOC_ERR QString("DVB#%1 CA Error: ").arg(cardnum)
-#define LOC QString("DVB#%1 CA: ").arg(cardnum)
+#define LOC_ERR QString("DVB#%1 CA Error: ").arg(device)
+#define LOC QString("DVB#%1 CA: ").arg(device)
 
-DVBCam::DVBCam(int cardNum)
-    : cardnum(cardNum),       numslots(0),
+DVBCam::DVBCam(const QString &aDevice)
+    : device(aDevice),        numslots(0),
       ciHandler(NULL),
       exitCiThread(false),    ciThreadRunning(false),
       have_pmt(false),        pmt_sent(false),
       pmt_updated(false),     pmt_added(false)
 {
-    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, cardnum);
+    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, device);
     int cafd = open(dvbdev.ascii(), O_RDWR);
     if (cafd >= 0)
     {
@@ -95,7 +95,7 @@ bool DVBCam::Start()
     pmt_updated  = false;
     pmt_added    = false;
 
-    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, cardnum);
+    QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, device);
     ciHandler = cCiHandler::CreateCiHandler(dvbdev.ascii());
     if (!ciHandler)
     {

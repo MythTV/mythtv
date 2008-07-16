@@ -55,17 +55,17 @@ static struct dvb_fe_params dtvmultiplex_to_dvbparams(
 static DTVMultiplex dvbparams_to_dtvmultiplex(
     DTVTunerType, const dvb_fe_params&);
 
-#define LOC QString("DVBChan(%1:%2): ").arg(GetCardID()).arg(cardnum)
+#define LOC QString("DVBChan(%1:%2): ").arg(GetCardID()).arg(device)
 #define LOC_WARN QString("DVBChan(%1:%2) Warning: ") \
-                 .arg(GetCardID()).arg(cardnum)
-#define LOC_ERR QString("DVBChan(%1:%2) Error: ").arg(GetCardID()).arg(cardnum)
+                 .arg(GetCardID()).arg(device)
+#define LOC_ERR QString("DVBChan(%1:%2) Error: ").arg(GetCardID()).arg(device)
 
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
  *
  *  \bug Only supports single input cards.
  */
-DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
+DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
     : DTVChannel(parent),           master(NULL),
       // Helper classes
       diseqc_tree(NULL),            dvbcam(NULL),
@@ -77,17 +77,17 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
       tuning_delay(0),              sigmon_delay(25),
       first_tune(true),
       // Misc
-      fd_frontend(-1),              cardnum(aCardNum),
+      fd_frontend(-1),              device(aDevice),
       has_crc_bug(false)
 {
-    QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, cardnum);
+    QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
     master = dynamic_cast<DVBChannel*>(GetMaster(devname));
     master = (master == this) ? NULL : master;
 
     if (!master)
     {
-        dvbcam = new DVBCam(cardnum);
-        has_crc_bug = CardUtil::HasDVBCRCBug(aCardNum);
+        dvbcam = new DVBCam(device);
+        has_crc_bug = CardUtil::HasDVBCRCBug(device);
     }
     else
     {
@@ -95,7 +95,7 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
         has_crc_bug  = master->has_crc_bug;
     }
 
-    sigmon_delay = CardUtil::GetMinSignalMonitoringDelay(aCardNum);
+    sigmon_delay = CardUtil::GetMinSignalMonitoringDelay(device);
 }
 
 DVBChannel::~DVBChannel()
@@ -187,7 +187,7 @@ bool DVBChannel::Open(DVBChannel *who)
         return true;
     }
 
-    QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, cardnum);
+    QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
     fd_frontend = open(devname.ascii(), O_RDWR | O_NONBLOCK);
 
     if (fd_frontend < 0)
@@ -262,7 +262,7 @@ bool DVBChannel::Open(DVBChannel *who)
     symbol_rate_maximum = info.symbol_rate_max;
 
     VERBOSE(VB_RECORD, LOC + QString("Using DVB card %1, with frontend '%2'.")
-            .arg(cardnum).arg(frontend_name));
+            .arg(device).arg(frontend_name));
 
     // Turn on the power to the LNB
     if (card_type == DTVTunerType::kTunerTypeQPSK ||

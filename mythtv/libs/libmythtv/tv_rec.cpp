@@ -142,7 +142,7 @@ bool TVRec::CreateChannel(const QString &startchannel)
     if (genOpt.cardtype == "DVB")
     {
 #ifdef USING_DVB
-        channel = new DVBChannel(genOpt.videodev.toInt(), this);
+        channel = new DVBChannel(genOpt.videodev, this);
         if (!channel->Open())
             return false;
         GetDVBChannel()->SetSlowTuning(dvbOpt.dvb_tuning_delay);

@@ -226,11 +226,11 @@ class MPUBLIC CardUtil
     static bool         IsDVB(uint cardid)
         { return "DVB" == GetRawCardType(cardid); }
     static bool         IsDVBCardType(const QString card_type);
-    static QString      ProbeDVBFrontendName(uint device);
-    static QString      ProbeDVBType(uint device);
-    static bool         HasDVBCRCBug(uint device);
-    static uint         GetMinSignalMonitoringDelay(uint device);
-    static QString      GetDeviceName(dvb_dev_type_t, uint cardnum);
+    static QString      ProbeDVBFrontendName(const QString &device);
+    static QString      ProbeDVBType(const QString &device);
+    static bool         HasDVBCRCBug(const QString &device);
+    static uint         GetMinSignalMonitoringDelay(const QString &device);
+    static QString      GetDeviceName(dvb_dev_type_t, const QString &device);
     static InputNames   GetConfiguredDVBInputs(uint cardid);
 
     // V4L info

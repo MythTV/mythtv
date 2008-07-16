@@ -34,8 +34,8 @@ class PIDInfo
         _pid(pid),                       filter_fd(-1),
         streamType(stream_type),         pesType(pes_type) {;}
 
-    bool Open(uint dvb_dev_num, bool use_section_reader);
-    bool Close(uint dvb_dev_num);
+    bool Open(const QString &dvb_dev, bool use_section_reader);
+    bool Close(const QString &dvb_dev);
     bool IsOpen(void) const { return filter_fd >= 0; }
 
     uint        _pid;
@@ -50,7 +50,7 @@ class DVBStreamHandler : public ReaderPausedCB
     friend void *run_dvb_stream_handler_thunk(void *param);
 
   public:
-    static DVBStreamHandler *Get(uint dvb_device_number);
+    static DVBStreamHandler *Get(const QString &dvb_device);
     static void Return(DVBStreamHandler * & ref);
 
     void AddListener(MPEGStreamData *data,
@@ -71,7 +71,7 @@ class DVBStreamHandler : public ReaderPausedCB
     virtual void ReaderPaused(int fd) { (void) fd; }
 
   private:
-    DVBStreamHandler(uint);
+    DVBStreamHandler(const QString &);
     ~DVBStreamHandler();
 
     void Start(void);
@@ -94,7 +94,7 @@ class DVBStreamHandler : public ReaderPausedCB
     bool SupportsTSMonitoring(void);
 
   private:
-    uint              _dvb_dev_num;
+    QString           _dvb_dev;
     QString           _dvr_dev_path;
     bool              _allow_section_reader;
     bool              _needs_buffering;
@@ -119,13 +119,13 @@ class DVBStreamHandler : public ReaderPausedCB
     vector<MPEGStreamData*> _stream_data_list;
 
     // for caching TS monitoring supported value.
-    static QMutex          _rec_supports_ts_monitoring_lock;
-    static QMap<uint,bool> _rec_supports_ts_monitoring;
+    static QMutex             _rec_supports_ts_monitoring_lock;
+    static QMap<QString,bool> _rec_supports_ts_monitoring;
 
     // for implementing Get & Return
-    static QMutex                       _handlers_lock;
-    static QMap<uint,DVBStreamHandler*> _handlers;
-    static QMap<uint,uint>              _handlers_refcnt;
+    static QMutex                          _handlers_lock;
+    static QMap<QString,DVBStreamHandler*> _handlers;
+    static QMap<QString,uint>              _handlers_refcnt;
 };
 
 #endif // _DVBSTREAMHANDLER_H_
