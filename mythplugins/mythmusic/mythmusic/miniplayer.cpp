@@ -32,9 +32,11 @@ MiniPlayer::MiniPlayer(MythMainWindow *parent,
     m_parentPlayer = parentPlayer;
 
     m_displayTimer = new QTimer(this);
+    m_displayTimer->setSingleShot(true);
     connect(m_displayTimer, SIGNAL(timeout()), this, SLOT(timerTimeout()));
 
     m_infoTimer = new QTimer(this);
+    m_infoTimer->setSingleShot(true);
     connect(m_infoTimer, SIGNAL(timeout()), this, SLOT(showInfoTimeout()));
 
     wireupTheme();
@@ -76,7 +78,7 @@ MiniPlayer::~MiniPlayer(void)
 
 void MiniPlayer::showPlayer(int showTime)
 {
-    m_displayTimer->start(showTime * 1000, true);
+    m_displayTimer->start(showTime * 1000);
     exec();
 }
 
@@ -299,6 +301,10 @@ void MiniPlayer::keyPressEvent(QKeyEvent *e)
             else
                 handled = false;
         }
+
+        // restart the display timer on any keypress if it is active
+        if (m_displayTimer->isActive())
+            m_displayTimer->start();
     }
 }
 
@@ -641,7 +647,7 @@ void MiniPlayer::showShuffleMode(void)
 
         m_showingInfo = true;
         m_infoText->SetText(msg);
-        m_infoTimer->start(5000, true);
+        m_infoTimer->start(5000);
     }
 }
 
@@ -672,7 +678,7 @@ void MiniPlayer::showRepeatMode(void)
 
         m_showingInfo = true;
         m_infoText->SetText(msg);
-        m_infoTimer->start(5000, true);
+        m_infoTimer->start(5000);
     }
 }
 
@@ -689,7 +695,7 @@ void MiniPlayer::showAutoMode(void)
 
         m_showingInfo = true;
         m_infoText->SetText(msg);
-        m_infoTimer->start(5000, true);
+        m_infoTimer->start(5000);
     }
 }
 
@@ -710,7 +716,7 @@ void MiniPlayer::showVolume(void)
 
         m_showingInfo = true;
         m_infoText->SetText(msg);
-        m_infoTimer->start(5000, true);
+        m_infoTimer->start(5000);
     }
 
     if (class LCD *lcd = LCD::Get())
@@ -750,7 +756,7 @@ void MiniPlayer::showSpeed(void)
         m_infoTimer->stop();
         m_showingInfo = true;
         m_infoText->SetText(msg);
-        m_infoTimer->start(5000, true);
+        m_infoTimer->start(5000);
     }
 
     if (class LCD *lcd = LCD::Get())
