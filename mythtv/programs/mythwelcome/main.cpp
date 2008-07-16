@@ -147,10 +147,12 @@ int main(int argc, char **argv)
         WelcomeDialog *mythWelcome = new WelcomeDialog(mainWindow,
             "welcome_screen", "welcome-", "welcome_screen");
         mythWelcome->exec();
-        
+
         delete mythWelcome;
     }
-    
+
+    DestroyMythMainWindow();
+
     delete gContext;
 
     return 0;
