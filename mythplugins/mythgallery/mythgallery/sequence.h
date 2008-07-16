@@ -154,7 +154,8 @@ class SequenceShuffle : public SequenceRandomBase
 {
 public:
 	SequenceShuffle(int _len)
-	: SequenceRandomBase(_len, false), map(0) { 
+	  : SequenceRandomBase(_len, false), map(0), used(0)
+	{ 
 		reset(_len); 
 	};
 
