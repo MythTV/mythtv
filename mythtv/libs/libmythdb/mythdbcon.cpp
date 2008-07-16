@@ -198,6 +198,8 @@ MDBManager::~MDBManager()
 
 MSqlDatabase *MDBManager::popConnection()
 {
+    PurgeIdleConnections();
+
     m_sem->acquire();
     m_lock.lock();
 
@@ -224,11 +226,38 @@ void MDBManager::pushConnection(MSqlDatabase *db)
 
     if (db)
     {
-        m_pool.append(db);
+        db->m_lastDBKick = QDateTime::currentDateTime();
+        m_pool.prepend(db);
     }
 
     m_lock.unlock();
     m_sem->release();
+
+    PurgeIdleConnections();
+}
+
+void MDBManager::PurgeIdleConnections(void)
+{
+    QMutexLocker locker(&m_lock);
+
+    QDateTime now = QDateTime::currentDateTime();
+    QList<MSqlDatabase*>::iterator it = m_pool.begin();
+
+    while (it != m_pool.end())
+    {
+        if ((*it)->m_lastDBKick.secsTo(now) <= 3600)
+        {
+            ++it;
+            continue;
+        }
+
+        // This connection has
+        // not been used in the past hour.
+        MSqlDatabase *entry = *it;
+        it = m_pool.erase(it);
+        --m_connID;
+        delete entry;
+    }
 }
 
 MSqlDatabase *MDBManager::getSchedCon()

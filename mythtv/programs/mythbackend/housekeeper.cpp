@@ -260,6 +260,11 @@ void HouseKeeper::RunHouseKeeping(void)
             updateLastrun(dbTag);
         }
 
+        if (wantToRun("DBCleanup", 1, 0, 24))
+        {
+            gContext->GetDBManager()->PurgeIdleConnections();
+        }
+
         sleep(300 + (random()%8));
     }
 } 

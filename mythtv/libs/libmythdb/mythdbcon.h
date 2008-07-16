@@ -48,6 +48,7 @@ class MPUBLIC MDBManager
     ~MDBManager(void);
 
     void CloseDatabases(void);
+    void PurgeIdleConnections(void);
 
   protected:
     MSqlDatabase *popConnection(void);
