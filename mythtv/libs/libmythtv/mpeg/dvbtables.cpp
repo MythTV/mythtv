@@ -94,7 +94,7 @@ QString ServiceDescriptionTable::toString(void) const
 {
     QString str =
         QString("SDT: TSID(0x%1) original_network_id(0x%2) services(%3)\n")
-        .arg(OriginalNetworkID(), 0, 16).arg(TSID(), 0, 16)
+        .arg(TSID(), 0, 16).arg(OriginalNetworkID(), 0, 16)
         .arg(ServiceCount());
     
     for (uint i = 0; i < ServiceCount(); i++)
