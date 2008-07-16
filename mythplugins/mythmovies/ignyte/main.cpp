@@ -20,8 +20,7 @@ int main(int argc, char **argv)
     }
 
     QApplication app(argc, argv, false);
-    IgnyteGrabber *grab;
-    grab = new IgnyteGrabber(zip, radius, &app);
+    new IgnyteGrabber(zip, radius, &app);
     return app.exec();
 }
 
