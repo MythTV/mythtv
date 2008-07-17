@@ -23,7 +23,6 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name)
               : MythUIType(parent, name)
 {
     m_showArrow = true;
-    m_showScrollArrows = false;
 
     Const();
 }
@@ -36,7 +35,6 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
     m_Area             = area;
 
     m_showArrow        = showArrow;
-    m_showScrollArrows = showScrollArrows;
 
     Const();
 }
@@ -174,7 +172,7 @@ void MythUIButtonList::SetPositionArrowStates(void)
 
     }
 
-    if (!m_showScrollArrows || !m_downArrow || !m_upArrow)
+    if (!m_downArrow || !m_upArrow)
         return;
 
     if (m_itemCount == 0)
@@ -618,11 +616,15 @@ void MythUIButtonList::Init()
         return;
 
     m_initialized = true;
+
+    m_upArrow = dynamic_cast<MythUIStateType *>(GetChild("upscrollarrow"));
+    m_downArrow = dynamic_cast<MythUIStateType *>(GetChild("downscrollarrow"));
+
     if (m_upArrow)
-        m_upArrow->SetVisible(m_showScrollArrows);
+        m_upArrow->SetVisible(true);
 
     if (m_downArrow)
-        m_downArrow->SetVisible(m_showScrollArrows);
+        m_downArrow->SetVisible(true);
 
     MythUIStateType *buttontemplate = dynamic_cast<MythUIStateType *>
                                                 (GetChild("buttonitem"));
@@ -895,20 +897,6 @@ bool MythUIButtonList::ParseElement(QDomElement &element)
         else if (layout == "free")
             m_scrollStyle = ScrollFree;
     }
-    else if (element.tagName() == "scrollarrows")
-    {
-        m_showScrollArrows = parseBool(element.attribute("show", ""));
-        if (m_showScrollArrows)
-        {
-            if (m_upArrow)
-                delete m_upArrow;
-            if (m_downArrow)
-                delete m_downArrow;
-            ParseChildren(element, this);
-            m_upArrow = dynamic_cast<MythUIStateType *>(GetChild("upscrollarrow"));
-            m_downArrow = dynamic_cast<MythUIStateType *>(GetChild("downscrollarrow"));
-        }
-    }
     else if (element.tagName() == "showarrow")
         m_showArrow = parseBool(element);
     else if (element.tagName() == "spacing")
@@ -947,7 +935,6 @@ void MythUIButtonList::CopyFrom(MythUIType *base)
     m_itemsVisible = lb->m_itemsVisible;
 
     m_active = lb->m_active;
-    m_showScrollArrows = lb->m_showScrollArrows;
     m_showArrow = lb->m_showArrow;
 
     m_drawoffset = lb->m_drawoffset;
@@ -1000,6 +987,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
     m_state     = state;
     m_showArrow = showArrow;
     m_data      = 0;
+    m_stringData = "";
     m_overrideInactive = false;
 
     if (state >= NotChecked)
@@ -1086,6 +1074,16 @@ void MythUIButtonListItem::setData(void *data)
 void *MythUIButtonListItem::getData()
 {
     return m_data;
+}
+
+QString MythUIButtonListItem::setStringData(const QString &data)
+{
+    m_stringData = data;
+}
+
+QString MythUIButtonListItem::getStringData()
+{
+    return m_stringData;
 }
 
 void MythUIButtonListItem::setOverrideInactive(bool flag)

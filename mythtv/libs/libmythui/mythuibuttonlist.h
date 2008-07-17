@@ -2,6 +2,7 @@
 #define MYTHUIBUTTONLIST_H_
 
 #include <QList>
+#include <QString>
 
 #include "mythuitype.h"
 #include "mythuiimage.h"
@@ -46,6 +47,9 @@ class MythUIButtonListItem
     void setData(void *data);
     void *getData();
 
+    QString setStringData(const QString &data);
+    QString getStringData();
+
     void setOverrideInactive(bool flag);
     bool getOverrideInactive(void);
 
@@ -60,6 +64,7 @@ class MythUIButtonListItem
     bool            m_checkable;
     CheckState      m_state;
     void           *m_data;
+    QString         m_stringData;
     bool            m_showArrow;
     bool            m_overrideInactive;
 
@@ -175,7 +180,6 @@ class MythUIButtonList : public MythUIType
     int m_columns;
 
     bool m_active;
-    bool m_showScrollArrows;
     bool m_showArrow;
 
     MythUIStateType *m_upArrow;
