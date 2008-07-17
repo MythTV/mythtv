@@ -1231,6 +1231,7 @@ MythListButtonItem::MythListButtonItem(MythListButton* lbtype,
     m_state     = state;
     m_showArrow = showArrow;
     m_data      = 0;
+    m_stringData = "";
     m_overrideInactive = false;
 
     if (state >= NotChecked)
@@ -1307,6 +1308,16 @@ void MythListButtonItem::setData(void *data)
 void *MythListButtonItem::getData()
 {
     return m_data;
+}
+
+QString MythListButtonItem::setStringData(const QString &data)
+{
+    m_stringData = data;
+}
+
+QString MythListButtonItem::getStringData()
+{
+    return m_stringData;
 }
 
 void MythListButtonItem::setOverrideInactive(bool flag)

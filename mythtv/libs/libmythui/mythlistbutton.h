@@ -2,6 +2,7 @@
 #define MYTHLISTBUTTON_H_
 
 #include <QList>
+#include <QString>
 
 #include "mythuitype.h"
 #include "mythuiimage.h"
@@ -47,12 +48,15 @@ class MythListButtonItem
     void setData(void *data);
     void *getData();
 
+    QString SetStringData(const QString &data);
+    QString GetStringData();
+
     void setOverrideInactive(bool flag);
     bool getOverrideInactive(void);
 
     bool moveUpDown(bool flag);
 
-    void SetToRealButton(MythUIButton *button, bool active_on); 
+    void SetToRealButton(MythUIButton *button, bool active_on);
 
   protected:
     MythListButton *m_parent;
@@ -61,6 +65,7 @@ class MythListButtonItem
     bool            m_checkable;
     CheckState      m_state;
     void           *m_data;
+    QString         m_stringData;
     bool            m_showArrow;
     bool            m_overrideInactive;
 
@@ -72,8 +77,8 @@ class MythListButton : public MythUIType
     Q_OBJECT
   public:
     MythListButton(MythUIType *parent, const QString &name);
-    MythListButton(MythUIType *parent, const QString &name, 
-                   const QRect &area, bool showArrow = true, 
+    MythListButton(MythUIType *parent, const QString &name,
+                   const QRect &area, bool showArrow = true,
                    bool showScrollArrows = false);
     ~MythListButton();
 
