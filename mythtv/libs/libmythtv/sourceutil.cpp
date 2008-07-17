@@ -7,7 +7,7 @@
 #include "mythcontext.h"
 #include "sourceutil.h"
 #include "cardutil.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "util.h"
 
 bool SourceUtil::HasDigitalChannel(uint sourceid)
@@ -22,7 +22,7 @@ bool SourceUtil::HasDigitalChannel(uint sourceid)
 
     if (!query.exec())
     {
-        MythContext::DBError("SourceUtil::HasDigitalChannel()", query);
+        MythDB::DBError("SourceUtil::HasDigitalChannel()", query);
         return false;
     }
 
@@ -52,7 +52,7 @@ QString SourceUtil::GetSourceName(uint sourceid)
 
     if (!query.exec())
     {
-        MythContext::DBError("SourceUtil::GetSourceName()", query);
+        MythDB::DBError("SourceUtil::GetSourceName()", query);
         return QString::null;
     }
     else if (!query.next())
@@ -130,7 +130,7 @@ bool SourceUtil::GetListingsLoginData(uint sourceid,
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("SourceUtil::GetListingsLoginData()", query);
+        MythDB::DBError("SourceUtil::GetListingsLoginData()", query);
         return false;
     }
 
@@ -158,7 +158,7 @@ static QStringList get_cardtypes(uint sourceid)
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("get_cardtypes()", query);
+        MythDB::DBError("get_cardtypes()", query);
     else
     {
         while (query.next())
@@ -286,7 +286,7 @@ bool SourceUtil::IsEncoder(uint sourceid, bool strict)
 
     bool has_any_chan = false;
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("SourceUtil::IsEncoder", query);
+        MythDB::DBError("SourceUtil::IsEncoder", query);
     else
     {
         while (query.next())
@@ -317,7 +317,7 @@ bool SourceUtil::IsAnySourceScanable(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("SourceUtil::IsAnySourceScanable", query);
+        MythDB::DBError("SourceUtil::IsAnySourceScanable", query);
         return false;
     }
 
@@ -354,7 +354,7 @@ bool SourceUtil::DeleteSource(uint sourceid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Deleting Channels", query);
+        MythDB::DBError("Deleting Channels", query);
         return false;
     }
 
@@ -365,7 +365,7 @@ bool SourceUtil::DeleteSource(uint sourceid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Deleting cardinputs", query);
+        MythDB::DBError("Deleting cardinputs", query);
         return false;
     }
 
@@ -376,7 +376,7 @@ bool SourceUtil::DeleteSource(uint sourceid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Deleting VideoSource", query);
+        MythDB::DBError("Deleting VideoSource", query);
         return false;
     }
 

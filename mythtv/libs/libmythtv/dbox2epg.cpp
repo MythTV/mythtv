@@ -10,7 +10,7 @@
 
 #include "dbox2channel.h"
 #include "dbox2epg.h"
-#include "mythcontext.h"
+#include "libmythdb/mythdb.h"
 #include "tv_rec.h"
 
 #define DEBUG_DBOX2EPG
@@ -176,7 +176,7 @@ void DBox2EPG::UpdateDB(uint chanid,
     query.bindValue(":STARTTIME", startTime);
 
     if (!query.exec())
-        MythContext::DBError("Deleting old program", query);
+        MythDB::DBError("Deleting old program", query);
 
     // Inserting new info
     query.prepare("INSERT INTO program "
@@ -199,7 +199,7 @@ void DBox2EPG::UpdateDB(uint chanid,
     query.bindValue(":STARS",       "0");
 
     if (!query.exec())
-        MythContext::DBError("Saving new program", query);
+        MythDB::DBError("Saving new program", query);
 }
 
 /** \fn DBox2EPG::httpRequestFinished(int requestID, bool error)
@@ -316,7 +316,7 @@ int DBox2EPG::GetChannelID(const QString& channum)
     }
     else
     {
-        MythContext::DBError("DBox2EPG::GetChannelID()", query);
+        MythDB::DBError("DBox2EPG::GetChannelID()", query);
     }
     return -1;
 }
@@ -346,7 +346,7 @@ bool DBox2EPG::UseOnAirGuide(uint chanid)
     }
     else
     {
-        MythContext::DBError("DBox2EPG::UseOnAirGuide()", query);
+        MythDB::DBError("DBox2EPG::UseOnAirGuide()", query);
     }
     return false;
 }

@@ -26,7 +26,6 @@ using namespace std;
 #include "mythwidgets.h"
 #include "mythdialogs.h"
 #include "mythcontext.h"
-#include "mythdbcon.h"
 #include "videosource.h"
 #include "datadirect.h"
 #include "scanwizard.h"
@@ -36,8 +35,9 @@ using namespace std;
 #include "frequencies.h"
 #include "diseqcsettings.h"
 #include "firewiredevice.h"
-#include "compat.h"
-#include "mythdirs.h"
+#include "libmythdb/compat.h"
+#include "libmythdb/mythdb.h"
+#include "libmythdb/mythdirs.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
@@ -65,7 +65,7 @@ VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
 void VideoSourceSelector::Load(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    
+
     QString querystr =
         "SELECT DISTINCT videosource.name, videosource.sourceid "
         "FROM cardinput, videosource, capturecard";
@@ -135,7 +135,7 @@ class InstanceCount : public TransSpinBoxSetting
 QString VideoSourceDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
     QString sourceidTag(":WHERESOURCEID");
-    
+
     QString query("sourceid = " + sourceidTag);
 
     bindings.insert(sourceidTag, parent.getSourceID());
@@ -148,7 +148,7 @@ QString VideoSourceDBStorage::GetSetClause(MSqlBindings& bindings) const
     QString sourceidTag(":SETSOURCEID");
     QString colTag(":SET" + GetColumnName().upper());
 
-    QString query("sourceid = " + sourceidTag + ", " + 
+    QString query("sourceid = " + sourceidTag + ", " +
             GetColumnName() + " = " + colTag);
 
     bindings.insert(sourceidTag, parent.getSourceID());
@@ -160,7 +160,7 @@ QString VideoSourceDBStorage::GetSetClause(MSqlBindings& bindings) const
 QString CaptureCardDBStorage::GetWhereClause(MSqlBindings& bindings) const
 {
     QString cardidTag(":WHERECARDID");
-    
+
     QString query("cardid = " + cardidTag);
 
     bindings.insert(cardidTag, parent.getCardID());
@@ -234,7 +234,7 @@ void TransFreqTableSelector::Load(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("TransFreqTableSelector::load", query);
+        MythDB::DBError("TransFreqTableSelector::load", query);
         return;
     }
 
@@ -275,7 +275,7 @@ void TransFreqTableSelector::Save(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("TransFreqTableSelector::load", query);
+        MythDB::DBError("TransFreqTableSelector::load", query);
         return;
     }
 }
@@ -324,7 +324,7 @@ class DataDirectPassword : public LineEditSetting, public VideoSourceDBStorage
 
 void DataDirectLineupSelector::fillSelections(const QString &uid,
                                               const QString &pwd,
-                                              int _source) 
+                                              int _source)
 {
     (void) uid;
     (void) pwd;
@@ -337,7 +337,7 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
     DataDirectProcessor ddp(_source, uid, pwd);
     QString waitMsg = tr("Fetching lineups from %1...")
         .arg(ddp.GetListingsProviderName());
-        
+
     VERBOSE(VB_GENERAL, waitMsg);
     MythProgressDialog *pdlg = new MythProgressDialog(waitMsg, 2);
 
@@ -366,7 +366,7 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
 #endif // USING_BACKEND
 }
 
-void DataDirect_config::Load() 
+void DataDirect_config::Load()
 {
     VerticalConfigurationGroup::Load();
     bool is_sd_userid = userid->getValue().contains("@") > 0;
@@ -375,7 +375,7 @@ void DataDirect_config::Load()
     if (((userid->getValue() != lastloadeduserid) ||
          (password->getValue() != lastloadedpassword)) && match)
     {
-        lineupselector->fillSelections(userid->getValue(), 
+        lineupselector->fillSelections(userid->getValue(),
                                        password->getValue(),
                                        source);
         lastloadeduserid = userid->getValue();
@@ -385,7 +385,7 @@ void DataDirect_config::Load()
 
 DataDirect_config::DataDirect_config(const VideoSource& _parent, int _source) :
     VerticalConfigurationGroup(false, false, false, false),
-    parent(_parent) 
+    parent(_parent)
 {
     source = _source;
 
@@ -415,10 +415,10 @@ void DataDirect_config::fillDataDirectLineupSelector(void)
         userid->getValue(), password->getValue(), source);
 }
 
-XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent, 
+XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent,
                                            QString _grabber) :
     VerticalConfigurationGroup(false, false, false, false),
-    parent(_parent), grabber(_grabber) 
+    parent(_parent), grabber(_grabber)
 {
     QString filename = QString("%1/%2.xmltv")
         .arg(GetConfDir()).arg(parent.getSourceName());
@@ -625,7 +625,7 @@ void XMLTVConfig::Load(void)
         "schedulesdirect1");
 
     grabber->addSelection(
-        QObject::tr("Transmitted guide only (EIT)"), "eitonly");    
+        QObject::tr("Transmitted guide only (EIT)"), "eitonly");
 
     grabber->addSelection(QObject::tr("No grabber"), "/bin/true");
 
@@ -643,7 +643,7 @@ void XMLTVConfig::Load(void)
     {
         addTarget(gname, new Loading_config(parent));
         grabber->addSelection(gname, gname, true);
-    }        
+    }
 
     addTarget("LOADING", new Loading_config(parent));
     grabber->addSelection(QObject::tr("Loading..."), "LOADING");
@@ -711,7 +711,7 @@ void XMLTVConfig::Save(void)
     query.exec();
 }
 
-VideoSource::VideoSource() 
+VideoSource::VideoSource()
 {
     // must be first
     addChild(id = new ID());
@@ -729,8 +729,8 @@ VideoSource::~VideoSource()
     xmltv->Stop();
 }
 
-bool VideoSourceEditor::cardTypesInclude(const int &sourceID, 
-                                         const QString &thecardtype) 
+bool VideoSourceEditor::cardTypesInclude(const int &sourceID,
+                                         const QString &thecardtype)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT count(cardtype)"
@@ -753,7 +753,7 @@ bool VideoSourceEditor::cardTypesInclude(const int &sourceID,
     return false;
 }
 
-void VideoSource::fillSelections(SelectSetting* setting) 
+void VideoSource::fillSelections(SelectSetting* setting)
 {
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT name, sourceid FROM videosource;");
@@ -768,7 +768,7 @@ void VideoSource::fillSelections(SelectSetting* setting)
     }
 }
 
-void VideoSource::loadByID(int sourceid) 
+void VideoSource::loadByID(int sourceid)
 {
     id->setValue(sourceid);
     Load();
@@ -1079,7 +1079,7 @@ class DVBCardNum : public ComboBoxSetting, public CaptureCardDBStorage
 
         if (sel.isEmpty() && sdevs.size())
             sel = sdevs[0];
- 
+
         QString usestr = QString(" -- ");
         usestr += QObject::tr("Warning: already in use");
 
@@ -1555,7 +1555,7 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
 
     setTrigger(cardtype);
     setSaveAll(false);
-    
+
 #ifdef USING_V4L
     addTarget("V4L",       new V4LConfigurationGroup(parent));
 # ifdef USING_IVTV
@@ -1584,13 +1584,13 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
 #endif // USING_IPTV
 }
 
-void CaptureCardGroup::triggerChanged(const QString& value) 
+void CaptureCardGroup::triggerChanged(const QString& value)
 {
     QString own = (value == "MJPEG" || value == "GO7007") ? "V4L" : value;
     TriggeredConfigurationGroup::triggerChanged(own);
 }
 
-CaptureCard::CaptureCard(bool use_card_group) 
+CaptureCard::CaptureCard(bool use_card_group)
     : id(new ID), instance_count(0)
 {
     addChild(id);
@@ -1599,7 +1599,7 @@ CaptureCard::CaptureCard(bool use_card_group)
     addChild(new Hostname(*this));
 }
 
-void CaptureCard::fillSelections(SelectSetting *setting) 
+void CaptureCard::fillSelections(SelectSetting *setting)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     QString qstr =
@@ -1613,7 +1613,7 @@ void CaptureCard::fillSelections(SelectSetting *setting)
 
     if (!query.exec())
     {
-        MythContext::DBError("CaptureCard::fillSelections", query);
+        MythDB::DBError("CaptureCard::fillSelections", query);
         return;
     }
 
@@ -1634,7 +1634,7 @@ void CaptureCard::fillSelections(SelectSetting *setting)
     }
 }
 
-void CaptureCard::loadByID(int cardid) 
+void CaptureCard::loadByID(int cardid)
 {
     id->setValue(cardid);
     Load();
@@ -1728,7 +1728,7 @@ void CaptureCard::reload(void)
 
 CardType::CardType(const CaptureCard &parent) :
     ComboBoxSetting(this),
-    CaptureCardDBStorage(this, parent, "cardtype") 
+    CaptureCardDBStorage(this, parent, "cardtype")
 {
     setLabel(QObject::tr("Card type"));
     setHelpText(QObject::tr("Change the cardtype to the appropriate type for "
@@ -1913,7 +1913,7 @@ void InputGroup::Load(void)
 
     if (!query.exec())
     {
-        MythContext::DBError("InputGroup::Load()", query);
+        MythDB::DBError("InputGroup::Load()", query);
     }
     else
     {
@@ -1989,14 +1989,14 @@ class RadioServices : public CheckBoxSetting, public CardInputDBStorage
 {
   public:
     RadioServices(const CardInput &parent) :
-        CheckBoxSetting(this), 
+        CheckBoxSetting(this),
         CardInputDBStorage(this, parent, "radioservices")
     {
         setValue(true);
         setLabel(QObject::tr("Allow audio only channels"));
         setHelpText(QObject::tr(
                         "If set, audio only channels will not be ignored "
-                        "by the MythTV channel scanner.")); 
+                        "by the MythTV channel scanner."));
     };
 };
 
@@ -2070,7 +2070,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
     query.bindValue(":INPUTID", getInputID());
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("SetSourceID -- get start chan", query);
+        MythDB::DBError("SetSourceID -- get start chan", query);
     else if (query.next())
         startChan = query.value(0).toString();
 
@@ -2083,7 +2083,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
         return;
     }
 
-    // If there are channels sort them, then add them 
+    // If there are channels sort them, then add theme
     // (selecting the old start channel if it is there).
     QString order = gContext->GetSetting("ChannelOrdering", "channum");
     ChannelUtil::SortChannels(channels, order);
@@ -2114,7 +2114,7 @@ class DishNetEIT : public CheckBoxSetting, public CardInputDBStorage
 {
   public:
     DishNetEIT(const CardInput &parent) :
-        CheckBoxSetting(this), 
+        CheckBoxSetting(this),
         CardInputDBStorage(this, parent, "dishnet_eit")
     {
         setLabel(QObject::tr("Use DishNet Long-term EIT Data"));
@@ -2167,7 +2167,7 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
     if (isDTVcard)
     {
         // we place this in a group just so the margins match the DVB ones.
-        ConfigurationGroup *chgroup = 
+        ConfigurationGroup *chgroup =
             new VerticalConfigurationGroup(false, false, true, true);
         chgroup->addChild(new QuickTune(*this));
         chgroup->addChild(new FreeToAir(*this));
@@ -2176,7 +2176,7 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
 
     if (isDVBcard)
     {
-        ConfigurationGroup *chgroup = 
+        ConfigurationGroup *chgroup =
             new HorizontalConfigurationGroup(false, false, true, true);
         chgroup->addChild(new RadioServices(*this));
         chgroup->addChild(new DishNetEIT(*this));
@@ -2292,7 +2292,7 @@ void CardInput::CreateNewInputGroup(void)
 
         if (!query.exec())
         {
-            MythContext::DBError("CreateNewInputGroup 1", query);
+            MythDB::DBError("CreateNewInputGroup 1", query);
             return;
         }
 
@@ -2348,7 +2348,7 @@ void CardInput::channelScanner(void)
     scanwizard->deleteLater();
 
     if (SourceUtil::GetChannelCount(srcid))
-        startchan->SetSourceID(QString::number(srcid));        
+        startchan->SetSourceID(QString::number(srcid));
     if (num_channels_before)
     {
         startchan->Load();
@@ -2358,7 +2358,7 @@ void CardInput::channelScanner(void)
     VERBOSE(VB_IMPORTANT, "You must compile the backend "
             "to be able to scan for channels");
 #endif
-    
+
 }
 
 void CardInput::sourceFetch(void)
@@ -2387,7 +2387,7 @@ void CardInput::sourceFetch(void)
     }
 
     if (SourceUtil::GetChannelCount(srcid))
-        startchan->SetSourceID(QString::number(srcid));        
+        startchan->SetSourceID(QString::number(srcid));
     if (num_channels_before)
     {
         startchan->Load();
@@ -2395,10 +2395,10 @@ void CardInput::sourceFetch(void)
     }
 }
 
-QString CardInputDBStorage::GetWhereClause(MSqlBindings &bindings) const 
+QString CardInputDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
     QString cardinputidTag(":WHERECARDINPUTID");
-    
+
     QString query("cardinputid = " + cardinputidTag);
 
     bindings.insert(cardinputidTag, parent.getInputID());
@@ -2406,12 +2406,12 @@ QString CardInputDBStorage::GetWhereClause(MSqlBindings &bindings) const
     return query;
 }
 
-QString CardInputDBStorage::GetSetClause(MSqlBindings &bindings) const 
+QString CardInputDBStorage::GetSetClause(MSqlBindings &bindings) const
 {
     QString cardinputidTag(":SETCARDINPUTID");
     QString colTag(":SET" + GetColumnName().upper());
 
-    QString query("cardinputid = " + cardinputidTag + ", " + 
+    QString query("cardinputid = " + cardinputidTag + ", " +
             GetColumnName() + " = " + colTag);
 
     bindings.insert(cardinputidTag, parent.getInputID());
@@ -2420,14 +2420,14 @@ QString CardInputDBStorage::GetSetClause(MSqlBindings &bindings) const
     return query;
 }
 
-void CardInput::loadByID(int inputid) 
+void CardInput::loadByID(int inputid)
 {
     id->setValue(inputid);
     externalInputSettings->Load(inputid);
     ConfigurationWizard::Load();
 }
 
-void CardInput::loadByInput(int _cardid, QString _inputname) 
+void CardInput::loadByInput(int _cardid, QString _inputname)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardinputid FROM cardinput "
@@ -2438,8 +2438,8 @@ void CardInput::loadByInput(int _cardid, QString _inputname)
     if (query.exec() && query.isActive() && query.next())
     {
         loadByID(query.value(0).toInt());
-    } 
-    else 
+    }
+    else
     { // create new input connection
         Load();
         cardid->setValue(QString::number(_cardid));
@@ -2483,12 +2483,12 @@ void CardInput::Save(void)
     CardUtil::UnlinkInputGroup(0,0);
 }
 
-int CardInputDBStorage::getInputID(void) const 
+int CardInputDBStorage::getInputID(void) const
 {
     return parent.getInputID();
 }
 
-int CaptureCardDBStorage::getCardID(void) const 
+int CaptureCardDBStorage::getCardID(void) const
 {
     return parent.getCardID();
 }
@@ -2518,7 +2518,7 @@ void CaptureCardEditor::Load(void)
 }
 
 MythDialog* CaptureCardEditor::dialogWidget(MythMainWindow* parent,
-                                            const char* widgetName) 
+                                            const char* widgetName)
 {
     dialog = ConfigurationDialog::dialogWidget(parent, widgetName);
     connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(menu()));
@@ -2533,8 +2533,8 @@ void CaptureCardEditor::menu(void)
     {
         CaptureCard cc;
         cc.exec();
-    } 
-    else 
+    }
+    else
     {
         DialogCode val = MythPopupBox::Show2ButtonPopup(
             gContext->GetMainWindow(),
@@ -2581,7 +2581,7 @@ void CaptureCardEditor::edit(void)
                     tr("Unable to delete capturecards for %1")
                     .arg(gContext->GetHostName()));
 
-                MythContext::DBError("Selecting cardids for deletion", cards);
+                MythDB::DBError("Selecting cardids for deletion", cards);
                 return;
             }
 
@@ -2635,7 +2635,7 @@ VideoSourceEditor::VideoSourceEditor() : listbox(new ListBoxSetting(this))
 }
 
 MythDialog* VideoSourceEditor::dialogWidget(MythMainWindow* parent,
-                                            const char* widgetName) 
+                                            const char* widgetName)
 {
     dialog = ConfigurationDialog::dialogWidget(parent, widgetName);
     connect(dialog, SIGNAL(menuButtonPressed()), this, SLOT(menu()));
@@ -2666,8 +2666,8 @@ void VideoSourceEditor::menu(void)
     {
         VideoSource vs;
         vs.exec();
-    } 
-    else 
+    }
+    else
     {
         DialogCode val = MythPopupBox::Show2ButtonPopup(
             gContext->GetMainWindow(),
@@ -2711,7 +2711,7 @@ void VideoSourceEditor::edit(void)
     }
 }
 
-void VideoSourceEditor::del() 
+void VideoSourceEditor::del()
 {
     DialogCode val = MythPopupBox::Show2ButtonPopup(
         gContext->GetMainWindow(), "",
@@ -2742,7 +2742,7 @@ DialogCode CardInputEditor::exec(void)
     return kDialogCodeRejected;
 }
 
-void CardInputEditor::Load(void) 
+void CardInputEditor::Load(void)
 {
     cardinputs.clear();
     listbox->clearSelections();
@@ -2761,7 +2761,7 @@ void CardInputEditor::Load(void)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardInputEditor::load", query);
+        MythDB::DBError("CardInputEditor::load", query);
         return;
     }
 
@@ -3007,7 +3007,7 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
 
     addChild(cardnum);
 
-    HorizontalConfigurationGroup *hg0 = 
+    HorizontalConfigurationGroup *hg0 =
         new HorizontalConfigurationGroup(false, false, true, true);
     hg0->addChild(cardname);
     hg0->addChild(cardtype);
@@ -3024,9 +3024,9 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent) :
     buttonDiSEqC->setHelpText(tr("Input and satellite settings."));
 
     TransButtonSetting *buttonRecOpt = new TransButtonSetting();
-    buttonRecOpt->setLabel(tr("Recording Options"));    
+    buttonRecOpt->setLabel(tr("Recording Options"));
 
-    HorizontalConfigurationGroup *advcfg = 
+    HorizontalConfigurationGroup *advcfg =
         new HorizontalConfigurationGroup(false, false, true, true);
     advcfg->addChild(buttonDiSEqC);
     advcfg->addChild(buttonRecOpt);

@@ -1,7 +1,7 @@
 #include "recordingprofile.h"
 #include "cardutil.h"
 #include "libmyth/mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "libmyth/mythwizard.h"
 #include <qsqldatabase.h>
 #include <q3header.h>
@@ -165,7 +165,7 @@ class SampleRate : public ComboBoxSetting, public CodecParamStorage
                             "not in the list of allowed rates.").arg(rate));
         }
     }
-    
+
     vector<uint>    rates;
     QMap<uint,bool> allowed_rate;
 };
@@ -243,7 +243,7 @@ class MPEG2audBitrateL1 : public ComboBoxSetting, public CodecParamStorage
         CodecParamStorage(this, parent, "mpeg2audbitratel1")
     {
         setLabel(QObject::tr("Bitrate"));
-        
+
         addSelection("32 kbps", "32");
         addSelection("64 kbps", "64");
         addSelection("96 kbps", "96");
@@ -271,7 +271,7 @@ class MPEG2audBitrateL2 : public ComboBoxSetting, public CodecParamStorage
         CodecParamStorage(this, parent, "mpeg2audbitratel2")
     {
         setLabel(QObject::tr("Bitrate"));
-        
+
         addSelection("32 kbps", "32");
         addSelection("48 kbps", "48");
         addSelection("56 kbps", "56");
@@ -692,7 +692,7 @@ class MPEG2streamType : public ComboBoxSetting, public CodecParamStorage
         CodecParamStorage(this, parent, "mpeg2streamtype")
     {
         setLabel(QObject::tr("Stream Type"));
-        
+
         addSelection("MPEG-2 PS");
         addSelection("MPEG-2 TS");
         addSelection("MPEG-1 VCD");
@@ -716,7 +716,7 @@ class MPEG2aspectRatio : public ComboBoxSetting, public CodecParamStorage
         CodecParamStorage(this, parent, "mpeg2aspectratio")
     {
         setLabel(QObject::tr("Aspect Ratio"));
-        
+
         addSelection(QObject::tr("Square"), "Square");
         addSelection("4:3");
         addSelection("16:9");
@@ -838,7 +838,7 @@ class VideoCompressionSettings : public TriggeredConfigurationGroup
         params->addChild(new HardwareMJPEGQuality(parent));
         params->addChild(new HardwareMJPEGHDecimation(parent));
         params->addChild(new HardwareMJPEGVDecimation(parent));
- 
+
         addTarget("Hardware MJPEG", params);
 
         params = new VerticalConfigurationGroup(false);
@@ -1183,12 +1183,12 @@ void RecordingProfile::SetLosslessTranscode(bool lossless)
     tr_resize->setEnabled(! lossless);
     wizard->setNextEnabled(wizard->page(0), ! lossless);
     wizard->setFinishEnabled(wizard->page(0), lossless);
-    
+
     if (tr_filters)
         tr_filters->setEnabled(!lossless);
 }
 
-void RecordingProfile::loadByID(int profileId) 
+void RecordingProfile::loadByID(int profileId)
 {
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(
@@ -1200,7 +1200,7 @@ void RecordingProfile::loadByID(int profileId)
 
     QString type = "";
     if (!result.exec())
-        MythContext::DBError("RecordingProfile::loadByID -- cardtype", result);
+        MythDB::DBError("RecordingProfile::loadByID -- cardtype", result);
     else if (result.next())
     {
         type = result.value(0).toString();
@@ -1243,8 +1243,8 @@ void RecordingProfile::FiltersChanged(const QString &val)
 {
     if (!tr_filters || !tr_lossless)
       return;
-   
-    // If there are filters, we can not do lossless transcoding 
+
+    // If there are filters, we can not do lossless transcoding
     if (val.stripWhiteSpace().length() > 0) {
        tr_lossless->setValue(false);
        tr_lossless->setEnabled(false);
@@ -1253,7 +1253,7 @@ void RecordingProfile::FiltersChanged(const QString &val)
     }
 }
 
-bool RecordingProfile::loadByType(QString name, QString cardtype) 
+bool RecordingProfile::loadByType(QString name, QString cardtype)
 {
     QString hostname = gContext->GetHostName();
     int recid = 0;
@@ -1271,7 +1271,7 @@ bool RecordingProfile::loadByType(QString name, QString cardtype)
 
     if (!result.exec() || !result.isActive())
     {
-        MythContext::DBError("RecordingProfile::loadByType()", result);
+        MythDB::DBError("RecordingProfile::loadByType()", result);
         return false;
     }
 
@@ -1293,7 +1293,7 @@ bool RecordingProfile::loadByType(QString name, QString cardtype)
     return false;
 }
 
-bool RecordingProfile::loadByGroup(QString name, QString group) 
+bool RecordingProfile::loadByGroup(QString name, QString group)
 {
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(
@@ -1334,7 +1334,7 @@ DialogCode RecordingProfile::exec(void)
     // Filters should be set last because it might disable lossless
     if (tr_filters)
         FiltersChanged(tr_filters->getValue());
-    
+
     DialogCode ret = dialog->exec();
 
     dialog->deleteLater();
@@ -1342,7 +1342,7 @@ DialogCode RecordingProfile::exec(void)
     return ret;
 }
 
-void RecordingProfileEditor::open(int id) 
+void RecordingProfileEditor::open(int id)
 {
     if (id)
     {
@@ -1381,7 +1381,7 @@ void RecordingProfileEditor::open(int id)
         query.bindValue(":AUDIOCODEC", "MP3");
         query.bindValue(":PROFILEGROUP", group);
         if (!query.exec())
-            MythContext::DBError("RecordingProfileEditor::open", query);
+            MythDB::DBError("RecordingProfileEditor::open", query);
         else
         {
             query.prepare(
@@ -1391,7 +1391,7 @@ void RecordingProfileEditor::open(int id)
             query.bindValue(":NAME", profName);
             query.bindValue(":PROFILEGROUP", group);
             if (!query.exec())
-                MythContext::DBError("RecordingProfileEditor::open", query);
+                MythDB::DBError("RecordingProfileEditor::open", query);
             else
             {
                 if (query.next())
@@ -1444,7 +1444,7 @@ void RecordingProfile::fillSelections(SelectSetting *setting, int group,
 
     if (!result.exec() || !result.isActive())
     {
-        MythContext::DBError("RecordingProfile::fillSelections 1", result);
+        MythDB::DBError("RecordingProfile::fillSelections 1", result);
         return;
     }
     else if (!result.size())
@@ -1506,7 +1506,7 @@ void RecordingProfile::fillSelections(SelectManagedListItem *setting,
 
     if (!result.exec())
     {
-        MythContext::DBError("RecordingProfile::fillSelections 2", result);
+        MythDB::DBError("RecordingProfile::fillSelections 2", result);
         return;
     }
     else if (!result.next())

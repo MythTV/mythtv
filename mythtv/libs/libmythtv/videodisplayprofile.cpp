@@ -2,8 +2,8 @@
 #include <algorithm>
 
 #include "videodisplayprofile.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythdb.h"
 
 bool ProfileItem::IsMatch(const QSize &size, float rate) const
 {
@@ -307,7 +307,7 @@ bool VideoDisplayProfile::IsDecoderCompatible(const QString &decoder)
         return true;
 
     QMutexLocker locker(&safe_lock);
-    return (safe_equiv_dec[dec].contains(decoder));        
+    return (safe_equiv_dec[dec].contains(decoder));
 }
 
 QString VideoDisplayProfile::GetFilteredDeint(const QString &override)
@@ -391,7 +391,7 @@ item_list_t VideoDisplayProfile::LoadDB(uint groupid)
     query.bindValue(":GROUPID", groupid);
     if (!query.exec())
     {
-        MythContext::DBError("loaddb 1", query);
+        MythDB::DBError("loaddb 1", query);
         return list;
     }
 
@@ -439,7 +439,7 @@ bool VideoDisplayProfile::DeleteDB(uint groupid, const item_list_t &items)
         query.bindValue(":PROFILEID", (*it).GetProfileID());
         if (!query.exec())
         {
-            MythContext::DBError("vdp::deletedb", query);
+            MythDB::DBError("vdp::deletedb", query);
             ok = false;
         }
     }
@@ -482,7 +482,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
             // create new profileid
             if (!query.exec("SELECT MAX(profileid) FROM displayprofiles"))
             {
-                MythContext::DBError("save_profile 1", query);
+                MythDB::DBError("save_profile 1", query);
                 ok = false;
                 continue;
             }
@@ -502,7 +502,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 insert.bindValue(":DATA",      (*lit));
                 if (!insert.exec())
                 {
-                    MythContext::DBError("save_profile 2", insert);
+                    MythDB::DBError("save_profile 2", insert);
                     ok = false;
                     continue;
                 }
@@ -521,10 +521,10 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
             query.bindValue(":GROUPID",   groupid);
             query.bindValue(":PROFILEID", (*it).GetProfileID());
             query.bindValue(":VALUE",     lit.key());
-            
+
             if (!query.exec())
             {
-                MythContext::DBError("save_profile 3", query);
+                MythDB::DBError("save_profile 3", query);
                 ok = false;
                 continue;
             }
@@ -536,7 +536,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 update.bindValue(":DATA",      (*lit));
                 if (!update.exec())
                 {
-                    MythContext::DBError("save_profile 5", update);
+                    MythDB::DBError("save_profile 5", update);
                     ok = false;
                     continue;
                 }
@@ -549,7 +549,7 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
                 insert.bindValue(":DATA",      (*lit));
                 if (!insert.exec())
                 {
-                    MythContext::DBError("save_profile 4", insert);
+                    MythDB::DBError("save_profile 4", insert);
                     ok = false;
                     continue;
                 }
@@ -702,7 +702,7 @@ QStringList VideoDisplayProfile::GetProfiles(const QString &hostname)
         "WHERE hostname = :HOST ");
     query.bindValue(":HOST", hostname);
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("get_profiles", query);
+        MythDB::DBError("get_profiles", query);
     else
     {
         while (query.next())
@@ -757,7 +757,7 @@ uint VideoDisplayProfile::GetProfileGroupID(const QString &profilename,
     query.bindValue(":HOST", hostname);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("get_profile_group_id", query);
+        MythDB::DBError("get_profile_group_id", query);
     else if (query.next())
         return query.value(0).toUInt();
 
@@ -774,7 +774,7 @@ void VideoDisplayProfile::DeleteProfiles(const QString &hostname)
         "WHERE hostname = :HOST ");
     query.bindValue(":HOST", hostname);
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("delete_profiles 1", query);
+        MythDB::DBError("delete_profiles 1", query);
     else
     {
         while (query.next())
@@ -783,13 +783,13 @@ void VideoDisplayProfile::DeleteProfiles(const QString &hostname)
                            "WHERE profilegroupid = :PROFID");
             query2.bindValue(":PROFID", query.value(0).toUInt());
             if (!query2.exec())
-                MythContext::DBError("delete_profiles 2", query2);
+                MythDB::DBError("delete_profiles 2", query2);
         }
     }
     query.prepare("DELETE FROM displayprofilegroups WHERE hostname = :HOST");
     query.bindValue(":HOST", hostname);
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("delete_profiles 3", query);
+        MythDB::DBError("delete_profiles 3", query);
 }
 
 //displayprofilegroups pk(name, hostname), uk(profilegroupid)
@@ -811,7 +811,7 @@ void VideoDisplayProfile::CreateProfile(
     // create new profileid
     uint profileid = 1;
     if (!query.exec("SELECT MAX(profileid) FROM displayprofiles"))
-        MythContext::DBError("create_profile 1", query);
+        MythDB::DBError("create_profile 1", query);
     else if (query.next())
         profileid = query.value(0).toUInt() + 1;
 
@@ -822,7 +822,7 @@ void VideoDisplayProfile::CreateProfile(
     query.bindValue(":PROFID",   profileid);
     query.bindValue(":PRIORITY", priority);
     if (!query.exec())
-        MythContext::DBError("create_profile 2", query);
+        MythDB::DBError("create_profile 2", query);
 
     QStringList queryValue;
     QStringList queryData;
@@ -875,7 +875,7 @@ void VideoDisplayProfile::CreateProfile(
         query.bindValue(":VALUE",  *itV);
         query.bindValue(":DATA",   *itD);
         if (!query.exec())
-            MythContext::DBError("create_profile 3", query);
+            MythDB::DBError("create_profile 3", query);
     }
 }
 
@@ -892,7 +892,7 @@ uint VideoDisplayProfile::CreateProfileGroup(
 
     if (!query.exec())
     {
-        MythContext::DBError("create_profile_group", query);
+        MythDB::DBError("create_profile_group", query);
         return 0;
     }
 
@@ -917,7 +917,7 @@ bool VideoDisplayProfile::DeleteProfileGroup(
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("delete_profile_group 1", query);
+        MythDB::DBError("delete_profile_group 1", query);
         ok = false;
     }
     else
@@ -929,7 +929,7 @@ bool VideoDisplayProfile::DeleteProfileGroup(
             query2.bindValue(":PROFID", query.value(0).toUInt());
             if (!query2.exec())
             {
-                MythContext::DBError("delete_profile_group 2", query2);
+                MythDB::DBError("delete_profile_group 2", query2);
                 ok = false;
             }
         }
@@ -945,7 +945,7 @@ bool VideoDisplayProfile::DeleteProfileGroup(
 
     if (!query.exec())
     {
-        MythContext::DBError("delete_profile_group 3", query);
+        MythDB::DBError("delete_profile_group 3", query);
         ok = false;
     }
 
@@ -1297,7 +1297,7 @@ QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
             QObject::tr(
                 "Note: nVidia hardware after the 5xxx series does not "
                 "have XVideo chromakey support.");
-            
+
 
     if (osd == "softblend")
     {

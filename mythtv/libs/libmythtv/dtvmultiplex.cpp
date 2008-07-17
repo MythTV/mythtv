@@ -3,8 +3,8 @@
 
 // MythTV headers
 #include "dtvmultiplex.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 
 #define LOC QString("DTVMux: ")
 #define LOC_ERR QString("DTVMux, Error: ")
@@ -211,7 +211,7 @@ bool DTVMultiplex::ParseTuningParams(
 
     if (DTVTunerType::kTunerTypeATSC == type)
         return ParseATSC(_frequency, _modulation);
-   
+
     return false;
 }
 
@@ -232,7 +232,7 @@ bool DTVMultiplex::FillFromDB(DTVTunerType type, uint mplexid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("DVBTuning::FillFromDB", query);
+        MythDB::DBError("DVBTuning::FillFromDB", query);
         return false;
     }
 
@@ -280,7 +280,7 @@ bool ScanDTVTransport::FillFromDB(DTVTunerType type, uint mplexid)
 
     if (!query.exec())
     {
-        MythContext::DBError("ScanDTVTransport::FillFromDB", query);
+        MythDB::DBError("ScanDTVTransport::FillFromDB", query);
         return false;
     }
 
@@ -350,13 +350,13 @@ uint ScanDTVTransport::SaveScan(uint scanid) const
 
     if (!query.exec())
     {
-        MythContext::DBError("ScanDTVTransport::SaveScan 1", query);
+        MythDB::DBError("ScanDTVTransport::SaveScan 1", query);
         return transportid;
     }
 
     query.prepare("SELECT MAX(transportid) FROM channelscan_dtv_multiplex");
     if (!query.exec())
-        MythContext::DBError("ScanDTVTransport::SaveScan 2", query);
+        MythDB::DBError("ScanDTVTransport::SaveScan 2", query);
     else if (query.next())
         transportid = query.value(0).toUInt();
 

@@ -11,7 +11,7 @@ using namespace std;
 #include <qfile.h>
 
 #include "channelutil.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "dvbtables.h"
 #include "tv.h" // for CHANNEL_DIRECTION
 
@@ -72,7 +72,7 @@ static uint get_dtv_multiplex(int  db_source_id,  QString sistandard,
                               // DVB specific
                               int  transport_id,  int     network_id)
 {
-    QString qstr = 
+    QString qstr =
         "SELECT mplexid "
         "FROM dtv_multiplex "
         "WHERE sourceid     = :SOURCEID   "
@@ -102,7 +102,7 @@ static uint get_dtv_multiplex(int  db_source_id,  QString sistandard,
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("get_dtv_multiplex", query);
+        MythDB::DBError("get_dtv_multiplex", query);
         return 0;
     }
 
@@ -172,7 +172,7 @@ static uint insert_dtv_multiplex(
     updateStr +=
         "WHERE sourceid    = :SOURCEID     AND "
         "      sistandard  = :SISTANDARD   AND ";
-    
+
     updateStr += (isDVB) ?
         " transportid = :TRANSPORTID AND networkid   = :NETWORKID " :
         " frequency = :FREQUENCY ";
@@ -258,7 +258,7 @@ static uint insert_dtv_multiplex(
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Adding transport to Database.", query);
+        MythDB::DBError("Adding transport to Database.", query);
         return 0;
     }
 
@@ -435,8 +435,8 @@ vector<uint> ChannelUtil::CreateMultiplexes(
         return muxes;
 
     for (uint i = 0; i < nit->TransportStreamCount(); ++i)
-    {        
-        const desc_list_t& list = 
+    {
+        const desc_list_t& list =
             MPEGDescriptor::Parse(nit->TransportDescriptors(i),
                                   nit->TransportDescriptorsLength(i));
 
@@ -465,7 +465,7 @@ uint ChannelUtil::GetMplexID(uint sourceid, const QString &channum)
     query.bindValue(":CHANNUM",   channum);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("GetMplexID 0", query);
+        MythDB::DBError("GetMplexID 0", query);
     else if (query.next())
         return query.value(0).toInt();
 
@@ -487,7 +487,7 @@ int ChannelUtil::GetMplexID(uint sourceid, uint frequency)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("GetMplexID 1", query);
+        MythDB::DBError("GetMplexID 1", query);
         return -1;
     }
 
@@ -514,10 +514,10 @@ int ChannelUtil::GetMplexID(uint sourceid,     uint frequency,
     query.bindValue(":NETWORKID",   network_id);
     query.bindValue(":TRANSPORTID", transport_id);
     query.bindValue(":FREQUENCY",   frequency);
-    
+
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("GetMplexID 2", query);
+        MythDB::DBError("GetMplexID 2", query);
         return -1;
     }
 
@@ -545,7 +545,7 @@ int ChannelUtil::GetMplexID(uint sourceid,
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("GetMplexID 3", query);
+        MythDB::DBError("GetMplexID 3", query);
         return -1;
     }
 
@@ -567,7 +567,7 @@ uint ChannelUtil::GetMplexID(uint chanid)
     query.bindValue(":CHANID", chanid);
 
     if (!query.exec())
-        MythContext::DBError("GetMplexID 4", query);
+        MythDB::DBError("GetMplexID 4", query);
     else if (query.next())
         return query.value(0).toInt();
 
@@ -614,7 +614,7 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
                           "WHERE mplexid = %1").arg(current_mplexid));
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("Getting mplexid global search", query);
+        MythDB::DBError("Getting mplexid global search", query);
     else if (query.size())
     {
         query.next();
@@ -641,7 +641,7 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
                       .arg(network_id).arg(transport_id).arg(current_mplexid));
 
         if (!query.exec() || !query.isActive())
-            MythContext::DBError("Getting mplexid global search", query);
+            MythDB::DBError("Getting mplexid global search", query);
 
         VERBOSE(VB_SIPARSER, QString(
                     "GetBetterMplexID(): net id and transport id "
@@ -673,7 +673,7 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
         query.prepare(theQueries[i]);
 
         if (!query.exec() || !query.isActive())
-            MythContext::DBError("Finding matching mplexid", query);
+            MythDB::DBError("Finding matching mplexid", query);
 
         if (query.size() == 1)
         {
@@ -721,7 +721,7 @@ bool ChannelUtil::GetTuningParams(uint      mplexid,
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("GetTuningParams failed ", query);
+        MythDB::DBError("GetTuningParams failed ", query);
         return false;
     }
 
@@ -747,7 +747,7 @@ QString ChannelUtil::GetChannelStringField(int chan_id, const QString &field)
             "WHERE chanid=%2").arg(field).arg(chan_id));
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Selecting channel/dtv_multiplex 1", query);
+        MythDB::DBError("Selecting channel/dtv_multiplex 1", query);
         return QString::null;
     }
     if (!query.size())
@@ -782,7 +782,7 @@ int ChannelUtil::GetSourceID(int db_mplexid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Selecting channel/dtv_multiplex", query);
+        MythDB::DBError("Selecting channel/dtv_multiplex", query);
         return -1;
     }
 
@@ -805,7 +805,7 @@ uint ChannelUtil::GetSourceIDForChannel(uint chanid)
     query.bindValue(":CHANID", chanid);
 
     if (!query.exec())
-        MythContext::DBError("Selecting channel/dtv_multiplex", query);
+        MythDB::DBError("Selecting channel/dtv_multiplex", query);
     else if (query.next())
         return query.value(0).toUInt();
 
@@ -855,7 +855,7 @@ QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
     query.bindValue(":CHANNUM",  channum);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("getchannelvalue", query);
+        MythDB::DBError("getchannelvalue", query);
     else if (query.next())
         retval = query.value(0).toString();
 
@@ -882,7 +882,7 @@ QString ChannelUtil::GetChannelValueStr(const QString &channel_field,
     query.bindValue(":CHANNUM",  channum);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("getchannelvalue", query);
+        MythDB::DBError("getchannelvalue", query);
     else if (query.next())
         retval = query.value(0).toString();
 
@@ -964,7 +964,7 @@ vector<uint> ChannelUtil::GetConflicting(const QString &channum, uint sourceid)
     query.bindValue(":CHANNUM",  channum);
     if (!query.exec())
     {
-        MythContext::DBError("IsConflicting", query);
+        MythDB::DBError("IsConflicting", query);
         conflicting.push_back(0);
         return conflicting;
     }
@@ -1012,7 +1012,7 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
     query.bindValue(":MPLEXID", mplexid);
     if (!query.exec())
     {
-        MythContext::DBError("Selecting channel/dtv_multiplex 2", query);
+        MythDB::DBError("Selecting channel/dtv_multiplex 2", query);
         return -1;
     }
     if (!query.next())
@@ -1054,7 +1054,7 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
     {
         query.prepare(qstr[i]);
         if (!query.exec())
-            MythContext::DBError("Selecting channel/dtv_multiplex 3", query);
+            MythDB::DBError("Selecting channel/dtv_multiplex 3", query);
         else if (query.next())
             return query.value(0).toInt();
     }
@@ -1074,7 +1074,7 @@ uint ChannelUtil::FindChannel(uint sourceid, const QString &freqid)
     query.bindValue(":FREQID",   freqid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("FindChannel", query);
+        MythDB::DBError("FindChannel", query);
     else if (query.next())
         return query.value(0).toUInt();
 
@@ -1094,7 +1094,7 @@ static uint get_max_chanid(uint sourceid)
         query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("Getting chanid for new channel (2)", query);
+        MythDB::DBError("Getting chanid for new channel (2)", query);
     else if (!query.next())
         VERBOSE(VB_IMPORTANT, "Error getting chanid for new channel.");
     else
@@ -1113,7 +1113,7 @@ static bool chanid_available(uint chanid)
     query.bindValue(":CHANID", chanid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("is_chan_id_available", query);
+        MythDB::DBError("is_chan_id_available", query);
     else if (query.size() == 0)
         return true;
 
@@ -1146,7 +1146,7 @@ int ChannelUtil::CreateChanID(uint sourceid, const QString &chan_num)
 
     // try to at least base it on the sourceid for human readability
     chanid = max(get_max_chanid(sourceid) + 1, sourceid * 1000);
-    
+
     if (chanid_available(chanid))
         return chanid;
 
@@ -1238,7 +1238,7 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Adding Service", query);
+        MythDB::DBError("Adding Service", query);
         return false;
     }
     return true;
@@ -1320,7 +1320,7 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
 
     if (!query.exec())
     {
-        MythContext::DBError("Updating Service", query);
+        MythDB::DBError("Updating Service", query);
         return false;
     }
     return true;
@@ -1337,7 +1337,7 @@ bool ChannelUtil::SetServiceVersion(int mplexid, int version)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Selecting channel/dtv_multiplex", query);
+        MythDB::DBError("Selecting channel/dtv_multiplex", query);
         return false;
     }
     return true;
@@ -1353,7 +1353,7 @@ int ChannelUtil::GetServiceVersion(int mplexid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Selecting channel/dtv_multiplex", query);
+        MythDB::DBError("Selecting channel/dtv_multiplex", query);
         return false;
     }
 
@@ -1364,7 +1364,7 @@ int ChannelUtil::GetServiceVersion(int mplexid)
     }
     return -1;
 }
-                   
+
 bool ChannelUtil::GetATSCChannel(uint sourceid, const QString &channum,
                                  uint &major,   uint          &minor)
 {
@@ -1381,7 +1381,7 @@ bool ChannelUtil::GetATSCChannel(uint sourceid, const QString &channum,
     query.bindValue(":CHANNUM",  channum);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("getatscchannel", query);
+        MythDB::DBError("getatscchannel", query);
     else if (query.next())
     {
         major = query.value(0).toUInt();
@@ -1426,7 +1426,7 @@ bool ChannelUtil::GetChannelData(
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("GetChannelData", query);
+        MythDB::DBError("GetChannelData", query);
         return false;
     }
     else if (!query.next())
@@ -1470,7 +1470,7 @@ bool ChannelUtil::GetChannelSettings(int chanid, bool &useonairguide,
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("GetChannelSettings", query);
+        MythDB::DBError("GetChannelSettings", query);
         return false;
     }
     else if (!query.next())
@@ -1496,7 +1496,7 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp)
         "SELECT chanid, favid "
         "FROM favorites");
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("get channels -- favorites", query);
+        MythDB::DBError("get channels -- favorites", query);
     else
     {
         while (query.next())
@@ -1525,7 +1525,7 @@ DBChanList ChannelUtil::GetChannels(uint sourceid, bool vis_only, QString grp)
     query.prepare(qstr);
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("get channels -- sourceid", query);
+        MythDB::DBError("get channels -- sourceid", query);
         return list;
     }
 
@@ -1618,7 +1618,7 @@ inline bool lt_smart(const DBChannel &a, const DBChannel &b)
         int b_maj = (!b_minor && isIntB) ? b_int : b_major;
         if ((cmp = a_maj - b_maj))
             return cmp < 0;
-        
+
         if ((cmp = a_minor - b_minor))
             return cmp < 0;
     }

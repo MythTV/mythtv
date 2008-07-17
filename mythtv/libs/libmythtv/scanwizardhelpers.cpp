@@ -36,6 +36,7 @@
 
 // MythTV headers
 #include "mythcontext.h"
+#include "libmythdb/mythdb.h"
 #include "frequencies.h"
 #include "videosource.h"
 #include "cardutil.h"
@@ -337,7 +338,7 @@ void InputSelector::Load(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("InputSelector::Load()", query);
+        MythDB::DBError("InputSelector::Load()", query);
         return;
     }
 

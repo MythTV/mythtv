@@ -6,8 +6,8 @@
 
 // MythTV headers
 #include "dbchannelinfo.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythdb.h"
 
 DBChannel::DBChannel(const DBChannel &other)
 {
@@ -184,7 +184,7 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
 
     if (!query.exec())
     {
-        MythContext::DBError("ChannelInsertInfo SaveScan 1", query);
+        MythDB::DBError("ChannelInsertInfo SaveScan 1", query);
         return false;
     }
 
@@ -215,7 +215,7 @@ ChannelInsertInfo::ChannelInsertInfo(
     source_id(_source_id),
     channel_id(_channel_id),
     callsign(Q3DeepCopy<QString>(_callsign)),
-    service_name(Q3DeepCopy<QString>(_service_name)), 
+    service_name(Q3DeepCopy<QString>(_service_name)),
     chan_num(Q3DeepCopy<QString>(_chan_num)),
     service_id(_service_id),
     atsc_major_channel(_atsc_major_channel),

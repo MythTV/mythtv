@@ -8,7 +8,7 @@
 #include "sr_root.h"
 #include "sr_dialog.h"
 #include "jobqueue.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "viewschdiff.h"
 
 #include <qlayout.h>
@@ -181,7 +181,7 @@ void ScheduledRecording::loadBySearch(RecSearchType lsearch,
             rid = query.value(0).toInt();
     }
     else
-        MythContext::DBError("loadBySearch", query);
+        MythDB::DBError("loadBySearch", query);
 
     if (rid)
         loadByID(rid);
@@ -488,7 +488,7 @@ void ScheduledRecording::save(bool sendSig)
         query.bindValue(":RECORDID", getRecordID());
 
         if (!query.exec())
-            MythContext::DBError("UPDATE recorded", query);
+            MythDB::DBError("UPDATE recorded", query);
     }
     if (sendSig)
         signalChange(getRecordID());
@@ -981,7 +981,7 @@ ScheduledRecording::testRecording()
             QString("DB Error (Obtaining lock in testRecording): \n"
                     "Query was: %1 \nError was: %2 \n")
             .arg(thequery)
-            .arg(MythContext::DBErrorMessage(query.lastError()));
+            .arg(MythDB::DBErrorMessage(query.lastError()));
         VERBOSE(VB_IMPORTANT, msg);
         return;
     }
@@ -996,7 +996,7 @@ ScheduledRecording::testRecording()
             QString("DB Error (deleting old table in testRecording): \n"
                     "Query was: %1 \nError was: %2 \n")
             .arg(thequery)
-            .arg(MythContext::DBErrorMessage(query.lastError()));
+            .arg(MythDB::DBErrorMessage(query.lastError()));
         VERBOSE(VB_IMPORTANT, msg);
         return;
     }
@@ -1010,7 +1010,7 @@ ScheduledRecording::testRecording()
             QString("DB Error (create new table): \n"
                     "Query was: %1 \nError was: %2 \n")
             .arg(thequery)
-            .arg(MythContext::DBErrorMessage(query.lastError()));
+            .arg(MythDB::DBErrorMessage(query.lastError()));
         VERBOSE(VB_IMPORTANT, msg);
         return;
     }
@@ -1041,7 +1041,7 @@ ScheduledRecording::testRecording()
             QString("DB Error (free lock): \n"
                     "Query was: %1 \nError was: %2 \n")
             .arg(thequery)
-            .arg(MythContext::DBErrorMessage(query.lastError()));
+            .arg(MythDB::DBErrorMessage(query.lastError()));
         VERBOSE(VB_IMPORTANT, msg);
         return;
     }

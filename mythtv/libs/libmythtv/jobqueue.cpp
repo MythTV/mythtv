@@ -20,11 +20,11 @@ using namespace std;
 #include "libmyth/mythcontext.h"
 #include "libmyth/util.h"
 #include "NuppelVideoPlayer.h"
-#include "mythdbcon.h"
 #include "previewgenerator.h"
 #include "compat.h"
 
-#include "mythdirs.h"
+#include "libmythdb/mythdb.h"
+#include "libmythdb/mythdirs.h"
 
 #define LOC     QString("JobQueue: ")
 #define LOC_ERR QString("JobQueue Error: ")
@@ -53,7 +53,7 @@ JobQueue::JobQueue(bool master)
 
 JobQueue::~JobQueue(void)
 {
-    pthread_cancel(queueThread);    
+    pthread_cancel(queueThread);
     pthread_join(queueThread, NULL);
 
     gContext->removeListener(this);
@@ -76,7 +76,7 @@ void JobQueue::customEvent(QEvent *e)
             int jobType = JOB_UNKNOWN;
             int jobID = -1;
             QString chanid;
-            
+
             QDateTime starttime;
             QString detectionHost = "";
 
@@ -191,7 +191,7 @@ void JobQueue::ProcessQueue(void)
         jobStatus.clear();
 
         GetJobsInQueue(jobs);
-        
+
         if (jobs.size())
         {
             inTimeWindow = InJobRunWindow();
@@ -321,15 +321,15 @@ void JobQueue::ProcessQueue(void)
                                           .arg(JobText(type))
                                           .arg(chanid).arg(startts);
                         VERBOSE(VB_JOBQUEUE, LOC + message);
-    
+
                         controlFlagsLock.lock();
                         if (jobControlFlags.contains(key))
                             *(jobControlFlags[key]) = JOB_STOP;
                         controlFlagsLock.unlock();
-    
+
                         // ChangeJobCmds(m_db, id, JOB_RUN);
                         continue;
-                    
+
                     // if we're trying to stop a job and it's still queued
                     //  then let's just change the status to cancelled so
                     //  we don't try to run it from the queue
@@ -341,7 +341,7 @@ void JobQueue::ProcessQueue(void)
                         VERBOSE(VB_JOBQUEUE, LOC + message);
 
                         // at the bottom of this loop we requeue any jobs that
-                        //  are not currently queued and also not associated 
+                        //  are not currently queued and also not associated
                         //  with a hostname so we must claim this job before we
                         //  can cancel it
                         if (!ChangeJobHost(id, m_hostname))
@@ -494,7 +494,7 @@ bool JobQueue::QueueRecordingJobs(ProgramInfo *pinfo, int jobTypes)
     return true;
 }
 
-bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime, 
+bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
                         QString args, QString comment, QString host,
                         int flags, int status, QDateTime schedruntime)
 {
@@ -504,7 +504,7 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
 
     if(!schedruntime.isValid())
         schedruntime = QDateTime::currentDateTime();
-    
+
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT status, id, cmds FROM jobqueue "
@@ -518,7 +518,7 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
 
     if (!query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::QueueJob()", query);
+        MythDB::DBError("Error in JobQueue::QueueJob()", query);
         return false;
     }
     else
@@ -568,14 +568,14 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
 
     if (!query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::StartJob()", query);
+        MythDB::DBError("Error in JobQueue::StartJob()", query);
         return false;
     }
 
     return true;
 }
 
-bool JobQueue::QueueJobs(int jobTypes, QString chanid, QDateTime starttime, 
+bool JobQueue::QueueJobs(int jobTypes, QString chanid, QDateTime starttime,
                          QString args, QString comment, QString host)
 {
     if (gContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0))
@@ -632,7 +632,7 @@ int JobQueue::GetJobID(int jobType, QString chanid, QDateTime starttime)
 
     if (!query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::GetJobID()", query);
+        MythDB::DBError("Error in JobQueue::GetJobID()", query);
         return -1;
     }
     else
@@ -644,7 +644,7 @@ int JobQueue::GetJobID(int jobType, QString chanid, QDateTime starttime)
     return -1;
 }
 
-bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid, 
+bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid,
                                 QDateTime &starttime)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -655,10 +655,10 @@ bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid,
     query.bindValue(":ID", jobID);
 
     query.exec();
-    
+
     if (!query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::GetJobID()", query);
+        MythDB::DBError("Error in JobQueue::GetJobID()", query);
         return false;
     }
     else
@@ -675,7 +675,7 @@ bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid,
     return false;
 }
 
-bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid, 
+bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid,
                                 QString &starttime)
 {
     QDateTime tmpStarttime;
@@ -741,7 +741,7 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
     query.exec();
 
     if (!query.isActive())
-        MythContext::DBError("Cancel Pending Jobs", query);
+        MythDB::DBError("Cancel Pending Jobs", query);
 
     query.prepare("UPDATE jobqueue SET cmds = :CMD "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME "
@@ -753,7 +753,7 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
 
     if (!query.exec())
     {
-        MythContext::DBError("Stop Unfinished Jobs", query);
+        MythDB::DBError("Stop Unfinished Jobs", query);
         return false;
     }
 
@@ -779,7 +779,7 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
 
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("Stop Unfinished Jobs", query);
+            MythDB::DBError("Stop Unfinished Jobs", query);
             return false;
         }
 
@@ -810,7 +810,7 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
         query.exec();
 
         if (!query.isActive())
-            MythContext::DBError("Delete All Jobs", query);
+            MythDB::DBError("Delete All Jobs", query);
     }
     else
     {
@@ -824,12 +824,12 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
 
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("Error in JobQueue::DeleteAllJobs(), Unable "
-                                 "to query list of Jobs left in Queue.", query);
+            MythDB::DBError("Error in JobQueue::DeleteAllJobs(), Unable "
+                            "to query list of Jobs left in Queue.", query);
             return 0;
         }
 
-        VERBOSE(VB_IMPORTANT, LOC_ERR + 
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString( "In DeleteAllJobs: There are Jobs "
                          "left in the JobQueue that are still running for "
                          "chanid %1 @ %2.").arg(chanid)
@@ -864,10 +864,10 @@ bool JobQueue::DeleteJob(int jobID)
     query.bindValue(":ID", jobID);
 
     query.exec();
-    
+
     if (!query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::DeleteJob()", query);
+        MythDB::DBError("Error in JobQueue::DeleteJob()", query);
         return false;
     }
 
@@ -890,7 +890,7 @@ bool JobQueue::ChangeJobCmds(int jobID, int newCmds)
 
     if (!query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::ChangeJobCmds()", query);
+        MythDB::DBError("Error in JobQueue::ChangeJobCmds()", query);
         return false;
     }
 
@@ -914,7 +914,7 @@ bool JobQueue::ChangeJobCmds(int jobType, QString chanid,
 
     if (!query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::ChangeJobCmds()", query);
+        MythDB::DBError("Error in JobQueue::ChangeJobCmds()", query);
         return false;
     }
 
@@ -937,7 +937,7 @@ bool JobQueue::ChangeJobFlags(int jobID, int newFlags)
 
     if (!query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::ChangeJobFlags()", query);
+        MythDB::DBError("Error in JobQueue::ChangeJobFlags()", query);
         return false;
     }
 
@@ -965,7 +965,7 @@ bool JobQueue::ChangeJobStatus(int jobID, int newStatus, QString comment)
 
     if (!query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::ChangeJobStatus()", query);
+        MythDB::DBError("Error in JobQueue::ChangeJobStatus()", query);
         return false;
     }
 
@@ -992,7 +992,7 @@ bool JobQueue::ChangeJobComment(int jobID, QString comment)
 
     if (!query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::ChangeJobComment()", query);
+        MythDB::DBError("Error in JobQueue::ChangeJobComment()", query);
         return false;
     }
 
@@ -1016,7 +1016,7 @@ bool JobQueue::ChangeJobArgs(int jobID, QString args)
 
     if (!query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::ChangeJobArgs()", query);
+        MythDB::DBError("Error in JobQueue::ChangeJobArgs()", query);
         return false;
     }
 
@@ -1136,7 +1136,7 @@ bool JobQueue::InJobRunWindow(int orStartsWithinMins)
         VERBOSE(VB_IMPORTANT, "Invalid JobQueueWindowEnd time, using 23:59");
         queueEndTime = QTime(23, 59);
     }
-    
+
     if ((queueStartTime <= curTime) && (curTime < queueEndTime))
     {
         inTimeWindow = true;
@@ -1188,7 +1188,7 @@ bool JobQueue::HasRunningOrPendingJobs(int startingWithinMins)
     QMap<int, JobQueueEntry>::Iterator it;
     QDateTime maxSchedRunTime = QDateTime::currentDateTime();
     int tmpStatus = 0;
-    bool checkForQueuedJobs = (startingWithinMins <= 0 
+    bool checkForQueuedJobs = (startingWithinMins <= 0
                                 || InJobRunWindow(startingWithinMins));
 
     if (checkForQueuedJobs && startingWithinMins > 0) {
@@ -1209,18 +1209,18 @@ bool JobQueue::HasRunningOrPendingJobs(int startingWithinMins)
                         QString("HasRunningOrPendingJobs: found running job"));
                 return true;
             }
-            
+
             if (checkForQueuedJobs) {
                 if ((tmpStatus != JOB_UNKNOWN) && (!(tmpStatus & JOB_DONE))) {
                     if (startingWithinMins <= 0) {
                         VERBOSE(VB_JOBQUEUE, LOC +
-                            QString("HasRunningOrPendingJobs: " 
+                            QString("HasRunningOrPendingJobs: "
                                     "found pending job"));
                         return true;
                     }
                     else if (it.data().schedruntime <= maxSchedRunTime) {
                         VERBOSE(VB_JOBQUEUE, LOC +
-                            QString("HasRunningOrPendingJobs: found pending " 
+                            QString("HasRunningOrPendingJobs: found pending "
                                     "job scheduled to start at: %1")
                                     .arg(it.data().schedruntime.toString()));
                         return true;
@@ -1253,8 +1253,8 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Error in JobQueue::GetJobs(), Unable to "
-                             "query list of Jobs in Queue.", query);
+        MythDB::DBError("Error in JobQueue::GetJobs(), Unable to "
+                        "query list of Jobs in Queue.", query);
         return 0;
     }
 
@@ -1262,7 +1262,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
             QString("GetJobsInQueue: findJobs search bitmask %1, "
                     "found %2 total jobs")
                     .arg(findJobs).arg(query.size()));
-                         
+
     while (query.next())
     {
         bool wantThisJob = false;
@@ -1334,7 +1334,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
             thisJob.type = JOB_NONE;
             VERBOSE(VB_JOBQUEUE, LOC +
                     QString("GetJobsInQueue: Unknown Job Type: %1")
-                    .arg(thisJob.type)); 
+                    .arg(thisJob.type));
         }
 
         if (thisJob.type != JOB_NONE)
@@ -1366,10 +1366,10 @@ bool JobQueue::ChangeJobHost(int jobID, QString newHostname)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError(QString("Error in JobQueue::ChangeJobHost(), "
-                                     "Unable to set hostname to '%1' for "
-                                     "job %2.").arg(newHostname).arg(jobID),
-                             query);
+        MythDB::DBError(QString("Error in JobQueue::ChangeJobHost(), "
+                                "Unable to set hostname to '%1' for "
+                                "job %2.").arg(newHostname).arg(jobID),
+                        query);
         return false;
     }
 
@@ -1427,7 +1427,7 @@ enum JobCmds JobQueue::GetJobCmd(int jobID)
     }
     else
     {
-        MythContext::DBError("Error in JobQueue::GetJobCmd()", query);
+        MythDB::DBError("Error in JobQueue::GetJobCmd()", query);
     }
 
     return JOB_RUN;
@@ -1450,7 +1450,7 @@ QString JobQueue::GetJobArgs(int jobID)
     }
     else
     {
-        MythContext::DBError("Error in JobQueue::GetJobArgs()", query);
+        MythDB::DBError("Error in JobQueue::GetJobArgs()", query);
     }
 
     return QString("");
@@ -1473,7 +1473,7 @@ enum JobFlags JobQueue::GetJobFlags(int jobID)
     }
     else
     {
-        MythContext::DBError("Error in JobQueue::GetJobFlags()", query);
+        MythDB::DBError("Error in JobQueue::GetJobFlags()", query);
     }
 
     return JOB_NO_FLAGS;
@@ -1496,7 +1496,7 @@ enum JobStatus JobQueue::GetJobStatus(int jobID)
     }
     else
     {
-        MythContext::DBError("Error in JobQueue::GetJobStatus()", query);
+        MythDB::DBError("Error in JobQueue::GetJobStatus()", query);
     }
     return JOB_UNKNOWN;
 }
@@ -1505,7 +1505,7 @@ enum JobStatus JobQueue::GetJobStatus(int jobType, QString chanid,
     QDateTime startts)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    
+
     query.prepare("SELECT status FROM jobqueue WHERE type = :TYPE "
                   "AND chanid = :CHANID AND starttime = :STARTTIME;");
 
@@ -1522,7 +1522,7 @@ enum JobStatus JobQueue::GetJobStatus(int jobType, QString chanid,
     }
     else
     {
-        MythContext::DBError("Error in JobQueue::GetJobStatus()", query);
+        MythDB::DBError("Error in JobQueue::GetJobStatus()", query);
     }
     return JOB_UNKNOWN;
 }
@@ -1537,7 +1537,7 @@ void JobQueue::RecoverQueue(bool justOld)
     VERBOSE(VB_JOBQUEUE, LOC + msg);
 
     GetJobsInQueue(jobs);
-        
+
     if (jobs.size())
     {
         QMap<int, JobQueueEntry>::Iterator it;
@@ -1567,7 +1567,7 @@ void JobQueue::RecoverQueue(bool justOld)
                               .arg(it.data().startts)
                               .arg(StatusText(it.data().status));
                 VERBOSE(VB_JOBQUEUE, LOC + msg);
-                        
+
                 ChangeJobStatus(it.data().id, JOB_QUEUED, "");
                 ChangeJobCmds(it.data().id, JOB_RUN);
                 if (!gContext->GetNumSetting("JobsRunOnRecordHost", 0))
@@ -1581,7 +1581,7 @@ void JobQueue::RecoverQueue(bool justOld)
                               .arg(it.data().chanid)
                               .arg(it.data().startts)
                               .arg(StatusText(it.data().status));
-                        
+
                 // VERBOSE(VB_JOBQUEUE, LOC + msg);
             }
         }
@@ -1608,8 +1608,8 @@ void JobQueue::CleanupOldJobsInQueue()
 
     if (!delquery.exec() || !delquery.isActive())
     {
-        MythContext::DBError("JobQueue::CleanupOldJobsInQueue: Error deleting "
-                             "old finished jobs.", delquery);
+        MythDB::DBError("JobQueue::CleanupOldJobsInQueue: Error deleting "
+                        "old finished jobs.", delquery);
     }
 }
 
@@ -1645,7 +1645,7 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
     }
 
     controlFlagsLock.lock();
-    
+
     ChangeJobStatus(id, JOB_STARTING);
     runningJobTypes[key] = jobType;
     runningJobIDs[key] = id;
@@ -1724,7 +1724,7 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
         command = gContext->GetSetting("JobQueueTranscodeCommand");
         if (command.stripWhiteSpace().isEmpty())
             command = "mythtranscode";
-            
+
         if (command == "mythtranscode")
             return command;
     }
@@ -1733,7 +1733,7 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
         command = gContext->GetSetting("JobQueueCommFlagCommand");
         if (command.stripWhiteSpace().isEmpty())
             command = "mythcommflag";
-            
+
         if (command == "mythcommflag")
             return command;
     }
@@ -1847,7 +1847,7 @@ void JobQueue::DoTranscodeThread(void)
     int controlTranscoding = JOB_RUN;
     QString subtitle = program_info->subtitle.isEmpty() ? "" :
                            QString(" \"%1\"").arg(program_info->subtitle);
-    
+
     QString key = GetJobQueueKey(program_info);
     int jobID = runningJobIDs[key];
 
@@ -1947,7 +1947,7 @@ void JobQueue::DoTranscodeThread(void)
 
         int result = myth_system(command);
         int status = GetJobStatus(jobID);
- 
+
         if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
             (result == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
         {
@@ -2083,7 +2083,7 @@ void JobQueue::DoFlagCommercialsThread(void)
                           .arg(subtitle)
                           .arg(program_info->chanid)
                           .arg(program_info->recstartts.toString());
-    
+
     QString key = GetJobQueueKey(program_info);
     int jobID = runningJobIDs[key];
 

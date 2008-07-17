@@ -6,11 +6,12 @@ using namespace std;
 
 #include "remoteencoder.h"
 #include "programinfo.h"
-#include "util.h"
-#include "mythcontext.h"
+#include "libmyth/util.h"
+#include "libmyth/mythcontext.h"
 #include "signalmonitor.h"
 #include "videooutbase.h"
-#include "mythsocket.h"
+#include "libmythdb/mythdb.h"
+#include "libmythdb/mythsocket.h"
 
 RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
     : recordernum(num),       controlSock(NULL),      remotehost(host),
@@ -425,7 +426,7 @@ uint RemoteEncoder::GetSignalLockTimeout(QString input)
     query.bindValue(":INNAME", input);
     query.bindValue(":CARDID", cardid);
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("Getting timeout", query);
+        MythDB::DBError("Getting timeout", query);
     else if (query.next() &&
              SignalMonitor::IsRequired(query.value(1).toString()))
         timeout = max(query.value(0).toInt(), 500);

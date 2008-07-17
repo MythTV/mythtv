@@ -19,6 +19,7 @@
 #include "mythdbcon.h"
 #include "dvbchannel.h"
 #include "diseqcsettings.h"
+#include "libmythdb/mythdb.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"
@@ -47,7 +48,7 @@ bool CardUtil::IsTunerShared(uint cardidA, uint cardidB)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::is_tuner_shared", query);
+        MythDB::DBError("CardUtil::is_tuner_shared", query);
         return false;
     }
 
@@ -103,7 +104,7 @@ bool CardUtil::IsCardTypePresent(const QString &rawtype, QString hostname)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::IsCardTypePresent", query);
+        MythDB::DBError("CardUtil::IsCardTypePresent", query);
         return false;
     }
 
@@ -125,7 +126,7 @@ QStringList CardUtil::GetCardTypes(void)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::GetCardTypes()", query);
+        MythDB::DBError("CardUtil::GetCardTypes()", query);
     }
     else
     {
@@ -166,7 +167,7 @@ QStringVec CardUtil::GetVideoDevices(const QString &rawtype, QString hostname)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::GetVideoDevices", query);
+        MythDB::DBError("CardUtil::GetVideoDevices", query);
         return list;
     }
 
@@ -347,7 +348,7 @@ QString get_on_cardid(const QString &to_get, uint cardid)
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec())
-        MythContext::DBError("CardUtil::get_on_source", query);
+        MythDB::DBError("CardUtil::get_on_source", query);
     else if (query.next())
         return query.value(0).toString();
 
@@ -376,7 +377,7 @@ bool set_on_source(const QString &to_set, uint cardid, uint sourceid,
     if (query.exec())
         return true;
 
-    MythContext::DBError("CardUtil::set_on_source", query);
+    MythDB::DBError("CardUtil::set_on_source", query);
     return false;
 }
 
@@ -426,7 +427,7 @@ vector<uint> CardUtil::GetCardIDs(QString videodevice,
         query.bindValue(":CARDTYPE", rawtype.upper());
 
     if (!query.exec())
-        MythContext::DBError("CardUtil::GetCardIDs(videodevice...)", query);
+        MythDB::DBError("CardUtil::GetCardIDs(videodevice...)", query);
     else
     {
         while (query.next())
@@ -449,7 +450,7 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
 
         if (!query.exec())
         {
-            MythContext::DBError("clone_capturecard -- delete temp", query);
+            MythDB::DBError("clone_capturecard -- delete temp", query);
             return 0;
         }
 
@@ -459,7 +460,7 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
 
         if (!query.exec())
         {
-            MythContext::DBError("clone_capturecard -- insert temp", query);
+            MythDB::DBError("clone_capturecard -- insert temp", query);
             return 0;
         }
 
@@ -470,7 +471,7 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
 
         if (!query.exec())
         {
-            MythContext::DBError("clone_capturecard -- get temp id", query);
+            MythDB::DBError("clone_capturecard -- get temp id", query);
             return 0;
         }
 
@@ -494,7 +495,7 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
 
     if (!query.exec())
     {
-        MythContext::DBError("clone_capturecard -- get data", query);
+        MythDB::DBError("clone_capturecard -- get data", query);
         return 0;
     }
     if (!query.next())
@@ -525,7 +526,7 @@ static uint clone_capturecard(uint src_cardid, uint orig_dst_cardid)
 
     if (!query2.exec())
     {
-        MythContext::DBError("clone_capturecard -- save data", query2);
+        MythDB::DBError("clone_capturecard -- save data", query2);
         if (!orig_dst_cardid)
             CardUtil::DeleteCard(dst_cardid);
         return 0;
@@ -565,7 +566,7 @@ bool clone_cardinputs(uint src_cardid, uint dst_cardid)
         query.bindValue(":INPUTID", src_inputs[i]);
         if (!query.exec())
         {
-            MythContext::DBError("clone_cardinput -- get data", query);
+            MythDB::DBError("clone_cardinput -- get data", query);
             ok = false;
             break;
         }
@@ -616,7 +617,7 @@ bool clone_cardinputs(uint src_cardid, uint dst_cardid)
 
             if (!query2.exec())
             {
-                MythContext::DBError("clone_cardinput -- update data", query2);
+                MythDB::DBError("clone_cardinput -- update data", query2);
                 ok = false;
                 break;
             }
@@ -651,7 +652,7 @@ bool clone_cardinputs(uint src_cardid, uint dst_cardid)
 
             if (!query2.exec())
             {
-                MythContext::DBError("clone_cardinput -- insert data", query2);
+                MythDB::DBError("clone_cardinput -- insert data", query2);
                 ok = false;
                 break;
             }
@@ -665,7 +666,7 @@ bool clone_cardinputs(uint src_cardid, uint dst_cardid)
             query2.bindValue(":NAME", query.value(1).toString());
             if (!query2.exec())
             {
-                MythContext::DBError("clone_cardinput -- "
+                MythDB::DBError("clone_cardinput -- "
                                      "insert, query inputid", query2);
                 ok = false;
                 break;
@@ -735,7 +736,7 @@ vector<uint> CardUtil::GetCloneCardIDs(uint cardid)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::GetCloneCardIDs() 1", query);
+        MythDB::DBError("CardUtil::GetCloneCardIDs() 1", query);
         return list;
     }
 
@@ -763,7 +764,7 @@ vector<uint> CardUtil::GetCloneCardIDs(uint cardid)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::GetCloneCardIDs() 2", query);
+        MythDB::DBError("CardUtil::GetCloneCardIDs() 2", query);
         return list;
     }
     
@@ -787,7 +788,7 @@ vector<uint> CardUtil::GetCardIDs(uint sourceid)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::GetCardIDs()", query);
+        MythDB::DBError("CardUtil::GetCardIDs()", query);
         return list;
     }
 
@@ -812,7 +813,7 @@ QString CardUtil::GetDefaultInput(uint nCardID)
     query.bindValue(":CARDID", nCardID);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::GetDefaultInput()", query);
+        MythDB::DBError("CardUtil::GetDefaultInput()", query);
     else if (query.next())
         str = query.value(0).toString();
 
@@ -842,7 +843,7 @@ QStringList CardUtil::GetInputNames(uint cardid, uint sourceid)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::GetInputNames()", query);
+        MythDB::DBError("CardUtil::GetInputNames()", query);
     }
     else
     {
@@ -866,7 +867,7 @@ bool CardUtil::GetInputInfo(InputInfo &input, vector<uint> *groupids)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::GetInputInfo()", query);
+        MythDB::DBError("CardUtil::GetInputInfo()", query);
         return false;
     }
 
@@ -906,7 +907,7 @@ QString CardUtil::GetDisplayName(uint inputid)
     query.bindValue(":INPUTID", inputid);
 
     if (!query.exec())
-        MythContext::DBError("CardUtil::GetDisplayName(uint)", query);
+        MythDB::DBError("CardUtil::GetDisplayName(uint)", query);
     else if (query.next())
         return query.value(0).toString();
 
@@ -924,7 +925,7 @@ uint CardUtil::GetInputID(uint cardid, const QString &inputname)
     query.bindValue(":CARDID",    cardid);
 
     if (!query.exec())
-        MythContext::DBError("CardUtil::GetInputID(uint,QString)", query);
+        MythDB::DBError("CardUtil::GetInputID(uint,QString)", query);
     else if (query.next())
         return query.value(0).toUInt();
 
@@ -940,7 +941,7 @@ uint CardUtil::GetSourceID(uint inputid)
         "WHERE cardinputid = :INPUTID");
     query.bindValue(":INPUTID", inputid);
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::GetSourceID()", query);
+        MythDB::DBError("CardUtil::GetSourceID()", query);
     else if (query.next())
         return query.value(0).toUInt();
 
@@ -961,7 +962,7 @@ vector<uint> CardUtil::GetInputIDs(uint cardid)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::GetInputIDs(uint)", query);
+        MythDB::DBError("CardUtil::GetInputIDs(uint)", query);
         return list;
     }
 
@@ -981,7 +982,7 @@ bool CardUtil::DeleteInput(uint inputid)
 
     if (!query.exec())
     {
-        MythContext::DBError("DeleteInput", query);
+        MythDB::DBError("DeleteInput", query);
         return false;
     }
 
@@ -998,7 +999,7 @@ bool CardUtil::DeleteOrphanInputs(void)
                   "WHERE capturecard.cardid IS NULL");
     if (!query.exec())
     {
-        MythContext::DBError("DeleteOrphanInputs -- query disconnects", query);
+        MythDB::DBError("DeleteOrphanInputs -- query disconnects", query);
         return false;
     }
 
@@ -1029,7 +1030,7 @@ uint CardUtil::CreateInputGroup(const QString &name)
     query.prepare("SELECT MAX(inputgroupid) FROM inputgroup");
     if (!query.exec())
     {
-        MythContext::DBError("CreateNewInputGroup 1", query);
+        MythDB::DBError("CreateNewInputGroup 1", query);
         return 0;
     }
     uint inputgroupid = (query.next()) ? query.value(0).toUInt() + 1 : 1;
@@ -1045,7 +1046,7 @@ uint CardUtil::CreateInputGroup(const QString &name)
 
     if (!query.exec())
     {
-        MythContext::DBError("CreateNewInputGroup 2", query);
+        MythDB::DBError("CreateNewInputGroup 2", query);
         return 0;
     }
 
@@ -1102,7 +1103,7 @@ bool CardUtil::LinkInputGroup(uint inputid, uint inputgroupid)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::CreateInputGroup() 1", query);
+        MythDB::DBError("CardUtil::CreateInputGroup() 1", query);
         return false;
     }
 
@@ -1122,7 +1123,7 @@ bool CardUtil::LinkInputGroup(uint inputid, uint inputgroupid)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::CreateInputGroup() 2", query);
+        MythDB::DBError("CardUtil::CreateInputGroup() 2", query);
         return false;
     }
 
@@ -1152,7 +1153,7 @@ bool CardUtil::UnlinkInputGroup(uint inputid, uint inputgroupid)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::DeleteInputGroup()", query);
+        MythDB::DBError("CardUtil::DeleteInputGroup()", query);
         return false;
     }
 
@@ -1175,7 +1176,7 @@ vector<uint> CardUtil::GetInputGroups(uint inputid)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::GetInputGroups()", query);
+        MythDB::DBError("CardUtil::GetInputGroups()", query);
         return list;
     }
 
@@ -1226,7 +1227,7 @@ vector<uint> CardUtil::GetGroupCardIDs(uint inputgroupid)
 
     if (!query.exec())
     {
-        MythContext::DBError("CardUtil::GetGroupCardIDs()", query);
+        MythDB::DBError("CardUtil::GetGroupCardIDs()", query);
         return list;
     }
 
@@ -1279,7 +1280,7 @@ bool CardUtil::GetTimeouts(uint cardid,
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::GetTimeouts()", query);
+        MythDB::DBError("CardUtil::GetTimeouts()", query);
     else if (query.next())
     {
         signal_timeout  = (uint) max(query.value(0).toInt(), 250);
@@ -1303,7 +1304,7 @@ bool CardUtil::IgnoreEncrypted(uint cardid, const QString &input_name)
     query.bindValue(":INPUTNAME", input_name);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::IgnoreEncrypted()", query);
+        MythDB::DBError("CardUtil::IgnoreEncrypted()", query);
     else if (query.next())
         freetoair = query.value(0).toBool();
 
@@ -1324,7 +1325,7 @@ bool CardUtil::TVOnly(uint cardid, const QString &input_name)
     query.bindValue(":INPUTNAME", input_name);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::TVOnly()", query);
+        MythDB::DBError("CardUtil::TVOnly()", query);
     else if (query.next())
         radioservices = query.value(0).toBool();
 
@@ -1357,7 +1358,7 @@ uint CardUtil::GetQuickTuning(uint cardid, const QString &input_name)
     query.bindValue(":INPUTNAME", input_name);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::GetQuickTuning()", query);
+        MythDB::DBError("CardUtil::GetQuickTuning()", query);
     else if (query.next())
         quicktune = query.value(0).toUInt();
 
@@ -1484,7 +1485,7 @@ InputNames CardUtil::GetConfiguredDVBInputs(uint cardid)
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("CardUtil::GetConfiguredDVBInputs", query);
+        MythDB::DBError("CardUtil::GetConfiguredDVBInputs", query);
     else
     {
         while (query.next())
@@ -1709,7 +1710,7 @@ bool CardUtil::DeleteCard(uint cardid)
 
         if (!query.exec())
         {
-            MythContext::DBError("DeleteCard -- find clone cards", query);
+            MythDB::DBError("DeleteCard -- find clone cards", query);
             return false;
         }
 
@@ -1734,7 +1735,7 @@ bool CardUtil::DeleteCard(uint cardid)
 
     if (!query.exec())
     {
-        MythContext::DBError("DeleteCard -- delete row", query);
+        MythDB::DBError("DeleteCard -- delete row", query);
         ok = false;
     }
 
@@ -1769,7 +1770,7 @@ vector<uint> CardUtil::GetCardList(void)
         "ORDER BY cardid");
 
     if (!query.exec())
-        MythContext::DBError("CardUtil::GetCardList()", query);
+        MythDB::DBError("CardUtil::GetCardList()", query);
     else
     {
         while (query.next())

@@ -9,8 +9,8 @@
 #include <q3deepcopy.h>
 
 // MythTV headers
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 #include "iptvchannelfetcher.h"
 #include "iptvfeederwrapper.h"
 
@@ -161,7 +161,7 @@ IPTVChannelInfo IPTVChannel::GetChanInfo(
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("fetching chaninfo", query);
+        MythDB::DBError("fetching chaninfo", query);
         VERBOSE(VB_IMPORTANT, msg);
         return dummy;
     }

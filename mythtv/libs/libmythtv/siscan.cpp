@@ -12,7 +12,7 @@
 #include "siscan.h"
 #include "scheduledrecording.h"
 #include "frequencies.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "channelutil.h"
 #include "cardutil.h"
 
@@ -49,8 +49,8 @@ QString SIScan::loc(const SIScan *siscan)
  *   this class. The SIParser is being phased out, so that is not
  *   described here.
  *
- *   With ScanStreamData, we call ScanTransport() on each transport 
- *   and frequency offset in the list of transports. This list is 
+ *   With ScanStreamData, we call ScanTransport() on each transport
+ *   and frequency offset in the list of transports. This list is
  *   created from a FrequencyTable object.
  *
  *   Each ScanTransport() call resets the ScanStreamData and the
@@ -67,14 +67,14 @@ QString SIScan::loc(const SIScan *siscan)
  *   if so we check if we at least got a PAT and if so we insert
  *    a channel based on that by calling HandleMPEGDBInsertion().
  *
- *   Meanwhile the ScanStreamData() emits several signals. For 
+ *   Meanwhile the ScanStreamData() emits several signals. For
  *   the UI it emits signal quality signals. For SIScan it emits
  *   UpdateMGT, UpdateVCT, UpdateNIT, and UpdateSDT signals. We
  *   connect these to the HandleMGT, HandleVCT, etc. These in
  *   turn just call HandleATSCDBInsertion() or
  *   HandleDVBDBInsertion() depending on the type of table.
  *
- *   HandleATSCDBInsertion() first checks if we have all the VCTs 
+ *   HandleATSCDBInsertion() first checks if we have all the VCTs
  *   described in the MGT. If we do we call UpdateVCTinDB() for each
  *   TVCT and CVCT in the stream. UpdateVCTinDB() inserts the actual
  *   channels. Then we set "waitingForTables" to false, set the
@@ -232,7 +232,7 @@ bool SIScan::ScanServicesSourceID(int SourceID)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Get Transports for SourceID", query);
+        MythDB::DBError("Get Transports for SourceID", query);
         return false;
     }
 
@@ -471,7 +471,7 @@ void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd,
     {
         emit PctServiceScanComplete(100);
         emit ServiceScanComplete();
-    }    
+    }
 }
 
 /** \fn SIScan::HandlePostInsertion(void)
@@ -603,7 +603,7 @@ bool SIScan::HasTimedOut(void)
 
     // have the tables have timed out?
     if (timer.elapsed() > (int)channelTimeout)
-    { 
+    {
         QString offset_str = current.offset() ?
             QObject::tr(" offset %2").arg(current.offset()) : "";
         QString cur_chan = QString("%1%2")
@@ -720,7 +720,7 @@ void SIScan::ScanTransport(const transport_scan_items_it_t transport)
 
     const TransportScanItem &item = *transport;
 
-    if (transport.offset() && 
+    if (transport.offset() &&
         (item.freq_offset(transport.offset()) == item.freq_offset(0)))
     {
         waitingForTables = false;
@@ -795,7 +795,7 @@ bool SIScan::ScanTransports(int SourceID,
     freq_table_list_t tables =
         get_matching_freq_tables(std, modulation, country);
 
-    VERBOSE(VB_SIPARSER, LOC + 
+    VERBOSE(VB_SIPARSER, LOC +
             QString("Looked up freq table (%1, %2, %3) w/%4 entries")
             .arg(std).arg(modulation).arg(country).arg(tables.size()));
 
@@ -904,7 +904,7 @@ bool SIScan::ScanTransportsStartingOn(int sourceid,
 
     DTVTunerType type;
 
-    if (std == "dvb") 
+    if (std == "dvb")
     {
         ok = type.Parse(mod);
     }
@@ -963,7 +963,7 @@ bool SIScan::ScanTransport(int mplexid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Get Transports for SourceID", query);
+        MythDB::DBError("Get Transports for SourceID", query);
         return false;
     }
 
@@ -982,7 +982,7 @@ bool SIScan::ScanTransport(int mplexid)
 
         QString fn = (tsid) ? QString("Transport ID %1").arg(tsid) :
             QString("Multiplex #%1").arg(queriedMplexid);
-        
+
         VERBOSE(VB_SIPARSER, LOC + "Adding " + fn);
 
         TransportScanItem item(
@@ -1074,7 +1074,7 @@ void SIScan::UpdatePMTinDB(
         chan_num = QString("%1#%2")
             .arg((freqid) ? freqid : db_mplexid).arg(pmt_indx);
     }
-        
+
     QString callsign = ChannelUtil::GetCallsign(chanid);
     QString service_name = ChannelUtil::GetServiceName(chanid);
 
@@ -1254,7 +1254,7 @@ void SIScan::UpdatePATinDB(
             UpdatePMTinDB(db_source_id, db_mplexid, friendlyName, freqid,
                           i, *vit, channels, force_update);
         }
-    }    
+    }
 }
 
 void SIScan::UpdateVCTinDB(int db_mplexid,
@@ -1286,13 +1286,13 @@ void SIScan::UpdateVCTinDB(int db_mplexid,
         if (vct->ServiceType(i) == 0x04 && ignoreDataServices)
         {
             IgnoreEmptyChanMsg(basic_status_info, vct->ProgramNumber(i));
-            continue;            
+            continue;
         }
 
         if (vct->ServiceType(i) == 0x03 && ignoreAudioOnlyServices)
         {
             IgnoreAudioOnlyMsg(basic_status_info, vct->ProgramNumber(i));
-            continue;            
+            continue;
         }
 
         if (vct->IsAccessControlled(i) && ignoreEncryptedServices)
@@ -1524,7 +1524,7 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
                 chan_num = ChannelUtil::GetChanNum(chanid);
             else
                 useeit = (sdt->HasEITSchedule(i) ||
-                            sdt->HasEITPresentFollowing(i) || 
+                            sdt->HasEITPresentFollowing(i) ||
                             force_guide_present);
 
             ChannelUtil::UpdateChannel(
@@ -1535,7 +1535,7 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
                 service_name,
                 chan_num,
                 sdt->ServiceID(i),
-                0, 0, 
+                0, 0,
                 useeit,
                 hidden, false, QString::null,
                 QString::null, QString::null, QString::null,

@@ -6,12 +6,13 @@
 using namespace std;
 
 #include "dbcheck.h"
-
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "datadirect.h" // for DataDirectProcessor::FixProgramIDs
-#include "dbutil.h"
+#include "datadirect.h"          // for DataDirectProcessor::FixProgramIDs
 #include "videodisplayprofile.h" // for "1214"
+
+#include "libmyth/dbutil.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythdb.h"
+
 
 #define MINIMUM_DBMS_VERSION 5
 
@@ -364,7 +365,7 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
             QString("DB Error (Deleting old DB version number): \n"
                     "Query was: %1 \nError was: %2 \nnew version: %3")
             .arg(thequery)
-            .arg(MythContext::DBErrorMessage(query.lastError()))
+            .arg(MythDB::DBErrorMessage(query.lastError()))
             .arg(newnumber);
         VERBOSE(VB_IMPORTANT, msg);
         return false;
@@ -382,7 +383,7 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
             QString("DB Error (Setting new DB version number): \n"
                     "Query was: %1 \nError was: %2 \nnew version: %3")
             .arg(thequery)
-            .arg(MythContext::DBErrorMessage(query.lastError()))
+            .arg(MythDB::DBErrorMessage(query.lastError()))
             .arg(newnumber);
         VERBOSE(VB_IMPORTANT, msg);
         return false;
@@ -420,7 +421,7 @@ static bool performActualUpdate(
                 QString("DB Error (Performing database upgrade): \n"
                         "Query was: %1 \nError was: %2 \nnew version: %3")
                 .arg(thequery)
-                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg(version);
             VERBOSE(VB_IMPORTANT, msg);
             return false;
@@ -448,7 +449,7 @@ bool lockSchema(MSqlQuery &query)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("ERROR: Unable to create schemalock table: %1")
-                        .arg(MythContext::DBErrorMessage(query.lastError())));
+                        .arg(MythDB::DBErrorMessage(query.lastError())));
         return false;
     }
 
@@ -456,7 +457,7 @@ bool lockSchema(MSqlQuery &query)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("ERROR: Unable to acquire database upgrade lock")
-                        .arg(MythContext::DBErrorMessage(query.lastError())));
+                        .arg(MythDB::DBErrorMessage(query.lastError())));
         return false;
     }
 
@@ -518,7 +519,7 @@ int CompareTVDatabaseSchemaVersion(void)
  *   If the program running this function is killed while
  *   this is running then the schema may be corrupted.
  *
- *  \return true on success, false on failure.
+ *  \return false on failure, error, or if the user selected "Exit."
  */
 bool UpgradeTVDatabaseSchema(void)
 {
@@ -568,10 +569,11 @@ bool UpgradeTVDatabaseSchema(void)
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;").arg(gContext->GetDatabaseParams().dbName));
+    query.exec(QString("ALTER DATABASE %1 DEFAULT"
+                       " CHARACTER SET utf8 COLLATE utf8_general_ci;")
+               .arg(gContext->GetDatabaseParams().dbName));
 
-    VERBOSE(VB_IMPORTANT, QString("Newest Schema Version : %1")
-                                  .arg(currentDatabaseVersion));
+    VERBOSE(VB_IMPORTANT, "Newest Schema Version : " + currentDatabaseVersion);
 
     if (!lockSchema(query))
         return false;
@@ -2823,7 +2825,7 @@ NULL
                 QString("DB Error (Performing database upgrade): \n"
                         "Query was: %1 \nError was: %2 \nnew version: %3")
                 .arg(thequery)
-                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg("1170");
             VERBOSE(VB_IMPORTANT, msg);
             return false;
@@ -2944,7 +2946,7 @@ NULL
                 QString("DB Error (Performing database upgrade): \n"
                         "Query was: %1 \nError was: %2 \nnew version: %3")
                 .arg(thequery)
-                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg("1176");
             VERBOSE(VB_IMPORTANT, msg);
             return false;
@@ -3334,7 +3336,7 @@ NULL
                 QString("DB Error (Performing database upgrade): \n"
                         "Query was: %1 \nError was: %2 \nnew version: %3")
                 .arg(thequery)
-                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg("1198");
             VERBOSE(VB_IMPORTANT, msg);
             return false;
@@ -4313,7 +4315,7 @@ NULL
 
         if (!query.exec())
         {
-            MythContext::DBError(
+            MythDB::DBError(
                 "Could not perform select for update to '1222'", query);
             ok = false;
         }
@@ -4338,7 +4340,7 @@ NULL
                 query2.bindValue(":CARDID",   query.value(0).toUInt());
                 if (!query2.exec())
                 {
-                    MythContext::DBError(
+                    MythDB::DBError(
                         "Could not perform update for '1222'", query2);
                     ok = false;
                 }

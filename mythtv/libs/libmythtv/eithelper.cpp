@@ -16,7 +16,7 @@ using namespace std;
 #include "eithelper.h"
 #include "eitfixup.h"
 #include "eitcache.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "atsctables.h"
 #include "dvbtables.h"
 #include "premieretables.h"
@@ -314,7 +314,7 @@ void EITHelper::AddEIT(const DVBEventInformationTable *eit)
     fix |= fixup[(eit->OriginalNetworkID() << 16) | eit->ServiceID()];
     fix |= fixup[(((uint64_t)eit->TSID()) << 32) |
                  (uint64_t)(eit->OriginalNetworkID() << 16) |
-		 (uint64_t)eit->ServiceID()];
+                  (uint64_t)eit->ServiceID()];
     fix |= EITFixUp::kFixGenericDVB;
 
     uint chanid = GetChanID(eit->ServiceID(), eit->OriginalNetworkID(),
@@ -631,7 +631,7 @@ static uint get_chan_id_from_db(uint sourceid,
     query.bindValue(":SOURCEID",  sourceid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("Looking up chanid 1", query);
+        MythDB::DBError("Looking up chanid 1", query);
     else if (query.next())
     {
         bool useOnAirGuide = query.value(1).toBool();
@@ -668,7 +668,7 @@ static uint get_chan_id_from_db(uint sourceid, uint serviceid,
         query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("Looking up chanID", query);
+        MythDB::DBError("Looking up chanID", query);
     else if (query.next())
     {
         // Check to see if we are interested in this channel
@@ -755,7 +755,7 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     // Mark Premiere HD and Discovery HD as HDTV
     fix[   6LL << 32 |  133 << 16 | 129] = EITFixUp::kFixHDTV;
     fix[   6LL << 32 |  133 << 16 | 130] = EITFixUp::kFixHDTV;
-    
+
     // Netherlands
     fix[ 1000U << 16] = EITFixUp::kFixNL;
 

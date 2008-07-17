@@ -9,8 +9,7 @@
 #include "settings.h"
 #include "mythwidgets.h"
 #include "mythwizard.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 
 class ChannelID : public IntegerSetting, public TransientStorage
 {
@@ -34,13 +33,13 @@ class ChannelID : public IntegerSetting, public TransientStorage
             setValue(findHighest());
 
             MSqlQuery query(MSqlQuery::InitCon());
-            
+
             QString querystr = QString("SELECT %1 FROM %2 WHERE %3='%4'")
                              .arg(field).arg(table).arg(field).arg(getValue());
             query.prepare(querystr);
 
             if (!query.exec() && !query.isActive())
-                MythContext::DBError("ChannelID::save", query);
+                MythDB::DBError("ChannelID::save", query);
 
             if (query.size())
                 return;
@@ -50,7 +49,7 @@ class ChannelID : public IntegerSetting, public TransientStorage
             query.prepare(querystr);
 
             if (!query.exec() || !query.isActive())
-                MythContext::DBError("ChannelID::save", query);
+                MythDB::DBError("ChannelID::save", query);
 
             if (query.numRowsAffected() != 1)
                 cerr << "ChannelID:Failed to insert into: " << (const char *)table << endl;
@@ -65,14 +64,14 @@ class ChannelID : public IntegerSetting, public TransientStorage
     {
         int tmpfloor = floor;
         MSqlQuery query(MSqlQuery::InitCon());
-        
+
         QString querystr = QString("SELECT %1 FROM %2")
                                 .arg(field).arg(table);
         query.prepare(querystr);
 
-        if (!query.exec() || !query.isActive()) 
+        if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("finding highest id", query);
+            MythDB::DBError("finding highest id", query);
             return floor;
         }
 

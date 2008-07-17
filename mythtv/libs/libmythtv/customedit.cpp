@@ -21,13 +21,13 @@ using namespace std;
 
 #include "customedit.h"
 
-#include "mythcontext.h"
-#include "dialogbox.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/dialogbox.h"
 #include "programinfo.h"
 #include "proglist.h"
 #include "scheduledrecording.h"
 #include "recordingtypes.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 
 CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
                        ProgramInfo *pginfo)
@@ -99,7 +99,7 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
         }
     }
     else
-        MythContext::DBError("Get power search rules query", result);
+        MythDB::DBError("Get power search rules query", result);
 
     hbox->addWidget(m_rule);
 
@@ -646,7 +646,7 @@ void CustomEdit::storeClicked(void)
         query.bindValue(":SEARCH", ret == sebtn);
 
         if (!query.exec())
-            MythContext::DBError("Store custom example", query);
+            MythDB::DBError("Store custom example", query);
         else if (nameExists)
         {
             // replace item
@@ -680,7 +680,7 @@ void CustomEdit::storeClicked(void)
         query.bindValue(":RULE", m_clause->currentText().remove(seSuffix)
                                                         .remove(exSuffix));
         if (!query.exec())
-            MythContext::DBError("Delete custom example", query);
+            MythDB::DBError("Delete custom example", query);
         else
         {
             // remove item

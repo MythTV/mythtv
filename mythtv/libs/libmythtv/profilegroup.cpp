@@ -2,7 +2,7 @@
 #include "videosource.h"
 #include "profilegroup.h"
 #include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "mythuihelper.h"
 #include "cardutil.h"
 #include <qsqldatabase.h>
@@ -29,7 +29,7 @@ QString ProfileGroupStorage::GetSetClause(MSqlBindings &bindings) const
     QString idTag(":SETID");
     QString colTag(":SET" + GetColumnName().upper());
 
-    QString query("id = " + idTag + ", " + 
+    QString query("id = " + idTag + ", " +
             GetColumnName() + " = " + colTag);
 
     bindings.insert(idTag, parent.getProfileNum());
@@ -82,7 +82,7 @@ void ProfileGroup::fillSelections(SelectSetting* setting)
 
     if (!result.exec())
     {
-        MythContext::DBError("ProfileGroup::fillSelections", result);
+        MythDB::DBError("ProfileGroup::fillSelections", result);
         return;
     }
 
@@ -189,7 +189,7 @@ void ProfileGroupEditor::open(int id) {
             profilegroup->Save();
             profileID = profilegroup->getProfileNum();
             Q3ValueList <int> found;
-            
+
             MSqlQuery result(MSqlQuery::InitCon());
             QString querystr = QString("SELECT name FROM recordingprofiles WHERE "
                                     "profilegroup = %1").arg(profileID);
@@ -236,7 +236,7 @@ void ProfileGroupEditor::open(int id) {
     delete profilegroup;
 };
 
-void ProfileGroupEditor::Load(void) 
+void ProfileGroupEditor::Load(void)
 {
     listbox->clearSelections();
     ProfileGroup::fillSelections(listbox);
@@ -283,28 +283,28 @@ DialogCode ProfileGroupEditor::exec(void)
 void ProfileGroupEditor::callDelete(void)
 {
     int id = listbox->getValue().toInt();
-    
+
     MSqlQuery result(MSqlQuery::InitCon());
     QString querystr = QString("SELECT id FROM profilegroups WHERE "
                             "id = %1 AND is_default = 0;").arg(id);
     result.prepare(querystr);
-    
+
     if (result.exec() && result.isActive() && result.size() > 0)
     {
         result.next();
-        QString message = QObject::tr("Delete profile group:") + 
+        QString message = QObject::tr("Delete profile group:") +
                           QString("\n'%1'?").arg(ProfileGroup::getName(id));
 
         DialogCode value = MythPopupBox::Show2ButtonPopup(
             gContext->GetMainWindow(),
-            "", message, 
+            "", message,
             QObject::tr("Yes, delete group"),
             QObject::tr("No, Don't delete group"), kDialogCodeButton1);
 
         if (kDialogCodeButton0 == value)
         {
             querystr = QString("DELETE codecparams FROM codecparams, "
-                            "recordingprofiles WHERE " 
+                            "recordingprofiles WHERE "
                             "codecparams.profile = recordingprofiles.id "
                             "AND recordingprofiles.profilegroup = %1").arg(id);
             result.prepare(querystr);

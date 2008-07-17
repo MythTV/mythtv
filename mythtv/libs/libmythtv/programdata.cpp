@@ -1,6 +1,6 @@
 // MythTV headers
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 #include "programinfo.h"
 #include "programdata.h"
 
@@ -27,7 +27,7 @@ static bool conflict(ProgInfo &a, ProgInfo &b)
     return false;
 }
 
-void ProgramData::clearDataByChannel(int chanid, QDateTime from, QDateTime to) 
+void ProgramData::clearDataByChannel(int chanid, QDateTime from, QDateTime to)
 {
     int secs;
     QDateTime newFrom, newTo;
@@ -39,7 +39,7 @@ void ProgramData::clearDataByChannel(int chanid, QDateTime from, QDateTime to)
     query.exec();
     if (!query.isActive() || query.size() != 1)
     {
-        MythContext::DBError("clearDataByChannel", query);
+        MythDB::DBError("clearDataByChannel", query);
         return;
     }
     query.next();
@@ -82,7 +82,7 @@ void ProgramData::clearDataByChannel(int chanid, QDateTime from, QDateTime to)
     query.exec();
 }
 
-void ProgramData::clearDataBySource(int sourceid, QDateTime from, QDateTime to) 
+void ProgramData::clearDataBySource(int sourceid, QDateTime from, QDateTime to)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid FROM channel WHERE "
@@ -90,8 +90,8 @@ void ProgramData::clearDataBySource(int sourceid, QDateTime from, QDateTime to)
     query.bindValue(":SOURCE", sourceid);
 
     if (!query.exec())
-        MythContext::DBError("Selecting channels per source", query);
-        
+        MythDB::DBError("Selecting channels per source", query);
+
     if (query.isActive() && query.size() > 0)
     {
         while (query.next())
@@ -108,7 +108,7 @@ void ProgramData::fixProgramList(QList<ProgInfo> *fixlist)
 
     QList<ProgInfo>::iterator i = fixlist->begin();
     QList<ProgInfo>::iterator cur;
-    while (1)    
+    while (1)
     {
         cur = i;
         i++;
@@ -197,7 +197,7 @@ void ProgramData::handlePrograms(
         int chanid = 0;
 
         chanQuery.prepare("SELECT chanid FROM channel WHERE sourceid = :ID AND "
-                          "xmltvid = :XMLTVID;"); 
+                          "xmltvid = :XMLTVID;");
         chanQuery.bindValue(":ID", id);
         chanQuery.bindValue(":XMLTVID", mapiter.key());
 
@@ -325,7 +325,7 @@ void ProgramData::handlePrograms(
                     subquery.bindValue(":CHANID", chanid);
                     subquery.bindValue(":START", (*i).start);
                     subquery.bindValue(":END", (*i).end);
- 
+
                     subquery.exec();
 
                     subquery.prepare("DELETE FROM credits WHERE "
@@ -382,7 +382,7 @@ void ProgramData::handlePrograms(
                 query.bindValue(":SYNDICATEDEPISODENUMBER", (*i).syndicatedepisodenumber);
                 query.bindValue(":PROGRAMID", (*i).programid);
                 if (!query.exec())
-                    MythContext::DBError("program insert", query);
+                    MythDB::DBError("program insert", query);
 
                 updated++;
 
@@ -398,7 +398,7 @@ void ProgramData::handlePrograms(
                     query.bindValue(":RATING", (*j).rating);
 
                     if (!query.exec())
-                        MythContext::DBError("programrating insert", query);
+                        MythDB::DBError("programrating insert", query);
                 }
 
                 QList<ProgCredit>::iterator k = (*i).credits.begin();
@@ -408,7 +408,7 @@ void ProgramData::handlePrograms(
                                   "name = :NAME;");
                     query.bindValue(":NAME", (*k).name);
                     if (!query.exec())
-                        MythContext::DBError("person lookup", query);
+                        MythDB::DBError("person lookup", query);
 
                     int personid = -1;
                     if (query.isActive() && query.size() > 0)
@@ -423,13 +423,13 @@ void ProgramData::handlePrograms(
                                       "(:NAME);");
                         query.bindValue(":NAME", (*k).name);
                         if (!query.exec())
-                            MythContext::DBError("person insert", query);
+                            MythDB::DBError("person insert", query);
 
                         query.prepare("SELECT person FROM people WHERE "
                                       "name = :NAME;");
                         query.bindValue(":NAME", (*k).name);
                         if (!query.exec())
-                            MythContext::DBError("person lookup", query);
+                            MythDB::DBError("person lookup", query);
 
                         if (query.isActive() && query.size() > 0)
                         {
@@ -466,7 +466,7 @@ void ProgramData::handlePrograms(
                         query.bindValue(":PERSON", personid);
 
                         if (!query.exec())
-                            MythContext::DBError("credits update", query);
+                            MythDB::DBError("credits update", query);
                     }
                 }
             }
@@ -528,7 +528,7 @@ int ProgramData::fix_end_times(void)
                                .arg(chanid)
                                .arg(starttime);
 
-            if (!query2.exec(querystr)) 
+            if (!query2.exec(querystr))
             {
                 VERBOSE(VB_IMPORTANT,
                        QString("fix_end_times query failed: %1").arg(querystr));

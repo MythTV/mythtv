@@ -37,7 +37,7 @@ using namespace std;
 #include "videosource.h"
 #include "cardutil.h"
 #include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 
 #define LOC QString("DTVMux: ")
 #define LOC_ERR QString("DTVMux, Error: ")
@@ -107,7 +107,7 @@ void TransportList::fillSelections(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("TransportList::fillSelections", query);
+        MythDB::DBError("TransportList::fillSelections", query);
         return;
     }
 
@@ -164,7 +164,7 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("TransportWizard()", query);
+        MythDB::DBError("TransportWizard()", query);
         return CardUtil::ERROR_PROBE;
     }
     else
@@ -325,13 +325,13 @@ void TransportListEditor::Delete(void)
     query.bindValue(":MPLEXID", mplexid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("TransportEditor -- delete multiplex", query);
+        MythDB::DBError("TransportEditor -- delete multiplex", query);
 
     query.prepare("DELETE FROM channel WHERE mplexid = :MPLEXID");
     query.bindValue(":MPLEXID", mplexid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("TransportEditor -- delete channels", query);
+        MythDB::DBError("TransportEditor -- delete channels", query);
 
     m_list->fillSelections();
 }

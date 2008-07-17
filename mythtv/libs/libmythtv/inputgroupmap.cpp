@@ -20,8 +20,7 @@
 #include <algorithm>
 
 #include "inputgroupmap.h"
-#include "mythdbcon.h"
-#include "mythcontext.h"
+#include "libmythdb/mythdb.h"
 
 bool InputGroupMap::Build(void)
 {
@@ -32,7 +31,7 @@ bool InputGroupMap::Build(void)
     query.prepare("SELECT cardinputid, inputgroupid from inputgroup");
     if (!query.exec())
     {
-        MythContext::DBError("InputGroupMap::Build 1", query);
+        MythDB::DBError("InputGroupMap::Build 1", query);
         ok = false;
     }
     else
@@ -48,7 +47,7 @@ bool InputGroupMap::Build(void)
     query.prepare("SELECT cardinputid, cardid from cardinput");
     if (!query.exec())
     {
-        MythContext::DBError("InputGroupMap::Build 2", query);
+        MythDB::DBError("InputGroupMap::Build 2", query);
         ok = false;
     }
     else

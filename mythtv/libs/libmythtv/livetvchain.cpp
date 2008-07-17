@@ -1,6 +1,6 @@
 #include "livetvchain.h"
 #include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "programinfo.h"
 #include "mythsocket.h"
 
@@ -82,7 +82,7 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
     query.bindValue(":INPUT", inputname);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("Chain: AppendNewProgram", query);
+        MythDB::DBError("Chain: AppendNewProgram", query);
     else
         VERBOSE(VB_RECORD, QString("Chain: Appended@%3 '%1_%2'")
                 .arg(newent.chanid)
@@ -105,7 +105,7 @@ void LiveTVChain::FinishedRecording(ProgramInfo *pginfo)
     query.bindValue(":START", pginfo->recstartts);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("Chain: FinishedRecording", query);
+        MythDB::DBError("Chain: FinishedRecording", query);
     else
         VERBOSE(VB_RECORD, QString("Chain: Updated endtime for '%1_%2' to %3")
                 .arg(pginfo->chanid)

@@ -9,8 +9,8 @@
 #include <qdatetime.h>
 
 #include "eitcache.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythdb.h"
 
 #define LOC QString("EITCache: ")
 
@@ -101,7 +101,7 @@ static void replace_in_db(int chanid, uint eventid, uint64_t sig)
     query.bindValue(":ENDTIME",  extract_endtime(sig));
 
     if (!query.exec())
-        MythContext::DBError("Error updating eitcache", query);
+        MythDB::DBError("Error updating eitcache", query);
 
     return;
 }
@@ -119,7 +119,7 @@ static void delete_in_db(uint endtime)
     query.bindValue(":ENDTIME", endtime);
 
     if (!query.exec())
-        MythContext::DBError("Error deleting old eitcache entries.", query);
+        MythDB::DBError("Error deleting old eitcache entries.", query);
 
     return;
 }
@@ -146,7 +146,7 @@ static bool lock_channel(int chanid, uint lastPruneTime)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Error checking for channel lock", query);
+        MythDB::DBError("Error checking for channel lock", query);
         return false;
     }
 
@@ -173,7 +173,7 @@ static bool lock_channel(int chanid, uint lastPruneTime)
 
         if (!query.exec())
         {
-            MythContext::DBError("Error inserting channel lock", query);
+            MythDB::DBError("Error inserting channel lock", query);
             return false;
         }
     }
@@ -195,7 +195,7 @@ static void unlock_channel(int chanid, uint updated)
     query.bindValue(":STATUS",  CHANNEL_LOCK);
 
     if (!query.exec())
-        MythContext::DBError("Error deleting channel lock", query);
+        MythDB::DBError("Error deleting channel lock", query);
 
     // inserting statistics
     uint now = QDateTime::currentDateTime().toTime_t();
@@ -210,7 +210,7 @@ static void unlock_channel(int chanid, uint updated)
     query.bindValue(":STATUS",   STATISTIC);
 
     if (!query.exec())
-        MythContext::DBError("Error inserting eit statistics", query);
+        MythDB::DBError("Error inserting eit statistics", query);
 }
 
 
@@ -236,7 +236,7 @@ event_map_t * EITCache::LoadChannel(uint chanid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Error loading eitcache", query);
+        MythDB::DBError("Error loading eitcache", query);
         return NULL;
     }
 
@@ -411,7 +411,7 @@ void EITCache::ClearChannelLocks(void)
     query.bindValue(":STATUS",  CHANNEL_LOCK);
 
     if (!query.exec())
-        MythContext::DBError("Error clearing channel locks", query);
+        MythDB::DBError("Error clearing channel locks", query);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

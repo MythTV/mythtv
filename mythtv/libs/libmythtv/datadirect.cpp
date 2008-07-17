@@ -16,7 +16,7 @@
 #include "frequencytables.h"
 #include "mythwidgets.h"
 #include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "util.h"
 #include "dbutil.h"
 
@@ -55,7 +55,7 @@ DataDirectStation::DataDirectStation(void) :
 DataDirectLineup::DataDirectLineup() :
     lineupid(""), name(""), displayname(""), type(""), postal(""), device("")
 {
-}   
+}
 
 DataDirectLineupMap::DataDirectLineupMap() :
     lineupid(""), stationid(""), channel(""), channelMinor("")
@@ -96,16 +96,16 @@ DataDirectGenre::DataDirectGenre() :
 // XXX Program duration should be stored as seconds, not as a QTime.
 //     limited to 24 hours this way.
 
-bool DDStructureParser::startElement(const QString &pnamespaceuri, 
-                                     const QString &plocalname, 
+bool DDStructureParser::startElement(const QString &pnamespaceuri,
+                                     const QString &plocalname,
                                      const QString &pqname,
-                                     const QXmlAttributes &pxmlatts) 
+                                     const QXmlAttributes &pxmlatts)
 {
     (void)pnamespaceuri;
     (void)plocalname;
 
     currtagname = pqname;
-    if (currtagname == "xtvd") 
+    if (currtagname == "xtvd")
     {
         QString   beg   = pxmlatts.value("from");
         QDateTime begts = QDateTime::fromString(beg, Qt::ISODate);
@@ -114,13 +114,13 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
         QString   end   = pxmlatts.value("to");
         QDateTime endts = QDateTime::fromString(end, Qt::ISODate);
         parent.SetDDProgramsEndAt(endts);
-    }   
-    else if (currtagname == "station") 
+    }
+    else if (currtagname == "station")
     {
         curr_station.Reset();
         curr_station.stationid = pxmlatts.value("id");
     }
-    else if (currtagname == "lineup") 
+    else if (currtagname == "lineup")
     {
         curr_lineup.Reset();
         curr_lineup.name = pxmlatts.value("name");
@@ -128,18 +128,18 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
         curr_lineup.device = pxmlatts.value("device");
         curr_lineup.postal = pxmlatts.value("postalCode");
         curr_lineup.lineupid = pxmlatts.value("id");
-        curr_lineup.displayname = curr_lineup.name + "-" + curr_lineup.type + 
-            "-" + curr_lineup.device + "-" + 
-            curr_lineup.postal + "-" + 
+        curr_lineup.displayname = curr_lineup.name + "-" + curr_lineup.type +
+            "-" + curr_lineup.device + "-" +
+            curr_lineup.postal + "-" +
             curr_lineup.lineupid;
 
-        if (curr_lineup.lineupid.isEmpty()) 
+        if (curr_lineup.lineupid.isEmpty())
         {
-            curr_lineup.lineupid = curr_lineup.name + curr_lineup.postal + 
+            curr_lineup.lineupid = curr_lineup.name + curr_lineup.postal +
                 curr_lineup.device + curr_lineup.type;
         }
     }
-    else if (currtagname == "map") 
+    else if (currtagname == "map")
     {
         int tmpindex;
         curr_lineupmap.Reset();
@@ -147,10 +147,10 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
         curr_lineupmap.stationid = pxmlatts.value("station");
         curr_lineupmap.channel = pxmlatts.value("channel");
         tmpindex = pxmlatts.index("channelMinor"); // for ATSC
-        if (tmpindex != -1) 
+        if (tmpindex != -1)
             curr_lineupmap.channelMinor = pxmlatts.value(tmpindex);
-    } 
-    else if (currtagname == "schedule") 
+    }
+    else if (currtagname == "schedule")
     {
         curr_schedule.Reset();
         curr_schedule.programid = pxmlatts.value("program");
@@ -163,7 +163,7 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
         QString durstr;
 
         durstr = pxmlatts.value("duration");
-        curr_schedule.duration = QTime(durstr.mid(2, 2).toInt(), 
+        curr_schedule.duration = QTime(durstr.mid(2, 2).toInt(),
                                        durstr.mid(5, 2).toInt(), 0, 0);
 
         curr_schedule.repeat = (pxmlatts.value("repeat") == "true");
@@ -173,44 +173,44 @@ bool DDStructureParser::startElement(const QString &pnamespaceuri,
                                pxmlatts.value("dolby") == "Dolby Digital");
         curr_schedule.subtitled = (pxmlatts.value("subtitled") == "true");
         curr_schedule.hdtv = (pxmlatts.value("hdtv") == "true");
-        curr_schedule.closecaptioned = (pxmlatts.value("closeCaptioned") == 
+        curr_schedule.closecaptioned = (pxmlatts.value("closeCaptioned") ==
                                         "true");
         curr_schedule.tvrating = pxmlatts.value("tvRating");
     }
-    else if (currtagname == "part") 
+    else if (currtagname == "part")
     {
         curr_schedule.partnumber = pxmlatts.value("number").toInt();
         curr_schedule.parttotal = pxmlatts.value("total").toInt();
     }
-    else if (currtagname == "program") 
+    else if (currtagname == "program")
     {
         curr_program.Reset();
         curr_program.programid = pxmlatts.value("id");
     }
-    else if (currtagname == "crew") 
+    else if (currtagname == "crew")
     {
         curr_program.Reset();
         lastprogramid = pxmlatts.value("program");
     }
-    else if (currtagname == "programGenre") 
+    else if (currtagname == "programGenre")
     {
         curr_genre.Reset();
         lastprogramid = pxmlatts.value("program");
-    }        
+    }
 
     return true;
-}                      
+}
 
-bool DDStructureParser::endElement(const QString &pnamespaceuri, 
-                                   const QString &plocalname, 
-                                   const QString &pqname) 
+bool DDStructureParser::endElement(const QString &pnamespaceuri,
+                                   const QString &plocalname,
+                                   const QString &pqname)
 {
     (void)pnamespaceuri;
     (void)plocalname;
 
     MSqlQuery query(MSqlQuery::DDCon());
 
-    if (pqname == "station") 
+    if (pqname == "station")
     {
         parent.stations[curr_station.stationid] = curr_station;
 
@@ -229,7 +229,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         query.bindValue(":FCCCHANNUM",  curr_station.fccchannelnumber);
 
         if (!query.exec())
-            MythContext::DBError("Inserting into dd_station", query);
+            MythDB::DBError("Inserting into dd_station", query);
     }
     else if (pqname == "lineup")
     {
@@ -250,9 +250,9 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         query.bindValue(":POSTAL",      curr_lineup.postal);
 
         if (!query.exec())
-            MythContext::DBError("Inserting into dd_lineup", query);
+            MythDB::DBError("Inserting into dd_lineup", query);
     }
-    else if (pqname == "map") 
+    else if (pqname == "map")
     {
         parent.lineupmaps[curr_lineupmap.lineupid].push_back(curr_lineupmap);
 
@@ -267,9 +267,9 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         query.bindValue(":CHANNEL",     curr_lineupmap.channel);
         query.bindValue(":CHANNELMINOR",curr_lineupmap.channelMinor);
         if (!query.exec())
-            MythContext::DBError("Inserting into dd_lineupmap", query);
+            MythDB::DBError("Inserting into dd_lineupmap", query);
     }
-    else if (pqname == "schedule") 
+    else if (pqname == "schedule")
     {
         QDateTime endtime = curr_schedule.time.addSecs(
             QTime().secsTo(curr_schedule.duration));
@@ -305,12 +305,12 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         query.bindValue(":ISNEW",       curr_schedule.isnew);
 
         if (!query.exec())
-            MythContext::DBError("Inserting into dd_schedule", query);
+            MythDB::DBError("Inserting into dd_schedule", query);
     }
-    else if (pqname == "program") 
+    else if (pqname == "program")
     {
         float staravg = 0.0;
-        if (!curr_program.starRating.isEmpty()) 
+        if (!curr_program.starRating.isEmpty())
         {
             int fullstarcount = curr_program.starRating.count("*");
             int halfstarcount = curr_program.starRating.count("+");
@@ -361,9 +361,9 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         query.bindValue(":ORIGAIRDATE", curr_program.originalAirDate);
 
         if (!query.exec())
-            MythContext::DBError("Inserting into dd_program", query);
-    }    
-    else if (pqname == "member") 
+            MythDB::DBError("Inserting into dd_program", query);
+    }
+    else if (pqname == "member")
     {
         QString roleunderlines = curr_productioncrew.role.replace(" ", "_");
 
@@ -384,12 +384,12 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         query.bindValue(":FULLNAME",    fullname);
 
         if (!query.exec())
-            MythContext::DBError("Inserting into dd_productioncrew", query);
+            MythDB::DBError("Inserting into dd_productioncrew", query);
 
         curr_productioncrew.givenname = "";
         curr_productioncrew.surname = "";
-    }    
-    else if (pqname == "genre") 
+    }
+    else if (pqname == "genre")
     {
         query.prepare(
             "INSERT INTO dd_genre "
@@ -401,24 +401,24 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         query.bindValue(":RELEVANCE",   curr_genre.relevance);
 
         if (!query.exec())
-            MythContext::DBError("Inserting into dd_genre", query);
+            MythDB::DBError("Inserting into dd_genre", query);
     }
 
     return true;
-} 
- 
-bool DDStructureParser::startDocument() 
+}
+
+bool DDStructureParser::startDocument()
 {
     parent.CreateTempTables();
     return true;
 }
 
-bool DDStructureParser::endDocument() 
+bool DDStructureParser::endDocument()
 {
     return true;
 }
- 
-bool DDStructureParser::characters(const QString& pchars) 
+
+bool DDStructureParser::characters(const QString& pchars)
 {
     // cerr << "Characters : " << pchars << "\n";
     if (pchars.stripWhiteSpace().isEmpty())
@@ -458,12 +458,12 @@ bool DDStructureParser::characters(const QString& pchars)
 
             if (!query.exec())
             {
-                MythContext::DBError("Updating DataDirect Status Message",
+                MythDB::DBError("Updating DataDirect Status Message",
                                      query);
             }
         }
     }
-    if (currtagname == "callSign") 
+    if (currtagname == "callSign")
         curr_station.callsign = pchars;
     else if (currtagname == "name")
         curr_station.stationname = pchars;
@@ -490,15 +490,15 @@ bool DDStructureParser::characters(const QString& pchars)
     else if (currtagname == "year")
         curr_program.year = pchars;
     else if (currtagname == "syndicatedEpisodeNumber")
-        curr_program.syndicatedEpisodeNumber = pchars; 
-    else if (currtagname == "runTime") 
+        curr_program.syndicatedEpisodeNumber = pchars;
+    else if (currtagname == "runTime")
     {
         QString runtimestr = pchars;
         QTime runtime = QTime(runtimestr.mid(2,2).toInt(),
                               runtimestr.mid(5,2).toInt(), 0, 0);
         curr_program.duration = runtime;
     }
-    else if (currtagname == "originalAirDate") 
+    else if (currtagname == "originalAirDate")
     {
         QDate airdate = QDate::fromString(pchars, Qt::ISODate);
         curr_program.originalAirDate = airdate;
@@ -508,10 +508,10 @@ bool DDStructureParser::characters(const QString& pchars)
     else if (currtagname == "givenname")
         curr_productioncrew.givenname = pchars;
     else if (currtagname == "surname")
-        curr_productioncrew.surname = pchars;  
-    else if (currtagname == "class") 
+        curr_productioncrew.surname = pchars;
+    else if (currtagname == "class")
         curr_genre.gclass = pchars;
-    else if (currtagname == "relevance") 
+    else if (currtagname == "relevance")
         curr_genre.relevance = pchars;
 
     return true;
@@ -569,9 +569,9 @@ DataDirectProcessor::~DataDirectProcessor()
 void DataDirectProcessor::UpdateStationViewTable(QString lineupid)
 {
     MSqlQuery query(MSqlQuery::DDCon());
-   
-    if (!query.exec("TRUNCATE TABLE dd_v_station;")) 
-        MythContext::DBError("Truncating temporary table dd_v_station", query);
+
+    if (!query.exec("TRUNCATE TABLE dd_v_station;"))
+        MythDB::DBError("Truncating temporary table dd_v_station", query);
 
     query.prepare(
         "INSERT INTO dd_v_station "
@@ -588,7 +588,7 @@ void DataDirectProcessor::UpdateStationViewTable(QString lineupid)
     query.bindValue(":LINEUP", lineupid);
 
     if (!query.exec())
-        MythContext::DBError("Populating temporary table dd_v_station", query);
+        MythDB::DBError("Populating temporary table dd_v_station", query);
 }
 
 void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
@@ -596,7 +596,7 @@ void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
     MSqlQuery query(MSqlQuery::DDCon());
 
     if (!query.exec("TRUNCATE TABLE dd_v_program;"))
-        MythContext::DBError("Truncating temporary table dd_v_program", query);
+        MythDB::DBError("Truncating temporary table dd_v_program", query);
 
     QString qstr =
         "INSERT INTO dd_v_program "
@@ -628,13 +628,13 @@ void DataDirectProcessor::UpdateProgramViewTable(uint sourceid)
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec())
-        MythContext::DBError("Populating temporary table dd_v_program", query);
+        MythDB::DBError("Populating temporary table dd_v_program", query);
 
     if (!query.exec("ANALYZE TABLE dd_v_program;"))
-        MythContext::DBError("Analyzing table dd_v_program", query);
+        MythDB::DBError("Analyzing table dd_v_program", query);
 
     if (!query.exec("ANALYZE TABLE dd_productioncrew;"))
-        MythContext::DBError("Analyzing table dd_productioncrew", query);
+        MythDB::DBError("Analyzing table dd_productioncrew", query);
 }
 
 int DataDirectProcessor::UpdateChannelsSafe(
@@ -671,7 +671,7 @@ int DataDirectProcessor::UpdateChannelsSafe(
 
     if (!query.exec())
     {
-        MythContext::DBError("Selecting new channels", query);
+        MythDB::DBError("Selecting new channels", query);
         return -1;
     }
 
@@ -750,7 +750,7 @@ bool DataDirectProcessor::UpdateChannelsUnsafe(
     bool is_encoder = (SourceUtil::IsEncoder(sourceid, true) ||
                        SourceUtil::IsUnscanable(sourceid));
 
-    while (dd_station_info.next())        
+    while (dd_station_info.next())
     {
         uint    freqid     = dd_station_info.value(3).toUInt();
         QString chan_major = dd_station_info.value(4).toString();
@@ -784,8 +784,8 @@ bool DataDirectProcessor::UpdateChannelsUnsafe(
 
         if (!chan_update_q.exec())
         {
-            MythContext::DBError("Updating channel table",
-                                 chan_update_q.lastQuery());
+            MythDB::DBError("Updating channel table",
+                            chan_update_q.lastQuery());
         }
     }
 
@@ -820,7 +820,7 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
                     "dd_v_program.programid = dd_genre.programid AND "
                     "dd_genre.relevance = '0') "
                     "WHERE dd_v_program.chanid = channel.chanid;"))
-        MythContext::DBError("Inserting into program table", query);
+        MythDB::DBError("Inserting into program table", query);
 
     //cerr << "Finished adding rows to main program table...\n";
     //cerr << "Adding program ratings...\n";
@@ -832,7 +832,7 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
                     "mpaarating FROM dd_v_program, channel WHERE "
                     "mpaarating != '' AND dd_v_program.chanid = "
                     "channel.chanid"))
-        MythContext::DBError("Inserting into programrating table", query);
+        MythDB::DBError("Inserting into programrating table", query);
 
     if (!query.exec("INSERT IGNORE INTO programrating (chanid, starttime, "
                     "system, rating) SELECT dd_v_program.chanid, "
@@ -840,14 +840,14 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
                     "'VCHIP', "
                     "tvrating FROM dd_v_program, channel WHERE tvrating != ''"
                     " AND dd_v_program.chanid = channel.chanid"))
-        MythContext::DBError("Inserting into programrating table", query);
+        MythDB::DBError("Inserting into programrating table", query);
 
     //cerr << "Finished adding program ratings...\n";
     //cerr << "Populating people table from production crew list...\n";
 
     if (!query.exec("INSERT IGNORE INTO people (name) SELECT fullname "
                     "FROM dd_productioncrew;"))
-        MythContext::DBError("Inserting into people table", query);
+        MythDB::DBError("Inserting into people table", query);
 
     //cerr << "Finished adding people...\n";
     //cerr << "Adding credits entries from production crew list...\n";
@@ -861,7 +861,7 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
                     "((dd_productioncrew.programid = dd_v_program.programid) "
                     "AND (dd_productioncrew.fullname = people.name)) "
                     "AND dd_v_program.chanid = channel.chanid;"))
-        MythContext::DBError("Inserting into credits table", query);
+        MythDB::DBError("Inserting into credits table", query);
 
     //cerr << "Finished inserting credits...\n";
     //cerr << "Adding genres...\n";
@@ -872,7 +872,7 @@ void DataDirectProcessor::DataDirectProgramUpdate(void)
                     "relevance, class FROM dd_v_program, dd_genre, channel "
                     "WHERE (dd_v_program.programid = dd_genre.programid) "
                     "AND dd_v_program.chanid = channel.chanid"))
-        MythContext::DBError("Inserting into programgenres table",query);
+        MythDB::DBError("Inserting into programgenres table",query);
 
     //cerr << "Done...\n";
 }
@@ -891,7 +891,7 @@ void DataDirectProcessor::FixProgramIDs(void)
 
     if (found_table["recorded"] && !query.exec())
     {
-        MythContext::DBError("Fixing program ids in recorded", query);
+        MythDB::DBError("Fixing program ids in recorded", query);
         return;
     }
 
@@ -903,7 +903,7 @@ void DataDirectProcessor::FixProgramIDs(void)
 
     if (found_table["oldrecorded"] && !query.exec())
     {
-        MythContext::DBError("Fixing program ids in oldrecorded", query);
+        MythDB::DBError("Fixing program ids in oldrecorded", query);
         return;
     }
 
@@ -915,7 +915,7 @@ void DataDirectProcessor::FixProgramIDs(void)
 
     if (found_table["program"] && !query.exec())
     {
-        MythContext::DBError("Fixing program ids in program", query);
+        MythDB::DBError("Fixing program ids in program", query);
         return;
     }
 
@@ -1060,7 +1060,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     {
         Q3TextStream stream(&file);
         QString line;
-        while (!stream.atEnd()) 
+        while (!stream.atEnd())
         {
             line = stream.readLine();
             if (line.contains("<suggestedTime>", false))
@@ -1073,7 +1073,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
                 GotNextSuggestedTime = TRUE;
                 QDateTime UTCdt = QDateTime::fromString(tmpStr, Qt::ISODate);
                 NextSuggestedTime = MythUTCToLocal(UTCdt);
-                VERBOSE(VB_GENERAL, LOC + QString("NextSuggestedTime is: ") 
+                VERBOSE(VB_GENERAL, LOC + QString("NextSuggestedTime is: ")
                         + NextSuggestedTime.toString(Qt::ISODate));
             }
 
@@ -1086,7 +1086,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
                 GotBlockedTime = TRUE;
                 QDateTime UTCdt = QDateTime::fromString(tmpStr, Qt::ISODate);
                 BlockedTime = MythUTCToLocal(UTCdt);
-                VERBOSE(VB_GENERAL, LOC + QString("BlockedTime is: ") 
+                VERBOSE(VB_GENERAL, LOC + QString("BlockedTime is: ")
                         + BlockedTime.toString(Qt::ISODate));
             }
         }
@@ -1122,7 +1122,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
                       .arg("MythFillSuggestedRunTime"));
 
         if (!query.exec())
-            MythContext::DBError("Updating DataDirect Suggested RunTime",
+            MythDB::DBError("Updating DataDirect Suggested RunTime",
                                  query);
     }
     return GotNextSuggestedTime;
@@ -1269,7 +1269,7 @@ bool DataDirectProcessor::GrabLineupsOnly(void)
     const QDateTime end   = start.addSecs(1);
 
     return GrabData(start, end);
-}   
+}
 
 bool DataDirectProcessor::GrabAllData(void)
 {
@@ -1277,24 +1277,24 @@ bool DataDirectProcessor::GrabAllData(void)
                     QDateTime(QDate::currentDate()).addDays(15));
 }
 
-void DataDirectProcessor::CreateATempTable(const QString &ptablename, 
-                                           const QString &ptablestruct) 
+void DataDirectProcessor::CreateATempTable(const QString &ptablename,
+                                           const QString &ptablestruct)
 {
     MSqlQuery query(MSqlQuery::DDCon());
     QString querystr;
-    querystr = "CREATE TEMPORARY TABLE IF NOT EXISTS " + ptablename + " " + 
+    querystr = "CREATE TEMPORARY TABLE IF NOT EXISTS " + ptablename + " " +
         ptablestruct + ";";
 
     if (!query.exec(querystr))
-        MythContext::DBError("Creating temporary table", query);
+        MythDB::DBError("Creating temporary table", query);
 
     querystr = "TRUNCATE TABLE " + ptablename + ";";
 
     if (!query.exec(querystr))
-        MythContext::DBError("Truncating temporary table", query);
-}      
+        MythDB::DBError("Truncating temporary table", query);
+}
 
-void DataDirectProcessor::CreateTempTables() 
+void DataDirectProcessor::CreateTempTables()
 {
     QMap<QString,QString> dd_tables;
 
@@ -1580,7 +1580,7 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
 
     Q3TextStream io(&lfile);
     io << QDateTime::currentDateTime().toString(Qt::ISODate) << endl;
-    
+
     const DDLineupChannels channels = GetDDLineup(lineupid);
     io << channels.size() << endl;
 
@@ -1683,7 +1683,7 @@ bool DataDirectProcessor::SaveLineup(const QString &lineupid,
         !GrabLoginCookiesAndLineups(false))
     {
         return false;
-    }        
+    }
 
     // Get callsigns based on xmltv ids (aka stationid)
     DDLineupMap::const_iterator ddit = lineupmaps.find(lineupid);
@@ -1753,7 +1753,7 @@ bool DataDirectProcessor::UpdateListings(uint sourceid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Selecting existing channels", query);
+        MythDB::DBError("Selecting existing channels", query);
         return false;
     }
 
@@ -1966,7 +1966,7 @@ bool DataDirectProcessor::ParseLineups(const QString &documentFile)
 
     rawlineups.clear();
 
-    while (!stream.atEnd()) 
+    while (!stream.atEnd())
     {
         QString line = stream.readLine();
         QString llow = line.lower();
@@ -2016,7 +2016,7 @@ bool DataDirectProcessor::ParseLineups(const QString &documentFile)
 #endif
             }
         }
-    }    
+    }
     return true;
 }
 
@@ -2040,7 +2040,7 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
     RawLineup &lineup = rawlineups[lineupid];
     RawLineupChannels &ch = lineup.channels;
 
-    while (!stream.atEnd()) 
+    while (!stream.atEnd())
     {
         QString line = stream.readLine();
         QString llow = line.lower();
@@ -2073,7 +2073,7 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
             QString name = get_setting(lbl_line, "for");
             in_label = (name == settings["chk_name"]) ? 1 : 0;
         }
-        
+
         if (in_label)
         {
             int start = (lbl >= 0) ? lbl + 6 : 0;
@@ -2243,8 +2243,7 @@ static uint update_channel_basic(uint    sourceid,   bool    insert,
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError(
-            "Getting chanid of existing channel", query);
+        MythDB::DBError("Getting chanid of existing channel", query);
         return 0; // go on to next channel without xmltv
     }
 
@@ -2286,7 +2285,7 @@ static uint update_channel_basic(uint    sourceid,   bool    insert,
 
             if (!chan_update_q.exec() || !chan_update_q.isActive())
             {
-                MythContext::DBError(
+                MythDB::DBError(
                     "Updating XMLTVID of existing channel", chan_update_q);
                 continue; // go on to next instance of this channel
             }
@@ -2325,7 +2324,7 @@ static uint update_channel_basic(uint    sourceid,   bool    insert,
         QString freq_id= QString::number(freqid);
 
         ChannelUtil::CreateChannel(
-            mplexid,   sourceid,  chanid, 
+            mplexid,   sourceid,  chanid,
             callsign,  name,      channum,
             serviceid, majorC,    minorC,
             oag,       hidden,    hidden_in_guide,
@@ -2352,7 +2351,7 @@ static void set_lineup_type(const QString &lineupid, const QString &type)
     query.bindValue(":LINEUPID", lineupid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("end_element", query);
+        MythDB::DBError("end_element", query);
     else if (query.next())
         srcid = query.value(0).toUInt();
 

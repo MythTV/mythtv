@@ -18,7 +18,7 @@
 
 // MythTV headers
 #include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "diseqc.h"
 #include "dtvmultiplex.h"
 #include "compat.h"
@@ -143,7 +143,7 @@ bool DiSEqCDevSettings::Load(uint card_input_id)
     query.bindValue(":INPUTID", card_input_id);
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("DiSEqCDevSettings::Load", query);
+        MythDB::DBError("DiSEqCDevSettings::Load", query);
         return false;
     }
 
@@ -172,7 +172,7 @@ bool DiSEqCDevSettings::Store(uint card_input_id) const
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("DiSEqCDevSettings::Store 1", query);
+        MythDB::DBError("DiSEqCDevSettings::Store 1", query);
         return false;
     }
 
@@ -190,7 +190,7 @@ bool DiSEqCDevSettings::Store(uint card_input_id) const
         query.bindValue(":VALUE",   *it);
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("DiSEqCDevSettings::Store 2", query);
+            MythDB::DBError("DiSEqCDevSettings::Store 2", query);
             return false;
         }
     }
@@ -337,7 +337,7 @@ bool DiSEqCDevTree::Load(uint cardid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("DiSEqCDevTree::Load", query);
+        MythDB::DBError("DiSEqCDevTree::Load", query);
     }
     else if (query.next() && query.value(0).toUInt())
     {
@@ -378,11 +378,11 @@ bool DiSEqCDevTree::Store(uint cardid)
         {
             query0.bindValue(":DEVID", *it);
             if (!query0.exec())
-                MythContext::DBError("DiSEqCDevTree::Store 1", query0);
+                MythDB::DBError("DiSEqCDevTree::Store 1", query0);
 
             query1.bindValue(":DEVID", *it);
             if (!query1.exec())
-                MythContext::DBError("DiSEqCDevTree::Store 2", query1);
+                MythDB::DBError("DiSEqCDevTree::Store 2", query1);
 
         }
         m_delete.clear();
@@ -407,7 +407,7 @@ bool DiSEqCDevTree::Store(uint cardid)
     query0.bindValue(":CARDID", cardid);
     if (!query0.exec())
     {
-        MythContext::DBError("DiSEqCDevTree::Store 3", query0);
+        MythDB::DBError("DiSEqCDevTree::Store 3", query0);
         return false;
     }
 
@@ -808,7 +808,7 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateById(DiSEqCDevTree &tree, uint devid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("DiSEqCDevDevice::CreateById", query);
+        MythDB::DBError("DiSEqCDevDevice::CreateById", query);
         return NULL;
     }
     else if (!query.next())
@@ -1133,7 +1133,7 @@ bool DiSEqCDevSwitch::Load(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("DiSEqCDevSwitch::Load 1", query);
+        MythDB::DBError("DiSEqCDevSwitch::Load 1", query);
         return false;
     }
     else if (query.next())
@@ -1154,7 +1154,7 @@ bool DiSEqCDevSwitch::Load(void)
     query.bindValue(":DEVID", GetDeviceID());
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("DiSEqCDevSwitch::Load 2", query);
+        MythDB::DBError("DiSEqCDevSwitch::Load 2", query);
         return false;
     }
 
@@ -1219,7 +1219,7 @@ bool DiSEqCDevSwitch::Store(void) const
 
     if (!query.exec())
     {
-        MythContext::DBError("DiSEqCDevSwitch::Store", query);
+        MythDB::DBError("DiSEqCDevSwitch::Store", query);
         return false;
     }
 
@@ -1735,7 +1735,7 @@ bool DiSEqCDevRotor::Load(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("DiSEqCDevRotor::Load 1", query);
+        MythDB::DBError("DiSEqCDevRotor::Load 1", query);
         return false;
     }
     else if (query.next())
@@ -1771,7 +1771,7 @@ bool DiSEqCDevRotor::Load(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("DiSEqCDevRotor::Load 2", query);
+        MythDB::DBError("DiSEqCDevRotor::Load 2", query);
         return false;
     }
     else if (query.next())
@@ -1844,7 +1844,7 @@ bool DiSEqCDevRotor::Store(void) const
 
     if (!query.exec())
     {
-        MythContext::DBError("DiSEqCDevRotor::Store", query);
+        MythDB::DBError("DiSEqCDevRotor::Store", query);
         return false;
     }
 
@@ -2068,7 +2068,7 @@ bool DiSEqCDevLNB::Load(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("DiSEqCDevLNB::Load", query);
+        MythDB::DBError("DiSEqCDevLNB::Load", query);
         return false;
     }
     else if (query.next())
@@ -2137,7 +2137,7 @@ bool DiSEqCDevLNB::Store(void) const
     // update dev_id
     if (!query.exec())
     {
-        MythContext::DBError("DiSEqCDevLNB::Store", query);
+        MythDB::DBError("DiSEqCDevLNB::Store", query);
         return false;
     }
 

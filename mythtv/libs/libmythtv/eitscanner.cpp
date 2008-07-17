@@ -14,6 +14,7 @@
 #include "eithelper.h"
 #include "scheduledrecording.h"
 #include "util.h"
+#include "libmythdb/mythdb.h"
 
 #define LOC QString("EITScanner: ")
 #define LOC_ID QString("EITScanner (%1): ").arg(cardnum)
@@ -83,7 +84,7 @@ void EITScanner::RunEventLoop(void)
 
     MythTimer t;
     uint eitCount = 0;
-    
+
     // Qt4 requires a QMutex as a parameter...
     // not sure if this is the best solution.  Mutex Must be locked before wait.
     QMutex mutex;
@@ -135,7 +136,7 @@ void EITScanner::RunEventLoop(void)
 
             if (activeScanNextChan == activeScanChannels.end())
                 activeScanNextChan = activeScanChannels.begin();
- 
+
             if (!(*activeScanNextChan).isEmpty())
             {
                 eitHelper->WriteEITCache();
@@ -192,7 +193,7 @@ void EITScanner::StartPassiveScan(ChannelBase *_channel,
                                   bool _ignore_source)
 {
     QMutexLocker locker(&lock);
-    
+
     uint sourceid = (_ignore_source) ? 0 : _channel->GetCurrentSourceID();
     eitSource     = _eitSource;
     channel       = _channel;
@@ -254,7 +255,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source,
 
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("EITScanner::StartActiveScan", query);
+            MythDB::DBError("EITScanner::StartActiveScan", query);
             return;
         }
 
@@ -269,7 +270,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source,
             .arg(activeScanChannels.size()));
 
     // Start at a random channel. This is so that multiple cards with
-    // the same source don't all scan the same channels in the same 
+    // the same source don't all scan the same channels in the same
     // order when the backend is first started up.
     if (activeScanChannels.size())
     {
@@ -278,7 +279,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source,
 
         activeScanNextTrig = QDateTime::currentDateTime();
         activeScanTrigTime = max_seconds_per_source;
-        // Add a little randomness to trigger time so multiple 
+        // Add a little randomness to trigger time so multiple
         // cards will have a staggered channel changing time.
         activeScanTrigTime += random() % 29;
         activeScan = true;

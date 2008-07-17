@@ -8,7 +8,7 @@ using namespace std;
 #include <q3deepcopy.h>
 
 // MythTV includes
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "eit.h"
 #include "dvbdescriptors.h"
 #include "programinfo.h" // for subtitle types and audio and video properties
@@ -50,7 +50,7 @@ uint DBPerson::GetPersonDB(MSqlQuery &query) const
     query.bindValue(":NAME", name);
 
     if (!query.exec())
-        MythContext::DBError("get_person", query);
+        MythDB::DBError("get_person", query);
     else if (query.next())
         return query.value(0).toUInt();
 
@@ -67,7 +67,7 @@ uint DBPerson::InsertPersonDB(MSqlQuery &query) const
     if (query.exec())
         return 1;
 
-    MythContext::DBError("insert_person", query);
+    MythDB::DBError("insert_person", query);
     return 0;
 }
 
@@ -89,7 +89,7 @@ uint DBPerson::InsertCreditsDB(MSqlQuery &query, uint personid, uint chanid,
     if (query.exec())
         return 1;
 
-    MythContext::DBError("insert_credits", query);
+    MythDB::DBError("insert_credits", query);
     return 0;
 }
 
@@ -154,7 +154,7 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("GetOverlappingPrograms 1", query);
+        MythDB::DBError("GetOverlappingPrograms 1", query);
         return 0;
     }
 
@@ -342,7 +342,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
     bool lpreviouslyshown = previouslyshown | match.previouslyshown;
 
     QString lsyndicatedepisodenumber = syndicatedepisodenumber;
-    if (lsyndicatedepisodenumber.isEmpty() && 
+    if (lsyndicatedepisodenumber.isEmpty() &&
         !match.syndicatedepisodenumber.isEmpty())
         lsyndicatedepisodenumber = match.syndicatedepisodenumber;
 
@@ -393,7 +393,7 @@ uint DBEvent::UpdateDB(MSqlQuery &query, const DBEvent &match) const
 
     if (!query.exec())
     {
-        MythContext::DBError("InsertDB", query);
+        MythDB::DBError("InsertDB", query);
         return 0;
     }
 
@@ -418,7 +418,7 @@ static bool delete_program(MSqlQuery &query, uint chanid, const QDateTime &st)
 
     if (!query.exec())
     {
-        MythContext::DBError("delete_program", query);
+        MythDB::DBError("delete_program", query);
         return false;
     }
 
@@ -432,7 +432,7 @@ static bool delete_program(MSqlQuery &query, uint chanid, const QDateTime &st)
 
     if (!query.exec())
     {
-        MythContext::DBError("delete_credits", query);
+        MythDB::DBError("delete_credits", query);
         return false;
     }
 
@@ -453,10 +453,10 @@ static bool change_program(MSqlQuery &query, uint chanid, const QDateTime &st,
     query.bindValue(":OLDSTART", st);
     query.bindValue(":NEWSTART", new_st);
     query.bindValue(":NEWEND",   new_end);
-    
+
     if (!query.exec())
     {
-        MythContext::DBError("change_program", query);
+        MythDB::DBError("change_program", query);
         return false;
     }
 
@@ -472,11 +472,11 @@ static bool change_program(MSqlQuery &query, uint chanid, const QDateTime &st,
 
     if (!query.exec())
     {
-        MythContext::DBError("change_credits", query);
+        MythDB::DBError("change_credits", query);
         return false;
     }
 
-    return true;    
+    return true;
 }
 
 bool DBEvent::MoveOutOfTheWayDB(MSqlQuery &query, const DBEvent &prog) const
@@ -558,7 +558,7 @@ uint DBEvent::InsertDB(MSqlQuery &query) const
 
     if (!query.exec())
     {
-        MythContext::DBError("InsertDB", query);
+        MythDB::DBError("InsertDB", query);
         return 0;
     }
 
@@ -585,7 +585,7 @@ QString DBEvent::AddAuthority(const QString& id, MSqlQuery &query) const
 
     if (!query.exec())
     {
-        MythContext::DBError("AddAuthority", query);
+        MythDB::DBError("AddAuthority", query);
         return id;
     }
 

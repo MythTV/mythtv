@@ -1,7 +1,7 @@
 #include <qsqldatabase.h>
 #include "settings.h"
 #include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "mythwidgets.h"
 #include "channeleditor.h"
 
@@ -57,7 +57,7 @@ QString ChannelWizard::getCardtype() {
                   " WHERE channel.chanid = :CHID "
                   " AND channel.sourceid = cardinput.sourceid"
                   " AND cardinput.cardid = capturecard.cardid");
-    query.bindValue(":CHID", cid->getValue()); 
+    query.bindValue(":CHID", cid->getValue());
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
@@ -111,7 +111,7 @@ int ChannelWizard::countCardtypes() {
         return 0;
 }
 
-int ChannelListSetting::fillSelections(void) 
+int ChannelListSetting::fillSelections(void)
 {
     QString currentValue = getValue();
     uint    currentIndex = max(getValueIndex(currentValue), 0);
@@ -138,7 +138,7 @@ int ChannelListSetting::fillSelections(void)
                            .arg(currentSourceID);
         fAllSources = false;
     }
-        
+
     if (currentSortMode == QObject::tr("Channel Name"))
     {
         querystr += " ORDER BY channel.name";
@@ -148,13 +148,13 @@ int ChannelListSetting::fillSelections(void)
         querystr += " ORDER BY channum + 0";
     }
 
-    MSqlQuery query(MSqlQuery::InitCon()); 
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(querystr);
 
     uint selidx = 0, idx = 1;
     if (query.exec() && query.isActive() && query.size() > 0)
     {
-        for (; query.next() ; idx++) 
+        for (; query.next() ; idx++)
         {
             QString name = query.value(0).toString();
             QString channum = query.value(1).toString();
@@ -168,18 +168,18 @@ int ChannelListSetting::fillSelections(void)
                     continue;
             }
 
-            if (channum == "" && currentHideMode) 
+            if (channum == "" && currentHideMode)
                 continue;
 
-            if (name == "") 
+            if (name == "")
                 name = "(Unnamed : " + chanid + ")";
 
-            if (currentSortMode == QObject::tr("Channel Name")) 
+            if (currentSortMode == QObject::tr("Channel Name"))
             {
-                if (channum != "") 
+                if (channum != "")
                     name += " (" + channum + ")";
             }
-            else if (currentSortMode == QObject::tr("Channel Number")) 
+            else if (currentSortMode == QObject::tr("Channel Number"))
             {
                 if (channum != "")
                     name = channum + ". " + name;
@@ -211,7 +211,7 @@ class SourceSetting : public ComboBoxSetting, public Storage
         addSelection(QObject::tr("(All)"),"All");
     };
 
-    void Load() 
+    void Load()
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT name, sourceid FROM videosource");
@@ -222,8 +222,8 @@ class SourceSetting : public ComboBoxSetting, public Storage
             {
                 addSelection(query.value(0).toString(),
                              query.value(1).toString());
-            } 
-        } 
+            }
+        }
         addSelection(QObject::tr("(Unassigned)"),"Unassigned");
     }
     void Save(void) { }
@@ -280,7 +280,7 @@ ChannelEditor::ChannelEditor() : ConfigurationDialog()
     buttonScan->setLabel(QObject::tr("Channel Scanner"));
     buttonScan->setHelpText(QObject::tr("Starts the channel scanner."));
     buttonScan->setEnabled(SourceUtil::IsAnySourceScanable());
-    
+
     buttonImportIcon = new TransButtonSetting();
     buttonImportIcon->setLabel(QObject::tr("Icon Download"));
     buttonImportIcon->setHelpText(QObject::tr("Starts the icon downloader"));
@@ -294,7 +294,7 @@ ChannelEditor::ChannelEditor() : ConfigurationDialog()
                     "a satellite dish and must enter an initial "
                     "frequency to for the channel scanner to try."));
 
-    HorizontalConfigurationGroup *h = 
+    HorizontalConfigurationGroup *h =
         new HorizontalConfigurationGroup(false, false);
     h->addChild(buttonScan);
     h->addChild(buttonImportIcon);
@@ -357,7 +357,7 @@ void ChannelEditor::deleteChannels(void)
 
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("ChannelEditor Delete Channels", query);
+            MythDB::DBError("ChannelEditor Delete Channels", query);
             return;
         }
 
@@ -384,7 +384,7 @@ void ChannelEditor::deleteChannels(void)
     }
 
     if (!query.exec())
-        MythContext::DBError("ChannelEditor Delete Channels", query);
+        MythDB::DBError("ChannelEditor Delete Channels", query);
 
     list->fillSelections();
 }
@@ -409,13 +409,13 @@ void ChannelEditor::edit()
     id = list->getValue().toInt();
     ChannelWizard cw(id, source->getValue().toUInt());
     cw.exec();
-    
+
     list->fillSelections();
     list->setFocus();
 }
 
 void ChannelEditor::edit(int /*iSelected*/)
-{ 
+{
     edit();
 }
 
@@ -435,7 +435,7 @@ void ChannelEditor::del()
         query.prepare("DELETE FROM channel WHERE chanid = :CHID ;");
         query.bindValue(":CHID", id);
         if (!query.exec() || !query.isActive())
-            MythContext::DBError("ChannelEditor Delete Channel", query);
+            MythDB::DBError("ChannelEditor Delete Channel", query);
 
         list->fillSelections();
     }
@@ -499,11 +499,11 @@ void ChannelEditor::channelIconImport(void)
                                         tr("Add some channels first!"));
         return;
     }
-    
+
     // Get selected channel name from database
     QString querystr = QString("SELECT channel.name FROM channel WHERE chanid='%1' ").arg(list->getValue());
     QString channelname = "";
-    MSqlQuery query(MSqlQuery::InitCon()); 
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(querystr);
 
     if (query.exec() && query.isActive() && query.size() > 0)

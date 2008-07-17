@@ -15,7 +15,7 @@ using namespace std;
 #include <QKeyEvent>
 #include <QEvent>
 
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "tv_play.h"
 #include "tv_rec.h"
 #include "osd.h"
@@ -8110,7 +8110,7 @@ QStringList TV::GetValidRecorderList(uint chanid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("GetValidRecorderList ChanID", query);
+        MythDB::DBError("GetValidRecorderList ChanID", query);
         return reclist;
     }
 
@@ -8142,7 +8142,7 @@ QStringList TV::GetValidRecorderList(const QString &channum)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("GetValidRecorderList ChanNum", query);
+        MythDB::DBError("GetValidRecorderList ChanNum", query);
         return reclist;
     }
 

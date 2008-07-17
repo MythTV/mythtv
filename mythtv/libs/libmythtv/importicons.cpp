@@ -6,7 +6,8 @@
 
 #include "mythwizard.h"
 #include "mythcontext.h"
-#include "mythdirs.h"
+#include "libmythdb/mythdb.h"
+#include "libmythdb/mythdirs.h"
 #include "httpcomms.h"
 #include "importicons.h"
 #include "util.h"
@@ -483,7 +484,7 @@ bool ImportIconsWizard::checkAndDownload(const QString& str, const QString& loca
 
         if (!query.exec())
         {
-            MythContext::DBError("Error inserting channel icon", query);
+            MythDB::DBError("Error inserting channel icon", query);
             return false;
         }
 

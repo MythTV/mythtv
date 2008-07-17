@@ -6,8 +6,7 @@
 
 
 // MythTV headers
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "cardutil.h"
 
 #define LOC QString("DTVChan(%1): ").arg(GetDevice())
@@ -56,10 +55,10 @@ void DTVChannel::GetCachedPids(int chanid, pid_cache_t &pid_cache)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("GetCachedPids: fetching pids", query);
+        MythDB::DBError("GetCachedPids: fetching pids", query);
         return;
     }
-    
+
     while (query.next())
     {
         int pid = query.value(0).toInt(), tid = query.value(1).toInt();
@@ -84,7 +83,7 @@ void DTVChannel::SaveCachedPids(int chanid, const pid_cache_t &pid_cache)
     query.prepare(thequery);
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("GetCachedPids -- delete", query);
+        MythDB::DBError("GetCachedPids -- delete", query);
         return;
     }
 
@@ -100,7 +99,7 @@ void DTVChannel::SaveCachedPids(int chanid, const pid_cache_t &pid_cache)
 
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("GetCachedPids -- insert", query);
+            MythDB::DBError("GetCachedPids -- insert", query);
             return;
         }
     }

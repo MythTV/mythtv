@@ -1,5 +1,5 @@
 #include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include <qsqldatabase.h>
 #include <q3header.h>
 #include <qcursor.h>
@@ -144,7 +144,7 @@ int PlayGroup::GetCount(void)
     query.prepare("SELECT COUNT(name) FROM playgroup "
                   "WHERE name <> 'Default' ORDER BY name;");
     if (!query.exec())
-        MythContext::DBError("PlayGroup::GetCount()", query);
+        MythDB::DBError("PlayGroup::GetCount()", query);
     else if (query.next())
         names = query.value(0).toInt();
 
@@ -159,7 +159,7 @@ QStringList PlayGroup::GetNames(void)
     query.prepare("SELECT name FROM playgroup "
                   "WHERE name <> 'Default' ORDER BY name;");
     if (!query.exec())
-        MythContext::DBError("PlayGroup::GetNames()", query);
+        MythDB::DBError("PlayGroup::GetNames()", query);
     else
     {
         while (query.next())
@@ -185,7 +185,7 @@ QString PlayGroup::GetInitialName(const ProgramInfo *pi)
     query.exec();
 
     if (!query.exec())
-        MythContext::DBError("GetInitialName", query);
+        MythDB::DBError("GetInitialName", query);
     else if (query.next())
         res = query.value(0).toString();
 
@@ -205,7 +205,7 @@ int PlayGroup::GetSetting(const QString &name, const QString &field,
                   .arg(field).arg(field));
     query.bindValue(":NAME", name);
     if (!query.exec())
-        MythContext::DBError("PlayGroup::GetSetting", query);
+        MythDB::DBError("PlayGroup::GetSetting", query);
     else if (query.next())
         res = query.value(1).toInt();
 
@@ -238,7 +238,7 @@ void PlayGroupEditor::open(QString name)
         query.prepare("INSERT INTO playgroup (name) VALUES (:NAME);");
         query.bindValue(":NAME", name);
         if (!query.exec())
-            MythContext::DBError("PlayGroupEditor::open", query);
+            MythDB::DBError("PlayGroupEditor::open", query);
         else
             created = true;
     }
@@ -252,7 +252,7 @@ void PlayGroupEditor::open(QString name)
         query.prepare("DELETE FROM playgroup WHERE name = :NAME;");
         query.bindValue(":NAME", name);
         if (!query.exec())
-            MythContext::DBError("PlayGroupEditor::open", query);
+            MythDB::DBError("PlayGroupEditor::open", query);
     }
 };
 
@@ -277,7 +277,7 @@ void PlayGroupEditor::doDelete(void)
         query.prepare("DELETE FROM playgroup WHERE name = :NAME;");
         query.bindValue(":NAME", name);
         if (!query.exec())
-            MythContext::DBError("PlayGroupEditor::doDelete", query);
+            MythDB::DBError("PlayGroupEditor::doDelete", query);
 
         int lastIndex = listbox->getValueIndex(name);
         lastValue = "";

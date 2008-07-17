@@ -22,7 +22,7 @@ using namespace std;
 #include "tv_rec.h"
 #include "mythcontext.h"
 #include "exitcodes.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "cardutil.h"
 #include "channelutil.h"
 #include "remoteutil.h"
@@ -35,7 +35,7 @@ using namespace std;
 #define LOC_ERR QString("ChannelBase(%1) Error: ").arg(GetCardID())
 
 ChannelBase::ChannelBase(TVRec *parent)
-    : 
+    :
     pParent(parent), curchannelname(""),
     currentInputID(-1), commfree(false), cardid(0)
 {
@@ -450,7 +450,7 @@ static bool is_input_group_busy(
             "WHERE chanid = :CHANID");
         query.bindValue(":CHANID", conflicts[0].chanid);
         if (!query.exec())
-            MythContext::DBError("is_input_group_busy", query);
+            MythDB::DBError("is_input_group_busy", query);
         else if (query.next())
         {
             mplexid_restriction = query.value(0).toUInt();
@@ -517,8 +517,8 @@ bool ChannelBase::IsInputAvailable(
 /** \fn ChannelBase::GetFreeInputs(const vector<uint>&) const
  *  \brief Returns the recorders available inputs.
  *
- *   This filters out the connected inputs that belong to an input 
- *   group which is busy. Recorders in the excluded cardids will 
+ *   This filters out the connected inputs that belong to an input
+ *   group which is busy. Recorders in the excluded cardids will
  *   not be considered busy for the sake of determining free inputs.
  *
  */
@@ -566,7 +566,7 @@ vector<InputInfo> ChannelBase::GetFreeInputs(
             continue;
 
         bool is_busy_grp = is_input_busy(
-            info.inputid, groupids, excluded_cardids, 
+            info.inputid, groupids, excluded_cardids,
             busygrp, busyrec, busyin, info.mplexid);
 
         if (!is_busy_grp)
@@ -581,7 +581,7 @@ uint ChannelBase::GetInputCardID(int inputNum) const
     InputMap::const_iterator it = inputs.find(inputNum);
     if (it != inputs.end())
         return (*it)->cardid;
-    return 0;    
+    return 0;
 }
 
 DBChanList ChannelBase::GetChannels(int inputNum) const
@@ -739,7 +739,7 @@ int ChannelBase::GetChanID() const
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("fetching chanid", query);
+        MythDB::DBError("fetching chanid", query);
         return -1;
     }
 
@@ -756,7 +756,7 @@ int ChannelBase::GetChanID() const
 bool ChannelBase::InitializeInputs(void)
 {
     inputs.clear();
-    
+
     uint cardid = max(GetCardID(), 0);
     if (!cardid)
     {
@@ -777,7 +777,7 @@ bool ChannelBase::InitializeInputs(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("InitializeInputs", query);
+        MythDB::DBError("InitializeInputs", query);
         return false;
     }
     else if (!query.size())
@@ -876,7 +876,7 @@ void ChannelBase::StoreInputChannels(const InputMap &inputs)
         query.bindValue(":CARDINPUTID", it.key());
 
         if (!query.exec() || !query.isActive())
-            MythContext::DBError("StoreInputChannels", query);
+            MythDB::DBError("StoreInputChannels", query);
     }
 }
 
@@ -896,14 +896,14 @@ void ChannelBase::StoreDefaultInput(uint cardid, const QString &input)
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("StoreDefaultInput", query);
+        MythDB::DBError("StoreDefaultInput", query);
 }
 
-bool ChannelBase::CheckChannel(const QString &channum, 
+bool ChannelBase::CheckChannel(const QString &channum,
                                QString& inputName) const
 {
     inputName = "";
-    
+
     bool ret = false;
 
     QString channelinput = GetCurrentInput();
@@ -928,7 +928,7 @@ bool ChannelBase::CheckChannel(const QString &channum,
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("checkchannel", query);
+        MythDB::DBError("checkchannel", query);
     }
     else if (query.size() > 0)
     {
@@ -955,8 +955,8 @@ bool ChannelBase::CheckChannel(const QString &channum,
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("checkchannel", query);
-    } 
+        MythDB::DBError("checkchannel", query);
+    }
     else if (query.size() > 0)
     {
         query.next();
