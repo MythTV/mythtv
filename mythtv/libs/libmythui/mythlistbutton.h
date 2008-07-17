@@ -48,8 +48,8 @@ class MythListButtonItem
     void setData(void *data);
     void *getData();
 
-    QString SetStringData(const QString &data);
-    QString GetStringData();
+    QString setStringData(const QString &data);
+    QString getStringData();
 
     void setOverrideInactive(bool flag);
     bool getOverrideInactive(void);
