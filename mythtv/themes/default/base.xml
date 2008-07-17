@@ -57,33 +57,31 @@
         <area>0,0,10,10</area>
         <layout>vertical</layout>
         <activefont>basesmall</activefont>
-        <inactivefont>basesmallgrey</inactivefont>
-        <scrollarrows show="yes">
-            <statetype name="upscrollarrow">
-                <state type="off">
-                    <imagetype name="upon">
-                        <filename>lb-uparrow-reg.png</filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="upoff">
-                        <filename>lb-uparrow-sel.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
-            <statetype name="downscrollarrow">
-                <state type="off">
-                    <imagetype name="dnon">
-                        <filename>lb-dnarrow-reg.png</filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="dnoff">
-                        <filename>lb-dnarrow-sel.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
-        </scrollarrows>
+        <inactivefont>basesmallgrey</inactivefont>>
+        <statetype name="upscrollarrow">
+            <state type="off">
+                <imagetype name="upon">
+                    <filename>lb-uparrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="upoff">
+                    <filename>lb-uparrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <statetype name="downscrollarrow">
+            <state type="off">
+                <imagetype name="dnon">
+                    <filename>lb-dnarrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="dnoff">
+                    <filename>lb-dnarrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
         <showarrow>yes</showarrow>
         <arrow filename="lb-arrow.png"/>
         <check-empty filename="lb-check-empty.png"/>
@@ -127,32 +125,30 @@
         <layout>horizontal</layout>
         <activefont>basesmall</activefont>
         <inactivefont>basesmallgrey</inactivefont>
-        <scrollarrows show="yes">
-            <statetype name="upscrollarrow">
-                <state type="off">
-                    <imagetype name="upon">
-                        <filename>lb-ltarrow-reg.png</filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="upoff">
-                        <filename>lb-ltarrow-sel.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
-            <statetype name="downscrollarrow">
-                <state type="off">
-                    <imagetype name="dnon">
-                        <filename>lb-rtarrow-reg.png</filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="dnoff">
-                        <filename>lb-rtarrow-sel.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
-        </scrollarrows>
+        <statetype name="upscrollarrow">
+            <state type="off">
+                <imagetype name="upon">
+                    <filename>lb-ltarrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="upoff">
+                    <filename>lb-ltarrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <statetype name="downscrollarrow">
+            <state type="off">
+                <imagetype name="dnon">
+                    <filename>lb-rtarrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="dnoff">
+                    <filename>lb-rtarrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
         <regular-background gradientstart="#505050" gradientend="#000000" gradientalpha="200"/>
         <selected-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
         <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="100"/>
