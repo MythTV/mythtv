@@ -662,7 +662,7 @@ void MythControls::GrabKey(void)
         popupStack->AddScreen(keyGrabPopup);
 
     connect(keyGrabPopup, SIGNAL(HaveResult(QString)),
-            SLOT(AddKeyToAction(QString)));
+            SLOT(AddKeyToAction(QString)), Qt::QueuedConnection);
 }
 
 /** \fn MythControls::AddKeyToAction(void)
