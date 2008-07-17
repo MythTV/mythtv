@@ -1193,6 +1193,7 @@ bool DiSEqCDevSwitch::Store(void) const
             "    switch_ports = :PORTS, "
             "    cmd_repeat   = :REPEAT "
             "WHERE diseqcid = :DEVID");
+        query.bindValue(":DEVID",   GetDeviceID());
     }
     else
     {
@@ -1200,7 +1201,7 @@ bool DiSEqCDevSwitch::Store(void) const
             "INSERT INTO diseqc_tree"
             " ( parentid,      ordinal,         type, "
             "   description,   subtype,         switch_ports, "
-            "   cmd_repeat )"
+            "   cmd_repeat ) "
             "VALUES "
             " (:PARENT,       :ORDINAL,         'switch', "
             "  :DESC,         :TYPE,            :PORTS, "
@@ -1215,7 +1216,6 @@ bool DiSEqCDevSwitch::Store(void) const
     query.bindValue(":TYPE",    type);
     query.bindValue(":PORTS",   m_num_ports);
     query.bindValue(":REPEAT",  m_repeat);
-    query.bindValue(":DEVID",   GetDeviceID());
 
     if (!query.exec())
     {
@@ -1816,6 +1816,7 @@ bool DiSEqCDevRotor::Store(void) const
             "    rotor_positions = :POSMAP,  "
             "    cmd_repeat      = :REPEAT   "
             "WHERE diseqcid = :DEVID");
+        query.bindValue(":DEVID",   GetDeviceID());
     }
     else
     {
@@ -1840,7 +1841,6 @@ bool DiSEqCDevRotor::Store(void) const
     query.bindValue(":LOSPEED", m_speed_lo);
     query.bindValue(":POSMAP",  posmap);
     query.bindValue(":REPEAT",  m_repeat);
-    query.bindValue(":DEVID",   GetDeviceID());
 
     if (!query.exec())
     {
@@ -2105,6 +2105,7 @@ bool DiSEqCDevLNB::Store(void) const
             "    lnb_pol_inv     = :POLINV,  "
             "    cmd_repeat      = :REPEAT   "
             "WHERE diseqcid = :DEVID");
+        query.bindValue(":DEVID",   GetDeviceID());
     }
     else
     {
@@ -2132,7 +2133,6 @@ bool DiSEqCDevLNB::Store(void) const
     query.bindValue(":LOFHI",   m_lof_hi);
     query.bindValue(":POLINV",  m_pol_inv);
     query.bindValue(":REPEAT",  m_repeat);
-    query.bindValue(":DEVID",   GetDeviceID());
 
     // update dev_id
     if (!query.exec())
