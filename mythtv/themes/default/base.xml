@@ -36,15 +36,15 @@
         <color>#000000</color>
     </font>
 
-    <font name="smallyellow" from="basesmall">
+    <font name="basesmallyellow" from="basesmall">
         <color>#FFFF33</color>
     </font>
 
-    <font name="smallgreen" from="basesmall">
+    <font name="basesmallgreen" from="basesmall">
         <color>#33CC33</color>
     </font>
 
-    <font name="smallred" from="basesmall">
+    <font name="basesmallred" from="basesmall">
         <color>#DD3333</color>
     </font>
 
@@ -201,7 +201,7 @@
         <textarea name="messagearea" from="basetextarea">
             <area>12,20,470,210</area>
             <multiline>yes</multiline>
-            <align>center</align>
+            <align>allcenter</align>
         </textarea>
 
         <buttonlist name="list" from="basebuttonlist">
@@ -209,7 +209,6 @@
             <drawfrombottom>yes</drawfrombottom>
             <align>center</align>
             <showarrow>no</showarrow>
-            <scrollarrows show="no"></scrollarrows>
         </buttonlist>
     </window>
 
