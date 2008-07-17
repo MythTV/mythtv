@@ -48,10 +48,12 @@ bool AudioOutputJACK::OpenDevice()
     VERBOSE(VB_GENERAL, QString("Opening JACK audio device '%1'.")
             .arg(audio_main_device));
 
-    if (!audio_main_device.isEmpty()) {
+    if (!audio_main_device.isEmpty())
+    {
+        QByteArray main_device = audio_main_device.toAscii();
         jack_port_flags = 0;
         jack_port_name_count = 1;
-        jack_port_name = audio_main_device.ascii();
+        jack_port_name = main_device.constData();
     }
 
     int err = -1;
@@ -78,15 +80,13 @@ bool AudioOutputJACK::OpenDevice()
             audio_samplerate = audio_samplerate_long;
         } else if (err == ERR_PORT_NOT_FOUND) {
             VERBOSE(VB_IMPORTANT, QString("Error opening audio device (%1), "
-                    " Port not found.").arg(audio_main_device));
-            perror(audio_main_device.ascii());
+                    " Port not found.").arg(audio_main_device) + ENO);
         }
 
         if (err != 0)
         {
-            VERBOSE(VB_IMPORTANT, QString("Error opening audio device (%1), the"
-                    " error num was: %2").arg(audio_main_device).arg(err));
-            perror(audio_main_device.ascii());
+            VERBOSE(VB_IMPORTANT, QString("Error opening audio device (%1)")
+                    .arg(audio_main_device) + ENO);
         }
         if (audioid < 0)
             usleep(50);

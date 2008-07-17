@@ -2309,8 +2309,9 @@ void MythContext::LogEntry(const QString &module, int priority,
 
         if (priority <= d->m_logprintlevel)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("%1: %2").arg(module).arg(fullMsg).utf8());
+            QByteArray tmp =
+                QString("%1: %2").arg(module).arg(fullMsg).toUtf8();
+            VERBOSE(VB_IMPORTANT, tmp.constData());
         }
     }
 }

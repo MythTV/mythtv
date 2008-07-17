@@ -657,11 +657,15 @@ QString MediaMonitor::defaultDevice(QString dbSetting,
     extern unsigned int print_verbose_messages;
     if (print_verbose_messages & 0x00800000)  // VB_MEDIA
     {
+        QByteArray tmp1 = dbSetting.toAscii();
+        QByteArray tmp2 = label.toAscii();
+        QByteArray tmp3 = device.toAscii();
         QDateTime dtmp = QDateTime::currentDateTime();
         QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz");
-        cout << dtime << " MediaMonitor::defaultDevice('" << dbSetting.ascii()
-             << "', '" << label.ascii() << "'') returning '"
-             << device.ascii() << "'" << endl;
+        cout << dtime << " MediaMonitor::defaultDevice('"
+             << tmp1.constData()
+             << "', '" << tmp2.constData() << "'') returning '"
+             << tmp3.constData() << "'" << endl;
     }
 #endif
 

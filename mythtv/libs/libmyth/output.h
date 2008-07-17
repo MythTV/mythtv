@@ -38,11 +38,12 @@ public:
 	  brate(b), freq(f), prec(p), chan(c)
     { ; }
 
-    OutputEvent(const QString &e)
-	: MythEvent(Error), elasped_seconds(0), written_bytes(0),
-	  brate(0), freq(0), prec(0), chan(0)
+    OutputEvent(const QString &e) :
+        MythEvent(Error), elasped_seconds(0), written_bytes(0),
+        brate(0), freq(0), prec(0), chan(0)
     {
-        error_msg = new QString(e.utf8());
+        QByteArray tmp = e.toUtf8();
+        error_msg = new QString(tmp.constData());
     }
 
 

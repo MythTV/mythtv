@@ -273,7 +273,8 @@ long long stringToLongLong(const QString &str)
     long long retval = 0;
     if (str != QString::null)
     {
-        retval = strtoll(str.ascii(), NULL, 0);
+        QByteArray tmp = str.toAscii();
+        retval = strtoll(tmp.constData(), NULL, 0);
     }
     return retval;
 }
@@ -773,7 +774,8 @@ QString createTempFile(QString name_template, bool dir)
     }
     QString tmpFileName(tempfilename);
 #else
-    const char *tmp = name_template.ascii();
+    QByteArray safe_name_template = name_template.toAscii();
+    const char *tmp = safe_name_template.constData();
     char *ctemplate = strdup(tmp);
 
     if (dir)

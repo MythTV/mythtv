@@ -50,18 +50,20 @@ bool AudioOutputOSS::OpenDevice()
     
     while (timer.elapsed() < 2000 && audiofd == -1)
     {
-        audiofd = open(audio_main_device.ascii(), O_WRONLY | O_NONBLOCK);
+        QByteArray main_device = audio_main_device.toAscii();
+        audiofd = open(main_device.constData(), O_WRONLY | O_NONBLOCK);
         if (audiofd < 0 && errno != EAGAIN && errno != EINTR)
         {
             if (errno == EBUSY)
             {
                 Error(QString("WARNING: something is currently"
-                              " using: %1, retrying.").arg(audio_main_device));
+                              " using: %1.").arg(audio_main_device));
                 return false;
             }
-            VERBOSE(VB_IMPORTANT, QString("Error opening audio device (%1), the"
-                    " error was: %2").arg(audio_main_device).arg(strerror(errno)));
-            perror(audio_main_device.ascii());
+
+            VERBOSE(VB_IMPORTANT, QString(
+                        "Error opening audio device (%1)")
+                    .arg(audio_main_device) + ENO);
         }
         if (audiofd < 0)
             usleep(50);
@@ -281,7 +283,8 @@ void AudioOutputOSS::VolumeInit()
     int volume = 0;
 
     QString device = gContext->GetSetting("MixerDevice", "/dev/mixer");
-    mixerfd = open(device.ascii(), O_RDONLY);
+    QByteArray dev = device.toAscii();
+    mixerfd = open(dev.constData(), O_RDONLY);
 
     QString controlLabel = gContext->GetSetting("MixerControl", "PCM");
 

@@ -138,7 +138,7 @@ void MythTerminal::ProcessSendKeyPress(QKeyEvent *e)
     if (running && process && e->text().length())
     {
         AddText(e->text().local8Bit());
-        if (e->ascii()=='\n' || e->ascii()=='\r')
+        if (e->text()=="\n" || e->text()=="\r")
             process->write("\r\n");
         else
             process->write(e->text().local8Bit());

@@ -483,10 +483,11 @@ int AudioOutputALSA::GetVolumeChannel(int channel) const
     if (mixer_handle == NULL)
         return 100;
 
+    QByteArray mix_ctl = mixer_control.toAscii();
     snd_mixer_selem_id_t *sid;
     snd_mixer_selem_id_alloca(&sid);
     snd_mixer_selem_id_set_index(sid, 0);
-    snd_mixer_selem_id_set_name(sid, mixer_control.ascii());
+    snd_mixer_selem_id_set_name(sid, mix_ctl.constData());
 
     snd_mixer_elem_t *elem = snd_mixer_find_selem(mixer_handle, sid);
     if (!elem)
@@ -529,10 +530,11 @@ void AudioOutputALSA::SetCurrentVolume(QString control, int channel, int volume)
     if (!mixer_handle)
         return; // no mixer, nothing to do
 
+    QByteArray ctl = control.toAscii();
     snd_mixer_selem_id_t *sid;
     snd_mixer_selem_id_alloca(&sid);
     snd_mixer_selem_id_set_index(sid, 0);
-    snd_mixer_selem_id_set_name(sid, control.ascii());
+    snd_mixer_selem_id_set_name(sid, ctl.constData());
 
     snd_mixer_elem_t *elem = snd_mixer_find_selem(mixer_handle, sid);
     if (!elem)
@@ -648,7 +650,8 @@ void AudioOutputALSA::SetupMixer(void)
         return;
     }
 
-    if ((err = snd_mixer_attach(mixer_handle, device.ascii())) < 0)
+    QByteArray dev = device.toAscii();
+    if ((err = snd_mixer_attach(mixer_handle, dev.constData())) < 0)
     {
         Warn(QString("Mixer attach error %1: %2"
                      "\n\t\t\tCheck Mixer Name in Setup: '%3'")

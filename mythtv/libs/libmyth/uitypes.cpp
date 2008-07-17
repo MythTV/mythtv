@@ -5862,8 +5862,10 @@ void UIKeyboardType::keyPressEvent(QKeyEvent *e)
 
     if (!handled)
     {
-        QApplication::postEvent(m_parentEdit, new QKeyEvent(e->type(), e->key(),
-                e->ascii(), e->state(), e->text(), e->isAutoRepeat(), e->count()));
+        QKeyEvent *key = new QKeyEvent(
+            e->type(), e->key(), e->modifiers(),
+            e->text(), e->isAutoRepeat(), e->count());
+        QApplication::postEvent(m_parentEdit, key);
         m_parentEdit->setFocus();
     }
 }

@@ -45,8 +45,9 @@ bool MythCommandLineParser::Parse(
         QFile f(filename);
         if (!f.open(IO_ReadOnly))
         {
+            QByteArray tmp = filename.toAscii();
             cerr << "Failed to open the override settings file: '"
-                 << filename.ascii() << "'" << endl;
+                 << tmp.constData() << "'" << endl;
             err = true;
             return true;
         }

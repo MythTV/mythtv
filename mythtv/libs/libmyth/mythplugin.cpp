@@ -39,7 +39,8 @@ int MythPlugin::init(const char *libversion)
     QString error_msg(dlerror());
     if (error_msg.isEmpty())
     {
-        (void)dlopen(QLibrary::library().ascii(), RTLD_LAZY);
+        QByteArray libname = QLibrary::library().toAscii();
+        (void)dlopen(libname.constData(), RTLD_LAZY);
         error_msg = dlerror();
     }
 
