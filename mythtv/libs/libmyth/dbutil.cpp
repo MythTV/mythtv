@@ -11,7 +11,7 @@
 
 #include "dbutil.h"
 #include "mythcontext.h"
-#include "mythdbcon.h"
+#include "mythdb.h"
 #include "storagegroup.h"
 #include "util.h"
 
@@ -247,7 +247,7 @@ QStringList DBUtil::GetTables(void)
     query.prepare("SHOW FULL TABLES");
     if (!query.exec())
     {
-        MythContext::DBError("DBUtil Finding Tables", query);
+        MythDB::DBError("DBUtil Finding Tables", query);
         return result;
     }
 
@@ -437,7 +437,7 @@ bool DBUtil::QueryDBMSVersion(void)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to determine MySQL "
                     "version.");
-            MythContext::DBError("DBUtil Querying DBMS version", query);
+            MythDB::DBError("DBUtil Querying DBMS version", query);
             dbmsVersion = QString::null;
         }
         else

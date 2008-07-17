@@ -4,7 +4,7 @@
 
 #include "storagegroup.h"
 #include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "util.h"
 
 #define LOC QString("SG(%1): ").arg(m_groupname)
@@ -64,7 +64,7 @@ void StorageGroup::Init(const QString group, const QString hostname)
     }
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("StorageGroup::StorageGroup()", query);
+        MythDB::DBError("StorageGroup::StorageGroup()", query);
     else if (!query.next())
     {
         if (group != "Default")
@@ -248,7 +248,7 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
     query.bindValue(":HOSTNAME", gContext->GetHostName());
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("StorageGroup::CheckAllStorageGroupDirs()", query);
+        MythDB::DBError("StorageGroup::CheckAllStorageGroupDirs()", query);
         return;
     }
 
@@ -411,7 +411,7 @@ void StorageGroupEditor::open(QString name)
         query.bindValue(":DIRNAME", name);
         query.bindValue(":HOSTNAME", gContext->GetHostName());
         if (!query.exec())
-            MythContext::DBError("StorageGroupEditor::open", query);
+            MythDB::DBError("StorageGroupEditor::open", query);
         else
             lastValue = name;
     } else {
@@ -436,7 +436,7 @@ void StorageGroupEditor::open(QString name)
         query.bindValue(":DIRNAME", lastValue);
         query.bindValue(":HOSTNAME", gContext->GetHostName());
         if (!query.exec())
-            MythContext::DBError("StorageGroupEditor::open", query);
+            MythDB::DBError("StorageGroupEditor::open", query);
 
         query.prepare("INSERT INTO storagegroup (groupname, hostname, dirname) "
                       "VALUES (:NAME, :HOSTNAME, :DIRNAME);");
@@ -444,7 +444,7 @@ void StorageGroupEditor::open(QString name)
         query.bindValue(":DIRNAME", name);
         query.bindValue(":HOSTNAME", gContext->GetHostName());
         if (!query.exec())
-            MythContext::DBError("StorageGroupEditor::open", query);
+            MythDB::DBError("StorageGroupEditor::open", query);
         else
             lastValue = name;
     }
@@ -476,7 +476,7 @@ void StorageGroupEditor::doDelete(void)
         query.bindValue(":DIRNAME", name);
         query.bindValue(":HOSTNAME", gContext->GetHostName());
         if (!query.exec())
-            MythContext::DBError("StorageGroupEditor::doDelete", query);
+            MythDB::DBError("StorageGroupEditor::doDelete", query);
 
         int lastIndex = listbox->getValueIndex(name);
         lastValue = "";
@@ -498,7 +498,7 @@ void StorageGroupEditor::Load(void)
     query.bindValue(":NAME", m_group);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("StorageGroupEditor::doDelete", query);
+        MythDB::DBError("StorageGroupEditor::doDelete", query);
     else
     {
         bool first = true;
@@ -615,7 +615,7 @@ void StorageGroupListEditor::doDelete(void)
         query.bindValue(":NAME", name);
         query.bindValue(":HOSTNAME", gContext->GetHostName());
         if (!query.exec())
-            MythContext::DBError("StorageGroupListEditor::doDelete", query);
+            MythDB::DBError("StorageGroupListEditor::doDelete", query);
 
         int lastIndex = listbox->getValueIndex(name);
         lastValue = "";
@@ -642,7 +642,7 @@ void StorageGroupListEditor::Load(void)
                   "ORDER BY groupname;");
     query.bindValue(":HOSTNAME", gContext->GetHostName());
     if (!query.exec())
-        MythContext::DBError("StorageGroup::Load getting local group names",
+        MythDB::DBError("StorageGroup::Load getting local group names",
                              query);
     else
     {
@@ -654,7 +654,7 @@ void StorageGroupListEditor::Load(void)
                   "FROM storagegroup "
                   "ORDER BY groupname;");
     if (!query.exec())
-        MythContext::DBError("StorageGroup::Load getting all group names",
+        MythDB::DBError("StorageGroup::Load getting all group names",
                              query);
     else
     {

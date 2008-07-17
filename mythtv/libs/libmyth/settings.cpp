@@ -28,8 +28,9 @@ using namespace std;
 
 #include "mythwidgets.h"
 #include "mythcontext.h"
-#include "DisplayRes.h"
-#include "mythuihelper.h"
+#include "libmythdb/mythdb.h"
+#include "libmythui/DisplayRes.h"
+#include "libmythui/mythuihelper.h"
 
 /** \class Configurable
  *  \brief Configurable is the root of all the database aware widgets.
@@ -873,7 +874,7 @@ void AutoIncrementDBSetting::Save(QString table)
 
         if (!query.isActive() || query.numRowsAffected() < 1) 
         {
-            MythContext::DBError("inserting row", query);
+            MythDB::DBError("inserting row", query);
             return;
         }
         // XXX -- HACK BEGIN:
