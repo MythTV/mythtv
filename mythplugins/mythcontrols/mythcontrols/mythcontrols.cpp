@@ -294,8 +294,6 @@ bool MythControls::keyPressEvent(QKeyEvent *event)
         {
             escape = true;
 
-            handled = false;
-
             if (m_bindings->HasChanges())
             {
                 /* prompt user to save changes */
@@ -615,7 +613,7 @@ void MythControls::DeleteKey(void)
  *  \return true if the conflict should be bound, false otherwise.
  */
 void MythControls::ResolveConflict(ActionID *conflict, int error_level,
-                                    QString key)
+                                    const QString &key)
 {
     if (!conflict)
         return;
@@ -663,7 +661,8 @@ void MythControls::GrabKey(void)
     if (keyGrabPopup->Create())
         popupStack->AddScreen(keyGrabPopup);
 
-    keyGrabPopup->SetReturnEvent(this, "keygrab");
+    connect(keyGrabPopup, SIGNAL(HaveResult(QString)),
+            SLOT(AddKeyToAction(QString)));
 }
 
 /** \fn MythControls::AddKeyToAction(void)
@@ -740,7 +739,7 @@ void MythControls::customEvent(QEvent *event)
             if (buttonnum == 0)
                 Save();
 
-            GetMythMainWindow()->GetMainStack()->PopScreen();
+            GetScreenStack()->PopScreen();
         }
         else if (resultid == "view")
         {
@@ -780,14 +779,6 @@ void MythControls::customEvent(QEvent *event)
 
             if (GetFocusWidget() != m_leftList)
                 SetFocusWidget(m_leftList);
-        }
-        else if (resultid == "keygrab")
-        {
-            if (buttonnum == 0)
-            {
-                QString key = *(QString *)dce->GetResultData();
-                AddKeyToAction(key);
-            }
         }
         else if (resultid == "conflict")
         {

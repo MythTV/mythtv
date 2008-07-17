@@ -9,7 +9,7 @@
  *  \brief Captures a key.
  *
  */
-class KeyGrabPopupBox : public MythDialogBox
+class KeyGrabPopupBox : public MythScreenType
 {
     Q_OBJECT
 
@@ -20,10 +20,20 @@ class KeyGrabPopupBox : public MythDialogBox
     bool keyPressEvent(QKeyEvent *);
     bool Create(void);
 
+  signals:
+    void HaveResult(QString);
+
+  private slots:
+    void SendResult();
+
   private:
     bool     m_waitingForKeyRelease;
     bool     m_keyReleaseSeen;
     QString  m_capturedKey;
+
+    MythUIText   *m_messageText;
+    MythUIButton *m_okButton;
+    MythUIButton *m_cancelButton;
 };
 
 #endif // KEYGRABBER_H_

@@ -78,7 +78,6 @@ class MythControls : public MythScreenType
     void    UpdateRightList(void);
 
     void GrabKey(void);
-    void AddKeyToAction(QString key, bool ignoreconflict = false);
     void DeleteKey(void);
     void Save(void) { m_bindings->CommitChanges(); }
 
@@ -86,7 +85,8 @@ class MythControls : public MythScreenType
     uint    GetCurrentButton(void);
 
     // Functions
-    void ResolveConflict(ActionID *conflict, int error_level, QString key);
+    void ResolveConflict(ActionID *conflict, int error_level,
+                         const QString &key);
     QString GetTypeDesc(ListType type) const;
 
   private slots:
@@ -96,6 +96,7 @@ class MythControls : public MythScreenType
     void RightPressed(MythListButtonItem*);
     void ActionButtonPressed();
     void RefreshKeyInformation(void);
+    void AddKeyToAction(QString key, bool ignoreconflict = false);
 
   private:
     ViewType          m_currentView;

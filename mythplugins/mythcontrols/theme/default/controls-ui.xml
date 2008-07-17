@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mythuitheme>
 
+    <window name="keygrabpopup">
+        <area>150,50,500,500</area>
+        <imagetype name="backimg">
+            <filename>mythdialogbox-background.png</filename>
+        </imagetype>
+
+        <textarea name="message" from="basetextarea">
+            <area>18,18,460,400</area>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <button name="cancel" from="basebutton">
+            <position>85,420</position>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>265,420</position>
+        </button>
+    </window>
+
     <window name="controls">
 
         <textarea name="leftdesc">
@@ -42,7 +62,7 @@
             <position>600,450</position>
         </button>
 
-        <textarea name="description">
+        <textarea name="description" from="basetextarea">
             <area>30,490,740,110</area>
             <multiline>yes</multiline>
             <align>center</align>

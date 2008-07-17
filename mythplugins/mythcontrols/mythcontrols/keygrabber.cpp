@@ -9,10 +9,12 @@
 #include "keygrabber.h"
 
 KeyGrabPopupBox::KeyGrabPopupBox(MythScreenStack *parent)
-    : MythDialogBox ("", parent, "keygrabberdialog")
+    : MythScreenType (parent, "keygrabberdialog")
 {
     m_waitingForKeyRelease = m_keyReleaseSeen = false;
     m_capturedKey = QString::null;
+    m_okButton = m_cancelButton = NULL;
+    m_messageText = NULL;
 }
 
 KeyGrabPopupBox::~KeyGrabPopupBox()
@@ -21,14 +23,35 @@ KeyGrabPopupBox::~KeyGrabPopupBox()
 
 bool KeyGrabPopupBox::Create(void)
 {
-    MythDialogBox::Create();
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("controls-ui.xml", "keygrabpopup", this);
+
+    if (!foundtheme)
+        return false;
+
+    m_messageText = dynamic_cast<MythUIText *> (GetChild("message"));
+    m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
+    m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
+
+    if (!m_messageText || !m_okButton || !m_cancelButton)
+    {
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical elements.");
+        return false;
+    }
 
     QString label = QString("%1\n\n%2").arg(tr("Press A Key")).arg(tr("Waiting for key press"));
 
-    m_textarea->SetText(label);
-    AddButton(tr("Ok"), &m_capturedKey);
-    AddButton(tr("Cancel"));
-    m_buttonList->SetActive(false);
+    m_messageText->SetText(label);
+    m_okButton->SetText(tr("Ok"));
+    m_cancelButton->SetText(tr("Cancel"));
+
+    connect(m_okButton, SIGNAL(buttonPressed()), SLOT(SendResult()));
+    connect(m_cancelButton, SIGNAL(buttonPressed()), SLOT(Close()));
+
+    m_okButton->SelectState(MythUIButton::Disabled);
+    m_cancelButton->SelectState(MythUIButton::Disabled);
 
     return true;
 }
@@ -76,18 +99,32 @@ bool KeyGrabPopupBox::keyPressEvent(QKeyEvent *event)
 
         if (key_name.isEmpty())
         {
-            m_textarea->SetText(tr("Pressed key not recognized"));
+            m_messageText->SetText(tr("Pressed key not recognized"));
         }
         else
         {
             m_capturedKey = key_name;
-            m_textarea->SetText(tr("Add key '%1'?").arg(key_name));
+            m_messageText->SetText(tr("Add key '%1'?").arg(key_name));
         }
 
-        m_buttonList->SetActive(true);
+        m_okButton->SelectState(MythUIButton::Normal);
+        m_cancelButton->SelectState(MythUIButton::Normal);
+
+        BuildFocusList();
+
+        SetFocusWidget(m_okButton);
 
         handled = true;
     }
 
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
     return handled;
+}
+
+void KeyGrabPopupBox::SendResult()
+{
+    emit HaveResult(m_capturedKey);
+    Close();
 }
