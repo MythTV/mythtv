@@ -84,7 +84,7 @@ class Source : public ComboBoxSetting, public ChannelDBStorage
         
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("Source::fillSelections", query);
+            MythDB::DBError("Source::fillSelections", query);
         }
         else
         {
@@ -431,7 +431,7 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
     query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("sourceChanged -- supports eit", query);
+        MythDB::DBError("sourceChanged -- supports eit", query);
     else
     {
         supports_eit = (query.size()) ? false : true;
@@ -447,7 +447,7 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
         query.bindValue(":SOURCEID", sourceid);
 
         if (!query.exec() || !query.isActive())
-            MythContext::DBError("sourceChanged -- eit only", query);
+            MythDB::DBError("sourceChanged -- eit only", query);
         else
         {
             uses_eit_only = (query.size()) ? true : false;
