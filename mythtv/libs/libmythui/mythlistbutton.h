@@ -190,7 +190,6 @@ class MythListButton : public MythUIType
     int m_columns;
 
     bool m_active;
-    bool m_showScrollArrows;
     bool m_showArrow;
 
     MythUIStateType *m_upArrow;

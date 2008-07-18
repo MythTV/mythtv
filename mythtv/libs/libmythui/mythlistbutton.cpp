@@ -19,7 +19,6 @@ MythListButton::MythListButton(MythUIType *parent, const QString &name)
               : MythUIType(parent, name)
 {
     m_showArrow = true;
-    m_showScrollArrows = false;
 
     Const();
 }
@@ -32,7 +31,6 @@ MythListButton::MythListButton(MythUIType *parent, const QString &name,
     m_Area             = area;
 
     m_showArrow        = showArrow;
-    m_showScrollArrows = showScrollArrows;
 
     Const();
 }
@@ -219,7 +217,7 @@ void MythListButton::SetPositionArrowStates(void)
 
     }
 
-    if (!m_showScrollArrows || !m_downArrow || !m_upArrow)
+    if (!m_downArrow || !m_upArrow)
         return;
 
     if (m_itemCount == 0)
@@ -664,17 +662,20 @@ void MythListButton::Init()
 
     m_initialized = true;
 
+    m_upArrow = dynamic_cast<MythUIStateType *>(GetChild("upscrollarrow"));
+    m_downArrow = dynamic_cast<MythUIStateType *>(GetChild("downscrollarrow"));
+
     QRect arrowsRect;
-    if (m_showScrollArrows && m_upArrow)
+    if (m_upArrow)
         arrowsRect = PlaceArrows(m_upArrow->GetArea().size());
     else
         arrowsRect = QRect(0, 0, 0, 0);
 
     if (m_upArrow)
-        m_upArrow->SetVisible(m_showScrollArrows);
+        m_upArrow->SetVisible(true);
 
     if (m_downArrow)
-        m_downArrow->SetVisible(m_showScrollArrows);
+        m_downArrow->SetVisible(true);
 
     m_contentsRect = CalculateContentsRect(arrowsRect);
 
@@ -1048,20 +1049,6 @@ bool MythListButton::ParseElement(QDomElement &element)
         if (fp)
             *m_fontActive = *fp;
     }
-    else if (element.tagName() == "scrollarrows")
-    {
-        m_showScrollArrows = parseBool(element.attribute("show", ""));
-        if (m_showScrollArrows)
-        {
-            if (m_upArrow)
-                delete m_upArrow;
-            if (m_downArrow)
-                delete m_downArrow;
-            ParseChildren(element, this);
-            m_upArrow = dynamic_cast<MythUIStateType *>(GetChild("upscrollarrow"));
-            m_downArrow = dynamic_cast<MythUIStateType *>(GetChild("downscrollarrow"));
-        }
-    }
     else if (element.tagName() == "showarrow")
         m_showArrow = parseBool(element);
     else if (element.tagName() == "arrow")
@@ -1173,7 +1160,6 @@ void MythListButton::CopyFrom(MythUIType *base)
         checkFullPix->UpRef();
 
     m_active = lb->m_active;
-    m_showScrollArrows = lb->m_showScrollArrows;
     m_showArrow = lb->m_showArrow;
 
     *m_fontActive = *lb->m_fontActive;
