@@ -11,6 +11,8 @@
  */
 class MythUICheckBox : public MythUIButton
 {
+    Q_OBJECT
+
   public:
     MythUICheckBox(MythUIType *parent, const QString &name, bool doInit = true);
    ~MythUICheckBox();
