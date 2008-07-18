@@ -28,6 +28,7 @@ LircThread::LircThread(QObject *main_window)
 {
     mainWindow = main_window;
     bStop = false;
+    lircConfig = NULL;
 }
 
 int LircThread::Init(const QString &config_file, const QString &program,
@@ -66,7 +67,8 @@ int LircThread::Init(const QString &config_file, const QString &program,
 LircThread::~LircThread()
 {
     lirc_deinit();
-    lirc_freeconfig(lircConfig);
+    if (lircConfig)
+        lirc_freeconfig(lircConfig);
 }
 
 void LircThread::run(void)
