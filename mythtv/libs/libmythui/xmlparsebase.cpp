@@ -181,7 +181,10 @@ void XMLParseBase::ParseChildren(QDomElement &element,
         if (!info.isNull())
         {
             QString type = info.tagName();
-            if (type == "font")
+            if (parent->ParseElement(info))
+            {
+            }
+            else if (type == "font")
             {
                 MythFontProperties *font;
                 bool global = (GetGlobalObjectStore() == parent);
