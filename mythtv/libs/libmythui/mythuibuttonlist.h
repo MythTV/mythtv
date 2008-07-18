@@ -3,6 +3,7 @@
 
 #include <QList>
 #include <QString>
+#include <QVariant>
 
 #include "mythuitype.h"
 #include "mythuiimage.h"
@@ -44,11 +45,13 @@ class MythUIButtonListItem
 
     void setDrawArrow(bool flag);
 
+    // Deprecated, use the QVariant based SetData & GetData instead
     void setData(void *data);
     void *getData();
+    // ------------
 
-    QString setStringData(const QString &data);
-    QString getStringData();
+    void SetData(QVariant data);
+    QVariant GetData();
 
     void setOverrideInactive(bool flag);
     bool getOverrideInactive(void);
@@ -63,7 +66,7 @@ class MythUIButtonListItem
     MythImage      *m_image;
     bool            m_checkable;
     CheckState      m_state;
-    void           *m_data;
+    QVariant        m_data;
     QString         m_stringData;
     bool            m_showArrow;
     bool            m_overrideInactive;

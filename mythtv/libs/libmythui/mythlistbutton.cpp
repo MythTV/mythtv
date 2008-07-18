@@ -1302,22 +1302,23 @@ void MythListButtonItem::setDrawArrow(bool flag)
 
 void MythListButtonItem::setData(void *data)
 {
-    m_data = data;
+    m_data = qVariantFromValue(data);
 }
 
 void *MythListButtonItem::getData()
 {
+    void *vp = m_data.value<void *>();
+    return vp;
+}
+
+void MythListButtonItem::SetData(QVariant data)
+{
+    m_data = data;
+}
+
+QVariant MythListButtonItem::GetData()
+{
     return m_data;
-}
-
-QString MythListButtonItem::setStringData(const QString &data)
-{
-    m_stringData = data;
-}
-
-QString MythListButtonItem::getStringData()
-{
-    return m_stringData;
 }
 
 void MythListButtonItem::setOverrideInactive(bool flag)
