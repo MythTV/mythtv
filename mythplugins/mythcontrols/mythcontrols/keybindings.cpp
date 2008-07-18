@@ -185,7 +185,7 @@ bool KeyBindings::AddActionKey(const QString &context_name,
 ActionID *KeyBindings::GetConflict(
     const QString &context_name, const QString &key, int &level) const
 {
-    const ActionList &ids = m_actionSet.GetActions(key);
+    const ActionList ids = m_actionSet.GetActions(key);
 
     // trying to bind a jumppoint to an already bound key
     if ((context_name == ActionSet::kJumpContext) && (ids.count() > 0))

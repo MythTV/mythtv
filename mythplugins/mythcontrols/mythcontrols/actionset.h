@@ -61,7 +61,7 @@ class ActionSet
     QStringList GetContextKeys(const QString &context_name) const;
     QStringList GetAllKeys(void) const;
     QString     GetDescription(const ActionID &id) const;
-    const ActionList& GetActions(const QString &key) const;
+    const ActionList GetActions(const QString &key) const;
     /// \brief Returns the appropriate container of modified actions
     ///        based on current context. (result not thread-safe)
     const ActionList &GetModified(void) const { return m_modified; }

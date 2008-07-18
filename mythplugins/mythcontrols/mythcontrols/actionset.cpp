@@ -304,7 +304,7 @@ QString ActionSet::GetDescription(const ActionID &id) const
  *  \brief Returns the actions bound to the specified key.
  *         (note: result not thread-safe)
  */
-const ActionList &ActionSet::GetActions(const QString &key) const
+const ActionList ActionSet::GetActions(const QString &key) const
 {
     return m_keyToActionMap[key];
 }
