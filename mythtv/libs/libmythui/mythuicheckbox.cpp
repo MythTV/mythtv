@@ -7,8 +7,7 @@ MythUICheckBox::MythUICheckBox(MythUIType *parent, const QString &name,
                                bool doInit)
             : MythUIButton(parent, name, doInit)
 {
-    if (doInit)
-        EnableCheck(true);
+    EnableCheck(true);
 }
 
 MythUICheckBox::~MythUICheckBox()
@@ -21,6 +20,8 @@ void MythUICheckBox::toggleCheckState()
         SetCheckState(MythUIStateType::Full);
     else
         SetCheckState(MythUIStateType::Off);
+
+    emit valueChanged();
 }
 
 /** \brief Mouse click/movement handler, recieves mouse gesture events from the
