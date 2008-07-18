@@ -191,6 +191,7 @@ void MythControls::ChangeButtonFocus(int direction)
  */
 void MythControls::LeftPressed(MythListButtonItem *item)
 {
+    (void) item;
     NextPrevWidgetFocus(true);
 }
 
@@ -199,6 +200,7 @@ void MythControls::LeftPressed(MythListButtonItem *item)
  */
 void MythControls::RightPressed(MythListButtonItem *item)
 {
+    (void) item;
     if (m_currentView == kActionsByContext)
         ChangeButtonFocus(0);
 }
@@ -413,7 +415,7 @@ void MythControls::RefreshKeyInformation(void)
 
     QStringList keys = m_bindings->GetActionKeys(context, action);
     for (int i = 0; (i < keys.count()) &&
-             (i < Action::kMaximumNumberOfBindings); i++)
+             (i < (int)Action::kMaximumNumberOfBindings); i++)
     {
         m_actionButtons.at(i)->SetText(keys[i]);
     }
