@@ -20,6 +20,9 @@ class MythUICheckBox : public MythUIButton
 
     void toggleCheckState(void);
 
+  signals:
+    void valueChanged();
+
   protected:
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
