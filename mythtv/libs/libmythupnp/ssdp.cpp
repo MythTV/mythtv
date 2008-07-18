@@ -142,13 +142,13 @@ void SSDP::DisableNotifications()
 
 void SSDP::PerformSearch( const QString &sST )
 {
-    Q3CString sRequest = QString( "M-SEARCH * HTTP/1.1\r\n"
-                                 "HOST: 239.255.255.250:1900\r\n"
-                                 "MAN: \"ssdp:discover\"\r\n"
-                                 "MX: 2\r\n"
-                                 "ST: %1\r\n"
-                                 "\r\n" )
-                           .arg( sST ).utf8();
+    QString rRequest = QString( "M-SEARCH * HTTP/1.1\r\n"
+                                "HOST: 239.255.255.250:1900\r\n"
+                                "MAN: \"ssdp:discover\"\r\n"
+                                "MX: 2\r\n"
+                                "ST: %1\r\n"
+                                "\r\n" ).arg( sST );
+    QByteArray sRequest = rRequest.toUtf8();
 
     Q3SocketDevice *pSocket = m_Sockets[ SocketIdx_Search ];
 

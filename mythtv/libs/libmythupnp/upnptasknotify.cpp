@@ -20,7 +20,6 @@
 #include <quuid.h> 
 #include <qdom.h> 
 #include <qfile.h>
-#include <Q3CString>
 
 // MythTV headers
 #include "upnp.h"
@@ -118,7 +117,7 @@ void UPnpNotifyTask::SendNotifyMsg( Q3SocketDevice *pSocket,
                              .arg( m_nServicePort);
 
         QString  sPacket  = sHeader + sData;
-        Q3CString scPacket = sPacket.utf8();
+        QByteArray scPacket = sPacket.toUtf8();
 
         // ------------------------------------------------------------------
         // Send Packet to Socket (Send same packet twice)

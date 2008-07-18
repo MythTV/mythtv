@@ -16,7 +16,6 @@
 #include <q3url.h>
 #include <qfile.h>
 #include <qfileinfo.h>
-#include <Q3CString>
 
 #include "mythconfig.h"
 #if defined CONFIG_DARWIN || defined CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW)
@@ -204,7 +203,6 @@ QString HTTPRequest::BuildHeader( long long nSize )
 long HTTPRequest::SendResponse( void )
 {
     long      nBytes    = 0;
-    Q3CString  sHeader;
 
     switch( m_eResponseType )
     {
@@ -248,7 +246,8 @@ long HTTPRequest::SendResponse( void )
     // Write out Header.
     // ----------------------------------------------------------------------
 
-    sHeader = BuildHeader     ( m_aBuffer.size() ).utf8();
+    QString    rHeader = BuildHeader( m_aBuffer.size() );
+    QByteArray sHeader = rHeader.toUtf8();
     nBytes  = WriteBlockDirect( sHeader.data(), sHeader.length() );
 
     // ----------------------------------------------------------------------
@@ -285,7 +284,6 @@ long HTTPRequest::SendResponse( void )
 
 long HTTPRequest::SendResponseFile( QString sFileName )
 {
-    Q3CString    sHeader;
     long        nBytes  = 0;
     long long   llSize  = 0;
     long long   llStart = 0;
@@ -326,7 +324,8 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
         struct stat st;
 
-        if (stat( sFileName.ascii(), &st ) == 0)
+        QByteArray tmp = sFileName.toAscii();
+        if (stat( tmp.constData(), &st ) == 0)
             llSize = llEnd = st.st_size;
 
         m_nResponseStatus = 200;
@@ -390,7 +389,8 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     // Write out Header.
     // ----------------------------------------------------------------------
 
-    sHeader  = BuildHeader( llSize ).utf8();
+    QString    rHeader = BuildHeader( llSize );
+    QByteArray sHeader = rHeader.toUtf8();
     nBytes = WriteBlockDirect( sHeader.data(), sHeader.length() );
 
     // ----------------------------------------------------------------------
@@ -400,9 +400,10 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     //VERBOSE(VB_UPNP, QString("SendResponseFile : size = %1, start = %2, end = %3").arg(llSize).arg(llStart).arg(llEnd));
     if (( m_eType != RequestTypeHead ) && (llSize != 0))
     {
-        __off64_t offset = llStart;
-        int       file   = open( sFileName.ascii(), O_RDONLY | O_LARGEFILE );
-        ssize_t   sent   = 0;  
+        __off64_t  offset = llStart;
+        QByteArray tmp    = sFileName.toAscii();
+        int        file   = open( tmp.constData(), O_RDONLY | O_LARGEFILE );
+        ssize_t    sent   = 0;  
 
         do 
         {  

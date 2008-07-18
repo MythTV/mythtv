@@ -18,7 +18,6 @@
 #include <quuid.h> 
 #include <qdom.h> 
 #include <qfile.h>
-#include <Q3CString>
 #include <sys/time.h>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -104,7 +103,7 @@ void UPnpSearchTask::SendMsg( Q3SocketDevice  *pSocket,
 
 
         QString  sPacket  = sHeader + sData;
-        Q3CString scPacket = sPacket.utf8();
+        QByteArray scPacket = sPacket.toUtf8();
 
         // ------------------------------------------------------------------
         // Send Packet to UDP Socket (Send same packet twice)
