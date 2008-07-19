@@ -722,6 +722,9 @@ void MythSocketThread::RemoveFromReadyRead(MythSocket *sock)
 
 void MythSocketThread::WakeReadyReadThread(void)
 {
+    if (!isRunning())
+	    return;
+
 #ifdef USING_MINGW
     if (readyreadevent) ::SetEvent(readyreadevent);
 #else
