@@ -314,6 +314,19 @@ void MythListButton::RemoveItem(MythListButtonItem *item)
         emit itemSelected(m_selItem);
 }
 
+void MythListButton::SetValueByData(QVariant data)
+{
+    for (int i = 0; i < m_itemList.size(); ++i)
+    {
+        MythListButtonItem *item = m_itemList.at(i);
+        if (item->GetData() == data)
+        {
+            SetItemCurrent(item);
+            return;
+        }
+    }
+}
+
 void MythListButton::SetItemCurrent(MythListButtonItem* item)
 {
     m_selPosition = m_itemList.indexOf(item);
