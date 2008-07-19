@@ -48,7 +48,7 @@ class MythUITextEdit : public MythUIType
     bool MoveCursor(MoveDirection);
 
   signals:
-    void Finished();
+    void valueChanged();
 
   protected:
     virtual bool ParseElement(QDomElement &element);

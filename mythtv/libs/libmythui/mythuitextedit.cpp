@@ -179,7 +179,7 @@ bool MythUITextEdit::ParseElement(QDomElement &element)
         SetBackgroundImage(tmp);
     }
     else
-        parsed = false;
+        return MythUIType::ParseElement(element);
 
     return parsed;
 }
@@ -253,6 +253,7 @@ void MythUITextEdit::SetText(const QString text, bool moveCursor)
     m_Text->SetText(m_Message);
     if (moveCursor)
         MoveCursor(MoveEnd);
+    emit valueChanged();
 }
 
 bool MythUITextEdit::InsertCharacter(const QString character)
