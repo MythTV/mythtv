@@ -95,6 +95,34 @@
         <align>left,vcenter</align>
     </buttonlist>
 
+    <buttonlist name="basehorizontalbuttonlist" from="basebuttonlist">
+        <layout>horizontal</layout>
+        <statetype name="upscrollarrow">
+            <state type="off">
+                <imagetype name="upon">
+                    <filename>lb-ltarrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="upoff">
+                    <filename>lb-ltarrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <statetype name="downscrollarrow">
+            <state type="off">
+                <imagetype name="dnon">
+                    <filename>lb-rtarrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="dnoff">
+                    <filename>lb-rtarrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+    </buttonlist>
+
     <!-- Base definition of a button -->
     <button name="basebutton">
         <position>0,0</position>
@@ -114,10 +142,10 @@
         <regular-background filename="checkbox_background_off.png" />
         <selected-background filename="checkbox_background_selected.png" />
         <inactive-background filename="checkbox_background_off.png" />
-        <check-empty filename="lb-check-empty.png"/>
-        <check-half filename="lb-check-half.png"/>
-        <check-full filename="lb-check-full.png"/>
-        <margin>5</margin>
+        <check-empty filename="blank.png"/>
+        <check-half filename="checkbox_halfcheck.png"/>
+        <check-full filename="checkbox_fullcheck.png"/>
+        <margin>3</margin>
     </checkbox>
 
     <spinbox name="basespinbox">
@@ -170,7 +198,7 @@
         <area>0,0,375,50</area>
         <font>basesmallblack</font>
         <cursor filename="cursor.png" />
-        <margin>12</margin>
+        <margin>11</margin>
         <background filename="textedit_background.png" />
     </textedit>
 
