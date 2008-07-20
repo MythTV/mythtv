@@ -28,6 +28,7 @@ class MythUICheckBox : public MythUIButton
   protected:
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
+    virtual void Finalize(void);
 };
 
 #endif

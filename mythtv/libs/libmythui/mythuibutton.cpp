@@ -299,6 +299,7 @@ void MythUIButton::EnableCheck(bool enable)
 {
     if (m_CheckState == MythUIStateType::None)
         m_CheckState = MythUIStateType::Off;
+    m_CheckImage->DisplayState(m_CheckState);
     m_CheckImage->SetVisible(enable);
     SetupPlacement();
 }

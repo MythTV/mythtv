@@ -7,7 +7,7 @@ MythUICheckBox::MythUICheckBox(MythUIType *parent, const QString &name,
                                bool doInit)
             : MythUIButton(parent, name, doInit)
 {
-    EnableCheck(true);
+
 }
 
 MythUICheckBox::~MythUICheckBox()
@@ -60,6 +60,11 @@ bool MythUICheckBox::keyPressEvent(QKeyEvent *event)
     }
 
     return handled;
+}
+
+void MythUICheckBox::Finalize(void)
+{
+    EnableCheck(true);
 }
 
 void MythUICheckBox::CreateCopy(MythUIType *parent)
