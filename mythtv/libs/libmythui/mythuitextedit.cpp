@@ -42,12 +42,6 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name,
 
 MythUITextEdit::~MythUITextEdit()
 {
-    if (m_backgroundImage)
-        delete m_backgroundImage;
-    if (m_cursorImage)
-        delete m_cursorImage;
-    if (m_Text)
-        delete m_Text;
 }
 
 void MythUITextEdit::Init(void)
