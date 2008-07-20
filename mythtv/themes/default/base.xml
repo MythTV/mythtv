@@ -52,7 +52,7 @@
         <color>#666666</color>
     </font>
 
-    <!-- Base definition of a buttonlist -->
+    <!-- Base definition of a buttonlist in vertical configuration -->
     <buttonlist name="basebuttonlist">
         <area>0,0,10,10</area>
         <layout>vertical</layout>
@@ -95,6 +95,7 @@
         <align>left,vcenter</align>
     </buttonlist>
 
+    <!-- Base definition of a buttonlist in horizontal configuration -->
     <buttonlist name="basehorizontalbuttonlist" from="basebuttonlist">
         <layout>horizontal</layout>
         <statetype name="upscrollarrow">
@@ -136,7 +137,7 @@
         <align>center</align>
     </button>
 
-    <!-- Base definition of a button in a checkbox configuration -->
+    <!-- Base definition of checkbox -->
     <checkbox name="basecheckbox">
         <position>0,0</position>
         <regular-background filename="checkbox_background_off.png" />
@@ -148,6 +149,7 @@
         <margin>3</margin>
     </checkbox>
 
+    <!-- Base definition of a spinbox -->
     <spinbox name="basespinbox">
         <area>0,0,100,40</area>
         <layout>horizontal</layout>
@@ -184,6 +186,15 @@
         <margin>5,2</margin>
         <align>right,vcenter</align>
     </spinbox>
+
+    <!-- Base definition of a list in 'selector' configuration -->
+    <buttonlist name="baseselector" from="basehorizontalbuttonlist">
+        <area>310,190,230,40</area>
+        <showarrow>no</showarrow>
+        <regular-background filename="selector_background.png" />
+        <selected-background filename="selector_background_selected.png" />
+        <inactive-background filename="selector_background.png" />
+    </buttonlist>
 
     <!-- Base definition of a textarea -->
     <textarea name="basetextarea">
