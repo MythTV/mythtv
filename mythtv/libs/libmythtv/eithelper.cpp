@@ -142,7 +142,7 @@ void EITHelper::SetLanguagePreferences(const QStringList &langPref)
     {
         if (!(*it).isEmpty())
         {
-            uint language_key   = iso639_str3_to_key((*it).ascii());
+            uint language_key   = iso639_str3_to_key(*it);
             uint canonoical_key = iso639_key_to_canonical_key(language_key);
             languagePreferences[canonoical_key] = priority++;
         }

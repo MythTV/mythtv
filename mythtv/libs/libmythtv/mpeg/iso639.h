@@ -59,6 +59,21 @@ static inline int iso639_str3_to_key(const char *iso639_2)
     return iso639_str3_to_key((const unsigned char*)iso639_2);
 }
 
+static inline int iso639_str3_to_key(const QString &iso639_2)
+{
+    if (iso639_2.length() < 3)
+    {
+        return iso639_str3_to_key("und");
+    }
+    else
+    {
+        return ((iso639_2.at(0).toAscii()<<16) |
+                (iso639_2.at(1).toAscii()<<8) |
+                (iso639_2.at(2).toAscii()));
+    }
+}
+
+
 static inline int iso639_str2_to_key2(const unsigned char *iso639_1)
 {
     return (iso639_1[0]<<8)|iso639_1[1];

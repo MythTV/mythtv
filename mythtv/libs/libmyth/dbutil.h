@@ -36,6 +36,9 @@ class MPUBLIC DBUtil
 
     static const int kUnknownVersionNumber;
 
+  protected:
+    static bool CreateTemporaryDBConf(
+        const QString &privateinfo, QString &filename);
 
   private:
     bool QueryDBMSVersion(void);

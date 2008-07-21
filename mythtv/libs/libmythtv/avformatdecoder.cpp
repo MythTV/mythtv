@@ -121,7 +121,7 @@ static int get_canonical_lang(const char *lang_cstr)
     {
         QString tmp2 = lang_cstr;
         QString tmp3 = iso639_str2_to_str3(tmp2);
-        int lang = iso639_str3_to_key(tmp3.ascii());
+        int lang = iso639_str3_to_key(tmp3);
         return iso639_key_to_canonical_key(lang);
     }
     else

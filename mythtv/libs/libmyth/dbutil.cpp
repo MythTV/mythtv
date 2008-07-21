@@ -339,6 +339,50 @@ QString DBUtil::GetBackupDirectory()
     return directory;
 }
 
+/** \brief Creates temporary file containing sensitive DB info.
+ *
+ *   So we don't have to specify the password on the command line, use
+ *   --defaults-extra-file to specify a temporary file with a [client] and
+ *  [mysqldump] section that provides the password.  This will fail if the
+ *   user's ~/.my.cnf (which is read after the --defaults-extra-file)
+ *  specifies a different password that's incorrect for dbUserName
+ */
+bool DBUtil::CreateTemporaryDBConf(
+    const QString &privateinfo, QString &filename)
+{
+    bool ok = true;
+    filename = createTempFile("/tmp/mythtv_db_backup_conf_XXXXXX");
+    const QByteArray     tmpfile     = filename.toLocal8Bit();
+    const DatabaseParams dbParams    = gContext->GetDatabaseParams();
+    const QString        dbSchemaVer = gContext->GetSetting("DBSchemaVer");
+
+    FILE *fp = fopen(tmpfile.constData(), "w");
+    if (!fp)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Unable to create temporary "
+                        "configuration file for creating DB backup: %1")
+                .arg(tmpfile.constData()));
+        filename = "";
+        ok = false;
+    }
+    else
+    {
+        chmod(tmpfile.constData(), S_IRUSR);
+
+        QByteArray outarr = privateinfo.toLocal8Bit();
+        fprintf(fp, outarr.constData());
+
+        if (fclose(fp))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Error closing '%1'")
+                    .arg(tmpfile.constData()) + ENO);
+        }
+    }
+
+    return ok;
+}
+
 /** \fn DBUtil::DoBackup(const QString&, QString&)
  *  \brief Creates a backup of the database by executing the backupScript.
  *
@@ -353,48 +397,23 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename)
     QString  backupFilename = CreateBackupFilename(dbParams.dbName + "-" +
                                                    dbSchemaVer, ".sql");
     QString      scriptArgs = gContext->GetSetting("BackupDBScriptArgs");
-
-    // Create a temporary file containing the database information
-    QString tempDatabaseConfFile =
-        createTempFile("/tmp/mythtv_db_backup_conf_XXXXXX");
-    QByteArray tmpfile = tempDatabaseConfFile.toLocal8Bit();
-    FILE *fp = fopen(tmpfile.constData(), "w");
-    if (!fp)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Unable to create temporary "
-                        "configuration file for creating DB backup: %1")
-                .arg(tmpfile.constData()));
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Attempting backup, anyway.");
-        tempDatabaseConfFile = "";
-    }
-    else
-    {
-        chmod(tmpfile.constData(), S_IRUSR);
-
-        QString outstr =
-            QString("DBHostName=%1\nDBPort=%2\n"
-                    "DBUserName=%3\nDBPassword=%4\n"
-                    "DBName=%5\nDBSchemaVer=%6\n"
-                    "DBBackupDirectory=%7\nDBBackupFilename=%8\n")
-            .arg(dbParams.dbHostName).arg(dbParams.dbPort)
-            .arg(dbParams.dbUserName).arg(dbParams.dbPassword)
-            .arg(dbParams.dbName).arg(dbSchemaVer)
-            .arg(backupDirectory).arg(backupFilename);
-
-        QByteArray outarr = outstr.toLocal8Bit();
-
-        fprintf(fp, outarr.constData());
-
-        if (fclose(fp))
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Error closing '%1'")
-                    .arg(tmpfile.constData()) + ENO);
-        }
-    }
-
     if (!scriptArgs.isEmpty())
         scriptArgs.prepend(" ");
+
+
+    QString privateinfo =
+        QString("DBHostName=%1\nDBPort=%2\n"
+                "DBUserName=%3\nDBPassword=%4\n"
+                "DBName=%5\nDBSchemaVer=%6\n"
+                "DBBackupDirectory=%7\nDBBackupFilename=%8\n")
+        .arg(dbParams.dbHostName).arg(dbParams.dbPort)
+        .arg(dbParams.dbUserName).arg(dbParams.dbPassword)
+        .arg(dbParams.dbName).arg(dbSchemaVer)
+        .arg(backupDirectory).arg(backupFilename);
+    QString tempDatabaseConfFile = QString::null;
+    bool hastemp = CreateTemporaryDBConf(privateinfo, tempDatabaseConfFile);
+    if (!hastemp)
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Attempting backup, anyway.");
 
     VERBOSE(VB_IMPORTANT, QString("Backing up database with script: '%1'")
             .arg(backupScript));
@@ -403,8 +422,11 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename)
     QByteArray tmpcmd = command.toLocal8Bit();
     uint status = system(tmpcmd.constData());
 
-    if (!tempDatabaseConfFile.isEmpty())
+    if (hastemp)
+    {
+        QByteArray tmpfile = tempDatabaseConfFile.toLocal8Bit();
         unlink(tmpfile.constData());
+    }
 
     if (status)
     {
@@ -464,35 +486,6 @@ bool DBUtil::DoBackup(QString &filename)
     QString     dbSchemaVer = gContext->GetSetting("DBSchemaVer");
     QString backupDirectory = GetBackupDirectory();
 
-    /* So we don't have to specify the password on the command line, use
-       --defaults-extra-file to specify a temporary file with a [client] and
-       [mysqldump] section that provides the password.  This will fail if the
-       user's ~/.my.cnf (which is read after the --defaults-extra-file)
-       specifies a different password that's incorrect for dbUserName */
-    QString tempExtraConfFile = Q3DeepCopy<QString>(
-                    createTempFile("/tmp/mythtv_db_backup_conf_XXXXXX"));
-    FILE *fp;
-    if (!(fp = fopen(tempExtraConfFile.ascii(), "w")))
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Unable to create temporary "
-                "configuration file for creating DB backup: %1")
-                .arg(tempExtraConfFile.ascii()));
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Attempting backup, anyway. "
-                "If the backup fails, please add the %1 user's database "
-                "password to your MySQL option file.")
-                .arg(dbParams.dbUserName));
-    }
-    else
-    {
-        chmod(tempExtraConfFile.ascii(), S_IRUSR);
-        fprintf(fp, QString("[client]\npassword=%1\n"
-                            "[mysqldump]\npassword=%2\n")
-                            .arg(dbParams.dbPassword).arg(dbParams.dbPassword));
-        if (fclose(fp))
-            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Error closing %1: %2")
-                    .arg(tempExtraConfFile.ascii()).arg(strerror(errno)));
-    }
-
     QString command;
     QString compressCommand("");
     QString extension = ".sql";
@@ -504,9 +497,17 @@ bool DBUtil::DoBackup(QString &filename)
         VERBOSE(VB_IMPORTANT, "Neither /bin/gzip nor /usr/bin/gzip exist. "
                               "The database backup will be uncompressed.");
 
-    QString backupPathname = backupDirectory + "/" +
-                             CreateBackupFilename(dbParams.dbName + "-" +
-                                                  dbSchemaVer, extension);
+    QString backupFilename = CreateBackupFilename(
+        dbParams.dbName + "-" + dbSchemaVer, extension);
+    QString backupPathname = backupDirectory + "/" + backupFilename;
+
+    QString privateinfo = QString(
+        "[client]\npassword=%1\n[mysqldump]\npassword=%2\n")
+        .arg(dbParams.dbPassword).arg(dbParams.dbPassword);
+    QString tempExtraConfFile = QString::null;
+    if (!CreateTemporaryDBConf(privateinfo, tempExtraConfFile))
+        return false;
+
     QString portArg = "";
     if (dbParams.dbPort > 0)
         portArg = QString(" --port='%1'").arg(dbParams.dbPort);
@@ -518,19 +519,23 @@ bool DBUtil::DoBackup(QString &filename)
                       .arg(tempExtraConfFile).arg(dbParams.dbHostName)
                       .arg(portArg).arg(dbParams.dbUserName)
                       .arg(dbParams.dbName).arg(backupPathname);
-    VERBOSE(VB_FILE, QString("Backing up database with command: %1")
-                             .arg(command.ascii()));
-    VERBOSE(VB_IMPORTANT, QString("Backing up database to file: %1")
-            .arg(backupPathname.ascii()));
-    uint status = system(command.ascii());
 
-    unlink(tempExtraConfFile.ascii());
+    VERBOSE(VB_FILE, QString("Backing up database with command: '%1'")
+            .arg(command));
+    VERBOSE(VB_IMPORTANT, QString("Backing up database to file: '%1'")
+            .arg(backupPathname));
+
+    QByteArray tmpcmd = command.toAscii();
+    uint status = system(tmpcmd.constData());
+
+    QByteArray tmpfile = tempExtraConfFile.toLocal8Bit();
+    unlink(tmpfile.constData());
 
     if (status)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Error backing up database: %1 (%2)")
-                .arg(command.ascii()).arg(status));
+                QString("Error backing up database: '%1' (%2)")
+                .arg(command).arg(status));
         filename = "__FAILED__";
         return false;
     }
@@ -539,7 +544,8 @@ bool DBUtil::DoBackup(QString &filename)
     {
         VERBOSE(VB_IMPORTANT, "Compressing database backup file.");
         compressCommand += " " + backupPathname;
-        status = system(compressCommand.ascii());
+        QByteArray tmpcompresscmd = compressCommand.toAscii();
+        status = system(tmpcompresscmd.constData());
 
         if (status)
         {
@@ -550,8 +556,8 @@ bool DBUtil::DoBackup(QString &filename)
         {
             backupPathname += ".gz";
 
-            VERBOSE(VB_IMPORTANT, QString("Database Backup filename: %1")
-                    .arg(backupPathname.ascii()));
+            VERBOSE(VB_IMPORTANT, QString("Database Backup filename: '%1'")
+                    .arg(backupPathname));
         }
     }
 
@@ -652,8 +658,11 @@ int DBUtil::CountClients(void)
     }
 
     while (proc.canReadLine())
-        if (proc.readLine().contains(DB.dbName.ascii()))
+    {
+        QByteArray dbname = DB.dbName.toAscii();
+        if (proc.readLine().contains(dbname.constData()))
             ++count;
+    }
 
 
     // On average, each myth program has 4 database connections,
