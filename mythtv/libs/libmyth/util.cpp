@@ -837,3 +837,52 @@ unsigned long long myth_get_approximate_large_file_size(const QString &fname)
 #endif
 }
 
+/**
+ * In an interactive shell, prompt the user to input a string
+ */
+QString getResponse(const QString &query, const QString &def)
+{
+    cout << (const char *)query;
+
+    if (def != "")
+        cout << " [" << (const char *)def << "]  ";
+    else
+        cout << "  ";
+
+    if (!isatty(fileno(stdin)) || !isatty(fileno(stdout)))
+    {
+        cout << endl << "[console is not interactive, using default '"
+             << (const char *)def  << "']" << endl;
+        return def;
+    }
+
+    char response[80];
+    cin.clear();
+    cin.getline(response, 80);
+    if (!cin.good())
+    {
+        cout << endl;
+        VERBOSE(VB_IMPORTANT, "Read from stdin failed");
+        return NULL;
+    }
+
+    QString qresponse = response;
+
+    if (qresponse.isEmpty())
+        qresponse = def;
+
+    return qresponse;
+}
+
+/**
+ * In an interactive shell, prompt the user to input a number
+ */
+int intResponse(const QString &query, int def)
+{
+    QString str_resp = getResponse(query, QString("%1").arg(def));
+    if (str_resp.isEmpty())
+        return false;
+    bool ok;
+    int resp = str_resp.toInt(&ok);
+    return (ok ? resp : def);
+}

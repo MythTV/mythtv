@@ -63,6 +63,9 @@ MPUBLIC unsigned long long myth_get_approximate_large_file_size(
 
 MPUBLIC double MythGetPixelAspectRatio(void);
 
+MPUBLIC QString getResponse(const QString &query, const QString &def);
+MPUBLIC int     intResponse(const QString &query, int def);
+
 inline float clamp(float val, float minimum, float maximum)
 {
     return min(max(val, minimum), maximum);

@@ -75,8 +75,6 @@ class MythContextPrivate
                            bool overwrite = false);
     bool FindSettingsProbs(void);
 
-    QString getResponse(const QString &query, const QString &def);
-    int     intResponse(const QString &query, int def);
     bool    PromptForDatabaseParams(const QString &error);
     QString TestDBconnection(void);
     void    ResetDatabase(void);
@@ -676,51 +674,6 @@ bool MythContextPrivate::FindSettingsProbs(void)
     return problems;
 }
 
-QString MythContextPrivate::getResponse(const QString &query,
-                                        const QString &def)
-{
-    cout << (const char *)query;
-
-    if (def != "")
-        cout << " [" << (const char *)def << "]  ";
-    else
-        cout << "  ";
-
-    if (!isatty(fileno(stdin)) || !isatty(fileno(stdout)))
-    {
-        cout << endl << "[console is not interactive, using default '"
-             << (const char *)def  << "']" << endl;
-        return def;
-    }
-
-    char response[80];
-    cin.clear();
-    cin.getline(response, 80);
-    if (!cin.good())
-    {
-        cout << endl;
-        VERBOSE(VB_IMPORTANT, "Read from stdin failed");
-        return NULL;
-    }
-
-    QString qresponse = response;
-
-    if (qresponse.isEmpty())
-        qresponse = def;
-
-    return qresponse;
-}
-
-int MythContextPrivate::intResponse(const QString &query, int def)
-{
-    QString str_resp = getResponse(query, QString("%1").arg(def));
-    if (str_resp.isEmpty())
-        return false;
-    bool ok;
-    int resp = str_resp.toInt(&ok);
-    return (ok ? resp : def);
-}
-
 bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
 {
     bool accepted = false;
@@ -757,7 +710,8 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
                                         params.dbHostName);
         response = getResponse("Should I test connectivity to this host "
                                "using the ping command?", "yes");
-        params.dbHostPing = (response.isEmpty() || response.left(1).lower() != "y");
+        params.dbHostPing = (response.isEmpty() ||
+                             response.left(1).lower() != "y");
 
         params.dbPort     = intResponse("Database non-default port:",
                                         params.dbPort);
