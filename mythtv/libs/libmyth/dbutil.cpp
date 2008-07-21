@@ -507,14 +507,17 @@ bool DBUtil::DoBackup(QString &filename)
     QString backupPathname = backupDirectory + "/" +
                              CreateBackupFilename(dbParams.dbName + "-" +
                                                   dbSchemaVer, extension);
-    command = QString("mysqldump --defaults-extra-file='%1' --host='%2'"
-                      " --user='%3' --add-drop-table --add-locks"
+    QString portArg = "";
+    if (dbParams.dbPort > 0)
+        portArg = QString(" --port='%1'").arg(dbParams.dbPort);
+    command = QString("mysqldump --defaults-extra-file='%1' --host='%2'%3"
+                      " --user='%4' --add-drop-table --add-locks"
                       " --allow-keywords --complete-insert"
                       " --extended-insert --lock-tables --no-create-db --quick"
-                      " '%4' > '%5' 2>/dev/null")
+                      " '%5' > '%6' 2>/dev/null")
                       .arg(tempExtraConfFile).arg(dbParams.dbHostName)
-                      .arg(dbParams.dbUserName).arg(dbParams.dbName)
-                      .arg(backupPathname);
+                      .arg(portArg).arg(dbParams.dbUserName)
+                      .arg(dbParams.dbName).arg(backupPathname);
     VERBOSE(VB_FILE, QString("Backing up database with command: %1")
                              .arg(command.ascii()));
     VERBOSE(VB_IMPORTANT, QString("Backing up database to file: %1")
