@@ -2110,13 +2110,13 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
 
     if (expertMode)
     {
-        resp = d->getResponse("Would you like to use the existing schema?",
+        resp = getResponse("Would you like to use the existing schema?",
                               "yes");
         if (resp.isEmpty() || resp.left(1).lower() == "y")
             return MYTH_SCHEMA_USE_EXISTING;
     }
 
-    resp = d->getResponse("\nShall I upgrade this database?", "yes");
+    resp = getResponse("\nShall I upgrade this database?", "yes");
     if (!resp.isEmpty() && resp.left(1).lower() != "y")
         return MYTH_SCHEMA_EXIT;
 
@@ -2126,8 +2126,8 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
     if ((backupResult == "__FAILED__") ||
         (backupResult == ""))
     {
-        resp = d->getResponse("\nA database backup might be a good idea"
-                              "\nAre you sure you want to upgrade?", "no");
+        resp = getResponse("\nA database backup might be a good idea"
+                           "\nAre you sure you want to upgrade?", "no");
         if (resp.isEmpty() || resp.left(1).lower() == "n")
             return MYTH_SCHEMA_EXIT;
     }
