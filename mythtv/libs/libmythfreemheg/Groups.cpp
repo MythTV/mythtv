@@ -460,7 +460,8 @@ void MHSendEvent::Initialise(MHParseNode *p, MHEngine *engine)
 void MHSendEvent::PrintArgs(FILE *fd, int) const
 {
     m_EventSource.PrintMe(fd, 0);
-    fprintf(fd, MHLink::EventTypeToString(m_EventType).ascii());
+    QByteArray tmp = MHLink::EventTypeToString(m_EventType).toAscii();
+    fprintf(fd, tmp.constData());
     fprintf(fd, " ");
     if (m_EventData.m_Type != MHParameter::P_Null) m_EventData.PrintMe(fd, 0);
 }

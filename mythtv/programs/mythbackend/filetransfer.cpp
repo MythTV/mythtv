@@ -163,7 +163,8 @@ long long FileTransfer::GetFileSize(void)
     struct stat st;
     long long size = 0;
 
-    if (stat(filename.ascii(), &st) == 0)
+    QByteArray fname = filename.toLocal8Bit();
+    if (stat(fname.constData(), &st) == 0)
         size = st.st_size;
 
     return size;

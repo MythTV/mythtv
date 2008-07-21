@@ -2207,7 +2207,9 @@ NULL
                 for (i = strlist.begin(); i != strlist.end(); ++i)
                 {
                     long long start = 0, end = 0;
-                    if (sscanf((*i).ascii(), "%lld - %lld", &start, &end) == 2)
+                    QByteArray tmp = (*i).toAscii();
+                    if (sscanf(tmp.constData(),
+                               "%lld - %lld", &start, &end) == 2)
                     {
                         insert.prepare(
                                "INSERT INTO recordedmarkup (chanid, starttime,"
@@ -3400,12 +3402,13 @@ NULL
                 in += "'" + query.value(0).toString() + "',";
         }
         in = (in.isEmpty()) ? "'5','6','7','8'" : in.left(in.length()-1);
-        QString tmp = QString(
+        QString qtmp = QString(
             "UPDATE codecparams "
             "SET value=48000 "
             "WHERE name='samplerate' AND profile IN (%1);").arg(in);
+        QByteArray tmp = qtmp.toAscii();
         const char *updates[] = {
-            tmp.ascii(),
+            tmp.constData(),
             NULL
         };
 
@@ -3639,11 +3642,12 @@ NULL
 
     if (dbver == "1215")
     {
-        QString tmp = QString(
+        QString qtmp = QString(
             "ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
             .arg(gContext->GetDatabaseParams().dbName);
+        QByteArray tmp = qtmp.toAscii();
         const char *updates[] = {
-tmp.ascii(),
+tmp.constData(),
 "ALTER TABLE callsignnetworkmap"
 "  MODIFY callsign varbinary(20) NOT NULL default '',"
 "  MODIFY network varbinary(20) NOT NULL default '';",
@@ -3879,12 +3883,13 @@ NULL
 
     if (dbver == "1216")
     {
-        QString tmp = QString(
+        QString qtmp = QString(
             "ALTER DATABASE %1 DEFAULT CHARACTER SET "
             "utf8 COLLATE utf8_general_ci;")
             .arg(gContext->GetDatabaseParams().dbName);
+        QByteArray tmp = qtmp.toAscii();
         const char *updates[] = {
-tmp.ascii(),
+tmp.constData(),
 "ALTER TABLE callsignnetworkmap"
 "  DEFAULT CHARACTER SET default,"
 "  MODIFY callsign varchar(20) CHARACTER SET utf8 NOT NULL default '',"
@@ -4379,11 +4384,12 @@ bool InitializeDatabase(void)
 
     VERBOSE(VB_IMPORTANT, "Inserting MythTV initial database information.");
 
-    QString tmp = QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
+    QString qtmp = QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
         .arg(gContext->GetDatabaseParams().dbName);
+    QByteArray tmp = qtmp.toAscii();
 
     const char *updates[] = {
-tmp.ascii(),
+tmp.constData(),
 "CREATE TABLE IF NOT EXISTS callsignnetworkmap ("
 "  id int(11) NOT NULL auto_increment,"
 "  callsign varchar(20) NOT NULL default '',"

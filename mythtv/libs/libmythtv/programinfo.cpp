@@ -377,21 +377,21 @@ bool ProgramInfo::FromStringList(const QStringList &list, uint offset)
                                if (ts.isNull())       \
                                    ts = "";
 
-#define INT_FROM_LIST(x)       NEXT_STR() (x) = atoi(ts.ascii());
-#define ENUM_FROM_LIST(x, y)   NEXT_STR() (x) = (y)atoi(ts.ascii());
+#define INT_FROM_LIST(x)       NEXT_STR() (x) = ts.toInt();
+#define ENUM_FROM_LIST(x, y)   NEXT_STR() (x) = ((y)ts.toInt());
 
-#define DATETIME_FROM_LIST(x)  NEXT_STR() (x).setTime_t((uint)atoi(ts.ascii()));
+#define DATETIME_FROM_LIST(x)  NEXT_STR() (x).setTime_t(ts.toUInt());
 #define DATE_FROM_LIST(x)      NEXT_STR() (x) = \
                                    ((ts.isEmpty()) || (ts == "0000-00-00")) ?\
                                    QDate() : QDate::fromString(ts, Qt::ISODate)
 
 #define LONGLONG_FROM_LIST(x)  INT_FROM_LIST(ti); NEXT_STR() \
                                (x) = ((long long)(ti) << 32) | \
-                               ((long long)(atoi(ts.ascii())) & 0xffffffffLL);
+                               ((long long)(ts.toInt()) & 0xffffffffLL);
 
 #define STR_FROM_LIST(x)       NEXT_STR() (x) = ts;
 
-#define FLOAT_FROM_LIST(x)     NEXT_STR() (x) = atof(ts.ascii());
+#define FLOAT_FROM_LIST(x)     NEXT_STR() (x) = ts.toFloat();
 
 /** \fn ProgramInfo::FromStringList(QStringList::const_iterator&,
                                     QStringList::const_iterator)

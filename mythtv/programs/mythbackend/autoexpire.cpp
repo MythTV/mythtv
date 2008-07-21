@@ -760,13 +760,17 @@ void AutoExpire::PrintExpireList(QString expHost)
         if (first->subtitle != "")
             title += ": \"" + first->subtitle + "\"";
 
-        cout << (const char *)title.local8Bit().leftJustify(39, ' ', true) << " "
-             << (const char *)QString("%1").arg(first->filesize >> 20).local8Bit()
-                .rightJustify(5, ' ', true) << "MB  "
-             << (const char *)first->startts.toString().local8Bit().leftJustify(24, ' ', true)
-             << " [" << (const char *)QString("%1").arg(first->recpriority).local8Bit()
-                .rightJustify(3, ' ', true) << "]"
-             << endl;
+        title = title.leftJustify(39, ' ', true);
+        QString outstr = QString("%1 %2 MB %3 [%4]")
+            .arg(title)
+            .arg(QString::number(first->filesize >> 20)
+                 .rightJustify(5, ' ', true))
+            .arg(first->startts.toString().leftJustify(24, ' ', true))
+            .arg(QString::number(first->recpriority)
+                 .rightJustify(3, ' ', true));
+        QByteArray out = outstr.toLocal8Bit();
+
+        cout << out.constData() << endl;
     }
 
     ClearExpireList(expireList);

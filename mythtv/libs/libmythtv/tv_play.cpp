@@ -2656,7 +2656,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         txt.toInt(&ok, 16);
         if (ok || txt=="_" || txt=="-" || txt=="#" || txt==".")
         {
-            AddKeyToInputQueue(txt.at(0).latin1());
+            AddKeyToInputQueue(txt.at(0).toLatin1());
             return;
         }
     }

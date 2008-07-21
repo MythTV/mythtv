@@ -184,7 +184,8 @@ bool IvtvDecoder::CheckDevice(void)
     if (GetDeviceWorks(videodev))
         return true;
 
-    int testfd = open(videodev.ascii(), O_RDWR);
+    QByteArray vdevice = videodev.toAscii();
+    int testfd = open(vdevice.constData(), O_RDWR);
     if (testfd < 0)
         return false;
 
@@ -245,7 +246,8 @@ bool IvtvDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
 
     AVProbeData probe;
 
-    probe.filename = (char *)(filename.ascii());
+    QByteArray fname = filename.toAscii();
+    probe.filename = fname.data();
     probe.buf = (unsigned char *)testbuf;
     probe.buf_size = testbufsize;
 

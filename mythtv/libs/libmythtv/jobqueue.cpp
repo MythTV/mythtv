@@ -1872,9 +1872,10 @@ void JobQueue::DoTranscodeThread(void)
     if (runningJobCommands[key] == "mythtranscode")
     {
         path = GetInstallPrefix() + "/bin/mythtranscode";
+        QByteArray parg = profilearg.toAscii();
         command = QString("%1 -j %2 -V %3 -p %4 %5")
-                          .arg(path).arg(jobID).arg(print_verbose_messages)
-                          .arg(profilearg.ascii()).arg(useCutlist ? "-l" : "");
+          .arg(path).arg(jobID).arg(print_verbose_messages)
+          .arg(parg.constData()).arg(useCutlist ? "-l" : "");
     }
     else
     {
@@ -1927,20 +1928,24 @@ void JobQueue::DoTranscodeThread(void)
         origfilesize = 0;
         filesize = 0;
 
-        if (stat(filename.ascii(), &st) == 0)
+        QByteArray fname = filename.toLocal8Bit();
+        if (stat(fname.constData(), &st) == 0)
             origfilesize = st.st_size;
 
         QString msg = QString("Transcode %1")
                               .arg(StatusText(GetJobStatus(jobID)));
 
-        QString details = QString("%1%2: %3 (%4)")
-                            .arg((const char *)program_info->title.local8Bit())
-                            .arg((const char *)subtitle.local8Bit())
-                            .arg(transcoderName)
-                            .arg(PrettyPrint(origfilesize));
+        QString detailstr = QString("%1%2: %3 (%4)")
+          .arg(program_info->title)
+          .arg(subtitle)
+          .arg(transcoderName)
+          .arg(PrettyPrint(origfilesize));
+        QByteArray details = detailstr.toLocal8Bit();
 
-        VERBOSE(VB_GENERAL, LOC + QString("%1 for %2").arg(msg).arg(details));
-        gContext->LogEntry("transcode", LP_NOTICE, msg, details);
+        VERBOSE(VB_GENERAL, LOC + QString("%1 for %2")
+                .arg(msg).arg(details.constData()));
+
+        gContext->LogEntry("transcode", LP_NOTICE, msg, detailstr);
 
         VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'")
                                            .arg(command));
@@ -1956,14 +1961,13 @@ void JobQueue::DoTranscodeThread(void)
             program_info->SetTranscoded(TRANSCODING_NOT_TRANSCODED);
 
             msg = QString("Transcode %1").arg(StatusText(GetJobStatus(jobID)));
-            details = QString("%1%2: %3 does not exist or is not executable")
-                            .arg((const char *)program_info->title.local8Bit())
-                            .arg((const char *)subtitle.local8Bit())
-                            .arg(path);
+            detailstr = QString("%1%2: %3 does not exist or is not executable")
+              .arg(program_info->title).arg(subtitle).arg(path);
+            details = detailstr.toLocal8Bit();
 
-            VERBOSE(VB_IMPORTANT,
-                    LOC_ERR + QString("%1 for %2").arg(msg).arg(details));
-            gContext->LogEntry("transcode", LP_WARNING, msg, details);
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("%1 for %2").arg(msg).arg(details.constData()));
+            gContext->LogEntry("transcode", LP_WARNING, msg, detailstr);
         }
         else if (result == TRANSCODE_EXIT_RESTART && retrylimit > 0)
         {
@@ -1984,8 +1988,9 @@ void JobQueue::DoTranscodeThread(void)
                 retry = false;
 
                 filename = program_info->GetPlaybackURL(false, true);
+                QByteArray fname = filename.toAscii();
 
-                if (stat(filename.ascii(), &st) == 0)
+                if (stat(fname.constData(), &st) == 0)
                 {
                     filesize = st.st_size;
 
@@ -2008,7 +2013,7 @@ void JobQueue::DoTranscodeThread(void)
                 {
                     int saved = errno;
                     QString comment = QString("couldn't stat \"%1\": %2")
-                        .arg(filename.ascii()).arg(strerror(saved));
+                        .arg(filename).arg(strerror(saved));
                     ChangeJobStatus(jobID, JOB_FINISHED, comment);
 
                     details = QString("%1%2: %3")
@@ -2111,7 +2116,7 @@ void JobQueue::DoFlagCommercialsThread(void)
     controlFlagsLock.unlock();
 
     QString msg = "Commercial Flagging Starting";
-    VERBOSE(VB_GENERAL, (LOC + QString("%1 for %2").arg(msg).arg(logDesc)).utf8());
+    VERBOSE(VB_GENERAL, (LOC + QString("%1 for %2").arg(msg).arg(logDesc)));
     gContext->LogEntry("commflag", LP_NOTICE, msg, logDesc);
 
     int breaksFound = 0;
@@ -2222,11 +2227,13 @@ void JobQueue::DoUserJobThread(void)
 
     QString msg = QString("Started \"%1\" for \"%2\" recorded "
                           "from channel %3 at %4")
-                          .arg(jobDesc)
-                          .arg((const char *)program_info->title.local8Bit())
-                          .arg(program_info->chanid)
-                          .arg(program_info->recstartts.toString());
-    VERBOSE(VB_GENERAL, LOC + msg);
+      .arg(jobDesc)
+      .arg(program_info->title)
+      .arg(program_info->chanid)
+      .arg(program_info->recstartts.toString());
+    QByteArray amsg = msg.toLocal8Bit();
+
+    VERBOSE(VB_GENERAL, LOC + QString(amsg.constData()));
     gContext->LogEntry("jobqueue", LP_NOTICE,
                        QString("Job \"%1\" Started").arg(jobDesc), msg);
 
@@ -2265,11 +2272,14 @@ void JobQueue::DoUserJobThread(void)
     {
         msg = QString("Finished \"%1\" for \"%2\" recorded from "
                       "channel %3 at %4.")
-                      .arg(jobDesc)
-                      .arg((const char *)program_info->title.local8Bit())
-                      .arg(program_info->chanid)
-                      .arg(program_info->recstartts.toString());
-        VERBOSE(VB_GENERAL, LOC + msg);
+          .arg(jobDesc)
+          .arg(program_info->title)
+          .arg(program_info->chanid)
+          .arg(program_info->recstartts.toString());
+
+        QByteArray amsg = msg.toLocal8Bit();
+
+        VERBOSE(VB_GENERAL, LOC + QString(amsg.constData()));
 
         gContext->LogEntry("jobqueue", LP_NOTICE,
                            QString("Job \"%1\" Finished").arg(jobDesc), msg);

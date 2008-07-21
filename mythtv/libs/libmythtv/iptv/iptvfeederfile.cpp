@@ -68,9 +68,12 @@ bool IPTVFeederFile::Open(const QString &url)
     // Begin by setting up our usage environment:
     if (!InitEnv())
         return false;
-    
+
+    QString pathstr = parse.path();
+    QByteArray path = pathstr.toLocal8Bit();
+
     _source = ByteStreamFileSource::createNew(
-        *_live_env, parse.path().local8Bit());
+        *_live_env, path.constData());
     if (!_source)
     {
         VERBOSE(VB_IMPORTANT, LOC + "Failed to create Live File Source.");

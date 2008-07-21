@@ -576,8 +576,7 @@ int main(int argc, char *argv[])
     int result = 0;
     if (!mpeg2)
     {
-        result = transcode->TranscodeFile((char *)infile.ascii(),
-                                          (char *)outfile.ascii(),
+        result = transcode->TranscodeFile(infile, outfile,
                                           profilename, useCutlist, 
                                           (fifosync || keyframesonly), jobID,
                                           fifodir, deleteMap);
@@ -598,10 +597,13 @@ int main(int argc, char *argv[])
            update_func = &UpdateJobQueue;
            check_func = &CheckJobQueue;
         }
-        MPEG2fixup *m2f = new MPEG2fixup(infile.ascii(), outfile.ascii(),
-                                         &deleteMap, NULL, false, false, 20,
-                                         showprogress, otype, update_func,
-                                         check_func);
+
+        MPEG2fixup *m2f = new MPEG2fixup(
+            infile, outfile,
+            &deleteMap, NULL, false, false, 20,
+            showprogress, otype, update_func,
+            check_func);
+
         if (build_index)
         {
             int err = BuildKeyframeIndex(m2f, infile, posMap, jobID);
@@ -714,31 +716,32 @@ int slowDelete(QString filename)
     bool inBackground = true;
     int increment =
         gContext->GetNumSetting("TruncateIncrement", 10 * 1024 * 1024);
-    QString msg = QString("Error Truncating '%1'").arg(filename.local8Bit().constData());
+    QByteArray fname = filename.toLocal8Bit();
+    QString msg = QString("Error Truncating '%1'").arg(fname.constData());
 
 
     struct stat st;
-    if (stat(filename.ascii(), &st) != 0)
+    if (stat(fname.constData(), &st) != 0)
     {
         VERBOSE(VB_IMPORTANT, msg + " could not stat " + ENO +
                 ", unlinking immediately.");
-        return unlink(filename.local8Bit());
+        return unlink(fname.constData());
     }
     off_t fsize = st.st_size;
 
-    int fd = open(filename.local8Bit(), O_WRONLY);
+    int fd = open(fname.constData(), O_WRONLY);
     if (fd == -1)
     {
         VERBOSE(VB_IMPORTANT, msg + " could not open " + ENO +
                 ", unlinking immediately.");
-        return unlink(filename.local8Bit());
+        return unlink(fname.constData());
     }
 
-    if (unlink(filename.local8Bit()))
+    if (unlink(fname.constData()))
     {
         close(fd);
         VERBOSE(VB_IMPORTANT, msg + " could not unlink " + ENO);
-        return unlink(filename.local8Bit());
+        return unlink(fname.constData());
     }
 
     VERBOSE(VB_FILE, QString("Truncating %1.").arg(filename));
@@ -809,34 +812,47 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
         return;
     }
 
-    QString filename = pginfo->GetPlaybackURL(false, true);
+    const QString filename = pginfo->GetPlaybackURL(false, true);
+    const QByteArray fname = filename.toLocal8Bit();
 
     if (status == JOB_STOPPING)
     {
-        QString tmpfile = filename + ".tmp";
+        const QString jobArgs = JobQueue::GetJobArgs(jobID);
+
+        const QString tmpfile = filename + ".tmp";
+        const QByteArray atmpfile = tmpfile.toLocal8Bit();
 
         // To save the original file...
-        QString oldfile = filename + ".old";
-        QString newfile = filename;
-        QString jobArgs = JobQueue::GetJobArgs(jobID);
+        const QString oldfile = filename + ".old";
+        const QByteArray aoldfile = oldfile.toLocal8Bit();
 
+        QString cnf = filename;
         if ((jobArgs == "RENAME_TO_NUV") &&
             (filename.contains(QRegExp("mpg$"))))
         {
             QString newbase = pginfo->GetRecordBasename();
 
-            newfile.replace(QRegExp("mpg$"), "nuv");
+            cnf.replace(QRegExp("mpg$"), "nuv");
             newbase.replace(QRegExp("mpg$"), "nuv");
             pginfo->SetRecordBasename(newbase);
         }
 
-        if (rename(filename.local8Bit(), oldfile.local8Bit()) == -1)
-            perror(QString("mythtranscode: Error Renaming '%1' to '%2'")
-                   .arg(filename).arg(oldfile).ascii());
+        const QString newfile = cnf;
+        const QByteArray anewfile = newfile.toLocal8Bit();
 
-        if (rename(tmpfile.local8Bit(), newfile.local8Bit()) == -1)
-            perror(QString("mythtranscode: Error Renaming '%1' to '%2'")
-                   .arg(tmpfile).arg(newfile).ascii());
+        if (rename(fname.constData(), aoldfile.constData()) == -1)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("mythtranscode: Error Renaming '%1' to '%2'")
+                    .arg(filename).arg(oldfile) + ENO);
+        }
+
+        if (rename(atmpfile.constData(), anewfile.constData()) == -1)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("mythtranscode: Error Renaming '%1' to '%2'")
+                    .arg(tmpfile).arg(newfile) + ENO);
+        }
 
         if (!gContext->GetNumSetting("SaveTranscoding", 0))
         {
@@ -848,25 +864,32 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             QFileInfo finfo(oldfile);
             if (followLinks && finfo.isSymLink())
             {
-                if ((err = transUnlink(finfo.readLink().local8Bit().constData())))
+                QString link = finfo.readLink();
+                QByteArray alink = link.toLocal8Bit();
+                err = transUnlink(alink.constData());
+
+                if (err)
                 {
                     VERBOSE(VB_IMPORTANT, QString(
-                            "mythtranscode: Error deleting '%1' pointed to by "
-                            "%2, %3")
-                            .arg((const char *)finfo.readLink().local8Bit())
-                            .arg((const char *)oldfile).arg(strerror(errno)));
+                                "mythtranscode: Error deleting '%1' "
+                                "pointed to by '%2'")
+                            .arg(alink.constData())
+                            .arg(aoldfile.constData()) + ENO);
                 }
 
-                if ((err = unlink(oldfile.local8Bit().constData())))
-                    VERBOSE(VB_IMPORTANT,
-                            QString("mythtranscode: Error deleting '%1' link "
-                                    "pointing to '%2', %3").arg(oldfile)
-                            .arg(finfo.readLink().local8Bit().constData())
-                            .arg(strerror(errno)));
+                err = unlink(aoldfile.constData());
+                if (err)
+                {
+                    VERBOSE(VB_IMPORTANT, QString(
+                                "mythtranscode: Error deleting '%1', "
+                                "a link pointing to '%2'")
+                            .arg(aoldfile.constData())
+                            .arg(alink.constData()) + ENO);
+                }
             }
             else
             {
-                if ((err = transUnlink(oldfile.local8Bit())))
+                if ((err = transUnlink(aoldfile.constData())))
                     VERBOSE(VB_IMPORTANT, QString(
                             "mythtranscode: Error deleting '%1', %2")
                             .arg(oldfile).arg(strerror(errno)));
@@ -889,12 +912,13 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
 
             for (uint nIdx = 0; nIdx < dir.count(); nIdx++)
             {
-                oldfile = QString("%1/%2").arg(fInfo.dirPath() )
-                                          .arg(dir[nIdx]);
                 // If unlink fails, keeping the old preview is not a problem.
                 // The RENAME_TO_NUV check below will attempt to rename the
                 // file, if required.
-                transUnlink(oldfile.local8Bit());
+                const QString oldfileop = QString("%1/%2")
+                    .arg(fInfo.dirPath()).arg(dir[nIdx]);
+                const QByteArray aoldfileop = oldfile.toLocal8Bit();
+                transUnlink(aoldfileop.constData());
             }
         }
 
@@ -912,16 +936,23 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
 
             for (uint nIdx = 0; nIdx < dir.count(); nIdx++)
             {
-                oldfile = QString("%1/%2").arg(fInfo.dirPath() )
-                                          .arg(dir[nIdx]);
-                newfile = oldfile;
-                QRegExp re("mpg(\\..*)?\\.png$");
-                if (re.search(newfile))
-                    newfile.replace(re, QString("nuv%1.png").arg(re.cap(1)));
+                const QString oldfileprev = QString("%1/%2")
+                    .arg(fInfo.dirPath()).arg(dir[nIdx]);
+                const QByteArray aoldfileprev = oldfileprev.toLocal8Bit();
 
-                QFile checkFile(oldfile);
-                if ((oldfile != newfile) && (checkFile.exists()))
-                    rename(oldfile.local8Bit(), newfile.local8Bit());
+                QString newfileprev = oldfileprev;
+                QRegExp re("mpg(\\..*)?\\.png$");
+                if (re.search(newfileprev))
+                {
+                    newfileprev.replace(
+                        re, QString("nuv%1.png").arg(re.cap(1)));
+                }
+                const QByteArray anewfileprev = newfileprev.toLocal8Bit();
+
+                QFile checkFile(oldfileprev);
+
+                if ((oldfileprev != newfileprev) && (checkFile.exists()))
+                    rename(aoldfileprev.constData(), anewfileprev.constData());
             }
         }
 
@@ -980,12 +1011,14 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
 
     } else {
         // Not a successful run, so remove the files we created
-        filename += ".tmp";
-        VERBOSE(VB_IMPORTANT, QString("Deleting %1").arg(filename));
-        transUnlink(filename.local8Bit());
+        QString filename_tmp = filename + ".tmp";
+        QByteArray fname_tmp = filename_tmp.toLocal8Bit();
+        VERBOSE(VB_IMPORTANT, QString("Deleting %1").arg(filename_tmp));
+        transUnlink(fname_tmp.constData());
 
-        filename += ".map";
-        unlink(filename.local8Bit());
+        QString filename_map = filename + ".tmp.map";
+        QByteArray fname_map = filename_map.toLocal8Bit();
+        unlink(fname_map.constData());
 
         if (status == JOB_ABORTING)                     // Stop command was sent
             JobQueue::ChangeJobStatus(jobID, JOB_ABORTED, "Job Aborted");

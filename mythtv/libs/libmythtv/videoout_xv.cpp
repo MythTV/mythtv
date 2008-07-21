@@ -1650,7 +1650,9 @@ bool VideoOutputXv::Init(
     Colormap cmap = XDefaultColormap(XJ_disp, XJ_screen_num);
     XColor colour, colour_exact;
     QString name = toXString(db_letterbox_colour);
-    if (XAllocNamedColor(XJ_disp, cmap, name.ascii(), &colour, &colour_exact))
+    QByteArray ascii_name =  name.toAscii();
+    const char *cname = ascii_name.constData();
+    if (XAllocNamedColor(XJ_disp, cmap, cname, &colour, &colour_exact))
         XJ_letterbox_colour = colour.pixel;
 
     X11U;
@@ -3843,6 +3845,9 @@ int VideoOutputXv::SetPictureAttribute(
     }
 
     QString attrName = toXVString(attribute);
+    QByteArray ascii_attr_name =  attrName.toAscii();
+    const char *cname = ascii_attr_name.constData();
+
     int valAdj = (kPictureAttribute_Hue == attribute) ? xv_hue_base : 0;
 
     if (attrName.isEmpty())
@@ -3873,15 +3878,15 @@ int VideoOutputXv::SetPictureAttribute(
     int tmpval2 = (newValue + valAdj) % 100; 
     int tmpval3 = (int) roundf(range * 0.01f * tmpval2); 
     int value   = min(tmpval3 + port_min, port_max); 
-    
-    xv_set_attrib(XJ_disp, xv_port, attrName.ascii(), value);
+
+    xv_set_attrib(XJ_disp, xv_port, cname, value);
 
 #ifdef USING_XVMC
     // Needed for VIA XvMC to commit change immediately.
     if (video_output_subtype > XVideo)
     {
         Atom xv_atom;
-        X11S(xv_atom = XInternAtom(XJ_disp, attrName.ascii(), False));
+        X11S(xv_atom = XInternAtom(XJ_disp, cname, False));
         if (xv_atom != None)
             X11S(XvMCSetAttribute(XJ_disp, xvmc_ctx, xv_atom, value));
     }
@@ -3905,10 +3910,13 @@ void VideoOutputXv::InitPictureAttributes(void)
         for (uint i = 0; i < kPictureAttribute_MAX; i++)
         {
             QString attrName = toXVString((PictureAttribute)i);
+            QByteArray ascii_attr_name =  attrName.toAscii();
+            const char *cname = ascii_attr_name.constData();
+
             if (attrName.isEmpty())
                 continue;
 
-            if (xv_is_attrib_supported(XJ_disp, xv_port, attrName.ascii(),
+            if (xv_is_attrib_supported(XJ_disp, xv_port, cname,
                                        &val, &min_val, &max_val))
             {
                 supported_attributes = (PictureAttributeSupported)

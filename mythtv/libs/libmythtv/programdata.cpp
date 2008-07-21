@@ -133,7 +133,9 @@ void ProgramData::fixProgramList(QList<ProgInfo> *fixlist)
                    (*cur).end.setDate((*cur).end.date().addDays(1));
                 }
 
-                (*cur).endts = (*cur).end.toString("yyyyMMddhhmmss").ascii();
+                QString    datestr = (*cur).end.toString("yyyyMMddhhmmss");
+                QByteArray datearr = datestr.toAscii();
+                (*cur).endts = QString(datearr.constData());
             }
         }
         if (i == fixlist->end())

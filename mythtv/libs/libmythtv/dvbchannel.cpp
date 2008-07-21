@@ -188,7 +188,8 @@ bool DVBChannel::Open(DVBChannel *who)
     }
 
     QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    fd_frontend = open(devname.ascii(), O_RDWR | O_NONBLOCK);
+    QByteArray devn = devname.toAscii();
+    fd_frontend = open(devn.constData(), O_RDWR | O_NONBLOCK);
 
     if (fd_frontend < 0)
     {

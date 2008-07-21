@@ -413,12 +413,14 @@ bool OpenGLContext::CreateFragmentProgram(const QString &program, uint &fp)
 
     MakeCurrent(true);
 
+    QByteArray tmp = program.toAscii();
+
     GLuint glfp;
     gMythGLGenProgramsARB(1, &glfp);
     gMythGLBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, glfp);
     gMythGLProgramStringARB(GL_FRAGMENT_PROGRAM_ARB,
                             GL_PROGRAM_FORMAT_ASCII_ARB,
-                            program.length(), program.latin1());
+                            tmp.length(), tmp.constData());
 
     glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &error);
     if (error != -1)

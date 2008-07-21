@@ -145,7 +145,10 @@ bool ThreadedFileWriter::Open(void)
     if (filename == "-")
         fd = fileno(stdout);
     else
-        fd = open(filename.ascii(), flags, mode);
+    {
+        QByteArray fname = filename.toAscii();
+        fd = open(fname.constData(), flags, mode);
+    }
 
     if (fd < 0)
     {

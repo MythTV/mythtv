@@ -163,8 +163,10 @@ int unlockShutdown()
 
 bool isRunning(QString program)
 {
-    QString sCommand = QString("ret=`ps cax | grep -c %1`; exit $ret").arg(program);
-    int res = system(sCommand.ascii());
+    QString sCommand = QString("ret=`ps cax | grep -c %1`; exit $ret")
+        .arg(program);
+    QByteArray aCommand = sCommand.toAscii();
+    int res = system(aCommand.constData());
     if (WIFEXITED(res))
         res = WEXITSTATUS(res);
 

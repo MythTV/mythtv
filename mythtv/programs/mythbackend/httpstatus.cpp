@@ -412,7 +412,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         QDomElement misc = pDoc->createElement("Miscellaneous");
         root.appendChild(misc);
 
-        FILE *fp = popen(info_script.ascii(), "r");
+        QByteArray iscript = info_script.toAscii();
+        FILE *fp = popen(iscript.constData(), "r");
 
         if (fp)
         {

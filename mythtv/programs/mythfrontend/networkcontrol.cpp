@@ -445,7 +445,7 @@ QString NetworkControl::processKey(QStringList tokens)
         {
             QKeySequence a(tokens[curToken]);
             int keyCode = a[0];
-            int ch = (tokens[curToken].ascii())[tokenLen - 1];
+            int ch = tokens[curToken][tokenLen - 1].toAscii();
             int buttons = Qt::NoButton;
 
             if (tokenLen > 1)
@@ -954,6 +954,7 @@ QString NetworkControl::listSchedule(const QString& chanID) const
 
             if (subtitle > " ")
                 title += QString(" -\"%1\"").arg(subtitle);
+            QByteArray atitle = title.toLocal8Bit();
 
             result +=
                 QString("%1 %2 %3 %4")
@@ -961,7 +962,7 @@ QString NetworkControl::listSchedule(const QString& chanID) const
                              .rightJustify(5, ' '))
                         .arg(query.value(1).toDateTime().toString(Qt::ISODate))
                         .arg(query.value(2).toDateTime().toString(Qt::ISODate))
-                        .arg(title.local8Bit().constData());
+                        .arg(atitle.constData());
 
             if (appendCRLF)
                 result += "\r\n";

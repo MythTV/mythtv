@@ -460,9 +460,10 @@ bool PreviewGenerator::SavePreview(QString filename,
     QImage small_img = img.scaled((int) ppw, (int) pph,
         Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-    if (small_img.save(filename, "PNG"))
+    QByteArray fname = filename.toAscii();
+    if (small_img.save(fname.constData(), "PNG"))
     {
-        chmod(filename.ascii(), 0666); // Let anybody update it
+        chmod(fname.constData(), 0666); // Let anybody update it
 
         VERBOSE(VB_PLAYBACK, LOC +
                 QString("Saved preview '%0' %1x%2")
@@ -473,11 +474,12 @@ bool PreviewGenerator::SavePreview(QString filename,
 
     // Save failed; if file exists, try saving to .new and moving over
     QString newfile = filename + ".new";
-    if (QFileInfo(filename.ascii()).exists() &&
-        small_img.save(newfile.ascii(), "PNG"))
+    QByteArray newfilea = newfile.toAscii();
+    if (QFileInfo(fname.constData()).exists() &&
+        small_img.save(newfilea.constData(), "PNG"))
     {
-        chmod(newfile.ascii(), 0666);
-        rename(newfile.ascii(), filename.ascii());
+        chmod(newfilea.constData(), 0666);
+        rename(newfilea.constData(), fname.constData());
 
         VERBOSE(VB_PLAYBACK, LOC +
                 QString("Saved preview '%0' %1x%2")

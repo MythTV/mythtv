@@ -27,8 +27,7 @@ enum kTTF_Color {
 class TTFFont
 {
   public:
-     TTFFont(char *file, int size, float wscale,
-             float hmult);
+     TTFFont(const QString &file, int size, float wscale, float hmult);
     ~TTFFont();
 
      // Actually greyscale, keep for compat.

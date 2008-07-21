@@ -131,7 +131,7 @@ class MPEG2replex
 class MPEG2fixup
 {
   public:
-    MPEG2fixup(const char *inf, const char *outf,
+    MPEG2fixup(const QString &inf, const QString &outf,
                QMap<long long, int> *deleteMap, const char *fmt, int norp,
                int fixPTS, int maxf, bool showprog, int otype,
                void (*update_func)(float) = NULL, int (*check_func)() = NULL);

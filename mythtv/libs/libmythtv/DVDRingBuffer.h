@@ -117,7 +117,7 @@ class MPUBLIC DVDRingBufferPriv
     dvdnav_t      *dvdnav;
     unsigned char  dvdBlockWriteBuf[DVD_BLOCK_SIZE];
     unsigned char *dvdBlockReadBuf;
-    const char *dvdFilename;
+    QString        dvdFilename;
     int            dvdBlockRPos;
     int            dvdBlockWPos;
     long long      pgLength;

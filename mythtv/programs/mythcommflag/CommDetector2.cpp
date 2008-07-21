@@ -852,7 +852,9 @@ void PrintReportMap(
         {
             tmp = QString("%1: %2").arg(bb, 10).arg(0, 10);
         }
-        out << tmp.ascii() << "\n";
+
+        QByteArray atmp = tmp.toAscii();
+        out << atmp.constData() << "\n";
     }
     out << flush;
 }

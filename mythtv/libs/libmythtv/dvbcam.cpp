@@ -69,7 +69,8 @@ DVBCam::DVBCam(const QString &aDevice)
       pmt_updated(false),     pmt_added(false)
 {
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, device);
-    int cafd = open(dvbdev.ascii(), O_RDWR);
+    QByteArray dev = dvbdev.toAscii();
+    int cafd = open(dev.constData(), O_RDWR);
     if (cafd >= 0)
     {
         ca_caps_t caps;
@@ -96,7 +97,8 @@ bool DVBCam::Start()
     pmt_added    = false;
 
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_CA, device);
-    ciHandler = cCiHandler::CreateCiHandler(dvbdev.ascii());
+    QByteArray dev = dvbdev.toAscii();
+    ciHandler = cCiHandler::CreateCiHandler(dev.constData());
     if (!ciHandler)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to initialize CI handler");

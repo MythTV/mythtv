@@ -78,7 +78,7 @@ void WelcomeDialog::startFrontend(void)
     QString startFECmd = gContext->GetSetting("MythWelcomeStartFECmd",
                          m_installDir + "/bin/mythfrontend");
 
-    myth_system(startFECmd.ascii());
+    myth_system(startFECmd);
 }
 
 void WelcomeDialog::startFrontendClick(void)
@@ -177,8 +177,11 @@ void WelcomeDialog::customEvent(QEvent *e)
                 {
                      VERBOSE(VB_GENERAL, "MythWelcome is shutting this computer down now");
                      QString poweroff_cmd = gContext->GetSetting("MythShutdownPowerOff", "");
-                     if (poweroff_cmd != "")
-                         system(poweroff_cmd.ascii());
+                     if (!poweroff_cmd.isEmpty())
+                     {
+                         QByteArray tmp = poweroff_cmd.toAscii();
+                         system(tmp.constData());
+                     }
                 }
             }
         }
@@ -234,15 +237,29 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "0")
         {
-            int statusCode = system(m_installDir + "/bin/mythshutdown --status 0");
+            QString mythshutdown_status =
+                m_installDir + "/bin/mythshutdown --status 0";
+            QString mythshutdown_unlock =
+                m_installDir + "/bin/mythshutdown --unlock";
+            QString mythshutdown_lock =
+                m_installDir + "/bin/mythshutdown --lock";
+
+            QByteArray tmp = mythshutdown_status.toAscii();
+            int statusCode = system(tmp.constData());
             if (WIFEXITED(statusCode))
                 statusCode = WEXITSTATUS(statusCode);
 
             // is shutdown locked by a user
             if (statusCode & 16)
-                system(m_installDir + "/bin/mythshutdown --unlock");
+            {
+                tmp = mythshutdown_unlock.toAscii();
+                system(tmp.constData());
+            }
             else
-                system(m_installDir + "/bin/mythshutdown --lock");
+            {
+                tmp = mythshutdown_lock.toAscii();
+                system(tmp.constData());
+            }
 
             updateStatusMessage();
             updateScreen();
@@ -250,14 +267,17 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
         else if (action == "STARTXTERM")
         {
             QString cmd = gContext->GetSetting("MythShutdownXTermCmd", "");
-            if (cmd != "")
+            if (!cmd.isEmpty())
             {
-                system(cmd);
+                QByteArray tmp = cmd.toAscii();
+                system(tmp);
             }
         }
         else if (action == "STARTSETUP")
         {
-            system(m_installDir + "/bin/mythtv-setup");
+            QString mythtv_setup = m_installDir + "/bin/mythtv-setup";
+            QByteArray tmp = mythtv_setup.toAscii();
+            system(tmp);
         }
         else
             handled = false;
@@ -466,9 +486,10 @@ void WelcomeDialog::runMythFillDatabase()
 
     command += "&";
 
-    VERBOSE(VB_GENERAL, "Grabbing EPG data using command:\n" << command);
+    VERBOSE(VB_GENERAL, QString("Grabbing EPG data using command: %1\n")
+            .arg(command));
 
-    myth_system(command.ascii());
+    myth_system(command);
 }
 
 void WelcomeDialog::updateAll(void)
@@ -584,7 +605,9 @@ void WelcomeDialog::updateStatusMessage(void)
         m_statusList.append(tr("MythTV is busy recording."));
     }
 
-    int statusCode = system(m_installDir + "/bin/mythshutdown --status 0");
+    QString mythshutdown_status = m_installDir + "/bin/mythshutdown --status 0";
+    QByteArray tmpcmd = mythshutdown_status.toAscii();
+    int statusCode = system(tmpcmd.constData());
     if (WIFEXITED(statusCode))
         statusCode = WEXITSTATUS(statusCode);
 
@@ -656,7 +679,9 @@ void WelcomeDialog::showPopup(void)
     QLabel *label = popup->addLabel(tr("Menu"), MythPopupBox::Large, false);
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
 
-    int statusCode = system(m_installDir + "/bin/mythshutdown --status 0");
+    QString mythshutdown_status = m_installDir + "/bin/mythshutdown --status 0";
+    QByteArray tmpcmd = mythshutdown_status.toAscii();
+    int statusCode = system(tmpcmd.constData());
     if (WIFEXITED(statusCode))
         statusCode = WEXITSTATUS(statusCode);
 
@@ -731,8 +756,11 @@ void WelcomeDialog::shutdownNow(void)
     {
         VERBOSE(VB_GENERAL, "MythWelcome is shutting this computer down now");
         QString poweroff_cmd = gContext->GetSetting("MythShutdownPowerOff", "");
-        if (poweroff_cmd != "")
-            system(poweroff_cmd.ascii());
+        if (!poweroff_cmd.isEmpty())
+        {
+            QByteArray tmp = poweroff_cmd.toAscii();
+            system(tmp);
+        }
         return;
     }
 
@@ -796,7 +824,10 @@ void WelcomeDialog::shutdownNow(void)
                                   restarttime.toString(wakeup_timeformat));
 
         if (!setwakeup_cmd.isEmpty())
-            system(setwakeup_cmd.ascii());
+        {
+            QByteArray tmp = setwakeup_cmd.toAscii();
+            system(tmp.constData());
+        }
     }
 
     // run command to set wakeuptime in bios and shutdown the system

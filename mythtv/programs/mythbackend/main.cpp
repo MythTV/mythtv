@@ -247,7 +247,8 @@ void cleanup(void)
 
     if (!pidfile.isEmpty())
     {
-        unlink(pidfile.ascii());
+        QByteArray tmp = pidfile.toAscii();
+        unlink(tmp.constData());
         pidfile = "";
     }
 
@@ -735,10 +736,11 @@ int main(int argc, char **argv)
     ofstream pidfs;
     if (pidfile != "")
     {
-        pidfs.open(pidfile.ascii());
+        QByteArray tmp = pidfile.toAscii();
+        pidfs.open(tmp.constData());
         if (!pidfs)
         {
-            perror(pidfile.ascii());
+            perror(tmp.constData());
             cerr << "Error opening pidfile";
             return BACKEND_EXIT_OPENING_PIDFILE_ERROR;
         }
@@ -994,7 +996,8 @@ int main(int argc, char **argv)
         if (!WOLslaveBackends.isEmpty())
         {
             VERBOSE(VB_IMPORTANT, "Waking slave Backends now.");
-            system(WOLslaveBackends.ascii());
+            QByteArray tmp = WOLslaveBackends.toAscii();
+            system(tmp.constData());
         }
     }
 

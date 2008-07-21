@@ -27,7 +27,7 @@ static const char *dvdnav_menu_table[] =
 
 DVDRingBufferPriv::DVDRingBufferPriv()
     : dvdnav(NULL),     dvdBlockReadBuf(NULL),
-      dvdFilename(NULL),
+      dvdFilename(QString::null),
       dvdBlockRPos(0),  dvdBlockWPos(0),
       pgLength(0),      pgcLength(0),
       cellStart(0),     cellChanged(false),
@@ -156,18 +156,21 @@ void DVDRingBufferPriv::GetDescForPos(QString &desc) const
 
 bool DVDRingBufferPriv::OpenFile(const QString &filename) 
 {
-    dvdFilename = filename.ascii();
-    dvdnav_status_t dvdRet = dvdnav_open(&dvdnav, filename.local8Bit());
+    dvdFilename = filename;
+    dvdFilename.detach();
+    QByteArray fname = dvdFilename.toLocal8Bit();
+
+    dvdnav_status_t dvdRet = dvdnav_open(&dvdnav, fname.constData());
     if (dvdRet == DVDNAV_STATUS_ERR)
     {
         VERBOSE(VB_IMPORTANT, QString("Failed to open DVD device at %1")
-                .arg((const char *)filename.local8Bit()));
+                .arg(fname.constData()));
         return false;
     }
     else
     {
         VERBOSE(VB_IMPORTANT, QString("Opened DVD device at %1")
-                .arg((const char *)filename.local8Bit()));
+                .arg(fname.constData()));
         dvdnav_set_readahead_flag(dvdnav, 1);
         dvdnav_set_PGC_positioning_flag(dvdnav, 1);
 

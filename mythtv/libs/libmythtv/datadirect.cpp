@@ -545,13 +545,22 @@ DataDirectProcessor::~DataDirectProcessor()
     VERBOSE(VB_GENERAL, LOC + "Deleting temporary files");
 
     if (!tmpPostFile.isEmpty())
-        unlink(tmpPostFile.ascii());
+    {
+        QByteArray tmp = tmpPostFile.toAscii();
+        unlink(tmp.constData());
+    }
 
     if (!tmpResultFile.isEmpty())
-        unlink(tmpResultFile.ascii());
+    {
+        QByteArray tmp = tmpResultFile.toAscii();
+        unlink(tmp.constData());
+    }
 
     if (!cookieFile.isEmpty())
-        unlink(cookieFile.ascii());
+    {
+        QByteArray tmp = cookieFile.toAscii();
+        unlink(tmp.constData());
+    }
 
     QDir d(tmpDir, "mythtv_dd_cache_*", QDir::Name,
            QDir::Files | QDir::NoSymLinks);
@@ -559,11 +568,16 @@ DataDirectProcessor::~DataDirectProcessor()
     for (uint i = 0; i < d.count(); i++)
     {
         //cout<<"deleting '"<<tmpDir<<"/"<<d[i]<<"'"<<endl;
-        unlink((tmpDir + "/" + d[i]).ascii());
+        QString    tmps = QString(tmpDir + "/" + d[i]);
+        QByteArray tmpa = tmps.toAscii();
+        unlink(tmpa.constData());
     }
 
     if (tmpDir != "/tmp")
-        rmdir(tmpDir.ascii());
+    {
+        QByteArray tmp = tmpDir.toAscii();
+        rmdir(tmp.constData());
+    }
 }
 
 void DataDirectProcessor::UpdateStationViewTable(QString lineupid)
@@ -936,7 +950,8 @@ FILE *DataDirectProcessor::DDPost(
     {
         err_txt = QString("Unable to open '%1'").arg(inputFile);
         is_pipe = false;
-        return fopen(inputFile.ascii(), "r");
+        QByteArray tmp = inputFile.toAscii();
+        return fopen(tmp.constData(), "r");
     }
 
     QFile postfile(postFilename);
@@ -987,7 +1002,8 @@ FILE *DataDirectProcessor::DDPost(
     err_txt = command;
 
     is_pipe = true;
-    return popen(command.ascii(), "r");
+    QByteArray tmp = command.toAscii();
+    return popen(tmp.constData(), "r");
 }
 
 bool DataDirectProcessor::GrabNextSuggestedTime(void)
@@ -1046,7 +1062,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     else
         command += " 2> /dev/null ";
 
-    myth_system(command.ascii());
+    myth_system(command);
 
     QDateTime NextSuggestedTime;
     QDateTime BlockedTime;
@@ -1158,9 +1174,10 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
 
     if (cachedata)
     {
+        QByteArray userid = GetUserID().toAscii();
         cache_dd_data = tmpDir + QString("/mythtv_dd_cache_%1_%2_UTC_%3_to_%4")
             .arg(GetListingsProvider())
-            .arg(GetUserID().ascii())
+            .arg(userid.constData())
             .arg(pstartDate.toString("yyyyMMddhhmmss"))
             .arg(pendDate.toString("yyyyMMddhhmmss"));
 
@@ -1216,7 +1233,8 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
 
             if (ok)
             {
-                fp = fopen(cache_dd_data.ascii(), "r");
+                QByteArray tmp = cache_dd_data.toAscii();
+                fp = fopen(tmp.constData(), "r");
                 fp_is_pipe = false;
             }
             else
@@ -1571,7 +1589,8 @@ bool DataDirectProcessor::GrabLineupsFromCache(const QString &lineupid)
 bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
 {
     QString fn = get_cache_filename(lineupid);
-    QFile lfile(fn.ascii());
+    QByteArray fna = fn.toAscii();
+    QFile lfile(fna.constData());
     if (!lfile.open(QIODevice::WriteOnly))
     {
         VERBOSE(VB_IMPORTANT, "SaveLineupToCache("<<lineupid<<") -- failed");
@@ -1618,7 +1637,7 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
 
     VERBOSE(VB_GENERAL, "SaveLineupToCache("<<lineupid<<") -- success");
 
-    chmod(fn.ascii(), 0666); // Let anybody update it
+    chmod(fna.constData(), 0666); // Let anybody update it
 
     return true;
 }
@@ -1940,7 +1959,7 @@ bool DataDirectProcessor::Post(QString url, const PostList &list,
         command += "/dev/null ";
     }
 
-    myth_system(command.ascii());
+    myth_system(command);
 
     if (documentFile.isEmpty())
         return true;
@@ -2134,7 +2153,9 @@ static QString html_escape(QString str)
         if (str[i].isLetterOrNumber())
             new_str += str[i];
         else
-            new_str += QString("\%%1").arg((int)str[i].latin1(),0,16);
+        {
+            new_str += QString("\%%1").arg((int)str[1].toLatin1(), 0, 16);
+        }
     }
 
     return new_str;

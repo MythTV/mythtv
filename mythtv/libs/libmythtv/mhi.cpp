@@ -60,24 +60,28 @@ MHIContext::MHIContext(InteractiveTV *parent)
 // Load the font.  Copied, generally, from OSD::LoadFont.
 bool MHIContext::LoadFont(QString name)
 {
-    QString fullname = GetConfDir() + "/" + name;
-    FT_Error error = FT_New_Face(ft_library, fullname.ascii(), 0, &m_face);
-    if (!error)
+    QString fullnameA = GetConfDir() + "/" + name;
+    QByteArray fnameA = fullnameA.toAscii();
+    FT_Error errorA = FT_New_Face(ft_library, fnameA.constData(), 0, &m_face);
+    if (!errorA)
         return true;
 
-    fullname = GetShareDir() + name;
-    error = FT_New_Face(ft_library, fullname.ascii(), 0, &m_face);
-    if (!error)
+    QString fullnameB = GetShareDir() + name;
+    QByteArray fnameB = fullnameB.toAscii();
+    FT_Error errorB = FT_New_Face(ft_library, fnameB.constData(), 0, &m_face);
+    if (!errorB)
         return true;
 
-    fullname = GetShareDir() + "themes/" + name;
-    error = FT_New_Face(ft_library, fullname.ascii(), 0, &m_face);
-    if (!error)
+    QString fullnameC = GetShareDir() + "themes/" + name;
+    QByteArray fnameC = fullnameC.toAscii();
+    FT_Error errorC = FT_New_Face(ft_library, fnameC.constData(), 0, &m_face);
+    if (!errorC)
         return true;
 
-    fullname = name;
-    error = FT_New_Face(ft_library, fullname.ascii(), 0, &m_face);
-    if (!error)
+    QString fullnameD = name;
+    QByteArray fnameD = fullnameD.toAscii();
+    FT_Error errorD = FT_New_Face(ft_library, fnameD.constData(), 0, &m_face);
+    if (!errorD)
         return true;
    
     VERBOSE(VB_IMPORTANT, QString("Unable to find font: %1").arg(name));

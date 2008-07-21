@@ -346,10 +346,8 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     QString configfile = QString("%1/%2.xmltv").arg(GetConfDir())
                                                .arg(source.name);
 
-    QString command  = QString("nice %1 --config-file '%2' --output %3")
-                            .arg(xmltv_grabber.ascii())
-                            .arg(configfile.ascii())
-                            .arg(filename.ascii());
+    QString command = QString("nice %1 --config-file '%2' --output %3")
+        .arg(xmltv_grabber).arg(configfile).arg(filename);
 
     // The one concession to grabber specific behaviour.
     // Will be removed when the grabber allows.
@@ -395,7 +393,8 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
     VERBOSE(VB_XMLTV,
             "----------------- Start of XMLTV output -----------------");
 
-    int systemcall_status = system(command.ascii());
+    QByteArray tmp = command.toAscii();
+    int systemcall_status = system(tmp.constData());
     bool succeeded = WIFEXITED(systemcall_status) &&
          WEXITSTATUS(systemcall_status) == 0;
 
@@ -1025,8 +1024,11 @@ ChanInfo *FillData::xawtvChannel(QString &id, QString &channel, QString &fine)
 
 void FillData::readXawtvChannels(int id, QString xawrcfile)
 {
-    fstream fin(xawrcfile.ascii(), ios::in);
-    if (!fin.is_open()) return;
+    QByteArray tmp = xawrcfile.toAscii();
+    fstream fin(tmp.constData(), ios::in);
+
+    if (!fin.is_open())
+        return;
 
     QList<ChanInfo> chanlist;
 

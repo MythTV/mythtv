@@ -342,8 +342,9 @@ void HouseKeeper::RunMFD(void)
         }
     }
 
-    myth_system(command.ascii(), MYTH_SYSTEM_DONT_BLOCK_LIRC | 
-                                 MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
+    myth_system(command,
+                MYTH_SYSTEM_DONT_BLOCK_LIRC | 
+                MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
 
     HouseKeeper_filldb_running = false;
 }

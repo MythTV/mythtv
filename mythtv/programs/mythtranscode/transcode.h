@@ -14,9 +14,12 @@ class Transcode : public QObject
   public:
     Transcode(ProgramInfo *pginfo);
     ~Transcode();
-    int TranscodeFile(char *inputname, char *outputname, QString profileName,
-                      bool honorCutList, bool framecontrol, int jobID,
-                      QString fifodir, QMap<long long, int> deleteMap);
+    int TranscodeFile(
+        const QString &inputname,
+        const QString &outputname,
+        const QString &profileName,
+        bool honorCutList, bool framecontrol, int jobID,
+        QString fifodir, QMap<long long, int> deleteMap);
     void ShowProgress(bool val) { showprogress = val; }
     void SetRecorderOptions(QString options) { recorderOptions = options; }
   private:

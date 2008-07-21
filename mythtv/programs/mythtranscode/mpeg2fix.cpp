@@ -204,7 +204,7 @@ int64_t PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket &pkt)
     return (delta);
 }
 
-MPEG2fixup::MPEG2fixup(const char *inf, const char *outf,
+MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
                        QMap<long long, int> *deleteMap,
                        const char *fmt, int norp, int fixPTS, int maxf,
                        bool showprog, int otype, void (*update_func)(float),
@@ -820,9 +820,10 @@ void MPEG2fixup::AddSequence(MPEG2frame *frame1, MPEG2frame *frame2)
     ProcessVideo(frame1, header_decoder);
     if (SHOW_MSG(MPF_PROCESS))
     {
-       static int count = 0;
-       QString fname = QString("hdr%1.yuv").arg(count++);
-       WriteFrame(fname.ascii(), &frame1->pkt);
+        static int count = 0;
+        QString filename = QString("hdr%1.yuv").arg(count++);
+        QByteArray fname = filename.toAscii();
+        WriteFrame(fname.constData(), &frame1->pkt);
     }
 }
 
@@ -976,7 +977,11 @@ void MPEG2fixup::WriteFrame(const char *filename, AVPacket *pkt)
     MPEG2frame *tmpFrame = GetPoolFrame(pkt);
     if (tmpFrame == NULL)
         return;
-    WriteData(filename + QString(".enc"), pkt->data, pkt->size);
+
+    QString fname = QString(filename) + ".enc";
+    QByteArray aname = fname.local8Bit();
+    WriteData(aname, pkt->data, pkt->size);
+
     mpeg2dec_t *tmp_decoder = mpeg2_init();
     mpeg2_info_t *info = (mpeg2_info_t *)mpeg2_info(tmp_decoder);
 
@@ -1043,8 +1048,12 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     outbuf_size = info->sequence->width * info->sequence->height * 2;
 
-    if (! fname.isNull())
-        WriteYUV(QString(fname + ".yuv").ascii(), info);
+    if (!fname.isEmpty())
+    {
+        QString tmpstr = fname + ".yuv";
+        QByteArray tmp = tmpstr.toAscii(); 
+        WriteYUV(tmp.constData(), info);
+    }
 
     picture = avcodec_alloc_frame();
 
@@ -1130,10 +1139,15 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
     }
 
     pkt->size = avcodec_encode_video(c, pkt->data, outbuf_size, picture);
-    if (! fname.isNull())
+    if (!fname.isEmpty())
     {
-        WriteData(QString(fname + ".enc").ascii(), pkt->data, pkt->size);
-        WriteFrame(QString(fname + ".enc.yuv").ascii(), pkt);
+        QString ename = fname + ".enc";
+        QByteArray aename = ename.toLocal8Bit();
+        WriteData(aename.constData(), pkt->data, pkt->size);
+
+        QString yname = fname + ".enc.yuv";
+        QByteArray ayname = yname.toLocal8Bit();
+        WriteFrame(ayname.constData(), pkt);
     }
     int delta = FindMPEG2Header(pkt->data, pkt->size, 0x00);
     //  out_size=avcodec_encode_video(c, outbuf, outbuf_size, picture);
@@ -1715,8 +1729,8 @@ void MPEG2fixup::AddRangeList(QStringList rangelist, int type)
     for (i = rangelist.begin(); i != rangelist.end(); ++i)
     {
         long long start = 0, end = 0;
- 
-        if (sscanf((*i).ascii(), "%lld - %lld", &start, &end) == 2)
+        QByteArray tmp = (*i).toAscii();
+        if (sscanf(tmp.constData(), "%lld - %lld", &start, &end) == 2)
         {
             if(start == 0)
             {
@@ -1822,7 +1836,8 @@ int MPEG2fixup::Start()
 
     AVPacket pkt, lastRealvPkt;
 
-    if (! InitAV(infile.ascii(), format, 0))
+    QByteArray ainfile = infile.toLocal8Bit();
+    if (! InitAV(ainfile.constData(), format, 0))
     {
         return (TRANSCODE_EXIT_UNKNOWN_ERROR);
     }
@@ -2528,7 +2543,8 @@ int MPEG2fixup::BuildKeyframeIndex(QString &file,
     int count = 0;
 
     /*============ initialise AV ===============*/
-    if (!InitAV(file.ascii(), NULL, 0))
+    QByteArray fname = file.toLocal8Bit();
+    if (!InitAV(fname.constData(), NULL, 0))
         return TRANSCODE_EXIT_UNKNOWN_ERROR;
 
     av_init_packet(&pkt);

@@ -554,7 +554,7 @@ void ScheduledRecording::doneRecording(ProgramInfo& proginfo)
                                     .arg(subtitle)
                                     .arg(proginfo.chanid);
 
-    VERBOSE(VB_GENERAL, QString("%1 %2").arg(msg).arg(details).utf8());
+    VERBOSE(VB_GENERAL, QString("%1 %2").arg(msg).arg(details));
     gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
 }
 

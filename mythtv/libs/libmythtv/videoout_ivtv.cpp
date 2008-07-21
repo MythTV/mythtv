@@ -481,7 +481,8 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
             }
 
             QString fbdev = QString("/dev/fb%1").arg(fbno);
-            fbfd = open(fbdev.ascii(), O_RDWR);
+            QByteArray fbdevice = fbdev.toAscii();
+            fbfd = open(fbdevice.constData(), O_RDWR);
 
             if (fbfd < 0)
             {
@@ -638,7 +639,8 @@ void VideoOutputIvtv::Open(void)
         return;
     }
 
-    videofd = open(videoDevice.ascii(), O_WRONLY | O_NONBLOCK, 0555);
+    QByteArray viddev = videoDevice.toAscii();
+    videofd = open(viddev.constData(), O_WRONLY | O_NONBLOCK, 0555);
     if (videofd < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to open decoder device " +

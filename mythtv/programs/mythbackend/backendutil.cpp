@@ -113,7 +113,8 @@ void BackendQueryDiskSpace(QStringList &strlist,
             {
                 if (checkDir.exists())
                 {
-                    getDiskSpace(currentDir.ascii(), totalKB, usedKB);
+                    QByteArray cdir = currentDir.toAscii();
+                    getDiskSpace(cdir.constData(), totalKB, usedKB);
                     bzero(&statbuf, sizeof(statbuf));
                     localStr = "1"; // Assume local
 

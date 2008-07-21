@@ -10,6 +10,7 @@
 // libmyth headers
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "mythdb.h"
 
 // libmythtv headers
 #include "channelutil.h"
@@ -77,11 +78,13 @@ bool ChannelData::insert_chan(uint sourceid)
 
 QString getResponse(const QString &query, const QString &def)
 {
-    cout << (const char *)query;
+    QByteArray aquery = query.toLocal8Bit();
+    cout << aquery.constData();
 
-    if (def != "")
+    if (!def.isEmpty())
     {
-        cout << " [" << (const char *)def.local8Bit() << "]  ";
+        QByteArray adef = def.toLocal8Bit();
+        cout << " [" << adef.constData() << "]  ";
     }
     
     char response[80];
@@ -89,7 +92,7 @@ QString getResponse(const QString &query, const QString &def)
 
     QString qresponse = QString::fromLocal8Bit(response);
 
-    if (qresponse == "")
+    if (qresponse.isEmpty())
         qresponse = def;
 
     return qresponse;
@@ -172,40 +175,52 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
 
         MSqlQuery query(MSqlQuery::InitCon());
 
-        QString querystr;
-
-        if ((*i).old_xmltvid != "")
+        if (!(*i).old_xmltvid.isEmpty())
         {
-            querystr.sprintf("SELECT xmltvid FROM channel WHERE xmltvid = '%s'",
-                             (*i).old_xmltvid.ascii());
-            query.exec(querystr);
+            query.prepare(
+                "SELECT xmltvid "
+                "FROM channel "
+                "WHERE xmltvid = :XMLTVID");
+            query.bindValue(":XMLTVID", (*i).old_xmltvid);
 
-            if (query.isActive() && query.size() > 0)
+            if (!query.exec())
             {
-                VERBOSE(VB_GENERAL, QString("Converting old xmltvid (%1) to "
-                                            "new (%2)")
-                                            .arg((*i).old_xmltvid)
-                                            .arg((*i).xmltvid));
+                MythDB::DBError("xmltvid conversion 1", query);
+            }
+            else if (query.next())
+            {
+                VERBOSE(VB_GENERAL,
+                        QString("Converting old xmltvid (%1) to new (%2)")
+                        .arg((*i).old_xmltvid).arg((*i).xmltvid));
 
-                query.exec(QString("UPDATE channel SET xmltvid = '%1' WHERE xmltvid = '%2';")
-                            .arg((*i).xmltvid)
-                            .arg((*i).old_xmltvid));
+                query.prepare("UPDATE channel "
+                              "SET xmltvid = :NEWXMLTVID"
+                              "WHERE xmltvid = :OLDXMLTVID");
+                query.bindValue(":NEWXMLTVID", (*i).xmltvid);
+                query.bindValue(":OLDXMLTVID", (*i).old_xmltvid);
 
-                if (!query.numRowsAffected())
-                    MythContext::DBError("xmltvid conversion",query);
+                if (!query.exec())
+                {
+                    MythDB::DBError("xmltvid conversion 2", query);
+                }
             }
         }
 
-        querystr.sprintf("SELECT chanid,name,callsign,channum,finetune,"
-                         "icon,freqid,tvformat FROM channel WHERE "
-                         "xmltvid = '%s' AND sourceid = %d;", 
-                         (*i).xmltvid.ascii(), id); 
+        query.prepare(
+            "SELECT chanid,   name, callsign, channum, "
+            "       finetune, icon, freqid,   tvformat "
+            "FROM channel "
+            "WHERE xmltvid  = :XMLTVID AND "
+            "      sourceid = :SOURCEID");
+        query.bindValue(":XMLTVID",  (*i).xmltvid);
+        query.bindValue(":SOURCEID", id);
 
-        query.exec(querystr);
-        if (query.isActive() && query.size() > 0)
+        if (!query.exec())
         {
-            query.next();
-
+            MythDB::DBError("handleChannels", query);            
+        }
+        else if (query.next())
+        {
             QString chanid = query.value(0).toString();
             if (interactive)
             {
@@ -220,16 +235,27 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                 cout << "### " << endl;
                 cout << "### Existing channel found" << endl;
                 cout << "### " << endl;
-                cout << "### xmltvid  = " << (const char *)(*i).xmltvid.local8Bit() << endl;
-                cout << "### chanid   = " << (const char *)chanid.local8Bit()       << endl;
-                cout << "### name     = " << (const char *)name.local8Bit()         << endl;
-                cout << "### callsign = " << (const char *)callsign.local8Bit()     << endl;
-                cout << "### channum  = " << (const char *)chanstr.local8Bit()      << endl;
+                cout << "### xmltvid  = "
+                     << (*i).xmltvid.toLocal8Bit().constData() << endl;
+                cout << "### chanid   = "
+                     << chanid.toLocal8Bit().constData()       << endl;
+                cout << "### name     = "
+                     << name.toLocal8Bit().constData()         << endl;
+                cout << "### callsign = "
+                     << callsign.toLocal8Bit().constData()     << endl;
+                cout << "### channum  = "
+                     << chanstr.toLocal8Bit().constData()      << endl;
                 if (channel_preset)
-                    cout << "### freqid   = " << (const char *)freqid.local8Bit()   << endl;
-                cout << "### finetune = " << (const char *)finetune.local8Bit()     << endl;
-                cout << "### tvformat = " << (const char *)tvformat.local8Bit()     << endl;
-                cout << "### icon     = " << (const char *)icon.local8Bit()         << endl;
+                {
+                    cout << "### freqid   = "
+                         << freqid.toLocal8Bit().constData()   << endl;
+                }
+                cout << "### finetune = "
+                     << finetune.toLocal8Bit().constData()     << endl;
+                cout << "### tvformat = "
+                     << tvformat.toLocal8Bit().constData()     << endl;
+                cout << "### icon     = "
+                     << icon.toLocal8Bit().constData()         << endl;
                 cout << "### " << endl;
 
                 (*i).name = name;
@@ -239,7 +265,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                 (*i).freqid = freqid;
                 (*i).tvformat = tvformat;
 
-                promptForChannelUpdates(i, atoi(chanid.ascii()));
+                promptForChannelUpdates(i, chanid.toUInt());
 
                 if ((*i).callsign == "")
                     (*i).callsign = chanid;
@@ -273,9 +299,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
 
                     if (!subquery.exec())
                     {
-                        VERBOSE(VB_IMPORTANT, QString("DB Error: Channel "
-                                            "update failed, SQL query was: %1")
-                                            .arg(querystr));
+                        MythDB::DBError("update failed", subquery);
                     }
                     else
                     {
@@ -317,14 +341,23 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                 cout << "### " << endl;
                 cout << "### New channel found" << endl;
                 cout << "### " << endl;
-                cout << "### name     = " << (const char *)(*i).name.local8Bit()     << endl;
-                cout << "### callsign = " << (const char *)(*i).callsign.local8Bit() << endl;
-                cout << "### channum  = " << (const char *)(*i).chanstr.local8Bit()  << endl;
+                cout << "### name     = "
+                     << (*i).name.toLocal8Bit().constData()     << endl;
+                cout << "### callsign = "
+                     << (*i).callsign.toLocal8Bit().constData() << endl;
+                cout << "### channum  = "
+                     << (*i).chanstr.toLocal8Bit().constData()  << endl;
                 if (channel_preset)
-                    cout << "### freqid   = " << (const char *)(*i).freqid.local8Bit() << endl;
-                cout << "### finetune = " << (const char *)(*i).finetune.local8Bit() << endl;
-                cout << "### tvformat = " << (const char *)(*i).tvformat.local8Bit() << endl;
-                cout << "### icon     = " << (const char *)localfile.local8Bit()     << endl;
+                {
+                    cout << "### freqid   = "
+                         << (*i).freqid.toLocal8Bit().constData() << endl;
+                }
+                cout << "### finetune = "
+                     << (*i).finetune.toLocal8Bit().constData() << endl;
+                cout << "### tvformat = "
+                     << (*i).tvformat.toLocal8Bit().constData() << endl;
+                cout << "### icon     = "
+                     << localfile.toLocal8Bit().constData()     << endl;
                 cout << "### " << endl;
 
                 uint chanid = promptForChannelUpdates(i,0);

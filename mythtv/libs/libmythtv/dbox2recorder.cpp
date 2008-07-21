@@ -297,7 +297,8 @@ int DBox2Recorder::OpenStream(void)
 
     request += "\r\n\r\n";
 
-    write(newSocket, request.ascii(), strlen(request.ascii()));
+    QByteArray req = request.toAscii();
+    write(newSocket, req.constData(), strlen(req.constData()));
 
     return newSocket;
 }

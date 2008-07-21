@@ -2093,8 +2093,7 @@ void LCDProcClient::outputMusic()
 
         if (shuffle.length() != 0 || repeat.length() != 0) 
         {
-            aString.sprintf("%s%s", shuffle.ascii(), repeat.ascii());
-
+            aString = shuffle + repeat;
             info_width = aString.length();
             outputLeftText("Music", aString, "infoWidget", lcdHeight);
         }

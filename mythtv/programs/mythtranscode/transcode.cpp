@@ -377,12 +377,14 @@ void TranscodeWriteText(void *ptr, unsigned char *buf, int len, int timecode, in
   nvr->WriteText(buf, len, timecode, pagenr);
 }
 
-int Transcode::TranscodeFile(char *inputname, char *outputname,
-                              QString profileName,
-                              bool honorCutList, bool framecontrol,
-                              int jobID, QString fifodir,
-                              QMap<long long, int> deleteMap)
-{ 
+int Transcode::TranscodeFile(
+    const QString &inputname,
+    const QString &outputname,
+    const QString &profileName,
+    bool honorCutList, bool framecontrol,
+    int jobID, QString fifodir,
+    QMap<long long, int> deleteMap)
+{
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime statustime = curtime;
     int audioframesize;

@@ -33,6 +33,7 @@
 #include "oldsettings.h"
 #include "tv.h"
 #include "guidegrid.h"
+#include "mythdb.h"
 
 using namespace std;
 
@@ -1057,14 +1058,9 @@ void ProgFinder::selectSearchData()
 
     query.prepare(thequery);
     query.bindValues(bindings);
-    query.exec();
-    
-    int rows = query.size();
-
-    if (rows == -1)
+    if (!query.exec())
     {
-        cerr << "MythProgFind: Error executing query! (selectSearchData)\n";
-        cerr << "MythProgFind: QUERY = " << (const char *)thequery.local8Bit() << endl;
+        MythDB::DBError("selectSeartData", thequery);
         return;
     }
 
@@ -1072,15 +1068,19 @@ void ProgFinder::selectSearchData()
 
     listCount = 0;
 
-    if (query.isActive() && rows > 0)
+    int rows = 0;
+    if (query.next())
     {
         typedef QMap<QString,QString> ShowData;
         ShowData tempList;
 
-        while (query.next())
+        do
         {
-            if (running == false)
+            rows++;
+
+            if (!running)
                 return;
+
             data = query.value(0).toString();
 
             if (formatSelectedData(data))
@@ -1089,6 +1089,7 @@ void ProgFinder::selectSearchData()
                 listCount++;
             }
         }
+        while (query.next());
 
         if (listCount < showsPerListing)
         {
@@ -1649,7 +1650,7 @@ void HeProgFinder::whereClauseGetSearchData(int charNum, QString &where,
     else 
     {
         QString one = searchData[charNum] + "%";
-        bindings[":ONE"] = one.local8Bit(); 
+        bindings[":ONE"] = one;
         where += "WHERE ( title LIKE :ONE ) ";
     }
 

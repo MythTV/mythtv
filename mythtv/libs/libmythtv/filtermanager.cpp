@@ -143,7 +143,8 @@ bool FilterManager::LoadFilterLib(const QString &path)
 
     if (!dlhandle)
     {
-        dlhandle = dlopen(path.ascii(), RTLD_LAZY);
+        QByteArray apath = path.toAscii();
+        dlhandle = dlopen(apath.constData(), RTLD_LAZY);
         if (!dlhandle)
         {
             const char *errmsg = dlerror();
@@ -180,7 +181,8 @@ bool FilterManager::LoadFilterLib(const QString &path)
         memcpy(newFilter->formats, filtInfo->formats,
                sizeof(FmtConv) * (i + 1));
 
-        newFilter->libname = strdup(path.ascii());
+        QByteArray libname = path.toAscii();
+        newFilter->libname = strdup(libname.constData());
         filters[newFilter->name] = newFilter;
         VERBOSE(VB_PLAYBACK, LOC + QString("filters[%1] = ")
                 .arg(newFilter->name) << newFilter);

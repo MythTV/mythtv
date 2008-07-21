@@ -795,7 +795,8 @@ void MythXML::GetChannelIcon( HTTPRequest *pRequest )
     QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
                                 Qt::SmoothTransformation);
 
-    img.save( sFileName.ascii(), "PNG" );
+    QByteArray fname = sFileName.toAscii();
+    img.save( fname.constData(), "PNG" );
 
     delete pImage;
 
@@ -981,7 +982,8 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
     QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
                                 Qt::SmoothTransformation);
 
-    img.save( sFileName.ascii(), "PNG" );
+    QByteArray fname = sFileName.toAscii();
+    img.save( fname.constData(), "PNG" );
 
     delete pImage;
 
@@ -1238,7 +1240,8 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
     QImage img = pImage->scaled( nWidth, nHeight, Qt::IgnoreAspectRatio,
                                 Qt::SmoothTransformation);
 
-    img.save( pRequest->m_sFileName.ascii(), "PNG" );
+    QByteArray fname = pRequest->m_sFileName.toAscii();
+    img.save( fname.constData(), "PNG" );
 
     delete pImage;
 }

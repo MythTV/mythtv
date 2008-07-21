@@ -638,8 +638,7 @@ QString OSD::FindTheme(QString name)
 TTFFont *OSD::LoadFont(QString name, int size)
 {
     QString fullname = GetConfDir() + "/" + name;
-    TTFFont *font = new TTFFont((char *)fullname.ascii(), size,
-                                wscale, hmult*fscale);
+    TTFFont *font = new TTFFont(fullname, size, wscale, hmult * fscale);
 
     if (font->isValid())
         return font;
@@ -647,8 +646,7 @@ TTFFont *OSD::LoadFont(QString name, int size)
     delete font;
     fullname = GetShareDir() + name;
 
-    font = new TTFFont((char *)fullname.ascii(), size,
-                       wscale, hmult*fscale);
+    font = new TTFFont(fullname, size, wscale, hmult*fscale);
 
     if (font->isValid())
         return font;
@@ -657,8 +655,7 @@ TTFFont *OSD::LoadFont(QString name, int size)
     if (themepath != "")
     {
         fullname = themepath + "/" + name;
-        font = new TTFFont((char *)fullname.ascii(), size,
-                           wscale, hmult*fscale);
+        font = new TTFFont(fullname, size, wscale, hmult * fscale);
         if (font->isValid())
             return font;
 
@@ -666,8 +663,7 @@ TTFFont *OSD::LoadFont(QString name, int size)
     }
 
     fullname = name;
-    font = new TTFFont((char *)fullname.ascii(), size,
-                       wscale, hmult*fscale);
+    font = new TTFFont(fullname, size, wscale, hmult * fscale);
 
     if (font->isValid())
         return font;

@@ -306,14 +306,17 @@ __GLXextFuncPtr get_gl_proc_address(const QString &procName)
 {
     __GLXextFuncPtr ret = NULL;
 
+    QByteArray tmp = procName.toAscii();
+    const GLubyte *procedureName = (const GLubyte*) tmp.constData();
+
 #if USING_GLX_PROC_ADDR_ARB
-    X11S(ret = glXGetProcAddressARB((const GLubyte*)procName.latin1()));
+    X11S(ret = glXGetProcAddressARB(procedureName));
 #elif GLX_VERSION_1_4
-    X11S(ret = glXGetProcAddress((const GLubyte*)procName.latin1()));
+    X11S(ret = glXGetProcAddress(procedureName));
 #elif GLX_ARB_get_proc_address
-    X11S(ret = glXGetProcAddressARB((const GLubyte*)procName.latin1()));
+    X11S(ret = glXGetProcAddressARB(procedureName));
 #elif GLX_EXT_get_proc_address
-    X11S(ret = glXGetProcAddressEXT((const GLubyte*)procName.latin1()));
+    X11S(ret = glXGetProcAddressEXT(procedureName));
 #endif
 
     return ret;

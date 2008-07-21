@@ -85,9 +85,9 @@ int delete_file_immediately(const QString &filename,
             QFile target(linktext);
             if (!(success1 = target.remove()))
             {
-                VERBOSE(VB_IMPORTANT, (const char *)QString("Error deleting '%1' -> '%2': %3")
-                        .arg((const char *)filename).arg((const char *)linktext.local8Bit())
-                        .arg(strerror(errno)));
+                VERBOSE(VB_IMPORTANT,
+                        QString("Error deleting '%1' -> '%2'")
+                        .arg(filename).arg(linktext) + ENO);
             }
         }
     }
@@ -596,8 +596,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
             QString halt_cmd = listline[1];
             if (!halt_cmd.isEmpty())
             {
-                VERBOSE(VB_IMPORTANT, "Going down now as of Mainserver request!");
-                system(halt_cmd.ascii());
+                VERBOSE(VB_IMPORTANT,
+                        "Going down now as of Mainserver request!");
+                QByteArray tmp = halt_cmd.toAscii();
+                system(tmp.constData());
             }
             else
                 VERBOSE(VB_IMPORTANT,
@@ -1312,8 +1314,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                     QFile checkFile(tmpURL);
                     if (tmpURL != "" && checkFile.exists())
                     {
+                        QByteArray atmpurl = tmpURL.toLocal8Bit();
                         struct stat st;
-                        if (stat(tmpURL.ascii(), &st) == 0)
+                        if (stat(atmpurl.constData(), &st) == 0)
                         {
                             proginfo->filesize = st.st_size;
 
@@ -1446,7 +1449,8 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     struct stat st;
 
     long long size = 0;
-    if (stat(lpath.ascii(), &st) == 0)
+    QByteArray apath = lpath.toLocal8Bit();
+    if (stat(apath.constData(), &st) == 0)
         size = st.st_size;
 
     pginfo->filesize = size;
@@ -1563,8 +1567,9 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     {
         // Since stat fails after unlinking on some filesystems,
         // get the filesize first
+        QByteArray fname = ds->filename.toLocal8Bit();
         struct stat st;
-        if (stat(ds->filename.ascii(), &st) == 0)
+        if (stat(fname.constData(), &st) == 0)
             size = st.st_size;
         fd = DeleteFile(ds->filename, followLinks);
 
@@ -1707,25 +1712,26 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks)
     QFileInfo finfo(filename);
     int fd = -1, err = 0;
     QString linktext = "";
+    QByteArray fname = filename.toLocal8Bit();
 
     VERBOSE(VB_FILE, QString("About to unlink/delete file: '%1'")
-            .arg(filename));
+            .arg(fname.constData()));
 
-    QString errmsg = QString("Delete Error '%1'").arg((const char *)filename.local8Bit());
+    QString errmsg = QString("Delete Error '%1'").arg(fname.constData());
     if (finfo.isSymLink())
     {
         linktext = finfo.readLink();
         if (linktext.left(1) != "/")
             linktext = finfo.dirPath(true) + "/" + finfo.readLink();
-
-        errmsg += QString(" -> '%2'").arg((const char *)linktext.local8Bit());
+        QByteArray alink = linktext.toLocal8Bit();
+        errmsg += QString(" -> '%2'").arg(alink.constData());
     }
 
     if (followLinks && finfo.isSymLink())
     {
         fd = OpenAndUnlink(linktext);
         if (fd >= 0)
-            err = unlink(filename.local8Bit());
+            err = unlink(fname.constData());
     }
     else if (!finfo.isSymLink())
     {
@@ -1733,7 +1739,7 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks)
     }
     else // just delete symlinks immediately
     {
-        err = unlink(filename.local8Bit());
+        err = unlink(fname.constData());
         if (err == 0)
             return -1; // no error
     }
@@ -1755,8 +1761,9 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks)
  */
 int MainServer::OpenAndUnlink(const QString &filename)
 {
-    QString msg = QString("Error deleting '%1'").arg((const char *)filename.local8Bit());
-    int fd = open(filename.local8Bit(), O_WRONLY);
+    QByteArray fname = filename.toLocal8Bit();
+    QString msg = QString("Error deleting '%1'").arg(fname.constData());
+    int fd = open(fname.constData(), O_WRONLY);
 
     if (fd == -1)
     {
@@ -1764,7 +1771,7 @@ int MainServer::OpenAndUnlink(const QString &filename)
         return -1;
     }
     
-    if (unlink(filename.local8Bit()))
+    if (unlink(fname.constData()))
     {
         VERBOSE(VB_IMPORTANT, msg + " could not unlink " + ENO);
         close(fd);

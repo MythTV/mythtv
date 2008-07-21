@@ -756,8 +756,9 @@ void AvFormatDecoder::Reset()
         ic->streams_changed = HandleStreamChange;
         ic->stream_change_data = this;
 
-        char *filename = (char *)(ringBuffer->GetFilename().ascii());
-        int err = av_open_input_file(&ic, filename, fmt, 0, &params);
+        QString    fnames = ringBuffer->GetFilename();
+        QByteArray fnamea = fnames.toAscii();
+        int err = av_open_input_file(&ic, fnamea.constData(), fmt, 0, &params);
         if (err < 0)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Reset(): "
@@ -781,7 +782,8 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
 
     AVProbeData probe;
 
-    probe.filename = (char *)(filename.ascii());
+    QByteArray fname = filename.toAscii();
+    probe.filename = fname.constData();
     probe.buf = (unsigned char *)testbuf;
     probe.buf_size = testbufsize;
 
@@ -858,8 +860,10 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         delete avfRingBuffer;
     avfRingBuffer = new AVFRingBuffer(rbuffer);
 
-    AVInputFormat *fmt = NULL;
-    char *filename = (char *)(rbuffer->GetFilename().ascii());
+    AVInputFormat *fmt      = NULL;
+    QString        fnames   = ringBuffer->GetFilename();
+    QByteArray     fnamea   = fnames.toAscii();
+    const char    *filename = fnamea.constData();
 
     AVProbeData probe;
     probe.filename = filename;

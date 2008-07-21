@@ -36,9 +36,15 @@ writeJPG(QString prefix, const AVPicture *img, int imgheight)
     if (!jpgfi.exists())
     {
         QFile pgmfile(prefix + ".pgm");
-        if (!pgmfile.exists() && pgm_write(img->data[0], imgwidth, imgheight,
-                    pgmfile.name().ascii()))
-            return -1;
+        if (!pgmfile.exists())
+        {
+            QByteArray pfname = pgmfile.name().toLocal8Bit();
+            if (pgm_write(img->data[0], imgwidth, imgheight,
+                          pfname.constData()))
+            {
+                return -1;
+            }
+        }
 
         if (myth_system(QString("convert -quality 50 -resize 192x144 %1 %2")
                     .arg(pgmfile.name()).arg(jpgfi.filePath())))
@@ -586,8 +592,8 @@ analyzeFrameDebug(long long frameno, const AVPicture *pgm, int pgmheight,
 
     if (debug_frames)
     {
-        QString base;
-        base.sprintf("%s/TemplateFinder-%05lld", debugdir.ascii(), frameno);
+        QString base = QString("%1/TemplateFinder-%2")
+            .arg(debugdir).arg(frameno, 5, 10, QChar('0'));
 
         /* PGM greyscale image of frame. */
         if (writeJPG(base, pgm, pgmheight))
@@ -637,7 +643,8 @@ readTemplate(QString datafile, int *prow, int *pcol, int *pwidth, int *pheight,
         return false;
     }
 
-    if (pgm_read(tmpl->data[0], *pwidth, *pheight, tmplfile.ascii()))
+    QByteArray tmfile = tmplfile.toAscii();
+    if (pgm_read(tmpl->data[0], *pwidth, *pheight, tmfile.constData()))
     {
         avpicture_free(tmpl);
         return false;
@@ -663,7 +670,8 @@ writeTemplate(QString tmplfile, const AVPicture *tmpl, QString datafile,
 {
     QFile tfile(tmplfile);
 
-    if (pgm_write(tmpl->data[0], width, height, tmplfile.ascii()))
+    QByteArray tmfile = tmplfile.toAscii();
+    if (pgm_write(tmpl->data[0], width, height, tmfile.constData()))
         return false;
 
     QFile dfile(datafile);

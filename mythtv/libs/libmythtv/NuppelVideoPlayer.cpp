@@ -1099,7 +1099,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
         {
             VERBOSE(VB_IMPORTANT,
                     QString("NVP::OpenFile(): Error, file not found: %1")
-                    .arg(ringBuffer->GetFilename().ascii()));
+                    .arg(ringBuffer->GetFilename()));
             return -1;
         }
     }
@@ -2116,8 +2116,9 @@ void NuppelVideoPlayer::UpdateCC(unsigned char *inpos)
 #if 0
                 if (ccbuf->size() > 4)
                 {
+                    QByteArray ccl = ccline.toAscii();
                     printf("CC overflow:  ");
-                    printf("%d %d %s\n", cccol, ccrow, ccline.ascii());
+                    printf("%d %d %s\n", cccol, ccrow, ccl.constData());
                 }
 #endif
             }
@@ -6069,7 +6070,8 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
         }
         else 
         {
-            text3.sprintf("%d %s", sbsecs, QObject::tr("seconds").ascii()); 
+            QByteArray tmp = QObject::tr("seconds").toAscii();
+            text3.sprintf("%d %s", sbsecs, tmp.constData()); 
         }
     }
 
@@ -7162,13 +7164,13 @@ long long NuppelVideoPlayer::GetDVDBookmark(void) const
         if (!dvdbookmark.empty())
         {
             QStringList::Iterator it = dvdbookmark.begin();
-            int title = atoi((*it).ascii());
-            frames = (long long)(atoi((*++it).ascii()) & 0xffffffffLL);
+            int title = (*it).toInt();
+            frames = (long long)((*++it).toLongLong() & 0xffffffffLL);
             if (jumptotitle)
             {
                 ringBuffer->DVD()->PlayTitleAndPart(title, 1);
-                int audiotrack = atoi((*++it).ascii());
-                int subtitletrack = atoi((*++it).ascii());
+                int audiotrack    = (*++it).toInt();
+                int subtitletrack = (*++it).toInt();
                 ringBuffer->DVD()->SetTrack(kTrackTypeAudio, audiotrack);
                 ringBuffer->DVD()->SetTrack(kTrackTypeSubtitle, subtitletrack);
                 ringBuffer->DVD()->JumpToTitle(false);

@@ -484,12 +484,13 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
         av_free(mpa_vidctx);
     mpa_vidctx = NULL;
 
-    mpa_vidcodec = avcodec_find_encoder_by_name(videocodec.ascii());
+    QByteArray vcodec = videocodec.toAscii();
+    mpa_vidcodec = avcodec_find_encoder_by_name(vcodec.constData());
 
     if (!mpa_vidcodec)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Video Codec not found: %1")
-                .arg(videocodec.ascii()));
+                .arg(vcodec.constData()));
         return false;
     }
 
@@ -683,7 +684,8 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
 
         return 1;
 #else
-        if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY | O_NONBLOCK)))
+        QByteArray adevice = audiodevice.toAscii();
+        if (-1 == (afd = open(adevice.constData(), O_RDONLY | O_NONBLOCK)))
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Cannot open DSP '%1'")
                     .arg(audiodevice));
@@ -780,7 +782,8 @@ bool NuppelVideoRecorder::MJPEGInit(void)
     int init_fd = fd;
     if (init_fd < 0)
     {
-        init_fd = open(videodevice.ascii(), O_RDWR);
+        QByteArray vdevice = videodevice.toAscii();
+        init_fd = open(vdevice.constData(), O_RDWR);
         we_opened_fd = true;
 
         if (init_fd < 0)
@@ -940,11 +943,12 @@ bool NuppelVideoRecorder::Open(void)
         return true;
 
     int retries = 0;
-    fd = open(videodevice.ascii(), O_RDWR);
+    QByteArray vdevice = videodevice.toAscii();
+    fd = open(vdevice.constData(), O_RDWR);
     while (fd < 0)
     {
         usleep(30000);
-        fd = open(videodevice.ascii(), O_RDWR);
+        fd = open(vdevice.constData(), O_RDWR);
         if (retries++ > 5)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -987,7 +991,7 @@ bool NuppelVideoRecorder::Open(void)
         QString driver = (char *)vcap.driver;
         if (driver == "cx8800" || driver == "go7007" || driver == "em28xx")
         {
-            channelfd = open(videodevice.ascii(), O_RDWR);
+            channelfd = open(vdevice.constData(), O_RDWR);
             if (channelfd < 0)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -2266,7 +2270,8 @@ void NuppelVideoRecorder::doAudioThread(void)
 
     act_audio_sample = 0;
 
-    if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY | O_NONBLOCK))) 
+    QByteArray adevice = audiodevice.toAscii();
+    if (-1 == (afd = open(adevice.constData(), O_RDONLY | O_NONBLOCK))) 
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Cannot open DSP '%1', exiting").
                 arg(audiodevice));
@@ -2659,9 +2664,10 @@ void NuppelVideoRecorder::doVbiThread(void)
     char *ptr = NULL;
     char *ptr_end = NULL;
 
+    QByteArray vbidev = vbidevice.toAscii();
     if (VBIMode::PAL_TT == vbimode)
     {
-        pal_tt = vbi_open(vbidevice.ascii(), NULL, 99, -1);
+        pal_tt = vbi_open(vbidev.constData(), NULL, 99, -1);
         if (pal_tt)
         {
             vbifd = pal_tt->fd;
@@ -2673,7 +2679,7 @@ void NuppelVideoRecorder::doVbiThread(void)
     {
         ntsc_cc = new struct cc;
         bzero(ntsc_cc, sizeof(struct cc));
-        ntsc_cc->fd = open(vbidevice.ascii(), O_RDONLY|O_NONBLOCK);
+        ntsc_cc->fd = open(vbidev.constData(), O_RDONLY|O_NONBLOCK);
         ntsc_cc->code1 = -1;
         ntsc_cc->code2 = -1;
 

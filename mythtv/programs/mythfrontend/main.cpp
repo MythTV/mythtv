@@ -621,21 +621,29 @@ void haltnow()
     QString halt_cmd = gContext->GetSetting("HaltCommand", 
                                             "sudo /sbin/halt -p");
     if (!halt_cmd.isEmpty())
-        system(halt_cmd.ascii());
+    {
+        QByteArray tmp = halt_cmd.toAscii();
+        system(tmp.constData());
+    }
 }
 
 void rebootnow() 
 { 
     QString reboot_cmd = gContext->GetSetting("RebootCommand", 
                                             "sudo /sbin/reboot"); 
-    if (!reboot_cmd.isEmpty()) 
-        system(reboot_cmd.ascii()); 
+    if (!reboot_cmd.isEmpty())
+    {
+        QByteArray tmp = reboot_cmd.toAscii();
+        system(tmp.constData());
+    }
 }
 
 bool RunMenu(QString themedir)
 {
-    menu = new MythThemedMenu(themedir.ascii(), "mainmenu.xml", 
-                              GetMythMainWindow()->GetMainStack(), "mainmenu");
+    QByteArray tmp = themedir.toLocal8Bit();
+    menu = new MythThemedMenu(
+        QString(tmp.constData()), "mainmenu.xml", 
+        GetMythMainWindow()->GetMainStack(), "mainmenu");
     menu->setCallback(TVMenuCallback, gContext);
    
     if (menu->foundTheme())
@@ -644,7 +652,7 @@ bool RunMenu(QString themedir)
         return true;
     }
 
-    cerr << "Couldn't find theme " << (const char *)themedir << endl;
+    cerr << "Couldn't find theme " << tmp.constData() << endl;
     return false;
 }   
 
@@ -773,7 +781,8 @@ int internal_play_media(const QString &mrl, const QString &plot,
                 if (!fields.empty())
                 {
                     QStringList::Iterator it = fields.begin();
-                    long long pos = (long long)(atoi((*++it).ascii()) & 0xffffffffLL);
+                    long long pos = (long long)
+                        ((*++it).toLongLong() & 0xffffffffLL);
                     if (pos > 0)
                     {
                         QString msg = QObject::tr("DVD contains a bookmark");
@@ -965,6 +974,8 @@ void CleanupMyOldInUsePrograms(void)
 
 void PrintHelp(const MythCommandLineParser &cmdlineparser)
 {
+    QString    help  = cmdlineparser.GetHelpString(false);
+    QByteArray ahelp = help.toLocal8Bit();
 
     cerr << "Valid options are: " << endl <<
 #ifdef USING_X11
@@ -974,7 +985,7 @@ void PrintHelp(const MythCommandLineParser &cmdlineparser)
             "-geometry WxH+X+Y              Override window size and position\n" <<
             "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
             "-r or --reset                  Resets frontend appearance settings and language" << endl <<
-            cmdlineparser.GetHelpString(false).ascii() <<
+            ahelp.constData() <<
             "-G or " << endl <<
             "  --get-setting KEY[,KEY2,etc] Returns the current database setting for 'KEY'" << endl <<
             "                               Use a comma seperated list to return multiple values" << endl <<

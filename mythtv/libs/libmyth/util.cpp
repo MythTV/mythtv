@@ -45,8 +45,6 @@ using namespace std;
 #include <qpixmap.h>
 #include <qfont.h>
 #include <qfile.h>
-#include <Q3CString>
-#include <Q3DeepCopy>
 
 // Myth headers
 #include "mythconfig.h"
@@ -349,7 +347,7 @@ long long getDiskSpace(const QString &file_on_disk,
     struct statfs statbuf;
     bzero(&statbuf, sizeof(statbuf));
     long long freespace = -1;
-    Q3CString cstr = file_on_disk.local8Bit();
+    QByteArray cstr = file_on_disk.toLocal8Bit();
 
     total = used = -1;
 
@@ -357,7 +355,7 @@ long long getDiskSpace(const QString &file_on_disk,
     // others are invalid and set to 0 (such as when an automounted directory
     // is not mounted but still visible because --ghost was used),
     // so check to make sure we can have a total size > 0
-    if ((statfs(cstr, &statbuf) == 0) &&
+    if ((statfs(cstr.constData(), &statbuf) == 0) &&
         (statbuf.f_blocks > 0) &&
         (statbuf.f_bsize > 0))
     {
@@ -817,15 +815,14 @@ double MythGetPixelAspectRatio(void)
 
 unsigned long long myth_get_approximate_large_file_size(const QString &fname)
 {
-    // .local8Bit() not thread-safe.. even with Qt4, make a deep copy first..
-    QString filename = Q3DeepCopy<QString>(fname);
+    QByteArray filename = fname.toLocal8Bit();
 #ifdef USING_MINGW
     struct _stati64 status;
-    _stati64(filename.local8Bit(), &status);
+    _stati64(filename.constData(), &status);
     return status.st_size;
 #else
     struct stat status;
-    if (stat(filename.local8Bit(), &status) == -1)
+    if (stat(filename.constData(), &status) == -1)
         return 0;
 
     // Using off_t requires a lot of 32/64 bit checking.

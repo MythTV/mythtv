@@ -82,10 +82,13 @@ int FIFOWriter::FIFOInit(int id, QString desc, QString name, long size,
 {
     if (id < 0 || id >= num_fifos)
         return false;
-    if (mkfifo(name.ascii(),S_IREAD | S_IWRITE | S_IRGRP | S_IROTH) == -1)
+
+    QByteArray  fname = name.toAscii();
+    const char *aname = fname.constData();
+    if (mkfifo(aname, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH) == -1)
     {
-        cerr << "Couldn't create fifo for file: " << name.ascii() << endl;
-        perror(NULL);
+        VERBOSE(VB_IMPORTANT, QString("Couldn't create fifo for file: '%1'")
+                .arg(name) + ENO);
         return false;
     }
     VERBOSE(VB_GENERAL, QString("Created %1 fifo: %2").arg(desc).arg(name));
@@ -141,7 +144,10 @@ void FIFOWriter::FIFOWriteThread(void)
         if (killwr[id])
             break;
         if (fd < 0)
-            fd = open(filename[id].ascii(), O_WRONLY| O_SYNC);
+        {
+            QByteArray fname = filename[id].toAscii();
+            fd = open(fname.constData(), O_WRONLY| O_SYNC);
+        }
         if (fd >= 0)
             write(fd, fb_outptr[id]->data, fb_outptr[id]->blksize);
         pthread_mutex_lock(&fifo_lock[id]);

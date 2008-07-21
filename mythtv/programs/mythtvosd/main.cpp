@@ -179,9 +179,10 @@ int main(int argc, char *argv[])
         QString value = QString::fromLocal8Bit(arg.section("=", 1));
         if (verbose)
         {
-
-            cerr << "name: " << (const char *)name
-		 << " -- value: " << (const char *)value.local8Bit() << endl;
+            QByteArray tmp_name  = name.toLocal8Bit();
+            QByteArray tmp_value = value.toLocal8Bit();
+            cerr << "name: " << tmp_name.constData()
+                 << " -- value: " << tmp_value.constData() << endl;
         }
 
         name.append("%");
@@ -191,7 +192,10 @@ int main(int argc, char *argv[])
     }
 
     if (verbose)
-        cout << "output:\n" << (const char *)message.local8Bit() << endl;
+    {
+        QByteArray tmp_message  = message.toLocal8Bit();
+        cout << "output:\n" << tmp_message.constData() << endl;
+    }
 
     Q3SocketDevice sock(Q3SocketDevice::Datagram);
 
@@ -203,10 +207,10 @@ int main(int argc, char *argv[])
         return TVOSD_EXIT_SOCKET_ERROR;
     }
 
-    Q3CString utf8 = message.utf8();
+    QByteArray utf8 = message.toUtf8();
     int size = utf8.length();
 
-    if (sock.writeBlock(utf8.data(), size, address, port) < 0)
+    if (sock.writeBlock(utf8.constData(), size, address, port) < 0)
     {
         perror("sendto");
     }

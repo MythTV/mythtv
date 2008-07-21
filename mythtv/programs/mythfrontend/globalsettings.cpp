@@ -3818,7 +3818,8 @@ uint PVR350VideoDevice::fillSelectionsFromDir(const QDir &dir,
             continue;
 
         // if the driver returns any info add this device to our list
-        int videofd = open(filepath.ascii(), O_RDWR);
+        QByteArray fpath = filepath.toAscii();
+        int videofd = open(fpath.constData(), O_RDWR);
         if (videofd >= 0)
         {
             QString cn, dn;

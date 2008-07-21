@@ -458,27 +458,32 @@ void Scheduler::PrintRec(const ProgramInfo *p, const char *prefix)
     if ((print_verbose_messages & VB_SCHEDULE) == 0)
         return;
 
-    QString episode;
-
     if (prefix)
         cout << prefix;
 
-    if (p->subtitle > " ")
-        episode = QString("%1 - \"%2\"").arg((const char *)p->title.local8Bit())
-            .arg((const char *)p->subtitle.local8Bit());
-    else
-        episode = p->title.local8Bit();
+    QString episode = p->title;
+    if (!p->subtitle.isEmpty() && (p->subtitle != " "))
+        episode = QString("%1 - \"%2\"").arg(p->title).arg(p->subtitle);
+    episode = episode.leftJustify(30, ' ', true);
 
-    cout << (const char *)episode.leftJustify(30, ' ', true) << " "
-         << (const char *)p->chanstr.rightJustify(4, ' ') << " "
-         << (const char *)p->chansign.leftJustify(7, ' ', true) << " "
-         << (const char *)p->recstartts.toString("dd hh:mm-").local8Bit()
-         << (const char *)p->recendts.toString("hh:mm  ").local8Bit()
-         << p->sourceid << " " << p->cardid << " " << p->inputid << "  " 
-         << (const char *)p->RecTypeChar() << " " << (const char *)p->RecStatusChar() << " "
-         << (const char *)(QString::number(p->recpriority) + "/" +
-             QString::number(p->recpriority2)).rightJustify(5, ' ')
-         << endl;
+    QString outstr = QString("%1 %2 %3 %4%5 %6 %7 %8 ")
+        .arg(episode)
+        .arg(p->chanstr.rightJustify(4, ' '))
+        .arg(p->chansign.leftJustify(7, ' ', true))
+        .arg(p->recstartts.toString("dd hh:mm-"))
+        .arg(p->recendts.toString("hh:mm  "))
+        .arg(p->sourceid)
+        .arg(p->cardid)
+        .arg(p->inputid);
+    outstr += QString("%1 %2 %3/%4")
+        .arg(p->RecTypeChar())
+        .arg(p->RecStatusChar())
+        .arg(p->recpriority)
+        .arg((QString::number(p->recpriority2)).rightJustify(5, ' '));
+
+    QByteArray out = outstr.toLocal8Bit();
+
+    cout << out.constData() << endl;
 }
 
 void Scheduler::UpdateRecStatus(ProgramInfo *pginfo)
@@ -1072,9 +1077,10 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p, bool samePriority,
             QString msg = QString(
                 "Moved \"%1\" on chanid: %2 from card: %3 to %4 "
                 "to avoid LiveTV conflict")
-                .arg(p->title.local8Bit().constData()).arg(p->chanid)
+                .arg(p->title).arg(p->chanid)
                 .arg(p->cardid).arg(q->cardid);
-            VERBOSE(VB_SCHEDULE, msg);
+            QByteArray amsg = msg.toLocal8Bit();
+            VERBOSE(VB_SCHEDULE, amsg.constData());
         }
 
         q->recstatus = rsWillRecord;
@@ -1656,7 +1662,7 @@ void Scheduler::RunScheduler(void)
                 if (!startupCommand.isEmpty())
                 {
                     startupCommand.replace("$status", startupParam);
-                    myth_system(startupCommand.ascii());
+                    myth_system(startupCommand);
                 }
                 firstRun = false;
             }
@@ -1728,11 +1734,12 @@ void Scheduler::RunScheduler(void)
                 msg = QString("SUPPRESSED recording \"%1\" on channel: "
                               "%2 on cardid: %3, sourceid %4. Tuner "
                               "is locked by an external application.")
-                    .arg((const char *)nextRecording->title.local8Bit())
+                    .arg(nextRecording->title)
                     .arg(nextRecording->chanid)
                     .arg(nextRecording->cardid)
                     .arg(nextRecording->sourceid);
-                VERBOSE(VB_GENERAL, msg);
+                QByteArray amsg = msg.toLocal8Bit();
+                VERBOSE(VB_GENERAL, msg.constData());
 
                 QMutexLocker lockit(reclist_lock);
                 nextRecording->recstatus = rsTunerBusy;
@@ -1815,7 +1822,7 @@ void Scheduler::RunScheduler(void)
             msg = is_rec ? "Started recording" : "Canceled recording (" +
                 nextRecording->RecStatusText() + ")"; 
 
-            VERBOSE(VB_GENERAL, QString("%1: %2").arg(msg).arg(details).utf8());
+            VERBOSE(VB_GENERAL, QString("%1: %2").arg(msg).arg(details));
             gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
 
             if (is_rec)
@@ -1965,7 +1972,7 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
     int state = 0;
     if (!preSDWUCheckCommand.isEmpty())
     {
-        state = myth_system(preSDWUCheckCommand.ascii());
+        state = myth_system(preSDWUCheckCommand);
 
         if (GENERIC_EXIT_NOT_OK != state)
         {
@@ -2049,7 +2056,7 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
 
         // now run the command to set the wakeup time
         if (!setwakeup_cmd.isEmpty())
-            myth_system(setwakeup_cmd.ascii());
+            myth_system(setwakeup_cmd);
     }
 
     // tell anyone who is listening the master server is going down now
@@ -2068,7 +2075,7 @@ void Scheduler::ShutdownServer(int prerollseconds, QDateTime &idleSince)
                                     "this computer :-\n\t\t\t\t\t\t") + halt_cmd);
 
         // and now shutdown myself
-        myth_system(halt_cmd.ascii());
+        myth_system(halt_cmd);
     }
 
     // If we make it here then either the shutdown failed

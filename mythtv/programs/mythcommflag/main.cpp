@@ -194,7 +194,7 @@ int CopySkipListToCutList(QString chanid, QString starttime)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
-                .arg(chanid.ascii()).arg(starttime.ascii()));
+                .arg(chanid).arg(starttime));
         return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
     }
 
@@ -231,7 +231,7 @@ int SetCutList(QString chanid, QString starttime, QString newCutList)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
-                .arg(chanid.ascii()).arg(starttime.ascii()));
+                .arg(chanid).arg(starttime));
         return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
     }
 
@@ -255,7 +255,7 @@ int GetMarkupList(QString list, QString chanid, QString starttime)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
-                .arg(chanid.ascii()).arg(starttime.ascii()));
+                .arg(chanid).arg(starttime));
         return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
     }
 
@@ -625,9 +625,11 @@ int FlagCommercials(
             .toString("yyyyMMddhhmmss").leftJustify(14, ' ', true);
         QString title = program_info->title.leftJustify(41, ' ', true);
 
-        cerr << chanid.ascii() << "  " << recstartts.ascii() << "  "
-             << title.ascii() << "  ";
-        cerr.flush();
+        QString outstr = QString("%1 %2 %3 ")
+            .arg(chanid).arg(recstartts).arg(title);
+        QByteArray out = outstr.toLocal8Bit();
+
+        cerr << out.constData() << flush;
     }
 
     if (!force && JobQueue::IsJobRunning(JOB_COMMFLAG, program_info))
@@ -752,7 +754,7 @@ int FlagCommercials(
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
-                .arg(chanid.ascii()).arg(starttime.ascii()));
+                .arg(chanid).arg(starttime));
         return COMMFLAG_EXIT_NO_PROGRAM_DATA;
     }
 
@@ -877,12 +879,13 @@ int main(int argc, char *argv[])
                     for (; it != list.end(); ++it)
                     {
                         QString val = (*it).lower();
+                        QByteArray aval = val.toAscii();
                         off_seen |= val == "off";
                         sit = skipTypes->find(val);
                         if (sit == skipTypes->end())
                         {
                             cerr << "Failed to decode --method option '"
-                                 << val.ascii() << "'" << endl;
+                                 << aval.constData() << "'" << endl;
                             return -1;
                         }
                         commDetectMethod = (SkipTypes)
@@ -909,12 +912,13 @@ int main(int argc, char *argv[])
                 {
                     outputMethod = kOutputMethodEssentials;
                     QString val = method.lower();
+                    QByteArray aval = val.toAscii();
                     QMap<QString,OutputMethod>::const_iterator it =
                         outputTypes->find(val);
                     if (it == outputTypes->end())
                     {
                         cerr << "Failed to decode --outputmethod option '"
-                             << val.ascii() << "'" << endl;
+                             << aval.constData() << "'" << endl;
                         return -1;
                     }
                     outputMethod = (OutputMethod) it.data();

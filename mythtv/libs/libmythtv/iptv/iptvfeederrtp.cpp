@@ -64,7 +64,8 @@ bool IPTVFeederRTP::Open(const QString &url)
     }
         
     struct in_addr addr;
-    addr.s_addr = our_inet_addr(parse.host().latin1());
+    QByteArray host = parse.host().toLatin1();
+    addr.s_addr = our_inet_addr(host.constData());
 
     // Begin by setting up our usage environment:
     if (!InitEnv())

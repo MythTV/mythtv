@@ -196,7 +196,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
         if (startpos > 20000)
         {
-            VERBOSE(VB_IMPORTANT, QString( "Bad file: %1").arg(ringBuffer->GetFilename().ascii()));
+            VERBOSE(VB_IMPORTANT, QString("Bad file: '%1'")
+                    .arg(ringBuffer->GetFilename()));
             return -1;
         }
     }

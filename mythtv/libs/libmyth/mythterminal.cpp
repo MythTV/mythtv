@@ -137,11 +137,12 @@ void MythTerminal::ProcessSendKeyPress(QKeyEvent *e)
     QMutexLocker locker(&lock);
     if (running && process && e->text().length())
     {
-        AddText(e->text().local8Bit());
+        QByteArray text = e->text().toLocal8Bit();
+        AddText(text.constData());
         if (e->text()=="\n" || e->text()=="\r")
             process->write("\r\n");
         else
-            process->write(e->text().local8Bit());
+            process->write(text.constData());
     }
 }
 

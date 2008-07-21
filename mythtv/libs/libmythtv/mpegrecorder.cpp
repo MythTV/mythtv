@@ -295,7 +295,8 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
 bool MpegRecorder::OpenMpegFileAsInput(void)
 {
-    chanfd = readfd = open(videodevice.ascii(), O_RDONLY);
+    QByteArray vdevice = videodevice.toAscii();
+    chanfd = readfd = open(vdevice.constData(), O_RDONLY);
 
     if (readfd < 0)
     {
@@ -309,7 +310,8 @@ bool MpegRecorder::OpenMpegFileAsInput(void)
 
 bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 {
-    chanfd = open(videodevice.ascii(), O_RDWR);
+    QByteArray vdevice = videodevice.toAscii();
+    chanfd = open(vdevice.constData(), O_RDWR);
     if (chanfd < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't open video device. " + ENO);
@@ -374,7 +376,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 
     SetVBIOptions(chanfd);
 
-    readfd = open(videodevice.ascii(), O_RDWR | O_NONBLOCK);
+    readfd = open(vdevice.constData(), O_RDWR | O_NONBLOCK);
 
     if (readfd < 0)
     {
@@ -876,6 +878,7 @@ void MpegRecorder::StartRecording(void)
     if (deviceIsMpegFile)
         elapsedTimer.start();
 
+    QByteArray vdevice = videodevice.toAscii();
     while (encoding)
     {
         if (PauseAndWait(100))
@@ -892,7 +895,7 @@ void MpegRecorder::StartRecording(void)
         }
 
         if (readfd < 0)
-            readfd = open(videodevice.ascii(), O_RDWR);
+            readfd = open(vdevice.constData(), O_RDWR);
 
         if (readfd < 0)
         {
@@ -953,7 +956,7 @@ void MpegRecorder::StartRecording(void)
         if ((len == 0) && (deviceIsMpegFile))
         {
             close(readfd);
-            readfd = open(videodevice.ascii(), O_RDONLY);
+            readfd = open(vdevice.constData(), O_RDONLY);
 
             if (readfd >= 0)
             {

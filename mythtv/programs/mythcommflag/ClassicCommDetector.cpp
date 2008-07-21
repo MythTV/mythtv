@@ -2448,7 +2448,10 @@ void ClassicCommDetector::PrintFullMap(
     ostream &out, const comm_break_t *comm_breaks, bool verbose) const
 {
     if (verbose)
-        out << FrameInfoEntry::GetHeader().ascii() << " mark" << endl;
+    {
+        QByteArray tmp = FrameInfoEntry::GetHeader().toAscii();
+        out << tmp.constData() << " mark" << endl;
+    }
 
     for (long long i = 1; i < curFrameNumber; i++)
     {
@@ -2456,7 +2459,8 @@ void ClassicCommDetector::PrintFullMap(
         if (it == frameInfo.end())
             continue;
 
-        out << (*it).toString(i, verbose).ascii() << " ";
+        QByteArray atmp = (*it).toString(i, verbose).toAscii();
+        out << atmp.constData() << " ";
         if (comm_breaks)
         {
             comm_map_t::const_iterator mit = comm_breaks->find(i);
@@ -2465,8 +2469,9 @@ void ClassicCommDetector::PrintFullMap(
                 QString tmp = (verbose) ?
                     toString((MarkTypes)mit.data()) :
                     QString::number(mit.data());
+                atmp = tmp.toAscii();
 
-                out << tmp.ascii();
+                out << atmp.constData();
             }
         }
         out << "\n";

@@ -254,7 +254,8 @@ void DVBStreamHandler::RunTS(void)
         return;
     bzero(buffer, buffer_size);
 
-    int dvr_fd = open(_dvr_dev_path.ascii(), O_RDONLY | O_NONBLOCK);
+    QByteArray dvr_dev_path = _dvr_dev_path.toAscii();
+    int dvr_fd = open(dvr_dev_path.constData(), O_RDONLY | O_NONBLOCK);
     if (dvr_fd < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC +
@@ -790,7 +791,8 @@ bool DVBStreamHandler::SupportsTSMonitoring(void)
             return *it;
     }
 
-    int dvr_fd = open(_dvr_dev_path.ascii(), O_RDONLY | O_NONBLOCK);
+    QByteArray dvr_dev_path = _dvr_dev_path.toAscii();
+    int dvr_fd = open(dvr_dev_path.constData(), O_RDONLY | O_NONBLOCK);
     if (dvr_fd < 0)
     {
         QMutexLocker locker(&_rec_supports_ts_monitoring_lock);
@@ -830,11 +832,12 @@ bool PIDInfo::Open(const QString &dvb_dev, bool use_section_reader)
     }
 
     QString demux_fn = CardUtil::GetDeviceName(DVB_DEV_DEMUX, dvb_dev);
+    QByteArray demux_ba = demux_fn.toAscii();
 
     VERBOSE(VB_RECORD, LOC + QString("Opening filter for pid 0x%1")
             .arg(_pid, 0, 16));
 
-    int mux_fd = open(demux_fn.ascii(), O_RDWR | O_NONBLOCK);
+    int mux_fd = open(demux_ba.constData(), O_RDWR | O_NONBLOCK);
     if (mux_fd == -1)
     {
         VERBOSE(VB_IMPORTANT, LOC +
@@ -989,8 +992,9 @@ int DVBRecorder::OpenFilterFd(uint pid, int pes_type, uint stream_type)
     // Open the demux device
     QString dvbdev = CardUtil::GetDeviceName(
         DVB_DEV_DEMUX, _card_number_option);
+    QByteArray dev = dvbdev.toAscii();
 
-    int fd_tmp = open(dvbdev.ascii(), O_RDWR);
+    int fd_tmp = open(dev.constData(), O_RDWR);
     if (fd_tmp < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not open demux device." + ENO);

@@ -208,7 +208,8 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
         while (openTimer.elapsed() < timetowait)
         {
             lasterror = 0;
-            fd2 = open(filename.local8Bit(),
+            QByteArray fname = filename.toLocal8Bit();
+            fd2 = open(fname.constData(),
                        O_RDONLY|O_LARGEFILE|O_STREAMING|O_BINARY);
                 
             if (fd2 < 0)
@@ -1325,7 +1326,8 @@ long long RingBuffer::GetRealFileSize(void) const
         return remotefile->GetFileSize();
 
     struct stat st;
-    if (stat(filename.ascii(), &st) == 0)
+    QByteArray fname = filename.toLocal8Bit();
+    if (stat(fname.constData(), &st) == 0)
         return st.st_size;
     return -1;
 }

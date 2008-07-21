@@ -2,6 +2,9 @@
 
 // Some of the XDS was inspired by code in TVTime. -- dtk 03/30/2006
 
+#include <algorithm>
+using namespace std;
+
 #include <qstringlist.h>
 #include <Q3CString>
 #include <Q3DeepCopy>
@@ -597,14 +600,12 @@ void CC608Decoder::ResetCC(int mode)
 
 void CC608Decoder::BufferCC(int mode, int len, int clr)
 {
-    Q3CString tmpbuf;
+    QByteArray tmpbuf;
     if (len)
     {
         // calculate UTF-8 encoding length
-        tmpbuf = ccbuf[mode].utf8();
-        len = tmpbuf.length();
-        if (len > 255)
-            len = 255;
+        tmpbuf = ccbuf[mode].toUtf8();
+        len = min(tmpbuf.length(), 255);
     }
 
     unsigned char f;
@@ -623,7 +624,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
     if (len)
     {
         memcpy(bp,
-               tmpbuf,
+               tmpbuf.constData(),
                len);
         len += sizeof(ccsubtitle);
     }
@@ -638,7 +639,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
     if ((print_verbose_messages & VB_VBI) != 0
         && len)
     {
-        QString dispbuf = QString::fromUtf8(tmpbuf, len);
+        QString dispbuf = QString::fromUtf8(tmpbuf.constData(), len);
         VERBOSE(VB_VBI, QString("%1 '").arg(timecode[mode], 10));
         QString vbuf = "";
         int i = 0;
@@ -658,7 +659,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
                 case 0x2588 :  vbuf += "[]"; break;
                 case 0x266A :  vbuf += "o/~"; break;
                 case '\b'   :  vbuf += "\\b"; break;
-                default     :  vbuf += cp.latin1();
+                default     :  vbuf += QString(cp.toLatin1());
             }
             i++;
         }

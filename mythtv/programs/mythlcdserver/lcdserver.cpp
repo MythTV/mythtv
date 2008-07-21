@@ -270,7 +270,8 @@ void LCDServer::sendMessage(Q3Socket *where, const QString &what)
 {
     QString message = what;
     message.append("\n");
-    where->writeBlock(message.utf8(), message.utf8().length());
+    QByteArray tmp = message.toUtf8();
+    where->writeBlock(tmp.constData(), tmp.length());
 }
 
 void LCDServer::sendKeyPress(QString key_pressed)

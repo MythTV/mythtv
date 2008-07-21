@@ -546,8 +546,7 @@ void TTFFont::KillFace(void)
     glyphs.clear();
 }
 
-TTFFont::TTFFont(char *file, int size, float wscale,
-                 float hmult) :
+TTFFont::TTFFont(const QString &file, int size, float wscale, float hmult) :
     valid(false),            face(0),
     max_descent(-1),         max_ascent(-1),
     fontsize(size),          vid_width(-1),
@@ -562,6 +561,8 @@ TTFFont::TTFFont(char *file, int size, float wscale,
     m_file(file),            loadedfontsize(-1),
     m_wscale(wscale),        m_hmult(hmult)
 {
+    m_file.detach();
+
    if (!have_library)
    {
        FT_Error error = FT_Init_FreeType(&the_library);

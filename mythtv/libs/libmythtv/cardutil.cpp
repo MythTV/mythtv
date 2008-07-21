@@ -226,7 +226,8 @@ QString CardUtil::ProbeDVBType(const QString &device)
 
 #ifdef USING_DVB
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    int fd_frontend = open(dvbdev.ascii(), O_RDONLY | O_NONBLOCK);
+    QByteArray dev = dvbdev.toAscii();
+    int fd_frontend = open(dev.constData(), O_RDONLY | O_NONBLOCK);
     if (fd_frontend < 0)
     {
         VERBOSE(VB_IMPORTANT, "Can't open DVB frontend (" + dvbdev + ").");
@@ -260,7 +261,8 @@ QString CardUtil::ProbeDVBFrontendName(const QString &device)
 
 #ifdef USING_DVB
     QString dvbdev = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
-    int fd_frontend = open(dvbdev.ascii(), O_RDWR | O_NONBLOCK);
+    QByteArray dev = dvbdev.toAscii();
+    int fd_frontend = open(dev.constData(), O_RDWR | O_NONBLOCK);
     if (fd_frontend < 0)
         return "ERROR_OPEN";
 
@@ -1517,7 +1519,8 @@ QStringList CardUtil::probeV4LInputs(QString device)
 {
     bool ok;
     QStringList ret;
-    int videofd = open(device.ascii(), O_RDWR);
+    QByteArray dev = device.toAscii();
+    int videofd = open(dev.constData(), O_RDWR);
     if (videofd < 0)
     {
         ret += QObject::tr("Could not open '%1' "
