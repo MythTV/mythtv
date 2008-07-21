@@ -14,6 +14,7 @@
 #include "mythdb.h"
 #include "storagegroup.h"
 #include "util.h"
+#include "mythdirs.h"
 
 #define LOC QString("DBUtil: ")
 #define LOC_ERR QString("DBUtil Error: ")
@@ -167,8 +168,18 @@ bool DBUtil::IsBackupInProgress(void)
     return false;
 }
 
-/** \fn DBUtil::BackupDB(QString)
+/** \fn DBUtil::BackupDB(QString&)
  *  \brief Requests a backup of the database.
+ *
+ *   If the DatabaseBackupScript exists in the ShareDir, it will be executed.
+ *   All required database information will be made available as name=value
+ *   pairs in a temporary file whose filename will be passed to the backup
+ *   script.  The script may parse this file to obtain the required information
+ *   to run a backup program, such as mysqldump or mysqlhotcopy.
+ *
+ *   If the DatabaseBackupScript does not exist, a backup will be performed
+ *   using mysqldump directly.  The database password will be passed in a
+ *   temporary file so it does not have to be specified on the command line.
  *
  *   Care should be taken in calling this function.  It has the potential to
  *   corrupt in-progress recordings or interfere with playback.
@@ -189,6 +200,16 @@ bool DBUtil::BackupDB(QString &filename)
         return true;
     }
 
+    QString backupScript = GetShareDir() + "mythconverg_backup.pl";
+    backupScript = gContext->GetSetting("DatabaseBackupScript", backupScript);
+
+    if (!QFile::exists(backupScript))
+    {
+        VERBOSE(VB_IMPORTANT, QString("Database backup script does "
+                                      "not exist: %1").arg(backupScript));
+        backupScript = QString::null;
+    }
+
     bool result = false;
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -196,7 +217,10 @@ bool DBUtil::BackupDB(QString &filename)
                                 QDateTime::currentDateTime()
                                 .toString("yyyy-MM-dd hh:mm:ss"), NULL);
 
-    result = DoBackup(filename);
+    if (backupScript.isEmpty())
+        result = DoBackup(filename);
+    else
+        result = DoBackup(backupScript, filename);
 
     gContext->SaveSettingOnHost("BackupDBLastRunEnd",
                                 QDateTime::currentDateTime()
@@ -315,8 +339,124 @@ QString DBUtil::GetBackupDirectory()
     return directory;
 }
 
-/** \fn DBUtil::DoBackup(QString)
+/** \fn DBUtil::DoBackup(const QString&, QString&)
+ *  \brief Creates a backup of the database by executing the backupScript.
+ *
+ *   This function executes the specified backup script to create a database
+ *   backup.  This is the preferred approach for creating the backup.
+ */
+bool DBUtil::DoBackup(const QString &backupScript, QString &filename)
+{
+    DatabaseParams dbParams = gContext->GetDatabaseParams();
+    QString     dbSchemaVer = gContext->GetSetting("DBSchemaVer");
+    QString backupDirectory = GetBackupDirectory();
+    QString  backupFilename = CreateBackupFilename(dbParams.dbName + "-" +
+                                                   dbSchemaVer, ".sql");
+    QString      scriptArgs = gContext->GetSetting("BackupDBScriptArgs");
+
+    // Create a temporary file containing the database information
+    QString tempDatabaseConfFile =
+        createTempFile("/tmp/mythtv_db_backup_conf_XXXXXX");
+    QByteArray tmpfile = tempDatabaseConfFile.toLocal8Bit();
+    FILE *fp = fopen(tmpfile.constData(), "w");
+    if (!fp)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Unable to create temporary "
+                        "configuration file for creating DB backup: %1")
+                .arg(tmpfile.constData()));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Attempting backup, anyway.");
+        tempDatabaseConfFile = "";
+    }
+    else
+    {
+        chmod(tmpfile.constData(), S_IRUSR);
+
+        QString outstr =
+            QString("DBHostName=%1\nDBPort=%2\n"
+                    "DBUserName=%3\nDBPassword=%4\n"
+                    "DBName=%5\nDBSchemaVer=%6\n"
+                    "DBBackupDirectory=%7\nDBBackupFilename=%8\n")
+            .arg(dbParams.dbHostName).arg(dbParams.dbPort)
+            .arg(dbParams.dbUserName).arg(dbParams.dbPassword)
+            .arg(dbParams.dbName).arg(dbSchemaVer)
+            .arg(backupDirectory).arg(backupFilename);
+
+        QByteArray outarr = outstr.toLocal8Bit();
+
+        fprintf(fp, outarr.constData());
+
+        if (fclose(fp))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Error closing '%1'")
+                    .arg(tmpfile.constData()) + ENO);
+        }
+    }
+
+    if (!scriptArgs.isEmpty())
+        scriptArgs.prepend(" ");
+
+    VERBOSE(VB_IMPORTANT, QString("Backing up database with script: '%1'")
+            .arg(backupScript));
+
+    QString command = backupScript + scriptArgs + " " + tempDatabaseConfFile;
+    QByteArray tmpcmd = command.toLocal8Bit();
+    uint status = system(tmpcmd.constData());
+
+    if (!tempDatabaseConfFile.isEmpty())
+        unlink(tmpfile.constData());
+
+    if (status)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Error backing up database: %1 (%2)")
+                .arg(tmpcmd.constData()).arg(status));
+        filename = "__FAILED__";
+        return false;
+    }
+
+    VERBOSE(VB_IMPORTANT, "Database Backup complete.");
+
+    QDir dir(backupDirectory, backupFilename + "*");
+    uint numfiles = dir.count();
+    if (numfiles < 1)
+    {
+        // If no file begins with the suggested filename, don't show the backup
+        // filename in the GUI message -- the script probably used some other
+        // filename
+        filename = "";
+        VERBOSE(VB_FILE, LOC_ERR + QString(
+                    "No files beginning with the suggested database backup "
+                    "filename '%1' were found in '%2'.")
+                .arg(backupFilename).arg(backupDirectory));
+    }
+    else
+    {
+        filename = dir.path() + "/" + dir[0];;
+        if (numfiles > 1)
+        {
+            VERBOSE(VB_FILE, LOC_ERR + QString(
+                        "Multiple files beginning with the suggested database "
+                        "backup filename '%1' were found in '%2'. "
+                        "Assuming the first is the backup.")
+                    .arg(backupFilename).arg(backupDirectory));
+        }
+    }
+
+    if (!filename.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Backed up database to file: '%1'")
+                .arg(filename));
+    }
+
+    return true;
+}
+
+/** \fn DBUtil::DoBackup(QString&)
  *  \brief Creates a backup of the database.
+ *
+ *   This fallback function is used only if the database backup script cannot
+ *   be found.
  */
 bool DBUtil::DoBackup(QString &filename)
 {

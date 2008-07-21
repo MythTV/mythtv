@@ -47,6 +47,7 @@ class MPUBLIC DBUtil
                                  QString extension = ".sql");
     QString GetBackupDirectory();
 
+    bool DoBackup(const QString &backupScript, QString &filename);
     bool DoBackup(QString &filename);
 
     QString m_versionString;
