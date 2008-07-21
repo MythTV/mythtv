@@ -172,7 +172,10 @@ void XMLParseBase::ParseChildren(QDomElement &element,
                                         MythUIType *parent)
 {
     if (!parent)
+    {
         VERBOSE(VB_IMPORTANT, "Parent is NULL");
+        return;
+    }
 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
