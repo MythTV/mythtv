@@ -3,9 +3,8 @@
 #ifndef _VIDEOOUT_TYPES_H_
 #define _VIDEOOUT_TYPES_H_
 
-#include <q3deepcopy.h>
-#include <qstring.h>
-#include <qobject.h>
+#include <QString>
+#include <QObject>
 
 typedef enum PIPLocation
 {
@@ -124,7 +123,9 @@ inline QString toString(FrameScanType scan, bool brief = false)
         default:
             break;
     }
-    return Q3DeepCopy<QString>(ret);
+
+    ret.detach();
+    return ret;
 }
 
 inline QString toString(PIPLocation location)
@@ -138,7 +139,9 @@ inline QString toString(PIPLocation location)
         case kPIPBottomRight: ret = QObject::tr("Bottom Right"); break;
         case kPIP_END: break;
     }
-    return Q3DeepCopy<QString>(ret);
+
+    ret.detach();
+    return ret;
 }
 
 inline QString toString(AspectOverrideMode aspectmode) 
@@ -153,7 +156,9 @@ inline QString toString(AspectOverrideMode aspectmode)
         case kAspect_Off:
         case kAspect_END: break;
     }
-    return Q3DeepCopy<QString>(ret);
+
+    ret.detach();
+    return ret;
 }
 
 inline QString toString(LetterBoxColour letterboxcolour)
@@ -166,7 +171,9 @@ inline QString toString(LetterBoxColour letterboxcolour)
         case kLetterBoxColour_Toggle:
         case kLetterBoxColour_END: break;
     }
-    return Q3DeepCopy<QString>(ret);
+
+    ret.detach();
+    return ret;
 }
 
 inline QString toXString(LetterBoxColour letterboxcolour)
@@ -179,7 +186,9 @@ inline QString toXString(LetterBoxColour letterboxcolour)
         case kLetterBoxColour_Toggle:
         case kLetterBoxColour_END: break;
     }
-    return Q3DeepCopy<QString>(ret);
+
+    ret.detach();
+    return ret;
 }
 
 inline float get_aspect_override(AspectOverrideMode aspectmode, float orig)
@@ -209,7 +218,9 @@ inline QString toString(AdjustFillMode aspectmode)
         case kAdjustFill_Off:
         case kAdjustFill_END: break;
     }
-    return Q3DeepCopy<QString>(ret);
+
+    ret.detach();
+    return ret;
 }
 
 inline QString toString(PictureAttribute pictureattribute)
@@ -231,7 +242,9 @@ inline QString toString(PictureAttribute pictureattribute)
       case kPictureAttribute_MAX:
           ret = "MAX";                     break;
     }
-    return Q3DeepCopy<QString>(ret);
+
+    ret.detach();
+    return ret;
 }
 
 inline QString toDBString(PictureAttribute pictureattribute)
@@ -255,7 +268,8 @@ inline QString toDBString(PictureAttribute pictureattribute)
     if (ret.isEmpty())
         return QString::null;
 
-    return Q3DeepCopy<QString>(ret);
+    ret.detach();
+    return ret;
 }
 
 inline QString toXVString(PictureAttribute pictureattribute)
@@ -279,7 +293,8 @@ inline QString toXVString(PictureAttribute pictureattribute)
     if (ret.isEmpty())
         return QString::null;
 
-    return Q3DeepCopy<QString>(ret);
+    ret.detach();
+    return ret;
 }
 
 inline QString toString(PictureAttributeSupported supported)
@@ -297,7 +312,9 @@ inline QString toString(PictureAttributeSupported supported)
     if (kPictureAttributeSupported_Volume & supported)
         ret += "Volume, ";
 
-    return (ret.isEmpty()) ? "" : ret.left(ret.length() - 2);
+    ret = (ret.isEmpty()) ? "" : ret.left(ret.length() - 2);
+    ret.detach();
+    return ret;
 }
 
 inline PictureAttributeSupported toMask(PictureAttribute pictureattribute)

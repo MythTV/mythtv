@@ -7,6 +7,7 @@ using namespace std;
 
 #include <qrect.h>
 #include <qmap.h>
+#include <Q3DeepCopy>
 
 #include "videooutbase.h"
 

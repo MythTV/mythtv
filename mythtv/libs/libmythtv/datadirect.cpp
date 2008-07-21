@@ -8,6 +8,7 @@
 #include <qdir.h>
 #include <qfileinfo.h>
 #include <Q3TextStream>
+#include <Q3DeepCopy>
 
 // MythTV headers
 #include "datadirect.h"

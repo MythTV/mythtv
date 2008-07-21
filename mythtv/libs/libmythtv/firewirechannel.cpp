@@ -5,6 +5,8 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+#include <Q3DeepCopy>
+
 #include "mythcontext.h"
 #include "tv_rec.h"
 #include "linuxfirewiredevice.h"

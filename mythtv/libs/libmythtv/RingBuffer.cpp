@@ -86,7 +86,7 @@ const uint RingBuffer::kReadTestSize = PNG_MIN_SIZE;
 RingBuffer::RingBuffer(const QString &lfilename,
                        bool write, bool readahead,
                        uint read_retries)
-    : filename(Q3DeepCopy<QString>(lfilename)),
+    : filename(lfilename),
       tfw(NULL),                fd2(-1),
       writemode(false),
       readpos(0),               writepos(0),
@@ -106,6 +106,7 @@ RingBuffer::RingBuffer(const QString &lfilename,
       livetvchain(NULL),        ignoreliveeof(false),
       readAdjust(0)
 {
+    filename.detach();
     pthread_rwlock_init(&rwlock, NULL);
 
     if (write)
