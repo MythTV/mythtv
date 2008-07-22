@@ -129,7 +129,7 @@ class MythMainWindowPrivate
 
 #ifdef USING_APPLEREMOTE
     AppleRemoteListener *appleRemoteListener;
-    AppleRemote         &appleRemote;
+    AppleRemote         *appleRemote;
 #endif
 
     bool exitingtomain;
@@ -341,14 +341,13 @@ MythMainWindow::MythMainWindow(const bool useDB)
 #endif
 
 #ifdef USING_APPLEREMOTE
-    d->appleRemoteListener = NULL;
     d->appleRemoteListener = new AppleRemoteListener(this);
-    d->appleRemote = AppleRemote(AppleRemote::instance());
+    d->appleRemote         = &AppleRemote::instance();
 
-    d->appleRemote.setListener(d->appleRemoteListener);
-    d->appleRemote.startListening();
-    if (d->appleRemote.isListeningToRemote())
-        d->appleRemote.start();
+    d->appleRemote->setListener(d->appleRemoteListener);
+    d->appleRemote->startListening();
+    if (d->appleRemote->isListeningToRemote())
+        d->appleRemote->start();
 #endif
 
     RegisterKey("Global", "UP", "Up Arrow", "Up");
@@ -436,11 +435,11 @@ MythMainWindow::~MythMainWindow()
 #endif
 
 #ifdef USING_APPLEREMOTE
-    if (d->AppleRemote.isRunning())
+    if (d->appleRemote->isRunning())
     {
-        d->AppleRemote.stopListening();
-        //d->AppleRemote.terminate();
-        //d->AppleRemote.wait();
+        d->appleRemote->stopListening();
+        //d->appleRemote->terminate();
+        //d->appleRemote->wait();
     }
 
     delete d->appleRemoteListener;
