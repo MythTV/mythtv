@@ -13,6 +13,9 @@
 #ifdef __STDC_LIMIT_MACROS
 #define FAAD_MODIFIED
 #endif
+#ifdef __NEAACDEC_H__
+#define FAAD_MODIFIED
+#endif
 
 // ANSI C headers
 #include <cstdlib>
