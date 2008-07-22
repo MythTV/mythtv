@@ -105,6 +105,12 @@ AppleRemote::run()
     CFRunLoopRun();
 }
 
+void
+AppleRemote::quit()
+{
+    CFRunLoopStop(CFRunLoopGetCurrent());
+}
+
 // protected
 AppleRemote::AppleRemote() : openInExclusiveMode(true),
                              hidDeviceInterface(0),

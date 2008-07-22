@@ -46,6 +46,7 @@ public:
     void      startListening();
     void      stopListening();
     void      run();
+    void      quit();
 
 protected:
     AppleRemote(); // will be a singleton class

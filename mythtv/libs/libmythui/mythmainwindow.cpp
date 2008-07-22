@@ -441,14 +441,14 @@ MythMainWindow::~MythMainWindow()
     if (d->appleRemote->isRunning())
     {
         d->appleRemote->stopListening();
-        //d->appleRemote->terminate();
-        //d->appleRemote->wait();
+        d->appleRemote->quit();
     }
+    delete d->appleRemote;
+    d->appleRemote = NULL;
 
     delete d->appleRemoteListener;
     d->appleRemoteListener = NULL;
 #endif
-
 
     delete d;
 }
@@ -667,26 +667,17 @@ bool MythMainWindow::screenShot(void)
 }
 
 #ifdef USING_APPLEREMOTE
-// This may be possible via installEventFilter() instead?
-
 bool MythMainWindow::event(QEvent* e)
 {
-    switch (e->type())
+    if (d->appleRemote)
     {
-        case QEvent::WindowActivate:
-        {
-            AppleRemote::instance().startListening();
-            break;
-        }
-        case QEvent::WindowDeactivate:
-        {
-            // relinquish the remote
-            AppleRemote::instance().stopListening();
-            break;
-        }
-        default:
-            break;
+        if (e->type() == QEvent::WindowActivate)
+            d->appleRemote->startListening();
+
+        if (e->type() == QEvent::WindowDeactivate)
+            d->appleRemote->startListening();
     }
+
     return QWidget::event(e);
 }
 #endif
