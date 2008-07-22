@@ -16,12 +16,15 @@
 #include <sstream>
 #include <iostream>
 
+#include "mythverbose.h"
+
 #include "AppleRemote.h"
 
 AppleRemote*      AppleRemote::_instance = 0;
 const char* const AppleRemote::AppleRemoteDeviceName = "AppleIRController";
 const int         AppleRemote::REMOTE_SWITCH_COOKIE = 19;
 
+const QString     LOC = "AppleRemote::";
 
 AppleRemote::Listener::~Listener()
 {
@@ -231,7 +234,7 @@ AppleRemote::_createDeviceInterface(io_object_t hidDevice)
                                  (LPVOID*) (&hidDeviceInterface));
 
         if (plugInResult != S_OK)
-            std::cerr << "AppleRemote Error: couldn't create device interface " << std::endl;
+            VERBOSE(VB_IMPORTANT, LOC + "_createDeviceInterface() failed");
 
         // Release
         if (plugInInterface)
@@ -257,19 +260,19 @@ AppleRemote::_openDevice()
 
     if (ioReturnValue != KERN_SUCCESS)
     {
-        std::cerr << "AppleRemote Error: when opening device" << std::endl;
+        VERBOSE(VB_IMPORTANT, LOC + "_openDevice() failed");
         return false;
     }
     queue = (*hidDeviceInterface)->allocQueue(hidDeviceInterface);
     if (!queue)
     {
-        std::cerr << "AppleRemote Error allocating queue" << std::endl;
+        VERBOSE(VB_IMPORTANT, LOC + "_openDevice() - error allocating queue");
         return false;
     }
 
     HRESULT result = (*queue)->create(queue, 0, 12);
     if (result != S_OK || !queue)
-    	std::cerr << "AppleRemote Error creating queue" << std::endl;
+        VERBOSE(VB_IMPORTANT, LOC + "_openDevice() - error creating queue");
 
     for (std::vector<int>::iterator iter = cookies.begin(); 
          iter != cookies.end();
@@ -282,7 +285,8 @@ AppleRemote::_openDevice()
     ioReturnValue = (*queue)->createAsyncEventSource(queue, &eventSource);
     if (ioReturnValue != KERN_SUCCESS)
     {
-        std::cerr << "AppleRemote Error creating async event source" << std::endl;
+        VERBOSE(VB_IMPORTANT,
+                LOC + "_openDevice() - failed to create async event source");
         return false;
     }
 
@@ -290,7 +294,8 @@ AppleRemote::_openDevice()
                                               this, NULL);
     if (ioReturnValue != KERN_SUCCESS)
     {
-        std::cerr << "AppleRemote Error registering callback" << std::endl;
+        VERBOSE(VB_IMPORTANT,
+                LOC + "_openDevice() - error registering callback");
         return false;
     }
 
