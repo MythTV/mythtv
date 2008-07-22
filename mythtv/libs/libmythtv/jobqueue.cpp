@@ -1119,23 +1119,27 @@ bool JobQueue::InJobRunWindow(int orStartsWithinMins)
     queueStartTimeStr = gContext->GetSetting("JobQueueWindowStart", "00:00");
     queueEndTimeStr = gContext->GetSetting("JobQueueWindowEnd", "23:59");
 
-    VERBOSE(VB_JOBQUEUE, LOC +
-            QString("Currently set to run new jobs from %1 to %2")
-                    .arg(queueStartTimeStr).arg(queueEndTimeStr));
-
     queueStartTime = QTime::fromString(queueStartTimeStr, "hh:mm");
     if (!queueStartTime.isValid())
     {
-        VERBOSE(VB_IMPORTANT, "Invalid JobQueueWindowStart time, using 00:00");
+        VERBOSE(VB_IMPORTANT,
+                QString("Invalid JobQueueWindowStart time '%1', using 00:00")
+                        .arg(queueStartTimeStr));
         queueStartTime = QTime(0, 0);
     }
 
     queueEndTime = QTime::fromString(queueEndTimeStr, "hh:mm");
     if (!queueEndTime.isValid())
     {
-        VERBOSE(VB_IMPORTANT, "Invalid JobQueueWindowEnd time, using 23:59");
+        VERBOSE(VB_IMPORTANT,
+                QString("Invalid JobQueueWindowEnd time '%1', using 23:59")
+                        .arg(queueEndTimeStr));
         queueEndTime = QTime(23, 59);
     }
+
+    VERBOSE(VB_JOBQUEUE, LOC +
+            QString("Currently set to run new jobs from %1 to %2")
+                    .arg(queueStartTimeStr).arg(queueEndTimeStr));
 
     if ((queueStartTime <= curTime) && (curTime < queueEndTime))
     {
