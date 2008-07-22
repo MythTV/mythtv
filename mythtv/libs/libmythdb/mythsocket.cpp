@@ -280,7 +280,7 @@ bool MythSocket::writeStringList(QStringList &list)
         QString msg = QString("write -> %1 %2")
             .arg(socket(), 2).arg((const char *)payload);
 
-        if ((print_verbose_messages != VB_ALL) && msg.length() > 88)
+        if (((print_verbose_messages & VB_EXTRA) == 0) && msg.length() > 88)
         {
             msg.truncate(85);
             msg += "...";
@@ -552,7 +552,7 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
         QString msg = QString("read  <- %1 %2").arg(socket(), 2)
                                                .arg((const char *)payload);
 
-        if ((print_verbose_messages != VB_ALL) && msg.length() > 88)
+        if (((print_verbose_messages & VB_EXTRA) == 0) && msg.length() > 88)
         {
             msg.truncate(85);
             msg += "...";
