@@ -4,7 +4,10 @@
 
 #include <algorithm>
 
+#ifdef USE_OPENGL_PAINTER
 #include <QGLWidget>
+#endif
+
 #include <QApplication>
 #include <QTimer>
 #include <QDesktopWidget>
