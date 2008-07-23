@@ -274,6 +274,7 @@ void DVBStreamHandler::RunTS(void)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate DRB buffer");
             _error = true;
+            delete[] buffer;
             return;
         }
 

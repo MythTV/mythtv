@@ -62,6 +62,7 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
 
 DTVRecorder::~DTVRecorder()
 {
+    SetStreamData(NULL);
 }
 
 void DTVRecorder::SetOption(const QString &name, const QString &value)
