@@ -420,8 +420,8 @@ void MTD::sendMessage(Q3Socket *where, const QString &what)
 {
     QString message = what;
     message.append("\n");
-    // VERBOSE(VB_IMPORTANT, "Sending : " << message.local8Bit());
-    where->writeBlock(message.utf8(), message.utf8().length());
+    QByteArray buf = message.toUtf8();
+    where->writeBlock(buf.constData(), buf.length());
 }
 
 void MTD::sayHi(Q3Socket *socket)

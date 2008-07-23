@@ -95,10 +95,9 @@ void runMenu()
 {
     QString themedir = GetMythUI()->GetThemeDir();
 
-    MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), 
-                                              "netflix_menu.xml", 
-                                              GetMythMainWindow()->GetMainStack(), 
-                                              "netflix menu");
+    MythThemedMenu *diag = new MythThemedMenu(
+        themedir, "netflix_menu.xml", GetMythMainWindow()->GetMainStack(),
+        "netflix menu");
 
     diag->setCallback(NetFlixCallback, NULL);
     diag->setKillable();

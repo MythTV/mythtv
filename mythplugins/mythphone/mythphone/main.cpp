@@ -22,6 +22,7 @@ using namespace std;
 #include <linux/videodev.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/dialogbox.h>
 #include <mythtv/util.h>
@@ -91,7 +92,7 @@ void runMenu(QString which_menu)
 {
     QString themedir = gContext->GetThemeDir();
 
-    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), which_menu, 
+    ThemedMenu *diag = new ThemedMenu(themedir, which_menu, 
                                       gContext->GetMainWindow(), "phone menu");
 
     diag->setCallback(PhoneCallback, NULL);
@@ -164,7 +165,6 @@ QString GetMySipIp()
 
 void addMyselfToDirectory()
 {
-QString thequery;
 char myHostname[64];
 
     // Create an automatic new entry in the MythPhone Directory for this Frontend to assist in
@@ -189,49 +189,74 @@ char myHostname[64];
     }
 
 
-    // First check if an entry already exists; and if it is up-to-date (IP address etc)
+    // First check if an entry already exists;
+    // and if it is up-to-date (IP address etc)
     MSqlQuery query(MSqlQuery::InitCon());
-    thequery = QString("SELECT intid,nickname,url "
-                       "FROM phonedirectory "
-                       "WHERE directory = \"%1\" and "
-                       "firstname = \"%2\" and "
-                       "surname = \"%3\";")
-                       .arg(Dir.latin1()).arg(FirstName.latin1()).arg(myHostname);
-    query.exec(thequery);
+    query.prepare(
+        "SELECT intid, nickname, url "
+        "FROM phonedirectory "
+        "WHERE directory = :DIRECTORY AND "
+        "      firstname = :FIRSTNAME AND "
+        "      surname   = :SURNAME");
+    query.bindValue(":DIRECTORY", Dir);
+    query.bindValue(":FIRSTNAME", FirstName);
+    query.bindValue(":SURNAME",   Surname);
 
-    if(query.isActive() && query.size() > 0)
+    if (!query.exec() || !query.next())
     {
-        while(query.next())
-        {
-            // See if the user has changed their display name or the IP address has changed
-            if ((query.value(1).toString() != NickName) || 
-                (query.value(2).toString() != Uri))
-            {
-                VERBOSE(VB_IMPORTANT, QString("SIP: Updating out-of-date autogen directory entry; %1, %2")
-                     .arg(query.value(1).toString().toLocal8Bit().constData())
-                     .arg(query.value(2).toString().toLocal8Bit().constData()));
+        VERBOSE(VB_IMPORTANT,
+                "SIP: Creating autogen directory entry for this host");
 
-                MSqlQuery query2(MSqlQuery::InitCon());
-                thequery = QString("UPDATE phonedirectory "
-                                   "SET nickname=\"%1\", "
-                                   "url=\"%2\" "
-                                   "WHERE intid=%3 ;")
-                           .arg(NickName.latin1()).arg(Uri.latin1()).arg(query.value(0).toInt());
-                query2.exec(thequery);
-            }
+        query.prepare(
+            "INSERT INTO phonedirectory "
+            " ( nickname,   firstname,  surname,    url, "
+            "   directory,  photofile,  speeddial,  onhomelan ) "
+            "VALUES "
+            " (:NICKNAME,  :FIRSTNAME, :SURNAME,  :URL, "
+            "  :DIRECTORY,  '',         '1',       '1')");
+        query.bindValue(":NICKNAME",  NickName);
+        query.bindValue(":FIRSTNAME", FirstName);
+        query.bindValue(":SURNAME",   Surname);
+        query.bindValue(":URL",       Uri);
+        query.bindValue(":DIRECTORY", Dir);
+
+        if (!query.exec())
+        {
+            MythDB::DBError("addMyselfToDirectory() 1", query);
         }
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "SIP: Creating autogen directory entry for this host");
-        thequery = QString("INSERT INTO phonedirectory (nickname,firstname,surname,"
-                               "url,directory,photofile,speeddial,onhomelan) VALUES "
-                               "(\"%1\",\"%2\",\"%3\",\"%4\",\"%5\",\"\",1,1);")
-                              .arg(NickName.latin1()).arg(FirstName.latin1())
-                              .arg(Surname.latin1()).arg(Uri.latin1())
-                              .arg(Dir.latin1())
-                              ;
-        query.exec(thequery);
+        do
+        {
+            // See if the user has changed their display name
+            // or the IP address has changed
+
+            if ((query.value(1).toString() != NickName) || 
+                (query.value(2).toString() != Uri))
+            {
+                VERBOSE(VB_IMPORTANT, QString(
+                            "SIP: Updating out-of-date "
+                            "autogen directory entry: %1, %2")
+                        .arg(query.value(1).toString())
+                        .arg(query.value(2).toString()));
+
+                MSqlQuery query2(MSqlQuery::InitCon());
+                query2.prepare(
+                    "UPDATE phonedirectory "
+                    "SET nickname = :NICKNAME, "
+                    "    url      = :URL "
+                    "WHERE intid = :INTID");
+                query2.bindValue(":NICKNAME", NickName);
+                query2.bindValue(":URL",      Uri);
+                query2.bindValue(":INTID",    query.value(0).toUInt());
+                if (!query2.exec())
+                {
+                    MythDB::DBError("addMyselfToDirectory() 2", query2);
+                }
+            }
+        }
+        while (query.next());
     }
 }
 

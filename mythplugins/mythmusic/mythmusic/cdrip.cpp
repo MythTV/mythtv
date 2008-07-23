@@ -78,7 +78,8 @@ void CDEjectorThread::run()
 static long int getSectorCount (QString &cddevice, int tracknum)
 {
 #ifdef HAVE_CDAUDIO
-    cdrom_drive *device = cdda_identify(cddevice.ascii(), 0, NULL);
+    QByteArray devname = cddevice.toAscii();
+    cdrom_drive *device = cdda_identify(devname.constData(), 0, NULL);
 
     if (!device)
         return -1;
@@ -291,7 +292,8 @@ void CDRipperThread::run(void)
         }
         else if (child == 0)
         {
-            execl("/bin/sh", "sh", "-c", PostRipCDScript.ascii(), NULL);
+            QByteArray script = PostRipCDScript.toAscii();
+            execl("/bin/sh", "sh", "-c", script.constData(), NULL);
             perror("exec");
             _exit(1);
         }
@@ -304,7 +306,8 @@ void CDRipperThread::run(void)
 int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
 {
 #ifdef HAVE_CDAUDIO  // && HAVE_CDPARANOIA
-    cdrom_drive *device = cdda_identify(cddevice.ascii(), 0, NULL);
+    QByteArray devname = cddevice.toAscii();
+    cdrom_drive *device = cdda_identify(devname.constData(), 0, NULL);
 
     if (!device)
     {
@@ -808,7 +811,8 @@ void Ripper::startScanCD(void)
 void Ripper::scanCD(void)
 {
 #ifdef HAVE_CDAUDIO
-    int cdrom_fd = cd_init_device((char*)m_CDdevice.ascii());
+    QByteArray devname = m_CDdevice.toAscii();
+    int cdrom_fd = cd_init_device(const_cast<char*>(devname.constData()));
     VERBOSE(VB_MEDIA, "Ripper::scanCD() - dev:" + m_CDdevice);
     if (cdrom_fd == -1)
     {
@@ -994,7 +998,7 @@ QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
         VERBOSE(VB_GENERAL, QString("Invalid file storage definition."));
     }
 
-    filename = filename.local8Bit();
+    filename = QString(filename.toLocal8Bit().constData());
 
     QStringList directoryList = QStringList::split("/", filename);
     for (int i = 0; i < (directoryList.size() - 1); i++)
@@ -1240,8 +1244,8 @@ void Ripper::ejectCD()
     if (bEjectCD)
     {
 #ifdef HAVE_CDAUDIO
-        int cdrom_fd;
-        cdrom_fd = cd_init_device((char*)m_CDdevice.ascii());
+        QByteArray devname = m_CDdevice.toAscii();
+        int cdrom_fd = cd_init_device(const_cast<char*>(devname.constData()));
         VERBOSE(VB_MEDIA, "Ripper::ejectCD() - dev " + m_CDdevice);
         if (cdrom_fd != -1)
         {
@@ -1256,7 +1260,8 @@ void Ripper::ejectCD()
         MediaMonitor *mon = MediaMonitor::GetMediaMonitor(); 
         if (mon) 
         { 
-            MythMediaDevice *pMedia = mon->GetMedia(m_CDdevice.ascii()); 
+            QByteArray devname = m_CDdevice.toAscii();
+            MythMediaDevice *pMedia = mon->GetMedia(devname.constData());
             if (pMedia && mon->ValidateAndLock(pMedia)) 
             { 
                 pMedia->eject();

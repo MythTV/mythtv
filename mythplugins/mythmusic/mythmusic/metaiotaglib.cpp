@@ -32,7 +32,8 @@ bool MetaIOTagLib::write(Metadata* mdata, bool exclusive)
     if (!mdata)
         return false;
 
-    File *taglib = new TagLib::MPEG::File(mdata->Filename().local8Bit());
+    QByteArray fname = mdata->Filename().toLocal8Bit();
+    File *taglib = new TagLib::MPEG::File(fname.constData());
 
     Tag *tag = taglib->tag();
 
@@ -132,7 +133,8 @@ Metadata* MetaIOTagLib::read(QString filename)
 
     QString extension = filename.section( '.', -1 ) ;
 
-    File *taglib = new TagLib::MPEG::File(filename.local8Bit());
+    QByteArray fname = filename.toLocal8Bit();
+    File *taglib = new TagLib::MPEG::File(fname.constData());
 
     Tag *tag = taglib->tag();
 
@@ -233,7 +235,8 @@ Metadata* MetaIOTagLib::read(QString filename)
 int MetaIOTagLib::getTrackLength(QString filename)
 {
     int seconds = 0;
-    File *taglib = new TagLib::MPEG::File(filename.local8Bit());
+    QByteArray fname = filename.toLocal8Bit();
+    File *taglib = new TagLib::MPEG::File(fname.constData());
 
     if (taglib)
     {
@@ -279,7 +282,8 @@ QImage MetaIOTagLib::getAlbumArt(QString filename, ImageType type)
             return picture;
     }
 
-    File *taglib = new TagLib::MPEG::File(filename.local8Bit());
+    QByteArray fname = filename.toLocal8Bit();
+    File *taglib = new TagLib::MPEG::File(fname.constData());
 
     if (taglib)
     {

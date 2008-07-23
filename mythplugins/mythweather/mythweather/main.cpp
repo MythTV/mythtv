@@ -104,11 +104,10 @@ void WeatherCallback(void *data, QString &selection)
 
 int mythplugin_config()
 {
-    MythThemedMenu *menu =
-            new MythThemedMenu(GetMythUI()->GetThemeDir().ascii(),
-                               "weather_settings.xml",
-                               gContext->GetMainWindow()->GetMainStack(),
-                               "weather menu");
+    MythThemedMenu *menu = new MythThemedMenu(
+        GetMythUI()->GetThemeDir(), "weather_settings.xml",
+        gContext->GetMainWindow()->GetMainStack(), "weather menu");
+
     menu->setCallback(WeatherCallback, 0);
     menu->setKillable();
     if (menu->foundTheme())

@@ -409,8 +409,6 @@ void DatabaseBox::closeErrorPopup(void)
 
 void DatabaseBox::BlankCDRW()
 {
-    char command[1024];
-
     if (!active_popup)
         return;
 
@@ -437,13 +435,15 @@ void DatabaseBox::BlankCDRW()
     QString blanktype=gContext->GetSetting("CDBlankType");
 
     record_progress->setProgress(1);
-    strcpy(command,"cdrecord -v ");
-    strcat(command," dev= ");
-    strcat(command,scsidev.ascii());
-    strcat(command," -blank=");
-    strcat(command,blanktype.ascii());
-    VERBOSE(VB_IMPORTANT, QString("%1").arg(command));
-    system(command);
+
+    QString cmd = QString("cdrecord -v  dev= %1 -blank=%2")
+        .arg(scsidev).arg(blanktype);
+
+    VERBOSE(VB_IMPORTANT, QString("DatabaseBox::BlankCDRW()") +
+            QString(" cmd: '%1'").arg(cmd));
+
+    QByteArray command = cmd.toAscii();
+    system(command.constData());
 
     record_progress->Close();
     record_progress->deleteLater();

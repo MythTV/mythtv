@@ -646,8 +646,9 @@ static bool FileMove(const QFileInfo &src, const QFileInfo &dst)
 {
     // attempt to rename the file,
     // this will fail if files are on different partitions
-    if (rename(src.absFilePath().local8Bit(),
-               dst.absFilePath().local8Bit()) == 0)
+    QByteArray source = src.absFilePath().toLocal8Bit();
+    QByteArray dest   = dst.absFilePath().toLocal8Bit();
+    if (rename(source.constData(), dest.constData()) == 0)
     {
         return true;
     }

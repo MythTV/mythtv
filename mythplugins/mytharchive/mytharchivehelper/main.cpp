@@ -1704,19 +1704,21 @@ int doImportArchive(const QString &inFile, int chanID)
 
 int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameCount)
 {
-    int ret;
-
     av_register_all();
 
     AVFormatContext *inputFC = NULL;
 
     // Open recording
-    VERBOSE(VB_JOBQUEUE, QString("Opening %1").arg(inFile));
+    VERBOSE(VB_JOBQUEUE, QString("grabThumbnail(): ") +
+            QString("Opening '%1'").arg(inFile));
 
-    if ((ret = av_open_input_file(&inputFC, inFile.ascii(), NULL, 0, NULL)) != 0)
+    QByteArray inFileBA = inFile.toLocal8Bit();
+
+    int ret = av_open_input_file(&inputFC, inFileBA.constData(), NULL, 0, NULL);
+    if (ret)
     {
-        VERBOSE(VB_JOBQUEUE,
-                QString("Couldn't open input file, error #%1").arg(ret));
+        VERBOSE(VB_JOBQUEUE,QString("grabThumbnail(), Error: ") +
+                "Couldn't open input file" + ENO);
         return 1;
     }
 
@@ -1845,9 +1847,13 @@ int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameC
                         QImage img(outputbuf, width, height,
                                    QImage::Format_RGB32);
 
-                        if (!img.save(filename.ascii(), saveFormat))
+                        QByteArray fname = filename.toLocal8Bit();
+                        if (!img.save(fname.constData(), saveFormat))
                         {
-                            VERBOSE(VB_IMPORTANT, "Failed to save thumb: " + filename);
+                            VERBOSE(VB_IMPORTANT,
+                                    QString("grabThumbnail(), Error: ") +
+                                    QString("Failed to save thumb: '%1'")
+                                    .arg(filename));
                         }
 
                         count++;
@@ -2019,7 +2025,6 @@ long long getFrameCount(const QString &filename, float fps)
 int getFileInfo(QString inFile, QString outFile, int lenMethod)
 {
     const char *type = NULL;
-    int ret;
 
     av_register_all();
 
@@ -2030,14 +2035,17 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
         fmt = av_find_input_format(type);
 
     // Open recording
-    VERBOSE(VB_JOBQUEUE, QString("Opening %1").arg(inFile));
+    VERBOSE(VB_JOBQUEUE, QString("getFileInfo(): ") +
+            QString("Opening '%1'").arg(inFile));
 
-    ret = av_open_input_file(&inputFC, inFile.ascii(), fmt, 0, NULL);
+    QByteArray inFileBA = inFile.toLocal8Bit();
 
-    if (ret != 0)
+    int ret = av_open_input_file(&inputFC, inFileBA.constData(), fmt, 0, NULL);
+
+    if (ret)
     {
-        VERBOSE(VB_JOBQUEUE,
-            QString("Couldn't open input file, error #%1").arg(ret));
+        VERBOSE(VB_JOBQUEUE, QString("getFileInfo(), Error: ") +
+                "Couldn't open input file" + ENO);
         return 1;
     }
 
@@ -2056,7 +2064,7 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
     av_estimate_timings(inputFC, 0);
 
     // Dump stream information
-    dump_format(inputFC, 0, inFile.ascii(), 0);
+    dump_format(inputFC, 0, inFileBA.constData(), 0);
 
     QDomDocument doc("FILEINFO");
 
@@ -2745,7 +2753,11 @@ int main(int argc, char **argv)
     else if (bDoBurn)
         res = doBurnDVD(mediaType, bEraseDVDRW, bNativeFormat);
     else if (bSup2Dast)
-        res = sup2dast(inFile.ascii(), ifoFile.ascii(), delay);
+    {
+        QByteArray inFileBA = inFile.toLocal8Bit();
+        QByteArray ifoFileBA = ifoFile.toLocal8Bit();
+        res = sup2dast(inFileBA.constData(), ifoFileBA.constData(), delay);
+    }
     else 
         showUsage();
 

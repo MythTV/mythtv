@@ -714,7 +714,7 @@ void PlaybackBoxMusic::byArtist()
     if (!playlist_popup || !curMeta)
         return;
 
-    QString value = formattedFieldValue(curMeta->Artist().utf8());
+    QString value = formattedFieldValue(curMeta->Artist().toUtf8().constData());
     QString whereClause = "WHERE music_artists.artist_name = " + value +
                           " ORDER BY album_name, track"; 
 
@@ -727,7 +727,7 @@ void PlaybackBoxMusic::byAlbum()
     if (!playlist_popup || !curMeta)
         return;
 
-    QString value = formattedFieldValue(curMeta->Album().utf8());
+    QString value = formattedFieldValue(curMeta->Album().toUtf8().constData());
     QString whereClause = "WHERE album_name = " + value + 
                           " ORDER BY track";
     closePlaylistPopup();
@@ -739,7 +739,7 @@ void PlaybackBoxMusic::byGenre()
    if (!playlist_popup || !curMeta)
         return;
 
-    QString value = formattedFieldValue(curMeta->Genre().utf8()); 
+    QString value = formattedFieldValue(curMeta->Genre().toUtf8().constData()); 
     QString whereClause = "WHERE genre = " + value +
                           " ORDER BY music_artists.artist_name, album_name, track";   
     closePlaylistPopup();
@@ -763,7 +763,7 @@ void PlaybackBoxMusic::byTitle()
    if (!playlist_popup || !curMeta)
         return;
 
-    QString value = formattedFieldValue(curMeta->Title().utf8()); 
+    QString value = formattedFieldValue(curMeta->Title().toUtf8().constData()); 
     QString whereClause = "WHERE music_songs.name = " + value + 
                           " ORDER BY music_artists.artist_name, album_name, track";
     closePlaylistPopup();

@@ -31,7 +31,7 @@ bool ThumbItem::Remove(void)
     query.prepare(
         "DELETE FROM gallerymetadata "
         "WHERE image = :PATH");
-    query.bindValue(":PATH", m_path.utf8());
+    query.bindValue(":PATH", m_path);
 
     if (!query.exec())
     {
@@ -57,7 +57,7 @@ void ThumbItem::SetRotationAngle(int angle)
         "REPLACE INTO gallerymetadata "
         "SET image = :IMAGE, "
         "    angle = :ANGLE");
-    query.bindValue(":IMAGE", m_path.utf8());
+    query.bindValue(":IMAGE", m_path);
     query.bindValue(":ANGLE", angle);
 
     if (!query.exec())
@@ -82,7 +82,7 @@ long ThumbItem::GetRotationAngle(void)
         "SELECT angle "
         "FROM gallerymetadata "
         "WHERE image = :PATH");
-    query.bindValue(":PATH", m_path.utf8());
+    query.bindValue(":PATH", m_path);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("get_rotation_angle", query);
@@ -95,7 +95,7 @@ long ThumbItem::GetRotationAngle(void)
         "FROM gallerymetadata "
         "WHERE image LIKE :PATH "
         "ORDER BY image");
-    query.bindValue(":PATH", m_path.utf8() + '%');
+    query.bindValue(":PATH", m_path + '%');
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("get_rotation_angle", query);

@@ -60,11 +60,15 @@ Metadata* MetaIOAVFComment::read(QString filename)
     AVFormatParameters* p_params = NULL;
     AVInputFormat* p_inputformat = NULL;
 
-    if (av_open_input_file(&p_context, filename.local8Bit(), 
-                           p_inputformat, 0, p_params) < 0
-        && av_open_input_file(&p_context, filename.ascii(), 
-                           p_inputformat, 0, p_params) < 0)
+    QByteArray local8bit = filename.toLocal8Bit();
+    QByteArray ascii     = filename.toAscii();
+    if ((av_open_input_file(&p_context, local8bit.constData(), 
+                           p_inputformat, 0, p_params) < 0) &&
+        (av_open_input_file(&p_context, ascii.constData(), 
+                            p_inputformat, 0, p_params) < 0))
+    {
         return NULL;
+    }
         
     if (av_find_stream_info(p_context) < 0)
         return NULL;
@@ -112,11 +116,15 @@ int MetaIOAVFComment::getTrackLength(QString filename)
     AVInputFormat* p_inputformat = NULL;
     
     // Open the specified file and populate the metadata info
-    if (av_open_input_file(&p_context, filename.local8Bit(), 
-                           p_inputformat, 0, p_params) < 0
-        && av_open_input_file(&p_context, filename.ascii(), 
-                           p_inputformat, 0, p_params) < 0)
+    QByteArray local8bit = filename.toLocal8Bit();
+    QByteArray ascii     = filename.toAscii();
+    if ((av_open_input_file(&p_context, local8bit.constData(), 
+                           p_inputformat, 0, p_params) < 0) &&
+        (av_open_input_file(&p_context, ascii.constData(), 
+                            p_inputformat, 0, p_params) < 0))
+    {
         return 0;
+    }
         
     if (av_find_stream_info(p_context) < 0)
         return 0;

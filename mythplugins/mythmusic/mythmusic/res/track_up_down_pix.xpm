@@ -1,5 +1,5 @@
 /* XPM */
-static char * track_up_down_pix_xpm[] = {
+static const char * const track_up_down_pix_xpm[] = {
 "16 16 2 1",
 " 	c None",
 ".	c #FF0000",

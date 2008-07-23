@@ -16,6 +16,7 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdirs.h>
+#include <mythtv/mythdb.h>
 
 
 static int counter = 0;
@@ -117,50 +118,78 @@ void DirEntry::writeTree(GenericTree *tree_to_write_to, GenericTree *sdTree)
 
 void DirEntry::updateYourselfInDB(QString Dir)
 {
-    QString thequery;
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!inDatabase)
     {
-        thequery = QString("INSERT INTO phonedirectory (nickname,firstname,surname,"
-                               "url,directory,photofile,speeddial,onhomelan) VALUES "
-                               "(\"%1\",\"%2\",\"%3\",\"%4\",\"%5\",\"%6\",%7,%8);")
-                              .arg(NickName.latin1()).arg(FirstName.latin1())
-                              .arg(Surname.latin1()).arg(Uri.latin1())
-                              .arg(Dir.latin1()).arg(PhotoFile.latin1())
-                              .arg(SpeedDial).arg(onHomeLan);
-        query.exec(thequery);
+        query.prepare(
+            "INSERT INTO phonedirectory "
+            "  ( nickname,   firstname,  surname,    url, "
+            "    directory,  photofile,  speeddial,  onhomelan) "
+            "VALUES "
+            "  (:NICKNAME,  :FIRSTNAME, :SURNAME,   :URL, "
+            "   :DIRECTORY, :PHOTOFILE, :SPEEDDIAL, :ONHOMELAN)");
 
-        thequery = QString("SELECT MAX(intid) FROM phonedirectory ;");
-        query.exec(thequery);
+        query.bindValue(":NICKNAME",  NickName);
+        query.bindValue(":FIRSTNAME", FirstName);
+        query.bindValue(":SURNAME",   Surname);
+        query.bindValue(":URL",       Uri);
+        query.bindValue(":DIRECTORY", Dir);
+        query.bindValue(":PHOTOFILE", PhotoFile);
+        query.bindValue(":SPEEDDIAL", SpeedDial);
+        query.bindValue(":ONHOMELAN", onHomeLan);
 
-        if ((query.isActive()) && (query.size() == 1))
+        if (!query.exec())
         {
-            query.next();
+            MythDB::DBError("DirEntry::updateYourselfInDB 1", query);
+        }
+
+        if (!query.exec("SELECT MAX(intid) FROM phonedirectory"))
+        {
+            MythDB::DBError("DirEntry::updateYourselfInDB 2", query);
+        }
+
+        if (query.next())
+        {
             dbId = query.value(0).toUInt();
             inDatabase = true;
             changed = false;
         }
         else
-            VERBOSE(VB_IMPORTANT, "Mythphone: Something is up with the database");
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "Mythphone: Something is up with the database");
+        }
     }
     else if (changed)
     {
-        thequery = QString("UPDATE phonedirectory "
-                           "SET nickname=\"%1\", "
-                               "firstname=\"%2\", "
-                               "surname=\"%3\", "
-                               "directory=\"%4\", "
-                               "url=\"%5\", "
-                               "photofile=\"%6\", "
-                               "speeddial=%7, "
-                               "onhomelan=%8 "
-                           "WHERE intid=%9 ;")
-                           .arg(NickName.latin1()).arg(FirstName.latin1())
-                           .arg(Surname.latin1()).arg(Dir.latin1()).arg(Uri.latin1())
-                           .arg(PhotoFile.latin1()).arg(SpeedDial).arg(onHomeLan)
-                           .arg(dbId);
-        query.exec(thequery);
+        query.prepare(
+            "UPDATE phonedirectory "
+            "SET nickname  = :NICKNAME, "
+            "    firstname = :FIRSTNAME, "
+            "    surname   = :SURNAME, "
+            "    url       = :URL, "
+            "    directory = :DIRECTORY, "
+            "    photofile = :PHOTOFILE, "
+            "    speeddial = :SPEEDDIAL, "
+            "    onhomelan = :ONHOMELAN "
+            "WHERE intid = :INTID");
+
+        query.bindValue(":NICKNAME",  NickName);
+        query.bindValue(":FIRSTNAME", FirstName);
+        query.bindValue(":SURNAME",   Surname);
+        query.bindValue(":URL",       Uri);
+        query.bindValue(":DIRECTORY", Dir);
+        query.bindValue(":PHOTOFILE", PhotoFile);
+        query.bindValue(":SPEEDDIAL", SpeedDial);
+        query.bindValue(":ONHOMELAN", onHomeLan);
+        query.bindValue(":INTID",     dbId);
+
+        if (!query.exec())
+        {
+            MythDB::DBError("DirEntry::updateYourselfInDB 3", query);
+        }
+
         changed = false;
     }
 }
@@ -168,14 +197,17 @@ void DirEntry::updateYourselfInDB(QString Dir)
 
 void DirEntry::deleteYourselfFromDB()
 {
-    QString thequery;
-    MSqlQuery query(MSqlQuery::InitCon());
-
     if (inDatabase)
     {
-        thequery = QString("DELETE FROM phonedirectory "
-                           "WHERE intid=%1 ;").arg(dbId);
-        query.exec(thequery);
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("DELETE FROM phonedirectory "
+                      "WHERE intid = :INTID");
+        query.bindValue(":INTID", dbId);
+
+        if (!query.exec())
+        {
+            MythDB::DBError("DirEntry::deleteYourselfInDB", query);
+        }
     }
 }
 
@@ -378,47 +410,70 @@ void CallRecord::writeTree(GenericTree *tree_to_write_to)
 
 void CallRecord::updateYourselfInDB()
 {
-    QString thequery;
-    MSqlQuery query(MSqlQuery::InitCon());
-
     if (!inDatabase)
     {
-        thequery = QString("INSERT INTO phonecallhistory (displayname,url,timestamp,"
-                               "duration, directionin, directoryref) VALUES "
-                               "(\"%1\",\"%2\",\"%3\",%4,%5,%6);")
-                              .arg(DisplayName.latin1()).arg(Uri.latin1())
-                              .arg(timestamp.latin1()).arg(Duration)
-                              .arg(DirectionIn).arg(0);
-        query.exec(thequery);
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+            "INSERT INTO phonecallhistory "
+            "  ( displayname,  url,          timestamp, "
+            "    duration,     directionin,  directoryref) "
+            "VALUES "
+            "  (:DISPLAYNAME, :URL,         :TIMESTAMP, "
+            "   :DURATION,    :DIRECTIONIN,  '0')");
+        query.bindValue(":DISPLAYNAME", DisplayName);
+        query.bindValue(":URL",         Uri);
+        query.bindValue(":TIMESTAMP",   timestamp);
+        query.bindValue(":DURATION",    Duration);
+        query.bindValue(":DIRECTIONIN", DirectionIn);
 
-        thequery = QString("SELECT MAX(recid) FROM phonecallhistory ;");
-        query.exec(thequery);
-
-        if ((query.isActive()) && (query.size() == 1))
+        if (!query.exec())
         {
-            query.next();
+            MythDB::DBError("updateYourselfInDB() 1", query);
+            return;
+        }
+
+        if (!query.exec("SELECT MAX(recid) FROM phonecallhistory"))
+        {
+            MythDB::DBError("updateYourselfInDB() 2", query);
+            return;
+        }
+
+        if (query.next())
+        {
             dbId = query.value(0).toUInt();
             inDatabase = true;
             changed = false;
         }
         else
-            VERBOSE(VB_IMPORTANT, "Mythphone: Something is up with the database");
+        {
+            VERBOSE(VB_IMPORTANT, "Mythphone: "
+                    "Something is up with the database");
+        }
     }
     else if (changed)
     {
-        thequery = QString("UPDATE phonecallhistory "
-                           "SET displayname=\"%1\", "
-                               "url=\"%2\", "
-                               "timestamp=\"%3\", "
-                               "duration=%4, "
-                               "directionin=%5, "
-                               "directoryref=%6 "
-                           "WHERE recid=%7 ;")
-                           .arg(DisplayName.latin1()).arg(Uri.latin1())
-                           .arg(timestamp.latin1()).arg(Duration)
-                           .arg(DirectionIn).arg(0)
-                           .arg(dbId);
-        query.exec(thequery);
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+            "UPDATE phonecallhistory "
+            "SET displayname  = :DISPLAYNAME, "
+            "    url          = :URL, "
+            "    timestamp    = :TIMESTAMP, "
+            "    duration     = :DURATION, "
+            "    directionin  = :DIRECTIONIN, "
+            "    directoryref = '0' "
+            "WHERE recid = :RECID");
+        query.bindValue(":DISPLAYNAME", DisplayName);
+        query.bindValue(":URL",         Uri);
+        query.bindValue(":TIMESTAMP",   timestamp);
+        query.bindValue(":DURATION",    Duration);
+        query.bindValue(":DIRECTIONIN", DirectionIn);
+        query.bindValue(":RECID",       dbId);
+
+        if (!query.exec())
+        {
+            MythDB::DBError("updateYourselfInDB() 3", query);
+        }
+
         changed = false;
     }
 }
@@ -426,14 +481,18 @@ void CallRecord::updateYourselfInDB()
 
 void CallRecord::deleteYourselfFromDB()
 {
-    QString thequery;
-    MSqlQuery query(MSqlQuery::InitCon());
+    if (!inDatabase)
+        return;
 
-    if (inDatabase)
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "DELETE FROM phonecallhistory "
+        "WHERE recid = :RECID");
+    query.bindValue(":RECID", dbId);
+
+    if (!query.exec())
     {
-        thequery = QString("DELETE FROM phonecallhistory "
-                           "WHERE recid=%1 ;").arg(dbId);
-        query.exec(thequery);
+        MythDB::DBError("deleteYourselfInDB()", query);
     }
 }
 

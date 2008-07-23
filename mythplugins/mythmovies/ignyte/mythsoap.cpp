@@ -14,7 +14,7 @@ void MythSoap::doSoapRequest(QString host, QString path, QString soapAction,
     header.setContentType("text/xml");
 
     http.setHost(host);
-    QByteArray bArray(query.utf8());
+    QByteArray bArray = query.toUtf8();
     bArray.resize(bArray.size() - 1);
     http.request(header, bArray);
 }

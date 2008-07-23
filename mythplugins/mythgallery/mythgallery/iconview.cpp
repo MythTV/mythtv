@@ -1197,9 +1197,9 @@ void IconView::ImportFromDir(const QString &fromDir, const QString &toDir)
                     .arg(toDir));
 
             // TODO FIXME, we shouldn't need a myth_system call here
-            QString cmd = "cp \"" + fi->absFilePath().local8Bit() +
-                          "\" \"" + toDir.local8Bit() + "\"";
-
+            QString cmd = QString("cp \"%1\" \"%2\"")
+                .arg(fi->absFilePath()).arg(toDir);
+            cmd = QString(cmd.toLocal8Bit().constData());
             myth_system(cmd);
         }
     }

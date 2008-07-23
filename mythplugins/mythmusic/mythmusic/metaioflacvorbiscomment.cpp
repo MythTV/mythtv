@@ -40,8 +40,10 @@ bool MetaIOFLACVorbisComment::write(Metadata* mdata, bool exclusive)
         return false;
 
     FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
-    if (!FLAC__metadata_chain_read(chain, mdata->Filename().local8Bit())
-        && !FLAC__metadata_chain_read(chain, mdata->Filename().ascii()))
+    QByteArray l8bit = mdata->Filename().toLocal8Bit();
+    QByteArray ascii = mdata->Filename().toAscii();
+    if (!FLAC__metadata_chain_read(chain, l8bit.constData()) &&
+        !FLAC__metadata_chain_read(chain, ascii.constData()))
     {
         FLAC__metadata_chain_delete(chain);
         return false;
@@ -141,8 +143,10 @@ Metadata* MetaIOFLACVorbisComment::read(QString filename)
     bool compilation = false;
 
     FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
-    if (!FLAC__metadata_chain_read(chain, filename.local8Bit())
-        && !FLAC__metadata_chain_read(chain, filename.ascii()))
+    QByteArray l8bit = filename.toLocal8Bit();
+    QByteArray ascii = filename.toAscii();
+    if (!FLAC__metadata_chain_read(chain, l8bit.constData()) &&
+        !FLAC__metadata_chain_read(chain, ascii.constData()))
     {
         FLAC__metadata_chain_delete(chain); 
         return NULL;
@@ -221,8 +225,10 @@ Metadata* MetaIOFLACVorbisComment::read(QString filename)
 int MetaIOFLACVorbisComment::getTrackLength(QString filename)
 {
     FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
-    if (!FLAC__metadata_chain_read(chain, filename.local8Bit()) &&
-        !FLAC__metadata_chain_read(chain, filename.ascii()))
+    QByteArray l8bit = filename.toLocal8Bit();
+    QByteArray ascii = filename.toAscii();
+    if (!FLAC__metadata_chain_read(chain, l8bit.constData()) &&
+        !FLAC__metadata_chain_read(chain, ascii.constData()))
     {
         FLAC__metadata_chain_delete(chain); 
         return 0;
@@ -323,15 +329,15 @@ void MetaIOFLACVorbisComment::setComment(FLAC__StreamMetadata* pBlock,
     QString test = getComment(pBlock, pLabel);
 
     QString thenewentry = QString(pLabel).upper() + "=" + rData;
-    Q3CString utf8str = thenewentry.utf8().data();
-    int thenewentrylen = utf8str.length();
+    QByteArray utf8str = thenewentry.toUtf8();
 
     FLAC__StreamMetadata_VorbisComment_Entry entry;
 
-    entry.length = thenewentrylen;
-    entry.entry = (unsigned char *)utf8str.data();
+    entry.length = utf8str.length();
+    entry.entry  = (FLAC__byte*) utf8str.data();
 
-    FLAC__metadata_object_vorbiscomment_insert_comment(pBlock, 
-                                                       pBlock->data.vorbis_comment.num_comments, 
-                                                       entry, true);
+    FLAC__metadata_object_vorbiscomment_insert_comment(
+        pBlock, 
+        pBlock->data.vorbis_comment.num_comments, 
+        entry, true);
 }

@@ -59,7 +59,7 @@ void Decoder::setOutput(AudioOutput *o)
 
 void Decoder::error(const QString &e) 
 {
-    QString *str = new QString(e.utf8());
+    QString *str = new QString(e.toUtf8());
     DecoderEvent ev(str);
     dispatch(ev);
 }

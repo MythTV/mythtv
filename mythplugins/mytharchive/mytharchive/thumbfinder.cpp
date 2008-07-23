@@ -13,6 +13,7 @@
 #include <mythtv/libmythtv/programinfo.h>
 #include <mythtv/libmythui/mythuihelper.h>
 #include <mythtv/mythdirs.h>
+#include <mythtv/util.h>
 
 // mytharchive
 #include "thumbfinder.h"
@@ -313,37 +314,6 @@ void ThumbFinder::gridItemChanged(ImageGridItem *item)
           seekToFrame(thumb->frame);
 }
 
-static bool copyFile(const QString &src, const QString &dst)
-{
-    const int bufferSize = 16*1024;
-
-    QFile s(src.ascii());
-    QFile d(dst.ascii());
-    char buffer[bufferSize];
-    int len;
-
-    if (!s.open(QIODevice::ReadOnly))
-        return false;
-
-    if (!d.open(QIODevice::WriteOnly))
-    {
-        s.close();
-        return false;
-    }
-
-    len = s.readBlock(buffer, bufferSize);
-    do
-    {
-        d.writeBlock(buffer, len);
-        len = s.readBlock(buffer, bufferSize);
-    } while (len > 0);
-
-    s.close();
-    d.close();
-
-    return true;
-}
-
 QString ThumbFinder::createThumbDir(void)
 {
     QString thumbDir = getTempDirectory() + "config/thumbs";
@@ -382,7 +352,9 @@ void ThumbFinder::updateThumb(void)
 
     // copy current frame image to the selected thumb image
     QString imageFile = thumb->filename;
-    copyFile(m_frameFile, imageFile);
+    QFile dst(imageFile);
+    QFile src(m_frameFile);
+    copy(dst, src);
 
     // update the image grid item
     QSize size = m_imageGrid->getImageItemSize();
@@ -561,19 +533,23 @@ QPixmap *ThumbFinder::createScaledPixmap(QString filename,
 
 bool ThumbFinder::initAVCodec(const QString &inFile)
 {
-    int ret;
-
     av_register_all();
 
     m_inputFC = NULL;
 
     // Open recording
-    VERBOSE(VB_JOBQUEUE, QString("Opening %1").arg(inFile));
+    VERBOSE(VB_JOBQUEUE, QString("ThumbFinder: ") +
+            QString("Opening '%1'").arg(inFile));
 
-    if ((ret = av_open_input_file(&m_inputFC, inFile.ascii(), NULL, 0, NULL)) != 0)
+    QByteArray inFileBA = inFile.toLocal8Bit();
+
+    int ret = av_open_input_file(
+        &m_inputFC, inFileBA.constData(), NULL, 0, NULL);
+
+    if (ret)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Couldn't open input file, error #%1").arg(ret));
+        VERBOSE(VB_IMPORTANT, QString("ThumbFinder, Error: ") +
+                "Couldn't open input file" + ENO);
         return false;
     }
 
@@ -587,7 +563,7 @@ bool ThumbFinder::initAVCodec(const QString &inFile)
         return false;
     }
     av_estimate_timings(m_inputFC, 0);
-    dump_format(m_inputFC, 0, inFile.ascii(), 0);
+    dump_format(m_inputFC, 0, inFileBA.constData(), 0);
 
     // find the first video stream
     m_videostream = -1;
@@ -850,7 +826,8 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
         QImage img(m_outputbuf, m_frameWidth, m_frameHeight,
                    QImage::Format_RGB32);
 
-        if (!img.save(m_frameFile.ascii(), "JPEG"))
+        QByteArray ffile = m_frameFile.toLocal8Bit();
+        if (!img.save(ffile.constData(), "JPEG"))
         {
             VERBOSE(VB_IMPORTANT, "Failed to save thumb: " + m_frameFile);
         }

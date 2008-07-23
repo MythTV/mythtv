@@ -19,10 +19,9 @@ bool operator==(const RomInfo& a, const RomInfo& b)
 
 void RomInfo::edit_rominfo()
 {
-
     QString rom_ver = Version();
 
-    GameEditDialog romeditdlg(Romname().latin1());
+    GameEditDialog romeditdlg(Romname());
 
     DialogCode res = romeditdlg.exec();
 

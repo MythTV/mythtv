@@ -113,16 +113,22 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
             QString dir(filename);
             dir.remove(0, m_startdir.length());
 
-            newparentid = m_directoryid[dir.utf8().lower()];
+            newparentid = m_directoryid[QString(dir.toUtf8()).lower()];
 
-            if (newparentid == 0) {
-                if ((m_directoryid[dir.utf8().lower()] = GetDirectoryId(dir, parentid)) > 0)
+            if (newparentid == 0)
+            {
+                int id = GetDirectoryId(dir, parentid);
+                m_directoryid[QString(dir.toUtf8()).lower()] = id;
+                    
+                if (id > 0)
                 {
-                    newparentid = m_directoryid[dir.utf8().lower()];
+                    newparentid = id;
                 }
                 else
                 {
-                    VERBOSE(VB_IMPORTANT, QString("Failed to get directory id for path %1").arg(dir).arg(m_directoryid[dir.utf8().lower()]));
+                    VERBOSE(VB_IMPORTANT,
+                            QString("Failed to get directory id for path %1")
+                            .arg(dir));
                 }
             }
 
@@ -208,7 +214,8 @@ bool FileScanner::HasFileChanged(const QString &filename, const QString &date_mo
 {
     struct stat stbuf;
 
-    if (stat(filename.local8Bit(), &stbuf) == 0)
+    QByteArray fname = filename.toLocal8Bit();
+    if (stat(fname.constData(), &stbuf) == 0)
     {
         if (date_modified.isEmpty() ||
             stbuf.st_mtime >
@@ -256,7 +263,8 @@ void FileScanner::AddFileToDB(const QString &filename)
         query.prepare("INSERT INTO music_albumart SET filename = :FILE, "
                       "directory_id = :DIRID, imagetype = :TYPE;");
         query.bindValue(":FILE", name);
-        query.bindValue(":DIRID", m_directoryid[directory.utf8().lower()]);
+        query.bindValue(":DIRID", m_directoryid[
+                            QString(directory.toUtf8()).lower()]);
         query.bindValue(":TYPE", AlbumArtImages::guessImageType(name));
 
         if (!query.exec() || query.numRowsAffected() <= 0)
@@ -277,30 +285,39 @@ void FileScanner::AddFileToDB(const QString &filename)
             QString album_cache_string;
 
             // Set values from cache
-            if (m_directoryid[directory.utf8().lower()] > 0)
-                data->setDirectoryId(m_directoryid[directory.utf8().lower()]);
-            if (m_artistid[data->Artist().utf8().lower()] > 0)
+            int did = m_directoryid[QString(directory.toUtf8()).lower()];
+            if (did > 0)
+                data->setDirectoryId(did);
+
+            int aid = m_artistid[QString(data->Artist().toUtf8()).lower()];
+            if (aid > 0)
             {
-                data->setArtistId(m_artistid[data->Artist().utf8().lower()]);
+                data->setArtistId(aid);
 
                 // The album cache depends on the artist id
                 album_cache_string = data->getArtistId() + "#"
-                    + data->Album().utf8().lower();
+                    + QString(data->Album().toUtf8()).lower();
 
                 if (m_albumid[album_cache_string] > 0)
                     data->setAlbumId(m_albumid[album_cache_string]);
             }
-            if (m_genreid[data->Genre().utf8().lower()] > 0)
-                data->setGenreId(m_genreid[data->Genre().utf8().lower()]);
+
+            int gid = m_genreid[QString(data->Genre().toUtf8()).lower()];
+            if (gid > 0)
+                data->setGenreId(gid);
 
             // Commit track info to database
             data->dumpToDatabase();
 
             // Update the cache
-            m_artistid[data->Artist().utf8().lower()] = data->getArtistId();
-            m_genreid[data->Genre().utf8().lower()] = data->getGenreId();
+            m_artistid[QString(data->Artist().toUtf8()).lower()] =
+                data->getArtistId();
+
+            m_genreid[QString(data->Genre().toUtf8()).lower()] =
+                data->getGenreId();
+
             album_cache_string = data->getArtistId() + "#"
-                + data->Album().utf8().lower();
+                + QString(data->Album().toUtf8()).lower();
             m_albumid[album_cache_string] = data->getAlbumId();
             delete data;
         }
@@ -425,7 +442,9 @@ void FileScanner::RemoveFileFromDB (const QString &filename)
         query.prepare("DELETE FROM music_albumart WHERE filename= :FILE AND "
                       "directory_id= :DIRID;");
         query.bindValue(":FILE", sqlfilename);
-        query.bindValue(":DIRID", m_directoryid[directory.utf8().lower()]);
+        query.bindValue(":DIRID", m_directoryid[
+                            QString(directory.toUtf8()).lower()]);
+
         if (!query.exec() || query.numRowsAffected() <= 0)
         {
                 MythContext::DBError("music delete artwork", query);
@@ -468,35 +487,37 @@ void FileScanner::UpdateFileInDB(const QString &filename)
             QString album_cache_string;
 
             // Set values from cache
-            if (m_directoryid[directory.utf8().lower()] > 0)
-                disk_meta->setDirectoryId(m_directoryid[directory
-                    .utf8().lower()]);
-            if (m_artistid[disk_meta->Artist().utf8().lower()] > 0)
+            int did = m_directoryid[QString(directory.toUtf8()).lower()];
+            if (did > 0)
+                disk_meta->setDirectoryId(did);
+
+            int aid = m_artistid[QString(disk_meta->Artist().toUtf8()).lower()];
+            if (aid > 0)
             {
-                disk_meta->setArtistId(m_artistid[disk_meta->Artist()
-                    .utf8().lower()]);
+                disk_meta->setArtistId(aid);
 
                 // The album cache depends on the artist id
-                album_cache_string = disk_meta->getArtistId() + "#"
-                    + disk_meta->Album().utf8().lower();
+                album_cache_string = disk_meta->getArtistId() + "#" +
+                    QString(disk_meta->Album().toUtf8()).lower();
 
                 if (m_albumid[album_cache_string] > 0)
                     disk_meta->setAlbumId(m_albumid[album_cache_string]);
             }
-            if (m_genreid[disk_meta->Genre().utf8().lower()] > 0)
-                disk_meta->setGenreId(m_genreid[disk_meta->Genre()
-                    .utf8().lower()]);
+
+            int gid = m_genreid[QString(disk_meta->Genre().toUtf8()).lower()];
+            if (gid > 0)
+                disk_meta->setGenreId(gid);
 
             // Commit track info to database
             disk_meta->dumpToDatabase();
 
             // Update the cache
-            m_artistid[disk_meta->Artist().utf8().lower()]
+            m_artistid[QString(disk_meta->Artist().toUtf8()).lower()]
                 = disk_meta->getArtistId();
-            m_genreid[disk_meta->Genre().utf8().lower()]
+            m_genreid[QString(disk_meta->Genre().toUtf8()).lower()]
                 = disk_meta->getGenreId();
-            album_cache_string = disk_meta->getArtistId() + "#"
-                + disk_meta->Album().utf8().lower();
+            album_cache_string = disk_meta->getArtistId() + "#" +
+                QString(disk_meta->Album().toUtf8()).lower();
             m_albumid[album_cache_string] = disk_meta->getAlbumId();
         }
 

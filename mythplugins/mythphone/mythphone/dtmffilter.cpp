@@ -157,7 +157,7 @@ QChar DtmfFilter::CheckAnyDTMF()
     if (Debounce[key] != 1) 
         return 0;
 
-    VERBOSE(VB_IMPORTANT, QString("DTMF Filter matched %1").arg(key.latin1())); 
+    VERBOSE(VB_IMPORTANT, QString("DTMF Filter matched %1").arg(key)); 
     return key;
 }
 

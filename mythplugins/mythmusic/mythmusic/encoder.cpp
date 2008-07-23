@@ -13,10 +13,13 @@ Encoder::Encoder(const QString &outfile, int qualitylevel, Metadata *metadata)
 {
     if (!m_outfile.isEmpty())
     {
-        m_out = fopen(m_outfile.local8Bit(), "w+");
+        QByteArray outfile = m_outfile.toLocal8Bit();
+        m_out = fopen(outfile.constData(), "w+");
         if (!m_out)
-            VERBOSE(VB_GENERAL, QString("Error opening output file: %1")
+        {
+            VERBOSE(VB_GENERAL, QString("Error opening output file: '%1'")
                     .arg(m_outfile));
+        }
     }
 }
 

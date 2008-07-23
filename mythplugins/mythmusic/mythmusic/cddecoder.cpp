@@ -96,14 +96,15 @@ bool CdDecoder::initialize()
     totalTime = 0.0;
 
     filename = ((QFile *)input())->name();
-    tracknum = atoi(filename.ascii());
+    tracknum = filename.toUInt();
    
     if (!output_buf)
         output_buf = new char[globalBufferSize];
     output_at = 0;
     output_bytes = 0;
 
-    device = cdda_identify(devicename.ascii(), 0, NULL);
+    QByteArray devname = devicename.toAscii();
+    device = cdda_identify(devname.constData(), 0, NULL);
     if (!device)
         return FALSE;
 
@@ -262,7 +263,8 @@ void CdDecoder::setCDSpeed(int speed)
 
 int CdDecoder::getNumTracks(void)
 {
-    int cd = cd_init_device((char *)devicename.ascii());
+    QByteArray devname = devicename.toAscii();
+    int cd = cd_init_device(const_cast<char*>(devname.constData()));
 
     struct disc_info discinfo;
     if (cd_stat(cd, &discinfo) != 0)
@@ -288,7 +290,8 @@ int CdDecoder::getNumTracks(void)
 
 int CdDecoder::getNumCDAudioTracks(void)
 {
-    int cd = cd_init_device((char *)devicename.ascii());
+    QByteArray devname = devicename.toAscii();
+    int cd = cd_init_device(const_cast<char*>(devname.constData()));
 
     struct disc_info discinfo;
     if (cd_stat(cd, &discinfo) != 0)
@@ -346,7 +349,8 @@ Metadata *CdDecoder::getMetadata()
     QString artist = "", album = "", compilation_artist = "", title = "", genre = "";
     int year = 0, tracknum = 0, length = 0;
 
-    int cd = cd_init_device((char *)devicename.ascii());
+    QByteArray devname = devicename.toAscii();
+    int cd = cd_init_device(const_cast<char*>(devname.constData()));
 
     struct disc_info discinfo;
     if (cd_stat(cd, &discinfo) != 0)
@@ -364,7 +368,7 @@ Metadata *CdDecoder::getMetadata()
     }
  
     if (settracknum == -1)
-        tracknum = atoi(filename.ascii());
+        tracknum = filename.toUInt();
     else
     {
         tracknum = settracknum;
@@ -448,9 +452,18 @@ Metadata *CdDecoder::getMetadata()
     return retdata;
 }    
 
+static void set_cstring(char *dest, const char *src, size_t dest_buf_size)
+{
+    if (dest_buf_size < 1)
+        return;
+    strncpy(dest, src, dest_buf_size - 1);
+    dest[dest_buf_size - 1] = 0;
+}
+
 void CdDecoder::commitMetadata(Metadata *mdata)
 {
-    int cd = cd_init_device((char *)devicename.ascii());
+    QByteArray devname = devicename.toAscii();
+    int cd = cd_init_device(const_cast<char*>(devname.constData()));
 
     struct disc_info discinfo;
     if (cd_stat(cd, &discinfo) != 0)
@@ -490,36 +503,41 @@ void CdDecoder::commitMetadata(Metadata *mdata)
     if (mdata->Compilation())
     {
         if (mdata->CompilationArtist() != discdata.data_artist)
-            strncpy(discdata.data_artist, mdata->CompilationArtist().utf8(), 256);
+        {
+            set_cstring(discdata.data_artist,
+                        mdata->CompilationArtist().toUtf8().constData(), 256);
+        }
     }
     else
     {
         if (mdata->Artist() != discdata.data_artist)
-            strncpy(discdata.data_artist, mdata->Artist().utf8(), 256);
+        {
+            set_cstring(discdata.data_artist,
+                        mdata->Artist().toUtf8().constData(), 256);
+        }
     }
     if (mdata->Album() != discdata.data_title)
-        strncpy(discdata.data_title, mdata->Album().utf8(), 256);
+    {
+        set_cstring(discdata.data_title,
+                    mdata->Album().toUtf8().constData(), 256);
+    }
     if (mdata->Title() != discdata.data_track[tracknum - 1].track_name)
     {
-        strncpy(discdata.data_track[tracknum - 1].track_name, mdata->Title().utf8(),
-                256);
-
+        set_cstring(discdata.data_track[tracknum - 1].track_name,
+                    mdata->Title().toUtf8().constData(), 256);
     }
 
     if (mdata->Compilation())
     {
         if (mdata->Artist() != discdata.data_track[tracknum - 1].track_artist)
         {
-            strncpy(discdata.data_track[tracknum - 1].track_artist, 
-                    mdata->Artist().utf8(), 256);
+            set_cstring(discdata.data_track[tracknum - 1].track_artist,
+                        mdata->Artist().toUtf8().constData(), 256);
         }
     }
     else
     {
-        if ("" != discdata.data_track[tracknum - 1].track_artist)
-        {
-            strncpy(discdata.data_track[tracknum - 1].track_artist, "", 256);
-        }
+        discdata.data_track[tracknum - 1].track_artist[0] = 0;
     }
     
     cddb_write_data(cd, &discdata);

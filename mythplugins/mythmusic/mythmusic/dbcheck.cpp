@@ -205,11 +205,11 @@ bool UpgradeMusicDatabaseSchema(void)
                                  "title = :TITLE, genre = :GENRE, "
                                  "filename = :FILENAME "
                                  "WHERE intid = :ID;");
-                subquery.bindValue(":ARTIST", artist.utf8());
-                subquery.bindValue(":ALBUM", album.utf8());
-                subquery.bindValue(":TITLE", title.utf8());
-                subquery.bindValue(":GENRE", genre.utf8());
-                subquery.bindValue(":FILENAME", filename.utf8());
+                subquery.bindValue(":ARTIST",   QString(artist.toUtf8()));
+                subquery.bindValue(":ALBUM",    QString(album.toUtf8()));
+                subquery.bindValue(":TITLE",    QString(title.toUtf8()));
+                subquery.bindValue(":GENRE",    QString(genre.toUtf8()));
+                subquery.bindValue(":FILENAME", QString(filename.toUtf8()));
                 subquery.bindValue(":ID", id);
 
                 if (!subquery.exec() || !subquery.isActive())
@@ -230,7 +230,7 @@ bool UpgradeMusicDatabaseSchema(void)
                 MSqlQuery subquery(MSqlQuery::InitCon());
                 subquery.prepare("UPDATE musicplaylist SET "
                                  "name = :NAME WHERE playlistid = :ID ;");
-                subquery.bindValue(":NAME", name.utf8());
+                subquery.bindValue(":NAME", QString(name.toUtf8()));
                 subquery.bindValue(":ID", id);
 
                 if (!subquery.exec() || !subquery.isActive())

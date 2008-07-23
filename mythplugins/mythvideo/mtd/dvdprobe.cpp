@@ -7,9 +7,6 @@
     implementation for dvd probing (libdvdread)
 */
 
-//#define QT_NO_ASCII_CAST
-// TODO: make VERBOSE use .ascii
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #if defined(__linux__) || defined(__FreeBSD__)
@@ -48,7 +45,7 @@ namespace
 }
 
 DVDSubTitle::DVDSubTitle(int subtitle_id, const QString &a_language) :
-    id(subtitle_id), language(a_language.utf8())
+    id(subtitle_id), language(a_language.toUtf8())
 {
     if (language.isEmpty())
         language = "unknown";
@@ -419,7 +416,8 @@ bool DVDProbe::probe()
 
     struct stat fileinfo;
 
-    int ret = stat(device.ascii(), &fileinfo);
+    QByteArray dev = device.toAscii();
+    int ret = stat(dev.constData(), &fileinfo);
     if (ret < 0)
     {
         //
@@ -437,7 +435,7 @@ bool DVDProbe::probe()
     //  this, but it seems to work.
     //
 
-    int drive_handle = open(device.ascii(), O_RDONLY | O_NONBLOCK);
+    int drive_handle = open(dev.constData(), O_RDONLY | O_NONBLOCK);
 
     if (drive_handle == -1)
     {
@@ -497,7 +495,7 @@ bool DVDProbe::probe()
 
     wipeClean();
     first_time = false;
-    dvd = DVDOpen(device.ascii());
+    dvd = DVDOpen(dev.constData());
     if (dvd)
     {
         //
@@ -636,9 +634,10 @@ bool DVDProbe::probe()
                                 //  with weird ass characters. This should
                                 //  probably handle that.
                                 //
-
-                                DVDSubTitle *new_subtitle = new DVDSubTitle(j,
-                                    lctola(sub_attributes->lang_code).utf8());
+                                QString tmp = QString(
+                                    lctola(sub_attributes->lang_code).toUtf8());
+                                DVDSubTitle *new_subtitle =
+                                    new DVDSubTitle(j, tmp);
                                 new_title->addSubTitle(new_subtitle);
                             }
                         }

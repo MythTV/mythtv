@@ -79,9 +79,12 @@ void LibVisualPlugin::handleKeyPress(const QString &action)
         if (SDL_MUSTLOCK(m_pSurface) == SDL_TRUE)
             SDL_LockSurface(m_pSurface);
 
-        visual_bin_set_morph_by_name(m_pVisBin, (char*)"alphablend");
-        visual_bin_switch_actor_by_name(m_pVisBin,
-                const_cast<char*>(m_pluginList[m_currentPlugin].ascii()));
+        visual_bin_set_morph_by_name(
+            m_pVisBin, const_cast<char*>("alphablend"));
+
+        QByteArray plugin = m_pluginList[m_currentPlugin].toAscii();
+        visual_bin_switch_actor_by_name(
+            m_pVisBin, const_cast<char*>(plugin.constData()));
 
         if (SDL_MUSTLOCK(m_pSurface) == SDL_TRUE)
             SDL_UnlockSurface(m_pSurface);
@@ -111,7 +114,10 @@ void LibVisualPlugin::switchToPlugin(const QString &pluginName)
         {
             if (visual_bin_set_video(m_pVisBin, m_pVisVideo) == VISUAL_OK)
             {
-                if (visual_bin_connect_by_names(m_pVisBin, const_cast<char*>(pluginName.ascii()), 0) == VISUAL_OK)
+                QByteArray plugin = m_pluginList[m_currentPlugin].toAscii();
+                if (visual_bin_connect_by_names(
+                        m_pVisBin,
+                        const_cast<char*>(plugin.constData()), 0) == VISUAL_OK)
                 {
                     if (visual_input_set_callback(visual_bin_get_input(m_pVisBin), AudioCallback, this) == VISUAL_OK)
                     {

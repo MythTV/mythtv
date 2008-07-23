@@ -431,9 +431,10 @@ void SelectorCallback(void *data, QString &selection)
 void runSelectMenu(QString which_menu)
 {
     QString themedir = GetMythUI()->GetThemeDir();
-    MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), which_menu, 
-                                      GetMythMainWindow()->GetMainStack(),
-                                      "select menu");
+    MythThemedMenu *diag = new MythThemedMenu(
+        themedir, which_menu, GetMythMainWindow()->GetMainStack(),
+        "select menu");
+
     diag->setCallback(SelectorCallback, NULL);
     diag->setKillable();
 
@@ -464,9 +465,10 @@ void FormatCallback(void *data, QString &selection)
 void runFormatMenu(QString which_menu)
 {
     QString themedir = GetMythUI()->GetThemeDir();
-    MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), which_menu, 
-                                              GetMythMainWindow()->GetMainStack(),
-                                              "format menu");
+    MythThemedMenu *diag = new MythThemedMenu(
+        themedir, which_menu, GetMythMainWindow()->GetMainStack(),
+        "format menu");
+
     diag->setCallback(FormatCallback, NULL);
     diag->setKillable();
 
@@ -504,10 +506,9 @@ void ArchiveCallback(void *data, QString &selection)
 void runMenu(QString which_menu)
 {
     QString themedir = GetMythUI()->GetThemeDir();
-
-    MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), which_menu, 
-                                      GetMythMainWindow()->GetMainStack(),
-                                      "archive menu");
+    MythThemedMenu *diag = new MythThemedMenu(
+        themedir, which_menu, GetMythMainWindow()->GetMainStack(),
+        "archive menu");
 
     diag->setCallback(ArchiveCallback, NULL);
     diag->setKillable();

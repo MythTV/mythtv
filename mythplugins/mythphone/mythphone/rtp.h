@@ -206,7 +206,7 @@ typedef struct VIDEOBUFFER
 #define DTMF_STAR 10
 #define DTMF_HASH 11
 #define DTMF2CHAR(d) ((d)>DTMF_HASH ? '?' : ((d)==DTMF_STAR ? '*' : ((d) == DTMF_HASH ? '#' : ((d)+'0'))))
-#define CHAR2DTMF(c) ((c)=='#' ? DTMF_HASH : ((c)=='*' ? DTMF_STAR : ((c).latin1())))
+#define CHAR2DTMF(c) ((c)=='#' ? DTMF_HASH : ((c)=='*' ? DTMF_STAR : ((c).toLatin1())))
 
 
 

@@ -3883,8 +3883,11 @@ void SipNotify::Display(QString name, QString number)
 
         int udp_port = gContext->GetNumSetting("UDPNotifyPort", 6948);
         if (udp_port > 0)
-            notifySocket->writeBlock(text.ascii(), text.length(), RemoteIP,
-                                     udp_port);
+        {
+            QByteArray buf = text.toAscii();
+            notifySocket->writeBlock(
+                buf.constData(), buf.length(), RemoteIP, udp_port);
+        }
     }
 }
 

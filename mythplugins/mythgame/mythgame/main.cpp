@@ -58,9 +58,8 @@ void runMenu(QString which_menu)
 {
     QString themedir = GetMythUI()->GetThemeDir();
 
-    MythThemedMenu *diag = new MythThemedMenu(themedir.ascii(), which_menu,
-                                              GetMythMainWindow()->GetMainStack(), 
-                                              "game menu");
+    MythThemedMenu *diag = new MythThemedMenu(
+        themedir, which_menu, GetMythMainWindow()->GetMainStack(), "game menu");
 
     GameData data;
 

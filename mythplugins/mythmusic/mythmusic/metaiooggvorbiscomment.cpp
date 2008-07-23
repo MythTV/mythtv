@@ -8,8 +8,6 @@
 // C++ headers
 #include <cstdlib>
 #include <iostream>
-//Added by qt3to4:
-#include <Q3CString>
 using namespace std;
 
 // MythTV headers
@@ -106,69 +104,76 @@ MetaIOOggVorbisComment::getRawVorbisComment(Metadata* mdata,
         p_comment = pComment;
     }
 
-    Q3CString utf8str;
     if (!mdata->Artist().isEmpty())
     {
-        utf8str = mdata->Artist().utf8();
-        char *artist = utf8str.data();
-        vorbis_comment_add_tag(p_comment, (char *)MYTH_VORBISCOMMENT_ARTIST,
-                               artist);    
+        QByteArray utf8str = mdata->Artist().toUtf8();
+        vorbis_comment_add_tag(
+            p_comment,
+            const_cast<char*>(MYTH_VORBISCOMMENT_ARTIST),
+            const_cast<char*>(utf8str.constData()));
     }
     
     if (mdata->Compilation())
     {
         // We use the MusicBrainz Identifier to indicate a compilation
-        vorbis_comment_add_tag(p_comment, (char *)MYTH_VORBISCOMMENT_MUSICBRAINZ_ALBUMARTISTID,
-                               MYTH_MUSICBRAINZ_ALBUMARTIST_UUID);
+        vorbis_comment_add_tag(
+            p_comment,
+            const_cast<char*>(MYTH_VORBISCOMMENT_MUSICBRAINZ_ALBUMARTISTID),
+            const_cast<char*>(MYTH_MUSICBRAINZ_ALBUMARTIST_UUID));
 
         if (!mdata->CompilationArtist().isEmpty())
         {
-            utf8str = mdata->CompilationArtist().utf8();
-            char *compilation_artist = utf8str.data();
-            vorbis_comment_add_tag(p_comment, (char *)MYTH_VORBISCOMMENT_COMPILATIONARTIST,
-                                   compilation_artist); 
-            
+            QByteArray utf8str = mdata->CompilationArtist().toUtf8();
+            vorbis_comment_add_tag(
+                p_comment,
+                const_cast<char*>(MYTH_VORBISCOMMENT_COMPILATIONARTIST),
+                const_cast<char*>(utf8str.constData()));
         }
     }
         
     if (!mdata->Title().isEmpty())
     {
-        utf8str = mdata->Title().utf8();
-        char *title = utf8str.data();
-        vorbis_comment_add_tag(p_comment, (char *)MYTH_VORBISCOMMENT_TITLE,
-                               title);
+        QByteArray utf8str = mdata->Title().toUtf8();
+        vorbis_comment_add_tag(
+            p_comment,
+            const_cast<char*>(MYTH_VORBISCOMMENT_TITLE),
+            const_cast<char*>(utf8str.constData()));
     }
     
     if (!mdata->Album().isEmpty())
     {
-        utf8str = mdata->Album().utf8();
-        char *album = utf8str.data();
-        vorbis_comment_add_tag(p_comment, (char *)MYTH_VORBISCOMMENT_ALBUM,
-                               album);
+        QByteArray utf8str = mdata->Album().toUtf8();
+        vorbis_comment_add_tag(
+            p_comment,
+            const_cast<char*>(MYTH_VORBISCOMMENT_ALBUM),
+            const_cast<char*>(utf8str.constData()));
     }
     
     if (!mdata->Genre().isEmpty())
     {
-        utf8str = mdata->Genre().utf8();
-        char *genre = utf8str.data();
-        vorbis_comment_add_tag(p_comment, (char *)MYTH_VORBISCOMMENT_GENRE,
-                               genre);
+        QByteArray utf8str = mdata->Genre().toUtf8();
+        vorbis_comment_add_tag(
+            p_comment,
+            const_cast<char*>(MYTH_VORBISCOMMENT_GENRE),
+            const_cast<char*>(utf8str.constData()));
     }
     
     if (0 != mdata->Track())
     {
-        char tracknum[10];
-        snprintf(tracknum, 9, "%d", mdata->Track());
-        vorbis_comment_add_tag(p_comment, (char *)MYTH_VORBISCOMMENT_TRACK,
-                               tracknum);
+        QByteArray utf8str = QString::number(mdata->Track()).toUtf8();
+        vorbis_comment_add_tag(
+            p_comment,
+            const_cast<char*>(MYTH_VORBISCOMMENT_TRACK),
+            const_cast<char*>(utf8str.constData()));
     }
     
     if (0 != mdata->Year())
     {
-        char year[10];
-        snprintf(year, 9, "%d", mdata->Year());
-        vorbis_comment_add_tag(p_comment, (char *)MYTH_VORBISCOMMENT_DATE,
-                               year);
+        QByteArray utf8str = QString::number(mdata->Year()).toUtf8();
+        vorbis_comment_add_tag(
+            p_comment,
+            const_cast<char*>(MYTH_VORBISCOMMENT_DATE),
+            const_cast<char*>(utf8str.constData()));
     }
     
     
@@ -192,16 +197,17 @@ bool MetaIOOggVorbisComment::write(Metadata* mdata, bool exclusive)
     if (!mdata)
         return false;
 
-    FILE* p_input = NULL;
-    p_input = fopen(mdata->Filename().local8Bit(), "rb");
+    QByteArray l8bit = mdata->Filename().toLocal8Bit();
+    QByteArray ascii = mdata->Filename().toAscii();
+    FILE *p_input = fopen(l8bit.constData(), "rb");
     if (!p_input)
-        p_input = fopen(mdata->Filename().ascii(), "rb");
+        p_input = fopen(ascii.constData(), "rb");
     
     if (!p_input)
         return false;
 
     QString newfilename = createTempFile(
-        mdata->Filename().local8Bit() + ".XXXXXX");
+        QString(l8bit.constData()) + ".XXXXXX");
 
     FILE *p_output = fopen(newfilename, "wb");
 
@@ -254,11 +260,13 @@ bool MetaIOOggVorbisComment::write(Metadata* mdata, bool exclusive)
     fclose(p_output);
 
     // Rename the file
-    if (0 != rename(newfilename.local8Bit(), mdata->Filename().local8Bit())
-        || 0 != rename(newfilename.ascii(), mdata->Filename().ascii()))
+    QByteArray newl8bit = newfilename.toLocal8Bit();
+    QByteArray newascii = newfilename.toAscii();
+    if (0 != rename(newl8bit.constData(), l8bit.constData()) ||
+        0 != rename(newascii.constData(), ascii.constData()))
     {
         // Can't overwrite the file for some reason.
-        remove(newfilename.local8Bit()) && remove(newfilename.ascii());
+        remove(newl8bit.constData()) && remove(newascii.constData());
         return false;
     }
 
@@ -279,10 +287,11 @@ Metadata* MetaIOOggVorbisComment::read(QString filename)
     int year = 0, tracknum = 0, length = 0;
     bool compilation = false;
 
-    FILE* p_input = NULL;
-    p_input = fopen(filename.local8Bit(), "rb");
+    QByteArray l8bit = filename.toLocal8Bit();
+    QByteArray ascii = filename.toAscii();
+    FILE *p_input = fopen(l8bit.constData(), "rb");
     if (!p_input)
-        p_input = fopen(filename.ascii(), "rb");
+        p_input = fopen(ascii.constData(), "rb");
     
     if (p_input)
     {
@@ -306,8 +315,8 @@ Metadata* MetaIOOggVorbisComment::read(QString filename)
             album = getComment(comment, MYTH_VORBISCOMMENT_ALBUM);
             title = getComment(comment, MYTH_VORBISCOMMENT_TITLE);
             genre = getComment(comment, MYTH_VORBISCOMMENT_GENRE);
-            tracknum = atoi(getComment(comment, MYTH_VORBISCOMMENT_TRACK).ascii()); 
-            year = atoi(getComment(comment, MYTH_VORBISCOMMENT_DATE).ascii());
+            tracknum = getComment(comment, MYTH_VORBISCOMMENT_TRACK).toUInt(); 
+            year = getComment(comment, MYTH_VORBISCOMMENT_DATE).toInt();
             
             QString tmp = getComment(comment, MYTH_VORBISCOMMENT_MUSICBRAINZ_ALBUMARTISTID);
             compilation = (MYTH_MUSICBRAINZ_ALBUMARTIST_UUID == tmp);
@@ -364,10 +373,11 @@ int MetaIOOggVorbisComment::getTrackLength(OggVorbis_File* pVf)
  */
 int MetaIOOggVorbisComment::getTrackLength(QString filename)
 {
-    FILE* p_input = NULL;
-    p_input = fopen(filename.local8Bit(), "rb");
+    QByteArray l8bit = filename.toLocal8Bit();
+    QByteArray ascii = filename.toAscii();
+    FILE *p_input = fopen(l8bit.constData(), "rb");
     if (!p_input)
-        p_input = fopen(filename.ascii(), "rb");
+        p_input = fopen(ascii.constData(), "rb");
     
     if (!p_input)
         return 0;
@@ -400,15 +410,16 @@ int MetaIOOggVorbisComment::getTrackLength(QString filename)
 QString MetaIOOggVorbisComment::getComment(vorbis_comment* pComment, 
                                            const char* pLabel)
 {
-    char *tag;
-    QString retstr;
-    
-    if (pComment 
-        && NULL != (tag = vorbis_comment_query(pComment, (char *)pLabel, 0)))
-        retstr = QString::fromUtf8(tag);
-    else
-        retstr = "";
+    QString ret = "";
 
-    return retstr;
+    if (pComment)
+    {
+        char *tag = vorbis_comment_query(
+            pComment, const_cast<char*>(pLabel), 0);
+
+        if (tag)
+            ret = QString::fromUtf8(tag);
+    }
+
+    return ret;
 }
-

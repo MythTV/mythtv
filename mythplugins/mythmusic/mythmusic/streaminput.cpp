@@ -34,7 +34,7 @@ void StreamInput::setup()
     if (port == -1)
         port = 42666;
 
-    request = ".song " + path.utf8() + "\r\n";
+    request = ".song " + QString(path.toUtf8()) + "\r\n";
 
 
     sock = new Q3Socket;

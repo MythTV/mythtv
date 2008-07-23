@@ -32,8 +32,9 @@ namespace
         QString ret = "";
         QString err = "";
 
-        VERBOSE(VB_GENERAL, QString("%1: Executing '%2'").arg(purpose).
-                arg(args.join(" ")).local8Bit() );
+        VERBOSE(VB_GENERAL, QString("%1: Executing '%2'")
+                .arg(purpose).arg(args.join(" ")));
+
         Q3Process proc(args);
 
         QString cmd = args[0];

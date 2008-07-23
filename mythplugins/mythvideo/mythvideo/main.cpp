@@ -567,10 +567,9 @@ namespace
     {
         QString themedir = GetMythUI()->GetThemeDir();
 
-        MythThemedMenu *diag =
-                new MythThemedMenu(themedir.ascii(), menuname,
-                                   GetMythMainWindow()->GetMainStack(),
-                                   "video menu");
+        MythThemedMenu *diag = new MythThemedMenu(
+            themedir, menuname, GetMythMainWindow()->GetMainStack(),
+            "video menu");
 
         diag->setCallback(VideoCallback, NULL);
         diag->setKillable();

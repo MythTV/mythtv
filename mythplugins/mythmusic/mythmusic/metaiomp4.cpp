@@ -83,10 +83,11 @@ bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
     if (!mdata)
         return false;
 
+    QByteArray filename = mdata->Filename().toLocal8Bit();
     mp4callback_data_t callback_data;
-
-    callback_data.fd = open(mdata->Filename().local8Bit(), O_RDWR);
-    if (callback_data.fd < 0) {
+    callback_data.fd = open(filename.constData(), O_RDWR);
+    if (callback_data.fd < 0)
+    {
         return false;
     }
      
@@ -143,30 +144,34 @@ bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
         return false;
     }
 
-    mp4ff_mdata->tags[0].item = "artist";
-    mp4ff_mdata->tags[0].value = (char*)mdata->Artist().ascii();
+    QByteArray artist = mdata->Artist().toAscii();
+    QByteArray album  = mdata->Album().toAscii();
+    QByteArray title  = mdata->Title().toAscii();
+    QByteArray genre  = mdata->Genre().toAscii();
+    QByteArray date   = QString::number(mdata->Year()).toAscii();
+    QByteArray track  = QString::number(mdata->Track()).toAscii();
+    QByteArray comp   = QString(mdata->Compilation() ? "1" : "0").toAscii();
 
-    mp4ff_mdata->tags[1].item = "album";
-    mp4ff_mdata->tags[1].value = (char*)mdata->Album().ascii();
+    mp4ff_mdata->tags[0].item  = const_cast<char*>("artist");
+    mp4ff_mdata->tags[0].value = const_cast<char*>(artist.constData());
 
-    mp4ff_mdata->tags[2].item = "title";
-    mp4ff_mdata->tags[2].value = (char*)mdata->Title().ascii();
+    mp4ff_mdata->tags[1].item  = const_cast<char*>("album");
+    mp4ff_mdata->tags[1].value = const_cast<char*>(album.constData());
 
-    mp4ff_mdata->tags[3].item = "genre";
-    mp4ff_mdata->tags[3].value = (char*)mdata->Genre().ascii();
+    mp4ff_mdata->tags[2].item  = const_cast<char*>("title");
+    mp4ff_mdata->tags[2].value = const_cast<char*>(title.constData());
 
-    mp4ff_mdata->tags[4].item = "date";
-    mp4ff_mdata->tags[4].value = (char*)malloc(128);
-    snprintf(mp4ff_mdata->tags[4].value, 128, "%d", mdata->Year());
+    mp4ff_mdata->tags[3].item  = const_cast<char*>("genre");
+    mp4ff_mdata->tags[3].value = const_cast<char*>(genre.constData());
 
-    mp4ff_mdata->tags[5].item = "track";
-    mp4ff_mdata->tags[5].value = (char*)malloc(128);
-    snprintf(mp4ff_mdata->tags[5].value, 128, "%d", mdata->Track());
+    mp4ff_mdata->tags[4].item  = const_cast<char*>("date");
+    mp4ff_mdata->tags[4].value = const_cast<char*>(date.constData());
 
-    mp4ff_mdata->tags[6].item = "compilation";
-    mp4ff_mdata->tags[6].value = (char*)malloc(2);
-    mp4ff_mdata->tags[6].value[0] = mdata->Compilation() ? 1 : 0;
-    mp4ff_mdata->tags[6].value[1] = 0;
+    mp4ff_mdata->tags[5].item  = const_cast<char*>("track");
+    mp4ff_mdata->tags[5].value = const_cast<char*>(track.constData());
+
+    mp4ff_mdata->tags[6].item  = const_cast<char*>("compilation");
+    mp4ff_mdata->tags[6].value = const_cast<char*>(comp.constData());
 
     mp4ff_mdata->count = 7;
 
@@ -176,9 +181,6 @@ bool MetaIOMP4::write(Metadata* mdata, bool exclusive)
     free(mp4_cb);
     close(callback_data.fd);
     fclose(callback_data.file);
-    free(mp4ff_mdata->tags[4].value);
-    free(mp4ff_mdata->tags[5].value);
-    free(mp4ff_mdata->tags[6].value);
     free(mp4ff_mdata->tags);
     free(mp4ff_mdata);
 
@@ -200,9 +202,10 @@ Metadata* MetaIOMP4::read(QString filename)
     int year = 0, tracknum = 0, length = 0;
     bool compilation = false;
 
+    QByteArray fname = filename.toLocal8Bit();
     mp4callback_data_t callback_data;
     callback_data.fd = 0;
-    callback_data.file = fopen(filename.local8Bit(), "r");
+    callback_data.file = fopen(fname.constData(), "r");
     if (!callback_data.file)
     {
         return NULL;
@@ -379,10 +382,10 @@ Metadata* MetaIOMP4::read(QString filename)
  */
 int MetaIOMP4::getTrackLength(QString filename)
 {
-
+    QByteArray fname = filename.toLocal8Bit();
     mp4callback_data_t callback_data;
     callback_data.fd = 0;
-    callback_data.file = fopen(filename.local8Bit(), "r");
+    callback_data.file = fopen(fname.constData(), "r");
     if (!callback_data.file)
     {
         return 0;

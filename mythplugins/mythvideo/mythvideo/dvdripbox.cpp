@@ -454,7 +454,7 @@ void DVDRipBox::readFromServer()
         line_from_server = line_from_server.replace( QRegExp("\n"), "" );
         line_from_server = line_from_server.replace( QRegExp("\r"), "" );
         line_from_server.simplifyWhiteSpace();
-        // VERBOSE(VB_IMPORTANT, QString("Getting '%1'").arg(line_from_server.local8Bit()));
+
         QStringList tokens = QStringList::split(" ", line_from_server);
         if(tokens.count() > 0)
         {

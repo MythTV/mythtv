@@ -1482,7 +1482,9 @@ QString SmartPlaylistEditor::getWhereClause(void)
     for (row = criteriaRows.first(); row; row = criteriaRows.next())
     {
         criteria = row->getSQL();
-        if (not criteria.isNull() && criteria != "")
+        if (criteria.isEmpty())
+            continue;
+
         if (bFirst)
         {
             sql += criteria;
@@ -1493,8 +1495,8 @@ QString SmartPlaylistEditor::getWhereClause(void)
             if (matchCombo->currentText() == tr("Any"))
                 sql += " OR " + criteria;
             else
-                sql += " AND " + criteria;    
-        }               
+                sql += " AND " + criteria;
+        }
     }
     
     return sql;

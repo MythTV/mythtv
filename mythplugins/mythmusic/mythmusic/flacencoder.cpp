@@ -54,19 +54,18 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
                   max_residual_partition_order,
                   rice_parameter_search_dist);
 
+    QByteArray ofile = outfile.toLocal8Bit();
 #if !defined(NEWFLAC)
     /* FLAC 1.0.4 to 1.1.2 */
-    FLAC__file_encoder_set_filename(encoder, outfile.local8Bit());
+    FLAC__file_encoder_set_filename(encoder, ofile.constData());
 
     int ret = FLAC__file_encoder_init(encoder);
     if (ret != FLAC__FILE_ENCODER_OK)
 #else
     /* FLAC 1.1.3 and up */
-    int ret = FLAC__stream_encoder_init_file(encoder,
-                           outfile.local8Bit(),
-                           NULL,
-                           NULL);
-    if(ret != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
+    int ret = FLAC__stream_encoder_init_file(
+        encoder, ofile.constData(), NULL, NULL);
+    if (ret != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
 #endif
     {
         VERBOSE(VB_GENERAL, QString("Error initializing FLAC encoder."
