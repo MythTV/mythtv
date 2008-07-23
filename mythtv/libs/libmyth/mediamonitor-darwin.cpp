@@ -382,10 +382,10 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
                                      QString model, bool isCDorDVD)
 {
     MythMediaDevice  *media;
-    QString           msg = QString("MonitorThreadDarwin::diskInsert(%1,%2,%3)")
-                            .arg(devName).arg(volName).arg(isCDorDVD);
+    QString           msg = "MonitorThreadDarwin::diskInsert";
 
-    VERBOSE(VB_MEDIA, msg);
+    VERBOSE(VB_MEDIA, (msg + "(%1,%2,'%3',%4)")
+                      .arg(devName).arg(volName).arg(model).arg(isCDorDVD));
 
     if (isCDorDVD)
         media = MythCDROM::get(NULL, devName, true, m_Monitor->m_AllowEject);
