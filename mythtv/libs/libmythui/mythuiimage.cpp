@@ -252,7 +252,7 @@ bool MythUIImage::Load(void)
             int w = (m_ForceSize.width() != -1) ? m_ForceSize.width() : image->width();
             int h = (m_ForceSize.height() != -1) ? m_ForceSize.height() : image->height();
 
-            image->Resize(QSize(w, h));
+            image->Resize(QSize(w, h), m_preserveAspect);
         }
 
         QSize aSize = m_Area.size();
