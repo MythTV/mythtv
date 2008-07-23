@@ -405,6 +405,7 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
 
     // Mac OS X devices are pre-mounted here:
     media->setMountPath(QString("/Volumes/") + volName);
+    media->setStatus(MEDIASTAT_MOUNTED);
 
     // This is checked in AddDevice(), but checking earlier means
     // we can avoid scanning all the files to determine its type
