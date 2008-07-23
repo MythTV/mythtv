@@ -675,7 +675,7 @@ bool MythMainWindow::event(QEvent* e)
             d->appleRemote->startListening();
 
         if (e->type() == QEvent::WindowDeactivate)
-            d->appleRemote->startListening();
+            d->appleRemote->stopListening();
     }
 
     return QWidget::event(e);
