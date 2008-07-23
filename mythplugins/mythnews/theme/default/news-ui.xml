@@ -20,7 +20,7 @@
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>20,390,610,150</area>
+            <area>20,390,570,150</area>
             <multiline>yes</multiline>
         </textarea>
 
@@ -34,8 +34,8 @@
         </imagetype>
 
         <imagetype name="thumbnail">
-            <position>660,390</position>
-            <staticsize>120,90</staticsize>
+            <area>600,390,160,120</area>
+            <preserveaspect>true</preserveaspect>
         </imagetype>
 
         <imagetype name="enclosures">
