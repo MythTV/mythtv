@@ -69,6 +69,13 @@ uint myth_system(const QString &command, int flags)
     JoystickMenuEventLock joystick_lock(joy_lock_flag && ready_to_lock);
 #endif
 
+#ifdef CONFIG_DARWIN
+    // Darwin waitpid() frequently fails EINTR (interrupted system call) -
+    // I think because the parent is being toggled between kernel sleep/wake.
+    // This seems to work around whatever is causing this 
+    flags |= MYTH_SYSTEM_DONT_BLOCK_PARENT;
+#endif
+
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(command);
 
 #ifndef USING_MINGW
