@@ -399,14 +399,21 @@ void MonitorThreadDarwin::diskInsert(const char *devName,
         return;
     }
 
-    /// We store the volume name for user activities like ChooseAndEjectMedia().
+    // We store the volume name for user activities like ChooseAndEjectMedia().
     media->setVolumeID(volName);
     media->setDeviceModel(model);  // Same for the Manufacturer and model
 
-    /// Mac OS X devices are pre-mounted, but we want to use MythMedia's code
-    /// to work out the mediaType. media->onDeviceMounted() is protected,
-    /// so to call it indirectly, we pretend to mount it here.
+    // Mac OS X devices are pre-mounted here:
     media->setMountPath(QString("/Volumes/") + volName);
+
+    // This is checked in AddDevice(), but checking earlier means
+    // we can avoid scanning all the files to determine its type
+    if (m_Monitor->shouldIgnore(media))
+        return;
+
+    // We want to use MythMedia's code to work out the mediaType.
+    // media->onDeviceMounted() is protected,
+    // so to call it indirectly, we pretend to mount it here.
     media->mount();
 
     m_Monitor->AddDevice(media);
