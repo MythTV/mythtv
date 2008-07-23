@@ -137,6 +137,7 @@ bool MythNews::Create()
     m_articlesList->SetActive(false);
 
     loadSites();
+    updateInfoView(m_sitesList->GetItemFirst());
 
     connect(m_sitesList, SIGNAL(itemSelected(MythListButtonItem*)),
             this, SLOT( slotSiteSelected(MythListButtonItem*)));
@@ -328,7 +329,7 @@ void MythNews::updateInfoView(MythListButtonItem* selected)
 
             if (!article->enclosure().isEmpty())
             {
-                if (m_enclosureImage->IsVisible())
+                if (!m_enclosureImage->IsVisible())
                     m_enclosureImage->Show();
             }
             else
@@ -382,7 +383,7 @@ void MythNews::updateInfoView(MythListButtonItem* selected)
                     m_thumbnailImage->SetFilename(sFilename);
                     m_thumbnailImage->Load();
 
-                    if (m_thumbnailImage->IsVisible())
+                    if (!m_thumbnailImage->IsVisible())
                         m_thumbnailImage->Show();
                 }
             }
