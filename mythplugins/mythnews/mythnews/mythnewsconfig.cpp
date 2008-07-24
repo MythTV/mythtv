@@ -128,7 +128,7 @@ void MythNewsConfig::populateSites()
 
     QDomNode catNode;
     QDomNode siteNode;
-    for (unsigned int i = 0; i < catList.count(); i++) {
+    for (int i = 0; i < catList.count(); i++) {
         catNode = catList.item(i);
 
         NewsCategory *cat = new NewsCategory();
@@ -138,7 +138,7 @@ void MythNewsConfig::populateSites()
 
         QDomNodeList siteList = catNode.childNodes();
 
-        for (unsigned int j = 0; j < siteList.count(); j++) {
+        for (int j = 0; j < siteList.count(); j++) {
             siteNode = siteList.item(j);
 
             NewsSiteItem *site = new NewsSiteItem();
