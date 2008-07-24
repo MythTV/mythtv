@@ -59,12 +59,14 @@ NewsArticle::~NewsArticle()
 
 NewsSite::NewsSite(const QString& name,
                    const QString& url,
-                   const QDateTime& updated)
+                   const QDateTime& updated,
+                   const bool& podcast)
     : QObject()
 {
     m_url     = url;
     m_name    = name;
     m_updated = updated;
+    m_podcast = podcast;
     m_state   = NewsSite::Success;
 
     m_destDir  = GetConfDir();

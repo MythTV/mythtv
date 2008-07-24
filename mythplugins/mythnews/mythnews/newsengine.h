@@ -84,7 +84,7 @@ public:
     typedef Q3PtrList<NewsSite> List;
 
     NewsSite(const QString& name, const QString& url,
-             const QDateTime& updated);
+             const QDateTime& updated, const bool& podcast);
     ~NewsSite();
 
     const QString&   url()  const;

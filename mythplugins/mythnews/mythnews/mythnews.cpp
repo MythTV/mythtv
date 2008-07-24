@@ -121,6 +121,7 @@ bool MythNews::Create()
     m_thumbnailImage = dynamic_cast<MythUIImage *> (GetChild("thumbnail"));
     m_enclosureImage = dynamic_cast<MythUIImage *> (GetChild("enclosures"));
     m_downloadImage = dynamic_cast<MythUIImage *> (GetChild("download"));
+    m_podcastImage = dynamic_cast<MythUIImage *> (GetChild("ispodcast"));
 
     if (!m_sitesList || !m_articlesList || !m_enclosureImage ||
         !m_downloadImage || !m_titleText || !m_descText)
@@ -155,7 +156,7 @@ void MythNews::loadSites(void)
     m_sitesList->Reset();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT name, url, ico, updated FROM newssites ORDER BY name");
+    query.exec("SELECT name, url, ico, updated, podcast FROM newssites ORDER BY name");
 
     if (!query.isActive()) {
         VERBOSE(VB_IMPORTANT, "MythNews: Error in loading Sites from DB");
@@ -165,12 +166,14 @@ void MythNews::loadSites(void)
         QString url;
         QString icon;
         QDateTime time;
+        bool podcast;
         while ( query.next() ) {
             name = query.value(0).toString();
             url  = query.value(1).toString();
             icon = query.value(2).toString();
             time.setTime_t(query.value(3).toUInt());
-            m_NewsSites.append(new NewsSite(name,url,time));
+            podcast = query.value(4).toInt();
+            m_NewsSites.append(new NewsSite(name,url,time,podcast));
         }
     }
 
@@ -334,12 +337,15 @@ void MythNews::updateInfoView(MythListButtonItem* selected)
             }
             else
                 m_enclosureImage->Hide();
+
+            m_podcastImage->Hide();
         }
     }
     else
     {
         m_downloadImage->Hide();
         m_enclosureImage->Hide();
+        m_podcastImage->Hide();
 
         if (site)
         {
@@ -351,6 +357,10 @@ void MythNews::updateInfoView(MythListButtonItem* selected)
 
             if (m_thumbnailImage && m_thumbnailImage->IsVisible())
                 m_thumbnailImage->Hide();
+
+            VERBOSE(VB_IMPORTANT, QString("Podcast is %1").arg(site->podcast()));
+            if (site->podcast() == 1)
+                m_podcastImage->Show();
 
             if (!site->imageURL().isEmpty())
             {

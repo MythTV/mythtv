@@ -94,6 +94,7 @@ private:
     MythUIImage *m_thumbnailImage;
     MythUIImage *m_downloadImage;
     MythUIImage *m_enclosureImage;
+    MythUIImage *m_podcastImage;
 
 private slots:
     void loadSites();

@@ -50,6 +50,12 @@
             <staticsize>32,32</staticsize>
         </imagetype>
 
+        <imagetype name="ispodcast">
+            <filename>podcast.png</filename>
+            <position>740,350</position>
+            <staticsize>32,32</staticsize>
+        </imagetype>
+
     </window>
 
     <window name="editor">
