@@ -114,7 +114,7 @@ void LibVisualPlugin::switchToPlugin(const QString &pluginName)
         {
             if (visual_bin_set_video(m_pVisBin, m_pVisVideo) == VISUAL_OK)
             {
-                QByteArray plugin = m_pluginList[m_currentPlugin].toAscii();
+                QByteArray plugin = pluginName.toAscii();
                 if (visual_bin_connect_by_names(
                         m_pVisBin,
                         const_cast<char*>(plugin.constData()), 0) == VISUAL_OK)
