@@ -349,6 +349,8 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
                     dlg2->AddButton(QObject::tr("Use current schema"));
 
                 selected = dlg2->exec();
+
+                dlg2->deleteLater();
             }
 
             switch (selected)
@@ -445,6 +447,5 @@ void SchemaUpgradeWizard::EndTempWindow(void)
 {
     gContext->SetMainWindow(NULL);
     DestroyMythMainWindow();
-    DestroyMythUI();  // The schema upgrade might change some screen settings?
     m_createdTempWindow = false;
 }
