@@ -36,7 +36,10 @@ HttpComms::HttpComms(QUrl &url, QHttpRequestHeader &header, int timeoutms)
 HttpComms::~HttpComms()
 {
     if (m_timer)
+    {
         delete m_timer;
+        m_timer = NULL;
+    }
 
     delete http;
 }
