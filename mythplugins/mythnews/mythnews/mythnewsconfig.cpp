@@ -70,13 +70,19 @@ MythNewsConfig::MythNewsConfig(MythScreenStack *parent, const char *name)
                          "  category  VARCHAR(255) NOT NULL,"
                          "  url  VARCHAR(255) NOT NULL,"
                          "  ico  VARCHAR(255),"
-                         "  updated INT UNSIGNED );");
+                         "  updated INT UNSIGNED,"
+                         "  podcast BOOL);");
 
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.exec(queryString)) {
         VERBOSE(VB_IMPORTANT, "MythNewsConfig: Error in creating sql table");
     }
+
+    // Add the podcast column to existing configurations
+    queryString = "ALTER TABLE `newssites` ADD `podcast` BOOL NOT NULL DEFAULT '0';";
+    query.exec(queryString);
+    // Do not check the return value as it may already exist
 
 //    m_SpinBox = NULL;
     m_siteList = m_categoriesList = NULL;
