@@ -151,8 +151,9 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
  *       to ensure the user is informed of the MySQL upgrade requirement.
  *
  * \todo This uses GetMythUI()->IsScreenSetup() to work out if this program's
- *       context is a GUI, but GetMythUI() always creates a MythUIHelper.
- *       Having a static bool MythUIHelper::usingMythUI() would be much tidier?
+ *       context is a GUI, but GetMythUI() might create a MythUIHelper.
+ *       Having a static bool MythUIHelper::ValidMythUI() would be much tidier?
+
  */
 enum MythSchemaUpgrade
 SchemaUpgradeWizard::PromptForUpgrade(const char *name,
@@ -380,7 +381,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     // We are not in a GUI environment, so try to prompt the user in the shell
     QString resp;
 
-    cout << endl << (const char *)message.constData() << endl << endl;
+    cout << endl << message.toLocal8Bit().constData() << endl << endl;
 
     if (returnValue == MYTH_SCHEMA_ERROR)
         return MYTH_SCHEMA_ERROR;
@@ -405,7 +406,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         return MYTH_SCHEMA_EXIT;
 
     if (connections)
-        cout << endl << (const char *)warnOtherCl.constData() <<endl;
+        cout << endl << warnOtherCl.toLocal8Bit().constData() << endl;
 
     if (didBackup)
     {

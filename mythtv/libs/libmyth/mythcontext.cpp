@@ -77,6 +77,8 @@ class MythContextPrivate
 
     bool    PromptForDatabaseParams(const QString &error);
     QString TestDBconnection(void);
+    void    SilenceDBerrors(void);
+    void    EnableDBerrors(void);
     void    ResetDatabase(void);
 
     bool    InitUPnP(void);
@@ -249,15 +251,7 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
     if (mainWindow)
         return;
 
-    // We clear the hostname so MSqlQuery will fail, instead of long
-    // timeouts per DB value, or hundreds of lines of DB connect errors.
-    // We save the value for later possible editing in the DbSettings pages
-    if (m_DBparams.dbHostName.length())
-    {
-        m_DBhostCp = m_DBparams.dbHostName;
-        m_DBparams.dbHostName = "";
-        m_database->SetDatabaseParams(m_DBparams);
-    }
+    SilenceDBerrors();
 
     m_database->SetSetting("Theme", "blue");
 #ifdef Q_WS_MACX
@@ -282,6 +276,7 @@ void MythContextPrivate::EndTempWindow(void)
 {
     parent->SetMainWindow(NULL);
     DestroyMythMainWindow();
+    EnableDBerrors();
 }
 
 bool MythContextPrivate::Init(const bool gui, UPnp *UPnPclient,
@@ -799,12 +794,7 @@ QString MythContextPrivate::TestDBconnection(void)
 
     if (doPing && !ping(host, 3))  // Fail after trying for 3 seconds
     {
-        // Save, to display in DatabaseSettings screens
-        m_DBhostCp = m_DBparams.dbHostName;
-
-        // Cause MSqlQuery to fail, instead of minutes timeout per DB value
-        m_DBparams.dbHostName = "";
-
+        SilenceDBerrors();
         err = QObject::tr("Cannot find (ping) database host %1 on the network");
         return err.arg(host);
     }
@@ -814,6 +804,7 @@ QString MythContextPrivate::TestDBconnection(void)
 
     if (port && !telnet(host, port))
     {
+        SilenceDBerrors();
         err = QObject::tr("Cannot connect to port %1 on database host %2");
         return err.arg(port).arg(host);
     }
@@ -822,11 +813,40 @@ QString MythContextPrivate::TestDBconnection(void)
     // 3. Finally, try to login, et c:
 
     if (!MSqlQuery::testDBConnection())
+    {
+        SilenceDBerrors();
         return QObject::tr(QString("Cannot login to database?"));
+    }
 
 
     return QString::null;
 }
+
+/**
+ * Cause MSqlDatabase::OpenDatabase() and MSqlQuery to fail silently.
+ *
+ * This is used when the DB host address is bad, is non-routable,
+ * the passwords are bad, or the DB or has some other problem.
+ *
+ * It prevents hundreds of long TCP/IP timeouts or DB connect errors.
+ */
+void MythContextPrivate::SilenceDBerrors(void)
+{
+    // Save the configured hostname, so that we can
+    // still display it in the DatabaseSettings screens
+    if (m_DBparams.dbHostName.length())
+        m_DBhostCp = m_DBparams.dbHostName;
+    m_DBparams.dbHostName = "";
+    m_database->SetDatabaseParams(m_DBparams);
+}
+
+void MythContextPrivate::EnableDBerrors(void)
+{
+    // Restore (possibly) blanked hostname
+    m_DBparams.dbHostName = m_DBhostCp;
+    m_database->SetDatabaseParams(m_DBparams);
+}
+
 
 /**
  * Called when the user changes the DB connection settings
@@ -2072,11 +2092,7 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
         }
 
         if (createdTempWindow)
-        {
             d->EndTempWindow();
-            d->m_DBparams.dbHostName = d->m_DBhostCp;
-            d->m_database->SetDatabaseParams(d->m_DBparams);
-        }
 
         return returnValue;
     }
@@ -2099,7 +2115,7 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
 
     QString resp;
 
-    cout << endl << (const char *)message << endl << endl;
+    cout << endl << message.toLocal8Bit().constData() << endl << endl;
 
     if (backupResult == "__FAILED__")
         cout << "WARNING: MythTV was unable to backup your database."
@@ -2121,7 +2137,7 @@ int MythContext::PromptForSchemaUpgrade(const QString &dbver,
         return MYTH_SCHEMA_EXIT;
 
     if (connections)
-        cout << endl << (const char *)warnOtherCl <<endl;
+        cout << endl << warnOtherCl.toLocal8Bit().constData() << endl;
 
     if ((backupResult == "__FAILED__") ||
         (backupResult == ""))
