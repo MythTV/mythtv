@@ -111,6 +111,11 @@ const QString& NewsSite::name() const
     return m_name;
 }
 
+const bool& NewsSite::podcast() const
+{
+    return m_podcast;
+}
+
 QString NewsSite::description() const
 {
     QString desc(m_desc+"\n"+m_errorString);

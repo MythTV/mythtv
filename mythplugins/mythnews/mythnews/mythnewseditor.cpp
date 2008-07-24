@@ -65,6 +65,9 @@ bool MythNewsEditor::Create()
     m_urlEdit = dynamic_cast<MythUITextEdit *> (GetChild("url"));
     m_iconEdit = dynamic_cast<MythUITextEdit *> (GetChild("icon"));
 
+    m_podcastCheck = dynamic_cast<MythUICheckBox *> (GetChild("podcast_check"));
+    m_podcastText = dynamic_cast<MythUIText *> (GetChild("podcast_text"));
+
     m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
@@ -93,6 +96,8 @@ bool MythNewsEditor::Create()
         m_nameEdit->SetText(m_site->name());
         m_urlEdit->SetText(m_site->url());
         m_iconEdit->SetText(m_site->imageURL());
+        if (m_site->podcast() == 1)
+           m_podcastCheck->SetCheckState(MythUIStateType::Full);
     }
 
     if (!BuildFocusList())
@@ -131,7 +136,7 @@ void MythNewsEditor::Save()
         removeFromDB(m_siteName);
 
     insertInDB(m_nameEdit->GetText(), m_urlEdit->GetText(),
-               m_iconEdit->GetText(), "custom");
+               m_iconEdit->GetText(), "custom", m_podcastCheck->GetCheckState());
 
     Exit();
 }

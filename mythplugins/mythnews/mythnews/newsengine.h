@@ -92,6 +92,7 @@ public:
     QString          description() const;
     const QDateTime& lastUpdated() const;
     const QString&   imageURL() const;
+    const bool&      podcast() const;
     unsigned int timeSinceLastUpdate() const; // in minutes
 
     void insertNewsArticle(NewsArticle* item);
@@ -118,6 +119,7 @@ private:
     State      m_state;
     QString    m_errorString;
     QString    m_imageURL;
+    bool       m_podcast;
 
     NewsArticle::List m_articleList;
     Q3UrlOperator     *m_urlOp;
@@ -146,6 +148,7 @@ public:
     QString url;
     QString ico;
     bool    inDB;
+    bool    podcast;
 };
 
 

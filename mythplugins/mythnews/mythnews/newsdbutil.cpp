@@ -20,22 +20,23 @@ bool insertInDB(NewsSiteItem* site)
 {
     if (!site) return false;
 
-    return insertInDB(site->name, site->url, site->ico, site->category);
+    return insertInDB(site->name, site->url, site->ico, site->category, site->podcast);
 }
 
 bool insertInDB(const QString &name, const QString &url,
-                          const QString &icon, const QString &category)
+                          const QString &icon, const QString &category, const bool &podcast)
 {
     if (findInDB(name))
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO newssites (name,category,url,ico) "
-            " VALUES( :NAME, :CATEGORY, :URL, :ICON );");
+    query.prepare("INSERT INTO newssites (name,category,url,ico,podcast) "
+            " VALUES( :NAME, :CATEGORY, :URL, :ICON, :PODCAST );");
     query.bindValue(":NAME", name);
     query.bindValue(":CATEGORY", category);
     query.bindValue(":URL", url);
     query.bindValue(":ICON", icon);
+    query.bindValue(":PODCAST", podcast);
     if (!query.exec() || !query.isActive()) {
         MythContext::DBError("news: inserting in DB", query);
         return false;

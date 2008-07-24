@@ -6,6 +6,7 @@
 #include <mythtv/libmythui/mythuibutton.h>
 #include <mythtv/libmythui/mythuitext.h>
 #include <mythtv/libmythui/mythuitextedit.h>
+#include <mythtv/libmythui/mythuicheckbox.h>
 #include <mythtv/httpcomms.h>
 
 // MythNews headers
@@ -44,6 +45,9 @@ private:
 
     MythUIButton *m_okButton;
     MythUIButton *m_cancelButton;
+
+    MythUIText *m_podcastText;
+    MythUICheckBox *m_podcastCheck;
 
 private slots:
     void Save(void);

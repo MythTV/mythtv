@@ -87,6 +87,15 @@
             <area>235,340,375,50</area>
         </textedit>
 
+        <checkbox name="podcast_check" from="basecheckbox">
+            <position>340,465</position>
+        </checkbox>
+
+        <textarea name="podcast_text" align="left">
+              <area>380,465,500,50</area>
+              <value>Podcast feed</value>
+        </textarea>
+
         <button name="cancel" from="basebutton">
             <position>60,480</position>
             <value>Cancel</value>
