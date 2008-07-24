@@ -97,7 +97,7 @@
             <position>340,465</position>
         </checkbox>
 
-        <textarea name="podcast_text" align="left">
+        <textarea name="podcast_text" from="basetextarea">
               <area>380,465,500,50</area>
               <value>Podcast feed</value>
         </textarea>
