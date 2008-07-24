@@ -200,10 +200,10 @@ bool MythNewsConfig::Create()
 
     loadData();
 
-    if (m_helpText) {
-        m_helpText->SetText(tr("Set update frequency by using the up/down arrows."
-                          "Minimum value is 30 Minutes."));
-    }
+//    if (m_helpText) {
+//        m_helpText->SetText(tr("Set update frequency by using the up/down arrows."
+//                          "Minimum value is 30 Minutes."));
+//    }
 
 //     m_SpinBox = new MythNewsSpinBox(this);
 //     m_SpinBox->setRange(30,1000);
