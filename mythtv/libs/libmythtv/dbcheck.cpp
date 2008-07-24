@@ -554,10 +554,10 @@ bool UpgradeTVDatabaseSchema(void)
     if (dbver == currentDatabaseVersion)
         return true;
 
-    QString backupResult = "";
-#ifndef USING_MINGW
-        dbutil.BackupDB(backupResult);
-#endif
+
+    QString backupResult;
+
+    dbutil.BackupDB(backupResult);
 
     switch (gContext->PromptForSchemaUpgrade(
                 dbver, currentDatabaseVersion, backupResult))

@@ -187,13 +187,18 @@ bool DBUtil::IsBackupInProgress(void)
 bool DBUtil::BackupDB(QString &filename)
 {
     filename = "";
+
+#ifdef USING_MINGW
+    VERBOSE(VB_IMPORTANT, "Database backups disabled on Windows.");
+    return true;
+#endif
+
     if (gContext->GetNumSetting("DisableAutomaticBackup", 0))
     {
         VERBOSE(VB_IMPORTANT, "Database backups disabled.  Skipping backup.");
         return true;
     }
 
-    filename = "";
     if (IsNewDatabase())
     {
         VERBOSE(VB_IMPORTANT, "New database detected.  Skipping backup.");
