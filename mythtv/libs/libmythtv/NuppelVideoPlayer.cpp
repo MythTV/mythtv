@@ -7054,19 +7054,23 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
     OSDSet *subtitleOSD = NULL;
     AVSubtitle *dvdSubtitle = ringBuffer->DVD()->GetMenuSubtitle();
     AVSubtitleRect *hl_button = NULL;
-    if (dvdSubtitle != NULL)
+
+    subtitleLock.lock();
+
+    if (dvdSubtitle)
+        subtitleOSD = osd->GetSet("subtitles");
+
+    if (dvdSubtitle && subtitleOSD)
     {
         hl_button = &(dvdSubtitle->rects[0]);
         osd->HideSet("subtitles");
         osd->ClearAll("subtitles");
-        subtitleLock.lock();
         uint h = hl_button->h;
         uint w  = hl_button->w;
         int linesize = hl_button->linesize;
         int x1 = hl_button->x;
         int y1 = hl_button->y;
         QRect buttonPos = ringBuffer->DVD()->GetButtonCoords();
-        subtitleOSD = osd->GetSet("subtitles");
         QImage hl_image(w, h, 32);
         hl_image.setAlphaBuffer(true);
         uint8_t color;
@@ -7119,8 +7123,9 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
         osd->SetVisible(subtitleOSD, 0);
 
         hidedvdbutton = false;
-        subtitleLock.unlock();
     }
+
+    subtitleLock.unlock();
 
     ringBuffer->DVD()->ReleaseMenuButton();
 }
