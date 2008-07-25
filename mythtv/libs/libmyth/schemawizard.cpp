@@ -278,6 +278,14 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         message = warnOldDBMS;
         returnValue = MYTH_SCHEMA_ERROR;
     }
+    else if (versionsBehind > 0)
+    {
+        message = tr("This version of MythTV requires an updated database. ")
+                  + tr("(schema is %1 versions behind)").arg(versionsBehind)
+                  + "\n\n" + tr("Please run mythtv-setup or mythbackend "
+                                "to update your database.");
+        MYTH_SCHEMA_ERROR;
+    }
     else   // This client is too old
     {
         if (m_expertMode)
@@ -300,11 +308,14 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
  
     if (gui)
     {
-        DialogBox      * dlg;
-        MythMainWindow * win = gContext->GetMainWindow();
+        DialogBox       * dlg;
+        MythScreenStack * pop;
+        MythMainWindow  * win = gContext->GetMainWindow();
 
         if (!win)
             win = TempMainWindow(true);
+
+        pop = win->GetStack("popup stack");
 
         dlg = new DialogBox(win, message);
         dlg->AddButton(QObject::tr("Exit"));
