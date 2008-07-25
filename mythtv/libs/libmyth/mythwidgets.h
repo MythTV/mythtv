@@ -19,7 +19,7 @@
 #include <qradiobutton.h>
 #include <qimage.h>
 #include <qlabel.h>
-#include <qtimer.h> 
+#include <qtimer.h>
 #include <QFocusEvent>
 #include <QMouseEvent>
 #include <QHideEvent>
@@ -42,7 +42,7 @@ using namespace std;
 // - Space selects
 
 
-class MPUBLIC MythComboBox: public QComboBox 
+class MPUBLIC MythComboBox: public QComboBox
 {
     Q_OBJECT
   public:
@@ -87,17 +87,17 @@ class MPUBLIC MythComboBox: public QComboBox
     int step;
 };
 
-class MPUBLIC MythSpinBox: public QSpinBox 
+class MPUBLIC MythSpinBox: public QSpinBox
 {
     Q_OBJECT
   public:
-    MythSpinBox(QWidget* parent = NULL, const char* widgetName = 0, 
+    MythSpinBox(QWidget* parent = NULL, const char* widgetName = 0,
                 bool allow_single_step = false) :
         QSpinBox(parent, widgetName),
         singlestep(allow_single_step) { if (singlestep) setLineStep(10); }
 
     void setHelpText(const QString&);
-    
+
     bool singleStep(void) { return singlestep; }
     void setSingleStep(bool arg = true) { singlestep = arg; }
 
@@ -114,7 +114,7 @@ class MPUBLIC MythSpinBox: public QSpinBox
     bool singlestep;
 };
 
-class MPUBLIC MythSlider: public QSlider 
+class MPUBLIC MythSlider: public QSlider
 {
     Q_OBJECT
   public:
@@ -128,7 +128,7 @@ class MPUBLIC MythSlider: public QSlider
 
   protected:
     virtual void keyPressEvent (QKeyEvent* e);
-    virtual void focusInEvent(QFocusEvent *e); 
+    virtual void focusInEvent(QFocusEvent *e);
     virtual void focusOutEvent(QFocusEvent *e);
 
   private:
@@ -136,7 +136,7 @@ class MPUBLIC MythSlider: public QSlider
 };
 
 
-class MPUBLIC MythLineEdit : public QLineEdit 
+class MPUBLIC MythLineEdit : public QLineEdit
 {
     Q_OBJECT
   public:
@@ -165,7 +165,7 @@ class MPUBLIC MythLineEdit : public QLineEdit
     virtual ~MythLineEdit(); // use deleteLater for thread safety
 
     virtual void keyPressEvent(QKeyEvent *e);
-    virtual void focusInEvent(QFocusEvent *e); 
+    virtual void focusInEvent(QFocusEvent *e);
     virtual void focusOutEvent(QFocusEvent *e);
     virtual void hideEvent(QHideEvent *e);
     virtual void mouseDoubleClickEvent(QMouseEvent *e);
@@ -190,8 +190,8 @@ class MPUBLIC MythRemoteLineEdit : public Q3TextEdit
   public:
 
     MythRemoteLineEdit( QWidget * parent, const char * name = 0 );
-    MythRemoteLineEdit( const QString & contents, QWidget * parent, const char * name = 0 );    
-    MythRemoteLineEdit( QFont *a_font, QWidget * parent, const char * name = 0 );    
+    MythRemoteLineEdit( const QString & contents, QWidget * parent, const char * name = 0 );
+    MythRemoteLineEdit( QFont *a_font, QWidget * parent, const char * name = 0 );
     MythRemoteLineEdit( int lines, QWidget * parent, const char * name = 0 );
 
     void setHelpText(const QString&);
@@ -218,7 +218,7 @@ class MPUBLIC MythRemoteLineEdit : public Q3TextEdit
   public slots:
     virtual void deleteLater(void);
     virtual void setText(const QString& text);
-    
+
   protected:
     void Teardown(void);
     virtual ~MythRemoteLineEdit(); // use deleteLater for thread safety
@@ -234,7 +234,7 @@ class MPUBLIC MythRemoteLineEdit : public Q3TextEdit
     void    endCycle();
 
   private:
-    
+
     QFont   *my_font;
     void    Init(void);
     void    cycleKeys(QString cycleList);
@@ -267,14 +267,6 @@ class MPUBLIC MythRemoteLineEdit : public Q3TextEdit
     VirtualKeyboard *popup;
     bool             useVirtualKeyboard;
     PopupPosition    popupPosition;
-};
-
-class MPUBLIC MythTable : public Q3Table
-{
-  public:
-    MythTable(QWidget *parent) : Q3Table(parent) { }
-
-    void keyPressEvent(QKeyEvent *e);
 };
 
 class MPUBLIC MythButtonGroup : public Q3ButtonGroup
@@ -398,9 +390,9 @@ class MPUBLIC MythListBox: public Q3ListBox {
     void focusInEvent(QFocusEvent *e);
     void focusOutEvent(QFocusEvent *e);
     virtual void polish(void);
- 
+
   public slots:
-    void setCurrentItem(const QString& matchText, bool caseSensitive = true, 
+    void setCurrentItem(const QString& matchText, bool caseSensitive = true,
                         bool partialMatch = false);
     void setCurrentItem(int index) { Q3ListBox::setCurrentItem(index); };
 
