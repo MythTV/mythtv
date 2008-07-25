@@ -12,8 +12,6 @@
 #include <qdialog.h>
 #include <q3listview.h>
 #include <q3header.h>
-#include <q3table.h>
-#include <q3buttongroup.h>
 #include <q3listbox.h>
 #include <qcheckbox.h>
 #include <qradiobutton.h>
@@ -134,7 +132,6 @@ class MPUBLIC MythSlider: public QSlider
   private:
     QString helptext;
 };
-
 
 class MPUBLIC MythLineEdit : public QLineEdit
 {
@@ -267,14 +264,6 @@ class MPUBLIC MythRemoteLineEdit : public Q3TextEdit
     VirtualKeyboard *popup;
     bool             useVirtualKeyboard;
     PopupPosition    popupPosition;
-};
-
-class MPUBLIC MythButtonGroup : public Q3ButtonGroup
-{
-  public:
-    MythButtonGroup(QWidget *parent = 0) : Q3ButtonGroup(parent) { }
-
-    void moveFocus(int key);
 };
 
 class MPUBLIC MythPushButton : public QPushButton

@@ -1139,24 +1139,6 @@ void MythRemoteLineEdit::backspace()
     emit textChanged(this->text());
 }
 
-void MythButtonGroup::moveFocus(int key)
-{
-    QAbstractButton *currentSel = selected();
-
-    QAbstractButton *pButton = find( key );
-    pButton->setFocus();
-
-    if (selected() == currentSel)
-    {
-        switch (key)
-        {
-            case Qt::Key_Up: focusNextPrevChild(FALSE); break;
-            case Qt::Key_Down: focusNextPrevChild(TRUE); break;
-            default: break;
-        }
-    }
-}
-
 MythPushButton::MythPushButton(const QString &ontext, const QString &offtext,
                                QWidget *parent, bool isOn, bool aa)
                                : QPushButton(ontext, parent)
