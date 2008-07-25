@@ -978,23 +978,15 @@ void PrintHelp(const MythCommandLineParser &cmdlineparser)
     QByteArray ahelp = help.toLocal8Bit();
 
     cerr << "Valid options are: " << endl <<
-#ifdef USING_X11
-            "-display X-server              Create GUI on X-server, not localhost\n" <<
-#endif
-            "-geometry or --geometry WxH    Override window size settings\n" <<
-            "-geometry WxH+X+Y              Override window size and position\n" <<
             "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
             "-r or --reset                  Resets frontend appearance settings and language" << endl <<
             ahelp.constData() <<
-            "-G or " << endl <<
-            "  --get-setting KEY[,KEY2,etc] Returns the current database setting for 'KEY'" << endl <<
             "                               Use a comma seperated list to return multiple values" << endl <<
             "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
             "-p or --prompt                 Always prompt for Mythbackend selection." << endl <<
             "-d or --disable-autodiscovery  Never prompt for Mythbackend selection." << endl <<
 
             "-u or --upgrade-schema         Allow mythfrontend to upgrade the database schema" << endl <<
-            "--version                      Version information" << endl <<
             "<plugin>                       Initialize and run this plugin" << endl <<
             endl <<
             "Environment Variables:" << endl <<
@@ -1104,35 +1096,32 @@ int main(int argc, char **argv)
     bool bBypassAutoDiscovery = false;
     bool upgradeAllowed = false;
 
-    QString geometry = QString::null;
-    QString display  = QString::null;
-
-    for(int argpos = 0; argpos < argc; ++argpos)
-    {
-        if (!strcmp(argv[argpos],"--version"))
-        {
-            extern const char *myth_source_version;
-            extern const char *myth_source_path;
-            cout << "Please include all output in bug reports." << endl;
-            cout << "MythTV Version   : " << myth_source_version << endl;
-            cout << "MythTV Branch    : " << myth_source_path << endl;
-            cout << "Library API      : " << MYTH_BINARY_VERSION << endl;
-            cout << "Network Protocol : " << MYTH_PROTO_VERSION << endl;
-            cout << "QT Version       : " << QT_VERSION_STR << endl;
-#ifdef MYTH_BUILD_CONFIG
-            cout << "Options compiled in:" <<endl;
-            cout << MYTH_BUILD_CONFIG << endl;
-#endif
-            return FRONTEND_EXIT_OK;
-        }
+    bool cmdline_err;
+    MythCommandLineParser cmdline(
+        kCLPOverrideSettingsFile |
+        kCLPOverrideSettings     |
+        kCLPWindowed             |
+        kCLPNoWindowed           |
+        kCLPGetSettings          |
+        kCLPQueryVersion         |
 #ifdef USING_X11
-    // Remember any -display or -geometry argument
-    // which QApplication init will remove.
-        else if (!strcmp(argv[argpos],"-geometry"))
-            geometry = argv[argpos+1];
-        else if (!strcmp(argv[argpos],"-display"))
-            display = argv[argpos+1];
+        kCLPDisplay              |
 #endif // USING_X11
+        kCLPGeometry);
+
+    for (int argpos = 0; argpos < argc; ++argpos)
+    {
+        if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
+        {
+            if (cmdline_err)
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            if (cmdline.WantsToExit())
+                return FRONTEND_EXIT_OK;
+        }
+        else
+        {
+            argpos++;
+        }
     }
 
 #ifdef Q_WS_MACX
@@ -1153,36 +1142,9 @@ int main(int argc, char **argv)
     if (binname.lower() != "mythfrontend")
         pluginname = binname;
 
-    bool cmdline_err;
-    MythCommandLineParser cmdline(
-        kCLPOverrideSettingsFile |
-        kCLPOverrideSettings     |
-        kCLPWindowed             |
-        kCLPNoWindowed);
-
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
-        if (!strcmp(a.argv()[argpos],"-display") ||
-            !strcmp(a.argv()[argpos],"--display"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                display = a.argv()[argpos+1];
-                if (display.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -display option\n";
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
-                }
-                else
-                    ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -display option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-h") ||
+        if (!strcmp(a.argv()[argpos],"-h") ||
                 !strcmp(a.argv()[argpos],"--help") ||
                 !strcmp(a.argv()[argpos],"--usage"))
         {
@@ -1219,13 +1181,15 @@ int main(int argc, char **argv)
         {
             if (cmdline_err)
                 return FRONTEND_EXIT_INVALID_CMDLINE;
+            if (cmdline.WantsToExit())
+                return FRONTEND_EXIT_OK;
         }
     }
     QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
 
-    if (!display.isEmpty())
+    if (!cmdline.GetDisplay().isEmpty())
     {
-        MythUIHelper::SetX11Display(display);
+        MythUIHelper::SetX11Display(cmdline.GetDisplay());
     }
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
@@ -1274,61 +1238,6 @@ int main(int argc, char **argv)
         {
             ResetSettings = true;
         }
-        else if (!strcmp(a.argv()[argpos],"-G") ||
-                 !strcmp(a.argv()[argpos],"--get-setting"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                QString tmpArg = a.argv()[argpos+1];
-                if (tmpArg.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -G/--get-setting option\n";
-                    cleanup();
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
-                } 
- 
-                QStringList pairs = QStringList::split(",", tmpArg);
-                QString value;
-                for (int index = 0; index < pairs.size(); ++index)
-                {
-                    value = gContext->GetSetting(pairs[index]);
-                    cout << "\tSettings Value : " << (const char *)pairs[index];
-                    cout <<  " = " << (const char *)value << endl;
-                }
-                cleanup();
-                return FRONTEND_EXIT_OK;
-            }
-            else
-            {
-                cerr << "Invalid or missing argument to -G/--get-setting option\n";
-                cleanup();
-                return FRONTEND_EXIT_INVALID_CMDLINE;
-            }
-
-            ++argpos;
-        }
-        else if (!strcmp(a.argv()[argpos],"-geometry") ||
-                 !strcmp(a.argv()[argpos],"--geometry"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                geometry = a.argv()[argpos+1];
-                if (geometry.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -geometry option\n";
-                    cleanup();
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
-                }
-                else
-                    ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -geometry option\n";
-                cleanup();
-                return FRONTEND_EXIT_INVALID_CMDLINE;
-            }
-        }
         else if (!strcmp(a.argv()[argpos],"--prompt") ||
                  !strcmp(a.argv()[argpos],"-p" ))
         {
@@ -1349,6 +1258,12 @@ int main(int argc, char **argv)
                 cleanup();
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
+
+            if (cmdline.WantsToExit())
+            {
+                cleanup();
+                return FRONTEND_EXIT_OK;
+            }
         }
         else if ((argpos + 1 == a.argc()) &&
                     !QString(a.argv()[argpos]).startsWith("-"))
@@ -1367,6 +1282,21 @@ int main(int argc, char **argv)
         }
     }
     settingsOverride = cmdline.GetSettingsOverride();
+
+    QStringList settingsQuery = cmdline.GetSettingsQuery();
+    if (!settingsQuery.empty())
+    {
+        QStringList::const_iterator it = settingsQuery.begin();
+        for (; it != settingsQuery.end(); ++it)
+        {
+            QString value = gContext->GetSetting(*it);
+            QString out = QString("\tSettings Value : %1 = %2")
+                .arg(*it).arg(value);
+            cout << out.toLocal8Bit().constData() << endl;
+        }
+        cleanup();
+        return FRONTEND_EXIT_OK;
+    }
 
     if (logfile != "")
     {
@@ -1400,6 +1330,7 @@ int main(int argc, char **argv)
         return FRONTEND_EXIT_OK;
     }
 
+    QString geometry = cmdline.GetGeometry();
     if (!geometry.isEmpty() && !GetMythUI()->ParseGeometryOverride(geometry))
     {
         VERBOSE(VB_IMPORTANT,

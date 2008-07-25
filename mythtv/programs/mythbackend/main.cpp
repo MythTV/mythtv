@@ -41,6 +41,7 @@ using namespace std;
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/jobqueue.h"
 #include "libmythtv/previewgenerator.h"
+#include "mythcommandlineparser.h"
 
 #include "mediaserver.h"
 #include "httpstatus.h"
@@ -426,7 +427,6 @@ int main(int argc, char **argv)
 
     QApplication a(argc, argv, need_gui);
 
-    QMap<QString, QString> settingsOverride;
     QString binname = basename(a.argv()[0]);
 
     long long previewFrameNumber = -2;
@@ -449,6 +449,12 @@ int main(int argc, char **argv)
     QString printexpire = "";
     bool clearsettingscache = false;
     bool wantupnprebuild = false;
+
+    bool cmdline_err;
+    MythCommandLineParser cmdline(
+        kCLPOverrideSettingsFile |
+        kCLPOverrideSettings     |
+        kCLPQueryVersion);
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -491,37 +497,6 @@ int main(int argc, char **argv)
         {
             daemonize = true;
 
-        }
-        else if (!strcmp(a.argv()[argpos],"-O") ||
-                 !strcmp(a.argv()[argpos],"--override-setting"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                QString tmpArg = a.argv()[argpos+1];
-                if (tmpArg.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -O/--override-setting option\n";
-                    return BACKEND_EXIT_INVALID_CMDLINE;
-                } 
- 
-                QStringList pairs = QStringList::split(",", tmpArg);
-                for (int index = 0; index < pairs.size(); ++index)
-                {
-                    QStringList tokens = QStringList::split("=", pairs[index]);
-                    tokens[0].replace(QRegExp("^[\"']"), "");
-                    tokens[0].replace(QRegExp("[\"']$"), "");
-                    tokens[1].replace(QRegExp("^[\"']"), "");
-                    tokens[1].replace(QRegExp("[\"']$"), "");
-                    settingsOverride[tokens[0]] = tokens[1];
-                }
-            }
-            else
-            {
-                cerr << "Invalid or missing argument to -O/--override-setting option\n";
-                return BACKEND_EXIT_INVALID_CMDLINE;
-            }
-
-            ++argpos;
         }
         else if (!strcmp(a.argv()[argpos],"-v") ||
                  !strcmp(a.argv()[argpos],"--verbose"))
@@ -589,22 +564,6 @@ int main(int argc, char **argv)
         {
             clearsettingscache = true;
         } 
-        else if (!strcmp(a.argv()[argpos],"--version"))
-        {
-            extern const char *myth_source_version;
-            extern const char *myth_source_path;
-            cout << "Please include all output in bug reports." << endl;
-            cout << "MythTV Version   : " << myth_source_version << endl;
-            cout << "MythTV Branch    : " << myth_source_path << endl;
-            cout << "Library API      : " << MYTH_BINARY_VERSION << endl;
-            cout << "Network Protocol : " << MYTH_PROTO_VERSION << endl;
-            cout << "QT Version       : " << QT_VERSION_STR << endl;
-#ifdef MYTH_BUILD_CONFIG
-            cout << "Options compiled in:" <<endl;
-            cout << MYTH_BUILD_CONFIG << endl;
-#endif
-            return BACKEND_EXIT_OK;
-        }
         else if (!strcmp(a.argv()[argpos],"--generate-preview"))
         {
             QString tmp = QString::null;
@@ -683,8 +642,18 @@ int main(int argc, char **argv)
 
             outfile = a.argv()[++argpos];
         }
+        else if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
+        {
+            if (cmdline_err)
+                return BACKEND_EXIT_INVALID_CMDLINE;
+
+            if (cmdline.WantsToExit())
+                return BACKEND_EXIT_OK;
+        }
         else
         {
+            QString    help  = cmdline.GetHelpString(false);
+            QByteArray ahelp = help.toLocal8Bit();
             if (!(!strcmp(a.argv()[argpos],"-h") ||
                 !strcmp(a.argv()[argpos],"--help")))
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
@@ -705,7 +674,7 @@ int main(int argc, char **argv)
                     "--nohousekeeper                Do not start the Housekeeper" << endl <<
                     "--noautoexpire                 Do not start the AutoExpire thread" << endl <<
                     "--clearcache                   Clear the settings cache on all myth servers" << endl <<
-                    "--version                      Version information" << endl <<
+                ahelp.constData() <<
                     "--generate-preview             Generate a preview image" << endl <<
                     "--upnprebuild                  Force an update of UPNP media" << endl <<
                     "--infile                       Input file for preview generation" << endl <<
@@ -801,6 +770,7 @@ int main(int argc, char **argv)
         }
     }
 
+    QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
     if (settingsOverride.size())
     {
         QMap<QString, QString>::iterator it;

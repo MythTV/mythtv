@@ -8,6 +8,7 @@
 
 #include "tv_play.h"
 #include "programinfo.h"
+#include "mythcommandlineparser.h"
 
 #include "exitcodes.h"
 #include "mythcontext.h"
@@ -73,132 +74,67 @@ static void *run_priv_thread(void *data)
 
 int main(int argc, char *argv[])
 {
-    QString geometry = QString::null;
-    QString display  = QString::null;
+bool cmdline_err;
+    MythCommandLineParser cmdline(
+        kCLPOverrideSettings     |
+        kCLPWindowed             |
+        kCLPNoWindowed           |
 #ifdef USING_X11
-    // Remember any -display or -geometry argument
-    // which QApplication init will remove.
-    for(int argpos = 1; argpos + 1 < argc; ++argpos)
+        kCLPDisplay              |
+#endif // USING_X11
+        kCLPGeometry             |
+        kCLPVerbose              |
+        kCLPHelp);
+
+    for (int argpos = 0; argpos < argc; ++argpos)
     {
-        if (!strcmp(argv[argpos],"-geometry"))
-            geometry = argv[argpos+1];
-        else if (!strcmp(argv[argpos],"-display"))
-            display = argv[argpos+1];
+        if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
+        {
+            if (cmdline_err)
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            if (cmdline.WantsToExit())
+                return FRONTEND_EXIT_OK;
+        }
+        else
+        {
+            argpos++;
+        }
     }
-#endif
 
     QApplication a(argc, argv);
 
     print_verbose_messages |= VB_PLAYBACK | VB_LIBAV;// | VB_AUDIO;
 
-    QMap<QString, QString> settingsOverride;
     int argpos = 1;
     QString filename = "";
 
     while (argpos < a.argc())
     {
-        if (!strcmp(a.argv()[argpos],"-v") ||
-            !strcmp(a.argv()[argpos],"--verbose"))
+        if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
         {
-            if ((a.argc() - 1) > argpos)
-            {
-                if (parse_verbose_arg(a.argv()[argpos+1]) ==
-                        GENERIC_EXIT_INVALID_CMDLINE)
-                    return GENERIC_EXIT_INVALID_CMDLINE;
-
-                ++argpos;
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT,
-                        "Missing argument to -v/--verbose option");
-                return COMMFLAG_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-O") ||
-                 !strcmp(a.argv()[argpos],"--override-setting"))
-        {
-            if ((a.argc() - 1) > argpos)
-            {
-                QString tmpArg = a.argv()[argpos+1];
-                if (tmpArg.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to "
-                            "-O/--override-setting option\n";
-                    return BACKEND_EXIT_INVALID_CMDLINE;
-                } 
- 
-                QStringList pairs = QStringList::split(",", tmpArg);
-                for (int index = 0; index < pairs.size(); ++index)
-                {
-                    QStringList tokens = QStringList::split("=", pairs[index]);
-                    tokens[0].replace(QRegExp("^[\"']"), "");
-                    tokens[0].replace(QRegExp("[\"']$"), "");
-                    tokens[1].replace(QRegExp("^[\"']"), "");
-                    tokens[1].replace(QRegExp("[\"']$"), "");
-                    settingsOverride[tokens[0]] = tokens[1];
-                }
-            }
-            else
-            { 
-                cerr << "Invalid or missing argument to -O/--override-setting "
-                        "option\n";
+            if (cmdline_err)
                 return GENERIC_EXIT_INVALID_CMDLINE;
-            }
-
-            ++argpos;
-        }
-        else if (!strcmp(a.argv()[argpos],"-display") ||
-                 !strcmp(a.argv()[argpos],"--display"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                display = a.argv()[argpos+1];
-                if (display.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -display option\n";
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
-                }
-                else
-                    ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -display option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
-            }
-        }
-        else if (!strcmp(a.argv()[argpos],"-geometry") ||
-                 !strcmp(a.argv()[argpos],"--geometry"))
-        {
-            if (a.argc()-1 > argpos)
-            {
-                geometry = a.argv()[argpos+1];
-                if (geometry.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -geometry option\n";
-                    return FRONTEND_EXIT_INVALID_CMDLINE;
-                }
-                else
-                    ++argpos;
-            }
-            else
-            {
-                cerr << "Missing argument to -geometry option\n";
-                return FRONTEND_EXIT_INVALID_CMDLINE;
-            }
+            if (cmdline.WantsToExit())
+                return GENERIC_EXIT_OK;
         }
         else if (a.argv()[argpos][0] != '-')
         {
             filename = a.argv()[argpos];
         }
+        else
+        {
+            QString help = cmdline.GetHelpString(true);
+            QByteArray ahelp = help.toLocal8Bit();
+            cerr << ahelp.constData();
+            return GENERIC_EXIT_INVALID_CMDLINE;
+        }
 
         ++argpos;
     }
 
-    if (!display.isEmpty())
+    if (!cmdline.GetDisplay().isEmpty())
     {
-        MythUIHelper::SetX11Display(display);
+        MythUIHelper::SetX11Display(cmdline.GetDisplay());
     }
 
     gContext = NULL;
@@ -209,6 +145,7 @@ int main(int argc, char *argv[])
         return TV_EXIT_NO_MYTHCONTEXT;
     }
 
+    QString geometry = cmdline.GetGeometry();
     if (!geometry.isEmpty() && !GetMythUI()->ParseGeometryOverride(geometry))
     {
         VERBOSE(VB_IMPORTANT,
@@ -216,6 +153,7 @@ int main(int argc, char *argv[])
                 .arg(geometry));
     }
 
+    QMap<QString, QString> settingsOverride = cmdline.GetSettingsOverride();
     if (settingsOverride.size())
     {
         QMap<QString, QString>::iterator it;
