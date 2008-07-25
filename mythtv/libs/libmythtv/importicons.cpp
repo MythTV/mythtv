@@ -198,7 +198,7 @@ void ImportIconsWizard::menuSelect()
 void ImportIconsWizard::menuSelection(int nIndex)
 {
     enableControls(STATE_SEARCHING);
-    SearchEntry entry = *(m_listSearch.at(nIndex));
+    SearchEntry entry = m_listSearch[nIndex];
 
     CSVEntry entry2 = (*m_missingIter);
     m_strMatches += QString("%1,%2,%3,%4,%5,%6,%7,%8,%9\n").

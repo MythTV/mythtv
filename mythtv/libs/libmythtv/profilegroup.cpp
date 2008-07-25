@@ -6,13 +6,9 @@
 #include "mythuihelper.h"
 #include "cardutil.h"
 #include <qsqldatabase.h>
-#include <q3header.h>
 #include <qcursor.h>
 #include <qlayout.h>
-#include <Q3ValueList>
-#include <Q3VBoxLayout>
 #include <iostream>
-#include <q3accel.h>
 
 QString ProfileGroupStorage::GetWhereClause(MSqlBindings &bindings) const
 {
@@ -188,7 +184,7 @@ void ProfileGroupEditor::open(int id) {
         {
             profilegroup->Save();
             profileID = profilegroup->getProfileNum();
-            Q3ValueList <int> found;
+            vector<int> found;
 
             MSqlQuery result(MSqlQuery::InitCon());
             QString querystr = QString("SELECT name FROM recordingprofiles WHERE "
@@ -208,8 +204,8 @@ void ProfileGroupEditor::open(int id) {
             for(int i = 0; availProfiles[i] != ""; i++)
             {
                 bool skip = false;
-                for (Q3ValueList <int>::Iterator j = found.begin();
-                       j != found.end(); j++)
+                for (vector<int>::iterator j = found.begin();
+                     j != found.end(); j++)
                     if (i == *j)
                         skip = true;
                 if (! skip)
@@ -263,7 +259,7 @@ DialogCode ProfileGroupEditor::exec(void)
         float wmult = 0.0f, hmult  = 0.0f;
         GetMythUI()->GetScreenSettings(width, wmult, height, hmult);
 
-        Q3VBoxLayout *layout = new Q3VBoxLayout(dialog, (int)(20 * hmult));
+        QVBoxLayout *layout = new QVBoxLayout(dialog, (int)(20 * hmult));
         layout->addWidget(listbox->configWidget(NULL, dialog));
 
         dialog->Show();

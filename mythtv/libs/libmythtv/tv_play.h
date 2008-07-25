@@ -7,9 +7,6 @@
 #include <QKeyEvent>
 #include <QEvent>
 #include <pthread.h>
-#include <q3valuevector.h>
-#include <q3valuelist.h>
-#include <q3ptrlist.h>
 #include <qmutex.h>
 #include <qstringlist.h>
 #include <qregexp.h>
@@ -42,7 +39,6 @@ class OSDGenericTree;
 class LiveTVChain;
 class UDPNotifyOSDSet;
 
-typedef Q3ValueVector<QString>    str_vec_t;
 typedef QMap<QString,QString>    InfoMap;
 typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
@@ -542,7 +538,7 @@ class MPUBLIC TV : public QThread
     MythTimer idleDialogTimer; ///< Timer for idle dialog.
 
     /// Queue of unprocessed key presses.
-    Q3PtrList<QKeyEvent> keyList;
+    MythDeque<QKeyEvent*> keyList;
     /// Since keys are processed outside Qt event loop, we need a lock.
     QMutex  keyListLock;
     MythTimer keyRepeatTimer; ///< Timeout timer for repeat key filtering
@@ -594,7 +590,7 @@ class MPUBLIC TV : public QThread
     QDateTime lastLockSeenTime;
 
     // Previous channel functionality state variables
-    str_vec_t prevChan;       ///< Previous channels
+    QStringList prevChan;     ///< Previous channels
     uint      prevChanKeyCnt; ///< Number of repeated channel button presses
     MythTimer prevChanTimer;  ///< Special (slower) repeat key filtering
 
@@ -716,7 +712,7 @@ class MPUBLIC TV : public QThread
     static const uint kPreviousSource;
 
     // Network Control stuff
-    Q3ValueList<QString> networkControlCommands;
+    MythDeque<QString> networkControlCommands;
     QMutex ncLock;
 };
 

@@ -1923,26 +1923,26 @@ void LCDProcClient::outputRecStatus(void)
     QString aString, status;
     QStringList list;
 
-    TunerStatus *tuner = tunerList.at(lcdTunerNo);
+    TunerStatus tuner = tunerList[lcdTunerNo];
 
     scrollListItems.clear();
     if (lcdHeight >= 4)
     {
         outputCenteredText("RecStatus", tr("RECORDING"), "textWidget1", 1);
 
-        status = tuner->title;
-        if (!tuner->subtitle.isEmpty())
-            status += " (" + tuner->subtitle + ")";
+        status = tuner.title;
+        if (!tuner.subtitle.isEmpty())
+            status += " (" + tuner.subtitle + ")";
 
         list = formatScrollerText(status);
         assignScrollingList(list, "RecStatus", "textWidget2", 2);
 
-        status = tuner->startTime.toString("hh:mm") + " to " + 
-                tuner->endTime.toString("hh:mm");
+        status = tuner.startTime.toString("hh:mm") + " to " + 
+                tuner.endTime.toString("hh:mm");
         outputCenteredText("RecStatus", status, "textWidget3", 3);
 
-        int length = tuner->startTime.secsTo(tuner->endTime);
-        int delta = tuner->startTime.secsTo(QDateTime::currentDateTime());
+        int length = tuner.startTime.secsTo(tuner.endTime);
+        int delta = tuner.startTime.secsTo(QDateTime::currentDateTime());
         double rec_progress = (double) delta / length;
 
         aString = "widget_set RecStatus progressBar 1 ";
@@ -1957,20 +1957,20 @@ void LCDProcClient::outputRecStatus(void)
     else
     {
         status = tr("RECORDING|");
-        status += tuner->title;
-        if (tuner->subtitle != "") 
-            status += "|(" + tuner->subtitle + ")";
+        status += tuner.title;
+        if (tuner.subtitle != "") 
+            status += "|(" + tuner.subtitle + ")";
 
-        status += "|" + tuner->startTime.toString("hh:mm") + " to " + 
-                tuner->endTime.toString("hh:mm");
+        status += "|" + tuner.startTime.toString("hh:mm") + " to " + 
+                tuner.endTime.toString("hh:mm");
 
         list = formatScrollerText(status);
         assignScrollingList(list, "RecStatus", "textWidget1", 1);
 
         if (lcdHeight > 1)
         {
-            int length = tuner->startTime.secsTo(tuner->endTime);
-            int delta = tuner->startTime.secsTo(QDateTime::currentDateTime());
+            int length = tuner.startTime.secsTo(tuner.endTime);
+            int delta = tuner.startTime.secsTo(QDateTime::currentDateTime());
             double rec_progress = (double) delta / length;
 
             aString = "widget_set RecStatus progressBar 1 ";
@@ -1991,7 +1991,7 @@ void LCDProcClient::outputRecStatus(void)
 
     recStatusTimer->start(listTime, FALSE);
 
-    if (lcdTunerNo < (int) tunerList.count() - 1)
+    if (lcdTunerNo < (int) tunerList.size() - 1)
         lcdTunerNo++;
     else
         lcdTunerNo = 0;

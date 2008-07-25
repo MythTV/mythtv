@@ -2,7 +2,7 @@
 #include <unistd.h>
 using namespace std;
 
-#include <q3url.h>
+#include <QUrl>
 
 #include "remotefile.h"
 #include "util.h"
@@ -33,7 +33,7 @@ RemoteFile::~RemoteFile()
 
 MythSocket *RemoteFile::openSocket(bool control)
 {
-    Q3Url qurl(path);
+    QUrl qurl(path);
 
     QString host = qurl.host();
     int port = qurl.port();

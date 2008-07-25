@@ -15,8 +15,7 @@
 #include <cerrno>
 #include <cmath>
 
-#include <qstringlist.h>
-#include <Q3PtrList>
+#include <QStringList>
 
 #include <iostream>
 using namespace std;
@@ -2101,9 +2100,9 @@ void NuppelVideoRecorder::WriteSeekTable(void)
 }
 
 void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
-                                     Q3PtrList<struct kfatable_entry> *kfa_table)
+    const vector<struct kfatable_entry> &kfa_table)
 {
-    int numentries = kfa_table->count();
+    int numentries = kfa_table.size();
 
     struct rtframeheader frameheader;
     memset(&frameheader, 0, sizeof(frameheader));
@@ -2115,12 +2114,12 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
     ringBuffer->Write(&frameheader, sizeof(frameheader));
 
     char *kfa_buf = new char[frameheader.packetlength];
-    int offset = 0;
+    uint offset = 0;
 
-    struct kfatable_entry *i = kfa_table->first();
-    for (; i ; i = kfa_table->next())
+    vector<struct kfatable_entry>::const_iterator it = kfa_table.begin();
+    for (; it != kfa_table.end() ; ++it)
     {
-        memcpy(kfa_buf + offset, (const void *)&(*i),
+        memcpy(kfa_buf + offset, &(*it),
                sizeof(struct kfatable_entry));
         offset += sizeof(struct kfatable_entry);
     }

@@ -15,7 +15,7 @@
 
 #include <qsqldatabase.h>
 #include <qurl.h>
-#include <Q3ValueList>
+#include <QList>
 
 #include "settings.h"
 
@@ -52,9 +52,9 @@ private:
         QString strNameCSV;          //!< name (csv form)
     };
     //! List of CSV entries
-    typedef Q3ValueList<CSVEntry> ListEntries;
+    typedef QList<CSVEntry> ListEntries;
     //! iterator over list of CSV entries
-    typedef Q3ValueListIterator<CSVEntry> ListEntriesIter;
+    typedef QList<CSVEntry>::Iterator ListEntriesIter;
 
     ListEntries m_listEntries;       //!< list of TV channels to search for
     ListEntries m_missingEntries;    //!< list of TV channels with no unique icon
@@ -68,9 +68,9 @@ private:
         QString strLogo;             //!< the actual logo
     };
     //! List of SearchEntry entries
-    typedef Q3ValueList<SearchEntry> ListSearchEntries;
+    typedef QList<SearchEntry> ListSearchEntries;
     //! iterator over list of SearchEntry entries
-    typedef Q3ValueListIterator<SearchEntry> ListSearchEntriesIter;
+    typedef QList<SearchEntry>::Iterator ListSearchEntriesIter;
 
     ListSearchEntries m_listSearch;  //!< the list of SearchEntry
     QString m_strMatches;            //!< the string for the submit() call

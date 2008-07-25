@@ -1,13 +1,11 @@
 #include <qlayout.h>
 #include <qpushbutton.h>
-#include <q3buttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
 #include <qsqldatabase.h>
 #include <qdatetime.h>
 #include <qapplication.h>
 #include <qregexp.h>
-#include <q3header.h>
 #include <QKeyEvent>
 #include <QEvent>
 #include <QPixmap>
@@ -1015,7 +1013,7 @@ void ProgLister::powerEdit()
 
     for (uint i = 0; i < channels.size(); i++)
     {
-        QString chantext = Q3DeepCopy<QString>(channelFormat);
+        QString chantext = channelFormat;
         chantext
             .replace("<num>",  channels[i].channum)
             .replace("<sign>", channels[i].callsign)
@@ -1236,7 +1234,7 @@ void ProgLister::fillViewList(const QString &view)
 
         for (uint i = 0; i < channels.size(); i++)
         {
-            QString chantext = Q3DeepCopy<QString>(channelFormat);
+            QString chantext = channelFormat;
             chantext
                 .replace("<num>",  channels[i].channum)
                 .replace("<sign>", channels[i].callsign)

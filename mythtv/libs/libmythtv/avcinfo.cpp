@@ -1,8 +1,5 @@
 // -*- Mode: c++ -*-
 
-// Qt headers
-#include <q3deepcopy.h>
-
 // MythTV headers
 #include "avcinfo.h"
 #include "firewiredevice.h"
@@ -17,7 +14,7 @@ QString guid_to_string(uint64_t guid)
     while (g1.length() < 8)
         g1 = "0" + g1;
 
-    return Q3DeepCopy<QString>(g0.upper() + g1.upper());
+    return g0.upper() + g1.upper();
 }
 
 uint64_t string_to_guid(const QString &guid)
@@ -42,8 +39,9 @@ AVCInfo::AVCInfo(const AVCInfo &o) :
     guid(o.guid),         specid(o.specid),
     vendorid(o.vendorid), modelid(o.modelid),
     firmware_revision(o.firmware_revision),
-    product_name(Q3DeepCopy<QString>(o.product_name))
+    product_name(o.product_name)
 {
+    product_name.detach();
     memcpy(unit_table, o.unit_table, sizeof(unit_table));
 }
 
@@ -56,7 +54,8 @@ AVCInfo &AVCInfo::operator=(const AVCInfo &o)
     vendorid = o.vendorid;
     modelid  = o.modelid;
     firmware_revision = o.firmware_revision;
-    product_name = Q3DeepCopy<QString>(o.product_name);
+    product_name = o.product_name;
+    product_name.detach();
     memcpy(unit_table, o.unit_table, sizeof(unit_table));
 
     return *this;

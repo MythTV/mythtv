@@ -7,9 +7,6 @@
 // C++ headers
 #include <algorithm>
 
-// Qt headers
-#include <q3deepcopy.h>
-
 // MythTV headers
 #include "linuxfirewiredevice.h"
 #include "darwinfirewiredevice.h"
@@ -359,7 +356,8 @@ QString FirewireDevice::GetModelName(uint vendor_id, uint model_id)
     if (ret.isEmpty())
         return "GENERIC";
 
-    return Q3DeepCopy<QString>(ret);
+    ret.detach();
+    return ret;
 }
 
 vector<AVCInfo> FirewireDevice::GetSTBList(void)

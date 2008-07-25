@@ -113,8 +113,6 @@ void MythPlugin::drawMenuPlugin(QPainter *painter, int x, int y, int w, int h)
 
 MythPluginManager::MythPluginManager()
 {
-    m_dict.setAutoDelete(true);
-
     QString pluginprefix = GetPluginsDir();
 
     QDir filterDir(pluginprefix);
@@ -153,7 +151,7 @@ bool MythPluginManager::init_plugin(const QString &plugname)
 {
     QString newname = FindPluginName(plugname);
    
-    if (m_dict.find(newname) == 0)
+    if (!m_dict[newname])
     {
         m_dict.insert(newname, new MythPlugin(newname));
         m_dict[newname]->setAutoUnload(true);
@@ -163,6 +161,7 @@ bool MythPluginManager::init_plugin(const QString &plugname)
   
     if (result == -1)
     {
+        delete m_dict[newname];
         m_dict.remove(newname);
         VERBOSE(VB_IMPORTANT, QString("Unable to initialize plugin '%1'.")
                 .arg(plugname));
@@ -189,7 +188,7 @@ bool MythPluginManager::run_plugin(const QString &plugname)
 {
     QString newname = FindPluginName(plugname);
 
-    if (m_dict.find(newname) == 0 && init_plugin(plugname) == false)
+    if (!m_dict[newname] && !init_plugin(plugname))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Unable to run plugin '%1': not initialized")
@@ -207,7 +206,7 @@ bool MythPluginManager::config_plugin(const QString &plugname)
 {
     QString newname = FindPluginName(plugname);
 
-    if (m_dict.find(newname) == 0 && init_plugin(plugname) == false)
+    if (!m_dict[newname] && !init_plugin(plugname))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Unable to configure plugin '%1': not initialized")
@@ -225,7 +224,7 @@ bool MythPluginManager::destroy_plugin(const QString &plugname)
 {
     QString newname = FindPluginName(plugname);
 
-    if (m_dict.find(newname) == 0 && init_plugin(plugname) == false)
+    if (!m_dict[newname] && !init_plugin(plugname))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Unable to destroy plugin '%1': not initialized")
@@ -259,10 +258,10 @@ MythPlugin *MythPluginManager::GetMenuPlugin(const QString &plugname)
 
 MythPlugin *MythPluginManager::GetMenuPluginAt(int pos)
 {
-    if (pos >= (int)menuPluginList.count())
+    if ((uint)pos >= menuPluginList.size())
         return NULL;
 
-    return menuPluginList.at(pos);
+    return menuPluginList[pos];
 }
 
 void MythPluginManager::orderMenuPlugins(void)
@@ -276,17 +275,17 @@ void MythPluginManager::orderMenuPlugins(void)
     for (; iter != menuPluginMap.end(); ++iter)
     {
         if (iter.data()->isEnabled())
-            menuPluginList.append(iter.data());
+            menuPluginList.push_back(iter.data());
     }
 }
 
 void MythPluginManager::DestroyAllPlugins(void)
 {
-    Q3DictIterator<MythPlugin> it(m_dict);
-    for (; it.current(); ++it)
+    QHash<QString, MythPlugin*>::iterator it = m_dict.begin();
+    for (; it != m_dict.end(); ++it)
     {
-        MythPlugin *plugin = it.current();
-        plugin->destroy();
+        (*it)->destroy();
+        delete *it;
     }
 
     m_dict.clear();

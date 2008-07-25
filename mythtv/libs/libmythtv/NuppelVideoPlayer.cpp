@@ -397,10 +397,16 @@ void NuppelVideoPlayer::SetAudioInfo(const QString &main_device,
     audio_main_device = audio_passthru_device = QString::null;
 
     if (!main_device.isEmpty())
-        audio_main_device     = Q3DeepCopy<QString>(main_device);
+    {
+        audio_main_device = main_device;
+        audio_main_device.detach();
+    }
 
     if (!passthru_device.isEmpty())
-        audio_passthru_device = Q3DeepCopy<QString>(passthru_device);
+    {
+        audio_passthru_device = passthru_device;
+        audio_passthru_device.detach();
+    }
 
     audio_samplerate      = (int)samplerate;
 }
@@ -570,8 +576,8 @@ void NuppelVideoPlayer::SetPlaybackInfo(ProgramInfo *pginfo)
     if (m_playbackinfo && !gContext->IsDatabaseIgnored())
     {
         m_playbackinfo->MarkAsInUse(true, m_recusage);
-        videoFiltersForProgram =
-            Q3DeepCopy<QString>(m_playbackinfo->chanOutputFilters);
+        videoFiltersForProgram = m_playbackinfo->chanOutputFilters;
+        videoFiltersForProgram.detach();
     }
 }
 
@@ -1212,6 +1218,12 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     return IsErrored() ? -1 : 0;
 }
 
+void NuppelVideoPlayer::SetVideoFilters(const QString &override)
+{
+    videoFiltersOverride = override;
+    videoFiltersOverride.detach();
+}
+
 void NuppelVideoPlayer::InitFilters(void)
 {
     QString filters = "";
@@ -1229,18 +1241,20 @@ void NuppelVideoPlayer::InitFilters(void)
     {
         if (videoFiltersForProgram[0] != '+')
         {
-            filters = Q3DeepCopy<QString>(videoFiltersForProgram);
+            filters = videoFiltersForProgram;
         }
         else
         {
             if ((filters.length() > 1) && (filters.right(1) != ","))
                 filters += ",";
-            filters += Q3DeepCopy<QString>(videoFiltersForProgram.mid(1));
+            filters += videoFiltersForProgram.mid(1);
         }
     }
 
     if (!videoFiltersOverride.isEmpty())
-        filters = Q3DeepCopy<QString>(videoFiltersOverride);
+        filters = videoFiltersOverride;
+
+    filters.detach();
 
     videofiltersLock.lock();
 
@@ -7480,16 +7494,19 @@ void NuppelVideoPlayer::TextWrite(uint service_num,
 void NuppelVideoPlayer::SetOSDFontName(const QString osdfonts[22],
                                        const QString &prefix)
 {
-    osdfontname   = Q3DeepCopy<QString>(osdfonts[0]);
-    osdccfontname = Q3DeepCopy<QString>(osdfonts[1]);
+    osdfontname   = osdfonts[0]; osdfontname.detach();
+    osdccfontname = osdfonts[1]; osdccfontname.detach();
     for (int i = 2; i < 22; i++)
-        osd708fontnames[i - 2] = Q3DeepCopy<QString>(osdfonts[i]);
-    osdprefix = Q3DeepCopy<QString>(prefix);
+    {
+        QString tmp = osdfonts[i]; tmp.detach();
+        osd708fontnames[i - 2] = tmp;
+    }
+    osdprefix = prefix; osdprefix.detach();
 }
 
 void NuppelVideoPlayer::SetOSDThemeName(const QString themename)
 {
-    osdtheme = Q3DeepCopy<QString>(themename);
+    osdtheme = themename; osdtheme.detach();
 }
 
 // EIA-708 caption support -- end

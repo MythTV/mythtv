@@ -5,9 +5,8 @@
 #include <pthread.h>
 
 // Qt headers
-#include <qstring.h>
-#include <qmutex.h>
-#include <q3ptrqueue.h>
+#include <QString>
+#include <QMutex>
 
 // MythTV headers
 #include "mythexp.h"

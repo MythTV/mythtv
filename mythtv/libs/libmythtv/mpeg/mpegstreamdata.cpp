@@ -8,8 +8,7 @@ using namespace std;
 #include <sys/time.h> // for gettimeofday
 
 // Qt headers
-#include <qstring.h>
-#include <q3deepcopy.h>
+#include <QString>
 
 // MythTV headers
 #include "mpegstreamdata.h"
@@ -140,7 +139,8 @@ void MPEGStreamData::SetDesiredProgram(int p)
 
 void MPEGStreamData::SetRecordingType(const QString &recording_type)
 {
-    _recording_type = Q3DeepCopy<QString>(recording_type);
+    _recording_type = recording_type;
+    _recording_type.detach();
     uint neededVideo = (_recording_type == "tv")    ? 1 : 0;
     uint neededAudio = (_recording_type == "audio") ? 1 : 0;
     SetVideoStreamsRequired(neededVideo);
@@ -149,7 +149,9 @@ void MPEGStreamData::SetRecordingType(const QString &recording_type)
 
 QString MPEGStreamData::GetRecordingType(void) const
 {
-    return Q3DeepCopy<QString>(_recording_type);
+    QString tmp = _recording_type;
+    tmp.detach();
+    return tmp;
 }
 
 void MPEGStreamData::SetEITHelper(EITHelper *eit_helper)

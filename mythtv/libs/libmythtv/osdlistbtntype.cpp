@@ -33,7 +33,6 @@ using namespace std;
 #include <qimage.h>
 #include <qcolor.h>
 #include <QKeyEvent>
-#include <Q3PtrList>
 
 // MythTV headers
 #include "mythcontext.h"
@@ -276,13 +275,14 @@ void OSDListTreeType::FillLevelFromTree(OSDGenericTree *item,
     }
     list->Reset();
 
-    Q3PtrList<GenericTree> *itemlist = item->getAllChildren();
-    Q3PtrListIterator<GenericTree> it(*itemlist);
-
-    OSDGenericTree     *child   = (OSDGenericTree*) it.current();
-    OSDListBtnTypeItem *newitem = NULL;
-    for (;(child = (OSDGenericTree*) it.current()); ++it)
+    vector<GenericTree*> itemlist = item->getAllChildren();
+    vector<GenericTree*>::iterator it = itemlist.begin();
+    for (; it != itemlist.end(); ++it)
     {
+        OSDGenericTree *child = dynamic_cast<OSDGenericTree*>(*it);
+        if (!child)
+            continue;
+
         OSDTypeImage *im = child->getImage();
         QString label    = child->getString();
         QString group    = child->getGroup();
@@ -290,7 +290,8 @@ void OSDListTreeType::FillLevelFromTree(OSDGenericTree *item,
         bool    hasCheck = child->getCheckable() == 1;
         bool    hasChild = child->childCount()   >  0;
 
-        newitem = new OSDListBtnTypeItem(list, label, im, canCheck, hasChild);
+        OSDListBtnTypeItem *newitem =
+            new OSDListBtnTypeItem(list, label, im, canCheck, hasChild);
 
         if (hasCheck)
             newitem->setChecked(OSDListBtnTypeItem::FullChecked);

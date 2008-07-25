@@ -13,7 +13,6 @@
 #include <pthread.h>
 
 // Qt headers
-#include <q3socket.h>
 #include <qfile.h>
 #include <qapplication.h>
 #include <qdatetime.h>

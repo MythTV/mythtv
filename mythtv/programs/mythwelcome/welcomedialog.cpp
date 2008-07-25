@@ -65,8 +65,6 @@ WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
                                  SLOT(updateTime()));
     m_timeTimer->start(1000);
 
-    m_tunerList.setAutoDelete(true);
-
     popup = NULL;
 
     checkConnectionToServer();
@@ -381,31 +379,31 @@ void WelcomeDialog::updateScreen(void)
     else
     {
         // update recording 
-        if (m_isRecording)
+        if (m_isRecording && m_tunerList.size())
         {
-            if (m_screenTunerNo >= m_tunerList.count())
+            if (m_screenTunerNo >= m_tunerList.size())
                 m_screenTunerNo = 0;
 
-            TunerStatus *tuner = m_tunerList.at(m_screenTunerNo);
+            TunerStatus tuner = m_tunerList[m_screenTunerNo];
 
-            if (tuner->isRecording)
+            if (tuner.isRecording)
             {
                 status = QObject::tr("Tuner %1 is recording:\n")
-                    .arg(tuner->id);
-                status += Q3DeepCopy<QString>(tuner->channame);
-                status += "\n" + Q3DeepCopy<QString>(tuner->title);
-                if (!tuner->subtitle.isEmpty()) 
-                    status += "\n("+Q3DeepCopy<QString>(tuner->subtitle)+")";
-                status += "\n" + tuner->startTime.toString(m_timeFormat) + 
-                          " " + tr("to") + " " + tuner->endTime.toString(m_timeFormat);
+                    .arg(tuner.id);
+                status += Q3DeepCopy<QString>(tuner.channame);
+                status += "\n" + Q3DeepCopy<QString>(tuner.title);
+                if (!tuner.subtitle.isEmpty()) 
+                    status += "\n("+Q3DeepCopy<QString>(tuner.subtitle)+")";
+                status += "\n" + tuner.startTime.toString(m_timeFormat) + 
+                          " " + tr("to") + " " + tuner.endTime.toString(m_timeFormat);
             }
             else
             {
                 status = QObject::tr("Tuner %1 is not recording")
-                    .arg(tuner->id);
+                    .arg(tuner.id);
             }
 
-            if (m_screenTunerNo < m_tunerList.count() - 1)
+            if (m_screenTunerNo < m_tunerList.size() - 1)
                 m_screenTunerNo++;
             else
                 m_screenTunerNo = 0;
@@ -421,18 +419,21 @@ void WelcomeDialog::updateScreen(void)
             if (m_screenScheduledNo >= m_scheduledList.size())
                 m_screenScheduledNo = 0;
 
-            ProgramDetail prog = m_scheduledList.at(m_screenScheduledNo);
+            ProgramDetail prog = m_scheduledList[m_screenScheduledNo];
 
             //status = QString("%1 of %2\n").arg(m_screenScheduledNo + 1)
-            //                               .arg(m_scheduledList.count());
+            //                               .arg(m_scheduledList.size());
             status = prog.channame + "\n";
             status += prog.title;
             if (prog.subtitle != "")
                 status += "\n(" + prog.subtitle + ")";
 
-            QString dateFormat = gContext->GetSetting("DateFormat", "ddd dd MMM yyyy");
-            status += "\n" + prog.startTime.toString(dateFormat + " (" + m_timeFormat) +
-                " " + tr("to") + " " +  prog.endTime.toString(m_timeFormat + ")");
+            QString dateFormat = gContext->GetSetting(
+                "DateFormat", "ddd dd MMM yyyy");
+            status += "\n" + prog.startTime.toString(
+                dateFormat + " (" + m_timeFormat) +
+                " " + tr("to") + " " +
+                prog.endTime.toString(m_timeFormat + ")");
 
             if (m_screenScheduledNo < m_scheduledList.size() - 1)
                 m_screenScheduledNo++;
@@ -446,7 +447,7 @@ void WelcomeDialog::updateScreen(void)
     }
 
     // update status message
-    if (m_statusList.count() == 0)
+    if (m_statusList.empty())
         status = tr("Please Wait ...");
     else
     {

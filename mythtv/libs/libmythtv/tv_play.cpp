@@ -920,7 +920,10 @@ int TV::LiveTV(bool showDialogs, bool startInGuide)
                 int keynum = keyseq[0];
                 keynum &= ~Qt::UNICODE_ACCEL;
 
-                keyList.prepend(new QKeyEvent(QEvent::KeyPress, keynum, 0, 0));
+                keyListLock.lock();
+                keyList.push_front(
+                    new QKeyEvent(QEvent::KeyPress, keynum, 0, 0));
+                keyListLock.unlock();
             }
         }
 
@@ -1152,7 +1155,7 @@ void TV::UpdateOSDAskAllowDialog(void)
         type = kAskAllowOneRec;
         it = askAllowPrograms.begin();
 
-        QString channel = Q3DeepCopy<QString>(db_channel_format);
+        QString channel = db_channel_format;
         channel
             .replace("<num>",  (*it).info->chanstr)
             .replace("<sign>", (*it).info->chansign)
@@ -1191,7 +1194,7 @@ void TV::UpdateOSDAskAllowDialog(void)
             if (title.length() > 20)
                 title = title.left(17) + "...";
 
-            QString channel = Q3DeepCopy<QString>(db_channel_format);
+            QString channel = db_channel_format;
             channel
                 .replace("<num>",  (*it).info->chanstr)
                 .replace("<sign>", (*it).info->chansign)
@@ -2190,11 +2193,7 @@ void TV::TVEventThreadChecks(void)
         QKeyEvent *keypressed = NULL;
 
         keyListLock.lock();
-        if (keyList.count() > 0)
-        {
-            keypressed = keyList.first();
-            keyList.removeFirst();
-        }
+        keypressed = keyList.dequeue();
         keyListLock.unlock();
 
         if (keypressed)
@@ -2210,10 +2209,7 @@ void TV::TVEventThreadChecks(void)
         QString netCmd = QString::null;
         ncLock.lock();
         if (networkControlCommands.size())
-        {
-            netCmd = networkControlCommands.front();
-            networkControlCommands.pop_front();
-        }
+            netCmd = networkControlCommands.dequeue();
         ncLock.unlock();
 
         if (!netCmd.isEmpty())
@@ -2332,7 +2328,7 @@ void TV::TVEventThreadChecks(void)
 
         uint    chanid  = pseudoLiveTVRec[i]->chanid.toUInt();
         QString channum = pseudoLiveTVRec[i]->chanstr;
-        str_vec_t tmp = prevChan;
+        QStringList tmp = prevChan;
         prevChan.clear();
         if (i && activenvp == nvp)
             ToggleActiveWindow();
@@ -2498,7 +2494,7 @@ bool TV::eventFilter(QObject *o, QEvent *e)
 
             // can't process these events in the Qt event loop.
             keyListLock.lock();
-            keyList.append(k);
+            keyList.enqueue(k);
             keyListLock.unlock();
 
             return true;
@@ -4818,7 +4814,9 @@ void TV::ChangeChannel(int direction)
 QString TV::GetQueuedInput(void) const
 {
     QMutexLocker locker(&queuedInputLock);
-    return Q3DeepCopy<QString>(queuedInput);
+    QString ret = queuedInput;
+    ret.detach();
+    return ret;
 }
 
 int TV::GetQueuedInputAsInt(bool *ok, int base) const
@@ -4846,7 +4844,9 @@ QString TV::GetQueuedChanNum(void) const
     // strip whitespace at end of string
     queuedChanNum.stripWhiteSpace();
 
-    return Q3DeepCopy<QString>(queuedChanNum);
+    QString ret = queuedChanNum;
+    ret.detach();
+    return ret;
 }
 
 /** \fn TV::ClearInputQueues(bool)
@@ -4925,7 +4925,7 @@ bool TV::ProcessSmartChannel(QString &inputStr)
             chan = chan.left(chan.length()-1);
 
             QMutexLocker locker(&queuedInputLock);
-            queuedChanNum = Q3DeepCopy<QString>(chan);
+            queuedChanNum = chan;
         }
     }
 
@@ -4965,7 +4965,8 @@ bool TV::ProcessSmartChannel(QString &inputStr)
 #endif
 
     QMutexLocker locker(&queuedInputLock);
-    inputStr = Q3DeepCopy<QString>(queuedChanNum);
+    inputStr = queuedChanNum;
+    inputStr.detach();
 
     return !is_not_complete;
 }
@@ -5210,8 +5211,8 @@ void TV::SetPreviousChannel()
     if (chan_name != prevChan[i])
     {
         QMutexLocker locker(&queuedInputLock);
-        queuedInput   = Q3DeepCopy<QString>(prevChan[i]);
-        queuedChanNum = Q3DeepCopy<QString>(prevChan[i]);
+        queuedInput   = prevChan[i]; queuedInput.detach();
+        queuedChanNum = prevChan[i]; queuedChanNum.detach();
         queuedChanID  = 0;
     }
 
@@ -5375,7 +5376,10 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
     if (!GetOSD() || browsemode || !queuedChanNum.isEmpty())
     {
         if (&lastSignalMsg != &strlist)
-            lastSignalMsg = Q3DeepCopy<QStringList>(strlist);
+        {
+            lastSignalMsg = strlist;
+            lastSignalMsg.detach();
+        }
         return;
     }
 
@@ -6302,8 +6306,8 @@ void TV::ChangeChannel(const DBChanList &options)
                 GetOSD()->HideSet("channel_number");
 
             QMutexLocker locker(&queuedInputLock);
-            queuedInput   = Q3DeepCopy<QString>(channum);
-            queuedChanNum = Q3DeepCopy<QString>(channum);
+            queuedInput   = channum; queuedInput.detach();
+            queuedChanNum = channum; queuedChanNum.detach();
             queuedChanID  = chanid;
             break;
         }
@@ -6443,7 +6447,8 @@ void TV::customEvent(QEvent *e)
             if (tokens[1] == "UPDATE")
             {
                 tvchainUpdateLock.lock();
-                tvchainUpdate += Q3DeepCopy<QString>(tokens[2]);
+                QString tmp = tokens[2]; tmp.detach();
+                tvchainUpdate += tmp;
                 tvchainUpdateLock.unlock();
             }
         }
@@ -6483,7 +6488,8 @@ void TV::customEvent(QEvent *e)
             if ((tokens[1] != "ANSWER") && (tokens[1] != "RESPONSE"))
             {
                 ncLock.lock();
-                networkControlCommands.push_back(Q3DeepCopy<QString>(message));
+                message.detach();
+                networkControlCommands.enqueue(message);
                 ncLock.unlock();
             }
         }
@@ -7197,7 +7203,11 @@ QString TV::GetDataDirect(QString key, QString value, QString field,
     {
         InfoMap::const_iterator it_field = (*it_val).find(field);
         if (it_field != (*it_val).end())
-            return Q3DeepCopy<QString>(*it_field);
+        {
+            QString ret = *it_field;
+            ret.detach();
+            return ret;
+        }
     }
 
     if (!allow_partial_match || value.isEmpty())
@@ -7225,7 +7235,11 @@ QString TV::GetDataDirect(QString key, QString value, QString field,
     {
         InfoMap::const_iterator it_field = (*best_match).find(field);
         if (it_field != (*it_val).end())
-            return Q3DeepCopy<QString>(*it_field);
+        {
+            QString ret = *it_field;
+            ret.detach();
+            return ret;
+        }
     }
 
     return QString::null;

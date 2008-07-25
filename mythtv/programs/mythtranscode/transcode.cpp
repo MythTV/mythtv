@@ -258,24 +258,17 @@ Transcode::~Transcode()
     if (fifow)
         delete fifow;
     if (kfa_table)
-    {
-        while(! kfa_table->isEmpty())
-        {
-           delete kfa_table->last();
-           kfa_table->removeLast();
-        }
         delete kfa_table;
-    }
 }
 void Transcode::ReencoderAddKFA(long curframe, long lastkey, long num_keyframes)
 {
     long delta = curframe - lastkey;
     if (delta != 0 && delta != keyframedist)
     {
-        struct kfatable_entry *kfate = new struct kfatable_entry;
-        kfate->adjust = keyframedist - delta;
-        kfate->keyframe_number = num_keyframes;
-        kfa_table->append(kfate);
+        struct kfatable_entry kfate;
+        kfate.adjust = keyframedist - delta;
+        kfate.keyframe_number = num_keyframes;
+        kfa_table->push_back(kfate);
     }
 }
 
@@ -486,7 +479,7 @@ int Transcode::TranscodeFile(
     int newWidth = video_width;
     int newHeight = video_height;
 
-    kfa_table = new Q3PtrList<struct kfatable_entry>;
+    kfa_table = new vector<struct kfatable_entry>;
 
     if (fifodir.isEmpty())
     {
@@ -1139,8 +1132,8 @@ int Transcode::TranscodeFile(
         }
 
         nvr->WriteSeekTable();
-        if (!kfa_table->isEmpty())
-            nvr->WriteKeyFrameAdjustTable(kfa_table);
+        if (!kfa_table->empty())
+            nvr->WriteKeyFrameAdjustTable(*kfa_table);
     } else {
         fifow->FIFODrain();
     }

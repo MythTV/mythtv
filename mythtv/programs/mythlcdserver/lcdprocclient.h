@@ -235,7 +235,7 @@ class LCDProcClient : public QObject
     bool isTimeVisible;
     int lcdTunerNo;
 
-    Q3PtrList<TunerStatus> tunerList;
+    vector<TunerStatus> tunerList;
 };
 
 #endif

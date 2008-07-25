@@ -697,8 +697,7 @@ void ViewScheduleDiff::updateRecStatus(QPainter *p)
     p->drawPixmap(pr.topLeft(), pix);
 }
 
-ProgramInfo *ViewScheduleDiff::CurrentProgram(void)
-{
+ProgramInfo *ViewScheduleDiff::CurrentProgram() {
     if (listPos >= (int)recList.size())
         return NULL;
     ProgramStruct s = recList[listPos];

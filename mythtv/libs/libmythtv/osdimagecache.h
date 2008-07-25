@@ -4,17 +4,16 @@
 #include <stdint.h>
 
 // Qt headers
-#include <qmap.h>
-#include <qrect.h>
-#include <qmutex.h>
-#include <qstring.h>
-#include <q3asciicache.h>
+#include <QMap>
+#include <QRect>
+#include <QMutex>
+#include <QString>
 
 class OSDImageCacheValue
 {
   public:
     OSDImageCacheValue(QString cacheKey,
-		       unsigned char *yuv,     unsigned char *ybuffer,
+                       unsigned char *yuv,     unsigned char *ybuffer,
                        unsigned char *ubuffer, unsigned char *vbuffer,
                        unsigned char *alpha,   QRect imagesize);
 
@@ -30,13 +29,14 @@ class OSDImageCacheValue
     unsigned char *m_vbuffer;
     unsigned char *m_alpha;
     QRect          m_imagesize;
+    uint           m_time;
 
   private:
     uint           m_size_in_bytes;
     QString        m_cacheKey;
 };
 
-typedef Q3AsciiCache<OSDImageCacheValue> img_cache_t;
+typedef QMap<QString,OSDImageCacheValue*> img_cache_t;
 
 class OSDImageCache
 {
@@ -68,6 +68,7 @@ class OSDImageCache
     int            m_memHits;
     int            m_diskHits;
     int            m_misses;
+    size_t         m_cacheSize;
 
     /// Limit on the maximum total size of OSD images cached in *memory*.
     static uint    kMaximumMemoryCacheSize;

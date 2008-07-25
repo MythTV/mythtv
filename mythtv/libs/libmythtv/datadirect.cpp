@@ -5,10 +5,8 @@
 #include <sys/stat.h>  // for chmod
 
 // Qt headers
-#include <qdir.h>
-#include <qfileinfo.h>
-#include <Q3TextStream>
-#include <Q3DeepCopy>
+#include <QDir>
+#include <QFileInfo>
 
 // MythTV headers
 #include "datadirect.h"
@@ -964,7 +962,7 @@ FILE *DataDirectProcessor::DDPost(
 
     QString startdatestr = pstartDate.toString(Qt::ISODate) + "Z";
     QString enddatestr = pendDate.toString(Qt::ISODate) + "Z";
-    Q3TextStream poststream(&postfile);
+    QTextStream poststream(&postfile);
     poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
     poststream << "<SOAP-ENV:Envelope\n";
     poststream <<
@@ -982,6 +980,7 @@ FILE *DataDirectProcessor::DDPost(
     poststream << "</ns1:download>\n";
     poststream << "</SOAP-ENV:Body>\n";
     poststream << "</SOAP-ENV:Envelope>\n";
+    poststream << flush;
     postfile.close();
 
     // Allow for single quotes in userid and password (shell escape)
@@ -1037,7 +1036,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
         return false;
     }
 
-    Q3TextStream poststream(&postfile);
+    QTextStream poststream(&postfile);
     poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
     poststream << "<SOAP-ENV:Envelope\n";
     poststream
@@ -1050,6 +1049,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     poststream << "<tms:acknowledge xmlns:tms='urn:TMSWebServices'>\n";
     poststream << "</SOAP-ENV:Body>\n";
     poststream << "</SOAP-ENV:Envelope>\n";
+    poststream << flush;
     postfile.close();
 
     QString command = QString("wget --http-user='%1' --http-passwd='%2' "
@@ -1075,7 +1075,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
 
     if (file.open(QIODevice::ReadOnly))
     {
-        Q3TextStream stream(&file);
+        QTextStream stream(&file);
         QString line;
         while (!stream.atEnd())
         {
@@ -1518,7 +1518,7 @@ QDateTime DataDirectProcessor::GetLineupCacheAge(const QString &lineupid) const
     }
 
     QString tmp;
-    Q3TextStream io(&lfile);
+    QTextStream io(&lfile);
     io >> tmp;
     cache_dt = QDateTime::fromString(tmp, Qt::ISODate);
 
@@ -1539,7 +1539,7 @@ bool DataDirectProcessor::GrabLineupsFromCache(const QString &lineupid)
 
     QString tmp;
     uint size;
-    Q3TextStream io(&lfile);
+    QTextStream io(&lfile);
     io >> tmp; // read in date
     io >> size; // read in number of channels mapped
 
@@ -1598,7 +1598,7 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
         return false;
     }
 
-    Q3TextStream io(&lfile);
+    QTextStream io(&lfile);
     io << QDateTime::currentDateTime().toString(Qt::ISODate) << endl;
 
     const DDLineupChannels channels = GetDDLineup(lineupid);
@@ -1635,6 +1635,7 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
         io << station.fccchannelnumber << endl;
         io << "# end record"      << endl;
     }
+    io << flush;
 
     VERBOSE(VB_GENERAL, "SaveLineupToCache("<<lineupid<<") -- success");
 
@@ -1846,12 +1847,12 @@ void DataDirectProcessor::CreateTemp(
     QString tmp = createTempFile(templatefilename, directory);
     if (templatefilename == tmp)
     {
-        fatalErrors.push_back(Q3DeepCopy<QString>(errmsg));
+        fatalErrors.push_back(errmsg);
         ok = false;
     }
     else
     {
-        filename = Q3DeepCopy<QString>(tmp);
+        filename = tmp;
         ok = true;
     }
 }
@@ -1866,7 +1867,7 @@ QString DataDirectProcessor::CreateTempDirectory(bool *pok)
                    "Failed to create temp directory",
                    true, tmpDir, *pok);
     }
-    return Q3DeepCopy<QString>(tmpDir);
+    return tmpDir;
 }
 
 QString DataDirectProcessor::GetPostFilename(bool &ok) const
@@ -1878,7 +1879,7 @@ QString DataDirectProcessor::GetPostFilename(bool &ok) const
                    "Failed to create temp post file",
                    false, tmpPostFile, ok);
     }
-    return Q3DeepCopy<QString>(tmpPostFile);
+    return tmpPostFile;
 }
 
 QString DataDirectProcessor::GetResultFilename(bool &ok) const
@@ -1890,7 +1891,7 @@ QString DataDirectProcessor::GetResultFilename(bool &ok) const
                    "Failed to create temp result file",
                    false, tmpResultFile, ok);
     }
-    return Q3DeepCopy<QString>(tmpResultFile);
+    return tmpResultFile;
 }
 
 QString DataDirectProcessor::GetCookieFilename(bool &ok) const
@@ -1902,22 +1903,25 @@ QString DataDirectProcessor::GetCookieFilename(bool &ok) const
                    "Failed to create temp cookie file",
                    false, cookieFile, ok);
     }
-    return Q3DeepCopy<QString>(cookieFile);
+    return cookieFile;
 }
 
 void DataDirectProcessor::SetUserID(const QString &uid)
 {
-    userid = Q3DeepCopy<QString>(uid);
+    userid = uid;
+    userid.detach();
 }
 
 void DataDirectProcessor::SetPassword(const QString &pwd)
 {
-    password = Q3DeepCopy<QString>(pwd);
+    password = pwd;
+    password.detach();
 }
 
 void DataDirectProcessor::SetInputFile(const QString &file)
 {
-    inputfilename = Q3DeepCopy<QString>(file);
+    inputfilename = file;
+    inputfilename.detach();
 }
 
 bool DataDirectProcessor::Post(QString url, const PostList &list,
@@ -1979,7 +1983,7 @@ bool DataDirectProcessor::ParseLineups(const QString &documentFile)
         return false;
     }
 
-    Q3TextStream stream(&file);
+    QTextStream stream(&file);
     bool in_form = false;
     QString get_action = QString::null;
     QMap<QString,QString> name_value;
@@ -2052,7 +2056,7 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
         return false;
     }
 
-    Q3TextStream stream(&file);
+    QTextStream stream(&file);
     bool in_form = false;
     int in_label = 0;
     QMap<QString,QString> settings;
@@ -2379,10 +2383,14 @@ static void set_lineup_type(const QString &lineupid, const QString &type)
 
     if (srcid)
     {
-        lineupid_to_srcid[Q3DeepCopy<QString>(lineupid)] = srcid;
+        QString tmpid = lineupid;
+        tmpid.detach();
+        lineupid_to_srcid[tmpid] = srcid;
 
         // set type for source
-        srcid_to_type[srcid] = Q3DeepCopy<QString>(type);
+        QString tmptype = type;
+        tmptype.detach();
+        srcid_to_type[srcid] = tmptype;
 
         VERBOSE(VB_GENERAL, "sourceid "<<srcid<<" has lineup type: "<<type);
     }
@@ -2391,7 +2399,9 @@ static void set_lineup_type(const QString &lineupid, const QString &type)
 static QString get_lineup_type(uint sourceid)
 {
     QMutexLocker locker(&lineup_type_lock);
-    return Q3DeepCopy<QString>(srcid_to_type[sourceid]);
+    QString ret = srcid_to_type[sourceid];
+    ret.detach();
+    return ret;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

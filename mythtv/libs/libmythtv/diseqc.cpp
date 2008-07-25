@@ -13,8 +13,7 @@
 #include <sys/time.h>
 
 // Qt headers
-#include <qstring.h>
-#include <Q3DeepCopy>
+#include <QString>
 
 // MythTV headers
 #include "mythcontext.h"
@@ -90,7 +89,11 @@ QString DiSEqCDevDevice::TableToString(uint type, const TypeTable *table)
     for (; !table->name.isEmpty(); table++)
     {
         if (type == table->value)
-            return Q3DeepCopy<QString>(table->name);
+        {
+            QString tmp = table->name;
+            tmp.detach();
+            return tmp;
+        }
     }
     return QString::null;
 }

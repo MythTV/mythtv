@@ -204,7 +204,7 @@ class DecoderBase
     bool posmapStarted;
     MarkTypes positionMapType;
  
-    Q3ValueVector<PosMapEntry> m_positionMap;
+    vector<PosMapEntry> m_positionMap;
     bool dontSyncPositionMap;
 
     bool exactseeks;

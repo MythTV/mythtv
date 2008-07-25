@@ -68,7 +68,9 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode) const
         {
             // found a sub to display
             m_lastReturnedSubtitle = sub;
-            return Q3DeepCopy<QStringList>(m_lastReturnedSubtitle.textLines);
+            QStringList tmp = m_lastReturnedSubtitle.textLines;
+            tmp.detach();
+            return tmp;
         }
 
         // the subtitle time span has ended, let's display a blank sub

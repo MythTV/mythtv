@@ -1,6 +1,3 @@
-// Qt headers
-#include <q3deepcopy.h>
-
 // MythTV headers
 #include "dtvmultiplex.h"
 #include "libmythdb/mythdb.h"
@@ -26,7 +23,8 @@ DTVMultiplex &DTVMultiplex::operator=(const DTVMultiplex &other)
     polarity       = other.polarity;
     fec            = other.fec;
     mplex          = other.mplex;
-    sistandard     = Q3DeepCopy<QString>(other.sistandard);
+    sistandard     = other.sistandard;
+    sistandard.detach();
     return *this;
 }
 
@@ -246,7 +244,8 @@ bool DTVMultiplex::FillFromDB(DTVTunerType type, uint mplexid)
     }
 
     mplex = mplexid;
-    sistandard = Q3DeepCopy<QString>(query.value(13).toString());
+    sistandard = query.value(13).toString();
+    sistandard.detach();
 
     // Parse the query into our DVBTuning class
     return ParseTuningParams(

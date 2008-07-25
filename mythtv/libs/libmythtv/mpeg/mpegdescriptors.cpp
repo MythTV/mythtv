@@ -3,8 +3,6 @@
 
 #include <limits.h>
 
-#include <Q3DeepCopy>
-
 #include "atscdescriptors.h"
 #include "dvbdescriptors.h"
 
@@ -519,8 +517,11 @@ QString RegistrationDescriptor::GetDescription(const QString &fmt)
         QMutexLocker locker(&description_map_lock);
         QMap<QString,QString>::const_iterator it = description_map.find(fmt);
         if (it != description_map.end())
-            ret = Q3DeepCopy<QString>(*it);
+            ret = *it;
     }
+
+    if (!ret.isNull())
+        ret.detach();
 
     return ret;
 }

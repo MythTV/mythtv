@@ -57,7 +57,7 @@ bool IPTVFeederFile::Open(const QString &url)
         VERBOSE(VB_RECORD, LOC + "Open() -- end 1");
         return true;
     }
-        
+
     Q3Url parse(url);
     if (!parse.hasPath() || !parse.isLocalFile())
     {

@@ -5,10 +5,6 @@
 
 // Std C++ headers
 #include <algorithm>
-
-// Qt headers
-#include <Q3DeepCopy>
-
 using namespace std;
 
 // MythTV includes
@@ -572,8 +568,10 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
     uint atsc_key = (atsc_major << 16) | atsc_minor;
 
     QMutexLocker locker(&eitList_lock);
-    db_events.enqueue(new DBEvent(chanid, Q3DeepCopy<QString>(event.title),
-                                  Q3DeepCopy<QString>(ett),
+    QString title = event.title, subtitle = ett;
+    title.detach();
+    subtitle.detach();
+    db_events.enqueue(new DBEvent(chanid, title, subtitle,
                                   starttime, endtime,
                                   fixup[atsc_key], subtitle_type,
                                   audio_properties, video_properties));

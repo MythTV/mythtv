@@ -1,13 +1,11 @@
 #include <qlayout.h>
 #include <qpushbutton.h>
-#include <q3buttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
 #include <qsqldatabase.h>
 #include <qdatetime.h>
 #include <qapplication.h>
 #include <qregexp.h>
-#include <q3header.h>
 #include <QKeyEvent>
 #include <QEvent>
 #include <QPixmap>

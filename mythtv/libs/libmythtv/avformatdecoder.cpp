@@ -7,8 +7,6 @@
 #include <iostream>
 using namespace std;
 
-#include <q3tl.h>
-
 // MythTV headers
 #include "mythconfig.h"
 #include "avformatdecoder.h"
@@ -1816,7 +1814,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     {
         if (tracks[kTrackTypeAudio].size() > 1)
         {
-            qBubbleSort(tracks[kTrackTypeAudio]);
+            stable_sort(tracks[kTrackTypeAudio].begin(),
+                        tracks[kTrackTypeAudio].end());
             sinfo_vec_t::iterator it = tracks[kTrackTypeAudio].begin();
             for (; it != tracks[kTrackTypeAudio].end(); ++it)
             {
@@ -1827,7 +1826,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                                     "Stream id #%1 track #%2 ")
                             .arg(it->stream_id).arg(it->dvd_track_num));
             }
-            qBubbleSort(tracks[kTrackTypeAudio]);
+            stable_sort(tracks[kTrackTypeAudio].begin(),
+                        tracks[kTrackTypeAudio].end());
             int trackNo = ringBuffer->DVD()->GetTrack(kTrackTypeAudio);
             if (trackNo >= (int)GetTrackCount(kTrackTypeAudio))
                 trackNo = GetTrackCount(kTrackTypeAudio) - 1;
@@ -1835,7 +1835,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         }
         if (tracks[kTrackTypeSubtitle].size() > 0)
         {
-            qBubbleSort(tracks[kTrackTypeSubtitle]);
+            stable_sort(tracks[kTrackTypeSubtitle].begin(),
+                        tracks[kTrackTypeSubtitle].end());
             sinfo_vec_t::iterator it = tracks[kTrackTypeSubtitle].begin();
             for(; it != tracks[kTrackTypeSubtitle].end(); ++it)
             {
@@ -1846,7 +1847,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                                 "Stream id #%1 track #%2 ")
                         .arg(it->stream_id).arg(it->dvd_track_num));
             }
-            qBubbleSort(tracks[kTrackTypeSubtitle]);
+            stable_sort(tracks[kTrackTypeSubtitle].begin(),
+                        tracks[kTrackTypeSubtitle].end());
             int trackNo = ringBuffer->DVD()->GetTrack(kTrackTypeSubtitle);
             uint captionmode = GetNVP()->GetCaptionMode();
             int trackcount = (int)GetTrackCount(kTrackTypeSubtitle);

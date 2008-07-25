@@ -120,7 +120,7 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
     if (!useframe)
         widget->setFrameShape(Q3GroupBox::NoFrame);
 
-    layout = new Q3VBoxLayout(widget, margin, space);
+    layout = new QVBoxLayout(widget, margin, space);
 
     if (uselabel)
         widget->setTitle(getLabel());

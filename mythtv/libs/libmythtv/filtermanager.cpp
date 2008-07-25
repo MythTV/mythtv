@@ -8,10 +8,8 @@
 #endif
 
 // Qt headers
-#include <qdir.h>
-#include <qstringlist.h>
-#include <q3strlist.h>
-#include <Q3PtrList>
+#include <QDir>
+#include <QStringList>
 
 // MythTV headers
 #include "filtermanager.h"
@@ -41,41 +39,30 @@ static const char *FmtToString(VideoFrameType ft)
     }
 }
 
-FilterChain::FilterChain(void)
-{
-    setAutoDelete(true);
-}
-
 FilterChain::~FilterChain()
 {
-    clear();
+    vector<VideoFilter*>::iterator it = filters.begin();
+    for (; it != filters.end(); ++it)
+    {
+        VideoFilter *filter = *it;
+        if (filter->opts)
+            free(filter->opts);
+        if (filter->cleanup)
+            filter->cleanup(filter);
+        dlclose(filter->handle);
+        free(filter);
+    }
+    filters.clear();
 }
 
-void FilterChain::ProcessFrame(VideoFrame *Frame)
+void FilterChain::ProcessFrame(VideoFrame *frame)
 {
-    if (!Frame)
+    if (!frame)
         return;
 
-    VideoFilter *VF = first();
-    while (VF)
-    {
-        VF->filter(VF, Frame);
-        VF = next();
-    }
-}
-
-void FilterChain::deleteItem(Q3PtrCollection::Item d)
-{
-    if (del_item)
-    {
-        VideoFilter *Filter = (VideoFilter *)d;
-        if (Filter->opts)
-            free(Filter->opts);
-        if (Filter->cleanup)
-            Filter->cleanup(Filter);
-        dlclose(Filter->handle);
-        free(Filter);
-    }
+    vector<VideoFilter*>::iterator it = filters.begin();
+    for (; it != filters.end(); ++it)
+        (*it)->filter(*it, frame);
 }
 
 FilterManager::FilterManager()
@@ -211,14 +198,14 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     if (Filters.lower() == "none")
         return NULL;
 
-    Q3PtrList<FilterInfo> FiltInfoChain;
+    vector<const FilterInfo*> FiltInfoChain;
     FilterChain *FiltChain = new FilterChain;
-    Q3PtrList<FmtConv> FmtList;
+    vector<FmtConv*> FmtList;
     const FilterInfo *FI;
-    FilterInfo *FI2;
+    const FilterInfo *FI2;
     QString Opts;
     const FilterInfo *Convert = GetFilterInfo("convert");
-    Q3StrList OptsList (TRUE);
+    QStringList OptsList;
     QStringList FilterList = QStringList::split(",", Filters);
     VideoFilter *NewFilt = NULL;
     FmtConv *FC, *FC2, *S1, *S2, *S3;
@@ -228,8 +215,6 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     int cbufsize;
     int postfilt_width = width;
     int postfilt_height = height;
-    FmtList.setAutoDelete(TRUE);
-    OptsList.setAutoDelete(TRUE);
 
     for (QStringList::Iterator i = FilterList.begin();
          i != FilterList.end(); ++i)
@@ -240,8 +225,8 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
 
         if (FI)
         {
-            FiltInfoChain.append(FI);
-            OptsList.append(FiltOpts);
+            FiltInfoChain.push_back(FI);
+            OptsList.push_back(FiltOpts);
         }
         else
         {
@@ -254,11 +239,11 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     }
 
     ifmt = inpixfmt;
-    for (i = 0; i < FiltInfoChain.count(); i++)
+    for (i = 0; i < FiltInfoChain.size(); i++)
     {
         S1 = S2 = S3 = NULL;
-        FI = FiltInfoChain.at(i);
-        if (FiltInfoChain.count() - i == 1)
+        FI = FiltInfoChain[i];
+        if (FiltInfoChain.size() - i == 1)
         {
             for (FC = FI->formats; FC->in != FMT_NONE; FC++)
             {
@@ -275,7 +260,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         }
         else
         {
-            FI2 = FiltInfoChain.at(i+1);
+            FI2 = FiltInfoChain[i+1];
             for (FC = FI->formats; FC->in != FMT_NONE; FC++)
             {
                 for (FC2 = FI2->formats; FC2->in != FMT_NONE; FC2++)
@@ -313,13 +298,13 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
                 FiltInfoChain.clear();
                 break;
             }
-            FiltInfoChain.insert(i, Convert);
+            FiltInfoChain.insert(FiltInfoChain.begin() + i, Convert);
             OptsList.insert(i, QString ());
-            FmtList.append(new FmtConv);
-            if (FmtList.last())
+            FmtList.push_back(new FmtConv);
+            if (FmtList.back())
             {
-                FmtList.last()->in = ifmt;
-                FmtList.last()->out = FC->in;
+                FmtList.back()->in = ifmt;
+                FmtList.back()->out = FC->in;
                 i++;
             }
             else
@@ -330,11 +315,11 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
                 break;
             }
         }
-        FmtList.append(new FmtConv);
-        if (FmtList.last())
+        FmtList.push_back(new FmtConv);
+        if (FmtList.back())
         {
-            FmtList.last()->in = FC->in;
-            FmtList.last()->out = FC->out;
+            FmtList.back()->in = FC->in;
+            FmtList.back()->out = FC->out;
         }
         else
         {
@@ -347,7 +332,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     }
 
     if (ifmt != outpixfmt && outpixfmt != FMT_NONE &&
-        (FiltInfoChain.count() || inpixfmt != FMT_NONE))
+        (FiltInfoChain.size() || inpixfmt != FMT_NONE))
     {
         if (!Convert)
         {
@@ -357,13 +342,13 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         }
         else
         {
-            FiltInfoChain.append(Convert);
-            OptsList.append( QString ());
-            FmtList.append(new FmtConv);
-            if (FmtList.last())
+            FiltInfoChain.push_back(Convert);
+            OptsList.push_back( QString ());
+            FmtList.push_back(new FmtConv);
+            if (FmtList.back())
             {
-                FmtList.last()->in = ifmt;
-                FmtList.last()->out = outpixfmt;
+                FmtList.back()->in = ifmt;
+                FmtList.back()->out = outpixfmt;
             }
             else
             {
@@ -376,27 +361,28 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
 
     nbufsize = -1;
 
-    if (!FiltInfoChain.count())
+    if (!FiltInfoChain.size())
     {
         delete FiltChain;
         FiltChain = NULL;
     }
     
-    for (i = 0; i < FiltInfoChain.count(); i++)
+    for (i = 0; i < FiltInfoChain.size(); i++)
     {
-        NewFilt = LoadFilter(FiltInfoChain.at(i), FmtList.at(i)->in,
-                             FmtList.at(i)->out, postfilt_width, 
-                             postfilt_height, OptsList.at(i));
+        QByteArray tmp = OptsList[i].toLocal8Bit();
+        NewFilt = LoadFilter(FiltInfoChain[i], FmtList[i]->in,
+                             FmtList[i]->out, postfilt_width, 
+                             postfilt_height, tmp.constData());
 
         if (!NewFilt)
         {
             delete FiltChain;
             VERBOSE(VB_IMPORTANT,QString("FilterManager: failed to load "
                         "filter %1 %2->%3 with args %4")
-                    .arg(FiltInfoChain.at(i)->name)
-                    .arg(FmtToString(FmtList.at(i)->in))
-                    .arg(FmtToString(FmtList.at(i)->out))
-                    .arg(OptsList.at(i)?OptsList.at(i):"NULL")
+                    .arg(FiltInfoChain[i]->name)
+                    .arg(FmtToString(FmtList[i]->in))
+                    .arg(FmtToString(FmtList[i]->out))
+                    .arg(OptsList[i])
                    );
             FiltChain = NULL;
             nbufsize = -1;
@@ -404,7 +390,9 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         }
 
         if (NewFilt->filter)
-            FiltChain->append(NewFilt);
+        {
+            FiltChain->Append(NewFilt);
+        }
         else
         {
             if (NewFilt->opts)
@@ -415,7 +403,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
             free(NewFilt);
         }
 
-        switch (FmtList.at(i)->out)
+        switch (FmtList[i]->out)
         {
             case FMT_YV12:
                 cbufsize = postfilt_width * postfilt_height * 3 / 2;
@@ -440,9 +428,9 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     if (FiltChain)
     {
         if (inpixfmt == FMT_NONE)
-            inpixfmt = FmtList.first()->in;
+            inpixfmt = FmtList.front()->in;
         if (outpixfmt == FMT_NONE)
-            inpixfmt = FmtList.last()->out;
+            inpixfmt = FmtList.back()->out;
         width = postfilt_width;
         height = postfilt_height;
     }
@@ -479,13 +467,18 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
 
     bufsize = nbufsize;
 
+    vector<FmtConv*>::iterator it = FmtList.begin();
+    for (; it != FmtList.end(); ++it)
+        delete *it;
+    FmtList.clear();
+
     return FiltChain;
 }
 
-VideoFilter * FilterManager::LoadFilter(FilterInfo *FiltInfo, 
+VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo, 
                                         VideoFrameType inpixfmt,
                                         VideoFrameType outpixfmt, int &width, 
-                                        int &height, char *opts)
+                                        int &height, const char *opts)
 {
     void *handle;
     VideoFilter *Filter;
@@ -539,7 +532,8 @@ VideoFilter * FilterManager::LoadFilter(FilterInfo *FiltInfo,
         return NULL;
     }
 
-    Filter = (*InitFilter)(inpixfmt, outpixfmt, &width, &height, opts);
+    Filter = (*InitFilter)(inpixfmt, outpixfmt, &width, &height,
+                           const_cast<char*>(opts));
 
     if (Filter == NULL)
     {
@@ -554,6 +548,6 @@ VideoFilter * FilterManager::LoadFilter(FilterInfo *FiltInfo,
         Filter->opts = strdup(opts);
     else
         Filter->opts = NULL;
-    Filter->info = FiltInfo;
+    Filter->info = const_cast<FilterInfo*>(FiltInfo);
     return Filter;
 }

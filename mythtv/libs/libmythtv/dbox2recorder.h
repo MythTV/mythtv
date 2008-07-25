@@ -16,7 +16,7 @@
 #include "dtvrecorder.h"
 
 class DBox2Channel;
-class Q3Http;
+class QHttp;
 class QString;
 
 typedef struct stream_meta_
@@ -98,7 +98,7 @@ class DBox2Recorder : public DTVRecorder
     int             httpPort;
     QString         ip;
     bool            isOpen;
-    Q3Http          *http;
+    QHttp          *http;
     DBox2Relay     *m_relay;
     int             m_lastPIDRequestID;
     int             m_lastInfoRequestID;

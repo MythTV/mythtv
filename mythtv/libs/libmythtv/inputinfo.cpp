@@ -1,34 +1,34 @@
 // -*- Mode: c++ -*-
 
-// Qt headers
-#include <q3deepcopy.h>
-
 // MythTV headers
 #include "inputinfo.h"
 
 InputInfo::InputInfo(
     const QString &_name,
     uint _sourceid, uint _inputid, uint _cardid, uint _mplexid) :
-    name(Q3DeepCopy<QString>(_name)),
+    name(_name),
     sourceid(_sourceid),
     inputid(_inputid),
     cardid(_cardid),
     mplexid(_mplexid)
 {
+    name.detach();
 }
 
 InputInfo::InputInfo(const InputInfo &other) :
-    name(Q3DeepCopy<QString>(other.name)),
+    name(other.name),
     sourceid(other.sourceid),
     inputid(other.inputid),
     cardid(other.cardid),
     mplexid(other.mplexid)
 {
+    name.detach();
 }
 
 InputInfo &InputInfo::operator=(const InputInfo &other)
 {
-    name     = Q3DeepCopy<QString>(other.name);
+    name     = other.name;
+    name.detach();
     sourceid = other.sourceid;
     inputid  = other.inputid;
     cardid   = other.cardid;
@@ -49,7 +49,8 @@ bool InputInfo::FromStringList(QStringList::const_iterator &it,
     if (it == end)
         return false;
 
-    name     = Q3DeepCopy<QString>(*it);
+    name     = *it;
+    name.detach();
     name     = (name == "<EMPTY>") ? QString::null : name;
     NEXT();
 
@@ -115,27 +116,34 @@ void TunedInputInfo::ToStringList(QStringList &list) const
 
 ChannelInputInfo::ChannelInputInfo(const ChannelInputInfo &other) :
     InputInfo(*this),
-    startChanNum(Q3DeepCopy<QString>(other.startChanNum)),
-    tuneToChannel(Q3DeepCopy<QString>(other.tuneToChannel)),
-    externalChanger(Q3DeepCopy<QString>(other.externalChanger)),
+    startChanNum(other.startChanNum),
+    tuneToChannel(other.tuneToChannel),
+    externalChanger(other.externalChanger),
     channels(other.channels),
     inputNumV4L(other.inputNumV4L),
     videoModeV4L1(other.videoModeV4L1),
     videoModeV4L2(other.videoModeV4L2)
 {
+    startChanNum.detach();
+    tuneToChannel.detach();
+    externalChanger.detach();
 }
 
 ChannelInputInfo &ChannelInputInfo::operator=(const ChannelInputInfo &other)
 {
     *((InputInfo*)this) = other;
 
-    startChanNum    = Q3DeepCopy<QString>(other.startChanNum);
-    tuneToChannel   = Q3DeepCopy<QString>(other.tuneToChannel);
-    externalChanger = Q3DeepCopy<QString>(other.externalChanger);
+    startChanNum    = other.startChanNum;
+    tuneToChannel   = other.tuneToChannel;
+    externalChanger = other.externalChanger;
     channels        = other.channels;
     inputNumV4L     = other.inputNumV4L;
     videoModeV4L1   = other.videoModeV4L1;
     videoModeV4L2   = other.videoModeV4L2;
+
+    startChanNum.detach();
+    tuneToChannel.detach();
+    externalChanger.detach();
 
     return *this;
 }

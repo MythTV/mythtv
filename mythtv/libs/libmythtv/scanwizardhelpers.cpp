@@ -238,7 +238,8 @@ void post_event(QObject *dest, ScannerEvent::TYPE type, int val)
 void post_event(QObject *dest, ScannerEvent::TYPE type, const QString &val)
 {
     ScannerEvent *e = new ScannerEvent(type);
-    e->strValue(Q3DeepCopy<QString>(val));
+    QString tmp = val; tmp.detach();
+    e->strValue(tmp);
     QApplication::postEvent(dest, e);
 }
 
@@ -312,8 +313,9 @@ void MultiplexSetting::SetSourceID(uint _sourceid)
 InputSelector::InputSelector(
     uint _default_cardid, const QString &_default_inputname) :
     ComboBoxSetting(this), sourceid(0), default_cardid(_default_cardid),
-    default_inputname(Q3DeepCopy<QString>(_default_inputname))
+    default_inputname(_default_inputname)
 {
+    default_inputname.detach();
     setLabel(tr("Input"));
 }
 

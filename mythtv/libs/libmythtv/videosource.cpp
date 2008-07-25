@@ -56,9 +56,10 @@ VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
                                          bool           _must_have_mplexid) :
     ComboBoxSetting(this),
     initial_sourceid(_initial_sourceid),
-    card_types(Q3DeepCopy<QString>(_card_types)),
+    card_types(_card_types),
     must_have_mplexid(_must_have_mplexid)
 {
+    card_types.detach();
     setLabel(tr("Video Source"));
 }
 
@@ -2274,7 +2275,7 @@ void CardInput::CreateNewInputGroup(void)
             gContext->GetMainWindow(), tr("Create Input Group"),
             tr("Enter new group name"), tmp_name);
 
-        new_name = Q3DeepCopy<QString>(tmp_name);
+        new_name = tmp_name;
 
         if (!ok)
             return;

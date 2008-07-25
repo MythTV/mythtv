@@ -6,9 +6,10 @@
 #include <q3valuelist.h>
 #include <q3ptrlist.h>
 
-#include "mythexp.h"
-
+#include <vector>
 using namespace std;
+
+#include "mythexp.h"
 
 class SortableGenericTreeList;
 
@@ -43,7 +44,7 @@ class MPUBLIC GenericTree
     GenericTree *getChildByName(const QString &a_name);
     GenericTree *getChildByInt(int an_int);
 
-    Q3PtrList<GenericTree> *getAllChildren(int ordering_index = -1);
+    vector<GenericTree*> getAllChildren(int ordering_index = -1);
 
     int getChildPosition(GenericTree *child, int ordering_index = -1);
     int getPosition(void);

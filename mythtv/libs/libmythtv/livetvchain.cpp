@@ -112,7 +112,7 @@ void LiveTVChain::FinishedRecording(ProgramInfo *pginfo)
                 .arg(pginfo->recstartts.toString("yyyyMMddhhmmss"))
                 .arg(pginfo->recendts.toString("yyyyMMddhhmmss")));
 
-    Q3ValueList<LiveTVChainEntry>::iterator it;
+    QList<LiveTVChainEntry>::iterator it;
     for (it = m_chain.begin(); it != m_chain.end(); ++it)
     {
         if ((*it).chanid == pginfo->chanid &&
@@ -128,7 +128,7 @@ void LiveTVChain::DeleteProgram(ProgramInfo *pginfo)
 {
     QMutexLocker lock(&m_lock);
 
-    Q3ValueList<LiveTVChainEntry>::iterator it, del;
+    QList<LiveTVChainEntry>::iterator it, del;
     for (it = m_chain.begin(); it != m_chain.end(); ++it)
     {
         if ((*it).chanid == pginfo->chanid &&
@@ -293,7 +293,7 @@ int LiveTVChain::ProgramIsAt(const QString &chanid,
     QMutexLocker lock(&m_lock);
 
     int count = 0;
-    Q3ValueList<LiveTVChainEntry>::const_iterator it;
+    QList<LiveTVChainEntry>::const_iterator it;
     for (it = m_chain.begin(); it != m_chain.end(); ++it, ++count)
     {
         if ((*it).chanid == chanid &&

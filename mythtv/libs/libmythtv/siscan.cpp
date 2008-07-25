@@ -92,7 +92,7 @@ SIScan::SIScan(const QString &_cardtype, ChannelBase *_channel, int _sourceID,
       scanMode(IDLE),
       signalTimeout(signal_timeout),
       channelTimeout(channel_timeout),
-      inputname(Q3DeepCopy<QString>(_inputname)),
+      inputname(_inputname),
       // Settable
       isAnalog(false),
       ignoreAudioOnlyServices(false),
@@ -109,6 +109,8 @@ SIScan::SIScan(const QString &_cardtype, ChannelBase *_channel, int _sourceID,
       // Misc
       scanner_thread_running(false)
 {
+    inputname.detach();
+
     // Initialize statics
     init_freq_tables();
     current = transport_scan_items_it_t( scanTransports.end());
@@ -1029,8 +1031,8 @@ bool SIScan::CheckImportedList(const DTVChannelInfoList &channels,
             found = true;
             if (!channels[i].name.isEmpty())
             {
-                service_name = Q3DeepCopy<QString>(channels[i].name);
-                callsign     = Q3DeepCopy<QString>(channels[i].name);
+                service_name = channels[i].name; service_name.detach();
+                callsign     = channels[i].name; callsign.detach();
             }
         }
     }

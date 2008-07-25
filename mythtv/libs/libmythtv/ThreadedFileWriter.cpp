@@ -12,7 +12,6 @@
 
 // Qt headers
 #include <qstring.h>
-#include <Q3DeepCopy>
 
 // MythTV headers
 #include "ThreadedFileWriter.h"
@@ -120,7 +119,7 @@ void *ThreadedFileWriter::boot_syncer(void *wotsit)
 ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
                                        int pflags, mode_t pmode) :
     // file stuff
-    filename(Q3DeepCopy<QString>(fname)), flags(pflags),
+    filename(fname),                     flags(pflags),
     mode(pmode),                         fd(-1),
     // state
     no_writes(false),                    flush(false),
@@ -132,6 +131,7 @@ ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
     // buffer
     buf(NULL),                           tfw_buf_size(0)
 {
+    filename.detach();
 }
 
 /** \fn ThreadedFileWriter::Open(void)

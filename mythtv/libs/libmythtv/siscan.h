@@ -10,7 +10,6 @@
 #include <qstring.h>
 #include <qmap.h>
 #include <qmutex.h>
-#include <q3valuelist.h>
 #include <qdatetime.h>
 
 // MythTV includes

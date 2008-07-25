@@ -9,8 +9,7 @@ using namespace std;
 
 // Qt headers
 #include <q3networkprotocol.h>
-#include <q3cstring.h>
-#include <qstring.h>
+#include <QString>
 
 class Q3NetworkOperation;
 class Q3UrlOperator;

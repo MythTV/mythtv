@@ -159,7 +159,9 @@ bool IvtvDecoder::GetDeviceNTSC(QString dev)
 
 void IvtvDecoder::SetDeviceInfo(QString dev, bool works, bool ntsc)
 {
-    QString tmpStr = Q3DeepCopy<QString>(dev);
+    QString tmpStr = dev;
+    tmpStr.detach();
+
     DeviceInfo tmp;
     tmp.works = works;
     tmp.ntsc  = ntsc;

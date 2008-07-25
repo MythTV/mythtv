@@ -92,9 +92,11 @@ NuppelDecoder::~NuppelDecoder()
         delete [] strm;
     if (audioSamples)
         delete [] audioSamples;
-    while(! StoredData.isEmpty()) {
-        delete StoredData.first();
-        StoredData.removeFirst();
+
+    while (!StoredData.empty())
+    {
+        delete StoredData.front();
+        StoredData.pop_front();
     }
     CloseAVCodecVideo();
     CloseAVCodecAudio();
@@ -926,15 +928,18 @@ void NuppelDecoder::StoreRawData(unsigned char *newstrm)
     else
         strmcpy = NULL;
 
-    StoredData.append(new RawDataList(frameheader, strmcpy));
+    StoredData.push_back(new RawDataList(frameheader, strmcpy));
 }
 
 // The return value is the number of bytes in StoredData before the 'SV' frame
 long NuppelDecoder::UpdateStoredFrameNum(long framenum)
 {
     long sync_offset = 0;
-    for (RawDataList *data = StoredData.first(); data; data = StoredData.next())
+
+    list<RawDataList*>::iterator it = StoredData.begin();
+    for ( ; it != StoredData.end(); ++it)
     {
+        RawDataList *data = *it;
         if (data->frameheader.frametype == 'S' &&
             data->frameheader.comptype == 'V')
         {
@@ -952,8 +957,9 @@ void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid,
                                     long timecodeOffset)
 {
     RawDataList *data;
-    while(! StoredData.isEmpty()) {
-        data = StoredData.first();
+    while (!StoredData.empty())
+    {
+        data = StoredData.front();
 
         if (data->frameheader.frametype != 'S')
             data->frameheader.timecode -= timecodeOffset;
@@ -964,7 +970,7 @@ void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid,
             if (data->packet)
                 rb->Write(data->packet, data->frameheader.packetlength);
         }
-        StoredData.removeFirst();
+        StoredData.pop_front();
         delete data;
     }
 }
@@ -972,9 +978,10 @@ void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid,
 void NuppelDecoder::ClearStoredData()
 {
     RawDataList *data;
-    while(!StoredData.isEmpty()) {
-        data = StoredData.first();
-        StoredData.removeFirst();
+    while (!StoredData.empty())
+    {
+        data = StoredData.front();
+        StoredData.pop_front();
         delete data;
     }
 }

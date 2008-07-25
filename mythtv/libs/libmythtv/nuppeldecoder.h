@@ -1,8 +1,10 @@
 #ifndef NUPPELDECODER_H_
 #define NUPPELDECODER_H_
 
-#include <qmap.h>
-#include <q3ptrlist.h>
+#include <list>
+using namespace std;
+
+#include <QMap>
 
 #include "programinfo.h"
 #include "format.h"
@@ -114,7 +116,7 @@ class NuppelDecoder : public DecoderBase
     unsigned char *buf2;
     unsigned char *planes[3];
 
-    Q3PtrList <RawDataList> StoredData;
+    list<RawDataList*> StoredData;
 
     int videosizetotal;
     int videoframesread;

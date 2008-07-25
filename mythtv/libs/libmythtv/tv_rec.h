@@ -1,15 +1,17 @@
 #ifndef TVREC_H
 #define TVREC_H
 
-#include <qstring.h>
+// POSIX headers
 #include <pthread.h>
-#include <qdatetime.h>
-#include <q3valuelist.h>
-#include <q3ptrlist.h>
-#include <qmap.h>
-#include <qstringlist.h>
-#include <qwaitcondition.h>
 
+// Qt headers
+#include <QWaitCondition>
+#include <QStringList>
+#include <QDateTime>
+#include <QString>
+#include <QMap>
+
+// MythTV headers
 #include "inputinfo.h"
 #include "inputgroupmap.h"
 #include "mythdeque.h"

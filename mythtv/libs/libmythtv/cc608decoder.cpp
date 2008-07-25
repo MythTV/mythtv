@@ -5,9 +5,7 @@
 #include <algorithm>
 using namespace std;
 
-#include <qstringlist.h>
-#include <Q3CString>
-#include <Q3DeepCopy>
+#include <QStringList>
 
 #include "format.h"
 #include "cc608decoder.h"
@@ -970,7 +968,10 @@ QString CC608Decoder::GetRatingString(uint i, bool future) const
     {
         uint cf = (future) ? 1 : 0;
         if (!(xds_rating[cf][i]&0xF0))
-            return Q3DeepCopy<QString>(main);
+        {
+            main.detach();
+            return main;
+        }
 
         main += " ";
         // TPG flags
@@ -984,13 +985,16 @@ QString CC608Decoder::GetRatingString(uint i, bool future) const
             main += "L"; // Language
     }
 
-    return Q3DeepCopy<QString>(main);
+    main.detach();
+    return main;
 }
 
 QString CC608Decoder::GetProgramName(bool future) const
 {
     QMutexLocker locker(&xds_lock);
-    return Q3DeepCopy<QString>(xds_program_name[(future) ? 1 : 0]);
+    QString ret = xds_program_name[(future) ? 1 : 0];
+    ret.detach();
+    return ret;
 }
 
 QString CC608Decoder::GetProgramType(bool future) const
@@ -1006,7 +1010,8 @@ QString CC608Decoder::GetProgramType(bool future) const
         tmp += xds_program_type_string[program_type[i]];
     }
 
-    return Q3DeepCopy<QString>(tmp);
+    tmp.detach();
+    return tmp;
 }
 
 QString CC608Decoder::GetXDS(const QString &key) const
@@ -1038,9 +1043,17 @@ QString CC608Decoder::GetXDS(const QString &key) const
         return GetProgramType(true);
 
     else if (key == "callsign")
-        return Q3DeepCopy<QString>(xds_net_call);
+    {
+        QString ret = xds_net_call;
+        ret.detach();
+        return ret;
+    }
     else if (key == "channame")
-        return Q3DeepCopy<QString>(xds_net_name);
+    {
+        QString ret = xds_net_name;
+        ret.detach();
+        return ret;
+    }
     else if (key == "tsid")
         return QString::number(xds_tsid);
 

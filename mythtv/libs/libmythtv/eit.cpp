@@ -4,9 +4,6 @@
 #include <algorithm>
 using namespace std;
 
-// Qt includes
-#include <q3deepcopy.h>
-
 // MythTV includes
 #include "libmythdb/mythdb.h"
 #include "eit.h"
@@ -14,8 +11,9 @@ using namespace std;
 #include "programinfo.h" // for subtitle types and audio and video properties
 
 DBPerson::DBPerson(Role _role, const QString &_name) :
-    role(_role), name(Q3DeepCopy<QString>(_name))
+    role(_role), name(_name)
 {
+    name.detach();
 }
 
 QString DBPerson::GetRole(void) const

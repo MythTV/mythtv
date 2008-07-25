@@ -3268,31 +3268,24 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
         {
             // add max of lcd height menu items either side of the selected node
             // let the lcdserver figure out which ones to display
-            GenericTree *lnode;
             int pos = parent->getChildPosition(current_node, visual_order);
             bool selected;
 
-            Q3PtrList<GenericTree> *nodes = parent->getAllChildren(visual_order);
+            vector<GenericTree*> nodes = parent->getAllChildren(visual_order);
             QList<LCDMenuItem> menuItems;
 
-            if (pos > (int)lcddev->getLCDHeight())
-                nodes->at(pos - lcddev->getLCDHeight());
-            else
-                nodes->first();
+            uint i =
+                (pos > (int)lcddev->getLCDHeight()) ?
+                pos - lcddev->getLCDHeight() : 0;
 
             uint count = 0;
 
-            while ((lnode = nodes->current()) != 0
-                   && count < lcddev->getLCDHeight() * 2)
+            for (;i < nodes.size() && (count < lcddev->getLCDHeight() * 2); i++)
             {
-                if (lnode == current_node)
-                    selected = true;
-                else
-                    selected = false;
+                selected = (nodes[i] == current_node);
 
                 menuItems.append(LCDMenuItem(selected, NOTCHECKABLE,
-                                             lnode->getString()));
-                nodes->next();
+                                             nodes[i]->getString()));
                 ++count;
             }
 

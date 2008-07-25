@@ -14,7 +14,7 @@
 
 class QString;
 class QDateTime;
-class Q3Http;
+class QHttp;
 class DBox2Channel;
 class DBox2DBOptions;
 
@@ -51,7 +51,7 @@ class DBox2EPG : public QThread
     int  GetChannelID(const QString& channelnumber);
     void run(void);
 
-    Q3Http             *http;
+    QHttp             *http;
     DBox2DBOptions    *m_dbox2options;
     DBox2Channel      *m_dbox2channel;
     QMap<int,QString>  m_channelnumbers;

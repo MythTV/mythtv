@@ -1,15 +1,12 @@
 #ifndef CUSTOMEDIT_H_
 #define CUSTOMEDIT_H_
 
-#include <qdatetime.h>
-#include <q3hbox.h>
+#include <QDateTime>
 #include <QLabel>
-#include "libmyth/mythwidgets.h"
+
+#include "mythwidgets.h"
 #include "NuppelVideoPlayer.h"
 
-#include <pthread.h>
-
-class QLabel;
 class ProgramInfo;
 
 class MPUBLIC CustomEdit : public MythDialog

@@ -4,7 +4,6 @@
 
 #include <unistd.h>
 #include <qtextcodec.h>
-#include <q3deepcopy.h>
 
 // Only some of the QTextCodec calls are reenterant.
 // If you use this please verify that you are using a reenterant call.
@@ -178,12 +177,20 @@ QString ContentDescriptor::GetDescription(uint i) const
     // Try to get detailed description
     map<uint,QString>::const_iterator it = categoryDesc.find(Nibble(i));
     if (it != categoryDesc.end())
-        return Q3DeepCopy<QString>((*it).second);
+    {
+        QString ret = (*it).second;
+        ret.detach();
+        return ret;
+    }
 
     // Fall back to category description
     it = categoryDesc.find(Nibble1(i)<<4);
     if (it != categoryDesc.end())
-        return Q3DeepCopy<QString>((*it).second);
+    {
+        QString ret = (*it).second;
+        ret.detach();
+        return ret;
+    }
 
     // Found nothing? Just return empty string.
     return "";

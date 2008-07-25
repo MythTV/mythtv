@@ -12,7 +12,6 @@
 #include <qfile.h>
 #include <qfileinfo.h>
 #include <qdatastream.h>
-#include <q3deepcopy.h>
 
 // MythTV headers
 #include "mythcontext.h"
@@ -41,7 +40,7 @@ OSDImageCacheValue::OSDImageCacheValue(
     m_yuv(yuv),         m_ybuffer(ybuffer),
     m_ubuffer(ubuffer), m_vbuffer(vbuffer),
     m_alpha(alpha),     m_imagesize(imagesize),
-    m_cacheKey(Q3DeepCopy<QString>(cacheKey))
+    m_cacheKey(cacheKey)
 {
     uint yuv_size = m_imagesize.width() * m_imagesize.height() * 3 / 2;
     m_size_in_bytes =
@@ -64,12 +63,9 @@ OSDImageCacheValue::~OSDImageCacheValue()
  *  \brief Constructor, initializes the internal cache structures.
  */
 OSDImageCache::OSDImageCache() : 
-    m_cacheLock(true), m_imageCache(kMaximumMemoryCacheSize, 50),
-    m_memHits(0), m_diskHits(0), m_misses(0) 
+    m_cacheLock(true),
+    m_memHits(0), m_diskHits(0), m_misses(0), m_cacheSize(0)
 {
-    // When the cache gets too large, items are
-    // automatically deleted from it in LRU order.
-    m_imageCache.setAutoDelete(true);
 }
 
 /** \fn OSDImageCache::~OSDImageCache()
@@ -106,7 +102,7 @@ bool OSDImageCache::Contains(const QString &key, bool useFile) const
 {
     QMutexLocker locker(&m_cacheLock);
 
-    if (m_imageCache.find(key) != NULL)
+    if (m_imageCache.find(key) != m_imageCache.end())
         return true;
 
     if (!useFile)
@@ -158,11 +154,13 @@ bool OSDImageCache::InFileCache(const QString &key) const
 OSDImageCacheValue *OSDImageCache::Get(const QString &key, bool useFile)
 {
     QMutexLocker locker(&m_cacheLock);
-    OSDImageCacheValue* item = m_imageCache.find(key);
-    if (item)
+    img_cache_t::iterator it = m_imageCache.find(key);
+    if (it != m_imageCache.end())
     {
         m_memHits++;
-        return m_imageCache.take(key);
+        OSDImageCacheValue *tmp = *it;
+        m_imageCache.erase(it);
+        return tmp;
     }
 
     if (!useFile || !InFileCache(key))
@@ -229,11 +227,47 @@ void OSDImageCache::Insert(OSDImageCacheValue *value)
     if (!value)
         return;
 
-    QMutexLocker locker(&m_cacheLock);
-    if (!m_imageCache.insert(value->GetKey(), value, value->GetSize()))
+    if (value->GetSize() >= kMaximumMemoryCacheSize)
     {
-        VERBOSE(VB_IMPORTANT, 
-                LOC_ERR + QString("inserting image to memory cache failed"));
+        delete value;
+        return;
+    }
+
+    value->m_time = QDateTime::currentDateTime().toTime_t();
+
+    QMutexLocker locker(&m_cacheLock);
+    img_cache_t::iterator it = m_imageCache.find(value->GetKey());
+    if (it != m_imageCache.end())
+    {
+        m_cacheSize -= (*it)->GetSize();
+        delete *it;
+        *it = value;
+        m_cacheSize += value->GetSize();
+    }
+    else
+    {
+        m_imageCache[value->GetKey()] = value;
+        m_cacheSize += value->GetSize();
+    }
+
+    // delete the oldest cached images until we fall below threshold.
+    while (m_cacheSize >= kMaximumMemoryCacheSize && m_imageCache.size())
+    {
+        img_cache_t::iterator mit = m_imageCache.begin();
+        uint min_time = (*mit)->m_time;
+        img_cache_t::iterator it = m_imageCache.begin();
+        for ( ; it != m_imageCache.end(); ++it)
+        {
+            if ((*it)->m_time < min_time)
+            {
+                min_time = (*it)->m_time;
+                mit = it;
+            }
+        }
+
+        m_cacheSize -= (*mit)->GetSize();
+        delete *mit;
+        m_imageCache.erase(mit);
     }
 }
 
@@ -300,6 +334,10 @@ QString OSDImageCache::ExtractOriginal(const QString &key)
 void OSDImageCache::Reset(void)
 {
     QMutexLocker locker(&m_cacheLock);
-    // this also deletes the images due to setAutoDelete(true)
+
+    img_cache_t::iterator it = m_imageCache.begin();
+    for (; it != m_imageCache.end(); ++it)
+        delete *it;
     m_imageCache.clear();
+    m_cacheSize = 0;
 }

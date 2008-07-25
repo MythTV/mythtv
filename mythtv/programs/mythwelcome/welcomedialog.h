@@ -90,7 +90,7 @@ class WelcomeDialog : public MythThemedDialog
     uint           m_statusListNo;
     QStringList    m_statusList;
      
-    Q3PtrList<TunerStatus> m_tunerList;
+    vector<TunerStatus> m_tunerList;
     ProgramDetailList   m_scheduledList;
 
     QMutex      m_RecListUpdateMuxtex;

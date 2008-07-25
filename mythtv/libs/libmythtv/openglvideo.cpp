@@ -806,6 +806,12 @@ void OpenGLVideo::SetDeinterlacing(bool deinterlacing)
     gl_context->MakeCurrent(false);
 }
 
+void OpenGLVideo::SetSoftwareDeinterlacer(const QString &filter)
+{
+    softwareDeinterlacer = filter;
+    softwareDeinterlacer.detach();
+}
+
 // locking ok
 void OpenGLVideo::PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
                                long long frame)

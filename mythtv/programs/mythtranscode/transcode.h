@@ -34,7 +34,7 @@ class Transcode : public QObject
     RingBuffer *inRingBuffer;
     RingBuffer *outRingBuffer;
     FIFOWriter::FIFOWriter *fifow;
-    Q3PtrList<struct kfatable_entry> *kfa_table;
+    vector<struct kfatable_entry> *kfa_table;
     bool showprogress;
 
     QString recorderOptions;

@@ -427,30 +427,31 @@ void UIListTreeType::FillLevelFromTree(UIListGenericTree *item,
 
     ClearLevel(list);
 
-    Q3PtrList<GenericTree> *itemlist = item->getAllChildren();
+    vector<GenericTree*> itemlist = item->getAllChildren();
 
-    Q3PtrListIterator<GenericTree> it(*itemlist);
-    GenericTree *child;
+    vector<GenericTree*>::const_iterator it = itemlist.begin();
 
-    while ((child = it.current()) != 0)
+    for ( ; it != itemlist.end(); ++it)
     {
-        UIListGenericTree *uichild = (UIListGenericTree *)child;
+        UIListGenericTree *uichild =
+            dynamic_cast<UIListGenericTree*>(*it);
+
+        if (!uichild)
+            continue;
 
         UIListBtnTypeItem *newitem;
 
         int check = uichild->getCheck();
-        newitem = new UIListBtnTypeItem(list, child->getString(),
+        newitem = new UIListBtnTypeItem(list, uichild->getString(),
                                         uichild->getImage(), (check >= 0),
                                         (UIListBtnTypeItem::CheckState)check,
-                                        (child->childCount() > 0));
+                                        (uichild->childCount() > 0));
         newitem->setData(uichild);
 
         uichild->setItem(newitem);
 
         if (!uichild->getActive())
             newitem->setOverrideInactive(true);
-
-        ++it;
     }
 }
 

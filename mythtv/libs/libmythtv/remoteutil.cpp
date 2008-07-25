@@ -670,7 +670,7 @@ int RemoteGetRecordingStatus(ProgramInfo *pginfo, int overrecsecs,
 }
 
 bool RemoteGetRecordingStatus(
-    Q3PtrList<TunerStatus> *tunerList, bool list_inactive)
+    vector<TunerStatus> *tunerList, bool list_inactive)
 {
     bool isRecording = false;
     vector<uint> cardlist = CardUtil::GetCardList();
@@ -732,17 +732,17 @@ bool RemoteGetRecordingStatus(
 
         if (tunerList)
         {
-            TunerStatus *tuner = new TunerStatus;
-            tuner->id          = cardid;
-            tuner->isRecording = ((kState_RecordingOnly     == state) ||
+            TunerStatus tuner;
+            tuner.id          = cardid;
+            tuner.isRecording = ((kState_RecordingOnly     == state) ||
                                   (kState_WatchingRecording == state));
-            tuner->channame    = channelName;
-            tuner->title       = (kState_ChangingState == state) ?
+            tuner.channame    = channelName;
+            tuner.title       = (kState_ChangingState == state) ?
                 QObject::tr("Error querying recorder state") : title;
-            tuner->subtitle    = subtitle;
-            tuner->startTime   = dtStart;
-            tuner->endTime     = dtEnd;
-            tunerList->append(tuner);
+            tuner.subtitle    = subtitle;
+            tuner.startTime   = dtStart;
+            tuner.endTime     = dtEnd;
+            tunerList->push_back(tuner);
         }
     }
 

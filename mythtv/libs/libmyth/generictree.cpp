@@ -277,12 +277,24 @@ int GenericTree::siblingCount(void)
     return 1;
 }
 
-Q3PtrList<GenericTree> *GenericTree::getAllChildren(int ordering_index)
+vector<GenericTree*> GenericTree::getAllChildren(int ordering_index)
 {
-    if (ordering_index == -1)
-        return m_subnodes;
+    vector<GenericTree*> list;
 
-    return m_ordered_subnodes;
+    if (ordering_index == -1)
+    {
+        SortableGenericTreeList::iterator it = m_subnodes->begin();
+        for (; it != m_subnodes->end(); ++it)
+            list.push_back(*it);
+    }
+    else
+    {
+        SortableGenericTreeList::iterator it = m_ordered_subnodes->begin();
+        for (; it != m_ordered_subnodes->end(); ++it)
+            list.push_back(*it);
+    }
+
+    return list;
 }
 
 GenericTree* GenericTree::getChildAt(uint reference, int ordering_index)

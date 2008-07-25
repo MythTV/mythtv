@@ -22,7 +22,6 @@
 #include "libmyth/mythwidgets.h"
 #include "programinfo.h"
 
-class Q3ListView;
 class ProgramInfo;
 class QWidget;
 class TV;

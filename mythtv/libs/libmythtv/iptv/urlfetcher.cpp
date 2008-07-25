@@ -66,9 +66,9 @@ QString URLFetcher::FetchData(const QString &url, bool inQtThread)
     QString ret = QString::null;
     if (instance->state == Q3NetworkProtocol::StDone)
     {
-        ret = Q3DeepCopy<QString>(
-            QString::fromUtf8((const char*) &instance->buf[0],
-                              instance->buf.size()));
+        ret = QString::fromUtf8(
+            reinterpret_cast<const char*>(&instance->buf[0]),
+            instance->buf.size());
     }
 
     instance->deleteLater();

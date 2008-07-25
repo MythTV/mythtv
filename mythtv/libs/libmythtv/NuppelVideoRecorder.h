@@ -28,7 +28,6 @@ using namespace std;
 // Qt headers
 #include <qstring.h>
 #include <qmap.h>
-#include <Q3PtrList>
 
 // MythTV headers
 #include "recorderbase.h"
@@ -92,7 +91,8 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Reader
     void StreamAllocate(void);
     void WriteHeader(void);
     void WriteSeekTable(void);
-    void WriteKeyFrameAdjustTable(Q3PtrList<struct kfatable_entry> *kfa_table);
+    void WriteKeyFrameAdjustTable(
+        const vector<struct kfatable_entry> &kfa_table);
     void UpdateSeekTable(int frame_num, long offset = 0);
 
     bool SetupAVCodecVideo(void);

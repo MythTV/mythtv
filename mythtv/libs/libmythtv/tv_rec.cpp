@@ -13,7 +13,6 @@ using namespace std;
 // Qt headers
 #include <qapplication.h>
 #include <qsqldatabase.h>
-#include <q3socket.h>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -2251,7 +2250,8 @@ bool TVRec::CheckChannel(QString name) const
  */
 static QString add_spacer(const QString &channel, const QString &spacer)
 {
-    QString chan = Q3DeepCopy<QString>(channel);
+    QString chan = channel;
+    chan.detach();
     if ((chan.length() >= 2) && !spacer.isEmpty())
         return chan.left(chan.length()-1) + spacer + chan.right(1);
     return chan;
@@ -2358,7 +2358,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
 
     if (fchanid.size() == 1) // Unique channel...
     {
-        needed_spacer = Q3DeepCopy<QString>(fspacer[0]);
+        needed_spacer = fspacer[0];
         bool nc       = (fchannum[0] != add_spacer(prefix, fspacer[0]));
 
         is_complete_valid_channel_on_rec = (nc) ? 0 : fcardid[0];
@@ -2402,7 +2402,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     for (uint i = 0; (i < fspacer.size() && spacer_needed); i++)
         spacer_needed = !fspacer[i].isEmpty();
     if (spacer_needed)
-        needed_spacer = Q3DeepCopy<QString>(fspacer[0]);
+        needed_spacer = fspacer[0];
 
     // If it isn't useful to wait for more characters,
     // then try to commit to any true match immediately.
@@ -2410,7 +2410,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     {
         if (fchannum[i] == add_spacer(prefix, fspacer[i]))
         {
-            needed_spacer = Q3DeepCopy<QString>(fspacer[i]);
+            needed_spacer = fspacer[i];
             is_complete_valid_channel_on_rec = fcardid[i];
             return true;
         }
@@ -3383,7 +3383,7 @@ bool TVRec::TuningOnSameMultiplex(TuningRequest &request)
 
     uint    sourceid   = channel->GetCurrentSourceID();
     QString oldchannum = channel->GetCurrentName();
-    QString newchannum = Q3DeepCopy<QString>(request.channel);
+    QString newchannum = request.channel;
 
     if (ChannelUtil::IsOnSameMultiplex(sourceid, newchannum, oldchannum))
     {

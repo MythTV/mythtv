@@ -1,7 +1,6 @@
 #include "mythcontext.h"
 #include "libmythdb/mythdb.h"
 #include <qsqldatabase.h>
-#include <q3header.h>
 #include <qcursor.h>
 #include <qlayout.h>
 #include <iostream>

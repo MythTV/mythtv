@@ -1,6 +1,5 @@
 #include "signalmonitorvalue.h"
 #include <qobject.h>
-#include <q3deepcopy.h>
 
 bool SignalMonitorValue::run_static_init = true;
 QStringList SignalMonitorValue::ERROR_NO_CHANNEL;
@@ -35,13 +34,16 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
                                        bool _high_threshold,
                                        int _min, int _max,
                                        int _timeout) :
-    name(Q3DeepCopy<QString>(_name)),
-    noSpaceName(Q3DeepCopy<QString>(_noSpaceName)),
+    name(_name),
+    noSpaceName(_noSpaceName),
     value(0),
     threshold(_threshold),
     minval(_min), maxval(_max), timeout(_timeout),
     high_threshold(_high_threshold), set(false)
 {
+    name.detach();
+    noSpaceName.detach();
+
     Init();
 #if DEBUG_SIGNAL_MONITOR_VALUE
     cerr<<"SignalMonitorValue("<<name<<", "<<noSpaceName<<", "<<value<<", "
@@ -56,13 +58,16 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
                                        bool _high_threshold,
                                        int _min, int _max,
                                        int _timeout, bool _set) :
-    name(Q3DeepCopy<QString>(_name)),
-    noSpaceName(Q3DeepCopy<QString>(_noSpaceName)),
+    name(_name),
+    noSpaceName(_noSpaceName),
     value(_value),
     threshold(_threshold),
     minval(_min), maxval(_max), timeout(_timeout),
     high_threshold(_high_threshold), set(_set)
 {
+    name.detach();
+    noSpaceName.detach();
+
     Init();
 #if DEBUG_SIGNAL_MONITOR_VALUE
     cerr<<"SignalMonitorValue("<<name<<", "<<noSpaceName<<", "<<value<<", "
@@ -76,7 +81,9 @@ QString SignalMonitorValue::GetName(void) const
     if (name.isNull())
         return QString::null;
 
-    return Q3DeepCopy<QString>(name);
+    QString ret = name;
+    ret.detach();
+    return ret;
 }
 
 QString SignalMonitorValue::GetShortName(void) const
@@ -84,7 +91,9 @@ QString SignalMonitorValue::GetShortName(void) const
     if (noSpaceName.isNull())
         return QString::null;
 
-    return Q3DeepCopy<QString>(noSpaceName);
+    QString ret = noSpaceName;
+    ret.detach();
+    return ret;
 }
 
 bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
@@ -119,6 +128,9 @@ bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
     SetTimeout(vals[5].toInt());
 
     set = (bool) vals[7].toInt();
+
+    name.detach();
+    noSpaceName.detach();
 
     return true;
 }

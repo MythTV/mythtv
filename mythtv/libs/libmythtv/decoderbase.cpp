@@ -325,7 +325,7 @@ bool DecoderBase::SyncPositionMap(void)
         }
     }
 
-    bool ret_val = m_positionMap.size() > (int)old_posmap_size;
+    bool ret_val = m_positionMap.size() > old_posmap_size;
     if (ret_val && keyframedist > 0)
     {
         long long totframes;
@@ -436,7 +436,7 @@ void DecoderBase::SetPositionMap(void)
     if (m_playbackinfo && (positionMapType != MARK_UNSET)) 
     {
         QMap<long long, long long> posMap;
-        for (int i=0; i < m_positionMap.size(); i++) 
+        for (uint i = 0; i < m_positionMap.size(); i++) 
             posMap[m_positionMap[i].index] = m_positionMap[i].pos;
     
         m_playbackinfo->SetPositionMap(posMap, positionMapType);
@@ -503,7 +503,7 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
     while (e.pos < 0)
     {
         pos_idx++;
-        if (pos_idx >= m_positionMap.size())
+        if (pos_idx >= (int)m_positionMap.size())
             return false;
 
         e = m_positionMap[pos_idx];

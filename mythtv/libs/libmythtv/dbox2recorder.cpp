@@ -19,8 +19,7 @@
 using namespace std;
 
 // Qt headers
-#include <q3http.h>
-#include <q3deepcopy.h>
+#include <QHttp>
 
 // MythTV headers
 #include "dbox2recorder.h"
@@ -107,7 +106,7 @@ DBox2Recorder::DBox2Recorder(TVRec *rec, DBox2Channel *channel)
       // ptr to DBox2Channel
       m_channel(channel),
       // Connection relevant members
-      port(-1), httpPort(-1), ip(""), isOpen(false), http(new Q3Http()),
+      port(-1), httpPort(-1), ip(""), isOpen(false), http(new QHttp()),
       m_relay(new DBox2Relay(this)),
       m_lastPIDRequestID(-1), m_lastInfoRequestID(-1), lastpacket(0),
       // Buffer info
@@ -208,7 +207,7 @@ bool DBox2Recorder::RequestStream()
     VERBOSE(VB_RECORD, LOC + QString("Retrieving PIDs from %1:%2...")
             .arg(ip).arg(httpPort));
 
-    Q3HttpRequestHeader header( "GET", "/control/zapto?getallpids" );
+    QHttpRequestHeader header( "GET", "/control/zapto?getallpids" );
     header.setValue("Host", ip);
     http->setHost(ip, httpPort);
     m_lastPIDRequestID = http->request(header);
@@ -228,7 +227,7 @@ bool DBox2Recorder::RequestInfo()
     VERBOSE(VB_RECORD, LOC + QString("Retrieving Info from %1:%2...")
             .arg(ip).arg(httpPort));
 
-    Q3HttpRequestHeader header( "GET", "/control/info?streaminfo" );
+    QHttpRequestHeader header( "GET", "/control/info?streaminfo" );
     header.setValue("Host", ip);
     http->setHost(ip, httpPort);
     m_lastInfoRequestID = http->request(header);
@@ -387,10 +386,11 @@ void DBox2Recorder::SetOptionsFromProfile(RecordingProfile *profile,
 
 void DBox2Recorder::SetOption(const QString &name, const QString &value)
 {
-    if (name == "ip")
-        ip = Q3DeepCopy<QString>(value);
-    if (name == "host")
-        ip = Q3DeepCopy<QString>(value);
+    if ((name == "ip") || (name == "host"))
+    {
+        ip = value;
+        ip.detach();
+    }
 }
 
 void DBox2Recorder::SetOption(const QString &name, int value)

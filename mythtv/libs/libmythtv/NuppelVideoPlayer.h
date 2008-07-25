@@ -140,8 +140,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetRingBuffer(RingBuffer *rbuf)      { ringBuffer = rbuf; }
     void SetLiveTVChain(LiveTVChain *tvchain) { livetvchain = tvchain; }
     void SetLength(int len)                   { totalLength = len; }
-    void SetVideoFilters(const QString &override)
-        { videoFiltersOverride = Q3DeepCopy<QString>(override); }
+    void SetVideoFilters(const QString &override);
     void SetFramesPlayed(long long played)    { framesPlayed = played; }
     void SetEof(void)                         { eof = true; }
     void SetPipPlayer(NuppelVideoPlayer *pip)

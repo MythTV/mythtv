@@ -4,7 +4,6 @@
 #include <qstring.h>
 #include <qrect.h>
 #include <qmap.h>
-#include <q3valuelist.h>
 #include <QKeyEvent>
 #include <vector>
 #include <qobject.h>

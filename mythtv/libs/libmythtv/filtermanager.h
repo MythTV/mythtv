@@ -13,22 +13,22 @@ using namespace std;
 
 // Qt headers
 #include <QString>
-#include <Q3PtrList>
 
 typedef map<QString,void*>       library_map_t;
 typedef map<QString,FilterInfo*> filter_map_t;
 
-class FilterChain : public Q3PtrList<VideoFilter>
+class FilterChain
 {
   public:
-    FilterChain();
-
+    FilterChain() { }
     virtual ~FilterChain();
 
     void ProcessFrame(VideoFrame *Frame);
 
+    void Append(VideoFilter *f) { filters.push_back(f); }
+
   private:
-    void deleteItem(Q3PtrCollection::Item d);
+    vector<VideoFilter*> filters;
 };
 
 class FilterManager
@@ -37,9 +37,9 @@ class FilterManager
     FilterManager();
    ~FilterManager();
 
-    VideoFilter *LoadFilter(FilterInfo *Filt, VideoFrameType inpixfmt,
+    VideoFilter *LoadFilter(const FilterInfo *Filt, VideoFrameType inpixfmt,
                             VideoFrameType outpixfmt, int &width,
-                            int &height, char *opts);
+                            int &height, const char *opts);
 
     FilterChain *LoadFilters(QString filters, VideoFrameType &inpixfmt,
                              VideoFrameType &outpixfmt, int &width,

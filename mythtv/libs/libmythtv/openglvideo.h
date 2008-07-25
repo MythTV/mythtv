@@ -7,7 +7,6 @@ using namespace std;
 
 #include <qrect.h>
 #include <qmap.h>
-#include <Q3DeepCopy>
 
 #include "videooutbase.h"
 
@@ -77,8 +76,7 @@ class OpenGLVideo
     void SetDeinterlacing(bool deinterlacing);
     QString GetDeinterlacer(void) const
          { return FilterToString(GetDeintFilter()); };
-    void SetSoftwareDeinterlacer(const QString &filter)
-         { softwareDeinterlacer = Q3DeepCopy<QString>(filter); };
+    void SetSoftwareDeinterlacer(const QString &filter);
 
     void PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
                       long long frame);

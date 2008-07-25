@@ -1,5 +1,6 @@
 // -*- Mode: c++ -*-
 #include <algorithm>
+using namespace std;
 
 #include "videodisplayprofile.h"
 #include "libmyth/mythcontext.h"
@@ -264,7 +265,8 @@ void VideoDisplayProfile::SetVideoRenderer(const QString &video_renderer)
     VERBOSE(VB_PLAYBACK, LOC +
             QString("SetVideoRenderer(%1)").arg(video_renderer));
 
-    last_video_renderer = Q3DeepCopy<QString>(video_renderer);
+    last_video_renderer = video_renderer;
+    last_video_renderer.detach();
 
     if (video_renderer == GetVideoRenderer())
     {
@@ -323,7 +325,8 @@ QString VideoDisplayProfile::GetFilteredDeint(const QString &override)
     VERBOSE(VB_PLAYBACK, LOC + QString("GetFilteredDeint(%1) : %2 -> '%3'")
             .arg(override).arg(renderer).arg(deint));
 
-    return Q3DeepCopy<QString>(deint);
+    deint.detach();
+    return deint;
 }
 
 QString VideoDisplayProfile::GetPreference(const QString &key) const
@@ -337,7 +340,9 @@ QString VideoDisplayProfile::GetPreference(const QString &key) const
     if (it == pref.end())
         return QString::null;
 
-    return Q3DeepCopy<QString>(*it);
+    QString pref = *it;
+    pref.detach();
+    return pref;
 }
 
 void VideoDisplayProfile::SetPreference(
@@ -346,7 +351,11 @@ void VideoDisplayProfile::SetPreference(
     QMutexLocker locker(&lock);
 
     if (!key.isEmpty())
-        pref[key] = Q3DeepCopy<QString>(value);
+    {
+        QString tmp = value;
+        tmp.detach();
+        pref[key] = tmp;
+    }
 }
 
 item_list_t::const_iterator VideoDisplayProfile::FindMatch(
@@ -602,11 +611,13 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
         dec_name["ivtv"]     = QObject::tr("PVR-350 decoder");
     }
 
+    QString ret = decoder;
     pref_map_t::const_iterator it = dec_name.find(decoder);
     if (it != dec_name.end())
-        return Q3DeepCopy<QString>(*it);
+        ret = *it;
 
-    return Q3DeepCopy<QString>(decoder);
+    ret.detach();
+    return ret;
 }
 
 
@@ -1068,8 +1079,9 @@ QStringList VideoDisplayProfile::GetVideoRenderers(const QString &decoder)
     safe_map_t::const_iterator it = safe_renderer.find(decoder);
     QStringList tmp;
     if (it != safe_renderer.end())
-        tmp = Q3DeepCopy<QStringList>(*it);
+        tmp = *it;
 
+    tmp.detach();
     return tmp;
 }
 
@@ -1173,8 +1185,9 @@ QStringList VideoDisplayProfile::GetDeinterlacers(
     safe_map_t::const_iterator it = safe_deint.find(video_renderer);
     QStringList tmp;
     if (it != safe_deint.end())
-        tmp = Q3DeepCopy<QStringList>(*it);
+        tmp = *it;
 
+    tmp.detach();
     return tmp;
 }
 
@@ -1275,8 +1288,9 @@ QStringList VideoDisplayProfile::GetOSDs(const QString &video_renderer)
     safe_map_t::const_iterator it = safe_osd.find(video_renderer);
     QStringList tmp;
     if (it != safe_osd.end())
-        tmp = Q3DeepCopy<QStringList>(*it);
+        tmp = *it;
 
+    tmp.detach();
     return tmp;
 }
 
@@ -1373,7 +1387,10 @@ QString VideoDisplayProfile::GetBestVideoRenderer(const QStringList &renderers)
         }
     }
 
-    return Q3DeepCopy<QString>(top_renderer);
+    if (!top_renderer.isNull())
+        top_renderer.detach();
+
+    return top_renderer;
 }
 
 QString VideoDisplayProfile::toString(void) const
