@@ -56,7 +56,7 @@ bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -66,11 +66,11 @@ bool XMLParse::doLoadTheme(QDomElement &ele, QString winName, QString themeFile)
     QFile f(themeFile);
 
     if (!f.open(QIODevice::ReadOnly))
-    {    
+    {
         //cerr << "XMLParse::LoadTheme(): Can't open: " << themeFile << endl;
         return false;
     }
-     
+
     QString errorMsg;
     int errorLine = 0;
     int errorColumn = 0;
@@ -139,7 +139,7 @@ void XMLParse::parseFont(QDomElement &element)
     QString bold;
     QString ital;
     QString under;
-    
+
     int size = -1;
     int sizeSmall = -1;
     int sizeBig = -1;
@@ -147,8 +147,8 @@ void XMLParse::parseFont(QDomElement &element)
     QString color = "#ffffff";
     QString dropcolor = "#000000";
     QString hint;
-    QFont::StyleHint styleHint = QFont::Helvetica;    
-    
+    QFont::StyleHint styleHint = QFont::Helvetica;
+
     bool haveSizeSmall = false;
     bool haveSizeBig = false;
     bool haveSize = false;
@@ -159,9 +159,9 @@ void XMLParse::parseFont(QDomElement &element)
     bool haveShadow = false;
     bool haveItal = false;
     bool haveUnder = false;
-    
+
     fontProp *baseFont = NULL;
-    
+
     name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
@@ -180,7 +180,7 @@ void XMLParse::parseFont(QDomElement &element)
             return;
         }
     }
-    
+
     face = element.attribute("face", "");
     if (face.isNull() || face.isEmpty())
     {
@@ -194,7 +194,7 @@ void XMLParse::parseFont(QDomElement &element)
     {
         haveFace = true;
     }
-    
+
     hint = element.attribute("stylehint", "");
     if (!hint.isNull() && !hint.isEmpty())
     {
@@ -261,16 +261,16 @@ void XMLParse::parseFont(QDomElement &element)
             }
         }
     }
-    
+
     fontProp *testFont = GetFont(name, false);
     if (testFont)
     {
         cerr << "Error: already have a font called: " << (const char *)name << endl;
         return;
     }
-    
+
     fontProp newFont;
-    
+
     if (baseFont)
         newFont = *baseFont;
 
@@ -293,9 +293,9 @@ void XMLParse::parseFont(QDomElement &element)
 
     if (baseFont && !haveSize)
         size = baseFont->face.pointSize();
-    else    
+    else
         size = GetMythMainWindow()->NormalizeFontSize(size);
-    
+
     // If we don't have to, don't load the font.
     if (!haveFace && baseFont)
     {
@@ -313,20 +313,20 @@ void XMLParse::parseFont(QDomElement &element)
 
         newFont.face = temp;
     }
-    
+
     if (baseFont && !haveBold)
         newFont.face.setBold(baseFont->face.bold());
-    else        
+    else
     {
         if (bold.lower() == "yes")
             newFont.face.setBold(true);
         else
             newFont.face.setBold(false);
     }
-    
+
     if (baseFont && !haveItal)
         newFont.face.setItalic(baseFont->face.italic());
-    else        
+    else
     {
         if (ital.lower() == "yes")
             newFont.face.setItalic(true);
@@ -336,29 +336,29 @@ void XMLParse::parseFont(QDomElement &element)
 
     if (baseFont && !haveUnder)
         newFont.face.setUnderline(baseFont->face.underline());
-    else        
+    else
     {
         if (under.lower() == "yes")
             newFont.face.setUnderline(true);
         else
             newFont.face.setUnderline(false);
-    }    
-    
+    }
+
     if (haveColor)
     {
         QColor foreColor(color);
-        newFont.color = foreColor; 
+        newFont.color = foreColor;
     }
-    
+
     if (haveDropColor)
     {
         QColor dropColor(dropcolor);
         newFont.dropColor = dropColor;
     }
-    
+
     if (haveShadow)
         newFont.shadowOffset = shadowOffset;
-    
+
     fontMap[name] = newFont;
 }
 
@@ -585,7 +585,7 @@ bool XMLParse::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
     QString errorMsg;
     int errorLine = 0;
     int errorColumn = 0;
-    
+
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
         VERBOSE(VB_IMPORTANT, "Error parsing: " << (const char *)f.name()
@@ -594,11 +594,11 @@ bool XMLParse::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
         f.close();
         return false;
     }
-    
+
     f.close();
-        
+
     QDomElement element = doc.documentElement();
-    for (QDomNode child = element.firstChild(); !child.isNull(); 
+    for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
         QDomElement info = child.toElement();
@@ -608,11 +608,11 @@ bool XMLParse::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
             QString col = "";
             cat = info.attribute("category");
             col = info.attribute("color");
-            
+
             catColors[cat.lower()] = col;
         }
     }
-    
+
     return true;
 }
 
@@ -1307,10 +1307,6 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             {
                 parseRichTextArea(container, info);
             }
-            else if (info.tagName() == "multitextarea")
-            {
-                parseMultiTextArea(container, info);
-            }
             else if (info.tagName() == "remoteedit")
             {
                 parseRemoteEdit(container, info);
@@ -1590,7 +1586,7 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
             {
                 font = getFirstText(info);
             }
-            else if (info.tagName() == "showscrollarrows") 
+            else if (info.tagName() == "showscrollarrows")
             {
                 if (getFirstText(info).lower() == "no")
                     bShowArrows = false;
@@ -1693,7 +1689,7 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
         return;
     }
 
-    UIRichTextType *text = new UIRichTextType(name, testfont, value, draworder, 
+    UIRichTextType *text = new UIRichTextType(name, testfont, value, draworder,
                                               area, textArea);
     text->SetScreen(wmult, hmult);
     if (context != -1)
@@ -1731,145 +1727,6 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
     container->AddType(text);
 }
 
-void XMLParse::parseMultiTextArea(LayerSet *container, QDomElement &element)
-{
-    int context = -1;
-    QRect area = QRect(0, 0, 0, 0);
-    QRect altArea = QRect(0, 0, 0, 0);
-    QPoint shadowOffset = QPoint(0, 0);
-    QString font = "";
-    QString cutdown = "";
-    QString value = "";
-    QString statictext = "";
-    QString multiline = "";
-    int padding = -1;
-    int drop_delay = -1;
-    int drop_pause = -1;
-    int scroll_delay = -1;
-    int scroll_pause = -1;
-    int draworder = 0;
-
-    QString name = element.attribute("name", "");
-    if (name.isNull() || name.isEmpty())
-    {
-        cerr << "Multitext area needs a name\n";
-        return;
-    }
-
-    QString layerNum = element.attribute("draworder", "");
-    if (layerNum.isNull() && layerNum.isEmpty())
-    {
-        cerr << "Multitext area needs a draworder\n";
-        return;
-    }
-    draworder = layerNum.toInt();
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "context")
-            {
-                context = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "padding")
-            {
-                padding = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "dropdelay")
-            {
-                drop_delay = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "droppause")
-            {
-                drop_pause = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "scrolldelay")
-            {
-                scroll_delay = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "scrollpause")
-            {
-                scroll_pause = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "area")
-            {
-                area = parseRect(getFirstText(info));
-                normalizeRect(area);
-            }
-            else if (info.tagName() == "altarea")
-            {
-                altArea = parseRect(getFirstText(info));
-                normalizeRect(altArea);
-            }
-            else if (info.tagName() == "font")
-            {
-                font = getFirstText(info);
-            }
-            else if (info.tagName() == "cutdown")
-            {
-                cutdown = getFirstText(info);
-            }
-            else if (info.tagName() == "shadow")
-            {
-                shadowOffset = parsePoint(getFirstText(info));
-                shadowOffset.setX((int)(shadowOffset.x() * wmult));
-                shadowOffset.setY((int)(shadowOffset.y() * hmult));
-            }
-            else
-            {
-                cerr << "Unknown tag in multitext area: "
-                     << (const char *)info.tagName()
-                     << endl;
-                return;
-            }
-        }
-    }
-
-    fontProp *testfont = GetFont(font);
-    if (!testfont)
-    {
-        cerr << "Unknown font: " << (const char *)font
-             << " in multitextarea: " << (const char *)name << endl;
-        return;
-    }
-
-    UIMultiTextType *multitext = new UIMultiTextType(name, testfont, draworder,
-                                      area, altArea);
-    multitext->SetScreen(wmult, hmult);
-    if (context != -1)
-    {
-        multitext->SetContext(context);
-    }
-
-    if (padding > -1)
-    {
-        multitext->setMessageSpacePadding(padding);
-    }
-    if (drop_delay > -1)
-    {
-        multitext->setDropTimingLength(drop_delay);
-    }
-    if (drop_pause > -1)
-    {
-        multitext->setDropTimingPause(drop_pause);
-    }
-    if (scroll_delay > -1)
-    {
-        multitext->setScrollTimingLength(scroll_delay);
-    }
-    if (scroll_pause > -1)
-    {
-        multitext->setScrollTimingPause(scroll_pause);
-    }
-
-    multitext->SetParent(container);
-    multitext->calculateScreenArea();
-    container->AddType(multitext);
-}
-
 void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
 {
     int context = -1;
@@ -1880,7 +1737,7 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
     QColor selectedColor = QColor(0, 255, 255);
     QColor unselectedColor = QColor(100, 100, 100);
     QColor specialColor = QColor(255, 0, 0);
-    
+
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
@@ -1941,13 +1798,13 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
                 selected = info.attribute("selected");
                 unselected = info.attribute("unselected");
                 special = info.attribute("special");
-                
+
                 if (!selected.isEmpty())
-                    selectedColor = createColor(selected);       
-    
+                    selectedColor = createColor(selected);
+
                 if (!unselected.isEmpty())
                     unselectedColor = createColor(unselected);
-                
+
                 if (!special.isEmpty())
                     specialColor = createColor(special);
             }
@@ -2363,7 +2220,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
                             else
                                 confile.replace(pathStart, 1, "/solid-");
                         }
-                        
+
                         imgContainer = ui->LoadScalePixmap(confile);
                     }
                     else
@@ -2394,7 +2251,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
                             fillfile = "trans-" + fillfile;
                         else
                             fillfile = "solid-" + fillfile;
-                        
+
                         imgFiller = ui->LoadScalePixmap(fillfile);
                      }
                      else
@@ -2478,7 +2335,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     QPoint downArrowPoint(0,0);
     QPoint rightArrowPoint(0,0);
     QPoint leftArrowPoint(0,0);
-    
+
 
     //
     //  A Map to store the geometry of
@@ -2567,7 +2424,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     {
                         selectPoint = parsePoint(imgpoint);
                         selectPoint.setX((int)(selectPoint.x() * wmult));
-                        selectPoint.setY((int)(selectPoint.y() * hmult));    
+                        selectPoint.setY((int)(selectPoint.y() * hmult));
                     }
 
                     imgPad = info.attribute("padding", "");
@@ -2596,9 +2453,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     {
                         upArrowPoint = parsePoint(imgpoint);
                         upArrowPoint.setX((int)(upArrowPoint.x() * wmult));
-                        upArrowPoint.setY((int)(upArrowPoint.y() * hmult));    
+                        upArrowPoint.setY((int)(upArrowPoint.y() * hmult));
                     }
-                    
+
                     uparrow_img = ui->LoadScalePixmap(file);
                     if (!uparrow_img)
                     {
@@ -2613,7 +2470,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     {
                         downArrowPoint = parsePoint(imgpoint);
                         downArrowPoint.setX((int)(downArrowPoint.x() * wmult));
-                        downArrowPoint.setY((int)(downArrowPoint.y() * hmult));    
+                        downArrowPoint.setY((int)(downArrowPoint.y() * hmult));
                     }
                     downarrow_img = ui->LoadScalePixmap(file);
                     if (!downarrow_img)
@@ -2800,7 +2657,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
         mtl->addIcon(icon->i, icon->img);
         iconList.remove();
     }
-    
+
     mtl->makeHighlights();
     mtl->calculateScreenArea();
     container->AddType(mtl);
@@ -3692,7 +3549,7 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
     l->SetParent(container);
     l->calculateScreenArea();
     l->SetContext(context);
-    
+
     container->AddType(l);
     container->bumpUpLayers(0);
 }
@@ -3782,7 +3639,7 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                     normalImage = ui->LoadScalePixmap(imgname);
                     if (!normalImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called " 
+                        cerr << "xmparse.o: I can't find a file called "
                              << (const char *)imgname << endl;
                     }
                 }
@@ -3791,7 +3648,7 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                     focusedImage = ui->LoadScalePixmap(imgname);
                     if (!focusedImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called " 
+                        cerr << "xmparse.o: I can't find a file called "
                              << (const char *)imgname << endl;
                     }
                 }
@@ -3801,7 +3658,7 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
 
                     if (!downImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called " 
+                        cerr << "xmparse.o: I can't find a file called "
                              << (const char *)imgname << endl;
                     }
                 }
@@ -3811,7 +3668,7 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
 
                     if (!downFocusedImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called " 
+                        cerr << "xmparse.o: I can't find a file called "
                              << (const char *)imgname << endl;
                     }
                 }
@@ -3871,11 +3728,11 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
 
 void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
 {
-    QString normalFontName = "", focusedFontName = ""; 
+    QString normalFontName = "", focusedFontName = "";
     QString downFontName = "", downFocusedFontName = "";
     int context = -1;
     QRect area;
-    QPixmap *normalImage = NULL, *focusedImage = NULL; 
+    QPixmap *normalImage = NULL, *focusedImage = NULL;
     QPixmap *downImage = NULL, *downFocusedImage = NULL;
 
     QString name = element.attribute("name", "");
@@ -3986,7 +3843,7 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
                     downFontName = fontName;
                 else if (fontFcn.lower() == "downfocused")
                     downFocusedFontName = fontName;
-                else 
+                else
                 {
                     std::cerr << "Unknown font function in keyboard type: "
                               << (const char *)fontFcn

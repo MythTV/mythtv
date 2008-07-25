@@ -12,6 +12,7 @@
 #include <qdialog.h>
 #include <q3listview.h>
 #include <q3header.h>
+#include <q3buttongroup.h>
 #include <q3listbox.h>
 #include <qcheckbox.h>
 #include <qradiobutton.h>

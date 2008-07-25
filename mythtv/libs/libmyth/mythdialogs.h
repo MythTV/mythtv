@@ -22,7 +22,6 @@ class UIType;
 class UIManagedTreeListType;
 class UITextType;
 class UIRichTextType;
-class UIMultiTextType;
 class UIPushButtonType;
 class UITextButtonType;
 class UIRemoteEditType;
@@ -41,7 +40,7 @@ class GenericTree;
 class MythMediaDevice;
 class MythLineEdit;
 class MythRemoteLineEdit;
-class MythListBox; 
+class MythListBox;
 struct fontProp;
 class MythMainWindow;
 
@@ -77,7 +76,7 @@ class MPUBLIC MythDialog : public QFrame
 {
     Q_OBJECT
   public:
-    MythDialog(MythMainWindow *parent, const char *name = 0, 
+    MythDialog(MythMainWindow *parent, const char *name = 0,
                bool setsize = true);
 
     // these are for backward compatibility..
@@ -92,9 +91,9 @@ class MPUBLIC MythDialog : public QFrame
     void hide(void);
 
     void setNoErase(void);
-   
-    virtual bool onMediaEvent(MythMediaDevice * mediadevice); 
-    
+
+    virtual bool onMediaEvent(MythMediaDevice * mediadevice);
+
     void setResult(DialogCode r);
 
     virtual void deleteLater(void);
@@ -121,7 +120,7 @@ class MPUBLIC MythDialog : public QFrame
     float wmult, hmult;
     int screenwidth, screenheight;
     int xbase, ybase;
- 
+
     MythMainWindow *m_parent;
 
     DialogCode rescode;
@@ -136,7 +135,7 @@ class MPUBLIC MythPopupBox : public MythDialog
     Q_OBJECT
   public:
     MythPopupBox(MythMainWindow *parent, const char *name = 0);
-    MythPopupBox(MythMainWindow *parent, bool graphicPopup, 
+    MythPopupBox(MythMainWindow *parent, bool graphicPopup,
                  QColor popupForeground, QColor popupBackground,
                  QColor popupHighlight, const char *name = 0);
 
@@ -145,14 +144,14 @@ class MPUBLIC MythPopupBox : public MythDialog
 
     typedef enum { Large, Medium, Small } LabelSize;
 
-    QLabel *addLabel(QString caption, LabelSize size = Medium, 
+    QLabel *addLabel(QString caption, LabelSize size = Medium,
                      bool wrap = false);
 
     QAbstractButton *addButton(QString caption, QObject *target = NULL,
                                const char *slot = NULL);
 
     void ShowPopup(QObject *target = NULL, const char *slot = NULL);
-    void ShowPopupAtXY(int destx, int desty, 
+    void ShowPopupAtXY(int destx, int desty,
                        QObject *target = NULL, const char *slot = NULL);
 
     DialogCode ExecPopup(QObject *target = NULL, const char *slot = NULL);
@@ -234,24 +233,24 @@ class MPUBLIC MythProgressDialog: public MythDialog
     Q_OBJECT
   public:
     /** Create a progress bar dialog.
-        
+
         \param message the title string to appear in the progress dialog.
         \param totalSteps the total number of steps
         \param cancelButton display cancel button
         \param target target for cancel signal
         \param slot slot for cancel signal
       */
-    MythProgressDialog(const QString& message, int totalSteps = 0, 
-                       bool cancelButton = false, 
-                       const QObject * target = NULL, 
+    MythProgressDialog(const QString& message, int totalSteps = 0,
+                       bool cancelButton = false,
+                       const QObject * target = NULL,
                        const char * slot = NULL);
 
     /* \brief Close the dialog.
 
-        This will close the dialog and return the LCD to the Time screen 
+        This will close the dialog and return the LCD to the Time screen
     */
     void Close(void);
-    /* \brief Update the progress bar.  
+    /* \brief Update the progress bar.
 
        This will move the progress bar the percentage-completed as
        determined by \p curprogress and the totalsteps as set by the
@@ -260,13 +259,13 @@ class MPUBLIC MythProgressDialog: public MythDialog
        The LCD is updated as well.
     */
     void setProgress(int curprogress);
-    
+
     void setLabel(QString newlabel);
-    
+
     void keyPressEvent(QKeyEvent *);
 
     virtual void deleteLater(void);
-    
+
   signals:
     void pressed();
 
@@ -283,7 +282,7 @@ class MPUBLIC MythProgressDialog: public MythDialog
 
 /** MythDialog box that displays a busy spinner-style dialog box to
     indicate the program is busy, but that the number of steps needed
-    is unknown. 
+    is unknown.
 
     Ie. used by MythMusic when scanning the filesystem for musicfiles.
  */
@@ -291,7 +290,7 @@ class MPUBLIC MythBusyDialog : public MythProgressDialog
 {
     Q_OBJECT
   public:
-    /** \brief Create the busy indicator.  
+    /** \brief Create the busy indicator.
 
         Creates the dialog widget and sets up the timer that causes
         the widget to indicate progress every 100msec;
@@ -302,8 +301,8 @@ class MPUBLIC MythBusyDialog : public MythProgressDialog
         \param slot slot for cancel signal
      */
     MythBusyDialog(const QString &title,
-                   bool cancelButton = false, 
-                   const QObject * target = NULL, 
+                   bool cancelButton = false,
+                   const QObject * target = NULL,
                    const char * slot = NULL);
 
     /** \brief Setup a timer to 'move' the spinner
@@ -317,7 +316,7 @@ class MPUBLIC MythBusyDialog : public MythProgressDialog
 
     /** \brief Close the dialog.
 
-        This will close the dialog and stop the timer.		
+        This will close the dialog and stop the timer.
     */
     void Close();
 
@@ -361,7 +360,6 @@ class MPUBLIC MythThemedDialog : public MythDialog
     UIManagedTreeListType *getUIManagedTreeListType(const QString &name);
     UITextType *getUITextType(const QString &name);
     UIRichTextType *getUIRichTextType(const QString &name);
-    UIMultiTextType *getUIMultiTextType(const QString &name);
     UIPushButtonType *getUIPushButtonType(const QString &name);
     UITextButtonType *getUITextButtonType(const QString &name);
     UIRemoteEditType *getUIRemoteEditType(const QString &name);
@@ -378,7 +376,7 @@ class MPUBLIC MythThemedDialog : public MythDialog
 
     LayerSet* getContainer(const QString &name);
     fontProp* getFont(const QString &name);
-    
+
     void setContext(int a_context) { context = a_context; }
     int  getContext(){return context;}
 
@@ -437,11 +435,11 @@ class MPUBLIC MythPasswordDialog: public MythDialog
     MythPasswordDialog( QString message,
                         bool *success,
                         QString target,
-                        MythMainWindow *parent, 
-                        const char *name = 0, 
+                        MythMainWindow *parent,
+                        const char *name = 0,
                         bool setsize = true);
   public slots:
-  
+
     void checkPassword(const QString &);
 
   protected:
@@ -449,7 +447,7 @@ class MPUBLIC MythPasswordDialog: public MythDialog
     void keyPressEvent(QKeyEvent *e);
 
   private:
-  
+
     MythLineEdit        *password_editor;
     QString             target_text;
     bool                *success_flag;
@@ -461,12 +459,12 @@ class MPUBLIC MythSearchDialog: public MythPopupBox
 
   public:
 
-    MythSearchDialog(MythMainWindow *parent, const char *name = 0); 
+    MythSearchDialog(MythMainWindow *parent, const char *name = 0);
 
-  public: 
+  public:
     void setCaption(QString text);
     void setSearchText(QString text);
-    void setItems(QStringList items); 
+    void setItems(QStringList items);
     QString getResult(void);
 
   public slots:
@@ -474,17 +472,17 @@ class MPUBLIC MythSearchDialog: public MythPopupBox
 
   protected slots:
     void searchTextChanged(void);
-     
+
   protected:
     void Teardown(void);
     ~MythSearchDialog(); // use deleteLater() instead for thread safety
     void keyPressEvent(QKeyEvent *e);
 
   private:
-  
+
     QLabel              *caption;
     MythRemoteLineEdit  *editor;
-    MythListBox         *listbox;  
+    MythListBox         *listbox;
     QAbstractButton     *ok_button;
     QAbstractButton     *cancel_button;
 };
@@ -501,16 +499,16 @@ class MPUBLIC MythImageFileDialog: public MythThemedDialog
   public:
 
     typedef Q3ValueVector<int> IntVector;
-    
+
     MythImageFileDialog(QString *result,
                         QString top_directory,
-                        MythMainWindow *parent, 
+                        MythMainWindow *parent,
                         QString window_name,
-                        QString theme_filename = "", 
+                        QString theme_filename = "",
                         const char *name = 0,
                         bool setsize=true);
   public slots:
-  
+
     void handleTreeListSelection(int, IntVector*);
     void handleTreeListEntered(int, IntVector*);
     void buildTree(QString starting_where);
@@ -537,7 +535,7 @@ class MPUBLIC MythImageFileDialog: public MythThemedDialog
 class MPUBLIC MythScrollDialog : public Q3ScrollView
 {
     Q_OBJECT
-    
+
   public:
 
     enum ScrollMode {
@@ -563,7 +561,7 @@ class MPUBLIC MythScrollDialog : public Q3ScrollView
     virtual void show();
     virtual void hide();
     virtual void setContentsPos(int x, int y);
-    
+
   protected slots:
 
     virtual void accept();
@@ -590,9 +588,9 @@ class MPUBLIC MythScrollDialog : public Q3ScrollView
 
     DialogCode      m_resCode;
     bool            m_inLoop;
-    
+
     QPixmap        *m_bgPixmap;
-    
+
     QPixmap        *m_upArrowPix;
     QPixmap        *m_dnArrowPix;
     QPixmap        *m_rtArrowPix;

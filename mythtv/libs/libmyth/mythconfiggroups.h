@@ -45,7 +45,7 @@ class MPUBLIC ConfigurationGroup : public Setting, public Storage
 
   signals:
     void changeHelpText(QString);
-    
+
   protected:
     virtual ~ConfigurationGroup();
 
@@ -117,7 +117,7 @@ class MPUBLIC GridConfigurationGroup : public ConfigurationGroup
     GridConfigurationGroup(uint col,
                            bool uselabel   = true,  bool useframe  = true,
                            bool zeroMargin = false, bool zeroSpace = false) :
-        ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace), 
+        ConfigurationGroup(uselabel, useframe, zeroMargin, zeroSpace),
         columns(col)
     {
     }
@@ -204,7 +204,7 @@ class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
     void addTarget(QString triggerValue, Configurable *target);
     void removeTarget(QString triggerValue);
 
-    virtual QWidget *configWidget(ConfigurationGroup *cg, 
+    virtual QWidget *configWidget(ConfigurationGroup *cg,
                                   QWidget            *parent,
                                   const char         *widgetName);
     virtual void widgetInvalid(QObject *obj);
@@ -251,7 +251,7 @@ class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
     QMap<QString,Configurable*>  triggerMap;
     QWidget                     *widget;
 };
-    
+
 class MPUBLIC TabbedConfigurationGroup : public ConfigurationGroup
 {
     Q_OBJECT

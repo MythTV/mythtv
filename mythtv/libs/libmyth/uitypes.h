@@ -115,7 +115,7 @@ class MPUBLIC UIType : public QObject
     bool    isShown(){return !hidden;}
     bool    isHidden(){return hidden;}
     bool    isFocused(){return has_focus;}
-    
+
   public slots:
 
     virtual bool takeFocus();
@@ -520,11 +520,11 @@ class MPUBLIC UIListType : public UIType
 
     void SetCount(int cnt) { m_count = cnt;
                              if (m_count)
-                                m_selheight = (int)(m_area.height() / m_count); 
+                                m_selheight = (int)(m_area.height() / m_count);
                              else
                                 m_selheight = 0;
                            }
-                                
+
 
     void SetItemText(int, int, QString);
     void SetItemText(int, QString);
@@ -760,19 +760,19 @@ class MPUBLIC UIRichTextType : public UIType
 
         QRect DisplayArea() { return m_displayArea; }
         void SetDisplayArea(const QRect &rect) { m_displayArea = rect; }
-        void SetShowScrollArrows(bool bShowArrows) 
+        void SetShowScrollArrows(bool bShowArrows)
             { m_showScrollArrows = bShowArrows; }
 
         QRect TextArea() { return m_textArea; }
         void SetTextArea(const QRect &rect) { m_textArea = rect; }
 
-        void SetImageUpArrowReg(QPixmap img, QPoint loc) 
+        void SetImageUpArrowReg(QPixmap img, QPoint loc)
             { m_upArrowReg = img; m_upArrowRegPos = loc; }
-        void SetImageDnArrowReg(QPixmap img, QPoint loc) 
+        void SetImageDnArrowReg(QPixmap img, QPoint loc)
             { m_dnArrowReg = img; m_dnArrowRegPos = loc; }
-        void SetImageUpArrowSel(QPixmap img, QPoint loc) 
+        void SetImageUpArrowSel(QPixmap img, QPoint loc)
             { m_upArrowSel = img; m_upArrowSelPos = loc; }
-        void SetImageDnArrowSel(QPixmap img, QPoint loc) 
+        void SetImageDnArrowSel(QPixmap img, QPoint loc)
             { m_dnArrowSel = img; m_dnArrowSelPos = loc; }
 
         void SetBackground(QPixmap *background);
@@ -807,9 +807,9 @@ class MPUBLIC UIRichTextType : public UIType
 
         fontProp *m_font;
 
-        QPixmap *m_background;    // clipped image of the window background 
+        QPixmap *m_background;    // clipped image of the window background
         QPixmap *m_compBackground;// composite of the window background + the
-                                  // widget background image 
+                                  // widget background image
         QPixmap *m_image;         // the completed image including the rich text
 
         QString m_backgroundFile;   //< current source of background image
@@ -830,73 +830,16 @@ class MPUBLIC UIRichTextType : public UIType
         QPixmap  m_dnArrowSel;
 };
 
-class MPUBLIC UIMultiTextType : public UITextType
-{
-
-  Q_OBJECT
-
-  public:
-
-    enum AnimationStage
-    {
-        Animation_Drop = 0,
-        Animation_DropPause,
-        Animation_Scroll,
-        Animation_ScrollPause
-    };
-
-    UIMultiTextType(
-                    const QString &,
-                    fontProp *,
-                    int,
-                    QRect displayrect,
-                    QRect altdisplayrect
-                   );
-
-    void setTexts(QStringList new_messagep);
-    void clearTexts();
-    void Draw(QPainter*, int, int);
-
-    void setDropTimingLength(int x){drop_timing_length = x;}
-    void setDropTimingPause(int x){drop_timing_pause = x;}
-    void setScrollTimingLength(int x){scroll_timing_length = x;}
-    void setScrollTimingPause(int x){scroll_timing_pause = x;}
-
-    void setMessageSpacePadding(int x){message_space_padding = x;}
-
-
-  private slots:
-
-    void        animate();
-
-  private:
-
-    QStringList     messages;
-    int             current_text_index;
-    QTimer          transition_timer;
-    AnimationStage  animation_stage;
-    int             horizontal_transform;
-    int             max_horizontal_transform;
-    int             vertical_transform;
-    int             drop_timing_length;
-    int             drop_timing_pause;
-    int             scroll_timing_length;
-    int             scroll_timing_pause;
-
-    int             message_space_padding;
-
-};
-
 class MPUBLIC UIRemoteEditType : public UIType
 {
     Q_OBJECT
 
   public:
 
-    UIRemoteEditType(const QString &name, fontProp *font, const QString &text, 
+    UIRemoteEditType(const QString &name, fontProp *font, const QString &text,
                      int dorder, QRect displayrect);
     ~UIRemoteEditType();
-    
+
     void    createEdit(MythThemedDialog* parent);
     QWidget *getEdit(void) { return (QWidget*) edit; };
     void    Draw(QPainter *, int drawlayer, int context);
@@ -914,7 +857,7 @@ class MPUBLIC UIRemoteEditType : public UIType
     virtual void looseFocus();
     virtual void show();
     virtual void hide();
-     
+
   signals:
     void    textChanged(QString value);
 
@@ -923,8 +866,8 @@ class MPUBLIC UIRemoteEditType : public UIType
     QRect    m_displaysize;
     QString  m_text;
     fontProp *m_font;
-    QColor   m_unselected; 
-    QColor   m_selected; 
+    QColor   m_unselected;
+    QColor   m_selected;
     QColor   m_special;
 
     MythThemedDialog* m_parentDialog;
@@ -987,8 +930,8 @@ class MPUBLIC UIManagedTreeListType : public UIType
 
     UIManagedTreeListType(const QString &name);
     ~UIManagedTreeListType();
-    void    setUpArrowOffset(QPoint& pt) { upArrowOffset = pt;}    
-    void    setDownArrowOffset(QPoint& pt) { downArrowOffset = pt;}    
+    void    setUpArrowOffset(QPoint& pt) { upArrowOffset = pt;}
+    void    setDownArrowOffset(QPoint& pt) { downArrowOffset = pt;}
     void    setLeftArrowOffset(QPoint& pt) {leftArrowOffset = pt;}
     void    setRightArrowOffset(QPoint& pt) {rightArrowOffset = pt;}
     void    setSelectPoint(QPoint& pt) { selectPoint = pt;}
@@ -1079,7 +1022,7 @@ class MPUBLIC UIManagedTreeListType : public UIType
     int         iconAttr;
     int         selectPadding;
     bool        selectScale;
-    
+
     QMap<QString, QString>  m_fonts;
     QMap<QString, fontProp> m_fontfcns;
     int                     m_justification;
@@ -1111,7 +1054,7 @@ class MPUBLIC UIPushButtonType : public UIType
   public:
 
     UIPushButtonType(const QString &name, QPixmap on, QPixmap off, QPixmap pushed, QPixmap pushedon=QPixmap());
-    
+
     virtual void Draw(QPainter *, int drawlayer, int context);
     void    setPosition(QPoint pos){m_displaypos = pos;}
     virtual void calculateScreenArea();
@@ -1200,7 +1143,7 @@ class MPUBLIC UICheckBoxType : public UIType
     void    setPosition(QPoint pos){m_displaypos = pos;}
     void    calculateScreenArea();
     bool    getState(){return checked;}
-     
+
   public slots:
 
     void    push();
@@ -1269,7 +1212,7 @@ class MPUBLIC UISelectorType : public UIPushButtonType
     void    setFont(fontProp *font) { m_font = font; }
     QString getCurrentString();
     int     getCurrentInt();
-    
+
   public slots:
 
     void push(bool up_or_down);
@@ -1278,7 +1221,7 @@ class MPUBLIC UISelectorType : public UIPushButtonType
     void cleanOut(){current_data = NULL; my_data.clear();}
     void setToItem(int which_item);
     void setToItem(const QString &which_item);
-     
+
   signals:
 
     void    pushed(int);
@@ -1291,9 +1234,6 @@ class MPUBLIC UISelectorType : public UIPushButtonType
     IntStringPair           *current_data;
 
 };
-
-
-
 
 class MPUBLIC UIBlackHoleType : public UIType
 {
@@ -1345,11 +1285,11 @@ class MPUBLIC UIKeyType : public UIType
     void    SetChars(QString normal, QString shift, QString alt, QString shiftAlt);
     QString GetChar();
 
-    void    SetMoves(QString moveLeft, QString moveRight, QString moveUp, 
+    void    SetMoves(QString moveLeft, QString moveRight, QString moveUp,
                   QString moveDown);
     QString GetMove(QString direction);
 
-    void SetShiftState(bool sh, bool ag); 
+    void SetShiftState(bool sh, bool ag);
     void SetOn(bool bOn) { m_bDown = bOn; refresh(); }
     bool IsOn(void) { return m_bDown; }
 
@@ -1385,9 +1325,9 @@ class MPUBLIC UIKeyType : public UIType
 
     QPoint m_pos;
 
-    QString m_normalChar; 
-    QString m_shiftChar; 
-    QString m_altChar; 
+    QString m_normalChar;
+    QString m_shiftChar;
+    QString m_altChar;
     QString m_shiftAltChar;
 
     QString m_moveLeft;
@@ -1440,7 +1380,7 @@ class MPUBLIC UIKeyboardType : public UIType
     void rightCursor();
     void backspaceKey();
     void delKey();
-    void close(); 
+    void close();
 
   private:
     void init();

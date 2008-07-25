@@ -167,7 +167,7 @@ void MythDialog::reject()
 
 DialogCode MythDialog::exec(void)
 {
-    if (in_loop) 
+    if (in_loop)
     {
         qWarning("MythDialog::exec: Recursive call detected.");
         return kDialogCodeRejected;
@@ -394,7 +394,7 @@ bool MythPopupBox::focusNextPrevChild(bool next)
 
     do
     {
-        if (w && w != startingPoint && !w->focusProxy() && 
+        if (w && w != startingPoint && !w->focusProxy() &&
             w->isVisibleTo(this) && w->isEnabled() &&
             (objList->find((QObject *)w) != -1))
         {
@@ -402,7 +402,7 @@ bool MythPopupBox::focusNextPrevChild(bool next)
         }
 
         w = (next) ? focusList->prev() : focusList->next();
-    }   
+    }
     while (w && !(candidate && w == startingPoint) && (countdown-- > 0));
 
     if (!candidate)
@@ -439,7 +439,7 @@ QLabel *MythPopupBox::addLabel(QString caption, LabelSize size, bool wrap)
         case Medium: label->setFont(defaultMediumFont); break;
         case Small: label->setFont(defaultSmallFont); break;
     }
-    
+
     label->setMaximumWidth((int)m_parent->width() / 2);
     if (wrap)
     {
@@ -482,7 +482,7 @@ void MythPopupBox::ShowPopup(QObject *target, const char *slot)
     ShowPopupAtXY(-1, -1, target, slot);
 }
 
-void MythPopupBox::ShowPopupAtXY(int destx, int desty, 
+void MythPopupBox::ShowPopupAtXY(int destx, int desty,
                                  QObject *target, const char *slot)
 {
     QList< QObject* > objlist = children();
@@ -739,18 +739,18 @@ bool MythPopupBox::showGetTextPopup(MythMainWindow *parent, QString title,
     MythPopupBox *popup = new MythPopupBox(parent, title);
 
     popup->addLabel(message, Medium, true);
-    
+
     MythRemoteLineEdit *textEdit =
         new MythRemoteLineEdit(popup, "chooseEdit");
 
     textEdit->setText(text);
     popup->addWidget(textEdit);
-    
+
     popup->addButton(tr("OK"),     popup, SLOT(accept()));
     popup->addButton(tr("Cancel"), popup, SLOT(reject()));
-    
+
     textEdit->setFocus();
-    
+
     bool ok = (Accepted == popup->ExecPopup());
     if (ok)
         text = textEdit->text();
@@ -827,7 +827,7 @@ DialogCode MythPopupBox::ShowButtonPopup(
     return ret;
 }
 
-MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps, 
+MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps,
                                          bool cancelButton, const QObject *target, const char *slot)
                   : MythDialog(gContext->GetMainWindow(), "progress", false)
 {
@@ -863,7 +863,7 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps,
 
     Q3HBox *hbox = new Q3HBox(vbox);
     hbox->setSpacing(5);
-    
+
     progress = new Q3ProgressBar(totalSteps, hbox);
     progress->setBackgroundOrigin(ParentOrigin);
 
@@ -1034,7 +1034,7 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
 
     if (!loadThemedWindow(window_name, theme_filename))
     {
-        QString msg = 
+        QString msg =
             QString(tr("Could not locate '%1' in theme '%2'."
                        "\n\nReturning to the previous menu."))
             .arg(window_name).arg(theme_filename);
@@ -1090,9 +1090,9 @@ bool MythThemedDialog::loadThemedWindow(QString window_name, QString theme_filen
         for (; i != all_ui_type_objects->end(); i++)
         {
             UIType *type = (*i);
-            connect(type, SIGNAL(requestUpdate()), this, 
+            connect(type, SIGNAL(requestUpdate()), this,
                     SLOT(updateForeground()));
-            connect(type, SIGNAL(requestUpdate(const QRect &)), this, 
+            connect(type, SIGNAL(requestUpdate(const QRect &)), this,
                     SLOT(updateForeground(const QRect &)));
             connect(type, SIGNAL(requestRegionUpdate(const QRect &)), this,
                     SLOT(updateForegroundRegion(const QRect &)));
@@ -1130,7 +1130,7 @@ bool MythThemedDialog::buildFocusList()
             UIType *type = (*i);
             if (type->canTakeFocus() && !type->isHidden())
             {
-                if (context == -1 || type->GetContext() == -1 || 
+                if (context == -1 || type->GetContext() == -1 ||
                         context == type->GetContext())
                     focus_taking_widgets.append(type);
             }
@@ -1296,9 +1296,9 @@ void MythThemedDialog::updateForeground(const QRect &r)
     {
         cerr << "MythThemedDialog.o: something is requesting a screen update of zero size. "
              << "A widget probably has not done a calculateScreeArea(). Will redraw "
-             << "the whole screen (inefficient!)." 
+             << "the whole screen (inefficient!)."
              << endl;
-             
+
         rect_to_update = this->geometry();
     }
 
@@ -1609,11 +1609,6 @@ UIRemoteEditType* MythThemedDialog::getUIRemoteEditType(const QString &name)
     return GetUIType<UIRemoteEditType>(this, name);
 }
 
-UIMultiTextType* MythThemedDialog::getUIMultiTextType(const QString &name)
-{
-    return GetUIType<UIMultiTextType>(this, name);
-}
-
 UIPushButtonType* MythThemedDialog::getUIPushButtonType(const QString &name)
 {
     return GetUIType<UIPushButtonType>(this, name);
@@ -1683,10 +1678,10 @@ LayerSet* MythThemedDialog::getContainer(const QString& name)
     {
         if (looper->GetName() == name)
             return looper;
-        
+
         ++an_it;
     }
-    
+
     return NULL;
 }
 
@@ -1714,8 +1709,8 @@ fontProp* MythThemedDialog::getFont(const QString &name)
 MythPasswordDialog::MythPasswordDialog(QString message,
                                        bool *success,
                                        QString target,
-                                       MythMainWindow *parent, 
-                                       const char *name, 
+                                       MythMainWindow *parent,
+                                       const char *name,
                                        bool)
                    :MythDialog(parent, name, false)
 {
@@ -1777,7 +1772,7 @@ void MythPasswordDialog::checkPassword(const QString &the_text)
     }
     else
     {
-        //  Oh to beep 
+        //  Oh to beep
     }
 }
 
@@ -1789,7 +1784,7 @@ MythPasswordDialog::~MythPasswordDialog()
 ---------------------------------------------------------------------
 */
 
-MythSearchDialog::MythSearchDialog(MythMainWindow *parent, const char *name) 
+MythSearchDialog::MythSearchDialog(MythMainWindow *parent, const char *name)
                  :MythPopupBox(parent, name)
 {
     // create the widgets
@@ -1799,7 +1794,7 @@ MythSearchDialog::MythSearchDialog(MythMainWindow *parent, const char *name)
     connect(editor, SIGNAL(textChanged()), this, SLOT(searchTextChanged()));
     addWidget(editor);
     editor->setFocus();
-    editor->setPopupPosition(VK_POSBOTTOMDIALOG); 
+    editor->setPopupPosition(VK_POSBOTTOMDIALOG);
 
     listbox = new MythListBox(this);
     listbox->setScrollBar(false);
@@ -1936,32 +1931,32 @@ void MythSearchDialog::Teardown(void)
  */
 MythImageFileDialog::MythImageFileDialog(QString *result,
                                          QString top_directory,
-                                         MythMainWindow *parent, 
+                                         MythMainWindow *parent,
                                          QString window_name,
                                          QString theme_filename,
-                                         const char *name, 
+                                         const char *name,
                                          bool setsize)
-                   :MythThemedDialog(parent, 
-                                     window_name, 
+                   :MythThemedDialog(parent,
+                                     window_name,
                                      theme_filename,
                                      name,
                                      setsize)
 {
     selected_file = result;
     initial_node = NULL;
-    
+
     UIImageType *file_browser_background = getUIImageType("file_browser_background");
     if (file_browser_background)
     {
         QPixmap background = file_browser_background->GetImage();
-        
+
         this->setFixedSize(QSize(background.width(), background.height()));
         this->move((screenwidth - background.width()) / 2,
                    (screenheight - background.height()) / 2);
     }
     else
     {
-        QString msg = 
+        QString msg =
             QString(tr("The theme you are using is missing the "
                        "'file_browser_background' "
                        "element. \n\nReturning to the previous menu."));
@@ -1995,8 +1990,8 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
                 this, SLOT(handleTreeListEntered(int, IntVector*)));
     }
     else
-    { 
-        QString msg = 
+    {
+        QString msg =
             QString(tr("The theme you are using is missing the "
                        "'file_browser' element. "
                        "\n\nReturning to the previous menu."));
@@ -2004,20 +1999,20 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
                                   tr("Missing UI Element"), msg);
         reject();
         return;
-    }    
-    
+    }
+
     //
     //  Find the UIImageType for previewing
     //  No image_box, no preview.
     //
-    
+
     image_box = getUIImageType("image_box");
     if (image_box)
     {
         image_box->calculateScreenArea();
     }
     initialDir = top_directory;
-        
+
     image_files.clear();
     buildTree(top_directory);
 
@@ -2028,7 +2023,7 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     }
     file_browser->enter();
     file_browser->refresh();
-    
+
 }
 
 void MythImageFileDialog::keyPressEvent(QKeyEvent *e)
@@ -2068,13 +2063,13 @@ void MythImageFileDialog::keyPressEvent(QKeyEvent *e)
 void MythImageFileDialog::buildTree(QString starting_where)
 {
     buildFileList(starting_where);
-    
+
     root_parent = new GenericTree("Image Files root", -1, false);
     file_root = root_parent->addNode("Image Files", -1, false);
 
     //
     //  Go through the files and build a tree
-    //    
+    //
     for(int i = 0; i < image_files.count(); ++i)
     {
         bool make_active = false;
@@ -2149,7 +2144,7 @@ void MythImageFileDialog::buildFileList(QString directory)
         imageExtensions += "jpg";
 
     QDir d(directory);
-       
+
     if (!d.exists())
         return;
 
@@ -2168,7 +2163,7 @@ void MythImageFileDialog::buildFileList(QString directory)
         {
             continue;
         }
-            
+
         if (fi.isDir())
         {
             buildFileList(fi.absFilePath());
@@ -2193,7 +2188,7 @@ void MythImageFileDialog::buildFileList(QString directory)
                 }
             }
         }
-    }                                                                                                                                                                                                                                                               
+    }
 }
 
 void MythImageFileDialog::handleTreeListEntered(int type, IntVector*)
@@ -2218,7 +2213,7 @@ void MythImageFileDialog::handleTreeListSelection(int type, IntVector*)
     {
         *selected_file = image_files[type];
         accept();
-    }   
+    }
 }
 
 MythImageFileDialog::~MythImageFileDialog()
@@ -2240,7 +2235,7 @@ MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
 {
     if (!parent)
     {
-        VERBOSE(VB_IMPORTANT, 
+        VERBOSE(VB_IMPORTANT,
                 "MythScrollDialog: Programmer error, trying to create "
                 "a dialog without a parent.");
         done(kDialogCodeRejected);
@@ -2249,10 +2244,10 @@ MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
 
     m_parent     = parent;
     m_scrollMode = mode;
-        
+
     m_resCode    = kDialogCodeRejected;
     m_inLoop     = false;
-    
+
     MythUIHelper *ui = GetMythUI();
     ui->GetScreenSettings(m_xbase, m_screenWidth, m_wmult,
                           m_ybase, m_screenHeight, m_hmult);
@@ -2263,7 +2258,7 @@ MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
 
     setFont(m_defaultMediumFont);
     setCursor(QCursor(Qt::ArrowCursor));
-    
+
     setFrameShape(Q3Frame::NoFrame);
     setHScrollBarMode(Q3ScrollView::AlwaysOff);
     setVScrollBarMode(Q3ScrollView::AlwaysOff);
@@ -2285,7 +2280,7 @@ MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
 
     int wmargin = (int)(20*m_wmult);
     int hmargin = (int)(20*m_hmult);
-    
+
     if (m_upArrowPix)
         m_upArrowRect = QRect(m_screenWidth - m_upArrowPix->width() - wmargin,
                               hmargin,
@@ -2302,12 +2297,12 @@ MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
         m_ltArrowRect = QRect(wmargin,
                               m_screenHeight - m_ltArrowPix->height() - hmargin,
                               m_ltArrowPix->width(), m_ltArrowPix->height());
-    
+
     m_showUpArrow  = true;
     m_showDnArrow  = true;
     m_showRtArrow  = false;
     m_showLtArrow  = false;
-    
+
     m_parent->attach(this);
 }
 
@@ -2348,7 +2343,7 @@ void MythScrollDialog::setAreaMultiplied(int areaWTimes, int areaHTimes)
 
 DialogCode MythScrollDialog::result(void) const
 {
-    return m_resCode;    
+    return m_resCode;
 }
 
 void MythScrollDialog::show()
@@ -2372,7 +2367,7 @@ void MythScrollDialog::hide()
 
 DialogCode MythScrollDialog::exec(void)
 {
-    if (m_inLoop) 
+    if (m_inLoop)
     {
         std::cerr << "MythScrollDialog::exec: Recursive call detected."
                   << std::endl;
@@ -2413,7 +2408,7 @@ void MythScrollDialog::reject()
 
 void MythScrollDialog::setResult(DialogCode r)
 {
-    m_resCode = r;    
+    m_resCode = r;
 }
 
 void MythScrollDialog::keyPressEvent(QKeyEvent *e)
@@ -2463,7 +2458,7 @@ void MythScrollDialog::viewportPaintEvent(QPaintEvent *pe)
 
     QRect   er(pe->rect());
     QRegion reg(er);
-    
+
     paintEvent(reg, er.x()+contentsX(), er.y()+contentsY(),
                er.width(), er.height());
 
@@ -2504,7 +2499,7 @@ void MythScrollDialog::viewportPaintEvent(QPaintEvent *pe)
     p.setClipRegion(reg);
     p.drawPixmap(0, 0, *m_bgPixmap, 0, 0, viewport()->width(),
                  viewport()->height());
-    p.end();    
+    p.end();
 }
 
 void MythScrollDialog::paintEvent(QRegion&, int , int , int , int )
@@ -2518,5 +2513,5 @@ void MythScrollDialog::setContentsPos(int x, int y)
     viewport()->setUpdatesEnabled(true);
     updateContents();
 }
-    
-      
+
+

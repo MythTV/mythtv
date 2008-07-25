@@ -464,7 +464,7 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
 {
     if (hidden)
         return;
-  
+
   if (m_context == context || m_context == -1)
   {
     if (drawlayer == m_order)
@@ -1310,17 +1310,17 @@ void UIListType::calculateScreenArea()
 
     // take the selection image position into account
     r2.setRect(r.x() + m_selection_loc.x(), r.y() + m_selection_loc.y(),
-               m_selection.width(), m_selection.height()); 
+               m_selection.width(), m_selection.height());
     r = r.unite(r2);
 
     // take the up arrow image position into account
     r2.setRect(m_uparrow_loc.x(), m_uparrow_loc.y(),
-              m_uparrow.width(), m_uparrow.height()); 
+              m_uparrow.width(), m_uparrow.height());
     r = r.unite(r2);
 
     // take the down arrow image position into account
     r2.setRect(m_downarrow_loc.x(), m_downarrow_loc.y(),
-               m_downarrow.width(), m_downarrow.height()); 
+               m_downarrow.width(), m_downarrow.height());
     r = r.unite(r2);
 
     r.moveBy(m_parent->GetAreaRect().left(),
@@ -1762,7 +1762,7 @@ void  UIImageGridType::setCurrentPos(int pos)
     currentItem = pos;
 
     // make sure the selected item is visible
-    if ((currentItem < topRow * columnCount) || 
+    if ((currentItem < topRow * columnCount) ||
             (currentItem >= (topRow + rowCount) * columnCount))
     {
         topRow = QMAX(QMIN(currentItem / columnCount, lastRow - rowCount + 1), 0);
@@ -1848,7 +1848,7 @@ void UIImageGridType::removeItem(int itemNo)
     lastColumn = QMAX(itemCount - lastRow * columnCount - 1, 0);
 
     // make sure the selected item is still visible
-    if (topRow + rowCount > lastRow) 
+    if (topRow + rowCount > lastRow)
         topRow = QMAX(QMIN(currentItem / columnCount, lastRow - rowCount + 1), 0);
 
     if (curRow > lastRow)
@@ -2464,7 +2464,7 @@ void UIRichTextType::loadBackgroundImg(bool &changed)
     {
         if (file != m_backgroundFile)
         {
-            if (m_backgroundImage) 
+            if (m_backgroundImage)
                 delete m_backgroundImage;
 
             m_backgroundImage = GetMythUI()->LoadScaleImage(file, true);
@@ -2527,11 +2527,11 @@ void UIRichTextType::Draw(QPainter *dr, int drawlayer, int context)
 
     if ((m_context == context || m_context == -1) && drawlayer == m_order)
     {
-        // draw text image 
+        // draw text image
         dr->drawPixmap(m_displayArea, *m_image);
 
         // draw scroll arrows
-        if (m_showScrollArrows) 
+        if (m_showScrollArrows)
         {
             if (m_showUpArrow)
                 dr->drawPixmap(m_upArrowSelPos, m_upArrowSel);
@@ -2639,7 +2639,7 @@ void UIRemoteEditType::createEdit(MythThemedDialog* parent)
 {
     m_parentDialog = parent;
     edit = new MythRemoteLineEdit(parent);
-     
+
     edit->setFocusPolicy( Qt::NoFocus );
     edit->setText(m_text);
     edit->setCurrentFont(m_font->face);
@@ -2647,10 +2647,10 @@ void UIRemoteEditType::createEdit(MythThemedDialog* parent)
     edit->setMaximumHeight(getScreenArea().height());
     edit->setGeometry(getScreenArea());
     edit->setCharacterColors(m_unselected, m_selected, m_special);
-        
-    connect(edit, SIGNAL(tryingToLooseFocus(bool)), 
+
+    connect(edit, SIGNAL(tryingToLooseFocus(bool)),
             this, SLOT(takeFocusAwayFromEditor(bool)));
-    connect(edit, SIGNAL(textChanged(QString)), 
+    connect(edit, SIGNAL(textChanged(QString)),
             this, SLOT(editorChanged(QString)));
 
     edit->show();
@@ -2663,7 +2663,7 @@ UIRemoteEditType::~UIRemoteEditType()
         edit->hide();
         edit->deleteLater();
         edit = NULL;
-    }    
+    }
 }
 
 void UIRemoteEditType::setText(const QString text)
@@ -2679,22 +2679,22 @@ QString UIRemoteEditType::getText()
     if (edit)
         return edit->text();
     else
-        return QString::null;    
+        return QString::null;
 }
 
 void  UIRemoteEditType::setFont(fontProp *font)
-{ 
+{
     m_font = font;
     if (edit)
         edit->setCurrentFont(font->face);
 }
- 
+
 void UIRemoteEditType::setCharacterColors(QColor unselected, QColor selected, QColor special)
 {
-    m_unselected = unselected; 
-    m_selected = selected; 
+    m_unselected = unselected;
+    m_selected = selected;
     m_special = special;
-    
+
     if (edit)
         edit->setCharacterColors(unselected, selected, special);
 }
@@ -2703,16 +2703,16 @@ void UIRemoteEditType::show(void)
 {
     if (edit)
         edit->show();
-    
-    UIType::show();    
+
+    UIType::show();
 }
 
 void UIRemoteEditType::hide(void)
 {
     if (edit)
         edit->hide();
-    
-    UIType::hide();    
+
+    UIType::hide();
 }
 
 void UIRemoteEditType::Draw(QPainter *dr, int drawlayer, int context)
@@ -2753,9 +2753,9 @@ void UIRemoteEditType::calculateScreenArea()
 
 void UIRemoteEditType::takeFocusAwayFromEditor(bool up_or_down)
 {
-    if (m_parentDialog) 
+    if (m_parentDialog)
         m_parentDialog->nextPrevWidgetFocus(up_or_down);
-    
+
     looseFocus();
 }
 
@@ -2766,7 +2766,7 @@ bool UIRemoteEditType::takeFocus()
         edit->setCursorPosition(0, edit->text().length());
         edit->setFocus();
     }
-    
+
     return UIType::takeFocus();
 }
 
@@ -2776,7 +2776,7 @@ void UIRemoteEditType::looseFocus()
     {
         edit->clearFocus();
     }
-    
+
     UIType::looseFocus();
 }
 
@@ -2784,271 +2784,6 @@ void UIRemoteEditType::editorChanged(QString value)
 {
     emit textChanged(value);
 }
-
-// ******************************************************************
-
-UIMultiTextType::UIMultiTextType(
-                                    const QString &name,
-                                    fontProp *font,
-                                    int dorder,
-                                    QRect displayrect,
-                                    QRect altdisplayrect
-                                )
-           : UITextType(name, font, "", dorder, displayrect, altdisplayrect)
-{
-    connect(&transition_timer, SIGNAL(timeout()),
-            this, SLOT(animate()));
-
-    m_justification = (Qt::AlignCenter | Qt::AlignBottom);
-
-    vertical_transform = 0;
-    horizontal_transform = 0;
-    m_cutdown = false;
-
-
-    drop_timing_length = 10;
-    drop_timing_pause = 500;
-    scroll_timing_length = 40;
-    scroll_timing_pause = 4000;
-    message_space_padding = 0;
-
-    current_text_index = -1;
-}
-
-void UIMultiTextType::setTexts(QStringList new_messages)
-{
-    messages = new_messages;
-    for(int i = 0; i < (int) messages.count(); i++)
-    {
-        for(int j = 0; j < message_space_padding; j++)
-        {
-            messages[i].prepend(" ");
-            messages[i].append(" ");
-        }
-    }
-    if (messages.count() > 0)
-    {
-        m_message = messages[0];
-        current_text_index = 0;
-        if (drop_timing_length > 0)
-        {
-            transition_timer.start(drop_timing_length);
-            animation_stage = Animation_Drop;
-            vertical_transform = m_displaysize.height();
-        }
-        else
-        {
-            transition_timer.start(drop_timing_pause);
-            animation_stage = Animation_DropPause;
-            vertical_transform = 0;
-        }
-
-        horizontal_transform = 0;
-        QFontMetrics fm(m_font->face);
-        max_horizontal_transform = fm.width(m_message) - m_displaysize.width();
-        if (max_horizontal_transform < 0)
-        {
-            max_horizontal_transform = 0;
-            m_justification = (Qt::AlignCenter | Qt::AlignBottom);
-        }
-        else
-        {
-            m_justification = (Qt::AlignLeft | Qt::AlignBottom);
-        }
-    }
-    else
-    {
-        //
-        //  No need to have a timer as there is nothing to cycle through
-        //
-
-        transition_timer.stop();
-    }
-}
-
-void UIMultiTextType::clearTexts()
-{
-    m_message = "";
-    messages.clear();
-    current_text_index = -1;
-    transition_timer.stop();
-    vertical_transform = 0;
-    horizontal_transform = 0;
-    refresh();
-}
-
-void UIMultiTextType::Draw(QPainter *dr, int drawlayer, int context)
-{
-    if (hidden)
-        return;
-
-    if (m_context == context || m_context == -1)
-    {
-
-        if (drawlayer == m_order)
-        {
-            dr->save();
-            dr->translate(-1.0 * horizontal_transform, -1.0 * vertical_transform);
-            bool m_multi = false;
-            if ((m_justification & Qt::WordBreak) > 0)
-            m_multi = true;
-            QPoint fontdrop = m_font->shadowOffset;
-            QString msg = m_message;
-            dr->setFont(m_font->face);
-            if (m_cutdown == true)
-            {
-                msg = cutDown(msg, &(m_font->face), m_multi, m_displaysize.width(), m_displaysize.height());
-            }
-            if (m_cutdown == true && m_debug == true)
-            {
-                cerr << "    +UITextType::CutDown Called.\n";
-            }
-
-            if (drawFontShadow && (fontdrop.x() != 0 || fontdrop.y() != 0))
-            {
-                if (m_debug == true)
-                {
-                    cerr << "    +UITextType::Drawing shadow @ ("
-                         << (int)(m_displaysize.left() + fontdrop.x()) << ", "
-                         << (int)(m_displaysize.top() + fontdrop.y()) << ")" << endl;
-                }
-                dr->setBrush(m_font->dropColor);
-                dr->setPen(QPen(m_font->dropColor, (int)(2 * m_wmult)));
-                dr->drawText((int)(m_displaysize.left() + fontdrop.x()),
-                               (int)(m_displaysize.top() + fontdrop.y()),
-                               m_displaysize.width(),
-                               m_displaysize.height(), m_justification, msg);
-            }
-
-            dr->setBrush(m_font->color);
-            dr->setPen(QPen(m_font->color, (int)(2 * m_wmult)));
-            if (m_debug == true)
-                    cerr << "    +UITextType::Drawing @ ("
-                         << (int)(m_displaysize.left()) << ", " << (int)(m_displaysize.top())
-                         << ")" << endl;
-            dr->drawText(m_displaysize.left(), m_displaysize.top(),
-                          m_displaysize.width() + horizontal_transform, m_displaysize.height(), m_justification, msg);
-            if (m_debug == true)
-            {
-                cerr << "   +UITextType::Draw() <- inside Layer\n";
-                cerr << "       -Message: " << (const char *)m_message << " (cut: "
-                     << (const char *)msg << ")" <<  endl;
-            }
-            dr->restore();
-            //dr->translate(horizontal_transform, vertical_transform);
-        }
-        else
-        {
-            if (m_debug == true)
-            {
-                 cerr << "   +UITextType::Draw() <- outside (layer = " << drawlayer
-                      << ", widget layer = " << m_order << "\n";
-            }
-        }
-    }
-}
-
-
-void UIMultiTextType::animate()
-{
-    //
-    //  Check which animation stage we're in and move things along appropriately
-    //
-
-    if (animation_stage == Animation_Drop)
-    {
-        if (vertical_transform > 0)
-        {
-            vertical_transform--;
-            refresh();
-        }
-        else
-        {
-
-            //
-            //  The drop down is finished.
-            //
-
-            animation_stage = Animation_DropPause;
-            transition_timer.changeInterval(drop_timing_pause);
-        }
-        return;
-    }
-    else if (animation_stage == Animation_DropPause)
-    {
-        //
-        //  Done pausing after drop
-        //
-
-        animation_stage = Animation_Scroll;
-        transition_timer.changeInterval(scroll_timing_length);
-        return;
-    }
-    else if (animation_stage == Animation_Scroll)
-    {
-        if (horizontal_transform < max_horizontal_transform)
-        {
-            horizontal_transform++;
-            refresh();
-        }
-        else
-        {
-            animation_stage = Animation_ScrollPause;
-            transition_timer.changeInterval(scroll_timing_pause);
-        }
-        return;
-    }
-    else if (animation_stage == Animation_ScrollPause)
-    {
-        if (messages.count() > 1)
-        {
-            current_text_index++;
-            if (current_text_index >= (int) messages.count())
-            {
-                current_text_index = 0;
-            }
-            m_message = messages[current_text_index];
-            if (drop_timing_length > 0)
-            {
-                transition_timer.start(drop_timing_length);
-                animation_stage = Animation_Drop;
-                vertical_transform = m_displaysize.height();
-            }
-            else
-            {
-                transition_timer.start(drop_timing_pause);
-                animation_stage = Animation_DropPause;
-                vertical_transform = 0;
-            }
-
-            horizontal_transform = 0;
-            QFontMetrics fm(m_font->face);
-            max_horizontal_transform = fm.width(m_message) - m_displaysize.width();
-            if (max_horizontal_transform < 0)
-            {
-                max_horizontal_transform = 0;
-                m_justification = (Qt::AlignCenter | Qt::AlignBottom);
-            }
-            else
-            {
-                m_justification = (Qt::AlignLeft | Qt::AlignBottom);
-            }
-            refresh();
-        }
-        else
-        {
-            transition_timer.stop();
-        }
-
-    }
-    else
-    {
-        cerr << "uitypes.o: animation_stage is set to unknown "
-             << "value in UIMutliTextType object"
-             << endl;
-    }
-}
-
 
 // ******************************************************************
 
@@ -3204,8 +2939,8 @@ void UIManagedTreeListType::drawText(QPainter *p,
         // See if we should leave room for an icon to the left of the text
         int iconDim = 0;
         if (iconAttr >= 0)
-            iconDim = QFontMetrics(temp_font->face).height(); 
-    
+            iconDim = QFontMetrics(temp_font->face).height();
+
         the_text = cutDown(the_text, &(temp_font->face), false, bin_corners[bin_number].width() - right_arrow_image.width()-iconDim, bin_corners[bin_number].height());
         p->drawText(x+iconDim, y, the_text);
         if ((icon_number >= 0) && (iconMap.contains(icon_number)))
@@ -3846,7 +3581,7 @@ void UIManagedTreeListType::makeHighlights()
             QString a_string = QString("bin%1-active").arg(i);
             tmpfont = &m_fontfcns[m_fonts[a_string]];
             temp_pixmap->convertFromImage(
-                    temp_image.scaled(bin_corners[i].width(), 
+                    temp_image.scaled(bin_corners[i].width(),
                         QFontMetrics(tmpfont->face).height() + selectPadding,
                         Qt::IgnoreAspectRatio,
                         Qt::SmoothTransformation));
@@ -3872,7 +3607,7 @@ void UIManagedTreeListType::makeHighlights()
         tmpfont = &m_fontfcns[m_fonts[a_string]];
         temp_pixmap->convertFromImage(
             temp_image.scaled(
-                area.width(), 
+                area.width(),
                 QFontMetrics(tmpfont->face).height() + selectPadding,
                 Qt::IgnoreAspectRatio,
                 Qt::SmoothTransformation));
@@ -4869,12 +4604,12 @@ void UICheckBoxType::Draw(QPainter *p, int drawlayer, int context)
             return;
         }
     }
-    
+
     if (drawlayer != m_order)
     {
         return;
     }
-    
+
     if (has_focus)
     {
         if (checked)
@@ -5059,20 +4794,20 @@ void UISelectorType::setToItem(const QString &which_item)
     }
 }
 
-QString UISelectorType::getCurrentString() 
+QString UISelectorType::getCurrentString()
 {
     if (current_data)
         return current_data->getString();
     else
-        return "";    
+        return "";
 }
 
-int UISelectorType::getCurrentInt() 
+int UISelectorType::getCurrentInt()
 {
     if (current_data)
         return current_data->getInt();
     else
-        return -1;    
+        return -1;
 }
 
 
@@ -5225,8 +4960,8 @@ void UIKeyType::Draw(QPainter *dr, int drawlayer, int context)
             }
 
             dr->setBrush(tempFont->color);
-            dr->setPen(QPen(tempFont->color, (int)(2 * m_wmult))); 
-            dr->drawText(m_pos.x(), m_pos.y(), 
+            dr->setPen(QPen(tempFont->color, (int)(2 * m_wmult)));
+            dr->drawText(m_pos.x(), m_pos.y(),
                          m_area.width(), m_area.height(),
                          Qt::AlignCenter,
                          text);
@@ -5313,7 +5048,7 @@ QString UIKeyType::decodeChar(QString c)
                 res += QString(uc);
             }
             else
-                cout <<  "UIKeyType::decodeChar - bad char code " 
+                cout <<  "UIKeyType::decodeChar - bad char code "
                      <<  "(" << (const char *)sCode << ")" << endl;
         }
         else
@@ -5441,7 +5176,7 @@ const QString comps[numcomps][3] = {
         {"a", "~", (QChar)0xe3},    {"a", "\"", (QChar)0xe4},
         {"a", "*", (QChar)0xe5},    {"a", "e", (QChar)0xe6},
         {"c", ",", (QChar)0xe7},    {"e", "`", (QChar)0xe8},
-        {"e", "'", (QChar)0xe9},    {"e", "^", (QChar)0xea},	
+        {"e", "'", (QChar)0xe9},    {"e", "^", (QChar)0xea},
         {"e", "\"", (QChar)0xeb},   {"i", "`", (QChar)0xec},
         {"i", "'", (QChar)0xed},    {"i", "^", (QChar)0xee},
         {"i", "\"", (QChar)0xef},   {"d", "-", (QChar)0xf0},
@@ -5570,7 +5305,7 @@ void UIKeyboardType::calculateScreenArea()
 
 void UIKeyboardType::leftCursor()
 {
-    if (!m_parentEdit) 
+    if (!m_parentEdit)
         return;
 
     if (m_parentEdit->inherits("QLineEdit"))
@@ -5592,7 +5327,7 @@ void UIKeyboardType::leftCursor()
 
 void UIKeyboardType::rightCursor()
 {
-    if (!m_parentEdit) 
+    if (!m_parentEdit)
         return;
 
     if (m_parentEdit->inherits("QLineEdit"))
@@ -5614,7 +5349,7 @@ void UIKeyboardType::rightCursor()
 
 void UIKeyboardType::backspaceKey()
 {
-    if (!m_parentEdit) 
+    if (!m_parentEdit)
         return;
 
     if (m_parentEdit->inherits("QLineEdit"))
@@ -5636,7 +5371,7 @@ void UIKeyboardType::backspaceKey()
 
 void UIKeyboardType::delKey()
 {
-    if (!m_parentEdit) 
+    if (!m_parentEdit)
         return;
 
     if (m_parentEdit->inherits("QLineEdit"))
@@ -5950,7 +5685,7 @@ UIKeyType *UIKeyboardType::findKey(QString keyName)
 
 void UIKeyboardType::AddKey(UIKeyType *key)
 {
-    m_keyList.append(key); 
+    m_keyList.append(key);
 
     if (key->GetType().lower() == "done")
     {
