@@ -1791,7 +1791,8 @@ bool TV::StartRecorder(RemoteEncoder *rec, int maxWait)
 bool TV::StartPlayer(bool isWatchingRecording, int maxWait)
 {
     SetupPlayer(isWatchingRecording);
-    pthread_create(&decode, NULL, SpawnDecode, nvp);
+    if (pthread_create(&decode, NULL, SpawnDecode, nvp))
+        return false;
 
     maxWait = (maxWait <= 0) ? 20000 : maxWait;
 #ifdef USING_VALGRIND
