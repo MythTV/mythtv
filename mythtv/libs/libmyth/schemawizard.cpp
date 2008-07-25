@@ -98,11 +98,16 @@ return 0;
     return versionsBehind = m_newSchemaVer.toInt() - DBver.toUInt();
 }
 
+/**
+ * \todo  Add code to check if the schemalock table is locked,
+ *        and also loop until that is released.
+ */
 int SchemaUpgradeWizard::CompareAndWait(const int seconds)
 {
     if (Compare() > 0)  // i.e. if DB is older than expected
     {
-        VERBOSE(VB_IMPORTANT, "Waiting to see if DB is being upgraded."); 
+        VERBOSE(VB_IMPORTANT, "Database schema is old."
+                              " Waiting to see if DB is being upgraded."); 
 
         bool backupRunning = false; 
         MythTimer elapsedTimer; 
@@ -113,11 +118,11 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
             Compare(); 
             if (IsBackupInProgress()) 
             { 
-                elapsedTimer.restart(); 
+                VERBOSE(VB_IMPORTANT,
+                        "Waiting for Database Backup to complete."); 
                 if (!backupRunning) 
                 { 
-                    VERBOSE(VB_IMPORTANT,
-                            "Waiting for Database Backup to complete."); 
+                    elapsedTimer.restart(); 
                     backupRunning = true; 
                 } 
             } 
@@ -153,7 +158,6 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
  * \todo This uses GetMythUI()->IsScreenSetup() to work out if this program's
  *       context is a GUI, but GetMythUI() might create a MythUIHelper.
  *       Having a static bool MythUIHelper::ValidMythUI() would be much tidier?
-
  */
 enum MythSchemaUpgrade
 SchemaUpgradeWizard::PromptForUpgrade(const char *name,

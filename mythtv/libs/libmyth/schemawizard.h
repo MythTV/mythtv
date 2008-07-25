@@ -93,4 +93,4 @@ class MPUBLIC SchemaUpgradeWizard : public DBUtil, public QObject
     QString  m_newSchemaVer;       ///< What we need to upgrade to
 };
 
-#endif VERSION_WIZARDS_H
+#endif // SCHEMA_WIZARD_H

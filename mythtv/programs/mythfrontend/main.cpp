@@ -1056,11 +1056,11 @@ void CheckSchemaVersion(bool upgradeAllowed)
 
             if (DBUtil::IsBackupInProgress())
             {
-                elapsedTimer.restart();
+                VERBOSE(VB_IMPORTANT,
+                        "Waiting for Database Backup to complete.");
                 if (!backupRunning)
                 {
-                    VERBOSE(VB_IMPORTANT, "Waiting for Database Backup to "
-                            "complete.");
+                    elapsedTimer.restart();
                     backupRunning = true;
                 }
             }
