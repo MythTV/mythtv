@@ -150,7 +150,6 @@ class MPUBLIC RingBuffer
     volatile bool wantseek;
     bool setswitchtonext;
 
-    mutable QMutex bitratelock;
     uint           rawbitrate;
     float          playspeed;
     int            fill_threshold;

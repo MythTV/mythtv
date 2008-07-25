@@ -57,6 +57,28 @@ const uint RingBuffer::kBufferSize = 3 * 1024 * 1024;
 /* should be minimum of the above test sizes */
 const uint RingBuffer::kReadTestSize = PNG_MIN_SIZE;
 
+/*
+  Locking relations:
+    rwlock->readAheadLock
+          ->readsAllowedWaitMutex->readAheadRunningCondLock
+          ->availWaitMutex
+
+  A child should never lock any of the parents without locking
+  the parent lock before the child lock.
+  void RingBuffer::Example1()
+  {
+      QMutexLocker locker1(&readAheadRunningCondLock);
+      QMutexLocker locker2(&readsAllowedWaitMutex); // error!
+      blah(); // <- does not implicitly aquire any locks
+  }
+  void RingBuffer::Example2()
+  {
+      QMutexLocker locker1(&readsAllowedWaitMutex);
+      QMutexLocker locker2(&readAheadRunningCondLock); // ok!
+      blah(); // <- does not implicitly aquire any locks
+  }
+*/
+
 /** \class RingBuffer
  *  \brief Implements a file/stream reader/writer.
  *
@@ -269,7 +291,9 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
     else if (is_dvd)
     {
         dvdPriv->OpenFile(filename);
+        pthread_rwlock_wrlock(&rwlock);
         readblocksize = DVD_BLOCK_SIZE * 62;
+        pthread_rwlock_unlock(&rwlock);
     }
 #endif // USING_FRONTEND
     else
@@ -290,8 +314,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
     commserror = false;
     numfailures = 0;
 
-    rawbitrate = 4000;
-    CalcReadAheadThresh();
+    UpdateRawBitrate(4000);
 }
 
 /** \fn RingBuffer::IsOpen(void) const
@@ -485,9 +508,10 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, uint sz)
  */
 void RingBuffer::UpdateRawBitrate(uint raw_bitrate)
 {
-    QMutexLocker locker(&bitratelock);
+    pthread_rwlock_wrlock(&rwlock);
     rawbitrate = raw_bitrate;
     CalcReadAheadThresh();
+    pthread_rwlock_unlock(&rwlock);
 }
 
 /** \fn RingBuffer::GetBitrate(void) const
@@ -498,8 +522,9 @@ void RingBuffer::UpdateRawBitrate(uint raw_bitrate)
  */
 uint RingBuffer::GetBitrate(void) const
 {
-    QMutexLocker locker(&bitratelock);
+    pthread_rwlock_rdlock(&rwlock);
     uint tmp = (uint) max(abs(rawbitrate * playspeed), 0.5f * rawbitrate);
+    pthread_rwlock_unlock(&rwlock);
     return min(rawbitrate * 3, tmp);
 }
 
@@ -508,8 +533,10 @@ uint RingBuffer::GetBitrate(void) const
  */
 uint RingBuffer::GetReadBlockSize(void) const
 {
-    QMutexLocker locker(&bitratelock);
-    return readblocksize;
+    pthread_rwlock_rdlock(&rwlock);
+    uint tmp = readblocksize;
+    pthread_rwlock_unlock(&rwlock);
+    return tmp;
 }
 
 /** \fn RingBuffer::UpdatePlaySpeed(float)
@@ -518,20 +545,23 @@ uint RingBuffer::GetReadBlockSize(void) const
  */
 void RingBuffer::UpdatePlaySpeed(float play_speed)
 {
-    QMutexLocker locker(&bitratelock);
+    pthread_rwlock_wrlock(&rwlock);
     playspeed = play_speed;
     CalcReadAheadThresh();
+    pthread_rwlock_unlock(&rwlock);
 }
 
 /** \fn RingBuffer::CalcReadAheadThresh(void)
  *  \brief Calculates fill_min, fill_threshold, and readblocksize
  *         from the estimated effective bitrate of the stream.
+ *
+ *   WARNING: Must be called with rwlock in write lock state.
+ *
  */
 void RingBuffer::CalcReadAheadThresh(void)
 {
     uint estbitrate = 0;
 
-    pthread_rwlock_wrlock(&rwlock);
     wantseek       = false;
     readsallowed   = false;
     readblocksize  = CHUNK;
@@ -566,8 +596,6 @@ void RingBuffer::CalcReadAheadThresh(void)
         fill_min        = ((fill_min / KB32) + 1) * KB32;
     }
 #endif // USING_FRONTEND    
-
-    pthread_rwlock_unlock(&rwlock);
 
     VERBOSE(VB_PLAYBACK, LOC +
             QString("CalcReadAheadThresh(%1 KB)\n\t\t\t -> "
@@ -742,7 +770,10 @@ void RingBuffer::ReadAheadThread(void)
 
     readAheadBuffer = new char[kBufferSize + KB640];
 
+    pthread_rwlock_wrlock(&rwlock);
     ResetReadAhead(0);
+    pthread_rwlock_unlock(&rwlock);
+
     totfree = ReadBufFree();
 
     readaheadrunning = true;
@@ -766,7 +797,7 @@ void RingBuffer::ReadAheadThread(void)
             readaheadpaused = false;
         }
 
-        if (totfree < readblocksize)
+        if (totfree < GetReadBlockSize())
         {
             usleep(50000);
             totfree = ReadBufFree();
