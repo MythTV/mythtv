@@ -926,9 +926,10 @@ void StatusBox::doScheduleStatus()
     contentDetail[count] = tmpstr;
     count++;
 
-    ProgramInfo *s;
-    for (s = schedList.first(); s; s = schedList.next())
+    ProgramList::const_iterator it = schedList.begin();
+    for (; it != schedList.end(); ++it)
     {
+        const ProgramInfo *s = *it;
         if (statusMatch[s->recstatus] < 1)
             statusText[s->recstatus] = s->RecStatusText();
 

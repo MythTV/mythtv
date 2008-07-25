@@ -1,13 +1,11 @@
 #include <qlayout.h>
 #include <qpushbutton.h>
-#include <q3buttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
 #include <qsqldatabase.h>
 #include <qdatetime.h>
 #include <qapplication.h>
 #include <qregexp.h>
-#include <q3header.h>
 #include <QPaintEvent>
 #include <QPixmap>
 #include <QKeyEvent>
@@ -232,12 +230,14 @@ void ViewScheduleDiff::paintEvent(QPaintEvent *e)
 
 void ViewScheduleDiff::cursorDown(bool page)
 {
-    if (recList.count() == 0) return;
-    if (listPos < recList.count() - 1)
+    if (recList.empty())
+        return;
+
+    if (listPos < (int)recList.size() - 1)
     {
         listPos += (page ? listsize : 1);
-        if (listPos > recList.count() - 1)
-            listPos = recList.count() - 1;
+        if (listPos > (int)recList.size() - 1)
+            listPos = (int)recList.size() - 1;
         update(fullRect);
     }
 }
@@ -303,9 +303,11 @@ void ViewScheduleDiff::statusDialog()
     {
         message += " " + QObject::tr("The following programs will be recorded "
                                      "instead:") + "\n\n";
-        ProgramInfo *pa = recListAfter.first();
-        while (pa)
+
+        ProgramList::const_iterator it = recListAfter.begin();
+        for (; it != recListAfter.end(); ++it)
         {
+            const ProgramInfo *pa = *it;
             if (pa->recstartts >= pi->recendts)
                 break;
             if (pa->recendts > pi->recstartts &&
@@ -319,7 +321,6 @@ void ViewScheduleDiff::statusDialog()
                     message += QString(" - \"%1\"").arg(pa->subtitle);
                 message += "\n";
             }
-            pa = recListAfter.next();
         }
     }
 
@@ -331,7 +332,7 @@ void ViewScheduleDiff::statusDialog()
     return;
 }
 
-static int comp_recstart(ProgramInfo *a, ProgramInfo *b)
+static int comp_recstart(const ProgramInfo *a, const ProgramInfo *b)
 {
     if (a->recstartts != b->recstartts)
     {
@@ -365,6 +366,11 @@ static int comp_recstart(ProgramInfo *a, ProgramInfo *b)
     return 0;
 }
 
+static bool comp_recstart_less_than(const ProgramInfo *a, const ProgramInfo *b)
+{
+    return comp_recstart(a,b) < 0;
+}
+
 void ViewScheduleDiff::FillList(void)
 {
     inFill = true;
@@ -372,7 +378,7 @@ void ViewScheduleDiff::FillList(void)
     QString callsign;
     QDateTime startts, recstartts;
 
-    if (listPos < recList.count())
+    if (listPos < (int)recList.size())
     {
         struct ProgramStruct s = recList[listPos];
         ProgramInfo *p = s.after;
@@ -388,73 +394,86 @@ void ViewScheduleDiff::FillList(void)
     recListBefore.FromScheduler(conflictBool);
     recListAfter.FromScheduler(conflictBool, altTable, recordid);
 
-    recListBefore.Sort(comp_recstart);
-    recListAfter.Sort(comp_recstart);
+    recListBefore.sort(comp_recstart_less_than);
+    recListAfter.sort(comp_recstart_less_than);
 
     QDateTime now = QDateTime::currentDateTime();
 
-    ProgramInfo *p = recListBefore.first();
-    while (p)
+    ProgramList::iterator it = recListBefore.begin();
+    while (it != recListBefore.end())
     {
-        if (p->recendts >= now || p->endts >= now)
-            p = recListBefore.next();
+        if ((*it)->recendts >= now || (*it)->endts >= now)
+        {
+            ++it;
+        }
         else
         {
-            recListBefore.remove();
-            p = recListBefore.current();
+            it = recListBefore.erase(it);
         }
     }
 
-    p = recListAfter.first();
-    while (p)
+    it = recListAfter.begin();
+    while (it != recListAfter.end())
     {
-        if (p->recendts >= now || p->endts >= now)
-            p = recListAfter.next();
+        if ((*it)->recendts >= now || (*it)->endts >= now)
+        {
+            ++it;
+        }
         else
         {
-            recListAfter.remove();
-            p = recListAfter.current();
+            it = recListAfter.erase(it);
         }
     }
 
-    ProgramInfo *pb = recListBefore.first();
-    ProgramInfo *pa = recListAfter.first();
+    ProgramList::iterator pb = recListBefore.begin();
+    ProgramList::iterator pa = recListAfter.begin();
     ProgramStruct s;
 
     recList.clear();
-    while (pa || pb) {
-           s.before = pb;
-           s.after = pa;
+    while (pa != recListAfter.end() || pb != recListBefore.end())
+    {
+        s.before = (pb != recListBefore.end()) ? *pb : NULL;
+        s.after  = (pa != recListAfter.end())  ? *pa : NULL;
 
-           if (!pa) {
-                pb = recListBefore.next();
-           } else if (!pb) {
-               pa = recListAfter.next();
-           } else switch (comp_recstart(pb, pa)) {
-               case 0:
-                   pb = recListBefore.next();
-                   pa = recListAfter.next();
-                   break;
-               case -1: // pb BEFORE pa
-                   pb = recListBefore.next();
-                   s.after = NULL;
-                   break;
-               case 1: // pa BEFORE pb
-                   s.before = NULL;
-                   pa = recListAfter.next();
-                   break;
-           }
-           if (s.before && s.after && (s.before->cardid == s.after->cardid) &&
-               (s.before->recstatus == s.after->recstatus))
-           {
-               continue;
-           }
-           recList.push_back(s);
+        if (pa == recListAfter.end())
+        {
+            ++pb;
+        }
+        else if (pb == recListBefore.end())
+        {
+            ++pa;
+        }
+        else
+        {
+            switch (comp_recstart(*pb, *pa))
+            {
+                case 0:
+                    ++pb;
+                    ++pa;
+                    break;
+                case -1: // pb BEFORE pa
+                    ++pb;
+                    s.after = NULL;
+                    break;
+                case 1: // pa BEFORE pb
+                    s.before = NULL;
+                    ++pa;
+                    break;
+            }
+        }
+
+        if (s.before && s.after && (s.before->cardid == s.after->cardid) &&
+            (s.before->recstatus == s.after->recstatus))
+        {
+            continue;
+        }
+
+        recList.push_back(s);
     }
 
     if (!callsign.isNull())
     {
-        listPos = recList.count() - 1;
+        listPos = recList.size() - 1;
         int i;
         for (i = listPos; i >= 0; i--)
         {
@@ -492,7 +511,7 @@ void ViewScheduleDiff::updateList(QPainter *p)
             ltype->ResetList();
             ltype->SetActive(true);
 
-            int listCount = (int)recList.count();
+            int listCount = (int)recList.size();
 
             int skip;
             if (listCount <= listsize || (int)listPos <= listsize / 2)
@@ -559,7 +578,7 @@ void ViewScheduleDiff::updateList(QPainter *p)
         }
     }
 
-    if (recList.count() == 0)
+    if (recList.empty())
         container = theme->GetSet("norecordings_list");
 
     if (container)
@@ -629,7 +648,7 @@ void ViewScheduleDiff::updateInfo(QPainter *p)
             container->SetText(infoMap);
         }
     }
-    if (recList.count() == 0)
+    if (recList.empty())
         container = theme->GetSet("norecordings_info");
 
     if (container)
@@ -678,8 +697,9 @@ void ViewScheduleDiff::updateRecStatus(QPainter *p)
     p->drawPixmap(pr.topLeft(), pix);
 }
 
-ProgramInfo *ViewScheduleDiff::CurrentProgram() {
-    if (listPos >= recList.count())
+ProgramInfo *ViewScheduleDiff::CurrentProgram(void)
+{
+    if (listPos >= (int)recList.size())
         return NULL;
     ProgramStruct s = recList[listPos];
     if (s.after) return s.after;

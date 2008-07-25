@@ -565,10 +565,11 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
     int          iChanCount = 0;
     QDomElement  channel;
     QString      sCurChanId = "";
-    ProgramInfo *pInfo      = progList.first();
 
-    while (pInfo != NULL)
+    ProgramList::iterator it = progList.begin();
+    for (; it != progList.end(); ++it)
     {
+        ProgramInfo *pInfo = *it;
         if ( sCurChanId != pInfo->chanid )
         {
             iChanCount++;
@@ -584,9 +585,6 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
         }
 
         FillProgramInfo( &doc, channel, pInfo, false, bDetails );
-
-        pInfo = progList.next();
-
     }
 
     // ----------------------------------------------------------------------
@@ -671,9 +669,9 @@ void MythXML::GetProgramDetails( HTTPRequest *pRequest )
 
     progList.FromProgram( sSQL, bindings, schedList );
 
-    ProgramInfo *pInfo = progList.first();
+    ProgramList::iterator pgit = progList.begin();
 
-    if (pInfo==NULL)
+    if (pgit == progList.end())
     {
         UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed,
                                                 "Error Reading Program Info" );
@@ -687,7 +685,7 @@ void MythXML::GetProgramDetails( HTTPRequest *pRequest )
 //    QDomElement root = doc.createElement("Programs");
 //    doc.appendChild(root);
 
-    FillProgramInfo( &doc, doc, pInfo, true );
+    FillProgramInfo( &doc, doc, *pgit, true );
 
     // ----------------------------------------------------------------------
 
@@ -1030,14 +1028,9 @@ void MythXML::GetRecorded( HTTPRequest *pRequest )
     QDomElement root = doc.createElement("Programs");
     doc.appendChild(root);
 
-    ProgramInfo *pInfo = progList.first();
-
-    while (pInfo != NULL)
-    {
-        FillProgramInfo( &doc, root, pInfo, true );
-
-        pInfo = progList.next();
-    }
+    ProgramList::iterator it = progList.begin();
+    for (; it != progList.end(); ++it)
+        FillProgramInfo( &doc, root, *it, true );
 
     // ----------------------------------------------------------------------
 

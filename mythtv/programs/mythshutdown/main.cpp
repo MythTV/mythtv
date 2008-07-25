@@ -364,12 +364,6 @@ int setWakeupTime(QString sWakeupTime)
 
 int setScheduledWakeupTime()
 {
-    typedef struct
-    {
-        QString channel, title, subtitle;
-        QDateTime startTime, endTime;
-    } ProgramDetail;
-
     if (!gContext->IsConnectedToMaster())
     {
         VERBOSE(VB_IMPORTANT, "setScheduledWakeupTime: Attempting to connect to master server...");
@@ -380,55 +374,15 @@ int setScheduledWakeupTime()
         }
     }
 
-    QDateTime m_nextRecordingStart = QDateTime();
-
-    ProgramList *progList = new ProgramList(true);
-    ProgramInfo *progInfo;
-
-    if (progList->FromScheduler())
-    {
-        if (progList->count() > 0)
-        {
-            VERBOSE(VB_IMPORTANT, "setScheduledWakeupTime: At least one scheduled recording found.");
-            // find the earliest scheduled recording
-            for (progInfo = progList->first(); progInfo; progInfo = progList->next())
-            {
-                if (progInfo->recstatus == rsWillRecord)
-                {
-                    if (m_nextRecordingStart.isNull() ||
-                            m_nextRecordingStart > progInfo->recstartts)
-                    {
-                        m_nextRecordingStart = progInfo->recstartts;
-                    }
-                }
-            }
-
-            // save the details of the earliest recording(s)
-            for (progInfo = progList->first(); progInfo; progInfo = progList->next())
-            {
-                if (progInfo->recstatus == rsWillRecord)
-                {
-                    if (progInfo->recstartts == m_nextRecordingStart)
-                    {
-                        ProgramDetail *prog = new ProgramDetail;
-                        prog->channel = progInfo->channame;
-                        prog->title = progInfo->title;
-                        prog->subtitle = progInfo->subtitle;
-                        prog->startTime = progInfo->recstartts;
-                        prog->endTime = progInfo->recendts;
-                    }
-                }
-            }
-        }
-    }
-
-    delete progList;
+    QDateTime nextRecordingStart;
+    ProgramList::GetProgramDetailList(nextRecordingStart);
 
     // set the wakeup time for the next scheduled recording
-    if (!m_nextRecordingStart.isNull())
+    if (!nextRecordingStart.isNull())
     {
         int m_preRollSeconds = gContext->GetNumSetting("RecordPreRoll");
-        QDateTime restarttime = m_nextRecordingStart.addSecs((-1) * m_preRollSeconds);
+        QDateTime restarttime = nextRecordingStart
+            .addSecs((-1) * m_preRollSeconds);
 
         int add = gContext->GetNumSetting("StartupSecsBeforeRecording", 240);
         if (add)

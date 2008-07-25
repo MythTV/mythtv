@@ -12,6 +12,7 @@ using namespace std;
 
 #include "mythdialogs.h"
 #include "remoteutil.h"
+#include "programinfo.h"
 
 class WelcomeDialog : public MythThemedDialog
 {
@@ -89,14 +90,8 @@ class WelcomeDialog : public MythThemedDialog
     uint           m_statusListNo;
     QStringList    m_statusList;
      
-    typedef struct
-    {
-        QString channel, title, subtitle;
-        QDateTime startTime, endTime;
-    } ProgramDetail;
-
-    Q3PtrList<TunerStatus>    m_tunerList;
-    Q3PtrList<ProgramDetail>  m_scheduledList;
+    Q3PtrList<TunerStatus> m_tunerList;
+    ProgramDetailList   m_scheduledList;
 
     QMutex      m_RecListUpdateMuxtex;
     bool        m_pendingRecListUpdate;

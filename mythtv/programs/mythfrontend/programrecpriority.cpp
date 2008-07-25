@@ -932,9 +932,10 @@ void ProgramRecPriority::countMatches()
     schedList.FromScheduler();
     QDateTime now = QDateTime::currentDateTime();
 
-    ProgramInfo *s;
-    for (s = schedList.first(); s; s = schedList.next())
+    ProgramList::const_iterator it = schedList.begin();
+    for (; it != schedList.end(); ++it)
     {
+        const ProgramInfo *s = *it;
         if (s->recendts > now && s->recstatus != rsNotListed)
         {
             listMatch[s->recordid]++;

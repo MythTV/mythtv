@@ -311,9 +311,10 @@ void ViewScheduled::FillList(void)
 
     QMap<int, int> toomanycounts;
 
-    ProgramInfo *p = recList.first();
-    while (p)
+    ProgramList::iterator pit = recList.begin();
+    while (pit != recList.end())
     {
+        ProgramInfo *p = *pit;
         if ((p->recendts >= now || p->endts >= now) && 
             (showAll || p->recstatus <= rsWillRecord || 
              p->recstatus == rsDontRecord ||
@@ -331,12 +332,11 @@ void ViewScheduled::FillList(void)
             if (p->inputid > maxinput)
                 maxinput = p->inputid;
 
-            p = recList.next();
+            ++pit;
         }
         else
         {
-            recList.remove();
-            p = recList.current();
+            pit = recList.erase(pit);
         }
     }
 

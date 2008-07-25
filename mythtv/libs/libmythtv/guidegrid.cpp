@@ -5,7 +5,6 @@
 #include <qsqlquery.h>
 #include <QKeyEvent>
 #include <QEvent>
-#include <Q3PtrList>
 #include <QPixmap>
 #include <QPaintEvent>
 #include <math.h>
@@ -15,8 +14,6 @@
 #include <qlayout.h>
 #include <qlabel.h>
 #include <qdatetime.h>
-#include <q3vgroupbox.h>
-#include <q3header.h>
 #include <qrect.h>
 
 #include <unistd.h>
@@ -1125,8 +1122,6 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
         type->ResetRow(row);
  
     ProgramList *proglist;
-    ProgramInfo *program;
-    ProgramInfo *proginfo = NULL;
 
     if (m_programs[row])
         delete m_programs[row];
@@ -1183,18 +1178,19 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
         type->SetProgPast(progPast);
     }
 
-    program = proglist->first();
-    Q3PtrList<ProgramInfo> unknownlist;
+    ProgramList::iterator program;
+    program = proglist->begin();
+    vector<ProgramInfo*> unknownlist;
     bool unknown = false;
-
+    ProgramInfo *proginfo = NULL;
     for (int x = 0; x < DISPLAY_TIMES; x++)
     {
-        if (program && (ts >= (*program).endts))
+        if (program != proglist->end() && (ts >= (*program)->endts))
         {
-            program = proglist->next();
+            ++program;
         }
 
-        if ((!program) || (ts < (*program).startts))
+        if ((program == proglist->end()) || (ts < (*program)->startts))
         {
             if (unknown)
             {
@@ -1204,7 +1200,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
             else
             {
                 proginfo = new ProgramInfo;
-                unknownlist.append(proginfo);
+                unknownlist.push_back(proginfo);
                 proginfo->title = unknownTitle;
                 proginfo->category = unknownCategory;
                 proginfo->startCol = x;
@@ -1216,13 +1212,13 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
         }
         else
         {
-            if (proginfo == &*program)
+            if (proginfo == *program)
             {
                 proginfo->spread++;
             }
             else
             {
-                proginfo = &*program;
+                proginfo = *program;
                 proginfo->startCol = x;
                 proginfo->spread = 1;
                 unknown = false;
@@ -1232,11 +1228,9 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
         ts = ts.addSecs(5 * 60);
     }
 
-    for (proginfo = unknownlist.first(); proginfo; 
-         proginfo = unknownlist.next())
-    {
-        proglist->append(proginfo);
-    }
+    vector<ProgramInfo*>::iterator it = unknownlist.begin();
+    for (; it != unknownlist.end(); ++it)
+        proglist->append(*it);
 
     int ydifference = programRect.height() / DISPLAY_CHANS;
     int xdifference = programRect.width() / DISPLAY_TIMES;
@@ -1250,33 +1244,33 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
 
     for (int x = 0; x < DISPLAY_TIMES; x++)
     {
-        proginfo = m_programInfos[row][x];
-        if (!proginfo)
+        ProgramInfo *pginfo = m_programInfos[row][x];
+        if (!pginfo)
             continue;
 
         spread = 1;
-        if (proginfo->startts != lastprog)
+        if (pginfo->startts != lastprog)
         {
             arrow = 0;
-            if (proginfo->startts < firstTime.addSecs(-300))
+            if (pginfo->startts < firstTime.addSecs(-300))
                 arrow = arrow + 1;
-            if (proginfo->endts > lastTime.addSecs(2100))
+            if (pginfo->endts > lastTime.addSecs(2100))
                 arrow = arrow + 2;
 
-            if (proginfo->spread != -1)
+            if (pginfo->spread != -1)
             {
-                spread = proginfo->spread;
+                spread = pginfo->spread;
             }
             else
             {
                 for (int z = x + 1; z < DISPLAY_TIMES; z++)
                 {
                     ProgramInfo *test = m_programInfos[row][z];
-                    if (test && test->startts == proginfo->startts)
+                    if (test && test->startts == pginfo->startts)
                         spread++;
                 }
-                proginfo->spread = spread;
-                proginfo->startCol = x;
+                pginfo->spread = spread;
+                pginfo->startCol = x;
 
                 for (int z = x + 1; z < x + spread; z++)
                 {
@@ -1290,7 +1284,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
             }
 
             tempRect = QRect((int)(x * xdifference), (int)(row * ydifference),
-                            (int)(xdifference * proginfo->spread), ydifference);
+                            (int)(xdifference * pginfo->spread), ydifference);
 
             if (m_currentRow == (int)row && (m_currentCol >= x) &&
                 (m_currentCol < (x + spread)))
@@ -1301,7 +1295,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
             if (type)
             {
                 int recFlag;
-                switch (proginfo->rectype) 
+                switch (pginfo->rectype) 
                 {
                 case kSingleRecord:
                     recFlag = 1;
@@ -1334,23 +1328,23 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
                 }
 
                 int recStat;
-                if (proginfo->recstatus == rsConflict ||
-                    proginfo->recstatus == rsOffLine)
+                if (pginfo->recstatus == rsConflict ||
+                    pginfo->recstatus == rsOffLine)
                     recStat = 2;
-                if (proginfo->recstatus <= rsWillRecord)
+                if (pginfo->recstatus <= rsWillRecord)
                     recStat = 1;
                 else
                     recStat = 0;
 
-                type->SetProgramInfo(row, cnt, tempRect, proginfo->title,
-                                     proginfo->category, arrow, recFlag, 
+                type->SetProgramInfo(row, cnt, tempRect, pginfo->title,
+                                     pginfo->category, arrow, recFlag, 
                                      recStat, isCurrent);
 
                 cnt++;
             }
         }
 
-        lastprog = proginfo->startts;
+        lastprog = pginfo->startts;
     } 
 }
 

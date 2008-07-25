@@ -66,7 +66,6 @@ WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
     m_timeTimer->start(1000);
 
     m_tunerList.setAutoDelete(true);
-    m_scheduledList.setAutoDelete(true);
 
     popup = NULL;
 
@@ -417,25 +416,25 @@ void WelcomeDialog::updateScreen(void)
         m_recording_text->SetText(status);
 
         // update scheduled
-        if (m_scheduledList.count() > 0)
+        if (!m_scheduledList.empty())
         {
-            if (m_screenScheduledNo >= m_scheduledList.count())
+            if (m_screenScheduledNo >= m_scheduledList.size())
                 m_screenScheduledNo = 0;
 
-            ProgramDetail *prog = m_scheduledList.at(m_screenScheduledNo);
+            ProgramDetail prog = m_scheduledList.at(m_screenScheduledNo);
 
             //status = QString("%1 of %2\n").arg(m_screenScheduledNo + 1)
             //                               .arg(m_scheduledList.count());
-            status = prog->channel + "\n";
-            status += prog->title;
-            if (prog->subtitle != "")
-                status += "\n(" + prog->subtitle + ")";
+            status = prog.channame + "\n";
+            status += prog.title;
+            if (prog.subtitle != "")
+                status += "\n(" + prog.subtitle + ")";
 
             QString dateFormat = gContext->GetSetting("DateFormat", "ddd dd MMM yyyy");
-            status += "\n" + prog->startTime.toString(dateFormat + " (" + m_timeFormat) +
-                " " + tr("to") + " " +  prog->endTime.toString(m_timeFormat + ")");
+            status += "\n" + prog.startTime.toString(dateFormat + " (" + m_timeFormat) +
+                " " + tr("to") + " " +  prog.endTime.toString(m_timeFormat + ")");
 
-            if (m_screenScheduledNo < m_scheduledList.count() - 1)
+            if (m_screenScheduledNo < m_scheduledList.size() - 1)
                 m_screenScheduledNo++;
             else
                 m_screenScheduledNo = 0;
@@ -537,49 +536,8 @@ bool WelcomeDialog::updateScheduledList()
         return false;
     }
 
-    m_nextRecordingStart = QDateTime();
-
-    ProgramList *progList = new ProgramList(true);
-    ProgramInfo *progInfo;
-
-    if (progList->FromScheduler(m_hasConflicts))
-    {
-        if (progList->count() > 0)
-        {
-            // find the earliest scheduled recording
-            for (progInfo = progList->first(); progInfo; progInfo = progList->next())
-            {
-                if (progInfo->recstatus == rsWillRecord)
-                {
-                    if (m_nextRecordingStart.isNull() ||
-                            m_nextRecordingStart > progInfo->recstartts)
-                    {
-                        m_nextRecordingStart = progInfo->recstartts;
-                    }
-                }
-            }
-
-            // save the details of the earliest recording(s)
-            for (progInfo = progList->first(); progInfo; progInfo = progList->next())
-            {
-                if (progInfo->recstatus == rsWillRecord)
-                {
-                    if (progInfo->recstartts == m_nextRecordingStart)
-                    {
-                        ProgramDetail *prog = new ProgramDetail;
-                        prog->channel = progInfo->channame;
-                        prog->title = progInfo->title;
-                        prog->subtitle = progInfo->subtitle;
-                        prog->startTime = progInfo->recstartts;
-                        prog->endTime = progInfo->recendts;
-                        m_scheduledList.append(prog);
-                    }
-                }
-            }
-        }
-    }
-
-    delete progList;
+    ProgramList::GetProgramDetailList(
+        m_nextRecordingStart, &m_hasConflicts, &m_scheduledList);
 
     updateStatus();
     updateScreen();
@@ -626,7 +584,7 @@ void WelcomeDialog::updateStatusMessage(void)
     if (statusCode & 128)
         m_statusList.append(tr("MythTV is about to start a wakeup/shutdown period."));
 
-    if (m_statusList.count() == 0)
+    if (m_statusList.empty())
     {
         if (m_bWillShutdown && m_secondsToShutdown != -1)
             m_statusList.append(tr("MythTV is idle and will shutdown in %1 seconds.")

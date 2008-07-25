@@ -1745,7 +1745,7 @@ void ProgLister::fillItemList(void)
 
     while (itemList.count())
     {
-        s = itemList.take();
+        s = itemList.take(0);
         if (type == plTitle)
             s->sortTitle = s->subtitle;
         else

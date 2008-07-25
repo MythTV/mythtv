@@ -1,5 +1,4 @@
 #include <iostream>
-#include <q3socket.h>
 #include <qregexp.h>
 #include <qmap.h>
 #include <qlayout.h>
@@ -180,21 +179,21 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     isVideo = other.isVideo;
     lenMins = other.lenMins;
 
-    title = Q3DeepCopy<QString>(other.title);
-    subtitle = Q3DeepCopy<QString>(other.subtitle);
-    description = Q3DeepCopy<QString>(other.description);
-    category = Q3DeepCopy<QString>(other.category);
-    chanid = Q3DeepCopy<QString>(other.chanid);
-    chanstr = Q3DeepCopy<QString>(other.chanstr);
-    chansign = Q3DeepCopy<QString>(other.chansign);
-    channame = Q3DeepCopy<QString>(other.channame);
+    title = other.title;
+    subtitle = other.subtitle;
+    description = other.description;
+    category = other.category;
+    chanid = other.chanid;
+    chanstr = other.chanstr;
+    chansign = other.chansign;
+    channame = other.channame;
     chancommfree = other.chancommfree;
-    chanOutputFilters = Q3DeepCopy<QString>(other.chanOutputFilters);
+    chanOutputFilters = other.chanOutputFilters;
 
-    pathname = Q3DeepCopy<QString>(other.pathname);
-    storagegroup = Q3DeepCopy<QString>(other.storagegroup);
+    pathname = other.pathname;
+    storagegroup = other.storagegroup;
     filesize = other.filesize;
-    hostname = Q3DeepCopy<QString>(other.hostname);
+    hostname = other.hostname;
 
     startts = other.startts;
     endts = other.endts;
@@ -222,11 +221,11 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     cardid = other.cardid;
     shareable = other.shareable;
     duplicate = other.duplicate;
-    schedulerid = Q3DeepCopy<QString>(other.schedulerid);
+    schedulerid = other.schedulerid;
     findid = other.findid;
     recpriority = other.recpriority;
-    recgroup = Q3DeepCopy<QString>(other.recgroup);
-    playgroup = Q3DeepCopy<QString>(other.playgroup);
+    recgroup = other.recgroup;
+    playgroup = other.playgroup;
     programflags = other.programflags;
     transcoder = other.transcoder;
     audioproperties = other.audioproperties;
@@ -236,22 +235,52 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     hasAirDate = other.hasAirDate;
     repeat = other.repeat;
 
-    seriesid = Q3DeepCopy<QString>(other.seriesid);
-    programid = Q3DeepCopy<QString>(other.programid);
-    catType = Q3DeepCopy<QString>(other.catType);
+    seriesid = other.seriesid;
+    programid = other.programid;
+    catType = other.catType;
 
-    sortTitle = Q3DeepCopy<QString>(other.sortTitle);
+    sortTitle = other.sortTitle;
 
     originalAirDate = other.originalAirDate;
     stars = other.stars;
-    year = Q3DeepCopy<QString>(other.year);
+    year = other.year;
     ignoreBookmark = other.ignoreBookmark;
 
-    inUseForWhat = Q3DeepCopy<QString>(other.inUseForWhat);
+    inUseForWhat = other.inUseForWhat;
     lastInUseTime = other.lastInUseTime;
     record = NULL;
 
     positionMapDBReplacement = other.positionMapDBReplacement;
+
+    title.detach();
+    subtitle.detach();
+    description.detach();
+    category.detach();
+
+    chanid.detach();
+    chanstr.detach();
+    chansign.detach();
+    channame.detach();
+
+    recgroup.detach();
+    playgroup.detach();
+
+    pathname.detach();
+    hostname.detach();
+    storagegroup.detach();
+
+    year.detach();
+
+    schedulerid.detach();
+
+    chanOutputFilters.detach();
+
+    seriesid.detach();
+    programid.detach();
+    catType.detach();
+
+    sortTitle.detach();
+    inUseForWhat.detach();
 
     return *this;
 }
@@ -801,7 +830,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
     progList.FromProgram(querystr, bindings, schedList);
 
     if (!progList.isEmpty())
-        nextstart = progList.at(0)->startts;
+        nextstart = (*progList.begin())->startts;
 
     if (nextstart > p->startts && nextstart < p->recendts)
     {
@@ -4636,6 +4665,71 @@ void ProgramInfo::ShowNotRecordingDialog(void)
  *                                                                           *
  * ************************************************************************* */
 
+ProgramList::~ProgramList(void)
+{
+    clear();
+}
+
+ProgramInfo *ProgramList::operator[](uint index)
+{
+    iterator it = pglist.begin();
+    for (uint i = 0; i < index; i++, it++)
+    {
+        if (it == pglist.end())
+            return NULL;
+    }
+    if (it == pglist.end())
+        return NULL;
+    return *it;
+}
+
+bool ProgramList::operator==(const ProgramList &b) const
+{
+    const_iterator it_a  = pglist.begin();
+    const_iterator it_b  = b.pglist.begin();
+    const_iterator end_a = pglist.end();
+    const_iterator end_b = b.pglist.end();
+
+    for (; it_a != end_a && it_b != end_b; ++it_a, ++it_b)
+    {
+        if (*it_a != *it_b)
+            return false;
+    }
+
+    return (it_a == end_a) && (it_b == end_b);
+}
+
+ProgramInfo *ProgramList::take(uint index)
+{
+    iterator it = pglist.begin();
+    for (uint i = 0; i < index; i++, it++)
+    {
+        if (it == pglist.end())
+            return NULL;
+    }
+    ProgramInfo *pginfo = *it;
+    pglist.erase(it);
+    return pginfo;
+}
+
+ProgramList::iterator ProgramList::erase(iterator it)
+{
+    if (autodelete)
+        delete *it;
+    return pglist.erase(it);
+}
+
+void ProgramList::clear(void)
+{
+    if (autodelete)
+    {
+        iterator it = pglist.begin();
+        for (; it != pglist.end(); ++it)
+            delete *it;
+    }
+    pglist.clear();
+}
+
 bool ProgramList::FromScheduler(bool &hasConflicts, QString tmptable,
                                 int recordid)
 {
@@ -4672,12 +4766,12 @@ bool ProgramList::FromScheduler(bool &hasConflicts, QString tmptable,
         ProgramInfo *p = new ProgramInfo();
         result = p->FromStringList(sit, slist.end());
         if (result)
-            append(p);
+            pglist.push_back(p);
         else
             delete p;
     }
 
-    if (count() != slist[1].toUInt())
+    if (pglist.size() != slist[1].toUInt())
     {
         VERBOSE(VB_IMPORTANT,
                 "ProgramList::FromScheduler(): Length mismatch");
@@ -4783,9 +4877,10 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
         p->recstatus = RecStatusType(query.value(21).toInt());
         p->findid = query.value(22).toInt();
 
-        ProgramInfo *s;
-        for (s = schedList.first(); s; s = schedList.next())
+        iterator it = schedList.pglist.begin();
+        for (; it != schedList.pglist.end(); ++it)
         {
+            ProgramInfo *s = *it;
             if (p->IsSameTimeslot(*s))
             {
                 p->recordid = s->recordid;
@@ -4819,7 +4914,7 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
             }
         }
 
-        append(p);
+        pglist.push_back(p);
     }
 
     return true;
@@ -5016,10 +5111,10 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
 
             if ((pSchedList != NULL) && (proginfo->recendts > rectime))
             {
-                ProgramInfo *s;
-
-                for (s = pSchedList->first(); s; s = pSchedList->next())
+                iterator it = pSchedList->pglist.begin();
+                for (; it != pSchedList->pglist.end(); ++it)
                 {
+                    ProgramInfo *s = *it;
                     if (s && s->recstatus    == rsRecording &&
                         proginfo->chanid     == s->chanid   &&
                         proginfo->recstartts == s->recstartts)
@@ -5032,8 +5127,7 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
 
             proginfo->stars = query.value(31).toDouble();
 
-            append(proginfo);
-
+            pglist.push_back(proginfo);
         }
     }
 
@@ -5088,20 +5182,56 @@ bool ProgramList::FromOldRecorded(const QString &sql, MSqlBindings &bindings)
         p->recordid = query.value(15).toInt();
         p->duplicate = query.value(16).toInt();
 
-        append(p);
+        pglist.push_back(p);
     }
 
     return true;
 }
 
-int ProgramList::compareItems(Q3PtrCollection::Item item1,
-                              Q3PtrCollection::Item item2)
+bool ProgramList::GetProgramDetailList(
+    QDateTime &nextRecordingStart, bool *hasConflicts, ProgramDetailList *list)
 {
-    if (compareFunc)
-        return compareFunc(reinterpret_cast<ProgramInfo *>(item1),
-                           reinterpret_cast<ProgramInfo *>(item2));
-    else
-        return 0;
+    nextRecordingStart = QDateTime();
+
+    bool dummy;
+    bool *conflicts = (hasConflicts) ? hasConflicts : &dummy;
+
+    ProgramList progList;
+    if (!progList.FromScheduler(*conflicts))
+        return false;
+
+    // find the earliest scheduled recording
+    ProgramList::const_iterator it = progList.begin();
+    for (; it != progList.end(); ++it)
+    {
+        if (((*it)->recstatus == rsWillRecord) &&
+            (nextRecordingStart.isNull() ||
+             nextRecordingStart > (*it)->recstartts))
+        {
+            nextRecordingStart = (*it)->recstartts;
+        }
+    }
+
+    if (!list)
+        return true;
+
+    // save the details of the earliest recording(s)
+    for (it = progList.begin(); it != progList.end(); ++it)
+    {
+        if (((*it)->recstatus  == rsWillRecord) &&
+            ((*it)->recstartts == nextRecordingStart))
+        {
+            ProgramDetail prog;
+            prog.channame  = (*it)->channame;
+            prog.title     = (*it)->title;
+            prog.subtitle  = (*it)->subtitle;
+            prog.startTime = (*it)->recstartts;
+            prog.endTime   = (*it)->recendts;
+            list->push_back(prog);
+        }
+    }
+
+    return true;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

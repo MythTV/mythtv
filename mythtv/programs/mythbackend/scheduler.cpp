@@ -421,9 +421,9 @@ void Scheduler::FillRecordListFromMaster(void)
 
     QMutexLocker lockit(reclist_lock);
 
-    ProgramInfo *p;
-    for (p = schedList.first(); p; p = schedList.next())
-        reclist.push_back(p);
+    ProgramList::iterator it = schedList.begin();
+    for (; it != schedList.end(); ++it)
+        reclist.push_back(*it);
 }
 
 void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
@@ -594,9 +594,10 @@ void Scheduler::SlaveConnected(ProgramList &slavelist)
 {
     QMutexLocker lockit(reclist_lock);
 
-    ProgramInfo *sp;
-    for (sp = slavelist.first(); sp; sp = slavelist.next())
+    ProgramList::iterator it = slavelist.begin();
+    for (; it != slavelist.end(); ++it)
     {
+        ProgramInfo *sp = *it;
         bool found = false;
 
         RecIter ri = reclist.begin();

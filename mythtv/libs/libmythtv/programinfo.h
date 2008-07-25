@@ -7,14 +7,14 @@
 #include <qstring.h>
 #include <qdatetime.h>
 #include <qmap.h>
-#include <Q3GridLayout>
-#include <Q3PtrList>
 #include <QStringList>
 
 #include <qregexp.h>
-#include <vector>
 
+#include <vector>
+#include <list>
 using namespace std;
+
 typedef QMap<long long, long long> frm_pos_map_t;
 typedef QMap<long long, int> frm_dir_map_t;
 
@@ -160,7 +160,6 @@ class PMapDBReplacement
 };
 
 class ScheduledRecording;
-class Q3GridLayout;
 
 class MPUBLIC ProgramInfo
 {
@@ -419,20 +418,31 @@ class MPUBLIC ProgramInfo
     PMapDBReplacement *positionMapDBReplacement;
 };
 
+class MPUBLIC ProgramDetail
+{
+  public:
+    QString   channame;
+    QString   title;
+    QString   subtitle;
+    QDateTime startTime;
+    QDateTime endTime;
+};
+typedef vector<ProgramDetail> ProgramDetailList;
+
 /** \class ProgramList
  *  \brief QPtrList of ProgramInfo instances, with helper functions.
  */
-class MPUBLIC ProgramList: public Q3PtrList<ProgramInfo> {
- public:
-    ProgramList(bool autoDelete = true) {
-        setAutoDelete(autoDelete);
-        compareFunc = NULL;
-    };
-    ~ProgramList(void) { };
+class MPUBLIC ProgramList
+{
+  public:
+    ProgramList(bool auto_delete = true) : autodelete(auto_delete) {}
+    ~ProgramList();
 
-    ProgramInfo * operator[](uint index) {
-        return at(index);
-    };
+    typedef list<ProgramInfo*>::iterator iterator;
+    typedef list<ProgramInfo*>::const_iterator const_iterator;
+
+    ProgramInfo *operator[](uint index);
+    bool operator==(const ProgramList &b) const;
 
     bool FromScheduler(bool &hasConflicts, QString altTable = "", int recordid=-1);
     bool FromScheduler(void) {
@@ -451,18 +461,38 @@ class MPUBLIC ProgramList: public Q3PtrList<ProgramInfo> {
 
     bool FromOldRecorded(const QString &sql, MSqlBindings &bindings);
 
-    typedef int (*CompareFunc)(ProgramInfo *p1, ProgramInfo *p2);
-    void Sort(CompareFunc func) {
-        compareFunc = func;
-        sort();
-    };
+    static bool GetProgramDetailList(
+        QDateTime         &nextRecordingStart,
+        bool              *hasConflicts = NULL,
+        ProgramDetailList *list = NULL);
 
- protected:
-    virtual int compareItems(Q3PtrCollection::Item item1,
-                             Q3PtrCollection::Item item2);
+    ProgramInfo *take(uint i);
+    iterator erase(iterator it);
+    void clear(void);
 
- private:
-    CompareFunc compareFunc;
+    iterator begin(void)             { return pglist.begin(); }
+    iterator end(void)               { return pglist.end();   }
+    const_iterator begin(void) const { return pglist.begin(); }
+    const_iterator end(void)   const { return pglist.end();   }
+
+    void sort(bool (&f)(const ProgramInfo*, const ProgramInfo*))
+        { pglist.sort(f); }
+    bool empty(void) const { return pglist.empty(); }
+    size_t size(void) const { return pglist.size(); }
+    void push_front(ProgramInfo *pginfo) { pglist.push_front(pginfo); }
+    void push_back(ProgramInfo *pginfo) { pglist.push_back(pginfo); }
+
+    // compatibility with old Q3PtrList
+    bool isEmpty(void) const { return empty(); }
+    size_t count(void) const { return size(); }
+    ProgramInfo *at(uint index) { return (*this)[index]; }
+    void prepend(ProgramInfo *pginfo) { push_front(pginfo); }
+    void append(ProgramInfo *pginfo) { push_back(pginfo); }
+    void setAutoDelete(bool auto_delete) { autodelete = auto_delete; }
+
+  protected:
+    list<ProgramInfo*> pglist;
+    bool autodelete;
 };
 
 #endif

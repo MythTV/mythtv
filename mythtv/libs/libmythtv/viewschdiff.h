@@ -1,7 +1,9 @@
 #ifndef VIEWSCHEDULEDIFF_H_
 #define VIEWSCHEDULEDIFF_H_
 
-#include <q3valuevector.h>
+#include <vector>
+using namespace std;
+
 #include <qdatetime.h>
 #include <qdom.h>
 #include <QPixmap>
@@ -13,9 +15,12 @@
 #include "xmlparse.h"
 #include "programinfo.h"
 
-struct ProgramStruct {
-        ProgramInfo *before;
-        ProgramInfo *after;
+class ProgramStruct
+{
+  public:
+    ProgramStruct() : before(NULL), after(NULL) {}
+    ProgramInfo *before;
+    ProgramInfo *after;
 };
 
 class MPUBLIC ViewScheduleDiff : public MythDialog
@@ -84,7 +89,7 @@ class MPUBLIC ViewScheduleDiff : public MythDialog
     QString altTable;
     QString m_title;
 
-    Q3ValueVector<struct ProgramStruct> recList;
+    vector<struct ProgramStruct> recList;
 
     int recordid; ///< recordid that differs from master (-1 = assume all)
 

@@ -904,12 +904,16 @@ void ProgFinder::showSearchList()
                             ltype->SetItemText(curLabel, " " + initData[i] +
                                                " ");
 
-                        ProgramInfo *s; 
-                        for (s = schedList.first(); s; s = schedList.next())
+                        ProgramInfo *s = NULL;
+                        ProgramList::iterator it = schedList.begin();
+                        for (; it != schedList.end(); ++it)
+                        {
+                            s = *it;
                             if ((s->title == initData[i]) &&
                                 ((s->recstatus == rsRecording) ||
                                  (s->recstatus == rsWillRecord)))
                                 break;
+                        }
 
                         if (s && s->recstatus == rsRecording)
                             ltype->EnableForcedFont(curLabel, "recording");
@@ -970,12 +974,16 @@ void ProgFinder::showProgramList()
                                 ltype->SetItemText(curLabel, " " + progData[t]
                                                    + " ");
 
-                            ProgramInfo *s; 
-                            for (s = schedList.first(); s; s = schedList.next())
+                            ProgramInfo *s = NULL;
+                            ProgramList::iterator it = schedList.begin();
+                            for (; it != schedList.end(); ++it)
+                            {
+                                s = *it;
                                 if ((s->title == progData[t]) &&
                                     ((s->recstatus == rsRecording) ||
                                      (s->recstatus == rsWillRecord)))
                                     break;
+                            }
 
                             if (s && s->recstatus == rsRecording)
                                 ltype->EnableForcedFont(curLabel, "recording");

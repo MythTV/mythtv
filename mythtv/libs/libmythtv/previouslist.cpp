@@ -516,7 +516,7 @@ void PreviousList::fillItemList(void)
     vector<ProgramInfo *> sortedList;
     while (itemList.count())
     {
-        s = itemList.take();
+        s = itemList.take(0);
         s->sortTitle = s->title;
         s->sortTitle.remove(QRegExp("^(The |A |An )"));
         sortedList.push_back(s);
