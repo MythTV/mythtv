@@ -63,6 +63,7 @@
 #define DCT6200_VENDOR_ID13 0x00001aad
 #define DCT6200_VENDOR_ID14 0x00000b06
 #define DCT6200_VENDOR_ID15 0x0000195e
+#define DCT6200_VENDOR_ID16 0x000010dc
 #define DCT6200_SPEC_ID    0x00005068
 #define DCT6200_SW_VERSION 0x00010101
 #define DCT6200_MODEL_ID1  0x0000620a
@@ -248,6 +249,7 @@ int main (int argc, char *argv[])
             (dir.vendor_id == DCT6200_VENDOR_ID13) ||
             (dir.vendor_id == DCT6200_VENDOR_ID14) ||
             (dir.vendor_id == DCT6200_VENDOR_ID15) ||
+            (dir.vendor_id == DCT6200_VENDOR_ID16) ||
             (dir.vendor_id == DCT6412_VENDOR_ID1) ||
             (dir.vendor_id == DCT6412_VENDOR_ID2) ||
             (dir.vendor_id == DCT6416_VENDOR_ID1) || 
