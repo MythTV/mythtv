@@ -3,7 +3,7 @@ include ( ../../settings.pro )
 
 TEMPLATE = lib
 TARGET = mythui-$$LIBVERSION
-CONFIG += thread dll 
+CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
@@ -17,7 +17,7 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 # Input
 HEADERS  = mythmainwindow.h mythpainter.h mythimage.h myththemebase.h
 HEADERS += mythpainter_qt.h mythmainwindow_internal.h mythuihelper.h
-HEADERS += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h 
+HEADERS += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h
 HEADERS += mythuitext.h mythuistatetype.h mythgesture.h xmlparsebase.h
 HEADERS += mythuibutton.h mythlistbutton.h myththemedmenu.h mythdialogbox.h
 HEADERS += mythuiclock.h mythuitextedit.h mythprogressdialog.h mythuispinbox.h
@@ -25,6 +25,7 @@ HEADERS += mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
 HEADERS += mythuiprogressbar.h
 HEADERS += screensaver.h screensaver-null.h mythsystem.h x11colors.h
 HEADERS += themeinfo.h util-x11.h DisplayRes.h DisplayResScreen.h
+HEADERS += mythgenerictree.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp myththemebase.cpp
 SOURCES += mythpainter_qt.cpp xmlparsebase.cpp mythuihelper.cpp
@@ -37,18 +38,19 @@ SOURCES += mythuispinbox.cpp mythuicheckbox.cpp mythuibuttonlist.cpp
 SOURCES += mythuigroup.cpp mythuiprogressbar.cpp
 SOURCES += screensaver.cpp screensaver-null.cpp mythsystem.cpp x11colors.cpp
 SOURCES += themeinfo.cpp util-x11.cpp DisplayRes.cpp DisplayResScreen.cpp
+SOURCES += mythgenerictree.cpp
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
 
 inc.files  = mythmainwindow.h mythpainter.h mythimage.h myththemebase.h
 inc.files += mythpainter_qt.h mythuistatetype.h mythuihelper.h
-inc.files += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h 
+inc.files += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h
 inc.files += mythuitext.h mythuibutton.h mythlistbutton.h xmlparsebase.h
 inc.files += myththemedmenu.h mythdialogbox.h mythfontproperties.h
 inc.files += mythuiclock.h mythgesture.h mythuitextedit.h mythprogressdialog.h
 inc.files += mythuispinbox.h mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
 inc.files += mythuiprogressbar.h
-inc.files += mythsystem.h x11colors.h
+inc.files += mythsystem.h x11colors.h mythgenerictree.h
 
 INSTALLS += inc
 
