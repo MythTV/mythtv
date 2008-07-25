@@ -22,7 +22,6 @@
 #include <q3socketdevice.h>
 
 // MythTV headers
-#include "upnp.h"
 #include "multicast.h"
 #include "compat.h"
 
