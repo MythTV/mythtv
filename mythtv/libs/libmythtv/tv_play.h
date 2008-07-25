@@ -14,6 +14,7 @@
 #include <qstringlist.h>
 #include <qregexp.h>
 #include <qwaitcondition.h>
+#include <QThread>
 
 #include "mythdeque.h"
 #include "tv.h"
@@ -39,6 +40,7 @@ class UDPNotify;
 class OSDListTreeType;
 class OSDGenericTree;
 class LiveTVChain;
+class UDPNotifyOSDSet;
 
 typedef Q3ValueVector<QString>    str_vec_t;
 typedef QMap<QString,QString>    InfoMap;
@@ -119,8 +121,10 @@ class AskProgramInfo
     ProgramInfo *info;
 };
 
-class MPUBLIC TV : public QObject
+class MPUBLIC TV : public QThread
 {
+    friend class QTVEventThread;
+
     Q_OBJECT
   public:
     /// \brief Helper class for Sleep Timer code.
@@ -194,7 +198,7 @@ class MPUBLIC TV : public QObject
     bool IsSwitchingCards(void)  const { return switchToRec; }
     /// Returns true if the TV event thread is running. Should always be true
     /// between the end of the constructor and the beginning of the destructor.
-    bool IsRunning(void)         const { return runMainLoop; }
+    bool IsRunning(void)         const { return isRunning(); }
     /// Returns true if the user told MythTV to stop plaback. If this
     /// is false when we exit the player, we display an error screen.
     bool WantsToQuit(void)       const { return wantsToQuit; }
@@ -240,8 +244,13 @@ class MPUBLIC TV : public QObject
     void ChangeVolume(bool up);
     void ToggleMute(void);
 
+    // Used for UDPNotify
+    bool HasUDPNotifyEvent(void) const;
+    void HandleUDPNotifyEvent(void);
+
   public slots:
     void HandleOSDClosed(int osdType);
+    void timerEvent(QTimerEvent*);
 
   protected slots:
     void SetPreviousChannel(void);
@@ -249,11 +258,15 @@ class MPUBLIC TV : public QObject
     void TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item);
     void TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item);
 
+    void AddUDPNotifyEvent(const QString &name, const UDPNotifyOSDSet*);
+    void ClearUDPNotifyEvents(void);
+
   protected:
     void doEditSchedule(int editType = kScheduleProgramGuide);
 
-    void RunTV(void);
-    static void *EventThread(void *param);
+    virtual void run(void);
+    void TVEventThreadChecks(void);
+
     void SetMuteTimer(int timeout);
 
     bool eventFilter(QObject *o, QEvent *e);
@@ -476,9 +489,9 @@ class MPUBLIC TV : public QObject
     mutable QMutex     stateLock;
     TVState            internalState;
 
+    uint updatecheck;
     uint switchToInputId;
     bool menurunning;
-    bool runMainLoop;
     bool wantsToQuit;
     bool exitPlayer;
     bool paused;
@@ -645,7 +658,12 @@ class MPUBLIC TV : public QObject
 
     /// UDPNotify instance which shows messages sent
     /// to the "UDPNotifyPort" in an OSD dialog.
-    UDPNotify      *udpnotify;
+    mutable QMutex                    udpnotifyLock;
+    UDPNotify                        *udpnotify;
+    MythDeque<QString>                udpnotifyEventName;
+    MythDeque<const UDPNotifyOSDSet*> udpnotifyEventSet;
+
+    // Signal info
     QStringList     lastSignalMsg;
     MythTimer       lastSignalMsgTime;
     InfoMap         lastSignalUIInfo;
@@ -672,8 +690,6 @@ class MPUBLIC TV : public QObject
     QMap< uint,vector<InputInfo> > is_tunable_cache_inputs;
 
     // Various threads
-    /// Event processing thread, runs RunTV().
-    pthread_t event;
     /// Video decoder thread, runs nvp's NuppelVideoPlayer::StartPlaying().
     pthread_t decode;
     /// Picture-in-Picture video decoder thread,

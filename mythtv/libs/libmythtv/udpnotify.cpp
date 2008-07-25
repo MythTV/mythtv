@@ -25,176 +25,91 @@ the corresponding widgets defined within the osd.xml file. If they do not
 match they will be ignored.
 */
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <unistd.h>
-#include <pthread.h>
-#include <sys/types.h>
-
-#include <qapplication.h>
-#include <q3socketdevice.h>
-#include <qsocketnotifier.h>
-#include <qhostaddress.h>
+#include <QUdpSocket>
 
 #include "udpnotify.h"
 #include "mythcontext.h"
-#include "osd.h"
-#include "tv_play.h"
-#include "compat.h"
 
-UDPNotifyOSDSet::UDPNotifyOSDSet(const QString &name)
+UDPNotifyOSDSet::UDPNotifyOSDSet(const QString &name, uint timeout)
+    : m_name(name), m_timeout(timeout)
 {
-    m_name = name;
-
-    allTypes = new vector<UDPNotifyOSDTypeText *>;
-}
-
-UDPNotifyOSDSet::~UDPNotifyOSDSet()
-{
-    vector<UDPNotifyOSDTypeText *>::iterator i = allTypes->begin();
-    for (; i != allTypes->end(); i++)
-    {
-        UDPNotifyOSDTypeText *type = (*i);
-        if (type)
-            delete type;
-    }
-    delete allTypes;
-}
-
-UDPNotifyOSDTypeText *UDPNotifyOSDSet::GetType(const QString &name)
-{
-    UDPNotifyOSDTypeText *ret = NULL;
-    if (typesMap.contains(name))
-        ret = typesMap[name];
-
-    return ret;
+    m_name.detach();
 }
 
 void UDPNotifyOSDSet::ResetTypes(void)
 {
-    typesMap.clear();
-    allTypes->clear();
+    QMutexLocker locker(&m_lock);
+    m_typesMap.clear();
 }
 
-void UDPNotifyOSDSet::AddType(UDPNotifyOSDTypeText *type, QString name)
+void UDPNotifyOSDSet::SetType(const QString &name, const QString &value)
 {
-    typesMap[name] = type;
-    allTypes->push_back(type);
+    QMutexLocker locker(&m_lock);
+    QString tmp_name  = name;  tmp_name.detach();
+    QString tmp_value = value; tmp_value.detach();
+    m_typesMap[tmp_name] = tmp_value;
 }
 
-QString UDPNotifyOSDSet::GetName(void)
+QString UDPNotifyOSDSet::GetName(void) const
 {
-    return m_name;
+    QMutexLocker locker(&m_lock);
+    QString tmp = m_name; tmp.detach();
+    return tmp;
 }
 
-vector<UDPNotifyOSDTypeText *> *UDPNotifyOSDSet::GetTypeList()
+uint UDPNotifyOSDSet::GetTimeout(void) const
 {
-    return allTypes;
+    QMutexLocker locker(&m_lock);
+    return m_timeout;
 }
 
-UDPNotifyOSDTypeText::UDPNotifyOSDTypeText(const QString &name, 
-                                           const QString &text)
+void UDPNotifyOSDSet::SetTimeout(uint timeout_in_seconds)
 {
-    m_name = name;
-    m_text = text;
+    QMutexLocker locker(&m_lock);
+    m_timeout = timeout_in_seconds;
 }
 
-UDPNotifyOSDTypeText::~UDPNotifyOSDTypeText()
+/////////////////////////////////////////////////////////////////////////
+
+UDPNotify::UDPNotify(uint udp_port) :
+    m_socket(new QUdpSocket()), m_db_osd_udpnotify_timeout(5)
 {
+    connect(m_socket, SIGNAL(readyRead()),
+            this,     SLOT(ReadPending()));
+
+    m_socket->bind(udp_port);
+
+    m_db_osd_udpnotify_timeout = gContext->GetNumSetting("OSDNotifyTimeout", 5);
 }
 
-QString UDPNotifyOSDTypeText::GetName(void)
+void UDPNotify::deleteLater(void)
 {
-    return m_name;
+    TeardownAll();
+    disconnect();
+    QObject::deleteLater();
 }
 
-QString UDPNotifyOSDTypeText::GetText(void)
+void UDPNotify::TeardownAll(void)
 {
-    return m_text;
-}
-
-void UDPNotifyOSDTypeText::SetText(const QString &text)
-{
-    m_text = text;
-}
-
-UDPNotify::UDPNotify(TV *tv, int udp_port)
-         : QObject()
-{
-    m_tv = tv;
-    setList = new vector<UDPNotifyOSDSet *>;
-
-    // Address to listen to - listen on all interfaces
-    bcastaddr.setAddress("0.0.0.0");
-  
-    // Setup UDP receive socket and install notifier
-    m_udp_port = udp_port;
-
-    // need to lock because of the socket notifier.
-    qApp->lock();
-
-    qsd = new Q3SocketDevice(Q3SocketDevice::Datagram);
-    if (!qsd->bind(bcastaddr, udp_port))
+    if (m_socket)
     {
-        VERBOSE(VB_IMPORTANT, QString("Could not bind to UDP notify port: %1")
-                                       .arg(udp_port));
-        qsn = NULL;
-    }
-    else
-    {
-        // Create the notifier
-        qsn = new QSocketNotifier(qsd->socket(), QSocketNotifier::Read);
-
-        // Connect the Notifier to the incming data slot
-        connect(qsn, SIGNAL(activated(int)), this, SLOT(incomingData(int)));
+        m_socket->disconnect();
+        m_socket->close();
+        m_socket->deleteLater();
+        m_socket = NULL;
     }
 
-    qApp->unlock();
-}
+    emit ClearUDPNotifyEvents();
 
-UDPNotify::~UDPNotify(void)
-{
-    qApp->lock();
-
-    if (qsn != NULL)
-       disconnect(qsn, SIGNAL(activated(int)), this, SLOT(incomingData(int)));
-
-    qsd->close();
-
-    delete qsd;
-
-    if (qsn)
-        delete qsn;
-
-    qApp->unlock();
-
-    vector<UDPNotifyOSDSet *>::iterator i = setList->begin();
-    for (; i != setList->end(); i++)
+    UDPNotifyOSDSetMap::iterator it = m_sets.begin();
+    for (; it != m_sets.end(); ++it)
     {
-        UDPNotifyOSDSet *set = (*i);
-        if (set)
-            delete set;
+        delete *it;
     }
-    delete setList;
+    m_sets.clear();
 }
 
-void UDPNotify::AddSet(UDPNotifyOSDSet *set, QString name)
-{
-    setMap[name] = set;
-    setList->push_back(set);
-}
-
-UDPNotifyOSDSet *UDPNotify::GetSet(const QString &text)
-{
-    UDPNotifyOSDSet *ret = NULL;
-    if (setMap.contains(text))
-        ret = setMap[text];
-
-    return ret;
-}
-
-QString UDPNotify::getFirstText(QDomElement &element)
+QString UDPNotify::GetFirstText(QDomElement &element)
 {
     for (QDomNode dname = element.firstChild(); !dname.isNull();
          dname = dname.nextSibling())
@@ -206,7 +121,7 @@ QString UDPNotify::getFirstText(QDomElement &element)
     return "";
 }
 
-void UDPNotify::parseTextArea(UDPNotifyOSDSet *container, QDomElement &element)
+void UDPNotify::ParseTextArea(UDPNotifyOSDSet *container, QDomElement &element)
 {
     QString value;
     QString name = element.attribute("name", "");
@@ -224,18 +139,9 @@ void UDPNotify::parseTextArea(UDPNotifyOSDSet *container, QDomElement &element)
         {
             if (info.tagName() == "value")
             {
-                value  = getFirstText(info);
+                value  = GetFirstText(info);
 
-                UDPNotifyOSDTypeText *text = container->GetType(name);
-                if (text != NULL)
-                {
-                    text->SetText(value);
-                }
-                else
-                {
-                    text = new UDPNotifyOSDTypeText(name, value);
-                    container->AddType(text, name);
-                }
+                container->SetType(name, value);
             }
             else
             {
@@ -246,7 +152,7 @@ void UDPNotify::parseTextArea(UDPNotifyOSDSet *container, QDomElement &element)
     }    
 }
 
-UDPNotifyOSDSet *UDPNotify::parseContainer(QDomElement &element)
+UDPNotifyOSDSet *UDPNotify::ParseContainer(QDomElement &element)
 {
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -255,16 +161,15 @@ UDPNotifyOSDSet *UDPNotify::parseContainer(QDomElement &element)
         return NULL;
     }
 
-    UDPNotifyOSDSet *container = GetSet(name);
-
-    if (container != NULL)
+    UDPNotifyOSDSetMap::iterator it = m_sets.find(name);
+    if (it == m_sets.end())
     {
-        ClearContainer(container);
+        it = m_sets.insert(name, new UDPNotifyOSDSet(
+                               name, m_db_osd_udpnotify_timeout));
     }
     else
     {
-        container = new UDPNotifyOSDSet(name);
-        AddSet(container, name);
+        ClearContainer(*it);
     }
 
     for (QDomNode child = element.firstChild(); !child.isNull();
@@ -275,66 +180,59 @@ UDPNotifyOSDSet *UDPNotify::parseContainer(QDomElement &element)
         {
             if (info.tagName() == "textarea")
             {
-                parseTextArea(container, info);
+                ParseTextArea(*it, info);
             }
             else
             {
                 VERBOSE(VB_IMPORTANT, QString("Unknown container child: %1")
-                                       .arg(info.tagName()));
+                        .arg(info.tagName()));
             }
         }
     }
 
-    return container;
+    return *it;
 }
 
 void UDPNotify::ClearContainer(UDPNotifyOSDSet *container)
 {
-    OSD *osd = m_tv->GetOSD();
-
-    if (osd)
-        osd->ClearNotify(container);
     container->ResetTypes();
+    emit AddUDPNotifyEvent(container->GetName(), NULL);
 }
 
-void UDPNotify::incomingData(int socket)
+void UDPNotify::ReadPending(void)
 {
-    OSD *osd = m_tv->GetOSD();
     QByteArray buf;
-    int nr;
-
-    socket = socket;
-
-    // Read the data
-    buf.resize(qsd->bytesAvailable());
-    nr = qsd->readBlock(buf.data(), qsd->bytesAvailable()); 
-    if (nr < 0)
+    while (m_socket->hasPendingDatagrams())
     {
-        VERBOSE(VB_IMPORTANT, "Error reading from udpnotify socket");
-        return;
-    }
-    buf.resize(nr);  // Resize to actual bytes read
-    //VERBOSE(VB_IMPORTANT, QString("Read %1 bytes from peer IP %2 port %3")
-    //                       .arg(nr)
-    //                       .arg(qsd->peerAddress().toString())
-    //                       .arg(qsd->port()));
+        buf.resize(m_socket->pendingDatagramSize());
+        QHostAddress sender;
+        quint16 senderPort;
 
+        m_socket->readDatagram(buf.data(), buf.size(),
+                               &sender, &senderPort);
+
+        Process(buf);
+    }
+}
+
+void UDPNotify::Process(const QByteArray &buf)
+{
     QString errorMsg;
     int errorLine = 0;
     int errorColumn = 0;
-  
+    QDomDocument doc;
     if (!doc.setContent(buf, false, &errorMsg, &errorLine, &errorColumn))
     {
-        VERBOSE(VB_IMPORTANT, QString("Error parsing udpnotify xml:\n"
-                                "at line: %1  column: %2\n%3")
-                               .arg(errorLine)
-                               .arg(errorColumn)
-                               .arg(errorMsg));
+        VERBOSE(VB_IMPORTANT, QString("UDPNotify, Error: ") +
+                QString("Parsing udpnotify xml:\n\t\t\t"
+                        "at line: %1  column: %2\n\t\t\t%3")
+                .arg(errorLine).arg(errorColumn).arg(errorMsg));
+
         return;
     }
- 
-    int displaytime = gContext->GetNumSetting("OSDNotifyTimeout", 5);
- 
+
+    int displaytime = -1;
+
     QDomElement docElem = doc.documentElement();
     if (!docElem.isNull())
     {
@@ -364,9 +262,10 @@ void UDPNotify::incomingData(int socket)
         {
             if (e.tagName() == "container")
             {
-                UDPNotifyOSDSet *container = parseContainer(e);
-                if (osd && container)
-                    osd->StartNotify(container, displaytime);
+                UDPNotifyOSDSet *container = ParseContainer(e);
+                if (displaytime >= 0)
+                    container->SetTimeout(displaytime);
+                emit AddUDPNotifyEvent(container->GetName(), container);
             }
             else
             {
@@ -378,4 +277,3 @@ void UDPNotify::incomingData(int socket)
         n = n.nextSibling();
     }
 }
-

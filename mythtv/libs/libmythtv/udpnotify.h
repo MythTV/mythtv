@@ -1,92 +1,90 @@
 #ifndef UDPNOTIFY_H
 #define UDPNOTIFY_H
 
-#include <qstring.h>
-#include <qmap.h>
-#include <pthread.h>
-#include <q3valuevector.h>
-#include <q3valuelist.h>
-#include <qdom.h>
-
-#include <q3socketdevice.h>
-#include <qsocketnotifier.h>
-#include <qhostaddress.h>
-
-#include <qobject.h>
+// C++ headers
 #include <vector>
 using namespace std;
 
+// POSIC headers
+#include <pthread.h>
+
+// Qt headers
+#include <QString>
+#include <QObject>
+#include <QMutex>
+#include <QMap>
+#include <QDomDocument>
 
 class TV;
 class OSD;
 class UDPNotifyOSDTypeText;
+class Q3SocketDevice;
+class QByteArray;
+class QUdpSocket;
 
 class UDPNotifyOSDSet
 {
   public:
-    UDPNotifyOSDSet(const QString &name);
-   ~UDPNotifyOSDSet();
+    UDPNotifyOSDSet(const QString &name, uint timeout);
+    QString GetName(void) const;
+    uint    GetTimeout(void) const;
 
-    UDPNotifyOSDTypeText *GetType(const QString &name);
-    void AddType(UDPNotifyOSDTypeText *type, QString name);
+    void SetTimeout(uint timeout_in_seconds);
+    void SetType(const QString &name, const QString &value);
     void ResetTypes(void);
-    QString GetName(void);
-    vector<UDPNotifyOSDTypeText *> *GetTypeList();
+
+    void Lock(void)   const { m_lock.lock();   }
+    void Unlock(void) const { m_lock.unlock(); }
+
+    // NOTE: You must call Lock()/Unlock() around use of the iterator
+    typedef QMap<QString,QString>::const_iterator const_iterator;
+    const_iterator begin() const { return m_typesMap.begin(); }
+    const_iterator end()   const { return m_typesMap.end(); }
 
   private:
-    QString m_name;
-    QMap<QString, UDPNotifyOSDTypeText *> typesMap;
-    vector<UDPNotifyOSDTypeText *> *allTypes;
+    mutable QMutex        m_lock;
+    QString               m_name;
+    uint                  m_timeout;
+    QMap<QString,QString> m_typesMap;
 };
 
-class UDPNotifyOSDTypeText
-{
-  public:
-    UDPNotifyOSDTypeText(const QString &name, const QString &text);
-    ~UDPNotifyOSDTypeText();
-    void SetText(const QString &text);
-    QString GetName(void);
-    QString GetText(void);
-
-  private:
-    QString m_name;
-    QString m_text;
-};
+typedef QMap<QString, UDPNotifyOSDSet*> UDPNotifyOSDSetMap;
 
 class UDPNotify : public QObject
 {
-  Q_OBJECT
+    Q_OBJECT
 
   public:
-    UDPNotify(TV *tv, int udp_port);
-   ~UDPNotify(void);
+    UDPNotify(uint udp_port);
 
-  protected slots:
-    virtual void incomingData(int socket);
+  signals:
+    void AddUDPNotifyEvent(const QString &name, const UDPNotifyOSDSet*);
+    void ClearUDPNotifyEvents(void);
+
+  public slots:
+    virtual void deleteLater(void);
+
+  private slots:
+    void ReadPending(void);
 
   private:
-    int m_udp_port;
-    QHostAddress bcastaddr;
-    TV *m_tv;
+    ~UDPNotify(void) { TeardownAll(); } // call deleteLater() instead
 
-    QMap<QString, UDPNotifyOSDSet *> setMap;
-    vector<UDPNotifyOSDSet *> *setList;
-
-    QDomDocument doc;
-
-    // Socket Device for UDP communication.
-    Q3SocketDevice *qsd;
-    // Notifier, signals available data on socket.
-    QSocketNotifier *qsn;
-
-    void AddSet(UDPNotifyOSDSet *set, QString name);
-    UDPNotifyOSDSet *GetSet(const QString &text);
-    UDPNotifyOSDSet *parseContainer(QDomElement &element);
-    void parseTextArea(UDPNotifyOSDSet *container, QDomElement &element);
-    QString getFirstText(QDomElement &element);
-
+    void Process(const QByteArray &buf);
+    void Set(UDPNotifyOSDSet *set, QString name);
     void ClearContainer(UDPNotifyOSDSet *container);
+
+    UDPNotifyOSDSet *ParseContainer(QDomElement &element);
+    void ParseTextArea(UDPNotifyOSDSet *container, QDomElement &element);
+    QString GetFirstText(QDomElement &element);
+
+    void TeardownAll(void);
+
+  private:
+    /// Socket Device for getting UDP datagrams
+    QUdpSocket            *m_socket;
+    uint                   m_db_osd_udpnotify_timeout;
+    UDPNotifyOSDSetMap     m_sets;
 };
 
-#endif
-
+#endif // UDPNOTIFY_H

@@ -149,8 +149,8 @@ class OSD : public QObject
 
     void SetFrameInterval(int frint);
 
-    void StartNotify(UDPNotifyOSDSet *notifySet, int displaytime = 5);
-    void ClearNotify(UDPNotifyOSDSet *notifySet);
+    void StartNotify(const UDPNotifyOSDSet *notifySet);
+    void ClearNotify(const QString &udpnotify_name);
 
     bool IsRunningTreeMenu(void);
     bool TreeMenuHandleKeypress(QKeyEvent *e);

@@ -2680,32 +2680,37 @@ void OSD::RemoveSet(OSDSet *set)
 }
 
 /* Ken Bass additions for notify_info container */
-void OSD::StartNotify(UDPNotifyOSDSet *notifySet, int displaytime)
+void OSD::StartNotify(const UDPNotifyOSDSet *notifySet)
 {
     if (!notifySet)
         return;
 
-    vector<UDPNotifyOSDTypeText *> *textList;
-
     QMutexLocker locker(&osdlock);
 
     OSDSet *container = GetSet(notifySet->GetName());
-    if (container)
-    {    
-        textList = notifySet->GetTypeList();
-    
-        vector<UDPNotifyOSDTypeText *>::iterator j = textList->begin();
-        for (; j != textList->end(); j++)
+    if (!container)
+        return;
+
+    notifySet->Lock();
+
+    UDPNotifyOSDSet::const_iterator it = notifySet->begin();
+
+    bool set_visible = false;
+    for (; it != notifySet->end(); ++it)
+    {
+        OSDTypeText *osdtype = (OSDTypeText *)container->GetType(it.key());
+        if (osdtype)
         {
-            UDPNotifyOSDTypeText *type = (*j);
-            if (type)
-            {
-                OSDTypeText *osdtype = (OSDTypeText *)container->GetType(type->GetName());
-                if (osdtype)
-                    osdtype->SetText(type->GetText());
-            }
+            osdtype->SetText(*it);
+            set_visible = true;
         }
-      
+    }
+
+    notifySet->Unlock();
+
+    if (set_visible)
+    {
+        uint displaytime = notifySet->GetTimeout();
         if (displaytime > 0)
             container->DisplayFor(displaytime * 1000000);
         else
@@ -2716,14 +2721,11 @@ void OSD::StartNotify(UDPNotifyOSDSet *notifySet, int displaytime)
     }
 }
 
-void OSD::ClearNotify(UDPNotifyOSDSet *notifySet)
+void OSD::ClearNotify(const QString &name)
 {
-    if (!notifySet)
-        return;
-
     QMutexLocker locker(&osdlock);
 
-    OSDSet *container = GetSet(notifySet->GetName());
+    OSDSet *container = GetSet(name);
     if (container)
     {
         container->ClearAllText();
