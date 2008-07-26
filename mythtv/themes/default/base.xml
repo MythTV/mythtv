@@ -282,4 +282,25 @@
         </textarea>
     </window>
 
+    <window name="MythTextInputDialog">
+        <area>110,217,580,165</area>
+
+        <imagetype name="backimg">
+            <filename>mythprogressdialog-background.png</filename>
+        </imagetype>
+
+        <textarea name="message" from="basetextarea">
+            <area>20,20,540,30</area>
+            <align>allcenter</align>
+        </textarea>
+
+        <textedit name="input" from="basetextedit">
+            <position>102,50</position>
+        </textedit>
+
+        <button name="ok" from="basebutton">
+            <position>109,110</position>
+        </button>
+    </window>
+
 </mythuitheme>
