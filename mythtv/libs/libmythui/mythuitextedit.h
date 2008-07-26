@@ -9,6 +9,16 @@
 
 class MythFontProperties;
 
+enum InputFilter
+{
+    FilterNone = 0x0,
+    FilterAlpha = 0x01,
+    FilterNumeric = 0x02,
+    FilterAlphaNumeric = 0x03,
+    FilterSymbols = 0x04,
+    FilterPunct = 0x08
+};
+
 /** \class MythUITextEdit
  *
  * \brief A text entry and edit widget
@@ -33,15 +43,6 @@ class MythUITextEdit : public MythUIType
     void SetText(const QString text, bool moveCursor = true);
     QString GetText() { return m_Message; }
 
-    enum InputFilter
-    {
-        FilterNone = 0x0,
-        FilterAlpha = 0x01,
-        FilterNumeric = 0x02,
-        FilterAlphaNumeric = 0x03,
-        FilterSymbols = 0x04,
-        FilterPunct = 0x08
-    };
     void SetFilter(InputFilter filter) { m_Filter = filter; }
 
     enum MoveDirection { MoveLeft, MoveRight, MoveEnd };

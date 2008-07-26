@@ -117,3 +117,56 @@ void MythDialogBox::SendEvent(int res, QString text, void *data)
     DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, res, text, data);
     QApplication::postEvent(m_retScreen, dce);
 }
+
+/////////////////////////////////////////////////////////////////
+
+MythTextInputDialog::MythTextInputDialog(MythScreenStack *parent,
+                                         const QString &message,
+                                         InputFilter filter,
+                                         bool isPassword)
+           : MythScreenType(parent, "mythtextinputpopup")
+{
+    m_filter = filter;
+    m_isPassword = isPassword;
+    m_message = message;
+    m_textEdit = NULL;
+}
+
+bool MythTextInputDialog::Create(void)
+{
+    if (!CopyWindowFromBase("MythTextInputDialog", this))
+        return false;
+
+    m_textEdit = dynamic_cast<MythUITextEdit *> (GetChild("input"));
+    MythUIText *messageText = dynamic_cast<MythUIText *>
+                                            (GetChild("message"));
+    MythUIButton *okButton = dynamic_cast<MythUIButton *>
+                                         (GetChild("ok"));
+    MythUIButton *cancelButton = dynamic_cast<MythUIButton *>
+                                         (GetChild("cancel"));
+
+    if (!m_textEdit || !okButton)
+        return false;
+
+    if (cancelButton)
+        connect(cancelButton, SIGNAL(buttonPressed()), SLOT(Close()));
+    connect(okButton, SIGNAL(buttonPressed()), SLOT(sendResult()));
+
+    m_textEdit->SetFilter(m_filter);
+    //m_textEdit->SetIsPassword(m_isPassword);
+
+    if (messageText)
+        messageText->SetText(m_message);
+    okButton->SetText(tr("Ok"));
+
+    BuildFocusList();
+
+    return true;
+}
+
+void MythTextInputDialog::sendResult()
+{
+    QString inputString = m_textEdit->GetText();
+    emit haveResult(inputString);
+    Close();
+}

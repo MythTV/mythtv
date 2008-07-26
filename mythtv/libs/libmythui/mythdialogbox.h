@@ -2,10 +2,11 @@
 #define MYTHDIALOGBOX_H_
 
 #include <QEvent>
-#include <QKeyEvent>
 
 #include "mythscreentype.h"
 #include "mythlistbutton.h"
+#include "mythuitextedit.h"
+#include "mythuibutton.h"
 
 class MythListButtonItem;
 class MythListButton;
@@ -64,6 +65,30 @@ class MythDialogBox : public MythScreenType
     bool    m_useSlots;
 
     QString m_text;
+};
+
+class MythTextInputDialog : public MythScreenType
+{
+    Q_OBJECT
+
+  public:
+    MythTextInputDialog(MythScreenStack *parent, const QString &message,
+                        InputFilter filter = FilterNone,
+                        bool isPassword = false);
+
+    bool Create(void);
+
+ signals:
+     void haveResult(QString);
+
+  private:
+    MythUITextEdit *m_textEdit;
+    QString m_message;
+    InputFilter m_filter;
+    bool m_isPassword;
+
+  private slots:
+    void sendResult();
 };
 
 #endif
