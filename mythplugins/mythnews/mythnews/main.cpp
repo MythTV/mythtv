@@ -19,17 +19,21 @@
  *
  * ============================================================ */
 
-#include <qapplication.h>
 #include <unistd.h>
 
-#include "mythnews.h"
-#include "mythnewsconfig.h"
+// qt
+#include <qapplication.h>
 
+// myth
 #include <mythtv/mythcontext.h>
 #include <mythtv/libmythui/mythmainwindow.h>
-
 #include <mythtv/mythplugin.h>
 #include <mythtv/mythpluginapi.h>
+
+// mythnews
+#include "dbcheck.h"
+#include "mythnews.h"
+#include "mythnewsconfig.h"
 
 using namespace std;
 
@@ -50,6 +54,15 @@ int mythplugin_init(const char *libversion)
                                     libversion,
                                     MYTH_BINARY_VERSION))
         return -1;
+
+    gContext->ActivateSettingsCache(false);
+    if (!UpgradeNewsDatabaseSchema())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Couldn't upgrade database to new schema, exiting.");
+        return -1;
+    }
+    gContext->ActivateSettingsCache(false);
 
     setupKeys();
 
