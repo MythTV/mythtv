@@ -27,7 +27,6 @@ using namespace std;
 #include <qevent.h>
 #include <qdir.h>
 #include <qmatrix.h>
-#include <QKeyEvent>
 #include <Q3ValueList>
 #include <QPixmap>
 #include <QFileInfo>
@@ -111,7 +110,7 @@ bool IconView::Create(void)
     if (!foundtheme)
         return false;
 
-    m_imageList = dynamic_cast<MythListButton *>
+    m_imageList = dynamic_cast<MythUIButtonList *>
                 (GetChild("images"));
 
     m_captionText = dynamic_cast<MythUIText *>
@@ -123,10 +122,10 @@ bool IconView::Create(void)
         return false;
     }
 
-    connect(m_imageList, SIGNAL(itemClicked( MythListButtonItem*)),
-            this, SLOT( HandleItemSelect(MythListButtonItem*)));
-    connect(m_imageList, SIGNAL(itemSelected( MythListButtonItem*)),
-            this, SLOT( UpdateText(MythListButtonItem*)));
+    connect(m_imageList, SIGNAL(itemClicked( MythUIButtonListItem*)),
+            this, SLOT( HandleItemSelect(MythUIButtonListItem*)));
+    connect(m_imageList, SIGNAL(itemSelected( MythUIButtonListItem*)),
+            this, SLOT( UpdateText(MythUIButtonListItem*)));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
@@ -162,10 +161,11 @@ void IconView::LoadDirectory(const QString &dir)
     ThumbItem *thumbitem;
     for ( thumbitem = m_itemList.first(); thumbitem; thumbitem = m_itemList.next() )
     {
-        MythListButtonItem* item =
-            new MythListButtonItem(m_imageList, "", 0, true,
-                                    MythListButtonItem::NotChecked);
-        item->setData(thumbitem);
+        thumbitem->InitCaption(m_showcaption);
+        MythUIButtonListItem* item =
+            new MythUIButtonListItem(m_imageList, thumbitem->GetCaption(), 0,
+                                     true, MythUIButtonListItem::NotChecked);
+        item->SetData(qVariantFromValue(thumbitem));
 
         LoadThumbnail(thumbitem);
 
@@ -180,10 +180,9 @@ void IconView::LoadDirectory(const QString &dir)
         }
     }
 
-    uint buttonwidth = m_imageList->ItemWidth() -
-                                            (2 * m_imageList->GetMarginX());
-    uint buttonheight = m_imageList->ItemHeight() -
-                                            (2 * m_imageList->GetMarginY());
+    // TODO Not accurate, the image may be smaller than the button
+    uint buttonwidth = m_imageList->ItemWidth();
+    uint buttonheight = m_imageList->ItemHeight();
 
     if (m_thumbGen)
     {
@@ -284,10 +283,10 @@ void IconView::SetupMediaMonitor(void)
             mon->Unlock(m_currDevice);
             return;
         }
-        else 
+        else
         {
 //             DialogBox *dlg = new DialogBox(gContext->GetMainWindow(),
-//                              tr("Failed to mount device: ") + 
+//                              tr("Failed to mount device: ") +
 //                              m_currDevice->getDevicePath() + "\n\n" +
 //                              tr("Showing the default MythGallery directory."));
 //             dlg->AddButton(tr("OK"));
@@ -301,17 +300,16 @@ void IconView::SetupMediaMonitor(void)
 #endif // _WIN32
 }
 
-void IconView::UpdateText(MythListButtonItem *item)
+void IconView::UpdateText(MythUIButtonListItem *item)
 {
     if (!m_captionText)
         return;
 
-    ThumbItem *thumbitem = (ThumbItem *)item->getData();
+    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
 
     QString caption = "";
     if (thumbitem)
     {
-        thumbitem->InitCaption(m_showcaption);
         caption = thumbitem->GetCaption();
         caption = (caption.isNull()) ? "" : caption;
     }
@@ -344,18 +342,18 @@ bool IconView::keyPressEvent(QKeyEvent *event)
             HandleDelete();
         else if (action == "MARK")
         {
-            MythListButtonItem *item = m_imageList->GetItemCurrent();
-            ThumbItem *thumbitem = (ThumbItem *)item->getData();
+            MythUIButtonListItem *item = m_imageList->GetItemCurrent();
+            ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
 
             if (!m_itemMarked.contains(thumbitem->GetPath()))
             {
                 m_itemMarked.append(thumbitem->GetPath());
-                item->setChecked(MythListButtonItem::FullChecked);
+                item->setChecked(MythUIButtonListItem::FullChecked);
             }
             else
             {
                 m_itemMarked.remove(thumbitem->GetPath());
-                item->setChecked(MythListButtonItem::NotChecked);
+                item->setChecked(MythUIButtonListItem::NotChecked);
             }
 
         }
@@ -378,11 +376,11 @@ bool IconView::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void IconView::HandleItemSelect(MythListButtonItem *item)
+void IconView::HandleItemSelect(MythUIButtonListItem *item)
 {
     bool handled = false;
 
-    ThumbItem *thumbitem = (ThumbItem *)item->getData();
+    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
 
     if (!thumbitem)
         return;
@@ -454,13 +452,13 @@ void IconView::HandleRandomShow(void)
 
 bool IconView::HandleImageSelect(const QString &action)
 {
-    MythListButtonItem *item = m_imageList->GetItemCurrent();
-    ThumbItem *thumbitem = (ThumbItem *)item->getData();
+    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
+    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
 
     if (!thumbitem || (thumbitem->IsDir() && !m_recurse))
         return false;
 
-    int slideShow = ((action == "PLAY" || action == "SLIDESHOW") ? 1 : 
+    int slideShow = ((action == "PLAY" || action == "SLIDESHOW") ? 1 :
                      (action == "RANDOMSHOW") ? 2 : 0);
 
     int pos = m_imageList->GetCurrentPos();
@@ -628,7 +626,7 @@ void IconView::customEvent(QEvent *event)
             {
                 image->Assign(*pixmap);
 
-                MythListButtonItem *item = m_imageList->GetItemAt(pos);
+                MythUIButtonListItem *item = m_imageList->GetItemAt(pos);
                 item->setImage(image);
             }
 
@@ -751,7 +749,7 @@ void IconView::HandleMainMenu(void)
 //         QDir d(m_currDir);
 //         if (!d.exists())
 //             m_currDir = m_galleryDir;
-// 
+//
 //         LoadDirectory(m_currDir);
 //         m_showDevices = false;
 //     }
@@ -818,8 +816,8 @@ void IconView::HandleSubMenuFile(void)
 
 void IconView::HandleRotateCW(void)
 {
-    MythListButtonItem *item = m_imageList->GetItemCurrent();
-    ThumbItem *thumbitem = (ThumbItem *)item->getData();
+    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
+    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
 
     if (!thumbitem || thumbitem->IsDir())
         return;
@@ -839,8 +837,8 @@ void IconView::HandleRotateCW(void)
 
 void IconView::HandleRotateCCW(void)
 {
-    MythListButtonItem *item = m_imageList->GetItemCurrent();
-    ThumbItem *thumbitem = (ThumbItem *)item->getData();
+    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
+    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
 
     if (!thumbitem || thumbitem->IsDir())
         return;
@@ -860,8 +858,8 @@ void IconView::HandleRotateCCW(void)
 
 void IconView::HandleDeleteCurrent(void)
 {
-    MythListButtonItem *item = m_imageList->GetItemCurrent();
-    ThumbItem *thumbitem = (ThumbItem *)item->getData();
+    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
+    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
 
     QString title = tr("Delete Current File or Folder");
     QString msg = (thumbitem->IsDir()) ?
@@ -918,7 +916,7 @@ void IconView::HandleImport(void)
 
 //     DialogBox *importDlg = new DialogBox(
 //         gContext->GetMainWindow(), tr("Import pictures?"));
-// 
+//
 //     importDlg->AddButton(tr("No"));
 //     importDlg->AddButton(tr("Yes"));
 //     DialogCode code = importDlg->exec();
@@ -961,7 +959,7 @@ void IconView::HandleImport(void)
     {
 //         DialogBox *nopicsDlg = new DialogBox(
 //             gContext->GetMainWindow(), tr("Nothing found to import"));
-// 
+//
 //         nopicsDlg->AddButton(tr("OK"));
 //         nopicsDlg->exec();
 //         nopicsDlg->deleteLater();
@@ -1086,7 +1084,7 @@ void IconView::HandleDeleteMarked(void)
 void IconView::HandleClearMarked(void)
 {
     m_itemMarked.clear();
-    m_imageList->SetAllChecked(MythListButtonItem::NotChecked);
+    m_imageList->SetAllChecked(MythUIButtonListItem::NotChecked);
 }
 
 void IconView::HandleSelectAll(void)
@@ -1100,7 +1098,7 @@ void IconView::HandleSelectAll(void)
         }
     }
 
-    m_imageList->SetAllChecked(MythListButtonItem::FullChecked);
+    m_imageList->SetAllChecked(MythUIButtonListItem::FullChecked);
 }
 
 void IconView::HandleMkDir(void)
@@ -1123,8 +1121,8 @@ void IconView::HandleMkDir(void)
 
 void IconView::HandleRename(void)
 {
-    MythListButtonItem *item = m_imageList->GetItemCurrent();
-    ThumbItem *thumbitem = (ThumbItem *)item->getData();
+    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
+    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
 
     if (!thumbitem)
         return;

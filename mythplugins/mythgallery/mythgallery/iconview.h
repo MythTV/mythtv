@@ -21,13 +21,12 @@
 
 // Qt headers
 #include <qstringlist.h>
-#include <QKeyEvent>
 #include <Q3PtrList>
 
 // MythTV headers
 #include <mythtv/libmythui/mythscreentype.h>
 #include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuibuttonlist.h>
 #include <mythtv/libmythui/mythuiimage.h>
 #include <mythtv/libmythui/mythdialogbox.h>
 #include <mythtv/mythmedia.h>
@@ -37,6 +36,8 @@
 
 class ThumbGenerator;
 class MediaMonitor;
+
+Q_DECLARE_METATYPE(ThumbItem*)
 
 class IconView : public MythScreenType
 {
@@ -55,8 +56,6 @@ class IconView : public MythScreenType
 
   private:
     void SetupMediaMonitor(void);
-
-    bool LoadTheme(void);
 
     void LoadDirectory(const QString &dir);
 
@@ -98,7 +97,7 @@ class IconView : public MythScreenType
     QStringList         m_itemMarked;
     QString             m_galleryDir;
 
-    MythListButton     *m_imageList;
+    MythUIButtonList   *m_imageList;
     MythUIText         *m_captionText;
     MythDialogBox      *m_menuPopup;
 
@@ -119,8 +118,8 @@ class IconView : public MythScreenType
 
   public slots:
     void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice *pMedia);
-    void HandleItemSelect(MythListButtonItem *);
-    void UpdateText(MythListButtonItem *);
+    void HandleItemSelect(MythUIButtonListItem *);
+    void UpdateText(MythUIButtonListItem *);
 };
 
 

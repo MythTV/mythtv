@@ -3,24 +3,67 @@
 
     <window name="gallery">
 
-        <buttonlist name="images" from="basebuttonlist">
-            <area>15,20,770,550</area>
+        <buttonlist2 name="images">
+            <area>15,20,770,560</area>
             <layout>grid</layout>
-            <showarrow>no</showarrow>
-            <regular-background filename="gallery-back-reg.png" />
-            <selected-background filename="gallery-back-sel.png" />
-            <inactive-background filename="gallery-back-reg.png" />
-            <check-empty filename="gallery-mark-none.png" />
-            <check-half filename="gallery-mark-none.png" />
-            <check-full filename="gallery-mark.png" />
-            <margin>6,6</margin>
-            <imagealign>hcenter,vcenter</imagealign>
-            <textflags>hcenter,bottom</textflags>
-        </buttonlist>
+            <spacing>5</spacing>
+            <buttonarea>0,0,770,520</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,150,150</area>
+                <state name="active">
+                    <imagetype name="buttonbackground">
+                        <filename>gallery-back-reg.png</filename>
+                    </imagetype>
+                    <imagetype name="buttonimage">
+                        <area>5,5,140,115</area>
+                        <preserveaspect>yes</preserveaspect>
+                    </imagetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>5,130,140,25</area>
+                        <font>basesmallgrey</font>
+                        <align>hcenter,bottom</align>
+                        <value>Test</value>
+                    </textarea>
+                    <statetype name="buttoncheck">
+                        <position>130,100</position>
+                        <state type="full">
+                            <imagetype name="marked">
+                                <filename>gallery-mark.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="buttonbackground">
+                        <filename>gallery-back-sel.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <font>basesmall</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>240,530</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>up_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>456,530</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>down_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist2>
 
         <textarea name="text" from="basetextarea">
-            <area>190,540,580,35</area>
+            <area>10,515,780,35</area>
             <font>basemedium</font>
+            <align>allcenter</align>
         </textarea>
 
     </window>
