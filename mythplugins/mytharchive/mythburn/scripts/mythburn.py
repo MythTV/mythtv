@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20080629-1"
+VERSION="0.1.20080726-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -1649,12 +1649,14 @@ def getFileInformation(file, folder):
             top_element.appendChild(node)   
 
             node = infoDOM.createElement("description")
-            desc = unicode(record[2], "UTF-8")
-            if desc != "None":
-                node.appendChild(infoDOM.createTextNode(desc))
+            if record[2] != None:
+                desc = unicode(record[2], "UTF-8")
+                if desc != "None":
+                    node.appendChild(infoDOM.createTextNode(desc))
+                else:
+                    node.appendChild(infoDOM.createTextNode(""))
             else:
-                node.appendChild(infoDOM.createTextNode(""))
-
+                    node.appendChild(infoDOM.createTextNode(""))
             top_element.appendChild(node)
 
             node = infoDOM.createElement("rating")
