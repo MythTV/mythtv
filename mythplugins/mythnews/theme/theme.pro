@@ -1,6 +1,6 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
-
+ 
 QMAKE_STRIP = echo
 
 TARGET = themenop
