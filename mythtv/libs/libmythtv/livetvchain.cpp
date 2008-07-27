@@ -409,11 +409,11 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
             m_switchid--;
 
         GetEntryAt(m_switchid, entry);
+        delete pginfo;
         pginfo = EntryToProgram(entry);
+        if (!pginfo)
+            return NULL;
     }
-
-    if (!pginfo)
-        return NULL;
 
     discont = true;
     if (m_curpos == m_switchid - 1)
