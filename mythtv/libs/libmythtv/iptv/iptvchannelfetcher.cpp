@@ -4,6 +4,10 @@
 #include <cmath>
 #include <unistd.h>
 
+// Qt headers
+#include <QFile>
+#include <QTextStream>
+
 // MythTV headers
 #include "mythcontext.h"
 #include "httpcomms.h"
@@ -34,11 +38,12 @@ void IPTVChannelFetcherThread::run(void)
 
 IPTVChannelFetcher::IPTVChannelFetcher(
     uint cardid, const QString &inputname, uint sourceid) :
-    _cardid(cardid),       _inputname(Q3DeepCopy<QString>(inputname)),
+    _cardid(cardid),       _inputname(inputname),
     _sourceid(sourceid),
     _chan_cnt(1),          _thread_running(false),
     _stop_now(false),      _lock(false)
 {
+    _inputname.detach();
 }
 
 IPTVChannelFetcher::~IPTVChannelFetcher()
@@ -189,6 +194,26 @@ void IPTVChannelFetcher::SetMessage(const QString &status)
 QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
                                              bool inQtThread)
 {
+    if (url.left(4).lower() == "file")
+    {
+        QString ret = "";
+        QUrl qurl(url);
+        QFile file(qurl.toLocalFile());
+        if (!file.open(QIODevice::ReadOnly))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Opening '%1'")
+                    .arg(qurl.toLocalFile()) + ENO);
+            return ret;
+        }
+
+        QTextStream stream(&file);
+        while (!stream.atEnd())
+            ret += stream.readLine() + "\n";
+
+        file.close();
+        return ret;
+    }
+
     // Use Myth HttpComms for http URLs
     QString redirected_url = url;
 
