@@ -436,8 +436,7 @@ using_backend {
         HEADERS += iptv/iptvfeeder.h          iptv/iptvfeederwrapper.h
         HEADERS += iptv/iptvfeederrtsp.h      iptv/iptvfeederudp.h
         HEADERS += iptv/iptvfeederfile.h      iptv/iptvfeederlive.h
-        HEADERS += iptv/iptvfeederrtp.h
-        HEADERS += iptv/urlfetcher.h          iptv/timeoutedtaskscheduler.h
+        HEADERS += iptv/iptvfeederrtp.h       iptv/timeoutedtaskscheduler.h
 
         SOURCES += iptvchannel.cpp            iptvrecorder.cpp
         SOURCES += iptvsignalmonitor.cpp
@@ -446,8 +445,7 @@ using_backend {
         SOURCES += iptv/iptvfeeder.cpp        iptv/iptvfeederwrapper.cpp
         SOURCES += iptv/iptvfeederrtsp.cpp    iptv/iptvfeederudp.cpp
         SOURCES += iptv/iptvfeederfile.cpp    iptv/iptvfeederlive.cpp
-        SOURCES += iptv/iptvfeederrtp.cpp
-        SOURCES += iptv/urlfetcher.cpp        iptv/timeoutedtaskscheduler.cpp
+        SOURCES += iptv/iptvfeederrtp.cpp     iptv/timeoutedtaskscheduler.cpp
 
         DEFINES += USING_IPTV
     }

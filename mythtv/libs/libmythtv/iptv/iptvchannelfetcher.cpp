@@ -9,7 +9,6 @@
 #include "httpcomms.h"
 #include "cardutil.h"
 #include "channelutil.h"
-#include "urlfetcher.h"
 #include "iptvchannelfetcher.h"
 
 #define LOC QString("IPTVChanFetch: ")
@@ -190,9 +189,6 @@ void IPTVChannelFetcher::SetMessage(const QString &status)
 QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
                                              bool inQtThread)
 {
-    if (!url.startsWith("http:"))
-        return URLFetcher::FetchData(url, inQtThread);
-
     // Use Myth HttpComms for http URLs
     QString redirected_url = url;
 
