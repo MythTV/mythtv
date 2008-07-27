@@ -12,7 +12,7 @@
 #include "iptvfeederfile.h"
 
 // Qt headers
-#include <q3url.h>
+#include <QUrl>
 
 // Live555 headers
 #include <BasicUsageEnvironment.hh>
@@ -58,10 +58,10 @@ bool IPTVFeederFile::Open(const QString &url)
         return true;
     }
 
-    Q3Url parse(url);
-    if (!parse.hasPath() || !parse.isLocalFile())
+    QUrl parse(url);
+    if (!parse.hasPath() || (parse.scheme().lower() != "file"))
     {
-        VERBOSE(VB_RECORD, LOC + "Open() -- end 2");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Open() -- end 2");
         return false;
     }
         
@@ -69,7 +69,7 @@ bool IPTVFeederFile::Open(const QString &url)
     if (!InitEnv())
         return false;
 
-    QString pathstr = parse.path();
+    QString pathstr = parse.toLocalFile();
     QByteArray path = pathstr.toLocal8Bit();
 
     _source = ByteStreamFileSource::createNew(
