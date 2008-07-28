@@ -3425,10 +3425,11 @@ fi
 echo "#endif /* FFMPEG_CONFIG_H */" >> $TMPH
 
 cat <<EOF >> $MYTH_CONFIG_MAK
-# Remove /usr/lib to prevent finding older binaries.
+# HACK: If Qt 4 and MythTV's installed library dirs are the same, remove the
+#       -L from early in the link line, to ignore any old installed libmyth*
 # Note: Qt uses QMAKE_INCDIR_QT to build an absolute path for include
 #       directories, it cannot be modified.
-QMAKE_LIBDIR_QT -= /usr/lib
+QMAKE_LIBDIR_QT -= $libdir
 EOF
 
 diff $TMPH $MYTH_CONFIG_H >/dev/null 2>&1
