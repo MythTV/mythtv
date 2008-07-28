@@ -919,6 +919,7 @@ MYTHTV_LIST='
     ffmpeg_pthreads
     mac_bundle
     proc_opt
+    silent_cc
     symbol_visibility
     xvmc_pro
 '
@@ -1768,6 +1769,8 @@ elif test x$compile_type = x"debug"; then
     enable debug
     disable optimizations
 fi
+
+enabled silent_cc && append CCONFIG "silent"
 
 
 if ! disabled logging ; then
