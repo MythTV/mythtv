@@ -202,6 +202,8 @@ our %depend = (
     =>  'ftp://ftp.trolltech.com/qt/source/qt-mac-opensource-src-4.3.4.tar.gz',
     'url'
     =>  'http://wftp.tu-chemnitz.de/pub/Qt/qt/source/qt-mac-opensource-src-4.3.4.tar.gz',
+    #'url'
+    #=>  'http://ftp3.ie.freebsd.org/pub/trolltech/pub/qt/source/qt-mac-opensource-src-4.4.0.tar.bz2',
     'conf-cmd'
     =>  'echo yes | MAKEFLAGS=$parallel_make_flags ./configure',
     'conf'
@@ -1121,7 +1123,7 @@ sub RecursiveCopy($$)
 }
 
 ######################################
-## CleanMakefiles removes every Makefile
+## CleanMakefiles removes every generated Makefile
 ## from our MythTV build that contains PREFIX.
 ## Necessary when we change the
 ## PREFIX variable.
@@ -1131,7 +1133,7 @@ sub CleanMakefiles
 {
   &Verbose("Cleaning MythTV makefiles containing PREFIX");
   &Syscall([ 'find', '.', '-name', 'Makefile', '-exec',
-             'egrep', '-q', 'PREFIX', '{}', ';', '-delete' ]) or die;
+             'egrep', '-q', 'qmake.*PREFIX', '{}', ';', '-delete' ]) or die;
 } # end CleanMakefiles
 
 
