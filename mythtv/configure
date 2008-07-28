@@ -2671,11 +2671,12 @@ enabled freetype2 ||
 #has_library libmysqlclient || has_library mysql/libmysqlclient ||
 #    die "ERROR! You must have a MySQL library installed to run MythTV."
 #
-enabled lamemp3 && has_library libmp3lame && has_header lame/lame.h ||
+enabled lamemp3 ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
 
 #test for lirc client libraries and headers
-enabled lirc && has_library liblirc_client && check_header lirc/lirc_client.h || disable lirc
+enabled lirc && check_lib lirc/lirc_client.h lirc_deinit -llirc_client ||
+    disable lirc
 
 if enabled firewire; then
     firewire="no"
@@ -2709,7 +2710,7 @@ if enabled firewire; then
     fi
 fi
 
-enabled libfftw3 && has_library libfftw3_threads && has_header fftw3.h ||
+enabled libfftw3 && check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3 ||
     disable libfftw3
 
 enabled x11 && has_library libX11 || disable x11
