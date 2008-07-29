@@ -116,7 +116,7 @@ if (!($dbh = DBI->connect("dbi:mysql:database=$opt_database:host=$opt_dbhost","$
 }
 
 if ($opt_dir eq "") {
-	&dir_lookup("SELECT dirname FROM storagegroup WHERE hostname=(?)");
+	&dir_lookup("SELECT dirname FROM storagegroup WHERE hostname=(?) AND groupname != 'DB Backups'");
 	&dir_lookup("SELECT data FROM settings WHERE value='RecordFilePrefix' AND hostname=(?)");
 
 	printf STDERR "Recording directories ($opt_host): $opt_dir\n" if $debug;
