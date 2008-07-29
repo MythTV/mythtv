@@ -36,10 +36,10 @@ const int kKeepPrebuffer   = 2;
 // ****************************************************************************
 
 #include <map>
+#include <vector>
 #include <iostream>
+#include <algorithm>
 using namespace std;
-
-#include <q3ptrlist.h>
 
 #include "DisplayRes.h"
 #include "yuv2rgb.h"
@@ -64,81 +64,6 @@ using namespace std;
 
 #define LOC QString("VideoOutputQuartz: ")
 #define LOC_ERR QString("VideoOutputQuartz Error: ")
-
-class VideoOutputQuartzView;
-
-/*
- * The floating window class needs an event callback.
- */
-OSStatus VoqvFloater_Callback(EventHandlerCallRef inHandlerCallRef, 
-                              EventRef inEvent, 
-                              void *inUserData);
-
-/*
- * The class containing most of VideoOutputQuartz's variables
- */
-class QuartzData
-{
-  public:
-    QuartzData() :
-        srcWidth(0),                srcHeight(0),
-        srcAspect(1.3333f),         srcMode(kAspect_Off),
-
-        pixelData(0),               pixelSize(0),
-        pixelLock(false),
-
-        window(0),
-        screen(0),                  refreshRate(60.0f),
-
-        drawInWindow(false),        windowedMode(false),
-        scaleUpVideo(false),        correctGamma(false),
-        convertI420to2VUY(NULL),
-
-	ZoomedH(1.0f), ZoomedV(1.0f),
-        ZoomedUp(0),                ZoomedRight(0),
-
-        embeddedView(NULL),         dvdv(NULL)
-    {;}
-
-    // Stored information about the media stream:
-    int                srcWidth,
-                       srcHeight;
-    float              srcAspect;
-    int                srcMode;           // letterbox mode
-
-    // Pixel storage for the media stream:
-    ImageDescriptionHandle imgDesc;       // source description header
-    char *             pixelData;         // storage for one frame
-    size_t             pixelSize;         // size of one frame
-    QMutex             pixelLock;         // to update pixels safely
-
-    // Information about the display:
-    WindowRef          window;            // MythTV window
-    Rect               windowBounds;      // dimensions, to restore size later
-    CGDirectDisplayID  screen;            // screen containing main window
-    float              refreshRate;       // for screen above
-
-    // Global preferences:
-    bool               drawInWindow;      // Fullscreen or in GUI view?
-    bool               windowedMode;      // GUI runs in window?
-    bool               scaleUpVideo;      // Enlarge video as needed?
-    bool               correctGamma;      // Video gamma correction
-    conv_i420_2vuy_fun convertI420to2VUY; // I420 -> 2VUY conversion function
-    
-    // Zoom preferences:
-    float              ZoomedH;           // VideoOutputBase::mz_scale_h
-    float              ZoomedV;           // VideoOutputBase::mz_scale_v
-    int                ZoomedUp;          // VideoOutputBase::mz_move.y()
-    int                ZoomedRight;       // VideoOutputBase::mz_move.x()
-
-    // Output viewports:
-    Q3PtrList<VideoOutputQuartzView> views;   // current views
-
-    // Embedding:
-    VideoOutputQuartzView * embeddedView;    // special embedded widget
-
-    DVDV                  * dvdv;            // MPEG acceleration data
-};
 
 /**
  * An abstract class for implementing QuickTime output viewports.
@@ -193,6 +118,89 @@ class VideoOutputQuartzView
     bool               applyTVoffset; // subclasses set this to affect transform
 
     QMutex             viewLock;
+};
+
+
+/*
+ * The floating window class needs an event callback.
+ */
+OSStatus VoqvFloater_Callback(EventHandlerCallRef inHandlerCallRef, 
+                              EventRef inEvent, 
+                              void *inUserData);
+
+/*
+ * The class containing most of VideoOutputQuartz's variables
+ */
+class QuartzData
+{
+  public:
+    QuartzData() :
+        srcWidth(0),                srcHeight(0),
+        srcAspect(1.3333f),         srcMode(kAspect_Off),
+
+        pixelData(0),               pixelSize(0),
+        pixelLock(false),
+
+        window(0),
+        screen(0),                  refreshRate(60.0f),
+
+        drawInWindow(false),        windowedMode(false),
+        scaleUpVideo(false),        correctGamma(false),
+        convertI420to2VUY(NULL),
+
+	ZoomedH(1.0f), ZoomedV(1.0f),
+        ZoomedUp(0),                ZoomedRight(0),
+
+        embeddedView(NULL),         dvdv(NULL)
+    {;}
+    ~QuartzData() { ClearViews(); }
+
+    void ClearViews(void)
+    {
+        vector<VideoOutputQuartzView*>::iterator it = views.begin();
+        for (; it != views.end(); ++it)
+            delete *it;
+        views.clear();
+    }
+
+    // Stored information about the media stream:
+    int                srcWidth,
+                       srcHeight;
+    float              srcAspect;
+    int                srcMode;           // letterbox mode
+
+    // Pixel storage for the media stream:
+    ImageDescriptionHandle imgDesc;       // source description header
+    char *             pixelData;         // storage for one frame
+    size_t             pixelSize;         // size of one frame
+    QMutex             pixelLock;         // to update pixels safely
+
+    // Information about the display:
+    WindowRef          window;            // MythTV window
+    Rect               windowBounds;      // dimensions, to restore size later
+    CGDirectDisplayID  screen;            // screen containing main window
+    float              refreshRate;       // for screen above
+
+    // Global preferences:
+    bool               drawInWindow;      // Fullscreen or in GUI view?
+    bool               windowedMode;      // GUI runs in window?
+    bool               scaleUpVideo;      // Enlarge video as needed?
+    bool               correctGamma;      // Video gamma correction
+    conv_i420_2vuy_fun convertI420to2VUY; // I420 -> 2VUY conversion function
+    
+    // Zoom preferences:
+    float              ZoomedH;           // VideoOutputBase::mz_scale_h
+    float              ZoomedV;           // VideoOutputBase::mz_scale_v
+    int                ZoomedUp;          // VideoOutputBase::mz_move.y()
+    int                ZoomedRight;       // VideoOutputBase::mz_move.x()
+
+    // Output viewports:
+    vector<VideoOutputQuartzView*> views;   // current views
+
+    // Embedding:
+    VideoOutputQuartzView * embeddedView;    // special embedded widget
+
+    DVDV                  * dvdv;            // MPEG acceleration data
 };
 
 VideoOutputQuartzView::VideoOutputQuartzView(QuartzData *pData)
@@ -1205,9 +1213,6 @@ VideoOutputQuartz::VideoOutputQuartz(
     myth_codec_id(_myth_codec_id)
 {
     init(&pauseFrame, FMT_YV12, NULL, 0, 0, 0, 0);
-
-    data->views.setAutoDelete(true);
-
     SetDVDVDecoder((DVDV*)codec_priv);
 }
 
@@ -1234,9 +1239,9 @@ void VideoOutputQuartz::VideoAspectRatioChanged(float aspect)
     data->srcAspect = aspect;
     data->srcMode   = db_aspectoverride;
 
-    VideoOutputQuartzView *view = NULL;
-    for (view = data->views.first(); view; view = data->views.next())
-        view->VideoAspectRatioChanged(aspect);
+    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
+    for (; it != data->views.end(); ++it)
+        (*it)->VideoAspectRatioChanged(aspect);
 }
 
 // this is documented in videooutbase.cpp
@@ -1252,12 +1257,9 @@ void VideoOutputQuartz::Zoom(ZoomDirection direction)
     data->ZoomedUp    = mz_move.y();
     data->ZoomedRight = mz_move.x();
 
-    for (VideoOutputQuartzView *view = data->views.first();
-         view;
-         view = data->views.next())
-    {
-        view->Zoom(direction);
-    }
+    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
+    for (; it != data->views.end(); ++it)
+        (*it)->Zoom(direction);
 }
 
 bool VideoOutputQuartz::InputChanged(const QSize &input_size,
@@ -1310,11 +1312,10 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
 
     CreateQuartzBuffers();
 
-    for (VideoOutputQuartzView *view = data->views.first();
-         view;
-         view = data->views.next())
+    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
+    for (; it != data->views.end(); ++it)
     {
-        view->InputChanged(
+        (*it)->InputChanged(
             video_dim.width(), video_dim.height(), aspect, av_codec_id);
     }
 
@@ -1441,14 +1442,14 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
         // Fullscreen will take over everything
         tmp = new VoqvFullscreen(data);
         tmp->SetFrameSkip(gContext->GetNumSetting("MacFullSkip", 0));
-        data->views.append(tmp);
+        data->views.push_back(tmp);
     }
     else if (!data->windowedMode)
     {
         // Full GUI is hidden, only show the main window
         tmp = new VoqvMainWindow(data, 1.0);
         tmp->SetFrameSkip(gContext->GetNumSetting("MacFullSkip", 0));
-        data->views.append(tmp);
+        data->views.push_back(tmp);
     }
     else
     {
@@ -1459,7 +1460,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
                 gContext->GetNumSetting("MacMainOpacity", 100) / 100.0;
             tmp = new VoqvMainWindow(data, opacity);
             tmp->SetFrameSkip(gContext->GetNumSetting("MacMainSkip", 0));
-            data->views.append(tmp);
+            data->views.push_back(tmp);
         }
         else
         {   
@@ -1474,30 +1475,29 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
                 gContext->GetNumSetting("MacFloatOpacity", 100) / 100.0;
             tmp = new VoqvFloater(data, opacity);
             tmp->SetFrameSkip(gContext->GetNumSetting("MacFloatSkip", 0));
-            data->views.append(tmp);
+            data->views.push_back(tmp);
         }
         if (gContext->GetNumSetting("MacDesktopEnabled", 0))
         {
             tmp = new VoqvDesktop(data);
             tmp->SetFrameSkip(gContext->GetNumSetting("MacDesktopSkip", 0));
-            data->views.append(tmp);
+            data->views.push_back(tmp);
         }
         if (gContext->GetNumSetting("MacDockEnabled", 1))
         { 
             tmp = new VoqvDock(data);
             tmp->SetFrameSkip(gContext->GetNumSetting("MacDockSkip", 3));
-            data->views.append(tmp);
+            data->views.push_back(tmp);
         }
     }
 
-    for (VideoOutputQuartzView *view = data->views.first();
-         view;
-         view = data->views.next())
+    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
+    for (; it != data->views.end(); ++it)
     {
-         if (!view->Init())
-         {
+        if (!(*it)->Init())
+        {
             puts("Init failed on view");
-         }
+        }
     }
 
     MoveResize();
@@ -1635,7 +1635,7 @@ void VideoOutputQuartz::Exit(void)
                             &(data->windowBounds));
         } 
 
-        data->views.clear();
+        data->ClearViews();
         DeleteQuartzBuffers();
     }
 }
@@ -1683,11 +1683,10 @@ void VideoOutputQuartz::EmbedInWidget(WId wid, int x, int y, int w, int h)
     data->pixelLock.lock();
 
     // warn other views that embedding is starting
-    for (VideoOutputQuartzView *view = data->views.first();
-         view;
-         view = data->views.next())
+    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
+    for (; it != data->views.end(); ++it)
     {
-        view->EmbedChanged(true);
+        (*it)->EmbedChanged(true);
     }
 
     // create embedded widget
@@ -1695,7 +1694,7 @@ void VideoOutputQuartz::EmbedInWidget(WId wid, int x, int y, int w, int h)
     if (data->embeddedView)
     {
         data->embeddedView->Init();
-        data->views.append(data->embeddedView);
+        data->views.push_back(data->embeddedView);
     }
     
     data->pixelLock.unlock();
@@ -1716,17 +1715,20 @@ void VideoOutputQuartz::StopEmbedding(void)
     // delete embedded widget
     if (data->embeddedView)
     {
-        data->views.removeRef(data->embeddedView);
+        vector<VideoOutputQuartzView*>::iterator it =
+            find(data->views.begin(), data->views.end(), data->embeddedView);
+        if (it != data->views.end())
+        {
+            delete *it;
+            data->views.erase(it);
+        }
         data->embeddedView = NULL;
     }
 
     // tell other views to return to normal
-    for (VideoOutputQuartzView *view = data->views.first();
-         view;
-         view = data->views.next())
-    {
-        view->EmbedChanged(false);
-    }
+    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
+    for (; it != data->views.end(); ++it)
+        (*it)->EmbedChanged(false);
     
     data->pixelLock.unlock();
 }
@@ -1765,12 +1767,9 @@ void VideoOutputQuartz::Show(FrameScanType t)
 #endif // USING_DVDV
 
     data->pixelLock.lock();
-    for (VideoOutputQuartzView *view = data->views.first();
-         view;
-         view = data->views.next())
-    {
-        view->Show();
-    }
+    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
+    for (; it != data->views.end(); ++it)
+        (*it)->Show();
     data->pixelLock.unlock();
 }
 
