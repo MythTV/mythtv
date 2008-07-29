@@ -98,10 +98,6 @@ return 0;
     return versionsBehind = m_newSchemaVer.toInt() - DBver.toUInt();
 }
 
-/**
- * \todo  Add code to check if the schemalock table is locked,
- *        and also loop until that is released.
- */
 int SchemaUpgradeWizard::CompareAndWait(const int seconds)
 {
     if (Compare() > 0)  // i.e. if DB is older than expected
@@ -109,13 +105,16 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
         VERBOSE(VB_IMPORTANT, "Database schema is old."
                               " Waiting to see if DB is being upgraded."); 
 
-        bool backupRunning = false; 
+        MSqlQuery query(MSqlQuery::InitCon());
+        bool      backupRunning  = false; 
+        bool      upgradeRunning = false; 
+
         MythTimer elapsedTimer; 
         elapsedTimer.start(); 
         while (versionsBehind && (elapsedTimer.elapsed() < seconds * 1000)) 
         { 
             sleep(1); 
-            Compare(); 
+
             if (IsBackupInProgress()) 
             { 
                 VERBOSE(VB_IMPORTANT,
@@ -125,7 +124,26 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
                     elapsedTimer.restart(); 
                     backupRunning = true; 
                 } 
+                continue;
             } 
+
+            if (!lockSchema(query))
+            {
+                VERBOSE(VB_IMPORTANT,
+                        "Waiting for Database Upgrade to complete."); 
+                if (!upgradeRunning) 
+                { 
+                    elapsedTimer.restart(); 
+                    upgradeRunning = true; 
+                } 
+                continue;
+            }
+
+            Compare(); 
+            unlockSchema(query);
+
+            if (m_expertMode)  // Experts don't like to wait around :-)
+                break;
         } 
   
         if (versionsBehind)
@@ -284,7 +302,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
                   + tr("(schema is %1 versions behind)").arg(versionsBehind)
                   + "\n\n" + tr("Please run mythtv-setup or mythbackend "
                                 "to update your database.");
-        MYTH_SCHEMA_ERROR;
+        returnValue = MYTH_SCHEMA_ERROR;
     }
     else   // This client is too old
     {
