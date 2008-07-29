@@ -23,7 +23,7 @@ class SimpleSRStorage : public SimpleDBStorage
         virtual QString GetSetClause(MSqlBindings &bindings) const
         {
             QString recordidTag(":SETRECORDID");
-            QString colTag(":SET" + GetColumnName().upper());
+            QString colTag(":SET" + GetColumnName().toUpper());
 
             QString query("recordid = " + recordidTag + ", " + 
                     GetColumnName() + " = " + colTag);
@@ -62,7 +62,7 @@ class SRSetting: public ManagedListSetting
         virtual QString GetSetClause(MSqlBindings &bindings) const
         {
             QString recordidTag(":SETRECORDID");
-            QString colTag(":SET" + GetColumnName().upper());
+            QString colTag(":SET" + GetColumnName().toUpper());
 
             QString query("recordid = " + recordidTag + ", " + 
                     GetColumnName() + " = " + colTag);
@@ -104,7 +104,7 @@ class SRSelectSetting : public SelectManagedListSetting
         virtual QString GetSetClause(MSqlBindings& bindings) const
         {
             QString recordidTag(":SETRECORDID");
-            QString colTag(":SET" + GetColumnName().upper());
+            QString colTag(":SET" + GetColumnName().toUpper());
 
             QString query("recordid = " + recordidTag + ", " + 
                     GetColumnName() + " = " + colTag);
@@ -145,7 +145,7 @@ class SRBoolSetting : public BoolManagedListSetting
         virtual QString GetSetClause(MSqlBindings &bindings) const
         {
             QString recordidTag(":SETRECORDID");
-            QString colTag(":SET" + GetColumnName().upper());
+            QString colTag(":SET" + GetColumnName().toUpper());
 
             QString query("recordid = " + recordidTag + ", " + GetColumnName()
                     + " = " + colTag);
@@ -189,7 +189,7 @@ class SRBoundedIntegerSetting : public BoundedIntegerManagedListSetting
         virtual QString GetSetClause(MSqlBindings &bindings) const
         {
             QString recordidTag(":SETRECORDID");
-            QString colTag(":SET" + GetColumnName().upper());
+            QString colTag(":SET" + GetColumnName().toUpper());
 
             QString query("recordid = " + recordidTag + ", " + 
                     GetColumnName() + " = " + colTag);

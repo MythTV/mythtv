@@ -174,7 +174,7 @@ bool DTVMultiplex::ParseDVB_S_and_C(
     ok &= modulation.Parse(_modulation);
 
     if (!_polarity.isEmpty())
-        polarity.Parse(_polarity.lower());
+        polarity.Parse(_polarity.toLower());
 
     if (ok)
         frequency = _frequency.toInt(&ok);

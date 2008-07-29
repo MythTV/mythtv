@@ -535,7 +535,7 @@ bool HDHRChannel::UpdateFilters(void)
         filter += " ";
     }
 
-    filter = filter.stripWhiteSpace();
+    filter = filter.trimmed();
 
     QString new_filter = TunerSet("filter", filter);
 

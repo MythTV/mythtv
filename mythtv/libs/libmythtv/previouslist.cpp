@@ -221,11 +221,11 @@ void PreviousList::LoadWindow(QDomElement &element)
             else if (e.tagName() == "container")
             {
                 theme->parseContainer(e, name, context, area);
-                if (name.lower() == "view")
+                if (name.toLower() == "view")
                     viewRect = area;
-                if (name.lower() == "selector")
+                if (name.toLower() == "selector")
                     listRect = area;
-                if (name.lower() == "program_info")
+                if (name.toLower() == "program_info")
                     infoRect = area;
             }
             else

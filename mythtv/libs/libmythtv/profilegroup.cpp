@@ -23,7 +23,7 @@ QString ProfileGroupStorage::GetWhereClause(MSqlBindings &bindings) const
 QString ProfileGroupStorage::GetSetClause(MSqlBindings &bindings) const
 {
     QString idTag(":SETID");
-    QString colTag(":SET" + GetColumnName().upper());
+    QString colTag(":SET" + GetColumnName().toUpper());
 
     QString query("id = " + idTag + ", " +
             GetColumnName() + " = " + colTag);

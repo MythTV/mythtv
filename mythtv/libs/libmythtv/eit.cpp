@@ -198,8 +198,8 @@ static int score_match(const QString &a, const QString &b)
     else if (a == b)
         return 1000;
 
-    QString A = a.stripWhiteSpace().upper();
-    QString B = b.stripWhiteSpace().upper();
+    QString A = a.trimmed().toUpper();
+    QString B = b.trimmed().toUpper();
     if (A == B)
         return 1000;
 

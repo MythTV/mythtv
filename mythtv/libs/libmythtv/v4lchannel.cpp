@@ -276,8 +276,8 @@ bool V4LChannel::InitializeInputs(void)
     // Get global TVFormat setting
     QString fmt = gContext->GetSetting("TVFormat");
     VERBOSE(VB_CHANNEL, QString("Global TVFormat Setting '%1'").arg(fmt));
-    int videomode_v4l1 = format_to_mode(fmt.upper(), 1);
-    int videomode_v4l2 = format_to_mode(fmt.upper(), 2);
+    int videomode_v4l1 = format_to_mode(fmt.toUpper(), 1);
+    int videomode_v4l2 = format_to_mode(fmt.toUpper(), 2);
 
     bool ok = false;
     InputNames v4l_inputs = CardUtil::probeV4LInputs(videofd, ok);
@@ -644,7 +644,7 @@ bool V4LChannel::Tune(uint frequency, QString inputname,
         vf.frequency = (isTunerCapLow) ?
             ((int)(frequency / 62.5)) : (frequency / 62500);
 
-        if (modulation.lower() == "digital")
+        if (modulation.toLower() == "digital")
         {
             VERBOSE(VB_CHANNEL, "using digital modulation");
             vf.type = V4L2_TUNER_DIGITAL_TV;

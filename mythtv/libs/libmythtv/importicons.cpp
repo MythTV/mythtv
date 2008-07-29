@@ -389,7 +389,7 @@ QStringList ImportIconsWizard::extract_csv(const QString& strLine)
     bool fFinish = false;
     while(!fFinish)
     {
-        str=str.stripWhiteSpace();
+        str = str.trimmed();
         while(!fFinish)
         {
             QString strLeft;
@@ -433,6 +433,11 @@ QStringList ImportIconsWizard::extract_csv(const QString& strLine)
             }
         }
     }
+
+    // This is just to avoid segfaulting, we should add some error recovery
+    while (ret.size() < 5)
+        ret.push_back("");
+
     return ret;
 }
 
@@ -622,15 +627,19 @@ bool ImportIconsWizard::findmissing(const QString& strParam)
     }
     else
     {
-        VERBOSE(VB_CHANNEL, QString("Icon Import: Working findmissing : %1").arg(str));
-        QStringList strSplit=QStringList::split("\n",str);
-        for (QStringList::iterator begin=strSplit.begin();
-             begin!=strSplit.end();begin++)
+        VERBOSE(VB_CHANNEL, QString("Icon Import: Working findmissing : %1")
+                .arg(str));
+        QStringList strSplit = str.split("\n", QString::SkipEmptyParts);
+        for (QStringList::const_iterator it = strSplit.begin();
+             it != strSplit.end(); ++it)
         {
-            if (*begin != "#" )
+            if (*it != "#")
             {
-                QStringList ret = extract_csv(*begin);
-                VERBOSE(VB_CHANNEL, QString("Icon Import: findmissing : %1 %2 %3 %4 %5").arg(ret[0]).arg(ret[1]).arg(ret[2]).arg(ret[3]).arg(ret[4]));
+                const QStringList ret = extract_csv(*it);
+                VERBOSE(VB_CHANNEL, QString(
+                            "Icon Import: findmissing : %1 %2 %3 %4 %5")
+                        .arg(ret[0]).arg(ret[1]).arg(ret[2])
+                        .arg(ret[3]).arg(ret[4]));
                 checkAndDownload(ret[4], (*m_iter).strChanId);
             }
         }
@@ -667,27 +676,31 @@ bool ImportIconsWizard::submit(const QString& strParam)
     }
     else
     {
-        VERBOSE(VB_CHANNEL, QString("Icon Import: Working submit : %1").arg(str));
-        QStringList strSplit=QStringList::split("\n",str);
-        unsigned atsc =0, dvb =0, callsign =0, tv =0, xmltvid=0;
-        for (QStringList::iterator begin=strSplit.begin();
-             begin!=strSplit.end();begin++)
+        VERBOSE(VB_CHANNEL, QString("Icon Import: Working submit : %1")
+                .arg(str));
+        QStringList strSplit = str.split("\n", QString::SkipEmptyParts);
+        unsigned atsc = 0, dvb = 0, callsign = 0, tv = 0, xmltvid = 0;
+        for (QStringList::const_iterator it = strSplit.begin();
+             it != strSplit.end(); ++it)
         {
-            if (*begin != "#" )
-            {
-                QStringList strSplit2=QStringList::split(":",*begin);
-                QString s=strSplit2[0].stripWhiteSpace();
-                if (s=="a")
-                     atsc=strSplit2[1].toUInt();
-                else if (s=="c")
-                     callsign=strSplit2[1].toUInt();
-                else if (s=="d")
-                     dvb=strSplit2[1].toUInt();
-                else if (s=="t")
-                     tv=strSplit2[1].toUInt();
-                else if (s=="x")
-                     xmltvid=strSplit2[1].toUInt();
-            }
+            if (*it == "#")
+                continue;
+
+            QStringList strSplit2=(*it).split(":", QString::SkipEmptyParts);
+            if (strSplit2.size() < 2)
+                continue;
+
+            QString s = strSplit2[0].trimmed();
+            if (s == "a")
+                atsc = strSplit2[1].toUInt();
+            else if (s == "c")
+                callsign = strSplit2[1].toUInt();
+            else if (s == "d")
+                dvb = strSplit2[1].toUInt();
+            else if (s == "t")
+                tv = strSplit2[1].toUInt();
+            else if (s == "x")
+                xmltvid = strSplit2[1].toUInt();
         }
         VERBOSE(VB_CHANNEL, QString("Icon Import: working submit : atsc=%1 callsign=%2 dvb=%3 tv=%4 xmltvid=%5")
                                               .arg(atsc).arg(callsign).arg(dvb).arg(tv).arg(xmltvid));

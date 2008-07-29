@@ -259,7 +259,7 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
     (void)audiodev;
     (void)vbidev;
 
-    if (videodev.lower().left(5) == "file:")
+    if (videodev.toLower().left(5) == "file:")
     {
         deviceIsMpegFile = true;
         bufferSize = 64000;

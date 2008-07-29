@@ -76,7 +76,7 @@ static QString pp_modulation(QString mod)
     if (mod == "analog")
         return QObject::tr("Analog");
 
-    return mod.upper();
+    return mod.toUpper();
 }
 
 void TransportList::fillSelections(void)
@@ -377,7 +377,7 @@ class MuxDBStorage : public SimpleDBStorage
 
 QString MuxDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
-    QString muxTag = ":WHERE" + mplexid->GetColumnName().upper();
+    QString muxTag = ":WHERE" + mplexid->GetColumnName().toUpper();
 
     bindings.insert(muxTag, mplexid->getValue());
 
@@ -387,8 +387,8 @@ QString MuxDBStorage::GetWhereClause(MSqlBindings &bindings) const
 
 QString MuxDBStorage::GetSetClause(MSqlBindings &bindings) const
 {
-    QString muxTag  = ":SET" + mplexid->GetColumnName().upper();
-    QString nameTag = ":SET" + GetColumnName().upper();
+    QString muxTag  = ":SET" + mplexid->GetColumnName().toUpper();
+    QString nameTag = ":SET" + GetColumnName().toUpper();
 
     bindings.insert(muxTag,  mplexid->getValue());
     bindings.insert(nameTag, user->GetValue());

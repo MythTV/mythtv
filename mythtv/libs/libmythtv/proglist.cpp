@@ -253,11 +253,11 @@ void ProgLister::LoadWindow(QDomElement &element)
             else if (e.tagName() == "container")
             {
                 theme->parseContainer(e, name, context, area);
-                if (name.lower() == "view")
+                if (name.toLower() == "view")
                     viewRect = area;
-                if (name.lower() == "selector")
+                if (name.toLower() == "selector")
                     listRect = area;
-                if (name.lower() == "program_info")
+                if (name.toLower() == "program_info")
                     infoRect = area;
             }
             else
@@ -445,10 +445,10 @@ void ProgLister::chooseEditChanged(void)
     if (!chooseOkButton || !chooseRecordButton || !chooseLineEdit)
         return;
 
-    chooseOkButton->setEnabled(chooseLineEdit->text().
-                               stripWhiteSpace().length() > 0);
-    chooseRecordButton->setEnabled(chooseLineEdit->text().
-                                   stripWhiteSpace().length() > 0);
+    chooseOkButton->setEnabled(
+        chooseLineEdit->text().trimmed().length() > 0);
+    chooseRecordButton->setEnabled(
+        chooseLineEdit->text().trimmed().length() > 0);
 }
 
 void ProgLister::chooseListBoxChanged(void)
@@ -515,7 +515,7 @@ void ProgLister::setViewFromEdit(void)
 
     QString text = chooseLineEdit->text();
 
-    if (text.stripWhiteSpace().length() == 0)
+    if (text.trimmed().length() == 0)
         return;
 
     updateKeywordInDB(text);
@@ -579,7 +579,7 @@ void ProgLister::addSearchRecord(void)
 
     QString what = text;
 
-    if (text.stripWhiteSpace().length() == 0)
+    if (text.trimmed().length() == 0)
         return;
 
     if (searchtype == kNoSearch)
@@ -773,10 +773,10 @@ void ProgLister::chooseView(void)
         choosePopup->addWidget(chooseRecordButton);
 
         chooseOkButton->setEnabled(chooseLineEdit->text()
-                                   .stripWhiteSpace().length() > 0);
+                                   .trimmed().length() > 0);
         chooseDeleteButton->setEnabled(curView >= 0);
         chooseRecordButton->setEnabled(chooseLineEdit->text()
-                                       .stripWhiteSpace().length() > 0);
+                                       .trimmed().length() > 0);
 
         connect(chooseListBox, SIGNAL(accepted(int)),
                 this,          SLOT(setViewFromList(int)));
@@ -939,7 +939,7 @@ void ProgLister::powerEdit()
     if (view >= 0)
         text = viewList[view];
 
-    QStringList field = QStringList::split( ":", text, true);
+    QStringList field = text.split(":");
 
     if (field.count() != 6)
     {
@@ -1065,7 +1065,7 @@ bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
     output = "";
     QString curfield;
 
-    QStringList field = QStringList::split(":", qphrase, true);
+    QStringList field = qphrase.split(":");
 
     if (field.count() != 6)
     {
@@ -1434,8 +1434,8 @@ void ProgLister::fillViewList(const QString &view)
     else if (type == plTime)
     {
         curView = 0;
-        viewList[curView] = searchTime.toString(fullDateFormat);
-        viewTextList[curView] = viewList[curView];
+        viewList << searchTime.toString(fullDateFormat);
+        viewTextList << viewList[curView];
     }
     else if (type == plSQLSearch)
     {

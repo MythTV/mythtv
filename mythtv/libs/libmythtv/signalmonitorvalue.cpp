@@ -116,9 +116,9 @@ bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
         return true;
     }
 
-    QStringList vals = QStringList::split(" ", longString);
+    QStringList vals = longString.split(" ", QString::SkipEmptyParts);
 
-    if (8 != vals.size() && "(null)" == vals[0])
+    if (8 != vals.size() || "(null)" == vals[0])
         return false;
 
     noSpaceName = vals[0];

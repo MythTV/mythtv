@@ -59,7 +59,7 @@ bool CardUtil::IsTunerShared(uint cardidA, uint cardidB)
     const QString hostname = query.value(1).toString();
     const QString cardtype = query.value(2).toString();
 
-    if (!IsTunerSharingCapable(cardtype.upper()))
+    if (!IsTunerSharingCapable(cardtype.toUpper()))
         return false;
 
     if (!query.next())
@@ -98,7 +98,7 @@ bool CardUtil::IsCardTypePresent(const QString &rawtype, QString hostname)
     query.prepare(qstr);
 
     if (!rawtype.isEmpty())
-        query.bindValue(":CARDTYPE", rawtype.upper());
+        query.bindValue(":CARDTYPE", rawtype.toUpper());
 
     query.bindValue(":HOSTNAME", hostname);
 
@@ -161,7 +161,7 @@ QStringVec CardUtil::GetVideoDevices(const QString &rawtype, QString hostname)
     query.prepare(qstr);
 
     if (!rawtype.isEmpty())
-        query.bindValue(":CARDTYPE", rawtype.upper());
+        query.bindValue(":CARDTYPE", rawtype.toUpper());
 
     query.bindValue(":HOSTNAME", hostname);
 
@@ -189,7 +189,7 @@ QStringVec CardUtil::ProbeVideoDevices(const QString &rawtype)
 {
     QStringVec devs;
 
-    if (rawtype.upper() == "DVB")
+    if (rawtype.toUpper() == "DVB")
     {
         QDir dir("/dev/dvb", "adapter*", QDir::Name, QDir::Dirs);
         const QFileInfoList il = dir.entryInfoList();
@@ -245,7 +245,7 @@ QString CardUtil::ProbeDVBType(const QString &device)
     close(fd_frontend);
 
     DTVTunerType type(info.type);
-    ret = (type.toString() != "UNKNOWN") ? type.toString().upper() : ret;
+    ret = (type.toString() != "UNKNOWN") ? type.toString().toUpper() : ret;
 #endif // USING_DVB
 
     return ret;
@@ -335,7 +335,7 @@ QString CardUtil::ProbeSubTypeName(uint cardid)
  */
 bool CardUtil::IsDVBCardType(const QString card_type)
 {
-    QString ct = card_type.upper();
+    QString ct = card_type.toUpper();
     return (ct == "DVB") || (ct == "QAM") || (ct == "QPSK") ||
         (ct == "OFDM") || (ct == "ATSC");
 }
@@ -426,7 +426,7 @@ vector<uint> CardUtil::GetCardIDs(QString videodevice,
     query.bindValue(":HOSTNAME", hostname);
 
     if (!rawtype.isEmpty())
-        query.bindValue(":CARDTYPE", rawtype.upper());
+        query.bindValue(":CARDTYPE", rawtype.toUpper());
 
     if (!query.exec())
         MythDB::DBError("CardUtil::GetCardIDs(videodevice...)", query);

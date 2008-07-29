@@ -350,7 +350,7 @@ void ScanWizardScanner::Scan(
 
         // HACK HACK HACK -- begin
         // if using QAM we may need additional time... (at least with HD-3000)
-        if ((mod.left(3).lower() == "qam") &&
+        if ((mod.left(3).toLower() == "qam") &&
             (scanner->GetSignalTimeout() < 1000))
         {
             scanner->SetSignalTimeout(1000);
@@ -400,7 +400,7 @@ void ScanWizardScanner::Scan(
 
             ok = !device.isEmpty();
             if (ok)
-                sub_type = CardUtil::ProbeDVBType(device).upper();
+                sub_type = CardUtil::ProbeDVBType(device).toUpper();
         }
 
         if (ok)
@@ -486,7 +486,7 @@ void ScanWizardScanner::PreScanCommon(int scantype,
 
     if ("DVB" == card_type)
     {
-        QString sub_type = CardUtil::ProbeDVBType(device).upper();
+        QString sub_type = CardUtil::ProbeDVBType(device).toUpper();
         bool need_nit = (("QAM"  == sub_type) ||
                          ("QPSK" == sub_type) ||
                          ("OFDM" == sub_type));

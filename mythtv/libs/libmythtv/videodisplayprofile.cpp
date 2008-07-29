@@ -19,7 +19,7 @@ bool ProfileItem::IsMatch(const QSize &size, float rate) const
         if (cmp.isEmpty())
             break;
 
-        QStringList clist = QStringList::split(" ", cmp);
+        QStringList clist = cmp.split(" ", QString::SkipEmptyParts);
         if (clist.size() != 3)
             break;
 

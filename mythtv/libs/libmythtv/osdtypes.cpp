@@ -280,7 +280,7 @@ void OSDSet::SetText(const QMap<QString, QString> &infoMap)
         {
             for (; riter != infoMap.end(); riter++)
             {
-                QString key  = riter.key().upper();
+                QString key  = riter.key().toUpper();
                 QString data = riter.data();
 
                 if (new_text.contains(key))
@@ -439,7 +439,7 @@ bool OSDSet::HandleKey(const QKeyEvent *e, bool *focus_change,
         if (txt != "\n" && txt != "\r" && txt != " ")
             return false;
 
-        const QString btn = item->Name().lower();
+        const QString btn = item->Name().toLower();
         if ((btn == "ok") || (btn == "cancel"))
             Hide();
 
@@ -488,7 +488,7 @@ static int extract_hot_key(const QString &text)
     int i = text.find("[");
     if ((i < 0) || ((i + 1) >= (int)text.length()))
         return 0;
-    int ch = text.at(i + 1).upper().toAscii() - 'A' + Qt::Key_A;
+    int ch = text.at(i + 1).toUpper().toAscii() - 'A' + Qt::Key_A;
     if (ch >= Qt::Key_A && ch <= Qt::Key_Z)
         return ch;
     return 0;
@@ -503,7 +503,7 @@ QString OSDSet::HandleHotKey(const QKeyEvent *e)
         if (item && item->IsButton() &&
             extract_hot_key(item->GetText()) == e->key())
         {
-            return item->Name().lower();
+            return item->Name().toLower();
         }
     }
     return QString::null;
@@ -978,7 +978,7 @@ void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
         tmp_msg.replace(nl," \n ");
         regexp_lock.unlock();
 
-        QStringList wordlist = QStringList::split(" ", tmp_msg);
+        QStringList wordlist = tmp_msg.split(" ", QString::SkipEmptyParts);
         int length = 0;
         int lines = 0;
 
@@ -2654,7 +2654,7 @@ QRect OSDType708CC::CalcBounds(const OSDSurface *surface,
 
             TTFFont *font = m_fonts[list[i]->attr.FontIndex()];
 
-            if (list[i]->str.stripWhiteSpace().isEmpty())
+            if (list[i]->str.trimmed().isEmpty())
             {
                 max_height = max(max_height, (uint)font->Size() * 3 / 2);
                 continue;

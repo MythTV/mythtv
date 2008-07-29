@@ -177,11 +177,11 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
     vector<uint8_t> cmd;
     vector<uint8_t> ret;
 
-    if ((panel_model.upper() == "GENERIC") ||
-        (panel_model.upper() == "SA4200HD") ||
-        (panel_model.upper() == "SA4250HDC"))
+    if ((panel_model.toUpper() == "GENERIC") ||
+        (panel_model.toUpper() == "SA4200HD") ||
+        (panel_model.toUpper() == "SA4250HDC"))
     {
-        if (panel_model.upper() == "SA4250HDC")
+        if (panel_model.toUpper() == "SA4250HDC")
         {
             VERBOSE(VB_IMPORTANT, LOC +
                     "The Scientific Atlanta 4250 HDC is not supported "
@@ -223,9 +223,9 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
 
     // the PACE is obviously not a Motorola channel changer, but the
     // same commands work for it as the Motorola.
-    bool is_mot = ((panel_model.upper().left(4) == "DCT-") ||
-                   (panel_model.upper().left(4) == "DCH-") ||
-                   (panel_model.upper().left(4) == "PACE-"));
+    bool is_mot = ((panel_model.toUpper().left(4) == "DCT-") ||
+                   (panel_model.toUpper().left(4) == "DCH-") ||
+                   (panel_model.toUpper().left(4) == "PACE-"));
 
     if (is_mot && !alt_method)
     {
@@ -271,7 +271,7 @@ bool FirewireDevice::SetChannel(const QString &panel_model,
         return true;
     }
 
-    if (panel_model.upper() == "SA3250HD")
+    if (panel_model.toUpper() == "SA3250HD")
     {
         cmd.push_back(kAVCControlCommand);
         cmd.push_back(kAVCSubunitTypePanel | m_subunitid);
@@ -464,7 +464,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
 
 bool FirewireDevice::IsSTBSupported(const QString &panel_model)
 {
-    QString model = panel_model.upper();
+    QString model = panel_model.toUpper();
     return ((model == "DCH-3200") ||
             (model == "DCT-3412") ||
             (model == "DCT-3416") ||

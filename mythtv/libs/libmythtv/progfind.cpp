@@ -459,9 +459,9 @@ void ProgFinder::parseContainer(QDomElement &element)
     int context;
     theme->parseContainer(element, name, context, area);
 
-    if (name.lower() == "selector")
+    if (name.toLower() == "selector")
         listRect = area;
-    if (name.lower() == "program_info")
+    if (name.toLower() == "program_info")
         infoRect = area;
 }
 
@@ -1093,7 +1093,7 @@ void ProgFinder::selectSearchData()
 
             if (formatSelectedData(data))
             {
-                tempList[data.lower()] = data;
+                tempList[data.toLower()] = data;
                 listCount++;
             }
         }
@@ -1262,7 +1262,7 @@ void ProgFinder::getSearchData(int charNum)
 
             if (formatSelectedData(data, charNum))
             {
-                tempList[data.lower()] = data;
+                tempList[data.toLower()] = data;
                 cnts++;
             }
         }

@@ -285,17 +285,17 @@ inline QString sm_flags_to_string(uint64_t flags)
 inline bool SignalMonitor::IsRequired(const QString &cardtype)
 {
     return (CardUtil::IsDVBCardType(cardtype) ||
-            (cardtype.upper() == "HDTV")      ||
-            (cardtype.upper() == "HDHOMERUN") ||
-            (cardtype.upper() == "FIREWIRE")  ||
-            (cardtype.upper() == "FREEBOX"));
+            (cardtype.toUpper() == "HDTV")      ||
+            (cardtype.toUpper() == "HDHOMERUN") ||
+            (cardtype.toUpper() == "FIREWIRE")  ||
+            (cardtype.toUpper() == "FREEBOX"));
 }
 
 inline bool SignalMonitor::IsSupported(const QString &cardtype)
 {
     return (IsRequired(cardtype)        ||
-            (cardtype.upper() == "V4L") ||
-            (cardtype.upper() == "MPEG"));
+            (cardtype.toUpper() == "V4L") ||
+            (cardtype.toUpper() == "MPEG"));
 }
 
 

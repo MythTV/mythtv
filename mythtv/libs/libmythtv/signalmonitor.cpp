@@ -92,8 +92,8 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 #endif
 
 #ifdef USING_V4L
-    if ((cardtype.upper() == "V4L") ||
-        (cardtype.upper() == "MPEG"))
+    if ((cardtype.toUpper() == "V4L") ||
+        (cardtype.toUpper() == "MPEG"))
     {
         V4LChannel *chan = dynamic_cast<V4LChannel*>(channel);
         if (chan)
@@ -102,7 +102,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 #endif
 
 #ifdef USING_HDHOMERUN
-    if (cardtype.upper() == "HDHOMERUN")
+    if (cardtype.toUpper() == "HDHOMERUN")
     {
         HDHRChannel *hdhrc = dynamic_cast<HDHRChannel*>(channel);
         if (hdhrc)
@@ -111,7 +111,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 #endif
 
 #ifdef USING_IPTV
-    if (cardtype.upper() == "FREEBOX")
+    if (cardtype.toUpper() == "FREEBOX")
     {
         IPTVChannel *fbc = dynamic_cast<IPTVChannel*>(channel);
         if (fbc)
@@ -120,7 +120,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 #endif
 
 #ifdef USING_FIREWIRE
-    if (cardtype.upper() == "FIREWIRE")
+    if (cardtype.toUpper() == "FIREWIRE")
     {
         FirewireChannel *fc = dynamic_cast<FirewireChannel*>(channel);
         if (fc)

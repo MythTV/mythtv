@@ -35,14 +35,15 @@ QStringList iso639_get_language_list(void)
         for (uint i = 0; true; i++)
         {
             QString q = QString("ISO639Language%1").arg(i);
-            QString lang = gContext->GetSetting(q, "").lower();
+            QString lang = gContext->GetSetting(q, "").toLower();
             if (lang == "")
                 break;
             _languages << lang;
         }
         if (_languages.empty())
         {
-            QString s3 = iso639_str2_to_str3(GetMythUI()->GetLanguage().lower());
+            QString s3 = iso639_str2_to_str3(
+                GetMythUI()->GetLanguage().toLower());
             if (!s3.isEmpty())
                 _languages << s3;
         }

@@ -916,7 +916,7 @@ QString CC608Decoder::XDSDecodeString(const vector<unsigned char> &buf,
     VERBOSE(VB_VBI, QString("XDSDecodeString: '%1'").arg(tmp));
 #endif // DEBUG_XDS
 
-    return tmp.stripWhiteSpace();
+    return tmp.trimmed();
 }
 
 bool is_better(const QString &newStr, const QString &oldStr)

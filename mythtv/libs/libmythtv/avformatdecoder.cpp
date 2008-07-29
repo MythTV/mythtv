@@ -1883,7 +1883,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     // video params are set properly
     if (selectedVideoIndex == -1)
     {
-        QString tvformat = gContext->GetSetting("TVFormat").lower();
+        QString tvformat = gContext->GetSetting("TVFormat").toLower();
         if (tvformat == "ntsc" || tvformat == "ntsc-jp" ||
             tvformat == "pal-m" || tvformat == "atsc")
         {
@@ -2649,7 +2649,7 @@ QString AvFormatDecoder::GetTrackDesc(uint type, uint trackNo) const
         if (s->codec->codec_id == CODEC_ID_MP3)
             msg += QString(" MP%1").arg(s->codec->sub_id);
         else if (s->codec->codec)
-            msg += QString(" %1").arg(s->codec->codec->name).upper();
+            msg += QString(" %1").arg(s->codec->codec->name).toUpper();
 
         int channels = 0;
         if (ringBuffer->isDVD())

@@ -380,7 +380,7 @@ void OSD::SetTextSubtitles(const QStringList &lines)
         }
 
         // wrap long lines at word spaces
-        QStringList words = QStringList::split(" ", line);
+        QStringList words = line.split(" ", QString::SkipEmptyParts);
         QString newString = "";
 
         do
@@ -741,7 +741,7 @@ void OSD::parseFont(QDomElement &element)
             }
             else if (info.tagName() == "outline")
             {
-                if (getFirstText(info).lower() == "yes")
+                if (getFirstText(info).toLower() == "yes")
                     outline = true;
             }
             else if (info.tagName() == "shadow")
@@ -937,7 +937,7 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
             }
             else if (info.tagName() == "multiline")
             {
-                if (getFirstText(info).lower() == "yes")
+                if (getFirstText(info).toLower() == "yes")
                     multiline = true;
             }
             else if (info.tagName() == "statictext")
@@ -950,7 +950,7 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
             }
             else if (info.tagName() == "scroller")
             {
-                if (getFirstText(info).lower() == "yes")
+                if (getFirstText(info).toLower() == "yes")
                     scroller = true;
             }
             else if (info.tagName() == "linespacing")
@@ -1009,9 +1009,9 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
     QString align = element.attribute("align", "");
     if (!align.isNull() && !align.isEmpty())
     {
-        if (align.lower() == "center")
+        if (align.toLower() == "center")
             text->SetCentered(true);
-        else if (align.lower() == "right")
+        else if (align.toLower() == "right")
             text->SetRightJustified(true);
     }
 
@@ -1024,7 +1024,7 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
     }
 
     QString button = element.attribute("button", "");
-    if (!button.isEmpty() && (button.lower() == "yes"))
+    if (!button.isEmpty() && (button.toLower() == "yes"))
         text->SetButton(true);
 
     if (scroller)
@@ -1096,13 +1096,13 @@ void OSD::parseSlider(OSDSet *container, QDomElement &element)
 
     filename = themepath + filename;
 
-    if (type.lower() == "fill")
+    if (type.toLower() == "fill")
     {
         OSDTypeFillSlider *slider = new OSDTypeFillSlider(
             name, filename, area, wmult, hmult);
         container->AddType(slider);
     }
-    else if (type.lower() == "edit")
+    else if (type.toLower() == "edit")
     {
         if (altfilename == "")
         {
@@ -1116,7 +1116,7 @@ void OSD::parseSlider(OSDSet *container, QDomElement &element)
             name, filename, altfilename, area, wmult, hmult);
         container->AddType(tes);
     }
-    else if (type.lower() == "position")
+    else if (type.toLower() == "position")
     {
         OSDTypePosSlider *pos = new OSDTypePosSlider(
             name, filename, area, wmult, hmult);
@@ -1331,9 +1331,9 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
                 QString fontName = info.attribute("name", "");
                 QString fontFcn  = info.attribute("function", "");
 
-                if (fontFcn.lower() == "active")
+                if (fontFcn.toLower() == "active")
                     fontActive = fontName;
-                else if (fontFcn.lower() == "inactive")
+                else if (fontFcn.toLower() == "inactive")
                     fontInactive = fontName;
                 else 
                 {
@@ -1344,23 +1344,23 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
             }
             else if (info.tagName() == "showarrow") 
             {
-                if (getFirstText(info).lower() == "no")
+                if (getFirstText(info).toLower() == "no")
                     showArrow = false;
             }
             else if (info.tagName() == "showscrollarrows") 
             {
-                if (getFirstText(info).lower() == "yes")
+                if (getFirstText(info).toLower() == "yes")
                     showScrollArrows = true;
             }
             else if (info.tagName() == "gradient") 
             {
-                if (info.attribute("type","").lower() == "selected") 
+                if (info.attribute("type","").toLower() == "selected") 
                 {
                     grSelectedBeg = createColor(info.attribute("start"));
                     grSelectedEnd = createColor(info.attribute("end"));
                     grSelectedAlpha = info.attribute("alpha","255").toUInt();
                 }
-                else if (info.attribute("type","").lower() == "unselected") 
+                else if (info.attribute("type","").toLower() == "unselected") 
                 {
                     grUnselectedBeg = createColor(info.attribute("start"));
                     grUnselectedEnd = createColor(info.attribute("end"));
@@ -1565,7 +1565,7 @@ bool OSD::LoadTheme(void)
             if (e.tagName() == "timeformat")
             {
                 timeFormat = getFirstText(e);
-                if (timeFormat.upper() == "FROMSETTINGS")
+                if (timeFormat.toUpper() == "FROMSETTINGS")
                     timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
             }
             else if (e.tagName() == "fadeaway")

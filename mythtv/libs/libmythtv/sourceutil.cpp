@@ -164,8 +164,8 @@ static QStringList get_cardtypes(uint sourceid)
         while (query.next())
         {
 /// BEGIN HACK HACK HACK -- return correct card type for child cards
-            QString cardtype = query.value(0).toString().upper();
-            QString inputname = query.value(1).toString().upper();
+            QString cardtype = query.value(0).toString().toUpper();
+            QString inputname = query.value(1).toString().toUpper();
             cardtype = ((cardtype == "DVB") && (inputname.left(3) != "DVB")) ?
                 "V4L" : cardtype;
 /// END  HACK HACK HACK

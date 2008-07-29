@@ -89,14 +89,14 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
     else if (name == "tvformat")
     {
         ntsc = false;
-        if (value.lower() == "ntsc" || value.lower() == "ntsc-jp")
+        if (value.toLower() == "ntsc" || value.toLower() == "ntsc-jp")
         {
             ntsc = true;
             SetFrameRate(29.97);
         }
-        else if (value.lower() == "pal-m")
+        else if (value.toLower() == "pal-m")
             SetFrameRate(29.97);
-        else if (value.lower() == "atsc")
+        else if (value.toLower() == "atsc")
         {
             // Here we set the TV format values for ATSC. ATSC isn't really 
             // NTSC, but users who configure a non-ATSC-recorder as ATSC
@@ -113,9 +113,9 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
     }
     else if (name == "vbiformat")
     {
-        if (value.lower() == "pal teletext")
+        if (value.toLower() == "pal teletext")
             vbimode = 1;
-        else if (value.lower().left(4) == "ntsc")
+        else if (value.toLower().left(4) == "ntsc")
             vbimode = 2;
         else
             vbimode = 0;

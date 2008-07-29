@@ -9,7 +9,6 @@
 #include "RingBuffer.h"
 #include "osd.h"
 #include "jitterometer.h"
-#include "recordingprofile.h"
 #include "videooutbase.h"
 #include "teletextdecoder.h"
 #include "textsubtitleparser.h"

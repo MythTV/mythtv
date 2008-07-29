@@ -143,7 +143,7 @@ class MPUBLIC CardUtil
                                         QString hostname = QString::null);
 
     static QString      GetRawCardType(uint cardid)
-        { return get_on_cardid("cardtype", cardid).upper(); }
+        { return get_on_cardid("cardtype", cardid).toUpper(); }
     static QString      GetVideoDevice(uint cardid)
         { return get_on_cardid("videodevice", cardid); }
     static QString      GetVBIDevice(uint cardid)

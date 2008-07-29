@@ -420,7 +420,7 @@ bool DDStructureParser::endDocument()
 bool DDStructureParser::characters(const QString& pchars)
 {
     // cerr << "Characters : " << pchars << "\n";
-    if (pchars.stripWhiteSpace().isEmpty())
+    if (pchars.trimmed().isEmpty())
         return true;
 
     if (currtagname == "message")
@@ -1993,7 +1993,7 @@ bool DataDirectProcessor::ParseLineups(const QString &documentFile)
     while (!stream.atEnd())
     {
         QString line = stream.readLine();
-        QString llow = line.lower();
+        QString llow = line.toLower();
         int frm = llow.find("<form");
         if (frm >= 0)
         {
@@ -2067,7 +2067,7 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
     while (!stream.atEnd())
     {
         QString line = stream.readLine();
-        QString llow = line.lower();
+        QString llow = line.toLower();
         int frm = llow.find("<form");
         if (frm >= 0)
         {
@@ -2168,7 +2168,7 @@ static QString html_escape(QString str)
 
 static QString get_setting(QString line, QString key)
 {
-    QString llow = line.lower();
+    QString llow = line.toLower();
     QString kfind = key + "=\"";
     int beg = llow.find(kfind), end = -1;
 
@@ -2195,7 +2195,7 @@ static QString get_setting(QString line, QString key)
 
 static bool has_setting(QString line, QString key)
 {
-    return (line.lower().find(key) >= 0);
+    return (line.toLower().find(key) >= 0);
 }
 
 static void get_atsc_stuff(QString channum, int sourceid, int freqid,

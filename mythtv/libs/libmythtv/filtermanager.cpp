@@ -195,7 +195,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
                                         VideoFrameType &outpixfmt, int &width,
                                         int &height, int &bufsize)
 {
-    if (Filters.lower() == "none")
+    if (Filters.toLower() == "none")
         return NULL;
 
     vector<const FilterInfo*> FiltInfoChain;
@@ -206,7 +206,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     QString Opts;
     const FilterInfo *Convert = GetFilterInfo("convert");
     QStringList OptsList;
-    QStringList FilterList = QStringList::split(",", Filters);
+    QStringList FilterList = Filters.split(",", QString::SkipEmptyParts);
     VideoFilter *NewFilt = NULL;
     FmtConv *FC, *FC2, *S1, *S2, *S3;
     VideoFrameType ifmt;

@@ -1044,17 +1044,17 @@ class ImageSize : public VerticalConfigurationGroup
         if (transcoding)
         {
             maxsize     = QSize(1920, 1088);
-            if (tvFormat.lower() == "ntsc" || tvFormat.lower() == "atsc")
+            if (tvFormat.toLower() == "ntsc" || tvFormat.toLower() == "atsc")
                 defaultsize = QSize(480, 480);
             else
                 defaultsize = QSize(480, 576);
         }
-        else if (tvFormat.lower().left(4) == "ntsc")
+        else if (tvFormat.toLower().left(4) == "ntsc")
         {
             maxsize     = QSize(720, 480);
             defaultsize = (ivtv) ? QSize(720, 480) : QSize(480, 480);
         }
-        else if (tvFormat.lower() == "atsc")
+        else if (tvFormat.toLower() == "atsc")
         {
             maxsize     = QSize(1920, 1088);
             defaultsize = QSize(1920, 1088);
@@ -1229,7 +1229,7 @@ void RecordingProfile::loadByID(int profileId)
                     this,        SLOT(FiltersChanged(const QString&)));
         }
     }
-    else if (type.upper() == "DVB")
+    else if (type.toUpper() == "DVB")
     {
         addChild(new RecordingType(*this));
     }
@@ -1244,10 +1244,13 @@ void RecordingProfile::FiltersChanged(const QString &val)
       return;
 
     // If there are filters, we can not do lossless transcoding
-    if (val.stripWhiteSpace().length() > 0) {
+    if (val.trimmed().length() > 0)
+    {
        tr_lossless->setValue(false);
        tr_lossless->setEnabled(false);
-    } else {
+    }
+    else
+    {
        tr_lossless->setEnabled(true);
     }
 }

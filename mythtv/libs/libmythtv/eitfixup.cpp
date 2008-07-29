@@ -157,11 +157,11 @@ void EITFixUp::Fix(DBEvent &event) const
     if (event.fixup)
     {
         if (!event.title.isEmpty())
-            event.title = event.title.stripWhiteSpace();
+            event.title = event.title.trimmed();
         if (!event.subtitle.isEmpty())
-            event.subtitle = event.subtitle.stripWhiteSpace();
+            event.subtitle = event.subtitle.trimmed();
         if (!event.description.isEmpty())
-            event.description = event.description.stripWhiteSpace();
+            event.description = event.description.trimmed();
     }
 }
 
@@ -227,7 +227,8 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
         if (position > 3)
         {
             tmp = event.description.left(position-3);
-            QStringList actors = QStringList::split(m_bellActors, tmp);
+            QStringList actors =
+                tmp.split(m_bellActors, QString::SkipEmptyParts);
             QStringList::const_iterator it = actors.begin();
             for (; it != actors.end(); it++)
                 event.AddPerson(DBPerson::kActor, *it);
@@ -304,7 +305,7 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
  */
 void EITFixUp::SetUKSubtitle(DBEvent &event) const
 {
-    QStringList strListColon = QStringList::split(":",event.description,TRUE);
+    QStringList strListColon = event.description.split(":");
     QStringList strListEnd;
 
     bool fColon = false;
@@ -329,7 +330,7 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
              QString strTmp = event.description.mid(nPosition1+1,
                                      nLength-nPosition1);
 
-             QStringList tmp = QStringList::split(" ", strTmp, true);
+             QStringList tmp = strTmp.split(" ");
              if (((uint) tmp.size()) < kMaxDotToColon)
                  fSingleDot = false;
          }
@@ -347,8 +348,7 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
              int i;
              for (i =0; (i<(int)strListColon.count()) && (nTitleMax==-1);i++)
              {
-                 const QStringList tmp =
-                     QStringList::split(" ", strListColon[i], true);
+                 const QStringList tmp = strListColon[i].split(" ");
 
                  nTitle += tmp.size();
 
@@ -375,7 +375,7 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
     QStringList strListExcl;
     if (!fColon)
     {
-        strListPeriod = QStringList::split(".",event.description,TRUE);
+        strListPeriod = event.description.split(".");
         if (strListPeriod.count() >1)
         {
             nPosition1 = event.description.find(".");
@@ -384,8 +384,8 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
                 strListEnd = strListPeriod;
         }
 
-        strListQuestion = QStringList::split("?",event.description,TRUE);
-        strListExcl = QStringList::split("!",event.description,TRUE);
+        strListQuestion = event.description.split("?");
+        strListExcl = event.description.split("!");
         if ((strListQuestion.size() > 1) &&
             ((uint)strListQuestion.size() <= kMaxQuestionExclamation))
         {
@@ -404,7 +404,8 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
 
     if (!strListEnd.empty())
     {
-        QStringList strListSpace = QStringList::split(" ",strListEnd[0]);
+        QStringList strListSpace = strListEnd[0].split(
+            " ", QString::SkipEmptyParts);
         if (fColon && ((uint)strListSpace.size() > kMaxToTitle))
              return;
         if ((uint)strListSpace.size() > kDotToTitle)
@@ -448,8 +449,8 @@ void EITFixUp::FixUK(DBEvent &event) const
     // Remove [AD,S] etc.
     event.description = event.description.remove(m_ukCC);
 
-    event.title = event.title.stripWhiteSpace();
-    event.description = event.description.stripWhiteSpace();
+    event.title       = event.title.trimmed();
+    event.description = event.description.trimmed();
 
     // Work out the episode numbers (if any)
     bool    series  = false;
@@ -742,18 +743,17 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
         // Year
         if (list[4].length() > 0)
         {
-            event.airdate = list[4].stripWhiteSpace();
+            event.airdate = list[4].trimmed();
         }
 
         // Actors
         if (list[5].length() > 0)
         {
-            QStringList actors;
-            actors=QStringList::split(m_comHemPersSeparator,list[5]);
-            for(QStringList::size_type i=0;i<actors.count();i++)
-            {
-                event.AddPerson(DBPerson::kActor, actors[i]);
-            }
+            const QStringList actors =
+                list[5].split(m_comHemPersSeparator, QString::SkipEmptyParts);
+            QStringList::const_iterator it = actors.begin();
+            for (; it != actors.end(); ++it)
+                event.AddPerson(DBPerson::kActor, *it);
         }
 
         // Remove year and actors.
@@ -793,12 +793,11 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
             continue;
         }
 
-        QStringList actors;
-        actors = QStringList::split(m_comHemPersSeparator, list[2]);
-        for(QStringList::size_type i=0;i<actors.count();i++)
-        {
-            event.AddPerson(role, actors[i]);
-        }
+        const QStringList actors =
+            list[2].split(m_comHemPersSeparator, QString::SkipEmptyParts);
+        QStringList::const_iterator it = actors.begin();
+        for (; it != actors.end(); ++it)
+            event.AddPerson(role, *it);
 
         // Remove it
         event.description=event.description.replace(list[0],"");
@@ -916,8 +915,8 @@ void EITFixUp::FixMCA(DBEvent &event) const
         tmpExp1.setCaseSensitive(false);
         if (tmpExp1.search(event.description) != -1)
         {
-            event.title       = tmpExp1.cap(1).stripWhiteSpace();
-            event.description = tmpExp1.cap(2).stripWhiteSpace();
+            event.title       = tmpExp1.cap(1).trimmed();
+            event.description = tmpExp1.cap(2).trimmed();
         }
         tmpExp1.setCaseSensitive(true);
     }
@@ -943,7 +942,7 @@ void EITFixUp::FixMCA(DBEvent &event) const
     {
         uint season    = tmpExp1.cap(1).toUInt();
         uint episode   = tmpExp1.cap(2).toUInt();
-        event.subtitle = tmpExp1.cap(3).stripWhiteSpace();
+        event.subtitle = tmpExp1.cap(3).trimmed();
         event.syndicatedepisodenumber =
                 QString("E%1S%2").arg(episode).arg(season);
         event.category_type = kCategorySeries;
@@ -976,9 +975,9 @@ void EITFixUp::FixMCA(DBEvent &event) const
     if (position != -1)
     {
         isMovie = true;
-        event.description = tmpExp1.cap(1).stripWhiteSpace();
-        event.airdate     = tmpExp1.cap(2).stripWhiteSpace();
-        event.AddPerson(DBPerson::kDirector, tmpExp1.cap(3).stripWhiteSpace());
+        event.description = tmpExp1.cap(1).trimmed();
+        event.airdate     = tmpExp1.cap(2).trimmed();
+        event.AddPerson(DBPerson::kDirector, tmpExp1.cap(3).trimmed());
     }
     else
     {
@@ -988,8 +987,8 @@ void EITFixUp::FixMCA(DBEvent &event) const
         if (position != -1)
         {
             isMovie = true;
-            event.description = tmpExp1.cap(1).stripWhiteSpace();
-            event.airdate     = tmpExp1.cap(2).stripWhiteSpace();
+            event.description = tmpExp1.cap(1).trimmed();
+            event.airdate     = tmpExp1.cap(2).trimmed();
         }
     }
 
@@ -999,11 +998,12 @@ void EITFixUp::FixMCA(DBEvent &event) const
         position = tmpExp1.search(event.description);
         if (position != -1)
         {
-            QStringList actors;
-            actors = QStringList::split(m_mcaActorsSeparator,tmpExp1.cap(2));
-            for (QStringList::size_type i = 0; i < actors.count(); ++i)
-                event.AddPerson(DBPerson::kActor, actors[i].stripWhiteSpace());
-            event.description = tmpExp1.cap(1).stripWhiteSpace();
+            const QStringList actors = tmpExp1.cap(2).split(
+                m_mcaActorsSeparator, QString::SkipEmptyParts);
+            QStringList::const_iterator it = actors.begin();
+            for (; it != actors.end(); it++)
+                event.AddPerson(DBPerson::kActor, (*it).trimmed());
+            event.description = tmpExp1.cap(1).trimmed();
         }
         event.category_type = kCategoryMovie;
     }
@@ -1030,8 +1030,7 @@ void EITFixUp::FixRTL(DBEvent &event) const
     {
         // remove '.' if it matches at the beginning of the description
         int length = tmpExpRepeat.cap(0).length() + (pos ? 0 : 1);
-        event.description =
-            event.description.remove(pos, length).stripWhiteSpace();
+        event.description = event.description.remove(pos, length).trimmed();
         event.originalairdate = event.starttime.addDays(-1).date();
     }
 
@@ -1152,12 +1151,14 @@ void EITFixUp::FixPremiere(DBEvent &event) const
     QRegExp tmpInfos =  m_dePremiereInfos;
     if (tmpInfos.search(event.description) != -1)
     {
-        country = tmpInfos.cap(1).stripWhiteSpace();
+        country = tmpInfos.cap(1).trimmed();
         event.airdate = tmpInfos.cap(2);
         event.AddPerson(DBPerson::kDirector, tmpInfos.cap(3));
-        QStringList actors = QStringList::split(", ", tmpInfos.cap(4));
-        for(QStringList::size_type j=0;j<actors.count();j++)
-            event.AddPerson(DBPerson::kActor, actors[j]);
+        const QStringList actors = tmpInfos.cap(4).split(
+            ", ", QString::SkipEmptyParts);
+        QStringList::const_iterator it = actors.begin();
+        for (; it != actors.end(); it++)
+            event.AddPerson(DBPerson::kActor, *it);
         event.description = event.description.replace(tmpInfos.cap(0), "");
     }
 
@@ -1312,7 +1313,7 @@ void EITFixUp::FixNL(DBEvent &event) const
     // This is trying to catch the case where the subtitle is in the main title
     // but avoid cases where it isn't a subtitle e.g cd:uk
     if (((position = event.title.find(":")) != -1) &&
-        (event.title[position + 1].upper() == event.title[position + 1]) &&
+        (event.title[position + 1].toUpper() == event.title[position + 1]) &&
         (event.subtitle.isEmpty()))
     {
         event.subtitle = event.title.mid(position + 1);
@@ -1322,35 +1323,31 @@ void EITFixUp::FixNL(DBEvent &event) const
     
     // Get the actors
     QRegExp tmpActors = m_nlActors;
-    QStringList actors;
-    QString tmpActorsString;
     if (tmpActors.search(fullinfo) != -1)
     {
-        tmpActorsString = tmpActors.cap(0);
+        QString tmpActorsString = tmpActors.cap(0);
         tmpActorsString = tmpActorsString.right(tmpActorsString.length() - 6);
         tmpActorsString = tmpActorsString.left(tmpActorsString.length() - 5);
-        actors = QStringList::split(QString(", "), tmpActorsString);
-        for (QStringList::size_type i =0; i < actors.count(); i++)
-        {
-            event.AddPerson(DBPerson::kActor, actors[i]);
-        }
+        const QStringList actors =
+            tmpActorsString.split(", ", QString::SkipEmptyParts);
+        QStringList::const_iterator it = actors.begin();
+        for (; it != actors.end(); it++)
+                event.AddPerson(DBPerson::kActor, *it);
         fullinfo = fullinfo.replace(tmpActors.cap(0), "");
     }
 
     // Try to find presenter
     QRegExp tmpPres = m_nlPres;
-    QStringList host;
-    QString tmpPresString;
     if (tmpPres.search(fullinfo) != -1)
     {
-        tmpPresString = tmpPres.cap(0);
+        QString tmpPresString = tmpPres.cap(0);
         tmpPresString = tmpPresString.right(tmpPresString.length() - 14);
         tmpPresString = tmpPresString.left(tmpPresString.length() -1);
-        host = QStringList::split(m_nlPersSeparator, tmpPresString);
-        for (QStringList::size_type i =0; i < host.count(); i++)
-        {
-            event.AddPerson(DBPerson::kPresenter, host[i]);
-        }
+        const QStringList host =
+            tmpPresString.split(m_nlPersSeparator, QString::SkipEmptyParts);
+        QStringList::const_iterator it = host.begin();
+        for (; it != host.end(); it++)
+                event.AddPerson(DBPerson::kPresenter, *it);
         fullinfo = fullinfo.replace(tmpPres.cap(0), "");
     }
 
@@ -1403,8 +1400,8 @@ void EITFixUp::FixNL(DBEvent &event) const
     // Put information back in description
 
     event.description = fullinfo;
-    event.description.stripWhiteSpace();
-    event.title.stripWhiteSpace();
-    event.subtitle.stripWhiteSpace();
+    event.description = event.description.trimmed();
+    event.title       = event.title.trimmed();
+    event.subtitle    = event.subtitle.trimmed();
 
 }

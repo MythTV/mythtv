@@ -78,7 +78,7 @@ static uint get_dtv_multiplex(int  db_source_id,  QString sistandard,
         "WHERE sourceid     = :SOURCEID   "
         "  AND sistandard   = :SISTANDARD ";
 
-    if (sistandard.lower() != "dvb")
+    if (sistandard.toLower() != "dvb")
         qstr += "AND frequency    = :FREQUENCY   ";
     else
     {
@@ -92,7 +92,7 @@ static uint get_dtv_multiplex(int  db_source_id,  QString sistandard,
     query.bindValue(":SOURCEID",          db_source_id);
     query.bindValue(":SISTANDARD",        sistandard);
 
-    if (sistandard.lower() != "dvb")
+    if (sistandard.toLower() != "dvb")
         query.bindValue(":FREQUENCY",     frequency);
     else
     {
@@ -136,7 +136,7 @@ static uint insert_dtv_multiplex(
         // DVB specific
         transport_id,  network_id);
 
-    bool isDVB = (sistandard.lower() == "dvb");
+    bool isDVB = (sistandard.toLower() == "dvb");
 
     QString updateStr =
         "UPDATE dtv_multiplex "
@@ -1649,7 +1649,7 @@ inline bool lt_smart(const DBChannel &a, const DBChannel &b)
 void ChannelUtil::SortChannels(DBChanList &list, const QString &order,
                                bool eliminate_duplicates)
 {
-    bool cs = order.lower() == "callsign";
+    bool cs = order.toLower() == "callsign";
     if (cs)
         stable_sort(list.begin(), list.end(), lt_callsign);
     else /* if (sortorder == "channum") */

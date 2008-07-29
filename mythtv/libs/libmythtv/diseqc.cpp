@@ -1750,11 +1750,12 @@ bool DiSEqCDevRotor::Load(void)
 
         // form of "angle1=index1:angle2=index2:..."
         QString positions = query.value(1).toString();
-        QStringList pos = QStringList::split(":", positions);
-        for (int i = 0; i < pos.count(); i++)
+        QStringList pos = positions.split(":", QString::SkipEmptyParts);
+        QStringList::const_iterator it = pos.begin();
+        for (; it != pos.end(); ++it)
         {
-            QStringList eq = QStringList::split("=", pos[i]);
-            if (eq.count() == 2)
+            const QStringList eq = (*it).split("=", QString::SkipEmptyParts);
+            if (eq.size() == 2)
                 m_posmap[eq[0].toFloat()] = eq[1].toUInt();
         }
     }
@@ -2179,7 +2180,7 @@ bool DiSEqCDevLNB::IsHighBand(const DTVMultiplex &tuning) const
  */
 bool DiSEqCDevLNB::IsHorizontal(const DTVMultiplex &tuning) const
 {
-    QString pol = tuning.polarity.toString().lower();
+    QString pol = tuning.polarity.toString().toLower();
     return (pol == "h" || pol == "l") ^ IsPolarityInverted();
 }
 

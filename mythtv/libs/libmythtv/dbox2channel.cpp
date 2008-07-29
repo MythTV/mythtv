@@ -342,7 +342,7 @@ void DBox2Channel::HttpChannelChangeDone(bool error)
 QString DBox2Channel::GetChannelID(const QString &name)
 {
     for (int i = m_dbox2channelcount-1; i >= 0; i--)
-        if (m_dbox2channelnames[i].upper() == name.upper())
+        if (m_dbox2channelnames[i].toUpper() == name.toUpper())
             return m_dbox2channelids[i];
 
     return "";

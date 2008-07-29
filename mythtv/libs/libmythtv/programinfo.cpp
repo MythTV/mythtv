@@ -1432,7 +1432,7 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
         (recordid == other.recordid || recordid == other.parentid))
            return true;
 
-    if (title.lower() != other.title.lower())
+    if (title.toLower() != other.title.toLower())
         return false;
 
     if (findid && findid == other.findid)
@@ -1453,18 +1453,18 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 
     if ((dupmethod & kDupCheckSub) &&
         ((subtitle.isEmpty()) ||
-         (subtitle.lower() != other.subtitle.lower())))
+         (subtitle.toLower() != other.subtitle.toLower())))
         return false;
 
     if ((dupmethod & kDupCheckDesc) &&
         ((description.isEmpty()) ||
-         (description.lower() != other.description.lower())))
+         (description.toLower() != other.description.toLower())))
         return false;
 
     if ((dupmethod & kDupCheckSubThenDesc) &&
         ((subtitle.isEmpty() && other.subtitle.isEmpty() &&
-          description.lower() != other.description.lower()) ||
-         (subtitle.lower() != other.subtitle.lower()) ||
+          description.toLower() != other.description.toLower()) ||
+         (subtitle.toLower() != other.subtitle.toLower()) ||
          (description.isEmpty() && subtitle.isEmpty())))
         return false;
 
@@ -3594,7 +3594,7 @@ static QString get_ratings(bool recorded, uint chanid, QDateTime startts)
     QString advisory = "";
     while (query.next())
     {
-        if (query.value(0).toString().lower() == "advisory")
+        if (query.value(0).toString().toLower() == "advisory")
         {
             advisory += query.value(1).toString() + ", ";
             continue;
@@ -4822,9 +4822,12 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(querystr);
-    query.bindValues(bindings);
+    MSqlBindings::const_iterator it;
+    for (it = bindings.begin(); it != bindings.end(); ++it)
+        if (querystr.contains(it.key()))
+            query.bindValue(it.key(), it.value());
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
     {
         MythDB::DBError("ProgramList::FromProgram", query);
         return false;

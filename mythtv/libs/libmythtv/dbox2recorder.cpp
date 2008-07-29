@@ -432,7 +432,7 @@ void DBox2Recorder::httpRequestFinished(int id, bool error)
 
                 m_pids.push_back(pid);
 
-                QString pidType = pidString.section(" ", 1).upper();
+                QString pidType = pidString.section(" ", 1).toUpper();
                 if (pidType == "PMT")
                 {
                     m_pmtPID = m_pids.back();

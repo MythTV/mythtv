@@ -126,7 +126,7 @@ QString DTVChannel::GetSIStandard(void) const
 void DTVChannel::SetSIStandard(const QString &si_std)
 {
     QMutexLocker locker(&dtvinfo_lock);
-    sistandard = Q3DeepCopy<QString>(si_std.lower());
+    sistandard = Q3DeepCopy<QString>(si_std.toLower());
 }
 
 QString DTVChannel::GetSuggestedTuningMode(bool is_live_tv) const
@@ -156,7 +156,7 @@ QString DTVChannel::GetTuningMode(void) const
 void DTVChannel::SetTuningMode(const QString &tuning_mode)
 {
     QMutexLocker locker(&dtvinfo_lock);
-    tuningMode = Q3DeepCopy<QString>(tuning_mode.lower());
+    tuningMode = Q3DeepCopy<QString>(tuning_mode.toLower());
 }
 
 DTVChannel *DTVChannel::GetMaster(const QString &videodevice)

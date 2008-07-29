@@ -49,6 +49,7 @@ using namespace std;
 #define IGNORE_TV_PLAY_REC
 #include "tv.h"
 #include "fourcc.h"
+#include "mythmainwindow.h"
 
 // MythTV OpenGL headers
 #include "openglcontext.h"

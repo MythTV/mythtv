@@ -157,7 +157,7 @@ void SIScan::AllGood(void)
         return;
 
     QString cur_chan = (*current).FriendlyName;
-    QStringList list = QStringList::split(" ", cur_chan);
+    QStringList list = cur_chan.split(" ", QString::SkipEmptyParts);
     QString freqid = (list.size() >= 2) ? list[1] : cur_chan;
 
     bool ok = false;
@@ -786,7 +786,7 @@ bool SIScan::ScanTransports(int SourceID,
                             const QString modulation,
                             const QString country)
 {
-    QString si_std = (std.lower() != "atsc") ? "dvb" : "atsc";
+    QString si_std = (std.toLower() != "atsc") ? "dvb" : "atsc";
     QString name("");
     if (scanMode == TRANSPORT_LIST)
         return false;
@@ -891,8 +891,8 @@ bool SIScan::ScanTransportsStartingOn(int sourceid,
     }
 
     QString std    = *startChan.find("std");
-    QString mod    = (*(startChan.find("modulation"))).upper();
-    QString si_std = (std.lower() != "atsc") ? "dvb" : "atsc";
+    QString mod    = (*(startChan.find("modulation"))).toUpper();
+    QString si_std = (std.toLower() != "atsc") ? "dvb" : "atsc";
     QString name   = "";
     bool    ok     = false;
 
@@ -1434,7 +1434,7 @@ void SIScan::UpdateSDTinDB(int /*mplexid*/, const ServiceDescriptionTable *sdt,
         if (desc)
             service_name = desc->ServiceName();
 
-        if (service_name.stripWhiteSpace().isEmpty())
+        if (service_name.trimmed().isEmpty())
             service_name = QString("%1 %2")
                 .arg(sdt->ServiceID(i)).arg(db_mplexid);
 

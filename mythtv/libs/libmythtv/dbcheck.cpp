@@ -2127,10 +2127,10 @@ NULL
             MSqlQuery insert(MSqlQuery::InitCon());
             while (query.next())
             {
-                QString cutlist = query.value(2).toString();
-
-                QStringList strlist = QStringList::split("\n", cutlist);
-                QStringList::Iterator i;
+                const QString cutlist = query.value(2).toString();
+                const QStringList strlist =
+                    cutlist.split("\n", QString::SkipEmptyParts);
+                QStringList::const_iterator i;
                 for (i = strlist.begin(); i != strlist.end(); ++i)
                 {
                     long long start = 0, end = 0;

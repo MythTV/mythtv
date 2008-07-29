@@ -147,7 +147,7 @@ QString VideoSourceDBStorage::GetWhereClause(MSqlBindings &bindings) const
 QString VideoSourceDBStorage::GetSetClause(MSqlBindings& bindings) const
 {
     QString sourceidTag(":SETSOURCEID");
-    QString colTag(":SET" + GetColumnName().upper());
+    QString colTag(":SET" + GetColumnName().toUpper());
 
     QString query("sourceid = " + sourceidTag + ", " +
             GetColumnName() + " = " + colTag);
@@ -172,7 +172,7 @@ QString CaptureCardDBStorage::GetWhereClause(MSqlBindings& bindings) const
 QString CaptureCardDBStorage::GetSetClause(MSqlBindings& bindings) const
 {
     QString cardidTag(":SETCARDID");
-    QString colTag(":SET" + GetColumnName().upper());
+    QString colTag(":SET" + GetColumnName().toUpper());
 
     QString query("cardid = " + cardidTag + ", " +
             GetColumnName() + " = " + colTag);
@@ -245,7 +245,7 @@ void TransFreqTableSelector::Load(void)
     {
         loaded_freq_table = query.value(0).toString();
         if (!loaded_freq_table.isEmpty() &&
-            (loaded_freq_table.lower() != "default"))
+            (loaded_freq_table.toLower() != "default"))
         {
             int idx = getValueIndex(loaded_freq_table);
             if (idx >= 0)
@@ -259,7 +259,7 @@ void TransFreqTableSelector::Save(void)
     VERBOSE(VB_IMPORTANT, "TransFreqTableSelector::Save(void)");
 
     if ((loaded_freq_table == getValue()) ||
-        ((loaded_freq_table.lower() == "default") &&
+        ((loaded_freq_table.toLower() == "default") &&
          (getValue() == gContext->GetSetting("FreqTable"))))
     {
         return;
@@ -565,8 +565,8 @@ void XMLTVFindGrabbers::run(void)
         QByteArray tmp = find_grabber_proc.readLine();
         QString grabber_list(tmp);
         grabber_list = grabber_list.left(grabber_list.size() - 1);
-        QStringList grabber_split = QStringList::split(
-            "|", grabber_list);
+        QStringList grabber_split =
+            grabber_list.split("|", QString::SkipEmptyParts);
         QString grabber_name = grabber_split[1] + " (xmltv)";
         QFileInfo grabber_file(grabber_split[0]);
 
@@ -1259,7 +1259,7 @@ void FirewireDesc::SetGUID(const QString &_guid)
     name.replace("Scientific-Atlanta", "SA");
     name.replace(", Inc.", "");
     name.replace("Explorer(R)", "");
-    name = name.simplifyWhiteSpace();
+    name = name.simplified();
     setValue((name.isEmpty()) ? "" : name);
 #endif // USING_FIREWIRE
 }
@@ -1629,7 +1629,7 @@ void CaptureCard::fillSelections(SelectSetting *setting)
         QString videodevice = query.value(1).toString();
         QString cardtype    = query.value(2).toString();
 
-        if ((cardtype.lower() == "dvb") && (1 != ++device_refs[videodevice]))
+        if ((cardtype.toLower() == "dvb") && (1 != ++device_refs[videodevice]))
             continue;
 
         QString label = CardUtil::GetDeviceLabel(
@@ -2414,7 +2414,7 @@ QString CardInputDBStorage::GetWhereClause(MSqlBindings &bindings) const
 QString CardInputDBStorage::GetSetClause(MSqlBindings &bindings) const
 {
     QString cardinputidTag(":SETCARDINPUTID");
-    QString colTag(":SET" + GetColumnName().upper());
+    QString colTag(":SET" + GetColumnName().toUpper());
 
     QString query("cardinputid = " + cardinputidTag + ", " +
             GetColumnName() + " = " + colTag);
@@ -2778,7 +2778,7 @@ void CardInputEditor::Load(void)
         QString videodevice = query.value(1).toString();
         QString cardtype    = query.value(2).toString();
 
-        if ((cardtype.lower() == "dvb") && (1 != ++device_refs[videodevice]))
+        if ((cardtype.toLower() == "dvb") && (1 != ++device_refs[videodevice]))
             continue;
 
         QStringList        inputLabels;
@@ -2806,7 +2806,7 @@ static QString remove_chaff(const QString &name)
         short_name = short_name.right(short_name.length() - 5);
     if (short_name.left(8) == "Nextwave")
         short_name = short_name.right(short_name.length() - 9);
-    if (short_name.right(8).lower() == "frontend")
+    if (short_name.right(8).toLower() == "frontend")
         short_name = short_name.left(short_name.length() - 9);
     if (short_name.right(7) == "VSB/QAM")
         short_name = short_name.left(short_name.length() - 8);
@@ -2819,20 +2819,20 @@ static QString remove_chaff(const QString &name)
     // the vendor ID. But instead we have to guess based on the
     // demodulator name. This means cards like the Air2PC HD5000
     // and DViCO Fusion HDTV cards are not identified correctly.
-    short_name = short_name.simplifyWhiteSpace();
-    if (short_name.left(7).lower() == "or51211")
+    short_name = short_name.simplified();
+    if (short_name.left(7).toLower() == "or51211")
         short_name = "pcHDTV HD-2000";
-    else if (short_name.left(7).lower() == "or51132")
+    else if (short_name.left(7).toLower() == "or51132")
         short_name = "pcHDTV HD-3000";
-    else if (short_name.left(7).lower() == "bcm3510")
+    else if (short_name.left(7).toLower() == "bcm3510")
         short_name = "Air2PC v1";
-    else if (short_name.left(7).lower() == "nxt2002")
+    else if (short_name.left(7).toLower() == "nxt2002")
         short_name = "Air2PC v2";
-    else if (short_name.left(7).lower() == "nxt200x")
+    else if (short_name.left(7).toLower() == "nxt200x")
         short_name = "Air2PC v2";
-    else if (short_name.left(8).lower() == "lgdt3302")
+    else if (short_name.left(8).toLower() == "lgdt3302")
         short_name = "DViCO HDTV3";
-    else if (short_name.left(8).lower() == "lgdt3303")
+    else if (short_name.left(8).toLower() == "lgdt3303")
         short_name = "DViCO v2 or Air2PC v3 or pcHDTV HD-5500";
 
     return short_name;
@@ -2882,7 +2882,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
             cardname->setValue(frontend_name);
             signal_timeout->setValue(500);
             channel_timeout->setValue(3000);
-            if (frontend_name.lower().find("usb") >= 0)
+            if (frontend_name.toLower().find("usb") >= 0)
             {
                 signal_timeout->setValue(40000);
                 channel_timeout->setValue(42500);
@@ -2899,9 +2899,9 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
 #if 0 // frontends on hybrid DVB-T/Analog cards
             QString short_name = remove_chaff(frontend_name);
             buttonAnalog->setVisible(
-                short_name.left(15).lower() == "zarlink zl10353" ||
-                short_name.lower() == "wintv hvr 900 m/r: 65008/a1c0" ||
-                short_name.left(17).lower() == "philips tda10046h");
+                short_name.left(15).toLower() == "zarlink zl10353" ||
+                short_name.toLower() == "wintv hvr 900 m/r: 65008/a1c0" ||
+                short_name.left(17).toLower() == "philips tda10046h");
 #endif
         }
         break;
@@ -2922,12 +2922,12 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
             }
 
 #if 0 // frontends on hybrid DVB-T/Analog cards
-            if (frontend_name.lower().find("usb") < 0)
+            if (frontend_name.toLower().find("usb") < 0)
             {
                 buttonAnalog->setVisible(
-                    short_name.left(6).lower() == "pchdtv" ||
-                    short_name.left(5).lower() == "dvico" ||
-                    short_name.left(8).lower() == "nextwave");
+                    short_name.left(6).toLower() == "pchdtv" ||
+                    short_name.left(5).toLower() == "dvico" ||
+                    short_name.left(8).toLower() == "nextwave");
             }
 #endif
         }

@@ -663,23 +663,23 @@ void GuideGrid::parseContainer(QDomElement &element)
     int context;
     theme->parseContainer(element, name, context, area);
 
-    if (name.lower() == "guide")
+    if (name.toLower() == "guide")
         programRect = area;
-    if (name.lower() == "program_info")
+    if (name.toLower() == "program_info")
         infoRect = area;
-    if (name.lower() == "chanbar")
+    if (name.toLower() == "chanbar")
         channelRect = area;
-    if (name.lower() == "timebar")
+    if (name.toLower() == "timebar")
         timeRect = area;
-    if (name.lower() == "date_info")
+    if (name.toLower() == "date_info")
         dateRect = area;
-    if (name.lower() == "jumptochannel") {
+    if (name.toLower() == "jumptochannel") {
         jumpToChannelRect = area;
         jumpToChannelHasRect = true;
     }
-    if (name.lower() == "current_info")
+    if (name.toLower() == "current_info")
         curInfoRect = area;
-    if (name.lower() == "current_video")
+    if (name.toLower() == "current_video")
         videoRect = area;
 }
 

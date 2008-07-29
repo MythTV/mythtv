@@ -181,13 +181,13 @@ void ViewScheduleDiff::parseContainer(QDomElement &element)
     int context;
     theme->parseContainer(element, name, context, area);
 
-    if (name.lower() == "selector")
+    if (name.toLower() == "selector")
         listRect = area;
-    if (name.lower() == "program_info")
+    if (name.toLower() == "program_info")
         infoRect = area;
-    if (name.lower() == "showlevel_info")
+    if (name.toLower() == "showlevel_info")
         showLevelRect = area;
-    if (name.lower() == "status_info")
+    if (name.toLower() == "status_info")
         recStatusRect = area;
 }
 
@@ -544,7 +544,7 @@ void ViewScheduleDiff::updateList(QPainter *p)
                 ltype->SetItemText(i, 2, pginfo->ChannelText(channelFormat));
 
                 temp = pginfo->title;
-                if ((pginfo->subtitle).stripWhiteSpace().length() > 0)
+                if ((pginfo->subtitle).trimmed().length() > 0)
                     temp += " - \"" + pginfo->subtitle + "\"";
                 ltype->SetItemText(i, 3, temp);
 

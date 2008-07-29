@@ -22,6 +22,7 @@ using namespace std;
 #include "NuppelVideoPlayer.h"
 #include "previewgenerator.h"
 #include "compat.h"
+#include "recordingprofile.h"
 
 #include "libmythdb/mythdb.h"
 #include "libmythdb/mythdirs.h"
@@ -70,8 +71,8 @@ void JobQueue::customEvent(QEvent *e)
         {
             // LOCAL_JOB action type chanid starttime hostname
             QString msg;
-            message = message.simplifyWhiteSpace();
-            QStringList tokens = QStringList::split(" ", message);
+            message = message.simplified();
+            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
             QString action = tokens[1];
             int jobType = JOB_UNKNOWN;
             int jobID = -1;
@@ -1726,7 +1727,7 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
     if (jobType == JOB_TRANSCODE)
     {
         command = gContext->GetSetting("JobQueueTranscodeCommand");
-        if (command.stripWhiteSpace().isEmpty())
+        if (command.trimmed().isEmpty())
             command = "mythtranscode";
 
         if (command == "mythtranscode")
@@ -1735,7 +1736,7 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
     else if (jobType == JOB_COMMFLAG)
     {
         command = gContext->GetSetting("JobQueueCommFlagCommand");
-        if (command.stripWhiteSpace().isEmpty())
+        if (command.trimmed().isEmpty())
             command = "mythcommflag";
 
         if (command == "mythcommflag")
@@ -1885,8 +1886,8 @@ void JobQueue::DoTranscodeThread(void)
     {
         command = runningJobCommands[key];
 
-        QStringList tokens = QStringList::split(" ", command);
-        path = tokens[0];
+        QStringList tokens = command.split(" ", QString::SkipEmptyParts);
+        path = (!tokens.empty()) ? tokens[0] : "";
     }
 
     if (jobQueueCPU < 2)
@@ -2136,9 +2137,8 @@ void JobQueue::DoFlagCommercialsThread(void)
     else
     {
         command = runningJobCommands[key];
-
-        QStringList tokens = QStringList::split(" ", command);
-        path = tokens[0];
+        QStringList tokens = command.split(" ", QString::SkipEmptyParts);
+        path = (!tokens.empty()) ? tokens[0] : "";
     }
 
     VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'").arg(command));

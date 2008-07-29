@@ -57,7 +57,7 @@ class VBIMode
 
     static uint Parse(QString vbiformat)
     {
-        QString fmt = vbiformat.lower().left(3);
+        QString fmt = vbiformat.toLower().left(3);
         vbimode_t mode;
         mode = (fmt == "pal") ? PAL_TT : ((fmt == "nts") ? NTSC_CC : None);
         return (uint) mode;

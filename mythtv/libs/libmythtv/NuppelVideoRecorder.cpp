@@ -569,7 +569,7 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
     mpa_vidctx->dct_algo = FF_DCT_AUTO;
     mpa_vidctx->idct_algo = FF_IDCT_AUTO;
     mpa_vidctx->prediction_method = FF_PRED_LEFT;
-    if (videocodec.lower() == "huffyuv" || videocodec.lower() == "mjpeg")
+    if (videocodec.toLower() == "huffyuv" || videocodec.toLower() == "mjpeg")
         mpa_vidctx->strict_std_compliance = FF_COMPLIANCE_INOFFICIAL;
 
     QMutexLocker locker(&avcodeclock);
@@ -1032,7 +1032,7 @@ void NuppelVideoRecorder::StartRecording(void)
     positionMapDelta.clear();
     positionMapLock.unlock();
 
-    if (videocodec.lower() == "rtjpeg")
+    if (videocodec.toLower() == "rtjpeg")
         useavcodec = false;
     else
         useavcodec = true;

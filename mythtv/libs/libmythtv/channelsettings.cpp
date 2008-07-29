@@ -4,7 +4,7 @@
 
 QString ChannelDBStorage::GetWhereClause(MSqlBindings &bindings) const
 {
-    QString fieldTag = (":WHERE" + id.getField().upper());
+    QString fieldTag = (":WHERE" + id.getField().toUpper());
     QString query(id.getField() + " = " + fieldTag);
 
     bindings.insert(fieldTag, id.getValue());
@@ -14,8 +14,8 @@ QString ChannelDBStorage::GetWhereClause(MSqlBindings &bindings) const
 
 QString ChannelDBStorage::GetSetClause(MSqlBindings &bindings) const
 {
-    QString fieldTag = (":SET" + id.getField().upper());
-    QString nameTag = (":SET" + GetColumnName().upper());
+    QString fieldTag = (":SET" + id.getField().toUpper());
+    QString nameTag = (":SET" + GetColumnName().toUpper());
 
     QString query(id.getField() + " = " + fieldTag + ", " +
                   GetColumnName() + " = " + nameTag);
@@ -438,7 +438,7 @@ void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
         while (query.next())
         {
             supports_eit |= CardUtil::IsEITCapable(
-                query.value(0).toString().upper());
+                query.value(0).toString().toUpper());
         }
 
         query.prepare("SELECT xmltvgrabber "

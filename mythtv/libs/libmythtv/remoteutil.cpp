@@ -187,7 +187,7 @@ bool RemoteRecordPending(uint cardid, const ProgramInfo *pginfo,
     if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
         return false;
 
-    return strlist[0].upper() == "OK";
+    return strlist[0].toUpper() == "OK";
 }
 
 void RemoteStopRecording(ProgramInfo *pginfo)
@@ -216,7 +216,7 @@ bool RemoteStopLiveTV(uint cardid)
     if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
         return false;
 
-    return strlist[0].upper() == "OK";
+    return strlist[0].toUpper() == "OK";
 }
 
 bool RemoteStopRecording(uint cardid)
@@ -237,7 +237,7 @@ bool RemoteStopRecording(uint cardid)
     if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
         return false;
 
-    return strlist[0].upper() == "OK";
+    return strlist[0].toUpper() == "OK";
 }
 
 bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,

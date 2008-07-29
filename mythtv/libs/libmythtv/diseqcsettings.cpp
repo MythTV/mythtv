@@ -385,8 +385,9 @@ static double AngleToFloat(const QString &angle, bool translated = true)
     {
         pos = angle.left(angle.length() - 1).toDouble();
         if ((translated &&
-             (postfix.upper() == DeviceTree::tr("W", "Western Hemisphere")[0])) ||
-            (!translated && (postfix.upper() == 'W')))
+             (postfix.toUpper() ==
+              DeviceTree::tr("W", "Western Hemisphere")[0])) ||
+            (!translated && (postfix.toUpper() == 'W')))
         {
             pos = -pos;
         }
@@ -1015,7 +1016,7 @@ void DeviceTree::edit(void)
     }
     else
     {
-        QStringList vals = QStringList::split(':', id, true);
+        QStringList vals = id.split(':');
         if (vals[0].isEmpty())
             CreateRootNodeDialog();
         else

@@ -14,7 +14,7 @@ QString guid_to_string(uint64_t guid)
     while (g1.length() < 8)
         g1 = "0" + g1;
 
-    return g0.upper() + g1.upper();
+    return g0.toUpper() + g1.toUpper();
 }
 
 uint64_t string_to_guid(const QString &guid)

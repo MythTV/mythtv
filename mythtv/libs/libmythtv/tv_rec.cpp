@@ -182,7 +182,7 @@ bool TVRec::CreateChannel(const QString &startchannel)
 #endif
     }
     else if (genOpt.cardtype == "MPEG" &&
-             genOpt.videodev.lower().left(5) == "file:")
+             genOpt.videodev.toLower().left(5) == "file:")
     {
         channel = new DummyChannel(this);
         InitChannel(genOpt.defaultinput, startchannel);

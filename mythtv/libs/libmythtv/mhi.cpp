@@ -299,7 +299,7 @@ void MHIContext::NetworkBootRequested(void)
 // Called by the engine to check for the presence of an object in the carousel.
 bool MHIContext::CheckCarouselObject(QString objectPath)
 {
-    QStringList path = QStringList::split(QChar('/'), objectPath);
+    QStringList path = objectPath.split(QChar('/'), QString::SkipEmptyParts);
     QByteArray result; // Unused
     int res = m_dsmcc->GetDSMCCObject(path, result);
     return res == 0; // It's available now.
@@ -310,7 +310,7 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
 {
     // Get the path components.  The string will normally begin with "//"
     // since this is an absolute path but that will be removed by split.
-    QStringList path = QStringList::split(QChar('/'), objectPath);
+    QStringList path = objectPath.split(QChar('/'), QString::SkipEmptyParts);
     // Since the DSMCC carousel and the MHEG engine are currently on the
     // same thread this is safe.  Otherwise we need to make a deep copy of
     // the result.
@@ -533,7 +533,7 @@ int MHIContext::GetChannelIndex(const QString &str)
 {
     if (str.startsWith("dvb://"))
     {
-        QStringList list = QStringList::split('.', str.mid(6), true);
+        QStringList list = str.mid(6).split('.');
         MSqlQuery query(MSqlQuery::InitCon());
         if (list.size() != 3) return -1; // Malformed.
         // The various fields are expressed in hexadecimal.

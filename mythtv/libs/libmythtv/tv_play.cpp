@@ -3616,7 +3616,7 @@ void TV::ProcessNetworkControlCommand(const QString &command)
             QString("%1)").arg(command));
 #endif
 
-    QStringList tokens = QStringList::split(" ", command);
+    QStringList tokens = command.split(" ", QString::SkipEmptyParts);
     if (tokens.size() < 2)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Not enough tokens"
@@ -4843,7 +4843,7 @@ QString TV::GetQueuedChanNum(void) const
     queuedChanNum = queuedChanNum.right(queuedChanNum.length() - i);
 
     // strip whitespace at end of string
-    queuedChanNum.stripWhiteSpace();
+    queuedChanNum.trimmed();
 
     QString ret = queuedChanNum;
     ret.detach();
@@ -6342,13 +6342,18 @@ void TV::customEvent(QEvent *e)
 
         if (recorder && message.left(14) == "DONE_RECORDING")
         {
+            message = message.simplified();
+            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            uint cardnum = 0;
+            int filelen = 0;
+            if (tokens.size() >= 3)
+            {
+                cardnum = tokens[1].toUInt();
+                filelen = tokens[2].toInt();
+            }
+
             if (GetState() == kState_WatchingRecording)
             {
-                message = message.simplifyWhiteSpace();
-                QStringList tokens = QStringList::split(" ", message);
-                int cardnum = tokens[1].toInt();
-                int filelen = tokens[2].toInt();
-
                 if (recorder && cardnum == recorder->GetRecorderNumber())
                 {
                     nvp->SetWatchingRecording(false);
@@ -6358,11 +6363,6 @@ void TV::customEvent(QEvent *e)
             }
             else if (StateIsLiveTV(GetState()))
             {
-                message = message.simplifyWhiteSpace();
-                QStringList tokens = QStringList::split(" ", message);
-                int cardnum = tokens[1].toInt();
-                int filelen = tokens[2].toInt();
-
                 if (recorder && cardnum == recorder->GetRecorderNumber() &&
                     tvchain && tvchain->HasNext())
                 {
@@ -6374,12 +6374,17 @@ void TV::customEvent(QEvent *e)
         else if (StateIsLiveTV(GetState()) &&
                  message.left(14) == "ASK_RECORDING ")
         {
-            message = message.simplifyWhiteSpace();
-            QStringList tokens = QStringList::split(" ", message);
-            int cardnum = tokens[1].toInt();
-            int timeuntil = tokens[2].toInt();
-            int hasrec    = tokens[3].toInt();
-            int haslater  = tokens[4].toInt();
+            message = message.simplified();
+            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            uint cardnum = 0;
+            int timeuntil = 0, hasrec = 0, haslater = 0;
+            if (tokens.size() >= 5)
+            {
+                cardnum   = tokens[1].toUInt();
+                timeuntil = tokens[2].toInt();
+                hasrec    = tokens[3].toInt();
+                haslater  = tokens[4].toInt();
+            }
             VERBOSE(VB_GENERAL, LOC + message << " hasrec: "<<hasrec
                     << " haslater: " << haslater);
 
@@ -6398,9 +6403,9 @@ void TV::customEvent(QEvent *e)
         }
         else if (recorder && message.left(11) == "QUIT_LIVETV")
         {
-            message = message.simplifyWhiteSpace();
-            QStringList tokens = QStringList::split(" ", message);
-            int cardnum = tokens[1].toInt();
+            message = message.simplified();
+            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            uint cardnum = (tokens.size() >= 2) ? tokens[1].toUInt() : 0;
 
             if (cardnum == recorder->GetRecorderNumber())
             {
@@ -6417,10 +6422,14 @@ void TV::customEvent(QEvent *e)
         }
         else if (recorder && message.left(12) == "LIVETV_WATCH")
         {
-            message = message.simplifyWhiteSpace();
-            QStringList tokens = QStringList::split(" ", message);
-            int cardnum = tokens[1].toInt();
-            int watch   = tokens[2].toInt();
+            message = message.simplified();
+            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            int cardnum = 0, watch = 0;
+            if (tokens.size() >= 3)
+            {
+                cardnum = tokens[1].toUInt();
+                watch   = tokens[2].toInt();
+            }
 
             uint s = (cardnum == recorder->GetRecorderNumber()) ? 0 : 1;
 
@@ -6443,9 +6452,9 @@ void TV::customEvent(QEvent *e)
         }
         else if (tvchain && message.left(12) == "LIVETV_CHAIN")
         {
-            message = message.simplifyWhiteSpace();
-            QStringList tokens = QStringList::split(" ", message);
-            if (tokens[1] == "UPDATE")
+            message = message.simplified();
+            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            if ((tokens.size() >= 2) && tokens[1] == "UPDATE")
             {
                 tvchainUpdateLock.lock();
                 QString tmp = tokens[2]; tmp.detach();
@@ -6465,7 +6474,9 @@ void TV::customEvent(QEvent *e)
         }
         else if (message.left(6) == "SIGNAL")
         {
-            int cardnum = (QStringList::split(" ", message))[1].toInt();
+            message = message.simplified();
+            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            uint cardnum = (tokens.size() >= 2) ? tokens[1].toUInt() : 0;
             QStringList signalList = me->ExtraDataList();
             bool tc = activerecorder &&
                 (activerecorder->GetRecorderNumber() == cardnum);
@@ -6476,17 +6487,23 @@ void TV::customEvent(QEvent *e)
         }
         else if (recorder && message.left(7) == "SKIP_TO")
         {
-            int cardnum = (QStringList::split(" ", message))[1].toInt();
+            message = message.simplified();
+            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            uint cardnum = (tokens.size() >= 2) ? tokens[1].toUInt() : 0;
             QStringList keyframe = me->ExtraDataList();
-            VERBOSE(VB_IMPORTANT, LOC + "Got SKIP_TO message. Keyframe: "
-                    <<stringToLongLong(keyframe[0]));
+            if (!keyframe.empty())
+            {
+                VERBOSE(VB_GENERAL, LOC + "Got SKIP_TO message. Keyframe: "
+                        <<stringToLongLong(keyframe[0]));
+            }
             bool tc = recorder && (recorder->GetRecorderNumber() == cardnum);
             (void)tc;
         }
         else if (message.left(15) == "NETWORK_CONTROL")
         {
-            QStringList tokens = QStringList::split(" ", message);
-            if ((tokens[1] != "ANSWER") && (tokens[1] != "RESPONSE"))
+            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            if ((tokens.size() >= 2) &&
+                (tokens[1] != "ANSWER") && (tokens[1] != "RESPONSE"))
             {
                 ncLock.lock();
                 message.detach();
@@ -6496,29 +6513,40 @@ void TV::customEvent(QEvent *e)
         }
         else if (message.left(6) == "UNMUTE")
         {
-            message = message.simplifyWhiteSpace();
-            QStringList tokens = QStringList::split(" ", message);
-            unmuteTimeout = tokens[1].toUInt();
-            unmuteTimer.start();
+            message = message.simplified();
+            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            if (tokens.size() >= 2)
+            {
+                unmuteTimeout = tokens[1].toUInt();
+                unmuteTimer.start();
+            }
         }
         else if (message.left(9) == "START_EPG")
         {
-            message = message.simplifyWhiteSpace();
-            QStringList tokens = QStringList::split(" ", message);
-            int editType = tokens[1].toInt();
-            doEditSchedule(editType);
+            message = message.simplified();
+            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            if (tokens.size() >= 2)
+            {
+                int editType = tokens[1].toInt();
+                doEditSchedule(editType);
+            }
         }
 
         pbinfoLock.lock();
         if (playbackinfo && message.left(14) == "COMMFLAG_START")
         {
-            message = message.simplifyWhiteSpace();
-            QStringList tokens = QStringList::split(" ", message);
-            QString evchanid = tokens[1];
-            QDateTime evstartts = QDateTime::fromString(tokens[2], Qt::ISODate);
-
+            message = message.simplified();
+            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            QString evchanid = QString::null;
+            QDateTime evstartts;
+            if (tokens.size() >= 3)
+            {
+                evchanid = tokens[1];
+                evstartts = QDateTime::fromString(tokens[2], Qt::ISODate);
+            }
             if ((playbackinfo->chanid == evchanid) &&
-                (playbackinfo->recstartts == evstartts))
+                (playbackinfo->recstartts == evstartts) &&
+                (tokens.size() >= 3))
             {
                 QString msg = "COMMFLAG_REQUEST ";
                 msg += tokens[1] + " " + tokens[2];
@@ -6529,20 +6557,27 @@ void TV::customEvent(QEvent *e)
         }
         else if (nvp && playbackinfo && message.left(15) == "COMMFLAG_UPDATE")
         {
-            message = message.simplifyWhiteSpace();
-            QStringList tokens = QStringList::split(" ", message);
-            QString evchanid = tokens[1];
-            QDateTime evstartts = QDateTime::fromString(tokens[2], Qt::ISODate);
+            message = message.simplified();
+            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            QString evchanid = QString::null;
+            QDateTime evstartts;
+            if (tokens.size() >= 3)
+            {
+                evchanid  = tokens[1];
+                evstartts = QDateTime::fromString(tokens[2], Qt::ISODate);
+            }
 
             if ((playbackinfo->chanid == evchanid) &&
-                (playbackinfo->recstartts == evstartts))
+                (playbackinfo->recstartts == evstartts) &&
+                (tokens.size() >= 4))
             {
                 QMap<long long, int> newMap;
                 QStringList mark;
-                QStringList marks = QStringList::split(",", tokens[3]);
+                QStringList marks =
+                    tokens[3].split(",", QString::SkipEmptyParts);
                 for (int i = 0; i < marks.size(); i++)
                 {
-                    mark = QStringList::split(":", marks[i]);
+                    mark = marks[i].split(":", QString::SkipEmptyParts);
                     newMap[mark[0].toInt()] = mark[1].toInt();
                 }
 
@@ -7077,10 +7112,10 @@ void TV::ChannelEditAutoFill(InfoMap &infoMap,
             chg[keys[i]] = infoMap[keys[i]] != chanEditMap[keys[i]];
 
         // clean up case and extra spaces
-        infoMap["callsign"] = infoMap["callsign"].upper().stripWhiteSpace();
-        infoMap["channum"]  = infoMap["channum"].stripWhiteSpace();
-        infoMap["channame"] = infoMap["channame"].stripWhiteSpace();
-        infoMap["XMLTV"]    = infoMap["XMLTV"].stripWhiteSpace();
+        infoMap["callsign"] = infoMap["callsign"].toUpper().trimmed();
+        infoMap["channum"]  = infoMap["channum"].trimmed();
+        infoMap["channame"] = infoMap["channame"].trimmed();
+        infoMap["XMLTV"]    = infoMap["XMLTV"].trimmed();
 
         // make sure changes weren't just chaff
         for (uint i = 0; i < 4; i++)
@@ -7109,7 +7144,7 @@ void TV::ChannelEditXDSFill(InfoMap &infoMap) const
         if (!modifiable[xds_keys[i]])
             continue;
 
-        QString tmp = activenvp->GetXDS(xds_keys[i]).upper();
+        QString tmp = activenvp->GetXDS(xds_keys[i]).toUpper();
         if (tmp.isEmpty())
             continue;
 

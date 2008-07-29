@@ -83,11 +83,11 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
     while (!stream.atEnd())
     {
         line = stream.readLine(); // line of text excluding '\n'
-        line.stripWhiteSpace();
+        line = line.trimmed();
         if (line.startsWith("#"))
             continue;
 
-        QStringList list = QStringList::split(":", line);
+        QStringList list = line.split(":", QString::SkipEmptyParts);
 
         if (list.size() < 1)
             continue;
@@ -95,11 +95,11 @@ DTVConfParser::return_t DTVConfParser::Parse(void)
         QString str = list[0];
         int channelNo = -1;
 
-        if (str.at(0) == '@')
+        if ((str.length() >= 1) && (str.at(0) == '@'))
         {
             channelNo = str.mid(1).toInt();
             line = stream.readLine();
-            list = QStringList::split(":", line);
+            list = line.split(":", QString::SkipEmptyParts);
         }
 
         if (list.size() < 4)
