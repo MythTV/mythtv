@@ -3,10 +3,9 @@
 
 #include "mythexp.h"
 
-// Used to compare the TV Database schema version against the expected version
-MPUBLIC int CompareTVDatabaseSchemaVersion(void);
 // Call after initialing the main db connection.
-MPUBLIC bool UpgradeTVDatabaseSchema(void);
+MPUBLIC bool UpgradeTVDatabaseSchema(const bool upgradeAllowed = false,
+                                     const bool upgradeIfNoUI  = false);
 
 #endif
 

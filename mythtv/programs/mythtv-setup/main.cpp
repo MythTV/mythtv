@@ -280,23 +280,11 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_DB_ERROR;
     }
 
-    if ((CompareTVDatabaseSchemaVersion() > 0) &&
-        // and Not MythContext::PromptForSchemaUpgrade() expertMode
-        (gContext->GetNumSetting("DBSchemaAutoUpgrade") != -1))
-    {
-        VERBOSE(VB_IMPORTANT, "The schema version of your existing database "
-                "is newer than this version of MythTV understands. Please "
-                "ensure that you have selected the proper database server or "
-                "upgrade this and all other frontends and backends to the "
-                "same MythTV version and revision.");
-        delete gContext;
-        return GENERIC_EXIT_DB_OUTOFDATE;
-    }
-    if (!UpgradeTVDatabaseSchema())
+    if (!UpgradeTVDatabaseSchema(true))
     {
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema.");
         delete gContext;
-        return GENERIC_EXIT_DB_OUTOFDATE;
+        return BACKEND_EXIT_DB_OUTOFDATE;
     }
 
     gContext->SetSetting("Theme", "G.A.N.T");

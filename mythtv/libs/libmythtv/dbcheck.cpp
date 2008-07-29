@@ -11,6 +11,7 @@ using namespace std;
 
 #include "libmyth/dbutil.h"
 #include "libmyth/mythcontext.h"
+#include "libmyth/schemawizard.h"
 #include "libmythdb/mythdb.h"
 
 
@@ -438,82 +439,13 @@ static bool performActualUpdate(
     return true;
 }
 
-/** \fn lockSchema(MSqlQuery&)
- *  \brief Get a lock on the schemalock table
- *
- */
-bool lockSchema(MSqlQuery &query)
-{
-    if (!query.exec("CREATE TABLE IF NOT EXISTS "
-                      "schemalock ( schemalock int(1));"))
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("ERROR: Unable to create schemalock table: %1")
-                        .arg(MythDB::DBErrorMessage(query.lastError())));
-        return false;
-    }
-
-    if (!query.exec("LOCK TABLE schemalock WRITE;"))
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("ERROR: Unable to acquire database upgrade lock")
-                        .arg(MythDB::DBErrorMessage(query.lastError())));
-        return false;
-    }
-
-    return true;
-}
-
-/** \fn unlockSchema(MSqlQuery&)
- *  \brief Release the lock on the schemalock table
- *
- */
-void unlockSchema(MSqlQuery &query)
-{
-    query.exec("UNLOCK TABLES;");
-}
-
-/** \fn CompareTVDatabaseSchemaVersion(void)
- *  \brief Called from outside dbcheck.cpp to compare the database schema
- *         version with the expected version.
- *
- *   If the "DBSchemaVer" property is not found (i.e. the schema has not been
- *   initialized, the function returns negative, as if the schema simply needed
- *   upgrading, so InitializeDatabase() can do its job.
- *
- *   We lock the schemalock table for write so that we block if there are any
- *   DB schema updates in progress.  This will make sure that we get the
- *   correct schema version number after the updates are completed and the
- *   update process unlocks the schemalock table.
- *
- *  \return negative, 0, or positive if the schema version is less than, equal
- *          to, or greater than the expected version
- */
-int CompareTVDatabaseSchemaVersion(void)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    if (!lockSchema(query))
-        return -1;
-
-    bool ok;
-    int databaseVersion = gContext->GetNumSetting("DBSchemaVer");
-    int expectedVersion = currentDatabaseVersion.toInt(&ok);
-
-    unlockSchema(query);
-
-    if (!ok)
-        return -1;
-
-    return databaseVersion - expectedVersion;
-}
-
 /** \fn UpgradeTVDatabaseSchema(void)
  *  \brief Called from outside dbcheck.cpp to update the schema.
  *
  *   If the "DBSchemaVer" property equals the currentDatabase version this
- *   returns true immediately. If not we lock the schemalock table. If this
- *   fails we return false. If it succeeds we call doUpgradeTVDatabaseSchema()
+ *   returns true immediately. If not, we try to do a database backup,
+ *   prompt the user for permission to do the upgrade,
+ *   lock the schemalock table, call doUpgradeTVDatabaseSchema()
  *   to do the actual update, and then we unlock the schemalock table.
  *
  *   If the program running this function is killed while
@@ -521,51 +453,45 @@ int CompareTVDatabaseSchemaVersion(void)
  *
  *  \return false on failure, error, or if the user selected "Exit."
  */
-bool UpgradeTVDatabaseSchema(void)
+bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
+                             const bool upgradeIfNoUI)
 {
-    QString dbver = gContext->GetSetting("DBSchemaVer");
+    SchemaUpgradeWizard  * DBup;
 
-    VERBOSE(VB_IMPORTANT, QString("Current Schema Version: %1").arg(dbver));
+
+    gContext->ActivateSettingsCache(false);
 
     if (!gContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
         DataDirectProcessor::FixProgramIDs();
 
-    DBUtil dbutil;
-    int dbmsVersionCheck = dbutil.CompareDBMSVersion(MINIMUM_DBMS_VERSION);
-    if (dbmsVersionCheck == DBUtil::kUnknownVersionNumber)
-    {
-        VERBOSE(VB_IMPORTANT, "ERROR: Unable to determine MySQL version.");
-        return false;
-    }
+    DBup = SchemaUpgradeWizard::Get("DBSchemaVer", currentDatabaseVersion);
 
-    if (dbmsVersionCheck < 0)
-    {
-        VERBOSE(VB_IMPORTANT, QString("ERROR: This version of MythTV requires "
-                                      "MySQL %1.0 or later.  You seem to be "
-                                      "running MySQL version %2.")
-                                      .arg(MINIMUM_DBMS_VERSION)
-                                      .arg(dbutil.GetDBMSVersion()));
-        VERBOSE(VB_IMPORTANT, "Your database has not been changed. Please "
-                              "upgrade your MySQL server or use an older "
-                              "version of MythTV.");
-        return false;
-    }
+    // There may be a race condition where another program (e.g. mythbackend)
+    // is upgrading, so wait up to 5 seconds for a more accurate version:
+    DBup->CompareAndWait(5);
 
-    if (dbver == currentDatabaseVersion)
+    if (DBup->versionsBehind == 0)  // same schema
+    {
+        gContext->ActivateSettingsCache(true);
         return true;
+    }
 
+    // An upgrade is likely. We do the backup first so that
+    // the UI can tell the user where the backup is located.
+    DBup->BackupDB();
 
-    QString backupResult;
-
-    dbutil.BackupDB(backupResult);
-
-    switch (gContext->PromptForSchemaUpgrade(
-                dbver, currentDatabaseVersion, backupResult))
+    // Pop up messages, questions, warnings, et c.
+    switch (DBup->PromptForUpgrade("TV", upgradeAllowed,
+                                   upgradeIfNoUI, MINIMUM_DBMS_VERSION))
     {
-        case MYTH_SCHEMA_USE_EXISTING: return true;  // Don't upgrade
+        case MYTH_SCHEMA_USE_EXISTING:
+            gContext->ActivateSettingsCache(true);
+            return true;
         case MYTH_SCHEMA_ERROR:
-        case MYTH_SCHEMA_EXIT:         return false;
-        case MYTH_SCHEMA_UPGRADE:      break;
+        case MYTH_SCHEMA_EXIT:
+            return false;
+        case MYTH_SCHEMA_UPGRADE:
+            break;
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -575,7 +501,7 @@ bool UpgradeTVDatabaseSchema(void)
 
     VERBOSE(VB_IMPORTANT, "Newest Schema Version : " + currentDatabaseVersion);
 
-    if (!lockSchema(query))
+    if (!DBUtil::lockSchema(query))
         return false;
 
     bool ret = doUpgradeTVDatabaseSchema();
@@ -585,7 +511,8 @@ bool UpgradeTVDatabaseSchema(void)
     else
         VERBOSE(VB_IMPORTANT, "Database Schema upgrade FAILED, unlocking.");
 
-    unlockSchema(query);
+    DBUtil::unlockSchema(query);
+    gContext->ActivateSettingsCache(true);
 
     return ret;
 }

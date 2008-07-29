@@ -16,6 +16,7 @@
 #include "mythdialogs.h"
 #include "compat.h"
 #include "mythuihelper.h"
+#include "dbcheck.h"
 
 #include <iostream>
 using namespace std;
@@ -163,6 +164,13 @@ bool cmdline_err;
                                           .arg(it.key()).arg(it.data()));
             gContext->OverrideSettingForSession(it.key(), it.data());
         }
+    }
+
+    if (!UpgradeTVDatabaseSchema(false))
+    {
+        VERBOSE(VB_IMPORTANT, "Incorrect database schema.");
+        delete gContext;
+        return BACKEND_EXIT_DB_OUTOFDATE;
     }
 
     // Create priveledged thread, then drop privs

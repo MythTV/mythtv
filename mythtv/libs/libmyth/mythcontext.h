@@ -177,8 +177,6 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
                            QStringList &actions, bool allowJumps = true);
 
 
-    int  PromptForSchemaUpgrade(const QString &dbver, const QString &current,
-                                const QString &backupResult);
     bool TestPopupVersion(const QString &name, const QString &libversion,
                           const QString &pluginversion);
 
@@ -221,15 +219,6 @@ extern MPUBLIC MythContext *gContext;
 
 /// This global variable is used to makes certain calls to avlib threadsafe.
 extern MPUBLIC QMutex avcodeclock;
-
-/// Return values for PromptForSchemaUpgrade()
-enum MythSchemaUpgrade
-{
-    MYTH_SCHEMA_EXIT         = 1,
-    MYTH_SCHEMA_ERROR        = 2,
-    MYTH_SCHEMA_UPGRADE      = 3,
-    MYTH_SCHEMA_USE_EXISTING = 4
-};
 
 /// Service type for the backend's UPnP server
 extern MPUBLIC const QString gBackendURI;

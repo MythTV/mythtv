@@ -17,6 +17,7 @@ using namespace std;
 #include "scheduledrecording.h"
 #include "remoteutil.h"
 #include "videosource.h" // for is_grabber..
+#include "dbcheck.h"
 
 // filldata headers
 #include "filldata.h"
@@ -498,6 +499,13 @@ int main(int argc, char *argv[])
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         delete gContext;
         return FILLDB_EXIT_NO_MYTHCONTEXT;
+    }
+
+    if (!UpgradeTVDatabaseSchema(false))
+    {
+        VERBOSE(VB_IMPORTANT, "Incorrect database schema");
+        delete gContext;
+        return BACKEND_EXIT_DB_OUTOFDATE;
     }
 
     gContext->LogEntry("mythfilldatabase", LP_INFO,

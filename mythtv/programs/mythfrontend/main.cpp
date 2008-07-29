@@ -53,7 +53,6 @@ using namespace std;
 #include "statusbox.h"
 #include "lcddevice.h"
 #include "langsettings.h"
-#include "dbutil.h"
 #include "mythcommandlineparser.h"
 
 #include "myththemedmenu.h"
@@ -1026,70 +1025,6 @@ void log_rotate_handler(int)
     log_rotate(0);
 }
 
-void CheckSchemaVersion(bool upgradeAllowed)
-{
-    gContext->ActivateSettingsCache(false);
-    int versionCheck = CompareTVDatabaseSchemaVersion();
-    bool expertMode = (gContext->GetNumSetting("DBSchemaAutoUpgrade") == -1);
-
-    if (versionCheck < 0 && !upgradeAllowed && !expertMode)
-    {
-        VERBOSE(VB_IMPORTANT, "Unexpected DB Schema version.  Waiting to see "
-                "if DB is being upgraded.");
-
-        bool backupRunning = false;
-        MythTimer elapsedTimer;
-        elapsedTimer.start();
-        while (versionCheck && (elapsedTimer.elapsed() < 5000))
-        {
-            sleep(1);
-
-            versionCheck = CompareTVDatabaseSchemaVersion();
-
-            if (DBUtil::IsBackupInProgress())
-            {
-                VERBOSE(VB_IMPORTANT,
-                        "Waiting for Database Backup to complete.");
-                if (!backupRunning)
-                {
-                    elapsedTimer.restart();
-                    backupRunning = true;
-                }
-            }
-        }
-
-        if (versionCheck)
-            VERBOSE(VB_IMPORTANT, "Timed out waiting.");
-        else
-            VERBOSE(VB_IMPORTANT,
-                    "Schema version was upgraded while we were waiting.");
-    }
-
-    if (versionCheck < 0 && !upgradeAllowed && !expertMode)
-    {
-        VERBOSE(VB_IMPORTANT, "This version of MythTV requires an updated "
-                "database schema. Please run mythtv-setup or mythbackend "
-                "to update your database.");
-        exit(FRONTEND_EXIT_DB_OUTOFDATE);
-    }
-    else if ((versionCheck > 0) && !expertMode)
-    {
-        VERBOSE(VB_IMPORTANT, "The schema version of your existing database "
-                "is newer than this version of MythTV understands. Please "
-                "ensure that you have selected the proper database server or "
-                "upgrade this and all other frontends and backends to the "
-                "same MythTV version and revision.");
-        exit(FRONTEND_EXIT_DB_OUTOFDATE);
-    }
-    if ((upgradeAllowed || expertMode) && !UpgradeTVDatabaseSchema())
-    {
-        VERBOSE(VB_IMPORTANT,
-                "Couldn't upgrade database to new schema, exiting.");
-        exit(FRONTEND_EXIT_DB_OUTOFDATE);
-    }
-    gContext->ActivateSettingsCache(true);
-}
-
 int main(int argc, char **argv)
 {
     bool bPromptForBackend    = false;
@@ -1366,7 +1301,13 @@ int main(int argc, char **argv)
     }
     setuid(getuid());
 
-    CheckSchemaVersion(upgradeAllowed);
+    if (!UpgradeTVDatabaseSchema(upgradeAllowed))
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Couldn't upgrade database to new schema, exiting."); 
+        cleanup();
+        return BACKEND_EXIT_DB_OUTOFDATE;
+    }
 
     VERBOSE(VB_IMPORTANT, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));
