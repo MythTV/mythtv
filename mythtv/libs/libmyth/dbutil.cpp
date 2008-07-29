@@ -186,7 +186,7 @@ bool DBUtil::IsBackupInProgress(void)
  */
 bool DBUtil::BackupDB(QString &filename)
 {
-    filename = "";
+    filename = QString();
 
 #ifdef USING_MINGW
     VERBOSE(VB_IMPORTANT, "Database backups disabled on Windows.");
@@ -678,6 +678,39 @@ int DBUtil::CountClients(void)
             QString("DBUtil::CountClients() found %1").arg(count));
 
     return count;
+}
+
+/**
+ * \brief Try to get a lock on the table schemalock.
+ *
+ * To prevent upgrades by different programs of the same schema.
+ * (<I>e.g.</I> when both mythbackend and mythfrontend start at the same time)
+ */
+bool DBUtil::lockSchema(MSqlQuery &query)
+{
+    if (!query.exec("CREATE TABLE IF NOT EXISTS "
+                      "schemalock ( schemalock int(1));"))
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("ERROR: Unable to create schemalock table: %1")
+                        .arg(MythDB::DBErrorMessage(query.lastError())));
+        return false;
+    }
+
+    if (!query.exec("LOCK TABLE schemalock WRITE;"))
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("ERROR: Unable to acquire database upgrade lock")
+                        .arg(MythDB::DBErrorMessage(query.lastError())));
+        return false;
+    }
+
+    return true;
+}
+
+void DBUtil::unlockSchema(MSqlQuery &query)
+{
+    query.exec("UNLOCK TABLES;");  // Should this _just_ unlock schemalock?
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

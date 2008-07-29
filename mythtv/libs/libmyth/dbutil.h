@@ -5,6 +5,7 @@
 #include <qmap.h>
 
 #include "mythexp.h"
+#include "mythdbcon.h"
 
 /** \class DBUtil
  *  \brief Aggregates database and DBMS utility functions.
@@ -33,6 +34,10 @@ class MPUBLIC DBUtil
     static bool IsNewDatabase(void);
     static bool IsBackupInProgress(void);
     static int  CountClients(void);
+
+    static bool lockSchema(MSqlQuery &);
+    static void unlockSchema(MSqlQuery &);
+
 
     static const int kUnknownVersionNumber;
 
