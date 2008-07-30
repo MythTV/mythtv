@@ -195,6 +195,7 @@ class LCDProcClient : public QObject
     QString scrollScreen;
     unsigned int scrollPosition;
     QString timeformat;
+    QString dateformat;
 
     QStringList scrollListItems;
     QString scrollListScreen, scrollListWidget;

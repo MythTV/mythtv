@@ -535,6 +535,7 @@ void LCDProcClient::loadSettings()
     QString old_keystring = lcd_keystring;
 
     timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    dateformat = gContext->GetSetting("DateFormat", "dd.MM.yyyy");
 
     // Get LCD settings
     lcd_showmusic=(gContext->GetSetting("LCDShowMusic", "1")=="1");
@@ -1842,7 +1843,7 @@ void LCDProcClient::outputTime()
         if (lcd_showrecstatus && isRecording)
             outputCenteredText("Time", tr("RECORDING"), "topWidget", 1);
         else
-            outputCenteredText("Time", QDate::currentDate().toString(), "topWidget", 1);
+            outputCenteredText("Time", QDate::currentDate().toString(dateformat), "topWidget", 1);
 
         dostdclock();
     }
