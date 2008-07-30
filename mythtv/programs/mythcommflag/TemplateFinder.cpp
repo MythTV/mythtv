@@ -8,7 +8,7 @@
 // Qt headers
 #include <QFile>
 #include <QFileInfo>
-#include <q3textstream.h>
+#include <QTextStream>
 
 // MythTV headers
 #include "NuppelVideoPlayer.h"
@@ -38,7 +38,7 @@ writeJPG(QString prefix, const AVPicture *img, int imgheight)
         QFile pgmfile(prefix + ".pgm");
         if (!pgmfile.exists())
         {
-            QByteArray pfname = pgmfile.name().toLocal8Bit();
+            QByteArray pfname = pgmfile.fileName().toLocal8Bit();
             if (pgm_write(img->data[0], imgwidth, imgheight,
                           pfname.constData()))
             {
@@ -47,14 +47,14 @@ writeJPG(QString prefix, const AVPicture *img, int imgheight)
         }
 
         if (myth_system(QString("convert -quality 50 -resize 192x144 %1 %2")
-                    .arg(pgmfile.name()).arg(jpgfi.filePath())))
+                    .arg(pgmfile.fileName()).arg(jpgfi.filePath())))
             return -1;
 
         if (!pgmfile.remove())
         {
             VERBOSE(VB_COMMFLAG, QString(
                         "TemplateFinder.writeJPG error removing %1 (%2)")
-                    .arg(pgmfile.name()).arg(strerror(errno)));
+                    .arg(pgmfile.fileName()).arg(strerror(errno)));
             return -1;
         }
     }
@@ -631,7 +631,7 @@ readTemplate(QString datafile, int *prow, int *pcol, int *pwidth, int *pheight,
         return true;
     }
 
-    Q3TextStream stream(&dfile);
+    QTextStream stream(&dfile);
     stream >> *prow >> *pcol >> *pwidth >> *pheight;
     dfile.close();
 
@@ -678,7 +678,7 @@ writeTemplate(QString tmplfile, const AVPicture *tmpl, QString datafile,
     if (!dfile.open(QIODevice::WriteOnly))
         return false;
 
-    Q3TextStream stream(&dfile);
+    QTextStream stream(&dfile);
     stream << row << " " << col << "\n" << width << " " << height << "\n";
     dfile.close();
     return true;

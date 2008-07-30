@@ -28,9 +28,9 @@ frameAnalyzerReportMap(const FrameAnalyzer::FrameMap *frameMap, float fps,
          * Recording" OSD.
          */
         bb = ii.key() + 1;
-        if (ii.data())
+        if (*ii)
         {
-            ee = bb + ii.data();
+            ee = bb + *ii;
             len = ee - bb;
 
             VERBOSE(VB_COMMFLAG, QString("%1: %2-%3 (%4-%5, %6)")
@@ -65,9 +65,9 @@ frameAnalyzerReportMapms(const FrameAnalyzer::FrameMap *frameMap, float fps,
          * Recording" OSD.
          */
         bb = ii.key() + 1;
-        if (ii.data())
+        if (*ii)
         {
-            ee = bb + ii.data();
+            ee = bb + *ii;
             len = ee - bb;
 
             VERBOSE(VB_COMMFLAG, QString("%1: %2-%3 (%4-%5, %6)")
@@ -94,7 +94,7 @@ frameAnalyzerMapSum(const FrameAnalyzer::FrameMap *frameMap)
     for (FrameAnalyzer::FrameMap::const_iterator ii = frameMap->begin();
             ii != frameMap->end();
             ++ii)
-        sum += ii.data();
+        sum += *ii;
     return sum;
 }
 
@@ -118,7 +118,7 @@ removeShortBreaks(FrameAnalyzer::FrameMap *breakMap, float fps, int minbreaklen,
         ++bb;
     while (bb != breakMap->end())
     {
-        if (bb.data() >= minbreaklen)
+        if (*bb >= minbreaklen)
         {
             ++bb;
             continue;
@@ -133,13 +133,13 @@ removeShortBreaks(FrameAnalyzer::FrameMap *breakMap, float fps, int minbreaklen,
         if (verbose)
         {
             long long start = bb1.key();
-            long long end = start + bb1.data() - 1;
+            long long end = start + *bb1 - 1;
             VERBOSE(VB_COMMFLAG, QString("Removing break %1-%2 (%3-%4)")
                 .arg(frameToTimestamp(start, fps))
                 .arg(frameToTimestamp(end, fps))
                 .arg(start + 1).arg(end + 1));
         }
-        breakMap->remove(bb1);
+        breakMap->erase(bb1);
         removed = true;
     }
 
@@ -171,7 +171,7 @@ removeShortSegments(FrameAnalyzer::FrameMap *breakMap, long long nframes,
         bbnext = bb;
         ++bbnext;
         long long brkb = bb.key();
-        long long segb = brkb + bb.data();
+        long long segb = brkb + *bb;
         long long sege = bbnext == breakMap->end() ? nframes : bbnext.key();
         long long seglen = sege - segb;
         if (seglen >= minseglen)
@@ -204,7 +204,8 @@ removeShortSegments(FrameAnalyzer::FrameMap *breakMap, long long nframes,
                         .arg(frameToTimestamp(new2 + 1, fps))
                         .arg(new1 + 1).arg(new2 + 1));
                 }
-                breakMap->replace(brkb, nframes - brkb);
+                breakMap->remove(brkb);
+                breakMap->insert(brkb, nframes - brkb);
                 removed = true;
             }
         }
@@ -216,7 +217,7 @@ removeShortSegments(FrameAnalyzer::FrameMap *breakMap, long long nframes,
                 long long old1 = brkb;
                 long long old2 = segb - 1;
                 long long new1 = brkb;
-                long long new2 = bbnext.key() + bbnext.data() - 1;
+                long long new2 = bbnext.key() + *bbnext - 1;
                 VERBOSE(VB_COMMFLAG,
                     QString("Removing segment %1-%2 (%3-%4)")
                     .arg(frameToTimestamp(segb + 1, fps))
@@ -232,20 +233,21 @@ removeShortSegments(FrameAnalyzer::FrameMap *breakMap, long long nframes,
                     .arg(frameToTimestamp(new2 + 1, fps))
                     .arg(new1 + 1).arg(new2 + 1));
             }
-            breakMap->replace(brkb, bbnext.key() + bbnext.data() - brkb);
+            breakMap->remove(brkb);
+            breakMap->insert(brkb, bbnext.key() + *bbnext - brkb);
 
             bb = bbnext;
             ++bbnext;
             if (verbose)
             {
                 long long start = bb.key();
-                long long end = start + bb.data() - 1;
+                long long end = start + *bb - 1;
                 VERBOSE(VB_COMMFLAG, QString("Removing break %1-%2 (%3-%4)")
                     .arg(frameToTimestamp(start + 1, fps))
                     .arg(frameToTimestamp(end + 1, fps))
                     .arg(start + 1).arg(end + 1));
             }
-            breakMap->remove(bb);
+            breakMap->erase(bb);
 
             removed = true;
         }
@@ -270,7 +272,7 @@ frameMapSearchForwards(const FrameAnalyzer::FrameMap *frameMap, long long mark,
     for (; block != frameMap->constEnd(); ++block)
     {
         const long long bb = block.key();
-        const long long ee = bb + block.data();
+        const long long ee = bb + *block;
         if (mark < ee)
         {
             if (mark <= bb && bb < markend)
@@ -296,7 +298,7 @@ frameMapSearchBackwards(const FrameAnalyzer::FrameMap *frameMap,
     for (--block; block != frameMap->constBegin(); --block)
     {
         const long long bb = block.key();
-        const long long ee = bb + block.data();
+        const long long ee = bb + *block;
         if (bb < mark)
         {
             if (markbegin < ee && ee <= mark)

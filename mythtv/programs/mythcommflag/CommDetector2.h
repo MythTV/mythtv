@@ -1,10 +1,12 @@
 #ifndef _COMMDETECTOR2_H_
 #define _COMMDETECTOR2_H_
 
+// C++ headers
+#include <vector>
+using namespace std;
+
 // Qt headers
 #include <QDateTime>
-#include <q3ptrlist.h>
-#include <q3valuelist.h>
 
 // MythTV headers
 #include "channelutil.h"
@@ -29,6 +31,9 @@ QString strftimeval(const struct timeval *tv);
 
 };  /* namespace */
 
+typedef vector<FrameAnalyzer*>    FrameAnalyzerItem;
+typedef vector<FrameAnalyzerItem> FrameAnalyzerList;
+
 class CommDetector2 : public CommDetectorBase
 {
 public:
@@ -45,6 +50,7 @@ public:
         ostream &out, const comm_break_t *comm_breaks, bool verbose) const;
 
 private:
+
     void reportState(int elapsed_sec, long long frameno, long long nframes,
             unsigned int passno, unsigned int npasses);
     int computeBreaks(long long nframes);
@@ -61,10 +67,9 @@ private:
     bool                    finished;
 
     long long               currentFrameNumber;
-    typedef Q3ValueList<Q3PtrList<FrameAnalyzer> >    frameAnalyzerList;
-    frameAnalyzerList       frameAnalyzers;     /* one list per scan of file */
-    frameAnalyzerList::iterator currentPass;
-    Q3PtrList<FrameAnalyzer> finishedAnalyzers;
+    FrameAnalyzerList       frameAnalyzers;     /* one list per scan of file */
+    FrameAnalyzerList::iterator currentPass;
+    FrameAnalyzerItem       finishedAnalyzers;
 
     FrameAnalyzer::FrameMap breaks;
 

@@ -4,10 +4,13 @@
 // ANSI C headers
 #include <cmath>
 
+// C++ headers
+#include <algorithm>
+using namespace std;
+
 // Qt headers
 #include <QDir>
 #include <QFileInfo>
-#include <Q3PtrList>
 
 // MythTV headers
 #include "mythcontext.h"
@@ -72,96 +75,98 @@ void waitForBuffer(const struct timeval *framestart, int minlag, int flaglag,
     usleep(sleepus);
 }
 
-int nuppelVideoPlayerInited(Q3PtrList<FrameAnalyzer> *pass,
-        Q3PtrList<FrameAnalyzer> *finishedAnalyzers,
-        Q3PtrList<FrameAnalyzer> *deadAnalyzers,
-        NuppelVideoPlayer *nvp, long long nframes)
+bool nuppelVideoPlayerInited(FrameAnalyzerItem &pass,
+                             FrameAnalyzerItem &finishedAnalyzers,
+                             FrameAnalyzerItem &deadAnalyzers,
+                             NuppelVideoPlayer *nvp,
+                             long long nframes)
 {
-    Q3PtrListIterator<FrameAnalyzer>     iifa(*pass);
-    FrameAnalyzer                       *fa;
-    FrameAnalyzer::analyzeFrameResult   ares;
-
-    for (Q3PtrListIterator<FrameAnalyzer> jjfa = iifa;
-            (fa = iifa.current()); iifa = jjfa)
+    FrameAnalyzerItem::iterator iifa = pass.begin();
+    FrameAnalyzerItem::iterator jjfa = iifa;
+    for ( ; iifa != pass.end(); iifa = jjfa)
     {
+        FrameAnalyzer *fa = *iifa;
         ++jjfa;
 
-        ares = fa->nuppelVideoPlayerInited(nvp, nframes);
+        FrameAnalyzer::analyzeFrameResult ares =
+            fa->nuppelVideoPlayerInited(nvp, nframes);
 
         if (ares == FrameAnalyzer::ANALYZE_OK ||
-                ares == FrameAnalyzer::ANALYZE_ERROR)
+            ares == FrameAnalyzer::ANALYZE_ERROR)
         {
             continue;
         }
 
         if (ares == FrameAnalyzer::ANALYZE_FINISHED)
         {
-            pass->remove(fa);
-            finishedAnalyzers->append(fa);
+            pass.erase(iifa);
+            finishedAnalyzers.push_back(fa);
             continue;
         }
 
         if (ares == FrameAnalyzer::ANALYZE_FATAL)
         {
-            pass->remove(fa);
-            deadAnalyzers->append(fa);
+            pass.erase(iifa);
+            deadAnalyzers.push_back(fa);
             continue;
         }
 
         VERBOSE(VB_IMPORTANT, QString("Unexpected return value from"
                     " %1::nuppelVideoPlayerInited: %2")
                 .arg(fa->name()).arg(ares));
-        return -1;
+        return false;
     }
 
-    return 0;
+    return true;
 }
 
-long long processFrame(Q3PtrList<FrameAnalyzer> *pass,
-        Q3PtrList<FrameAnalyzer> *finishedAnalyzers,
-        Q3PtrList<FrameAnalyzer> *deadAnalyzers,
-        const VideoFrame *frame, long long frameno)
+long long processFrame(FrameAnalyzerItem &pass,
+                       FrameAnalyzerItem &finishedAnalyzers,
+                       FrameAnalyzerItem &deadAnalyzers,
+                       const VideoFrame *frame,
+                       long long frameno)
 {
-    Q3PtrListIterator<FrameAnalyzer>     iifa(*pass);
-    FrameAnalyzer                       *fa;
-    FrameAnalyzer::analyzeFrameResult   ares;
-    long long                           nextFrame, minNextFrame;
+    FrameAnalyzerItem::iterator iifa = pass.begin();
+    FrameAnalyzerItem::iterator jjfa = iifa;
 
-    minNextFrame = FrameAnalyzer::ANYFRAME;
-    for (Q3PtrListIterator<FrameAnalyzer> jjfa = iifa;
-            (fa = iifa.current()); iifa = jjfa)
+    long long nextFrame;
+    long long minNextFrame = FrameAnalyzer::ANYFRAME;
+
+    for ( ; iifa != pass.end(); iifa = jjfa)
     {
+        FrameAnalyzer *fa = *iifa;
         ++jjfa;
 
-        ares = fa->analyzeFrame(frame, frameno, &nextFrame);
+        FrameAnalyzer::analyzeFrameResult ares =
+            fa->analyzeFrame(frame, frameno, &nextFrame);
 
         if (ares == FrameAnalyzer::ANALYZE_OK ||
-                ares == FrameAnalyzer::ANALYZE_ERROR)
+            ares == FrameAnalyzer::ANALYZE_ERROR)
         {
-            if (minNextFrame > nextFrame)
-                minNextFrame = nextFrame;
+            minNextFrame = std::min(minNextFrame, nextFrame);
             continue;
         }
 
         if (ares == FrameAnalyzer::ANALYZE_FINISHED)
         {
-            pass->remove(fa);
-            finishedAnalyzers->append(fa);
+            pass.erase(iifa);
+            finishedAnalyzers.push_back(fa);
             continue;
         }
 
         if (ares == FrameAnalyzer::ANALYZE_FATAL)
         {
-            pass->remove(fa);
-            deadAnalyzers->append(fa);
+            pass.erase(iifa);
+            deadAnalyzers.push_back(fa);
             continue;
         }
 
         VERBOSE(VB_IMPORTANT, QString("Unexpected return value from"
                     " %1::analyzeFrame: %2")
                 .arg(fa->name()).arg(ares));
-        pass->remove(fa);
-        deadAnalyzers->append(fa);
+
+        pass.erase(iifa);
+        deadAnalyzers.push_back(fa);
     }
 
     if (minNextFrame == FrameAnalyzer::ANYFRAME)
@@ -173,31 +178,33 @@ long long processFrame(Q3PtrList<FrameAnalyzer> *pass,
     return minNextFrame;
 }
 
-int passFinished(Q3PtrList<FrameAnalyzer> *pass, long long nframes, bool final)
+int passFinished(FrameAnalyzerItem &pass, long long nframes, bool final)
 {
-    FrameAnalyzer       *fa;
-
-    for (Q3PtrListIterator<FrameAnalyzer> iifa(*pass);
-            (fa = iifa.current()); ++iifa)
-        (void)fa->finished(nframes, final);
+    FrameAnalyzerItem::iterator it = pass.begin();
+    for (; it != pass.end(); ++it)
+        (void)(*it)->finished(nframes, final);
 
     return 0;
 }
 
-int passReportTime(Q3PtrList<FrameAnalyzer> *pass)
+int passReportTime(const FrameAnalyzerItem &pass)
 {
-    FrameAnalyzer       *fa;
-
-    for (Q3PtrListIterator<FrameAnalyzer> iifa(*pass);
-            (fa = iifa.current()); ++iifa)
-        (void)fa->reportTime();
+    FrameAnalyzerItem::const_iterator it = pass.begin();
+    for (; it != pass.end(); ++it)
+        (void)(*it)->reportTime();
 
     return 0;
 }
 
-bool searchingForLogo(TemplateFinder *tf, Q3PtrList<FrameAnalyzer> *pass)
+bool searchingForLogo(TemplateFinder *tf, const FrameAnalyzerItem &pass)
 {
-    return tf && pass->find(tf) != -1;
+    if (!tf)
+        return false;
+
+    FrameAnalyzerItem::const_iterator it =
+        std::find(pass.begin(), pass.end(), tf);
+
+    return it != pass.end();
 }
 
 };  // namespace
@@ -335,7 +342,7 @@ CommDetector2::CommDetector2(
     , sceneChangeDetector(NULL)
     , debugdir("")
 {
-    Q3PtrList<FrameAnalyzer> pass0, pass1;
+    FrameAnalyzerItem        pass0, pass1;
     PGMConverter            *pgmConverter = NULL;
     BorderDetector          *borderDetector = NULL;
     HistogramAnalyzer       *histogramAnalyzer = NULL;
@@ -365,7 +372,7 @@ CommDetector2::CommDetector2(
         {
             blankFrameDetector = new BlankFrameDetector(histogramAnalyzer,
                     debugdir);
-            pass1.append(blankFrameDetector);
+            pass1.push_back(blankFrameDetector);
         }
     }
 
@@ -391,7 +398,7 @@ CommDetector2::CommDetector2(
         {
             sceneChangeDetector = new SceneChangeDetector(histogramAnalyzer,
                     debugdir);
-            pass1.append(sceneChangeDetector);
+            pass1.push_back(sceneChangeDetector);
         }
     }
 
@@ -419,14 +426,14 @@ CommDetector2::CommDetector2(
             logoFinder = new TemplateFinder(pgmConverter, borderDetector,
                     cannyEdgeDetector, nvp, recstartts.secsTo(recendts),
                     debugdir);
-            pass0.append(logoFinder);
+            pass0.push_back(logoFinder);
         }
 
         if (!logoMatcher)
         {
             logoMatcher = new TemplateMatcher(pgmConverter, cannyEdgeDetector,
                     logoFinder, debugdir);
-            pass1.append(logoMatcher);
+            pass1.push_back(logoMatcher);
         }
     }
 
@@ -434,8 +441,8 @@ CommDetector2::CommDetector2(
         histogramAnalyzer->setLogoState(logoFinder);
 
     /* Aggregate them all together. */
-    frameAnalyzers.append(pass0);
-    frameAnalyzers.append(pass1);
+    frameAnalyzers.push_back(pass0);
+    frameAnalyzers.push_back(pass1);
 }
 
 void CommDetector2::reportState(int elapsedms, long long frameno,
@@ -458,7 +465,7 @@ void CommDetector2::reportState(int elapsedms, long long frameno,
             tmp = QString("\r%1/ %2fps").arg(frameno,6).arg(fps,6,'f',2);
 
         QByteArray tmp2 = tmp.toLocal8Bit();
-        cerr << tmp2.data() << "          \r";
+        cerr << tmp2.constData() << "          \r";
         cerr.flush();
     }
 
@@ -561,12 +568,12 @@ bool CommDetector2::go(void)
 
     QMap<long long, int> lastBreakMap;
     unsigned int passno = 0;
-    unsigned int npasses = frameAnalyzers.count();
+    unsigned int npasses = frameAnalyzers.size();
     for (currentPass = frameAnalyzers.begin();
             currentPass != frameAnalyzers.end();
             ++currentPass, passno++)
     {
-        Q3PtrList<FrameAnalyzer> deadAnalyzers;
+        FrameAnalyzerItem deadAnalyzers;
 
         VERBOSE(VB_COMMFLAG, QString(
                     "CommDetector2::go pass %1 of %2 (%3 frames, %4 fps)")
@@ -574,9 +581,11 @@ bool CommDetector2::go(void)
                 .arg(nvp->GetTotalFrameCount())
                 .arg(nvp->GetFrameRate(), 0, 'f', 2));
 
-        if (nuppelVideoPlayerInited(&(*currentPass), &finishedAnalyzers,
-                    &deadAnalyzers, nvp, nframes))
+        if (!nuppelVideoPlayerInited(
+                *currentPass, finishedAnalyzers, deadAnalyzers, nvp, nframes))
+        {
             return false;
+        }
 
         nvp->DiscardVideoFrame(nvp->GetRawVideoFrame(0));
         long long nextFrame = -1;
@@ -585,13 +594,13 @@ bool CommDetector2::go(void)
         QTime passTime, clock;
         struct timeval getframetime;
 
-        if (searchingForLogo(logoFinder, &(*currentPass)))
+        if (searchingForLogo(logoFinder, *currentPass))
             emit statusUpdate("Performing Logo Identification");
 
         clock.start();
         passTime.start();
         memset(&getframetime, 0, sizeof(getframetime));
-        while (!(*currentPass).isEmpty() && !nvp->GetEof())
+        while (!(*currentPass).empty() && !nvp->GetEof())
         {
             struct timeval start, end, elapsedtv;
 
@@ -630,7 +639,7 @@ bool CommDetector2::go(void)
                 sleep(1);
             }
 
-            if (!searchingForLogo(logoFinder, &(*currentPass)) &&
+            if (!searchingForLogo(logoFinder, *currentPass) &&
                     needToReportState(showProgress, isRecording,
                         currentFrameNumber))
             {
@@ -638,8 +647,9 @@ bool CommDetector2::go(void)
                         nframes, passno, npasses);
             }
 
-            nextFrame = processFrame(&(*currentPass), &finishedAnalyzers,
-                    &deadAnalyzers, currentFrame, currentFrameNumber);
+            nextFrame = processFrame(
+                *currentPass, finishedAnalyzers,
+                deadAnalyzers, currentFrame, currentFrameNumber);
 
             if (((currentFrameNumber >= 1) &&
                  (((nextFrame * 10) / nframes) !=
@@ -684,7 +694,7 @@ bool CommDetector2::go(void)
                 {
                     if (ii.key() != jj.key())
                         break;
-                    if (ii.data() != jj.data())
+                    if (*ii != *jj)
                         break;
                     ++ii;
                     ++jj;
@@ -701,22 +711,19 @@ bool CommDetector2::go(void)
             nvp->DiscardVideoFrame(currentFrame);
         }
 
-        Q3PtrListIterator<FrameAnalyzer> iifa(finishedAnalyzers);
-        FrameAnalyzer *fa;
-        while ((fa = iifa.current()))
-        {
-            finishedAnalyzers.remove(fa);
-            (*currentPass).append(fa);
-        }
+        currentPass->insert(currentPass->end(),
+                            finishedAnalyzers.begin(),
+                            finishedAnalyzers.end());
+        finishedAnalyzers.clear();
 
         if (postprocessing)
             currentFrameNumber = nvp->GetTotalFrameCount() - 1;
-        if (passFinished(&(*currentPass), currentFrameNumber + 1, true))
+        if (passFinished(*currentPass, currentFrameNumber + 1, true))
             return false;
 
         VERBOSE(VB_COMMFLAG, QString("NVP Time: GetRawVideoFrame=%1s")
                 .arg(strftimeval(&getframetime)));
-        if (passReportTime(&(*currentPass)))
+        if (passReportTime(*currentPass))
             return false;
     }
 
@@ -738,14 +745,16 @@ void CommDetector2::getCommercialBreakList(QMap<long long, int> &marks)
 {
     if (!finished)
     {
-        for (frameAnalyzerList::iterator pass = frameAnalyzers.begin();
-                pass != frameAnalyzers.end();
-                ++pass)
+        for (FrameAnalyzerList::iterator pass = frameAnalyzers.begin();
+             pass != frameAnalyzers.end(); ++pass)
         {
-            if (*pass == *currentPass && passFinished(&finishedAnalyzers,
-                        currentFrameNumber + 1, false))
+            if (*pass == *currentPass &&
+                passFinished(finishedAnalyzers, currentFrameNumber + 1, false))
+            {
                 return;
-            if (passFinished(&(*pass), currentFrameNumber + 1, false))
+            }
+
+            if (passFinished(*pass, currentFrameNumber + 1, false))
                 return;
         }
     }
@@ -762,7 +771,7 @@ void CommDetector2::getCommercialBreakList(QMap<long long, int> &marks)
             ++bb)
     {
         long long segb = bb.key();
-        long long seglen = bb.data();
+        long long seglen = *bb;
         long long sege = segb + seglen - 1;
 
         if (segb < sege)
@@ -814,7 +823,7 @@ void CommDetector2::recordingFinished(long long totalFileSize)
 
 void CommDetector2::requestCommBreakMapUpdate(void)
 {
-    if (searchingForLogo(logoFinder, &(*currentPass)))
+    if (searchingForLogo(logoFinder, *currentPass))
     {
         VERBOSE(VB_COMMFLAG, "Ignoring request for commBreakMapUpdate;"
                 " still doing logo detection");
@@ -842,9 +851,9 @@ void PrintReportMap(
          * Recording" OSD.
          */
         bb = it.key() + 1;
-        if (it.data())
+        if (*it)
         {
-            ee = bb + it.data();
+            ee = bb + *it;
             len = ee - bb;
             tmp = QString("%1: %2").arg(bb, 10).arg(ee - 1, 10);
         }

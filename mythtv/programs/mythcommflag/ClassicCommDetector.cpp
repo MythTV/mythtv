@@ -453,7 +453,7 @@ bool ClassicCommDetector::go()
                 {
                     lastIt = lastSentCommBreakMap.find(it.key());
                     if ((lastIt == lastSentCommBreakMap.end()) ||
-                        (lastIt.data() != it.data()))
+                        (*lastIt != *it))
                         mapsAreIdentical = false;
                 }
             }
@@ -502,20 +502,17 @@ bool ClassicCommDetector::go()
             {
                 if (myTotalFrames)
                 {
-                    cerr << "\b\b\b\b\b\b\b\b\b\b\b"
-                         << (const char *)QString::number(percentage).rightJustify(3, ' ')
-                         << "%/"
-                         << (const char *)QString::number((int)flagFPS).rightJustify(3, ' ')
-                         << "fps";
+                    QString tmp = QString("\b\b\b\b\b\b\b\b\b\b\b%1%/%2fps")
+                        .arg(percentage, 3).arg((int)flagFPS, 3);
+                    QByteArray ba = tmp.toAscii();
+                    cerr << ba.constData() << flush;
                 }
                 else
                 {
-                    cerr << "\b\b\b\b\b\b\b\b\b\b\b\b\b"
-                         << (const char *)QString::number(currentFrameNumber)
-                                            .rightJustify(6, ' ')
-                         << "/"
-                         << (const char *)QString::number((int)flagFPS).rightJustify(3, ' ')
-                         << "fps";
+                    QString tmp = QString("\b\b\b\b\b\b\b\b\b\b\b\b\b%1/%2fps")
+                        .arg(currentFrameNumber, 6).arg((int)flagFPS, 3);
+                    QByteArray ba = tmp.toAscii();
+                    cerr << ba.constData() << flush;
                 }
                 cerr.flush();
             }
@@ -594,7 +591,7 @@ void ClassicCommDetector::sceneChangeDetectorHasNewInformation(
     else
     {
         frameInfo[framenum].flagMask &= ~COMM_FRAME_SCENE_CHANGE;
-        sceneMap.erase(framenum);
+        sceneMap.remove(framenum);
     }
 
     frameInfo[framenum].sceneChangePercent = (int) (debugValue*100);
@@ -1015,7 +1012,7 @@ void ClassicCommDetector::GetSceneChangeMap(comm_map_t &scenes,
 
     for (it = sceneMap.begin(); it != sceneMap.end(); ++it)
         if ((start_frame == -1) || (it.key() >= start_frame))
-            scenes[it.key()] = it.data();
+            scenes[it.key()] = *it;
 }
 
 comm_map_t ClassicCommDetector::Combine2Maps(comm_map_t &a, comm_map_t &b) const
@@ -1028,7 +1025,7 @@ comm_map_t ClassicCommDetector::Combine2Maps(comm_map_t &a, comm_map_t &b) const
     {
         comm_map_t::const_iterator it = a.begin();
         for (; it != a.end(); ++it)
-            newMap[it.key()] = it.data();
+            newMap[it.key()] = *it;
     }
 
     if ((a.size() > 1) &&
@@ -1041,10 +1038,9 @@ comm_map_t ClassicCommDetector::Combine2Maps(comm_map_t &a, comm_map_t &b) const
         it_a = a.begin();
         it_b = b.begin();
 
-        if ((it_b.key() < 2) &&
-            (it_a.key() > 2))
+        if ((it_b.key() < 2) && (it_a.key() > 2))
         {
-            newMap.erase(it_a.key());
+            newMap.remove(it_a.key());
             newMap[0] = MARK_COMM_START;
         }
 
@@ -1057,21 +1053,21 @@ comm_map_t ClassicCommDetector::Combine2Maps(comm_map_t &a, comm_map_t &b) const
         it = a.begin();
         for (; it != a.end(); ++it)
         {
-            if ((it.data() == MARK_COMM_END) && (it.key() > max_a))
+            if ((*it == MARK_COMM_END) && (it.key() > max_a))
                 max_a = it.key();
         }
 
         it = b.begin();
         for (; it != b.end(); ++it)
         {
-            if ((it.data() == MARK_COMM_END) && (it.key() > max_b))
+            if ((*it == MARK_COMM_END) && (it.key() > max_b))
                 max_b = it.key();
         }
 
         if ((max_a < (framesProcessed - 2)) &&
             (max_b > (framesProcessed - 2)))
         {
-            newMap.erase(max_a);
+            newMap.remove(max_a);
             newMap[framesProcessed] = MARK_COMM_END;
         }
     }
@@ -1108,8 +1104,8 @@ comm_map_t ClassicCommDetector::Combine2Maps(comm_map_t &a, comm_map_t &b) const
 
             if (allTrue)
             {
-                newMap.erase(it_a.key());
-                newMap.erase(it_b.key());
+                newMap.remove(it_a.key());
+                newMap.remove(it_b.key());
             }
 
             it_a++; it_a++;
@@ -1651,8 +1647,8 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             {
                 if ((fbp->start - lastEnd) < (commDetectMinShowLength * fps))
                 {
-                    commBreakMap.erase(lastStart);
-                    commBreakMap.erase(lastEnd);
+                    commBreakMap.remove(lastStart);
+                    commBreakMap.remove(lastEnd);
                     breakStart = lastStart;
 
                     if (verboseDebugging)
@@ -1787,7 +1783,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
         VERBOSE(VB_COMMFLAG, "Adjusting start/end marks according to blanks.");
     for (it = tmpCommMap.begin(); it != tmpCommMap.end(); ++it)
     {
-        if (it.data() == MARK_COMM_START)
+        if (*it == MARK_COMM_START)
         {
             lastStart = it.key();
             if (skipAllBlanks)
@@ -1976,14 +1972,14 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
     VERBOSE(VB_COMMFLAG, "Blank-Frame Commercial Map" );
     for(it = blankCommMap.begin(); it != blankCommMap.end(); ++it)
         VERBOSE(VB_COMMFLAG, QString("    %1:%2")
-                .arg((long int)it.key()).arg(it.data()));
+                .arg((long int)it.key()).arg(*it));
 
     MergeBlankCommList();
 
     VERBOSE(VB_COMMFLAG, "Merged Blank-Frame Commercial Break Map" );
     for(it = blankCommBreakMap.begin(); it != blankCommBreakMap.end(); ++it)
         VERBOSE(VB_COMMFLAG, QString("    %1:%2")
-                .arg((long int)it.key()).arg(it.data()));
+                .arg((long int)it.key()).arg(*it));
 }
 
 
@@ -2032,8 +2028,9 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
             {
                 if (sceneMap.contains(f))
                 {
-                    if (sceneCommBreakMap.contains(f))
-                        sceneCommBreakMap.erase(f);
+                    comm_map_t::iterator dit =  sceneCommBreakMap.find(f);
+                    if (dit != sceneCommBreakMap.end())
+                        sceneCommBreakMap.erase(dit);
                     else
                         sceneCommBreakMap[f] = MARK_COMM_END;
                     i = (int)(fps) + 1;
@@ -2064,7 +2061,7 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
         it++;
         while (it != sceneCommBreakMap.end())
         {
-            if ((it.data() == MARK_COMM_END) &&
+            if ((*it == MARK_COMM_END) &&
                 (it.key() - prev.key()) < (30 * fps))
             {
                 deleteMap[it.key()] = 1;
@@ -2076,13 +2073,13 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
         }
 
         for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
-            sceneCommBreakMap.erase(it.key());
+            sceneCommBreakMap.remove(it.key());
     }
 
     VERBOSE(VB_COMMFLAG, "Scene-Change Commercial Break Map" );
     for(it = sceneCommBreakMap.begin(); it != sceneCommBreakMap.end(); ++it)
         VERBOSE(VB_COMMFLAG, QString("    %1:%2")
-                .arg((long int)it.key()).arg(it.data()));
+                .arg((long int)it.key()).arg(*it));
 }
 
 
@@ -2096,7 +2093,7 @@ void ClassicCommDetector::BuildLogoCommList()
     VERBOSE(VB_COMMFLAG, "Logo Commercial Break Map" );
     for(it = logoCommBreakMap.begin(); it != logoCommBreakMap.end(); ++it)
         VERBOSE(VB_COMMFLAG, QString("    %1:%2")
-                .arg((long int)it.key()).arg(it.data()));
+                .arg((long int)it.key()).arg(*it));
 }
 
 void ClassicCommDetector::MergeBlankCommList(void)
@@ -2113,7 +2110,7 @@ void ClassicCommDetector::MergeBlankCommList(void)
         return;
 
     for (it = blankCommMap.begin(); it != blankCommMap.end(); ++it)
-        blankCommBreakMap[it.key()] = it.data();
+        blankCommBreakMap[it.key()] = *it;
 
     if (blankCommBreakMap.isEmpty())
         return;
@@ -2126,11 +2123,11 @@ void ClassicCommDetector::MergeBlankCommList(void)
         // if next commercial starts less than 15*fps frames away then merge
         if ((((prev.key() + 1) == it.key()) ||
             ((prev.key() + (15 * fps)) > it.key())) &&
-            (prev.data() == MARK_COMM_END) &&
-            (it.data() == MARK_COMM_START))
+            (*prev == MARK_COMM_END) &&
+            (*it == MARK_COMM_START))
         {
-            blankCommBreakMap.erase(prev.key());
-            blankCommBreakMap.erase(it.key());
+            blankCommBreakMap.remove(prev.key());
+            blankCommBreakMap.remove(it.key());
         }
     }
 
@@ -2142,8 +2139,8 @@ void ClassicCommDetector::MergeBlankCommList(void)
     tmpMap[prev.key()] = it.key();
     for(; it != blankCommBreakMap.end(); ++it, ++prev)
     {
-        if ((prev.data() == MARK_COMM_START) &&
-            (it.data() == MARK_COMM_END))
+        if ((*prev == MARK_COMM_START) &&
+            (*it == MARK_COMM_END))
             tmpMap[prev.key()] = it.key();
     }
 
@@ -2154,12 +2151,12 @@ void ClassicCommDetector::MergeBlankCommList(void)
     {
         // if we find any segments less than 35 seconds between commercial
         // breaks include those segments in the commercial break.
-        if (((tmpMap_prev.data() + (35 * fps)) > tmpMap_it.key()) &&
-            ((tmpMap_prev.data() - tmpMap_prev.key()) > (35 * fps)) &&
-            ((tmpMap_it.data() - tmpMap_it.key()) > (35 * fps)))
+        if (((*tmpMap_prev + (35 * fps)) > tmpMap_it.key()) &&
+            ((*tmpMap_prev - tmpMap_prev.key()) > (35 * fps)) &&
+            ((*tmpMap_it - tmpMap_it.key()) > (35 * fps)))
         {
-            blankCommBreakMap.erase(tmpMap_prev.data());
-            blankCommBreakMap.erase(tmpMap_it.key());
+            blankCommBreakMap.remove(*tmpMap_prev);
+            blankCommBreakMap.remove(tmpMap_it.key());
         }
     }
 }
@@ -2199,7 +2196,7 @@ void ClassicCommDetector::DumpMap(comm_map_t &map)
     for (it = map.begin(); it != map.end(); ++it)
     {
         long long frame = it.key();
-        int flag = it.data();
+        int flag = *it;
         int my_fps = (int)ceil(fps);
         int hour = (frame / my_fps) / 60 / 60;
         int min = (frame / my_fps) / 60 - (hour * 60);
@@ -2229,8 +2226,8 @@ void ClassicCommDetector::CondenseMarkMap(comm_map_t&map, int spacing,
     for (it = map.begin(); it != map.end(); it++)
     {
         VERBOSE(VB_COMMFLAG, QString("    %1:%2")
-                .arg((long int)it.key()).arg(it.data()));
-        tmpMap[it.key()] = it.data();
+                .arg((long int)it.key()).arg(*it));
+        tmpMap[it.key()] = *it;
     }
 
     prev = tmpMap.begin();
@@ -2238,12 +2235,12 @@ void ClassicCommDetector::CondenseMarkMap(comm_map_t&map, int spacing,
     it++;
     while(it != tmpMap.end())
     {
-        if ((it.data() == MARK_START) &&
-            (prev.data() == MARK_END) &&
+        if ((*it == MARK_START) &&
+            (*prev == MARK_END) &&
             ((it.key() - prev.key()) < spacing))
         {
-            map.erase(prev.key());
-            map.erase(it.key());
+            map.remove(prev.key());
+            map.remove(it.key());
         }
         prev++;
         it++;
@@ -2255,19 +2252,19 @@ void ClassicCommDetector::CondenseMarkMap(comm_map_t&map, int spacing,
     // delete any segments less than 'length' frames in length
     tmpMap.clear();
     for (it = map.begin(); it != map.end(); it++)
-        tmpMap[it.key()] = it.data();
+        tmpMap[it.key()] = *it;
 
     prev = tmpMap.begin();
     it = prev;
     it++;
     while(it != tmpMap.end())
     {
-        if ((prev.data() == MARK_START) &&
-            (it.data() == MARK_END) &&
+        if ((*prev == MARK_START) &&
+            (*it == MARK_END) &&
             ((it.key() - prev.key()) < length))
         {
-            map.erase(prev.key());
-            map.erase(it.key());
+            map.remove(prev.key());
+            map.remove(it.key());
         }
         prev++;
         it++;
@@ -2276,7 +2273,7 @@ void ClassicCommDetector::CondenseMarkMap(comm_map_t&map, int spacing,
     VERBOSE(VB_COMMFLAG, "Commercial Map After condense:" );
     for (it = map.begin(); it != map.end(); it++)
         VERBOSE(VB_COMMFLAG, QString("    %1:%2")
-                .arg((long int)it.key()).arg(it.data()));
+                .arg((long int)it.key()).arg(*it));
 }
 
 void ClassicCommDetector::ConvertShowMapToCommMap(comm_map_t&map)
@@ -2288,7 +2285,7 @@ void ClassicCommDetector::ConvertShowMapToCommMap(comm_map_t&map)
 
     for (it = map.begin(); it != map.end(); it++)
     {
-        if (it.data() == MARK_START)
+        if (*it == MARK_START)
             map[it.key()] = MARK_COMM_END;
         else
             map[it.key()] = MARK_COMM_START;
@@ -2301,14 +2298,14 @@ void ClassicCommDetector::ConvertShowMapToCommMap(comm_map_t&map)
         {
                 case MARK_COMM_END:
                 if (it.key() == 0)
-                    map.erase(0);
+                    map.remove(0);
                 else
                     map[0] = MARK_COMM_START;
                 break;
                 case MARK_COMM_START:
                 break;
                 default:
-                map.erase(0);
+                map.remove(0);
                 break;
         }
     }
@@ -2467,8 +2464,7 @@ void ClassicCommDetector::PrintFullMap(
             if (mit != comm_breaks->end())
             {
                 QString tmp = (verbose) ?
-                    toString((MarkTypes)mit.data()) :
-                    QString::number(mit.data());
+                    toString((MarkTypes)*mit) : QString::number(*mit);
                 atmp = tmp.toAscii();
 
                 out << atmp.constData();

@@ -1,8 +1,8 @@
-#include "ClassicSceneChangeDetector.h"
 #include <algorithm>
-#include "Histogram.h"
+using namespace std;
 
-#include "libmyth/mythcontext.h"  //To be able to use VERBOSE()
+#include "ClassicSceneChangeDetector.h"
+#include "Histogram.h"
 
 ClassicSceneChangeDetector::ClassicSceneChangeDetector(unsigned int width,
         unsigned int height, unsigned int commdetectborder_in,

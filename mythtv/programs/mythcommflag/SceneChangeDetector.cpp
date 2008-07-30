@@ -66,7 +66,8 @@ writeData(QString filename, const unsigned short *scdiff, long long nframes)
     FILE            *fp;
     long long       frameno;
 
-    if (!(fp = fopen(filename, "w")))
+    QByteArray fname = filename.toLocal8Bit();
+    if (!(fp = fopen(fname.constData(), "w")))
         return false;
     for (frameno = 0; frameno < nframes; frameno++)
         (void)fprintf(fp, "%5u\n", scdiff[frameno]);

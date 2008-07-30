@@ -103,7 +103,8 @@ readMatches(QString filename, unsigned short *matches, long long nframes)
     FILE        *fp;
     long long   frameno;
 
-    if (!(fp = fopen(filename, "r")))
+    QByteArray fname = filename.toLocal8Bit();
+    if (!(fp = fopen(fname.constData(), "r")))
         return false;
 
     for (frameno = 0; frameno < nframes; frameno++)
@@ -135,7 +136,8 @@ writeMatches(QString filename, unsigned short *matches, long long nframes)
     FILE        *fp;
     long long   frameno;
 
-    if (!(fp = fopen(filename, "w")))
+    QByteArray fname = filename.toLocal8Bit();
+    if (!(fp = fopen(fname.constData(), "w")))
         return false;
 
     for (frameno = 0; frameno < nframes; frameno++)
@@ -768,7 +770,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
          * not search into adjacent breaks.
          */
         const long long brkb = ii.key();
-        const long long brke = brkb + ii.data();
+        const long long brke = brkb + *ii;
         FrameAnalyzer::FrameMap::const_iterator jj = blankMap->constEnd();
         if (brkb > 0)
         {
@@ -783,7 +785,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
         {
             newbrkb = jj.key();
             if (!skipCommBlanks)
-                newbrkb += jj.data();
+                newbrkb += *jj;
         }
 
         /*
@@ -801,7 +803,7 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
         {
             newbrke = kk.key();
             if (skipCommBlanks)
-                newbrke += kk.data();
+                newbrke += *kk;
         }
 
         /*
@@ -810,16 +812,19 @@ TemplateMatcher::adjustForBlanks(const BlankFrameDetector *blankFrameDetector,
         long long newbrklen = newbrke - newbrkb;
         if (newbrkb != brkb)
         {
-            breakMap.remove(ii);
+            breakMap.erase(ii);
             if (newbrkb < nframes && newbrklen)
                 breakMap.insert(newbrkb, newbrklen);
         }
         else if (newbrke != brke)
         {
             if (newbrklen)
-                breakMap.replace(newbrkb, newbrklen);
+            {
+                breakMap.remove(newbrkb);
+                breakMap.insert(newbrkb, newbrklen);
+            }
             else
-                breakMap.remove(ii);
+                breakMap.erase(ii);
         }
 
         prevbrke = newbrke;
@@ -841,7 +846,7 @@ TemplateMatcher::computeBreaks(FrameAnalyzer::FrameMap *breaks)
             bb != breakMap.end();
             ++bb)
     {
-        breaks->insert(bb.key(), bb.data());
+        breaks->insert(bb.key(), *bb);
     }
     return 0;
 }

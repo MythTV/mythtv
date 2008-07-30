@@ -32,7 +32,8 @@ readData(QString filename, float *mean, unsigned char *median, float *stddev,
     long long       frameno;
     int             counter[UCHAR_MAX + 1];
 
-    if (!(fp = fopen(filename, "r")))
+    QByteArray fname = filename.toLocal8Bit();
+    if (!(fp = fopen(fname.constData(), "r")))
         return false;
 
     for (frameno = 0; frameno < nframes; frameno++)
@@ -110,7 +111,8 @@ writeData(QString filename, float *mean, unsigned char *median, float *stddev,
     FILE            *fp;
     long long       frameno;
 
-    if (!(fp = fopen(filename, "w")))
+    QByteArray fname = filename.toLocal8Bit();
+    if (!(fp = fopen(fname, "w")))
         return false;
     for (frameno = 0; frameno < nframes; frameno++)
     {

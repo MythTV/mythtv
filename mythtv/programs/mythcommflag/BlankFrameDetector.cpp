@@ -192,7 +192,7 @@ computeBlankMap(FrameAnalyzer::FrameMap *blankMap, long long nframes,
 
     FrameAnalyzer::FrameMap::Iterator iiblank = blankMap->end();
     --iiblank;
-    if (iiblank.key() + iiblank.data() < nframes)
+    if (iiblank.key() + *iiblank < nframes)
     {
         /*
          * Didn't end on blank frames, so add a dummy blank frame at the
@@ -239,7 +239,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
             ++iiblank)
     {
         long long brkb = iiblank.key();
-        long long iilen = iiblank.data();
+        long long iilen = *iiblank;
         long long start = brkb + iilen / 2;
 
         for (unsigned int ii = 0; ii < nbreaktypes; ii++)
@@ -249,7 +249,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
             for (++jjblank; jjblank != blankMap->end(); ++jjblank)
             {
                 long long brke = jjblank.key();
-                long long jjlen = jjblank.data();
+                long long jjlen = *jjblank;
                 long long end = brke + jjlen / 2;
 
                 long long testlen = (long long)roundf((end - start) / fps);
@@ -301,7 +301,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
         while (iibreak != breakMap->end())
         {
             long long iib = iibreak.key();
-            long long iie = iib + iibreak.data();
+            long long iie = iib + *iibreak;
 
             FrameAnalyzer::FrameMap::iterator jjbreak = iibreak;
             ++jjbreak;
@@ -309,7 +309,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
                 break;
 
             long long jjb = jjbreak.key();
-            long long jje = jjb + jjbreak.data();
+            long long jje = jjb + *jjbreak;
 
             if (jjb < iib)
             {
@@ -327,8 +327,11 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
 
             /* Coalesce. */
             if (jje > iie)
-                breakMap->replace(iib, jje - iib);  /* overlap */
-            breakMap->remove(jjbreak);
+            {
+                breakMap->remove(iib);             /* overlap */
+                breakMap->insert(iib, jje - iib);  /* overlap */
+            }
+            breakMap->erase(jjbreak);
             coalesced = true;
             iibreak = breakMap->find(iib);
         }
@@ -341,7 +344,7 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
     while (iibreak != breakMap->end())
     {
         long long iib = iibreak.key();
-        long long iie = iib + iibreak.data();
+        long long iie = iib + *iibreak;
 
         if (!skipcommblanks)
         {
@@ -350,8 +353,8 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
                 blankMap->find(iib);
             FrameAnalyzer::FrameMap::iterator jjbreak = iibreak;
             ++jjbreak;
-            iib += iiblank.data();
-            breakMap->remove(iibreak);
+            iib += *iiblank;
+            breakMap->erase(iibreak);
             breakMap->insert(iib, iie - iib);
             iibreak = jjbreak;
         }
@@ -361,8 +364,9 @@ computeBreakMap(FrameAnalyzer::FrameMap *breakMap,
             ++iibreak;
             FrameAnalyzer::FrameMap::const_iterator jjblank =
                 blankMap->find(iie);
-            iie += jjblank.data();
-            breakMap->replace(iib, iie - iib);
+            iie += *jjblank;
+            breakMap->remove(iib);
+            breakMap->insert(iib, iie - iib);
         }
     }
 }
@@ -483,7 +487,7 @@ BlankFrameDetector::computeForLogoSurplus(
                 ++jj)
         {
             long long jjbb = jj.key();
-            long long jjee = jjbb + jj.data();
+            long long jjee = jjbb + *jj;
 
             if (iiee < jjbb)
                 break;      /* No nearby blank frames. */
@@ -505,15 +509,13 @@ BlankFrameDetector::computeForLogoSurplus(
         /* Adjust blank frame to begin with logo break beginning. */
         if (jjfound != blankMap.end())
         {
-            long long jjee = jjfound.key() + jjfound.data();
-            blankMap.remove(jjfound);
+            long long jjee = jjfound.key() + *jjfound;
+            blankMap.erase(jjfound);
             if (jjee <= iikey)
             {
                 /* Move blank frame to beginning of logo break. */
-                if (blankMap.find(iikey) == blankMap.end())
-                    blankMap.insert(iikey, 1);
-                else
-                    blankMap.replace(iikey, 1);
+                blankMap.remove(iikey);
+                blankMap.insert(iikey, 1);
             }
             else
             {
@@ -523,7 +525,7 @@ BlankFrameDetector::computeForLogoSurplus(
         }
 
         /* Get bounds of end of logo break. */
-        long long kkkey = ii.key() + ii.data();
+        long long kkkey = ii.key() + *ii;
         long long kkbb = kkkey - MAXBLANKADJUSTMENT;
         long long kkee = kkkey + MAXBLANKADJUSTMENT;
         FrameAnalyzer::FrameMap::Iterator mmfound = blankMap.end();
@@ -534,7 +536,7 @@ BlankFrameDetector::computeForLogoSurplus(
                 ++mm)
         {
             long long mmbb = mm.key();
-            long long mmee = mmbb + mm.data();
+            long long mmee = mmbb + *mm;
 
             if (kkee < mmbb)
                 break;      /* No nearby blank frames. */
@@ -556,16 +558,15 @@ BlankFrameDetector::computeForLogoSurplus(
             if (mmbb < kkkey)
             {
                 /* Adjust blank frame to end with logo break. */
-                blankMap.replace(mmbb, kkkey - mmbb);
+                blankMap.remove(mmbb);
+                blankMap.insert(mmbb, kkkey - mmbb);
             }
             else
             {
                 /* Move blank frame to end of logo break. */
-                blankMap.remove(mmfound);
-                if (blankMap.find(kkkey) == blankMap.end())
-                    blankMap.insert(kkkey - 1, 1);
-                else
-                    blankMap.replace(kkkey - 1, 1);
+                blankMap.erase(mmfound);
+                blankMap.remove(kkkey - 1);
+                blankMap.insert(kkkey - 1, 1);
             }
         }
     }
@@ -585,7 +586,7 @@ BlankFrameDetector::computeForLogoSurplus(
             ++ii)
     {
         long long iibb = ii.key();
-        long long iiee = iibb + ii.data();
+        long long iiee = iibb + *ii;
         bool overlap = false;
 
         for (FrameAnalyzer::FrameMap::Iterator jj = breakMap.begin();
@@ -593,7 +594,7 @@ BlankFrameDetector::computeForLogoSurplus(
             )
         {
             long long jjbb = jj.key();
-            long long jjee = jjbb + jj.data();
+            long long jjee = jjbb + *jj;
             FrameAnalyzer::FrameMap::Iterator jjnext = jj;
             ++jjnext;
 
@@ -611,7 +612,7 @@ BlankFrameDetector::computeForLogoSurplus(
             {
                 /* End of logo break includes beginning of blank-frame break. */
                 overlap = true;
-                breakMap.remove(jj);
+                breakMap.erase(jj);
                 breakMap.insert(iibb, max(iiee, jjee) - iibb);
             }
             else if (jjbb < iibb && iibb < jjee)
@@ -619,7 +620,10 @@ BlankFrameDetector::computeForLogoSurplus(
                 /* End of blank-frame break includes beginning of logo break. */
                 overlap = true;
                 if (jjee < iiee)
-                    breakMap.replace(jjbb, iiee - jjbb);
+                {
+                    breakMap.remove(jjbb);
+                    breakMap.insert(jjbb, iiee - jjbb);
+                }
             }
 
             jj = jjnext;
@@ -655,7 +659,7 @@ BlankFrameDetector::computeBreaks(FrameAnalyzer::FrameMap *breaks)
     for (FrameAnalyzer::FrameMap::Iterator bb = breakMap.begin();
             bb != breakMap.end();
             ++bb)
-        breaks->insert(bb.key(), bb.data());
+        breaks->insert(bb.key(), *bb);
 
     return 0;
 }

@@ -156,8 +156,12 @@ int QueueCommFlagJob(QString chanid, QString starttime)
     if (!pginfo)
     {
         if (!quiet)
-            cerr << "Unable to find program info for chanid " << (const char *)chanid
-                 << " @ " << (const char *)starttime << endl;
+        {
+            QString tmp = QString(
+                "Unable to find program info for chanid %1 @ %2")
+                .arg(chanid).arg(starttime);
+            cerr << tmp.toLocal8Bit().constData() << endl;
+        }
         return COMMFLAG_EXIT_NO_PROGRAM_DATA;
     }
 
@@ -167,15 +171,21 @@ int QueueCommFlagJob(QString chanid, QString starttime)
     if (result)
     {
         if (!quiet)
-            cerr << "Job Queued for chanid " << (const char *)chanid << " @ "
-                 << (const char *)starttime << endl;
+        {
+            QString tmp = QString("Job Queued for chanid %1 @ %2")
+                .arg(chanid).arg(starttime);
+            cerr << tmp.toLocal8Bit().constData() << endl;
+        }
         return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
     }
     else
     {
         if (!quiet)
-            cerr << "Error queueing job for chanid " << (const char *)chanid
-                 << " @ " << (const char *)starttime << endl;
+        {
+            QString tmp = QString("Error queueing job for chanid %1 @ %2")
+                .arg(chanid).arg(starttime);
+            cerr << tmp.toLocal8Bit().constData() << endl;
+        }
         return COMMFLAG_EXIT_DB_ERROR;
     }
 
@@ -200,7 +210,7 @@ int CopySkipListToCutList(QString chanid, QString starttime)
 
     pginfo->GetCommBreakList(cutlist);
     for (it = cutlist.begin(); it != cutlist.end(); ++it)
-        if (it.data() == MARK_COMM_START)
+        if (*it == MARK_COMM_START)
             cutlist[it.key()] = MARK_CUT_START;
         else
             cutlist[it.key()] = MARK_CUT_END;
@@ -215,11 +225,11 @@ int SetCutList(QString chanid, QString starttime, QString newCutList)
 
     newCutList.replace(QRegExp(" "), "");
 
-    QStringList tokens = QStringList::split(",", newCutList);
+    QStringList tokens = newCutList.split(",", QString::SkipEmptyParts);
 
     for (int i = 0; i < tokens.size(); i++)
     {
-        QStringList cutpair = QStringList::split("-", tokens[i]);
+        QStringList cutpair = tokens[i].split("-", QString::SkipEmptyParts);
         cutlist[cutpair[0].toInt()] = MARK_CUT_START;
         cutlist[cutpair[1].toInt()] = MARK_CUT_END;
     }
@@ -266,8 +276,8 @@ int GetMarkupList(QString list, QString chanid, QString starttime)
 
     for (it = cutlist.begin(); it != cutlist.end(); ++it)
     {
-        if ((it.data() == MARK_COMM_START) ||
-            (it.data() == MARK_CUT_START))
+        if ((*it == MARK_COMM_START) ||
+            (*it == MARK_CUT_START))
         {
             if (result != "")
                 result += ",";
@@ -278,9 +288,12 @@ int GetMarkupList(QString list, QString chanid, QString starttime)
     }
 
     if (list == "cutlist")
-        cout << (const char *)QString("Cutlist: %1\n").arg(result);
+        cout << QString("Cutlist: %1\n").arg(result).toLocal8Bit().constData();
     else
-        cout << (const char *)QString("Commercial Skip List: %1\n").arg((const char *)result);
+    {
+        cout << QString("Commercial Skip List: %1\n")
+            .arg(result).toLocal8Bit().constData();
+    }
 
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
@@ -301,7 +314,7 @@ void streamOutCommercialBreakList(
         QMap<long long, int>::const_iterator it = commercialBreakList.begin();
         for (; it != commercialBreakList.end(); it++)
         {
-            output << "framenum: " << it.key() << "\tmarktype: " << it.data()
+            output << "framenum: " << it.key() << "\tmarktype: " << *it
                    << endl;
         }
     }
@@ -322,7 +335,10 @@ static void print_comm_flag_output(
 
     ostream *out = &cout;
     if (output_filename != "-")
-        out = new fstream(output_filename, ios::app | ios::out );
+    {
+        QByteArray tmp = output_filename.toLocal8Bit();
+        out = new fstream(tmp.constData(), ios::app | ios::out );
+    }
 
     if (!quiet)
     {
@@ -341,7 +357,7 @@ static void print_comm_flag_output(
         }
 
         const QByteArray tmp2 = tmp.toLocal8Bit();
-        *out << tmp2.data() << endl;
+        *out << tmp2.constData() << endl;
 
         if (frame_count)
             *out << "totalframecount: " << frame_count << endl;
@@ -417,7 +433,7 @@ void commDetectorGotNewCommercialBreakList(void)
         else
             message += " ";
         message += QString("%1:%2").arg(it.key())
-                   .arg(it.data());
+                   .arg(*it);
     }
 
     VERBOSE(VB_COMMFLAG,
@@ -433,8 +449,8 @@ void incomingCustomEvent(QEvent* e)
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();
 
-        message = message.simplifyWhiteSpace();
-        QStringList tokens = QStringList::split(" ", message);
+        message = message.simplified();
+        QStringList tokens = message.split(" ", QString::SkipEmptyParts);
 
         VERBOSE(VB_COMMFLAG,
                 QString("mythcommflag: Received Event: '%1'")
@@ -520,11 +536,14 @@ int DoFlagCommercials(
     QObject::connect(commDetector, SIGNAL(gotNewCommercialBreakList()), &c,
                      SLOT(relay()));
 
-    VERBOSE(VB_COMMFLAG, "mythcommflag sending COMMFLAG_START notification");
-    QString message = "COMMFLAG_START ";
-    message += program_info->chanid + " " +
-               program_info->recstartts.toString(Qt::ISODate);
-    RemoteSendMessage(message);
+    if (useDB)
+    {
+        VERBOSE(VB_COMMFLAG, "mythcommflag sending COMMFLAG_START notification");
+        QString message = "COMMFLAG_START ";
+        message += program_info->chanid + " " +
+            program_info->recstartts.toString(Qt::ISODate);
+        RemoteSendMessage(message);
+    }
 
     bool result = commDetector->go();
     int comms_found = 0;
@@ -620,10 +639,10 @@ int FlagCommercials(
 
     if (!quiet)
     {
-        QString chanid = program_info->chanid.leftJustify(6, ' ', true);
+        QString chanid = program_info->chanid.leftJustified(6, ' ', true);
         QString recstartts = program_info->recstartts
-            .toString("yyyyMMddhhmmss").leftJustify(14, ' ', true);
-        QString title = program_info->title.leftJustify(41, ' ', true);
+            .toString("yyyyMMddhhmmss").leftJustified(14, ' ', true);
+        QString title = program_info->title.leftJustified(41, ' ', true);
 
         QString outstr = QString("%1 %2 %3 ")
             .arg(chanid).arg(recstartts).arg(title);
@@ -874,11 +893,12 @@ int main(int argc, char *argv[])
                     commDetectMethod = COMM_DETECT_OFF;
                     bool off_seen = false;
                     QMap<QString,SkipTypes>::const_iterator sit;
-                    QStringList list = QStringList::split(",", method);
+                    QStringList list =
+                        method.split(",", QString::SkipEmptyParts);
                     QStringList::const_iterator it = list.begin();
                     for (; it != list.end(); ++it)
                     {
-                        QString val = (*it).lower();
+                        QString val = (*it).toLower();
                         QByteArray aval = val.toAscii();
                         off_seen |= val == "off";
                         sit = skipTypes->find(val);
@@ -889,7 +909,7 @@ int main(int argc, char *argv[])
                             return -1;
                         }
                         commDetectMethod = (SkipTypes)
-                            ((int)commDetectMethod | (int)sit.data());
+                            ((int)commDetectMethod | (int)*sit);
                     }
                     if (COMM_DETECT_OFF == commDetectMethod)
                         commDetectMethod = COMM_DETECT_UNINIT;
@@ -911,7 +931,7 @@ int main(int argc, char *argv[])
                 if (!ok)
                 {
                     outputMethod = kOutputMethodEssentials;
-                    QString val = method.lower();
+                    QString val = method.toLower();
                     QByteArray aval = val.toAscii();
                     QMap<QString,OutputMethod>::const_iterator it =
                         outputTypes->find(val);
@@ -921,7 +941,7 @@ int main(int argc, char *argv[])
                              << aval.constData() << "'" << endl;
                         return -1;
                     }
-                    outputMethod = (OutputMethod) it.data();
+                    outputMethod = (OutputMethod) *it;
                 }
             }
             else
@@ -1023,9 +1043,10 @@ int main(int argc, char *argv[])
         {
             if (a.argc() > argpos)
             {
-                outputfilename = a.argv()[++argpos];
                 //clear file.
-                fstream output(outputfilename, ios::out);
+                outputfilename = a.argv()[++argpos];
+                QByteArray tmp = outputfilename.toLocal8Bit();
+                fstream output(tmp.constData(), ios::out);
             }
             else
             {
@@ -1143,8 +1164,8 @@ int main(int argc, char *argv[])
         for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(it.data()));
-            gContext->OverrideSettingForSession(it.key(), it.data());
+                                          .arg(it.key()).arg(*it));
+            gContext->OverrideSettingForSession(it.key(), *it);
         }
     }
 
@@ -1178,7 +1199,7 @@ int main(int argc, char *argv[])
         else
         {
             cerr << "mythcommflag: ERROR: Unable to find DB info for "
-                 << (const char *)fullfile.dirName() << endl;
+                 << fullfile.dirName().toLocal8Bit().constData() << endl;
             return COMMFLAG_EXIT_NO_PROGRAM_DATA;
         }
     }
@@ -1270,7 +1291,8 @@ int main(int argc, char *argv[])
         }
         else
         {
-            cerr << "Building seek table for: " << (const char *)filename << "\n";
+            cerr << "Building seek table for: "
+                 << filename.toLocal8Bit().constData() << endl;
         }
     }
 
@@ -1311,10 +1333,10 @@ int main(int argc, char *argv[])
 
         // RingBuffer doesn't like relative pathnames
         if (filename.left(1) != "/" && !filename.startsWith("dvd://"))
-            pginfo->pathname.prepend(QDir::currentDirPath() + '/');
+            pginfo->pathname.prepend(QDir::currentPath() + '/');
 
-        if ((filename.right(3).lower() == "mpg") ||
-            (filename.right(4).lower() == "mpeg"))
+        if ((filename.right(3).toLower() == "mpg") ||
+            (filename.right(4).toLower() == "mpeg"))
         {
             result = BuildVideoMarkup(pginfo, useDB);
             if (COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS != result)
