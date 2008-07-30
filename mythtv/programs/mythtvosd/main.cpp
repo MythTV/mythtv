@@ -12,7 +12,6 @@ using namespace std;
 #include <qapplication.h>
 #include <q3socketdevice.h>
 #include <qstring.h>
-#include <q3cstring.h>
 #include <qfile.h>
 #include <qhostaddress.h>
 
@@ -136,7 +135,8 @@ int main(int argc, char *argv[])
         QFile mfile(templatearg);
         if (!mfile.open(QIODevice::ReadOnly))
         {
-            cerr << "Unable to open template file '" << (const char *)templatearg << "'\n";
+            cerr << "Unable to open template file '"
+                 << templatearg.toLocal8Bit().constData() << "'\n";
             return TVOSD_EXIT_NO_TEMPLATE;
         }
 
@@ -176,7 +176,8 @@ int main(int argc, char *argv[])
         QString name = arg.section("=", 0, 0);
         name.replace("--", "");
 
-        QString value = QString::fromLocal8Bit(arg.section("=", 1));
+        QString value = QString::fromLocal8Bit(
+            arg.section("=", 1).toLocal8Bit());
         if (verbose)
         {
             QByteArray tmp_name  = name.toLocal8Bit();
@@ -216,7 +217,8 @@ int main(int argc, char *argv[])
     }
     else
     {
-        cout << "Sent UDP/XML packet to IP " << (const char *)address.toString()
+        cout << "Sent UDP/XML packet to IP "
+             << address.toString().toLocal8Bit().constData()
              << " and port: " << port << endl;
     }
    
