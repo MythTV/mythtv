@@ -1041,6 +1041,9 @@ void MythUIButtonListItem::setImage(MythImage *image)
 {
     if (!image)
         return;
+
+    if (m_image)
+        m_image->DownRef();
     m_image = image;
     m_image->UpRef();
     m_parent->Update();
