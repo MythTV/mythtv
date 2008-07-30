@@ -608,6 +608,8 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                 this, SLOT(setValue(const QString &)));
         connect(widget, SIGNAL(activated(const QString &)),
                 this, SLOT(setValue(const QString &)));
+        connect(widget, SIGNAL(editTextChanged(const QString &)),
+                this, SLOT(setValue(const QString &)));
     }
     else
     {
