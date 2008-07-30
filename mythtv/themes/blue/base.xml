@@ -2,10 +2,9 @@
 
   <window name="backgroundwindow"> 
     <imagetype name="backimg"> 
-      <filename>background.png</filename> 
-      <staticsize>-1,-1</staticsize> 
-    </imagetype> 
- 
+      <filename>background.png</filename>
+    </imagetype>
+
     <font name="small" face="Arial">
       <color>#FFFFFF</color>
       <size>14</size>
@@ -30,21 +29,21 @@
       <bold>yes</bold>
     </font>
 
-    <font name="clock" face="Arial"> 
-      <color>#FFFFFF</color> 
-      <size>22</size> 
-      <size:small>18</size:small> 
-      <size:big>22</size:big> 
-      <bold>yes</bold> 
-    </font> 
+    <font name="clock" face="Arial">
+      <color>#FFFFFF</color>
+      <size>22</size>
+      <size:small>18</size:small>
+      <size:big>22</size:big>
+      <bold>yes</bold>
+    </font>
 
-    <clock name="clock"> 
-      <area>10,110,790,50</area> 
-      <font>clock</font> 
-      <align>center</align> 
-      <format>%DATE% %TIME%</format> 
-    </clock> 
-  </window> 
+    <clock name="clock">
+      <area>10,110,790,50</area>
+      <font>clock</font>
+      <align>center</align>
+      <format>%DATE% %TIME%</format>
+    </clock>
+  </window>
 
-</mythuitheme> 
+</mythuitheme>
 

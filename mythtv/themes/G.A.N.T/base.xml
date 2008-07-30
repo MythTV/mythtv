@@ -3,7 +3,6 @@
   <window name="backgroundwindow">
     <imagetype name="backimg">
       <filename>bkg/grey.png</filename>
-      <staticsize>-1,-1</staticsize>
     </imagetype>
 
     <imagetype name="logo">
