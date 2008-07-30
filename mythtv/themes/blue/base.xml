@@ -1,49 +1,43 @@
-<mythuitheme> 
+<mythuitheme>
 
-  <window name="backgroundwindow"> 
-    <imagetype name="backimg"> 
-      <filename>background.png</filename>
-    </imagetype>
+    <window name="backgroundwindow">
+        <imagetype name="backimg">
+            <filename>background.png</filename>
+        </imagetype>
 
-    <font name="small" face="Arial">
-      <color>#FFFFFF</color>
-      <size>14</size>
-      <size:small>12</size:small>
-      <size:big>16</size:big>
-      <bold>yes</bold>
-    </font>
+        <font name="small" face="Arial">
+            <color>#FFFFFF</color>
+            <size>14</size>
+            <size:small>12</size:small>
+            <size:big>16</size:big>
+            <bold>yes</bold>
+        </font>
 
-    <font name="medium" face="Arial">
-      <color>#FFFFFF</color>
-      <size>16</size>
-      <size:small>14</size:small>
-      <size:big>20</size:big>
-      <bold>yes</bold>
-    </font>
+        <font name="medium" from="small">
+            <size>16</size>
+            <size:small>14</size:small>
+            <size:big>20</size:big>
+        </font>
 
-    <font name="large" face="Arial">
-      <color>#FFFFFF</color>
-      <size>20</size>
-      <size:small>18</size:small>
-      <size:big>22</size:big>
-      <bold>yes</bold>
-    </font>
+        <font name="large" from="small">
+            <size>20</size>
+            <size:small>18</size:small>
+            <size:big>22</size:big>
+        </font>
 
-    <font name="clock" face="Arial">
-      <color>#FFFFFF</color>
-      <size>22</size>
-      <size:small>18</size:small>
-      <size:big>22</size:big>
-      <bold>yes</bold>
-    </font>
+        <font name="clock" from="small">
+            <size>22</size>
+            <size:small>18</size:small>
+            <size:big>22</size:big>
+        </font>
 
-    <clock name="clock">
-      <area>10,110,790,50</area>
-      <font>clock</font>
-      <align>center</align>
-      <format>%DATE% %TIME%</format>
-    </clock>
-  </window>
+        <clock name="clock">
+            <area>10,110,790,50</area>
+            <font>clock</font>
+            <align>center</align>
+            <format>%DATE% %TIME%</format>
+        </clock>
+    </window>
 
 </mythuitheme>
 
