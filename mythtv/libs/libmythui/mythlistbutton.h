@@ -28,6 +28,8 @@ class MythListButtonItem
     MythListButtonItem(MythListButton *lbtype, const QString& text,
                        MythImage *image = 0, bool checkable = false,
                        CheckState state = CantCheck, bool showArrow = false);
+    MythListButtonItem(MythListButton *lbtype, const QString& text,
+                       QVariant data);
     ~MythListButtonItem();
 
     MythListButton *parent() const;
@@ -68,7 +70,6 @@ class MythListButtonItem
     bool            m_checkable;
     CheckState      m_state;
     QVariant        m_data;
-    QString         m_stringData;
     bool            m_showArrow;
     bool            m_overrideInactive;
 
@@ -223,6 +224,7 @@ class MythListButton : public MythUIType
     MythImage *itemRegPix, *itemSelActPix, *itemSelInactPix;
 
     friend class MythListButtonItem;
+    friend class MythUIButtonTree;
 };
 
 #endif
