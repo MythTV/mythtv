@@ -170,7 +170,7 @@ bool cmdline_err;
     {
         VERBOSE(VB_IMPORTANT, "Incorrect database schema.");
         delete gContext;
-        return BACKEND_EXIT_DB_OUTOFDATE;
+        return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
     // Create priveledged thread, then drop privs

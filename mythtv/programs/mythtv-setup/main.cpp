@@ -284,7 +284,7 @@ int main(int argc, char *argv[])
     {
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema.");
         delete gContext;
-        return BACKEND_EXIT_DB_OUTOFDATE;
+        return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
     gContext->SetSetting("Theme", "G.A.N.T");
