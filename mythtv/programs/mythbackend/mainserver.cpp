@@ -317,10 +317,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "ANN")
     {
-        if (tokens.size() < 3 || tokens.size() > 5)
-            VERBOSE(VB_IMPORTANT, "Bad ANN query");
-        else
-            HandleAnnounce(listline, tokens, sock);
+        HandleAnnounce(listline, tokens, sock);
         return;
     }
     else if (command == "DONE")
@@ -930,6 +927,18 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 {
     QStringList retlist( "OK" );
 
+    if (commands.size() < 3 || commands.size() > 5)
+    {
+        QString info = "";
+        if (commands.size() == 2)
+            info = QString(" %1").arg(commands[1]);
+
+        VERBOSE(VB_IMPORTANT,
+                QString("Received malformed ANN%1 query")
+                .arg(info));
+        return;
+    }
+
     sockListLock.lock();
     vector<PlaybackSock *>::iterator iter = playbackList.begin();
     for (; iter != playbackList.end(); iter++)
@@ -949,11 +958,18 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
     if (commands[1] == "Playback" || commands[1] == "Monitor")
     {
+        if (commands.size() < 4)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("Received malformed ANN %1 query")
+                    .arg(commands[1]));
+            return;
+        }
         // Monitor connections are same as Playback but they don't
         // block shutdowns. See the Scheduler event loop for more.
 
         bool wantevents = commands[3].toInt();
-        VERBOSE(VB_GENERAL, QString("MainServer::HandleAnnounce %1")
+        VERBOSE(VB_GENERAL, QString("MainServer::ANN %1")
                                     .arg(commands[1]));
         VERBOSE(VB_IMPORTANT, QString("adding: %1 as a client (events: %2)")
                                .arg(commands[2]).arg(wantevents));
@@ -965,6 +981,13 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
     }
     else if (commands[1] == "SlaveBackend")
     {
+        if (commands.size() < 4)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Received malformed ANN %1 query")
+                    .arg(commands[1]));
+            return;
+        }
+
         VERBOSE(VB_IMPORTANT, QString("adding: %1 as a slave backend server")
                                .arg(commands[2]));
         PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2], false);
