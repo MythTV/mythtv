@@ -641,8 +641,8 @@ void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
 
     cache.Lock();
 
-    QString     sXML;
-    Q3TextStream os( sXML, QIODevice::WriteOnly );
+    QString     sXML = "";
+    QTextStream os( &sXML, QIODevice::WriteOnly );
 
     for (SSDPCacheEntriesMap::Iterator it  = cache.Begin();
                                        it != cache.End();
@@ -684,6 +684,7 @@ void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
             pEntries->Unlock();
         }
     }
+    os << flush;
 
     list.append( new NameValue( "DeviceCount"          , QString::number( cache.Count() )));
     list.append( new NameValue( "DevicesAllocated"     , QString::number( SSDPCacheEntries::g_nAllocated )));

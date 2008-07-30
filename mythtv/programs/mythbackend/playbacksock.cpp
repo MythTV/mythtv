@@ -6,7 +6,6 @@ using namespace std;
 
 #include "playbacksock.h"
 #include "programinfo.h"
-#include "server.h"
 #include "mainserver.h"
 
 #include "libmyth/mythcontext.h"

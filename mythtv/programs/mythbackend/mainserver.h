@@ -3,18 +3,14 @@
 
 #include <qmap.h>
 #include <qtimer.h>
-#include <q3url.h>
 #include <qmutex.h>
 #include <qdom.h>
 #include <QEvent>
-#include <Q3ValueList>
-#include <Q3PtrList>
 
 #include <vector>
 using namespace std;
 
 #include "tv.h"
-#include "server.h"
 #include "playbacksock.h"
 #include "encoderlink.h"
 #include "filetransfer.h"
@@ -22,8 +18,11 @@ using namespace std;
 #include "livetvchain.h"
 #include "autoexpire.h"
 #include "mythsocket.h"
+#include "mythdeque.h"
 
 class ProcessRequestThread;
+class QUrl;
+class MythServer;
 
 class MainServer : public QObject, public MythSocketCBs
 {
@@ -148,15 +147,15 @@ class MainServer : public QObject, public MythSocketCBs
     FileTransfer *getFileTransferByID(int id);
     FileTransfer *getFileTransferBySock(MythSocket *socket);
 
-    QString LocalFilePath(Q3Url &url);
+    QString LocalFilePath(const QUrl &url);
 
     static void *SpawnDeleteThread(void *param);
     void DoDeleteThread(const DeleteStruct *ds);
     void DoDeleteInDB(const DeleteStruct *ds);
 
-    LiveTVChain *GetExistingChain(QString id);
-    LiveTVChain *GetExistingChain(MythSocket *sock);
-    LiveTVChain *GetChainWithRecording(ProgramInfo *pginfo);
+    LiveTVChain *GetExistingChain(const QString &id);
+    LiveTVChain *GetExistingChain(const MythSocket *sock);
+    LiveTVChain *GetChainWithRecording(const ProgramInfo *pginfo);
     void AddToChains(LiveTVChain *chain);
     void DeleteChain(LiveTVChain *chain);
 
@@ -166,7 +165,7 @@ class MainServer : public QObject, public MythSocketCBs
                                  int fd, const QString &filename,
                                  off_t fsize);
 
-    Q3PtrList<LiveTVChain> liveTVChains;
+    vector<LiveTVChain*> liveTVChains;
     QMutex liveTVChainsLock;
 
     QMap<int, EncoderLink *> *encoderList;
@@ -202,7 +201,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     QMutex deferredDeleteLock;
     QTimer *deferredDeleteTimer;
-    Q3ValueList<DeferredDeleteStruct> deferredDeleteList;
+    MythDeque<DeferredDeleteStruct> deferredDeleteList;
 
     QTimer *autoexpireUpdateTimer;
 

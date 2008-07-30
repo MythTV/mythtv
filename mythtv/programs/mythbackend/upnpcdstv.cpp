@@ -8,12 +8,12 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+// POSIX headers
+#include <limits.h>
+
+// MythTV headers
 #include "upnpcdstv.h"
 #include "httprequest.h"
-#include <qfileinfo.h>
-#include <qregexp.h>
-#include <q3url.h>
-#include <limits.h>
 #include "storagegroup.h"
 #include "util.h"
 #include "mythcontext.h"

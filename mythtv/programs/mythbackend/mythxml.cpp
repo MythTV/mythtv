@@ -8,6 +8,14 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include <cmath>
+
+#include <QTextStream>
+#include <QDir>
+#include <QFile>
+#include <QRegExp>
+#include <QBuffer>
+
 #include "mythxml.h"
 #include "backendutil.h"
 
@@ -15,17 +23,9 @@
 #include "util.h"
 #include "mythdbcon.h"
 
-#include <q3textstream.h>
 #include "previewgenerator.h"
 #include "backendutil.h"
-
-#include <qdir.h>
-#include <qfile.h>
-#include <qregexp.h>
-#include <qbuffer.h>
-#include <math.h>
-
-#include "../../config.h"
+#include "mythconfig.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -221,8 +221,8 @@ void MythXML::GetHosts( HTTPRequest *pRequest )
 
         if (query.isActive() && query.size() > 0)
         {
-             QString     sHosts;
-             Q3TextStream os( &sHosts, QIODevice::WriteOnly );
+            QString     sHosts;
+            QTextStream os( &sHosts, QIODevice::WriteOnly );
 
             while(query.next())
             {
@@ -265,8 +265,8 @@ void MythXML::GetKeys( HTTPRequest *pRequest )
 
         if (query.isActive() && query.size() > 0)
         {
-             QString     sKeys;
-             Q3TextStream os( &sKeys, QIODevice::WriteOnly );
+            QString     sKeys;
+            QTextStream os( &sKeys, QIODevice::WriteOnly );
 
             while(query.next())
             {
@@ -315,7 +315,7 @@ void MythXML::GetSetting( HTTPRequest *pRequest )
         // Was a Key Supplied?
 
         QString       sXml;
-        Q3TextStream   os( &sXml, QIODevice::WriteOnly );
+        QTextStream   os( &sXml, QIODevice::WriteOnly );
 
         if (sKey.length() > 0)
         {
@@ -1612,7 +1612,7 @@ void MythXML::GetConnectionInfo( HTTPRequest *pRequest )
     }
 
     QString     sXml;
-    Q3TextStream os( &sXml, QIODevice::WriteOnly );
+    QTextStream os( &sXml, QIODevice::WriteOnly );
 
     os <<  "<Database>";
     os <<   "<Host>"      << params.dbHostName << "</Host>";

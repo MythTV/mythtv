@@ -13,7 +13,7 @@
 
 #include <iostream>
 #include <q3ptrlist.h>
-#include <Q3TextStream>
+#include <QTextStream>
 
 using namespace std;
 
@@ -127,7 +127,7 @@ class HTTPRequest
 
         QString             m_sFileName;
 
-        Q3TextStream         m_response;
+        QTextStream         m_response;
 
         IPostProcess       *m_pPostProcess;
 
@@ -190,8 +190,10 @@ class HTTPRequest
         virtual bool    CanReadLine     () = 0;
         virtual QString ReadLine        ( int msecs = 0 ) = 0;
         virtual Q_LONG  ReadBlock       ( char *pData, Q_ULONG nMaxLen, int msecs = 0 ) = 0;
-        virtual Q_LONG  WriteBlock      ( char *pData, Q_ULONG nLen    ) = 0;
-        virtual Q_LONG  WriteBlockDirect( char *pData, Q_ULONG nLen    ) = 0;
+        virtual Q_LONG  WriteBlock      ( const char *pData,
+                                          Q_ULONG nLen    ) = 0;
+        virtual Q_LONG  WriteBlockDirect( const char *pData,
+                                          Q_ULONG nLen    ) = 0;
         virtual QString GetHostAddress  () = 0;
         virtual QString GetPeerAddress  () = 0;
         virtual void    Flush           () = 0;
@@ -221,8 +223,8 @@ class BufferedSocketDeviceRequest : public HTTPRequest
         virtual bool    CanReadLine     ();
         virtual QString ReadLine        ( int msecs = 0 );
         virtual Q_LONG  ReadBlock       ( char *pData, Q_ULONG nMaxLen, int msecs = 0  );
-        virtual Q_LONG  WriteBlock      ( char *pData, Q_ULONG nLen    );
-        virtual Q_LONG  WriteBlockDirect( char *pData, Q_ULONG nLen    );
+        virtual Q_LONG  WriteBlock      ( const char *pData, Q_ULONG nLen    );
+        virtual Q_LONG  WriteBlockDirect( const char *pData, Q_ULONG nLen    );
         virtual QString GetHostAddress  ();
         virtual QString GetPeerAddress  ();
         virtual void    Flush           () { m_pSocket->Flush(); }

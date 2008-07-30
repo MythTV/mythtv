@@ -100,10 +100,11 @@ HTTPRequest::HTTPRequest() : m_eType          ( RequestTypeUnknown ),
                              m_bSOAPRequest   ( false ),
                              m_eResponseType  ( ResponseTypeUnknown),
                              m_nResponseStatus( 200 ),
-                             m_response       ( m_aBuffer, QIODevice::WriteOnly ),
+                             m_response       ( &m_aBuffer,
+                                                QIODevice::WriteOnly ),
                              m_pPostProcess   ( NULL )
 {
-    m_response.setEncoding( Q3TextStream::UnicodeUTF8 );
+    m_response.setEncoding( QTextStream::UnicodeUTF8 );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -121,6 +122,7 @@ void HTTPRequest::Reset()
     m_nResponseStatus= 200;
     m_pPostProcess   = NULL;
 
+    m_response << flush;
     m_aBuffer.truncate( 0 );
 
     m_sRawRequest = QString();
@@ -227,11 +229,12 @@ long HTTPRequest::SendResponse( void )
             break;
     }
 
-     VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse(xml/html) (%1) :%2 -> %3: %4")
-		        .arg(m_sFileName)
-                        .arg(GetResponseStatus())
-                        .arg(GetPeerAddress())
-			.arg(m_eResponseType));
+     VERBOSE(VB_UPNP,QString(
+                 "HTTPRequest::SendResponse(xml/html) (%1) :%2 -> %3: %4")
+             .arg(m_sFileName)
+             .arg(GetResponseStatus())
+             .arg(GetPeerAddress())
+             .arg(m_eResponseType));
 
     // ----------------------------------------------------------------------
     // Make it so the header is sent with the data
@@ -246,9 +249,10 @@ long HTTPRequest::SendResponse( void )
     // Write out Header.
     // ----------------------------------------------------------------------
 
+    m_response << flush;
     QString    rHeader = BuildHeader( m_aBuffer.size() );
     QByteArray sHeader = rHeader.toUtf8();
-    nBytes  = WriteBlockDirect( sHeader.data(), sHeader.length() );
+    nBytes  = WriteBlockDirect( sHeader.constData(), sHeader.length() );
 
     // ----------------------------------------------------------------------
     // Write out Response buffer.
@@ -256,15 +260,15 @@ long HTTPRequest::SendResponse( void )
 
     if (( m_eType != RequestTypeHead ) && ( m_aBuffer.size() > 0 ))
     {
-/*
-        VERBOSE(VB_UPNP,QString("HTTPRequest::SendResponse : DATA : %1 : ").arg( m_aBuffer.size() ));
-
-        for (int i=0; i<m_aBuffer.size(); i++)
-          cout << m_aBuffer.data()[i];
+#if 0
+        VERBOSE(VB_UPNP, QString("HTTPRequest::SendResponse : DATA : %1 : ")
+                .arg( m_aBuffer.size() ));
+        for (uint i = 0; i < (uint)m_aBuffer.size(); i++)
+            cout << m_aBuffer.data()[i];
 
         cout << endl;
-*/
-        nBytes += WriteBlockDirect( m_aBuffer.data(), m_aBuffer.size() );
+#endif
+        nBytes += WriteBlockDirect( m_aBuffer.constData(), m_aBuffer.size() );
     }
 
     // ----------------------------------------------------------------------
@@ -391,7 +395,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
     QString    rHeader = BuildHeader( llSize );
     QByteArray sHeader = rHeader.toUtf8();
-    nBytes = WriteBlockDirect( sHeader.data(), sHeader.length() );
+    nBytes = WriteBlockDirect( sHeader.constData(), sHeader.length() );
 
     // ----------------------------------------------------------------------
     // Write out File.
@@ -1273,7 +1277,8 @@ Q_LONG  BufferedSocketDeviceRequest::ReadBlock( char *pData, Q_ULONG nMaxLen, in
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_LONG BufferedSocketDeviceRequest::WriteBlock( char *pData, Q_ULONG nLen )
+Q_LONG BufferedSocketDeviceRequest::WriteBlock(
+    const char *pData, Q_ULONG nLen)
 {
     if (m_pSocket)
         return( m_pSocket->WriteBlock( pData, nLen ));
@@ -1285,7 +1290,8 @@ Q_LONG BufferedSocketDeviceRequest::WriteBlock( char *pData, Q_ULONG nLen )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_LONG BufferedSocketDeviceRequest::WriteBlockDirect( char *pData, Q_ULONG nLen )
+Q_LONG BufferedSocketDeviceRequest::WriteBlockDirect(
+    const char *pData, Q_ULONG nLen)
 {
     if (m_pSocket)
         return( m_pSocket->WriteBlockDirect( pData, nLen ));

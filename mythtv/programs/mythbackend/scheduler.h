@@ -12,13 +12,13 @@ using namespace std;
 #include <qwaitcondition.h>
 #include <qmap.h> 
 #include <qobject.h>
-#include <Q3ValueList>
 
 // MythTV headers
 #include "scheduledrecording.h"
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "inputgroupmap.h"
+#include "mythdeque.h"
 
 class EncoderLink;
 class MainServer;
@@ -131,7 +131,7 @@ class Scheduler : public QObject
     int FillRecordingDir(ProgramInfo *pginfo, RecList& reclist);
     void FillDirectoryInfoCache(bool force = false);
 
-    Q3ValueList<int> reschedQueue;
+    MythDeque<int> reschedQueue;
     QMutex reschedLock;
     QMutex recordmatchLock;
     QWaitCondition reschedWait;

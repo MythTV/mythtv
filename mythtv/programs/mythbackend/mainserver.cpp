@@ -1,14 +1,19 @@
+#include <list>
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qdatetime.h>
 #include <qfile.h>
 #include <qdir.h>
-#include <q3url.h>
 #include <qthread.h>
 #include <qwaitcondition.h>
 #include <qregexp.h>
 #include <QEvent>
-#include <Q3PtrList>
+#include <QUrl>
+#include <QTcpServer>
 
 #include <cstdlib>
 #include <cerrno>
@@ -24,10 +29,6 @@
 #ifndef USING_MINGW
 #include <sys/ioctl.h>
 #endif
-
-#include <list>
-#include <iostream>
-using namespace std;
 
 #include <sys/stat.h>
 #ifdef __linux__
@@ -45,6 +46,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 #include "mainserver.h"
+#include "server.h"
 #include "scheduler.h"
 #include "backendutil.h"
 #include "programinfo.h"
@@ -191,8 +193,8 @@ MainServer::MainServer(bool master, int port,
 
     masterBackendOverride = gContext->GetNumSetting("MasterBackendOverride", 0);
 
-    mythserver = new MythServer(port);
-    if (!mythserver->ok())
+    mythserver = new MythServer();
+    if (!mythserver->listen(QHostAddress::Any, port))
     {
         VERBOSE(VB_IMPORTANT, QString("Failed to bind port %1. Exiting.")
                 .arg(port));
@@ -227,7 +229,12 @@ MainServer::MainServer(bool master, int port,
 
 MainServer::~MainServer()
 {
-    delete mythserver;
+    if (mythserver)
+    {
+        mythserver->disconnect();
+        mythserver->deleteLater();
+        mythserver = NULL;
+    }
 
     if (masterServerReconnect)
         delete masterServerReconnect;
@@ -820,7 +827,7 @@ void MainServer::customEvent(QEvent *e)
             sendGlobal = true;
         }
 
-        Q3PtrList<PlaybackSock> sentSet;
+        vector<PlaybackSock*> sentSet;
 
         // Make a local copy of the list, upping the refcount as we go..
         vector<PlaybackSock *> localPBSList;
@@ -838,10 +845,12 @@ void MainServer::customEvent(QEvent *e)
         {
             PlaybackSock *pbs = (*iter);
 
-            if (sentSet.containsRef(pbs) || pbs->IsDisconnected())
+            vector<PlaybackSock*>::const_iterator it =
+                find(sentSet.begin(), sentSet.end(), pbs);
+            if (it != sentSet.end() || pbs->IsDisconnected())
                 continue;
 
-            sentSet.append(pbs);
+            sentSet.push_back(pbs);
 
             bool reallysendit = false;
 
@@ -1037,7 +1046,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         VERBOSE(VB_GENERAL, "MainServer::HandleAnnounce FileTransfer");
         VERBOSE(VB_IMPORTANT, QString("adding: %1 as a remote file transfer")
                                .arg(commands[2]));
-        Q3Url qurl = slist[1];
+        QUrl qurl = slist[1];
         QString filename = LocalFilePath(qurl);
 
         FileTransfer *ft = NULL;
@@ -4037,7 +4046,7 @@ void MainServer::deferredDeleteSlot(void)
 {
     QMutexLocker lock(&deferredDeleteLock);
 
-    if (deferredDeleteList.size() == 0)
+    if (deferredDeleteList.empty())
         return;
 
     DeferredDeleteStruct dds = deferredDeleteList.front();
@@ -4045,7 +4054,7 @@ void MainServer::deferredDeleteSlot(void)
     {
         delete dds.sock;
         deferredDeleteList.pop_front();
-        if (deferredDeleteList.size() == 0)
+        if (deferredDeleteList.empty())
             return;
         dds = deferredDeleteList.front();
     }
@@ -4251,52 +4260,43 @@ FileTransfer *MainServer::getFileTransferBySock(MythSocket *sock)
     return retval;
 }
 
-LiveTVChain *MainServer::GetExistingChain(QString id)
+LiveTVChain *MainServer::GetExistingChain(const QString &id)
 {
     QMutexLocker lock(&liveTVChainsLock);
 
-    LiveTVChain *chain;
-
-    Q3PtrListIterator<LiveTVChain> it(liveTVChains);
-    while ((chain = it.current()) != 0)
+    vector<LiveTVChain*>::iterator it = liveTVChains.begin();
+    for (; it != liveTVChains.end(); ++it)
     {
-        ++it;
-        if (chain->GetID() == id)
-            return chain;
+        if ((*it)->GetID() == id)
+            return *it;
     }
 
     return NULL;
 }
 
-LiveTVChain *MainServer::GetExistingChain(MythSocket *sock)
+LiveTVChain *MainServer::GetExistingChain(const MythSocket *sock)
 {
     QMutexLocker lock(&liveTVChainsLock);
 
-    LiveTVChain *chain;
-
-    Q3PtrListIterator<LiveTVChain> it(liveTVChains);
-    while ((chain = it.current()) != 0)
+    vector<LiveTVChain*>::iterator it = liveTVChains.begin();
+    for (; it != liveTVChains.end(); ++it)
     {
-        ++it;
-        if (chain->IsHostSocket(sock))
-            return chain;
+        if ((*it)->IsHostSocket(sock))
+            return *it;
     }
 
     return NULL;
 }
 
-LiveTVChain *MainServer::GetChainWithRecording(ProgramInfo *pginfo)
+LiveTVChain *MainServer::GetChainWithRecording(const ProgramInfo *pginfo)
 {
     QMutexLocker lock(&liveTVChainsLock);
 
-    LiveTVChain *chain;
-
-    Q3PtrListIterator<LiveTVChain> it(liveTVChains);
-    while ((chain = it.current()) != 0)
+    vector<LiveTVChain*>::iterator it = liveTVChains.begin();
+    for (; it != liveTVChains.end(); ++it)
     {
-        ++it;
-        if (chain->ProgramIsAt(pginfo) >= 0)
-            return chain;
+        if ((*it)->ProgramIsAt(pginfo) >= 0)
+            return *it;
     }
 
     return NULL;
@@ -4304,20 +4304,33 @@ LiveTVChain *MainServer::GetChainWithRecording(ProgramInfo *pginfo)
 
 void MainServer::AddToChains(LiveTVChain *chain)
 {
-    liveTVChains.append(chain);
+    QMutexLocker lock(&liveTVChainsLock);
+
+    if (chain)
+        liveTVChains.push_back(chain);
 }
 
 void MainServer::DeleteChain(LiveTVChain *chain)
 {
     QMutexLocker lock(&liveTVChainsLock);
 
-    while (liveTVChains.removeRef(chain))
-        ;
+    if (!chain)
+        return;
+
+    vector<LiveTVChain*> newChains;
+
+    vector<LiveTVChain*>::iterator it = liveTVChains.begin();
+    for (; it != liveTVChains.end(); ++it)
+    {
+        if (*it != chain)
+            newChains.push_back(*it);
+    }
+    liveTVChains = newChains;
 
     delete chain;
 }
 
-QString MainServer::LocalFilePath(Q3Url &url)
+QString MainServer::LocalFilePath(const QUrl &url)
 {
     QString lpath = url.path();
 

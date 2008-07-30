@@ -16,6 +16,7 @@
 #include <cerrno>
 
 #include <qfile.h>
+#include <QTextStream>
 
 int DeviceLocation::g_nAllocated   = 0;       // Debugging only
 
@@ -265,10 +266,10 @@ void UPnpDeviceDesc::SetNumValue( const QDomNode &n, int &nValue )
 QString  UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort )
 {
     QString     sXML;
-    Q3TextStream os( sXML, QIODevice::WriteOnly );
+    QTextStream os( &sXML, QIODevice::WriteOnly );
 
     GetValidXML( sBaseAddress, nPort, os );
-
+    os << flush;
     return( sXML );
 }
     
@@ -276,7 +277,9 @@ QString  UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort, Q3TextStream &os, const QString &sUserAgent )
+void UPnpDeviceDesc::GetValidXML(
+    const QString &sBaseAddress, int nPort,
+    QTextStream &os, const QString &sUserAgent )
 {
 //    os.setEncoding( QTextStream::UnicodeUTF8 );
 
@@ -291,13 +294,14 @@ void UPnpDeviceDesc::GetValidXML( const QString &sBaseAddress, int nPort, Q3Text
     OutputDevice( os, &m_rootDevice, sUserAgent );
 
     os << "</root>\n";
+    os << flush;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::OutputDevice( Q3TextStream &os,
+void UPnpDeviceDesc::OutputDevice( QTextStream &os,
                                    UPnpDevice *pDevice, 
                                    const QString &sUserAgent )
 {
@@ -450,6 +454,7 @@ void UPnpDeviceDesc::OutputDevice( Q3TextStream &os,
     }
 */
     os << "</device>\n";
+    os << flush;
 }
 
 /////////////////////////////////////////////////////////////////////////////

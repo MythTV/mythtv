@@ -16,7 +16,6 @@
 #include <qdom.h>
 #include <Q3PtrList>
 #include <Q3Url>
-#include <Q3TextStream>
 
 #include "upnputil.h"
 #include "refcounted.h"
@@ -28,6 +27,7 @@ class UPnpDeviceDesc;
 class UPnpDevice;
 class UPnpService;
 class UPnpIcon;
+class QTextStream;
 
 /////////////////////////////////////////////////////////////////////////////
 // Typedefs
@@ -140,7 +140,7 @@ class UPnpDeviceDesc
         void     ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice );
         void     ProcessDeviceList ( QDomNode oListNode, UPnpDevice *pDevice );
 
-        void     OutputDevice( Q3TextStream &os,
+        void     OutputDevice( QTextStream &os,
                                UPnpDevice *pDevice, 
                                const QString &sUserAgent = "" );
 
@@ -160,7 +160,7 @@ class UPnpDeviceDesc
         bool     Load       ( const QString &sFileName );
         bool     Load       ( const QDomDocument &xmlDevDesc );
 
-        void     GetValidXML( const QString &sBaseAddress, int nPort, Q3TextStream &os, const QString &sUserAgent = "" );
+        void     GetValidXML( const QString &sBaseAddress, int nPort, QTextStream &os, const QString &sUserAgent = "" );
         QString  GetValidXML( const QString &sBaseAddress, int nPort );
 
         QString  FindDeviceUDN( UPnpDevice *pDevice, QString sST );

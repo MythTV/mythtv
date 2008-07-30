@@ -290,9 +290,9 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 
     int          nCount  = 0;
     QByteArray   aBody;
-    Q3TextStream  tsBody( aBody, QIODevice::WriteOnly );
+    QTextStream  tsBody( &aBody, QIODevice::WriteOnly );
 
-    tsBody.setEncoding( Q3TextStream::UnicodeUTF8 );
+    tsBody.setEncoding( QTextStream::UnicodeUTF8 );
 
     // ----------------------------------------------------------------------
     // Build Body... Only send if there are changes
@@ -304,9 +304,9 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
         // -=>TODO: Need to add support for more than one CallBack URL.
 
         QByteArray  *pBuffer = new QByteArray();    // UPnpEventTask will delete this pointer.
-        Q3TextStream  tsMsg( *pBuffer, QIODevice::WriteOnly );
+        QTextStream  tsMsg( pBuffer, QIODevice::WriteOnly );
 
-        tsMsg.setEncoding( Q3TextStream::UnicodeUTF8 );
+        tsMsg.setEncoding( QTextStream::UnicodeUTF8 );
 
         // ----------------------------------------------------------------------
         // Build Message Header 
@@ -325,7 +325,8 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
         tsMsg << "SID: uuid:" << pInfo->sUUID << "\r\n";
         tsMsg << "SEQ: " << QString::number( pInfo->nKey ) << "\r\n";
         tsMsg << "\r\n";
-        tsMsg.writeRawBytes( aBody.data(), aBody.size() );
+        tsMsg << aBody;
+        tsMsg << flush;
 
         // ------------------------------------------------------------------
         // Add new EventTask to the TaskQueue to do the actual sending.
@@ -353,7 +354,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-int Eventing::BuildNotifyBody( Q3TextStream &ts, TaskTime ttLastNotified )
+int Eventing::BuildNotifyBody( QTextStream &ts, TaskTime ttLastNotified )
 {
     int nCount = 0;
 
@@ -377,6 +378,7 @@ int Eventing::BuildNotifyBody( Q3TextStream &ts, TaskTime ttLastNotified )
     }
 
     ts << "</e:propertyset>" << endl;
+    ts << flush;
 
     return nCount;
 }

@@ -4,7 +4,6 @@
 #include <qregexp.h>
 #include <qstring.h>
 #include <qdatetime.h>
-#include <Q3ValueList>
 
 #include <iostream>
 #include <algorithm>
@@ -1419,14 +1418,17 @@ void Scheduler::getAllScheduled(QStringList &strList)
     }
 }
 
-void Scheduler::Reschedule(int recordid) { 
-    reschedLock.lock(); 
+void Scheduler::Reschedule(int recordid)
+{
+    QMutexLocker locker(&reschedLock);
+
     if (recordid == -1)
         reschedQueue.clear();
-    if (recordid != 0 || !reschedQueue.size())
-        reschedQueue.append(recordid);
+
+    if (recordid != 0 || reschedQueue.empty())
+        reschedQueue.enqueue(recordid);
+
     reschedWait.wakeOne();
-    reschedLock.unlock();
 }
 
 void Scheduler::AddRecording(const ProgramInfo &pi)
@@ -1557,11 +1559,12 @@ void Scheduler::RunScheduler(void)
       else
       {
         reschedLock.lock();
-        if (!reschedQueue.count())
+        if (reschedQueue.empty())
             reschedWait.wait(&reschedLock, 1000);
+        bool queue_empty = reschedQueue.empty();
         reschedLock.unlock();
             
-        if (reschedQueue.count())
+        if (!queue_empty)
         {
             // We might have been inactive for a long time, so make
             // sure our DB connection is fresh before continuing.
@@ -1569,21 +1572,27 @@ void Scheduler::RunScheduler(void)
 
             gettimeofday(&fillstart, NULL);
             QString msg;
-            while (reschedQueue.count())
+
+            reschedLock.lock();
+            while (!reschedQueue.empty())
             {
-                int recordid = reschedQueue.front();
-                reschedQueue.pop_front();
-                msg.sprintf("Reschedule requested for id %d.", recordid);
-                VERBOSE(VB_GENERAL, msg);
+                int recordid = reschedQueue.dequeue();
+                VERBOSE(VB_GENERAL, QString("Reschedule requested for id %1.")
+                        .arg(recordid));
+
                 if (recordid != 0)
                 {
                     if (recordid == -1)
                         reschedQueue.clear();
-                    recordmatchLock.lock();
+
+                    reschedLock.unlock();
+                    QMutexLocker locker(&recordmatchLock);
                     UpdateMatches(recordid);
-                    recordmatchLock.unlock();
+                    reschedLock.lock();
                 }
             }
+            reschedLock.unlock();
+
             gettimeofday(&fillend, NULL);
 
             matchTime = ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
@@ -2130,9 +2139,9 @@ void Scheduler::UpdateManuals(int recordid)
         return;
     }
 
-    Q3ValueList<int> chanidlist;
+    vector<uint> chanidlist;
     while (query.next())
-        chanidlist.append(query.value(0).toInt());
+        chanidlist.push_back(query.value(0).toUInt());
 
     int progcount;
     int skipdays;

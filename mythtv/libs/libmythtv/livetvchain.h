@@ -78,8 +78,8 @@ class MPUBLIC LiveTVChain
 
     // socket stuff
     void SetHostSocket(MythSocket *sock);
-    bool IsHostSocket(MythSocket *sock);
-    int HostSocketCount(void);
+    bool IsHostSocket(const MythSocket *sock) const;
+    uint HostSocketCount(void) const;
     void DelHostSocket(MythSocket *sock);
  
   private:
@@ -104,7 +104,7 @@ class MPUBLIC LiveTVChain
 
     int m_jumppos;
 
-    QMutex m_sockLock;
+    mutable QMutex m_sockLock;
     QList<MythSocket*> m_inUseSocks;
 };
 

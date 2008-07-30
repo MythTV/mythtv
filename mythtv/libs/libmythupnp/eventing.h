@@ -266,7 +266,8 @@ class Eventing : public HttpServerExtension,
 
         virtual void Notify           ( );
         void         NotifySubscriber ( SubscriberInfo *pInfo );
-        int          BuildNotifyBody  ( Q3TextStream &ts, TaskTime ttLastNotified );
+        int          BuildNotifyBody  ( QTextStream &ts,
+                                        TaskTime ttLastNotified );
 
         void         HandleSubscribe  ( HTTPRequest *pRequest ); 
         void         HandleUnsubscribe( HTTPRequest *pRequest ); 

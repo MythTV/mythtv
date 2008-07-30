@@ -11,11 +11,11 @@
 #ifndef MYTHXML_H_
 #define MYTHXML_H_
 
-#include <qdom.h>
-#include <qdatetime.h> 
+#include <QDomDocument>
+#include <QMap>
+#include <QDateTime> 
 
 #include "upnp.h"
-//#include "httpserver.h"
 #include "mainserver.h"
 #include "eventing.h"
 

@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <QList>
 #include <QThread>
+#include <QMutex>
 
 #include "compat.h"   /// for HANDLE
 #include "mythexp.h"

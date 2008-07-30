@@ -538,14 +538,15 @@ void LiveTVChain::SetHostSocket(MythSocket *sock)
         m_inUseSocks.append(sock);
 }
 
-bool LiveTVChain::IsHostSocket(MythSocket *sock)
+bool LiveTVChain::IsHostSocket(const MythSocket *sock) const
 {
     QMutexLocker lock(&m_sockLock);
-    return m_inUseSocks.contains(sock);
+    return m_inUseSocks.contains(const_cast<MythSocket*>(sock));
 }
 
-int LiveTVChain::HostSocketCount(void)
+uint LiveTVChain::HostSocketCount(void) const
 {
+    QMutexLocker lock(&m_sockLock);
     return m_inUseSocks.count();
 }
 

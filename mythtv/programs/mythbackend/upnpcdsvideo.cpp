@@ -4,15 +4,16 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+// POSIX headers
+#include <limits.h>
+
+// Qt headers
+#include <QFileInfo>
+
+// MythTV headers
 #include "upnpcdsvideo.h"
 #include "httprequest.h"
 #include "upnpmedia.h"
-
-#include <qfileinfo.h>
-#include <qregexp.h>
-#include <q3url.h>
-#include <qdir.h>
-#include <limits.h>
 #include "util.h"
 #include "mythcontext.h"
 
