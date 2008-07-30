@@ -15,7 +15,7 @@ using namespace std;
 #include "libmythdb/mythdb.h"
 
 
-#define MINIMUM_DBMS_VERSION 5
+#define MINIMUM_DBMS_VERSION 5,0,15
 
 /// This is the DB schema version expected by the running MythTV instance.
 const QString currentDatabaseVersion = "1222";
