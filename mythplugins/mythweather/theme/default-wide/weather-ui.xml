@@ -22,6 +22,7 @@
         <textarea name="pause_text" from="basetextarea">
             <area>60,181,700,35</area>
             <align>right,top</align>
+            <font>baselarge</font>
         </textarea>
 
         <textarea name="update_text" from="basetextarea">
@@ -116,9 +117,8 @@
         </textarea>
 
         <imagetype name="weather_icon">
-            <position>555,226</position>
+            <area>555,226,200,150</area>
             <filename>unknown.png</filename>
-            <staticsize>200,150</staticsize>
         </imagetype>
 
         <textarea name="observation_time" from="basetextarea">
@@ -140,8 +140,7 @@
 
         <imagetype name="background-0">
             <filename>mw_shading.png</filename>
-            <position>40,220</position>
-            <staticsize>230,305</staticsize>
+            <area>40,220,230,305</area>
         </imagetype>
 
         <imagetype name="background-1" from="background-0">
@@ -159,8 +158,7 @@
         </textarea>
 
         <imagetype name="icon-0">
-            <position>55,235</position>
-            <staticsize>200,150</staticsize>
+            <area>55,235,200,150</area>
         </imagetype>
 
         <textarea name="lolbl0" from="basetextarea">
@@ -244,8 +242,7 @@
 
         <imagetype name="background-0">
             <filename>mw_shading.png</filename>
-            <position>40,135</position>
-            <staticsize>233,190</staticsize>
+            <area>40,135,233,190</area>
         </imagetype>
 
         <imagetype name="background-1" from="background-0">
@@ -285,8 +282,7 @@
         </textarea>
 
         <imagetype name="icon-0">
-            <position>73,165</position>
-            <staticsize>167,125</staticsize>
+            <area>73,165,167,125</area>
         </imagetype>
         <imagetype name="icon-1" from="icon-0">
             <position>316,165</position>
@@ -391,8 +387,7 @@
             <align>allcenter</align>
         </textarea>
         <imagetype name="map">
-            <position>160,225</position>
-            <staticsize>485,300</staticsize>
+            <area>160,225,485,300</area>
         </imagetype>
     </window>
 
@@ -405,8 +400,7 @@
         </textarea>
 
         <imagetype name="animatedimagetype">
-            <position>160,225</position>
-            <staticsize>485,300</staticsize>
+            <area>160,225,485,300</area>
         </imagetype>
     </window>
 
@@ -431,8 +425,7 @@
 
         <imagetype name="background-0">
             <filename>mw_shading.png</filename>
-            <position>40,135</position>
-            <staticsize>233,190</staticsize>
+            <area>40,135,233,190</area>
         </imagetype>
 
         <imagetype name="background-1" from="background-0">
@@ -472,8 +465,7 @@
         </textarea>
 
         <imagetype name="18icon-0">
-            <position>73,165</position>
-            <staticsize>167,125</staticsize>
+            <area>73,165,167,125</area>
         </imagetype>
         <imagetype name="18icon-1" from="18icon-0">
             <position>316,165</position>
@@ -656,9 +648,8 @@
         </buttonlist>
 
         <imagetype name="srclines">
-            <position>315,95</position>
+            <area>315,95,500,370</area>
             <filename>cr-lines.png</filename>
-            <staticsize>500,370</staticsize>
         </imagetype>
 
         <textarea name="updatetxt" from="basetextarea">

@@ -28,8 +28,8 @@
         </textarea>
 
         <imagetype name="boxshot">
-            <position>20,390</position>
-            <staticsize>110,150</staticsize>
+            <area>20,390,110,150</area>
+            <preserveaspect>true</preserveaspect>
         </imagetype>
 
         <imagetype name="background">
@@ -68,8 +68,8 @@
         </textarea>
 
         <imagetype name="boxshot">
-            <position>20,390</position>
-            <staticsize>110,150</staticsize>
+            <area>20,390,110,150</area>
+            <preserveaspect>true</preserveaspect>
         </imagetype>
 
         <imagetype name="background">

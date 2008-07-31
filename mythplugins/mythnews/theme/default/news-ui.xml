@@ -41,19 +41,16 @@
         <imagetype name="enclosures">
             <filename>enclosures.png</filename>
             <position>705,350</position>
-            <staticsize>32,32</staticsize>
         </imagetype>
 
         <imagetype name="download">
             <filename>need-download.png</filename>
             <position>740,350</position>
-            <staticsize>32,32</staticsize>
         </imagetype>
 
         <imagetype name="ispodcast">
             <filename>podcast.png</filename>
             <position>740,350</position>
-            <staticsize>32,32</staticsize>
         </imagetype>
 
     </window>
