@@ -10,6 +10,7 @@
 #include <QKeyEvent>
 
 #include "xmlparsebase.h"
+#include "mythrect.h"
 
 class MythImage;
 class MythPainter;
@@ -137,7 +138,7 @@ class MythUIType : public QObject, public XMLParseBase
 
     int m_focusOrder;
 
-    QRect m_Area;
+    MythRect m_Area;
 
     QRegion m_DirtyRegion;
     bool m_NeedsRedraw;

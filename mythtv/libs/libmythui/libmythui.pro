@@ -15,7 +15,8 @@ LIBS += -L../libmythdb -lmythdb-$$LIBVERSION
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
-HEADERS  = mythmainwindow.h mythpainter.h mythimage.h myththemebase.h
+HEADERS  = mythmainwindow.h mythpainter.h mythimage.h mythrect.h
+HEADERS += myththemebase.h
 HEADERS += mythpainter_qt.h mythmainwindow_internal.h mythuihelper.h
 HEADERS += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h
 HEADERS += mythuitext.h mythuistatetype.h mythgesture.h xmlparsebase.h
@@ -27,7 +28,8 @@ HEADERS += screensaver.h screensaver-null.h mythsystem.h x11colors.h
 HEADERS += themeinfo.h util-x11.h DisplayRes.h DisplayResScreen.h
 HEADERS += mythgenerictree.h
 
-SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp myththemebase.cpp
+SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
+SOURCES += myththemebase.cpp
 SOURCES += mythpainter_qt.cpp xmlparsebase.cpp mythuihelper.cpp
 SOURCES += mythscreenstack.cpp mythscreentype.cpp mythgesture.cpp
 SOURCES += mythuitype.cpp mythuiimage.cpp mythuitext.cpp
@@ -42,7 +44,8 @@ SOURCES += mythgenerictree.cpp
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
 
-inc.files  = mythmainwindow.h mythpainter.h mythimage.h myththemebase.h
+inc.files  = mythrect.h mythmainwindow.h mythpainter.h mythimage.h
+inc.files += myththemebase.h
 inc.files += mythpainter_qt.h mythuistatetype.h mythuihelper.h
 inc.files += mythscreenstack.h mythscreentype.h mythuitype.h mythuiimage.h
 inc.files += mythuitext.h mythuibutton.h mythlistbutton.h xmlparsebase.h
