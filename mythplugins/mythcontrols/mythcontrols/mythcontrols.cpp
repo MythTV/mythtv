@@ -661,7 +661,7 @@ void MythControls::GrabKey(void)
     KeyGrabPopupBox *keyGrabPopup = new KeyGrabPopupBox(popupStack);
 
     if (keyGrabPopup->Create())
-        popupStack->AddScreen(keyGrabPopup);
+        popupStack->AddScreen(keyGrabPopup, false);
 
     connect(keyGrabPopup, SIGNAL(HaveResult(QString)),
             SLOT(AddKeyToAction(QString)), Qt::QueuedConnection);
