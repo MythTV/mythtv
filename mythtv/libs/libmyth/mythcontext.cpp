@@ -834,7 +834,7 @@ void MythContextPrivate::SilenceDBerrors(void)
 {
     // This silences any DB errors from Get*Setting(),
     // (which is the vast majority of them)
-    m_database->IgnoreDatabase(true);
+    //m_database->IgnoreDatabase(true);
 
     // Save the configured hostname, so that we can
     // still display it in the DatabaseSettings screens
@@ -851,7 +851,7 @@ void MythContextPrivate::EnableDBerrors(void)
     m_DBparams.dbHostName = m_DBhostCp;
     m_database->SetDatabaseParams(m_DBparams);
 
-    m_database->IgnoreDatabase(true);
+    //m_database->IgnoreDatabase(false);
 }
 
 
