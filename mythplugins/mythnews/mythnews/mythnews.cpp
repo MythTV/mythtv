@@ -124,7 +124,7 @@ bool MythNews::Create()
     m_podcastImage = dynamic_cast<MythUIImage *> (GetChild("ispodcast"));
 
     if (!m_sitesList || !m_articlesList || !m_enclosureImage ||
-        !m_downloadImage || !m_titleText || !m_descText)
+        !m_downloadImage || !m_podcastImage || !m_titleText || !m_descText)
     {
         VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
         return false;
