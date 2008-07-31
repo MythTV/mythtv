@@ -331,15 +331,10 @@ MSqlQuery::MSqlQuery(const MSqlQueryInfo &qi) : QSqlQuery(QString::null, qi.qsql
 
 MSqlQuery::~MSqlQuery()
 {
-    if (!GetMythDB())
-    {
-        VERBOSE(VB_IMPORTANT, "~MSqlQuery::gContext null");
-        return;
-    }
-
     if (m_returnConnection)
     {
         MDBManager *dbmanager = GetMythDB()->GetDBManager();
+
         if (dbmanager && m_db)
         {
             dbmanager->pushConnection(m_db);
@@ -349,23 +344,17 @@ MSqlQuery::~MSqlQuery()
 
 MSqlQueryInfo MSqlQuery::InitCon()
 {
+    MSqlDatabase *db = GetMythDB()->GetDBManager()->popConnection();
     MSqlQueryInfo qi;
+
     InitMSqlQueryInfo(qi);
 
-    if (GetMythDB())
+    if (db)
     {
-        MSqlDatabase *db = GetMythDB()->GetDBManager()->popConnection();
-        if (db)
-        {
-            qi.db = db;
-            qi.qsqldb = db->db();
+        qi.db = db;
+        qi.qsqldb = db->db();
 
-            db->KickDatabase();
-        } 
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, "MSqlQuery::InitCon gContext null");
+        db->KickDatabase();
     }
 
     return qi;
@@ -373,24 +362,18 @@ MSqlQueryInfo MSqlQuery::InitCon()
 
 MSqlQueryInfo MSqlQuery::SchedCon()
 {
+    MSqlDatabase *db = GetMythDB()->GetDBManager()->getSchedCon();
     MSqlQueryInfo qi;
+
     InitMSqlQueryInfo(qi);
     qi.returnConnection = false;
 
-    if (GetMythDB())
+    if (db)
     {
-        MSqlDatabase *db = GetMythDB()->GetDBManager()->getSchedCon();
-        if (db)
-        {
-            qi.db = db;
-            qi.qsqldb = db->db(); 
+        qi.db = db;
+        qi.qsqldb = db->db(); 
 
-            db->KickDatabase();
-        } 
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, "MSqlQuery::SchedCon gContext null");
+        db->KickDatabase();
     }
 
     return qi;
@@ -398,25 +381,19 @@ MSqlQueryInfo MSqlQuery::SchedCon()
 
 MSqlQueryInfo MSqlQuery::DDCon()
 {
+    MSqlDatabase *db = GetMythDB()->GetDBManager()->getDDCon();
     MSqlQueryInfo qi;
+
     InitMSqlQueryInfo(qi);
     qi.returnConnection = false;
 
-    if (GetMythDB())
+    if (db)
     {
-        MSqlDatabase *db = GetMythDB()->GetDBManager()->getDDCon();
-        if (db)
-        {
-            qi.db = db;
-            qi.qsqldb = db->db(); 
+        qi.db = db;
+        qi.qsqldb = db->db(); 
 
-            db->KickDatabase();
-        } 
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, "MSqlQuery::DDCon gContext null");
-    }
+        db->KickDatabase();
+    } 
 
     return qi;
 }
