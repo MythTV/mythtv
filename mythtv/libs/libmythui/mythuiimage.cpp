@@ -349,11 +349,6 @@ bool MythUIImage::ParseElement(QDomElement &element)
         SetArea(area);
         m_ForceSize = area.size();
     }
-    else if (element.tagName() == "staticsize")
-    {
-        QSize forceSize = parseSize(element);
-        SetSize(forceSize);
-    }
     else if (element.tagName() == "preserveaspect")
         m_preserveAspect = parseBool(element);
     else if (element.tagName() == "crop")
