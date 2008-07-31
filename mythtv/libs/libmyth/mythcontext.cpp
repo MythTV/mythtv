@@ -567,7 +567,7 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
     }
 
     VERBOSE(VB_IMPORTANT, QString("Writing settings file %1").arg(path));
-    Q3TextStream s(f);
+    QTextStream s(f);
     s << "DBHostName=" << params.dbHostName << endl;
 
     s << "\n"
