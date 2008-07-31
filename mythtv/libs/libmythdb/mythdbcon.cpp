@@ -41,9 +41,6 @@ bool MSqlDatabase::isOpen()
 {
     if (m_db.isValid())
     {
-        if (!m_db.hostName().length())   // Bootstrapping without a database?
-            return true;                 // Pretend its open to reduce errors
-
         if (m_db.isOpen())
             return true;
     }
@@ -133,12 +130,6 @@ bool MSqlDatabase::KickDatabase()
     // with no intervention).
     // mdz, 2003/08/11
 
-
-    if (m_db.hostName().isEmpty())  // Bootstrapping without a database?
-    {                                // Pretend we kicked, to reduce errors
-        m_lastDBKick = QDateTime::currentDateTime();
-        return true;
-    }
 
     if (m_lastDBKick.secsTo(QDateTime::currentDateTime()) < 30 && 
         m_db.isOpen())
@@ -318,7 +309,8 @@ void InitMSqlQueryInfo(MSqlQueryInfo &qi)
 }
 
 
-MSqlQuery::MSqlQuery(const MSqlQueryInfo &qi) : QSqlQuery(QString::null, qi.qsqldb)
+MSqlQuery::MSqlQuery(const MSqlQueryInfo &qi)
+         : QSqlQuery(QString::null, qi.qsqldb)
 {
     m_isConnected = false;
     m_db = qi.db;
@@ -348,6 +340,20 @@ MSqlQueryInfo MSqlQuery::InitCon()
     MSqlQueryInfo qi;
 
     InitMSqlQueryInfo(qi);
+
+
+    // Bootstrapping without a database?
+    //if (db->pretendHaveDB)
+    if (db->m_db.hostName().isEmpty())
+    {
+        // Return an invalid database so that QSqlQuery does nothing.
+        // Also works around a Qt4 bug where QSqlQuery::~QSqlQuery
+        // calls QMYSQLResult::cleanup() which uses mysql_next_result()
+
+        GetMythDB()->GetDBManager()->pushConnection(db);
+        qi.returnConnection = false;
+        return qi;
+    }
 
     if (db)
     {
@@ -400,9 +406,6 @@ MSqlQueryInfo MSqlQuery::DDCon()
 
 bool MSqlQuery::exec()
 {
-    if (m_db->m_db.hostName().isEmpty())  // Bootstrapping without a database?
-        return true;                      // Pretend success, to reduce errors
-
     bool result = QSqlQuery::exec();
 
     if (print_verbose_messages & VB_DATABASE)
@@ -428,9 +431,6 @@ bool MSqlQuery::exec()
 
 bool MSqlQuery::exec(const QString &query)
 {
-    if (m_db->m_db.hostName().isEmpty())  // Bootstrapping without a database?
-        return true;                      // Pretend success, to reduce errors
-
     VERBOSE(VB_DATABASE, "MSqlQuery::exec(\"" + query + "\")");
 
     return QSqlQuery::exec(query);
@@ -438,9 +438,6 @@ bool MSqlQuery::exec(const QString &query)
 
 bool MSqlQuery::prepare(const QString& query)
 {
-    if (m_db->m_db.hostName().isEmpty())  // Bootstrapping without a database?
-        return true;                      // Pretend success, to reduce errors
-
     QMutexLocker lock(&prepareLock);
 
     m_last_prepared_query = query;
@@ -463,9 +460,6 @@ bool MSqlQuery::testDBConnection()
 void MSqlQuery::bindValue (const QString  & placeholder,
                            const QVariant & val, QSql::ParamType paramType)
 {
-    if (!m_db->m_db.hostName().length())  // Bootstrapping without a database?
-        return;                           // Pretend we bound, to reduce errors
-
     // XXX - HACK BEGIN
     QMutexLocker lock(&prepareLock);
 
@@ -509,9 +503,6 @@ void MSqlQuery::bindValues(MSqlBindings &bindings)
 
 QVariant MSqlQuery::lastInsertId()
 {
-    if (m_db->m_db.hostName().isEmpty())   // Bootstrapping without a database?
-        return value(0);                   // Pretend success, to reduce errors
-
     return QSqlQuery::lastInsertId();
 }
 

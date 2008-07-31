@@ -567,7 +567,7 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
     }
 
     VERBOSE(VB_IMPORTANT, QString("Writing settings file %1").arg(path));
-    QTextStream s(f);
+    Q3TextStream s(f);
     s << "DBHostName=" << params.dbHostName << endl;
 
     s << "\n"
@@ -832,6 +832,10 @@ QString MythContextPrivate::TestDBconnection(void)
  */
 void MythContextPrivate::SilenceDBerrors(void)
 {
+    // This silences any DB errors from Get*Setting(),
+    // (which is the vast majority of them)
+    m_database->IgnoreDatabase(true);
+
     // Save the configured hostname, so that we can
     // still display it in the DatabaseSettings screens
     if (m_DBparams.dbHostName.length())
@@ -846,6 +850,8 @@ void MythContextPrivate::EnableDBerrors(void)
     // Restore (possibly) blanked hostname
     m_DBparams.dbHostName = m_DBhostCp;
     m_database->SetDatabaseParams(m_DBparams);
+
+    m_database->IgnoreDatabase(true);
 }
 
 
