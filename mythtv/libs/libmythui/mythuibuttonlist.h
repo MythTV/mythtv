@@ -25,8 +25,10 @@ class MythUIButtonListItem
     };
 
     MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,
-                       MythImage *image = 0, bool checkable = false,
-                       CheckState state = CantCheck, bool showArrow = false);
+                         MythImage *image = 0, bool checkable = false,
+                         CheckState state = CantCheck, bool showArrow = false);
+    MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,
+                         QVariant data);
     ~MythUIButtonListItem();
 
     MythUIButtonList *parent() const;
@@ -67,7 +69,6 @@ class MythUIButtonListItem
     bool            m_checkable;
     CheckState      m_state;
     QVariant        m_data;
-    QString         m_stringData;
     bool            m_showArrow;
     bool            m_overrideInactive;
 
@@ -118,8 +119,8 @@ class MythUIButtonList : public MythUIType
     MythUIButtonListItem* GetItemNext(MythUIButtonListItem *item);
     MythUIButtonListItem* GetItemAt(int pos);
 
-    virtual uint ItemWidth(void) const { return m_itemWidth; }
-    virtual uint ItemHeight(void) const { return m_itemHeight; }
+    uint ItemWidth(void) const { return m_itemWidth; }
+    uint ItemHeight(void) const { return m_itemHeight; }
 
     bool MoveItemUpDown(MythUIButtonListItem *item, bool flag);
 
@@ -207,6 +208,7 @@ class MythUIButtonList : public MythUIType
     bool m_drawFromBottom;
 
     friend class MythUIButtonListItem;
+    friend class MythUIButtonTree;
 };
 
 #endif

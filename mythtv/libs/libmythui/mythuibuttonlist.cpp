@@ -1000,11 +1000,29 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
     m_state     = state;
     m_showArrow = showArrow;
     m_data      = 0;
-    m_stringData = "";
     m_overrideInactive = false;
 
     if (state >= NotChecked)
         m_checkable = true;
+
+    m_parent->InsertItem(this);
+}
+
+MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
+                                       const QString& text,
+                                       QVariant data)
+{
+    assert(lbtype);
+
+    m_parent    = lbtype;
+    m_text      = text;
+    m_data      = data;
+
+    m_image     = NULL;
+    m_checkable = false;
+    m_state     = CantCheck;
+    m_showArrow = false;
+    m_overrideInactive = false;
 
     m_parent->InsertItem(this);
 }
