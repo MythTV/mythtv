@@ -19,10 +19,15 @@ class MythRect : public QRect
 
     void setRect(const QString &sX, const QString &sY, const QString &sWidth,
                  const QString &sHeight);
+    void setRect(int X, int Y, int w,int h) { QRect::setRect(X,Y,w,h); }
     void setX(const QString &sX);
+    void setX(int X) { QRect::setX(X); }
     void setY(const QString &sY);
+    void setY(int Y) { QRect::setY(Y); }
     void setWidth(const QString &sWidth);
+    void setWidth(int width) { QRect::setWidth(width); }
     void setHeight(const QString &sHeight);
+    void setHeight(int height) { QRect::setHeight(height); }
 
     QRect toQRect(void);
 
