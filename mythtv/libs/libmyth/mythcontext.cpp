@@ -434,6 +434,7 @@ bool MythContextPrivate::FindDatabase(const bool prompt, const bool noPrompt)
 DBfound:
     //VERBOSE(VB_GENERAL, "FindDatabase() - Success!");
     StoreConnectionInfo();
+    EnableDBerrors();
     ResetDatabase();
     DeleteUPnP();
     return true;
@@ -747,6 +748,8 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
 
 /**
  * Some quick sanity checks before opening a database connection
+ *
+ * \todo  Rationalise the WOL stuff. We should have one method to wake BEs
  */
 QString MythContextPrivate::TestDBconnection(void)
 {
@@ -755,8 +758,6 @@ QString MythContextPrivate::TestDBconnection(void)
     QString host   = m_DBparams.dbHostName;
     int     port   = m_DBparams.dbPort;
 
-    if (m_database->IsDatabaseIgnored())
-        return err;
 
     // 1. Check the supplied host or IP address, to prevent the app
     //    appearing to hang if we cannot route to the machine:
@@ -834,7 +835,7 @@ void MythContextPrivate::SilenceDBerrors(void)
 {
     // This silences any DB errors from Get*Setting(),
     // (which is the vast majority of them)
-    //m_database->IgnoreDatabase(true);
+    m_database->IgnoreDatabase(true);
 
     // Save the configured hostname, so that we can
     // still display it in the DatabaseSettings screens
@@ -848,10 +849,13 @@ void MythContextPrivate::SilenceDBerrors(void)
 void MythContextPrivate::EnableDBerrors(void)
 {
     // Restore (possibly) blanked hostname
-    m_DBparams.dbHostName = m_DBhostCp;
-    m_database->SetDatabaseParams(m_DBparams);
+    if (m_DBparams.dbHostName.isNull() && m_DBhostCp.length())
+    {
+        m_DBparams.dbHostName = m_DBhostCp;
+        m_database->SetDatabaseParams(m_DBparams);
+    }
 
-    //m_database->IgnoreDatabase(false);
+    m_database->IgnoreDatabase(false);
 }
 
 
