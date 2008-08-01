@@ -15,7 +15,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
 
     m_Visible = true;
     m_CanHaveFocus = m_HasFocus = false;
-    m_Area = QRect(0, 0, 0, 0);
+    m_Area = MythRect(0, 0, 0, 0);
     m_NeedsRedraw = false;
     m_Alpha = 255;
     m_AlphaChangeMode = m_AlphaChange = m_AlphaMin = 0;
@@ -179,9 +179,9 @@ void MythUIType::SetRedraw(void)
     m_NeedsRedraw = true;
 
     if (m_DirtyRegion.isEmpty())
-        m_DirtyRegion = QRegion(m_Area);
+        m_DirtyRegion = QRegion(m_Area.toQRect());
     else
-        m_DirtyRegion = m_DirtyRegion.unite(QRegion(m_Area));
+        m_DirtyRegion = m_DirtyRegion.unite(QRegion(m_Area.toQRect()));
 
     if (m_Parent)
         m_Parent->SetChildNeedsRedraw(this);
@@ -195,7 +195,7 @@ void MythUIType::SetChildNeedsRedraw(MythUIType *child)
 
     childRegion.translate(m_Area.x(), m_Area.y());
 
-    childRegion = childRegion.intersect(m_Area);
+    childRegion = childRegion.intersect(m_Area.toQRect());
 
     m_NeedsRedraw = true;
 
@@ -227,7 +227,7 @@ void MythUIType::HandleMovementPulse(void)
         return;
 
     QPoint curXY = m_Area.topLeft();
-    m_DirtyRegion = m_Area;
+    m_DirtyRegion = m_Area.toQRect();
 
     int xdir = m_XYDestination.x() - curXY.x();
     int ydir = m_XYDestination.y() - curXY.y();
@@ -318,7 +318,7 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
     if (!m_Visible)
         return;
 
-    QRect realArea = m_Area;
+    QRect realArea = m_Area.toQRect();
     realArea.translate(xoffset, yoffset);
 
     if (!realArea.intersects(clipRect))
@@ -344,7 +344,7 @@ void MythUIType::SetPosition(const QPoint &pos)
     if (m_Area.topLeft() == pos)
         return;
 
-    m_DirtyRegion = QRegion(m_Area);
+    m_DirtyRegion = QRegion(m_Area.toQRect());
 
     m_Area.moveTopLeft(pos);
     SetRedraw();
@@ -360,31 +360,40 @@ void MythUIType::SetSize(const QSize &size)
     if (size == m_Area.size())
         return;
 
-    m_DirtyRegion = QRegion(m_Area);
+    m_DirtyRegion = QRegion(m_Area.toQRect());
 
     m_Area.setSize(size);
+    if (m_Parent)
+        m_Area.CalculateArea(m_Parent->GetArea());
+    else
+        m_Area.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
 
     if (m_Parent)
-        m_Parent->ExpandArea(m_Area);
+        m_Parent->ExpandArea(m_Area.toQRect());
 
     SetRedraw();
 }
 
-void MythUIType::SetArea(const QRect &rect)
+void MythUIType::SetArea(const MythRect &rect)
 {
     if (rect == m_Area)
         return;
 
-    m_DirtyRegion = QRegion(m_Area);
+    m_DirtyRegion = QRegion(m_Area.toQRect());
+
+    m_Area = rect;
+    if (m_Parent)
+        m_Area.CalculateArea(m_Parent->GetArea());
+    else
+        m_Area.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
 
     if (m_Parent)
         m_Parent->ExpandArea(rect);
 
-    m_Area = rect;
     SetRedraw();
 }
 
-void MythUIType::ExpandArea(const QRect &rect)
+void MythUIType::ExpandArea(const MythRect &rect)
 {
     QSize childSize = rect.size();
     QSize size = m_Area.size();
@@ -395,7 +404,7 @@ void MythUIType::ExpandArea(const QRect &rect)
     SetSize(size.expandedTo(childSize));
 }
 
-QRect MythUIType::GetArea(void) const
+MythRect MythUIType::GetArea(void) const
 {
     return m_Area;
 }
@@ -589,7 +598,7 @@ QFont MythUIType::CreateQFont(const QString &face, int pointSize,
     return GetMythMainWindow()->CreateQFont(face, pointSize, weight, italic);
 }
 
-QRect MythUIType::NormRect(const QRect &rect)
+MythRect MythUIType::NormRect(const MythRect &rect)
 {
     return GetMythMainWindow()->NormRect(rect);
 }
@@ -694,7 +703,7 @@ void MythUIType::Rescale(const float hscale, const float vscale)
     int x = m_Area.x() * vscale;
     int y = m_Area.y() * hscale;
 
-    SetArea(QRect(x,y,width,height));
+    SetArea(MythRect(x,y,width,height));
 
     QVector<MythUIType*>::iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)

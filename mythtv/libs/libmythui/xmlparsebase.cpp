@@ -17,6 +17,7 @@
 #include "mythuiclock.h"
 #include "mythlistbutton.h"
 #include "mythuibuttonlist.h"
+#include "mythuibuttontree.h"
 #include "mythuibutton.h"
 #include "mythuispinbox.h"
 #include "mythuicheckbox.h"
@@ -92,20 +93,22 @@ QSize XMLParseBase::parseSize(QDomElement &element, bool normalize)
     return parseSize(getFirstText(element), normalize);
 }
 
-QRect XMLParseBase::parseRect(const QString &text, bool normalize)
+MythRect XMLParseBase::parseRect(const QString &text, bool normalize)
 {
-    int x, y, w, h;
-    QRect retval;
-    if (sscanf(text.toAscii().constData(), "%d,%d,%d,%d", &x, &y, &w, &h) == 4)
-        retval = QRect(x, y, w, h);
+    MythRect retval;
+    QStringList values = text.split(',', QString::SkipEmptyParts);
+    if (values.size() == 4)
+    {
+        retval = MythRect(values[0], values[1], values[2], values[3]);
+    }
 
-    if (normalize)
+    if (normalize && retval.isValid())
         retval = GetMythMainWindow()->NormRect(retval);
 
     return retval;
 }
 
-QRect XMLParseBase::parseRect(QDomElement &element, bool normalize)
+MythRect XMLParseBase::parseRect(QDomElement &element, bool normalize)
 {
     return parseRect(getFirstText(element), normalize);
 }
@@ -208,6 +211,7 @@ void XMLParseBase::ParseChildren(QDomElement &element,
                      type == "button" ||
                      type == "buttonlist" ||
                      type == "buttonlist2" ||
+                     type == "buttontree" ||
                      type == "spinbox" ||
                      type == "checkbox" ||
                      type == "statetype" ||
@@ -287,6 +291,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         uitype = new MythListButton(parent, name);
     else if (type == "buttonlist2")
         uitype = new MythUIButtonList(parent, name);
+    else if (type == "buttontree")
+        uitype = new MythUIButtonTree(parent, name);
     else if (type == "spinbox")
         uitype = new MythUISpinBox(parent, name);
     else if (type == "checkbox")
@@ -364,6 +370,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                      info.tagName() == "button" ||
                      info.tagName() == "buttonlist" ||
                      info.tagName() == "buttonlist2" ||
+                     info.tagName() == "buttontree" ||
                      info.tagName() == "spinbox" ||
                      info.tagName() == "checkbox" ||
                      info.tagName() == "statetype" ||
@@ -476,6 +483,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                          type == "button" ||
                          type == "buttonlist" ||
                          type == "buttonlist2" ||
+                         type == "buttontree" ||
                          type == "spinbox" ||
                          type == "checkbox" ||
                          type == "statetype" ||

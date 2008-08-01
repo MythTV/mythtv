@@ -10,19 +10,21 @@ class MythRect : public QRect
   public:
     MythRect();
     MythRect(int x, int y, int width, int height);
-    MythRect(QString sX, QString sY, QString sWidth, QString sHeight);
+    MythRect(const QString &sX, const QString &sY, const QString &sWidth,
+             const QString &sHeight);
     MythRect(QRect rect);
 
-    void Init();
+    void Init(void);
     void CalculateArea(MythRect parentArea);
 
-    void setRect(QString sX, QString sY, QString sWidth, QString sHeight);
-    void setX(QString sX);
-    void setY(QString sY);
-    void setWidth(QString sWidth);
-    void setHeight(QString sHeight);
+    void setRect(const QString &sX, const QString &sY, const QString &sWidth,
+                 const QString &sHeight);
+    void setX(const QString &sX);
+    void setY(const QString &sY);
+    void setWidth(const QString &sWidth);
+    void setHeight(const QString &sHeight);
 
-    QRect toQRect();
+    QRect toQRect(void);
 
   private:
     float m_percentWidth;

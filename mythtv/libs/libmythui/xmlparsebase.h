@@ -3,8 +3,9 @@
 
 #include <QDomElement>
 #include <QPoint>
-#include <QRect>
 #include <QString>
+
+#include "mythrect.h"
 
 class MythUIType;
 class MythScreenType;
@@ -19,8 +20,8 @@ class XMLParseBase
     static QPoint parsePoint(QDomElement &element, bool normalize = true);
     static QSize parseSize(const QString &text, bool normalize = true);
     static QSize parseSize(QDomElement &element, bool normalize = true);
-    static QRect parseRect(const QString &text, bool normalize = true);
-    static QRect parseRect(QDomElement &element, bool normalize = true);
+    static MythRect parseRect(const QString &text, bool normalize = true);
+    static MythRect parseRect(QDomElement &element, bool normalize = true);
     static int parseAlignment(const QString &text);
     static int parseAlignment(QDomElement &element);
 
@@ -34,13 +35,13 @@ class XMLParseBase
                                    MythUIType *parent,
                                    MythScreenType *screen = NULL);
 
-    static bool LoadWindowFromXML(const QString &xmlfile, 
+    static bool LoadWindowFromXML(const QString &xmlfile,
                                   const QString &windowname,
                                   MythUIType *parent);
 
     static bool LoadBaseTheme(void);
 
-    static bool CopyWindowFromBase(const QString &windowname, 
+    static bool CopyWindowFromBase(const QString &windowname,
                                    MythScreenType *win);
 
   private:

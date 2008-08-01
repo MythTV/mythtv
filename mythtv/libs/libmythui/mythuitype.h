@@ -59,9 +59,9 @@ class MythUIType : public QObject, public XMLParseBase
     virtual void SetPosition(const QPoint &pos);
     virtual QPoint GetPosition(void) const;
     virtual void SetSize(const QSize &size);
-    virtual void SetArea(const QRect &rect);
-    virtual QRect GetArea(void) const;
-    void ExpandArea(const QRect &rect);
+    virtual void SetArea(const MythRect &rect);
+    virtual MythRect GetArea(void) const;
+    void ExpandArea(const MythRect &rect);
     virtual void Rescale(const float hscale, const float vscale);
 
     virtual QRegion GetDirtyArea(void) const;
@@ -120,7 +120,7 @@ class MythUIType : public QObject, public XMLParseBase
 
     QFont CreateQFont(const QString &face, int pointSize = 12,
                       int weight = QFont::Normal, bool italic = FALSE);
-    QRect NormRect(const QRect &rect);
+    MythRect NormRect(const MythRect &rect);
     QPoint NormPoint(const QPoint &point);
     int NormX(const int width);
     int NormY(const int height);

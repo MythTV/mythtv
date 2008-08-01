@@ -13,7 +13,8 @@ MythRect::MythRect(int x, int y, int width, int height)
     Init();
 }
 
-MythRect::MythRect(QString sX, QString sY, QString sWidth, QString sHeight)
+MythRect::MythRect(const QString &sX, const QString &sY, const QString &sWidth,
+                   const QString &sHeight)
          : QRect()
 {
     Init();
@@ -56,7 +57,8 @@ void MythRect::CalculateArea(MythRect parentArea)
     QRect::setRect(X,Y,w,h);
 }
 
-void MythRect::setRect(QString sX, QString sY, QString sWidth, QString sHeight)
+void MythRect::setRect(const QString &sX, const QString &sY, const QString &sWidth,
+                       const QString &sHeight)
 {
     setX(sX);
     setY(sY);
@@ -64,49 +66,53 @@ void MythRect::setRect(QString sX, QString sY, QString sWidth, QString sHeight)
     setHeight(sHeight);
 }
 
-void MythRect::setX(QString sX)
+void MythRect::setX(const QString &sX)
 {
-    if (sX.endsWith("%"))
+    QString X = sX;
+    if (X.endsWith("%"))
     {
-        sX.chop(1);
-        m_percentX = (sX.toInt()) / 100;
+        X.chop(1);
+        m_percentX = (X.toInt()) / 100;
     }
     else
-        QRect::setX(sX.toInt());
+        QRect::setX(X.toInt());
 }
 
-void MythRect::setY(QString sY)
+void MythRect::setY(const QString &sY)
 {
-    if (sY.endsWith("%"))
+    QString Y = sY;
+    if (Y.endsWith("%"))
     {
-        sY.chop(1);
-        m_percentY = (sY.toInt()) / 100;
+        Y.chop(1);
+        m_percentY = (Y.toInt()) / 100;
     }
     else
-        QRect::setY(sY.toInt());
+        QRect::setY(Y.toInt());
 }
 
 
-void MythRect::setWidth(QString sWidth)
+void MythRect::setWidth(const QString &sWidth)
 {
-    if (sWidth.endsWith("%"))
+    QString width = sWidth;
+    if (width.endsWith("%"))
     {
-        sWidth.chop(1);
-        m_percentWidth = (sWidth.toInt()) / 100;
+        width.chop(1);
+        m_percentWidth = (width.toInt()) / 100;
     }
     else
-        QRect::setWidth(sWidth.toInt());
+        QRect::setWidth(width.toInt());
 }
 
-void MythRect::setHeight(QString sHeight)
+void MythRect::setHeight(const QString &sHeight)
 {
-    if (sHeight.endsWith("%"))
+    QString height = sHeight;
+    if (height.endsWith("%"))
     {
-        sHeight.chop(1);
-        m_percentHeight = (sHeight.toInt()) / 100;
+        height.chop(1);
+        m_percentHeight = (height.toInt()) / 100;
     }
     else
-        QRect::setHeight(sHeight.toInt());
+        QRect::setHeight(height.toInt());
 }
 
 QRect MythRect::toQRect()
