@@ -64,7 +64,7 @@ void MythUIImage::Clear(void)
 
 void MythUIImage::Init(void)
 {
-    m_cropRect = QRect(0,0,0,0);
+    m_cropRect = MythRect(0,0,0,0);
     m_ForceSize = QSize(0,0);
 
     m_CurPos = 0;
@@ -208,7 +208,12 @@ void MythUIImage::SetSize(const QSize &size)
 
 void MythUIImage::SetCropRect(int x, int y, int width, int height)
 {
-    m_cropRect = QRect(x, y, width, height);
+    SetCropRect(MythRect(x, y, width, height));
+}
+
+void MythUIImage::SetCropRect(const MythRect &rect)
+{
+    m_cropRect = rect;
     SetRedraw();
 }
 
@@ -302,14 +307,15 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         if (m_CurPos > (uint)m_Images.size())
             m_CurPos = 0;
 
-        QRect area = m_Area;
+        QRect area = m_Area.toQRect();
         area.translate(xoffset, yoffset);
 
         int alpha = CalcAlpha(alphaMod);
 
         QRect srcRect;
+        m_cropRect.CalculateArea(m_Area);
         if (!m_cropRect.isEmpty())
-            srcRect = m_cropRect;
+            srcRect = m_cropRect.toQRect();
         else
             srcRect = m_Images[m_CurPos]->rect();
 
@@ -345,9 +351,8 @@ bool MythUIImage::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "area")
     {
-        QRect area = parseRect(element);
-        SetArea(area);
-        m_ForceSize = area.size();
+        SetArea(parseRect(element));
+        m_ForceSize = m_Area.size();
     }
     else if (element.tagName() == "preserveaspect")
         m_preserveAspect = parseBool(element);

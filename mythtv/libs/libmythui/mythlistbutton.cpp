@@ -1023,7 +1023,7 @@ void MythListButton::CalculateVisibleItems(void)
 bool MythListButton::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "area")
-        m_Area = parseRect(element);
+        SetArea(parseRect(element));
     else if (element.tagName() == "layout")
     {
         QString layout = getFirstText(element).toLower();

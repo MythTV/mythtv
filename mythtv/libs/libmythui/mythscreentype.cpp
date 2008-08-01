@@ -224,7 +224,7 @@ bool MythScreenType::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "area")
     {
-        m_Area = parseRect(element);
+        SetArea(parseRect(element));
         QRect screenArea = GetMythMainWindow()->GetUIScreenRect();
         if (m_Area.width() < screenArea.width() ||
             m_Area.height() < screenArea.height())

@@ -83,7 +83,7 @@ bool MythUITextEdit::ParseElement(QDomElement &element)
 
     if (element.tagName() == "area")
     {
-        m_Area = parseRect(element);
+        SetArea(parseRect(element));
         SetTextRect(m_Area);
     }
     else if (element.tagName() == "font")
