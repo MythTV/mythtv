@@ -813,6 +813,9 @@ QString MythContextPrivate::TestDBconnection(void)
 
     // 3. Finally, try to login, et c:
 
+    // Current DB connection may have been silenced (invalid):
+    ResetDatabase();
+
     if (!MSqlQuery::testDBConnection())
     {
         SilenceDBerrors();
@@ -873,6 +876,7 @@ void MythContextPrivate::EnableDBerrors(void)
 void MythContextPrivate::ResetDatabase(void)
 {
     m_database->GetDBManager()->CloseDatabases();
+    m_database->SetDatabaseParams(m_DBparams);
     parent->ClearSettingsCache();
 }
 
