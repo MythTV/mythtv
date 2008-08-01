@@ -32,9 +32,9 @@ class MythUIText : public MythUIType
     int GetJustification(void);
     void SetCutDown(bool cut);
 
-    void SetArea(const QRect &rect);
+    void SetArea(const MythRect &rect);
     void SetPosition(const QPoint &pos);
-    QRect GetDrawRect(void) { return m_drawRect; }
+    MythRect GetDrawRect(void) { return m_drawRect; }
     void SetStartPosition(const int x, const int y);
     void MoveStartPosition(const int x, const int y);
 
@@ -53,9 +53,9 @@ class MythUIText : public MythUIType
     virtual void Finalize(void);
 
     int m_Justification;
-    QRect m_OrigDisplayRect;
-    QRect m_AltDisplayRect;
-    QRect m_drawRect;
+    MythRect m_OrigDisplayRect;
+    MythRect m_AltDisplayRect;
+    MythRect m_drawRect;
 
     QString m_Message;
     QString m_CutMessage;

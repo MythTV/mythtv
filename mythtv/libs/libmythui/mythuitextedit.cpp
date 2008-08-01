@@ -18,8 +18,6 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name,
     m_Message = "";
     m_Filter = FilterNone;
 
-    m_Area = QRect();
-
     m_Justification = (Qt::AlignLeft | Qt::AlignTop);
 
     m_showCursor = false;
@@ -220,16 +218,16 @@ void MythUITextEdit::SetPaddingMargin(const int margin)
     m_cursorImage->SetPosition(margin,margin);
 }
 
-void MythUITextEdit::SetTextRect(const QRect area)
+void MythUITextEdit::SetTextRect(const MythRect &area)
 {
-    QRect textrect;
+    MythRect textrect;
 
     if (area.isNull() || area.isEmpty())
         textrect = m_Area;
     else
         textrect = area;
 
-    textrect = QRect( m_PaddingMargin,
+    textrect = MythRect( m_PaddingMargin,
                       m_PaddingMargin,
                       textrect.width() - m_PaddingMargin * 2,
                       textrect.height() - m_PaddingMargin * 2);
@@ -296,8 +294,8 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
 
     int cursorPos = m_cursorImage->GetArea().x();
     int cursorWidth = m_cursorImage->GetArea().width();
-    QRect textRect = m_Text->GetArea();
-    QRect drawRect = m_Text->GetDrawRect();
+    MythRect textRect = m_Text->GetArea();
+    MythRect drawRect = m_Text->GetDrawRect();
     int newcursorPos = 0;
     QSize size;
 
