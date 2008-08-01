@@ -101,8 +101,8 @@ MythRect XMLParseBase::parseRect(const QString &text, bool normalize)
         retval = MythRect(values[0], values[1], values[2], values[3]);
     }
 
-    if (normalize && retval.isValid())
-        retval = GetMythMainWindow()->NormRect(retval);
+     if (normalize && retval.isValid())
+         retval.NormRect();
 
     return retval;
 }
@@ -210,6 +210,7 @@ void XMLParseBase::ParseChildren(QDomElement &element,
                      type == "button" ||
                      type == "buttonlist" ||
                      type == "buttonlist2" ||
+                     type == "buttontree" ||
                      type == "spinbox" ||
                      type == "checkbox" ||
                      type == "statetype" ||
@@ -366,6 +367,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                      info.tagName() == "button" ||
                      info.tagName() == "buttonlist" ||
                      info.tagName() == "buttonlist2" ||
+                     info.tagName() == "buttontree" ||
                      info.tagName() == "spinbox" ||
                      info.tagName() == "checkbox" ||
                      info.tagName() == "statetype" ||
@@ -478,6 +480,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                          type == "button" ||
                          type == "buttonlist" ||
                          type == "buttonlist2" ||
+                         type == "buttontree" ||
                          type == "spinbox" ||
                          type == "checkbox" ||
                          type == "statetype" ||

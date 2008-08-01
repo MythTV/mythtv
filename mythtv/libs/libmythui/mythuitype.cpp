@@ -1,4 +1,3 @@
-#include <iostream>
 
 using namespace std;
 
@@ -596,11 +595,6 @@ QFont MythUIType::CreateQFont(const QString &face, int pointSize,
                               int weight, bool italic)
 {
     return GetMythMainWindow()->CreateQFont(face, pointSize, weight, italic);
-}
-
-MythRect MythUIType::NormRect(const MythRect &rect)
-{
-    return GetMythMainWindow()->NormRect(rect);
 }
 
 QPoint MythUIType::NormPoint(const QPoint &point)

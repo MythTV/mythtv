@@ -120,7 +120,6 @@ class MythUIType : public QObject, public XMLParseBase
 
     QFont CreateQFont(const QString &face, int pointSize = 12,
                       int weight = QFont::Normal, bool italic = FALSE);
-    MythRect NormRect(const MythRect &rect);
     QPoint NormPoint(const QPoint &point);
     int NormX(const int width);
     int NormY(const int height);

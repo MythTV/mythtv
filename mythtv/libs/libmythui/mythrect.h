@@ -14,8 +14,13 @@ class MythRect : public QRect
              const QString &sHeight);
     MythRect(QRect rect);
 
+    MythRect(const MythRect &rect);
+    MythRect& operator=(const MythRect& rect);
+
     void Init(void);
     void CalculateArea(MythRect parentArea);
+
+    void NormRect(void);
 
     void setRect(const QString &sX, const QString &sY, const QString &sWidth,
                  const QString &sHeight);
@@ -36,6 +41,8 @@ class MythRect : public QRect
     float m_percentHeight;
     float m_percentX;
     float m_percentY;
+
+    bool m_needsUpdate;
 };
 
 #endif
