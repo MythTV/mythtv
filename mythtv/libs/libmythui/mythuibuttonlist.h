@@ -174,7 +174,7 @@ class MythUIButtonList : public MythUIType
     LayoutType m_layout;
     ScrollStyle m_scrollStyle;
 
-    QRect m_contentsRect;
+    MythRect m_contentsRect;
 
     int m_itemWidth;
     int m_itemHeight;

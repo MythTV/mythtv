@@ -41,7 +41,7 @@ MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name,
 
 void MythUIButtonList::Const(void)
 {
-    m_contentsRect = QRect(0,0,0,0);
+    m_contentsRect = MythRect(0,0,0,0);
 
     m_layout      = LayoutVertical;
     m_scrollStyle = ScrollFree;
@@ -649,6 +649,8 @@ void MythUIButtonList::Init()
                                       .arg(objectName()));
         return;
     }
+
+    m_contentsRect.CalculateArea(m_Area);
 
     buttontemplate->SetVisible(false);
     QRect buttonItemArea = buttontemplate->GetArea();

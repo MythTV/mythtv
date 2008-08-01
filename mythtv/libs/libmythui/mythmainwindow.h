@@ -42,7 +42,7 @@ class MythMainWindow : public QWidget
     MythScreenStack *GetMainStack();
     MythScreenStack *GetStack(const QString &stackname);
 
-    bool TranslateKeyPress(const QString &context, QKeyEvent *e, 
+    bool TranslateKeyPress(const QString &context, QKeyEvent *e,
                            QStringList &actions, bool allowJumps = true);
 
     void ClearKey(const QString &context, const QString &action);
@@ -65,8 +65,8 @@ class MythMainWindow : public QWidget
     void RegisterMediaPlugin(const QString &name, const QString &desc,
                              MediaPlayCallback fn);
 
-    bool HandleMedia(QString& handler, const QString& mrl, 
-                     const QString& plot="", const QString& title="", 
+    bool HandleMedia(QString& handler, const QString& mrl,
+                     const QString& plot="", const QString& title="",
                      const QString& director="", int lenMins=120,
                      const QString& year="1895");
 
@@ -92,13 +92,13 @@ class MythMainWindow : public QWidget
     int NormalizeFontSize(int pointSize);
     QFont CreateQFont(const QString &face, int pointSize = 12,
                       int weight = QFont::Normal, bool italic = FALSE);
-    QRect NormRect(const QRect &rect);
+    MythRect NormRect(const MythRect &rect);
     QPoint NormPoint(const QPoint &point);
     QSize NormSize(const QSize &size);
     int NormX(const int x);
     int NormY(const int y);
     int fonTweak;
- 
+
     /* compatability functions, to go away once everything's mythui */
     void attach(QWidget *child);
     void detach(QWidget *child);
@@ -124,7 +124,7 @@ class MythMainWindow : public QWidget
 #ifdef USING_APPLEREMOTE
     bool event(QEvent* e);
 #endif
-    
+
     void ExitToMainMenu();
 
     QObject *getTarget(QKeyEvent &key);
