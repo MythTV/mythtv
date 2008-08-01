@@ -11,8 +11,7 @@
 #ifndef HTTPREQUEST_H_
 #define HTTPREQUEST_H_
 
-#include <iostream>
-#include <q3ptrlist.h>
+#include <QRegExp>
 #include <QTextStream>
 
 using namespace std;
@@ -90,7 +89,8 @@ class HTTPRequest
 
         static const char  *m_szServerHeaders;
 
-
+        QRegExp             m_procReqLineExp;
+        QRegExp             m_parseRangeExp;
         QByteArray          m_aBuffer;
 
 
@@ -167,13 +167,11 @@ class HTTPRequest
                                               const QString &sFaultString, 
                                               const QString &sDetails );
 
-        void            FormatActionResponse( NameValueList *pArgs );
+        void            FormatActionResponse( const NameValues &pArgs );
         void            FormatFileResponse ( const QString &sFileName );
 
         long            SendResponse    ( void );
         long            SendResponseFile( QString sFileName );
-
-        static QString &Encode          ( QString &sStr );
 
         QString         GetHeaderValue  ( const QString &sKey, QString sDefault );
 
@@ -182,18 +180,19 @@ class HTTPRequest
         static QString  GetMimeType     ( const QString &sFileExtension );
         static QString  TestMimeType    ( const QString &sFileName );
         static long     GetParameters   ( QString  sParams, QStringMap &mapParams );
+        static QString  Encode          ( const QString &sIn );
 
         // ------------------------------------------------------------------
 
-        virtual Q_LONG  BytesAvailable  () = 0;
-        virtual Q_ULONG WaitForMore     ( int msecs, bool *timeout = NULL ) = 0;
+        virtual qlonglong  BytesAvailable  () = 0;
+        virtual qulonglong WaitForMore     ( int msecs, bool *timeout = NULL ) = 0;
         virtual bool    CanReadLine     () = 0;
         virtual QString ReadLine        ( int msecs = 0 ) = 0;
-        virtual Q_LONG  ReadBlock       ( char *pData, Q_ULONG nMaxLen, int msecs = 0 ) = 0;
-        virtual Q_LONG  WriteBlock      ( const char *pData,
-                                          Q_ULONG nLen    ) = 0;
-        virtual Q_LONG  WriteBlockDirect( const char *pData,
-                                          Q_ULONG nLen    ) = 0;
+        virtual qlonglong  ReadBlock       ( char *pData, qulonglong nMaxLen, int msecs = 0 ) = 0;
+        virtual qlonglong  WriteBlock      ( const char *pData,
+                                          qulonglong nLen    ) = 0;
+        virtual qlonglong  WriteBlockDirect( const char *pData,
+                                          qulonglong nLen    ) = 0;
         virtual QString GetHostAddress  () = 0;
         virtual QString GetPeerAddress  () = 0;
         virtual void    Flush           () = 0;
@@ -218,13 +217,13 @@ class BufferedSocketDeviceRequest : public HTTPRequest
                  BufferedSocketDeviceRequest( BufferedSocketDevice *pSocket );
         virtual ~BufferedSocketDeviceRequest() {};
 
-        virtual Q_LONG  BytesAvailable  ();
-        virtual Q_ULONG WaitForMore     ( int msecs, bool *timeout = NULL );
+        virtual qlonglong  BytesAvailable  ();
+        virtual qulonglong WaitForMore     ( int msecs, bool *timeout = NULL );
         virtual bool    CanReadLine     ();
         virtual QString ReadLine        ( int msecs = 0 );
-        virtual Q_LONG  ReadBlock       ( char *pData, Q_ULONG nMaxLen, int msecs = 0  );
-        virtual Q_LONG  WriteBlock      ( const char *pData, Q_ULONG nLen    );
-        virtual Q_LONG  WriteBlockDirect( const char *pData, Q_ULONG nLen    );
+        virtual qlonglong  ReadBlock       ( char *pData, qulonglong nMaxLen, int msecs = 0  );
+        virtual qlonglong  WriteBlock      ( const char *pData, qulonglong nLen    );
+        virtual qlonglong  WriteBlockDirect( const char *pData, qulonglong nLen    );
         virtual QString GetHostAddress  ();
         virtual QString GetPeerAddress  ();
         virtual void    Flush           () { m_pSocket->Flush(); }

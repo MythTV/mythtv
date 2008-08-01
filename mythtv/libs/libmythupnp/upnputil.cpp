@@ -36,7 +36,7 @@
 
 QString LookupUDN( QString sDeviceType )
 {
-    QStringList sList = QStringList::split( ":", sDeviceType );
+    QStringList sList = sDeviceType.split(":", QString::SkipEmptyParts);
     QString     sLoc  = "LookupUDN(" + sDeviceType + ")";
     QString     sName;
     QString     sUDN;
@@ -129,7 +129,7 @@ long GetIPAddressList( QStringList &sStrList )
 
     sStrList.clear();
 
-    Q3SocketDevice socket( Q3SocketDevice::Datagram );
+    MSocketDevice socket( MSocketDevice::Datagram );
 
     struct ifreq  ifReqs[ 16 ];
     struct ifreq  ifReq;

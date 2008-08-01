@@ -11,13 +11,12 @@
 #ifndef __SSDP_H__
 #define __SSDP_H__
 
-#include <qthread.h>
-#include <q3socketdevice.h>
-#include <qfile.h>
+#include <QThread>
+#include <QFile>
 
 #include "httpserver.h"
 #include "taskqueue.h"
-
+#include "msocketdevice.h"
 #include "ssdpcache.h"
 #include "upnptasknotify.h"
 
@@ -54,13 +53,14 @@ typedef enum
 #define SocketIdx_Multicast  1
 #define SocketIdx_Broadcast  2
 
-#define NumberOfSockets     (sizeof( m_Sockets ) / sizeof( Q3SocketDevice * ))
+#define NumberOfSockets     (sizeof( m_Sockets ) / sizeof( MSocketDevice * ))
 
 class SSDP : public QThread
 {
     private:
 
-        Q3SocketDevice      *m_Sockets[3];
+        QRegExp             m_procReqLineExp;
+        MSocketDevice      *m_Sockets[3];
 
         int                 m_nPort;
         int                 m_nSearchPort;
@@ -75,7 +75,7 @@ class SSDP : public QThread
 
         bool    ProcessSearchRequest ( const QStringMap &sHeaders,
                                        QHostAddress  peerAddress,
-                                       Q_UINT16      peerPort );
+                                       quint16       peerPort );
         bool    ProcessSearchResponse( const QStringMap &sHeaders );
         bool    ProcessNotify        ( const QStringMap &sHeaders );
 
@@ -85,7 +85,7 @@ class SSDP : public QThread
                                     const QString    &sKey, 
                                     const QString    &sDefault );
 
-        void    ProcessData       ( Q3SocketDevice *pSocket );
+        void    ProcessData       ( MSocketDevice *pSocket );
 
         SSDPRequestType ProcessRequestLine( const QString &sLine );
 

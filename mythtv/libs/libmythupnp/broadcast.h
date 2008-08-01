@@ -11,24 +11,26 @@
 #ifndef __BROADCAST_H__
 #define __BROADCAST_H__
 
-#include <q3socketdevice.h>
+#include <QString>
+
+#include "msocketdevice.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // Broadcast Socket is used for XBox (original) since Multicast is not supported
 /////////////////////////////////////////////////////////////////////////////
 
-class QBroadcastSocket : public Q3SocketDevice
+class QBroadcastSocket : public MSocketDevice
 {
     public:
 
         QHostAddress    m_address;
-        Q_UINT16        m_port;
+        quint16         m_port;
         struct ip_mreq  m_imr;
 
     public:
 
-        QBroadcastSocket( QString sAddress, Q_UINT16 nPort )
-         : Q3SocketDevice( Q3SocketDevice::Datagram )
+        QBroadcastSocket( QString sAddress, quint16 nPort ) 
+         : MSocketDevice( MSocketDevice::Datagram )
         {
             m_address.setAddress( sAddress );
             m_port = nPort;

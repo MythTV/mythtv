@@ -11,59 +11,19 @@
 #ifndef __BUFFEREDSOCKETDEVICE_H__
 #define __BUFFEREDSOCKETDEVICE_H__
 
+// C++ headers
+#include <deque>
+using namespace std;
+
 // Qt headers
-#include <Q3PtrList>
-#include <Q3SocketDevice>
-
-
-#include <q3socketdevice.h>
-//#include <q3membuf_p.h>
+#include <QString>
+#include <QByteArray>
+#include <QHostAddress>
 
 // MythTV headers
+#include "mmembuf.h"
+#include "msocketdevice.h"
 #include "compat.h"
-
-// file q3membuf_p.h not installed on my system using ubuntu Qt4 Dev Package.
-// Including class here.
-
-class Q_COMPAT_EXPORT Q3Membuf
-{
-public:
-    Q3Membuf();
-    ~Q3Membuf();
-
-    void append(QByteArray *ba);
-    void clear();
-
-    bool consumeBytes(Q_ULONG nbytes, char *sink);
-    QByteArray readAll();
-    bool scanNewline(QByteArray *store);
-    bool canReadLine() const;
-
-    int ungetch(int ch);
-
-    qint64 size() const;
-
-private:
-
-    QList<QByteArray *> buf;
-    qint64 _size;
-    qint64 _index;
-};
-
-inline void Q3Membuf::append(QByteArray *ba)
-{ buf.append(ba); _size += ba->size(); }
-
-inline void Q3Membuf::clear()
-{ qDeleteAll(buf); buf.clear(); _size=0; _index=0; }
-
-inline QByteArray Q3Membuf::readAll()
-{ QByteArray ba; ba.resize(_size); consumeBytes(_size,ba.data()); return ba; }
-
-inline bool Q3Membuf::canReadLine() const
-{ return const_cast<Q3Membuf*>(this)->scanNewline(0); }
-
-inline qint64 Q3Membuf::size() const
-{ return _size; }
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -77,55 +37,60 @@ class BufferedSocketDevice
 {
     protected:
 
-        Q3SocketDevice          *m_pSocket;
+        MSocketDevice          *m_pSocket;
 
-        Q_ULONG                 m_nMaxReadBufferSize; 
-        QIODevice::Offset       m_nWriteSize;           // write total buf size
-        QIODevice::Offset       m_nWriteIndex;          // write index
+        qulonglong              m_nMaxReadBufferSize; 
+        qint64                  m_nWriteSize;          ///< write total buf size
+        qint64                  m_nWriteIndex;         ///< write index
 
         bool                    m_bHandleSocketDelete;
 
         QHostAddress            m_DestHostAddress;
-        Q_UINT16                m_nDestPort;
+        quint16                 m_nDestPort;
 
-        Q3Membuf                m_bufRead;
-        Q3PtrList<QByteArray>   m_bufWrite;
+        MMembuf                 m_bufRead;
+        deque<QByteArray*>      m_bufWrite;
 
         int     ReadBytes      ( );
-        bool    ConsumeWriteBuf( Q_ULONG nbytes );
+        bool    ConsumeWriteBuf( qulonglong nbytes );
 
     public:
 
         BufferedSocketDevice( int nSocket );
-        BufferedSocketDevice( Q3SocketDevice *pSocket = NULL,
+        BufferedSocketDevice( MSocketDevice *pSocket = NULL,
                               bool    bTakeOwnership = false );
 
         virtual ~BufferedSocketDevice( );
 
-        Q3SocketDevice      *SocketDevice        ();
-        void                SetSocketDevice     ( Q3SocketDevice *pSocket );
+        MSocketDevice      *SocketDevice        ();
+        void                SetSocketDevice     ( MSocketDevice *pSocket );
 
         void                SetDestAddress      ( QHostAddress hostAddress,
-                                                  Q_UINT16     nPort );
+                                                  quint16      nPort );
 
-        bool                Connect             ( const QHostAddress & addr, Q_UINT16 port );
+        bool                Connect             ( const QHostAddress &addr,
+                                                  quint16             port );
         void                Close               ();
         void                Flush               ();
-        QIODevice::Offset   Size                ();
-        QIODevice::Offset   At                  (); 
+        qint64              Size                ();
+        qint64              At                  (); 
         bool                At                  ( qlonglong );
         bool                AtEnd               ();
 
-        Q_ULONG             BytesAvailable      (); 
-        Q_ULONG             WaitForMore         ( int msecs, bool *timeout = NULL );
+        qulonglong          BytesAvailable      (); 
+        qulonglong          WaitForMore         ( int msecs,
+                                                  bool *timeout = NULL );
 
-        Q_ULONG             BytesToWrite        () const;
+        qulonglong          BytesToWrite        () const;
         void                ClearPendingData    ();
         void                ClearReadBuffer     ();
 
-        Q_LONG              ReadBlock           ( char *data, Q_ULONG maxlen );
-        Q_LONG              WriteBlock          ( const char *data, Q_ULONG len );
-        Q_LONG              WriteBlockDirect    ( const char *data, Q_ULONG len );
+        qlonglong           ReadBlock           ( char *data,
+                                                  qulonglong maxlen );
+        qlonglong           WriteBlock          ( const char *data,
+                                                  qulonglong len );
+        qlonglong           WriteBlockDirect    ( const char *data,
+                                                  qulonglong len );
 
         int                 Getch               ();
         int                 Putch               ( int );
@@ -134,15 +99,16 @@ class BufferedSocketDevice
         bool                CanReadLine         ();
         QString             ReadLine            ();
         QString             ReadLine            ( int msecs );
-        Q_LONG              ReadLine            ( char *data, Q_ULONG maxlen );
+        qlonglong           ReadLine            ( char *data,
+                                                  qulonglong maxlen );
 
-        Q_UINT16            Port                () const;
-        Q_UINT16            PeerPort            () const;
+        quint16             Port                () const;
+        quint16             PeerPort            () const;
         QHostAddress        Address             () const;
         QHostAddress        PeerAddress         () const;
 
-        void                SetReadBufferSize   ( Q_ULONG );
-        Q_ULONG             ReadBufferSize      () const;
+        void                SetReadBufferSize   ( qulonglong );
+        qulonglong             ReadBufferSize      () const;
 
         bool                IsValid             () { return( ( m_pSocket ) ? m_pSocket->isValid() : false ); }
         int                 socket              () { return( ( m_pSocket ) ? m_pSocket->socket() : 0 ); }

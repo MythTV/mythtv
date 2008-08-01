@@ -10,12 +10,10 @@
 
 #include "httprequest.h"
 
-#include <qregexp.h>
-#include <qstringlist.h>
-#include <q3textstream.h>
-#include <q3url.h>
-#include <qfile.h>
-#include <qfileinfo.h>
+#include <QFile>
+#include <QFileInfo>
+#include <QTextCodec>
+#include <QStringList>
 
 #include "mythconfig.h"
 #if defined CONFIG_DARWIN || defined CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW)
@@ -93,7 +91,9 @@ const char *HTTPRequest::m_szServerHeaders = "Accept-Ranges: bytes\r\n";
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HTTPRequest::HTTPRequest() : m_eType          ( RequestTypeUnknown ),
+HTTPRequest::HTTPRequest() : m_procReqLineExp ( "[ \r\n][ \r\n]*"  ),
+                             m_parseRangeExp  ( "(\\d|\\-)"        ),
+                             m_eType          ( RequestTypeUnknown ),
                              m_eContentType   ( ContentType_Unknown),
                              m_nMajor         (   0 ),
                              m_nMinor         (   0 ),
@@ -104,7 +104,7 @@ HTTPRequest::HTTPRequest() : m_eType          ( RequestTypeUnknown ),
                                                 QIODevice::WriteOnly ),
                              m_pPostProcess   ( NULL )
 {
-    m_response.setEncoding( QTextStream::UnicodeUTF8 );
+    m_response.setCodec(QTextCodec::codecForName("UTF-8"));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -487,7 +487,7 @@ void HTTPRequest::FormatErrorResponse( bool  bServerError,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HTTPRequest::FormatActionResponse( NameValueList *pArgs )
+void HTTPRequest::FormatActionResponse(const NameValues &args)
 {
     m_eResponseType   = ResponseTypeXML;
     m_nResponseStatus = 200;
@@ -499,34 +499,35 @@ void HTTPRequest::FormatActionResponse( NameValueList *pArgs )
         m_mapRespHeaders[ "EXT" ] = "";
 
         m_response << SOAP_ENVELOPE_BEGIN 
-                   << "<u:" << m_sMethod << "Response xmlns:u=\"" << m_sNameSpace << "\">\r\n";
+                   << "<u:" << m_sMethod << "Response xmlns:u=\""
+                   << m_sNameSpace << "\">\r\n";
     }
     else
         m_response << "<" << m_sMethod << "Response>\r\n";
 
-    for (NameValue *pNV = pArgs->first(); pNV != NULL; pNV = pArgs->next())
-    {                                                               
-        m_response << "<" << pNV->sName;
-        
-        if (pNV->pAttributes != NULL)
-        {
+    NameValues::const_iterator nit = args.begin();
+    for (; nit != args.end(); ++nit)
+    {
+        m_response << "<" << (*nit).sName;
 
-            for (NameValue *pAttr  = pNV->pAttributes->first(); 
-                            pAttr != NULL; 
-                            pAttr  = pNV->pAttributes->next())
-            {                                                               
-                m_response << " " << pAttr->sName << "='" << Encode( pAttr->sValue ) << "'";
+        if ((*nit).pAttributes)
+        {
+            NameValues::const_iterator nit2 = (*nit).pAttributes->begin();
+            for (; nit2 != (*nit).pAttributes->end(); ++nit2)
+            {
+                m_response << " " << (*nit2).sName << "='"
+                           << Encode( (*nit2).sValue ) << "'";
             }
         }
 
         m_response << ">";
 
         if (m_bSOAPRequest)
-            m_response << Encode( pNV->sValue );
+            m_response << Encode( (*nit).sValue );
         else
-            m_response << pNV->sValue;
+            m_response << (*nit).sValue;
 
-        m_response << "</" << pNV->sName << ">\r\n";
+        m_response << "</" << (*nit).sName << ">\r\n";
     }
 
     if (m_bSOAPRequest) 
@@ -567,8 +568,8 @@ void HTTPRequest::FormatFileResponse( const QString &sFileName )
 
 void HTTPRequest::SetRequestProtocol( const QString &sLine )
 {
-    m_sProtocol      = sLine.section( '/', 0, 0 ).stripWhiteSpace();
-    QString sVersion = sLine.section( '/', 1    ).stripWhiteSpace();
+    m_sProtocol      = sLine.section( '/', 0, 0 ).trimmed();
+    QString sVersion = sLine.section( '/', 1    ).trimmed();
 
     m_nMajor = sVersion.section( '.', 0, 0 ).toInt();
     m_nMinor = sVersion.section( '.', 1    ).toInt();
@@ -652,7 +653,7 @@ QString HTTPRequest::GetMimeType( const QString &sFileExtension )
     {
         ext = g_MIMETypes[i].pszExtension;
 
-        if ( sFileExtension.upper() == ext.upper() )
+        if ( sFileExtension.toUpper() == ext.toUpper() )
             return( g_MIMETypes[i].pszType );
     }
 
@@ -667,7 +668,7 @@ QString HTTPRequest::TestMimeType( const QString &sFileName )
 {
     QFileInfo info( sFileName );
     QString   sLOC    = "HTTPRequest::TestMimeType( " + sFileName + ") - ";
-    QString   sSuffix = info.suffix().lower();
+    QString   sSuffix = info.suffix().toLower();
     QString   sMIME   = GetMimeType( sSuffix );
 
     if ( sSuffix == "nuv"      // If a very old recording, might be an MPEG?
@@ -709,7 +710,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 
     if (sParams.length() > 0)
     { 
-        QStringList params = QStringList::split( "&", sParams );
+        QStringList params = sParams.split("&", QString::SkipEmptyParts);
     
         for ( QStringList::Iterator it  = params.begin(); 
                                     it != params.end();  ++it ) 
@@ -719,10 +720,10 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 
             if ((sName.length() != 0) && (sValue.length() !=0))
             {
-                Q3Url::decode( sName  );
-                Q3Url::decode( sValue );
+                sName  = QUrl::fromPercentEncoding(sName.toLatin1());
+                sValue = QUrl::fromPercentEncoding(sValue.toLatin1());
 
-                mapParams.insert( sName.stripWhiteSpace(), sValue );
+                mapParams.insert( sName.trimmed(), sValue );
                 nCount++;
             }
         }
@@ -738,12 +739,12 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 
 QString HTTPRequest::GetHeaderValue( const QString &sKey, QString sDefault )
 {
-    QStringMap::iterator it = m_mapHeaders.find( sKey.lower() );
+    QStringMap::iterator it = m_mapHeaders.find( sKey.toLower() );
 
     if ( it == m_mapHeaders.end())
         return( sDefault );
 
-    return( it.data() );
+    return *it;
 }
 
 
@@ -760,7 +761,7 @@ QString HTTPRequest::GetAdditionalHeaders( void )
                              ++it ) 
     {
         sHeader += it.key()  + ": ";
-        sHeader += it.data() + "\r\n";
+        sHeader += *it + "\r\n";
     }
 
     return( sHeader );
@@ -781,7 +782,7 @@ bool HTTPRequest::GetKeepAlive()
 
     // Read Connection Header...
 
-    QString sConnection = GetHeaderValue( "connection", "default" ).lower();
+    QString sConnection = GetHeaderValue( "connection", "default" ).toLower();
 
     if ( sConnection == "close" )
         bKeepAlive = false;
@@ -829,13 +830,16 @@ bool HTTPRequest::ParseRequest()
         {
             if (sLine != "\r\n")
             {
-                QString sName  = sLine.section( ':', 0, 0 ).stripWhiteSpace();
+                QString sName  = sLine.section( ':', 0, 0 ).trimmed();
                 QString sValue = sLine.section( ':', 1 );
 
                 sValue.truncate( sValue.length() - 2 );
 
                 if ((sName.length() != 0) && (sValue.length() !=0))
-                    m_mapHeaders.insert( sName.lower(), sValue.stripWhiteSpace()  );
+                {
+                    m_mapHeaders.insert(
+                        sName.toLower(), sValue.trimmed());
+                }
 
                 sLine = ReadLine( 2000 );
 
@@ -918,11 +922,10 @@ bool HTTPRequest::ParseRequest()
 
 void HTTPRequest::ProcessRequestLine( const QString &sLine )
 {
-
     m_sRawRequest = sLine;
 
     QString     sToken;
-    QStringList tokens = QStringList::split(QRegExp("[ \r\n][ \r\n]*"), sLine );
+    QStringList tokens = sLine.split(m_procReqLineExp, QString::SkipEmptyParts);
     int         nCount = tokens.count();
 
     // ----------------------------------------------------------------------
@@ -946,11 +949,11 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
         // ------------------------------------------------------------------
 
         if (nCount > 0)
-            SetRequestType( tokens[0].stripWhiteSpace() );
+            SetRequestType( tokens[0].trimmed() );
 
         if (nCount > 1)
         {
-            m_sBaseUrl = tokens[1].section( '?', 0, 0).stripWhiteSpace();
+            m_sBaseUrl = tokens[1].section( '?', 0, 0).trimmed();
 
             // Process any Query String Parameters
 
@@ -962,7 +965,7 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
         }
 
         if (nCount > 2)
-            SetRequestProtocol( tokens[2].stripWhiteSpace() );
+            SetRequestProtocol( tokens[2].trimmed() );
     }
     else
     {
@@ -971,7 +974,7 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
         // ------------------------------------------------------------------
 
         if (nCount > 0)
-            SetRequestProtocol( tokens[0].stripWhiteSpace() );
+            SetRequestProtocol( tokens[0].trimmed() );
 
         if (nCount > 1)
             m_nResponseStatus = tokens[1].toInt();
@@ -997,8 +1000,7 @@ bool HTTPRequest::ParseRange( QString sRange,
     // ----------------------------------------------------------------------        
     // remove any "bytes="
     // ----------------------------------------------------------------------        
-
-    int nIdx = sRange.find( QRegExp( "(\\d|\\-)") );
+    int nIdx = sRange.indexOf(m_parseRangeExp);
 
     if (nIdx < 0)
         return false;
@@ -1010,7 +1012,7 @@ bool HTTPRequest::ParseRange( QString sRange,
     // Split multiple ranges
     // ----------------------------------------------------------------------        
 
-    QStringList ranges = QStringList::split( ",", sRange );
+    QStringList ranges = sRange.split(",", QString::SkipEmptyParts);
 
     if (ranges.count() == 0)
         return false;
@@ -1019,7 +1021,7 @@ bool HTTPRequest::ParseRange( QString sRange,
     // Split first range into its components
     // ----------------------------------------------------------------------        
 
-    QStringList parts = QStringList::split( "-", ranges[0], true );
+    QStringList parts = ranges[0].split("-");
 
     if (parts.count() != 2) 
         return false;
@@ -1037,7 +1039,8 @@ bool HTTPRequest::ParseRange( QString sRange,
         // Does it match "-####"
         // ------------------------------------------------------------------
 
-        long long llValue = strtoll( parts[1], NULL, 10 );
+        QByteArray tmp = parts[1].toAscii();
+        long long llValue = strtoll(tmp.constData(), NULL, 10);
 
         *pllStart = llSize - llValue;
         *pllEnd   = llSize - 1;
@@ -1048,7 +1051,8 @@ bool HTTPRequest::ParseRange( QString sRange,
         // Does it match "####-"
         // ------------------------------------------------------------------
 
-        *pllStart = strtoll( parts[0], NULL, 10 );
+        QByteArray tmp = parts[0].toAscii();
+        *pllStart = strtoll(tmp.constData(), NULL, 10);
 
         if (*pllStart == 0)
             return false;
@@ -1061,8 +1065,10 @@ bool HTTPRequest::ParseRange( QString sRange,
         // Must be  "####-####"
         // ------------------------------------------------------------------
 
-        *pllStart = strtoll( parts[0], NULL, 10 );
-        *pllEnd   = strtoll( parts[1], NULL, 10 );
+        QByteArray tmp0 = parts[0].toAscii();
+        QByteArray tmp1 = parts[1].toAscii();
+        *pllStart = strtoll(tmp0.constData(), NULL, 10);
+        *pllEnd   = strtoll(tmp1.constData(), NULL, 10);
 
         if (*pllStart > *pllEnd)
             return false;
@@ -1079,7 +1085,7 @@ bool HTTPRequest::ParseRange( QString sRange,
 
 void HTTPRequest::ExtractMethodFromURL()
 {
-    QStringList sList = QStringList::split( "/", m_sBaseUrl, false );
+    QStringList sList = m_sBaseUrl.split("/", QString::SkipEmptyParts);
     
     m_sMethod = "";
 
@@ -1154,10 +1160,10 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
                     if (!oText.isNull())
                         sValue = oText.nodeValue();
                      
-                    Q3Url::decode( sName  );
-                    Q3Url::decode( sValue );
+                    sName  = QUrl::fromPercentEncoding(sName.toLatin1());
+                    sValue = QUrl::fromPercentEncoding(sValue.toLatin1());
 
-                    m_mapParams.insert( sName.stripWhiteSpace(), sValue );
+                    m_mapParams.insert( sName.trimmed(), sValue );
                 }
             }
 
@@ -1172,16 +1178,17 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString &HTTPRequest::Encode( QString &sStr )
+QString HTTPRequest::Encode(const QString &sIn)
 {
+    QString sStr = sIn;
     //VERBOSE(VB_UPNP, QString("HTTPRequest::Encode Input : %1").arg(sStr));
-    sStr.replace(QRegExp( "&"), "&amp;" ); // This _must_ come first
-    sStr.replace(QRegExp( "<"), "&lt;"  );
-    sStr.replace(QRegExp( ">"), "&gt;"  );
-    sStr.replace(QRegExp("\""), "&quot;");
-    sStr.replace(QRegExp( "'"), "&apos;");
+    sStr.replace("&",  "&amp;" ); // This _must_ come first
+    sStr.replace("<",  "&lt;"  );
+    sStr.replace(">",  "&gt;"  );
+    sStr.replace("\"", "&quot;");
+    sStr.replace("'",  "&apos;");
     //VERBOSE(VB_UPNP, QString("HTTPRequest::Encode Output : %1").arg(sStr));
-    return( sStr );
+    return sStr;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1201,7 +1208,7 @@ BufferedSocketDeviceRequest::BufferedSocketDeviceRequest( BufferedSocketDevice *
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_LONG BufferedSocketDeviceRequest::BytesAvailable()
+qlonglong BufferedSocketDeviceRequest::BytesAvailable(void)
 {
     if (m_pSocket)
         return( m_pSocket->BytesAvailable() );
@@ -1213,7 +1220,7 @@ Q_LONG BufferedSocketDeviceRequest::BytesAvailable()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_ULONG BufferedSocketDeviceRequest::WaitForMore( int msecs, bool *timeout )
+qulonglong BufferedSocketDeviceRequest::WaitForMore( int msecs, bool *timeout )
 {
     if (m_pSocket)
         return( m_pSocket->WaitForMore( msecs, timeout ));
@@ -1251,7 +1258,8 @@ QString BufferedSocketDeviceRequest::ReadLine( int msecs )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_LONG  BufferedSocketDeviceRequest::ReadBlock( char *pData, Q_ULONG nMaxLen, int msecs )
+qlonglong BufferedSocketDeviceRequest::ReadBlock(
+    char *pData, qulonglong nMaxLen, int msecs)
 {
     if (m_pSocket)
     {
@@ -1277,8 +1285,8 @@ Q_LONG  BufferedSocketDeviceRequest::ReadBlock( char *pData, Q_ULONG nMaxLen, in
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_LONG BufferedSocketDeviceRequest::WriteBlock(
-    const char *pData, Q_ULONG nLen)
+qlonglong BufferedSocketDeviceRequest::WriteBlock(
+    const char *pData, qulonglong nLen)
 {
     if (m_pSocket)
         return( m_pSocket->WriteBlock( pData, nLen ));
@@ -1290,8 +1298,8 @@ Q_LONG BufferedSocketDeviceRequest::WriteBlock(
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_LONG BufferedSocketDeviceRequest::WriteBlockDirect(
-    const char *pData, Q_ULONG nLen)
+qlonglong BufferedSocketDeviceRequest::WriteBlockDirect(
+    const char *pData, qulonglong nLen)
 {
     if (m_pSocket)
         return( m_pSocket->WriteBlockDirect( pData, nLen ));

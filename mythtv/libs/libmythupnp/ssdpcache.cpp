@@ -48,14 +48,11 @@ void SSDPCacheEntries::Clear()
 {
     Lock();
 
-    for (EntryMap::Iterator it  = m_mapEntries.begin();
-                            it != m_mapEntries.end();
-                          ++it )
+    EntryMap::iterator it = m_mapEntries.begin();
+    for (; it != m_mapEntries.end(); ++it)
     {
-        DeviceLocation *pEntry = (DeviceLocation *)it.data();
-
-        if (pEntry != NULL)
-            pEntry->Release();
+        if ((*it))
+            (*it)->Release();
     }
 
     m_mapEntries.clear();
@@ -69,13 +66,10 @@ void SSDPCacheEntries::Clear()
 
 DeviceLocation *SSDPCacheEntries::Find( const QString &sUSN )
 {
-    DeviceLocation *pEntry = NULL;
-
     Lock();
-    EntryMap::Iterator it = m_mapEntries.find( sUSN );
 
-    if ( it != m_mapEntries.end() )
-        pEntry = (DeviceLocation *)it.data();
+    EntryMap::iterator it = m_mapEntries.find(sUSN);
+    DeviceLocation *pEntry = (it != m_mapEntries.end()) ? *it : NULL;
 
     Unlock();
 
@@ -98,11 +92,8 @@ void SSDPCacheEntries::Insert( const QString &sUSN, DeviceLocation *pEntry )
 
     EntryMap::Iterator it = m_mapEntries.find( sUSN );
 
-    if (it != m_mapEntries.end())
-    {
-        if (it.data() != NULL)
-            ((DeviceLocation *)it.data())->Release();
-    }
+    if (it != m_mapEntries.end() && *it)
+        (*it)->Release();
 
     m_mapEntries.insert( sUSN, pEntry );
 
@@ -117,16 +108,15 @@ void SSDPCacheEntries::Remove( const QString &sUSN )
 {
     Lock();
 
-    EntryMap::Iterator it = m_mapEntries.find( sUSN );
-
+    EntryMap::iterator it = m_mapEntries.find(sUSN);
     if (it != m_mapEntries.end())
     {
-        if (it.data() != NULL)
-            ((DeviceLocation *)it.data())->Release();
+        if (*it)
+            (*it)->Release();
 
         // -=>TODO: Need to somehow call SSDPCache::NotifyRemove
 
-        m_mapEntries.remove( it );
+        m_mapEntries.erase(it);
     }
 
     Unlock();
@@ -147,21 +137,18 @@ int SSDPCacheEntries::RemoveStale( const TaskTime &ttNow )
     // Iterate through all USN's and build list of stale entries keys
     // ----------------------------------------------------------------------
 
-    for (EntryMap::Iterator it  = m_mapEntries.begin();
-                            it != m_mapEntries.end();
-                          ++it )
+    EntryMap::iterator it  = m_mapEntries.begin();
+    for (; it != m_mapEntries.end(); ++it)
     {
-        DeviceLocation *pEntry = (DeviceLocation *)it.data();
+        if (*it)
+            continue;
 
-        if (pEntry != NULL)
-        {
-            pEntry->AddRef();
+        (*it)->AddRef();
         
-            if ( pEntry->m_ttExpires < ttNow )
-                lstKeys.append( it.key() );
+        if ((*it)->m_ttExpires < ttNow)
+            lstKeys.push_back(it.key());
 
-            pEntry->Release();
-        }
+        (*it)->Release();
     }
 
     Unlock();
@@ -214,14 +201,11 @@ void SSDPCache::Clear()
 {
     Lock();
 
-    for (SSDPCacheEntriesMap::Iterator it  = m_cache.begin();
-                                       it != m_cache.end();
-                                     ++it )
+    SSDPCacheEntriesMap::iterator it  = m_cache.begin();
+    for (; it != m_cache.end(); ++it)
     {
-        SSDPCacheEntries *pEntries = (SSDPCacheEntries *)it.data();
-
-        if (pEntries != NULL)
-            pEntries->Release();
+        if (*it)
+            (*it)->Release();
     }
 
     m_cache.clear();
@@ -238,10 +222,10 @@ SSDPCacheEntries *SSDPCache::Find( const QString &sURI )
     SSDPCacheEntries *pEntries = NULL;
 
     Lock();
-    SSDPCacheEntriesMap::Iterator it = m_cache.find( sURI );
 
+    SSDPCacheEntriesMap::iterator it = m_cache.find(sURI);
     if ( it != m_cache.end() )
-        pEntries = (SSDPCacheEntries *)it.data();
+        pEntries = *it;
 
     Unlock();
 
@@ -342,7 +326,7 @@ void SSDPCache::Remove( const QString &sURI, const QString &sUSN )
 
     if (it != m_cache.end())
     {
-        SSDPCacheEntries *pEntries = (SSDPCacheEntries *)it.data();
+        SSDPCacheEntries *pEntries = *it;
 
         if (pEntries != NULL)
         {
@@ -353,7 +337,7 @@ void SSDPCache::Remove( const QString &sURI, const QString &sUSN )
             if (pEntries->Count() == 0)
             {
                 pEntries->Release();
-                m_cache.remove( it );
+                m_cache.erase(it);
             }
 
             pEntries->Release();
@@ -390,7 +374,7 @@ int SSDPCache::RemoveStale()
                                        it != m_cache.end();
                                      ++it )
     {
-        SSDPCacheEntries *pEntries = (SSDPCacheEntries *)it.data();
+        SSDPCacheEntries *pEntries = *it;
 
         if (pEntries != NULL)
         {
@@ -418,17 +402,14 @@ int SSDPCache::RemoveStale()
                                 itKey != lstKeys.end();
                               ++itKey ) 
     {
-        SSDPCacheEntriesMap::Iterator it = m_cache.find( *itKey );
+        SSDPCacheEntriesMap::iterator it = m_cache.find( *itKey );
+        if (it == m_cache.end())
+            continue;
 
-        if (it != m_cache.end())
+        if (*it)
         {
-            SSDPCacheEntries *pEntries = (SSDPCacheEntries *)it.data();
-
-            if (pEntries != NULL)
-            {
-                pEntries->Release();
-                m_cache.remove( it );
-            }
+            (*it)->Release();
+            m_cache.erase(it);
         }
     }
 
@@ -498,7 +479,7 @@ void SSDPCache::Dump()
                                            it != m_cache.end();
                                          ++it )
         {
-            SSDPCacheEntries *pEntries = (SSDPCacheEntries *)it.data();
+            SSDPCacheEntries *pEntries = *it;
 
             if (pEntries != NULL)
             {
@@ -513,7 +494,7 @@ void SSDPCache::Dump()
                                       ++itEntry )
                 {
 
-                    DeviceLocation *pEntry = (DeviceLocation *)itEntry.data();
+                    DeviceLocation *pEntry = *itEntry;
 
                     if (pEntry != NULL)
                     {

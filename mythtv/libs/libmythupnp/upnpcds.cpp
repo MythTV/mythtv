@@ -8,13 +8,11 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include <cmath>
+
 #include "upnp.h"
 #include "upnpcds.h"
 #include "upnputil.h"
-
-#include <q3textstream.h>
-#include <math.h>
-#include <qregexp.h>
 
 #define DIDL_LITE_BEGIN "<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\">"
 #define DIDL_LITE_END   "</DIDL-Lite>";
@@ -37,14 +35,11 @@ QString UPnpCDSExtensionResults::GetResultXML()
 {
     QString sXML;
 
-    for ( CDSObject *pObject  = m_List.first(); 
-                     pObject != NULL;
-                     pObject  = m_List.next() )
-    {
-        sXML += pObject->toXml();    
-    }
+    CDSObjects::const_iterator it = m_List.begin();
+    for (; it != m_List.end(); ++it)
+        sXML += (*it)->toXml();    
 
-    return( sXML );
+    return sXML;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -53,8 +48,6 @@ QString UPnpCDSExtensionResults::GetResultXML()
 
 UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath ) : Eventing( "UPnpCDS", "CDS_Event" )
 {
-    m_extensions.setAutoDelete( true );
-
     m_root.m_eType      = OT_Container;
     m_root.m_sId        = "0";
     m_root.m_sParentId  = "-1";
@@ -87,6 +80,11 @@ UPnpCDS::UPnpCDS( UPnpDevice *pDevice, const QString &sSharePath ) : Eventing( "
 
 UPnpCDS::~UPnpCDS()
 {
+    while (!m_extensions.empty())
+    {
+        delete m_extensions.back();
+        m_extensions.pop_back();
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -133,8 +131,11 @@ void UPnpCDS::RegisterExtension  ( UPnpCDSExtension *pExtension )
 
 void UPnpCDS::UnregisterExtension( UPnpCDSExtension *pExtension )
 {
-    if (pExtension != NULL )
-        m_extensions.remove( pExtension );
+    if (pExtension)
+    {
+        delete pExtension;
+        m_extensions.removeAll(pExtension);
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -265,7 +266,6 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                 short nStart = Max( request.m_nStartingIndex, short( 0 ));
                 short nCount = Min( nTotalMatches, request.m_nRequestedCount );
 
-                UPnpCDSExtension    *pExtension = m_extensions.at( nStart );
                 UPnpCDSRequest       childRequest;
 
                 childRequest.m_sParentId         = "0";
@@ -275,8 +275,12 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                 childRequest.m_nRequestedCount   = 1;
                 childRequest.m_sSortCriteria     = "";
 
-                while (( pExtension != NULL ) && (nNumberReturned < nCount ))
+                for (uint i = nStart;
+                     (i < (uint)m_extensions.size()) &&
+                         (nNumberReturned < nCount);
+                     i++)
                 {
+                    UPnpCDSExtension *pExtension = m_extensions[i];
                     childRequest.m_sObjectId = pExtension->m_sExtensionId;
 
                     pResult = pExtension->Browse( &childRequest );
@@ -291,8 +295,6 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 
                         delete pResult;
                     }
-
-                    pExtension = m_extensions.next();
                 }
 
                 break;
@@ -306,14 +308,14 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
         // Look for a CDS Extension that knows how to handle this ObjectID
         // ------------------------------------------------------------------
 
-        UPnpCDSExtension *pExtension = m_extensions.first();
-
-        while (( pExtension != NULL ) && (pResult == NULL))
+        UPnpCDSExtensionList::iterator it = m_extensions.begin();
+        for (; (it != m_extensions.end()) && !pResult; ++it)
         {
-            VERBOSE(VB_UPNP, QString("UPNP Browse : Searching for : %1  / ObjectID : %2").arg(pExtension->m_sExtensionId).arg(request.m_sObjectId));
-            pResult = pExtension->Browse( &request );
+            VERBOSE(VB_UPNP, QString(
+                        "UPNP Browse : Searching for : %1  / ObjectID : %2")
+                    .arg((*it)->m_sExtensionId).arg(request.m_sObjectId));
 
-            pExtension = m_extensions.next();
+            pResult = (*it)->Browse(&request);
         }
 
         if (pResult != NULL)
@@ -339,18 +341,18 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 
     if (eErrorCode == UPnPResult_Success)
     {
-        NameValueList list;
+        NameValues list;
 
         QString sResults = DIDL_LITE_BEGIN;
         sResults += sResultXML;
         sResults += DIDL_LITE_END;
 
-        list.append( new NameValue( "Result"        , sResults                          ));
-        list.append( new NameValue( "NumberReturned", QString::number( nNumberReturned )));
-        list.append( new NameValue( "TotalMatches"  , QString::number( nTotalMatches   )));
-        list.append( new NameValue( "UpdateID"      , QString::number( nUpdateID       )));
+        list.push_back(NameValue("Result",         sResults));
+        list.push_back(NameValue("NumberReturned", nNumberReturned));
+        list.push_back(NameValue("TotalMatches",   nTotalMatches));
+        list.push_back(NameValue("UpdateID",       nUpdateID));
 
-        pRequest->FormatActionResponse( &list );
+        pRequest->FormatActionResponse(list);
     }
     else
         UPnp::FormatErrorResponse ( pRequest, eErrorCode, sErrorDesc );
@@ -391,9 +393,10 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
     // ----------------------------------------------------------------------
 
     QRegExp  rMatch( "\\b(or|and)\\b" );
-             rMatch.setCaseSensitive( FALSE );
+    rMatch.setCaseSensitivity(Qt::CaseInsensitive);
 
-    request.m_sSearchList  = QStringList::split( rMatch, request.m_sSearchCriteria );
+    request.m_sSearchList  = request.m_sSearchCriteria.split(
+        rMatch, QString::SkipEmptyParts);
     request.m_sSearchClass = "object";  // Default to all objects.
 
     // ----------------------------------------------------------------------
@@ -405,13 +408,13 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
                                 it != request.m_sSearchList.end(); 
                               ++it ) 
     {
-        if ( (*it).contains( "upnp:class derivedfrom", FALSE ) > 0)
+        if ((*it).contains("upnp:class derivedfrom", Qt::CaseInsensitive))
         {
-            QStringList sParts = QStringList::split( ' ', *it );
+            QStringList sParts = (*it).split(' ', QString::SkipEmptyParts);
 
             if (sParts.count() > 2)
             {
-                request.m_sSearchClass = sParts[2].stripWhiteSpace();
+                request.m_sSearchClass = sParts[2].trimmed();
                 request.m_sSearchClass.remove( '"' );
 
                 break;
@@ -443,17 +446,11 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
                        .arg( request.m_sSearchClass   ));
 
 
-    UPnpCDSExtension    *pExtension = m_extensions.first();
-
     //bool bSearchDone = false;
 
-    while (( pExtension != NULL ) && (pResult == NULL))
-    {
-        //VERBOSE(VB_UPNP, QString("UPNP Search : Searching for : %1  / ObjectID : %2").arg(pExtension->m_sExtensionId).arg(request.m_sObjectId));
-        pResult = pExtension->Search( &request );
-
-    	pExtension = m_extensions.next();
-    }
+    UPnpCDSExtensionList::iterator it = m_extensions.begin();
+    for (; (it != m_extensions.end()) && !pResult; ++it)
+        pResult = (*it)->Search(&request);
 
     if (pResult != NULL)
     {
@@ -477,17 +474,17 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
 
     if (eErrorCode == UPnPResult_Success)
     {
-        NameValueList list;
+        NameValues list;
         QString sResults = DIDL_LITE_BEGIN;
         sResults += sResultXML;
         sResults += DIDL_LITE_END;
 
-        list.append( new NameValue( "Result"        , sResults                          ));
-        list.append( new NameValue( "NumberReturned", QString::number( nNumberReturned )));
-        list.append( new NameValue( "TotalMatches"  , QString::number( nTotalMatches   )));
-        list.append( new NameValue( "UpdateID"      , QString::number( nUpdateID       )));
+        list.push_back(NameValue("Result",         sResults));
+        list.push_back(NameValue("NumberReturned", nNumberReturned));
+        list.push_back(NameValue("TotalMatches",   nTotalMatches));
+        list.push_back(NameValue("UpdateID",       nUpdateID));
 
-        pRequest->FormatActionResponse( &list );
+        pRequest->FormatActionResponse(list);
     }
     else
         UPnp::FormatErrorResponse( pRequest, eErrorCode, sErrorDesc );
@@ -500,7 +497,7 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
 
 void UPnpCDS::HandleGetSearchCapabilities( HTTPRequest *pRequest )
 {
-    NameValueList list;
+    NameValues list;
 
     VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest : %1 : %2")
                        .arg(pRequest->m_sBaseUrl)
@@ -508,9 +505,11 @@ void UPnpCDS::HandleGetSearchCapabilities( HTTPRequest *pRequest )
 
     // -=>TODO: Need to implement based on CDS Extension Capabilities
 
-    list.append( new NameValue( "SearchCaps", "dc:title,dc:creator,dc:date,upnp:class,res@size" ));
+    list.push_back(
+        NameValue("SearchCaps",
+                  "dc:title,dc:creator,dc:date,upnp:class,res@size"));
 
-    pRequest->FormatActionResponse( &list );
+    pRequest->FormatActionResponse(list);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -519,7 +518,7 @@ void UPnpCDS::HandleGetSearchCapabilities( HTTPRequest *pRequest )
 
 void UPnpCDS::HandleGetSortCapabilities( HTTPRequest *pRequest )
 {
-    NameValueList list;
+    NameValues list;
 
     VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest : %1 : %2")
                        .arg(pRequest->m_sBaseUrl)
@@ -527,9 +526,11 @@ void UPnpCDS::HandleGetSortCapabilities( HTTPRequest *pRequest )
 
     // -=>TODO: Need to implement based on CDS Extension Capabilities
 
-    list.append( new NameValue( "SortCaps", "dc:title,dc:creator,dc:date,upnp:class,res@size" ));
+    list.push_back(
+        NameValue("SortCaps",
+                  "dc:title,dc:creator,dc:date,upnp:class,res@size"));
 
-    pRequest->FormatActionResponse( &list );
+    pRequest->FormatActionResponse(list);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -538,7 +539,7 @@ void UPnpCDS::HandleGetSortCapabilities( HTTPRequest *pRequest )
 
 void UPnpCDS::HandleGetSystemUpdateID( HTTPRequest *pRequest )
 {
-    NameValueList list;
+    NameValues list;
 
     VERBOSE(VB_UPNP,QString("UPnpCDS::ProcessRequest : %1 : %2")
                        .arg(pRequest->m_sBaseUrl)
@@ -546,9 +547,9 @@ void UPnpCDS::HandleGetSystemUpdateID( HTTPRequest *pRequest )
 
     unsigned short nId = GetValue< unsigned short >( "SystemUpdateID" );
 
-    list.append( new NameValue( "Id", QString::number( nId ) ));
+    list.push_back(NameValue("Id", nId));
 
-    pRequest->FormatActionResponse( &list );
+    pRequest->FormatActionResponse(list);
 }
 
 
@@ -567,7 +568,7 @@ void UPnpCDS::HandleGetSystemUpdateID( HTTPRequest *pRequest )
 
 bool UPnpCDSExtension::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
 {
-    if (!pRequest->m_sObjectId.startsWith( m_sExtensionId, true ))
+    if (!pRequest->m_sObjectId.startsWith(m_sExtensionId, Qt::CaseSensitive))
         return false;
 
     return true;
@@ -589,7 +590,8 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
     // Parse out request object's path
     // ----------------------------------------------------------------------
 
-    QStringList idPath = QStringList::split( "/", pRequest->m_sObjectId.section('=',0,0) );
+    QStringList idPath = pRequest->m_sObjectId.section('=',0,0).split(
+        "/", QString::SkipEmptyParts);
 
     QString key = pRequest->m_sObjectId.section('=',1);
 
@@ -610,8 +612,9 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
         {
             if (pRequest->m_sObjectId.contains("item"))
             {
-                idPath = QStringList::split( " ", idPath[idPath.count() - 2] );
-                idPath = QStringList::split( "?", idPath[0] );
+                idPath = idPath[idPath.count() - 2].split(
+                    " ", QString::SkipEmptyParts);
+                idPath = idPath[0].split("?", QString::SkipEmptyParts);
 
                 if (idPath[0].startsWith("Id"))
                     idPath[0] = QString("item=%1").arg(idPath[0].right(idPath[0].length() - 2));
@@ -624,8 +627,12 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
 
         if (sLast == m_sExtensionId         ) { return( ProcessRoot   ( pRequest, pResults, idPath )); }
         if (sLast == "0"                    ) { return( ProcessAll    ( pRequest, pResults, idPath )); }
-        if (sLast.startsWith( "key" , true )) { return( ProcessKey    ( pRequest, pResults, idPath )); }
-        if (sLast.startsWith( "item", true )) { return( ProcessItem   ( pRequest, pResults, idPath )); }
+
+        if (sLast.startsWith("key" , Qt::CaseSensitive))
+            return ProcessKey(pRequest, pResults, idPath);
+
+        if (sLast.startsWith("item", Qt::CaseSensitive))
+            return ProcessItem(pRequest, pResults, idPath);
 
         int nNodeIdx = sLast.toInt();
 
@@ -687,7 +694,7 @@ QString UPnpCDSExtension::RemoveToken( const QString &sToken, const QString &sSt
 
     for (int nIdx=0; nIdx < num; nIdx++)
     {
-        if ((nPos = sStr.findRev( sToken, nPos )) == -1)
+        if ((nPos = sStr.lastIndexOf( sToken, nPos )) == -1)
             break;
     }
 
@@ -859,7 +866,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessItem( UPnpCDSRequest          
 
             QStringMap  mapParams;
             QString     sParams = idPath.last().section( '?', 1, 1 );
-            sParams.replace(QRegExp( "&amp;"), "&" ); 
+            sParams.replace("&amp;", "&"); 
 
             HTTPRequest::GetParameters( sParams, mapParams );
 
@@ -911,7 +918,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessKey( UPnpCDSRequest          *
     // ----------------------------------------------------------------------
     
     QString sKey = idPath.last().section( '=', 1, 1 );
-    Q3Url::decode( sKey );
+    sKey = QUrl::fromPercentEncoding(sKey.toLatin1());
 
     if (sKey.length() > 0)
     {

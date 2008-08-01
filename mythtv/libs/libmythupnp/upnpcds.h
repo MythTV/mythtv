@@ -11,9 +11,8 @@
 #ifndef UPnpCDS_H_
 #define UPnpCDS_H_
 
-#include <qdom.h>
-#include <qdatetime.h> 
-#include <Q3PtrList>
+#include <QList>
+#include <QObject>
 
 #include "upnp.h"
 #include "upnpcdsobjects.h"
@@ -95,7 +94,14 @@ class UPnpCDSExtensionResults
                                     m_nTotalMatches(0), 
                                     m_nUpdateID(0)
         {
-            m_List.setAutoDelete( true );
+        }
+        ~UPnpCDSExtensionResults()
+        {
+            while (!m_List.empty())
+            {
+                delete m_List.back();
+                m_List.pop_back();
+            }
         }
 
         void    Add         ( CDSObject *pObject );
@@ -183,7 +189,7 @@ class UPnpCDSExtension
                           QString sExtensionId, 
                           QString sClass )
         {
-            m_sName        = QObject::tr( sName );
+            m_sName        = QObject::tr(sName.toLatin1().constData());
             m_sExtensionId = sExtensionId;
             m_sClass       = sClass;
         }
@@ -197,7 +203,7 @@ class UPnpCDSExtension
         virtual QString GetSortCapabilities  () { return( "" ); }
 };
 
-typedef Q3PtrList< UPnpCDSExtension > UPnpCDSExtensionList;
+typedef QList<UPnpCDSExtension*> UPnpCDSExtensionList;
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -238,8 +244,8 @@ class UPnpCDS : public Eventing
         virtual QString GetServiceDescURL   () { return m_sControlUrl.mid( 1 ) + "/GetServDesc"; }
 
     public:
-                 UPnpCDS( UPnpDevice *pDevice,
-		          const QString &sSharePath ); 
+        UPnpCDS( UPnpDevice *pDevice,
+                 const QString &sSharePath ); 
 
         virtual ~UPnpCDS();
 

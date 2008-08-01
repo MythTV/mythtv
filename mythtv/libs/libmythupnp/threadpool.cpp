@@ -8,6 +8,9 @@
 //                                                                            
 /////////////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
+using namespace std;
+
 #include "threadpool.h"
 #include "upnp.h"       // only needed for Config... remove once config is moved.
 #include "mythtimer.h"
@@ -247,9 +250,6 @@ ThreadPool::ThreadPool( const QString &sName )
 {
     m_sName = sName;
 
-    m_lstThreads         .setAutoDelete( false );
-    m_lstAvailableThreads.setAutoDelete( false );
-
     m_nInitialThreadCount = UPnp::g_pConfig->GetValue( "ThreadPool/" + m_sName + "/Initial", 1 );
     m_nMaxThreadCount     = UPnp::g_pConfig->GetValue( "ThreadPool/" + m_sName + "/Max"    , 5 );
     m_nIdleTimeout        = UPnp::g_pConfig->GetValue( "ThreadPool/" + m_sName + "/Timeout", 60000 );
@@ -321,14 +321,13 @@ WorkerThread *ThreadPool::GetWorkerThread()
         
         m_mList.lock();
         {
-            if ( m_lstAvailableThreads.count() > 0)
+            if ( m_lstAvailableThreads.size() > 0)
             {
-                pThread = m_lstAvailableThreads.getFirst();                
-            
-                m_lstAvailableThreads.removeFirst();                
+                pThread = m_lstAvailableThreads.front();                
+                m_lstAvailableThreads.pop_front();
             }
         
-            nThreadCount = m_lstThreads.count();
+            nThreadCount = m_lstThreads.size();
         }
         m_mList.unlock();
 
@@ -381,11 +380,11 @@ WorkerThread *ThreadPool::AddWorkerThread( bool bMakeAvailable, long nTimeout )
             m_mList.lock();
             {
 
-                m_lstThreads.append( pThread );
+                m_lstThreads.push_back( pThread );
                 
                 if (bMakeAvailable)
                 {
-                    m_lstAvailableThreads.append( pThread );
+                    m_lstAvailableThreads.push_back( pThread );
                 
                     m_threadAvail.wakeAll();
                 }
@@ -417,7 +416,7 @@ WorkerThread *ThreadPool::AddWorkerThread( bool bMakeAvailable, long nTimeout )
 void ThreadPool::ThreadAvailable ( WorkerThread *pThread )
 {
     m_mList.lock();
-    m_lstAvailableThreads.prepend( pThread );
+    m_lstAvailableThreads.push_front(pThread);
     m_mList.unlock();
 
     m_threadAvail.wakeAll();
@@ -431,9 +430,13 @@ void ThreadPool::ThreadTerminating ( WorkerThread *pThread )
 {
     m_mList.lock();
     {
-        m_lstAvailableThreads.remove( pThread );
+        WorkerThreadList::iterator it =
+            find(m_lstAvailableThreads.begin(),
+                 m_lstAvailableThreads.end(), pThread);
+        m_lstAvailableThreads.erase(it);
 
-        // Need to leave in m_lstThreads so that we can delete the ptr in destructor
+        // Need to leave in m_lstThreads so that we can
+        // delete the ptr in destructor
     }
     m_mList.unlock();
 }

@@ -13,16 +13,15 @@
 
 #include <sys/time.h>
 
-#include <qdom.h>
-#include <q3url.h>
-#include <quuid.h>
-#include <qdatetime.h> 
-#include <q3ptrlist.h>
-#include <q3dict.h>
+#include <QUrl>
+#include <QUuid>
+#include <QMap>
 
 #include "upnpimpl.h"
 #include "upnputil.h"
 #include "httpserver.h"
+
+class QTextStream;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -65,7 +64,7 @@ class SubscriberInfo
         TaskTime            ttLastNotified;
 
         QString             sUUID;
-        Q3Url                qURL;
+        QUrl                qURL;
         unsigned short      nKey;
         unsigned long       nDuration;       // Seconds
 
@@ -86,17 +85,7 @@ class SubscriberInfo
 
 //////////////////////////////////////////////////////////////////////////////
 
-class Subscribers : public Q3Dict< SubscriberInfo >
-{
-    public:
-
-        Subscribers()
-        {
-            setAutoDelete( true );
-        }       
-};
-
-typedef Q3DictIterator< SubscriberInfo >  SubscriberIterator;
+typedef QMap<QString,SubscriberInfo*> Subscribers;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -174,19 +163,24 @@ class StateVariable : public StateVariableBase
 
 //////////////////////////////////////////////////////////////////////////////
 
-class StateVariables : public Q3Dict< StateVariableBase >
+class StateVariables
 {
     protected:
 
         virtual void Notify() = 0;
-
+        typedef QMap<QString, StateVariableBase*> SVMap;
+        SVMap m_map;
     public:
 
         // ------------------------------------------------------------------
 
-        StateVariables()
+        StateVariables() { }     
+        ~StateVariables()
         {
-            setAutoDelete( true );
+            SVMap::iterator it = m_map.begin();
+            for (; it != m_map.end(); ++it)
+                delete *it;
+            m_map.clear();
         }     
 
         // ------------------------------------------------------------------
@@ -194,14 +188,19 @@ class StateVariables : public Q3Dict< StateVariableBase >
         void AddVariable( StateVariableBase *pBase )
         {
             if (pBase != NULL)
-                insert( pBase->m_sName, pBase );
+                m_map.insert(pBase->m_sName, pBase);
         }
 
         // ------------------------------------------------------------------
         template < class T >
         bool SetValue( const QString &sName, T value )
         {
-            StateVariable< T > *pVariable = dynamic_cast< StateVariable< T > *>( find( sName ) );
+            SVMap::iterator it = m_map.find(sName);
+            if (it == m_map.end())
+                return false;
+
+            StateVariable< T > *pVariable =
+                dynamic_cast< StateVariable< T > *>( *it );
 
             if (pVariable == NULL)
                 return false;           // It's not the expected type.
@@ -222,7 +221,12 @@ class StateVariables : public Q3Dict< StateVariableBase >
         template < class T >
         T GetValue( const QString &sName )
         {
-            StateVariable< T > *pVariable = dynamic_cast< StateVariable< T > *>( find( sName ) );
+            SVMap::iterator it = m_map.find(sName);
+            if (it == m_map.end())
+                return T(0);
+
+            StateVariable< T > *pVariable =
+                dynamic_cast< StateVariable< T > *>( *it );
 
             if (pVariable != NULL)
                 return pVariable->GetValue();
@@ -230,11 +234,9 @@ class StateVariables : public Q3Dict< StateVariableBase >
             return T(0);
         }
 
+        uint BuildNotifyBody(QTextStream &ts, TaskTime ttLastNotified) const;
 };
 
-typedef Q3DictIterator< StateVariableBase >  StateVariableIterator;
-        
-              
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -266,9 +268,6 @@ class Eventing : public HttpServerExtension,
 
         virtual void Notify           ( );
         void         NotifySubscriber ( SubscriberInfo *pInfo );
-        int          BuildNotifyBody  ( QTextStream &ts,
-                                        TaskTime ttLastNotified );
-
         void         HandleSubscribe  ( HTTPRequest *pRequest ); 
         void         HandleUnsubscribe( HTTPRequest *pRequest ); 
 

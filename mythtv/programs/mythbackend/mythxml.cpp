@@ -22,10 +22,33 @@
 #include "mythcontext.h"
 #include "util.h"
 #include "mythdbcon.h"
+#include "mythdb.h"
 
 #include "previewgenerator.h"
 #include "backendutil.h"
 #include "mythconfig.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+static QString extract_id(const QString &raw_request)
+{
+    QStringList idPath = raw_request.split( "/", QString::SkipEmptyParts);
+    if (idPath.size() < 2)
+        return "";
+
+    idPath = idPath[idPath.size() - 2].split(" ", QString::SkipEmptyParts);
+    if (idPath.empty())
+        return "";
+
+    idPath = idPath[0].split("?", QString::SkipEmptyParts);
+    if (idPath.empty())
+        return "";
+
+    QString sId = idPath[0];
+    return (sId.startsWith("Id")) ? sId.right(sId.length() - 2) : "";
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -213,38 +236,47 @@ void MythXML::GetHosts( HTTPRequest *pRequest )
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (query.isConnected())
+    if (!query.isConnected())
     {
-        query.prepare("SELECT DISTINCTROW hostname "
-                        "FROM settings WHERE (not isNull( hostname ));" );
-        query.exec();
-
-        if (query.isActive() && query.size() > 0)
-        {
-            QString     sHosts;
-            QTextStream os( &sHosts, QIODevice::WriteOnly );
-
-            while(query.next())
-            {
-                QString sHost = query.value(0).toString();
-
-                os << "<Host>" 
-                   << HTTPRequest::Encode( sHost )
-                   << "</Host>";
-            }
-
-            NameValueList list;
-
-            list.append( new NameValue( "Count", query.size() ));
-            list.append( new NameValue( "Hosts", sHosts       ));
-
-            pRequest->FormatActionResponse( &list );
-
-        }
-    }
-    else
         UPnp::FormatErrorResponse( pRequest, UPnPResult_ActionFailed,
                     "Database not open while trying to load list of hosts" );
+        return;
+    }
+
+    query.prepare(
+        "SELECT DISTINCTROW hostname "
+        "FROM settings "
+        "WHERE (not isNull( hostname ))");
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythXML::GetHosts()", query);
+        return;
+    }
+
+    uint        nCount = 0;
+    QString     sHosts = "";
+    QTextStream os( &sHosts, QIODevice::WriteOnly );
+
+    while (query.next())
+    {
+        nCount++;
+        os << "<Host>" 
+           << HTTPRequest::Encode( query.value(0).toString() )
+           << "</Host>";
+    }
+
+    if (!nCount)
+        return; // no hosts, should we format some response?
+
+    os << flush;
+
+    NameValues list;
+
+    list.push_back(NameValue( "Count", nCount ));
+    list.push_back(NameValue( "Hosts", sHosts ));
+
+    pRequest->FormatActionResponse( list );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -258,39 +290,44 @@ void MythXML::GetKeys( HTTPRequest *pRequest )
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (query.isConnected())
+    if (!query.isConnected())
     {
-        query.prepare("SELECT DISTINCTROW value FROM settings;" );
-        query.exec();
-
-        if (query.isActive() && query.size() > 0)
-        {
-            QString     sKeys;
-            QTextStream os( &sKeys, QIODevice::WriteOnly );
-
-            while(query.next())
-            {
-                QString sKey = query.value(0).toString();
-
-                os << "<Key>" 
-                   << HTTPRequest::Encode( sKey )
-                   << "</Key>";
-            }
-
-            NameValueList list;
-
-            list.append( new NameValue( "Count", query.size() ));
-            list.append( new NameValue( "Keys" , sKeys        ));
-
-            pRequest->FormatActionResponse( &list );
-        }
+        UPnp::FormatErrorResponse(
+            pRequest, UPnPResult_ActionFailed,
+            QString("Database not open while trying to load setting: %1")
+            .arg( pRequest->m_mapParams[ "Key" ] ));
+        return;
     }
-    else
-        UPnp::FormatErrorResponse( pRequest, 
-                                   UPnPResult_ActionFailed, 
-                                   QString("Database not open while trying to "
-                                           "load setting: %1")
-                                      .arg( pRequest->m_mapParams[ "Key" ] ));
+
+    query.prepare("SELECT DISTINCTROW value FROM settings;" );
+
+    if (!query.exec())
+    {
+        MythDB::DBError("MythXML::GetKeys()", query);
+        return;
+    }
+
+    uint        nCount = 0;
+    QString     sKeys  = "";
+    QTextStream os( &sKeys, QIODevice::WriteOnly );
+
+    while (query.next())
+    {
+        os << "<Key>" 
+           << HTTPRequest::Encode( query.value(0).toString() )
+           << "</Key>";
+    }
+    os << flush;
+
+    if (!nCount)
+        return; // no keys, should we format some response?
+
+    NameValues list;
+
+    list.push_back( NameValue( "Count", nCount ));
+    list.push_back( NameValue( "Keys" , sKeys  ));
+
+    pRequest->FormatActionResponse( list );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -299,128 +336,112 @@ void MythXML::GetKeys( HTTPRequest *pRequest )
 
 void MythXML::GetSetting( HTTPRequest *pRequest )
 {
-    pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", "
-                                                    "max-age = 5000";
+    pRequest->m_mapRespHeaders[ "Cache-Control" ] =
+        "no-cache=\"Ext\", max-age = 5000";
 
     QString sKey      = pRequest->m_mapParams[ "Key"      ];
     QString sHostName = pRequest->m_mapParams[ "HostName" ];
-    QString sValue;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (query.isConnected())
+    if (!query.isConnected())
     {
-        NameValueList list;
+        UPnp::FormatErrorResponse(
+            pRequest, UPnPResult_ActionFailed, 
+            QString("Database not open while trying to load setting: %1")
+            .arg( pRequest->m_mapParams[ "Key" ] ));
+    }
 
-        // Was a Key Supplied?
+    uint          nCount = 0;
+    QString       sXml;
+    QTextStream   os( &sXml, QIODevice::WriteOnly );
 
-        QString       sXml;
-        QTextStream   os( &sXml, QIODevice::WriteOnly );
+    // Was a Key Supplied?
+    if (!sKey.isEmpty())
+    {
+        query.prepare("SELECT data, hostname from settings "
+                      "WHERE value = :KEY AND "
+                      "(hostname = :HOSTNAME OR hostname IS NULL) "
+                      "ORDER BY hostname DESC;" );
 
-        if (sKey.length() > 0)
+        query.bindValue(":KEY"     , sKey      );
+        query.bindValue(":HOSTNAME", sHostName );
+
+        if (!query.exec())
         {
-            query.prepare("SELECT data, hostname from settings "
-                            "WHERE value = :KEY AND "
-                                 "(hostname = :HOSTNAME OR hostname IS NULL) "
-                            "ORDER BY hostname DESC;" );
+            MythDB::DBError("MythXML::GetSetting() w/key ", query);
+            return;
+        }
 
-            query.bindValue(":KEY"     , sKey      );
-            query.bindValue(":HOSTNAME", sHostName );
-            query.exec();
-
-            if (query.isActive() && query.size() > 0)
+        if (query.next())
+        {
+            if ( (sHostName.isEmpty()) || 
+                 ((!sHostName.isEmpty()) && 
+                  (sHostName == query.value(1).toString())))
             {
-                query.next();
+                nCount    = 1;
+                sHostName = query.value(1).toString();
 
-                if ( (sHostName.length() == 0) || 
-                    ((sHostName.length() >  0) && 
-                     (sHostName == query.value(1).toString())))
-                {
-                    sValue    = query.value(0).toString();
-                    sHostName = query.value(1).toString();
-
-                    os <<  "<Value key='" 
-                       << HTTPRequest::Encode( sKey   )
-                       << "'>"
-                       << HTTPRequest::Encode( sValue )
-                       << "</Value>";
-
-                    list.append( new NameValue( "Count"   , 1         ));
-                    list.append( new NameValue( "HostName", sHostName ));
-                    list.append( new NameValue( "Values", sXml        ));
-
-                    pRequest->FormatActionResponse( &list );
-
-                    return;
-                }
+                os <<  "<Value key='" 
+                   << HTTPRequest::Encode( sKey   )
+                   << "'>"
+                   << HTTPRequest::Encode( query.value(0).toString() )
+                   << "</Value>";
             }
+        }
 
+    }
+    else
+    {
+        if (sHostName.isEmpty())
+        {
+            query.prepare("SELECT value, data FROM settings "
+                          "WHERE (hostname IS NULL)" );
         }
         else
         {
-
-            if (sHostName.length() == 0)
-            {
-                query.prepare("SELECT value, data FROM settings "
-                                "WHERE (hostname IS NULL)" );
-            }
-            else
-            {
-                query.prepare("SELECT value, data FROM settings "
-                                "WHERE (hostname = :HOSTNAME)" );
-                query.bindValue(":HOSTNAME", sHostName );
-            }
-
-            query.exec();
-
-            if (query.isActive() && query.size() > 0)
-            {
-
-                while(query.next())
-                {
-                    sKey      = query.value(0).toString();
-                    sValue    = query.value(1).toString();
-
-                    os <<  "<Value key='" 
-                       << HTTPRequest::Encode( sKey   )
-                       << "'>"
-                       << HTTPRequest::Encode( sValue )
-                       << "</Value>";
-                }
-
-
-                list.append( new NameValue( "Count"   , query.size()));
-                list.append( new NameValue( "HostName", sHostName   ));
-                list.append( new NameValue( "Values"  , sXml        ));
-
-                pRequest->FormatActionResponse( &list );
-
-                return;
-            }
-
+            query.prepare("SELECT value, data FROM settings "
+                          "WHERE (hostname = :HOSTNAME)" );
+            query.bindValue(":HOSTNAME", sHostName );
         }
 
-        // Not found, so return the supplied default value
+        if (!query.exec())
+        {
+            MythDB::DBError("MythXML::GetSetting() w/o key ", query);
+            return;
+        }
 
+        while (query.next())
+        {
+            nCount++;
+            os <<  "<Value key='" 
+               << HTTPRequest::Encode( query.value(0).toString() )
+               << "'>"
+               << HTTPRequest::Encode( query.value(1).toString() )
+               << "</Value>";
+        }
+    }
+
+    if (!nCount)
+    {
+        // Not found, so return the supplied default value
+        nCount = 1;
         os <<  "<Value key='" 
            << HTTPRequest::Encode( sKey   )
            << "'>"
            << HTTPRequest::Encode( pRequest->m_mapParams[ "Default" ] )
            << "</Value>";
-
-
-        list.append( new NameValue( "Count"   , 1        ));
-        list.append( new NameValue( "HostName", sHostName));
-        list.append( new NameValue( "Values", sXml       ));
-
-        pRequest->FormatActionResponse( &list );
     }
-    else
-        UPnp::FormatErrorResponse( pRequest, 
-                                   UPnPResult_ActionFailed, 
-                                   QString("Database not open while trying to "
-                                           "load setting: %1")
-                                      .arg( pRequest->m_mapParams[ "Key" ] ));
+
+    os << flush;
+
+    NameValues list;
+
+    list.push_back( NameValue( "Count"   , nCount    ));
+    list.push_back( NameValue( "HostName", sHostName ));
+    list.push_back( NameValue( "Values",   sXml      ));
+
+    pRequest->FormatActionResponse( list );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -436,16 +457,16 @@ void MythXML::PutSetting( HTTPRequest *pRequest )
     QString sKey      = pRequest->m_mapParams[ "Key"      ];
     QString sValue    = pRequest->m_mapParams[ "Value"    ];
 
-    if (sKey.length() > 0)
+    if (!sKey.isEmpty())
     {
-        NameValueList list;
+        NameValues list;
 
         if ( gContext->SaveSettingOnHost( sKey, sValue, sHostName ) )
-            list.append( new NameValue( "Result", "True" ));
+            list.push_back( NameValue( "Result", "True" ));
         else
-            list.append( new NameValue( "Result", "False" ));
+            list.push_back( NameValue( "Result", "False" ));
 
-        pRequest->FormatActionResponse( &list );
+        pRequest->FormatActionResponse( list );
     }
     else
         UPnp::FormatErrorResponse( pRequest, UPnPResult_InvalidArgs,
@@ -508,8 +529,8 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
     query.bindValue(":STARTCHANID", iStartChanId );
     query.bindValue(":NUMCHAN"    , iNumOfChannels );
 
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Select ChanId", query);
+    if (!query.exec())
+        MythDB::DBError("Select ChanId", query);
 
     query.first();  iStartChanId = query.value(0).toInt();
     query.last();   iEndChanId   = query.value(0).toInt();
@@ -589,24 +610,23 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
 
     // ----------------------------------------------------------------------
 
-    NameValueList list;
+    NameValues list;
 
-    list.append( new NameValue( "StartTime"    , sStartTime   ));
-    list.append( new NameValue( "EndTime"      , sEndTime     ));
-    list.append( new NameValue( "StartChanId"  , iStartChanId ));
-    list.append( new NameValue( "EndChanId"    , iEndChanId   ));
-    list.append( new NameValue( "NumOfChannels", iChanCount   ));
-    list.append( new NameValue( "Details"      , bDetails     ));
+    list.push_back( NameValue( "StartTime"    , sStartTime   ));
+    list.push_back( NameValue( "EndTime"      , sEndTime     ));
+    list.push_back( NameValue( "StartChanId"  , iStartChanId ));
+    list.push_back( NameValue( "EndChanId"    , iEndChanId   ));
+    list.push_back( NameValue( "NumOfChannels", iChanCount   ));
+    list.push_back( NameValue( "Details"      , bDetails     ));
 
-    list.append( new NameValue( "Count"        , (int)progList.count() ));
-    list.append( new NameValue( "AsOf"         , QDateTime::currentDateTime()
+    list.push_back( NameValue( "Count"        , (int)progList.count() ));
+    list.push_back( NameValue( "AsOf"         , QDateTime::currentDateTime()
                                             .toString( Qt::ISODate )));
-    list.append( new NameValue( "Version"      , MYTH_BINARY_VERSION ));
-    list.append( new NameValue( "ProtoVer"     , MYTH_PROTO_VERSION  ));
-    list.append( new NameValue( "ProgramGuide" , doc.toString()      ));
+    list.push_back( NameValue( "Version"      , MYTH_BINARY_VERSION ));
+    list.push_back( NameValue( "ProtoVer"     , MYTH_PROTO_VERSION  ));
+    list.push_back( NameValue( "ProgramGuide" , doc.toString()      ));
 
-    pRequest->FormatActionResponse( &list );
-
+    pRequest->FormatActionResponse( list );
 }
 
 
@@ -689,20 +709,20 @@ void MythXML::GetProgramDetails( HTTPRequest *pRequest )
 
     // ----------------------------------------------------------------------
 
-    NameValueList list;
+    NameValues list;
 
-    list.append( new NameValue( "StartTime"    , sStartTime   ));
-    list.append( new NameValue( "ChanId"       , sChanId      ));
+    list.push_back( NameValue( "StartTime"    , sStartTime   ));
+    list.push_back( NameValue( "ChanId"       , sChanId      ));
 
-    list.append( new NameValue( "Count"        , 1  ));
-    list.append( new NameValue( "AsOf"         , QDateTime::currentDateTime()
+    list.push_back( NameValue( "Count"        , 1  ));
+    list.push_back( NameValue( "AsOf"         , QDateTime::currentDateTime()
                                                     .toString( Qt::ISODate )));
-    list.append( new NameValue( "Version"      , MYTH_BINARY_VERSION ));
-    list.append( new NameValue( "ProtoVer"     , MYTH_PROTO_VERSION  ));
+    list.push_back( NameValue( "Version"      , MYTH_BINARY_VERSION ));
+    list.push_back( NameValue( "ProtoVer"     , MYTH_PROTO_VERSION  ));
 
-    list.append( new NameValue( "ProgramDetails" , doc.toString()      ));
+    list.push_back( NameValue( "ProgramDetails" , doc.toString()      ));
 
-    pRequest->FormatActionResponse( &list );
+    pRequest->FormatActionResponse( list );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -729,15 +749,11 @@ void MythXML::GetChannelIcon( HTTPRequest *pRequest )
     query.prepare( "SELECT icon FROM channel WHERE (chanid = :CHANID )" );
     query.bindValue(":CHANID", iChanId );
 
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Select ChanId", query);
+    if (!query.exec())
+        MythDB::DBError("Select ChanId", query);
 
-    if (query.size() > 0)
-    {
-        query.first();  
-
-        pRequest->m_sFileName       = query.value(0).toString();
-    }
+    if (query.next())
+        pRequest->m_sFileName = query.value(0).toString();
 
     if ((nWidth == 0) && (nHeight == 0))
     {
@@ -815,16 +831,8 @@ void MythXML::GetVideoArt( HTTPRequest *pRequest )
 
     if (sId.isEmpty())
     {
-        QStringList idPath = QStringList::split( "/", pRequest->m_sRawRequest );
-
-        idPath = QStringList::split( " ", idPath[idPath.count() - 2] );
-        idPath = QStringList::split( "?", idPath[0] );
-
-        sId = idPath[0];
-
-        if (sId.startsWith("Id"))
-            sId = sId.right(sId.length() - 2);
-        else
+        sId = extract_id(pRequest->m_sRawRequest);
+        if (sId.isEmpty())
             return;
 
         pRequest->m_mapParams[ "Id" ] = sId;
@@ -840,19 +848,15 @@ void MythXML::GetVideoArt( HTTPRequest *pRequest )
     query.prepare("SELECT coverart FROM upnpmedia WHERE intid = :ITEMID");
     query.bindValue(":ITEMID", sId);
 
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("GetVideoArt ", query);
+    if (!query.exec())
+        MythDB::DBError("GetVideoArt ", query);
 
     QString sFileName;
 
-    if (query.size() > 0)
-    {
-        query.first();
-
-        sFileName = query.value(0).toString();
-    }
-    else
+    if (!query.next())
         return;
+
+    sFileName = query.value(0).toString();
 
     if (bDefaultPixmap)
     {
@@ -883,16 +887,8 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
 
     if (sId.isEmpty())
     {
-        QStringList idPath = QStringList::split( "/", pRequest->m_sRawRequest );
-
-        idPath = QStringList::split( " ", idPath[idPath.count() - 2] );
-        idPath = QStringList::split( "?", idPath[0] );
-
-        sId = idPath[0];
-
-        if (sId.startsWith("Id"))
-            sId = sId.right(sId.length() - 2);
-        else
+        sId = extract_id(pRequest->m_sRawRequest);
+        if (sId.isEmpty())
             return;
 
         pRequest->m_mapParams[ "Id" ] = sId;
@@ -914,15 +910,13 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
                   "WHERE music_albumart.albumart_id = :ARTID;");
     query.bindValue(":ARTID", sId );
 
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Select ArtId", query);
+    if (!query.exec())
+        MythDB::DBError("Select ArtId", query);
 
     QString musicbasepath = gContext->GetSetting("MusicLocation", "");
 
-    if (query.size() > 0)
+    if (query.next())
     {
-        query.first();
-
         pRequest->m_sFileName = QString( "%1/%2" )
                         .arg( musicbasepath )
                         .arg( query.value(0).toString() );
@@ -1034,18 +1028,17 @@ void MythXML::GetRecorded( HTTPRequest *pRequest )
 
     // ----------------------------------------------------------------------
 
-    NameValueList list;
+    NameValues list;
 
-    list.append( new NameValue( "Count"    , (int)progList.count()));
-    list.append( new NameValue( "AsOf"     , QDateTime::currentDateTime()
+    list.push_back( NameValue( "Count"    , (int)progList.count()));
+    list.push_back( NameValue( "AsOf"     , QDateTime::currentDateTime()
                                                     .toString( Qt::ISODate )));
-    list.append( new NameValue( "Version"  , MYTH_BINARY_VERSION ));
-    list.append( new NameValue( "ProtoVer" , MYTH_PROTO_VERSION  ));
+    list.push_back( NameValue( "Version"  , MYTH_BINARY_VERSION ));
+    list.push_back( NameValue( "ProtoVer" , MYTH_PROTO_VERSION  ));
 
-    list.append( new NameValue( "Recorded" , doc.toString()      ));
+    list.push_back( NameValue( "Recorded" , doc.toString()      ));
 
-    pRequest->FormatActionResponse( &list );
-
+    pRequest->FormatActionResponse( list );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1079,18 +1072,17 @@ void MythXML::GetExpiring( HTTPRequest *pRequest )
 
     // ----------------------------------------------------------------------
 
-    NameValueList list;
+    NameValues list;
 
-    list.append( new NameValue( "Count"    , (int)infoList.size()));
-    list.append( new NameValue( "AsOf"     , QDateTime::currentDateTime()
+    list.push_back( NameValue( "Count"    , (int)infoList.size()));
+    list.push_back( NameValue( "AsOf"     , QDateTime::currentDateTime()
                                                     .toString( Qt::ISODate )));
-    list.append( new NameValue( "Version"  , MYTH_BINARY_VERSION ));
-    list.append( new NameValue( "ProtoVer" , MYTH_PROTO_VERSION  ));
+    list.push_back( NameValue( "Version"  , MYTH_BINARY_VERSION ));
+    list.push_back( NameValue( "ProtoVer" , MYTH_PROTO_VERSION  ));
 
-    list.append( new NameValue( "Expiring" , doc.toString()      ));
+    list.push_back( NameValue( "Expiring" , doc.toString()      ));
 
-    pRequest->FormatActionResponse( &list );
-
+    pRequest->FormatActionResponse( list );
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1256,7 +1248,7 @@ void MythXML::GetRecording( HttpWorkerThread *pThread,
     QString sChanId   = pRequest->m_mapParams[ "ChanId"    ];
     QString sStartTime= pRequest->m_mapParams[ "StartTime" ];
 
-    if (sStartTime.length() == 0)
+    if (sStartTime.isEmpty())
     {
         VERBOSE( VB_UPNP, "MythXML::GetRecording - StartTime missing.");
         return;
@@ -1387,7 +1379,7 @@ void MythXML::GetMusic( HttpWorkerThread *pThread,
 
     QString sId   = pRequest->m_mapParams[ "Id"    ];
 
-    if (sId.length() == 0)
+    if (sId.isEmpty())
         return;
 
     int nTrack = sId.toInt();
@@ -1433,11 +1425,15 @@ void MythXML::GetMusic( HttpWorkerThread *pThread,
                            "WHERE music_songs.song_id = :KEY");
 
             query.bindValue(":KEY", nTrack );
-            query.exec();
 
-            if (query.isActive() && query.size() > 0)
+            if (!query.exec())
             {
-                query.first();  
+                MythDB::DBError("MythXML::GetMusic()", query);
+                return;
+            }
+
+            if (query.next())
+            {
                 pRequest->m_sFileName = QString( "%1/%2" )
                         .arg( sBasePath )
                         .arg( query.value(0).toString() );
@@ -1478,18 +1474,10 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
 
     QString sId   = pRequest->m_mapParams[ "Id" ];
 
-    if (sId.length() == 0) 
+    if (sId.isEmpty()) 
     {
-        QStringList idPath = QStringList::split( "/", pRequest->m_sRawRequest );
-
-        idPath = QStringList::split( " ", idPath[idPath.count() - 2] );
-        idPath = QStringList::split( "?", idPath[0] );
-
-        sId = idPath[0];
-
-        if (sId.startsWith("Id"))
-            sId = sId.right(sId.length() - 2);
-        else
+        sId = extract_id(pRequest->m_sRawRequest);
+        if (sId.isEmpty())
             return;
 
         //VERBOSE(VB_UPNP, QString("MythXML::GetVideo : %1 ").arg(sId));
@@ -1540,14 +1528,17 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
         {
             query.prepare("SELECT filepath FROM upnpmedia WHERE intid = :KEY" );
             query.bindValue(":KEY", sId );
-            query.exec();
 
-            if (query.isActive() && query.size() > 0)
+            if (!query.exec())
             {
-                query.first();
+                MythDB::DBError("MythXML::GetVideo()", query);
+                return;
+            }
+
+            if (query.next())
+            {
                 pRequest->m_sFileName = QString( "%1/%2" )
-                                           .arg( sBasePath )
-                            .arg( query.value(0).toString() );
+                    .arg( sBasePath ).arg( query.value(0).toString() );
             }
         }
 
@@ -1583,7 +1574,7 @@ void MythXML::GetConnectionInfo( HTTPRequest *pRequest )
     QString sPin         = pRequest->m_mapParams[ "Pin" ];
     QString sSecurityPin = gContext->GetSetting( "SecurityPin", "");
 
-    if ( sSecurityPin.length() == 0 )
+    if ( sSecurityPin.isEmpty() )
     {
         UPnp::FormatErrorResponse( pRequest,
               UPnPResult_HumanInterventionRequired, 
@@ -1628,15 +1619,13 @@ void MythXML::GetConnectionInfo( HTTPRequest *pRequest )
     os <<   "<Reconnect>" << params.wolReconnect << "</Reconnect>";
     os <<   "<Retry>"     << params.wolRetry     << "</Retry>";
     os <<   "<Command>"   << params.wolCommand   << "</Command>";
-    os <<  "</WOL>";
+    os <<  "</WOL>" << flush;
 
-    NameValueList list;
+    NameValues list;
 
-    list.append( new NameValue( "Info", sXml ));
+    list.push_back( NameValue( "Info", sXml ));
 
-    pRequest->FormatActionResponse( &list );
-
-    return;
+    pRequest->FormatActionResponse( list );
 }
 
 /////////////////////////////////////////////////////////////////////////////

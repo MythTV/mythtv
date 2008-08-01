@@ -20,14 +20,8 @@
 #endif
 
 // Qt headers
-#include <qthread.h>
-#include <q3serversocket.h>
-#include <q3socketdevice.h>
-#include <q3socket.h>
-#include <qdom.h>
-#include <qdatetime.h> 
-#include <qtimer.h>
-#include <q3ptrlist.h>
+#include <QThread>
+#include <QTcpServer>
 
 // MythTV headers
 #include "upnputil.h"
@@ -68,7 +62,7 @@ class HttpServerExtension
 //        virtual bool  Uninitialize  ( ) = 0;
 };
 
-typedef Q3PtrList< HttpServerExtension > HttpServerExtensionList;
+typedef QList<HttpServerExtension*> HttpServerExtensionList;
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -78,7 +72,7 @@ typedef Q3PtrList< HttpServerExtension > HttpServerExtensionList;
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class HttpServer : public Q3ServerSocket,
+class HttpServer : public QTcpServer,
                    public ThreadPool
 {
 
@@ -89,7 +83,7 @@ class HttpServer : public Q3ServerSocket,
 
         virtual WorkerThread *CreateWorkerThread( ThreadPool *,
                                                   const QString &sName );
-        virtual void          newConnection     ( int socket );
+        virtual void          incomingConnection     ( int socket );
 
     public:
 
@@ -98,7 +92,7 @@ class HttpServer : public Q3ServerSocket,
 
     public:
 
-                 HttpServer( int nPort );
+                 HttpServer();
         virtual ~HttpServer();
 
         void     RegisterExtension  ( HttpServerExtension *pExtension );

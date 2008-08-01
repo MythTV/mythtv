@@ -17,7 +17,6 @@
 #include "broadcast.h"
 
 #include <qregexp.h>
-#include <Q3CString>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -36,29 +35,36 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-SSDP::SSDP( int nServicePort ) : m_bTermRequested( false )
+SSDP::SSDP( int nServicePort ) :
+    m_procReqLineExp("[ \r\n][ \r\n]*"),
+    m_nPort(SSDP_PORT),
+    m_nSearchPort(SSDP_SEARCHPORT),
+    m_nServicePort(nServicePort),
+    m_pNotifyTask(NULL),
+    m_bTermRequested(false),
+    m_lock(QMutex::NonRecursive)
 {
+    m_nPort =
+        UPnp::g_pConfig->GetValue( "UPnP/SSDP/Port"      , SSDP_PORT       );
+    m_nSearchPort =
+        UPnp::g_pConfig->GetValue( "UPnP/SSDP/SearchPort", SSDP_SEARCHPORT );
 
-    m_nServicePort = nServicePort;
-    m_nPort        = UPnp::g_pConfig->GetValue( "UPnP/SSDP/Port"      , SSDP_PORT       );
-    m_nSearchPort  = UPnp::g_pConfig->GetValue( "UPnP/SSDP/SearchPort", SSDP_SEARCHPORT );
+    m_Sockets[ SocketIdx_Search    ] =
+        new MSocketDevice( MSocketDevice::Datagram );
+    m_Sockets[ SocketIdx_Multicast ] =
+        new QMulticastSocket( SSDP_GROUP, m_nPort );
+    m_Sockets[ SocketIdx_Broadcast ] =
+        new QBroadcastSocket( "255.255.255.255", m_nPort );
 
-    m_Sockets[ SocketIdx_Search    ] = new Q3SocketDevice( Q3SocketDevice::Datagram );
-    m_Sockets[ SocketIdx_Multicast ] = new QMulticastSocket( SSDP_GROUP, m_nPort );
-    m_Sockets[ SocketIdx_Broadcast ] = new QBroadcastSocket( "255.255.255.255", m_nPort );
-
-
-    m_Sockets[ SocketIdx_Search    ]->setBlocking( FALSE );
-    m_Sockets[ SocketIdx_Multicast ]->setBlocking( FALSE );
-    m_Sockets[ SocketIdx_Broadcast ]->setBlocking( FALSE );
+    m_Sockets[ SocketIdx_Search    ]->setBlocking( false );
+    m_Sockets[ SocketIdx_Multicast ]->setBlocking( false );
+    m_Sockets[ SocketIdx_Broadcast ]->setBlocking( false );
 
     // Setup SearchSocket
-    QHostAddress ip4addr( (Q_UINT32) INADDR_ANY );
+    QHostAddress ip4addr( QHostAddress::Any );
     m_Sockets[ SocketIdx_Search ]->bind( ip4addr, m_nSearchPort ); 
 
     m_Sockets[ SocketIdx_Search ]->bind( QHostAddress::Any, m_nSearchPort );
-
-    m_pNotifyTask   = NULL;
 
 }
 
@@ -150,7 +156,7 @@ void SSDP::PerformSearch( const QString &sST )
                                 "\r\n" ).arg( sST );
     QByteArray sRequest = rRequest.toUtf8();
 
-    Q3SocketDevice *pSocket = m_Sockets[ SocketIdx_Search ];
+    MSocketDevice *pSocket = m_Sockets[ SocketIdx_Search ];
 
     QHostAddress address;
     address.setAddress( SSDP_GROUP );
@@ -229,24 +235,25 @@ void SSDP::run()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void SSDP::ProcessData( Q3SocketDevice *pSocket )
+void SSDP::ProcessData( MSocketDevice *pSocket )
 {
     long nBytes = 0;
     long nRead  = 0;
 
     while ((nBytes = pSocket->bytesAvailable()) > 0)
     {
-        Q3CString buffer( nBytes + 1 );
+        QByteArray buffer;
+        buffer.resize(nBytes);
 
         nRead = pSocket->readBlock( buffer.data(), nBytes );
 
         QHostAddress  peerAddress = pSocket->peerAddress();
-        Q_UINT16      peerPort    = pSocket->peerPort   ();
+        quint16       peerPort    = pSocket->peerPort   ();
 
         // ------------------------------------------------------------------
-
-        QStringList lines        = QStringList::split( "\r\n", buffer );
-        QString     sRequestLine = lines[0];
+        QString     str          = QString(buffer.constData());
+        QStringList lines        = str.split("\r\n", QString::SkipEmptyParts);
+        QString     sRequestLine = lines.size() ? lines[0] : "";
 
         lines.pop_front();
 
@@ -267,13 +274,13 @@ void SSDP::ProcessData( Q3SocketDevice *pSocket )
         for ( QStringList::Iterator it = lines.begin(); it != lines.end(); ++it ) 
         {
             QString sLine  = *it;
-            QString sName  = sLine.section( ':', 0, 0 ).stripWhiteSpace();
+            QString sName  = sLine.section( ':', 0, 0 ).trimmed();
             QString sValue = sLine.section( ':', 1 );
 
             sValue.truncate( sValue.length() );  //-2
 
             if ((sName.length() != 0) && (sValue.length() !=0))
-                headers.insert( sName.lower(), sValue.stripWhiteSpace() );
+                headers.insert( sName.toLower(), sValue.trimmed() );
         }
 
 //        pSocket->SetDestAddress( peerAddress, peerPort );
@@ -302,7 +309,7 @@ void SSDP::ProcessData( Q3SocketDevice *pSocket )
 
 SSDPRequestType SSDP::ProcessRequestLine( const QString &sLine )
 {
-    QStringList tokens = QStringList::split(QRegExp("[ \r\n][ \r\n]*"), sLine );
+    QStringList tokens = sLine.split(m_procReqLineExp, QString::SkipEmptyParts);
 
     // ----------------------------------------------------------------------
     // if this is actually a response, then sLine's format will be:
@@ -331,12 +338,12 @@ SSDPRequestType SSDP::ProcessRequestLine( const QString &sLine )
 
 QString SSDP::GetHeaderValue( const QStringMap &headers, const QString &sKey, const QString &sDefault )
 {
-    QStringMap::const_iterator it = headers.find( sKey.lower() );
+    QStringMap::const_iterator it = headers.find( sKey.toLower() );
 
     if ( it == headers.end())
         return( sDefault );
 
-    return( it.data() );
+    return *it;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -345,7 +352,7 @@ QString SSDP::GetHeaderValue( const QStringMap &headers, const QString &sKey, co
 
 bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders, 
                                  QHostAddress      peerAddress,
-                                 Q_UINT16          peerPort )
+                                 quint16           peerPort )
 {
     QString sMAN = GetHeaderValue( sHeaders, "MAN", "" );
     QString sST  = GetHeaderValue( sHeaders, "ST" , "" );
@@ -448,12 +455,12 @@ bool SSDP::ProcessSearchResponse( const QStringMap &headers )
                          .arg( sUSN     )
                          .arg( sCache   ));
 
-    int nPos = sCache.find( "max-age", 0, false );
+    int nPos = sCache.indexOf("max-age", 0, Qt::CaseInsensitive);
 
     if (nPos < 0)
         return false;
 
-    if ((nPos = sCache.find( "=", nPos, false )) < 0)
+    if ((nPos = sCache.indexOf("=", nPos)) < 0)
         return false;
 
     int nSecs = sCache.mid( nPos+1 ).toInt();
@@ -490,12 +497,12 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
 
     if (sNTS.contains( "ssdp:alive"))
     {
-        int nPos = sCache.find( "max-age", 0, false );
+        int nPos = sCache.indexOf("max-age", 0, Qt::CaseInsensitive);
 
         if (nPos < 0)
             return false;
 
-        if ((nPos = sCache.find( "=", nPos, false )) < 0)
+        if ((nPos = sCache.indexOf("=", nPos)) < 0)
             return false;
 
         int nSecs = sCache.mid( nPos+1 ).toInt();
@@ -635,7 +642,7 @@ void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
 {
     SSDPCache    &cache  = UPnp::g_SSDPCache;
     int           nCount = 0;
-    NameValueList list;
+    NameValues    list;
 
     VERBOSE( VB_UPNP, "SSDPExtension::GetDeviceList" );
 
@@ -648,7 +655,7 @@ void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
                                        it != cache.End();
                                      ++it )
     {
-        SSDPCacheEntries *pEntries = (SSDPCacheEntries *)it.data();
+        SSDPCacheEntries *pEntries = *it;
 
         if (pEntries != NULL)
         {
@@ -663,7 +670,7 @@ void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
                                   ++itEntry )
             {
 
-                DeviceLocation *pEntry = (DeviceLocation *)itEntry.data();
+                DeviceLocation *pEntry = *itEntry;
 
                 if (pEntry != NULL)
                 {
@@ -686,19 +693,21 @@ void SSDPExtension::GetDeviceList( HTTPRequest *pRequest )
     }
     os << flush;
 
-    list.append( new NameValue( "DeviceCount"          , QString::number( cache.Count() )));
-    list.append( new NameValue( "DevicesAllocated"     , QString::number( SSDPCacheEntries::g_nAllocated )));
-
-    list.append( new NameValue( "CacheEntriesFound"    , QString::number( nCount )));
-    list.append( new NameValue( "CacheEntriesAllocated", QString::number( DeviceLocation::g_nAllocated )));
-
-    list.append( new NameValue( "DeviceList"           , sXML));
+    list.push_back(
+        NameValue("DeviceCount",           cache.Count()));
+    list.push_back(
+        NameValue("DevicesAllocated",      SSDPCacheEntries::g_nAllocated));
+    list.push_back(
+        NameValue("CacheEntriesFound",     nCount));
+    list.push_back(
+        NameValue("CacheEntriesAllocated", DeviceLocation::g_nAllocated));
+    list.push_back(
+        NameValue("DeviceList",            sXML));
 
     cache.Unlock();
 
-    pRequest->FormatActionResponse( &list );
+    pRequest->FormatActionResponse( list );
 
     pRequest->m_eResponseType   = ResponseTypeXML;
     pRequest->m_nResponseStatus = 200;
-
 }

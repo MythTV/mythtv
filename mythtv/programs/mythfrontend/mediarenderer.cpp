@@ -40,12 +40,12 @@ MediaRenderer::MediaRenderer()
 
     int nPort = g_pConfig->GetValue( "UPnP/MythFrontend/ServicePort", 6547 );
 
-    m_pHttpServer = new HttpServer( nPort ); 
+    m_pHttpServer = new HttpServer();
 
     if (!m_pHttpServer)
         return;
 
-    if (!m_pHttpServer->ok())
+    if (!m_pHttpServer->listen(QHostAddress::Any, nPort))
     {
         VERBOSE(VB_IMPORTANT, "MediaRenderer::HttpServer Create Error");
         // exit(BACKEND_BUGGY_EXIT_NO_BIND_STATUS);

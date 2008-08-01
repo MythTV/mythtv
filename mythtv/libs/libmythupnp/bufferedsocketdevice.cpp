@@ -8,7 +8,8 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
+#include <algorithm>
+using namespace std;
 
 #include "mythtimer.h"
 #include "bufferedsocketdevice.h"
@@ -21,9 +22,9 @@
 
 BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
 {
-    m_pSocket = new Q3SocketDevice();
+    m_pSocket = new MSocketDevice();
 
-    m_pSocket->setSocket         ( nSocket, Q3SocketDevice::Stream );
+    m_pSocket->setSocket         ( nSocket, MSocketDevice::Stream );
     m_pSocket->setBlocking       ( false );
     m_pSocket->setAddressReusable( true );
 
@@ -31,8 +32,6 @@ BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
 
     if ( setsockopt( socket(), SOL_SOCKET, SO_LINGER, &ling, sizeof( ling )) < 0) 
         VERBOSE(VB_IMPORTANT, QString( "BufferedSocketDevice: setsockopt - SO_LINGER Error" ));
-
-    m_bufWrite.setAutoDelete( TRUE );
 
     m_nDestPort          = 0;
 
@@ -46,12 +45,9 @@ BufferedSocketDevice::BufferedSocketDevice( int nSocket  )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-BufferedSocketDevice::BufferedSocketDevice( Q3SocketDevice *pSocket /*= NULL*/,
+BufferedSocketDevice::BufferedSocketDevice( MSocketDevice *pSocket /*= NULL*/,
                                             bool bTakeOwnership /* = false */ )
 {
-
-    m_bufWrite.setAutoDelete( TRUE );
-
     m_pSocket            = pSocket;
 
     m_nDestPort          = 0;
@@ -82,7 +78,7 @@ void BufferedSocketDevice::Close()
     ReadBytes();
 
     m_bufRead.clear();
-    m_bufWrite.clear();
+    ClearPendingData();
 
     if (m_pSocket != NULL)
     {
@@ -95,13 +91,13 @@ void BufferedSocketDevice::Close()
         m_pSocket = NULL;
     }
 
-}                      
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool BufferedSocketDevice::Connect( const QHostAddress &addr, Q_UINT16 port )
+bool BufferedSocketDevice::Connect( const QHostAddress &addr, quint16 port )
 {
     if (m_pSocket == NULL)
         return false;
@@ -113,7 +109,7 @@ bool BufferedSocketDevice::Connect( const QHostAddress &addr, Q_UINT16 port )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q3SocketDevice *BufferedSocketDevice::SocketDevice()
+MSocketDevice *BufferedSocketDevice::SocketDevice()
 {
     return( m_pSocket );
 }
@@ -122,7 +118,7 @@ Q3SocketDevice *BufferedSocketDevice::SocketDevice()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void BufferedSocketDevice::SetSocketDevice( Q3SocketDevice *pSocket )
+void BufferedSocketDevice::SetSocketDevice( MSocketDevice *pSocket )
 {
     if ((m_bHandleSocketDelete) && (m_pSocket != NULL))
         delete m_pSocket;
@@ -136,7 +132,8 @@ void BufferedSocketDevice::SetSocketDevice( Q3SocketDevice *pSocket )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void BufferedSocketDevice::SetDestAddress( QHostAddress hostAddress, Q_UINT16 nPort )
+void BufferedSocketDevice::SetDestAddress(
+    QHostAddress hostAddress, quint16 nPort)
 {
     m_DestHostAddress = hostAddress;
     m_nDestPort       = nPort;
@@ -146,7 +143,7 @@ void BufferedSocketDevice::SetDestAddress( QHostAddress hostAddress, Q_UINT16 nP
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void BufferedSocketDevice::SetReadBufferSize( Q_ULONG bufSize )
+void BufferedSocketDevice::SetReadBufferSize( qulonglong bufSize )
 {
     m_nMaxReadBufferSize = bufSize;
 }
@@ -155,7 +152,7 @@ void BufferedSocketDevice::SetReadBufferSize( Q_ULONG bufSize )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_ULONG BufferedSocketDevice::ReadBufferSize() const
+qulonglong BufferedSocketDevice::ReadBufferSize(void) const
 {
     return m_nMaxReadBufferSize;
 }
@@ -169,7 +166,7 @@ int BufferedSocketDevice::ReadBytes()
     if (m_pSocket == NULL)
         return m_bufRead.size();
 
-    Q_LONG maxToRead = 0;
+    qlonglong maxToRead = 0;
 
     if ( m_nMaxReadBufferSize > 0 ) 
     {
@@ -179,16 +176,18 @@ int BufferedSocketDevice::ReadBytes()
             return m_bufRead.size();
     }
 
-    Q_LONG nbytes = m_pSocket->bytesAvailable();
-    Q_LONG nread;
+    qlonglong nbytes = m_pSocket->bytesAvailable();
+    qlonglong nread;
 
     QByteArray *a = 0;
 
     if ( nbytes > 0 )
     {
-        a = new QByteArray( nbytes );
+        a = new QByteArray();
+        a->resize(nbytes);
 
-        nread = m_pSocket->readBlock( a->data(), maxToRead ? QMIN( nbytes, maxToRead ) : nbytes );
+        nread = m_pSocket->readBlock(
+            a->data(), maxToRead ? std::min(nbytes, maxToRead) : nbytes);
 
         if (( nread > 0 ) && ( nread != (int)a->size() ))
         {
@@ -212,21 +211,22 @@ int BufferedSocketDevice::ReadBytes()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool BufferedSocketDevice::ConsumeWriteBuf( Q_ULONG nbytes )
+bool BufferedSocketDevice::ConsumeWriteBuf( qulonglong nbytes )
 {
-    if ( !nbytes || ((Q_LONG)nbytes > m_nWriteSize) )
+    if ( !nbytes || ((qlonglong)nbytes > m_nWriteSize) )
         return FALSE;
 
     m_nWriteSize -= nbytes;
 
     for ( ;; ) 
     {
-        QByteArray *a = m_bufWrite.first();
+        QByteArray *a = m_bufWrite.front();
 
-        if ( m_nWriteIndex + nbytes >= (Q_ULONG)a->size() ) 
+        if ( m_nWriteIndex + nbytes >= (qulonglong)a->size() ) 
         {
             nbytes -= a->size() - m_nWriteIndex;
-            m_bufWrite.remove();
+            m_bufWrite.pop_front();
+            delete a;
 
             m_nWriteIndex = 0;
 
@@ -258,14 +258,16 @@ void BufferedSocketDevice::Flush()
 
     while ( !osBufferFull && ( m_nWriteSize > 0 ) && m_pSocket->isValid())
     {
-        QByteArray *a = m_bufWrite.first();
+        deque<QByteArray*>::iterator it = m_bufWrite.begin();
+        QByteArray *a = *it;
 
         int nwritten = 0;
         int i = 0;
 
         if ( (int)a->size() - m_nWriteIndex < 1460 ) 
         {
-            QByteArray out( 65536 );
+            QByteArray out;
+            out.resize(65536);
 
             int j = m_nWriteIndex;
             int s = a->size() - j;
@@ -275,7 +277,8 @@ void BufferedSocketDevice::Flush()
                 memcpy( out.data()+i, a->data()+j, s );
                 j = 0;
                 i += s;
-                a = m_bufWrite.next();
+                ++it;
+                a = *it;
                 s = a ? a->size() : 0;
             }
 
@@ -337,7 +340,8 @@ bool BufferedSocketDevice::At( qlonglong index )
     if ( index > m_bufRead.size() )
         return FALSE;
 
-    m_bufRead.consumeBytes( (Q_ULONG)index, 0 );    // throw away data 0..index-1
+    // throw away data 0..index-1
+    m_bufRead.consumeBytes( (qulonglong)index, 0 );
 
     return TRUE;
 }
@@ -361,7 +365,7 @@ bool BufferedSocketDevice::AtEnd()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_ULONG BufferedSocketDevice::BytesAvailable()  
+qulonglong BufferedSocketDevice::BytesAvailable(void)  
 {
     if ( !m_pSocket->isValid() )
         return 0;
@@ -373,14 +377,15 @@ Q_ULONG BufferedSocketDevice::BytesAvailable()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_ULONG BufferedSocketDevice::WaitForMore( int msecs, bool *pTimeout /* = NULL*/ ) 
+qulonglong BufferedSocketDevice::WaitForMore(
+    int msecs, bool *pTimeout /* = NULL*/ ) 
 {
     bool bTimeout = false;
 
     if ( !m_pSocket->isValid() )
         return 0;
 
-    Q_LONG nBytes = BytesAvailable();
+    qlonglong nBytes = BytesAvailable();
 
     if (nBytes == 0)
     {
@@ -423,7 +428,7 @@ Q_ULONG BufferedSocketDevice::WaitForMore( int msecs, bool *pTimeout /* = NULL*/
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_ULONG BufferedSocketDevice::BytesToWrite() const
+qulonglong BufferedSocketDevice::BytesToWrite(void) const
 {
     return m_nWriteSize;
 
@@ -435,7 +440,11 @@ Q_ULONG BufferedSocketDevice::BytesToWrite() const
 
 void BufferedSocketDevice::ClearPendingData()
 {
-    m_bufWrite.clear();
+    while (!m_bufWrite.empty())
+    {
+        delete m_bufWrite.back();
+        m_bufWrite.pop_back();
+    }
     m_nWriteIndex = m_nWriteSize = 0;
 }
 
@@ -452,7 +461,7 @@ void BufferedSocketDevice::ClearReadBuffer()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_LONG BufferedSocketDevice::ReadBlock( char *data, Q_ULONG maxlen )
+qlonglong BufferedSocketDevice::ReadBlock( char *data, qulonglong maxlen )
 {
     if ( data == 0 && maxlen != 0 ) 
         return -1;
@@ -462,7 +471,7 @@ Q_LONG BufferedSocketDevice::ReadBlock( char *data, Q_ULONG maxlen )
 
     ReadBytes();
 
-    if ( maxlen >= (Q_ULONG)m_bufRead.size() )
+    if ( maxlen >= (qulonglong)m_bufRead.size() )
         maxlen = m_bufRead.size();
 
     m_bufRead.consumeBytes( maxlen, data );
@@ -475,12 +484,12 @@ Q_LONG BufferedSocketDevice::ReadBlock( char *data, Q_ULONG maxlen )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_LONG BufferedSocketDevice::WriteBlock( const char *data, Q_ULONG len )
+qlonglong BufferedSocketDevice::WriteBlock( const char *data, qulonglong len )
 {
     if ( len == 0 )
         return 0;
 
-    QByteArray *a = m_bufWrite.last();
+    QByteArray *a = m_bufWrite.back();
 
     bool writeNow = ( m_nWriteSize + len >= 1400 || len > 512 );
 
@@ -495,10 +504,7 @@ Q_LONG BufferedSocketDevice::WriteBlock( const char *data, Q_ULONG len )
     else 
     {
         // append new buffer
-        a = new QByteArray( len );
-        memcpy( a->data(), data, len );
-
-        m_bufWrite.append( a );
+        m_bufWrite.push_back(new QByteArray(data, len));
     }
 
     m_nWriteSize += len;
@@ -513,9 +519,10 @@ Q_LONG BufferedSocketDevice::WriteBlock( const char *data, Q_ULONG len )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_LONG BufferedSocketDevice::WriteBlockDirect( const char *data, Q_ULONG len )
+qlonglong BufferedSocketDevice::WriteBlockDirect(
+    const char *data, qulonglong len)
 {
-    Q_LONG nWritten = 0;
+    qlonglong nWritten = 0;
         
     // must Flush data just in case caller is mixing buffered & un-buffered calls
 
@@ -594,7 +601,8 @@ bool BufferedSocketDevice::CanReadLine()
 
 QString BufferedSocketDevice::ReadLine()
 {
-    QByteArray a(256);
+    QByteArray a;
+    a.resize(256);
 
     ReadBytes();
 
@@ -660,7 +668,7 @@ QString BufferedSocketDevice::ReadLine( int msecs )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_UINT16 BufferedSocketDevice::Port() const
+quint16 BufferedSocketDevice::Port(void) const
 {
     if (m_pSocket)
         return( m_pSocket->port() );
@@ -672,7 +680,7 @@ Q_UINT16 BufferedSocketDevice::Port() const
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Q_UINT16 BufferedSocketDevice::PeerPort() const
+quint16 BufferedSocketDevice::PeerPort(void) const
 {
     if (m_pSocket)
         return( m_pSocket->peerPort() );

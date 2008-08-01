@@ -59,7 +59,7 @@ UPnpNotifyTask::~UPnpNotifyTask()
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpNotifyTask::SendNotifyMsg( Q3SocketDevice *pSocket,
+void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
                                     QString        sNT,
                                     QString        sUDN )
 {
@@ -138,7 +138,7 @@ void UPnpNotifyTask::SendNotifyMsg( Q3SocketDevice *pSocket,
 void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 {
 
-    Q3SocketDevice *pMulticast = new QMulticastSocket( SSDP_GROUP       , SSDP_PORT );
+    MSocketDevice *pMulticast = new QMulticastSocket(SSDP_GROUP, SSDP_PORT);
 //    QSocketDevice *pBroadcast = new QBroadcastSocket( "255.255.255.255", SSDP_PORT );
 
     // ----------------------------------------------------------------------
@@ -180,7 +180,8 @@ void UPnpNotifyTask::Execute( TaskQueue *pQueue )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpNotifyTask::ProcessDevice( Q3SocketDevice *pSocket, UPnpDevice *pDevice )
+void UPnpNotifyTask::ProcessDevice(
+    MSocketDevice *pSocket, UPnpDevice *pDevice)
 {
     // ----------------------------------------------------------------------
     // Loop for each device and send the 2 required messages
@@ -196,21 +197,15 @@ void UPnpNotifyTask::ProcessDevice( Q3SocketDevice *pSocket, UPnpDevice *pDevice
     // Loop for each service in this device and send the 1 required message
     // ------------------------------------------------------------------
 
-    for ( UPnpService *pService  = pDevice->m_listServices.first(); 
-                       pService != NULL;
-                       pService  = pDevice->m_listServices.next() )
-    {
-        SendNotifyMsg( pSocket, pService->m_sServiceType, pDevice->GetUDN() );
-    }
+    UPnpServiceList::const_iterator sit = pDevice->m_listServices.begin();
+    for (; sit != pDevice->m_listServices.end(); ++sit)
+        SendNotifyMsg( pSocket, (*sit)->m_sServiceType, pDevice->GetUDN() );
 
     // ----------------------------------------------------------------------
     // Process any Embedded Devices
     // ----------------------------------------------------------------------
 
-    for ( UPnpDevice *pEmbeddedDevice  = pDevice->m_listDevices.first(); 
-                      pEmbeddedDevice != NULL;
-                      pEmbeddedDevice  = pDevice->m_listDevices.next() )
-    {
-        ProcessDevice( pSocket, pEmbeddedDevice );
-    }
+    UPnpDeviceList::iterator dit = pDevice->m_listDevices.begin();
+    for (; dit != pDevice->m_listDevices.end(); ++dit)
+        ProcessDevice( pSocket, *dit);
 }

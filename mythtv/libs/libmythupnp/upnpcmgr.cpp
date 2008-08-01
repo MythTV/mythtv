@@ -136,12 +136,14 @@ bool UPnpCMGR::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest 
 
 void UPnpCMGR::HandleGetProtocolInfo( HTTPRequest *pRequest )
 {
-    NameValueList list;
+    NameValues list;
 
-    list.append( new NameValue( "Source", GetValue< QString >( "SourceProtocolInfo")));
-    list.append( new NameValue( "Sink"  , GetValue< QString >( "SinkProtocolInfo"  )));
+    list.push_back(
+        NameValue("Source", GetValue<QString>("SourceProtocolInfo")));
+    list.push_back(
+        NameValue("Sink",   GetValue<QString>("SinkProtocolInfo")));
 
-    pRequest->FormatActionResponse( &list );
+    pRequest->FormatActionResponse(list);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -158,18 +160,17 @@ void UPnpCMGR::HandleGetCurrentConnectionInfo( HTTPRequest *pRequest )
         return;
     }
 
-    NameValueList list;
+    NameValues list;
 
-    list.append( new NameValue( "RcsID"                , "-1"             ));
-    list.append( new NameValue( "AVTransportID"        , "-1"             ));
-    list.append( new NameValue( "ProtocolInfo"         , "http-get:*:*:*" ));
-    list.append( new NameValue( "PeerConnectionManager", "/"              ));
-    list.append( new NameValue( "PeerConnectionID"     , "-1"             ));
-    list.append( new NameValue( "Direction"            , "Output"         ));
-    list.append( new NameValue( "Status"               , "Unknown"        ));
+    list.push_back(NameValue( "RcsID"                , "-1"             ));
+    list.push_back(NameValue( "AVTransportID"        , "-1"             ));
+    list.push_back(NameValue( "ProtocolInfo"         , "http-get:*:*:*" ));
+    list.push_back(NameValue( "PeerConnectionManager", "/"              ));
+    list.push_back(NameValue( "PeerConnectionID"     , "-1"             ));
+    list.push_back(NameValue( "Direction"            , "Output"         ));
+    list.push_back(NameValue( "Status"               , "Unknown"        ));
     
-    pRequest->FormatActionResponse( &list );
-
+    pRequest->FormatActionResponse(list);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -178,10 +179,10 @@ void UPnpCMGR::HandleGetCurrentConnectionInfo( HTTPRequest *pRequest )
 
 void UPnpCMGR::HandleGetCurrentConnectionIDs ( HTTPRequest *pRequest )
 {
-    NameValueList list;
+    NameValues list;
 
-    list.append( new NameValue( "ConnectionIDs", GetValue< QString >( "CurrentConnectionIDs" )));
+    list.push_back(
+        NameValue("ConnectionIDs", GetValue<QString>("CurrentConnectionIDs")));
 
-    pRequest->FormatActionResponse( &list );
-
+    pRequest->FormatActionResponse(list);
 }

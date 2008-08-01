@@ -19,12 +19,6 @@
 #include <sys/utsname.h> 
 #endif
 
-// Qt headers
-#include <qregexp.h>
-#include <qstringlist.h>
-#include <q3textstream.h>
-#include <qdatetime.h>
-
 // MythTV headers
 #include "httpserver.h"
 #include "upnputil.h"
@@ -46,12 +40,9 @@ QString  HttpServer::g_sPlatform;
 //
 /////////////////////////////////////////////////////////////////////////////
 
-HttpServer::HttpServer( int nPort ) 
-          : Q3ServerSocket( nPort, 20 ), //5),
-            ThreadPool( "HTTP" )
+HttpServer::HttpServer() : QTcpServer(), ThreadPool("HTTP")
 {
-    m_extensions.setAutoDelete( true );
-
+    setMaxPendingConnections(20);
     InitializeThreads();
 
     // ----------------------------------------------------------------------
@@ -76,9 +67,8 @@ HttpServer::HttpServer( int nPort )
     // ----------------------------------------------------------------------
 
     m_sSharePath = GetShareDir();
-    VERBOSE( VB_UPNP, QString( "HttpServer( %1 ) - SharePath = %2" )
-                      .arg( nPort ).arg( m_sSharePath ));
-
+    VERBOSE(VB_UPNP, QString( "HttpServer() - SharePath = %1")
+            .arg(m_sSharePath));
 
     // -=>TODO: Load Config XML
     // -=>TODO: Load & initialize - HttpServerExtensions
@@ -90,6 +80,11 @@ HttpServer::HttpServer( int nPort )
 
 HttpServer::~HttpServer()
 {
+    while (!m_extensions.empty())
+    {
+        delete m_extensions.back();
+        m_extensions.pop_back();
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -106,7 +101,7 @@ WorkerThread *HttpServer::CreateWorkerThread( ThreadPool * /*pThreadPool */,
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HttpServer::newConnection(int nSocket)
+void HttpServer::incomingConnection(int nSocket)
 {
     HttpWorkerThread *pThread = (HttpWorkerThread *)GetWorkerThread();
 
@@ -138,7 +133,8 @@ void HttpServer::UnregisterExtension( HttpServerExtension *pExtension )
     if (pExtension != NULL )
     {
         m_mutex.lock();
-        m_extensions.remove( pExtension );
+        delete pExtension;
+        m_extensions.removeAll(pExtension);
         m_mutex.unlock();
     }
 }
@@ -153,20 +149,21 @@ void HttpServer::DelegateRequest( HttpWorkerThread *pThread, HTTPRequest *pReque
 
     m_mutex.lock();
 
-    HttpServerExtension *pExtension = m_extensions.first();
+    HttpServerExtensionList::iterator it = m_extensions.begin();
 
-    while (( pExtension != NULL ) && !bProcessed )
+    for (; (it != m_extensions.end()) && !bProcessed; ++it)
     {
         try
         {
-            bProcessed = pExtension->ProcessRequest( pThread, pRequest );
+            bProcessed = (*it)->ProcessRequest(pThread, pRequest);
         }
         catch(...)
         {
-            VERBOSE( VB_IMPORTANT, QString( "HttpServer::DelegateRequest - Unexpected Exception - pExtension->ProcessRequest()." ));
+            VERBOSE(VB_IMPORTANT,
+                    QString("HttpServer::DelegateRequest - "
+                            "Unexpected Exception - "
+                            "pExtension->ProcessRequest()."));
         }
-
-        pExtension = m_extensions.next();
     }
 
     m_mutex.unlock();
@@ -265,7 +262,7 @@ void  HttpWorkerThread::ProcessWork()
         {
             bTimeout = 0;
 
-            Q_LONG nBytes = pSocket->WaitForMore( m_nSocketTimeout, &bTimeout );
+            int64_t nBytes = pSocket->WaitForMore(m_nSocketTimeout, &bTimeout);
 
             if ( nBytes > 0)
             {

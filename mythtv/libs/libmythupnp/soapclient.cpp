@@ -42,7 +42,7 @@ SOAPClient::~SOAPClient()
 
 QDomNode SOAPClient::FindNode( const QString &sName, QDomNode &baseNode )
 {
-    QStringList parts = QStringList::split( "/", sName );
+    QStringList parts = sName.split("/", QString::SkipEmptyParts);
 
     return FindNode( parts, baseNode );
 
@@ -88,16 +88,16 @@ bool SOAPClient::GetNodeValue( QDomNode &node, const QString &sName, bool bDefau
     QString sDefault = (bDefault) ? "true" : "false";
     QString sValue   = GetNodeValue( node, sName, sDefault );
 
-    if (sValue.startsWith( "T" , false ) || 
-        sValue.startsWith( "Y" , false ) ||
-        sValue.startsWith( "1" , false ) )
+    if (sValue.startsWith( "T" , Qt::CaseInsensitive ) || 
+        sValue.startsWith( "Y" , Qt::CaseInsensitive ) ||
+        sValue.startsWith( "1" , Qt::CaseInsensitive ) )
     {
         return true;
     }
 
-    if (sValue.startsWith( "F" , false ) || 
-        sValue.startsWith( "N" , false ) ||
-        sValue.startsWith( "0" , false ) )
+    if (sValue.startsWith( "F" , Qt::CaseInsensitive ) || 
+        sValue.startsWith( "N" , Qt::CaseInsensitive ) ||
+        sValue.startsWith( "0" , Qt::CaseInsensitive ) )
     {
         return false;
     }
@@ -126,9 +126,7 @@ QString SOAPClient::GetNodeValue( QDomNode &node, const QString &sName, const QS
         if (!oText.isNull())
             sValue = oText.nodeValue();
 
-        QUrl::decode( sValue );
-
-        return sValue;
+        return QUrl::fromPercentEncoding(sValue.toLatin1());
     }
 
     return sDefault;
@@ -179,7 +177,7 @@ bool SOAPClient::SendSOAPRequest( const QString    &sMethod,
                              ++it ) 
     {                                                               
         os << "   <" << it.key() << ">";
-        os << HTTPRequest::Encode( it.data() );
+        os << HTTPRequest::Encode( *it );
         os << "</"   << it.key() << ">\r\n";
     }
 
@@ -249,11 +247,9 @@ bool SOAPClient::SendSOAPRequest( const QString    &sMethod,
     
                     if (!oText.isNull())
                         sValue = oText.nodeValue();
-             
-                    QUrl::decode( sName  );
-                    QUrl::decode( sValue );
 
-                    list.insert( sName, sValue );
+                    list.insert(QUrl::fromPercentEncoding(sName.toLatin1()),
+                                QUrl::fromPercentEncoding(sValue.toLatin1()));
                 }
             }
         }

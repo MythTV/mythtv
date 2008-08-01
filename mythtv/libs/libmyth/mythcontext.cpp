@@ -895,9 +895,9 @@ bool MythContextPrivate::InitUPnP(void)
     m_UPnP->SetConfiguration(m_XML);
 
     int port=6549;
-    m_HTTP = new HttpServer(port);
+    m_HTTP = new HttpServer();
 
-    if (!m_HTTP->ok())
+    if (!m_HTTP->listen(QHostAddress::Any,port))
     {
         VERBOSE(VB_IMPORTANT, "MCP::InitUPnP() - HttpServer Create Error");
         DeleteUPnP();
@@ -1674,7 +1674,7 @@ double MythContext::GetFloatSettingOnHost(
 
 QImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
 {
-    Q3Url qurl = url;
+    QUrl qurl = url;
     if (qurl.host() == "")
         return NULL;
 

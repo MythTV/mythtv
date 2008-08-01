@@ -295,12 +295,10 @@ void UPnp::FormatErrorResponse( HTTPRequest   *pRequest,
         if (sMsg.length() == 0)
             sMsg = GetResultDesc( eCode );
 
-        HTTPRequest::Encode( sMsg );
-
         sDetails += QString( "<errorCode>%1</errorCode>"
                              "<errorDescription>%2</errorDescription>" )
                        .arg( eCode )
-                       .arg( sMsg  );
+                       .arg( HTTPRequest::Encode( sMsg ) );
 
         if (pRequest->m_bSOAPRequest)     
             sDetails += "</UPnPResult>";

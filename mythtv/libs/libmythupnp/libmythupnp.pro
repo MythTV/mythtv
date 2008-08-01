@@ -22,13 +22,13 @@ HEADERS += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnputil.
 HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h bufferedsocketdevice.h upnpmsrr.h
 HEADERS += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
 HEADERS += upnpimpl.h multicast.h broadcast.h configuration.h
-HEADERS += soapclient.h mythxmlclient.h
+HEADERS += soapclient.h mythxmlclient.h mmembuf.h
 
 SOURCES += httprequest.cpp upnp.cpp ssdp.cpp taskqueue.cpp upnputil.cpp
 SOURCES += upnpdevice.cpp upnptasknotify.cpp upnptasksearch.cpp threadpool.cpp
 SOURCES += httpserver.cpp upnpcds.cpp upnpcdsobjects.cpp bufferedsocketdevice.cpp
 SOURCES += eventing.cpp upnpcmgr.cpp upnpmsrr.cpp upnptaskevent.cpp ssdpcache.cpp
-SOURCES += configuration.cpp soapclient.cpp mythxmlclient.cpp
+SOURCES += configuration.cpp soapclient.cpp mythxmlclient.cpp mmembuf.cpp
 
 INCLUDEPATH += ../libmythdb
 DEPENDPATH += ../libmythdb
@@ -50,7 +50,7 @@ inc.files += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnputi
 inc.files += httpserver.h httpstatus.h upnpcds.h upnpcdsobjects.h
 inc.files += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
 inc.files += upnpimpl.h multicast.h broadcast.h configuration.h
-inc.files += soapclient.h mythxmlclient.h
+inc.files += soapclient.h mythxmlclient.h mmembuf.h
 
 INSTALLS += inc
 
@@ -68,6 +68,6 @@ macx {
 }
 
 #The following line was inserted by qt3to4
-QT += network xml  sql opengl qt3support
+QT += network xml sql
 
 include ( ../libs-targetfix.pro )

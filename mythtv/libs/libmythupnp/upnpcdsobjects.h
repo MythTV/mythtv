@@ -11,13 +11,13 @@
 #ifndef __UPNPCDSOBJECTS_H_
 #define __UPNPCDSOBJECTS_H_
 
-#include <qdom.h>
-#include <qdatetime.h> 
-#include <q3textstream.h>
-#include <q3dict.h>
-#include <q3ptrlist.h>
+#include <QDateTime>
+#include <QString>
+#include <QList>
+#include <QMap>
 
 class CDSObject;
+class QTextStream;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -59,9 +59,8 @@ class Property
         }
 };
 
-typedef Q3Dict        < Property >  Properties;
-typedef Q3DictIterator< Property >  PropertiesIterator;
-typedef Q3PtrList     < CDSObject>  CDSObjects;
+typedef QMap<QString,Property*> Properties;
+typedef QList<CDSObject*>       CDSObjects;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -74,7 +73,7 @@ class Resource
         QString         m_sProtocolInfo;
         QString         m_sURI;
 
-        NameValueList   m_lstAttributes;
+        NameValues      m_lstAttributes;
 
     public:
 
@@ -88,11 +87,11 @@ class Resource
         void AddAttribute( const QString &sName, 
                            const QString &sValue )
         {
-            m_lstAttributes.append( new NameValue( sName, sValue ));
+            m_lstAttributes.push_back(NameValue(sName, sValue));
         }
 };
 
-typedef Q3PtrList < Resource > Resources;
+typedef QList<Resource*> Resources;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -118,7 +117,7 @@ class ContainerClass
         }
 };
 
-typedef Q3PtrList < ContainerClass > Classes;
+typedef QList<ContainerClass*> Classes;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -171,12 +170,12 @@ class CDSObject
         ContainerClass *AddCreateClass( ContainerClass *pClass );
 
         void          SetPropValue( QString sName, QString sValue );
-        QString       GetPropValue( QString sName );
+        QString       GetPropValue( const QString &sName ) const;
 
-        QString       toXml      ();
-        void          toXml      ( Q3TextStream &os );
+        QString       toXml      (  void ) const;
+        void          toXml      ( QTextStream &os ) const;
 
-        long          GetChildCount();
+        long          GetChildCount( void ) const;
         void          SetChildCount( long nCount );
 
         Resource     *AddResource( QString sProtocol, QString sURI );

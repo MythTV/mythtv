@@ -23,8 +23,7 @@
 #include <map>
 
 // Qt headers
-#include <qthread.h>
-#include <q3socketdevice.h>
+#include <QThread>
 
 // MythTV headers
 #include "upnputil.h"

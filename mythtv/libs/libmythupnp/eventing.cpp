@@ -8,13 +8,47 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include <cmath>
+
+#include <QTextCodec>
+#include <QTextStream>
+
 #include "upnp.h"
 #include "eventing.h"
 #include "upnptaskevent.h"
 
-#include <q3textstream.h>
-#include <math.h>
-#include <qregexp.h>
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+uint StateVariables::BuildNotifyBody(
+    QTextStream &ts, TaskTime ttLastNotified) const
+{
+    uint nCount = 0;
+
+    ts << "<?xml version=\"1.0\"?>" << endl
+       << "<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">" << endl;
+
+    SVMap::const_iterator it = m_map.begin();
+    for (; it != m_map.end(); ++it)
+    {
+        if ( ttLastNotified < (*it)->m_ttLastChanged )
+        {
+            nCount++;
+
+            ts << "<e:property>" << endl;
+            ts <<   "<" << (*it)->m_sName << ">";
+            ts <<     (*it)->ToString();
+            ts <<   "</" << (*it)->m_sName << ">";
+            ts << "</e:property>" << endl;
+        }
+    }
+
+    ts << "</e:propertyset>" << endl;
+    ts << flush;
+
+    return nCount;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -32,6 +66,10 @@ Eventing::Eventing( const QString &sExtensionName, const QString &sEventMethodNa
 
 Eventing::~Eventing()
 {
+    Subscribers::iterator it = m_Subscribers.begin();
+    for (; it != m_Subscribers.end(); ++it)
+        delete *it;
+    m_Subscribers.clear();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -164,11 +202,17 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
 
         // -=>TODO: Temp code until support for multiple callbacks are supported.
 
-        sCallBack = sCallBack.mid( 1, sCallBack.find( ">" ) - 1);
+        sCallBack = sCallBack.mid( 1, sCallBack.indexOf(">") - 1);
 
         pInfo = new SubscriberInfo( sCallBack, m_nSubscriptionDuration );
 
-        m_Subscribers.insert( pInfo->sUUID, pInfo );
+        Subscribers::iterator it = m_Subscribers.find(pInfo->sUUID);
+        if (it != m_Subscribers.end())
+        {
+            delete *it;
+            m_Subscribers.erase(it);
+        }
+        m_Subscribers[pInfo->sUUID] = pInfo;
 
         // Use PostProcess Hook to Send Initial FULL Notification...
         //      *** Must send this response first then notify.
@@ -186,7 +230,7 @@ void Eventing::HandleSubscribe( HTTPRequest *pRequest )
         if ( sSID.length() != 0 )   
         {
             sSID  = sSID.mid( 5 );
-            pInfo = m_Subscribers.find( sSID );
+            pInfo = m_Subscribers[sSID];
         }
 
     }
@@ -226,10 +270,13 @@ void Eventing::HandleUnsubscribe( HTTPRequest *pRequest )
 
     sSID = sSID.mid( 5 );
 
-    if (!m_Subscribers.remove( sSID ))
-        return;
-
-    pRequest->m_nResponseStatus = 200;
+    Subscribers::iterator it = m_Subscribers.find(sSID);
+    if (it != m_Subscribers.end())
+    {
+        delete *it;
+        m_Subscribers.erase(it);
+        pRequest->m_nResponseStatus = 200;
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -243,36 +290,26 @@ void Eventing::Notify()
 
     m_mutex.lock();
 
-
-    for ( SubscriberIterator it( m_Subscribers ); it.current();  )
+    Subscribers::iterator it = m_Subscribers.begin();
+    while (it != m_Subscribers.end())
     { 
-        SubscriberInfo *pInfo = it.current();
+        if (!(*it))
+        {   // This should never happen, but if someone inserted bad data...
+            ++it;
+            continue;
+        }
 
-        if ( pInfo != NULL )
+        if (tt < (*it)->ttExpires)
         {
-            // --------------------------------------------------------------
-            // Check to see if it's time to expire this Subscription.
-            // --------------------------------------------------------------
-
-            if ( tt < pInfo->ttExpires )
-            {
-                // --------------------------------------------------------------
-                // Nope... Send Event notification
-                // --------------------------------------------------------------
-
-                NotifySubscriber( pInfo );
-
-                ++it;
-            }
-            else
-            {
-                // --------------------------------------------------------------
-                // Yes... Remove subscriber from list 
-                //        (automatically moves iterator to next item)
-                // --------------------------------------------------------------
-
-                m_Subscribers.remove( pInfo->sUUID );
-            }
+            // Subscription not expired yet. Send event notification.
+            NotifySubscriber(*it);
+            ++it;
+        }
+        else
+        {
+            // Time to expire this subscription. Remove subscriber from list.
+            delete *it;
+            it = m_Subscribers.erase(it);
         }
     }
 
@@ -288,17 +325,17 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
     if (pInfo == NULL)
         return;
 
-    int          nCount  = 0;
     QByteArray   aBody;
     QTextStream  tsBody( &aBody, QIODevice::WriteOnly );
 
-    tsBody.setEncoding( QTextStream::UnicodeUTF8 );
+    tsBody.setCodec(QTextCodec::codecForName("UTF-8"));
 
     // ----------------------------------------------------------------------
     // Build Body... Only send if there are changes
     // ----------------------------------------------------------------------
 
-    if (( nCount = BuildNotifyBody( tsBody, pInfo->ttLastNotified )) > 0)
+    uint nCount = BuildNotifyBody(tsBody, pInfo->ttLastNotified);
+    if (nCount)
     {
 
         // -=>TODO: Need to add support for more than one CallBack URL.
@@ -306,13 +343,13 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
         QByteArray  *pBuffer = new QByteArray();    // UPnpEventTask will delete this pointer.
         QTextStream  tsMsg( pBuffer, QIODevice::WriteOnly );
 
-        tsMsg.setEncoding( QTextStream::UnicodeUTF8 );
+        tsMsg.setCodec(QTextCodec::codecForName("UTF-8"));
 
         // ----------------------------------------------------------------------
         // Build Message Header 
         // ----------------------------------------------------------------------
 
-        int   nPort = pInfo->qURL.hasPort() ? pInfo->qURL.port() : 80;
+        int     nPort = (pInfo->qURL.port()>=0) ? pInfo->qURL.port() : 80;
         QString sHost = QString( "%1:%2" ).arg( pInfo->qURL.host() )
                                           .arg( nPort );
 
@@ -348,38 +385,5 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
         gettimeofday( &pInfo->ttLastNotified, NULL );
     }
 
-}
-
-/////////////////////////////////////////////////////////////////////////////
-//
-/////////////////////////////////////////////////////////////////////////////
-
-int Eventing::BuildNotifyBody( QTextStream &ts, TaskTime ttLastNotified )
-{
-    int nCount = 0;
-
-    ts << "<?xml version=\"1.0\"?>" << endl
-       << "<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">" << endl;
-
-    for( StateVariableIterator it( *((StateVariables *)this) ); it.current(); ++it )
-    {
-        StateVariableBase *pBase = it.current();
-
-        if ( ttLastNotified < pBase->m_ttLastChanged )
-        {
-            nCount++;
-
-            ts << "<e:property>" << endl;
-            ts <<   "<" << pBase->m_sName << ">";
-            ts <<     pBase->ToString();
-            ts <<   "</" << pBase->m_sName << ">";
-            ts << "</e:property>" << endl;
-        }
-    }
-
-    ts << "</e:propertyset>" << endl;
-    ts << flush;
-
-    return nCount;
 }
 

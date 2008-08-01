@@ -97,7 +97,7 @@ bool XmlConfiguration::Save( void )
 
         if (!createDir.exists())
         {
-            if (!createDir.mkdir( m_sPath, true ))
+            if (!createDir.mkdir(m_sPath))
             {
                 VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg( m_sPath ));
                 return false;
@@ -128,7 +128,7 @@ bool XmlConfiguration::Save( void )
 
 QDomNode XmlConfiguration::FindNode( const QString &sName, bool bCreate )
 {
-    QStringList parts = QStringList::split( "/", sName );
+    QStringList parts = sName.split("/", QString::SkipEmptyParts);
 
     return FindNode( parts, m_rootNode, bCreate );
 

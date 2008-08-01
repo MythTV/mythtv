@@ -143,7 +143,7 @@ void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
 
             SetStrValue( e, sValue );
 
-            pCurDevice->m_lstExtra.append( new NameValue( e.tagName(), sValue ));
+            pCurDevice->m_lstExtra.push_back(NameValue(e.tagName(), sValue));
         }
     }
 }
@@ -330,7 +330,9 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     //          kind of way.
     // ----------------------------------------------------------------------
 
-    bool bIsXbox360 = sUserAgent.startsWith( "Xbox/2.0", false ) || sUserAgent.startsWith( "Mozilla/4.0", false);
+    bool bIsXbox360 =
+        sUserAgent.startsWith("Xbox/2.0", Qt::CaseInsensitive) ||
+        sUserAgent.startsWith( "Mozilla/4.0", Qt::CaseInsensitive);
 
     os << FormatValue( "manufacturer" , pDevice->m_sManufacturer    );
     os << FormatValue( "modelURL"     , pDevice->m_sModelURL        );    
@@ -351,17 +353,20 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     os << FormatValue( "UPC"              , pDevice->m_sUPC             );
     os << FormatValue( "presentationURL"  , pDevice->m_sPresentationURL );
 
-    for (NameValue *pNV  = pDevice->m_lstExtra.first(); 
-                    pNV != NULL; 
-                    pNV  = pDevice->m_lstExtra.next() )
+    NameValues::const_iterator nit = pDevice->m_lstExtra.begin();
+    for (; nit != pDevice->m_lstExtra.end(); ++nit)
     {
         // -=>TODO: Hack to handle one element with attributes... need to 
         //          handle attributes in a more generic way.
 
-        if (pNV->sName == "dlna:X_DLNADOC")
-            os << QString( "<dlna:X_DLNADOC xmlns:dlna=\"urn:schemas-dlna-org:device-1-0\">%1</dlna:X_DLNADOC>\n" ).arg( pNV->sValue);
+        if ((*nit).sName == "dlna:X_DLNADOC")
+        {
+            os << QString("<dlna:X_DLNADOC xmlns:dlna=\"urn:"
+                          "schemas-dlna-org:device-1-0\">%1"
+                          "</dlna:X_DLNADOC>\n" ).arg((*nit).sValue);
+        }
         else
-            os << FormatValue( pNV->sName, pNV->sValue );
+            os << FormatValue( (*nit).sName, (*nit).sValue );
     }
 
     // ----------------------------------------------------------------------
@@ -372,17 +377,16 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     {
         os << "<iconList>\n";
 
-        for ( UPnpIcon *pIcon  = pDevice->m_listIcons.first(); 
-                        pIcon != NULL;
-                        pIcon  = pDevice->m_listIcons.next() )
+        UPnpIconList::const_iterator it = pDevice->m_listIcons.begin();
+        for (; it != pDevice->m_listIcons.end(); ++it)
         {
 
             os << "<icon>\n";
-            os << FormatValue( "mimetype", pIcon->m_sMimeType );
-            os << FormatValue( "width"   , pIcon->m_nWidth    );
-            os << FormatValue( "height"  , pIcon->m_nHeight   );
-            os << FormatValue( "depth"   , pIcon->m_nDepth    );
-            os << FormatValue( "url"     , pIcon->m_sURL      );
+            os << FormatValue( "mimetype", (*it)->m_sMimeType );
+            os << FormatValue( "width"   , (*it)->m_nWidth    );
+            os << FormatValue( "height"  , (*it)->m_nHeight   );
+            os << FormatValue( "depth"   , (*it)->m_nDepth    );
+            os << FormatValue( "url"     , (*it)->m_sURL      );
             os << "</icon>\n";
         }
         os << "</iconList>\n";
@@ -413,19 +417,22 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
 
         os << "<serviceList>\n";
 
-        for ( UPnpService *pService  = pDevice->m_listServices.first(); 
-                           pService != NULL;
-                           pService  = pDevice->m_listServices.next() )
+        UPnpServiceList::const_iterator it = pDevice->m_listServices.begin();
+        for (; it != pDevice->m_listServices.end(); ++it)
         {
-            if ( !bIsXbox360 && pService->m_sServiceType.startsWith( "urn:microsoft.com:service:X_MS_MediaReceiverRegistrar", false ))
+            if (!bIsXbox360 && (*it)->m_sServiceType.startsWith(
+                    "urn:microsoft.com:service:X_MS_MediaReceiverRegistrar",
+                    Qt::CaseInsensitive))
+            {
                 continue;
+            }
 
             os << "<service>\n";
-            os << FormatValue( "serviceType", pService->m_sServiceType );
-            os << FormatValue( "serviceId"  , pService->m_sServiceId   );
-            os << FormatValue( "SCPDURL"    , pService->m_sSCPDURL     );
-            os << FormatValue( "controlURL" , pService->m_sControlURL  );
-            os << FormatValue( "eventSubURL", pService->m_sEventSubURL );
+            os << FormatValue( "serviceType", (*it)->m_sServiceType );
+            os << FormatValue( "serviceId"  , (*it)->m_sServiceId   );
+            os << FormatValue( "SCPDURL"    , (*it)->m_sSCPDURL     );
+            os << FormatValue( "controlURL" , (*it)->m_sControlURL  );
+            os << FormatValue( "eventSubURL", (*it)->m_sEventSubURL );
             os << "</service>\n";
         }
         os << "</serviceList>\n";
@@ -482,41 +489,38 @@ QString UPnpDeviceDesc::FormatValue( const QString &sName, int nValue )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString  UPnpDeviceDesc::FindDeviceUDN( UPnpDevice *pDevice, QString sST )
+QString UPnpDeviceDesc::FindDeviceUDN( UPnpDevice *pDevice, QString sST )
 {
     if (sST == pDevice->m_sDeviceType)
-        return( pDevice->GetUDN() );
+        return pDevice->GetUDN();
 
     if (sST == pDevice->GetUDN())
-        return( sST );
+        return sST;
             
     // ----------------------------------------------------------------------
     // Check for matching Service
     // ----------------------------------------------------------------------
 
-    for ( UPnpService *pService  = pDevice->m_listServices.first(); 
-                       pService != NULL;
-                       pService  = pDevice->m_listServices.next() )
+    UPnpServiceList::const_iterator sit = pDevice->m_listServices.begin();
+    for (; sit != pDevice->m_listServices.end(); ++sit)
     {
-        if (sST == pService->m_sServiceType)
-            return( pDevice->GetUDN() );
+        if (sST == (*sit)->m_sServiceType)
+            return pDevice->GetUDN();
     }
 
     // ----------------------------------------------------------------------
     // Check Embedded Devices for a Match
     // ----------------------------------------------------------------------
 
-    for ( UPnpDevice *pEmbeddedDevice  = pDevice->m_listDevices.first(); 
-                      pEmbeddedDevice != NULL;
-                      pEmbeddedDevice  = pDevice->m_listDevices.next() )
+    UPnpDeviceList::const_iterator dit = pDevice->m_listDevices.begin();
+    for (; dit != pDevice->m_listDevices.end(); ++dit)
     {
-        QString sUDN = FindDeviceUDN( pEmbeddedDevice, sST );
-
+        QString sUDN = FindDeviceUDN( *dit, sST );
         if (sUDN.length() > 0)
-            return( sUDN );
+            return sUDN;
     }
 
-    return( "" );
+    return "";
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -542,11 +546,10 @@ UPnpDevice *UPnpDeviceDesc::FindDevice( UPnpDevice *pDevice, const QString &sURI
     // Check Embedded Devices for a Match
     // ----------------------------------------------------------------------
 
-    for ( UPnpDevice *pEmbeddedDevice  = pDevice->m_listDevices.first(); 
-                      pEmbeddedDevice != NULL;
-                      pEmbeddedDevice  = pDevice->m_listDevices.next() )
+    UPnpDeviceList::iterator dit = pDevice->m_listDevices.begin();
+    for (; dit != pDevice->m_listDevices.end(); ++dit)
     {
-        UPnpDevice *pFound = FindDevice( pEmbeddedDevice, sURI );
+        UPnpDevice *pFound = FindDevice(*dit, sURI);
 
         if (pFound != NULL)
             return pFound;

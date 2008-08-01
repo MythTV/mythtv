@@ -8,10 +8,11 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
-#include "upnpcds.h"
-#include <q3url.h>
+#include <QTextStream>
+#include <QTextCodec>
+#include <QUrl>
 
-#include <q3textstream.h>
+#include "upnpcds.h"
 
 inline QString GetBool( bool bVal ) { return( (bVal) ? "1" : "0" ); }
 
@@ -26,20 +27,13 @@ inline QString GetBool( bool bVal ) { return( (bVal) ? "1" : "0" ); }
 CDSObject::CDSObject( const QString sId, 
                       const QString sTitle, 
                       const QString sParentId )
-    : m_nUpdateId(1), m_eType(OT_Container)
-    , m_sId(sId), m_sParentId(sParentId)
-    , m_sTitle(sTitle), m_bRestricted(true)
-    , m_bSearchable(false), m_sWriteStatus("PROTECTED")
-    , m_nChildCount(-1)
+    : m_nUpdateId(1), m_eType(OT_Container),
+      m_sId(HTTPRequest::Encode(sId)),
+      m_sParentId(HTTPRequest::Encode(sParentId)),
+      m_sTitle(HTTPRequest::Encode(sTitle)),
+      m_bRestricted(true), m_bSearchable(false),
+      m_sWriteStatus("PROTECTED"), m_nChildCount(-1)
 {
-    HTTPRequest::Encode( m_sId       );
-    HTTPRequest::Encode( m_sParentId );
-    HTTPRequest::Encode( m_sTitle    );
-    
-    m_properties.setAutoDelete( true );
-    m_children  .setAutoDelete( true );
-    m_resources .setAutoDelete( true );
-
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -48,7 +42,22 @@ CDSObject::CDSObject( const QString sId,
 
 CDSObject::~CDSObject()
 {
+    while (!m_resources.empty())
+    {
+        delete m_resources.back();
+        m_resources.pop_back();
+    }
 
+    while (!m_children.empty())
+    {
+        delete m_children.back();
+        m_children.pop_back();
+    }
+
+    Properties::iterator it = m_properties.begin();
+    for (; it != m_properties.end(); ++it)
+        delete *it;
+    m_properties.clear();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -58,9 +67,17 @@ CDSObject::~CDSObject()
 Property *CDSObject::AddProperty( Property *pProp )
 {
     if (pProp)
-        m_properties.insert( pProp->m_sName, pProp );
+    {
+        Properties::iterator it = m_properties.find(pProp->m_sName);
+        if (it != m_properties.end())
+        {
+            delete *it;
+            m_properties.erase(it);
+        }
+        m_properties[pProp->m_sName] = pProp;
+    }
 
-    return( pProp );
+    return pProp;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -69,12 +86,10 @@ Property *CDSObject::AddProperty( Property *pProp )
 
 void CDSObject::SetPropValue( QString sName, QString sValue )
 {
-    Property *pProp = m_properties[ sName ];
-
-    if (pProp != NULL)
+    Properties::iterator it = m_properties.find(sName);
+    if (it !=  m_properties.end() && *it)
     {
-        pProp->m_sValue = sValue;
-        HTTPRequest::Encode( pProp->m_sValue );
+        (*it)->m_sValue = HTTPRequest::Encode(sValue);
     }
 }
 
@@ -82,18 +97,14 @@ void CDSObject::SetPropValue( QString sName, QString sValue )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString CDSObject::GetPropValue( QString sName )
+QString CDSObject::GetPropValue(const QString &sName) const
 {
-    Property *pProp = m_properties[ sName ];
+    Properties::const_iterator it = m_properties.find(sName);
 
-    if (pProp != NULL)
-    {
-        QString sValue = pProp->m_sValue;
-        Q3Url::decode( sValue );
-        return( sValue );
-    }
+    if (it !=  m_properties.end() && *it)
+        return QUrl::fromPercentEncoding((*it)->m_sValue.toLatin1());
     
-    return( "" );
+    return "";
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -115,7 +126,7 @@ CDSObject *CDSObject::AddChild( CDSObject *pChild )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-long CDSObject::GetChildCount()
+long CDSObject::GetChildCount(void) const
 {
     long nCount = m_children.count();
     if ( nCount == 0)
@@ -150,15 +161,13 @@ void CDSObject::SetChildCount( long nCount )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString CDSObject::toXml()// FilterMap &filter )
+QString CDSObject::toXml(void) const
 {
     QString     sXML;
-    Q3TextStream os( sXML, QIODevice::WriteOnly );
-    
-    os.setEncoding( Q3TextStream::UnicodeUTF8 );
-
-    toXml( os ); //, filter );
-
+    QTextStream os( &sXML, QIODevice::WriteOnly );
+    os.setCodec(QTextCodec::codecForName("UTF-8"));
+    toXml(os);
+    os << flush;
     return( sXML );
 }
 
@@ -166,7 +175,7 @@ QString CDSObject::toXml()// FilterMap &filter )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void CDSObject::toXml( Q3TextStream &os ) //, FilterMap &filter )
+void CDSObject::toXml(QTextStream &os) const
 {
     QString sEndTag = "";
     bool    bFilter = false;
@@ -207,9 +216,10 @@ void CDSObject::toXml( Q3TextStream &os ) //, FilterMap &filter )
     // Output all Properties
     // ----------------------------------------------------------------------
 
-    for( PropertiesIterator it( m_properties ); it.current(); ++it )
+    Properties::const_iterator it = m_properties.begin();
+    for (; it != m_properties.end(); ++it)
     {
-        Property *pProp = it.current();
+        const Property *pProp = *it;
 
         if (pProp->m_bRequired || (pProp->m_sValue.length() > 0))
         {
@@ -233,20 +243,16 @@ void CDSObject::toXml( Q3TextStream &os ) //, FilterMap &filter )
     // Output any Res Elements
     // ----------------------------------------------------------------------
 
-    for ( Resource *pRes  = m_resources.first(); 
-                    pRes != NULL; 
-                    pRes  = m_resources.next() )
+    Resources::const_iterator rit = m_resources.begin();
+    for (; rit != m_resources.end(); ++rit)
     {
-        os << "<res protocolInfo=\"" << pRes->m_sProtocolInfo << "\" ";
+        os << "<res protocolInfo=\"" << (*rit)->m_sProtocolInfo << "\" ";
 
-        for (NameValue *pNV  = pRes->m_lstAttributes.first(); 
-                        pNV != NULL; 
-                        pNV  = pRes->m_lstAttributes.next())
-        {                               
-            os << pNV->sName << "=\"" << pNV->sValue << "\" ";
-        }
+        NameValues::const_iterator nit = (*rit)->m_lstAttributes.begin();
+        for (; nit != (*rit)->m_lstAttributes.end(); ++ nit)
+            os << (*nit).sName << "=\"" << (*nit).sValue << "\" ";
 
-        os << ">" << pRes->m_sURI;                                            
+        os << ">" << (*rit)->m_sURI;
         os << "</res>\r\n";
     }
 
@@ -254,18 +260,16 @@ void CDSObject::toXml( Q3TextStream &os ) //, FilterMap &filter )
     // Output any children
     // ----------------------------------------------------------------------
 
-    for ( CDSObject *pObject  = m_children.first(); 
-                  pObject != NULL; 
-                  pObject = m_children.next() )
-    {
-        pObject->toXml( os ); //, filter );
-    }
+    CDSObjects::const_iterator cit = m_children.begin();
+    for (; cit != m_children.end(); ++cit)
+        (*cit)->toXml(os);
 
     // ----------------------------------------------------------------------
     // Close Element Tag
     // ----------------------------------------------------------------------
 
     os << sEndTag;
+    os << flush;
 }
 
 

@@ -13,9 +13,8 @@
 
 #include <sys/time.h>
 
-#include <qdom.h>
-#include <Q3PtrList>
-#include <Q3Url>
+#include <QDomDocument>
+#include <QUrl>
 
 #include "upnputil.h"
 #include "refcounted.h"
@@ -33,9 +32,9 @@ class QTextStream;
 // Typedefs
 /////////////////////////////////////////////////////////////////////////////
 
-typedef Q3PtrList< UPnpDevice  >  UPnpDeviceList;
-typedef Q3PtrList< UPnpService >  UPnpServiceList;
-typedef Q3PtrList< UPnpIcon    >  UPnpIconList;
+typedef QList< UPnpDevice*  >  UPnpDeviceList;
+typedef QList< UPnpService* >  UPnpServiceList;
+typedef QList< UPnpIcon*    >  UPnpIconList;
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -88,7 +87,7 @@ class UPnpDevice
         QString         m_sPresentationURL;
         QString         m_sUDN;
 
-        NameValueList   m_lstExtra;
+        NameValues      m_lstExtra;
 
         UPnpIconList    m_listIcons;
         UPnpServiceList m_listServices;
@@ -100,10 +99,24 @@ class UPnpDevice
         {
             m_sModelNumber  = MYTH_BINARY_VERSION;
             m_sSerialNumber = myth_source_version;
-
-            m_listIcons   .setAutoDelete( true );
-            m_listServices.setAutoDelete( true );
-            m_listDevices .setAutoDelete( true );
+        }
+        ~UPnpDevice()
+        {
+            while (!m_listIcons.empty())
+            {
+                delete m_listIcons.back();
+                m_listIcons.pop_back();
+            }
+            while (!m_listServices.empty())
+            {
+                delete m_listServices.back();
+                m_listServices.pop_back();
+            }
+            while (!m_listDevices.empty())
+            {
+                delete m_listDevices.back();
+                m_listDevices.pop_back();
+            }
         }
 
         QString GetUDN()
@@ -130,7 +143,7 @@ class UPnpDeviceDesc
 
         UPnpDevice      m_rootDevice;
         QString         m_sHostName;
-        Q3Url            m_HostUrl;
+        QUrl            m_HostUrl;
 
     protected: 
 

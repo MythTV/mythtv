@@ -13,9 +13,8 @@
 
 #include "mythobservable.h"
 
-#include <qobject.h>
-#include <q3dict.h>
-#include <qmap.h>
+#include <QObject>
+#include <QMap>
 
 #include "upnpdevice.h"
 

@@ -105,17 +105,14 @@ void UPnpMSRR::HandleIsAuthorized( HTTPRequest *pRequest )
 {
     /* Always tell the user they are authorized to access this data */
     VERBOSE(VB_UPNP, QString("UPnpMSRR::HandleIsAuthorized"));
-    NameValueList list;
+    NameValues list;
 
-    NameValue *pResult = new NameValue( "Result", "1");
+    list.push_back(NameValue("Result", "1"));
 
-    pResult->AddAttribute( "xmlns:dt", "urn:schemas-microsoft-com:datatypes" );
-    pResult->AddAttribute( "dt:dt"   , "int"                                 );
+    list.back().AddAttribute("xmlns:dt", "urn:schemas-microsoft-com:datatypes");
+    list.back().AddAttribute("dt:dt",    "int");
 
-    list.append( pResult );
-
-    pRequest->FormatActionResponse( &list );
-
+    pRequest->FormatActionResponse(list);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -126,12 +123,11 @@ void UPnpMSRR::HandleRegisterDevice( HTTPRequest *pRequest )
 {
     /* Sure, register, we don't really care */
     VERBOSE(VB_UPNP, QString("UPnpMSRR::HandleRegisterDevice"));
-    NameValueList list;
+    NameValues list;
 
-    list.append( new NameValue( "Result", "1"));
+    list.push_back(NameValue("Result", "1"));
 
-    pRequest->FormatActionResponse( &list );
-
+    pRequest->FormatActionResponse(list);
 }
 
 void UPnpMSRR::HandleIsValidated( HTTPRequest *pRequest )
@@ -139,16 +135,13 @@ void UPnpMSRR::HandleIsValidated( HTTPRequest *pRequest )
     /* You are valid sir */
 
     VERBOSE(VB_UPNP, QString("UPnpMSRR::HandleIsValidated"));
-    NameValueList list;
+    NameValues list;
 
-    NameValue *pResult = new NameValue( "Result", "1");
+    list.push_back(NameValue("Result", "1"));
 
-    pResult->AddAttribute( "xmlns:dt", "urn:schemas-microsoft-com:datatypes" );
-    pResult->AddAttribute( "dt:dt"   , "int"                                 );
+    list.back().AddAttribute("xmlns:dt", "urn:schemas-microsoft-com:datatypes");
+    list.back().AddAttribute( "dt:dt",   "int");
 
-    list.append( pResult );
-
-    pRequest->FormatActionResponse( &list );
-
+    pRequest->FormatActionResponse(list);
 }
 

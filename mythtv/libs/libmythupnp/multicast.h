@@ -12,9 +12,12 @@
 #define __MULTICAST_H__
 
 // Qt headers
-#include <q3socketdevice.h>
+#include <QString>
+#include <QByteArray>
+#include <QHostAddress>
 
 // MythTV headers
+#include "msocketdevice.h"
 #include "compat.h"
 #include "mythverbose.h"
 
@@ -28,18 +31,18 @@
 
 // -=>TODO: Need to add support for Multi-Homed machines.
 
-class QMulticastSocket : public Q3SocketDevice
+class QMulticastSocket : public MSocketDevice
 {
     public:
 
         QHostAddress    m_address;
-        Q_UINT16        m_port;
+        quint16         m_port;
         struct ip_mreq  m_imr;
 
     public:
 
-        QMulticastSocket( QString sAddress, Q_UINT16 nPort, u_char ttl = 0 )
-         : Q3SocketDevice( Q3SocketDevice::Datagram )
+        QMulticastSocket( QString sAddress, quint16 nPort, u_char ttl = 0 )
+         : MSocketDevice( MSocketDevice::Datagram )
         {
             m_address.setAddress( sAddress );
             m_port = nPort;
@@ -48,8 +51,8 @@ class QMulticastSocket : public Q3SocketDevice
                 ttl = 4;
 
 //            ttl = UPnp::g_pConfig->GetValue( "UPnP/TTL", 4 );
-
-            m_imr.imr_multiaddr.s_addr = inet_addr( sAddress );
+            QByteArray addr = sAddress.toLatin1();
+            m_imr.imr_multiaddr.s_addr = inet_addr( addr.constData() );
             m_imr.imr_interface.s_addr = htonl(INADDR_ANY);       
 
             if ( setsockopt( socket(), IPPROTO_IP, IP_ADD_MEMBERSHIP, &m_imr, sizeof( m_imr )) < 0) 

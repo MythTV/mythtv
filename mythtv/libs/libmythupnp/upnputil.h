@@ -1,3 +1,4 @@
+// -*- Mode: c++ -*-
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: upnputil.h
 //                                                                            
@@ -11,9 +12,8 @@
 #ifndef __UPNPUTIL_H__
 #define __UPNPUTIL_H__
 
-#include <q3ptrlist.h>
-#include <qstringlist.h>
-#include <qmap.h>
+#include <QStringList>
+#include <QMap>
 
 #include "compat.h"     // for suseconds_t
 
@@ -40,56 +40,89 @@ typedef QMap< QString, QString >    QStringMap;
 /////////////////////////////////////////////////////////////////////////////
 
 class NameValue;
-
-class NameValueList : public Q3PtrList< NameValue >
-{
-    public:
-
-        NameValueList()
-        {
-            setAutoDelete( true );
-        }       
-};
-
+class NameValues;
 class NameValue
 {
-    public:
+  public:
+    QString sName;
+    QString sValue;
 
-        QString sName;
-        QString sValue;
+    NameValues *pAttributes;
 
-        NameValueList *pAttributes;
+  public:
+    NameValue() :
+        sName(QString::null), sValue(QString::null), pAttributes(NULL) { }
+    NameValue(const QString &name, const QString &value) :
+        sName(name), sValue(value), pAttributes(NULL) { }
+    NameValue(const QString &name, const char *value) :
+        sName(name), sValue(value), pAttributes(NULL) { }
+    NameValue(const QString &name, int value) :
+        sName(name), sValue(QString::number(value)), pAttributes(NULL) { }
+    NameValue(const QString &name, long value) :
+        sName(name), sValue(QString::number(value)), pAttributes(NULL) { }
+    NameValue(const QString &name, qlonglong value) :
+        sName(name), sValue(QString::number(value)), pAttributes(NULL) { }
+    NameValue(const QString &name, uint value) :
+        sName(name), sValue(QString::number(value)), pAttributes(NULL) { }
+    NameValue(const QString &name, ulong value) :
+        sName(name), sValue(QString::number(value)), pAttributes(NULL) { }
+    NameValue(const QString &name, qulonglong value) :
+        sName(name), sValue(QString::number(value)), pAttributes(NULL) { }
+    NameValue(const QString &name, bool value) :
+        sName(name), sValue((value) ? "1" : "0"), pAttributes(NULL) { }
+    inline NameValue(const NameValue &nv);
+    inline NameValue& operator=(const NameValue &nv);
 
-    NameValue() 
-      : sName( NULL ), sValue( NULL ), pAttributes( NULL ) { }
+    inline ~NameValue();
 
-    NameValue( const QString &name, const QString &value ) 
-      : sName( name ), sValue( value ), pAttributes( NULL ) { }
-
-    NameValue( const QString &name, const char *value ) 
-      : sName( name ), sValue( value ), pAttributes( NULL ) { }
-
-    NameValue( const QString &name, int value ) 
-      : sName( name ), sValue( QString::number( value )), pAttributes( NULL ) { }
-
-    NameValue( const QString &name, bool value ) 
-      : sName( name ), sValue( (value) ? "1" : "0" ), pAttributes( NULL ) { }
-
-    ~NameValue()
-    {
-        if (pAttributes != NULL)
-            delete pAttributes;
-    }
-
-    void AddAttribute( const QString &name, const QString &value )
-    {
-        if (pAttributes == NULL)
-            pAttributes = new NameValueList();
-
-        pAttributes->append( new NameValue( name, value ));
-    }
-
+    inline void AddAttribute(const QString &name, const QString &value);
 };
+class NameValues : public QList<NameValue> {};
+
+inline NameValue::NameValue(const NameValue &nv) :
+    sName(nv.sName), sValue(nv.sValue), pAttributes(NULL)
+{
+    if (nv.pAttributes)
+    {
+        pAttributes = new NameValues;
+        *pAttributes = *nv.pAttributes;
+    }
+}
+
+inline NameValue& NameValue::operator=(const NameValue &nv)
+{
+    sName  = nv.sName;
+    sValue = nv.sValue;
+
+    if (nv.pAttributes)
+    {
+        pAttributes = new NameValues;
+        *pAttributes = *nv.pAttributes;
+    }
+    else
+    {
+        pAttributes = NULL;
+    }
+
+    return *this;
+}
+
+inline NameValue::~NameValue()
+{
+    if (pAttributes)
+    {
+        delete pAttributes;
+        pAttributes = NULL;
+    }
+}
+
+inline void NameValue::AddAttribute(const QString &name, const QString &value)
+{
+    if (!pAttributes)
+        pAttributes = new NameValues();
+
+    pAttributes->push_back(NameValue(name, value));
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // Global Function Prototypes

@@ -11,11 +11,13 @@
 #ifndef __THREADPOOL_H__
 #define __THREADPOOL_H__
 
-#include <qstring.h> 
-#include <q3ptrlist.h>
-#include <qmutex.h> 
-#include <qwaitcondition.h> 
-#include <qthread.h>
+#include <deque>
+using namespace std;
+
+#include <QString> 
+#include <QMutex> 
+#include <QWaitCondition>
+#include <QThread>
 
 class ThreadPool;
 
@@ -98,7 +100,7 @@ class WorkerThread : public QThread
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-typedef Q3PtrList< WorkerThread >  WorkerThreadList;
+typedef deque<WorkerThread*> WorkerThreadList;
 
 class ThreadPool
 {
