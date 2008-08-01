@@ -75,7 +75,7 @@ AudioSettings::AudioSettings(
 
 void AudioSettings::FixPassThrough(void)
 {
-    if (passthru_device.isEmpty() || passthru_device.lower() == "default")
+    if (passthru_device.isEmpty() || passthru_device.toLower() == "default")
         passthru_device = GetMainDevice();
 }
 

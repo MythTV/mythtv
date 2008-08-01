@@ -15,6 +15,7 @@
 #include <Q3PtrList>
 #include <QThread>
 #include <Q3Socket>
+#include <QVector>
 
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>
@@ -82,7 +83,7 @@ class DVDRipBox : public MythThemedDialog
 
   public:
 
-    typedef Q3ValueVector<int> IntVector;
+    typedef QVector<int> IntVector;
     
     DVDRipBox(MythMainWindow *parent, QString window_name,
               QString dev, QString theme_filename, const char *name = 0);

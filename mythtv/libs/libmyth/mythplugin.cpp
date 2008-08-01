@@ -125,7 +125,7 @@ MythPluginManager::MythPluginManager()
 
     if (filterDir.exists())
     {
-        int prefixLength = filter.find("*");
+        int prefixLength = filter.indexOf("*");
         int suffixLength = filter.length() - prefixLength - 1;
 
         QStringList libraries = filterDir.entryList();

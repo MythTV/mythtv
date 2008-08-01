@@ -1,5 +1,4 @@
 #include <iostream>
-#include <Q3ValueList>
 #include <Q3PtrList>
 using namespace std;
 
@@ -31,8 +30,8 @@ class SortableGenericTreeList : public Q3PtrList<GenericTree>
         }
         else if (sort_type == 1)
         {
-            QString ones = one->getString().lower();
-            QString twos = two->getString().lower();
+            QString ones = one->getString().toLower();
+            QString twos = two->getString().toLower();
             return QString::localeAwareCompare(ones, twos);
         }
         else if (sort_type == 2)
@@ -59,8 +58,8 @@ class SortableGenericTreeList : public Q3PtrList<GenericTree>
 
             if (onea == twoa)
             {
-                QString ones = one->getString().lower();
-                QString twos = two->getString().lower();
+                QString ones = one->getString().toLower();
+                QString twos = two->getString().toLower();
                 return QString::localeAwareCompare(ones, twos);
             }
             else if (onea < twoa)
@@ -118,8 +117,8 @@ GenericTree::~GenericTree()
 GenericTree* GenericTree::addNode(const QString &a_string, int an_int, 
                                   bool selectable_flag)
 {
-    GenericTree *new_node = new GenericTree(a_string.stripWhiteSpace(),
-                                            an_int, selectable_flag);
+    GenericTree *new_node = new GenericTree(
+        a_string.trimmed(), an_int, selectable_flag);
 
     return addNode(new_node);
 }
@@ -177,7 +176,7 @@ GenericTree* GenericTree::findLeaf(int ordering_index)
     return this;
 }
 
-GenericTree* GenericTree::findNode(Q3ValueList<int> route_of_branches)
+GenericTree* GenericTree::findNode(QList<int> route_of_branches)
 {
     // Starting from *this* node (which will often be root) find a set of 
     // branches that have id's that match the collection passed in 
@@ -190,7 +189,7 @@ GenericTree* GenericTree::findNode(Q3ValueList<int> route_of_branches)
     return recursiveNodeFinder(route_of_branches);
 }
 
-GenericTree* GenericTree::recursiveNodeFinder(Q3ValueList<int> route_of_branches)
+GenericTree* GenericTree::recursiveNodeFinder(QList<int> route_of_branches)
 {
     if (checkNode(route_of_branches))
         return this;
@@ -213,7 +212,7 @@ GenericTree* GenericTree::recursiveNodeFinder(Q3ValueList<int> route_of_branches
     return NULL;
 }
 
-bool GenericTree::checkNode(Q3ValueList<int> route_of_branches)
+bool GenericTree::checkNode(QList<int> route_of_branches)
 {
     bool found_it = true;
     GenericTree *parent_finder = this;
@@ -222,7 +221,7 @@ bool GenericTree::checkNode(Q3ValueList<int> route_of_branches)
 
     for (int i = route_of_branches.count() - 1; i > -1 && found_it; --i)
     {
-        if (!(parent_finder->getInt() == (*route_of_branches.at(i))))
+        if (parent_finder->getInt() != route_of_branches[i])
             found_it = false;
 
         if (i > 0)
@@ -397,9 +396,10 @@ void GenericTree::setAttribute(uint attribute_position, int value_of_attribute)
     // stores a value for random ordering in the first "column" (0) and a value
     // for "intelligent" (1) ordering in the second column
     
-    if (m_attributes->size() < (int)(attribute_position + 1))
-        m_attributes->resize(attribute_position + 1, -1);
-    m_attributes->at(attribute_position) = value_of_attribute;
+    while ((uint)m_attributes->size() < (attribute_position + 1))
+        m_attributes->push_back(-1);
+
+    (*m_attributes)[attribute_position] = value_of_attribute;
 }
 
 int GenericTree::getAttribute(uint which_one)

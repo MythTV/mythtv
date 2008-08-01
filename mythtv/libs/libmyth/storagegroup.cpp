@@ -1,6 +1,6 @@
-#include <qdir.h>
-#include <qfile.h>
-#include <qregexp.h>
+#include <QDir>
+#include <QFile>
+#include <QRegExp>
 
 #include "storagegroup.h"
 #include "mythcontext.h"
@@ -28,9 +28,10 @@ const QStringList StorageGroup::kSpecialGroups = QStringList()
  *                  This is parameter is ignored if group is an empty string.
  */
 StorageGroup::StorageGroup(const QString group, const QString hostname) :
-    m_groupname(Q3DeepCopy<QString>(group)),
-    m_hostname(Q3DeepCopy<QString>(hostname))
+    m_groupname(group), m_hostname(hostname)
 {
+    m_groupname.detach();
+    m_hostname.detach();
     m_dirlist.clear();
 
     Init(m_groupname, m_hostname);
@@ -41,8 +42,8 @@ void StorageGroup::Init(const QString group, const QString hostname)
     QString dirname;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    m_groupname = Q3DeepCopy<QString>(group);
-    m_hostname  = Q3DeepCopy<QString>(hostname);
+    m_groupname = group;    m_groupname.detach();
+    m_hostname  = hostname; m_hostname.detach();
     m_dirlist.clear();
 
     QString sql = "SELECT DISTINCT dirname "
@@ -94,7 +95,7 @@ void StorageGroup::Init(const QString group, const QString hostname)
             dirname.replace(QRegExp("\\s*$"), "");
             if (dirname.right(1) == "/")
                 dirname.remove(dirname.length() - 1, 1);
-            m_dirlist << Q3DeepCopy<QString>(dirname);
+            m_dirlist << dirname;
         }
         while (query.next());
     }
@@ -115,7 +116,7 @@ void StorageGroup::Init(const QString group, const QString hostname)
                            .arg(kDefaultStorageDir);
         }
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
-        m_dirlist << Q3DeepCopy<QString>(tmpDir);
+        m_dirlist << tmpDir;
     }
 }
 
@@ -156,7 +157,11 @@ QString StorageGroup::FindRecordingDir(QString filename)
                 .arg(m_dirlist[curDir]));
         checkFile.setName(testFile);
         if (checkFile.exists())
-            return Q3DeepCopy<QString>(m_dirlist[curDir]);
+        {
+            QString tmp = m_dirlist[curDir];
+            tmp.detach();
+            return tmp;
+        }
 
         curDir++;
     }
@@ -185,7 +190,8 @@ QString StorageGroup::FindRecordingDir(QString filename)
         result = (tmpFile.isEmpty()) ? result : tmpFile;
     }
 
-    return Q3DeepCopy<QString>(result);
+    result.detach();
+    return result;
 }
 
 QString StorageGroup::FindNextDirMostFree(void)
@@ -233,7 +239,8 @@ QString StorageGroup::FindNextDirMostFree(void)
     VERBOSE(VB_FILE, LOC + QString("FindNextDirMostFree: Using '%1'")
                                    .arg(nextDir));
 
-    return Q3DeepCopy<QString>(nextDir);
+    nextDir.detach();
+    return nextDir;
 }
 
 void StorageGroup::CheckAllStorageGroupDirs(void)
@@ -314,8 +321,9 @@ QStringList StorageGroup::getRecordingsGroups(void)
             groups += query.value(0).toString();
 
     groups.sort();
+    groups.detach();
 
-    return Q3DeepCopy<QStringList>(groups);
+    return groups;
 }
 
 /****************************************************************************/
@@ -349,7 +357,10 @@ SGPopupResult StorageGroupPopup::showPopup(MythMainWindow *parent,
 
     bool ok = (MythDialog::Accepted == popup->ExecPopup());
     if (ok)
-        text = Q3DeepCopy<QString>(textEdit->text());
+    {
+        text = textEdit->text();
+        text.detach();
+    }
 
     popup->hide();
     popup->deleteLater();

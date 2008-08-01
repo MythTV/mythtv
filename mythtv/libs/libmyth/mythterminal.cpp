@@ -75,9 +75,9 @@ void MythTerminal::AddText(const QString &_str)
     QString str = _str;
     while (str.length())
     {
-        int nlf = str.find("\r\n");
-        nlf = (nlf < 0) ? str.find("\r") : nlf;
-        nlf = (nlf < 0) ? str.find("\n") : nlf;
+        int nlf = str.indexOf("\r\n");
+        nlf = (nlf < 0) ? str.indexOf("\r") : nlf;
+        nlf = (nlf < 0) ? str.indexOf("\n") : nlf;
 
         QString curStr = (nlf >= 0) ? str.left(nlf) : str;
         if (curStr.length())

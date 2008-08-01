@@ -155,7 +155,7 @@ bool MythCommandLineParser::Parse(
             if (len >= 1 && buf[len-1]=='\n')
                 buf[len-1] = 0;
             QString line(buf);
-            QStringList tokens = QStringList::split("=", line);
+            QStringList tokens = line.split("=", QString::SkipEmptyParts);
             if (tokens.size() == 1)
                 tokens.push_back("");
             if (tokens.size() >= 2)
@@ -186,10 +186,11 @@ bool MythCommandLineParser::Parse(
                 return true;
             } 
  
-            QStringList pairs = QStringList::split(",", tmpArg);
+            QStringList pairs = tmpArg.split(",", QString::SkipEmptyParts);
             for (int index = 0; index < pairs.size(); ++index)
             {
-                QStringList tokens = QStringList::split("=", pairs[index]);
+                QStringList tokens = pairs[index].split(
+                    "=", QString::SkipEmptyParts);
                 if (tokens.size() == 1)
                     tokens.push_back("");
                 if (tokens.size() >= 2)
@@ -230,7 +231,7 @@ bool MythCommandLineParser::Parse(
                 return true;
             } 
  
-            settingsQuery = QStringList::split(",", tmpArg);
+            settingsQuery = tmpArg.split(",", QString::SkipEmptyParts);
         }
         else
         {

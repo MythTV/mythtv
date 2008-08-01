@@ -83,12 +83,12 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
 
     for (uint i = 0; i < channels.size(); i++)
     {
-        QString chantext = Q3DeepCopy<QString>(longChannelFormat);
+        QString chantext = longChannelFormat;
         chantext
             .replace("<num>",  channels[i].channum)
             .replace("<sign>", channels[i].callsign)
             .replace("<name>", channels[i].name);
-
+        chantext.detach();
         m_channel->insertItem(chantext);
         m_chanids << QString::number(channels[i].chanid);
     }
@@ -326,7 +326,7 @@ void ManualSchedule::recordClicked(void)
                   p.startts.toString(timeformat);
 
     p.title += " (" + tr("Manual Record") + ")";
-    p.description = Q3DeepCopy<QString>(p.title);
+    p.description = p.title; p.description.detach();
 
     ScheduledRecording *record = new ScheduledRecording();
     record->loadByProgram(&p);

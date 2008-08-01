@@ -176,14 +176,14 @@ static void configplugin_cb(const QString &cmd)
 {
     MythPluginManager *pmanager = gContext->getPluginManager();
     if (pmanager)
-        pmanager->config_plugin(cmd.stripWhiteSpace());
+        pmanager->config_plugin(cmd.trimmed());
 }
 
 static void plugin_cb(const QString &cmd)
 {
     MythPluginManager *pmanager = gContext->getPluginManager();
     if (pmanager)
-        pmanager->run_plugin(cmd.stripWhiteSpace());
+        pmanager->run_plugin(cmd.trimmed());
 }
 
 static void eject_cb(void)
@@ -699,7 +699,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
         response = getResponse("Would you like to configure the database "
                                "connection now?",
                                "yes");
-        if (response.isEmpty() || response.left(1).lower() != "y")
+        if (response.isEmpty() || response.left(1).toLower() != "y")
             return false;
 
         params.dbHostName = getResponse("Database host name:",
@@ -707,7 +707,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
         response = getResponse("Should I test connectivity to this host "
                                "using the ping command?", "yes");
         params.dbHostPing = (response.isEmpty() ||
-                             response.left(1).lower() != "y");
+                             response.left(1).toLower() != "y");
 
         params.dbPort     = intResponse("Database non-default port:",
                                         params.dbPort);
@@ -728,7 +728,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
                                "database connections?",
                                (params.wolEnabled ? "yes" : "no"));
         if (!response.isEmpty())
-            params.wolEnabled  = (response.left(1).lower() == "y");
+            params.wolEnabled  = (response.left(1).toLower() == "y");
 
         if (params.wolEnabled)
         {
@@ -1563,11 +1563,9 @@ void MythContext::ActivateSettingsCache(bool activate)
 
 QString MythContext::GetHostName(void)
 {
-    // The reference counting in QString isn't thread-safe, so we need
-    // take care of it ourselves.
-    d->m_hostnamelock.lock();
-    QString tmp = Q3DeepCopy<QString>(d->m_localhostname);
-    d->m_hostnamelock.unlock();
+    QMutexLocker (&d->m_hostnamelock);
+    QString tmp = d->m_localhostname;
+    tmp.detach();
     return tmp;
 }
 

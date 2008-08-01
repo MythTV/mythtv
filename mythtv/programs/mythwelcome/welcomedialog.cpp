@@ -390,10 +390,10 @@ void WelcomeDialog::updateScreen(void)
             {
                 status = QObject::tr("Tuner %1 is recording:\n")
                     .arg(tuner.id);
-                status += Q3DeepCopy<QString>(tuner.channame);
-                status += "\n" + Q3DeepCopy<QString>(tuner.title);
+                status += tuner.channame;
+                status += "\n" + tuner.title;
                 if (!tuner.subtitle.isEmpty()) 
-                    status += "\n("+Q3DeepCopy<QString>(tuner.subtitle)+")";
+                    status += "\n("+tuner.subtitle+")";
                 status += "\n" + tuner.startTime.toString(m_timeFormat) + 
                           " " + tr("to") + " " + tuner.endTime.toString(m_timeFormat);
             }
@@ -410,6 +410,8 @@ void WelcomeDialog::updateScreen(void)
         }
         else
             status = tr("There are no recordings currently taking place");
+
+        status.detach();
 
         m_recording_text->SetText(status);
 

@@ -8,7 +8,7 @@
 using namespace std;
 
 // Qt headers
-#include <Q3ValueList>
+#include <QList>
 #include <qapplication.h>
 #include <q3process.h>
 #include <qdir.h>
@@ -117,8 +117,8 @@ static const QString DevName(MythMediaDevice *d)
 MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
                                                  bool          showMounted)
 {       
-    Q3ValueList <MythMediaDevice *>           drives;
-    Q3ValueList <MythMediaDevice *>::iterator it = m_Devices.begin();
+    QList <MythMediaDevice *>           drives;
+    QList <MythMediaDevice *>::iterator it = m_Devices.begin();
     QMutexLocker                             locker(&m_DevicesLock);
 
     for (it = m_Devices.begin(); it != m_Devices.end(); ++it)
@@ -268,7 +268,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
     QString ignore = gContext->GetSetting("IgnoreDevices", "");
 
     if (ignore.length())
-        m_IgnoreList = QStringList::split(',', ignore);
+        m_IgnoreList = ignore.split(',', QString::SkipEmptyParts);
     else
         m_IgnoreList = QStringList();  // Force empty list
 
@@ -321,7 +321,7 @@ bool MediaMonitor::RemoveDevice(const QString &dev)
 {
     QMutexLocker locker(&m_DevicesLock);
 
-    Q3ValueList<MythMediaDevice*>::iterator it;
+    QList<MythMediaDevice*>::iterator it;
     for (it = m_Devices.begin(); it != m_Devices.end(); it++)
     {
         if ((*it)->getDevicePath() == dev)
@@ -355,7 +355,7 @@ void MediaMonitor::CheckDevices(void)
     /* check if new devices have been plugged in */
     CheckDeviceNotifications();
 
-    Q3ValueList<MythMediaDevice*>::iterator itr = m_Devices.begin();
+    QList<MythMediaDevice*>::iterator itr = m_Devices.begin();
     MythMediaDevice* pDev;
     while (itr != m_Devices.end()) 
     {
@@ -456,7 +456,7 @@ MythMediaDevice* MediaMonitor::GetMedia(const QString& path)
 {
     QMutexLocker locker(&m_DevicesLock);
 
-    Q3ValueList<MythMediaDevice*>::iterator it = m_Devices.begin();
+    QList<MythMediaDevice*>::iterator it = m_Devices.begin();
     for (;it != m_Devices.end(); it++)
     {
         if ((*it)->isSameDevice(path) &&
@@ -512,13 +512,13 @@ QString MediaMonitor::GetMountPath(const QString& devPath)
  *  \sa ValidateAndLock(MythMediaDevice *pMedia)
  *  \sa Unlock(MythMediaDevice *pMedia)
  */
-Q3ValueList<MythMediaDevice*> MediaMonitor::GetMedias(MediaType mediatype)
+QList<MythMediaDevice*> MediaMonitor::GetMedias(MediaType mediatype)
 {
     QMutexLocker locker(&m_DevicesLock);
 
-    Q3ValueList<MythMediaDevice*> medias;
+    QList<MythMediaDevice*> medias;
 
-    Q3ValueList<MythMediaDevice*>::iterator it = m_Devices.begin();
+    QList<MythMediaDevice*>::iterator it = m_Devices.begin();
     for (;it != m_Devices.end(); it++)
     {
         if (((*it)->getMediaType() == mediatype) &&
@@ -542,7 +542,7 @@ void MediaMonitor::MonitorRegisterExtensions(uint mediatype,
     VERBOSE(VB_IMPORTANT, QString("MonitorRegisterExtensions(0x%1, %2)")
             .arg(mediatype, 0, 16).arg(extensions));
 
-    Q3ValueList<MythMediaDevice*>::iterator it = m_Devices.begin();
+    QList<MythMediaDevice*>::iterator it = m_Devices.begin();
     for (; it != m_Devices.end(); ++it)
     {
         if (*it)
@@ -718,7 +718,7 @@ QString MediaMonitor::defaultWriter()
  */
 const QString MediaMonitor::listDevices(void)
 {
-    Q3ValueList<MythMediaDevice*>::const_iterator dev;
+    QList<MythMediaDevice*>::const_iterator dev;
     QStringList list;
 
     for (dev = m_Devices.begin(); dev != m_Devices.end(); ++dev)

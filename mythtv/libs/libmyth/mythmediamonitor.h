@@ -1,7 +1,7 @@
 #ifndef MYTH_MEDIA_MONITOR_H
 #define MYTH_MEDIA_MONITOR_H
 
-#include <q3valuelist.h>
+#include <QList>
 #include <qpointer.h>
 #include <qthread.h>
 #include <qstring.h>
@@ -69,7 +69,7 @@ class MPUBLIC MediaMonitor : public QObject
     // To safely dereference the pointers returned by this function
     // first validate the pointer with ValidateAndLock(), if true is returned
     // it is safe to dereference the pointer. When finished call Unlock()
-    Q3ValueList<MythMediaDevice*> GetMedias(MediaType mediatype);
+    QList<MythMediaDevice*> GetMedias(MediaType mediatype);
     MythMediaDevice* GetMedia(const QString &path);
 
     void MonitorRegisterExtensions(uint mediaType, const QString &extensions);
@@ -101,8 +101,8 @@ class MPUBLIC MediaMonitor : public QObject
 
   protected:
     QMutex                       m_DevicesLock;
-    Q3ValueList<MythMediaDevice*> m_Devices;
-    Q3ValueList<MythMediaDevice*> m_RemovedDevices;
+    QList<MythMediaDevice*>      m_Devices;
+    QList<MythMediaDevice*>      m_RemovedDevices;
     QMap<MythMediaDevice*, int>  m_UseCount;
 
     // List of devices/mountpoints that the user doesn't want to monitor:

@@ -211,7 +211,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     QString app_binary_version;
 
     QMutex locationLock;
-    QList<QString> currentLocation;
+    QStringList currentLocation;
 };
 
 /// This global variable contains the MythContext instance for the application

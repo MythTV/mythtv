@@ -1364,7 +1364,7 @@ void MythThemedDialog::UpdateForegroundRect(const QRect &inv_rect)
         if (container_area.isValid() &&
             (looper_context == context || looper_context == -1) &&
             intersect.isValid() &&
-            looper->GetName().lower() != "background")
+            looper->GetName().toLower() != "background")
         {
             //
             //  Debugging
@@ -2085,7 +2085,7 @@ void MythImageFileDialog::buildTree(QString starting_where)
             cerr << "mythdialogs.o: Seems unlikely that this is going to work" << endl;
         }
         file_string.remove(0, prefix.length());
-        QStringList list(QStringList::split("/", file_string));
+        QStringList list = file_string.split("/", QString::SkipEmptyParts);
         GenericTree *where_to_add;
         where_to_add = file_root;
         int a_counter = 0;

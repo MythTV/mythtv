@@ -15,6 +15,9 @@
 #include <algorithm>
 using namespace std;
 
+// Qt headers
+#include <q3deepcopy.h>
+
 // MythTV headers
 #include "videodev_myth.h"
 #include "channelbase.h"

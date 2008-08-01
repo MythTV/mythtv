@@ -83,7 +83,7 @@ void LanguageSettings::load(QString module_name)
         QTranslator *trans = new QTranslator(0);
         trans->load(GetTranslationsDir() +
                     module_name + QString("_") +
-                    d.m_language.lower() + QString(".qm"), ".");
+                    d.m_language.toLower() + QString(".qm"), ".");
         qApp->installTranslator(trans);
         d.m_translators[module_name] = trans;
     }

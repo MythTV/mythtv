@@ -109,7 +109,7 @@ void IntegerManagedListItem::setShortTemplates(const QString& negStr, const QStr
 }
 
 #define ASSIGN_TEMPLATE(x,y,z) \
-    if (x.find("%1") != -1) \
+    if (x.indexOf("%1") != -1) \
         y = QString(x).arg(abs(z)); \
     else \
         y = x;

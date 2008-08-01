@@ -10,12 +10,8 @@
 #ifndef PHONEUI_H_
 #define PHONEUI_H_
 
-#include <qregexp.h>
-#include <qtimer.h>
-#include <q3ptrlist.h>
-#include <qthread.h>
-#include <qsound.h>
-//Added by qt3to4:
+#include <QTimer>
+#include <QVector>
 #include <QKeyEvent>
 #include <QLabel>
 
@@ -46,7 +42,7 @@ class PhoneUIBox : public MythThemedDialog
 
   public:
 
-    typedef Q3ValueVector<int> IntVector;
+    typedef QVector<int> IntVector;
 
     PhoneUIBox(MythMainWindow *parent, QString window_name,
                QString theme_filename, const char *name = 0);

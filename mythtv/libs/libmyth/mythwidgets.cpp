@@ -695,8 +695,8 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
 
     if (shift)
     {
-        set = set.upper();
-        current_choice = current_choice.upper();
+        set = set.toUpper();
+        current_choice = current_choice.toUpper();
     }
 
     bString  = "<B>";
@@ -718,7 +718,7 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
     }
     bString += "</B>";
 
-    index = set.find(current_choice);
+    index = set.indexOf(current_choice);
     int length = set.length();
     if (index < 0 || index > length)
     {
@@ -808,7 +808,7 @@ void MythRemoteLineEdit::endCycle()
         else if (shift)
         {
             aString  = pre_cycle_text_upto;
-            aString += current_choice.upper();
+            aString += current_choice.toUpper();
             aString += pre_cycle_text_from;
         }
         else
@@ -1003,7 +1003,7 @@ void MythRemoteLineEdit::cycleKeys(QString cycle_list)
         {
             //  Regular movement through existing set
             cycle_timer->changeInterval(cycle_time);
-            index = current_set.find(current_choice);
+            index = current_set.indexOf(current_choice);
             int length = current_set.length();
             if (index + 1 >= length)
             {
@@ -1047,8 +1047,8 @@ void MythRemoteLineEdit::toggleShift()
     else
     {
         shift = true;
-        temp_choice = current_choice.upper();
-        temp_set = current_set.upper();
+        temp_choice = current_choice.toUpper();
+        temp_set = current_set.toUpper();
     }
     if (active_cycle)
     {
@@ -1387,7 +1387,7 @@ void MythListBox::setCurrentItem(const QString& matchText, bool caseSensitive,
             }
             else
             {
-                if (text(i).lower().startsWith(matchText.lower()))
+                if (text(i).toLower().startsWith(matchText.toLower()))
                 {
                     setCurrentItem(i);
                     break;
@@ -1406,7 +1406,7 @@ void MythListBox::setCurrentItem(const QString& matchText, bool caseSensitive,
             }
             else
             {
-                if (text(i).lower() == matchText.lower())
+                if (text(i).toLower() == matchText.toLower())
                 {
                     setCurrentItem(i);
                     break;

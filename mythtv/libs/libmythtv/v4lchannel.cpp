@@ -18,6 +18,7 @@ using namespace std;
 
 // Qt headers
 #include <qsqldatabase.h>
+#include <q3deepcopy.h>
 
 // MythTV headers
 #include "videodev_myth.h"

@@ -6,7 +6,7 @@ using namespace std;
 
 #include <qapplication.h>
 #include <QPixmap>
-#include <Q3ValueList>
+#include <QList>
 #include <Q3PtrList>
 
 #include "uilistbtntype.h"
@@ -45,8 +45,8 @@ bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
 
     fontSizeType = gContext->GetSetting("ThemeFontSizeType", "default");
 
-    Q3ValueList<QString> searchpath = ui->GetThemeSearchPath();
-    for (Q3ValueList<QString>::const_iterator ii = searchpath.begin();
+    QStringList searchpath = ui->GetThemeSearchPath();
+    for (QStringList::const_iterator ii = searchpath.begin();
         ii != searchpath.end(); ii++)
     {
         QString themefile = *ii + specialfile + "ui.xml";
@@ -318,7 +318,7 @@ void XMLParse::parseFont(QDomElement &element)
         newFont.face.setBold(baseFont->face.bold());
     else
     {
-        if (bold.lower() == "yes")
+        if (bold.toLower() == "yes")
             newFont.face.setBold(true);
         else
             newFont.face.setBold(false);
@@ -328,7 +328,7 @@ void XMLParse::parseFont(QDomElement &element)
         newFont.face.setItalic(baseFont->face.italic());
     else
     {
-        if (ital.lower() == "yes")
+        if (ital.toLower() == "yes")
             newFont.face.setItalic(true);
         else
             newFont.face.setItalic(false);
@@ -338,7 +338,7 @@ void XMLParse::parseFont(QDomElement &element)
         newFont.face.setUnderline(baseFont->face.underline());
     else
     {
-        if (under.lower() == "yes")
+        if (under.toLower() == "yes")
             newFont.face.setUnderline(true);
         else
             newFont.face.setUnderline(false);
@@ -431,7 +431,7 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
     QString flex = element.attribute("fleximage", "");
     if (!flex.isNull() && !flex.isEmpty())
     {
-        if (flex.lower() == "yes")
+        if (flex.toLower() == "yes")
             image->SetFlex(true);
         else
             image->SetFlex(false);
@@ -442,7 +442,7 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
     QString visible = element.attribute("visible", "");
     if (!visible.isNull() && !visible.isEmpty())
     {
-        if (visible.lower() == "yes")
+        if (visible.toLower() == "yes")
             image->show();
         else
             image->hide();
@@ -513,7 +513,7 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
             }
             else if (info.tagName() == "orientation")
             {
-                QString orient_string = getFirstText(info).lower();
+                QString orient_string = getFirstText(info).toLower();
                 if (orient_string == "lefttoright")
                 {
                     orientation = 0;
@@ -547,7 +547,7 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
     QString flex = element.attribute("fleximage", "");
     if (!flex.isNull() && !flex.isEmpty())
     {
-        if (flex.lower() == "yes")
+        if (flex.toLower() == "yes")
             image->SetFlex(true);
         else
             image->SetFlex(false);
@@ -567,8 +567,8 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
 bool XMLParse::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
 {
     QFile f;
-    Q3ValueList<QString> searchpath = ui->GetThemeSearchPath();
-    for (Q3ValueList<QString>::const_iterator ii = searchpath.begin();
+    QStringList searchpath = ui->GetThemeSearchPath();
+    for (QStringList::const_iterator ii = searchpath.begin();
         ii != searchpath.end(); ii++)
     {
         f.setName(*ii + "categories.xml");
@@ -609,7 +609,7 @@ bool XMLParse::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
             cat = info.attribute("category");
             col = info.attribute("color");
 
-            catColors[cat.lower()] = col;
+            catColors[cat.toLower()] = col;
         }
     }
 
@@ -683,7 +683,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
             }
             else if (info.tagName() == "cutdown")
             {
-                if (getFirstText(info).lower() == "no")
+                if (getFirstText(info).toLower() == "no")
                    cutdown = false;
             }
             else if (info.tagName() == "textoffset")
@@ -702,7 +702,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
             }
             else if (info.tagName() == "multiline")
             {
-                if (getFirstText(info).lower() == "yes")
+                if (getFirstText(info).toLower() == "yes")
                    multiline = true;
             }
             else if (info.tagName() == "selector")
@@ -759,7 +759,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
                 cat = info.attribute("category");
                 col = info.attribute("color");
 
-                catColors[cat.lower()] = col;
+                catColors[cat.toLower()] = col;
             }
             else
             {
@@ -790,7 +790,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     guide->SetSelectorColor(selcolor);
     for (int i = 1; i <= 7; i++)
         guide->LoadImage(i, recImgs[i]);
-    if (seltype.lower() == "box")
+    if (seltype.toLower() == "box")
         guide->SetSelectorType(1);
     else
         guide->SetSelectorType(2); // solid
@@ -804,17 +804,17 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
 
     if (!align.isNull() && !align.isEmpty())
     {
-        if (align.lower() == "center")
+        if (align.toLower() == "center")
             guide->SetJustification(Qt::AlignCenter | jst);
-        else if (align.lower() == "right")
+        else if (align.toLower() == "right")
             guide->SetJustification(Qt::AlignRight | jst);
-        else if (align.lower() == "left")
+        else if (align.toLower() == "left")
             guide->SetJustification(Qt::AlignLeft | jst);
-        else if (align.lower() == "allcenter")
+        else if (align.toLower() == "allcenter")
             guide->SetJustification(Qt::AlignHCenter | Qt::AlignVCenter | jst);
-        else if (align.lower() == "vcenter")
+        else if (align.toLower() == "vcenter")
             guide->SetJustification(Qt::AlignVCenter | jst);
-        else if (align.lower() == "hcenter")
+        else if (align.toLower() == "hcenter")
             guide->SetJustification(Qt::AlignHCenter | jst);
     }
     else
@@ -913,22 +913,22 @@ void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
             }
             else if (info.tagName() == "cutdown")
             {
-                if (getFirstText(info).lower() == "no")
+                if (getFirstText(info).toLower() == "no")
                     cutdown = false;
             }
             else if (info.tagName() == "showchecks")
             {
-                if (getFirstText(info).lower() == "yes")
+                if (getFirstText(info).toLower() == "yes")
                     showChecks = true;
             }
             else if (info.tagName() == "showselected")
             {
-                if (getFirstText(info).lower() == "yes")
+                if (getFirstText(info).toLower() == "yes")
                     showSelected = true;
             }
             else if (info.tagName() == "showscrollarrows")
             {
-                if (getFirstText(info).lower() == "yes")
+                if (getFirstText(info).toLower() == "yes")
                     showScrollArrows = true;
             }
             else if (info.tagName() == "textheight")
@@ -941,7 +941,7 @@ void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
             }
             else if (info.tagName() == "multiline")
             {
-                if (getFirstText(info).lower() == "yes")
+                if (getFirstText(info).toLower() == "yes")
                     multiline = true;
             }
             else if (info.tagName() == "image")
@@ -963,22 +963,22 @@ void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
                     return;
                 }
 
-                if (imgname.lower() == "normal")
+                if (imgname.toLower() == "normal")
                 {
                     normalImage = file;
                 }
 
-                if (imgname.lower() == "selected")
+                if (imgname.toLower() == "selected")
                 {
                     selectedImage = file;
                 }
 
-                if (imgname.lower() == "highlighted")
+                if (imgname.toLower() == "highlighted")
                 {
                     highlightedImage = file;
                 }
 
-                if (imgname.lower() == "default")
+                if (imgname.toLower() == "default")
                 {
                     defaultImage = file;
                 }
@@ -1040,15 +1040,15 @@ void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
 
     if (!align.isNull() && !align.isEmpty())
     {
-        if (align.lower() == "center")
+        if (align.toLower() == "center")
             grid->setJustification(Qt::AlignCenter | jst);
-        else if (align.lower() == "right")
+        else if (align.toLower() == "right")
             grid->setJustification(Qt::AlignRight | jst);
-        else if (align.lower() == "allcenter")
+        else if (align.toLower() == "allcenter")
             grid->setJustification(Qt::AlignHCenter | Qt::AlignVCenter | jst);
-        else if (align.lower() == "vcenter")
+        else if (align.toLower() == "vcenter")
             grid->setJustification(Qt::AlignVCenter | jst);
-        else if (align.lower() == "hcenter")
+        else if (align.toLower() == "hcenter")
             grid->setJustification(Qt::AlignHCenter | jst);
     }
     else
@@ -1173,17 +1173,17 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
 
     if (!align.isNull() && !align.isEmpty())
     {
-        if (align.lower() == "center")
+        if (align.toLower() == "center")
             bar->SetJustification(Qt::AlignCenter);
-        else if (align.lower() == "right")
+        else if (align.toLower() == "right")
             bar->SetJustification(Qt::AlignRight);
-        else if (align.lower() == "left")
+        else if (align.toLower() == "left")
             bar->SetJustification(Qt::AlignLeft);
-        else if (align.lower() == "allcenter")
+        else if (align.toLower() == "allcenter")
             bar->SetJustification(Qt::AlignHCenter | Qt::AlignVCenter);
-        else if (align.lower() == "vcenter")
+        else if (align.toLower() == "vcenter")
             bar->SetJustification(Qt::AlignVCenter);
-        else if (align.lower() == "hcenter")
+        else if (align.toLower() == "hcenter")
             bar->SetJustification(Qt::AlignHCenter);
 
     }
@@ -1272,7 +1272,7 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             if (info.tagName() == "debug")
             {
                 debug = getFirstText(info);
-                if (debug.lower() == "yes")
+                if (debug.toLower() == "yes")
                     container->SetDebug(true);
             }
             else if (info.tagName() == "context")
@@ -1443,12 +1443,12 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
                 {
                     value = qApp->translate("ThemeUI", getFirstText(info));
                 }
-                else if (info.attribute("lang","").lower() ==
+                else if (info.attribute("lang","").toLower() ==
                          ui->GetLanguageAndVariant())
                 {
                     value = getFirstText(info);
                 }
-                else if (info.attribute("lang","").lower() ==
+                else if (info.attribute("lang","").toLower() ==
                          ui->GetLanguage())
                 {
                     value = getFirstText(info);
@@ -1491,32 +1491,32 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
     {
         text->SetContext(context);
     }
-    if (multiline.lower() == "yes")
+    if (multiline.toLower() == "yes")
         text->SetJustification(Qt::WordBreak);
     if (!value.isNull() && !value.isEmpty())
         text->SetText(value);
-    if (cutdown.lower() == "no")
+    if (cutdown.toLower() == "no")
         text->SetCutDown(false);
 
     QString align = element.attribute("align", "");
     if (!align.isNull() && !align.isEmpty())
     {
         int jst = (Qt::AlignTop | Qt::AlignLeft);
-        if (multiline.lower() == "yes")
+        if (multiline.toLower() == "yes")
         {
             jst = Qt::WordBreak;
         }
-        if (align.lower() == "center")
+        if (align.toLower() == "center")
             text->SetJustification(jst | Qt::AlignCenter);
-        else if (align.lower() == "right")
+        else if (align.toLower() == "right")
             text->SetJustification(jst | Qt::AlignRight);
-        else if (align.lower() == "left")
+        else if (align.toLower() == "left")
             text->SetJustification(jst | Qt::AlignLeft);
-        else if (align.lower() == "allcenter")
+        else if (align.toLower() == "allcenter")
             text->SetJustification(jst | Qt::AlignHCenter | Qt::AlignVCenter);
-        else if (align.lower() == "vcenter")
+        else if (align.toLower() == "vcenter")
             text->SetJustification(jst | Qt::AlignVCenter);
-        else if (align.lower() == "hcenter")
+        else if (align.toLower() == "hcenter")
             text->SetJustification(jst | Qt::AlignHCenter);
     }
     align = "";
@@ -1588,7 +1588,7 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
             }
             else if (info.tagName() == "showscrollarrows")
             {
-                if (getFirstText(info).lower() == "no")
+                if (getFirstText(info).toLower() == "no")
                     bShowArrows = false;
             }
             else if (info.tagName() == "backgroundsel")
@@ -1606,12 +1606,12 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
                 {
                     value = qApp->translate("ThemeUI", getFirstText(info));
                 }
-                else if (info.attribute("lang","").lower() ==
+                else if (info.attribute("lang","").toLower() ==
                          ui->GetLanguageAndVariant())
                 {
                     value = getFirstText(info);
                 }
-                else if (info.attribute("lang","").lower() ==
+                else if (info.attribute("lang","").toLower() ==
                          ui->GetLanguage())
                 {
                     value = getFirstText(info);
@@ -1644,28 +1644,28 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
                     return;
                 }
 
-                if (imgname.lower() == "uparrow-reg")
+                if (imgname.toLower() == "uparrow-reg")
                 {
                     upArrowReg = ui->LoadScalePixmap(imgfile);
                     upArrowRegPos = parsePoint(imgpoint);
                     upArrowRegPos.setX((int)(upArrowRegPos.x() * wmult));
                     upArrowRegPos.setY((int)(upArrowRegPos.y() * hmult));
                 }
-                if (imgname.lower() == "downarrow-reg")
+                if (imgname.toLower() == "downarrow-reg")
                 {
                     dnArrowReg = ui->LoadScalePixmap(imgfile);
                     dnArrowRegPos = parsePoint(imgpoint);
                     dnArrowRegPos.setX((int)(dnArrowRegPos.x() * wmult));
                     dnArrowRegPos.setY((int)(dnArrowRegPos.y() * hmult));
                 }
-                if (imgname.lower() == "uparrow-sel")
+                if (imgname.toLower() == "uparrow-sel")
                 {
                     upArrowSel = ui->LoadScalePixmap(imgfile);
                     upArrowSelPos = parsePoint(imgpoint);
                     upArrowSelPos.setX((int)(upArrowSelPos.x() * wmult));
                     upArrowSelPos.setY((int)(upArrowSelPos.y() * hmult));
                 }
-                if (imgname.lower() == "downarrow-sel")
+                if (imgname.toLower() == "downarrow-sel")
                 {
                     dnArrowSel = ui->LoadScalePixmap(imgfile);
                     dnArrowSelPos = parsePoint(imgpoint);
@@ -1779,12 +1779,12 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
                 {
                     value = qApp->translate("ThemeUI", getFirstText(info));
                 }
-                else if (info.attribute("lang","").lower() ==
+                else if (info.attribute("lang","").toLower() ==
                          ui->GetLanguageAndVariant())
                 {
                     value = getFirstText(info);
                 }
-                else if (info.attribute("lang","").lower() ==
+                else if (info.attribute("lang","").toLower() ==
                          ui->GetLanguage())
                 {
                     value = getFirstText(info);
@@ -2006,28 +2006,28 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                     return;
                 }
 
-                if (imgname.lower() == "selectionbar")
+                if (imgname.toLower() == "selectionbar")
                 {
                     select_img = ui->LoadScalePixmap(imgfile);
                     select_loc = parsePoint(imgpoint);
                     select_loc.setX((int)(select_loc.x() * wmult));
                     select_loc.setY((int)(select_loc.y() * hmult));
                 }
-                if (imgname.lower() == "uparrow")
+                if (imgname.toLower() == "uparrow")
                 {
                     uparrow_img = ui->LoadScalePixmap(imgfile);
                     uparrow_loc = parsePoint(imgpoint);
                     uparrow_loc.setX((int)(uparrow_loc.x() * wmult));
                     uparrow_loc.setY((int)(uparrow_loc.y() * hmult));
                 }
-                if (imgname.lower() == "downarrow")
+                if (imgname.toLower() == "downarrow")
                 {
                     dnarrow_img = ui->LoadScalePixmap(imgfile);
                     dnarrow_loc = parsePoint(imgpoint);
                     dnarrow_loc.setX((int)(dnarrow_loc.x() * wmult));
                     dnarrow_loc.setY((int)(dnarrow_loc.y() * hmult));
                 }
-                if (imgname.lower() == "leftarrow")
+                if (imgname.toLower() == "leftarrow")
                 {
                     left_img = ui->LoadScalePixmap(imgfile);
                     leftarrow_loc = parsePoint(imgpoint);
@@ -2035,7 +2035,7 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                     leftarrow_loc.setY((int)(leftarrow_loc.y() * hmult));
 
                 }
-                else if (imgname.lower() == "rightarrow")
+                else if (imgname.toLower() == "rightarrow")
                 {
                     right_img = ui->LoadScalePixmap(imgfile);
                     rightarrow_loc = parsePoint(imgpoint);
@@ -2203,9 +2203,9 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
                 QString flex = info.attribute("fleximage", "");
                 if (!flex.isNull() && !flex.isEmpty())
                 {
-                    if (flex.lower() == "yes")
+                    if (flex.toLower() == "yes")
                     {
-                        int pathStart = confile.findRev('/');
+                        int pathStart = confile.lastIndexOf('/');
                         if (usetrans == 1)
                         {
                             if (pathStart < 0 )
@@ -2245,7 +2245,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
                 QString flex = info.attribute("fleximage", "");
                 if (!flex.isNull() && !flex.isEmpty())
                 {
-                    if (flex.lower() == "yes")
+                    if (flex.toLower() == "yes")
                     {
                         if (usetrans == 1)
                             fillfile = "trans-" + fillfile;
@@ -2264,7 +2264,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
             }
             else if (info.tagName() == "orientation")
             {
-                QString orient_string = getFirstText(info).lower();
+                QString orient_string = getFirstText(info).toLower();
                 if (orient_string == "lefttoright")
                 {
                     orientation = 0;
@@ -2414,7 +2414,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     context = getFirstText(info).toInt();
                 }
 
-                if (imgname.lower() == "selectionbar")
+                if (imgname.toLower() == "selectionbar")
                 {
                     QString imgpoint = "";
                     QString imgPad = "";
@@ -2434,7 +2434,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     }
 
                     imgScale = info.attribute("scale", "");
-                    if (imgScale.lower() == "no")
+                    if (imgScale.toLower() == "no")
                     {
                         selectScale = false;
                     }
@@ -2445,7 +2445,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                else if (imgname.lower() == "uparrow")
+                else if (imgname.toLower() == "uparrow")
                 {
                     QString imgpoint = "";
                     imgpoint = info.attribute("location", "");
@@ -2462,7 +2462,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                else if (imgname.lower() == "downarrow")
+                else if (imgname.toLower() == "downarrow")
                 {
                     QString imgpoint = "";
                     imgpoint = info.attribute("location", "");
@@ -2478,7 +2478,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                else if (imgname.lower() == "leftarrow")
+                else if (imgname.toLower() == "leftarrow")
                 {
                     QString imgpoint = "";
                     imgpoint = info.attribute("location", "");
@@ -2494,7 +2494,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                else if (imgname.lower() == "rightarrow")
+                else if (imgname.toLower() == "rightarrow")
                 {
                     QString imgpoint = "";
                     imgpoint = info.attribute("location", "");
@@ -2510,7 +2510,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                else if ((imgname.lower() == "icon") && (imgnumber != -1))
+                else if ((imgname.toLower() == "icon") && (imgnumber != -1))
                 {
                     icon_img = ui->LoadScalePixmap(file);
                     if (!icon_img)
@@ -2721,7 +2721,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                     return;
                 }
 
-                if (imgname.lower() == "on")
+                if (imgname.toLower() == "on")
                 {
                     image_on = ui->LoadScalePixmap(file);
                     if (!image_on)
@@ -2729,7 +2729,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                if (imgname.lower() == "off")
+                if (imgname.toLower() == "off")
                 {
                     image_off = ui->LoadScalePixmap(file);
                     if (!image_off)
@@ -2737,7 +2737,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                if (imgname.lower() == "pushed")
+                if (imgname.toLower() == "pushed")
                 {
                     image_pushed = ui->LoadScalePixmap(file);
                     if (!image_pushed)
@@ -2745,7 +2745,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                if (imgname.lower() == "pushedon")
+                if (imgname.toLower() == "pushedon")
                 {
                     image_pushedon = ui->LoadScalePixmap(file);
                     if (!image_pushedon)
@@ -2854,7 +2854,7 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
                     return;
                 }
 
-                if (imgname.lower() == "on")
+                if (imgname.toLower() == "on")
                 {
                     image_on = ui->LoadScalePixmap(file);
                     if (!image_on)
@@ -2862,7 +2862,7 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                if (imgname.lower() == "off")
+                if (imgname.toLower() == "off")
                 {
                     image_off = ui->LoadScalePixmap(file);
                     if (!image_off)
@@ -2870,7 +2870,7 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                if (imgname.lower() == "pushed")
+                if (imgname.toLower() == "pushed")
                 {
                     image_pushed = ui->LoadScalePixmap(file);
 
@@ -2981,7 +2981,7 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                     return;
                 }
 
-                if (imgname.lower() == "checked")
+                if (imgname.toLower() == "checked")
                 {
                     image_checked = ui->LoadScalePixmap(file);
                     if (!image_checked)
@@ -2989,7 +2989,7 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                if (imgname.lower() == "unchecked")
+                if (imgname.toLower() == "unchecked")
                 {
                     image_unchecked = ui->LoadScalePixmap(file);
                     if (!image_unchecked)
@@ -2997,7 +2997,7 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                if (imgname.lower() == "checked_high")
+                if (imgname.toLower() == "checked_high")
                 {
                     image_checked_high = ui->LoadScalePixmap(file);
                     if (!image_checked_high)
@@ -3005,7 +3005,7 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                if (imgname.lower() == "unchecked_high")
+                if (imgname.toLower() == "unchecked_high")
                 {
                     image_unchecked_high = ui->LoadScalePixmap(file);
                     if (!image_unchecked_high)
@@ -3113,7 +3113,7 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
                     return;
                 }
 
-                if (imgname.lower() == "on")
+                if (imgname.toLower() == "on")
                 {
                     image_on = ui->LoadScalePixmap(file);
                     if (!image_on)
@@ -3121,7 +3121,7 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                if (imgname.lower() == "off")
+                if (imgname.toLower() == "off")
                 {
                     image_off = ui->LoadScalePixmap(file);
                     if (!image_off)
@@ -3129,7 +3129,7 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
                     }
                 }
-                if (imgname.lower() == "pushed")
+                if (imgname.toLower() == "pushed")
                 {
                     image_pushed = ui->LoadScalePixmap(file);
 
@@ -3274,9 +3274,9 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
                 QString fontName = info.attribute("name", "");
                 QString fontFcn  = info.attribute("function", "");
 
-                if (fontFcn.lower() == "active")
+                if (fontFcn.toLower() == "active")
                     fontActive = fontName;
-                else if (fontFcn.lower() == "inactive")
+                else if (fontFcn.toLower() == "inactive")
                     fontInactive = fontName;
                 else {
                     std::cerr << "Unknown font function for listbtn area: "
@@ -3286,7 +3286,7 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
                 }
             }
             else if (info.tagName() == "showarrow") {
-                if (getFirstText(info).lower() == "no")
+                if (getFirstText(info).toLower() == "no")
                     showArrow = false;
             }
             else if (info.tagName() == "align")
@@ -3294,17 +3294,17 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
                 align = getFirstText(info);
             }
             else if (info.tagName() == "showscrollarrows") {
-                if (getFirstText(info).lower() == "yes")
+                if (getFirstText(info).toLower() == "yes")
                     showScrollArrows = true;
             }
             else if (info.tagName() == "gradient") {
 
-                if (info.attribute("type","").lower() == "selected") {
+                if (info.attribute("type","").toLower() == "selected") {
                     grSelectedBeg = createColor(info.attribute("start"));
                     grSelectedEnd = createColor(info.attribute("end"));
                     grSelectedAlpha = info.attribute("alpha","255").toUInt();
                 }
-                else if (info.attribute("type","").lower() == "unselected") {
+                else if (info.attribute("type","").toLower() == "unselected") {
                     grUnselectedBeg = createColor(info.attribute("start"));
                     grUnselectedEnd = createColor(info.attribute("end"));
                     grUnselectedAlpha = info.attribute("alpha","100").toUInt();
@@ -3348,11 +3348,11 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
 
     if (!align.isEmpty())
     {
-        if (align.lower() == "center")
+        if (align.toLower() == "center")
             jst = Qt::AlignCenter | Qt::AlignVCenter;
-        else if (align.lower() == "right")
+        else if (align.toLower() == "right")
             jst = Qt::AlignRight  | Qt::AlignVCenter;
-    	else if (align.lower() == "left")
+    	else if (align.toLower() == "left")
             jst = Qt::AlignLeft   | Qt::AlignVCenter;
     }
 
@@ -3453,9 +3453,9 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
                 QString fontName = info.attribute("name", "");
                 QString fontFcn  = info.attribute("function", "");
 
-                if (fontFcn.lower() == "active")
+                if (fontFcn.toLower() == "active")
                     fontActive = fontName;
-                else if (fontFcn.lower() == "inactive")
+                else if (fontFcn.toLower() == "inactive")
                     fontInactive = fontName;
                 else {
                     std::cerr << "Unknown font function for ListTreeArea: "
@@ -3465,21 +3465,21 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
                 }
             }
             else if (info.tagName() == "showarrow") {
-                if (getFirstText(info).lower() == "no")
+                if (getFirstText(info).toLower() == "no")
                     showArrow = false;
             }
             else if (info.tagName() == "showscrollarrows") {
-                if (getFirstText(info).lower() == "yes")
+                if (getFirstText(info).toLower() == "yes")
                     showScrollArrows = true;
             }
             else if (info.tagName() == "gradient") {
 
-                if (info.attribute("type","").lower() == "selected") {
+                if (info.attribute("type","").toLower() == "selected") {
                     grSelectedBeg = createColor(info.attribute("start"));
                     grSelectedEnd = createColor(info.attribute("end"));
                     grSelectedAlpha = info.attribute("alpha","255").toUInt();
                 }
-                else if (info.attribute("type","").lower() == "unselected") {
+                else if (info.attribute("type","").toLower() == "unselected") {
                     grUnselectedBeg = createColor(info.attribute("start"));
                     grUnselectedEnd = createColor(info.attribute("end"));
                     grUnselectedAlpha = info.attribute("alpha","100").toUInt();
@@ -3634,7 +3634,7 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                     return;
                 }
 
-                if (imgfunction.lower() == "normal")
+                if (imgfunction.toLower() == "normal")
                 {
                     normalImage = ui->LoadScalePixmap(imgname);
                     if (!normalImage)
@@ -3643,7 +3643,7 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                              << (const char *)imgname << endl;
                     }
                 }
-                else if (imgfunction.lower() == "focused")
+                else if (imgfunction.toLower() == "focused")
                 {
                     focusedImage = ui->LoadScalePixmap(imgname);
                     if (!focusedImage)
@@ -3652,7 +3652,7 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                              << (const char *)imgname << endl;
                     }
                 }
-                else if (imgfunction.lower() == "down")
+                else if (imgfunction.toLower() == "down")
                 {
                     downImage = ui->LoadScalePixmap(imgname);
 
@@ -3662,7 +3662,7 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                              << (const char *)imgname << endl;
                     }
                 }
-                else if (imgfunction.lower() == "downfocused")
+                else if (imgfunction.toLower() == "downfocused")
                 {
                     downFocusedImage = ui->LoadScalePixmap(imgname);
 
@@ -3684,13 +3684,13 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                 QString fontName = e.attribute("name", "");
                 QString fontFcn  = e.attribute("function", "");
 
-                if (fontFcn.lower() == "normal")
+                if (fontFcn.toLower() == "normal")
                     normalFontName = fontName;
-                else if (fontFcn.lower() == "focused")
+                else if (fontFcn.toLower() == "focused")
                     focusedFontName = fontName;
-                else if (fontFcn.lower() == "down")
+                else if (fontFcn.toLower() == "down")
                     downFontName = fontName;
-                else if (fontFcn.lower() == "downfocused")
+                else if (fontFcn.toLower() == "downfocused")
                     downFocusedFontName = fontName;
                 else
                 {
@@ -3788,7 +3788,7 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
                     return;
                 }
 
-                if (imgfunction.lower() == "normal")
+                if (imgfunction.toLower() == "normal")
                 {
                     normalImage = ui->LoadScalePixmap(imgname);
                     if (!normalImage)
@@ -3796,7 +3796,7 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)imgname << endl ;
                     }
                 }
-                else if (imgfunction.lower() == "focused")
+                else if (imgfunction.toLower() == "focused")
                 {
                     focusedImage = ui->LoadScalePixmap(imgname);
                     if (!focusedImage)
@@ -3804,7 +3804,7 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)imgname << endl ;
                     }
                 }
-                else if (imgfunction.lower() == "down")
+                else if (imgfunction.toLower() == "down")
                 {
                     downImage = ui->LoadScalePixmap(imgname);
 
@@ -3813,7 +3813,7 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
                         cerr << "xmparse.o: I can't find a file called " << (const char *)imgname << endl ;
                     }
                 }
-                else if (imgfunction.lower() == "downfocused")
+                else if (imgfunction.toLower() == "downfocused")
                 {
                     downFocusedImage = ui->LoadScalePixmap(imgname);
 
@@ -3835,13 +3835,13 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
                 QString fontName = e.attribute("name", "");
                 QString fontFcn  = e.attribute("function", "");
 
-                if (fontFcn.lower() == "normal")
+                if (fontFcn.toLower() == "normal")
                     normalFontName = fontName;
-                else if (fontFcn.lower() == "focused")
+                else if (fontFcn.toLower() == "focused")
                     focusedFontName = fontName;
-                else if (fontFcn.lower() == "down")
+                else if (fontFcn.toLower() == "down")
                     downFontName = fontName;
-                else if (fontFcn.lower() == "downfocused")
+                else if (fontFcn.toLower() == "downfocused")
                     downFocusedFontName = fontName;
                 else
                 {

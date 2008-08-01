@@ -8,10 +8,10 @@
 #include <qrect.h>
 #include <qfile.h>
 #include <qmap.h>
-#include <Q3ValueList>
+#include <QList>
 #include <QKeyEvent>
 #include <vector>
-#include <q3valuevector.h>
+#include <QVector>
 #include <qfont.h>
 #include <qpixmap.h>
 #include <qpainter.h>
@@ -272,7 +272,7 @@ class MPUBLIC UIGuideType : public UIType
         {
             this->drawArea = drawArea;
             this->title = title;
-            this->category = category.stripWhiteSpace();
+            this->category = category.trimmed();
             this->arrow = arrow;
             this->recType = recType;
             this->recStat = recStat;
@@ -924,7 +924,7 @@ class MPUBLIC UIManagedTreeListType : public UIType
     //  don't need this
     //
     typedef QMap <int, QRect> CornerMap;
-    typedef Q3ValueVector<int> IntVector;
+    typedef QVector<int> IntVector;
 
   public:
 
@@ -942,11 +942,11 @@ class MPUBLIC UIManagedTreeListType : public UIType
     void    setBinAreas(CornerMap some_bin_corners) { bin_corners = some_bin_corners; }
     void    Draw(QPainter *, int drawlayer, int context);
     void    assignTreeData(GenericTree *a_tree);
-    void    moveToNode(Q3ValueList<int> route_of_branches);
-    void    moveToNodesFirstChild(Q3ValueList<int> route_of_branchs);
-    Q3ValueList <int>* getRouteToActive();
+    void    moveToNode(QList<int> route_of_branches);
+    void    moveToNodesFirstChild(QList<int> route_of_branchs);
+    QList<int>* getRouteToActive();
     QStringList getRouteToCurrent();
-    bool    tryToSetActive(Q3ValueList <int> route);
+    bool    tryToSetActive(QList<int> route);
     bool    tryToSetCurrent(QStringList route);
     void    setHighlightImage(QPixmap an_image){highlight_image = an_image;}
     void    setArrowImages(QPixmap up, QPixmap down, QPixmap left, QPixmap right)
@@ -1033,7 +1033,7 @@ class MPUBLIC UIManagedTreeListType : public UIType
     QPixmap                 right_arrow_image;
     Q3PtrList<QPixmap>       resized_highlight_images;
     QMap<int, QPixmap*>     highlight_map;
-    Q3ValueList <int>        route_to_active;
+    QList<int>              route_to_active;
     bool                    show_whole_tree;
     bool                    scrambled_parents;
     bool                    color_selectables;

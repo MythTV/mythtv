@@ -18,6 +18,9 @@
 #include <algorithm>
 using namespace std;
 
+// Qt includes
+#include <q3deepcopy.h>
+
 // MythTV includes
 #include "mythdbcon.h"
 #include "mythcontext.h"

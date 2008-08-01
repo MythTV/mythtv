@@ -22,8 +22,8 @@
 using namespace std;
 
 // Qt headers
-#include <Q3ValueList>
-#include <Q3TextStream>
+#include <QList>
+#include <QTextStream>
 #include <qapplication.h>
 #include <q3process.h>
 #include <qdir.h>
@@ -224,14 +224,14 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
     QFile file("/proc/sys/dev/cdrom/info");
     if (file.open(QIODevice::ReadOnly))
     {
-        Q3TextStream stream(&file);
+        QTextStream stream(&file);
         QString line;
         while (!stream.atEnd())
         {
             line = stream.readLine();
             if (line.startsWith("drive name:"))
             {
-                QStringList  devs = QStringList::split('\t', line);
+                QStringList devs = line.split('\t', QString::SkipEmptyParts);
 
                 devs.pop_front();   // Remove 'drive name:' field
                 l += devs;
@@ -262,7 +262,7 @@ static void LookupModel(MythMediaDevice* device)
         QFile  file("/proc/ide/" + devname.left(3) + "/model");
         if (file.open(QIODevice::ReadOnly))
         {
-            Q3TextStream stream(&file);
+            QTextStream stream(&file);
 
             desc.append(stream.readLine());
             file.close();
@@ -281,7 +281,7 @@ static void LookupModel(MythMediaDevice* device)
         QFile  file(path + "vendor");
         if (file.open(QIODevice::ReadOnly))
         {
-            Q3TextStream stream(&file);
+            QTextStream stream(&file);
 
             desc.append(stream.readLine());
             desc.append(' ');
@@ -291,7 +291,7 @@ static void LookupModel(MythMediaDevice* device)
         file.setName(path + "model");
         if (file.open(QIODevice::ReadOnly))
         {
-            Q3TextStream stream(&file);
+            QTextStream stream(&file);
 
             desc.append(stream.readLine());
             desc.append(' ');
@@ -339,7 +339,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
     //
     // Check if this is a duplicate of a device we have already added
     //
-    Q3ValueList<MythMediaDevice*>::const_iterator itr = m_Devices.begin();
+    QList<MythMediaDevice*>::const_iterator itr = m_Devices.begin();
     for (; itr != m_Devices.end(); ++itr)
     {
         if (stat((*itr)->getDevicePath(), &sb) < 0)
@@ -614,7 +614,7 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
         qBuffer.append(buffer);
         size = read(m_fifo, buffer, 255);
     }
-    const QStringList list = QStringList::split('\n', qBuffer);
+    const QStringList list = qBuffer.split('\n', QString::SkipEmptyParts);
 
     QStringList::const_iterator it = list.begin();
     for (; it != list.end(); it++)

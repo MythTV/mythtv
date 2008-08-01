@@ -39,6 +39,9 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
+// Qt headers
+#include <q3deepcopy.h>
+
 // MythTV headers
 #include "mythcontext.h"
 #include "mythdbcon.h"

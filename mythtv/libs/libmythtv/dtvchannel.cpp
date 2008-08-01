@@ -1,9 +1,7 @@
 #include "dtvchannel.h"
 
 // Qt headers
-
-
-
+#include <q3deepcopy.h>
 
 // MythTV headers
 #include "libmythdb/mythdb.h"

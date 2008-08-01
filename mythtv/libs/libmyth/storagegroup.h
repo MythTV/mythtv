@@ -1,8 +1,7 @@
 #ifndef _STORAGEGROUP_H
 #define _STORAGEGROUP_H
 
-#include <qstringlist.h>
-#include <Q3DeepCopy>
+#include <QStringList>
 
 #include "libmyth/settings.h"
 #include "libmyth/mythwidgets.h"
@@ -16,10 +15,10 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
                  const QString hostname = "");
 
     QString getName(void) const
-        { return Q3DeepCopy<QString>(m_groupname); }
+        { QString tmp = m_groupname; tmp.detach(); return tmp; }
 
     QStringList GetDirList(void) const
-        { return Q3DeepCopy<QStringList>(m_dirlist); }
+        { QStringList tmp = m_dirlist; tmp.detach(); return tmp; }
 
     QString FindRecordingFile(QString filename);
     QString FindRecordingDir(QString filename);

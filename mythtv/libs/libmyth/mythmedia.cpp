@@ -249,7 +249,7 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
 
         const QString ext = fi.extension(false);
         if (!ext.isEmpty())
-            cnt[ext.lower()]++;
+            cnt[ext.toLower()]++;
     }
 
     return !cnt.empty();
@@ -264,7 +264,7 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
 void MythMediaDevice::RegisterMediaExtensions(uint mediatype,
                                               const QString &extensions)
 {
-    const QStringList list = QStringList::split(",", extensions, "");
+    const QStringList list = extensions.split(",");
     for (QStringList::const_iterator it = list.begin(); it != list.end(); ++it)
         m_ext_to_media[*it] |= mediatype;
 }

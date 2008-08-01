@@ -1,9 +1,9 @@
 #ifndef GENERICTREE_H_
 #define GENERICTREE_H_
 
-#include <qstring.h>
-#include <q3valuevector.h>
-#include <q3valuelist.h>
+#include <QString>
+#include <QVector>
+#include <QList>
 #include <q3ptrlist.h>
 
 #include <vector>
@@ -15,7 +15,7 @@ class SortableGenericTreeList;
 
 class MPUBLIC GenericTree
 {
-    typedef Q3ValueVector<int> IntVector;
+    typedef QVector<int> IntVector;
 
   public:
     GenericTree(const QString &a_string = "", int an_int = 0, 
@@ -30,9 +30,9 @@ class MPUBLIC GenericTree
 
     GenericTree *findLeaf(int ordering_index = -1);
 
-    GenericTree* findNode(Q3ValueList<int> route_of_branches);
-    GenericTree* recursiveNodeFinder(Q3ValueList<int> route_of_branches);
-    bool checkNode(Q3ValueList<int> route_of_branches);
+    GenericTree* findNode(QList<int> route_of_branches);
+    GenericTree* recursiveNodeFinder(QList<int> route_of_branches);
+    bool checkNode(QList<int> route_of_branches);
 
     GenericTree *nextSibling(int number_down, int ordering_index = -1);
     GenericTree *prevSibling(int number_up, int ordering_index = -1);

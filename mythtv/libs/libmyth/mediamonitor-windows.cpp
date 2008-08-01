@@ -79,7 +79,7 @@ bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)
     //
     // Check if this is a duplicate of a device we have already added
     //
-    Q3ValueList<MythMediaDevice*>::const_iterator itr = m_Devices.begin();
+    QList<MythMediaDevice*>::const_iterator itr = m_Devices.begin();
     for (; itr != m_Devices.end(); ++itr)
     {
         if ((*itr)->getDevicePath() == pDevice->getDevicePath())

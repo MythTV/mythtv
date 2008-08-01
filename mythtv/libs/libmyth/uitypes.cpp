@@ -7,7 +7,6 @@
 #include <qbitmap.h>
 #include <QLabel>
 #include <QPixmap>
-#include <Q3ValueList>
 #include <QKeyEvent>
 #include <QEvent>
 #include <Q3PtrList>
@@ -143,8 +142,8 @@ void LayerSet::SetText(QMap<QString, QString> &infoMap)
             {
                 for (; riter != infoMap.end(); riter++)
                 {
-                    QString key = riter.key().upper();
-                    QString data = riter.data();
+                    QString key = riter.key().toUpper();
+                    QString data = *riter;
 
                     if (new_text.contains(key))
                     {
@@ -519,7 +518,7 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
         QColor clr = m_font->color;
         int h,s,v;
 
-        int fav = msg.find("<MARK:fav>");
+        int fav = msg.indexOf("<MARK:fav>");
         if (fav >= 0)
         {
             msg = msg.left(fav) + msg.mid(fav + 10);
@@ -527,7 +526,7 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
             clr.setHsv(60, 200, v);
         }
 
-        int unavail = msg.find("<MARK:unavail>");
+        int unavail = msg.indexOf("<MARK:unavail>");
         if (unavail >= 0)
         {
             msg = msg.left(unavail) + msg.mid(unavail + 14);
@@ -887,7 +886,7 @@ void UIGuideType::SetProgramInfo(int row, int col, const QRect &area,
 
     if (drawCategoryColors)
     {
-        data->categoryColor = categoryColors[data->category.lower()];
+        data->categoryColor = categoryColors[data->category.toLower()];
         if (!data->categoryColor.isValid())
             data->categoryColor = categoryColors["none"];
     }
@@ -1378,7 +1377,7 @@ void UIImageType::LoadImage()
     if (m_flex == true)
     {
         QString flexprefix = m_transparent ? "trans-" : "solid-";
-        int pathStart = m_filename.findRev('/');
+        int pathStart = m_filename.lastIndexOf('/');
         if (pathStart < 0 )
             m_filename = flexprefix + m_filename;
         else
@@ -3384,7 +3383,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 
 }
 
-void UIManagedTreeListType::moveToNode(Q3ValueList<int> route_of_branches)
+void UIManagedTreeListType::moveToNode(QList<int> route_of_branches)
 {
     current_node = my_tree_data->findNode(route_of_branches);
     if (!current_node)
@@ -3396,7 +3395,7 @@ void UIManagedTreeListType::moveToNode(Q3ValueList<int> route_of_branches)
     emit nodeSelected(current_node->getInt(), current_node->getAttributes());
 }
 
-void UIManagedTreeListType::moveToNodesFirstChild(Q3ValueList<int> route_of_branches)
+void UIManagedTreeListType::moveToNodesFirstChild(QList<int> route_of_branches)
 {
     GenericTree *finder = my_tree_data->findNode(route_of_branches);
 
@@ -3424,7 +3423,7 @@ void UIManagedTreeListType::moveToNodesFirstChild(Q3ValueList<int> route_of_bran
     }
 }
 
-Q3ValueList <int> * UIManagedTreeListType::getRouteToActive()
+QList<int> *UIManagedTreeListType::getRouteToActive(void)
 {
     if (active_node)
     {
@@ -3457,7 +3456,7 @@ QStringList UIManagedTreeListType::getRouteToCurrent()
     return route_to_current;
 }
 
-bool UIManagedTreeListType::tryToSetActive(Q3ValueList <int> route)
+bool UIManagedTreeListType::tryToSetActive(QList<int> route)
 {
     GenericTree *a_node = my_tree_data->findNode(route);
     if (a_node && a_node->isSelectable())
@@ -3912,13 +3911,19 @@ bool UIManagedTreeListType::incSearchNext(void)
     {
         if (bIncSearchContains)
         {
-            if (new_node->getString().find(incSearch, 0, false) != -1)
+            if (new_node->getString().indexOf(
+                    incSearch, 0, Qt::CaseInsensitive) != -1)
+            {
                 break;
+            }
         }
         else
         {
-            if (new_node->getString().startsWith(incSearch, false))
+            if (new_node->getString().startsWith(
+                    incSearch, Qt::CaseInsensitive))
+            {
                 break;
+            }
         }
 
         new_node = new_node->nextSibling(1, visual_order);
@@ -3942,13 +3947,19 @@ bool UIManagedTreeListType::incSearchNext(void)
 
             if (bIncSearchContains)
             {
-                if (new_node->getString().find(incSearch, 0, false) != -1)
+                if (new_node->getString().indexOf(
+                        incSearch, 0, Qt::CaseInsensitive) != -1)
+                {
                     break;
+                }
             }
             else
             {
-                if (new_node->getString().startsWith(incSearch, false))
+                if (new_node->getString().startsWith(
+                        incSearch, Qt::CaseInsensitive))
+                {
                     break;
+                }
             }
 
             new_node = new_node->nextSibling(1, visual_order);
@@ -5687,7 +5698,7 @@ void UIKeyboardType::AddKey(UIKeyType *key)
 {
     m_keyList.append(key);
 
-    if (key->GetType().lower() == "done")
+    if (key->GetType().toLower() == "done")
     {
         key->takeFocus();
         m_focusedKey = key;

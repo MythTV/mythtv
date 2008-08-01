@@ -41,12 +41,12 @@ void VirtualKeyboard::SwitchLayout(const QString &lang)
         return;
     }
 
-    QString language = lang.lower();
+    QString language = lang.toLower();
 
     // figure out which of the english layouts to use (UK or US)
     if (language.left(2) == "en")
     {
-        if (language.contains("en_gb", false))
+        if (language.contains("en_gb", Qt::CaseInsensitive))
         {
             language = "en_uk";
         }

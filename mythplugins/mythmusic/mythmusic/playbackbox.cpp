@@ -785,15 +785,13 @@ void PlaybackBoxMusic::doUpdatePlaylist(QString whereClause)
     if (!menufilters && !getInsertPLOptions(insertOption, playOption, bRemoveDups))
         return;
 
-    Q3ValueList <int> branches_to_current_node;
+    QList<int> branches_to_current_node;
     trackCount = music_tree_list->getCurrentNode()->siblingCount();
 
     // store path to current track
     if (curMeta)
     {
-        Q3ValueList <int> *a_route;
-        a_route = music_tree_list->getRouteToActive();
-        branches_to_current_node = *a_route;
+        branches_to_current_node = *music_tree_list->getRouteToActive();
         curTrackID = curMeta->ID();
     }
     else
@@ -1021,11 +1019,8 @@ void PlaybackBoxMusic::showEditMetadataDialog()
         mainvisual->deleteMetadata();
 
         // Get a reference to the current track
-        Q3ValueList <int> branches_to_current_node;
-
-        Q3ValueList <int> *a_route;
-        a_route = music_tree_list->getRouteToActive();
-        branches_to_current_node = *a_route;
+        QList<int> branches_to_current_node =
+            *music_tree_list->getRouteToActive();
 
         // reload music
         gMusicData->all_music->save();
@@ -1713,13 +1708,11 @@ void PlaybackBoxMusic::setRepeatMode(MusicPlayer::RepeatMode mode)
 
 void PlaybackBoxMusic::savePosition(uint position)
 {
-    Q3ValueList <int> branches_to_current_node;
+    QList<int> branches_to_current_node;
 
     if (curMeta)
     {
-        Q3ValueList <int> *a_route;
-        a_route = music_tree_list->getRouteToActive();
-        branches_to_current_node = *a_route;
+        branches_to_current_node = *music_tree_list->getRouteToActive();
     }
     else
     {
@@ -1731,8 +1724,8 @@ void PlaybackBoxMusic::savePosition(uint position)
     }
 
     QString s = "";
-    Q3ValueListIterator <int> it;
-    for (it = branches_to_current_node.begin(); it != branches_to_current_node.end(); ++it)
+    QList<int>::const_iterator it = branches_to_current_node.begin();
+    for (; it != branches_to_current_node.end(); ++it)
         s += "," + QString::number(*it);
 
     s.remove(0, 1);
@@ -1844,13 +1837,11 @@ void PlaybackBoxMusic::editPlaylist()
 {
     // Get a reference to the current track
 
-    Q3ValueList <int> branches_to_current_node;
+    QList<int> branches_to_current_node;
 
     if (curMeta)
     {
-        Q3ValueList <int> *a_route;
-        a_route = music_tree_list->getRouteToActive();
-        branches_to_current_node = *a_route;
+        branches_to_current_node = *music_tree_list->getRouteToActive();
     }
     else
     {

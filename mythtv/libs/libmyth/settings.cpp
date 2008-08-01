@@ -751,7 +751,7 @@ void HostRefreshRateComboBox::ChangeResolution(const QString& resolution)
 
 const vector<short> HostRefreshRateComboBox::GetRefreshRates(const QString &res)
 {
-    QStringList slist = QStringList::split("x", res);
+    QStringList slist = res.split("x");
     int w = 0, h = 0;
     bool ok0 = false, ok1 = false;
     if (2 == slist.size())

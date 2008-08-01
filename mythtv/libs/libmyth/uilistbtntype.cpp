@@ -1548,13 +1548,19 @@ bool UIListBtnType::incSearchNext(void)
     {
         if (m_bIncSearchContains)
         {
-            if (it.current()->text().find(m_incSearch, 0, false) != -1)
+            if (it.current()->text().indexOf(
+                    m_incSearch, 0, Qt::CaseInsensitive) != -1)
+            {
                 break;
+            }
         }
         else
         {
-            if (it.current()->text().startsWith(m_incSearch, false))
+            if (it.current()->text().startsWith(
+                    m_incSearch, Qt::CaseInsensitive))
+            {
                 break;
+            }
         }
 
         ++it;
@@ -1577,13 +1583,19 @@ bool UIListBtnType::incSearchNext(void)
 
             if (m_bIncSearchContains)
             {
-                if (it.current()->text().find(m_incSearch, 0, false) != -1)
+                if (it.current()->text().indexOf(
+                        m_incSearch, 0, Qt::CaseInsensitive) != -1)
+                {
                     break;
+                }
             }
             else
             {
-                if (it.current()->text().startsWith(m_incSearch, false))
+                if (it.current()->text().startsWith(
+                        m_incSearch, Qt::CaseInsensitive))
+                {
                     break;
+                }
             }
 
             ++it;

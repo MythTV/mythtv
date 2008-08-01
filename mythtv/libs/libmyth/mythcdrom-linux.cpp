@@ -441,8 +441,7 @@ MediaStatus MythCDROMLinux::checkMedia()
                         struct iso_primary_descriptor buf;
                         lseek(this->m_DeviceHandle,(off_t) 2048*16,SEEK_SET);
                         read(this->m_DeviceHandle, &buf,2048);
-                        this->m_VolumeID = QString(buf.volume_id)
-                                                       .stripWhiteSpace();
+                        this->m_VolumeID = QString(buf.volume_id).trimmed();
                         this->m_KeyID = QString("%1%2")
                                       .arg(this->m_VolumeID)
                                       .arg(QString(buf.creation_date).left(16));

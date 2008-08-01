@@ -4,9 +4,8 @@
 #define MYTH_CONFIG_DIALOGS_H
 
 // Qt headers
-#include <qobject.h>
-#include <qstring.h>
-#include <Q3DeepCopy>
+#include <QObject>
+#include <QString>
 
 // MythTV headers
 #include "mythexp.h"

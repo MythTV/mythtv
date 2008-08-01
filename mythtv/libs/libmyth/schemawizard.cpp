@@ -355,7 +355,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
             {
                 if (didBackup)
                 {
-                    int dirPos = m_backupResult.findRev(QChar('/'));
+                    int dirPos = m_backupResult.lastIndexOf(QChar('/'));
                     QString dirName;
                     QString fileName;
                     if (dirPos > 0)

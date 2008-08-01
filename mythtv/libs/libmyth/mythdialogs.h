@@ -9,7 +9,7 @@
 #include <Q3ProgressBar>
 #include <QFrame>
 #include <Q3ScrollView>
-#include <Q3ValueVector>
+#include <QVector>
 #include <Q3PtrList>
 
 #include "mythexp.h"
@@ -498,7 +498,7 @@ class MPUBLIC MythImageFileDialog: public MythThemedDialog
 
   public:
 
-    typedef Q3ValueVector<int> IntVector;
+    typedef QVector<int> IntVector;
 
     MythImageFileDialog(QString *result,
                         QString top_directory,
