@@ -3,6 +3,7 @@
 #include <pthread.h>
 
 #include <algorithm>
+#include <vector>
 
 #ifdef USE_OPENGL_PAINTER
 #include <QGLWidget>
