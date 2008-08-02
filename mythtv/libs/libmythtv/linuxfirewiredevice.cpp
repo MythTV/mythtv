@@ -24,6 +24,7 @@
 
 // C++ headers
 #include <algorithm>
+#include <map>
 using namespace std;
 
 // Qt headers
