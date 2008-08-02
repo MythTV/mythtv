@@ -118,15 +118,15 @@ void MythUIText::SetCutDown(bool cut)
 
 void MythUIText::SetArea(const MythRect &rect)
 {
-    m_CutMessage = "";
-    m_drawRect = rect;
     MythUIType::SetArea(rect);
+    m_CutMessage = "";
+    m_drawRect = m_Area;
 }
 
 void MythUIText::SetPosition(const QPoint &pos)
 {
-    m_drawRect.moveTopLeft(pos);
     MythUIType::SetPosition(pos);
+    m_drawRect.moveTopLeft(m_Area.topLeft());
 }
 
 void MythUIText::SetStartPosition(const int x, const int y)
