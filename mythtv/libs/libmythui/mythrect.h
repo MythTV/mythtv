@@ -4,6 +4,8 @@
 #include <QRect>
 #include <QString>
 
+class MythRect;
+
 class MythRect : public QRect
 {
 
@@ -43,6 +45,8 @@ class MythRect : public QRect
     float m_percentY;
 
     bool m_needsUpdate;
+
+    QRect m_parentArea;
 };
 
 #endif
