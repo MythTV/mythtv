@@ -2,8 +2,8 @@
  * File  : thumbgenerator.cpp
  * Author: Renchi Raju <renchi@pooh.tam.uiuc.edu>
  * Date  : 2004-01-02
- * Description : 
- * 
+ * Description :
+ *
  * Copyright 2004 by Renchi Raju
 
  * This program is free software; you can redistribute it
@@ -11,12 +11,12 @@
  * Public License as published bythe Free Software Foundation;
  * either version 2, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * ============================================================ */
 
 #include <qapplication.h>
@@ -112,7 +112,7 @@ void ThumbGenerator::run()
 
         if (isGallery) {
 
-            if (fileInfo.isDir()) 
+            if (fileInfo.isDir())
                 isGallery = checkGalleryDir(fileInfo);
             else
                 isGallery = checkGalleryFile(fileInfo);
@@ -138,7 +138,7 @@ void ThumbGenerator::run()
                     QFile::remove(cachePath);
                 }
 
-                if (fileInfo.isDir()) 
+                if (fileInfo.isDir())
                     loadDir(image, fileInfo);
                 else
                     loadFile(image, fileInfo);
@@ -152,12 +152,12 @@ void ThumbGenerator::run()
                     QString screenshotPath = QString("%1%2-screenshot.jpg")
                             .arg(getThumbcacheDir(dir))
                             .arg(file);
-                    image.save(screenshotPath, "JPEG");
+                    image.save(screenshotPath, "JPEG", 90);
                 }
 
                 image = image.scaled(m_width,m_height,
                                 Qt::KeepAspectRatio, Qt::SmoothTransformation);
-                image.save(cachePath, "JPEG");
+                image.save(cachePath, "JPEG", 90);
 
                 // deep copies all over
                 ThumbData *td = new ThumbData;
@@ -185,10 +185,10 @@ bool ThumbGenerator::moreWork()
 bool ThumbGenerator::checkGalleryDir(const QFileInfo& fi)
 {
     // try to find a highlight
-    QDir subdir(fi.absFilePath(), "*.highlight.*", QDir::Name, 
+    QDir subdir(fi.absFilePath(), "*.highlight.*", QDir::Name,
                 QDir::Files);
 
-    
+
     if (subdir.count() > 0) {
         // check if the image format is understood
         QString path(subdir.entryInfoList().begin()->absFilePath());
@@ -205,7 +205,7 @@ bool ThumbGenerator::checkGalleryFile(const QFileInfo& fi)
     // for a file named xyz.thumb.jpg.
     QString fn = fi.fileName();
     int firstDot = fn.find('.');
-    if (firstDot > 0) 
+    if (firstDot > 0)
     {
         fn.insert(firstDot, ".thumb");
         QFileInfo galThumb(fi.dirPath(true) + "/" + fn);
@@ -265,7 +265,7 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
 
             if (f->fileName() == "." || f->fileName() == "..")
                 continue;
-            
+
             loadDir(image, *f);
         }
     }
@@ -288,8 +288,8 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 
         if (tmpDir.exists())
         {
-            QString cmd = "cd \"" + tmpDir.absPath() + 
-                          "\"; mplayer -nosound -frames 1 -vo png:z=6 \"" + 
+            QString cmd = "cd \"" + tmpDir.absPath() +
+                          "\"; mplayer -nosound -frames 1 -vo png:z=6 \"" +
                           fi.absFilePath() + "\"";
             if (myth_system(cmd) == 0)
             {
@@ -338,7 +338,7 @@ QString ThumbGenerator::getThumbcacheDir(const QString& inDir)
 {
     QString galleryDir = gContext->GetSetting("GalleryDir");
 
-    // For directory "/my/images/january", this function either returns 
+    // For directory "/my/images/january", this function either returns
     // "/my/images/january/.thumbcache" or "~/.mythtv/mythgallery/january/.thumbcache"
     QString aPath = inDir + QString("/.thumbcache/");
     QDir dir(aPath);
@@ -353,7 +353,7 @@ QString ThumbGenerator::getThumbcacheDir(const QString& inDir)
         !dir.exists() ||
         !inDir.startsWith(galleryDir))
     {
-        // Arrive here if storing thumbs in home dir, 
+        // Arrive here if storing thumbs in home dir,
         // OR failed to create thumb dir in gallery pics location
         int prefixLen = gContext->GetSetting("GalleryDir").length();
         aPath = GetConfDir() + "/MythGallery";
