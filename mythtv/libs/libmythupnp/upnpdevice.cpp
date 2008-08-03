@@ -66,7 +66,8 @@ bool UPnpDeviceDesc::Load( const QString &sFileName )
     QString sErrMsg;
     int     nErrLine = 0;
     int     nErrCol  = 0;
-    bool    bSuccess = doc.setContent( &file, false, &sErrMsg, &nErrLine, &nErrCol );
+    bool    bSuccess = doc.setContent( &file, false,
+                                       &sErrMsg, &nErrLine, &nErrCol );
 
     file.close();
 
@@ -114,28 +115,45 @@ bool UPnpDeviceDesc::Load( const QDomDocument &xmlDevDesc )
 
 void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
 {
-    for ( oNode = oNode.firstChild(); !oNode.isNull(); oNode = oNode.nextSibling() )
+    for ( oNode = oNode.firstChild();
+                 !oNode.isNull();
+                  oNode = oNode.nextSibling() )
     {
         QDomElement e = oNode.toElement();
 
         if (!e.isNull())
         {
-            if ( e.tagName() == "deviceType"       ) { SetStrValue( e, pCurDevice->m_sDeviceType      ); continue; }
-            if ( e.tagName() == "friendlyName"     ) { SetStrValue( e, pCurDevice->m_sFriendlyName    ); continue; }
-            if ( e.tagName() == "manufacturer"     ) { SetStrValue( e, pCurDevice->m_sManufacturer    ); continue; }
-            if ( e.tagName() == "manufacturerURL"  ) { SetStrValue( e, pCurDevice->m_sManufacturerURL ); continue; }
-            if ( e.tagName() == "modelDescription" ) { SetStrValue( e, pCurDevice->m_sModelDescription); continue; }
-            if ( e.tagName() == "modelName"        ) { SetStrValue( e, pCurDevice->m_sModelName       ); continue; }
-            if ( e.tagName() == "modelNumber"      ) { SetStrValue( e, pCurDevice->m_sModelNumber     ); continue; }
-            if ( e.tagName() == "modelURL"         ) { SetStrValue( e, pCurDevice->m_sModelURL        ); continue; }
-            if ( e.tagName() == "serialNumber"     ) { SetStrValue( e, pCurDevice->m_sSerialNumber    ); continue; }
-            if ( e.tagName() == "UPC"              ) { SetStrValue( e, pCurDevice->m_sUPC             ); continue; }
-            if ( e.tagName() == "presentationURL"  ) { SetStrValue( e, pCurDevice->m_sPresentationURL ); continue; }
-            if ( e.tagName() == "UDN"              ) { SetStrValue( e, pCurDevice->m_sUDN             ); continue; }
+            if ( e.tagName() == "deviceType"       )
+            { SetStrValue( e, pCurDevice->m_sDeviceType      ); continue; }
+            if ( e.tagName() == "friendlyName"     )
+            { SetStrValue( e, pCurDevice->m_sFriendlyName    ); continue; }
+            if ( e.tagName() == "manufacturer"     )
+            { SetStrValue( e, pCurDevice->m_sManufacturer    ); continue; }
+            if ( e.tagName() == "manufacturerURL"  )
+            { SetStrValue( e, pCurDevice->m_sManufacturerURL ); continue; }
+            if ( e.tagName() == "modelDescription" )
+            { SetStrValue( e, pCurDevice->m_sModelDescription); continue; }
+            if ( e.tagName() == "modelName"        )
+            { SetStrValue( e, pCurDevice->m_sModelName       ); continue; }
+            if ( e.tagName() == "modelNumber"      )
+            { SetStrValue( e, pCurDevice->m_sModelNumber     ); continue; }
+            if ( e.tagName() == "modelURL"         )
+            { SetStrValue( e, pCurDevice->m_sModelURL        ); continue; }
+            if ( e.tagName() == "serialNumber"     )
+            { SetStrValue( e, pCurDevice->m_sSerialNumber    ); continue; }
+            if ( e.tagName() == "UPC"              )
+            { SetStrValue( e, pCurDevice->m_sUPC             ); continue; }
+            if ( e.tagName() == "presentationURL"  )
+            { SetStrValue( e, pCurDevice->m_sPresentationURL ); continue; }
+            if ( e.tagName() == "UDN"              )
+            { SetStrValue( e, pCurDevice->m_sUDN             ); continue; }
 
-            if ( e.tagName() == "iconList"         ) { ProcessIconList   ( oNode, pCurDevice ); continue; }
-            if ( e.tagName() == "serviceList"      ) { ProcessServiceList( oNode, pCurDevice ); continue; }
-            if ( e.tagName() == "deviceList"       ) { ProcessDeviceList ( oNode, pCurDevice ); continue; }
+            if ( e.tagName() == "iconList"         )
+            { ProcessIconList   ( oNode, pCurDevice ); continue; }
+            if ( e.tagName() == "serviceList"      )
+            { ProcessServiceList( oNode, pCurDevice ); continue; }
+            if ( e.tagName() == "deviceList"       )
+            { ProcessDeviceList ( oNode, pCurDevice ); continue; }
 
             // Not one of the expected element names... add to extra list.
 
@@ -154,7 +172,9 @@ void UPnpDeviceDesc::_InternalLoad( QDomNode oNode, UPnpDevice *pCurDevice )
 
 void UPnpDeviceDesc::ProcessIconList( QDomNode oListNode, UPnpDevice *pDevice )
 {
-    for ( QDomNode oNode = oListNode.firstChild(); !oNode.isNull(); oNode = oNode.nextSibling() )
+    for ( QDomNode oNode = oListNode.firstChild();
+                  !oNode.isNull();
+                   oNode = oNode.nextSibling() )
     {
         QDomElement e = oNode.toElement();
 
@@ -181,7 +201,9 @@ void UPnpDeviceDesc::ProcessIconList( QDomNode oListNode, UPnpDevice *pDevice )
 
 void UPnpDeviceDesc::ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice )
 {
-    for ( QDomNode oNode = oListNode.firstChild(); !oNode.isNull(); oNode = oNode.nextSibling() )
+    for ( QDomNode oNode = oListNode.firstChild();
+                  !oNode.isNull();
+                   oNode = oNode.nextSibling() )
     {
         QDomElement e = oNode.toElement();
 
@@ -192,15 +214,21 @@ void UPnpDeviceDesc::ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice
                 UPnpService *pService = new UPnpService(); 
                 pDevice->m_listServices.append( pService );
 
-                SetStrValue( e.namedItem( "serviceType" ), pService->m_sServiceType );
-                SetStrValue( e.namedItem( "serviceId"   ), pService->m_sServiceId   );
-                SetStrValue( e.namedItem( "SCPDURL"     ), pService->m_sSCPDURL     );
-                SetStrValue( e.namedItem( "controlURL"  ), pService->m_sControlURL  );
-                SetStrValue( e.namedItem( "eventSubURL" ), pService->m_sEventSubURL );
+                SetStrValue( e.namedItem( "serviceType" ),
+                             pService->m_sServiceType     );
+                SetStrValue( e.namedItem( "serviceId"   ),
+                             pService->m_sServiceId       );
+                SetStrValue( e.namedItem( "SCPDURL"     ),
+                             pService->m_sSCPDURL         );
+                SetStrValue( e.namedItem( "controlURL"  ),
+                             pService->m_sControlURL      );
+                SetStrValue( e.namedItem( "eventSubURL" ),
+                             pService->m_sEventSubURL     );
 
-                VERBOSE(VB_UPNP,QString("ProcessServiceList adding service : %1 : %2 :")
-                                .arg(pService->m_sServiceType)
-                                .arg(pService->m_sServiceId ));
+                VERBOSE(VB_UPNP,
+                        QString("ProcessServiceList adding service : %1 : %2 :")
+                        .arg(pService->m_sServiceType)
+                        .arg(pService->m_sServiceId ));
             }
         }
     }
@@ -210,9 +238,12 @@ void UPnpDeviceDesc::ProcessServiceList( QDomNode oListNode, UPnpDevice *pDevice
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void UPnpDeviceDesc::ProcessDeviceList( QDomNode oListNode, UPnpDevice *pDevice )
+void UPnpDeviceDesc::ProcessDeviceList( QDomNode    oListNode,
+                                        UPnpDevice *pDevice )
 {
-    for ( QDomNode oNode = oListNode.firstChild(); !oNode.isNull(); oNode = oNode.nextSibling() )
+    for ( QDomNode oNode = oListNode.firstChild();
+                  !oNode.isNull();
+                   oNode = oNode.nextSibling() )
     {
         QDomElement e = oNode.toElement();
 
@@ -289,7 +320,8 @@ void UPnpDeviceDesc::GetValidXML(
               "<major>1</major>\n"
               "<minor>0</minor>\n"
             "</specVersion>\n"
-            "<URLBase>http://" << sBaseAddress << ":" << nPort << "/</URLBase>\n";
+            "<URLBase>http://"
+       << sBaseAddress << ":" << nPort << "/</URLBase>\n";
 
     OutputDevice( os, &m_rootDevice, sUserAgent );
 
@@ -317,7 +349,8 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     // ----------------------------------------------------------------------
 
     if (pDevice == &m_rootDevice)
-        sFriendlyName = UPnp::g_pConfig->GetValue( "UPnP/FriendlyName", sFriendlyName  );
+        sFriendlyName = UPnp::g_pConfig->GetValue( "UPnP/FriendlyName",
+                                                   sFriendlyName  );
     
     os << "<device>\n";
     os << FormatValue( "deviceType"   , pDevice->m_sDeviceType );
@@ -339,7 +372,8 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
 
     if ( bIsXbox360 )
     {
-        os << FormatValue( "modelName"    , "Windows Media Connect Compatible (MythTV)");
+        os << FormatValue( "modelName"    ,
+                           "Windows Media Connect Compatible (MythTV)");
     }
     else
     {
@@ -443,7 +477,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
     // ----------------------------------------------------------------------
 
     // -=>Note:  XBMC can't handle sub-devices, it's UserAgent is blank.
-/*
+#if 0
     if (sUserAgent.length() > 0)
     {
         if (pDevice->m_listDevices.count() > 0)
@@ -459,7 +493,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
             os << "</deviceList>";
         }
     }
-*/
+#endif
     os << "</device>\n";
     os << flush;
 }
@@ -536,7 +570,8 @@ UPnpDevice *UPnpDeviceDesc::FindDevice( const QString &sURI )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpDevice *UPnpDeviceDesc::FindDevice( UPnpDevice *pDevice, const QString &sURI )
+UPnpDevice *UPnpDeviceDesc::FindDevice( UPnpDevice    *pDevice,
+                                        const QString &sURI )
 
 {
     if ( sURI == pDevice->m_sDeviceType )
@@ -566,9 +601,8 @@ UPnpDeviceDesc *UPnpDeviceDesc::Retrieve( QString &sURL, bool bInQtThread )
 {
     UPnpDeviceDesc *pDevice = NULL;
 
-    VERBOSE( VB_UPNP, QString( "UPnpDeviceDesc::Retrieve( %1, %2 ) - Requesting Device Description." )
-                         .arg( sURL )
-                         .arg( bInQtThread ));
+    VERBOSE( VB_UPNP, QString( "UPnpDeviceDesc::Retrieve( %1, %2 )" )
+                      .arg( sURL ).arg( bInQtThread ));
 
     QString sXml = HttpComms::getHttp( sURL,
                                        10000, // ms
@@ -595,14 +629,14 @@ UPnpDeviceDesc *UPnpDeviceDesc::Retrieve( QString &sURL, bool bInQtThread )
         }
         else
         {
-            VERBOSE( VB_UPNP, QString( "UPnp::Retrieve - Error parsing device description xml [%1]" )
-                                 .arg( sErrorMsg ));
+            VERBOSE( VB_UPNP,
+                     QString( "... Error parsing device description xml [%1]" )
+                     .arg( sErrorMsg ));
         }
     }
     else
     {
-        VERBOSE( VB_UPNP, QString( "UPnp::Retrieve - Invalid response from %1" )
-                             .arg( sURL ));
+        VERBOSE( VB_UPNP, QString( "... Invalid response '%1'" ).arg( sXml ));
     }
 
     return pDevice;
@@ -621,9 +655,12 @@ QString UPnpDeviceDesc::GetHostName()
         char localHostName[1024];
 
         if (gethostname(localHostName, 1024))
-            VERBOSE(VB_IMPORTANT, "UPnpDeviceDesc: Error, could not determine host name." + ENO);
+            VERBOSE(VB_IMPORTANT,
+                    "UPnpDeviceDesc: Error, could not determine host name."
+                    + ENO);
 
-        return UPnp::g_pConfig->GetValue( "Settings/HostName", QString( localHostName ));
+        return UPnp::g_pConfig->GetValue( "Settings/HostName",
+                                          QString( localHostName ));
     }
 
     return m_sHostName;

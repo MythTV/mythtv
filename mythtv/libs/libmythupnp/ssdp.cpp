@@ -163,12 +163,14 @@ void SSDP::PerformSearch( const QString &sST )
 
     int nSize = sRequest.size();
 
-    if ( pSocket->writeBlock( sRequest.data(), sRequest.size(), address, SSDP_PORT ) != nSize)
+    if ( pSocket->writeBlock( sRequest.data(),
+                              sRequest.size(), address, SSDP_PORT ) != nSize)
         cerr << "SSDP::PerformSearch - did not write entire buffer." << endl;
 
     usleep( rand() % 250000 );
 
-    if ( pSocket->writeBlock( sRequest.data(), sRequest.size(), address, SSDP_PORT ) != nSize)
+    if ( pSocket->writeBlock( sRequest.data(),
+                              sRequest.size(), address, SSDP_PORT ) != nSize)
         cerr << "SSDP::PerformSearch - did not write entire buffer." << endl;
 
 }
@@ -199,13 +201,13 @@ void SSDP::run()
                 FD_SET( m_Sockets[ nIdx ]->socket(), &read_set );
                 nMaxSocket = max( m_Sockets[ nIdx ]->socket(), nMaxSocket );
 
-/*
+#if 0
                 if (m_Sockets[ nIdx ]->bytesAvailable() > 0)
                 {
 	            cout << "Found Extra data before select: " << nIdx << endl;
                     ProcessData( m_Sockets[ nIdx ] );
                 }
-*/
+#endif
 
             }
         }
@@ -261,7 +263,9 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
         // Parse request Type
         // ------------------------------------------------------------------
 
-        VERBOSE(VB_UPNP, QString( "SSDP::ProcessData - requestLine: %1" ).arg( sRequestLine ));
+        VERBOSE(VB_UPNP+VB_EXTRA,
+                QString( "SSDP::ProcessData - requestLine: %1" )
+                .arg( sRequestLine ));
 
         SSDPRequestType eType = ProcessRequestLine( sRequestLine );
 
@@ -271,7 +275,8 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
 
         QStringMap  headers;
 
-        for ( QStringList::Iterator it = lines.begin(); it != lines.end(); ++it ) 
+        for ( QStringList::Iterator it = lines.begin();
+                                    it != lines.end(); ++it ) 
         {
             QString sLine  = *it;
             QString sName  = sLine.section( ':', 0, 0 ).trimmed();
@@ -291,9 +296,12 @@ void SSDP::ProcessData( MSocketDevice *pSocket )
 
         switch( eType )
         {
-            case SSDP_MSearch    :  ProcessSearchRequest ( headers, peerAddress, peerPort ); break;
-            case SSDP_MSearchResp:  ProcessSearchResponse( headers                        ); break;
-            case SSDP_Notify     :  ProcessNotify        ( headers                        ); break;
+            case SSDP_MSearch    :
+                ProcessSearchRequest ( headers, peerAddress, peerPort ); break;
+            case SSDP_MSearchResp:
+                ProcessSearchResponse( headers                        ); break;
+            case SSDP_Notify     :
+                ProcessNotify        ( headers                        ); break;
             case SSDP_Unknown:
             default:
                 VERBOSE(VB_UPNP, "SSPD::ProcessData - Unknown request Type.");
@@ -336,7 +344,8 @@ SSDPRequestType SSDP::ProcessRequestLine( const QString &sLine )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString SSDP::GetHeaderValue( const QStringMap &headers, const QString &sKey, const QString &sDefault )
+QString SSDP::GetHeaderValue( const QStringMap &headers,
+                              const QString    &sKey, const QString &sDefault )
 {
     QStringMap::const_iterator it = headers.find( sKey.toLower() );
 
@@ -359,9 +368,9 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
     QString sMX  = GetHeaderValue( sHeaders, "MX" , "" );
     int     nMX  = 0;
 
-    VERBOSE( VB_UPNP, QString( "SSDP::ProcessSearchrequest : [%1] MX=%2" )
-                         .arg( sST )
-                         .arg( nMX ));
+    VERBOSE( VB_UPNP+VB_EXTRA,
+             QString( "SSDP::ProcessSearchrequest : [%1] MX=%2" )
+             .arg( sST ).arg( nMX ));
 
     // ----------------------------------------------------------------------
     // Validate Header Values...
@@ -392,14 +401,11 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
     if ((sST == "ssdp:all") || (sST == "upnp:rootdevice"))
     {
         UPnpSearchTask *pTask = new UPnpSearchTask( m_nServicePort, 
-                                                    peerAddress,
-                                                    peerPort,
-                                                    sST, 
-                                   UPnp::g_UPnpDeviceDesc.m_rootDevice.GetUDN());
+            peerAddress, peerPort, sST, 
+            UPnp::g_UPnpDeviceDesc.m_rootDevice.GetUDN());
 
-        // Excute task now for fastest response & queue for time-delayed response
+        // Excute task now for fastest response, queue for time-delayed response
         // -=>TODO: To be trully uPnp compliant, this Execute should be removed.
-
         //pTask->Execute( NULL );
 
         UPnp::g_pTaskQueue->AddTask( nNewMX, pTask );
@@ -411,7 +417,8 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
     // Look for a specific device/service
     // ----------------------------------------------------------------------
 
-    QString sUDN = UPnp::g_UPnpDeviceDesc.FindDeviceUDN( &(UPnp::g_UPnpDeviceDesc.m_rootDevice), sST );
+    QString sUDN = UPnp::g_UPnpDeviceDesc.FindDeviceUDN(
+        &(UPnp::g_UPnpDeviceDesc.m_rootDevice), sST );
 
     if (sUDN.length() > 0)
     {
@@ -421,9 +428,8 @@ bool SSDP::ProcessSearchRequest( const QStringMap &sHeaders,
                                                     sST, 
                                                     sUDN );
 
-        // Excute task now for fastest response & queue for time-delayed response
+        // Excute task now for fastest response, queue for time-delayed response
         // -=>TODO: To be trully uPnp compliant, this Execute should be removed.
-
         pTask->Execute( NULL );
 
         UPnp::g_pTaskQueue->AddTask( nNewMX, pTask );
@@ -445,15 +451,13 @@ bool SSDP::ProcessSearchResponse( const QStringMap &headers )
     QString sUSN     = GetHeaderValue( headers, "USN"           , "" );
     QString sCache   = GetHeaderValue( headers, "CACHE-CONTROL" , "" );
 
-    VERBOSE( VB_UPNP, QString( "SSDP::ProcessSearchResponse \n"
-                               "DescURL=%1\n"
-                               "ST     =%2\n"
-                               "USN    =%3\n"
-                               "Cache  =%4")
-                         .arg( sDescURL )
-                         .arg( sST      )
-                         .arg( sUSN     )
-                         .arg( sCache   ));
+    VERBOSE( VB_UPNP+VB_EXTRA,
+             QString( "SSDP::ProcessSearchResponse ...\n"
+                      "DescURL=%1\n"
+                      "ST     =%2\n"
+                      "USN    =%3\n"
+                      "Cache  =%4")
+             .arg(sDescURL).arg(sST).arg(sUSN).arg(sCache));
 
     int nPos = sCache.indexOf("max-age", 0, Qt::CaseInsensitive);
 
@@ -482,17 +486,14 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
     QString sUSN     = GetHeaderValue( headers, "USN"           , "" );
     QString sCache   = GetHeaderValue( headers, "CACHE-CONTROL" , "" );
 
-    VERBOSE( VB_UPNP, QString( "SSDP::ProcessNotify\n"
-                               "DescURL=%1\n"
-                               "NTS    =%2\n"
-                               "NT     =%3\n"
-                               "USN    =%4\n"
-                               "Cache  =%5" )
-                         .arg( sDescURL )
-                         .arg( sNTS     )
-                         .arg( sNT      )
-                         .arg( sUSN     )
-                         .arg( sCache   ));
+    VERBOSE( VB_UPNP+VB_EXTRA,
+             QString( "SSDP::ProcessNotify ...\n"
+                      "DescURL=%1\n"
+                      "NTS    =%2\n"
+                      "NT     =%3\n"
+                      "USN    =%4\n"
+                      "Cache  =%5" )
+             .arg(sDescURL).arg(sNTS).arg(sNT).arg(sUSN).arg(sCache));
 
 
     if (sNTS.contains( "ssdp:alive"))
@@ -537,7 +538,8 @@ bool SSDP::ProcessNotify( const QStringMap &headers )
 
 SSDPExtension::SSDPExtension( int nServicePort ) : HttpServerExtension( "SSDP" )
 {
-    m_sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath", m_sSharePath );
+    m_sUPnpDescPath = UPnp::g_pConfig->GetValue( "UPnP/DescXmlPath",
+                                                 m_sSharePath );
     m_nServicePort  = nServicePort;
 }
 
@@ -574,8 +576,8 @@ bool SSDPExtension::ProcessRequest( HttpWorkerThread *, HTTPRequest *pRequest )
 
         switch( GetMethod( pRequest->m_sMethod ))
         {
-            case SSDPM_GetDeviceDesc    : GetDeviceDesc( pRequest ); return( true );
-            case SSDPM_GetDeviceList    : GetDeviceList( pRequest ); return( true );
+            case SSDPM_GetDeviceDesc: GetDeviceDesc( pRequest ); return( true );
+            case SSDPM_GetDeviceList: GetDeviceList( pRequest ); return( true );
 
             default: break;
         }
@@ -594,7 +596,8 @@ void SSDPExtension::GetDeviceDesc( HTTPRequest *pRequest )
 
     QString sUserAgent = pRequest->GetHeaderValue( "User-Agent", "" );
 
-    VERBOSE( VB_UPNP, QString( "SSDPExtension::GetDeviceDesc - Host=%1 Port=%2 UserAgent=%3" )
+    VERBOSE( VB_UPNP, "SSDPExtension::GetDeviceDesc - "
+                       + QString( "Host=%1 Port=%2 UserAgent=%3" )
                          .arg( pRequest->GetHostAddress() )
                          .arg( m_nServicePort )
                          .arg( sUserAgent ));
@@ -622,9 +625,10 @@ void SSDPExtension::GetFile( HTTPRequest *pRequest, QString sFileName )
         VERBOSE( VB_UPNP, QString( "SSDPExtension::GetFile( %1 ) - Exists" )
                              .arg( pRequest->m_sFileName ));
 
-        pRequest->m_eResponseType                     = ResponseTypeFile;
-        pRequest->m_nResponseStatus                   = 200;
-        pRequest->m_mapRespHeaders[ "Cache-Control" ] = "no-cache=\"Ext\", max-age = 5000";
+        pRequest->m_eResponseType   = ResponseTypeFile;
+        pRequest->m_nResponseStatus = 200;
+        pRequest->m_mapRespHeaders[ "Cache-Control" ]
+            = "no-cache=\"Ext\", max-age = 5000";
     }
     else
     {
