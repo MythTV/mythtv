@@ -583,7 +583,7 @@ void MythUIType::Show(void)
 
 void MythUIType::AddFocusableChildrenToList(QMap<int, MythUIType *> &focusList)
 {
-    if (m_CanHaveFocus)
+    if (m_CanHaveFocus && m_Visible)
         focusList.insertMulti(m_focusOrder, this);
 
     QList<MythUIType *>::Iterator it;
