@@ -1146,7 +1146,10 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
     if (this == m_parent->m_selItem)
     {
         if (m_parent->m_active && !m_overrideInactive && active_on)
+        {
             button->DisplayState("Selected");
+            button->MoveToTop();
+        }
         else
         {
 //             if (active_on)

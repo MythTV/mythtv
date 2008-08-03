@@ -48,6 +48,9 @@ class MythUIType : public QObject, public XMLParseBase
     void SetCanTakeFocus(bool set = true);
     void SetFocusOrder(int);
 
+    bool MoveToTop(void);
+    bool MoveChildToTop(MythUIType *child);
+
     // Called each draw pulse.  Will redraw automatically if dirty afterwards
     virtual void Pulse(void);
 

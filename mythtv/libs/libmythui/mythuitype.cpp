@@ -711,3 +711,31 @@ void MythUIType::SetFocusOrder(int order)
     m_focusOrder = order;
 }
 
+bool MythUIType::MoveChildToTop(MythUIType *child)
+{
+    if (!child)
+        return false;
+
+    int i = m_ChildrenList.indexOf(child);
+    if (i != -1 || i != m_ChildrenList.size()-1)
+    {
+        m_ChildrenList.removeAt(i);
+        m_ChildrenList.append(child);
+        child->SetRedraw();
+        return true;
+    }
+
+    return false;
+}
+
+
+bool MythUIType::MoveToTop(void)
+{
+    if (m_Parent)
+    {
+        return m_Parent->MoveChildToTop(this);
+    }
+
+    return false;
+}
+
