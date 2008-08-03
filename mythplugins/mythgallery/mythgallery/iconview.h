@@ -19,6 +19,8 @@
 #ifndef ICONVIEW_H
 #define ICONVIEW_H
 
+#include <vector>
+
 // Qt headers
 #include <qstringlist.h>
 #include <Q3PtrList>
@@ -33,6 +35,8 @@
 
 // MythGallery headers
 #include "thumbview.h"
+
+using namespace std;
 
 class ThumbGenerator;
 class MediaMonitor;
@@ -96,6 +100,7 @@ class IconView : public MythScreenType
     Q3Dict<ThumbItem>    m_itemDict;
     QStringList         m_itemMarked;
     QString             m_galleryDir;
+    vector<int>         m_history;
 
     MythUIButtonList   *m_imageList;
     MythUIText         *m_captionText;

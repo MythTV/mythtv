@@ -39,7 +39,7 @@ class ImageView
 {
   public:
     ImageView(const ThumbList &itemList,
-              int pos, int slideShow, int sortorder);
+              int *pos, int slideShow, int sortorder);
     virtual ~ImageView();
 
   protected:
@@ -59,11 +59,14 @@ class ImageView
 
     void UpdateLCD(const ThumbItem *item);
     QString GetDescriptionStatus(void) const;
+    void GetScreenShot(QImage& image, const ThumbItem *item);
+
   protected:
     QSize                  m_screenSize;
     float                  m_wmult;
     float                  m_hmult;
     int                    m_pos;
+    int                   *m_savedPos;
     ThumbList              m_itemList;
     int                    m_movieState;
     float                  m_zoom;

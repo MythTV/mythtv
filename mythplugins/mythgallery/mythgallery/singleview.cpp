@@ -51,7 +51,7 @@ using namespace std;
 template<typename T> T sq(T val) { return val * val; }
 
 SingleView::SingleView(
-    ThumbList       itemList,  int pos,
+    ThumbList       itemList,  int *pos,
     int             slideShow, int sortorder,
     MythMainWindow *parent,
     const char *name)
@@ -203,11 +203,32 @@ void SingleView::paintEvent(QPaintEvent *)
 
             if (!m_slideshow_running)
             {
-                reject();
+                if (item)
+                {
+                    QImage image;
+                    GetScreenShot(image, item);
+                    if (image.isNull())
+                        return;
+
+                    image = image.scaled(800, 600);
+
+                    // overlay "Press SELECT to play again" text
+                    QPainter p(&image);
+                    QRect rect = QRect(20, image.height() - 100, image.width() - 40, 80);
+                    p.fillRect(rect, QBrush(QColor(0,0,0,100)));
+                    p.setFont(QFont("Arial", 25, QFont::Bold));
+                    p.setPen(QColor(255,255,255));
+                    p.drawText(rect, Qt::AlignCenter, tr("Press SELECT to play again"));
+                    p.end();
+
+                    m_image = image;
+                    SetZoom(1.0);
+                }
             }
         }
     }
-    else if (!m_effect_running)
+
+    if (!m_effect_running)
     {
         QPixmap pix(screenwidth, screenheight);
         pix.fill(this, 0, 0);
@@ -586,11 +607,11 @@ void SingleView::Load(void)
     m_movieState = 0;
 
     SetPixmap(NULL);
-    
+
     ThumbItem *item = m_itemList.at(m_pos);
     if (!item)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "No item at "<<m_pos);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "No item at " << m_pos);
         return;
     }
 
@@ -611,7 +632,7 @@ void SingleView::Load(void)
         matrix.rotate(m_angle);
         m_image = m_image.xForm(matrix);
     }
-        
+
     SetZoom(m_zoom);
 
     UpdateLCD(item);

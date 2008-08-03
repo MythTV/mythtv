@@ -47,7 +47,7 @@ class GLSDialog : public MythDialog
 {
   public:  
     GLSDialog(const ThumbList& itemList,
-              int pos, int slideShow, int sortOrder,
+              int *pos, int slideShow, int sortOrder,
               MythMainWindow *parent, const char *name=0);
 
   protected:
@@ -62,7 +62,7 @@ class GLSingleView : public QGLWidget, public ImageView
     Q_OBJECT
 
   public:
-    GLSingleView(ThumbList itemList, int pos, int slideShow, int sordorder,
+    GLSingleView(ThumbList itemList, int *pos, int slideShow, int sordorder,
                  QWidget *parent);
     ~GLSingleView();
 

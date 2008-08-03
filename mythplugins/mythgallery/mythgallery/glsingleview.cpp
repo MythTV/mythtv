@@ -47,7 +47,7 @@ using namespace std;
 #define LOC_ERR QString("GLView, Error: ")
 
 GLSDialog::GLSDialog(const ThumbList& itemList,
-                     int pos, int slideShow, int sortOrder,
+                     int *pos, int slideShow, int sortOrder,
                      MythMainWindow *parent, const char *name)
     : MythDialog(parent, name)
 {
@@ -66,9 +66,11 @@ void GLSDialog::closeEvent(QCloseEvent *e)
 {
     m_view->CleanUp();
     e->accept();
+
+    accept();
 }
 
-GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
+GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
                            int sortorder, QWidget *parent)
     : QGLWidget(parent),
       ImageView(itemList, pos, slideShow, sortorder),
@@ -138,6 +140,7 @@ GLSingleView::~GLSingleView()
 {
     // save the current m_scaleMax setting so we can restore it later
     gContext->SaveSetting("GalleryScaleMax", (m_scaleMax ? "1" : "0"));
+    CleanUp();
 }
 
 void GLSingleView::CleanUp(void)
@@ -218,10 +221,32 @@ void GLSingleView::paintGL(void)
 
             if (!m_slideshow_running)
             {
-                close();
+                if (item)
+                {
+                    QImage image;
+                    GetScreenShot(image, item);
+                    if (image.isNull())
+                        return;
+
+                    image = image.scaled(800, 600);
+
+                    // overlay "Press SELECT to play again" text
+                    QPainter p(&image);
+                    QRect rect = QRect(20, image.height() - 100, image.width() - 40, 80);
+                    p.fillRect(rect, QBrush(QColor(0,0,0,100)));
+                    p.setFont(QFont("Arial", 25, QFont::Bold));
+                    p.setPen(QColor(255,255,255));
+                    p.drawText(rect, Qt::AlignCenter, tr("Press SELECT to play again"));
+                    p.end();
+
+                    int a = m_tex1First ? 0 : 1;
+                    m_texItem[a].SetItem(item, image.size());
+                    m_texItem[a].ScaleTo(m_screenSize, m_scaleMax);
+                    m_texItem[a].Init(convertToGLFormat(
+                        image.scaled(m_texSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation)));
+                }
             }
         }
-        return;
     }
 
     glDisable(GL_DEPTH_TEST);
@@ -410,6 +435,10 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
             }
             m_info_show = wasInfo;
             m_slideshow_running = wasRunning;
+        }
+        else if ((action == "PLAY" || action == "SELECT") && m_movieState == 2)
+        {
+            m_movieState = 1;
         }
         else if (action == "PLAY" || action == "SLIDESHOW" ||
                  action == "RANDOMSHOW")

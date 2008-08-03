@@ -237,7 +237,7 @@ void IconView::LoadThumbnail(ThumbItem *item)
     if (!canLoadGallery)
     {
         QString cachePath = QString("%1%2.jpg")
-                                .arg(m_thumbGen->getThumbcacheDir(m_currDir))
+                                .arg(ThumbGenerator::getThumbcacheDir(m_currDir))
                                 .arg(item->GetName());
 
         if (!image.load(cachePath))
@@ -392,7 +392,9 @@ void IconView::HandleItemSelect(MythUIButtonListItem *item)
 
     if (!handled && thumbitem->IsDir())
     {
+        m_history.push_back(m_imageList->GetCurrentPos());
         LoadDirectory(thumbitem->GetPath());
+
         handled = true;
     }
 
@@ -466,7 +468,7 @@ bool IconView::HandleImageSelect(const QString &action)
 #ifdef USING_OPENGL
     if (m_useOpenGL && QGLFormat::hasOpenGL())
     {
-        GLSDialog gv(m_itemList, pos,
+        GLSDialog gv(m_itemList, &pos,
                         slideShow, m_sortorder,
                         gContext->GetMainWindow());
         gv.exec();
@@ -474,7 +476,7 @@ bool IconView::HandleImageSelect(const QString &action)
     else
 #endif
     {
-        SingleView sv(m_itemList, pos, slideShow, m_sortorder,
+        SingleView sv(m_itemList, &pos, slideShow, m_sortorder,
                       gContext->GetMainWindow());
         sv.exec();
     }
@@ -483,6 +485,8 @@ bool IconView::HandleImageSelect(const QString &action)
     // the cached contents of the directory will be out of
     // sync, reload the current directory to refresh the view
     LoadDirectory(m_currDir);
+
+    m_imageList->SetItemCurrent(pos);
 
     return true;
 }
@@ -549,14 +553,9 @@ bool IconView::HandleSubDirEscape(const QString &parent)
         curdir.cdUp();
         LoadDirectory(curdir.absPath());
 
-        // Make sure up-directory is visible and selected
-        ThumbItem *item = m_itemDict.find(oldDirName);
-        if (item)
-        {
-            int pos = m_itemList.find(item);
-            m_imageList->SetItemCurrent(pos);
-        }
-
+        int pos = m_history.back();
+        m_history.pop_back();
+        m_imageList->SetItemCurrent(pos);
         handled = true;
     }
 

@@ -20,6 +20,7 @@
 
 // Qt headers
 #include <q3ptrlist.h>
+#include <QDir>
 
 // MythTV plugin headers
 #include <mythtv/mythcontext.h>
@@ -29,13 +30,15 @@
 // MythGallery headers
 #include "imageview.h"
 #include "galleryutil.h"
+#include "thumbgenerator.h"
 
 ImageView::ImageView(const ThumbList &itemList,
-                     int pos, int slideShow, int sortorder)
+                     int *pos, int slideShow, int sortorder)
     : m_screenSize(640,480),
       m_wmult(1.0f),
       m_hmult(1.0f),
-      m_pos(pos),
+      m_pos(*pos),
+      m_savedPos(pos),
       m_itemList(itemList),
       m_movieState(0),
       m_zoom(1.0f),
@@ -131,6 +134,8 @@ ImageView::~ImageView()
         delete m_slideshow_sequence;
         m_slideshow_sequence = NULL;
     }
+
+    *m_savedPos = m_pos;
 }
 
 QString ImageView::GetRandomEffect(void) const
@@ -173,4 +178,26 @@ QString ImageView::GetDescriptionStatus(void) const
         return " [" + QObject::tr(m_slideshow_mode) + "]";
 
     return "";
+}
+
+void ImageView::GetScreenShot(QImage& image, const ThumbItem *item)
+{
+    QFileInfo fi(item->GetPath());
+    QString screenshot = QString("%1%2-screenshot.jpg")
+                                .arg(ThumbGenerator::getThumbcacheDir(fi.path()))
+                                .arg(item->GetName());
+
+    if (QFile::exists(screenshot))
+    {
+        QImage img(screenshot);
+        image = img;
+    }
+    else
+    {
+        QImage *img = GetMythUI()->LoadScaleImage("gallery-moviethumb.png");
+        if (img)
+        {
+            image = *img;
+        }
+    }
 }

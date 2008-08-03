@@ -146,6 +146,15 @@ void ThumbGenerator::run()
                 if (image.isNull())
                     continue; // give up;
 
+                // if the file is a movie save the image to use as a screenshot
+                if (GalleryUtil::isMovie(fileInfo.filePath()))
+                {
+                    QString screenshotPath = QString("%1%2-screenshot.jpg")
+                            .arg(getThumbcacheDir(dir))
+                            .arg(file);
+                    image.save(screenshotPath, "JPEG");
+                }
+
                 image = image.scaled(m_width,m_height,
                                 Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 image.save(cachePath, "JPEG");
@@ -280,7 +289,7 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
         if (tmpDir.exists())
         {
             QString cmd = "cd \"" + tmpDir.absPath() + 
-                          "\"; mplayer -nosound -frames 1 -vo png \"" + 
+                          "\"; mplayer -nosound -frames 1 -vo png:z=6 \"" + 
                           fi.absFilePath() + "\"";
             if (myth_system(cmd) == 0)
             {
@@ -324,6 +333,7 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
     }
 }
 
+// static function
 QString ThumbGenerator::getThumbcacheDir(const QString& inDir)
 {
     QString galleryDir = gContext->GetSetting("GalleryDir");
@@ -331,14 +341,16 @@ QString ThumbGenerator::getThumbcacheDir(const QString& inDir)
     // For directory "/my/images/january", this function either returns 
     // "/my/images/january/.thumbcache" or "~/.mythtv/mythgallery/january/.thumbcache"
     QString aPath = inDir + QString("/.thumbcache/");
+    QDir dir(aPath);
     if (gContext->GetNumSetting("GalleryThumbnailLocation") &&
-        !QDir(aPath).exists() &&
+        !dir.exists() &&
         inDir.startsWith(galleryDir))
     {
-        mkpath(aPath);
+        dir.mkpath(aPath);
     }
+
     if (!gContext->GetNumSetting("GalleryThumbnailLocation") ||
-        !QDir(aPath).exists() ||
+        !dir.exists() ||
         !inDir.startsWith(galleryDir))
     {
         // Arrive here if storing thumbs in home dir, 
@@ -347,34 +359,9 @@ QString ThumbGenerator::getThumbcacheDir(const QString& inDir)
         aPath = GetConfDir() + "/MythGallery";
         aPath += inDir.right(inDir.length() - prefixLen);
         aPath += QString("/.thumbcache/");
-        mkpath(aPath);
+        dir.setPath(aPath);
+        dir.mkpath(aPath);
     }
-    
+
     return aPath;
-}
-
-bool ThumbGenerator::mkpath(const QString& inPath)
-{
-    // The function will create all parent directories necessary to create the directory.
-    // We can replace this function with QDir::mkpath() when uprading to Qt 4.0
-    int i = 0;
-    QString absPath = QDir(inPath).absPath() + "/";
-    QDir parent("/");
-    do 
-    {
-        i = absPath.find('/', i + 1);
-        if (i == -1) 
-            return true;
-
-        QString subPath(absPath.left(i));
-        if (!QDir(subPath).exists()) 
-        {
-            if (!parent.mkdir(subPath.right(subPath.length() - 
-                                            parent.absPath().length() - 1))) 
-            {
-                return false;
-            }
-        }
-        parent = QDir(subPath);
-    } while(1);
 }
