@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QImage>
 #include <QList>
-#include <QVector>
 #include <QFont>
 #include <QEvent>
 #include <QKeyEvent>
@@ -32,7 +31,7 @@ class MythUIType : public QObject, public XMLParseBase
     void AddChild(MythUIType *child);
     MythUIType *GetChild(const QString &name);
     MythUIType *GetChildAt(const QPoint &p);
-    QVector<MythUIType *> *GetAllChildren(void);
+    QList<MythUIType *> *GetAllChildren(void);
 
     void DeleteChild(const QString &name);
     void DeleteChild(MythUIType *child);
@@ -129,7 +128,7 @@ class MythUIType : public QObject, public XMLParseBase
     virtual void CreateCopy(MythUIType *parent);
     virtual void Finalize(void);
 
-    QVector<MythUIType *> m_ChildrenList;
+    QList<MythUIType *> m_ChildrenList;
 
     bool m_Visible;
     bool m_HasFocus;

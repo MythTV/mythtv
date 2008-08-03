@@ -88,7 +88,7 @@ MythUIType *MythUIType::GetChild(const QString &name)
 
 void MythUIType::DeleteChild(const QString &name)
 {
-    QMutableVectorIterator<MythUIType *> it(m_ChildrenList);
+    QMutableListIterator<MythUIType *> it(m_ChildrenList);
     while (it.hasNext()) {
         it.next();
         MythUIType *type = it.value();
@@ -103,7 +103,7 @@ void MythUIType::DeleteChild(const QString &name)
 
 void MythUIType::DeleteChild(MythUIType *child)
 {
-    QMutableVectorIterator<MythUIType *> it(m_ChildrenList);
+    QMutableListIterator<MythUIType *> it(m_ChildrenList);
     while (it.hasNext()) {
         it.next();
         MythUIType *type = it.value();
@@ -116,14 +116,14 @@ void MythUIType::DeleteChild(MythUIType *child)
     }
 }
 
-QVector<MythUIType *> *MythUIType::GetAllChildren(void)
+QList<MythUIType *> *MythUIType::GetAllChildren(void)
 {
     return &m_ChildrenList;
 }
 
 void MythUIType::DeleteAllChildren(void)
 {
-    QVector<MythUIType*>::iterator it;
+    QList<MythUIType*>::iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
     {
         (*it)->deleteLater();
@@ -152,7 +152,7 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p)
             return NULL;
 
         /* check all children */
-        QVector<MythUIType*>::iterator it;
+        QList<MythUIType *>::iterator it;
         for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; it--)
         {
             MythUIType *child = (*it)->GetChildAt(p - GetArea().topLeft());
@@ -294,7 +294,7 @@ void MythUIType::Pulse(void)
     HandleMovementPulse();
     HandleAlphaPulse();
 
-    QVector<MythUIType *>::Iterator it;
+    QList<MythUIType *>::Iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
         (*it)->Pulse();
 }
@@ -325,7 +325,7 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
 
     DrawSelf(p, xoffset, yoffset, alphaMod, clipRect);
 
-    QVector<MythUIType *>::Iterator it;
+    QList<MythUIType *>::Iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
     {
         (*it)->Draw(p, xoffset + m_Area.x(), yoffset + m_Area.y(),
@@ -586,7 +586,7 @@ void MythUIType::AddFocusableChildrenToList(QMap<int, MythUIType *> &focusList)
     if (m_CanHaveFocus)
         focusList.insertMulti(m_focusOrder, this);
 
-    QVector<MythUIType *>::Iterator it;
+    QList<MythUIType *>::Iterator it;
     for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; --it)
         (*it)->AddFocusableChildrenToList(focusList);
 }
@@ -629,7 +629,7 @@ void MythUIType::CopyFrom(MythUIType *base)
     m_XYDestination = base->m_XYDestination;
     m_XYSpeed = base->m_XYSpeed;
 
-    QVector<MythUIType *>::Iterator it;
+    QList<MythUIType *>::Iterator it;
     for (it = base->m_ChildrenList.begin(); it != base->m_ChildrenList.end();
          ++it)
     {
@@ -699,7 +699,7 @@ void MythUIType::Rescale(const float hscale, const float vscale)
 
     SetArea(MythRect(x,y,width,height));
 
-    QVector<MythUIType*>::iterator it;
+    QList<MythUIType *>::iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
     {
         (*it)->Rescale(hscale, vscale);

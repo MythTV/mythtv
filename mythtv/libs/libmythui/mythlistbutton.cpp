@@ -898,7 +898,7 @@ MythUIType *MythListButton::GetChildAtPoint(const QPoint &p)
             return NULL;
 
         /* check all children */
-        QVector<MythUIType*>::iterator it;
+        QList<MythUIType*>::iterator it;
         for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; it--)
         {
             MythUIType *child = NULL;
