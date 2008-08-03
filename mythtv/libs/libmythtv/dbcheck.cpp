@@ -527,7 +527,8 @@ bool UpgradeTVDatabaseSchema(void)
 {
     QString dbver = gContext->GetSetting("DBSchemaVer");
 
-    VERBOSE(VB_IMPORTANT, QString("Current Schema Version: %1").arg(dbver));
+    VERBOSE(VB_IMPORTANT, "Current Schema Version: "
+                          + dbver.length() ? dbver : QString("(none)"));
 
     if (!gContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
         DataDirectProcessor::FixProgramIDs();
