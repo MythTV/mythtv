@@ -178,6 +178,9 @@ void IconView::LoadDirectory(const QString &dir)
 
             item->setImage(image);
         }
+
+        if (m_itemMarked.contains(thumbitem->GetPath()))
+            item->setChecked(MythUIButtonListItem::FullChecked);
     }
 
     // TODO Not accurate, the image may be smaller than the button
