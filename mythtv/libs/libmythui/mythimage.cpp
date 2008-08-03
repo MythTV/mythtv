@@ -23,6 +23,9 @@ MythImage::MythImage(MythPainter *parent)
     m_gradEnd = QColor("#FFFFFF");
     m_gradAlpha = 255;
     m_gradDirection = FillTopToBottom;
+
+    m_isReflected = false;
+
     m_imageId = 0;
 }
 
@@ -82,6 +85,9 @@ void MythImage::Resize(const QSize &newSize, bool preserveAspect)
 
 void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length)
 {
+    if (m_isReflected)
+        return;
+
     QImage mirrorImage;
     FillDirection fillDirection = FillTopToBottom;
     if (axis == ReflectVertical)
@@ -159,6 +165,8 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length)
     newpainter.end();
 
     Assign(temp);
+
+    m_isReflected = true;
 }
 
 MythImage *MythImage::FromQImage(QImage **img)

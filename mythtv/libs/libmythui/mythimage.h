@@ -68,6 +68,8 @@ class MythImage : public QImage
     int m_gradAlpha;
     FillDirection m_gradDirection;
 
+    bool m_isReflected;
+
     unsigned int m_imageId;
 };
 
