@@ -132,9 +132,10 @@ void MythUIImage::SetImage(MythImage *img)
         int h = (m_ForceSize.height() <= 0) ? img->height() : m_ForceSize.height();
         img->Resize(QSize(w, h), m_preserveAspect);
     }
+    else
+        SetSize(img->size());
 
     m_Images.push_back(img);
-    SetSize(img->size());
     m_CurPos = 0;
 }
 
@@ -163,7 +164,8 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
         aSize = aSize.expandedTo(im->size());
     }
 
-    SetSize(aSize);
+    if (m_ForceSize.isNull())
+        SetSize(aSize);
 
     m_CurPos = 0;
 }
@@ -192,7 +194,7 @@ void MythUIImage::ForceSize(const QSize &size)
         aSize = aSize.expandedTo(im->size());
     }
 
-    SetSize(aSize);
+    SetSize(m_ForceSize);
 }
 
 void MythUIImage::SetSize(int width, int height)
@@ -259,10 +261,12 @@ bool MythUIImage::Load(void)
 
             image->Resize(QSize(w, h), m_preserveAspect);
         }
-
-        QSize aSize = m_Area.size();
-        aSize = aSize.expandedTo(image->size());
-        SetSize(aSize);
+        else
+        {
+            QSize aSize = m_Area.size();
+            aSize = aSize.expandedTo(image->size());
+            SetSize(aSize);
+        }
 
         image->SetChanged();
 
@@ -312,14 +316,28 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
         int alpha = CalcAlpha(alphaMod);
 
+        MythImage *currentImage = m_Images[m_CurPos];
+        QRect currentImageArea = currentImage->rect();
+
+        // Centre image in available space
+        int x = 0;
+        int y = 0;
+        if (area.width() > currentImageArea.width())
+            x = (area.width() - currentImageArea.width()) / 2;
+        if (area.height() > currentImageArea.height())
+            y = (area.height() - currentImageArea.height()) / 2;
+
+        if (x > 0 || y > 0)
+            area.translate(x,y);
+
         QRect srcRect;
         m_cropRect.CalculateArea(m_Area);
         if (!m_cropRect.isEmpty())
             srcRect = m_cropRect.toQRect();
         else
-            srcRect = m_Images[m_CurPos]->rect();
+            srcRect = currentImageArea;
 
-        p->DrawImage(area, m_Images[m_CurPos], srcRect, alpha);
+        p->DrawImage(area, currentImage, srcRect, alpha);
     }
 }
 
