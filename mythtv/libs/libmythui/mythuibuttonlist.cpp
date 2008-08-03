@@ -653,7 +653,17 @@ void MythUIButtonList::Init()
     m_contentsRect.CalculateArea(m_Area);
 
     buttontemplate->SetVisible(false);
-    QRect buttonItemArea = buttontemplate->GetArea();
+
+    MythRect buttonItemArea;
+
+    MythUIGroup *buttonactivestate = dynamic_cast<MythUIGroup *>
+                                        (buttontemplate->GetState("active"));
+    if (buttonactivestate)
+        buttonItemArea = buttonactivestate->GetArea();
+    else
+        buttonItemArea = buttontemplate->GetArea();
+
+    buttonItemArea.CalculateArea(m_contentsRect);
 
     if (buttonItemArea.height() > 0)
         m_itemHeight = buttonItemArea.height();
@@ -662,13 +672,6 @@ void MythUIButtonList::Init()
         m_itemWidth = buttonItemArea.width();
     else
         m_itemWidth = m_contentsRect.width();
-
-//     QFontMetrics fm(m_fontActive->face());
-//     QSize sz1 = fm.size(Qt::TextSingleLine, "XXXXX");
-//     fm = QFontMetrics(m_fontInactive->face());
-//     QSize sz2 = fm.size(Qt::TextSingleLine, "XXXXX");
-//    m_itemHeight = QMAX(sz1.height(), sz2.height()) + (int)(2 * m_itemMarginY);
-//    m_itemWidth = m_contentsRect.width();
 
     CalculateVisibleItems();
 
