@@ -300,7 +300,7 @@ void MythUIButtonList::SetItemCurrent(MythUIButtonListItem* item)
             break;
         case ScrollFree :
             while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
-                ++m_topPosition;
+                m_topPosition += m_columns;
 
             break;
     }
