@@ -68,7 +68,7 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
         {
             current = *it;
 
-            if (current->CanTakeFocus())
+            if (current->CanTakeFocus() && current->IsVisible())
             {
                 widget = current;
                 break;
@@ -106,7 +106,7 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
         {
             current = *it;
 
-            if (reachedCurrent)
+            if (reachedCurrent && current->IsVisible())
                 return SetFocusWidget(current);
 
             if (current == m_CurrentFocusWidget)
@@ -122,7 +122,7 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
         {
             current = *it;
 
-            if (reachedCurrent)
+            if (reachedCurrent && current->IsVisible())
                 return SetFocusWidget(current);
 
             if (current == m_CurrentFocusWidget)
