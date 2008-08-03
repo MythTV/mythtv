@@ -120,6 +120,22 @@ bool MythUIStateType::DisplayState(StateType type)
     return (m_CurrentState != NULL);
 }
 
+MythUIType *MythUIStateType::GetState(const QString &name)
+{
+    if (m_ObjectsByName.contains(name.toLower()))
+        return m_ObjectsByName[name.toLower()];
+
+    return NULL;
+}
+
+MythUIType *MythUIStateType::GetState(StateType state)
+{
+    if (m_ObjectsByState.contains(state))
+        return m_ObjectsByState[state];
+
+    return NULL;
+}
+
 void MythUIStateType::ClearMaps()
 {
     QMap<QString, MythUIType *>::Iterator i;

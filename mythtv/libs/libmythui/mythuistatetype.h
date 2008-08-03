@@ -30,6 +30,8 @@ class MythUIStateType : public MythUIType
     bool DisplayState(StateType type);
 
     MythUIType* GetCurrentState() { return m_CurrentState; }
+    MythUIType* GetState(const QString &name);
+    MythUIType* GetState(StateType state);
 
     void Reset();
 
