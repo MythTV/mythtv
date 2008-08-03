@@ -126,6 +126,10 @@ void MythUIImage::SetImage(MythImage *img)
 
     img->UpRef();
 
+    if (m_isReflected)
+        img->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
+                        m_reflectLength);
+
     if (!m_ForceSize.isNull())
     {
         int w = (m_ForceSize.width() <= 0) ? img->width() : m_ForceSize.width();
@@ -150,6 +154,10 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
     {
         MythImage *im = (*it);
         im->UpRef();
+
+        if (m_isReflected)
+            im->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
+                         m_reflectLength);
 
         if (!m_ForceSize.isNull())
         {
