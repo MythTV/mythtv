@@ -152,12 +152,12 @@ void ThumbGenerator::run()
                     QString screenshotPath = QString("%1%2-screenshot.jpg")
                             .arg(getThumbcacheDir(dir))
                             .arg(file);
-                    image.save(screenshotPath, "JPEG", 90);
+                    image.save(screenshotPath, "JPEG", 96);
                 }
 
                 image = image.scaled(m_width,m_height,
                                 Qt::KeepAspectRatio, Qt::SmoothTransformation);
-                image.save(cachePath, "JPEG", 90);
+                image.save(cachePath, "JPEG", 96);
 
                 // deep copies all over
                 ThumbData *td = new ThumbData;
