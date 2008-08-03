@@ -9,7 +9,7 @@
             <spacing>5</spacing>
             <buttonarea>0,0,770,520</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,150,150</area>
+                <area>0,0,150,125</area>
                 <state name="active">
                     <imagetype name="buttonbackground">
                         <filename>gallery-back-reg.png</filename>
@@ -18,12 +18,6 @@
                         <area>5,5,140,115</area>
                         <preserveaspect>yes</preserveaspect>
                     </imagetype>
-                    <textarea name="buttontext" from="basetextarea">
-                        <area>5,130,140,25</area>
-                        <font>basesmallgrey</font>
-                        <align>hcenter,bottom</align>
-                        <value>Test</value>
-                    </textarea>
                     <statetype name="buttoncheck">
                         <position>130,100</position>
                         <state type="full">
@@ -32,9 +26,6 @@
                             </imagetype>
                         </state>
                         <state type="off">
-                            <imagetype name="unmarked">
-                                <filename>blank.png</filename>
-                            </imagetype>
                         </state>
                     </statetype>
                 </state>
@@ -42,8 +33,11 @@
                     <imagetype name="buttonbackground">
                         <filename>gallery-back-sel.png</filename>
                     </imagetype>
-                    <textarea name="buttontext">
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>5,130,140,40</area>
                         <font>basesmall</font>
+                        <align>hcenter,vcenter</align>
+                        <cutdown>yes</cutdown>
                     </textarea>
                 </state>
             </statetype>
@@ -65,11 +59,11 @@
             </statetype>
         </buttonlist2>
 
-        <textarea name="text" from="basetextarea">
+<!--        <textarea name="text" from="basetextarea">
             <area>10,515,780,35</area>
             <font>basemedium</font>
             <align>allcenter</align>
-        </textarea>
+        </textarea>-->
 
     </window>
 
