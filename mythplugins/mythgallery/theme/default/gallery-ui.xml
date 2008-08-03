@@ -20,12 +20,11 @@
                     </imagetype>
                     <statetype name="buttoncheck">
                         <position>130,100</position>
+                        <showempty>yes</showempty>
                         <state type="full">
                             <imagetype name="marked">
                                 <filename>gallery-mark.png</filename>
                             </imagetype>
-                        </state>
-                        <state type="off">
                         </state>
                     </statetype>
                 </state>
