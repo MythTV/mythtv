@@ -224,6 +224,7 @@ class MPUBLIC ProgramInfo
     void ApplyRecordRecID(void);
     void ApplyRecordRecGroupChange(const QString &newrecgroup);
     void ApplyRecordPlayGroupChange(const QString &newrecgroup);
+    void ApplyStorageGroupChange(const QString &newstoragegroup);
     void ApplyRecordRecTitleChange(const QString &newTitle,
                                    const QString &newSubtitle);
     void ApplyTranscoderProfileChange(QString);

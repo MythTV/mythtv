@@ -2273,10 +2273,22 @@ static HostLineEdit *HaltCommand()
     return ge;
 }
 
+static HostLineEdit *LircDaemonDevice()
+{
+    HostLineEdit *ge = new HostLineEdit("LircSocket");
+    ge->setLabel(QObject::tr("LIRC Daemon Socket"));
+    ge->setValue("/dev/lircd");
+    QString help = QObject::tr(
+        "UNIX socket or IP address[:port] to connect in "
+        "order to communicate with the LIRC Daemon.");
+    ge->setHelpText(help);
+    return ge;
+}
+
 static HostLineEdit *LircKeyPressedApp()
 {
     HostLineEdit *ge = new HostLineEdit("LircKeyPressedApp");
-    ge->setLabel(QObject::tr("Keypress Application"));
+    ge->setLabel(QObject::tr("LIRC Keypress Application"));
     ge->setValue("");
     ge->setHelpText(QObject::tr("External application or script to run when "
                     "a keypress is received by LIRC."));
@@ -2286,7 +2298,7 @@ static HostLineEdit *LircKeyPressedApp()
 static HostLineEdit *ScreenShotPath()
 {
     HostLineEdit *ge = new HostLineEdit("ScreenShotPath");
-    ge->setLabel(QObject::tr("ScreenShotPath"));
+    ge->setLabel(QObject::tr("Screen Shot Path"));
     ge->setValue("/tmp/");
     ge->setHelpText(QObject::tr("Path to screenshot storage location. Should be writable by the frontend"));
     return ge;
@@ -4571,27 +4583,24 @@ MainGeneralSettings::MainGeneralSettings()
     VerticalConfigurationGroup *general =
         new VerticalConfigurationGroup(false, true, false, false);
     general->setLabel(QObject::tr("General"));
+    general->addChild(AllowQuitShutdown());
     HorizontalConfigurationGroup *row =
         new HorizontalConfigurationGroup(false, false, true, true);
-    VerticalConfigurationGroup *col1 =
-        new VerticalConfigurationGroup(false, false, true, true);
-    VerticalConfigurationGroup *col2 =
-        new VerticalConfigurationGroup(false, false, true, true);
-    col1->addChild(AllowQuitShutdown());
-    col1->addChild(NoPromptOnExit());
-    col2->addChild(UseArrowAccels());
-    col2->addChild(NetworkControlEnabled());
-    row->addChild(col1);
-    row->addChild(col2);
-
-    MythMediaSettings *mediaMon = new MythMediaSettings();
-
-    general->addChild(LircKeyPressedApp());
-    general->addChild(ScreenShotPath());
+    row->addChild(NoPromptOnExit());
+    row->addChild(UseArrowAccels());
     general->addChild(row);
-    general->addChild(NetworkControlPort());
-    general->addChild(mediaMon);
+    general->addChild(new MythMediaSettings());
+    general->addChild(ScreenShotPath());
     addChild(general);
+
+    VerticalConfigurationGroup *remotecontrol =
+        new VerticalConfigurationGroup(false, true, false, false);
+    remotecontrol->setLabel(QObject::tr("Remote Control"));
+    remotecontrol->addChild(LircDaemonDevice());
+    remotecontrol->addChild(LircKeyPressedApp());
+    remotecontrol->addChild(NetworkControlEnabled());
+    remotecontrol->addChild(NetworkControlPort());
+    addChild(remotecontrol);
 
     VerticalConfigurationGroup* misc = new VerticalConfigurationGroup(false);
     misc->setLabel(QObject::tr("Miscellaneous"));

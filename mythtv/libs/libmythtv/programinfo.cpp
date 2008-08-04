@@ -1234,6 +1234,29 @@ void ProgramInfo::ApplyRecordPlayGroupChange(const QString &newplaygroup)
     playgroup = newplaygroup;
 }
 
+/** \fn ProgramInfo::ApplyStorageGroupChange(const QString &newstoragegroup)
+ *  \brief Sets the storage group, both in this ProgramInfo
+ *         and in the database.
+ *  \param newstoragegroup New storage group.
+ */
+void ProgramInfo::ApplyStorageGroupChange(const QString &newstoragegroup)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE recorded"
+                  " SET storagegroup = :STORAGEGROUP"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :START ;");
+    query.bindValue(":STORAGEGROUP", newstoragegroup);
+    query.bindValue(":START", recstartts);
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec())
+        MythContext::DBError("StorageGroup update", query);
+
+    storagegroup = newstoragegroup;
+}
+
 /** \fn ProgramInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QString &newSubtitle)
  *  \brief Sets the recording title and subtitle, both in this ProgramInfo
  *         and in the database.
@@ -3626,9 +3649,9 @@ static QString get_ratings(bool recorded, uint chanid, QDateTime startts)
     return ratings + "Advisory" + advisory;
 }
 
-#define ADD_PAR(title,text,result)                                    \
-    result += details_dialog->themeText("heading", title + ":  ", 3)  \
-           +  details_dialog->themeText("body", text, 3) + "<br>";
+#define ADD_PAR(title,text,result)       \
+    result += "<h2>" + title + "</h2>"   \
+           +  "<p>" + text + "</p>";
 
 /** \fn ProgramInfo::showDetails(void) const
  *  \brief Pops up a DialogBox with program info, blocking until user exits
@@ -3709,10 +3732,27 @@ void ProgramInfo::showDetails(void) const
            category_type = "tvshow";
     }
 
-    ProgDetails *details_dialog = new ProgDetails(gContext->GetMainWindow(),
-            "progdetails");
+//    ProgDetails *details_dialog = new ProgDetails(gContext->GetMainWindow(),
+//            "progdetails");
 
-    QString msg = "";
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ProgDetails *details_dialog  = new ProgDetails(mainStack, "progdetails");
+
+    if (!details_dialog->Create())
+    {
+        delete details_dialog;
+        return;
+    }
+
+    QString msg = "<HTML>\n"
+                  "  <head>\n"
+                  "    <style type=\"text/css\">\n"
+                  "      h1 {font-style: normal}\n"
+                  "      h2 {font-size:15pt;font-style: normal;color:#ffffdd}\n"
+                  "      p  {font-size:15pt;font-style: normal;color:#ffffff;margin-top: -15pt}\n"
+                  "    </style>\n"
+                  "  </head>\n"
+                  "  <body>\n";
     QString s   = "";
 
     s = title;
@@ -3918,7 +3958,7 @@ void ProgramInfo::showDetails(void) const
     }
 
     // Begin MythTV information not found in the listings info
-    msg += "<p>";
+//    msg += "<br>";
     QDateTime statusDate;
     if (recstatus == rsWillRecord)
         statusDate = startts;
@@ -4076,11 +4116,44 @@ void ProgramInfo::showDetails(void) const
     {
         ADD_PAR(QObject::tr("Recording Profile"), record->getProfileName(),msg)
     }
-    msg.remove(QRegExp("<br>$"));
-    details_dialog->setDetails(msg);
-    details_dialog->exec();
+    //msg.remove(QRegExp("<br>$"));
+    msg += "\n</body>\n</html>\n";
 
-    delete details_dialog;
+    details_dialog->setDetails(msg);
+    mainStack->AddScreen(details_dialog);
+
+    // HACK begin - remove when everything is using mythui 
+    QWidget *widget = GetMythMainWindow()->currentWidget();
+    vector<QWidget *> widgetList;
+
+    while (widget)
+    {
+        widgetList.push_back(widget);
+        GetMythMainWindow()->detach(widget);
+        widget = GetMythMainWindow()->currentWidget();
+    }
+    // HACK end
+
+//    mainStack->AddScreen(details_dialog);
+
+    // HACK begin - remove when everything is using mythui 
+    GetMythMainWindow()->GetPaintWindow()->raise();
+    GetMythMainWindow()->GetPaintWindow()->setFocus();
+
+    int screenCount = mainStack->TotalScreens();
+    do
+    {
+        qApp->processEvents();
+        usleep(5000);
+    } while (mainStack->TotalScreens() >= screenCount);
+
+    vector<QWidget*>::reverse_iterator it;
+    for (it = widgetList.rbegin(); it != widgetList.rend(); ++it)
+    {
+        cout << "adding: " << *it << endl;
+        GetMythMainWindow()->attach(*it);
+    }
+    // HACK end
 }
 
 /** \fn ProgramInfo::getProgramFlags(void) const

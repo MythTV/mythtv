@@ -124,7 +124,7 @@ class MythMainWindowPrivate
     bool ignore_joystick_keys;
 
 #ifdef USE_LIRC
-    LircThread *lircThread;
+    LIRC *lircThread;
 #endif
 
 #ifdef USE_JOYSTICK_MENU
@@ -328,8 +328,13 @@ MythMainWindow::MythMainWindow(const bool useDB)
         config_file = QDir::homePath() + "/.lircrc";
 
     d->lircThread = NULL;
-    d->lircThread = new LircThread(this);
-    if (!d->lircThread->Init(config_file, "mythtv"))
+    d->lircThread = new LIRC(
+        this,
+        GetMythDB()->GetSetting("LircSocket", "/dev/lircd"),
+        "mythtv", config_file,
+        GetMythDB()->GetSetting("LircKeyPressedApp", ""));
+
+    if (d->lircThread->Init())
         d->lircThread->start();
 #endif
 
@@ -413,13 +418,7 @@ MythMainWindow::~MythMainWindow()
 #ifdef USE_LIRC
     if (d->lircThread)
     {
-        if (d->lircThread->isRunning())
-        {
-            d->lircThread->Stop();
-            d->lircThread->wait();
-        }
-
-        delete d->lircThread;
+        d->lircThread->deleteLater();
         d->lircThread = NULL;
     }
 #endif
@@ -758,6 +757,11 @@ void MythMainWindow::Init(void)
     d->paintwin->setFixedSize(size());
     d->paintwin->raise();
     d->paintwin->show();
+}
+
+QWidget *MythMainWindow::GetPaintWindow(void)
+{
+    return d->paintwin;
 }
 
 void MythMainWindow::Show(void)
@@ -1353,6 +1357,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
             }
             break;
         }
+#if 0
         case QEvent::MouseButtonPress:
         {
             if (!d->gesture.recording())
@@ -1451,10 +1456,11 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
             }
             break;
         }
+ #endif
+
         default:
             break;
     }
-
     return false;
 }
 
@@ -1565,7 +1571,7 @@ void MythMainWindow::customEvent(QEvent *ce)
     {
         LircKeycodeEvent *lke = (LircKeycodeEvent *)ce;
         int keycode = lke->getKeycode();
-
+        cout << "Got key: " << keycode << endl;
         if (keycode)
         {
             GetMythUI()->ResetScreensaver();

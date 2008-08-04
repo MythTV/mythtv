@@ -52,6 +52,7 @@ void MythUITextEdit::Init(void)
 
 void MythUITextEdit::Pulse(void)
 {
+    cout << "MythUITextEdit::Pulse: has focus" << m_HasFocus << " m_showCursor: " << m_showCursor << endl;
     if (m_showCursor && m_HasFocus)
     {
         if (m_blinkInterval > m_cursorBlinkRate)
