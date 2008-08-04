@@ -205,12 +205,14 @@ void MythConfirmationDialog::sendResult(bool ok)
 MythTextInputDialog::MythTextInputDialog(MythScreenStack *parent,
                                          const QString &message,
                                          InputFilter filter,
-                                         bool isPassword)
+                                         bool isPassword,
+                                         const QString &defaultValue)
            : MythScreenType(parent, "mythtextinputpopup")
 {
     m_filter = filter;
     m_isPassword = isPassword;
     m_message = message;
+    m_defaultValue = defaultValue;
     m_textEdit = NULL;
 
     m_id = "";
@@ -238,6 +240,7 @@ bool MythTextInputDialog::Create(void)
     connect(okButton, SIGNAL(buttonPressed()), SLOT(sendResult()));
 
     m_textEdit->SetFilter(m_filter);
+    m_textEdit->SetText(m_defaultValue);
     //m_textEdit->SetIsPassword(m_isPassword);
 
     messageText->SetText(m_message);
