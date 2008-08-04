@@ -36,7 +36,7 @@ class MythUIButtonListItem
     void setText(const QString &text, const QString &name="");
     QString text() const;
 
-    void setImage(MythImage *image);
+    void setImage(MythImage *image, const QString &name="");
     const MythImage *image() const;
 
     bool checkable() const;

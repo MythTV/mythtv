@@ -656,22 +656,17 @@ void MythUIButtonList::Init()
 
     MythRect buttonItemArea;
 
-    MythUIGroup *buttonactivestate = dynamic_cast<MythUIGroup *>
-                                        (buttontemplate->GetState("active"));
-    if (buttonactivestate)
-        buttonItemArea = buttonactivestate->GetArea();
+    MythUIGroup *buttonActiveState = dynamic_cast<MythUIGroup *>
+                                        (buttontemplate->GetState("Active"));
+    if (buttonActiveState)
+        buttonItemArea = buttonActiveState->GetArea();
     else
         buttonItemArea = buttontemplate->GetArea();
 
     buttonItemArea.CalculateArea(m_contentsRect);
 
-    if (buttonItemArea.height() > 0)
-        m_itemHeight = buttonItemArea.height();
-
-    if (buttonItemArea.width() > 0)
-        m_itemWidth = buttonItemArea.width();
-    else
-        m_itemWidth = m_contentsRect.width();
+    m_itemHeight = buttonItemArea.height();
+    m_itemWidth = buttonItemArea.width();
 
     CalculateVisibleItems();
 
@@ -696,6 +691,27 @@ void MythUIButtonList::Init()
 
         m_ButtonList.push_back(button);
     }
+
+    // The following is pretty much a hack for the benefit of MythGallery
+    // it scales images based on the button size and we need to give it the
+    // largest button state so that the images are not too small
+    // This can be removed once the disk based image caching is added to mythui,
+    // since the mythui thumbnail generator can be ditched.
+    MythUIGroup *buttonSelectedState = dynamic_cast<MythUIGroup *>
+                                        (buttontemplate->GetState("Selected"));
+
+    if (buttonSelectedState)
+    {
+        MythRect itemArea = buttonSelectedState->GetArea();
+        itemArea.CalculateArea(m_contentsRect);
+
+        if (m_itemHeight < itemArea.height())
+            m_itemHeight = itemArea.height();
+        if (m_itemWidth < itemArea.width())
+            m_itemWidth = itemArea.width();
+    }
+    // End Hack
+
 
     SetPositionArrowStates();
 }
@@ -789,11 +805,18 @@ void MythUIButtonList::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
         {
             QString buttonname = button->objectName();
             int pos = buttonname.section(' ',2,2).toInt();
+            pos += m_topPosition;
             if (pos < m_itemList.size())
             {
-                SetItemCurrent(pos);
-                //MoveToNamedPosition(button->GetText());
-                emit itemClicked(GetItemCurrent());
+                if (pos == GetCurrentPos())
+                {
+                    emit itemClicked(GetItemCurrent());
+                }
+                else
+                {
+                    SetItemCurrent(pos);
+                    emit itemSelected(GetItemCurrent());
+                }
             }
 
             return;
@@ -1038,6 +1061,12 @@ MythUIButtonListItem::~MythUIButtonListItem()
         m_parent->RemoveItem(this);
     if (m_image)
         m_image->DownRef();
+
+    QMapIterator<QString, MythImage*> it(m_images);
+    while (it.hasNext()) {
+        it.next();
+        it.value()->DownRef();
+    }
 }
 
 QString MythUIButtonListItem::text() const
@@ -1060,15 +1089,26 @@ const MythImage* MythUIButtonListItem::image() const
     return m_image;
 }
 
-void MythUIButtonListItem::setImage(MythImage *image)
+void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
 {
     if (!image)
         return;
 
-    if (m_image)
-        m_image->DownRef();
-    m_image = image;
-    m_image->UpRef();
+    if (!name.isEmpty())
+    {
+        if (m_images.contains(name))
+            m_images.value(name)->DownRef();
+        m_images.insert(name, image);
+        image->UpRef();
+    }
+    else
+    {
+        if (m_image)
+            m_image->DownRef();
+        m_image = image;
+        m_image->UpRef();
+    }
+
     m_parent->Update();
 }
 
