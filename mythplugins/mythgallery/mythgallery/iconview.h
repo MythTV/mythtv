@@ -95,6 +95,7 @@ class IconView : public MythScreenType
 
     void DoMkDir(QString folderName);
     void DoDeleteMarked(bool doDelete);
+    void DoRename(QString folderName);
 
   private:
     void LoadThumbnail(ThumbItem *item);

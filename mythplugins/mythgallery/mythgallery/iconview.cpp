@@ -1127,30 +1127,43 @@ void IconView::HandleRename(void)
 
     QString folderName = thumbitem->GetName();
 
-    bool res = MythPopupBox::showGetTextPopup(
-        gContext->GetMainWindow(), tr("Rename"),
-        tr("Rename"), folderName);
+    QString message = tr("Rename");
 
+    MythTextInputDialog *dialog = new MythTextInputDialog(m_popupStack,
+            message, FilterNone, false, folderName);
+
+    if (dialog->Create())
+       m_popupStack->AddScreen(dialog);
+
+     connect(dialog, SIGNAL(haveResult(QString)),
+            SLOT(DoRename(QString)), Qt::QueuedConnection);
+}
+
+void IconView::DoRename(QString folderName)
+{
     if (folderName.isEmpty() || folderName == "." || folderName == "..")
         return;
 
-    if (res)
+    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
+    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
+
+    if (!thumbitem)
+        return;
+
+    if (!GalleryUtil::Rename(m_currDir, thumbitem->GetName(), folderName))
     {
-        if (!GalleryUtil::Rename(m_currDir, thumbitem->GetName(), folderName))
-        {
-            QString msg;
-            if (thumbitem->IsDir())
-                msg = tr("Failed to rename directory");
-            else
-                msg = tr("Failed to rename file");
+        QString msg;
+        if (thumbitem->IsDir())
+            msg = tr("Failed to rename directory");
+        else
+            msg = tr("Failed to rename file");
 
-            ShowOKDialog(msg, NULL);
+        ShowOKDialog(msg, NULL);
 
-            return;
-        }
-
-        LoadDirectory(m_currDir);
+        return;
     }
+
+    LoadDirectory(m_currDir);
 }
 
 
