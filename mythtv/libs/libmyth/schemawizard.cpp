@@ -1,3 +1,5 @@
+#include <unistd.h>      // for isatty() on Windows
+
 #include "dialogbox.h"
 #include "langsettings.h"
 #include "mythcontext.h"
