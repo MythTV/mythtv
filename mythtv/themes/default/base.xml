@@ -3,12 +3,12 @@
 
     <!-- Base Font Definitions -->
     <font name="basesmall" face="Bitstream Vera Sans">
-        <size>16</size>
+        <size>14</size>
         <color>#FFFFFF</color>
     </font>
 
     <font name="basemedium" from="basesmall">
-        <size>18</size>
+        <size>17</size>
     </font>
 
     <font name="baselarge" from="basesmall">
@@ -293,6 +293,7 @@
             <area>20,20,540,80</area>
             <align>allcenter</align>
             <multiline>yes</multiline>
+            <cutdown>yes</cutdown>
         </textarea>
 
         <button name="cancel" from="basebutton">
