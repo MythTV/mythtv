@@ -4,6 +4,7 @@
 using namespace std;
 
 #include <iostream>
+#include <vector>
 
 // qt
 #include <qobject.h>
