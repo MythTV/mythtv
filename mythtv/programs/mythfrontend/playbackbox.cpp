@@ -14,7 +14,6 @@
 #include <qpainter.h>
 #include <q3header.h>
 #include <qfile.h>
-#include <qdir.h>
 #include <qfileinfo.h>
 #include <qsqldatabase.h>
 #include <qmap.h>
@@ -51,7 +50,6 @@ using namespace std;
 #include "playgroup.h"
 #include "customedit.h"
 #include "util.h"
-#include "storagegroup.h"
 #include "x11colors.h"
 #include "mythuihelper.h"
 
@@ -3217,9 +3215,6 @@ void PlaybackBox::showStoragePopup()
     popup->addButton(tr("Change Playback Group"), this,
                      SLOT(showPlayGroupChanger()));
 
-    popup->addButton(tr("Change Storage Group"), this,
-                     SLOT(showStorageGroupChanger()));
-
     if (delitem)
     {
         toggleButton = new MythPushButton(
@@ -5551,162 +5546,6 @@ void PlaybackBox::showPlayGroupChanger(void)
         setPlayGroup();
 
     closeRecGroupPopup(result != MythDialog::Rejected);
-}
-
-void PlaybackBox::showStorageGroupChanger(void)
-{
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    if (!curitem)
-        return;
-
-    // check the recording isn't in use somewhere
-    QString usedBy;
-    if (curitem->IsInUse(usedBy))
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "In Use",
-                tr("Cannot move this recording at this time as it is in use by '") +
-                usedBy + "'");
-        return;
-    }
-
-    // dont bother showing the dialog if there is only one storage group
-    QStringList storageGroups(StorageGroup::getRecordingsGroups());
-    if (storageGroups.size() < 2)
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "no group", 
-                tr("There are no other storage groups available to move the recording to!!"));
-        return;
-    }
-
-    // remove the recordings current storage group from the list
-    cout << "recordings storage group is: " << curitem->storagegroup.toStdString() << endl;
-    storageGroups.remove(curitem->storagegroup);
-
-    initRecGroupPopup(tr("Select Storage Group"), "showStorageGroupChanger");
-
-    recGroupPopup->addLabel(tr("Current Storage Group: ") + curitem->storagegroup);
-
-    recGroupListBox = new MythListBox(recGroupPopup);
-    recGroupListBox->insertStringList(storageGroups);
-    recGroupPopup->addWidget(recGroupListBox);
-    recGroupListBox->setFocus();
-    Q3ListBoxItem *item = recGroupListBox->item(0);
-    if (item)
-        recGroupListBox->setSelected(item, true);
-
-    recGroupOkButton = new MythPushButton(recGroupPopup);
-    recGroupOkButton->setText(tr("OK"));
-    recGroupPopup->addWidget(recGroupOkButton);
-
-    connect(recGroupOkButton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
-
-    DialogCode result = recGroupPopup->ExecPopup();
-
-    QString group = recGroupListBox->currentText();
-
-    closeRecGroupPopup(false);
-
-    if (result != MythDialog::Accepted)
-        return;
-
-    // get the new filename
-    StorageGroup sg(group, gContext->GetHostName());
-    QString newDir = sg.FindNextDirMostFree();
-    QString newFile(newDir + "/" + curitem->GetRecordBasename());
-    cout << "New File Name is: " << newFile.toStdString() << endl;
-
-    // get the old filename
-    StorageGroup sg1(curitem->storagegroup, gContext->GetHostName());
-    QString oldFile = sg1.FindRecordingFile(curitem->GetRecordBasename());
-    cout << "Old File Name is: " << oldFile.toStdString() << endl;
-
-    // sanity check - make sure they aren't the same file
-    if (newFile == oldFile)
-        return;
-
-    // find any associated files (preview images etc)
-    QFileInfo fi(oldFile);
-    QDir d;
-    QFileInfoList list;
-    QString oldDir(fi.dirPath(true));
-
-    d.setPath(oldDir);
-    if (d.exists())
-    {
-        list = d.entryInfoList(fi.fileName() + ".*", QDir::Files, QDir::Name);
-
-        for (int x = 0; x < list.size(); x++)
-        {
-            fi = list.at(x);
-            cout << "found file" << fi.fileName().toStdString() << endl;
-        }
-    }
-
-    // copy the recording over
-    QFile srcFile(oldFile);
-    QFile destFile(newFile);
-    long long size = copy(destFile, srcFile, 4*1024*1024, true);
-
-    if (size == -1LL)
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Copy Failed",
-            tr("Copy Failed.\n"
-               "Could not move the recording to the new storage group."));
-        return;
-    }
-
-    // double check the file sizes match before deleting the original
-    if (srcFile.size() != destFile.size())
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Copy Failed",
-            tr("File size mismatch.\n"
-               "Could not move the recording to the new storage group."));
-        return;
-    }
-
-    // remove the old recording
-    srcFile.remove();
-
-    // copy any associated files
-    for (int x = 0; x < list.size(); x++)
-    {
-        fi = list.at(x);
-        QString oldFile(fi.dirPath(true) + '/' + fi.fileName());
-        QString newFile(newDir + '/' + fi.fileName());
-        cout << "copy file from " << oldFile.toStdString() << 
-                " to " << newFile.toStdString() << endl;
-        srcFile.setName(oldFile);
-        destFile.setName(newFile);
-        copy(destFile, srcFile, 1024*1024, false);
-    }
-
-    // remove any associated files
-    for (int x = 0; x < list.size(); x++)
-    {
-        fi = list.at(x);
-        QString delFile(fi.dirPath(true) + '/' + fi.fileName());
-        cout << "deleting file" << delFile.toStdString() << endl;
-        srcFile.setName(fi.dirPath(true) + '/' + fi.fileName());
-        srcFile.remove();
-    }
-
-    curitem->ApplyStorageGroupChange(group);
-
-    // refresh program list and restart preview 
-    connected = FillList(true);
-
-    paintSkipUpdate = false;
-    paintSkipCount = 2;
-
-    previewVideoState = kChanging;
-
-    setActiveWindow();
-
-    EmbedTVWindow();
 }
 
 void PlaybackBox::showRecTitleChanger()

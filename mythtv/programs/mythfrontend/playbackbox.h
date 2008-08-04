@@ -159,7 +159,6 @@ class PlaybackBox : public MythDialog
     void showActionsSelected();
     void showRecGroupChanger();
     void showPlayGroupChanger();
-    void showStorageGroupChanger();
     void showRecTitleChanger();
     void showRecGroupChooser();
     void showRecGroupPasswordChanger();

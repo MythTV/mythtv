@@ -52,7 +52,6 @@ using namespace std;
 #include "util.h"
 #include "util-x11.h"
 #include "mythmediamonitor.h"
-#include "mythdialogs.h"
 
 #ifdef CONFIG_DARWIN
 #include <mach/mach.h> 
@@ -679,7 +678,7 @@ bool telnet(const QString &host, int port)
     return false;
 }
 
-/** \fn copy(QFile&,QFile&,uint,bool)
+/** \fn copy(QFile&,QFile&,uint)
  *  \brief Copies src file to dst file.
  *
  *   If the dst file is open, it must be open for writing.
@@ -698,10 +697,9 @@ bool telnet(const QString &host, int port)
  *  \param src Source QFile
  *  \param block_size Optional block size in bytes, must be at least 1024,
  *                    otherwise the default of 16 KB will be used.
- *  \param showProgress Whether to show on screen progress dialog.
  *  \return bytes copied on success, -1 on failure.
  */
-long long copy(QFile &dst, QFile &src, uint block_size, bool showProgress)
+long long copy(QFile &dst, QFile &src, uint block_size)
 {
     uint buflen = (block_size < 1024) ? (16 * 1024) : block_size;
     char *buf = new char[buflen];
@@ -718,18 +716,10 @@ long long copy(QFile &dst, QFile &src, uint block_size, bool showProgress)
 
     bool ok = dst.isWritable() && src.isReadable();
     long long total_bytes = 0LL;
-    MythProgressDialog *progressDialog = NULL;
-
-    if (showProgress)
-    {
-        progressDialog = new MythProgressDialog(QObject::tr("Copying file."), src.size() / block_size);
-        progressDialog->setProgress(0);
-    }
-
     while (ok)
     {
         long long rlen, wlen, off = 0;
-        rlen = src.read(buf, buflen);
+        rlen = src.readBlock(buf, buflen);
         if (rlen<0)
         {
             VERBOSE(VB_IMPORTANT, "util.cpp:copy: read error");
@@ -743,7 +733,7 @@ long long copy(QFile &dst, QFile &src, uint block_size, bool showProgress)
 
         while ((rlen-off>0) && ok)
         {
-            wlen = dst.write(buf + off, rlen - off);
+            wlen = dst.writeBlock(buf + off, rlen - off);
             if (wlen>=0)
                 off+= wlen;
             if (wlen<0)
@@ -751,12 +741,6 @@ long long copy(QFile &dst, QFile &src, uint block_size, bool showProgress)
                 VERBOSE(VB_IMPORTANT, "util.cpp:copy: write error");
                 ok = false;
             }
-        }
-
-        if (showProgress && progressDialog)
-        {
-            progressDialog->setProgress(total_bytes / block_size);
-            qApp->processEvents();
         }
     }
     delete[] buf;
@@ -766,12 +750,6 @@ long long copy(QFile &dst, QFile &src, uint block_size, bool showProgress)
 
     if (osrc)
         src.close();
-
-    if (progressDialog)
-    {
-        progressDialog->Close();
-        progressDialog->deleteLater();
-    }
 
     return (ok) ? total_bytes : -1LL;
 }

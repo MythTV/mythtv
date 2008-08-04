@@ -98,9 +98,6 @@
     <!-- Base definition of a buttonlist in horizontal configuration -->
     <buttonlist name="basehorizontalbuttonlist" from="basebuttonlist">
         <layout>horizontal</layout>
-        <showarrow>no</showarrow>
-        <spacing>0</spacing>
-        <margin>3,3</margin>
         <statetype name="upscrollarrow">
             <state type="off">
                 <imagetype name="upon">

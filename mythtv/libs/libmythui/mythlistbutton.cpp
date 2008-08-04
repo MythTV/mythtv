@@ -946,9 +946,6 @@ const QRect MythListButton::PlaceArrows(const QSize &arrowSize)
 {
     if (m_layout == LayoutHorizontal)
     {
-        cout << "Area: x: " << GetArea().x() << " y: " << GetArea().y() 
-             << "width: " << GetArea().width() << " height: " << GetArea().height() << endl;
-
         int x = GetArea().width() - arrowSize.width() - 1;
         int ytop = GetArea().height() / 2 - m_itemMarginY / 2 - arrowSize.height();
         int ybottom = GetArea().height() / 2 + m_itemMarginY / 2;
@@ -958,8 +955,6 @@ const QRect MythListButton::PlaceArrows(const QSize &arrowSize)
 
         /* rightmost rectangle (full height) */
         QRect arrowsRect(x, 0, arrowSize.width() + 1, m_Area.height());
-        cout << "PlaceArrows: x: " << arrowsRect.x() << " y: " << arrowsRect.y() 
-             << "width: " << arrowsRect.width() << " height: " << arrowsRect.height() << endl;
 
         return QRect(x, 0, arrowSize.width() + 1, m_Area.height());
     }
@@ -973,7 +968,6 @@ const QRect MythListButton::PlaceArrows(const QSize &arrowSize)
 
 QRect MythListButton::CalculateContentsRect(const QRect &arrowsRect) const
 {
-    cout << "m_itemMarginX: " << m_itemMarginX << endl;
     QRect contectRect;
 
     if (m_layout == LayoutHorizontal)

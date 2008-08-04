@@ -524,6 +524,6 @@ inc.files = programinfo.h remoteutil.h recordingtypes.h
 INSTALLS += inc
 
 #The following line was inserted by qt3to4
-QT += network xml sql opengl qt3support webkit
+QT += network xml  sql opengl qt3support
 
 include ( ../libs-targetfix.pro )

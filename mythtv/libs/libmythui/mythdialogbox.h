@@ -100,8 +100,7 @@ class MythTextInputDialog : public MythScreenType
   public:
     MythTextInputDialog(MythScreenStack *parent, const QString &message,
                         InputFilter filter = FilterNone,
-                        bool isPassword = false,
-                        const QString &defaultValue = "");
+                        bool isPassword = false);
 
     bool Create(void);
     void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
@@ -112,7 +111,6 @@ class MythTextInputDialog : public MythScreenType
   private:
     MythUITextEdit *m_textEdit;
     QString m_message;
-    QString m_defaultValue;
     InputFilter m_filter;
     bool m_isPassword;
     MythScreenType *m_retScreen;

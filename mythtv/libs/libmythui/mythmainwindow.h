@@ -79,7 +79,6 @@ class MythMainWindow : public QWidget
     static void destroyMainWindow();
 
     MythPainter *GetCurrentPainter();
-    QWidget     *GetPaintWindow();
 
     bool screenShot(QString fname, int x, int y, int x2, int y2, int w, int h);
     bool screenShot(int x, int y, int x2, int y2);

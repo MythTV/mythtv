@@ -12,7 +12,6 @@ MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
                                bool fullscreen)
               : MythUIType(parent, name)
 {
-    cout << "creating screen: " << qPrintable(name) << endl;
     assert(parent);
 
     m_FullScreen = fullscreen;
@@ -29,8 +28,6 @@ MythScreenType::MythScreenType(MythUIType *parent, const QString &name,
                                bool fullscreen)
               : MythUIType(parent, name)
 {
-    cout << "creating screen: " << qPrintable(name) << endl;
-
     m_FullScreen = fullscreen;
     m_CurrentFocusWidget = NULL;
 
@@ -42,8 +39,6 @@ MythScreenType::MythScreenType(MythUIType *parent, const QString &name,
 
 MythScreenType::~MythScreenType()
 {
-    cout << "deleting screen: " << qPrintable(objectName()) << endl;
-
     emit Exiting();
 }
 
