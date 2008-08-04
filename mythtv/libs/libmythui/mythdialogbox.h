@@ -67,6 +67,32 @@ class MythDialogBox : public MythScreenType
     QString m_text;
 };
 
+class MythConfirmationDialog : public MythScreenType
+{
+    Q_OBJECT
+
+  public:
+    MythConfirmationDialog(MythScreenStack *parent, const QString &message,
+                           bool showCancel = true);
+
+    bool Create(void);
+    void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
+
+ signals:
+     void haveResult(bool);
+
+  private:
+    void sendResult(bool);
+    QString m_message;
+    bool m_showCancel;
+    MythScreenType *m_retScreen;
+    QString m_id;
+
+  private slots:
+    void Confirm(void);
+    void Cancel();
+};
+
 class MythTextInputDialog : public MythScreenType
 {
     Q_OBJECT
@@ -77,6 +103,7 @@ class MythTextInputDialog : public MythScreenType
                         bool isPassword = false);
 
     bool Create(void);
+    void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
 
  signals:
      void haveResult(QString);
@@ -86,6 +113,8 @@ class MythTextInputDialog : public MythScreenType
     QString m_message;
     InputFilter m_filter;
     bool m_isPassword;
+    MythScreenType *m_retScreen;
+    QString m_id;
 
   private slots:
     void sendResult();

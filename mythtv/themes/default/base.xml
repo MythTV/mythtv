@@ -130,9 +130,9 @@
         <activefont>basemedium</activefont>
         <inactivefont>basemediumgrey</inactivefont>
         <showarrow>no</showarrow>
-        <regular-background filename="text_button_off.png" />
-        <selected-background filename="text_button_on.png" />
-        <inactive-background filename="text_button_off.png" />
+        <regular-background filename="button_background.png" />
+        <selected-background filename="button_selected_background.png" />
+        <inactive-background filename="button_background.png" />
         <margin>5</margin>
         <align>center</align>
     </button>
@@ -280,6 +280,28 @@
             <align>left,top</align>
             <value>0%</value>
         </textarea>
+    </window>
+
+    <window name="MythConfirmationDialog">
+        <area>110,217,580,165</area>
+
+        <imagetype name="backimg">
+            <filename>mythprogressdialog-background.png</filename>
+        </imagetype>
+
+        <textarea name="message" from="basetextarea">
+            <area>20,20,540,80</area>
+            <align>allcenter</align>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <button name="cancel" from="basebutton">
+            <position>90,110</position>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>338,110</position>
+        </button>
     </window>
 
     <window name="MythTextInputDialog">

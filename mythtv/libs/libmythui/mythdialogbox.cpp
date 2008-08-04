@@ -1,7 +1,6 @@
 #include <QApplication>
 
 #include "mythdialogbox.h"
-#include "mythlistbutton.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 
@@ -120,6 +119,89 @@ void MythDialogBox::SendEvent(int res, QString text, void *data)
 
 /////////////////////////////////////////////////////////////////
 
+MythConfirmationDialog::MythConfirmationDialog(MythScreenStack *parent,
+                                               const QString &message,
+                                               bool showCancel)
+                       : MythScreenType(parent, "mythconfirmpopup")
+{
+    m_message = message;
+    m_showCancel = showCancel;
+
+    m_id = "";
+    m_retScreen = NULL;
+}
+
+bool MythConfirmationDialog::Create(void)
+{
+    if (!CopyWindowFromBase("MythConfirmationDialog", this))
+        return false;
+
+    MythUIText *messageText = dynamic_cast<MythUIText *>
+                                            (GetChild("message"));
+    MythUIButton *okButton = dynamic_cast<MythUIButton *>
+                                         (GetChild("ok"));
+    MythUIButton *cancelButton = dynamic_cast<MythUIButton *>
+                                         (GetChild("cancel"));
+
+    if (!messageText || !okButton || !cancelButton)
+        return false;
+
+    if (m_showCancel)
+    {
+        connect(cancelButton, SIGNAL(buttonPressed()), SLOT(Cancel()));
+    }
+    else
+        cancelButton->SetVisible(false);
+
+    connect(okButton, SIGNAL(buttonPressed()), SLOT(Confirm()));
+
+    okButton->SetText(tr("Ok"));
+    cancelButton->SetText(tr("Cancel"));
+
+    messageText->SetText(m_message);
+
+    BuildFocusList();
+
+    return true;
+}
+
+void MythConfirmationDialog::SetReturnEvent(MythScreenType *retscreen,
+                                            const QString &resultid)
+{
+    m_retScreen = retscreen;
+    m_id = resultid;
+}
+
+void MythConfirmationDialog::Confirm()
+{
+    sendResult(true);
+}
+
+void MythConfirmationDialog::Cancel()
+{
+    sendResult(false);
+}
+
+void MythConfirmationDialog::sendResult(bool ok)
+{
+    emit haveResult(ok);
+
+    if (m_retScreen)
+    {
+        int res = 0;
+        if (ok)
+            res = 1;
+
+        DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, res, "",
+                                                               NULL);
+        QApplication::postEvent(m_retScreen, dce);
+    }
+
+    Close();
+}
+
+/////////////////////////////////////////////////////////////////
+
 MythTextInputDialog::MythTextInputDialog(MythScreenStack *parent,
                                          const QString &message,
                                          InputFilter filter,
@@ -130,6 +212,9 @@ MythTextInputDialog::MythTextInputDialog(MythScreenStack *parent,
     m_isPassword = isPassword;
     m_message = message;
     m_textEdit = NULL;
+
+    m_id = "";
+    m_retScreen = NULL;
 }
 
 bool MythTextInputDialog::Create(void)
@@ -145,7 +230,7 @@ bool MythTextInputDialog::Create(void)
     MythUIButton *cancelButton = dynamic_cast<MythUIButton *>
                                          (GetChild("cancel"));
 
-    if (!m_textEdit || !okButton)
+    if (!m_textEdit || !messageText || !okButton)
         return false;
 
     if (cancelButton)
@@ -155,8 +240,7 @@ bool MythTextInputDialog::Create(void)
     m_textEdit->SetFilter(m_filter);
     //m_textEdit->SetIsPassword(m_isPassword);
 
-    if (messageText)
-        messageText->SetText(m_message);
+    messageText->SetText(m_message);
     okButton->SetText(tr("Ok"));
 
     BuildFocusList();
@@ -164,9 +248,24 @@ bool MythTextInputDialog::Create(void)
     return true;
 }
 
+void MythTextInputDialog::SetReturnEvent(MythScreenType *retscreen,
+                                         const QString &resultid)
+{
+    m_retScreen = retscreen;
+    m_id = resultid;
+}
+
 void MythTextInputDialog::sendResult()
 {
     QString inputString = m_textEdit->GetText();
     emit haveResult(inputString);
+
+    if (m_retScreen)
+    {
+        DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
+                                                            inputString, NULL);
+        QApplication::postEvent(m_retScreen, dce);
+    }
+
     Close();
 }
