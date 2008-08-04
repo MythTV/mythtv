@@ -47,7 +47,7 @@ $| = 1; # autoflush stdout;
                           # (included below). This is the last version that is
                           # Qt 3 based. Qt 4 merges began immediately after.
 #my $SVNRELEASE = '17190'; # Recent 0-21-fixes
-my $SVNRELEASE = '17688'; # Recent trunk
+my $SVNRELEASE = '18010'; # Recent trunk
 #my $SVNRELEASE = 'HEAD'; # If you are game, go forth and test the latest!
 
 
@@ -108,6 +108,7 @@ if (defined $opt{b}) {
     my @num = split /\./, $version;
     $svnlocation = "branches/release-$num[0]-$num[1]-fixes";
     print "NOT using SVN 'trunk', using '$svnlocation'\n";
+    
 } else {
     $svnlocation = "trunk";
 }
@@ -141,6 +142,10 @@ print "\tSVN location is: $svnlocation\n\tSVN revision is: $SVNRELEASE\n\n";
 print "Press [enter] to continue, or [ctrl]-c to exit now....\n";
 getc();
 
+# Used to test if we the same basic build type/layout as previously.
+my $is_same = "$compile_type-$svnlocation-$qtver.same";
+$is_same =~ s#/#-#g; # don't put dir slashes in a filename! 
+
 # this list defines the components to build , to build everything, leave as-is
 my @components = ( 'mythtv', 'myththemes', 'mythplugins' );
 
@@ -151,7 +156,8 @@ my @components = ( 'mythtv', 'myththemes', 'mythplugins' );
 #      unless $ENV{SOURCES};
 #  my $sources = $ENV{SOURCES};
 # TODO - although theoretically possible to change these paths,
-#        it has NOT been tested much, and will with HIGH PROBABILITY fail somewhere. 
+#        it has NOT been tested much,
+#        and will with HIGH PROBABILITY fail somewhere. 
 #      - Only $mingw is tested and most likely is safe to change.
 
 # Perl compatible paths. DOS style, but forward slashes, and must end in slash:
@@ -571,7 +577,7 @@ if ($package == 1) {
 # successful (not necessarily true, but it's a start) but this requires that
 # the .tar.gz didn't come with a Makefile in it.
 
-# Most of these look for a Makefile as a sign that the ./configure was successful 
+# Most of these look for a Makefile as a sign that ./configure was successful 
 # (not necessarily true, but it's a start)
 # but this requires that the .tar.gz didn't come with a Makefile in it.
 push @{$expect},
@@ -583,16 +589,17 @@ push @{$expect},
 [ file    => $sources.'freetype-2.3.5/Makefile_', 
   shell   => ["cd $unixsources/freetype-2.3.5",
               "./configure --prefix=/mingw",
-              "touch $unixsources/freetype-2.3.5/Makefile_"] ],
+              "touch $unixsources/freetype-2.3.5/Makefile_"],
+  comment => 'building freetype' ],
               
 # here's an example of specifying the make and make install steps separately, 
 # for apps that can't be relied on to have the make step work!
 [ file    => $sources.'freetype-2.3.5/objs/.libs/libfreetype.a', 
   shell   => ["cd $unixsources/freetype-2.3.5",
-              "make"] ],
+              "make"],comment => 'checking freetype' ],
 [ file    => $mingw.'lib/libfreetype.a', 
   shell   => ["cd $unixsources/freetype-2.3.5",
-              "make install"] ],
+              "make install"],comment => 'installing freetype' ],
 # Test of checking only for the end result - libfreetype.a
 # [ file => $mingw.'lib/libfreetype.a', shell => ["cd $unixsources/freetype-2.3.5","make install"] ],
 [ file    => $mingw.'bin/libfreetype-6.dll', 
@@ -602,33 +609,46 @@ push @{$expect},
   fetch   => 'http://'.$sourceforge.'/sourceforge/lame/lame-3.97.tar.gz'],
 [ dir     => $sources.'lame-3.97', 
   extract => $sources.'lame-3.97.tar' ],
-[ file    => $sources.'lame-3.97/Makefile', 
+[ file    => $mingw.'lib/libmp3lame.a', 
   shell   => ["cd $unixsources/lame-3.97",
               "./configure --prefix=/mingw",
               "make",
-              "make install"] ],
+              "make install"],
+  comment => 'building and installing: mingw lame' ],
+[ file    => $msys.'lib/libmp3lame.a', 
+  shell   => ["cd $unixsources/lame-3.97",
+              "./configure --prefix=/usr",
+              "make",
+              "make install"],comment => 'building and installing: msys lame' ],
 
 [ archive => $sources.'libmad-0.15.1b.tar.gz',  
   fetch   => 'http://'.$sourceforge.'/sourceforge/mad/libmad-0.15.1b.tar.gz'],
 [ dir     => $sources.'libmad-0.15.1b', 
   extract => $sources.'libmad-0.15.1b.tar' ],
-[ file    => $sources.'libmad-0.15.1b/Makefile', 
+[ file    => $msys.'lib/libmad.a', 
   shell   => ["cd $unixsources/libmad-0.15.1b",
               "./configure --prefix=/usr",
               "make",
-              "make install"] ],
+              "make install"],comment => 'building and installing: libmad' ],
 
 [ archive => $sources.'taglib-1.4.tar.gz',  
   fetch   => 'http://developer.kde.org/~wheeler/files/src/taglib-1.4.tar.gz'],
 [ dir     => $sources.'taglib-1.4', 
   extract => $sources.'taglib-1.4.tar' ],
-[ file    => $sources.'taglib-1.4/Makefile', 
+[ file    => $mingw.'lib/libtag.a', 
   shell   => ["cd $unixsources/taglib-1.4",
-              "./configure --prefix=/mingw",
+              "./configure --prefix=/mingw --disable-fast-perl", # or we get cranky INSTALL macro's in all the the generated Makefiles
               "make",
-              "make install"] ],
-# TODO tweak makefiles:
-# INSTALL = C:/msys/1.0/bin/install -c -p
+              "make install"],
+  comment => 'building and installing: mingw taglib' ],
+[ file    => $msys.'lib/libtag.a', 
+  shell   => ["cd $unixsources/taglib-1.4",
+              "./configure --prefix=/usr --disable-fast-perl", # or we get cranky INSTALL macro's in all the the generated Makefiles
+              "make",
+              "make install"],
+  comment => 'building and installing: msys taglib' ],
+
+# --disable-fast-perl fixes makefiles that otherwise have bits like below:
 # INSTALL = ../C:/msys/1.0/bin/install -c -p
 # INSTALL = ../../C:/msys/1.0/bin/install -c -p
 
@@ -637,31 +657,31 @@ push @{$expect},
   fetch   => 'http://downloads.xiph.org/releases/ao/libao-0.8.8.tar.gz'],
 [ dir     => $sources.'libao-0.8.8', 
   extract => $sources.'libao-0.8.8.tar' ],
-[ file    => $sources.'libao-0.8.8/Makefile', 
+[ file    => $msys.'bin/libao-2.dll',  # test for successfull completion of the LAST step (ie the make install), not the first one. :-)
   shell   => ["cd $unixsources/libao-0.8.8",
               "./configure --prefix=/usr",
               "make",
-              "make install"] ],
+              "make install"],comment => 'building and installing: libao' ],
 
 [ archive => $sources.'libogg-1.1.3.tar.gz',  
   fetch   => 'http://downloads.xiph.org/releases/ogg/libogg-1.1.3.tar.gz'],
 [ dir     => $sources.'libogg-1.1.3', 
   extract => $sources.'libogg-1.1.3.tar' ],
-[ file    => $sources.'libogg-1.1.3/Makefile', 
+[ file    => $msys.'bin/libogg-0.dll', 
   shell   => ["cd $unixsources/libogg-1.1.3",
               "./configure --prefix=/usr",
               "make",
-              "make install"] ],
+              "make install"],comment => 'building and installing: libogg' ],
 
 [ archive => $sources.'libvorbis-1.2.0.tar.gz',  
   fetch   => 'http://downloads.xiph.org/releases/vorbis/libvorbis-1.2.0.tar.gz'],
 [ dir     => $sources.'libvorbis-1.2.0', 
   extract => $sources.'libvorbis-1.2.0.tar' ],
-[ file    => $sources.'libvorbis-1.2.0/Makefile', 
+[ file    => $msys.'lib/libvorbis.a', 
   shell   => ["cd $unixsources/libvorbis-1.2.0",
               "./configure --prefix=/usr --disable-shared",
               "make",
-              "make install"] ],
+              "make install"],comment => 'building and installing: libvorbis' ],
 
 
 [ archive => $sources.'flac-1.2.1.tar.gz',  
@@ -670,8 +690,41 @@ push @{$expect},
   extract => $sources.'flac-1.2.1.tar' ],
 [ grep    => ['\#define SIZE_T_MAX UINT_MAX',$mingw.'include/limits.h'], 
   shell   => "echo \\#define SIZE_T_MAX UINT_MAX >> $mingw/include/limits.h" ], 
-[ file    => $sources.'flac-1.2.1/Makefile', 
-  shell   => ["cd $unixsources/flac-1.2.1","./configure --prefix=/mingw","make","make install"] ],
+[ file    => $mingw.'lib/libFLAC.a', 
+  shell   => ["cd $unixsources/flac-1.2.1",
+              "./configure --prefix=/mingw",
+              "make",
+              "make install"],
+  comment => 'building and installing: mingw flac/FLAC' ],
+[ file    => $msys.'lib/libFLAC.a', 
+  shell   => ["cd $unixsources/flac-1.2.1",
+              "./configure --prefix=/usr",
+              "make",
+              "make install"],
+  comment => 'building and installing: msys flac/FLAC' ],
+ 
+ 
+[ archive => $sources.'libcdaudio-0.99.12p2.tar.gz',
+  fetch   => 'http://'.$sourceforge.'/sourceforge/libcdaudio/libcdaudio-0.99.12p2.tar.gz'],
+[ dir     => $sources.'libcdaudio-0.99.12p2', 
+  extract => $sources.'libcdaudio-0.99.12p2.tar' ],
+
+[ archive => $sources.'libcdaudio-0.99.12p2-WIN32-support.patch',  
+  fetch   => 'http://sourceforge.net/tracker/download.php?group_id=27134&atid=389444&file_id=286748&aid=2035008'],
+  
+[ grep => ['ifdef __WIN32', $sources.'libcdaudio-0.99.12p2/src/cddb.c'], 
+  shell => ["cd ".$sources.'libcdaudio-0.99.12p2',
+            "patch -p1 < ".$unixsources.
+             'libcdaudio-0.99.12p2-WIN32-support.patch'] ],
+ 
+[ file    => $msys.'bin/libcdaudio-config', 
+  shell   => ["cd ".$unixsources."libcdaudio-0.99.12p2",
+              "./configure --prefix=/usr",
+              "make",
+              "make install"],
+  comment => 'building and installing:  libcdaudio' ],  
+  
+#[ pause => 'flac, taglib, lame all done.... press [enter] to continue !'],
 
 # skip doing pthreads from source, we use binaries that were fetched earlier:
 #[ archive => $sources.'pthreads-w32-2-8-0-release.tar.gz',  
@@ -687,7 +740,7 @@ push @{$expect},
   shell   => ["cd $unixsources/SDL-1.2.12",
               "./configure --prefix=/usr",
               "make",
-              "make install"] ],
+              "make install"],comment => 'building and installing: SDL' ],
 
 [ archive => $sources.'tiff-3.8.2.tar.gz',  
   fetch   => 'ftp://ftp.remotesensing.org/pub/libtiff/tiff-3.8.2.tar.gz'],
@@ -697,7 +750,7 @@ push @{$expect},
   shell   => ["cd $unixsources/tiff-3.8.2",
               "./configure --prefix=/usr",
               "make",
-              "make install"] ],
+              "make install"],comment => 'building and installing: TIFF' ],
 
 [ archive => $sources.'libexif-0.6.16.tar.gz',  
   fetch   => 'http://'.$sourceforge.'/sourceforge/libexif/libexif-0.6.16.tar.gz'],
@@ -707,7 +760,7 @@ push @{$expect},
   shell   => ["cd $unixsources/libexif-0.6.16",
               "./configure --prefix=/usr",
               "make",
-              "make install"] ],
+              "make install"],comment => 'building and installing: libexif' ],
 
 [ archive => $sources.'libvisual-0.4.0.tar.gz',  
   fetch   => 'http://'.$sourceforge.'/sourceforge/libvisual/libvisual-0.4.0.tar.gz'],
@@ -717,22 +770,27 @@ push @{$expect},
   shell  => ["cd $unixsources/libvisual-0.4.0",
              "./configure --prefix=/usr",
              "make",
-             "make install"] ],
+             "make install"],comment => 'building and installing: libvisual' ],
 
 [ archive => $sources.'fftw-3.1.2.tar.gz',  
   fetch   => 'http://www.fftw.org/fftw-3.1.2.tar.gz'],
 [ dir     => $sources.'fftw-3.1.2', 
   extract => $sources.'fftw-3.1.2.tar' ],
-[ file    => $sources.'fftw-3.1.2/Makefile', 
+[ file    => $msys.'lib/libfftw3.a', 
+  shell  => ["cd $unixsources/fftw-3.1.2",
+             "./configure --prefix=/usr",
+             "make",
+             "make install"],comment => 'building and installing: msys fftw' ],
+[ file    => $mingw.'lib/libfftw3.a', 
   shell  => ["cd $unixsources/fftw-3.1.2",
              "./configure --prefix=/mingw",
              "make",
-             "make install"] ],
+             "make install"],comment => 'building and installing: mingw fftw' ],
 
 # typical template:
 #[ archive => $sources.'xxx.tar.gz',  fetch => ''],
 #[ dir => $sources.'xxx', extract => $sources.'xxx.tar' ],
-#[ file => $sources.'xxx/Makefile', 
+#[ file => $msys.'lib/something-xx.a', 
 #  shell => ["cd $unixsources/xxx",
 #            "./configure --prefix=/usr",
 #            "make",
@@ -743,19 +801,24 @@ push @{$expect},
 #
 
 ;
+
 if ( $qtver == 3  ) {
 push @{$expect}, 
 
-[ pause => 'press [enter] to build QT3 next!'],
+#[ pause => 'press [enter] to build QT3 next!'],
 [ archive => $sources.'qt-3.3.x-p8.tar.bz2',  
   fetch => 'http://'.$sourceforge.'/sourceforge/qtwin/qt-3.3.x-p8.tar.bz2'],
 [ dir => $msys.'qt-3.3.x-p8', extract => [$sources.'qt-3.3.x-p8.tar', $msys] ],
 
 
 # equivalent patch:
-[ archive => $sources.'qt.patch' , 'fetch' => 'http://tanas.ca/qt.patch',comment => ' patch the QT sources'],
-[ filesame => [$msys.'qt-3.3.x-p8/qt.patch',$sources."qt.patch"], copy => [''=>''] ],
-[ grep => ["\-lws2_32", $msys.'qt-3.3.x-p8/mkspecs/win32-g++/qmake.conf'], shell => ["cd ".$unixmsys."qt-3.3.x-p8/","patch -p1 < qt.patch"] ],
+[ archive => $sources.'qt.patch' ,
+  fetch   => 'http://tanas.ca/qt.patch',
+  comment => ' patch the QT sources'],
+[ filesame => [$msys.'qt-3.3.x-p8/qt.patch',$sources."qt.patch"],
+  copy     => [''=>''] ],
+[ grep  => ["\-lws2_32", $msys.'qt-3.3.x-p8/mkspecs/win32-g++/qmake.conf'],
+  shell => ["cd ".$unixmsys."qt-3.3.x-p8/","patch -p1 < qt.patch"] ],
 
 
 [ file => $msys.'bin/sh_.exe',
@@ -763,7 +826,8 @@ push @{$expect},
  comment => 'rename msys sh.exe out of the way before building QT! ' ] ,
 
 # write a batch script for the QT environment under DOS:
-[ file => $msys.'qt-3.3.x-p8/qt3_env.bat', write => [$msys.'qt-3.3.x-p8/qt3_env.bat',
+[ file  => $msys.'qt-3.3.x-p8/qt3_env.bat',
+  write => [$msys.'qt-3.3.x-p8/qt3_env.bat',
 'rem a batch script for the QT environment under DOS:
 set QTDIR='.$dosmsys.'qt-3.3.x-p8
 set MINGW='.$dosmingw.'
@@ -774,12 +838,17 @@ cd %QTDIR%
 ],comment=>'write a batch script for the QT3 environment under DOS'],
 
 
-[ file => $msys.'qt-3.3.x-p8/lib/libqt-mt3.dll', exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && configure.bat -thread -plugin-sql-mysql -opengl -no-sql-sqlite',comment => 'Execute qt3_env.bat  && the configure command to actually build QT now!  - ie configures qt and also makes it, hopefully! WARNING SLOW (MAY TAKE HOURS!)' ],
+[ file => $msys.'qt-3.3.x-p8/lib/libqt-mt3.dll', 
+  exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && configure.bat -thread -plugin-sql-mysql -opengl -no-sql-sqlite',
+  comment => 'Execute qt3_env.bat  && the configure command to actually build QT now!  - ie configures qt and '.
+             'also makes it, hopefully! WARNING SLOW (MAY TAKE HOURS!)' ],
 [ exists => $mingw.'bin/sh.exe',
    shell => ["mv ".$unixmingw."bin/sh.exe ".$unixmingw."bin/sh_.exe"],
  comment => 'rename mingw sh.exe out of the way before building QT! ' ] ,
 
-[ filesame => [$msys.'qt-3.3.x-p8/bin/libqt-mt3.dll',$msys.'qt-3.3.x-p8/lib/libqt-mt3.dll'], copy => [''=>''], comment => 'is there a libqt-mt3.dll in the "lib" folder of QT? if so, copy it to the the "bin" folder for uic.exe to use!' ],
+[ filesame => [$msys.'qt-3.3.x-p8/bin/libqt-mt3.dll',$msys.'qt-3.3.x-p8/lib/libqt-mt3.dll'], 
+  copy => [''=>''], 
+  comment => 'is there a libqt-mt3.dll in the "lib" folder of QT? if so, copy it to the the "bin" folder for uic.exe to use!' ],
 
 # did the configure finish?  - run mingw32-make to get it to finish
 # properly.
@@ -787,19 +856,16 @@ cd %QTDIR%
 #[ file => $msys.'qt-3.3.x-p8/examples/xml/tagreader-with-features/tagreader-with-features.exe', exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make',comment => 'we try to finish the build of QT with mingw32-make, incase it was just a build dependancy issue? WARNING SLOW (MAY TAKE HOURS!)' ],
 
 # TODO - do we have an action we can take to build just this one file/dll if it fails?  
-# For now, we will just test if it built, and abort if it didn't!
-[ file => $msys.'qt-3.3.x-p8/plugins/sqldrivers/libqsqlmysql.dll', exec => '', comment => 'lib\libqsqlmysql.dll - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed ( is the sql driver built properly?) '],
-[ file => $msys.'qt-3.3.x-p8/bin/qmake.exe', exec => '', comment => 'bin\qmake.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
-[ file => $msys.'qt-3.3.x-p8/bin/moc.exe', exec => '', comment => 'bin\moc.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
-[ file => $msys.'qt-3.3.x-p8/bin/uic.exe', exec => '', comment => 'bin\uic.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
+# For now, we will just test if it built, and try to run 'make' again if it didn't!
+[ file => $msys.'qt-3.3.x-p8/plugins/sqldrivers/libqsqlmysql.dll',  exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make -j', comment => 'lib\libqsqlmysql.dll - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed ( is the sql driver built properly?) '],
+[ file => $msys.'qt-3.3.x-p8/bin/qmake.exe', exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make', comment => 'bin\qmake.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
+[ file => $msys.'qt-3.3.x-p8/bin/moc.exe', exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make', comment => 'bin\moc.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
+[ file => $msys.'qt-3.3.x-p8/bin/uic.exe', exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make', comment => 'bin\uic.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
+[ file => $msys.'qt-3.3.x-p8/lib/libqt-mt3.dll', exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make',comment => 'bin\libqt-mt3.dll - - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed' ],
 
-
-# TODO "make install" qt - where to?, will this work? (not sure, it
-# sometimes might, but it's not critical?)
-#[ file => $msys.'qt-3.3.x-p8/lib/libqt-mt3.dll', exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make install',comment => 'install QT' ],
 # a manual method for "installing" QT would be to put all the 'bin' files
 # into /mingw/bin and similarly for the 'lib' and 'include' folders to their
-# respective mingw folders?:
+# respective mingw folders, but we don't.  we run it from the build location!
 
 
 #  (back to sh.exe ) now that we are done !
@@ -817,13 +883,11 @@ cd %QTDIR%
 
 # 
 #----------------------------------------
-# building QT4 is complicated too, but hopefully less so:
-#
+# building QT4 is complicated too
 #----------------------------------------
-
 if ( $qtver == 4  ) {
 push @{$expect}, 
-[ pause => 'press [enter] to extract and patch QT4 next!'],
+#[ pause => 'press [enter] to extract and patch QT4 next!'],
 
 [ archive => $sources.'qt-win-opensource-src-4.4.0.zip',  
   fetch => 'http://ftp.ntua.gr/pub/X11/Qt/qt/source/qt-win-opensource-src-4.4.0.zip'],
@@ -950,7 +1014,7 @@ push @{$expect},
   shell => ['cd '.$unixmsys, 'patch -p0 < '.$sources.'qt-4.4.0.patch4'] ],
 
 
-[ pause => 'press [enter] to build QT4 !'],
+#[ pause => 'press [enter] to build QT4 !'],
 
 # qt recommend NOT having sh.exe in the path when building QT (yes this applies to QT4 too!)
 [ file   => $msys.'bin/sh_.exe',
@@ -1033,17 +1097,29 @@ copy libqtmain.a     libqtmaind.a
   comment => 'rename mingw sh_.exe back again!' ] ,
 
 ;
+} # end of QT4 install
 
-}
+
+push @{$expect},
+#----------------------------------------
+# is the build type we are doing basically the same as any previous one?
+# if not, we must cleanup our build and SVN area BEFORE we try to do any SVN activities! 
+#----------------------------------------
+# $compile_type, $svnlocation, and $qtver changing are all good reasons to cleanup the build area:
+# later on, we'll also see if the $SVNRELEASE has changed, and triger on that to....
+[ file  => $mythtv.$is_same,
+  shell   => ['source '.$unixmythtv.'make_clean.sh',
+    	      #'rm -f '.$unixmythtv.'*.same',
+              #'touch '.$unixmythtv.$is_same,
+              'nocheck' ],
+  comment => 'cleaning environment' ],
 
 
 #----------------------------------------
 # get mythtv sources, if we don't already have them
 # download all the files from the web, and save them here:
 #----------------------------------------
-push @{$expect}, 
-
-[ dir => $mythtv.'mythtv', mkdirs => $mythtv.'mythtv' ],
+[ dir => $mythtv.'mythtv', mkdirs => $mythtv.'mythtv' , comment => 'make myth dir'],
 
 
 # if we dont have the sources at all, get them all from SVN!
@@ -1059,7 +1135,9 @@ foreach my $comp( @components ) {
              "http://svn.mythtv.org/svn/$svnlocation/$comp $dosmythtv$comp",
              'nocheck'],
     comment => "Get all the mythtv sources from SVN!:$comp" ];
+
 }
+
 
 push @{$expect}, 
 # now lets write some build scripts to help with mythtv itself
@@ -1082,23 +1160,39 @@ export PATH=$QTDIR/bin:/usr/local/bin:$PATH
 ' ],comment => 'write a QT4 script that we can source later when inside msys to setup the environment variables'],
 
 
-[ file => $mythtv.'make_clean.sh', write => [$mythtv.'make_clean.sh',
-' 
+[ always => [], write => [$mythtv.'make_clean.sh',
+'source '.$unixmythtv.'qt'.$qtver.'_env.sh
 rm -f /usr/bin/myth*.exe
 rm -f /usr/bin/libmyth*.dll
 rm -f /usr/lib/libmyth*.*
+rm -f /usr/lib/liblibmyth*.*
 rm -fr /usr/include/mythtv
 rm -fr /usr/lib/mythtv
 rm -fr /usr/share/mythtv
 rm -fr /lib/mythtv
 rm -f /usr/bin/mtd.exe
 rm -f /usr/bin/ignyte.exe
-rm -f '.$mythtv.'delete_to_do_make_clean.txt']
+cd '.$unixmythtv.'mythtv
+make clean
+cd '.$unixmythtv.'mythplugins
+make clean
+cd '.$unixmythtv.'myththemes
+make clean
+cd '.$unixmythtv.'
+find . -type f -name \*.dll | xargs -n1 rm
+find . -type f -name \*.exe | grep -v setup | xargs -n1 rm
+find . -type f -name \*.a | xargs -n1 rm
+find . -type f -name \*.o | xargs -n1 rm
+find . -type f -name Makefile\.* | grep -v svn | xargs -n1 rm
+find . -type f -name moc_\*.cpp |  grep -v svn | xargs -n1 rm
+rm -rf '.$unixmythtv.'mythtv/libs/libmythdb
+rm -f '.$mythtv.'delete_to_do_make_clean.txt
+']
 , comment => 'write a script to clean up myth environment'],
 
 
 # chmod the shell scripts, everytime
-[ always => [] , shell => ["cd $mythtv","chmod 755 *.sh"] ],
+[ always => [] , shell => ["cd $mythtv","chmod 775 *.sh"] ],
 
 #----------------------------------------
 # now we prep for the build of mythtv! 
@@ -1111,13 +1205,42 @@ if ($makeclean) {
     comment => 'cleaning environment'],
   ;
 }
-# SVN update every time, before patches
+
 foreach my $comp( @components ) {
-  push @{$expect}, 
+
+# switch to the correct SVN branch before we do anything,
+# if we are on the wrong one...
+  push @{$expect},
+  #[ file  => $mythtv.$is_same,
+  [ always => '',
+    exec => [ "$dosmsys\\bin\\svn cleanup $dosmythtv$comp",
+             'nocheck'],
+    comment => " SVN cleanup:$comp" ],
+    
+  #[ file  => $mythtv.$is_same,
+  [ always => '',
+    exec => [ "$dosmsys\\bin\\svn switch ".
+             "http://svn.mythtv.org/svn/$svnlocation/$comp $dosmythtv$comp",
+             'nocheck'],
+    comment => " SVN SWITCH BRANCH!:$comp" ],
+    
+  # if we don't have the needed indicator of the branch we are now on,
+  # save that info...
+  [ file  => $mythtv.$is_same,
+  shell   => ['rm -f '.$unixmythtv.'*.same',
+              'touch '.$unixmythtv.$is_same,
+             ],
+  comment => 'cleaning environment' ], 
+
+  #[ pause => 'press [enter] to continue !'],
+
+# ... then SVN update every time, before patches
+
   [ always  => [],
     exec    => [$dosmsys."bin\\svn.exe -r $SVNRELEASE update $dosmythtv$comp"],
     comment => "Getting SVN updates for:$comp on $svnlocation" ];
 }
+
 push @{$expect}, 
 
 # always get svn num 
@@ -1133,12 +1256,15 @@ push @{$expect},
 # is svn num (ie file contents) changed since last run, if so, do a 'make
 # clean' (overkill, I know, but safer)!
 [ filesame => [$mythtv.'mythtv\svn_info.txt',$mythtv.'mythtv\svn_info.new'], 
-  shell => ['rm -f '.$unixmythtv.'delete_to_do_make_clean.txt',
+  shell => ['source '.$unixmythtv.'make_clean.sh',
             'touch '.$unixmythtv.'mythtv/last_build.txt',
             'cat '.$unixmythtv.'mythtv/svn_info.new >'.$unixmythtv.'mythtv/svn_info.txt',
             'touch -r '.$unixmythtv.'mythtv/svn_info.txt '.$unixmythtv.'mythtv/svn_info.new'], 
   comment => 'if the SVN number is changed, then remember that, AND arrange for a full re-make of mythtv. (overkill, I know, but safer)' ], 
 
+
+#  [ pause => 'press [enter] to continue !'],
+  
 # apply any outstanding win32 patches - this section will be hard to keep upwith HEAD/SVN:
 #----------------------------------------
 # expired patches
@@ -1218,18 +1344,32 @@ push @{$expect},
 [ file    => $mythtv.'mythtv/config/config.pro',
   shell   => ['touch '.$unixmythtv.'mythtv/config/config.pro'], 
   comment => 'create an empty config.pro or the mythtv build will fail'],
-
-# do a make clean (nd re-configure) before going any further?
+;
+# do a make clean before going any further?
 # Yes, if the SVN revision has changed (it deleted the file for us),
 #  or the user deleted the file manually, to request it. 
+# ...to do a full clean-up of a prevous build, a bit more than a 'make clean' can be required:
+foreach my $comp( @components ) {
+  push @{$expect}, 
+  [ file    => $mythtv.'delete_to_do_make_clean.txt',
+    exec    => [$dosmsys."bin\\svn.exe -R revert $dosmythtv$comp", "nocheck"],
+    comment => "reverting any local MODS from SVN - $comp on $svnlocation" ],
+    
+# this is now done as part of make_clean.sh, which happens EARLIER in the process, prior to any possible SVN branch changes! 
+#  [ file    => $mythtv.'delete_to_do_make_clean.txt',
+#    shell   =>['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
+#              'cd '.$unixmythtv.$comp,
+#              'make clean',
+#              'rm Makefile',
+#              'nocheck']
+#  ];
+}
+push @{$expect}, 
+
 [ file    => $mythtv.'delete_to_do_make_clean.txt',
-  shell   => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
-              'cd '.$unixmythtv.'mythtv','make clean',
-              'find . -type f -name \*.dll | grep -v build | xargs -n1 rm',
-              'find . -type f -name \*.a | grep -v build | xargs -n1 rm',
-              'rm Makefile',
-              'touch '.$unixmythtv.'delete_to_do_make_clean.txt','nocheck'],
+  shell   => ['touch '.$unixmythtv.'delete_to_do_make_clean.txt'],
   comment => 'do a "make clean" first? not strictly necessary in all cases, and the build will be MUCH faster without it, but it is safer with it... ( we do a make clean if the SVN revision changes) '], 
+
 
 #broken Makefile?, delete it
 [  grep   => ['Makefile|MAKEFILE',$mythtv.'mythtv/Makefile'],
@@ -1335,6 +1475,7 @@ cp /mingw/bin/*.dll '.$unixmythtv.'build/bin
 cp /bin/msys-1.0.dll '.$unixmythtv.'build/bin
 echo copying lib files...
 mv '.$unixmythtv.'build/lib/*.dll '.$unixmythtv.'build/bin/
+mv '.$unixmythtv.'build/bin/*.a '.$unixmythtv.'build/lib/
 mv '.$unixmythtv.'build/lib/mythtv/filters/*.dll '.$unixmythtv.'build/bin/
 
 # because the install process failes to copy the .mak file (needed by the plugins), we copy it manually.
@@ -1519,13 +1660,16 @@ push @{$expect},
   shell   => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
              'cd '.$unixmythtv.'mythplugins',
              './configure --prefix='.$unixbuild.
-             ' --disable-mythgallery --disable-mythmusic'.
+             ' --disable-mythgallery --enable-mythmusic'.
              ' --disable-mytharchive --disable-mythbrowser --disable-mythflix'.
              ' --disable-mythgame --disable-mythnews --disable-mythphone'.
              ' --disable-mythzoneminder --disable-mythweb --enable-aac'.
              ' --enable-libvisual --enable-fftw --compile-type='.$compile_type,
              'touch '.$unixmythtv.'mythplugins/cleanup/cleanup.pro'], 
   comment => 'do we already have a Makefile for myth plugins?' ],
+  
+#[ pause => 'how does the mythplugins Makefile look? (did we get any errors on screen?)'],
+
 
 [ grep    => ['win32:DEPENDS', $mythtv.'mythplugins/settings.pro'], 
   shell   => ['echo \'win32:DEPENDS += ./\' >> '.$mythtv.'mythplugins/settings.pro','nocheck'], 
@@ -1538,24 +1682,24 @@ push @{$expect},
               'cp mythconfig2.mak mythconfig.mak', 'nocheck'], 
   comment => 'hack mythconfig.mak'],
 
-## make
-#[ newer => [$mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll',
-#            $mythtv.'mythtv/last_build.txt'], 
-#  shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
-#            'cd '.$unixmythtv.'mythplugins', $parallelMake], 
-#comment => 'PLUGINS! redo make if we need to (see the  last_build.txt identifier)' ],
+# make
+[ newer => [$mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll',
+            $mythtv.'mythtv/last_build.txt'], 
+  shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
+            'cd '.$unixmythtv.'mythplugins', $parallelMake], 
+comment => 'PLUGINS! redo make if we need to (see the  last_build.txt identifier)' ],
 
 # make cleanup/cleanup.pro as install fails without it
 [ file    => $mythtv.'mythplugins/cleanup/cleanup.pro', 
   shell   => ['touch '.$unixmythtv.'mythplugins/cleanup/cleanup.pro', 'nocheck'], 
   comment => 'make cleanup.pro'],
 
-## make install
-#[ newer => [$mythtv.'build/lib/mythtv/plugins/libmythmovies.dll',
-#            $mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll'],
-#  shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
-#            'cd '.$unixmythtv.'mythplugins','make install'],
-#comment => 'PLUGINS! make install' ],
+# make install
+[ newer => [$mythtv.'build/lib/mythtv/plugins/libmythmovies.dll',
+            $mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll'],
+  shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
+            'cd '.$unixmythtv.'mythplugins','make install'],
+comment => 'PLUGINS! make install' ],
 
 # Copy to build area
 #[ newer => [$mythtv.'build/lib/mythtv/plugins/libmythmovies.dll',$msys.'lib/mythtv/plugins/libmythmovies.dll'], shell => [$unixmythtv.'setup_plugins.sh'], comment => 'Copy mythplugins to ./build folder' ],
@@ -1892,6 +2036,7 @@ foreach my $dep ( @{$expect} ) {
         undef $mtime2;
         
     } elsif ( $causetype eq 'grep' ) {
+        print "grep-ing for pattern($cause[0]) in file($cause[1]):\n" if $NOISY >0;
         if ( ! _grep($cause[0],$cause[1]) ) { # grep actually needs two parameters on the source side of the action
             effect($effecttype,@nocheckeffectparams);   
         } else {
@@ -1902,6 +2047,7 @@ foreach my $dep ( @{$expect} ) {
         }
 
     } elsif ( $causetype eq 'exists' ) {
+        print "testing if '$cause[0]' exists...\n" if $NOISY >0;
         if ( -e $cause[0] ) {
             effect($effecttype,@nocheckeffectparams);
         }
@@ -2152,7 +2298,7 @@ sub perl2dos {
 sub _grep {
     my ($pattern,$file) = @_;
     #$pattern = qw($pattern);
-    print "grep-ing for pattern($pattern) in file($file)\n";
+    
     my $fh = IO::File->new("< $file");
     unless ( $fh) { print "WARNING: Unable to read file ($file) when searching for pattern:($pattern), assumed to NOT match pattern\n";  return 0; }
     my $found = 0;
