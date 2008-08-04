@@ -415,28 +415,27 @@ void MythUITextEdit::CopyFrom(MythUIType *base)
         return;
     }
 
+    m_Message = "";
+    m_Position = -1;
+
     m_blinkInterval = textedit->m_blinkInterval;
     m_cursorBlinkRate = textedit->m_cursorBlinkRate;
     m_showCursor = textedit->m_showCursor;
     m_maxLength = textedit->m_maxLength;
     m_Justification = textedit->m_Justification;
     m_PaddingMargin = textedit->m_PaddingMargin;
-    m_Message = textedit->m_Message;
-    m_Position = textedit->m_Position;
     m_Filter = textedit->m_Filter;
 
     MythUIType::CopyFrom(base);
 
     m_backgroundImage = dynamic_cast<MythUIImage *>
-                    (GetChild("backgroundimage"));
-    m_Text = dynamic_cast<MythUIText *>
-                (GetChild("textarea"));
-    m_cursorImage = dynamic_cast<MythUIImage *>
-                    (GetChild("cursorimage"));
+                                            (GetChild("backgroundimage"));
+    m_Text = dynamic_cast<MythUIText *> (GetChild("textarea"));
+    m_cursorImage = dynamic_cast<MythUIImage *> (GetChild("cursorimage"));
 }
 
 void MythUITextEdit::CreateCopy(MythUIType *parent)
 {
-    MythUITextEdit *textedit = new MythUITextEdit(parent, objectName());
+    MythUITextEdit *textedit = new MythUITextEdit(parent, objectName(), false);
     textedit->CopyFrom(this);
 }
