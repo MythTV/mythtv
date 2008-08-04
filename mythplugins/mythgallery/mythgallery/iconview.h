@@ -75,6 +75,7 @@ class IconView : public MythScreenType
     void HandleSubMenuMark(void);
     void HandleSubMenuFile(void);
 
+  private slots:
     void HandleRotateCW(void);
     void HandleRotateCCW(void);
     void HandleDeleteCurrent(void);
@@ -92,9 +93,14 @@ class IconView : public MythScreenType
     void HandleMkDir(void);
     void HandleRename(void);
 
+    void DoMkDir(QString folderName);
+    void DoDeleteMarked(bool doDelete);
+
+  private:
     void LoadThumbnail(ThumbItem *item);
     void ImportFromDir(const QString &fromDir, const QString &toDir);
     void CopyMarkedFiles(bool move = false);
+    void ShowOKDialog(const QString &message, const char *slot, bool showCancel = false);
 
     Q3PtrList<ThumbItem> m_itemList;
     Q3Dict<ThumbItem>    m_itemDict;
@@ -105,6 +111,7 @@ class IconView : public MythScreenType
     MythUIButtonList   *m_imageList;
     MythUIText         *m_captionText;
     MythDialogBox      *m_menuPopup;
+    MythScreenStack    *m_popupStack;
 
     bool                m_isGallery;
     bool                m_showDevices;

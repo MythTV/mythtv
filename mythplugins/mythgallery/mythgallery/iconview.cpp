@@ -88,6 +88,7 @@ IconView::IconView(MythScreenStack *parent, const char *name,
         return;
     }
 
+    m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 }
 
 IconView::~IconView()
@@ -730,13 +731,10 @@ void IconView::HandleMainMenu(void)
 {
     QString label = tr("Gallery Options");
 
-    MythScreenStack *popupStack =
-                            GetMythMainWindow()->GetStack("popup stack");
-
-    m_menuPopup = new MythDialogBox(label, popupStack, "mythgallerymenupopup");
+    m_menuPopup = new MythDialogBox(label, m_popupStack, "mythgallerymenupopup");
 
     if (m_menuPopup->Create())
-        popupStack->AddScreen(m_menuPopup);
+        m_popupStack->AddScreen(m_menuPopup);
 
     m_menuPopup->SetReturnEvent(this, "mainmenu");
 
@@ -761,13 +759,10 @@ void IconView::HandleSubMenuMetadata(void)
 {
     QString label = tr("Metadata Options");
 
-    MythScreenStack *popupStack =
-                            GetMythMainWindow()->GetStack("popup stack");
-
-    m_menuPopup = new MythDialogBox(label, popupStack, "mythgallerymenupopup");
+    m_menuPopup = new MythDialogBox(label, m_popupStack, "mythgallerymenupopup");
 
     if (m_menuPopup->Create())
-        popupStack->AddScreen(m_menuPopup);
+        m_popupStack->AddScreen(m_menuPopup);
 
     m_menuPopup->SetReturnEvent(this, "metadatamenu");
 
@@ -779,13 +774,10 @@ void IconView::HandleSubMenuMark(void)
 {
     QString label = tr("Marking Options");
 
-    MythScreenStack *popupStack =
-                            GetMythMainWindow()->GetStack("popup stack");
-
-    m_menuPopup = new MythDialogBox(label, popupStack, "mythgallerymenupopup");
+    m_menuPopup = new MythDialogBox(label, m_popupStack, "mythgallerymenupopup");
 
     if (m_menuPopup->Create())
-        popupStack->AddScreen(m_menuPopup);
+        m_popupStack->AddScreen(m_menuPopup);
 
     m_menuPopup->SetReturnEvent(this, "markingmenu");
 
@@ -797,13 +789,10 @@ void IconView::HandleSubMenuFile(void)
 {
     QString label = tr("File Options");
 
-    MythScreenStack *popupStack =
-                            GetMythMainWindow()->GetStack("popup stack");
-
-    m_menuPopup = new MythDialogBox(label, popupStack, "mythgallerymenupopup");
+    m_menuPopup = new MythDialogBox(label, m_popupStack, "mythgallerymenupopup");
 
     if (m_menuPopup->Create())
-        popupStack->AddScreen(m_menuPopup);
+        m_popupStack->AddScreen(m_menuPopup);
 
     m_menuPopup->SetReturnEvent(this, "filemenu");
 
@@ -1058,14 +1047,15 @@ void IconView::HandleDelete(void)
 
 void IconView::HandleDeleteMarked(void)
 {
-    bool cont = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),
-                    tr("Delete Marked Files"),
-                    QString(tr("Deleting %1 images and folders, including "
-                               "any subfolders and files."))
-                            .arg(m_itemMarked.count()),
-                    false);
+    QString msg = /*tr("Delete Marked Files") + "\n\n" +*/ 
+            tr("Deleting %1 images and folders, including "
+               "any subfolders and files.").arg(m_itemMarked.count());
+    ShowOKDialog(msg, SLOT(DoDeleteMarked(bool)), true);
+}
 
-    if (cont)
+void IconView::DoDeleteMarked(bool doDelete)
+{
+    if (doDelete)
     {
         QStringList::iterator it;
         QFileInfo fi;
@@ -1107,17 +1097,23 @@ void IconView::HandleMkDir(void)
 {
     QString folderName = tr("New Folder");
 
-    bool res = MythPopupBox::showGetTextPopup(
-        gContext->GetMainWindow(), tr("Create New Folder"),
-        tr("Create New Folder"), folderName);
+    QString message = tr("Create New Folder");
 
-    if (res)
-    {
-        QDir cdir(m_currDir);
-        cdir.mkdir(folderName);
+    MythTextInputDialog *dialog = new MythTextInputDialog(m_popupStack, message);
 
-        LoadDirectory(m_currDir);
-    }
+    if (dialog->Create())
+       m_popupStack->AddScreen(dialog);
+
+     connect(dialog, SIGNAL(haveResult(QString)),
+            SLOT(DoMkDir(QString)), Qt::QueuedConnection);
+}
+
+void IconView::DoMkDir(QString folderName)
+{
+    QDir cdir(m_currDir);
+    cdir.mkdir(folderName);
+
+    LoadDirectory(m_currDir);
 }
 
 
@@ -1148,10 +1144,7 @@ void IconView::HandleRename(void)
             else
                 msg = tr("Failed to rename file");
 
-//             DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), msg);
-//             dlg->AddButton(tr("OK"));
-//             dlg->exec();
-//             dlg->deleteLater();
+            ShowOKDialog(msg, NULL);
 
             return;
         }
@@ -1248,4 +1241,16 @@ void IconView::mediaStatusChanged(MediaStatus oldStatus,
 
         // UpdateText();
     }
+}
+
+void IconView::ShowOKDialog(const QString &message, const char *slot, bool showCancel)
+{
+    MythConfirmationDialog *dialog = new MythConfirmationDialog(
+            m_popupStack, message, showCancel);
+
+    if (dialog->Create())
+        m_popupStack->AddScreen(dialog);
+
+    if (slot)
+        connect(dialog, SIGNAL(haveResult(bool)), slot, Qt::QueuedConnection);
 }
