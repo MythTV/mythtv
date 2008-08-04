@@ -207,7 +207,7 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
             NextPrevWidgetFocus(false);
         else if (action == "RIGHT")
             NextPrevWidgetFocus(true);
-        if (action == "UP")
+        else if (action == "UP")
             NextPrevWidgetFocus(false);
         else if (action == "DOWN")
             NextPrevWidgetFocus(true);
