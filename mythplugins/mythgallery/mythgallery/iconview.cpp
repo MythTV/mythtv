@@ -99,8 +99,6 @@ IconView::IconView(MythScreenStack *parent, const char *name,
                    const QString &galleryDir, MythMediaDevice *initialDevice)
         : MythScreenType(parent, name)
 {
-    m_itemList.setAutoDelete(true);
-
     m_galleryDir = galleryDir;
 
     m_isGallery = false;
@@ -194,7 +192,10 @@ void IconView::LoadDirectory(const QString &dir)
     m_showDevices = false;
 
     m_currDir = d.absPath();
-    m_itemList.clear();
+
+    while (!m_itemList.isEmpty())
+        delete m_itemList.takeFirst();
+
     m_itemHash.clear();
     m_imageList->Reset();
 
@@ -202,8 +203,10 @@ void IconView::LoadDirectory(const QString &dir)
                                              false, &m_itemHash, m_thumbGen);
 
     ThumbItem *thumbitem;
-    for ( thumbitem = m_itemList.first(); thumbitem; thumbitem = m_itemList.next() )
+    for (int x = 0; x < m_itemList.size(); x++)
     {
+        thumbitem = m_itemList.at(x);
+
         thumbitem->InitCaption(m_showcaption);
         MythUIButtonListItem* item =
             new MythUIButtonListItem(m_imageList, thumbitem->GetCaption(), 0,
@@ -559,7 +562,7 @@ bool IconView::HandleMediaEscape(MediaMonitor *mon)
 
             if (item)
             {
-                int pos = m_itemList.find(item);
+                int pos = m_itemList.indexOf(item);
                 m_imageList->SetItemCurrent(pos);
             }
 
@@ -659,7 +662,7 @@ void IconView::customEvent(QEvent *event)
                 td->thumb = td->thumb.xForm(matrix);
             }
 
-            int pos = m_itemList.find(thumbitem);
+            int pos = m_itemList.indexOf(thumbitem);
 
             LoadThumbnail(thumbitem);
 
@@ -1027,7 +1030,9 @@ void IconView::HandleShowDevices(void)
 
     m_showDevices = true;
 
-    m_itemList.clear();
+    while (!m_itemList.isEmpty())
+        delete m_itemList.takeFirst();
+
     m_itemHash.clear();
 
     m_thumbGen->cancel();
@@ -1122,12 +1127,12 @@ void IconView::HandleClearMarked(void)
 void IconView::HandleSelectAll(void)
 {
     ThumbItem *item;
-    for (item = m_itemList.first(); item; item = m_itemList.next())
+    for (int x = 0; x < m_itemList.size(); x++)
     {
+        item = m_itemList.at(x);
+
         if (!m_itemMarked.contains(item->GetPath()))
-        {
             m_itemMarked.append(item->GetPath());
-        }
     }
 
     m_imageList->SetAllChecked(MythUIButtonListItem::FullChecked);

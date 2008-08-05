@@ -5,10 +5,9 @@
 
 // Qt headers
 #include <q3deepcopy.h>
-#include <qstring.h>
-#include <q3ptrlist.h>
-#include <q3dict.h>
-//Added by qt3to4:
+#include <QString>
+#include <QList>
+#include <QHash>
 #include <QPixmap>
 
 class MythMediaDevice;
@@ -66,7 +65,7 @@ class ThumbItem
     QPixmap *m_pixmap;
     MythMediaDevice *m_mediaDevice;
 };
-typedef Q3PtrList<ThumbItem> ThumbList;
+typedef QList<ThumbItem*> ThumbList;
 typedef QHash<QString, ThumbItem*>    ThumbHash;
 
 #endif // _THUMBVIEW_H_

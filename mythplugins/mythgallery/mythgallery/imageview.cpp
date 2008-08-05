@@ -19,7 +19,6 @@
  * ============================================================ */
 
 // Qt headers
-#include <q3ptrlist.h>
 #include <QDir>
 
 // MythTV plugin headers
@@ -72,32 +71,30 @@ ImageView::ImageView(const ThumbList &itemList,
 
     bool recurse = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
 
-    m_itemList.setAutoDelete(false);
-
     ThumbItem *origItem = NULL;
-    if ((uint)m_pos < m_itemList.count())
+    if (m_pos < m_itemList.size())
         origItem = m_itemList.at(m_pos);
 
-    // remove all dirs from m_itemList;
-    ThumbItem *item = m_itemList.first();
-    while (item)
+    // FIXME this looks wrong
+    //remove all dirs from m_itemList;
+    ThumbItem *item;
+    for (int x = 0; x < m_itemList.size(); x++)
     {
-        ThumbItem *next = m_itemList.next();
+        item = m_itemList.at(x);
         if (item->IsDir())
         {
             if (recurse)
                 GalleryUtil::LoadDirectory(m_itemList, item->GetPath(),
                                            sortorder, recurse, NULL, NULL);
-            m_itemList.remove(item);
+            delete m_itemList.takeAt(x);
         }
-        item = next;
     }
 
     // --------------------------------------------------------------------
 
     // since we remove dirs item position might have changed
     if (origItem) 
-        m_pos = m_itemList.find(origItem);
+        m_pos = m_itemList.indexOf(origItem);
 
     m_pos = (!origItem || (m_pos == -1)) ? 0 : m_pos;
 
@@ -112,13 +109,13 @@ ImageView::ImageView(const ThumbList &itemList,
 
     if (slideShow > 1)
     {
-        m_slideshow_sequence = new SequenceShuffle(m_itemList.count());
+        m_slideshow_sequence = new SequenceShuffle(m_itemList.size());
         m_slideshow_mode = "Random Slideshow";
         m_pos = 0;
     }
     else
     {
-        m_slideshow_sequence = new SequenceInc(m_itemList.count());
+        m_slideshow_sequence = new SequenceInc(m_itemList.size());
         m_slideshow_mode = "Slideshow";
     }
 
@@ -161,7 +158,7 @@ void ImageView::UpdateLCD(const ThumbItem *item)
 
     QString name = item->GetName();
     QString desc = QString::number(m_pos + 1) + " / " +
-        QString::number(m_itemList.count());
+        QString::number(m_itemList.size());
 
     QList<LCDTextItem> textItems;
     textItems.append(LCDTextItem(
