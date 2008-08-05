@@ -433,12 +433,9 @@ bool IconView::HandleMediaDeviceSelect(ThumbItem *item)
     else
     {
         // device was removed
-        MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(),
-            tr("Error"),
-            tr("The selected device is no longer available"));
-
-        HandleShowDevices();
+        QString msg = tr("Error") + '\n' + 
+                tr("The selected device is no longer available");
+        ShowOKDialog(msg, SLOT(HandleShowDevices()));
     }
 
     return true;
