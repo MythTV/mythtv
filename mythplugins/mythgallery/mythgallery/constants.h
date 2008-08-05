@@ -20,7 +20,7 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#include <qstring.h>
+#include <QString>
 
 static const QString IMAGE_FILENAMES(
 	"*.jpg *.JPG *.jpeg *.JPEG *.png *.PNG "

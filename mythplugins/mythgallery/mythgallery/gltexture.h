@@ -24,8 +24,8 @@
 #define _GL_TEXTURE_H_
 #ifdef USING_OPENGL
 
-#include <qgl.h>
-#include <qsize.h>
+#include <QtOpenGL>
+#include <QSize>
 
 class ThumbItem;
 

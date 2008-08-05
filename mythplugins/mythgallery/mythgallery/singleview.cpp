@@ -23,18 +23,18 @@
 
 // C++ headers
 #include <iostream>
-//Added by qt3to4:
-#include <QKeyEvent>
-#include <QPixmap>
-#include <QPaintEvent>
 using namespace std;
 
 // Qt headers
-#include <qevent.h>
-#include <qimage.h>
-#include <qtimer.h>
-#include <qpainter.h>
+//#include <qevent.h>
+#include <QImage>
+#include <QTimer>
+#include <QPainter>
+#include <QKeyEvent>
+#include <QPixmap>
+#include <QPaintEvent>
 
+                 
 // MythTV plugin headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/util.h>

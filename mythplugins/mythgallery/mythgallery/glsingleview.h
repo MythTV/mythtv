@@ -23,11 +23,6 @@
 #define GLSINGLEVIEW_H
 #ifdef USING_OPENGL
 
-// Qt headers
-#include <qgl.h>
-#include <qmap.h>
-#include <qsize.h>
-
 // MythTV plugin headers
 #include <mythtv/util.h>
 #include <mythtv/mythdialogs.h>

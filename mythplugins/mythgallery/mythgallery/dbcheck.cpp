@@ -1,12 +1,15 @@
-#include <qstring.h>
-
 #include <iostream>
 using namespace std;
 
-#include "dbcheck.h"
+// qt
+#include <QString>
 
+// myth
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
+
+// mythgallery
+#include "dbcheck.h"
 
 const QString currentDatabaseVersion = "1002";
 

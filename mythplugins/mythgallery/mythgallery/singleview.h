@@ -22,15 +22,16 @@
 #define SINGLEVIEW_H
 
 #include <vector>
-//Added by qt3to4:
-#include <QPixmap>
-#include <QKeyEvent>
-#include <QPaintEvent>
+
 using namespace std;
 
 // Qt headers
-#include <qimage.h>
+#include <QImage>
 #include <q3pointarray.h>
+#include <QPixmap>
+#include <QKeyEvent>
+#include <QPaintEvent>
+
 
 // MythTV plugin headers
 #include <mythtv/mythdialogs.h>

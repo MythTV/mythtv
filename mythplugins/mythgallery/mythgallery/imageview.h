@@ -24,9 +24,6 @@
 #include <vector>
 using namespace std;
 
-// Qt headers
-#include <q3pointarray.h>
-
 // MythGallery headers
 #include "iconview.h"
 #include "sequence.h"

@@ -22,10 +22,10 @@
 #ifndef THUMBGENERATOR_H
 #define THUMBGENERATOR_H
 
-#include <qthread.h>
-#include <qstring.h>
-#include <qstringlist.h>
-#include <qimage.h>
+#include <QThread>
+#include <QString>
+#include <QStringList>
+#include <QImage>
 
 class QObject;
 class QImage;

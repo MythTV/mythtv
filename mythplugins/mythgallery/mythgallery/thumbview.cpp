@@ -1,9 +1,9 @@
 // -*- Mode: c++ -*-
 
 // Qt headers
-#include <qpixmap.h>
-#include <qfileinfo.h>
-#include <qdir.h>
+#include <QPixmap>
+#include <QFileInfo>
+#include <QDir>
 
 // MythTV plugin headers
 #include <mythtv/mythcontext.h>

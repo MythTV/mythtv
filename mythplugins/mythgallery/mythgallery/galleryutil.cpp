@@ -16,14 +16,16 @@
  * 
  * ============================================================ */
 
-#include <qfileinfo.h>
-#include <qdir.h>
+// qt
+#include <QDir>
 
+// myth
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/util.h>
 #include <mythtv/mythdirs.h>
 
+// mythgallery
 #include "config.h"
 #include "constants.h"
 #include "galleryutil.h"

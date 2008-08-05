@@ -27,12 +27,10 @@
 using namespace std;
 
 // Qt headers
-#include <qtimer.h>
-#include <qimage.h>
-#include <qlayout.h>
-#include <qsize.h>
-#include <qdir.h>
-#include <qpainter.h>
+#include <QTimer>
+#include <QImage>
+#include <QDir>
+#include <QPainter>
 
 // MythTV plugin headers
 #include <mythtv/mythcontext.h>

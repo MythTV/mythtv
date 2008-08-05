@@ -19,20 +19,22 @@
  *
  * ============================================================ */
 
-#include <qapplication.h>
-#include <qimage.h>
-#include <qobject.h>
-#include <qfileinfo.h>
-#include <qdir.h>
+// qt
+#include <QApplication>
+#include <QImage>
+#include <QFileInfo>
+#include <QDir>
 #include <QEvent>
-#include <qimagereader.h>
+#include <QImageReader>
 
-#include "config.h"
+// myth
 #include "mythtv/mythcontext.h"
 #include "mythtv/util.h"
 #include <mythtv/libmythui/mythuihelper.h>
 #include <mythtv/mythdirs.h>
 
+// mythgallery
+#include "config.h"
 #include "thumbgenerator.h"
 #include "constants.h"
 #include "galleryutil.h"

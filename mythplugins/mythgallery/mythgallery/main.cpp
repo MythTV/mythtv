@@ -1,20 +1,23 @@
+// c++
 #include <iostream>
 
-
+// qt
 #include <qapplication.h>
 #include <qimage.h>
 #include <qdir.h>
 
-#include "iconview.h"
-#include "gallerysettings.h"
-#include "dbcheck.h"
-
+// myth
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/dialogbox.h>
 #include <mythtv/mythmedia.h>
 #include <mythtv/mythpluginapi.h>
+
+// mythgallery
+#include "iconview.h"
+#include "gallerysettings.h"
+#include "dbcheck.h"
 
 static void run(MythMediaDevice *dev)
 {

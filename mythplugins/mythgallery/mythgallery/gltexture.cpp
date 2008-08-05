@@ -21,7 +21,7 @@
  * ============================================================ */
 
 // Qt headers
-#include <qimage.h>
+#include <QImage>
 
 // MythGallery headers
 #include "thumbview.h"

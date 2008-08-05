@@ -1,13 +1,13 @@
+
+// qt
+#include <QDir>
+
+// myth
 #include <mythtv/mythcontext.h>
 
-#include "gallerysettings.h"
-#include <qfile.h>
-#include <qdialog.h>
-#include <qcursor.h>
-#include <qdir.h>
-#include <qimage.h>
-
+// mythgallery
 #include "config.h"
+#include "gallerysettings.h"
 
 // General Settings
 
