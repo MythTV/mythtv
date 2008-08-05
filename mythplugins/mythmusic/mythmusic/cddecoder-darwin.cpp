@@ -69,6 +69,9 @@ bool CdDecoder::initialize()
     QDomDocument TOC;
     uint         trk;
 
+    m_tracks.clear();
+    m_firstTrack = m_lastTrack = m_leadout = 0;
+
     if (!TOCfile.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_GENERAL,
@@ -84,7 +87,6 @@ bool CdDecoder::initialize()
         return false;
     }
 
-    m_tracks.clear();
 
     // HACK. This is a really bad example of XML parsing. No type checking,
     // it doesn't deal with comments. It only works because the TOC.plist
