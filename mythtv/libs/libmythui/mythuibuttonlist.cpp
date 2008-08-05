@@ -696,7 +696,7 @@ void MythUIButtonList::Init()
     // it scales images based on the button size and we need to give it the
     // largest button state so that the images are not too small
     // This can be removed once the disk based image caching is added to mythui,
-    // since the mythui thumbnail generator can be ditched.
+    // since the mythgallery thumbnail generator can be ditched.
     MythUIGroup *buttonSelectedState = dynamic_cast<MythUIGroup *>
                                         (buttontemplate->GetState("Selected"));
 
@@ -1103,10 +1103,13 @@ void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
     }
     else
     {
+        if (image == m_image)
+            return;
+
         if (m_image)
             m_image->DownRef();
         m_image = image;
-        m_image->UpRef();
+        image->UpRef();
     }
 
     m_parent->Update();
