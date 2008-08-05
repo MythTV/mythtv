@@ -446,7 +446,8 @@ our $WORKDIR = "$SCRIPTDIR/.osx-packager";
 mkdir $WORKDIR;
 
 # Do we need to force a case-sensitive disk image?
-if (!$OPT{usehdimage} && !CaseSensitiveFilesystem())
+if (0 &&       # No. MythTV source doesn't require it at the moment.
+    !$OPT{usehdimage} && !CaseSensitiveFilesystem())
 {
   Verbose("Forcing -usehdimage due to case-insensitive filesystem");
   $OPT{usehdimage} = 1;
@@ -959,7 +960,7 @@ if ( $OPT{'verbose'} )
 my $AVCfw = '/Developer/FireWireSDK*/Examples/' .
             'Framework/AVCVideoServices.framework';
 my @AVCfw = split / /, `ls -d $AVCfw`;
-my $AVCfw = pop @AVCfw;
+$AVCfw = pop @AVCfw;
 chop $AVCfw;
 
 ### Create each package.
