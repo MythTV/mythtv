@@ -24,6 +24,7 @@
 using namespace std;
 
 // Qt headers
+#include <QApplication>
 #include <qevent.h>
 #include <qdir.h>
 #include <qmatrix.h>
@@ -37,6 +38,7 @@ using namespace std;
 #include <mythtv/httpcomms.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/libmythui/mythmainwindow.h>
+#include <mythtv/libmythui/mythprogressdialog.h>
 #include <mythtv/mythmediamonitor.h>
 
 // MythGallery headers
@@ -51,6 +53,47 @@ using namespace std;
 
 #define LOC QString("IconView: ")
 #define LOC_ERR QString("IconView, Error: ")
+
+class FileCopyThread: public QThread
+{
+  public:
+    FileCopyThread(IconView *parent, bool move);
+    virtual void run();
+    int GetProgress(void) { return m_progress; }
+
+  private:
+    bool         m_move;
+    IconView    *m_parent;
+    volatile int m_progress;
+};
+
+FileCopyThread::FileCopyThread(IconView *parent, bool move)
+{
+    m_move = move;
+    m_parent = parent;
+}
+
+void FileCopyThread::run()
+{
+    QStringList::iterator it;
+    QFileInfo fi;
+    QFileInfo dest;
+
+    m_progress = 0;
+
+    for (it = m_parent->m_itemMarked.begin(); it != m_parent->m_itemMarked.end(); it++)
+    {
+        fi.setFile(*it);
+        dest.setFile(QDir(m_parent->m_currDir), fi.fileName());
+
+        if (fi.exists())
+            GalleryUtil::CopyMove(fi, dest, m_move);
+
+        m_progress++;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 IconView::IconView(MythScreenStack *parent, const char *name,
                    const QString &galleryDir, MythMediaDevice *initialDevice)
@@ -1162,8 +1205,6 @@ void IconView::DoRename(QString folderName)
     LoadDirectory(m_currDir);
 }
 
-
-
 void IconView::ImportFromDir(const QString &fromDir, const QString &toDir)
 {
     QDir d(fromDir);
@@ -1212,30 +1253,47 @@ void IconView::CopyMarkedFiles(bool move)
     if (m_itemMarked.isEmpty())
         return;
 
-    QStringList::iterator it;
-    QFileInfo fi;
-    QFileInfo dest;
-    int count = 0;
-
     QString msg = (move) ?
         tr("Moving marked images...") : tr("Copying marked images...");
 
-    MythProgressDialog *progress =
-        new MythProgressDialog(msg, m_itemMarked.count());
+    MythUIProgressDialog *copy_progress = new MythUIProgressDialog(msg,
+                                                    m_popupStack,
+                                                    "copyprogressdialog");
 
-    for (it = m_itemMarked.begin(); it != m_itemMarked.end(); it++)
+    if (copy_progress->Create())
     {
-        fi.setFile(*it);
-        dest.setFile(QDir(m_currDir), fi.fileName());
-
-        if (fi.exists())
-            GalleryUtil::CopyMove(fi, dest, move);
-
-        progress->setProgress(++count);
+        m_popupStack->AddScreen(copy_progress, false);
+        copy_progress->SetTotal(m_itemMarked.count());
+    }
+    else
+    {
+        delete copy_progress;
+        copy_progress = NULL;
     }
 
-    progress->Close();
-    progress->deleteLater();
+    FileCopyThread *filecopy = new FileCopyThread(this, move);
+    int progress = -1;
+    filecopy->start();
+
+    while (!filecopy->isFinished())
+    {
+        if (copy_progress)
+        {
+            if (progress != filecopy->GetProgress())
+            {
+                progress = filecopy->GetProgress();
+                copy_progress->SetProgress(progress);
+            }
+        }
+
+        usleep(500);
+        qApp->processEvents();
+    }
+
+    delete filecopy;
+
+    if (copy_progress)
+        copy_progress->Close();
 
     LoadDirectory(m_currDir);
 }

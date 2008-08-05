@@ -135,6 +135,8 @@ class IconView : public MythScreenType
     void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice *pMedia);
     void HandleItemSelect(MythUIButtonListItem *);
     void UpdateText(MythUIButtonListItem *);
+
+    friend class FileCopyThread;
 };
 
 
