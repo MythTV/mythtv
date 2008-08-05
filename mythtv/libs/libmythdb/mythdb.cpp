@@ -93,12 +93,51 @@ Settings *MythDB::GetOldSettings(void)
     return d->m_settings;
 }
 
+QString MythDB::toCommaList(const QMap<QString, QVariant> &bindings,
+                            uint indent, uint maxColumn)
+{
+    QMap<QString, QVariant>::const_iterator it = bindings.begin();
+    if (it == bindings.end())
+        return "";
+
+    uint curColumn = indent;
+    QString str = QString("%1").arg("", indent);
+    for (; it != bindings.end(); ++it)
+    {
+        const QString curBinding = it.key() + "=" + (*it).toString() + ",";
+        if ((curColumn > indent) &&
+            ((curBinding.length() + curColumn) > maxColumn))
+        {
+            str += "\n";
+            str += QString("%1").arg("", indent);
+            curColumn = indent;
+        }
+        if (curColumn > indent)
+        {
+            str += " ";
+            curColumn++;
+        }
+        str += curBinding;
+        curColumn += curBinding.length();
+    }
+    str = str.left(str.length() - 1); // remove trailing comma.
+    str += "\n";
+
+    return str;
+}
+
 void MythDB::DBError(const QString &where, const QSqlQuery& query)
 {
     QString str = QString("DB Error (%1):\n").arg(where);
 
     str += "Query was:\n";
     str += query.executedQuery() + "\n";
+    QString tmp = toCommaList(query.boundValues());
+    if (!tmp.isEmpty())
+    {
+        str += "Bindings were:\n";
+        str += tmp;
+    }
     str += DBErrorMessage(query.lastError());
     VERBOSE(VB_IMPORTANT, QString("%1").arg(str));
 }
