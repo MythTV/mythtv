@@ -20,7 +20,7 @@
 #ifndef EXIFUTIL_H
 #define EXIFUTIL_H
 
-#include <qfileinfo.h>
+#include <QFileInfo>
 
 #include "iconview.h"
 
@@ -35,7 +35,7 @@ class GalleryUtil
 
     static bool LoadDirectory(ThumbList &itemList, const QString &dir,
                               int sortorder, bool recurse,
-                              ThumbDict *itemDict, ThumbGenerator *thumbGen);
+                              ThumbHash *itemHash, ThumbGenerator *thumbGen);
 
     static QSize ScaleToDest(const QSize &sz, const QSize &dest, bool scaleMax);
 

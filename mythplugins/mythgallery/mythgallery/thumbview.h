@@ -67,6 +67,6 @@ class ThumbItem
     MythMediaDevice *m_mediaDevice;
 };
 typedef Q3PtrList<ThumbItem> ThumbList;
-typedef Q3Dict<ThumbItem>    ThumbDict;
+typedef QHash<QString, ThumbItem*>    ThumbHash;
 
 #endif // _THUMBVIEW_H_

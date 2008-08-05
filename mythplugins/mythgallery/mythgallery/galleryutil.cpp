@@ -140,7 +140,7 @@ long GalleryUtil::GetNaturalRotation(const char* filePath)
 
 bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
                                 int sortorder, bool recurse,
-                                ThumbDict *itemDict, ThumbGenerator* thumbGen)
+                                ThumbHash *itemHash, ThumbGenerator* thumbGen)
 {
     QString blah = dir;
     QDir d(blah);
@@ -190,7 +190,7 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
         {
             GalleryUtil::LoadDirectory(
                 itemList, QDir::cleanDirPath(fi->absFilePath()),
-                sortorder, true, itemDict, thumbGen);
+                sortorder, true, itemHash, thumbGen);
         }
         else 
         {
@@ -200,8 +200,8 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
 
             itemList.append(item);
 
-            if (itemDict)
-                itemDict->insert(item->GetName(), item);
+            if (itemHash)
+                itemHash->insert(item->GetName(), item);
 
             if (thumbGen)
                 thumbGen->addFile(item->GetName());

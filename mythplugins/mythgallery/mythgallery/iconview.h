@@ -24,6 +24,7 @@
 // Qt headers
 #include <qstringlist.h>
 #include <Q3PtrList>
+#include <QHash>
 
 // MythTV headers
 #include <mythtv/libmythui/mythscreentype.h>
@@ -105,8 +106,8 @@ class IconView : public MythScreenType
     void ShowOKDialog(const QString &message, const char *slot, bool showCancel = false);
     ThumbItem *GetCurrentThumb(void);
 
-    Q3PtrList<ThumbItem> m_itemList;
-    Q3Dict<ThumbItem>    m_itemDict;
+    Q3PtrList<ThumbItem>       m_itemList;
+    QHash<QString, ThumbItem*>  m_itemHash;
     QStringList         m_itemMarked;
     QString             m_galleryDir;
     vector<int>         m_history;

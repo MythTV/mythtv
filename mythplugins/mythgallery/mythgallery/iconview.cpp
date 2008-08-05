@@ -25,9 +25,9 @@ using namespace std;
 
 // Qt headers
 #include <QApplication>
-#include <qevent.h>
-#include <qdir.h>
-#include <qmatrix.h>
+#include <QEvent>
+#include <QDir>
+#include <QMatrix>
 #include <Q3ValueList>
 #include <QPixmap>
 #include <QFileInfo>
@@ -100,7 +100,6 @@ IconView::IconView(MythScreenStack *parent, const char *name,
         : MythScreenType(parent, name)
 {
     m_itemList.setAutoDelete(true);
-    m_itemDict.setAutoDelete(false);
 
     m_galleryDir = galleryDir;
 
@@ -196,11 +195,11 @@ void IconView::LoadDirectory(const QString &dir)
 
     m_currDir = d.absPath();
     m_itemList.clear();
-    m_itemDict.clear();
+    m_itemHash.clear();
     m_imageList->Reset();
 
     m_isGallery = GalleryUtil::LoadDirectory(m_itemList, dir, m_sortorder,
-                                             false, &m_itemDict, m_thumbGen);
+                                             false, &m_itemHash, m_thumbGen);
 
     ThumbItem *thumbitem;
     for ( thumbitem = m_itemList.first(); thumbitem; thumbitem = m_itemList.next() )
@@ -554,9 +553,9 @@ bool IconView::HandleMediaEscape(MediaMonitor *mon)
             // Make sure previous devices are visible and selected
             ThumbItem *item = NULL;
             if (!(*it)->getVolumeID().isEmpty())
-                item = m_itemDict.find((*it)->getVolumeID());
+                item = m_itemHash.value((*it)->getVolumeID());
             else
-                item = m_itemDict.find((*it)->getDevicePath());
+                item = m_itemHash.value((*it)->getDevicePath());
 
             if (item)
             {
@@ -646,7 +645,7 @@ void IconView::customEvent(QEvent *event)
         ThumbData *td = tge->thumbData;
         if (!td) return;
 
-        ThumbItem *thumbitem = m_itemDict.find(td->fileName);
+        ThumbItem *thumbitem = m_itemHash.value(td->fileName);
         if (thumbitem)
         {
             thumbitem->SetPixmap(NULL);
@@ -1002,7 +1001,7 @@ void IconView::HandleImport(void)
     ThumbItem *item = new ThumbItem(importdir.dirName(),
                                     importdir.absPath(), true);
     m_itemList.append(item);
-    m_itemDict.insert(item->GetName(), item);
+    m_itemHash.insert(item->GetName(), item);
     m_thumbGen->addFile(item->GetName());
 
     if (!m_thumbGen->running())
@@ -1029,14 +1028,14 @@ void IconView::HandleShowDevices(void)
     m_showDevices = true;
 
     m_itemList.clear();
-    m_itemDict.clear();
+    m_itemHash.clear();
 
     m_thumbGen->cancel();
 
     // add gallery directory
     ThumbItem *item = new ThumbItem("Gallery", m_galleryDir, true);
     m_itemList.append(item);
-    m_itemDict.insert(item->GetName(), item);
+    m_itemHash.insert(item->GetName(), item);
 
 #ifndef _WIN32
     if (mon)
@@ -1054,7 +1053,7 @@ void IconView::HandleShowDevices(void)
                     (*it)->getMountPath(), true, *it);
 
                 m_itemList.append(item);
-                m_itemDict.insert(item->GetName(), item);
+                m_itemHash.insert(item->GetName(), item);
 
                 mon->Unlock(*it);
             }
