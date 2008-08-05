@@ -45,9 +45,7 @@ MythUIType::~MythUIType()
 void MythUIType::AddChild(MythUIType *child)
 {
     if (!child)
-    {
         return;
-    }
 
     m_ChildrenList.push_back(child);
 }
@@ -381,10 +379,7 @@ void MythUIType::SetArea(const MythRect &rect)
     m_DirtyRegion = QRegion(m_Area.toQRect());
 
     m_Area = rect;
-    if (m_Parent)
-        m_Area.CalculateArea(m_Parent->GetArea());
-    else
-        m_Area.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
+    RecalculateArea();
 
     if (m_Parent)
         m_Parent->ExpandArea(rect);
@@ -703,6 +698,20 @@ void MythUIType::Rescale(const float hscale, const float vscale)
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
     {
         (*it)->Rescale(hscale, vscale);
+    }
+}
+
+void MythUIType::RecalculateArea(void)
+{
+    if (m_Parent)
+        m_Area.CalculateArea(m_Parent->GetArea());
+    else
+        m_Area.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
+
+    QList<MythUIType *>::iterator it;
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+    {
+        (*it)->RecalculateArea();
     }
 }
 
