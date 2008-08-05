@@ -31,7 +31,7 @@ void SimpleDBStorage::Load(void)
 
 void SimpleDBStorage::Save(QString _table)
 {
-    if (user->GetValue() == initval)
+    if (!IsSaveRequired())
         return;
 
     MSqlBindings bindings;
@@ -92,6 +92,11 @@ QString SimpleDBStorage::GetSetClause(MSqlBindings &bindings) const
     bindings.insert(tagname, user->GetValue());
 
     return clause;
+}
+
+bool SimpleDBStorage::IsSaveRequired(void) const
+{
+    return user->GetValue() != initval;
 }
 
 //////////////////////////////////////////////////////////////////////

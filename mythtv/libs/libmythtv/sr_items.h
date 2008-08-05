@@ -13,11 +13,24 @@ class SimpleSRStorage : public SimpleDBStorage
 {
   protected:
     SimpleSRStorage(Setting *_setting, ScheduledRecording *_parent,
-                    QString name) :
-        SimpleDBStorage(_setting, "record", name), parent(_parent)
+                    const QString &name) :
+        SimpleDBStorage(_setting, "record", name),
+        parent(_parent), loadRecordID(-1)
     {
         parent->addChild(_setting);
         _setting->setName(name);
+    }
+
+    virtual bool IsSaveRequired(void) const
+    {
+        return (SimpleDBStorage::IsSaveRequired() ||
+                (loadRecordID != parent->getRecordID()));
+    }
+
+    virtual void Load(void)
+    {
+        loadRecordID = parent->getRecordID();
+        SimpleDBStorage::Load();
     }
 
         virtual QString GetSetClause(MSqlBindings &bindings) const
@@ -44,7 +57,9 @@ class SimpleSRStorage : public SimpleDBStorage
             return query;
         }
 
-        ScheduledRecording *parent;
+  private:
+    ScheduledRecording *parent;
+    int loadRecordID;
 };
 
 

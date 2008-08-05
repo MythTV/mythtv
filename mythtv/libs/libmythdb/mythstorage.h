@@ -60,6 +60,7 @@ class MPUBLIC SimpleDBStorage : public DBStorage
   protected:
     virtual QString GetWhereClause(MSqlBindings&) const = 0;
     virtual QString GetSetClause(MSqlBindings& bindings) const;
+    virtual bool    IsSaveRequired(void) const;
 
   protected:
     QString initval;
