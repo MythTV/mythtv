@@ -27,7 +27,7 @@ using namespace std;
 
 // Qt headers
 #include <QImage>
-#include <q3pointarray.h>
+#include <QPolygon>
 #include <QPixmap>
 #include <QKeyEvent>
 #include <QPaintEvent>
@@ -139,8 +139,8 @@ class SingleView : public MythDialog, public ImageView
     QPoint        m_effect_spiral_tmp1;
     vector<int>   m_effect_meltdown_y_disp;
     float         m_effect_multi_circle_out_delta_alpha;
-    Q3PointArray   m_effect_milti_circle_out_points;
-    Q3PointArray   m_effect_circle_out_points;
+    QPolygon      m_effect_milti_circle_out_points;
+    QPolygon      m_effect_circle_out_points;
 };
 
 #endif /* SINGLEVIEW_H */

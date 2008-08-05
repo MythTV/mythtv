@@ -4,7 +4,6 @@
 #define _THUMBVIEW_H_
 
 // Qt headers
-#include <q3deepcopy.h>
 #include <QString>
 #include <QList>
 #include <QHash>
@@ -21,10 +20,7 @@ class ThumbItem
         m_path(QString::null), m_isDir(false),
         m_pixmap(NULL),        m_mediaDevice(NULL) { }
     ThumbItem(const QString &name, const QString &path, bool isDir,
-              MythMediaDevice *dev = NULL) :
-        m_name(Q3DeepCopy<QString>(name)), m_caption(QString::null),
-        m_path(Q3DeepCopy<QString>(path)), m_isDir(isDir),
-        m_pixmap(NULL),                   m_mediaDevice(dev) { }
+              MythMediaDevice *dev = NULL);
     ~ThumbItem();
 
     // commands
@@ -34,11 +30,11 @@ class ThumbItem
     // sets
     void SetRotationAngle(int angle);
     void SetName(const QString &name)
-        { m_name = Q3DeepCopy<QString>(name); }
+        { m_name = name; m_name.detach(); }
     void SetCaption(const QString &caption)
-        { m_caption = Q3DeepCopy<QString>(caption); }
+        { m_caption = caption; m_caption.detach(); }
     void SetPath(const QString &path, bool isDir)
-        { m_path = Q3DeepCopy<QString>(path); m_isDir = isDir; }
+        { m_path = path; m_path.detach(), m_isDir = isDir; }
     void SetPixmap(QPixmap *pixmap);
     void SetMediaDevice(MythMediaDevice *dev)
         { m_mediaDevice = dev; }

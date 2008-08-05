@@ -28,7 +28,7 @@ using namespace std;
 #include <QEvent>
 #include <QDir>
 #include <QMatrix>
-#include <Q3ValueList>
+#include <QList>
 #include <QPixmap>
 #include <QFileInfo>
 
@@ -542,8 +542,8 @@ bool IconView::HandleMediaEscape(MediaMonitor *mon)
 {
     bool handled = false;
     QDir curdir(m_currDir);
-    Q3ValueList<MythMediaDevice*> removables = mon->GetMedias(MEDIATYPE_DATA);
-    Q3ValueList<MythMediaDevice*>::iterator it = removables.begin();
+    QList<MythMediaDevice*> removables = mon->GetMedias(MEDIATYPE_DATA);
+    QList<MythMediaDevice*>::iterator it = removables.begin();
     for (; !handled && (it != removables.end()); it++)
     {
         if (!mon->ValidateAndLock(*it))
@@ -1045,9 +1045,8 @@ void IconView::HandleShowDevices(void)
 #ifndef _WIN32
     if (mon)
     {
-        Q3ValueList<MythMediaDevice*> removables =
-            mon->GetMedias(MEDIATYPE_DATA);
-        Q3ValueList<MythMediaDevice*>::Iterator it = removables.begin();
+        QList<MythMediaDevice*> removables = mon->GetMedias(MEDIATYPE_DATA);
+        QList<MythMediaDevice*>::Iterator it = removables.begin();
         for (; it != removables.end(); it++)
         {
             if (mon->ValidateAndLock(*it))
