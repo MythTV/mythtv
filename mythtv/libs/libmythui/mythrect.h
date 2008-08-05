@@ -36,6 +36,11 @@ class MythRect : public QRect
     void setHeight(const QString &sHeight);
     void setHeight(int height) { QRect::setHeight(height); }
 
+    QString getX(void);
+    QString getY(void);
+    QString getWidth(void);
+    QString getHeight(void);
+
     QRect toQRect(void);
 
   private:

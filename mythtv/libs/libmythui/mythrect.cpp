@@ -172,6 +172,46 @@ void MythRect::setHeight(const QString &sHeight)
         QRect::setHeight(height.toInt());
 }
 
+QString MythRect::getX(void)
+{
+    QString stringX;
+    if (m_percentX > 0.0)
+        stringX = QString("%1%").arg((int)(m_percentX * 100));
+    else
+        stringX = QString("%1").arg(x());
+    return stringX;
+}
+
+QString MythRect::getY(void)
+{
+    QString stringY;
+    if (m_percentY > 0.0)
+        stringY = QString("%1%").arg((int)(m_percentY * 100));
+    else
+        stringY = QString("%1").arg(y());
+    return stringY;
+}
+
+QString MythRect::getWidth(void)
+{
+    QString stringWidth;
+    if (m_percentWidth > 0.0)
+        stringWidth = QString("%1%").arg((int)(m_percentWidth * 100));
+    else
+        stringWidth = QString("%1").arg(width());
+    return stringWidth;
+}
+
+QString MythRect::getHeight(void)
+{
+    QString stringHeight;
+    if (m_percentHeight > 0.0)
+        stringHeight = QString("%1%").arg((int)(m_percentHeight * 100));
+    else
+        stringHeight = QString("%1").arg(height());
+    return stringHeight;
+}
+
 QRect MythRect::toQRect()
 {
     return QRect(x(),y(),width(),height());

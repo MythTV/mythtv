@@ -46,7 +46,8 @@ bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
     if (objectArea.width() > m_Area.width() ||
         objectArea.height() > m_Area.height())
     {
-        m_Area = objectArea;
+        m_Area.setWidth(objectArea.getWidth());
+        m_Area.setHeight(objectArea.getHeight());
     }
 
     return true;
@@ -82,7 +83,8 @@ bool MythUIStateType::AddObject(StateType type, MythUIType *object)
     if (objectArea.width() > m_Area.width() ||
         objectArea.height() > m_Area.height())
     {
-        m_Area = objectArea;
+        m_Area.setWidth(objectArea.getWidth());
+        m_Area.setHeight(objectArea.getHeight());
     }
 
     return true;
