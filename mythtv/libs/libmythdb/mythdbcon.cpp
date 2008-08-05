@@ -453,8 +453,14 @@ bool MSqlQuery::prepare(const QString& query)
 
 bool MSqlQuery::testDBConnection()
 {
-    MSqlQuery query(MSqlQuery::InitCon());
-    return query.isConnected();
+    MSqlDatabase *db = GetMythDB()->GetDBManager()->popConnection();
+
+    // popConnection() has already called OpenDatabase(),
+    // so we only have to check if it was successful:
+    bool isOpen = db->isOpen();
+
+    GetMythDB()->GetDBManager()->pushConnection(db);
+    return isOpen;
 }
 
 void MSqlQuery::bindValue (const QString  & placeholder,
