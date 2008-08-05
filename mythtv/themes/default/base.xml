@@ -124,6 +124,87 @@
         </statetype>
     </buttonlist>
 
+    <buttonlist2 name="basebuttonlist2">
+        <area>0,0,300,250</area>
+        <layout>vertical</layout>
+        <spacing>5</spacing>
+        <buttonarea>0,0,100%,97%</buttonarea>
+        <statetype name="buttonitem">
+            <state name="active">
+                <area>0,0,100%,40</area>
+                <imagetype name="buttonbackground">
+                    <gradient start="#505050" end="#000000" alpha="200" />
+                </imagetype>
+                <statetype name="buttoncheck">
+                    <position>5,5</position>
+                    <state type="off">
+                        <imagetype name="checkoff">
+                            <filename>lb-check-empty.png</filename>
+                        </imagetype>
+                    </state>
+                    <state type="half">
+                        <imagetype name="checkhalf">
+                            <filename>lb-check-half.png</filename>
+                        </imagetype>
+                    </state>
+                    <state type="full">
+                        <imagetype name="checkfull">
+                            <filename>lb-check-full.png</filename>
+                        </imagetype>
+                    </state>
+                </statetype>
+                <textarea name="buttontext">
+                    <area>10%,5,80%,30</area>
+                    <font>basesmall</font>
+                    <cutdown>yes</cutdown>
+                </textarea>
+                <imagetype name="buttonarrow">
+                    <position>92%,5</position>
+                    <filename>lb-arrow.png</filename>
+                </imagetype>
+            </state>
+            <state name="selected" from="active">
+                <imagetype name="buttonbackground">
+                    <gradient start="#52CA38" end="#349838" alpha="255" />
+                </imagetype>
+            </state>
+            <state name="inactive" from="active">
+                <imagetype name="buttonbackground">
+                    <gradient start="#52CA38" end="#349838" alpha="100" />
+                </imagetype>
+                <textarea name="buttontext">
+                    <font>basesmallgrey</font>
+                </textarea>
+            </state>
+        </statetype>
+        <statetype name="upscrollarrow">
+            <position>10,232</position>
+            <state type="off">
+                <imagetype name="upon">
+                    <filename>lb-uparrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="upoff">
+                    <filename>lb-uparrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>37,232</position>
+            <state type="off">
+                <imagetype name="dnon">
+                    <filename>lb-dnarrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="dnoff">
+                    <filename>lb-dnarrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+    </buttonlist2>
+
     <!-- Base definition of a button -->
     <button name="basebutton">
         <position>0,0</position>
@@ -239,12 +320,32 @@
             <align>allcenter</align>
         </textarea>
 
-        <buttonlist name="list" from="basebuttonlist">
-            <area>12,250,470,250</area>
+        <buttonlist2 name="list" from="basebuttonlist2">
+            <area>12,230,470,250</area>
             <drawfrombottom>yes</drawfrombottom>
             <align>center</align>
             <showarrow>no</showarrow>
-        </buttonlist>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <textarea name="buttontext">
+                        <area>0,2,100%,30</area>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="inactive">
+                    <textarea name="buttontext">
+                        <area>0,2,100%,30</area>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected">
+                    <textarea name="buttontext">
+                        <area>0,2,100%,30</area>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+            </statetype>
+        </buttonlist2>
     </window>
 
     <window name="MythBusyDialog">

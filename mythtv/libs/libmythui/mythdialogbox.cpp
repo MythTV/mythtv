@@ -1,3 +1,4 @@
+
 #include <QApplication>
 
 #include "mythdialogbox.h"
@@ -23,7 +24,7 @@ bool MythDialogBox::Create(void)
         return false;
 
     m_textarea = dynamic_cast<MythUIText *>(GetChild("messagearea"));
-    m_buttonList = dynamic_cast<MythListButton *>(GetChild("list"));
+    m_buttonList = dynamic_cast<MythUIButtonList *>(GetChild("list"));
 
     if (!m_textarea || !m_buttonList)
         return false;
@@ -31,13 +32,13 @@ bool MythDialogBox::Create(void)
     m_textarea->SetText(m_text);
     m_buttonList->SetActive(true);
 
-    connect(m_buttonList, SIGNAL(itemClicked(MythListButtonItem*)),
-            this, SLOT(Select(MythListButtonItem*)));
+    connect(m_buttonList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+            this, SLOT(Select(MythUIButtonListItem*)));
 
     return true;
 }
 
-void MythDialogBox::Select(MythListButtonItem* item)
+void MythDialogBox::Select(MythUIButtonListItem* item)
 {
     const char *slot = (const char *)item->getData();
     if (m_useSlots && slot)
@@ -61,14 +62,14 @@ void MythDialogBox::SetReturnEvent(MythScreenType *retscreen,
 
 void MythDialogBox::AddButton(const QString &title, void *data)
 {
-    MythListButtonItem *button = new MythListButtonItem(m_buttonList, title);
+    MythUIButtonListItem *button = new MythUIButtonListItem(m_buttonList, title);
     if (data)
         button->setData(data);
 }
 
 void MythDialogBox::AddButton(const QString &title, const char *slot)
 {
-    MythListButtonItem *button = new MythListButtonItem(m_buttonList, title);
+    MythUIButtonListItem *button = new MythUIButtonListItem(m_buttonList, title);
 
     m_useSlots = true;
 
@@ -97,7 +98,7 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
             }
             else if (action == "RIGHT")
             {
-                MythListButtonItem *item = m_buttonList->GetItemCurrent();
+                MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
                 Select(item);
             }
             else
@@ -245,6 +246,8 @@ bool MythTextInputDialog::Create(void)
 
     messageText->SetText(m_message);
     okButton->SetText(tr("Ok"));
+
+    m_textEdit->SetText("");
 
     BuildFocusList();
 

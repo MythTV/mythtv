@@ -4,12 +4,12 @@
 #include <QEvent>
 
 #include "mythscreentype.h"
-#include "mythlistbutton.h"
+#include "mythuibuttonlist.h"
 #include "mythuitextedit.h"
 #include "mythuibutton.h"
 
-class MythListButtonItem;
-class MythListButton;
+class MythUIButtonListItem;
+class MythUIButtonList;
 
 const int kMythDialogBoxCompletionEventType = 34111;
 
@@ -50,7 +50,7 @@ class MythDialogBox : public MythScreenType
     virtual bool keyPressEvent(QKeyEvent *event);
 
   public slots:
-    void Select(MythListButtonItem* item);
+    void Select(MythUIButtonListItem* item);
 
   signals:
     void Selected();
@@ -59,7 +59,7 @@ class MythDialogBox : public MythScreenType
     void SendEvent(int res, QString text = "", void *data = 0);
 
     MythUIText     *m_textarea;
-    MythListButton *m_buttonList;
+    MythUIButtonList *m_buttonList;
     MythScreenType *m_retScreen;
     QString m_id;
     bool    m_useSlots;
