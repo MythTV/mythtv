@@ -346,20 +346,22 @@ bool IconView::keyPressEvent(QKeyEvent *event)
             HandleDelete();
         else if (action == "MARK")
         {
+            ThumbItem *thumbitem = GetCurrentThumb();
             MythUIButtonListItem *item = m_imageList->GetItemCurrent();
-            ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
 
-            if (!m_itemMarked.contains(thumbitem->GetPath()))
+            if (thumbitem)
             {
-                m_itemMarked.append(thumbitem->GetPath());
-                item->setChecked(MythUIButtonListItem::FullChecked);
+                if (!m_itemMarked.contains(thumbitem->GetPath()))
+                {
+                    m_itemMarked.append(thumbitem->GetPath());
+                    item->setChecked(MythUIButtonListItem::FullChecked);
+                }
+                else
+                {
+                    m_itemMarked.remove(thumbitem->GetPath());
+                    item->setChecked(MythUIButtonListItem::NotChecked);
+                }
             }
-            else
-            {
-                m_itemMarked.remove(thumbitem->GetPath());
-                item->setChecked(MythUIButtonListItem::NotChecked);
-            }
-
         }
         else if (action == "SLIDESHOW")
             HandleSlideShow();
@@ -458,8 +460,7 @@ void IconView::HandleRandomShow(void)
 
 bool IconView::HandleImageSelect(const QString &action)
 {
-    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
-    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
+    ThumbItem *thumbitem = GetCurrentThumb();
 
     if (!thumbitem || (thumbitem->IsDir() && !m_recurse))
         return false;
@@ -807,8 +808,7 @@ void IconView::HandleSubMenuFile(void)
 
 void IconView::HandleRotateCW(void)
 {
-    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
-    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
+    ThumbItem *thumbitem = GetCurrentThumb();
 
     if (!thumbitem || thumbitem->IsDir())
         return;
@@ -828,8 +828,7 @@ void IconView::HandleRotateCW(void)
 
 void IconView::HandleRotateCCW(void)
 {
-    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
-    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
+    ThumbItem *thumbitem = GetCurrentThumb();
 
     if (!thumbitem || thumbitem->IsDir())
         return;
@@ -849,19 +848,21 @@ void IconView::HandleRotateCCW(void)
 
 void IconView::HandleDeleteCurrent(void)
 {
-    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
-    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
+    ThumbItem *thumbitem = GetCurrentThumb();
 
     QString title = tr("Delete Current File or Folder");
     QString msg = (thumbitem->IsDir()) ?
         tr("Deleting 1 folder, including any subfolders and files.") :
         tr("Deleting 1 image.");
 
-    bool cont = MythPopupBox::showOkCancelPopup(
-        gContext->GetMainWindow(), title, msg, false);
+    ShowOKDialog(title + '\n' + msg, SLOT(DoDeleteCurrent(bool)), true);
+}
 
-    if (cont)
+void IconView::DoDeleteCurrent(bool doDelete)
+{
+    if (doDelete)
     {
+        ThumbItem *thumbitem = GetCurrentThumb();
         QFileInfo fi;
         fi.setFile(thumbitem->GetPath());
         GalleryUtil::Delete(fi);
@@ -1119,8 +1120,7 @@ void IconView::DoMkDir(QString folderName)
 
 void IconView::HandleRename(void)
 {
-    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
-    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
+    ThumbItem *thumbitem = GetCurrentThumb();
 
     if (!thumbitem)
         return;
@@ -1144,8 +1144,7 @@ void IconView::DoRename(QString folderName)
     if (folderName.isEmpty() || folderName == "." || folderName == "..")
         return;
 
-    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
-    ThumbItem *thumbitem = qVariantValue<ThumbItem *>(item->GetData());
+    ThumbItem *thumbitem = GetCurrentThumb();
 
     if (!thumbitem)
         return;
@@ -1266,4 +1265,10 @@ void IconView::ShowOKDialog(const QString &message, const char *slot, bool showC
 
     if (slot)
         connect(dialog, SIGNAL(haveResult(bool)), slot, Qt::QueuedConnection);
+}
+
+ThumbItem *IconView::GetCurrentThumb(void)
+{
+    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
+    return qVariantValue<ThumbItem *>(item->GetData());
 }

@@ -96,12 +96,14 @@ class IconView : public MythScreenType
     void DoMkDir(QString folderName);
     void DoDeleteMarked(bool doDelete);
     void DoRename(QString folderName);
+    void DoDeleteCurrent(bool doDelete);
 
   private:
     void LoadThumbnail(ThumbItem *item);
     void ImportFromDir(const QString &fromDir, const QString &toDir);
     void CopyMarkedFiles(bool move = false);
     void ShowOKDialog(const QString &message, const char *slot, bool showCancel = false);
+    ThumbItem *GetCurrentThumb(void);
 
     Q3PtrList<ThumbItem> m_itemList;
     Q3Dict<ThumbItem>    m_itemDict;
