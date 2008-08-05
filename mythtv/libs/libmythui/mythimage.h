@@ -23,6 +23,7 @@ class MythImage : public QImage
     bool IsChanged() { return m_Changed; }
 
     bool IsGradient() { return m_isGradient; }
+    bool IsReflected() { return m_isReflected; }
 
     void Assign(const QImage &img);
     void Assign(const QPixmap &pix);
