@@ -5554,9 +5554,9 @@ void TV::UpdateOSDTimeoutMessage(void)
     static QString tog_cards = GET_KEY("TV Playback", "NEXTINPUT");
 
     QString message = tr(
-        "You should have gotten a channel lock by now. "
+        "You should have received a channel lock by now. "
         "You can continue to wait for a signal, or you "
-        "can change the channels with %1 or %2, change "
+        "can change the channel with %1 or %2, change "
         "video source (%3), inputs (%4), etc.")
         .arg(chan_up).arg(chan_down).arg(next_src).arg(tog_cards);
 
@@ -6209,7 +6209,7 @@ void TV::SleepDialog(void)
     if (sleepTimer.isRunning() && sleepTimer.elapsed() > sleepTimerTimeout)
     {
         QString message = QObject::tr(
-            "Mythtv has was set to sleep for %1 minutes and "
+            "MythTV has was set to sleep for %1 minutes and "
             "will exit in %2 seconds.\n"
             "Do you wish to continue watching?")
             .arg(sleepTimerTimeout / (60 * 1000))
@@ -6260,7 +6260,7 @@ void TV::IdleDialog(void)
     if (idleTimer.isRunning() && (idleTimer.elapsed() > (int)db_idle_timeout))
     {
         QString message = QObject::tr(
-            "Mythtv has been idle for %1 minutes and "
+            "MythTV has been idle for %1 minutes and "
             "will exit in %2 seconds. Are you still watching?")
             .arg(db_idle_timeout / (60 * 1000))
             .arg("%d");
