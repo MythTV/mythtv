@@ -1183,9 +1183,9 @@ find . -type f -name \*.dll | xargs -n1 rm
 find . -type f -name \*.exe | grep -v setup | xargs -n1 rm
 find . -type f -name \*.a | xargs -n1 rm
 find . -type f -name \*.o | xargs -n1 rm
-find . -type f -name Makefile\.* | grep -v svn | xargs -n1 rm
+#find . -type f -name Makefile\.* | grep -v svn | xargs -n1 rm
 find . -type f -name moc_\*.cpp |  grep -v svn | xargs -n1 rm
-rm -rf '.$unixmythtv.'mythtv/libs/libmythdb
+#rm -rf '.$unixmythtv.'mythtv/libs/libmythdb
 rm -f '.$mythtv.'delete_to_do_make_clean.txt
 ']
 , comment => 'write a script to clean up myth environment'],
