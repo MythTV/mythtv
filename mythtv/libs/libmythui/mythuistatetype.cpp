@@ -37,9 +37,17 @@ bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
     object->SetVisible(false);
     m_ObjectsByName[key] = object;
 
-    QSize aSize = m_Area.size();
-    aSize = aSize.expandedTo(object->GetArea().size());
-    m_Area.setSize(aSize);
+    MythRect objectArea = object->GetArea();
+    if (m_Parent)
+        objectArea.CalculateArea(m_Parent->GetArea());
+    else
+        objectArea.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
+
+    if (objectArea.width() > m_Area.width() ||
+        objectArea.height() > m_Area.height())
+    {
+        m_Area = objectArea;
+    }
 
     return true;
 }
@@ -65,9 +73,17 @@ bool MythUIStateType::AddObject(StateType type, MythUIType *object)
     object->SetVisible(false);
     m_ObjectsByState[(int)type] = object;
 
-    QSize aSize = m_Area.size();
-    aSize = aSize.expandedTo(object->GetArea().size());
-    m_Area.setSize(aSize);
+    MythRect objectArea = object->GetArea();
+    if (m_Parent)
+        objectArea.CalculateArea(m_Parent->GetArea());
+    else
+        objectArea.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
+
+    if (objectArea.width() > m_Area.width() ||
+        objectArea.height() > m_Area.height())
+    {
+        m_Area = objectArea;
+    }
 
     return true;
 }
