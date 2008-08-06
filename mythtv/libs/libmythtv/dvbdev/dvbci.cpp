@@ -1612,14 +1612,18 @@ bool cLlCiHandler::OpenSession(int Length, const uint8_t *Data)
        case RI_HOST_CONTROL:
        case RI_DATE_TIME:
        case RI_MMI:
-            {
-              cCiSession *Session = CreateSession(ResourceId);
-              if (Session) {
-                 Send(ST_OPEN_SESSION_RESPONSE, Session->SessionId(), Session->ResourceId(), SS_OK);
-                 return true;
-                 }
-              esyslog("ERROR: can't create session for resource identifier: %08X", ResourceId);
-            }
+       {
+           cCiSession *Session = CreateSession(ResourceId);
+           if (Session)
+           {
+               Send(ST_OPEN_SESSION_RESPONSE, Session->SessionId(),
+                    Session->ResourceId(), SS_OK);
+               return true;
+           }
+           esyslog("ERROR: can't create session for resource identifier: %08X",
+                   ResourceId);
+           break;
+       }
        default: esyslog("ERROR: unknown resource identifier: %08X", ResourceId);
        }
      }
