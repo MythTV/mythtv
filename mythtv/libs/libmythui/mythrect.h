@@ -2,10 +2,17 @@
 #define MYTHRECT_H_
 
 #include <QRect>
+#include <QPoint>
 #include <QString>
 
 class MythRect;
+class MythPoint;
 
+/** \class MythRect
+ *
+ * \brief Wrapper around QRect allowing us to handle percentage and other
+ *        relative values for areas in mythui
+ */
 class MythRect : public QRect
 {
 
@@ -15,9 +22,6 @@ class MythRect : public QRect
     MythRect(const QString &sX, const QString &sY, const QString &sWidth,
              const QString &sHeight);
     MythRect(QRect rect);
-
-    MythRect(const MythRect &rect);
-    MythRect& operator=(const MythRect& rect);
 
     void Init(void);
     void CalculateArea(MythRect parentArea);
@@ -36,16 +40,61 @@ class MythRect : public QRect
     void setHeight(const QString &sHeight);
     void setHeight(int height) { QRect::setHeight(height); }
 
-    QString getX(void);
-    QString getY(void);
-    QString getWidth(void);
-    QString getHeight(void);
+    QString getX(void) const;
+    QString getY(void) const;
+    QString getWidth(void) const;
+    QString getHeight(void) const;
 
-    QRect toQRect(void);
+    MythPoint topLeft(void) const;
+    void moveTopLeft(const MythPoint points);
+    void moveLeft(const QString &sX);
+    void moveLeft(int X) { QRect::moveLeft(X); }
+    void moveTop(const QString &sX);
+    void moveTop(int Y) { QRect::moveTop(Y); }
+
+    QRect toQRect(void) const;
 
   private:
     float m_percentWidth;
     float m_percentHeight;
+    float m_percentX;
+    float m_percentY;
+
+    bool m_needsUpdate;
+
+    QRect m_parentArea;
+};
+
+/** \class MythPoint
+ *
+ * \brief Wrapper around QPoint allowing us to handle percentage and other
+ *        relative values for positioning in mythui
+ */
+class MythPoint : public QPoint
+{
+
+  public:
+    MythPoint();
+    MythPoint(int x, int y);
+    MythPoint(const QString &sX, const QString &sY);
+    MythPoint(QPoint point);
+
+    void Init(void);
+    void CalculatePoint(MythRect parentArea);
+
+    void NormPoint(void);
+
+    void setX(const QString &sX);
+    void setX(int X) { QPoint::setX(X); }
+    void setY(const QString &sY);
+    void setY(int Y) { QPoint::setY(Y); }
+
+    QString getX(void) const;
+    QString getY(void) const;
+
+    QPoint toQPoint(void) const;
+
+  private:
     float m_percentX;
     float m_percentY;
 

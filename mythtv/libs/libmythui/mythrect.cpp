@@ -28,33 +28,6 @@ MythRect::MythRect(QRect rect)
     Init();
 }
 
-MythRect::MythRect(const MythRect &rect)
-          : QRect(rect)
-{
-    Init();
-
-    m_percentWidth = rect.m_percentWidth;
-    m_percentHeight = rect.m_percentHeight;
-    m_percentX = rect.m_percentX;
-    m_percentY = rect.m_percentY;
-
-    m_needsUpdate = rect.m_needsUpdate;
-}
-
-MythRect& MythRect::operator=(const MythRect& rect)
-{
-    if (this != &rect)
-    {
-        QRect::operator=(rect);
-        m_percentWidth = rect.m_percentWidth;
-        m_percentHeight = rect.m_percentHeight;
-        m_percentX = rect.m_percentX;
-        m_percentY = rect.m_percentY;
-        m_needsUpdate = rect.m_needsUpdate;
-    }
-    return *this;
-}
-
 void MythRect::Init()
 {
     m_needsUpdate = true;
@@ -105,7 +78,7 @@ void MythRect::NormRect(void)
     if (m_percentY == 0.0)
         Y = GetMythMainWindow()->NormY(y());
 
-    moveTopLeft(QPoint(X,Y));
+    QRect::moveTopLeft(QPoint(X,Y));
 
     normalized();
 }
@@ -145,7 +118,6 @@ void MythRect::setY(const QString &sY)
         QRect::setY(Y.toInt());
 }
 
-
 void MythRect::setWidth(const QString &sWidth)
 {
     QString width = sWidth;
@@ -172,7 +144,47 @@ void MythRect::setHeight(const QString &sHeight)
         QRect::setHeight(height.toInt());
 }
 
-QString MythRect::getX(void)
+MythPoint MythRect::topLeft(void) const
+{
+    MythPoint point;
+    point.setX(getX());
+    point.setY(getY());
+    return point;
+}
+
+void MythRect::moveTopLeft(MythPoint point)
+{
+    moveLeft(point.getX());
+    moveTop(point.getY());
+}
+
+void MythRect::moveLeft(const QString &sX)
+{
+    QString X = sX;
+    if (X.endsWith("%"))
+    {
+        X.chop(1);
+        m_percentX = X.toFloat() / 100.0;
+        m_needsUpdate = true;
+    }
+    else
+        QRect::moveLeft(X.toInt());
+}
+
+void MythRect::moveTop(const QString &sY)
+{
+    QString Y = sY;
+    if (Y.endsWith("%"))
+    {
+        Y.chop(1);
+        m_percentY = Y.toFloat() / 100.0;
+        m_needsUpdate = true;
+    }
+    else
+        QRect::moveTop(Y.toInt());
+}
+
+QString MythRect::getX(void) const
 {
     QString stringX;
     if (m_percentX > 0.0)
@@ -182,7 +194,7 @@ QString MythRect::getX(void)
     return stringX;
 }
 
-QString MythRect::getY(void)
+QString MythRect::getY(void) const
 {
     QString stringY;
     if (m_percentY > 0.0)
@@ -192,7 +204,7 @@ QString MythRect::getY(void)
     return stringY;
 }
 
-QString MythRect::getWidth(void)
+QString MythRect::getWidth(void) const
 {
     QString stringWidth;
     if (m_percentWidth > 0.0)
@@ -202,7 +214,7 @@ QString MythRect::getWidth(void)
     return stringWidth;
 }
 
-QString MythRect::getHeight(void)
+QString MythRect::getHeight(void) const
 {
     QString stringHeight;
     if (m_percentHeight > 0.0)
@@ -212,8 +224,124 @@ QString MythRect::getHeight(void)
     return stringHeight;
 }
 
-QRect MythRect::toQRect()
+QRect MythRect::toQRect() const
 {
     return QRect(x(),y(),width(),height());
+}
+
+///////////////////////////////////////////////////////////////////
+
+MythPoint::MythPoint()
+         : QPoint()
+{
+    Init();
+}
+
+MythPoint::MythPoint(int x, int y)
+         : QPoint(x, y)
+{
+    Init();
+}
+
+MythPoint::MythPoint(const QString &sX, const QString &sY)
+         : QPoint()
+{
+    Init();
+    setX(sX);
+    setY(sY);
+}
+
+MythPoint::MythPoint(QPoint point)
+          : QPoint(point)
+{
+    Init();
+}
+
+void MythPoint::Init()
+{
+    m_needsUpdate = true;
+    m_percentX = m_percentY = 0.0;
+}
+
+void MythPoint::CalculatePoint(MythRect parentArea)
+{
+    QRect area  = parentArea.toQRect();
+    if ((m_parentArea == area && !m_needsUpdate) || !parentArea.isValid())
+        return;
+
+    m_parentArea  = area;
+
+    int X = x();
+    int Y = y();
+
+    if (m_percentX > 0.0)
+        X = m_percentX * (float)(m_parentArea.width());
+    if (m_percentY > 0.0)
+        Y = m_percentY * (float)(m_parentArea.height());
+
+    QPoint::setX(X);
+    QPoint::setY(Y);
+
+    m_needsUpdate = false;
+}
+
+void MythPoint::NormPoint(void)
+{
+    if (m_percentX == 0.0)
+        QPoint::setX(GetMythMainWindow()->NormX(x()));
+
+    if (m_percentY == 0.0)
+        QPoint::setY(GetMythMainWindow()->NormY(y()));
+}
+
+void MythPoint::setX(const QString &sX)
+{
+    QString X = sX;
+    if (X.endsWith("%"))
+    {
+        X.chop(1);
+        m_percentX = X.toFloat() / 100.0;
+        m_needsUpdate = true;
+    }
+    else
+        QPoint::setX(X.toInt());
+}
+
+void MythPoint::setY(const QString &sY)
+{
+    QString Y = sY;
+    if (Y.endsWith("%"))
+    {
+        Y.chop(1);
+        m_percentY = Y.toFloat() / 100.0;
+        m_needsUpdate = true;
+    }
+    else
+        QPoint::setY(Y.toInt());
+}
+
+QString MythPoint::getX(void) const
+{
+    QString stringX;
+    if (m_percentX > 0.0)
+        stringX = QString("%1%").arg((int)(m_percentX * 100));
+    else
+        stringX = QString("%1").arg(x());
+    return stringX;
+}
+
+QString MythPoint::getY(void) const
+{
+    QString stringY;
+    if (m_percentY > 0.0)
+        stringY = QString("%1%").arg((int)(m_percentY * 100));
+    else
+        stringY = QString("%1").arg(y());
+    return stringY;
+}
+
+QPoint MythPoint::toQPoint() const
+{
+    return QPoint(x(),y());
 }
 

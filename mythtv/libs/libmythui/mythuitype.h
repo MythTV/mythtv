@@ -38,7 +38,7 @@ class MythUIType : public QObject, public XMLParseBase
     void DeleteAllChildren(void);
 
     // Check set dirty status
-    bool NeedsRedraw(void);
+    bool NeedsRedraw(void) const;
     void SetRedraw();
 
     void SetChildNeedsRedraw(MythUIType *child);
@@ -58,8 +58,8 @@ class MythUIType : public QObject, public XMLParseBase
               QRect clipRegion = QRect());
 
     virtual void SetPosition(int x, int y);
-    virtual void SetPosition(const QPoint &pos);
-    virtual QPoint GetPosition(void) const;
+    virtual void SetPosition(const MythPoint &pos);
+    virtual MythPoint GetPosition(void) const;
     virtual void SetSize(const QSize &size);
     virtual void SetArea(const MythRect &rect);
     virtual MythRect GetArea(void) const;
@@ -73,7 +73,7 @@ class MythUIType : public QObject, public XMLParseBase
                     bool multiline = false, int overload_width = -1,
                     int overload_height = -1);
 
-    bool IsVisible(void);
+    bool IsVisible(void) const;
     void SetVisible(bool visible);
 
     void MoveTo(QPoint destXY, QPoint speedXY);
@@ -81,7 +81,7 @@ class MythUIType : public QObject, public XMLParseBase
     void AdjustAlpha(int mode, int alphachange, int minalpha = 0,
                      int maxalpha = 255);
     void SetAlpha(int newalpha);
-    int GetAlpha(void);
+    int GetAlpha(void) const;
 
     virtual bool keyPressEvent(QKeyEvent *);
     virtual void gestureEvent(MythUIType *origtype, MythGestureEvent *ge);
@@ -123,7 +123,6 @@ class MythUIType : public QObject, public XMLParseBase
 
     QFont CreateQFont(const QString &face, int pointSize = 12,
                       int weight = QFont::Normal, bool italic = FALSE);
-    QPoint NormPoint(const QPoint &point);
     int NormX(const int width);
     int NormY(const int height);
 

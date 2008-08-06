@@ -1,4 +1,7 @@
 
+#include <iostream>
+#include "mythverbose.h"
+
 using namespace std;
 
 #include "mythuitype.h"
@@ -163,7 +166,7 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p)
     return NULL;
 }
 
-bool MythUIType::NeedsRedraw(void)
+bool MythUIType::NeedsRedraw(void) const
 {
     return m_NeedsRedraw;
 }
@@ -223,7 +226,7 @@ void MythUIType::HandleMovementPulse(void)
     if (!m_Moving)
         return;
 
-    QPoint curXY = m_Area.topLeft();
+    QPoint curXY = m_Area.topLeft().toQPoint();
     m_DirtyRegion = m_Area.toQRect();
 
     int xdir = m_XYDestination.x() - curXY.x();
@@ -333,10 +336,10 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
 
 void MythUIType::SetPosition(int x, int y)
 {
-    SetPosition(QPoint(x, y));
+    SetPosition(MythPoint(x, y));
 }
 
-void MythUIType::SetPosition(const QPoint &pos)
+void MythUIType::SetPosition(const MythPoint &pos)
 {
     if (m_Area.topLeft() == pos)
         return;
@@ -344,12 +347,18 @@ void MythUIType::SetPosition(const QPoint &pos)
     m_DirtyRegion = QRegion(m_Area.toQRect());
 
     m_Area.moveTopLeft(pos);
+
+    if (m_Parent)
+        m_Area.CalculateArea(m_Parent->GetArea());
+    else
+        m_Area.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
+
     SetRedraw();
 }
 
-QPoint MythUIType::GetPosition(void) const
+MythPoint MythUIType::GetPosition(void) const
 {
-    return QPoint(m_Area.x(), m_Area.y());
+    return m_Area.topLeft();
 }
 
 void MythUIType::SetSize(const QSize &size)
@@ -460,7 +469,7 @@ QString MythUIType::cutDown(const QString &data, QFont *font,
 
 }
 
-bool MythUIType::IsVisible(void)
+bool MythUIType::IsVisible(void) const
 {
     return m_Visible;
 }
@@ -502,7 +511,7 @@ void MythUIType::SetAlpha(int newalpha)
     SetRedraw();
 }
 
-int MythUIType::GetAlpha(void)
+int MythUIType::GetAlpha(void) const
 {
     return m_Alpha;
 }
@@ -590,11 +599,6 @@ QFont MythUIType::CreateQFont(const QString &face, int pointSize,
                               int weight, bool italic)
 {
     return GetMythMainWindow()->CreateQFont(face, pointSize, weight, italic);
-}
-
-QPoint MythUIType::NormPoint(const QPoint &point)
-{
-    return GetMythMainWindow()->NormPoint(point);
 }
 
 int MythUIType::NormX(const int x)

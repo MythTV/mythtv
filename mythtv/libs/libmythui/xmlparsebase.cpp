@@ -46,20 +46,20 @@ bool XMLParseBase::parseBool(QDomElement &element)
     return parseBool(getFirstText(element));
 }
 
-QPoint XMLParseBase::parsePoint(const QString &text, bool normalize)
+MythPoint XMLParseBase::parsePoint(const QString &text, bool normalize)
 {
-    int x, y;
-    QPoint retval;
-    if (sscanf(text.toAscii().constData(), "%d,%d", &x, &y) == 2)
-        retval = QPoint(x, y);
+    MythPoint retval;
+    QStringList values = text.split(',', QString::SkipEmptyParts);
+    if (values.size() == 2)
+        retval = MythPoint(values[0], values[1]);
 
-    if (normalize)
-        retval = GetMythMainWindow()->NormPoint(retval);
+     if (normalize)
+         retval.NormPoint();
 
     return retval;
 }
 
-QPoint XMLParseBase::parsePoint(QDomElement &element, bool normalize)
+MythPoint XMLParseBase::parsePoint(QDomElement &element, bool normalize)
 {
     return parsePoint(getFirstText(element), normalize);
 }
@@ -97,11 +97,9 @@ MythRect XMLParseBase::parseRect(const QString &text, bool normalize)
     MythRect retval;
     QStringList values = text.split(',', QString::SkipEmptyParts);
     if (values.size() == 4)
-    {
         retval = MythRect(values[0], values[1], values[2], values[3]);
-    }
 
-     if (normalize && retval.isValid())
+     if (normalize)
          retval.NormRect();
 
     return retval;

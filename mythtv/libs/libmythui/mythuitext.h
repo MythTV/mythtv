@@ -33,7 +33,7 @@ class MythUIText : public MythUIType
     void SetCutDown(bool cut);
 
     void SetArea(const MythRect &rect);
-    void SetPosition(const QPoint &pos);
+    void SetPosition(const MythPoint &pos);
     MythRect GetDrawRect(void) { return m_drawRect; }
     void SetStartPosition(const int x, const int y);
     void MoveStartPosition(const int x, const int y);

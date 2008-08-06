@@ -123,7 +123,7 @@ void MythUIText::SetArea(const MythRect &rect)
     m_drawRect = m_Area;
 }
 
-void MythUIText::SetPosition(const QPoint &pos)
+void MythUIText::SetPosition(const MythPoint &pos)
 {
     MythUIType::SetPosition(pos);
     m_drawRect.moveTopLeft(m_Area.topLeft());
