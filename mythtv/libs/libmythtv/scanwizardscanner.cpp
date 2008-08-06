@@ -510,8 +510,11 @@ void ScanWizardScanner::PreScanCommon(int scantype,
 #endif
 
 #ifdef USING_V4L
-    if (("V4L" == card_type) || ("MPEG" == card_type))
+    if (("V4L" == card_type) || ("MPEG" == card_type) ||
+        ("HDPVR" == card_type))
+    {
         channel = new V4LChannel(NULL, device);
+    }
 #endif
 
 #ifdef USING_HDHOMERUN

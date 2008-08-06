@@ -1517,7 +1517,7 @@ MPEGConfigurationGroup::MPEGConfigurationGroup(CaptureCard &a_parent) :
     input(new TunerCardInput(parent))
 {
     VideoDevice *device =
-        new VideoDevice(parent, 0, 15, QString::null, "(ivtv|hdpvr)");
+        new VideoDevice(parent, 0, 15, QString::null, "ivtv");
 
     cardinfo->setLabel(tr("Probed info"));
 
@@ -1550,6 +1550,47 @@ void MPEGConfigurationGroup::probeCard(const QString &device)
     input->fillSelections(device);
 }
 
+HDPVRConfigurationGroup::HDPVRConfigurationGroup(CaptureCard &a_parent) :
+    VerticalConfigurationGroup(false, true, false, false),
+    parent(a_parent), cardinfo(new TransLabelSetting()),
+    videoinput(new TunerCardInput(parent)),
+    audioinput(new TunerCardAudioInput(parent, QString::null, "HDPVR"))
+{
+    VideoDevice *device =
+        new VideoDevice(parent, 0, 15, QString::null, "hdpvr");
+
+    cardinfo->setLabel(tr("Probed info"));
+
+    addChild(device);
+    addChild(cardinfo);
+    addChild(videoinput);
+    addChild(audioinput);
+
+    connect(device, SIGNAL(valueChanged(const QString&)),
+            this,   SLOT(  probeCard(   const QString&)));
+
+    probeCard(device->getValue());
+}
+
+void HDPVRConfigurationGroup::probeCard(const QString &device)
+{
+    QString cn = tr("Failed to open"), ci = cn, dn = QString::null;
+
+    int videofd = open(device.ascii(), O_RDWR);
+    if (videofd >= 0)
+    {
+        if (!CardUtil::GetV4LInfo(videofd, cn, dn))
+            ci = cn = tr("Failed to probe");
+        else if (!dn.isEmpty())
+            ci = cn + "  [" + dn + "]";
+        close(videofd);
+    }
+
+    cardinfo->setValue(ci);
+    videoinput->fillSelections(device);
+    audioinput->fillSelections(device);
+}
+
 CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
     TriggeredConfigurationGroup(true, true, false, false)
 {
@@ -1566,6 +1607,9 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
 # ifdef USING_IVTV
     addTarget("MPEG",      new MPEGConfigurationGroup(parent));
 # endif // USING_IVTV
+# ifdef USING_HDPVR
+    addTarget("HDPVR",     new HDPVRConfigurationGroup(parent));
+# endif // USING_HDPVR
 #endif // USING_V4L
 
 #ifdef USING_DVB
@@ -1752,6 +1796,10 @@ void CardType::fillSelections(SelectSetting* setting)
     setting->addSelection(
         QObject::tr("MPEG-2 encoder card (PVR-x50, PVR-500)"), "MPEG");
 # endif // USING_IVTV
+# ifdef USING_HDPVR
+    setting->addSelection(
+        QObject::tr("H.264 encoder card (HD-PVR)"), "HDPVR");
+# endif // USING_HDPVR
 #endif // USING_V4L
 
 #ifdef USING_DVB
@@ -2952,10 +3000,42 @@ void TunerCardInput::fillSelections(const QString& device)
 
     last_device = device;
     QStringList inputs =
-        CardUtil::probeInputs(device, last_cardtype);
+        CardUtil::ProbeVideoInputs(device, last_cardtype);
 
     for (QStringList::iterator i = inputs.begin(); i != inputs.end(); ++i)
         addSelection(*i);
+}
+
+TunerCardAudioInput::TunerCardAudioInput(const CaptureCard &parent,
+                                         QString dev, QString type) :
+    ComboBoxSetting(this), CaptureCardDBStorage(this, parent, "audiodevice"),
+    last_device(dev), last_cardtype(type)
+{
+    setLabel(QObject::tr("Audio input"));
+    int cardid = parent.getCardID();
+    if (cardid <= 0)
+        return;
+
+    last_cardtype = CardUtil::GetRawCardType(cardid);
+    last_device   = CardUtil::GetAudioDevice(cardid);
+}
+
+void TunerCardAudioInput::fillSelections(const QString &device)
+{
+    clearSelections();
+
+    if (device.isEmpty())
+        return;
+
+    last_device = device;
+    QStringList inputs =
+        CardUtil::ProbeAudioInputs(device, last_cardtype);
+
+    for (uint i = 0; i < inputs.size(); i++)
+    {
+        addSelection(inputs[i], QString::number(i),
+                     last_device == QString::number(i));
+    }
 }
 
 class DVBExtra : public ConfigurationWizard

@@ -208,7 +208,7 @@ bool TVRec::CreateChannel(const QString &startchannel)
         CloseChannel();
         init_run = true;
 #endif
-        if (genOpt.cardtype != "MPEG")
+        if ((genOpt.cardtype != "MPEG") && (genOpt.cardtype != "HDPVR"))
             rbFileExt = "nuv";
     }
 
@@ -951,7 +951,7 @@ void TVRec::ChangeState(TVState nextState)
  *  \brief Allocates and initializes the RecorderBase instance.
  *
  *  Based on the card type, one of the possible recorders are started.
- *  If the card type is "MPEG" a MpegRecorder is started,
+ *  If the card type is "MPEG" or "HDPVR" a MpegRecorder is started,
  *  if the card type is "HDHOMERUN" a HDHRRecorder is started,
  *  if the card type is "FIREWIRE" a FirewireRecorder is started,
  *  if the card type is "DVB" a DVBRecorder is started,
@@ -968,6 +968,12 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
 #ifdef USING_IVTV
         recorder = new MpegRecorder(this);
 #endif // USING_IVTV
+    }
+    if (genOpt.cardtype == "HDPVR")
+    {
+#ifdef USING_HDPVR
+        recorder = new MpegRecorder(this);
+#endif // USING_HDPVR
     }
     else if (genOpt.cardtype == "FIREWIRE")
     {
@@ -2576,6 +2582,8 @@ long long TVRec::GetMaxBitrate(void)
     long long bitrate;
     if (genOpt.cardtype == "MPEG")
         bitrate = 10080000LL; // use DVD max bit rate
+    if (genOpt.cardtype == "HDPVR")
+        bitrate = 20200000LL; // Peek bit rate for HD-PVR
     else if (genOpt.cardtype == "DBOX2")
         bitrate = 10080000LL; // use DVD max bit rate
     else if (!CardUtil::IsEncoder(genOpt.cardtype))

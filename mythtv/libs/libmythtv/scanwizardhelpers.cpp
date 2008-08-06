@@ -60,6 +60,9 @@ static QString card_types(void)
 # ifdef USING_IVTV
     cardTypes += ",'MPEG'";
 # endif // USING_IVTV
+# ifdef USING_HDPVR
+    cardTypes += ",'HDPVR'";
+# endif // USING_HDPVR
 #endif // USING_V4L
 
 #ifdef USING_IPTV

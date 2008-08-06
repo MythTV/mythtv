@@ -23,7 +23,7 @@ class MPUBLIC RemoteEncoder
     int GetRecorderNumber(void);
 
     ProgramInfo *GetRecording(void);
-    bool IsRecording(void);
+    bool IsRecording(bool *ok = NULL);
     float GetFrameRate(void);
     long long GetFramesWritten(void);
     /// \brief Return value last returned by GetFramesWritten().

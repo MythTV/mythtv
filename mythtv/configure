@@ -158,6 +158,7 @@ BLOCK_QUOTE
   echo "  --disable-hdhomerun      disable support for HDHomeRun boxes"
   echo "  --disable-v4l            disable Video4Linux support"
   echo "  --disable-ivtv           disable ivtv support (PVR-x50) req. v4l support"
+  echo "  --disable-hdpvr          disable HD-PVR support"
   echo "  --disable-dvb            disable DVB support"
   echo "  --dvb-path=HDRLOC        location of directory containing"
   echo "                           'linux/dvb/frontend.h', not the"
@@ -892,6 +893,7 @@ MYTHTV_CONFIG_LIST='
     hdhomerun
     iptv
     ivtv
+    hdpvr
     joystick_menu
     libfftw3
     lirc
@@ -1050,6 +1052,7 @@ dvb_deps="backend"
 firewire_deps="backend"
 iptv_deps="backend"
 ivtv_deps="backend v4l"
+hdpvr_deps="backend v4l"
 hdhomerun_deps="backend"
 opengl_deps="GL_gl_h"
 opengl_deps_any="windows x11"
@@ -1182,6 +1185,7 @@ frontend="yes"
 hdhomerun="yes"
 iptv="yes"
 ivtv="yes"
+hdpvr="yes"
 joystick_menu="default"
 lamemp3="yes"
 lirc="yes"
@@ -1619,6 +1623,7 @@ case $targetos in
     enable  darwin
     disable dvb
     disable ivtv
+    disable hdpvr
     ldver=$(ld -v 2>&1 | sed -e s/^[^-]*-//)
     osxver=$(uname -r | cut -c 1)
     if [[ ${ldver%.*} -lt "82" && ${osxver} = "9" && ${arch} = "x86_32" ]]; then
@@ -1649,6 +1654,7 @@ case $targetos in
     disable dv1394
     disable dvb
     disable ivtv
+    disable hdpvr
     enable  memalign_hack
     disable network
     enable opengl
@@ -3000,6 +3006,7 @@ fi
 if enabled backend; then
   echo "Video4Linux sup.          ${v4l-no}"
   echo "ivtv support              ${ivtv-no}"
+  echo "HR-PVR support            ${hdpvr-no}"
   echo "FireWire support          ${firewire-no}"
   echo "DVB support               ${dvb-no} [$dvb_path]"
   echo "DBox2 support             ${dbox2-no}"

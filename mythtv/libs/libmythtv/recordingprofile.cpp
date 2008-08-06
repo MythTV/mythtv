@@ -653,32 +653,43 @@ class EncodingThreadCount : public SliderSetting, public CodecParamStorage
     };
 };
 
-class MPEG2bitrate : public SliderSetting, public CodecParamStorage
+class AverageBitrate : public SliderSetting, public CodecParamStorage
 {
   public:
-    MPEG2bitrate(const RecordingProfile &parent) :
-        SliderSetting(this, 1000, 16000, 100),
-        CodecParamStorage(this, parent, "mpeg2bitrate")
+    AverageBitrate(const RecordingProfile &parent,
+                   QString setting = "mpeg2bitrate",
+                   uint min_br = 1000, uint max_br = 16000,
+                   uint default_br = 4500, uint increment = 100,
+                   QString label = QString::null) :
+        SliderSetting(this, min_br, max_br, increment),
+        CodecParamStorage(this, parent, setting)
     {
-
-        setLabel(QObject::tr("Bitrate"));
-        setValue(4500);
-        setHelpText(QObject::tr("Bitrate in kilobits/second.  2200Kbps is "
-                    "approximately 1 Gigabyte per hour."));
+        if (label.isEmpty())
+            label = QObject::tr("Avg. Bitrate");
+        setLabel(label);
+        setValue(default_br);
+        setHelpText(QObject::tr(
+                        "Average bit rate in kilobits/second. "
+                        "2200Kbps is approximately 1 Gigabyte per hour."));
     };
 };
 
-class MPEG2maxBitrate : public SliderSetting, public CodecParamStorage
+class PeakBitrate : public SliderSetting, public CodecParamStorage
 {
   public:
-    MPEG2maxBitrate(const RecordingProfile &parent) :
-        SliderSetting(this, 1000, 16000, 100),
-        CodecParamStorage(this, parent, "mpeg2maxbitrate")
+    PeakBitrate(const RecordingProfile &parent,
+                QString setting = "mpeg2maxbitrate",
+                uint min_br = 1000, uint max_br = 16000,
+                uint default_br = 6000, uint increment = 100,
+                QString label = QString::null) :
+        SliderSetting(this, min_br, max_br, increment),
+        CodecParamStorage(this, parent, setting)
     {
-
-        setLabel(QObject::tr("Max. Bitrate"));
-        setValue(6000);
-        setHelpText(QObject::tr("Maximum Bitrate in kilobits/second.  "
+        if (label.isEmpty())
+            label = QObject::tr("Max. Bitrate");
+        setLabel(label);
+        setValue(default_br);
+        setHelpText(QObject::tr("Maximum bit rate in kilobits/second. "
                     "2200Kbps is approximately 1 Gigabyte per hour."));
     };
 };
@@ -820,7 +831,7 @@ class VideoCompressionSettings : public TriggeredConfigurationGroup
 
         params = new VerticalConfigurationGroup(false);
         params->setLabel(QObject::tr("MPEG-2 Parameters"));
-        params->addChild(new MPEG2bitrate(parent));
+        params->addChild(new AverageBitrate(parent));
         params->addChild(new ScaleBitrate(parent));
         //params->addChild(new MPEG4MaxQuality(parent));
         //params->addChild(new MPEG4MinQuality(parent));
@@ -844,17 +855,47 @@ class VideoCompressionSettings : public TriggeredConfigurationGroup
         params->setLabel(QObject::tr("MPEG-2 Hardware Encoder"));
         params->addChild(new MPEG2streamType(parent));
         params->addChild(new MPEG2aspectRatio(parent));
-        params->addChild(new MPEG2bitrate(parent));
-        params->addChild(new MPEG2maxBitrate(parent));
+        params->addChild(new AverageBitrate(parent));
+        params->addChild(new PeakBitrate(parent));
 
         addTarget("MPEG-2 Hardware Encoder", params);
+
+        params = new VerticalConfigurationGroup(false);
+        params->setLabel(QObject::tr("MPEG-4 AVC Hardware Encoder"));
+        ConfigurationGroup *h0 = new HorizontalConfigurationGroup(
+            true, false, true, true);
+        h0->setLabel(QObject::tr("Low Resolution"));
+        h0->addChild(new AverageBitrate(parent, "low_mpeg4avgbitrate",
+                                        1000, 13500, 4500, 500));
+        h0->addChild(new PeakBitrate(parent, "low_mpeg4peakbitrate",
+                                     1100, 20200, 6000, 500));
+        params->addChild(h0);
+        ConfigurationGroup *h1 = new HorizontalConfigurationGroup(
+            true, false, true, true);
+        h1->setLabel(QObject::tr("Medium Resolution"));
+        h1->addChild(new AverageBitrate(parent, "medium_mpeg4avgbitrate",
+                                        1000, 13500, 9000, 500));
+        h1->addChild(new PeakBitrate(parent, "medium_mpeg4peakbitrate",
+                                     1100, 20200, 11000, 500));
+        params->addChild(h1);
+        ConfigurationGroup *h2 = new HorizontalConfigurationGroup(
+            true, false, true, true);
+        h2->setLabel(QObject::tr("High Resolution"));
+        h2->addChild(new AverageBitrate(parent, "high_mpeg4avgbitrate",
+                                        1000, 13500, 13500, 500));
+        h2->addChild(new PeakBitrate(parent, "high_mpeg4peakbitrate",
+                                     1100, 20200, 20200, 500));
+        params->addChild(h2);
+        addTarget("MPEG-4 AVC Hardware Encoder", params);
     }
 
     void selectCodecs(QString groupType)
     {
         if (!groupType.isNull())
         {
-            if (groupType == "MPEG")
+            if (groupType == "HDPVR")
+               codecName->addSelection("MPEG-4 AVC Hardware Encoder");
+            else if (groupType == "MPEG")
                codecName->addSelection("MPEG-2 Hardware Encoder");
             else if (groupType == "MJPEG")
                 codecName->addSelection("Hardware MJPEG");
@@ -1211,13 +1252,17 @@ void RecordingProfile::loadByID(int profileId)
     if (isEncoder)
     {
         QString tvFormat = gContext->GetSetting("TVFormat");
-        addChild(new ImageSize(*this, tvFormat, profileName));
+        if (type.upper() != "HDPVR")
+            addChild(new ImageSize(*this, tvFormat, profileName));
 
         videoSettings = new VideoCompressionSettings(*this, profileName);
         addChild(videoSettings);
 
-        audioSettings = new AudioCompressionSettings(*this, profileName);
-        addChild(audioSettings);
+        if (type.upper() != "HDPVR")
+        {
+            audioSettings = new AudioCompressionSettings(*this, profileName);
+            addChild(audioSettings);
+        }
 
         if (!profileName.isEmpty() && profileName.left(11) == "Transcoders")
         {

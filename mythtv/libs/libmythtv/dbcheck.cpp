@@ -18,7 +18,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1222";
+const QString currentDatabaseVersion = "1223";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -4287,6 +4287,20 @@ NULL
             return false;
     }
 
+    if (dbver == "1222")
+    {
+        const char *updates[] = {
+"INSERT INTO profilegroups SET name = 'HD-PVR Recorders', "
+"  cardtype = 'HDPVR', is_default = 1;",
+"INSERT INTO recordingprofiles SET name = 'Default',      profilegroup = 13;",
+"INSERT INTO recordingprofiles SET name = 'Live TV',      profilegroup = 13;",
+"INSERT INTO recordingprofiles SET name = 'High Quality', profilegroup = 13;",
+"INSERT INTO recordingprofiles SET name = 'Low Quality',  profilegroup = 13;",
+NULL
+};
+        if (!performActualUpdate(updates, "1223", dbver))
+            return false;
+    }
 
     return true;
 }

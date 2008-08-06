@@ -93,7 +93,8 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 
 #ifdef USING_V4L
     if ((cardtype.toUpper() == "V4L") ||
-        (cardtype.toUpper() == "MPEG"))
+        (cardtype.toUpper() == "MPEG") || 
+        (cardtype.toUpper() == "HDPVR"))
     {
         V4LChannel *chan = dynamic_cast<V4LChannel*>(channel);
         if (chan)

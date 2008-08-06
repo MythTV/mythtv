@@ -365,6 +365,22 @@ class SingleCardInput : public TunerCardInput
     }
 };
 
+class TunerCardAudioInput : public ComboBoxSetting, public CaptureCardDBStorage
+{
+    Q_OBJECT
+  public:
+    TunerCardAudioInput(const CaptureCard &parent,
+                        QString dev  = QString::null,
+                        QString type = QString::null);
+
+  public slots:
+    void fillSelections(const QString &device);
+
+  private:
+    QString last_device;
+    QString last_cardtype;
+};
+
 class DVBAudioDevice : public LineEditSetting, public CaptureCardDBStorage
 {
     Q_OBJECT
@@ -453,6 +469,23 @@ class MPEGConfigurationGroup: public VerticalConfigurationGroup
     CaptureCard       &parent;
     TransLabelSetting *cardinfo;
     TunerCardInput    *input;
+};
+
+class HDPVRConfigurationGroup: public VerticalConfigurationGroup
+{
+   Q_OBJECT
+
+  public:
+    HDPVRConfigurationGroup(CaptureCard &parent);
+
+  public slots:
+    void probeCard(const QString &device);
+
+  private:
+    CaptureCard         &parent;
+    TransLabelSetting   *cardinfo;
+    TunerCardInput      *videoinput;
+    TunerCardAudioInput *audioinput;
 };
 
 class DVBCardNum;

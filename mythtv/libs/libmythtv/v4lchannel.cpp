@@ -281,7 +281,7 @@ bool V4LChannel::InitializeInputs(void)
     int videomode_v4l2 = format_to_mode(fmt.toUpper(), 2);
 
     bool ok = false;
-    InputNames v4l_inputs = CardUtil::probeV4LInputs(videofd, ok);
+    InputNames v4l_inputs = CardUtil::ProbeV4LVideoInputs(videofd, ok);
 
     // Insert info from hardware
     uint valid_cnt = 0;

@@ -90,14 +90,28 @@ MythSocket *RemoteEncoder::openControlSocket(const QString &host, short port)
     return sock;
 }
 
-bool RemoteEncoder::IsRecording(void)
+bool RemoteEncoder::IsRecording(bool *ok)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum) );
     strlist << "IS_RECORDING";
 
     SendReceiveStringList(strlist);
 
+    if (strlist.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "RemoteEncoder::IsRecording(), Error: No Reply.");
+        if (ok)
+            *ok = false;
+
+        return false;
+    }
+
     bool retval = strlist[0].toInt();
+
+    if (ok)
+        *ok = true;
+
     return retval;
 }
 

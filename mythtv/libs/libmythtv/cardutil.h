@@ -53,6 +53,7 @@ class MPUBLIC CardUtil
         FIREWIRE  = 9,
         HDHOMERUN = 10,
         FREEBOX   = 11,
+        HDPVR     = 12,
     };
 
     static enum CARD_TYPES toCardType(const QString &name)
@@ -81,6 +82,8 @@ class MPUBLIC CardUtil
             return HDHOMERUN;
         if ("FREEBOX" == name)
             return FREEBOX;
+        if ("HDPVR" == name)
+            return HDPVR;
         return ERROR_UNKNOWN;
     }
 
@@ -95,7 +98,8 @@ class MPUBLIC CardUtil
     static bool         IsUnscanable(const QString &rawtype)
     {
         return
-            (rawtype == "FIREWIRE")  || (rawtype == "DBOX2");
+            (rawtype == "FIREWIRE")  || (rawtype == "DBOX2") ||
+            (rawtype == "HDPVR");
     }
 
     static bool         IsEITCapable(const QString &rawtype)
@@ -119,7 +123,9 @@ class MPUBLIC CardUtil
 
     static bool         IsTuningAnalog(const QString &rawtype)
     {
-        return (rawtype == "V4L");
+        return
+            (rawtype == "V4L")    || (rawtype == "MPEG") ||
+            (rawtype == "HDPVR");
     }
 
     /// Convenience function for GetCardIDs(const QString&, QString, QString)
@@ -146,6 +152,8 @@ class MPUBLIC CardUtil
         { return get_on_cardid("cardtype", cardid).toUpper(); }
     static QString      GetVideoDevice(uint cardid)
         { return get_on_cardid("videodevice", cardid); }
+    static QString      GetAudioDevice(uint cardid)
+        { return get_on_cardid("audiodevice", cardid); }
     static QString      GetVBIDevice(uint cardid)
         { return get_on_cardid("vbidevice", cardid); }
     static uint         GetHDHRTuner(uint cardid)
@@ -194,8 +202,10 @@ class MPUBLIC CardUtil
 
     static QString      ProbeSubTypeName(uint cardid);
 
-    static QStringList  probeInputs(QString device,
-                                    QString cardtype = QString::null);
+    static QStringList  ProbeVideoInputs(QString device,
+                                         QString cardtype = QString::null);
+    static QStringList  ProbeAudioInputs(QString device,
+                                         QString cardtype = QString::null);
     static void         GetCardInputs(uint                cardid,
                                       const QString      &device,
                                       const QString      &cardtype,
@@ -240,11 +250,13 @@ class MPUBLIC CardUtil
                                    uint32_t &version);
     static bool         GetV4LInfo(int videofd, QString &card, QString &driver)
         { uint32_t dummy; return GetV4LInfo(videofd, card, driver, dummy); }
-    static InputNames   probeV4LInputs(int videofd, bool &ok);
+    static InputNames   ProbeV4LVideoInputs(int videofd, bool &ok);
+    static InputNames   ProbeV4LAudioInputs(int videofd, bool &ok);
 
   private:
-    static QStringList  probeV4LInputs(QString device);
-    static QStringList  probeDVBInputs(QString device);
+    static QStringList  ProbeV4LVideoInputs(QString device);
+    static QStringList  ProbeV4LAudioInputs(QString device);
+    static QStringList  ProbeDVBInputs(QString device);
 };
 
 #endif //_CARDUTIL_H_

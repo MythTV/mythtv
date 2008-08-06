@@ -93,6 +93,9 @@ MpegRecorder::MpegRecorder(TVRec *rec) : DTVRecorder(rec),
     audbitratel1(14),         audbitratel2(14),
     audbitratel3(10),
     audvolume(80),            language(0),
+    low_mpeg4avgbitrate(4500),    low_mpeg4peakbitrate(6000),
+    medium_mpeg4avgbitrate(9000), medium_mpeg4peakbitrate(13500),
+    high_mpeg4avgbitrate(13500),  high_mpeg4peakbitrate(20200),
     // Input file descriptors
     chanfd(-1),               readfd(-1),
     // TS packet handling
@@ -177,6 +180,28 @@ void MpegRecorder::SetOption(const QString &opt, int value)
     }
     else if (opt == "mpeg2audvolume")
         audvolume = value;
+    else if (opt.right(16) == "_mpeg4avgbitrate")
+    {
+        if (opt.left(3) == "low")
+            low_mpeg4avgbitrate = value;
+        else if (opt.left(6) == "medium")
+            medium_mpeg4avgbitrate = value;
+        else if (opt.left(4) == "high")
+            high_mpeg4avgbitrate = value;
+        else
+            RecorderBase::SetOption(opt, value);
+    }
+    else if (opt.right(17) == "_mpeg4peakbitrate")
+    {
+        if (opt.left(3) == "low")
+            low_mpeg4peakbitrate = value;
+        else if (opt.left(6) == "medium")
+            medium_mpeg4peakbitrate = value;
+        else if (opt.left(4) == "high")
+            high_mpeg4peakbitrate = value;
+        else
+            RecorderBase::SetOption(opt, value);
+    }
     else
         RecorderBase::SetOption(opt, value);
 }
@@ -273,6 +298,8 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
         SetOption("videodevice", videodev);
     }
 
+    SetOption("audiodevice", audiodev);
+
     SetOption("tvformat", gContext->GetSetting("TVFormat"));
     SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
 
@@ -291,6 +318,29 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
     SetIntOption(profile, "width");
     SetIntOption(profile, "height");
+
+    SetIntOption(profile, "low_mpeg4avgbitrate");
+    SetIntOption(profile, "low_mpeg4peakbitrate");
+    SetIntOption(profile, "medium_mpeg4avgbitrate");
+    SetIntOption(profile, "medium_mpeg4peakbitrate");
+    SetIntOption(profile, "high_mpeg4avgbitrate");
+    SetIntOption(profile, "high_mpeg4peakbitrate");
+}
+
+// same as the base class, it just doesn't complain if an option is missing
+void MpegRecorder::SetIntOption(RecordingProfile *profile, const QString &name)
+{
+    const Setting *setting = profile->byName(name);
+    if (setting)
+        SetOption(name, setting->getValue().toInt());
+}
+
+// same as the base class, it just doesn't complain if an option is missing
+void MpegRecorder::SetStrOption(RecordingProfile *profile, const QString &name)
+{
+    const Setting *setting = profile->byName(name);
+    if (setting)
+        SetOption(name, setting->getValue());
 }
 
 bool MpegRecorder::OpenMpegFileAsInput(void)
@@ -678,6 +728,12 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
 
         add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_STREAM_TYPE,
                      streamtype_ivtv_to_v4l2(GetFilteredStreamType()));
+
+    }
+    else
+    {
+        maxbitrate = high_mpeg4peakbitrate;
+        bitrate    = high_mpeg4avgbitrate;
     }
 
     add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE_PEAK,
@@ -702,6 +758,29 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("Could not set %1 to %2")
                     .arg(control_description[ext_ctrls[i].id]).arg(value) + ENO);
+        }
+    }
+
+    bool ok;
+    int audioinput = audiodevice.toUInt(&ok);
+    if (ok)
+    {
+        struct v4l2_audio ain;
+        bzero(&ain, sizeof(ain));
+        ain.index = audioinput;
+        if (ioctl(chanfd, VIDIOC_ENUMAUDIO, &ain) < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "Unable to get audio input.");
+        }
+        else
+        {
+            ain.index = audioinput;
+            if (ioctl(chanfd, VIDIOC_S_AUDIO, &ain) < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        "Unable to set audio input.");
+            }
         }
     }
 

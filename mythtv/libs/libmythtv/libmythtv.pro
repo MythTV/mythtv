@@ -475,6 +475,11 @@ using_backend {
     using_ivtv:SOURCES += mpegrecorder.cpp
     using_ivtv:DEFINES += USING_IVTV
 
+    # Support for HD-PVR on Linux
+    using_hdpvr:HEADERS *= mpegrecorder.h
+    using_hdpvr:SOURCES *= mpegrecorder.cpp
+    using_hdpvr:DEFINES += USING_HDPVR
+
     # Support for Linux DVB drivers
     using_dvb {
         # Basic DVB types

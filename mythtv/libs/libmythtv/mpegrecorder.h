@@ -59,6 +59,9 @@ class MpegRecorder : public DTVRecorder,
     void HandleSingleProgramPMT(ProgramMapTable *pmt);
 
   private:
+    void SetIntOption(RecordingProfile *profile, const QString &name);
+    void SetStrOption(RecordingProfile *profile, const QString &name);
+
     bool OpenMpegFileAsInput(void);
     bool OpenV4L2DeviceAsInput(void);
     bool SetIVTVDeviceOptions(int chanfd);
@@ -104,6 +107,12 @@ class MpegRecorder : public DTVRecorder,
     int audtype, audsamplerate, audbitratel1, audbitratel2, audbitratel3;
     int audvolume;
     unsigned int language; ///< 0 is Main Lang; 1 is SAP Lang; 2 is Dual
+    unsigned int low_mpeg4avgbitrate;
+    unsigned int low_mpeg4peakbitrate;
+    unsigned int medium_mpeg4avgbitrate;
+    unsigned int medium_mpeg4peakbitrate;
+    unsigned int high_mpeg4avgbitrate;
+    unsigned int high_mpeg4peakbitrate;
 
     // Input file descriptors
     int chanfd;

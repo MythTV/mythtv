@@ -1428,7 +1428,7 @@ bool CardUtil::GetV4LInfo(
     return !card.isEmpty();
 }
 
-InputNames CardUtil::probeV4LInputs(int videofd, bool &ok)
+InputNames CardUtil::ProbeV4LVideoInputs(int videofd, bool &ok)
 {
     (void) videofd;
 
@@ -1493,6 +1493,39 @@ InputNames CardUtil::probeV4LInputs(int videofd, bool &ok)
     return list;
 }
 
+InputNames CardUtil::ProbeV4LAudioInputs(int videofd, bool &ok)
+{
+    (void) videofd;
+
+    InputNames list;
+    ok = false;
+
+#ifdef USING_V4L
+    bool usingv4l2 = hasV4L2(videofd);
+
+    // V4L v2 query
+    struct v4l2_audio ain;
+    bzero(&ain, sizeof(ain));
+    while (usingv4l2 && (ioctl(videofd, VIDIOC_ENUMAUDIO, &ain) >= 0))
+    {
+        QString input((char *)ain.name);
+        list[ain.index] = input;
+        ain.index++;
+    }
+    if (ain.index)
+    {
+        ok = true;
+        return list;
+    }
+
+    ok = true;
+#else // if !USING_V4L
+    list[-1] += QObject::tr(
+        "ERROR, Compile with V4L support to query audio inputs");
+#endif // !USING_V4L
+    return list;
+}
+
 InputNames CardUtil::GetConfiguredDVBInputs(uint cardid)
 {
     InputNames list;
@@ -1513,7 +1546,7 @@ InputNames CardUtil::GetConfiguredDVBInputs(uint cardid)
     return list;
 }
 
-QStringList CardUtil::probeInputs(QString device, QString cardtype)
+QStringList CardUtil::ProbeVideoInputs(QString device, QString cardtype)
 {
     QStringList ret;
 
@@ -1525,14 +1558,25 @@ QStringList CardUtil::probeInputs(QString device, QString cardtype)
         ret += "MPEG2TS";
     }
     else if ("DVB" == cardtype)
-        ret += probeDVBInputs(device);
+        ret += ProbeDVBInputs(device);
     else
-        ret += probeV4LInputs(device);
+        ret += ProbeV4LVideoInputs(device);
 
     return ret;
 }
 
-QStringList CardUtil::probeV4LInputs(QString device)
+QStringList CardUtil::ProbeAudioInputs(QString device, QString cardtype)
+{
+    VERBOSE(VB_IMPORTANT, QString("ProbeAudioInputs(%1,%2)").arg(device).arg(cardtype));
+    QStringList ret;
+
+    if ("HDPVR" == cardtype)
+        ret += ProbeV4LAudioInputs(device);
+
+    return ret;
+}
+
+QStringList CardUtil::ProbeV4LVideoInputs(QString device)
 {
     bool ok;
     QStringList ret;
@@ -1544,7 +1588,7 @@ QStringList CardUtil::probeV4LInputs(QString device)
                            "to probe its inputs.").arg(device);
         return ret;
     }
-    InputNames list = CardUtil::probeV4LInputs(videofd, ok);
+    InputNames list = CardUtil::ProbeV4LVideoInputs(videofd, ok);
     close(videofd);
 
     if (!ok)
@@ -1563,7 +1607,40 @@ QStringList CardUtil::probeV4LInputs(QString device)
     return ret;
 }
 
-QStringList CardUtil::probeDVBInputs(QString device)
+QStringList CardUtil::ProbeV4LAudioInputs(QString device)
+{
+    VERBOSE(VB_IMPORTANT, QString("ProbeV4LAudioInputs(%1)").arg(device));
+
+    bool ok;
+    QStringList ret;
+    int videofd = open(device.ascii(), O_RDWR);
+    if (videofd < 0)
+    {
+        VERBOSE(VB_IMPORTANT, QString("ProbeAudioInputs() -> couldn't open device"));
+        ret += QObject::tr("Could not open '%1' "
+                           "to probe its inputs.").arg(device);
+        return ret;
+    }
+    InputNames list = CardUtil::ProbeV4LAudioInputs(videofd, ok);
+    close(videofd);
+
+    if (!ok)
+    {
+        ret += list[-1];
+        return ret;
+    }
+
+    InputNames::iterator it;
+    for (it = list.begin(); it != list.end(); ++it)
+    {
+        if (it.key() >= 0)
+            ret += *it;
+    }
+
+    return ret;
+}
+
+QStringList CardUtil::ProbeDVBInputs(QString device)
 {
     QStringList ret;
 
@@ -1651,7 +1728,7 @@ void CardUtil::GetCardInputs(
         inputs += "MPEG2TS";
     }
     else if ("DVB" != cardtype)
-        inputs += probeV4LInputs(device);
+        inputs += ProbeV4LVideoInputs(device);
 
     QString dev_label = GetDeviceLabel(cardid, cardtype, device);
 
