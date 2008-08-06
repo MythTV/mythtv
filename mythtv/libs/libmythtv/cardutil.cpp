@@ -900,6 +900,22 @@ QString CardUtil::GetInputName(uint inputid)
     return info.name;
 }
 
+QString CardUtil::GetStartingChannel(uint inputid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT startchan "
+                  "FROM cardinput "
+                  "WHERE cardinputid = :INPUTID");
+    query.bindValue(":INPUTID", inputid);
+
+    if (!query.exec())
+        MythContext::DBError("CardUtil::GetStartingChannel(uint)", query);
+    else if (query.next())
+        return query.value(0).toString();
+
+    return QString::null;
+}
+
 QString CardUtil::GetDisplayName(uint inputid)
 {
     MSqlQuery query(MSqlQuery::InitCon());

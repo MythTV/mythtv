@@ -2066,18 +2066,7 @@ void StartingChannel::SetSourceID(const QString &sourceid)
         return;
 
     // Get the existing starting channel
-    QString startChan = QString::null;
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT startchan "
-        "FROM cardinput "
-        "WHERE cardinputid = :INPUTID");
-    query.bindValue(":INPUTID", getInputID());
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("SetSourceID -- get start chan", query);
-    else if (query.next())
-        startChan = query.value(0).toString();
+    QString startChan = CardUtil::GetStartingChannel(getInputID());
 
     DBChanList channels = ChannelUtil::GetChannels(sourceid.toUInt(), false);
 

@@ -168,6 +168,7 @@ class MPUBLIC CardUtil
                                      vector<uint> *groupids = NULL);
     static uint         GetCardID(uint inputid);
     static QString      GetInputName(uint inputid);
+    static QString      GetStartingChannel(uint inputid);
     static QString      GetDisplayName(uint inputid);
     static QString      GetDisplayName(uint cardid, const QString &inputname)
         { return GetDisplayName(GetInputID(cardid, inputname)); }
