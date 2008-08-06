@@ -42,7 +42,7 @@ class SimpleSRStorage : public SimpleDBStorage
                     GetColumnName() + " = " + colTag);
 
             bindings.insert(recordidTag, parent->getRecordID());
-            bindings.insert(colTag, user->GetValue());
+            bindings.insert(colTag, user->GetDBValue());
 
             return query;
         }

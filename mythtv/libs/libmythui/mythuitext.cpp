@@ -68,19 +68,20 @@ void MythUIText::SetText(const QString &text)
     SetRedraw();
 }
 
-QString MythUIText::GetText(void)
+QString MythUIText::GetText(void) const
 {
     return m_Message;
 }
 
-QString MythUIText::GetDefaultText(void)
+QString MythUIText::GetDefaultText(void) const
 {
     return m_DefaultMessage;
 }
 
 void MythUIText::SetFontProperties(const MythFontProperties &fontProps)
 {
-    *m_Font = fontProps;
+    if (m_Font)
+        *m_Font = fontProps;
     SetRedraw();
 }
 

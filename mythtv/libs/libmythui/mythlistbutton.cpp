@@ -374,6 +374,30 @@ MythListButtonItem* MythListButton::GetItemCurrent()
     return m_selItem;
 }
 
+void MythListButton::SetDBValue(const QString &value)
+{
+    for (uint i = 0; i < (uint) m_itemList.size(); i++)
+    {
+        QVariant data = m_itemList[i]->GetData();
+        if (!data.isNull() && (data.toString() == value))
+        {
+            SetItemCurrent(m_itemList[i]);
+            return;
+        }
+    }
+
+    VERBOSE(VB_IMPORTANT, QString("MythListButton::SetDBValue(%1) -- failed")
+            .arg(value));
+}
+
+QString MythListButton::GetDBValue(void) const
+{
+    QString ret = QString::null;
+    if (m_selItem && !m_selItem->GetData().isNull())
+        ret = m_selItem->GetData().toString();
+    return ret;
+}
+
 MythListButtonItem* MythListButton::GetItemFirst()
 {
     return m_itemList.first();

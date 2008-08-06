@@ -118,7 +118,7 @@ QString GameDBStorage::GetSetClause(MSqlBindings &bindings) const
                   GetColumnName() + " = " + colTag);
 
     bindings.insert(playerID, parent.getGamePlayerID());
-    bindings.insert(colTag, user->GetValue());
+    bindings.insert(colTag, user->GetDBValue());
 
     return query;
 }

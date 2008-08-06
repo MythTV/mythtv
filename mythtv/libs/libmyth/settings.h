@@ -111,8 +111,8 @@ class MPUBLIC Setting : public Configurable, public StorageUser
     void setChanged(void)   { SetChanged(true);  }
 
     // StorageUser
-    void SetValue(QString &val) { setValue(val); }
-    QString GetValue(void) const { return getValue(); }
+    void SetDBValue(const QString &val) { setValue(val); }
+    QString GetDBValue(void) const { return getValue(); }
   public slots:
     virtual void setValue(const QString &newValue);
 

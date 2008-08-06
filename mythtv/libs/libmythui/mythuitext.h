@@ -2,6 +2,7 @@
 #define MYTHUI_TEXT_H_
 
 #include "mythuitype.h"
+#include "mythstorage.h"
 
 #include <QImage>
 #include <QColor>
@@ -10,7 +11,7 @@
 
 class MythFontProperties;
 
-class MythUIText : public MythUIType
+class MythUIText : public MythUIType, public StorageUser
 {
   public:
     MythUIText(MythUIType *parent, const QString &name);
@@ -20,8 +21,8 @@ class MythUIText : public MythUIType
     ~MythUIText();
 
     void SetText(const QString &text);
-    QString GetText(void);
-    QString GetDefaultText(void);
+    QString GetText(void) const;
+    QString GetDefaultText(void) const;
 
     void SetFontProperties(const MythFontProperties &fontProps);
     const MythFontProperties* GetFontProperties() { return m_Font; }
@@ -42,6 +43,10 @@ class MythUIText : public MythUIType
 
     void CycleColor(QColor startColor, QColor endColor, int numSteps);
     void StopCycling();
+
+    // StorageUser
+    void SetDBValue(const QString &text) { SetText(text); }
+    QString GetDBValue(void) const { return GetText(); }
 
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,

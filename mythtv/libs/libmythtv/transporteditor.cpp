@@ -391,7 +391,7 @@ QString MuxDBStorage::GetSetClause(MSqlBindings &bindings) const
     QString nameTag = ":SET" + GetColumnName().toUpper();
 
     bindings.insert(muxTag,  mplexid->getValue());
-    bindings.insert(nameTag, user->GetValue());
+    bindings.insert(nameTag, user->GetDBValue());
 
     // return query
     return (mplexid->GetColumnName() + " = " + muxTag + ", " +

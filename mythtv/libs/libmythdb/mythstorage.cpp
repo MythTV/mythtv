@@ -24,7 +24,7 @@ void SimpleDBStorage::Load(void)
         if (!result.isNull())
         {
             initval = result;
-            user->SetValue(result);
+            user->SetDBValue(result);
         }
     }
 }
@@ -89,14 +89,37 @@ QString SimpleDBStorage::GetSetClause(MSqlBindings &bindings) const
     QString tagname(":SET" + GetColumnName().toUpper());
     QString clause(GetColumnName() + " = " + tagname);
 
-    bindings.insert(tagname, user->GetValue());
+    bindings.insert(tagname, user->GetDBValue());
 
     return clause;
 }
 
 bool SimpleDBStorage::IsSaveRequired(void) const
 {
-    return user->GetValue() != initval;
+    return user->GetDBValue() != initval;
+}
+
+//////////////////////////////////////////////////////////////////////
+
+QString GenericDBStorage::GetWhereClause(MSqlBindings &bindings) const
+{
+    QString keycolumnTag = ":WHERE" + keycolumn.toUpper();
+
+    bindings.insert(keycolumnTag, keyvalue);
+
+    return keycolumn + " = " + keycolumnTag;
+}
+
+QString GenericDBStorage::GetSetClause(MSqlBindings &bindings) const
+{
+    QString keycolumnTag = ":SETKEY" + keycolumn.toUpper();
+    QString columnTag    = ":SETCOL" + GetColumnName().toUpper();
+
+    bindings.insert(keycolumnTag, keyvalue);
+    bindings.insert(columnTag,    user->GetDBValue());
+
+    return keycolumn + " = " + keycolumnTag + ", " + 
+        GetColumnName() + " = " + columnTag;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -132,7 +155,7 @@ QString HostDBStorage::GetSetClause(MSqlBindings &bindings) const
                    + ", hostname = " + hostnameTag);
 
     bindings.insert(valueTag, settingname);
-    bindings.insert(dataTag, user->GetValue());
+    bindings.insert(dataTag, user->GetDBValue());
     bindings.insert(hostnameTag, MythDB::getMythDB()->GetHostName());
 
     return clause;
@@ -164,7 +187,7 @@ QString GlobalDBStorage::GetSetClause(MSqlBindings &bindings) const
     QString clause("value = " + valueTag + ", data = " + dataTag);
 
     bindings.insert(valueTag, settingname);
-    bindings.insert(dataTag, user->GetValue());
+    bindings.insert(dataTag, user->GetDBValue());
 
     return clause;
 }

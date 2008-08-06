@@ -18,6 +18,10 @@ using namespace std;
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 #include "mythuistatetype.h"
+#include "mythverbose.h"
+
+#define LOC     QString("MythUIButtonList(%1): ").arg(objectName())
+#define LOC_ERR QString("MythUIButtonList(%1), Error: ").arg(objectName())
 
 MythUIButtonList::MythUIButtonList(MythUIType *parent, const QString &name)
               : MythUIType(parent, name)
@@ -652,6 +656,13 @@ void MythUIButtonList::Init()
 
     m_contentsRect.CalculateArea(m_Area);
 
+    if (!buttontemplate)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "UI XML file is missing 'buttonitem' statetype.");
+        return;
+    }
+
     buttontemplate->SetVisible(false);
 
     MythRect buttonItemArea;
@@ -1207,7 +1218,10 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
                                             (button->GetCurrentState());
 
     if (!buttonstate)
+    {
+        VERBOSE(VB_IMPORTANT, "Failed to query button state");
         return;
+    }
 
     buttonstate->SetVisible(true);
 

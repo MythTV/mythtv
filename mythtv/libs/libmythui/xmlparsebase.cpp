@@ -306,6 +306,13 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         return NULL;
     }
 
+    if (!uitype)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Failed to instanciate widget type: %1")
+                .arg(type));
+        return NULL;
+    }
+
     if (olduitype)
     {
         if (typeid(*olduitype) != typeid(*uitype))

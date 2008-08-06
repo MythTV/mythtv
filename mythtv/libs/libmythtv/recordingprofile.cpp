@@ -50,7 +50,7 @@ QString CodecParamStorage::GetSetClause(MSqlBindings &bindings) const
 
     bindings.insert(profileTag, parent.getProfileNum());
     bindings.insert(nameTag, codecname);
-    bindings.insert(valueTag, user->GetValue());
+    bindings.insert(valueTag, user->GetDBValue());
 
     return query;
 }

@@ -76,7 +76,7 @@ class MythListButtonItem
     friend class MythListButton;
 };
 
-class MythListButton : public MythUIType
+class MythListButton : public MythUIType, public StorageUser
 {
     Q_OBJECT
   public:
@@ -142,6 +142,10 @@ class MythListButton : public MythUIType
 
     void SetDrawOffset(QPoint off) { m_drawoffset = off; }
     QPoint GetDrawOffset(void) { return m_drawoffset; }
+
+    // StorageUser
+    void SetDBValue(const QString &value);
+    QString GetDBValue(void) const;
 
   public slots:
     void Select();

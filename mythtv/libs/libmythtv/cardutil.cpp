@@ -19,7 +19,8 @@
 #include "mythdbcon.h"
 #include "dvbchannel.h"
 #include "diseqcsettings.h"
-#include "libmythdb/mythdb.h"
+#include "sourceutil.h"
+#include "mythdb.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"

@@ -45,33 +45,31 @@ void RomInfo::edit_rominfo()
             return;
         }
 
-        if (query.isActive() && query.size() > 0);
-        {
-            QString t_gamename, t_genre, t_year, t_country, t_publisher;
-            bool t_favourite;
+        if (!query.next())
+            return;
 
-            query.next();
-            t_gamename = query.value(0).toString();
-            t_genre = query.value(1).toString();
-            t_year = query.value(2).toString();
-            t_country = query.value(3).toString();
-            t_publisher = query.value(4).toString();
-            t_favourite = query.value(5).toBool();
+        QString t_gamename  = query.value(0).toString();
+        QString t_genre     = query.value(1).toString();
+        QString t_year      = query.value(2).toString();
+        QString t_country   = query.value(3).toString();
+        QString t_publisher = query.value(4).toString();
+        bool    t_favourite = query.value(5).toBool();
     
-            if ((t_gamename != Gamename()) || (t_genre != Genre()) || (t_year != Year()) 
-               || (t_country != Country()) || (t_publisher != Publisher()) || (t_favourite != Favorite()))
-            {
-                query.prepare("UPDATE gamemetadata SET version = 'CUSTOM' "
-                              "WHERE gametype = :GAMETYPE "
-                              "AND romname = :ROMNAME");
-                query.bindValue(":GAMETYPE", GameType());
-                query.bindValue(":ROMNAME", Romname());
+        if ((t_gamename  != Gamename())  || (t_genre     != Genre())   ||
+            (t_year      != Year())      || (t_country   != Country()) ||
+            (t_publisher != Publisher()) || (t_favourite != Favorite()))
+        {
+            query.prepare("UPDATE gamemetadata "
+                          "SET version = 'CUSTOM' "
+                          "WHERE gametype = :GAMETYPE AND "
+                          "      romname  = :ROMNAME");
+            query.bindValue(":GAMETYPE", GameType());
+            query.bindValue(":ROMNAME",  Romname());
 
-                if (!query.exec())
-                {   
-                    MythContext::DBError("RomInfo::edit_rominfo", query);
-                    return;
-                }
+            if (!query.exec())
+            {   
+                MythContext::DBError("RomInfo::edit_rominfo", query);
+                return;
             }
         }
    }
@@ -98,11 +96,8 @@ int romInDB(QString rom, QString gametype)
     }
 
 
-    if (query.isActive() && query.size() > 0);
-    {
-        query.next();
+    if (query.next())
         count = query.value(0).toInt();
-    };
 
     return count;
 }
@@ -225,10 +220,8 @@ void RomInfo::fillData()
     query.bindValue(":GAMENAME", gamename);
     query.exec();
 
-    if (query.isActive() && query.size() > 0);
+    if (query.next())
     {
-        query.next();
-
         setSystem(query.value(0).toString());
         setGamename(query.value(1).toString());
         setGenre(query.value(2).toString());
@@ -249,9 +242,8 @@ void RomInfo::fillData()
     query.bindValue(":SYSTEM",system);
     query.exec();
 
-    if (query.isActive() && query.size() > 0);
+    if (query.next())
     {
-        query.next();
         if (!query.value(0).toString().isEmpty()) 
         {
             QString Image = query.value(0).toString() + "/" + romname;
@@ -273,18 +265,17 @@ void RomInfo::fillData()
         query.bindValue(":ROMNAME", Romname());
         query.exec();
 
-        if (query.isActive() && query.size() > 0);
+        while (query.next())
         {
-            while(query.next())
-            {
-                if (allsystems == "")
-                    allsystems = query.value(0).toString();
-                else
-                    allsystems += "," + query.value(0).toString();
-            }
+            if (allsystems.isEmpty())
+                allsystems = query.value(0).toString();
+            else
+                allsystems += "," + query.value(0).toString();
         }
-    } else 
+    }
+    else
+    {
         allsystems = system;
-
+    }
 }
 

@@ -13,8 +13,8 @@
 class StorageUser
 {
   public:
-    virtual void SetValue(QString&) = 0;
-    virtual QString GetValue(void) const = 0;
+    virtual void SetDBValue(const QString&) = 0;
+    virtual QString GetDBValue(void) const = 0;
 };
 
 class MPUBLIC Storage
@@ -58,12 +58,34 @@ class MPUBLIC SimpleDBStorage : public DBStorage
     virtual void Save(QString destination);
 
   protected:
-    virtual QString GetWhereClause(MSqlBindings&) const = 0;
-    virtual QString GetSetClause(MSqlBindings& bindings) const;
+    virtual QString GetWhereClause(MSqlBindings &bindings) const = 0;
+    virtual QString GetSetClause(MSqlBindings &bindings) const;
     virtual bool    IsSaveRequired(void) const;
 
   protected:
     QString initval;
+};
+
+class MPUBLIC GenericDBStorage : public SimpleDBStorage
+{
+  public:
+    GenericDBStorage(StorageUser *_user,
+                     QString _table, QString _column,
+                     QString _keycolumn, QString _keyvalue = QString::null) :
+        SimpleDBStorage(_user, _table, _column),
+        keycolumn(_keycolumn), keyvalue(_keyvalue) {}
+    virtual ~GenericDBStorage() { }
+
+    void SetKeyValue(const QString val) { keyvalue = val; }
+    void SetKeyValue(long long val) { keyvalue = QString::number(val); }
+
+  protected:
+    virtual QString GetWhereClause(MSqlBindings &bindings) const;
+    virtual QString GetSetClause(MSqlBindings &bindings) const;
+
+  protected:
+    QString keycolumn;
+    QString keyvalue;
 };
 
 class MPUBLIC TransientStorage : public Storage

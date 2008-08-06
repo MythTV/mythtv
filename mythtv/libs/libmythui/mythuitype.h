@@ -89,6 +89,9 @@ class MythUIType : public QObject, public XMLParseBase
     MythFontProperties *GetFont(const QString &text);
     bool AddFont(const QString &text, MythFontProperties *fontProp);
 
+    void SetHelpText(const QString &text) { helptext = text; }
+    QString GetHelpText(void) const { return helptext; }
+
   protected:
     virtual void customEvent(QEvent *);
 
@@ -157,6 +160,8 @@ class MythUIType : public QObject, public XMLParseBase
     FontMap *m_Fonts;
 
     MythUIType *m_Parent;
+
+    QString helptext;
 
   friend class XMLParseBase;
 };

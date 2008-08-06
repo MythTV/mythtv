@@ -7,7 +7,7 @@ using namespace std;
 #include "mythfontproperties.h"
 
 MythUIType::MythUIType(QObject *parent, const QString &name)
-          : QObject(parent)
+    : QObject(parent), helptext(QString::null)
 {
     setObjectName(name);
 

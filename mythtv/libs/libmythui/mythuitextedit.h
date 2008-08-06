@@ -24,7 +24,7 @@ enum InputFilter
  * \brief A text entry and edit widget
  *
  */
-class MythUITextEdit : public MythUIType
+class MythUITextEdit : public MythUIType, public StorageUser
 {
     Q_OBJECT
 
@@ -41,12 +41,16 @@ class MythUITextEdit : public MythUIType
     void SetPaddingMargin(const int margin);
     void SetTextRect(const MythRect &area=MythRect(0,0,0,0));
     void SetText(const QString text, bool moveCursor = true);
-    QString GetText() { return m_Message; }
+    QString GetText(void) const { return m_Message; }
 
     void SetFilter(InputFilter filter) { m_Filter = filter; }
 
     enum MoveDirection { MoveLeft, MoveRight, MoveEnd };
     bool MoveCursor(MoveDirection);
+
+    // StorageUser
+    void SetDBValue(const QString &text) { SetText(text); }
+    QString GetDBValue(void) const { return GetText(); }
 
   signals:
     void valueChanged();
