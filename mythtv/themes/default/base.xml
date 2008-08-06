@@ -131,12 +131,12 @@
         <buttonarea>0,0,100%,97%</buttonarea>
         <statetype name="buttonitem">
             <state name="active">
-                <area>0,0,100%,40</area>
+                <area>0,0,100%,35</area>
                 <imagetype name="buttonbackground">
                     <gradient start="#505050" end="#000000" alpha="200" />
                 </imagetype>
                 <statetype name="buttoncheck">
-                    <position>5,5</position>
+                    <position>5,2</position>
                     <state type="off">
                         <imagetype name="checkoff">
                             <filename>lb-check-empty.png</filename>
@@ -154,12 +154,12 @@
                     </state>
                 </statetype>
                 <textarea name="buttontext">
-                    <area>10%,5,80%,30</area>
+                    <area>10%,2,80%,30</area>
                     <font>basesmall</font>
                     <cutdown>yes</cutdown>
                 </textarea>
                 <imagetype name="buttonarrow">
-                    <position>92%,5</position>
+                    <position>92%,2</position>
                     <filename>lb-arrow.png</filename>
                 </imagetype>
             </state>
