@@ -358,7 +358,6 @@ void MythNews::updateInfoView(MythListButtonItem* selected)
             if (m_thumbnailImage && m_thumbnailImage->IsVisible())
                 m_thumbnailImage->Hide();
 
-            VERBOSE(VB_IMPORTANT, QString("Podcast is %1").arg(site->podcast()));
             if (site->podcast() == 1)
                 m_podcastImage->Show();
 
