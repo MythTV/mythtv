@@ -1,39 +1,23 @@
-/* ============================================================
- * File  : newsengine.cpp
- * Author: Renchi Raju <renchi@pooh.tam.uiuc.edu>
- * Date  : 2003-09-03
- * Description :
- *
- * Copyright 2003 by Renchi Raju
-
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General
- * Public License as published bythe Free Software Foundation;
- * either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * ============================================================ */
-
+// C/C++ headers
 #include <iostream>
-
-#include <qfile.h>
-#include <qdatastream.h>
-#include <qdom.h>
-#include <q3urloperator.h>
-#include <q3network.h>
 
 extern "C" {
 #include <stdlib.h>
 }
 
-#include "newsengine.h"
+// QT headers
+#include <QFile>
+#include <QDataStream>
+#include <QDomAttr>
+#include <Q3UrlOperator>
+#include <q3network.h>
+
+// Myth headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdirs.h>
+
+// MythNews headers
+#include "newsengine.h"
 
 using namespace std;
 
@@ -174,7 +158,7 @@ QString NewsSite::errorMsg() const
 void NewsSite::slotFinished(Q3NetworkOperation* op)
 {
     if (op->state() == Q3NetworkProtocol::StDone &&
-        op->errorCode() == Q3NetworkProtocol::NoError) 
+        op->errorCode() == Q3NetworkProtocol::NoError)
     {
 
         QFile xmlFile(m_destDir+QString("/")+m_name);
@@ -185,13 +169,13 @@ void NewsSite::slotFinished(Q3NetworkOperation* op)
             m_updated = QDateTime::currentDateTime();
             m_state = NewsSite::Success;
         }
-        else 
+        else
         {
             m_state = NewsSite::WriteFailed;
             VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: Write failed");
         }
     }
-    else 
+    else
     {
         m_state = NewsSite::RetrieveFailed;
     }
@@ -236,7 +220,7 @@ void NewsSite::process()
 
     //Check the type of the feed
     QString rootName = domDoc.documentElement().nodeName();
-    if(rootName == QString::fromLatin1("rss") || 
+    if(rootName == QString::fromLatin1("rss") ||
        rootName == QString::fromLatin1("rdf:RDF")) {
         parseRSS(domDoc);
         xmlFile.close();
@@ -280,7 +264,7 @@ void NewsSite::parseRSS(QDomDocument domDoc)
         {
             description = descNode.toElement().text().simplifyWhiteSpace();
             ReplaceHtmlChar(description);
-        }            
+        }
         else
             description = QString::null;
 
@@ -300,9 +284,9 @@ void NewsSite::parseRSS(QDomDocument domDoc)
             QDomAttr enclosureType = enclosureNode.toElement().attributeNode("type");
             if (!enclosureType.isNull())
                enclosure_type  = enclosureType.value();
-               
+
             // VERBOSE(VB_GENERAL, QString("MythNews: Enclosure URL is %1").arg(enclosure));
-        } else 
+        } else
             enclosure = QString::null;
 
         // From this point forward, we process RSS 2.0 media tags.  Please put all
@@ -322,7 +306,7 @@ void NewsSite::parseRSS(QDomDocument domDoc)
             // VERBOSE(VB_GENERAL, QString("MythNews: Thumbnail is %1").arg(thumbnail));
         } else
             thumbnail = QString::null;
-            
+
         QDomNode playerNode = itemNode.namedItem(QString::fromLatin1("media:player"));
         if (!playerNode.isNull())
         {
@@ -337,7 +321,7 @@ void NewsSite::parseRSS(QDomDocument domDoc)
         descNode = itemNode.namedItem(QString::fromLatin1("media:description"));
         if (!descNode.isNull())
             description = descNode.toElement().text().simplifyWhiteSpace();
- 
+
         if (enclosure.isEmpty())
         {
             QDomNode contentNode = itemNode.namedItem(QString::fromLatin1("media:content"));
@@ -361,7 +345,7 @@ void NewsSite::parseRSS(QDomDocument domDoc)
                     QDomNode altcontentNode = contentNode.nextSibling();
                     if (altcontentNode.nodeName() != "media:content")
                         break;
-  
+
                     QDomAttr enclosureType = altcontentNode.toElement().attributeNode("type");
                     if (!enclosureType.isNull())
                     {
@@ -396,10 +380,10 @@ void NewsSite::parseAtom(QDomDocument domDoc)
         {
             description = summNode.toElement().text().simplifyWhiteSpace();
             ReplaceHtmlChar(description);
-        }            
+        }
         else
             description = QString::null;
-        
+
         QDomNode linkNode = itemNode.namedItem(QString::fromLatin1("link"));
         if (!linkNode.isNull()){
             QDomAttr linkHref = linkNode.toElement().attributeNode("href");

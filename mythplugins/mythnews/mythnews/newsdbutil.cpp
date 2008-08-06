@@ -1,6 +1,8 @@
+// Myth headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 
+// MythNews headers
 #include "newsdbutil.h"
 
 bool findInDB(const QString& name)
@@ -20,11 +22,13 @@ bool insertInDB(NewsSiteItem* site)
 {
     if (!site) return false;
 
-    return insertInDB(site->name, site->url, site->ico, site->category, site->podcast);
+    return insertInDB(site->name, site->url, site->ico, site->category,
+                      site->podcast);
 }
 
 bool insertInDB(const QString &name, const QString &url,
-                          const QString &icon, const QString &category, const bool &podcast)
+                          const QString &icon, const QString &category,
+                          const bool &podcast)
 {
     if (findInDB(name))
         return false;

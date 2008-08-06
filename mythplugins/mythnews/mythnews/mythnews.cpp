@@ -1,35 +1,15 @@
-/* ============================================================
- * File  : mythnews.cpp
- * Author: Renchi Raju <renchi@pooh.tam.uiuc.edu>
- * Date  : 2003-08-30
- * Description :
- *
- * Copyright 2003 by Renchi Raju
 
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General
- * Public License as published bythe Free Software Foundation;
- * either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * ============================================================ */
-
-// C Headers
+// C/C++ Headers
 #include <unistd.h>
 #include <math.h>
 
 // QT headers
-#include <qapplication.h>
+#include <QApplication>
 #include <q3network.h>
-#include <qdatetime.h>
-#include <qdir.h>
-#include <qtimer.h>
-#include <qregexp.h>
+#include <QDateTime>
+#include <QDir>
+#include <QTimer>
+#include <QRegExp>
 //Added by qt3to4:
 #include <QUrl>
 
@@ -111,8 +91,8 @@ bool MythNews::Create()
     if (!foundtheme)
         return false;
 
-    m_sitesList = dynamic_cast<MythListButton *> (GetChild("siteslist"));
-    m_articlesList = dynamic_cast<MythListButton *> (GetChild("articleslist"));
+    m_sitesList = dynamic_cast<MythUIButtonList *> (GetChild("siteslist"));
+    m_articlesList = dynamic_cast<MythUIButtonList *> (GetChild("articleslist"));
 
     m_updatedText = dynamic_cast<MythUIText *> (GetChild("updated"));
     m_titleText = dynamic_cast<MythUIText *> (GetChild("title"));
@@ -140,12 +120,12 @@ bool MythNews::Create()
     loadSites();
     updateInfoView(m_sitesList->GetItemFirst());
 
-    connect(m_sitesList, SIGNAL(itemSelected(MythListButtonItem*)),
-            this, SLOT( slotSiteSelected(MythListButtonItem*)));
-    connect(m_articlesList, SIGNAL(itemSelected( MythListButtonItem*)),
-            this, SLOT( updateInfoView(MythListButtonItem*)));
-    connect(m_articlesList, SIGNAL(itemClicked( MythListButtonItem*)),
-            this, SLOT( slotViewArticle(MythListButtonItem*)));
+    connect(m_sitesList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            this, SLOT( slotSiteSelected(MythUIButtonListItem*)));
+    connect(m_articlesList, SIGNAL(itemSelected( MythUIButtonListItem*)),
+            this, SLOT( updateInfoView(MythUIButtonListItem*)));
+    connect(m_articlesList, SIGNAL(itemClicked( MythUIButtonListItem*)),
+            this, SLOT( slotViewArticle(MythUIButtonListItem*)));
 
     return true;
 }
@@ -179,8 +159,8 @@ void MythNews::loadSites(void)
 
     for (NewsSite *site = m_NewsSites.first(); site; site = m_NewsSites.next())
     {
-        MythListButtonItem* item =
-            new MythListButtonItem(m_sitesList, site->name());
+        MythUIButtonListItem* item =
+            new MythUIButtonListItem(m_sitesList, site->name());
         item->setData(site);
 
         connect(site, SIGNAL(finished(NewsSite*)),
@@ -190,7 +170,7 @@ void MythNews::loadSites(void)
     slotRetrieveNews();
 }
 
-void MythNews::updateInfoView(MythListButtonItem* selected)
+void MythNews::updateInfoView(MythUIButtonListItem* selected)
 {
     if (!selected)
         return;
@@ -548,7 +528,7 @@ void MythNews::processAndShowNews(NewsSite* site)
 
     site->process();
 
-    MythListButtonItem *siteUIItem = m_sitesList->GetItemCurrent();
+    MythUIButtonListItem *siteUIItem = m_sitesList->GetItemCurrent();
     if (!siteUIItem || !siteUIItem->getData())
         return;
 
@@ -558,14 +538,14 @@ void MythNews::processAndShowNews(NewsSite* site)
 
         for (NewsArticle* article = site->articleList().first(); article;
              article = site->articleList().next()) {
-            MythListButtonItem* item =
-                new MythListButtonItem(m_articlesList, article->title());
+            MythUIButtonListItem* item =
+                new MythUIButtonListItem(m_articlesList, article->title());
             item->setData(article);
         }
     }
 }
 
-void MythNews::slotSiteSelected(MythListButtonItem *item)
+void MythNews::slotSiteSelected(MythUIButtonListItem *item)
 {
     if (!item || !item->getData())
         return;
@@ -576,8 +556,8 @@ void MythNews::slotSiteSelected(MythListButtonItem *item)
 
     for (NewsArticle* article = site->articleList().first(); article;
          article = site->articleList().next()) {
-        MythListButtonItem* articleitem =
-            new MythListButtonItem(m_articlesList, article->title());
+        MythUIButtonListItem* articleitem =
+            new MythUIButtonListItem(m_articlesList, article->title());
         articleitem->setData(article);
     }
 
@@ -693,7 +673,7 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
 
 }
 
-void MythNews::slotViewArticle(MythListButtonItem *articlesListItem)
+void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
 {
     if (articlesListItem && articlesListItem->getData())
     {
@@ -782,7 +762,7 @@ void MythNews::ShowEditDialog(bool edit)
 
     if (edit)
     {
-        MythListButtonItem *siteListItem = m_sitesList->GetItemCurrent();
+        MythUIButtonListItem *siteListItem = m_sitesList->GetItemCurrent();
 
         if (siteListItem && siteListItem->getData())
             site = (NewsSite*) siteListItem->getData();
@@ -822,7 +802,7 @@ void MythNews::ShowMenu()
 
 void MythNews::deleteNewsSite()
 {
-    MythListButtonItem *siteUIItem = m_sitesList->GetItemCurrent();
+    MythUIButtonListItem *siteUIItem = m_sitesList->GetItemCurrent();
 
     QString siteName;
     if (siteUIItem && siteUIItem->getData())

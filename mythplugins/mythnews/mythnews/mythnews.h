@@ -1,35 +1,18 @@
-/* ============================================================
- * File  : mythnews.h
- * Author: Renchi Raju <renchi@pooh.tam.uiuc.edu>
- * Date  : 2003-08-30
- * Description :
- *
- * Copyright 2003 by Renchi Raju
-
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General
- * Public License as published bythe Free Software Foundation;
- * either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * ============================================================ */
-
 #ifndef MYTHNEWS_H
 #define MYTHNEWS_H
 
 // MythTV headers
+#include <mythtv/httpcomms.h>
+
+// MythUI headers
 #include <mythtv/libmythui/mythscreentype.h>
 #include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuibuttonlist.h>
 #include <mythtv/libmythui/mythuiimage.h>
 #include <mythtv/libmythui/mythdialogbox.h>
 #include <mythtv/libmythui/mythprogressdialog.h>
-#include <mythtv/httpcomms.h>
+
+// MythNews headers
 #include "newsengine.h"
 
 class QTimer;
@@ -84,8 +67,8 @@ private:
     MythUIProgressDialog *m_progressPopup;
     HttpComms      *httpGrabber;
 
-    MythListButton *m_sitesList;
-    MythListButton *m_articlesList;
+    MythUIButtonList *m_sitesList;
+    MythUIButtonList *m_articlesList;
 
     MythUIText *m_updatedText;
     MythUIText *m_titleText;
@@ -98,11 +81,11 @@ private:
 
 private slots:
     void loadSites();
-    void updateInfoView(MythListButtonItem*);
-    void slotViewArticle(MythListButtonItem*);
+    void updateInfoView(MythUIButtonListItem*);
+    void slotViewArticle(MythUIButtonListItem*);
     void slotRetrieveNews();
     void slotNewsRetrieved(NewsSite*);
-    void slotSiteSelected(MythListButtonItem*);
+    void slotSiteSelected(MythUIButtonListItem*);
 
     void slotProgressCancelled();
 };

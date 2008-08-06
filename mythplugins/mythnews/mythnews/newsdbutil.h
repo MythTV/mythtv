@@ -1,6 +1,7 @@
 #ifndef NEWSDBUTIL_H_
 #define NEWSDBUTIL_H_
 
+// MythNews headers
 #include "newsengine.h"
 
 bool findInDB(const QString& name);

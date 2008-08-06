@@ -1,29 +1,8 @@
-/* ============================================================
- * File  : mythnewsconfig.cpp
- * Author: Renchi Raju <renchi@pooh.tam.uiuc.edu>
- * Date  : 2003-09-02
- * Description :
- *
- * Copyright 2003 by Renchi Raju
-
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General
- * Public License as published bythe Free Software Foundation;
- * either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * ============================================================ */
-
 // QT Headers
-#include <qapplication.h>
-#include <q3ptrlist.h>
-#include <qstring.h>
-#include <qfile.h>
+#include <QApplication>
+#include <Q3PtrList>
+#include <QString>
+#include <QFile>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
@@ -97,7 +76,7 @@ void MythNewsConfig::populateSites()
 
     QDomDocument domDoc;
 
-    if (!domDoc.setContent(&xmlFile, false, &errorMsg, &errorLine, &errorColumn)) 
+    if (!domDoc.setContent(&xmlFile, false, &errorMsg, &errorLine, &errorColumn))
     {
         VERBOSE(VB_IMPORTANT, "MythNews: Error in reading content of news-sites.xml");
         VERBOSE(VB_IMPORTANT, QString("MythNews: Error, parsing %1\n"
@@ -157,10 +136,10 @@ bool MythNewsConfig::Create()
     if (!foundtheme)
         return false;
 
-    m_categoriesList = dynamic_cast<MythListButton *>
+    m_categoriesList = dynamic_cast<MythUIButtonList *>
                 (GetChild("category"));
 
-    m_siteList = dynamic_cast<MythListButton *>
+    m_siteList = dynamic_cast<MythUIButtonList *>
                 (GetChild("sites"));
 
     m_helpText = dynamic_cast<MythUIText *>
@@ -172,10 +151,10 @@ bool MythNewsConfig::Create()
         return false;
     }
 
-    connect(m_categoriesList, SIGNAL(itemSelected(MythListButtonItem*)),
-            this, SLOT(slotCategoryChanged(MythListButtonItem*)));
-    connect(m_siteList, SIGNAL(itemClicked(MythListButtonItem*)),
-            this, SLOT(toggleItem(MythListButtonItem*)));
+    connect(m_categoriesList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            this, SLOT(slotCategoryChanged(MythUIButtonListItem*)));
+    connect(m_siteList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+            this, SLOT(toggleItem(MythUIButtonListItem*)));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
@@ -203,40 +182,40 @@ void MythNewsConfig::loadData()
 
     for (NewsCategory* cat = m_priv->categoryList.first();
          cat; cat = m_priv->categoryList.next() ) {
-        MythListButtonItem* item =
-            new MythListButtonItem(m_categoriesList, cat->name);
+        MythUIButtonListItem* item =
+            new MythUIButtonListItem(m_categoriesList, cat->name);
         item->setData(cat);
     }
     slotCategoryChanged(m_categoriesList->GetItemFirst());
 
 }
 
-void MythNewsConfig::toggleItem(MythListButtonItem *item)
+void MythNewsConfig::toggleItem(MythUIButtonListItem *item)
 {
     if (!item || !item->getData())
         return;
 
     NewsSiteItem* site = (NewsSiteItem*) item->getData();
 
-    bool checked = (item->state() == MythListButtonItem::FullChecked);
+    bool checked = (item->state() == MythUIButtonListItem::FullChecked);
 
     if (!checked) {
         if (insertInDB(site))
         {
             site->inDB = true;
-            item->setChecked(MythListButtonItem::FullChecked);
+            item->setChecked(MythUIButtonListItem::FullChecked);
         }
     }
     else {
         if (removeFromDB(site))
         {
             site->inDB = false;
-            item->setChecked(MythListButtonItem::NotChecked);
+            item->setChecked(MythUIButtonListItem::NotChecked);
         }
     }
 }
 
-void MythNewsConfig::slotCategoryChanged(MythListButtonItem *item)
+void MythNewsConfig::slotCategoryChanged(MythUIButtonListItem *item)
 {
     if (!item)
         return;
@@ -248,11 +227,11 @@ void MythNewsConfig::slotCategoryChanged(MythListButtonItem *item)
 
         for (NewsSiteItem* site = cat->siteList.first();
              site; site = cat->siteList.next() ) {
-            MythListButtonItem* item =
-                new MythListButtonItem(m_siteList, site->name, 0, true,
+            MythUIButtonListItem* item =
+                new MythUIButtonListItem(m_siteList, site->name, 0, true,
                                       site->inDB ?
-                                      MythListButtonItem::FullChecked :
-                                      MythListButtonItem::NotChecked);
+                                      MythUIButtonListItem::FullChecked :
+                                      MythUIButtonListItem::NotChecked);
             item->setData(site);
         }
     }

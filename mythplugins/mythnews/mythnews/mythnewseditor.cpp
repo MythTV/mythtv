@@ -1,4 +1,3 @@
-// QT headers
 
 // MythTV headers
 #include <mythtv/libmythui/mythmainwindow.h>

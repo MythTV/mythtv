@@ -1,23 +1,23 @@
+// C++ headers
 #include <iostream>
 
-// qt
+// QT headers
 #include <QString>
 #include <QSqlError>
 
-// myth
+// Myth headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 
-// mythnews
+// MythNews headers
 #include "dbcheck.h"
-
 
 const QString currentDatabaseVersion = "1001";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
 
-    if (!gContext->SaveSettingOnHost("NewsDBSchemaVer", newnumber, NULL)) 
+    if (!gContext->SaveSettingOnHost("NewsDBSchemaVer", newnumber, NULL))
     {
         VERBOSE(VB_IMPORTANT, QString("DB Error (Setting new DB version number): %1\n")
                               .arg(newnumber));
@@ -33,7 +33,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythNews schema version ") + 
+    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythNews schema version ") +
             version);
 
     int counter = 0;
@@ -77,7 +77,7 @@ bool UpgradeNewsDatabaseSchema(void)
     {
         VERBOSE(VB_IMPORTANT, "Inserting MythNews initial database information.");
 
-        const QString updates[] = 
+        const QString updates[] =
         {
             "CREATE TABLE IF NOT EXISTS newssites "
             "( name VARCHAR(100) NOT NULL PRIMARY KEY,"
