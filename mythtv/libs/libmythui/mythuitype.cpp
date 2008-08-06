@@ -1,7 +1,3 @@
-
-#include <iostream>
-#include "mythverbose.h"
-
 using namespace std;
 
 #include "mythuitype.h"

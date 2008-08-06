@@ -114,10 +114,10 @@ class MythUIButtonList : public MythUIType
 
     void SetItemCurrent(MythUIButtonListItem* item);
     void SetItemCurrent(int pos);
-    MythUIButtonListItem* GetItemCurrent();
-    MythUIButtonListItem* GetItemFirst();
-    MythUIButtonListItem* GetItemNext(MythUIButtonListItem *item);
-    MythUIButtonListItem* GetItemAt(int pos);
+    MythUIButtonListItem* GetItemCurrent() const;
+    MythUIButtonListItem* GetItemFirst() const;
+    MythUIButtonListItem* GetItemNext(MythUIButtonListItem *item) const;
+    MythUIButtonListItem* GetItemAt(int pos) const;
 
     uint ItemWidth(void) const { return m_itemWidth; }
     uint ItemHeight(void) const { return m_itemHeight; }
@@ -126,10 +126,10 @@ class MythUIButtonList : public MythUIType
 
     void SetAllChecked(MythUIButtonListItem::CheckState state);
 
-    int GetCurrentPos() { return m_selPosition; }
-    int GetItemPos(MythUIButtonListItem* item);
-    int GetCount();
-    bool IsEmpty();
+    int GetCurrentPos() const { return m_selPosition; }
+    int GetItemPos(MythUIButtonListItem* item) const;
+    int GetCount() const;
+    bool IsEmpty() const;
 
     enum ScrollStyle { ScrollFree, ScrollCenter };
     enum LayoutType { LayoutVertical, LayoutHorizontal, LayoutGrid };
@@ -138,9 +138,6 @@ class MythUIButtonList : public MythUIType
     void MoveDown(MovementUnit unit = MoveItem);
     void MoveUp(MovementUnit unit = MoveItem);
     bool MoveToNamedPosition(const QString &position_name);
-
-    void SetDrawOffset(QPoint off) { m_drawoffset = off; }
-    QPoint GetDrawOffset(void) { return m_drawoffset; }
 
   public slots:
     void Select();
@@ -204,7 +201,6 @@ class MythUIButtonList : public MythUIType
 
     QList<MythUIButtonListItem*> m_itemList;
 
-    QPoint m_drawoffset;
     bool m_drawFromBottom;
 
     friend class MythUIButtonListItem;

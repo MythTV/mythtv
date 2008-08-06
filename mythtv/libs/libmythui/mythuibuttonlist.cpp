@@ -324,17 +324,17 @@ void MythUIButtonList::SetItemCurrent(int current)
     SetItemCurrent(item);
 }
 
-MythUIButtonListItem* MythUIButtonList::GetItemCurrent()
+MythUIButtonListItem* MythUIButtonList::GetItemCurrent() const
 {
     return m_selItem;
 }
 
-MythUIButtonListItem* MythUIButtonList::GetItemFirst()
+MythUIButtonListItem* MythUIButtonList::GetItemFirst() const
 {
     return m_itemList.first();
 }
 
-MythUIButtonListItem* MythUIButtonList::GetItemNext(MythUIButtonListItem *item)
+MythUIButtonListItem* MythUIButtonList::GetItemNext(MythUIButtonListItem *item) const
 {
     QListIterator<MythUIButtonListItem*> it(m_itemList);
     if (!it.findNext(item))
@@ -343,12 +343,12 @@ MythUIButtonListItem* MythUIButtonList::GetItemNext(MythUIButtonListItem *item)
     return it.previous();
 }
 
-int MythUIButtonList::GetCount()
+int MythUIButtonList::GetCount() const
 {
     return m_itemCount;
 }
 
-bool MythUIButtonList::IsEmpty()
+bool MythUIButtonList::IsEmpty() const
 {
     if (m_itemCount > 0)
         return false;
@@ -356,12 +356,12 @@ bool MythUIButtonList::IsEmpty()
         return true;
 }
 
-MythUIButtonListItem* MythUIButtonList::GetItemAt(int pos)
+MythUIButtonListItem* MythUIButtonList::GetItemAt(int pos) const
 {
     return m_itemList.at(pos);
 }
 
-int MythUIButtonList::GetItemPos(MythUIButtonListItem* item)
+int MythUIButtonList::GetItemPos(MythUIButtonListItem* item) const
 {
     if (!item)
         return -1;
@@ -978,7 +978,6 @@ void MythUIButtonList::CopyFrom(MythUIType *base)
     m_active = lb->m_active;
     m_showArrow = lb->m_showArrow;
 
-    m_drawoffset = lb->m_drawoffset;
     m_drawFromBottom = lb->m_drawFromBottom;
 
     m_scrollStyle = lb->m_scrollStyle;

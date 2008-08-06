@@ -1,8 +1,9 @@
 #ifndef MYTHSCREEN_TYPE_H_
 #define MYTHSCREEN_TYPE_H_
 
+#include <QList>
+
 #include "mythuitype.h"
-#include "qlist.h"
 
 class MythScreenStack;
 
@@ -22,20 +23,20 @@ class MythScreenType : public MythUIType
     virtual bool keyPressEvent(QKeyEvent *);
 
     // if the widget is full screen and obscures widgets below it
-    bool IsFullscreen(void);
+    bool IsFullscreen(void) const;
     void SetFullscreen(bool full);
 
-    MythUIType *GetFocusWidget(void);
+    MythUIType *GetFocusWidget(void) const;
     bool SetFocusWidget(MythUIType *widget);
     virtual bool NextPrevWidgetFocus(bool up_or_down);
     bool BuildFocusList(void);
 
-    MythScreenStack *GetScreenStack();
+    MythScreenStack *GetScreenStack() const;
 
     virtual void aboutToHide(void);
     virtual void aboutToShow(void);
 
-    bool IsDeleting(void);
+    bool IsDeleting(void) const;
     void SetDeleting(bool deleting);
 
   public slots:

@@ -42,7 +42,7 @@ MythScreenType::~MythScreenType()
     emit Exiting();
 }
 
-bool MythScreenType::IsFullscreen(void)
+bool MythScreenType::IsFullscreen(void) const
 {
     return m_FullScreen;
 }
@@ -52,7 +52,7 @@ void MythScreenType::SetFullscreen(bool full)
     m_FullScreen = full;
 }
 
-MythUIType *MythScreenType::GetFocusWidget(void)
+MythUIType *MythScreenType::GetFocusWidget(void) const
 {
     return m_CurrentFocusWidget;
 }
@@ -156,7 +156,7 @@ bool MythScreenType::BuildFocusList(void)
     return false;
 }
 
-MythScreenStack *MythScreenType::GetScreenStack(void)
+MythScreenStack *MythScreenType::GetScreenStack(void) const
 {
     return m_ScreenStack;
 }
@@ -169,7 +169,7 @@ void MythScreenType::aboutToShow(void)
 {
 }
 
-bool MythScreenType::IsDeleting(void)
+bool MythScreenType::IsDeleting(void) const
 {
     return m_IsDeleting;
 }
@@ -257,7 +257,6 @@ void MythScreenType::CopyFrom(MythUIType *base)
     MythUIType::CopyFrom(base);
 
     BuildFocusList();
-    SetFocusWidget(NULL);
 };
 
 void MythScreenType::CreateCopy(MythUIType *)
