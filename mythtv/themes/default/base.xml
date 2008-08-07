@@ -290,9 +290,14 @@
     <textedit name="basetextedit">
         <area>0,0,375,50</area>
         <font>basesmallblack</font>
-        <cursor filename="cursor.png" />
+        <imagetype name="background">
+            <area>0,0,100%,100%</area>
+            <filename>textedit_background.png</filename>
+        </imagetype>
+        <imagetype name="cursor">
+            <filename>cursor.png</filename>
+        </imagetype>
         <margin>11</margin>
-        <background filename="textedit_background.png" />
     </textedit>
 
     <!-- Base definition of a progressbar -->
