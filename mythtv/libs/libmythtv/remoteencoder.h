@@ -70,7 +70,7 @@ class MPUBLIC RemoteEncoder
  
   private:
     MythSocket *openControlSocket(const QString &host, short port);
-    void SendReceiveStringList(QStringList &strlist);
+    bool SendReceiveStringList(QStringList &strlist, uint min_reply_length = 0);
 
     int recordernum;
 

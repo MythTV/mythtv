@@ -1764,9 +1764,21 @@ bool TV::StartRecorder(RemoteEncoder *rec, int maxWait)
     maxWait = (maxWait <= 0) ? 40000 : maxWait;
     MythTimer t;
     t.start();
-    while (!rec->IsRecording() && !exitPlayer && t.elapsed() < maxWait)
+    bool recording = false, ok = true;
+    while (!(recording = rec->IsRecording(&ok)) &&
+           !exitPlayer && t.elapsed() < maxWait)
+    {
+        if (!ok)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "StartRecorder() -- "
+                    "lost contact with backend");
+            errored = true;
+            return false;
+        }
         usleep(5000);
-    if (!rec->IsRecording() || exitPlayer)
+    }
+
+    if (!recording || exitPlayer)
     {
         if (!exitPlayer)
             VERBOSE(VB_IMPORTANT, LOC_ERR + "StartRecorder() -- "
@@ -2125,6 +2137,9 @@ void TV::timerEvent(QTimerEvent*)
 
 void TV::TVEventThreadChecks(void)
 {
+    if (IsErrored())
+        exit(-1);
+
     stateLock.lock();
     bool doHandle = nextStates.size() > 0;
     stateLock.unlock();
@@ -2178,11 +2193,18 @@ void TV::TVEventThreadChecks(void)
 
         recorder->Setup();
 
-        if (recorder->IsRecording())
+        bool ok = true;
+        if (recorder->IsRecording(&ok))
         {
             recorderPlaybackInfo = recorder->GetRecording();
-            RemoteFillProginfo(recorderPlaybackInfo,
-                               gContext->GetHostName());
+            if (recorderPlaybackInfo)
+                RemoteFillProginfo(recorderPlaybackInfo,
+                                   gContext->GetHostName());
+        }
+        if (!ok || !recorderPlaybackInfo)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "lost contact with backend");
+            errored = true;
         }
 
         getRecorderPlaybackInfo = false;
@@ -2475,6 +2497,9 @@ void TV::TVEventThreadChecks(void)
 
     while (HasUDPNotifyEvent())
         HandleUDPNotifyEvent();
+
+    if (IsErrored())
+        exit(-1);
 }
 
 bool TV::eventFilter(QObject *o, QEvent *e)
