@@ -81,13 +81,14 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
         return "";
     }
 
-    // Strip formatting characters
-    // Also, if a override encoding is specified copy it in front of the text
+    // if a override encoding is specified and the default ISO 6937 encoding
+    // would be used copy the ovverride encoding in front of the text
     unsigned char dst[raw_length + encoding_override_length];
     uint length = encoding_override_length;
-    if (encoding_override)
+    if (encoding_override && src[0] >= 0x20)
         memcpy(dst, encoding_override, encoding_override_length);
     
+    // Strip formatting characters
     for (uint i = 0; i < raw_length; i++)
     {
         if ((src[i] < 0x80) || (src[i] > 0x9F))
