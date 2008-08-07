@@ -35,9 +35,11 @@ class MythUITextEdit : public MythUIType, public StorageUser
     virtual void Pulse(void);
     virtual bool keyPressEvent(QKeyEvent *);
 
+    void SetBackgroundImage(MythImage *);
+    void SetCursorImage(MythImage *);
     void SetMaxLength(const int length);
     void SetPaddingMargin(const int margin);
-    void SetTextRect();
+    void SetTextRect(const MythRect &area=MythRect(0,0,0,0));
     void SetText(const QString text, bool moveCursor = true);
     QString GetText(void) const { return m_Message; }
 
@@ -57,7 +59,6 @@ class MythUITextEdit : public MythUIType, public StorageUser
     virtual bool ParseElement(QDomElement &element);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
-    virtual void Finalize(void);
 
     void Init(void);
 
@@ -77,8 +78,7 @@ class MythUITextEdit : public MythUIType, public StorageUser
     InputFilter m_Filter;
     int m_Position;
 
-    MythPoint m_cursorPosition;
-
+    MythUIImage *m_backgroundImage;
     MythUIImage *m_cursorImage;
     MythUIText  *m_Text;
 };
