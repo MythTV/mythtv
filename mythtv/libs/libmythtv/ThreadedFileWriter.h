@@ -21,8 +21,8 @@ class ThreadedFileWriter
     void SetWriteBufferSize(uint newSize = TFW_DEF_BUF_SIZE);
     void SetWriteBufferMinWriteSize(uint newMinSize = TFW_MIN_WRITE_SIZE);
 
-    uint BufUsed(void);
-    uint BufFree(void);
+    uint BufUsed(void) const;
+    uint BufFree(void) const;
 
     void Sync(void);
     void Flush(void);
@@ -33,6 +33,9 @@ class ThreadedFileWriter
 
     static void *boot_syncer(void *);
     void SyncLoop(void);
+
+    uint BufUsedPriv(void) const;
+    uint BufFreePriv(void) const;
 
   private:
     // file info
@@ -52,7 +55,7 @@ class ThreadedFileWriter
     // buffer position state
     uint            rpos;    ///< points to end of data written to disk
     uint            wpos;    ///< points to end of data added to buffer
-    QMutex          buflock; ///< lock needed to update rpos and wpos
+    mutable QMutex  buflock; ///< lock needed to update rpos and wpos
     long long       written;
 
     // buffer

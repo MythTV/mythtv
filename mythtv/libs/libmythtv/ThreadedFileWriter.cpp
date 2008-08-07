@@ -212,42 +212,49 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
 
     bool first = true;
 
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
-    while (count > BufFree())
+    buflock.lock();
+    while (count > BufFreePriv())
     {
         if (first)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Write() -- IOBOUND begin " + 
-                    QString("cnt(%1) free(%2)").arg(count).arg(BufFree()));
+                    QString("cnt(%1) free(%2)").arg(count).arg(BufFreePriv()));
             first = false;
         }
 
-        bufferWroteData.wait(&mutex, 100);
+        bufferWroteData.wait(&buflock, 100);
     }
+    uint twpos = wpos;
+    buflock.unlock();
+
     if (!first)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Write() -- IOBOUND end");
 
     if (no_writes)
         return 0;
 
-    if ((wpos + count) > tfw_buf_size)
+    if ((twpos + count) > tfw_buf_size)
     {
-        int first_chunk_size = tfw_buf_size - wpos;
+        int first_chunk_size = tfw_buf_size - twpos;
         int second_chunk_size = count - first_chunk_size;
-        memcpy(buf + wpos, data, first_chunk_size );
-        memcpy(buf, (char *)data + first_chunk_size, second_chunk_size );
+        memcpy(buf + twpos, data, first_chunk_size);
+        memcpy(buf, ((const char*)data) + first_chunk_size, second_chunk_size);
     }
     else
     {
-        memcpy(buf + wpos, data, count);
+        memcpy(buf + twpos, data, count);
     }
 
     buflock.lock();
-    wpos = (wpos + count) % tfw_buf_size;
+    if (twpos == wpos)
+    {
+        wpos = (wpos + count) % tfw_buf_size;
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Programmer Error detected! "
+                "wpos was changed from under the Write() function.");
+    }
     buflock.unlock();
 
     bufferHasData.wakeAll();
@@ -278,15 +285,11 @@ long long ThreadedFileWriter::Seek(long long pos, int whence)
  */
 void ThreadedFileWriter::Flush(void)
 {
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
+    QMutexLocker locker(&buflock);
     flush = true;
-    while (BufUsed() > 0)
+    while (BufUsedPriv() > 0)
     {
-        if (!bufferEmpty.wait(&mutex, 2000))
+        if (!bufferEmpty.wait(locker.mutex(), 2000))
             VERBOSE(VB_IMPORTANT, LOC + "Taking a long time to flush..");
     }
     flush = false;
@@ -328,13 +331,12 @@ void ThreadedFileWriter::SetWriteBufferSize(uint newSize)
 
     Flush();
 
-    buflock.lock();
+    QMutexLocker locker(&buflock);
     delete [] buf;
     rpos = wpos = 0;
     buf = new char[newSize + 1024];
     bzero(buf, newSize + 64);
     tfw_buf_size = newSize;
-    buflock.unlock();
 }
 
 /** \fn ThreadedFileWriter::SetWriteBufferMinWriteSize(uint)
@@ -354,14 +356,13 @@ void ThreadedFileWriter::SetWriteBufferMinWriteSize(uint newMinSize)
  */
 void ThreadedFileWriter::SyncLoop(void)
 {
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
     while (!in_dtor)
     {
-        bufferSyncWait.wait(&mutex, written > tfw_min_write_size ? 1000 : 100);
+        buflock.lock();
+        int mstimeout = (written > tfw_min_write_size) ? 1000 : 100;
+        bufferSyncWait.wait(&buflock, mstimeout);
+        buflock.unlock();
+
         Sync();
     }
 }
@@ -374,25 +375,28 @@ void ThreadedFileWriter::DiskLoop(void)
     uint size = 0;
     written = 0;
 
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
     while (!in_dtor || BufUsed() > 0)
     {
-        size = BufUsed();
+        buflock.lock();
+        size = BufUsedPriv();
 
         if (size == 0)
+        {
+            buflock.unlock();
             bufferEmpty.wakeAll();
+            buflock.lock();
+        }
 
         if (!size || (!in_dtor && !flush &&
             ((size < tfw_min_write_size) &&
              (written >= tfw_min_write_size))))
         {
-            bufferHasData.wait(&mutex, 100);
+            bufferHasData.wait(&buflock, 100);
+            buflock.unlock();
             continue;
         }
+        uint trpos = rpos;
+        buflock.unlock();
 
         /* cap the max. write size. Prevents the situation where 90% of the
            buffer is valid, and we try to write all of it at once which
@@ -403,17 +407,17 @@ void ThreadedFileWriter::DiskLoop(void)
         bool write_ok;
         if (ignore_writes)
             ;
-        else if ((rpos + size) > tfw_buf_size)
+        else if ((trpos + size) > tfw_buf_size)
         {
-            int first_chunk_size  = tfw_buf_size - rpos;
+            int first_chunk_size  = tfw_buf_size - trpos;
             int second_chunk_size = size - first_chunk_size;
-            size = safe_write(fd, buf+rpos, first_chunk_size, write_ok);
+            size = safe_write(fd, buf + trpos, first_chunk_size, write_ok);
             if ((int)size == first_chunk_size && write_ok)
                 size += safe_write(fd, buf, second_chunk_size, write_ok);
         }
         else
         {
-            size = safe_write(fd, buf+rpos, size, write_ok);
+            size = safe_write(fd, buf + trpos, size, write_ok);
         }
 
 
@@ -440,26 +444,50 @@ void ThreadedFileWriter::DiskLoop(void)
         }
 
         buflock.lock();
-        rpos = (rpos + size) % tfw_buf_size;
+        if (trpos == rpos)
+        {
+            rpos = (rpos + size) % tfw_buf_size;
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Programmer Error detected! "
+                    "rpos was changed from under the DiskLoop() function.");
+        }
         buflock.unlock();
 
         bufferWroteData.wakeAll();
     }
 }
 
-/** \fn ThreadedFileWriter::BufUsed(void)
+/** \fn ThreadedFileWriter::BufUsedPriv(void) const
  *  \brief Number of bytes queued for write by the write thread.
  */
-uint ThreadedFileWriter::BufUsed(void)
+uint ThreadedFileWriter::BufUsedPriv(void) const
+{
+    return (wpos >= rpos) ? wpos - rpos : tfw_buf_size - rpos + wpos;
+}
+
+/** \fn ThreadedFileWriter::BufFreePriv(void) const
+ *  \brief Number of bytes that can be written without blocking.
+ */
+uint ThreadedFileWriter::BufFreePriv(void) const
+{
+    return ((wpos >= rpos) ? (rpos + tfw_buf_size) : rpos) - wpos - 1;
+}
+
+/** \fn ThreadedFileWriter::BufUsed(void) const
+ *  \brief Number of bytes queued for write by the write thread. With locking.
+ */
+uint ThreadedFileWriter::BufUsed(void) const
 {
     QMutexLocker locker(&buflock);
     return (wpos >= rpos) ? wpos - rpos : tfw_buf_size - rpos + wpos;
 }
 
 /** \fn ThreadedFileWriter::BufFree(void)
- *  \brief Number of bytes that can be written without blocking.
+ *  \brief Number of bytes that can be written without blocking. With locking.
  */
-uint ThreadedFileWriter::BufFree(void)
+uint ThreadedFileWriter::BufFree(void) const
 {
     QMutexLocker locker(&buflock);
     return ((wpos >= rpos) ? (rpos + tfw_buf_size) : rpos) - wpos - 1;
