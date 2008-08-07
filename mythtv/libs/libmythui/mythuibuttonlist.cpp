@@ -811,32 +811,10 @@ void MythUIButtonList::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
         if (!type)
             return;
 
-        MythUIStateType *button = dynamic_cast<MythUIStateType *>(type);
-        if (button)
+        MythUIStateType *object = dynamic_cast<MythUIStateType *>(type);
+        if (object)
         {
-            QString buttonname = button->objectName();
-            int pos = buttonname.section(' ',2,2).toInt();
-            pos += m_topPosition;
-            if (pos < m_itemList.size())
-            {
-                if (pos == GetCurrentPos())
-                {
-                    emit itemClicked(GetItemCurrent());
-                }
-                else
-                {
-                    SetItemCurrent(pos);
-                    emit itemSelected(GetItemCurrent());
-                }
-            }
-
-            return;
-        }
-
-        MythUIStateType *arrow = dynamic_cast<MythUIStateType *>(type);
-        if (arrow)
-        {
-            QString name = arrow->objectName();
+            QString name = object->objectName();
 
             if (name == "upscrollarrow")
             {
@@ -846,6 +824,24 @@ void MythUIButtonList::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
             {
                 MoveDown(MovePage);
             }
+            else if (name.startsWith("buttonlist button"))
+            {
+                int pos = name.section(' ',2,2).toInt();
+                pos += m_topPosition;
+                if (pos < m_itemList.size())
+                {
+                    if (pos == GetCurrentPos())
+                    {
+                        emit itemClicked(GetItemCurrent());
+                    }
+                    else
+                    {
+                        SetItemCurrent(pos);
+                        emit itemSelected(GetItemCurrent());
+                    }
+                }
+            }
+
             return;
         }
     }
