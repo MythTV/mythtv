@@ -1250,10 +1250,13 @@ bool MpegRecorder::StartEncoding(int fd)
     memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
     command.cmd = V4L2_ENC_CMD_START;
 
-    for (int idx = 0; idx < 10; ++idx)
+    for (int idx = 0; idx < 40; ++idx)
     {
         if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
+        {
+            VERBOSE(VB_RECORD, LOC + "Encoding started");
             return true;
+        }
 
         if (errno != EAGAIN)
         {
@@ -1278,7 +1281,10 @@ bool MpegRecorder::StopEncoding(int fd)
     {
 
         if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
+        {
+            VERBOSE(VB_RECORD, LOC + "Encoding stopped");
             return true;
+        }
 
         if (errno != EAGAIN)
         {
