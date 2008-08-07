@@ -969,7 +969,7 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
         recorder = new MpegRecorder(this);
 #endif // USING_IVTV
     }
-    if (genOpt.cardtype == "HDPVR")
+    else if (genOpt.cardtype == "HDPVR")
     {
 #ifdef USING_HDPVR
         recorder = new MpegRecorder(this);
