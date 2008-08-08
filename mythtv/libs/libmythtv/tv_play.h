@@ -485,7 +485,6 @@ class MPUBLIC TV : public QThread
     mutable QMutex     stateLock;
     TVState            internalState;
 
-    uint updatecheck;
     uint switchToInputId;
     bool menurunning;
     bool wantsToQuit;

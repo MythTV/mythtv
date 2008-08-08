@@ -548,7 +548,6 @@ TV::TV(void)
       vbimode(VBIMode::None),
       // State variables
       internalState(kState_None),
-      updatecheck(0),
       switchToInputId(0),
       menurunning(false), wantsToQuit(true),
       exitPlayer(false), paused(false), errored(false),
@@ -2381,11 +2380,10 @@ void TV::TVEventThreadChecks(void)
         UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
     }
 
-    if (++updatecheck >= 100)
+    if (update_osd_pos && GetOSD())
     {
-        OSDSet *oset;
-        if (GetOSD() && (oset = GetOSD()->GetSet("status")) &&
-            oset->Displaying() && update_osd_pos &&
+        OSDSet *oset = GetOSD()->GetSet("status");
+        if (oset && oset->Displaying() && 
             (StateIsLiveTV(internalState) ||
              StateIsPlaying(internalState)))
         {
@@ -2393,8 +2391,6 @@ void TV::TVEventThreadChecks(void)
             nvp->calcSliderPos(posInfo);
             GetOSD()->UpdateStatus(posInfo);
         }
-
-        updatecheck = 0;
     }
 
     if (browseTimer.isRunning() &&
