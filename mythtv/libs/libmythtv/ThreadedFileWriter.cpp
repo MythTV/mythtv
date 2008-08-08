@@ -210,54 +210,78 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
     if (count == 0)
         return 0;
 
-    bool first = true;
-
-    buflock.lock();
-    while (count > BufFreePriv())
+    if (count > tfw_buf_size)
     {
-        if (first)
+        VERBOSE(VB_IMPORTANT, LOC + 
+                QString("WARNING: count(%1), tfw_buf_size(%2)")
+                .arg(count).arg(tfw_buf_size));
+    }
+
+    uint iobound_cnt = 0;
+    uint remaining = count;
+    while (remaining)
+    {
+        bool first = true;
+
+        buflock.lock();
+        while (BufFreePriv() == 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Write() -- IOBOUND begin " + 
-                    QString("cnt(%1) free(%2)").arg(count).arg(BufFreePriv()));
-            first = false;
+            if (first)
+            {
+                ++iobound_cnt;
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Write() -- IOBOUND begin " +
+                        QString("remaining(%1) free(%2) size(%3) cnt(%4)")
+                        .arg(remaining).arg(BufFree())
+                        .arg(tfw_buf_size).arg(iobound_cnt));
+                first = false;
+            }
+
+            bufferWroteData.wait(&buflock, 1000);
+        }
+        uint twpos = wpos;
+        uint bytes = (BufFreePriv() < remaining) ? BufFreePriv() : remaining;
+        buflock.unlock();
+
+        if (!first)
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Write() -- IOBOUND end");
+
+        if (no_writes)
+            return 0;
+
+        if ((twpos + bytes) > tfw_buf_size)
+        {
+            int first_chunk_size  = tfw_buf_size - twpos;
+            int second_chunk_size = bytes - first_chunk_size;
+            memcpy(buf + twpos, data, first_chunk_size);
+            memcpy(buf, ((const char*)data) + first_chunk_size,
+                   second_chunk_size);
+        }
+        else
+        {
+            memcpy(buf + twpos, data, bytes);
         }
 
-        bufferWroteData.wait(&buflock, 100);
-    }
-    uint twpos = wpos;
-    buflock.unlock();
+        buflock.lock();
+        if (twpos == wpos)
+        {
+            wpos = (wpos + bytes) % tfw_buf_size;
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Programmer Error detected! "
+                    "wpos was changed from under the Write() function.");
+        }
+        buflock.unlock();
 
-    if (!first)
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Write() -- IOBOUND end");
+        bufferHasData.wakeAll();
 
-    if (no_writes)
-        return 0;
+        remaining -= bytes;
 
-    if ((twpos + count) > tfw_buf_size)
-    {
-        int first_chunk_size = tfw_buf_size - twpos;
-        int second_chunk_size = count - first_chunk_size;
-        memcpy(buf + twpos, data, first_chunk_size);
-        memcpy(buf, ((const char*)data) + first_chunk_size, second_chunk_size);
+        buflock.lock();
+        if (remaining && (0 == BufFreePriv()))
+            bufferWroteData.wait(&buflock, 10000);
+        buflock.unlock();
     }
-    else
-    {
-        memcpy(buf + twpos, data, count);
-    }
-
-    buflock.lock();
-    if (twpos == wpos)
-    {
-        wpos = (wpos + count) % tfw_buf_size;
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Programmer Error detected! "
-                "wpos was changed from under the Write() function.");
-    }
-    buflock.unlock();
-
-    bufferHasData.wakeAll();
 
     return count;
 }
