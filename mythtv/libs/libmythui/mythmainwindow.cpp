@@ -510,15 +510,13 @@ void MythMainWindow::animate(void)
              ++screenit)
         {
             (*screenit)->Pulse();
-        }
 
-        // Should we care if non-top level screens need redrawing?
-        MythScreenType *top = (*it)->GetTopScreen();
-        if (top && top->NeedsRedraw())
-        {
-            QRegion topDirty = top->GetDirtyArea();
-            d->repaintRegion = d->repaintRegion.unite(topDirty);
-            redraw = true;
+            if ((*screenit)->NeedsRedraw())
+            {
+                QRegion topDirty = (*screenit)->GetDirtyArea();
+                d->repaintRegion = d->repaintRegion.unite(topDirty);
+                redraw = true;
+            }
         }
     }
 

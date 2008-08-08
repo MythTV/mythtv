@@ -124,11 +124,7 @@ void MythScreenStack::PopScreen(bool allowFade, bool deleteScreen)
             if (*it != top && !(*it)->IsDeleting())
             {
                 topScreen = (*it);
-                if (m_DoTransitions)
-                {
-                    (*it)->SetAlpha(0);
-                    (*it)->AdjustAlpha(1, kFadeVal);
-                }
+                (*it)->SetAlpha(255);
                 (*it)->aboutToShow();
             }
         }
