@@ -73,7 +73,8 @@ const char* MpegRecorder::aspectRatio[] =
     "Square", "4:3", "16:9", "2.21:1", 0
 };
 
-MpegRecorder::MpegRecorder(TVRec *rec) : DTVRecorder(rec),
+MpegRecorder::MpegRecorder(TVRec *rec) :
+    DTVRecorder(rec),
     // Debugging variables
     deviceIsMpegFile(false),
     // Driver info
@@ -83,6 +84,7 @@ MpegRecorder::MpegRecorder(TVRec *rec) : DTVRecorder(rec),
     requires_special_pause(false),
     // State
     recording(false),         encoding(false),
+    needs_resolution(false),  start_stop_encoding_lock(QMutex::Recursive),
     // Pausing state
     cleartimeonpause(false),
     // Encoding info
@@ -98,8 +100,9 @@ MpegRecorder::MpegRecorder(TVRec *rec) : DTVRecorder(rec),
     high_mpeg4avgbitrate(13500),  high_mpeg4peakbitrate(20200),
     // Input file descriptors
     chanfd(-1),               readfd(-1),
+    _device_read_buffer(NULL),
     // TS packet handling
-    _stream_data(NULL)                                   
+    _stream_data(NULL)
 {
 }
 
@@ -110,6 +113,8 @@ MpegRecorder::~MpegRecorder()
 
 void MpegRecorder::TeardownAll(void)
 {
+    StopRecording();
+
     if (chanfd >= 0)
     {
         close(chanfd);
@@ -360,6 +365,9 @@ bool MpegRecorder::OpenMpegFileAsInput(void)
 
 bool MpegRecorder::OpenV4L2DeviceAsInput(void)
 {
+    // open implicitly starts encoding, so we need the lock..
+    QMutexLocker locker(&start_stop_encoding_lock);
+
     QByteArray vdevice = videodevice.toAscii();
     chanfd = open(vdevice.constData(), O_RDWR);
     if (chanfd < 0)
@@ -433,6 +441,33 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't open video device." + ENO);
         return false;
     }
+
+    if (_device_read_buffer)
+    {
+        if (_device_read_buffer->IsRunning())
+            _device_read_buffer->Stop();
+        
+        delete _device_read_buffer;
+        _device_read_buffer = NULL;
+    }
+
+    _device_read_buffer = new DeviceReadBuffer(this);
+    
+    if (!_device_read_buffer)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate DRB buffer");
+        _error = true;
+        return false;   
+    }
+
+    if (!_device_read_buffer->Setup(vdevice.constData(), readfd))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate DRB buffer");
+        _error = true;
+        return false;
+    }
+
+    VERBOSE(VB_RECORD, LOC + "DRB ready");
 
     return true;
 }
@@ -679,8 +714,8 @@ static int streamtype_ivtv_to_v4l2(int st)
     }
 }
 
-void add_ext_ctrl(vector<struct v4l2_ext_control> &ctrl_list,
-                  uint32_t id, int32_t value)
+static void add_ext_ctrl(vector<struct v4l2_ext_control> &ctrl_list,
+                         uint32_t id, int32_t value)
 {
     struct v4l2_ext_control tmp_ctrl;
     bzero(&tmp_ctrl, sizeof(struct v4l2_ext_control));
@@ -689,25 +724,56 @@ void add_ext_ctrl(vector<struct v4l2_ext_control> &ctrl_list,
     ctrl_list.push_back(tmp_ctrl);
 }
 
+static void set_ctrls(int fd, vector<struct v4l2_ext_control> &ext_ctrls)
+{
+    static QMutex control_description_lock;
+    static QMap<uint32_t,QString> control_description;
+    
+    control_description_lock.lock();
+    if (control_description.isEmpty())
+    {
+        control_description[V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ] =
+            "Audio Sampling Frequency";
+        control_description[V4L2_CID_MPEG_VIDEO_ASPECT] =
+            "Video Aspect ratio";
+        control_description[V4L2_CID_MPEG_AUDIO_ENCODING] =
+            "Audio Encoding";
+        control_description[V4L2_CID_MPEG_AUDIO_L2_BITRATE] =
+            "Audio L2 Bitrate";
+        control_description[V4L2_CID_MPEG_VIDEO_BITRATE_PEAK] =
+            "Video Peak Bitrate";
+        control_description[V4L2_CID_MPEG_VIDEO_BITRATE] =
+            "Video Average Bitrate";
+        control_description[V4L2_CID_MPEG_STREAM_TYPE] =
+            "MPEG Stream type";
+    }
+    control_description_lock.unlock();
+
+    for (uint i = 0; i < ext_ctrls.size(); i++)
+    {
+        struct v4l2_ext_controls ctrls;
+        bzero(&ctrls, sizeof(struct v4l2_ext_controls));
+
+        int value = ext_ctrls[i].value;
+
+        ctrls.ctrl_class  = V4L2_CTRL_CLASS_MPEG;
+        ctrls.count       = 1;
+        ctrls.controls    = &ext_ctrls[i];
+            
+        if (ioctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
+        {
+            QMutexLocker locker(&control_description_lock);
+            VERBOSE(VB_IMPORTANT, QString("mpegrecorder.cpp:set_ctrls(): ") +
+                    QString("Could not set %1 to %2")
+                    .arg(control_description[ext_ctrls[i].id]).arg(value) +
+                    ENO);
+        }
+    }
+}
+
 bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
 {
     vector<struct v4l2_ext_control> ext_ctrls;
-
-    QMap<uint32_t,QString> control_description;
-    control_description[V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ] =
-        "Audio Sampling Frequency";
-    control_description[V4L2_CID_MPEG_VIDEO_ASPECT] =
-        "Video Aspect ratio";
-    control_description[V4L2_CID_MPEG_AUDIO_ENCODING] =
-        "Audio Encoding";
-    control_description[V4L2_CID_MPEG_AUDIO_L2_BITRATE] =
-        "Audio L2 Bitrate";
-    control_description[V4L2_CID_MPEG_VIDEO_BITRATE_PEAK] =
-        "Video Peak Bitrate";
-    control_description[V4L2_CID_MPEG_VIDEO_BITRATE] =
-        "Video Average Bitrate";
-    control_description[V4L2_CID_MPEG_STREAM_TYPE] =
-        "MPEG Stream type";
 
     // Set controls
     if (driver != "hdpvr")
@@ -742,24 +808,7 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
     add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE,
                  (bitrate = min(bitrate, maxbitrate)) * 1000);
 
-    for (uint i = 0; i < ext_ctrls.size(); i++)
-    {
-        struct v4l2_ext_controls ctrls;
-        bzero(&ctrls, sizeof(struct v4l2_ext_controls));
-
-        int value = ext_ctrls[i].value;
-
-        ctrls.ctrl_class  = V4L2_CTRL_CLASS_MPEG;
-        ctrls.count       = 1;
-        ctrls.controls    = &ext_ctrls[i];
-            
-        if (ioctl(chanfd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Could not set %1 to %2")
-                    .arg(control_description[ext_ctrls[i].id]).arg(value) + ENO);
-        }
-    }
+    set_ctrls(chanfd, ext_ctrls);
 
     bool ok;
     int audioinput = audiodevice.toUInt(&ok);
@@ -921,6 +970,13 @@ void MpegRecorder::StartRecording(void)
         return;
     }
 
+    bool has_select = true;
+    
+#if defined(__FreeBSD__)
+    // HACK. FreeBSD PVR150/500 driver doesn't currently support select()
+    has_select = false;
+#endif
+
     _start_code = 0xffffffff;
     _last_gop_seen = 0;
     _frames_written_count = 0;
@@ -956,107 +1012,169 @@ void MpegRecorder::StartRecording(void)
 
     if (deviceIsMpegFile)
         elapsedTimer.start();
+    else if (_device_read_buffer)
+        _device_read_buffer->Start();
+
+    needs_resolution = (driver == "hdpvr");
 
     QByteArray vdevice = videodevice.toAscii();
-    while (encoding)
+    while (encoding && !_error)
     {
         if (PauseAndWait(100))
             continue;
 
-        if ((deviceIsMpegFile) && (GetFramesWritten()))
+        HandleResolutionChanges();
+        
+        if (deviceIsMpegFile)
         {
-            elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
-            while ((GetFramesWritten() / elapsed) > 30)
+            if (GetFramesWritten())
             {
-                usleep(50000);
                 elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
+                while ((GetFramesWritten() / elapsed) > 30)
+                {
+                    usleep(50000);
+                    elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
+                }
+            }
+        }
+        else
+        {
+            if (readfd < 0)
+            {
+                if (!Open())
+                {
+                    _error = true;
+                    return;
+                }
+
+                if (readfd < 0)
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_ERR + 
+                            QString("Failed to open device '%1'")
+                            .arg(videodevice));
+                    continue;
+                }
             }
         }
 
-        if (readfd < 0)
-            readfd = open(vdevice.constData(), O_RDWR);
-
-        if (readfd < 0)
+        if (_device_read_buffer)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + 
-                    QString("Failed to open device '%1'").arg(videodevice));
-            continue;
-        }
+            len = _device_read_buffer->Read(
+                    &(buffer[remainder]), bufferSize - remainder);
 
-        bool has_select = true;
-
-#if defined(__FreeBSD__)
-        // HACK. FreeBSD PVR150/500 driver doesn't currently support select()
-        has_select = false;
-#endif
-
-        if (has_select)
-        {
-            tv.tv_sec = 5;
-            tv.tv_usec = 0;
-            FD_ZERO(&rdset);
-            FD_SET(readfd, &rdset);
-
-            switch (select(readfd + 1, &rdset, NULL, NULL, &tv))
+            // Check for DRB errors
+            if (_device_read_buffer->IsErrored())
             {
-                case -1:
-                    if (errno == EINTR)
-                        continue;
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Device error detected");
 
-                    VERBOSE(VB_IMPORTANT, LOC_ERR + "Select error" + ENO);
-                    continue;
+                _device_read_buffer->Stop();
 
-                case 0:
-                    VERBOSE(VB_IMPORTANT, LOC_ERR + "select timeout - "
-                            "driver has stopped responding");
+                QMutexLocker locker(&start_stop_encoding_lock);
 
-                    if (close(readfd) != 0)
-                    {
+                StopEncoding(readfd);
+
+                // Make sure the next things in the file are a PAT & PMT
+                if (_stream_data->PATSingleProgram() &&
+                    _stream_data->PMTSingleProgram())
+                {
+                    bool tmp = _wait_for_keyframe_option;
+                    _wait_for_keyframe_option = false;
+                    HandleSingleProgramPAT(_stream_data->PATSingleProgram());
+                    HandleSingleProgramPMT(_stream_data->PMTSingleProgram());
+                    _wait_for_keyframe_option = tmp;
+                }
+
+                if (StartEncoding(readfd))
+                {
+                    _device_read_buffer->Start();
+                }
+                else
+                {
+                    if (0 != close(readfd))
                         VERBOSE(VB_IMPORTANT, LOC_ERR + "Close error" + ENO);
-                    }
-
+                    
                     // Force card to be reopened on next iteration..
                     readfd = -1;
+                }
+            }
+            else if (_device_read_buffer->IsEOF())
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Device EOF detected");
+                _error = true;
+            }
+        }
+        else
+        {
+            if (has_select)
+            {
+                tv.tv_sec = 5;
+                tv.tv_usec = 0;
+                FD_ZERO(&rdset);
+                FD_SET(readfd, &rdset);
 
-                    continue;
+                switch (select(readfd + 1, &rdset, NULL, NULL, &tv))
+                {
+                    case -1:
+                        if (errno == EINTR)
+                            continue;
+
+                        VERBOSE(VB_IMPORTANT, LOC_ERR + "Select error" + ENO);
+                        continue;
+
+                    case 0:
+                        VERBOSE(VB_IMPORTANT, LOC_ERR + "select timeout - "
+                                "driver has stopped responding");
+
+                        if (close(readfd) != 0)
+                        {
+                            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                                    "Close error" + ENO);
+                        }
+
+                        // Force card to be reopened on next iteration..
+                        readfd = -1;
+                        continue;
                 
-                default: break;
-            }
-        }
-
-        len = read(readfd, &(buffer[remainder]), bufferSize - remainder);
-
-        if (len < 0 && !has_select)
-        {
-            usleep(25 * 1000);
-            continue;
-        }
-
-        if ((len == 0) && (deviceIsMpegFile))
-        {
-            close(readfd);
-            readfd = open(vdevice.constData(), O_RDONLY);
-
-            if (readfd >= 0)
-            {
-                len = read(readfd,
-                           &(buffer[remainder]), bufferSize - remainder);
+                    default:
+                        break;
+                }
             }
 
-            if (len <= 0)
+            len = read(readfd, &(buffer[remainder]), bufferSize - remainder);
+
+            if (len < 0 && !has_select)
             {
-                encoding = false;
+                usleep(25 * 1000);
+                continue;
+            }
+            
+            if ((len == 0) && (deviceIsMpegFile))
+            {
+                close(readfd);
+                readfd = open(vdevice.constData(), O_RDONLY);
+                
+                if (readfd >= 0)
+                {
+                    len = read(readfd,
+                               &(buffer[remainder]), bufferSize - remainder);
+                }
+                
+                if (len <= 0)
+                {
+                    encoding = false;
+                    continue;
+                }
+            }
+            else if (len < 0 && errno != EAGAIN)
+            {
+                VERBOSE(VB_IMPORTANT,
+                        LOC_ERR + QString("error reading from: %1")
+                        .arg(videodevice) + ENO);
                 continue;
             }
         }
-        else if (len < 0 && errno != EAGAIN)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("error reading from: %1")
-                    .arg(videodevice) + ENO);
 
-            continue;
-        }
-        else if (len > 0)
+        if (len > 0)
         {
             len += remainder;
 
@@ -1073,6 +1191,15 @@ void MpegRecorder::StartRecording(void)
                 FindPSKeyFrames(buffer, len);
             }
         }
+    }
+
+    if (_device_read_buffer)
+    {
+        if (_device_read_buffer->IsRunning())
+            _device_read_buffer->Stop();
+
+        delete _device_read_buffer;
+        _device_read_buffer = NULL;
     }
 
     FinishRecording();
@@ -1174,6 +1301,9 @@ bool MpegRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
 void MpegRecorder::StopRecording(void)
 {
     encoding = false;
+    if (_device_read_buffer)
+        _device_read_buffer->Stop();
+    StopEncoding(readfd);
 }
 
 void MpegRecorder::ResetForNewFile(void)
@@ -1212,19 +1342,34 @@ bool MpegRecorder::PauseAndWait(int timeout)
     if (request_pause)
     {
         QMutex waitlock;
+        waitlock.lock();
+
         if (!paused)
         {
+            if (_device_read_buffer)
+            {
+                QMutex drb_lock;
+                drb_lock.lock();
+
+                _device_read_buffer->SetRequestPause(true);
+
+                pauseWait.wait(&drb_lock, timeout);
+            }
+            else
+            {
+                paused = true;
+                pauseWait.wakeAll();
+            }
+
             // Some drivers require streaming to be disabled before
             // an input switch and other channel format setting.
             if (requires_special_pause)
                 StopEncoding(readfd);
 
-            paused = true;
-            pauseWait.wakeAll();
             if (tvrec)
                 tvrec->RecorderPaused();
         }
-        waitlock.lock();
+
         unpauseWait.wait(&waitlock, timeout);
     }
     if (!request_pause)
@@ -1236,6 +1381,9 @@ bool MpegRecorder::PauseAndWait(int timeout)
             if (requires_special_pause)
                 StartEncoding(readfd);
 
+            if (_device_read_buffer)
+                _device_read_buffer->SetRequestPause(false);
+
             if (_stream_data)
                 _stream_data->Reset(_stream_data->DesiredProgram());
         }
@@ -1246,17 +1394,31 @@ bool MpegRecorder::PauseAndWait(int timeout)
 
 bool MpegRecorder::StartEncoding(int fd)
 {
+    QMutexLocker locker(&start_stop_encoding_lock);
+
     struct v4l2_encoder_cmd command;
     memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
     command.cmd = V4L2_ENC_CMD_START;
 
-    for (int idx = 0; idx < 40; ++idx)
+    VERBOSE(VB_RECORD, LOC + "StartEncoding");
+    needs_resolution = (driver == "hdpvr");
+
+    for (int idx = 0; idx < 10; ++idx)
     {
         if (ioctl(fd, VIDIOC_ENCODER_CMD, &command) == 0)
         {
             VERBOSE(VB_RECORD, LOC + "Encoding started");
             return true;
         }
+
+        // BEGIN -- HACK HACK HACK
+        if ((errno == EAGAIN) && (driver == "hdpvr"))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "Encoding probably started -- using hdpvr hack");
+            return true;
+        }
+        // END   -- HACK HACK HACK
 
         if (errno != EAGAIN)
         {
@@ -1273,9 +1435,13 @@ bool MpegRecorder::StartEncoding(int fd)
 
 bool MpegRecorder::StopEncoding(int fd)
 {
+    QMutexLocker locker(&start_stop_encoding_lock);
+
     struct v4l2_encoder_cmd command;
     memset(&command, 0, sizeof(struct v4l2_encoder_cmd));
     command.cmd = V4L2_ENC_CMD_STOP;
+
+    VERBOSE(VB_RECORD, LOC + "StopEncoding");
 
     for (int idx = 0; idx < 10; ++idx)
     {
@@ -1285,6 +1451,15 @@ bool MpegRecorder::StopEncoding(int fd)
             VERBOSE(VB_RECORD, LOC + "Encoding stopped");
             return true;
         }
+
+        // BEGIN -- HACK HACK HACK
+        if ((errno == EAGAIN) && (driver == "hdpvr"))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "Encoding probably stopped -- using hdpvr hack");
+            return true;
+        }
+        // END   -- HACK HACK HACK
 
         if (errno != EAGAIN)
         {
@@ -1378,4 +1553,65 @@ void MpegRecorder::HandleSingleProgramPMT(ProgramMapTable *pmt)
 
     for (uint i = 0; i < size ; i += TSPacket::SIZE)
         DTVRecorder::BufferedWrite(*(reinterpret_cast<TSPacket*>(&buf[i])));
+}
+
+void MpegRecorder::HandleResolutionChanges(void)
+{
+    if (!needs_resolution)
+        return;
+
+    VERBOSE(VB_RECORD, LOC + "Checking Resolution");
+    struct v4l2_format vfmt;
+    memset(&vfmt, 0, sizeof(vfmt));
+    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+            
+    uint pix = 0;
+    if (0 == ioctl(chanfd, VIDIOC_G_FMT, &vfmt))
+    {
+        VERBOSE(VB_RECORD, LOC + QString("Got Resolution %1x%2")
+                .arg(vfmt.fmt.pix.width).arg(vfmt.fmt.pix.height));
+        pix = vfmt.fmt.pix.width * vfmt.fmt.pix.height;
+        needs_resolution = false;
+    }
+
+    if (!pix)
+        return; // nothing to do, we don't have a resolution yet
+
+    int old_max = maxbitrate, old_avg = bitrate;
+    if (pix <= 768*568)
+    {
+        maxbitrate = low_mpeg4peakbitrate;
+        bitrate    = low_mpeg4avgbitrate;
+    }
+    else if (pix >= 1920*1080)
+    {
+        maxbitrate = high_mpeg4peakbitrate;
+        bitrate    = high_mpeg4avgbitrate;
+    }
+    else
+    {
+        maxbitrate = medium_mpeg4peakbitrate;
+        bitrate    = medium_mpeg4avgbitrate;
+    }
+
+    if ((old_max != maxbitrate) || (old_avg != bitrate))
+    {
+        VERBOSE(VB_RECORD, LOC +
+                QString("Changing bitrates from (%1,%2) to (%3,%4)")
+                .arg(old_avg).arg(old_max)
+                .arg(bitrate).arg(maxbitrate));
+        vector<struct v4l2_ext_control> ext_ctrls;
+        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE_PEAK,
+                     maxbitrate * 1000);
+        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE,
+                     (bitrate = min(bitrate, maxbitrate)) * 1000);
+        set_ctrls(readfd, ext_ctrls);
+    }
+
+    // Restart streaming. Shouldn't be needed? seems to be with current driver.
+    QMutexLocker locker(&start_stop_encoding_lock);
+    StopEncoding(readfd);
+    StartEncoding(readfd);
+
+    needs_resolution = false;
 }

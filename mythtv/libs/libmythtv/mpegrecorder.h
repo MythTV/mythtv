@@ -6,6 +6,7 @@
 #include "dtvrecorder.h"
 #include "tspacket.h"
 #include "mpegstreamdata.h"
+#include "DeviceReadBuffer.h"
 
 struct AVFormatContext;
 struct AVPacket;
@@ -13,7 +14,8 @@ struct AVPacket;
 class MpegRecorder : public DTVRecorder,
                      public MPEGSingleProgramStreamListener,
                      public TSPacketListener,
-                     public TSPacketListenerAV
+                     public TSPacketListenerAV,
+                     public ReaderPausedCB
 {
   public:
     MpegRecorder(TVRec*);
@@ -58,6 +60,9 @@ class MpegRecorder : public DTVRecorder,
     void HandleSingleProgramPAT(ProgramAssociationTable *pat);
     void HandleSingleProgramPMT(ProgramMapTable *pmt);
 
+    // ReaderPausedCB
+    virtual void ReaderPaused(int fd) { paused = true; pauseWait.wakeAll(); }
+
   private:
     void SetIntOption(RecordingProfile *profile, const QString &name);
     void SetStrOption(RecordingProfile *profile, const QString &name);
@@ -80,6 +85,8 @@ class MpegRecorder : public DTVRecorder,
 
     void ResetForNewFile(void);
 
+    void HandleResolutionChanges(void);
+
     inline bool CheckCC(uint pid, uint cc);
 
     bool deviceIsMpegFile;
@@ -97,6 +104,8 @@ class MpegRecorder : public DTVRecorder,
     // State
     bool recording;
     bool encoding;
+    bool needs_resolution;
+    mutable QMutex start_stop_encoding_lock;
 
     // Pausing state
     bool cleartimeonpause;
@@ -124,6 +133,9 @@ class MpegRecorder : public DTVRecorder,
     static const char *streamType[];
     static const char *aspectRatio[];
     static const unsigned int kBuildBufferMaxSize;
+
+    // Buffer device reads
+    DeviceReadBuffer *_device_read_buffer;
 
     // TS
     MPEGStreamData *_stream_data;
