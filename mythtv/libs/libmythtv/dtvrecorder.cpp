@@ -535,8 +535,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
                 hasKeyFrame = true;
                 hasFrame = true;
             }
-
-            if (_h264_kf_seq.IsOnFrame())
+            else if (_h264_kf_seq.IsOnFrame())
                 hasFrame = true;
         }
     } // for (; i < TSPacket::SIZE; i++)
