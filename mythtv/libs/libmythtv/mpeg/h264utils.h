@@ -35,6 +35,11 @@
 
 #include <stdint.h>
 
+extern "C" {
+#include <limits.h> // golomb.h should include this...
+#include "golomb.h"
+}
+
 namespace H264
 {
 
@@ -174,6 +179,8 @@ class KeyframeSequencer
 
   private:
     void KeyframePredicate(const uint8_t new_first_NAL_byte); /* throw() */
+    void decode_Header(GetBitContext *gb);
+    void decode_SPS(GetBitContext *gb);
 
     bool    errored;
     bool    state_changed;
@@ -182,14 +189,27 @@ class KeyframeSequencer
     int64_t  sync_stream_offset;
 
     uint8_t first_NAL_byte;
+    int     log2_max_frame_num;
+    int     frame_num;
+    int     prev_frame_num;
 
     bool    saw_AU_delimiter;
     bool    saw_first_VCL_NAL_unit;
     bool    saw_sps;
+    bool    new_VLC_NAL;
+
+    bool    separate_colour_plane_flag;
+    bool    frame_mbs_only_flag;
+    bool    prev_field_pic_flag;
+    bool    prev_bottom_field_flag;
+    uint    prev_pic_parameter_set_id;
+
 
     bool    did_evaluate_once;
     bool    keyframe;
     int64_t keyframe_sync_stream_offset;
+
+    GetBitContext gb;
 };
 
 } // namespace H264
