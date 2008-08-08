@@ -3,6 +3,11 @@
 // C headers
 #include <ctime>
 
+// C++ headers
+#include <algorithm>
+#include <vector>
+using namespace std;
+
 // POSIX headers
 #include <pthread.h>
 #include <fcntl.h>
@@ -14,9 +19,6 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
-
-#include <algorithm>
-using namespace std;
 
 // avlib headers
 extern "C" {
@@ -746,6 +748,8 @@ static void set_ctrls(int fd, vector<struct v4l2_ext_control> &ext_ctrls)
             "Video Average Bitrate";
         control_description[V4L2_CID_MPEG_STREAM_TYPE] =
             "MPEG Stream type";
+        control_description[V4L2_CID_MPEG_VIDEO_BITRATE_MODE] =
+            "MPEG Bitrate mode";
     }
     control_description_lock.unlock();
 
@@ -801,12 +805,21 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
         maxbitrate = high_mpeg4peakbitrate;
         bitrate    = high_mpeg4avgbitrate;
     }
+    maxbitrate = std::max(maxbitrate, bitrate);
+
+    if (driver == "hdpvr")
+    {
+        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE_MODE,
+                     (maxbitrate == bitrate) ?
+                     V4L2_MPEG_VIDEO_BITRATE_MODE_CBR :
+                     V4L2_MPEG_VIDEO_BITRATE_MODE_VBR);
+    }
+
+    add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE,
+                 bitrate * 1000);
 
     add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE_PEAK,
                  maxbitrate * 1000);
-
-    add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE,
-                 (bitrate = min(bitrate, maxbitrate)) * 1000);
 
     set_ctrls(chanfd, ext_ctrls);
 
@@ -1593,18 +1606,45 @@ void MpegRecorder::HandleResolutionChanges(void)
         maxbitrate = medium_mpeg4peakbitrate;
         bitrate    = medium_mpeg4avgbitrate;
     }
+    maxbitrate = std::max(maxbitrate, bitrate);
 
     if ((old_max != maxbitrate) || (old_avg != bitrate))
     {
-        VERBOSE(VB_RECORD, LOC +
-                QString("Changing bitrates from (%1,%2) to (%3,%4)")
-                .arg(old_avg).arg(old_max)
-                .arg(bitrate).arg(maxbitrate));
+        if (old_max == old_avg)
+        {
+            VERBOSE(VB_RECORD, LOC +
+                    QString("Old bitrate %1 CBR").arg(old_avg));
+        }
+        else
+        {
+            VERBOSE(VB_RECORD, LOC +
+                    QString("Old bitrate %1/%2 VBR")
+                    .arg(old_avg).arg(old_max));
+        }
+
+        if (maxbitrate == bitrate)
+        {
+            VERBOSE(VB_RECORD, LOC + QString("New bitrate %1 kbps CBR")
+                    .arg(bitrate));
+        }
+        else
+        {
+            VERBOSE(VB_RECORD, LOC + QString("New bitrate %1/%2 kbps VBR")
+                    .arg(bitrate).arg(maxbitrate));
+        }
+
         vector<struct v4l2_ext_control> ext_ctrls;
+        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE_MODE,
+                     (maxbitrate == bitrate) ?
+                     V4L2_MPEG_VIDEO_BITRATE_MODE_CBR :
+                     V4L2_MPEG_VIDEO_BITRATE_MODE_VBR);
+
+        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE,
+                     bitrate * 1000);
+
         add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE_PEAK,
                      maxbitrate * 1000);
-        add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_BITRATE,
-                     (bitrate = min(bitrate, maxbitrate)) * 1000);
+
         set_ctrls(readfd, ext_ctrls);
     }
 
