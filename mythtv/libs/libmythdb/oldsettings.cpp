@@ -10,6 +10,7 @@
 
 
 #include "oldsettings.h"
+#include "mythverbose.h"
 
 #include <qstring.h>
 #include <fstream>
@@ -121,8 +122,14 @@ bool Settings::LoadSettingsFiles(QString filename, QString prefix,
 
 bool Settings::ReadSettings(QString pszFile)
 {
+    QString LOC = "(old)Settings::ReadSettings(" + pszFile + ") - ";
     fstream fin(pszFile.toAscii(), ios::in);
-    if (!fin.is_open()) return false;
+
+    if (!fin.is_open())
+    {
+        VERBOSE(VB_FILE, LOC + "No such file");
+        return false;
+    }
 
     string strLine;
     QString strKey;
@@ -151,6 +158,8 @@ bool Settings::ReadSettings(QString pszFile)
                 strVal = line.mid(nSplitPoint + 1, strLine.size());
 
                 (*m_pSettings)[strKey] = strVal;
+
+                VERBOSE(VB_FILE, LOC + "'" + strKey + "' = '" + strVal + "'.");
             }
         }
     } // wend
