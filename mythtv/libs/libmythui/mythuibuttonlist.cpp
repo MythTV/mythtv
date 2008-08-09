@@ -668,7 +668,7 @@ void MythUIButtonList::Init()
     MythRect buttonItemArea;
 
     MythUIGroup *buttonActiveState = dynamic_cast<MythUIGroup *>
-                                        (buttontemplate->GetState("Active"));
+                                        (buttontemplate->GetState("active"));
     if (buttonActiveState)
         buttonItemArea = buttonActiveState->GetArea();
     else
@@ -709,7 +709,7 @@ void MythUIButtonList::Init()
     // This can be removed once the disk based image caching is added to mythui,
     // since the mythgallery thumbnail generator can be ditched.
     MythUIGroup *buttonSelectedState = dynamic_cast<MythUIGroup *>
-                                        (buttontemplate->GetState("Selected"));
+                                        (buttontemplate->GetState("selected"));
 
     if (buttonSelectedState)
     {
@@ -1196,19 +1196,19 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
     {
         if (m_parent->m_active && !m_overrideInactive && active_on)
         {
-            button->DisplayState("Selected");
+            button->DisplayState("selected");
             button->MoveToTop();
         }
         else
         {
 //             if (active_on)
-//                 button->DisplayState("SelectedInactive");
+//                 button->DisplayState("selectedinactive");
 //             else
-                button->DisplayState("Active");
+                button->DisplayState("active");
         }
     }
     else
-        button->DisplayState("Active");
+        button->DisplayState("active");
 
     MythUIGroup *buttonstate = dynamic_cast<MythUIGroup *>
                                             (button->GetCurrentState());

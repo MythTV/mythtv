@@ -18,7 +18,7 @@ MythUIStateType::~MythUIStateType()
 
 bool MythUIStateType::AddImage(const QString &name, MythImage *image)
 {
-    QString key = name.toLower();
+    QString key = name;
     if (m_ObjectsByName.contains(key) || !image)
         return false;
 
@@ -30,7 +30,7 @@ bool MythUIStateType::AddImage(const QString &name, MythImage *image)
 
 bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
 {
-    QString key = name.toLower();
+    QString key = name;
     if (m_ObjectsByName.contains(key) || !object)
         return false;
 
@@ -43,11 +43,16 @@ bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
     else
         objectArea.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
 
-    if (objectArea.width() > m_Area.width() ||
-        objectArea.height() > m_Area.height())
+    if ((objectArea.width() + objectArea.x()) > m_Area.width() ||
+        (objectArea.height() + objectArea.y()) > m_Area.height())
     {
-        m_Area.setWidth(objectArea.getWidth());
-        m_Area.setHeight(objectArea.getHeight());
+        VERBOSE(VB_IMPORTANT, QString("Expand state: %1 width %2 Object: %3 total width %4")
+        .arg(name)
+        .arg(object->objectName())
+        .arg(object->objectName())
+        .arg(objectArea.width() + objectArea.x()));
+        m_Area.setWidth(objectArea.width() + objectArea.x());
+        m_Area.setHeight(objectArea.height() + objectArea.y());
     }
 
     return true;
@@ -80,11 +85,11 @@ bool MythUIStateType::AddObject(StateType type, MythUIType *object)
     else
         objectArea.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
 
-    if (objectArea.width() > m_Area.width() ||
-        objectArea.height() > m_Area.height())
+    if ((objectArea.width() + objectArea.x()) > m_Area.width() ||
+        (objectArea.height() + objectArea.y()) > m_Area.height())
     {
-        m_Area.setWidth(objectArea.getWidth());
-        m_Area.setHeight(objectArea.getHeight());
+        m_Area.setWidth(objectArea.width() + objectArea.x());
+        m_Area.setHeight(objectArea.height() + objectArea.y());
     }
 
     return true;
@@ -94,7 +99,7 @@ bool MythUIStateType::DisplayState(const QString &name)
 {
     MythUIType *old = m_CurrentState;
 
-    QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name.toLower());
+    QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name);
     if (i != m_ObjectsByName.end())
         m_CurrentState = i.value();
     else
@@ -140,8 +145,8 @@ bool MythUIStateType::DisplayState(StateType type)
 
 MythUIType *MythUIStateType::GetState(const QString &name)
 {
-    if (m_ObjectsByName.contains(name.toLower()))
-        return m_ObjectsByName[name.toLower()];
+    if (m_ObjectsByName.contains(name)
+        return m_ObjectsByName[name];
 
     return NULL;
 }
@@ -186,8 +191,8 @@ bool MythUIStateType::ParseElement(QDomElement &element)
         m_ShowEmpty = parseBool(element);
     else if (element.tagName() == "state")
     {
-        QString name = element.attribute("name", "").toLower();
-        QString type = element.attribute("type", "").toLower();
+        QString name = element.attribute("name", "");
+        QString type = element.attribute("type", "");
 
         QString statename = "";
 
