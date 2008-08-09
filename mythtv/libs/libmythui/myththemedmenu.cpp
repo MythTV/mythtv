@@ -1230,7 +1230,7 @@ bool MythThemedMenuState::parseSettings(
                 if (parseFonts)
                 {
                     MythFontProperties *font;
-                    font = MythFontProperties::ParseFromXml(e, true);
+                    font = MythFontProperties::ParseFromXml(e, NULL, true);
                     delete font;
                 }
             }
