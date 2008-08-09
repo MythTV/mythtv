@@ -43,16 +43,11 @@ bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
     else
         objectArea.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
 
-    if ((objectArea.width() + objectArea.x()) > m_Area.width() ||
-        (objectArea.height() + objectArea.y()) > m_Area.height())
+    if (objectArea.width() > m_Area.width() ||
+        objectArea.height() > m_Area.height())
     {
-        VERBOSE(VB_IMPORTANT, QString("Expand state: %1 width %2 Object: %3 total width %4")
-        .arg(name)
-        .arg(object->objectName())
-        .arg(object->objectName())
-        .arg(objectArea.width() + objectArea.x()));
-        m_Area.setWidth(objectArea.width() + objectArea.x());
-        m_Area.setHeight(objectArea.height() + objectArea.y());
+        m_Area.setWidth(objectArea.getWidth());
+        m_Area.setHeight(objectArea.getHeight());
     }
 
     return true;
@@ -85,11 +80,11 @@ bool MythUIStateType::AddObject(StateType type, MythUIType *object)
     else
         objectArea.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
 
-    if ((objectArea.width() + objectArea.x()) > m_Area.width() ||
-        (objectArea.height() + objectArea.y()) > m_Area.height())
+    if (objectArea.width() > m_Area.width() ||
+        objectArea.height() > m_Area.height())
     {
-        m_Area.setWidth(objectArea.width() + objectArea.x());
-        m_Area.setHeight(objectArea.height() + objectArea.y());
+        m_Area.setWidth(objectArea.getWidth());
+        m_Area.setHeight(objectArea.getHeight());
     }
 
     return true;
@@ -145,7 +140,7 @@ bool MythUIStateType::DisplayState(StateType type)
 
 MythUIType *MythUIStateType::GetState(const QString &name)
 {
-    if (m_ObjectsByName.contains(name)
+    if (m_ObjectsByName.contains(name))
         return m_ObjectsByName[name];
 
     return NULL;
