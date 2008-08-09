@@ -9,8 +9,8 @@
 
 MythFontProperties::MythFontProperties() :
     m_color(QColor(Qt::white)), m_hasShadow(false), m_shadowAlpha(255),
-    m_hasOutline(false), m_outlineAlpha(255), m_bFreeze(false) 
-{ 
+    m_hasOutline(false), m_outlineAlpha(255), m_bFreeze(false)
+{
     CalcHash();
 }
 
@@ -26,7 +26,7 @@ void MythFontProperties::SetColor(const QColor &color)
     CalcHash();
 }
 
-void MythFontProperties::SetShadow(bool on, const QPoint &offset, 
+void MythFontProperties::SetShadow(bool on, const QPoint &offset,
                                    const QColor &color, int alpha)
 {
     m_hasShadow = on;
@@ -36,7 +36,7 @@ void MythFontProperties::SetShadow(bool on, const QPoint &offset,
     CalcHash();
 }
 
-void MythFontProperties::SetOutline(bool on, const QColor &color, 
+void MythFontProperties::SetOutline(bool on, const QColor &color,
                                     int size, int alpha)
 {
     m_hasOutline = on;
@@ -117,6 +117,7 @@ void MythFontProperties::Unfreeze(void)
 }
 
 MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
+                                                     MythUIType *parent,
                                                      bool addToGlobal)
 {
     // Crappy, but cached.  Move to GlobalFontMap?
@@ -148,7 +149,14 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
 
     if (!base.isEmpty())
     {
-        MythFontProperties *tmp = GetGlobalFontMap()->GetFont(base);
+        MythFontProperties *tmp;
+
+        if (parent)
+            tmp = parent->GetFont(base);
+
+        if (!tmp)
+            tmp = GetGlobalFontMap()->GetFont(base);
+
         if (!tmp)
         {
             VERBOSE(VB_IMPORTANT,
@@ -275,7 +283,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
         return NULL;
     }
     else if (size > 0)
-        newFont->m_face.setPointSize(GetMythMainWindow()->NormalizeFontSize(size));    
+        newFont->m_face.setPointSize(GetMythMainWindow()->NormalizeFontSize(size));
 
     newFont->Unfreeze();
 

@@ -31,6 +31,7 @@ class MythFontProperties: public XMLParseBase
     QString GetHash(void) const { return m_hash; }
 
     static MythFontProperties *ParseFromXml(QDomElement &element,
+                                            MythUIType *parent = NULL,
                                             bool addToGlobal = false);
 
     void GetOffset(QPoint &offset) const;

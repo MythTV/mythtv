@@ -191,7 +191,7 @@ void XMLParseBase::ParseChildren(QDomElement &element,
             {
                 MythFontProperties *font;
                 bool global = (GetGlobalObjectStore() == parent);
-                font = MythFontProperties::ParseFromXml(info, global);
+                font = MythFontProperties::ParseFromXml(info, parent, global);
                 if (!global && font)
                 {
                     QString name = info.attribute("name");
@@ -355,7 +355,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
             {
                 MythFontProperties *font;
                 bool global = (GetGlobalObjectStore() == parent);
-                font = MythFontProperties::ParseFromXml(info, global);
+                font = MythFontProperties::ParseFromXml(info, parent, global);
                 if (!global && font)
                 {
                     QString name = info.attribute("name");
@@ -469,7 +469,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 {
                     MythFontProperties *font;
                     bool global = (GetGlobalObjectStore() == parent);
-                    font = MythFontProperties::ParseFromXml(e, global);
+                    font = MythFontProperties::ParseFromXml(e, parent, global);
                     if (!global && font)
                     {
                         QString name = e.attribute("name");
