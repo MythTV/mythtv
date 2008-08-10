@@ -14,12 +14,6 @@
             <outlinesize>3</outlinesize>
         </font>
 
-        <imagetype name="logo">
-            <filename>myth_logo.png</filename>
-            <position>20,170</position>
-            <alphapulse min="0" max="255" change="1"/>
-        </imagetype>
-
         <font name="clock" from="small">
             <size>16</size>
             <size:small>14</size:small>
