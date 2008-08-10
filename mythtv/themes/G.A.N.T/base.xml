@@ -5,12 +5,6 @@
             <filename>bkg/grey.png</filename>
         </imagetype>
 
-        <imagetype name="logo">
-            <filename>myth_logo.png</filename>
-            <position>20,170</position>
-            <alphapulse min="0" max="255" change="1"/>
-        </imagetype>
-
         <font name="small" face="Arial">
             <color>#FFFFFF</color>
             <size>14</size>
@@ -30,22 +24,6 @@
             <size:small>18</size:small>
             <size:big>22</size:big>
         </font>
-
-        <font name="clock" from="small">
-            <size>16</size>
-            <size:small>14</size:small>
-            <size:big>18</size:big>
-            <outlinesize>2</outlinesize>
-            <outlinecolor>black</outlinecolor>
-        </font>
-
-        <clock name="clock">
-            <area>340,32,415,50</area>
-            <font>clock</font>
-            <align>right</align>
-            <format>%DATE% %TIME%</format>
-            <alpha>200</alpha>
-        </clock>
     </window>
 
 </mythuitheme>
