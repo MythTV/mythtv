@@ -92,6 +92,9 @@ bool MythUIStateType::AddObject(StateType type, MythUIType *object)
 
 bool MythUIStateType::DisplayState(const QString &name)
 {
+    if (name.isEmpty())
+        return false;
+
     MythUIType *old = m_CurrentState;
 
     QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name);
