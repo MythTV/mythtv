@@ -126,7 +126,7 @@ class MythUIHelperPrivate
 
 MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
     : m_qtThemeSettings(new Settings()),
-      m_themeloaded(false), 
+      m_themeloaded(false),
       m_menuthemepathname(QString::null), m_themepathname(QString::null),
       language(""),
       m_wmult(1.0), m_hmult(1.0),
@@ -975,33 +975,37 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
         delete bgpixmap;
 }
 
-bool MythUIHelper::FindThemeFile(QString &filename)
+bool MythUIHelper::FindThemeFile(QString &path)
 {
-    // Given a full path, or in current working directory?
-    if (QFile::exists(filename))
+    VERBOSE(VB_IMPORTANT, QString("Find File %1").arg(path));
+    QFileInfo fi(path);
+    if (fi.isAbsolute() && fi.exists())
         return true;
 
-    int pathStart = filename.lastIndexOf('/');
-    QString basename;
-    if (pathStart > 0)
-        basename = filename.mid(pathStart + 1);
-
     QString file;
+    bool foundit = false;
     QList<QString> searchpath = GetThemeSearchPath();
     for (QList<QString>::const_iterator ii = searchpath.begin();
         ii != searchpath.end(); ii++)
     {
-        if (QFile::exists((file = *ii + filename)))
-            goto found;
-        if (pathStart > 0 && QFile::exists((file = *ii + basename)))
-            goto found;
+        if (fi.isRelative())
+        {
+            file = *ii + fi.filePath();
+        }
+        else if (fi.isAbsolute() && !fi.isRoot())
+        {
+            file = *ii + fi.fileName();
+        }
+
+        if (QFile::exists(file))
+        {
+            path = file;
+            foundit = true;
+            break;
+        }
     }
 
-    return false;
-
-found:
-    filename = file;
-    return true;
+    return foundit;
 }
 
 QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
@@ -1057,7 +1061,6 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
         }
     }
 
-
     if (!FindThemeFile(filename))
     {
         VERBOSE(VB_IMPORTANT,
@@ -1111,7 +1114,7 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
     if (filename.left(5) == "myth:")
         return NULL;
 
-    if (d->themecachedir != "" && fromcache)
+    if (!d->themecachedir.isEmpty() && fromcache)
     {
         QString cachefilepath;
         bool bFound = false;
@@ -1119,7 +1122,7 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
         // Is absolute path in theme directory.
         if (!bFound)
         {
-            if (filename.left(d->m_themepathname.length()) == 
+            if (filename.left(d->m_themepathname.length()) ==
                 d->m_themepathname)
             {
                 QString tmpfilename = filename;
@@ -1251,7 +1254,7 @@ QString MythUIHelper::GetLanguage(void)
  */
 QString MythUIHelper::GetLanguageAndVariant(void)
 {
-    if (d->language == QString::null || d->language == "")
+    if (d->language == QString::null || d->language.isEmpty())
         d->language = GetMythDB()->GetSetting("Language", "EN").toLower();
 
     return d->language;
