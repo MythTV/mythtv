@@ -525,7 +525,7 @@ void VideoOutput::FallbackDeint(void)
         SetupDeinterlace(true, db_vdisp_profile->GetFallbackDeinterlacer());
 }
 
-/** \fn VideoOutput::FallbackDeint(void)
+/** \fn VideoOutput::BestDeint(void)
  *  \brief Change to the best deinterlacing method.
  */
 void VideoOutput::BestDeint(void)
@@ -627,6 +627,8 @@ bool VideoOutput::InputChanged(const QSize &input_size,
         db_vdisp_profile->SetInput(video_dim);
 
     SetVideoAspectRatio(aspect);
+
+    BestDeint();
     
     DiscardFrames(true);
 
