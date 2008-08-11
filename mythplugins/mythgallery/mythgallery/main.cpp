@@ -11,7 +11,7 @@
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/dialogbox.h>
-#include <mythtv/mythmedia.h>
+#include <mythtv/mythmediamonitor.h>
 #include <mythtv/mythpluginapi.h>
 
 // mythgallery
