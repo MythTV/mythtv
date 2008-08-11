@@ -46,6 +46,10 @@ using namespace std;
 #include "mediaserver.h"
 #include "httpstatus.h"
 
+#define LOC      QString("MythBackend: ")
+#define LOC_WARN QString("MythBackend, Warning: ")
+#define LOC_ERR  QString("MythBackend, Error: ")
+
 QMap<int, EncoderLink *> tvList;
 AutoExpire *expirer = NULL;
 Scheduler *sched = NULL;
@@ -215,8 +219,10 @@ bool setupTVs(bool ismaster, bool &error)
 
     if (tvList.empty())
     {
-        cerr << "ERROR: no valid capture cards are defined in the database.\n";
-        cerr << "Perhaps you should read the installation instructions?\n";
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "No valid capture cards are defined in the database.\n\t\t\t"
+                "Perhaps you should re-read the installation instructions?");
+
         gContext->LogEntry("mythbackend", LP_CRITICAL,
                            "No capture cards are defined", 
                            "Please run the setup program.");
@@ -267,7 +273,8 @@ int log_rotate(int report_error)
         // If we can't open the new logfile, send data to /dev/null
         if (report_error)
         {
-            cerr << "cannot open logfile " << (const char *)logfile << endl;
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Cannot open logfile '%1'").arg(logfile));
             return -1;
         }
         new_logfd = open("/dev/null", O_WRONLY);
@@ -697,7 +704,10 @@ int main(int argc, char **argv)
     if (logfile != "" )
     {
         if (log_rotate(1) < 0)
-            cerr << "cannot open logfile; using stdout/stderr" << endl;
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "Cannot open logfile; using stdout/stderr instead");
+        }
         else
             signal(SIGHUP, &log_rotate_handler);
     }
@@ -709,21 +719,20 @@ int main(int argc, char **argv)
         pidfs.open(tmp.constData());
         if (!pidfs)
         {
-            perror(tmp.constData());
-            cerr << "Error opening pidfile";
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Could not open pid file" + ENO);
             return BACKEND_EXIT_OPENING_PIDFILE_ERROR;
         }
     }
 
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-        cerr << "Unable to ignore SIGPIPE\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Unable to ignore SIGPIPE");
 
-    if (daemonize)
-        if (daemon(0, 1) < 0)
-        {
-            perror("daemon");
-            return BACKEND_EXIT_DAEMONIZING_ERROR;
-        }
+    if (daemonize && (daemon(0, 1) < 0))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to daemonize" + ENO);
+        return BACKEND_EXIT_DAEMONIZING_ERROR;
+    }
 
 
     if (pidfs)
@@ -866,28 +875,34 @@ int main(int argc, char **argv)
 
     if (ismaster)
     {
-        cerr << "Starting up as the master server.\n";
+        VERBOSE(VB_GENERAL, LOC + "Starting up as the master server.");
         gContext->LogEntry("mythbackend", LP_INFO,
                            "MythBackend started as master server", "");
 
         if (nosched)
-            cerr << "********** The Scheduler has been DISABLED with "
-                    "the --nosched option **********\n";
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "********** The Scheduler has been DISABLED with "
+                    "the --nosched option **********");
+        }
 
         // kill -USR1 mythbackendpid will force a upnpmedia rebuild
         signal(SIGUSR1, &upnp_rebuild);
     }
     else
     {
-        cerr << "Running as a slave backend.\n";
+        VERBOSE(VB_GENERAL, LOC + "Running as a slave backend.");
         gContext->LogEntry("mythbackend", LP_INFO,
                            "MythBackend started as a slave backend", "");
     }
 
     // Get any initial housekeeping done before we fire up anything else
     if (nohousekeeper)
-        cerr << "****** The Housekeeper has been DISABLED with "
-                "the --nohousekeeper option ******\n";
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN + 
+                "****** The Housekeeper has been DISABLED with "
+                "the --nohousekeeper option ******");
+    }
     else
         housekeeping = new HouseKeeper(true, ismaster);
 
@@ -902,6 +917,12 @@ int main(int argc, char **argv)
     if (ismaster && runsched)
     {
         sched = new Scheduler(true, &tvList);
+        int err = sched->GetError();
+        if (err)
+        {
+            cleanup();
+            return err;
+        }
 
         if (nosched)
             sched->DisableScheduling();
@@ -910,8 +931,11 @@ int main(int argc, char **argv)
     if (ismaster)
     {
         if (noexpirer)
-            cerr << "********* Auto-Expire has been DISABLED with "
-                    "the --noautoexpire option ********\n";
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    "********* Auto-Expire has been DISABLED with "
+                    "the --noautoexpire option ********");
+        }
         else
             expirer = new AutoExpire(&tvList);
     }
@@ -920,8 +944,11 @@ int main(int argc, char **argv)
         sched->SetExpirer(expirer);
 
     if (nojobqueue)
-        cerr << "********* The JobQueue has been DISABLED with "
-                "the --nojobqueue option *********\n";
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                "********* The JobQueue has been DISABLED with "
+                "the --nojobqueue option *********");
+    }
     else
         jobqueue = new JobQueue(ismaster);
 

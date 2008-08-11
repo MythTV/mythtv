@@ -36,25 +36,34 @@ using namespace std;
 #include "programinfo.h"
 #include "scheduledrecording.h"
 #include "cardutil.h"
+#include "mythdb.h"
 
 #define LOC QString("Scheduler: ")
+#define LOC_WARN QString("Scheduler, Warning: ")
 #define LOC_ERR QString("Scheduler, Error: ")
 
 Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
                      QString tmptable, Scheduler *master_sched) :
-    livetvTime(QDateTime())
+    recordTable(tmptable),
+    priorityTable("powerpriority"),
+    reclist_lock(NULL),
+    reclist_changed(false),
+    specsched(master_sched),
+    schedMoveHigher(false),
+    schedulingEnabled(true),
+    m_tvList(tvList),
+    expirer(NULL),
+    threadrunning(false),
+    m_mainServer(NULL),
+    resetIdleTime(false),
+    m_isShuttingDown(false),
+    error(0),
+    livetvTime(QDateTime()),
+    livetvpriority(0),
+    prefinputpri(0)
 {
-    m_tvList = tvList;
-    specsched = false;
-    schedulingEnabled = true;
-
-    expirer = NULL;
-
     if (master_sched)
-    {
-        specsched = true;
         master_sched->getAllPending(&reclist);
-    }
 
     // Only the master scheduler should use SchedCon()
     if (runthread)
@@ -62,21 +71,17 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     else
         dbConn = MSqlQuery::DDCon();
 
-    recordTable = tmptable;
-    priorityTable = "powerpriority";
-
     if (tmptable == "powerpriority_tmp")
     {
         priorityTable = tmptable;
         recordTable = "record";
     }
 
-    m_mainServer = NULL;
-
-    m_isShuttingDown = false;
-    resetIdleTime = false;
-
-    verifyCards();
+    if (!VerifyCards())
+    {
+        error = true;
+        return;
+    }
 
     threadrunning = runthread;
 
@@ -99,17 +104,15 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
 
 Scheduler::~Scheduler()
 {
-    while (reclist.size() > 0)
+    while (!reclist.empty())
     {
-        ProgramInfo *pginfo = reclist.back();
-        delete pginfo;
+        delete reclist.back();
         reclist.pop_back();
     }
 
-    while (worklist.size() > 0)
+    while (!worklist.empty())
     {
-        ProgramInfo *pginfo = worklist.back();
-        delete pginfo;
+        delete worklist.back();
         worklist.pop_back();
     }
 
@@ -119,7 +122,8 @@ Scheduler::~Scheduler()
         pthread_join(schedThread, NULL);
     }
 
-    delete reclist_lock;
+    if (reclist_lock)
+        delete reclist_lock;
 }
 
 void Scheduler::SetMainServer(MainServer *ms)
@@ -134,55 +138,72 @@ void Scheduler::ResetIdleTime(void)
     resetIdleTime_lock.unlock();
 }
 
-void Scheduler::verifyCards(void)
+bool Scheduler::VerifyCards(void)
 {
-    QString thequery;
-
     MSqlQuery query(dbConn);
-    query.prepare("SELECT NULL FROM capturecard;");
-
-    int numcards = -1;
-    if (query.exec() && query.isActive())
-        numcards = query.size();
-
-    if (numcards <= 0)
+    if (!query.exec("SELECT count(*) FROM capturecard") || !query.next())
     {
-        cerr << "ERROR: no capture cards are defined in the database.\n";
-        cerr << "Perhaps you should read the installation instructions?\n";
-        exit(BACKEND_BUGGY_EXIT_NO_CAP_CARD);
+        MythDB::DBError("verifyCards() -- main query 1", query);
+        error = BACKEND_EXIT_NO_CAP_CARD;
+        return false;
+    }
+
+    uint numcards = query.value(0).toUInt();
+    if (!numcards)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "No capture cards are defined in the database.\n\t\t\t"
+                "Perhaps you should re-read the installation instructions?");
+        error = BACKEND_EXIT_NO_CAP_CARD;
+        return false;
     }
 
     query.prepare("SELECT sourceid,name FROM videosource ORDER BY sourceid;");
 
-    int numsources = -1;
-    if (query.exec() && query.isActive())
+    if (!query.exec())
     {
-        numsources = query.size();
+        MythDB::DBError("verifyCards() -- main query 2", query);
+        error = BACKEND_EXIT_NO_CHAN_DATA;
+        return false;
+    }
 
-        int source = 0;
+    uint numsources = 0;
+    MSqlQuery subquery(dbConn);
+    while (query.next())
+    {
+        subquery.prepare(
+            "SELECT cardinputid "
+            "FROM cardinput "
+            "WHERE sourceid = :SOURCEID "
+            "ORDER BY cardinputid;");
+        subquery.bindValue(":SOURCEID", query.value(0).toUInt());
 
-        while (query.next())
+        if (!subquery.exec())
         {
-            source = query.value(0).toInt();
-            MSqlQuery subquery(dbConn);
-
-            subquery.prepare("SELECT cardinputid FROM cardinput WHERE "
-                             "sourceid = :SOURCEID ORDER BY cardinputid;");
-            subquery.bindValue(":SOURCEID", source);
-            subquery.exec();
-            
-            if (!subquery.isActive() || subquery.size() <= 0)
-                cerr << (const char *)query.value(1).toString() << " is defined, but isn't "
-                     << "attached to a cardinput.\n";
+            MythDB::DBError("verifyCards() -- sub query", subquery);
+        }
+        else if (!subquery.next())
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    QString("Listings source '%1' is defined, "
+                            "but is not attached to a card input.")
+                    .arg(query.value(1).toString()));
+        }
+        else
+        {
+            numsources++;
         }
     }
 
-    if (numsources <= 0)
+    if (!numsources)
     {
-        VERBOSE(VB_IMPORTANT, "ERROR: No channel sources "
-                "defined in the database");
-        exit(BACKEND_BUGGY_EXIT_NO_CHAN_DATA);
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "No channel sources defined in the database");
+        error = BACKEND_EXIT_NO_CHAN_DATA;
+        return false;
     }
+
+    return true;
 }
 
 static inline bool Recording(const ProgramInfo *p)

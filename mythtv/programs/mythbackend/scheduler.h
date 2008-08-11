@@ -75,6 +75,8 @@ class Scheduler : public QObject
     void GetNextLiveTVDir(int cardid);
     void ResetIdleTime(void);
 
+    int GetError(void) const { return error; }
+
   protected:
     void RunScheduler(void);
     static void *SchedulerThread(void *param);
@@ -83,7 +85,7 @@ class Scheduler : public QObject
     QString recordTable;
     QString priorityTable;
 
-    void verifyCards(void);
+    bool VerifyCards(void);
 
     bool FillRecordList(void);
     void UpdateMatches(int recordid);
@@ -169,6 +171,8 @@ class Scheduler : public QObject
 
     QDateTime fsInfoCacheFillTime;
     QMap<QString, FileSystemInfo> fsInfoCache;
+
+    int error;
 
     // Try to avoid LiveTV sessions until this time
     QDateTime livetvTime;
