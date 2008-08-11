@@ -550,6 +550,75 @@ void MediaMonitor::MonitorRegisterExtensions(uint mediatype,
     }
 }
 
+void MediaMonitor::RegisterMediaHandler(const QString  &destination,
+                                        const QString  &description,
+                                        const QString  &key,
+                                        void          (*callback)
+                                              (MythMediaDevice*),
+                                        int             mediaType,
+                                        const QString  &extensions)
+{
+    if (m_handlerMap.count(destination) == 0)
+    {
+        MHData  mhd = { callback, mediaType, destination, description };
+        QString msg = MythMediaDevice::MediaTypeString((MediaType)mediaType);
+
+        if (extensions.length())
+            msg += QString(", ext(%1)").arg(extensions);
+
+        VERBOSE(VB_MEDIA, "Registering '" + destination +
+                          "'\n as a media handler for " + msg);
+
+        m_handlerMap[destination] = mhd;
+
+        if (extensions.length())
+            MonitorRegisterExtensions(mediaType, extensions);
+    }
+    else
+    {
+       VERBOSE(VB_GENERAL,
+               destination + " is already registered as a media handler.");
+    }
+}
+
+/**
+ * Find a relevant jump point for this type of media.
+ *
+ * If there's more than one we should show a popup
+ * to allow the user to select which one to use,
+ * but for now, we're going to just use the first one.
+ */
+void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
+{
+    QList<MHData>                    handlers;
+    QMap<QString, MHData>::Iterator  itr = m_handlerMap.begin();
+
+    while (itr != m_handlerMap.end())
+    {
+        if ((itr.data().MediaType & (int)pMedia->getMediaType()))
+        {
+            VERBOSE(VB_IMPORTANT, "Found a handler - '" + itr.key() + "'");
+            handlers.append(itr.data());
+        }
+        itr++;
+    }
+
+    if (handlers.empty())
+    {
+        VERBOSE(VB_MEDIA, "No media handler found for event type");
+        return;
+    }
+
+
+    // Generate a dialog, add buttons for each description,
+    // if user didn't cancel, selected = handlers.at(choice);
+    int selected = 0;
+
+
+    GetMythMainWindow()->JumpTo("Main Menu");
+    handlers.at(selected).callback(pMedia);
+}
+
 // Signal handler.
 void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus, 
                                       MythMediaDevice* pMedia)
@@ -569,14 +638,17 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
     // We now send events for all non-error statuses, so plugins get ejects
     if (m_SendEvent && stat != MEDIASTAT_ERROR && stat != MEDIASTAT_UNKNOWN)
     {
+        // Should we ValidateAndLock() first?
+        QEvent *e = new MediaEvent(stat, pMedia);
+
         VERBOSE(VB_MEDIA, "Posting MediaEvent" + msg);
 
         // sendEvent() is needed here - it waits for the event to be used.
         // postEvent() would result in pDevice's media type changing
         // ... before the plugin's event chain would process it.
         // Another way would be to send an exact copy of pDevice instead.
-        QApplication::sendEvent((QObject*)gContext->GetMainWindow(),
-                                new MediaEvent(stat, pMedia));
+        QApplication::sendEvent((QObject*)gContext->GetMainWindow(), e);
+        delete e;
     }
     else
         VERBOSE(VB_MEDIA, "Media status changed, but not sending event" + msg);
@@ -611,6 +683,46 @@ bool MediaMonitor::shouldIgnore(MythMediaDevice* device)
 #endif
 
     return false;
+}
+
+/**
+ * Installed into the main window's event chain,
+ * so that the main thread can safely jump to plugin code.
+ */
+bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == kMediaEventType)
+    {
+        MythMediaDevice *pDev = ((MediaEvent*)event)->getDevice();
+
+        if (!pDev)
+        {
+            VERBOSE(VB_IMPORTANT,
+                   "MediaMonitor::eventFilter() got a bad media event?");
+            return true;
+        }
+
+        if (pDev->isUsable())
+            JumpToMediaHandler(pDev);
+        else
+        {
+            // We don't want to jump around in the menus, but should
+            // call each plugin's callback so it can track this change.
+
+            QMap<QString, MHData>::Iterator itr = m_handlerMap.begin();
+            while (itr != m_handlerMap.end())
+            {
+                if (itr.data().MediaType & (int)pDev->getMediaType())
+                    itr.data().callback(pDev);
+                itr++;
+            }
+        }
+
+        return true;  // We ate the event
+    }
+
+    // standard event processing
+    return QObject::eventFilter(obj, event);
 }
 
 /*

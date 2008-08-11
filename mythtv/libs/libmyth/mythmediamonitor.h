@@ -13,6 +13,15 @@
 
 const int kMediaEventType = 30042;
 
+/// Stores details of media handlers
+struct MHData
+{
+    void   (*callback)(MythMediaDevice *mediadevice);
+    int      MediaType;
+    QString  destination;
+    QString  description;
+};
+
 class MPUBLIC MediaEvent : public QEvent
 {
   public:
@@ -70,9 +79,16 @@ class MPUBLIC MediaMonitor : public QObject
     // first validate the pointer with ValidateAndLock(), if true is returned
     // it is safe to dereference the pointer. When finished call Unlock()
     QList<MythMediaDevice*> GetMedias(MediaType mediatype);
-    MythMediaDevice* GetMedia(const QString &path);
+    MythMediaDevice*        GetMedia(const QString &path);
 
     void MonitorRegisterExtensions(uint mediaType, const QString &extensions);
+    void RegisterMediaHandler(const QString  &destination,
+                              const QString  &description,
+                              const QString  &key,
+                              void          (*callback) (MythMediaDevice*),
+                              int             mediaType,
+                              const QString  &extensions);
+    void JumpToMediaHandler(MythMediaDevice*  pMedia);
 
     // Plugins should use these if they need to access optical disks:
     static QString defaultCDdevice();
@@ -91,6 +107,7 @@ class MPUBLIC MediaMonitor : public QObject
     virtual bool AddDevice(MythMediaDevice* pDevice) = 0;
     bool RemoveDevice(const QString &dev);
     bool shouldIgnore(MythMediaDevice *device);
+    bool eventFilter(QObject *obj, QEvent *event);
 
     const QString listDevices(void);
 
@@ -116,7 +133,12 @@ class MPUBLIC MediaMonitor : public QObject
     unsigned long                m_MonitorPollingInterval;
     bool                         m_AllowEject;
 
+    QMap<QString, MHData>        m_handlerMap;  ///< Registered Media Handlers
+
     static MediaMonitor         *c_monitor;
 };
+
+#define REG_MEDIA_HANDLER(a, b, c, d, e, f) \
+        MediaMonitor::GetMediaMonitor()->RegisterMediaHandler(a, b, c, d, e, f)
 
 #endif // MYTH_MEDIA_MONITOR_H

@@ -1403,7 +1403,10 @@ int main(int argc, char **argv)
 
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon)
+    {
         mon->StartMonitoring();
+        mainWindow->installEventFilter(mon);
+    }
 
     NetworkControl *networkControl = NULL;
     if (gContext->GetNumSetting("NetworkControlEnabled", 0))

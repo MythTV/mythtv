@@ -93,14 +93,6 @@ struct JumpData
     QString localAction;
 };
 
-struct MHData
-{
-    void (*callback)(MythMediaDevice *mediadevice);
-    int MediaType;
-    QString destination;
-    QString description;
-};
-
 struct MPData {
     QString description;
     MediaPlayCallback playFn;
@@ -144,7 +136,6 @@ class MythMainWindowPrivate
     QHash<QString, KeyContext *> keyContexts;
     QMap<int, JumpData*> jumpMap;
     QMap<QString, JumpData> destinationMap;
-    QMap<QString, MHData> mediaHandlerMap;
     QMap<QString, MPData> mediaPluginMap;
 
     void (*exitmenucallback)(void);
@@ -1219,40 +1210,6 @@ bool MythMainWindow::DestinationExists(const QString& destination) const
     return (d->destinationMap.count(destination) > 0) ? true : false;
 }
 
-void MythMainWindow::RegisterMediaHandler(const QString &destination,
-                                          const QString &description,
-                                          const QString &/*key*/,
-                                          void (*callback)(MythMediaDevice*),
-                                          int            mediaType,
-                                          const QString &extensions)
-{
-#ifndef _WIN32
-#if 0
-    if (d->mediaHandlerMap.count(destination) == 0)
-    {
-        MHData mhd = { callback, mediaType, destination, description };
-        QString msg = MythMediaDevice::MediaTypeString((MediaType)mediaType);
-        if (!extensions.isEmpty())
-            msg += QString(", ext(%1)").arg(extensions);
-
-        VERBOSE(VB_MEDIA, "Registering " + destination +
-                          " as a media handler for " + msg);
-
-        d->mediaHandlerMap[destination] = mhd;
-
-        MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-        if (mon && !extensions.isEmpty())
-            mon->MonitorRegisterExtensions(mediaType, extensions);
-    }
-    else
-    {
-       VERBOSE(VB_GENERAL, QString("%1 is already registered as a media "
-                                   "handler.").arg(destination));
-    }
-#endif
-#endif // !_WIN32
-}
-
 void MythMainWindow::RegisterMediaPlugin(const QString &name,
                                          const QString &desc,
                                          MediaPlayCallback fn)
@@ -1282,7 +1239,8 @@ bool MythMainWindow::HandleMedia(QString &handler, const QString &mrl,
     // Let's see if we have a plugin that matches the handler name...
     if (d->mediaPluginMap.count(handler))
     {
-        d->mediaPluginMap[handler].playFn(mrl, plot, title, director, lenMins, year);
+        d->mediaPluginMap[handler].playFn(mrl, plot, title,
+                                          director, lenMins, year);
         return true;
     }
 
@@ -1490,74 +1448,6 @@ void MythMainWindow::customEvent(QEvent *ce)
         else
             QApplication::sendEvent(key_target, &key);
     }
-#ifndef _WIN32
-#if 0
-    else if (ce->type() == kMediaEventType)
-    {
-        MediaEvent *media_event = (MediaEvent*)ce;
-        // Let's see which of our jump points are configured to handle this
-        // type of media...  If there's more than one we'll want to show some
-        // UI to allow the user to select which jump point to use. But for
-        // now we're going to just use the first one.
-        QMap<QString, MHData>::Iterator itr = d->mediaHandlerMap.begin();
-        MythMediaDevice *pDev = media_event->getDevice();
-
-        if (pDev)
-        {
-            if (!pDev->isUsable())
-            {
-                // We don't want to jump to the main window, but should
-                // call each plugin's callback so it can track this change.
-                // Should also do MediaMonitor::ValidateAndLock(pDev) first
-
-                while (itr != d->mediaHandlerMap.end())
-                {
-                    if (itr.data().MediaType & (int)pDev->getMediaType())
-                        itr.data().callback(pDev);
-
-                    itr++;
-                }
-
-                return;
-            }
-
-            /* FIXME, this needs rewritten */
-            QWidget * activewidget = qApp->focusWidget();
-            MythDialog * activedialog = NULL;
-            bool iscatched = false;
-            while (activewidget && !activedialog)
-            {
-                activedialog = dynamic_cast<MythDialog*>(activewidget);
-                if (!activedialog)
-                    activewidget = activewidget->parentWidget();
-            }
-            if (activedialog)
-                iscatched = activedialog->onMediaEvent(pDev);
-
-            MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
-            if (iscatched || !mon->ValidateAndLock(pDev))
-                mon = NULL;
-
-            while (mon && (itr != d->mediaHandlerMap.end()))
-            {
-                if ((itr.data().MediaType & (int)pDev->getMediaType()))
-                {
-                    VERBOSE(VB_IMPORTANT, "Found a handler");
-                    d->exitingtomain = true;
-                    d->exitmenumediadevicecallback = itr.data().callback;
-                    d->mediadeviceforcallback = pDev;
-                    QApplication::postEvent(this, new ExitToMainMenuEvent());
-                    break;
-                }
-                itr++;
-            }
-            if (mon)
-                mon->Unlock(pDev);
-        }
-    }
-#endif
-#endif // !_WIN32
-
 #if defined(USE_LIRC) || defined(USING_APPLEREMOTE)
     else if (ce->type() == kLircKeycodeEventType && !d->ignore_lirc_keys)
     {

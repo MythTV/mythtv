@@ -17,7 +17,6 @@ class MythMediaDevice;
 #define REG_JUMP(a, b, c, d) GetMythMainWindow()->RegisterJump(a, b, c, d)
 #define REG_JUMPLOC(a, b, c, d, e) GetMythMainWindow()->RegisterJump(a, b, c, d, true, e)
 #define REG_JUMPEX(a, b, c, d, e) GetMythMainWindow()->RegisterJump(a, b, c, d, e)
-#define REG_MEDIA_HANDLER(a, b, c, d, e, f) GetMythMainWindow()->RegisterMediaHandler(a, b, c, d, e, f)
 #define REG_MEDIAPLAYER(a,b,c) GetMythMainWindow()->RegisterMediaPlugin(a, b, c)
 
 typedef int (*MediaPlayCallback)(const QString &, const QString &, const QString &, const QString &, int, const QString &);
@@ -57,10 +56,6 @@ class MythMainWindow : public QWidget
     void RegisterJump(const QString &destination, const QString &description,
                       const QString &key, void (*callback)(void),
                       bool exittomain = true, QString localAction = "");
-    void RegisterMediaHandler(const QString &destination,
-                              const QString &description, const QString &key,
-                              void (*callback)(MythMediaDevice* mediadevice),
-                              int mediaType, const QString &extensions);
 
     void RegisterMediaPlugin(const QString &name, const QString &desc,
                              MediaPlayCallback fn);
