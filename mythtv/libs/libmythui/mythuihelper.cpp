@@ -977,7 +977,6 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
 
 bool MythUIHelper::FindThemeFile(QString &path)
 {
-    VERBOSE(VB_IMPORTANT, QString("Find File %1").arg(path));
     QFileInfo fi(path);
     if (fi.isAbsolute() && fi.exists())
         return true;
