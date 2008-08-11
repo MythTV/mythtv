@@ -337,7 +337,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
 #ifdef USING_APPLEREMOTE
     d->appleRemoteListener = new AppleRemoteListener(this);
-    d->appleRemote         = &AppleRemote::instance();
+    d->appleRemote         = AppleRemote::Get();
 
     d->appleRemote->setListener(d->appleRemoteListener);
     d->appleRemote->startListening();
@@ -430,16 +430,12 @@ MythMainWindow::~MythMainWindow()
 #endif
 
 #ifdef USING_APPLEREMOTE
+    // We don't delete this, just disable its plumbing. If we create another
+    // MythMainWindow later, AppleRemote::get() will retrieve the instance.
     if (d->appleRemote->isRunning())
-    {
         d->appleRemote->stopListening();
-        d->appleRemote->quit();
-    }
-    delete d->appleRemote;
-    d->appleRemote = NULL;
 
     delete d->appleRemoteListener;
-    d->appleRemoteListener = NULL;
 #endif
 
     delete d;
@@ -1282,6 +1278,10 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
         case QEvent::KeyPress:
         {
             QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
+
+            // Work around weird GCC run-time bug. Only manifest on Mac OS X
+            if (!ke)
+                ke = (QKeyEvent *)e;
 
             if (currentWidget())
             {

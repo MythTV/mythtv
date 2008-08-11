@@ -30,13 +30,13 @@ AppleRemote::Listener::~Listener()
 {
 }
 
-AppleRemote&
-AppleRemote::instance()
+AppleRemote *
+AppleRemote::Get()
 {
     if (_instance == 0)
         _instance = new AppleRemote();
 
-    return *_instance;
+    return _instance;
 }
 
 AppleRemote::~AppleRemote()
@@ -103,11 +103,7 @@ void
 AppleRemote::run()
 {
     CFRunLoopRun();
-}
-
-void
-AppleRemote::quit()
-{
+    exec();  // prevent QThread exiting, by entering its run loop
     CFRunLoopStop(CFRunLoopGetCurrent());
 }
 

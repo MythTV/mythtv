@@ -35,7 +35,7 @@ public:
         virtual void appleRemoteButton(Event button, bool pressedDown) = 0;
     };
 
-    static AppleRemote& instance();
+    static AppleRemote * Get();
     ~AppleRemote();
 
     bool      isListeningToRemote();
@@ -46,7 +46,6 @@ public:
     void      startListening();
     void      stopListening();
     void      run();
-    void      quit();
 
 protected:
     AppleRemote(); // will be a singleton class
