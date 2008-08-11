@@ -149,7 +149,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
 
     if (!base.isEmpty())
     {
-        MythFontProperties *tmp;
+        MythFontProperties *tmp = NULL;
 
         if (parent)
             tmp = parent->GetFont(base);
