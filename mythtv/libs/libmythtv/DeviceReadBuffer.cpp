@@ -143,9 +143,8 @@ void DeviceReadBuffer::SetRequestPause(bool req)
 
 void DeviceReadBuffer::SetPaused(bool val)
 {
-    lock.lock();
+    QMutexLocker locker(&lock);
     paused = val;
-    lock.unlock();
     if (val)
         pauseWait.wakeAll();
     else
@@ -160,16 +159,12 @@ bool DeviceReadBuffer::IsPaused(void) const
 
 bool DeviceReadBuffer::WaitForUnpause(int timeout)
 {
-    if (IsPaused())
-    {
-        // Qt4 requires a QMutex as a parameter...
-        // not sure if this is the best solution.  Mutex Must be locked before wait.
-        QMutex mutex;
-        mutex.lock();
+    QMutexLocker locker(&lock);
 
-        unpauseWait.wait(&mutex, timeout);
-    }
-    return IsPaused();
+    if (paused)
+        unpauseWait.wait(&lock, timeout);
+
+    return paused;
 }
 
 bool DeviceReadBuffer::IsPauseRequested(void) const
