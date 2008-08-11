@@ -60,8 +60,10 @@ void EITScanner::TeardownAll(void)
     StopActiveScan();
     if (!exitThread)
     {
+        lock.lock();
         exitThread = true;
         exitThreadCond.wakeAll();
+        lock.unlock();
         eventThread.wait();
     }
 
@@ -72,7 +74,7 @@ void EITScanner::TeardownAll(void)
     }
 }
 
-/** \fn EITScanner::RunEventLoop()
+/** \fn EITScanner::RunEventLoop(void)
  *  \brief This runs the event loop for EITScanner until 'exitThread' is true.
  */
 void EITScanner::RunEventLoop(void)
@@ -80,18 +82,15 @@ void EITScanner::RunEventLoop(void)
     static const uint  sz[] = { 2000, 1800, 1600, 1400, 1200, };
     static const float rt[] = { 0.0f, 0.2f, 0.4f, 0.6f, 0.8f, };
 
+    lock.lock();
     exitThread = false;
 
     MythTimer t;
     uint eitCount = 0;
 
-    // Qt4 requires a QMutex as a parameter...
-    // not sure if this is the best solution.  Mutex Must be locked before wait.
-    QMutex mutex;
-    mutex.lock();
-
     while (!exitThread)
     {
+        lock.unlock();
         uint list_size = eitHelper->GetListSize();
 
         float rate = 1.0f;
@@ -155,8 +154,11 @@ void EITScanner::RunEventLoop(void)
             eitHelper->PruneEITCache(activeScanNextTrig.toTime_t() - 86400);
         }
 
-        exitThreadCond.wait(&mutex, 400); // sleep up to 400 ms.
+        lock.lock();
+        if (!exitThread)
+            exitThreadCond.wait(&lock, 400); // sleep up to 400 ms.
     }
+    lock.unlock();
 }
 
 /** \fn EITScanner::RescheduleRecordings(void)
