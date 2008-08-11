@@ -39,6 +39,8 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     _start_code(0xffffffff),        _first_keyframe(-1),
     _last_gop_seen(0),              _last_seq_seen(0),
     _last_keyframe_seen(0),
+    _audio_bytes_remaining(0),      _video_bytes_remaining(0),
+    _other_bytes_remaining(0),
     // H.264 support
     _pes_synced(false),
     _seen_sps(false),
@@ -150,12 +152,15 @@ void DTVRecorder::ResetForNewFile(void)
     VERBOSE(VB_RECORD, LOC + "ResetForNewFile(void)");
     QMutexLocker locker(&positionMapLock);
 
-    //_start_code
+    _start_code                 = 0xffffffff;
     _first_keyframe             =-1;
     _has_written_other_keyframe = false;
     _last_keyframe_seen         = 0;
     _last_gop_seen              = 0;
     _last_seq_seen              = 0;
+    _audio_bytes_remaining      = 0;
+    _video_bytes_remaining      = 0;
+    _other_bytes_remaining      = 0;
     //_recording
     _error                      = false;
     //_buffer
@@ -587,34 +592,85 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
     const uint8_t *bufptr   = buffer;
     const uint8_t *bufend   = buffer + len;
 
-    while (bufptr < bufend)
+    uint skip = std::max(_audio_bytes_remaining, _other_bytes_remaining);
+    while (bufptr + skip < bufend)
     {
         bool hasFrame     = false;
         bool hasKeyFrame  = false;
 
-        bufptr = ff_find_start_code(bufptr, bufend, &_start_code);
+        const uint8_t *tmp = bufptr;
+        bufptr = ff_find_start_code(bufptr + skip, bufend, &_start_code);
+        _audio_bytes_remaining = 0;
+        _other_bytes_remaining = 0;
+        _video_bytes_remaining -= std::min(
+            (uint)(bufptr - tmp), _video_bytes_remaining);
+
         if ((_start_code & 0xffffff00) != 0x00000100)
             continue;
 
+        // NOTE: Length may be zero for packets that only contain bytes from
+        // video elementary streams in TS packets. 13818-1:2000 2.4.3.7
+        int pes_packet_length = -1;
+        if ((bufend - bufptr) >= 2)
+            pes_packet_length = ((bufptr[0]<<8) | bufptr[1]) + 2 + 6;
+
         const int stream_id = _start_code & 0x000000ff;
-        if (PESStreamID::PictureStartCode == stream_id)
+        if (_video_bytes_remaining)
         {
-            hasFrame = true;
+            if ((stream_id >= PESStreamID::SliceStartCodeBegin) &&
+                (stream_id <= PESStreamID::SliceStartCodeEnd))
+            { // pes_packet_length is meaningless
+                _other_bytes_remaining =
+                    std::max(_other_bytes_remaining, _video_bytes_remaining);
+            }
+            if (PESStreamID::PictureStartCode == stream_id)
+            { // pes_packet_length is meaningless
+                pes_packet_length = -1;
+                uint frmtypei = 1;
+                if (bufend-bufptr >= 4)
+                {
+                    frmtypei = (bufptr[1]>>3) & 0x7;
+                    if ((1 <= frmtypei) && (frmtypei <= 5))
+                        hasFrame = true;
+                }
+                else
+                {
+                    hasFrame = true;
+                }
+            }
+            else if (PESStreamID::GOPStartCode == stream_id)
+            { // pes_packet_length is meaningless
+                pes_packet_length = -1;
+                _last_gop_seen  = _frames_seen_count;
+                hasKeyFrame    |= true;
+            }
+            else if (PESStreamID::SequenceStartCode == stream_id)
+            { // pes_packet_length is meaningless
+                pes_packet_length = -1;
+                _last_seq_seen  = _frames_seen_count;
+                hasKeyFrame    |= (_last_gop_seen + maxKFD)<_frames_seen_count;
+            }
         }
-        else if (PESStreamID::GOPStartCode == stream_id)
+        else if (!_video_bytes_remaining && !_audio_bytes_remaining)
         {
-            _last_gop_seen  = _frames_seen_count;
-            hasKeyFrame    |= true;
+            if ((stream_id >= PESStreamID::MPEGVideoStreamBegin) &&
+                (stream_id <= PESStreamID::MPEGVideoStreamEnd))
+            { // ok-dvdinfo
+                _video_bytes_remaining = std::max(0, (int)pes_packet_length);
+            }
+            else if ((stream_id >= PESStreamID::MPEGAudioStreamBegin) &&
+                     (stream_id <= PESStreamID::MPEGAudioStreamEnd))
+            { // ok-dvdinfo
+                _audio_bytes_remaining = std::max(0, (int)pes_packet_length);
+            }
         }
-        else if (PESStreamID::SequenceStartCode == stream_id)
-        {
-            _last_seq_seen  = _frames_seen_count;
-            hasKeyFrame    |= (_last_gop_seen + maxKFD)<_frames_seen_count;
+
+        if (PESStreamID::PaddingStream == stream_id)
+        { // ok-dvdinfo
+            _other_bytes_remaining = std::max(0, (int)pes_packet_length);
         }
-        else if (PESStreamID::PackHeader == stream_id)
-        {
-            _start_code = 0xffffffff;
-        }
+
+        _start_code = 0xffffffff; // reset start code
 
         if (hasFrame && !hasKeyFrame)
         {
@@ -659,6 +715,19 @@ void DTVRecorder::FindPSKeyFrames(const uint8_t *buffer, uint len)
 
             bufstart = bufptr;
         }
+
+        skip = std::max(_audio_bytes_remaining, _other_bytes_remaining);
+    }
+
+    int bytes_skipped = bufend - bufptr;
+    if (bytes_skipped > 0)
+    {
+        _audio_bytes_remaining -= std::min(
+            (uint)bytes_skipped, _audio_bytes_remaining);
+        _video_bytes_remaining -= std::min(
+            (uint)bytes_skipped, _video_bytes_remaining);
+        _other_bytes_remaining -= std::min(
+            (uint)bytes_skipped, _other_bytes_remaining);
     }
 
     uint64_t idx = _payload_buffer.size();

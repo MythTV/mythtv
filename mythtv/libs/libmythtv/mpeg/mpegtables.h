@@ -73,11 +73,11 @@ class PESStreamID
         DataH2221End            = 0xf8,
         AncillaryData           = 0xf9,
         MPEGReservedFA          = 0xfa,
-        MPEGReservedFB          = 0xfb,
+        FlexMux                 = 0xfb, // MPEG-2 13818-1
         MPEGReservedFC          = 0xfc,
         MPEGReservedFD          = 0xfd,
         MPEGReservedFE          = 0xfe,
-        MPEGReservedFF          = 0xff,
+        ProgramStreamDirectory  = 0xff, // MPEG-2 13818-1
     };
 };
 

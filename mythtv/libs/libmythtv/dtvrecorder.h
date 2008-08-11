@@ -83,6 +83,9 @@ class DTVRecorder: public RecorderBase
     unsigned long long _last_gop_seen;
     unsigned long long _last_seq_seen;
     unsigned long long _last_keyframe_seen;
+    unsigned int _audio_bytes_remaining;
+    unsigned int _video_bytes_remaining;
+    unsigned int _other_bytes_remaining;
 
     // H.264 support
     bool _pes_synced;
