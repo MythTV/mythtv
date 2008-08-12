@@ -375,6 +375,28 @@ MythMainWindow::MythMainWindow(const bool useDB)
     RegisterKey("Global", "8", "8", "8");
     RegisterKey("Global", "9", "9", "9");
 
+    // these are for the html viewer widget (MythUIWebBrowser)
+    RegisterKey("Browser", "ZOOMIN",      "Zoom in on browser window",           ".,>");
+    RegisterKey("Browser", "ZOOMOUT",     "Zoom out on browser window",          ",,<");
+    RegisterKey("Browser", "TOGGLEINPUT", "Toggle where keyboard input goes to", "F1");
+
+    RegisterKey("Browser", "MOUSEUP",         "Move mouse pointer up",   "2");
+    RegisterKey("Browser", "MOUSEDOWN",       "Move mouse pointer down", "8");
+    RegisterKey("Browser", "MOUSELEFT",       "Move mouse pointer left", "4");
+    RegisterKey("Browser", "MOUSERIGHT",      "Move mouse pointer right","6");
+    RegisterKey("Browser", "MOUSELEFTBUTTON", "Mouse Left button click", "5");
+
+    RegisterKey("Browser", "PAGEDOWN",       "Scroll down half a page",  "9");
+    RegisterKey("Browser", "PAGEUP",         "Scroll up half a page",    "3");
+    RegisterKey("Browser", "PAGELEFT",       "Scroll left half a page",  "7");
+    RegisterKey("Browser", "PAGERIGHT",      "Scroll right half a page", "1");
+
+    RegisterKey("Browser", "NEXTLINK",       "Move selection to next link",     "Z");
+    RegisterKey("Browser", "PREVIOUSLINK",   "Move selection to previous link", "Q");
+    RegisterKey("Browser", "FOLLOWLINK",     "Follow selected link",            "Return,Space,Enter");
+    RegisterKey("Browser", "HISTORYBACK",    "Go back to previous page",        "R,Backspace");
+    RegisterKey("Browser", "HISTORYFORWARD", "Go forward to previous page",     "F");
+
     d->gestureTimer = new QTimer(this);
     connect(d->gestureTimer, SIGNAL(timeout()), this, SLOT(mouseTimeout()));
 
@@ -444,6 +466,11 @@ MythMainWindow::~MythMainWindow()
 MythPainter *MythMainWindow::GetCurrentPainter(void)
 {
     return d->painter;
+}
+
+QWidget *MythMainWindow::GetPaintWindow(void)
+{
+    return d->paintwin;
 }
 
 void MythMainWindow::AddScreenStack(MythScreenStack *stack, bool main)
