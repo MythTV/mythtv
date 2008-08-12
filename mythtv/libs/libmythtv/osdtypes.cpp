@@ -2740,7 +2740,11 @@ QRect OSDType708CC::CalcBounds(const OSDSurface *surface,
     if (anchor_y + total_height > (uint)surface->height)
         total_height = surface->height - anchor_y;
 
-    return QRect(anchor_x, anchor_y, max_width, total_height);
+    // Finally, adjust for any user initiated zoom
+    QRect ret = QRect(anchor_x, anchor_y, max_width, total_height)
+        .intersected(QRect(xoffset, yoffset, displaywidth, displayheight));
+
+    return ret;
 }
 
 void OSDType708CC::Draw(OSDSurface *surface,
