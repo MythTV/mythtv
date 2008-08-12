@@ -982,19 +982,13 @@ void vxmlVarContainer::removeMatching(QString N)
     }
 }
 
-vxmlVariable::vxmlVariable(QString N, QString V)
+vxmlVariable::vxmlVariable(QString N, QString V) :
+    Name(N), Type("STRING"), sValue(V), spValue(NULL), spLength(0)
 {
-    Name = N;
-    sValue = V;
-    Type = "STRING";
-    spValue = 0;
 }
 
-vxmlVariable::vxmlVariable(QString N, short *wav, int S)
+vxmlVariable::vxmlVariable(QString N, short *wav, int S) :
+    Name(N), Type("SHORTPTR"), sValue(""), spValue(wav), spLength(S)
 {
-    Name = N;
-    spValue = wav;
-    spLength = S;
-    Type = "SHORTPTR";
 }
 

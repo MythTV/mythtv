@@ -23,16 +23,14 @@ using namespace std;
 #include "h263.h"
 
 
-H263Container::H263Container()
+H263Container::H263Container() :
+    pictureIn(NULL),       h263Encoder(NULL),
+    h263Decoder(NULL),     h263EncContext(NULL),
+    h263DecContext(NULL),
+    MaxPostEncodeSize(0),  lastCompressedSize(0),
+    PostEncodeFrame(NULL), PreEncodeFrame(NULL)
 {
-    lastCompressedSize = 0;
-    PostEncodeFrame = 0;
-    h263Encoder = 0;
-    h263EncContext = 0;
-
-    h263Decoder = 0;
-    h263DecContext = 0;
-    pictureIn = 0;
+    memset(&pictureOut, 0, sizeof(pictureOut));
 
     avcodec_init();
     avcodec_register_all();

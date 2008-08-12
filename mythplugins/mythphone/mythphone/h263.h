@@ -65,11 +65,16 @@ class H263Container
     void H263StopDecoder();
 
   private:
-    AVFrame pictureOut, *pictureIn;
-    AVCodec *h263Encoder, *h263Decoder;
-    AVCodecContext *h263EncContext, *h263DecContext;
-    int MaxPostEncodeSize, lastCompressedSize;
-    unsigned char *PostEncodeFrame, *PreEncodeFrame;
+    AVFrame         pictureOut;
+    AVFrame        *pictureIn;
+    AVCodec        *h263Encoder;
+    AVCodec        *h263Decoder;
+    AVCodecContext *h263EncContext;
+    AVCodecContext *h263DecContext;
+    int             MaxPostEncodeSize;
+    int             lastCompressedSize;
+    unsigned char  *PostEncodeFrame;
+    unsigned char  *PreEncodeFrame;
 
 };
 

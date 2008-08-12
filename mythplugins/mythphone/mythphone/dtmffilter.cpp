@@ -170,7 +170,7 @@ Goertzel Generic Filter class.
 
 **********************************************************************/
 
-goertzel::goertzel(int N, float targetFreq, float sampleRate)
+goertzel::goertzel(int N, float targetFreq, float sampleRate) : Match(0)
 {
     initialise(N, targetFreq, sampleRate);
 }

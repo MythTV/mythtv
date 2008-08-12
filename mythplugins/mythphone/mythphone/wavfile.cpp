@@ -19,15 +19,14 @@ using namespace std;
 #include "wavfile.h"
 #include <mythtv/mythverbose.h>
 
-wavfile::wavfile()
+wavfile::wavfile() : loaded(false), audio(NULL)
 {
-    loaded=false;
-    audio = 0;
+    memset(&w, 0, sizeof(w));
 }
 
 wavfile::~wavfile()
 {
-    if (loaded && audio)
+    if (audio)
         delete [] audio;
 }
 
@@ -73,8 +72,8 @@ void wavfile::load(short *data, int samples, int bitsPerSample, int AudioFormat,
 
     if (audio)
     {
-        delete audio;
-        audio = 0;
+        delete [] audio;
+        audio = NULL;
     }
 
     audio = new char[w.subChunk2Size];

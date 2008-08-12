@@ -6,10 +6,12 @@
   Directory class holding a simple contact database plus call history.
 */
 #include <iostream>
-//Added by qt3to4:
+using namespace std;
+
+#include <QMutex>
 #include <QStringList>
 #include <Q3PtrList>
-using namespace std;
+
 #include "directory.h"
 #include "qdatetime.h"
 #include "qdir.h"
@@ -18,43 +20,41 @@ using namespace std;
 #include <mythtv/mythdirs.h>
 #include <mythtv/mythdb.h>
 
-
+static QMutex counter_lock;
 static int counter = 0;
 
 ///////////////////////////////////////////////////////
 //                  DirEntry Class
 ///////////////////////////////////////////////////////
 
-DirEntry::DirEntry(QString nn, QString uri, QString fn, QString sn, QString ph, bool ohl)
+DirEntry::DirEntry(QString nn, QString uri, QString fn,
+                   QString sn, QString ph, bool ohl) :
+    NickName(nn),      FirstName(fn),
+    Surname(sn),       Uri(uri),
+    PhotoFile(ph),     id(0),
+    SpeedDial(false),  onHomeLan(ohl),
+    inDatabase(false), changed(true),
+    dbId(-1),
+    TreeNode(NULL),    SpeeddialNode(NULL)
 {
-    NickName = nn;
-    FirstName = fn;
-    Surname = sn;
-    Uri = uri;
-    PhotoFile = ph;
-    id = counter++;
-    SpeedDial = false;
-    inDatabase = false;
-    changed = true;
-    onHomeLan = ohl;
-    dbId = -1;
+    QMutexLocker locker(&counter_lock);
+    id = counter;
+    counter++;
 }
 
 
-DirEntry::DirEntry(DirEntry *Original)
+DirEntry::DirEntry(DirEntry *Original) :
+    NickName(Original->NickName),   FirstName(Original->FirstName),
+    Surname(Original->Surname),     Uri(Original->Uri),
+    PhotoFile(Original->PhotoFile), id(0),
+    SpeedDial(Original->SpeedDial), onHomeLan(Original->onHomeLan),
+    inDatabase(false),              changed(true),
+    dbId(-1),
+    TreeNode(NULL),                 SpeeddialNode(NULL)
 {
-    NickName = Original->NickName;
-    FirstName = Original->FirstName;
-    Surname = Original->Surname;
-    Uri = Original->Uri;
-    PhotoFile = Original->PhotoFile;
-    onHomeLan = Original->onHomeLan;
-    id = counter++;
-    inDatabase = false;
-    changed = true;
-    dbId = -1;
-    TreeNode = 0;
-    SpeeddialNode = 0;
+    QMutexLocker locker(&counter_lock);
+    id = counter;
+    counter++;
 }
 
 
@@ -577,10 +577,13 @@ void CallHistory::deleteRecords()
 ///////////////////////////////////////////////////////
 
 
-DirectoryContainer::DirectoryContainer()
+/// Create the Call History directory
+DirectoryContainer::DirectoryContainer() :
+    callHistory(new CallHistory()),
+    TreeRoot(NULL),          voicemailTree(NULL),
+    receivedcallsTree(NULL), placedcallsTree(NULL),
+    speeddialTree(NULL)
 {
-    // Create the Call History directory
-    callHistory = new CallHistory();
 }
 
 
