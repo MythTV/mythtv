@@ -273,8 +273,7 @@ QStringList DBUtil::GetTables(void)
     if (!query.isConnected())
         return result;
 
-    query.prepare("SHOW FULL TABLES");
-    if (!query.exec())
+    if (!query.exec("SHOW FULL TABLES"))
     {
         MythDB::DBError("DBUtil Finding Tables", query);
         return result;
