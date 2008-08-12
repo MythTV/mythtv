@@ -154,7 +154,8 @@ void H263Container::H263ForceIFrame()
     while (lastCompressedSize != 0)
         lastCompressedSize = avcodec_encode_video(h263EncContext, PostEncodeFrame, MaxPostEncodeSize, NULL);
     avcodec_close(h263EncContext);
-    avcodec_open(h263EncContext, h263Encoder);
+    if (avcodec_open(h263EncContext, h263Encoder) < 0)
+        VERBOSE(VB_IMPORTANT, "Could not open H.263 Encoder");
 }
 
 void H263Container::H263StopEncoder()
