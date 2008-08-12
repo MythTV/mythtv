@@ -14,8 +14,6 @@ TARGET = mythgallery
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
-LIBS += -ltiff
-
 INCLUDEPATH += $${PREFIX}/include/mythtv
 
 # Input
