@@ -824,7 +824,7 @@ QString SipFsm::DetermineNatAddress()
 
                         if (resp.contains("200 OK") && !resp.contains("</body"))
                         {
-                            delete httpResponse;
+                            delete [] httpResponse;
                             continue;
                         }
                         QString temp1 = resp.section("<body>", 1, 1);
@@ -839,7 +839,7 @@ QString SipFsm::DetermineNatAddress()
                         VERBOSE(VB_IMPORTANT,
                                 "SIP: Got invalid HTML response "
                                 "whilst detecting your NAT settings");
-                        delete httpResponse;
+                        delete [] httpResponse;
                         break;
                     }
                 }

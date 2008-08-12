@@ -219,7 +219,7 @@ void Webcam::camClose()
 #endif
 
     if (picbuff1)
-        delete picbuff1;
+        delete [] picbuff1;
 
     picbuff1 = 0;
 }

@@ -327,7 +327,7 @@ bool vxmlParser::loadVxmlPage(QString strUrl, QString Method, QString Namelist, 
                     QString firstLine = resp.section('\n', 0);
                     if ((firstLine.contains("200 OK")) && !resp.contains("</vxml>"))
                     {
-                        delete httpResponse;
+                        delete [] httpResponse;
                         continue;
                     }
 
@@ -335,7 +335,7 @@ bool vxmlParser::loadVxmlPage(QString strUrl, QString Method, QString Namelist, 
                     script.setContent(Content);
                     //cout << "Got VXML content\n" << Content << endl;
                 }
-                delete httpResponse;
+                delete [] httpResponse;
                 break;
             }
         }
@@ -845,7 +845,7 @@ void vxmlParser::PlayBeep(int freqHz, int volume, int ms)
 
     Rtp->Transmit(beepBuffer, Samples);
     waitUntilFinished(false);
-    delete beepBuffer;
+    delete [] beepBuffer;
 }
 
 

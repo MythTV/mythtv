@@ -28,7 +28,7 @@ wavfile::wavfile()
 wavfile::~wavfile()
 {
     if (loaded && audio)
-        delete audio;
+        delete [] audio;
 }
 
 bool wavfile::load(const char *Filename)

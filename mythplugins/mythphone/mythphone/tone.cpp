@@ -182,7 +182,7 @@ Tone::~Tone()
     Stop();
 
     if (toneBuffer)
-        delete toneBuffer;
+        delete [] toneBuffer;
     toneBuffer = 0;
 }
 
