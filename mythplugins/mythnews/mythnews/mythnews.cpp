@@ -734,18 +734,8 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
                 QString cmdUrl(article->articleURL());
                 cmdUrl.replace('\'', "%27");
 
-                QString geometry = QString(" -x %1 -y %2 -w %3 -h %4 ")
-                        .arg(gContext->GetMainWindow()->x())
-                        .arg(gContext->GetMainWindow()->y())
-                        .arg(gContext->GetMainWindow()->width())
-                        .arg(gContext->GetMainWindow()->height());
-
-                if (gContext->GetMainWindow()->windowFlags() & Qt::WStyle_NoBorder)
-                    geometry += " -g ";
-
-                QString cmd = QString("%1 %2 %3 '%4'")
+                QString cmd = QString("%1 %2 '%3'")
                      .arg(browser)
-                     .arg(geometry)
                      .arg(zoom)
                      .arg(cmdUrl);
                 gContext->GetMainWindow()->AllowInput(false);
