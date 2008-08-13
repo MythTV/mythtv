@@ -7,10 +7,8 @@
 #include <QTime>
 #include <QColor>
 
-//#undef QT_VERSION
-//#define QT_VERSION 0x040300
 
-#if QT_VERSION >= 0x040400
+#ifdef USING_QTWEBKIT
 #include <QWebView>
 #include <QWebPage>
 #include <QNetworkReply>
@@ -22,7 +20,7 @@
 
 class MythUIWebBrowser;
 
-#if QT_VERSION >= 0x040400
+#ifdef USING_QTWEBKIT
 class MythWebView : public QWebView
 {
   Q_OBJECT
@@ -101,7 +99,7 @@ class MythUIWebBrowser : public MythUIType
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
 
-#if QT_VERSION >= 0x040400
+#ifdef USING_QTWEBKIT
     MythWebView *m_browser;
 #endif
 

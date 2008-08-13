@@ -4,17 +4,12 @@
  * \brief Provide a web browser widget.
  *
  * This requires qt4.4.0 or later to function properly.
- * There is a dummy class so Qt 4.3.x users can still compile MythTV
- * but with reduced functionality.
+ * There is a dummy class so to make it optimal.
+ * Qt 4.3.x users can still compile MythTV but with reduced functionality.
  * 
  */
 
-#include <QtGlobal>
-
-//#undef QT_VERSION
-//#define QT_VERSION 0x040300
-
-#if QT_VERSION >= 0x040400
+#ifdef USING_QTWEBKIT
 
 // qt
 #include <QApplication>
@@ -767,10 +762,10 @@ void MythUIWebBrowser::CreateCopy(MythUIType *parent)
 }
 
 
-#else // QT_VERSION < 0x040400
+#else // USING_QTWEBKIT
 ///////////////////////////////////////////////////////////////////////////////
 // fake MythUIWebBrowser
-// remove when qt4.4.0 is the minium version supported
+// remove when we require qtwebkit
 ///////////////////////////////////////////////////////////////////////////////
 
 // qt
@@ -810,7 +805,7 @@ void MythUIWebBrowser::Init(void)
     painter.setPen(Qt::black);
     painter.setFont(QFont("Arial", 30));
     painter.drawText(area, Qt::AlignCenter|Qt::TextWordWrap, 
-                     "This feature requires Qt 4.4.0 or later");
+                     "This feature requires QtWebKit from Qt 4.4.0 or later");
     painter.end();
 
     m_initialized = true;
@@ -965,4 +960,4 @@ void MythUIWebBrowser::CreateCopy(MythUIType *parent)
     browser->CopyFrom(this);
 }
 
-#endif // QT_VERSION >= 0x040400
+#endif // USING_QTWEBKIT

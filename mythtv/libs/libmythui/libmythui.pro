@@ -127,6 +127,11 @@ mingw {
 }
 
 #The following line was inserted by qt3to4
-QT += xml sql opengl webkit network
+QT += xml sql opengl network
+
+using_qtwebkit {
+        QT += webkit
+        DEFINES += USING_QTWEBKIT
+}
 
 include ( ../libs-targetfix.pro )

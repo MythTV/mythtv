@@ -899,6 +899,7 @@ MYTHTV_CONFIG_LIST='
     lirc
     opengl_vsync
     opengl_video
+    qtwebkit
     v4l
     valgrind
     x11
@@ -1058,6 +1059,7 @@ opengl_deps="GL_gl_h"
 opengl_deps_any="windows x11"
 opengl_video_deps="opengl xv"
 opengl_vsync_deps="opengl"
+qtwebkit_deps="QtWebKit_QWebView"
 v4l_deps="backend"
 xrandr_deps="x11"
 xv_deps="x11"
@@ -1166,6 +1168,7 @@ targetos=$(tolower $(uname -s))
 CONFIG_DEFINES=""
 CONFIG_INCLUDEPATH=""
 PROFILEFLAGS=""
+
 audio_alsa="default"
 audio_alsa_libs="-lasound"
 audio_arts="default"
@@ -1191,6 +1194,7 @@ lamemp3="yes"
 lirc="yes"
 mac_bundle="no"
 opengl="yes"
+enable qtwebkit
 v4l="yes"
 x11="yes"
 x11_include_path="/usr/X11R6/include"
@@ -2671,6 +2675,8 @@ enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
 #test for lirc client libraries and headers
 enabled lirc && check_lib lirc/lirc_client.h lirc_deinit -llirc_client ||
     disable lirc
+
+check_header QtWebKit/QWebView
 
 if enabled firewire; then
     firewire="no"
