@@ -1752,21 +1752,6 @@ has_library()
     expr $HAS_IT : "yes" > /dev/null
 }
 
-has_header()
-{
-    HPATHS="/usr/local/include /usr/include /usr/include/g++-v3 /usr/X11R6/include"
-    INCL=`echo $DYLD_LIBRARY_PATH $LD_LIBRARY_PATH | sed s/':'/' '/g`
-    HPATHS="$HPATHS "$(echo $INCL | sed "s/$libdir_name/include/g")
-
-    HAS_IT="no"
-    for HPATH in $HPATHS ; do
-        if test x`ls $HPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
-            HAS_IT="yes"
-        fi
-    done
-    expr $HAS_IT : "yes" > /dev/null
-}
-
 append CCONFIG "$compile_type"
 if test x$compile_type = x"profile" ; then
     PROFILEFLAGS="-DNDEBUG"
@@ -2723,7 +2708,7 @@ enabled libfftw3 && check_lib2 fftw3.h fftw_init_threads -lfftw3_threads -lfftw3
     disable libfftw3
 
 enabled x11 && has_library libX11 || disable x11
-enabled xrandr && has_header X11/extensions/Xrandr.h || disable xrandr
+enabled xrandr && check_header X11/extensions/Xrandr.h || disable xrandr
 enabled xv && has_library libXv || disable xv
 
 check_header GL/gl.h
