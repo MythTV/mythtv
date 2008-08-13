@@ -1438,15 +1438,6 @@ bool MpegRecorder::StartEncoding(int fd)
             return true;
         }
 
-        // BEGIN -- HACK HACK HACK
-        if ((errno == EAGAIN) && (driver == "hdpvr"))
-        {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "Encoding probably started -- using hdpvr hack");
-            return true;
-        }
-        // END   -- HACK HACK HACK
-
         if (errno != EAGAIN)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "StartEncoding" + ENO);
@@ -1478,15 +1469,6 @@ bool MpegRecorder::StopEncoding(int fd)
             VERBOSE(VB_RECORD, LOC + "Encoding stopped");
             return true;
         }
-
-        // BEGIN -- HACK HACK HACK
-        if ((errno == EAGAIN) && (driver == "hdpvr"))
-        {
-            VERBOSE(VB_IMPORTANT, LOC_WARN +
-                    "Encoding probably stopped -- using hdpvr hack");
-            return true;
-        }
-        // END   -- HACK HACK HACK
 
         if (errno != EAGAIN)
         {
