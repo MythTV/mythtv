@@ -1,0 +1,136 @@
+This is the README file for MythBrowser.
+
+MythBrowser is distributed under the GNU GENERAL PUBLIC LICENSE version 2
+(see http://www.gnu.org)
+
+
+
+Contents
+========
+
+1.  About
+2.  Installation
+3.  Usage
+4.  Hints
+5.  TODO/Plans
+
+
+
+1. About
+========
+
+MythBrowser is a tabbed web-browser based on QtWebKit designed to be used with
+a remote control.
+
+MythBrowser also contains a BookmarkManager to manage the website links in a
+simple mythplugin.
+
+
+
+2. Installation
+===============
+
+2.1 Prerequisits
+----------------
+
+You have to have mythtv, Qt4.4.0 or later and QtWebKit installed.
+
+
+2.2 Compilation/Installation
+----------------------------
+
+qmake
+make
+make install
+
+
+3. Usage
+========
+
+Start mythbrowser from the command like this:
+$ mythbrowser --zoom 1.4 www.mythtv.org
+
+Use the arrow keys and PAGEUP, PAGEDOWN, PAGELEFT, PAGERIGHT to scroll around
+the webpage.
+
+ZOOMIN/ZOOMOUT will increase/decrease the size of the text.
+
+You can follow a link by first using NEXTLINK/PREVIOUSLINK to highlight the
+link you wish to follow then press FOLLOWLINK to show the linked page.
+
+MOUSEUP/MOUSEDOWN/MOUSELEFT/MOUSERIGHT allows you to move the mouse pointer
+using your remote control. MOUSELEFTBUTTON simulates clicking the left mouse
+button allowing you to click on a link for example.
+
+MythBrowser is a tabbed browser. You can use PREVTAB/NEXTTAB to change tabs
+and DELETETAB to remove the current tab. You can add a new tab from the popup
+menu. You can move the focus to the tab widget by pressing INFO which allows
+you to use the LEFT/RIGHT arrows to quickly change tabs. Press INFO again to
+return the focus to the active web page. If you add more than one URL to the
+command line a tab will be created for each URL added.
+
+To view a page Press MENU and choose 'Enter URL'. Enter the URL of the page
+you want to view. There is no need to add the 'html://' MythBrowser will add
+that for you if missing.
+
+MythBrowser will remember the pages visited and allow you to return to them by
+pressing HISTORYBACK/HISTORYFORWARD.
+
+Most actions can be accessed from the popup menu (Press MENU).
+
+
+Command line options
+--------------------
+Valid options are:
+-v or --verbose debug-level    Use '-v help' for level info
+-z or --zoom                   Zoom factor 0.2-5 (default: 1)
+-l or --logfile filename       Writes STDERR and STDOUT messages to filename
++file                          URLs to display
+
+For example:
+
+mythbrowser --zoom 1.4 www.mythtv.org www.google.com
+
+
+Default key bindings :
+---------------------
+ZOOMIN          Increase text size                    .,>
+ZOOMOUT         Decrease text size                    ,,<
+TOGGLEINPUT     Toggle where keyboard input goes to   F1
+
+MOUSEUP         Move mouse pointer up                 2
+MOUSEDOWN       Move mouse pointer down               8
+MOUSELEFT       Move mouse pointer left               4
+MOUSERIGHT      Move mouse pointer right              6
+MOUSELEFTBUTTON Mouse Left button click               5
+
+PAGEDOWN        Scroll down half a page               9, PAGEDOWN
+PAGEUP          Scroll up half a page                 3, PAGEUP
+PAGELEFT        Scroll left half a page               7
+PAGERIGHT       Scroll right half a page              1
+
+NEXTLINK        Move selection to next link",         Z
+PREVIOUSLINK    Move selection to previous link",     Q
+FOLLOWLINK      Follow selected link",                Return,Space,Enter
+HISTORYBACK     Go back to previous page",            R,Backspace
+HISTORYFORWARD  Go forward to previous page",         F
+
+NEXTTAB         Move to next browser tab              P
+PREVTAB         Move to previous browser tab          <NO DEFAULT>
+DELETETAB       Delete the current browser tab        D
+
+ESCAPE          Exit                                  Escape
+MENU            Show poup menu                        M
+INFO            Toggle focused widget                 I
+
+4. Hints
+========
+
+The F1 key selects where the keyboard input does to. If a web page requires
+some sort of input, like an edit control used to enter a search term, pressing
+F1 allows you to send all input to the web page. Pressing it again allows
+MythBrowser to again capture keyboard input.
+
+You can get smoother mouse pointer movement by lowering the repeat count for
+the remote keys used for mouse emulation in your lircrc config file.
+
