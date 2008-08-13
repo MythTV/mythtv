@@ -389,6 +389,14 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
             requires_special_pause =
                 (version >= IVTV_KERNEL_VERSION(0, 10, 0));
         }
+        else if (driver == "pvrusb2")
+        {
+            bufferSize    = 4096;
+            usingv4l2     = true;
+            has_v4l2_vbi  = true;
+            has_buggy_vbi = true;
+            requires_special_pause = true;
+        }
         else if (driver == "hdpvr")
         {
             bufferSize = 1500 * TSPacket::SIZE;
@@ -401,8 +409,9 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "\n\nNot ivtv or hdpvr driver??\n\n");
-            usingv4l2 = has_v4l2_vbi = true;
+            VERBOSE(VB_IMPORTANT, "\n\nNot ivtv or pvrusb2 or hdpvr driver\n\n");
+            bufferSize    = 4096;
+            usingv4l2     = has_v4l2_vbi = true;
             has_buggy_vbi = requires_special_pause = false;
         }
     }
