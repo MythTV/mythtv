@@ -3,18 +3,18 @@
 
     <window name="browser">
         <buttonlist name="pagelist" from="baseselector">
-            <area>20,10,760,45</area>
+            <area>20,10,1240,45</area>
             <inactive-background filename="selector_background_inactive.png" />
         </buttonlist>
 
         <webbrowser name="webbrowser">
-            <area>20,55,760,490</area>
+            <area>20,55,1240,600</area>
             <zoom>1.4</zoom>
         </webbrowser>
 
         <!-- these are optional -->
         <progressbar name="progressbar" from="baseprogressbar">
-            <position>20,550</position>
+            <position>260,670</position>
             <imagetype name="background">
                 <filename>mb_progressbar_background.png</filename>
             </imagetype>
@@ -24,7 +24,7 @@
         </progressbar>
 
         <textarea name="status" from="basetextarea">
-            <area>30,550,740,38</area>
+            <area>270,670,740,38</area>
             <align>left,vcenter</align>
             <multiline>no</multiline>
         </textarea>
