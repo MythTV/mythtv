@@ -2634,7 +2634,7 @@ check_ldflags -Wl,--warn-common
 check_ldflags $LDLATEFLAGS
 
 # GCC version
-gcc_version=$($cc -v 2>&1 | grep version | cut -s -d' ' -f 3)
+gcc_version=$($cc -v 2>&1 | grep "^gcc version" | cut -s -d' ' -f 3)
 GCC_MAJOR=$(echo ${gcc_version} | cut -s -d'.' -f1)
 GCC_MINOR=$(echo ${gcc_version} | cut -s -d'.' -f2)
 
@@ -2680,7 +2680,7 @@ enabled freetype2 ||
 #has_library libmysqlclient || has_library mysql/libmysqlclient ||
 #    die "ERROR! You must have a MySQL library installed to run MythTV."
 #
-enabled lamemp3 ||
+enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
 
 #test for lirc client libraries and headers
