@@ -70,8 +70,8 @@ MythArchive related options:
   --enable-create-dvd      enable dvd creation [$createdvd]
   --enable-create-archive  enable native archive creation [$createarchive]
 
-#MythBrowser related options:
-#  --enable-mythbrowser     build the mythbrowser plugin [$browser]
+MythBrowser related options:
+  --enable-mythbrowser     build the mythbrowser plugin [$browser]
 
 MythControls related options:
   --enable-mythcontrols    build the mythcontrols plugin [$controls]
@@ -199,12 +199,10 @@ for opt do
   ;;
   --disable-mythphone) phone="no"
   ;;
-#  --enable-mythbrowser)
-#      echo "mythbrowser won't build with qt4 until it is ported to kde4 or QtWebKit"
-#      #browser="yes"
-#  ;;
-#  --disable-mythbrowser) browser="no"
-#  ;;
+  --enable-mythbrowser) browser="yes"
+  ;;
+  --disable-mythbrowser) browser="no"
+  ;;
   --enable-mythzoneminder) zoneminder="yes"
   ;;
   --disable-mythzoneminder) zoneminder="no"
@@ -600,12 +598,12 @@ else
   echo "        MythArchive    plugin will not be built"
 fi
 
-#if test "$browser" = "yes" ; then
-#  echo "        MythBrowser    plugin will be built"
-#  echo "SUBDIRS += mythbrowser" >> ./config.pro
-#else
-#  echo "        MythBrowser    plugin will not be built"
-#fi
+if test "$browser" = "yes" ; then
+  echo "        MythBrowser    plugin will be built"
+  echo "SUBDIRS += mythbrowser" >> ./config.pro
+else
+  echo "        MythBrowser    plugin will not be built"
+fi
 
 if test "$controls" = "yes" ; then
   echo "        MythControls   plugin will be built"
