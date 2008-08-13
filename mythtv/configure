@@ -1174,7 +1174,6 @@ audio_alsa_libs="-lasound"
 audio_arts="default"
 audio_jack="default"
 audio_jack_libs="-ljack"
-joystick_menu="default"
 
 enable audio_oss
 enable bindings_perl
