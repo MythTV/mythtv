@@ -106,6 +106,8 @@ class MpegRecorder : public DTVRecorder,
     bool encoding;
     bool needs_resolution;
     mutable QMutex start_stop_encoding_lock;
+    QMutex recording_wait_lock;
+    QWaitCondition recording_wait;
 
     // Pausing state
     bool cleartimeonpause;

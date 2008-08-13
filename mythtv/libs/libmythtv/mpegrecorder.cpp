@@ -87,6 +87,7 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
     // State
     recording(false),         encoding(false),
     needs_resolution(false),  start_stop_encoding_lock(QMutex::Recursive),
+    recording_wait_lock(),    recording_wait(),
     // Pausing state
     cleartimeonpause(false),
     // Encoding info
@@ -1223,12 +1224,15 @@ void MpegRecorder::StartRecording(void)
         delete _device_read_buffer;
         _device_read_buffer = NULL;
     }
+    StopEncoding(readfd);
 
     FinishRecording();
 
     delete[] buffer;
     SetStreamData(NULL);
     recording = false;
+    QMutexLocker locker(&recording_wait_lock);
+    recording_wait.wakeAll();
 }
 
 bool MpegRecorder::ProcessTSPacket(const TSPacket &tspacket_real)
@@ -1322,10 +1326,11 @@ bool MpegRecorder::ProcessAVTSPacket(const TSPacket &tspacket)
 
 void MpegRecorder::StopRecording(void)
 {
-    encoding = false;
-    if (_device_read_buffer)
-        _device_read_buffer->Stop();
-    StopEncoding(readfd);
+    QMutexLocker locker(&recording_wait_lock);
+    if (encoding) {
+        encoding = false;
+        recording_wait.wait(&recording_wait_lock);
+    }
 }
 
 void MpegRecorder::ResetForNewFile(void)
