@@ -888,17 +888,20 @@ MYTHTV_CONFIG_LIST='
     directfb
     directx
     dvb
+    dvdv
     firewire
+    fribidi
     frontend
+    glx_proc_addr_arb
     hdhomerun
+    hdpvr
     iptv
     ivtv
-    hdpvr
     joystick_menu
     libfftw3
     lirc
-    opengl_vsync
     opengl_video
+    opengl_vsync
     qtwebkit
     v4l
     valgrind
@@ -906,12 +909,9 @@ MYTHTV_CONFIG_LIST='
     xrandr
     xv
     xvmc
-    xvmcw
     xvmc_opengl
     xvmc_vld
-    dvdv
-    fribidi
-    glx_proc_addr_arb
+    xvmcw
 '
 
 MYTHTV_LIST='
@@ -1126,7 +1126,7 @@ fi
 arch=`uname -m`
 arch_raw="$arch"
 cpu="generic"
-cpu_override="no"
+disable cpu_override
 processor=`uname -p 2>/dev/null`
 processor_flags=""
 tune="generic"
@@ -1174,37 +1174,37 @@ audio_alsa_libs="-lasound"
 audio_arts="default"
 audio_jack="default"
 audio_jack_libs="-ljack"
-enable audio_oss
-bindings_perl="yes"
-bindings_python="yes"
-dbox2="yes"
-directfb="yes"
-dvb_path="/usr/include"
-dvb="yes"
-dvdv="no"
-ffmpeg_pthreads="yes"
-firewire="yes"
-frontend="yes"
-hdhomerun="yes"
-iptv="yes"
-ivtv="yes"
-hdpvr="yes"
 joystick_menu="default"
-lamemp3="yes"
-lirc="yes"
-mac_bundle="no"
-opengl="yes"
+
+enable audio_oss
+enable bindings_perl
+enable bindings_python
+enable dbox2
+enable directfb
+enable dvb
+enable ffmpeg_pthreads
+enable firewire
+enable frontend
+enable hdhomerun
+enable hdpvr
+enable iptv
+enable ivtv
+enable lamemp3
+enable lirc
+enable opengl
 enable qtwebkit
-v4l="yes"
-x11="yes"
+enable v4l
+enable x11
+enable xrandr
+enable xv
+enable xvmc
+enable xvmc_vld
+enable xvmcw
+
+# mythtv paths 
+dvb_path="/usr/include"
 x11_include_path="/usr/X11R6/include"
-xrandr="yes"
-xv="yes"
-xvmc="yes"
 xvmc_lib=""
-xvmc_vld="yes"
-xvmcw="yes"
-glx_proc_addr_arb="no"
 
 # libraries
 enable zlib
@@ -3206,7 +3206,7 @@ if enabled darwin_da; then
   echo "SLIB_UNINSTALL_EXTRA_CMD=${SLIB_UNINSTALL_EXTRA_CMD}" >> $MYTH_CONFIG_MAK
 fi
 
-if test $targetos = darwin && disabled mac_bundle; then
+if test $targetos = darwin && !enabled mac_bundle; then
   # Qt, by default builds .app bundles everywhere. Prevent this.
   echo "CONFIG -= app_bundle" >> $MYTH_CONFIG_MAK
 fi
