@@ -2622,7 +2622,7 @@ check_ldflags -Wl,--warn-common
 check_ldflags $LDLATEFLAGS
 
 # GCC version
-gcc_version=$($cc -v 2>&1 | grep "^gcc version" | cut -s -d' ' -f 3)
+gcc_version=$($cc -dumpversion)
 GCC_MAJOR=$(echo ${gcc_version} | cut -s -d'.' -f1)
 GCC_MINOR=$(echo ${gcc_version} | cut -s -d'.' -f2)
 
