@@ -78,6 +78,7 @@ class MPUBLIC MediaMonitor : public QObject
     // To safely dereference the pointers returned by this function
     // first validate the pointer with ValidateAndLock(), if true is returned
     // it is safe to dereference the pointer. When finished call Unlock()
+    QList<MythMediaDevice*> GetRemovable(bool mounted=false);
     QList<MythMediaDevice*> GetMedias(MediaType mediatype);
     MythMediaDevice*        GetMedia(const QString &path);
 
@@ -102,11 +103,12 @@ class MPUBLIC MediaMonitor : public QObject
     void mediaStatusChanged(MediaStatus oldStatus, MythMediaDevice* pMedia);
 
   protected:
+    void AttemptEject(MythMediaDevice *device);
     void CheckDevices(void);
     virtual void CheckDeviceNotifications(void) {};
     virtual bool AddDevice(MythMediaDevice* pDevice) = 0;
     bool RemoveDevice(const QString &dev);
-    bool shouldIgnore(MythMediaDevice *device);
+    bool shouldIgnore(const MythMediaDevice *device);
     bool eventFilter(QObject *obj, QEvent *event);
 
     const QString listDevices(void);

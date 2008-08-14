@@ -9,10 +9,9 @@ using namespace std;
 
 // Qt headers
 #include <QList>
-#include <qapplication.h>
-#include <q3process.h>
-#include <qdir.h>
-#include <qfile.h>
+#include <QApplication>
+#include <QDir>
+#include <QFile>
 
 // MythTV headers
 #include "mythmediamonitor.h"
@@ -109,17 +108,15 @@ static const QString DevName(MythMediaDevice *d)
 }
 
 /**
- * \brief Popup a dialog box for the user to select one drive.
+ * \brief Generate a list of removable drives.
  *  
- * Has to iterate through all devices to check if any are suitable,
- * prevent drawing a list if there is only one drive, et cetera
+ * Has to iterate through all devices to check if any are suitable.
  */ 
-MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
-                                                 bool          showMounted)
+QList<MythMediaDevice*> MediaMonitor::GetRemovable(bool showMounted)
 {       
     QList <MythMediaDevice *>           drives;
-    QList <MythMediaDevice *>::iterator it = m_Devices.begin();
-    QMutexLocker                             locker(&m_DevicesLock);
+    QList <MythMediaDevice *>::iterator it;
+    QMutexLocker                        locker(&m_DevicesLock);
 
     for (it = m_Devices.begin(); it != m_Devices.end(); ++it)
     {
@@ -130,6 +127,19 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
                (showMounted && (*it)->isMounted()))
             drives.append(*it);
     }
+
+    return drives;
+}
+
+/**
+ * \brief List removable drives, let the user select one.
+ *  
+ * prevent drawing a list if there is only one drive, et cetera
+ */ 
+MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
+                                                 bool          showMounted)
+{
+    QList <MythMediaDevice *> drives = GetRemovable(showMounted);
 
     if (drives.count() == 0)
     {
@@ -146,6 +156,7 @@ MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
     }
 
     QStringList buttonmsgs;
+    QList <MythMediaDevice *>::iterator it;
     for (it = drives.begin(); it != drives.end(); ++it)
         buttonmsgs += DevName(*it);
     buttonmsgs += tr("Cancel");
@@ -196,14 +207,19 @@ void MediaMonitor::ChooseAndEjectMedia(void)
         return;
     }
 
-    QString  dev = DevName(selected);
+    AttemptEject(selected);
+}
 
-    if (selected->getStatus() == MEDIASTAT_OPEN)
+void MediaMonitor::AttemptEject(MythMediaDevice *device)
+{
+    QString  dev = DevName(device);
+
+    if (device->getStatus() == MEDIASTAT_OPEN)
     {
         VERBOSE(VB_MEDIA,
                 QString("Disk %1's tray is OPEN. Closing tray").arg(dev));
 
-        if (selected->eject(false) != MEDIAERR_OK)
+        if (device->eject(false) != MEDIAERR_OK)
         {
             QString msg = "Unable to open or close the empty drive %1.\n\n";
             msg += "You may have to use the eject button under its tray.";
@@ -215,12 +231,12 @@ void MediaMonitor::ChooseAndEjectMedia(void)
         return;
     }
 
-    if (selected->isMounted(true))
+    if (device->isMounted(true))
     {
         VERBOSE(VB_MEDIA, QString("Disk %1 is mounted? Unmounting").arg(dev));
-        selected->unmount();
+        device->unmount();
 
-        if (selected->isMounted(true))
+        if (device->isMounted(true))
         {
             MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                       "eject unmount fail",
@@ -230,9 +246,9 @@ void MediaMonitor::ChooseAndEjectMedia(void)
     }
 
     VERBOSE(VB_MEDIA, QString("Unlocking disk %1, then eject()ing").arg(dev));
-    selected->unlock();
+    device->unlock();
 
-    MediaError err = selected->eject();
+    MediaError err = device->eject();
 
     if (err == MEDIAERR_UNSUPPORTED)
     {
@@ -664,7 +680,7 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
 /**
  * Check user preferences to see if this device should be monitored
  */
-bool MediaMonitor::shouldIgnore(MythMediaDevice* device)
+bool MediaMonitor::shouldIgnore(const MythMediaDevice* device)
 {
     if (m_IgnoreList.contains(device->getMountPath()) ||
         m_IgnoreList.contains(device->getRealDevice())||
