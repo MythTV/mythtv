@@ -32,8 +32,6 @@ using namespace std;
 #include "xmlparse.h"
 #include "mythdialogs.h"
 #include "lcddevice.h"
-#include "mythmediamonitor.h"
-#include "screensaver.h"
 #include "mythdbcon.h"
 
 #include "mythfontproperties.h"
