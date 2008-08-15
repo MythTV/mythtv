@@ -747,7 +747,7 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
  * but that is a bit wasteful when most users only have one drive.
  *
  * To make it a bit more beginner friendly, if no database default exists,
- * or if it contins "default", the code tries to find a monitored drive.
+ * or if it contains "default", the code tries to find a monitored drive.
  * If, still, nothing is suitable, a caller hard-coded default is used.
  *
  * Ideally, these would return a MythMediaDevice * instead of a QString
@@ -758,6 +758,10 @@ QString MediaMonitor::defaultDevice(QString dbSetting,
                                     const char *hardCodedDefault)
 {
     QString device = gContext->GetSetting(dbSetting);
+
+    VERBOSE(VB_MEDIA+VB_EXTRA,
+            QString("MediaMonitor::defaultDevice(%1,..,%2) dbSetting='%3'")
+            .arg(dbSetting).arg(hardCodedDefault).arg(device));
 
     // No settings database defaults? Try to choose one:
     if (device.isEmpty() || device == "default")
@@ -782,6 +786,8 @@ QString MediaMonitor::defaultDevice(QString dbSetting,
         }
     }
 
+    VERBOSE(VB_MEDIA+VB_EXTRA,
+            "MediaMonitor::defaultDevice() returning " + device);
     return device;
 }
 
