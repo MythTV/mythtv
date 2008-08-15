@@ -127,7 +127,7 @@ void MythAppearance::getScreenInfo()
 
 bool MythAppearance::keyPressEvent(QKeyEvent *event)
 {
-    if (GetFocusWidget()->keyPressEvent(event))
+    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
         return true;
 
     QStringList actions;
