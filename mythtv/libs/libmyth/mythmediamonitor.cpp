@@ -747,8 +747,7 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
  * but that is a bit wasteful when most users only have one drive.
  *
  * To make it a bit more beginner friendly, if no database default exists,
- * or if it contins "default", the code tries to guess the correct drive,
- * or put a dialog box up if there are several valid options.
+ * or if it contins "default", the code tries to find a monitored drive.
  * If, still, nothing is suitable, a caller hard-coded default is used.
  *
  * Ideally, these would return a MythMediaDevice * instead of a QString
@@ -775,27 +774,13 @@ QString MediaMonitor::defaultDevice(QString dbSetting,
             if (d == (MythMediaDevice *) -1)    // User cancelled
                 d = NULL;
 
-            if (d)
+            if (d && c_monitor->ValidateAndLock(d))
+            {
                 device = d->getDevicePath();
+                c_monitor->Unlock(d);
+            }
         }
     }
-
-#if 0
-    // A hack to do VERBOSE in a static method:
-    extern unsigned int print_verbose_messages;
-    if (print_verbose_messages & 0x00800000)  // VB_MEDIA
-    {
-        QByteArray tmp1 = dbSetting.toAscii();
-        QByteArray tmp2 = label.toAscii();
-        QByteArray tmp3 = device.toAscii();
-        QDateTime dtmp = QDateTime::currentDateTime();
-        QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz");
-        cout << dtime << " MediaMonitor::defaultDevice('"
-             << tmp1.constData()
-             << "', '" << tmp2.constData() << "'') returning '"
-             << tmp3.constData() << "'" << endl;
-    }
-#endif
 
     return device;
 }
