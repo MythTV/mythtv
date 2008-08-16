@@ -695,7 +695,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
         QString response;
 
         // give user chance to skip config
-        cout << endl << (const char *)error << endl << endl;
+        cout << endl << error.toLocal8Bit().constData() << endl << endl;
         response = getResponse("Would you like to configure the database "
                                "connection now?",
                                "yes");
@@ -780,7 +780,7 @@ QString MythContextPrivate::TestDBconnection(void)
 
             VERBOSE(VB_GENERAL, QString("Trying to wake up host %1, attempt %2")
                                 .arg(host).arg(attempt));
-            system(m_DBparams.wolCommand);
+            system(m_DBparams.wolCommand.toLocal8Bit().constData());
 
             VERBOSE(VB_GENERAL,
                     QString("Waiting for %1 seconds").arg(wakeupTime));
@@ -819,7 +819,7 @@ QString MythContextPrivate::TestDBconnection(void)
     if (!MSqlQuery::testDBConnection())
     {
         SilenceDBerrors();
-        return QObject::tr(QString("Cannot login to database?"));
+        return QObject::tr("Cannot login to database?");
     }
 
 
