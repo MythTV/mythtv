@@ -1,5 +1,4 @@
 #include <iostream>
-#include <algorithm>
 
 using namespace std;
 
@@ -103,11 +102,11 @@ MythGenericTree::MythGenericTree(const QString &a_string, int an_int,
 {
     m_subnodes = new SortableMythGenericTreeList;
     m_ordered_subnodes = new SortableMythGenericTreeList;
-    m_flatened_subnodes = new SortableMythGenericTreeList;
+    m_flatenedSubnodes = new SortableMythGenericTreeList;
 
     m_parent = NULL;
     m_selected_subnode = NULL;
-    m_current_ordering_index = -1;
+    m_currentOrderingIndex = -1;
 
     // Use 6 here, because we know that's what mythmusic wants (limits resizing)
     m_attributes = new IntVector(6);
@@ -123,7 +122,7 @@ MythGenericTree::~MythGenericTree()
         delete m_subnodes->takeFirst();
     delete m_subnodes;
     delete m_ordered_subnodes;
-    delete m_flatened_subnodes;
+    delete m_flatenedSubnodes;
     delete m_attributes;
 }
 
@@ -151,7 +150,7 @@ void MythGenericTree::removeNode(MythGenericTree *child)
         m_selected_subnode = NULL;
 
     m_ordered_subnodes->removeAll(child);
-    m_flatened_subnodes->removeAll(child);
+    m_flatenedSubnodes->removeAll(child);
     m_subnodes->removeAll(child);
 }
 
@@ -175,16 +174,16 @@ int MythGenericTree::calculateDepth(int start)
     return current_depth;
 }
 
-MythGenericTree* MythGenericTree::findLeaf(int ordering_index)
+MythGenericTree* MythGenericTree::findLeaf()
 {
     if (m_subnodes->count() > 0)
     {
-        if (ordering_index == -1)
+        if (m_currentOrderingIndex == -1)
             return m_subnodes->first()->findLeaf();
 
-        MythGenericTree *first_child = getChildAt(0, ordering_index);
+        MythGenericTree *first_child = getChildAt(0);
 
-        return first_child->findLeaf(ordering_index);
+        return first_child->findLeaf();
     }
 
     return this;
@@ -251,16 +250,10 @@ bool MythGenericTree::checkNode(QList<int> route_of_branches)
     return found_it;
 }
 
-int MythGenericTree::getChildPosition(MythGenericTree *child, int ordering_index)
+int MythGenericTree::getChildPosition(MythGenericTree *child)
 {
-    if (ordering_index == -1)
+    if (m_currentOrderingIndex == -1)
         return m_subnodes->indexOf(child);
-
-    if (m_current_ordering_index != ordering_index)
-    {
-        reorderSubnodes(ordering_index);
-        m_current_ordering_index = ordering_index;
-    }
 
     return m_ordered_subnodes->indexOf(child);
 }
@@ -272,11 +265,32 @@ int MythGenericTree::getPosition()
     return 0;
 }
 
-int MythGenericTree::getPosition(int ordering_index)
+QList<int> MythGenericTree::getRouteByID()
 {
-    if (m_parent)
-        return m_parent->getChildPosition(this, ordering_index);
-    return 0;
+    QList<int> routeByID;
+
+    routeByID.push_front(getInt());
+
+    MythGenericTree *parent = this;
+    while( (parent = parent->getParent()) )
+    {
+        routeByID.push_front(parent->getInt());
+    }
+    return routeByID;
+}
+
+QStringList MythGenericTree::getRouteByString()
+{
+    QStringList routeByString;
+
+    routeByString.push_front(getString());
+
+    MythGenericTree *parent = this;
+    while( (parent = parent->getParent()) )
+    {
+        routeByString.push_front(parent->getString());
+    }
+    return routeByString;
 }
 
 int MythGenericTree::childCount(void)
@@ -291,36 +305,30 @@ int MythGenericTree::siblingCount(void)
     return 1;
 }
 
-QList<MythGenericTree*> *MythGenericTree::getAllChildren(int ordering_index)
+QList<MythGenericTree*> *MythGenericTree::getAllChildren()
 {
-    if (ordering_index == -1)
+    if (m_currentOrderingIndex == -1)
         return m_subnodes;
 
     return m_ordered_subnodes;
 }
 
-MythGenericTree* MythGenericTree::getChildAt(uint reference, int ordering_index)
+MythGenericTree* MythGenericTree::getChildAt(uint reference)
 {
     if (reference >= (uint)m_ordered_subnodes->count())
         return NULL;
 
-    if (ordering_index == -1)
+    if (m_currentOrderingIndex == -1)
         return m_subnodes->at(reference);
-
-    if (ordering_index != m_current_ordering_index)
-    {
-        reorderSubnodes(ordering_index);
-        m_current_ordering_index = ordering_index;
-    }
 
     return m_ordered_subnodes->at(reference);
 }
 
-MythGenericTree* MythGenericTree::getSelectedChild(int ordering_index)
+MythGenericTree* MythGenericTree::getSelectedChild()
 {
     if (m_selected_subnode)
         return m_selected_subnode;
-    return getChildAt(0, ordering_index);
+    return getChildAt(0);
 }
 
 void MythGenericTree::becomeSelectedChild()
@@ -331,7 +339,7 @@ void MythGenericTree::becomeSelectedChild()
         VERBOSE(VB_IMPORTANT, "Top level can't become selected child");
 }
 
-MythGenericTree* MythGenericTree::prevSibling(int number_up, int ordering_index)
+MythGenericTree* MythGenericTree::prevSibling(int number_up)
 {
     if (!m_parent)
     {
@@ -339,7 +347,7 @@ MythGenericTree* MythGenericTree::prevSibling(int number_up, int ordering_index)
         return NULL;
     }
 
-    int position = m_parent->getChildPosition(this, ordering_index);
+    int position = m_parent->getChildPosition(this);
 
     if (position < number_up)
     {
@@ -347,10 +355,10 @@ MythGenericTree* MythGenericTree::prevSibling(int number_up, int ordering_index)
         return NULL;
     }
 
-    return m_parent->getChildAt(position - number_up, ordering_index);
+    return m_parent->getChildAt(position - number_up);
 }
 
-MythGenericTree* MythGenericTree::nextSibling(int number_down, int ordering_index)
+MythGenericTree* MythGenericTree::nextSibling(int number_down)
 {
     if (!m_parent)
     {
@@ -358,7 +366,7 @@ MythGenericTree* MythGenericTree::nextSibling(int number_down, int ordering_inde
         return NULL;
     }
 
-    int position = m_parent->getChildPosition(this, ordering_index);
+    int position = m_parent->getChildPosition(this);
 
     if (position + number_down >= m_parent->childCount())
     {
@@ -366,22 +374,16 @@ MythGenericTree* MythGenericTree::nextSibling(int number_down, int ordering_inde
         return NULL;
     }
 
-    return m_parent->getChildAt(position + number_down, ordering_index);
+    return m_parent->getChildAt(position + number_down);
 }
 
-QList<MythGenericTree*>::iterator MythGenericTree::getFirstChildIterator(int ordering)
+QList<MythGenericTree*>::iterator MythGenericTree::getFirstChildIterator()
 {
-    if (ordering == -1)
+    if (m_currentOrderingIndex == -1)
     {
         QList<MythGenericTree*>::iterator it;
         it = m_subnodes->begin();
         return it;
-    }
-
-    if (ordering != m_current_ordering_index)
-    {
-        reorderSubnodes(ordering);
-        m_current_ordering_index = ordering;
     }
 
     QList<MythGenericTree*>::iterator it;
@@ -419,13 +421,19 @@ int MythGenericTree::getAttribute(uint which_one)
     return m_attributes->at(which_one);
 }
 
-void MythGenericTree::reorderSubnodes(int ordering_index)
+void MythGenericTree::setOrderingIndex(int ordering_index)
+{
+    m_currentOrderingIndex = ordering_index;
+    reorderSubnodes();
+}
+
+void MythGenericTree::reorderSubnodes()
 {
     // The nodes are there, we just want to re-order them according to
     // attribute column defined by ordering_index
 
     m_ordered_subnodes->Sort(SortableMythGenericTreeList::SORT_ATTRIBUTE,
-                             ordering_index);
+                             m_currentOrderingIndex);
 }
 
 void MythGenericTree::addYourselfIfSelectable(QList<MythGenericTree*> *flat_list)
@@ -443,36 +451,31 @@ void MythGenericTree::addYourselfIfSelectable(QList<MythGenericTree*> *flat_list
     }
 }
 
-void MythGenericTree::buildFlatListOfSubnodes(int ordering_index,
-                                          bool scrambled_parents)
+void MythGenericTree::buildFlatListOfSubnodes(bool scrambled_parents)
 {
-    // This builds a flat list of every selectable child according to some
-    // some_ordering index.
+    // This builds a flat list of every selectable child according to the
+    // current ordering index.
 
-    m_flatened_subnodes->clear();
+    m_flatenedSubnodes->clear();
 
     QList<MythGenericTree*>::iterator it;
     it = m_subnodes->begin();
     MythGenericTree *child;
     while ((child = *it) != 0)
     {
-        child->addYourselfIfSelectable(m_flatened_subnodes);
+        child->addYourselfIfSelectable(m_flatenedSubnodes);
         ++it;
     }
 
-    if (scrambled_parents)
-    {
-        // sort the flatened list in the order indicated by ordering_index
-        m_flatened_subnodes->Sort(SortableMythGenericTreeList::SORT_ATTRIBUTE,
-                                  ordering_index);
-    }
+    if (m_currentOrderingIndex > -1)
+        m_flatenedSubnodes->SetAttributeIndex(m_currentOrderingIndex);
 }
 
 MythGenericTree* MythGenericTree::nextPrevFromFlatList(bool forward_or_backward,
                                                bool wrap_around,
                                                MythGenericTree *active)
 {
-    int i = m_flatened_subnodes->indexOf(active);
+    int i = m_flatenedSubnodes->indexOf(active);
     if (i < 0)
     {
         VERBOSE(VB_IMPORTANT, "Can't find active item on flatened list");
@@ -482,7 +485,7 @@ MythGenericTree* MythGenericTree::nextPrevFromFlatList(bool forward_or_backward,
     if (forward_or_backward)
     {
         ++i;
-        if (i >= (int)m_flatened_subnodes->count())
+        if (i >= (int)m_flatenedSubnodes->count())
         {
             if (wrap_around)
                 i = 0;
@@ -496,13 +499,13 @@ MythGenericTree* MythGenericTree::nextPrevFromFlatList(bool forward_or_backward,
         if (i < 0)
         {
             if (wrap_around)
-                i = m_flatened_subnodes->count() - 1;
+                i = m_flatenedSubnodes->count() - 1;
             else
                 return NULL;
         }
     }
 
-    return m_flatened_subnodes->at(i);
+    return m_flatenedSubnodes->at(i);
 }
 
 MythGenericTree* MythGenericTree::getChildByName(const QString &a_name)
@@ -578,10 +581,10 @@ void MythGenericTree::sortBySelectable()
 
 void MythGenericTree::deleteAllChildren()
 {
-    m_flatened_subnodes->clear();
+    m_flatenedSubnodes->clear();
     m_ordered_subnodes->clear();
     m_selected_subnode = NULL;
-    m_current_ordering_index = -1;
+    m_currentOrderingIndex = -1;
     while (!m_subnodes->isEmpty())
         delete m_subnodes->takeFirst();
     m_subnodes->clear();
@@ -602,7 +605,7 @@ void MythGenericTree::reOrderAsSorted()
     }
 
     m_subnodes->clear();
-    m_current_ordering_index = -1;
+    m_currentOrderingIndex = -1;
 
     QList<MythGenericTree*>::iterator it;
     it = m_ordered_subnodes->begin();
@@ -633,4 +636,3 @@ void MythGenericTree::MoveItemUpDown(MythGenericTree *item, bool flag)
     m_subnodes->removeAt(num);
     m_subnodes->insert(insertat, item);
 }
-

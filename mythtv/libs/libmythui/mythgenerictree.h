@@ -2,6 +2,7 @@
 #define MYTHGENERICTREE_H_
 
 #include <QString>
+#include <QStringList>
 #include <QList>
 #include <QVector>
 
@@ -26,27 +27,29 @@ class MPUBLIC MythGenericTree
 
     void removeNode(MythGenericTree *child);
 
-    MythGenericTree *findLeaf(int ordering_index = -1);
+    MythGenericTree *findLeaf();
 
     MythGenericTree* findNode(QList<int> route_of_branches);
     MythGenericTree* recursiveNodeFinder(QList<int> route_of_branches);
     bool checkNode(QList<int> route_of_branches);
 
-    MythGenericTree *nextSibling(int number_down, int ordering_index = -1);
-    MythGenericTree *prevSibling(int number_up, int ordering_index = -1);
+    MythGenericTree *nextSibling(int number_down);
+    MythGenericTree *prevSibling(int number_up);
 
-    QList<MythGenericTree*>::iterator getFirstChildIterator(int ordering = -1);
+    QList<MythGenericTree*>::iterator getFirstChildIterator();
 
-    MythGenericTree *getSelectedChild(int ordering_index);
-    MythGenericTree *getChildAt(uint reference, int ordering_index = -1);
+    MythGenericTree *getSelectedChild();
+    MythGenericTree *getChildAt(uint reference);
     MythGenericTree *getChildByName(const QString &a_name);
     MythGenericTree *getChildByInt(int an_int);
 
-    QList<MythGenericTree*> *getAllChildren(int ordering_index = -1);
+    QList<MythGenericTree*> *getAllChildren();
 
-    int getChildPosition(MythGenericTree *child, int ordering_index = -1);
+    int getChildPosition(MythGenericTree *child);
     int getPosition(void);
-    int getPosition(int ordering_index);
+
+    QList<int> getRouteByID(void);
+    QStringList getRouteByString(void);
 
     void setInt(int an_int) { m_int = an_int; }
     int getInt() { return m_int; }
@@ -69,16 +72,14 @@ class MPUBLIC MythGenericTree
     int getAttribute(uint which_one);
     IntVector *getAttributes(void) { return m_attributes; }
 
-    void reorderSubnodes(int ordering_index);
-    void setOrderingIndex(int ordering_index)
-                 { m_current_ordering_index = ordering_index; }
-    int getOrderingIndex(void) { return m_current_ordering_index; }
+    void setOrderingIndex(int ordering_index);
+    int getOrderingIndex(void) { return m_currentOrderingIndex; }
 
     void becomeSelectedChild(void);
     void setSelectedChild(MythGenericTree* a_node) { m_selected_subnode = a_node; }
 
     void addYourselfIfSelectable(QList<MythGenericTree*> *flat_list);
-    void buildFlatListOfSubnodes(int ordering_index, bool scrambled_parents);
+    void buildFlatListOfSubnodes(bool scrambled_parents);
 
     MythGenericTree *nextPrevFromFlatList(bool forward_or_back, bool wrap_around,
                                       MythGenericTree *active);
@@ -93,19 +94,21 @@ class MPUBLIC MythGenericTree
     void MoveItemUpDown(MythGenericTree *item, bool flag);
 
   private:
+    void reorderSubnodes(void);
+
     QString m_string;
     int m_int;
 
     SortableMythGenericTreeList *m_subnodes;
     SortableMythGenericTreeList *m_ordered_subnodes;
-    SortableMythGenericTreeList *m_flatened_subnodes;
+    SortableMythGenericTreeList *m_flatenedSubnodes;
 
     MythGenericTree *m_selected_subnode;
     IntVector *m_attributes;
     MythGenericTree *m_parent;
 
     bool m_selectable;
-    int m_current_ordering_index;
+    int m_currentOrderingIndex;
 };
 
 #endif
