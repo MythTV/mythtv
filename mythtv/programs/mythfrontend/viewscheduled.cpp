@@ -32,8 +32,6 @@ using namespace std;
 
 void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 {
-    qApp->lock();
-
     ViewScheduled *vsb = new ViewScheduled(gContext->GetMainWindow(),
                             "view scheduled", (TV*)player, showTV);
     vsb->Show();

@@ -163,9 +163,7 @@ bool LCDProcClient::connectToHost(const QString &lhostname, unsigned int lport)
 
         while (--timeout && socket->state() != Q3Socket::Idle)
         {
-            qApp->lock();
             qApp->processEvents();
-            qApp->unlock();
             usleep(1000);
 
             if (socket->state() == Q3Socket::Connected)

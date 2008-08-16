@@ -576,13 +576,8 @@ void PlaybackBox::killPlayerSafe(void)
         previewVideoState = (previewVideoState == kKilled) ?
             kKilled :  kKilling;
 
-        /* NOTE: need unlock/process/lock here because we need
-           to allow drawVideo() to run to handle changes in
-           previewVideoStates */
-        qApp->unlock();
         qApp->processEvents();
         usleep(500);
-        qApp->lock();
     }
     previewVideoState = kStopped;
 
@@ -4623,10 +4618,6 @@ void PlaybackBox::previewReady(const ProgramInfo *pginfo)
     }
     previewGeneratorLock.unlock();
 
-    // lock QApplication so that we don't remove pixmap
-    // from under a running paint event.
-    qApp->lock();
-
     // If we are still displaying this preview update it.
     if (pginfo->recstartts  == previewStartts &&
         pginfo->chanid      == previewChanid  &&
@@ -4642,7 +4633,6 @@ void PlaybackBox::previewReady(const ProgramInfo *pginfo)
         // ask for repaint
         update(blackholeBounds);
     }
-    qApp->unlock();
 }
 
 bool check_lastmod(LastCheckedMap &elapsedtime, const QString &filename)

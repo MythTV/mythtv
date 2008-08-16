@@ -44,8 +44,6 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
     if (!screen)
         return;
 
-    //qApp->lock();
-
     MythScreenType *old = topScreen;
     if (old)
         old->aboutToHide();
@@ -66,8 +64,6 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
     screen->aboutToShow();
 
     topScreen = screen;
-
-    //qApp->unlock();
 }
 
 void MythScreenStack::PopScreen(bool allowFade, bool deleteScreen)
@@ -81,8 +77,6 @@ void MythScreenStack::PopScreen(bool allowFade, bool deleteScreen)
         return;
 
     MythMainWindow *mainwindow = GetMythMainWindow();
-
-    //qApp->lock();
 
     top->setParent(0);
     if (allowFade && m_DoTransitions && !mainwindow->IsExitingToMain())
@@ -140,8 +134,6 @@ void MythScreenStack::PopScreen(bool allowFade, bool deleteScreen)
         if (mainscreen)
             mainscreen->SetRedraw();
     }
-
-    //qApp->unlock();
 }
 
 MythScreenType *MythScreenStack::GetTopScreen(void)

@@ -180,9 +180,8 @@ bool ManualBox::eventFilter(QObject *, QEvent *e)
         if (NULL != m_tv)
         {
             QKeyEvent* k = (QKeyEvent*)e;
-            qApp->unlock();
+
             m_tv->ProcessKeypress(k);
-            qApp->lock();
         }
     }
 
@@ -198,9 +197,7 @@ void ManualBox::killPlayer(void)
     if (NULL != m_tv)
     {
         m_tv->StopEmbeddingOutput();
-        qApp->unlock();
         delete m_tv;
-        qApp->lock();
         m_tv = NULL;
     }
 }
@@ -227,21 +224,17 @@ void ManualBox::startPlayer(void)
                                                      (int)(240 * hmult));
         if (m_tv->LiveTV(true))
         {
-            qApp->unlock();
             while (m_tv->GetState() == kState_ChangingState)
             {
                 usleep(50);
                 qApp->processEvents();
             }
-            qApp->lock();
             setActiveWindow();
             m_wasRecording = !m_tv->IsRecording();
         }
         else
         {
-            qApp->unlock();
             delete m_tv;
-            qApp->lock();
             m_tv = NULL;
             emit dismissWindow();
         }

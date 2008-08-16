@@ -1772,7 +1772,6 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
                 d->serverSock = NULL;
             }
 
-            qApp->lock();
             if (!block)
                 d->serverSockLock.unlock();
             VERBOSE(VB_IMPORTANT,
@@ -1785,7 +1784,6 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
 
             if (!block)
                 d->serverSockLock.lock();
-            qApp->unlock();
         }
     }
 
@@ -1856,7 +1854,6 @@ bool MythContext::CheckProtoVersion(MythSocket* socket)
 
         if (d->m_ui && d->m_ui->IsScreenSetup())
         {
-            qApp->lock();
             MythPopupBox::showOkPopup(d->mainWindow,
                                       "Connection failure",
                                       tr(QString("The server uses network "
@@ -1868,7 +1865,6 @@ bool MythContext::CheckProtoVersion(MythSocket* socket)
                                                  "the backend and frontend."))
                                                  .arg(strlist[1])
                                                  .arg(MYTH_PROTO_VERSION));
-            qApp->unlock();
         }
         return false;
     }

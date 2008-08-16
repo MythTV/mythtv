@@ -127,136 +127,94 @@ void startSearchTitle(void)
 {
     ProgLister searchTitle(plTitleSearch, "", "",
                          gContext->GetMainWindow(), "proglist");
-
-    qApp->unlock();
     searchTitle.exec();
-    qApp->lock();
 }
 
 void startSearchKeyword(void)
 {
     ProgLister searchKeyword(plKeywordSearch, "", "",
                         gContext->GetMainWindow(), "proglist");
-
-    qApp->unlock();
     searchKeyword.exec();
-    qApp->lock();
 }
 
 void startSearchPeople(void)
 {
     ProgLister searchPeople(plPeopleSearch, "", "",
                          gContext->GetMainWindow(), "proglist");
-
-    qApp->unlock();
     searchPeople.exec();
-    qApp->lock();
 }
 
 void startSearchPower(void)
 {
     ProgLister searchPower(plPowerSearch, "", "",
                          gContext->GetMainWindow(), "proglist");
-
-    qApp->unlock();
     searchPower.exec();
-    qApp->lock();
 }
 
 void startSearchStored(void)
 {
     ProgLister searchStored(plStoredSearch, "", "",
                          gContext->GetMainWindow(), "proglist");
-
-    qApp->unlock();
     searchStored.exec();
-    qApp->lock();
 }
 
 void startSearchChannel(void)
 {
     ProgLister searchChannel(plChannel, "", "",
                              gContext->GetMainWindow(), "proglist");
-
-    qApp->unlock();
     searchChannel.exec();
-    qApp->lock();
 }
 
 void startSearchCategory(void)
 {
     ProgLister searchCategory(plCategory, "", "",
                             gContext->GetMainWindow(), "proglist");
-
-    qApp->unlock();
     searchCategory.exec();
-    qApp->lock();
 }
 
 void startSearchMovie(void)
 {
     ProgLister searchMovie(plMovies, "", "",
                            gContext->GetMainWindow(), "proglist");
-
-    qApp->unlock();
     searchMovie.exec();
-    qApp->lock();
 }
 
 void startSearchNew(void)
 {
     ProgLister searchNew(plNewListings, "", "",
                          gContext->GetMainWindow(), "proglist");
-
-    qApp->unlock();
     searchNew.exec();
-    qApp->lock();
 }
 
 void startSearchTime(void)
 {
     ProgLister searchTime(plTime, "", "",
                          gContext->GetMainWindow(), "proglist");
-
-    qApp->unlock();
     searchTime.exec();
-    qApp->lock();
 }
 
 void startManaged(void)
 {
     ViewScheduled vsb(gContext->GetMainWindow(), "view scheduled");
-
-    qApp->unlock();
     vsb.exec();
-    qApp->lock();
 }
 
 void startProgramRecPriorities(void)
 {
     ProgramRecPriority rsb(gContext->GetMainWindow(), "recpri scheduled");
-
-    qApp->unlock();
     rsb.exec();
-    qApp->lock();
 }
 
 void startChannelRecPriorities(void)
 {
     ChannelRecPriority rch(gContext->GetMainWindow(), "recpri channels");
-
-    qApp->unlock();
     rch.exec();
-    qApp->lock();
 }
 
 void startCustomPriority(void)
 {
     CustomPriority custom(gContext->GetMainWindow(), "custom priority");
-
-    qApp->unlock();
     custom.exec();
-    qApp->lock();
 }
 
 void startPlaybackWithGroup(QString recGroup = "")
@@ -267,9 +225,7 @@ void startPlaybackWithGroup(QString recGroup = "")
     if (recGroup != "")
         pbb.displayRecGroup(recGroup);
 
-    qApp->unlock();
     pbb.exec();
-    qApp->lock();
 }
 
 void startPlayback(void)
@@ -281,46 +237,31 @@ void startDelete(void)
 {
     PlaybackBox delbox(PlaybackBox::Delete, gContext->GetMainWindow(), 
                        "tvplayselect");
-   
-    qApp->unlock();
     delbox.exec();
-    qApp->lock();
 }
 
 void startPrevious(void)
 {
     PreviousList previous(gContext->GetMainWindow(), "previous list");
-
-    qApp->unlock();
     previous.exec();
-    qApp->lock();
 }
 
 void startCustomEdit(void)
 {
     CustomEdit custom(gContext->GetMainWindow(), "custom record");
-
-    qApp->unlock();
     custom.exec();
-    qApp->lock();
 }
 
 void startManual(void)
 {
     ManualBox manbox(gContext->GetMainWindow(), "manual box");
-
-    qApp->unlock();
     manbox.exec();
-    qApp->lock();
 }
 
 void startManualSchedule(void)
 {
     ManualSchedule mansched(gContext->GetMainWindow(), "manual schedule");
-
-    qApp->unlock();
     mansched.exec();
-    qApp->lock();
 }
 
 void startTVInGuide(void)
@@ -346,9 +287,7 @@ void showStatus(void)
     }
     else
     {
-        qApp->unlock();
         statusbox.exec();
-        qApp->lock();
     }
 }
 
@@ -1371,8 +1310,6 @@ int main(int argc, char **argv)
     if (gContext->GetNumSetting("idleTimeoutSecs",0) > 0)
         gContext->ConnectToMasterServer();
 
-    qApp->lock();
-
     if (pluginname != "")
     {
         if (pmanager->run_plugin(pluginname))
@@ -1380,7 +1317,6 @@ int main(int argc, char **argv)
             qApp->setMainWidget(mainWindow);
             qApp->exec();
 
-            qApp->unlock();
             cleanup();
             return FRONTEND_EXIT_OK;
         }
@@ -1392,14 +1328,11 @@ int main(int argc, char **argv)
                 qApp->setMainWidget(mainWindow);
                 qApp->exec();
 
-                qApp->unlock();
                 cleanup();
                 return FRONTEND_EXIT_OK;
             }
         }
     }
-
-    qApp->unlock();
 
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon)

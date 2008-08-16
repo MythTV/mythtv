@@ -728,7 +728,6 @@ void NuppelVideoPlayer::ReinitVideo(void)
         if (!using_null_videoout)
         {
 /* TODO FIXME, not Qt4 safe
-            qApp->lock();
             DialogBox *dlg = new DialogBox(
                 gContext->GetMainWindow(),
                 QObject::tr("Failed to Reinit Video."));
@@ -736,7 +735,6 @@ void NuppelVideoPlayer::ReinitVideo(void)
             dlg->AddButton(QObject::tr("Return to menu."));
             dlg->exec();
             dlg->deleteLater();
-            qApp->unlock();
 */
         }
         errored = true;
@@ -3294,10 +3292,8 @@ void NuppelVideoPlayer::StartPlaying(void)
             dlg->AddButton(neverask);
             dlg->AddButton(quit);
 
-            qApp->lock();
             ret = dlg->exec();
             dlg->deleteLater();
-            qApp->unlock();
 */
         }
             
@@ -3324,14 +3320,12 @@ void NuppelVideoPlayer::StartPlaying(void)
         if (!using_null_videoout)
         {
 /* TODO FIXME, not Qt4 safe
-            qApp->lock();
             DialogBox *dialog = new DialogBox(
                 gContext->GetMainWindow(),
                 QObject::tr("Unable to initialize video."));
             dialog->AddButton(QObject::tr("Return to menu."));
             dialog->exec();
             dialog->deleteLater();
-            qApp->unlock();
 */
         }
 
@@ -3712,15 +3706,12 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (IsErrored() && !using_null_videoout)
     {
 /* TODO FIXME, not Qt4 safe
-        qApp->lock();
         DialogBox *dialog =
             new DialogBox(gContext->GetMainWindow(),
                           QObject::tr("Error was encountered while displaying video."));
         dialog->AddButton(QObject::tr("Return to Menu"));
         dialog->exec();
         dialog->deleteLater();
-
-        qApp->unlock();
 */
     }
 }
