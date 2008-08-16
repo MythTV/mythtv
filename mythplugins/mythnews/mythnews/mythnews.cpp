@@ -725,9 +725,7 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
 
                 if (getHttpFile(sFilename, cmdURL))
                 {
-                    qApp->unlock();
                     playVideo(sFilename);
-                    qApp->lock();
                 }
             }
             else {

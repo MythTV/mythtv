@@ -152,10 +152,7 @@ void startPlayback(void)
     PlaybackBoxMusic *pbb;
     pbb = new PlaybackBoxMusic(gContext->GetMainWindow(),
                                "music_play", "music-", chooseCD(), "music_playback");
-    qApp->unlock();
     pbb->exec();
-    qApp->lock();
-
     qApp->processEvents();
 
     delete pbb;
@@ -165,10 +162,7 @@ void startDatabaseTree(void)
 {
     DatabaseBox *dbbox = new DatabaseBox(gContext->GetMainWindow(),
                          chooseCD(), "music_select", "music-", "music database");
-    qApp->unlock();
     dbbox->exec();
-    qApp->lock();
-
     delete dbbox;
 
     gPlayer->constructPlaylist();
@@ -179,12 +173,9 @@ bool startRipper(void)
 #ifndef USING_MINGW
     Ripper rip(chooseCD(), gContext->GetMainWindow(), "cd ripper");
 
-    qApp->unlock();
     rip.exec();
-    qApp->lock();
-
     if (rip.somethingWasRipped())
-      return true;
+        return true;
 #endif
     return false;
 }
@@ -194,10 +185,7 @@ bool startImport(void)
 #ifndef USING_MINGW
     ImportMusicDialog import(gContext->GetMainWindow(), "import music");
 
-    qApp->unlock();
     import.exec();
-    qApp->lock();
-
     if (import.somethingWasImported())
         return true;
 #endif

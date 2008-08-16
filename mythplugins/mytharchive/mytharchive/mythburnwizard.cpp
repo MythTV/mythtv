@@ -1483,15 +1483,13 @@ void MythburnWizard::handleFind(void)
 {
     FileSelector selector(FSTYPE_FILE, "/", "*.*", gContext->GetMainWindow(),
                           "file_selector", "mytharchive-", "file selector");
-    qApp->unlock();
-    bool res = (kDialogCodeRejected != selector.exec());
 
+    bool res = (kDialogCodeRejected != selector.exec());
     if (res)
     {
         filename_edit->setText(selector.getSelected());
         filenameEditLostFocus();
     }
-    qApp->lock();
 }
 
 void MythburnWizard::filenameEditLostFocus()

@@ -826,9 +826,7 @@ void VideoGallery::handleVideoSelect()
                                                 gContext->GetMainWindow(),
                                                 "video selected",
                                                 where_we_are->getInt());
-    qApp->unlock();
     selected->exec();
-    qApp->lock();
     delete selected;
 }
 

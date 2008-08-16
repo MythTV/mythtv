@@ -542,8 +542,6 @@ void DatabaseBox::fillCD(void)
         cditem->setCheck(0);
         cditem->setCheckable(false);
 
-        qApp->lock();
-
         gMusicData->all_music->putCDOnTheListView(cditem);
         
         //  reflect selections in cd playlist
@@ -561,8 +559,6 @@ void DatabaseBox::fillCD(void)
             }
             ++it;
         }
-
-        qApp->unlock();
 
         // Can't check what ain't there
     

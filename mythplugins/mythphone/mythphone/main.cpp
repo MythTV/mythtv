@@ -47,9 +47,7 @@ void PhoneUI(void)
 
     puib = new PhoneUIBox(gContext->GetMainWindow(),
                           "phone_ui", "phone-");
-    qApp->unlock();
     puib->exec();
-    qApp->lock();
     qApp->processEvents();
 
     delete puib;
@@ -63,9 +61,7 @@ void startWebcamSettings(void)
 
     wsb = new WebcamSettingsBox(gContext->GetMainWindow(),
                                 "webcam_settings", "webcam-");
-    qApp->unlock();
     wsb->exec();
-    qApp->lock();
     qApp->processEvents();
 
     delete wsb;

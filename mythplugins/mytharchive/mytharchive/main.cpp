@@ -136,9 +136,7 @@ void runCreateDVD(void)
 
     burnWiz = new MythburnWizard(gContext->GetMainWindow(),
                              "mythburn_wizard", "mythburn-");
-    qApp->unlock();
     DialogCode res = burnWiz->exec();
-    qApp->lock();
     qApp->processEvents();
     delete burnWiz;
 
@@ -183,9 +181,7 @@ void runCreateArchive(void)
 
     nativeWiz = new ExportNativeWizard(gContext->GetMainWindow(),
                                  "exportnative_wizard", "mythnative-");
-    qApp->unlock();
     DialogCode res = nativeWiz->exec();
-    qApp->lock();
     qApp->processEvents();
     delete nativeWiz;
 
@@ -233,9 +229,7 @@ void runImportVideo(void)
 
     ImportNativeWizard wiz("/", filter, gContext->GetMainWindow(),
                           "import_native_wizard", "mythnative-", "import native wizard");
-    qApp->unlock();
     DialogCode res = wiz.exec();
-    qApp->lock();
 
     if (kDialogCodeRejected == res)
         return;
@@ -375,9 +369,7 @@ void runRecordingSelector(void)
 {
     RecordingSelector selector(gContext->GetMainWindow(),
                           "recording_selector", "mytharchive-", "recording selector");
-    qApp->unlock();
     selector.exec();
-    qApp->lock();
 }
 
 void runVideoSelector(void)
@@ -397,9 +389,7 @@ void runVideoSelector(void)
 
     VideoSelector selector(gContext->GetMainWindow(),
                           "video_selector", "mytharchive-", "video selector");
-    qApp->unlock();
     selector.exec();
-    qApp->lock();
 }
 
 void runFileSelector(void)
@@ -409,9 +399,7 @@ void runFileSelector(void)
 
     FileSelector selector(FSTYPE_FILELIST, "/", filter, gContext->GetMainWindow(),
                        "file_selector", "mytharchive-", "file selector");
-    qApp->unlock();
     selector.exec();
-    qApp->lock();
 }
 
 void SelectorCallback(void *data, QString &selection)

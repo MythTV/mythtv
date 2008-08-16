@@ -54,9 +54,7 @@ namespace
         int run()
         {
             gContext->addCurrentLocation(m_location_name);
-            qApp->unlock();
             m_inst->exec();
-            qApp->lock();
             gContext->removeCurrentLocation();
             return m_inst->videoExitType();
         }
@@ -83,9 +81,7 @@ namespace
         int run()
         {
             gContext->addCurrentLocation(m_location_name);
-            qApp->unlock();
             m_inst->exec();
-            qApp->lock();
             gContext->removeCurrentLocation();
             return m_inst->videoExitType();
         }
@@ -256,9 +252,7 @@ namespace
         DVDRipBox *drb = new DVDRipBox(gContext->GetMainWindow(),
                                        "dvd_rip", dvd_device, "dvd-"); 
         gContext->addCurrentLocation("ripdvd");
-        qApp->unlock();
         drb->exec();
-        qApp->lock();
         gContext->removeCurrentLocation();
 
         qApp->processEvents();
