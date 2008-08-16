@@ -2675,7 +2675,8 @@ enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
 enabled lirc && check_lib lirc/lirc_client.h lirc_deinit -llirc_client ||
     disable lirc
 
-check_header QtWebKit/QWebView
+check_header QtWebKit/QWebView -I/usr/include/qt4 -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtWebKit
+disabled QtWebKit_QWebView && echo "Warning! QtWebkit headers not found, MythBrowser will not work."
 
 if enabled firewire; then
     firewire="no"
