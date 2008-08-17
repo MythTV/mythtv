@@ -1416,7 +1416,7 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
     QDomDocument doc;
     QFile f(filename);
 
-    if (!f.open(QIODevice::ReadOnly))
+    if (!f.exists() || !f.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Couldn't read "
                                       "menu file %1").arg(menuname));
