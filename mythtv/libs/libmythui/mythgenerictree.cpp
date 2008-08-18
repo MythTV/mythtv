@@ -265,7 +265,7 @@ int MythGenericTree::getPosition()
     return 0;
 }
 
-QList<int> MythGenericTree::getRouteByID()
+QList<int> MythGenericTree::getRouteById()
 {
     QList<int> routeByID;
 

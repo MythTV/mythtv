@@ -48,7 +48,7 @@ class MPUBLIC MythGenericTree
     int getChildPosition(MythGenericTree *child);
     int getPosition(void);
 
-    QList<int> getRouteByID(void);
+    QList<int> getRouteById(void);
     QStringList getRouteByString(void);
 
     void setInt(int an_int) { m_int = an_int; }
