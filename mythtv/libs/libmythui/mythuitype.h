@@ -30,7 +30,7 @@ class MythUIType : public QObject, public XMLParseBase
 
     void AddChild(MythUIType *child);
     MythUIType *GetChild(const QString &name);
-    MythUIType *GetChildAt(const QPoint &p);
+    MythUIType *GetChildAt(const QPoint &p, bool recursive=true);
     QList<MythUIType *> *GetAllChildren(void);
 
     void DeleteChild(const QString &name);
@@ -63,9 +63,7 @@ class MythUIType : public QObject, public XMLParseBase
     virtual void SetSize(const QSize &size);
     virtual void SetArea(const MythRect &rect);
     virtual MythRect GetArea(void) const;
-    void ExpandArea(const MythRect &rect);
-    virtual void Rescale(const float hscale, const float vscale);
-    virtual void RecalculateArea(void);
+    virtual void RecalculateArea(bool recurse = true);
 
     virtual QRegion GetDirtyArea(void) const;
 

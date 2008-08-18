@@ -806,7 +806,7 @@ void MythUIButtonList::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
     {
         QPoint position = event->GetPosition();
 
-        MythUIType *type = GetChildAtPoint(position);
+        MythUIType *type = GetChildAt(position,false);
 
         if (!type)
             return;
@@ -845,35 +845,6 @@ void MythUIButtonList::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
             return;
         }
     }
-}
-
-/** \brief Get the button within the list at a specified coordinates
- *
- *  \param p QPoint coordinates
- *
- *  \return MythUIType at these coordinates
- */
-MythUIType *MythUIButtonList::GetChildAtPoint(const QPoint &p)
-{
-    if (GetArea().contains(p))
-    {
-        if (m_ChildrenList.isEmpty())
-            return NULL;
-
-        /* check all children */
-        QList<MythUIType*>::iterator it;
-        for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; it--)
-        {
-            MythUIType *child = NULL;
-
-            if ((*it)->GetArea().contains(p - GetArea().topLeft()))
-                child = *it;
-
-            if (child != NULL)
-                return child;
-        }
-    }
-    return NULL;
 }
 
 QPoint MythUIButtonList::GetButtonPosition(int column, int row) const

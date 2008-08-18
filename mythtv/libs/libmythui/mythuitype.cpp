@@ -133,16 +133,17 @@ void MythUIType::DeleteAllChildren(void)
  *         coordinates
  *
  *  \param p QPoint coordinates
+ *  \param recursive Whether to perform a recursive search
  *
  *  \return The widget at these coordinates
  */
-MythUIType *MythUIType::GetChildAt(const QPoint &p)
+MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive)
 {
     if (GetArea().contains(p))
     {
         /* assumes no selectible ui type will contain another
          * selectible ui type. */
-        if (CanTakeFocus() && IsVisible())
+        if (!recursive && CanTakeFocus() && IsVisible())
             return this;
 
         if (m_ChildrenList.isEmpty())
@@ -152,11 +153,18 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p)
         QList<MythUIType *>::iterator it;
         for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; it--)
         {
-            MythUIType *child = (*it)->GetChildAt(p - GetArea().topLeft());
-            if (child != NULL)
+            MythUIType *child = NULL;
+
+            if (recursive)
             {
-                return child;
+                if ((*it)->GetArea().contains(p - GetArea().topLeft()))
+                    child = *it;
             }
+            else
+                child = (*it)->GetChildAt(p - GetArea().topLeft());
+
+            if (child != NULL)
+                return child;
         }
     }
     return NULL;
@@ -344,10 +352,7 @@ void MythUIType::SetPosition(const MythPoint &pos)
 
     m_Area.moveTopLeft(pos);
 
-    if (m_Parent)
-        m_Area.CalculateArea(m_Parent->GetArea());
-    else
-        m_Area.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
+    RecalculateArea(false);
 
     SetRedraw();
 }
@@ -365,13 +370,7 @@ void MythUIType::SetSize(const QSize &size)
     m_DirtyRegion = QRegion(m_Area.toQRect());
 
     m_Area.setSize(size);
-    if (m_Parent)
-        m_Area.CalculateArea(m_Parent->GetArea());
-    else
-        m_Area.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
-
-    if (m_Parent)
-        m_Parent->ExpandArea(m_Area.toQRect());
+    RecalculateArea();
 
     SetRedraw();
 }
@@ -386,21 +385,7 @@ void MythUIType::SetArea(const MythRect &rect)
     m_Area = rect;
     RecalculateArea();
 
-    if (m_Parent)
-        m_Parent->ExpandArea(rect);
-
     SetRedraw();
-}
-
-void MythUIType::ExpandArea(const MythRect &rect)
-{
-    QSize childSize = rect.size();
-    QSize size = m_Area.size();
-
-    if (childSize == size)
-        return;
-
-    SetSize(size.expandedTo(childSize));
 }
 
 MythRect MythUIType::GetArea(void) const
@@ -503,6 +488,8 @@ void MythUIType::AdjustAlpha(int mode, int alphachange, int minalpha,
 
 void MythUIType::SetAlpha(int newalpha)
 {
+    if (m_Alpha == newalpha)
+        return;
     m_Alpha = newalpha;
     SetRedraw();
 }
@@ -685,33 +672,20 @@ bool MythUIType::AddFont(const QString &text, MythFontProperties *fontProp)
     return m_Fonts->AddFont(text, fontProp);
 }
 
-void MythUIType::Rescale(const float hscale, const float vscale)
-{
-    int width = m_Area.width() * vscale;
-    int height = m_Area.height() * hscale;
-    int x = m_Area.x() * vscale;
-    int y = m_Area.y() * hscale;
-
-    SetArea(MythRect(x,y,width,height));
-
-    QList<MythUIType *>::iterator it;
-    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
-    {
-        (*it)->Rescale(hscale, vscale);
-    }
-}
-
-void MythUIType::RecalculateArea(void)
+void MythUIType::RecalculateArea(bool recurse)
 {
     if (m_Parent)
         m_Area.CalculateArea(m_Parent->GetArea());
     else
         m_Area.CalculateArea(GetMythMainWindow()->GetUIScreenRect());
 
-    QList<MythUIType *>::iterator it;
-    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+    if (recurse)
     {
-        (*it)->RecalculateArea();
+        QList<MythUIType *>::iterator it;
+        for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+        {
+            (*it)->RecalculateArea(recurse);
+        }
     }
 }
 
