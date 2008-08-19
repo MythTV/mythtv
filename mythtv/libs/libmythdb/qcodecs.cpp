@@ -291,10 +291,8 @@ void QCodecs::quotedPrintableDecode(const QByteArray& in, QByteArray& out)
       return;
 
   char *cursor;
-  const char *data;
   const unsigned int length = in.size();
 
-  data = in.data();
   out.resize (length);
   cursor = out.data();
 
