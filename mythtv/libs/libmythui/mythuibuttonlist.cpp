@@ -1172,9 +1172,9 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
         }
         else
         {
-//             if (active_on)
-//                 button->DisplayState("selectedinactive");
-//             else
+             if (active_on)
+                 button->DisplayState("inactive");
+             else
                 button->DisplayState("active");
         }
     }
