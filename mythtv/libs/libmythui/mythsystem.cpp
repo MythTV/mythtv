@@ -95,12 +95,24 @@ uint myth_system(const QString &command, int flags)
         for (int i = sysconf(_SC_OPEN_MAX) - 1; i > 2; i--)
             close(i);
 
-        /* Attach stdin to /dev/null */
-        close(0);
+        /* Try to attach stdin to /dev/null */
         int fd = open("/dev/null", O_RDONLY);
-        dup2(fd, 0);
-        if (fd != 0)
+        if (fd > 0)
+        {
+            // Note: dup2() will close old stdin descriptor.
+            if (dup2(fd, 0) < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "Can not redirect /dev/null to standard input,"
+                        "\n\t\t\tfailed to duplicate file descriptor." + ENO);
+            }
             close(fd);
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Can not redirect /dev/null "
+                    "to standard input, failed to open." + ENO);
+        }
 
         /* Run command */
         execl("/bin/sh", "sh", "-c", command.toUtf8().constData(), NULL);
