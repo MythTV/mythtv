@@ -685,6 +685,13 @@ void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
     else if (!mapfile.isEmpty())
     {
         FILE *mapfh = fopen(mapfile, "w");
+        if (!mapfh)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("Could not open map file '%1'")
+                    .arg(mapfile) + ENO);
+            return;
+        }
         QMap<long long, long long>::Iterator i;
         fprintf (mapfh, "Type: %d\n", MARK_GOP_BYFRAME);
         for (i = posMap.begin(); i != posMap.end(); ++i)
