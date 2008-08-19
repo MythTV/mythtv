@@ -1,3 +1,4 @@
+// -*- Mode: c++ -*-
 #ifndef GAMEHANDLER_H_
 #define GAMEHANDLER_H_
 
@@ -23,45 +24,40 @@ enum GameFound
 
 class GameScan
 {
-public:
-    GameScan(QString lromname = "", QString lromfullpath = "", 
-             int lfoundloc = 0, QString lgamename = "", 
-             QString lrompath = "" )
-            {
-                romname = lromname;
-                romfullpath = lromfullpath;
-                foundloc = lfoundloc; 
-                gamename = lgamename;
-                rompath = lrompath;
-            }
+  public:
+    GameScan(QString lromname = "", QString lromfullpath = "",
+             int lfoundloc    = 0,  QString lgamename = "",
+             QString lrompath = "") :
+        romname(lromname), romfullpath(lromfullpath), gamename(lgamename),
+        rompath(lrompath), foundloc(lfoundloc) {}
 
+    QString Rom(void)         const { return romname;       }
+    QString RomFullPath(void) const { return romfullpath;   }
+    int     FoundLoc(void)    const { return foundloc;      }
+    void    setLoc(int lfoundloc)   { foundloc = lfoundloc; }
+    QString GameName(void)    const { return gamename;      }
+    QString RomPath(void)     const { return rompath;       }
 
-    QString Rom() const { return romname; }
-    QString RomFullPath() const { return romfullpath; }
-    int FoundLoc() const { return foundloc; }
-    void setLoc( int lfoundloc) { foundloc = lfoundloc; } 
-    QString GameName() const { return gamename; }
-    QString RomPath() const { return rompath; } 
-
-private:
+  private:
     QString romname;
     QString romfullpath;
-    int foundloc;
     QString gamename;
     QString rompath;
+    int     foundloc;
 };
 
-typedef QMap <QString, GameScan> GameScanMap;
+typedef QMap<QString, GameScan> GameScanMap;
 
 class GameHandler
 {
   public:
-    GameHandler()
-    {
-        m_RemoveAll = false;
-        m_KeepAll = false;
-        rebuild = false;
-    }
+    GameHandler() :
+        rebuild(false),             spandisks(0),
+        systemname(QString::null),  rompath(QString::null),
+        commandline(QString::null), workingpath(QString::null),
+        screenshots(QString::null), gameplayerid(0),
+        gametype(QString::null),
+        m_RemoveAll(false),         m_KeepAll(false) {}
 
     static void updateSettings(GameHandler*);
     static GameHandler* getHandler(uint i);
@@ -126,9 +122,7 @@ class GameHandler
     bool m_KeepAll;
 
   private:
-    static GameHandler* newInstance;
-
-
+    static GameHandler *newInstance;
 };
 
 #endif

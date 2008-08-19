@@ -19,7 +19,7 @@
 
 using namespace std;
 
-static Q3PtrList<GameHandler> *handlers = 0;
+static Q3PtrList<GameHandler> *handlers = NULL;
 
 bool existsHandler(const QString name)
 {
@@ -877,12 +877,12 @@ void GameHandler::Launchgame(RomInfo *romdata, QString systemname)
     (void)d.cd(savedir);      
 }
 
-RomInfo* GameHandler::CreateRomInfo(RomInfo* parent)
+RomInfo *GameHandler::CreateRomInfo(RomInfo *parent)
 {
-    GameHandler *handler;
-    if((handler = GetHandler(parent)))
-        return new RomInfo(*parent);
-    return NULL;
+    if (!parent || !GetHandler(parent))
+        return NULL;
+
+    return new RomInfo(*parent);
 }
 
 void GameHandler::registerHandler(GameHandler *handler)

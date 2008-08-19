@@ -167,10 +167,7 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
                    QString themeFilename, const char *name)
         : MythThemedDialog(parent, windowName, themeFilename, name)
 {
-    QString levels;
-    GameTreeRoot *root;
-    GenericTree *node;
-    int pos = 0;
+    GameTreeRoot *root = NULL;
 
     m_gameTree = new GenericTree("game root", 0, false);
 
@@ -207,48 +204,46 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     //  approach with multiple roots if/when someone has the time to create
     //  the relevant dialog screens
 
-    levels = gContext->GetSetting("GameFavTreeLevels");
+    QString levels = gContext->GetSetting("GameFavTreeLevels");
     root = new GameTreeRoot(levels, systemFilter + " and favorite=1");
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root));
-    node = m_gameTree->addNode(tr("Favourites"), m_gameTreeItems.size(), false);
-    m_favouriteNode = node;
+    m_favouriteNode =
+        m_gameTree->addNode(tr("Favourites"), m_gameTreeItems.size(), false);
 
     levels = gContext->GetSetting("GameAllTreeLevels");
 
-    if (m_showHashed) {
-        pos = levels.find("gamename",0);
-
-        if (pos != -1) 
+    if (m_showHashed)
+    {
+        int pos = levels.find("gamename",0);
+        if (pos >= 0) 
             levels.insert(pos, " hash ");
-
     }
 
     root = new GameTreeRoot(levels, systemFilter);
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root, m_showHashed));
-    node = m_gameTree->addNode(tr("All Games"), m_gameTreeItems.size(), false);
+    m_gameTree->addNode(tr("All Games"), m_gameTreeItems.size(), false);
 
     root = new GameTreeRoot("genre gamename", systemFilter);
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root));
-    node = m_gameTree->addNode(tr("-   By Genre"), m_gameTreeItems.size(), false);
+    m_gameTree->addNode(tr("-   By Genre"), m_gameTreeItems.size(), false);
 
     root = new GameTreeRoot("year gamename", systemFilter);
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root));
-    node = m_gameTree->addNode(tr("-   By Year"), m_gameTreeItems.size(), false);
+    m_gameTree->addNode(tr("-   By Year"), m_gameTreeItems.size(), false);
 
     root = new GameTreeRoot("gamename", systemFilter);
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root));
-    node = m_gameTree->addNode(tr("-   By Name"), m_gameTreeItems.size(), false);
+    m_gameTree->addNode(tr("-   By Name"), m_gameTreeItems.size(), false);
 
     root = new GameTreeRoot("publisher gamename", systemFilter);
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root));
-    node = m_gameTree->addNode(tr("-   By Publisher"), m_gameTreeItems.size(), false);
-
+    m_gameTree->addNode(tr("-   By Publisher"), m_gameTreeItems.size(), false);
 
     m_gameTreeUI->assignTreeData(m_gameTree);
     m_gameTreeUI->enter();
@@ -369,37 +364,40 @@ QString getElement(QStringList list, int pos)
 
 void GameTree::handleTreeListSelection(int nodeInt, IntVector *)
 {
-    if (nodeInt > 0)
+    int index = nodeInt - 1;
+    if ((index < 0) || (index >= m_gameTreeItems.size()))
+        return;
+
+    GameTreeItem *item = m_gameTreeItems[index];
+    if (!item || !item->isLeaf())
+        return;
+
+    if (item->getRomInfo()->RomCount() == 1)
     {
-        GameTreeItem *item = nodeInt ? m_gameTreeItems[nodeInt - 1] : 0;
-
-        if (item->isLeaf())
-        {
-            if (item->getRomInfo()->RomCount() == 1)
-                GameHandler::Launchgame(item->getRomInfo(),NULL);
-            else if (item->getRomInfo()->RomCount() > 1)
-            {
-                QString all_systems = item->getRomInfo()->AllSystems();
-                QStringList players = QStringList::split(",", all_systems);
-                players += QObject::tr("Cancel");
-
-                DialogCode val = MythPopupBox::ShowButtonPopup(
-                    gContext->GetMainWindow(),
-                    "", tr("Players Available. \n\n Please pick one."),
-                    players, kDialogCodeButton0);
-
-                int idx = MythDialog::CalcItemIndex(val);
-                if ((0 <= idx) && (idx < ((int)players.size() - 1)))
-                {
-                    QString systemname = getElement(players, idx);
-                    if (!systemname.isEmpty())
-                        GameHandler::Launchgame(item->getRomInfo(),systemname);
-                }
-            } 
-            raise();
-            setActiveWindow();
-        }
+        GameHandler::Launchgame(item->getRomInfo(),NULL);
     }
+    else if (item->getRomInfo()->RomCount() > 1)
+    {
+        QString all_systems = item->getRomInfo()->AllSystems();
+        QStringList players = QStringList::split(",", all_systems);
+        players += QObject::tr("Cancel");
+
+        DialogCode val = MythPopupBox::ShowButtonPopup(
+            gContext->GetMainWindow(),
+            "", tr("Players Available. \n\n Please pick one."),
+            players, kDialogCodeButton0);
+
+        int idx = MythDialog::CalcItemIndex(val);
+        if ((0 <= idx) && (idx < ((int)players.size() - 1)))
+        {
+            QString systemname = getElement(players, idx);
+            if (!systemname.isEmpty())
+                GameHandler::Launchgame(item->getRomInfo(),systemname);
+        }
+    } 
+
+    raise();
+    setActiveWindow();
 }
 
 void GameTree::showInfo(void)
@@ -470,7 +468,7 @@ void GameTree::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Game", e, actions);
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (unsigned int i = 0; i < (unsigned) actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
