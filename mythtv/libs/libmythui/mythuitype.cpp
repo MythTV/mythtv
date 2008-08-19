@@ -372,6 +372,9 @@ void MythUIType::SetSize(const QSize &size)
     m_Area.setSize(size);
     RecalculateArea();
 
+    if (m_Parent)
+        m_Parent->ExpandArea(m_Area.toQRect());
+
     SetRedraw();
 }
 
@@ -385,6 +388,21 @@ void MythUIType::SetArea(const MythRect &rect)
     m_Area = rect;
     RecalculateArea();
 
+    if (m_Parent)
+        m_Parent->ExpandArea(m_Area.toQRect());
+
+    SetRedraw();
+}
+
+void MythUIType::ExpandArea(const MythRect &rect)
+{
+    QSize childSize = rect.size();
+    QSize size = m_Area.size();
+
+    if (childSize == size)
+        return;
+
+    SetSize(size.expandedTo(childSize));
     SetRedraw();
 }
 

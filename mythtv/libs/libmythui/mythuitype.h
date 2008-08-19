@@ -64,6 +64,7 @@ class MythUIType : public QObject, public XMLParseBase
     virtual void SetArea(const MythRect &rect);
     virtual MythRect GetArea(void) const;
     virtual void RecalculateArea(bool recurse = true);
+    void ExpandArea(const MythRect &rect);
 
     virtual QRegion GetDirtyArea(void) const;
 
