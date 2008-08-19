@@ -2049,6 +2049,9 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
 void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
                                          bool forceMetadataDelete, bool expirer)
 {
+    if (!pginfo)
+        return;
+
     int resultCode = -1;
     MythSocket *pbssock = NULL;
     if (pbs)
