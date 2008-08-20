@@ -1,6 +1,6 @@
 /* Text.cpp
 
-   Copyright (C)  David C. J. Matthews 2004  dm at prolingua.co.uk
+   Copyright (C)  David C. J. Matthews 2004, 2008  dm at prolingua.co.uk
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -465,6 +465,11 @@ void MHText::Redraw()
                     pNewLine->m_Items.Append(pNewItem);
                     pNewItem->m_Unicode = pItem->m_Unicode.mid(nNewStart, nNewWidth);
                     pNewItem->m_nUnicode = nNewWidth;
+                    // Move any remaining items, e.g. in a different colour, from this line onto the new line.
+                    while (pLine->m_Items.Size() > j+1) {
+                        pNewLine->m_Items.Append(pLine->m_Items.GetAt(j+1));
+                        pLine->m_Items.RemoveAt(j+1);
+                    }
                 }
                 // Remove any spaces at the end of the old section.  If we don't do that and
                 // we are centering or right aligning the text we'll get it wrong.
@@ -536,7 +541,7 @@ QRegion MHText::GetOpaqueArea()
 }
 
 
-MHHyperText::MHHyperText()
+MHHyperText::MHHyperText(): MHInteractible(this)
 {
 
 }

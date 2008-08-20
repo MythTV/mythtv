@@ -176,6 +176,22 @@ public:
     virtual void SetVideoDecodeOffset(int /*newXOffset*/, int /*newYOffset*/, MHEngine *) { InvalidAction("SetVideoDecodeOffset"); }
     virtual void GetVideoDecodeOffset(MHRoot * /*pXOffset*/, MHRoot */*pYOffset*/, MHEngine *) { InvalidAction("GetVideoDecodeOffset"); }
 
+    // Actions on Interactibles.
+    virtual void SetInteractionStatus(bool /*newStatus*/, MHEngine *) { InvalidAction("SetInteractionStatus"); }
+    virtual bool GetInteractionStatus(void) { InvalidAction("GetInteractionStatus"); return false; }
+    virtual void SetHighlightStatus(bool /*newStatus*/, MHEngine *engine) { InvalidAction("SetHighlightStatus"); }
+    virtual bool GetHighlightStatus(void) { InvalidAction("GetHighlightStatus"); return false; }
+
+    // Actions on Sliders.
+    virtual void Step(int /*nbSteps*/, MHEngine */*engine*/) { InvalidAction("Step"); }
+    virtual void SetSliderValue(int /*nbSteps*/, MHEngine */*engine*/) { InvalidAction("SetSliderValue"); }
+    virtual int GetSliderValue(void) { InvalidAction("GetSliderValue"); return 0; }
+    virtual void SetPortion(int /*newPortion*/, MHEngine */*engine*/) { InvalidAction("SetPortion"); }
+    virtual int GetPortion(void) { InvalidAction("GetPortion"); return 0; }
+    // Additional action defined in UK MHEG.
+    virtual void SetSliderParameters(int /*newMin*/, int /*newMax*/, int /*newStep*/, MHEngine */*engine*/)
+         { InvalidAction("SetSliderParameters"); }
+
 protected:
 
     void InvalidAction(const char *actionName);

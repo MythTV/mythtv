@@ -1,6 +1,6 @@
 /* Engine.cpp
 
-   Copyright (C)  David C. J. Matthews 2004  dm at prolingua.co.uk
+   Copyright (C)  David C. J. Matthews 2004, 2008  dm at prolingua.co.uk
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -31,6 +31,7 @@
 #include "ASN1Codes.h"
 #include "Logging.h"
 #include "freemheg.h"
+#include "Visible.h"  // For MHInteractible
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,6 +47,7 @@ MHEngine::MHEngine(MHContext *context): m_Context(context)
 {
     m_fInTransition = false;
     m_fBooting = true;
+    m_Interacting = 0;
 }
 
 MHEngine::~MHEngine()
@@ -323,6 +325,7 @@ void MHEngine::TransitionToScene(const MHObjectRef &target)
         pApp->m_pCurrentScene = NULL;
     }
 
+    m_Interacting = 0;
 
     // Switch to the new scene.
     CurrentApp()->m_pCurrentScene = (MHScene*) pProgram;
@@ -620,7 +623,29 @@ void MHEngine::GenerateUserAction(int nCode)
 {
     MHScene *pScene = CurrentScene();
     if (! pScene) return;
-    EventTriggered(pScene, EventUserInput, nCode);
+    // Various keys generate engine events as well as user events.
+    // These are generated before the user events and even if there
+    // is an interactible.
+    switch (nCode)
+    {
+    case 104:
+    case 105: // Text key
+        EventTriggered(pScene, EventEngineEvent, 4);
+        break;
+    case 16: // Text Exit/Cancel key
+    case 100: // Red
+    case 101: // Green
+    case 102: // Yellow
+    case 103: // Blue
+        EventTriggered(pScene, EventEngineEvent, nCode);
+        break;
+    }
+
+    // If we are interacting with an interactible send the key
+    // there otherwise generate a user event.
+    if (m_Interacting)
+        m_Interacting->KeyEvent(this, nCode);
+    else EventTriggered(pScene, EventUserInput, nCode);
 }
 
 // Called by an ingredient wanting external content.

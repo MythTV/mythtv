@@ -355,9 +355,11 @@ void MHRectangle::Display(MHEngine *engine)
 }
 
 
-MHInteractible::MHInteractible()
+MHInteractible::MHInteractible(MHVisible *parent): m_parent(parent)
 {
-
+    m_fEngineResp = true;
+    m_fHighlightStatus = false;
+    m_fInteractionStatus = false;
 }
 
 MHInteractible::~MHInteractible()
@@ -365,41 +367,389 @@ MHInteractible::~MHInteractible()
 
 }
 
-void MHInteractible::Initialise(MHParseNode */*p*/, MHEngine */*engine*/)
+void MHInteractible::Initialise(MHParseNode *p, MHEngine *engine)
 {
+    // Engine Resp - optional
+    MHParseNode *pEngineResp = p->GetNamedArg(C_ENGINE_RESP);
+    if (pEngineResp) m_fEngineResp = pEngineResp->GetArgN(0)->GetBoolValue();
+    // Highlight colour.
+    MHParseNode *phlCol = p->GetNamedArg(C_HIGHLIGHT_REF_COLOUR);
+    if (phlCol) m_highlightRefColour.Initialise(phlCol->GetArgN(0), engine);
+    else engine->GetDefaultHighlightRefColour(m_highlightRefColour);
+    m_fHighlightStatus = false;
+    m_fInteractionStatus = false;
 }
 
-void MHInteractible::PrintMe(FILE */*fd*/, int /*nTabs*/) const
+void MHInteractible::PrintMe(FILE *fd, int nTabs) const
 {
+    if (! m_fEngineResp)  { PrintTabs(fd, nTabs); fprintf(fd, ":EngineResp false\n"); }
+
+    if (m_highlightRefColour.IsSet()) {
+        PrintTabs(fd, nTabs);
+        fprintf(fd, ":HighlightRefColour ");
+        m_highlightRefColour.PrintMe(fd, nTabs+1);
+        fprintf(fd, "\n");
+    }
 }
 
-MHSlider::MHSlider()
+void MHInteractible::Interaction(MHEngine *engine)
 {
+    m_fInteractionStatus = true;
+    engine->SetInteraction(this);
+    // The MHEG standard says: "generate visual feedback" here
+    // but it appears that any visual feedback is controlled only
+    // by the highlight status combined with engine-resp.
+}
 
+void MHInteractible::InteractSetInteractionStatus(bool newStatus, MHEngine *engine)
+{
+    if (newStatus) { // Turning interaction on.
+        if (engine->GetInteraction() == 0) // No current interactible
+            Interaction(engine); // virtual function
+    }
+    else { // Turning interaction off.
+        if (m_fInteractionStatus) {
+            m_fInteractionStatus = false;
+            engine->SetInteraction(0);
+            InteractionCompleted(engine); // Interaction is interrupted.
+            engine->EventTriggered(m_parent, EventInteractionCompleted);
+        }
+    }
+}
+
+void MHInteractible::InteractSetHighlightStatus(bool newStatus, MHEngine *engine)
+{
+    if (newStatus == m_fHighlightStatus) return;
+    m_fHighlightStatus = newStatus;
+    // If active redraw to show change of status.
+    if (m_parent->GetRunningStatus() && m_fEngineResp)
+        engine->Redraw(m_parent->GetVisibleArea());
+    // Generate the event for the change of highlight status.
+    engine->EventTriggered(m_parent, m_fHighlightStatus ? EventHighlightOn: EventHighlightOff);
+}
+
+MHSlider::MHSlider(): MHInteractible(this)
+{
+    m_orientation = SliderLeft;
+    orig_max_value = -1;
+    orig_min_value = initial_value = orig_step_size = 1;
+    initial_portion = 0;
+    m_style = SliderNormal;
 }
 
 MHSlider::~MHSlider()
 {
-
 }
 
 void MHSlider::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHVisible::Initialise(p, engine);
     MHInteractible::Initialise(p, engine);
-    //
+    // 
+    MHParseNode *pOrientation = p->GetNamedArg(C_ORIENTATION);
+    if (pOrientation)
+        m_orientation = (enum SliderOrientation)pOrientation->GetArgN(0)->GetEnumValue();
+    // This is not optional.
+
+    MHParseNode *pMin = p->GetNamedArg(C_MIN_VALUE);
+    if (pMin) orig_min_value = pMin->GetArgN(0)->GetIntValue();
+    else orig_min_value = 1;
+
+    MHParseNode *pMax = p->GetNamedArg(C_MAX_VALUE);
+    if (pMax) orig_max_value = pMax->GetArgN(0)->GetIntValue();
+    else orig_max_value = orig_min_value-1; // Unset
+
+    MHParseNode *pInit = p->GetNamedArg(C_INITIAL_VALUE);
+    if (pInit) initial_value = pInit->GetArgN(0)->GetIntValue();
+    else initial_value = orig_min_value; // Default is min_value
+
+    MHParseNode *pPortion = p->GetNamedArg(C_INITIAL_PORTION);
+    if (pPortion) initial_portion = pPortion->GetArgN(0)->GetIntValue();
+    else initial_portion = orig_min_value-1; // Unset
+
+    MHParseNode *pStep = p->GetNamedArg(C_STEP_SIZE);
+    if (pStep) orig_step_size = pStep->GetArgN(0)->GetIntValue();
+    else orig_step_size = 1; // Unset
+
+    MHParseNode *pStyle = p->GetNamedArg(C_SLIDER_STYLE);
+    if (pStyle) m_style = (enum SliderStyle)pStyle->GetArgN(0)->GetEnumValue();
+    else m_style = SliderNormal;
+
+    MHParseNode *pslCol = p->GetNamedArg(C_SLIDER_REF_COLOUR);
+    if (pslCol) m_sliderRefColour.Initialise(pslCol->GetArgN(0), engine);
+    else engine->GetDefaultSliderRefColour(m_sliderRefColour);
+}
+
+static const char *rchOrientation[] =
+{
+    "left", // 1
+    "right",
+    "up",
+    "down" // 4
+};
+
+// Look up the Orientation. Returns zero if it doesn't match.  Used in the text parser only.
+int MHSlider::GetOrientation(const char *str)
+{
+    for (int i = 0; i < (int)(sizeof(rchOrientation)/sizeof(rchOrientation[0])); i++) {
+        if (strcasecmp(str, rchOrientation[i]) == 0) return (i+1); // Numbered from 1
+    }
+    return 0;
+}
+
+static const char *rchStyle[] =
+{
+    "normal", // 1
+    "thermometer",
+    "proportional" // 3
+};
+
+int MHSlider::GetStyle(const char *str)
+{
+    for (int i = 0; i < (int)(sizeof(rchStyle)/sizeof(rchStyle[0])); i++) {
+        if (strcasecmp(str, rchStyle[i]) == 0) return (i+1); // Numbered from 1
+    }
+    return 0;
 }
 
 void MHSlider::PrintMe(FILE *fd, int nTabs) const
 {
     PrintTabs(fd, nTabs); fprintf(fd, "{:Slider ");
-    MHVisible::PrintMe(fd, nTabs);
+    MHVisible::PrintMe(fd, nTabs+1);
     MHInteractible::PrintMe(fd, nTabs+1);
-    fprintf(fd, "****TODO\n");
+
+    PrintTabs(fd, nTabs); fprintf(fd, ":Orientation %s\n", rchOrientation[m_orientation-1]);
+
+    if (initial_value >= orig_min_value) {
+        PrintTabs(fd, nTabs+1); fprintf(fd, ":InitialValue %d\n", initial_value);
+    }
+
+    if (orig_min_value != 1) {
+        PrintTabs(fd, nTabs+1); fprintf(fd, ":MinValue %d\n", orig_min_value);
+    }
+
+    if (orig_max_value > orig_min_value) {
+        PrintTabs(fd, nTabs+1); fprintf(fd, ":MaxValue %d\n", orig_max_value);
+    }
+
+    if (initial_portion >= orig_min_value) {
+        PrintTabs(fd, nTabs+1); fprintf(fd, ":InitialPortion %d\n", initial_portion);
+    }
+
+    if (orig_step_size != 1) {
+        PrintTabs(fd, nTabs+1); fprintf(fd, ":StepSize %d\n", orig_step_size);
+    }
+
+    if (m_style != SliderNormal)
+    {
+        PrintTabs(fd, nTabs+1);
+        fprintf(fd, ":SliderStyle %s\n", rchStyle[m_style-1]);
+    }
+
+    if (m_sliderRefColour.IsSet()) {
+        PrintTabs(fd, nTabs+1);
+        fprintf(fd, ":SliderRefColour ");
+        m_sliderRefColour.PrintMe(fd, nTabs+2);
+        fprintf(fd, "\n");
+    }
+
     PrintTabs(fd, nTabs); fprintf(fd, "}\n");
 }
 
-MHEntryField::MHEntryField()
+// The MHEG standard doesn't define where the internal values are
+// initialised.  Assume it's during preparation.
+void MHSlider::Preparation(MHEngine *engine)
+{
+    MHVisible::Preparation(engine);
+    max_value = orig_max_value;
+    min_value = orig_min_value;
+    step_size = orig_step_size;
+    slider_value = initial_value;
+    portion = initial_portion;
+}
+
+void MHSlider::Display(MHEngine *engine)
+{
+    MHContext *d = engine->GetContext();
+    MHRgba colour;
+    if (m_fHighlightStatus && m_fEngineResp)
+        colour = GetColour(m_highlightRefColour);
+    else colour = GetColour(m_sliderRefColour);
+
+    int major; // Direction of change.
+    if (m_orientation == SliderLeft || m_orientation == SliderRight)
+        major = m_nBoxWidth;
+    else major = m_nBoxHeight;
+
+    if (max_value <= min_value) return; // Avoid divide by zero if error.
+
+    if (m_style == SliderNormal)
+    {
+        // This is drawn as a 9 pixel wide "thumb" at the position.
+        major -= 9; // Width of "thumb"
+        int posn = major * (slider_value-min_value) / (max_value-min_value);
+        switch (m_orientation)
+        {
+        case SliderLeft:
+            d->DrawRect(m_nPosX + posn, m_nPosY, 9, m_nBoxHeight, colour);
+            break;
+        case SliderRight:
+            d->DrawRect(m_nPosX + m_nBoxWidth - posn - 9, m_nPosY, 9, m_nBoxHeight, colour);
+            break;
+        case SliderUp:
+            d->DrawRect(m_nPosX, m_nPosY + m_nBoxHeight - posn - 9, m_nBoxWidth, 9, colour);
+            break;
+        case SliderDown:
+            d->DrawRect(m_nPosX, m_nPosY + posn, m_nBoxWidth, 9, colour);
+            break;
+        }
+    }
+    else {
+        // Thermometer and proportional sliders are drawn as bars.  Thermometers
+        // run from the start to the position, proportional sliders from the
+        // position for the "portion".
+        int start = 0;
+        int end = major * (slider_value-min_value) / (max_value-min_value);
+        if (m_style == SliderProp)
+        {
+            start = end;
+            end = major * (slider_value+portion -min_value) / (max_value-min_value);
+        }
+        switch (m_orientation)
+        {
+        case SliderLeft:
+            d->DrawRect(m_nPosX + start, m_nPosY, end-start, m_nBoxHeight, colour);
+            break;
+        case SliderRight:
+            d->DrawRect(m_nPosX + m_nBoxWidth - end, m_nPosY, end-start, m_nBoxHeight, colour);
+            break;
+        case SliderUp:
+            d->DrawRect(m_nPosX, m_nPosY + m_nBoxHeight - end, m_nBoxWidth, end-start, colour);
+            break;
+        case SliderDown:
+            d->DrawRect(m_nPosX, m_nPosY + start, m_nBoxWidth, end-start, colour);
+            break;
+        }
+
+    }
+}
+
+void MHSlider::Interaction(MHEngine *engine)
+{
+    MHInteractible::Interaction(engine);
+    // All the interaction is handled by KeyEvent.
+}
+
+// Called when the interaction has been terminated and we need
+// to restore the state to non-interacting.
+void MHSlider::InteractionCompleted(MHEngine *engine)
+{
+    MHInteractible::InteractionCompleted(engine);
+    // Redraw with the interaction highlighting turned off
+    engine->Redraw(GetVisibleArea());
+}
+
+// Called when a key is pressed.  The only keys that have an effect are
+// the Select and Cancel keys which both terminate the action and the
+// arrow keys.  The effect of the arrow keys depends on the orientation of
+// the slider.
+void MHSlider::KeyEvent(MHEngine *engine, int nCode)
+{
+    switch (nCode)
+    {
+    case 15: // Select key
+    case 16: // Cancel key
+        m_fInteractionStatus = false;
+        engine->SetInteraction(0);
+        InteractionCompleted(engine); // Interaction is interrupted.
+        engine->EventTriggered(this, EventInteractionCompleted);
+        break;
+
+    case 1: // Up
+        if (m_orientation == SliderUp)
+            Increment(engine);
+        else if (m_orientation == SliderDown)
+            Decrement(engine);
+        break;
+
+    case 2: // Down
+        if (m_orientation == SliderUp)
+            Decrement(engine);
+        else if (m_orientation == SliderDown)
+            Increment(engine);
+        break;
+
+    case 3: // Left
+        if (m_orientation == SliderLeft)
+            Increment(engine);
+        else if (m_orientation == SliderRight)
+            Decrement(engine);
+        break;
+
+    case 4: // Right
+        if (m_orientation == SliderLeft)
+            Decrement(engine);
+        else if (m_orientation == SliderRight)
+            Increment(engine);
+        break;
+
+    }
+}
+
+void MHSlider::Increment(MHEngine *engine)
+{
+    if (slider_value+step_size <= max_value)
+    {
+        slider_value += step_size;
+        engine->Redraw(GetVisibleArea());
+        engine->EventTriggered(this, EventSliderValueChanged);
+    }
+}
+
+void MHSlider::Decrement(MHEngine *engine)
+{
+    if (slider_value-step_size >= min_value)
+    {
+        slider_value -= step_size;
+        engine->Redraw(GetVisibleArea());
+        engine->EventTriggered(this, EventSliderValueChanged);
+    }
+}
+
+void MHSlider::Step(int nbSteps, MHEngine *engine)
+{
+    step_size = nbSteps;
+    if (m_fRunning) engine->Redraw(GetVisibleArea());
+    engine->EventTriggered(this, EventSliderValueChanged);
+}
+
+void MHSlider::SetSliderValue(int newValue, MHEngine *engine)
+{
+    slider_value = newValue;
+    if (m_fRunning) engine->Redraw(GetVisibleArea());
+    engine->EventTriggered(this, EventSliderValueChanged);
+}
+
+void MHSlider::SetPortion(int newPortion, MHEngine *engine)
+{
+    portion = newPortion;
+    if (m_fRunning) engine->Redraw(GetVisibleArea());
+    engine->EventTriggered(this, EventSliderValueChanged);
+}
+
+// Additional action defined in UK MHEG.
+void MHSlider::SetSliderParameters(int newMin, int newMax, int newStep, MHEngine *engine)
+{
+    min_value = newMin;
+    max_value = newMax;
+    step_size = newStep;
+    slider_value = newMin;
+    if (m_fRunning) engine->Redraw(GetVisibleArea());
+    engine->EventTriggered(this, EventSliderValueChanged);
+}
+
+
+MHEntryField::MHEntryField(): MHInteractible(this)
 {
 
 }

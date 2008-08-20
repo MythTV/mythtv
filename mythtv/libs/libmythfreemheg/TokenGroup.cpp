@@ -54,7 +54,8 @@ void MHTokenGroupItem::PrintMe(FILE *fd, int nTabs) const
         for (int i = 0; i < m_ActionSlots.Size(); i++) {
             PrintTabs(fd, nTabs+2); fprintf(fd, "(\n");
             MHActionSequence *pActions = m_ActionSlots.GetAt(i);
-            if (pActions->Size() == 0) fprintf(fd, "NULL\n");
+            if (pActions->Size() == 0) 
+                { PrintTabs(fd, nTabs+2); fprintf(fd, "NULL\n"); }
             else pActions->PrintMe(fd, nTabs+2);
             PrintTabs(fd, nTabs+2); fprintf(fd, ")\n");
         }

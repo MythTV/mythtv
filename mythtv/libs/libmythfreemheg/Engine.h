@@ -1,6 +1,6 @@
 /* Engine.h
 
-   Copyright (C)  David C. J. Matthews 2004  dm at prolingua.co.uk
+   Copyright (C)  David C. J. Matthews 2004, 2008  dm at prolingua.co.uk
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -63,6 +63,8 @@ public:
     QString m_FileName;
     MHIngredient *m_pRequester; 
 };
+
+class MHInteractible;
 
 class MHEngine: public MHEG {
 public:
@@ -149,6 +151,10 @@ public:
 
     static const char *MHEGEngineProviderIdString;
 
+    // Interaction: Set if an Interactible has the focus and is receiving key presses.
+    MHInteractible *GetInteraction(void) { return m_Interacting; }
+    void SetInteraction(MHInteractible *p) { m_Interacting = p; }
+
 protected:
     void CheckLinks(const MHObjectRef &sourceRef, enum EventType ev, const MHUnion &un);
     MHGroup *ParseProgram(QByteArray &text);
@@ -193,6 +199,8 @@ protected:
 
     MHContext       *m_Context; // Pointer to the context providing drawing and other operations
     bool            m_fBooting;
+
+    MHInteractible  *m_Interacting; // Set to current interactive object if any.
 };
 
 #endif

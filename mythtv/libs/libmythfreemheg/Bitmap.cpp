@@ -1,6 +1,6 @@
 /* Bitmap.cpp
 
-   Copyright (C)  David C. J. Matthews 2004  dm at prolingua.co.uk
+   Copyright (C)  David C. J. Matthews 2004, 2008  dm at prolingua.co.uk
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -113,7 +113,10 @@ void MHBitmap::ContentArrived(const unsigned char *data, int length, MHEngine *e
     if (nCHook == 4) { // PNG.
         m_pContent->CreateFromPNG(data, length);
     }
-    else if (nCHook == 2) { // MPEG I-frame.
+    // CHook 5 seems to be used by the BBC on Freesat for an MPEG I-frame for the
+    // background but enabling it here results in it overlaying the video.
+    // Presumably it is not simply the same as CHook 2.
+    else if (nCHook == 2 /* ||nCHook == 5 */) { // MPEG I-frame.
         m_pContent->CreateFromMPEG(data, length);
     }
 

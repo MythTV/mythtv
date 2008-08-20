@@ -492,7 +492,31 @@ void MHResidentProgram::CallProgram(bool fIsFork, const MHObjectRef &success, co
         }
 
         else if (m_Name.Equal("DBG")) { // Debug - optional
-            MHERROR("Debug ResidentProgram is not implemented");
+            QString message = "DEBUG: ";
+            for (int i = 0; i < args.Size(); i++) {
+                MHUnion un;
+                un.GetValueFrom(*(args.GetAt(i)), engine);
+                switch (un.m_Type) {
+                case MHUnion::U_Int:
+                    message.append(QString("%1").arg(un.m_nIntVal));
+                    break;
+                case MHParameter::P_Bool:
+                    message.append(un.m_fBoolVal ? "True" : "False");
+                    break;
+                case MHParameter::P_String:
+                    message.append(QString::fromUtf8((const char *)un.m_StrVal.Bytes(), un.m_StrVal.Size()));
+                    break;
+                case MHParameter::P_ObjRef:
+                    message.append(un.m_ObjRefVal.Printable());
+                    break;
+                case MHParameter::P_ContentRef:
+                    message.append(un.m_ContentRefVal.Printable());
+                    break;
+                case MHParameter::P_Null:
+                    break;
+                }
+            }
+            MHLOG(MHLogNotifications, message);
         }
 
         else {

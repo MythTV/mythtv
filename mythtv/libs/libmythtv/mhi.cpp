@@ -37,7 +37,8 @@ MHIContext::MHIContext(InteractiveTV *parent)
       m_face_loaded(false), m_currentChannel(-1),
       m_isLive(false),      m_currentCard(0),
       m_audioTag(-1),       m_videoTag(-1),
-      m_tuningTo(-1),       m_lastNbiVersion(NBI_VERSION_UNSET)
+      m_tuningTo(-1),       m_lastNbiVersion(NBI_VERSION_UNSET),
+      m_videoRect(0, 0, StdDisplayWidth, StdDisplayHeight)
 {
     m_display.setAutoDelete(true);
     m_dsmccQueue.setAutoDelete(true);
@@ -418,6 +419,7 @@ void MHIContext::Reinit(const QRect &display)
 {
     m_displayWidth = display.width();
     m_displayHeight = display.height();
+    m_videoRect = display; // Assume full screen at this stage.
 }
 
 void MHIContext::SetInputRegister(int num)
@@ -468,7 +470,50 @@ void MHIContext::RequireRedraw(const QRegion &)
 void MHIContext::AddToDisplay(const QImage &image, int x, int y)
 {
     MHIImageData *data = new MHIImageData;
-    data->m_image = image;
+    // It seems that OSDTypeImage::Load doesn't deal well with images
+    // located on odd pixel boundaries and the resulting display contains
+    // transparent lines.  To avoid this we create a new image if either
+    // the x or y offset would be odd and set the extra pixels to transparent.
+    QImage img = image;
+    int xboundary = x & 1;
+    int yboundary = y & 1;
+    
+    if (xboundary || yboundary)
+    {
+        int width = img.width(), height = img.height();
+        if (xboundary)
+        {
+            width++;
+            x--;
+        }
+        if (yboundary)
+        {
+            height++;
+            y--;
+        }
+        img = QImage(width, height, QImage::Format_ARGB32);
+        QRgb qTransparent = qRgba(0,0,0,0);
+        if (xboundary)
+        {
+            for (int i = 0; i < height; i++)
+                img.setPixel(0, i, qTransparent);
+        }
+
+        if (yboundary)
+        {
+            for (int j = 0; j < width; j++)
+                img.setPixel(j, 0, qTransparent);
+        }
+
+        for (int i = 0; i < height-yboundary; i++)
+        {
+            for (int j = 0; j < width-xboundary; j++)
+            {
+                img.setPixel(j+xboundary, i+yboundary, image.pixel(j,i));
+            }
+        }
+    }
+    data->m_image = img;
     data->m_x = x;
     data->m_y = y;
     QMutexLocker locker(&m_display_lock);
@@ -486,7 +531,17 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
 {
     // tell the video player to resize the video stream
     if (m_parent->GetNVP())
-        m_parent->GetNVP()->SetVideoResize(videoRect);
+    {
+        QRect vidRect(videoRect.x() * m_displayWidth/StdDisplayWidth,
+                      videoRect.y() * m_displayHeight/StdDisplayHeight,
+                      videoRect.width() * m_displayWidth/StdDisplayWidth,
+                      videoRect.height() * m_displayHeight/StdDisplayHeight);
+        if (m_videoRect != vidRect)
+        {
+            m_parent->GetNVP()->SetVideoResize(vidRect);
+            m_videoRect = vidRect;
+        }
+    }
 
     QMutexLocker locker(&m_display_lock);
     QRect displayRect(dispRect.x() * m_displayWidth/StdDisplayWidth,
@@ -729,15 +784,10 @@ void MHIContext::DrawRect(int xPos, int yPos, int width, int height,
     QRgb qColour = qRgba(colour.red(), colour.green(),
                          colour.blue(), colour.alpha());
 
-    // This is a bit of a mess: we should be able to create a rectangle object.
-    // Scale the image to the current display size
     int scaledWidth = width * GetWidth() / MHIContext::StdDisplayWidth;
     int scaledHeight = height * GetHeight() / MHIContext::StdDisplayHeight;
-    QImage qImage(scaledWidth, scaledHeight, 32);
-    qImage.setAlphaBuffer(true);
+    QImage qImage(scaledWidth, scaledHeight, QImage::Format_ARGB32);
 
-    // As far as I can tell this is the only way to draw with an
-    // intermediate transparency.
     for (int i = 0; i < scaledHeight; i++)
     {
         for (int j = 0; j < scaledWidth; j++)
@@ -921,9 +971,7 @@ QRect MHIText::GetBounds(const QString &str, int &strLen, int maxSize)
 // different layers.  The background is drawn separately as a rectangle.
 void MHIText::Clear(void)
 {
-    m_image = QImage(m_width, m_height, 32);
-    // 
-    m_image.setAlphaBuffer(true);
+    m_image = QImage(m_width, m_height, QImage::Format_ARGB32);
     // QImage::fill doesn't set the alpha buffer.
     for (int i = 0; i < m_height; i++)
     {
@@ -1062,7 +1110,7 @@ void MHIDLA::Clear()
         m_image = QImage();
         return;
     }
-    m_image = QImage(m_width, m_height, 32);
+    m_image = QImage(m_width, m_height, QImage::Format_ARGB32);
     // Fill the image with "transparent colour".
     DrawRect(0, 0, m_width, m_height, MHRgba(0, 0, 0, 0));
 }
@@ -1274,6 +1322,8 @@ void MHIDLA::DrawArcSector(int x, int y, int width, int height,
 // The UK profile says that MHEG should not contain concave or
 // self-crossing polygons but we can get the former at least as
 // a result of rounding when drawing ellipses.
+typedef struct { int yBottom, yTop, xBottom; float slope; } lineSeg;
+
 void MHIDLA::DrawPoly(bool isFilled, const Q3PointArray &points)
 {
     int nPoints = points.size();
@@ -1282,116 +1332,73 @@ void MHIDLA::DrawPoly(bool isFilled, const Q3PointArray &points)
 
     if (isFilled)
     {
-        // Polygon filling is done by sketching the outline of
-        // the polygon in a separate bitmap and then raster scanning
-        // across this to generate the fill.  There are some special
-        // cases that have to be considered when doing this.  Maximum
-        // and minimum points have to be removed otherwise they will
-        // turn the scan on but not off again.  Horizontal lines are
-        // suppressed and their ends handled specially.
-        QRect bounds = points.boundingRect();
-        int width = bounds.width()+1, height = bounds.height()+1;
-        QBitArray boundsMap(width*height);
-        boundsMap.fill(0);
-        // Draw the boundaries in the bounds map.  This is
-        // the Bresenham algorithm if the absolute gradient is
-        // greater than 1 but puts only the centre of each line
-        // (so there is only one point for each y value) if less.
-        QPoint last = points[nPoints-1]; // Last point
-        for (int i = 0; i < nPoints; i++)
+        Q3MemArray <lineSeg> lineArray(nPoints);
+        int nLines = 0;
+        // Initialise the line segment array.  Include all lines
+        // apart from horizontal.  Close the polygon by starting
+        // with the last point in the array.
+        int lastX = points[nPoints-1].x(); // Last point
+        int lastY = points[nPoints-1].y();
+        int yMin = lastY, yMax = lastY;
+        for (int k = 0; k < nPoints; k++)
         {
-            QPoint thisPoint = points[i];
-            int x1 = last.x() - bounds.x();
-            int y1 = last.y() - bounds.y();
-            int x2 = thisPoint.x() - bounds.x();
-            int y2 = thisPoint.y() - bounds.y();
-            int x, xEnd, y, yEnd;
-            if (y2 > y1)
+            int thisX = points[k].x();
+            int thisY = points[k].y();
+            if (lastY != thisY)
             {
-                x = x1;
-                y = y1;
-                xEnd = x2;
-                yEnd = y2;
-            }
-            else
-            {
-                x = x2;
-                y = y2;
-                xEnd = x1;
-                yEnd = y1;
-            }
-            int dx = abs(xEnd-x), dy = yEnd-y;
-            int xStep = xEnd >= x ? 1 : -1;
-            if (abs(y2-y1) > abs(x2-x1))
-            {
-                int error = dy/2;
-                y++;
-                for (; y < yEnd; y++) // Exclude endpoints
+                if (lastY > thisY)
                 {
-                    boundsMap.toggleBit(x+y*width);
-                    error += dx;
-                    if (error*2 > dy)
-                    {
-                        error -= dy;
-                        x += xStep;
-                    }
+                    lineArray[nLines].yBottom = thisY;
+                    lineArray[nLines].yTop = lastY;
+                    lineArray[nLines].xBottom = thisX;
                 }
-            }
-            else
-            {
-                int error = 0;
-                y++;
-                for (; y < yEnd; y++)
+                else
                 {
-                    boundsMap.toggleBit(x+y*width);
-                    error += dx;
-                    while (error > dy)
-                    {
-                        x += xStep;
-                        error -= dy;
-                    }
+                    lineArray[nLines].yBottom = lastY;
+                    lineArray[nLines].yTop = thisY;
+                    lineArray[nLines].xBottom = lastX;
                 }
+                lineArray[nLines++].slope =
+                    (float)(thisX-lastX) / (float)(thisY-lastY);
             }
-            QPoint nextPoint = points[(i+1) % nPoints];
-            int nextY = nextPoint.y() - bounds.y();
-            int turn = (y2 - y1) * (nextY - y2);
-            if (turn > 0) // Not a max or min
-                boundsMap.toggleBit(x2+y2*width);
-            else if (turn == 0) // Previous or next line is horizontal
-            {
-                // We only draw a point at the beginning or end of a horizontal
-                // line if it turns clockwise.  This means that the fill
-                // will be different depending on the direction the polygon was
-                // drawn but that will be tidied up when we draw the lines round.
-                if (y1 == y2)
-                {
-                    if ((x2-x1) * (nextY - y2) > 0)
-                       boundsMap.toggleBit(x2+y2*width);
-                }
-                else if ((nextPoint.x() - bounds.x() - x2) * (y2 - y1) < 0)
-                    // Next line is horizontal -  draw point if turn is clockwise.
-                    boundsMap.toggleBit(x2+y2*width);
-            }
-            last = thisPoint;
+            if (thisY < yMin)
+                yMin = thisY;
+            if (thisY > yMax)
+                yMax = thisY;
+            lastX = thisX;
+            lastY = thisY;
         }
+        
+        // Find the intersections of each line in the line segment array
+        // with the scan line.  Because UK MHEG says that figures should be
+        // convex we only need to consider two intersections.
         QRgb fillColour = qRgba(m_fillColour.red(), m_fillColour.green(),
                                 m_fillColour.blue(), m_fillColour.alpha());
-        // Now scan the bounds map and use this to fill the polygon.
-        for (int j = 0; j < bounds.height(); j++)
+        for (int y = yMin; y < yMax; y++)
         {
-            bool penDown = false;
-            for (int k = 0; k < bounds.width(); k++)
+            int crossings = 0, xMin = 0, xMax = 0;
+            for (int l = 0; l < nLines; l++)
             {
-                if (boundsMap.testBit(k+j*width))
-                    penDown = ! penDown;
-                else if (penDown && k+bounds.x() >= 0 && j+bounds.y() >= 0 &&
-                         k+bounds.x() < m_width && j+bounds.y() < m_height)
-                    m_image.setPixel(k+bounds.x(), j+bounds.y(), fillColour);
+                if (y >= lineArray[l].yBottom && y < lineArray[l].yTop)
+                {
+                    int x = (int)round((float)(y - lineArray[l].yBottom) * 
+                        lineArray[l].slope) + lineArray[l].xBottom;
+                    if (crossings == 0 || x < xMin)
+                        xMin = x;
+                    if (crossings == 0 || x > xMax)
+                        xMax = x;
+                    crossings++;
+                }
+            }
+            if (crossings == 2)
+            {
+                for (int x = xMin; x <= xMax; x++)
+                    m_image.setPixel(x, y, fillColour);
             }
         }
 
         // Draw the boundary
-        last = points[nPoints-1]; // Last point
+        QPoint last = points[nPoints-1]; // Last point
         for (int i = 0; i < nPoints; i++)
         {
             DrawLine(points[i].x(), points[i].y(), last.x(), last.y());
@@ -1502,7 +1509,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
     {
         int nContentWidth = c->width;
         int nContentHeight = c->height;
-        m_image = QImage(nContentWidth, nContentHeight, 32);
+        m_image = QImage(nContentWidth, nContentHeight, QImage::Format_ARGB32);
         m_opaque = true; // MPEG images are always opaque.
 
         AVPicture retbuf;
@@ -1559,3 +1566,5 @@ void MHIBitmap::ScaleImage(int newWidth, int newHeight)
     m_image = m_image.scaled(newWidth, newHeight,
             Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 }
+
+

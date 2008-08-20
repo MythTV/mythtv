@@ -1,6 +1,6 @@
 /* Actions.cpp
 
-   Copyright (C)  David C. J. Matthews 2004  dm at prolingua.co.uk
+   Copyright (C)  David C. J. Matthews 2004, 2008  dm at prolingua.co.uk
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -93,8 +93,8 @@ void MHActionSequence::Initialise(MHParseNode *p, MHEngine *engine)
         case C_GET_ENTRY_POINT: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break; // EntryField
         case C_GET_FILL_COLOUR: pAction = new MHGetFillColour; break;
         case C_GET_FIRST_ITEM: pAction = new MHGetFirstItem; break;
-        case C_GET_HIGHLIGHT_STATUS: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break;// ?
-        case C_GET_INTERACTION_STATUS: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break;// ?
+        case C_GET_HIGHLIGHT_STATUS: pAction = new MHGetHighlightStatus; break;
+        case C_GET_INTERACTION_STATUS: pAction = new MHGetInteractionStatus; break;
         case C_GET_ITEM_STATUS: pAction = new MHGetItemStatus; break;
         case C_GET_LABEL: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break;// PushButton
         case C_GET_LAST_ANCHOR_FIRED: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break;// HyperText
@@ -104,11 +104,11 @@ void MHActionSequence::Initialise(MHParseNode *p, MHEngine *engine)
         case C_GET_LIST_ITEM: pAction = new MHGetListItem; break;
         case C_GET_LIST_SIZE: pAction = new MHGetListSize; break;
         case C_GET_OVERWRITE_MODE: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break;// ?
-        case C_GET_PORTION: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break;// Slider
+        case C_GET_PORTION: pAction = new MHGetPortion; break;
         case C_GET_POSITION: pAction = new MHGetPosition; break;
         case C_GET_RUNNING_STATUS: pAction = new MHGetRunningStatus; break;
         case C_GET_SELECTION_STATUS: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break;// ?
-        case C_GET_SLIDER_VALUE: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break;// Slider
+        case C_GET_SLIDER_VALUE: pAction = new MHGetSliderValue; break;
         case C_GET_TEXT_CONTENT: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break;// Text
         case C_GET_TEXT_DATA: pAction = new MHGetTextData; break;
         case C_GET_TOKEN_POSITION: pAction = new MHGetTokenPosition; break;
@@ -145,24 +145,24 @@ void MHActionSequence::Initialise(MHParseNode *p, MHEngine *engine)
         case C_SET_FILL_COLOUR: pAction = new MHSetFillColour; break;
         case C_SET_FIRST_ITEM: pAction = new MHSetFirstItem; break;
         case C_SET_FONT_REF: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break; // Text
-        case C_SET_HIGHLIGHT_STATUS: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break; // ?
-        case C_SET_INTERACTION_STATUS: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break; // ?
+        case C_SET_HIGHLIGHT_STATUS: pAction = new MHSetHighlightStatus; break;
+        case C_SET_INTERACTION_STATUS: pAction = new MHSetInteractionStatus; break;
         case C_SET_LABEL: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break; // PushButton
         case C_SET_LINE_COLOUR: pAction = new MHSetLineColour; break;
         case C_SET_LINE_STYLE: pAction = new MHSetLineStyle; break;
         case C_SET_LINE_WIDTH: pAction = new MHSetLineWidth; break;
         case C_SET_OVERWRITE_MODE: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break; // EntryField
         case C_SET_PALETTE_REF: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break; // Visible
-        case C_SET_PORTION: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break; // Slider
+        case C_SET_PORTION: pAction = new MHSetPortion; break;
         case C_SET_POSITION: pAction = new MHSetPosition; break;
-        case C_SET_SLIDER_VALUE: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break; // Slider
+        case C_SET_SLIDER_VALUE: pAction = new MHSetSliderValue; break;
         case C_SET_SPEED: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break; // ?
         case C_SET_TIMER: pAction = new MHSetTimer; break;
         case C_SET_TRANSPARENCY: pAction = new MHSetTransparency; break;
         case C_SET_VARIABLE: pAction = new MHSetVariable; break;
         case C_SET_VOLUME: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break; // ?
         case C_SPAWN: pAction = new MHSpawn; break;
-        case C_STEP: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break; // Slider
+        case C_STEP: pAction = new MHStep; break;
         case C_STOP: pAction = new MHStop; break;
         case C_STORE_PERSISTENT: pAction = new MHPersistent(":StorePersistent", false); break;
         case C_SUBTRACT: pAction = new MHSubtract; break;
@@ -184,7 +184,7 @@ void MHActionSequence::Initialise(MHParseNode *p, MHEngine *engine)
         case C_SET_FOCUS_POSITION: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break; // HyperText
         case C_SET_BITMAP_DECODE_OFFSET: pAction = new MHSetBitmapDecodeOffset; break;
         case C_GET_BITMAP_DECODE_OFFSET: pAction = new MHGetBitmapDecodeOffset; break;
-        case C_SET_SLIDER_PARAMETERS: pAction = new MHUnimplementedAction(pElemAction->GetTagNo()); break; // ?
+        case C_SET_SLIDER_PARAMETERS: pAction = new MHSetSliderParameters; break;
 
         default:
             MHLOG(MHLogWarning, QString("Unknown action %1").arg(pElemAction->GetTagNo()));

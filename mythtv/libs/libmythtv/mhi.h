@@ -182,6 +182,8 @@ class MHIContext : public MHContext
 
     uint             m_lastNbiVersion;
     Q3MemArray<unsigned char> m_nbiData;
+
+    QRect            m_videoRect;
 };
 
 // Object for drawing text.
