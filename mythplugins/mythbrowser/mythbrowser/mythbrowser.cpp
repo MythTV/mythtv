@@ -2,8 +2,9 @@
 #include <iostream>
 
 // qt
-#include <QWebFrame>
+//#include <QWebFrame>
 #include <QEvent>
+#include <QIcon>
 
 // myth
 #include "mythverbose.h"
@@ -65,7 +66,7 @@ bool MythBrowser::Create(void)
     page->getBrowser()->SetZoom(m_zoom);
     page->SetActive(true);
 
-    connect(page, SIGNAL(loadProgress(int)), 
+    connect(page, SIGNAL(loadProgress(int)),
             this, SLOT(slotLoadProgress(int)));
     connect(page, SIGNAL(statusBarMessage(const QString&)),
             this, SLOT(slotStatusBarMessage(const QString&)));
@@ -400,7 +401,7 @@ void MythBrowser::customEvent(QEvent *event)
 
         if (resultid == "action")
         {
-            // make the current browser active again unless we need to show 
+            // make the current browser active again unless we need to show
             // the text input popup
             if (GetFocusWidget() == activeBrowser() && buttonnum != 0)
                 activeBrowser()->SetActive(true);

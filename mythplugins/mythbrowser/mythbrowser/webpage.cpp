@@ -2,8 +2,9 @@
 #include <iostream>
 
 // qt
-#include <QWebFrame>
+//#include <QWebFrame>
 #include <QEvent>
+#include <QIcon>
 
 // myth
 #include "mythverbose.h"
@@ -19,7 +20,7 @@ WebPage::WebPage(MythBrowser *parent, QRect area, const char* name)
 {
     m_parent = parent;
 
-    m_listItem = new MythListButtonItem(parent->m_pageList, "", NULL, false, 
+    m_listItem = new MythListButtonItem(parent->m_pageList, "", NULL, false,
                                         MythListButtonItem::CantCheck, false);
 
     m_browser = new MythUIWebBrowser(parent, name);
