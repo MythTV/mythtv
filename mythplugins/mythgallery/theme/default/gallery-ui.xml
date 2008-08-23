@@ -2,21 +2,23 @@
 <mythuitheme>
 
     <window name="gallery">
+        <imagetype name="background">
+            <area>0,0,800,600</area>
+            <gradient start="#000000" end="#000000" alpha="255" />
+        </imagetype>
 
         <buttonlist2 name="images">
-            <area>15,20,770,560</area>
-            <layout>grid</layout>
-            <spacing>5</spacing>
-            <buttonarea>0,0,770,520</buttonarea>
+            <area>25,50,770,560</area>
+            <layout>horizontal</layout>
+            <spacing>0</spacing>
+            <scrollstyle>center</scrollstyle>
+            <buttonarea>0,0,770,500</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,150,125</area>
                 <state name="active">
-                    <imagetype name="buttonbackground">
-                        <filename>gallery-back-reg.png</filename>
-                    </imagetype>
                     <imagetype name="buttonimage">
-                        <area>5,5,140,115</area>
+                        <area>0,0,250,300</area>
                         <preserveaspect>yes</preserveaspect>
+                        <reflection axis="vertical" shear="24" scale="85" length="35" />
                     </imagetype>
                     <statetype name="buttoncheck">
                         <position>130,100</position>
@@ -29,30 +31,31 @@
                     </statetype>
                 </state>
                 <state name="selected" from="active">
-                    <imagetype name="buttonbackground">
-                        <filename>gallery-back-sel.png</filename>
+                    <imagetype name="buttonimage">
+                        <area>-70,20,400,450</area>
                     </imagetype>
                     <textarea name="buttontext" from="basetextarea">
-                        <area>5,130,140,40</area>
-                        <font>basesmall</font>
+                        <area>-70,480,400,35</area>
+                        <font>baselarge</font>
                         <align>hcenter,vcenter</align>
                         <cutdown>yes</cutdown>
+                        <multiline>yes</multiline>
                     </textarea>
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>240,530</position>
+                <position>20,470</position>
                 <state type="off">
                     <imagetype name="upon">
-                        <filename>up_arrow.png</filename>
+                        <filename>left_arrow.png</filename>
                     </imagetype>
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>456,530</position>
+                <position>710,470</position>
                 <state type="off">
                     <imagetype name="dnon">
-                        <filename>down_arrow.png</filename>
+                        <filename>right_arrow.png</filename>
                     </imagetype>
                 </state>
             </statetype>
@@ -63,20 +66,6 @@
             <font>basemedium</font>
             <align>allcenter</align>
         </textarea>-->
-
-    </window>
-
-    <window>
-
-        <imagetype name="image">
-            <position>0,0</position>
-        </imagetype>
-
-        <textarea name="caption" from="basetextarea">
-            <area>0,550,800,50</area>
-            <font>basemedium</font>
-            <align>hcenter,vcenter</align>
-        </textarea>
 
     </window>
 
