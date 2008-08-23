@@ -27,7 +27,7 @@ class MythScreenType : public MythUIType
     void SetFullscreen(bool full);
 
     MythUIType *GetFocusWidget(void) const;
-    bool SetFocusWidget(MythUIType *widget);
+    bool SetFocusWidget(MythUIType *widget = NULL);
     virtual bool NextPrevWidgetFocus(bool up_or_down);
     bool BuildFocusList(void);
 

@@ -59,7 +59,7 @@ MythUIType *MythScreenType::GetFocusWidget(void) const
 
 bool MythScreenType::SetFocusWidget(MythUIType *widget)
 {
-    if (!widget)
+    if (!widget || !widget->IsVisible())
     {
         QMap<int, MythUIType *>::iterator it = m_FocusWidgetList.begin();
         MythUIType *current;
@@ -149,7 +149,7 @@ bool MythScreenType::BuildFocusList(void)
 
     if (m_FocusWidgetList.size() > 0)
     {
-        SetFocusWidget(*(m_FocusWidgetList.begin()));
+        SetFocusWidget();
         return true;
     }
 
