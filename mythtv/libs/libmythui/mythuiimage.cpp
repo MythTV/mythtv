@@ -60,7 +60,6 @@ void MythUIImage::Clear(void)
         m_Images.back()->DownRef();
         m_Images.pop_back();
     }
-    SetRedraw();
 }
 
 void MythUIImage::Init(void)
@@ -123,7 +122,10 @@ void MythUIImage::SetImage(MythImage *img)
     m_Delay = -1;
 
     if (!img)
+    {
+        SetRedraw();
         return;
+    }
 
     img->UpRef();
 
@@ -142,7 +144,6 @@ void MythUIImage::SetImage(MythImage *img)
 
     m_Images.push_back(img);
     m_CurPos = 0;
-    SetRedraw();
 }
 
 void MythUIImage::SetImages(QVector<MythImage *> &images)
@@ -258,7 +259,10 @@ bool MythUIImage::Load(void)
                 filename = QString(m_Filename).arg(i);
 
             if (!image->Load(filename))
+            {
+                SetRedraw();
                 return false;
+            }
         }
 
         if (m_isReflected)
@@ -296,6 +300,7 @@ bool MythUIImage::Load(void)
 void MythUIImage::Reset(void)
 {
     Clear();
+    SetRedraw();
 }
 
 void MythUIImage::Pulse(void)
