@@ -60,6 +60,7 @@ void MythUIImage::Clear(void)
         m_Images.back()->DownRef();
         m_Images.pop_back();
     }
+    SetRedraw();
 }
 
 void MythUIImage::Init(void)
@@ -141,6 +142,7 @@ void MythUIImage::SetImage(MythImage *img)
 
     m_Images.push_back(img);
     m_CurPos = 0;
+    SetRedraw();
 }
 
 void MythUIImage::SetImages(QVector<MythImage *> &images)
@@ -176,6 +178,7 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
         SetSize(aSize);
 
     m_CurPos = 0;
+    SetRedraw();
 }
 
 void MythUIImage::ForceSize(const QSize &size)
