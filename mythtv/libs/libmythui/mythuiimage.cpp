@@ -144,6 +144,7 @@ void MythUIImage::SetImage(MythImage *img)
 
     m_Images.push_back(img);
     m_CurPos = 0;
+    SetRedraw();
 }
 
 void MythUIImage::SetImages(QVector<MythImage *> &images)
