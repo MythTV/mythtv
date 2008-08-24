@@ -1,6 +1,8 @@
 
 #include <QApplication>
 
+#include "mythverbose.h"
+
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
@@ -274,4 +276,144 @@ void MythTextInputDialog::sendResult()
     }
 
     Close();
+}
+
+/////////////////////////////////////////////////////////////////////
+
+
+/** \fn MythUISearchDialog::MythUISearchDialog(MythScreenStack*,
+                                   const QString&,
+                                   const QStringList&,
+                                   bool  matchAnywhere,
+                                   const QString&)
+ *  \brief the classes constructor
+ *  \param parent the MythScreenStack this widget belongs to
+ *  \param title  the text to show as the title
+ *  \param list   the list of text strings to search
+ *  \param matchAnywhere if true will match the input text anywhere in the string.
+                         if false will match only strings that start with the input text.
+                         Default is false.
+ *  \param defaultValue  The initial value for the input text. Default is ""
+ */
+MythUISearchDialog::MythUISearchDialog(MythScreenStack *parent,
+                                   const QString &title,
+                                   const QStringList &list,
+                                   bool  matchAnywhere,
+                                   const QString &defaultValue)
+                : MythScreenType(parent, "mythsearchdialogpopup")
+{
+    m_list = list;
+    m_matchAnywhere = matchAnywhere;
+    m_title = title;
+    m_defaultValue = defaultValue;
+
+    m_titleText = NULL;
+    m_matchesText = NULL;
+    m_textEdit = NULL;
+    m_itemList = NULL;
+
+    m_id = "";
+    m_retScreen = NULL;
+}
+
+bool MythUISearchDialog::Create(void)
+{
+    if (!CopyWindowFromBase("MythSearchDialog", this))
+        return false;
+
+    m_textEdit = dynamic_cast<MythUITextEdit *> (GetChild("input"));
+
+    m_titleText = dynamic_cast<MythUIText *>(GetChild("title"));
+    m_matchesText = dynamic_cast<MythUIText *>(GetChild("matches"));
+
+    m_itemList =  dynamic_cast<MythUIButtonList *>(GetChild("itemlist"));
+
+    MythUIButton *okButton = dynamic_cast<MythUIButton *>(GetChild("ok"));
+    MythUIButton *cancelButton = dynamic_cast<MythUIButton *>(GetChild("cancel"));
+
+    if (!m_textEdit || !m_titleText || !okButton || !m_itemList)
+    {
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        return false;
+    }
+
+    if (cancelButton)
+    {
+        cancelButton->SetText(tr("Cancel"));
+        connect(cancelButton, SIGNAL(buttonPressed()), SLOT(Close()));
+    }
+
+    connect(okButton, SIGNAL(buttonPressed()), SLOT(slotSendResult()));
+
+    connect(m_itemList, SIGNAL(itemClicked(MythUIButtonListItem*)), SLOT(slotSendResult()));
+
+    m_textEdit->SetText(m_defaultValue);
+    connect(m_textEdit, SIGNAL(valueChanged()), SLOT(slotUpdateList()));
+
+    m_titleText->SetText(m_title);
+    if (m_matchesText)
+        m_matchesText->SetText(tr("0 matches"));
+
+    okButton->SetText(tr("Ok"));
+
+    BuildFocusList();
+
+    slotUpdateList();
+
+    return true;
+}
+
+void MythUISearchDialog::SetReturnEvent(MythScreenType *retscreen,
+                                         const QString &resultid)
+{
+    m_retScreen = retscreen;
+    m_id = resultid;
+}
+
+void MythUISearchDialog::slotSendResult()
+{
+    if (!m_itemList->GetItemCurrent())
+        return;
+
+    QString result = m_itemList->GetValue();
+
+    emit haveResult(result);
+
+    if (m_retScreen)
+    {
+        DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
+                                                            result, NULL);
+        QApplication::postEvent(m_retScreen, dce);
+    }
+
+    Close();
+}
+
+void MythUISearchDialog::slotUpdateList(void)
+{
+    m_itemList->Reset();
+
+    for (int x = 0; x < m_list.size(); x++)
+    {
+        QString item = m_list.at(x);
+
+        if (m_matchAnywhere)
+        {
+            if (!item.contains(m_textEdit->GetText(), Qt::CaseInsensitive))
+                continue;
+        }
+        else
+        {
+            if (!item.startsWith(m_textEdit->GetText(), Qt::CaseInsensitive))
+                continue;
+        }
+
+        // add item to list
+        new MythUIButtonListItem(m_itemList, item, NULL, true, MythUIButtonListItem::NotChecked);
+    }
+
+    m_itemList->SetItemCurrent(0);
+
+    if (m_matchesText)
+        m_matchesText->SetText(tr("%1 matches").arg(m_list.size()));
 }

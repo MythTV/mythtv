@@ -122,4 +122,55 @@ class MythTextInputDialog : public MythScreenType
     void sendResult();
 };
 
+
+/**
+ * \class MythUISearchDialog
+ * \brief Provide a dialog to quickly find an entry in a list
+ * 
+ * You pass a QStringList containing the list you want to search.
+ * As the user enters a text string in the edit the list of entries
+ * changes to show only the entries that match the input string. You
+ * have the option to search anywhere in the string or only the start.
+ *
+ * When the user either clicks an entry in the list or presses the OK
+ * button the dialog will either send a DialogCompletionEvent or an 
+ * haveResult(QString) signal will be generated. Both pass the selected
+ * string back to the caller.
+ */
+class MythUISearchDialog : public MythScreenType
+{
+  Q_OBJECT
+
+  public:
+    MythUISearchDialog(MythScreenStack *parent,
+                     const QString &message,
+                     const QStringList &list,
+                     bool  matchAnywhere = false,
+                     const QString &defaultValue = "");
+
+    bool Create(void);
+    void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
+
+  signals:
+     void haveResult(QString);
+
+  private:
+    MythUIButtonList *m_itemList;
+    MythUITextEdit   *m_textEdit;
+    MythUIText       *m_titleText;
+    MythUIText       *m_matchesText;
+
+    QString           m_title;
+    QString           m_defaultValue;
+    QStringList       m_list;
+    bool              m_matchAnywhere;
+
+    MythScreenType   *m_retScreen;
+    QString           m_id;
+
+  private slots:
+    void slotSendResult(void);
+    void slotUpdateList(void);
+};
+
 #endif
