@@ -67,7 +67,12 @@ void HttpComms::init()
 
 void HttpComms::request(QUrl &url, int timeoutms, bool allowGzip)
 {
-    QHttpRequestHeader header("GET", url.toEncoded());
+    QString path = url.encodedQuery();
+
+    if (!path.length())
+        path = url.path() + url.encodedQuery();
+
+    QHttpRequestHeader header("GET", path);
     QString userAgent = "Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) "
                         "Gecko/25250101 Netscape/5.432b1";
 
