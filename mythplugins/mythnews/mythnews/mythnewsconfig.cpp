@@ -227,12 +227,12 @@ void MythNewsConfig::slotCategoryChanged(MythUIButtonListItem *item)
 
         for (NewsSiteItem* site = cat->siteList.first();
              site; site = cat->siteList.next() ) {
-            MythUIButtonListItem* item =
+            MythUIButtonListItem* newitem =
                 new MythUIButtonListItem(m_siteList, site->name, 0, true,
                                       site->inDB ?
                                       MythUIButtonListItem::FullChecked :
                                       MythUIButtonListItem::NotChecked);
-            item->setData(site);
+            newitem->setData(site);
         }
     }
 }
