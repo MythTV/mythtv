@@ -431,6 +431,20 @@ QIcon MythUIWebBrowser::GetIcon(void)
         return QIcon();
 }
 
+/** \fn MythUIWebBrowser::GetUrl(void)
+ *  \brief Gets the current page's url
+ *  \return return the url
+ */
+QUrl MythUIWebBrowser::GetUrl(void)
+{
+    if (m_browser)
+    {
+        return m_browser->url();
+    }
+    else
+        return QUrl();
+}
+
 void MythUIWebBrowser::slotLoadStarted(void)
 {
     emit loadStarted();
