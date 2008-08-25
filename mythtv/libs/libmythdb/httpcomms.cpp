@@ -67,10 +67,10 @@ void HttpComms::init()
 
 void HttpComms::request(QUrl &url, int timeoutms, bool allowGzip)
 {
-    QString path = url.encodedQuery();
+    QString path = url.path();
 
-    if (!path.length())
-        path = url.path() + url.encodedQuery();
+    if (url.hasQuery())
+        path += "?" + url.encodedQuery();
 
     QHttpRequestHeader header("GET", path);
     QString userAgent = "Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) "
