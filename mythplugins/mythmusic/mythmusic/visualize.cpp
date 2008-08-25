@@ -579,12 +579,6 @@ bool Squares::draw(QPainter *p, const QColor &back)
 #endif
 
     return true;
-
-    for (int x = 0; x < size.width (); x += w) {
-        p->fillRect (x, center - h / 2, w, h, QColor ("red"));
-        p->fillRect (x, center + h / 2, w, h, QColor ("blue"));
-    }
-    return true;
 }
 
 static class SquaresFactory : public VisFactory

@@ -58,14 +58,15 @@ QString chooseCD(void)
 
 void CheckFreeDBServerFile(void)
 {
-    char filename[1024];
-    if (getenv("HOME") == NULL)
+    QString homeDir = QDir::home().path();
+
+    if (homeDir == "")
     {
         VERBOSE(VB_IMPORTANT, "main.o: You don't have a HOME environment variable. CD lookup will almost certainly not work.");
         return;
     }
-    sprintf(filename, "%s/.cdserverrc", getenv("HOME"));
 
+    QString filename = homeDir + "/.cdserverrc";
     QFile file(filename);
 
     if (!file.exists())

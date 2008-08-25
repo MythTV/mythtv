@@ -193,12 +193,8 @@ int FileScanner::GetDirectoryId(const QString &directory, const int &parentid)
             return query.lastInsertId().toInt();
         }
     }
-    else
-    {
-        MythContext::DBError("music select directory id", query);
-        return -1;
-    }
 
+    MythContext::DBError("music select directory id", query);
     return -1;
 }
 

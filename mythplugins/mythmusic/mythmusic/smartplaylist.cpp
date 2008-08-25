@@ -826,8 +826,7 @@ void SmartPLCriteriaRow::initValues(QString Field, QString Operator, QString Val
     fieldCombo->setCurrentText(Field);
     operatorCombo->setCurrentText(Operator);
     
-    SmartPLField *PLField;
-    PLField = lookupField(Field);
+    SmartPLField *PLField = lookupField(Field);
     if (PLField)
     {
         if (PLField->type == ftNumeric)
@@ -853,8 +852,8 @@ void SmartPLCriteriaRow::initValues(QString Field, QString Operator, QString Val
     }
     else
     {
-        value1SpinEdit->setValue(PLField->defaultValue);
-        value2SpinEdit->setValue(PLField->defaultValue);
+        value1SpinEdit->setValue(0);
+        value2SpinEdit->setValue(0);
         value1Edit->setText("");
         value2Edit->setText("");
     }
@@ -1733,12 +1732,11 @@ void SmartPLResultViewer::setSQL(QString sql)
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec(sql);
     
-    Q3ListViewItem *item;
     if (query.last())
     {
         do
         {
-            item = new Q3ListViewItem(listView, 
+            new Q3ListViewItem(listView, 
                 query.value(0).toString(),
                 query.value(1).toString(),
                 query.value(2).toString(),
@@ -1750,7 +1748,7 @@ void SmartPLResultViewer::setSQL(QString sql)
     }
     
     // set selection to first item
-    item = listView->firstChild();
+    Q3ListViewItem *item = listView->firstChild();
     if (item)
         listView->setSelected(item, true);     
 }

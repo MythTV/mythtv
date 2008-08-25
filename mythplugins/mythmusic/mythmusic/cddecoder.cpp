@@ -580,4 +580,3 @@ Decoder *CdDecoderFactory::create(const QString &file, QIODevice *input,
 
     return decoder;
 }
-   

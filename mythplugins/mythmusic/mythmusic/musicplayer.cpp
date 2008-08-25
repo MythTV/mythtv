@@ -311,7 +311,7 @@ void MusicPlayer::play(void)
             {
                 // CD track
                 CdDecoder *cddecoder = dynamic_cast<CdDecoder*>(m_decoder);
-                if (m_decoder)
+                if (cddecoder)
                     m_currentMetadata = cddecoder->getMetadata(-m_currentNode->getInt());
             }
         }
@@ -397,6 +397,8 @@ void MusicPlayer::next(void)
                 else
                     return; // stop()
             }
+            else
+                return; // stop()
         }
         else
             return; // stop()

@@ -1078,14 +1078,16 @@ void DatabaseBox::deleteTrack(UIListGenericTree *item)
         else if (delete_item->prevSibling(1))
             tree->MoveUp();
 
-        UIListGenericTree *item = (UIListGenericTree *)delete_item->getParent();
-        if (TreeCheckItem *item_owner = dynamic_cast<TreeCheckItem*>(item))
+        UIListGenericTree *newItem = (UIListGenericTree *)delete_item->getParent();
+        if (TreeCheckItem *item_owner = dynamic_cast<TreeCheckItem*>(newItem))
         {
-            Playlist *owner = gMusicData->all_playlists->getPlaylist(item_owner->getID() * 
-                                                         -1);
-            owner->removeTrack(delete_item->getID(), true);
+            Playlist *owner =
+                gMusicData->all_playlists->getPlaylist(item_owner->getID() * -1);
+
+            if (owner)
+                owner->removeTrack(delete_item->getID(), true);
         }
-        else if (PlaylistTitle *item_owner = dynamic_cast<PlaylistTitle*>(item))
+        else if (PlaylistTitle *item_owner = dynamic_cast<PlaylistTitle*>(newItem))
         {
             (void)item_owner;
             active_playlist->removeTrack(delete_item->getID(), true);
@@ -1106,14 +1108,16 @@ void DatabaseBox::deleteTrack(UIListGenericTree *item)
         else if (delete_item->prevSibling(1))
             tree->MoveUp();
 
-        UIListGenericTree *item = (UIListGenericTree *)delete_item->getParent();
-        if (TreeCheckItem *item_owner = dynamic_cast<TreeCheckItem*>(item))
+        UIListGenericTree *newItem = (UIListGenericTree *)delete_item->getParent();
+        if (TreeCheckItem *item_owner = dynamic_cast<TreeCheckItem*>(newItem))
         {
-            Playlist *owner = gMusicData->all_playlists->getPlaylist(item_owner->getID() * 
-                                                         -1);
-            owner->removeTrack(delete_item->getID(), false);
+            Playlist *owner =
+                gMusicData->all_playlists->getPlaylist(item_owner->getID() * -1);
+
+            if (owner)
+                owner->removeTrack(delete_item->getID(), false);
         }
-        else if (PlaylistTitle *item_owner = dynamic_cast<PlaylistTitle*>(item))
+        else if (PlaylistTitle *item_owner = dynamic_cast<PlaylistTitle*>(newItem))
         {
             (void)item_owner;
             active_playlist->removeTrack(delete_item->getID(), false);

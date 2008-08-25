@@ -974,40 +974,39 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                 // Normal track
                 Metadata *tmpdata
                     = all_available_music->getMetadata(it->getValue());
-                if (tmpdata && tmpdata->isVisible())
+                if (tmpdata)
                 {
-                    if (songs.at() == 0) 
-                    { // first song
-                        playcountMin = playcountMax = tmpdata->PlayCount();
-                        lastplayMin = lastplayMax = tmpdata->LastPlay();
-                    }
-                    else 
+                    if (tmpdata->isVisible())
                     {
-                        if (tmpdata->PlayCount() < playcountMin)
-                            playcountMin = tmpdata->PlayCount();
-                        else if (tmpdata->PlayCount() > playcountMax)
-                            playcountMax = tmpdata->PlayCount();
+                        if (songs.at() == 0) 
+                        { // first song
+                            playcountMin = playcountMax = tmpdata->PlayCount();
+                            lastplayMin = lastplayMax = tmpdata->LastPlay();
+                        }
+                        else 
+                        {
+                            if (tmpdata->PlayCount() < playcountMin)
+                                playcountMin = tmpdata->PlayCount();
+                            else if (tmpdata->PlayCount() > playcountMax)
+                                playcountMax = tmpdata->PlayCount();
 
-                        if (tmpdata->LastPlay() < lastplayMin)
-                            lastplayMin = tmpdata->LastPlay();
-                        else if (tmpdata->LastPlay() > lastplayMax) 
-                            lastplayMax = tmpdata->LastPlay();
+                            if (tmpdata->LastPlay() < lastplayMin)
+                                lastplayMin = tmpdata->LastPlay();
+                            else if (tmpdata->LastPlay() > lastplayMax) 
+                                lastplayMax = tmpdata->LastPlay();
+                        }
                     }
+                    // pre-fill the album-map with the album name.
+                    // This allows us to do album mode in album order
+                    album = tmpdata->Album();
+                    // pre-fill the artist map with the artist name and song title
+                    artist = tmpdata->Artist() + "~" + tmpdata->Title();
                 }
-                // pre-fill the album-map with the album name.
-                // This allows us to do album mode in album order
-                album = tmpdata->Album();
                 if ((Ialbum = album_map.find(album)) == album_map.end()) 
-                {
                     album_map.insert(AlbumMap::value_type(album,0));
-                }
 
-                // pre-fill the artist map with the artist name and song title
-                artist = tmpdata->Artist() + "~" + tmpdata->Title();
                 if ((Iartist = artist_map.find(artist)) == artist_map.end()) 
-                {
-                  artist_map.insert(ArtistMap::value_type(artist,0));
-                }
+                    artist_map.insert(ArtistMap::value_type(artist,0));
             }
         }
     }
@@ -1778,11 +1777,21 @@ int Playlist::CreateCDMP3(void)
     }
 
     // probably should tie stdout of mkisofs to stdin of cdrecord sometime
-    char tmprecordlist[L_tmpnam];
-    char tmprecordisofs[L_tmpnam];
+    QString tmptemplate("/tmp/mythmusicXXXXXX");
 
-    tmpnam(tmprecordlist);
-    tmpnam(tmprecordisofs);
+    QString tmprecordlist = createTempFile(tmptemplate);
+    if (tmprecordlist == tmptemplate)
+    {
+        VERBOSE(VB_IMPORTANT, "Unable to open temporary file");
+        return 1;
+    }
+
+    QString tmprecordisofs = createTempFile(tmptemplate);
+    if (tmprecordisofs == tmptemplate)
+    {
+        VERBOSE(VB_IMPORTANT, "Unable to open temporary file");
+        return 1;
+    }
 
     QFile reclistfile(tmprecordlist);
 

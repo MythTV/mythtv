@@ -410,9 +410,8 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
     return (curpos - start + 1) * CD_FRAMESIZE_RAW;
 #else
     (void)cddevice; (void)encoder; (void)tracknum;
-#endif
-
     return 0;
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -784,6 +783,8 @@ void Ripper::startScanCD(void)
                     }
                 }
             }
+            else
+                delete ripTrack;
         }
 
         m_artistEdit->setText(m_artistName);
