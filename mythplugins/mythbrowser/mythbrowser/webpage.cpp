@@ -2,7 +2,6 @@
 #include <iostream>
 
 // qt
-//#include <QWebFrame>
 #include <QEvent>
 #include <QIcon>
 

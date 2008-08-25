@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mythuitheme>
 
+    <font name="title" from="baselarge">
+        <color>#ffff00</color>
+        <bold>yes</bold>
+    </font>
+
     <window name="browser">
         <buttonlist name="pagelist" from="baseselector">
             <area>20,10,760,45</area>
@@ -29,4 +34,225 @@
             <multiline>no</multiline>
         </textarea>
     </window>
+
+    <window name="bookmarkmanager">
+        <textarea name="title" from="basetextarea">
+            <area>0,10,800,38</area>
+            <align>allcenter</align>
+            <multiline>no</multiline>
+            <value>Bookmark Manager</value>
+            <font>baselarge</font>
+        </textarea>
+
+        <imagetype name="topbgimage">
+            <area>25,75,760,110</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
+
+        <textarea name="categorylabel">
+            <area>60,90,130,30</area>
+            <font>basesmallyellow</font>
+            <value>Category</value>
+        </textarea>
+
+        <buttonlist name="grouplist" from="basehorizontalbuttonlist">
+            <area>60,125,690,35</area>
+            <showarrow>no</showarrow>
+            <margin>5,5</margin>
+        </buttonlist>
+
+        <textarea name="label">
+            <area>45,200,130,30</area>
+            <font>basesmallyellow</font>
+            <value>[x]</value>
+        </textarea>
+
+        <textarea name="namelabel" from="label">
+            <area>80,200,130,30</area>
+            <value>Name</value>
+        </textarea>
+
+        <textarea name="urllabel" from="label">
+            <area>335,200,130,30</area>
+            <value>URL</value>
+        </textarea>
+
+        <imagetype name="bgimage">
+            <area>25,220,760,360</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
+
+        <imagetype name="showinglines">
+            <filename>rk-lines.png</filename>
+            <area>25,220,760,335</area>
+        </imagetype>
+
+        <buttonlist2 name="bookmarklist" from="basebuttonlist2">
+            <area>40,230,720,280</area>
+            <spacing>4</spacing>
+            <layout>vertical</layout>
+            <showarrow>no</showarrow>
+            <buttonarea>0,0,720,280</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <statetype name="buttoncheck">
+                        <position>5,5</position>
+                    </statetype>
+                    <textarea name="name">
+                        <area>40,0,250,30</area>
+                        <font>basesmall</font>
+                        <align>left,vcenter</align>
+                    </textarea>
+                    <textarea name="url">
+                        <area>295,0,315,30</area>
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected">
+                    <statetype name="buttoncheck">
+                        <position>5,5</position>
+                    </statetype>
+                    <textarea name="name">
+                        <area>40,0,250,30</area>
+                        <font>basesmall</font>
+                        <align>left,vcenter</align>
+                    </textarea>
+                    <textarea name="url">
+                        <area>295,0,400,30</area>
+                        <font>basesmall</font>
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+                <state name="inactive">
+                    <statetype name="buttoncheck">
+                        <position>5,5</position>
+                    </statetype>
+                    <textarea name="name">
+                        <area>40,0,250,30</area>
+                        <font>basesmall</font>
+                        <align>left,vcenter</align>
+                    </textarea>
+                    <textarea name="url">
+                        <area>295,0,400,30</area>
+                        <font>basesmall</font>
+                        <align>left,vcenter</align>
+                    </textarea>
+                </state>
+            </statetype>
+        </buttonlist2>
+
+        <textarea name="messagetext" from="basetextarea">
+            <font>basemedium</font>
+            <area>40,230,720,290</area>
+            <align>allcenter</align>
+            <multiline>yes</multiline>
+        </textarea>
+
+    </window>
+
+    <window name="bookmarkeditor">
+
+        <textarea name="title" from="basetextarea">
+            <font>baselarge</font>
+            <area>0,50,800,50</area>
+            <align>allcenter</align>
+        </textarea>
+
+        <textarea name="categorylabel" from="basetextarea">
+            <area>80,150,100,30</area>
+            <align>right,vcenter</align>
+            <value>Category:</value>
+        </textarea>
+
+        <textedit name="category" from="basetextedit">
+            <area>195,140,375,50</area>
+        </textedit>
+
+        <button name="findcategory" from="basebutton">
+            <position>590,145</position>
+            <value>Find...</value>
+        </button>
+
+        <textarea name="namelabel" from="basetextarea">
+            <area>80,250,100,30</area>
+            <align>right,vcenter</align>
+            <value>Name:</value>
+        </textarea>
+
+        <textedit name="name" from="basetextedit">
+            <area>195,240,375,50</area>
+        </textedit>
+
+        <textarea name="urllabel" from="basetextarea">
+            <area>80,350,100,30</area>
+            <align>right,vcenter</align>
+            <value>URL:</value>
+        </textarea>
+
+        <textedit name="url" from="basetextedit">
+            <area>195,340,375,50</area>
+        </textedit>
+
+        <button name="cancel" from="basebutton">
+            <position>60,480</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>590,480</position>
+            <value>Ok</value>
+        </button>
+
+    </window>
+
+    <window name="browserconfig">
+
+        <textarea name="title" from="basetextarea">
+            <font>baselarge</font>
+            <area>0,50,800,50</area>
+            <align>allcenter</align>
+        </textarea>
+
+        <textarea name="commandlabel" from="basetextarea">
+            <area>30,150,200,30</area>
+            <align>right,vcenter</align>
+            <value>Browser Command:</value>
+        </textarea>
+
+        <textedit name="command" from="basetextedit">
+            <area>245,140,375,50</area>
+        </textedit>
+
+        <textarea name="zoomlabel" from="basetextarea">
+            <area>30,250,200,30</area>
+            <align>right,vcenter</align>
+            <value>Text Size:</value>
+        </textarea>
+
+        <textedit name="zoom" from="basetextedit">
+            <area>245,240,375,50</area>
+        </textedit>
+
+        <imagetype name="bgimage">
+            <area>50,445,700,100</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
+
+        <textarea name="description" from="basetextarea">
+            <area>70,455,660,90</area>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <button name="cancel" from="basebutton">
+            <position>60,550</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>590,550</position>
+            <value>Ok</value>
+        </button>
+
+    </window>
+
 </mythuitheme>

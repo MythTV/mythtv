@@ -2,9 +2,7 @@
 #include <iostream>
 
 // qt
-//#include <QWebFrame>
 #include <QEvent>
-#include <QIcon>
 
 // myth
 #include "mythverbose.h"
@@ -13,7 +11,9 @@
 
 // mythbrowser
 #include "webpage.h"
+
 #include "mythbrowser.h"
+#include "bookmarkeditor.h"
 
 using namespace std;
 
@@ -66,7 +66,7 @@ bool MythBrowser::Create(void)
     page->getBrowser()->SetZoom(m_zoom);
     page->SetActive(true);
 
-    connect(page, SIGNAL(loadProgress(int)),
+    connect(page, SIGNAL(loadProgress(int)), 
             this, SLOT(slotLoadProgress(int)));
     connect(page, SIGNAL(statusBarMessage(const QString&)),
             this, SLOT(slotStatusBarMessage(const QString&)));
@@ -115,6 +115,8 @@ void MythBrowser::slotEnterURL(void)
 
      connect(dialog, SIGNAL(haveResult(QString)),
             SLOT(slotOpenURL(QString)), Qt::QueuedConnection);
+
+     connect(dialog, SIGNAL(Exiting()), SLOT(slotExitingMenu()));
 }
 
 void MythBrowser::slotAddTab(const QString &url, bool doSwitch)
@@ -191,9 +193,6 @@ void MythBrowser::slotOpenURL(const QString &url)
         sUrl.prepend("http://");
 
     activeBrowser()->LoadPage(QUrl(sUrl));
-
-    if (GetFocusWidget() == activeBrowser())
-        activeBrowser()->SetActive(true);
 }
 
 void MythBrowser::slotZoomOut()
@@ -214,6 +213,42 @@ void MythBrowser::slotBack()
 void MythBrowser::slotForward()
 {
     activeBrowser()->Forward();
+}
+
+void MythBrowser::slotShowBookmarks()
+{
+    activeBrowser()->SetActive(false);
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    BookmarkManager *manager = new BookmarkManager(mainStack, "bookmarkmanager");
+
+    if (manager->Create())
+        mainStack->AddScreen(manager);
+
+    manager->SetBrowser(this);
+
+    connect(manager, SIGNAL(Exiting()), SLOT(slotExitingMenu()));
+}
+
+void MythBrowser::slotAddBookmark()
+{
+    activeBrowser()->SetActive(false);
+
+    m_editBookmark.category = "";
+    m_editBookmark.name = m_pageList->GetValue();
+    m_editBookmark.url = activeBrowser()->GetUrl().toString();
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    BookmarkEditor *editor = new BookmarkEditor(&m_editBookmark, 
+            true, mainStack, "bookmarkeditor");
+
+
+    if (editor->Create())
+        mainStack->AddScreen(editor);
+
+    connect(editor, SIGNAL(Exiting()), SLOT(slotExitingMenu()));
 }
 
 void MythBrowser::slotLoadStarted(void)
@@ -334,6 +369,8 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
 
             m_menuPopup->SetReturnEvent(this, "action");
 
+            connect(m_menuPopup, SIGNAL(Exiting()), SLOT(slotExitingMenu()));
+
             m_menuPopup->AddButton(tr("Enter URL"), SLOT(slotEnterURL()));
 
             if (activeBrowser()->CanGoBack())
@@ -348,6 +385,9 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
 
             if (m_browserList.size() > 1)
                 m_menuPopup->AddButton(tr("Delete Tab"), SLOT(slotDeleteTab()));
+
+            m_menuPopup->AddButton(tr("Edit Bookmarks"), SLOT(slotShowBookmarks()));
+            m_menuPopup->AddButton(tr("Add Bookmark"), SLOT(slotAddBookmark()));
 
             m_menuPopup->AddButton(tr("Cancel"));
         }
@@ -389,27 +429,9 @@ bool MythBrowser::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void MythBrowser::customEvent(QEvent *event)
+void MythBrowser::slotExitingMenu(void)
 {
-    if (event->type() == kMythDialogBoxCompletionEventType)
-    {
-        DialogCompletionEvent *dce =
-                                dynamic_cast<DialogCompletionEvent*>(event);
-
-        QString resultid= dce->GetId();
-        int buttonnum  = dce->GetResult();
-
-        if (resultid == "action")
-        {
-            // make the current browser active again unless we need to show
-            // the text input popup
-            if (GetFocusWidget() == activeBrowser() && buttonnum != 0)
-                activeBrowser()->SetActive(true);
-        }
-
-        m_menuPopup = NULL;
-    }
+    if (GetFocusWidget() == activeBrowser())
+        activeBrowser()->SetActive(true);
 }
-
-
 

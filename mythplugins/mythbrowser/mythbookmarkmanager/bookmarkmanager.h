@@ -7,79 +7,108 @@
 #include <mythtv/mythwidgets.h>
 #include <mythtv/mythdialogs.h>
 
-//class BookmarkConfigPriv;
+// libmythui
+#include <libmythui/mythlistbutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythdialogbox.h>
 
-class PopupBox : public QDialog
+class MythBrowser;
+
+class Bookmark
 {
-    Q_OBJECT
+  public:
+    Bookmark(void)
+    {
+        category = "";
+        name = "";
+        url = "";
+        selected = false;
+    }
 
-public:
-    PopupBox(QWidget *parent);
-    ~PopupBox();
+    QString category;
+    QString name;
+    QString url;
+    bool    selected;
 
-signals:
-    void finished(const char* group, const char* desc,const char* url);
-
-private slots:
-    void slotOkClicked();
-
-private:
-    QLineEdit* group;
-    QLineEdit* desc;
-    QLineEdit* url;
+    inline bool operator == (const Bookmark &b) const
+    {
+        return category == b.category && name == b.name && url == b.url;
+    }
 };
 
-class BookmarksConfig : public MythDialog
+class BrowserConfig : public MythScreenType
 {
-    Q_OBJECT
+  Q_OBJECT
 
-public:
+  public:
 
-    BookmarksConfig(MythMainWindow *parent,
-                    const char *name = 0);
-    ~BookmarksConfig();
+    BrowserConfig(MythScreenStack *parent, const char *name = 0);
+    ~BrowserConfig();
 
-private:
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
 
-    void populateListView();
-    void setupView();
+  private:
+    MythUITextEdit   *m_commandEdit;
+    MythUITextEdit   *m_zoomEdit;
 
-    MythSpinBox        *zoom;
-    MythSpinBox        *scrollspeed;
-    MythCheckBox       *scrollmode;
-    MythCheckBox       *hidescrollbars;
-    MythLineEdit       *browser;
-    MythListView       *myBookmarksView;
+    MythUIText       *m_descriptionText;
+    MythUIText       *m_titleText;
 
-private slots:
+    MythUIButton     *m_okButton;
+    MythUIButton     *m_cancelButton;
 
-    void slotBookmarksViewExecuted(Q3ListViewItem *item);
-    void slotAddBookmark();
-    void slotFinish();
-    void slotWebSiteAdded(const char* group, const char* desc, const char* url);
+  private slots:
+    void slotSave(void);
+    void slotFocusChanged(void);
 };
 
-
-class Bookmarks : public MythDialog
+class BookmarkManager : public MythScreenType
 {
-    Q_OBJECT
+  Q_OBJECT
 
-public:
+  public:
+    BookmarkManager(MythScreenStack *parent, const char *name);
+    ~BookmarkManager();
 
-    Bookmarks(MythMainWindow *parent, const char *name = 0);
-    ~Bookmarks();
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
+    void SetBrowser(MythBrowser *browser) { m_browser = browser; }
 
-private:
+  private slots:
+    void slotGroupSelected(MythListButtonItem *item);
+    void slotBookmarkClicked(MythUIButtonListItem *item);
+    void slotEditDialogExited(void);
+    void slotDoDeleteCurrent(bool doDelete);
+    void slotDoDeleteMarked(bool doDelete);
 
-    void populateListView();
-    void setupView();
+    void slotAddBookmark(void);
+    void slotEditBookmark(void);
+    void slotDeleteCurrent(void);
+    void slotDeleteMarked(void);
+    void slotShowCurrent(void);
+    void slotShowMarked(void);
+    void slotClearMarked(void);
 
-    MythListView       *myBookmarksView;
-//    BookmarkConfigPriv *myTree;
+  private:
+    uint GetMarkedCount(void);
+    void UpdateGroupList(void);
+    void UpdateURLList(void);
+    void ShowEditDialog(bool edit);
+    void ReloadBookmarks(void);
 
-private slots:
+    MythBrowser      *m_browser;
 
-    void slotBookmarksViewExecuted(Q3ListViewItem *item);
+    QList<Bookmark*>  m_siteList;
+
+    Bookmark          m_savedBookmark;
+
+    MythUIButtonList *m_bookmarkList;
+    MythListButton   *m_groupList;
+    MythUIText       *m_messageText;
+
+    MythDialogBox    *m_menuPopup;
 };
 
-#endif /* BOOKMARKMANAGER_H */
+#endif

@@ -1,20 +1,7 @@
 #include <iostream>
 
 // qt
-#include <q3ptrlist.h>
 #include <qstring.h>
-#include <qfile.h>
-#include <qdom.h>
-#include <qlayout.h>
-#include <qcursor.h>
-#include <qlabel.h>
-#include <q3vgroupbox.h>
-#include <qtimer.h>
-
-//Added by qt3to4:
-#include <Q3HBoxLayout>
-#include <Q3Frame>
-#include <Q3VBoxLayout>
 
 // myth
 #include <mythtv/mythcontext.h>
@@ -23,540 +10,591 @@
 
 // mythbrowser
 #include "bookmarkmanager.h"
+#include "bookmarkeditor.h"
+#include "browserdbutil.h"
+#include "../mythbrowser/mythbrowser.h"
 
 using namespace std;
 
 // ---------------------------------------------------
 
-class BookmarkItem
+BrowserConfig::BrowserConfig(MythScreenStack *parent, const char *name)
+               : MythScreenType(parent, name)
 {
-public:
-    typedef Q3PtrList<BookmarkItem> List;
-
-    QString group;
-    QString desc;
-    QString url;
-};
-
-// ---------------------------------------------------
-
-class BookmarkGroup
-{
-public:
-
-    typedef Q3PtrList<BookmarkGroup> List;
-
-    QString name;
-    BookmarkItem::List  siteList;
-
-    BookmarkGroup() {
-        siteList.setAutoDelete(true);
-    }
-
-    ~BookmarkGroup() {
-        siteList.clear();
-    }
-
-    void clear() {
-        siteList.clear();
-    };
-};
-
-// ---------------------------------------------------
-
-class BookmarkViewItem : public Q3ListViewItem
-{
-public:
-
-    BookmarkViewItem(Q3ListViewItem* parent, BookmarkItem* siteItem)
-        : Q3ListViewItem(parent, siteItem->desc, siteItem->url)
-        {
-        myBookmarkSite = siteItem;
-    }
-
-    ~BookmarkViewItem()
-        {}
-
-    BookmarkItem* myBookmarkSite;
-};
-
-// ---------------------------------------------------
-
-PopupBox::PopupBox(QWidget *parent)
-        : QDialog(parent, 0, true, Qt::WType_Popup)
-{
-    setPalette(parent->palette());
-    setFont(parent->font());
-
-    Q3VBoxLayout *lay  = new Q3VBoxLayout(this, 5);
-
-    Q3VGroupBox  *vbox = new Q3VGroupBox(tr("Add New Website"),this);
-    lay->addWidget(vbox);
-
-    QLabel *groupLabel = new QLabel(tr("Group:"), vbox);
-    groupLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    group = new QLineEdit(vbox);
-
-    QLabel *descLabel = new QLabel(tr("Description:"), vbox);
-    descLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    desc = new QLineEdit(vbox);
-
-    QLabel *urlLabel =new QLabel(tr("URL:"), vbox);
-    urlLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    url = new QLineEdit(vbox);
-
-    Q3HBoxLayout *hbox = new Q3HBoxLayout(lay);
-
-    hbox->addItem(new QSpacerItem(100, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
-
-    MythPushButton *okButton = new MythPushButton(tr("&Ok"), this);
-    okButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    hbox->addWidget(okButton);
-
-    hbox->addItem(new QSpacerItem(100, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
-
-    connect(okButton, SIGNAL(clicked()), this, SLOT(slotOkClicked()));
-
-//    gContext->ThemeWidget(this);
+    m_commandEdit = NULL;
+    m_zoomEdit = NULL;
+    m_descriptionText = NULL;
+    m_okButton = NULL;
+    m_cancelButton = NULL;
 }
 
-PopupBox::~PopupBox()
+bool BrowserConfig::Create()
 {
-}
+    bool foundtheme = false;
 
-void PopupBox::slotOkClicked()
-{
-    emit finished(group->text(),desc->text(),url->text());
-    close();
-}
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("browser-ui.xml", "browserconfig", this);
 
-// ---------------------------------------------------
+    if (!foundtheme)
+        return false;
 
- class BookmarkConfigPriv
-{
-public:
+    m_titleText = dynamic_cast<MythUIText *> (GetChild("title"));
 
-    BookmarkGroup::List groupList;
-    QStringList selectedSitesList;
+    if (m_titleText)
+          m_titleText->SetText(tr("MythBrowser Settings"));
 
-    BookmarkConfigPriv() {
-        groupList.setAutoDelete(true);
-    }
+    m_commandEdit = dynamic_cast<MythUITextEdit *> (GetChild("command"));
+    m_zoomEdit = dynamic_cast<MythUITextEdit *> (GetChild("zoom"));
 
-    ~BookmarkConfigPriv() {
-        groupList.clear();
-    }
-};
+    m_descriptionText = dynamic_cast<MythUIText *> (GetChild("description"));
 
-// ---------------------------------------------------
+    m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
+    m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
-BookmarksConfig::BookmarksConfig(MythMainWindow *parent,
-                                 const char *name)
-    : MythDialog(parent, name)
-{
-    setPalette(parent->palette());
-
-//    myTree = new BookmarkConfigPriv;
-
-    // Create the database if not exists
-    QString queryString( "CREATE TABLE IF NOT EXISTS websites "
-                         "( grp VARCHAR(255) NOT NULL, dsc VARCHAR(255),"
-             " url VARCHAR(255) NOT NULL PRIMARY KEY,"
-                         "  updated INT UNSIGNED );");
-    MSqlQuery query(MSqlQuery::InitCon());
-    if (!query.exec(queryString)) {
-        cerr << "MythBookmarksConfig: Error in creating sql table" << endl;
-    }
-
-    // List View of Tabs and their bookmaks
-    myBookmarksView = new MythListView(this);
-    myBookmarksView->header()->hide();
-    myBookmarksView->addColumn("Sites");
-    myBookmarksView->setRootIsDecorated(true);
-    myBookmarksView->addColumn("URL",-1);
-
-    populateListView();
-    setupView();
-
-    setCursor(QCursor(Qt::ArrowCursor));
-}
-
-
-BookmarksConfig::~BookmarksConfig()
-{
-//    delete myTree;
-    gContext->SaveSetting("WebBrowserZoomLevel", zoom->value());
-    gContext->SaveSetting("WebBrowserCommand", browser->text());
-    gContext->SaveSetting("WebBrowserScrollMode", 
-                                               scrollmode->isChecked()?1:0);
-    gContext->SaveSetting("WebBrowserScrollSpeed", scrollspeed->value());
-    gContext->SaveSetting("WebBrowserHideScrollbars", 
-                                               hidescrollbars->isChecked()?1:0);
-}
-
-
-void BookmarksConfig::populateListView()
-{
-    BookmarkConfigPriv* myTree = new BookmarkConfigPriv;
-
-    myTree->groupList.clear();
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT grp, dsc, url FROM websites ORDER BY grp");
-
-    if (!query.isActive()) {
-        cerr << "MythBrowserConfig: Error in loading from DB" << endl;
-    } else {
-        BookmarkGroup *group = new BookmarkGroup();
-        group->name="Empty";
-        while( query.next() ) {
-            if( QString::compare(group->name,query.value(0).toString())!=0 ) {
-                group = new BookmarkGroup();
-                group->name = query.value(0).toString();
-                myTree->groupList.append(group);
-            }
-            BookmarkItem *site = new BookmarkItem();
-            site->group = query.value(0).toString();
-            site->desc = query.value(1).toString();
-            site->url = query.value(2).toString();
-            group->siteList.append(site);
-        }
-    }
-
-    // Build the ListView
-    myBookmarksView->clear();
-    for (BookmarkGroup* cat = myTree->groupList.first(); cat; cat = myTree->groupList.next() ) {
-    Q3ListViewItem *catItem = new Q3ListViewItem(myBookmarksView, cat->name,"");
-    catItem->setOpen(true);
-    for(BookmarkItem* site = cat->siteList.first(); site; site = cat->siteList.next() ) {
-        new BookmarkViewItem(catItem, site);
-    }
-    }
-}
-
-
-void BookmarksConfig::setupView()
-{
-    Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(hmult*10));
-
-    // Top fancy stuff
-    QLabel *topLabel = new QLabel(this);
-    topLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    topLabel->setText(tr("MythBrowser Bookmarks Settings"));
-
-    vbox->addWidget(topLabel);
-
-    QLabel *helpLabel = new QLabel(this);
-    helpLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    helpLabel->setFrameStyle(Q3Frame::Box + Q3Frame::Sunken);
-    helpLabel->setMargin(int(hmult*4));
-    helpLabel->setText(tr("Press the 'New Bookmark' button to "
-               "add a new site/group.\n"
-               "Pressing SPACE/Enter on a selected entry "
-               "removes it from the listview."));
-    vbox->addWidget(helpLabel);
-
-    // Add List View of Tabs and their bookmaks
-    vbox->addWidget(myBookmarksView);
-
-    connect(myBookmarksView, SIGNAL(doubleClicked(Q3ListViewItem*)),
-        this, SLOT(slotBookmarksViewExecuted(Q3ListViewItem*)));
-    connect(myBookmarksView, SIGNAL(spacePressed(Q3ListViewItem*)),
-        this, SLOT(slotBookmarksViewExecuted(Q3ListViewItem*)));
-
-    Q3Frame *hbar2 = new Q3Frame( this, "<hr>", 0 );
-    hbar2->setBackgroundOrigin(QWidget::WindowOrigin);
-    hbar2->setFrameStyle( Q3Frame::Sunken + Q3Frame::HLine );
-    hbar2->setFixedHeight( 12 );
-    vbox->addWidget(hbar2);
-
-    // Zoom Level & Browser Command
-    Q3HBoxLayout *hbox2 = new Q3HBoxLayout(vbox);
-
-    QLabel *zoomLabel = new QLabel(this);
-    zoomLabel->setText(tr("Zoom [%]:"));
-    zoomLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    zoomLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    hbox2->addWidget(zoomLabel);
-
-    zoom = new MythSpinBox(this);
-    zoom->setMinValue(20);
-    zoom->setMaxValue(300);
-    zoom->setLineStep(5);
-    hbox2->addWidget(zoom);
-    zoom->setValue(gContext->GetNumSetting("WebBrowserZoomLevel", 20));
-
-    QLabel *browserLabel = new QLabel(this);
-    browserLabel->setText(tr("Browser:"));
-    browserLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    browserLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    hbox2->addWidget(browserLabel);
-    browser = new MythLineEdit(this);
-    browser->setRW(true);
-    browser->setHelpText("this is the help line");
-    hbox2->addWidget(browser);
-    browser->setText(gContext->GetSetting("WebBrowserCommand", GetInstallPrefix() + "/bin/mythbrowser"));
-
-    // Scroll Settings 
-    Q3HBoxLayout *hbox3 = new Q3HBoxLayout(vbox);
-
-    hidescrollbars = new MythCheckBox(this);
-    hidescrollbars->setText(tr("Hide Scrollbars"));
-    hidescrollbars->setChecked(gContext->GetNumSetting(
-                                                "WebBrowserHideScrollbars", 0) 
-             == 1);
-    hbox3->addWidget(hidescrollbars);
-
-    scrollmode = new MythCheckBox(this);
-    scrollmode->setText(tr("Scroll Page"));
-    scrollmode->setChecked(gContext->GetNumSetting("WebBrowserScrollMode", 1) 
-             == 1);
-    hbox3->addWidget(scrollmode);
-
-    QLabel *label = new QLabel(this);
-    label->setText(tr("Scroll Speed:"));
-    label->setBackgroundOrigin(QWidget::WindowOrigin);
-    label->setBackgroundOrigin(QWidget::WindowOrigin);
-    hbox3->addWidget(label);
-
-    scrollspeed = new MythSpinBox(this);
-    scrollspeed->setMinValue(1);
-    scrollspeed->setMaxValue(16);
-    scrollspeed->setLineStep(1);
-    hbox3->addWidget(scrollspeed);
-    scrollspeed->setValue(gContext->GetNumSetting("WebBrowserScrollSpeed", 4));
-
-    // Add new bookmark ------------------------------------
-    Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox);
-
-    MythPushButton *newBookmark = new MythPushButton(tr("&New Bookmark"), this);
-    hbox->addWidget(newBookmark);
-
-    connect(newBookmark, SIGNAL(clicked()), this, SLOT(slotAddBookmark()));
-
-    QLabel *customSiteLabel = new QLabel(this);
-    customSiteLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    customSiteLabel->setText(tr("Add a new Website"));
-    hbox->addWidget(customSiteLabel);
-
-    // Finish -----------------------------------
-    hbox->addItem(new QSpacerItem(100, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
-
-    MythPushButton *finish = new MythPushButton(tr("&Finish"), this);
-    hbox->addWidget(finish);
-
-    connect(finish, SIGNAL(clicked()), this, SLOT(slotFinish()));
-}
-
-
-void BookmarksConfig::slotFinish()
-{
-    close();
-}
-
-
-void BookmarksConfig::slotBookmarksViewExecuted(Q3ListViewItem *item)
-{
-    if(!item)
-        return;
-
-    BookmarkViewItem* viewItem = dynamic_cast<BookmarkViewItem*>(item);
-    if (!viewItem) { // This is a upper level item, i.e. a "group name"
-        // item->setOpen(!(item->isOpen()));
-    } else {
-    
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM websites WHERE url=:URL");
-        query.bindValue(":URL",viewItem->myBookmarkSite->url);
-
-        if (!query.exec()) {
-           cerr << "MythBookmarksConfig: Error in deleting in DB" << endl;
-           return;
-        }
-        populateListView();
-    }
-}
-
-void BookmarksConfig::slotAddBookmark()
-{
-     PopupBox *popupBox = new PopupBox(this);
-     connect(popupBox, SIGNAL(finished(const char*,const char*,const char*)),
-             this, SLOT(slotWebSiteAdded(const char*,const char*,const char*)));
-     popupBox->show();
-}
-
-void BookmarksConfig::slotWebSiteAdded(const char* group, const char* desc, const char* url)
-{
-    QString *groupStr = new QString(group);
-    QString *descStr = new QString(desc);
-    QString *urlStr = new QString(url);
-    urlStr->stripWhiteSpace();
-    if ( !urlStr->startsWith("http://") && !urlStr->startsWith("https://") && 
-            !urlStr->startsWith("file:/") )
-        urlStr->prepend("http://");
-
-    if (groupStr->isEmpty() || urlStr->isEmpty())
-        return;
-
-    urlStr->replace("&amp;","&");
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO websites (grp, dsc, url) VALUES(:GROUP, :DESC, :URL);");
-    query.bindValue(":GROUP",groupStr->utf8());
-    query.bindValue(":DESC",descStr->utf8());
-    query.bindValue(":URL",urlStr->utf8());
-    if (!query.exec()) {
-        cerr << "MythBookmarksConfig: Error in inserting in DB" << endl;
-    }
-    populateListView();
-}
-
-// ---------------------------------------------------
-
-Bookmarks::Bookmarks(MythMainWindow *parent, const char *name)
-    : MythDialog(parent, name)
-{
-    setPalette(parent->palette());
-
-//    myTree = new BookmarkConfigPriv;
-
-    // Create the database if not exists
-    QString queryString( "CREATE TABLE IF NOT EXISTS websites "
-                         "( grp VARCHAR(255) NOT NULL, dsc VARCHAR(255),"
-             " url VARCHAR(255) NOT NULL PRIMARY KEY,"
-                         "  updated INT UNSIGNED );");
-    MSqlQuery query(MSqlQuery::InitCon());
-    if (!query.exec(queryString)) {
-        cerr << "MythBookmarksConfig: Error in creating sql table" << endl;
-    }
-
-    // List View of Tabs and their bookmaks
-    myBookmarksView = new MythListView(this);
-    myBookmarksView->header()->hide();
-    myBookmarksView->addColumn("Sites");
-    myBookmarksView->setRootIsDecorated(true);
-    myBookmarksView->addColumn("URL",-1);
-
-    populateListView();
-    setupView();
-
-    setCursor(QCursor(Qt::ArrowCursor));
-}
-
-
-Bookmarks::~Bookmarks()
-{
-//    delete myTree;
-}
-
-
-void Bookmarks::populateListView()
-{
-    BookmarkConfigPriv* myTree = new BookmarkConfigPriv;
-
-    myTree->groupList.clear();
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT grp, dsc, url FROM websites ORDER BY grp");
-
-    if (!query.isActive()) {
-        cerr << "MythBrowserConfig: Error in loading from DB" << endl;
-    } else {
-        BookmarkGroup *group = new BookmarkGroup();
-        group->name="Empty";
-        while( query.next() ) {
-            if( QString::compare(group->name,query.value(0).toString())!=0 ) {
-                group = new BookmarkGroup();
-                group->name = query.value(0).toString();
-                myTree->groupList.append(group);
-            }
-            BookmarkItem *site = new BookmarkItem();
-            site->group = query.value(0).toString();
-            site->desc = query.value(1).toString();
-            site->url = query.value(2).toString();
-            group->siteList.append(site);
-        }
-    }
-
-    // Build the ListView
-    myBookmarksView->clear();
-    for (BookmarkGroup* cat = myTree->groupList.first(); cat; cat = myTree->groupList.next() ) {
-        Q3ListViewItem *catItem = new Q3ListViewItem(myBookmarksView, cat->name,"");
-        catItem->setOpen(false);
-        for(BookmarkItem* site = cat->siteList.first(); site; site = cat->siteList.next() ) {
-            new BookmarkViewItem(catItem, site);
-        }
-    }
-
-    myBookmarksView->setFocus();
-    myBookmarksView->setCurrentItem(myBookmarksView->firstChild());
-    myBookmarksView->setSelected(myBookmarksView->firstChild(),true);
-}
-
-
-void Bookmarks::setupView()
-{
-    Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(hmult*10));
-
-    // Top fancy stuff
-    QLabel *topLabel = new QLabel(this);
-    topLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    topLabel->setText(tr("MythBrowser: Select group or single site to view"));
-
-    Q3Frame *hbar1 = new Q3Frame( this, "<hr>", 0 );
-    hbar1->setBackgroundOrigin(QWidget::WindowOrigin);
-    hbar1->setFrameStyle( Q3Frame::Sunken + Q3Frame::HLine );
-    hbar1->setFixedHeight( 12 );
-
-    vbox->addWidget(topLabel);
-    vbox->addWidget(hbar1);
-
-    // Add List View of Tabs and their bookmaks
-    vbox->addWidget(myBookmarksView);
-
-    connect(myBookmarksView, SIGNAL(doubleClicked(Q3ListViewItem*)),
-        this, SLOT(slotBookmarksViewExecuted(Q3ListViewItem*)));
-    connect(myBookmarksView, SIGNAL(spacePressed(Q3ListViewItem*)),
-        this, SLOT(slotBookmarksViewExecuted(Q3ListViewItem*)));
-}
-
-
-void Bookmarks::slotBookmarksViewExecuted(Q3ListViewItem *item)
-{
-    QString cmd = gContext->GetSetting("WebBrowserCommand", GetInstallPrefix() + "/bin/mythbrowser");
-    cmd += QString(" -z %1 ").arg(gContext->GetNumSetting("WebBrowserZoomLevel", 1.4));
-
-    if(!item)
-        return;
-
-    BookmarkViewItem* viewItem = dynamic_cast<BookmarkViewItem*>(item);
-    if (!viewItem) 
+    if (!m_commandEdit || !m_zoomEdit || !m_okButton || !m_cancelButton)
     {
-        // This is a upper level item, i.e. a "group name"
-        Q3ListViewItemIterator it(item);
-        ++it;
-        while (it.current())
-        {
-            BookmarkViewItem* leafItem = dynamic_cast<BookmarkViewItem*>(it.current());
-            if(leafItem)
-                cmd += " " + leafItem->myBookmarkSite->url;
-            else
-                break;
-            ++it;
-        }
-        gContext->GetMainWindow()->AllowInput(false);
-        cmd.replace("&","\\&"); 
-        cmd.replace(";","\\;"); 
-        myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
-        gContext->GetMainWindow()->AllowInput(true);
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        return false;
     }
-    else
+
+    m_commandEdit->SetText(gContext->GetSetting("WebBrowserCommand",
+                           GetInstallPrefix() + "/bin/mythbrowser"));
+
+    m_zoomEdit->SetText(gContext->GetSetting("WebBrowserZoomLevel", "1.4"));
+
+    m_okButton->SetText(tr("Ok"));
+    m_cancelButton->SetText(tr("Cancel"));
+
+    connect(m_okButton, SIGNAL(buttonPressed()), this, SLOT(slotSave()));
+    connect(m_cancelButton, SIGNAL(buttonPressed()), this, SLOT(Close()));
+
+    connect(m_commandEdit,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+    connect(m_zoomEdit   ,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+    connect(m_okButton,     SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+    connect(m_cancelButton, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+
+    SetFocusWidget(m_commandEdit);
+
+    return true;
+}
+
+BrowserConfig::~BrowserConfig()
+{
+}
+
+void BrowserConfig::slotSave(void)
+{
+    //FIXME should check the zoom level is a valid value 0.3 to 5.0
+    gContext->SaveSetting("WebBrowserZoomLevel", m_zoomEdit->GetText());
+    gContext->SaveSetting("WebBrowserCommand", m_commandEdit->GetText());
+
+    Close();
+}
+
+bool BrowserConfig::keyPressEvent(QKeyEvent *event)
+{
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
+    bool handled = false;
+
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
+}
+
+void BrowserConfig::slotFocusChanged(void)
+{
+    if (!m_descriptionText)
+        return;
+
+    QString msg = "";
+    if (GetFocusWidget() == m_commandEdit)
+        msg = tr("This is the command that will be used to show the web browser. "
+                 "The default is to use MythBrowser.");
+    else if (GetFocusWidget() == m_zoomEdit)
+        msg = tr("This is the default text size that will be used. Valid values "
+                 "are from 0.3 to 5.0 with 1.0 being normal size less than 1 is "
+                 "smaller and greater than 1 is larger than normal size.");
+    else if (GetFocusWidget() == m_cancelButton)
+        msg = tr("Exit without saving settings");
+    else if (GetFocusWidget() == m_okButton)
+        msg = tr("Save settings and Exit");
+
+    m_descriptionText->SetText(msg);
+}
+
+// ---------------------------------------------------
+
+BookmarkManager::BookmarkManager(MythScreenStack *parent, const char *name)
+               : MythScreenType(parent, name)
+{
+    m_browser = NULL;
+    m_bookmarkList = NULL;
+    m_groupList = NULL;
+    m_messageText = NULL;
+    m_menuPopup = NULL;
+}
+
+bool BookmarkManager::Create(void)
+{
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("browser-ui.xml", "bookmarkmanager", this);
+
+    if (!foundtheme)
+        return false;
+
+    m_groupList = dynamic_cast<MythListButton *>(GetChild("grouplist"));
+    m_bookmarkList = dynamic_cast<MythUIButtonList *>(GetChild("bookmarklist"));
+
+    // optional text area warning user hasn't set any bookmarks yet
+    m_messageText = dynamic_cast<MythUIText *>(GetChild("messagetext"));
+    if (m_messageText)
+        m_messageText->SetText(tr("No bookmarks defined.\n\n"
+                "Use the 'Add Bookmark' menu option to add new bookmarks"));
+
+    if (!m_groupList || !m_bookmarkList)
     {
-        cmd += viewItem->myBookmarkSite->url;
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        return false;
+    }
+
+    m_groupList->SetActive(true);
+    m_bookmarkList->SetActive(false);
+
+    GetSiteList(m_siteList);
+    UpdateGroupList();
+    UpdateURLList();
+
+    connect(m_groupList, SIGNAL(itemSelected(MythListButtonItem*)),
+            this, SLOT(slotGroupSelected(MythListButtonItem*)));
+
+    connect(m_bookmarkList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+            this, SLOT(slotBookmarkClicked(MythUIButtonListItem*)));
+
+    m_groupList->SetActive(true);
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+
+    SetFocusWidget(m_groupList);
+
+    return true;
+}
+
+BookmarkManager::~BookmarkManager()
+{
+    while (!m_siteList.isEmpty())
+        delete m_siteList.takeFirst();
+}
+
+void BookmarkManager::UpdateGroupList(void)
+{
+    m_groupList->Reset();
+    QStringList groups;
+    for (int x = 0; x < m_siteList.count(); x++)
+    {
+        Bookmark *site = m_siteList.at(x);
+
+        if (groups.indexOf(site->category) == -1)
+        {
+            groups.append(site->category);
+            new MythListButtonItem(m_groupList, site->category);
+        }
+    }
+}
+
+void BookmarkManager::UpdateURLList(void)
+{
+    m_bookmarkList->Reset();
+
+    if (m_messageText)
+        m_messageText->SetVisible((m_siteList.count() == 0));
+
+    MythListButtonItem *item = m_groupList->GetItemCurrent();
+    if (!item)
+        return;
+
+    QString group = item->text();
+
+    for (int x = 0; x < m_siteList.count(); x++)
+    {
+        Bookmark *site = m_siteList.at(x);
+
+        if (group == site->category)
+        {
+            MythUIButtonListItem *item = new MythUIButtonListItem(
+                    m_bookmarkList, "", NULL, true, MythUIButtonListItem::NotChecked);
+            item->setText(site->name, "name");
+            item->setText(site->url, "url");
+            item->setData((void*) site);
+            item->setChecked(site->selected ? 
+                    MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
+        }
+    }
+}
+
+uint BookmarkManager::GetMarkedCount(void)
+{
+    uint count = 0;
+
+    for (int x = 0; x < m_siteList.size(); x++)
+    {
+        Bookmark *site = m_siteList.at(x);
+        if (site && site->selected)
+            count++;
+    }
+
+    return count;
+}
+
+bool BookmarkManager::keyPressEvent(QKeyEvent *event)
+{
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("qt", event, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "MENU")
+        {
+            QString label = tr("Actions");
+
+            MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+            m_menuPopup = new MythDialogBox(label, popupStack, "actionmenu");
+
+            if (!m_menuPopup->Create())
+            {
+                delete m_menuPopup;
+                m_menuPopup = NULL;
+                return true;
+            }
+
+            m_menuPopup->SetReturnEvent(this, "action");
+
+            m_menuPopup->AddButton(tr("Add Bookmark"), SLOT(slotAddBookmark()));
+
+            if (m_bookmarkList->GetItemCurrent())
+            {
+                m_menuPopup->AddButton(tr("Edit Bookmark"), SLOT(slotEditBookmark()));
+                m_menuPopup->AddButton(tr("Delete Bookmark"), SLOT(slotDeleteCurrent()));
+                m_menuPopup->AddButton(tr("Show bookmark"), SLOT(slotShowCurrent()));
+            }
+
+            if (GetMarkedCount() > 0)
+            {
+                m_menuPopup->AddButton(tr("Delete Marked"), SLOT(slotDeleteMarked()));
+                if (!m_browser)
+                    m_menuPopup->AddButton(tr("Show Marked"), SLOT(slotShowMarked()));
+                m_menuPopup->AddButton(tr("Clear Marked"), SLOT(slotClearMarked()));
+            }
+
+            m_menuPopup->AddButton(tr("Cancel"));
+
+            popupStack->AddScreen(m_menuPopup);
+        }
+        else if (action == "INFO")
+        {
+            MythUIButtonListItem *item = m_bookmarkList->GetItemCurrent();
+
+            if (item)
+            {
+                Bookmark *site = (Bookmark*) item->getData();
+
+                if (item->state() == MythUIButtonListItem::NotChecked)
+                {
+                    item->setChecked(MythUIButtonListItem::FullChecked);
+                    if (site)
+                        site->selected = true;
+                }
+                else
+                {
+                    item->setChecked(MythUIButtonListItem::NotChecked);
+                    if (site)
+                        site->selected = false;
+                }
+            }
+        }
+        else if (action == "DELETE")
+            slotDeleteCurrent();
+        else if (action == "EDIT")
+            slotEditBookmark();
+        else
+            handled = false;
+    }
+
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
+}
+
+void BookmarkManager::slotGroupSelected(MythListButtonItem *item)
+{
+    (void) item;
+
+    UpdateURLList();
+    m_bookmarkList->Refresh();
+}
+
+void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
+{
+    if (!item)
+        return;
+
+    Bookmark *site = (Bookmark*) item->getData();
+    if (!site)
+        return;
+
+    if (!m_browser)
+    {
+        QString cmd = gContext->GetSetting("WebBrowserCommand", 
+                       GetInstallPrefix() + "/bin/mythbrowser");
+        cmd += QString(" -z %1 ").arg(
+                       gContext->GetSetting("WebBrowserZoomLevel", "1.4"));
+
+        m_savedBookmark = *site;
+
+        cmd += site->url;
         gContext->GetMainWindow()->AllowInput(false);
         cmd.replace("&","\\&");
         cmd.replace(";","\\;");
         myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
         gContext->GetMainWindow()->AllowInput(true);
+
+        // we need to reload the bookmarks incase the user added/deleted
+        // any while in MythBrowser 
+        ReloadBookmarks();
+    }
+    else
+    {
+        m_browser->slotOpenURL(site->url);
+        GetScreenStack()->PopScreen();
+    }
+}
+
+void BookmarkManager::ShowEditDialog(bool edit)
+{
+    Bookmark *site = NULL;
+
+    if (edit)
+    {
+        MythUIButtonListItem *item = m_bookmarkList->GetItemCurrent();
+
+        if (item && item->getData())
+        {
+            site = (Bookmark*) item->getData();
+            m_savedBookmark = *site;
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, "BookmarkManager: Something is wrong. "
+                                  "Asked to edit a non existent bookmark!");
+            return;
+        }
+    }
+
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    BookmarkEditor *editor = new BookmarkEditor(&m_savedBookmark, edit, mainStack,
+                                                        "bookmarkeditor");
+
+    connect(editor, SIGNAL(Exiting()), this, SLOT(slotEditDialogExited()));
+
+    if (editor->Create())
+        mainStack->AddScreen(editor);
+}
+
+void BookmarkManager::slotEditDialogExited(void)
+{
+    ReloadBookmarks();
+}
+
+void BookmarkManager::ReloadBookmarks(void)
+{
+    GetSiteList(m_siteList);
+    UpdateGroupList();
+
+    m_groupList->MoveToNamedPosition(m_savedBookmark.category);
+    UpdateURLList();
+
+    // try to set the current item to name
+    MythUIButtonListItem *item;
+    for (int x = 0; x < m_bookmarkList->GetCount(); x++)
+    {
+        item = m_bookmarkList->GetItemAt(x);
+        if (item && item->getData())
+        {
+            Bookmark *site = (Bookmark*) item->getData();
+            if (site && (*site == m_savedBookmark))
+            {
+                m_bookmarkList->SetItemCurrent(item);
+                break;
+            }
+        }
+    }
+}
+
+void BookmarkManager::slotAddBookmark(void)
+{
+    ShowEditDialog(false);
+}
+
+void BookmarkManager::slotEditBookmark(void)
+{
+    ShowEditDialog(true);
+}
+
+void BookmarkManager::slotDeleteCurrent(void)
+{
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    QString message = tr("Are you sure you want to delete the selected bookmark");
+
+    MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, message, true);
+
+    if (dialog->Create())
+        popupStack->AddScreen(dialog);
+
+    connect(dialog, SIGNAL(haveResult(bool)),
+            this, SLOT(slotDoDeleteCurrent(bool)));
+}
+
+void BookmarkManager::slotDoDeleteCurrent(bool doDelete)
+{
+    if (!doDelete)
+        return;
+
+    MythUIButtonListItem *item = m_bookmarkList->GetItemCurrent();
+    if (item)
+    {
+        QString category = "";
+        Bookmark *site = (Bookmark*) item->getData();
+        if (site)
+        {
+            category = site->category;
+            RemoveFromDB(site);
+        }
+
+        GetSiteList(m_siteList);
+        UpdateGroupList();
+
+        if (category != "")
+            m_groupList->MoveToNamedPosition(category);
+
+        UpdateURLList();
+    }
+}
+
+void BookmarkManager::slotDeleteMarked(void)
+{
+    if (GetMarkedCount() == 0)
+        return;
+
+     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    QString message = tr("Are you sure you want to delete the marked bookmarks");
+
+    MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, message, true);
+
+    if (dialog->Create())
+        popupStack->AddScreen(dialog);
+
+    connect(dialog, SIGNAL(haveResult(bool)),
+            this, SLOT(slotDoDeleteMarked(bool)));
+}
+
+void BookmarkManager::slotDoDeleteMarked(bool doDelete)
+{
+    if (!doDelete)
+        return;
+
+    QString category = m_groupList->GetValue();
+
+    for (int x = 0; x < m_siteList.size(); x++)
+    {
+        Bookmark *site = m_siteList.at(x);
+        if (site && site->selected)
+            RemoveFromDB(site);
+    }
+
+    GetSiteList(m_siteList);
+    UpdateGroupList();
+
+    if (category != "")
+        m_groupList->MoveToNamedPosition(category);
+
+    UpdateURLList();
+}
+
+void BookmarkManager::slotShowCurrent(void)
+{
+    MythUIButtonListItem *item = m_bookmarkList->GetItemCurrent();
+    if (item)
+        slotBookmarkClicked(item);
+}
+
+void BookmarkManager::slotShowMarked(void)
+{
+    if (GetMarkedCount() == 0)
+        return;
+
+    MythUIButtonListItem *item = m_bookmarkList->GetItemCurrent();
+    if (item && item->getData())
+    {
+       Bookmark *site = (Bookmark*) item->getData();
+       m_savedBookmark = *site; 
+    }
+
+    QString cmd = gContext->GetSetting("WebBrowserCommand", GetInstallPrefix() + "/bin/mythbrowser");
+    cmd += QString(" -z %1 ").arg(gContext->GetSetting("WebBrowserZoomLevel", "1.4"));
+
+    for (int x = 0; x < m_siteList.size(); x++)
+    {
+        Bookmark *site = m_siteList.at(x);
+        if (site && site->selected)
+            cmd += " " + site->url;
+    }
+
+    cmd.replace("&","\\&");
+    cmd.replace(";","\\;");
+
+    gContext->GetMainWindow()->AllowInput(false);
+    myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
+    gContext->GetMainWindow()->AllowInput(true);
+
+    // we need to reload the bookmarks incase the user added/deleted
+    // any while in MythBrowser 
+    ReloadBookmarks();
+}
+
+void BookmarkManager::slotClearMarked(void)
+{
+    for (int x = 0; x < m_bookmarkList->GetCount(); x++)
+    {
+        MythUIButtonListItem *item = m_bookmarkList->GetItemAt(x);
+        if (item)
+        {
+            item->setChecked(MythUIButtonListItem::NotChecked);
+
+            Bookmark *site = (Bookmark*) item->getData();
+            if (site)
+                site->selected = false;
+        }
     }
 }

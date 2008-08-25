@@ -9,6 +9,8 @@
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythuiprogressbar.h>
 
+#include "bookmarkmanager.h"
+
 class WebPage;
 
 class MythBrowser : public MythScreenType
@@ -22,11 +24,11 @@ class MythBrowser : public MythScreenType
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
-    void customEvent(QEvent*);
 
-  protected slots:
+  public slots:
     void slotOpenURL(const QString &url);
 
+  protected slots:
     void slotZoomIn();
     void slotZoomOut();
 
@@ -38,6 +40,9 @@ class MythBrowser : public MythScreenType
     void slotAddTab(const QString &url = "", bool doSwitch = true);
     void slotDeleteTab(void);
 
+    void slotShowBookmarks(void);
+    void slotAddBookmark(void);
+
     void slotLoadStarted(void);
     void slotLoadFinished(bool OK);
     void slotLoadProgress(int progress);
@@ -46,6 +51,7 @@ class MythBrowser : public MythScreenType
     void slotTabSelected(MythListButtonItem *item);
     void slotTabLosingFocus(void);
     void slotIconChanged(void);
+    void slotExitingMenu(void);
 
   private:
     MythUIWebBrowser* activeBrowser(void);
@@ -63,6 +69,8 @@ class MythBrowser : public MythScreenType
     int       m_currentBrowser;
     QUrl      m_url;
     float     m_zoom;
+
+    Bookmark  m_editBookmark;
 
     MythDialogBox *m_menuPopup;
 
