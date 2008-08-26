@@ -316,6 +316,7 @@ void MythXML::GetKeys( HTTPRequest *pRequest )
         os << "<Key>" 
            << HTTPRequest::Encode( query.value(0).toString() )
            << "</Key>";
+        nCount++;
     }
     os << flush;
 
