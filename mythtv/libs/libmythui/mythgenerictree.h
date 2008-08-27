@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <QList>
 #include <QVector>
+#include <QMetaType>
 
 #include "mythexp.h"
 
@@ -29,9 +30,7 @@ class MPUBLIC MythGenericTree
 
     MythGenericTree *findLeaf();
 
-    MythGenericTree* findNode(QList<int> route_of_branches);
-    MythGenericTree* recursiveNodeFinder(QList<int> route_of_branches);
-    bool checkNode(QList<int> route_of_branches);
+    MythGenericTree* findNode(QList<int> route_of_branches, int depth=-1);
 
     MythGenericTree *nextSibling(int number_down);
     MythGenericTree *prevSibling(int number_up);
@@ -41,7 +40,7 @@ class MPUBLIC MythGenericTree
     MythGenericTree *getSelectedChild();
     MythGenericTree *getChildAt(uint reference);
     MythGenericTree *getChildByName(const QString &a_name);
-    MythGenericTree *getChildByInt(int an_int);
+    MythGenericTree *getChildById(int an_int);
 
     QList<MythGenericTree*> *getAllChildren();
 
@@ -60,7 +59,7 @@ class MPUBLIC MythGenericTree
     const QString getString(void) { return m_string; }
     void setString(const QString &str) { m_string = str; }
 
-    int calculateDepth(int start);
+    int calculateDepth(int start=0);
 
     int childCount(void);
     int siblingCount(void);
@@ -110,5 +109,7 @@ class MPUBLIC MythGenericTree
     bool m_selectable;
     int m_currentOrderingIndex;
 };
+
+Q_DECLARE_METATYPE(MythGenericTree*)
 
 #endif

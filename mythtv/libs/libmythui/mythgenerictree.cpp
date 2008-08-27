@@ -1,9 +1,10 @@
+// C++/C headers
 #include <iostream>
 
-using namespace std;
-
+// Myth headers
 #include "mythverbose.h"
 
+// Mythui headers
 #include "mythgenerictree.h"
 
 class SortableMythGenericTreeList : public QList<MythGenericTree*>
@@ -97,6 +98,8 @@ class SortableMythGenericTreeList : public QList<MythGenericTree*>
     int m_attributeIndex; // for getAttribute
 };
 
+///////////////////////////////////////////////////////
+
 MythGenericTree::MythGenericTree(const QString &a_string, int an_int,
                          bool selectable_flag)
 {
@@ -159,16 +162,22 @@ int MythGenericTree::calculateDepth(int start)
     int current_depth;
     int found_depth;
     current_depth = start + 1;
-    QList<MythGenericTree*>::iterator it;
-    it = m_subnodes->begin();
-    MythGenericTree *child;
 
-    while ((child = *it) != 0)
+    QList<MythGenericTree*> *children = getAllChildren();
+    if (children && children->count() > 0)
     {
-        found_depth = child->calculateDepth(start + 1);
-        if (found_depth > current_depth)
-            current_depth = found_depth;
-        ++it;
+        SortableMythGenericTreeList::Iterator it;
+        MythGenericTree *child = NULL;
+
+        for (it = children->begin(); it != children->end(); ++it)
+        {
+            child = *it;
+            if (!child)
+                continue;
+            found_depth = child->calculateDepth(start + 1);
+            if (found_depth > current_depth)
+                current_depth = found_depth;
+        }
     }
 
     return current_depth;
@@ -189,65 +198,49 @@ MythGenericTree* MythGenericTree::findLeaf()
     return this;
 }
 
-MythGenericTree* MythGenericTree::findNode(QList<int> route_of_branches)
+MythGenericTree* MythGenericTree::findNode(QList<int> route_of_branches,
+                                           int depth)
 {
     // Starting from *this* node (which will often be root) find a set of
     // branches that have id's that match the collection passed in
-    // route_of_branches. Return the end point of those branches (which will
-    // often be a leaf node).
+    // route_of_branches. Return the end point of those branches.
     //
     // In practical terms, mythmusic will use this to force the playback
     // screen's ManagedTreeList to move to a given track in a given playlist
 
-    return recursiveNodeFinder(route_of_branches);
-}
-
-MythGenericTree* MythGenericTree::recursiveNodeFinder(QList<int> route_of_branches)
-{
-    if (checkNode(route_of_branches))
-        return this;
-    else
+    MythGenericTree *node = NULL;
+    for (int i = 0; i < route_of_branches.count(); i++)
     {
-        QList<MythGenericTree*>::iterator it;
-        it = m_subnodes->begin();
-        MythGenericTree *child;
+        if (!node)
+            node = this;
 
-        while ((child = *it) != 0)
+        bool foundit = false;
+        QList<MythGenericTree*>::iterator it;
+        QList<MythGenericTree*> *children = node->getAllChildren();
+
+        if (!children)
+            break;
+
+        MythGenericTree *child = NULL;
+
+        for (it = children->begin(); it != children->end(); ++it)
         {
-            MythGenericTree *sub_checker;
-            sub_checker = child->recursiveNodeFinder(route_of_branches);
-            if (sub_checker)
-                return sub_checker;
-            else
-                ++it;
+            child = *it;
+            if (!child)
+                continue;
+            if (child->getInt() == route_of_branches[i])
+            {
+                node = child;
+                foundit = true;
+                break;
+            }
         }
+
+        if (!foundit)
+            break;
     }
 
     return NULL;
-}
-
-bool MythGenericTree::checkNode(QList<int> route_of_branches)
-{
-    bool found_it = true;
-    MythGenericTree *parent_finder = this;
-
-    // FIXME: slow
-
-    for (int i = route_of_branches.count() - 1; i > -1 && found_it; --i)
-    {
-        if (!(parent_finder->getInt() == route_of_branches.at(i)))
-            found_it = false;
-
-        if (i > 0)
-        {
-            if (parent_finder->getParent())
-                parent_finder = parent_finder->getParent();
-            else
-                found_it = false;
-        }
-    }
-
-    return found_it;
 }
 
 int MythGenericTree::getChildPosition(MythGenericTree *child)
@@ -522,7 +515,7 @@ MythGenericTree* MythGenericTree::getChildByName(const QString &a_name)
     return NULL;
 }
 
-MythGenericTree* MythGenericTree::getChildByInt(int an_int)
+MythGenericTree* MythGenericTree::getChildById(int an_int)
 {
     QList<MythGenericTree*>::iterator it;
     it = m_subnodes->begin();
