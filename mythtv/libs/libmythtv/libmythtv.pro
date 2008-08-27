@@ -286,7 +286,7 @@ using_frontend {
 
     using_directx:HEADERS +=      videoout_dx.h
     using_directx:SOURCES +=      videoout_dx.cpp
-    using_directfb:DEFINES +=     USING_DIRECTX
+    using_directx:DEFINES +=      USING_DIRECTX
 
     using_ivtv:HEADERS +=         videoout_ivtv.h
     using_ivtv:SOURCES +=         videoout_ivtv.cpp
