@@ -6933,6 +6933,8 @@
        handle SIG33 nostop noprint
        set logging on
        set pagination off
+       set breakpoint pending on
+       break qFatal
        set args -l myth.log -v record,channel,siparser
        run
        thread apply all bt full
