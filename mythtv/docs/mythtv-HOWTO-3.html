@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
- <TITLE>Installing and using MythTV: Checking prerequisites. </TITLE>
+ <TITLE>Installing and using MythTV: Checking prerequisites.</TITLE>
  <LINK HREF="mythtv-HOWTO-4.html" REL=next>
  <LINK HREF="mythtv-HOWTO-2.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc3" REL=contents>
@@ -12,11 +12,11 @@
 <A HREF="mythtv-HOWTO-2.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc3">Contents</A>
 <HR>
-<H2><A NAME="s3">3.</A> <A HREF="mythtv-HOWTO.html#toc3">Checking prerequisites. </A></H2>
+<H2><A NAME="s3">3.</A> <A HREF="mythtv-HOWTO.html#toc3">Checking prerequisites.</A></H2>
 
 <P>You must ensure that any firewalls (either hardware, or a software
 firewall installed by your distribution) will not block access to the ports
-that will be used by the MythTV clients and servers on the "inside" LAN. 
+that will be used by the MythTV clients and servers on the "inside" LAN.
 The ports for MySQL (TCP port 3306) and mythbackend (TCP ports 6543 and
 6544) must be open.  It is <EM>strongly</EM> recommended that you do
 <EM>not</EM> expose the MythTV and MySQL ports to the Internet or your
@@ -26,7 +26,7 @@ The ports for MySQL (TCP port 3306) and mythbackend (TCP ports 6543 and
 </H2>
 
 <P>Hardware selection is a complex topic, one this HOWTO will only discuss
-briefly and in general terms. The following subsections offer some general 
+briefly and in general terms. The following subsections offer some general
 guidance but stop short of offering specific recommendations.</P>
 <P>For a good MythTV experience, you must understand that MythTV exercises your
 hardware more than a typical desktop. Encoder cards generate DMA across the
@@ -120,7 +120,8 @@ MPEG-4, 2 GB/hour for MPEG-2 and RTjpeg and 7 GB/hour for ATSC HDTV.</P>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
 <CAPTION><B>NOTE</B>:  You <EM>must</EM> use DMA for hard drive access to prevent
-choppy or jittery video.  Not all distributions enable DMA at boot time. See the Troubleshooting Section for 
+choppy or jittery video.  Not all distributions enable DMA at boot time.
+See the Troubleshooting Section for 
 <A HREF="mythtv-HOWTO-22.html#Setting_DMA">instructions</A> on how to do this.</CAPTION>
 </FIGURE>
 </P>
@@ -135,10 +136,10 @@ information.</P>
 
 <H3>Filesystems</H3>
 
-<P>MythTV creates large files, many in excess of 4GB.  You <EM>must</EM> 
+<P>MythTV creates large files, many in excess of 4GB.  You <EM>must</EM>
 use a 64 or 128 bit filesystem. These will allow you to create large files.
 Filesystems known to have problems with large files are FAT (all versions),
-and ReiserFS (versions 3 and 4). </P>
+and ReiserFS (versions 3 and 4).</P>
 <P>Because MythTV creates very large files, a filesystem that does well at
 deleting large files is important.  Numerous benchmarks show that XFS and
 JFS do very well at this task.  You are <EM>strongly</EM> encouraged to
@@ -166,11 +167,11 @@ capacity for additional hard drives, read through the
 <A HREF="mythtv-HOWTO-24.html#advancedpartitionformatting">Advanced Partition Formatting</A> sections for some pointers.</P>
 <P>
 <A NAME="video_capture_device"></A> </P>
-<H3>Video Capture Device </H3>
+<H3>Video Capture Device</H3>
 
 <P>In order to capture video, MythTV will need one or more video capture
 devices with Linux drivers.  There are a number of classes of hardware
-available for capturing video.  </P>
+available for capturing video.</P>
 <H3>Frame Grabbers.</H3>
 
 <P>This class of card is the simplest and is usually the cheapest.  There is no
@@ -208,12 +209,13 @@ are not the same.  The All-in-Wonder cards will not work with MythTV.
 as the ATI TV Wonder, TV Wonder VE or TV Wonder Pro) <EM>will not</EM> work
 as a MythTV capture device because the GATOS 
 <A HREF="http://gatos.sourceforge.net">http://gatos.sourceforge.net</A>
-drivers that are available provide only a limited subset of the V4L API. The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.</CAPTION>
+drivers that are available provide only a limited subset of the V4L API.
+The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.</CAPTION>
 </FIGURE>
 </P>
-<P>After you have installed a suitable capture device, you can check that 
-the kernel sees it with <CODE>lspci</CODE>. Look for an entry labeled "Multimedia 
-video controller". To get more detailed information about the card, use 
+<P>After you have installed a suitable capture device, you can check that
+the kernel sees it with <CODE>lspci</CODE>. Look for an entry labeled "Multimedia
+video controller". To get more detailed information about the card, use
 <CODE>lspci -v</CODE> or <CODE>lspci -vv</CODE>.  Ensure that your system is loading
 the bttv modules by typing:
 <BLOCKQUOTE><CODE>
@@ -262,7 +264,7 @@ for Live TV at 416x480.</LI>
 
 <P>DVB is a video standard primarily found in Europe (where it comes in
 DVB-C, DVB-T and DVB-S varieties for Cable, Terrestrial and Satellite) and
-is also used as the programming interface for HDTV capture cards in Linux. 
+is also used as the programming interface for HDTV capture cards in Linux.
 To see if your DVB card is supported, see the list of cards in the
 "Supported Hardware" section of the DVB Wiki at 
 <A HREF="http://www.linuxtv.org/wiki/index.php/Main_Page">http://www.linuxtv.org/wiki/index.php/Main_Page</A> for more
@@ -320,14 +322,14 @@ use a 1.8GHz processor.</P>
 
 <H3>Firewire.</H3>
 
-<P>You may use the Firewire output of the Motorola DCT6200 or the SA3250. 
+<P>You may use the Firewire output of the Motorola DCT6200 or the SA3250.
 If your provider uses 5C encryption on a particular channel, you won't be
 able to get any content.</P>
 
 <H3>DBoxII or other devices running Neutrino</H3>
 
-<P>You may use the Ethernet port of an DBoxII or a similar device to capture 
-MPEG2. Your set top box has to be running the Neutrino GUI. </P>
+<P>You may use the Ethernet port of an DBoxII or a similar device to capture
+MPEG2. Your set top box has to be running the Neutrino GUI.</P>
 
 <H3>USB Capture Devices.</H3>
 
@@ -466,8 +468,8 @@ regular cards with TV-out." See the "Adventurous Setup" section of
 
 <H3>NVIDIA</H3>
 
-<P>Some NVIDIA cards with TV-out can be run using the standard nv driver in 
-X, combined with the userspace application <B>nvtv</B> to control the TV-out 
+<P>Some NVIDIA cards with TV-out can be run using the standard nv driver in
+X, combined with the userspace application <B>nvtv</B> to control the TV-out
 port. See 
 <A HREF="http://sourceforge.net/projects/nv-tv-out/">http://sourceforge.net/projects/nv-tv-out/</A> for details.  Recent
 versions of the NVIDIA driver have better support for overscan and other
@@ -500,16 +502,16 @@ audio control on the PVR-350 setup page.</LI>
 
 <H3>Other Options</H3>
 
-<P>Some devices with on-board TV-out capability, such as Xboxes converted to 
-Linux and some laptops can be used as MythTV frontends to display on a 
-television screen. Please consult the mythtv-users mailing list for messages 
+<P>Some devices with on-board TV-out capability, such as Xboxes converted to
+Linux and some laptops can be used as MythTV frontends to display on a
+television screen. Please consult the mythtv-users mailing list for messages
 that report the details of these special arrangements.</P>
 
 <H3>External Adapters</H3>
 
-<P>External adapters convert standard VGA output to a form suitable for 
-display on a television. The output format varies by region, since 
-different countries have different TV standards. People on the mythtv-users 
+<P>External adapters convert standard VGA output to a form suitable for
+display on a television. The output format varies by region, since
+different countries have different TV standards. People on the mythtv-users
 list have mentioned these adapters:</P>
 <P>
 <UL>
@@ -560,11 +562,11 @@ pre-compiled package <B>MUST</B> be raised with the packager.</CAPTION>
 </FIGURE>
 </P>
 <P>If you use any of the pre-compiled packages you may not need to perform any
-additional configuration steps in this HOWTO.  The next logical step is 
+additional configuration steps in this HOWTO.  The next logical step is
 <A HREF="mythtv-HOWTO-6.html#mysql">configuring MySQL</A>, which you may or may not have to
 perform.  See your package documentation.</P>
 
-<H3><A NAME="atrpms"></A> Red Hat Linux / Fedora Core </H3>
+<H3><A NAME="atrpms"></A> Red Hat Linux / Fedora Core</H3>
 
 <P>The definitive documentation on installing MythTV on Red Hat Linux /
 Fedora Core can be found in Jarod Wilson's (
@@ -615,7 +617,7 @@ And finally:
 # apt-get install mythtv-suite
 </PRE>
 </CODE></BLOCKQUOTE>
-        
+
 These steps however, do NOT perform the installation of any drivers required
 for <B>ALSA</B>, capture cards, <B>lirc kernel modules</B>, etc., nor do
 they set up your MythTV database. Check 
@@ -634,7 +636,7 @@ send him email directly at
 <P>Debian packages for MythTV and most of its add-on modules are maintained
 by Christian Marillat 
 <A HREF="mailto:marillat@free.fr">mailto:marillat@free.fr</A> and are available at 
-<A HREF="http://www.debian-multimedia.org/">http://www.debian-multimedia.org/</A>. 
+<A HREF="http://www.debian-multimedia.org/">http://www.debian-multimedia.org/</A>.
 Installation instructions can be found on those pages as well. All of the
 prerequisites for MythTV are available as Debian packages, most of them from
 the official Debian archive.</P>
@@ -648,14 +650,6 @@ deb-src http://www.debian-multimedia.org sid main
 <P>to your <CODE>/etc/apt/sources.list</CODE> file.  Running <B>apt-get update</B> and then
 executing <B>apt-get build-dep mythtv</B> should install all the
 pre-requisites required to compile MythTV.</P>
-<P>
-<FIGURE>
-<EPS FILE="warning.eps">
-<IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>:  Due to the requirement for Qt 3.3+, there are no packages for
-Debian woody/stable.</CAPTION>
-</FIGURE>
-</P>
 
 <P>The Debian packages are configured such that MythTV programs should be
 run as the <CODE>mythtv</CODE> user, which is automatically created during
@@ -683,9 +677,7 @@ going to need the <B>cdialog</B> package in order to compile
 <P>
 <HR>
 <PRE>
-NOTE:  Qt v3.3 or higher is required.
-
-NOTE:  MythTV DOES NOT WORK with Qt4.
+NOTE:  Qt v4.3 or higher is required.
 
 NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
@@ -700,56 +692,9 @@ that you've installed the -devel version of a prerequisite.
 <P> This section details the various methods for installing prerequisites
 from the command line.</P>
 
-<H3>Mandriva</H3>
+<H3>Gentoo.</H3>
 
-<P><B>NOTE</B>:  The following instructions should be considered out of
-date as of 2006-09-10.  If updated instructions are not submitted by the
-release of v0.21 of MythTV they will be removed.</P>
-<P><B>urpmi</B> is the simplest tool for installation of packages from the
-command line, but properly configuring it can be difficult.  The
-following website 
-<A HREF="http://easyurpmi.zarb.org/">http://easyurpmi.zarb.org/</A> will allow you to choose
-a mirror site and then present the command-line configuration text for that
-mirror.  You will most likely need to add a "Contrib" mirror to your setup. 
-If you add a site from the "Penguin Liberation Front", you will be able to
-load the <CODE>lame</CODE> library without compiling from source.</P>
-<P>Open a shell, and execute the following. You may get
-asked a number of questions regarding dependencies.  It's best to answer
-"YES".
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
-# urpmi XFree86-devel perl
-# urpmi libqt3-devel libMesaGLU1-devel
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>
-<HR>
-<PRE>
-NOTE for Mandriva 9.1+ users: execute the following command.
-
-# urpmi libqt3-mysql
-</PRE>
-<HR>
-
-However, you might get this when you execute the commands above:
-<BLOCKQUOTE><CODE>
-<PRE>
-everything already installed
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>In that case, you're ready to move to the next 
-<A HREF="mythtv-HOWTO-4.html#Setting_up_paths">section</A>.  Once you have completed installing the pre-requisites,
-exit out of the shell and start a new one to ensure that any environment
-variables setup by the installation have a chance to take effect.</P>
-
-<H3>Gentoo. </H3>
-
-<P><B>NOTE</B>:  MythTV does <EM>not</EM> run on Qt4.
-If Qt has not been installed on your system: Edit
+<P>If Qt has not been installed on your system: Edit
 <CODE>/etc/make.conf</CODE> and locate the "USE" variable. If the line is
 commented out, remove the comment. The line should have at least:
 <BLOCKQUOTE><CODE>
@@ -758,7 +703,7 @@ USE="mysql alsa"
 </PRE>
 </CODE></BLOCKQUOTE>
 
-Next you need to build Qt. If you don't plan on using the ebuilds as 
+Next you need to build Qt. If you don't plan on using the ebuilds as
 described in the Gentoo section then you also need to install lame.
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -767,8 +712,8 @@ described in the Gentoo section then you also need to install lame.
 </CODE></BLOCKQUOTE>
 </P>
 <P>If you have already installed Qt: you will need to rebuild because the
-default installation doesn't include MySQL support, a requirement for MythTV.  
-To enable SQL support, add "mysql" to your USE variable in 
+default installation doesn't include MySQL support, a requirement for MythTV.
+To enable SQL support, add "mysql" to your USE variable in
 <CODE>/etc/make.conf</CODE> and rebuild Qt by running
 <BLOCKQUOTE><CODE>
 <PRE>

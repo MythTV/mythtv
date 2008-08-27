@@ -62,7 +62,7 @@ maximizes the number of programs that can be recorded if you don't have
 enough tuners.
 <item>MythTV implements a UPNP server, so a UPNP client should automatically
 see content from your MythTV system.
-</itemize> 
+</itemize>
 Other modules in MythTV include:
 <itemize>
 <item>MythArchive, a tool to create DVDs
@@ -235,7 +235,7 @@ implement it.
 
 If a developer closes out your bug, it's likely you didn't provide enough
 information.  Don't re-open a bug without providing additional information.
-   
+
 <sect1>Contributing to this document
 <p>Contributions to the HOWTO are welcome, especially if you find a
 grammatical or spelling error, or if the wording of something is just plain
@@ -265,10 +265,10 @@ American environment. If you have installation instructions for a different
 region or Linux distribution, please send them to the author so that it can
 be included in other versions of this document.
 
-<sect>Checking prerequisites. 
+<sect>Checking prerequisites.
 <p>You must ensure that any firewalls (either hardware, or a software
 firewall installed by your distribution) will not block access to the ports
-that will be used by the MythTV clients and servers on the "inside" LAN. 
+that will be used by the MythTV clients and servers on the "inside" LAN.
 The ports for MySQL (TCP port 3306) and mythbackend (TCP ports 6543 and
 6544) must be open.  It is <em>strongly</em> recommended that you do
 <em>not</em> expose the MythTV and MySQL ports to the Internet or your
@@ -276,7 +276,7 @@ The ports for MySQL (TCP port 3306) and mythbackend (TCP ports 6543 and
 
 <sect1>Hardware
 <p>Hardware selection is a complex topic, one this HOWTO will only discuss
-briefly and in general terms. The following subsections offer some general 
+briefly and in general terms. The following subsections offer some general
 guidance but stop short of offering specific recommendations.
 
 For a good MythTV experience, you must understand that MythTV exercises your
@@ -376,7 +376,7 @@ MPEG-4, 2 GB/hour for MPEG-2 and RTjpeg and 7 GB/hour for ATSC HDTV.
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
 <caption><bf>NOTE</bf>:  You <em>must</em> use DMA for hard drive access to prevent
-choppy or jittery video.  Not all distributions enable DMA at boot time. 
+choppy or jittery video.  Not all distributions enable DMA at boot time.
 See the Troubleshooting Section for <ref id="Setting_DMA"
 name="instructions"> on how to do this.</caption>
 </figure>
@@ -391,10 +391,10 @@ See the Troubleshooting <ref id="Setting_DMA" name="section"> for more
 information.
 
 <sect2>Filesystems
-<p>MythTV creates large files, many in excess of 4GB.  You <em>must</em> 
+<p>MythTV creates large files, many in excess of 4GB.  You <em>must</em>
 use a 64 or 128 bit filesystem. These will allow you to create large files.
 Filesystems known to have problems with large files are FAT (all versions),
-and ReiserFS (versions 3 and 4). 
+and ReiserFS (versions 3 and 4).
 
 Because MythTV creates very large files, a filesystem that does well at
 deleting large files is important.  Numerous benchmarks show that XFS and
@@ -424,10 +424,10 @@ name="LVM"> and <ref id="advancedpartitionformatting" name="Advanced
 Partition Formatting"> sections for some pointers.
 
 <label id="video_capture_device">
-<sect2>Video Capture Device 
+<sect2>Video Capture Device
 <p>In order to capture video, MythTV will need one or more video capture
 devices with Linux drivers.  There are a number of classes of hardware
-available for capturing video.  
+available for capturing video.
 <sect3>Frame Grabbers.
 <p>This class of card is the simplest and is usually the cheapest.  There is no
 on-board encoding of the analog video; hardware known as a Digital-Analog
@@ -463,14 +463,14 @@ are not the same.  The All-in-Wonder cards will not work with MythTV.
 as the ATI TV Wonder, TV Wonder VE or TV Wonder Pro) <em>will not</em> work
 as a MythTV capture device because the GATOS <url
 url="http://gatos.sourceforge.net" name="http://gatos.sourceforge.net">
-drivers that are available provide only a limited subset of the V4L API. 
+drivers that are available provide only a limited subset of the V4L API.
 The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.
 </caption>
 </figure>
 
-After you have installed a suitable capture device, you can check that 
-the kernel sees it with <tt>lspci</tt>. Look for an entry labeled "Multimedia 
-video controller". To get more detailed information about the card, use 
+After you have installed a suitable capture device, you can check that
+the kernel sees it with <tt>lspci</tt>. Look for an entry labeled "Multimedia
+video controller". To get more detailed information about the card, use
 <tt>lspci -v</tt> or <tt>lspci -vv</tt>.  Ensure that your system is loading
 the bttv modules by typing:
 <tscreen><verb>
@@ -515,7 +515,7 @@ for Live TV at 416x480.
 <sect3>DVB capture cards.
 <p>DVB is a video standard primarily found in Europe (where it comes in
 DVB-C, DVB-T and DVB-S varieties for Cable, Terrestrial and Satellite) and
-is also used as the programming interface for HDTV capture cards in Linux. 
+is also used as the programming interface for HDTV capture cards in Linux.
 To see if your DVB card is supported, see the list of cards in the
 "Supported Hardware" section of the DVB Wiki at <url
 url="http://www.linuxtv.org/wiki/index.php/Main_Page"
@@ -580,13 +580,13 @@ acceleration.  If you enable the hardware acceleration, you may be able to
 use a 1.8GHz processor.
 
 <sect3>Firewire.
-<p>You may use the Firewire output of the Motorola DCT6200 or the SA3250. 
+<p>You may use the Firewire output of the Motorola DCT6200 or the SA3250.
 If your provider uses 5C encryption on a particular channel, you won't be
 able to get any content.
 
 <sect3>DBoxII or other devices running Neutrino
-<p>You may use the Ethernet port of an DBoxII or a similar device to capture 
-MPEG2. Your set top box has to be running the Neutrino GUI. 
+<p>You may use the Ethernet port of an DBoxII or a similar device to capture
+MPEG2. Your set top box has to be running the Neutrino GUI.
 
 <sect3>USB Capture Devices.
 <p>The Plextor ConvertX PVR devices are supported through Linux drivers
@@ -728,8 +728,8 @@ name="http://gatos.sourceforge.net/watching_tv.php"> for details. Also see
 name="http://www.retinalburn.net/linux/tvout.html"> for more information.
 
 <sect3>NVIDIA
-<p>Some NVIDIA cards with TV-out can be run using the standard nv driver in 
-X, combined with the userspace application <bf>nvtv</bf> to control the TV-out 
+<p>Some NVIDIA cards with TV-out can be run using the standard nv driver in
+X, combined with the userspace application <bf>nvtv</bf> to control the TV-out
 port. See <url url="http://sourceforge.net/projects/nv-tv-out/"
 name="http://sourceforge.net/projects/nv-tv-out/"> for details.  Recent
 versions of the NVIDIA driver have better support for overscan and other
@@ -762,15 +762,15 @@ audio control on the PVR-350 setup page.
 </enum>
 
 <sect3>Other Options
-<p>Some devices with on-board TV-out capability, such as Xboxes converted to 
-Linux and some laptops can be used as MythTV frontends to display on a 
-television screen. Please consult the mythtv-users mailing list for messages 
+<p>Some devices with on-board TV-out capability, such as Xboxes converted to
+Linux and some laptops can be used as MythTV frontends to display on a
+television screen. Please consult the mythtv-users mailing list for messages
 that report the details of these special arrangements.
 
 <sect2>External Adapters
-<p>External adapters convert standard VGA output to a form suitable for 
-display on a television. The output format varies by region, since 
-different countries have different TV standards. People on the mythtv-users 
+<p>External adapters convert standard VGA output to a form suitable for
+display on a television. The output format varies by region, since
+different countries have different TV standards. People on the mythtv-users
 list have mentioned these adapters:
 
 <itemize>
@@ -818,7 +818,7 @@ pre-compiled package <bf>MUST</bf> be raised with the packager.
 </figure>
 
 If you use any of the pre-compiled packages you may not need to perform any
-additional configuration steps in this HOWTO.  The next logical step is 
+additional configuration steps in this HOWTO.  The next logical step is
 <ref id="mysql" name="configuring MySQL">, which you may or may not have to
 perform.  See your package documentation.
 
@@ -868,7 +868,7 @@ Then run:
 And finally:
 <tscreen><verb>
 # apt-get install mythtv-suite
-</verb></tscreen>	
+</verb></tscreen>
 These steps however, do NOT perform the installation of any drivers required
 for <bf>ALSA</bf>, capture cards, <bf>lirc kernel modules</bf>, etc., nor do
 they set up your MythTV database. Check <url
@@ -885,7 +885,7 @@ send him email directly at <url url="thac@nyvalls.se" name="thac@nyvalls.se">.
 by Christian Marillat <url url="mailto:marillat@free.fr"
 name="mailto:marillat@free.fr"> and are available at <url
 url="http://www.debian-multimedia.org/"
-name="http://www.debian-multimedia.org/">. 
+name="http://www.debian-multimedia.org/">.
 Installation instructions can be found on those pages as well. All of the
 prerequisites for MythTV are available as Debian packages, most of them from
 the official Debian archive.
@@ -936,22 +936,22 @@ that you've installed the -devel version of a prerequisite.
 <p> This section details the various methods for installing prerequisites
 from the command line.
 
-<sect3>Gentoo. 
+<sect3>Gentoo.
 <p>If Qt has not been installed on your system: Edit
 <tt>/etc/make.conf</tt> and locate the "USE" variable. If the line is
 commented out, remove the comment. The line should have at least:
 <tscreen><verb>
 USE="mysql alsa"
 </verb></tscreen>
-Next you need to build Qt. If you don't plan on using the ebuilds as 
+Next you need to build Qt. If you don't plan on using the ebuilds as
 described in the Gentoo section then you also need to install lame.
 <tscreen><verb>
 # emerge lame mysql qt
 </verb></tscreen>
 
 If you have already installed Qt: you will need to rebuild because the
-default installation doesn't include MySQL support, a requirement for MythTV.  
-To enable SQL support, add "mysql" to your USE variable in 
+default installation doesn't include MySQL support, a requirement for MythTV.
+To enable SQL support, add "mysql" to your USE variable in
 <tt>/etc/make.conf</tt> and rebuild Qt by running
 <tscreen><verb>
 # emerge qt
@@ -988,19 +988,19 @@ help if the packager skipped a step in their packaging.
 
 <sect1>Software requirements for compiling MythTV
 <sect2>General requirements
-<p>MythTV is written in C++ and requires a fairly complete, but standard, 
-compilation environment, including a recent g++ compiler, <tt>make</tt>, and 
-appropriate header files for shared libraries. Any standard Linux 
-distribution should be able to install a suitable compilation environment 
-from its packaging system. Section 3.2 of this HOWTO provides some details 
+<p>MythTV is written in C++ and requires a fairly complete, but standard,
+compilation environment, including a recent g++ compiler, <tt>make</tt>, and
+appropriate header files for shared libraries. Any standard Linux
+distribution should be able to install a suitable compilation environment
+from its packaging system. Section 3.2 of this HOWTO provides some details
 of how to install the required environment for many distributions.
 
-Subsequent sections of this chapter address the few oddities that you may 
+Subsequent sections of this chapter address the few oddities that you may
 have to adjust by hand before you compile MythTV.
 
 The reference compilation system for MythTV is Ubuntu.
 
-<sect1>Shared-Library requirements for MythTV 
+<sect1>Shared-Library requirements for MythTV
 <sect2>Modifying /etc/ld.so.conf <label id="modifying_ld.so.conf">
 <p>The runtime manager for shared libraries, <bf>/lib/ld.so</bf>, gets
 information about the locations and contents of shared libraries from
@@ -1044,7 +1044,7 @@ $ which qmake
 For Mandriva, you should see a value like <tt>/usr/lib/qt3</tt> for
 <tt>QTDIR</tt> and <tt>/usr/lib/qt3/bin</tt> should be in $PATH.
 
-For Gentoo, you should see a value like <tt>/usr/qt/3</tt> for <tt>QTDIR</tt> 
+For Gentoo, you should see a value like <tt>/usr/qt/3</tt> for <tt>QTDIR</tt>
 and <tt>/usr/qt/3/bin</tt> should be in $PATH.
 
 If you don't, do not proceed past this step until you have resolved this
@@ -1074,7 +1074,7 @@ the if / fi block.
 As root, create the following file in <tt>/etc/profile.d</tt> The example
 filename is "mythtv.sh". Use what you feel is appropriate.
 
-Open a shell, and switch to superuser mode. 
+Open a shell, and switch to superuser mode.
 
 <figure loc="here">
 <eps file="warning.eps" height="1cm">
@@ -1094,7 +1094,7 @@ export PATH=$PATH:/usr/lib/qt3/bin
 # exit
 $ exit
 </verb></tscreen>
-The last two commands are to exit out of the shell. This way, when you next 
+The last two commands are to exit out of the shell. This way, when you next
 open a shell your new commands
 will take effect.
 
@@ -1189,7 +1189,7 @@ libmp3lame.so.0.0.0*
 libmp3lame.so.0.0.0*
 
 # exit
-$ 
+$
 </verb></tscreen>
 
 <sect1>XMLTV
@@ -1266,7 +1266,7 @@ data to make it available to users of Freeware and Open Source applications.
 
 If you wish to use Schedules Direct, you'll need to establish a user
 account.  Go to <url url="http://www.schedulesdirect.org"
-name="http://www.schedulesdirect.org"> and click on the "Membership" link. 
+name="http://www.schedulesdirect.org"> and click on the "Membership" link.
 
 Once you've read and agreed to the Subscriber Agreement, Terms of Use and
 Privacy Policy proceed to the lineup choices and configure your account for
@@ -1308,7 +1308,7 @@ $ ./configure
 </verb></tscreen>
 
 If you wish to change options, run <bf>./configure --help</bf> to
-see what is available and to override and automatically detected options. 
+see what is available and to override and automatically detected options.
 See the <tt>config.log</tt> file after running <bf>configure</bf> to see
 previous runs.
 
@@ -1319,7 +1319,7 @@ $ make -j 2
 
 The MythTV compile can take advantage of multiple CPUs, SMP and
 Hyperthreading.  If you want to build MythTV on a multi-CPU machine (or with
-<bf>distcc</bf>), specify "-j numjobs", where "numjobs" is greater than 2. 
+<bf>distcc</bf>), specify "-j numjobs", where "numjobs" is greater than 2.
 In the above example, we had two concurrent jobs executing, which is
 recommended for a single CPU system.  Do not set the number of jobs too
 high, or your compile will actually take longer to complete than it would if
@@ -1342,7 +1342,7 @@ illustration; your actual results may vary.  The test involves a complete
 <tt>make distclean</tt> to the final binary.
 <itemize>
 <item>P4 3.2Ghz HT: "standard" make: 12m 49s
-<item>P4 3.2Ghz HT: make -j 2: 11m 24s 
+<item>P4 3.2Ghz HT: make -j 2: 11m 24s
 </itemize>
 
 In the above example, we see that with a single CPU, a multi-stage
@@ -1401,7 +1401,7 @@ group like so:
 <tscreen><verb>
 $ grep audio /etc/group
 </verb></tscreen>
-If the number printed out from the grep was 18, you can now load 
+If the number printed out from the grep was 18, you can now load
 this module as root before starting <bf>mythfrontend</bf>:
 <tscreen><verb>
 # modprobe realtime gid=18
@@ -1506,7 +1506,7 @@ This can be done from the command line by typing:
 
 <sect2>Gentoo
 <p>After installing MySQL you need to initialize the database by running
-<bf>mysql_install_db</bf> as root. 
+<bf>mysql_install_db</bf> as root.
 <sect1>Setting up the initial database
 <p>This step is only required on the system maintaining the database, which
 may or may not be one of your MythTV boxes.  If the database is on a
@@ -1532,7 +1532,7 @@ $ su
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
-<caption><bf>NOTE</bf>: It is good practice to set a root password for MySQL. 
+<caption><bf>NOTE</bf>: It is good practice to set a root password for MySQL.
 Instructions for doing so can be found on MySQL's web site at <url
 url="http://www.mysql.com/doc/en/Security.html"
 name="http://www.mysql.com/doc/en/Security.html">.
@@ -1658,7 +1658,7 @@ $ amixer set Capture,0 100%,100% captur
 $ su
 # alsactl store
 # exit
-$ 
+$
 </verb></tscreen>
 
 If you have multiple sound cards, then use the <tt>-c</tt> parameter to
@@ -1688,7 +1688,7 @@ Finally, if you've performed all of the above steps, and you still don't seem to
 <tscreen><verb>
 $ v4lctl -c /dev/video0 setattr mute off
 </verb></tscreen>
- 
+
 <sect>Setting up a remote control.
 <p>MythTV does not have native remote control receiver and decoder software
 built-in.  Instead, remote control functions are implemented by cooperating
@@ -1703,7 +1703,7 @@ if the user had pressed the keys on the keyboard.  The file
 <caption><bf>NOTE</bf>: If you are running Mandriva, you may install
 <bf>lirc</bf> by executing: <tt># urpmi lirc lirc-remotes</tt> and bypass
 the manual compilation steps described below by jumping to the <ref
-id="completing_lirc_install" name="Completing the lirc install"> section. 
+id="completing_lirc_install" name="Completing the lirc install"> section.
 See the contrib/mandrake91.etc.sysconfig.lircd file for an example of how to
 configure lircd.
 </caption>
@@ -1711,7 +1711,7 @@ configure lircd.
 
 Some IR devices require a kernel recompile, and some don't. However, all at
 least require having the kernel source available as a resource for the lirc
-build process. 
+build process.
 
 <sect1>Gentoo
 <p>To install lirc on Gentoo, all you need to do is:
@@ -1723,7 +1723,7 @@ build process.
 <p>You're going to need to download and compile <bf>lircd</bf>.  Go to <url
 url="http://www.lirc.org" name="http://www.lirc.org"> and download lirc; as
 of 2006-01-21, the version available is 0.8.0.  Grab the remotes.tar.bz2 file as
-well. 
+well.
 <tscreen><verb>
 $ tar -xjf lirc-0.8.0.tar.bz2
 $ cd lirc-0.8.0
@@ -1855,7 +1855,7 @@ users, type: <tt># /etc/rc.d/init.d/lircd start</tt> instead of:
 <bf>NOTE</bf>:  Read this next section if you're not familiar with how lirc works!
 
 There are two separate files used by lirc, and both are required for your
-remote control to do anything useful. First is the <tt>lircd.conf</tt> file. 
+remote control to do anything useful. First is the <tt>lircd.conf</tt> file.
 <tt>lircd.conf</tt> tells the lirc daemon how to interpret the IR pulses
 that it receives from a remote control and what name to assign to each
 sequence of pulses.  Without getting too involved, a particular series of
@@ -1897,8 +1897,8 @@ To make your own <tt>lircd.conf</tt> file
 $ irrecord myremote
 </verb></tscreen>
 
-Follow the on-screen directions to train your remote and define keys. If  
-your remote ends up working well, you should consider submitting your  
+Follow the on-screen directions to train your remote and define keys. If
+your remote ends up working well, you should consider submitting your
 <tt>lircd.conf</tt> file back to the lirc developers. Once finished:
 <tscreen><verb>
 $ su
@@ -1926,8 +1926,8 @@ echo "Starting lircd"
 /usr/local/sbin/lircd
 ^D
 # exit
-$ 
-</verb></tscreen> 
+$
+</verb></tscreen>
 
 This takes care of the lircd portion, which "listens" for the IR signals. If
 everything went well, the install script for lircd put an appropriate
@@ -1937,12 +1937,12 @@ receiver.
 
 The next step is to convert those signals into something that can be used
 to control MythTV.  MythTV now includes native support for lirc and can
-interact directly with 
+interact directly with
 
 <tscreen><verb>
 $ cd ~/mythtv-0.21/contrib/configfiles
 $ cp lircrc.example ~/.lircrc
-</verb></tscreen> 
+</verb></tscreen>
 or
 <tscreen><verb>
 $ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
@@ -1990,13 +1990,13 @@ begin
     config = Key Down CurrentWindow
 end
 </verb></tscreen>
-but the <tt>/etc/lircd.conf</tt> that comes in the lircd package 
+but the <tt>/etc/lircd.conf</tt> that comes in the lircd package
 defines the buttons for the Pinnacle Studio PCTV as:
 <tscreen><verb>
           channel+                 0x0000000000000017
           channel-                 0x000000000000001C
 </verb></tscreen>
-rather than "ChannelUp" and "ChannelDown".  I added the 
+rather than "ChannelUp" and "ChannelDown".  I added the
 following to my /home/[yourusername]/.lircrc file:
 <tscreen><verb>
 begin
@@ -2078,13 +2078,13 @@ before you load the lirc_sir module. Follow this with the install:
 $ su
 # make install
 </verb></tscreen>
- 
+
 You will notice that lirc installs the kernel module in
-<tt>/lib/modules/uname -a/misc</tt>. 
+<tt>/lib/modules/uname -a/misc</tt>.
 
 The configuration for starting <bf>lircd</bf> differs if you're going to be
 sending and receiving IR versus just receiving.
-<tscreen><verb> 
+<tscreen><verb>
 # cd /etc/rc.d
 # cat >> rc.local
 echo "Starting lircd"
@@ -2093,9 +2093,9 @@ modprobe lirc_sir
 /usr/local/sbin/lircd
 ^D
 # exit
-$ 
+$
 </verb></tscreen>
- 
+
 At this point you have to populate the <tt>/etc/lircd.conf</tt> file with the proper
 codes for your A/V remote. You should be able to find your remote within the
 lirc remote tar file located at <url
@@ -2112,10 +2112,10 @@ $ irw
 000000000000bff8 00 2 gi-motorola-dct2000
 000000000000f7f0 00 ENTER gi-motorola-dct2000
 </verb></tscreen>
- 
+
 Once you've verified lirc is working you can press <bf>CTRL-C</bf> to exit
 <bf>irw</bf> and configure the channel changing script.
- 
+
 The path to the channel changing script will need to be entered on the
 mythtv-setup screen for Input Connections.
 
@@ -2138,10 +2138,10 @@ echo "changing to $1"
 # exit
 $ exit
 </verb></tscreen>
- 
+
 See <tt>contrib/channel.pl</tt> for the actual file.  Copy it to
 <tt>/usr/local/bin/</tt>
- 
+
 The last statement within the perl script is the lirc rc command. This is
 the command that transmits the code to your cable/DSS box. Make sure to have
 the IRDA device within a few feet of the box.
@@ -2228,8 +2228,8 @@ have only one backend, then it will be its own master.
 
 The Master backend will always choose the first available tuner in the same
 order as you add cards through "mythtv-setup". In other words, the second
-card you add will only be used when there are two overlapping recordings, 
-the third when there are three, and so on. 
+card you add will only be used when there are two overlapping recordings,
+the third when there are three, and so on.
 <!-- Remove the next part once .21 is released --> Therefore, you will want to have
 the greatest amount of disk space on the Master backend because its tuner
 will always be the first choice. You will then want to add your <ref
@@ -2352,9 +2352,9 @@ Choose the appropriate settings for your particular tuner.  Use the arrow
 keys to move around and to make your choices, and press RETURN when
 complete.  Pressing RETURN will take you back to the Capture Cards screen;
 if you have additional capture cards in this machine, press the space bar
-when the highlight is on the (New Capture Card) row to define another card. 
+when the highlight is on the (New Capture Card) row to define another card.
 
-If you have made a mistake, you can delete a card by highlighting it and 
+If you have made a mistake, you can delete a card by highlighting it and
 pressing the 'D' key, or you can highlight it and press the RETURN or 'E'
 key to edit it.
 
@@ -2376,7 +2376,7 @@ the card and configure the analog portion of the card there.
 <p>When you start, the highlight should be on (New Video Source).  Press the
 space bar to begin.  The first field asks for the name of the video source.
 You may choose something easy to remember, like "Antenna" or "Cable".  Once
-you've chosen a name, press the down arrow to move to the next field.  
+you've chosen a name, press the down arrow to move to the next field.
 
 If you're in North America, change the grabber to
 "SchedulesDirect.org(Internal)", then continue pressing the down arrow to
@@ -2423,10 +2423,10 @@ connections available on each of the Capture cards you defined earlier.  For
 example, you may have a capture card with a tuner, a SVideo and a Composite
 connection.  If you wanted to associate the tuner (a.k.a., "Television")
 with an "Antenna" source you defined in Video Sources, you would move to the
-<tt>/dev/videodevice (Television) -> </tt> line and press the space bar. 
+<tt>/dev/videodevice (Television) -> </tt> line and press the space bar.
 Using the left and right arrow keys will show you the various choices you
 have already created for video source.  In our case, you would use the
-left/right cursor keys until "Antenna" was shown in the Video Source field. 
+left/right cursor keys until "Antenna" was shown in the Video Source field.
 Press down to move to the next setting.
 
 On the connection pane there is a "Scan for channels" button, if you are
@@ -2456,7 +2456,7 @@ single PVR-500 card, it will appear as <tt>/dev/video0</tt> and
 <tt>/dev/video1</tt>.  Each <tt>/dev/video</tt> device will have a Tuner input.
 </caption>
 </figure>
-Once you're done, press RETURN to go back to the Input Connections screen. 
+Once you're done, press RETURN to go back to the Input Connections screen.
 You would then finish associating the video sources to any other hardware
 devices you have available.
 
@@ -2540,7 +2540,7 @@ system, mount it and update the Storage Group to add additional space.
 
 You may create additional Storage Groups to store specific recordings in
 their own directories.  Storage Groups are edited via the 'Storage
-Directories' section of mythtv-setup.  
+Directories' section of mythtv-setup.
 
 You can also create multiple Storage Groups to group recordings together;
 recording schedules now have an option to specify which Storage Group to
@@ -2571,7 +2571,7 @@ into the Default Storage Group where they'll be the first programs eligible
 for expiration if the system needs free space for recordings.
 
 Usage information for all Storage Group directories is visible on the
-mythfrontend status screen as well as the mythbackend status webpage. 
+mythfrontend status screen as well as the mythbackend status webpage.
 MythTV is smart enough to determine which directories are on shared
 filesystems so it should not count free or used space multiple times if you
 have more than one directory on the same filesystem.
@@ -2606,7 +2606,7 @@ weights are added to a filesystem if it is in use for the following things:
 
 If a recording is due to end within 3 minutes, it is not counted against
 the weight of a filesystem. This is done to account for the pre/post-roll
-and start-early/end-late settings. 
+and start-early/end-late settings.
 
 <sect1>Post-configuration
 <p>Run the <tt>mythfilldatabase</tt> program as directed.  The master
@@ -2700,14 +2700,14 @@ of the MySQL server.
 
 Caveat:  You may make a slave backend the primary MySQL server, or run a
 non-MythTV database on a slave backend as long as you have edited the
-<tt>mysql.txt</tt> file on <bf>all</bf> systems and made it consistent. 
+<tt>mysql.txt</tt> file on <bf>all</bf> systems and made it consistent.
 There can be only one authoritative MySQL database in a MythTV system -
 errors such as the one above ensue if backends and frontends have differing
 ideas of which MySQL database they should talk to.
 </caption>
 </figure>
 
-Make sure that the IP addresses on the General setup screen are accurate. 
+Make sure that the IP addresses on the General setup screen are accurate.
 If the slave backend can't communicate with the master backend due to IP
 address misconfiguration then MythTV will not function properly.
 
@@ -2733,11 +2733,11 @@ best to just let the program run to completion.
 </caption>
 </figure>
 <bf>mythfilldatabase --help</bf> will give a full listing of the options
-available.  
+available.
 
 <bf>mythfilldatabase --manual</bf> is another option; the manual option will
 allow you to fine tune channel frequencies and specify which channels will
-be added to the database.  
+be added to the database.
 
 <bf>mythfilldatabase --file</bf> is an option if there isn't an XMLTV grabber
 for your country, but you <bf>do</bf> have an XML formatted listings file
@@ -2795,7 +2795,7 @@ $ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
 
 <sect>Configuring mythfrontend.
 <p>Once you have completed configuration of your backend systems, the next
-step is to configure the frontend client.  
+step is to configure the frontend client.
 
 When you start mythfrontend for the first time, it will attempt to connect
 to a configuration database on the local machine.  If there is none, a
@@ -2823,7 +2823,7 @@ is correctly initialized.
 else.  The first few configuration items ask you to indicate the number of
 seconds to record before or after a program, which is useful if the
 broadcast network or your system clock are out of sync and will help prevent
-you missing the beginning or end of a program.  
+you missing the beginning or end of a program.
 
 To change the value, use the left and right arrow keys to increment and
 decrement the number of seconds.  When you're satisfied with the result, use
@@ -2848,10 +2848,10 @@ use the same font settings as defined in Appearance, so if the EPG is
 unreadable this is where you make the adjustments to fonts, number of
 elements displayed, etc.
 
-<sect1>Playback <label id="deinterlace_"> 
+<sect1>Playback <label id="deinterlace_">
 <p>The one configuration item which may cause problems on your system is the
 "Deinterlace playback" setting.  MythTV uses a linear blend algorithm for
-deinterlacing, which will improve how the image looks on your screen. 
+deinterlacing, which will improve how the image looks on your screen.
 Deinterlacing requires that your processor support SSE. (Streaming SIMD
 Extensions, aka "MMX2").  Early Intel Celeron (those that don't use the
 Coppermine 0.18um core and are usually <600MHz), Pentium Pro and Pentium II
@@ -3035,7 +3035,7 @@ these at the head of a filter chain to change the capture format. The most
 likely use would be forceyuv422p to use YUV422P capture on cards with known
 chroma interlacing problems with YV12.
 
-There are some filters included in the MythTV source code that should 
+There are some filters included in the MythTV source code that should
 not be used:
 
 o The "forcergb24" and "forceargb32" filters
@@ -3070,14 +3070,14 @@ For typical broadcast stations:	"kerneldeint,quickdnr"
 For stations with poor signal quality: "linearblend,denoise3d=12"
 
 For synchronous TV-out: check Deinterlace with "Bob (2x framerate)"
- 
+
 <sect1>Recording <label id="Recording">
-<p>Depending on your capture card, MythTV offers different video encoders. 
+<p>Depending on your capture card, MythTV offers different video encoders.
 The following types of hardware encoding cards are supported:
 <itemize>
 <item>MJPEG - Zoran-based cards; see <url url="http://mjpeg.sourceforge.net" name="http://mjpeg.sourceforge.net">
 <item>MPEG-2 - iTVC15/16 based cards (Hauppauge PVR-250/PVR-350); see <url
-url="http://ivtvdriver.org" name="http://ivtvdriver.org"> 
+url="http://ivtvdriver.org" name="http://ivtvdriver.org">
 <item>HDTV - pcHDTV cards; see <url url="http://pchdtv.com" name="http://pchdtv.com"> and
 the Air2PC-ATSC-PCI see <url
 url="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103"
@@ -3091,9 +3091,9 @@ but it generates larger files than MPEG-4 for a given recording.
 
 For DVB and HDTV cards, no further configuration is required after
 setting up the card using the 'mythtv-setup' program.
-For all other cards, configuration is done through MythFrontend. 
+For all other cards, configuration is done through MythFrontend.
 Selecting 'Recording Profiles' from the 'TV Settings' screen will list
-the profiles currently available for the cards in your system. 
+the profiles currently available for the cards in your system.
 Depending on what types of cards you have installed you may see:
 <tscreen><verb>
 (Create new profile group)
@@ -3152,7 +3152,7 @@ use? How does video work?"> section for more information.
 
 <sect1>Xbox Frontends
 <p>MythTV is able to control the LED on the Xbox to indicate backend
-recording status.  
+recording status.
 
 To control the LED, you will need the <bf>blink</bf> program from the
 xbox-linux project, which is installed as <tt>/bin/led</tt> on GentooX.  On
@@ -3165,7 +3165,7 @@ url="http://xbox-linux.sf.net/" name="http://xbox-linux.sf.net/">. The
 program you need is part of the <tt>eds_i2c_staff</tt> module in CVS.  Note
 the spelling.
 
-Once you have installed <bf>blink</bf> you will need to set permissions. 
+Once you have installed <bf>blink</bf> you will need to set permissions.
 <bf>blink</bf> needs write permission to the i2c device to function
 properly.  There are three methods to accomplish this.  First, you could run
 <tt>mythfrontend</tt> as root, which is the simplest method, but could
@@ -3179,12 +3179,12 @@ $ su
 The final technique would be to set the <tt>/dev/i2c/0</tt> device read/write
 for all users, but this is the least preferred method.
 
-Now it's time to setup MythTV for Xbox hardware.  Enter Setup -> General. 
+Now it's time to setup MythTV for Xbox hardware.  Enter Setup -> General.
 On the second page check the 'Enable Xbox Hardware' option.  Upon reentering
 the settings, you should have a new option named 'Xbox'.  Within this option
 you may select the distribution, LED colors for recording and the update
 interval.  If you select GentooX as the distribution <bf>led</bf> will be
-used as the <bf>blink</bf> binary name, otherwise, <bf>blink</bf> is used. 
+used as the <bf>blink</bf> binary name, otherwise, <bf>blink</bf> is used.
 Colors should be self explanatory.  The update interval determines how often
 the frontend should poll the backend to determine if the status has changed.
 
@@ -3223,7 +3223,7 @@ U		| to view details for the currently selected show on the Watch&nbsp;
 O		| to list the upcoming episodes for the currently selected show&nbsp;
                   on the EPG, "Program Finder", "Program Recording Priorities",&nbsp;
                   "Fix Scheduling Conflicts" or search results screens          @
-I       	| edit recording options from the EPG, "Program Finder",&nbsp;	
+I       	| edit recording options from the EPG, "Program Finder",&nbsp;
                  "Program Recording Priorities", or "Fix Scheduling Conflicts"&nbsp;
                  screens. From the Playback and Delete screens, 'I' presents&nbsp;
                  options for recorded shows such as Auto Expire or Stop Recording.&nbsp;
@@ -3235,71 +3235,71 @@ I       	| edit recording options from the EPG, "Program Finder",&nbsp;
 <p>
 <table loc=p>
 <tabular ca="rll">
-Up or down	| keys change the channel						     @  
-num pad	        | Type a number to enter a channel number or jump amount (HHMM format)	     @  
+Up or down	| keys change the channel						     @
+num pad	        | Type a number to enter a channel number or jump amount (HHMM format)	     @
 P	        | pause / play.  You may also add an explicit keybinding for 'Play' through&nbsp;
                   MythWeb, returning you to normal speed if you are in slow motion, rewind&nbsp;
-                  fast forward or pause mode.						     @  
-C	        | change inputs on TV Tuner card					     @  
-ESC	        | quits									     @  
-I	        | puts the On-screen Display up again. During playback, 'I' toggles&nbsp;          
+                  fast forward or pause mode.						     @
+C	        | change inputs on TV Tuner card					     @
+ESC	        | quits									     @
+I	        | puts the On-screen Display up again. During playback, 'I' toggles&nbsp;
                   between position and show description info. If a jump amount is&nbsp;
-                  entered, jump to that position. 					     @  
-M	        | brings up the electronic program guide (Grid) -- see the EPG section	     @  
-Page Up	        | jump back the configured number of minutes  (default is 10)		     @  
-Page Down	| jump ahead the configured number of minutes  (default is 10)		     @  
-End or Z	| skip to next commercial break marker					     @  
-Home or Q	| skip back to previous commercial break marker				     @  
-T	        | toggle close caption support&nbsp;						     
+                  entered, jump to that position. 					     @
+M	        | brings up the electronic program guide (Grid) -- see the EPG section	     @
+Page Up	        | jump back the configured number of minutes  (default is 10)		     @
+Page Down	| jump ahead the configured number of minutes  (default is 10)		     @
+End or Z	| skip to next commercial break marker					     @
+Home or Q	| skip back to previous commercial break marker				     @
+T	        | toggle close caption support&nbsp;
                   Pressing 0-9 (preferably 3 times) + T changes teletext page and turns on teletext. @
 F	        | rotate between the various Picture Adjustments (Colour, Hue, etc.)&nbsp;
                   While Picture Adjustment is on-screen, use Left and Right arrows to&nbsp;
                   adjust. These settings adjust the look of the video playback, and are&nbsp;
-                  independent of the G-key settings used at record-time.  	             @  
-&#91; or F10	| decrease volume							     @  
-] or F11	| increase volume							     @  
-&#124; or F9 	| toggle mute								     @  
-/       	| jump to the next "favorite" channel					     @  
-?       	| mark/unmark the current channel as a "favorite"			     @  
-U       	| increase the play speed						     @  
-J       	| decrease the play speed						     @  
+                  independent of the G-key settings used at record-time.  	             @
+&#91; or F10	| decrease volume							     @
+] or F11	| increase volume							     @
+&#124; or F9 	| toggle mute								     @
+/       	| jump to the next "favorite" channel					     @
+?       	| mark/unmark the current channel as a "favorite"			     @
+U       	| increase the play speed						     @
+J       	| decrease the play speed						     @
 A		| Adjust time stretch (speed up or slow down normal play of audio and video  @
 W       	| cycle through zoom and fill modes: 4:3 aspect ratio, 16:9, 4:3 Zoom &nbsp;
-                  (like Pan and Scan), 16:9 Zoom, and 16:9 Stretch (eliminates black &nbsp; 
+                  (like Pan and Scan), 16:9 Zoom, and 16:9 Stretch (eliminates black &nbsp;
                   sidebars in TV signal)                                                     @
 F8		| toggle the sleep timer 30m->1hr->1hr30m->2hr->Off @
 CTRL-B		| Jump to the beginning of the recording / ringbuffer @
 +		| Switch between audio streams @
-Left    	| (if a jump amount is entered) to jump back that amount		     @  
-Right   	| (if a jump amount is entered) to jump ahead that amount		     @  
+Left    	| (if a jump amount is entered) to jump back that amount		     @
+Right   	| (if a jump amount is entered) to jump ahead that amount		     @
                 | @
-                | @                                                                          
-                | <bf>Without the stickykeys option selected</bf>                            @     
-Left            | rewind the configured number of seconds  (default is 5)	             @      
-Right           | fast forward the configured number of seconds (default is 30)             @      
-<               | starts rewind mode as if stickykeys are selected		             @      
+                | @
+                | <bf>Without the stickykeys option selected</bf>                            @
+Left            | rewind the configured number of seconds  (default is 5)	             @
+Right           | fast forward the configured number of seconds (default is 30)             @
+<               | starts rewind mode as if stickykeys are selected		             @
 >               | starts fast forward mode as if stickykeys are selected	             @
-                | @                                                                          
-                | @                                                                          
-                | <BF>With Stickykeys option selected</BF>                                   @    
-Right           | starts fast forward mode	                                             @     
-Left            | starts rewind mode		                                             @     
-                | @                                                                          
-                | @                                                                          
-                | <bf>In fast forward or rewind mode:</bf>                                   @     
-Left/Right	| increases the ff/rew speed					             @     
-0       	| plays at normal speed, but leaves the time indicator on screen            @     
-1 or 2	        | plays back more slowly than normal ff/rew speed (1 is slowest)            @     
-3       	| plays back at normal ff/rew speed				             @     
-4-9	        | plays back faster than normal ff/rew speed (9 is fastest)	             @     
+                | @
+                | @
+                | <BF>With Stickykeys option selected</BF>                                   @
+Right           | starts fast forward mode	                                             @
+Left            | starts rewind mode		                                             @
+                | @
+                | @
+                | <bf>In fast forward or rewind mode:</bf>                                   @
+Left/Right	| increases the ff/rew speed					             @
+0       	| plays at normal speed, but leaves the time indicator on screen            @
+1 or 2	        | plays back more slowly than normal ff/rew speed (1 is slowest)            @
+3       	| plays back at normal ff/rew speed				             @
+4-9	        | plays back faster than normal ff/rew speed (9 is fastest)	             @
 Space	        | exits fast forward or rewind mode				             @
-                | @                                                                          
-                | @                                                                          
-                | <bf>While video is paused:</bf>                                                @     
-Left            | rewind 1 frame                                                             @   
-&lt;            | rewind 1 second                                                            @   
-Right           | advance 1 frame                                                            @   
-&gt;            | advance 1 second                                                           
+                | @
+                | @
+                | <bf>While video is paused:</bf>                                                @
+Left            | rewind 1 frame                                                             @
+&lt;            | rewind 1 second                                                            @
+Right           | advance 1 frame                                                            @
+&gt;            | advance 1 second
 </tabular>
 </table>
 <sect2>Watching TV only
@@ -3307,12 +3307,12 @@ Right           | advance 1 frame                                               
 <table loc=p>
 <tabular ca="rll">
 G	| rotate between the various Picture Adjustments (Colour, Hue, etc.)&nbsp;
-          for recording.  These values affect the look of the resulting .nuv&nbsp;      
+          for recording.  These values affect the look of the resulting .nuv&nbsp;
           file, and are independent of the playback picture settings. While&nbsp;
-          Picture Adjustment is on-screen, use Left and Right arrows to adjust.   @     
-H	| Channel history. Each repeat steps back through the previous channels.  @     
-O	| Turns on 'Browse' mode, allowing user to browse channels and program&nbsp; 
-          info while watching current show FullScreen.				  @     
+          Picture Adjustment is on-screen, use Left and Right arrows to adjust.   @
+H	| Channel history. Each repeat steps back through the previous channels.  @
+O	| Turns on 'Browse' mode, allowing user to browse channels and program&nbsp;
+          info while watching current show FullScreen.				  @
 Y	| switch between multiple capture cards.&nbsp; <bf>NOTE</bf>:&nbsp;
 	  you will lose your LiveTV buffer on your current card. Useful&nbsp;
 	  for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.) @
@@ -3322,64 +3322,64 @@ Y	| switch between multiple capture cards.&nbsp; <bf>NOTE</bf>:&nbsp;
 <p>
 <table loc=p>
 <tabular ca="rll">
-Left	        | browse program prior to current listed program		   @    
-Right	        | browse program following current listed program		   @    
-Up	        | browse program on channel above current listed channel/program  @    
-Down	        | browse program on channel below current listed channel/program  @    
-/	        | browse program on next favorite channel			   @    
-0-9	        | enter a channel number to browse				   @    
-Space/Enter	| change channel to channel of current listed program		   @    
-R/r	        | Toggle recording of current program (cycles through types)	   @    
-ESC/O	        | Exit Browse mode						   
+Left	        | browse program prior to current listed program		   @
+Right	        | browse program following current listed program		   @
+Up	        | browse program on channel above current listed channel/program  @
+Down	        | browse program on channel below current listed channel/program  @
+/	        | browse program on next favorite channel			   @
+0-9	        | enter a channel number to browse				   @
+Space/Enter	| change channel to channel of current listed program		   @
+R/r	        | Toggle recording of current program (cycles through types)	   @
+ESC/O	        | Exit Browse mode
 </tabular>
 </table>
 <sect2>Playback Recording Zoom Mode
 <p>
 <table loc=p>
 <tabular ca="rll">
-Left	        | Move video to Left						 @      
-Right	        | Move video to Right						 @      
-Up	        | Move video Up							 @      
-Down	        | Move video Down						 @      
-PageUp	        | Zoom In							 @      
-PageDown	| Zoom Out							 @      
-Space/Enter	| Exit Zoom mode leaving picture at current size and position	 @      
-ESC	        | Exit Zoom mode and return to original size			       
+Left	        | Move video to Left						 @
+Right	        | Move video to Right						 @
+Up	        | Move video Up							 @
+Down	        | Move video Down						 @
+PageUp	        | Zoom In							 @
+PageDown	| Zoom Out							 @
+Space/Enter	| Exit Zoom mode leaving picture at current size and position	 @
+ESC	        | Exit Zoom mode and return to original size
 </tabular>
 </table>
 <sect2>If you have two or more tuner cards
 <p>
 <table loc=p>
 <tabular ca="rll">
-V	| toggle Picture-in-picture on or off					  @     
-B	| toggles the window focus (lets you change channels on the PiP window)  @     
-N	| swaps the two channels by changing channels on both cards		       
+V	| toggle Picture-in-picture on or off					  @
+B	| toggles the window focus (lets you change channels on the PiP window)  @
+N	| swaps the two channels by changing channels on both cards
 </tabular>
 </table>
 <sect2>Watching a recording only
 <p>
 <table loc=p>
-<tabular ca="rll">                                                                  
+<tabular ca="rll">
 Space/Enter     | set a bookmark at that point.  Next time you start the&nbsp;
                   recording, you will automatically jump forward to this point&nbsp;
-                  and clear the bookmark.					    @     
-X	        | queues the current recording for transcoding			    @     
+                  and clear the bookmark.					    @
+X	        | queues the current recording for transcoding			    @
 O	        | brings up menu to allow toggling settings such as Commercial&nbsp;
-                  Auto-Skip, Auto-Expire, etc.					    @     
+                  Auto-Skip, Auto-Expire, etc.					    @
 D		| exits the current recording and displays the Delete menu @
-E or M	        | enters/exits edit mode.					    @     
-                | @                                                                 
-                | @                                                                 
-                | <bf>In edit mode</bf>                                             @     
-Left/Right	| move forward and backward					    @     
+E or M	        | enters/exits edit mode.					    @
+                | @
+                | @
+                | <bf>In edit mode</bf>                                             @
+Left/Right	| move forward and backward					    @
 Up/Down	        | alter the amount of time you jump forward and backward.&nbsp;
                   Increments are: nearest cutpoint, nearest video keyframe, 1&nbsp;
                   frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes,&nbsp;
-                  and 10 minutes.						    @     
-PageUp/PageDown	| move forward and backward to the nearest cut point		    @     
-< or >	        | move forward or backward by 10 times the normal jump amount	    @     
-Space/Enter	| allows you to set or delete a cut point			    @     
-Z	        | loads the commercial skip list (if one exists) into the cutlist  @     
+                  and 10 minutes.						    @
+PageUp/PageDown	| move forward and backward to the nearest cut point		    @
+< or >	        | move forward or backward by 10 times the normal jump amount	    @
+Space/Enter	| allows you to set or delete a cut point			    @
+Z	        | loads the commercial skip list (if one exists) into the cutlist  @
 C or Q	        | clear all cut points in the cutlist			    @
 I		| Inverts the cutlist
 </tabular>
@@ -3388,65 +3388,65 @@ I		| Inverts the cutlist
 <p>
 <table loc=p>
 <tabular ca="rll">
-Arrows	           | are used to move the highlighted program point around		@       
-A, D, S, W         | perform the same as left, right, down and up			@       
-PageUp/PageDown    | move the channel list up or down a page				@       
-Home/End           | move the highlight left or right by one day			@       
-Ctrl+Left or &lt;  | move the highlight left by one page 				@       
-Ctrl+Right or &gt; | move the highlight right by one page 				@       
+Arrows	           | are used to move the highlighted program point around		@
+A, D, S, W         | perform the same as left, right, down and up			@
+PageUp/PageDown    | move the channel list up or down a page				@
+Home/End           | move the highlight left or right by one day			@
+Ctrl+Left or &lt;  | move the highlight left by one page 				@
+Ctrl+Right or &gt; | move the highlight right by one page 				@
 9, 3, 7, 1         | (like a numeric keypad) perform the same as PageUp, PageDown,&nbsp;
-                     Home and End 							@       
+                     Home and End 							@
 I	           | bring up more information about a show, and allow you to&nbsp;
                      schedule a recording.  If you select "Record this showing"&nbsp;
-                     while watching Live TV you can "Instant Record" a program.		@       
+                     while watching Live TV you can "Instant Record" a program.		@
 Space/Enter        | allow you resolve conflicts or change overrides. If the&nbsp;
                      program is not already scheduled to record, it will instead act like&nbsp;
-                     pressing 'I'.						@       
-M	           | when on a channel will change to that channel			@       
-ESC or C           | exits without changing the channel				@       
+                     pressing 'I'.						@
+M	           | when on a channel will change to that channel			@
+ESC or C           | exits without changing the channel				@
 R	           | change the current item from Recording/Not-Recording.&nbsp;
                      Successive keypresses cycle through the scheduled recording&nbsp;
-                     type list.								@       
+                     type list.								@
 X	           | change the channel to the currently selected channel without&nbsp;
-                     leaving the EPG (Most useful in the alternate EPG)			@       
-?	           | mark/unmark the current channel as a "favorite"			@       
+                     leaving the EPG (Most useful in the alternate EPG)			@
+?	           | mark/unmark the current channel as a "favorite"			@
 / or 4	           | toggle the guide listing between all channels and filtered&nbsp;
-                     "favorites"							       
+                     "favorites"
 </tabular>
 </table>
 <sect2>Setting Program or Channel Recording Priorities
 <p>
 <table loc="l">
 <tabular ca="rll">
-Right	        | increases priority value	@       
-Left	        | decreases priority value	@       
-1	        | sorts by title		@       
-2	        | sorts by priority		@       
-Home/End	| toggle sort priority		@       
-I	        | edit recording options	@       
-ESC	        | commits changes and exits	       
+Right	        | increases priority value	@
+Left	        | decreases priority value	@
+1	        | sorts by title		@
+2	        | sorts by priority		@
+Home/End	| toggle sort priority		@
+I	        | edit recording options	@
+ESC	        | commits changes and exits
 </tabular>
 </table>
 <sect2>Viewing Scheduled Recordings/Resolving Conflicts
 <p>
 <table loc=p>
 <tabular ca="rll">
-1	        | show all recordings		      @ 
-2	        | show only important recordings     @ 
-Home/End	| toggle show showing all/important  @ 
-I	        | edit recording options	      @ 
-Space/Enter	| resolve conflict or override	       
+1	        | show all recordings		      @
+2	        | show only important recordings     @
+Home/End	| toggle show showing all/important  @
+I	        | edit recording options	      @
+Space/Enter	| resolve conflict or override
 </tabular>
 </table>
 <sect2>Viewing Search Listings
 <p>
 <table loc=p>
 <tabular ca="rll">
-Home	| change to the previous view if applicable	@       
-End	| change to the next view if applicable	@       
+Home	| change to the previous view if applicable	@
+End	| change to the next view if applicable	@
 M	| select another view if applicable. In the&nbsp;
           title and description search popup, press&nbsp;
-          M again to edit or delete the selected view.         
+          M again to edit or delete the selected view.
 </tabular>
 </table>
 <sect2>Recording Profiles Setup Screen
@@ -3458,13 +3458,13 @@ D	| on a custom profile group displays a popup to delete the group@
 </table>
 <sect2>Recording Groups
 <p>In the Watch Recordings screen, Recording Groups allow you to separate
-programs into user-defined categories, such as "Kids", "Alice", "Bob", etc. 
+programs into user-defined categories, such as "Kids", "Alice", "Bob", etc.
 This can be used to reduce clutter, or to segregate content if you use the
 PIN function.
 <table loc=p>
 <tabular ca="rll">
-M	| change the view or to set a group password		@       
-I	| move a program from one Recording Group to another	       
+M	| change the view or to set a group password		@
+I	| move a program from one Recording Group to another
 </tabular>
 </table>
 <sect2>Watch Recordings Screen
@@ -3496,18 +3496,18 @@ features can be used with this configuration.  If you have more keys then you
 can access all of the features.  With only 16 keys most features are usable.
 <table loc=p>
 <tabular ca="rll">
-REMOTE CONTROL         | LIRC KEYSTROKE   | FUNCTION 									@       
-0 - 9                  | 0 - 9            | channel selection, EPG navigation, ff/rew speed setting (with stickykeys)	@       
-Left Arrow             | Left             | scroll left, rewind								@       
-Right Arrow            | Right            | scroll right, fast forward							@       
-Up Arrow               | Up               | scroll up, channel change up						@       
-Down Arrow             | Down             | scroll down, channel change down						@       
-Select / OK / Play     | Space            | Select item, play (with stickykeys) set bookmark				@       
-Cancel                 | Escape           | Cancel, quit playback							@       
-Menu                   | m                | EPG (from watching TV) edit (from playback).				@       
-Pause                  | p                | Pause									@       
-Other key 1            | i                | Information									@       
-Other key 2            | c                | Change tuner card input							       
+REMOTE CONTROL         | LIRC KEYSTROKE   | FUNCTION 									@
+0 - 9                  | 0 - 9            | channel selection, EPG navigation, ff/rew speed setting (with stickykeys)	@
+Left Arrow             | Left             | scroll left, rewind								@
+Right Arrow            | Right            | scroll right, fast forward							@
+Up Arrow               | Up               | scroll up, channel change up						@
+Down Arrow             | Down             | scroll down, channel change down						@
+Select / OK / Play     | Space            | Select item, play (with stickykeys) set bookmark				@
+Cancel                 | Escape           | Cancel, quit playback							@
+Menu                   | m                | EPG (from watching TV) edit (from playback).				@
+Pause                  | p                | Pause									@
+Other key 1            | i                | Information									@
+Other key 2            | c                | Change tuner card input
 </tabular>
 </table>
 
@@ -3587,7 +3587,7 @@ parameter.
 <item>no client is connected to the server
 <item>no recording (neither LiveTV nor a regular recording) is currently taking place
 <item>no recording starts within a definable amount of time ("Max. wait for recording (min)")
-<item>the "pre Shutdown check-command" returns 0 
+<item>the "pre Shutdown check-command" returns 0
 </itemize>
 
 If we get to this idle state the Master backend will set the wakeuptime using the "Set
@@ -3624,7 +3624,7 @@ their bootup cycle.
 the "Set wakeuptime command" as a parameter "$time". You need to set this
 according to your wakeup mechanism. If you need seconds since the epoch
 (1970-01-01) set the "Wakeup time format" to "time_t".
-<item>"Set wakeuptime command" is the command executed to set the new wakeuptime. 
+<item>"Set wakeuptime command" is the command executed to set the new wakeuptime.
 <item>"Server Halt Command" is the command executed to shutdown the Master
 backend and the Slave backends.
 <item>"pre Shutdown check-command" is used to give a
@@ -3663,7 +3663,7 @@ your Slave backends. This should be a script that contains the calls to
 wakeup all Slave backend systems.
 </itemize>
 
-<sect3>Using WOL to wake your Master backend. 
+<sect3>Using WOL to wake your Master backend.
 <p>To use WOL to wake your Master backend you will need a WOL capable Master
 backend, a machine that runs 24/7 which can execute an at-job and nc (netcat)
 on the Master backend. I use some little bash scripts to make my DSL router
@@ -3690,10 +3690,10 @@ If you use <bf>xinetd</bf>, save the following as <bf>mythwake</bf> in your
 <tt>/etc/xinet.d/</tt> directory:
 <tscreen><verb>
 service mythwake
-  {    
+  {
 	socket_type     = stream
 	wait            = no
-	user            = mythtv	
+	user            = mythtv
 	protocol        = tcp
 	id              = mythwake
 	server          = /usr/local/bin/mythwake
@@ -3920,7 +3920,7 @@ digital channel whenever possible but the channel on the analog input could
 still be used when the digital input is busy.
 <item>
 Custom Priority -- this allows you to add any specialized factors you
-would like in order to influence scheduling decisions. See the 
+would like in order to influence scheduling decisions. See the
 <ref id="Custom Priority" name="Custom Priority"> section below.
 </itemize>
 For any single showing of any show you've chosen to record, these factors
@@ -3980,7 +3980,7 @@ schedule.
 in progress can not be moved to another input or time so it "wins"
 its current timeslot.
 
-<item>Single, Daily, or Weekly rules with no match are marked Not Listed -- 
+<item>Single, Daily, or Weekly rules with no match are marked Not Listed --
 If these or Overrides do not match the current listings because the
 listings have changed, they are added to the schedule and marked to
 indicate that they will not record.
@@ -4080,7 +4080,7 @@ shows from being recorded.
 The items in the list are colored in the record color for things that
 will record, white for things that may need attention, gray for those
 that do not need to record and yellow when there is a time conflict.
-Items at the top of the list may also be highlighted indicating that the 
+Items at the top of the list may also be highlighted indicating that the
 recording is in progress.
 
 Along with the channels, start times and titles, the right-hand column has
@@ -4458,7 +4458,7 @@ These columns contain bit flags for a variety of attributes that
 may be associated with a program. These are filled with information
 offered by the TV listings provider. However, your listings source
 will not have information for all of the available flags. Therefore,
-some of these may not be useful for your search rules. This information 
+some of these may not be useful for your search rules. This information
 is organized in "sets" and the MySQL function FIND_IN_SET() can be used
 to test for any of these flags. For example:
 <tscreen><verb>
@@ -4525,7 +4525,7 @@ to the same set top cable box.
 |     |                     `---------=|        input 2 | Digital
 |wall |               coax             | Card 2         |
 |=---=^=------------------------------=|        input 3 | Cable
-|                                      +-----|||||||||||| 
+|                                      +-----||||||||||||
 </verb></tscreen>
 
 Input 1 and input 2 receive content from the same set top box and the
@@ -4939,7 +4939,7 @@ like to enable support for the opengl and FFT visualizations.  The command
 line would look like:
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.21 
+$ cd ~/mythplugins-0.21
 $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
 $ qmake mythplugins.pro
 $ make
@@ -4966,7 +4966,7 @@ and if you have PHP support.
 
 <sect2>Mandriva
 <p>Mandriva has <bf>apache</bf> and <bf>PHP</bf> pre-packaged, so
-installation is quite simple.  
+installation is quite simple.
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -4988,7 +4988,7 @@ $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
 # exit
-$ 
+$
 </verb></tscreen>
 
 By default, MythWeb uses an Apache <tt>.htaccess</tt> file to restrict
@@ -5038,7 +5038,7 @@ id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.
 
 There are a number of transitions available, some requiring OpenGL
-support.  You will also need to install a TIFF library.  Under Mandriva, you 
+support.  You will also need to install a TIFF library.  Under Mandriva, you
 would perform the following command:
 <tscreen><verb>
 # urpmi libtiff3-devel
@@ -5052,7 +5052,7 @@ $ make
 # su
 # make install
 # exit
-$ 
+$
 </verb></tscreen>
 The configuration for MythGallery is accessed through the main Setup option
 in mythfrontend.  Make sure you set your pictures directory to wherever
@@ -5072,7 +5072,7 @@ Use the arrow keys to select a folder or picture to open/view with the
 Select key, or use the Menu key to toggle access the menu on the left.  The
 menu options are as follows:
 <itemize>
-<item> Slideshow - Will cycle through all the pictures in the current folder. 
+<item> Slideshow - Will cycle through all the pictures in the current folder.
 The currently selected item must be a picture (not a folder) for this to
 work.  It does not currently traverse subfolders.
 <item> Rotate CW - Rotate the current image 90 degrees in the clockwise
@@ -5103,19 +5103,19 @@ create the appearance of MythGallery hanging (e.g. running
 have executable permissions set.
 
 Here is an example script that a user may want to run
-on import: 
+on import:
 <tscreen><verb>
 #!/bin/csh
 
-if ($#argv == 0) then 
-        echo "Usage: $0 dest_dir" 
-        exit 
-endif 
+if ($#argv == 0) then
+        echo "Usage: $0 dest_dir"
+        exit
+endif
 
 cd $argv[1]
 
 # get stuff over the network
-wget http://www.somesite.dom/dir/file1.jpg 
+wget http://www.somesite.dom/dir/file1.jpg
 wget http://www.somesite.dom/dir/file2.jpg
 wget http://www.somesite.dom/dir/file3.jpg
 
@@ -5195,7 +5195,7 @@ $ cp docs/xmamerc.dist ~/.xmame/xmamerc
 
 Because some ROMS work better with different display toolkits, or possibly
 even older versions of xmame, it's convenient to keep all of your
-<bf>xmame</bf> binaries and to rename them to include the version number. 
+<bf>xmame</bf> binaries and to rename them to include the version number.
 MythGame allows you to match individual roms to preferred binaries.
 
 <tscreen><verb>
@@ -5328,7 +5328,7 @@ File Extensions:                                (List of all file extension to b
 <item>Assign a Game Favorite Status: Browse to the desired game and press "/".
 </itemize>
 
-<sect>MythMusic.  
+<sect>MythMusic.
 <p>MythMusic has a number of prerequisites that must be satisfied before it
 is operational.  Depending on your distribution, some of these prerequisites can
 be satisfied through the various package managers.  If your distribution doesn't
@@ -5389,7 +5389,7 @@ $ make
 $ su
 # make install
 # exit
-$ 
+$
 </verb></tscreen>
 
 Download libcdaudio from <url name="http://libcdaudio.sourceforge.net"
@@ -5403,7 +5403,7 @@ $ make
 $ su
 # make install
 # exit
-$ 
+$
 </verb></tscreen>
 
 Download cdparanoia from <url name="http://www.xiph.org/paranoia/down.html"
@@ -5419,13 +5419,13 @@ $ su
 # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
 # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
 # exit
-$ 
+$
 </verb></tscreen>
 
 <sect1>Mandriva
 <p>Mandriva has a number of the prerequisites available on the
 installation CD.  Some of the software you're going to need will have to be
-obtained from the "contrib" or "cooker" development repositories. 
+obtained from the "contrib" or "cooker" development repositories.
 Applications downloaded from "cooker" come from the development branch, so
 there may be issues with some software.  It isn't recommended that you mix
 cooker and release-level software.
@@ -5464,7 +5464,7 @@ typing:
 # urpmi libfftw2 libfftw2-devel
 </verb></tscreen>
 
-<tt>OpenGL</tt> should be installed on practically all distributions. 
+<tt>OpenGL</tt> should be installed on practically all distributions.
 However, you will need the devel module.  In Mandriva it may be
 installed by typing:
 <tscreen><verb>
@@ -5479,17 +5479,17 @@ typing:
 </verb></tscreen>
 
 <sect1>Red Hat Linux 9
-<p>Red Hat provides packages for several of the prerequisites, making 
-installation very simple. Of the prerequisites, Red Hat provides 
-packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably 
+<p>Red Hat provides packages for several of the prerequisites, making
+installation very simple. Of the prerequisites, Red Hat provides
+packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably
 already have installed). To install these all at once, simply type (all on
 the same line):
 <tscreen><verb>
 $ up2date --solvedeps libvorbis libvorbis-devel vorbis-tools cdparanoia-devel cdparanoia-libs cdparanoia SDL-devel SDL
 </verb></tscreen>
 
-If you get the following message: "None of the packages you requested 
-were found, or they are already updated" it probably means you already 
+If you get the following message: "None of the packages you requested
+were found, or they are already updated" it probably means you already
 have all of those packages installed.
 
 You must install the remaining packages, (MAD, FLAC, libcdaudio and
@@ -5561,11 +5561,11 @@ doesn't try to automount the CD and begin playing it automatically.
 
 <!--
 Next stuff is from a message by jasonmiller [jasonmiller@micron.com]
-with additional comments by Thor 
+with additional comments by Thor
 -->
 Here's some information on playlist management:
 
-Q: How do I create a new playlist?  
+Q: How do I create a new playlist?
 A: Using the MythMusic "Select Music" menu option, setup the playlist as you
 normally would by adding songs or other playlists as needed.  When you are
 ready to save the new playlist, highlight "Active Play Queue" at the bottom
@@ -5585,7 +5585,7 @@ quickly through a combination of jumping around the number keys AND hitting
 a non-number key (right arrow is particularly good for this) to force the
 current character.
 
-Q: How do I edit a playlist? 
+Q: How do I edit a playlist?
 A: Highlight the playlist in the selection tree and hit the "i" key then
 select "Move to Active Play Queue" in the popup.  You can now modify the
 "Active Play Queue" like normal, adding songs and playlists by selecting
@@ -5610,10 +5610,10 @@ select "Delete this Playlist" from the popup.
 
 <sect1>Troubleshooting MythMusic
 <p>You may run into errors when running MythMusic.
-<sect2>When I run MythMusic and try and look up a CD, I get an error message 
-<p>The full text of the message will say: 
+<sect2>When I run MythMusic and try and look up a CD, I get an error message
+<p>The full text of the message will say:
 
-databasebox.o: Couldn't find your CD. It may not be in the freedb database. 
+databasebox.o: Couldn't find your CD. It may not be in the freedb database.
 More likely, however, is that you need to delete ~/.cddb and ~/.cdserverrc
 and restart mythmusic. Have a nice day.
 
@@ -5714,7 +5714,7 @@ use with MythVideo.  You may also transcode the DVD content from MPEG-2 to
 other formats which should greatly reduce the amount of space the DVD
 material takes up on your hard drive.
 
-MythDVD has a number of prerequisites to enable transcoding functionality. 
+MythDVD has a number of prerequisites to enable transcoding functionality.
 If you only wish to play DVDs rather than convert them to something like
 MPEG-4 or xvid you may skip the prerequisite installation step.
 
@@ -5723,7 +5723,7 @@ MPEG-4 or xvid you may skip the prerequisite installation step.
 <sect1>Pre-compiled binaries
 <p>Mandriva users may install the prerequisites this way:
 <tscreen><verb>
-# urpmi libdvdread3 libdvdread3-devel a52dec liba52dec-devel 
+# urpmi libdvdread3 libdvdread3-devel a52dec liba52dec-devel
 # urpmi mplayer ogle xine
 </verb></tscreen>
 Assuming that you've added a PLF mirror, you may also load the rest of the
@@ -5864,6 +5864,8 @@ handle SIGPIPE nostop noprint
 handle SIG33 nostop noprint
 set logging on
 set pagination off
+set breakpoint pending on
+break qFatal
 set args -l myth.log -v record,channel,siparser
 run
 thread apply all bt full
@@ -5901,7 +5903,7 @@ begins.  This ensures that there is some context to the backtrace, and so
 that it's possible to see what exactly caused the segfault.
 
 <bf>gdb</bf> has a number of options, read the <tt>man</tt> page for more
-information.  
+information.
 
 Using the <tt>gdbcommands</tt> file in conjunction with a <bf>while</bf> loop
 will ensure that <bf>gdb</bf> creates a trace file and then restarts:
@@ -5921,7 +5923,7 @@ that you're going to test using <bf/ssh</> or <bf>telnet</bf>. Next, type
 <tt>$ export DISPLAY=localhost:0.0</tt>.  This will allow the graphics to be
 displayed on the X console (usually ALT-F6 or ALT-F7) and still give you
 output and control of <bf>mythfrontend</bf>, either from the <bf>ssh</bf>
-session, or by switching back to the text console by pressing CTRL-ALT-F1. 
+session, or by switching back to the text console by pressing CTRL-ALT-F1.
 You can now continue troubleshooting using <bf>gdb</bf> as detailed in the
 instructions.
 
@@ -5938,7 +5940,7 @@ available CPU.  You will not be able to interrupt the process, so for all
 intents and purposes your computer will have crashed.
 
 <sect1>Installing
-<sect2>When trying to run mythtv-setup, you get an error like this: 
+<sect2>When trying to run mythtv-setup, you get an error like this:
 "mythtv-setup: error while loading shared libraries:"
 <p>You didn't add <tt>/usr/local/lib</tt> to <tt>/etc/ld.so.conf</tt>.  See the
 section on modifying <ref id="modifying_ld.so.conf" name="/etc/ld.so.conf">.
@@ -5975,11 +5977,11 @@ write to <tt>/var</tt> and the system may not boot if it is unable to write
 to <tt>/var</tt> due to a full partition.
 
 <sect2>MySQL not connecting correctly
-<p>Your <bf>MySQL</bf> installation may have networking turned off. 
+<p>Your <bf>MySQL</bf> installation may have networking turned off.
 Check that <tt>/etc/mysql/my.cnf</tt> <em>does not</em> contain
-<tt>skip-networking</tt>.  If it does, remove it.  Also verify that 
-<tt>bind-address</tt> is set to your IP address instead of 
-<tt>127.0.0.1</tt>.  If you change either of these items, restart 
+<tt>skip-networking</tt>.  If it does, remove it.  Also verify that
+<tt>bind-address</tt> is set to your IP address instead of
+<tt>127.0.0.1</tt>.  If you change either of these items, restart
 <bf>MySQL</bf>.
 
 <sect2>MySQL database is corrupt
@@ -6006,7 +6008,7 @@ Profiles and adjust the <bf>Default</bf> and <bf>Live TV</bf> options to
 <sect2>Screen goes blank but returns when mouse is moved or keyboard is used
 <p>This is due to DPMS, the Display Power Management System, which is used
 to save power by turning off your monitor when the system decides that it's
-not being used or due to a screensaver that has defaulted to a blank screen. 
+not being used or due to a screensaver that has defaulted to a blank screen.
 MythTV now has DPMS support built-in, and should intelligently handle the
 screen.  Continue reading if you wish to override DPMS and force it off.
 
@@ -6092,7 +6094,7 @@ within the control panel.
 <sect1>Miscellaneous
 <sect2>mythfilldatabase failing
 <p>If mythfilldatabase suddenly appears to be failing, there are at least
-two things to check.  
+two things to check.
 
 First, if you are in North America, ensure that your DataDirect subscription
 is still valid, otherwise, check to see what version of XMLTV you're
@@ -6138,7 +6140,7 @@ command to your <tt>/etc/rc.local</tt> file, or by adding files to
 /etc/sysconfig.
 
 On Mandriva and other distributions, if you install <bf>hdparm</bf> from an RPM you
-will most likely get a <tt>/etc/sysconfig/harddisks</tt> file installed. 
+will most likely get a <tt>/etc/sysconfig/harddisks</tt> file installed.
 This file will be parsed by the <tt>/etc/rc.sysinit</tt> script.  If you use
 the default <tt>harddisks</tt> file, your changes will affect all IDE devices
 (including CD ROMs).  If you wish to use different parameters for various
@@ -6159,7 +6161,7 @@ reboot your setting will be preserved.
 <img src="stop.png">
 <caption><bf>NOTE</bf>:  the following instructions do not apply to PVR-250/350
 encoders; the MPEG-2 file will have the audio embedded in the stream so it
-is not accessible using <tt>/dev/dsp</tt>.  
+is not accessible using <tt>/dev/dsp</tt>.
 </caption>
 </figure>
 
@@ -6235,7 +6237,7 @@ second card is #1, etc.
 duplex operation.  If it's not, it's most likely that you're going to run
 into issues when you try to record and play sound at the same time.  If your
 backend is a separate machine than your frontend, then there's no problem,
-since you're only going to be doing one thing at a time with the card. 
+since you're only going to be doing one thing at a time with the card.
 Likewise, if you're running the frontend and backend on the same machine,
 but you're using btaudio or a hardware encoder card such as the Hauppauge
 PVR-250, DVB cards or HDTV capture cards as your recording source and you're
@@ -6283,8 +6285,8 @@ apply in that case.
 frequencies as the United States.  "Canada Cable" was a hack that some
 people used when they would discover that their channels were off-by-one,
 i.e. when tuning to channel 42, they might get channel 41 or 43.  This is
-actually due to the tuner on the video capture device being mis-detected. 
-You must manually specify the tuner type in your <tt>/etc/modules.conf</tt>. 
+actually due to the tuner on the video capture device being mis-detected.
+You must manually specify the tuner type in your <tt>/etc/modules.conf</tt>.
 See the video4linux mailing list (<url
 url="https://listman.redhat.com/mailman/listinfo/video4linux-list"
 name="https://listman.redhat.com/mailman/listinfo/video4linux-list">) for
@@ -6334,7 +6336,7 @@ In KDE, you may want to perform the following:
 <tscreen><verb>
 $ rm ~/.kde/Autostart/Autorun.desktop
 </verb></tscreen>
-<sect>Miscellaneous. 
+<sect>Miscellaneous.
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format
 <p>First, check if the <bf>mytharchive</bf> plugin does what you want.  If not, then
 read on:
@@ -6344,7 +6346,7 @@ decode nuv files into raw format for use with other applications.  This
 command-line utility was not designed to be used by the end-user, but
 instead to be called by other applications or scripts.  Programs like
 <bf>nuvexport</bf> (<url url="http://forevermore.net/myth/"
-name="http://forevermore.net/myth/">) are better suited for the end user. 
+name="http://forevermore.net/myth/">) are better suited for the end user.
 However, since <bf>mythtranscode</bf> can be a useful tool, directions on
 using it follow.
 
@@ -6354,7 +6356,7 @@ sampling rate.  In order to process the output, you must supply this
 information to the processing utility.  <bf>mythtranscode</bf> provides the
 relevant information on STDOUT.
 
-There are two modes in which <bf>mythtranscode</bf> can create raw streams. 
+There are two modes in which <bf>mythtranscode</bf> can create raw streams.
 The first has no synchronization and assumes that the processing utility
 will read audio and video at a constant rate.  This method is useful when a
 single application will be processing the raw output, such as
@@ -6453,14 +6455,14 @@ From "best" to "worst", in NTSC:
 <item>544x480 TiVo Best resolution
 <item>480x480 SuperVCD (SVCD) Video CD resolution, TiVo High resolution
 <item>352x480 ReplayTV "Standard" quality, TiVo Basic and Medium resolution, DVD "LP" resolution
-<item>320x480 
+<item>320x480
 <item>544x240
-<item>480x240 
+<item>480x240
 <item>352x240 Video CD (VCD) resolution
 <item>320x240
 </itemize>
 
-As you can see, the lower quality values are half of the better ones. 
+As you can see, the lower quality values are half of the better ones.
 720x240 is possible, but isn't a good tradeoff relative to the number of
 vertical lines lost.  In a PAL country, the you would use values like
 720x576 or x288.
@@ -6572,7 +6574,7 @@ information.
 <p><figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
-<caption><bf>NOTE</bf>:  Performing this step will remove the entire database. 
+<caption><bf>NOTE</bf>:  Performing this step will remove the entire database.
 You will lose all of your settings and will need to re-run the mc.sql script
 to setup the database structure before running the mythtv-setup program.
 </caption>
@@ -6631,7 +6633,7 @@ standard MythTV installation.
 At this point we will restore the information about your programs back into
 the database:
 <tscreen><verb>
-$ mysql -u mythtv -pmythtv mythconverg < restore.sql 
+$ mysql -u mythtv -pmythtv mythconverg < restore.sql
 </verb></tscreen>
 
 After successful insertion of the data you may delete the
@@ -6682,7 +6684,7 @@ what's going on.
 include in your TV listings, you can remove the entries from the grabber
 configuration and the MySQL database.  This often happens with premium
 channels; for example, HBO or Showtime may be available on your cable TV
-system, but is scrambled because you're not a subscriber to that channel. 
+system, but is scrambled because you're not a subscriber to that channel.
 Since you can never watch it, you want to get rid of it.
 
 If you are using the DataDirect service, login to your account at
@@ -6720,7 +6722,7 @@ mysql> delete from program where chanid = 1015;
 </verb></tscreen>
 
 <sect1>NFS
-<p>You may want to use a central server to store your files.  
+<p>You may want to use a central server to store your files.
 
 On the host machine, (in this case, the hostname is "masterbackend") you'll
 want to edit your <tt>/etc/exports</tt> file and use something like:
@@ -6821,7 +6823,7 @@ $
 </verb></tscreen>
 
 <label id="logrotate">
-<sect3>Log files 
+<sect3>Log files
 <p>By default, the log file for mythbackend will be written to
 <tt>/var/tmp/mythbackend.log</tt>. This has been tested and is known to work
 on Mandriva and Red Hat, but many people prefer to place logs under
@@ -6852,21 +6854,21 @@ $ su
 # cat > /etc/logrotate.d/mythtv
 # Set default values for all log files first...
 
-# Rotate the logs once a week, or more frequently if they 
+# Rotate the logs once a week, or more frequently if they
 # exceed 10Mb in size (size is checked daily).
 weekly
 size 10M
 
-# 'copytruncate' is used for logs generated by 
-# currently-running programs that should not be restarted 
-# (and can't be signalled to start a new log) after the 
-# rotation.  It duplicates the existing log file and then 
-# sets the length of the existing file to 0.  The only time 
-# this would break would be if the program writing the log 
+# 'copytruncate' is used for logs generated by
+# currently-running programs that should not be restarted
+# (and can't be signalled to start a new log) after the
+# rotation.  It duplicates the existing log file and then
+# sets the length of the existing file to 0.  The only time
+# this would break would be if the program writing the log
 # was using lseek.
 copytruncate
 
-# After rotating the files, leave the most recent rotated 
+# After rotating the files, leave the most recent rotated
 # copy alone but gzip everything else to save space.
 compress
 delaycompress
@@ -6880,9 +6882,9 @@ notifempty
 # end of the global options
 
 /var/log/mythtv/mythbackend.log /var/log/mythtv/mythfrontend.log {
-  # Keep logs until they are 2 months old or the number of 
-  # logs reaches 12.  If the log files stay small, the age will 
-  # kick in first and you'll only have 8 log files.  If they 
+  # Keep logs until they are 2 months old or the number of
+  # logs reaches 12.  If the log files stay small, the age will
+  # kick in first and you'll only have 8 log files.  If they
   # get larger than 10Mb then you won't keep all 60 days.
   rotate 12
   maxage 60
@@ -6896,7 +6898,7 @@ notifempty
 #
 </verb></tscreen>
 
-<sect3>Mandriva 
+<sect3>Mandriva
 <p>Mandriva adds one more twist in the form of the <tt>msec</tt> utility,
 which runs regularly and (at the default or any higher security level) sets
 permissions on many files, including those under <tt>/var/log</tt>.
@@ -7010,7 +7012,7 @@ etc.) to MPEG-4, it can be used to transcode RTjpeg files (usually only used
 on systems that can not real-time encode to MPEG-4 using a framegrabber) to
 MPEG-4, and finally it can be used to remove commercials from a MPEG-2 file
 while leaving the file in MPEG-2 format.
- 
+
 When MythTV transcodes a file to MPEG-4 or RTjpeg the resulting file format
 is NuppelVideo (nuv).  NuppelVideo is a container which provides a method of
 keeping the audio and video in sync throughout the recording, which is why
@@ -7021,7 +7023,7 @@ playing <tt>.nuv</tt> files in non-MythTV systems.
 you want something more portable you can look at some of the other sections
 in this HOWTO. -->
 
-The original file is removed when the transcoding process is complete. 
+The original file is removed when the transcoding process is complete.
 Unless you're sure that you will be satisfied with the result you may want
 to enable the <bf>mythtv-setup</bf> option which causes <bf>mythbackend</bf>
 to keep the original file after transcoding.  This option is on the second
@@ -7110,7 +7112,7 @@ results from MPEG-4 transcoding try setting as above and go from there. -->
 <sect2>Create/Alter Scheduled Recordings to Enable Transcoding
 
 <p>Transcoding is actually enabled on a per-recording basis.  Two things
-must be true before any given recording will be auto-transcoded, however. 
+must be true before any given recording will be auto-transcoded, however.
 The first is that the recording must have been made with a recording profile
 that has auto-transcode enabled. Under "Storage Options" for the recording
 you must set the "Record using the "X" profile" to the profile you
@@ -7130,7 +7132,7 @@ the V4L card, as it's already likely to be MPEG-4.
 As an example, you could configure the Default profile for "Hardware DVB
 Encoders" (the profile group used for DVB cards, including ATSC cards like
 the pcHDTV 3000) to "Enable auto-transcoding". In the Default profile for
-MPEG-2 Encoders (PVR cards) you'd leave "Enable auto-transcoding" unchecked. 
+MPEG-2 Encoders (PVR cards) you'd leave "Enable auto-transcoding" unchecked.
 For programs that are available on both kinds of cards you'd set the
 recording profile to Default and enable auto-transcoding in the record
 settings.  Then you pick your transcoding profile.  The result is that when
@@ -7165,7 +7167,7 @@ mysql> select r.* from recordingprofiles r,profilegroups p where p.name='Transco
 +----+----------------+------------+------------+--------------+
 5 rows in set (0.01 sec)
 
-mysql>                                                                        
+mysql>
 </verb></tscreen>
 
 Armed with the knowledge of what the profile ID's are you can also choose to
@@ -7188,7 +7190,7 @@ name of the system was "frontend1" and we're going to change it to
 <caption><bf>NOTE</bf>:  Changing the hostname using direct SQL update commands will
 break things.  You <em>MUST</em> use this indirect method.
 </caption>
-</figure> 
+</figure>
 
 1.  Stop all backends.  If you run <bf>mythbackend</bf> from a terminal
 session, press control-c. If your backends are started with an init
@@ -7233,13 +7235,13 @@ If you don't feel comfortable using <bf>sed</bf>, you can open the
 <tt>mythtv_backup.sql</tt> file in a text editor and perform a global search
 and replace.  When saving the file, make sure you use the new name,
 <tt>mythtv_restore.sql</tt> or the rest of the steps below will fail.
-	
+
 5.  Drop and recreate the database.
 <tscreen><verb>
 $ mysql -u root
 mysql>drop database mythconverg;
 mysql>create database mythconverg;
-mysql>exit	
+mysql>exit
 </verb></tscreen>
 
 6.  Restore the database using your edited version.
@@ -7249,7 +7251,7 @@ $ mysql -u mythtv -pmythtv mythconverg < mythtv_restore.sql
 
 If you are running slave backends or frontends, don't forget to re-enable
 access as detailed in <ref id="modify_perm_mysql" name="Modifying access to
-the MySQL database for multiple systems">. 
+the MySQL database for multiple systems">.
 
 7.  Start the backends.  If you use init scripts, do the following, otherwise
 start them from terminal consoles.
@@ -7295,16 +7297,16 @@ name="http://www.tuxbox.org">. Additionally, you need to enable the SPTS
 mode in Neutrino.
 
 <itemize>
-<item>Add a new "Capture Card" in the setup. The "Card type" is "DBOX2 Input", 
-the other values have to be adjusted according to your setup. 
+<item>Add a new "Capture Card" in the setup. The "Card type" is "DBOX2 Input",
+the other values have to be adjusted according to your setup.
 The default values, except for the "DBOX2 host ip", should work fine.
-<item>Define a new video source. It doesn't need to be configured, 
+<item>Define a new video source. It doesn't need to be configured,
 you just need to define it. MythTV grabs the EPG from the DBoxII.
 <item>Connect the DBoxII to the newly defined input source in "input connections".
-<item>Since channel scanning is not implemented yet, you need to define channels 
-in the "Channel Editor". Make sure that you use the same value for 
-"Channel Name" as on the DBoxII. You can get a list of available 
-channels from the web interface of Neutrino at http://ip-of-your-box:80/. 
+<item>Since channel scanning is not implemented yet, you need to define channels
+in the "Channel Editor". Make sure that you use the same value for
+"Channel Name" as on the DBoxII. You can get a list of available
+channels from the web interface of Neutrino at http://ip-of-your-box:80/.
 Associate the channel with your new video source and repeat when needed.
 </itemize>
 
@@ -7321,8 +7323,8 @@ Lower case = seen
 Upper Case = seen & good
 <itemize>
 <item>l/L = Lock  : This could be seen by PVR-250/BTTV users
-<item>a/A = PAT   : Any recording transmitted in MPEG 
-<item>m/M = PMT   : Any recording transmitted in MPEG 
+<item>a/A = PAT   : Any recording transmitted in MPEG
+<item>m/M = PMT   : Any recording transmitted in MPEG
 <item>g/G = MGT   : ATSC only
 <item>v/V = VCT   : ATSC only
 <item>n/N = NIT   : DVB only
@@ -7345,7 +7347,7 @@ usually used as the second, third, etc capture device.
 <item>The PVR-150 MCE Kit (Model 1062) does not have a radio tuner and
 comes with a Microsoft Media Center remote control instead of Hauppauge's.
 <item>The PVR-150 low profile (Model 1086) is a low-profile card. It has a
-radio tuner and is approximately half the height of a standard card. 
+radio tuner and is approximately half the height of a standard card.
 However, it comes with a low-profile PCI bracket, so it is not suitable for
 use in a standard PCI slot without removing the bracket, which may not be
 worth the trouble.
@@ -7508,7 +7510,7 @@ chunk of space in /dev/hda5, using a reiserfs filesystem and mounted on
 You need to create at least one LVM partition for a physical volume. Use
 <bf>fdisk</bf> or your favorite partition editor to set the type to LVM
 (0x8e). If you're using an entire disk, create one big partition rather than
-using the device itself. e.g. use /dev/hdb1 not /dev/hdb.  
+using the device itself. e.g. use /dev/hdb1 not /dev/hdb.
 
 In the following example, you have a 15GB disk.  The first 6GB are set as
 your boot partition.  <tt>/dev/hda2</tt> was added as an extended partition,
@@ -7604,7 +7606,7 @@ Add the new physical volume to the volume group:
 <img src="stop.png">
 <caption><bf>NOTE</bf>:  You may get errors at this point stating that there are no
 physical volumes available for adding to the LV, even though you know for a
-fact that there are.  You may need to specify the physical volume in the 
+fact that there are.  You may need to specify the physical volume in the
 <tt>/dev/ide/host/bus/target/lun/etc</tt> format.
 </caption>
 </figure>
@@ -7616,7 +7618,7 @@ Make the logical volume used for video bigger:
 <tt># lvextend --size +50G /dev/VGforMyth/video</tt>
 <sect2>ReiserFS
 <p>Unmount, resize and remount the filesystem.  Technically, you don't need to
-unmount and remount the ReiserFS. 
+unmount and remount the ReiserFS.
 <tscreen><verb>
 # umount /var/video
 # resize_reiserfs /dev/VGforMyth/video
@@ -7669,7 +7671,7 @@ mailing list.
 
 <sect2>Ext2
 <p>Ext2 was the defacto standard Linux filesystem for many years.  It is
-stable, provides good I/O performance and can quickly delete large files. 
+stable, provides good I/O performance and can quickly delete large files.
 The primary disadvantage of Ext2 is that it is not a journaling filesystem,
 so a file system consistency check (fsck, which is normally only performed
 after a system crash) can take many hours on a filesystem the size of a
@@ -7730,10 +7732,10 @@ leading to dropped frames.
 <!-- Mostly from a post by Bruce Markey -->
 <sect1>Migrating from DataDirect Labs to Schedules Direct
 
-<p>MythTV v0.20.2 or later is required to natively support Schedules Direct. 
+<p>MythTV v0.20.2 or later is required to natively support Schedules Direct.
 Code has been included to make the transition as simple as possible.
 
-<bf>You do not need to delete your existing video sources or add new ones!</bf>  
+<bf>You do not need to delete your existing video sources or add new ones!</bf>
 
 The following steps should work for most users:
 <itemize>
@@ -7745,7 +7747,7 @@ time.
 name="Saving or restoring the database"> for instructions.
 <item>Run <bf>mythtv-setup</bf> -> Video Sources.  Change the grabber to
 Schedules Direct, update the username and password fields with the account
-information you created at Schedules Direct and select "Retrieve Lineups". 
+information you created at Schedules Direct and select "Retrieve Lineups".
 Click Finish.
 <item>Exit <bf>mythtv-setup</bf> and run <bf>mythfilldatabase</bf>.  Check
 if there were any errors.
@@ -7878,7 +7880,7 @@ Continue press ENTER until you reach the Mythfilldatabase configuration
 screen.  In the "mythfilldatabase Arguments" field, type
 --remove-new-channels
 
-then press the TAB key until you reach Finish, then press ENTER to save. 
+then press the TAB key until you reach Finish, then press ENTER to save.
 You can then press ESC until you return to the main screen.
 </article>
 <!-- Revision History

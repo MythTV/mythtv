@@ -101,8 +101,8 @@ decisions about which programs will be recorded on which tuners.  If you
 have only one backend, then it will be its own master.</P>
 <P>The Master backend will always choose the first available tuner in the same
 order as you add cards through "mythtv-setup". In other words, the second
-card you add will only be used when there are two overlapping recordings, 
-the third when there are three, and so on. 
+card you add will only be used when there are two overlapping recordings,
+the third when there are three, and so on.
  Therefore, you will want to have
 the greatest amount of disk space on the Master backend because its tuner
 will always be the first choice. You will then want to add your 
@@ -219,8 +219,8 @@ you back to the main configuration screen.</P>
 keys to move around and to make your choices, and press RETURN when
 complete.  Pressing RETURN will take you back to the Capture Cards screen;
 if you have additional capture cards in this machine, press the space bar
-when the highlight is on the (New Capture Card) row to define another card. </P>
-<P>If you have made a mistake, you can delete a card by highlighting it and 
+when the highlight is on the (New Capture Card) row to define another card.</P>
+<P>If you have made a mistake, you can delete a card by highlighting it and
 pressing the 'D' key, or you can highlight it and press the RETURN or 'E'
 key to edit it.</P>
 <P>Once you have no additional cards to setup, press ESC.</P>
@@ -241,7 +241,7 @@ the card and configure the analog portion of the card there.</CAPTION>
 <P>When you start, the highlight should be on (New Video Source).  Press the
 space bar to begin.  The first field asks for the name of the video source.
 You may choose something easy to remember, like "Antenna" or "Cable".  Once
-you've chosen a name, press the down arrow to move to the next field.  </P>
+you've chosen a name, press the down arrow to move to the next field.</P>
 <P>If you're in North America, change the grabber to
 "SchedulesDirect.org(Internal)", then continue pressing the down arrow to
 move to the next field.  Fill in the username (lowercase only) and password
@@ -281,10 +281,10 @@ connections available on each of the Capture cards you defined earlier.  For
 example, you may have a capture card with a tuner, a SVideo and a Composite
 connection.  If you wanted to associate the tuner (a.k.a., "Television")
 with an "Antenna" source you defined in Video Sources, you would move to the
-<CODE>/dev/videodevice (Television) -> </CODE> line and press the space bar. 
+<CODE>/dev/videodevice (Television) -> </CODE> line and press the space bar.
 Using the left and right arrow keys will show you the various choices you
 have already created for video source.  In our case, you would use the
-left/right cursor keys until "Antenna" was shown in the Video Source field. 
+left/right cursor keys until "Antenna" was shown in the Video Source field.
 Press down to move to the next setting.</P>
 <P>On the connection pane there is a "Scan for channels" button, if you are
 configuring a digital source such as a DVB card, you need scan for channels
@@ -311,7 +311,7 @@ single PVR-500 card, it will appear as <CODE>/dev/video0</CODE> and
 <CODE>/dev/video1</CODE>.  Each <CODE>/dev/video</CODE> device will have a Tuner input.</CAPTION>
 </FIGURE>
 
-Once you're done, press RETURN to go back to the Input Connections screen. 
+Once you're done, press RETURN to go back to the Input Connections screen.
 You would then finish associating the video sources to any other hardware
 devices you have available.</P>
 <P>
@@ -388,7 +388,7 @@ hard drive is now filling up.  You could simply add a new drive to your
 system, mount it and update the Storage Group to add additional space.</P>
 <P>You may create additional Storage Groups to store specific recordings in
 their own directories.  Storage Groups are edited via the 'Storage
-Directories' section of mythtv-setup.  </P>
+Directories' section of mythtv-setup.</P>
 <P>You can also create multiple Storage Groups to group recordings together;
 recording schedules now have an option to specify which Storage Group to
 use.</P>
@@ -414,7 +414,7 @@ course, you don't have to do anything, and Live TV recordings will just go
 into the Default Storage Group where they'll be the first programs eligible
 for expiration if the system needs free space for recordings.</P>
 <P>Usage information for all Storage Group directories is visible on the
-mythfrontend status screen as well as the mythbackend status webpage. 
+mythfrontend status screen as well as the mythbackend status webpage.
 MythTV is smart enough to determine which directories are on shared
 filesystems so it should not count free or used space multiple times if you
 have more than one directory on the same filesystem.</P>
@@ -450,7 +450,7 @@ weights are added to a filesystem if it is in use for the following things:
 </P>
 <P>If a recording is due to end within 3 minutes, it is not counted against
 the weight of a filesystem. This is done to account for the pre/post-roll
-and start-early/end-late settings. </P>
+and start-early/end-late settings.</P>
 
 <H2><A NAME="ss9.2">9.2</A> <A HREF="mythtv-HOWTO.html#toc9.2">Post-configuration</A>
 </H2>
@@ -550,12 +550,13 @@ on all slave backends to ensure that the <CODE>DBHostName</CODE> has the address
 of the MySQL server.
 Caveat:  You may make a slave backend the primary MySQL server, or run a
 non-MythTV database on a slave backend as long as you have edited the
-<CODE>mysql.txt</CODE> file on <B>all</B> systems and made it consistent. There can be only one authoritative MySQL database in a MythTV system -
+<CODE>mysql.txt</CODE> file on <B>all</B> systems and made it consistent.
+There can be only one authoritative MySQL database in a MythTV system -
 errors such as the one above ensue if backends and frontends have differing
 ideas of which MySQL database they should talk to.</CAPTION>
 </FIGURE>
 </P>
-<P>Make sure that the IP addresses on the General setup screen are accurate. 
+<P>Make sure that the IP addresses on the General setup screen are accurate.
 If the slave backend can't communicate with the master backend due to IP
 address misconfiguration then MythTV will not function properly.</P>
 <P>Configuration of a non-master backend follows the same general procedure
@@ -583,10 +584,10 @@ best to just let the program run to completion.</CAPTION>
 </FIGURE>
 
 <B>mythfilldatabase --help</B> will give a full listing of the options
-available.  </P>
+available.</P>
 <P><B>mythfilldatabase --manual</B> is another option; the manual option will
 allow you to fine tune channel frequencies and specify which channels will
-be added to the database.  </P>
+be added to the database.</P>
 <P><B>mythfilldatabase --file</B> is an option if there isn't an XMLTV grabber
 for your country, but you <B>do</B> have an XML formatted listings file
 created by some other program.</P>

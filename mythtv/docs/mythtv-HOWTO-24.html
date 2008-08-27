@@ -71,7 +71,7 @@ chunk of space in /dev/hda5, using a reiserfs filesystem and mounted on
 <P>You need to create at least one LVM partition for a physical volume. Use
 <B>fdisk</B> or your favorite partition editor to set the type to LVM
 (0x8e). If you're using an entire disk, create one big partition rather than
-using the device itself. e.g. use /dev/hdb1 not /dev/hdb.  </P>
+using the device itself. e.g. use /dev/hdb1 not /dev/hdb.</P>
 <P>In the following example, you have a 15GB disk.  The first 6GB are set as
 your boot partition.  <CODE>/dev/hda2</CODE> was added as an extended partition,
 and within that partition you created the <CODE>/dev/hda5</CODE> linux (ext2)
@@ -173,7 +173,8 @@ it type 0x8e using your partition editor.</P>
 <IMG SRC="stop.png">
 <CAPTION><B>NOTE</B>:  You may get errors at this point stating that there are no
 physical volumes available for adding to the LV, even though you know for a
-fact that there are.  You may need to specify the physical volume in the <CODE>/dev/ide/host/bus/target/lun/etc</CODE> format.</CAPTION>
+fact that there are.  You may need to specify the physical volume in the
+<CODE>/dev/ide/host/bus/target/lun/etc</CODE> format.</CAPTION>
 </FIGURE>
 
 Once you've completed one of the following two procedures, use <B>df</B>
@@ -183,7 +184,7 @@ to check that you've got more space.</P>
 <H3>ReiserFS</H3>
 
 <P>Unmount, resize and remount the filesystem.  Technically, you don't need to
-unmount and remount the ReiserFS. 
+unmount and remount the ReiserFS.
 <BLOCKQUOTE><CODE>
 <PRE>
 # umount /var/video
@@ -243,7 +244,7 @@ mailing list.</P>
 <H3>Ext2</H3>
 
 <P>Ext2 was the defacto standard Linux filesystem for many years.  It is
-stable, provides good I/O performance and can quickly delete large files. 
+stable, provides good I/O performance and can quickly delete large files.
 The primary disadvantage of Ext2 is that it is not a journaling filesystem,
 so a file system consistency check (fsck, which is normally only performed
 after a system crash) can take many hours on a filesystem the size of a
@@ -306,9 +307,9 @@ leading to dropped frames.</P>
 <H2><A NAME="ss24.3">24.3</A> <A HREF="mythtv-HOWTO.html#toc24.3">Migrating from DataDirect Labs to Schedules Direct</A>
 </H2>
 
-<P>MythTV v0.20.2 or later is required to natively support Schedules Direct. 
+<P>MythTV v0.20.2 or later is required to natively support Schedules Direct.
 Code has been included to make the transition as simple as possible.</P>
-<P><B>You do not need to delete your existing video sources or add new ones!</B>  </P>
+<P><B>You do not need to delete your existing video sources or add new ones!</B></P>
 <P>The following steps should work for most users:
 <UL>
 <LI>Create a Schedules Direct account and use the same information as your
@@ -319,7 +320,7 @@ time.</LI>
 <A HREF="mythtv-HOWTO-23.html#backupdb">Saving or restoring the database</A> for instructions.</LI>
 <LI>Run <B>mythtv-setup</B> -> Video Sources.  Change the grabber to
 Schedules Direct, update the username and password fields with the account
-information you created at Schedules Direct and select "Retrieve Lineups". 
+information you created at Schedules Direct and select "Retrieve Lineups".
 Click Finish.</LI>
 <LI>Exit <B>mythtv-setup</B> and run <B>mythfilldatabase</B>.  Check
 if there were any errors.</LI>
@@ -442,7 +443,7 @@ $ mythfilldatabase --remove-new-channels
 <P>Continue press ENTER until you reach the Mythfilldatabase configuration
 screen.  In the "mythfilldatabase Arguments" field, type
 --remove-new-channels</P>
-<P>then press the TAB key until you reach Finish, then press ENTER to save. 
+<P>then press the TAB key until you reach Finish, then press ENTER to save.
 You can then press ESC until you return to the main screen.</P>
 <HR>
 Next

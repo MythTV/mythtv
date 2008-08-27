@@ -24,7 +24,7 @@ operational.</P>
 <A HREF="mythtv-HOWTO-13.html#mythplugins_">MythPlugins</A> for instructions on downloading the
 tarball.</P>
 <P>There are a number of transitions available, some requiring OpenGL
-support.  You will also need to install a TIFF library.  Under Mandriva, you 
+support.  You will also need to install a TIFF library.  Under Mandriva, you
 would perform the following command:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -42,7 +42,7 @@ $ make
 # su
 # make install
 # exit
-$ 
+$
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -64,7 +64,7 @@ menu of options.</P>
 Select key, or use the Menu key to toggle access the menu on the left.  The
 menu options are as follows:
 <UL>
-<LI> Slideshow - Will cycle through all the pictures in the current folder. 
+<LI> Slideshow - Will cycle through all the pictures in the current folder.
 The currently selected item must be a picture (not a folder) for this to
 work.  It does not currently traverse subfolders.</LI>
 <LI> Rotate CW - Rotate the current image 90 degrees in the clockwise
@@ -96,20 +96,20 @@ create the appearance of MythGallery hanging (e.g. running
 <B>smbclient</B> and prompting for password).  Also be sure that scripts
 have executable permissions set.</P>
 <P>Here is an example script that a user may want to run
-on import: 
+on import:
 <BLOCKQUOTE><CODE>
 <PRE>
 #!/bin/csh
 
-if ($#argv == 0) then 
-        echo "Usage: $0 dest_dir" 
-        exit 
-endif 
+if ($#argv == 0) then
+        echo "Usage: $0 dest_dir"
+        exit
+endif
 
 cd $argv[1]
 
 # get stuff over the network
-wget http://www.somesite.dom/dir/file1.jpg 
+wget http://www.somesite.dom/dir/file1.jpg
 wget http://www.somesite.dom/dir/file2.jpg
 wget http://www.somesite.dom/dir/file3.jpg
 

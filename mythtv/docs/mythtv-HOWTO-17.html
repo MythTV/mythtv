@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
- <TITLE>Installing and using MythTV: MythMusic. </TITLE>
+ <TITLE>Installing and using MythTV: MythMusic.</TITLE>
  <LINK HREF="mythtv-HOWTO-18.html" REL=next>
  <LINK HREF="mythtv-HOWTO-16.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc17" REL=contents>
@@ -12,7 +12,7 @@
 <A HREF="mythtv-HOWTO-16.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc17">Contents</A>
 <HR>
-<H2><A NAME="s17">17.</A> <A HREF="mythtv-HOWTO.html#toc17">MythMusic. </A></H2>
+<H2><A NAME="s17">17.</A> <A HREF="mythtv-HOWTO.html#toc17">MythMusic.</A></H2>
 
 <P>MythMusic has a number of prerequisites that must be satisfied before it
 is operational.  Depending on your distribution, some of these prerequisites can
@@ -79,7 +79,7 @@ $ make
 $ su
 # make install
 # exit
-$ 
+$
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -95,7 +95,7 @@ $ make
 $ su
 # make install
 # exit
-$ 
+$
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -113,7 +113,7 @@ $ su
 # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
 # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
 # exit
-$ 
+$
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -123,7 +123,7 @@ $
 
 <P>Mandriva has a number of the prerequisites available on the
 installation CD.  Some of the software you're going to need will have to be
-obtained from the "contrib" or "cooker" development repositories. 
+obtained from the "contrib" or "cooker" development repositories.
 Applications downloaded from "cooker" come from the development branch, so
 there may be issues with some software.  It isn't recommended that you mix
 cooker and release-level software.</P>
@@ -167,7 +167,7 @@ typing:
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><CODE>OpenGL</CODE> should be installed on practically all distributions. 
+<P><CODE>OpenGL</CODE> should be installed on practically all distributions.
 However, you will need the devel module.  In Mandriva it may be
 installed by typing:
 <BLOCKQUOTE><CODE>
@@ -189,9 +189,9 @@ typing:
 <H2><A NAME="ss17.3">17.3</A> <A HREF="mythtv-HOWTO.html#toc17.3">Red Hat Linux 9</A>
 </H2>
 
-<P>Red Hat provides packages for several of the prerequisites, making 
-installation very simple. Of the prerequisites, Red Hat provides 
-packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably 
+<P>Red Hat provides packages for several of the prerequisites, making
+installation very simple. Of the prerequisites, Red Hat provides
+packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably
 already have installed). To install these all at once, simply type (all on
 the same line):
 <BLOCKQUOTE><CODE>
@@ -200,8 +200,8 @@ $ up2date --solvedeps libvorbis libvorbis-devel vorbis-tools cdparanoia-devel cd
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>If you get the following message: "None of the packages you requested 
-were found, or they are already updated" it probably means you already 
+<P>If you get the following message: "None of the packages you requested
+were found, or they are already updated" it probably means you already
 have all of those packages installed.</P>
 <P>You must install the remaining packages, (MAD, FLAC, libcdaudio and
 optionally fftw) manually following the installation directions above. When
@@ -272,7 +272,7 @@ length, just the portion that tries to read ID3 info.</P>
 CD before selecting "Import CD".  You should also ensure that your system
 doesn't try to automount the CD and begin playing it automatically.</P>
 <P>Here's some information on playlist management:</P>
-<P>Q: How do I create a new playlist?  
+<P>Q: How do I create a new playlist?
 A: Using the MythMusic "Select Music" menu option, setup the playlist as you
 normally would by adding songs or other playlists as needed.  When you are
 ready to save the new playlist, highlight "Active Play Queue" at the bottom
@@ -290,7 +290,7 @@ able to specify the cycle timing in a Setup screen. You can type fairly
 quickly through a combination of jumping around the number keys AND hitting
 a non-number key (right arrow is particularly good for this) to force the
 current character.</P>
-<P>Q: How do I edit a playlist? 
+<P>Q: How do I edit a playlist?
 A: Highlight the playlist in the selection tree and hit the "i" key then
 select "Move to Active Play Queue" in the popup.  You can now modify the
 "Active Play Queue" like normal, adding songs and playlists by selecting
@@ -314,10 +314,10 @@ select "Delete this Playlist" from the popup.</P>
 </H2>
 
 <P>You may run into errors when running MythMusic.</P>
-<H3>When I run MythMusic and try and look up a CD, I get an error message </H3>
+<H3>When I run MythMusic and try and look up a CD, I get an error message</H3>
 
-<P>The full text of the message will say: </P>
-<P>databasebox.o: Couldn't find your CD. It may not be in the freedb database. 
+<P>The full text of the message will say:</P>
+<P>databasebox.o: Couldn't find your CD. It may not be in the freedb database.
 More likely, however, is that you need to delete &nbsp;/.cddb and &nbsp;/.cdserverrc
 and restart mythmusic. Have a nice day.</P>
 <P>If you get this message, you should go to the home directory of whatever

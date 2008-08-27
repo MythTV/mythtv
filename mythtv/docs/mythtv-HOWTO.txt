@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2008-03-05, v0.21.00pre
+  2008-05-12, v0.22.00pre
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -58,9 +58,8 @@
            3.2.1.3 Debian
         3.2.2 Manual installation
         3.2.3 Command-line installation
-           3.2.3.1 Mandriva
-           3.2.3.2 Gentoo.
-           3.2.3.3 Debian.
+           3.2.3.1 Gentoo.
+           3.2.3.2 Debian.
 
   4. System Configuration Requirements for Compiling MythTV.
      4.1 Software requirements for compiling MythTV
@@ -343,7 +342,6 @@
      24.4 Caching support for Schedules Direct
 
 
-
   ______________________________________________________________________
 
   [1m1.  First things first.[0m
@@ -473,6 +471,7 @@
   See ``Saving or Restoring the database'' for instructions.
 
 
+
   [1m1.4.  How to obtain this document / PDF versions of this document[0m
 
   This HOWTO document is maintained at the primary MythTV website:
@@ -485,7 +484,7 @@
   at http://www.mythtv.org/docs/mythtv-HOWTO.pdf
   <http://www.mythtv.org/docs/mythtv-HOWTO.pdf>.
 
-  This HOWTO is for MythTV v0.21
+  This HOWTO is for MythTV v0.22
 
   Release notes for this version may be found in the MythTV Wiki at
   http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.21
@@ -756,7 +755,7 @@
 
          [1mNOTE[22m:  You [4mmust[24m use DMA for hard drive access to prevent
   choppy or jittery video.  Not all distributions enable DMA at boot
-  time. See the Troubleshooting Section for ``instructions'' on how to
+  time.  See the Troubleshooting Section for ``instructions'' on how to
   do this.
 
   Writing video to disk is sensitive to timing issues; RTjpeg requires
@@ -837,7 +836,7 @@
   as the ATI TV Wonder, TV Wonder VE or TV Wonder Pro) [4mwill[24m [4mnot[24m work as
   a MythTV capture device because the GATOS http://gatos.sourceforge.net
   <http://gatos.sourceforge.net> drivers that are available provide only
-  a limited subset of the V4L API. The TV Wonder series of cards are
+  a limited subset of the V4L API.  The TV Wonder series of cards are
   supported by the Bt8x8 Video4Linux driver.
 
   After you have installed a suitable capture device, you can check that
@@ -1328,11 +1327,6 @@
   requisites required to compile MythTV.
 
 
-
-   [1mNOTE[22m:  Due to the requirement for Qt 3.3+, there are no packages for
-  Debian woody/stable.
-
-
   The Debian packages are configured such that MythTV programs should be
   run as the mythtv user, which is automatically created during
   installation.  This user has access to write new recordings to disk in
@@ -1359,10 +1353,9 @@
   [1mperl[22m.
 
 
-  ______________________________________________________________________
-  NOTE:  Qt v3.3 or higher is required.
 
-  NOTE:  MythTV DOES NOT WORK with Qt4.
+  ______________________________________________________________________
+  NOTE:  Qt v4.3 or higher is required.
 
   NOTE:  If you are going to be using RPMs to install various
   components, you should be aware that not all packages include the necessary
@@ -1378,57 +1371,11 @@
   from the command line.
 
 
-  [1m3.2.3.1.  Mandriva[0m
+  [1m3.2.3.1.  Gentoo.[0m
 
-  [1mNOTE[22m:  The following instructions should be considered out of date as
-  of 2006-09-10.  If updated instructions are not submitted by the
-  release of v0.21 of MythTV they will be removed.
-
-  [1murpmi [22mis the simplest tool for installation of packages from the
-  command line, but properly configuring it can be difficult.  The
-  following website http://easyurpmi.zarb.org/
-  <http://easyurpmi.zarb.org/> will allow you to choose a mirror site
-  and then present the command-line configuration text for that mirror.
-  You will most likely need to add a "Contrib" mirror to your setup.  If
-  you add a site from the "Penguin Liberation Front", you will be able
-  to load the lame library without compiling from source.
-
-  Open a shell, and execute the following. You may get asked a number of
-  questions regarding dependencies.  It's best to answer "YES".
-
-
-       $ su
-       # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
-       # urpmi XFree86-devel perl
-       # urpmi libqt3-devel libMesaGLU1-devel
-
-
-
-  ______________________________________________________________________
-  NOTE for Mandriva 9.1+ users: execute the following command.
-
-  # urpmi libqt3-mysql
-  ______________________________________________________________________
-
-
-  However, you might get this when you execute the commands above:
-
-
-       everything already installed
-
-
-  In that case, you're ready to move to the next ``section''.  Once you
-  have completed installing the pre-requisites, exit out of the shell
-  and start a new one to ensure that any environment variables setup by
-  the installation have a chance to take effect.
-
-
-  [1m3.2.3.2.  Gentoo.[0m
-
-  [1mNOTE[22m:  MythTV does [4mnot[24m run on Qt4.  If Qt has not been installed on
-  your system: Edit /etc/make.conf and locate the "USE" variable. If the
-  line is commented out, remove the comment. The line should have at
-  least:
+  If Qt has not been installed on your system: Edit /etc/make.conf and
+  locate the "USE" variable. If the line is commented out, remove the
+  comment. The line should have at least:
 
 
        USE="mysql alsa"
@@ -1457,7 +1404,7 @@
   machine this may take a lot of time if you need to do a full Qt build.
 
 
-  [1m3.2.3.3.  Debian.[0m
+  [1m3.2.3.2.  Debian.[0m
 
   Build-dependencies for MythTV can be satisfied by adding the following
   to your /etc/apt/sources.list
@@ -1597,17 +1544,16 @@
             [1mNOTE[22m: ^D means press CTRL and d at the same time.
 
 
+       $ su
+       # cd /etc/profile.d
+       cat > mythtv.sh
+       export QTDIR=/usr/lib/qt3
+       export PATH=$PATH:/usr/lib/qt3/bin
+       ^D
 
-  $ su
-  # cd /etc/profile.d
-  cat > mythtv.sh
-  export QTDIR=/usr/lib/qt3
-  export PATH=$PATH:/usr/lib/qt3/bin
-  ^D
-
-  # chmod a+x mythtv.sh
-  # exit
-  $ exit
+       # chmod a+x mythtv.sh
+       # exit
+       $ exit
 
 
 
@@ -1708,18 +1654,19 @@
   Check that it worked:
 
 
-       # ls -l /usr/local/lib
-       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-       libmp3lame.so.0.0.0*
-       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-       libmp3lame.so.0.0.0*
-       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-       libmp3lame.so.0.0.0*
 
-       # exit
-       $
+  # ls -l /usr/local/lib
+  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+  libmp3lame.so.0.0.0*
+  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+  libmp3lame.so.0.0.0*
+  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+  libmp3lame.so.0.0.0*
+
+  # exit
+  $
 
 
 
@@ -1769,22 +1716,20 @@
 
        $ tar -xjf xmltv-0.5.51.tar.bz2
 
-
-
   Install the xmltv prerequisites.  The following prerequisites are the
   minimum required; when you actually start running the xmltv setup pro-
   gram it may alert you to other modules that are required.:
 
 
 
-  $ su
-  # perl -MCPAN -e shell
-  cpan> install XML::Twig
-  cpan> install Date::Manip
-  Date::Manip is up to date.
-  cpan> install LWP
-  cpan> install XML::Writer
-  cpan> exit
+       $ su
+       # perl -MCPAN -e shell
+       cpan> install XML::Twig
+       cpan> install Date::Manip
+       Date::Manip is up to date.
+       cpan> install LWP
+       cpan> install XML::Writer
+       cpan> exit
 
 
 
@@ -1838,9 +1783,9 @@
 
 
 
-  $ mkdir mythtv
-  $ svn co http://svn.mythtv.org/svn/trunk/ mythtv
-  $ cd mythtv
+       $ mkdir mythtv
+       $ svn co http://svn.mythtv.org/svn/trunk/ mythtv
+       $ cd mythtv
 
 
 
@@ -1892,8 +1837,9 @@
   blue) participating, you would do something like:
 
 
-       $ export DISTCC_HOSTS='localhost red blue'
-       $ make -j 6 CXX=distcc
+
+  $ export DISTCC_HOSTS='localhost red blue'
+  $ make -j 6 CXX=distcc
 
 
 
@@ -1949,7 +1895,6 @@
        *               -       nice       0
        @audio          -       rtprio     50
        @audio          -       nice       0
-
 
 
   [1m5.4.1.2.  realtime module[0m
@@ -2077,11 +2022,10 @@
   If this is happening to you, try running the following commands.
 
 
-
-  $ su
-  # chkconfig --level 35 mysql on
-  # /etc/rc.d/init.d/mysql start
-  # exit
+       $ su
+       # chkconfig --level 35 mysql on
+       # /etc/rc.d/init.d/mysql start
+       # exit
 
 
 
@@ -2134,7 +2078,6 @@
        $ mysql < mc.sql
 
 
-
   [1m6.2.3.  Gentoo[0m
 
 
@@ -2144,9 +2087,10 @@
 
 
 
-  [1mNOTE[22m: It is good practice to set a root password for MySQL. Instruc-
-  tions for doing so can be found on MySQL's web site at
-  http://www.mysql.com/doc/en/Security.html <http://www.mysql.com/doc/en/Security.html>.
+       [1mNOTE[22m: It is good practice to set a root password for MySQL.
+  Instructions for doing so can be found on MySQL's web site at
+  http://www.mysql.com/doc/en/Security.html
+  <http://www.mysql.com/doc/en/Security.html>.
 
   [1m6.2.4.  Modifying access to the MySQL database for multiple systems[0m
 
@@ -2186,9 +2130,12 @@
   the 192.168.1. network):
 
 
-       $ mysql -u root mythconverg
-       mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
-       mysql> flush privileges;
+
+  $ mysql -u root mythconverg
+  mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
+  mysql> flush privileges;
+
+
 
   You'll also need to check that the "networking" feature of MySQL is
   turned on. Check that /etc/mysql/my.cnf [4mdoes[24m [4mnot[24m contain skip-
@@ -2248,7 +2195,6 @@
   click on the red LED so that it turns bright red, indicating that it's
   "ON"; this insures that the Line-in is used as the source.  Click OK,
   and make sure that you save the settings so that this is your default.
-
 
   [1m7.1.1.1.  Using ALSA.[0m
 
@@ -2314,8 +2260,6 @@
   Finally, if you've performed all of the above steps, and you still
   don't seem to have any sound, it's possible that your video capture
   device is muting the audio output.
-
-
        $ v4lctl -c /dev/video0 setattr mute off
 
 
@@ -2334,8 +2278,9 @@
             [1mNOTE[22m: If you are running Mandriva, you may install
   [1mlirc [22mby executing: # urpmi lirc lirc-remotes and bypass the manual
   compilation steps described below by jumping to the ``Completing the
-  lirc install'' section. See the contrib/mandrake91.etc.sysconfig.lircd
-  file for an example of how to configure lircd.
+  lirc install'' section.  See the
+  contrib/mandrake91.etc.sysconfig.lircd file for an example of how to
+  configure lircd.
 
   Some IR devices require a kernel recompile, and some don't. However,
   all at least require having the kernel source available as a resource
@@ -2371,6 +2316,7 @@
   menu comes up, perform the configuration by going to Driver Configura-
   tion->Other Serial Port Devices->Pinnacle Systems Receiver->OK and on
   the next page select COM1->OK.
+
 
   Each remote is different; some remote receivers connect directly to
   your capture card and not to a serial port, so make sure that you've
@@ -2431,11 +2377,12 @@
   use ttyS1, etc.
 
 
-       $ su
-       # cd /dev
-       # ln -sf ttyS0 lirc
-       # exit
-       $
+
+  $ su
+  # cd /dev
+  # ln -sf ttyS0 lirc
+  # exit
+  $
 
 
 
@@ -2499,7 +2446,7 @@
   9.1 users, type: # /etc/rc.d/init.d/lircd start instead of:
 
 
-  # /usr/local/sbin/lircd
+       # /usr/local/sbin/lircd
 
 
 
@@ -2548,7 +2495,7 @@
   To make your own lircd.conf file
 
 
-       $ irrecord myremote
+  $ irrecord myremote
 
 
 
@@ -2622,6 +2569,7 @@
        $ irw
 
 
+
   Start pressing the keys on your remote; [1mirw [22mwill print the name of the
   button as it is defined in your /etc/lircd.conf. If you don't see any-
   thing at this point, you need to troubleshoot further by going back to
@@ -2670,8 +2618,6 @@
 
   but the /etc/lircd.conf that comes in the lircd package defines the
   buttons for the Pinnacle Studio PCTV as:
-
-
                  channel+                 0x0000000000000017
                  channel-                 0x000000000000001C
 
@@ -2681,20 +2627,19 @@
   my /home/[yourusername]/.lircrc file:
 
 
+       begin
+           prog = irxevent
+           button = channel+
+           repeat = 3
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = channel+
-      repeat = 3
-      config = Key Up CurrentWindow
-  end
-
-  begin
-      prog = irxevent
-      button = channel-
-      repeat = 3
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = channel-
+           repeat = 3
+           config = Key Down CurrentWindow
+       end
 
 
 
@@ -2737,28 +2682,25 @@
 
        $ make
 
-
-
   Please note: unlike the Pinnacle receiver above you will be compiling
   lircd in addition to a kernel module for the SIR transmitter.
   Depending on whether you have your serial port driver configured as a
   kernel module you might see the following message during make:
 
 
+       lirc_sir.c:56:2: warning: #warning
+       "******************************************"
 
-  lirc_sir.c:56:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
-
-  lirc_sir.c:61:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:61:2: warning: #warning
+       "******************************************"
 
 
 
@@ -2777,7 +2719,6 @@
 
   The configuration for starting [1mlircd [22mdiffers if you're going to be
   sending and receiving IR versus just receiving.
-
 
 
        # cd /etc/rc.d
@@ -2804,10 +2745,12 @@
   something similar to the following:
 
 
-       $ irw
-       0000000000007ff0 00 1 gi-motorola-dct2000
-       000000000000bff8 00 2 gi-motorola-dct2000
-       000000000000f7f0 00 ENTER gi-motorola-dct2000
+  $ irw
+  0000000000007ff0 00 1 gi-motorola-dct2000
+  000000000000bff8 00 2 gi-motorola-dct2000
+  000000000000f7f0 00 ENTER gi-motorola-dct2000
+
+
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -2862,7 +2805,6 @@
        $ su -
        # apt-get install libqt3c102-mt-mysql
        # exit
-
 
 
   [1m9.1.  Configuring the Master backend system[0m
@@ -2933,7 +2875,6 @@
   decisions about which programs will be recorded on which tuners.  If
   you have only one backend, then it will be its own master.
 
-
   The Master backend will always choose the first available tuner in the
   same order as you add cards through "mythtv-setup". In other words,
   the second card you add will only be used when there are two
@@ -2987,10 +2928,8 @@
   The first question will ask if you wish to clear out your existing
   configurations for your capture cards.  Initially, you should say
   "YES" so that there are no surprises later.
-
   The next question will ask you if you wish to clear out your video
   source information.  You should answer "YES" to this as well.
-
 
   Once the graphical setup starts, you'll see that there are six choices
 
@@ -3117,7 +3056,6 @@
   the load of the listings provider and the speed of your connection to
   the Internet.  Be patient!
 
-
   You will then be returned to the Video Sources screen.  If you have
   multiple video sources available, such as Antenna, Cable, etc, go
   ahead and define them all, even if they're not all going to be
@@ -3236,8 +3174,6 @@
   directory and make that the destination path for the Storage Group.
   See the ``Tip'' in the "Configuring the Master backend" section for
   additional information.
-
-
   You would then add the four subdirectories you created under the mount
   points (/mnt/store/d1/video, etc) into the "Default" Storage Group.
 
@@ -3426,7 +3362,7 @@
   that the DBHostName has the address of the MySQL server.  Caveat:  You
   may make a slave backend the primary MySQL server, or run a non-MythTV
   database on a slave backend as long as you have edited the mysql.txt
-  file on [1mall [22msystems and made it consistent. There can be only one
+  file on [1mall [22msystems and made it consistent.  There can be only one
   authoritative MySQL database in a MythTV system - errors such as the
   one above ensue if backends and frontends have differing ideas of
   which MySQL database they should talk to.
@@ -6929,6 +6865,8 @@
        handle SIG33 nostop noprint
        set logging on
        set pagination off
+       set breakpoint pending on
+       break qFatal
        set args -l myth.log -v record,channel,siparser
        run
        thread apply all bt full
@@ -7747,9 +7685,9 @@
 
 
 
-  [1mNOTE[22m:  Performing this step will remove the entire database. You will
-   lose all of your settings and will need to re-run the mc.sql script
-  to setup the database structure before running the mythtv-setup
+       [1mNOTE[22m:  Performing this step will remove the entire database.
+  You will lose all of your settings and will need to re-run the mc.sql
+  script to setup the database structure before running the mythtv-setup
   program.
 
 

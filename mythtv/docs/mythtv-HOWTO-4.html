@@ -28,17 +28,17 @@ help if the packager skipped a step in their packaging.</P>
 
 <H3>General requirements</H3>
 
-<P>MythTV is written in C++ and requires a fairly complete, but standard, 
-compilation environment, including a recent g++ compiler, <CODE>make</CODE>, and 
-appropriate header files for shared libraries. Any standard Linux 
-distribution should be able to install a suitable compilation environment 
-from its packaging system. Section 3.2 of this HOWTO provides some details 
+<P>MythTV is written in C++ and requires a fairly complete, but standard,
+compilation environment, including a recent g++ compiler, <CODE>make</CODE>, and
+appropriate header files for shared libraries. Any standard Linux
+distribution should be able to install a suitable compilation environment
+from its packaging system. Section 3.2 of this HOWTO provides some details
 of how to install the required environment for many distributions.</P>
-<P>Subsequent sections of this chapter address the few oddities that you may 
+<P>Subsequent sections of this chapter address the few oddities that you may
 have to adjust by hand before you compile MythTV.</P>
 <P>The reference compilation system for MythTV is Ubuntu.</P>
 
-<H2><A NAME="ss4.2">4.2</A> <A HREF="mythtv-HOWTO.html#toc4.2">Shared-Library requirements for MythTV </A>
+<H2><A NAME="ss4.2">4.2</A> <A HREF="mythtv-HOWTO.html#toc4.2">Shared-Library requirements for MythTV</A>
 </H2>
 
 <H3><A NAME="modifying_ld.so.conf"></A> Modifying /etc/ld.so.conf </H3>
@@ -92,7 +92,7 @@ $ which qmake
 </P>
 <P>For Mandriva, you should see a value like <CODE>/usr/lib/qt3</CODE> for
 <CODE>QTDIR</CODE> and <CODE>/usr/lib/qt3/bin</CODE> should be in $PATH.</P>
-<P>For Gentoo, you should see a value like <CODE>/usr/qt/3</CODE> for <CODE>QTDIR</CODE> 
+<P>For Gentoo, you should see a value like <CODE>/usr/qt/3</CODE> for <CODE>QTDIR</CODE>
 and <CODE>/usr/qt/3/bin</CODE> should be in $PATH.</P>
 <P>If you don't, do not proceed past this step until you have resolved this
 error. You may need to manually specify the QTDIR and PATH at the shell
@@ -121,7 +121,7 @@ the if / fi block.</CAPTION>
 
 As root, create the following file in <CODE>/etc/profile.d</CODE> The example
 filename is "mythtv.sh". Use what you feel is appropriate.</P>
-<P>Open a shell, and switch to superuser mode. </P>
+<P>Open a shell, and switch to superuser mode.</P>
 <P>
 <FIGURE>
 <EPS FILE="warning.eps">
@@ -144,7 +144,7 @@ $ exit
 </PRE>
 </CODE></BLOCKQUOTE>
 
-The last two commands are to exit out of the shell. This way, when you next 
+The last two commands are to exit out of the shell. This way, when you next
 open a shell your new commands
 will take effect.</P>
 

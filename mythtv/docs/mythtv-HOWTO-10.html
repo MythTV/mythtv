@@ -15,7 +15,7 @@
 <H2><A NAME="s10">10.</A> <A HREF="mythtv-HOWTO.html#toc10">Configuring mythfrontend.</A></H2>
 
 <P>Once you have completed configuration of your backend systems, the next
-step is to configure the frontend client.  </P>
+step is to configure the frontend client.</P>
 <P>When you start mythfrontend for the first time, it will attempt to connect
 to a configuration database on the local machine.  If there is none, a
 "Database Configuration" screen will appear, and you will need to fill in
@@ -43,7 +43,7 @@ is correctly initialized.</CAPTION>
 else.  The first few configuration items ask you to indicate the number of
 seconds to record before or after a program, which is useful if the
 broadcast network or your system clock are out of sync and will help prevent
-you missing the beginning or end of a program.  </P>
+you missing the beginning or end of a program.</P>
 <P>To change the value, use the left and right arrow keys to increment and
 decrement the number of seconds.  When you're satisfied with the result, use
 the down arrow to put the input focus on the Next button or press RETURN to
@@ -70,11 +70,11 @@ unreadable this is where you make the adjustments to fonts, number of
 elements displayed, etc.</P>
 
 <H2><A NAME="deinterlace_"></A> <A NAME="ss10.4">10.4</A> <A HREF="mythtv-HOWTO.html#toc10.4">Playback </A>
- </H2>
+</H2>
 
 <P>The one configuration item which may cause problems on your system is the
 "Deinterlace playback" setting.  MythTV uses a linear blend algorithm for
-deinterlacing, which will improve how the image looks on your screen. 
+deinterlacing, which will improve how the image looks on your screen.
 Deinterlacing requires that your processor support SSE. (Streaming SIMD
 Extensions, aka "MMX2").  Early Intel Celeron (those that don't use the
 Coppermine 0.18um core and are usually &lt;600MHz), Pentium Pro and Pentium II
@@ -229,7 +229,7 @@ so, for example, the default is "=1:1:1:1".</P>
 these at the head of a filter chain to change the capture format. The most
 likely use would be forceyuv422p to use YUV422P capture on cards with known
 chroma interlacing problems with YV12.</P>
-<P>There are some filters included in the MythTV source code that should 
+<P>There are some filters included in the MythTV source code that should
 not be used:</P>
 <P>o The "forcergb24" and "forceargb32" filters</P>
 <P>The two RGB formats should not be used because there is no conversion filter
@@ -260,13 +260,13 @@ that you may find useful:</P>
 <H2><A NAME="Recording"></A> <A NAME="ss10.5">10.5</A> <A HREF="mythtv-HOWTO.html#toc10.5">Recording </A>
 </H2>
 
-<P>Depending on your capture card, MythTV offers different video encoders. 
+<P>Depending on your capture card, MythTV offers different video encoders.
 The following types of hardware encoding cards are supported:
 <UL>
 <LI>MJPEG - Zoran-based cards; see 
 <A HREF="http://mjpeg.sourceforge.net">http://mjpeg.sourceforge.net</A></LI>
 <LI>MPEG-2 - iTVC15/16 based cards (Hauppauge PVR-250/PVR-350); see 
-<A HREF="http://ivtvdriver.org">http://ivtvdriver.org</A> </LI>
+<A HREF="http://ivtvdriver.org">http://ivtvdriver.org</A></LI>
 <LI>HDTV - pcHDTV cards; see 
 <A HREF="http://pchdtv.com">http://pchdtv.com</A> and
 the Air2PC-ATSC-PCI see 
@@ -281,9 +281,9 @@ RTjpeg and MPEG-4.  RTjpeg has significantly fewer CPU demands than MPEG-4,
 but it generates larger files than MPEG-4 for a given recording.</P>
 <P>For DVB and HDTV cards, no further configuration is required after
 setting up the card using the 'mythtv-setup' program.
-For all other cards, configuration is done through MythFrontend. 
+For all other cards, configuration is done through MythFrontend.
 Selecting 'Recording Profiles' from the 'TV Settings' screen will list
-the profiles currently available for the cards in your system. 
+the profiles currently available for the cards in your system.
 Depending on what types of cards you have installed you may see:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -343,7 +343,7 @@ default as-is until you're sure that MythTV is operational.</CAPTION>
 </H2>
 
 <P>MythTV is able to control the LED on the Xbox to indicate backend
-recording status.  </P>
+recording status.</P>
 <P>To control the LED, you will need the <B>blink</B> program from the
 xbox-linux project, which is installed as <CODE>/bin/led</CODE> on GentooX.  On
 Xebian (the new Ed's Debian) you must install it yourself.  On other
@@ -354,7 +354,7 @@ blink</CODE> to see if the program is available.) If you do not have
 <A HREF="http://xbox-linux.sf.net/">http://xbox-linux.sf.net/</A>. The
 program you need is part of the <CODE>eds_i2c_staff</CODE> module in CVS.  Note
 the spelling.</P>
-<P>Once you have installed <B>blink</B> you will need to set permissions. 
+<P>Once you have installed <B>blink</B> you will need to set permissions.
 <B>blink</B> needs write permission to the i2c device to function
 properly.  There are three methods to accomplish this.  First, you could run
 <CODE>mythfrontend</CODE> as root, which is the simplest method, but could
@@ -370,12 +370,12 @@ $ su
 
 The final technique would be to set the <CODE>/dev/i2c/0</CODE> device read/write
 for all users, but this is the least preferred method.</P>
-<P>Now it's time to setup MythTV for Xbox hardware.  Enter Setup -> General. 
+<P>Now it's time to setup MythTV for Xbox hardware.  Enter Setup -> General.
 On the second page check the 'Enable Xbox Hardware' option.  Upon reentering
 the settings, you should have a new option named 'Xbox'.  Within this option
 you may select the distribution, LED colors for recording and the update
 interval.  If you select GentooX as the distribution <B>led</B> will be
-used as the <B>blink</B> binary name, otherwise, <B>blink</B> is used. 
+used as the <B>blink</B> binary name, otherwise, <B>blink</B> is used.
 Colors should be self explanatory.  The update interval determines how often
 the frontend should poll the backend to determine if the status has changed.</P>
 

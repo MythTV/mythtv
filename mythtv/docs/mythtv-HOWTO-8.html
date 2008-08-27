@@ -27,13 +27,14 @@ if the user had pressed the keys on the keyboard.  The file
 <CAPTION><B>NOTE</B>: If you are running Mandriva, you may install
 <B>lirc</B> by executing: <CODE># urpmi lirc lirc-remotes</CODE> and bypass
 the manual compilation steps described below by jumping to the 
-<A HREF="#completing_lirc_install">Completing the lirc install</A> section. See the contrib/mandrake91.etc.sysconfig.lircd file for an example of how to
+<A HREF="#completing_lirc_install">Completing the lirc install</A> section.
+See the contrib/mandrake91.etc.sysconfig.lircd file for an example of how to
 configure lircd.</CAPTION>
 </FIGURE>
 </P>
 <P>Some IR devices require a kernel recompile, and some don't. However, all at
 least require having the kernel source available as a resource for the lirc
-build process. </P>
+build process.</P>
 
 <H2><A NAME="ss8.1">8.1</A> <A HREF="mythtv-HOWTO.html#toc8.1">Gentoo</A>
 </H2>
@@ -52,7 +53,7 @@ build process. </P>
 <P>You're going to need to download and compile <B>lircd</B>.  Go to 
 <A HREF="http://www.lirc.org">http://www.lirc.org</A> and download lirc; as
 of 2006-01-21, the version available is 0.8.0.  Grab the remotes.tar.bz2 file as
-well. 
+well.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ tar -xjf lirc-0.8.0.tar.bz2
@@ -200,7 +201,7 @@ users, type: <CODE># /etc/rc.d/init.d/lircd start</CODE> instead of:
 </P>
 <P><B>NOTE</B>:  Read this next section if you're not familiar with how lirc works!</P>
 <P>There are two separate files used by lirc, and both are required for your
-remote control to do anything useful. First is the <CODE>lircd.conf</CODE> file. 
+remote control to do anything useful. First is the <CODE>lircd.conf</CODE> file.
 <CODE>lircd.conf</CODE> tells the lirc daemon how to interpret the IR pulses
 that it receives from a remote control and what name to assign to each
 sequence of pulses.  Without getting too involved, a particular series of
@@ -241,8 +242,8 @@ $ irrecord myremote
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Follow the on-screen directions to train your remote and define keys. If  
-your remote ends up working well, you should consider submitting your  
+<P>Follow the on-screen directions to train your remote and define keys. If
+your remote ends up working well, you should consider submitting your
 <CODE>lircd.conf</CODE> file back to the lirc developers. Once finished:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -277,10 +278,10 @@ echo "Starting lircd"
 /usr/local/sbin/lircd
 ^D
 # exit
-$ 
+$
 </PRE>
 </CODE></BLOCKQUOTE>
- </P>
+</P>
 <P>This takes care of the lircd portion, which "listens" for the IR signals. If
 everything went well, the install script for lircd put an appropriate
 configuration file for your remote into <CODE>/etc/lircd.conf</CODE> This file
@@ -288,7 +289,7 @@ maps the buttons on the remote control to the IR pulses coming from the
 receiver.</P>
 <P>The next step is to convert those signals into something that can be used
 to control MythTV.  MythTV now includes native support for lirc and can
-interact directly with </P>
+interact directly with</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -296,7 +297,7 @@ $ cd ~/mythtv-0.21/contrib/configfiles
 $ cp lircrc.example ~/.lircrc
 </PRE>
 </CODE></BLOCKQUOTE>
- 
+
 or
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -356,7 +357,7 @@ end
 </PRE>
 </CODE></BLOCKQUOTE>
 
-but the <CODE>/etc/lircd.conf</CODE> that comes in the lircd package 
+but the <CODE>/etc/lircd.conf</CODE> that comes in the lircd package
 defines the buttons for the Pinnacle Studio PCTV as:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -365,7 +366,7 @@ defines the buttons for the Pinnacle Studio PCTV as:
 </PRE>
 </CODE></BLOCKQUOTE>
 
-rather than "ChannelUp" and "ChannelDown".  I added the 
+rather than "ChannelUp" and "ChannelDown".  I added the
 following to my /home/[yourusername]/.lircrc file:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -455,12 +456,11 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 <P>You will notice that lirc installs the kernel module in
-<CODE>/lib/modules/uname -a/misc</CODE>. </P>
+<CODE>/lib/modules/uname -a/misc</CODE>.</P>
 <P>The configuration for starting <B>lircd</B> differs if you're going to be
 sending and receiving IR versus just receiving.
 <BLOCKQUOTE><CODE>
 <PRE>
- 
 # cd /etc/rc.d
 # cat >> rc.local
 echo "Starting lircd"
@@ -469,7 +469,7 @@ modprobe lirc_sir
 /usr/local/sbin/lircd
 ^D
 # exit
-$ 
+$
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

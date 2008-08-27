@@ -268,7 +268,7 @@ D       </TD><TD> on a custom profile group displays a popup to delete the group
 <H3>Recording Groups</H3>
 
 <P>In the Watch Recordings screen, Recording Groups allow you to separate
-programs into user-defined categories, such as "Kids", "Alice", "Bob", etc. 
+programs into user-defined categories, such as "Kids", "Alice", "Bob", etc.
 This can be used to reduce clutter, or to segregate content if you use the
 PIN function.
 <BR><CENTER>
@@ -400,7 +400,7 @@ parameter.
 <LI>no client is connected to the server</LI>
 <LI>no recording (neither LiveTV nor a regular recording) is currently taking place</LI>
 <LI>no recording starts within a definable amount of time ("Max. wait for recording (min)")</LI>
-<LI>the "pre Shutdown check-command" returns 0 </LI>
+<LI>the "pre Shutdown check-command" returns 0</LI>
 </UL>
 </P>
 <P>If we get to this idle state the Master backend will set the wakeuptime using the "Set
@@ -435,7 +435,7 @@ their bootup cycle.</LI>
 the "Set wakeuptime command" as a parameter "$time". You need to set this
 according to your wakeup mechanism. If you need seconds since the epoch
 (1970-01-01) set the "Wakeup time format" to "time_t".</LI>
-<LI>"Set wakeuptime command" is the command executed to set the new wakeuptime. </LI>
+<LI>"Set wakeuptime command" is the command executed to set the new wakeuptime.</LI>
 <LI>"Server Halt Command" is the command executed to shutdown the Master
 backend and the Slave backends.</LI>
 <LI>"pre Shutdown check-command" is used to give a
@@ -476,7 +476,7 @@ wakeup all Slave backend systems.</LI>
 </UL>
 </P>
 
-<H3>Using WOL to wake your Master backend. </H3>
+<H3>Using WOL to wake your Master backend.</H3>
 
 <P>To use WOL to wake your Master backend you will need a WOL capable Master
 backend, a machine that runs 24/7 which can execute an at-job and nc (netcat)
@@ -509,10 +509,10 @@ If you use <B>xinetd</B>, save the following as <B>mythwake</B> in your
 <BLOCKQUOTE><CODE>
 <PRE>
 service mythwake
-  {    
+  {
         socket_type     = stream
         wait            = no
-        user            = mythtv        
+        user            = mythtv
         protocol        = tcp
         id              = mythwake
         server          = /usr/local/bin/mythwake

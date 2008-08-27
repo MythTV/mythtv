@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
- <TITLE>Installing and using MythTV: Miscellaneous. </TITLE>
+ <TITLE>Installing and using MythTV: Miscellaneous.</TITLE>
  <LINK HREF="mythtv-HOWTO-24.html" REL=next>
  <LINK HREF="mythtv-HOWTO-22.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc23" REL=contents>
@@ -12,7 +12,7 @@
 <A HREF="mythtv-HOWTO-22.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc23">Contents</A>
 <HR>
-<H2><A NAME="s23">23.</A> <A HREF="mythtv-HOWTO.html#toc23">Miscellaneous. </A></H2>
+<H2><A NAME="s23">23.</A> <A HREF="mythtv-HOWTO.html#toc23">Miscellaneous.</A></H2>
 
 <H2><A NAME="ss23.1">23.1</A> <A HREF="mythtv-HOWTO.html#toc23.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format</A>
 </H2>
@@ -24,7 +24,7 @@ decode nuv files into raw format for use with other applications.  This
 command-line utility was not designed to be used by the end-user, but
 instead to be called by other applications or scripts.  Programs like
 <B>nuvexport</B> (
-<A HREF="http://forevermore.net/myth/">http://forevermore.net/myth/</A>) are better suited for the end user. 
+<A HREF="http://forevermore.net/myth/">http://forevermore.net/myth/</A>) are better suited for the end user.
 However, since <B>mythtranscode</B> can be a useful tool, directions on
 using it follow.</P>
 <P><B>mythtranscode</B> creates raw streams, which means that they do not
@@ -32,7 +32,7 @@ contain any container information such as resolution, frame-rate, or audio
 sampling rate.  In order to process the output, you must supply this
 information to the processing utility.  <B>mythtranscode</B> provides the
 relevant information on STDOUT.</P>
-<P>There are two modes in which <B>mythtranscode</B> can create raw streams. 
+<P>There are two modes in which <B>mythtranscode</B> can create raw streams.
 The first has no synchronization and assumes that the processing utility
 will read audio and video at a constant rate.  This method is useful when a
 single application will be processing the raw output, such as
@@ -111,7 +111,7 @@ $ cat vidout > video.yuv
 run a lightweight window manager, the <CODE>contrib/configfiles/</CODE> directory has an
 example of a <CODE>.twmrc</CODE> and <CODE>.fvwmrc</CODE> file you may use.</P>
 
-<H2><A NAME="capture_resolution_"></A> <A NAME="ss23.3">23.3</A> <A HREF="mythtv-HOWTO.html#toc23.3">What capture resolution should I use?  How does video work? </A>
+<H2><A NAME="capture_resolution_"></A> <A NAME="ss23.3">23.3</A> <A HREF="mythtv-HOWTO.html#toc23.3">What capture resolution should I use?  How does video work?</A>
 </H2>
 
 <P>While MythTV allows you to set various GUI and capture resolutions, not
@@ -138,14 +138,14 @@ resolution, they will cause scan lines to be repeated or dropped.</P>
 <LI>544x480 TiVo Best resolution</LI>
 <LI>480x480 SuperVCD (SVCD) Video CD resolution, TiVo High resolution</LI>
 <LI>352x480 ReplayTV "Standard" quality, TiVo Basic and Medium resolution, DVD "LP" resolution</LI>
-<LI>320x480 </LI>
+<LI>320x480</LI>
 <LI>544x240</LI>
-<LI>480x240 </LI>
+<LI>480x240</LI>
 <LI>352x240 Video CD (VCD) resolution</LI>
 <LI>320x240</LI>
 </UL>
 </P>
-<P>As you can see, the lower quality values are half of the better ones. 
+<P>As you can see, the lower quality values are half of the better ones.
 720x240 is possible, but isn't a good tradeoff relative to the number of
 vertical lines lost.  In a PAL country, the you would use values like
 720x576 or x288.</P>
@@ -263,7 +263,8 @@ information.</P>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  Performing this step will remove the entire database. You will lose all of your settings and will need to re-run the mc.sql script
+<CAPTION><B>NOTE</B>:  Performing this step will remove the entire database.
+You will lose all of your settings and will need to re-run the mc.sql script
 to setup the database structure before running the mythtv-setup program.</CAPTION>
 </FIGURE>
 
@@ -326,7 +327,7 @@ standard MythTV installation.</P>
 the database:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ mysql -u mythtv -pmythtv mythconverg &lt; restore.sql 
+$ mysql -u mythtv -pmythtv mythconverg &lt; restore.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -380,7 +381,7 @@ what's going on.</P>
 include in your TV listings, you can remove the entries from the grabber
 configuration and the MySQL database.  This often happens with premium
 channels; for example, HBO or Showtime may be available on your cable TV
-system, but is scrambled because you're not a subscriber to that channel. 
+system, but is scrambled because you're not a subscriber to that channel.
 Since you can never watch it, you want to get rid of it.</P>
 <P>If you are using the DataDirect service, login to your account at
 <A HREF="http://labs.zap2it.com/">http://labs.zap2it.com/</A> to
@@ -422,7 +423,7 @@ mysql> delete from program where chanid = 1015;
 <H2><A NAME="ss23.10">23.10</A> <A HREF="mythtv-HOWTO.html#toc23.10">NFS</A>
 </H2>
 
-<P>You may want to use a central server to store your files.  </P>
+<P>You may want to use a central server to store your files.</P>
 <P>On the host machine, (in this case, the hostname is "masterbackend") you'll
 want to edit your <CODE>/etc/exports</CODE> file and use something like:
 <BLOCKQUOTE><CODE>
@@ -540,7 +541,7 @@ $
 </P>
 <P>
 <A NAME="logrotate"></A> </P>
-<H3>Log files </H3>
+<H3>Log files</H3>
 
 <P>By default, the log file for mythbackend will be written to
 <CODE>/var/tmp/mythbackend.log</CODE>. This has been tested and is known to work
@@ -572,21 +573,21 @@ $ su
 # cat > /etc/logrotate.d/mythtv
 # Set default values for all log files first...
 
-# Rotate the logs once a week, or more frequently if they 
+# Rotate the logs once a week, or more frequently if they
 # exceed 10Mb in size (size is checked daily).
 weekly
 size 10M
 
-# 'copytruncate' is used for logs generated by 
-# currently-running programs that should not be restarted 
-# (and can't be signalled to start a new log) after the 
-# rotation.  It duplicates the existing log file and then 
-# sets the length of the existing file to 0.  The only time 
-# this would break would be if the program writing the log 
+# 'copytruncate' is used for logs generated by
+# currently-running programs that should not be restarted
+# (and can't be signalled to start a new log) after the
+# rotation.  It duplicates the existing log file and then
+# sets the length of the existing file to 0.  The only time
+# this would break would be if the program writing the log
 # was using lseek.
 copytruncate
 
-# After rotating the files, leave the most recent rotated 
+# After rotating the files, leave the most recent rotated
 # copy alone but gzip everything else to save space.
 compress
 delaycompress
@@ -600,9 +601,9 @@ notifempty
 # end of the global options
 
 /var/log/mythtv/mythbackend.log /var/log/mythtv/mythfrontend.log {
-  # Keep logs until they are 2 months old or the number of 
-  # logs reaches 12.  If the log files stay small, the age will 
-  # kick in first and you'll only have 8 log files.  If they 
+  # Keep logs until they are 2 months old or the number of
+  # logs reaches 12.  If the log files stay small, the age will
+  # kick in first and you'll only have 8 log files.  If they
   # get larger than 10Mb then you won't keep all 60 days.
   rotate 12
   maxage 60
@@ -618,7 +619,7 @@ notifempty
 </CODE></BLOCKQUOTE>
 </P>
 
-<H3>Mandriva </H3>
+<H3>Mandriva</H3>
 
 <P>Mandriva adds one more twist in the form of the <CODE>msec</CODE> utility,
 which runs regularly and (at the default or any higher security level) sets
@@ -754,7 +755,7 @@ keeping the audio and video in sync throughout the recording, which is why
 it is used instead of the <CODE>.avi</CODE> format.  You may have difficulty
 playing <CODE>.nuv</CODE> files in non-MythTV systems.</P>
 
-<P>The original file is removed when the transcoding process is complete. 
+<P>The original file is removed when the transcoding process is complete.
 Unless you're sure that you will be satisfied with the result you may want
 to enable the <B>mythtv-setup</B> option which causes <B>mythbackend</B>
 to keep the original file after transcoding.  This option is on the second
@@ -835,7 +836,7 @@ enabled.  The other options are unchecked.  </P>
 <H3>Create/Alter Scheduled Recordings to Enable Transcoding</H3>
 
 <P>Transcoding is actually enabled on a per-recording basis.  Two things
-must be true before any given recording will be auto-transcoded, however. 
+must be true before any given recording will be auto-transcoded, however.
 The first is that the recording must have been made with a recording profile
 that has auto-transcode enabled. Under "Storage Options" for the recording
 you must set the "Record using the "X" profile" to the profile you
@@ -853,7 +854,7 @@ the V4L card, as it's already likely to be MPEG-4.</P>
 <P>As an example, you could configure the Default profile for "Hardware DVB
 Encoders" (the profile group used for DVB cards, including ATSC cards like
 the pcHDTV 3000) to "Enable auto-transcoding". In the Default profile for
-MPEG-2 Encoders (PVR cards) you'd leave "Enable auto-transcoding" unchecked. 
+MPEG-2 Encoders (PVR cards) you'd leave "Enable auto-transcoding" unchecked.
 For programs that are available on both kinds of cards you'd set the
 recording profile to Default and enable auto-transcoding in the record
 settings.  Then you pick your transcoding profile.  The result is that when
@@ -888,7 +889,7 @@ mysql> select r.* from recordingprofiles r,profilegroups p where p.name='Transco
 +----+----------------+------------+------------+--------------+
 5 rows in set (0.01 sec)
 
-mysql>                                                                        
+mysql>
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -913,7 +914,7 @@ name of the system was "frontend1" and we're going to change it to
 <CAPTION><B>NOTE</B>:  Changing the hostname using direct SQL update commands will
 break things.  You <EM>MUST</EM> use this indirect method.</CAPTION>
 </FIGURE>
- </P>
+</P>
 <P>1.  Stop all backends.  If you run <B>mythbackend</B> from a terminal
 session, press control-c. If your backends are started with an init
 script, you would do something like the following:
@@ -976,7 +977,7 @@ and replace.  When saving the file, make sure you use the new name,
 $ mysql -u root
 mysql>drop database mythconverg;
 mysql>create database mythconverg;
-mysql>exit      
+mysql>exit
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -989,7 +990,7 @@ $ mysql -u mythtv -pmythtv mythconverg &lt; mythtv_restore.sql
 </P>
 <P>If you are running slave backends or frontends, don't forget to re-enable
 access as detailed in 
-<A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A>. </P>
+<A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A>.</P>
 <P>7.  Start the backends.  If you use init scripts, do the following, otherwise
 start them from terminal consoles.
 <BLOCKQUOTE><CODE>
@@ -1044,16 +1045,16 @@ further information, please refer to
 mode in Neutrino.</P>
 <P>
 <UL>
-<LI>Add a new "Capture Card" in the setup. The "Card type" is "DBOX2 Input", 
-the other values have to be adjusted according to your setup. 
+<LI>Add a new "Capture Card" in the setup. The "Card type" is "DBOX2 Input",
+the other values have to be adjusted according to your setup.
 The default values, except for the "DBOX2 host ip", should work fine.</LI>
-<LI>Define a new video source. It doesn't need to be configured, 
+<LI>Define a new video source. It doesn't need to be configured,
 you just need to define it. MythTV grabs the EPG from the DBoxII.</LI>
 <LI>Connect the DBoxII to the newly defined input source in "input connections".</LI>
-<LI>Since channel scanning is not implemented yet, you need to define channels 
-in the "Channel Editor". Make sure that you use the same value for 
-"Channel Name" as on the DBoxII. You can get a list of available 
-channels from the web interface of Neutrino at http://ip-of-your-box:80/. 
+<LI>Since channel scanning is not implemented yet, you need to define channels
+in the "Channel Editor". Make sure that you use the same value for
+"Channel Name" as on the DBoxII. You can get a list of available
+channels from the web interface of Neutrino at http://ip-of-your-box:80/.
 Associate the channel with your new video source and repeat when needed.</LI>
 </UL>
 </P>
@@ -1072,8 +1073,8 @@ to tune to a channel.</P>
 <P>Upper Case = seen &amp; good
 <UL>
 <LI>l/L = Lock  : This could be seen by PVR-250/BTTV users</LI>
-<LI>a/A = PAT   : Any recording transmitted in MPEG </LI>
-<LI>m/M = PMT   : Any recording transmitted in MPEG </LI>
+<LI>a/A = PAT   : Any recording transmitted in MPEG</LI>
+<LI>m/M = PMT   : Any recording transmitted in MPEG</LI>
 <LI>g/G = MGT   : ATSC only</LI>
 <LI>v/V = VCT   : ATSC only</LI>
 <LI>n/N = NIT   : DVB only</LI>
@@ -1097,7 +1098,7 @@ usually used as the second, third, etc capture device.</LI>
 <LI>The PVR-150 MCE Kit (Model 1062) does not have a radio tuner and
 comes with a Microsoft Media Center remote control instead of Hauppauge's.</LI>
 <LI>The PVR-150 low profile (Model 1086) is a low-profile card. It has a
-radio tuner and is approximately half the height of a standard card. 
+radio tuner and is approximately half the height of a standard card.
 However, it comes with a low-profile PCI bracket, so it is not suitable for
 use in a standard PCI slot without removing the bracket, which may not be
 worth the trouble.</LI>

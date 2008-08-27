@@ -36,7 +36,7 @@ compiler is telling you that you don't have XFree86-devel installed, or that
 your distribution hasn't set it up correctly.  This needs to be fixed before
 MythTV will compile.</P>
 
-<H3><A NAME="mkspecs_error"></A> make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop. </H3>
+<H3><A NAME="mkspecs_error"></A> make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</H3>
 
 <P>This error happens when there's a missing link in the
 <CODE>/usr/lib/qt3/mkspecs</CODE> directory.  There are two ways to fix this
@@ -111,6 +111,8 @@ handle SIGPIPE nostop noprint
 handle SIG33 nostop noprint
 set logging on
 set pagination off
+set breakpoint pending on
+break qFatal
 set args -l myth.log -v record,channel,siparser
 run
 thread apply all bt full
@@ -147,7 +149,7 @@ at least 10 lines <EM>prior</EM> to the point where the backtrace actually
 begins.  This ensures that there is some context to the backtrace, and so
 that it's possible to see what exactly caused the segfault.</P>
 <P><B>gdb</B> has a number of options, read the <CODE>man</CODE> page for more
-information.  </P>
+information.</P>
 <P>Using the <CODE>gdbcommands</CODE> file in conjunction with a <B>while</B> loop
 will ensure that <B>gdb</B> creates a trace file and then restarts:</P>
 <P>
@@ -166,7 +168,7 @@ that you're going to test using <B>ssh</B> or <B>telnet</B>. Next, type
 <CODE>$ export DISPLAY=localhost:0.0</CODE>.  This will allow the graphics to be
 displayed on the X console (usually ALT-F6 or ALT-F7) and still give you
 output and control of <B>mythfrontend</B>, either from the <B>ssh</B>
-session, or by switching back to the text console by pressing CTRL-ALT-F1. 
+session, or by switching back to the text console by pressing CTRL-ALT-F1.
 You can now continue troubleshooting using <B>gdb</B> as detailed in the
 instructions.</P>
 
@@ -185,7 +187,7 @@ intents and purposes your computer will have crashed.</P>
 <H2><A NAME="ss22.3">22.3</A> <A HREF="mythtv-HOWTO.html#toc22.3">Installing</A>
 </H2>
 
-<H3>When trying to run mythtv-setup, you get an error like this: "mythtv-setup: error while loading shared libraries:"</H3>
+<H3>When trying to run mythtv-setup, you get an error like this:"mythtv-setup: error while loading shared libraries:"</H3>
 
 <P>You didn't add <CODE>/usr/local/lib</CODE> to <CODE>/etc/ld.so.conf</CODE>.  See the
 section on modifying 
@@ -227,11 +229,11 @@ to <CODE>/var</CODE> due to a full partition.</P>
 
 <H3>MySQL not connecting correctly</H3>
 
-<P>Your <B>MySQL</B> installation may have networking turned off. 
+<P>Your <B>MySQL</B> installation may have networking turned off.
 Check that <CODE>/etc/mysql/my.cnf</CODE> <EM>does not</EM> contain
-<CODE>skip-networking</CODE>.  If it does, remove it.  Also verify that 
-<CODE>bind-address</CODE> is set to your IP address instead of 
-<CODE>127.0.0.1</CODE>.  If you change either of these items, restart 
+<CODE>skip-networking</CODE>.  If it does, remove it.  Also verify that
+<CODE>bind-address</CODE> is set to your IP address instead of
+<CODE>127.0.0.1</CODE>.  If you change either of these items, restart
 <B>MySQL</B>.</P>
 
 <H3>MySQL database is corrupt</H3>
@@ -260,7 +262,7 @@ Profiles and adjust the <B>Default</B> and <B>Live TV</B> options to
 
 <P>This is due to DPMS, the Display Power Management System, which is used
 to save power by turning off your monitor when the system decides that it's
-not being used or due to a screensaver that has defaulted to a blank screen. 
+not being used or due to a screensaver that has defaulted to a blank screen.
 MythTV now has DPMS support built-in, and should intelligently handle the
 screen.  Continue reading if you wish to override DPMS and force it off.</P>
 <P>Since it's likely that watching TV will not generate keyboard or mouse
@@ -357,7 +359,7 @@ within the control panel.</P>
 <H3>mythfilldatabase failing</H3>
 
 <P>If mythfilldatabase suddenly appears to be failing, there are at least
-two things to check.  </P>
+two things to check.</P>
 <P>First, if you are in North America, ensure that your DataDirect subscription
 is still valid, otherwise, check to see what version of XMLTV you're
 running and that it's the latest version.</P>
@@ -403,7 +405,7 @@ program to check and enable DMA.
 command to your <CODE>/etc/rc.local</CODE> file, or by adding files to
 /etc/sysconfig.</P>
 <P>On Mandriva and other distributions, if you install <B>hdparm</B> from an RPM you
-will most likely get a <CODE>/etc/sysconfig/harddisks</CODE> file installed. 
+will most likely get a <CODE>/etc/sysconfig/harddisks</CODE> file installed.
 This file will be parsed by the <CODE>/etc/rc.sysinit</CODE> script.  If you use
 the default <CODE>harddisks</CODE> file, your changes will affect all IDE devices
 (including CD ROMs).  If you wish to use different parameters for various
@@ -426,7 +428,7 @@ reboot your setting will be preserved.</P>
 <IMG SRC="stop.png">
 <CAPTION><B>NOTE</B>:  the following instructions do not apply to PVR-250/350
 encoders; the MPEG-2 file will have the audio embedded in the stream so it
-is not accessible using <CODE>/dev/dsp</CODE>. </CAPTION>
+is not accessible using <CODE>/dev/dsp</CODE>.</CAPTION>
 </FIGURE>
 </P>
 <P>Audio appears to be one of the bigger issues that users run into on the
@@ -495,7 +497,7 @@ second card is #1, etc.</P>
 duplex operation.  If it's not, it's most likely that you're going to run
 into issues when you try to record and play sound at the same time.  If your
 backend is a separate machine than your frontend, then there's no problem,
-since you're only going to be doing one thing at a time with the card. 
+since you're only going to be doing one thing at a time with the card.
 Likewise, if you're running the frontend and backend on the same machine,
 but you're using btaudio or a hardware encoder card such as the Hauppauge
 PVR-250, DVB cards or HDTV capture cards as your recording source and you're
@@ -544,8 +546,8 @@ apply in that case.</P>
 frequencies as the United States.  "Canada Cable" was a hack that some
 people used when they would discover that their channels were off-by-one,
 i.e. when tuning to channel 42, they might get channel 41 or 43.  This is
-actually due to the tuner on the video capture device being mis-detected. 
-You must manually specify the tuner type in your <CODE>/etc/modules.conf</CODE>. 
+actually due to the tuner on the video capture device being mis-detected.
+You must manually specify the tuner type in your <CODE>/etc/modules.conf</CODE>.
 See the video4linux mailing list (
 <A HREF="https://listman.redhat.com/mailman/listinfo/video4linux-list">https://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
 more information.</P>
