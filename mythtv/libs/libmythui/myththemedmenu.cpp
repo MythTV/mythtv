@@ -1426,8 +1426,8 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
         }
         else
         {
-            parent->GetScreenStack()->PopScreen();
 #if 0
+            parent->GetScreenStack()->PopScreen();
             MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("No Menu File"),
                                       QObject::tr(QString("Myth could not locate the menu file %1.\n\n"
                                       "We will now return to the main menu.").arg(menuname)));
@@ -1454,8 +1454,8 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
             return false;
         }
 
-        parent->GetScreenStack()->PopScreen();
 #if 0
+        parent->GetScreenStack()->PopScreen();
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
                                   QObject::tr("Bad Menu File"),
                                   QObject::tr(QString("The menu file %1 is "
@@ -2436,7 +2436,7 @@ void MythThemedMenu::Init(const QString &cdir, const QString &menufile)
         d->foundtheme = d->m_state->parseSettings(dir, "theme.xml");
 
     if (d->foundtheme)
-        d->parseMenu(menufile);
+        d->foundtheme = d->parseMenu(menufile);
 }
 
 MythThemedMenu::~MythThemedMenu(void)
