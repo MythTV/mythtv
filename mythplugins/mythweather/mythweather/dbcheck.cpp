@@ -3,7 +3,7 @@
 #include <qstringlist.h>
 
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 
 #include "dbcheck.h"
 
@@ -11,11 +11,11 @@ const QString currentDatabaseVersion = "1003";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
- 
     if (!gContext->SaveSettingOnHost("WeatherDBSchemaVer",newnumber,NULL))
-    {   
-        VERBOSE(VB_IMPORTANT, QString("DB Error (Setting new DB version number): %1\n")
-                              .arg(newnumber));
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("DB Error (Setting new DB version number): %1\n")
+                .arg(newnumber));
 
         return false;
     }
@@ -26,13 +26,12 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
 static bool performActualUpdate(const QStringList updates, QString version,
                                 QString &dbver)
 {
-    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythWeather schema version ") +
-            version);
+    VERBOSE(VB_IMPORTANT, "Upgrading to MythWeather schema version " + version);
 
     MSqlQuery query(MSqlQuery::InitCon());
 
     QStringList::const_iterator it = updates.begin();
-    
+
     while (it != updates.end())
     {
         QString thequery = *it;
@@ -44,7 +43,7 @@ static bool performActualUpdate(const QStringList updates, QString version,
                 QString("DB Error (Performing database upgrade): \n"
                         "Query was: %1 \nError was: %2 \nnew version: %3")
                 .arg(thequery)
-                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg(version);
             VERBOSE(VB_IMPORTANT, msg);
             return false;

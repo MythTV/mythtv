@@ -6,7 +6,7 @@
 #include <QRegExp>
 
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 
 #include "globals.h"
 #include "metadata.h"
@@ -382,14 +382,14 @@ bool MetadataImp::dropFromDB()
     query.bindValue(":ID", m_id);
     if (!query.exec())
     {
-        MythContext::DBError("delete from videometadata", query);
+        MythDB::DBError("delete from videometadata", query);
     }
 
     query.prepare("DELETE FROM filemarkup WHERE filename = :FILENAME");
     query.bindValue(":FILENAME", m_filename);
     if (!query.exec())
     {
-        MythContext::DBError("delete from filemarkup", query);
+        MythDB::DBError("delete from filemarkup", query);
     }
 
     return true;
@@ -568,7 +568,7 @@ void MetadataImp::saveToDatabase()
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("video metadata update", query);
+        MythDB::DBError("video metadata update", query);
         return;
     }
 
@@ -580,7 +580,7 @@ void MetadataImp::saveToDatabase()
 
         if (!query.isActive() || query.size() < 1)
         {
-            MythContext::DBError("metadata id get", query);
+            MythDB::DBError("metadata id get", query);
             return;
         }
 

@@ -1,5 +1,4 @@
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythcontext.h>
+#include <mythtv/mythdb.h>
 
 #include <algorithm>
 #include <vector>
@@ -78,7 +77,7 @@ class SingleValueImp
                     m_dirty = true;
                 }
                 else
-                    MythContext::DBError("get last id", query);
+                    MythDB::DBError("get last id", query);
             }
         }
 
@@ -322,7 +321,7 @@ class MultiValueImp
             query.bindValue(":ID", id);
             query.bindValue(":VALUE", value);
             if (!query.exec())
-                MythContext::DBError("multi value insert", query);
+                MythDB::DBError("multi value insert", query);
         }
 
         return id;
@@ -358,7 +357,7 @@ class MultiValueImp
                 query.bindValue(":VALUE", int(*vp));
                 if (!query.exec() || !query.isActive())
                 {
-                    MythContext::DBError("multivalue remove", query);
+                    MythDB::DBError("multivalue remove", query);
                 }
                 p->second.values.erase(vp);
             }
@@ -377,7 +376,7 @@ class MultiValueImp
             query.bindValue(":ID", p->first);
             if (!query.exec() || !query.isActive())
             {
-                MythContext::DBError("multivalue remove", query);
+                MythDB::DBError("multivalue remove", query);
             }
             m_val_map.erase(p);
         }
