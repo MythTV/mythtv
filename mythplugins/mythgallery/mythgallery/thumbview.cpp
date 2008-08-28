@@ -6,8 +6,7 @@
 #include <QDir>
 
 // MythTV plugin headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 
 // MythGallery headers
 #include "thumbview.h"
@@ -17,7 +16,7 @@ ThumbItem::ThumbItem(const QString &name, const QString &path, bool isDir,
                      MythMediaDevice *dev) :
         m_name(name), m_caption(QString::null),
         m_path(path), m_isDir(isDir),
-        m_pixmap(NULL), m_mediaDevice(dev) 
+        m_pixmap(NULL), m_mediaDevice(dev)
 {
     m_name.detach();
     m_path.detach();
@@ -45,7 +44,7 @@ bool ThumbItem::Remove(void)
 
     if (!query.exec())
     {
-        MythContext::DBError("thumb_item_remove", query);
+        MythDB::DBError("thumb_item_remove", query);
         return false;
     }
 
@@ -71,7 +70,7 @@ void ThumbItem::SetRotationAngle(int angle)
     query.bindValue(":ANGLE", angle);
 
     if (!query.exec())
-        MythContext::DBError("set_rotation_angle", query);
+        MythDB::DBError("set_rotation_angle", query);
 
     SetPixmap(NULL);
 }
@@ -95,7 +94,7 @@ long ThumbItem::GetRotationAngle(void)
     query.bindValue(":PATH", m_path);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("get_rotation_angle", query);
+        MythDB::DBError("get_rotation_angle", query);
     else if (query.next())
         return query.value(0).toInt();
 
@@ -108,7 +107,7 @@ long ThumbItem::GetRotationAngle(void)
     query.bindValue(":PATH", m_path + '%');
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("get_rotation_angle", query);
+        MythDB::DBError("get_rotation_angle", query);
     else if (query.next())
         return query.value(0).toInt();
 

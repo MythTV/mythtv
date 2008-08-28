@@ -31,7 +31,7 @@
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/libmythdb/mythdb.h>
 #include <mythtv/libmythui/mythmainwindow.h>
 
 // MythControls headers
@@ -61,7 +61,7 @@ QStringList KeyBindings::GetKeys(void) const
  */
 QStringList KeyBindings::GetContexts(void) const
 {
-    QStringList ctxts = 
+    QStringList ctxts =
         Q3DeepCopy<QStringList>(m_actionSet.GetContextStrings());
     ctxts.sort();
     return ctxts;
@@ -284,7 +284,7 @@ void KeyBindings::CommitAction(const ActionID &id)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("KeyBindings::CommitAction", query);
+        MythDB::DBError("KeyBindings::CommitAction", query);
         return;
     }
 
@@ -313,7 +313,7 @@ void KeyBindings::CommitJumppoint(const ActionID &id)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("KeyBindings::CommitJumppoint", query);
+        MythDB::DBError("KeyBindings::CommitJumppoint", query);
         return;
     }
 
@@ -366,7 +366,7 @@ void KeyBindings::LoadJumppoints(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("KeyBindings::LoadJumppoint", query);
+        MythDB::DBError("KeyBindings::LoadJumppoint", query);
         return;
     }
 
@@ -405,7 +405,7 @@ void KeyBindings::LoadContexts(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("KeyBindings::LoadContexts", query);
+        MythDB::DBError("KeyBindings::LoadContexts", query);
         return;
     }
 

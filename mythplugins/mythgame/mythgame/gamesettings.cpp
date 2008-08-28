@@ -1,5 +1,5 @@
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 
 #include "gamesettings.h"
 #include <qfile.h>
@@ -48,14 +48,14 @@ static HostLineEdit *GameFavTreeLevels()
 }
 
 static HostCheckBox *GameDeepScan()
-{   
+{
     HostCheckBox *gc = new HostCheckBox("GameDeepScan");
     gc->setLabel(QObject::tr("Indepth Game Scan"));
     gc->setHelpText(QObject::tr("Enabling this causes a game scan to gather crc values and attempt to find out more"
                     " detailed information about the game: NOTE this can greatly increase the time a gamescan takes"
                     " based on the amount of games scanned."));
     return gc;
-}   
+}
 
 static HostCheckBox *GameRemovalPrompt()
 {
@@ -64,17 +64,17 @@ static HostCheckBox *GameRemovalPrompt()
     gc->setHelpText(QObject::tr("This enables a prompt for removing"
                                 " deleted roms from the database during a "
                                 " gamescan"));
-    
+
     return gc;
 }
 
 static HostCheckBox *GameShowFileNames()
-{  
+{
     HostCheckBox *gc = new HostCheckBox("GameShowFileNames");
     gc->setLabel(QObject::tr("Display Files Names in Game Tree"));
     gc->setHelpText(QObject::tr("Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename"));
     return gc;
-}   
+}
 
 static HostCheckBox *GameTreeView()
 {
@@ -210,7 +210,7 @@ MythGamePlayerSettings::MythGamePlayerSettings()
 {
     // must be first
     addChild(id = new ID());
-    
+
     ConfigurationGroup *group = new VerticalConfigurationGroup(false, false);
     group->setLabel(QObject::tr("Game Player Setup"));
     group->addChild(name = new Name(*this));
@@ -279,17 +279,17 @@ MythDialog *MythGamePlayerEditor::dialogWidget(MythMainWindow *parent,
 void MythGamePlayerEditor::menu(void)
 {
     if (!listbox->getValue().toUInt())
-    {   
+    {
         MythGamePlayerSettings gp;
         gp.exec();
     }
     else
-    {   
+    {
         DialogCode val = MythPopupBox::Show2ButtonPopup(
             gContext->GetMainWindow(),
             "", tr("Game Player Menu"),
             tr("Edit.."), tr("Delete.."), kDialogCodeButton1);
-        
+
         if (kDialogCodeButton0 == val)
             edit();
         else if (kDialogCodeButton1 == val)
@@ -298,7 +298,7 @@ void MythGamePlayerEditor::menu(void)
 }
 
 void MythGamePlayerEditor::edit(void)
-{   
+{
     MythGamePlayerSettings gp;
 
     uint sourceid = listbox->getValue().toUInt();
@@ -325,9 +325,9 @@ void MythGamePlayerEditor::del(void)
         query.bindValue(":SOURCEID", listbox->getValue());
 
         if (!query.exec() || !query.isActive())
-            MythContext::DBError("Deleting MythGamePlayerSettings:", query);
+            MythDB::DBError("Deleting MythGamePlayerSettings:", query);
 
-        Load(); 
+        Load();
     }
 }
 

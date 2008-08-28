@@ -28,8 +28,8 @@
 
 // MythTV headers
 #include <mythtv/util.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythcontext.h>
+#include <mythtv/mythdb.h>
+#include <mythtv/mythverbose.h>
 #include <mythtv/libmythui/mythmainwindow.h>
 #include <mythtv/mythdirs.h>
 
@@ -264,7 +264,7 @@ bool MythFlixConfig::findInDB(const QString& name)
     query.prepare("SELECT name FROM netflix WHERE name = :NAME ;");
     query.bindValue(":NAME", name);
     if (!query.exec() || !query.isActive()) {
-        MythContext::DBError("new find in db", query);
+        MythDB::DBError("new find in db", query);
         return false;
     }
 
@@ -286,7 +286,7 @@ bool MythFlixConfig::insertInDB(NewsSiteItem* site)
     query.bindValue(":URL", site->url);
     query.bindValue(":ICON", site->ico);
     if (!query.exec() || !query.isActive()) {
-        MythContext::DBError("netlix: inserting in DB", query);
+        MythDB::DBError("netlix: inserting in DB", query);
         return false;
     }
 
@@ -301,7 +301,7 @@ bool MythFlixConfig::removeFromDB(NewsSiteItem* site)
     query.prepare("DELETE FROM netflix WHERE name = :NAME ;");
     query.bindValue(":NAME", site->name);
     if (!query.exec() || !query.isActive()) {
-        MythContext::DBError("netflix: delete from db", query);
+        MythDB::DBError("netflix: delete from db", query);
         return false;
     }
 

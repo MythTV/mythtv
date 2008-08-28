@@ -1,6 +1,6 @@
 // myth
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 
 // mythbrowser
 #include "browserdbutil.h"
@@ -12,8 +12,9 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
 
     if (!gContext->SaveSettingOnHost("BrowserDBSchemaVer", newnumber, NULL))
     {
-        VERBOSE(VB_IMPORTANT, QString("DB Error (Setting new DB version number): %1\n")
-                              .arg(newnumber));
+        VERBOSE(VB_IMPORTANT,
+                QString("DB Error (Setting new DB version number): %1\n")
+                .arg(newnumber));
 
         return false;
     }
@@ -26,8 +27,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythBrowser schema version ") +
-            version);
+    VERBOSE(VB_IMPORTANT, "Upgrading to MythBrowser schema version " + version);
 
     int counter = 0;
     QString thequery = updates[counter];
@@ -42,7 +42,7 @@ static bool performActualUpdate(const QString updates[], QString version,
                 QString("DB Error (Performing database upgrade): \n"
                         "Query was: %1 \nError was: %2 \nnew version: %3")
                 .arg(thequery)
-                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg(version);
             VERBOSE(VB_IMPORTANT, msg);
             return false;
@@ -68,7 +68,8 @@ bool UpgradeBrowserDatabaseSchema(void)
 
     if (dbver == "")
     {
-        VERBOSE(VB_IMPORTANT, "Inserting MythBrowser initial database information.");
+        VERBOSE(VB_IMPORTANT,
+                "Inserting MythBrowser initial database information.");
 
         const QString updates[] =
         {
@@ -96,7 +97,7 @@ bool FindInDB(const QString &category, const QString& name)
     query.bindValue(":NAME", name);
     if (!query.exec())
     {
-        MythContext::DBError("mythbrowser: find in db", query);
+        MythDB::DBError("mythbrowser: find in db", query);
         return false;
     }
 
@@ -105,13 +106,14 @@ bool FindInDB(const QString &category, const QString& name)
 
 bool InsertInDB(Bookmark* site)
 {
-    if (!site) 
+    if (!site)
         return false;
 
     return InsertInDB(site->category, site->name, site->url);
 }
 
-bool InsertInDB(const QString &category, const QString &name, const QString &url)
+bool InsertInDB(const QString &category,
+                const QString &name, const QString &url)
 {
     if (category.isEmpty() || name.isEmpty() || url.isEmpty())
         return false;
@@ -121,21 +123,21 @@ bool InsertInDB(const QString &category, const QString &name, const QString &url
 
     QString _url = url;
     _url.stripWhiteSpace();
-    if (!_url.startsWith("http://") && !_url.startsWith("https://") && 
+    if (!_url.startsWith("http://") && !_url.startsWith("https://") &&
             !_url.startsWith("file:/"))
         _url.prepend("http://");
 
     _url.replace("&amp;","&");
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO websites (category, name, url) " 
+    query.prepare("INSERT INTO websites (category, name, url) "
                   "VALUES(:CATEGORY, :NAME, :URL);");
     query.bindValue(":CATEGORY", category);
     query.bindValue(":NAME", name);
     query.bindValue(":URL", _url);
     if (!query.exec())
     {
-        MythContext::DBError("mythbrowser: inserting in DB", query);
+        MythDB::DBError("mythbrowser: inserting in DB", query);
         return false;
     }
 
@@ -159,7 +161,7 @@ bool RemoveFromDB(const QString &category, const QString &name)
     query.bindValue(":NAME", name);
     if (!query.exec())
     {
-        MythContext::DBError("mythbrowser: delete from db", query);
+        MythDB::DBError("mythbrowser: delete from db", query);
         return false;
     }
 
@@ -174,7 +176,7 @@ int GetCategoryList(QStringList &list)
 
     if (!query.exec())
     {
-        MythContext::DBError("mythbrowser: get category list", query);
+        MythDB::DBError("mythbrowser: get category list", query);
         return false;
     }
     else
@@ -197,7 +199,7 @@ int GetSiteList(QList<Bookmark*>  &siteList)
     query.exec("SELECT category, name, url FROM websites "
                "ORDER BY category, name");
 
-    if (!query.isActive()) 
+    if (!query.isActive())
     {
         VERBOSE(VB_IMPORTANT, "BookmarkManager: Error in loading from DB");
     }

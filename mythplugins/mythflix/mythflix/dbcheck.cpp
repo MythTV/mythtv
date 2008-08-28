@@ -8,7 +8,7 @@ using namespace std;
 
 #include "dbcheck.h"
 #include "mythtv/mythcontext.h"
-#include "mythtv/mythdbcon.h"
+#include "mythtv/mythdb.h"
 
 const QString currentDatabaseVersion = "1003";
 
@@ -47,7 +47,7 @@ static bool performActualUpdate(const QString updates[], QString version,
                 QString("DB Error (Performing database upgrade): \n"
                         "Query was: %1 \nError was: %2 \nnew version: %3")
                 .arg(thequery)
-                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg(version);
             VERBOSE(VB_IMPORTANT, msg);
             return false;

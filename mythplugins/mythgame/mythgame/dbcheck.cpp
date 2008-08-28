@@ -8,7 +8,7 @@ using namespace std;
 #include "dbcheck.h"
 
 #include "mythtv/mythcontext.h"
-#include "mythtv/mythdbcon.h"
+#include "mythtv/mythdb.h"
 
 #include "gamesettings.h"
 
@@ -17,7 +17,7 @@ const QString currentDatabaseVersion = "1014";
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
 
-    if (!gContext->SaveSettingOnHost("GameDBSchemaVer",newnumber,NULL)) 
+    if (!gContext->SaveSettingOnHost("GameDBSchemaVer",newnumber,NULL))
     {
         VERBOSE(VB_IMPORTANT, QString("DB Error (Setting new DB version number): %1\n")
                               .arg(newnumber));
@@ -33,7 +33,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythGame schema version ") + 
+    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythGame schema version ") +
             version);
 
     int counter = 0;
@@ -49,7 +49,7 @@ static bool performActualUpdate(const QString updates[], QString version,
                 QString("DB Error (Performing database upgrade): \n"
                         "Query was: %1 \nError was: %2 \nnew version: %3")
                 .arg(thequery)
-                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg(version);
             VERBOSE(VB_IMPORTANT, msg);
             return false;
@@ -65,7 +65,7 @@ static bool performActualUpdate(const QString updates[], QString version,
     dbver = version;
     return true;
 }
- 
+
 bool InitializeDatabase(void)
 {
     VERBOSE(VB_IMPORTANT, "Inserting MythGame initial database information.");
@@ -159,11 +159,11 @@ bool UpgradeGameDatabaseSchema(void)
             return false;
     }
 
-    if ((((dbver == "1004") 
-      || (dbver == "1003")) 
+    if ((((dbver == "1004")
+      || (dbver == "1003"))
       || (dbver == "1002"))
       || (dbver == "1001"))
-    {   
+    {
         const QString updates[] = {
 
 "CREATE TABLE gameplayers ("
@@ -187,7 +187,7 @@ bool UpgradeGameDatabaseSchema(void)
     }
 
     if (dbver == "1005")
-    {   
+    {
         const QString updates[] = {
 "ALTER TABLE gameplayers ADD COLUMN spandisks tinyint(1) NOT NULL default 0; ",
 "ALTER TABLE gamemetadata ADD COLUMN diskcount tinyint(1) NOT NULL default 1; ",
@@ -198,8 +198,8 @@ bool UpgradeGameDatabaseSchema(void)
     }
 
     if (dbver == "1006")
-    {   
-        
+    {
+
         if (!gContext->GetSetting("GameAllTreeLevels").isEmpty())
             query.exec("UPDATE settings SET data = 'system gamename' WHERE value = 'GameAllTreeLevels'; ");
 
@@ -267,7 +267,7 @@ bool UpgradeGameDatabaseSchema(void)
     }
 
     if (dbver == "1010")
-    {   
+    {
         const QString updates[] = {
 
 "ALTER TABLE gamemetadata ADD COLUMN version varchar(64) NOT NULL default '';",

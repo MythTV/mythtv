@@ -1,7 +1,6 @@
 #include <qfile.h>
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 
 #include "rominfo.h"
 #include "romedit.h"
@@ -40,8 +39,8 @@ void RomInfo::edit_rominfo()
         query.bindValue(":ROMNAME", Romname());
 
         if (!query.exec())
-        {   
-            MythContext::DBError("RomInfo::edit_rominfo", query);
+        {
+            MythDB::DBError("RomInfo::edit_rominfo", query);
             return;
         }
 
@@ -54,7 +53,7 @@ void RomInfo::edit_rominfo()
         QString t_country   = query.value(3).toString();
         QString t_publisher = query.value(4).toString();
         bool    t_favourite = query.value(5).toBool();
-    
+
         if ((t_gamename  != Gamename())  || (t_genre     != Genre())   ||
             (t_year      != Year())      || (t_country   != Country()) ||
             (t_publisher != Publisher()) || (t_favourite != Favorite()))
@@ -67,8 +66,8 @@ void RomInfo::edit_rominfo()
             query.bindValue(":ROMNAME",  Romname());
 
             if (!query.exec())
-            {   
-                MythContext::DBError("RomInfo::edit_rominfo", query);
+            {
+                MythDB::DBError("RomInfo::edit_rominfo", query);
                 return;
             }
         }
@@ -91,7 +90,7 @@ int romInDB(QString rom, QString gametype)
 
     if (!query.exec())
     {
-        MythContext::DBError("romInDB", query);
+        MythDB::DBError("romInDB", query);
         return -1;
     }
 
@@ -178,8 +177,8 @@ void RomInfo::setFavorite()
     query.bindValue(":ROMNAME",romname);
 
     if (!query.exec())
-    {   
-        MythContext::DBError("RomInfo::setFavorite", query);
+    {
+        MythDB::DBError("RomInfo::setFavorite", query);
     }
 }
 
@@ -212,7 +211,7 @@ void RomInfo::fillData()
 
     QString thequery = "SELECT system,gamename,genre,year,romname,favorite,"
                        "rompath,country,crc_value,diskcount,gametype,publisher,"
-                       "version FROM gamemetadata WHERE gamename = :GAMENAME " 
+                       "version FROM gamemetadata WHERE gamename = :GAMENAME "
                        + systemtype + " ORDER BY diskcount DESC";
 
     query.prepare(thequery);
@@ -244,7 +243,7 @@ void RomInfo::fillData()
 
     if (query.next())
     {
-        if (!query.value(0).toString().isEmpty()) 
+        if (!query.value(0).toString().isEmpty())
         {
             QString Image = query.value(0).toString() + "/" + romname;
             if (FindImage(query.value(0).toString() + "/" + romname, &Image))
@@ -258,7 +257,7 @@ void RomInfo::fillData()
 
     // If we have more than one instance of this rom in the DB fill in all
     // systems available to play it.
-    if (RomCount() > 1) 
+    if (RomCount() > 1)
     {
         query.prepare("SELECT DISTINCT system FROM gamemetadata "
                       "WHERE romname = :ROMNAME");
