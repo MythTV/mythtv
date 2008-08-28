@@ -8,7 +8,7 @@
 
 #include <qstring.h>
 #include <qdir.h>
-#include "mythdbcon.h"
+#include "mythdb.h"
 #include "mythcontext.h"
 #include "util.h"
 
@@ -55,7 +55,7 @@ bool checkStoragePaths(QString *probs)
     query.prepare("SELECT count(groupname) FROM storagegroup;");
     if (!query.exec() || !query.isActive() || query.size() < 1)
     {
-        MythContext::DBError("checkStoragePaths", query);
+        MythDB::DBError("checkStoragePaths", query);
         return false;
     }
 
@@ -79,7 +79,7 @@ bool checkStoragePaths(QString *probs)
     query.bindValue(":HOSTNAME", gContext->GetHostName());
     if (!query.exec() || !query.isActive() || query.size() < 1)
     {
-        MythContext::DBError("checkStoragePaths", query);
+        MythDB::DBError("checkStoragePaths", query);
         return false;
     }
 
@@ -119,7 +119,7 @@ bool checkChannelPresets(QString *probs)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("checkChannelPresets", query);
+        MythDB::DBError("checkChannelPresets", query);
         return false;
     }
 
@@ -141,7 +141,7 @@ bool checkChannelPresets(QString *probs)
 
         if (!channelExists.exec() || !channelExists.isActive())
         {
-            MythContext::DBError("checkChannelPresets", channelExists);
+            MythDB::DBError("checkChannelPresets", channelExists);
             return problemFound;
         }
 

@@ -19,13 +19,12 @@ using namespace std;
 
 #include "config.h"
 #include "statusbox.h"
-#include "mythcontext.h"
 #include "remoteutil.h"
 #include "programinfo.h"
 #include "tv.h"
 #include "jobqueue.h"
 #include "util.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "cardutil.h"
 #include "mythuihelper.h"
 
@@ -170,7 +169,7 @@ void StatusBox::updateContent()
         startPos = contentPos - contentMid;
         highlightPos = contentMid;
     }
- 
+
     if (content  == NULL) return;
     LayerSet *container = content;
 
@@ -216,7 +215,7 @@ void StatusBox::updateSelector()
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
     QPainter p(this);
- 
+
     if (selector == NULL) return;
     LayerSet *container = selector;
 
@@ -429,7 +428,7 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
                 update(SelectRect);
             }
         }
-        else if (action == "PAGEUP" && inContent) 
+        else if (action == "PAGEUP" && inContent)
         {
             contentPos -= contentSize;
             if (contentPos < 0)
@@ -661,7 +660,7 @@ void StatusBox::clicked()
 
             rec = expList[contentPos];
 
-            if (rec) 
+            if (rec)
             {
                 QStringList msgs;
 
@@ -699,13 +698,13 @@ void StatusBox::clicked()
 
                 // Update list, prevent selected item going off bottom
                 doAutoExpireList();
-                if (contentPos >= (int)expList.size())  
+                if (contentPos >= (int)expList.size())
                     contentPos = max((int)expList.size()-1,0);
             }
         }
         return;
     }
-    
+
     // Clear all visible content elements here
     // I'm sure there's a better way to do this but I can't find it
     content->ClearAllText();
@@ -778,8 +777,8 @@ void StatusBox::doListingsStatus()
     contentLines[count++] = QObject::tr("Result: ") + mfdLastRunStatus;
 
 
-    if (mfdNextRunStart >= mfdLastRunStart) 
-        contentLines[count++] = QObject::tr("Suggested Next: ") + 
+    if (mfdNextRunStart >= mfdLastRunStart)
+        contentLines[count++] = QObject::tr("Suggested Next: ") +
                                 mfdNextRunStart;
 
     DaysOfData = qdtNow.daysTo(GuideDataThrough);
@@ -792,7 +791,7 @@ void StatusBox::doListingsStatus()
     }
     else
     {
-        contentLines[count++] = QObject::tr("There is guide data until ") + 
+        contentLines[count++] = QObject::tr("There is guide data until ") +
                                 QDateTime(GuideDataThrough)
                                           .toString("yyyy-MM-dd hh:mm");
 
@@ -816,10 +815,10 @@ void StatusBox::doListingsStatus()
 
     if (!DataDirectMessage.isNull())
     {
-        contentLines[count++] = QObject::tr("DataDirect Status: "); 
+        contentLines[count++] = QObject::tr("DataDirect Status: ");
         contentLines[count++] = DataDirectMessage;
     }
-   
+
     contentTotalLines = count;
     update(ContentRect);
 }
@@ -838,7 +837,7 @@ void StatusBox::doScheduleStatus()
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("StatusBox::doScheduleStatus()", query);
+        MythDB::DBError("StatusBox::doScheduleStatus()", query);
         contentTotalLines = 0;
         update(ContentRect);
         return;
@@ -856,7 +855,7 @@ void StatusBox::doScheduleStatus()
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("StatusBox::doScheduleStatus()", query);
+        MythDB::DBError("StatusBox::doScheduleStatus()", query);
         contentTotalLines = 0;
         update(ContentRect);
         return;
@@ -1020,7 +1019,7 @@ void StatusBox::doTunerStatus()
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("StatusBox::doTunerStatus()", query);
+        MythDB::DBError("StatusBox::doTunerStatus()", query);
         contentTotalLines = 0;
         update(ContentRect);
         return;
@@ -1037,7 +1036,7 @@ void StatusBox::doTunerStatus()
 
         gContext->SendReceiveStringList(strlist);
         int state = strlist[0].toInt();
-  
+
         QString status = "";
         if (state == kState_Error)
             status = tr("is unavailable");
@@ -1046,7 +1045,7 @@ void StatusBox::doTunerStatus()
         else if (state == kState_RecordingOnly ||
                  state == kState_WatchingRecording)
             status = tr("is recording");
-        else 
+        else
             status = tr("is not recording");
 
         QString tun = tr("Tuner %1 ").arg(cardid);
@@ -1064,7 +1063,7 @@ void StatusBox::doTunerStatus()
             gContext->SendReceiveStringList(strlist);
             ProgramInfo *proginfo = new ProgramInfo;
             proginfo->FromStringList(strlist, 0);
-   
+
             status += " " + proginfo->title;
             status += "\n";
             status += proginfo->subtitle;
@@ -1080,7 +1079,7 @@ void StatusBox::doLogEntries(void)
 {
     QString line;
     int count = 0;
- 
+
     doScroll = true;
 
     contentLines.clear();
@@ -1136,7 +1135,7 @@ void StatusBox::doLogEntries(void)
         contentLines[count++] = QObject::tr("Use 1-8 to change priority "
                                             "level.");
     }
-      
+
     contentTotalLines = count;
     if (contentPos > (contentTotalLines - 1))
         contentPos = contentTotalLines - 1;
@@ -1284,7 +1283,7 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
     {
         const QString pro =
                 tail.arg(it.key()).arg((int)((float)it.data() / 1024.0));
-        
+
         long long bytesPerMin = (it.data() >> 1) * 15;
         uint minLeft = ((free<<5)/bytesPerMin)<<5;
         minLeft = (minLeft/15)*15;
@@ -1385,7 +1384,7 @@ void StatusBox::getActualRecordedBPS(QString hostnames)
 
 /** \fn StatusBox::doMachineStatus()
  *  \brief Show machine status.
- *  
+ *
  *   This returns statisics for master backend when using
  *   a frontend only machine. And returns info on the current
  *   system if frontend is running on a backend machine.
@@ -1530,7 +1529,7 @@ void StatusBox::doMachineStatus()
 
     // get free disk space
     QString hostnames;
-    
+
     vector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
     for (uint i=0; i<fsInfos.size(); i++)
     {
@@ -1560,7 +1559,7 @@ void StatusBox::doMachineStatus()
         }
         else
         {
-            contentLines[count] = 
+            contentLines[count] =
                 QObject::tr("MythTV Drive #%1:")
                             .arg(fsInfos[i].fsID);
             detailString += contentLines[count] + "\n";
@@ -1635,7 +1634,7 @@ void StatusBox::doAutoExpireList()
     for (it = expList.begin(); it != expList.end(); it++)
     {
         pginfo = *it;
-       
+
         totalSize += pginfo->filesize;
         if (pginfo->recgroup == "LiveTV")
         {

@@ -13,7 +13,7 @@ using namespace std;
 
 // libmyth headers
 #include "mythcontext.h"
-#include "mythdbcon.h"
+#include "mythdb.h"
 
 // filldata headers
 #include "fillutil.h"
@@ -143,7 +143,7 @@ void RunSimpleQuery(const QString &query)
 {
     MSqlQuery q(MSqlQuery::InitCon());
     if (!q.exec(query))
-        MythContext::DBError("RunSimpleQuery ", q);
+        MythDB::DBError("RunSimpleQuery ", q);
 }
 
 void IconData::UpdateSourceIcons(int sourceid)
@@ -163,7 +163,7 @@ void IconData::UpdateSourceIcons(int sourceid)
     query.bindValue(":NOICON", "none");
 
     if (!query.exec())
-        MythContext::DBError("Looking for icons to fetch", query);
+        MythDB::DBError("Looking for icons to fetch", query);
 
     if (query.isActive() && query.size() > 0)
     {
@@ -203,7 +203,7 @@ void IconData::UpdateSourceIcons(int sourceid)
                 icon_update_query.bindValue(":SOURCEID", sourceid);
 
                 if (!icon_update_query.exec())
-                    MythContext::DBError("Setting the icon file name",
+                    MythDB::DBError("Setting the icon file name",
                             icon_update_query);
             }
             else
@@ -262,7 +262,7 @@ void IconData::ImportIconMap(const QString &filename)
                         nm_query.bindValue(":NETWORK", net.stripWhiteSpace());
                         nm_query.bindValue(":URL", u.stripWhiteSpace());
                         if (!nm_query.exec())
-                            MythContext::DBError(
+                            MythDB::DBError(
                                     "Inserting network->url mapping", nm_query);
                     }
                     else if (e.tagName() == IM_CS_TO_NET_TAG)
@@ -273,7 +273,7 @@ void IconData::ImportIconMap(const QString &filename)
                         cm_query.bindValue(":CALLSIGN", cs.stripWhiteSpace());
                         cm_query.bindValue(":NETWORK", net.stripWhiteSpace());
                         if (!cm_query.exec())
-                            MythContext::DBError("Inserting callsign->network "
+                            MythDB::DBError("Inserting callsign->network "
                                     "mapping", cm_query);
                     }
                     else if (e.tagName() == IM_BASEURL_TAG)
@@ -302,7 +302,7 @@ void IconData::ImportIconMap(const QString &filename)
                         qr->bindValue(":URL", u);
 
                         if (!qr->exec())
-                            MythContext::DBError(
+                            MythDB::DBError(
                                     "Inserting callsign->network mapping", *qr);
                     }
                 }
@@ -446,7 +446,7 @@ void IconData::ResetIconMap(bool reset_icons)
     query.prepare("DELETE FROM settings WHERE value LIKE :URLMAPLIKE");
     query.bindValue(":URLMAPLIKE", QString(BASEURLMAP_START) + '%');
     if (!query.exec())
-        MythContext::DBError("ResetIconMap", query);
+        MythDB::DBError("ResetIconMap", query);
 
     RunSimpleQuery("TRUNCATE TABLE callsignnetworkmap;");
     RunSimpleQuery("TRUNCATE TABLE networkiconmap");

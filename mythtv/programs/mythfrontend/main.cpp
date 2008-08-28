@@ -219,7 +219,7 @@ void startCustomPriority(void)
 
 void startPlaybackWithGroup(QString recGroup = "")
 {
-    PlaybackBox pbb(PlaybackBox::Play, gContext->GetMainWindow(), 
+    PlaybackBox pbb(PlaybackBox::Play, gContext->GetMainWindow(),
                     "tvplayselect");
 
     if (recGroup != "")
@@ -235,7 +235,7 @@ void startPlayback(void)
 
 void startDelete(void)
 {
-    PlaybackBox delbox(PlaybackBox::Delete, gContext->GetMainWindow(), 
+    PlaybackBox delbox(PlaybackBox::Delete, gContext->GetMainWindow(),
                        "tvplayselect");
     delbox.exec();
 }
@@ -352,7 +352,7 @@ void TVMenuCallback(void *data, QString &selection)
         startSearchTime();
     else if (sel == "tv_previous")
         startPrevious();
-    else if (sel == "settings appearance") 
+    else if (sel == "settings appearance")
     {
         AppearanceSettings *settings = new AppearanceSettings();
         DialogCode res = settings->exec();
@@ -363,61 +363,61 @@ void TVMenuCallback(void *data, QString &selection)
             qApp->processEvents();
             GetMythMainWindow()->JumpTo("Reload Theme");
         }
-    } 
+    }
 
     else if (sel == "screensetupwizard")
     {
        startAppearWiz();
     }
 
-    else if (sel == "settings recording") 
+    else if (sel == "settings recording")
     {
         ProfileGroupEditor editor;
         editor.exec();
-    } 
-    else if (sel == "settings playgroup") 
+    }
+    else if (sel == "settings playgroup")
     {
         PlayGroupEditor editor;
         editor.exec();
-    } 
-    else if (sel == "settings general") 
+    }
+    else if (sel == "settings general")
     {
         GeneralSettings settings;
         settings.exec();
-    } 
-    else if (sel == "settings maingeneral") 
+    }
+    else if (sel == "settings maingeneral")
     {
         MainGeneralSettings mainsettings;
         mainsettings.exec();
         menu->ReloadExitKey();
         QStringList strlist( QString("REFRESH_BACKEND") );
         gContext->SendReceiveStringList(strlist);
-    } 
-    else if (sel == "settings playback") 
+    }
+    else if (sel == "settings playback")
     {
         PlaybackSettings settings;
         settings.exec();
-    } 
-    else if (sel == "settings osd") 
+    }
+    else if (sel == "settings osd")
     {
         OSDSettings settings;
         settings.exec();
-    } 
-    else if (sel == "settings epg") 
+    }
+    else if (sel == "settings epg")
     {
         EPGSettings settings;
         settings.exec();
-    } 
-    else if (sel == "settings generalrecpriorities") 
+    }
+    else if (sel == "settings generalrecpriorities")
     {
         GeneralRecPrioritiesSettings settings;
         settings.exec();
-    } 
-    else if (sel == "settings channelrecpriorities") 
+    }
+    else if (sel == "settings channelrecpriorities")
     {
         startChannelRecPriorities();
     }
-    else if (sel == "settings custompriority") 
+    else if (sel == "settings custompriority")
     {
         startCustomPriority();
     }
@@ -451,6 +451,16 @@ int handleExit(void)
 
     // first of all find out, if this is a frontend only host...
     bool frontendOnly = gContext->IsFrontendOnly();
+
+// That may have triggered a popup when it failed to communicate
+// with a local backend. We don't care, so just delete it.
+    MythScreenStack  *ss = GetMythMainWindow()->GetStack("popup stack");
+    while (ss->TotalScreens())
+    {
+puts("Popping a screen we don't care about");
+        ss->PopScreen();
+    }
+
 
     // how do you want to quit today?
     int  exitMenuStyle = gContext->GetNumSetting("OverrideExitMenu", 0);
@@ -556,7 +566,7 @@ int handleExit(void)
 
 void haltnow()
 {
-    QString halt_cmd = gContext->GetSetting("HaltCommand", 
+    QString halt_cmd = gContext->GetSetting("HaltCommand",
                                             "sudo /sbin/halt -p");
     if (!halt_cmd.isEmpty())
     {
@@ -565,10 +575,10 @@ void haltnow()
     }
 }
 
-void rebootnow() 
-{ 
-    QString reboot_cmd = gContext->GetSetting("RebootCommand", 
-                                            "sudo /sbin/reboot"); 
+void rebootnow()
+{
+    QString reboot_cmd = gContext->GetSetting("RebootCommand",
+                                              "sudo /sbin/reboot");
     if (!reboot_cmd.isEmpty())
     {
         QByteArray tmp = reboot_cmd.toAscii();
@@ -580,10 +590,10 @@ bool RunMenu(QString themedir)
 {
     QByteArray tmp = themedir.toLocal8Bit();
     menu = new MythThemedMenu(
-        QString(tmp.constData()), "mainmenu.xml", 
+        QString(tmp.constData()), "mainmenu.xml",
         GetMythMainWindow()->GetMainStack(), "mainmenu");
     menu->setCallback(TVMenuCallback, gContext);
-   
+
     if (menu->foundTheme())
     {
         GetMythMainWindow()->GetMainStack()->AddScreen(menu);
@@ -592,11 +602,11 @@ bool RunMenu(QString themedir)
 
     cerr << "Couldn't find theme " << tmp.constData() << endl;
     return false;
-}   
+}
 
 // If any settings are missing from the database, this will write
 // the default values
-void WriteDefaults() 
+void WriteDefaults()
 {
     PlaybackSettings ps;
     ps.Load();
@@ -650,7 +660,7 @@ QString RandTheme(QString &themename)
             themelist.append(theme.fileName());
     }
 
-    if (themelist.size()) 
+    if (themelist.size())
         themename = themelist[rand() % themelist.size()];
 
     gContext->SaveSetting("Theme", themename);
@@ -658,12 +668,12 @@ QString RandTheme(QString &themename)
     return themename;
 }
 
-int internal_play_media(const QString &mrl, const QString &plot, 
-                        const QString &title, const QString &director, 
-                        int lenMins, const QString &year) 
+int internal_play_media(const QString &mrl, const QString &plot,
+                        const QString &title, const QString &director,
+                        int lenMins, const QString &year)
 {
-    int res = -1; 
-  
+    int res = -1;
+
     QFile checkFile(mrl);
     if (!checkFile.exists() && !mrl.startsWith("dvd:"))
     {
@@ -694,19 +704,19 @@ int internal_play_media(const QString &mrl, const QString &plot,
     {
         pginfo->pathname = QString("dvd:%1").arg(mrl);
     }
-    
+
     pginfo->description = plot;
-    
+
     if (director.length())
         pginfo->subtitle = QString( "%1: %2" ).arg(QObject::tr("Directed By")).arg(director);
-    
+
     pginfo->title = title;
 
     if (pginfo->pathname.startsWith("dvd:"))
     {
         bool allowdvdbookmark = gContext->GetNumSetting("EnableDVDBookmark", 0);
         pginfo->setIgnoreBookmark(!allowdvdbookmark);
-        if (allowdvdbookmark && 
+        if (allowdvdbookmark &&
             gContext->GetNumSetting("DVDBookmarkPrompt", 0))
         {
             RingBuffer *tmprbuf = new RingBuffer(pginfo->pathname, false);
@@ -726,7 +736,7 @@ int internal_play_media(const QString &mrl, const QString &plot,
                         QString msg = QObject::tr("DVD contains a bookmark");
                         QString btn0msg = QObject::tr("Play from bookmark");
                         QString btn1msg = QObject::tr("Play from beginning");
-        
+
                         DialogCode ret = MythPopupBox::Show2ButtonPopup(
                             gContext->GetMainWindow(),
                             "", msg,
@@ -749,12 +759,12 @@ int internal_play_media(const QString &mrl, const QString &plot,
     }
 
     TV::StartTV(pginfo);
-    
+
     res = 0;
-    
+
     sleep(1);
     delete pginfo;
-    
+
     return res;
 }
 
@@ -783,7 +793,7 @@ void reloadTheme(void)
         exit(FRONTEND_BUGGY_EXIT_NO_THEME);
 
     LCD::SetupLCD();
-    if (LCD *lcd = LCD::Get()) 
+    if (LCD *lcd = LCD::Get())
     {
         lcd->setupLEDs(RemoteGetRecordingMask);
         lcd->resetServer();
@@ -802,7 +812,7 @@ void InitJumpPoints(void)
     REG_JUMPLOC("Program Guide", "", "", startGuide, "GUIDE");
     REG_JUMPLOC("Program Finder", "", "", startFinder, "FINDER");
     //REG_JUMP("Search Listings", "", "", startSearch);
-    REG_JUMPLOC("Manage Recordings / Fix Conflicts", "", "", 
+    REG_JUMPLOC("Manage Recordings / Fix Conflicts", "", "",
                 startManaged, "VIEWSCHEDULED");
     REG_JUMP("Program Recording Priorities", "", "", startProgramRecPriorities);
     REG_JUMP("Channel Recording Priorities", "", "", startChannelRecPriorities);
@@ -836,9 +846,9 @@ void signal_USR1_handler(int){
       gContext->ActivateSettingsCache(true);
 }
 
-int internal_media_init() 
+int internal_media_init()
 {
-    REG_MEDIAPLAYER("Internal", "MythTV's native media player.", 
+    REG_MEDIAPLAYER("Internal", "MythTV's native media player.",
                     internal_play_media);
     return 0;
 }
@@ -849,15 +859,15 @@ static void *run_priv_thread(void *data)
                             .arg(getuid()).arg(geteuid()));
 
     (void)data;
-    while (true) 
+    while (true)
     {
         gContext->waitPrivRequest();
-        
-        for (MythPrivRequest req = gContext->popPrivRequest(); 
-             true; req = gContext->popPrivRequest()) 
+
+        for (MythPrivRequest req = gContext->popPrivRequest();
+             true; req = gContext->popPrivRequest())
         {
             bool done = false;
-            switch (req.getType()) 
+            switch (req.getType())
             {
             case MythPrivRequest::MythRealtime:
                 if (gContext->GetNumSetting("RealtimePriority", 1))
@@ -869,7 +879,7 @@ static void *run_priv_thread(void *data)
                     {
                         int status = pthread_setschedparam(
                             *target_thread, SCHED_FIFO, &sp);
-                        if (status) 
+                        if (status)
                         {
                             // perror("pthread_setschedparam");
                             VERBOSE(VB_GENERAL, "Realtime priority would require SUID as root.");
@@ -1232,7 +1242,7 @@ int main(int argc, char **argv)
     int status = pthread_create(&priv_thread, NULL, run_priv_thread, NULL);
     VERBOSE(VB_PLAYBACK, QString("user: %1 effective user: %2 after "
                             "privileged thread").arg(getuid()).arg(geteuid()));
-    if (status) 
+    if (status)
     {
         VERBOSE(VB_IMPORTANT, QString("Warning: ") +
                 "Failed to create priveledged thread." + ENO);
@@ -1243,7 +1253,7 @@ int main(int argc, char **argv)
     if (!UpgradeTVDatabaseSchema(upgradeAllowed))
     {
         VERBOSE(VB_IMPORTANT,
-                "Couldn't upgrade database to new schema, exiting."); 
+                "Couldn't upgrade database to new schema, exiting.");
         cleanup();
         return FRONTEND_EXIT_DB_OUTOFDATE;
     }
@@ -1320,7 +1330,7 @@ int main(int argc, char **argv)
             cleanup();
             return FRONTEND_EXIT_OK;
         }
-        else 
+        else
         {
             pluginname = "myth" + pluginname;
             if (pmanager->run_plugin(pluginname))
@@ -1375,6 +1385,7 @@ int main(int argc, char **argv)
 
         qApp->setMainWidget(mainWindow);
         qApp->exec();
+puts("Leaving qApp->exec()");
     } while (!(exitstatus = handleExit()));
 
     if (exitstatus == HALT)

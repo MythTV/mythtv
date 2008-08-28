@@ -22,9 +22,9 @@ using namespace std;
 #include <QEvent>
 
 // MythTV headers
-#include "exitcodes.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/exitcodes.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythdb.h"
 #include "NuppelVideoPlayer.h"
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
@@ -599,7 +599,7 @@ int FlagCommercials(
 
         if (!query.exec())
         {
-            MythContext::DBError("FlagCommercials", query);
+            MythDB::DBError("FlagCommercials", query);
         }
         else if (query.next())
         {
@@ -836,7 +836,7 @@ int main(int argc, char *argv[])
                         "Missing or invalid parameters for --chanid option");
                 return COMMFLAG_EXIT_INVALID_CHANID;
             }
-            
+
             chanid += a.argv()[++argpos];
         }
         else if (!strcmp(a.argv()[argpos],"-s") ||
@@ -849,7 +849,7 @@ int main(int argc, char *argv[])
                         "Missing or invalid parameters for --starttime option");
                 return COMMFLAG_EXIT_INVALID_STARTTIME;
             }
-            
+
             starttime += a.argv()[++argpos];
         }
         else if (!strcmp(a.argv()[argpos],"-f") ||
@@ -980,7 +980,7 @@ int main(int argc, char *argv[])
                 cerr << "Missing or invalid parameter for --allstart\n";
                 return COMMFLAG_EXIT_INVALID_STARTTIME;
             }
-            
+
             allStart = a.argv()[++argpos];
         }
         else if (!strcmp(a.argv()[argpos], "--allend"))
@@ -991,7 +991,7 @@ int main(int argc, char *argv[])
                 cerr << "Missing or invalid parameter for --allend\n";
                 return COMMFLAG_EXIT_INVALID_STARTTIME;
             }
-            
+
             allEnd = a.argv()[++argpos];
         }
         else if (!strcmp(a.argv()[argpos], "--quiet"))
@@ -1452,7 +1452,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            MythContext::DBError("Querying recorded programs", query);
+            MythDB::DBError("Querying recorded programs", query);
             return COMMFLAG_EXIT_DB_ERROR;
         }
     }

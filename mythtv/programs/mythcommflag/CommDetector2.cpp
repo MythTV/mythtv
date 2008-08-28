@@ -3,6 +3,7 @@
 
 // ANSI C headers
 #include <cmath>
+#include <cerrno>
 
 // C++ headers
 #include <algorithm>
@@ -13,10 +14,10 @@ using namespace std;
 #include <QFileInfo>
 
 // MythTV headers
-#include "mythcontext.h"
+#include "libmythdb/compat.h"
+#include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 #include "NuppelVideoPlayer.h"
-#include "mythdbcon.h"
-#include "compat.h"
 #include "programinfo.h"
 #include "channelutil.h"
 
@@ -227,8 +228,7 @@ QString debugDirectory(int chanid, const QDateTime& recstartts)
     query.exec();
     if (query.size() <= 0 || !query.next())
     {
-        MythContext::DBError("Error in CommDetector2::CommDetector2",
-                query);
+        MythDB::DBError("Error in CommDetector2::CommDetector2", query);
         return "";
     }
 
@@ -549,7 +549,7 @@ bool CommDetector2::go(void)
 
     QTime totalFlagTime;
     totalFlagTime.start();
-    
+
     /* If still recording, estimate the eventual total number of frames. */
     long long nframes = isRecording ?
         (long long)roundf((recstartts.secsTo(recendts) + 5) *

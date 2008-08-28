@@ -33,7 +33,7 @@ using namespace std;
 #include "housekeeper.h"
 
 #include "mythcontext.h"
-#include "mythdbcon.h"
+#include "mythdb.h"
 #include "exitcodes.h"
 #include "compat.h"
 #include "storagegroup.h"
@@ -76,7 +76,7 @@ bool setupTVs(bool ismaster, bool &error)
                         "DATE_FORMAT(starttime, '%Y%m%d%H%i00'), '_', "
                         "DATE_FORMAT(endtime, '%Y%m%d%H%i00'), '.nuv') "
                         "WHERE basename = '';"))
-            MythContext::DBError("Updating record basename",
+            MythDB::DBError("Updating record basename",
                                  query.lastQuery());
 
         // Hack to make sure record.station gets set if the user
@@ -84,8 +84,7 @@ bool setupTVs(bool ismaster, bool &error)
         // without it.
         if (!query.exec("UPDATE channel SET callsign=chanid "
                         "WHERE callsign IS NULL OR callsign='';"))
-            MythContext::DBError("Updating channel callsign",
-                                 query.lastQuery());
+            MythDB::DBError("Updating channel callsign", query.lastQuery());
 
         if (query.exec("SELECT MIN(chanid) FROM channel;"))
         {
@@ -93,18 +92,16 @@ bool setupTVs(bool ismaster, bool &error)
             int min_chanid = query.value(0).toInt();
             if (!query.exec(QString("UPDATE record SET chanid = %1 "
                                     "WHERE chanid IS NULL;").arg(min_chanid)))
-                MythContext::DBError("Updating record chanid",
-                                     query.lastQuery());
+                MythDB::DBError("Updating record chanid", query.lastQuery());
         }
         else
-            MythContext::DBError("Querying minimum chanid",
-                                 query.lastQuery());
+            MythDB::DBError("Querying minimum chanid", query.lastQuery());
 
         MSqlQuery records_without_station(MSqlQuery::InitCon());
         records_without_station.prepare("SELECT record.chanid,"
                 " channel.callsign FROM record LEFT JOIN channel"
                 " ON record.chanid = channel.chanid WHERE record.station='';");
-        records_without_station.exec(); 
+        records_without_station.exec();
         if (records_without_station.first())
         {
             MSqlQuery update_record(MSqlQuery::InitCon());
@@ -118,7 +115,7 @@ bool setupTVs(bool ismaster, bool &error)
                         records_without_station.value(0));
                 if (!update_record.exec())
                 {
-                    MythContext::DBError("Updating record station",
+                    MythDB::DBError("Updating record station",
                             update_record.lastQuery());
                 }
             } while (records_without_station.next());
@@ -130,7 +127,7 @@ bool setupTVs(bool ismaster, bool &error)
             "FROM capturecard "
             "ORDER BY cardid"))
     {
-        MythContext::DBError("Querying Recorders", query);
+        MythDB::DBError("Querying Recorders", query);
         return false;
     }
 
@@ -224,7 +221,7 @@ bool setupTVs(bool ismaster, bool &error)
                 "Perhaps you should re-read the installation instructions?");
 
         gContext->LogEntry("mythbackend", LP_CRITICAL,
-                           "No capture cards are defined", 
+                           "No capture cards are defined",
                            "Please run the setup program.");
         return false;
     }
@@ -232,7 +229,7 @@ bool setupTVs(bool ismaster, bool &error)
     return true;
 }
 
-void cleanup(void) 
+void cleanup(void)
 {
     if (sched)
     {
@@ -481,7 +478,7 @@ int main(int argc, char **argv)
                     ++argpos;
                 }
             }
-        } 
+        }
         else if (!strcmp(a.argv()[argpos],"-p") ||
                  !strcmp(a.argv()[argpos],"--pidfile"))
         {
@@ -492,13 +489,13 @@ int main(int argc, char **argv)
                 {
                     cerr << "Invalid or missing argument to -p/--pidfile option\n";
                     return BACKEND_EXIT_INVALID_CMDLINE;
-                } 
+                }
                 else
                 {
                    ++argpos;
                 }
             }
-        } 
+        }
         else if (!strcmp(a.argv()[argpos],"-d") ||
                  !strcmp(a.argv()[argpos],"--daemon"))
         {
@@ -515,29 +512,29 @@ int main(int argc, char **argv)
                     return BACKEND_EXIT_INVALID_CMDLINE;
 
                 ++argpos;
-            } 
+            }
             else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
                 return BACKEND_EXIT_INVALID_CMDLINE;
             }
-        } 
+        }
         else if (!strcmp(a.argv()[argpos],"--printsched"))
         {
             printsched = true;
-        } 
+        }
         else if (!strcmp(a.argv()[argpos],"--testsched"))
         {
             testsched = true;
-        } 
+        }
         else if (!strcmp(a.argv()[argpos],"--resched"))
         {
             resched = true;
-        } 
+        }
         else if (!strcmp(a.argv()[argpos],"--nosched"))
         {
             nosched = true;
-        } 
+        }
         else if (!strcmp(a.argv()[argpos],"--noupnp"))
         {
             noupnp = true;
@@ -549,15 +546,15 @@ int main(int argc, char **argv)
         else if (!strcmp(a.argv()[argpos],"--nojobqueue"))
         {
             nojobqueue = true;
-        } 
+        }
         else if (!strcmp(a.argv()[argpos],"--nohousekeeper"))
         {
             nohousekeeper = true;
-        } 
+        }
         else if (!strcmp(a.argv()[argpos],"--noautoexpire"))
         {
             noexpirer = true;
-        } 
+        }
         else if (!strcmp(a.argv()[argpos],"--printexpire"))
         {
             printexpire = "ALL";
@@ -566,11 +563,11 @@ int main(int argc, char **argv)
                 printexpire = a.argv()[argpos+1];
                 ++argpos;
             }
-        } 
+        }
         else if (!strcmp(a.argv()[argpos],"--clearcache"))
         {
             clearsettingscache = true;
-        } 
+        }
         else if (!strcmp(a.argv()[argpos],"--generate-preview"))
         {
             QString tmp = QString::null;
@@ -711,7 +708,7 @@ int main(int argc, char **argv)
         else
             signal(SIGHUP, &log_rotate_handler);
     }
-    
+
     ofstream pidfs;
     if (pidfile != "")
     {
@@ -796,7 +793,7 @@ int main(int argc, char **argv)
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema");
         cleanup();
         return BACKEND_EXIT_DB_OUTOFDATE;
-    }    
+    }
 
     close(0);
 
@@ -899,7 +896,7 @@ int main(int argc, char **argv)
     // Get any initial housekeeping done before we fire up anything else
     if (nohousekeeper)
     {
-        VERBOSE(VB_IMPORTANT, LOC_WARN + 
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "****** The Housekeeper has been DISABLED with "
                 "the --nohousekeeper option ******");
     }
@@ -952,7 +949,7 @@ int main(int argc, char **argv)
     else
         jobqueue = new JobQueue(ismaster);
 
-    // Start UPnP Services 
+    // Start UPnP Services
 
     g_pUPnp = new MediaServer( ismaster, noupnp );
 
@@ -985,7 +982,7 @@ int main(int argc, char **argv)
     }
 
     StorageGroup::CheckAllStorageGroupDirs();
- 
+
     a.exec();
 
     gContext->LogEntry("mythbackend", LP_INFO, "MythBackend exiting", "");

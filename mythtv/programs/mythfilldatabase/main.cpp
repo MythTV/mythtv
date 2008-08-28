@@ -11,7 +11,7 @@ using namespace std;
 // libmyth headers
 #include "exitcodes.h"
 #include "mythcontext.h"
-#include "mythdbcon.h"
+#include "mythdb.h"
 
 // libmythtv headers
 #include "scheduledrecording.h"
@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
         {
             fill_data.SetRefresh(FillData::kRefreshAll, true);
         }
-	else if (!strcmp(a.argv()[argpos], "--refresh-day"))
+        else if (!strcmp(a.argv()[argpos], "--refresh-day"))
         {
             if (((argpos + 1) >= a.argc()))
             {
@@ -249,10 +249,10 @@ int main(int argc, char *argv[])
             {
                 printf("ignoring invalid parameter for --refresh-day\n");
             }
-	    else
-	    {
+            else
+            {
                 fill_data.SetRefresh(day, true);
-	    }
+            }
         }
         else if (!strcmp(a.argv()[argpos], "--dont-refresh-tba"))
         {
@@ -272,7 +272,7 @@ int main(int argc, char *argv[])
                     return GENERIC_EXIT_INVALID_CMDLINE;
 
                 ++argpos;
-            } 
+            }
             else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
@@ -369,7 +369,7 @@ int main(int argc, char *argv[])
             cout << "--update\n";
             cout << "   For running non-destructive updates on the database for\n";
             cout << "   users in xmltv zones that do not provide channel data\n";
-            cout << "   Stops the addition of new channels and the changing of channel icons.\n"; 
+            cout << "   Stops the addition of new channels and the changing of channel icons.\n";
             cout << "\n";
             cout << "--preset\n";
             cout << "   Use it in case that you want to assign a preset number for\n";
@@ -437,7 +437,7 @@ int main(int argc, char *argv[])
             cout << "--refresh-today\n";
             cout << "--refresh-second\n";
             cout << "--refresh-all\n";
-	    cout << "--refresh-day <number>";
+            cout << "--refresh-day <number>";
             cout << "   (Only valid for selected grabbers: e.g. DataDirect)\n";
             cout << "   Force a refresh today, two days, every day, or a specific day from now,\n";
             cout << "   to catch the latest changes\n";
@@ -650,7 +650,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-             MythContext::DBError("loading channel sources", sourcequery);
+             MythDB::DBError("loading channel sources", sourcequery);
              delete gContext;
              return FILLDB_EXIT_DB_ERROR;
         }

@@ -3,7 +3,6 @@
 #include <q3buttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
-#include <qsqldatabase.h>
 #include <qdatetime.h>
 #include <qapplication.h>
 #include <qregexp.h>
@@ -24,10 +23,9 @@ using namespace std;
 #include "proglist.h"
 #include "tv.h"
 
-#include "exitcodes.h"
-#include "dialogbox.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmyth/dialogbox.h"
+#include "libmythdb/exitcodes.h"
+#include "libmythdb/mythdb.h"
 #include "remoteutil.h"
 #include "mythuihelper.h"
 
@@ -41,7 +39,7 @@ ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) : ProgramInfo()
     avg_delay = 0;
     autoRecPriority = 0;
 }
-ProgramRecPriorityInfo::ProgramRecPriorityInfo(const ProgramRecPriorityInfo &other) 
+ProgramRecPriorityInfo::ProgramRecPriorityInfo(const ProgramRecPriorityInfo &other)
                       : ProgramInfo::ProgramInfo(other)
 {
     recTypeRecPriority = other.recTypeRecPriority;
@@ -90,7 +88,7 @@ ProgramRecPriorityInfo& ProgramRecPriorityInfo::operator=(const ProgramInfo &oth
     return(*this);
 }
 
-ProgramRecPriority::ProgramRecPriority(MythMainWindow *parent, 
+ProgramRecPriority::ProgramRecPriority(MythMainWindow *parent,
                              const char *name)
             : MythDialog(parent, name)
 {
@@ -152,11 +150,11 @@ ProgramRecPriority::ProgramRecPriority(MythMainWindow *parent,
     updateBackground();
 
     FillList();
-    sortType = (SortType)gContext->GetNumSetting("ProgramRecPrioritySorting", 
+    sortType = (SortType)gContext->GetNumSetting("ProgramRecPrioritySorting",
                                                  (int)byTitle);
     reverseSort = gContext->GetNumSetting("ProgramRecPriorityReverse", 0);
 
-    SortList(); 
+    SortList();
     inList = inData = 0;
     setNoErase();
 
@@ -413,7 +411,7 @@ void ProgramRecPriority::paintEvent(QPaintEvent *e)
 {
     QRect r = e->rect();
     QPainter p(this);
- 
+
     if (r.intersects(listRect))
     {
         updateList(&p);
@@ -551,7 +549,7 @@ void ProgramRecPriority::edit(void)
         }
 
         // We need to refetch the recording priority values since the Advanced
-        // Recording Options page could've been used to change them 
+        // Recording Options page could've been used to change them
 
         if (!recid)
             recid = rec->getRecordID();
@@ -575,40 +573,40 @@ void ProgramRecPriority::edit(void)
 
                 // iterate through programData till we hit the line where
                 // the cursor currently is
-                for (cnt = 0, it = programData.begin(); cnt < inList+inData; 
+                for (cnt = 0, it = programData.begin(); cnt < inList+inData;
                      cnt++, ++it);
                 progInfo = &(it.data());
-           
+
                 int rtRecPriors[11];
                 rtRecPriors[0] = 0;
-                rtRecPriors[kSingleRecord] = 
+                rtRecPriors[kSingleRecord] =
                     gContext->GetNumSetting("SingleRecordRecPriority", 1);
-                rtRecPriors[kTimeslotRecord] = 
+                rtRecPriors[kTimeslotRecord] =
                     gContext->GetNumSetting("TimeslotRecordRecPriority", 0);
-                rtRecPriors[kChannelRecord] = 
+                rtRecPriors[kChannelRecord] =
                     gContext->GetNumSetting("ChannelRecordRecPriority", 0);
-                rtRecPriors[kAllRecord] = 
+                rtRecPriors[kAllRecord] =
                     gContext->GetNumSetting("AllRecordRecPriority", 0);
-                rtRecPriors[kWeekslotRecord] = 
+                rtRecPriors[kWeekslotRecord] =
                     gContext->GetNumSetting("WeekslotRecordRecPriority", 0);
-                rtRecPriors[kFindOneRecord] = 
+                rtRecPriors[kFindOneRecord] =
                     gContext->GetNumSetting("FindOneRecordRecPriority", -1);
-                rtRecPriors[kOverrideRecord] = 
+                rtRecPriors[kOverrideRecord] =
                     gContext->GetNumSetting("OverrideRecordRecPriority", 0);
-                rtRecPriors[kDontRecord] = 
+                rtRecPriors[kDontRecord] =
                     gContext->GetNumSetting("OverrideRecordRecPriority", 0);
-                rtRecPriors[kFindDailyRecord] = 
+                rtRecPriors[kFindDailyRecord] =
                     gContext->GetNumSetting("FindOneRecordRecPriority", -1);
-                rtRecPriors[kFindWeeklyRecord] = 
+                rtRecPriors[kFindWeeklyRecord] =
                     gContext->GetNumSetting("FindOneRecordRecPriority", -1);
 
-                // set the recording priorities of that program 
+                // set the recording priorities of that program
                 progInfo->recpriority = recPriority;
                 progInfo->recType = (RecordingType)rectype;
                 progInfo->recTypeRecPriority = rtRecPriors[progInfo->recType];
-                // also set the origRecPriorityData with new recording 
+                // also set the origRecPriorityData with new recording
                 // priority so we don't save to db again when we exit
-                origRecPriorityData[progInfo->recordid] = 
+                origRecPriorityData[progInfo->recordid] =
                                                         progInfo->recpriority;
                 // also set the active/inactive state
                 progInfo->recstatus = inactive ? rsInactive : rsUnknown;
@@ -620,7 +618,7 @@ void ProgramRecPriority::edit(void)
                 RemoveCurItemFromList();
             }
         else
-            MythContext::DBError("Get new recording priority query", query);
+            MythDB::DBError("Get new recording priority query", query);
 
         countMatches();
         update(fullRect);
@@ -664,10 +662,10 @@ void ProgramRecPriority::remove(void)
     {
         record->remove();
 
-        RemoveCurItemFromList(); 
+        RemoveCurItemFromList();
 
-        countMatches(); 
-        update(fullRect); 
+        countMatches();
+        update(fullRect);
 
         ScheduledRecording::signalChange(recid);
     }
@@ -719,7 +717,7 @@ void ProgramRecPriority::deactivate(void)
                     progInfo = &(it.data());
                     progInfo->recstatus = inactive ? rsInactive : rsUnknown;
                 } else
-                    MythContext::DBError("Update recording schedule inactive query", query);
+                    MythDB::DBError("Update recording schedule inactive query", query);
             }
 
         update(fullRect);
@@ -758,12 +756,12 @@ void ProgramRecPriority::details(void)
     curitem->showDetails();
 }
 
-void ProgramRecPriority::changeRecPriority(int howMuch) 
+void ProgramRecPriority::changeRecPriority(int howMuch)
 {
     int tempRecPriority, cnt;
     QMap<QString, ProgramRecPriorityInfo>::Iterator it;
     ProgramRecPriorityInfo *progInfo;
- 
+
     // iterate through programData till we hit the line where
     // the cursor currently is
     for (cnt = 0, it = programData.begin(); cnt < inList+inData; cnt++, ++it);
@@ -771,7 +769,7 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
 
     // inc/dec recording priority
     tempRecPriority = progInfo->recpriority + howMuch;
-    if (tempRecPriority > -100 && tempRecPriority < 100) 
+    if (tempRecPriority > -100 && tempRecPriority < 100)
     {
         progInfo->recpriority = tempRecPriority;
 
@@ -782,14 +780,14 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
     }
 }
 
-void ProgramRecPriority::saveRecPriority(void) 
+void ProgramRecPriority::saveRecPriority(void)
 {
     QMap<QString, ProgramRecPriorityInfo>::Iterator it;
 
-    for (it = programData.begin(); it != programData.end(); ++it) 
+    for (it = programData.begin(); it != programData.end(); ++it)
     {
         ProgramRecPriorityInfo *progInfo = &(it.data());
-        int key = progInfo->recordid; 
+        int key = progInfo->recordid;
 
         // if this program's recording priority changed from when we entered
         // save new value out to db
@@ -815,7 +813,7 @@ void ProgramRecPriority::FillList(void)
     {
         programData[QString::number(cnt)] = *(*pgiter);
 
-        // save recording priority value in map so we don't have to 
+        // save recording priority value in map so we don't have to
         // save all program's recording priority values when we exit
         origRecPriorityData[(*pgiter)->recordid] = (*pgiter)->recpriority;
 
@@ -829,27 +827,27 @@ void ProgramRecPriority::FillList(void)
 
     // get all the recording type recording priority values
     rtRecPriors[0] = 0;
-    rtRecPriors[kSingleRecord] = 
+    rtRecPriors[kSingleRecord] =
         gContext->GetNumSetting("SingleRecordRecPriority", 1);
-    rtRecPriors[kTimeslotRecord] = 
+    rtRecPriors[kTimeslotRecord] =
         gContext->GetNumSetting("TimeslotRecordRecPriority", 0);
-    rtRecPriors[kChannelRecord] = 
+    rtRecPriors[kChannelRecord] =
         gContext->GetNumSetting("ChannelRecordRecPriority", 0);
-    rtRecPriors[kAllRecord] = 
+    rtRecPriors[kAllRecord] =
         gContext->GetNumSetting("AllRecordRecPriority", 0);
-    rtRecPriors[kWeekslotRecord] = 
+    rtRecPriors[kWeekslotRecord] =
         gContext->GetNumSetting("WeekslotRecordRecPriority", 0);
-    rtRecPriors[kFindOneRecord] = 
+    rtRecPriors[kFindOneRecord] =
         gContext->GetNumSetting("FindOneRecordRecPriority", -1);
-    rtRecPriors[kOverrideRecord] = 
+    rtRecPriors[kOverrideRecord] =
         gContext->GetNumSetting("OverrideRecordRecPriority", 0);
-    rtRecPriors[kDontRecord] = 
+    rtRecPriors[kDontRecord] =
         gContext->GetNumSetting("OverrideRecordRecPriority", 0);
-    rtRecPriors[kFindDailyRecord] = 
+    rtRecPriors[kFindDailyRecord] =
         gContext->GetNumSetting("FindOneRecordRecPriority", -1);
-    rtRecPriors[kFindWeeklyRecord] = 
+    rtRecPriors[kFindWeeklyRecord] =
         gContext->GetNumSetting("FindOneRecordRecPriority", -1);
-    
+
     // get recording types associated with each program from db
     // (hope this is ok to do here, it's so much lighter doing
     // it all at once than once per program)
@@ -858,12 +856,12 @@ void ProgramRecPriority::FillList(void)
     result.prepare("SELECT recordid, title, chanid, starttime, startdate, "
                    "type, inactive, last_record, avg_delay "
                    "FROM record;");
-   
+
     if (result.exec() && result.isActive() && result.size() > 0)
     {
         countMatches();
 
-        while (result.next()) 
+        while (result.next())
         {
             int recordid = result.value(0).toInt();
             QString title = result.value(1).toString();
@@ -896,7 +894,7 @@ void ProgramRecPriority::FillList(void)
                     progInfo->avg_delay = avgd;
 
                     if (autopriority)
-                        progInfo->autoRecPriority = 
+                        progInfo->autoRecPriority =
                             autopriority - (progInfo->avg_delay *
                             (autopriority * 2 + 1) / 200);
                     else
@@ -919,7 +917,7 @@ void ProgramRecPriority::FillList(void)
         }
     }
     else
-        MythContext::DBError("Get program recording priorities query", result);
+        MythDB::DBError("Get program recording priorities query", result);
 }
 
 void ProgramRecPriority::countMatches()
@@ -959,12 +957,12 @@ typedef struct RecPriorityInfo
     int cnt;
 } RecPriorityInfo;
 
-class titleSort 
+class titleSort
 {
     public:
         titleSort(bool reverseSort = false) {m_reverse = reverseSort;}
 
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
         {
             if (a.prog->sortTitle != b.prog->sortTitle)
             {
@@ -1004,13 +1002,13 @@ class titleSort
         bool m_reverse;
 };
 
-class programRecPrioritySort 
+class programRecPrioritySort
 {
     public:
         programRecPrioritySort(bool reverseSort = false)
                                {m_reverse = reverseSort;}
 
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
         {
             int finalA = a.prog->recpriority + a.prog->autoRecPriority +
                          a.prog->recTypeRecPriority;
@@ -1044,13 +1042,13 @@ class programRecPrioritySort
         bool m_reverse;
 };
 
-class programRecTypeSort 
+class programRecTypeSort
 {
     public:
         programRecTypeSort(bool reverseSort = false)
                                {m_reverse = reverseSort;}
 
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
         {
             int typeA = RecTypePriority(a.prog->recType);
             int typeB = RecTypePriority(b.prog->recType);
@@ -1082,12 +1080,12 @@ class programRecTypeSort
         bool m_reverse;
 };
 
-class programCountSort 
+class programCountSort
 {
     public:
         programCountSort(bool reverseSort = false) {m_reverse = reverseSort;}
 
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
         {
             int countA = a.prog->matchCount;
             int countB = b.prog->matchCount;
@@ -1115,12 +1113,12 @@ class programCountSort
         bool m_reverse;
 };
 
-class programRecCountSort 
+class programRecCountSort
 {
     public:
         programRecCountSort(bool reverseSort=false) {m_reverse = reverseSort;}
 
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
         {
             int countA = a.prog->matchCount;
             int countB = b.prog->matchCount;
@@ -1148,13 +1146,13 @@ class programRecCountSort
         bool m_reverse;
 };
 
-class programLastRecordSort 
+class programLastRecordSort
 {
     public:
-        programLastRecordSort(bool reverseSort=false) 
+        programLastRecordSort(bool reverseSort=false)
             {m_reverse = reverseSort;}
 
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
         {
             QDateTime lastRecA = a.prog->last_record;
             QDateTime lastRecB = b.prog->last_record;
@@ -1173,13 +1171,13 @@ class programLastRecordSort
         bool m_reverse;
 };
 
-class programAvgDelaySort 
+class programAvgDelaySort
 {
     public:
-        programAvgDelaySort(bool reverseSort=false) 
+        programAvgDelaySort(bool reverseSort=false)
             {m_reverse = reverseSort;}
 
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
         {
             int avgA = a.prog->avg_delay;
             int avgB = b.prog->avg_delay;
@@ -1198,7 +1196,7 @@ class programAvgDelaySort
         bool m_reverse;
 };
 
-void ProgramRecPriority::SortList() 
+void ProgramRecPriority::SortList()
 {
     int i, j;
     bool cursorChanged = false;
@@ -1219,7 +1217,7 @@ void ProgramRecPriority::SortList()
     }
 
     // sort sortedList
-    switch(sortType) 
+    switch(sortType)
     {
         case byTitle :
                  if (reverseSort)
@@ -1230,50 +1228,50 @@ void ProgramRecPriority::SortList()
                  break;
         case byRecPriority :
                  if (reverseSort)
-                     sort(sortedList.begin(), sortedList.end(), 
+                     sort(sortedList.begin(), sortedList.end(),
                           programRecPrioritySort(true));
                  else
-                     sort(sortedList.begin(), sortedList.end(), 
+                     sort(sortedList.begin(), sortedList.end(),
                           programRecPrioritySort());
                  break;
         case byRecType :
                  if (reverseSort)
-                     sort(sortedList.begin(), sortedList.end(), 
+                     sort(sortedList.begin(), sortedList.end(),
                           programRecTypeSort(true));
                  else
-                     sort(sortedList.begin(), sortedList.end(), 
+                     sort(sortedList.begin(), sortedList.end(),
                           programRecTypeSort());
                  break;
         case byCount :
                  if (reverseSort)
-                     sort(sortedList.begin(), sortedList.end(), 
+                     sort(sortedList.begin(), sortedList.end(),
                           programCountSort(true));
                  else
-                     sort(sortedList.begin(), sortedList.end(), 
+                     sort(sortedList.begin(), sortedList.end(),
                           programCountSort());
                  break;
         case byRecCount :
                  if (reverseSort)
-                     sort(sortedList.begin(), sortedList.end(), 
+                     sort(sortedList.begin(), sortedList.end(),
                           programRecCountSort(true));
                  else
-                     sort(sortedList.begin(), sortedList.end(), 
+                     sort(sortedList.begin(), sortedList.end(),
                           programRecCountSort());
                  break;
         case byLastRecord :
                  if (reverseSort)
-                     sort(sortedList.begin(), sortedList.end(), 
+                     sort(sortedList.begin(), sortedList.end(),
                           programLastRecordSort(true));
                  else
-                     sort(sortedList.begin(), sortedList.end(), 
+                     sort(sortedList.begin(), sortedList.end(),
                           programLastRecordSort());
                  break;
         case byAvgDelay :
                  if (reverseSort)
-                     sort(sortedList.begin(), sortedList.end(), 
+                     sort(sortedList.begin(), sortedList.end(),
                           programAvgDelaySort(true));
                  else
-                     sort(sortedList.begin(), sortedList.end(), 
+                     sort(sortedList.begin(), sortedList.end(),
                           programAvgDelaySort());
                  break;
     }
@@ -1285,7 +1283,7 @@ void ProgramRecPriority::SortList()
     {
         recPriorityInfo = &(*sit);
 
-        // find recPriorityInfo[i] in pdCopy 
+        // find recPriorityInfo[i] in pdCopy
         for (j = 0,pit = pdCopy.begin(); j != recPriorityInfo->cnt; j++, ++pit);
 
         // put back into programData
@@ -1294,10 +1292,10 @@ void ProgramRecPriority::SortList()
         // if recPriorityInfo[i] is the program where the cursor
         // was pre-sort then we need to update to cursor
         // to the ith position
-        if (!cursorChanged && recPriorityInfo->cnt == inList+inData) 
+        if (!cursorChanged && recPriorityInfo->cnt == inList+inData)
         {
             inList = dataCount - i - 1;
-            if (inList > (int)((int)(listsize / 2) - 1)) 
+            if (inList > (int)((int)(listsize / 2) - 1))
             {
                 inList = (int)(listsize / 2);
                 inData = dataCount - i - 1 - inList;
@@ -1305,7 +1303,7 @@ void ProgramRecPriority::SortList()
             else
                 inData = 0;
 
-            if (dataCount > listsize && inData > dataCount - listsize) 
+            if (dataCount > listsize && inData > dataCount - listsize)
             {
                 inList += inData - (dataCount - listsize);
                 inData = dataCount - listsize;
@@ -1322,7 +1320,7 @@ void ProgramRecPriority::RemoveCurItemFromList(void)
     // remove it from programData
     int cnt;
     QMap<QString, ProgramRecPriorityInfo>::Iterator it;
-    for (cnt = 0, it = programData.begin(); cnt < inList+inData; 
+    for (cnt = 0, it = programData.begin(); cnt < inList+inData;
          cnt++, ++it);
     programData.remove(it);
     SortList();
@@ -1347,7 +1345,7 @@ void ProgramRecPriority::updateList(QPainter *p)
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
-    
+
     int pastSkip = (int)inData;
     pageDowner = false;
     listCount = 0;
@@ -1373,16 +1371,16 @@ void ProgramRecPriority::updateList(QPainter *p)
                         ProgramRecPriorityInfo *progInfo = &(it.data());
 
                         int progRecPriority = progInfo->recpriority;
-                        int finalRecPriority = progRecPriority + 
-                                               progInfo->autoRecPriority + 
+                        int finalRecPriority = progRecPriority +
+                                               progInfo->autoRecPriority +
                                                progInfo->recTypeRecPriority;
-        
+
                         QString tempSubTitle = progInfo->title;
                         if ((progInfo->rectype == kSingleRecord ||
                              progInfo->rectype == kOverrideRecord ||
                              progInfo->rectype == kDontRecord) &&
                             (progInfo->subtitle).stripWhiteSpace().length() > 0)
-                            tempSubTitle = tempSubTitle + " - \"" + 
+                            tempSubTitle = tempSubTitle + " - \"" +
                                            progInfo->subtitle + "\"";
 
                         if (cnt == inList)
@@ -1400,7 +1398,7 @@ void ProgramRecPriority::updateList(QPainter *p)
                             ltype->SetItemText(cnt, 3, "-");
                         else
                             ltype->SetItemText(cnt, 3, "+");
-                        ltype->SetItemText(cnt, 4, 
+                        ltype->SetItemText(cnt, 4,
                                 QString::number(abs(progRecPriority)));
 
                         if (finalRecPriority < 0)
@@ -1408,7 +1406,7 @@ void ProgramRecPriority::updateList(QPainter *p)
                         else
                             ltype->SetItemText(cnt, 5, "+");
 
-                        ltype->SetItemText(cnt, 6, 
+                        ltype->SetItemText(cnt, 6,
                                 QString::number(abs(finalRecPriority)));
 
                         if (progInfo->recType == kDontRecord ||
@@ -1466,9 +1464,9 @@ void ProgramRecPriority::updateInfo(QPainter *p)
     QPainter tmp(&pix);
 
     if (programData.count() > 0 && curitem)
-    {  
+    {
         int progRecPriority, autorecpri, rectyperecpriority, finalRecPriority;
-        RecordingType rectype; 
+        RecordingType rectype;
 
         progRecPriority = curitem->recpriority;
         autorecpri = curitem->autoRecPriority;
@@ -1504,7 +1502,7 @@ void ProgramRecPriority::updateInfo(QPainter *p)
             UITextType *type = (UITextType *)container->GetType("title");
             if (type)
                 type->SetText(curitem->title);
- 
+
             type = (UITextType *)container->GetType("subtitle");
             if (type)
                 type->SetText(subtitle);
@@ -1602,7 +1600,7 @@ void ProgramRecPriority::updateInfo(QPainter *p)
                     type->SetText(QString::number(finalRecPriority));
             }
         }
-       
+
         if (container)
         {
             container->Draw(&tmp, 4, 0);

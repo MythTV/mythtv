@@ -8,8 +8,7 @@
 #include <cstdlib>
 
 // libmyth headers
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "mythverbose.h"
 #include "mythdb.h"
 
 // libmythtv headers
@@ -86,7 +85,7 @@ QString getResponse(const QString &query, const QString &def)
         QByteArray adef = def.toLocal8Bit();
         cout << " [" << adef.constData() << "]  ";
     }
-    
+
     char response[80];
     cin.getline(response, 80);
 
@@ -217,7 +216,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
 
         if (!query.exec())
         {
-            MythDB::DBError("handleChannels", query);            
+            MythDB::DBError("handleChannels", query);
         }
         else if (query.next())
         {
@@ -326,7 +325,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                     subquery.bindValue(":CHANID", chanid);
 
                     if (!subquery.exec())
-                        MythContext::DBError("Channel icon change", subquery);
+                        MythDB::DBError("Channel icon change", subquery);
                 }
             }
         }

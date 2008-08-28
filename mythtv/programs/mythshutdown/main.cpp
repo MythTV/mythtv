@@ -9,7 +9,7 @@ using namespace std;
 
 #include <exitcodes.h>
 #include <mythcontext.h>
-#include <mythdbcon.h>
+#include <mythdb.h>
 #include "libmythtv/programinfo.h"
 #include "libmythtv/jobqueue.h"
 #include "tv.h"
@@ -25,7 +25,7 @@ void setGlobalSetting(const QString &key, const QString &value)
         query.bindValue(":KEY", key);
 
         if (!query.exec() || !query.isActive())
-            MythContext::DBError("Clear setting", query);
+            MythDB::DBError("Clear setting", query);
 
         query.prepare("INSERT INTO settings ( value, data ) "
                 "VALUES ( :VALUE, :DATA );");
@@ -33,7 +33,7 @@ void setGlobalSetting(const QString &key, const QString &value)
         query.bindValue(":DATA", value);
 
         if (!query.exec() || !query.isActive())
-            MythContext::DBError("Save new global setting", query);
+            MythDB::DBError("Save new global setting", query);
     }
     else
     {
@@ -62,7 +62,7 @@ QString getGlobalSetting(const QString &key, const QString &defaultval)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, 
+        VERBOSE(VB_IMPORTANT,
                 QString("Database not open while trying to load setting: %1")
                         .arg(key));
     }
@@ -316,7 +316,7 @@ int getStatus(bool bWantRecStatus)
 
 int checkOKShutdown(bool bWantRecStatus)
 {
-    // mythbackend wants 0=ok to shutdown, 1=reset idle count, 2=wait for frontend 
+    // mythbackend wants 0=ok to shutdown, 1=reset idle count, 2=wait for frontend
 
     VERBOSE(VB_GENERAL, "Mythshutdown: --check");
 
@@ -431,7 +431,7 @@ int shutdown()
     {
         if (dtCurrent < dtPeriod1Start)
         {
-            VERBOSE(VB_IMPORTANT, "daily wakeup today at " << 
+            VERBOSE(VB_IMPORTANT, "daily wakeup today at " <<
                         dtPeriod1Start.toString("hh:mm:ss"));
             dtNextDailyWakeup = dtPeriod1Start;
         }
@@ -442,14 +442,14 @@ int shutdown()
     {
         if (dtCurrent < dtPeriod2Start)
         {
-            VERBOSE(VB_IMPORTANT, "daily wakeup today at " << 
+            VERBOSE(VB_IMPORTANT, "daily wakeup today at " <<
                         dtPeriod2Start.toString("hh:mm:ss"));
             dtNextDailyWakeup = dtPeriod2Start;
         }
     }
 
-    // if we have at least one valid daily wakeup time and dtNextDailyWakeup is 
-    // still not valid then next daily wakeup is tomorrow 
+    // if we have at least one valid daily wakeup time and dtNextDailyWakeup is
+    // still not valid then next daily wakeup is tomorrow
     if (!dtNextDailyWakeup.isValid())
     {
         if (dtPeriod1Start != dtPeriod1End)
@@ -461,7 +461,7 @@ int shutdown()
         {
             dtNextDailyWakeup = dtNextDailyWakeup.addDays(1);
 
-            VERBOSE(VB_IMPORTANT, "next daily wakeup is tomorrow at " << 
+            VERBOSE(VB_IMPORTANT, "next daily wakeup is tomorrow at " <<
                         dtNextDailyWakeup.toString("hh:mm:ss"));
         }
     }
@@ -479,18 +479,18 @@ int shutdown()
     if (!dtNextRecordingStart.isValid())
         VERBOSE(VB_IMPORTANT,"no recording time is set");
     else
-        VERBOSE(VB_IMPORTANT, "recording scheduled at: " << 
+        VERBOSE(VB_IMPORTANT, "recording scheduled at: " <<
                     dtNextRecordingStart.toString(Qt::ISODate));
 
     // check if scheduled recording time has already passed
     if (dtNextRecordingStart.isValid())
     {
-        int delta = dtCurrent.secsTo(dtNextRecordingStart); 
+        int delta = dtCurrent.secsTo(dtNextRecordingStart);
 
-        if (delta < 0) 
+        if (delta < 0)
         {
             VERBOSE(VB_IMPORTANT, "scheduled recording time has already passed. "
-                                  "schedule deleted"); 
+                                  "schedule deleted");
 
             dtNextRecordingStart = QDateTime();
             setGlobalSetting("MythShutdownNextScheduled", "");
@@ -499,7 +499,7 @@ int shutdown()
 
     QDateTime dtWakeupTime = QDateTime();
 
-    // simple case 
+    // simple case
     // no daily wakeup set
     // no scheduled program set
     // just shut down
@@ -547,11 +547,11 @@ int shutdown()
     // save the next wakuptime in the db
     setGlobalSetting("MythShutdownWakeupTime", dtWakeupTime.toString(Qt::ISODate));
 
-    // stop here to debug  
+    // stop here to debug
     //return 0;
 
-    int shutdownmode = 0; // default to poweroff no reboot 
-    QString nvramRestartCmd = 
+    int shutdownmode = 0; // default to poweroff no reboot
+    QString nvramRestartCmd =
             gContext->GetSetting("MythShutdownNvramRestartCmd", "");
 
     if (dtWakeupTime.isValid())
@@ -605,7 +605,7 @@ int shutdown()
 
     int res = 0;
 
-    switch (shutdownmode) 
+    switch (shutdownmode)
     {
         case 0:
         {
@@ -663,7 +663,7 @@ int startup()
     else
     {
         // if we started within 15mins of the saved wakeup time assume we started
-        // automatically to record or for a daily wakeup/shutdown period 
+        // automatically to record or for a daily wakeup/shutdown period
 
         int delta = startupTime.secsTo(QDateTime::currentDateTime());
         if (delta < 0)
@@ -688,7 +688,7 @@ int startup()
 
 void showUsage()
 {
-  cout << "Usage of mythshutdown\n"; 
+  cout << "Usage of mythshutdown\n";
   cout << "-w/--setwakeup time      (sets the wakeup time. time=yyyy-MM-ddThh:mm:ss\n";
   cout << "                          doesn't write it into nvram)\n";
   cout << "-t/--setscheduledwakeup  (sets the wakeup time to the next scheduled recording)\n";
@@ -697,7 +697,7 @@ void showUsage()
   cout <<"                           scheduled wakeup and shutdown)\n";
   cout << "-p/--startup             (check startup. check will return 0 if automatic\n";
   cout << "                                                           1 for manually)\n";
-  cout << "-c/--check flag          (check shutdown possible\n"; 
+  cout << "-c/--check flag          (check shutdown possible\n";
   cout << "                          flag is 0 - don't check recording status\n";
   cout << "                                  1 - do check recording status (default)\n";
   cout << "                          returns 0 ok to shutdown\n";
@@ -809,8 +809,8 @@ int main(int argc, char **argv)
             {
                 sWakeupTime = a.argv()[argpos+1];
                 ++argpos;
-            } 
-            else 
+            }
+            else
             {
                 cout << "mythshutdown: Missing argument to "
                                 "-w/--setwakeup option" << endl;

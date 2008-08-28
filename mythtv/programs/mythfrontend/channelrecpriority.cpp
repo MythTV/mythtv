@@ -3,7 +3,6 @@
 #include <q3buttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
-#include <qsqldatabase.h>
 #include <qdatetime.h>
 #include <qapplication.h>
 #include <qregexp.h>
@@ -23,8 +22,7 @@ using namespace std;
 
 #include "exitcodes.h"
 #include "dialogbox.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 #include "scheduledrecording.h"
 #include "proglist.h"
 #include "infostructs.h"
@@ -94,12 +92,12 @@ ChannelRecPriority::ChannelRecPriority(MythMainWindow *parent, const char *name)
     sortType = (SortType)gContext->GetNumSetting("ChannelRecPrioritySorting",
                                                  (int)byChannel);
 
-    SortList(); 
+    SortList();
     inList = 0;
     inData = 0;
     setNoErase();
 
-    longchannelformat = 
+    longchannelformat =
         gContext->GetSetting("LongChannelFormat", "<num> <name>");
 
     gContext->addListener(this);
@@ -147,7 +145,7 @@ void ChannelRecPriority::keyPressEvent(QKeyEvent *e)
                 changeRecPriority(-1);
             else if (action == "ESCAPE" || action == "LEFT")
             {
-                saveRecPriority(); 
+                saveRecPriority();
                 gContext->SaveSetting("ChannelRecPrioritySorting",
                                       (int)sortType);
                 done(MythDialog::Accepted);
@@ -156,8 +154,8 @@ void ChannelRecPriority::keyPressEvent(QKeyEvent *e)
             {
                 if (sortType != byChannel)
                 {
-                    sortType = byChannel; 
-                    SortList();     
+                    sortType = byChannel;
+                    SortList();
                     update(fullRect);
                 }
             }
@@ -165,8 +163,8 @@ void ChannelRecPriority::keyPressEvent(QKeyEvent *e)
             {
                 if (sortType != byRecPriority)
                 {
-                    sortType = byRecPriority; 
-                    SortList(); 
+                    sortType = byRecPriority;
+                    SortList();
                     update(fullRect);
                 }
             }
@@ -175,8 +173,8 @@ void ChannelRecPriority::keyPressEvent(QKeyEvent *e)
                 if (sortType == byChannel)
                     sortType = byRecPriority;
                 else
-                    sortType = byChannel; 
-                SortList();     
+                    sortType = byChannel;
+                SortList();
                 update(fullRect);
             }
             else
@@ -249,7 +247,7 @@ void ChannelRecPriority::paintEvent(QPaintEvent *e)
 {
     QRect r = e->rect();
     QPainter p(this);
- 
+
     if (r.intersects(listRect))
     {
         updateList(&p);
@@ -306,7 +304,7 @@ void ChannelRecPriority::cursorDown(bool page)
         inData = dataCount - listsize;
     }
 
-    if (inData < 0) 
+    if (inData < 0)
         inData = 0;
 
     if (inList >= listCount)
@@ -365,7 +363,7 @@ void ChannelRecPriority::cursorUp(bool page)
          inList = 0;
 }
 
-void ChannelRecPriority::changeRecPriority(int howMuch) 
+void ChannelRecPriority::changeRecPriority(int howMuch)
 {
     int tempRecPriority, cnt;
     QPainter p(this);
@@ -391,8 +389,8 @@ void ChannelRecPriority::changeRecPriority(int howMuch)
     }
 }
 
-void ChannelRecPriority::applyChannelRecPriorityChange(QString chanid, 
-                                                 const QString &newrecpriority) 
+void ChannelRecPriority::applyChannelRecPriorityChange(QString chanid,
+                                                 const QString &newrecpriority)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE channel SET recpriority = :RECPRI "
@@ -401,14 +399,14 @@ void ChannelRecPriority::applyChannelRecPriorityChange(QString chanid,
     query.bindValue(":CHANID", chanid);
 
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("Save recpriority update", query);
+        MythDB::DBError("Save recpriority update", query);
 }
 
-void ChannelRecPriority::saveRecPriority(void) 
+void ChannelRecPriority::saveRecPriority(void)
 {
     QMap<QString, ChannelInfo>::Iterator it;
 
-    for (it = channelData.begin(); it != channelData.end(); ++it) 
+    for (it = channelData.begin(); it != channelData.end(); ++it)
     {
         ChannelInfo *chanInfo = &(it.data());
         QString key = QString::number(chanInfo->chanid);
@@ -462,9 +460,9 @@ void ChannelRecPriority::FillList(void)
 
             channelData[QString::number(cnt)] = *chaninfo;
 
-            // save recording priority value in map so we don't have to save 
+            // save recording priority value in map so we don't have to save
             // all channel's recording priority values when we exit
-            origRecPriorityData[QString::number(chaninfo->chanid)] = 
+            origRecPriorityData[QString::number(chaninfo->chanid)] =
                     chaninfo->recpriority;
 
             cnt--;
@@ -472,19 +470,19 @@ void ChannelRecPriority::FillList(void)
         }
     }
     else if (!result.isActive())
-        MythContext::DBError("Get channel recording priorities query", result);
+        MythDB::DBError("Get channel recording priorities query", result);
 }
 
-typedef struct RecPriorityInfo 
+typedef struct RecPriorityInfo
 {
     ChannelInfo *chan;
     int cnt;
 } RecPriorityInfo;
 
-class channelSort 
+class channelSort
 {
     public:
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
         {
             if (a.chan->chanstr.toInt() == b.chan->chanstr.toInt())
                 return(a.chan->sourceid > b.chan->sourceid);
@@ -492,10 +490,10 @@ class channelSort
         }
 };
 
-class channelRecPrioritySort 
+class channelRecPrioritySort
 {
     public:
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
+        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
         {
             if (a.chan->recpriority.toInt() == b.chan->recpriority.toInt())
                 return (a.chan->chanstr.toInt() > b.chan->chanstr.toInt());
@@ -503,11 +501,11 @@ class channelRecPrioritySort
         }
 };
 
-void ChannelRecPriority::SortList() 
+void ChannelRecPriority::SortList()
 {
     typedef vector<RecPriorityInfo> sortList;
     typedef QMap<QString, ChannelInfo> chanMap;
-    
+
     int i, j;
     bool cursorChanged = false;
     sortList sortedList;
@@ -527,15 +525,15 @@ void ChannelRecPriority::SortList()
         cdCopy[pit.key()] = pit.data();
     }
 
-    switch(sortType) 
+    switch(sortType)
     {
         case byRecPriority:
-            sort(sortedList.begin(), sortedList.end(), 
+            sort(sortedList.begin(), sortedList.end(),
             channelRecPrioritySort());
             break;
         case byChannel:
         default:
-            sort(sortedList.begin(), sortedList.end(), 
+            sort(sortedList.begin(), sortedList.end(),
             channelSort());
             break;
     }
@@ -543,7 +541,7 @@ void ChannelRecPriority::SortList()
     channelData.clear();
 
     // rebuild channelData in sortedList order from cdCopy
-    for(i = 0, sit = sortedList.begin(); sit != sortedList.end(); i++, ++sit ) 
+    for (i = 0, sit = sortedList.begin(); sit != sortedList.end(); i++, ++sit)
     {
         recPriorityInfo = &(*sit);
 
@@ -556,10 +554,10 @@ void ChannelRecPriority::SortList()
         // if recPriorityInfo[i] is the channel where the cursor
         // was pre-sort then we need to update to cursor
         // to the ith position
-        if (!cursorChanged && recPriorityInfo->cnt == inList+inData) 
+        if (!cursorChanged && recPriorityInfo->cnt == inList+inData)
         {
             inList = dataCount - i - 1;
-            if (inList > (int)((int)(listsize / 2) - 1)) 
+            if (inList > (int)((int)(listsize / 2) - 1))
             {
                 inList = (int)(listsize / 2);
                 inData = dataCount - i - 1 - inList;
@@ -567,7 +565,7 @@ void ChannelRecPriority::SortList()
             else
                 inData = 0;
 
-            if (dataCount > listsize && inData > dataCount - listsize) 
+            if (dataCount > listsize && inData > dataCount - listsize)
             {
                 inList += inData - (dataCount - listsize);
                 inData = dataCount - listsize;
@@ -583,7 +581,7 @@ void ChannelRecPriority::updateList(QPainter *p)
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
-    
+
     int pastSkip = (int)inData;
     pageDowner = false;
     listCount = 0;
@@ -617,14 +615,14 @@ void ChannelRecPriority::updateList(QPainter *p)
                             ltype->SetItemCurrent(cnt);
                         }
 
-                        ltype->SetItemText(cnt, 1, 
+                        ltype->SetItemText(cnt, 1,
                             chanInfo->Text(" <num>  <sign>  \"<name>\""));
 
                         if (chanInfo->recpriority.toInt() > 0)
                             ltype->SetItemText(cnt, 2, "+");
                         else if (chanInfo->recpriority.toInt() < 0)
                             ltype->SetItemText(cnt, 2, "-");
-                        ltype->SetItemText(cnt, 3, 
+                        ltype->SetItemText(cnt, 3,
                                            QString::number(abs(recPriority)));
 
                         if (!visMap[chanInfo->chanid])
@@ -677,7 +675,7 @@ void ChannelRecPriority::updateInfo(QPainter *p)
     UIImageType *itype = NULL;
 
     if (channelData.count() > 0 && curitem)
-    {  
+    {
         LayerSet *container = NULL;
         container = theme->GetSet("channel_info");
         if (container)
@@ -697,7 +695,7 @@ void ChannelRecPriority::updateInfo(QPainter *p)
             UITextType *type = (UITextType *)container->GetType("title");
             if (type)
                 type->SetText(curitem->Text(longchannelformat));
- 
+
             type = (UITextType *)container->GetType("source");
             if (type)
             {
@@ -713,7 +711,7 @@ void ChannelRecPriority::updateInfo(QPainter *p)
                     type->SetText(curitem->recpriority);
             }
         }
-       
+
         if (container)
         {
             container->Draw(&tmp, 4, 0);
@@ -779,7 +777,7 @@ void ChannelRecPriority::edit()
             visMap[chanInfo->chanid] = false;
     }
     else if (!result.isActive())
-        MythContext::DBError("Get channel priorities update", result);
+        MythDB::DBError("Get channel priorities update", result);
 
     SortList();
     update(fullRect);

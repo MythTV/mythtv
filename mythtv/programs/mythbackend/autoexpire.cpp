@@ -3,8 +3,6 @@
 #include <signal.h>
 
 
-#include <qsqldatabase.h>
-#include <qsqlquery.h>
 #include <qregexp.h>
 #include <qstring.h>
 #include <qdatetime.h>
@@ -27,7 +25,7 @@ using namespace std;
 #include "autoexpire.h"
 #include "programinfo.h"
 #include "mythcontext.h"
-#include "mythdbcon.h"
+#include "mythdb.h"
 #include "util.h"
 #include "storagegroup.h"
 #include "remoteutil.h"
@@ -307,7 +305,7 @@ void AutoExpire::RunExpirer(void)
 
         Sleep(60 - (timer.elapsed() / 1000));
     }
-} 
+}
 
 /** \fn AutoExpire::Sleep(int sleepTime)
  *  \brief Sleeps for sleepTime minutes; unless the expire thread
@@ -458,7 +456,7 @@ void AutoExpire::ExpireRecordings(void)
                     "    Searching for expireable files in these directories");
             QString myHostName = gContext->GetHostName();
             pginfolist_t::iterator it = expireList.begin();
-            while ((it != expireList.end()) && 
+            while ((it != expireList.end()) &&
                    ((size_t)max(0LL, fsit->freeSpaceKB) < desired_space[fsit->fsID]))
             {
                 ProgramInfo *p = *it;
@@ -493,7 +491,7 @@ void AutoExpire::ExpireRecordings(void)
                     {
                         // Wasn't found so check locally
                         QString file = GetPlaybackURL(p);
-                        
+
                         if (file.left(1) == "/")
                         {
                             p->pathname = file;
@@ -567,7 +565,7 @@ void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
             VERBOSE(VB_FILE, QString("    ") +  msg);
 
         gContext->LogEntry("autoexpire", LP_NOTICE,
-                           "Expiring Program", msg);                
+                           "Expiring Program", msg);
 
         // send auto expire message to backend's event thread.
         MythEvent me(QString("AUTO_EXPIRE %1 %2").arg((*it)->chanid)
@@ -585,7 +583,7 @@ void *AutoExpire::ExpirerThread(void *param)
 {
     AutoExpire *expirer = (AutoExpire *)param;
     expirer->RunExpirer();
- 
+
     return NULL;
 }
 
@@ -637,7 +635,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("AutoExpire query failed!", query);
+            MythDB::DBError("AutoExpire query failed!", query);
             continue;
         }
 
@@ -661,7 +659,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                              .arg(progstart.toString(Qt::ISODate))
                              .arg(progend.toString(Qt::ISODate));
 
-                if ((!IsInDontExpireSet(chanid, startts)) && 
+                if ((!IsInDontExpireSet(chanid, startts)) &&
                     (!episodeParts.contains(episodeKey)) &&
                     (found > maxIter.data()))
                 {
@@ -843,7 +841,7 @@ void AutoExpire::ClearExpireList(pginfolist_t &expireList, bool deleteProg)
 }
 
 /** \fn AutoExpire::FillDBOrdered(pginfolist_t&, int)
- *  \brief Creates a list of programs to delete using the database to 
+ *  \brief Creates a list of programs to delete using the database to
  *         order list.
  */
 void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
@@ -1114,7 +1112,7 @@ bool AutoExpire::IsInExpireList(pginfolist_t &expireList, QString chanid,
                                 QDateTime starttime)
 {
     pginfolist_t::iterator it;
-    
+
     for (it = expireList.begin(); it != expireList.end(); ++it)
     {
         if (((*it)->chanid == chanid) &&

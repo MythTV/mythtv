@@ -13,7 +13,7 @@ using namespace std;
 #include "programinfo.h"
 #include "jobqueue.h"
 #include "mythcontext.h"
-#include "mythdbcon.h"
+#include "mythdb.h"
 #include "transcode.h"
 #include "mpeg2fix.h"
 
@@ -28,7 +28,7 @@ int CheckJobQueue();
 static int glbl_jobID = -1;
 QString recorderOptions = "";
 
-void usage(char *progname) 
+void usage(char *progname)
 {
     cerr << "Usage: " << progname << " <--chanid <channelid>>\n";
     cerr << "\t<--starttime <starttime>> <--profile <profile>>\n";
@@ -97,44 +97,44 @@ int main(int argc, char *argv[])
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
         if (!strcmp(a.argv()[argpos],"-s") ||
-            !strcmp(a.argv()[argpos],"--starttime")) 
+            !strcmp(a.argv()[argpos],"--starttime"))
         {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 starttime = a.argv()[argpos + 1];
                 found_starttime = 1;
                 ++argpos;
-            } 
-            else 
+            }
+            else
             {
                 cerr << "Missing argument to -s/--starttime option\n";
                 usage(a.argv()[0]);
                 return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
-        } 
+        }
         else if (!strcmp(a.argv()[argpos],"-c") ||
-                 !strcmp(a.argv()[argpos],"--chanid")) 
+                 !strcmp(a.argv()[argpos],"--chanid"))
         {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 chanid = a.argv()[argpos + 1];
                 found_chanid = 1;
                 ++argpos;
-            } 
-            else 
+            }
+            else
             {
                 cerr << "Missing argument to -c/--chanid option\n";
                 usage(a.argv()[0]);
                 return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
-        } 
+        }
         else if (!strcmp(a.argv()[argpos], "-j"))
         {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 jobID = QString(a.argv()[++argpos]).toInt();
             }
-            else 
+            else
             {
                 cerr << "Missing argument to -j option\n";
                 usage(a.argv()[0]);
@@ -142,22 +142,22 @@ int main(int argc, char *argv[])
             }
         }
         else if (!strcmp(a.argv()[argpos],"-i") ||
-                 !strcmp(a.argv()[argpos],"--infile")) 
+                 !strcmp(a.argv()[argpos],"--infile"))
         {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 infile = a.argv()[argpos + 1];
                 found_infile = 1;
                 ++argpos;
-            } 
-            else 
+            }
+            else
             {
                 cerr << "Missing argument to -i/--infile option\n";
                 usage(a.argv()[0]);
                 return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
         }
-        else if (!strcmp(a.argv()[argpos],"--video")) 
+        else if (!strcmp(a.argv()[argpos],"--video"))
         {
             isVideo = 1;
             //mpeg2 = true;
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
         }
         else if (!strcmp(a.argv()[argpos],"-V"))
         {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 QString temp = a.argv()[++argpos];
                 print_verbose_messages = temp.toInt();
@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"-v") ||
                  !strcmp(a.argv()[argpos],"--verbose"))
         {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 if (parse_verbose_arg(a.argv()[argpos+1]) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
@@ -209,14 +209,14 @@ int main(int argc, char *argv[])
             }
         }
         else if (!strcmp(a.argv()[argpos],"-p") ||
-                 !strcmp(a.argv()[argpos],"--profile")) 
+                 !strcmp(a.argv()[argpos],"--profile"))
         {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 profilename = a.argv()[argpos + 1];
                 ++argpos;
-            } 
-            else 
+            }
+            else
             {
                 cerr << "Missing argument to -p/--profile option\n";
                 usage(a.argv()[0]);
@@ -224,18 +224,18 @@ int main(int argc, char *argv[])
             }
         }
         else if (!strcmp(a.argv()[argpos],"-l") ||
-                 !strcmp(a.argv()[argpos],"--honorcutlist")) 
+                 !strcmp(a.argv()[argpos],"--honorcutlist"))
         {
             useCutlist = true;
             if (!found_infile)
                 continue;
 
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 QStringList cutlist;
                 cutlist = QStringList::split( " ", a.argv()[argpos + 1]);
                 ++argpos;
-                for (QStringList::Iterator it = cutlist.begin(); 
+                for (QStringList::Iterator it = cutlist.begin();
                      it != cutlist.end(); ++it )
                 {
                     QStringList startend;
@@ -266,14 +266,14 @@ int main(int argc, char *argv[])
                 return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
 
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 long long last = 0;
                 QStringList cutlist;
                 cutlist = QStringList::split( " ", a.argv()[argpos + 1]);
                 ++argpos;
                 deleteMap[0] = 1;
-                for (QStringList::Iterator it = cutlist.begin(); 
+                for (QStringList::Iterator it = cutlist.begin();
                      it != cutlist.end(); ++it )
                 {
                     QStringList startend;
@@ -299,7 +299,7 @@ int main(int argc, char *argv[])
             }
         }
         else if (!strcmp(a.argv()[argpos],"-k") ||
-                 !strcmp(a.argv()[argpos],"--allkeys")) 
+                 !strcmp(a.argv()[argpos],"--allkeys"))
         {
             keyframesonly = true;
         }
@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"-f") ||
                  !strcmp(a.argv()[argpos],"--fifodir"))
         {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 fifodir = a.argv()[argpos + 1];
                 ++argpos;
@@ -326,7 +326,7 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"-ro") ||
                  !strcmp(a.argv()[argpos],"--recorderOptions"))
         {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 recorderOptions = a.argv()[argpos + 1];
                 ++argpos;
@@ -347,14 +347,14 @@ int main(int argc, char *argv[])
             showprogress = true;
         }
         else if (!strcmp(a.argv()[argpos],"-m") ||
-                 !strcmp(a.argv()[argpos],"--mpeg2")) 
+                 !strcmp(a.argv()[argpos],"--mpeg2"))
         {
             mpeg2 = true;
         }
         else if (!strcmp(a.argv()[argpos],"-e") ||
-                 !strcmp(a.argv()[argpos],"--ostream")) 
+                 !strcmp(a.argv()[argpos],"--ostream"))
         {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 if(!strcmp(a.argv()[argpos + 1], "dvd"))
                     otype = REPLEX_DVD;
@@ -373,7 +373,7 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"-O") ||
                  !strcmp(a.argv()[argpos],"--override-setting"))
         {
-            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-') 
+            if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 QStringList pairs = QStringList::split(",", a.argv()[argpos+1]);
                 for (int index = 0; index < pairs.size(); ++index)
@@ -387,7 +387,7 @@ int main(int argc, char *argv[])
                 }
             }
             else
-            { 
+            {
                 cerr << "Invalid or missing argument to -O/--override-setting "
                         "option\n";
                 usage(a.argv()[0]);
@@ -397,7 +397,7 @@ int main(int argc, char *argv[])
             ++argpos;
         }
         else if (!strcmp(a.argv()[argpos],"-h") ||
-                 !strcmp(a.argv()[argpos],"--help")) 
+                 !strcmp(a.argv()[argpos],"--help"))
         {
             usage(a.argv()[0]);
             return TRANSCODE_EXIT_OK;
@@ -450,7 +450,7 @@ int main(int argc, char *argv[])
     }
 
     if ((! found_infile && !(found_chanid && found_starttime)) ||
-        (found_infile && (found_chanid || found_starttime)) ) 
+        (found_infile && (found_chanid || found_starttime)) )
     {
          cerr << "Must specify -i OR -c AND -s options!\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
@@ -531,7 +531,7 @@ int main(int argc, char *argv[])
                    QDate(r.cap(2).toInt(), r.cap(3).toInt(), r.cap(4).toInt()),
                    QTime(r.cap(5).toInt(), r.cap(6).toInt(), r.cap(7).toInt()));
                 pginfo = ProgramInfo::GetProgramFromRecorded(chanid, startts);
-            
+
                 if (!pginfo)
                 {
                     VERBOSE(VB_IMPORTANT,
@@ -539,14 +539,14 @@ int main(int argc, char *argv[])
                                 "starting at %2 in the database.")
                                 .arg(chanid).arg(startts.toString()));
                 }
-            }            
+            }
             else
             {
                 VERBOSE(VB_IMPORTANT,
                         QString("Couldn't deduce channel and start time from "
                                 "%1 ").arg(base));
             }
-        }       
+        }
     }
 
     if (infile.left(7) == "myth://" && (outfile.isNull() || outfile != "-"))
@@ -577,13 +577,13 @@ int main(int argc, char *argv[])
     if (!mpeg2)
     {
         result = transcode->TranscodeFile(infile, outfile,
-                                          profilename, useCutlist, 
+                                          profilename, useCutlist,
                                           (fifosync || keyframesonly), jobID,
                                           fifodir, deleteMap);
         if ((result == REENCODE_OK) && (jobID >= 0))
             JobQueue::ChangeJobArgs(jobID, "RENAME_TO_NUV");
     }
-                                              
+
     int exitcode = TRANSCODE_EXIT_OK;
     if ((result == REENCODE_MPEG2TRANS) || mpeg2)
     {
@@ -632,13 +632,13 @@ int main(int argc, char *argv[])
         }
         delete m2f;
     }
-    
+
     if (result == REENCODE_OK)
     {
         if (jobID >= 0)
             JobQueue::ChangeJobStatus(jobID, JOB_STOPPING);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 done").arg(infile));
-    } 
+    }
     else if (result == REENCODE_CUTLIST_CHANGE)
     {
         if (jobID >= 0)
@@ -975,7 +975,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             query.exec();
 
             if (!query.isActive())
-                MythContext::DBError("Error in mythtranscode", query);
+                MythDB::DBError("Error in mythtranscode", query);
 
             query.prepare("UPDATE recorded "
                           "SET cutlist = :CUTLIST, bookmark = :BOOKMARK, "
@@ -989,7 +989,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             query.exec();
 
             if (!query.isActive())
-                MythContext::DBError("Error in mythtranscode", query);
+                MythDB::DBError("Error in mythtranscode", query);
 
             pginfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
         }
@@ -1011,7 +1011,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             query.exec();
 
             if (!query.isActive())
-                MythContext::DBError("Error in mythtranscode", query);
+                MythDB::DBError("Error in mythtranscode", query);
         }
 
         JobQueue::ChangeJobStatus(jobID, JOB_FINISHED);
@@ -1039,7 +1039,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
 
 void UpdateJobQueue(float percent_done)
 {
-    JobQueue::ChangeJobComment(glbl_jobID, 
+    JobQueue::ChangeJobComment(glbl_jobID,
                                QString("%1% " + QObject::tr("Completed"))
                                .arg(percent_done, 0, 'f', 1));
 }

@@ -29,7 +29,7 @@ using namespace std;
 #include "scheduledrecording.h"
 #include "recordingtypes.h"
 #include "viewschdiff.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdb.h"
 
 CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
                        ProgramInfo *pginfo)
@@ -94,7 +94,7 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
         }
     }
     else
-        MythContext::DBError("Get power search rules query", result);
+        MythDB::DBError("Get power search rules query", result);
 
     hbox->addWidget(m_rule);
 
@@ -269,7 +269,7 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
     hbox->addWidget(m_cancelButton);
 
     connect(this, SIGNAL(dismissWindow()), this, SLOT(accept()));
-     
+
     connect(m_rule, SIGNAL(activated(int)), this, SLOT(ruleChanged(void)));
     connect(m_rule, SIGNAL(highlighted(int)), this, SLOT(ruleChanged(void)));
     connect(m_title, SIGNAL(textChanged(void)), this, SLOT(textChanged(void)));
@@ -301,7 +301,7 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
 
     if (m_title->text().isEmpty())
         m_rule->setFocus();
-    else 
+    else
         m_clause->setFocus();
 
     clauseChanged();
@@ -390,7 +390,7 @@ void CustomPriority::installClicked(void)
     query.bindValue(":NAME", m_title->text());
 
     if (!query.exec())
-        MythContext::DBError("Install power search delete", query);
+        MythDB::DBError("Install power search delete", query);
 
     query.prepare("INSERT INTO powerpriority "
                   "(priorityname, recpriority, selectclause) "
@@ -400,7 +400,7 @@ void CustomPriority::installClicked(void)
     query.bindValue(":CLAUSE", m_description->text());
 
     if (!query.exec())
-        MythContext::DBError("Install power search insert", query);
+        MythDB::DBError("Install power search insert", query);
     else
         ScheduledRecording::signalChange(0);
 
@@ -421,7 +421,7 @@ void CustomPriority::deleteClicked(void)
     query.bindValue(":NAME", m_title->text());
 
     if (!query.exec())
-        MythContext::DBError("Delete power search query", query);
+        MythDB::DBError("Delete power search query", query);
     else
         ScheduledRecording::signalChange(0);
 
@@ -507,7 +507,7 @@ void CustomPriority::testSchedule(void)
             QString("DB Error (Obtaining lock in testRecording): \n"
                     "Query was: %1 \nError was: %2 \n")
             .arg(thequery)
-            .arg(MythContext::DBErrorMessage(query.lastError()));
+            .arg(MythDB::DBErrorMessage(query.lastError()));
         VERBOSE(VB_IMPORTANT, msg);
         return;
     }
@@ -521,7 +521,7 @@ void CustomPriority::testSchedule(void)
             QString("DB Error (deleting old table in testRecording): \n"
                     "Query was: %1 \nError was: %2 \n")
             .arg(thequery)
-            .arg(MythContext::DBErrorMessage(query.lastError()));
+            .arg(MythDB::DBErrorMessage(query.lastError()));
         VERBOSE(VB_IMPORTANT, msg);
         return;
     }
@@ -536,7 +536,7 @@ void CustomPriority::testSchedule(void)
             QString("DB Error (create new table): \n"
                     "Query was: %1 \nError was: %2 \n")
             .arg(thequery)
-            .arg(MythContext::DBErrorMessage(query.lastError()));
+            .arg(MythDB::DBErrorMessage(query.lastError()));
         VERBOSE(VB_IMPORTANT, msg);
         return;
     }
@@ -546,7 +546,7 @@ void CustomPriority::testSchedule(void)
     query.bindValue(":NAME", m_title->text());
 
     if (!query.exec())
-        MythContext::DBError("Test power search delete", query);
+        MythDB::DBError("Test power search delete", query);
 
     thequery = QString("INSERT INTO %1 "
                        "(priorityname, recpriority, selectclause) "
@@ -557,7 +557,7 @@ void CustomPriority::testSchedule(void)
     query.bindValue(":CLAUSE", m_description->text());
 
     if (!query.exec())
-        MythContext::DBError("Test power search insert", query);
+        MythDB::DBError("Test power search insert", query);
 
     QString ltitle = tr("Power Priority");
     if (!m_title->text().isEmpty())
@@ -576,7 +576,7 @@ void CustomPriority::testSchedule(void)
             QString("DB Error (free lock): \n"
                     "Query was: %1 \nError was: %2 \n")
             .arg(thequery)
-            .arg(MythContext::DBErrorMessage(query.lastError()));
+            .arg(MythDB::DBErrorMessage(query.lastError()));
         VERBOSE(VB_IMPORTANT, msg);
         return;
     }

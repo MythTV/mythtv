@@ -15,11 +15,11 @@ using namespace std;
 #include "housekeeper.h"
 #include "jobqueue.h"
 
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "util.h"
-#include "compat.h"
-#include "mythdirs.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythdb.h"
+#include "libmyth/util.h"
+#include "libmythdb/compat.h"
+#include "libmythdb/mythdirs.h"
 
 #include "programinfo.h"
 
@@ -181,8 +181,8 @@ void HouseKeeper::RunHouseKeeping(void)
                 {
                     VERBOSE(VB_GENERAL, "mythfilldatabase still running, "
                                         "skipping checks.");
-                } 
-                else 
+                }
+                else
                 {
                     period = gContext->GetNumSetting("MythFillPeriod", 1);
                     minhr = gContext->GetNumSetting("MythFillMinHour", -1);
@@ -190,8 +190,8 @@ void HouseKeeper::RunHouseKeeping(void)
                     {
                         minhr = 0;
                         maxhr = 24;
-                    } 
-                    else 
+                    }
+                    else
                     {
                         maxhr = gContext->GetNumSetting("MythFillMaxHour", 24);
                     }
@@ -267,7 +267,7 @@ void HouseKeeper::RunHouseKeeping(void)
 
         sleep(300 + (random()%8));
     }
-} 
+}
 
 void HouseKeeper::flushLogs()
 {
@@ -343,7 +343,7 @@ void HouseKeeper::RunMFD(void)
     }
 
     myth_system(command,
-                MYTH_SYSTEM_DONT_BLOCK_LIRC | 
+                MYTH_SYSTEM_DONT_BLOCK_LIRC |
                 MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
 
     HouseKeeper_filldb_running = false;
@@ -396,7 +396,7 @@ void HouseKeeper::CleanupOrphanedLivetvChains(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("HouseKeeper Cleaning TVChain Table", query);
+        MythDB::DBError("HouseKeeper Cleaning TVChain Table", query);
         return;
     }
 
@@ -406,7 +406,7 @@ void HouseKeeper::CleanupOrphanedLivetvChains(void)
             keepChains = "'" + query.value(0).toString() + "'";
         else
             keepChains += ", '" + query.value(0).toString() + "'";
- 
+
     if (keepChains.isEmpty())
         msg = "DELETE FROM tvchain WHERE endtime < now();";
     else
@@ -449,7 +449,7 @@ void HouseKeeper::CleanupRecordedTables(void)
 
     if (!query.exec(querystr))
     {
-        MythContext::DBError("Housekeeper Creating Temporary Table", query);
+        MythDB::DBError("Housekeeper Creating Temporary Table", query);
         return;
     }
 
@@ -458,8 +458,7 @@ void HouseKeeper::CleanupRecordedTables(void)
         query.prepare(QString("TRUNCATE TABLE temprecordedcleanup;"));
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("Housekeeper Truncating Temporary Table",
-                                 query);
+            MythDB::DBError("Housekeeper Truncating Temporary Table", query);
             return;
         }
 
@@ -471,7 +470,7 @@ void HouseKeeper::CleanupRecordedTables(void)
 
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("HouseKeeper Cleaning Recorded Tables", query);
+            MythDB::DBError("HouseKeeper Cleaning Recorded Tables", query);
             return;
         }
 
@@ -483,7 +482,7 @@ void HouseKeeper::CleanupRecordedTables(void)
                               "WHERE r.chanid IS NULL;").arg(column));
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("HouseKeeper Cleaning Recorded Tables", query);
+            MythDB::DBError("HouseKeeper Cleaning Recorded Tables", query);
             return;
         }
 
@@ -504,7 +503,7 @@ void HouseKeeper::CleanupRecordedTables(void)
     }
 
     if (!query.exec("DROP TABLE temprecordedcleanup;"))
-        MythContext::DBError("Housekeeper Dropping Temporary Table", query);
+        MythDB::DBError("Housekeeper Dropping Temporary Table", query);
 
 }
 
@@ -596,7 +595,7 @@ void *HouseKeeper::doHouseKeepingThread(void *param)
 {
     HouseKeeper *hkeeper = (HouseKeeper*)param;
     hkeeper->RunHouseKeeping();
- 
+
     return NULL;
 }
 
