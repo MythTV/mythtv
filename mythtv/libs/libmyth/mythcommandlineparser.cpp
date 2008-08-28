@@ -101,6 +101,24 @@ bool MythCommandLineParser::PreParse(
         cerr << ahelp.constData();
         wantsToExit = true;
     }
+    else if ((parseTypes & kCLPQueryVersion) &&
+             !strcmp(argv[argpos],"--version"))
+    {
+        extern const char *myth_source_version;
+        extern const char *myth_source_path;
+        cout << "Please include all output in bug reports." << endl;
+        cout << "MythTV Version   : " << myth_source_version << endl;
+        cout << "MythTV Branch    : " << myth_source_path << endl;
+        cout << "Library API      : " << MYTH_BINARY_VERSION << endl;
+        cout << "Network Protocol : " << MYTH_PROTO_VERSION << endl;
+        cout << "QT Version       : " << QT_VERSION_STR << endl;
+#ifdef MYTH_BUILD_CONFIG
+        cout << "Options compiled in:" <<endl;
+        cout << MYTH_BUILD_CONFIG << endl;
+#endif
+        wantsToExit = true;
+        return true;
+    }
 
     return false;
 }
@@ -184,8 +202,8 @@ bool MythCommandLineParser::Parse(
                      << "-O/--override-setting option\n";
                 err = true;
                 return true;
-            } 
- 
+            }
+
             QStringList pairs = tmpArg.split(",", QString::SkipEmptyParts);
             for (int index = 0; index < pairs.size(); ++index)
             {
@@ -229,8 +247,8 @@ bool MythCommandLineParser::Parse(
                      << "-G/--get-setting option\n";
                 err = true;
                 return true;
-            } 
- 
+            }
+
             settingsQuery = tmpArg.split(",", QString::SkipEmptyParts);
         }
         else
@@ -244,25 +262,7 @@ bool MythCommandLineParser::Parse(
         ++argpos;
         return true;
     }
-    if ((parseTypes & kCLPQueryVersion) &&
-        !strcmp(argv[argpos],"--version"))
-    {
-        extern const char *myth_source_version;
-        extern const char *myth_source_path;
-        cout << "Please include all output in bug reports." << endl;
-        cout << "MythTV Version   : " << myth_source_version << endl;
-        cout << "MythTV Branch    : " << myth_source_path << endl;
-        cout << "Library API      : " << MYTH_BINARY_VERSION << endl;
-        cout << "Network Protocol : " << MYTH_PROTO_VERSION << endl;
-        cout << "QT Version       : " << QT_VERSION_STR << endl;
-#ifdef MYTH_BUILD_CONFIG
-        cout << "Options compiled in:" <<endl;
-        cout << MYTH_BUILD_CONFIG << endl;
-#endif
-        wantsToExit = true;
-        return true;
-    }
-    else if ((parseTypes & kCLPDisplay) &&
+    if ((parseTypes & kCLPDisplay) &&
              (!strcmp(argv[argpos],"-display") ||
               !strcmp(argv[argpos],"--display")))
     {
@@ -272,7 +272,7 @@ bool MythCommandLineParser::Parse(
              (!strcmp(argv[argpos],"-geometry") ||
               !strcmp(argv[argpos],"--geometry")))
     {
-        return PreParse(argc, argv, argpos, err);        
+        return PreParse(argc, argv, argpos, err);
     }
     else
     {

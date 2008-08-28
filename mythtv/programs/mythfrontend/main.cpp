@@ -1002,10 +1002,6 @@ int main(int argc, char **argv)
             if (cmdline.WantsToExit())
                 return FRONTEND_EXIT_OK;
         }
-        else
-        {
-            argpos++;
-        }
     }
 
 #ifdef Q_WS_MACX
