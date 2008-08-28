@@ -6358,14 +6358,14 @@ void TV::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
-        MythEvent *me = (MythEvent *)e;
-        QString message = me->Message();
+        int        cardnum = 0;
+        MythEvent *me      = (MythEvent *)e;
+        QString    message = me->Message();
 
         if (recorder && message.left(14) == "DONE_RECORDING")
         {
             message = message.simplified();
             QStringList tokens = message.split(" ", QString::SkipEmptyParts);
-            uint cardnum = 0;
             int filelen = 0;
             if (tokens.size() >= 3)
             {
@@ -6397,7 +6397,6 @@ void TV::customEvent(QEvent *e)
         {
             message = message.simplified();
             QStringList tokens = message.split(" ", QString::SkipEmptyParts);
-            uint cardnum = 0;
             int timeuntil = 0, hasrec = 0, haslater = 0;
             if (tokens.size() >= 5)
             {
@@ -6426,8 +6425,7 @@ void TV::customEvent(QEvent *e)
         {
             message = message.simplified();
             QStringList tokens = message.split(" ", QString::SkipEmptyParts);
-            uint cardnum = (tokens.size() >= 2) ? tokens[1].toUInt() : 0;
-
+            cardnum = (tokens.size() >= 2) ? tokens[1].toUInt() : 0;
             if (cardnum == recorder->GetRecorderNumber())
             {
                 menurunning = false;
@@ -6445,7 +6443,7 @@ void TV::customEvent(QEvent *e)
         {
             message = message.simplified();
             QStringList tokens = message.split(" ", QString::SkipEmptyParts);
-            int cardnum = 0, watch = 0;
+            int watch = 0;
             if (tokens.size() >= 3)
             {
                 cardnum = tokens[1].toUInt();
@@ -6497,7 +6495,7 @@ void TV::customEvent(QEvent *e)
         {
             message = message.simplified();
             QStringList tokens = message.split(" ", QString::SkipEmptyParts);
-            uint cardnum = (tokens.size() >= 2) ? tokens[1].toUInt() : 0;
+            cardnum = (tokens.size() >= 2) ? tokens[1].toUInt() : 0;
             QStringList signalList = me->ExtraDataList();
             bool tc = activerecorder &&
                 (activerecorder->GetRecorderNumber() == cardnum);
@@ -6510,7 +6508,7 @@ void TV::customEvent(QEvent *e)
         {
             message = message.simplified();
             QStringList tokens = message.split(" ", QString::SkipEmptyParts);
-            uint cardnum = (tokens.size() >= 2) ? tokens[1].toUInt() : 0;
+            cardnum = (tokens.size() >= 2) ? tokens[1].toUInt() : 0;
             QStringList keyframe = me->ExtraDataList();
             if (!keyframe.empty())
             {
