@@ -169,6 +169,8 @@ class MythThemedMenuState: public XMLParseBase
 
 bool MythThemedMenuState::parseFonts = true;
 
+static QString LOC = "MythThemedMenuPrivate: ";
+
 class MythThemedMenuPrivate: public XMLParseBase
 {
   public:
@@ -379,15 +381,15 @@ void MythThemedMenuState::parseBackground(
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 in "
-                                            "background").arg(info.tagName()));
+                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in background")
+                                    .arg(info.tagName()));
             }
         }
     }
 
     if (!hasarea)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing button area in background");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing button area in background");
         return;
     }
 }
@@ -433,27 +435,27 @@ void MythThemedMenuState::parseShadow(TextAttributes &attributes,
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 in "
-                                            "text/shadow").arg(info.tagName()));
+                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in text/shadow")
+                                    .arg(info.tagName()));
             }
         }
     }
 
     if (!hascolor)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing color tag in shadow");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing color tag in shadow");
         return;
     }
 
     if (!hasalpha)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing alpha tag in shadow");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing alpha tag in shadow");
         return;
     }
 
     if (!hasoffset)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing offset tag in shadow");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing offset tag in shadow");
         return;
     }
 
@@ -496,21 +498,21 @@ void MythThemedMenuState::parseOutline(TextAttributes &attributes,
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 in "
-                                            "text/shadow").arg(info.tagName()));
+                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in text/shadow")
+                                    .arg(info.tagName()));
             }
         }
     }
 
     if (!hassize)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing size in outline");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing size in outline");
         return;
     }
 
     if (!hascolor)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing color in outline");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing color in outline");
         return;
     }
 
@@ -628,9 +630,8 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
                 }
                 else
                 {
-                            VERBOSE(VB_GENERAL,
-                    QString("MythThemedMenuPrivate: Unknown value %1 "
-                                        "for halign").arg(getFirstText(info)));
+                    VERBOSE(VB_GENERAL, (LOC + "Unknown value %1 for halign")
+                                        .arg(getFirstText(info)));
                 }
             }
             // valign has three possible values: center, top, and bottom. //
@@ -656,9 +657,8 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
                 }
                 else
                 {
-                            VERBOSE(VB_GENERAL,
-                    QString("MythThemedMenuPrivate: Unknown value %1 "
-                                        "for valign").arg(getFirstText(info)));
+                    VERBOSE(VB_GENERAL, (LOC + "Unknown value %1 for valign")
+                                        .arg(getFirstText(info)));
                 }
             }
             else if (info.tagName() == "outline")
@@ -671,8 +671,8 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown "
-                                        "tag %1 in text").arg(info.tagName()));
+                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in text")
+                                    .arg(info.tagName()));
                 return;
             }
         }
@@ -685,7 +685,7 @@ void MythThemedMenuState::parseText(TextAttributes &attributes,
 
     if (!hasarea)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing 'area' "
+        VERBOSE(VB_IMPORTANT, LOC + "Missing 'area' "
                 "tag in 'text' element of 'genericbutton'");
         return;
     }
@@ -732,7 +732,7 @@ void MythThemedMenuState::parseButtonDefinition(const QString &dir,
             {
                 if (!hasnormal)
                 {
-                    VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: The 'normal' "
+                    VERBOSE(VB_IMPORTANT, LOC + "The 'normal' "
                             "tag needs to come before the 'text' tag");
                     return;
                 }
@@ -742,7 +742,7 @@ void MythThemedMenuState::parseButtonDefinition(const QString &dir,
             {
                 if (!hasactive)
                 {
-                    VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: The 'active' "
+                    VERBOSE(VB_IMPORTANT, LOC + "The 'active' "
                             "tag needs to come before the 'activetext' tag");
                     return;
                 }
@@ -755,8 +755,7 @@ void MythThemedMenuState::parseButtonDefinition(const QString &dir,
             }
             else
             {
-                VERBOSE(VB_GENERAL,
-                        QString("MythThemedMenuPrivate: Unknown tag %1 in "
+                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in "
                                 "genericbutton").arg(info.tagName()));
             }
         }
@@ -764,13 +763,13 @@ void MythThemedMenuState::parseButtonDefinition(const QString &dir,
 
     if (!hasnormal)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: No normal button image defined");
+        VERBOSE(VB_IMPORTANT, LOC + "No normal button image defined");
         return;
     }
 
     if (!hasactive)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: No active button image defined");
+        VERBOSE(VB_IMPORTANT, LOC + "No active button image defined");
         return;
     }
 
@@ -818,21 +817,21 @@ void MythThemedMenuState::parseLogo(const QString &dir, QDomElement &element)
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
-                                            "in logo").arg(info.tagName()));
+                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in logo")
+                                    .arg(info.tagName()));
             }
         }
     }
 
     if (!hasimage)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing image tag in logo");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing image tag in logo");
         return;
     }
 
     if (!hasposition)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing position tag in logo");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing position tag in logo");
         return;
     }
 
@@ -888,7 +887,7 @@ void MythThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
                 }
                 else
                 {
-                    VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: "
+                    VERBOSE(VB_IMPORTANT, LOC +
                             "Missing mode in titles/image");
                     return;
                 }
@@ -902,21 +901,21 @@ void MythThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
-                                            "in logo").arg(info.tagName()));
+                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in logo")
+                                    .arg(info.tagName()));
             }
         }
     }
 
     if (!hasimage)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing image tag in titles");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing image tag in titles");
         return;
     }
 
     if (!hasposition)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing position tag in titles");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing position tag in titles");
         return;
     }
 }
@@ -957,21 +956,21 @@ void MythThemedMenuState::parseArrow(const QString &dir, QDomElement &element,
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
-                                            "in arrow").arg(info.tagName()));
+                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in arrow")
+                                    .arg(info.tagName()));
             }
         }
     }
 
     if (!hasimage)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing image tag in arrow");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing image tag in arrow");
         return;
     }
 
     if (!hasposition)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing position tag in arrow");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing position tag in arrow");
         return;
     }
 
@@ -1077,29 +1076,29 @@ void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
-                                            "in buttondef").arg(info.tagName()));
+                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in buttondef")
+                                    .arg(info.tagName()));
             }
         }
     }
 
     if (!hasname)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing name in button");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing name in button");
         return;
     }
 
     if (!hasoffset)
     {
-        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Missing offset "
-                                      "in buttondef %1").arg(name));
+        VERBOSE(VB_IMPORTANT, (LOC + "Missing offset in buttondef %1")
+                              .arg(name));
         return;
     }
 
     if (!hasicon) 
     {
-        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Missing image "
-                                      "in buttondef %1").arg(name));
+        VERBOSE(VB_IMPORTANT, (LOC + "Missing image in buttondef %1")
+                              .arg(name));
         return;
     }
 
@@ -1163,8 +1162,8 @@ bool MythThemedMenuState::parseSettings(
 
     if (!f.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate::parseSettings(): "
-                                      "Can't open: %1").arg(filename));
+        VERBOSE(VB_IMPORTANT, (LOC + ":parseSettings(): Can't open: %1")
+                              .arg(filename));
         return false;
     }
 
@@ -1174,7 +1173,7 @@ bool MythThemedMenuState::parseSettings(
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Error, parsing %1\n"
+        VERBOSE(VB_IMPORTANT, (LOC + "Error, parsing %1\n"
                                       "at line: %2  column: %3 msg: %4").
                 arg(filename).arg(errorLine).arg(errorColumn).arg(errorMsg));
         f.close();
@@ -1236,8 +1235,8 @@ bool MythThemedMenuState::parseSettings(
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown "
-                                            "element %1").arg(e.tagName()));
+                VERBOSE(VB_GENERAL, (LOC + "Unknown element %1")
+                                    .arg(e.tagName()));
             }
         }
         n = n.nextSibling();
@@ -1245,14 +1244,13 @@ bool MythThemedMenuState::parseSettings(
 
     if (!setbackground)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing background element");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing background element");
         return false;
     }
 
     if (!setbuttondef)
     {
-        VERBOSE(VB_IMPORTANT,
-                "MythThemedMenuPrivate: Missing genericbutton definition");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing genericbutton definition");
         return false;
     }
 
@@ -1374,21 +1372,21 @@ void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
-                                            "in button").arg(info.tagName()));
+                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in button")
+                                    .arg(info.tagName()));
             }
         }
     }
 
     if (text == "")
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing 'text' in button");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing 'text' in button");
         return;
     }
    
     if (action.empty())
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing 'action' in button");
+        VERBOSE(VB_IMPORTANT, LOC + "Missing 'action' in button");
         return;
     }
 
@@ -1418,8 +1416,8 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
 
     if (!f.exists() || !f.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Couldn't read "
-                                      "menu file %1").arg(menuname));
+        VERBOSE(VB_IMPORTANT, (LOC + "Couldn't read menu file %1")
+                              .arg(menuname));
         if (menuname == "mainmenu.xml" )
         {
             return false;
@@ -1489,8 +1487,8 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Unknown "
-                                              "element %1").arg(e.tagName()));
+                VERBOSE(VB_IMPORTANT, (LOC + "Unknown element %1")
+                                      .arg(e.tagName()));
                 return false;
             }
         }
@@ -1499,8 +1497,7 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
 
     if (buttonList.size() == 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: No buttons "
-                                      "for menu %1").arg(menuname));
+        VERBOSE(VB_IMPORTANT, (LOC + "No buttons for menu %1").arg(menuname));
         return false;
     }
 
@@ -1725,14 +1722,14 @@ bool MythThemedMenuPrivate::layoutButtons(void)
 
     if (maxrows < 1)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Must have "
+        VERBOSE(VB_IMPORTANT, LOC + "Must have "
                 "room for at least 1 row of buttons");
         return false;
     }
     
     if (columns < 1)
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Must have "
+        VERBOSE(VB_IMPORTANT, LOC + "Must have "
                 "room for at least 1 column of buttons");
         return false;
     }
@@ -2344,7 +2341,7 @@ bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
     if (last_time_stamp.length() < 1)
     {
         VERBOSE(VB_IMPORTANT,
-                "MythThemedMenuPrivate: Could not read password/pin time stamp.\n"
+                LOC + "Could not read password/pin time stamp.\n"
                 "This is only an issue if it happens repeatedly.");
     }
     else
