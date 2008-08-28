@@ -357,24 +357,24 @@ void CdDecoder::deinit()
 
 int CdDecoder::getNumTracks(void)
 {
-    if (!inited)
-        initialize();
+    if (!inited && !initialize())
+        return 0;
 
     return m_lastTrack;
 }
 
 int CdDecoder::getNumCDAudioTracks(void)
 {
-    if (!inited)
-        initialize();
+    if (!inited && !initialize())
+        return 0;
 
     return m_lastTrack - m_firstTrack + 1;
 }
 
 Metadata* CdDecoder::getMetadata(int track)
 {
-    if (!inited)
-        initialize();
+    if (!inited && !initialize())
+        return NULL;
 
     if (track < 1 || (uint)track > m_mData.size())
     {
@@ -389,8 +389,8 @@ Metadata* CdDecoder::getMetadata(int track)
 
 Metadata *CdDecoder::getLastMetadata()
 {
-    if (!inited)
-        initialize();
+    if (!inited && !initialize())
+        return NULL;
 
     return new Metadata(*(m_mData[m_mData.size() - 1]));
 }
