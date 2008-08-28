@@ -20,6 +20,7 @@ using namespace std;
 // mythtv
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
+#include <mythtv/libmythdb/mythdb.h>
 #include <mythtv/libmythtv/programinfo.h>
 #include <mythtv/libmythtv/remoteutil.h>
 
@@ -27,9 +28,11 @@ using namespace std;
 #include "recordingselector.h"
 #include "archiveutil.h"
 
-RecordingSelector::RecordingSelector(MythMainWindow *parent, QString window_name,
-                                 QString theme_filename, const char *name)
-                : MythThemedDialog(parent, window_name, theme_filename, name, true)
+RecordingSelector::RecordingSelector(MythMainWindow *parent,
+                                     QString         window_name,
+                                     QString         theme_filename,
+                                     const char     *name)
+    : MythThemedDialog(parent, window_name, theme_filename, name, true)
 {
     recordingList = NULL;
     wireUpTheme();
@@ -258,8 +261,9 @@ void RecordingSelector::wireUpTheme()
                 this, SLOT(titleChanged(UIListBtnTypeItem *)));
     }
 
-    if (!ok_button || !cancel_button || !category_selector || !title_text || !datetime_text
-         || !description_text || !filesize_text || !preview_image || !cutlist_image || !recording_list)
+    if (!ok_button || !cancel_button || !category_selector ||
+        !title_text || !datetime_text || !description_text ||
+        !filesize_text || !preview_image || !cutlist_image || !recording_list)
     {
         VERBOSE(VB_IMPORTANT, "One or more UI elements is missing from your theme - bailing out!");
         QTimer::singleShot(100, this, SLOT(cancelPressed()));
@@ -349,7 +353,7 @@ void RecordingSelector::OKPressed()
         query.bindValue(":FILENAME", p->GetPlaybackURL(false, true));
         query.bindValue(":HASCUTLIST", (p->programflags & FL_CUTLIST));
         if (!query.exec())
-            MythContext::DBError("archive item insert", query);
+            MythDB::DBError("archive item insert", query);
     }
 
     done(Accepted);
@@ -375,18 +379,18 @@ void RecordingSelector::updateRecordingList(void)
         {
             p = *i;
 
-            if (p->title == category_selector->getCurrentString() || 
+            if (p->title == category_selector->getCurrentString() ||
                 category_selector->getCurrentString() == tr("All Recordings"))
             {
-                UIListBtnTypeItem* item = new UIListBtnTypeItem(recording_list, 
-                        p->title + " ~ " + 
+                UIListBtnTypeItem* item = new UIListBtnTypeItem(recording_list,
+                        p->title + " ~ " +
                         p->startts.toString("dd MMM yy (hh:mm)"));
                 item->setCheckable(true);
                 if (selectedList.indexOf((ProgramInfo *) p) != -1)
                 {
                     item->setChecked(UIListBtnTypeItem::FullChecked);
                 }
-                else 
+                else
                 {
                     item->setChecked(UIListBtnTypeItem::NotChecked);
                 }
@@ -458,7 +462,7 @@ void RecordingSelector::getRecordingList(void)
     for (int x = 1; x <= categories.count(); x++)
     {
         if (category_selector)
-            category_selector->addItem(x, categories[x-1]); 
+            category_selector->addItem(x, categories[x-1]);
     }
 
     setCategory(0);
@@ -486,7 +490,7 @@ void RecordingSelector::updateSelectedList()
     {
         while (query.next())
         {
-            QString filename = query.value(0).toString(); 
+            QString filename = query.value(0).toString();
 
             ProgramInfo *p;
             vector<ProgramInfo *>::iterator i = recordingList->begin();

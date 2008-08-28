@@ -8,7 +8,7 @@
 
 // myth
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 
 // mytharchive
 #include "dbcheck.h"
@@ -19,10 +19,11 @@ const QString currentDatabaseVersion = "1003";
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
 
-    if (!gContext->SaveSettingOnHost("ArchiveDBSchemaVer",newnumber,NULL)) 
+    if (!gContext->SaveSettingOnHost("ArchiveDBSchemaVer",newnumber,NULL))
     {
-        VERBOSE(VB_IMPORTANT, QString("DB Error (Setting new DB version number): %1\n")
-                              .arg(newnumber));
+        VERBOSE(VB_IMPORTANT,
+                QString("DB Error (Setting new DB version number): %1\n")
+                .arg(newnumber));
 
         return false;
     }
@@ -35,8 +36,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythArchive schema version ") + 
-            version);
+    VERBOSE(VB_IMPORTANT, "Upgrading to MythArchive schema version " + version);
 
     int counter = 0;
     QString thequery = updates[counter];
@@ -51,7 +51,7 @@ static bool performActualUpdate(const QString updates[], QString version,
                 QString("DB Error (Performing database upgrade): \n"
                         "Query was: %1 \nError was: %2 \nnew version: %3")
                 .arg(thequery)
-                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg(version);
             VERBOSE(VB_IMPORTANT, msg);
             return false;
@@ -77,7 +77,8 @@ bool UpgradeArchiveDatabaseSchema(void)
 
     if (dbver == "")
     {
-        VERBOSE(VB_IMPORTANT, "Inserting MythArchive initial database information.");
+        VERBOSE(VB_IMPORTANT,
+                "Inserting MythArchive initial database information.");
 
         const QString updates[] = {
 "DROP TABLE IF EXISTS archiveitems;",

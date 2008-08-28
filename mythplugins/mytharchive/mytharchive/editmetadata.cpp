@@ -115,24 +115,28 @@ void EditMetadataDialog::wireUpTheme()
     if (description_edit)
     {
         description_edit->createEdit(this);
-        MythRemoteLineEdit *edit = (MythRemoteLineEdit *) description_edit->getEdit();
-        if (edit)
-            edit->setWordWrap(Q3TextEdit::WidgetWidth); 
-        connect(description_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
+        MythRemoteLineEdit *edit
+            = (MythRemoteLineEdit *) description_edit->getEdit();
+        //if (edit)
+        //    edit->setWordWrap(Q3TextEdit::WidgetWidth);
+        connect(description_edit, SIGNAL(loosingFocus()),
+                this,             SLOT(editLostFocus()));
     }
 
     startdate_edit = getUIRemoteEditType("startdate_edit");
     if (startdate_edit)
     {
         startdate_edit->createEdit(this);
-        connect(startdate_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
+        connect(startdate_edit, SIGNAL(loosingFocus()),
+                this,           SLOT(editLostFocus()));
     }
 
     starttime_edit = getUIRemoteEditType("starttime_edit");
     if (starttime_edit)
     {
         starttime_edit->createEdit(this);
-        connect(starttime_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
+        connect(starttime_edit, SIGNAL(loosingFocus()),
+                this,           SLOT(editLostFocus()));
     }
 
     ok_button = getUITextButtonType("ok_button");
@@ -154,7 +158,8 @@ void EditMetadataDialog::wireUpTheme()
 
 void EditMetadataDialog::editLostFocus()
 {
-    UIRemoteEditType *whichEditor = (UIRemoteEditType *) getCurrentFocusWidget();
+    UIRemoteEditType *whichEditor
+        = (UIRemoteEditType *) getCurrentFocusWidget();
 
     if (whichEditor == title_edit)
     {

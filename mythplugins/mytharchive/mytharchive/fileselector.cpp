@@ -7,7 +7,7 @@
 
 // Myth
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 #include <mythtv/uitypes.h>
 #include <mythtv/libmythui/mythuihelper.h>
 
@@ -17,9 +17,9 @@
 
 ////////////////////////////////////////////////////////////////
 
-FileSelector::FileSelector(FSTYPE type, const QString &startDir, 
-                const QString &filemask, MythMainWindow *parent, 
-                const QString &window_name, const QString &theme_filename, 
+FileSelector::FileSelector(FSTYPE type, const QString &startDir,
+                const QString &filemask, MythMainWindow *parent,
+                const QString &window_name, const QString &theme_filename,
                 const char *name)
                 :MythThemedDialog(parent, window_name, theme_filename, name)
 {
@@ -170,7 +170,7 @@ void FileSelector::wireUpTheme()
     if (m_locationEdit)
     {
         m_locationEdit->createEdit(this);
-        connect(m_locationEdit, SIGNAL(loosingFocus()), 
+        connect(m_locationEdit, SIGNAL(loosingFocus()),
                 this, SLOT(locationEditLostFocus()));
     }
 
@@ -206,10 +206,10 @@ void FileSelector::wireUpTheme()
         connect(m_homeButton, SIGNAL(pushed()), this, SLOT(homePressed()));
     }
 
-    if (!m_fileList || !m_locationEdit || !m_backButton || !m_okButton 
+    if (!m_fileList || !m_locationEdit || !m_backButton || !m_okButton
          || !m_cancelButton || !m_homeButton)
     {
-        VERBOSE(VB_IMPORTANT, 
+        VERBOSE(VB_IMPORTANT,
                 "FileSelector: Your theme is missing some UI elements! "
                 "Bailing out.");
         QTimer::singleShot(100, this, SLOT(reject()));
@@ -288,7 +288,7 @@ void FileSelector::OKPressed()
                 query.bindValue(":FILENAME", s);
                 query.bindValue(":HASCUTLIST", 0);
                 if (!query.exec())
-                    MythContext::DBError("archive item insert", query);
+                    MythDB::DBError("archive item insert", query);
             }
         }
     }
@@ -378,7 +378,7 @@ void FileSelector::updateFileList()
             fi = list.at(x);
             if (fi.fileName() != ".")
             {
-                FileData  *data = new FileData; 
+                FileData  *data = new FileData;
                 data->selected = false;
                 data->directory = true;
                 data->filename = fi.fileName();
@@ -401,7 +401,7 @@ void FileSelector::updateFileList()
             for (int x = 0; x < list.size(); x++)
             {
                 fi = list.at(x);
-                FileData  *data = new FileData; 
+                FileData  *data = new FileData;
                 data->selected = false;
                 data->directory = false;
                 data->filename = fi.fileName();
@@ -428,7 +428,7 @@ void FileSelector::updateFileList()
                     {
                         item->setChecked(UIListBtnTypeItem::FullChecked);
                     }
-                    else 
+                    else
                     {
                         item->setChecked(UIListBtnTypeItem::NotChecked);
                     }

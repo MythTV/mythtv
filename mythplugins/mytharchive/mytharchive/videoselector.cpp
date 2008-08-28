@@ -17,7 +17,7 @@
 // mythtv
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 
 // mytharchive
 #include "videoselector.h"
@@ -27,7 +27,7 @@ using namespace std;
 
 VideoSelector::VideoSelector(MythMainWindow *parent, QString window_name,
                                  QString theme_filename, const char *name)
-                : MythThemedDialog(parent, window_name, theme_filename, name, true)
+    : MythThemedDialog(parent, window_name, theme_filename, name, true)
 {
     currentParentalLevel = 1;
     videoList = NULL;
@@ -315,7 +315,7 @@ void VideoSelector::titleChanged(UIListBtnTypeItem *item)
             if (file.exists())
                 v->size = (unsigned long long)file.size();
             else
-                VERBOSE(VB_IMPORTANT, 
+                VERBOSE(VB_IMPORTANT,
                         QString("VideoSelector: Cannot find file: %1")
                                 .arg(v->filename.toLocal8Bit().constData()));
         }
@@ -356,7 +356,7 @@ void VideoSelector::OKPressed()
             query.bindValue(":FILENAME", v->filename);
             query.bindValue(":HASCUTLIST", 0);
             if (!query.exec())
-                MythContext::DBError("archive item insert", query);
+                MythDB::DBError("archive item insert", query);
         }
     }
 
@@ -383,7 +383,7 @@ void VideoSelector::updateVideoList(void)
         {
             v = *i;
 
-            if (v->category == category_selector->getCurrentString() || 
+            if (v->category == category_selector->getCurrentString() ||
                 category_selector->getCurrentString() == tr("All Videos"))
             {
                 if (v->parentalLevel <= currentParentalLevel)
@@ -395,7 +395,7 @@ void VideoSelector::updateVideoList(void)
                     {
                         item->setChecked(UIListBtnTypeItem::FullChecked);
                     }
-                    else 
+                    else
                     {
                         item->setChecked(UIListBtnTypeItem::NotChecked);
                     }
@@ -497,7 +497,7 @@ void VideoSelector::getVideoList(void)
     }
     else
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Video Selector"),
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Video Selector",
                                   tr("You don't have any videos!\n\nClick OK"));
         QTimer::singleShot(100, this, SLOT(cancelPressed()));
         return;
@@ -515,7 +515,7 @@ void VideoSelector::getVideoList(void)
     for (int x = 1; x <= categories.count(); x++)
     {
         if (category_selector)
-            category_selector->addItem(x, categories[x-1]); 
+            category_selector->addItem(x, categories[x-1]);
     }
 
     setCategory(0);
@@ -543,7 +543,7 @@ void VideoSelector::updateSelectedList()
     {
         while (query.next())
         {
-            QString filename = query.value(0).toString(); 
+            QString filename = query.value(0).toString();
 
             VideoInfo *v;
             vector<VideoInfo *>::iterator i = videoList->begin();
@@ -598,7 +598,8 @@ bool VideoSelector::checkParentPassword()
     }
     else
     {
-        QDateTime last_time = QDateTime::fromString(last_time_stamp, Qt::TextDate);
+        QDateTime last_time = QDateTime::fromString(last_time_stamp,
+                                                    Qt::TextDate);
         if (last_time.secsTo(curr_time) < 120)
         {
             //  Two minute window
