@@ -1,6 +1,5 @@
 // Myth headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 
 // MythNews headers
 #include "newsdbutil.h"
@@ -11,7 +10,7 @@ bool findInDB(const QString& name)
     query.prepare("SELECT name FROM newssites WHERE name = :NAME ;");
     query.bindValue(":NAME", name);
     if (!query.exec() || !query.isActive()) {
-        MythContext::DBError("new find in db", query);
+        MythDB::DBError("new find in db", query);
         return false;
     }
 
@@ -42,7 +41,7 @@ bool insertInDB(const QString &name, const QString &url,
     query.bindValue(":ICON", icon);
     query.bindValue(":PODCAST", podcast);
     if (!query.exec() || !query.isActive()) {
-        MythContext::DBError("news: inserting in DB", query);
+        MythDB::DBError("news: inserting in DB", query);
         return false;
     }
 
@@ -62,7 +61,7 @@ bool removeFromDB(const QString &name)
     query.prepare("DELETE FROM newssites WHERE name = :NAME ;");
     query.bindValue(":NAME", name);
     if (!query.exec() || !query.isActive()) {
-        MythContext::DBError("news: delete from db", query);
+        MythDB::DBError("news: delete from db", query);
         return false;
     }
 

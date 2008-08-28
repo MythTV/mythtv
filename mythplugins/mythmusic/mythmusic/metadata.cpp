@@ -13,7 +13,7 @@ using namespace std;
 // mythtv
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 
 // mythmusic
 #include "metadata.h"
@@ -83,7 +83,7 @@ void Metadata::persist()
     query.bindValue(":ID", m_id);
 
     if (!query.exec())
-        MythContext::DBError("music persist", query);
+        MythDB::DBError("music persist", query);
 }
 
 int Metadata::compare(Metadata *other) 
@@ -192,7 +192,7 @@ void Metadata::dumpToDatabase()
 
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("music select directory id", query);
+            MythDB::DBError("music select directory id", query);
             return;
         }
         if (query.next())
@@ -206,7 +206,7 @@ void Metadata::dumpToDatabase()
 
             if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
             {
-                MythContext::DBError("music insert directory", query);
+                MythDB::DBError("music insert directory", query);
                 return;
             }
             m_directoryid = query.lastInsertId().toInt();
@@ -222,7 +222,7 @@ void Metadata::dumpToDatabase()
 
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("music select artist id", query);
+            MythDB::DBError("music select artist id", query);
             return;
         }
         if (query.next())
@@ -236,7 +236,7 @@ void Metadata::dumpToDatabase()
 
             if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
             {
-                MythContext::DBError("music insert artist", query);
+                MythDB::DBError("music insert artist", query);
                 return;
             }
             m_artistid = query.lastInsertId().toInt();
@@ -255,7 +255,7 @@ void Metadata::dumpToDatabase()
         query.bindValue(":ARTIST", m_compilation_artist);
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("music select compilation artist id", query);
+            MythDB::DBError("music select compilation artist id", query);
             return;
         }
         if (query.next())
@@ -269,7 +269,7 @@ void Metadata::dumpToDatabase()
 
             if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
             {
-                MythContext::DBError("music insert compilation artist", query);
+                MythDB::DBError("music insert compilation artist", query);
                 return;
             }
             m_compartistid = query.lastInsertId().toInt();
@@ -286,7 +286,7 @@ void Metadata::dumpToDatabase()
         query.bindValue(":ALBUM", m_album);
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("music select album id", query);
+            MythDB::DBError("music select album id", query);
             return;
         }
         if (query.next())
@@ -303,7 +303,7 @@ void Metadata::dumpToDatabase()
 
             if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
             {
-                MythContext::DBError("music insert album", query);
+                MythDB::DBError("music insert album", query);
                 return;
             }
             m_albumid = query.lastInsertId().toInt();
@@ -318,7 +318,7 @@ void Metadata::dumpToDatabase()
         query.bindValue(":GENRE", m_genre);
         if (!query.exec() || !query.isActive())
         {
-            MythContext::DBError("music select genre id", query);
+            MythDB::DBError("music select genre id", query);
             return;
         }
         if (query.next())
@@ -332,7 +332,7 @@ void Metadata::dumpToDatabase()
 
             if (!query.exec() || !query.isActive() || query.numRowsAffected() <= 0)
             {
-                MythContext::DBError("music insert genre", query);
+                MythDB::DBError("music insert genre", query);
                 return;
             }
             m_genreid = query.lastInsertId().toInt();
@@ -443,7 +443,7 @@ void Metadata::dumpToDatabase()
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("music compilation update", query);
+        MythDB::DBError("music compilation update", query);
         return;
     }
 }

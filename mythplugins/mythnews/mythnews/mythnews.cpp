@@ -18,7 +18,7 @@
 #include <mythtv/util.h>
 #include <mythtv/httpcomms.h>
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 #include <mythtv/mythdirs.h>
 
 // MythNews headers
@@ -45,7 +45,8 @@ MythNews::MythNews(MythScreenStack *parent, const char *name)
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
+    zoom = QString("-z %1")
+           .arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
     browser = gContext->GetSetting("WebBrowserCommand",
                                    GetInstallPrefix() +
                                       "/bin/mythbrowser");
@@ -92,7 +93,8 @@ bool MythNews::Create()
         return false;
 
     m_sitesList = dynamic_cast<MythUIButtonList *> (GetChild("siteslist"));
-    m_articlesList = dynamic_cast<MythUIButtonList *> (GetChild("articleslist"));
+    m_articlesList = dynamic_cast<MythUIButtonList *>
+                     (GetChild("articleslist"));
 
     m_updatedText = dynamic_cast<MythUIText *> (GetChild("updated"));
     m_titleText = dynamic_cast<MythUIText *> (GetChild("title"));
@@ -111,7 +113,8 @@ bool MythNews::Create()
     }
 
     if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+        VERBOSE(VB_IMPORTANT,
+                "Failed to build a focuslist. Something is wrong");
 
     SetFocusWidget(m_sitesList);
     m_sitesList->SetActive(true);
@@ -136,7 +139,8 @@ void MythNews::loadSites(void)
     m_sitesList->Reset();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT name, url, ico, updated, podcast FROM newssites ORDER BY name");
+    query.exec("SELECT name, url, ico, updated, podcast"
+               " FROM newssites ORDER BY name");
 
     if (!query.isActive()) {
         VERBOSE(VB_IMPORTANT, "MythNews: Error in loading Sites from DB");
@@ -188,7 +192,8 @@ void MythNews::updateInfoView(MythUIButtonListItem* selected)
     {
         site = (NewsSite*) selected->getData();
         if (m_articlesList->GetItemCurrent())
-            article = (NewsArticle*) m_articlesList->GetItemCurrent()->getData();
+            article = (NewsArticle*)
+                      m_articlesList->GetItemCurrent()->getData();
     }
 
     if (GetFocusWidget() == m_articlesList)
@@ -507,7 +512,7 @@ void MythNews::slotNewsRetrieved(NewsSite* site)
     query.bindValue(":UPDATED", updated);
     query.bindValue(":NAME", site->name());
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("news update time", query);
+        MythDB::DBError("news update time", query);
 
     processAndShowNews(site);
 }
@@ -691,21 +696,29 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
                     QString mediaPage = HttpComms::getHttp(cmdURL);
                     if (!mediaPage.isEmpty())
                     {
-                        // If this breaks in the future, we are building the URL to download
-                        // a video.  At this time, this requires the video_id and the t argument
+                        // If this breaks in the future, we are building the URL
+                        // to download a video.  At this time, this requires
+                        // the video_id and the t argument
                         // from the source HTML of the page
                         int playerPos = mediaPage.find("swfArgs") + 7;
 
-                        int tArgStart = mediaPage.find("\"t\": \"", playerPos) + 6;
+                        int tArgStart = mediaPage.find("\"t\": \"",
+                                                       playerPos) + 6;
                         int tArgEnd = mediaPage.find("\"", tArgStart);
-                        QString tArgString = mediaPage.mid(tArgStart, tArgEnd - tArgStart);
+                        QString tArgString = mediaPage.mid(tArgStart,
+                                                           tArgEnd - tArgStart);
 
-                        int vidStart = mediaPage.find("\"video_id\": \"", playerPos) + 13;
+                        int vidStart = mediaPage.find("\"video_id\": \"",
+                                                      playerPos) + 13;
                         int vidEnd = mediaPage.find("\"", vidStart);
-                        QString vidString = mediaPage.mid(vidStart, vidEnd - vidStart);
+                        QString vidString = mediaPage.mid(vidStart,
+                                                          vidEnd - vidStart);
 
-                        cmdURL = QString("http://youtube.com/get_video.php?video_id=%2&t=%1").arg(tArgString).arg(vidString);
-                        VERBOSE(VB_GENERAL, QString("MythNews: VideoURL %1").arg(cmdURL));
+                        cmdURL = QString("http://youtube.com/get_video.php"
+                                         "?video_id=%2&t=%1")
+                                 .arg(tArgString).arg(vidString);
+                        VERBOSE(VB_GENERAL,
+                                QString("MythNews: VideoURL %1").arg(cmdURL));
                     }
                 }
 

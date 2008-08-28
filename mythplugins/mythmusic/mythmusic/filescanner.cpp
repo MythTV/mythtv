@@ -7,7 +7,7 @@
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 #include <mythtv/mythdialogs.h>
 
 // MythUI headers
@@ -72,7 +72,7 @@ FileScanner::~FileScanner ()
 }
 
 /*!
- * \brief Builds a list of all the files found descending recursively 
+ * \brief Builds a list of all the files found descending recursively
  *        into the given directory
  *
  * \param directory Directory to begin search
@@ -119,7 +119,7 @@ void FileScanner::BuildFileList(QString &directory, MusicLoadedMap &music_files,
             {
                 int id = GetDirectoryId(dir, parentid);
                 m_directoryid[QString(dir.toUtf8()).lower()] = id;
-                    
+
                 if (id > 0)
                 {
                     newparentid = id;
@@ -187,14 +187,14 @@ int FileScanner::GetDirectoryId(const QString &directory, const int &parentid)
             if (!query.exec() || !query.isActive()
             || query.numRowsAffected() <= 0)
             {
-                MythContext::DBError("music insert directory", query);
+                MythDB::DBError("music insert directory", query);
                 return -1;
             }
             return query.lastInsertId().toInt();
         }
     }
 
-    MythContext::DBError("music select directory id", query);
+    MythDB::DBError("music select directory id", query);
     return -1;
 }
 
@@ -265,7 +265,7 @@ void FileScanner::AddFileToDB(const QString &filename)
 
         if (!query.exec() || query.numRowsAffected() <= 0)
         {
-                MythContext::DBError("music insert artwork", query);
+            MythDB::DBError("music insert artwork", query);
         }
         return;
     }
@@ -443,14 +443,13 @@ void FileScanner::RemoveFileFromDB (const QString &filename)
 
         if (!query.exec() || query.numRowsAffected() <= 0)
         {
-                MythContext::DBError("music delete artwork", query);
+            MythDB::DBError("music delete artwork", query);
         }
         return;
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM music_songs WHERE "
-                  "filename = :NAME ;");
+    query.prepare("DELETE FROM music_songs WHERE filename = :NAME ;");
     query.bindValue(":NAME", sqlfilename);
     query.exec();
 }

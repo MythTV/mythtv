@@ -15,7 +15,7 @@ using namespace std;
 // mythtv
 #include <mythtv/mythcontext.h>
 #include <mythtv/audiooutput.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 
 // mythmusic
 #include "musicplayer.h"
@@ -84,7 +84,8 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     else
         m_resumeMode = RESUME_EXACT;
 
-    m_lastplayDelay = gContext->GetNumSetting("MusicLastPlayDelay", LASTPLAY_DELAY);
+    m_lastplayDelay = gContext->GetNumSetting("MusicLastPlayDelay",
+                                              LASTPLAY_DELAY);
 
     m_autoShowPlayer = (gContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
 
@@ -127,7 +128,8 @@ MusicPlayer::~MusicPlayer()
     else
         gContext->SaveSetting("RepeatMode", "none");
 
-    gContext->SaveSetting("MusicAutoShowPlayer", (m_autoShowPlayer ? "1" : "0"));
+    gContext->SaveSetting("MusicAutoShowPlayer",
+                          (m_autoShowPlayer ? "1" : "0"));
 }
 
 void MusicPlayer::setListener(QObject *listener)
@@ -228,13 +230,13 @@ void MusicPlayer::stop(bool stopAll)
 
 void MusicPlayer::pause(void)
 {
-    if (m_output) 
+    if (m_output)
     {
         m_isPlaying = !m_isPlaying;
         m_output->Pause(!m_isPlaying);
     }
     // wake up threads
-    if (m_decoder) 
+    if (m_decoder)
     {
         m_decoder->lock();
         m_decoder->cond()->wakeAll();
@@ -270,7 +272,8 @@ void MusicPlayer::play(void)
         m_decoder = Decoder::create(m_currentFile, m_input, m_output, true);
         if (!m_decoder)
         {
-            VERBOSE(VB_IMPORTANT, "MusicPlayer: Failed to create decoder for playback");
+            VERBOSE(VB_IMPORTANT,
+                    "MusicPlayer: Failed to create decoder for playback");
             return;
         }
 
@@ -304,7 +307,8 @@ void MusicPlayer::play(void)
         {
             if (m_currentNode->getInt() > 0)
             {
-                m_currentMetadata = Metadata::getMetadataFromID(m_currentNode->getInt());
+                m_currentMetadata = Metadata::getMetadataFromID(
+                    m_currentNode->getInt());
                 m_updatedLastplay = false;
             }
             else
@@ -312,7 +316,8 @@ void MusicPlayer::play(void)
                 // CD track
                 CdDecoder *cddecoder = dynamic_cast<CdDecoder*>(m_decoder);
                 if (cddecoder)
-                    m_currentMetadata = cddecoder->getMetadata(-m_currentNode->getInt());
+                    m_currentMetadata = cddecoder->getMetadata(
+                        -m_currentNode->getInt());
             }
         }
     }
@@ -327,7 +332,7 @@ void MusicPlayer::stopDecoder(void)
         m_decoder->unlock();
     }
 
-    if (m_decoder) 
+    if (m_decoder)
     {
         m_decoder->lock();
         m_decoder->cond()->wakeAll();
@@ -378,7 +383,8 @@ void MusicPlayer::next(void)
     if (!m_currentNode)
         return;
 
-    GenericTree *node = m_currentNode->nextSibling(1, ((int) m_shuffleMode) + 1);
+    GenericTree *node
+        = m_currentNode->nextSibling(1, ((int) m_shuffleMode) + 1);
     if (node)
     {
         m_currentNode = node;
@@ -416,7 +422,8 @@ void MusicPlayer::previous(void)
     if (!m_currentNode)
         return;
 
-    GenericTree *node = m_currentNode->prevSibling(1, ((int) m_shuffleMode) + 1);
+    GenericTree *node
+        = m_currentNode->prevSibling(1, ((int) m_shuffleMode) + 1);
     if (node)
     {
         m_currentNode = node;
@@ -472,7 +479,8 @@ void MusicPlayer::customEvent(QEvent *event)
                         .arg(*aoe->errorMessage()));
                 MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                         "Output Error:",
-                        QString("MythMusic has encountered the following error:\n%1")
+                        QString("MythMusic has encountered"
+                                " the following error:\n%1")
                                 .arg(*aoe->errorMessage()));
                 stop(true);
 
@@ -495,9 +503,10 @@ void MusicPlayer::customEvent(QEvent *event)
 
                 VERBOSE(VB_IMPORTANT, QString("Decoder Error - %1")
                         .arg(*dxe->errorMessage()));
-                MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+                MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                         "Decoder Error",
-                                        QString("MythMusic has encountered the following error:\n%1")
+                                        QString("MythMusic has encountered"
+                                                " the following error:\n%1")
                                         .arg(*dxe->errorMessage()));
                 break;
             }
@@ -526,7 +535,8 @@ void MusicPlayer::customEvent(QEvent *event)
                         if (hostname == gContext->GetHostName())
                         {
                             play();
-                            seek(gContext->GetNumSetting("MusicBookmarkPosition", 0));
+                            seek(gContext->GetNumSetting(
+                                "MusicBookmarkPosition", 0));
                             gContext->SaveSetting("MusicBookmark", "");
                             gContext->SaveSetting("MusicBookmarkPosition", 0);
                         }
@@ -548,8 +558,8 @@ void MusicPlayer::customEvent(QEvent *event)
 
         if (!m_updatedLastplay)
         {
-            // we update the lastplay and playcount after playing for m_lastplayDelay seconds
-            // or half the total track time
+            // we update the lastplay and playcount after playing
+            // for m_lastplayDelay seconds or half the total track time
             if ((m_currentMetadata &&  m_currentTime > (m_currentMetadata->Length() / 1000) / 2) ||
                  m_currentTime >= m_lastplayDelay)
             updateLastplay();
@@ -566,16 +576,17 @@ QString MusicPlayer::getFilenameFromID(int id)
     if (id > 0)
     {
         QString aquery = "SELECT CONCAT_WS('/', "
-                        "music_directories.path, music_songs.filename) AS filename "
-                        "FROM music_songs "
-                        "LEFT JOIN music_directories ON music_songs.directory_id=music_directories.directory_id "
-                        "WHERE music_songs.song_id = :ID";
+            "music_directories.path, music_songs.filename) AS filename "
+            "FROM music_songs "
+            "LEFT JOIN music_directories"
+            " ON music_songs.directory_id=music_directories.directory_id "
+            "WHERE music_songs.song_id = :ID";
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(aquery);
         query.bindValue(":ID", id);
         if (!query.exec() || query.size() < 1)
-            MythContext::DBError("get filename", query);
+            MythDB::DBError("get filename", query);
 
         if (query.isActive() && query.size() > 0)
         {
@@ -800,7 +811,8 @@ void MusicPlayer::updateLastplay()
         // if all_music is still in scope we need to keep that in sync
         if (gMusicData->all_music)
         {
-            Metadata *mdata = gMusicData->all_music->getMetadata(m_currentNode->getInt());
+            Metadata *mdata
+                = gMusicData->all_music->getMetadata(m_currentNode->getInt());
             if (mdata)
             {
                 mdata->incPlayCount();

@@ -5,7 +5,7 @@
 
 // MythTV plugin includes
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 
 // MythMusic includes
 #include "search.h"
@@ -105,10 +105,13 @@ void SearchDialog::runQuery(QString searchText)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString queryString("SELECT filename, music_artists.artist_name, album_name, name, song_id "
+    QString queryString("SELECT filename, music_artists.artist_name,"
+                        " album_name, name, song_id "
                         "FROM music_songs "
-                        "LEFT JOIN music_artists ON music_songs.artist_id=music_artists.artist_id "
-                        "LEFT JOIN music_albums ON music_songs.album_id=music_albums.album_id ");
+                        "LEFT JOIN music_artists"
+                        " ON music_songs.artist_id=music_artists.artist_id "
+                        "LEFT JOIN music_albums"
+                        " ON music_songs.album_id=music_albums.album_id ");
 
     QStringList list = QStringList::split(QRegExp("[>,]"), searchText);
     whereClause = "";
@@ -129,7 +132,7 @@ void SearchDialog::runQuery(QString searchText)
         }
         else // numeric
         {
-            for (int i = 0; i < list.count(); i++) 
+            for (int i = 0; i < list.count(); i++)
             {
                 QString stxt = list[i].stripWhiteSpace();
                 whereClause += (i) ? " AND ( " : "WHERE (";
@@ -143,7 +146,8 @@ void SearchDialog::runQuery(QString searchText)
     }
 
     queryString += whereClause;
-    queryString += " ORDER BY music_artists.artist_name, album_name, name, song_id, filename ";
+    queryString += " ORDER BY music_artists.artist_name,"
+                   " album_name, name, song_id, filename ";
     queryString += "LIMIT ";
     queryString += searchLimit;
     query.prepare(queryString);
@@ -151,7 +155,7 @@ void SearchDialog::runQuery(QString searchText)
     bool has_entries = true;
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Search music database", query);
+        MythDB::DBError("Search music database", query);
         has_entries = false;
     }
     has_entries &= (query.size() > 0);
@@ -168,16 +172,16 @@ void SearchDialog::runQuery(QString searchText)
                      query.value(3).toString() );
 
         // Highlight matches as appropriate
-        if(!searchText.isEmpty()) 
+        if (!searchText.isEmpty())
         {
             if (substringSearch) // alpha
             {
-                for (int i = 0; i < list.count(); i++) 
+                for (int i = 0; i < list.count(); i++)
                 {
                     QString stxt = list[i];
                     stxt.replace("''", "'");
                     int index = -1;
-                    while( (index = text.findRev(stxt, index, false)) != -1 ) 
+                    while( (index = text.findRev(stxt, index, false)) != -1 )
                     {
                         text.insert(index + stxt.length(), "]");
                         text.insert(index, "[");
@@ -186,11 +190,12 @@ void SearchDialog::runQuery(QString searchText)
             }
             else // numeric
             {
-                for (int i = 0; i < list.count(); i++) 
+                for (int i = 0; i < list.count(); i++)
                 {
                     QString stxt = list[i].stripWhiteSpace();
                     int index = -1;
-                    while( (index = text.findRev(QRegExp(stxt, false), index)) != -1 )
+                    while( (index = text.findRev(QRegExp(stxt, false),
+                                                 index)) != -1 )
                     {
                         text.insert(index + (stxt.contains('[') ? 1 : 0), "]");
                         text.insert(index, "[");
@@ -213,7 +218,7 @@ void SearchDialog::runQuery(QString searchText)
         listbox->setTopItem(0);
     }
 
-    QString captionText = 
+    QString captionText =
         tr("Search Music Database (%1 matches)").arg(matchCount);
     caption->setText(captionText);
 }
@@ -266,7 +271,7 @@ void SearchListBoxItem::paint(QPainter *p)
             sNormal = sText.mid(index, 0xffffffff);
             sHighlight = "";
             index = sText.length();
-        } 
+        }
 
         if (sNormal != "")
         {

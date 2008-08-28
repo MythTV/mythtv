@@ -9,17 +9,18 @@ using namespace std;
 #include "dbcheck.h"
 #include "metadata.h"
 #include "mythtv/mythcontext.h"
-#include "mythtv/mythdbcon.h"
+#include "mythtv/mythdb.h"
 
 const QString currentDatabaseVersion = "1016";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
-{   
+{
 
     if (!gContext->SaveSettingOnHost("MusicDBSchemaVer",newnumber,NULL))
-    {   
-        VERBOSE(VB_IMPORTANT, QString("DB Error (Setting new DB version number): %1\n")
-                              .arg(newnumber));
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("DB Error (Setting new DB version number): %1\n")
+                .arg(newnumber));
 
         return false;
     }
@@ -32,7 +33,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythMusic schema version ") + 
+    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythMusic schema version ") +
             version);
 
     int counter = 0;
@@ -48,7 +49,7 @@ static bool performActualUpdate(const QString updates[], QString version,
                 QString("DB Error (Performing database upgrade): \n"
                         "Query was: %1 \nError was: %2 \nnew version: %3")
                 .arg(thequery)
-                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(MythDB::DBErrorMessage(query.lastError()))
                 .arg(version);
             VERBOSE(VB_IMPORTANT, msg);
             return false;
@@ -68,7 +69,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 bool UpgradeMusicDatabaseSchema(void)
 {
     QString dbver = gContext->GetSetting("MusicDBSchemaVer");
-    
+
     if (dbver == currentDatabaseVersion)
         return true;
 
@@ -132,7 +133,7 @@ bool UpgradeMusicDatabaseSchema(void)
                 intid = query.value(1).toString();
 
                 if (newname.startsWith(startdir))
-                { 
+                {
                     newname.remove(0, startdir.length());
                     modify.exec(QString("UPDATE musicmetadata SET "
                                 "filename = \"%1\" "
@@ -179,7 +180,7 @@ bool UpgradeMusicDatabaseSchema(void)
         if (!performActualUpdate(updates, "1002", dbver))
             return false;
     }
-    
+
     if (dbver == "1002")
     {
         VERBOSE(VB_IMPORTANT, "Updating music metadata to be UTF-8 in the database");
@@ -213,7 +214,7 @@ bool UpgradeMusicDatabaseSchema(void)
                 subquery.bindValue(":ID", id);
 
                 if (!subquery.exec() || !subquery.isActive())
-                    MythContext::DBError("music utf8 update", subquery);
+                    MythDB::DBError("music utf8 update", subquery);
             }
         }
 
@@ -234,7 +235,7 @@ bool UpgradeMusicDatabaseSchema(void)
                 subquery.bindValue(":ID", id);
 
                 if (!subquery.exec() || !subquery.isActive())
-                    MythContext::DBError("music playlist utf8 update", subquery);
+                    MythDB::DBError("music playlist utf8 update", subquery);
             }
         }
 
@@ -246,7 +247,7 @@ bool UpgradeMusicDatabaseSchema(void)
         if (!performActualUpdate(updates, "1003", dbver))
             return false;
     }
-    
+
     if (dbver == "1003")
     {
         const QString updates[] = {
@@ -316,7 +317,7 @@ bool UpgradeMusicDatabaseSchema(void)
 "    operator = \"is between\", value1 = \"2000\", value2 = \"2009\";",
 
 "INSERT INTO smartplaylist SET smartplaylistid = 6, name = \"Favorite Tracks\", "
-"    categoryid = 2, matchtype = \"All\"," 
+"    categoryid = 2, matchtype = \"All\","
 "    orderby = \"Artist (A), Album (A)\", limitto = 0;",
 "INSERT INTO smartplaylistitem SET smartplaylistid = 6, field = \"Rating\","
 "    operator = \"is greater than\", value1 = \"7\", value2 = \"0\";",
@@ -527,7 +528,7 @@ bool UpgradeMusicDatabaseSchema(void)
     if (!performActualUpdate(updates, "1010", dbver))
         return false;
 
-    // scan though the music_albumart table and make a guess at what 
+    // scan though the music_albumart table and make a guess at what
     // each image represents from the filename
 
     VERBOSE(VB_IMPORTANT, "Updating music_albumart image types");
@@ -556,7 +557,7 @@ bool UpgradeMusicDatabaseSchema(void)
                                  "WHERE directory_id = :DIR;");
                 subquery.bindValue(":DIR", directoryID);
                 if (!subquery.exec() || !subquery.isActive())
-                    MythContext::DBError("album art image count", subquery);
+                    MythDB::DBError("album art image count", subquery);
                 subquery.first();
                 if (query.value(0).toInt() == 1)
                     type = IT_FRONTCOVER;
@@ -569,7 +570,7 @@ bool UpgradeMusicDatabaseSchema(void)
             subquery.bindValue(":TYPE", type);
             subquery.bindValue(":ID", id);
             if (!subquery.exec() || !subquery.isActive())
-                MythContext::DBError("album art image type update", subquery);
+                MythDB::DBError("album art image type update", subquery);
         }
     }
  }
