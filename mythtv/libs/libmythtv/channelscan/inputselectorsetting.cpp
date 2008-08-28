@@ -59,7 +59,7 @@ void InputSelector::Load(void)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("InputSelector::load()", query);
+        MythDB::DBError("InputSelector::load()", query);
         return;
     }
 

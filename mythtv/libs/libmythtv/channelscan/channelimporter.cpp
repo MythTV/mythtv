@@ -484,7 +484,7 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
 
     if (!query.exec())
     {
-        MythContext::DBError("GetDBTransports()", query);
+        MythDB::DBError("GetDBTransports()", query);
         return not_in_scan;
     }
 

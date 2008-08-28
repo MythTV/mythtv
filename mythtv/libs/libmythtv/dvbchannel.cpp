@@ -43,8 +43,7 @@
 #include <q3deepcopy.h>
 
 // MythTV headers
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "mythdb.h"
 #include "cardutil.h"
 #include "channelutil.h"
 #include "dvbtypes.h"
@@ -909,7 +908,7 @@ int DVBChannel::GetChanID() const
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("fetching chanid", query);
+        MythDB::DBError("fetching chanid", query);
         return -1;
     }
 

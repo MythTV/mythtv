@@ -275,7 +275,7 @@ bool ChannelScanSM::ScanServicesSourceID(int SourceID)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Get Transports for SourceID", query);
+        MythDB::DBError("Get Transports for SourceID", query);
         return false;
     }
 
@@ -1479,7 +1479,7 @@ bool ChannelScanSM::ScanTransport(int mplexid)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("Get Transports for SourceID", query);
+        MythDB::DBError("Get Transports for SourceID", query);
         return false;
     }
 

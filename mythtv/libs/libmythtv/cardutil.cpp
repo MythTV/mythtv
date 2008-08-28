@@ -15,7 +15,6 @@
 // MythTV headers
 #include "cardutil.h"
 #include "videosource.h"
-#include "mythcontext.h"
 #include "mythdbcon.h"
 #include "dvbchannel.h"
 #include "diseqcsettings.h"
@@ -910,7 +909,7 @@ QString CardUtil::GetStartingChannel(uint inputid)
     query.bindValue(":INPUTID", inputid);
 
     if (!query.exec())
-        MythContext::DBError("CardUtil::GetStartingChannel(uint)", query);
+        MythDB::DBError("CardUtil::GetStartingChannel(uint)", query);
     else if (query.next())
         return query.value(0).toString();
 

@@ -25,8 +25,7 @@ using namespace std;
 #include "v4lchannel.h"
 #include "frequencies.h"
 #include "tv_rec.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "mythdb.h"
 #include "channelutil.h"
 #include "cardutil.h"
 
@@ -775,7 +774,7 @@ QString V4LChannel::GetFormatForChannel(QString channum, QString inputname)
 
     QString fmt = QString::null;
     if (!query.exec() || !query.isActive())
-        MythContext::DBError("SwitchToInput:find format", query);
+        MythDB::DBError("SwitchToInput:find format", query);
     else if (query.next())
         fmt = query.value(0).toString();
     return fmt;

@@ -46,13 +46,13 @@ uint SaveScan(const ScanDTVTransportList &scan)
 
     if (!query.exec())
     {
-        MythContext::DBError("SaveScan 1", query);
+        MythDB::DBError("SaveScan 1", query);
         return scanid;
     }
 
     query.prepare("SELECT MAX(scanid) FROM channelscan");
     if (!query.exec())
-        MythContext::DBError("SaveScan 2", query);
+        MythDB::DBError("SaveScan 2", query);
     else if (query.next())
         scanid = query.value(0).toUInt();
 
@@ -82,7 +82,7 @@ ScanDTVTransportList LoadScan(uint scanid)
     query.bindValue(":SCANID", scanid);
     if (!query.exec())
     {
-        MythContext::DBError("LoadScan 1", query);
+        MythDB::DBError("LoadScan 1", query);
         return list;
     }
 
@@ -119,7 +119,7 @@ ScanDTVTransportList LoadScan(uint scanid)
         
         if (!query2.exec())
         {
-            MythContext::DBError("LoadScan 2", query2);
+            MythDB::DBError("LoadScan 2", query2);
             continue;
         }
 
@@ -193,7 +193,7 @@ bool ScanInfo::MarkProcessed(uint scanid)
 
     if (!query.exec())
     {
-        MythContext::DBError("MarkProcessed", query);
+        MythDB::DBError("MarkProcessed", query);
         return false;
     }
 
@@ -210,7 +210,7 @@ bool ScanInfo::DeleteScan(uint scanid)
 
     if (!query.exec())
     {
-        MythContext::DBError("DeleteScan", query);
+        MythDB::DBError("DeleteScan", query);
         return false;
     }
 
@@ -221,7 +221,7 @@ bool ScanInfo::DeleteScan(uint scanid)
 
     if (!query.exec())
     {
-        MythContext::DBError("DeleteScan", query);
+        MythDB::DBError("DeleteScan", query);
         return false;
     }
 
@@ -232,7 +232,7 @@ bool ScanInfo::DeleteScan(uint scanid)
 
     if (!query.exec())
     {
-        MythContext::DBError("DeleteScan", query);
+        MythDB::DBError("DeleteScan", query);
         return false;
     }
 
@@ -251,7 +251,7 @@ vector<ScanInfo> LoadScanList(void)
 
     if (!query.exec())
     {
-        MythContext::DBError("LoadScanList", query);
+        MythDB::DBError("LoadScanList", query);
         return list;
     }
 
