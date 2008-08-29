@@ -750,6 +750,14 @@ int main(int argc, char **argv)
         pidfs.close();
     }
 
+    extern const char *myth_source_version;
+    extern const char *myth_source_path;
+
+    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
+                            .arg(binname)
+                            .arg(myth_source_path)
+                            .arg(myth_source_version));
+
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
@@ -973,9 +981,6 @@ int main(int argc, char **argv)
         pHS->RegisterExtension( new HttpStatus( &tvList, sched,
                                                 expirer, ismaster ));
     }
-
-    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 www.mythtv.org")
-                            .arg(binname).arg(MYTH_BINARY_VERSION));
 
     VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));
 

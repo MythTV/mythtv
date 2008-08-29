@@ -1017,6 +1017,14 @@ int main(int argc, char **argv)
 
     QString binname = finfo.baseName();
 
+    extern const char *myth_source_version;
+    extern const char *myth_source_path;
+
+    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
+                            .arg(binname)
+                            .arg(myth_source_path)
+                            .arg(myth_source_version));
+
     bool ResetSettings = false;
 
     if (binname.lower() != "mythfrontend")
@@ -1253,9 +1261,6 @@ int main(int argc, char **argv)
         cleanup();
         return FRONTEND_EXIT_DB_OUTOFDATE;
     }
-
-    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 www.mythtv.org")
-                            .arg(binname).arg(MYTH_BINARY_VERSION));
 
     VERBOSE(VB_IMPORTANT,
             QString("Enabled verbose msgs: %1").arg(verboseString));
