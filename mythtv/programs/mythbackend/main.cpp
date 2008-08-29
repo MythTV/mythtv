@@ -419,6 +419,24 @@ bool parse_preview_info(const QString &param,
 
 int main(int argc, char **argv)
 {
+    bool cmdline_err;
+    MythCommandLineParser cmdline(
+        kCLPOverrideSettingsFile |
+        kCLPOverrideSettings     |
+        kCLPQueryVersion);
+
+    for (int argpos = 0; argpos < argc; ++argpos)
+    {
+        if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
+        {
+            if (cmdline_err)
+                return BACKEND_EXIT_INVALID_CMDLINE;
+
+            if (cmdline.WantsToExit())
+                return BACKEND_EXIT_OK;
+        }
+    }
+
     bool need_gui = false;
 #ifndef _WIN32
     for (int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
@@ -453,12 +471,6 @@ int main(int argc, char **argv)
     QString printexpire = "";
     bool clearsettingscache = false;
     bool wantupnprebuild = false;
-
-    bool cmdline_err;
-    MythCommandLineParser cmdline(
-        kCLPOverrideSettingsFile |
-        kCLPOverrideSettings     |
-        kCLPQueryVersion);
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
