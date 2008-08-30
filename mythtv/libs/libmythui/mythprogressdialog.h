@@ -32,6 +32,7 @@ class MythUIProgressDialog : public MythScreenType
     bool Create(void);
     bool keyPressEvent(QKeyEvent *event);
 
+  public slots:
     void SetTotal(uint total);
     void SetProgress(uint count);
 
