@@ -68,6 +68,23 @@ bool MythUIProgressDialog::keyPressEvent(QKeyEvent *event)
     return false;
 }
 
+void MythUIProgressDialog::customEvent(QEvent *event)
+{
+    if (event->type() == kProgressUpdateEventType)
+    {
+        ProgressUpdateEvent *pue = dynamic_cast<ProgressUpdateEvent*>(event);
+
+        QString message = pue->GetMessage();
+        if (!message.isEmpty())
+            m_message = message;
+        uint total = pue->GetTotal();
+        if (total > 0)
+            m_total = total;
+        m_count = pue->GetCount();
+        UpdateProgress();
+    }
+}
+
 void MythUIProgressDialog::SetTotal(uint total)
 {
     m_total = total;
@@ -80,8 +97,17 @@ void MythUIProgressDialog::SetProgress(uint count)
     UpdateProgress();
 }
 
+void MythUIProgressDialog::SetMessage(const QString &message)
+{
+    m_message = message;
+    UpdateProgress();
+}
+
 void MythUIProgressDialog::UpdateProgress()
 {
+    if (m_messageText)
+        m_messageText->SetText(m_message);
+
     if (m_total == 0)
         return;
 

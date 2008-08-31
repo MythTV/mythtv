@@ -1,10 +1,31 @@
 #ifndef MYTHPROGRESSBOX_H_
 #define MYTHPROGRESSBOX_H_
 
+#include <QEvent>
+
 #include "mythscreentype.h"
 #include "mythmainwindow.h"
 #include "mythuitext.h"
 #include "mythuiprogressbar.h"
+
+const int kProgressUpdateEventType = 35111;
+
+class ProgressUpdateEvent : public QEvent
+{
+  public:
+    ProgressUpdateEvent(uint count, uint total=0, QString message="")
+        : QEvent((QEvent::Type)kProgressUpdateEventType),
+          m_total(total), m_count(count), m_message(message) { }
+
+    QString GetMessage() { return m_message; }
+    uint GetTotal() { return m_total; }
+    uint GetCount() { return m_count; }
+
+  private:
+    uint m_total;
+    uint m_count;
+    QString m_message;
+};
 
 class MythUIBusyDialog : public MythScreenType
 {
@@ -31,10 +52,10 @@ class MythUIProgressDialog : public MythScreenType
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *event);
-
-  public slots:
+    void customEvent(QEvent *event);
     void SetTotal(uint total);
     void SetProgress(uint count);
+    void SetMessage(const QString &message);
 
   protected:
     void UpdateProgress(void);
