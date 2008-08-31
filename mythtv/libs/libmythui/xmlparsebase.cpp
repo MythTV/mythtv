@@ -23,6 +23,7 @@
 #include "mythuiprogressbar.h"
 #include "mythuigroup.h"
 #include "mythuiwebbrowser.h"
+#include "mythuibuttontree.h"
 
 QString XMLParseBase::getFirstText(QDomElement &element)
 {
@@ -290,6 +291,8 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         uitype = new MythListButton(parent, name);
     else if (type == "buttonlist2")
         uitype = new MythUIButtonList(parent, name);
+    else if (type == "buttontree")
+        uitype = new MythUIButtonTree(parent, name);
     else if (type == "spinbox")
         uitype = new MythUISpinBox(parent, name);
     else if (type == "checkbox")

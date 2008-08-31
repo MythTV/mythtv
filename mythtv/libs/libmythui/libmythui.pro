@@ -26,7 +26,7 @@ HEADERS += mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
 HEADERS += mythuiprogressbar.h mythuiwebbrowser.h
 HEADERS += screensaver.h screensaver-null.h mythsystem.h x11colors.h
 HEADERS += themeinfo.h util-x11.h DisplayRes.h DisplayResScreen.h
-HEADERS += mythgenerictree.h
+HEADERS += mythgenerictree.h mythuibuttontree.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += myththemebase.cpp
@@ -40,7 +40,7 @@ SOURCES += mythuispinbox.cpp mythuicheckbox.cpp mythuibuttonlist.cpp
 SOURCES += mythuigroup.cpp mythuiprogressbar.cpp mythuiwebbrowser.cpp
 SOURCES += screensaver.cpp screensaver-null.cpp mythsystem.cpp x11colors.cpp
 SOURCES += themeinfo.cpp util-x11.cpp DisplayRes.cpp DisplayResScreen.cpp
-SOURCES += mythgenerictree.cpp
+SOURCES += mythgenerictree.cpp mythuibuttontree.cpp
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
 
@@ -53,7 +53,7 @@ inc.files += myththemedmenu.h mythdialogbox.h mythfontproperties.h
 inc.files += mythuiclock.h mythgesture.h mythuitextedit.h mythprogressdialog.h
 inc.files += mythuispinbox.h mythuicheckbox.h mythuibuttonlist.h mythuigroup.h
 inc.files += mythuiprogressbar.h mythuiwebbrowser.h
-inc.files += mythsystem.h x11colors.h mythgenerictree.h
+inc.files += mythsystem.h x11colors.h mythgenerictree.h mythuibuttontree.h
 
 INSTALLS += inc
 
