@@ -1,8 +1,7 @@
 #include <list>
 #include <map>
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythtv/mythdb.h>
 
 #include "metadata.h"
 #include "metadatalistmanager.h"
@@ -129,7 +128,7 @@ void MetadataListManager::loadAllFromDatabase(metadata_list &items)
     }
     else
     {
-        MythContext::DBError("Querying video metadata", query);
+        MythDB::DBError("Querying video metadata", query);
     }
 }
 
