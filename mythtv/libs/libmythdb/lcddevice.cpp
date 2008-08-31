@@ -29,16 +29,7 @@
 #include "mythdirs.h"
 #include "mythevent.h"
 
-/*
-  LCD_DEVICE_DEBUG control how much debug info we get
-  0 = none
-  1 = LCDServer info 
-  2 = screen switch info
-  5 = every command received
-  10 = every command sent and error received
- */
-
-#define LCD_DEVICE_DEBUG 0
+static QString LOC = "lcddevice: ";
 
 LCD::LCD()
     : QObject(),
@@ -73,10 +64,8 @@ LCD::LCD()
     // Note that this does *not* include opening the socket and initiating 
     // communications with the LDCd daemon.
 
-#if LCD_DEVICE_DEBUG > 0
-    VERBOSE(VB_IMPORTANT, "lcddevice: An LCD object now exists "
-            "(LCD() was called)");
-#endif
+    VERBOSE(VB_GENERAL|VB_EXTRA, LOC + "An LCD object now exists "
+                                      "(LCD() was called)");
 
     connect(retryTimer, SIGNAL(timeout()),   this, SLOT(restartConnection()));
     connect(LEDTimer,   SIGNAL(timeout()),   this, SLOT(outputLEDs()));
@@ -125,10 +114,8 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 {
     QMutexLocker locker(&socketLock);
 
-#if LCD_DEVICE_DEBUG > 0
-    VERBOSE(VB_IMPORTANT, "lcddevice: connecting to host: " 
-            << lhostname << " - port: " << lport);
-#endif
+    VERBOSE(VB_NETWORK|VB_EXTRA, QString(LOC + "connecting to host: %1 - port: %2")
+            .arg(lhostname).arg(lport));
 
     // Open communications
     // Store the hostname and port in case we need to reconnect.
@@ -223,11 +210,9 @@ void LCD::sendToServer(const QString &someText)
 
     if (bConnected)
     {
-#if LCD_DEVICE_DEBUG > 9
-        VERBOSE(VB_IMPORTANT, "lcddevice: Sending to Server: " << someText);
-#endif
-        // Just stream the text out the socket
+        VERBOSE(VB_NETWORK|VB_EXTRA, QString(LOC + "Sending to Server: %1").arg(someText));
 
+        // Just stream the text out the socket
         os << someText << "\n";
     }
     else
@@ -276,11 +261,10 @@ void LCD::readyRead(MythSocket *sock)
     lineFromServer = lineFromServer.replace( QRegExp("\r"), " " );
     lineFromServer = lineFromServer.simplified();
 
-#if LCD_DEVICE_DEBUG > 4
     // Make debugging be less noisy
     if (lineFromServer != "OK")
-        VERBOSE(VB_IMPORTANT, "lcddevice: Received from server: " << lineFromServer);
-#endif
+        VERBOSE(VB_NETWORK|VB_EXTRA, QString(LOC + "Received from server: %1")
+                .arg(lineFromServer));
 
     aList = lineFromServer.split(" ");
     if (aList[0] == "CONNECTED")
@@ -291,7 +275,7 @@ void LCD::readyRead(MythSocket *sock)
         // get lcd width & height
         if (aList.count() != 3)
         {
-            VERBOSE(VB_IMPORTANT, "lcddevice: received bad no. of arguments "
+            VERBOSE(VB_IMPORTANT, LOC + "received bad no. of arguments "
                             "in CONNECTED response from LCDServer");
         }
 
@@ -299,14 +283,14 @@ void LCD::readyRead(MythSocket *sock)
         lcd_width = aList[1].toInt(&bOK);
         if (!bOK)
         {
-            VERBOSE(VB_IMPORTANT, "lcddevice: received bad int for width"
+            VERBOSE(VB_IMPORTANT, LOC + "received bad int for width"
                             "in CONNECTED response from LCDServer");
         }
 
         lcd_height = aList[2].toInt(&bOK);
         if (!bOK)
         {
-            VERBOSE(VB_IMPORTANT, "lcddevice: received bad int for height"
+            VERBOSE(VB_IMPORTANT, LOC + "received bad int for height"
                             "in CONNECTED response from LCDServer");
         }
 
@@ -314,9 +298,9 @@ void LCD::readyRead(MythSocket *sock)
     }
     else if (aList[0] == "HUH?")
     {
-        VERBOSE(VB_IMPORTANT, "lcddevice: WARNING: Something is getting passed"
+        VERBOSE(VB_IMPORTANT, LOC + "WARNING: Something is getting passed"
                         "to LCDServer that it doesn't understand");
-        VERBOSE(VB_IMPORTANT, QString("lcddevice: last command: %1").arg( last_command ));
+        VERBOSE(VB_IMPORTANT, QString(LOC + "last command: %1").arg( last_command ));
     }
     else if (aList[0] == "KEY")
         handleKeyPress(aList.last().trimmed());
@@ -388,9 +372,7 @@ void LCD::stopAll()
     if (!lcd_ready)
         return;
 
-#if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_IMPORTANT, "lcddevice: stopAll");
-#endif
+    VERBOSE(VB_IMPORTANT|VB_EXTRA, "lcddevice: stopAll");
 
     sendToServer("STOP_ALL");
 }
@@ -401,7 +383,7 @@ void LCD::setChannelProgress(float value)
         return;
 
     value = min(max(0.0f, value), 1.0f);
-    sendToServer(QString("SET_CHANNEL_PROGRESS %1").arg(value));    
+    sendToServer(QString("SET_CHANNEL_PROGRESS %1").arg(value));
 }
 
 void LCD::setGenericProgress(float value)
@@ -484,9 +466,7 @@ void LCD::switchToTime()
     if (!lcd_ready || !lcd_showtime)
         return;
 
-#if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_IMPORTANT, "lcddevice: switchToTime");
-#endif
+    VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "switchToTime");
 
     sendToServer("SWITCH_TO_TIME");
 }
@@ -496,9 +476,7 @@ void LCD::switchToMusic(const QString &artist, const QString &album, const QStri
     if (!lcd_ready || !lcd_showmusic)
         return;
 
-#if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_IMPORTANT, "lcddevice: switchToMusic");
-#endif
+    VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "switchToMusic");
 
     sendToServer("SWITCH_TO_MUSIC " + quotedString(artist) + " " 
             + quotedString(album) + " " 
@@ -510,9 +488,7 @@ void LCD::switchToChannel(QString channum, QString title, QString subtitle)
     if (!lcd_ready || !lcd_showchannel)
         return;
 
-#if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_IMPORTANT, "lcddevice: switchToChannel");
-#endif
+    VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "switchToChannel");
 
     sendToServer("SWITCH_TO_CHANNEL " + quotedString(channum) + " " 
             + quotedString(title) + " " 
@@ -525,9 +501,7 @@ void LCD::switchToMenu(QList<LCDMenuItem> &menuItems, QString app_name,
     if (!lcd_ready || !lcd_showmenu)
         return;
 
-#if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_IMPORTANT, "lcddevice: switchToMenu");
-#endif
+    VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "switchToMenu");
 
     if (menuItems.isEmpty())
         return;
@@ -568,9 +542,7 @@ void LCD::switchToGeneric(QList<LCDTextItem> &textItems)
     if (!lcd_ready || !lcd_showgeneric)
         return;
 
-#if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_IMPORTANT, "lcddevice: switchToGeneric ");
-#endif
+    VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "switchToGeneric ");
 
     if (textItems.isEmpty())
         return;
@@ -608,9 +580,7 @@ void LCD::switchToVolume(QString app_name)
     if (!lcd_ready || !lcd_showvolume)
         return;
 
-#if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_IMPORTANT, "lcddevice: switchToVolume ");
-#endif
+    VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "switchToVolume ");
 
     sendToServer("SWITCH_TO_VOLUME " + quotedString(app_name));
 }
@@ -620,9 +590,7 @@ void LCD::switchToNothing()
     if (!lcd_ready)
         return;
 
-#if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_IMPORTANT, "lcddevice: switchToNothing");
-#endif
+    VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "switchToNothing");
 
     sendToServer("SWITCH_TO_NOTHING");
 }
@@ -631,9 +599,7 @@ void LCD::shutdown()
 {
     QMutexLocker locker(&socketLock);
 
-#if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_IMPORTANT, "lcddevice: shutdown");
-#endif
+    VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "shutdown");
 
     if (socket)
         socket->close();
@@ -648,10 +614,8 @@ void LCD::resetServer()
 
     if (!lcd_ready)
         return;
-    
-#if LCD_DEVICE_DEBUG > 1
-    VERBOSE(VB_IMPORTANT, "lcddevice: RESET");
-#endif
+
+    VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "RESET");
 
     sendToServer("RESET");
 }
@@ -660,10 +624,8 @@ LCD::~LCD()
 {
     m_lcd = NULL;
 
-#if LCD_DEVICE_DEBUG > 0
-    VERBOSE(VB_IMPORTANT, "lcddevice: An LCD device is being snuffed out of "
+    VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "An LCD device is being snuffed out of "
                     "existence (~LCD() was called)");
-#endif
 
     if (socket)
     {
@@ -678,9 +640,7 @@ void LCD::setLevels(int numbLevels, float *values)
     numbLevels = numbLevels;
     values = values;
 
-#if LCD_DEVICE_DEBUG > 0
-    VERBOSE(VB_IMPORTANT, "lcddevice: setLevels");
-#endif
+    VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "setLevels");
 }
 
 QString LCD::quotedString(const QString &s)
