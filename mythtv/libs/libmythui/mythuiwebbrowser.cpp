@@ -843,6 +843,7 @@ MythUIWebBrowser::~MythUIWebBrowser()
 
 void MythUIWebBrowser::LoadPage(QUrl url)
 {
+    (void) url;
 }
 
 void MythUIWebBrowser::SetHtml(const QString &html, const QUrl &baseUrl)
@@ -901,24 +902,33 @@ QIcon MythUIWebBrowser::GetIcon(void)
     return QIcon();
 }
 
+QUrl MythUIWebBrowser::GetUrl(void)
+{
+    return QUrl();
+}
+
 void MythUIWebBrowser::slotLoadStarted(void)
 {
 }
 
 void MythUIWebBrowser::slotLoadFinished(bool ok)
 {
+    (void) ok;
 }
 
 void MythUIWebBrowser::slotLoadProgress(int progress)
 {
+    (void) progress;
 }
 
 void MythUIWebBrowser::slotTitleChanged( const QString &title)
 {
+    (void) title;
 }
 
 void MythUIWebBrowser::slotStatusBarMessage(const QString &text)
 {
+    (void) text;
 }
 
 void MythUIWebBrowser::slotIconChanged(void)
@@ -930,6 +940,10 @@ void MythUIWebBrowser::slotTakingFocus(void)
 }
 
 void MythUIWebBrowser::slotLosingFocus(void)
+{
+}
+
+void MythUIWebBrowser::UpdateBuffer(void)
 {
 }
 
@@ -949,6 +963,11 @@ void MythUIWebBrowser::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
 {
     return false;
+}
+
+void MythUIWebBrowser::HandleMouseAction(const QString &action)
+{
+    (void) action;
 }
 
 bool MythUIWebBrowser::ParseElement(QDomElement &element)

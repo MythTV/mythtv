@@ -15,7 +15,6 @@
 #endif
 
 #include "mythuitype.h"
-#include "mythgesture.h"
 
 
 class MythUIWebBrowser;
