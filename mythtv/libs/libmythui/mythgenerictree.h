@@ -6,6 +6,7 @@
 #include <QList>
 #include <QVector>
 #include <QMetaType>
+#include <QVariant>
 
 #include "mythexp.h"
 
@@ -59,6 +60,9 @@ class MPUBLIC MythGenericTree
     const QString getString(void) { return m_string; }
     void setString(const QString &str) { m_string = str; }
 
+    void SetData(QVariant data) { m_data = data; }
+    const QVariant GetData(void) { return m_data; }
+
     int calculateDepth(int start=0);
 
     int childCount(void);
@@ -97,6 +101,7 @@ class MPUBLIC MythGenericTree
 
     QString m_string;
     int m_int;
+    QVariant m_data;
 
     SortableMythGenericTreeList *m_subnodes;
     SortableMythGenericTreeList *m_ordered_subnodes;

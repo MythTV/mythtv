@@ -503,29 +503,43 @@ MythGenericTree* MythGenericTree::nextPrevFromFlatList(bool forward_or_backward,
 
 MythGenericTree* MythGenericTree::getChildByName(const QString &a_name)
 {
-    QList<MythGenericTree*>::iterator it;
-    it = m_subnodes->begin();
-    MythGenericTree *child;
-    while ((child = *it) != 0)
+    QList<MythGenericTree*> *children = getAllChildren();
+    if (children && children->count() > 0)
     {
-        if (child->getString() == a_name)
-            return child;
-        ++it;
+        SortableMythGenericTreeList::Iterator it;
+        MythGenericTree *child = NULL;
+
+        for (it = children->begin(); it != children->end(); ++it)
+        {
+            child = *it;
+            if (!child)
+                continue;
+            if (child->getString() == a_name)
+                return child;
+        }
     }
+
     return NULL;
 }
 
 MythGenericTree* MythGenericTree::getChildById(int an_int)
 {
-    QList<MythGenericTree*>::iterator it;
-    it = m_subnodes->begin();
-    MythGenericTree *child;
-    while ((child = *it) != 0)
+    QList<MythGenericTree*> *children = getAllChildren();
+    if (children && children->count() > 0)
     {
-        if (child->getInt() == an_int)
-            return child;
-        ++it;
+        SortableMythGenericTreeList::Iterator it;
+        MythGenericTree *child = NULL;
+
+        for (it = children->begin(); it != children->end(); ++it)
+        {
+            child = *it;
+            if (!child)
+                continue;
+            if (child->getInt() == an_int)
+                return child;
+        }
     }
+
     return NULL;
 }
 
@@ -533,13 +547,19 @@ void MythGenericTree::sortByString()
 {
     m_ordered_subnodes->Sort(SortableMythGenericTreeList::SORT_STRING);
 
-    QList<MythGenericTree*>::iterator it;
-    it = m_subnodes->begin();
-    MythGenericTree *child;
-    while ((child = *it) != 0)
+    QList<MythGenericTree*> *children = getAllChildren();
+    if (children && children->count() > 0)
     {
-        child->sortByString();
-        ++it;
+        SortableMythGenericTreeList::Iterator it;
+        MythGenericTree *child = NULL;
+
+        for (it = children->begin(); it != children->end(); ++it)
+        {
+            child = *it;
+            if (!child)
+                continue;
+            child->sortByString();
+        }
     }
 }
 
