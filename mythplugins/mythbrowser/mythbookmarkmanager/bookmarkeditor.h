@@ -8,8 +8,6 @@
 #include <mythtv/libmythui/mythuitext.h>
 #include <mythtv/libmythui/mythuitextedit.h>
 
-// mythbrowser
-
 
 class Bookmark;
 

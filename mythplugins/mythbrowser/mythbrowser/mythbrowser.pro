@@ -15,6 +15,8 @@ INSTALLS += installimages
 
 INCLUDEPATH += ../mythbookmarkmanager
 
+DEFINES += MYTHBROWSER_STANDALONE
+
 # Input
 HEADERS += mythbrowser.h webpage.h ../mythbookmarkmanager/bookmarkeditor.h
 HEADERS += ../mythbookmarkmanager/bookmarkmanager.h ../mythbookmarkmanager/browserdbutil.h

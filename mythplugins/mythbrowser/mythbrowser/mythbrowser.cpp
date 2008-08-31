@@ -12,8 +12,8 @@
 // mythbrowser
 #include "webpage.h"
 
-#include "mythbrowser.h"
 #include "bookmarkeditor.h"
+#include "mythbrowser.h"
 
 using namespace std;
 

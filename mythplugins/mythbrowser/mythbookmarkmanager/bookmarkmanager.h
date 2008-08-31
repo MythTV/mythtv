@@ -74,7 +74,10 @@ class BookmarkManager : public MythScreenType
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
+
+#ifdef MYTHBROWSER_STANDALONE
     void SetBrowser(MythBrowser *browser) { m_browser = browser; }
+#endif
 
   private slots:
     void slotGroupSelected(MythListButtonItem *item);
@@ -98,7 +101,9 @@ class BookmarkManager : public MythScreenType
     void ShowEditDialog(bool edit);
     void ReloadBookmarks(void);
 
+#ifdef MYTHBROWSER_STANDALONE
     MythBrowser      *m_browser;
+#endif
 
     QList<Bookmark*>  m_siteList;
 

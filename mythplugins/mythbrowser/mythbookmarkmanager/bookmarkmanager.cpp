@@ -12,7 +12,10 @@
 #include "bookmarkmanager.h"
 #include "bookmarkeditor.h"
 #include "browserdbutil.h"
+
+#ifdef MYTHBROWSER_STANDALONE
 #include "../mythbrowser/mythbrowser.h"
+#endif
 
 using namespace std;
 
@@ -133,7 +136,9 @@ void BrowserConfig::slotFocusChanged(void)
 BookmarkManager::BookmarkManager(MythScreenStack *parent, const char *name)
                : MythScreenType(parent, name)
 {
+#ifdef MYTHBROWSER_STANDALONE
     m_browser = NULL;
+#endif
     m_bookmarkList = NULL;
     m_groupList = NULL;
     m_messageText = NULL;
@@ -298,8 +303,13 @@ bool BookmarkManager::keyPressEvent(QKeyEvent *event)
             if (GetMarkedCount() > 0)
             {
                 m_menuPopup->AddButton(tr("Delete Marked"), SLOT(slotDeleteMarked()));
-                if (!m_browser)
+
+#ifdef MYTHBROWSER_STANDALONE
+                if (m_browser)
                     m_menuPopup->AddButton(tr("Show Marked"), SLOT(slotShowMarked()));
+#else
+                m_menuPopup->AddButton(tr("Show Marked"), SLOT(slotShowMarked()));
+#endif
                 m_menuPopup->AddButton(tr("Clear Marked"), SLOT(slotClearMarked()));
             }
 
@@ -360,31 +370,28 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
     if (!site)
         return;
 
-    if (!m_browser)
-    {
-        QString cmd = gContext->GetSetting("WebBrowserCommand", 
-                       GetInstallPrefix() + "/bin/mythbrowser");
-        cmd += QString(" -z %1 ").arg(
-                       gContext->GetSetting("WebBrowserZoomLevel", "1.4"));
+#ifdef MYTHBROWSER_STANDALONE
+    m_browser->slotOpenURL(site->url);
+    GetScreenStack()->PopScreen();
+#else
+    QString cmd = gContext->GetSetting("WebBrowserCommand", 
+                    GetInstallPrefix() + "/bin/mythbrowser");
+    cmd += QString(" -z %1 ").arg(
+                    gContext->GetSetting("WebBrowserZoomLevel", "1.4"));
 
-        m_savedBookmark = *site;
+    m_savedBookmark = *site;
 
-        cmd += site->url;
-        gContext->GetMainWindow()->AllowInput(false);
-        cmd.replace("&","\\&");
-        cmd.replace(";","\\;");
-        myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
-        gContext->GetMainWindow()->AllowInput(true);
+    cmd += site->url;
+    gContext->GetMainWindow()->AllowInput(false);
+    cmd.replace("&","\\&");
+    cmd.replace(";","\\;");
+    myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
+    gContext->GetMainWindow()->AllowInput(true);
 
-        // we need to reload the bookmarks incase the user added/deleted
-        // any while in MythBrowser 
-        ReloadBookmarks();
-    }
-    else
-    {
-        m_browser->slotOpenURL(site->url);
-        GetScreenStack()->PopScreen();
-    }
+    // we need to reload the bookmarks incase the user added/deleted
+    // any while in MythBrowser 
+    ReloadBookmarks();
+#endif
 }
 
 void BookmarkManager::ShowEditDialog(bool edit)
