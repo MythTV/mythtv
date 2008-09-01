@@ -24,6 +24,7 @@ MythUIButtonTree::MythUIButtonTree(MythUIType *parent, const QString &name)
     m_active = true;
 
     m_listTemplate = NULL;
+    SetCanTakeFocus(true);
 }
 
 MythUIButtonTree::~MythUIButtonTree()
@@ -58,6 +59,7 @@ void MythUIButtonTree::Init()
         list->CopyFrom(m_listTemplate);
         list->SetVisible(false);
         list->SetActive(false);
+        list->SetCanTakeFocus(false);
         int x = i * (width + m_listSpacing);
         MythRect listArea = MythRect(x,0,width,height);
         list->SetArea(listArea);
@@ -131,13 +133,18 @@ bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node)
     QList<MythGenericTree*>::iterator it;
     for (it = nodelist->begin(); it != nodelist->end(); ++it)
     {
-        MythUIButtonListItem *item = new MythUIButtonListItem(list, (*it)->getString());
-        item->SetData(qVariantFromValue(*it));
+        MythGenericTree *childnode = *it;
+        if (!childnode->IsVisible())
+            continue;
 
-        if ((*it)->childCount() > 0)
+        MythUIButtonListItem *item = new MythUIButtonListItem(list,
+                                                        childnode->getString());
+        item->SetData(qVariantFromValue(childnode));
+
+        if (childnode->childCount() > 0)
             item->setDrawArrow(true);
 
-        if ((*it) == selectedNode)
+        if (childnode == selectedNode)
             selectedItem = item;
     }
 

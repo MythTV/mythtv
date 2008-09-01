@@ -24,59 +24,61 @@ class MPUBLIC MythGenericTree
     virtual ~MythGenericTree();
 
     MythGenericTree *addNode(const QString &a_string, int an_int = 0,
-                         bool selectable_flag = false);
+                         bool selectable_flag = false, bool visible = true);
     MythGenericTree *addNode(MythGenericTree *child);
 
     void removeNode(MythGenericTree *child);
 
     MythGenericTree *findLeaf();
-
     MythGenericTree* findNode(QList<int> route_of_branches, int depth=-1);
 
     MythGenericTree *nextSibling(int number_down);
     MythGenericTree *prevSibling(int number_up);
 
-    QList<MythGenericTree*>::iterator getFirstChildIterator();
+    QList<MythGenericTree*>::iterator getFirstChildIterator() const;
 
-    MythGenericTree *getSelectedChild();
-    MythGenericTree *getChildAt(uint reference);
-    MythGenericTree *getChildByName(const QString &a_name);
-    MythGenericTree *getChildById(int an_int);
+    MythGenericTree *getSelectedChild() const;
+    MythGenericTree *getChildAt(uint reference) const;
+    MythGenericTree *getChildByName(const QString &a_name) const;
+    MythGenericTree *getChildById(int an_int) const;
 
-    QList<MythGenericTree*> *getAllChildren();
+    QList<MythGenericTree*> *getAllChildren() const;
 
-    int getChildPosition(MythGenericTree *child);
+    int getChildPosition(MythGenericTree *child) const;
     int getPosition(void);
 
     QList<int> getRouteById(void);
     QStringList getRouteByString(void);
 
     void setInt(int an_int) { m_int = an_int; }
-    int getInt() { return m_int; }
+    int getInt() const { return m_int; }
 
     void setParent(MythGenericTree* a_parent) { m_parent = a_parent; }
-    MythGenericTree *getParent(void);
+    MythGenericTree *getParent(void) const;
 
-    const QString getString(void) { return m_string; }
+    const QString getString(void) const { return m_string; }
     void setString(const QString &str) { m_string = str; }
 
     void SetData(QVariant data) { m_data = data; }
-    const QVariant GetData(void) { return m_data; }
+    const QVariant GetData(void) const { return m_data; }
 
     int calculateDepth(int start=0);
 
-    int childCount(void);
-    int siblingCount(void);
+    int childCount(void) const;
+    int siblingCount(void) const;
 
     void setSelectable(bool flag) { m_selectable = flag; }
-    bool isSelectable() { return m_selectable; }
+    bool isSelectable() const { return m_selectable; }
+
+    void SetVisible(bool visible) { m_visible = visible; }
+    bool IsVisible() const { return m_visible; }
 
     void setAttribute(uint attribute_position, int value_of_attribute);
-    int getAttribute(uint which_one);
-    IntVector *getAttributes(void) { return m_attributes; }
+    int getAttribute(uint which_one) const;
+    IntVector *getAttributes(void) const { return m_attributes; }
 
     void setOrderingIndex(int ordering_index);
-    int getOrderingIndex(void) { return m_currentOrderingIndex; }
+    int getOrderingIndex(void) const { return m_currentOrderingIndex; }
 
     void becomeSelectedChild(void);
     void setSelectedChild(MythGenericTree* a_node) { m_selected_subnode = a_node; }
@@ -85,7 +87,7 @@ class MPUBLIC MythGenericTree
     void buildFlatListOfSubnodes(bool scrambled_parents);
 
     MythGenericTree *nextPrevFromFlatList(bool forward_or_back, bool wrap_around,
-                                      MythGenericTree *active);
+                                      MythGenericTree *active) const;
 
     void sortByString();
     void sortByAttributeThenByString(int which_attribute);
@@ -112,6 +114,7 @@ class MPUBLIC MythGenericTree
     MythGenericTree *m_parent;
 
     bool m_selectable;
+    bool m_visible;
     int m_currentOrderingIndex;
 };
 

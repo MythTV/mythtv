@@ -130,10 +130,11 @@ MythGenericTree::~MythGenericTree()
 }
 
 MythGenericTree* MythGenericTree::addNode(const QString &a_string, int an_int,
-                                  bool selectable_flag)
+                                  bool selectable_flag, bool visible)
 {
     MythGenericTree *new_node = new MythGenericTree(a_string.simplified(),
                                             an_int, selectable_flag);
+    new_node->SetVisible(visible);
 
     return addNode(new_node);
 }
@@ -243,7 +244,7 @@ MythGenericTree* MythGenericTree::findNode(QList<int> route_of_branches,
     return NULL;
 }
 
-int MythGenericTree::getChildPosition(MythGenericTree *child)
+int MythGenericTree::getChildPosition(MythGenericTree *child) const
 {
     if (m_currentOrderingIndex == -1)
         return m_subnodes->indexOf(child);
@@ -286,19 +287,19 @@ QStringList MythGenericTree::getRouteByString()
     return routeByString;
 }
 
-int MythGenericTree::childCount(void)
+int MythGenericTree::childCount(void) const
 {
     return m_subnodes->count();
 }
 
-int MythGenericTree::siblingCount(void)
+int MythGenericTree::siblingCount(void) const
 {
     if (m_parent)
         return m_parent->childCount();
     return 1;
 }
 
-QList<MythGenericTree*> *MythGenericTree::getAllChildren()
+QList<MythGenericTree*> *MythGenericTree::getAllChildren() const
 {
     if (m_currentOrderingIndex == -1)
         return m_subnodes;
@@ -306,7 +307,7 @@ QList<MythGenericTree*> *MythGenericTree::getAllChildren()
     return m_ordered_subnodes;
 }
 
-MythGenericTree* MythGenericTree::getChildAt(uint reference)
+MythGenericTree* MythGenericTree::getChildAt(uint reference) const
 {
     if (reference >= (uint)m_ordered_subnodes->count())
         return NULL;
@@ -317,7 +318,7 @@ MythGenericTree* MythGenericTree::getChildAt(uint reference)
     return m_ordered_subnodes->at(reference);
 }
 
-MythGenericTree* MythGenericTree::getSelectedChild()
+MythGenericTree* MythGenericTree::getSelectedChild() const
 {
     if (m_selected_subnode)
         return m_selected_subnode;
@@ -370,21 +371,17 @@ MythGenericTree* MythGenericTree::nextSibling(int number_down)
     return m_parent->getChildAt(position + number_down);
 }
 
-QList<MythGenericTree*>::iterator MythGenericTree::getFirstChildIterator()
+QList<MythGenericTree*>::iterator MythGenericTree::getFirstChildIterator() const
 {
-    if (m_currentOrderingIndex == -1)
-    {
-        QList<MythGenericTree*>::iterator it;
-        it = m_subnodes->begin();
-        return it;
-    }
-
     QList<MythGenericTree*>::iterator it;
-    it = m_ordered_subnodes->begin();
+    if (m_currentOrderingIndex == -1)
+        it = m_subnodes->begin();
+    else
+        it = m_ordered_subnodes->begin();
     return it;
 }
 
-MythGenericTree* MythGenericTree::getParent()
+MythGenericTree* MythGenericTree::getParent() const
 {
     if (m_parent)
         return m_parent;
@@ -402,7 +399,7 @@ void MythGenericTree::setAttribute(uint attribute_position, int value_of_attribu
     (*m_attributes)[attribute_position] = value_of_attribute;
 }
 
-int MythGenericTree::getAttribute(uint which_one)
+int MythGenericTree::getAttribute(uint which_one) const
 {
     if (m_attributes->size() < (int)(which_one + 1))
     {
@@ -466,7 +463,7 @@ void MythGenericTree::buildFlatListOfSubnodes(bool scrambled_parents)
 
 MythGenericTree* MythGenericTree::nextPrevFromFlatList(bool forward_or_backward,
                                                bool wrap_around,
-                                               MythGenericTree *active)
+                                               MythGenericTree *active) const
 {
     int i = m_flatenedSubnodes->indexOf(active);
     if (i < 0)
@@ -501,7 +498,7 @@ MythGenericTree* MythGenericTree::nextPrevFromFlatList(bool forward_or_backward,
     return m_flatenedSubnodes->at(i);
 }
 
-MythGenericTree* MythGenericTree::getChildByName(const QString &a_name)
+MythGenericTree* MythGenericTree::getChildByName(const QString &a_name) const
 {
     QList<MythGenericTree*> *children = getAllChildren();
     if (children && children->count() > 0)
@@ -522,7 +519,7 @@ MythGenericTree* MythGenericTree::getChildByName(const QString &a_name)
     return NULL;
 }
 
-MythGenericTree* MythGenericTree::getChildById(int an_int)
+MythGenericTree* MythGenericTree::getChildById(int an_int) const
 {
     QList<MythGenericTree*> *children = getAllChildren();
     if (children && children->count() > 0)
