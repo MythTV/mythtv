@@ -667,7 +667,7 @@ QString HTTPRequest::GetMimeType( const QString &sFileExtension )
 QString HTTPRequest::TestMimeType( const QString &sFileName )
 {
     QFileInfo info( sFileName );
-    QString   sLOC    = "HTTPRequest::TestMimeType( " + sFileName + ") - ";
+    QString   sLOC    = "HTTPRequest::TestMimeType(" + sFileName + ") - ";
     QString   sSuffix = info.suffix().toLower();
     QString   sMIME   = GetMimeType( sSuffix );
 
@@ -684,17 +684,32 @@ QString HTTPRequest::TestMimeType( const QString &sFileName )
             QByteArray head = file.read(8);
             QString    sHex = head.toHex();
 
-            VERBOSE(VB_UPNP+VB_EXTRA, sLOC + " file starts with " + sHex);
+            VERBOSE(VB_UPNP+VB_EXTRA, sLOC + "file starts with " + sHex);
 
             if ( sHex == "000001ba44000400" )  // MPEG2 PS
                 sMIME = "video/mpeg";
+
+            if ( head == "MythTVVi" )
+            {
+                file.seek(100);
+                head = file.read(4);
+
+                if ( head == "DIVX" )
+                {
+                    VERBOSE(VB_UPNP+VB_EXTRA, sLOC + "('MythTVVi...DIVXLAME')");
+                    sMIME = "video/mp4";
+                }
+                // NuppelVideo is "RJPG" at byte 612
+                // We could also check the audio (LAME or RAWA),
+                // but since most UPnP clients choke on Nuppel, no need
+            }
 
             file.close();
         }
         else VERBOSE(VB_IMPORTANT, sLOC + "Couldn't read file");
     }
 
-    VERBOSE(VB_UPNP, sLOC + " type is " + sMIME);
+    VERBOSE(VB_UPNP, sLOC + "type is " + sMIME);
     return sMIME;
 }
 
