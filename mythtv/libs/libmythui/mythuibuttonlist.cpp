@@ -64,7 +64,7 @@ void MythUIButtonList::Const(void)
     m_itemHorizSpacing = 0;
     m_itemVertSpacing  = 0;
     m_itemHeight       = 0;
-    m_itemWidth       = 0;
+    m_itemWidth        = 0;
     m_itemsVisible     = 0;
     m_columns          = 0;
     m_rows             = 0;
@@ -440,7 +440,8 @@ void MythUIButtonList::MoveUp(MovementUnit unit)
 
     SetPositionArrowStates();
 
-    emit itemSelected(m_selItem);
+    if (pos != m_selPosition)
+        emit itemSelected(m_selItem);
 }
 
 void MythUIButtonList::MoveDown(MovementUnit unit)
@@ -512,7 +513,8 @@ void MythUIButtonList::MoveDown(MovementUnit unit)
 
     SetPositionArrowStates();
 
-    emit itemSelected(m_selItem);
+    if (pos != m_selPosition)
+        emit itemSelected(m_selItem);
 }
 
 bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
@@ -722,9 +724,6 @@ void MythUIButtonList::Init()
             m_itemWidth = itemArea.width();
     }
     // End Hack
-
-
-    SetPositionArrowStates();
 }
 
 bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
@@ -782,10 +781,7 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
         {
             MythUIButtonListItem *item = GetItemCurrent();
             if (item)
-            {
-                emit itemSelected(item);
                 emit itemClicked(item);
-            }
         }
         else
             handled = false;
@@ -834,7 +830,7 @@ void MythUIButtonList::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
                     {
                         emit itemClicked(GetItemCurrent());
                     }
-                    else
+                    else if (pos != m_selPosition)
                     {
                         SetItemCurrent(pos);
                         emit itemSelected(GetItemCurrent());
@@ -1172,9 +1168,9 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
         }
         else
         {
-             if (active_on)
-                 button->DisplayState("inactive");
-             else
+            if (active_on)
+                button->DisplayState("inactive");
+            else
                 button->DisplayState("active");
         }
     }
@@ -1233,7 +1229,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
     QMap<QString, QString>::iterator string_it = m_strings.begin();
     while (string_it != m_strings.end()) {
         text = dynamic_cast<MythUIText *>
-                                        (buttonstate->GetChild(string_it.key()));
+                                    (buttonstate->GetChild(string_it.key()));
         if (text)
             text->SetText(string_it.value());
         ++string_it;
@@ -1243,7 +1239,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
     QMap<QString, MythImage*>::iterator image_it = m_images.begin();
     while (image_it != m_images.end()) {
         image = dynamic_cast<MythUIImage *>
-                                        (buttonstate->GetChild(image_it.key()));
+                                    (buttonstate->GetChild(image_it.key()));
         if (image)
             image->SetImage(image_it.value());
         ++image_it;
