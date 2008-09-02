@@ -144,8 +144,10 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 
     if (res == 0)
     {
-        // we need to start the mythlcdserver 
+        // we need to start the mythlcdserver
+        VERBOSE(VB_GENERAL, "Starting mythlcdserver");
         system(gContext->GetInstallPrefix() + "/bin/mythlcdserver -v none&");
+        usleep(500000);
     }
 
     if (!bConnected)
@@ -153,7 +155,6 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
         int count = 0;
         do
         {
-            usleep(500000);
             ++count;
 
             VERBOSE(VB_GENERAL, QString("Connecting to lcd server: " 
@@ -162,6 +163,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 
             if (socket)
                 socket->DownRef();
+
             socket = new MythSocket();
             socket->setCallbacks(this);
             socket->connect(hostname, port);
@@ -176,14 +178,22 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 
                 if (socket->state() == MythSocket::Connected)
                 {
-                    lcd_ready = true;
+                    lcd_ready = false;
                     bConnected = true;
 
                     QTextStream os(socket);
                     os << "HELLO\n";
+
+                    // HACK make sure the readyread_thread is awake
+                    usleep(1000);
+                    socket->Lock();
+                    socket->Unlock();
+
                     break;
                 }
             }
+
+            usleep(500000);
         }
         while (count < 10 && !bConnected);
     }
@@ -198,15 +208,12 @@ void LCD::sendToServer(const QString &someText)
 {
     QMutexLocker locker(&socketLock);
 
-    if (!socket)
+    if (!socket || !lcd_ready)
         return;
 
     // Check the socket, make sure the connection is still up
     if (socket->state() == MythSocket::Idle)
     {
-        if (!lcd_ready)
-            return;
-
         lcd_ready = false;
 
         // Ack, connection to server has been severed try to re-establish the 
@@ -289,8 +296,6 @@ void LCD::readyRead(MythSocket *sock)
     if (aList[0] == "CONNECTED")
     {
         // We got "CONNECTED", which is a response to "HELLO"
-        lcd_ready = true;
-
         // get lcd width & height
         if (aList.count() != 3)
         {
@@ -362,7 +367,7 @@ void LCD::init()
     lcd_showrecstatus = (gContext->GetSetting("LCDShowRecStatus", "1") == "1");
     lcd_keystring = gContext->GetSetting("LCDKeyString", "ABCDEF");    
 
-    bConnected = TRUE;
+    bConnected = true;
     lcd_ready = true;
 
     // send buffer if there's anything in there
@@ -472,6 +477,9 @@ void LCD::setupLEDs(int(*LedMaskFunc)(void))
 
 void LCD::outputLEDs()
 {
+    if (!lcd_ready)
+        return;
+
     QString aString;
     int mask = 0;
     if (0 && GetLEDMask)
