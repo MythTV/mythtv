@@ -16,17 +16,18 @@
 #   Made -u option a dummy for this release, it is deprecated and will be
 #   removed
 
-use LWP::Simple;      # libwww-perl providing simple HTML get actions
-use HTML::Entities;
-use URI::Escape;
+use File::Basename;
+use lib dirname($0);
 
+use MythTV::MythVideoCommon;
 
 use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P $opt_originaltitle $opt_casting $opt_u_dummy);
 use Getopt::Long;
 
 $title = "Allocine Query"; 
-$version = "v2.00";
+$version = "v2.01";
 $author = "Xavier Hervy";
+push(@MythTV::MythVideoCommon::URL_get_extras, ($title, $version));
 
 binmode(STDOUT, ":utf8");
 
@@ -62,39 +63,6 @@ sub help {
    usage();
 }
 
-# returns text within 'data' between 'beg' and 'end' matching strings
-sub parseBetween {
-   my ($data, $beg, $end)=@_; # grab parameters
-
-   my $ldata = lc($data);
-   my $start = index($ldata, lc($beg)) + length($beg);
-   my $finish = index($ldata, lc($end), $start);
-   
-
-   if ($start != (length($beg) -1) && $finish != -1) {
-    	my $result = substr($data, $start, $finish - $start);
-    	# dont use decode entities &npsp; => spécial characters bug in html::entities ?
-    	#decode_entities($result);
-     	return  removenbsp($result);
-   }
-   return "";
-}
-
-# use to replace &nbsp; by " " (instead of decode_entities)
-sub removenbsp {
-   my ($data)=@_; # grab parameters
-
-   my $ldata = lc($data);
-   my $start = index($ldata, "&nbsp;");
-   while ($start != -1){
-      $data = substr($data, 0, $start). " " .substr($data, $start+6, length($data));
-      $ldata = lc($data);
-      $start = index($ldata, "&nbsp;");
-   }
-   return $data;
-}
-
-
 # returns text within 'data' without tag
 sub removeTag {
    my ($data)=@_; # grab parameters
@@ -119,7 +87,7 @@ sub getMovieData {
    # get the search results  page
    my $request = "http://www.allocine.fr/film/fichefilm_gen_cfilm=" . $movieid . ".html";
    if (defined $opt_d) { printf("# request: '%s'\n", $request); }
-   my $response = get $request;
+   my ($rc, $response) = myth_url_get($request);
 
    # parse title and year
    my $title = parseBetween($response, "<title>", "</title>");
@@ -201,7 +169,7 @@ sub getMovieData {
    my $cast = parseBetween($response, "<h4>Avec ","</h4>");
    $cast = removeTag($cast);
    if (defined $opt_casting){
-      my $responsecasting = get "http://www.allocine.fr/film/casting_gen_cfilm=" . $movieid . ".html";
+      my ($rc, $responsecasting) = myth_url_get("http://www.allocine.fr/film/casting_gen_cfilm=" . $movieid . ".html");
       my $fullcast = parseBetween($responsecasting, "Acteur(s)", "<table");
       my $oneactor;
       $fullcast = parseBetween($fullcast,"style=\"background-color", "</table>");
@@ -252,7 +220,7 @@ sub getMoviePoster {
    
    my $request = "http://www.allocine.fr/film/galerie_gen_cfilm=" . $movieid . ".html";
    if (defined $opt_d) { printf("# request: '%s'\n", $request); }
-   my $response = get $request;
+   my ($rc, $response) = myth_url_get($request);
    my $page=parseBetween($response,"&page=",".html\" class=\"link1\"><span class=\"text2\">>>");
    my @pages = split ("page=",$page);
    $request = "";
@@ -270,7 +238,7 @@ sub getMoviePoster {
   
         if (!($request eq "")) {
 	     $request = "http://www.allocine.fr/film/galerie_gen_cfilm=" . $movieid . "&page=" . $request . ".html";
-	     $response = get $request;
+	     ($rc, $response) = myth_url_get($request);
         
              $uri = parseBetween($response,"<table style=\"padding:0 0 0 0\" border=\"0\" >","Ko\" />");
              $uri = parseBetween($uri ,"<img src=\"","\" border=\"0\" class=\"galerie\" ");
@@ -304,7 +272,7 @@ sub getMoviePoster {
    if ($uri eq "")
    {
 	$request = "http://www.allocine.fr/film/fichefilm_gen_cfilm=" . $movieid .".html";
-	$response = get $request;
+	($rc, $response) = myth_url_get($request);
 	$response = parseBetween($response, "sousnav_separe_droite2.gif","sortie");
 	$uri = parseBetween($response, "<img src=\"","\"");
    
@@ -315,7 +283,7 @@ sub getMoviePoster {
         if ($uri =~ /AffichetteAllocine/)
 	{
 		$request = "http://www.allocine.fr/film/fichefilm_gen_cfilm=" . $movieid .".html";
-		$response = get $request;
+		($rc, $response) = myth_url_get($request);
 		$response = parseBetween($response, "Disponible en","Zone");
 		$uri = parseBetween($response, "<img src=\"","\"");
 		return if ($uri eq "");
@@ -334,31 +302,7 @@ sub getMovieList {
    #
    # Convert filename into a query string 
    # (use same rules that Metadata::guesTitle does)
-   my $query = $filename;
-   $query = uri_unescape($query);  # in case it was escaped
-   # Strip off the file extension
-   if (rindex($query, '.') != -1) {
-      $query = substr($query, 0, rindex($query, '.'));
-   }
-   # Strip off anything following '(' - people use this for general comments
-   if (rindex($query, '(') != -1) {
-      $query = substr($query, 0, rindex($query, '(')); 
-   }
-   # Strip off anything following '[' - people use this for general comments
-   if (rindex($query, '[') != -1) {
-      $query = substr($query, 0, rindex($query, '[')); 
-   }
-   # Strip off anything following '-' - people use this for general comments
-   if (index($query, '-') != -1) {
-      $query = substr($query, 0, index($query, '-')); 
-   }
-
-   # IMDB searches do better if any trailing ,The is left off
-   $query =~ /(.*), The$/i;
-   if ($1) { $query = $1; }
-   
-   # prepare the url 
-   $query = uri_escape($query);
+   my $query = cleanTitleQuery($filename);
    if (!$options) { $options = "" ;}
    if (defined $opt_d) { 
       printf("# query: '%s', options: '%s'\n", $query, $options);
@@ -370,7 +314,7 @@ sub getMovieList {
 	   # get the search results  page
 	   my $request = "http://www.allocine.fr/recherche/?rub=1&motcle=$query";
 	   if (defined $opt_d) { printf("# request: '%s'\n", $request); }
-	   my $response = get $request;
+	   my ($rc, $response) = myth_url_get($request);
 
 	   #
 	   # don't try to invent if it doesn't exist

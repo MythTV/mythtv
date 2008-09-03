@@ -5,13 +5,16 @@ include ( ../../programs-libs.pro )
 TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mythvideo
+
 target.path = $${LIBDIR}/mythtv/plugins
-INSTALLS += target
 
 installscripts.path = $${PREFIX}/share/mythtv/mythvideo/scripts
-installscripts.files = scripts/*
+installscripts.files = scripts/*.pl scripts/*.py scripts/README
 
-INSTALLS += installscripts
+installscriptmodules.path = $${PREFIX}/share/mythtv/mythvideo/scripts/MythTV
+installscriptmodules.files = scripts/MythTV/MythVideoCommon.pm
+ 
+INSTALLS += installscripts installscriptmodules target
 
 # Input
 
@@ -44,5 +47,6 @@ macx {
 }
 
 mingw:DEFINES += USING_MINGW
+
 #The following line was inserted by qt3to4
 QT += opengl sql xml qt3support

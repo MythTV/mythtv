@@ -16,9 +16,10 @@
 #  Internal encoding of this script is koi8-r
 #  The output of this script is in utf8 (set by "outcp" below)
 
-use LWP::Simple;      # libwww-perl providing simple HTML get actions
-use HTML::Entities;
-use URI::Escape qw(uri_unescape uri_escape uri_escape_utf8);
+use File::Basename;
+use lib dirname($0);
+
+use MythTV::MythVideoCommon;
 
 no encoding;
 
@@ -27,8 +28,9 @@ use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P $opt_origina
 use Getopt::Long;
 
 $title = "KinoX Query"; 
-$version = "v0.03";
+$version = "v0.04";
 $author = "Denys Dmytriyenko";
+push(@MythTV::MythVideoCommon::URL_get_extras, ($title, $version));
 
 # This is the output encoding
 $outcp = "utf8";
@@ -67,24 +69,6 @@ sub help {
 	version();
 	info();
 	usage();
-}
-
-# returns text within 'data' between 'beg' and 'end' matching strings
-sub parseBetween {
-	my ($data, $beg, $end)=@_; # grab parameters
-
-	my $ldata = lc($data);
-	my $start = index($ldata, lc($beg)) + length($beg);
-	my $finish = index($ldata, lc($end), $start);
-
-
-	if ($start != (length($beg) -1) && $finish != -1) {
-		my $result = substr($data, $start, $finish - $start);
-		# dont use decode entities &npsp; => spécial characters bug in html::entities ?
-		#decode_entities($result);
-		return  removenbsp($result);
-	}
-	return "";
 }
 
 # use to replace &nbsp; by " " (instead of decode_entities)
@@ -126,7 +110,7 @@ sub getMovieData {
 	# get the search results  page
 	my $request = "http://www.kinox.ru/index.asp?comm=4&num=" . $movieid;
 	if (defined $opt_d) { printf("# request: '%s'\n", $request); }
-	my $response = get $request;
+	my ($rc, $response) = myth_url_get($request);
 
 	# parse title and year
 	my $sub = parseBetween($response, "<h1>", "</h1>");
@@ -244,33 +228,11 @@ sub getMovieList {
 	#
 	# Convert filename into a query string 
 	# (use same rules that Metadata::guesTitle does)
-	my $query = $filename;
-
-	$query = uri_unescape($query);  # in case it was escaped
-	# Strip off the file extension
-	if (rindex($query, '.') != -1) {
-		$query = substr($query, 0, rindex($query, '.'));
-	}
-	# Strip off anything following '(' - people use this for general comments
-	if (rindex($query, '(') != -1) {
-		$query = substr($query, 0, rindex($query, '(')); 
-	}
-	# Strip off anything following '[' - people use this for general comments
-	if (rindex($query, '[') != -1) {
-		$query = substr($query, 0, rindex($query, '[')); 
-	}
-	# Strip off anything following '-' - people use this for general comments
-	if (index($query, '-') != -1) {
-		$query = substr($query, 0, index($query, '-')); 
-	}
-
-	# IMDB searches do better if any trailing ,The is left off
-	$query =~ /(.*), The$/i;
-	if ($1) { $query = $1; }
-	Encode::from_to($query, "koi8-r", "windows-1251");
-
-	# prepare the url 
-	$query = uri_escape($query);
+	my $query = cleanTitleQuery($filename, sub {
+			my ($arg) = @_;
+			Encode::from_to($arg, "koi8-r", "windows-1251");
+			return $arg;
+		});
 	if (!$options) { $options = "" ;}
 	if (defined $opt_d) {
 		printf("# query: '%s', options: '%s'\n", $query, $options);
@@ -283,7 +245,7 @@ sub getMovieList {
 		# get the search results  page
 		my $request = "http://www.kinox.ru/index.asp?comm=1&fop=false&pack=0&kw=$query";
 		if (defined $opt_d) { printf("# request: '%s'\n", $request); }
-		my $response = get $request;
+		my ($rc, $response) = myth_url_get($request);
 		if (defined $opt_d) { printf("# response: '%s'\n", $response); }
 
 		#

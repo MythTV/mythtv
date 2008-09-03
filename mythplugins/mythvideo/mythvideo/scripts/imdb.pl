@@ -29,9 +29,10 @@
 # 9-10-2006: Anduin Withers
 #   Changed output to utf8
 
-use LWP::Simple;      # libwww-perl providing simple HTML get actions
-use HTML::Entities;
-use URI::Escape;
+use File::Basename;
+use lib dirname($0);
+
+use MythTV::MythVideoCommon;
 
 eval "use DateTime::Format::Strptime"; my $has_date_format = $@ ? 0 : 1;
 
@@ -41,6 +42,7 @@ use Getopt::Std;
 $title = "IMDB Query";
 $version = "v1.3.5";
 $author = "Tim Harvey, Andrei Rjeousski";
+push(@MythTV::MythVideoCommon::URL_get_extras, ($title, $version));
 
 my @countries = qw(USA UK Canada Japan);
 
@@ -85,30 +87,6 @@ sub help {
    usage();
 }
 
-sub trim {
-   my ($str) = @_;
-   $str =~ s/^\s+//;
-   $str =~ s/\s+$//;
-   return $str;
-}
-
-# returns text within 'data' between 'beg' and 'end' matching strings
-sub parseBetween {
-   my ($data, $beg, $end)=@_; # grab parameters
-
-   my $ldata = lc($data);
-   my $start = index($ldata, lc($beg)) + length($beg);
-   my $finish = index($ldata, lc($end), $start);
-   if ($start != (length($beg) -1) && $finish != -1) {
-      my $result = substr($data, $start, $finish - $start);
-      # return w/ decoded numeric character references
-      # (see http://www.w3.org/TR/html4/charset.html#h-5.3.1)
-      decode_entities($result);
-      return $result;
-   }
-   return "";
-}
-
 # get Movie Data
 sub getMovieData {
    my ($movieid)=@_; # grab movieid parameter
@@ -119,7 +97,7 @@ sub getMovieData {
    # get the search results  page
    my $request = "http://www.imdb.com/title/tt" . $movieid . "/";
    if (defined $opt_d) { printf("# request: '%s'\n", $request); }
-   my $response = get $request;
+   my ($rc, $response) = myth_url_get($request);
    if (defined $opt_r) { printf("%s", $response); }
 
    # parse title and year
@@ -264,139 +242,9 @@ sub getMovieData {
 
 # dump Movie Poster
 sub getMoviePoster {
-   my ($movieid)=@_; # grab movieid parameter
-   if (defined $opt_d) { printf("# looking for movie id: '%s'\n", $movieid);}
-
-   # get the search results  page
-   my $request = "http://www.imdb.com/title/tt" . $movieid . "/posters";
-   if (defined $opt_d) { printf("# request: '%s'\n", $request); }
-   my $response = get $request;
-   if (defined $opt_r) { printf("%s", $response); }
-
-   if (!defined $response) {return;}
-
-   my $uri = "";
-
-   # look for references to impawards.com posters - they are high quality
-   my $site = "http://www.impawards.com";
-   my $impsite = parseBetween($response, "<a href=\"".$site, "\">".$site);
-
-   # jersey girl fix
-   $impsite = parseBetween($response, "<a href=\"http://impawards.com","\">http://impawards.com") if ($impsite eq "");
-
-   if ($impsite) {
-      $impsite = $site . $impsite;
-
-      if (defined $opt_d) { print "# Searching for poster at: ".$impsite."\n"; }
-      my $impres = get $impsite;
-      if (defined $opt_d) { printf("# got %i bytes\n", length($impres)); }
-      if (defined $opt_r) { printf("%s", $impres); }
-
-      # making sure it isnt redirect
-      $uri = parseBetween($impres, "0;URL=..", "\">");
-      if ($uri ne "") {
-         if (defined $opt_d) { printf("# processing redirect to %s\n",$uri); }
-         # this was redirect
-         $impsite = $site . $uri;
-         $impres = get $impsite;
-      }
-
-      # do stuff normally
-      $uri = parseBetween($impres, "<img SRC=\"posters/", "\" ALT");
-      # uri here is relative... patch it up to make a valid uri
-      if ($uri =~ /\.(jpe?g|gif|png)$/) {
-          if (!($uri =~ /http:(.*)/ )) {
-             my $path = substr($impsite, 0, rindex($impsite, '/') + 1);
-             $uri = $path."posters/".$uri;
-          }
-          if (defined $opt_d) { print "# found ipmawards poster: $uri\n"; }
-      }
-      else {
-          $uri = "";
-      }
-   }
-
-   # try looking on nexbase
-   if ($uri eq "" && $response =~ m/<a href="([^"]*)">([^"]*?)nexbase/i) {
-      if ($1 ne "") {
-         if (defined $opt_d) { print "# found nexbase poster page: $1 \n"; }
-         my $cinres = get $1;
-         if (defined $opt_d) { printf("# got %i bytes\n", length($cinres)); }
-         if (defined $opt_r) { printf("%s", $cinres); }
-
-         if ($cinres =~ m/<a id="photo_url" href="([^"]*?)" ><\/a>/i) {
-            if (defined $opt_d) { print "# nexbase url retreived\n"; }
-            $uri = $1;
-         }
-      }
-   }
-
-   # try looking on cinemablend
-   if ($uri eq "" && $response =~ m/<a href="([^"]*)">([^"]*?)cinemablend/i) {
-      if ($1 ne "") {
-         if (defined $opt_d) { print "# found cinemablend poster page: $1 \n"; }
-         my $cinres = get $1;
-         if (defined $opt_d) { printf("# got %i bytes\n", length($cinres)); }
-         if (defined $opt_r) { printf("%s", $cinres); }
-        if ($cinres =~ m#<img\b[^>]+\bsrc="(/images/reviews/[^"]*?)"#i) {
-            if (defined $opt_d) { print "# cinemablend url retreived\n"; }
-            $uri = "http://www.cinemablend.com/".$1;
-         }
-      }
-   }
-
-   # if the impawards site attempt didn't give a filename grab it from imdb
-   if ($uri eq "") {
-       if (defined $opt_d) { print "# looking for imdb posters\n"; }
-       my $host = "http://posters.imdb.com/posters/";
-
-       $uri = parseBetween($response, $host, "\"><td><td><a href=\"");
-       if ($uri ne "") {
-           $uri = $host.$uri;
-       } else {
-          if (defined $opt_d) { print "# no poster found\n"; }
-       }
-   }
-
-
-
-   my @movie_titles;
-   my $found_low_res = 0;
-   my $k = 0;
-
-   # no poster found, take lowres image from imdb
-   if ($uri eq "") {
-      if (defined $opt_d) { print "# looking for lowres imdb posters\n"; }
-      my $host = "http://www.imdb.com/title/tt" . $movieid . "/";
-      $response = get $host;
-
-      # Better handling for low resolution posters
-      #
-      if ($response =~ m/<a name="poster".*<img.*src="([^"]*).*<\/a>/ig) {
-         if (defined $opt_d) { print "# found low res poster at: $1\n"; }
-         $uri = $1;
-         $found_low_res = 1;
-      } else {
-         if (defined $opt_d) { print "# no low res poster found\n"; }
-         $uri = "";
-      }
-
-      if (defined $opt_d) { print "# starting to look for movie title\n"; }
-
-      # get main title
-      if (defined $opt_d) { print "# Getting possible movie titles:\n"; }
-      $movie_titles[$k++] = parseBetween($response, "<title>", "<\/title>");
-      if (defined $opt_d) { print "# Title: ".$movie_titles[$k-1]."\n"; }
-
-      # now we get all other possible movie titles and store them in the titles array
-      while($response =~ m/>([^>^\(]*)([ ]{0,1}\([^\)]*\)[^\(^\)]*[ ]{0,1}){0,1}\(informal title\)/g) {
-         $movie_titles[$k++] = trim($1);
-         if (defined $opt_d) { print "# Title: ".$movie_titles[$k-1]."\n"; }
-      }
-
-   }
-
-   print "$uri\n";
+   my ($movieid) = @_;
+   @poster_urls = getPosterURLsFromIMDB($movieid, $opt_d, $opt_r);
+   for $url (@poster_urls) { print("$url\n"); }
 }
 
 # dump Movie list:  1 entry per line, each line as 'movieid:Movie Title'
@@ -408,27 +256,7 @@ sub getMovieList {
    #
    # Convert filename into a query string
    # (use same rules that Metadata::guesTitle does)
-   my $query = $filename;
-   $query = uri_unescape($query);  # in case it was escaped
-   # Strip off the file extension
-   if (rindex($query, '.') != -1) {
-      $query = substr($query, 0, rindex($query, '.'));
-   }
-   # Strip off anything following '(' - people use this for general comments
-   if (rindex($query, '(') != -1) {
-      $query = substr($query, 0, rindex($query, '('));
-   }
-   # Strip off anything following '[' - people use this for general comments
-   if (rindex($query, '[') != -1) {
-      $query = substr($query, 0, rindex($query, '['));
-   }
-
-   # IMDB searches do better if any trailing ,The is left off
-   $query =~ /(.*), The$/i;
-   if ($1) { $query = $1; }
-
-   # prepare the url
-   $query = uri_escape($query);
+   my $query = cleanTitleQuery($filename);
    if (!$options) { $options = "" ;}
    if (defined $opt_d) {
       printf("# query: '%s', options: '%s'\n", $query, $options);
@@ -444,7 +272,7 @@ sub getMovieList {
    #$options = "tt=on;nm=on;mx=20";  # not exactly clear what these options do
    my $request = "http://www.imdb.com/find?q=$query;$options";
    if (defined $opt_d) { printf("# request: '%s'\n", $request); }
-   my $response = get $request;
+   my ($rc, $response) = myth_url_get($request);
    if (defined $opt_r) {
       print $response;
       exit(0);

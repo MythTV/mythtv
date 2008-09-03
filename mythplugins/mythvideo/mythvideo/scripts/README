@@ -28,6 +28,9 @@ To create a new/different query engine you need to implement the following optio
                 UserRating    - this is popularity rating from 1/10 (float)
                 MovieRating   - this is a MPAA rating (string)
                 Runtime       - length in minutes (int)
+                Cast          - a comma separated list of cast members
+                Genres        - a comma separated list of genres
+                Countries     - a comma separated list of countries
 
 Additionally, any line starting with a '#' is considered to be a comment and is thrown away by the VideoManager.  This may be a usefull way of showing debugging (for example, specify a '-d' flag for your script and run mythfrontend with a -v' for verbose mode.  In that mode, the VideoManager will display the command executed and its output).
 
@@ -41,6 +44,3 @@ http://www.mythtv.org/mailman/listinfo/mythtv-dev
 
 A list that's restricted to the CVS commit messages is available at:
 http://www.mythtv.org/mailman/listinfo/mythtv-commits
-
-or, just email me directly:  Tim Harvey <tharvey (at) alumni.calpoly (dot) edu>
-
