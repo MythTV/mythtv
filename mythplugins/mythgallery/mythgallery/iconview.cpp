@@ -776,8 +776,12 @@ void IconView::HandleMainMenu(void)
 
     m_menuPopup = new MythDialogBox(label, m_popupStack, "mythgallerymenupopup");
 
-    if (m_menuPopup->Create())
-        m_popupStack->AddScreen(m_menuPopup);
+    if (!m_menuPopup->Create())
+    {
+        delete m_menuPopup;
+        m_menuPopup = NULL;
+        return;
+    }
 
     m_menuPopup->SetReturnEvent(this, "mainmenu");
 
@@ -796,6 +800,8 @@ void IconView::HandleMainMenu(void)
 //         LoadDirectory(m_currDir);
 //         m_showDevices = false;
 //     }
+
+    m_popupStack->AddScreen(m_menuPopup);
 }
 
 void IconView::HandleSubMenuMetadata(void)
