@@ -23,14 +23,14 @@
 
 #include "titledialog.h"
 
-TitleDialog::TitleDialog(Q3Socket *a_socket, 
-                         QString d_name, 
-                         Q3PtrList<DVDTitleInfo> *titles, 
-                         MythMainWindow *parent,
+TitleDialog::TitleDialog(Q3Socket *a_socket,
+                         QString d_name,
+                         Q3PtrList<DVDTitleInfo> *titles,
+                         MythMainWindow *parent_win,
                          QString window_name,
                          QString theme_filename,
-                         const char* name)
-            :MythThemedDialog(parent, window_name, theme_filename, name)
+                         const char *lname) :
+    MythThemedDialog(parent_win, window_name, theme_filename, lname)
 {
 
     name_editor = NULL;
@@ -166,11 +166,11 @@ void TitleDialog::showCurrentTitle()
 void TitleDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
-    QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("DVD", e, actions);
+    QStringList lactions;
+    gContext->GetMainWindow()->TranslateKeyPress("DVD", e, lactions);
 
-    for (QStringList::const_iterator p = actions.begin();
-         p != actions.end() && !handled; ++p)
+    for (QStringList::const_iterator p = lactions.begin();
+         p != lactions.end() && !handled; ++p)
     {
         QString action = *p;
         handled = true;

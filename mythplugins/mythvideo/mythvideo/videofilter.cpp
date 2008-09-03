@@ -651,11 +651,11 @@ void VideoFilterDialog::keyPressEvent(QKeyEvent *e)
     bool handled = false;
     bool something_pushed = false;
 
-    QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
+    QStringList lactions;
+    gContext->GetMainWindow()->TranslateKeyPress("Video", e, lactions);
 
-    for (QStringList::const_iterator p = actions.begin();
-         p != actions.end() && !handled; ++p)
+    for (QStringList::const_iterator p = lactions.begin();
+         p != lactions.end() && !handled; ++p)
     {
         QString action = *p;
         handled = true;

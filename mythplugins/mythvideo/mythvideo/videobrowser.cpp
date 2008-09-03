@@ -63,11 +63,11 @@ void VideoBrowser::slotParentalLevelChanged()
 void VideoBrowser::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
-    QStringList actions;
+    QStringList lactions;
 
-    gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
-    for (QStringList::const_iterator p = actions.begin();
-         p != actions.end() && !handled; ++p)
+    gContext->GetMainWindow()->TranslateKeyPress("Video", e, lactions);
+    for (QStringList::const_iterator p = lactions.begin();
+         p != lactions.end() && !handled; ++p)
     {
         QString action = *p;
         handled = true;
@@ -109,10 +109,11 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
 
     if (!handled)
     {
-        gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+        gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e,
+                                                     lactions);
 
-        for (QStringList::const_iterator p = actions.begin();
-             p != actions.end() && !handled; ++p)
+        for (QStringList::const_iterator p = lactions.begin();
+             p != lactions.end() && !handled; ++p)
         {
             if (*p == "PLAYBACK")
             {

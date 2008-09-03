@@ -75,10 +75,10 @@ void MTDJob::setSubjob(double a_number)
 */
 
 
-DVDRipBox::DVDRipBox(MythMainWindow *parent, QString window_name,
-                     QString device, QString theme_filename, const char *name)
+DVDRipBox::DVDRipBox(MythMainWindow *parent_win, QString window_name,
+                     QString device, QString theme_filename, const char *lname)
 
-           : MythThemedDialog(parent, window_name, theme_filename, name)
+           : MythThemedDialog(parent_win, window_name, theme_filename, lname)
 {
     //
     //  A DVDRipBox is a single dialog that does a bunch of things
@@ -282,11 +282,11 @@ void DVDRipBox::connectToMtd(bool try_to_run_mtd)
 void DVDRipBox::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
-    QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("DVD", e, actions);
+    QStringList lactions;
+    gContext->GetMainWindow()->TranslateKeyPress("DVD", e, lactions);
 
-    for (QStringList::const_iterator p = actions.begin();
-         p != actions.end() && !handled; ++p)
+    for (QStringList::const_iterator p = lactions.begin();
+         p != lactions.end() && !handled; ++p)
     {
         QString action = *p;
         handled = true;

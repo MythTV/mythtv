@@ -213,12 +213,12 @@ MythMultiPasswordDialog::MythMultiPasswordDialog(const QString &message,
 
 void MythMultiPasswordDialog::keyPressEvent(QKeyEvent *e)
 {
-    QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    QStringList lactions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, lactions))
     {
         bool handled = false;
-        for (QStringList::const_iterator p = actions.begin();
-             p != actions.end() && !handled; ++p)
+        for (QStringList::const_iterator p = lactions.begin();
+             p != lactions.end() && !handled; ++p)
         {
             if (*p == "ESCAPE")
             {

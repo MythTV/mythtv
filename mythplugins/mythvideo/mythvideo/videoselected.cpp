@@ -68,11 +68,11 @@ void VideoSelected::processEvents()
 void VideoSelected::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
-    QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
+    QStringList lactions;
+    gContext->GetMainWindow()->TranslateKeyPress("Video", e, lactions);
 
-    for (QStringList::const_iterator p = actions.begin();
-         p != actions.end() && !handled; ++p)
+    for (QStringList::const_iterator p = lactions.begin();
+         p != lactions.end() && !handled; ++p)
     {
         if (*p == "SELECT" && allowselect)
         {
@@ -85,10 +85,11 @@ void VideoSelected::keyPressEvent(QKeyEvent *e)
 
     if (!handled)
     {
-        gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+        gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e,
+                                                     lactions);
 
-        for (QStringList::const_iterator p = actions.begin();
-             p != actions.end()&& !handled; ++p)
+        for (QStringList::const_iterator p = lactions.begin();
+             p != lactions.end()&& !handled; ++p)
         {
             if (*p == "PLAYBACK")
             {
