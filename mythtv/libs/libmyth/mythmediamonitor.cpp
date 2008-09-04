@@ -18,6 +18,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdialogs.h"
 #include "mythconfig.h"
+#include "mythdialogbox.h"
 
 #ifdef USING_DARWIN_DA
 #include "mediamonitor-darwin.h" 
@@ -201,9 +202,7 @@ void MediaMonitor::ChooseAndEjectMedia(void)
 
     if (!selected)
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                  "nothing to eject ",
-                                  tr("No devices to eject"));
+        ShowOkPopup(tr("No devices to eject"));
         return;
     }
 
@@ -223,9 +222,7 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
         {
             QString msg = "Unable to open or close the empty drive %1.\n\n";
             msg += "You may have to use the eject button under its tray.";
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                      "eject close-tray fail",
-                                      tr(msg).arg(dev));
+            ShowOkPopup(tr(msg).arg(dev));
         }
 
         return;
@@ -238,9 +235,7 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
 
         if (device->isMounted(true))
         {
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                      "eject unmount fail",
-                                      tr("Failed to unmount %1").arg(dev));
+            ShowOkPopup(tr("Failed to unmount %1").arg(dev));
             return;
         }
     }
@@ -252,13 +247,13 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
 
     if (err == MEDIAERR_UNSUPPORTED)
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "eject success",
-                                  tr("You may safely remove %1").arg(dev));
+        // Physical ejection isn't possible (there is no tray or slot),
+        // but logically the device is now ejected (ignored by the OS).
+        ShowOkPopup(tr("You may safely remove %1").arg(dev));
     }
     else if (err == MEDIAERR_FAILED)
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "eject fail",
-                                  tr("Failed to eject %1").arg(dev));
+        ShowOkPopup(tr("Failed to eject %1").arg(dev));
     }
 }
 
