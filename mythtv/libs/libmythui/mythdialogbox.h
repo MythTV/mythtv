@@ -173,6 +173,6 @@ class MythUISearchDialog : public MythScreenType
     void slotUpdateList(void);
 };
 
-extern MPUBLIC ShowOkPopup(const QString &message);
+extern MPUBLIC void ShowOkPopup(const QString &message);
 
 #endif
