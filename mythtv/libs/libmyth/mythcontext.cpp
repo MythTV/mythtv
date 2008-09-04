@@ -33,6 +33,7 @@
 
 #include "libmythdb/mythdb.h"
 #include "libmythdb/mythdirs.h"
+#include "libmythui/mythdialogbox.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythuihelper.h"
 #include "libmythupnp/mythxmlclient.h"
@@ -258,7 +259,7 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
     // Myth looks horrible in default Mac style for Qt
     m_database->SetSetting("Style", "Windows");
 #endif
-    m_ui->LoadQtConfig();
+    GetMythUI()->LoadQtConfig();
 
     MythMainWindow *mainWindow = MythMainWindow::getMainWindow(false);
     mainWindow->Init();
@@ -1942,19 +1943,12 @@ bool MythContext::TestPopupVersion(const QString &name,
     if (libversion == pluginversion)
         return true;
 
-    QString err = "The " + name + " plugin was compiled against libmyth " +
-                  "version: " + pluginversion + ", but the installed " +
-                  "libmyth is at version: " + libversion + ".  You probably " +
-                  "want to recompile the " + name + " plugin after doing a " +
-                  "make distclean.";
+    QString err = "Plugin %1 (%2) is not compatible\n"
+                  "with the installed MythTV libraries (%3).\n"
+                  "Please recompile the plugin after a make distclean";
 
     if (GetMainWindow() && !d->disablelibrarypopup)
-    {
-        DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), err);
-        dlg->AddButton("OK");
-        dlg->exec();
-        dlg->deleteLater();
-    }
+        ShowOkPopup(tr(err).arg(name).arg(pluginversion).arg(libversion));
 
     return false;
 }
