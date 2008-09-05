@@ -49,6 +49,7 @@ class MPUBLIC MythGenericTree
 
     QList<int> getRouteById(void);
     QStringList getRouteByString(void);
+    QList<MythGenericTree*> getRoute(void);
 
     void setInt(int an_int) { m_int = an_int; }
     int getInt() const { return m_int; }

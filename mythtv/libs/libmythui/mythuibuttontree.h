@@ -59,7 +59,7 @@ class MythUIButtonTree : public MythUIType
     uint m_numLists;
     uint m_visibleLists;
     uint m_currentDepth;
-    uint m_totalDepth;
+    uint m_oldDepth;
     QList<MythUIButtonList*> m_buttonlists;
     MythUIButtonList *m_listTemplate;
     MythUIButtonList *m_activeList;

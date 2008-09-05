@@ -111,12 +111,15 @@ MythGenericTree::MythGenericTree(const QString &a_string, int an_int,
     m_selected_subnode = NULL;
     m_currentOrderingIndex = -1;
 
-    // Use 6 here, because we know that's what mythmusic wants (limits resizing)
+    // TODO Switch to a QT List, or drop the attribute concept entirely
     m_attributes = new IntVector(6);
 
     m_string = a_string;
     m_int = an_int;
+    m_data = 0;
+
     m_selectable = selectable_flag;
+    m_visible = true;
 }
 
 MythGenericTree::~MythGenericTree()
@@ -285,6 +288,20 @@ QStringList MythGenericTree::getRouteByString()
         routeByString.push_front(parent->getString());
     }
     return routeByString;
+}
+
+QList<MythGenericTree*> MythGenericTree::getRoute(void)
+{
+    QList<MythGenericTree*> route;
+
+    route.push_front(this);
+
+    MythGenericTree *parent = this;
+    while( (parent = parent->getParent()) )
+    {
+        route.push_front(parent);
+    }
+    return route;
 }
 
 int MythGenericTree::childCount(void) const

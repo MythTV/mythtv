@@ -15,7 +15,7 @@ MythUIButtonTree::MythUIButtonTree(MythUIType *parent, const QString &name)
 
     m_numLists = 1;
     m_visibleLists = 0;
-    m_currentDepth = m_totalDepth = 0;
+    m_currentDepth = m_oldDepth = 0;
     m_rootNode = m_currentNode = NULL;
     m_listSpacing = 0;
     m_activeList = NULL;
@@ -72,6 +72,7 @@ void MythUIButtonTree::Init()
 
 void MythUIButtonTree::SetTreeState()
 {
+    VERBOSE(VB_IMPORTANT, "SetTreeState()");
     if (!m_initialized)
         Init();
 
@@ -83,6 +84,21 @@ void MythUIButtonTree::SetTreeState()
 
     MythGenericTree *node = m_rootNode;
 
+    bool refreshAll = false;
+    if (m_currentDepth > 0)
+    {
+        QList<MythGenericTree*> route = m_currentNode->getRoute();
+        if ((int)m_currentDepth > route.size())
+        {
+            VERBOSE(VB_IMPORTANT, "Requested depth is greater than currentNode");
+            return;
+        }
+        node = route.at(m_currentDepth);
+        if (m_currentDepth != m_oldDepth)
+            refreshAll = true;
+        m_oldDepth = m_currentDepth;
+    }
+
     m_visibleLists = 0;
     uint listid = 0;
 
@@ -93,7 +109,15 @@ void MythUIButtonTree::SetTreeState()
         list->SetVisible(false);
         list->SetActive(false);
 
-        if (m_activeListID <= listid)
+        if (node)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Selected node in list %1 is %2")
+                .arg(listid)
+                .arg(node->getString()));
+        }
+
+        MythGenericTree *selectedNode = node->getSelectedChild();
+        if (refreshAll || m_activeListID <= listid)
         {
             if (!UpdateList(list, node))
                 break;
@@ -102,6 +126,7 @@ void MythUIButtonTree::SetTreeState()
             {
                 m_activeList = list;
                 list->SetActive(true);
+                SetCurrentNode(selectedNode);
             }
         }
 
@@ -110,13 +135,15 @@ void MythUIButtonTree::SetTreeState()
         list->SetVisible(true);
         m_visibleLists++;
 
-        node = node->getSelectedChild();
+        node = selectedNode;
     }
 }
 
 bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node)
 {
     disconnect(list, 0, 0, 0);
+
+    VERBOSE(VB_IMPORTANT, QString("Redraw list %1").arg(list->objectName()));
 
     QList<MythGenericTree*> *nodelist = NULL;
 
@@ -151,8 +178,9 @@ bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node)
     if (selectedItem)
     {
         list->SetItemCurrent(selectedItem);
-        emit itemSelected(selectedItem);
     }
+
+    //emit itemSelected(selectedItem);
 
     connect(list, SIGNAL(itemSelected(MythUIButtonListItem *)),
             SLOT(handleSelect(MythUIButtonListItem *)));
@@ -171,7 +199,6 @@ bool MythUIButtonTree::AssignTree(MythGenericTree *tree)
 
     m_rootNode = tree;
     m_currentNode = m_rootNode;
-    m_totalDepth = m_rootNode->calculateDepth();
     SetTreeState();
 
     return true;
@@ -184,7 +211,7 @@ void MythUIButtonTree::Reset(void)
 
     m_rootNode = m_currentNode = NULL;
     m_visibleLists = 0;
-    m_currentDepth = m_totalDepth = 0;
+    m_currentDepth = m_oldDepth = 0;
     m_activeList = NULL;
     m_activeListID = 0;
     m_active = true;
@@ -209,7 +236,6 @@ bool MythUIButtonTree::SetNodeByString(QStringList route)
     if (!m_rootNode)
     {
         SetCurrentNode(NULL);
-        SetTreeState();
         return false;
     }
 
@@ -239,8 +265,7 @@ bool MythUIButtonTree::SetNodeByString(QStringList route)
         }
     }
 
-    if (foundit)
-        SetTreeState();
+    SetTreeState();
 
     return foundit;
 }
@@ -252,10 +277,11 @@ bool MythUIButtonTree::SetCurrentNode(MythGenericTree *node)
         if (node == m_currentNode)
             return true;
 
+        VERBOSE(VB_IMPORTANT, QString("Set Node: %1").arg(node->getString()));
+
         m_currentNode = node;
         node->becomeSelectedChild();
         emit nodeChanged(m_currentNode);
-        SetTreeState();
         return true;
         // Ensure that this node exists in the current tree
         //QList<int> route = node->getRouteById();
@@ -280,7 +306,7 @@ void MythUIButtonTree::SwitchList(bool right)
     {
         if (m_activeListID < m_visibleLists-1)
             m_activeListID++;
-        else if (m_currentDepth < m_totalDepth-1)
+        else if (m_currentNode->childCount() > 0)
         {
             m_currentDepth++;
             doUpdate = true;
@@ -327,6 +353,7 @@ void MythUIButtonTree::handleSelect(MythUIButtonListItem *item)
 
     MythGenericTree *node = qVariantValue<MythGenericTree*> (item->GetData());
     SetCurrentNode(node);
+    SetTreeState();
 }
 
 void MythUIButtonTree::handleClick(MythUIButtonListItem *item)
