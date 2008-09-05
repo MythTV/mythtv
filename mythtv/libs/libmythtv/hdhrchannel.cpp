@@ -102,7 +102,7 @@ bool HDHRChannel::FindDevice(void)
 
     /* Discover. */
     struct hdhomerun_discover_device_t result;
-    int ret = hdhomerun_discover_find_device(_device_id, &result);
+    int ret = hdhomerun_discover_find_devices_custom(0, HDHOMERUN_DEVICE_TYPE_WILDCARD, _device_id, &result, 1);
     if (ret < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to send discovery request" + ENO);

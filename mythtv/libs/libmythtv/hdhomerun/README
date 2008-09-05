@@ -1,7 +1,28 @@
+/*
+ * libhdhomerun
+ *
+ * Copyright © 2005-2006 Silicondust Engineering Ltd. <www.silicondust.com>.
+ *
+ * This library is free software; you can redistribute it and/or 
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-This directory contains Silicondust Engineering's hdhomerun
-library used for communicating with the HDHomeRun hardware.
+Top level include file: hdhomerun.h
 
-The files in this directory are released under the GNU LESSER GENERAL PUBLIC LICENSE
-For details see the lgpl.txt file which should be located in this directory.
-If you can not find it, it can also be seen at http://www.gnu.org/licenses/lgpl.txt
+Top level API: hdhomerun_device. See hdhomerun_device.h for documentation.
+
+The hdhomerun_device API should be used rather than the low level control and video APIs required with previous versions.
+
+Additional libraries required:
+- pthread
+- iphlpapi (windows only)

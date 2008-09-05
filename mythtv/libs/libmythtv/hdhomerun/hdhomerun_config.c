@@ -1,12 +1,12 @@
 /*
  * hdhomerun_config.c
  *
- * Copyright © 2006 Silicondust Engineering Ltd. <www.silicondust.com>.
+ * Copyright © 2006-2008 Silicondust Engineering Ltd. <www.silicondust.com>.
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 3 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "hdhomerun.h"
@@ -31,7 +30,8 @@ static int help(void)
 	printf("\t%s <id> get help\n", appname);
 	printf("\t%s <id> get <item>\n", appname);
 	printf("\t%s <id> set <item> <value>\n", appname);
-	printf("\t%s <id> scan <tuner> <starting channel>\n", appname);
+	printf("\t%s <id> scan <tuner> [<filename>]\n", appname);
+	printf("\t%s <id> save <tuner> <filename>\n", appname);
 	printf("\t%s <id> upgrade <filename>\n", appname);
 	return -1;
 }
@@ -68,10 +68,29 @@ static bool_t contains(const char *arg, const char *cmpstr)
 	return FALSE;
 }
 
-static int discover_print(void)
+static uint32_t parse_ip_addr(const char *str)
 {
+	unsigned long a[4];
+	if (sscanf(str, "%lu.%lu.%lu.%lu", &a[0], &a[1], &a[2], &a[3]) != 4) {
+		return 0;
+	}
+
+	return (uint32_t)((a[0] << 24) | (a[1] << 16) | (a[2] << 8) | (a[3] << 0));
+}
+
+static int discover_print(char *target_ip_str)
+{
+	uint32_t target_ip = 0;
+	if (target_ip_str) {
+		target_ip = parse_ip_addr(target_ip_str);
+		if (target_ip == 0) {
+			fprintf(stderr, "invalid ip address: %s\n", target_ip_str);
+			return -1;
+		}
+	}
+
 	struct hdhomerun_discover_device_t result_list[64];
-	int count = hdhomerun_discover_find_devices(HDHOMERUN_DEVICE_TYPE_TUNER, result_list, 64);
+	int count = hdhomerun_discover_find_devices_custom(target_ip, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, result_list, 64);
 	if (count < 0) {
 		fprintf(stderr, "error sending discover request\n");
 		return -1;
@@ -92,32 +111,6 @@ static int discover_print(void)
 	}
 
 	return count;
-}
-
-static bool_t parse_device_id_str(const char *s, uint32_t *pdevice_id, uint32_t *pdevice_ip)
-{
-	unsigned long a[4];
-	if (sscanf(s, "%lu.%lu.%lu.%lu", &a[0], &a[1], &a[2], &a[3]) == 4) {
-		*pdevice_id = HDHOMERUN_DEVICE_ID_WILDCARD;
-		*pdevice_ip = (uint32_t)((a[0] << 24) | (a[1] << 16) | (a[2] << 8) | (a[3] << 0));
-		return TRUE;
-	}
-
-	unsigned long device_id_raw;
-	if (sscanf(s, "%lx", &device_id_raw) != 1) {
-		fprintf(stderr, "invalid device id: %s\n", s);
-		return FALSE;
-	}
-
-	uint32_t device_id = (uint32_t)device_id_raw;
-	if (!hdhomerun_discover_validate_device_id(device_id)) {
-		fprintf(stderr, "invalid device id: %s\n", s);
-		return FALSE;
-	}
-
-	*pdevice_id = device_id;
-	*pdevice_ip = 0;
-	return TRUE;
 }
 
 static int cmd_get(const char *item)
@@ -154,117 +147,175 @@ static int cmd_set(const char *item, const char *value)
 	return 1;
 }
 
-static int cmd_streaminfo(const char *tuner_str)
+static void cmd_scan_printf(FILE *fp, const char *fmt, ...)
 {
-	fprintf(stderr, "streaminfo: use \"get /tuner<n>/streaminfo\"\n");
-	return -1;
+	va_list ap;
+	va_start(ap, fmt);
+
+	if (fp) {
+		va_list apc;
+		va_copy(apc, ap);
+
+		vfprintf(fp, fmt, apc);
+		fflush(fp);
+
+		va_end(apc);
+	}
+
+	vprintf(fmt, ap);
+	fflush(stdout);
+
+	va_end(ap);
 }
 
-static int cmd_scan(const char *tuner_str, const char *start_value)
+static int cmd_scan(const char *tuner_str, const char *filename)
 {
-	unsigned int tuner;
-	if (sscanf(tuner_str, "%u", &tuner) != 1) {
+	if (hdhomerun_device_set_tuner_from_str(hd, tuner_str) <= 0) {
 		fprintf(stderr, "invalid tuner number\n");
 		return -1;
 	}
 
-	hdhomerun_device_set_tuner(hd, tuner);
-
-	char channel_str[64];
-	strncpy(channel_str, start_value, sizeof(channel_str));
-	channel_str[sizeof(channel_str) - 8] = 0;
-
-	char *channel_number_ptr = strrchr(channel_str, ':');
-	if (!channel_number_ptr) {
-		channel_number_ptr = channel_str;
-	} else {
-		channel_number_ptr++;
-	}
-
-	unsigned int channel_number = atol(channel_number_ptr);
-	if (channel_number == 0) {
-		fprintf(stderr, "invalid starting channel\n");
+	uint32_t channel_map = hdhomerun_device_model_channel_map_all(hd);
+	if (channel_map == 0) {
+		fprintf(stderr, "failed to detect channel_map set\n");
 		return -1;
 	}
 
-	/* Test starting channel. */
-	int ret = hdhomerun_device_set_tuner_channel(hd, channel_str);
+	if (hdhomerun_device_channelscan_init(hd, channel_map, 0) <= 0) {
+		fprintf(stderr, "failed to initialize channel scan\n");
+		return -1;
+	}
+
+	FILE *fp = NULL;
+	if (filename) {
+		fp = fopen(filename, "w");
+		if (!fp) {
+			fprintf(stderr, "unable to create file: %s\n", filename);
+			return -1;
+		}
+	}
+
+	int ret;
+	while (1) {
+		struct hdhomerun_channelscan_result_t result;
+		ret = hdhomerun_device_channelscan_advance(hd, &result);
+		if (ret <= 0) {
+			break;
+		}
+
+		cmd_scan_printf(fp, "SCANNING: %lu (%s)\n",
+			result.frequency, result.channel_str
+		);
+
+		ret = hdhomerun_device_channelscan_detect(hd, &result);
+		if (ret <= 0) {
+			break;
+		}
+
+		cmd_scan_printf(fp, "LOCK: %s (ss=%u snq=%u seq=%u)\n",
+			result.status.lock_str, result.status.signal_strength,
+			result.status.signal_to_noise_quality, result.status.symbol_error_quality
+		);
+
+		int i;
+		for (i = 0; i < result.program_count; i++) {
+			struct hdhomerun_channelscan_program_t *program = &result.programs[i];
+			cmd_scan_printf(fp, "PROGRAM %s\n", program->program_str);
+		}
+	}
+
+	if (fp) {
+		fclose(fp);
+	}
 	if (ret < 0) {
 		fprintf(stderr, "communication error sending request to hdhomerun device\n");
-		return -1;
 	}
-	if (ret == 0) {
-		fprintf(stderr, "invalid starting channel\n");
+	return ret;
+}
+
+static void cmd_save_abort(int junk)
+{
+	struct hdhomerun_video_stats_t stats;
+	hdhomerun_device_get_video_stats(hd, &stats);
+	hdhomerun_device_stream_stop(hd);
+
+	fprintf(stderr, "\n");
+	fprintf(stderr, "-- Video statistics --\n");
+	fprintf(stderr, "%u packets received, %u network errors, %u transport errors, %u sequence errors\n",
+		(unsigned)stats.packet_count, 
+		(unsigned)stats.network_error_count, 
+		(unsigned)stats.transport_error_count, 
+		(unsigned)stats.sequence_error_count);
+
+	exit(0);
+}
+
+static int cmd_save(const char *tuner_str, const char *filename)
+{
+	if (hdhomerun_device_set_tuner_from_str(hd, tuner_str) <= 0) {
+		fprintf(stderr, "invalid tuner number\n");
 		return -1;
 	}
 
+	FILE *fp = NULL;
+
+	if (strcmp(filename, "-") == 0) {
+		fp = stdout;
+	} else if (strcmp(filename, "null") != 0) {
+		fp = fopen(filename, "wb");
+
+		if (!fp) {
+			fprintf(stderr, "unable to create file %s\n", filename);
+			return -1;
+		}
+	}
+
+	signal(SIGINT, cmd_save_abort);
+	signal(SIGPIPE, cmd_save_abort);
+
+	int ret = hdhomerun_device_stream_start(hd);
+	if (ret <= 0) {
+		fprintf(stderr, "unable to start stream\n");
+		fclose(fp);
+		return ret;
+	}
+
+	struct hdhomerun_video_stats_t stats_old, stats_cur;
+	hdhomerun_device_get_video_stats(hd, &stats_old);
+
+	uint64_t next_progress = getcurrenttime() + 1000;
 	while (1) {
-		/* Update channel value */
-		sprintf(channel_number_ptr, "%u", channel_number);
+		usleep(64000);
 
-		/* Set channel. */
-		ret = hdhomerun_device_set_tuner_channel(hd, channel_str);
-		if (ret < 0) {
-			fprintf(stderr, "communication error sending request to hdhomerun device\n");
-			return -1;
-		}
-		if (ret == 0) {
-			return 0;
-		}
-
-		/* Wait 1.5s for lock (qam auto is the slowest to lock). */
-		usleep(HDHOMERUN_DEVICE_MAX_TUNE_TO_LOCK_TIME * 1000);
-
-		/* Get status to check for signal. Quality numbers will not be valid yet. */
-		struct hdhomerun_tuner_status_t status;
-		if (hdhomerun_device_get_tuner_status(hd, &status) < 0) {
-			fprintf(stderr, "communication error sending request to hdhomerun device\n");
-			return -1;
-		}
-
-		/* If no signal then advance to next channel. */
-		if (status.signal_strength == 0) {
-			printf("%s: no signal\n", channel_str);
-			channel_number++;
+		size_t actual_size;
+		uint8_t *ptr = hdhomerun_device_stream_recv(hd, VIDEO_DATA_BUFFER_SIZE_1S, &actual_size);
+		if (!ptr) {
 			continue;
 		}
 
-		/* Wait for 2s. */
-		usleep(HDHOMERUN_DEVICE_MAX_LOCK_TO_DATA_TIME * 1000);
+		if (fp) {
+			fwrite(ptr, 1, actual_size, fp);
+		}
 
-		/* Get status to check quality numbers. */
-		if (hdhomerun_device_get_tuner_status(hd, &status) < 0) {
-			fprintf(stderr, "communication error sending request to hdhomerun device\n");
-			return -1;
-		}
-		if (status.signal_strength == 0) {
-			printf("%s: no signal\n", channel_str);
-			channel_number++;
-			continue;
-		}
-		printf("%s: ss=%u snq=%u seq=%u\n", channel_str, status.signal_strength, status.signal_to_noise_quality, status.symbol_error_quality);
+		uint64_t current_time = getcurrenttime();
+		if (current_time >= next_progress) {
+			next_progress = current_time + 1000;
 
-		/* Detect sub channels. */
-		usleep(4 * 1000000);
-		char *streaminfo;
-		if (hdhomerun_device_get_tuner_streaminfo(hd, &streaminfo) <= 0) {
-			channel_number++;
-			continue;
-		}
-		while (1) {
-			char *end = strchr(streaminfo, '\n');
-			if (!end) {
-				break;
+			hdhomerun_device_get_video_stats(hd, &stats_cur);
+
+			if (stats_cur.network_error_count > stats_old.network_error_count) {
+				fprintf(stderr, "n");
+			} else if (stats_cur.transport_error_count > stats_old.transport_error_count) {
+				fprintf(stderr, "t");
+			} else if (stats_cur.sequence_error_count > stats_old.sequence_error_count) {
+				fprintf(stderr, "s");
+			} else {
+				fprintf(stderr, ".");
 			}
 
-			*end++ = 0;
-			printf("program %s\n", streaminfo);
-
-			streaminfo = end;
+			stats_old = stats_cur;
+			fflush(stderr);
 		}
-
-		/* Advance to next channel. */
-		channel_number++;
 	}
 }
 
@@ -276,13 +327,36 @@ static int cmd_upgrade(const char *filename)
 		return -1;
 	}
 
+	printf("uploading firmware...\n");
 	if (hdhomerun_device_upgrade(hd, fp) <= 0) {
 		fprintf(stderr, "error sending upgrade file to hdhomerun device\n");
 		fclose(fp);
 		return -1;
 	}
+	sleep(2);
 
-	printf("upgrade complete\n");
+	printf("upgrading firmware...\n");
+	sleep(8);
+
+	printf("rebooting...\n");
+	int count = 0;
+	char *version_str;
+	while (1) {
+		if (hdhomerun_device_get_version(hd, &version_str, NULL) >= 0) {
+			break;
+		}
+
+		count++;
+		if (count > 30) {
+			fprintf(stderr, "error finding device after firmware upgrade\n");
+			fclose(fp);
+			return -1;
+		}
+
+		sleep(1);
+	}
+
+	printf("upgrade complete - now running firmware %s\n", version_str);
 	return 0;
 }
 
@@ -308,18 +382,22 @@ static int main_cmd(int argc, char *argv[])
 		return cmd_set(argv[0], argv[1]);
 	}
 
-	if (contains(cmd, "streaminfo")) {
+	if (contains(cmd, "scan")) {
 		if (argc < 1) {
 			return help();
 		}
-		return cmd_streaminfo(argv[0]);
+		if (argc < 2) {
+			return cmd_scan(argv[0], NULL);
+		} else {
+			return cmd_scan(argv[0], argv[1]);
+		}
 	}
 
-	if (contains(cmd, "scan")) {
+	if (contains(cmd, "save")) {
 		if (argc < 2) {
 			return help();
 		}
-		return cmd_scan(argv[0], argv[1]);
+		return cmd_save(argv[0], argv[1]);
 	}
 
 	if (contains(cmd, "upgrade")) {
@@ -335,10 +413,6 @@ static int main_cmd(int argc, char *argv[])
 static int main_internal(int argc, char *argv[])
 {
 #if defined(__WINDOWS__)
-	//Start pthreads
-	pthread_win32_process_attach_np();
-
-	// Start WinSock
 	WORD wVersionRequested = MAKEWORD(2, 0);
 	WSADATA wsaData;
 	WSAStartup(wVersionRequested, &wsaData);
@@ -357,35 +431,36 @@ static int main_internal(int argc, char *argv[])
 		return help();
 	}
 	if (contains(id_str, "discover")) {
-		return discover_print();
-	}
-
-	/* Device ID. */
-	uint32_t device_id, device_ip;
-	if (!parse_device_id_str(id_str, &device_id, &device_ip)) {
-		return -1;
+		if (argc < 1) {
+			return discover_print(NULL);
+		} else {
+			return discover_print(argv[0]);
+		}
 	}
 
 	/* Device object. */
-	hd = hdhomerun_device_create(device_id, device_ip, 0);
+	hd = hdhomerun_device_create_from_str(id_str);
 	if (!hd) {
-		fprintf(stderr, "unable to create device\n");
+		fprintf(stderr, "invalid device id: %s\n", id_str);
 		return -1;
 	}
 
-	/* Connect to device and check firmware version. */
-	int ret = hdhomerun_device_firmware_version_check(hd, 0);
-	if (ret < 0) {
+	/* Device ID check. */
+	uint32_t device_id_requested = hdhomerun_device_get_device_id_requested(hd);
+	if (!hdhomerun_discover_validate_device_id(device_id_requested)) {
+		fprintf(stderr, "invalid device id: %08lX\n", (unsigned long)device_id_requested);
+	}
+
+	/* Connect to device and check model. */
+	const char *model = hdhomerun_device_get_model_str(hd);
+	if (!model) {
 		fprintf(stderr, "unable to connect to device\n");
 		hdhomerun_device_destroy(hd);
 		return -1;
 	}
-	if (ret == 0) {
-		fprintf(stderr, "WARNING: firmware upgrade needed for all operations to function\n");
-	}
 
 	/* Command. */
-	ret = main_cmd(argc, argv);
+	int ret = main_cmd(argc, argv);
 
 	/* Cleanup. */
 	hdhomerun_device_destroy(hd);

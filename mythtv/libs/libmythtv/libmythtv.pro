@@ -465,10 +465,17 @@ using_backend {
         # HDHomeRun library
         HEADERS += hdhomerun/hdhomerun_pkt.h   hdhomerun/hdhomerun_discover.h
         HEADERS += hdhomerun/hdhomerun_video.h hdhomerun/hdhomerun_control.h
-        HEADERS += hdhomerun/hdhomerun_os.h
+        HEADERS += hdhomerun/hdhomerun_os.h    hdhomerun/hdhomerun.h
+        HEADERS += hdhomerun/hdhomerun_dhcp.h  hdhomerun/hdhomerun_types.h
+        HEADERS += hdhomerun/hdhomerun_channels.h
+        HEADERS += hdhomerun/hdhomerun_channelscan.h
+        HEADERS += hdhomerun/hdhomerun_debug.h
 
         SOURCES += hdhomerun/hdhomerun_pkt.c   hdhomerun/hdhomerun_discover.c
         SOURCES += hdhomerun/hdhomerun_video.c hdhomerun/hdhomerun_control.c
+        SOURCES += hdhomerun/hdhomerun_debug.c hdhomerun/hdhomerun_channels.c
+        SOURCES += hdhomerun/hdhomerun_dhcp.c  hdhomerun/hdhomerun_channelscan.c
+        SOURCES += hdhomerun/hdhomerun_device.c
     }
 
     # Support for PVR-150/250/350/500, etc. on Linux

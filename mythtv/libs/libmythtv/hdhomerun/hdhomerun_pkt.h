@@ -3,10 +3,10 @@
  *
  * Copyright © 2005-2006 Silicondust Engineering Ltd. <www.silicondust.com>.
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 3 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifdef __cplusplus
 extern "C" {
@@ -129,25 +128,33 @@ extern "C" {
 
 #define HDHOMERUN_MIN_PEEK_LENGTH 4
 
-extern uint8_t hdhomerun_read_u8(uint8_t **pptr);
-extern uint16_t hdhomerun_read_u16(uint8_t **pptr);
-extern uint32_t hdhomerun_read_u32(uint8_t **pptr);
-extern size_t hdhomerun_read_var_length(uint8_t **pptr, uint8_t *end);
-extern void hdhomerun_write_u8(uint8_t **pptr, uint8_t v);
-extern void hdhomerun_write_u16(uint8_t **pptr, uint16_t v);
-extern void hdhomerun_write_u32(uint8_t **pptr, uint32_t v);
-extern void hdhomerun_write_var_length(uint8_t **pptr, size_t v);
-extern void hdhomerun_write_crc(uint8_t **pptr, uint8_t *start);
+struct hdhomerun_pkt_t {
+	uint8_t *pos;
+	uint8_t *start;
+	uint8_t *end;
+	uint8_t *limit;
+	uint8_t buffer[3074];
+};
 
-extern size_t hdhomerun_peek_packet_length(uint8_t *ptr);
-extern int hdhomerun_process_packet(uint8_t **pptr, uint8_t **pend);
-extern int hdhomerun_read_tlv(uint8_t **pptr, uint8_t *end, uint8_t *ptag, size_t *plength, uint8_t **pvalue);
+extern LIBTYPE struct hdhomerun_pkt_t *hdhomerun_pkt_create(void);
+extern LIBTYPE void hdhomerun_pkt_destroy(struct hdhomerun_pkt_t *pkt);
+extern LIBTYPE void hdhomerun_pkt_reset(struct hdhomerun_pkt_t *pkt);
 
-extern void hdhomerun_write_discover_request(uint8_t **pptr, uint32_t device_type, uint32_t device_id);
-extern void hdhomerun_write_get_set_request(uint8_t **pptr, const char *name, const char *value);
-extern void hdhomerun_write_upgrade_request(uint8_t **pptr, uint32_t sequence, void *data, size_t length);
+extern LIBTYPE uint8_t hdhomerun_pkt_read_u8(struct hdhomerun_pkt_t *pkt);
+extern LIBTYPE uint16_t hdhomerun_pkt_read_u16(struct hdhomerun_pkt_t *pkt);
+extern LIBTYPE uint32_t hdhomerun_pkt_read_u32(struct hdhomerun_pkt_t *pkt);
+extern LIBTYPE size_t hdhomerun_pkt_read_var_length(struct hdhomerun_pkt_t *pkt);
+extern LIBTYPE uint8_t *hdhomerun_pkt_read_tlv(struct hdhomerun_pkt_t *pkt, uint8_t *ptag, size_t *plength);
+
+extern LIBTYPE void hdhomerun_pkt_write_u8(struct hdhomerun_pkt_t *pkt, uint8_t v);
+extern LIBTYPE void hdhomerun_pkt_write_u16(struct hdhomerun_pkt_t *pkt, uint16_t v);
+extern LIBTYPE void hdhomerun_pkt_write_u32(struct hdhomerun_pkt_t *pkt, uint32_t v);
+extern LIBTYPE void hdhomerun_pkt_write_var_length(struct hdhomerun_pkt_t *pkt, size_t v);
+extern LIBTYPE void hdhomerun_pkt_write_mem(struct hdhomerun_pkt_t *pkt, const void *mem, size_t length);
+
+extern LIBTYPE bool_t hdhomerun_pkt_open_frame(struct hdhomerun_pkt_t *pkt, uint16_t *ptype);
+extern LIBTYPE void hdhomerun_pkt_seal_frame(struct hdhomerun_pkt_t *pkt, uint16_t frame_type);
 
 #ifdef __cplusplus
 }
 #endif
-
