@@ -32,8 +32,6 @@ class MythUIProgressBar : public MythUIType
     LayoutType m_layout;
     EffectType m_effect;
 
-    bool m_initialized;
-
     int m_total;
     int m_start;
     int m_current;
