@@ -991,35 +991,35 @@ void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
             }
         }
     }
-    fontProp *font1 = GetFont(activeFont);
-    if (!font1)
+    fontProp *activeProp = GetFont(activeFont);
+    if (!activeProp)
     {
-        cerr << "Unknown font: " << (const char *)activeFont
+        cerr << "Unknown active font: " << (const char *)activeFont
              << " in image grid: " << (const char *)name << endl;
         return;
     }
 
-    fontProp *font2 = GetFont(selectedFont);
-    if (!font2)
+    fontProp *selectedProp = GetFont(selectedFont);
+    if (!selectedProp)
     {
-        cerr << "Unknown font: " << (const char *)selectedFont
+        cerr << "Unknown selected font: " << (const char *)selectedFont
              << " in image grid: " << (const char *)name << endl;
         return;
     }
 
-    fontProp *font3 = GetFont(inactiveFont);
-    if (!font2)
+    fontProp *inactiveProp = GetFont(inactiveFont);
+    if (!inactiveProp)
     {
-        cerr << "Unknown font: " << (const char *)inactiveFont
+        cerr << "Unknown inactive font: " << (const char *)inactiveFont
              << " in image grid: " << (const char *)name << endl;
         return;
     }
 
     UIImageGridType *grid = new UIImageGridType(name, order.toInt());
     grid->SetScreen(wmult, hmult);
-    grid->setActiveFont(font1);
-    grid->setSelectedFont(font2);
-    grid->setInactiveFont(font3);
+    grid->setActiveFont(activeProp);
+    grid->setSelectedFont(selectedProp);
+    grid->setInactiveFont(inactiveProp);
     grid->setCutDown(cutdown);
     grid->setShowChecks(showChecks);
     grid->setShowSelected(showSelected);
