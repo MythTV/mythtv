@@ -15,7 +15,6 @@ class MediaMonitorUnix : public MediaMonitor
     bool FindPartitions(const QString &dev, bool checkPartitions);
 
     virtual bool AddDevice(MythMediaDevice* pDevice);
-    bool AddDevice(const char* dev);
     bool AddDevice(struct fstab* mep);
 
     QString GetDeviceFile(const QString &sysfs);

@@ -458,60 +458,6 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
     return false;
 }
 
-// Given a path to a media device determine what type of device it is and
-// add it to our collection.
-bool MediaMonitorUnix::AddDevice(const char* devPath)
-{
-    QString devicePath( devPath );
-    //cout << "AddDevice - " << devicePath << endl;
-
-    struct fstab * mep = NULL;
-    char lpath[PATH_MAX];
-
-    // Resolve the symlink for the device.
-    int len = readlink(devicePath, lpath, PATH_MAX);
-    if (len == -1)
-        len = 0;
-    if (len < PATH_MAX)
-        lpath[len] = 0;
-
-    // Attempt to open the file system descriptor entry.
-    if (!setfsent())
-    {
-        fstabError(QString(":AddDevice(%2)").arg(devPath));
-        return false;
-    }
-
-    // Loop over the file system descriptor entry.
-    while ((mep = getfsent()) != NULL)
-    {
-#if 0
-        cout << "***************************************************" << endl;
-        cout << "devicePath == " << devicePath << endl;
-        cout << "mep->fs_spec == " << mep->fs_spec << endl;
-        cout << "lpath == " << lpath << endl;
-        cout << "strcmp(devicePath, mep->fs_spec) == "
-             << strcmp(devicePath, mep->fs_spec) << endl;
-        cout << "len ==" << len << endl;
-        cout << "strcmp(lpath, mep->fs_spec)=="
-             << strcmp(lpath, mep->fs_spec) << endl;
-        cout <<endl << endl;
-#endif
-
-        // Check to see if this is the same as our passed in device.
-        if ((strcmp(devicePath, mep->fs_spec) != 0) &&
-             (len && strncmp(lpath, mep->fs_spec, PATH_MAX) != 0))
-            continue;
-    }
-
-    endfsent();
-
-    if (mep)
-        return AddDevice(mep);
-
-    return false;
-}
-
 /**
  *  \brief Creates MythMedia instances for sysfs removable media devices.
  *
