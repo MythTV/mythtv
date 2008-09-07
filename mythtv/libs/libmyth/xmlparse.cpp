@@ -1,13 +1,13 @@
-#include <iostream>
+#include <deque>
 using namespace std;
 
 #include <cmath>
 #include <cstdlib>
 
-#include <qapplication.h>
+#include <QApplication>
 #include <QPixmap>
 #include <QList>
-#include <Q3PtrList>
+#include <QFile>
 
 #include "uilistbtntype.h"
 #include "xmlparse.h"
@@ -20,6 +20,10 @@ using namespace std;
 #ifdef USING_MINGW
 #undef LoadImage
 #endif
+
+#define LOC QString("XMLParse: ")
+#define LOC_WARN QString("XMLParse, Warning: ")
+#define LOC_ERR QString("XMLParse, Error: ")
 
 XMLParse::XMLParse(void) : wmult(0.0), hmult(0.0), usetrans(-1)
 {
@@ -52,7 +56,8 @@ bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
         QString themefile = *ii + specialfile + "ui.xml";
         if (doLoadTheme(ele, winName, themefile))
         {
-            VERBOSE(VB_GENERAL, "XMLParse::LoadTheme using " << themefile);
+            VERBOSE(VB_GENERAL, LOC + QString("LoadTheme using '%1'")
+                    .arg(themefile));
             return true;
         }
     }
@@ -77,9 +82,10 @@ bool XMLParse::doLoadTheme(QDomElement &ele, QString winName, QString themeFile)
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        cerr << "Error parsing: " << (const char *)themeFile << endl;
-        cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
-        cerr << (const char *)errorMsg << endl;
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Parsing: %1 at line: %2 column: %3")
+                .arg(themeFile).arg(errorLine).arg(errorColumn) +
+                QString("\n\t\t\t%1").arg(errorMsg));
         f.close();
         return false;
     }
@@ -98,7 +104,7 @@ bool XMLParse::doLoadTheme(QDomElement &ele, QString winName, QString themeFile)
                 QString name = e.attribute("name", "");
                 if (name.isNull() || name.isEmpty())
                 {
-                    cerr << "Window needs a name\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN + "Window needs a name");
                     return false;
                 }
 
@@ -110,7 +116,8 @@ bool XMLParse::doLoadTheme(QDomElement &ele, QString winName, QString themeFile)
             }
             else
             {
-                cerr << "Unknown element: " << (const char *)e.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown element: %1").arg(e.tagName()));
                 return false;
             }
         }
@@ -165,7 +172,7 @@ void XMLParse::parseFont(QDomElement &element)
     name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Font needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Font needs a name");
         return;
     }
 
@@ -175,8 +182,10 @@ void XMLParse::parseFont(QDomElement &element)
         baseFont = GetFont(base);
         if (!baseFont)
         {
-            cerr << "Specified base font '" << (const char *)base
-                 << "'  does not exist for font " << (const char *)face << endl;
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    QString("Specified base font '%1' "
+                            "does not exist for font '%2'")
+                    .arg(base).arg(face));
             return;
         }
     }
@@ -186,7 +195,7 @@ void XMLParse::parseFont(QDomElement &element)
     {
         if (!baseFont)
         {
-            cerr << "Font needs a face\n";
+            VERBOSE(VB_IMPORTANT, LOC_WARN + "Font needs a face");
             return;
         }
     }
@@ -256,7 +265,9 @@ void XMLParse::parseFont(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag " << (const char *)info.tagName() << " in font\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in font")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -265,7 +276,8 @@ void XMLParse::parseFont(QDomElement &element)
     fontProp *testFont = GetFont(name, false);
     if (testFont)
     {
-        cerr << "Error: already have a font called: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("MythTV already has a font called: '%1'").arg(name));
         return;
     }
 
@@ -287,7 +299,7 @@ void XMLParse::parseFont(QDomElement &element)
 
     if (size < 0 && !baseFont)
     {
-        cerr << "Error: font size must be > 0\n";
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Font size must be > 0");
         return;
     }
 
@@ -368,14 +380,14 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Image needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Image needs a name");
         return;
     }
 
     QString order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "Image needs an order\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Image needs an order");
         return;
     }
 
@@ -417,7 +429,8 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << (const char *)info.tagName() << " in image\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown: %1 in image").arg(info.tagName()));
                 return;
             }
         }
@@ -464,14 +477,14 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Repeated Image needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Repeated Image needs a name");
         return;
     }
 
     QString order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "Repeated Image needs an order\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Repeated Image needs an order");
         return;
     }
 
@@ -533,7 +546,9 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << (const char *)info.tagName() << " in repeated image\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown: %1 in repeated image")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -571,13 +586,14 @@ bool XMLParse::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
     for (QStringList::const_iterator ii = searchpath.begin();
         ii != searchpath.end(); ii++)
     {
-        f.setName(*ii + "categories.xml");
+        f.setFileName(*ii + "categories.xml");
         if (f.open(QIODevice::ReadOnly))
             break;
     }
     if (f.handle() == -1)
     {
-        VERBOSE(VB_IMPORTANT, "Error: Unable to open " << (const char *)f.name());
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Unable to open '%1'")
+                .arg(f.fileName()));
         return false;
     }
 
@@ -588,9 +604,10 @@ bool XMLParse::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        VERBOSE(VB_IMPORTANT, "Error parsing: " << (const char *)f.name()
-                << " line: " << errorLine << "  column: " << errorColumn
-                << ": " << (const char *)errorMsg);
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Parsing colors: %1 at line: %2 column: %3")
+                .arg(f.name()).arg(errorLine).arg(errorColumn) +
+                QString("\n\t\t\t%1").arg(errorMsg));
         f.close();
         return false;
     }
@@ -637,20 +654,21 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Guide needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Guide needs a name");
         return;
     }
 
     QString order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "Guide needs an order\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Guide needs an order");
         return;
     }
 
     if (!parseDefaultCategoryColors(catColors))
     {
-        //cerr << "No default category colors to parse." << endl;
+        //VERBOSE(VB_IMPORTANT, LOC_WARN +
+        //        "No default category colors to parse." );
     }
 
     for (QDomNode child = element.firstChild(); !child.isNull();
@@ -763,7 +781,8 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << (const char *)info.tagName() << " in bar\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown: %1 in bar").arg(info.tagName()));
                 return;
             }
         }
@@ -771,8 +790,9 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << (const char *)font
-             << " in guidegrid: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown font '%1' in guidegrid '%2'")
+                .arg(font).arg(name));
         return;
     }
 
@@ -856,14 +876,14 @@ void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Image Grid needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Image Grid needs a name");
         return;
     }
 
     QString order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "Image Grid needs an order\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Image Grid needs an order");
         return;
     }
 
@@ -952,14 +972,16 @@ void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
                 imgname = info.attribute("function", "");
                 if (imgname.isNull() || imgname.isEmpty())
                 {
-                    cerr << "Image in a image grid needs a function\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Image in a image grid needs a function");
                     return;
                 }
 
                 file = info.attribute("filename", "");
                 if (file.isNull() || file.isEmpty())
                 {
-                    cerr << "Image in a image grid needs a filename\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Image in a image grid needs a filename");
                     return;
                 }
 
@@ -982,11 +1004,12 @@ void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
                 {
                     defaultImage = file;
                 }
-
             }
             else
             {
-                cerr << "Unknown: " << (const char *)info.tagName() << " in bar\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in image grid")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -994,24 +1017,27 @@ void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
     fontProp *activeProp = GetFont(activeFont);
     if (!activeProp)
     {
-        cerr << "Unknown active font: " << (const char *)activeFont
-             << " in image grid: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown active font: '%1' in image grid: '%2'")
+                .arg(activeFont).arg(name));
         return;
     }
 
     fontProp *selectedProp = GetFont(selectedFont);
     if (!selectedProp)
     {
-        cerr << "Unknown selected font: " << (const char *)selectedFont
-             << " in image grid: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown selected font: '%1' in image grid: '%2'")
+                .arg(selectedFont).arg(name));
         return;
     }
 
     fontProp *inactiveProp = GetFont(inactiveFont);
     if (!inactiveProp)
     {
-        cerr << "Unknown inactive font: " << (const char *)inactiveFont
-             << " in image grid: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown inactive font: '%1' in image grid: '%2'")
+                .arg(inactiveFont).arg(name));
         return;
     }
 
@@ -1085,14 +1111,14 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Bar needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Bar needs a name");
         return;
     }
 
     QString order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "Bar needs an order\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Bar needs an order");
         return;
     }
 
@@ -1147,7 +1173,9 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << (const char *)info.tagName() << " in bar\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in bar")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -1155,8 +1183,9 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << (const char *)font
-             << " in bar: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown font: '%1' in bar: '%2'")
+                .arg(font).arg(name));
         return;
     }
 
@@ -1223,7 +1252,8 @@ QPoint XMLParse::parsePoint(QString text)
 {
     int x, y;
     QPoint retval(0, 0);
-    if (sscanf((const char *)text, "%d,%d", &x, &y) == 2)
+    QByteArray tmp = text.toLocal8Bit();
+    if (sscanf(tmp.constData(), "%d,%d", &x, &y) == 2)
         retval = QPoint(x, y);
     return retval;
 }
@@ -1232,7 +1262,8 @@ QRect XMLParse::parseRect(QString text)
 {
     int x, y, w, h;
     QRect retval(0, 0, 0, 0);
-    if (sscanf((const char *)text, "%d,%d,%d,%d", &x, &y, &w, &h) == 4)
+    QByteArray tmp = text.toLocal8Bit();
+    if (sscanf(tmp.constData(), "%d,%d,%d,%d", &x, &y, &w, &h) == 4)
         retval = QRect(x, y, w, h);
 
     return retval;
@@ -1246,14 +1277,15 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Container needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Container needs a name");
         return;
     }
 
     LayerSet *container = GetSet(name);
     if (container)
     {
-        cerr << "Container: " << (const char *)name << " already exists\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Container: '%1' already exists").arg(name));
         return;
     }
     newname = name;
@@ -1364,7 +1396,7 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             else
             {
                 VERBOSE(VB_IMPORTANT,
-                        QString("Container %1 contains unknown child: %2")
+                        QString("Container '%1' contains unknown child: '%2'")
                         .arg(name).arg(info.tagName()));
                 ok = false;
             }
@@ -1400,14 +1432,14 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Text area needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Text area needs a name");
         return;
     }
 
     QString layerNum = element.attribute("draworder", "");
     if (layerNum.isNull() && layerNum.isEmpty())
     {
-        cerr << "Text area needs a draworder\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Text area needs a draworder");
         return;
     }
     draworder = layerNum.toInt();
@@ -1441,7 +1473,8 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
                 if ((value.isNull() || value.isEmpty()) &&
                     info.attribute("lang","") == "")
                 {
-                    value = qApp->translate("ThemeUI", getFirstText(info));
+                    value = qApp->translate(
+                        "ThemeUI", getFirstText(info).toLatin1().constData());
                 }
                 else if (info.attribute("lang","").toLower() ==
                          ui->GetLanguageAndVariant())
@@ -1470,7 +1503,9 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag in textarea: " << (const char *)info.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in textarea")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -1479,8 +1514,9 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << (const char *)font
-             << " in textarea: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown font: '%1' in textarea '%2'")
+                .arg(font).arg(name));
         return;
     }
 
@@ -1550,14 +1586,14 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Rich Text area needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Rich Text area needs a name");
         return;
     }
 
     QString layerNum = element.attribute("draworder", "");
     if (layerNum.isNull() && layerNum.isEmpty())
     {
-        cerr << "Rich Text area needs a draworder\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Rich Text area needs a draworder");
         return;
     }
     draworder = layerNum.toInt();
@@ -1604,7 +1640,8 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
                 if ((value.isNull() || value.isEmpty()) &&
                      info.attribute("lang","") == "")
                 {
-                    value = qApp->translate("ThemeUI", getFirstText(info));
+                    value = qApp->translate(
+                        "ThemeUI", getFirstText(info).toLatin1().constData());
                 }
                 else if (info.attribute("lang","").toLower() ==
                          ui->GetLanguageAndVariant())
@@ -1626,21 +1663,21 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
                 imgname = info.attribute("function", "");
                 if (imgname.isNull() || imgname.isEmpty())
                 {
-                    cerr << "Image needs a function\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN + "Image needs a function");
                     return;
                 }
 
                 imgfile = info.attribute("filename", "");
                 if (imgfile.isNull() || imgfile.isEmpty())
                 {
-                    cerr << "Image needs a filename\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN + "Image needs a filename");
                     return;
                 }
 
                 imgpoint = info.attribute("location", "");
                 if (imgpoint.isNull() && imgpoint.isEmpty())
                 {
-                    cerr << "Image needs a location\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN + "Image needs a location");
                     return;
                 }
 
@@ -1675,7 +1712,9 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag in richtextarea: " << (const char *)info.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in richtextarea")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -1684,8 +1723,9 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << (const char *)font
-             << " in richtextarea: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown font '%1' in richtextarea '%2")
+                .arg(font).arg(name));
         return;
     }
 
@@ -1741,14 +1781,14 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "RemoteEdit needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "RemoteEdit needs a name");
         return;
     }
 
     QString layerNum = element.attribute("draworder", "");
     if (layerNum.isNull() && layerNum.isEmpty())
     {
-        cerr << "RemoteEdit needs a draworder\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "RemoteEdit needs a draworder");
         return;
     }
     draworder = layerNum.toInt();
@@ -1777,7 +1817,8 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
                 if ((value.isNull() || value.isEmpty()) &&
                     info.attribute("lang","") == "")
                 {
-                    value = qApp->translate("ThemeUI", getFirstText(info));
+                    value = qApp->translate(
+                        "ThemeUI", getFirstText(info).toLatin1().constData());
                 }
                 else if (info.attribute("lang","").toLower() ==
                          ui->GetLanguageAndVariant())
@@ -1811,7 +1852,9 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
 
             else
             {
-                cerr << "Unknown tag in RemoteEdit: " << (const char *)info.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in RemoteEdit")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -1820,8 +1863,9 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << (const char *)font
-             << " in RemoteEdit: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown font '%1' in RemoteEdit '%2'")
+                .arg(font).arg(name));
         return;
     }
 
@@ -1875,14 +1919,14 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "List area needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "List area needs a name");
         return;
     }
 
     QString layerNum = element.attribute("draworder", "");
     if (layerNum.isNull() && layerNum.isEmpty())
     {
-        cerr << "List area needs a draworder\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "List area needs a draworder");
         return;
     }
     draworder = layerNum.toInt();
@@ -1928,13 +1972,14 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
 
                 if (fontname.isNull() || fontname.isEmpty())
                 {
-                    cerr << "FcnFont needs a name\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN + "FcnFont needs a name");
                     return;
                 }
 
                 if (fontfcn.isNull() || fontfcn.isEmpty())
                 {
-                    cerr << "FcnFont needs a function\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "FcnFont needs a function");
                     return;
                 }
                 fontFunctions[fontfcn] = fontname;
@@ -1953,12 +1998,12 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
 
                 if (fillfcn.isNull() || fillfcn.isEmpty())
                 {
-                    cerr << "Fill needs a function\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN + "Fill needs a function");
                     return;
                 }
                 if (fillcolor.isNull() || fillcolor.isEmpty())
                 {
-                    cerr << "Fill needs a color\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN + "Fill needs a color");
                     return;
                 }
                 if (filltype == "5050")
@@ -1987,14 +2032,14 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                 imgname = info.attribute("function", "");
                 if (imgname.isNull() || imgname.isEmpty())
                 {
-                    cerr << "Image needs a function\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN + "Image needs a function");
                     return;
                 }
 
                 imgfile = info.attribute("filename", "");
                 if (imgfile.isNull() || imgfile.isEmpty())
                 {
-                    cerr << "Image needs a filename\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN + "Image needs a filename");
                     return;
                 }
 
@@ -2002,7 +2047,7 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                 imgpoint = info.attribute("location", "");
                 if (imgpoint.isNull() && imgpoint.isEmpty())
                 {
-                    cerr << "Image needs a location\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN + "Image needs a location");
                     return;
                 }
 
@@ -2051,14 +2096,14 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                 colnum = info.attribute("number", "");
                 if (colnum.isNull() || colnum.isEmpty())
                 {
-                    cerr << "Column needs a number\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN + "Column needs a number");
                     return;
                 }
 
                 colwidth = info.attribute("width", "");
                 if (colwidth.isNull() && colwidth.isEmpty())
                 {
-                    cerr << "Column needs a width\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN + "Column needs a width");
                     return;
                 }
 
@@ -2076,7 +2121,9 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag in listarea: " << (const char *)info.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in listarea")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -2120,9 +2167,9 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
     fontdata::Iterator it;
     for ( it = fontFunctions.begin(); it != fontFunctions.end(); ++it )
     {
-        fontProp *testFont = GetFont(it.data());
+        fontProp *testFont = GetFont(*it);
         if (testFont)
-            theFonts[it.data()] = *testFont;
+            theFonts[*it] = *testFont;
     }
     if (theFonts.size() > 0)
         list->SetFonts(fontFunctions, theFonts);
@@ -2174,14 +2221,14 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "StatusBar needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "StatusBar needs a name");
         return;
     }
 
     QString order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "StatusBar needs an order\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "StatusBar needs an order");
         return;
     }
 
@@ -2284,7 +2331,9 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << (const char *)info.tagName() << " in statusbar\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in statusbar")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -2343,8 +2392,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     //
 
     typedef QMap<int, QRect> CornerMap;
-    Q3PtrList<TreeIcon> iconList;
-    iconList.setAutoDelete(true);
+    deque<TreeIcon> iconList;
     CornerMap bin_corners;
     bin_corners.clear();
 
@@ -2358,14 +2406,14 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "ManagedTreeList needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "ManagedTreeList needs a name");
         return;
     }
 
     QString order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "ManagedTreeList needs an order\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "ManagedTreeList needs an order");
         return;
     }
 
@@ -2395,19 +2443,19 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 imgname = info.attribute("function", "");
                 if (imgname.isNull() || imgname.isEmpty())
                 {
-                    cerr << "Image needs a function\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN + "Image needs a function");
                     return;
                 }
 
                 file = info.attribute("filename", "");
                 if (file.isNull() || file.isEmpty())
                 {
-                    cerr << "Image needs a filename\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN + "Image needs a filename");
                     return;
                 }
 
                 QString imgNumStr = info.attribute("number", "");
-                imgnumber = atoi(imgNumStr);
+                imgnumber = imgNumStr.toInt();
 
                 if (info.tagName() == "context")
                 {
@@ -2442,7 +2490,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     select_img = ui->LoadScalePixmap(file);
                     if (!select_img)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'select' image '%1'")
+                                .arg(file));
                     }
                 }
                 else if (imgname.toLower() == "uparrow")
@@ -2459,7 +2509,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     uparrow_img = ui->LoadScalePixmap(file);
                     if (!uparrow_img)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'up arrow' image '%1'")
+                                .arg(file));
                     }
                 }
                 else if (imgname.toLower() == "downarrow")
@@ -2475,7 +2527,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     downarrow_img = ui->LoadScalePixmap(file);
                     if (!downarrow_img)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'down arrow' image '%1'")
+                                .arg(file));
                     }
                 }
                 else if (imgname.toLower() == "leftarrow")
@@ -2491,7 +2545,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     leftarrow_img = ui->LoadScalePixmap(file);
                     if (!leftarrow_img)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'left arrow' image '%1'")
+                                .arg(file));
                     }
                 }
                 else if (imgname.toLower() == "rightarrow")
@@ -2507,7 +2563,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     rightarrow_img = ui->LoadScalePixmap(file);
                     if (!rightarrow_img)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'right arrow' image '%1'")
+                                .arg(file));
                     }
                 }
                 else if ((imgname.toLower() == "icon") && (imgnumber != -1))
@@ -2515,19 +2573,22 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     icon_img = ui->LoadScalePixmap(file);
                     if (!icon_img)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'icon' image '%1'")
+                                .arg(file));
                     }
                     else
                     {
-                        TreeIcon *icn = new TreeIcon;
-                        icn->img = icon_img;
-                        icn->i = imgnumber;
-                        iconList.append(icn);
+                        iconList.push_back(TreeIcon());
+                        iconList.back().img = icon_img;
+                        iconList.back().i = imgnumber;
                     }
                 }
                 else
                 {
-                    cerr << "xmlparse.o: I don't know what to do with an image tag who's function is " << (const char *)imgname << endl;
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            QString("Unknown image tag whose function is '%1'")
+                            .arg(imgname));
                 }
             }
             else if (info.tagName() == "bin")
@@ -2536,12 +2597,15 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 int whichbin = whichbin_string.toInt();
                 if (whichbin < 1)
                 {
-                    cerr << "xmlparse.o: Bad setting for bin number in bin tag" << endl;
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Bad setting for bin number in bin tag");
                     return;
                 }
                 if (whichbin > bins + 1)
                 {
-                    cerr << "xmlparse.o: Attempt to set bin with a reference larger than number of bins" << endl;
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Attempt to set bin with a reference "
+                            "larger than number of bins" );
                     return;
                 }
                 for (QDomNode child = info.firstChild(); !child.isNull();
@@ -2566,21 +2630,26 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
 
                             if (fontname.isNull() || fontname.isEmpty())
                             {
-                                cerr << "FcnFont needs a name\n";
+                                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                        "FcnFont needs a name");
                                 return;
                             }
 
                             if (fontfcn.isNull() || fontfcn.isEmpty())
                             {
-                                cerr << "FcnFont needs a function\n";
+                                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                        "FcnFont needs a function");
                                 return;
                             }
-                            QString a_string = QString("bin%1-%2").arg(whichbin).arg(fontfcn);
+                            QString a_string = QString("bin%1-%2")
+                                .arg(whichbin).arg(fontfcn);
                             fontFunctions[a_string] = fontname;
                         }
                         else
                         {
-                            cerr << "Unknown tag in bin: " << (const char *)info.tagName() << endl;
+                            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                    QString("Unknown tag '%1' in tree list")
+                                    .arg(info.tagName()));
                             return;
                         }
                     }
@@ -2588,7 +2657,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << (const char *)info.tagName() << " in ManagedTreeList\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in ManagedTreeList")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -2612,9 +2683,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     fontdata::Iterator it;
     for ( it = fontFunctions.begin(); it != fontFunctions.end(); ++it )
     {
-        fontProp *testFont = GetFont(it.data());
+        fontProp *testFont = GetFont(*it);
         if (testFont)
-            theFonts[it.data()] = *testFont;
+            theFonts[*it] = *testFont;
     }
 
     if (theFonts.size() > 0)
@@ -2651,11 +2722,10 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     delete rightarrow_img;
 
     // Add in the icon images
-    TreeIcon *icon;
-    while ((icon=iconList.first()) != 0)
+    while (!iconList.empty())
     {
-        mtl->addIcon(icon->i, icon->img);
-        iconList.remove();
+        mtl->addIcon(iconList.front().i, iconList.front().img);
+        iconList.pop_front();
     }
 
     mtl->makeHighlights();
@@ -2675,14 +2745,14 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "PushButton needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "PushButton needs a name");
         return;
     }
 
     QString order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "PushButton needs an order\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "PushButton needs an order");
         return;
     }
 
@@ -2710,14 +2780,16 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                 imgname = info.attribute("function", "");
                 if (imgname.isNull() || imgname.isEmpty())
                 {
-                    cerr << "Image in a push button needs a function\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Image in a push button needs a function");
                     return;
                 }
 
                 file = info.attribute("filename", "");
                 if (file.isNull() || file.isEmpty())
                 {
-                    cerr << "Image in a push button needs a filename\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Image in a push button needs a filename");
                     return;
                 }
 
@@ -2726,7 +2798,9 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                     image_on = ui->LoadScalePixmap(file);
                     if (!image_on)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'on' image '%1'")
+                                .arg(file));
                     }
                 }
                 if (imgname.toLower() == "off")
@@ -2734,7 +2808,9 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                     image_off = ui->LoadScalePixmap(file);
                     if (!image_off)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'off' image '%1'")
+                                .arg(file));
                     }
                 }
                 if (imgname.toLower() == "pushed")
@@ -2742,7 +2818,9 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                     image_pushed = ui->LoadScalePixmap(file);
                     if (!image_pushed)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'pushed' image '%1'")
+                                .arg(file));
                     }
                 }
                 if (imgname.toLower() == "pushedon")
@@ -2750,13 +2828,17 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
                     image_pushedon = ui->LoadScalePixmap(file);
                     if (!image_pushedon)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'pushed on' image '%1'")
+                                .arg(file));
                     }
                 }
             }
             else
             {
-                cerr << "Unknown: " << (const char *)info.tagName() << " in PushButton\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in PushButton")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -2804,14 +2886,14 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "TextButton needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "TextButton needs a name");
         return;
     }
 
     QString order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "TextButton needs an order\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "TextButton needs an order");
         return;
     }
 
@@ -2843,14 +2925,16 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
                 imgname = info.attribute("function", "");
                 if (imgname.isNull() || imgname.isEmpty())
                 {
-                    cerr << "Image in a text button needs a function\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Image in a text button needs a function");
                     return;
                 }
 
                 file = info.attribute("filename", "");
                 if (file.isNull() || file.isEmpty())
                 {
-                    cerr << "Image in a text button needs a filename\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Image in a text button needs a filename");
                     return;
                 }
 
@@ -2859,7 +2943,9 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
                     image_on = ui->LoadScalePixmap(file);
                     if (!image_on)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'on' image '%1'")
+                                .arg(file));
                     }
                 }
                 if (imgname.toLower() == "off")
@@ -2867,7 +2953,9 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
                     image_off = ui->LoadScalePixmap(file);
                     if (!image_off)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'off' image '%1'")
+                                .arg(file));
                     }
                 }
                 if (imgname.toLower() == "pushed")
@@ -2876,13 +2964,17 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
 
                     if (!image_pushed)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'pushed' image '%1'")
+                                .arg(file));
                     }
                 }
             }
             else
             {
-                cerr << "Unknown: " << (const char *)info.tagName() << " in TextButton\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in textbutton")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -2891,8 +2983,9 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << (const char *)font << " in textbutton: "
-             << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown font '%1' in textbutton '%2'")
+                .arg(font).arg(name));
         return;
     }
 
@@ -2935,14 +3028,14 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "CheckBox needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "CheckBox needs a name");
         return;
     }
 
     QString order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "CheckBox needs an order\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "CheckBox needs an order");
         return;
     }
 
@@ -2970,14 +3063,16 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                 imgname = info.attribute("function", "");
                 if (imgname.isNull() || imgname.isEmpty())
                 {
-                    cerr << "Image in a CheckBox needs a function\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Image in a CheckBox needs a function");
                     return;
                 }
 
                 file = info.attribute("filename", "");
                 if (file.isNull() || file.isEmpty())
                 {
-                    cerr << "Image in a CheckBox needs a filename\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Image in a CheckBox needs a filename");
                     return;
                 }
 
@@ -2986,7 +3081,9 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                     image_checked = ui->LoadScalePixmap(file);
                     if (!image_checked)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'checked' image '%1'")
+                                .arg(file));
                     }
                 }
                 if (imgname.toLower() == "unchecked")
@@ -2994,7 +3091,9 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                     image_unchecked = ui->LoadScalePixmap(file);
                     if (!image_unchecked)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'unchecked' image '%1'")
+                                .arg(file));
                     }
                 }
                 if (imgname.toLower() == "checked_high")
@@ -3002,7 +3101,9 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                     image_checked_high = ui->LoadScalePixmap(file);
                     if (!image_checked_high)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'checked high' "
+                                        "image '%1'").arg(file));
                     }
                 }
                 if (imgname.toLower() == "unchecked_high")
@@ -3010,13 +3111,17 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
                     image_unchecked_high = ui->LoadScalePixmap(file);
                     if (!image_unchecked_high)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'unchecked high' "
+                                        "image '%1'").arg(file));
                     }
                 }
             }
             else
             {
-                cerr << "Unknown: " << (const char *)info.tagName() << " in CheckBox\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in checkbox")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -3064,14 +3169,14 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Selector needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Selector needs a name");
         return;
     }
 
     QString order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "Selector needs an order\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Selector needs an order");
         return;
     }
 
@@ -3102,14 +3207,16 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
                 imgname = info.attribute("function", "");
                 if (imgname.isNull() || imgname.isEmpty())
                 {
-                    cerr << "Image in a selector needs a function\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Image in a selector needs a function");
                     return;
                 }
 
                 file = info.attribute("filename", "");
                 if (file.isNull() || file.isEmpty())
                 {
-                    cerr << "Image in a selector needs a filename\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Image in a selector needs a filename");
                     return;
                 }
 
@@ -3118,7 +3225,9 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
                     image_on = ui->LoadScalePixmap(file);
                     if (!image_on)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'on' image '%1'")
+                                .arg(file));
                     }
                 }
                 if (imgname.toLower() == "off")
@@ -3126,7 +3235,9 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
                     image_off = ui->LoadScalePixmap(file);
                     if (!image_off)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'off' image '%1'")
+                                .arg(file));
                     }
                 }
                 if (imgname.toLower() == "pushed")
@@ -3135,13 +3246,17 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
 
                     if (!image_pushed)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)file << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'pushed' image '%1'")
+                                .arg(file));
                     }
                 }
             }
             else
             {
-                cerr << "Unknown: " << (const char *)info.tagName() << " in Selector\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in selector")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -3150,8 +3265,9 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << (const char *)font
-             << " in Selector: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown font '%1' in selector '%2'")
+                .arg(font).arg(name));
         return;
     }
 
@@ -3190,7 +3306,7 @@ void XMLParse::parseBlackHole(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "BlackHole needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "BlackHole needs a name");
         return;
     }
 
@@ -3207,7 +3323,9 @@ void XMLParse::parseBlackHole(LayerSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << (const char *)info.tagName() << " in Black Hole\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in blackhole")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -3242,21 +3360,23 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
     int     margin = 3;
 
     QString name = element.attribute("name", "");
-    if (name.isEmpty()) {
-        std::cerr << "ListBtn area needs a name" << std::endl;
+    if (name.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "ListBtn area needs a name");
         return;
     }
 
     QString layerNum = element.attribute("draworder", "");
     if (layerNum.isNull() || layerNum.isEmpty())
     {
-        cerr << "ListBtn area needs a draworder\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "ListBtn area needs a draworder");
         return;
     }
 
     draworder = layerNum.toInt();
     for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling()) {
+         child = child.nextSibling())
+    {
         QDomElement info = child.toElement();
         if (!info.isNull())
         {
@@ -3278,14 +3398,16 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
                     fontActive = fontName;
                 else if (fontFcn.toLower() == "inactive")
                     fontInactive = fontName;
-                else {
-                    std::cerr << "Unknown font function for listbtn area: "
-                              << (const char *)fontFcn
-                              << std::endl;
+                else
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            QString("Unknown font function '%1' "
+                                    "for listbtn area").arg(fontFcn));
                     return;
                 }
             }
-            else if (info.tagName() == "showarrow") {
+            else if (info.tagName() == "showarrow")
+            {
                 if (getFirstText(info).toLower() == "no")
                     showArrow = false;
             }
@@ -3293,51 +3415,61 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
             {
                 align = getFirstText(info);
             }
-            else if (info.tagName() == "showscrollarrows") {
+            else if (info.tagName() == "showscrollarrows")
+            {
                 if (getFirstText(info).toLower() == "yes")
                     showScrollArrows = true;
             }
-            else if (info.tagName() == "gradient") {
+            else if (info.tagName() == "gradient")
+            {
 
-                if (info.attribute("type","").toLower() == "selected") {
+                if (info.attribute("type","").toLower() == "selected")
+                {
                     grSelectedBeg = createColor(info.attribute("start"));
                     grSelectedEnd = createColor(info.attribute("end"));
                     grSelectedAlpha = info.attribute("alpha","255").toUInt();
                 }
-                else if (info.attribute("type","").toLower() == "unselected") {
+                else if (info.attribute("type","").toLower() == "unselected")
+                {
                     grUnselectedBeg = createColor(info.attribute("start"));
                     grUnselectedEnd = createColor(info.attribute("end"));
                     grUnselectedAlpha = info.attribute("alpha","100").toUInt();
                 }
-                else {
-                    std::cerr << "Unknown type for gradient in listbtn area"
-                              << std::endl;
+                else
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Unknown type for gradient in listbtn area");
                     return;
                 }
 
                 if (!grSelectedBeg.isValid() || !grSelectedEnd.isValid() ||
-                    !grUnselectedBeg.isValid() || !grUnselectedEnd.isValid()) {
-                    std::cerr << "Unknown color for gradient in listbtn area"
-                              << std::endl;
+                    !grUnselectedBeg.isValid() || !grUnselectedEnd.isValid())
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Unknown color for gradient in listbtn area");
                     return;
                 }
 
-                if (grSelectedAlpha > 255 || grUnselectedAlpha > 255) {
-                    std::cerr << "Incorrect alpha for gradient in listbtn area"
-                              << std::endl;
+                if (grSelectedAlpha > 255 || grUnselectedAlpha > 255)
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Incorrect alpha for gradient in listbtn area");
                     return;
                 }
             }
-            else if (info.tagName() == "spacing") {
+            else if (info.tagName() == "spacing")
+            {
                 spacing = getFirstText(info).toInt();
             }
-            else if (info.tagName() == "margin") {
+            else if (info.tagName() == "margin")
+            {
                 margin = getFirstText(info).toInt();
             }
             else
             {
-                std::cerr << "Unknown tag in listbtn area: "
-                          << (const char *)info.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in listbtn area")
+                        .arg(info.tagName()));
                 return;
             }
 
@@ -3352,23 +3484,25 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
             jst = Qt::AlignCenter | Qt::AlignVCenter;
         else if (align.toLower() == "right")
             jst = Qt::AlignRight  | Qt::AlignVCenter;
-    	else if (align.toLower() == "left")
+        else if (align.toLower() == "left")
             jst = Qt::AlignLeft   | Qt::AlignVCenter;
     }
 
     fontProp *fpActive = GetFont(fontActive);
     if (!fpActive)
     {
-        cerr << "Unknown font: " << (const char *)fontActive
-             << " in listbtn area: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown active font '%1' in listbtn area '%2'")
+                .arg(fontActive).arg(name));
         return;
     }
 
     fontProp *fpInactive = GetFont(fontInactive);
     if (!fpInactive)
     {
-        cerr << "Unknown font: " << (const char *)fontInactive
-             << " in listbtn area: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown inactive font '%1' in listbtn area '%2'")
+                .arg(fontInactive).arg(name));
         return;
     }
 
@@ -3412,21 +3546,23 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
     int     margin = 3;
 
     QString name = element.attribute("name", "");
-    if (name.isEmpty()) {
-        std::cerr << "ListTreeArea area needs a name" << std::endl;
+    if (name.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "ListTreeArea area needs a name" );
         return;
     }
 
     QString layerNum = element.attribute("draworder", "");
     if (layerNum.isNull() || layerNum.isEmpty())
     {
-        cerr << "ListTreeArea needs a draworder\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "ListTreeArea needs a draworder");
         return;
     }
 
     draworder = layerNum.toInt();
     for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling()) {
+         child = child.nextSibling())
+    {
         QDomElement info = child.toElement();
         if (!info.isNull())
         {
@@ -3457,62 +3593,75 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
                     fontActive = fontName;
                 else if (fontFcn.toLower() == "inactive")
                     fontInactive = fontName;
-                else {
-                    std::cerr << "Unknown font function for ListTreeArea: "
-                              << (const char *)fontFcn
-                              << std::endl;
+                else
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            QString("Unknown font function '%1' "
+                                    "for ListTreeArea: ").arg(fontFcn));
                     return;
                 }
             }
-            else if (info.tagName() == "showarrow") {
+            else if (info.tagName() == "showarrow")
+            {
                 if (getFirstText(info).toLower() == "no")
                     showArrow = false;
             }
-            else if (info.tagName() == "showscrollarrows") {
+            else if (info.tagName() == "showscrollarrows")
+            {
                 if (getFirstText(info).toLower() == "yes")
                     showScrollArrows = true;
             }
-            else if (info.tagName() == "gradient") {
+            else if (info.tagName() == "gradient")
+            {
 
-                if (info.attribute("type","").toLower() == "selected") {
+                if (info.attribute("type","").toLower() == "selected")
+                {
                     grSelectedBeg = createColor(info.attribute("start"));
                     grSelectedEnd = createColor(info.attribute("end"));
                     grSelectedAlpha = info.attribute("alpha","255").toUInt();
                 }
-                else if (info.attribute("type","").toLower() == "unselected") {
+                else if (info.attribute("type","").toLower() == "unselected")
+                {
                     grUnselectedBeg = createColor(info.attribute("start"));
                     grUnselectedEnd = createColor(info.attribute("end"));
                     grUnselectedAlpha = info.attribute("alpha","100").toUInt();
                 }
-                else {
-                    std::cerr << "Unknown type for gradient in ListTreeArea"
-                              << std::endl;
+                else
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Unknown type for gradient in ListTreeArea");
                     return;
                 }
 
                 if (!grSelectedBeg.isValid() || !grSelectedEnd.isValid() ||
-                    !grUnselectedBeg.isValid() || !grUnselectedEnd.isValid()) {
-                    std::cerr << "Unknown color for gradient in ListTreeArea area"
-                              << std::endl;
+                    !grUnselectedBeg.isValid() || !grUnselectedEnd.isValid())
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Unknown color for gradient in ListTreeArea area");
                     return;
                 }
 
-                if (grSelectedAlpha > 255 || grUnselectedAlpha > 255) {
-                    std::cerr << "Incorrect alpha for gradient in ListTreeArea area"
-                              << std::endl;
+                if (grSelectedAlpha > 255 || grUnselectedAlpha > 255)
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Incorrect alpha for gradient "
+                            "in ListTreeArea area");
                     return;
                 }
             }
-            else if (info.tagName() == "spacing") {
+            else if (info.tagName() == "spacing")
+            {
                 spacing = getFirstText(info).toInt();
             }
-            else if (info.tagName() == "margin") {
+            else if (info.tagName() == "margin")
+            {
                 margin = getFirstText(info).toInt();
             }
             else
             {
-                std::cerr << "Unknown tag in ListTreeArea: "
-                          << (const char *)info.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in listtreearea")
+                        .arg(info.tagName()));
                 return;
             }
 
@@ -3522,16 +3671,18 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
     fontProp *fpActive = GetFont(fontActive);
     if (!fpActive)
     {
-        cerr << "Unknown font: " << (const char *)fontActive
-             << " in ListTreeArea: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown active font '%1' in textbutton '%2'")
+                .arg(fontActive).arg(name));
         return;
     }
 
     fontProp *fpInactive = GetFont(fontInactive);
     if (!fpInactive)
     {
-        cerr << "Unknown font: " << (const char *)fontInactive
-             << " in ListTreeArea: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown inactive font '%1' in textbutton '%2'")
+                .arg(fontInactive).arg(name));
         return;
     }
 
@@ -3570,21 +3721,21 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
     name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "key needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "key needs a name");
         return;
     }
 
     type = element.attribute("type", "");
     if (type.isNull() || type.isEmpty())
     {
-        cerr << "key needs a type\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "key needs a type");
         return;
     }
 
     order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "key needs an order\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "key needs an order");
         return;
     }
 
@@ -3623,14 +3774,16 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                 imgfunction = e.attribute("function", "");
                 if (imgfunction.isNull() || imgfunction.isEmpty())
                 {
-                    cerr << "Image in a key needs a function\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Image in a key needs a function");
                     return;
                 }
 
                 imgname = e.attribute("filename", "");
                 if (imgname.isNull() || imgname.isEmpty())
                 {
-                    cerr << "Image in a key needs a filename\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Image in a key needs a filename");
                     return;
                 }
 
@@ -3639,8 +3792,9 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                     normalImage = ui->LoadScalePixmap(imgname);
                     if (!normalImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called "
-                             << (const char *)imgname << endl;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'normal' image '%1'")
+                                .arg(imgname));
                     }
                 }
                 else if (imgfunction.toLower() == "focused")
@@ -3648,8 +3802,9 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                     focusedImage = ui->LoadScalePixmap(imgname);
                     if (!focusedImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called "
-                             << (const char *)imgname << endl;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'focused' image '%1'")
+                                .arg(imgname));
                     }
                 }
                 else if (imgfunction.toLower() == "down")
@@ -3658,8 +3813,9 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
 
                     if (!downImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called "
-                             << (const char *)imgname << endl;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'down' image '%1'")
+                                .arg(imgname));
                     }
                 }
                 else if (imgfunction.toLower() == "downfocused")
@@ -3668,14 +3824,16 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
 
                     if (!downFocusedImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called "
-                             << (const char *)imgname << endl;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'downfocused' image '%1'")
+                                .arg(imgname));
                     }
                 }
                 else
                 {
-                    std::cerr << "Unknown image function in key type: "
-                              << (const char *)imgfunction << endl;
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            QString("Unknown image function '%1' in key")
+                            .arg(imgfunction));
                     return;
                 }
             }
@@ -3694,14 +3852,16 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
                     downFocusedFontName = fontName;
                 else
                 {
-                    cerr << "Unknown font function in key type: "
-                         << (const char *)fontFcn << endl;
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            QString("Unknown font function '%1' in key")
+                            .arg(fontFcn));
                     return;
                 }
             }
             else
             {
-                cerr << "Unknown: " << (const char *)e.tagName() << " in key\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in key").arg(e.tagName()));
                 return;
             }
         }
@@ -3738,14 +3898,14 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "keyboard needs a name\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "keyboard needs a name");
         return;
     }
 
     QString order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "keyboard needs an order\n";
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "keyboard needs an order");
         return;
     }
 
@@ -3777,14 +3937,16 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
                 imgfunction = e.attribute("function", "");
                 if (imgfunction.isNull() || imgfunction.isEmpty())
                 {
-                    cerr << "Image in a keyboard needs a function\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Image in a keyboard needs a function");
                     return;
                 }
 
                 imgname = e.attribute("filename", "");
                 if (imgname.isNull() || imgname.isEmpty())
                 {
-                    cerr << "Image in a keyboard needs a filename\n";
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Image in a keyboard needs a filename");
                     return;
                 }
 
@@ -3793,7 +3955,9 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
                     normalImage = ui->LoadScalePixmap(imgname);
                     if (!normalImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)imgname << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'normal' image '%1'")
+                                .arg(imgname));
                     }
                 }
                 else if (imgfunction.toLower() == "focused")
@@ -3801,7 +3965,9 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
                     focusedImage = ui->LoadScalePixmap(imgname);
                     if (!focusedImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)imgname << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'focused' image '%1'")
+                                .arg(imgname));
                     }
                 }
                 else if (imgfunction.toLower() == "down")
@@ -3810,7 +3976,9 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
 
                     if (!downImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)imgname << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'down' image '%1'")
+                                .arg(imgname));
                     }
                 }
                 else if (imgfunction.toLower() == "downfocused")
@@ -3819,14 +3987,16 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
 
                     if (!downFocusedImage)
                     {
-                        cerr << "xmparse.o: I can't find a file called " << (const char *)imgname << endl ;
+                        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                                QString("Can't locate 'downfocused' image '%1'")
+                                .arg(imgname));
                     }
                 }
                 else
                 {
-                    std::cerr << "Unknown image function in keyboard type: "
-                              << (const char *)imgfunction
-                              << std::endl;
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            QString("Unknown image function '%1' in keyboard")
+                            .arg(imgfunction));
                     return;
                 }
             }
@@ -3845,15 +4015,17 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
                     downFocusedFontName = fontName;
                 else
                 {
-                    std::cerr << "Unknown font function in keyboard type: "
-                              << (const char *)fontFcn
-                              << std::endl;
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            QString("Unknown font function '%1' in keyboard")
+                            .arg(fontFcn));
                     return;
                 }
             }
             else
             {
-                cerr << "Unknown: " << (const char *)e.tagName() << " in keyboard\n";
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unknown tag '%1' in keyboard")
+                        .arg(e.tagName()));
                 return;
             }
         }
@@ -3861,8 +4033,8 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
 
     if (normalFontName == "")
     {
-      cerr << "Keyboard need a normal font" << endl;
-      return;
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Keyboard need a normal font" );
+        return;
     }
 
     if (focusedFontName == "")
@@ -3877,32 +4049,36 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
     fontProp *normalFont = GetFont(normalFontName);
     if (!normalFont)
     {
-      cerr << "Unknown font: " << (const char *)normalFontName
-           << " in Keyboard: " << (const char *)name << endl;
-      return;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown normal font '%1' in in Keyboard '%2'")
+                .arg(normalFontName).arg(name));
+        return;
     }
 
     fontProp *focusedFont = GetFont(focusedFontName);
     if (!focusedFont)
     {
-        cerr << "Unknown font: " << (const char *)focusedFontName
-                << " in Keyboard: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown focused font '%1' in in Keyboard '%2'")
+                .arg(focusedFontName).arg(name));
         return;
     }
 
     fontProp *downFont = GetFont(downFontName);
     if (!downFont)
     {
-        cerr << "Unknown font: " << (const char *)downFontName
-                << " in Keyboard: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown down font '%1' in in Keyboard '%2'")
+                .arg(downFontName).arg(name));
         return;
     }
 
     fontProp *downFocusedFont = GetFont(downFocusedFontName);
     if (!downFocusedFont)
     {
-        cerr << "Unknown font: " << (const char *)downFocusedFontName
-                << " in Keyboard: " << (const char *)name << endl;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unknown down focus font '%1' in in Keyboard '%2'")
+                .arg(downFocusedFontName).arg(name));
         return;
     }
 
