@@ -50,7 +50,7 @@ class JobThread : public QThread
     void    sendLoggingEvent(const QString &event_string);
 
     virtual bool usesDevice(const QString &device)
-                 { return false; (void)device; }
+                 { (void)device; return false; }
     
   protected:
 
