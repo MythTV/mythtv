@@ -606,7 +606,7 @@ bool XMLParse::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Parsing colors: %1 at line: %2 column: %3")
-                .arg(f.name()).arg(errorLine).arg(errorColumn) +
+                .arg(f.fileName()).arg(errorLine).arg(errorColumn) +
                 QString("\n\t\t\t%1").arg(errorMsg));
         f.close();
         return false;

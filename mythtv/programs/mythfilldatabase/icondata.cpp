@@ -198,7 +198,7 @@ void IconData::UpdateSourceIcons(int sourceid)
                 MSqlQuery icon_update_query(MSqlQuery::InitCon());
                 icon_update_query.prepare("UPDATE channel SET icon = :ICON "
                         "WHERE chanid = :CHANID AND sourceid = :SOURCEID");
-                icon_update_query.bindValue(":ICON", localfile.name());
+                icon_update_query.bindValue(":ICON", localfile.fileName());
                 icon_update_query.bindValue(":CHANID", query.value(0).toInt());
                 icon_update_query.bindValue(":SOURCEID", sourceid);
 
@@ -211,7 +211,7 @@ void IconData::UpdateSourceIcons(int sourceid)
                 VERBOSE(VB_IMPORTANT, QString(
                         "Error retrieving icon from '%1' to file '%2'")
                         .arg(icon_url)
-                        .arg(localfile.name()));
+                        .arg(localfile.fileName()));
             }
         }
     }
