@@ -95,8 +95,8 @@ bool CdDecoder::initialize()
     seekTime = -1.0;
     totalTime = 0.0;
 
-    filename = ((QFile *)input())->name();
-    tracknum = filename.toUInt();
+    filename = ((QFile *)input())->fileName();
+    tracknum = filename.section('.', 0, 0).toUInt();
    
     if (!output_buf)
         output_buf = new char[globalBufferSize];
