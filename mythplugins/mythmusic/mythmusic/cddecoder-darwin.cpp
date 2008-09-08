@@ -75,14 +75,14 @@ bool CdDecoder::initialize()
     if (!TOCfile.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_GENERAL,
-                "Unable to open Audio CD TOC file: " + TOCfile.name());
+                "Unable to open Audio CD TOC file: " + TOCfile.fileName());
         return false;
     }
 
     if (!TOC.setContent(&TOCfile))
     {
         VERBOSE(VB_GENERAL,
-                "Unable to parse Audio CD TOC file: " + TOCfile.name());
+                "Unable to parse Audio CD TOC file: " + TOCfile.fileName());
         TOCfile.close();
         return false;
     }

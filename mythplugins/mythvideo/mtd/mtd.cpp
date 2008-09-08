@@ -720,7 +720,7 @@ void MTD::startDVD(const QStringList &tokens)
                                                   dvd_drive_access, 
                                                   dvd_device, 
                                                   dvd_title, 
-                                                  final_file.name(), 
+                                                  final_file.fileName(), 
                                                   file_name,
                                                   flat,
                                                   nice_level);
@@ -747,7 +747,7 @@ void MTD::startDVD(const QStringList &tokens)
                                                   dvd_drive_access, 
                                                   dvd_device, 
                                                   dvd_title, 
-                                                  final_file.name(), 
+                                                  final_file.fileName(), 
                                                   file_name,
                                                   flat,
                                                   nice_level);
