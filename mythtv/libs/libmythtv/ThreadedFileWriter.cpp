@@ -231,7 +231,7 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
                 ++iobound_cnt;
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "Write() -- IOBOUND begin " +
                         QString("remaining(%1) free(%2) size(%3) cnt(%4)")
-                        .arg(remaining).arg(BufFree())
+                        .arg(remaining).arg(BufFreePriv())
                         .arg(tfw_buf_size).arg(iobound_cnt));
                 first = false;
             }
