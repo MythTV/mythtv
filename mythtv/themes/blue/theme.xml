@@ -292,7 +292,7 @@
 
   <buttondef name="WEBPAGE">
     <image>webpage.png</image>
-    <offset>20,10</offset>
+    <offset>22,10</offset>
   </buttondef>
 
   <buttondef name="RECIPE">
@@ -401,7 +401,7 @@
 
   <buttondef name="SETTINGS_WEBPAGE">
     <image>webpage.png</image>
-    <offset>55,30</offset>
+    <offset>22,10</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_RECIPE">
