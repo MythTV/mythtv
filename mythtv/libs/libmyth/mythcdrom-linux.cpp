@@ -357,193 +357,178 @@ MediaStatus MythCDROMLinux::checkMedia()
 {
     bool OpenedHere = false;
 
-    if (testMedia() != MEDIAERR_OK)
-    {
-        m_MediaType = MEDIATYPE_UNKNOWN;
-        return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
-    }
-
     // If it's not already open we need to at least
     // TRY to open it for most of these checks to work.
     if (!isDeviceOpen())
+    {
         OpenedHere = openDevice();
 
-    if (isDeviceOpen())
-    {
-        VERBOSE(VB_MEDIA+VB_EXTRA, LOC + ":checkMedia - Device is open...");
-        switch (driveStatus())
+        if (!OpenedHere)
         {
-            case CDS_DISC_OK:
-                VERBOSE(VB_MEDIA, getDevicePath() + " Disk OK, type = "
-                                  + MediaTypeString(m_MediaType) );
-                // 1. Audio CDs are not mounted
-                // 2. If we don't know the media type yet,
-                //    test the disk after this switch exits
-                if (m_MediaType == MEDIATYPE_AUDIO ||
-                    m_MediaType == MEDIATYPE_UNKNOWN)
-                    break;
-                // If we have tried to mount and failed, don't keep trying:
-                if (m_Status == MEDIASTAT_ERROR)
-                    return m_Status;
-                // If the disc is ok and we already know it's mediatype
-                // returns MOUNTED.
+            VERBOSE(VB_MEDIA, "Device not open - returning UNKNOWN");
+            m_MediaType = MEDIATYPE_UNKNOWN;
+            return setStatus(MEDIASTAT_UNKNOWN, false);
+        }
+    }
+
+    VERBOSE(VB_MEDIA+VB_EXTRA, LOC + ":checkMedia - Device is open...");
+    switch (driveStatus())
+    {
+        case CDS_DISC_OK:
+            VERBOSE(VB_MEDIA, getDevicePath() + " Disk OK, type = "
+                              + MediaTypeString(m_MediaType) );
+            // 1. Audio CDs are not mounted
+            // 2. If we don't know the media type yet,
+            //    test the disk after this switch exits
+            if (m_MediaType == MEDIATYPE_AUDIO ||
+                m_MediaType == MEDIATYPE_UNKNOWN)
+                break;
+            // If we have tried to mount and failed, don't keep trying:
+            if (m_Status == MEDIASTAT_ERROR)
+                return m_Status;
+            // If the disc is ok and we already know it's mediatype
+            // returns MOUNTED.
+            if (isMounted())
+                return setStatus(MEDIASTAT_MOUNTED, OpenedHere);
+            break;
+        case CDS_TRAY_OPEN:
+            VERBOSE(VB_MEDIA, getDevicePath() + " Tray open or no disc");
+            setStatus(MEDIASTAT_OPEN, OpenedHere);
+            m_MediaType = MEDIATYPE_UNKNOWN;
+            return MEDIASTAT_OPEN;
+            break;
+        case CDS_NO_DISC:
+            VERBOSE(VB_MEDIA, getDevicePath() + " No disc");
+            m_MediaType = MEDIATYPE_UNKNOWN;
+            return setStatus(MEDIASTAT_NODISK, OpenedHere);
+            break;
+        case CDS_NO_INFO:
+        case CDS_DRIVE_NOT_READY:
+            VERBOSE(VB_MEDIA, getDevicePath() + " No info or drive not ready");
+            m_MediaType = MEDIATYPE_UNKNOWN;
+            return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
+        default:
+            VERBOSE(VB_IMPORTANT, "Failed to get drive status of "
+                                  + getDevicePath() + " : " + ENO);
+            m_MediaType = MEDIATYPE_UNKNOWN;
+            return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
+    }
+
+    if (mediaChanged())
+    {
+        VERBOSE(VB_MEDIA, getDevicePath() + " Media changed");
+        // Regardless of the actual status lie here and say
+        // it's open for now, so we can cover the case of a missed open.
+        return setStatus(MEDIASTAT_OPEN, OpenedHere);
+    }
+
+    VERBOSE(VB_MEDIA+VB_EXTRA, getDevicePath() + " Media unchanged...");
+    if ((m_Status == MEDIASTAT_OPEN) ||
+        (m_Status == MEDIASTAT_UNKNOWN))
+    {
+        VERBOSE(VB_MEDIA, getDevicePath() + " Current status " +
+                MythMediaDevice::MediaStatusStrings[m_Status]);
+        int type = ioctl(m_DeviceHandle, CDROM_DISC_STATUS, CDSL_CURRENT);
+        switch (type)
+        {
+            case CDS_DATA_1:
+            case CDS_DATA_2:
+                m_MediaType = MEDIATYPE_DATA;
+                VERBOSE(VB_MEDIA, "Found a data disk");
+                //grab information from iso9660 (& udf)
+                struct iso_primary_descriptor buf;
+                lseek(this->m_DeviceHandle,(off_t) 2048*16,SEEK_SET);
+                read(this->m_DeviceHandle, &buf,2048);
+                this->m_VolumeID = QString(buf.volume_id).trimmed();
+                this->m_KeyID = QString("%1%2").arg(this->m_VolumeID)
+                                .arg(QString(buf.creation_date).left(16));
+
+                // the base class's onDeviceMounted will do fine
+                // grained detection of the type of data on this disc
                 if (isMounted())
+                    onDeviceMounted();
+                else
+                    if (mount())
+                        ;    // onDeviceMounted() called as side-effect
+                    else
+                        return setStatus(MEDIASTAT_ERROR, OpenedHere);
+
+                if (isMounted())
+                {
+                    // pretend we're NOTMOUNTED so setStatus emits a signal
+                    m_Status = MEDIASTAT_NOTMOUNTED;
                     return setStatus(MEDIASTAT_MOUNTED, OpenedHere);
+                }
+                else if (m_MediaType == MEDIATYPE_DVD)
+                {
+                    // pretend we're NOTMOUNTED so setStatus emits a signal
+                    m_Status = MEDIASTAT_NOTMOUNTED;
+                    return setStatus(MEDIASTAT_USEABLE, OpenedHere);
+                }
+                else
+                    return setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
                 break;
-            case CDS_TRAY_OPEN:
-                VERBOSE(VB_MEDIA, getDevicePath() + " Tray open or no disc");
-                setStatus(MEDIASTAT_OPEN, OpenedHere);
-                m_MediaType = MEDIATYPE_UNKNOWN;
-                return MEDIASTAT_OPEN;
+            case CDS_AUDIO:
+                VERBOSE(VB_MEDIA, "found an audio disk");
+                m_MediaType = MEDIATYPE_AUDIO;
+                return setStatus(MEDIASTAT_USEABLE, OpenedHere);
                 break;
-            case CDS_NO_DISC:
-                VERBOSE(VB_MEDIA, getDevicePath() + " No disc");
-                m_MediaType = MEDIATYPE_UNKNOWN;
-                return setStatus(MEDIASTAT_NODISK, OpenedHere);
+            case CDS_MIXED:
+                m_MediaType = MEDIATYPE_MIXED;
+                VERBOSE(VB_MEDIA, "found a mixed CD");
+                // Note: Mixed mode CDs require an explixit mount call
+                //       since we'll usually want the audio portion.
+                // undefine ASSUME_WANT_AUDIO to change this behavior.
+                #ifdef ASSUME_WANT_AUDIO
+                    return setStatus(MEDIASTAT_USEABLE, OpenedHere);
+                #else
+                    mount();
+                    if (isMounted())
+                    {
+                        // pretend we're NOTMOUNTED so setStatus
+                        // emits a signal
+                        m_Status = MEDIASTAT_NOTMOUNTED;
+                        return setStatus(MEDIASTAT_MOUNTED, OpenedHere);
+                    }
+                    else
+                    {
+                        return setStatus(MEDIASTAT_USEABLE, OpenedHere);
+                    }
+                #endif
                 break;
             case CDS_NO_INFO:
-            case CDS_DRIVE_NOT_READY:
-                VERBOSE(VB_MEDIA, getDevicePath()
-                                  + " No info or drive not ready");
-                m_MediaType = MEDIATYPE_UNKNOWN;
-                return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
-            default:
-                VERBOSE(VB_IMPORTANT, "Failed to get drive status of "
-                                      + getDevicePath() + " : " + ENO);
-                m_MediaType = MEDIATYPE_UNKNOWN;
-                return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
-        }
-
-        if (mediaChanged())
-        {
-            VERBOSE(VB_MEDIA, getDevicePath() + " Media changed");
-            // Regardless of the actual status lie here and say
-            // it's open for now, so we can cover the case of a missed open.
-            return setStatus(MEDIASTAT_OPEN, OpenedHere);
-        }
-        else
-        {
-            VERBOSE(VB_MEDIA+VB_EXTRA, getDevicePath() + " Media unchanged...");
-            if ((m_Status == MEDIASTAT_OPEN) ||
-                (m_Status == MEDIASTAT_UNKNOWN))
-            {
-                VERBOSE(VB_MEDIA, getDevicePath() + " Current status " +
-                        MythMediaDevice::MediaStatusStrings[m_Status]);
-                int type = ioctl(m_DeviceHandle,
-                                 CDROM_DISC_STATUS, CDSL_CURRENT);
-                switch (type)
+            case CDS_NO_DISC:
+                if (hasWritableMedia())
                 {
-                    case CDS_DATA_1:
-                    case CDS_DATA_2:
-                        m_MediaType = MEDIATYPE_DATA;
-                        VERBOSE(VB_MEDIA, "Found a data disk");
-                        //grab information from iso9660 (& udf)
-                        struct iso_primary_descriptor buf;
-                        lseek(this->m_DeviceHandle,(off_t) 2048*16,SEEK_SET);
-                        read(this->m_DeviceHandle, &buf,2048);
-                        this->m_VolumeID = QString(buf.volume_id).trimmed();
-                        this->m_KeyID = QString("%1%2")
-                                      .arg(this->m_VolumeID)
-                                      .arg(QString(buf.creation_date).left(16));
-
-                        // the base class's onDeviceMounted will do fine
-                        // grained detection of the type of data on this disc
-                        if (isMounted())
-                            onDeviceMounted();
-                        else
-                            if (mount())
-                                ;    // onDeviceMounted() called as side-effect
-                            else
-                                return setStatus(MEDIASTAT_ERROR, OpenedHere);
-
-                        if (isMounted())
-                        {
-                            // pretend we're NOTMOUNTED so setStatus emits
-                            // a signal
-                            m_Status = MEDIASTAT_NOTMOUNTED;
-                            return setStatus(MEDIASTAT_MOUNTED, OpenedHere);
-                        }
-                        else if (m_MediaType == MEDIATYPE_DVD)
-                        {
-                            // pretend we're NOTMOUNTED so setStatus emits
-                            // a signal
-                            m_Status = MEDIASTAT_NOTMOUNTED;
-                            return setStatus(MEDIASTAT_USEABLE, OpenedHere);
-                        }
-                        else
-                            return setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
-                        break;
-                    case CDS_AUDIO:
-                        VERBOSE(VB_MEDIA, "found an audio disk");
-                        m_MediaType = MEDIATYPE_AUDIO;
-                        return setStatus(MEDIASTAT_USEABLE, OpenedHere);
-                        break;
-                    case CDS_MIXED:
-                        m_MediaType = MEDIATYPE_MIXED;
-                        VERBOSE(VB_MEDIA, "found a mixed CD");
-                        // Note: Mixed mode CDs require an explixit mount call
-                        //       since we'll usually want the audio portion.
-                        // undefine ASSUME_WANT_AUDIO to change this behavior.
-                        #ifdef ASSUME_WANT_AUDIO
-                            return setStatus(MEDIASTAT_USEABLE, OpenedHere);
-                        #else
-                            mount();
-                            if (isMounted())
-                            {
-                                // pretend we're NOTMOUNTED so setStatus
-                                // emits a signal
-                                m_Status = MEDIASTAT_NOTMOUNTED;
-                                return setStatus(MEDIASTAT_MOUNTED,
-                                                 OpenedHere);
-                            }
-                            else
-                            {
-                                return setStatus(MEDIASTAT_USEABLE,
-                                                 OpenedHere);
-                            }
-                        #endif
-                        break;
-                    case CDS_NO_INFO:
-                    case CDS_NO_DISC:
-                        if (hasWritableMedia())
-                        {
-                            VERBOSE(VB_MEDIA, "found a blank or writable disk");
-                            return setStatus(MEDIASTAT_UNFORMATTED, OpenedHere);
-                        }
-
-                        VERBOSE(VB_MEDIA, "found no disk");
-                        m_MediaType = MEDIATYPE_UNKNOWN;
-                        return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
-                        break;
-                    default:
-                        VERBOSE(VB_MEDIA, "found unknown disk type: "
-                                          + QString().setNum(type));
-                        m_MediaType = MEDIATYPE_UNKNOWN;
-                        return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
+                    VERBOSE(VB_MEDIA, "found a blank or writable disk");
+                    return setStatus(MEDIASTAT_UNFORMATTED, OpenedHere);
                 }
-            }
-            else if (m_Status == MEDIASTAT_MOUNTED ||
-                     m_Status == MEDIASTAT_NOTMOUNTED)
-            {
-                VERBOSE(VB_MEDIA, QString("Current status == ") +
-                        MythMediaDevice::MediaStatusStrings[m_Status]);
-                VERBOSE(VB_MEDIA, "Setting status to not mounted?");
-                if (isMounted())
-                    setStatus(MEDIASTAT_MOUNTED, OpenedHere);
-                else
-                    setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
-            }
 
-            if (m_AllowEject)
-                ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 0);
-        }// mediaChanged()
-    } // isDeviceOpen();
-    else
-    {
-        VERBOSE(VB_MEDIA, "Device not open - returning UNKNOWN");
-        m_MediaType = MEDIATYPE_UNKNOWN;
-        return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
+                VERBOSE(VB_MEDIA, "found no disk");
+                m_MediaType = MEDIATYPE_UNKNOWN;
+                return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
+                break;
+            default:
+                VERBOSE(VB_MEDIA, "found unknown disk type: "
+                                  + QString().setNum(type));
+                m_MediaType = MEDIATYPE_UNKNOWN;
+                return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
+        }
     }
+    else if (m_Status == MEDIASTAT_MOUNTED ||
+             m_Status == MEDIASTAT_NOTMOUNTED)
+    {
+        VERBOSE(VB_MEDIA, QString("Current status == ")
+                          + MythMediaDevice::MediaStatusStrings[m_Status]);
+        VERBOSE(VB_MEDIA, "Setting status to not mounted?");
+        if (isMounted())
+            setStatus(MEDIASTAT_MOUNTED, OpenedHere);
+        else
+            setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
+    }
+
+    if (m_AllowEject)
+        ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 0);
 
     if (OpenedHere)
         closeDevice();
