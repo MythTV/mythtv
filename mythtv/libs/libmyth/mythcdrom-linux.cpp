@@ -165,7 +165,7 @@ int MythCDROMLinux::driveStatus()
         return CDS_NO_INFO;
     }
 
-    if (drive_status == CDS_TRAY_OPEN && getDevicePath().contains("/dev/scd"))
+    if (drive_status == CDS_TRAY_OPEN && m_DevicePath.contains("/dev/scd"))
         return SCSIstatus();
 
     return drive_status;
@@ -324,8 +324,8 @@ MediaError MythCDROMLinux::testMedia()
         //cout << "Device is not open - ";
         if (!openDevice())
         {
-            VERBOSE(VB_MEDIA+VB_EXTRA, LOC + ":testMedia - failed to open "
-                                           + getDevicePath() + ENO);
+            VERBOSE(VB_MEDIA+VB_EXTRA, LOC + ":testMedia - failed to open '"
+                                           + m_DevicePath +  "' : " +ENO);
             if (errno == EBUSY)
                 return isMounted() ? MEDIAERR_OK : MEDIAERR_FAILED;
             else
@@ -345,8 +345,9 @@ MediaError MythCDROMLinux::testMedia()
 
     if (Stat == -1)
     {
-        VERBOSE(VB_MEDIA, LOC + ":testMedia - Failed to get drive status of "
-                          + getDevicePath() + ENO);
+        VERBOSE(VB_MEDIA+VB_EXTRA,
+                LOC + ":testMedia - Failed to get drive status of '"
+                    + m_DevicePath + "' : " + ENO);
         return MEDIAERR_FAILED;
     }
 
@@ -365,17 +366,18 @@ MediaStatus MythCDROMLinux::checkMedia()
 
         if (!OpenedHere)
         {
-            VERBOSE(VB_MEDIA, "Device not open - returning UNKNOWN");
+            VERBOSE(VB_MEDIA, LOC + ":checkMedia() - cannot open device '"
+                                  + m_DevicePath + "' : "
+                                  + ENO + "- returning UNKNOWN");
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_UNKNOWN, false);
         }
     }
 
-    VERBOSE(VB_MEDIA+VB_EXTRA, LOC + ":checkMedia - Device is open...");
     switch (driveStatus())
     {
         case CDS_DISC_OK:
-            VERBOSE(VB_MEDIA, getDevicePath() + " Disk OK, type = "
+            VERBOSE(VB_MEDIA, m_DevicePath + " Disk OK, type = "
                               + MediaTypeString(m_MediaType) );
             // 1. Audio CDs are not mounted
             // 2. If we don't know the media type yet,
@@ -392,41 +394,41 @@ MediaStatus MythCDROMLinux::checkMedia()
                 return setStatus(MEDIASTAT_MOUNTED, OpenedHere);
             break;
         case CDS_TRAY_OPEN:
-            VERBOSE(VB_MEDIA, getDevicePath() + " Tray open or no disc");
+            VERBOSE(VB_MEDIA, m_DevicePath + " Tray open or no disc");
             setStatus(MEDIASTAT_OPEN, OpenedHere);
             m_MediaType = MEDIATYPE_UNKNOWN;
             return MEDIASTAT_OPEN;
             break;
         case CDS_NO_DISC:
-            VERBOSE(VB_MEDIA, getDevicePath() + " No disc");
+            VERBOSE(VB_MEDIA, m_DevicePath + " No disc");
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_NODISK, OpenedHere);
             break;
         case CDS_NO_INFO:
         case CDS_DRIVE_NOT_READY:
-            VERBOSE(VB_MEDIA, getDevicePath() + " No info or drive not ready");
+            VERBOSE(VB_MEDIA, m_DevicePath + " No info or drive not ready");
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
         default:
             VERBOSE(VB_IMPORTANT, "Failed to get drive status of "
-                                  + getDevicePath() + " : " + ENO);
+                                  + m_DevicePath + " : " + ENO);
             m_MediaType = MEDIATYPE_UNKNOWN;
             return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
     }
 
     if (mediaChanged())
     {
-        VERBOSE(VB_MEDIA, getDevicePath() + " Media changed");
+        VERBOSE(VB_MEDIA, m_DevicePath + " Media changed");
         // Regardless of the actual status lie here and say
         // it's open for now, so we can cover the case of a missed open.
         return setStatus(MEDIASTAT_OPEN, OpenedHere);
     }
 
-    VERBOSE(VB_MEDIA+VB_EXTRA, getDevicePath() + " Media unchanged...");
+    VERBOSE(VB_MEDIA+VB_EXTRA, m_DevicePath + " Media unchanged...");
     if ((m_Status == MEDIASTAT_OPEN) ||
         (m_Status == MEDIASTAT_UNKNOWN))
     {
-        VERBOSE(VB_MEDIA, getDevicePath() + " Current status " +
+        VERBOSE(VB_MEDIA, m_DevicePath + " Current status " +
                 MythMediaDevice::MediaStatusStrings[m_Status]);
         int type = ioctl(m_DeviceHandle, CDROM_DISC_STATUS, CDSL_CURRENT);
         switch (type)
@@ -520,7 +522,7 @@ MediaStatus MythCDROMLinux::checkMedia()
     {
         VERBOSE(VB_MEDIA, QString("Current status == ")
                           + MythMediaDevice::MediaStatusStrings[m_Status]);
-        VERBOSE(VB_MEDIA, "Setting status to not mounted?");
+        VERBOSE(VB_MEDIA, "Setting mount status");
         if (isMounted())
             setStatus(MEDIASTAT_MOUNTED, OpenedHere);
         else
@@ -528,7 +530,9 @@ MediaStatus MythCDROMLinux::checkMedia()
     }
 
     if (m_AllowEject)
-        ioctl(m_DeviceHandle, CDROM_LOCKDOOR, 0);
+        unlock();
+    else
+        lock();
 
     if (OpenedHere)
         closeDevice();
