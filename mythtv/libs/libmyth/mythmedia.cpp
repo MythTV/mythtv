@@ -134,7 +134,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 if (!findMountPath())
                 {
                     VERBOSE(VB_MEDIA, "performMountCmd() attempted to"
-                                      + " mount media, but failed?");
+                                      " find mounted media, but failed?");
                     return false;
                 }
                 m_Status = MEDIASTAT_MOUNTED;
