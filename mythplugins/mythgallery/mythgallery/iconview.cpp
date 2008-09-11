@@ -317,7 +317,7 @@ void IconView::SetupMediaMonitor(void)
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (m_currDevice && mon && mon->ValidateAndLock(m_currDevice))
     {
-        bool mounted = m_currDevice->isMounted(true);
+        bool mounted = m_currDevice->isMounted();
         if (!mounted)
             mounted = m_currDevice->mount();
 
@@ -460,7 +460,7 @@ bool IconView::HandleMediaDeviceSelect(ThumbItem *item)
     {
         m_currDevice = item->GetMediaDevice();
 
-        if (!m_currDevice->isMounted())
+        if (!m_currDevice->isMounted(false))
             m_currDevice->mount();
 
         item->SetPath(m_currDevice->getMountPath(), true);
