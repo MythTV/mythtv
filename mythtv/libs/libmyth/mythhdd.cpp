@@ -31,7 +31,7 @@ MythHDD::MythHDD(QObject *par, const char *DevicePath,
  */
 MediaStatus MythHDD::checkMedia(void)
 {
-    if (isMounted(true))
+    if (isMounted())
     {
         // A lazy way to present volume name for the user to eject.
         // Hotplug devices are usually something like /media/VOLUME
@@ -46,7 +46,7 @@ MediaStatus MythHDD::checkMedia(void)
     {
         // a removable device was just plugged in try to mount it.
         mount();
-        if (isMounted(true))
+        if (isMounted())
         {
             m_Status = MEDIASTAT_NOTMOUNTED;
             return setStatus(MEDIASTAT_MOUNTED);

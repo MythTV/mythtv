@@ -161,9 +161,8 @@ bool MediaMonitorUnix::CheckMountable(void)
         sysfs.cd(*it);
 
         QFile removable(sysfs.absFilePath("removable"));
-        if (removable.exists())
+        if (removable.exists() && removable.open(QIODevice::ReadOnly))
         {
-            removable.open(QIODevice::ReadOnly);
             int c = removable.getch();
             removable.close();
 

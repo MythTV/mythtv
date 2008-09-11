@@ -54,7 +54,7 @@ MediaError MythCDROMFreeBSD::testMedia()
             if (errno == EBUSY)
             {
                 //cout << "errno == EBUSY" << endl;
-                return isMounted(true) ? MEDIAERR_OK : MEDIAERR_FAILED;
+                return isMounted() ? MEDIAERR_OK : MEDIAERR_FAILED;
             } 
             else 
             { 

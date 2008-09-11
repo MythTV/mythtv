@@ -22,9 +22,7 @@ using namespace std;
 #   define O_NONBLOCK 0
 #endif
 
-#define LOC      QString("MythMediaDevice:")
-#define LOC_WARN QString("MythMediaDevice, Warning: ")
-#define LOC_ERR  QString("MythMediaDevice, Error: ")
+#define LOC QString("MythMediaDevice:")
 
 static const QString PATHTO_PMOUNT("/usr/bin/pmount");
 static const QString PATHTO_PUMOUNT("/usr/bin/pumount");
@@ -101,7 +99,7 @@ bool MythMediaDevice::isDeviceOpen() const
 
 bool MythMediaDevice::performMountCmd(bool DoMount)
 {
-    if (DoMount && isMounted(true))
+    if (DoMount && isMounted())
     {
         VERBOSE(VB_MEDIA, "MythMediaDevice::performMountCmd(true)"
                           " - Logic Error? Device already mounted.");
@@ -133,7 +131,12 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
             {
                 // we cannot tell beforehand what the pmount mount point is
                 // so verify the mount status of the device
-                isMounted(true);
+                if (!findMountPath())
+                {
+                    VERBOSE(VB_MEDIA, "performMountCmd() attempted to"
+                                      + " mount media, but failed?");
+                    return false;
+                }
                 m_Status = MEDIASTAT_MOUNTED;
                 onDeviceMounted();
                 VERBOSE(VB_GENERAL,
@@ -141,13 +144,12 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
             }
             else
                 onDeviceUnmounted();
+
             return true;
         }
         else
-        {
             VERBOSE(VB_GENERAL, QString("Failed to mount %1.")
                                        .arg(m_DevicePath));
-        }
     } 
     else 
     {
@@ -163,6 +165,7 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
         }
         else
             onDeviceUnmounted();
+
         return true;
     }
     return false;
@@ -322,12 +325,19 @@ MediaError MythMediaDevice::unlock()
 /// \brief Tells us if m_DevicePath is a mounted device.
 bool MythMediaDevice::isMounted(bool Verify)
 {
-    if (!Verify)
+    if (Verify)
+        return findMountPath();
+    else
         return (m_Status == MEDIASTAT_MOUNTED);
+}
 
+/// \brief Try to find a mount of m_DevicePath in the mounts file.
+bool MythMediaDevice::findMountPath()
+{
     if (m_DevicePath.isEmpty())
     {
-        VERBOSE(VB_MEDIA, LOC + ":isMounted() - logic error, no device path");
+        VERBOSE(VB_MEDIA,
+                LOC + ":findMountPath() - logic error, no device path");
         return false;
     }
 
@@ -398,7 +408,7 @@ bool MythMediaDevice::isMounted(bool Verify)
 
     if (print_verbose_messages & VB_MEDIA)
     {
-        debug = LOC + ":isMounted() - mount of '"
+        debug = LOC + ":findMountPath() - mount of '"
                 + m_DevicePath + "' not found.\n"
                 + "                 Device name/type | Current mountpoint\n"
                 + "                 -----------------+-------------------\n"
@@ -427,7 +437,7 @@ MediaStatus MythMediaDevice::setStatus( MediaStatus NewStatus, bool CloseIt )
             case MEDIASTAT_OPEN:
             case MEDIASTAT_NODISK:
             case MEDIASTAT_NOTMOUNTED:
-                if (isMounted(true))
+                if (isMounted())
                     unmount();
                 break;
             case MEDIASTAT_UNKNOWN:

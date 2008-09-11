@@ -125,7 +125,7 @@ QList<MythMediaDevice*> MediaMonitor::GetRemovable(bool showMounted)
         // Caller can also request mounted drives to be listed (e.g. USB flash)
 
         if (QString(typeid(**it).name()).contains("MythCDROM") ||
-               (showMounted && (*it)->isMounted()))
+               (showMounted && (*it)->isMounted(false)))
             drives.append(*it);
     }
 
@@ -228,12 +228,12 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
         return;
     }
 
-    if (device->isMounted(true))
+    if (device->isMounted())
     {
         VERBOSE(VB_MEDIA, QString("Disk %1 is mounted? Unmounting").arg(dev));
         device->unmount();
 
-        if (device->isMounted(true))
+        if (device->isMounted())
         {
             ShowOkPopup(tr("Failed to unmount %1").arg(dev));
             return;

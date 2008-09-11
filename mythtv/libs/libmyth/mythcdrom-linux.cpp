@@ -327,7 +327,7 @@ MediaError MythCDROMLinux::testMedia()
             VERBOSE(VB_MEDIA+VB_EXTRA, LOC + ":testMedia - failed to open "
                                            + getDevicePath() + ENO);
             if (errno == EBUSY)
-                return isMounted(true) ? MEDIAERR_OK : MEDIAERR_FAILED;
+                return isMounted() ? MEDIAERR_OK : MEDIAERR_FAILED;
             else
                 return MEDIAERR_FAILED;
         }
@@ -387,7 +387,7 @@ MediaStatus MythCDROMLinux::checkMedia()
                     return m_Status;
                 // If the disc is ok and we already know it's mediatype
                 // returns MOUNTED.
-                if (isMounted(true))
+                if (isMounted())
                     return setStatus(MEDIASTAT_MOUNTED, OpenedHere);
                 break;
             case CDS_TRAY_OPEN:
@@ -448,7 +448,7 @@ MediaStatus MythCDROMLinux::checkMedia()
 
                         // the base class's onDeviceMounted will do fine
                         // grained detection of the type of data on this disc
-                        if (isMounted(true))
+                        if (isMounted())
                             onDeviceMounted();
                         else
                             if (mount())
@@ -456,7 +456,7 @@ MediaStatus MythCDROMLinux::checkMedia()
                             else
                                 return setStatus(MEDIASTAT_ERROR, OpenedHere);
 
-                        if (isMounted(true))
+                        if (isMounted())
                         {
                             // pretend we're NOTMOUNTED so setStatus emits
                             // a signal
@@ -488,7 +488,7 @@ MediaStatus MythCDROMLinux::checkMedia()
                             return setStatus(MEDIASTAT_USEABLE, OpenedHere);
                         #else
                             mount();
-                            if (isMounted(true))
+                            if (isMounted())
                             {
                                 // pretend we're NOTMOUNTED so setStatus
                                 // emits a signal
@@ -528,7 +528,7 @@ MediaStatus MythCDROMLinux::checkMedia()
                 VERBOSE(VB_MEDIA, QString("Current status == ") +
                         MythMediaDevice::MediaStatusStrings[m_Status]);
                 VERBOSE(VB_MEDIA, "Setting status to not mounted?");
-                if (isMounted(true))
+                if (isMounted())
                     setStatus(MEDIASTAT_MOUNTED, OpenedHere);
                 else
                     setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);

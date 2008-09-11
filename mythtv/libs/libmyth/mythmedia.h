@@ -86,7 +86,7 @@ class MPUBLIC MythMediaDevice : public QObject
 
     MediaType getMediaType() const { return m_MediaType; }
 
-    bool isSuperMount() const { return m_SuperMount; }
+    bool isSuperMount()      const { return m_SuperMount; }
 
     virtual MediaError  testMedia() { return MEDIAERR_UNSUPPORTED; }
     virtual bool openDevice();
@@ -99,9 +99,11 @@ class MPUBLIC MythMediaDevice : public QObject
     virtual MediaError unlock();
     virtual bool performMountCmd( bool DoMount );
 
-    bool mount() {  return performMountCmd(true); }
+    bool mount()   { return performMountCmd(true);  }
     bool unmount() { return performMountCmd(false); }
-    bool isMounted(bool bVerify = false);
+
+    bool isMounted(bool bVerify = true);
+    bool findMountPath();
 
     void RegisterMediaExtensions(uint mediatype,
                                  const QString& extensions);
