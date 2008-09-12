@@ -58,7 +58,9 @@
 #include <QByteArray>
 #include <QList>
 
-class Q_COMPAT_EXPORT MMembuf
+#include "mythexp.h"
+
+class MPUBLIC MMembuf
 {
 public:
     MMembuf();
