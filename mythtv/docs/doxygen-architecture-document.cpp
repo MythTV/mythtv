@@ -570,12 +570,12 @@ to access these assets:
 \defgroup lang_supp Myth Language Support
 This line is filler that is ignored by Doxygen.
 
-There are three sets of language translations in MythTV;
-source code translation, menus, and MythWeb.
+There are three sets of language translations in %MythTV;
+source code translation, menus, and %MythWeb.
 
 \section lang_src Source Code
 
-The MythTV C++ graphical programs use the Qt text translation system -
+The %MythTV C++ graphical programs use the Qt text translation system -
 QTranslator - to present messages or button names in the user's local language.
 This system uses a number of files that contain the source program's text
 strings (in English), and a translation of that string into the language.
@@ -586,11 +586,12 @@ some messages will still appear in English.
 If there is no exact translation for a particular message, the Qt runtime
 system attempts to build a translation from existing elements.
 The Qt Linguist tool is a handy way to update the translation files
-(which live in mythtv/i18n). If you choose to edit them manually,
-you must use a UTF compatible editor, so that the languages
-which contain accents and multi-byte strings and not corrupted.
+(which live in mythtv/i18n and mythplugins/*/i18n).
+If you choose to edit them manually, you must use a UTF compatible editor,
+so that the languages which contain accents and multi-byte strings
+are not corrupted.
 
-This page
+This page:
 http://www.mythtv.org/wiki/index.php/Translation
 on the Wiki explains how to update an existing translation.
 
@@ -613,7 +614,7 @@ Be sure to edit these with a UTF compatible editor.
 
 \section lang_web MythWeb
 
-MythWeb also supports translated strings in the web pages it publishes.
+%MythWeb also supports translated strings in the web pages it publishes.
 See mythplugins/mythweb/modules/_shared/lang/translations.txt for more info.
 
  */
