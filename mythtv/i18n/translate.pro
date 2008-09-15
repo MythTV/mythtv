@@ -112,9 +112,9 @@ SOURCES += ../themes/themestrings.h
 
 TRANSLATIONS  = mythfrontend_it.ts mythfrontend_es.ts mythfrontend_ca.ts
 TRANSLATIONS += mythfrontend_nl.ts mythfrontend_fr.ts mythfrontend_de.ts
-TRANSLATIONS += mythfrontend_dk.ts mythfrontend_pt.ts mythfrontend_sv.ts
-TRANSLATIONS += mythfrontend_ja.ts mythfrontend_si.ts mythfrontend_fi.ts
+TRANSLATIONS += mythfrontend_da.ts mythfrontend_pt.ts mythfrontend_sv.ts
+TRANSLATIONS += mythfrontend_ja.ts mythfrontend_sl.ts mythfrontend_fi.ts
 TRANSLATIONS += mythfrontend_zh_tw.ts mythfrontend_nb.ts mythfrontend_is.ts
-TRANSLATIONS += mythfrontend_pt_br.ts mythfrontend_en_gb.ts mythfrontend_cz.ts
+TRANSLATIONS += mythfrontend_pt_br.ts mythfrontend_en_gb.ts mythfrontend_cs.ts
 TRANSLATIONS += mythfrontend_et.ts mythfrontend_pl.ts mythfrontend_tr.ts
 TRANSLATIONS += mythfrontend_ru.ts mythfrontend_he.ts
