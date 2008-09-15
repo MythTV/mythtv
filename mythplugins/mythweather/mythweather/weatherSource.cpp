@@ -59,7 +59,6 @@ bool WeatherSource::probeTimeouts(Q3Process *proc, uint &updateTimeout,
                                   uint &scriptTimeout)
 {
     proc->addArgument("-T");
-    bool *ok = new bool;
     updateTimeout = 0;
     scriptTimeout = 0;
 
@@ -97,12 +96,12 @@ bool WeatherSource::probeTimeouts(Q3Process *proc, uint &updateTimeout,
         return false;
     }
 
-    uint i = temp[0].toUInt(ok);
-    updateTimeout = *ok ? i * 1000 : DEFAULT_UPDATE_TIMEOUT;
+    bool isOK = false;
+    uint i = temp[0].toUInt(&isOK);
+    updateTimeout = isOK ? i * 1000 : DEFAULT_UPDATE_TIMEOUT;
 
-    i = temp[1].toUInt(ok);
-    scriptTimeout = *ok ? i * 1000 : DEFAULT_SCRIPT_TIMEOUT;
-    delete ok;
+    i = temp[1].toUInt(&isOK);
+    scriptTimeout = isOK ? i * 1000 : DEFAULT_SCRIPT_TIMEOUT;
     return true;
 }
 
