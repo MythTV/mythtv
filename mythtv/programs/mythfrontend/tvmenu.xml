@@ -146,7 +146,6 @@
    <button>
       <type>TV_STATUS</type>
       <text>System Status</text>
-      <text lang="DE">Stato del Sistema</text>
       <text lang="DE">Systemstatus</text>
       <text lang="IS">Staða kerfis</text>
       <text lang="NL">Systeemstatus</text>
