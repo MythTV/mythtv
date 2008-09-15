@@ -8614,13 +8614,13 @@ TV::PromptStopWatchingRecording(void)
     QStringList options;
 
     if (StateIsLiveTV(GetState()))
-        videotype = "Live TV";
+        videotype = tr("Live TV");
     else if (prbuffer->isDVD())
-        videotype = "this DVD";
+        videotype = tr("this DVD");
     else if (playbackinfo->isVideo)
-        videotype = "this Video";
+        videotype = tr("this Video");
     else
-        videotype = "this recording";
+        videotype = tr("this recording");
 
     message = tr("You are exiting %1").arg(videotype);
 
@@ -8669,15 +8669,15 @@ void TV::PromptDeleteRecording(QString title)
         QStringList options;
         if (title == "End Of Recording")
         {
-            options += "Delete it, but allow it to re-record";
-            options += "Delete it";
-            options += "Save it so I can watch it again";
+            options += tr("Delete it, but allow it to re-record");
+            options += tr("Delete it");
+            options += tr("Save it so I can watch it again");
         }
         else
         {
-            options += "Yes, and allow re-record";
-            options += "Yes, delete it";
-            options += "No, keep it, I changed my mind";
+            options += tr("Yes, and allow re-record");
+            options += tr("Yes, delete it");
+            options += tr("No, keep it, I changed my mind");
         }
 
         dialogname = "askdeleterecording";
