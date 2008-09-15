@@ -4,22 +4,22 @@
       <type>DVD_PLAY</type>
       <text>Play DVD</text>
       <text lang="IT">Riproduci DVD</text>
-      <text lang="DK">Afspil DVD</text>
+      <text lang="DA">Afspil DVD</text>
       <text lang="PT">Ver DVD</text>
       <text lang="IS">Spila DVD</text>
       <text lang="DE">DVD abspielen</text>
       <text lang="SV">Spela DVD</text>
       <text lang="ES">Ver DVD</text>
-      <text lang="CA">Veure DVD</text>
+      <text lang="CS">Veure DVD</text>
       <text lang="FR">Lecture DVD</text>
       <text lang="NL">DVD Afspelen</text>
       <text lang="JA">DVD再生</text>
       <text lang="FI">Katso DVD</text>
       <text lang="ZH_TW">播放DVD</text>
-      <text lang="SI">Predvajaj DVD</text>
+      <text lang="SL">Predvajaj DVD</text>
       <text lang="ET">Mängi DVD-d</text>
       <text lang="NB">Se på DVD</text>
-      <text lang="CZ">Přehrát DVD</text>
+      <text lang="CS">Přehrát DVD</text>
       <text lang="RU">Смотреть DVD</text>
       <text lang="PL">Oglądanie DVD</text>
       <text lang="HE">נגן DVD</text>
@@ -31,22 +31,22 @@
       <type>VCD_PLAY</type>
       <text>Play VCD</text>
       <text lang="IT">Riproduci VCD</text>
-      <text lang="DK">Afspil VCD</text>
+      <text lang="DA">Afspil VCD</text>
       <text lang="PT">Ver VCD</text>
       <text lang="DE">VCD abspielen</text>
       <text lang="IS">Spila VCD</text>
       <text lang="SV">Spela VCD</text>
       <text lang="ES">Ver VCD</text>
-      <text lang="CA">Veure VCD</text>
+      <text lang="CS">Veure VCD</text>
       <text lang="FR">Lecture VCD</text>
       <text lang="NL">VCD Afspelen</text>
       <text lang="JA">VCD再生</text>
       <text lang="FI">Toista VCD</text>
       <text lang="ZH_TW">播放VCD</text>
-      <text lang="SI">Predvajaj VCD</text>
+      <text lang="SL">Predvajaj VCD</text>
       <text lang="ET">Mängi VCD-d</text>
       <text lang="NB">Se på VCD</text>
-      <text lang="CZ">Přehrát VCD</text>
+      <text lang="CS">Přehrát VCD</text>
       <text lang="RU">Смотреть VCD</text>
       <text lang="PL">Oglądanie VCD</text>
       <text lang="HE">נגן VCD</text>
@@ -59,9 +59,9 @@
       <text>Import DVD</text>
       <text lang="IT">Importa DVD</text>
       <text lang="ES">Importar DVD</text>
-      <text lang="CA">Importar DVD</text>
+      <text lang="CS">Importar DVD</text>
       <text lang="DE">DVD importieren</text>
-      <text lang="DK">Importér DVD</text>
+      <text lang="DA">Importér DVD</text>
       <text lang="IS">Hlaða inn DVD</text>
       <text lang="NL">DVD Importeren</text>
       <text lang="PT">Importar DVD p/ Disco</text>
@@ -70,10 +70,10 @@
       <text lang="JA">DVD取込</text>
       <text lang="FI">Kopioi DVD</text>
       <text lang="ZH_TW">輸入DVD</text>
-      <text lang="SI">DVD rip</text>
+      <text lang="SL">DVD rip</text>
       <text lang="ET">DVD rippimine</text>
       <text lang="NB">Importer DVD</text>
-      <text lang="CZ">Načíst DVD</text>
+      <text lang="CS">Načíst DVD</text>
       <text lang="RU">Импортировать DVD</text>
       <text lang="PL">Importowanie DVD</text>
       <text lang="HE">יבא DVD</text>
@@ -87,13 +87,13 @@
       <text lang="FI">Arkistoi</text>
       <text lang="IT">Archivia Files</text>
       <text lang="SV">Arkivera filer</text>
-      <text lang="DK">Arkivér filer</text>
+      <text lang="DA">Arkivér filer</text>
       <text lang="ES">Archivar Ficheros</text>
       <text lang="RU">Архивировать файлы</text>
       <text lang="HE">ארכב קבצים</text>
       <text lang="ET">Arhiveerimine</text>
       <text lang="DE">Dateien archivieren</text>
-      <text lang="SI">Arhiviranje datotek</text>
+      <text lang="SL">Arhiviranje datotek</text>
       <text lang="PL">Archiwalne pliki</text>
       <text lang="HE">צרוב CD/DVD</text>
       <action>PLUGIN mytharchive</action>
@@ -105,9 +105,9 @@
       <text>Import CD</text>
       <text lang="IT">Importa CD</text>
       <text lang="ES">Importar CD</text>
-      <text lang="CA">Importar CD</text>
+      <text lang="CS">Importar CD</text>
       <text lang="DE">CD importieren</text>
-      <text lang="DK">Importér CD</text>
+      <text lang="DA">Importér CD</text>
       <text lang="IS">Hlaða inn hljóðdisk</text>
       <text lang="NL">CD Importeren</text>
       <text lang="PT">Importar CD p/ Disco</text>
@@ -116,10 +116,10 @@
       <text lang="JA">CD取込</text>
       <text lang="FI">Kopioi CD</text>
       <text lang="ZH_TW">輸入音樂CD</text>
-      <text lang="SI">CD rip</text>
+      <text lang="SL">CD rip</text>
       <text lang="ET">CD rippimine</text>
       <text lang="NB">Importer CD</text>
-      <text lang="CZ">Načíst CD</text>
+      <text lang="CS">Načíst CD</text>
       <text lang="RU">Импортировать CD</text>
       <text lang="HE">יבא CD</text>
       <text lang="ET">Meedia väljastamine</text>
@@ -136,8 +136,8 @@
       <text lang="FR">Ejecter le Média</text>
       <text lang="ES">Expulsar medios</text>
       <text lang="RU">Достать диск</text>
-      <text lang="DK">Skub ud</text>
-      <text lang="SI">Izvrzi plošček</text>
+      <text lang="DA">Skub ud</text>
+      <text lang="SL">Izvrzi plošček</text>
       <text lang="PL">Wysuń tackę</text>
       <text lang="HE">הוצא מדיה</text>
       <text lang="FI">Poista Media</text>

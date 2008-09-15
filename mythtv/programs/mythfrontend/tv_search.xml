@@ -12,13 +12,13 @@
       <text lang="FR">Titres</text>
       <text lang="FI">Nimikkeet</text>
       <text lang="ZH_TW">標題</text>
-      <text lang="SI">Naslovi</text>
+      <text lang="SL">Naslovi</text>
       <text lang="ET">Pealkirjad</text>
       <text lang="NB">Titler</text>
-      <text lang="DK">Titler</text>
+      <text lang="DA">Titler</text>
       <text lang="ES">Títulos</text>
       <text lang="PT">Por Títulos</text>
-      <text lang="CZ">dle názvu</text>
+      <text lang="CS">dle názvu</text>
       <text lang="RU">Заголовки</text>
       <text lang="PL">Tytuły</text>
       <text lang="HE">כותרים</text>
@@ -37,13 +37,13 @@
       <text lang="JA">キーワード</text>
       <text lang="FI">Avainsanat</text>
       <text lang="ZH_TW">關鍵字</text>
-      <text lang="SI">Ključne besede</text>
+      <text lang="SL">Ključne besede</text>
       <text lang="ET">Võtmesõnad</text>
       <text lang="NB">Nøkkelord</text>
-      <text lang="DK">Nøgleord</text>
+      <text lang="DA">Nøgleord</text>
       <text lang="ES">Claves</text>
       <text lang="PT">Por Palavras-Chave</text>
-      <text lang="CZ">dle klíčových slov</text>
+      <text lang="CS">dle klíčových slov</text>
       <text lang="RU">Ключевые слова</text>
       <text lang="PL">Słowa kluczowe</text>
       <text lang="HE">מילות מפתח</text>
@@ -61,13 +61,13 @@
       <text lang="DE">nach Personen</text>
       <text lang="IS">Manneskjum</text>
       <text lang="FI">Ihmiset</text>
-      <text lang="SI">Osebe</text>
+      <text lang="SL">Osebe</text>
       <text lang="ET">Inimesed</text>
       <text lang="NB">Personer</text>
-      <text lang="DK">Personer</text>
+      <text lang="DA">Personer</text>
       <text lang="ES">Personas</text>
       <text lang="PT">Por Pessoas</text>
-      <text lang="CZ">dle hereckého obsazení</text>
+      <text lang="CS">dle hereckého obsazení</text>
       <text lang="RU">Действующие лица</text>
       <text lang="PL">Osoby</text>
       <text lang="HE">אנשים</text>
@@ -85,13 +85,13 @@
       <text lang="JA">アドバンスト</text>
       <text lang="DE">Erweiterte Suche</text>
       <text lang="FI">Lisävalinnat</text>
-      <text lang="SI">Napredno</text>
+      <text lang="SL">Napredno</text>
       <text lang="ET">Muud valikud</text>
       <text lang="NB">Avansert</text>
-      <text lang="DK">Avanceret</text>
+      <text lang="DA">Avanceret</text>
       <text lang="ES">Avanzada</text>
       <text lang="PT">Pesquisa Avançada</text>
-      <text lang="CZ">Pokročilé</text>
+      <text lang="CS">Pokročilé</text>
       <text lang="RU">Дополнительно</text>
       <text lang="PL">Zaawansowane</text>
       <text lang="HE">מתקדם</text>
@@ -104,7 +104,7 @@
    <button>
       <type>TV_SEARCH_STORED</type>
       <text>Stored Searches</text>
-      <text lang="SI">Shranjena iskanja</text>
+      <text lang="SL">Shranjena iskanja</text>
       <text lang="HE">חיפושים שמורים</text>
       <text lang="FI">Tallennetut Haut</text>
       <action>TV_SEARCH_STORED</action>

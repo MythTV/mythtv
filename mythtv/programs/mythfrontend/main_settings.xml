@@ -5,10 +5,10 @@
       <text>General</text>
       <text lang="IT">Generale</text>
       <text lang="ES">General</text>
-      <text lang="CA">General</text>
+      <text lang="CS">General</text>
       <text lang="FR">Généraux</text>
       <text lang="DE">Grundeinstellungen</text>
-      <text lang="DK">Generelt</text>
+      <text lang="DA">Generelt</text>
       <text lang="IS">Almennt</text>
       <text lang="NL">Algemeen</text>
       <text lang="PT">Configurações Gerais</text>
@@ -16,10 +16,10 @@
       <text lang="JA">全般</text>
       <text lang="FI">Yleiset</text>
       <text lang="ZH_TW">一般設定</text>
-      <text lang="SI">Splošno</text>
+      <text lang="SL">Splošno</text>
       <text lang="ET">Üldine</text>
       <text lang="NB">Generelt</text>
-      <text lang="CZ">Obecné</text>
+      <text lang="CS">Obecné</text>
       <text lang="RU">Общие</text>
       <text lang="PL">Ogólne</text>
       <text lang="HE">כללי</text>
@@ -31,10 +31,10 @@
       <text>Appearance</text>
       <text lang="IT">Aspetto</text>
       <text lang="ES">Aspecto</text>
-      <text lang="CA">Aspecte</text>
+      <text lang="CS">Aspecte</text>
       <text lang="FR">Aspect</text>
       <text lang="DE">Erscheinungsbild</text>
-      <text lang="DK">Udseende</text>
+      <text lang="DA">Udseende</text>
       <text lang="IS">Útlit</text>
       <text lang="NL">Uiterlijk</text>
       <text lang="PT">Configurar Aparência</text>
@@ -42,10 +42,10 @@
       <text lang="JA">画面表示</text>
       <text lang="FI">Näkymä</text>
       <text lang="ZH_TW">外觀設定</text>
-      <text lang="SI">Vzgled</text>
+      <text lang="SL">Vzgled</text>
       <text lang="ET">Kujundus</text>
       <text lang="NB">Utseende</text>
-      <text lang="CZ">Vzhled</text>
+      <text lang="CS">Vzhled</text>
       <text lang="RU">Внешний вид</text>
       <text lang="PL">Wygląd</text>
       <text lang="HE">מראה</text>
@@ -72,12 +72,12 @@
      <text lang="JA">TV設定</text>
      <text lang="FI">TV:n Asetukset</text>
      <text lang="ZH_TW">電視設定</text>
-     <text lang="SI">TV nastavitve</text>
+     <text lang="SL">TV nastavitve</text>
      <text lang="ET">TV sätted</text>
      <text lang="NB">TV</text>
-     <text lang="DK">TV</text>
+     <text lang="DA">TV</text>
      <text lang="PT">Configurar Televisão</text>
-     <text lang="CZ">Nastavení televize</text>
+     <text lang="CS">Nastavení televize</text>
      <text lang="RU">Настройки ТВ</text>
      <text lang="PL">Telewizja</text>
      <text lang="HE">הגדרות טלויזיה</text>
@@ -96,13 +96,13 @@
      <text lang="JA">メディア設定</text>
      <text lang="FI">Media</text>
      <text lang="ZH_TW">媒體設定</text>
-     <text lang="SI">Media nastavitve</text>
+     <text lang="SL">Media nastavitve</text>
      <text lang="ET">Andmekandja sätted</text>
      <text lang="NB">Media</text>
-     <text lang="DK">Medier</text>
+     <text lang="DA">Medier</text>
      <text lang="ES">Medios</text>
      <text lang="PT">Configurar Multimédia</text>
-     <text lang="CZ">Nastavení multimédií</text>
+     <text lang="CS">Nastavení multimédií</text>
      <text lang="RU">Настройки мультимедиа</text>
      <text lang="PL">Media</text>
      <text lang="HE">הגדרות מדיה</text>
@@ -122,14 +122,14 @@
      <text lang="JA">インフォセンター設定</text>
      <text lang="FI">Tiedoteasetukset</text>
      <text lang="ZH_TW">資訊中心設定</text>
-     <text lang="SI">Nastavitve info centra</text>
+     <text lang="SL">Nastavitve info centra</text>
      <text lang="ET">Infokeskuse sätted</text>
      <text lang="NB">Informasjonssenter</text>
-     <text lang="DK">Informationscenter</text>
+     <text lang="DA">Informationscenter</text>
      <text lang="ES">Centro Información</text>
      <text lang="EN_GB">Info Centre Settings</text>
      <text lang="PT">Config. Centro de Info.</text>
-     <text lang="CZ">Nastavení informačního centra</text>
+     <text lang="CS">Nastavení informačního centra</text>
      <text lang="RU">Настройки инфоцентра</text>
      <text lang="PL">Centrum informacyjne</text>
      <text lang="HE">הגדרות מרכז מידע</text>
@@ -143,7 +143,7 @@
      <text>Xbox Settings</text>
      <text lang="IT">Impostazioni Xbox</text>
      <text lang="PT">Configurar XBox</text>
-     <text lang="CA">Configurar XBox</text>
+     <text lang="CS">Configurar XBox</text>
      <text lang="ES">Configurar XBox</text>
      <text lang="FR">Paramètres XBox</text>
      <text lang="DE">Xbox</text>
@@ -153,11 +153,11 @@
      <text lang="JA">XBox設定</text>
      <text lang="FI">Xbox Asetukset</text>
      <text lang="ZH_TW">XBox設定</text>
-     <text lang="SI">Xbox nastavitve</text>
+     <text lang="SL">Xbox nastavitve</text>
      <text lang="ET">Xbox-i sätted</text>
      <text lang="NB">X-Box</text>
-     <text lang="DK">Xbox</text>
-     <text lang="CZ">Nastavení XBOXu</text>
+     <text lang="DA">Xbox</text>
+     <text lang="CS">Nastavení XBOXu</text>
      <text lang="RU">Настройки XBOX</text>
      <text lang="PL">Xbox</text>
      <text lang="HE">הגדרות Xbox</text>
@@ -175,13 +175,13 @@
       <text lang="SV">Telefon</text>
       <text lang="NL">Telefoon Instellingen</text>      
       <text lang="FI">Puhelimen Asetukset</text>
-      <text lang="SI">Nastavitve telefona</text>
+      <text lang="SL">Nastavitve telefona</text>
       <text lang="ET">Telefoni sätted</text>
       <text lang="NB">Telefon</text>
-      <text lang="DK">Telefon</text>
+      <text lang="DA">Telefon</text>
       <text lang="ES">Teléfono</text>
       <text lang="PT">Configurar Telefone</text>
-      <text lang="CZ">Nastavení telefonu</text>
+      <text lang="CS">Nastavení telefonu</text>
       <text lang="JA">電話設定</text>
       <text lang="RU">Настройки телефона</text>
       <text lang="PL">Telefon</text>
@@ -194,7 +194,7 @@
        <type>ZONEMINDER</type>
        <text>ZoneMinder Settings</text>
        <text lang="IT">Impostazioni Videosorveglianza</text>
-       <text lang="DK">ZoneMinder</text>
+       <text lang="DA">ZoneMinder</text>
        <text lang="PL">Ustaw strażnika</text>
        <text lang="FI">Zoneminder Asetukset</text>
        <action>CONFIGPLUGIN mythzoneminder</action>

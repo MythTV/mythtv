@@ -10,12 +10,12 @@
      <text lang="DE">1. Allgemeines</text>
      <text lang="FI">1. Yleiset</text>
      <text lang="FR">1. Général</text>
-     <text lang="SI">1. Splošno</text>
+     <text lang="SL">1. Splošno</text>
      <text lang="ET">1. Üldine</text>
      <text lang="NB">1 Generelt</text>
-     <text lang="DK">1. Generelt</text>
+     <text lang="DA">1. Generelt</text>
      <text lang="ES">1. General</text>
-     <text lang="CZ">1. Obecný</text>
+     <text lang="CS">1. Obecný</text>
      <text lang="RU">1. Общие</text>
      <action>GENERAL</action>
    </button>
@@ -30,12 +30,12 @@
      <text lang="DE">2. TV-Karten</text>
      <text lang="FI">2. TV-kortit</text>
      <text lang="FR">2. Cartes d'acquisition</text>
-     <text lang="SI">2. Kartice za zajem</text>
+     <text lang="SL">2. Kartice za zajem</text>
      <text lang="ET">2. TV-kaardid</text>
      <text lang="NB">2 TV-kort</text>
-     <text lang="DK">2. TV-kort</text>
+     <text lang="DA">2. TV-kort</text>
      <text lang="ES">2. Capturadoras</text>
-     <text lang="CZ">2. Zachytávací karty</text>
+     <text lang="CS">2. Zachytávací karty</text>
      <text lang="RU">2. Карты захвата</text>
      <action>CAPTURE CARDS</action>
    </button>
@@ -50,12 +50,12 @@
      <text lang="DE">3. Videoquellen</text>
      <text lang="FI">3. Kuvanlähteet</text>
      <text lang="FR">3. Sources vidéo</text>
-     <text lang="SI">3. Video viri</text>
+     <text lang="SL">3. Video viri</text>
      <text lang="ET">3. Videosisendid</text>
      <text lang="NB">3 Videokilder</text>
-     <text lang="DK">3. Videokilder</text>
+     <text lang="DA">3. Videokilder</text>
      <text lang="ES">3. Fuentes de Vídeo</text>
-     <text lang="CZ">3. Zdroje obrazu</text>
+     <text lang="CS">3. Zdroje obrazu</text>
      <text lang="RU">3. Видео источники</text>
      <action>VIDEO SOURCES</action>
    </button>
@@ -70,12 +70,12 @@
      <text lang="DE">4. Verknüpfungen</text>
      <text lang="FI">4. Sisääntuloasetukset</text>
      <text lang="FR">4. Entrées Vidéos</text>
-     <text lang="SI">4. Vhodne povezave</text>
+     <text lang="SL">4. Vhodne povezave</text>
      <text lang="ET">4. Sisendite ühendused</text>
      <text lang="NB">4 Inndata</text>
-     <text lang="DK">4. Indgange</text>
+     <text lang="DA">4. Indgange</text>
      <text lang="ES">4. Conexiones</text>
-     <text lang="CZ">4. Připojení vstupů</text>
+     <text lang="CS">4. Připojení vstupů</text>
      <text lang="RU">4. Соединение входов</text>
      <action>CARD INPUTS</action>
    </button>
@@ -89,12 +89,12 @@
      <text lang="DE">5. Sender bearbeiten</text>
      <text lang="FI">5. Kanavanviritys</text>
      <text lang="FR">5. Editeur de chaînes</text>
-     <text lang="SI">5. Urejanje kanalov</text>
+     <text lang="SL">5. Urejanje kanalov</text>
      <text lang="ET">5. Kanaliredaktor</text>
      <text lang="NB">5 Kanalredigerer</text>
-     <text lang="DK">5. Kanal opsætning</text>
+     <text lang="DA">5. Kanal opsætning</text>
      <text lang="ES">5. Editor Canales</text>
-     <text lang="CZ">5. Editor kanálů</text>
+     <text lang="CS">5. Editor kanálů</text>
      <text lang="RU">5. Редактор каналов</text>
      <action>CHANNEL EDITOR</action>
    </button>
