@@ -10,7 +10,7 @@
       <text lang="nb">Lag DVD</text>
       <text lang="de">DVD erstellen</text>
       <text lang="RU">Создать DVD</text>
-      <text lang="SI">Ustvari DVD</text>
+      <text lang="SL">Ustvari DVD</text>
       <text lang="PL">Utwórz DVD</text>
       <text lang="FI">Luo DVD</text>
       <action>ARCHIVE_CREATE_DVD</action>
@@ -27,7 +27,7 @@
       <text lang="de">Natives Archiv erstellen</text>
       <text lang="nb">Lag naturlig arkiv</text>
       <text lang="RU">Создать архив</text>
-      <text lang="SI">Ustvari izvorni arhiv</text>
+      <text lang="SL">Ustvari izvorni arhiv</text>
       <text lang="PL">Utwórz archiwum</text>
       <text lang="FI">Luo Tiedosto</text>
       <action>ARCHIVE_CREATE_ARCHIVE</action>
@@ -44,7 +44,7 @@
        <text lang="nl">Encodeer Video Bestanden</text>
        <text lang="nb">Konverter videofil</text>
        <text lang="RU">Кодировать фильмы</text>
-       <text lang="SI">Kodiranje videa</text>
+       <text lang="SL">Kodiranje videa</text>
        <text lang="PL">Zakoduj plik wideo</text>
        <text lang="FI">Luo Video</text>
        <action>ARCHIVE_ENCODE_VIDEO</action>

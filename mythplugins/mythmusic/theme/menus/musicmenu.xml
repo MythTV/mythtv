@@ -7,14 +7,14 @@
       <text lang="ES">Escuchar Música</text>
       <text lang="CA">Escoltar Música</text>
       <text lang="DE">Musik hören</text>
-      <text lang="DK">Afspil musik</text>
+      <text lang="DA">Afspil musik</text>
       <text lang="NL">Muziek Afspelen</text>
       <text lang="PT">Tocar Músicas</text>
       <text lang="SV">Spela musik</text>
       <text lang="FR">Jouer la musique</text>
       <text lang="JA">ミュージック再生</text>
       <text lang="FI">Soita Musiikkia</text>
-      <text lang="SI">Predvajaj glasbo</text>
+      <text lang="SL">Predvajaj glasbo</text>
       <text lang="ET">Muusika mängimine</text>
       <text lang="RU">Слушать музыку</text>
       <text lang="PL">Odtwarzaj muzykę</text>
@@ -28,14 +28,14 @@
       <text lang="ES">Seleccionar Música</text>
       <text lang="CA">Escollir Música</text>
       <text lang="DE">Lieder auswählen</text>
-      <text lang="DK">Vælg musik</text>
+      <text lang="DA">Vælg musik</text>
       <text lang="NL">Muziek Kiezen</text>
       <text lang="PT">Escolher Músicas</text>
       <text lang="SV">Välj musik</text>
       <text lang="FR">Créer une playlist</text>
       <text lang="JA">ミュージック選択</text>
       <text lang="FI">Valitse Musiikkia</text>
-      <text lang="SI">Izberi glasbo</text>
+      <text lang="SL">Izberi glasbo</text>
       <text lang="ET">Muusika valimine</text>
       <text lang="RU">Выбрать музыку</text>
       <text lang="PL">Lista odtwarzania</text>
@@ -49,14 +49,14 @@
       <text lang="ES">Importar CD</text>
       <text lang="CA">Importar CD</text>
       <text lang="DE">CD importieren</text>
-      <text lang="DK">Importér CD</text>
+      <text lang="DA">Importér CD</text>
       <text lang="NL">CD Importeren</text>
       <text lang="PT">Importar CD para Disco</text>
       <text lang="SV">Importera CD</text>
       <text lang="FR">Encoder un CD</text>
       <text lang="JA">CD取込</text>
       <text lang="FI">Tuo CD</text>
-      <text lang="SI">Uvozi CD</text>
+      <text lang="SL">Uvozi CD</text>
       <text lang="ET">CD importimine</text>
       <text lang="RU">Импортировать CD</text>
       <text lang="PL">Zrzucaj CD</text>
@@ -66,8 +66,8 @@
    <button>
        <type>MUSIC_IMPORT</type>
        <text>Import Files</text>
-       <text lang="DK">Importér filer</text>
-       <text lang="SI">Uvoz datotek</text>
+       <text lang="DA">Importér filer</text>
+       <text lang="SL">Uvoz datotek</text>
        <text lang="PL">Importuj muzykę</text>
        <text lang="FI">Tuo Tiedostoja</text>
        <action>MUSIC_IMPORT</action>
@@ -80,14 +80,14 @@
       <text lang="ES">Actualizar Lista</text>
       <text lang="CA">Actualitzar llista</text>
       <text lang="DE">Musikdateien suchen</text>
-      <text lang="DK">Søg efter musik</text>
+      <text lang="DA">Søg efter musik</text>
       <text lang="NL">Muziek Zoeken</text>
       <text lang="PT">Refresc. Lista Músicas</text>
       <text lang="SV">Scanna efter ny musik</text>
       <text lang="FR">Rafraichir la liste</text>
       <text lang="JA">新しいミュージックを検索</text>
       <text lang="FI">Hae Uutta Musiikkia</text>
-      <text lang="SI">Iskanje nove glasbe</text>
+      <text lang="SL">Iskanje nove glasbe</text>
       <text lang="ET">Uue muusika skaneerimine</text>
       <text lang="RU">Искать новую музыку</text>
       <text lang="PL">Wyszukaj nową muzykę</text>
@@ -100,7 +100,7 @@
       <text lang="ET">Meedia väljastamine</text>
       <text lang="RU">Достать диск</text>
       <text lang="FR">Ejecter le Média</text>
-      <text lang="SI">Izvrzi medij</text>
+      <text lang="SL">Izvrzi medij</text>
       <text lang="PL">Wysuń tackę</text>
       <text lang="FI">Poista Media</text>
       <action>EJECT</action>

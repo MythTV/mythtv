@@ -6,13 +6,13 @@
      <text lang="ES">Ver Videos</text>
      <text lang="CA">Veure vídeos</text>
      <text lang="DE">Videos ansehen</text>
-     <text lang="DK">Gennemse film</text>
+     <text lang="DA">Gennemse film</text>
      <text lang="PT">Navegar na Biblioteca de Filmes</text>
      <text lang="SV">Bläddra bland filmer</text>
      <text lang="FR">Parcourir les vidéos</text>
      <text lang="NL">Blader door videos</text>
      <text lang="JA">ビデオブラウズ</text>
-     <text lang="SI">Iskanje filmov</text>
+     <text lang="SL">Iskanje filmov</text>
      <text lang="FI">Selaa Videoita</text>
      <text lang="ET">Filmide brausimine</text>
      <text lang="RU">Браузер фильмов</text>
@@ -25,14 +25,14 @@
      <text>Video List</text>
      <text lang="ES">Listar Videos</text>
      <text lang="CA">Llistar vídeos</text>
-     <text lang="DK">Film oversigt</text>
+     <text lang="DA">Film oversigt</text>
      <text lang="DE">Liste</text>
      <text lang="PT">Lista de Filmes</text>
      <text lang="SV">Filmlista</text>
      <text lang="FR">Liste des vidéos</text>
      <text lang="NL">Video Verkenner</text>
      <text lang="JA">ビデオリスト</text>
-     <text lang="SI">Seznam filmov</text>
+     <text lang="SL">Seznam filmov</text>
      <text lang="FI">Videolistaus</text>
      <text lang="ET">Filmide nimekiri</text>
      <text lang="RU">Список фильмов</text>
@@ -45,10 +45,10 @@
      <text>Video Gallery</text>
      <text lang="FR">Gallerie vidéo</text>
      <text lang="DE">Galerie</text>
-     <text lang="SI">Galerija filmov</text>
+     <text lang="SL">Galerija filmov</text>
      <text lang="FI">Videogalleria</text>
      <text lang="FR">Gallerie des vidéos</text>
-     <text lang="DK">Film Galleri</text>
+     <text lang="DA">Film Galleri</text>
      <text lang="SV">Filmgalleri</text>
      <text lang="PT">Galeria de Filmes</text>
      <text lang="ES">Galería</text>
@@ -63,14 +63,14 @@
      <text>Video Manager</text>
      <text lang="ES">Gestionar Videos</text>
      <text lang="CA">Gestionar vídeos</text>
-     <text lang="DK">Film opsætning</text>
+     <text lang="DA">Film opsætning</text>
      <text lang="DE">Video-Manager</text>
      <text lang="PT">Gestor de Filmes</text>
      <text lang="SV">Filmhanterare</text>
      <text lang="FR">Gestion des vidéos</text>
      <text lang="NL">Video's Beheren</text>
      <text lang="JA">ビデオマネージャー</text>
-     <text lang="SI">Upravitelj filmov</text>
+     <text lang="SL">Upravitelj filmov</text>
      <text lang="FI">Videohallinta</text>
      <text lang="ET">Filmihaldus</text>
      <text lang="RU">Менеджер фильмов</text>
@@ -82,7 +82,7 @@
    <button>
       <type>DVD_PLAY</type>
       <text>Play DVD</text>
-      <text lang="DK">Afspil DVD</text>
+      <text lang="DA">Afspil DVD</text>
       <text lang="PT">Ver DVD</text>
       <text lang="DE">DVD abspielen</text>
       <text lang="SV">Spela DVD</text>
@@ -102,7 +102,7 @@
    <button>
       <type>VCD_PLAY</type>
       <text>Play VCD</text>
-      <text lang="DK">Afspil VCD</text>
+      <text lang="DA">Afspil VCD</text>
       <text lang="FR">Lecture VCD</text>
       <text lang="PT">Ver VCD</text>
       <text lang="DE">VCD abspielen</text>
@@ -118,7 +118,7 @@
    <button>
       <type>DVD_RIP</type>
       <text>Rip DVD</text>
-      <text lang="DK">Genkod DVD</text>
+      <text lang="DA">Genkod DVD</text>
       <text lang="PT">Importar DVD p/ Disco</text>
       <text lang="DE">DVD importieren</text>
       <text lang="SV">Kopiera DVD</text>
