@@ -107,6 +107,7 @@
       <text lang="SL">Shranjena iskanja</text>
       <text lang="HE">חיפושים שמורים</text>
       <text lang="FI">Tallennetut Haut</text>
+      <text lang="DE">Gespeicherte Suche</text>
       <action>TV_SEARCH_STORED</action>
    </button>
 

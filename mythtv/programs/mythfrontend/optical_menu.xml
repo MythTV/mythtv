@@ -141,6 +141,7 @@
       <text lang="PL">Wysuń tackę</text>
       <text lang="HE">הוצא מדיה</text>
       <text lang="FI">Poista Media</text>
+      <text lang="DE">Medien auswerfen</text>
       <action>EJECT</action>
    </button>
 

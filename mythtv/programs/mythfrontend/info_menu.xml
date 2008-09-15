@@ -103,6 +103,7 @@
    <button>
        <type>WEATHER</type>
        <text>Weather Station</text>
+       <text lang="DE">Wetterstation</text>
        <action>PLUGIN mythwstation</action>
        <depends>mythwstation</depends>
    </button>
