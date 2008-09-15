@@ -732,8 +732,6 @@ void MythXML::GetProgramDetails( HTTPRequest *pRequest )
 
 void MythXML::GetChannelIcon( HTTPRequest *pRequest )
 {
-    bool bDefaultPixmap = false;
-
     pRequest->m_eResponseType   = ResponseTypeFile;
 
     int  iChanId   = pRequest->m_mapParams[ "ChanId"  ].toInt();
@@ -757,18 +755,9 @@ void MythXML::GetChannelIcon( HTTPRequest *pRequest )
         pRequest->m_sFileName = query.value(0).toString();
 
     if ((nWidth == 0) && (nHeight == 0))
-    {
-        bDefaultPixmap = true;
-    }
+        return;  // Use default pixmap
 
-    QString sFileName;
-
-    if (bDefaultPixmap)
-    {
-        return;
-    }
-    else
-        sFileName = QString( "%1.%2x%3.png" )
+    QString sFileName = QString( "%1.%2x%3.png" )
                                    .arg( pRequest->m_sFileName )
                                    .arg( nWidth    )
                                    .arg( nHeight   );
@@ -824,8 +813,6 @@ void MythXML::GetChannelIcon( HTTPRequest *pRequest )
 
 void MythXML::GetVideoArt( HTTPRequest *pRequest )
 {
-    bool bDefaultPixmap = false;
-
     pRequest->m_eResponseType   = ResponseTypeFile;
     
     QString sId =  pRequest->m_mapParams[ "Id"  ];
@@ -852,17 +839,10 @@ void MythXML::GetVideoArt( HTTPRequest *pRequest )
     if (!query.exec())
         MythDB::DBError("GetVideoArt ", query);
 
-    QString sFileName;
-
     if (!query.next())
         return;
 
-    sFileName = query.value(0).toString();
-
-    if (bDefaultPixmap)
-    {
-        return;
-    }
+    QString sFileName = query.value(0).toString();
 
     // ----------------------------------------------------------------------
     // check to see if albumart image is already created.
@@ -880,8 +860,6 @@ void MythXML::GetVideoArt( HTTPRequest *pRequest )
 
 void MythXML::GetAlbumArt( HTTPRequest *pRequest )
 {
-    bool bDefaultPixmap = false;
-
     pRequest->m_eResponseType   = ResponseTypeFile;
 
     QString sId =  pRequest->m_mapParams[ "Id"  ];
@@ -924,18 +902,9 @@ void MythXML::GetAlbumArt( HTTPRequest *pRequest )
     }
 
     if ((nWidth == 0) && (nHeight == 0))
-    {
-        bDefaultPixmap = true;
-    }
+        return;  // use default pixmap
 
-    QString sFileName;
-
-    if (bDefaultPixmap)
-    {
-        return;
-    }
-    else
-        sFileName = QString( "%1.%2x%3.png" )
+    QString sFileName = QString( "%1.%2x%3.png" )
                                    .arg( pRequest->m_sFileName )
                                    .arg( nWidth    )
                                    .arg( nHeight   );
@@ -1092,8 +1061,6 @@ void MythXML::GetExpiring( HTTPRequest *pRequest )
 
 void MythXML::GetPreviewImage( HTTPRequest *pRequest )
 {
-    bool bDefaultPixmap = false;
-
     pRequest->m_eResponseType   = ResponseTypeHTML;
     pRequest->m_nResponseStatus = 404;
 
@@ -1129,7 +1096,7 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
         return;
     }
 
-    bDefaultPixmap = (nWidth == 0) && (nHeight == 0) && (nSecsIn >= 0);
+    bool bDefaultPixmap = (nWidth == 0) && (nHeight == 0) && (nSecsIn >= 0);
 
     // ----------------------------------------------------------------------
     // If a specific size/time is requested, don't use cached image.
