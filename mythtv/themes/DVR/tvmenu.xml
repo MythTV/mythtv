@@ -9,11 +9,11 @@
       <text lang="NL">TV Kijken</text>
       <text lang="FR">Regarder la TV</text>
       <text lang="DE">Fernsehen</text>
-      <text lang="DK">Se TV</text>
+      <text lang="DA">Se TV</text>
       <text lang="PT">Ver Televisão</text>
       <text lang="SV">Se på TV</text>
       <text lang="JA">TVを見る</text>
-      <text lang="SI">Gledanje TV</text>
+      <text lang="SL">Gledanje TV</text>
       <text lang="ET">Vaata telerit</text>
       <text lang="RU">Смотреть ТВ</text>
       <action>TV_WATCH_LIVE</action>
@@ -28,11 +28,11 @@
       <text lang="NL">Opnames Verwijderen</text>
       <text lang="FR">Supprimer Enregistrement</text>
       <text lang="DE">Aufnahmen löschen</text>
-      <text lang="DK">Slet optagelser</text>
+      <text lang="DA">Slet optagelser</text>
       <text lang="PT">Apagar Gravações</text>
       <text lang="SV">Radera inspelningar</text>
       <text lang="JA">録画削除</text>
-      <text lang="SI">Brisanje Snemanj</text>
+      <text lang="SL">Brisanje Snemanj</text>
       <text lang="ET">Salvestiste kustutamine</text>
       <text lang="RU">Удалить записи</text>
       <alttext lang="DE">Löschen</alttext>
@@ -67,9 +67,9 @@
       <text lang="FR">Enregistré précedemment</text>
       <text lang="SV">Föregående</text>
       <text lang="DE">Alte Aufnahmen</text>
-      <text lang="SI">Že posneto</text>
+      <text lang="SL">Že posneto</text>
       <text lang="ET">Varem salvestatud</text>
-      <text lang="DK">Tidligere optagelser</text>
+      <text lang="DA">Tidligere optagelser</text>
       <text lang="PT">Gravações Feitas</text>
       <text lang="ES">Grabaciones Anteriores</text>
       <text lang="NL">Eerder Opgenomen</text>

@@ -10,9 +10,9 @@
       <text lang="FR">Titres</text>
       <text lang="FI">Nimikkeet</text>
       <text lang="ZH_TW">標題</text>
-      <text lang="SI">Naslovu</text>
+      <text lang="SL">Naslovu</text>
       <text lang="ET">Pealkirjad</text>
-      <text lang="DK">Titel</text>
+      <text lang="DA">Titel</text>
       <text lang="PT">Por Títulos</text>
       <text lang="ES">Títulos</text>
       <text lang="RU">Заголовки</text>
@@ -29,9 +29,9 @@
       <text lang="JA">キーワード</text>
       <text lang="FI">Avainsanat</text>
       <text lang="ZH_TW">關鍵字</text>
-      <text lang="SI">Ključnih besedah</text>
+      <text lang="SL">Ključnih besedah</text>
       <text lang="ET">Võtmesõnad</text>
-      <text lang="DK">Søgeord</text>
+      <text lang="DA">Søgeord</text>
       <text lang="PT">Por Palavras-Chave</text>
       <text lang="ES">Palabras</text>
       <text lang="RU">Ключевые слова</text>
@@ -47,9 +47,9 @@
       <text lang="JA">人</text>
       <text lang="DE">nach Personen</text>
       <text lang="FI">Ihmiset</text>
-      <text lang="SI">Osebah</text>
+      <text lang="SL">Osebah</text>
       <text lang="ET">Inimesed</text>
-      <text lang="DK">Person</text>
+      <text lang="DA">Person</text>
       <text lang="PT">Por Pessoas</text>
       <text lang="ES">Personas</text>
       <text lang="RU">Действующие лица</text>
@@ -65,9 +65,9 @@
       <text lang="JA">アドバンスト</text>
       <text lang="DE">Erweiterte Suche</text>
       <text lang="FI">Lisävalinnat</text>
-      <text lang="SI">Napredno</text>
+      <text lang="SL">Napredno</text>
       <text lang="ET">Muud valikud</text>
-      <text lang="DK">Supersøgning</text>
+      <text lang="DA">Supersøgning</text>
       <text lang="PT">Pesquisa Avançada</text>
       <text lang="ES">Avanzada</text>
       <text lang="RU">Дополнительно</text>
@@ -80,7 +80,7 @@
    <button>
       <type>TV_SEARCH_STORED</type>
       <text>Stored Searches</text>
-      <text lang="SI">Shranjena iskanja</text>
+      <text lang="SL">Shranjena iskanja</text>
       <action>TV_SEARCH_STORED</action>
    </button>
 

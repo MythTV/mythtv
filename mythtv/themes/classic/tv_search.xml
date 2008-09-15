@@ -11,9 +11,9 @@
       <text lang="NL">Titels</text>
       <text lang="FI">Nimikkeet</text>
       <text lang="ZH_TW">標題</text>
-      <text lang="SI">Naslovi</text>
+      <text lang="SL">Naslovi</text>
       <text lang="ET">Pealkirjad</text>
-      <text lang="DK">Titel</text>
+      <text lang="DA">Titel</text>
       <text lang="PT">Por Títulos</text>
       <text lang="ES">Títulos</text>
       <text lang="RU">Заголовки</text>
@@ -32,9 +32,9 @@
       <text lang="JA">キーワード</text>
       <text lang="FI">Avainsanat</text>
       <text lang="ZH_TW">關鍵字</text>
-      <text lang="SI">Ključne besede</text>
+      <text lang="SL">Ključne besede</text>
       <text lang="ET">Võtmesõnad</text>
-      <text lang="DK">Søgeord</text>
+      <text lang="DA">Søgeord</text>
       <text lang="PT">Por Palavras-Chave</text>
       <text lang="ES">Palabras</text>
       <text lang="RU">Ключевые слова</text>
@@ -51,7 +51,7 @@
       <text lang="JA">人</text>
       <text lang="DE">nach Personen</text>
       <text lang="FI">Ihmiset</text>
-      <text lang="SI">Osebe</text>
+      <text lang="SL">Osebe</text>
       <text lang="ET">Inimesed</text>
       <text lang="PT">Por Pessoas</text>
       <text lang="ES">Personas</text>
@@ -70,9 +70,9 @@
       <text lang="JA">アドバンスト</text>
       <text lang="DE">Erweiterte Suche</text>
       <text lang="FI">Lisävalinnat</text>
-      <text lang="SI">Napredno</text>
+      <text lang="SL">Napredno</text>
       <text lang="ET">Muud valikud</text>
-      <text lang="DK">Supersøger</text>
+      <text lang="DA">Supersøger</text>
       <text lang="PT">Pesquisa Avançada</text>
       <text lang="ES">Avanzada</text>
       <text lang="NL">Geavanceerd</text>
@@ -93,8 +93,8 @@
       <text lang="NL">Nieuwe Titels</text>
       <text lang="FI">Uudet Ohjelmat</text>
       <text lang="ZH_TW">新標題</text>
-      <text lang="SI">Novi naslovi</text>
-      <text lang="DK">Nye titler</text>
+      <text lang="SL">Novi naslovi</text>
+      <text lang="DA">Nye titler</text>
       <text lang="PT">Por Novos Títulos</text>
       <text lang="ET">Uued saated</text>
       <text lang="ES">Nuevos Títulos</text>
@@ -115,8 +115,8 @@
       <text lang="NL">Films</text>
       <text lang="FI">Elokuvat</text>
       <text lang="ZH_TW">電影</text>
-      <text lang="SI">Filmi</text>
-      <text lang="DK">Film</text>
+      <text lang="SL">Filmi</text>
+      <text lang="DA">Film</text>
       <text lang="PT">Por Filmes</text>
       <text lang="ET">Filmid</text>
       <text lang="ES">Películas</text>
@@ -136,8 +136,8 @@
       <text lang="NL">Categorie</text>
       <text lang="FI">Kategoriat</text>
       <text lang="ZH_TW">種類</text>
-      <text lang="SI">Kategorije</text>
-      <text lang="DK">Kategorier</text>
+      <text lang="SL">Kategorije</text>
+      <text lang="DA">Kategorier</text>
       <text lang="PT">Por Categorias</text>
       <text lang="ET">Kategooriad</text>
       <text lang="ES">Categorías</text>
@@ -157,8 +157,8 @@
       <text lang="JA">チャンネル</text>
       <text lang="FI">Kanavat</text>
       <text lang="ZH_TW">電視台</text>
-      <text lang="SI">Kanali</text>
-      <text lang="DK">Kanal</text>
+      <text lang="SL">Kanali</text>
+      <text lang="DA">Kanal</text>
       <text lang="PT">Por Canais</text>
       <text lang="ET">Kanalid</text>
       <text lang="ES">Canales</text>
@@ -178,8 +178,8 @@
       <text lang="DE">Sendezeit</text>
       <text lang="FI">Aika</text>
       <text lang="ZH_TW">時間</text>
-      <text lang="SI">Čas</text>
-      <text lang="DK">Tid</text>
+      <text lang="SL">Čas</text>
+      <text lang="DA">Tid</text>
       <text lang="PT">Por Data e Hora</text>
       <text lang="ET">Aeg</text>
       <text lang="ES">Horas</text>
@@ -191,7 +191,7 @@
    <button>
       <type>TV_SEARCH_STORED</type>
       <text>Stored Searches</text>
-      <text lang="SI">Shranjena iskanja</text>
+      <text lang="SL">Shranjena iskanja</text>
       <text lang="PL">Znaleziony zapamiętany</text>
       <action>TV_SEARCH_STORED</action>
    </button>
