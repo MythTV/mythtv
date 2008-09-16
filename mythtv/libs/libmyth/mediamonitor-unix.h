@@ -23,7 +23,7 @@ class MediaMonitorUnix : public MediaMonitor
 
   protected:
     int                          m_fifo;
-    static const QString         kUDEV_FIFO;
+    static const char           *kUDEV_FIFO;
 };
 
 #endif // MYTH_MEDIA_MONITOR_H
