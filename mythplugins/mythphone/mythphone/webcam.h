@@ -86,8 +86,10 @@ class WebcamEvent : public QEvent
 public:
     enum Type { FrameReady = (QEvent::User + 200), WebcamErrorEv, WebcamDebugEv  };
 
-    WebcamEvent(Type t, wcClient *c) : QEvent((QEvent::Type)t) { client=c; }
-    WebcamEvent(Type t, QString s) : QEvent((QEvent::Type)t) { text=s; }
+    WebcamEvent(Type t, wcClient *c)
+        : QEvent((QEvent::Type)t), client(c), text() { }
+    WebcamEvent(Type t, QString s)
+        : QEvent((QEvent::Type)t), client(NULL), text(s) { }
     ~WebcamEvent() {}
 
     wcClient *getClient() { return client; }
@@ -151,8 +153,6 @@ class Webcam : public QThread
     void WebcamThreadWorker();
 
 #ifdef WIN32
-    HWND hwndCap; 
-    HWND hwndWebcam;
     static LRESULT CALLBACK frameReadyCallbackProc(HWND hWnd, LPVIDEOHDR lpVHdr);
     static LRESULT CALLBACK ErrorCallbackProc(HWND hWnd, int nErrID, LPSTR lpErrorText);
     static LRESULT CALLBACK StatusCallbackProc(HWND hWnd, int nID, LPSTR lpStatusText);
@@ -180,11 +180,15 @@ class Webcam : public QThread
     int frameCount;
     int totalCaptureMs;
 
-    // OS specific data structures
+    // OS specific members
 #ifdef WIN32
+    HWND hwndCap; 
+    HWND hwndWebcam;
     CAPTUREPARMS capParams;
     BITMAPINFO bitmapInfo;
-#else
+#endif
+
+#ifdef __linux__
     struct video_capability vCaps;
     struct video_window vWin;
     struct video_picture vPic;

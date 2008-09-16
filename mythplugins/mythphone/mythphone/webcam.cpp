@@ -31,54 +31,40 @@ using namespace std;
 #include "h263.h"
 #include "webcam.h"
 
-#ifdef WIN32
 QWidget *wcMainWidget;
+#ifdef WIN32
 HWND wcMainHwnd;
 #endif
 
 Webcam::Webcam(QWidget *parent, QWidget *localVideoWidget)
+    : hDev(0), DevName(""),
+      picbuff1(NULL), imageLen(0),
+      frameSize(0), fps(5),
+      actualFps(fps), killWebcamThread(true), // Leave true whilst its not running
+      wcFormat(0), wcFlip(false),
+      cameraTime(), frameCount(0),
+      totalCaptureMs(0)
 {
-    hDev = 0;
-    DevName = "";
-    picbuff1 = 0;
-    imageLen = 0;
-    frameSize = 0;
-    fps = 5;
-    killWebcamThread = true; // Leave true whilst its not running
-    wcFormat = 0;
-    wcFlip = false;
-
-#ifndef WIN32
-    (void)parent;
-    (void)localVideoWidget;
-    vCaps.name[0] = 0;
-    vCaps.maxwidth = 0;
-    vCaps.maxheight = 0;
-    vCaps.minwidth = 0;
-    vCaps.minheight = 0;
-    memset(&vWin, 0, sizeof(struct video_window));
-    vWin.width = 0;
-    vWin.height = 0;
-    vPic.brightness = 0;
-    vPic.depth = 0;
-    vPic.palette = 0;
-    vPic.colour = 0;
-    vPic.contrast = 0;
-    vPic.hue = 0;
-
-#else
     wcMainWidget = parent;
+#ifdef WIN32
     hwndWebcam = localVideoWidget->winId();
     wcMainHwnd = hwndCap = capCreateCaptureWindow(NULL, WS_CHILD | WS_VISIBLE, 2, 2, 
                                      localVideoWidget->width()-4, 
                                      localVideoWidget->height()-4, 
                                      hwndWebcam, 1);
-
     capSetCallbackOnVideoStream(hwndCap, frameReadyCallbackProc);
     capSetCallbackOnError(hwndCap, ErrorCallbackProc) ;
     capSetCallbackOnStatus(hwndCap, StatusCallbackProc) ;
     capDriverConnect(hwndCap, 0);
     capSetUserData(hwndCap, (long)this);
+#endif
+
+#ifdef __linux__
+    (void)localVideoWidget;
+    bzero(&vCaps, sizeof(vCaps));
+    bzero(&vWin, sizeof(vWin));
+    bzero(&vPic, sizeof(vPic));
+    bzero(&vClips, sizeof(vClips));
 #endif
 }
 

@@ -39,18 +39,55 @@ class rtp;
 class RtpEvent : public QEvent
 {
 public:
-    enum Type { RxVideoFrame = (QEvent::User + 300), RtpDebugEv, RtpStatisticsEv, RtpRtcpStatsEv };
+    enum Type {
+        RxVideoFrame = (QEvent::User + 300), RtpDebugEv, RtpStatisticsEv,
+        RtpRtcpStatsEv
+    };
 
-    RtpEvent(Type t, QString s="") : QEvent((QEvent::Type)t) { text=s; }
-    RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2, int s3, int s4, int s5, int s6, 
-             int s7, int s8, int s9, int s10, int s11, int s12, int s13, int s14, int s15, int s16)
-              : QEvent((QEvent::Type)t)
-             { rtpThread=r; timestamp=tm; msPeriod = ms; pkIn=s1; pkOut=s2; pkMiss=s3; pkLate=s4; 
-               pkInDisc=s5; pkOutDrop=s6;
-               byteIn=s7; byteOut=s8; bytePlayed=s9; framesIn=s10; framesOut=s11; framesInDisc=s12; 
-               framesOutDisc=s13; minPlayout=s14; avgPlayout=s15; maxPlayout=s16; }
-    RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2) : QEvent((QEvent::Type)t)
-             { rtpThread=r; timestamp=tm; msPeriod = ms; rtcpFractionLoss=s1; rtcpTotalLoss=s2;}    
+    RtpEvent(Type t, QString s="")
+        : QEvent((QEvent::Type)t),
+          text(s),           rtpThread(NULL),
+          timestamp(),       msPeriod(0),
+          pkIn(0),           pkOut(0),
+          pkOutDrop(0),      pkMiss(0),
+          pkLate(0),         pkInDisc(0),
+          framesIn(0),       framesOut(0),
+          framesInDisc(0),   framesOutDisc(0),
+          byteIn(0),         byteOut(0),
+          bytePlayed(0),     rtcpFractionLoss(0),
+          rtcpTotalLoss(0),  minPlayout(0),
+          avgPlayout(0),     maxPlayout(0) { }
+
+    RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2, int s3, int s4,
+             int s5, int s6, int s7, int s8, int s9, int s10, int s11, int s12,
+             int s13, int s14, int s15, int s16)
+        : QEvent((QEvent::Type)t),
+          text(""),          rtpThread(r),
+          timestamp(tm),     msPeriod(ms),
+          pkIn(s1),          pkOut(s2),
+          pkOutDrop(s6),     pkMiss(s3),
+          pkLate(s4),        pkInDisc(s5),
+          framesIn(s10),     framesOut(s11),
+          framesInDisc(s12), framesOutDisc(s13),
+          byteIn(s7),        byteOut(s8),
+          bytePlayed(s9),    rtcpFractionLoss(0),
+          rtcpTotalLoss(0),  minPlayout(s14),
+          avgPlayout(s15),   maxPlayout(s16) { }
+
+    RtpEvent(Type t, rtp *r, QTime tm, int ms, int s1, int s2)
+        : QEvent((QEvent::Type)t),
+          text(""),          rtpThread(r),
+          timestamp(tm),     msPeriod(ms),
+          pkIn(0),           pkOut(0),
+          pkOutDrop(0),      pkMiss(0),
+          pkLate(0),         pkInDisc(0),
+          framesIn(0),       framesOut(0),
+          framesInDisc(0),   framesOutDisc(0),
+          byteIn(0),         byteOut(0),
+          bytePlayed(0),     rtcpFractionLoss(s1),
+          rtcpTotalLoss(s2), minPlayout(0),
+          avgPlayout(0),     maxPlayout(0) { }
+
     ~RtpEvent()                 {  }
     QString msg()               { return text;}
     rtp *owner()                { return rtpThread; }
