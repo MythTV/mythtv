@@ -71,6 +71,7 @@ FileCopyThread::FileCopyThread(IconView *parent, bool move)
 {
     m_move = move;
     m_parent = parent;
+    m_progress = 0;
 }
 
 void FileCopyThread::run()
