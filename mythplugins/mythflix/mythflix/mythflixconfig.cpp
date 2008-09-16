@@ -317,16 +317,18 @@ void MythFlixConfig::slotCategoryChanged(MythListButtonItem *item)
     m_genresList->Reset();
 
     NewsCategory* cat = (NewsCategory*) item->getData();
-    if (cat) {
-
+    if (cat)
+    {
         for (NewsSiteItem* site = cat->siteList.first();
-             site; site = cat->siteList.next() ) {
-            MythListButtonItem* item =
+             site;
+             site = cat->siteList.next())
+        {
+            MythListButtonItem* newItem =
                 new MythListButtonItem(m_genresList, site->name, 0, true,
                                       site->inDB ?
                                       MythListButtonItem::FullChecked :
                                       MythListButtonItem::NotChecked);
-            item->setData(site);
+            newItem->setData(site);
         }
     }
 }
