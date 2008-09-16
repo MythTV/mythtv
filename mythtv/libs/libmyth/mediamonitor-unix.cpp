@@ -24,10 +24,10 @@ using namespace std;
 // Qt headers
 #include <QList>
 #include <QTextStream>
-#include <qapplication.h>
-#include <q3process.h>
-#include <qdir.h>
-#include <qfile.h>
+#include <QApplication>
+#include <QProcess>
+#include <QDir>
+#include <QFile>
 
 // MythTV headers
 #include "mythmediamonitor.h"
@@ -59,12 +59,12 @@ using namespace std;
 #endif
 #define SUPER_OPT_DEV "dev="
 
-const QString MediaMonitorUnix::kUDEV_FIFO = "/tmp/mythtv_media";
+const char * MediaMonitorUnix::kUDEV_FIFO = "/tmp/mythtv_media";
 
 
 // Some helpers for debugging:
 
-static const QString LOC = QString("MediaMonitorUnix:");
+static const QString LOC = QString("MMUnix:");
 
 static void fstabError(const QString &methodName)
 {
@@ -133,7 +133,7 @@ bool MediaMonitorUnix::CheckFileSystemTable(void)
  *   This function creates MediaDevice instances for valid removable media
  *   devices found under the /sys/block filesystem in Linux.  CD and DVD
  *   devices are created as MythCDROM instances.  MythHDD instances will be
- *   created for each partition on removable hard disk devices, if they exists.
+ *   created for each partition on removable hard disk devices, if they exist.
  *   Otherwise a single MythHDD instance will be created for the entire disc.
  *
  *   NOTE: Floppy disks are ignored.
@@ -160,14 +160,25 @@ bool MediaMonitorUnix::CheckMountable(void)
 
         sysfs.cd(*it);
 
-        QFile removable(sysfs.absFilePath("removable"));
+        QString removablePath = sysfs.absoluteFilePath("removable");
+        QFile   removable(removablePath);
         if (removable.exists() && removable.open(QIODevice::ReadOnly))
         {
-            int c = removable.getch();
+            char    c   = 0;
+            QString msg = LOC + ":CheckMountable() '" + removablePath + "' ";
+            bool    ok  = removable.getChar(&c);
             removable.close();
 
-            if (c == '1')
-                FindPartitions(sysfs.absPath(), true);
+            if (ok)
+            {
+                VERBOSE(VB_MEDIA+VB_EXTRA, msg + c);
+                if (c == '1')
+                    FindPartitions(sysfs.absPath(), true);
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, msg + "failed");
+            }
         }
         sysfs.cdUp();
     }
@@ -184,31 +195,54 @@ bool MediaMonitorUnix::CheckMountable(void)
  */
 QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
 {
+    QString msg = LOC + ":GetDeviceFile(" + sysfs + ")";
+    QString ret = QString::null;
+
 #ifdef linux
-    Q3Process udevinfo(this);
-    udevinfo.addArgument("udevinfo");
-    udevinfo.addArgument("-q");
-    udevinfo.addArgument("name");
-    udevinfo.addArgument("-rp");
-    udevinfo.addArgument(sysfs);
-    udevinfo.setCommunication(Q3Process::Stdout|Q3Process::Stderr);
+    QProcess    *udevinfo = new QProcess();
+    QTextStream  stream(udevinfo);
+    QStringList  args;
 
-    udevinfo.start();
+    args << "-q";
+    args << "name";
+    args << "-rp";
+    args << sysfs;
+    udevinfo->start("udevinfo", args);
 
-    int status;
-    waitpid(udevinfo.processIdentifier(), &status, 0);
-
-    if (udevinfo.canReadLineStderr())
-        VERBOSE(VB_MEDIA, LOC + QString(":GetDeviceFile(%1) - ").arg(sysfs)
-                          + udevinfo.readLineStderr());
-
-    QString ret = udevinfo.readLineStdout();
-    if (ret != "device not found in database")
+    if (!udevinfo->waitForStarted(2000 /*ms*/))
+    {
+        VERBOSE(VB_IMPORTANT, msg + ", Error failed to start!");
+        udevinfo->deleteLater();
         return ret;
+    }
 
+    if (!udevinfo->waitForFinished(2000 /*ms*/))
+    {
+        VERBOSE(VB_IMPORTANT,
+                msg + ", Error failed to end! Terminating udevinfo process");
+        udevinfo->kill();
+        udevinfo->deleteLater();
+        return ret;
+    }
+
+    udevinfo->setReadChannel(QProcess::StandardError);
+
+    while (!stream.atEnd())
+    {
+        VERBOSE(VB_MEDIA+VB_EXTRA, msg + stream.readLine());
+    }
+
+    udevinfo->setReadChannel(QProcess::StandardOutput);
+
+    ret = stream.readLine();
+    if (ret.startsWith("device not found in database"))
+        ret = QString::null;
+
+    udevinfo->deleteLater();
 #endif // linux
-    (void)sysfs;
-    return QString::null;
+
+    VERBOSE(VB_MEDIA, msg + " -> " + ret);
+    return ret;
 }
 
 /*
