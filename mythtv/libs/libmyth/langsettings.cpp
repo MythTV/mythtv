@@ -90,9 +90,10 @@ void LanguageSettings::load(QString module_name)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    "Cannot load language " + d.m_language.toLower()
-                    + " for module " + module_name);
+            if (d.m_language.toLower() != "en_gb")
+                VERBOSE(VB_IMPORTANT,
+                        "Cannot load language " + d.m_language.toLower()
+                        + " for module " + module_name);
         }
     }
 }
