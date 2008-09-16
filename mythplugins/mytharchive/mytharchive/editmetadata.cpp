@@ -117,8 +117,8 @@ void EditMetadataDialog::wireUpTheme()
         description_edit->createEdit(this);
         MythRemoteLineEdit *edit
             = (MythRemoteLineEdit *) description_edit->getEdit();
-        //if (edit)
-        //    edit->setWordWrap(Q3TextEdit::WidgetWidth);
+        if (edit)
+            edit->setWordWrap(Q3TextEdit::WidgetWidth);
         connect(description_edit, SIGNAL(loosingFocus()),
                 this,             SLOT(editLostFocus()));
     }
