@@ -39,7 +39,6 @@ void *my_malloc(unsigned size, mpeg2_alloc_t reason)
     if (size)
     {
         buf = (char *) malloc (size + 63 + sizeof (void **));
-        memset(buf, 0, size + 63 + sizeof (void **));
         if (buf)
         {
             char * align_buf;
