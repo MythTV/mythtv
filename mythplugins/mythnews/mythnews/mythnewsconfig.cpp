@@ -38,14 +38,12 @@ public:
 // ---------------------------------------------------
 
 MythNewsConfig::MythNewsConfig(MythScreenStack *parent, const char *name)
-    : MythScreenType(parent, name)
+    : MythScreenType(parent, name),
+      m_priv(new MythNewsConfigPriv), m_categoriesList(NULL),
+      m_siteList(NULL),               m_helpText(NULL),
+      m_contextText(NULL),            //m_SpinBox(NULL),
+      m_updateFreq(gContext->GetNumSetting("NewsUpdateFrequency", 30))
 {
-    m_priv            = new MythNewsConfigPriv;
-    m_updateFreq      = gContext->GetNumSetting("NewsUpdateFrequency", 30);
-
-//    m_SpinBox = NULL;
-    m_siteList = m_categoriesList = NULL;
-
     populateSites();
 }
 
