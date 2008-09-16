@@ -109,7 +109,8 @@ QMutex MainServer::truncate_and_close_lock;
 class ProcessRequestThread : public QThread
 {
   public:
-    ProcessRequestThread(MainServer *ms) { parent = ms; }
+    ProcessRequestThread(MainServer *ms)
+        : parent(ms), socket(0), threadlives(false) {}
 
     void setup(MythSocket *sock)
     {

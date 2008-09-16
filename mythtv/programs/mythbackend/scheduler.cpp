@@ -3691,8 +3691,8 @@ void Scheduler::SchedPreserveLiveTV(void)
         // Get the program that will be recording on this channel
         // at record start time, if this LiveTV session continues.
         ProgramInfo *dummy =
-            dummy->GetProgramAtDateTime(QString::number(in.chanid),
-                                        livetvTime, true, 4);
+            ProgramInfo::GetProgramAtDateTime(QString::number(in.chanid),
+                                              livetvTime, true, 4);
         if (!dummy)
             continue;
 
