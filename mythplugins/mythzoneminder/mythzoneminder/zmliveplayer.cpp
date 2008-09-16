@@ -412,11 +412,14 @@ void ZMLivePlayer::updateMonitorStatus()
 #define TEXTURE_HEIGHT 1024
 
 Player::Player()
+    : m_initalized(false), m_cx(0)
+    , m_dis(0),            m_win(0)
+    , m_screenNum(0),      m_gc(0)
+    , m_XImage(0),         m_XvImage(0)
+    , m_rgba(0),           m_XVport(0)
+    , m_haveXV(false)
 {
-    m_initalized = false;
     m_useGL = (gContext->GetNumSetting("ZoneMinderUseOpenGL", 1) == 1);
-    m_XvImage = NULL;
-    m_XImage = NULL;
 
     if (m_useGL)
         VERBOSE(VB_GENERAL, "MythZoneMinder: Using openGL for display");
