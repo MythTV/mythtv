@@ -1701,7 +1701,7 @@ UIImageGridType::UIImageGridType(const QString &name, int order)
     defaultPixmap = normalPixmap = selectedPixmap = highlightedPixmap = NULL;
 
     topRow = rowCount = columnCount = itemCount = currentItem =
-            borderWidth = padding = topRow = cellWidth = cellHeight =
+            borderWidth = padding = cellWidth = cellHeight =
             lastRow = lastColumn = curColumn = curRow = 0;
 
     textPos = UIImageGridType::textPosBottom;
@@ -1749,7 +1749,7 @@ UIImageGridType::~UIImageGridType(void)
 void UIImageGridType::reset(void)
 {
     allData->clear();
-    topRow = itemCount = currentItem = topRow = lastRow =
+    topRow = itemCount = currentItem = lastRow =
             lastColumn = curColumn = curRow = 0;
 }
 
