@@ -1731,7 +1731,8 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
     switch (Event | State)
     {
     case SIP_IDLE_BYE:
-        BuildSendStatus(481, "BYE", sipMsg->getCSeqValue());
+        if (sipMsg != 0)
+            BuildSendStatus(481, "BYE", sipMsg->getCSeqValue());
         //481 Call/Transaction does not exist
         State = SIP_IDLE;
         break;
@@ -1739,7 +1740,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
     case SIP_IDLE_INVITESTATUS_2xx:
     case SIP_IDLE_INVITESTATUS_3456:
         // Check if we are being a proxy
-        if (sipMsg->getViaIp() == sipLocalIP)
+        if (sipMsg != 0 && sipMsg->getViaIp() == sipLocalIP)
         {
             ForwardMessage(sipMsg);
             State = SIP_IDLE;
@@ -1772,9 +1773,10 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         State = SIP_OCONNECTING1;
         break;
     case SIP_IDLE_INVITE:
-        cseq = sipMsg->getCSeqValue();
+        if (sipMsg != 0)
+            cseq = sipMsg->getCSeqValue();
 #ifdef SIPREGISTRAR
-        if ((toUrl->getUser() == sipUsername)) &&
+        if ((toUrl->getUser() == sipUsername) &&
             (toUrl->getHost() ==  "Volkaerts"))
 #endif
         {
@@ -1782,28 +1784,34 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
             if (parent->numCalls() > 1)
             {
                 // 486 Busy Here
-                BuildSendStatus(486, "INVITE", sipMsg->getCSeqValue());
+                if (sipMsg != 0)
+                    BuildSendStatus(486, "INVITE", sipMsg->getCSeqValue());
+
                 State = SIP_DISCONNECTING;
             }
             else
             {
-                GetSDPInfo(sipMsg);
-                // INVITE had a codec we support; proces
-                if (audioPayloadIdx != -1)
+                if (sipMsg != 0)
                 {
-                    AlertUser(sipMsg);
-                    BuildSendStatus(100, "INVITE", sipMsg->getCSeqValue(),
-                                    SIP_OPT_CONTACT | SIP_OPT_TIMESTAMP);
-                    // 100 Trying
-                    BuildSendStatus(180, "INVITE", sipMsg->getCSeqValue(),
-                                    SIP_OPT_CONTACT); //180 Ringing
-                    State = SIP_ICONNECTING;
-                }
-                else
-                {
-                    BuildSendStatus(488, "INVITE", sipMsg->getCSeqValue());
-                    // 488 Not Acceptable Here
-                    State = SIP_DISCONNECTING;
+                    GetSDPInfo(sipMsg);
+
+                    // INVITE had a codec we support; proces
+                    if (audioPayloadIdx != -1)
+                    {
+                        AlertUser(sipMsg);
+                        BuildSendStatus(100, "INVITE", sipMsg->getCSeqValue(),
+                                        SIP_OPT_CONTACT | SIP_OPT_TIMESTAMP);
+                        // 100 Trying
+                        BuildSendStatus(180, "INVITE", sipMsg->getCSeqValue(),
+                                        SIP_OPT_CONTACT); //180 Ringing
+                        State = SIP_ICONNECTING;
+                    }
+                    else
+                    {
+                        BuildSendStatus(488, "INVITE", sipMsg->getCSeqValue());
+                        // 488 Not Acceptable Here
+                        State = SIP_DISCONNECTING;
+                    }
                 }
             }
         }
@@ -1826,23 +1834,28 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
     case SIP_OCONNECTING1_INVITESTATUS_1xx:
         (parent->Timer())->Stop(this, SIP_RETX);
-        if ((sipMsg->getStatusCode() == 180) && (eventWindow))
-            QApplication::postEvent(
-                eventWindow, new SipEvent(SipEvent::SipRingbackTone));
-        parent->SetNotification(
-            "CALLSTATUS", "", QString::number(sipMsg->getStatusCode()),
-            sipMsg->getReasonPhrase());
+        if (sipMsg != 0)
+        {
+            if ((sipMsg->getStatusCode() == 180) && (eventWindow))
+                QApplication::postEvent(
+                    eventWindow, new SipEvent(SipEvent::SipRingbackTone));
+
+            parent->SetNotification(
+                "CALLSTATUS", "", QString::number(sipMsg->getStatusCode()),
+                sipMsg->getReasonPhrase());
+        }
         State = SIP_OCONNECTING2;
         break;
     case SIP_OCONNECTING1_INVITESTATUS_3456:
         (parent->Timer())->Stop(this, SIP_RETX);
-        parent->SetNotification(
-            "CALLSTATUS", "", QString::number(sipMsg->getStatusCode()),
-            sipMsg->getReasonPhrase());
+        if (sipMsg != 0)
+            parent->SetNotification(
+                "CALLSTATUS", "", QString::number(sipMsg->getStatusCode()),
+                sipMsg->getReasonPhrase());
         // Fall through
     case SIP_OCONNECTING2_INVITESTATUS_3456:
-        if (((sipMsg->getStatusCode() == 407) ||
-             (sipMsg->getStatusCode() == 401)) &&
+        if (sipMsg != 0 && ((sipMsg->getStatusCode() == 407) ||
+                            (sipMsg->getStatusCode() == 401)) &&
             (viaRegProxy != 0) && (viaRegProxy->isRegistered()))
         {
             // Authentication Required
@@ -1862,19 +1875,25 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
 
     case SIP_OCONNECTING2_INVITESTATUS_1xx:
-        if ((sipMsg->getStatusCode() == 180) && (eventWindow))
-            QApplication::postEvent(
-                eventWindow, new SipEvent(SipEvent::SipRingbackTone));
-        parent->SetNotification(
-            "CALLSTATUS", "", QString::number(sipMsg->getStatusCode()),
-            sipMsg->getReasonPhrase());
+        if (sipMsg != 0)
+        {
+            if ((sipMsg->getStatusCode() == 180) && (eventWindow))
+                QApplication::postEvent(
+                    eventWindow, new SipEvent(SipEvent::SipRingbackTone));
+
+            parent->SetNotification(
+                "CALLSTATUS", "", QString::number(sipMsg->getStatusCode()),
+                sipMsg->getReasonPhrase());
+        }
         break;
 
     case SIP_OCONNECTING1_INVITESTATUS_2xx:
         (parent->Timer())->Stop(this, SIP_RETX);
         // Fall through
     case SIP_OCONNECTING2_INVITESTATUS_2xx:
-        GetSDPInfo(sipMsg);
+        if (sipMsg != 0)
+            GetSDPInfo(sipMsg);
+
         if (audioPayloadIdx != -1) // INVITE had a codec we support; proces
         {
             BuildSendAck();
@@ -1956,8 +1975,9 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         State = SIP_DISCONNECTING;
         break;
     case SIP_ICONNECTING_INVITE:
-        BuildSendStatus(180, "INVITE", sipMsg->getCSeqValue(),
-                        SIP_OPT_CONTACT); // Retxed INVITE, resend 180 Ringing
+        if (sipMsg != 0)
+            BuildSendStatus(180, "INVITE", sipMsg->getCSeqValue(),
+                            SIP_OPT_CONTACT); // Retxed INVITE, resend 180 Ringing
         break;
     case SIP_ICONNECTING_ANSWER:
         BuildSendStatus(200, "INVITE", cseq, SIP_OPT_SDP | SIP_OPT_CONTACT,
@@ -1976,7 +1996,9 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
                 eventWindow, new SipEvent(SipEvent::SipCeaseAlertUser));
         }
     case SIP_ICONNECTING_WAITACK_CANCEL:
-        BuildSendStatus(200, "CANCEL", sipMsg->getCSeqValue()); // 200 Ok
+        if (sipMsg != 0)
+            BuildSendStatus(200, "CANCEL", sipMsg->getCSeqValue()); // 200 Ok
+
         State = SIP_IDLE;
         break;
     case SIP_ICONNECTING_WAITACK_ACK:
@@ -2028,7 +2050,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
     case SIP_CONNECTED_BYE:
         (parent->Timer())->Stop(this, SIP_RETX);
-        if (sipMsg->getCSeqValue() > cseq)
+        if (sipMsg != 0 && sipMsg->getCSeqValue() > cseq)
         {
             cseq = sipMsg->getCSeqValue();
             BuildSendStatus(200, "BYE", cseq); // 200 Ok
@@ -2039,7 +2061,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
             }
             State = SIP_IDLE;
         }
-        else
+        else if (sipMsg != 0)
         {
             // 400 Bad Request
             BuildSendStatus(400, "BYE", sipMsg->getCSeqValue());
@@ -2066,13 +2088,15 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
     case SIP_DISCONNECTING_CANCEL:
         (parent->Timer())->Stop(this, SIP_RETX);
-        BuildSendStatus(200, "CANCEL", sipMsg->getCSeqValue()); //200 Ok
+        if (sipMsg != 0)
+            BuildSendStatus(200, "CANCEL", sipMsg->getCSeqValue()); //200 Ok
+
         State = SIP_IDLE;
         break;
     case SIP_DISCONNECTING_BYESTATUS:
         (parent->Timer())->Stop(this, SIP_RETX);
-        if (((sipMsg->getStatusCode() == 407) ||
-             (sipMsg->getStatusCode() == 401)) &&
+        if (sipMsg != 0 && ((sipMsg->getStatusCode() == 407) ||
+                            (sipMsg->getStatusCode() == 401)) &&
             (viaRegProxy != 0) && (viaRegProxy->isRegistered()))
         {
             // Authentication Required
@@ -2084,8 +2108,8 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
     case SIP_DISCONNECTING_CANCELSTATUS:
         (parent->Timer())->Stop(this, SIP_RETX);
-        if (((sipMsg->getStatusCode() == 407) ||
-             (sipMsg->getStatusCode() == 401)) &&
+        if (sipMsg != 0 && ((sipMsg->getStatusCode() == 407) ||
+                            (sipMsg->getStatusCode() == 401)) &&
             (viaRegProxy != 0) && (viaRegProxy->isRegistered()))
         {
             // Authentication Required
@@ -2097,7 +2121,9 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
     case SIP_DISCONNECTING_BYE:
         (parent->Timer())->Stop(this, SIP_RETX);
-        BuildSendStatus(200, "BYE", sipMsg->getCSeqValue()); //200 Ok
+        if (sipMsg != 0)
+            BuildSendStatus(200, "BYE", sipMsg->getCSeqValue()); //200 Ok
+
         State = SIP_IDLE;
         break;
 
@@ -2107,7 +2133,9 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         State = SIP_CONNECT_MODIFYING1;
         break;
     case SIP_CONNECTED_INVITE:
-        GetSDPInfo(sipMsg);
+        if (sipMsg != 0)
+            GetSDPInfo(sipMsg);
+
         if (audioPayloadIdx != -1) // INVITE had a codec we support; proces
         {
             BuildSendStatus(200, "INVITE", cseq,
@@ -2115,7 +2143,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
                             BuildSdpResponse());
             State = SIP_CONNECT_MODIFYING2;
         }
-        else
+        else if (sipMsg != 0)
         {
             BuildSendStatus(488, "INVITE", sipMsg->getCSeqValue());
             // 488 Not Acceptable Here
@@ -2126,7 +2154,9 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
     case SIP_CONNMOD1_INVITESTATUS_2xx:
         (parent->Timer())->Stop(this, SIP_RETX);
-        GetSDPInfo(sipMsg);
+        if (sipMsg != 0)
+            GetSDPInfo(sipMsg);
+
         if (audioPayloadIdx != -1) // INVITE had a codec we support; proces
         {
             BuildSendAck();
@@ -2157,8 +2187,8 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
     case SIP_CONNMOD1_INVITESTATUS_3456:
         (parent->Timer())->Stop(this, SIP_RETX);
-        if (((sipMsg->getStatusCode() == 407) ||
-             (sipMsg->getStatusCode() == 401)) &&
+        if (sipMsg != 0 && ((sipMsg->getStatusCode() == 407) ||
+                            (sipMsg->getStatusCode() == 401)) &&
             (viaRegProxy != 0) && (viaRegProxy->isRegistered()))
         {
             // Authentication Required

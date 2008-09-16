@@ -1389,11 +1389,11 @@ void PhoneUIBox::menuHistorySave(void)
         CallRecord *crEntry =
             DirContainer->fetchCallRecordById(Current->getAttribute(1));
 
-        DirEntry *entry =
-            DirContainer->FindMatchingDirectoryEntry(crEntry->getUri());
 
         if (crEntry != 0)
         {
+            DirEntry *entry =
+                DirContainer->FindMatchingDirectoryEntry(crEntry->getUri());
             if (entry != 0)
             {
                 // Tell the user one exists
