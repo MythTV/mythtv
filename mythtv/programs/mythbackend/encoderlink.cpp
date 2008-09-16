@@ -24,7 +24,7 @@ using namespace std;
  * \class EncoderLink
  * \brief Provides an interface to both local and remote TVRec's for the mythbackend.
  *
- *  This class be instanciated for either a local or remote TVRec's.
+ *  This class be instantiated for either a local or remote TVRec's.
  *  Many of the methods will work with either, but many only work for
  *  a local TVRec's and these are labeled appropriately in this document.
  *
@@ -539,8 +539,8 @@ void EncoderLink::CancelNextRecording(bool cancel)
  *
  *  \param chain The LiveTV chain to use
  *  \param startchan The channel the LiveTV should start with
- *  \param pip Tells TVRec's RingBuffer that this is for a Picture in Picture di
-splay.
+ *  \param pip Tells TVRec's RingBuffer that this is for a Picture in Picture
+ *  display.
  *  \sa TVRec::SpawnLiveTV(LiveTVChain*,bool,QString),
  *      RemoteEncoder::SpawnLiveTV(QString,bool,QString)
  */

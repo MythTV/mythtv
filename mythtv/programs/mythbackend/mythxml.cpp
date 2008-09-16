@@ -599,7 +599,7 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
 
             sCurChanId = pInfo->chanid;
 
-            // Ouput new Channel Node
+            // Output new Channel Node
 
             channel = doc.createElement( "Channel" );
             channels.appendChild( channel );

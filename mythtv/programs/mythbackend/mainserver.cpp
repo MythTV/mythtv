@@ -608,7 +608,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
             }
             else
                 VERBOSE(VB_IMPORTANT,
-                        "WARNING: Recieved an empty SHUTDOWN_NOW query!");
+                        "WARNING: Received an empty SHUTDOWN_NOW query!");
         }
     }
     else if (command == "BACKEND_MESSAGE")
@@ -1512,7 +1512,7 @@ void *MainServer::SpawnDeleteThread(void *param)
 void MainServer::DoDeleteThread(const DeleteStruct *ds)
 {
     // sleep a little to let frontends reload the recordings list
-    // after deleteing a recording, then we can hammer the DB and filesystem
+    // after deleting a recording, then we can hammer the DB and filesystem
     sleep(3);
     usleep(rand()%2000);
 
@@ -1817,7 +1817,7 @@ int MainServer::OpenAndUnlink(const QString &filename)
  *
  *   When the file is small enough this closes the file and returns.
  *
- *   NOTE: This aquires a lock so that only one instance of TruncateAndClose()
+ *   NOTE: This acquires a lock so that only one instance of TruncateAndClose()
  *         is running at a time.
  */
 bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
@@ -2111,7 +2111,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
         }
     }
 
-    // Tell all encoders to stop recordering to the file being deleted.
+    // Tell all encoders to stop recording to the file being deleted.
     // Hopefully this is never triggered.
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
@@ -3500,7 +3500,7 @@ void MainServer::HandleCommBreakQuery(const QString &chanid,
 {
 // Commercial break query
 // Format:  QUERY_COMMBREAK <chanid> <starttime>
-// chanid is chanid, starttime is startime of prorgram in
+// chanid is chanid, starttime is startime of program in
 //   # of seconds since Jan 1, 1970, in UTC time.  Same format as in
 //   a ProgramInfo structure in a string list.
 // Return structure is [number of rows] followed by a triplet of values:
@@ -3515,7 +3515,7 @@ void MainServer::HandleCutlistQuery(const QString &chanid,
 {
 // Cutlist query
 // Format:  QUERY_CUTLIST <chanid> <starttime>
-// chanid is chanid, starttime is startime of prorgram in
+// chanid is chanid, starttime is startime of program in
 //   # of seconds since Jan 1, 1970, in UTC time.  Same format as in
 //   a ProgramInfo structure in a string list.
 // Return structure is [number of rows] followed by a triplet of values:
@@ -3530,7 +3530,7 @@ void MainServer::HandleBookmarkQuery(const QString &chanid,
                                      PlaybackSock *pbs)
 // Bookmark query
 // Format:  QUERY_BOOKMARK <chanid> <starttime>
-// chanid is chanid, starttime is startime of prorgram in
+// chanid is chanid, starttime is startime of program in
 //   # of seconds since Jan 1, 1970, in UTC time.  Same format as in
 //   a ProgramInfo structure in a string list.
 // Return value is a long-long encoded as two separate values
@@ -3562,7 +3562,7 @@ void MainServer::HandleSetBookmark(QStringList &tokens,
 {
 // Bookmark query
 // Format:  SET_BOOKMARK <chanid> <starttime> <long part1> <long part2>
-// chanid is chanid, starttime is startime of prorgram in
+// chanid is chanid, starttime is startime of program in
 //   # of seconds since Jan 1, 1970, in UTC time.  Same format as in
 //   a ProgramInfo structure in a string list.  The two longs are the two
 //   portions of the bookmark value to set.

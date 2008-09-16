@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: upnpcdstv.cpp
 //                                                                            
-// Purpose - uPnp Content Directory Extention for Recorded TV  
+// Purpose - uPnp Content Directory Extension for Recorded TV  
 //                                                                            
 // Created By  : David Blain                    Created On : Jan. 24, 2005
 // Modified By :                                Modified On:                  

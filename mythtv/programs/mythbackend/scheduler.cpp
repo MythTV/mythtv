@@ -2939,7 +2939,7 @@ void Scheduler::AddNewRecords(void)
         p->schedulerid =
             p->startts.toString() + "_" + p->chanid;
 
-        // Chedk to see if the program is currently recording and if
+        // Check to see if the program is currently recording and if
         // the end time was changed.  Ideally, checking for a new end
         // time should be done after PruneOverlaps, but that would
         // complicate the list handling.  Do it here unless it becomes

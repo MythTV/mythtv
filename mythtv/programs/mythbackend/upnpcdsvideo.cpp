@@ -1,6 +1,6 @@
 // Program Name: upnpcdsvideo.cpp
 //                                                                            
-// Purpose - uPnp Content Directory Extention for MythVideo Videos
+// Purpose - uPnp Content Directory Extension for MythVideo Videos
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 

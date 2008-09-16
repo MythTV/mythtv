@@ -116,7 +116,7 @@ size_t AutoExpire::GetDesiredSpace(int fsID) const
 }
 
 /** \fn AutoExpire::CalcParams()
- *   Calcualtes how much space needs to be cleared, and how often.
+ *   Calculates how much space needs to be cleared, and how often.
  */
 void AutoExpire::CalcParams()
 {
@@ -144,7 +144,7 @@ void AutoExpire::CalcParams()
 
     // we use this copying on purpose. The used_encoders map ensures
     // that every encoder writes only to one fs.
-    // Copying the data minizes the time the lock is held
+    // Copying the data minimizes the time the lock is held
     instance_lock.lock();
     QMap<int, int>::const_iterator ueit = used_encoders.begin();
     while (ueit != used_encoders.end())
@@ -163,7 +163,7 @@ void AutoExpire::CalcParams()
         fsMap[fsit->fsID] = 0;
         size_t thisKBperMin = 0;
 
-        // append unkown recordings to all fsIDs
+        // append unknown recordings to all fsIDs
         vector<int>::iterator unknownfs_it = fsEncoderMap[-1].begin();
         for (; unknownfs_it != fsEncoderMap[-1].end(); ++unknownfs_it)
             fsEncoderMap[fsit->fsID].push_back(*unknownfs_it);
@@ -251,10 +251,10 @@ void AutoExpire::CalcParams()
  *  \brief This contains the main loop for the auto expire process.
  *
  *   Responsible for cleanup of old LiveTV programs as well as deleting as
- *   many expireable recordings as necessary to maintain enough free space
- *   on all directories in MythTV Storage Groups.  The thread deletes short
- *   LiveTV programs every 2 minutes and long LiveTV and regular programs
- *   as needed every "desired_freq" minutes.
+ *   many recordings that are expirable as necessary to
+ *   maintain enough free space on all directories in MythTV Storage Groups.
+ *   The thread deletes short LiveTV programs every 2 minutes and long
+ *   LiveTV and regular programs as needed every "desired_freq" minutes.
  */
 void AutoExpire::RunExpirer(void)
 {
@@ -270,7 +270,7 @@ void AutoExpire::RunExpirer(void)
     while (expire_thread_running)
     {
         curTime = QDateTime::currentDateTime();
-        // recalculate auto expire parametes
+        // recalculate auto expire parameters
         if (curTime >= next_expire)
             CalcParams();
 
@@ -453,7 +453,7 @@ void AutoExpire::ExpireRecordings(void)
             }
 
             VERBOSE(VB_FILE,
-                    "    Searching for expireable files in these directories");
+                    "    Searching for files expirable in these directories");
             QString myHostName = gContext->GetHostName();
             pginfolist_t::iterator it = expireList.begin();
             while ((it != expireList.end()) &&
@@ -515,7 +515,7 @@ void AutoExpire::ExpireRecordings(void)
                     fsit->freeSpaceKB += (p->filesize / 1024);
                     deleteList.push_back(p);
 
-                    VERBOSE(VB_FILE, QString("        FOUND Expireable file. "
+                    VERBOSE(VB_FILE, QString("        FOUND file expirable. "
                             "%1 @ %2 is located at %3 which is on fsID #%4. "
                             "Adding to deleteList.  After deleting we should "
                             "have %5 MB free on this filesystem.")
@@ -855,21 +855,21 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
     {
         default:
         case emOldestFirst:
-            msg = "Adding expirable programs in Oldest First order";
+            msg = "Adding programs expirable in Oldest First order";
             where = "autoexpire > 0";
             if (gContext->GetNumSetting("AutoExpireWatchedPriority", 0))
                 orderby = "recorded.watched DESC, ";
             orderby += "starttime ASC";
             break;
         case emLowestPriorityFirst:
-            msg = "Adding expirable programs in Lowest Priority First order";
+            msg = "Adding programs expirable in Lowest Priority First order";
             where = "autoexpire > 0";
             if (gContext->GetNumSetting("AutoExpireWatchedPriority", 0))
                 orderby = "recorded.watched DESC, ";
             orderby += "recorded.recpriority ASC, starttime ASC";
             break;
         case emWeightedTimePriority:
-            msg = "Adding expirable programs in Weighted Time Priority order";
+            msg = "Adding programs expirable in Weighted Time Priority order";
             where = "autoexpire > 0";
             if (gContext->GetNumSetting("AutoExpireWatchedPriority", 0))
                 orderby = "recorded.watched DESC, ";

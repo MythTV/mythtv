@@ -705,8 +705,8 @@ int main(int argc, char **argv)
         (chanid.isEmpty() || starttime.isEmpty()) && infile.isEmpty())
     {
         cerr << "--generate-preview must be accompanied by either " <<endl
-             << "\nboth --chanid and --starttime paramaters, " << endl
-             << "\nor the --infile paramater." << endl;
+             << "\nboth --chanid and --starttime parameters, " << endl
+             << "\nor the --infile parameter." << endl;
         return BACKEND_EXIT_INVALID_CMDLINE;
     }
 

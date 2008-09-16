@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: upnpcdsmusic.cpp
 //                                                                            
-// Purpose - uPnp Content Directory Extention for Music  
+// Purpose - uPnp Content Directory Extension for Music  
 //                                                                            
 // Created By  : David Blain                    Created On : Jan. 24, 2005
 // Modified By :                                Modified On:                  
