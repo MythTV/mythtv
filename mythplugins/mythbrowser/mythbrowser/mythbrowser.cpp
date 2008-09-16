@@ -19,13 +19,12 @@ using namespace std;
 
 MythBrowser::MythBrowser (MythScreenStack *parent, const char *name,
                   QStringList &urlList, float zoom)
-       : MythScreenType (parent, name)
+    : MythScreenType (parent, name),
+      m_urlList(urlList),  m_pageList(NULL),
+      m_progressBar(NULL), m_titleText(NULL),
+      m_statusText(NULL),  m_currentBrowser(-1),
+      m_zoom(zoom),        m_menuPopup(NULL)
 {
-    m_currentBrowser = -1;
-    m_zoom = zoom;
-    m_urlList = urlList;
-
-    m_menuPopup = NULL;
 }
 
 MythBrowser::~MythBrowser()

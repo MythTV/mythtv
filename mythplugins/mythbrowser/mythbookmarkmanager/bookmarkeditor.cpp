@@ -18,21 +18,19 @@
  */
 BookmarkEditor::BookmarkEditor(Bookmark *site, bool edit,
                                MythScreenStack *parent, const char *name)
-    : MythScreenType (parent, name)
+    : MythScreenType (parent, name),
+      m_site(site),               m_siteName(""),
+      m_siteCategory(),           m_editing(edit),
+      m_titleText(NULL),          m_categoryEdit(NULL),
+      m_nameEdit(NULL),           m_urlEdit(NULL),
+      m_okButton(NULL),           m_cancelButton(NULL),
+      m_findCategoryButton(NULL), m_searchDialog(NULL)
 {
-    m_categoryEdit = m_nameEdit = m_urlEdit = NULL;
-    m_okButton = m_cancelButton = NULL;
-
-    m_site = site;
-    m_editing = edit;
-
     if (m_editing)
     {
         m_siteCategory = m_site->category;
         m_siteName = m_site->name;
     }
-    else
-        m_siteName = "";
 }
 
 BookmarkEditor::~BookmarkEditor()

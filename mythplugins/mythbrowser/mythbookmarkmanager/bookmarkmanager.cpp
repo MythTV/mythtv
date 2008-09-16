@@ -22,13 +22,11 @@ using namespace std;
 // ---------------------------------------------------
 
 BrowserConfig::BrowserConfig(MythScreenStack *parent, const char *name)
-               : MythScreenType(parent, name)
+    : MythScreenType(parent, name),
+      m_commandEdit(NULL),     m_zoomEdit(NULL),
+      m_descriptionText(NULL), m_titleText(NULL),
+      m_okButton(NULL),        m_cancelButton(NULL)
 {
-    m_commandEdit = NULL;
-    m_zoomEdit = NULL;
-    m_descriptionText = NULL;
-    m_okButton = NULL;
-    m_cancelButton = NULL;
 }
 
 bool BrowserConfig::Create()
