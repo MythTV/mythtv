@@ -225,11 +225,14 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
         return ret;
     }
 
-    udevinfo->setReadChannel(QProcess::StandardError);
-
-    while (!stream.atEnd())
+    if (print_verbose_messages & VB_MEDIA+VB_EXTRA)
     {
-        VERBOSE(VB_MEDIA+VB_EXTRA, msg + stream.readLine());
+        udevinfo->setReadChannel(QProcess::StandardError);
+
+        while (!stream.atEnd())
+        {
+            VERBOSE(VB_MEDIA+VB_EXTRA, msg + stream.readLine());
+        }
     }
 
     udevinfo->setReadChannel(QProcess::StandardOutput);
