@@ -451,6 +451,8 @@ void XMLTV_generic_config::save()
     QString filename = QString("%1/%2.xmltv")
         .arg(MythContext::GetConfDir()).arg(parent.getSourceName());
 
+    gContext->SaveSetting(QString("XMLTVConfig.%1").arg(parent.getSourceName()), filename);
+
     command = QString("%1 --config-file '%2' --configure")
         .arg(grabber).arg(filename);
 

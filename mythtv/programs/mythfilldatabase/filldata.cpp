@@ -103,7 +103,7 @@ bool FillData::DataDirectUpdateChannels(Source source)
         logged_in  = source.userid;
         raw_lineup = source.id;
     }
-  
+
     if (ok)
         DataDirectStationUpdate(source, false);
 
@@ -111,7 +111,7 @@ bool FillData::DataDirectUpdateChannels(Source source)
 }
 
 bool FillData::grabDDData(Source source, int poffset,
-                          QDate pdate, int ddSource) 
+                          QDate pdate, int ddSource)
 {
     if (source.dd_dups.empty())
         ddprocessor.SetCacheData(false);
@@ -155,7 +155,7 @@ bool FillData::grabDDData(Source source, int poffset,
     if (needtoretrieve)
     {
         VERBOSE(VB_GENERAL, "Retrieving datadirect data.");
-        if (dd_grab_all) 
+        if (dd_grab_all)
         {
             VERBOSE(VB_GENERAL, "Grabbing ALL available data.");
             if (!ddprocessor.GrabAllData())
@@ -315,9 +315,20 @@ bool FillData::grabData(Source source, int offset, QDate *qCurrentDate)
 
     QString filename = QString(tempfilename);
 
-    QString home = QDir::homeDirPath();
-    QString configfile = QString("%1/%2.xmltv").arg(MythContext::GetConfDir())
+    QString configfile = gContext->GetSetting(QString("XMLTVConfig.%1")
+                                                .arg(source.name),"");
+
+    if (configfile.isEmpty())
+    {
+
+        VERBOSE(VB_GENERAL, "XMLTVConfig entry in settings table missing, "
+                            "falling back to old behavior");
+        QString home = QDir::homeDirPath();
+        configfile = QString("%1/%2.xmltv").arg(MythContext::GetConfDir())
                                                        .arg(source.name);
+    }
+
+    VERBOSE(VB_GENERAL, QString("XMLTV config file is: %1").arg(configfile));
 
     QString command  = QString("nice %1 --config-file '%2' --output %3")
                             .arg(xmltv_grabber.ascii())
@@ -709,14 +720,14 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
 
             for (int i = 0; i < grabdays; i++)
             {
-                // We need to check and see if the current date has changed 
+                // We need to check and see if the current date has changed
                 // since we started in this loop.  If it has, we need to adjust
                 // the value of 'i' to compensate for this.
                 if (QDate::currentDate() != qCurrentDate)
                 {
                     QDate newDate = QDate::currentDate();
                     i += (newDate.daysTo(qCurrentDate));
-                    if (i < 0) 
+                    if (i < 0)
                         i = 0;
                     qCurrentDate = newDate;
                 }
@@ -764,7 +775,7 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                                "GROUP BY c.chanid;";
 
                     if (query.exec(querystr.arg(i-1).arg(i).arg((*it).id)) &&
-                        query.isActive()) 
+                        query.isActive())
                     {
                         VERBOSE(VB_CHANNEL, QString(
                                 "Checking program counts for day %1").arg(i-1));
@@ -782,7 +793,7 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                         }
 
                         if (query.exec(querystr.arg(i).arg(i+1).arg((*it).id))
-                                && query.isActive()) 
+                                && query.isActive())
                         {
                             VERBOSE(VB_CHANNEL, QString("Checking program "
                                                 "counts for day %1").arg(i));
@@ -824,7 +835,7 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                             VERBOSE(VB_GENERAL, QString(
                                     "Data refresh needed because no data "
                                     "exists for day @ offset %1 from 8PM - "
-                                    "midnight.").arg(i)); 
+                                    "midnight.").arg(i));
                             download_needed = true;
                         }
                         else if (previousDayCount == 0)
@@ -834,7 +845,7 @@ bool FillData::fillData(QValueList<Source> &sourcelist)
                                     "exists for day @ offset %1 from 8PM - "
                                     "midnight.  Unable to calculate how much "
                                     "we should have for the current day so "
-                                    "a refresh is being forced.").arg(i-1)); 
+                                    "a refresh is being forced.").arg(i-1));
                             download_needed = true;
                         }
                         else if (currentDayCount < (currentChanCount * 3))
@@ -1019,7 +1030,7 @@ void FillData::readXawtvChannels(int id, QString xawrcfile)
 
                 if (!strncmp(strLine.c_str(), "channel", 7))
                 {
-                    channel = strLine.substr(nSplitPoint, 
+                    channel = strLine.substr(nSplitPoint,
                                              strLine.size()).c_str();
                 }
                 else if (!strncmp(strLine.c_str(), "fine", 4))
