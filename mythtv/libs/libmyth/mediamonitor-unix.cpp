@@ -378,7 +378,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
     QList<MythMediaDevice*>::const_iterator itr = m_Devices.begin();
     for (; itr != m_Devices.end(); ++itr)
     {
-        if (stat((*itr)->getDevicePath(), &sb) < 0)
+        if (stat((*itr)->getDevicePath().toLocal8Bit().constData(), &sb) < 0)
         {
             statError(":AddDevice()", (*itr)->getDevicePath());
             return false;
@@ -533,12 +533,13 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
                                  || *pit == "slaves"  || *pit == "subsystem")
                 continue;
 
-            found_partitions |= FindPartitions(sysfs.absFilePath(*pit), false);
+            found_partitions |= FindPartitions(
+                sysfs.absoluteFilePath(*pit), false);
         }
 
         // no partitions on block device, use main device
         if (!found_partitions)
-            found_partitions |= FindPartitions(sysfs.absPath(), false);
+            found_partitions |= FindPartitions(sysfs.absolutePath(), false);
 
         return found_partitions;
     }
@@ -608,13 +609,24 @@ void MediaMonitorUnix::CheckDeviceNotifications(void)
             // check if removeable
             QFile removable(dev + "/removable");
             if (removable.exists() &&
-                removable.open(IO_ReadOnly))
+                removable.open(QIODevice::ReadOnly))
             {
-                int c = removable.getch();
+                char    c   = 0;
+                QString msg = LOC + ":CheckDeviceNotifications() '"
+                              + dev + "/removable' ";
+                bool    ok  = removable.getChar(&c);
                 removable.close();
 
-                if (c == '1')
-                    FindPartitions((*it).section(' ', 1, 1), true);
+                if (ok)
+                {
+                    VERBOSE(VB_MEDIA+VB_EXTRA, msg + c);
+                    if (c == '1')
+                        FindPartitions(dev, true);
+                }
+                else
+                {
+                    VERBOSE(VB_IMPORTANT, msg + "failed");
+                }
             }
         }
         else if ((*it).startsWith("remove"))
