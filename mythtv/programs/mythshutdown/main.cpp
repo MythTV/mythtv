@@ -388,9 +388,7 @@ int setScheduledWakeupTime()
         if (add)
             restarttime = restarttime.addSecs((-1) * add);
 
-        QString wakeup_timeformat = gContext->GetSetting("WakeupTimeFormat",
-                                                            "yyyy-MM-ddThh:mm");
-        setWakeupTime(restarttime.toString(wakeup_timeformat));
+        setWakeupTime(restarttime.toString(Qt::ISODate));
 
         return true;
     }
