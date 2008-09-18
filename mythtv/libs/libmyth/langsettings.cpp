@@ -81,19 +81,19 @@ void LanguageSettings::load(QString module_name)
         unload(module_name);
         
         // install translator
+        QString      lang  = d.m_language.toLower();
         QTranslator *trans = new QTranslator(0);
         if (trans->load(GetTranslationsDir() + module_name
-                        + "_" + d.m_language.toLower() + ".qm", "."))
+                        + "_" + lang + ".qm", "."))
         {
             qApp->installTranslator(trans);
             d.m_translators[module_name] = trans;
         }
         else
         {
-            if (d.m_language.toLower() != "en_gb")
-                VERBOSE(VB_IMPORTANT,
-                        "Cannot load language " + d.m_language.toLower()
-                        + " for module " + module_name);
+            if (!lang.startsWith("en"))
+                VERBOSE(VB_IMPORTANT, "Cannot load language " + lang
+                                      + " for module " + module_name);
         }
     }
 }
