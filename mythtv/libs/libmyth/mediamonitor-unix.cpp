@@ -211,7 +211,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
 
     if (!udevinfo->waitForStarted(2000 /*ms*/))
     {
-        VERBOSE(VB_IMPORTANT, msg + ", Error failed to start!");
+        VERBOSE(VB_IMPORTANT, msg + ", Error - udevinfo failed to start!");
         udevinfo->deleteLater();
         return ret;
     }
@@ -219,19 +219,20 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     if (!udevinfo->waitForFinished(2000 /*ms*/))
     {
         VERBOSE(VB_IMPORTANT,
-                msg + ", Error failed to end! Terminating udevinfo process");
+                msg + ", Error - udevinfo failed to end! Terminating");
         udevinfo->kill();
         udevinfo->deleteLater();
         return ret;
     }
 
-    if (print_verbose_messages & VB_MEDIA+VB_EXTRA)
+    if (print_verbose_messages & VB_MEDIA+VB_EXTRA) 
     {
         udevinfo->setReadChannel(QProcess::StandardError);
 
         while (!stream.atEnd())
         {
-            VERBOSE(VB_MEDIA+VB_EXTRA, msg + stream.readLine());
+            VERBOSE(VB_MEDIA+VB_EXTRA,
+                    msg + " - udevinfo error...\n" + stream.readLine());
         }
     }
 
@@ -244,7 +245,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
     udevinfo->deleteLater();
 #endif // linux
 
-    VERBOSE(VB_MEDIA, msg + " -> " + ret);
+    VERBOSE(VB_MEDIA, msg + "->'" + ret + "'");
     return ret;
 }
 
@@ -277,8 +278,7 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
     }
 #endif // linux
 
-    VERBOSE(VB_MEDIA, "MediaMonitorUnix::GetCDROMBlockDevices() returning "
-                      + l.join(", "));
+    VERBOSE(VB_MEDIA, LOC + ":GetCDROMBlockDevices()->'" + l.join(", ") + "'");
     return l;
 }
 
@@ -324,7 +324,7 @@ static void LookupModel(MythMediaDevice* device)
             file.close();
         }
 
-        file.setName(path + "model");
+        file.setFileName(path + "model");
         if (file.open(QIODevice::ReadOnly))
         {
             QTextStream stream(&file);
@@ -365,7 +365,7 @@ bool MediaMonitorUnix::AddDevice(MythMediaDevice* pDevice)
     dev_t new_rdev;
     struct stat sb;
 
-    if (stat(path, &sb) < 0)
+    if (stat(path.toLocal8Bit().constData(), &sb) < 0)
     {
         statError(":AddDevice()", path);
         return false;
