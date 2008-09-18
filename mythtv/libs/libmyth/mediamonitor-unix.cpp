@@ -261,19 +261,19 @@ QStringList MediaMonitorUnix::GetCDROMBlockDevices(void)
     QFile file("/proc/sys/dev/cdrom/info");
     if (file.open(QIODevice::ReadOnly))
     {
+        QString     line;
         QTextStream stream(&file);
-        QString line;
-        while (!stream.atEnd())
+        do
         {
             line = stream.readLine();
             if (line.startsWith("drive name:"))
             {
-                QStringList devs = line.split('\t', QString::SkipEmptyParts);
-
-                devs.pop_front();   // Remove 'drive name:' field
-                l += devs;
+                l = line.split('\t', QString::SkipEmptyParts);
+                l.pop_front();   // Remove 'drive name:' field
+                break;           // file should only contain one drive table?
             }
         }
+        while (!stream.atEnd());
         file.close();
     }
 #endif // linux
