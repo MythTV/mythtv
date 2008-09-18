@@ -15,3 +15,6 @@ mingw {
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress
 }
+
+# Trigger rebuilds if installed MythTV libs have changed
+include (../../targetdep.pro)

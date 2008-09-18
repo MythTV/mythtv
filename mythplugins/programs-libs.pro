@@ -10,3 +10,6 @@ mac:using_firewire:using_backend:LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVide
 
 # On Windows, libs are stored with the binaries:
 mingw:LIBS += -L$${PREFIX}/bin
+
+# Trigger rebuilds if installed MythTV libs have changed
+include (../../targetdep.pro)
