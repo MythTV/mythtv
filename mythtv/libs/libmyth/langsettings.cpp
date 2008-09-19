@@ -104,9 +104,9 @@ void LanguageSettings::unload(QString module_name)
     if (it != d.m_translators.end())
     {
         // found translator, remove it from qApp and our map
-        qApp->removeTranslator(it.data());
-        delete it.data();
-        d.m_translators.remove(it);
+        qApp->removeTranslator(*it);
+        delete *it;
+        d.m_translators.erase(it);
     }
 }
 

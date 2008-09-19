@@ -1,10 +1,7 @@
-#include <iostream>
-using namespace std;
-
-#include <qpixmap.h>
-#include <qimage.h>
-#include <qapplication.h>
-#include <Q3Frame>
+#include <QPixmap>
+#include <QImage>
+#include <QApplication>
+#include <QFrame>
 #include <QKeyEvent>
 
 #include "virtualkeyboard.h"
@@ -25,7 +22,7 @@ VirtualKeyboard::VirtualKeyboard(MythMainWindow *parent,
                     bool setsize)
             : MythThemedDialog(parent, name, setsize)
 {
-    setFrameStyle(Q3Frame::Panel | Q3Frame::Raised);
+    setFrameStyle(QFrame::Panel | QFrame::Raised);
     setLineWidth(1);
     m_parentEdit = parentEdit;
 

@@ -39,7 +39,7 @@ int MythPlugin::init(const char *libversion)
     QString error_msg(dlerror());
     if (error_msg.isEmpty())
     {
-        QByteArray libname = QLibrary::library().toAscii();
+        QByteArray libname = QLibrary::fileName().toAscii();
         (void)dlopen(libname.constData(), RTLD_LAZY);
         error_msg = dlerror();
     }
@@ -119,7 +119,7 @@ MythPluginManager::MythPluginManager()
 
     filterDir.setFilter(QDir::Files | QDir::Readable);
     QString filter = GetPluginsNameFilter();
-    filterDir.setNameFilter(filter);
+    filterDir.setNameFilters(QStringList(filter));
 
     gContext->SetDisableLibraryPopup(true);
 
@@ -274,8 +274,8 @@ void MythPluginManager::orderMenuPlugins(void)
     QMap<QString, MythPlugin *>::iterator iter = menuPluginMap.begin();
     for (; iter != menuPluginMap.end(); ++iter)
     {
-        if (iter.data()->isEnabled())
-            menuPluginList.push_back(iter.data());
+        if ((*iter)->isEnabled())
+            menuPluginList.push_back(*iter);
     }
 }
 
