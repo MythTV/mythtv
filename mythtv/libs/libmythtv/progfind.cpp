@@ -20,6 +20,7 @@
 #include <QEvent>
 #include <QPixmap>
 #include <QPaintEvent>
+#include <QPainter>
 
 #include <unistd.h>
 #include <time.h>

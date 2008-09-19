@@ -8,6 +8,7 @@
 #include <qregexp.h>
 #include <q3header.h>
 #include <QPaintEvent>
+#include <QPainter>
 #include <QPixmap>
 #include <QKeyEvent>
 

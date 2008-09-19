@@ -4,6 +4,7 @@
 #include "sr_dialog.h"
 
 #include <QPixmap>
+#include <QPainter>
 #include <QKeyEvent>
 #include <QPaintEvent>
 

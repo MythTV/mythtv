@@ -9,6 +9,7 @@
 #include <QKeyEvent>
 #include <QPixmap>
 #include <QPaintEvent>
+#include <QPainter>
 
 #include <unistd.h>
 #include <stdlib.h>

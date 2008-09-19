@@ -10,6 +10,7 @@
 #include <q3header.h>
 #include <QEvent>
 #include <QPaintEvent>
+#include <QPainter>
 #include <QPixmap>
 #include <QKeyEvent>
 

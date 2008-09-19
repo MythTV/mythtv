@@ -15,6 +15,7 @@ using namespace std;
 #include <QEvent>
 #include <QPixmap>
 #include <QPaintEvent>
+#include <QPainter>
 
 #include "mythwidgets.h"
 #include "mythdialogs.h"

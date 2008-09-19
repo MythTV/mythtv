@@ -10,6 +10,7 @@
 #include <QKeyEvent>
 #include <QPixmap>
 #include <QPaintEvent>
+#include <QPainter>
 
 #include <iostream>
 #include <map>
