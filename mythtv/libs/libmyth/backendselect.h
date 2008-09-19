@@ -6,6 +6,10 @@
 
 #include "libmythupnp/upnpdevice.h"
 
+// define this to add a search button. In Nigel's testing, an extra ssdp
+// doesn't get any extra responses, so it is disabled by default.
+//#define SEARCH_BUTTON
+
 class DatabaseParams;
 
 class ListBoxDevice : public Q3ListBoxText
@@ -49,7 +53,9 @@ class BackendSelect : public MythDialog
 
         void Accept    (void);   ///< Linked to the OK button
         void Manual    (void);   ///< Linked to 'Configure Manually' button
-        //void Search    (void);
+#ifdef SEARCH_BUTTON
+        void Search    (void);
+#endif
 
 
     protected:

@@ -156,7 +156,9 @@ void BackendSelect::CreateUI(void)
     MythPushButton *cancel;
     MythPushButton *manual;
     MythPushButton *OK;
-    //MythPushButton *search;   // I don't see the need for this?
+#ifdef SEARCH_BUTTON
+    MythPushButton *search;
+#endif
 
 
     label = new QLabel(tr("Please select default Myth Backend Server"), this);
@@ -166,23 +168,30 @@ void BackendSelect::CreateUI(void)
     OK         = new MythPushButton(tr("OK"), this);
     cancel     = new MythPushButton(tr("Cancel"), this);
     manual     = new MythPushButton(tr("Configure Manually"), this);
-    //search     = new MythPushButton(tr("Search"), this);
+#ifdef SEARCH_BUTTON
+    search     = new MythPushButton(tr("Search"), this);
+#endif
 
 
-    layout = new QGridLayout(this);//this, 5, 5, 40);
+    layout = new QGridLayout(this);
     layout->setContentsMargins(40,40,40,40);
     layout->addWidget(label, 0, 1, 1, 3);
     layout->addWidget(m_backends, 1, 0, 1, 5);
 
+#ifdef SEARCH_BUTTON
+    layout->addWidget(search, 4, 0);
+    layout->addWidget(manual, 4, 1, 1, 2);
+#else
     layout->addWidget(manual, 4, 0, 1, 2);
-    //layout->addWidget(search, 4, 0);
-    //layout->addWidget(manual, 4, 1);
+#endif
     layout->addWidget(cancel, 4, 3);
     layout->addWidget(OK    , 4, 4);
 
 
     connect(m_backends, SIGNAL(accepted(int)), SLOT(Accept()));
-    //connect(search,     SIGNAL(clicked()),     SLOT(Search()));
+#ifdef SEARCH_BUTTON
+    connect(search,     SIGNAL(clicked()),     SLOT(Search()));
+#endif
     connect(manual,     SIGNAL(clicked()),     SLOT(Manual()));
     connect(cancel,     SIGNAL(clicked()),     SLOT(reject()));
     connect(OK,         SIGNAL(clicked()),     SLOT(Accept()));
@@ -282,7 +291,9 @@ void BackendSelect::RemoveItem(QString USN)
     }
 }
 
-//void BackendSelect::Search(void)
-//{
-//    UPnp::PerformSearch(gBackendURI);
-//}
+#ifdef SEARCH_BUTTON
+void BackendSelect::Search(void)
+{
+    UPnp::PerformSearch(gBackendURI);
+}
+#endif
