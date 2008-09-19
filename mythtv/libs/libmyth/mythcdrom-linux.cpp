@@ -573,7 +573,7 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
     dev_t new_rdev;
     struct stat sb;
 
-    if (stat(path, &sb) < 0)
+    if (stat(path.toLocal8Bit().constData(), &sb) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC + ":isSameDevice() -- " +
                 QString("Failed to stat '%1'")
@@ -583,7 +583,7 @@ bool MythCDROMLinux::isSameDevice(const QString &path)
     new_rdev = sb.st_rdev;
 
     // Check against m_DevicePath...
-    if (stat(m_DevicePath, &sb) < 0)
+    if (stat(m_DevicePath.toLocal8Bit().constData(), &sb) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC + ":isSameDevice() -- " +
                 QString("Failed to stat '%1'")
@@ -613,7 +613,8 @@ void MythCDROMLinux::setSpeed(int speed)
     memset(cmd, 0, sizeof(cmd));
     memset(&st, 0, sizeof(st));
 
-    if ((fd = open(m_DevicePath, O_RDWR | O_NONBLOCK)) == -1)
+    if ((fd = open(m_DevicePath.toLocal8Bit().constData(),
+                   O_RDWR | O_NONBLOCK)) == -1)
     {
         VERBOSE(VB_MEDIA, LOC_ERR + "Changing CD/DVD speed needs write access");
         return;
