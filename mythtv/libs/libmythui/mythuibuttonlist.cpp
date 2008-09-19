@@ -658,13 +658,6 @@ void MythUIButtonList::Init()
 
     m_contentsRect.CalculateArea(m_Area);
 
-    if (!buttontemplate)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "UI XML file is missing 'buttonitem' statetype.");
-        return;
-    }
-
     buttontemplate->SetVisible(false);
 
     MythRect buttonItemArea;
@@ -1055,6 +1048,8 @@ void MythUIButtonListItem::setText(const QString &text, const QString &name)
     }
     else
         m_text = text;
+
+    m_parent->Update();
 }
 
 const MythImage* MythUIButtonListItem::image() const
