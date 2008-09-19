@@ -998,7 +998,7 @@ int MythContextPrivate::ChooseBackend(const QString &error)
             m_XML->Save();
             break;
         case kDialogCodeButton1:
-            if (BEsel->GetPIN().length())
+            if (BEsel->m_PIN.length())
                 m_XML->SetValue(kDefaultPIN, BEsel->m_PIN);
             m_XML->SetValue(kDefaultUSN, BEsel->m_USN);
             m_XML->Save();
