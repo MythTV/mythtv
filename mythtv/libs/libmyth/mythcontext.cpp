@@ -9,7 +9,7 @@
 #include <QDebug>
 
 #ifdef QT3SUPPORT
-#include <Q3Network>
+#include <q3network.h>
 #else
 #warning Qt3 networking disabled...
 #endif // !QT3SUPPORT
@@ -1947,12 +1947,12 @@ bool MythContext::TestPopupVersion(const QString &name,
     if (libversion == pluginversion)
         return true;
 
-    QString err = "Plugin %1 (%2) is not compatible\n"
-                  "with the installed MythTV libraries (%3).\n"
-                  "Please recompile the plugin after a make distclean";
+    QString err = tr("Plugin %1 (%2) is not compatible\n"
+                     "with the installed MythTV libraries (%3).\n"
+                     "Please recompile the plugin after a make distclean");
 
     if (GetMainWindow() && !d->disablelibrarypopup)
-        ShowOkPopup(tr(err).arg(name).arg(pluginversion).arg(libversion));
+        ShowOkPopup(err.arg(name).arg(pluginversion).arg(libversion));
 
     return false;
 }

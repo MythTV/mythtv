@@ -8,7 +8,7 @@ target.path = $${LIBDIR}
 INSTALLS = target
 
 QT += network xml opengl sql qt3support
-qt3support:DEFINES += QT3SUPPORT
+DEFINES += QT3SUPPORT
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
