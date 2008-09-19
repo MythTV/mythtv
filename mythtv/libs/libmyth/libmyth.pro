@@ -7,6 +7,9 @@ CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
+QT += network xml opengl sql qt3support
+qt3support:DEFINES += QT3SUPPORT
+
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
@@ -190,8 +193,5 @@ contains( CONFIG_LIBA52, yes ) {
 contains( CONFIG_LIBFFTW3, yes ) {
     LIBS += -lfftw3f
 }
-
-#The following line was inserted by qt3to4
-QT += network xml opengl sql qt3support
 
 include ( ../libs-targetfix.pro )
