@@ -1229,13 +1229,10 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
 {
     if (app_binary_version != MYTH_BINARY_VERSION)
     {
-        QString warning =
-                QString("This app was compiled against libmyth version: %1"
-                "\n\t\t\tbut the library is version: %2"
-                "\n\t\t\tYou probably want to recompile everything, and do a"
-                "\n\t\t\t'make distclean' first.")
+        QString warning = tr("This application (%1) is not compatible\n" 
+                             "with the installed MythTV libraries (%2).\n" 
+                             "Please recompile after a make distclean")
                 .arg(app_binary_version).arg(MYTH_BINARY_VERSION);
-
         if (gui)
         {
             d->TempMainWindow(false);
