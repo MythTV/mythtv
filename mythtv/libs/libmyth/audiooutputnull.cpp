@@ -22,7 +22,7 @@ using namespace std;
 
 AudioOutputNULL::AudioOutputNULL(const AudioSettings &settings) :
     AudioOutputBase(settings),
-    pcm_output_buffer_mutex(false),
+    pcm_output_buffer_mutex(QMutex::NonRecursive),
     current_buffer_size(0),
     locked_audio_channels(settings.channels),
     locked_audio_bits(settings.bits),

@@ -20,6 +20,10 @@
 
 using namespace std;
 
+#define LOC      QString("AudioOuputOSS: ")
+#define LOC_WARN QString("AudioOuputOSS, Warning: ")
+#define LOC_ERR  QString("AudioOuputOSS, Error: ")
+
 #include "mythcontext.h"
 #include "audiooutputoss.h"
 #include "util.h"
@@ -299,7 +303,8 @@ void AudioOutputOSS::VolumeInit()
 
     if (mixerfd < 0)
     {
-        cerr << "Unable to open mixer: '" << (const char *)device << "'\n";
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("Unable to open mixer: '%1'").arg(device));
         return;
     }
 
@@ -309,17 +314,19 @@ void AudioOutputOSS::VolumeInit()
         volume = gContext->GetNumSetting("MasterMixerVolume", 80);
         tmpVol = (volume << 8) + volume;
         int ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_VOLUME), &tmpVol);
-        if (ret < 0) {
-            VERBOSE(VB_IMPORTANT, QString("Error Setting initial Master Volume"));
-            perror("Setting master volume: ");
+        if (ret < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Error Setting initial Master Volume") + ENO);
         }
 
         volume = gContext->GetNumSetting("PCMMixerVolume", 80);
         tmpVol = (volume << 8) + volume;
         ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_PCM), &tmpVol);
-        if (ret < 0) {
-            VERBOSE(VB_IMPORTANT, QString("Error setting initial PCM Volume"));
-            perror("Setting PCM volume: ");
+        if (ret < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Error setting initial PCM Volume") + ENO);
         }
     }
 }

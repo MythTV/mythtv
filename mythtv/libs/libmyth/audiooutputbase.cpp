@@ -62,7 +62,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     raud(0),                    waud(0),
     audbuf_timecode(0),
 
-    numlowbuffer(0),            killAudioLock(false),
+    numlowbuffer(0),            killAudioLock(QMutex::NonRecursive),
     current_seconds(-1),        source_bitrate(-1),
 
     memory_corruption_test0(0xdeadbeef),

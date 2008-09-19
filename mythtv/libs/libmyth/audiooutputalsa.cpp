@@ -20,8 +20,9 @@ using namespace std;
 
 AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
     AudioOutputBase(settings),
-    pcm_handle(NULL),             numbadioctls(0),
-    killAudioLock(false),         mixer_handle(NULL),
+    pcm_handle(NULL),
+    numbadioctls(0),
+    mixer_handle(NULL),
     mixer_control(QString::null)
 {
     // Set everything up
@@ -51,7 +52,8 @@ bool AudioOutputALSA::OpenDevice()
     VERBOSE(VB_GENERAL, QString("Opening ALSA audio device '%1'.")
             .arg(real_device));
 
-    err = snd_pcm_open(&pcm_handle, real_device,
+    QByteArray dev_ba = real_device.toLocal8Bit();
+    err = snd_pcm_open(&pcm_handle, dev_ba.constData(),
                        SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
 
     if (err < 0)

@@ -10,8 +10,11 @@
 class OutputListeners;
 class OutputEvent;
 
+#include <vector>
+using namespace std;
+
 #include <QMutex>
-#include <Q3PtrList>
+#include <QList>
 
 #include "mythobservable.h"
 
@@ -72,6 +75,7 @@ private:
     int brate, freq, prec, chan;
 };
 
+typedef vector<MythTV::Visual*> Visuals;
 
 class MPUBLIC OutputListeners : public MythObservable
 {
@@ -81,7 +85,7 @@ public:
 
     void addVisual(MythTV::Visual *);
     void removeVisual(MythTV::Visual *);
-    
+
     QMutex *mutex() { return &mtx; }
 
     void setBufferSize(unsigned int sz) { bufsize = sz; }
@@ -89,14 +93,14 @@ public:
 
 protected:
     void error(const QString &e);
-    void dispatchVisual(uchar *b, unsigned long b_len, 
+    void dispatchVisual(uchar *b, unsigned long b_len,
                        unsigned long written, int chan, int prec);
     void prepareVisuals();
 
 private:
-    QMutex mtx;
-    Q3PtrList<MythTV::Visual> visuals;
-    
+    QMutex       mtx;
+    Visuals      visuals;
+
     unsigned int bufsize;
 };
 

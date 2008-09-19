@@ -4,8 +4,11 @@
 // warranty, or liability of any kind.
 //
 
-#include <qobject.h>
-#include <qapplication.h>
+#include <algorithm>
+using namespace std;
+
+#include <QObject>
+#include <QApplication>
 
 #include "output.h"
 #include "visual.h"
@@ -23,22 +26,25 @@ OutputListeners::~OutputListeners()
 
 void OutputListeners::error(const QString &e) {
     QObject *object = firstListener();
-    while (object) {
-	QApplication::postEvent(object, new OutputEvent(e));
-	object = nextListener();
+    while (object)
+    {
+        QApplication::postEvent(object, new OutputEvent(e));
+        object = nextListener();
     }
 }
 
 void OutputListeners::addVisual(MythTV::Visual *v)
 {
-    if (visuals.find(v) == -1) {
-       visuals.append(v);
-    }
+    Visuals::iterator it = std::find(visuals.begin(), visuals.end(), v);
+    if (it == visuals.end())
+        visuals.push_back(v);
 }
 
 void OutputListeners::removeVisual(MythTV::Visual *v)
 {
-    visuals.remove(v);
+    Visuals::iterator it = std::find(visuals.begin(), visuals.end(), v);
+    if (it != visuals.end())
+        visuals.erase(it);
 }
 
 void OutputListeners::dispatchVisual(uchar *buffer, unsigned long b_len,
@@ -47,24 +53,20 @@ void OutputListeners::dispatchVisual(uchar *buffer, unsigned long b_len,
     if (! buffer)
        return;
 
-    MythTV::Visual *visual = visuals.first();
-    while (visual) {
-       visual->mutex()->lock();
-       visual->add(buffer, b_len, written, chan, prec);
-       visual->mutex()->unlock();
-
-       visual = visuals.next();
+    Visuals::iterator it = visuals.begin();
+    for (; it != visuals.end(); ++it)
+    {
+        QMutexLocker locker((*it)->mutex());
+        (*it)->add(buffer, b_len, written, chan, prec);
     }
 }
 
 void OutputListeners::prepareVisuals()
 {
-    MythTV::Visual *visual = visuals.first();
-    while (visual) {
-       visual->mutex()->lock();
-       visual->prepare();
-       visual->mutex()->unlock();
-
-       visual = visuals.next();
+    Visuals::iterator it = visuals.begin();
+    for (; it != visuals.end(); ++it)
+    {
+        QMutexLocker locker((*it)->mutex());
+        (*it)->prepare();
     }
 }
