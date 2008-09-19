@@ -455,7 +455,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
     if (!is_supermount)
     {
         if (is_cdrom)
-            pDevice = MythCDROM::get(this, QString(mep->fs_spec),
+            pDevice = MythCDROM::get(this, mep->fs_spec,
                                      is_supermount, m_AllowEject);
     }
     else
@@ -473,7 +473,7 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
             strncpy(devstr, dev, len);
             devstr[len] = 0;
             if (is_cdrom)
-                pDevice = MythCDROM::get(this, QString(devstr),
+                pDevice = MythCDROM::get(this, devstr,
                                          is_supermount, m_AllowEject);
         }
         else
