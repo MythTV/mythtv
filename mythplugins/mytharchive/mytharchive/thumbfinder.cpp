@@ -6,6 +6,7 @@
 #include <qapplication.h>
 #include <qfileinfo.h>
 #include <qsqldatabase.h>
+#include <QPainter>
 
 // myth
 #include <mythtv/mythcontext.h>

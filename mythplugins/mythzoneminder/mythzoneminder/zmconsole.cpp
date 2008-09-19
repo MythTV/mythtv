@@ -22,6 +22,7 @@
 #include <qdir.h>
 #include <qtimer.h>
 #include <qapplication.h>
+#include <QGridLayout>
 #include <QKeyEvent>
 
 // myth

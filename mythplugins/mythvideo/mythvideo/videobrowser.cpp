@@ -2,6 +2,7 @@
 #include <algorithm>
 
 #include <QPixmap>
+#include <QPainter>
 #include <QPaintEvent>
 #include <QKeyEvent>
 

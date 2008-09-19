@@ -12,6 +12,7 @@
 #include <qdir.h>
 #include <qimage.h>
 #include <qbitmap.h>
+#include <QPainter>
 //Added by qt3to4:
 #include <QLabel>
 #include <QStringList>

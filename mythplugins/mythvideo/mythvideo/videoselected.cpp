@@ -17,6 +17,7 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QApplication>
 #include <QStringList>
 #include <QPixmap>
+#include <QPainter>
 #include <QPaintEvent>
 #include <QKeyEvent>
 

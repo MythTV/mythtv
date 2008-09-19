@@ -20,6 +20,8 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <QPixmap>
 #include <QKeyEvent>
 #include <QPaintEvent>
+#include <QPainter>
+#include <QFile>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/xmlparse.h>

@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QPixmap>
 #include <QLabel>
+#include <QPainter>
 
 #include <mythtv/xmlparse.h>
 #include <mythtv/mythcontext.h>
