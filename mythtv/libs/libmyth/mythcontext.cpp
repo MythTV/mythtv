@@ -1,4 +1,3 @@
-#include <q3network.h>
 #include <QPixmap>
 #include <QImage>
 #include <qurl.h>
@@ -8,6 +7,12 @@
 #include <qdesktopwidget.h>
 #include <qpainter.h>
 #include <QDebug>
+
+#ifdef QT3SUPPORT
+#include <Q3Network>
+#else
+#warning Qt3 networking disabled...
+#endif // !QT3SUPPORT
 
 #include <cmath>
 #include <queue>
@@ -46,7 +51,7 @@
 #endif
 
 MythContext *gContext = NULL;
-QMutex avcodeclock(true);
+QMutex avcodeclock(QMutex::Recursive);
 
 // Some common UPnP search and XML value strings
 const QString gBackendURI = "urn:schemas-mythtv-org:device:MasterMediaServer:1";
@@ -554,7 +559,7 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
 
     if (!createDir.exists())
     {
-        if (!createDir.mkdir(dirpath, true))
+        if (!createDir.mkdir(dirpath))
         {
             VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg(dirpath));
             return false;
@@ -993,7 +998,7 @@ int MythContextPrivate::ChooseBackend(const QString &error)
             m_XML->Save();
             break;
         case kDialogCodeButton1:
-            if (BEsel->m_PIN.length())
+            if (BEsel->GetPIN().length())
                 m_XML->SetValue(kDefaultPIN, BEsel->m_PIN);
             m_XML->SetValue(kDefaultUSN, BEsel->m_USN);
             m_XML->Save();
@@ -1091,7 +1096,7 @@ int MythContextPrivate::UPnPautoconf(const int milliSeconds)
 
     // Get this backend's location:
     backends->Lock();
-    DeviceLocation *BE = backends->GetEntryMap()->begin().data();
+    DeviceLocation *BE = *(backends->GetEntryMap()->begin());
     backends->Unlock();
     backends->Release();
 
@@ -1209,7 +1214,9 @@ MythContext::MythContext(const QString &binversion)
     }
 #endif
 
+#ifdef QT3SUPPORT
     q3InitNetworkProtocols();
+#endif // QT3SUPPORT
 
     d = new MythContextPrivate(this);
     assert(d);
@@ -1256,7 +1263,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
     }
 #endif
 
-    if (QDir::homeDirPath() == "/" && ! getenv("MYTHCONFDIR"))
+    if (QDir::homePath() == "/" && ! getenv("MYTHCONFDIR"))
     {
         QString warning = "Cannot locate your home directory."
                           " Please set the environment variable HOME";
@@ -1691,7 +1698,7 @@ QImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
 
     if (ret)
     {
-        QImage image(data);
+        QImage image = QImage::fromData(data);
         if (image.width() > 0)
             return d->m_ui->CacheImage(url, image);
     }
@@ -1855,17 +1862,14 @@ bool MythContext::CheckProtoVersion(MythSocket* socket)
 
         if (d->m_ui && d->m_ui->IsScreenSetup())
         {
-            MythPopupBox::showOkPopup(d->mainWindow,
-                                      "Connection failure",
-                                      tr(QString("The server uses network "
-                                                 "protocol version %1, "
-                                                 "but this client only "
-                                                 "understands version %2.  "
-                                                 "Make sure you are running "
-                                                 "compatible versions of "
-                                                 "the backend and frontend."))
-                                                 .arg(strlist[1])
-                                                 .arg(MYTH_PROTO_VERSION));
+            MythPopupBox::showOkPopup(
+                d->mainWindow,
+                "Connection failure",
+                tr("The server uses network protocol version %1, "
+                   "but this client only understands version %2.  "
+                   "Make sure you are running compatible versions of "
+                   "the backend and frontend.")
+                .arg(strlist[1]).arg(MYTH_PROTO_VERSION));
         }
         return false;
     }

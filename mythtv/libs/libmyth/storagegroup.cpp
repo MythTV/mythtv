@@ -155,7 +155,7 @@ QString StorageGroup::FindRecordingDir(QString filename)
         QString testFile = m_dirlist[curDir] + "/" + filename;
         VERBOSE(VB_FILE, LOC + QString("FindRecordingDir: Checking '%1'")
                 .arg(m_dirlist[curDir]));
-        checkFile.setName(testFile);
+        checkFile.setFileName(testFile);
         if (checkFile.exists())
         {
             QString tmp = m_dirlist[curDir];
@@ -171,7 +171,7 @@ QString StorageGroup::FindRecordingDir(QString filename)
         // Not found in any dir, so try RecordFilePrefix if it exists
         QString tmpFile =
             gContext->GetSetting("RecordFilePrefix") + "/" + filename;
-        checkFile.setName(tmpFile);
+        checkFile.setFileName(tmpFile);
         if (checkFile.exists())
             result = tmpFile;
     }
@@ -287,7 +287,7 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
         }
         else
         {
-            testFile.setName(dirname + "/.test");
+            testFile.setFileName(dirname + "/.test");
             if (testFile.open(IO_WriteOnly))
                 testFile.remove();
             else
@@ -378,7 +378,7 @@ StorageGroupEditor::StorageGroupEditor(QString group) :
     if (group == "Default")
         dispGroup = QObject::tr("Default");
     else if (StorageGroup::kSpecialGroups.contains(group))
-        dispGroup = QObject::tr(group);
+        dispGroup = QObject::tr(group.toLatin1().constData());
 
     if (gContext->GetSetting("MasterServerIP","master") ==
             gContext->GetSetting("BackendServerIP","me"))
@@ -608,7 +608,7 @@ void StorageGroupListEditor::doDelete(void)
     if (name == "Default")
         dispGroup = QObject::tr("Default");
     else if (StorageGroup::kSpecialGroups.contains(name))
-        dispGroup = QObject::tr(name);
+        dispGroup = QObject::tr(name.toLatin1().constData());
 
     QString message = tr("Delete '%1' Storage Group?").arg(dispGroup);
 
@@ -690,7 +690,8 @@ void StorageGroupListEditor::Load(void)
         groupName = StorageGroup::kSpecialGroups[curGroup];
         if (names.contains(groupName))
         {
-            listbox->addSelection(QObject::tr(groupName), groupName);
+            listbox->addSelection(
+                QObject::tr(groupName.toLatin1().constData()), groupName);
             createAddSpecialGroupButton[curGroup] = false;
         }
         else
