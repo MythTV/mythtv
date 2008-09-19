@@ -14,11 +14,10 @@
 
 
 BackendSelect::BackendSelect(MythMainWindow *parent, DatabaseParams *params)
-             : MythDialog(parent, "BackEnd Selection", TRUE)
+    : MythDialog(parent, "BackEnd Selection", true),
+      m_PIN(QString::null), m_USN(QString::null),
+      m_DBparams(params), m_parent(parent), m_backends(NULL)
 {
-    m_parent   = parent;
-    m_DBparams = params;
-
     CreateUI();
 
     UPnp::PerformSearch(gBackendURI);
@@ -36,7 +35,7 @@ BackendSelect::~BackendSelect()
     ItemMap::iterator it;
     for (it = m_devices.begin(); it != m_devices.end(); ++it)
     {
-        ListBoxDevice *item = it.data();
+        ListBoxDevice *item = *it;
 
         if (item != NULL)
             delete item;
@@ -121,7 +120,8 @@ bool BackendSelect::Connect(DeviceLocation *dev)
 
         case UPnPResult_HumanInterventionRequired:
             VERBOSE(VB_UPNP, error);
-            MythPopupBox::showOkPopup(m_parent, "", tr(message));
+            MythPopupBox::showOkPopup(m_parent, "",
+                                      tr(message.toLatin1().constData()));
             break;
 
         case UPnPResult_ActionNotAuthorized:
@@ -130,7 +130,8 @@ bool BackendSelect::Connect(DeviceLocation *dev)
             do
             {
                 m_PIN = MythPopupBox::showPasswordPopup(
-                    m_parent, "Backend PIN entry", tr(message));
+                    m_parent, "Backend PIN entry",
+                    tr(message.toLatin1().constData()));
                 stat = xml->GetConnectionInfo(m_PIN, m_DBparams, message);
             }
             while (stat == UPnPResult_ActionNotAuthorized);
@@ -168,11 +169,12 @@ void BackendSelect::CreateUI(void)
     //search     = new MythPushButton(tr("Search"), this);
 
 
-    layout = new QGridLayout(this, 5, 5, 40);
-    layout->addMultiCellWidget(label, 0, 0, 1, 3);
-    layout->addMultiCellWidget(m_backends, 1, 1, 0, 4);
+    layout = new QGridLayout(this);//this, 5, 5, 40);
+    layout->setContentsMargins(40,40,40,40);
+    layout->addWidget(label, 0, 1, 1, 3);
+    layout->addWidget(m_backends, 1, 0, 1, 5);
 
-    layout->addMultiCellWidget(manual, 4, 4, 0, 1);
+    layout->addWidget(manual, 4, 0, 1, 2);
     //layout->addWidget(search, 4, 0);
     //layout->addWidget(manual, 4, 1);
     layout->addWidget(cancel, 4, 3);
@@ -240,7 +242,7 @@ void BackendSelect::FillListBox(void)
 
     for (it = pMap->begin(); it != pMap->end(); ++it)
     {
-        pDevLoc = (DeviceLocation *)it.data();
+        pDevLoc = (DeviceLocation *)*it;
 
         if (!pDevLoc)
             continue;
@@ -255,7 +257,7 @@ void BackendSelect::FillListBox(void)
 
     for (it = ourMap.begin(); it != ourMap.end(); ++it)
     {
-        pDevLoc = (DeviceLocation *)it.data();
+        pDevLoc = (DeviceLocation *)*it;
         AddItem(pDevLoc);   // this does a Release()
     }
 }
@@ -276,7 +278,7 @@ void BackendSelect::RemoveItem(QString USN)
         if (item != NULL)
             delete item;
 
-        m_devices.remove(it);
+        m_devices.erase(it);
     }
 }
 
