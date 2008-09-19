@@ -15,7 +15,7 @@ RemoteFile::RemoteFile(const QString &_path, bool useRA, int _retries) :
     usereadahead(useRA),  retries(_retries),
     filesize(-1),         timeoutisfast(false),
     readposition(0),      recordernum(0),
-    lock(false),
+    lock(QMutex::NonRecursive),
     controlSock(NULL),    sock(NULL),
     query("QUERY_FILETRANSFER %1")
 {

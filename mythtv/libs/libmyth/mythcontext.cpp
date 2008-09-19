@@ -208,7 +208,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_gui(false), m_backend(false),
       m_localhostname(QString::null),
       m_UPnP(NULL), m_XML(NULL), m_HTTP(NULL),
-      serverSockLock(false),
+      serverSockLock(QMutex::NonRecursive),
       attemptingToConnect(false),
       mainWindow(NULL),
       serverSock(NULL), eventSock(NULL),
