@@ -11,6 +11,7 @@ using namespace std;
 #include <qapplication.h>
 #include <q3url.h>
 #include <qwidget.h>
+#include <QFile>
 
 // mythtv
 #include <mythtv/mythcontext.h>
