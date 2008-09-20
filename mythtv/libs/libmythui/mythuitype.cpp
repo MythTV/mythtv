@@ -41,6 +41,23 @@ MythUIType::~MythUIType()
     delete m_Fonts;
 }
 
+void MythUIType::Reset()
+{
+    // Reset the widget to it's original state, should not reset changes made
+    // by the theme
+
+    // Reset all children
+    QMutableListIterator<MythUIType *> it(m_ChildrenList);
+    while (it.hasNext())
+    {
+        it.next();
+        MythUIType *type = it.value();
+        type->Reset();
+    }
+
+    SetRedraw();
+}
+
 void MythUIType::AddChild(MythUIType *child)
 {
     if (!child)
@@ -58,9 +75,11 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
     bool onlyWidgets = (inheritsClass && qstrcmp(inheritsClass, "QWidget") == 0)
 ;
     const QLatin1String oName(objName);
-    for (int i = 0; i < children.size(); ++i) {
+    for (int i = 0; i < children.size(); ++i)
+    {
         QObject *obj = children.at(i);
-        if (onlyWidgets) {
+        if (onlyWidgets)
+        {
             if (obj->isWidgetType() && (!objName || obj->objectName() == oName))
                 return obj;
         } else if ((!inheritsClass || obj->inherits(inheritsClass))
@@ -86,7 +105,8 @@ MythUIType *MythUIType::GetChild(const QString &name)
 void MythUIType::DeleteChild(const QString &name)
 {
     QMutableListIterator<MythUIType *> it(m_ChildrenList);
-    while (it.hasNext()) {
+    while (it.hasNext())
+    {
         it.next();
         MythUIType *type = it.value();
         if (type->objectName() == name)

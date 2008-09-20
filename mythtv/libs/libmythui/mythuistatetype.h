@@ -33,11 +33,10 @@ class MythUIStateType : public MythUIType
     MythUIType* GetState(const QString &name);
     MythUIType* GetState(StateType state);
 
-    void Reset();
+    void Reset(void);
+    void Clear(void);
 
   protected:
-    void ClearMaps();
-
     virtual bool ParseElement(QDomElement &element);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);

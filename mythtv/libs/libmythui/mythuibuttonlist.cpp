@@ -131,6 +131,7 @@ void MythUIButtonList::Reset()
     m_itemCount   = 0;
 
     SetPositionArrowStates();
+    MythUIType::Reset();
 }
 
 void MythUIButtonList::Update()
@@ -1222,7 +1223,8 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
 
     MythUIText *text;
     QMap<QString, QString>::iterator string_it = m_strings.begin();
-    while (string_it != m_strings.end()) {
+    while (string_it != m_strings.end())
+    {
         text = dynamic_cast<MythUIText *>
                                     (buttonstate->GetChild(string_it.key()));
         if (text)
@@ -1232,7 +1234,8 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
 
     MythUIImage *image;
     QMap<QString, MythImage*>::iterator image_it = m_images.begin();
-    while (image_it != m_images.end()) {
+    while (image_it != m_images.end())
+    {
         image = dynamic_cast<MythUIImage *>
                                     (buttonstate->GetChild(image_it.key()));
         if (image)

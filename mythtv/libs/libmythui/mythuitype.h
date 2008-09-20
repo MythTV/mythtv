@@ -28,6 +28,8 @@ class MythUIType : public QObject, public XMLParseBase
     MythUIType(QObject *parent, const QString &name);
     virtual ~MythUIType();
 
+    virtual void Reset(void);
+
     void AddChild(MythUIType *child);
     MythUIType *GetChild(const QString &name);
     MythUIType *GetChildAt(const QPoint &p, bool recursive=true);

@@ -15,6 +15,8 @@ class MythUIGroup : public MythUIType
     MythUIGroup(MythUIType *parent, const QString &name);
    ~MythUIGroup();
 
+    void Reset(void);
+
   protected:
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);

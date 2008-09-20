@@ -20,6 +20,8 @@ class MythUIText : public MythUIType, public StorageUser
                MythUIType *parent, const QString &name);
     ~MythUIText();
 
+    void Reset(void);
+
     void SetText(const QString &text);
     QString GetText(void) const;
     QString GetDefaultText(void) const;

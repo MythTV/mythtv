@@ -23,6 +23,12 @@ MythUIProgressBar::~MythUIProgressBar()
 
 }
 
+void MythUIProgressBar::Reset()
+{
+    m_total = m_start = m_current = 0;
+    MythUIType::Reset();
+}
+
 bool MythUIProgressBar::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "layout")

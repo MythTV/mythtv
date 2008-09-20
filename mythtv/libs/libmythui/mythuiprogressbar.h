@@ -17,6 +17,8 @@ class MythUIProgressBar : public MythUIType
     MythUIProgressBar(MythUIType *parent, const QString &name);
    ~MythUIProgressBar();
 
+    void Reset(void);
+
     enum LayoutType { LayoutVertical, LayoutHorizontal };
     enum EffectType { EffectReveal, EffectSlide, EffectAnimate };
 

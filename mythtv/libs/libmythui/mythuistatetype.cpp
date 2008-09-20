@@ -157,7 +157,7 @@ MythUIType *MythUIStateType::GetState(StateType state)
     return NULL;
 }
 
-void MythUIStateType::ClearMaps()
+void MythUIStateType::Clear()
 {
     QMap<QString, MythUIType *>::Iterator i;
     for (i = m_ObjectsByName.begin(); i != m_ObjectsByName.end(); ++i)
@@ -175,12 +175,12 @@ void MythUIStateType::ClearMaps()
     m_ObjectsByState.clear();
 
     m_CurrentState = NULL;
+    SetRedraw();
 }
 
 void MythUIStateType::Reset()
 {
-    ClearMaps();
-    SetRedraw();
+    MythUIType::Reset();
 }
 
 bool MythUIStateType::ParseElement(QDomElement &element)
@@ -235,7 +235,7 @@ void MythUIStateType::CopyFrom(MythUIType *base)
     if (!st)
         return;
 
-    ClearMaps();
+    Clear();
 
     m_ShowEmpty = st->m_ShowEmpty;
 

@@ -10,6 +10,11 @@ MythUIGroup::~MythUIGroup()
 {
 }
 
+void MythUIGroup::Reset()
+{
+    MythUIType::Reset();
+}
+
 bool MythUIGroup::ParseElement(QDomElement &element)
 {
     return MythUIType::ParseElement(element);

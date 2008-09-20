@@ -58,6 +58,13 @@ MythUIText::~MythUIText()
     }
 }
 
+void MythUIText::Reset()
+{
+    m_Message = m_DefaultMessage;
+    m_Area = m_drawRect = m_OrigDisplayRect;
+    MythUIType::Reset();
+}
+
 void MythUIText::SetText(const QString &text)
 {
     if (text == m_Message)

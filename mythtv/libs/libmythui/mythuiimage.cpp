@@ -110,12 +110,6 @@ void MythUIImage::SetDelay(int delayms)
     m_CurPos = 0;
 }
 
-void MythUIImage::ResetFilename(void)
-{
-    m_Filename = m_OrigFilename;
-    Load();
-}
-
 void MythUIImage::SetImage(MythImage *img)
 {
     Clear();
@@ -300,8 +294,9 @@ bool MythUIImage::Load(void)
 
 void MythUIImage::Reset(void)
 {
-    Clear();
-    SetRedraw();
+    m_Filename = m_OrigFilename;
+    Load();
+    MythUIType::Reset();
 }
 
 void MythUIImage::Pulse(void)

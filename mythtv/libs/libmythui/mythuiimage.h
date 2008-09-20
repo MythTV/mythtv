@@ -23,10 +23,6 @@ class MythUIImage : public MythUIType
 
     void SetImageCount(int low, int high);
     void SetDelay(int delayms);
-
-    // load's original
-    void ResetFilename();
-
     void SetImage(MythImage *img);
     void SetImages(QVector<MythImage *> &images);
 

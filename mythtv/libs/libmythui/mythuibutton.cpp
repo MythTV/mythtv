@@ -42,6 +42,11 @@ void MythUIButton::Init()
 
 }
 
+void MythUIButton::Reset()
+{
+    MythUIType::Reset();
+}
+
 bool MythUIButton::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "inactivefont")

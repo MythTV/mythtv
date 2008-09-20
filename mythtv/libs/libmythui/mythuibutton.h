@@ -22,11 +22,13 @@ class MythUIButton : public MythUIType
 {
     Q_OBJECT
   public:
-    enum StateType { None = 0, Normal, Disabled, Active, Selected, 
+    enum StateType { None = 0, Normal, Disabled, Active, Selected,
                      SelectedInactive };
 
     MythUIButton(MythUIType *parent, const QString &name, bool doInit = true);
    ~MythUIButton();
+
+    virtual void Reset(void);
 
     virtual void gestureEvent(MythUIType *uitype, MythGestureEvent *event);
     virtual bool keyPressEvent(QKeyEvent *);
