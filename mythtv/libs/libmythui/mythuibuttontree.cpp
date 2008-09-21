@@ -122,6 +122,7 @@ void MythUIButtonTree::SetTreeState()
             {
                 m_activeList = list;
                 list->SetActive(true);
+                emit itemSelected(list->GetItemCurrent());
                 SetCurrentNode(selectedNode);
             }
         }
@@ -172,8 +173,6 @@ bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node)
 
     if (selectedItem)
         list->SetItemCurrent(selectedItem);
-
-    //emit itemSelected(selectedItem);
 
     connect(list, SIGNAL(itemSelected(MythUIButtonListItem *)),
             SLOT(handleSelect(MythUIButtonListItem *)));
