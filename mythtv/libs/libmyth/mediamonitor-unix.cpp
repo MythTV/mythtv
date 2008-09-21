@@ -225,7 +225,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
         return ret;
     }
 
-    if (print_verbose_messages & VB_MEDIA+VB_EXTRA) 
+    if ((print_verbose_messages & VB_MEDIA+VB_EXTRA) == VB_MEDIA+VB_EXTRA)
     {
         udevinfo->setReadChannel(QProcess::StandardError);
 
