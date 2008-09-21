@@ -29,7 +29,6 @@ MythUIButtonTree::MythUIButtonTree(MythUIType *parent, const QString &name)
 
 MythUIButtonTree::~MythUIButtonTree()
 {
-    Reset();
 }
 
 void MythUIButtonTree::Init()
@@ -72,7 +71,6 @@ void MythUIButtonTree::Init()
 
 void MythUIButtonTree::SetTreeState()
 {
-    VERBOSE(VB_IMPORTANT, "SetTreeState()");
     if (!m_initialized)
         Init();
 
@@ -96,8 +94,9 @@ void MythUIButtonTree::SetTreeState()
         node = route.at(m_currentDepth);
         if (m_currentDepth != m_oldDepth)
             refreshAll = true;
-        m_oldDepth = m_currentDepth;
     }
+
+    m_oldDepth = m_currentDepth;
 
     m_visibleLists = 0;
     uint listid = 0;
@@ -109,14 +108,11 @@ void MythUIButtonTree::SetTreeState()
         list->SetVisible(false);
         list->SetActive(false);
 
-        if (node)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Selected node in list %1 is %2")
-                .arg(listid)
-                .arg(node->getString()));
-        }
+        MythGenericTree *selectedNode = NULL;
 
-        MythGenericTree *selectedNode = node->getSelectedChild();
+        if (node)
+            selectedNode = node->getSelectedChild(true);
+
         if (refreshAll || m_activeListID <= listid)
         {
             if (!UpdateList(list, node))
@@ -143,7 +139,7 @@ bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node)
 {
     disconnect(list, 0, 0, 0);
 
-    VERBOSE(VB_IMPORTANT, QString("Redraw list %1").arg(list->objectName()));
+    list->Reset();
 
     QList<MythGenericTree*> *nodelist = NULL;
 
@@ -153,8 +149,7 @@ bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node)
     if (!nodelist || nodelist->isEmpty())
         return false;
 
-    MythGenericTree *selectedNode = node->getSelectedChild();
-    list->Reset();
+    MythGenericTree *selectedNode = node->getSelectedChild(true);
 
     MythUIButtonListItem *selectedItem = NULL;
     QList<MythGenericTree*>::iterator it;
@@ -274,8 +269,6 @@ bool MythUIButtonTree::SetCurrentNode(MythGenericTree *node)
     {
         if (node == m_currentNode)
             return true;
-
-        VERBOSE(VB_IMPORTANT, QString("Set Node: %1").arg(node->getString()));
 
         m_currentNode = node;
         node->becomeSelectedChild();

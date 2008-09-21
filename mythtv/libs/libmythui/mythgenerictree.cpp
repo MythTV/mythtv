@@ -335,11 +335,45 @@ MythGenericTree* MythGenericTree::getChildAt(uint reference) const
     return m_ordered_subnodes->at(reference);
 }
 
-MythGenericTree* MythGenericTree::getSelectedChild() const
+MythGenericTree* MythGenericTree::getVisibleChildAt(uint reference) const
 {
+    if (reference >= (uint)m_ordered_subnodes->count())
+        return NULL;
+
+    QList<MythGenericTree*> *list;
+
+    if (m_currentOrderingIndex == -1)
+        list = m_subnodes;
+    else
+        list = m_ordered_subnodes;
+
+    uint n = 0;
+    for (int i = 0; i < list->size(); ++i)
+    {
+        MythGenericTree *child = list->at(i);
+        if (child->IsVisible())
+        {
+            if (n == reference)
+                return child;
+            n++;
+        }
+    }
+
+    return NULL;
+}
+
+MythGenericTree* MythGenericTree::getSelectedChild(bool onlyVisible) const
+{
+    MythGenericTree *selectedChild = NULL;
+
     if (m_selected_subnode)
-        return m_selected_subnode;
-    return getChildAt(0);
+        selectedChild = m_selected_subnode;
+    else if (onlyVisible)
+        selectedChild = getVisibleChildAt(0);
+    else
+        selectedChild = getChildAt(0);
+
+    return selectedChild;
 }
 
 void MythGenericTree::becomeSelectedChild()

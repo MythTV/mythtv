@@ -37,7 +37,8 @@ class MPUBLIC MythGenericTree
 
     QList<MythGenericTree*>::iterator getFirstChildIterator() const;
 
-    MythGenericTree *getSelectedChild() const;
+    MythGenericTree *getSelectedChild(bool onlyVisible = false) const;
+    MythGenericTree *getVisibleChildAt(uint reference) const;
     MythGenericTree *getChildAt(uint reference) const;
     MythGenericTree *getChildByName(const QString &a_name) const;
     MythGenericTree *getChildById(int an_int) const;
