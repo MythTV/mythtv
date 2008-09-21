@@ -279,6 +279,9 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
 
 void MythUIButtonList::SetValueByData(QVariant data)
 {
+    if (!m_initialized)
+        Init();
+
     for (int i = 0; i < m_itemList.size(); ++i)
     {
         MythUIButtonListItem *item = m_itemList.at(i);
@@ -292,12 +295,18 @@ void MythUIButtonList::SetValueByData(QVariant data)
 
 void MythUIButtonList::SetItemCurrent(MythUIButtonListItem* item)
 {
+    if (!m_initialized)
+        Init();
+
     m_selPosition = m_itemList.indexOf(item);
 
     if (m_selPosition == -1)
         m_selPosition = 0;
 
     m_selItem = m_itemList.at(m_selPosition);
+
+    if (m_itemsVisible == 0)
+        return;
 
     switch (m_scrollStyle)
     {
@@ -523,6 +532,9 @@ void MythUIButtonList::MoveDown(MovementUnit unit)
 
 bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
 {
+    if (!m_initialized)
+        Init();
+
     if (m_selPosition < 0)
         return false;
 

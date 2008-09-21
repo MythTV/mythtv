@@ -176,9 +176,7 @@ bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node)
     }
 
     if (selectedItem)
-    {
         list->SetItemCurrent(selectedItem);
-    }
 
     //emit itemSelected(selectedItem);
 
@@ -195,7 +193,8 @@ bool MythUIButtonTree::AssignTree(MythGenericTree *tree)
     if (!tree)
         return false;
 
-    Reset();
+    if (m_rootNode)
+        Reset();
 
     m_rootNode = tree;
     m_currentNode = m_rootNode;
@@ -206,9 +205,6 @@ bool MythUIButtonTree::AssignTree(MythGenericTree *tree)
 
 void MythUIButtonTree::Reset(void)
 {
-    for (int i = 0; i < m_buttonlists.size(); ++i)
-        m_buttonlists.at(i)->Reset();
-
     m_rootNode = m_currentNode = NULL;
     m_visibleLists = 0;
     m_currentDepth = m_oldDepth = 0;
@@ -217,6 +213,8 @@ void MythUIButtonTree::Reset(void)
     m_active = true;
 
     SetTreeState();
+
+    MythUIType::Reset();
 }
 
 bool MythUIButtonTree::SetNodeById(QList<int> route)
