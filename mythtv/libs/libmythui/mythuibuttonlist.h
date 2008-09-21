@@ -146,6 +146,8 @@ class MythUIButtonList : public MythUIType
     void itemClicked(MythUIButtonListItem* item);
 
   protected:
+    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
+                          int alphaMod, QRect clipRect);
     void Const();
     virtual void Init();
     void LoadPixmap(MythImage **pix, QDomElement &element);
@@ -188,6 +190,7 @@ class MythUIButtonList : public MythUIType
     QVector<MythUIStateType *> m_ButtonList;
 
     bool m_initialized;
+    bool m_needsUpdate;
     bool m_clearing;
 
     MythUIButtonListItem* m_topItem;

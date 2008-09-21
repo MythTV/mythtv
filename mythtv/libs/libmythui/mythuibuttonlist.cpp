@@ -60,6 +60,7 @@ void MythUIButtonList::Const(void)
     m_itemCount = 0;
 
     m_initialized      = false;
+    m_needsUpdate      = false;
     m_clearing         = false;
     m_itemHorizSpacing = 0;
     m_itemVertSpacing  = 0;
@@ -112,7 +113,7 @@ void MythUIButtonList::SetActive(bool active)
 {
     m_active = active;
     if (m_initialized)
-        SetPositionArrowStates();
+        Update();
 }
 
 void MythUIButtonList::Reset()
@@ -130,14 +131,14 @@ void MythUIButtonList::Reset()
     m_topPosition = 0;
     m_itemCount   = 0;
 
-    SetPositionArrowStates();
+    Update();
     MythUIType::Reset();
 }
 
 void MythUIButtonList::Update()
 {
-    if (m_initialized)
-        SetPositionArrowStates();
+    m_needsUpdate = true;
+    SetRedraw();
 }
 
 void MythUIButtonList::SetPositionArrowStates(void)
@@ -197,6 +198,8 @@ void MythUIButtonList::SetPositionArrowStates(void)
         else
             m_downArrow->DisplayState(MythUIStateType::Off);
     }
+
+    m_needsUpdate = false;
 }
 
 void MythUIButtonList::InsertItem(MythUIButtonListItem *item)
@@ -215,7 +218,7 @@ void MythUIButtonList::InsertItem(MythUIButtonListItem *item)
         emit itemSelected(item);
     }
 
-    SetPositionArrowStates();
+    Update();
 }
 
 void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
@@ -268,7 +271,7 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
     m_itemList.removeAt(curIndex);
     m_itemCount--;
 
-    SetPositionArrowStates();
+    Update();
 
     if (m_selItem)
         emit itemSelected(m_selItem);
@@ -312,7 +315,7 @@ void MythUIButtonList::SetItemCurrent(MythUIButtonListItem* item)
 
     m_topItem = m_itemList.at(m_topPosition);
 
-    SetPositionArrowStates();
+    Update();
 
     emit itemSelected(m_selItem);
 }
@@ -439,7 +442,7 @@ void MythUIButtonList::MoveUp(MovementUnit unit)
 
     m_topItem = m_itemList.at(m_topPosition);
 
-    SetPositionArrowStates();
+    Update();
 
     if (pos != m_selPosition)
         emit itemSelected(m_selItem);
@@ -512,7 +515,7 @@ void MythUIButtonList::MoveDown(MovementUnit unit)
 
     m_topItem = m_itemList.at(m_topPosition);
 
-    SetPositionArrowStates();
+    Update();
 
     if (pos != m_selPosition)
         emit itemSelected(m_selItem);
@@ -570,7 +573,7 @@ bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
 
     m_topItem = m_itemList.at(m_topPosition);
 
-    SetPositionArrowStates();
+    Update();
 
     emit itemSelected(m_selItem);
 
@@ -921,6 +924,12 @@ bool MythUIButtonList::ParseElement(QDomElement &element)
     return true;
 }
 
+void MythUIButtonList::DrawSelf(MythPainter *, int, int, int, QRect)
+{
+    if (m_needsUpdate)
+        SetPositionArrowStates();
+}
+
 void MythUIButtonList::CreateCopy(MythUIType *parent)
 {
     MythUIButtonList *lb = new MythUIButtonList(parent, objectName());
@@ -1183,6 +1192,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
     }
 
     buttonstate->SetVisible(true);
+    buttonstate->Reset();
 
     MythUIImage *buttonbackground = dynamic_cast<MythUIImage *>
                                         (buttonstate->GetChild("buttonbackground"));

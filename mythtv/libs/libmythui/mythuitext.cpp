@@ -60,8 +60,13 @@ MythUIText::~MythUIText()
 
 void MythUIText::Reset()
 {
-    m_Message = m_DefaultMessage;
-    m_Area = m_drawRect = m_OrigDisplayRect;
+    if (m_Message != m_DefaultMessage)
+    {
+        m_Message = m_DefaultMessage;
+        m_CutMessage = "";
+        SetRedraw();
+    }
+
     MythUIType::Reset();
 }
 
@@ -163,7 +168,7 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
     int alpha = CalcAlpha(alphaMod);
 
-    if (m_CutMessage == "")
+    if (m_CutMessage.isEmpty())
     {
         bool multiline = (m_Justification & Qt::TextWordWrap);
 

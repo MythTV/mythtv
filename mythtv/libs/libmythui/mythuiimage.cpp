@@ -62,6 +62,16 @@ void MythUIImage::Clear(void)
     }
 }
 
+void MythUIImage::Reset(void)
+{
+    if (m_Filename != m_OrigFilename)
+    {
+        m_Filename = m_OrigFilename;
+        Load();
+    }
+    MythUIType::Reset();
+}
+
 void MythUIImage::Init(void)
 {
     m_cropRect = MythRect(0,0,0,0);
@@ -290,13 +300,6 @@ bool MythUIImage::Load(void)
     SetRedraw();
 
     return true;
-}
-
-void MythUIImage::Reset(void)
-{
-    m_Filename = m_OrigFilename;
-    Load();
-    MythUIType::Reset();
 }
 
 void MythUIImage::Pulse(void)

@@ -1,5 +1,8 @@
 using namespace std;
 
+#include <iostream>
+#include "mythverbose.h"
+
 #include "mythuitype.h"
 #include "mythimage.h"
 #include "mythpainter.h"
@@ -54,8 +57,6 @@ void MythUIType::Reset()
         MythUIType *type = it.value();
         type->Reset();
     }
-
-    SetRedraw();
 }
 
 void MythUIType::AddChild(MythUIType *child)

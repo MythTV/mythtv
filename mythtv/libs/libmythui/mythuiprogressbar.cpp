@@ -26,6 +26,7 @@ MythUIProgressBar::~MythUIProgressBar()
 void MythUIProgressBar::Reset()
 {
     m_total = m_start = m_current = 0;
+    CalculatePosition();
     MythUIType::Reset();
 }
 
