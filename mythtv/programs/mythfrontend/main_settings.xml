@@ -56,6 +56,7 @@
        <text>Screen Setup Wizards</text>
        <text lang="HE">אשף הגדרות מסך</text>
        <text lang="FI">Kuvavelho</text>
+       <text lang="NB">Skjerm</text>
        <text lang="DE">Bildschirm einrichten</text>
        <action>SCREENSETUPWIZARD</action>
    </button>
