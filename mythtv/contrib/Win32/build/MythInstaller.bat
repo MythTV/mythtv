@@ -1,9 +1,10 @@
-@rem = '--*-Perl-*--
 @rem
 @rem Wrapper for bootstrapping Windows build and install.
 @rem Checks for Perl, attempts to download latest win32-packager.pl,
 @rem and then executes that with any supplied arguments.
-@rem 
+@rem
+@rem $Id$
+@rem
 
 @echo off
 
