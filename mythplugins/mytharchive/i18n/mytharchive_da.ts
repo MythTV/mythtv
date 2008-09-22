@@ -25,47 +25,47 @@
     <name>ExportNativeWizard</name>
     <message>
         <source>0 Mb</source>
-        <translation type="unfinished">0 Mb</translation>
+        <translation>0 Mb</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Næste</translation>
+        <translation>Næste</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Forrige</translation>
+        <translation>Forrige</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Afbryd</translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <source>Choose File...</source>
-        <translation type="unfinished">Vælg fil...</translation>
+        <translation>Vælg fil...</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj optagelse</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj video</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Filarkivering</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished"></translation>
+        <translation>Du skal tilføje mindst en fil til arkivet!</translation>
     </message>
     <message>
         <source>Finish</source>
-        <translation type="unfinished">Færdig</translation>
+        <translation>Færdig</translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation type="unfinished">Fjern</translation>
+        <translation>Fjern</translation>
     </message>
 </context>
 <context>
@@ -103,55 +103,55 @@
     <name>ImportNativeWizard</name>
     <message>
         <source>Back</source>
-        <translation type="unfinished">Tilbage</translation>
+        <translation>Tilbage</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation type="unfinished">Hjem</translation>
+        <translation>Hjem</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Næste</translation>
+        <translation>Næste</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Forrige</translation>
+        <translation>Forrige</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Afbryd</translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <source>Myth Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Filarkivering</translation>
     </message>
     <message>
         <source>You need to select a valid archive XML file!</source>
-        <translation type="unfinished"></translation>
+        <translation>Du skal vælge en gyldig arkiv-XML-fil!</translation>
     </message>
     <message>
         <source>You need to select a valid chanID!</source>
-        <translation type="unfinished"></translation>
+        <translation>Du skal vælge et gyldigt kanal-ID!</translation>
     </message>
     <message>
         <source>Finish</source>
-        <translation type="unfinished">Færdig</translation>
+        <translation>Færdig</translation>
     </message>
     <message>
         <source>Select a ChanID</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg et kanal-ID</translation>
     </message>
     <message>
         <source>Select a ChanNo</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg et kanalnummer</translation>
     </message>
     <message>
         <source>Select a Channel Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg et kanalnavn</translation>
     </message>
     <message>
         <source>Select a Callsign</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg et callsign</translation>
     </message>
 </context>
 <context>
@@ -178,19 +178,19 @@
     </message>
     <message>
         <source>Increase Font Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Forøg skriftstørrelse</translation>
     </message>
     <message>
         <source>Decrease Font Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Formindsk skriftstørrelse</translation>
     </message>
     <message>
         <source>Show Progress Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis fremskridt</translation>
     </message>
     <message>
         <source>Show Full Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis alt</translation>
     </message>
 </context>
 <context>
@@ -343,35 +343,35 @@ Tryk OK</translation>
     </message>
     <message>
         <source>Choose File...</source>
-        <translation type="unfinished">Vælg fil...</translation>
+        <translation>Vælg fil...</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj optagelse</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj video</translation>
     </message>
     <message>
         <source>Add File</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg fil</translation>
     </message>
     <message>
         <source>Don&apos;t re-encode</source>
-        <translation type="unfinished"></translation>
+        <translation>Undlad genkodning</translation>
     </message>
     <message>
         <source>New Size </source>
-        <translation type="unfinished"></translation>
+        <translation>Ny størrelse </translation>
     </message>
     <message>
         <source>Original Size </source>
-        <translation type="unfinished"></translation>
+        <translation>Oprindelig størrelse </translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished"></translation>
+        <translation>Du skal tilføje mindst en fil til arkivet!</translation>
     </message>
 </context>
 <context>
@@ -398,7 +398,7 @@ Tryk OK</translation>
     </message>
     <message>
         <source>Video format for DVD recordings, PAL or NTSC.</source>
-        <translation>Videoformat for DVD-optagelser (PAL eller NTSC).
+        <translation>Videoformat for dvd-optagelser (PAL eller NTSC).
 </translation>
     </message>
     <message>
@@ -411,11 +411,11 @@ Tryk OK</translation>
     </message>
     <message>
         <source>Location of DVD</source>
-        <translation>Sti til DVD</translation>
+        <translation>Sti til dvd</translation>
     </message>
     <message>
         <source>Which DVD drive to use when burning discs.</source>
-        <translation>Hvilket DVD-drev der skal bruges ved brænding</translation>
+        <translation>Hvilket dvd-drev der skal bruges ved brænding.</translation>
     </message>
     <message>
         <source>ffmpeg Command</source>
@@ -455,7 +455,7 @@ Tryk OK</translation>
     </message>
     <message>
         <source>Command to run growisofs. (Used to burn DVD&apos;s)</source>
-        <translation>Kommandoen for at køre growisofs (bruges til at brænde DVD&apos;er)</translation>
+        <translation>Kommandoen for at køre growisofs (bruges til at brænde dvd&apos;er)</translation>
     </message>
     <message>
         <source>tcrequant command</source>
@@ -517,7 +517,7 @@ Dette kan tage et par minutter.</translation>
     </message>
     <message>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
-        <translation>Det var ikke muligt at lave DVD&apos;en.  Der opstod en fejl under kørsel af scripts</translation>
+        <translation>Det var ikke muligt at lave dvd&apos;en.  Der opstod en fejl under kørsel af scripts</translation>
     </message>
     <message>
         <source>It was not possible to create the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
@@ -525,155 +525,155 @@ Dette kan tage et par minutter.</translation>
     </message>
     <message>
         <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Placering af filarkiveringens arbejdsfiler. Der kræves MEGET fri plads her.</translation>
     </message>
     <message>
         <source>DVD Drive Write Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Skrivehastighed for dvd-drev </translation>
     </message>
     <message>
         <source>This is the write speed to use when burning a DVD. Set to 0 to allow growisofs to choose the fastest available speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette er skrivehastigheden under brænding af en dvd. Sæt den til 0 for at tillade growisofs at vælge den hurtigst tilgængelige hastighed.</translation>
     </message>
     <message>
         <source>Command to play DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandoen for at afspille en dvd</translation>
     </message>
     <message>
         <source>Command to run when test playing a created DVD. &apos;Internal&apos; will use the internal MythTV player. %f will be replaced with the path to the created DVD structure eg. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandoen for at foretage en testafspilning af en ny dvd. &apos;Intern&apos; vil bruge MythTVs indbyggede afspiller. %f vil blive erstattet af stien til den oprettede dvd-struktur, f.eks. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</translation>
     </message>
     <message>
         <source>Always Encode to AC3</source>
-        <translation type="unfinished"></translation>
+        <translation>Genkod altid til AC3</translation>
     </message>
     <message>
         <source>If set audio tracks will always be re-encoded to AC3 for better compatibility with DVD players in NTSC countries.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis valgt, vil lydsporet altid blive genkodet til AC3 for bedre kompabilitet med dvd-afspillere i lande der bruger NTSC.</translation>
     </message>
     <message>
         <source>Copy remote files</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopier ikke-lokale filer</translation>
     </message>
     <message>
         <source>If set files on remote filesystems will be copied over to the local filesystem before processing. Speeds processing and reduces bandwidth on the network</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis valgt, vil filer på andre maskiner blive kopieret til det lokale filsystem før behandling. Dette gør behandlingen hurtigere og sparer båndbredde på netværket</translation>
     </message>
     <message>
         <source>Always Use Mythtranscode</source>
-        <translation type="unfinished"></translation>
+        <translation>Brug altid mythtranscode</translation>
     </message>
     <message>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis valgt, vil filer altid blive sendt igennem mythtranscode for at rette eventuelle fejl. Dette kan afhjælpe visse lydproblemer. Ignoreres hvis &apos;Brug ProjectX&apos; er valgt.</translation>
     </message>
     <message>
         <source>Use ProjectX</source>
-        <translation type="unfinished"></translation>
+        <translation>Brug ProjectX</translation>
     </message>
     <message>
         <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis valgt, bruges ProjectX til at fjerne reklamer og opdele MPEG-2 filer i stedet for mythtranscode og mythreplex.</translation>
     </message>
     <message>
         <source>Use FIFOs</source>
-        <translation type="unfinished"></translation>
+        <translation>Brug FIFOer</translation>
     </message>
     <message>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not  supported on Windows platform</source>
-        <translation type="unfinished"></translation>
+        <translation>Brug FIFOer for at sende resultatet af mplex ind i dvdauthor i stedet for at oprette midlertidige filer. Sparer tid og diskplads, men er ikke understøttet på Windows</translation>
     </message>
     <message>
         <source>Add Subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj undertekster</translation>
     </message>
     <message>
         <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis valgt, tilføjes der undertekster til dvd&apos;en. Kræver at &apos;Brug ProjectX&apos; er valgt.</translation>
     </message>
     <message>
         <source>Main Menu Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Aspektforhold for hovedmenu</translation>
     </message>
     <message>
         <source>Aspect ratio to use when creating the main menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det aspektforhold der bruges ved oprettelse af hovedmenuen.</translation>
     </message>
     <message>
         <source>Chapter Menu Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Aspektforhold for kapitelmenu</translation>
     </message>
     <message>
         <source>Aspect ratio to use when creating the chapter menu. Video means use the same aspect ratio as the associated video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det aspektforhold der bruges ved oprettelse af kapitelmenuen. &apos;Video&apos; betyder at der bruges samme aspektforhold som den tilknyttede video.</translation>
     </message>
     <message>
         <source>Date format</source>
-        <translation type="unfinished"></translation>
+        <translation>Datoformat</translation>
     </message>
     <message>
         <source>Samples are shown using today&apos;s date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prøver vises med datoen i dag.</translation>
     </message>
     <message>
         <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prøver vises med datoen i morgen.</translation>
     </message>
     <message>
         <source>Your preferred date format to use on DVD menus.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit foretrukne datoformat på dvd-menuer.</translation>
     </message>
     <message>
         <source>Time format</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsformat</translation>
     </message>
     <message>
         <source>Your preferred time format to display on DVD menus. You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit foretrukne tidsformat på dvd-menuer. Hvis du ikke vælger et format med &apos;AM&apos; eller &apos;PM&apos;, bruges der 24-timers tidsformat.</translation>
     </message>
     <message>
         <source>Default Encoder Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard kodningsprofil</translation>
     </message>
     <message>
         <source>Default encoding profile to use if a file needs re-encoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard kodningsprofil hvis det er nødvendigt at rekode en fil.</translation>
     </message>
     <message>
         <source>jpeg2yuv command</source>
-        <translation type="unfinished"></translation>
+        <translation>jpeg2yuv-kommando</translation>
     </message>
     <message>
         <source>Command to run jpeg2yuv. Part of mjpegtools package</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandoen for at køre jpeg2yuv. En del af mjpegtools-pakken</translation>
     </message>
     <message>
         <source>projectx command</source>
-        <translation type="unfinished"></translation>
+        <translation>projectx-kommando</translation>
     </message>
     <message>
         <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandoen for at køre ProjectX. Bruges til at fjerne reklamer og opdele MPEG-2 filer i stedet for mythtranscode og mythreplex.</translation>
     </message>
     <message>
         <source>MythArchive Settings (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>MythArchive indstillinger (2)</translation>
     </message>
     <message>
         <source>DVD Menu Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Indstilinger for dvd-menu</translation>
     </message>
     <message>
         <source>Video Selector</source>
-        <translation type="unfinished">Video-vælger</translation>
+        <translation>Video-vælger</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!</source>
-        <translation type="unfinished"></translation>
+        <translation>Du har ingen videoer!</translation>
     </message>
     <message>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Det var ikke muligt at importere arkivet.  Der opstod en fejl under kørsel af &apos;mytharchivehelper&apos;</translation>
     </message>
 </context>
 <context>
@@ -720,13 +720,15 @@ Tryk OK</translation>
     </message>
     <message>
         <source>MythArchive</source>
-        <translation type="unfinished"></translation>
+        <translation>Filarkivering</translation>
     </message>
     <message>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!
 
 Click OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Enten har du ingen optagelser, eller også er de ikke tilgængelige lokalt!
+
+Klik OK</translation>
     </message>
 </context>
 <context>
@@ -773,7 +775,7 @@ Tryk Ok</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Forældre-PIN:</translation>
     </message>
 </context>
 </TS>
