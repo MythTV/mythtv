@@ -3,47 +3,47 @@
 <context>
     <name>MythFlix</name>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="448"/>
+        <location filename="../mythflix/mythflix.cpp" line="413"/>
         <source>Browse Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Bläddra inställningar</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="460"/>
+        <location filename="../mythflix/mythflix.cpp" line="425"/>
         <source>Add to Top of Queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till först i kön</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="461"/>
+        <location filename="../mythflix/mythflix.cpp" line="426"/>
         <source>Add to Bottom of Queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till sist i kön</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="462"/>
+        <location filename="../mythflix/mythflix.cpp" line="427"/>
         <source>Show NetFlix Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa NetFlix sidan</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="463"/>
+        <location filename="../mythflix/mythflix.cpp" line="428"/>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
 </context>
 <context>
     <name>MythFlixConfig</name>
     <message>
-        <location filename="" line="81"/>
+        <location filename="" line="0"/>
         <source>Press MENU to set the update frequency.</source>
         <translation type="obsolete">Tryck MENY för att sätta uppdateringsfrekvensen.</translation>
     </message>
     <message>
-        <location filename="" line="81"/>
+        <location filename="" line="0"/>
         <source>Set update frequency by using the up/down arrows.
 The minimum allowed value is 30 Minutes.</source>
         <translation type="obsolete">Sätt uppdateringsfrekvensen genom att använda upp/ner-pilarna.
 Minsta tillåtna värde är 30 minuter.</translation>
     </message>
     <message>
-        <location filename="" line="81"/>
+        <location filename="" line="0"/>
         <source>Press MENU to return to feed selection.</source>
         <translation type="obsolete">Tryck MENY för att återgå till matningsval.</translation>
     </message>
@@ -51,70 +51,70 @@ Minsta tillåtna värde är 30 minuter.</translation>
 <context>
     <name>MythFlixQueue</name>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="517"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="502"/>
         <source>Manage Queue</source>
         <translation>Hantera kö</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="529"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="514"/>
         <source>Top Of Queue</source>
         <translation>Först i kön</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="530"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="515"/>
         <source>Remove From Queue</source>
         <translation>Ta bort från kö</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="534"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="519"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="182"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="183"/>
         <source>History for Queue: </source>
-        <translation type="unfinished"></translation>
+        <translation>Historia för kön:</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="184"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="185"/>
         <source>Items in Queue: </source>
-        <translation type="unfinished"></translation>
+        <translation>Nummer i kön:</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="532"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="517"/>
         <source>Move To Another Queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytta till en annan kö</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="533"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="518"/>
         <source>Show NetFlix Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa NetFlix sidan</translation>
     </message>
 </context>
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="205"/>
+        <location filename="../mythflix/newsengine.cpp" line="206"/>
         <source>Retrieve Failed. </source>
         <translation>Hämtning misslyckades. </translation>
     </message>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="225"/>
+        <location filename="../mythflix/newsengine.cpp" line="226"/>
         <source>Failed to retrieve news</source>
         <translation>Misslyckades med att hämta nyheter</translation>
     </message>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="214"/>
+        <location filename="../mythflix/newsengine.cpp" line="215"/>
         <source>No Cached News</source>
         <translation>Inga cachade nyhter</translation>
     </message>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="227"/>
+        <location filename="../mythflix/newsengine.cpp" line="228"/>
         <source>Failed to read downloaded file</source>
         <translation>Misslyckades med att läsa nerladdad fil</translation>
     </message>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="233"/>
+        <location filename="../mythflix/newsengine.cpp" line="234"/>
         <source>Showing Cached News</source>
         <translation>Visar cachade nyheter</translation>
     </message>
@@ -122,9 +122,9 @@ Minsta tillåtna värde är 30 minuter.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="179"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="180"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades</translation>
     </message>
 </context>
 <context>

@@ -66,15 +66,15 @@ Klicka på OK</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till inspelning</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till video</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished"></translation>
+        <translation>Du måste åtminstone lägga till ett objekt för att arkivera!</translation>
     </message>
 </context>
 <context>
@@ -270,19 +270,19 @@ Klicka på OK</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till inspelning</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till video</translation>
     </message>
     <message>
         <source>Add File</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till fil</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished"></translation>
+        <translation>Du behöver åtminstonde lägga till ett objekt för att arkivera!</translation>
     </message>
 </context>
 <context>
@@ -519,63 +519,63 @@ Detta kan ta ett par minuter.</translation>
     </message>
     <message>
         <source>DVD Drive Write Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Skrivhastighet för DVD</translation>
     </message>
     <message>
         <source>This is the write speed to use when burning a DVD. Set to 0 to allow growisofs to choose the fastest available speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är skrivhastigheten som används vid bränning av DVD. Ställ in till 0 för att tillåta growisofs för att välja snabbast tillgängliga hastighet.</translation>
     </message>
     <message>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om inställt mpeg2 filer vill alltid passera igenom mythtrancode för att rena några fel.Kan hjälpa för att fastslå några audioproblem.Ignorerar om &apos;Använd ProjectX&apos; är inställt.</translation>
     </message>
     <message>
         <source>Use ProjectX</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd ProjectX</translation>
     </message>
     <message>
         <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om inställt ProjectX kommer att användas för att klippa reklamer och dela mpeg2 filer istället för mythtranscode och mythreplex.</translation>
     </message>
     <message>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not  supported on Windows platform</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Add Subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till textning</translation>
     </message>
     <message>
         <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om möjligt dethär valet kommer att lägga till textning till slutliga DVD. Begär att &apos;Använd ProjectX&apos; att vara på.</translation>
     </message>
     <message>
         <source>Default Encoder Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Omkodarens profil Default</translation>
     </message>
     <message>
         <source>Default encoding profile to use if a file needs re-encoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Förvald kodningsprofil att använda om en fil behöver omkodas.</translation>
     </message>
     <message>
         <source>projectx command</source>
-        <translation type="unfinished"></translation>
+        <translation>projectX kommando</translation>
     </message>
     <message>
         <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för att köra ProjectX.Kommer att användas för att klippa reklam och splittra mpeg filer iställer för mythtranscode och mythreplex.</translation>
     </message>
     <message>
         <source>DVD Menu Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD meny inställningar</translation>
     </message>
     <message>
         <source>Video Selector</source>
-        <translation type="unfinished">Videoväljare</translation>
+        <translation>Videoväljare</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!</source>
-        <translation type="unfinished"></translation>
+        <translation>Du har inga videos!</translation>
     </message>
 </context>
 <context>
@@ -624,7 +624,7 @@ Klicka på OK</translation>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!
 
 Click OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Antingen har du inga inspelningar eller inga inspelningar är tillgängliga lokalt!</translation>
     </message>
 </context>
 <context>

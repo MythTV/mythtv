@@ -1,25 +1,32 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name></name>
+    <name>@default</name>
     <message>
         <source>G</source>
         <comment>PL 1 default search string.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">G
+
+PL 1  förvald söksträng.</translation>
     </message>
     <message>
         <source>PG</source>
         <comment>PL 2 default search string.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PG
+PL 2 förvald söksträng.</translation>
     </message>
     <message>
         <source>PG-13</source>
         <comment>PL3 default search string.</comment>
-        <translation type="unfinished"></translation>
+        <translation>PG-13
+
+PL3 förvald söksträng</translation>
     </message>
     <message>
         <source>R:NC-17</source>
         <comment>PL4 default search string.</comment>
-        <translation type="unfinished"></translation>
+        <translation>R:NC-17
+
+PL4 förvald söksträng</translation>
     </message>
 </context>
 <context>
@@ -74,19 +81,19 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could rip a DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inga jobb och inget annat att göra. Du kan rippa en DVD.</translation>
     </message>
     <message>
         <source>No jobs and nothing else to do. You could rip a disc if you like.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inga jobb och inget annat att göra. Du kan rippa en disk om du vill.</translation>
     </message>
     <message>
         <source>New Rip</source>
-        <translation type="unfinished"></translation>
+        <translation>Ny rip</translation>
     </message>
     <message>
         <source>Cancel Job</source>
-        <translation type="unfinished"></translation>
+        <translation>Avbryt jobb</translation>
     </message>
 </context>
 <context>
@@ -710,134 +717,134 @@ Ta bort den från databasen?</translation>
     </message>
     <message>
         <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ställa in dethär värdet för alla nummer kommer göra ditt liv mycket enklare.</translation>
     </message>
     <message>
         <source>Parental Level 4 PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>Förälder nivå 4 PIN</translation>
     </message>
     <message>
         <source>This PIN is used to enter Parental Control Level 4 as well as the Video Manager.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denhär PIN är använt för att komma till barnlås nivå 4.</translation>
     </message>
     <message>
         <source>Parental Level 3 PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>Förälder nivå 4 PIN {3 ?}</translation>
     </message>
     <message>
         <source>This PIN is used to enter Parental Control Level 3.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denhär PIN används för barnlås nivå 3.</translation>
     </message>
     <message>
         <source>Parental Level 2 PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>Barnlås nivå 2 PIN</translation>
     </message>
     <message>
         <source>This PIN is used to enter Parental Control Level 2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denhär PIN används för Barnlås nivå 2.</translation>
     </message>
     <message>
         <source>Video Tree remembers last selected position</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoträdet kommer ihåg senast markerade position</translation>
     </message>
     <message>
         <source>If set, the current position in the Video Tree is persistent.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om inställt, nuvarande position i videoträdet är ständig.</translation>
     </message>
     <message>
         <source>Directories that hold videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Kataloger som kontrollerar videor</translation>
     </message>
     <message>
         <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running MythVideo.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mångfaldiga kataloger kan separeras med &apos;:&apos;. Varje katalog måste existera och vara läsbar för användaren som kör MythVideo.</translation>
     </message>
     <message>
         <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>Ställ in DVD hastighet under DVD uppspelning. Hastigheten är multipler av 177KB/s</translation>
     </message>
     <message>
         <source>Let transcode determine frame rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Låt transcode bestämma bildhastighet</translation>
     </message>
     <message>
         <source>If set, transcode will determine the frame rate automatically. If not set, 23.976 is assumed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om inställt, trancode kommer att bestämma bildrutans hastighet automatiskt. Om inte inställt, 23.976 är antaget.</translation>
     </message>
     <message>
         <source>Enable automatic Parental Level from rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Möjliggör automatisk barnlås värdighet</translation>
     </message>
     <message>
         <source>If enabled, searches will automatically set the Parental Level to the one matching the rating below.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om möjligt, sökningar vill automatiskt ställas in på barnlås till det som matchar värdet ovanför.</translation>
     </message>
     <message>
         <source>Level %1</source>
-        <translation type="unfinished">Nivå %1</translation>
+        <translation>Nivå %1</translation>
     </message>
     <message>
         <source>Ratings containing these strings (separated by :) will be assigned to Parental Level %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Värdering som innehåller dessa strängar (separerade med :) kommer vara utsett till barnlås nivå %1.</translation>
     </message>
     <message>
         <source>Theme Error: browser/playwait has an invalid area.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tema fel: Webbläsare/playwait har en ogiltigt område.</translation>
     </message>
     <message>
         <source>Theme Error: browser/novideos_info has an invalid area.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tema fel: webbläsare/novideos_info har ett ogiltigt område.</translation>
     </message>
     <message>
         <source>Manually Enter Video #</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till video manuellt #</translation>
     </message>
     <message>
         <source>Manually Enter Video Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till videotitel manuellt</translation>
     </message>
     <message>
         <source>Reset Entry</source>
-        <translation type="unfinished"></translation>
+        <translation>Nollställ inmatning</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando</translation>
     </message>
     <message>
         <source>%1 failed</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 misslyckades</translation>
     </message>
     <message>
         <source>%1
 
 Check VideoManager Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Kontrollera Videomanager inställníngar</translation>
     </message>
     <message>
         <source>Fetching poster for %1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilldragande anslag för %1 (%2)</translation>
     </message>
     <message>
         <source>A poster exists for this item but could not be retrieved within the timeout period.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Ett omslag existerar för dethär numret men kan inte hämta inom tidsramen perioden.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Theme Error: selected/playwait has an invalid area.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tema fel: markerad/playwait har ett ogiltig område.</translation>
     </message>
     <message>
         <source>None defined</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen begränsning</translation>
     </message>
 </context>
 <context>
@@ -1023,10 +1030,6 @@ Check VideoManager Settings</source>
         <translation>VÄLJ: Ändra</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Parental</source>
         <translation>Barnlås</translation>
     </message>
@@ -1139,7 +1142,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Begin Ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>Börja rippa</translation>
     </message>
 </context>
 <context>
@@ -1170,7 +1173,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>View Cast</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa fördelning</translation>
     </message>
 </context>
 <context>
@@ -1197,7 +1200,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>ok</translation>
     </message>
 </context>
 <context>
@@ -1247,7 +1250,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>View Cast</source>
-        <translation type="unfinished"></translation>
+        <translation>visa fördelning</translation>
     </message>
 </context>
 <context>
@@ -1333,58 +1336,58 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>View Cast</source>
-        <translation type="unfinished"></translation>
+        <translation>visa fördelning</translation>
     </message>
 </context>
 <context>
     <name>mythvideo_videomanager::VideoManagerImp</name>
     <message>
         <source>Select action:</source>
-        <translation type="unfinished">Välj åtgärd:</translation>
+        <translation>Välj åtgärd:</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation type="unfinished">Ändra metadata</translation>
+        <translation>Ändra metadata</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>sök</translation>
     </message>
     <message>
         <source>Manually Enter Video #</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till video manuellt #</translation>
     </message>
     <message>
         <source>Manually Enter Video Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till videotitel manuellt</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation type="unfinished">Återställ metadata</translation>
+        <translation>Återställ metadata</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
-        <translation type="unfinished">Växla bläddringsbar</translation>
+        <translation>Växla bläddringsbar</translation>
     </message>
     <message>
         <source>Remove Video</source>
-        <translation type="unfinished">Ta bort film</translation>
+        <translation>Ta bort film</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished">Filtervisning</translation>
+        <translation>Filtervisning</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Delete this file?</source>
-        <translation type="unfinished">Ta bort denna fil?</translation>
+        <translation>Ta bort denna fil?</translation>
     </message>
     <message>
         <source>delete failed</source>
-        <translation type="unfinished">borttagning misslyckades</translation>
+        <translation>borttagning misslyckades</translation>
     </message>
 </context>
 </TS>
