@@ -48,6 +48,8 @@ using namespace std;
 #ifdef CONFIG_DARWIN
 #include <mach/mach.h> 
 #include <sys/mount.h>  // for struct statfs
+#include <sys/sysctl.h>
+#include <sys/stat.h>   // for umask()
 #endif
 
 /** \fn mythCurrentDateTime()
