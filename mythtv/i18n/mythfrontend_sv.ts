@@ -491,11 +491,11 @@
     <name>DTVSignalMonitor</name>
     <message>
         <source>Seen</source>
-        <translation>Sedd</translation>
+        <translation type="obsolete">Sedd</translation>
     </message>
     <message>
         <source>Matching</source>
-        <translation>Matchar</translation>
+        <translation type="obsolete">Matchar</translation>
     </message>
 </context>
 <context>
@@ -518,11 +518,11 @@
     </message>
     <message>
         <source>Could not open card #%1</source>
-        <translation>Kunde inte öppna kort #%1</translation>
+        <translation type="obsolete">Kunde inte öppna kort #%1</translation>
     </message>
     <message>
         <source>Could not get card info for card #%1</source>
-        <translation>Kunde inte hämta kortinformation för kort #%1</translation>
+        <translation type="obsolete">Kunde inte hämta kortinformation för kort #%1</translation>
     </message>
     <message>
         <source>Analog child card settings.
@@ -530,24 +530,32 @@ WARNING: Do not press button if you are using an Air2PC HD-5000 or Avermedia A18
         <translation type="obsolete">Inställningar för analogt dotterkort.
 VARNING: Tryck inte på knappen om du använder ett Air2PC HD-5000 eller Avermedia A180-kort. Dessa kort stödjer inte analog sökning men DVB-drivrutinerna låter oss inte detektera detta problem.</translation>
     </message>
+    <message>
+        <source>Could not open card %1</source>
+        <translation>Kunde inte öppna kort %1</translation>
+    </message>
+    <message>
+        <source>Could not get card info for card %1</source>
+        <translation>Kunde inte få fram information för kort %1</translation>
+    </message>
 </context>
 <context>
     <name>DVBSignalMonitor</name>
     <message>
         <source>Signal To Noise</source>
-        <translation>Signal-till-brus</translation>
+        <translation type="obsolete">Signal-till-brus</translation>
     </message>
     <message>
         <source>Bit Error Rate</source>
-        <translation>Bitfelsfrekvens</translation>
+        <translation type="obsolete">Bitfelsfrekvens</translation>
     </message>
     <message>
         <source>Uncorrected Blocks</source>
-        <translation>Okorrigerade block</translation>
+        <translation type="obsolete">Okorrigerade block</translation>
     </message>
     <message>
         <source>Rotor Progress</source>
-        <translation>Rotorförlopp</translation>
+        <translation type="obsolete">Rotorförlopp</translation>
     </message>
 </context>
 <context>
@@ -896,6 +904,21 @@ VARNING: Tryck inte på knappen om du använder ett Air2PC HD-5000 eller Avermed
     </message>
 </context>
 <context>
+    <name>HDPVRConfigurationGroup</name>
+    <message>
+        <source>Probed info</source>
+        <translation>Undersökt info</translation>
+    </message>
+    <message>
+        <source>Failed to open</source>
+        <translation>Misslyckades att öppna</translation>
+    </message>
+    <message>
+        <source>Failed to probe</source>
+        <translation>Misslyckades att undersöka</translation>
+    </message>
+</context>
+<context>
     <name>InfoDialog</name>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
@@ -1135,43 +1158,43 @@ VARNING: Tryck inte på knappen om du använder ett Air2PC HD-5000 eller Avermed
     </message>
     <message>
         <source>There are also other clients using this database. They should be shut down first.</source>
-        <translation>Andra klienter använder databasen. Dessa borde stängas av först.</translation>
+        <translation type="obsolete">Andra klienter använder databasen. Dessa borde stängas av först.</translation>
     </message>
     <message>
         <source>Error: MythTV cannot upgrade the schema of this datatase because other clients are using it.
 
 Please shut them down before upgrading.</source>
-        <translation>Fel: MythTV kan inte uppgradera schemat för denna databas eftersom andra klienter använder den.
+        <translation type="obsolete">Fel: MythTV kan inte uppgradera schemat för denna databas eftersom andra klienter använder den.
 
 Var god och stäng av dom andar klienterna före uppgradering.</translation>
     </message>
     <message>
         <source>Warning: MythTV wants to upgrade your database schema, from %1 to %2.</source>
-        <translation>Varning: MythTV kommer att uppgradera ditt databas schema, från %1 till %2.</translation>
+        <translation type="obsolete">Varning: MythTV kommer att uppgradera ditt databas schema, från %1 till %2.</translation>
     </message>
     <message>
         <source>You can try using the old schema, but that may cause problems.</source>
-        <translation>Du kan försöka använda det gamla schemat, men det kan orsaka problem.</translation>
+        <translation type="obsolete">Du kan försöka använda det gamla schemat, men det kan orsaka problem.</translation>
     </message>
     <message>
         <source>Warning: MythTV database has newer schema (%1) than expected (%2).</source>
-        <translation>Varning: MythTV databasen har ett nyare schema (%1) än väntat (%2).</translation>
+        <translation type="obsolete">Varning: MythTV databasen har ett nyare schema (%1) än väntat (%2).</translation>
     </message>
     <message>
         <source>Error: MythTV database has newer schema (%1) than expected (%2).</source>
-        <translation>Fel: MythTV databasen har ett nyare schema (%1) än väntat (%2).</translation>
+        <translation type="obsolete">Fel: MythTV databasen har ett nyare schema (%1) än väntat (%2).</translation>
     </message>
     <message>
         <source>MythTV was unable to backup your database.</source>
-        <translation>MythTV kunde inte säkerhetskopiera din databas.</translation>
+        <translation type="obsolete">MythTV kunde inte säkerhetskopiera din databas.</translation>
     </message>
     <message>
         <source>If your system becomes unstable, a database backup file called %1 is located in %2.</source>
-        <translation>Om ditt system blir ostabilt, så finns en säkerhetskopia med namn %1 i %2.</translation>
+        <translation type="obsolete">Om ditt system blir ostabilt, så finns en säkerhetskopia med namn %1 i %2.</translation>
     </message>
     <message>
         <source>This cannot be un-done, so having a database backup would be a good idea.</source>
-        <translation>Detta kan inte ångras, så att ha en säkerhetskopia av databasen vore en god ide&apos;.</translation>
+        <translation type="obsolete">Detta kan inte ångras, så att ha en säkerhetskopia av databasen vore en god ide&apos;.</translation>
     </message>
 </context>
 <context>
@@ -2341,7 +2364,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Pre-scaling theme images</source>
-        <translation>Skalar om bilder för temat</translation>
+        <translation type="obsolete">Skalar om bilder för temat</translation>
     </message>
     <message>
         <source>Audio output device</source>
@@ -2401,15 +2424,15 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Commercial Skip Method</source>
-        <translation>Metod för reklamöverhoppning</translation>
+        <translation type="obsolete">Metod för reklamöverhoppning</translation>
     </message>
     <message>
         <source>Blank Frame + Scene Change</source>
-        <translation>Svart bild + scenbyte</translation>
+        <translation type="obsolete">Svart bild + scenbyte</translation>
     </message>
     <message>
         <source>Scene Change Detection</source>
-        <translation>Scenbyte</translation>
+        <translation type="obsolete">Scenbyte</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -2933,7 +2956,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Maximum Bitrate in kilobits/second.  2200Kbps is approximately 1 Gigabyte per hour.</source>
-        <translation>Maximal bithastighet i kbit/s. 2200kbps är ungefär 1 Gigabyte/timme.  Högre värden ger bättre kvalité men större filer.</translation>
+        <translation type="obsolete">Maximal bithastighet i kbit/s. 2200kbps är ungefär 1 Gigabyte/timme.  Högre värden ger bättre kvalité men större filer.</translation>
     </message>
     <message>
         <source>Stream Type</source>
@@ -3499,23 +3522,23 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Failed to retrieve channel information.</source>
-        <translation>Misslyckades med hämtning av kanalinformation.</translation>
+        <translation type="obsolete">Misslyckades med hämtning av kanalinformation.</translation>
     </message>
     <message>
         <source>MythTV was unable to retrieve channel information for your provider.
 Please check the terminal window for more information</source>
-        <translation>MythTV kunde inte hämta kanalinformation från din leverantör.
+        <translation type="obsolete">MythTV kunde inte hämta kanalinformation från din leverantör.
 Kontrollera terminalfönstret för mer information</translation>
     </message>
     <message>
         <source>Warning.</source>
-        <translation>Varning.</translation>
+        <translation type="obsolete">Varning.</translation>
     </message>
     <message>
         <source>You MUST run &apos;mythfilldatabase --manual the first time,
  instead of just &apos;mythfilldatabase&apos;.
 Your grabber does not provide channel numbers, so you have to set them manually.</source>
-        <translation>Du MÅSTE köra &apos;mythfilldatabase --manual&apos; första gången,
+        <translation type="obsolete">Du MÅSTE köra &apos;mythfilldatabase --manual&apos; första gången,
 istället för bara &apos;mythfilldatabase&apos;.
 Din grabber tillhandahåller inte kanalinställningar,
 så du måste ställa in dessa manuellt.</translation>
@@ -3550,7 +3573,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Configuration will run in the terminal window</source>
-        <translation>Konfigurationen kommer att köras i ett terminalfönster</translation>
+        <translation type="obsolete">Konfigurationen kommer att köras i ett terminalfönster</translation>
     </message>
     <message>
         <source>Video source setup</source>
@@ -3838,7 +3861,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Logo Detection</source>
-        <translation>Logodetektering</translation>
+        <translation type="obsolete">Logodetektering</translation>
     </message>
     <message>
         <source>Skip %1</source>
@@ -3862,11 +3885,11 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Continue WITHOUT AUDIO!</source>
-        <translation>Fortsätt UTAN LJUD!</translation>
+        <translation type="obsolete">Fortsätt UTAN LJUD!</translation>
     </message>
     <message>
         <source>Return to menu.</source>
-        <translation>Återvänd till menyn.</translation>
+        <translation type="obsolete">Återvänd till menyn.</translation>
     </message>
     <message>
         <source>Earlier Showing</source>
@@ -3915,10 +3938,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>Use select to change the channel in the program guide</source>
         <translation>Använd OK för att ändra kanal i programguiden</translation>
-    </message>
-    <message>
-        <source></source>
-        <translation></translation>
     </message>
     <message>
         <source>Visible</source>
@@ -4293,13 +4312,13 @@ så du måste ställa in dessa manuellt.</translation>
 You might want to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation>Vänta... MythTV hämtar listan med tillgängliga kanaler.
+        <translation type="obsolete">Vänta... MythTV hämtar listan med tillgängliga kanaler.
 Du kan kontrollera förloppet genom att växla till terminalfönstret
 som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Commercial Free</source>
-        <translation>Reklamfri</translation>
+        <translation type="obsolete">Reklamfri</translation>
     </message>
     <message>
         <source>Title Search</source>
@@ -5487,15 +5506,15 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Unable to initialize video.</source>
-        <translation>Kan inte initiera video.</translation>
+        <translation type="obsolete">Kan inte initiera video.</translation>
     </message>
     <message>
         <source>Error was encountered while displaying video.</source>
-        <translation>Fel uppstod vid videovisning.</translation>
+        <translation type="obsolete">Fel uppstod vid videovisning.</translation>
     </message>
     <message>
         <source>Return to Menu</source>
-        <translation>Återgå till meny</translation>
+        <translation type="obsolete">Återgå till meny</translation>
     </message>
     <message>
         <source>Single Record</source>
@@ -6025,7 +6044,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>Failed to Reinit Video.</source>
-        <translation>Misslyckades återstarta video.</translation>
+        <translation type="obsolete">Misslyckades återstarta video.</translation>
     </message>
     <message>
         <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems.</source>
@@ -6309,11 +6328,11 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>And, never ask again.</source>
-        <translation>Fråga aldrig mer.</translation>
+        <translation type="obsolete">Fråga aldrig mer.</translation>
     </message>
     <message>
         <source>And, don&apos;t ask again in this session.</source>
-        <translation>Fråga inte igen under denna session.</translation>
+        <translation type="obsolete">Fråga inte igen under denna session.</translation>
     </message>
     <message>
         <source>Category of shows to be extended</source>
@@ -6321,7 +6340,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>category name</source>
-        <translation>kategorinamn</translation>
+        <translation type="obsolete">kategorinamn</translation>
     </message>
     <message>
         <source>For a specific category (e.g. &quot;Sports event&quot;), request that shows be autoextended.  Only works if a show&apos;s category can be determined.</source>
@@ -6474,7 +6493,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for a frontend.</source>
-        <translation>Ett kommando som ska exekveras innan inspelningsservern stängs ner. Returvärdet avgör om nedstängningen ska fortsätta: 0 - ja, 1 - försök senare, 2 - vänta på uppspelningsklient.</translation>
+        <translation type="obsolete">Ett kommando som ska exekveras innan inspelningsservern stängs ner. Returvärdet avgör om nedstängningen ska fortsätta: 0 - ja, 1 - försök senare, 2 - vänta på uppspelningsklient.</translation>
     </message>
     <message>
         <source>Image file to use as the icon for this channel on various MythTV displays.</source>
@@ -7340,11 +7359,11 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>All Available Methods</source>
-        <translation>Alla tillgängliga metoder</translation>
+        <translation type="obsolete">Alla tillgängliga metoder</translation>
     </message>
     <message>
         <source>Blank Frame Detection</source>
-        <translation>Svart bild</translation>
+        <translation type="obsolete">Svart bild</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.</source>
@@ -8180,7 +8199,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Length of time the frontend waits between tries to wake up the master backend. This should be the time your masterbackend needs to startup. Set 0 to disable.</source>
-        <translation>Den tid uppspelningsklienten väntar mellan försök att väcka huvudinspelningsservern. Bör vara den tid det tar att väcka din huvudinspelningsservern. Sätt till 0 för att avaktivera.</translation>
+        <translation type="obsolete">Den tid uppspelningsklienten väntar mellan försök att väcka huvudinspelningsservern. Bör vara den tid det tar att väcka din huvudinspelningsservern. Sätt till 0 för att avaktivera.</translation>
     </message>
     <message>
         <source>EIT Scanner Options</source>
@@ -8241,7 +8260,7 @@ Kontrollera om videon existerar</translation>
     </message>
     <message>
         <source>Experimental</source>
-        <translation>Experimentell</translation>
+        <translation type="obsolete">Experimentell</translation>
     </message>
     <message>
         <source>Use Xv picture controls</source>
@@ -8770,7 +8789,7 @@ Frekvensen för denna kanal i</translation>
     </message>
     <message>
         <source>Use Global Setting</source>
-        <translation>Använd global inställning</translation>
+        <translation type="obsolete">Använd global inställning</translation>
     </message>
     <message>
         <source>Channel Options - Filters</source>
@@ -8850,11 +8869,11 @@ Frekvensen för denna kanal i</translation>
     </message>
     <message>
         <source>Upgrade</source>
-        <translation>Uppgradera</translation>
+        <translation type="obsolete">Uppgradera</translation>
     </message>
     <message>
         <source>Use current schema</source>
-        <translation>Använd nuvarande schema</translation>
+        <translation type="obsolete">Använd nuvarande schema</translation>
     </message>
     <message>
         <source>Subtitle</source>
@@ -9042,7 +9061,7 @@ Dom flesta dvb-s transpondrar sänder 27,5 millioner symboler per sekund.</trans
     </message>
     <message>
         <source>Mythtv has been idle for %1 minutes and will exit in %2 seconds. Are you still watching?</source>
-        <translation>MythTV har varit oanvänt i %1 minuter och kommer att avslutas efter %2 sekunder. Tittar du på TV ännu?</translation>
+        <translation type="obsolete">MythTV har varit oanvänt i %1 minuter och kommer att avslutas efter %2 sekunder. Tittar du på TV ännu?</translation>
     </message>
     <message>
         <source>On known multiplex...</source>
@@ -9258,7 +9277,7 @@ Dom flesta dvb-s transpondrar sänder 27,5 millioner symboler per sekund.</trans
     </message>
     <message>
         <source>Searching for installed XMLTV grabbers</source>
-        <translation>Söker efter installerade XMLTV hämtare</translation>
+        <translation type="obsolete">Söker efter installerade XMLTV hämtare</translation>
     </message>
     <message>
         <source>DVB Device Number</source>
@@ -9843,7 +9862,7 @@ Dom flesta dvb-s transpondrar sänder 27,5 millioner symboler per sekund.</trans
     </message>
     <message>
         <source>For a specific category (e.g. &quot;Sports event&quot;), request that shows be autoextended. Only works if a show&apos;s category can be determined.</source>
-        <translation>För en specific kategori (t.ex. &quot;Sporthändelse&quot;), begär att program blir automatiskt förlängda. Fungerar endast om programmets kategori kan bestämmas.</translation>
+        <translation type="obsolete">För en specific kategori (t.ex. &quot;Sporthändelse&quot;), begär att program blir automatiskt förlängda. Fungerar endast om programmets kategori kan bestämmas.</translation>
     </message>
     <message>
         <source>Profile Item</source>
@@ -10487,6 +10506,201 @@ namnet &apos;%1&apos; är redan använt.</translation>
     <message>
         <source>MythTV Setup</source>
         <translation>MythTV Setup</translation>
+    </message>
+    <message>
+        <source>Cannot login to database?</source>
+        <translation>Kunde inte logga in till database?</translation>
+    </message>
+    <message>
+        <source>TXT File</source>
+        <comment>Text File</comment>
+        <translation>Text Fil</translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with V4L support to query audio inputs</source>
+        <translation>FEL, Kompilera med stöd för v4L för att att undersöka ljud ingångar</translation>
+    </message>
+    <message>
+        <source>Seen</source>
+        <translation>Sedd</translation>
+    </message>
+    <message>
+        <source>Matching</source>
+        <translation>Matchar</translation>
+    </message>
+    <message>
+        <source>Signal To Noise</source>
+        <translation>Signal till brus</translation>
+    </message>
+    <message>
+        <source>Bit Error Rate</source>
+        <translation>Bitfelsfrekvens</translation>
+    </message>
+    <message>
+        <source>Uncorrected Blocks</source>
+        <translation>Okorrigerade block</translation>
+    </message>
+    <message>
+        <source>Rotor Progress</source>
+        <translation>Rotorförlopp</translation>
+    </message>
+    <message>
+        <source>Avg. Bitrate</source>
+        <translation>Medel. Bithastighet</translation>
+    </message>
+    <message>
+        <source>Average bit rate in kilobits/second. 2200Kbps is approximately 1 Gigabyte per hour.</source>
+        <translation>Medel bit hastighet i kilobit/sekund. 2200Kbps är ungefär 1 Gigabyte per timme.</translation>
+    </message>
+    <message>
+        <source>Maximum bit rate in kilobits/second. 2200Kbps is approximately 1 Gigabyte per hour.</source>
+        <translation>Maximal bit hastighet i kilobit/sekund. 2200Kbps är ungefär 1 Gigabyte per timme.</translation>
+    </message>
+    <message>
+        <source>MPEG-4 AVC Hardware Encoder</source>
+        <translation>MPEG-4 AVC Hårdvaru Enhet</translation>
+    </message>
+    <message>
+        <source>Low Resolution</source>
+        <translation>Låg Upplösning</translation>
+    </message>
+    <message>
+        <source>Medium Resolution</source>
+        <translation>Medle Upplösning</translation>
+    </message>
+    <message>
+        <source>High Resolution</source>
+        <translation>Hög Upplösning</translation>
+    </message>
+    <message>
+        <source>New Zealand</source>
+        <translation>Nya Zeland</translation>
+    </message>
+    <message>
+        <source>MythTV has was set to sleep for %1 minutes and will exit in %2 seconds.
+Do you wish to continue watching?</source>
+        <translation>MythTV har sats att sova för 1% minuter och kommer att avslutas om %2 sekunder.
+Vill ni fortsätta att titta?</translation>
+    </message>
+    <message>
+        <source>MythTV has been idle for %1 minutes and will exit in %2 seconds. Are you still watching?</source>
+        <translation>MythTV har varit inaktiv i %1 minuter och kommer att avslutas om %2 sekunder. Tittar ni fortfarande?</translation>
+    </message>
+    <message>
+        <source>Do not configure a grabber</source>
+        <translation>Konfigurerar inte en hämtare</translation>
+    </message>
+    <message>
+        <source>Loading XMLTV configuration...</source>
+        <translation>Laddar XMLTV konfigurationen...</translation>
+    </message>
+    <message>
+        <source>North America (SchedulesDirect.org) (Internal)</source>
+        <translation>Nord Amerika (SchedulesDirect.org) (Intern)</translation>
+    </message>
+    <message>
+        <source>Transmitted guide only (EIT)</source>
+        <translation>Sänd guide ändast (EIT)</translation>
+    </message>
+    <message>
+        <source>No grabber</source>
+        <translation>Ingen hämtare</translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation>Laddar...</translation>
+    </message>
+    <message>
+        <source>H.264 encoder card (HD-PVR)</source>
+        <translation>H.264 packnings kort (HD-PVR)</translation>
+    </message>
+    <message>
+        <source>Audio input</source>
+        <translation>Ljud ingång</translation>
+    </message>
+    <message>
+        <source>For a special category (e.g. &quot;Sports event&quot;), request that shows be autoextended. Only works if a show&apos;s category can be determined.</source>
+        <translation>För en speciell kategori ( ex  &quot;sport evenemang&quot;), begär att inspelningen blir automatiskt förlängd. Fungerar endast om kategorin känns igen.</translation>
+    </message>
+    <message>
+        <source>Decode VBI format</source>
+        <translation>Avkoda VBI format</translation>
+    </message>
+    <message>
+        <source>PAL Teletext</source>
+        <translation>PAL Text-tv</translation>
+    </message>
+    <message>
+        <source>NTSC Closed Caption</source>
+        <translation>NTSC Textning</translation>
+    </message>
+    <message>
+        <source>If set, this overrides the mythtv-setup setting used during recording when decoding captions.</source>
+        <translation>Om inställt, dethär åsidosätts myth-tvinställningar som används under inspelning när kodat överskrift.</translation>
+    </message>
+    <message>
+        <source>Subtitle Codec</source>
+        <translation>Textningskodning</translation>
+    </message>
+    <message>
+        <source>External Subtitle Settings</source>
+        <translation>Extern Textningsinställningar</translation>
+    </message>
+    <message>
+        <source>Disable Automatic Database Backup</source>
+        <translation>Inaktivera automatisk databas säkerhetskopiering</translation>
+    </message>
+    <message>
+        <source>This will prevent Myth from backing up the database before upgrades.  If disabled, you should have your own backup strategy in place.</source>
+        <translation>Detta kommer att förhindra myth att säkerhetskopiera databasen före uppgradering.Om inaktivt, borde du ha egen säkerhetskopieringsstrategi klarlagt.</translation>
+    </message>
+    <message>
+        <source>Length of time the frontend waits between tries to wake up the master backend. This should be the time your master backend needs to startup. Set 0 to disable.</source>
+        <translation>Tidslängden frontend väntar mellan försök att väcka master backend. Dethär borde vara tiden din master backend behöver för att starta upp. Sätt 0 för att inaktivera.</translation>
+    </message>
+    <message>
+        <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idling, 2 - reset the backend to wait for a frontend.</source>
+        <translation>Ett kommando som utför innan backend skall stängas av. Returneringsvärdet bestämmer om backend kan stängas ner. 0 -ja, 1-starta om tomgång, 2- nollställ bakcen för att vänta på frontend.</translation>
+    </message>
+    <message>
+        <source>Include Recordings in Video List</source>
+        <translation>Inkludera inspelningar i videolistan</translation>
+    </message>
+    <message>
+        <source>If enabled, the master backend will include the  list of recorded shows in the list of videos  This is mainly to accommodate UPnP players which do not allow more than 1 video section.</source>
+        <translation>Om möjligt, master backend vill inkludera en lista av inspelade program i listan för video. Dethär är främst för att anpassa UPnP spelare vilket inte tillåter mera än 1 video sektion.</translation>
+    </message>
+    <message>
+        <source>Upnp Media Update Time</source>
+        <translation>UPnP media uppdateringstid</translation>
+    </message>
+    <message>
+        <source>The number of minutes between mythbackend checking  for new videos to serve via upnp. 0 = Off. </source>
+        <translation>Nummer för minuter mellan mythbackend kontrollerar för nya videor att fungera via upnp. 0=av.</translation>
+    </message>
+    <message>
+        <source>Video content to show a WMP Client</source>
+        <translation>Video innehåll att visa em WMP klient</translation>
+    </message>
+    <message>
+        <source>Recordings</source>
+        <translation>Inspelningar</translation>
+    </message>
+    <message>
+        <source>Videos</source>
+        <translation>videor</translation>
+    </message>
+    <message>
+        <source>This lets decided to map a WMP  client to the Recordings tree or to the Video tree when  it requests a list of videos </source>
+        <translation>Dethär bestämmer att kartlägga WMP klient till inspelningsträdet eller till viedoträdet vid förfrågningar av en videolista</translation>
+    </message>
+    <message>
+        <source>Local Backend</source>
+        <translation>Lokal backend</translation>
+    </message>
+    <message>
+        <source>UPNP Server Settings</source>
+        <translation>UPNP server inställningar</translation>
     </message>
 </context>
 <context>
@@ -11626,7 +11840,7 @@ Välj ett inspelat program</translation>
     </message>
     <message>
         <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change video source (%3), inputs (%4), etc.</source>
-        <translation>Du borde ha fått kanallåsning vi det här laget. Du kan fortsätta att vänta på signal, byta kanal med %1 or %2, byta videokälla (%3), ingångar (%4), etc.</translation>
+        <translation type="obsolete">Du borde ha fått kanallåsning vi det här laget. Du kan fortsätta att vänta på signal, byta kanal med %1 or %2, byta videokälla (%3), ingångar (%4), etc.</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -11677,6 +11891,14 @@ Välj ett inspelat program</translation>
     <message>
         <source>MythTV has no capture cards defined. Please run the mythtv-setup program.</source>
         <translation>MythTV har inga mottagare definierade. Var god och kör mythtv-setup programmet.</translation>
+    </message>
+    <message>
+        <source>You should have received a channel lock by now. You can continue to wait for a signal, or you can change the channel with %1 or %2, change video source (%3), inputs (%4), etc.</source>
+        <translation>Ni borde redan fått en kanal låsning. Ni kan vänta på en signal, eller så kan ni byta kana med %1 eller %2, byt video källa (%3), ingångar (%4), etc.</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Nej</translation>
     </message>
 </context>
 <context>
@@ -12180,6 +12402,17 @@ Välj ett inspelat program</translation>
     <message>
         <source>MythTV has running or pending jobs.</source>
         <translation>MythTV har pågående eller avvaktande jobb.</translation>
+    </message>
+</context>
+<context>
+    <name>XMLTV_generic_config</name>
+    <message>
+        <source>Configure</source>
+        <translation>Konfigurera</translation>
+    </message>
+    <message>
+        <source>Run xmltv configure command.</source>
+        <translation>Kör xmltv konfigurations kommandot.</translation>
     </message>
 </context>
 <context>
