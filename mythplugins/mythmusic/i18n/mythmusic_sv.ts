@@ -3,43 +3,43 @@
     <name>AlbumArtImages</name>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Okänd</translation>
+        <translation>Okänd</translation>
     </message>
     <message>
         <source>Front Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Framsidans omslag</translation>
     </message>
     <message>
         <source>Back Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Baksidans omslag</translation>
     </message>
     <message>
         <source>CD</source>
-        <translation type="unfinished"></translation>
+        <translation>CD</translation>
     </message>
     <message>
         <source>Inlay</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägga in</translation>
     </message>
     <message>
         <source>front</source>
-        <translation type="unfinished"></translation>
+        <translation>Fram</translation>
     </message>
     <message>
         <source>back</source>
-        <translation type="unfinished"></translation>
+        <translation>Bak</translation>
     </message>
     <message>
         <source>inlay</source>
-        <translation type="unfinished"></translation>
+        <translation>Inlägg</translation>
     </message>
     <message>
         <source>cd</source>
-        <translation type="unfinished"></translation>
+        <translation>Cd</translation>
     </message>
     <message>
         <source>cover</source>
-        <translation type="unfinished"></translation>
+        <translation>omslag</translation>
     </message>
 </context>
 <context>
@@ -156,7 +156,7 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>The theme you are using does not contain any info lines in the music element. Please contact the theme creator and ask if they could please update it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temat du använder innehåller inga infolinjer i musikelementet. Vänligen kontakta temaskaparem och fråga om dom kan vänligen uppdatera det.</translation>
     </message>
 </context>
 <context>
@@ -223,19 +223,19 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>Track Info.</source>
-        <translation type="unfinished"></translation>
+        <translation>Låtinformation.</translation>
     </message>
     <message>
         <source>Album Art</source>
-        <translation type="unfinished"></translation>
+        <translation>Album typ</translation>
     </message>
     <message>
         <source>Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Statistik</translation>
     </message>
     <message>
         <source>Change Image Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Ändra bildtyp</translation>
     </message>
 </context>
 <context>
@@ -431,63 +431,64 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>Exiting Music Player
 Do you want to continue playing in the background?</source>
-        <translation type="unfinished"></translation>
+        <translation>Avslutar musikspelaren
+Vill du fortsätta att spela musik i bakgrunden?</translation>
     </message>
     <message>
         <source>No - Exit, Stop Playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej- Avsluta nu och sluta spela nu</translation>
     </message>
     <message>
         <source>Yes - Exit, Continue Playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja-Avsluta och fortsätt spela</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Tracks with same Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Låtar med samma titel</translation>
     </message>
     <message>
         <source>Speed: </source>
-        <translation type="unfinished"></translation>
+        <translation>Hastighet:</translation>
     </message>
     <message>
         <source>Smart</source>
-        <translation type="unfinished"></translation>
+        <translation>smart</translation>
     </message>
     <message>
         <source>Rand</source>
-        <translation type="unfinished"></translation>
+        <translation>Slumpvis</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation type="unfinished">Album</translation>
+        <translation>Album</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished">Artist</translation>
+        <translation>Artist</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Inget</translation>
     </message>
     <message>
         <source>Shuffle</source>
-        <translation type="unfinished"></translation>
+        <translation>Slumpvis</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished">Alla</translation>
+        <translation>Alla</translation>
     </message>
     <message>
         <source>Track</source>
-        <translation type="unfinished"></translation>
+        <translation>Låt</translation>
     </message>
     <message>
         <source>Repeat</source>
-        <translation type="unfinished"></translation>
+        <translation>Repetera</translation>
     </message>
 </context>
 <context>
@@ -1024,131 +1025,151 @@ Do you want to continue playing in the background?</source>
     </message>
     <message>
         <source>Tag Encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Markera kodning</translation>
     </message>
     <message>
         <source>UTF-16</source>
-        <translation type="unfinished"></translation>
+        <translation>UTF-16</translation>
     </message>
     <message>
         <source>UTF-8</source>
-        <translation type="unfinished"></translation>
+        <translation>UTF-8</translation>
     </message>
     <message>
         <source>Ascii</source>
-        <translation type="unfinished"></translation>
+        <translation>Ascii</translation>
     </message>
     <message>
         <source>Some mp3 players don&apos;t understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vissa mp3 spelare förstår inte markeringar kodat i UTF8 eller UTF16, denhär inställningen låter dig ändra det använda kodade formatet. Detta gäller endast ID3 markeringar. </translation>
     </message>
     <message>
         <source>Maximum Search Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximalt antal sökresultat</translation>
     </message>
     <message>
         <source>Used to limit the number of results returned when using the search feature.</source>
-        <translation type="unfinished"></translation>
+        <translation>Används för att begränsa antalet sökresultat vid användning av sökfunktionen.</translation>
     </message>
     <message>
         <source>Resume mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Återupptagnings läge</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Av</translation>
     </message>
     <message>
         <source>Track</source>
-        <translation type="unfinished"></translation>
+        <translation>Spår</translation>
     </message>
     <message>
         <source>Exact</source>
-        <translation type="unfinished"></translation>
+        <translation>Exakt</translation>
     </message>
     <message>
         <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
-        <translation type="unfinished"></translation>
+        <translation>Återuppta uppspelning antingen i början av den aktiva spelkön, i början av sista spåret, en exakt punkt inom senaste spår.</translation>
     </message>
     <message>
         <source>Playback Settings (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppspelningsinställningar (2)</translation>
     </message>
     <message>
         <source>The theme you are using does not contain the %1 element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temat du använder innehåller inte %1 element. Vänligen kontakta temats upphovsman och fråga om dom kan uppdatera det.&lt;br&gt;&lt;br&gt;Nästa bildruta kommer att vara tomt.Gå tillbaka för att komma tillbaka till menyn.</translation>
     </message>
     <message>
         <source>Number of Artists Tree Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Nummer för artist trädgrupper</translation>
     </message>
     <message>
         <source>Few</source>
-        <translation type="unfinished"></translation>
+        <translation>Få</translation>
     </message>
     <message>
         <source>Average</source>
-        <translation type="unfinished"></translation>
+        <translation>Genomsnitt</translation>
     </message>
     <message>
         <source>Many</source>
-        <translation type="unfinished"></translation>
+        <translation>Många</translation>
     </message>
     <message>
         <source>Determines how many groups we have in the artist tree.  Few gives &apos;A B C D&apos; as per the old behaviour, average gives two letters per group, many gives one letter per group.</source>
-        <translation type="unfinished"></translation>
+        <translation>Avgör hur många grupper vi har i artist trädet. Några ger &apos;A B C D&apos;  som enligt gammalt uppförande, medeltal ger two bokstäver för varje grupp, många ger en bokstav per grupp.</translation>
     </message>
     <message>
         <source>If selected, you can navigate your entire music tree from the playing screen. N.B. Does not work with accelerated buttons disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Om markerat, kan du navigera dintt fullständiga musikträd från spelskärmen.D.V.S. Fungerar inte med påskynda hastighetsknapparna påslagna</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation type="unfinished">Album</translation>
+        <translation>Album</translation>
     </message>
     <message>
         <source>Starting shuffle mode for the player.  Can be either normal, random, intelligent (random), or Album.</source>
-        <translation type="unfinished"></translation>
+        <translation>Startar slumpvisa läget för spelaren.Kan antingen vara normal, slumpmässigt, begåvat ( slumpmässigt), eller album.</translation>
     </message>
     <message>
         <source>Change the visualizer when the song changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ändra visualisering när låten ändras.</translation>
     </message>
     <message>
         <source>Show Album Art at the start of each song</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa albumets typ i början av varje låt</translation>
     </message>
     <message>
         <source>When the song changes and the new song has an album art image display it in the visualizer for a short period.</source>
-        <translation type="unfinished"></translation>
+        <translation>När låten ändras och den nya låten har ett albumtypbeskrivning visa i visualiseringen för en kort stund.</translation>
     </message>
     <message>
         <source>Randomize Visualizer order</source>
-        <translation type="unfinished"></translation>
+        <translation>Slumpmässig visualiseringsordning</translation>
     </message>
     <message>
         <source>On changing the visualizer pick a new one at random.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vid ändring av visualisering välj en ny vid slumpvis.</translation>
     </message>
     <message>
         <source>List of visualizations to use during playback. Click the button below to edit this list</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualiseringslista att användas under uppspelning. Klick på knappen nedanför för att redigera denhär listan</translation>
     </message>
     <message>
         <source>Edit Visualizations</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera visualiseringar</translation>
     </message>
     <message>
         <source>Edit the list of visualizations to use during playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera listan av visualiseringar att använda under uppspelning.</translation>
     </message>
     <message>
         <source>General Settings (1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Allmänna inställningar (1)</translation>
     </message>
     <message>
         <source>General Settings (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Allmänna inställningar (2)</translation>
+    </message>
+    <message>
+        <source>Action on exit</source>
+        <translation>Ågärd vid avslut</translation>
+    </message>
+    <message>
+        <source>Prompt</source>
+        <translation>Skriv ut</translation>
+    </message>
+    <message>
+        <source>Stop Playing</source>
+        <translation>Avsluta Spelning</translation>
+    </message>
+    <message>
+        <source>Keep Playing</source>
+        <translation>Fortsätt Spela</translation>
+    </message>
+    <message>
+        <source>Specify what action to take when exiting mythmusic plugin.</source>
+        <translation>Specificera vilken åtgärd som skall ske när mythmusic pluginet avslutas.</translation>
     </message>
 </context>
 <context>
@@ -1163,12 +1184,12 @@ Do you want to continue playing in the background?</source>
     </message>
     <message>
         <source>Cancelled by the user</source>
-        <translation type="unfinished"></translation>
+        <translation>Avbruten av användaren</translation>
     </message>
     <message>
         <source>The encoder failed to create the file.
 Do you have write permissions for the music directory?</source>
-        <translation type="unfinished"></translation>
+        <translation>Kodaren misslyckades att skapa fil. Har du skriv tillåtelse för musik katalogen?</translation>
     </message>
 </context>
 <context>
@@ -1249,13 +1270,13 @@ Vill du ta bort det existerande spåret?</translation>
     </message>
     <message>
         <source>Encoding Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Kodningen misslyckades</translation>
     </message>
     <message>
         <source>Encoding failed with the following error:-
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Kodningen misslyckades med följande meddelande:-</translation>
     </message>
 </context>
 <context>
@@ -1512,10 +1533,6 @@ Vill du ta bort det existerande spåret?</translation>
         <translation>Gräns:</translation>
     </message>
     <message>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
@@ -1611,39 +1628,39 @@ Vill du ta bort det existerande spåret?</translation>
     <name>VisualizationsEditor</name>
     <message>
         <source>Visualizations</source>
-        <translation type="unfinished">Visualiseringar</translation>
+        <translation>Visualiseringar</translation>
     </message>
     <message>
         <source>Selected Visualizations</source>
-        <translation type="unfinished"></translation>
+        <translation>Markerade visualiseringar</translation>
     </message>
     <message>
         <source>Available Visualizations</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillgängliga visualiseringar</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Namn</translation>
     </message>
     <message>
         <source>Provider</source>
-        <translation type="unfinished"></translation>
+        <translation>Utgivare</translation>
     </message>
     <message>
         <source>Move Up</source>
-        <translation type="unfinished">Flytta upp</translation>
+        <translation>Flytta upp</translation>
     </message>
     <message>
         <source>Move Down</source>
-        <translation type="unfinished">Flytta ned</translation>
+        <translation>Flytta ned</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
 </context>
 </TS>

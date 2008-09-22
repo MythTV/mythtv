@@ -891,7 +891,11 @@ Tryck OK för att försöka igen med längre tid. Tryck Avbryt för att avbryta.
     </message>
     <message>
         <source>No Screens defined; Entering Screen Setup.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Ingen skärm definierad; Går till skärminställningar.</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation>Pausad</translation>
     </message>
 </context>
 </TS>

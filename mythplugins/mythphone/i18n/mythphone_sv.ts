@@ -307,15 +307,15 @@
     </message>
     <message>
         <source>Loopback Audio and video at ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Se sig audio och video...</translation>
     </message>
     <message>
         <source>Socket on this machine</source>
-        <translation type="unfinished"></translation>
+        <translation>Socket på denhär maskinen</translation>
     </message>
     <message>
         <source>NAT Device</source>
-        <translation type="unfinished"></translation>
+        <translation>NAT enhet</translation>
     </message>
 </context>
 <context>
