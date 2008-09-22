@@ -12,17 +12,17 @@
 ###
 ### =examples
 ### win32-packager.pl -h
-### Print usage
-### win32-packager.pl -v
-### Compile mythtv based on trunk svn 16789
-### win32-packager.pl -v -r head
-### Compile mythtv based on trunk head
-### win32-packager.pl -v -b
-### Compile mythtv based on release-021-fixes svn 16468
-### win32-packager.pl -v -b -t
-### include some patches which are still not accepted and needed for Win32 
-### win32-packager.pl -v -b -t -k
-### Same but package and create setup at the end
+###      => Print usage
+### win32-packager.pl   
+###      => based on latest "tested" SVN trunk (ie a known-good win32 build)
+### win32-packager.pl -r head
+###      => based on trunk head
+### win32-packager.pl -b
+###      => based on release-021-fixes branch
+### win32-packager.pl -b -t 
+###      => include some known patches which are not accepted and needed for Win32 
+### win32-packager.pl -b -t -k
+###      =>Same but package and create setup.exe at the end
 ###
 ### =revision
 ### $Id$
@@ -37,6 +37,7 @@ use IO::File;
 use Data::Dumper; 
 use File::Copy qw(cp);
 use Getopt::Std;
+use Digest::MD5;
 
 
 $| = 1; # autoflush stdout;
@@ -47,7 +48,7 @@ $| = 1; # autoflush stdout;
                           # (included below). This is the last version that is
                           # Qt 3 based. Qt 4 merges began immediately after.
 #my $SVNRELEASE = '17190'; # Recent 0-21-fixes
-my $SVNRELEASE = '18010'; # Recent trunk
+my $SVNRELEASE = '18315'; # Recent trunk
 #my $SVNRELEASE = 'HEAD'; # If you are game, go forth and test the latest!
 
 
@@ -82,10 +83,12 @@ my $makeclean = 0;          # Flag to make clean
 my $svnlocation = "trunk";  # defaults to trunk unless -b specified
 my $qtver = 3;              # default to 3 until we can test otherwise below,
                             #  do not change this here.
+my $continuous = 0 ;        # by default the app pauses to notify you what 
+														#it's about to do, -y overrides for batch usage.
 
 ##############################################################################
 # get command line options
-my $opt_string = 'vhu:kp:r:c:tldb';
+my $opt_string = 'vhu:kp:r:c:tldby';
 my %opt = ();
 getopts( "$opt_string", \%opt );
 usage() if $opt{h};
@@ -98,6 +101,8 @@ $proxy      = $opt{p} if defined $opt{p};
 $SVNRELEASE = $opt{r} if defined $opt{r};
 $dbconf     = 1       if defined $opt{d};
 $makeclean  = 1       if defined $opt{l};
+$continuous  = 1       if defined $opt{y};
+
 
 if (defined $opt{c}) {
     $compile_type = $opt{c} if ($opt{c} eq "release") ;
@@ -140,9 +145,9 @@ if ( $numCPU gt 1 ) {
 }
 print "\tSVN location is: $svnlocation\n\tSVN revision is: $SVNRELEASE\n\n";
 print "Press [enter] to continue, or [ctrl]-c to exit now....\n";
-getc();
+getc() unless $continuous;
 
-# Used to test if we the same basic build type/layout as previously.
+# this will be used to test if we the same basic build type/layout as previously.
 my $is_same = "$compile_type-$svnlocation-$qtver.same";
 $is_same =~ s#/#-#g; # don't put dir slashes in a filename! 
 
@@ -156,11 +161,11 @@ my @components = ( 'mythtv', 'myththemes', 'mythplugins' );
 #      unless $ENV{SOURCES};
 #  my $sources = $ENV{SOURCES};
 # TODO - although theoretically possible to change these paths,
-#        it has NOT been tested much,
-#        and will with HIGH PROBABILITY fail somewhere. 
+#        it has NOT been tested much, and will with HIGH PROBABILITY fail somewhere. 
 #      - Only $mingw is tested and most likely is safe to change.
 
 # Perl compatible paths. DOS style, but forward slashes, and must end in slash:
+# TIP: using paths with spaces in them is NOT supported, and will break. patches welcome.
 my $msys    = 'C:/MSys/1.0/';
 my $sources = 'C:/MSys/1.0/sources/';
 my $mingw   = 'C:/MinGW/';
@@ -384,15 +389,19 @@ push @{$expect},
 # we could probably put the unzip.exe into the path...
 
 
-[ archive => $sources.'svn-win32-1.4.6.zip',  
-  'fetch' => 'http://subversion.tigris.org/files/documents/15/41077/svn-win32-1.4.6.zip',
+# we now use SVN 1.5.x
+[ archive => $sources.'svn-win32-1.5.1.zip',  
+  'fetch' => 'http://subversion.tigris.org/files/documents/15/43251/svn-win32-1.5.1.zip',
   comment => 'Subversion comes as a zip file, so it cant be done earlier than the unzip tool!'],
-[ dir     => $sources.'svn-win32-1.4.6', 
-  extract => $sources.'svn-win32-1.4.6.zip' ],
+[ dir     => $sources.'svn-win32-1.5.1', 
+  extract => $sources.'svn-win32-1.5.1.zip' ],
 
 
-[ file    => $msys.'bin/svn.exe', 
-  shell   => ["cp -R $unixsources/svn-win32-1.4.6/* ".$unixmsys],
+[ file    => $msys.'bin/svn151.exe', 
+  shell   => [
+        "cp -R $unixsources/svn-win32-1.5.1/* ".$unixmsys,
+        "cp $unixsources/svn-win32-1.5.1/bin/svn.exe ".$unixmsys."bin/svn151.exe"
+  ],
   comment => 'put the svn.exe executable into the path, so we can use it easily later!' ],
 
 # :
@@ -418,12 +427,12 @@ push @{$expect},
 
 # fetch mysql
 # primary server site is:
-# http://dev.mysql.com/get/Downloads/MySQL-5.0/mysql-essential-5.0.45-win32.msi/from/http://mysql.mirrors.ilisys.com.au/
-[ archive => $sources.'mysql-essential-5.0.45-win32.msi', 
-  'fetch' => 'http://mirror.services.wisc.edu/mysql/Downloads/MySQL-5.0/mysql-essential-5.0.45-win32.msi',
+# http://dev.mysql.com/get/Downloads/MySQL-5.0/mysql-essential-5.0.67-win32.msi/from/http://mysql.mirrors.ilisys.com.au/
+[ archive => $sources.'mysql-essential-5.0.67-win32.msi', 
+  'fetch' => 'http://mirror.services.wisc.edu/mysql/Downloads/MySQL-5.0/mysql-essential-5.0.67-win32.msi',
   comment => 'fetch mysql binaries - this is a big download(23MB) so it might take a while' ],
 [ file    => "c:/Program Files/MySQL/MySQL Server 5.0/bin/libmySQL.dll",
-  exec    => $dossources.'mysql-essential-5.0.45-win32.msi INSTALLLEVEL=2',
+  exec    => $dossources.'mysql-essential-5.0.67-win32.msi INSTALLLEVEL=2',
   comment => 'Install mysql - be sure to choose to do a "COMPLETE" install. You should also choose NOT to "configure the server now" ' ],
 
 # after mysql install 
@@ -535,12 +544,12 @@ push @{$expect},
 # if packaging is selected, get innosetup
 if ($package == 1) {
   push @{$expect},
- [ archive => $sources.'isetup-5.2.2.exe',
-     fetch => 'http://files.jrsoftware.org/ispack/ispack-5.2.2.exe',
+ [ archive => $sources.'isetup-5.2.3.exe',
+     fetch => 'http://files.jrsoftware.org/ispack/ispack-5.2.3.exe',
    comment => 'fetch inno setup setup' ],
  [ file    => "C:/Program Files/Inno Setup 5/iscc.exe",
-   exec    => $dossources.'isetup-5.2.2.exe /silent',
-   comment => 'Install innosetup' ],
+   exec    => $dossources.'isetup-5.2.3.exe', #/silent is broken! 
+   comment => 'Install innosetup - be sure to install ISTool, ISSP, AND encryption support too! ' ],
  # Get advanced uninstall
  [ archive => $sources.'UninsHs.rar',
      fetch => 'http://www.uninshs.com/down/UninsHs.rar',
@@ -577,7 +586,7 @@ if ($package == 1) {
 # successful (not necessarily true, but it's a start) but this requires that
 # the .tar.gz didn't come with a Makefile in it.
 
-# Most of these look for a Makefile as a sign that ./configure was successful 
+# Most of these look for a Makefile as a sign that the ./configure was successful 
 # (not necessarily true, but it's a start)
 # but this requires that the .tar.gz didn't come with a Makefile in it.
 push @{$expect},
@@ -629,7 +638,18 @@ push @{$expect},
   shell   => ["cd $unixsources/libmad-0.15.1b",
               "./configure --prefix=/usr",
               "make",
-              "make install"],comment => 'building and installing: libmad' ],
+             "make install"],
+  comment => 'building and installing: msys libmad' ],
+
+[ archive => $sources.'libmad-0.15.1b.tar.gz',  
+  fetch   => 'http://'.$sourceforge.'/sourceforge/mad/libmad-0.15.1b.tar.gz'],
+[ dir     => $sources.'libmad-0.15.1b', 
+  extract => $sources.'libmad-0.15.1b.tar' ],
+[ file    => $mingw.'lib/libmad.a', 
+  shell   => ["cd $unixsources/libmad-0.15.1b",
+              "./configure --prefix=/mingw",
+              "make",
+              "make install"],comment => 'building and installing: mingw libmad' ],
 
 [ archive => $sources.'taglib-1.4.tar.gz',  
   fetch   => 'http://developer.kde.org/~wheeler/files/src/taglib-1.4.tar.gz'],
@@ -647,7 +667,7 @@ push @{$expect},
               "make",
               "make install"],
   comment => 'building and installing: msys taglib' ],
-
+              
 # --disable-fast-perl fixes makefiles that otherwise have bits like below:
 # INSTALL = ../C:/msys/1.0/bin/install -c -p
 # INSTALL = ../../C:/msys/1.0/bin/install -c -p
@@ -663,6 +683,7 @@ push @{$expect},
               "make",
               "make install"],comment => 'building and installing: libao' ],
 
+# definitely need mingw version of ogg for plugins, and for mingw vorbis to build!
 [ archive => $sources.'libogg-1.1.3.tar.gz',  
   fetch   => 'http://downloads.xiph.org/releases/ogg/libogg-1.1.3.tar.gz'],
 [ dir     => $sources.'libogg-1.1.3', 
@@ -670,6 +691,17 @@ push @{$expect},
 [ file    => $msys.'bin/libogg-0.dll', 
   shell   => ["cd $unixsources/libogg-1.1.3",
               "./configure --prefix=/usr",
+              "make",
+              "make install"],comment => 'building and installing: libogg' ],
+
+#  need msys version of ogg for msys version of vorbis!
+[ archive => $sources.'libogg-1.1.3.tar.gz',  
+  fetch   => 'http://downloads.xiph.org/releases/ogg/libogg-1.1.3.tar.gz'],
+[ dir     => $sources.'libogg-1.1.3', 
+  extract => $sources.'libogg-1.1.3.tar' ],
+[ file    => $mingw.'bin/libogg-0.dll', 
+  shell   => ["cd $unixsources/libogg-1.1.3",
+              "./configure --prefix=/mingw",
               "make",
               "make install"],comment => 'building and installing: libogg' ],
 
@@ -681,7 +713,20 @@ push @{$expect},
   shell   => ["cd $unixsources/libvorbis-1.2.0",
               "./configure --prefix=/usr --disable-shared",
               "make",
-              "make install"],comment => 'building and installing: libvorbis' ],
+              "make install"],
+  comment => 'building and installing: msys libvorbis' ],
+
+# definitely need mingw version for mythtv plugins to build
+[ archive => $sources.'libvorbis-1.2.0.tar.gz',  
+  fetch   => 'http://downloads.xiph.org/releases/vorbis/libvorbis-1.2.0.tar.gz'],
+[ dir     => $sources.'libvorbis-1.2.0', 
+  extract => $sources.'libvorbis-1.2.0.tar' ],
+[ file    => $mingw.'lib/libvorbis.a', 
+  shell   => ["cd $unixsources/libvorbis-1.2.0",
+              "./configure --prefix=/mingw --disable-shared",
+              "make",
+              "make install"],
+  comment => 'building and installing: mingw libvorbis' ],
 
 
 [ archive => $sources.'flac-1.2.1.tar.gz',  
@@ -692,15 +737,15 @@ push @{$expect},
   shell   => "echo \\#define SIZE_T_MAX UINT_MAX >> $mingw/include/limits.h" ], 
 [ file    => $mingw.'lib/libFLAC.a', 
   shell   => ["cd $unixsources/flac-1.2.1",
-              "./configure --prefix=/mingw",
-              "make",
-              "make install"],
+  			      "./configure --prefix=/mingw",
+  			      "make",
+  			      "make install"],
   comment => 'building and installing: mingw flac/FLAC' ],
 [ file    => $msys.'lib/libFLAC.a', 
   shell   => ["cd $unixsources/flac-1.2.1",
-              "./configure --prefix=/usr",
-              "make",
-              "make install"],
+  			      "./configure --prefix=/usr",
+  			      "make",
+  			      "make install"],
   comment => 'building and installing: msys flac/FLAC' ],
  
  
@@ -708,21 +753,27 @@ push @{$expect},
   fetch   => 'http://'.$sourceforge.'/sourceforge/libcdaudio/libcdaudio-0.99.12p2.tar.gz'],
 [ dir     => $sources.'libcdaudio-0.99.12p2', 
   extract => $sources.'libcdaudio-0.99.12p2.tar' ],
-
+   			      
 [ archive => $sources.'libcdaudio-0.99.12p2-WIN32-support.patch',  
   fetch   => 'http://sourceforge.net/tracker/download.php?group_id=27134&atid=389444&file_id=286748&aid=2035008'],
   
 [ grep => ['ifdef __WIN32', $sources.'libcdaudio-0.99.12p2/src/cddb.c'], 
   shell => ["cd ".$sources.'libcdaudio-0.99.12p2',
-            "patch -p1 < ".$unixsources.
-             'libcdaudio-0.99.12p2-WIN32-support.patch'] ],
+			"patch -p1 < ".$unixsources.'libcdaudio-0.99.12p2-WIN32-support.patch'] ],
  
 [ file    => $msys.'bin/libcdaudio-config', 
   shell   => ["cd ".$unixsources."libcdaudio-0.99.12p2",
-              "./configure --prefix=/usr",
-              "make",
-              "make install"],
-  comment => 'building and installing:  libcdaudio' ],  
+  			      "./configure --prefix=/usr",
+  			      "make",
+  			      "make install"],
+  comment => 'building and installing:  msys libcdaudio' ],  
+
+# mingw version is needed, or mythmusic won't build
+[ file    => $mingw.'bin/libcdaudio-config', 
+  shell   => ["cd ".$unixsources."libcdaudio-0.99.12p2",
+  			      "./configure --prefix=/mingw",
+  			      "make",
+  			      "make install"],comment => 'building and installing:  mingw libcdaudio' ],  
   
 #[ pause => 'flac, taglib, lame all done.... press [enter] to continue !'],
 
@@ -808,25 +859,27 @@ push @{$expect},
 #[ pause => 'press [enter] to build QT3 next!'],
 [ archive => $sources.'qt-3.3.x-p8.tar.bz2',  
   fetch => 'http://'.$sourceforge.'/sourceforge/qtwin/qt-3.3.x-p8.tar.bz2'],
-[ dir => $msys.'qt-3.3.x-p8', extract => [$sources.'qt-3.3.x-p8.tar', $msys] ],
+[ dir => $msys.'qt-3.3.x-p8',
+  extract => [$sources.'qt-3.3.x-p8.tar', $msys] ],
 
 
 # equivalent patch:
 [ archive => $sources.'qt.patch' ,
-  fetch   => 'http://tanas.ca/qt.patch',
+  'fetch' => 'http://tanas.ca/qt.patch',
   comment => ' patch the QT sources'],
 [ filesame => [$msys.'qt-3.3.x-p8/qt.patch',$sources."qt.patch"],
-  copy     => [''=>''] ],
-[ grep  => ["\-lws2_32", $msys.'qt-3.3.x-p8/mkspecs/win32-g++/qmake.conf'],
-  shell => ["cd ".$unixmsys."qt-3.3.x-p8/","patch -p1 < qt.patch"] ],
+  copy => [''=>''] ],
+[ grep => ["\-lws2_32", $msys.'qt-3.3.x-p8/mkspecs/win32-g++/qmake.conf'],
+  shell => ["cd ".$unixmsys."qt-3.3.x-p8/","patch -p1 < qt.patch"],
+  comment => 'patch the qt3 qmake.conf' ],
 
 
 [ file => $msys.'bin/sh_.exe',
- shell => ["mv ".$unixmsys."bin/sh.exe ".$unixmsys."bin/sh_.exe"],
- comment => 'rename msys sh.exe out of the way before building QT! ' ] ,
+  shell => ["mv ".$unixmsys."bin/sh.exe ".$unixmsys."bin/sh_.exe"],
+  comment => 'rename msys sh.exe out of the way before building QT! ' ] ,
 
 # write a batch script for the QT environment under DOS:
-[ file  => $msys.'qt-3.3.x-p8/qt3_env.bat',
+[ file => $msys.'qt-3.3.x-p8/qt3_env.bat',
   write => [$msys.'qt-3.3.x-p8/qt3_env.bat',
 'rem a batch script for the QT environment under DOS:
 set QTDIR='.$dosmsys.'qt-3.3.x-p8
@@ -857,11 +910,21 @@ cd %QTDIR%
 
 # TODO - do we have an action we can take to build just this one file/dll if it fails?  
 # For now, we will just test if it built, and try to run 'make' again if it didn't!
-[ file => $msys.'qt-3.3.x-p8/plugins/sqldrivers/libqsqlmysql.dll',  exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make -j', comment => 'lib\libqsqlmysql.dll - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed ( is the sql driver built properly?) '],
-[ file => $msys.'qt-3.3.x-p8/bin/qmake.exe', exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make', comment => 'bin\qmake.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
-[ file => $msys.'qt-3.3.x-p8/bin/moc.exe', exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make', comment => 'bin\moc.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
-[ file => $msys.'qt-3.3.x-p8/bin/uic.exe', exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make', comment => 'bin\uic.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
-[ file => $msys.'qt-3.3.x-p8/lib/libqt-mt3.dll', exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make',comment => 'bin\libqt-mt3.dll - - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed' ],
+[ file => $msys.'qt-3.3.x-p8/plugins/sqldrivers/libqsqlmysql.dll',
+  exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make -j',
+  comment => 'lib\libqsqlmysql.dll - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed ( is the sql driver built properly?) '],
+[ file => $msys.'qt-3.3.x-p8/bin/qmake.exe',
+  exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make',
+  comment => 'bin\qmake.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
+[ file => $msys.'qt-3.3.x-p8/bin/moc.exe',
+  exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make', 
+  comment => 'bin\moc.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
+[ file => $msys.'qt-3.3.x-p8/bin/uic.exe',
+  exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make', 
+  comment => 'bin\uic.exe - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed'],
+[ file => $msys.'qt-3.3.x-p8/lib/libqt-mt3.dll',
+  exec => $dosmsys.'qt-3.3.x-p8\qt3_env.bat && mingw32-make',
+  comment => 'bin\libqt-mt3.dll - - here we are just validating some basics of the the QT install, and if any of these components are missing, the build must have failed' ],
 
 # a manual method for "installing" QT would be to put all the 'bin' files
 # into /mingw/bin and similarly for the 'lib' and 'include' folders to their
@@ -877,7 +940,9 @@ cd %QTDIR%
  comment => 'rename mingw sh_.exe back again!' ] ,
 
 #Copy libqt-mt3.dll to libqt-mt.dll  , if there is any date/size change!
-[ filesame => [$msys.'qt-3.3.x-p8/lib/libqt-mt.dll',$msys.'qt-3.3.x-p8/lib/libqt-mt3.dll'], copy => [''=>''],comment => 'Copy libqt-mt3.dll to libqt-mt.dll' ] ,
+[ filesame => [$msys.'qt-3.3.x-p8/lib/libqt-mt.dll',$msys.'qt-3.3.x-p8/lib/libqt-mt3.dll'],
+  copy => [''=>''],
+  comment => 'Copy libqt-mt3.dll to libqt-mt.dll' ] ,
 ;
 }
 
@@ -1109,11 +1174,13 @@ push @{$expect},
 # later on, we'll also see if the $SVNRELEASE has changed, and triger on that to....
 [ file  => $mythtv.$is_same,
   shell   => ['source '.$unixmythtv.'make_clean.sh',
-    	      #'rm -f '.$unixmythtv.'*.same',
-              #'touch '.$unixmythtv.$is_same,
-              'nocheck' ],
-  comment => 'cleaning environment' ],
+    						'nocheck' ],
+  comment => 'cleaning environment - step 1a' ],
 
+[ file  => $mythtv."delete_to_do_make_clean.txt",
+  shell   => ['source '.$unixmythtv.'make_clean.sh',
+    						'nocheck' ],
+  comment => 'cleaning environment - step 1b' ],
 
 #----------------------------------------
 # get mythtv sources, if we don't already have them
@@ -1174,10 +1241,13 @@ rm -f /usr/bin/mtd.exe
 rm -f /usr/bin/ignyte.exe
 cd '.$unixmythtv.'mythtv
 make clean
+rm Makefile
 cd '.$unixmythtv.'mythplugins
 make clean
+rm Makefile
 cd '.$unixmythtv.'myththemes
 make clean
+rm Makefile
 cd '.$unixmythtv.'
 find . -type f -name \*.dll | xargs -n1 rm
 find . -type f -name \*.exe | grep -v setup | xargs -n1 rm
@@ -1208,8 +1278,7 @@ if ($makeclean) {
 
 foreach my $comp( @components ) {
 
-# switch to the correct SVN branch before we do anything,
-# if we are on the wrong one...
+# switch to the correct SVN branch before we do anything, if we are on the wrong one...
   push @{$expect},
   #[ file  => $mythtv.$is_same,
   [ always => '',
@@ -1219,17 +1288,16 @@ foreach my $comp( @components ) {
     
   #[ file  => $mythtv.$is_same,
   [ always => '',
-    exec => [ "$dosmsys\\bin\\svn switch ".
+    exec => [ "$dosmsys\\bin\\svn -r $SVNRELEASE  switch ".
              "http://svn.mythtv.org/svn/$svnlocation/$comp $dosmythtv$comp",
              'nocheck'],
     comment => " SVN SWITCH BRANCH!:$comp" ],
     
-  # if we don't have the needed indicator of the branch we are now on,
-  # save that info...
+  # if we don't have the needed indicator of the branch we are now on, save that info...
   [ file  => $mythtv.$is_same,
   shell   => ['rm -f '.$unixmythtv.'*.same',
-              'touch '.$unixmythtv.$is_same,
-             ],
+    					'touch '.$unixmythtv.$is_same,
+    					],
   comment => 'cleaning environment' ], 
 
   #[ pause => 'press [enter] to continue !'],
@@ -1243,24 +1311,37 @@ foreach my $comp( @components ) {
 
 push @{$expect}, 
 
-# always get svn num 
+# always get svn num
 [ always   => [],
     exec   => ['cd '.$dosmythtv.'mythtv && '.
                $dosmsys.'bin\svn.exe info > '.$dosmythtv.'mythtv\svn_info.new'],
  comment   => 'fetching the SVN number to a text file, if we can'],
-[ filesame => [$mythtv.'mythtv\svn_info.txt',$mythtv.'mythtv\svn_info.new'],
+[ filesame => [$mythtv.'mythtv/svn_info.txt',$mythtv.'mythtv/svn_info.new'],
      shell => ['touch -r '.$unixmythtv.'mythtv/svn_info.txt '.
-               $unixmythtv.'mythtv/svn_info.new'],
+               $unixmythtv.'mythtv/svn_info.new', 'nocheck'],
    comment => 'match the datetime of these files, so that the contents only can be compared next' ],
 
 # is svn num (ie file contents) changed since last run, if so, do a 'make
 # clean' (overkill, I know, but safer)!
-[ filesame => [$mythtv.'mythtv\svn_info.txt',$mythtv.'mythtv\svn_info.new'], 
+[ filesame => [$mythtv.'mythtv/svn_info.txt',$mythtv.'mythtv/svn_info.new'], 
   shell => ['source '.$unixmythtv.'make_clean.sh',
             'touch '.$unixmythtv.'mythtv/last_build.txt',
             'cat '.$unixmythtv.'mythtv/svn_info.new >'.$unixmythtv.'mythtv/svn_info.txt',
             'touch -r '.$unixmythtv.'mythtv/svn_info.txt '.$unixmythtv.'mythtv/svn_info.new'], 
   comment => 'if the SVN number is changed, then remember that, AND arrange for a full re-make of mythtv. (overkill, I know, but safer)' ], 
+
+# open up the permissions:
+[ always   => [],
+    shell   => [
+    						'cd '.$unixmythtv.'mythtv',
+               'chmod -R 777 .'
+#    						'cd '.$unixmythtv.'mythplugins',
+#               'chmod -R 777 .'
+#    						'cd '.$unixmythtv.'mythtvthemes',
+#               'chmod -R 777 .'
+               ],
+ comment   => 'loosening permissions on source code:'],
+
 
 
 #  [ pause => 'press [enter] to continue !'],
@@ -1357,12 +1438,12 @@ foreach my $comp( @components ) {
     
 # this is now done as part of make_clean.sh, which happens EARLIER in the process, prior to any possible SVN branch changes! 
 #  [ file    => $mythtv.'delete_to_do_make_clean.txt',
-#    shell   =>['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
+#	  shell   =>['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
 #              'cd '.$unixmythtv.$comp,
 #              'make clean',
 #              'rm Makefile',
-#              'nocheck']
-#  ];
+#							'nocheck']
+#	];
 }
 push @{$expect}, 
 
@@ -1660,9 +1741,10 @@ push @{$expect},
   shell   => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
              'cd '.$unixmythtv.'mythplugins',
              './configure --prefix='.$unixbuild.
-             ' --disable-mythgallery --enable-mythmusic'.
+             ' --disable-mythgallery --disable-mythmusic'.
              ' --disable-mytharchive --disable-mythbrowser --disable-mythflix'.
              ' --disable-mythgame --disable-mythnews --disable-mythphone'.
+             ' --disable-mythcontrols'.
              ' --disable-mythzoneminder --disable-mythweb --enable-aac'.
              ' --enable-libvisual --enable-fftw --compile-type='.$compile_type,
              'touch '.$unixmythtv.'mythplugins/cleanup/cleanup.pro'], 
@@ -1978,36 +2060,44 @@ foreach my $dep ( @{$expect} ) {
         }
 
     } elsif ( $causetype eq 'file' ) {
-        if ( -f $cause[0] ) {print "file exists: $cause[0]\n"; next;}
+        if ( -f $cause[0] ) {print "file already exists: $cause[0]\n"; next;}
         effect($effecttype,@nocheckeffectparams);
         if ( ! -f $cause[0] && $nocheck == 0) {
             die "EFFECT FAILED ($causetype -> $effecttype): unable to locate expected file ($cause[0]).\n";
         }
     } elsif ( $causetype eq 'filesame' ) {
-        # TODO - currently we check file mtime, and byte size, but not
-        # MD5/CRC32 or contents, this is "good enough" for most
-        # circumstances.
-        my ( $size,$mtime)=(0,0);
-        if ( -f $cause[0] ) {
-          $size = (stat($cause[0]))[7];
-          $mtime  = (stat($cause[0]))[9];
-        }
-        if (! (-f $cause[1] ) ) {  die "cause: $causetype requires its SECOND filename to exist for comparison: ($cause[1]).\n"; }
-        my $size2 = (stat($cause[1]))[7];
-        my $mtime2  = (stat($cause[1]))[9];
-        if ( $mtime != $mtime2 || $size != $size2) {
+        # NOTE - we check file mtime, byte size, AND MD5 of contents
+        #      as without the MD5, the script can break in some circumstances.
+        my ( $size,$mtime,$md5)=fileinfo($cause[0]);
+        my ( $size2,$mtime2,$md5_2)=fileinfo($cause[1]);
+        if ( $mtime != $mtime2 || $size != $size2 || $md5 ne $md5_2 ) {
           if ( ! $nocheckeffectparams[0] ) {
             die "sorry but you can not leave the arguments list empty for anything except the 'copy' action (and only when used with the 'filesame' cause)" unless $effecttype eq 'copy';
             print "no parameters defined, so applying effect($effecttype) as ( 2nd src parameter => 1st src parameter)!\n";
-            effect($effecttype,$cause[1],$cause[0]); #copy the requested file[1] to the requested destn[0], now the [0] file exists and is the same.
+            effect($effecttype,$cause[1],$cause[0]); 
           } else {
             effect($effecttype,@nocheckeffectparams); # do something else if the files are not 100% identical?
+             	if ( $nocheck == 0 ) {
+	              # now verify the effect was successful at matching the file contents!:
+	              undef $size; undef $size2;
+	              undef $mtime; undef $mtime2;
+	              undef $md5; undef $md5_2;
+	              ( $size,$mtime,$md5)=fileinfo($cause[0]);
+	        			( $size2,$mtime2,$md5_2)=fileinfo($cause[1]);
+	        			if ( $mtime != $mtime2 || $size != $size2 || $md5 ne $md5_2 ) {
+								  die("effect failed, files NOT identical size,mtime, and MD5: ($cause[0] => $cause[1]).\n");
+							  } else {
+							  	print "files ($cause[0] => $cause[1]) now identical - successful! \n";
+							  }
+						 	}
+						  
           }  
         }else {
            print "effect not required files already up-to-date/identical: ($cause[0] => $cause[1]).\n";
         }
-        undef $size; undef $mtime;
-        undef $size2; undef $mtime2;
+        undef $size; undef $size2;
+        undef $mtime; undef $mtime2;
+        undef $md5; undef $md5_2;
         
     } elsif ( $causetype eq 'newer' ) {
         my $mtime = 0;
@@ -2036,7 +2126,7 @@ foreach my $dep ( @{$expect} ) {
         undef $mtime2;
         
     } elsif ( $causetype eq 'grep' ) {
-        print "grep-ing for pattern($cause[0]) in file($cause[1]):\n" if $NOISY >0;
+    	  print "grep-ing for pattern($cause[0]) in file($cause[1]):\n" if $NOISY >0;
         if ( ! _grep($cause[0],$cause[1]) ) { # grep actually needs two parameters on the source side of the action
             effect($effecttype,@nocheckeffectparams);   
         } else {
@@ -2047,7 +2137,7 @@ foreach my $dep ( @{$expect} ) {
         }
 
     } elsif ( $causetype eq 'exists' ) {
-        print "testing if '$cause[0]' exists...\n" if $NOISY >0;
+    	  print "testing if '$cause[0]' exists...\n" if $NOISY >0;
         if ( -e $cause[0] ) {
             effect($effecttype,@nocheckeffectparams);
         }
@@ -2057,12 +2147,12 @@ foreach my $dep ( @{$expect} ) {
         die "Stop found \n";
     } elsif ( $causetype eq 'pause' ){
         comment("PAUSED! : ".$cause);
-        my $temp = getc();
+        my $temp = getc() unless $continuous;
     } else {
         die " unknown causetype $causetype \n";
     }
 }
-print "\nall done\n";
+print "\nwin32-packager all done\n";
 _end();
 
 #------------------------------------------------------------------------------
@@ -2124,6 +2214,32 @@ sub effect {
         }
         return; # which ever one we actioned, we don't want to action anything else 
 }
+
+#------------------------------------------------------------------------------
+# get info from a file for comparisons
+sub fileinfo {
+	  # filename passed in should be perl compatible path usinjg single FORWARD slashes
+		my $filename = shift;
+		
+	      my ( $size,$mtime,$md5)=(0,0,0);
+	      
+        if ( -f $filename ) {
+          $size = (stat($filename))[7];
+          $mtime  = (stat($filename))[9];
+          my $md5obj = Digest::MD5->new();
+          my $fileh = IO::File->new($filename);
+          binmode($fileh);
+          $md5obj->addfile($fileh);
+          $md5 = $md5obj->digest();
+        }	 else {
+        	warn(" invalid file name provided for testing: ($filename)\n");
+        	$size=rand(99);
+        	$mtime=rand(999);
+        	$md5=rand(999);
+        }
+		
+		   return ($size,$mtime,$md5);
+	}
 
 #------------------------------------------------------------------------------
 # kinda like a directory search for blah.tar* but faster/easier.
