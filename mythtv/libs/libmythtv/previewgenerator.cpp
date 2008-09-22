@@ -606,14 +606,8 @@ char *PreviewGenerator::GetScreenGrab(
     if (filename.left(1)=="/")
     {
         QFileInfo info(filename);
-        bool invalid = !info.exists() || !info.isReadable() || !info.isFile();
-        if (!invalid)
-        {
-            // Check size too, QFileInfo can not handle large files
-            unsigned long long fsize =
-                myth_get_approximate_large_file_size(filename);
-            invalid = (fsize < 8*1024);
-        }
+        bool invalid = (!info.exists() || !info.isReadable() ||
+                        !info.isFile() || (info.size() < 8*1024));
         if (invalid)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer file " +

@@ -58,8 +58,6 @@ MPUBLIC bool telnet(const QString &host, int port);
 MPUBLIC long long copy(QFile &dst, QFile &src, uint block_size = 0);
 MPUBLIC QString createTempFile(QString name_template = "/tmp/mythtv_XXXXXX",
                                bool dir = false);
-MPUBLIC unsigned long long myth_get_approximate_large_file_size(
-    const QString &fname);
 
 MPUBLIC double MythGetPixelAspectRatio(void);
 

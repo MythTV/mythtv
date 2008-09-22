@@ -15,26 +15,18 @@ using namespace std;
 #include "compat.h"
 #ifdef USING_MINGW
 # include <sys/types.h>
-# include <sys/stat.h>
 # include <sys/param.h>
 #else
 # include <sys/types.h>
 # include <sys/wait.h>
-# include <sys/stat.h>
 # ifdef linux
 #   include <sys/vfs.h>
-#   include <sys/statvfs.h>
 #   include <sys/sysinfo.h>
 # else
 #   include <sys/param.h>
 #   ifdef __FreeBSD__ 
 #     include <sys/mount.h> 
 #   endif
-#   ifdef CONFIG_CYGWIN
-#     include <sys/statfs.h>
-#   else // if !CONFIG_CYGWIN
-#     include <sys/sysctl.h>
-#   endif // !CONFIG_CYGWIN
 # endif
 #endif //MINGW
 
@@ -811,27 +803,6 @@ double MythGetPixelAspectRatio(void)
     pixelAspect = MythXGetPixelAspectRatio();
 #endif // USING_X11
     return pixelAspect;
-}
-
-unsigned long long myth_get_approximate_large_file_size(const QString &fname)
-{
-    QByteArray filename = fname.toLocal8Bit();
-#ifdef USING_MINGW
-    struct _stati64 status;
-    _stati64(filename.constData(), &status);
-    return status.st_size;
-#else
-    struct stat status;
-    if (stat(filename.constData(), &status) == -1)
-        return 0;
-
-    // Using off_t requires a lot of 32/64 bit checking.
-    // So just get the size in blocks.
-    unsigned long long bsize = status.st_blksize;
-    unsigned long long nblk  = status.st_blocks;
-    unsigned long long approx_size = nblk * bsize;
-    return approx_size;
-#endif
 }
 
 /**

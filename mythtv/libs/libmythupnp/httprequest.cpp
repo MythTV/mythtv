@@ -304,7 +304,8 @@ long HTTPRequest::SendResponseFile( QString sFileName )
                                it != m_mapHeaders.end(); 
                              ++it ) 
     {  
-        cout << it.key() << ": " << it.data() << endl;
+        cout << it.key().toLatin1().constData() << ": "
+             << (*it).toLatin1().constData() << endl;
     }
     */
 
@@ -317,7 +318,8 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_on, sizeof( g_on ));
 #endif
 
-    if (QFile::exists( sFileName ))
+    QFile tmpFile( sFileName );
+    if (tmpFile.exists( ) && tmpFile.open( QIODevice::ReadOnly ))
     {
 
         m_sResponseTypeText = TestMimeType( sFileName );
@@ -326,11 +328,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
         // Get File size
         // ------------------------------------------------------------------
 
-        struct stat st;
-
-        QByteArray tmp = sFileName.toAscii();
-        if (stat( tmp.constData(), &st ) == 0)
-            llSize = llEnd = st.st_size;
+        llSize = llEnd = tmpFile.size( );
 
         m_nResponseStatus = 200;
 
@@ -405,22 +403,35 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     if (( m_eType != RequestTypeHead ) && (llSize != 0))
     {
         __off64_t  offset = llStart;
-        QByteArray tmp    = sFileName.toAscii();
-        int        file   = open( tmp.constData(), O_RDONLY | O_LARGEFILE );
+        int        file   = tmpFile.handle( );
         ssize_t    sent   = 0;  
 
-        do 
-        {  
-            // SSIZE_MAX should work in kernels 2.6.16 and later.  
-            // The loop is needed in any case.  
+        if ( file == -1 )
+        {
+            VERBOSE(VB_UPNP, QString("SendResponseFile( %1 ) Error: %2 [%3]" )
+                                 .arg( sFileName )
+                                 .arg( tmpFile.error( ))
+                                 .arg( strerror( tmpFile.error( ) )));
+            nBytes = -1;
+        }
+        else
+        {
+            do
+            {
+                // SSIZE_MAX should work in kernels 2.6.16 and later.
+                // The loop is needed in any case.
 
-            sent = sendfile64( getSocketHandle(), file, &offset, 
-                                (size_t)(llSize > INT_MAX ? INT_MAX : llSize));  
+                sent = sendfile64(
+                    getSocketHandle(), file, &offset,
+                    (size_t) ((llSize > INT_MAX) ? INT_MAX : llSize));
 
-            llSize  = llEnd - offset;  
-	    //VERBOSE(VB_UPNP, QString("SendResponseFile : --- size = %1, offset = %2, sent = %3").arg(llSize).arg(offset).arg(sent));
-        } 
-        while (( sent >= 0 ) && ( llSize > 0 ));  
+                llSize  = llEnd - offset;  
+                //VERBOSE(VB_UPNP, QString("SendResponseFile : --- "
+                //"size = %1, offset = %2, sent = %3")
+                //.arg(llSize).arg(offset).arg(sent));
+            } 
+            while (( sent >= 0 ) && ( llSize > 0 ));  
+        }
 
         if (sent == -1)
         {
@@ -431,8 +442,6 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
             nBytes = -1;
         }
-            
-        close( file );
     }
 
     // ----------------------------------------------------------------------
