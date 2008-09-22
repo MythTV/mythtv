@@ -54,7 +54,7 @@ NAL_SPS_EXT,
 NAL_AUXILIARY_SLICE=19
 };
 
-static const AVRational pixel_aspect[14]={
+static const AVRational pixel_aspect[17]={
  {0, 1},
  {1, 1},
  {12, 11},
@@ -69,6 +69,9 @@ static const AVRational pixel_aspect[14]={
  {15, 11},
  {64, 33},
  {160,99},
+ {4, 3},
+ {3, 2},
+ {2, 1},
 };
 
 static const uint8_t golomb_to_pict_type[5]=
@@ -107,6 +110,14 @@ static const uint8_t inter_cbp_to_golomb[48]={
   0,  2,  3,  7,  4,  8, 17, 13,  5, 18,  9, 14, 10, 15, 16, 11,
   1, 32, 33, 36, 34, 37, 44, 40, 35, 45, 38, 41, 39, 42, 43, 19,
   6, 24, 25, 20, 26, 21, 46, 28, 27, 47, 22, 29, 23, 30, 31, 12
+};
+
+static const uint8_t golomb_to_inter_cbp_gray[16]={
+ 0, 1, 2, 4, 8, 3, 5,10,12,15, 7,11,13,14, 6, 9,
+};
+
+static const uint8_t golomb_to_intra4x4_cbp_gray[16]={
+15, 0, 7,11,13,14, 3, 5,10,12, 1, 2, 4, 8, 6, 9,
 };
 
 static const uint8_t chroma_dc_coeff_token_len[4*5]={

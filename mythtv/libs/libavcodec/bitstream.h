@@ -800,9 +800,19 @@ int init_vlc_sparse(VLC *vlc, int nb_bits, int nb_codes,
              const void *codes, int codes_wrap, int codes_size,
              const void *symbols, int symbols_wrap, int symbols_size,
              int flags);
-#define INIT_VLC_USE_STATIC 1
+#define INIT_VLC_USE_STATIC 1 ///< VERY strongly deprecated and forbidden
 #define INIT_VLC_LE         2
+#define INIT_VLC_USE_NEW_STATIC 4
 void free_vlc(VLC *vlc);
+
+#define INIT_VLC_STATIC(vlc, bits, a,b,c,d,e,f,g, static_size)\
+{\
+    static VLC_TYPE table[static_size][2];\
+    (vlc)->table= table;\
+    (vlc)->table_allocated= static_size;\
+    init_vlc(vlc, bits, a,b,c,d,e,f,g, INIT_VLC_USE_NEW_STATIC);\
+}
+
 
 /**
  *

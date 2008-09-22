@@ -51,9 +51,13 @@
 
 #define MAX_MMCO_COUNT 66
 
+#define MAX_DELAYED_PIC_COUNT 16
+
 /* Compiling in interlaced support reduces the speed
  * of progressive decoding by about 2%. */
 #define ALLOW_INTERLACE
+
+#define ALLOW_NOCHROMA
 
 #ifdef ALLOW_INTERLACE
 #define MB_MBAFF h->mb_mbaff
@@ -70,6 +74,16 @@
 #endif
 #define FIELD_OR_MBAFF_PICTURE (FRAME_MBAFF || FIELD_PICTURE)
 
+#ifdef ALLOW_NOCHROMA
+#define CHROMA h->sps.chroma_format_idc
+#else
+#define CHROMA 1
+#endif
+
+#ifndef ENABLE_H264_ENCODER
+#define ENABLE_H264_ENCODER 0
+#endif
+
 /**
  * Sequence parameter set
  */
@@ -77,6 +91,7 @@ typedef struct SPS{
 
     int profile_idc;
     int level_idc;
+    int chroma_format_idc;
     int transform_bypass;              ///< qpprime_y_zero_transform_bypass_flag
     int log2_max_frame_num;            ///< log2_max_frame_num_minus4 + 4
     int poc_type;                      ///< pic_order_cnt_type
@@ -132,7 +147,7 @@ typedef struct PPS{
     int transform_8x8_mode;     ///< transform_8x8_mode_flag
     uint8_t scaling_matrix4[6][16];
     uint8_t scaling_matrix8[2][64];
-    uint8_t chroma_qp_table[2][256];  ///< pre-scaled (with chroma_qp_index_offset) version of qp_table
+    uint8_t chroma_qp_table[2][64];  ///< pre-scaled (with chroma_qp_index_offset) version of qp_table
     int chroma_qp_diff;
 }PPS;
 
@@ -264,6 +279,7 @@ typedef struct H264Context{
     uint8_t *slice_table_base;
     uint8_t *slice_table;      ///< slice_table_base + 2*mb_stride + 1
     int slice_type;
+    int slice_type_nos;        ///< S free slice type (SI/SP are remapped to I/P)
     int slice_type_fixed;
 
     //interlacing specific flags
@@ -330,8 +346,9 @@ typedef struct H264Context{
     Picture ref_list[2][48];         /**< 0..15: frame refs, 16..47: mbaff field refs.
                                           Reordered version of default_ref_list
                                           according to picture reordering in slice header */
-    Picture *delayed_pic[18]; //FIXME size?
-    Picture *delayed_output_pic;
+    int ref2frm[16][2][64];          ///< reference to frame number lists, used in the loop filter, the first 2 are for -2,-1
+    Picture *delayed_pic[MAX_DELAYED_PIC_COUNT+2]; //FIXME size?
+    int outputed_poc;
 
     /**
      * memory management control operations buffer.
@@ -413,6 +430,8 @@ typedef struct H264Context{
 
     int last_slice_type;
     /** @} */
+
+    int mb_xy;
 
 }H264Context;
 
