@@ -15,6 +15,7 @@ using namespace std;
 #include "compat.h"
 #ifdef USING_MINGW
 # include <sys/types.h>
+# include <sys/stat.h>   // for S_IREAD and S_IWRITE
 # include <sys/param.h>
 #else
 # include <sys/types.h>
