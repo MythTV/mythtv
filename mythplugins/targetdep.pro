@@ -10,6 +10,9 @@ MYTH_SHLIB_EXT=$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 MYTH_LIB_EXT  =$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 
 
+# On Windows, dlls were installed with exes:
+mingw : LIBDIR = $${PREFIX}/bin
+
 TARGETDEPS += $${LIBDIR}/libmyth-$${MYTH_SHLIB_EXT}
 TARGETDEPS += $${LIBDIR}/libmythdb-$${MYTH_SHLIB_EXT}
 TARGETDEPS += $${LIBDIR}/libmythtv-$${MYTH_SHLIB_EXT}
