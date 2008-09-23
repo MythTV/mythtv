@@ -1,3 +1,6 @@
+#include <vector>
+#include <utility>
+
 #include "mythtv/mythcontext.h"
 
 // c/c++
@@ -9,8 +12,6 @@
 #include <qcursor.h>
 #include <qdir.h>
 #include <qimage.h>
-#include <qstringlist.h>
-#include <q3process.h>
 #include <qapplication.h>
 #include <qobject.h>
 //Added by qt3to4:
@@ -19,6 +20,8 @@
 #include <QKeyEvent>
 #include <QEvent>
 #include <Q3VBoxLayout>
+#include <QProcess>
+#include <QStringList>
 
 // mythtv
 #include <mythtv/util.h>
@@ -493,79 +496,55 @@ static HostComboBox *CDWriterDevice()
 {
     HostComboBox *gc = new HostComboBox("CDWriterDevice");
 
-    QString argadd[3]  = { "", "-dev=ATA", "-dev=ATAPI" };
-    QString prepend[3] = { "", "ATA:", "ATAPI:" };
+    typedef std::vector<std::pair<QString, QString> > search_cmd_list;
+    search_cmd_list search_types;
+    search_types.push_back(std::make_pair("", ""));
+    search_types.push_back(std::make_pair("-dev=ATA", "ATA:"));
+    search_types.push_back(std::make_pair("-dev=ATAPI", "ATAPI:"));
 
-    for (int i = 0; i < 3; i++)
+    const QString scan_command("cdrecord");
+    for (search_cmd_list::const_iterator p = search_types.begin();
+            p != search_types.end(); ++p)
     {
         QStringList args;
-        QStringList result;
+        args << "--scanbus";
+        if (p->first.size())
+            args << p->first;
 
-        args << "cdrecord";
-        args += "--scanbus";
+        QProcess proc;
 
-        if (argadd[i].length() > 1)
-            args += argadd[i];
-
-        QString  cmd = args.join(" ");
-        Q3Process proc(args);
-
-        MythTimer totaltimer;
-    
-        if (proc.start())
+        proc.start(scan_command, args, QIODevice::ReadOnly);
+        if (proc.waitForStarted() && proc.waitForFinished(1500) &&
+                proc.exitStatus() == QProcess::NormalExit)
         {
-            totaltimer.start();
+            QTextStream output(&proc);
 
-            while (1)
+            QString line;
+            while (!(line = output.readLine()).isNull())
             {
-                while (proc.canReadLineStdout())
-                    result += proc.readLineStdout();
-                if (proc.isRunning())
+                if (line.length() > 12)
                 {
-                    qApp->processEvents();
-                    usleep(10000);
-                }
-                else
-                {
-                    if (!proc.normalExit())
-                        VERBOSE(VB_GENERAL,
-                                QString("Failed to run '%1'").arg(cmd));
-                    break;
-                }
+                    if (line[10] == ')' && line[12] != '*')
+                    {
+                        QString name = line.mid(24, 16);
+                        QString dev  = p->second + line.mid(1, 5);
 
-                if (totaltimer.elapsed() > 1500)
-                {
-                    //VERBOSE(VB_GENERAL, QString("Killed '%1' after %2ms")
-                    //                    .arg(cmd).arg(totaltimer.elapsed()));
-                    proc.kill();
+                        gc->addSelection(name, dev);
+                        VERBOSE(VB_GENERAL,
+                                QString("MythMusic adding CD-Writer: %1 -- %2")
+                                .arg(dev).arg(name));
+                    }
                 }
             }
         }
         else
-            VERBOSE(VB_GENERAL, QString("Failed to run '%1'").arg(cmd));
-
-        while (proc.canReadLineStdout())
-            result += proc.readLineStdout();
-
-        for (QStringList::Iterator it = result.begin(); it != result.end();
-             ++it)
         {
-            QString line = *it;
-            if (line.length() > 12)
-            {
-                if (line[10] == ')' && line[12] != '*')
-                {
-                    QString dev  = prepend[i] + line.mid(1, 5);
-                    QString name = line.mid(24, 16);
-
-                    gc->addSelection(name, dev);
-                    VERBOSE(VB_GENERAL, "MythMusic adding CD-Writer: "
-                                        + dev + " -- " + name);
-                }
-            }
+                VERBOSE(VB_GENERAL, QString("Failed to run '%1 %2' "
+                                "error code: %3").arg(scan_command)
+                        .arg(args.join(" ")).arg(proc.error()));
         }
     }
-    
+
     gc->setLabel(QObject::tr("CD-Writer Device"));
     gc->setHelpText(QObject::tr("Select the SCSI or IDE Device for CD Writing."));
     return gc;
