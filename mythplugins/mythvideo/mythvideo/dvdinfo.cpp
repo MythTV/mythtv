@@ -36,10 +36,8 @@ DVDTitleInfo::DVDTitleInfo()
     minutes = 0;
     seconds = 0;
     audio_tracks.clear();
-    audio_tracks.setAutoDelete(true);
     subtitles.clear();
-    subtitles.setAutoDelete(true);
-    
+
     is_selected = false;
     selected_quality = -1;
 
@@ -80,7 +78,11 @@ void DVDTitleInfo::addSubTitle(DVDSubTitleInfo *new_subtitle)
 
 DVDTitleInfo::~DVDTitleInfo()
 {
+    while( !audio_tracks.isEmpty() )
+        delete audio_tracks.takeFirst();
     audio_tracks.clear();
+    while( !subtitles.isEmpty() )
+        delete subtitles.takeFirst();
     subtitles.clear();
 }
 
@@ -95,20 +97,20 @@ DVDInfo::DVDInfo(const QString &new_name)
     //  This object just figures out what's on a disc
     //  and tells whoever asks about it.
     //
-    
-    titles.setAutoDelete(true);
+
     titles.clear();
     volume_name = new_name;
 }
 
 DVDTitleInfo* DVDInfo::getTitle(uint which_one)
 {
-    DVDTitleInfo *iter;
-    for(iter = titles.first(); iter; iter = titles.next())
+    QListIterator<DVDTitleInfo *> iter(titles);
+    while (iter.hasNext())
     {
-        if(iter->getTrack() == which_one)
+        DVDTitleInfo *title = iter.next();
+        if(title->getTrack() == which_one)
         {
-            return iter;
+            return title;
         }
     }
     return NULL;
@@ -117,6 +119,8 @@ DVDTitleInfo* DVDInfo::getTitle(uint which_one)
 
 DVDInfo::~DVDInfo()
 {
+    while( !titles.isEmpty() )
+        delete titles.takeFirst();
     titles.clear();
 }
 

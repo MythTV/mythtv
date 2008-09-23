@@ -1,69 +1,32 @@
 #ifndef VIDEOTREE_H_
 #define VIDEOTREE_H_
 
-#include <memory>
+#include <mythtv/libmythui/mythscreentype.h>
+#include <mythtv/libmythui/mythuibuttontree.h>
 
-#include <mythtv/mythdialogs.h>
-
-class QKeyEvent;
+#include "videodlg.h"
 
 class Metadata;
 class VideoList;
 class ParentalLevel;
 
-class VideoTreeImp;
-class VideoTree : public MythThemedDialog
+class VideoTree : public VideoDialog
 {
     Q_OBJECT
 
   public:
-    VideoTree(MythMainWindow *lparent, const QString &window_name,
-              const QString &theme_filename, const QString &name,
-              VideoList *video_list);
+    VideoTree(MythScreenStack *parent, const QString &name,
+              VideoList *video_list, DialogType type=DLG_TREE);
    ~VideoTree();
 
-    void buildVideoList();
-
-    void playVideo(Metadata *someItem);
-    int videoExitType() { return m_exit_type; }
-
-  public slots:
-    void slotDoCancel();
-    void slotVideoGallery();
-    void slotVideoBrowser();
-    void slotViewPlot();
-    void slotViewCast();
-    void slotDoFilter();
-    void slotWatchVideo();
-
-    void handleTreeListSelection(int node_int);
-    void handleTreeListEntry(int node_int);
-    void playVideo(int node_number);
-    void setParentalLevel(const ParentalLevel &which_level);
-
-  protected:
-    void keyPressEvent(QKeyEvent *e);
-    bool createPopup();
-    void cancelPopup();
-    void doMenu(bool info);
+    bool Create(void);
 
   private:
-    MythPopupBox *popup;
-    bool expectingPopup;
-    Metadata *curitem;
-    std::auto_ptr<ParentalLevel> current_parental_level;
-    bool file_browser;
-    bool m_db_folders;
+    void loadData(void);
+    MythUIButtonListItem* GetItemCurrent(void);
 
-    VideoList    *m_video_list;
-    GenericTree *video_tree_root;
-
-    int m_exit_type;
-
-  private:
-    void jumpTo(const QString &location);
-    void setExitType(int exit_type) { m_exit_type = exit_type; }
-    std::auto_ptr<VideoTreeImp> m_imp;
+    MythUIButtonTree* m_videoButtonTree;
+    bool m_rememberPosition;
 };
 
 #endif

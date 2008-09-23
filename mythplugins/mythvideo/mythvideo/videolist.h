@@ -14,7 +14,7 @@ enum TreeNodeAttributes {
     kFolderPath
 };
 
-class GenericTree;
+class MythGenericTree;
 class VideoFilterSettings;
 class Metadata;
 class MetadataListManager;
@@ -26,7 +26,7 @@ class VideoList
     VideoList();
     ~VideoList();
 
-    GenericTree *buildVideoList(bool filebrowser, bool flatlist,
+    MythGenericTree *buildVideoList(bool filebrowser, bool flatlist,
                                 const ParentalLevel &parental_level,
                                 bool include_updirs);
 
@@ -55,6 +55,8 @@ class VideoList
 
     // returns the folder path associated with a returned tree
     QString getFolderPath(int folder_id) const;
+
+    MythGenericTree *GetTreeRoot();
 
   private:
     class VideoListImp *m_imp;

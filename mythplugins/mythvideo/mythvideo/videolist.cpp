@@ -1,21 +1,34 @@
+// TODO
+// This needs a complete re-write, it's overly complex and doesn't make good
+// use of MythGenericTree e.g. the flat view
+//
+// A schema change, to match mythmusic would make everything faster, allow
+// browsing by metadata and all sorts of interesting stuff whilst keeping
+// things fast
+
+// C++ headers
 #include <memory>
 #include <algorithm>
 #include <iterator>
 #include <map>
 
+// QT headers
 #include <QFileInfo>
-#include <Q3ValueList>
+#include <QList>
 
+// Myth headers
 #include <mythtv/mythcontext.h>
-#include <mythtv/uitypes.h>
 #include <mythtv/mythmediamonitor.h>
 
+// Mythui headers
+#include <mythtv/libmythui/mythgenerictree.h>
+
+// Mythvideo headers
 #include "videolist.h"
 #include "videofilter.h"
 #include "metadata.h"
 #include "metadatalistmanager.h"
 #include "dbaccess.h"
-
 #include "quicksp.h"
 #include "dirscan.h"
 #include "videoutils.h"
@@ -345,8 +358,8 @@ namespace fake_unnamed
             QString rhs_comp(rhs);
             if (m_ignore_case)
             {
-                lhs_comp = lhs_comp.lower();
-                rhs_comp = rhs_comp.lower();
+                lhs_comp = lhs_comp.toLower();
+                rhs_comp = rhs_comp.toLower();
             }
             return QString::localeAwareCompare(lhs_comp, rhs_comp) < 0;
         }
@@ -387,7 +400,7 @@ namespace fake_unnamed
             insert_chunk = metadata->Filename().mid(dir->getFQPath().length());
         }
 
-        QStringList path = QStringList::split("/", insert_chunk);
+        QStringList path = insert_chunk.split("/", QString::SkipEmptyParts);
         if (path.size() > 1)
         {
             path.pop_back();
@@ -449,9 +462,9 @@ class VideoListImp
   public:
     VideoListImp();
 
-    void build_generic_tree(GenericTree *dst, meta_dir_node *src,
+    void build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
                             bool include_updirs);
-    GenericTree *buildVideoList(bool filebrowser, bool flatlist,
+    MythGenericTree *buildVideoList(bool filebrowser, bool flatlist,
                                 const ParentalLevel &parental_level,
                                 bool include_updirs);
 
@@ -519,6 +532,11 @@ class VideoListImp
         return ret;
     }
 
+    MythGenericTree *GetTreeRoot()
+    {
+        return video_tree_root.get();
+    }
+
   private:
     void update_flat_index();
     void sort_view_data(bool flat_list);
@@ -529,9 +547,9 @@ class VideoListImp
     void buildFileList(smart_dir_node &directory, metadata_list &metalist,
                        const QString &prefix);
 
-    GenericTree *addDirNode(GenericTree *where_to_add, const QString &dname,
+    MythGenericTree *addDirNode(MythGenericTree *where_to_add, const QString &dname,
                             bool add_up_dirs);
-    int addFileNode(GenericTree *where_to_add, const QString &name, int id);
+    int addFileNode(MythGenericTree *where_to_add, const QString &name, int id);
 
     void update_meta_view(bool flat_list);
 
@@ -539,7 +557,7 @@ class VideoListImp
     bool m_ListUnknown;
     bool m_LoadMetaData;
 
-    std::auto_ptr<GenericTree> video_tree_root;
+    std::auto_ptr<MythGenericTree> video_tree_root;
 
     MetadataListManager m_metadata;
     meta_dir_node m_metadata_tree; // master list for tree views
@@ -569,7 +587,7 @@ VideoList::~VideoList()
     delete m_imp;
 }
 
-GenericTree *VideoList::buildVideoList(bool filebrowser, bool flatlist,
+MythGenericTree *VideoList::buildVideoList(bool filebrowser, bool flatlist,
     const ParentalLevel &parental_level, bool include_updirs)
 {
     return m_imp->buildVideoList(filebrowser, flatlist, parental_level,
@@ -637,6 +655,11 @@ bool VideoList::Delete(int video_id)
     return m_imp->Delete(video_id);
 }
 
+MythGenericTree *VideoList::GetTreeRoot()
+{
+    return m_imp->GetTreeRoot();
+}
+
 //////////////////////////////
 // VideoListImp
 //////////////////////////////
@@ -651,7 +674,7 @@ VideoListImp::VideoListImp() : m_metadata_view_tree("", "top"),
             gContext->GetNumSetting("mythvideo.sort_ignores_case", 1);
 }
 
-void VideoListImp::build_generic_tree(GenericTree *dst, meta_dir_node *src,
+void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
                                       bool include_updirs)
 {
     for (meta_dir_node::const_dir_iterator dir = src->dirs_begin();
@@ -659,7 +682,7 @@ void VideoListImp::build_generic_tree(GenericTree *dst, meta_dir_node *src,
     {
         if ((*dir)->has_entries())
         {
-            GenericTree *t = addDirNode(dst, (*dir)->getName(), include_updirs);
+            MythGenericTree *t = addDirNode(dst, (*dir)->getName(), include_updirs);
             t->setAttribute(kFolderPath, m_folder_id);
             m_folder_id_to_path.
                     insert(id_string_map::value_type(m_folder_id,
@@ -691,16 +714,17 @@ void VideoListImp::build_generic_tree(GenericTree *dst, meta_dir_node *src,
 //      videos found.
 //      If false, the hierarchy present on the filesystem or in the database
 //      is preserved. In this mode, both sub-dirs and updirs are present.
-GenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
+MythGenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
                                           const ParentalLevel &parental_level,
                                           bool include_updirs)
 {
     refreshList(filebrowser, parental_level, flatlist);
 
-    typedef std::map<QString, GenericTree *> string_to_tree;
+    typedef std::map<QString, MythGenericTree *> string_to_tree;
     string_to_tree prefix_tree_map;
 
-    video_tree_root.reset(new GenericTree("video root", kRootNode, false));
+    video_tree_root.reset(new MythGenericTree(QObject::tr("Video Home"), kRootNode,
+                                          false));
 
     m_folder_id_to_path.clear();
     m_folder_id = 1;
@@ -709,7 +733,8 @@ GenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
 
     if (m_metadata_view_flat.empty())
     {
-        video_tree_root.reset(new GenericTree("video root", kRootNode, false));
+        video_tree_root.reset(new MythGenericTree(QObject::tr("Video Home"),
+                                              kRootNode, false));
         addDirNode(video_tree_root.get(), QObject::tr("No files found"),
                    include_updirs);
     }
@@ -928,9 +953,9 @@ void VideoListImp::buildFsysList()
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
     if (mon)
     {
-        Q3ValueList <MythMediaDevice*> medias = mon->GetMedias(MEDIATYPE_DATA);
+        QList <MythMediaDevice*> medias = mon->GetMedias(MEDIATYPE_DATA);
 
-        for (Q3ValueList <MythMediaDevice*>::Iterator itr = medias.begin();
+        for (QList <MythMediaDevice*>::Iterator itr = medias.begin();
              itr != medias.end(); ++itr)
         {
             MythMediaDevice *pDev = *itr;
@@ -982,19 +1007,19 @@ void VideoListImp::buildFsysList()
     m_metadata.setList(ml);
 }
 
-GenericTree *VideoListImp::addDirNode(GenericTree *where_to_add,
+MythGenericTree *VideoListImp::addDirNode(MythGenericTree *where_to_add,
                                       const QString &dname, bool add_up_dirs)
 {
     // Add the subdir node...
-    GenericTree *sub_node = where_to_add->addNode(dname, kSubFolder, false);
+    MythGenericTree *sub_node = where_to_add->addNode(dname, kSubFolder, false);
     sub_node->setAttribute(kNodeSort, kOrderSub);
     sub_node->setOrderingIndex(kNodeSort);
 
     // ...and the updir node.
     if (add_up_dirs)
     {
-        GenericTree *up_node = sub_node->addNode(where_to_add->getString(),
-                                                 kUpFolder, true);
+        MythGenericTree *up_node = sub_node->addNode(where_to_add->getString(),
+                                                 kUpFolder, true, false);
         up_node->setAttribute(kNodeSort, kOrderUp);
         up_node->setOrderingIndex(kNodeSort);
     }
@@ -1002,10 +1027,10 @@ GenericTree *VideoListImp::addDirNode(GenericTree *where_to_add,
     return sub_node;
 }
 
-int VideoListImp::addFileNode(GenericTree *where_to_add, const QString &name,
+int VideoListImp::addFileNode(MythGenericTree *where_to_add, const QString &name,
                               int index)
 {
-    GenericTree *sub_node = where_to_add->addNode(name, index, true);
+    MythGenericTree *sub_node = where_to_add->addNode(name, index, true);
     sub_node->setAttribute(kNodeSort, kOrderItem);
     sub_node->setOrderingIndex(kNodeSort);
 

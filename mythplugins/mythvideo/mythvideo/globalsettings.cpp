@@ -1,11 +1,15 @@
+// C++ headers
 #include <map>
 #include <vector>
 
+// QT headers
 #include <QDir>
 
+// Myth headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdirs.h>
 
+// Mythvideo headers
 #include "globalsettings.h"
 #include "globals.h"
 #include "videodlg.h"
@@ -36,11 +40,11 @@ HostComboBox *VideoDefaultView()
     HostComboBox *gc = new HostComboBox("Default MythVideo View");
     gc->setLabel(QObject::tr("Default View"));
     gc->addSelection(QObject::tr("Gallery"),
-                     QString::number(VideoDialog::DLG_GALLERY));
+                     QString::number(DLG_GALLERY));
     gc->addSelection(QObject::tr("Browser"),
-                     QString::number(VideoDialog::DLG_BROWSER));
+                     QString::number(DLG_BROWSER));
     gc->addSelection(QObject::tr("Listings"),
-                     QString::number(VideoDialog::DLG_TREE));
+                     QString::number(DLG_TREE));
     gc->setHelpText(QObject::tr("The default view for MythVideo. "
                     "Other views can be reached via the popup menu available "
                     "via the MENU key."));
@@ -323,7 +327,7 @@ HostLineEdit *SetDVDDevice()
     gc->setLabel(QObject::tr("Location of DVD device"));
 #ifdef Q_WS_MACX
     gc->setValue("default");
-#elif defined(_WIN32) 
+#elif defined(_WIN32)
     gc->setValue("D:\\");
 #else
     gc->setValue("/dev/dvd");

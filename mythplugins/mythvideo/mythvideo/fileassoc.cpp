@@ -1,22 +1,15 @@
-/*
-    fileassoc.cpp
-
-    (c) 2003 Thor Sigvaldason, Isaac Richards, and ?? ??
-    Part of the mythTV project
-
-    Classes to manipulate the file associations stored
-    in the videotypes table (in the mythconverg database)
-
-*/
-
-#include <QKeyEvent>
-
+// Myth headers
 #include <mythtv/mythcontext.h>
-#include <mythtv/uitypes.h>
-#include <mythtv/libmythui/mythuihelper.h>
 
+// Mythui headers
+#include <mythtv/libmythui/mythuihelper.h>
+#include <mythtv/libmythui/mythmainwindow.h>
+#include <mythtv/libmythui/mythdialogbox.h>
+
+// Mythvideo headers
 #include "fileassoc.h"
 #include "dbaccess.h"
+#include "videopopups.h"
 
 class FileAssociation
 {
@@ -100,97 +93,67 @@ class FileAssociation
 
 };
 
-/*
----------------------------------------------------------------------
-*/
+////////////////////////////////////////////////////////////
 
-FileAssocDialog::FileAssocDialog(MythMainWindow *parent_,
-                                 QString window_name,
-                                 QString theme_filename,
-                                 const char *name_)
-                : MythThemedDialog(parent_, window_name, theme_filename, name_)
+FileAssocDialog::FileAssocDialog(MythScreenStack *parent, const QString &name)
+                : MythScreenType(parent, name)
 {
-    command_editor = NULL;
-    file_associations.clear();
-    file_associations.setAutoDelete(true);
-    current_fa = NULL;
-    new_extension_popup = NULL;
-    new_extension_editor = NULL;
-    wireUpTheme();
-    assignFirstFocus();
+    m_commandEdit = NULL;
+    m_fileAssociations.clear();
+    m_currentFileAssociation = NULL;
 
     loadFileAssociations();
     showCurrentFA();
 }
 
-void FileAssocDialog::keyPressEvent(QKeyEvent *e)
+FileAssocDialog::~FileAssocDialog()
 {
-    bool handled = false;
-    QStringList lactions;
-    gContext->GetMainWindow()->TranslateKeyPress("Video", e, lactions);
+    while (!m_fileAssociations.isEmpty())
+        delete m_fileAssociations.takeFirst();
+}
 
-    for (QStringList::const_iterator p = lactions.begin();
-         p != lactions.end() && !handled; ++p)
+bool FileAssocDialog::Create()
+{
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("video-ui.xml", "file_associations", this);
+
+    if (!foundtheme)
+        return false;
+
+    m_extensionList = dynamic_cast<MythListButton *> (GetChild("m_extensionList"));
+    m_commandEdit = dynamic_cast<MythUITextEdit *> (GetChild("command"));
+    m_ignoreCheck = dynamic_cast<MythUICheckBox *> (GetChild("m_ignoreCheck"));
+    m_defaultCheck = dynamic_cast<MythUICheckBox *> (GetChild("m_defaultCheck"));
+    m_doneButton = dynamic_cast<MythUIButton *> (GetChild("m_doneButton"));
+    m_newButton = dynamic_cast<MythUIButton *> (GetChild("m_newButton"));
+    m_deleteButton = dynamic_cast<MythUIButton *> (GetChild("m_deleteButton"));
+
+    if (!m_commandEdit || !m_extensionList || !m_defaultCheck || !m_ignoreCheck
+        || !m_doneButton || !m_newButton || !m_deleteButton)
     {
-        QString action = *p;
-        handled = true;
-
-        if (action == "UP")
-        {
-            nextPrevWidgetFocus(false);
-            while (getCurrentFocusWidget()->GetContext() < -1)
-                nextPrevWidgetFocus(false);
-        }
-        else if (action == "DOWN")
-        {
-            nextPrevWidgetFocus(true);
-            while (getCurrentFocusWidget()->GetContext() < -1)
-                nextPrevWidgetFocus(true);
-        }
-        else if (action == "LEFT")
-        {
-            if (extension_select)
-            {
-                if (extension_select == getCurrentFocusWidget())
-                    extension_select->push(false);
-            }
-            if (default_check)
-            {
-                if (default_check == getCurrentFocusWidget())
-                    activateCurrent();
-            }
-            if (ignore_check)
-            {
-                if (ignore_check == getCurrentFocusWidget())
-                    activateCurrent();
-            }
-        }
-        else if (action == "RIGHT")
-        {
-            if (extension_select)
-            {
-                if (extension_select == getCurrentFocusWidget())
-                    extension_select->push(true);
-            }
-            if (default_check)
-            {
-                if (default_check == getCurrentFocusWidget())
-                    activateCurrent();
-            }
-            if (ignore_check)
-            {
-                if (ignore_check == getCurrentFocusWidget())
-                    activateCurrent();
-            }
-        }
-        else if (action == "SELECT")
-            activateCurrent();
-        else
-            handled = false;
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical elements.");
+        return false;
     }
 
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
+    connect(m_extensionList, SIGNAL(itemSelected(MythListButtonItem*)),
+            SLOT(switchToFA(MythListButtonItem*)));
+    connect(m_commandEdit, SIGNAL(valueChanged()), SLOT(setPlayerCommand()));
+    connect(m_defaultCheck, SIGNAL(valueChanged()), SLOT(toggleDefault()));
+    connect(m_ignoreCheck, SIGNAL(valueChanged()), SLOT(toggleIgnore()));
+    connect(m_doneButton, SIGNAL(buttonPressed()), SLOT(saveAndExit()));
+    connect(m_newButton, SIGNAL(buttonPressed()), SLOT(makeNewExtension()));
+    connect(m_deleteButton, SIGNAL(buttonPressed()), SLOT(deleteCurrent()));
+
+    m_deleteButton->SetText(tr("Delete"));
+    m_doneButton->SetText(tr("Done"));
+    m_newButton->SetText(tr("New"));
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+
+    return true;
 }
 
 void FileAssocDialog::loadFileAssociations()
@@ -204,12 +167,12 @@ void FileAssocDialog::loadFileAssociations()
         FileAssociation *new_fa =
                 new FileAssociation(p->id, p->extension, p->playcommand,
                                     p->ignore, p->use_default);
-        file_associations.append(new_fa);
+        m_fileAssociations.append(new_fa);
     }
 
-    if (file_associations.count())
+    if (!m_fileAssociations.isEmpty())
     {
-        current_fa = file_associations.getFirst();
+        m_currentFileAssociation = m_fileAssociations.first();
     }
     else
     {
@@ -220,103 +183,67 @@ void FileAssocDialog::loadFileAssociations()
 
 void FileAssocDialog::saveFileAssociations()
 {
-    for (uint i = 0; i < file_associations.count(); i++)
+    for (int i = 0; i < m_fileAssociations.count(); i++)
     {
-        file_associations.at(i)->saveYourself();
+        m_fileAssociations.at(i)->saveYourself();
     }
 }
 
 void FileAssocDialog::showCurrentFA()
 {
-    if (!current_fa)
+    if (!m_currentFileAssociation)
     {
-        if (extension_select)
-        {
-            extension_select->SetContext(-2);
-        }
-        if (command_editor)
-        {
-            command_editor->hide();
-            command_editor->SetContext(-2);
-        }
-        if (default_check)
-        {
-            default_check->SetContext(-2);
-        }
-        if (ignore_check)
-        {
-            ignore_check->SetContext(-2);
-        }
-        if (delete_button)
-        {
-            delete_button->SetContext(-2);
-        }
-        UIType *current_widget = getCurrentFocusWidget();
-        if (current_widget)
-        {
-            current_widget->looseFocus();
-        }
-        if (new_button)
-        {
-            new_button->takeFocus();
-            widget_with_current_focus = new_button;
-        }
-        else if (done_button)
-        {
-            done_button->takeFocus();
-            widget_with_current_focus = done_button;
-        }
-        else
-        {
-            assignFirstFocus();
-        }
+        m_extensionList->SetVisible(false);
+        m_commandEdit->SetVisible(false);
+        m_defaultCheck->SetVisible(false);
+        m_ignoreCheck->SetVisible(false);
+        m_deleteButton->SetVisible(false);
+
+        BuildFocusList();
     }
     else
     {
-        if (extension_select)
-        {
-            extension_select->SetContext(-1);
-            extension_select->cleanOut();
-            for (uint i = 0; i < file_associations.count(); i++)
-            {
-                extension_select->addItem(file_associations.at(i)->getID(),
-                                       file_associations.at(i)->getExtension());
-            }
-            extension_select->setToItem(current_fa->getID());
-        }
 
-        if (command_editor)
+        m_extensionList->SetVisible(true);
+        m_extensionList->Reset();
+        for (int i = 0; i < m_fileAssociations.count(); i++)
         {
-            command_editor->SetContext(-1);
-            command_editor->show();
-            command_editor->setText(current_fa->getCommand());
+            new MythListButtonItem(m_extensionList,
+                                   m_fileAssociations.at(i)->getExtension(),
+                                   m_fileAssociations.at(i)->getID());
         }
-        if (default_check)
-        {
-            default_check->SetContext(-1);
-            default_check->setState(current_fa->getDefault());
-        }
-        if (ignore_check)
-        {
-            ignore_check->SetContext(-1);
-            ignore_check->setState(current_fa->getIgnore());
-        }
-        if (delete_button)
-        {
-            delete_button->SetContext(-1);
-        }
+        m_extensionList->SetValueByData(m_currentFileAssociation->getID());
+
+        m_commandEdit->SetVisible(true);
+        m_commandEdit->SetText(m_currentFileAssociation->getCommand());
+
+        m_defaultCheck->SetVisible(true);
+        if (m_currentFileAssociation->getDefault())
+            m_defaultCheck->SetCheckState(MythUIStateType::Full);
+        else
+            m_defaultCheck->SetCheckState(MythUIStateType::Off);
+
+        m_ignoreCheck->SetVisible(true);
+        if (m_currentFileAssociation->getIgnore())
+            m_ignoreCheck->SetCheckState(MythUIStateType::Full);
+        else
+            m_ignoreCheck->SetCheckState(MythUIStateType::Off);
+
+        m_deleteButton->SetVisible(true);
+
+        BuildFocusList();
     }
-    update();
 }
 
-void FileAssocDialog::switchToFA(int which_one)
+void FileAssocDialog::switchToFA(MythListButtonItem *item)
 {
-    for (uint i = 0; i < file_associations.count(); i++)
+    int which_one = item->GetData().toInt();
+    for (int i = 0; i < m_fileAssociations.count(); i++)
     {
-        if (file_associations.at(i)->getID() == which_one)
+        if (m_fileAssociations.at(i)->getID() == which_one)
         {
-            current_fa = file_associations.at(i);
-            i = file_associations.count() + 1;
+            m_currentFileAssociation = m_fileAssociations.at(i);
+            i = m_fileAssociations.count() + 1;
         }
     }
     showCurrentFA();
@@ -325,172 +252,72 @@ void FileAssocDialog::switchToFA(int which_one)
 void FileAssocDialog::saveAndExit()
 {
     saveFileAssociations();
-    reject();
+    Close();
 }
 
-void FileAssocDialog::toggleDefault(bool yes_or_no)
+void FileAssocDialog::toggleDefault()
 {
-    if (current_fa)
+    if (m_currentFileAssociation)
     {
-        current_fa->setDefault(yes_or_no);
+        if (m_defaultCheck->GetCheckState() == MythUIStateType::Full)
+            m_currentFileAssociation->setDefault(true);
+        else
+            m_currentFileAssociation->setDefault(false);
     }
 }
 
-void FileAssocDialog::toggleIgnore(bool yes_or_no)
+void FileAssocDialog::toggleIgnore()
 {
-    if (current_fa)
+    if (m_currentFileAssociation)
     {
-        current_fa->setIgnore(yes_or_no);
+        if (m_ignoreCheck->GetCheckState() == MythUIStateType::Full)
+            m_currentFileAssociation->setIgnore(true);
+        else
+            m_currentFileAssociation->setIgnore(false);
     }
 }
 
-void FileAssocDialog::setPlayerCommand(QString new_command)
+void FileAssocDialog::setPlayerCommand()
 {
-    if (current_fa)
-    {
-        current_fa->setCommand(new_command);
-    }
+    QString new_command = m_commandEdit->GetText();
+    if (m_currentFileAssociation)
+        m_currentFileAssociation->setCommand(new_command);
 }
 
 void FileAssocDialog::deleteCurrent()
 {
-    if (current_fa)
+    if (m_currentFileAssociation)
     {
-        current_fa->deleteYourselfFromDB();
-        file_associations.remove(current_fa);
-        current_fa = file_associations.first();
+        m_currentFileAssociation->deleteYourselfFromDB();
+        m_fileAssociations.remove(m_currentFileAssociation);
+        m_currentFileAssociation = m_fileAssociations.first();
     }
     showCurrentFA();
 }
 
 void FileAssocDialog::makeNewExtension()
 {
-    // Create the popup window for new extension dialog/widgets
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    new_extension_popup = new MythPopupBox(gContext->GetMainWindow(),
-                                           "new extension popup");
-    GetMythUI()->ThemeWidget(new_extension_popup);
+    QString message = tr("Enter the new extension:");
 
-    new_extension_popup->addLabel("");
-    new_extension_popup->addLabel(tr("Please enter the new extension:"));
-    new_extension_popup->addLabel("");
+    MythTextInputDialog *newextdialog =
+                                new MythTextInputDialog(popupStack, message);
 
+    if (newextdialog->Create())
+        popupStack->AddScreen(newextdialog);
 
-    new_extension_editor = new MythRemoteLineEdit(new_extension_popup);
-    new_extension_popup->addWidget(new_extension_editor);
-
-    new_extension_popup->addButton(tr("Create new extension"), this,
-                                   SLOT(createExtension()));
-    new_extension_popup->addButton(tr("Cancel"), this,
-                                   SLOT(removeExtensionPopup()));
-
-    new_extension_editor->setFocus();
-
-    new_extension_popup->ShowPopup(this, SLOT(removeExtensionPopup()));
+    connect(newextdialog, SIGNAL(haveResult(QString &)),
+            SLOT(createExtension(QString)), Qt::QueuedConnection);
 }
 
-void FileAssocDialog::createExtension()
+void FileAssocDialog::createExtension(QString new_extension)
 {
-    QString new_extension = new_extension_editor->text();
     if (new_extension.length() > 0)
     {
         FileAssociation *new_fa = new FileAssociation(new_extension);
-        file_associations.append(new_fa);
-        current_fa = new_fa;
+        m_fileAssociations.append(new_fa);
+        m_currentFileAssociation = new_fa;
     }
-    removeExtensionPopup();
     showCurrentFA();
-}
-
-void FileAssocDialog::removeExtensionPopup()
-{
-    new_extension_popup->close();
-    new_extension_editor->deleteLater();
-    new_extension_editor = NULL;
-    new_extension_popup->deleteLater();
-    new_extension_popup = NULL;
-
-    //
-    //  Move focus to the extension
-    //  selector
-    //
-
-    UIType *current_widget = getCurrentFocusWidget();
-    if (current_widget)
-    {
-        current_widget->looseFocus();
-    }
-    if (extension_select)
-    {
-        widget_with_current_focus = extension_select;
-        extension_select->takeFocus();
-    }
-    else
-    {
-        assignFirstFocus();
-    }
-    update();
-}
-
-void FileAssocDialog::wireUpTheme()
-{
-    extension_select = getUISelectorType("extension_select");
-    if (extension_select)
-    {
-        connect(extension_select, SIGNAL(pushed(int)), this,
-                SLOT(switchToFA(int)));
-    }
-    command_editor = getUIRemoteEditType("command");
-    if (command_editor)
-    {
-        command_editor->createEdit(this);
-        connect(command_editor, SIGNAL(textChanged(QString)),
-                this, SLOT(setPlayerCommand(QString)));
-    }
-
-    default_check = getUICheckBoxType("default_check");
-    if (default_check)
-    {
-        connect(default_check, SIGNAL(pushed(bool)), this,
-                SLOT(toggleDefault(bool)));
-    }
-
-    ignore_check = getUICheckBoxType("ignore_check");
-    if (ignore_check)
-    {
-        connect(ignore_check, SIGNAL(pushed(bool)), this,
-                SLOT(toggleIgnore(bool)));
-    }
-
-    done_button = getUITextButtonType("done_button");
-    if (done_button)
-    {
-        done_button->setText(tr("Done"));
-        connect(done_button, SIGNAL(pushed()), this, SLOT(saveAndExit()));
-    }
-
-    new_button = getUITextButtonType("new_button");
-    if (new_button)
-    {
-        new_button->setText(tr("New"));
-        connect(new_button, SIGNAL(pushed()), this, SLOT(makeNewExtension()));
-    }
-
-    delete_button = getUITextButtonType("delete_button");
-    if (delete_button)
-    {
-        delete_button->setText(tr("Delete"));
-        connect(delete_button, SIGNAL(pushed()), this, SLOT(deleteCurrent()));
-    }
-    buildFocusList();
-}
-
-FileAssocDialog::~FileAssocDialog()
-{
-    file_associations.clear();
-    if (command_editor)
-    {
-        command_editor->deleteLater();
-        command_editor = NULL;
-    }
 }

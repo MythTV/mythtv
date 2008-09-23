@@ -1,372 +1,223 @@
-<!--
-
-    This is a myth style theme file for mythdvd
-
-    (c) 2003 by a whole bunch of people associated with MythTV
-
--->
 <mythuitheme>
- 
 
-    <!--
-        
-        The dvd ripping/transcoding screen
-
-    -->
+    <!-- The dvd ripping/transcoding screen -->
     <window name="dvd_rip">
-    
+        <imagetype name="banner">
+            <filename>md_rip_banner.png</filename>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <font>baselarge</font>
+            <area>200,25,600,95</area>
+            <value>Rip/Transcode</value>
+        </textarea>
+
+        <imagetype name="progress_background">
+            <filename>md_progress_background.png</filename>
+            <position>50,120</position>
+        </imagetype>
+
         <!--
-
-            First, define all the fonts we need on this screen
-
+            Context 1 & 2
+            Warnings or Status Messages
         -->
-        <font name="title" face="Arial">
-            <color>#ffffff</color>
-            <dropcolor>#000000</dropcolor>
-            <size>40</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
 
-        <font name="warning" face="Arial">
-            <color>#ffffff</color>
-            <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>2,2</shadow>
-            <bold>yes</bold>
-        </font>
-  
-        <font name="display" face="Arial">
-            <color>#ffffff</color>
-            <size>18</size>
-            <bold>yes</bold>
-        </font>
+        <textarea name="warning" from="basetextarea">
+            <multiline>yes</multiline>
+            <area>100,170,600,300</area>
+            <align>allcenter</align>
+        </textarea>
 
-        <font name="buttons" face="Arial">
-            <color>#ffffff</color>
-            <size>14</size>
-            <bold>yes</bold>
-        </font>
+        <!--
+            Context 3
+            Browse active jobs
+        -->
 
-        <container name="background">
-            <image name="banner" draworder="0" fleximage="no">
-                <filename>md_rip_banner.png</filename>
-                <position>0,0</position>
-            </image>
-            <textarea name="banner" draworder="0">
-                <font>title</font>
-                <area>200,5,600,95</area>
-                <value>Rip/Transcode</value>
-            </textarea>
-            <image name="progress_background" draworder="0">
-                <filename>md_progress_background.png</filename>
-                <position>50,120</position>
-            </image>
+        <textarea name="overall_text" from="basetextarea">
+            <area>50,150,700,30</area>
+            <align>allcenter</align>
+        </textarea>
 
-        </container>
+        <textarea name="job_text" from="basetextarea">
+            <area>50,300,700,30</area>
+            <align>allcenter</align>
+        </textarea>
 
-        <container name="main_display">
-            <area>50,120,700,480</area>
+        <textarea name="numbjobs" from="basetextarea">
+            <area>325,450,150,30</area>
+            <value>Job 1 of 1</value>
+            <align>allcenter</align>
+        </textarea>
 
+        <progressbar name="overall_progress" from="baseprogressbar">
+            <position>132,190</position>
+        </progressbar>
 
-            <!-- 
-                Context 1 & 2
-                Warnings or Status Messages
-            -->
+        <progressbar name="job_progress" from="baseprogressbar">
+            <position>132,340</position>
+        </progressbar>
 
-            <textarea name="warning" draworder="0" align="center">
-                <multiline>yes</multiline>
-                <font>warning</font>
-                <area>50,50,600,300</area>
-            </textarea>
+        <button name="next">
+            <position>485,435</position>
+            <regular-background filename="md_job_next_off.png" />
+            <selected-background filename="md_job_next_on.png" />
+            <showarrow>no</showarrow>
+        </button>
 
-            <!-- 
-                Context 3
-                Browse active jobs
-            -->
+        <button name="prev">
+            <position>255,435</position>
+            <regular-background filename="md_job_prev_off.png" />
+            <selected-background filename="md_job_prev_on.png" />
+            <showarrow>no</showarrow>
+        </button>
 
-            <textarea name="overall_text" draworder="1" align="center">
-                <context>3</context>
-                <font>display</font>
-                <area>0,30,700,30</area>
-            </textarea>
+        <button name="ripscreen" from="basebutton">
+            <position>225,530</position>
+        </button>
 
-            <textarea name="job_text" draworder="1" align="center">
-                <context>3</context>
-                <font>display</font>
-                <area>0,180,700,30</area>
-            </textarea>
+        <button name="cancel" from="basebutton">
+            <position>425,530</position>
+        </button>
 
-            <textarea name="numb_jobs_text" draworder="1" align="center">
-                <context>3</context>
-                <font>display</font>
-                <area>275,330,150,30</area>
-                <value>Job 1 of 1</value>
-            </textarea>
+        <!--
+            Context 4
+            Browse DVD, start a job
 
-            <statusbar name="overall_status" draworder="1" whitespace="15">
-                <context>3</context>
-                <container fleximage="no">md_job_progress_background.png</container>
-                <fill>md_job_progress_foreground.png</fill>
-                <position>110,70</position>
-                <orientation>LeftToRight</orientation>
-            </statusbar>
-        
-            <statusbar name="job_status" draworder="1" whitespace="15">
-                <context>3</context>
-                <container fleximage="no">md_job_progress_background.png</container>
-                <fill>md_job_progress_foreground.png</fill>
-                <position>110,220</position>
-                <orientation>LeftToRight</orientation>
-            </statusbar>
+            Right now this is a HACK, because the widgets
+            used are actually Qt-derived widgets not theme-able
+            Myth widgets. This will change.
+        -->
 
-            <pushbutton name="job_next_button" draworder="2">
-                <context>3</context>
-                <position>435,315</position>
-                <image function="on" filename="md_job_next_on.png"></image>
-                <image function="off" filename="md_job_next_off.png"></image>
-                <image function="pushed" filename="md_job_next_pushed.png"></image>
-            </pushbutton>
-            
-            <pushbutton name="job_prev_button" draworder="2">
-                <context>3</context>
-                <position>205,315</position>
-                <image function="on" filename="md_job_prev_on.png"></image>
-                <image function="off" filename="md_job_prev_off.png"></image>
-                <image function="pushed" filename="md_job_prev_pushed.png"></image>
-            </pushbutton>
-            
-            <textbutton name="ripscreen_button" draworder="1">
-                <context>3</context>
-                <position>175,410</position>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
-                <font>buttons</font>
-            </textbutton>
+        <!--
+            Context 4
+            Want to rip, no DVD
 
-            <textbutton name="cancel_button" draworder="1">
-                <context>3</context>
-                <position>375,410</position>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
-                <font>buttons</font>
-            </textbutton>
-
-            <!-- 
-                Context 4
-                Browse DVD, start a job
-
-                Right now this is a HACK, because the widgets
-                used are actually Qt-derived widgets not theme-able
-                Myth widgets. This will change.
-
-            -->
-                
-            
-            <!--
-                Context 4
-                Want to rip, no DVD
-            
-            <textarea name="nodvd_text" draworder="0" align="center">
-                <context>4</context>
-                <multiline>yes</multiline>
-                <font>warning</font>
-                <area>50,100,600,300</area>
-            </textarea>
-            -->
-            
-        </container>
+        <textarea name="nodvd_text" align="center" from="basetextarea">
+            <multiline>yes</multiline>
+            <area>100,220,600,300</area>
+        </textarea>
+        -->
     </window>
 
-    
     <window name="title_dialog">
 
-        <font name="title" face="Arial">
-            <color>#ffffff</color>
-            <dropcolor>#000000</dropcolor>
-            <size>40</size>
-            <shadow>3,3</shadow>
-            <bold>yes</bold>
-        </font>
+        <imagetype name="banner">
+            <filename>md_rip_banner.png</filename>
+        </imagetype>
 
-        <font name="display" face="Arial">
-            <color>#ffffff</color>
-            <size>18</size>
-            <bold>yes</bold>
-        </font>
+        <textarea name="title" from="basetextarea">
+            <area>200,25,600,95</area>
+            <font>baselarge</font>
+            <value>Rip/Transcode</value>
+        </textarea>
 
-        <container name="background">
-            <image name="banner" draworder="0" fleximage="no">
-                <filename>md_rip_banner.png</filename>
-                <position>0,0</position>
-            </image>
-            <textarea name="banner" draworder="0">
-                <font>title</font>
-                <area>200,5,600,95</area>
-                <value>Rip/Transcode</value>
-            </textarea>
-            <image name="progress_background" draworder="0">
-                <filename>md_progress_background.png</filename>
-                <position>50,120</position>
-            </image>
-        </container>
+        <imagetype name="progress_background">
+            <filename>md_progress_background.png</filename>
+            <position>50,120</position>
+        </imagetype>
 
-        <container name="main_display">
-            <area>50,120,700,480</area>
+        <!-- A bunch of text "labels" -->
+        <textarea name="playtime_text" from="basetextarea">
+            <area>70,150,250,30</area>
+            <value>Length:</value>
+            <align>right</align>
+        </textarea>
 
-            <!--
-            
-                A bunch of text "labels"
-            
-            -->
-            <textarea name="playtime_text" draworder="0" align="right">
-                <font>display</font>
-                <area>50,35,250,30</area>
-                <value>Length:</value>
-            </textarea>
+        <textarea name="ripcheck_text" from="playtime_text">
+            <position>70,178</position>
+            <value>Select:</value>
+        </textarea>
 
-            <textarea name="ripcheck_text" draworder="0" align="right">
-                <font>display</font>
-                <area>50,75,250,30</area>
-                <value>Select:</value>
-            </textarea>
+        <textarea name="ripname_text" from="playtime_text">
+            <position>70,228</position>
+            <value>Name:</value>
+        </textarea>
 
-            <textarea name="ripname_text" draworder="0" align="right">
-                <font>display</font>
-                <area>50,110,250,30</area>
-                <value>Name:</value>
-            </textarea>
+        <textarea name="ripquality_text" from="playtime_text">
+            <position>70,273</position>
+            <value>Quality:</value>
+        </textarea>
 
-            <textarea name="ripquality_text" draworder="0" align="right">
-                <font>display</font>
-                <area>50,145,250,30</area>
-                <value>Quality:</value>
-            </textarea>
+        <textarea name="ripaudio_text" from="playtime_text">
+            <position>70,318</position>
+            <value>Audio Track:</value>
+        </textarea>
 
-            <textarea name="ripaudio_text" draworder="0" align="right">
-                <font>display</font>
-                <area>50,180,250,30</area>
-                <value>Audio Track:</value>
-            </textarea>
+        <textarea name="ripacthree_text" from="playtime_text">
+            <position>70,363</position>
+            <value>AC3 Audio:</value>
+        </textarea>
 
-            <textarea name="ripacthree_text" draworder="0" align="right">
-                <font>display</font>
-                <area>50,215,250,30</area>
-                <value>AC3 Audio:</value>
-            </textarea>
+        <textarea name="subtitle_text" from="playtime_text">
+            <position>70,398</position>
+            <value>Subtitles:</value>
+        </textarea>
 
-            <textarea name="subtitle_text" draworder="0" align="right">
-                <font>display</font>
-                <area>50,250,250,30</area>
-                <value>Subtitles:</value>
-            </textarea>
+        <textarea name="ripview_text" from="playtime_text">
+            <position>70,436</position>
+            <value>View:</value>
+        </textarea>
 
-            <textarea name="ripview_text" draworder="0" align="right">
-                <font>display</font>
-                <area>50,285,250,30</area>
-                <value>View:</value>
-            </textarea>
+        <!-- Widgets that actually do things -->
 
-            <!--
-            
-                Widgets that actually do things
-                
-            -->
+        <textarea name="playlength" from="basetextarea">
+            <area>330,150,300,40</area>
+            <value>0:00:00</value>
+        </textarea>
 
-            <textarea name="playlength_text" draworder="0" align="left">
-                <font>display</font>
-                <area>312,35,300,40</area>
-                <value>0:00:00</value>
-            </textarea>
+        <checkbox name="ripcheck" from="basecheckbox">
+            <position>330,178</position>
+        </checkbox>
 
-            <checkbox name="ripcheck" draworder="0">
-                <position>310,70</position>
-                <image function="checked" filename="checked.png"></image>
-                <image function="unchecked" filename="unchecked.png"></image>
-                <image function="checked_high" filename="checked_high.png"></image>
-                <image function="unchecked_high" filename="unchecked_high.png"></image>
-            </checkbox>      
-            
-            <remoteedit name="name_edit" draworder="0">
-                <area>312,105,300,40</area>
-                <font>display</font>
-            </remoteedit>
+        <textedit name="name" from="basetextedit">
+            <position>330,213</position>
+        </textedit>
 
-            <selector name="quality_select" draworder="0">
-                <area>310,140,300,40</area>
-                <font>display</font>
-                <image function="on" filename="leftright_on.png"></image>
-                <image function="off" filename="leftright_off.png"></image>
-                <image function="pushed" filename="leftright_pushed.png"></image>
-            </selector>      
-            
-            <selector name="audio_select" draworder="0">
-                <area>310,175,300,40</area>
-                <font>display</font>
-                <image function="on" filename="leftright_on.png"></image>
-                <image function="off" filename="leftright_off.png"></image>
-                <image function="pushed" filename="leftright_pushed.png"></image>
-            </selector>      
-            
-            <checkbox name="ripacthree" draworder="0">
-                <position>310,210</position>
-                <image function="checked" filename="checked.png"></image>
-                <image function="unchecked" filename="unchecked.png"></image>
-                <image function="checked_high" filename="checked_high.png"></image>
-                <image function="unchecked_high" filename="unchecked_high.png"></image>
-            </checkbox>      
-            
-            <selector name="subtitle_select" draworder="0">
-                <area>310,245,300,40</area>
-                <font>display</font>
-                <image function="on" filename="leftright_on.png"></image>
-                <image function="off" filename="leftright_off.png"></image>
-                <image function="pushed" filename="leftright_pushed.png"></image>
-            </selector>      
-            
-            <pushbutton name="view_button" draworder="0">
-                <position>310,280</position>
-                <image function="on" filename="blankbutton_on.png"></image>
-                <image function="off" filename="blankbutton_off.png"></image>
-                <image function="pushed" filename="blankbutton_pushed.png"></image>
-            </pushbutton>
+        <buttonlist name="quality" from="baseselector">
+            <position>330,268</position>
+        </buttonlist>
 
+        <buttonlist name="audio" from="baseselector">
+            <position>330,313</position>
+        </buttonlist>
 
-            <textarea name="numb_titles_text" draworder="0" align="center">
-                <font>display</font>
-                <area>265,330,170,30</area>
-                <value>Title 1 of 1</value>
-            </textarea>
+        <checkbox name="ripacthree" from="basecheckbox">
+            <position>330,358</position>
+        </checkbox>
 
-            <pushbutton name="prev_title_button" draworder="0">
-                <position>205,315</position>
-                <image function="on" filename="md_job_prev_on.png"></image>
-                <image function="off" filename="md_job_prev_off.png"></image>
-                <image function="pushed" filename="md_job_prev_pushed.png"></image>
-            </pushbutton>
+        <buttonlist name="subtitle" from="baseselector">
+            <position>330,393</position>
+        </buttonlist>
 
-            <pushbutton name="next_title_button" draworder="0">
-                <position>435,315</position>
-                <image function="on" filename="md_job_next_on.png"></image>
-                <image function="off" filename="md_job_next_off.png"></image>
-                <image function="pushed" filename="md_job_next_pushed.png"></image>
-            </pushbutton>
-            
-            <textbutton name="ripaway_button" draworder="0">
-                <position>150,410</position>
-                <image function="on" filename="md_large_text_button_on.png"></image>
-                <image function="off" filename="md_large_text_button_off.png"></image>
-                <image function="pushed" filename="md_large_text_button_pushed.png"></image>
-                <font>display</font>
-            </textbutton>
+        <button name="view">
+            <area>330,435,32,32</area>
+            <regular-background filename="blankbutton_off.png" />
+            <selected-background filename="blankbutton_on.png" />
+            <showarrow>no</showarrow>
+        </button>
 
-            
+        <textarea name="numb_titles" from="basetextarea">
+            <area>266,468,266,30</area>
+            <value>Title 1 of 1</value>
+            <align>allcenter</align>
+        </textarea>
 
-        </container>
+        <button name="prev_title" from="basebutton">
+            <position>255,435</position>
+            <regular-background filename="md_job_prev_off.png" />
+            <selected-background filename="md_job_prev_on.png" />
+        </button>
 
+        <button name="next_title" from="basebutton">
+            <position>485,435</position>
+            <regular-background filename="md_job_next_off.png" />
+            <selected-background filename="md_job_next_on.png" />
+        </button>
+
+        <button name="ripaway" from="basebutton">
+            <position>200,530</position>
+        </button>
 
     </window>
-    
+
 </mythuitheme>

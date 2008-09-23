@@ -1,63 +1,75 @@
+// C++ headers
 #include <set>
-#include <map>
 
+// QT headers
 #include <QImage>
 #include <QImageReader>
+#include <QApplication>
 
+// Myth headers
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdialogs.h>
 
+// MythUI headers
+#include <mythtv/libmythui/mythscreenstack.h>
+
+// Mythvideo headers
 #include "globals.h"
 #include "videoscan.h"
 #include "metadata.h"
-
-#include "metadatalistmanager.h"
 #include "dbaccess.h"
 #include "dirscan.h"
 
-class VideoScannerImp
-{
-  public:
-    VideoScannerImp();
-    ~VideoScannerImp();
-    void doScan(const QStringList &dirs);
-
-  private:
-    typedef std::vector<std::pair<unsigned int, QString> > PurgeList;
-    typedef std::map<QString, bool> FileCheckList;
-
-  private:
-    bool m_ListUnknown;
-    bool m_RemoveAll;
-    bool m_KeepAll;
-
-    MetadataListManager *m_dbmetadata;
-
-  private:
-    void promptForRemoval(unsigned int id, const QString &filename);
-    void verifyFiles(FileCheckList &files, PurgeList &remove);
-    void updateDB(const FileCheckList &add, const PurgeList &remove);
-    void buildFileList(const QString &directory,
-                       const QStringList &imageExtensions,
-                       FileCheckList &filelist);
-};
-
 VideoScanner::VideoScanner()
+             : QObject()
 {
-    m_imp = new VideoScannerImp();
+    m_scanThread = new VideoScannerThread();
 }
 
 VideoScanner::~VideoScanner()
 {
-    delete m_imp;
+    if (m_scanThread && m_scanThread->wait())
+        delete m_scanThread;
 }
 
 void VideoScanner::doScan(const QStringList &dirs)
 {
-    m_imp->doScan(dirs);
+    if (m_scanThread->isRunning())
+        return;
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythUIProgressDialog *progressDlg = new MythUIProgressDialog("",
+                                                    popupStack,
+                                                    "videoscanprogressdialog");
+
+    if (progressDlg->Create())
+    {
+        popupStack->AddScreen(progressDlg, false);
+        connect(m_scanThread, SIGNAL(finished()),
+                progressDlg, SLOT(Close()));
+        connect(m_scanThread, SIGNAL(finished()),
+                this, SLOT(finishedScan()));
+    }
+    else
+    {
+        delete progressDlg;
+        progressDlg = NULL;
+    }
+
+    m_scanThread->SetDirs(dirs);
+    m_scanThread->SetProgressDialog(progressDlg);
+    m_scanThread->start();
 }
 
-VideoScannerImp::VideoScannerImp() : m_RemoveAll(false), m_KeepAll(false)
+void VideoScanner::finishedScan()
+{
+    emit finished();
+}
+
+///////////////////////////////////////////////////////////////
+
+VideoScannerThread::VideoScannerThread()
+                   : QThread(), m_RemoveAll(false), m_KeepAll(false)
 {
     m_dbmetadata = new MetadataListManager;
     MetadataListManager::metadata_list ml;
@@ -67,17 +79,34 @@ VideoScannerImp::VideoScannerImp() : m_RemoveAll(false), m_KeepAll(false)
     m_ListUnknown = gContext->GetNumSetting("VideoListUnknownFileTypes", 1);
 }
 
-VideoScannerImp::~VideoScannerImp()
+VideoScannerThread::~VideoScannerThread()
 {
     delete m_dbmetadata;
 }
 
-void VideoScannerImp::doScan(const QStringList &dirs)
+void VideoScannerThread::SetDirs(const QStringList &dirs)
 {
-    MythProgressDialog *progressDlg =
-        new MythProgressDialog(QObject::tr("Searching for video files"),
-                               dirs.size());
+    m_directories = dirs;
+}
 
+void VideoScannerThread::SetProgressDialog(MythUIProgressDialog *dialog)
+{
+    m_dialog = dialog;
+}
+
+void VideoScannerThread::SendProgressEvent(uint progress, uint total,
+                                           QString messsage)
+{
+    if (!m_dialog)
+        return;
+
+    ProgressUpdateEvent *pue = new ProgressUpdateEvent(progress, total,
+                                                       messsage);
+    QApplication::postEvent(m_dialog, pue);
+}
+
+void VideoScannerThread::run()
+{
     QList<QByteArray> image_types = QImageReader::supportedImageFormats();
     QStringList imageExtensions;
     for (QList<QByteArray>::const_iterator p = image_types.begin();
@@ -85,72 +114,74 @@ void VideoScannerImp::doScan(const QStringList &dirs)
     {
         imageExtensions.push_back(QString(*p));
     }
-    int counter = 0;
 
+    uint counter = 0;
     FileCheckList fs_files;
 
-    for (QStringList::const_iterator iter = dirs.begin(); iter != dirs.end();
-         ++iter)
+    SendProgressEvent(counter, (uint)m_directories.size(),
+                      tr("Searching for video files"));
+    for (QStringList::const_iterator iter = m_directories.begin();
+         iter != m_directories.end(); ++iter)
     {
         buildFileList(*iter, imageExtensions, fs_files);
-        progressDlg->setProgress(++counter);
+        SendProgressEvent(++counter);
     }
-
-    progressDlg->close();
-    progressDlg->deleteLater();
 
     PurgeList db_remove;
     verifyFiles(fs_files, db_remove);
     updateDB(fs_files, db_remove);
 }
 
-void VideoScannerImp::promptForRemoval(unsigned int id, const QString &filename)
+void VideoScannerThread::promptForRemoval(unsigned int id, const QString &filename)
 {
     // TODO: use single DB connection for all calls
     if (m_RemoveAll)
         m_dbmetadata->purgeByID(id);
 
-    if (m_KeepAll || m_RemoveAll)
-        return;
+//     QStringList buttonText;
+//     buttonText += QObject::tr("No");
+//     buttonText += QObject::tr("No to all");
+//     buttonText += QObject::tr("Yes");
+//     buttonText += QObject::tr("Yes to all");
+//
+//     DialogCode result = MythPopupBox::ShowButtonPopup(
+//         gContext->GetMainWindow(),
+//         QObject::tr("File Missing"),
+//         QObject::tr("%1 appears to be missing.\n"
+//                     "Remove it from the database?").arg(filename),
+//         buttonText, kDialogCodeButton0);
+//
+//     switch (result)
+//     {
+//         case kDialogCodeRejected:
+//         case kDialogCodeButton0:
+//         default:
+//             break;
+//         case kDialogCodeButton1:
+//             m_KeepAll = true;
+//             break;
+//         case kDialogCodeButton2:
+//             m_dbmetadata->purgeByID(id);
+//             break;
+//         case kDialogCodeButton3:
+//             m_RemoveAll = true;
+//             m_dbmetadata->purgeByID(id);
+//             break;
+//     };
 
-    QStringList buttonText;
-    buttonText += QObject::tr("No");
-    buttonText += QObject::tr("No to all");
-    buttonText += QObject::tr("Yes");
-    buttonText += QObject::tr("Yes to all");
-
-    DialogCode result = MythPopupBox::ShowButtonPopup(
-        gContext->GetMainWindow(),
-        QObject::tr("File Missing"),
-        QObject::tr("%1 appears to be missing.\n"
-                    "Remove it from the database?").arg(filename),
-        buttonText, kDialogCodeButton0);
-
-    switch (result)
+    if (!m_KeepAll && !m_RemoveAll)
     {
-        case kDialogCodeRejected:
-        case kDialogCodeButton0:
-        default:
-            break;
-        case kDialogCodeButton1:
-            m_KeepAll = true;
-            break;
-        case kDialogCodeButton2:
-            m_dbmetadata->purgeByID(id);
-            break;
-        case kDialogCodeButton3:
-            m_RemoveAll = true;
-            m_dbmetadata->purgeByID(id);
-            break;
-    };
+        m_RemoveAll = true;
+        m_dbmetadata->purgeByID(id);
+    }
 }
 
-void VideoScannerImp::updateDB(const FileCheckList &add,
+void VideoScannerThread::updateDB(const FileCheckList &add,
                                const PurgeList &remove)
 {
-    int counter = 0;
-    MythProgressDialog *progressDlg = new MythProgressDialog(
-        QObject::tr("Updating video database"), add.size() + remove.size());
+    uint counter = 0;
+    SendProgressEvent(counter, (uint)(add.size() + remove.size()),
+                      tr("Updating video database"));
 
     for (FileCheckList::const_iterator p = add.begin(); p != add.end(); ++p)
     {
@@ -166,28 +197,23 @@ void VideoScannerImp::updateDB(const FileCheckList &add,
 
             newFile.dumpToDatabase();
         }
-
-        progressDlg->setProgress(++counter);
+        SendProgressEvent(++counter);
     }
 
     for (PurgeList::const_iterator p = remove.begin(); p != remove.end(); ++p)
     {
         promptForRemoval(p->first, p->second);
-
-        progressDlg->setProgress(++counter);
+        SendProgressEvent(++counter);
     }
-
-    progressDlg->Close();
-    progressDlg->deleteLater();
 }
 
-void VideoScannerImp::verifyFiles(FileCheckList &files, PurgeList &remove)
+void VideoScannerThread::verifyFiles(FileCheckList &files, PurgeList &remove)
 {
     int counter = 0;
     FileCheckList::iterator iter;
 
-    MythProgressDialog *progressDlg = new MythProgressDialog(
-        QObject::tr("Verifying video files"), m_dbmetadata->getList().size());
+    SendProgressEvent(counter, (uint)m_dbmetadata->getList().size(),
+                      tr("Verifying video files"));
 
     // For every file we know about, check to see if it still exists.
     for (MetadataListManager::metadata_list::const_iterator p =
@@ -211,11 +237,8 @@ void VideoScannerImp::verifyFiles(FileCheckList &files, PurgeList &remove)
             }
         }
 
-        progressDlg->setProgress(++counter);
+        SendProgressEvent(++counter);
     }
-
-    progressDlg->Close();
-    progressDlg->deleteLater();
 }
 
 namespace
@@ -231,7 +254,7 @@ namespace
             for (QStringList::const_iterator p = image_extensions.begin();
                  p != image_extensions.end(); ++p)
             {
-                m_image_ext.insert((*p).lower());
+                m_image_ext.insert((*p).toLower());
             }
         }
 
@@ -249,7 +272,7 @@ namespace
 
         {
             (void)file_name;
-            if (m_image_ext.find(extension.lower()) == m_image_ext.end())
+            if (m_image_ext.find(extension.toLower()) == m_image_ext.end())
                 m_video_files[fq_file_name] = false;
         }
 
@@ -260,7 +283,7 @@ namespace
     };
 }
 
-void VideoScannerImp::buildFileList(const QString &directory,
+void VideoScannerThread::buildFileList(const QString &directory,
                                     const QStringList &imageExtensions,
                                     FileCheckList &filelist)
 {

@@ -1,20 +1,17 @@
-/*
-    editmetadata.cpp
-
-    (c) 2003 Thor Sigvaldason, Isaac Richards, and ?? ??
-    Part of the mythTV project
-
-
-*/
-
-#include <QKeyEvent>
-
-#include <mythtv/mythcontext.h>
-#include <mythtv/uitypes.h>
-#include <mythtv/mythdirs.h>
-
+// C++ headers
+#include <iostream>
 #include <algorithm>
 
+// Myth headers
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythdirs.h>
+#include <mythtv/mythverbose.h>
+
+// MythUI headers
+#include <mythtv/libmythui/mythmainwindow.h>
+#include <mythtv/libmythui/mythdialogbox.h>
+
+// MythVideo headers
 #include "globals.h"
 #include "editmetadata.h"
 #include "metadata.h"
@@ -22,16 +19,15 @@
 #include "metadatalistmanager.h"
 #include "videoutils.h"
 #include "parentalcontrols.h"
+#include "videopopups.h"
 
 
-EditMetadataDialog::EditMetadataDialog(Metadata *source_metadata,
-                                       const MetadataListManager &cache,
-                                       MythMainWindow *parent_,
-                                       const QString &window_name,
-                                       const QString &theme_filename,
-                                       const char *name_)
-    : MythThemedDialog(parent_, window_name, theme_filename, name_),
-    m_orig_metadata(source_metadata), m_meta_cache(cache)
+EditMetadataDialog::EditMetadataDialog(MythScreenStack *parent,
+                                       const QString &name,
+                                       Metadata *source_metadata,
+                                       const MetadataListManager &cache)
+    : MythScreenType(parent, name), m_origMetadata(source_metadata),
+    m_metaCache(cache)
 {
     //
     //  The only thing this screen does is let the
@@ -39,27 +35,86 @@ EditMetadataDialog::EditMetadataDialog(Metadata *source_metadata,
     //  works on a single metadata entry.
     //
 
-
     //
     //  Make a copy, so we can abandon changes if desired
     //
 
-    working_metadata = new Metadata(*m_orig_metadata);
+    m_workingMetadata = new Metadata(*m_origMetadata);
 
-    category_select = NULL;
-    level_select = NULL;
-    child_check = NULL;
-    child_select = NULL;
-    browse_check = NULL;
-    coverart_button = NULL;
-    coverart_text = NULL;
-    done_button = NULL;
-    title_editor = NULL;
-    player_editor = NULL;
+    m_categoryList = m_levelList = m_childList = NULL;
+    m_browseCheck = NULL;
+    m_coverartButton = m_doneButton = NULL;
+    m_coverartText = NULL;
+    m_titleEdit = m_playerEdit = NULL;
+}
 
-    wireUpTheme();
+EditMetadataDialog::~EditMetadataDialog()
+{
+    if (m_workingMetadata)
+    {
+        delete m_workingMetadata;
+        m_workingMetadata = NULL;
+    }
+}
+
+bool EditMetadataDialog::Create(void)
+{
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("video-ui.xml", "edit_metadata", this);
+
+    if (!foundtheme)
+        return false;
+
+    m_titleEdit = dynamic_cast<MythUITextEdit *> (GetChild("title_edit"));
+    m_playerEdit = dynamic_cast<MythUITextEdit *> (GetChild("player_edit"));
+
+    m_coverartText = dynamic_cast<MythUIText *> (GetChild("coverart_text"));
+
+    m_categoryList = dynamic_cast<MythListButton *>(GetChild("category_select"));
+    m_levelList = dynamic_cast<MythListButton *>(GetChild("level_select"));
+    m_childList = dynamic_cast<MythListButton *>(GetChild("child_select"));
+
+    m_browseCheck = dynamic_cast<MythUICheckBox *>(GetChild("browse_check"));
+
+    m_coverartButton = dynamic_cast<MythUIButton *>
+                                         (GetChild("coverart_button"));
+    m_doneButton = dynamic_cast<MythUIButton *> (GetChild("done_button"));
+
+    if (!m_titleEdit || !m_playerEdit || !m_categoryList || !m_levelList
+        || !m_childList || !m_browseCheck
+        || !m_coverartButton || !m_doneButton || !m_coverartText)
+    {
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical elements.");
+        return false;
+    }
+
+    m_doneButton->SetText(tr("Done"));
+
     fillWidgets();
-    assignFirstFocus();
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+
+    connect(m_titleEdit, SIGNAL(valueChanged()), SLOT(setTitle()));
+    connect(m_playerEdit, SIGNAL(valueChanged()), SLOT(setPlayer()));
+
+    connect(m_doneButton, SIGNAL(buttonPressed()), SLOT(saveAndExit()));
+    connect(m_coverartButton, SIGNAL(buttonPressed()), SLOT(findCoverArt()));
+
+    connect(m_browseCheck, SIGNAL(valueChanged()), SLOT(toggleBrowse()));
+
+    connect(m_childList, SIGNAL(itemSelected(MythListButtonItem*)),
+            SLOT(setChild(MythListButtonItem*)));
+    connect(m_levelList, SIGNAL(itemSelected(MythListButtonItem*)),
+            SLOT(setLevel(MythListButtonItem*)));
+    connect(m_categoryList, SIGNAL(itemSelected(MythListButtonItem*)),
+            SLOT(setCategory(MythListButtonItem*)));
+    connect(m_categoryList, SIGNAL(itemClicked(MythListButtonItem*)),
+            SLOT(NewCategoryPopup()));
+
+    return true;
 }
 
 namespace
@@ -76,271 +131,144 @@ namespace
 
 void EditMetadataDialog::fillWidgets()
 {
-    if (title_editor) title_editor->setText(working_metadata->Title());
+    m_titleEdit->SetText(m_workingMetadata->Title());
 
-    if (category_select)
+    MythListButtonItem *button =
+        new MythListButtonItem(m_categoryList, VIDEO_CATEGORY_UNKNOWN);
+    const VideoCategory::entry_list &vcl =
+            VideoCategory::getCategory().getList();
+    for (VideoCategory::entry_list::const_iterator p = vcl.begin();
+            p != vcl.end(); ++p)
     {
-        category_select->addItem(0, VIDEO_CATEGORY_UNKNOWN);
-        const VideoCategory::entry_list &vcl =
-                VideoCategory::getCategory().getList();
-        for (VideoCategory::entry_list::const_iterator p = vcl.begin();
-             p != vcl.end(); ++p)
-        {
-            category_select->addItem(p->first, p->second);
-        }
-        category_select->setToItem(working_metadata->getCategoryID());
+        button = new MythListButtonItem(m_categoryList, p->second);
+        button->SetData(p->first);
     }
+    m_categoryList->SetValueByData(m_workingMetadata->getCategoryID());
 
-    if (level_select)
+    for (ParentalLevel i = ParentalLevel::plLowest;
+            i <= ParentalLevel::plHigh && i.good(); ++i)
     {
-        for (ParentalLevel i = ParentalLevel::plLowest;
-                i <= ParentalLevel::plHigh && i.good(); ++i)
-        {
-            level_select->addItem(i.GetLevel(),
-                                  QString(tr("Level %1")).arg(i.GetLevel()));
-        }
-        level_select->setToItem(working_metadata->ShowLevel());
+        button = new MythListButtonItem(m_levelList,
+                                    QString(tr("Level %1")).arg(i.GetLevel()));
+        button->SetData(i.GetLevel());
     }
+    m_levelList->SetValueByData(m_workingMetadata->ShowLevel());
 
-    if (child_select)
+    //
+    //  Fill the "always play this video next" option
+    //  with all available videos.
+    //
+
+    bool trip_catch = false;
+    QString caught_name = "";
+    int possible_starting_point = 0;
+
+    button = new MythListButtonItem(m_childList,tr("None"));
+
+    // TODO: maybe make the title list have the same sort order
+    // as elsewhere.
+    typedef std::vector<std::pair<unsigned int, QString> > title_list;
+    const MetadataListManager::metadata_list &mdl = m_metaCache.getList();
+    title_list tc;
+    tc.reserve(mdl.size());
+    for (MetadataListManager::metadata_list::const_iterator p = mdl.begin();
+            p != mdl.end(); ++p)
     {
-        //
-        //  Fill the "always play this video next" option
-        //  with all available videos.
-        //
+        tc.push_back(std::make_pair((*p)->ID(), (*p)->Title()));
+    }
+    std::sort(tc.begin(), tc.end(), title_sort<title_list::value_type>());
 
-        bool trip_catch = false;
-        QString caught_name = "";
-        int possible_starting_point = 0;
-        child_select->addItem(0, tr("None"));
-
-        // TODO: maybe make the title list have the same sort order
-        // as elsewhere.
-        typedef std::vector<std::pair<unsigned int, QString> > title_list;
-        const MetadataListManager::metadata_list &mdl = m_meta_cache.getList();
-        title_list tc;
-        tc.reserve(mdl.size());
-        for (MetadataListManager::metadata_list::const_iterator p = mdl.begin();
-             p != mdl.end(); ++p)
+    for (title_list::const_iterator p = tc.begin(); p != tc.end(); ++p)
+    {
+        if (trip_catch)
         {
-            tc.push_back(std::make_pair((*p)->ID(), (*p)->Title()));
-        }
-        std::sort(tc.begin(), tc.end(), title_sort<title_list::value_type>());
+            //
+            //  Previous loop told us to check if the two
+            //  movie names are close enough to try and
+            //  set a default starting point.
+            //
 
-        for (title_list::const_iterator p = tc.begin(); p != tc.end(); ++p)
-        {
-            if (trip_catch)
+            QString target_name = p->second;
+            int length_compare = 0;
+            if (target_name.length() < caught_name.length())
             {
-                //
-                //  Previous loop told us to check if the two
-                //  movie names are close enough to try and
-                //  set a default starting point.
-                //
-
-                QString target_name = p->second;
-                int length_compare = 0;
-                if (target_name.length() < caught_name.length())
-                {
-                    length_compare = target_name.length();
-                }
-                else
-                {
-                    length_compare = caught_name.length();
-                }
-
-                QString caught_name_three_quarters =
-                        caught_name.left((int)(length_compare * 0.75));
-                QString target_name_three_quarters =
-                        target_name.left((int)(length_compare * 0.75));
-
-                if (caught_name_three_quarters == target_name_three_quarters &&
-                    working_metadata->ChildID() == -1)
-                {
-                    possible_starting_point = p->first;
-                    working_metadata->setChildID(possible_starting_point);
-                }
-                trip_catch = false;
-            }
-
-            if (p->first != working_metadata->ID())
-            {
-                child_select->addItem(p->first, p->second);
+                length_compare = target_name.length();
             }
             else
             {
-                //
-                //  This is the current file. Set a flag so the default
-                //  selected child will be set next loop
-                //
-
-                trip_catch = true;
-                caught_name = p->second;
+                length_compare = caught_name.length();
             }
+
+            QString caught_name_three_quarters =
+                    caught_name.left((int)(length_compare * 0.75));
+            QString target_name_three_quarters =
+                    target_name.left((int)(length_compare * 0.75));
+
+            if (caught_name_three_quarters == target_name_three_quarters &&
+                m_workingMetadata->ChildID() == -1)
+            {
+                possible_starting_point = p->first;
+                m_workingMetadata->setChildID(possible_starting_point);
+            }
+            trip_catch = false;
         }
 
-        if (working_metadata->ChildID() > 0)
+        if (p->first != m_workingMetadata->ID())
         {
-            child_select->setToItem(working_metadata->ChildID());
-            cachedChildSelection = working_metadata->ChildID();
+            button = new MythListButtonItem(m_childList,p->second);
+            button->SetData(p->first);
         }
         else
         {
-            child_select->setToItem(possible_starting_point);
-            cachedChildSelection = possible_starting_point;
+            //
+            //  This is the current file. Set a flag so the default
+            //  selected child will be set next loop
+            //
+
+            trip_catch = true;
+            caught_name = p->second;
         }
     }
 
-    if (child_select && child_check)
+    if (m_workingMetadata->ChildID() > 0)
     {
-        child_check->setState(cachedChildSelection > 0);
-        child_select->allowFocus(cachedChildSelection > 0);
+        m_childList->SetValueByData(m_workingMetadata->ChildID());
+        cachedChildSelection = m_workingMetadata->ChildID();
+    }
+    else
+    {
+        m_childList->SetValueByData(possible_starting_point);
+        cachedChildSelection = possible_starting_point;
     }
 
-    if (browse_check) browse_check->setState(working_metadata->Browse());
-    checkedSetText(coverart_text, working_metadata->CoverFile());
-    if (player_editor) player_editor->setText(working_metadata->PlayCommand());
+    if (m_workingMetadata->Browse())
+        m_browseCheck->SetCheckState(MythUIStateType::Full);
+    m_coverartText->SetText(m_workingMetadata->CoverFile());
+    m_playerEdit->SetText(m_workingMetadata->PlayCommand());
 }
 
-void EditMetadataDialog::toggleChild(bool yes_or_no)
+void EditMetadataDialog::NewCategoryPopup()
 {
-    if (child_select)
-    {
-        if (yes_or_no)
-        {
-            child_select->setToItem(cachedChildSelection);
-            working_metadata->setChildID(cachedChildSelection);
-        }
-        else
-        {
-            child_select->setToItem(0);
-            working_metadata->setChildID(0);
-        }
-        child_select->allowFocus(yes_or_no);
-    }
+    QString message = tr("Enter new category");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythTextInputDialog *categorydialog =
+                                    new MythTextInputDialog(popupStack,message);
+
+    if (categorydialog->Create())
+        popupStack->AddScreen(categorydialog);
+
+    connect(categorydialog, SIGNAL(haveResult(QString)),
+            SLOT(AddCategory(QString)), Qt::QueuedConnection);
 }
 
-void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
+void EditMetadataDialog::AddCategory(QString category)
 {
-    bool handled = false;
-    bool something_pushed = false;
-
-    QStringList lactions;
-    gContext->GetMainWindow()->TranslateKeyPress("Video", e, lactions);
-
-    for (QStringList::const_iterator p = lactions.begin();
-         p != lactions.end() && !handled; ++p)
-    {
-        QString action = *p;
-        handled = true;
-
-        if (action == "UP")
-            nextPrevWidgetFocus(false);
-        else if (action == "DOWN")
-            nextPrevWidgetFocus(true);
-        else if (action == "LEFT")
-        {
-            something_pushed = false;
-            if (category_select)
-            {
-                if (getCurrentFocusWidget() == category_select)
-                {
-                    category_select->push(false);
-                    something_pushed = true;
-                }
-            }
-            if (level_select)
-            {
-                if (getCurrentFocusWidget() == level_select)
-                {
-                    level_select->push(false);
-                    something_pushed = true;
-                }
-            }
-            if (child_select)
-            {
-                if (getCurrentFocusWidget() == child_select)
-                {
-                    child_select->push(false);
-                    something_pushed = true;
-                }
-            }
-            if (!something_pushed)
-            {
-                activateCurrent();
-            }
-        }
-        else if (action == "RIGHT")
-        {
-            something_pushed = false;
-            if (category_select)
-            {
-                if (getCurrentFocusWidget() == category_select)
-                {
-                    category_select->push(true);
-                    something_pushed = true;
-                }
-            }
-            if (level_select)
-            {
-                if (getCurrentFocusWidget() == level_select)
-                {
-                    level_select->push(true);
-                    something_pushed = true;
-                }
-            }
-            if (child_select)
-            {
-                if (getCurrentFocusWidget() == child_select)
-                {
-                    child_select->push(true);
-                    something_pushed = true;
-                }
-            }
-            if (!something_pushed)
-            {
-                activateCurrent();
-            }
-        }
-        else if (action == "SELECT")
-        {
-            something_pushed = false;
-            if (category_select)
-            {
-                if (getCurrentFocusWidget() == category_select)
-                {
-                    QString category = QString("");
-                    if (MythPopupBox::showGetTextPopup(
-                                gContext->GetMainWindow(),
-                                "Enter category",
-                                QObject::tr("New category"),
-                                category))
-                    {
-
-                        int id = VideoCategory::getCategory().add(category);
-                        working_metadata->setCategoryID(id);
-                        category_select->addItem(id, category);
-                        category_select->setToItem(id);
-                    }
-                    something_pushed = true;
-                }
-            }
-
-            if (!something_pushed)
-            {
-                activateCurrent();
-            }
-        }
-        else if (action == "0")
-        {
-            if (done_button)
-                done_button->push();
-        }
-        else
-            handled = false;
-    }
-
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
+    int id = VideoCategory::getCategory().add(category);
+    m_workingMetadata->setCategoryID(id);
+    new MythListButtonItem(m_categoryList, category, id);
+    m_categoryList->SetValueByData(id);
 }
 
 void EditMetadataDialog::saveAndExit()
@@ -349,58 +277,59 @@ void EditMetadataDialog::saveAndExit()
     //  Persist to database
     //
 
-    *m_orig_metadata = *working_metadata;
-    m_orig_metadata->updateDatabase();
+    *m_origMetadata = *m_workingMetadata;
+    m_origMetadata->updateDatabase();
 
     //
     //  All done
     //
-
-    reject();
+    emit Finished();
+    Close();
 }
 
-void EditMetadataDialog::setTitle(QString new_title)
+void EditMetadataDialog::setTitle()
 {
-    working_metadata->setTitle(new_title);
+    m_workingMetadata->setTitle(m_titleEdit->GetText());
 }
 
-void EditMetadataDialog::setCategory(int new_category)
+void EditMetadataDialog::setCategory(MythListButtonItem *item)
 {
-    working_metadata->setCategoryID(new_category);
+    m_workingMetadata->setCategoryID(item->GetData().toInt());
 }
 
-void EditMetadataDialog::setPlayer(QString new_command)
+void EditMetadataDialog::setPlayer()
 {
-    working_metadata->setPlayCommand(new_command);
+    m_workingMetadata->setPlayCommand(m_playerEdit->GetText());
 }
 
-void EditMetadataDialog::setLevel(int new_level)
+void EditMetadataDialog::setLevel(MythListButtonItem *item)
 {
-    ParentalLevel nl(new_level);
-    working_metadata->setShowLevel(nl.GetLevel());
+    ParentalLevel nl(item->GetData().toInt());
+    m_workingMetadata->setShowLevel(nl.GetLevel());
 }
 
-void EditMetadataDialog::setChild(int new_child)
+void EditMetadataDialog::setChild(MythListButtonItem *item)
 {
-    working_metadata->setChildID(new_child);
-    if (child_check)
-    {
-        child_check->setState(new_child > 0);
-        cachedChildSelection = new_child;
-    }
+    int new_child = item->GetData().toInt();
+    m_workingMetadata->setChildID(new_child);
+    cachedChildSelection = new_child;
 }
 
-void EditMetadataDialog::toggleBrowse(bool yes_or_no)
+void EditMetadataDialog::toggleBrowse()
 {
-    working_metadata->setBrowse(yes_or_no);
+    MythUIStateType::StateType state = m_browseCheck->GetCheckState();
+    if (state == MythUIStateType::Off)
+        m_workingMetadata->setBrowse(false);
+    else if (state == MythUIStateType::Full)
+        m_workingMetadata->setBrowse(true);
 }
 
 void EditMetadataDialog::findCoverArt()
 {
     QString new_coverart_file;
-    if (!isDefaultCoverFile(working_metadata->CoverFile()))
+    if (!isDefaultCoverFile(m_workingMetadata->CoverFile()))
     {
-        new_coverart_file = working_metadata->CoverFile();
+        new_coverart_file = m_workingMetadata->CoverFile();
     }
 
     QString fileprefix = gContext->GetSetting("VideoArtworkDir");
@@ -411,113 +340,31 @@ void EditMetadataDialog::findCoverArt()
         fileprefix = GetConfDir() + "/MythVideo";
     }
 
-    MythImageFileDialog *nca =
-        new MythImageFileDialog(&new_coverart_file,
-                                fileprefix,
-                                gContext->GetMainWindow(),
-                                "file_chooser",
-                                "video-",
-                                "image file chooser",
-                                true);
-    nca->exec();
-    if (new_coverart_file.length() > 0)
-    {
-        working_metadata->setCoverFile(new_coverart_file);
-        checkedSetText(coverart_text, new_coverart_file);
-    }
+//     QStringList imageExtensions;
+//
+//     QList< QByteArray > exts = QImageReader::supportedImageFormats();
+//
+//     for (QList< QByteArray >::Iterator it  = exts.begin();
+//                                        it != exts.end();
+//                                      ++it )
+//     {
+//         imageExtensions.append( QString( *it ) );
+//     }
 
-    nca->deleteLater();
-}
-
-void EditMetadataDialog::wireUpTheme()
-{
-    title_editor = getUIRemoteEditType("title");
-    if (title_editor)
-    {
-        title_editor->createEdit(this);
-        connect(title_editor, SIGNAL(textChanged(QString)),
-                this, SLOT(setTitle(QString)));
-    }
-
-    category_select = getUISelectorType("category_select");
-    if (category_select)
-    {
-        connect(category_select, SIGNAL(pushed(int)),
-                this, SLOT(setCategory(int)));
-    }
-
-    player_editor = getUIRemoteEditType("player");
-    if (player_editor)
-    {
-        player_editor->createEdit(this);
-        connect(player_editor, SIGNAL(textChanged(QString)),
-                this, SLOT(setPlayer(QString)));
-    }
-
-    level_select = getUISelectorType("level_select");
-    if (level_select)
-    {
-        connect(level_select, SIGNAL(pushed(int)),
-                this, SLOT(setLevel(int)));
-    }
-
-    child_check = getUICheckBoxType("child_check");
-    if (child_check)
-    {
-        connect(child_check, SIGNAL(pushed(bool)),
-                this, SLOT(toggleChild(bool)));
-    }
-
-    child_select = getUISelectorType("child_select");
-    if (child_select)
-    {
-        connect(child_select, SIGNAL(pushed(int)),
-                this, SLOT(setChild(int)));
-    }
-
-    browse_check = getUICheckBoxType("browse_check");
-    if (browse_check)
-    {
-        connect(browse_check, SIGNAL(pushed(bool)),
-                this, SLOT(toggleBrowse(bool)));
-    }
-
-    coverart_button = getUIPushButtonType("coverart_button");
-    if (coverart_button)
-    {
-        connect(coverart_button, SIGNAL(pushed()),
-                this, SLOT(findCoverArt()));
-    }
-    coverart_text = getUITextType("coverart_text");
-
-    done_button = getUITextButtonType("done_button");
-    if (done_button)
-    {
-        done_button->setText(tr("Done"));
-        connect(done_button, SIGNAL(pushed()), this, SLOT(saveAndExit()));
-    }
-
-    buildFocusList();
-}
-
-
-EditMetadataDialog::~EditMetadataDialog()
-{
-    if (title_editor)
-    {
-        title_editor->deleteLater();
-        title_editor = NULL;
-    }
-
-    if (player_editor)
-    {
-        player_editor->deleteLater();
-        player_editor = NULL;
-    }
-
-    if (working_metadata)
-    {
-        delete working_metadata;
-        working_metadata = NULL;
-    }
+//     MythImageFileDialog *nca =
+//         new MythImageFileDialog(&new_coverart_file,
+//                                 fileprefix,
+//                                 gContext->GetMainWindow(),
+//                                 "file_chooser",
+//                                 "video-",
+//                                 "image file chooser",
+//                                 true);
+//     nca->exec();
+//     if (new_coverart_file.length() > 0)
+//     {
+//         m_workingMetadata->setCoverFile(new_coverart_file);
+//         checkedSetText(m_coverartText, new_coverart_file);
+//     }
+//
+//     nca->deleteLater();
 }

@@ -1,18 +1,9 @@
-/*
-    dvdinfo.h
-
-    (c) 2003 Thor Sigvaldason and Isaac Richards
-    Part of the mythTV project
-
-    header for class to store info about a DVD
-*/
-
 #ifndef DVDINFO_H_
 #define DVDINFO_H_
 
 // Qt headers
 #include <QString>
-#include <Q3PtrList>
+#include <QList>
 
 class DVDSubTitleInfo
 {
@@ -21,17 +12,17 @@ class DVDSubTitleInfo
     //  subtitles
 
   public:
-      
+
     DVDSubTitleInfo(int subtitle_id, const QString &subtitle_name)
                    {id = subtitle_id; name = subtitle_name;}
-    
+
     int     getID(){return id;}
     QString getName(){return name;}
-    
+
   private:
-  
+
     int     id;
-    QString name;  
+    QString name;
 };
 
 class DVDAudioInfo
@@ -46,14 +37,14 @@ class DVDAudioInfo
 
      DVDAudioInfo(int track_number, const QString &audio_description);
     ~DVDAudioInfo();
-    
+
     QString getAudioString(){return description;}
     void    setChannels(int a_number){channels = a_number;}
     int     getChannels(){return channels;}
     int     getTrack(){return track;}
 
   private:
-  
+
     QString description;
     int     track;
     int     channels;
@@ -62,21 +53,21 @@ class DVDAudioInfo
 class DVDTitleInfo
 {
     //
-    //  A little "struct" class that holds 
+    //  A little "struct" class that holds
     //  DVD Title information
     //  (n.b. a DVD "title" is a logically distinct section
     //  of video, i.e. A movie, a special, a featurette, etc.)
     //
 
   public:
-      
+
      DVDTitleInfo();
     ~DVDTitleInfo();
 
     //
     //  Set
     //
-    
+
     void    setChapters(uint a_uint){numb_chapters = a_uint;}
     void    setAngles(uint a_uint){numb_angles = a_uint;}
     void    setTrack(uint a_uint){track_number = a_uint;}
@@ -88,11 +79,11 @@ class DVDTitleInfo
     void    setName(QString a_name){name = a_name;}
     void    setInputID(uint a_uint){dvdinput_id = a_uint;}
     void    setAC3(bool y_or_n){use_ac3 = y_or_n;}
-    
+
     //
     //  Get
     //
-    
+
     uint    getChapters(){return numb_chapters;}
     uint    getAngles(){return numb_angles;}
     uint    getTrack(){return track_number;}
@@ -108,22 +99,22 @@ class DVDTitleInfo
 
     void                       addAudio(DVDAudioInfo *new_audio_track);
     void                       addSubTitle(DVDSubTitleInfo *new_subtitle);
-    Q3PtrList<DVDAudioInfo>*    getAudioTracks(){return &audio_tracks;}
-    Q3PtrList<DVDSubTitleInfo>* getSubTitles(){return &subtitles;}
+    QList<DVDAudioInfo*>*    getAudioTracks(){return &audio_tracks;}
+    QList<DVDSubTitleInfo*>* getSubTitles(){return &subtitles;}
     DVDAudioInfo*              getAudioTrack(int which_one){return audio_tracks.at(which_one);}
-        
+
   private:
-  
+
     uint    numb_chapters;
     uint    numb_angles;
     uint    track_number;
-    
+
     uint    hours;
     uint    minutes;
     uint    seconds;
-    
-    Q3PtrList<DVDAudioInfo>    audio_tracks;
-    Q3PtrList<DVDSubTitleInfo> subtitles;
+
+    QList<DVDAudioInfo*>    audio_tracks;
+    QList<DVDSubTitleInfo*> subtitles;
 
     bool    is_selected;
     int     selected_quality;
@@ -131,9 +122,9 @@ class DVDTitleInfo
     int     selected_subtitle;
     bool    use_ac3;
     QString name;
-    
+
     uint    dvdinput_id;
-    
+
 };
 
 class DVDInfo
@@ -144,19 +135,19 @@ class DVDInfo
     //
 
   public:
-  
+
     DVDInfo(const QString &new_name);
     ~DVDInfo();
-    
+
     void  addTitle(DVDTitleInfo *new_title){titles.append(new_title);}
     DVDTitleInfo*           getTitle(uint which_one);
 
     QString                 getName(){return volume_name;}
-    Q3PtrList<DVDTitleInfo>* getTitles(){return &titles;}
-    
+    QList<DVDTitleInfo*>* getTitles(){return &titles;}
+
   private:
 
-    Q3PtrList<DVDTitleInfo>  titles;
+    QList<DVDTitleInfo*>  titles;
     QString             volume_name;
 };
 

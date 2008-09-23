@@ -1,21 +1,15 @@
 #ifndef VIDEOFILTER_H_
 #define VIDEOFILTER_H_
 
-/*
-    videofilter.h
+// Mythui headers
+#include "mythtv/libmythui/mythscreentype.h"
+#include "mythtv/libmythui/mythlistbutton.h"
+#include "mythtv/libmythui/mythuibutton.h"
+#include "mythtv/libmythui/mythuitext.h"
 
-    (c) 2003 Xavier Hervy
-    Part of the mythTV project
-
-    Class to let user filter the video list
-
-*/
-
-#include <mythtv/mythdialogs.h>
-
+// Mythvideo headers
 #include "parentalcontrols.h"
 
-class QKeyEvent;
 class Metadata;
 class VideoList;
 
@@ -199,69 +193,58 @@ class BasicFilterSettingsProxy : public FilterSettingsProxy
     T &m_type;
 };
 
-class VideoFilterDialog : public MythThemedDialog
+class VideoFilterDialog : public MythScreenType
 {
 
   Q_OBJECT
 
-    //
-    //  Dialog to manipulate the data
-    //
-
   public:
-    VideoFilterDialog(FilterSettingsProxy *fsp,
-                       MythMainWindow *parent_,
-                       QString window_name,
-                       QString theme_filename,
-                       const VideoList &video_list,
-                       const char *name_ = 0);
+    VideoFilterDialog( MythScreenStack *parent, QString name,
+                       VideoList *video_list);
     ~VideoFilterDialog();
 
-    void keyPressEvent(QKeyEvent *e);
-    void wireUpTheme();
-    void fillWidgets();
+    bool Create(void);
+
+  signals:
+    void filterChanged(void);
 
   public slots:
-
-    void takeFocusAwayFromEditor(bool up_or_down);
-    void saveAndExit();
-    void saveAsDefault();
-    void setYear(int new_year);
-    void setUserRating(int new_userrating);
-    void setCategory(int new_category);
-    void setCountry(int new_country);
-    void setGenre(int new_genre);
-    void setCast(int new_cast);
-    void setRunTime(int new_runtime);
-    void setBrowse(int new_browse);
-    void setInetRef(int new_inetref);
-    void setCoverFile(int new_coverfile);
-    void setOrderby(int new_orderby);
+    void saveAndExit(void);
+    void saveAsDefault(void);
+    void setYear(MythListButtonItem *item);
+    void setUserRating(MythListButtonItem *item);
+    void setCategory(MythListButtonItem *item);
+    void setCountry(MythListButtonItem *item);
+    void setGenre(MythListButtonItem *item);
+    void setCast(MythListButtonItem *item);
+    void setRunTime(MythListButtonItem *item);
+    void setBrowse(MythListButtonItem *item);
+    void setInetRef(MythListButtonItem *item);
+    void setCoverFile(MythListButtonItem *item);
+    void setOrderby(MythListButtonItem *item);
 
  private:
-    void update_numvideo();
+    void fillWidgets(void);
+    void update_numvideo(void);
     VideoFilterSettings m_settings;
-    //
-    //  GUI Stuff
-    //
-    UISelectorType      *browse_select;
-    UISelectorType      *orderby_select;
-    UISelectorType      *year_select;
-    UISelectorType  *userrating_select;
-    UISelectorType  *category_select;
-    UISelectorType  *country_select;
-    UISelectorType  *genre_select;
-    UISelectorType  *cast_select;
-    UISelectorType  *runtime_select;
-    UITextButtonType    *save_button;
-    UITextButtonType    *done_button;
-    UITextType          *numvideos_text;
 
-    UISelectorType  *m_intetref_select;
-    UISelectorType  *m_coverfile_select;
+    MythListButton  *m_browseList;
+    MythListButton  *m_orderbyList;
+    MythListButton  *m_yearList;
+    MythListButton  *m_userratingList;
+    MythListButton  *m_categoryList;
+    MythListButton  *m_countryList;
+    MythListButton  *m_genreList;
+    MythListButton  *m_castList;
+    MythListButton  *m_runtimeList;
+    MythListButton  *m_inetrefList;
+    MythListButton  *m_coverfileList;
+    MythUIButton    *m_saveButton;
+    MythUIButton    *m_doneButton;
+    MythUIText      *m_numvideosText;
 
+    const VideoList &m_videoList;
     FilterSettingsProxy *m_fsp;
-    const VideoList &m_video_list;
 };
 
 #endif

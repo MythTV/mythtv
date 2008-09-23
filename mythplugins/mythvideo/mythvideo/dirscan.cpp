@@ -27,14 +27,14 @@ namespace
             for (FileAssociations::ext_ignore_list::const_iterator p =
                  ext_disposition.begin(); p != ext_disposition.end(); ++p)
             {
-                m_extensions.insert(ext_map::value_type(p->first.lower(),
+                m_extensions.insert(ext_map::value_type(p->first.toLower(),
                                                         p->second));
             }
         }
 
         bool extension_ignored(const QString &extension) const
         {
-            ext_map::const_iterator p = m_extensions.find(extension.lower());
+            ext_map::const_iterator p = m_extensions.find(extension.toLower());
             if (p != m_extensions.end())
                 return p->second;
             return !m_list_unknown;

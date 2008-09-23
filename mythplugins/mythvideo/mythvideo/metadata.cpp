@@ -1,13 +1,17 @@
+// C++ headers
 #include <cmath>
 
+// QT headers
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
 #include <QRegExp>
 
+// Myth headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdb.h>
 
+// Mythvideo headers
 #include "globals.h"
 #include "metadata.h"
 #include "metadatalistmanager.h"
@@ -504,17 +508,17 @@ void MetadataImp::fromDBRow(MSqlQuery &query)
 
 void MetadataImp::saveToDatabase()
 {
-    if (m_title == "")
+    if (m_title.isEmpty())
         m_title = Metadata::FilenameToTitle(m_filename);
-    if (m_director == "")
+    if (m_director.isEmpty())
         m_director = VIDEO_DIRECTOR_UNKNOWN;
-    if (m_plot == "")
+    if (m_plot.isEmpty())
         m_plot = VIDEO_PLOT_DEFAULT;
-    if (m_rating == "")
+    if (m_rating.isEmpty())
         m_rating = VIDEO_RATING_DEFAULT;
-    if (m_coverfile == "")
+    if (m_coverfile.isEmpty())
         m_coverfile = VIDEO_COVERFILE_DEFAULT;
-    if (m_inetref == "")
+    if (m_inetref.isEmpty())
         m_inetref = VIDEO_INETREF_DEFAULT;
     if (isnan(m_userrating))
         m_userrating = 0.0;
@@ -645,7 +649,7 @@ void MetadataImp::updateGenres()
     genre_list::iterator genre = m_genres.begin();
     while (genre != m_genres.end())
     {
-        if (genre->second.stripWhiteSpace().length())
+        if (genre->second.trimmed().length())
         {
             genre->first = VideoGenre::getGenre().add(genre->second);
             VideoGenreMap::getGenreMap().add(m_id, genre->first);
@@ -666,7 +670,7 @@ void MetadataImp::updateCountries()
     country_list::iterator country = m_countries.begin();
     while (country != m_countries.end())
     {
-        if (country->second.stripWhiteSpace().length())
+        if (country->second.trimmed().length())
         {
             country->first = VideoCountry::getCountry().add(country->second);
             VideoCountryMap::getCountryMap().add(m_id, country->first);
@@ -687,7 +691,7 @@ void MetadataImp::updateCast()
     cast_list::iterator cast = m_cast.begin();
     while (cast != m_cast.end())
     {
-        if (cast->second.stripWhiteSpace().length())
+        if (cast->second.trimmed().length())
         {
             cast->first = VideoCast::getCast().add(cast->second);
             VideoCastMap::getCastMap().add(m_id, cast->first);
@@ -706,7 +710,7 @@ void MetadataImp::updateCast()
 Metadata::SortKey Metadata::GenerateDefaultSortKey(const Metadata &m,
                                                    bool ignore_case)
 {
-    QString title(ignore_case ? m.Title().lower() : m.Title());
+    QString title(ignore_case ? m.Title().toLower() : m.Title());
     title = trimTitle(title, ignore_case);
 
     return SortKey(SortData(title, m.Filename(),
@@ -773,7 +777,7 @@ QString Metadata::FilenameToTitle(const QString &file_name)
     title = eatBraces(title, "(", ")");
     title = eatBraces(title, "{", "}");
 
-    return title.stripWhiteSpace();
+    return title.trimmed();
 }
 
 namespace
@@ -885,7 +889,7 @@ bool Metadata::getPlayer(const QString &extension, QString &player,
     for (FileAssociations::association_list::const_iterator p = fa_list.begin();
          p != fa_list.end(); ++p)
     {
-        if (p->extension.lower() == extension.lower())
+        if (p->extension.toLower() == extension.toLower())
         {
             player = p->playcommand;
             use_default = p->use_default;
@@ -1209,7 +1213,7 @@ bool Metadata::fillDataFromID(const MetadataListManager &cache)
 
 bool Metadata::fillDataFromFilename(const MetadataListManager &cache)
 {
-    if (m_imp->getFilename() == "")
+    if (m_imp->getFilename().isEmpty())
         return false;
 
     MetadataListManager::MetadataPtr mp =

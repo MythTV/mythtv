@@ -1,28 +1,21 @@
-/*
-    dvdripbox.h
-
-    (c) 2003 Thor Sigvaldason and Isaac Richards
-    Part of the mythTV project
-
-    header for the main interface screen
-*/
-
 #ifndef DVDRIPBOX_H_
 #define DVDRIPBOX_H_
 
+// QT headers
 #include <QRegExp>
 #include <QTimer>
-#include <Q3PtrList>
 #include <QThread>
 #include <Q3Socket>
 #include <QVector>
 
-#include <mythtv/mythwidgets.h>
-#include <mythtv/dialogbox.h>
+// Mythui headers
+#include <mythtv/libmythui/mythscreentype.h>
+#include <mythtv/libmythui/mythuibutton.h>
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythuiprogressbar.h>
 
+// Mythvideo headers
 #include "dvdinfo.h"
-
-class QKeyEvent;
 
 class MTDJob : public QObject
 {
@@ -35,39 +28,38 @@ class MTDJob : public QObject
     //
 
   public:
-  
     MTDJob();
     MTDJob(const QString &a_name_);
-    
+
     void init();
-    
+
     //
     //  Set
     //
-    
-    void setNumber(int a_number){job_number = a_number;}
+
+    void setNumber(int a_number) { job_number = a_number; }
     void SetName(const QString &a_name);
     void setActivity(const QString &an_act);
-    void setOverall(double a_number){overall_progress = a_number;}
+    void setOverall(double a_number) { overall_progress = a_number; }
     void setSubjob(double a_number);
-    void setCancelled(bool yes_or_no){cancelled = yes_or_no;}
-        
+    void setCancelled(bool yes_or_no) { cancelled = yes_or_no; }
+
     //
     //  Get
     //
-    
-    int     getNumber(){return job_number;}
-    QString getName(){return job_name;}
-    QString getActivity(){return current_activity;}
-    double  getOverall(){return overall_progress;}
-    double  getSubjob(){return subjob_progress;}
+
+    int     getNumber() { return job_number; }
+    QString getName() { return job_name; }
+    QString getActivity() { return current_activity; }
+    double  getOverall() { return overall_progress; }
+    double  getSubjob() { return subjob_progress; }
 
   signals:
-  
+
     void    toggledCancelled();
-          
+
   private:
-  
+
     int      job_number;
     QString  job_name;
     QString  current_activity;
@@ -76,25 +68,24 @@ class MTDJob : public QObject
     bool     cancelled;
 };
 
-class DVDRipBox : public MythThemedDialog
+class DVDRipBox : public MythScreenType
 {
-
-  Q_OBJECT
+    Q_OBJECT
 
   public:
-
     typedef QVector<int> IntVector;
-    
-    DVDRipBox(MythMainWindow *parent, QString window_name,
-              QString dev, QString theme_filename, const char *name = 0);
 
+    DVDRipBox(MythScreenStack *parent, const QString &name, const QString &dev);
     ~DVDRipBox(void);
 
-    void connectToMtd(bool try_to_run_mtd);
-    void keyPressEvent(QKeyEvent *e);
-    
+    bool Create(void);
+
+    void connectToMtd();
+
+    enum RipState { RIPSTATE_UNKNOWN=0, RIPSTATE_NOCONNECT, RIPSTATE_NOJOBS,
+                   RIPSTATE_HAVEJOBS };
+
   public slots:
-  
     void connectionError(int error_id);
     void connectionMade();
     void connectionClosed();
@@ -117,44 +108,40 @@ class DVDRipBox : public MythThemedDialog
     void checkDisc();
     void cancelJob();
     void toggleCancel();
-     
+    void ExitingRipScreen();
+
   private:
+    void Init();
+    void createSocket();
 
-    void    wireUpTheme();
-    void    createSocket();
-
-    Q3Socket          *client_socket;
-    QTimer           *status_timer;
-    bool             tried_mtd;
-    bool             connected;
-    bool             first_time_through;
-    bool             have_disc;
-    bool             first_disc_found;
-    bool             block_media_requests;
-    Q3PtrList<MTDJob> jobs;
-    uint             numb_jobs;
-    int              current_job;
-    bool             ignore_cancels;
+    Q3Socket         *m_clientSocket;
+    QTimer           *m_statusTimer;
+    bool             m_triedMTD;
+    bool             m_connected;
+    bool             m_firstRun;
+    bool             m_haveDisc;
+    bool             m_firstDiscFound;
+    bool             m_blockMediaRequests;
+    QList<MTDJob*>    m_jobs;
+    uint             m_jobCount;
+    int              m_currentJob;
+    bool             m_ignoreCancels;
+    RipState         m_context;
 
     QString          m_device;       ///> The most recent usable DVD drive
-    DVDInfo          *dvd_info;
-    QTimer           *disc_checking_timer;
+    DVDInfo          *m_dvdInfo;
+    QTimer           *m_discCheckingTimer;
 
-    //
-    //  Theme-related "widgets"
-    //
-
-    UITextType       *warning_text;
-    UITextType       *overall_text;
-    UITextType       *job_text;
-    UITextType       *numb_jobs_text;
-    UITextType       *nodvd_text;
-    UIStatusBarType  *overall_status;
-    UIStatusBarType  *job_status;
-    UIPushButtonType *nextjob_button;
-    UIPushButtonType *prevjob_button;
-    UITextButtonType *ripscreen_button;
-    UITextButtonType *cancel_button;
+    MythUIText        *m_warningText;
+    MythUIText        *m_overallText;
+    MythUIText        *m_jobText;
+    MythUIText        *m_numjobsText;
+    MythUIProgressBar *m_overallProgress;
+    MythUIProgressBar *m_jobProgress;
+    MythUIButton      *m_ripscreenButton;
+    MythUIButton      *m_cancelButton;
+    MythUIButton      *m_nextjobButton;
+    MythUIButton      *m_prevjobButton;
 };
 
 

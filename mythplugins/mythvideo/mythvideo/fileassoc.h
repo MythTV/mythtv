@@ -1,83 +1,57 @@
 #ifndef FILEASSOC_H_
 #define FILEASSOC_H_
 
-/*
-    fileassoc.h
+// QT headers
+#include <QList>
 
-    (c) 2003 Thor Sigvaldason, Isaac Richards, and ?? ??
-    Part of the mythTV project
-
-    Classes to manipulate the file associations stored
-    in the videotypes table (in the mythconverg database)
-
-*/
-
-#include <Q3PtrList>
-
-#include <mythtv/mythdialogs.h>
-
-class QKeyEvent;
+// MythUI headers
+#include <mythtv/libmythui/mythscreentype.h>
+#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuitextedit.h>
+#include <mythtv/libmythui/mythuicheckbox.h>
+#include <mythtv/libmythui/mythuibutton.h>
 
 class FileAssociation;
 
-class FileAssocDialog : public MythThemedDialog
+class FileAssocDialog : public MythScreenType
 {
 
   Q_OBJECT
 
-    //
-    //  Dialog to manipulate the data
-    //
-
   public:
 
-    FileAssocDialog(MythMainWindow *parent_,
-                    QString window_name,
-                    QString theme_filename,
-                    const char *name_ = 0);
+    FileAssocDialog(MythScreenStack *parent, const QString &name);
     ~FileAssocDialog();
 
-    void keyPressEvent(QKeyEvent *e);
+    bool Create();
+
     void loadFileAssociations();
     void saveFileAssociations();
     void showCurrentFA();
-    void wireUpTheme();
 
   public slots:
 
-    void switchToFA(int which_one);
+    void switchToFA(MythListButtonItem*);
     void saveAndExit();
-    void toggleDefault(bool on_or_off);
-    void toggleIgnore(bool on_or_off);
-    void setPlayerCommand(QString);
+    void toggleDefault();
+    void toggleIgnore();
+    void setPlayerCommand();
     void deleteCurrent();
     void makeNewExtension();
-    void createExtension();
-    void removeExtensionPopup();
+    void createExtension(QString);
 
   private:
 
-    Q3PtrList<FileAssociation>   file_associations;
-    FileAssociation             *current_fa;
+    QList<FileAssociation*>     m_fileAssociations;
+    FileAssociation             *m_currentFileAssociation;
 
-    //
-    //  GUI stuff
-    //
-
-    UIRemoteEditType    *command_editor;
-    UISelectorType      *extension_select;
-    UICheckBoxType      *default_check;
-    UICheckBoxType      *ignore_check;
-    UITextButtonType    *done_button;
-    UITextButtonType    *new_button;
-    UITextButtonType    *delete_button;
-
-    //
-    //  Stuff for new extension
-    //
-
-    MythPopupBox        *new_extension_popup;
-    MythRemoteLineEdit  *new_extension_editor;
+    MythUITextEdit      *m_commandEdit;
+    MythListButton      *m_extensionList;
+    MythUICheckBox      *m_defaultCheck;
+    MythUICheckBox      *m_ignoreCheck;
+    MythUIButton        *m_doneButton;
+    MythUIButton        *m_newButton;
+    MythUIButton        *m_deleteButton;
 };
 
 #endif

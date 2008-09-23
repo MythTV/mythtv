@@ -14,7 +14,7 @@ Some inspiration from original attempts by:
 MythDVD relies heavily on the transcode project:
 
     http://www.theorie.physik.uni-goettingen.de/~ostreich/transcode/
-    Main Author: Thomas Östreich <ostreich@theorie.physik.uni-goettingen.de>
+    Main Author: Thomas ï¿½streich <ostreich@theorie.physik.uni-goettingen.de>
     Current Maintainer: Tilmann Bitterberg <transcode@tibit.org>
 
 Translations:
@@ -25,6 +25,9 @@ Previous maintainers:
 
 Fix to always use YV12/I420 codec
     Dave Alden <alden at math dot ohio-state dot edu>
+
+Video list filters:
+    Xavier Hervy
 
 and, by the time anyone reads this file, probably a lot of patch
 contributors.

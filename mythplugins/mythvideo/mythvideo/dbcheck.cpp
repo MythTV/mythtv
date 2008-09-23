@@ -604,10 +604,10 @@ namespace
             {
                 switch (view)
                 {
-                    case 0: view = VideoDialog::DLG_BROWSER; break;
-                    case 2: view = VideoDialog::DLG_TREE; break;
+                    case 0: view = DLG_BROWSER; break;
+                    case 2: view = DLG_TREE; break;
                     case 1:
-                    default: view = VideoDialog::DLG_GALLERY; break;
+                    default: view = DLG_GALLERY; break;
                 }
                 gContext->SaveSetting(setting, view);
             }

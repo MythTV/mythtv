@@ -1,11 +1,14 @@
 #ifndef METADATA_H_
 #define METADATA_H_
 
-#include <QString>
-
+// C++ headers
 #include <utility>
 #include <vector>
 
+// QT headers
+#include <QString>
+
+// Mythvideo headers
 #include "parentalcontrols.h"
 
 class MSqlQuery;

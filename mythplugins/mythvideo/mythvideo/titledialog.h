@@ -1,87 +1,75 @@
-/*
-    titledialog.h
-
-    (c) 2003 Thor Sigvaldason and Isaac Richards
-    Part of the mythTV project
-
-    the dialog where you actually choose titles to rip
-*/
-
 #ifndef TITLEDIALOG_H_
 #define TITLEDIALOG_H_
 
+// QT headers
 #include <QTimer>
 #include <Q3Socket>
+#include <QList>
 
-#include <Q3PtrList>
-
-#include <mythtv/mythdialogs.h>
+// Myth headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 
+// Mythui headers
+#include <mythtv/libmythui/mythscreentype.h>
+#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythuitextedit.h>
+#include <mythtv/libmythui/mythuibutton.h>
+#include <mythtv/libmythui/mythuicheckbox.h>
+
+// Mythvideo headers
 #include "dvdinfo.h"
 
-class QKeyEvent;
-
-class TitleDialog : public MythThemedDialog
+class TitleDialog : public MythScreenType
 {
     Q_OBJECT
 
   public:
-  
-    TitleDialog(Q3Socket *a_socket, 
-                QString d_name, 
-                Q3PtrList<DVDTitleInfo> *titles,
-                MythMainWindow *parent, 
-                QString window_name,
-                QString theme_filename,
-                const char* name = 0);
+
+    TitleDialog(MythScreenStack *parent,
+                const QString &name,
+                Q3Socket *a_socket,
+                QString d_name,
+                QList<DVDTitleInfo*> *titles);
    ~TitleDialog();
 
-    void keyPressEvent(QKeyEvent *e);
-
+    bool Create(void);
 
   public slots:
-  
+
     void showCurrentTitle();
     void viewTitle();
     void nextTitle();
     void prevTitle();
     void gotoTitle(uint title_number);
-    void toggleTitle(bool);
-    void changeName(QString new_name);
-    void setAudio(int);
-    void setQuality(int which_quality);
-    void setSubTitle(int which_subtitle);
-    void toggleAC3(bool);
+    void toggleTitle();
+    void changeName();
+    void setAudio(MythListButtonItem *);
+    void setQuality(MythListButtonItem *);
+    void setSubTitle(MythListButtonItem *);
+    void toggleAC3();
     void ripTitles();
-    
-  private:
-  
-    void    wireUpTheme();
-  
-    QTimer                 *check_dvd_timer;
-    QString                disc_name;
-    Q3PtrList<DVDTitleInfo> *dvd_titles;
-    DVDTitleInfo           *current_title;
-    Q3Socket                *socket_to_mtd;
 
-    //
-    //  GUI "widgets"
-    //
-    
-    UIRemoteEditType    *name_editor;
-    UISelectorType      *audio_select;
-    UISelectorType      *quality_select;
-    UISelectorType      *subtitle_select;
-    UICheckBoxType      *ripcheck;
-    UICheckBoxType      *ripacthree;
-    UITextType          *playlength_text;
-    UITextType          *numb_titles_text;
-    UIPushButtonType    *view_button;
-    UIPushButtonType    *next_title_button;
-    UIPushButtonType    *prev_title_button;
-    UITextButtonType    *ripaway_button;
+  private:
+    QTimer                  *m_checkDvdTimer;
+    QString                  m_discName;
+    QList<DVDTitleInfo*>    *m_dvdTitles;
+    DVDTitleInfo            *m_currentTitle;
+    Q3Socket                *m_socketToMtd;
+
+    MythUITextEdit      *m_nameEdit;
+    MythListButton      *m_audioList;
+    MythListButton      *m_qualityList;
+    MythListButton      *m_subtitleList;
+    MythUICheckBox      *m_ripCheck;
+    MythUICheckBox      *m_ripacthreeCheck;
+    MythUIText          *m_playlengthText;
+    MythUIText          *m_numbtitlesText;
+    MythUIButton        *m_viewButton;
+    MythUIButton        *m_nexttitleButton;
+    MythUIButton        *m_prevtitleButton;
+    MythUIButton        *m_ripawayButton;
 };
 
 #endif
