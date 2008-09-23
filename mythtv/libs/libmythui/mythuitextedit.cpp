@@ -18,6 +18,8 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name,
     m_Message = "";
     m_Filter = FilterNone;
 
+    m_isPassword = false;
+
     m_Justification = (Qt::AlignLeft | Qt::AlignTop);
 
     m_showCursor = false;
@@ -241,8 +243,21 @@ void MythUITextEdit::SetTextRect(const MythRect &area)
 
 void MythUITextEdit::SetText(const QString text, bool moveCursor)
 {
+    if (m_Message == text)
+        return;
+
     m_Message = text;
-    m_Text->SetText(m_Message);
+
+    if (m_isPassword)
+    {
+        QString obscured;
+        while (obscured.size() < m_Message.size())
+            obscured.append("*");
+        m_Text->SetText(obscured);
+    }
+    else
+        m_Text->SetText(m_Message);
+
     if (moveCursor)
         MoveCursor(MoveEnd);
     emit valueChanged();
@@ -299,13 +314,23 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
     int newcursorPos = 0;
     QSize size;
 
+    QString string;
+
+    if (m_isPassword)
+    {
+        while (string.size() < m_Message.size())
+            string.append("*");
+    }
+    else
+        string = m_Message;
+
     switch (moveDir)
     {
         case MoveLeft:
             if (m_Position < 0)
                 return false;
 
-            size = fm.size(Qt::TextSingleLine, m_Message.mid(m_Position,1));
+            size = fm.size(Qt::TextSingleLine, string.mid(m_Position,1));
 
             newcursorPos = cursorPos - size.width();
 
@@ -321,10 +346,10 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
             m_Position--;
             break;
         case MoveRight:
-            if (m_Position == (m_Message.size() - 1))
+            if (m_Position == (string.size() - 1))
                 return false;
 
-            size = fm.size(Qt::TextSingleLine, m_Message.mid(m_Position+1,1));
+            size = fm.size(Qt::TextSingleLine, string.mid(m_Position+1,1));
 
             newcursorPos = cursorPos + size.width();
 
@@ -337,7 +362,7 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
             m_Position++;
             break;
         case MoveEnd:
-            size = fm.size(Qt::TextSingleLine, m_Message);
+            size = fm.size(Qt::TextSingleLine, string);
 
             int messageWidth = size.width();
 
@@ -358,7 +383,7 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
                     newcursorPos = messageWidth + m_PaddingMargin;
             }
 
-            m_Position = m_Message.size() - 1;
+            m_Position = string.size() - 1;
 
             break;
     }

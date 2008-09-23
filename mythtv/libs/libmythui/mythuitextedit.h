@@ -35,15 +35,11 @@ class MythUITextEdit : public MythUIType, public StorageUser
     virtual void Pulse(void);
     virtual bool keyPressEvent(QKeyEvent *);
 
-    void SetBackgroundImage(MythImage *);
-    void SetCursorImage(MythImage *);
-    void SetMaxLength(const int length);
-    void SetPaddingMargin(const int margin);
-    void SetTextRect(const MythRect &area=MythRect(0,0,0,0));
     void SetText(const QString text, bool moveCursor = true);
     QString GetText(void) const { return m_Message; }
 
     void SetFilter(InputFilter filter) { m_Filter = filter; }
+    void SetPassword(bool isPassword)  { m_isPassword = isPassword; }
 
     enum MoveDirection { MoveLeft, MoveRight, MoveEnd };
     bool MoveCursor(MoveDirection);
@@ -65,6 +61,12 @@ class MythUITextEdit : public MythUIType, public StorageUser
     bool InsertCharacter(const QString character);
     void RemoveCharacter(void);
 
+    void SetBackgroundImage(MythImage *);
+    void SetCursorImage(MythImage *);
+    void SetMaxLength(const int length);
+    void SetPaddingMargin(const int margin);
+    void SetTextRect(const MythRect &area=MythRect(0,0,0,0));
+
     int m_blinkInterval;
     int m_cursorBlinkRate;
     bool m_showCursor;
@@ -77,6 +79,8 @@ class MythUITextEdit : public MythUIType, public StorageUser
     QString m_Message;
     InputFilter m_Filter;
     int m_Position;
+
+    bool m_isPassword;
 
     MythUIImage *m_backgroundImage;
     MythUIImage *m_cursorImage;

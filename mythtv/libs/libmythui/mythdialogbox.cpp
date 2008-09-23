@@ -203,46 +203,46 @@ void MythConfirmationDialog::sendResult(bool ok)
     Close();
 }
 
-/** 
- * Non-blocking version of MythPopupBox::showOkPopup() 
- */ 
-void ShowOkPopup(const QString &message) 
-{ 
-    QString                  LOC = "ShowOkPopup('" + message + "') - "; 
-    MythConfirmationDialog  *pop; 
-    static MythScreenStack  *stk = NULL; 
- 
- 
-    if (!stk) 
-    { 
-        MythMainWindow *win = GetMythMainWindow(); 
- 
-        if (win) 
-            stk = win->GetStack("popup stack"); 
+/**
+ * Non-blocking version of MythPopupBox::showOkPopup()
+ */
+void ShowOkPopup(const QString &message)
+{
+    QString                  LOC = "ShowOkPopup('" + message + "') - ";
+    MythConfirmationDialog  *pop;
+    static MythScreenStack  *stk = NULL;
+
+
+    if (!stk)
+    {
+        MythMainWindow *win = GetMythMainWindow();
+
+        if (win)
+            stk = win->GetStack("popup stack");
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC + "no main window?"); 
+            VERBOSE(VB_IMPORTANT, LOC + "no main window?");
             return;
         }
 
-        if (!stk) 
-        { 
+        if (!stk)
+        {
             VERBOSE(VB_IMPORTANT, LOC + "no popup stack?\n"
-                                        "Is there a MythThemeBase?"); 
-            return; 
-        } 
-    } 
+                                        "Is there a MythThemeBase?");
+            return;
+        }
+    }
 
     pop = new MythConfirmationDialog(stk, message, false);  // No cancel button
-    if (pop->Create()) 
-        stk->AddScreen(pop); 
-    else 
-    { 
-        delete pop; 
-        VERBOSE(VB_IMPORTANT, LOC + "Couldn't Create() Dialog"); 
-    } 
-} 
- 
+    if (pop->Create())
+        stk->AddScreen(pop);
+    else
+    {
+        delete pop;
+        VERBOSE(VB_IMPORTANT, LOC + "Couldn't Create() Dialog");
+    }
+}
+
 /////////////////////////////////////////////////////////////////
 
 MythTextInputDialog::MythTextInputDialog(MythScreenStack *parent,
@@ -284,7 +284,7 @@ bool MythTextInputDialog::Create(void)
 
     m_textEdit->SetFilter(m_filter);
     m_textEdit->SetText(m_defaultValue);
-    //m_textEdit->SetIsPassword(m_isPassword);
+    m_textEdit->SetPassword(m_isPassword);
 
     messageText->SetText(m_message);
     okButton->SetText(tr("Ok"));
