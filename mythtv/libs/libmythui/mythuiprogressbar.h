@@ -8,14 +8,14 @@ class MythFontProperties;
 
 /** \class MythUIProgressBar
  *
- * \brief Progress bar widget.
+ *  \brief Progress bar widget.
  *
  */
 class MythUIProgressBar : public MythUIType
 {
   public:
     MythUIProgressBar(MythUIType *parent, const QString &name);
-   ~MythUIProgressBar();
+   ~MythUIProgressBar() { }
 
     void Reset(void);
 

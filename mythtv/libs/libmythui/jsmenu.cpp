@@ -51,14 +51,12 @@ using namespace std;
 ** JoystickMenuThread Constructor
 **--------------------------------------------------------------------------*/
 JoystickMenuThread::JoystickMenuThread(QObject *main_window)
-                  : QThread()
+    : QThread(),
+      mainWindow(main_window), devicename(""),
+      fd(-1),                  button_count(0),
+      axes_count(0),           buttons(NULL),
+      axes(NULL),              bStop(false)
 {
-    mainWindow = main_window;
-
-    fd = -1;
-    axes = NULL;
-    buttons = NULL;
-    bStop = false;
 }
 
 /*----------------------------------------------------------------------------

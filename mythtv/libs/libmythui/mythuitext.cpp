@@ -12,41 +12,35 @@
 #include "compat.h"
 
 MythUIText::MythUIText(MythUIType *parent, const QString &name)
-          : MythUIType(parent, name)
+           : MythUIType(parent, name),
+            m_Justification(Qt::AlignLeft | Qt::AlignTop), m_OrigDisplayRect(),
+            m_AltDisplayRect(),                            m_drawRect(),
+            m_Message(""),                                 m_CutMessage(""),
+            m_DefaultMessage(""),                          m_Cutdown(true),
+            m_Font(new MythFontProperties()),              m_colorCycling(false),
+            m_startColor(),                                m_endColor(),
+            m_numSteps(0),                                 m_curStep(0),
+            curR(0.0),              curG(0.0),             curB(0.0),
+            incR(0.0),              incG(0.0),             incB(0.0)
 {
-    m_Message = m_DefaultMessage = "";
-
-    m_Font = new MythFontProperties();
-
-    m_OrigDisplayRect = m_AltDisplayRect = m_Area = m_drawRect = MythRect();
-
-    m_Cutdown = true;
-    m_CutMessage = "";
-
-    m_Justification = (Qt::AlignLeft | Qt::AlignTop);
-
-    m_colorCycling = false;
 }
 
 MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
                        QRect displayRect, QRect altDisplayRect,
                        MythUIType *parent, const QString &name)
-          : MythUIType(parent, name)
+           : MythUIType(parent, name),
+             m_Justification(Qt::AlignLeft | Qt::AlignTop),
+             m_OrigDisplayRect(displayRect), m_AltDisplayRect(altDisplayRect),
+             m_drawRect(displayRect),        m_Message(text),
+             m_CutMessage(""),               m_DefaultMessage(text),
+             m_Cutdown(true),                m_Font(new MythFontProperties()),
+             m_colorCycling(false),          m_startColor(),
+             m_endColor(),                   m_numSteps(0),
+             m_curStep(0),
+             curR(0.0),      curG(0.0),      curB(0.0),
+             incR(0.0),      incG(0.0),      incB(0.0)
 {
-    m_Message = text;
-    m_DefaultMessage = text;
-
-    m_Font = new MythFontProperties();
     *m_Font = font;
-
-    m_OrigDisplayRect = m_Area = m_drawRect = displayRect;
-    m_AltDisplayRect = altDisplayRect;
-
-    m_Cutdown = true;
-    m_CutMessage = "";
-    m_Justification = (Qt::AlignLeft | Qt::AlignTop);
-
-    m_colorCycling = false;
 }
 
 MythUIText::~MythUIText()

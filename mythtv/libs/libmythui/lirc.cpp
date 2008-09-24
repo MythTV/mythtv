@@ -24,11 +24,11 @@
  */
 
 LircThread::LircThread(QObject *main_window)
-          : QThread()
+    : QThread(),
+      lircConfig(NULL), mainWindow(main_window),
+      bStop(false),     fd(-1),
+      external_app("")
 {
-    mainWindow = main_window;
-    bStop = false;
-    lircConfig = NULL;
 }
 
 int LircThread::Init(const QString &config_file, const QString &program,

@@ -10,17 +10,11 @@
 #include "mythuiprogressbar.h"
 
 MythUIProgressBar::MythUIProgressBar(MythUIType *parent, const QString &name)
-           : MythUIType(parent, name)
+                  : MythUIType(parent, name),
+                    m_layout(LayoutHorizontal), m_effect(EffectReveal),
+                    m_initialized(false),       m_total(0),
+                    m_start(0),                 m_current(0)
 {
-    m_layout = LayoutHorizontal;
-    m_effect = EffectReveal;
-
-    m_total = m_start = m_current = 0;
-}
-
-MythUIProgressBar::~MythUIProgressBar()
-{
-
 }
 
 void MythUIProgressBar::Reset()

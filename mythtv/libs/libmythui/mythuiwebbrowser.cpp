@@ -147,24 +147,22 @@ void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
  *  \param name the name of this widget
  */
 MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
-                : MythUIType(parent, name)
+    : MythUIType(parent, name),
+#ifdef USING_QTWEBKIT
+      m_browser(NULL),
+#endif
+      m_image(NULL),         m_active(false),
+      m_initialized(false),  m_zoom(1.0),
+      m_bgColor("White"),    m_inputToggled(false),
+      m_lastMouseAction(""), m_mouseKeyCount(0),
+      m_lastMouseActionTime()
 {
-    m_zoom = 1.0;
-    m_bgColor = QColor("white");
-    m_image = NULL;
-    m_browser = NULL;
-
-    m_initialized = false;
-    m_active = false;
-    m_inputToggled = false;
-
     SetCanTakeFocus(true);
 }
 
 void MythUIWebBrowser::Finalize(void)
 {
     Init();
-
     MythUIType::Finalize();
 }
 
