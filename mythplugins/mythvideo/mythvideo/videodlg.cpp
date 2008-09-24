@@ -22,6 +22,7 @@
 
 // Mythvideo headers
 #include "videodlg.h"
+#include "videotree.h"
 #include "globals.h"
 #include "videofilter.h"
 #include "metadata.h"
@@ -874,8 +875,12 @@ void VideoDialog::SwitchLayout(DialogType type)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    VideoDialog *mythvideo = new VideoDialog(mainStack, "mythvideo", m_videoList,
-                                             type);
+    VideoDialog *mythvideo;
+
+    if (type == DLG_TREE)
+        mythvideo = new VideoTree(mainStack, "mythvideo", m_videoList, type);
+    else
+        mythvideo = new VideoDialog(mainStack, "mythvideo", m_videoList, type);
 
     if (mythvideo->Create())
     {
