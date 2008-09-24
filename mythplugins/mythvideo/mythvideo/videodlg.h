@@ -83,7 +83,6 @@ class VideoDialog : public MythScreenType
     void ManageMenu(void);
     void ViewMenu(void);
 
-    void ChangeView(void);
     void ChangeFilter(void);
 
     void ToggleBrowseMode(void);
@@ -117,7 +116,6 @@ class VideoDialog : public MythScreenType
     void OnParentalChange(int amount);
 
     // Called when the underlying data for an item changes
-    void OnVideoMenuDone(void);
     void OnVideoSearchListSelection(const QString &video_uid);
 
     void OnManualVideoUID(const QString &video_uid);
