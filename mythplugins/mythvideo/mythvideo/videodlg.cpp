@@ -811,7 +811,7 @@ void VideoDialog::ManageMenu()
 void VideoDialog::ToggleBrowseMode()
 {
     m_isFileBrowser = !m_isFileBrowser;
-    gContext->SetSetting("VideoDialogNoDB", QString("%").arg((int)m_isFileBrowser));
+    gContext->SetSetting("VideoDialogNoDB", QString("%1").arg((int)m_isFileBrowser));
     refreshData();
 }
 
