@@ -104,7 +104,7 @@ int TimezoneToInt (QString timezone)
 {
     // we signal an error by setting it invalid (> 840min = 14hr)
     int result = 841;
-    
+
     if (timezone.upper() == "UTC" || timezone.upper() == "GMT")
         return 0;
 
@@ -299,12 +299,12 @@ ProgInfo *XMLTVParser::parseProgram(
     pginfo->endts = text;
 
     text = element.attribute("channel", "");
-    QStringList split = QStringList::split(" ", text);   
- 
+    QStringList split = QStringList::split(" ", text);
+
     pginfo->channel = split[0];
 
     text = element.attribute("clumpidx", "");
-    if (!text.isEmpty()) 
+    if (!text.isEmpty())
     {
         split = QStringList::split("/", text);
         pginfo->clumpidx = split[0];
@@ -416,9 +416,9 @@ ProgInfo *XMLTVParser::parseProgram(
             {
                 pginfo->previouslyshown = true;
 
-                QString prevdate = getFirstText(info);
+                QString prevdate = info.attribute("start");
                 pginfo->originalairdate = prevdate;
-            } 
+            }
             else if (info.tagName() == "credits")
             {
                 parseCredits(info, pginfo);
@@ -483,11 +483,11 @@ ProgInfo *XMLTVParser::parseProgram(
                 }
 
                 if (!partnumber.isEmpty())
-                {                
+                {
                     tmp = partnumber.toInt() + 1;
                     partnumber = QString::number(tmp);
                 }
-                
+
                 if (!parttotal.isEmpty() && parttotal >= partnumber)
                 {
                     pginfo->parttotal = parttotal;
@@ -506,7 +506,7 @@ ProgInfo *XMLTVParser::parseProgram(
 
     if (pginfo->category.isEmpty() && !pginfo->catType.isEmpty())
         pginfo->category = pginfo->catType;
-    
+
     /* Hack for teveblad grabber to do something with the content tag*/
     if (pginfo->content != "")
     {
@@ -515,7 +515,7 @@ ProgInfo *XMLTVParser::parseProgram(
             pginfo->subtitle = pginfo->desc;
             pginfo->desc = pginfo->content;
         }
-        else if (pginfo->desc != "") 
+        else if (pginfo->desc != "")
         {
             pginfo->desc = pginfo->desc + " - " + pginfo->content;
         }
@@ -524,13 +524,13 @@ ProgInfo *XMLTVParser::parseProgram(
             pginfo->desc = pginfo->content;
         }
     }
-    
+
     if (pginfo->airdate.isEmpty())
         pginfo->airdate = QDate::currentDate().toString("yyyy");
 
     /* Let's build ourself a programid */
     QString programid;
-    
+
     if (pginfo->catType == "movie")
         programid = "MV";
     else if (pginfo->catType == "series")
@@ -539,7 +539,7 @@ ProgInfo *XMLTVParser::parseProgram(
         programid = "SP";
     else
         programid = "SH";
-    
+
     if (!uniqueid.isEmpty()) // we already have a unique id ready for use
         programid.append(uniqueid);
     else
@@ -574,7 +574,7 @@ ProgInfo *XMLTVParser::parseProgram(
 
     return pginfo;
 }
-                  
+
 bool XMLTVParser::parseFile(
     QString filename, QList<ChanInfo> *chanlist,
     QMap<QString, QList<ProgInfo> > *proglist)
@@ -647,7 +647,7 @@ bool XMLTVParser::parseFile(
     while (!n.isNull())
     {
         QDomElement e = n.toElement();
-        if (!e.isNull()) 
+        if (!e.isNull())
         {
             if (e.tagName() == "channel")
             {
@@ -707,8 +707,8 @@ bool XMLTVParser::parseFile(
                             if (!aggregatedDesc.isEmpty())
                                 aggregatedDesc.append(" | ");
                             aggregatedDesc.append(pginfo->desc);
-                        }    
-                        if (pginfo->clumpidx.toInt() == 
+                        }
+                        if (pginfo->clumpidx.toInt() ==
                             pginfo->clumpmax.toInt() - 1)
                         {
                             pginfo->title = aggregatedTitle;
