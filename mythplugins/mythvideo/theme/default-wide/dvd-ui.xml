@@ -118,86 +118,86 @@
 
         <!-- A bunch of text "labels" -->
         <textarea name="playtime_text" from="basetextarea">
-            <area>100,155,250,30</area>
+            <area>70,150,250,30</area>
             <value>Length:</value>
             <align>right</align>
         </textarea>
 
         <textarea name="ripcheck_text" from="playtime_text">
-            <position>100,195</position>
+            <position>70,178</position>
             <value>Select:</value>
         </textarea>
 
         <textarea name="ripname_text" from="playtime_text">
-            <position>100,230</position>
+            <position>70,228</position>
             <value>Name:</value>
         </textarea>
 
         <textarea name="ripquality_text" from="playtime_text">
-            <position>100,265</position>
+            <position>70,273</position>
             <value>Quality:</value>
         </textarea>
 
         <textarea name="ripaudio_text" from="playtime_text">
-            <position>100,300</position>
+            <position>70,318</position>
             <value>Audio Track:</value>
         </textarea>
 
         <textarea name="ripacthree_text" from="playtime_text">
-            <position>100,335</position>
+            <position>70,363</position>
             <value>AC3 Audio:</value>
         </textarea>
 
         <textarea name="subtitle_text" from="playtime_text">
-            <position>100,370</position>
+            <position>70,398</position>
             <value>Subtitles:</value>
         </textarea>
 
         <textarea name="ripview_text" from="playtime_text">
-            <position>100,405</position>
+            <position>70,436</position>
             <value>View:</value>
         </textarea>
 
         <!-- Widgets that actually do things -->
 
         <textarea name="playlength" from="basetextarea">
-            <area>362,155,300,40</area>
+            <area>330,150,300,40</area>
             <value>0:00:00</value>
         </textarea>
 
         <checkbox name="ripcheck" from="basecheckbox">
-            <position>360,190</position>
+            <position>330,178</position>
         </checkbox>
 
         <textedit name="name" from="basetextedit">
-            <area>362,225,300,40</area>
+            <position>330,213</position>
         </textedit>
 
         <buttonlist name="quality" from="baseselector">
-            <position>360,260</position>
+            <position>330,268</position>
         </buttonlist>
 
         <buttonlist name="audio" from="baseselector">
-            <position>360,295</position>
+            <position>330,313</position>
         </buttonlist>
 
         <checkbox name="ripacthree" from="basecheckbox">
-            <position>360,330</position>
+            <position>330,358</position>
         </checkbox>
 
         <buttonlist name="subtitle" from="baseselector">
-            <position>360,365</position>
+            <position>330,393</position>
         </buttonlist>
 
         <button name="view">
-            <area>360,400,32,32</area>
+            <area>330,435,32,32</area>
             <regular-background filename="blankbutton_off.png" />
             <selected-background filename="blankbutton_on.png" />
             <showarrow>no</showarrow>
         </button>
 
         <textarea name="numb_titles" from="basetextarea">
-            <area>315,450,170,30</area>
+            <area>266,468,266,30</area>
             <value>Title 1 of 1</value>
             <align>allcenter</align>
         </textarea>

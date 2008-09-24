@@ -22,11 +22,12 @@
         </imagetype>
 
         <buttonlist name="cast" from="basebuttonlist">
-            <area>18,18,300,300</area>
+            <area>18,18,360,325</area>
+            <showarrow>no</showarrow>
         </buttonlist>
 
         <button name="ok" from="basebutton">
-            <position>109,350</position>
+            <position>119,350</position>
         </button>
     </window>
 
@@ -38,17 +39,47 @@
         </imagetype>
 
         <textarea name="plot" from="basetextarea">
-            <area>18,18,300,300</area>
+            <area>18,18,360,325</area>
             <multiline>yes</multiline>
         </textarea>
 
         <button name="ok" from="basebutton">
-            <position>109,350</position>
+            <position>119,350</position>
         </button>
     </window>
 
     <!-- Main Windows -->
     <window name="manager">
+
+
+        <statetype name="parentallevel">
+            <position>740,10</position>
+            <state name="None">
+                <imagetype name="icon">
+                    <filename>level_none.png</filename>
+                </imagetype>
+            </state>
+            <state name="Lowest">
+                <imagetype name="icon">
+                    <filename>level_lowest.png</filename>
+                </imagetype>
+            </state>
+            <state name="Low">
+                <imagetype name="icon">
+                    <filename>level_low.png</filename>
+                </imagetype>
+            </state>
+            <state name="Medium">
+                <imagetype name="icon">
+                    <filename>level_medium.png</filename>
+                </imagetype>
+            </state>
+            <state name="High">
+                <imagetype name="icon">
+                    <filename>level_high.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
 
         <textarea name="novideos" from="basetextarea">
             <area>0,110,800,70</area>
@@ -57,7 +88,7 @@
         </textarea>
 
         <textarea name="title" from="basetextarea">
-            <area>20,10,800,80</area>
+            <area>20,10,710,80</area>
             <font>baselarge</font>
         </textarea>
 
@@ -70,7 +101,7 @@
 
         <textarea name="director" from="basetextarea">
             <area>160,65,350,35</area>
-            <font>smallyellow</font>
+            <font>basesmallyellow</font>
         </textarea>
 
         <textarea name="yrlbl" from="dirlbl">
@@ -79,7 +110,7 @@
         </textarea>
 
         <textarea name="year" from="director">
-            <area>680,65,100,35</area>
+            <area>650,65,100,35</area>
         </textarea>
 
         <textarea name="ratlbl" from="dirlbl">
@@ -96,9 +127,44 @@
             <value>Parental Level:</value>
         </textarea>
 
-        <textarea name="level" from="director">
-            <area>680,95,100,35</area>
-        </textarea>
+        <statetype name="videolevel">
+            <position>645,90</position>
+            <state name="Lowest">
+                <imagetype name="icon">
+                    <area>0,2,30,30</area>
+                    <filename>level_lowest.png</filename>
+                </imagetype>
+                <textarea name="label">
+                    <area>35,6,100,35</area>
+                    <value>Lowest</value>
+                    <font>basesmallyellow</font>
+                </textarea>
+            </state>
+            <state name="Low" from="Lowest">
+                <imagetype name="icon">
+                    <filename>level_low.png</filename>
+                </imagetype>
+                <textarea name="label">
+                    <value>Low</value>
+                </textarea>
+            </state>
+            <state name="Medium" from="Lowest">
+                <imagetype name="icon">
+                    <filename>level_medium.png</filename>
+                </imagetype>
+                <textarea name="label">
+                    <value>Medium</value>
+                </textarea>
+            </state>
+            <state name="High" from="High">
+                <imagetype name="icon">
+                    <filename>level_high.png</filename>
+                </imagetype>
+                <textarea name="label">
+                    <value>High</value>
+                </textarea>
+            </state>
+        </statetype>
 
         <textarea name="browselbl" from="dirlbl">
             <position>500,125</position>
@@ -107,7 +173,7 @@
         </textarea>
 
         <textarea name="browseable" from="director">
-            <area>680,125,100,35</area>
+            <area>650,125,100,35</area>
         </textarea>
 
         <textarea name="lenlbl" from="dirlbl">
@@ -239,98 +305,40 @@
     <window name="browser">
 
         <imagetype name="filler">
-            <position>30,125</position>
-            <filename>mv-background.png</filename>
+            <position>0,0</position>
+            <filename>browse_background.png</filename>
         </imagetype>
 
         <buttonlist2 name="videos">
-            <area>0,0,770,520</area>
+            <area>15,440,770,150</area>
             <layout>horizontal</layout>
-            <spacing>5</spacing>
-            <buttonarea>0,0,770,500</buttonarea>
+            <scrollstyle>center</scrollstyle>
+            <spacing>9</spacing>
+            <buttonarea>38,0,690,155</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,770,500</area>
                 <state name="active">
+                    <area>0,0,90,155</area>
+                    <imagetype name="buttonbackground" />
                     <imagetype name="buttonimage">
-                        <area>30,125,203,311</area>
+                        <area>10,15,80,120</area>
+                        <preserveaspect>true</preserveaspect>
+                        <filename>browse_nocover.png</filename>
                     </imagetype>
-
-                    <textarea name="buttontext" from="basetextarea">
-                        <area>40,18,760,100</area>
-                        <multiline>yes</multiline>
-                        <font>baseextralarge</font>
-                    </textarea>
-
-                    <textarea name="currentvideo" from="basetextarea">
-                        <area>150,476,500,35</area>
-                        <align>top,vcenter</align>
-                    </textarea>
-
-                    <textarea name="pl_label" from="basetextarea">
-                        <area>670,455,100,40</area>
-                        <value>Parental</value>
-                        <align>hcenter,top</align>
-                    </textarea>
-
-                    <textarea name="pl_value" from="basetextarea">
-                        <area>705,482,20,38</area>
-                        <value>1</value>
-                        <align>hcenter,vcenter</align>
-                    </textarea>
-
-                    <textarea name="dirlbl" from="basetextarea">
-                        <area>255,100,150,35</area>
-                        <value>Directed by</value>
-                    </textarea>
-
-                    <textarea name="director" from="basetextarea">
-                        <area>400,100,350,35</area>
-                    </textarea>
-
-                    <textarea name="plot" from="basetextarea">
-                        <area>245,130,533,145</area>
-                        <multiline>yes</multiline>
-                    </textarea>
-
-                    <textarea name="rating" from="basetextarea">
-                        <area>245,290,533,90</area>
-                        <multiline>yes</multiline>
-                    </textarea>
-
-                    <textarea name="lenlbl" from="basetextarea">
-                        <area>260,375,150,35</area>
-                        <value>Runtime</value>
-                    </textarea>
-
-                    <textarea name="length" from="basetextarea">
-                        <area>260,406,350,35</area>
-                    </textarea>
-
-                    <textarea name="yrlbl" from="basetextarea">
-                        <area>470,375,90,35</area>
-                        <value>Year</value>
-                    </textarea>
-
-                    <textarea name="year" from="basetextarea">
-                        <area>470,406,100,35</area>
-                    </textarea>
-
-                    <textarea name="userratinglbl" from="basetextarea">
-                        <area>620,375,150,35</area>
-                        <align>right,top</align>
-                        <value>User Rating</value>
-                    </textarea>
-
-                    <textarea name="userrating" from="basetextarea">
-                        <area>670,406,100,35</area>
-                        <align>hcenter,top</align>
+                    <textarea name="childcount" from="basetextarea">
+                        <area>15,70,70,20</area>
+                        <font>basesmallblack</font>
+                        <align>hcenter</align>
                     </textarea>
                 </state>
                 <state name="selected" from="active">
+                    <imagetype name="buttonbackground">
+                        <position>5,7</position>
+                        <filename>browse_selector.png</filename>
+                    </imagetype>
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>266,469</position>
+                <position>0,42</position>
                 <state type="off">
                     <imagetype name="upon">
                         <filename>left_arrow.png</filename>
@@ -338,7 +346,7 @@
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>497,469</position>
+                <position>730,42</position>
                 <state type="off">
                     <imagetype name="dnon">
                         <filename>right_arrow.png</filename>
@@ -347,9 +355,75 @@
             </statetype>
         </buttonlist2>
 
+        <textarea name="title" from="basetextarea">
+            <area>40,20,700,100</area>
+            <multiline>yes</multiline>
+            <font>baseextralarge</font>
+        </textarea>
+
+        <imagetype name="coverimage">
+            <area>30,90,203,311</area>
+        </imagetype>
+
+        <textarea name="currentvideo" from="basetextarea">
+            <area>150,486,500,35</area>
+            <align>top,vcenter</align>
+        </textarea>
+
+        <textarea name="dirlbl" from="basetextarea">
+            <area>240,65,100,35</area>
+            <value>Directed by</value>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="director" from="basetextarea">
+            <area>348,63,350,35</area>
+            <font>basemedium</font>
+        </textarea>
+
+        <textarea name="plot" from="basetextarea">
+            <area>245,97,523,145</area>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <textarea name="rating" from="basetextarea">
+            <area>245,257,533,90</area>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <textarea name="lenlbl" from="basetextarea">
+            <area>260,343,150,35</area>
+            <value>Runtime</value>
+        </textarea>
+
+        <textarea name="length" from="basetextarea">
+            <area>260,373,350,35</area>
+        </textarea>
+
+        <textarea name="yrlbl" from="basetextarea">
+            <area>470,343,90,35</area>
+            <value>Year</value>
+        </textarea>
+
+        <textarea name="year" from="basetextarea">
+            <area>470,373,100,35</area>
+        </textarea>
+
+        <textarea name="userratinglbl" from="basetextarea">
+            <area>620,343,150,35</area>
+            <align>right,top</align>
+            <value>User Rating</value>
+        </textarea>
+
+        <textarea name="userrating" from="basetextarea">
+            <area>670,373,100,35</area>
+            <align>hcenter,top</align>
+        </textarea>
+
         <textarea name="position" from="basetextarea">
-             <area>320,482,160,38</area>
+            <area>320,410,160,38</area>
             <align>hcenter,vcenter</align>
+            <font>basemedium</font>
         </textarea>
 
         <textarea name="novideos" from="basetextarea">
@@ -357,20 +431,49 @@
             <multiline>yes</multiline>
             <align>hcenter,vcenter</align>
         </textarea>
+
+        <statetype name="parentallevel">
+            <position>740,20</position>
+            <state name="None">
+                <imagetype name="icon">
+                    <filename>level_none.png</filename>
+                </imagetype>
+            </state>
+            <state name="Lowest">
+                <imagetype name="icon">
+                    <filename>level_lowest.png</filename>
+                </imagetype>
+            </state>
+            <state name="Low">
+                <imagetype name="icon">
+                    <filename>level_low.png</filename>
+                </imagetype>
+            </state>
+            <state name="Medium">
+                <imagetype name="icon">
+                    <filename>level_medium.png</filename>
+                </imagetype>
+            </state>
+            <state name="High">
+                <imagetype name="icon">
+                    <filename>level_high.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
     </window>
 
     <window name="gallery">
         <textarea name="title" from="basetextarea">
-            <area>20,20,250,50</area>
+            <area>70,20,460,50</area>
             <cutdown>yes</cutdown>
             <font>baselarge</font>
         </textarea>
 
         <buttonlist2 name="videos">
-            <area>0,0,770,520</area>
+            <area>15,0,770,585</area>
             <layout>grid</layout>
             <spacing>5</spacing>
-            <buttonarea>15,65,770,520</buttonarea>
+            <buttonarea>0,65,770,520</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,150,125</area>
                 <state name="active">
@@ -378,13 +481,18 @@
                         <filename>mv_gallery_back_reg.png</filename>
                     </imagetype>
                     <imagetype name="buttonimage">
-                        <area>10,10,130,90</area>
+                        <area>10,8,130,90</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <textarea name="buttontext">
-                        <area>5,97,140,25</area>
+                        <area>5,98,140,25</area>
                         <font>menufont</font>
                         <align>hcenter,bottom</align>
+                    </textarea>
+                    <textarea name="childcount" from="basetextarea">
+                        <area>55,72,55,20</area>
+                        <font>basesmallblack</font>
+                        <align>right</align>
                     </textarea>
                 </state>
                 <state name="selected" from="active">
@@ -394,7 +502,7 @@
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>280,15</position>
+                <position>640,20</position>
                 <state type="off">
                     <imagetype name="upon">
                         <filename>up_arrow.png</filename>
@@ -402,7 +510,7 @@
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>456,15</position>
+                <position>700,20</position>
                 <state type="off">
                     <imagetype name="dnon">
                         <filename>down_arrow.png</filename>
@@ -412,8 +520,9 @@
         </buttonlist2>
 
         <textarea name="position" from="basetextarea">
-             <area>345,15,110,40</area>
+            <area>530,20,110,40</area>
             <align>hcenter,vcenter</align>
+            <font>basemedium</font>
         </textarea>
 
         <textarea name="novideos" from="basetextarea">
@@ -422,17 +531,47 @@
             <align>hcenter,vcenter</align>
         </textarea>
 
-       <textarea name="breadcrumbs" from="basetextarea">
-            <area>30,580,530,30</area>
+       <!-- <textarea name="breadcrumbs" from="basetextarea">
+            <area>500,20,280,30</area>
             <font>basemedium</font>
-        </textarea>
+            <align>right,vcenter</align>
+        </textarea> -->
+
+        <statetype name="parentallevel">
+            <position>20,20</position>
+            <state name="None">
+                <imagetype name="icon">
+                    <filename>level_none.png</filename>
+                </imagetype>
+            </state>
+            <state name="Lowest">
+                <imagetype name="icon">
+                    <filename>level_lowest.png</filename>
+                </imagetype>
+            </state>
+            <state name="Low">
+                <imagetype name="icon">
+                    <filename>level_low.png</filename>
+                </imagetype>
+            </state>
+            <state name="Medium">
+                <imagetype name="icon">
+                    <filename>level_medium.png</filename>
+                </imagetype>
+            </state>
+            <state name="High">
+                <imagetype name="icon">
+                    <filename>level_high.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
     </window>
 
     <window name="tree">
 
         <imagetype name="morefiller">
             <filename>mv_other_background.png</filename>
-            <position>146,325</position>
+            <position>624,335</position>
         </imagetype>
 
        <textarea name="breadcrumbs" from="basetextarea">
@@ -534,31 +673,27 @@
             <font>baselarge</font>
         </textarea>
 
+        <textarea name="director" from="basetextarea">
+            <area>50,367,450,30</area>
+        </textarea>
+
+        <textarea name="year" from="basetextarea">
+            <area>500,367,80,30</area>
+            <align>right</align>
+        </textarea>
+
         <textarea name="plot" from="basetextarea">
-            <area>50,370,490,80</area>
+            <area>40,395,530,80</area>
             <align>left,top</align>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
         </textarea>
 
-        <textarea name="file_label" from="basetextarea">
-            <area>45,478,90,30</area>
-            <align>right</align>
-            <value>File:</value>
-            <font>basemedium</font>
-        </textarea>
-
-        <textarea name="filename" from="basetextarea">
-            <area>155,480,430,40</area>
-        </textarea>
-
-        <textarea name="player_label" from="file_label">
-            <position>45,520</position>
-            <value>Player:</value>
-        </textarea>
-
-        <textarea name="player" from="basetextarea">
-            <area>155,522,430,40</area>
+        <textarea name="cast" from="basetextarea">
+            <area>60,480,505,70</area>
+            <align>left,top</align>
+            <multiline>yes</multiline>
+            <cutdown>no</cutdown>
         </textarea>
 
         <textarea name="position" from="basetextarea">
@@ -569,17 +704,42 @@
 
         <imagetype name="coverimage">
             <area>624,335,140,212</area>
-            <preserveaspect>yes</preserveaspect>
         </imagetype>
 
-        <textarea name="level_label" from="file_label">
-            <area>720,555,30,40</area>
-            <value>PL</value>
+        <textarea name="level_label" from="basetextarea">
+            <area>600,560,130,30</area>
+            <value>Parental Level</value>
+            <align>right,vcenter</align>
         </textarea>
 
-        <textarea name="level" from="basetextarea">
-            <area>760,555,20,40</area>
-        </textarea>
+        <statetype name="parentallevel">
+            <position>740,553</position>
+            <state name="None">
+                <imagetype name="icon">
+                    <filename>level_none.png</filename>
+                </imagetype>
+            </state>
+            <state name="Lowest">
+                <imagetype name="icon">
+                    <filename>level_lowest.png</filename>
+                </imagetype>
+            </state>
+            <state name="Low">
+                <imagetype name="icon">
+                    <filename>level_low.png</filename>
+                </imagetype>
+            </state>
+            <state name="Medium">
+                <imagetype name="icon">
+                    <filename>level_medium.png</filename>
+                </imagetype>
+            </state>
+            <state name="High">
+                <imagetype name="icon">
+                    <filename>level_high.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
     </window>
 
     <window name="file_associations">
