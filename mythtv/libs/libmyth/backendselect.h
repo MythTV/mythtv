@@ -1,9 +1,9 @@
 #ifndef __BACKENDSELECT_H__
 #define __BACKENDSELECT_H__
 
-#include "mythdialogs.h"
-#include "mythwidgets.h"
+#include <QListWidget>
 
+#include "mythdialogs.h"
 #include "libmythupnp/upnpdevice.h"
 
 // define this to add a search button. In Nigel's testing, an extra ssdp
@@ -12,20 +12,20 @@
 
 class DatabaseParams;
 
-class ListBoxDevice : public Q3ListBoxText
+class ListBoxDevice : public QListWidgetItem
 {
   public:
 
-    ListBoxDevice(Q3ListBox *list, const QString &name, DeviceLocation *dev)
-        : Q3ListBoxText(list, name)
+    ListBoxDevice(QListWidget *parent, const QString &name, DeviceLocation *dev)
+        : QListWidgetItem(name, parent), m_dev(dev)
     {
-        if ((m_dev = dev) != NULL)
+        if (m_dev)
             m_dev->AddRef();
     }
 
     virtual ~ListBoxDevice()
     {
-        if (m_dev != NULL)
+        if (m_dev)
             m_dev->Release();
     }
 
@@ -50,10 +50,11 @@ class BackendSelect : public MythDialog
 
 
   public slots:
-    void Accept    (void);   ///< Linked to the OK button
-    void Manual    (void);   ///< Linked to 'Configure Manually' button
+    void Accept(QListWidgetItem *);  ///< Invoked by mouse click
+    void Accept(void);   ///< Linked to the OK button
+    void Manual(void);   ///< Linked to 'Configure Manually' button
 #ifdef SEARCH_BUTTON
-    void Search    (void);
+    void Search(void);
 #endif
 
 
@@ -63,11 +64,12 @@ class BackendSelect : public MythDialog
     void CreateUI   (void);
     void FillListBox(void);
     void RemoveItem (QString URN);
+    bool eventFilter(QObject *obj, QEvent *event);
 
     DatabaseParams *m_DBparams;
     ItemMap         m_devices;
     MythMainWindow *m_parent;
-    MythListBox    *m_backends;
+    QListWidget    *m_backends;
 };
 
 #endif

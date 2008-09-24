@@ -44,15 +44,15 @@ BackendSelect::~BackendSelect()
     m_devices.clear();
 }
 
-void BackendSelect::Accept(void)
+void BackendSelect::Accept(QListWidgetItem *item)
 {
     DeviceLocation *dev;
-    Q3ListBoxItem   *selected = m_backends->selectedItem();
+    ListBoxDevice  *selected = dynamic_cast<ListBoxDevice*>(item);
 
     if (!selected)
         return;
 
-    dev = ((ListBoxDevice *)selected)->m_dev;
+    dev = selected->m_dev;
 
     if (!dev)
         reject();
@@ -61,6 +61,21 @@ void BackendSelect::Accept(void)
     if (Connect(dev))  // this does a Release()
         accept();
 }
+
+void BackendSelect::Accept(void)
+{
+    QList<QListWidgetItem *>  selections = m_backends->selectedItems();
+
+    if (selections.empty())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "BackendSelect::Accept() - no QListWidget selected?");
+        return;
+    }
+
+    Accept(selections[0]);
+}
+
 
 void BackendSelect::AddItem(DeviceLocation *dev)
 {
@@ -84,8 +99,8 @@ void BackendSelect::AddItem(DeviceLocation *dev)
         m_devices.insert(USN, item);
 
         // Pre-select at least one item:
-        if (m_backends->numRows() == 1)
-            m_backends->setSelected(0, true);
+        if (m_backends->count() == 1)
+            m_backends->setCurrentRow(0);
     }
 
     dev->Release();
@@ -162,9 +177,8 @@ void BackendSelect::CreateUI(void)
 
 
     label = new QLabel(tr("Please select default Myth Backend Server"), this);
-    label->setBackgroundOrigin(QWidget::WindowOrigin);
 
-    m_backends = new MythListBox(this);
+    m_backends = new QListWidget(this);
     OK         = new MythPushButton(tr("OK"), this);
     cancel     = new MythPushButton(tr("Cancel"), this);
     manual     = new MythPushButton(tr("Configure Manually"), this);
@@ -188,7 +202,12 @@ void BackendSelect::CreateUI(void)
     layout->addWidget(OK    , 4, 4);
 
 
-    connect(m_backends, SIGNAL(accepted(int)), SLOT(Accept()));
+    // Catch Escape/Enter/Return key
+    m_backends->installEventFilter(this);
+
+    // Mouse double click on a list item
+    connect(m_backends, SIGNAL(itemActivated(QListWidgetItem *)),
+                                 SLOT(Accept(QListWidgetItem *)));
 #ifdef SEARCH_BUTTON
     connect(search,     SIGNAL(clicked()),     SLOT(Search()));
 #endif
@@ -230,6 +249,33 @@ void BackendSelect::customEvent(QEvent *e)
         //         SSDPCache is changed to handle NotifyRemove correctly
         RemoveItem(URN);
     }
+}
+
+/**
+ * Allow key shortcuts in the backend list widget.
+ *
+ * Note that this has to use Qt style event codes, instead of the QStrings
+ * returned by TranslateKeyPress(), because there is no translation table yet.
+ */
+bool BackendSelect::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress)
+    {
+        int key = ((QKeyEvent*)event)->key();
+
+        if (key == Qt::Key_Return || key == Qt::Key_Enter)
+        {
+            Accept();
+            return true;
+        }
+        else if (key == Qt::Key_Escape)
+        {
+            reject();
+            return true;
+        }
+    }
+
+    return QObject::eventFilter(obj, event);
 }
 
 void BackendSelect::FillListBox(void)
