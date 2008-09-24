@@ -11,13 +11,13 @@
 
 #include "mythgesture.h"
 
-// A button is a:
-// - multi-state background image (active/selected/etc)
-// - Text (with a set of properties)
-// - optional checkbox (dual/tri state)
-//
-// Creator class _must_ create at least a 'Normal' state (button background and
-// font properties).
+/** \class MythUIButton
+ *
+ *  \brief Single button widget
+ *         Has a multiple states with backgrounds and fonts, text and optional
+ *         checkbox (dual/tri state)
+ *
+ */
 class MythUIButton : public MythUIType
 {
     Q_OBJECT

@@ -1,6 +1,11 @@
+// C/C++ headers
 #include <iostream>
 using namespace std;
 
+// Myth headers
+#include "mythverbose.h"
+
+// MythUI headers
 #include "mythuibutton.h"
 #include "mythmainwindow.h"
 
@@ -395,7 +400,8 @@ void MythUIButton::CopyFrom(MythUIType *base)
     MythUIButton *button = dynamic_cast<MythUIButton *>(base);
     if (!button)
     {
-        cerr << "ERROR, bad parsing" << endl;
+        VERBOSE(VB_IMPORTANT,
+                        "MythUIButton::CopyFrom: Dynamic cast of base failed");
         return;
     }
 
@@ -419,6 +425,14 @@ void MythUIButton::CopyFrom(MythUIType *base)
                     (GetChild("buttonimage"));
     m_ArrowImage = dynamic_cast<MythUIImage *>
                     (GetChild("arrowimage"));
+
+    if (m_BackgroundImage || !m_CheckImage || !m_Text || !m_ButtonImage ||
+        !m_ArrowImage)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "MythUIButton::CopyFrom: Dynamic cast of a child failed");
+        return;
+    }
 
     m_CheckImage->SetVisible(false);
     m_ButtonImage->SetVisible(false);
