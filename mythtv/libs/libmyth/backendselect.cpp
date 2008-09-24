@@ -155,7 +155,8 @@ bool BackendSelect::Connect(DeviceLocation *dev)
 
         default:
             VERBOSE(VB_UPNP, "GetConnectionInfo() failed for " + error);
-            MythPopupBox::showOkPopup(m_parent, "", tr(message));
+            MythPopupBox::showOkPopup(m_parent, "",
+                                      tr(message.toLatin1().constData()));
     }
 
     // Back to the list, so the user can choose a different backend:
