@@ -12,9 +12,10 @@
 #include <unistd.h>
 
 // Qt headers
-#include <qfileinfo.h>
-#include <qimage.h>
-#include <qurl.h>
+#include <QFileInfo>
+#include <QImage>
+#include <QMetaType>
+#include <QUrl>
 
 // MythTV headers
 #include "RingBuffer.h"
@@ -133,6 +134,7 @@ void PreviewGenerator::deleteLater()
 void PreviewGenerator::AttachSignals(QObject *obj)
 {
     QMutexLocker locker(&previewLock);
+    qRegisterMetaType<bool>("bool &");
     connect(this, SIGNAL(previewThreadDone(const QString&,bool&)),
             obj,  SLOT(  previewThreadDone(const QString&,bool&)));
     connect(this, SIGNAL(previewReady(const ProgramInfo*)),
