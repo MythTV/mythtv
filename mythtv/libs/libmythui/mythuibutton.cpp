@@ -426,7 +426,7 @@ void MythUIButton::CopyFrom(MythUIType *base)
     m_ArrowImage = dynamic_cast<MythUIImage *>
                     (GetChild("arrowimage"));
 
-    if (m_BackgroundImage || !m_CheckImage || !m_Text || !m_ButtonImage ||
+    if (!m_BackgroundImage || !m_CheckImage || !m_Text || !m_ButtonImage ||
         !m_ArrowImage)
     {
         VERBOSE(VB_IMPORTANT,
