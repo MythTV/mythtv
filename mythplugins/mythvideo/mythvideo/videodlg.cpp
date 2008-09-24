@@ -812,7 +812,7 @@ void VideoDialog::ToggleBrowseMode()
 {
     m_isFileBrowser = !m_isFileBrowser;
     gContext->SetSetting("VideoDialogNoDB", QString("%1").arg((int)m_isFileBrowser));
-    refreshData();
+    reloadData();
 }
 
 void VideoDialog::ToggleFlatView()
