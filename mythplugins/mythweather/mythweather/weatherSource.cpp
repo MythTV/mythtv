@@ -311,18 +311,13 @@ ScriptInfo *WeatherSource::probeScript(const QFileInfo &fi)
  * that wouldn't be good.
  */
 WeatherSource::WeatherSource(ScriptInfo *info)
+    : m_ready(info ? true : false),    m_inuse(info ? true : false),
+      m_info(info),
+      m_proc(info ? new Q3Process(info->file->absFilePath()) : NULL),
+      m_locale(""),                    m_buffer(""),
+      m_units(SI_UNITS),               m_scriptTimer(new QTimer(this)),
+      m_updateTimer(new QTimer(this)), m_connectCnt(0)
 {
-    if (!info)
-    {
-        m_ready = false;
-        return;
-    }
-    m_ready = true;
-    m_inuse = true;
-    m_units = SI_UNITS;
-    m_info = info;
-    m_connectCnt = 0;
-
     QDir dir(GetConfDir());
     if (!dir.exists("MythWeather"))
         dir.mkdir("MythWeather");
@@ -332,38 +327,38 @@ WeatherSource::WeatherSource(ScriptInfo *info)
     dir.cd(info->name);
     m_dir = dir.absPath();
 
-    m_scriptTimer = new QTimer(this);
     connect( m_scriptTimer, SIGNAL(timeout()),
             this, SLOT(scriptTimeout()));
 
-    m_updateTimer = new QTimer(this);
     connect( m_updateTimer, SIGNAL(timeout()),
             this, SLOT(updateTimeout()));
-    m_proc = new Q3Process(info->file->absFilePath());
-    m_proc->setWorkingDirectory(QDir(GetShareDir() +
-                                     "mythweather/scripts/"));
-    connect(this, SIGNAL(killProcess()), m_proc, SLOT(kill()));
+
+    if (m_proc) {
+        m_proc->setWorkingDirectory(QDir(GetShareDir() +
+                                         "mythweather/scripts/"));
+        connect(this, SIGNAL(killProcess()), m_proc, SLOT(kill()));
+    }
 }
 
 WeatherSource::WeatherSource(const QString &filename)
+    : m_ready(false),                  m_inuse(false),
+      m_info(NULL),                    m_proc(NULL),
+      m_dir(""),                       m_locale(""),
+      m_buffer(""),                    m_units(SI_UNITS), 
+      m_scriptTimer(new QTimer(this)), m_updateTimer(new QTimer(this)),
+      m_connectCnt(0)
 {
-    m_ready = false;
-
-    m_connectCnt = 0;
-    m_scriptTimer = new QTimer(this);
     connect( m_scriptTimer, SIGNAL(timeout()),
             this, SLOT(scriptTimeout()));
 
-    m_updateTimer = new QTimer(this);
     connect( m_updateTimer, SIGNAL(timeout()),
             this, SLOT(updateTimeout()));
 
-    m_units = SI_UNITS;
 
     const QFileInfo fi(filename);
-    ScriptInfo *info = WeatherSource::probeScript(fi);
+    m_info = WeatherSource::probeScript(fi);
 
-    if (info)
+    if (m_info)
     {
         m_proc = new Q3Process(filename);
         m_proc->setWorkingDirectory(QDir(GetShareDir() +
@@ -371,7 +366,6 @@ WeatherSource::WeatherSource(const QString &filename)
         connect(this, SIGNAL(killProcess()),
                 m_proc, SLOT(kill()));
         m_ready = true;
-        m_info = info;
     }
     else
         VERBOSE(VB_IMPORTANT, "Error probing script");

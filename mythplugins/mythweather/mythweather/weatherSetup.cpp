@@ -19,7 +19,10 @@
 #define SRC_SCREEN 2
 
 GlobalSetup::GlobalSetup(MythScreenStack *parent, const char *name)
-    : MythScreenType(parent, name)
+    : MythScreenType(parent, name),
+      m_backgroundCheckbox(NULL), m_timeoutSpinbox(NULL),
+      m_timeout(0),               m_hold_timeout(0),
+      m_finishButton(NULL)
 {
 }
 
@@ -84,19 +87,13 @@ void GlobalSetup::saveData()
 ///////////////////////////////////////////////////////////////////////
 
 ScreenSetup::ScreenSetup(MythScreenStack *parent, const char *name,
-                         SourceManager *srcman) : MythScreenType(parent, name)
+                         SourceManager *srcman)
+    : MythScreenType(parent, name),
+      m_sourceManager(srcman ? srcman : new SourceManager()),
+      m_createdSrcMan(srcman ? false : true),
+      m_helpText(NULL),     m_activeList(NULL),
+      m_inactiveList(NULL), m_finishButton(NULL)
 {
-    if (!srcman)
-    {
-        m_sourceManager = new SourceManager();
-        m_createdSrcMan = true;
-    }
-    else
-    {
-        m_sourceManager = srcman;
-        m_createdSrcMan = false;
-    }
-
     m_sourceManager->clearSources();
     m_sourceManager->findScripts();
 }
@@ -848,7 +845,11 @@ void SourceSetup::sourceListItemSelected(MythListButtonItem *item)
 LocationDialog::LocationDialog(MythScreenStack *parent, const char *name,
                                MythScreenType *retScreen, ScreenListInfo *si,
                                SourceManager *srcman)
-    : MythScreenType(parent, name)
+    : MythScreenType(parent, name),
+      m_screenListInfo(si),   m_sourceManager(srcman),
+      m_retScreen(retScreen), m_locationList(NULL),
+      m_locationEdit(NULL),   m_searchButton(NULL),
+      m_resultsText(NULL),    m_sourceText(NULL)
 {
 
     QStringList types;
@@ -861,9 +862,6 @@ LocationDialog::LocationDialog(MythScreenStack *parent, const char *name,
     }
 
     m_types = types;
-    m_sourceManager = srcman;
-    m_screenListInfo = si;
-    m_retScreen = retScreen;
 }
 
 LocationDialog::~LocationDialog()
