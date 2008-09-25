@@ -11,15 +11,15 @@
 using namespace std;
 
 // Qt headers
-#include <qapplication.h>
-#include <qstringlist.h>
-#include <qcursor.h>
-#include <qlayout.h>
-#include <qfile.h>
-#include <qmap.h>
-#include <qdir.h>
+#include <QApplication>
+#include <QStringList>
+#include <QCursor>
+#include <QLayout>
+#include <QFile>
+#include <QMap>
+#include <QDir>
 #include <QProcess>
-#include <qdatetime.h>
+#include <QDateTime>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -38,6 +38,7 @@ using namespace std;
 #include "libmythdb/compat.h"
 #include "libmythdb/mythdb.h"
 #include "libmythdb/mythdirs.h"
+#include "libmythdb/mythverbose.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"

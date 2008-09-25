@@ -1,15 +1,15 @@
 #include <iostream>
-#include <qregexp.h>
-#include <qmap.h>
-#include <qlayout.h>
-#include <qlabel.h>
-#include <qapplication.h>
-#include <qfile.h>
-#include <qfileinfo.h>
-
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdlib.h>
+
+#include <QRegExp>
+#include <QMap>
+#include <QLayout>
+#include <QLabel>
+#include <QApplication>
+#include <QFile>
+#include <QFileInfo>
 
 #include "programinfo.h"
 #include "progdetails.h"
@@ -20,6 +20,7 @@
 #include "remoteutil.h"
 #include "jobqueue.h"
 #include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 #include "storagegroup.h"
 #include "previewgenerator.h"
 #include "channelutil.h" // for SkipTypes

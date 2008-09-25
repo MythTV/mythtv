@@ -11,8 +11,8 @@
 #include <cmath>
 
 #include "fifowriter.h"
-#include "mythcontext.h"
-#include "compat.h"
+#include "libmythdb/compat.h"
+#include "libmythdb/mythverbose.h"
 
 #include "config.h"
 #ifdef CONFIG_DARWIN

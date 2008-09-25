@@ -22,8 +22,9 @@ using namespace std;
 #include <q3deepcopy.h>
 
 // MythTV includes
-#include "mythdbcon.h"
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythdbcon.h"
+#include "libmythdb/mythverbose.h"
 #include "hdhrchannel.h"
 #include "videosource.h"
 #include "channelutil.h"

@@ -16,8 +16,8 @@ using namespace std;
 #include "nuppeldecoder.h"
 #include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdbcon.h"
+#include "libmythdb/mythverbose.h"
 
 #include "minilzo.h"
 

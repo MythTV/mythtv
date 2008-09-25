@@ -31,11 +31,12 @@
 #include <unistd.h>
 
 // Qt headers
-#include <qapplication.h>
+#include <QApplication>
 #include <QEvent>
 
 // MythTV headers
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythverbose.h"
 #include "scanwizard.h"
 #include "scanwizardhelpers.h"
 #include "scanwizardscanner.h"

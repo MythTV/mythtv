@@ -8,15 +8,16 @@
 #include <stdint.h>
 
 // Qt headers
-#include <qdir.h>
-#include <qfile.h>
-#include <qfileinfo.h>
-#include <qdatastream.h>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <QDataStream>
 
 // MythTV headers
 #include "mythcontext.h"
 #include "osdimagecache.h"
-#include "mythdirs.h"
+#include "libmythdb/mythdirs.h"
+#include "libmythdb/mythverbose.h"
 
 // Print statistics of OSD image access in the destructor of OSDImageCache
 //#define PRINT_OSD_IMAGE_CACHE_STATS

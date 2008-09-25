@@ -16,8 +16,9 @@
 #include <QString>
 
 // MythTV headers
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
 #include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 #include "diseqc.h"
 #include "dtvmultiplex.h"
 #include "compat.h"

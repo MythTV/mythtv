@@ -1,11 +1,11 @@
-#include <qimage.h>
-#include <qmap.h>
-#include <qregexp.h>
-#include <QKeyEvent>
-
 #include <iostream>
 #include <algorithm>
 using namespace std;
+
+#include <QImage>
+#include <QMap>
+#include <QRegExp>
+#include <QKeyEvent>
 
 #include "yuv2rgb.h"
 #include "osdtypes.h"
@@ -15,8 +15,9 @@ using namespace std;
 #include "osdtypeteletext.h"
 #include "util.h"
 
-#include "mythcontext.h"
-#include "mythdialogs.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/mythdialogs.h"
+#include "libmythdb/mythverbose.h"
 
 #ifdef USING_FRIBIDI
     #include "fribidi/fribidi.h"

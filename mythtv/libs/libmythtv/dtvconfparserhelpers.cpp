@@ -1,8 +1,8 @@
 
-#include <qmutex.h>
-#include <qmap.h>
+#include <QMutex>
+#include <QMap>
 
-#include "mythcontext.h"
+#include "libmythdb/mythverbose.h"
 #include "dtvconfparserhelpers.h"
 
 bool DTVParamHelper::ParseParam(const QString &symbol, int &value,

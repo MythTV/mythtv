@@ -1,8 +1,7 @@
-#include <qapplication.h>
-
 #include <unistd.h>
-
 using namespace std;
+
+#include <QApplication>
 
 #include "remoteencoder.h"
 #include "programinfo.h"
@@ -12,6 +11,7 @@ using namespace std;
 #include "videooutbase.h"
 #include "libmythdb/mythdb.h"
 #include "libmythdb/mythsocket.h"
+#include "libmythdb/mythverbose.h"
 
 #define LOC QString("RemoteEncoder(%1): ").arg(recordernum)
 #define LOC_WARN QString("RemoteEncoder(%1), Warning: ").arg(recordernum)

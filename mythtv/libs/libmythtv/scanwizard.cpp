@@ -35,6 +35,7 @@
 #include "sourceutil.h"
 #include "cardutil.h"
 #include "videosource.h"
+#include "libmythdb/mythverbose.h"
 
 #define LOC QString("SWiz: ")
 #define LOC_ERR QString("SWiz, Error: ")

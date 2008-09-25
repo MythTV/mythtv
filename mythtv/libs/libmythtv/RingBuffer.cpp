@@ -6,30 +6,29 @@
 
 // POSIX C headers
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <pthread.h>
 
 // Qt headers
-#include <qfile.h>
-#include <qapplication.h>
-#include <qdatetime.h>
-#include <qfileinfo.h>
+#include <QFile>
+#include <QApplication>
+#include <QDateTime>
+#include <QFileInfo>
 
 using namespace std;
 
 #include "exitcodes.h"
 #include "RingBuffer.h"
-#include "mythcontext.h"
 #include "remotefile.h"
 #include "remoteencoder.h"
 #include "ThreadedFileWriter.h"
 #include "livetvchain.h"
 #include "DVDRingBuffer.h"
 #include "util.h"
-#include "compat.h"
+#include "libmythdb/compat.h"
+#include "libmythdb/mythverbose.h"
 
 #ifndef O_STREAMING
 #define O_STREAMING 0
@@ -1356,11 +1355,8 @@ long long RingBuffer::GetRealFileSize(void) const
     if (remotefile)
         return remotefile->GetFileSize();
 
-    struct stat st;
-    QByteArray fname = filename.toLocal8Bit();
-    if (stat(fname.constData(), &st) == 0)
-        return st.st_size;
-    return -1;
+    QFileInfo info(filename);
+    return info.size();
 }
 
 /** \fn RingBuffer::LiveMode(void) const

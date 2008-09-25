@@ -1,17 +1,19 @@
 #include <sys/stat.h>
-#include <qapplication.h>
-#include <qregexp.h>
-#include <qbuffer.h>
-#include <qfileinfo.h>
+
+#include <QApplication>
+#include <QRegExp>
+#include <QBuffer>
+#include <QDir>
+#include <QFileInfo>
 
 #include "mythwizard.h"
 #include "mythcontext.h"
 #include "libmythdb/mythdb.h"
 #include "libmythdb/mythdirs.h"
+#include "libmythdb/mythverbose.h"
 #include "httpcomms.h"
 #include "importicons.h"
 #include "util.h"
-#include <qdir.h>
 
 ImportIconsWizard::ImportIconsWizard(bool fRefresh, QString channelname)
 {

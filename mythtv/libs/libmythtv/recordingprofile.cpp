@@ -1,13 +1,14 @@
+#include <iostream>
+
+#include <QCursor>
+#include <QLayout>
+
 #include "recordingprofile.h"
 #include "cardutil.h"
 #include "libmyth/mythcontext.h"
 #include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 #include "libmyth/mythwizard.h"
-#include <qsqldatabase.h>
-#include <qcursor.h>
-#include <qlayout.h>
-#include <iostream>
-
 #include "managedlist.h"
 
 QString RecordingProfileStorage::GetWhereClause(MSqlBindings &bindings) const

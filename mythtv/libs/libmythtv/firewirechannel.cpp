@@ -7,7 +7,7 @@
 
 #include <Q3DeepCopy>
 
-#include "mythcontext.h"
+#include "libmythdb/mythverbose.h"
 #include "tv_rec.h"
 #include "linuxfirewiredevice.h"
 #include "darwinfirewiredevice.h"

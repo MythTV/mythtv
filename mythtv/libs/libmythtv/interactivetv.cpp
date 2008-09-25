@@ -7,12 +7,13 @@
 #include <pthread.h>
 
 // Qt headers
-#include <qstring.h>
-#include <qimage.h>
+#include <QString>
+#include <QImage>
 
 // MythTV headers
 #include "interactivetv.h"
 #include "mhi.h"
+#include "libmythdb/mythverbose.h"
 
 InteractiveTV::InteractiveTV(NuppelVideoPlayer *nvp)
     : m_context(new MHIContext(this)), m_nvp(nvp)

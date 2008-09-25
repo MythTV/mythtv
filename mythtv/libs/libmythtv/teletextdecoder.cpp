@@ -32,7 +32,7 @@ using namespace std;
 #include "osd.h"
 #include "teletextdecoder.h"
 #include "vbilut.h"
-#include "mythcontext.h"
+#include "libmythdb/mythverbose.h"
 
 /******************************************************************/
 //Decoder section

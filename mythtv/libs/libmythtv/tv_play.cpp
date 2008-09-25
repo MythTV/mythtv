@@ -7,11 +7,11 @@
 #include <algorithm>
 using namespace std;
 
-#include <qapplication.h>
-#include <qregexp.h>
-#include <qfile.h>
-#include <qtimer.h>
-#include <qdir.h>
+#include <QApplication>
+#include <QRegExp>
+#include <QFile>
+#include <QTimer>
+#include <QDir>
 #include <QKeyEvent>
 #include <QEvent>
 
@@ -47,7 +47,8 @@ using namespace std;
 #include "sourceutil.h"
 #include "cardutil.h"
 #include "util-osx-cocoa.h"
-#include "compat.h"
+#include "libmythdb/compat.h"
+#include "libmythdb/mythverbose.h"
 #include "mythuihelper.h"
 
 #ifndef HAVE_ROUND

@@ -1,13 +1,13 @@
 // -*- Mode: c++ -*-
 
 // Qt headers
-#include <qregexp.h>
+#include <QRegExp>
 
 // MythTV headers
-#include "mythcontext.h"
 #include "sourceutil.h"
 #include "cardutil.h"
 #include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 #include "util.h"
 
 bool SourceUtil::HasDigitalChannel(uint sourceid)

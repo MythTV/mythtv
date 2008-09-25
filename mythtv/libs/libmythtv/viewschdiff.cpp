@@ -1,19 +1,18 @@
-#include <qlayout.h>
-#include <qpushbutton.h>
-#include <qlabel.h>
-#include <qcursor.h>
-#include <qsqldatabase.h>
-#include <qdatetime.h>
-#include <qapplication.h>
-#include <qregexp.h>
+#include <iostream>
+#include <cstdlib>
+using namespace std;
+
+#include <QLayout>
+#include <QPushButton>
+#include <QLabel>
+#include <QCursor>
+#include <QDateTime>
+#include <QApplication>
+#include <QRegExp>
 #include <QPaintEvent>
 #include <QPixmap>
 #include <QKeyEvent>
 #include <QPainter>
-
-#include <iostream>
-#include <cstdlib>
-using namespace std;
 
 #include "viewschdiff.h"
 #include "scheduledrecording.h"
@@ -22,7 +21,8 @@ using namespace std;
 
 #include "exitcodes.h"
 #include "dialogbox.h"
-#include "mythcontext.h"
+//#include "mythcontext.h"
+#include "libmythdb/mythverbose.h"
 #include "remoteutil.h"
 
 ViewScheduleDiff::ViewScheduleDiff(MythMainWindow *parent, const char *name, QString altTbl, int recordidDiff, QString ltitle)

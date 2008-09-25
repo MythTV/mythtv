@@ -1,9 +1,8 @@
-#include <qsqldatabase.h>
-#include <qstring.h>
-#include <QSqlError>
-
 #include <iostream>
 using namespace std;
+
+#include <QString>
+//#include <QSqlError>
 
 #include "dbcheck.h"
 #include "datadirect.h"          // for DataDirectProcessor::FixProgramIDs
@@ -13,6 +12,7 @@ using namespace std;
 #include "libmyth/mythcontext.h"
 #include "libmyth/schemawizard.h"
 #include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 
 
 #define MINIMUM_DBMS_VERSION 5,0,15

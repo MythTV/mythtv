@@ -1,28 +1,26 @@
-#include <qapplication.h>
-#include <qpainter.h>
-#include <qfont.h>
-#include <qsqldatabase.h>
-#include <qsqlquery.h>
-#include <QKeyEvent>
-#include <QEvent>
-#include <QPixmap>
-#include <QPaintEvent>
 #include <math.h>
-#include <qcursor.h>
-#include <qapplication.h>
-#include <qimage.h>
-#include <qlayout.h>
-#include <qlabel.h>
-#include <qdatetime.h>
-#include <qrect.h>
-
 #include <unistd.h>
 #include <iostream>
 #include <algorithm>
 using namespace std;
 
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include <QApplication>
+#include <QPainter>
+#include <QFont>
+#include <QKeyEvent>
+#include <QEvent>
+#include <QPixmap>
+#include <QPaintEvent>
+#include <QCursor>
+#include <QImage>
+#include <QLayout>
+#include <QLabel>
+#include <QDateTime>
+#include <QRect>
+
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythdbcon.h"
+#include "libmythdb/mythverbose.h"
 #include "guidegrid.h"
 #include "infostructs.h"
 #include "programinfo.h"

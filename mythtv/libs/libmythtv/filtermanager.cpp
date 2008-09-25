@@ -14,7 +14,8 @@
 // MythTV headers
 #include "filtermanager.h"
 #include "mythcontext.h"
-#include "mythdirs.h"
+#include "libmythdb/mythdirs.h"
+#include "libmythdb/mythverbose.h"
 
 #define LOC QString("FilterManager: ")
 #define LOC_WARN QString("FilterManager, Warning: ")

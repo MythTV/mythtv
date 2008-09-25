@@ -4,7 +4,8 @@
 #include "DeviceReadBuffer.h"
 #include "mythcontext.h"
 #include "tspacket.h"
-#include "compat.h"
+#include "libmythdb/compat.h"
+#include "libmythdb/mythverbose.h"
 
 #ifndef USING_MINGW
 #include <sys/poll.h>

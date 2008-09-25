@@ -2,15 +2,16 @@
  *  Copyright (C) David C.J. Matthews 2005, 2006
  *     Derived from libdsmcc by Richard Palmer 
  */
-#include <qstringlist.h>
 #include <string.h> // For memcmp
+
+#include <QStringList>
 
 #include "dsmcccache.h"
 #include "dsmccbiop.h"
 #include "dsmccreceiver.h"
 #include "dsmcc.h"
 
-#include "mythcontext.h"
+#include "libmythdb/mythverbose.h"
 
 /** \class DSMCCCache
  *

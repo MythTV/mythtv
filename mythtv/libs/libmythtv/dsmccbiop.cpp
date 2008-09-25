@@ -12,7 +12,7 @@
 #include "dsmccobjcarousel.h"
 #include "dsmcc.h"
 
-#include "mythcontext.h"
+#include "libmythdb/mythverbose.h"
 
 BiopNameComp::~BiopNameComp()
 {

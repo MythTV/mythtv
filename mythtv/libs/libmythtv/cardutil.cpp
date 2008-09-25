@@ -9,17 +9,17 @@
 #endif
 
 // Qt headers
-#include <qmap.h>
-#include <qdir.h>
+#include <QMap>
+#include <QDir>
 
 // MythTV headers
 #include "cardutil.h"
 #include "videosource.h"
-#include "mythdbcon.h"
 #include "dvbchannel.h"
 #include "diseqcsettings.h"
 #include "sourceutil.h"
-#include "mythdb.h"
+#include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 
 #ifdef USING_DVB
 #include "dvbtypes.h"

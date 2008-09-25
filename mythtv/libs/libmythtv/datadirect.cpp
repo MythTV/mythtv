@@ -16,6 +16,7 @@
 #include "mythwidgets.h"
 #include "mythcontext.h"
 #include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 #include "util.h"
 #include "dbutil.h"
 

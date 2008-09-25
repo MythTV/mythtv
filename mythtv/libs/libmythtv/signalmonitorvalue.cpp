@@ -1,5 +1,5 @@
 #include "signalmonitorvalue.h"
-#include <qobject.h>
+#include "libmythdb/mythverbose.h"
 
 bool SignalMonitorValue::run_static_init = true;
 QStringList SignalMonitorValue::ERROR_NO_CHANNEL;

@@ -20,7 +20,7 @@
 using namespace std;
 
 // Qt headers
-#include <qapplication.h>
+#include <QApplication>
 #include <QKeyEvent>
 
 // MythTV headers
@@ -50,6 +50,7 @@ using namespace std;
 #include "tv_play.h"
 #include "interactivetv.h"
 #include "util-osx-cocoa.h"
+#include "libmythdb/mythverbose.h"
 
 extern "C" {
 #include "vbitext/vbi.h"

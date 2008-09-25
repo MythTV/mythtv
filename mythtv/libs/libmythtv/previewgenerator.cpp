@@ -26,7 +26,8 @@
 #include "remotefile.h"
 #include "storagegroup.h"
 #include "util.h"
-#include "mythdirs.h"
+#include "libmythdb/mythdirs.h"
+#include "libmythdb/mythverbose.h"
 
 #define LOC QString("Preview: ")
 #define LOC_ERR QString("Preview Error: ")

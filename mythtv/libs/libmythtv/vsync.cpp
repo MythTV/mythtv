@@ -31,12 +31,8 @@
 #include <sys/poll.h>
 #endif
 
-#include <mythcontext.h>
-#include "mythdialogs.h" // for OpenGL VSync
-#ifdef USING_XV
-#include "videoout_xv.h" // for OpenGL VSync
-#endif
-#include "util-x11.h"    // for OpenGL VSync
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythverbose.h"
 
 #ifdef USING_OPENGL_VSYNC
 #include "util-opengl.h"

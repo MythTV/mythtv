@@ -11,12 +11,13 @@
 #include <fcntl.h>
 
 // Qt headers
-#include <qstring.h>
+#include <QString>
 
 // MythTV headers
 #include "ThreadedFileWriter.h"
 #include "mythcontext.h"
-#include "compat.h"
+#include "libmythdb/compat.h"
+#include "libmythdb/mythverbose.h"
 
 #if defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO > 0
 #define HAVE_FDATASYNC

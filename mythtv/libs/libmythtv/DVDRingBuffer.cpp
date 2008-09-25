@@ -7,7 +7,8 @@
 #include "iso639.h"
 
 #include "NuppelVideoPlayer.h"
-#include "compat.h"
+#include "libmythdb/compat.h"
+#include "libmythdb/mythverbose.h"
 #include "mythuihelper.h"
 
 #define LOC QString("DVDRB: ")

@@ -26,6 +26,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "exitcodes.h"
 #include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 #include "cardutil.h"
 #include "channelutil.h"
 #include "remoteutil.h"

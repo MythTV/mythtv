@@ -31,12 +31,13 @@
  */
 
 // Qt headers
-#include <qapplication.h>
-#include <qlocale.h>
+#include <QApplication>
+#include <QLocale>
 
 // MythTV headers
 #include "mythcontext.h"
 #include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 #include "frequencies.h"
 #include "videosource.h"
 #include "cardutil.h"

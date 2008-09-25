@@ -25,7 +25,7 @@ using namespace std;
 #include "dbox2recorder.h"
 #include "dbox2channel.h"
 #include "RingBuffer.h"
-#include "mythcontext.h"
+#include "libmythdb/mythverbose.h"
 #include "tspacket.h"
 
 #define DEBUG_DBOX2_TS

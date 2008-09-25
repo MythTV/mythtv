@@ -27,18 +27,19 @@
 using namespace std;
 
 // Qt headers
-#include <qapplication.h>
-#include <qpixmap.h>
-#include <qpainter.h>
-#include <qimage.h>
-#include <qcolor.h>
+#include <QApplication>
+#include <QPixmap>
+#include <QPainter>
+#include <QImage>
+#include <QColor>
 #include <QKeyEvent>
 
 // MythTV headers
 #include "mythcontext.h"
 #include "mythdialogs.h"
 #include "osdlistbtntype.h"
-#include "mythdirs.h"
+#include "libmythdb/mythdirs.h"
+#include "libmythdb/mythverbose.h"
 
 #define LOC QString("OSDListTreeType: ")
 #define LOC_ERR QString("OSDListTreeType, Error: ")

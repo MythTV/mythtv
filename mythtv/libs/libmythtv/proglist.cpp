@@ -1,16 +1,3 @@
-#include <qlayout.h>
-#include <qpushbutton.h>
-#include <qlabel.h>
-#include <qcursor.h>
-#include <qsqldatabase.h>
-#include <qdatetime.h>
-#include <qapplication.h>
-#include <qregexp.h>
-#include <QKeyEvent>
-#include <QEvent>
-#include <QPixmap>
-#include <QPaintEvent>
-
 #include <iostream>
 #include <map>
 #include <vector>
@@ -18,13 +5,26 @@
 #include <cassert>
 using namespace std;
 
+#include <QLayout>
+#include <QPushButton>
+#include <QLabel>
+#include <QCursor>
+#include <QDateTime>
+#include <QApplication>
+#include <QRegExp>
+#include <QKeyEvent>
+#include <QEvent>
+#include <QPixmap>
+#include <QPaintEvent>
+
 #include "proglist.h"
 #include "scheduledrecording.h"
 #include "customedit.h"
 #include "dialogbox.h"
 #include "mythcontext.h"
 #include "remoteutil.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdbcon.h"
+#include "libmythdb/mythverbose.h"
 #include "channelutil.h"
 
 ProgLister::ProgLister(ProgListType pltype,

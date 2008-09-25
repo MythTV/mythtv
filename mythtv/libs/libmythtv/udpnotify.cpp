@@ -28,7 +28,8 @@ match they will be ignored.
 #include <QUdpSocket>
 
 #include "udpnotify.h"
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythverbose.h"
 
 UDPNotifyOSDSet::UDPNotifyOSDSet(const QString &name, uint timeout)
     : m_name(name), m_timeout(timeout)

@@ -7,7 +7,8 @@
 #include "videodisplayprofile.h"
 #include "decoderbase.h"
 
-#include "../libmyth/mythcontext.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythverbose.h"
 
 #ifdef USING_XV
 #include "videoout_xv.h"

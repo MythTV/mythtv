@@ -4,7 +4,8 @@
 
 #include "mhi.h"
 #include "osd.h"
-#include "mythdirs.h"
+#include "libmythdb/mythdirs.h"
+#include "libmythdb/mythverbose.h"
 
 static bool       ft_loaded = false;
 static FT_Library ft_library;

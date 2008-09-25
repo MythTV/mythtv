@@ -13,7 +13,7 @@ using namespace std;
 #include <q3http.h>
 
 // MythTV headers
-#include "mythcontext.h"
+#include "libmythdb/mythverbose.h"
 #include "dbox2channel.h"
 #include "dbox2recorder.h"
 #include "dbox2epg.h"

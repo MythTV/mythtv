@@ -1,6 +1,7 @@
 #include "livetvchain.h"
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
 #include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 #include "programinfo.h"
 #include "mythsocket.h"
 

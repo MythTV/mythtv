@@ -1,18 +1,15 @@
+
 #include <unistd.h>
-
-#include <qsqldatabase.h>
-#include <qsqlquery.h>
-#include <qdatetime.h>
-#include <qfileinfo.h>
-#include <qregexp.h>
-#include <QEvent>
-
 #include <sys/types.h>
 #include <sys/stat.h>
-
 #include <iostream>
 #include <cstdlib>
 using namespace std;
+
+#include <QDateTime>
+#include <QFileInfo>
+#include <QRegExp>
+#include <QEvent>
 
 #include "exitcodes.h"
 #include "jobqueue.h"
@@ -26,6 +23,7 @@ using namespace std;
 
 #include "libmythdb/mythdb.h"
 #include "libmythdb/mythdirs.h"
+#include "libmythdb/mythverbose.h"
 
 #define LOC     QString("JobQueue: ")
 #define LOC_ERR QString("JobQueue Error: ")
@@ -1920,9 +1918,6 @@ void JobQueue::DoTranscodeThread(void)
     int retrylimit = 3;
     while (retry)
     {
-        off_t origfilesize, filesize;
-        struct stat st;
-
         retry = false;
 
         ChangeJobStatus(jobID, JOB_STARTING);
@@ -1930,12 +1925,8 @@ void JobQueue::DoTranscodeThread(void)
 
         QString filename = program_info->GetPlaybackURL(false, true);
 
-        origfilesize = 0;
-        filesize = 0;
-
-        QByteArray fname = filename.toLocal8Bit();
-        if (stat(fname.constData(), &st) == 0)
-            origfilesize = st.st_size;
+        long long filesize = 0;
+        long long origfilesize = QFileInfo(filename).size();
 
         QString msg = QString("Transcode %1")
                               .arg(StatusText(GetJobStatus(jobID)));
@@ -1993,11 +1984,11 @@ void JobQueue::DoTranscodeThread(void)
                 retry = false;
 
                 filename = program_info->GetPlaybackURL(false, true);
-                QByteArray fname = filename.toAscii();
+                QFileInfo st(filename);
 
-                if (stat(fname.constData(), &st) == 0)
+                if (st.exists())
                 {
-                    filesize = st.st_size;
+                    filesize = st.size();
 
                     QString comment = QString("%1: %2 => %3")
                                             .arg(transcoderName)
@@ -2016,9 +2007,9 @@ void JobQueue::DoTranscodeThread(void)
                 }
                 else
                 {
-                    int saved = errno;
-                    QString comment = QString("couldn't stat \"%1\": %2")
-                        .arg(filename).arg(strerror(saved));
+                    QString comment =
+                        QString("could not stat '%1'").arg(filename);
+
                     ChangeJobStatus(jobID, JOB_FINISHED, comment);
 
                     details = QString("%1%2: %3")

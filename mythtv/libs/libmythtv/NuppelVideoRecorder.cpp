@@ -20,7 +20,8 @@
 #include <iostream>
 using namespace std;
 
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythverbose.h"
 #include "NuppelVideoRecorder.h"
 #include "vbitext/cc.h"
 #include "channelbase.h"

@@ -8,14 +8,14 @@
 using namespace std;
 
 // Qt headers
-#include <qstring.h>
-#include <qimage.h>
-#include <qpixmap.h>
-#include <qbitmap.h>
-#include <qdir.h>
-#include <qfile.h>
-#include <qcolor.h>
-#include <qregexp.h>
+#include <QString>
+#include <QImage>
+#include <QPixmap>
+#include <QBitmap>
+#include <QDir>
+#include <QFile>
+#include <QColor>
+#include <QRegExp>
 #include <QKeyEvent>
 
 // MythTV headers
@@ -27,7 +27,8 @@ using namespace std;
 #include "textsubtitleparser.h"
 #include "oldsettings.h"
 #include "udpnotify.h"
-#include "compat.h"
+#include "libmythdb/compat.h"
+#include "libmythdb/mythverbose.h"
 #include "util.h"
 
 #include "x11colors.h"

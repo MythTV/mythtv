@@ -1,3 +1,10 @@
+#include <QLayout>
+#include <QLabel>
+#include <QApplication>
+#include <QRegExp>
+#include <QSqlQuery>
+#include <QSqlError>
+
 #include "scheduledrecording.h"
 #include "programinfo.h"
 #include "recordingprofile.h"
@@ -9,14 +16,8 @@
 #include "sr_dialog.h"
 #include "jobqueue.h"
 #include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 #include "viewschdiff.h"
-
-#include <qlayout.h>
-#include <qlabel.h>
-#include <qapplication.h>
-#include <qregexp.h>
-#include <qsqlquery.h>
-#include <QSqlError>
 
 // NOTE: if this changes, you _MUST_ update the RecTypePriority function 
 // in recordingtypes.cpp.
