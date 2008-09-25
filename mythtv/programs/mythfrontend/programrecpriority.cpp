@@ -1,16 +1,3 @@
-#include <qlayout.h>
-#include <qpushbutton.h>
-#include <q3buttongroup.h>
-#include <qlabel.h>
-#include <qcursor.h>
-#include <qdatetime.h>
-#include <qapplication.h>
-#include <qregexp.h>
-#include <q3header.h>
-#include <QKeyEvent>
-#include <QPixmap>
-#include <QPaintEvent>
-#include <QPainter>
 
 #include <iostream>
 #include <map>
@@ -18,15 +5,30 @@
 #include <algorithm>
 using namespace std;
 
+#include <QLayout>
+#include <QPushButton>
+#include <q3buttongroup.h>
+#include <QLabel>
+#include <QCursor>
+#include <QDateTime>
+#include <QApplication>
+#include <QRegExp>
+#include <q3header.h>
+#include <QKeyEvent>
+#include <QPixmap>
+#include <QPaintEvent>
+#include <QPainter>
+
 #include "programrecpriority.h"
 #include "scheduledrecording.h"
 #include "customedit.h"
 #include "proglist.h"
 #include "tv.h"
 
-#include "libmyth/dialogbox.h"
-#include "libmythdb/exitcodes.h"
-#include "libmythdb/mythdb.h"
+#include "dialogbox.h"
+#include "exitcodes.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 #include "remoteutil.h"
 #include "mythuihelper.h"
 

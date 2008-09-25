@@ -1,24 +1,22 @@
-#include <qlayout.h>
-#include <qpushbutton.h>
+#include <unistd.h>
+#include <iostream>
+using namespace std;
+
+#include <QLayout>
+#include <QPushButton>
 #include <q3buttongroup.h>
-#include <qlabel.h>
-#include <qcursor.h>
+#include <QLabel>
+#include <QCursor>
 #include <q3listview.h>
-#include <qdatetime.h>
-#include <qapplication.h>
-#include <qimage.h>
-#include <qpainter.h>
+#include <QDateTime>
+#include <QApplication>
+#include <QImage>
+#include <QPainter>
 #include <q3header.h>
-#include <qsqldatabase.h>
 #include <q3hbox.h>
 #include <Q3HBoxLayout>
 #include <Q3VBoxLayout>
 #include <QSqlError>
-
-#include <unistd.h>
-
-#include <iostream>
-using namespace std;
 
 #include "custompriority.h"
 
@@ -29,7 +27,8 @@ using namespace std;
 #include "scheduledrecording.h"
 #include "recordingtypes.h"
 #include "viewschdiff.h"
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 
 CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
                        ProgramInfo *pginfo)

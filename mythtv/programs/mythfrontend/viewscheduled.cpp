@@ -1,23 +1,22 @@
-#include <qlayout.h>
-#include <qpushbutton.h>
+#include <stdlib.h>
+
+#include <iostream>
+using namespace std;
+
+#include <QLayout>
+#include <QPushButton>
 #include <q3buttongroup.h>
-#include <qlabel.h>
-#include <qcursor.h>
-#include <qsqldatabase.h>
-#include <qdatetime.h>
-#include <qapplication.h>
-#include <qregexp.h>
+#include <QLabel>
+#include <QCursor>
+#include <QDateTime>
+#include <QApplication>
+#include <QRegExp>
 #include <q3header.h>
 #include <QEvent>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QPixmap>
 #include <QKeyEvent>
-
-#include <stdlib.h>
-
-#include <iostream>
-using namespace std;
 
 #include "viewscheduled.h"
 #include "scheduledrecording.h"
@@ -26,8 +25,9 @@ using namespace std;
 #include "tv_play.h"
 
 #include "exitcodes.h"
-#include "dialogbox.h"
-#include "mythcontext.h"
+#include "libmyth/dialogbox.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythverbose.h"
 #include "remoteutil.h"
 
 

@@ -1,22 +1,21 @@
-#include <qlayout.h>
-#include <q3iconview.h>
-#include <qsqldatabase.h>
-#include <q3widgetstack.h>
-#include <q3vbox.h>
-#include <q3grid.h>
-#include <qregexp.h>
-#include <qhostaddress.h>
-#include <QKeyEvent>
-#include <QPixmap>
-#include <QPaintEvent>
-#include <QPainter>
-
 #include <unistd.h>
 #include <stdlib.h>
 
 #include <iostream>
 #include <cerrno>
 using namespace std;
+
+#include <QLayout>
+#include <q3iconview.h>
+#include <q3widgetstack.h>
+#include <q3vbox.h>
+#include <q3grid.h>
+#include <QRegExp>
+#include <QHostAddress>
+#include <QKeyEvent>
+#include <QPixmap>
+#include <QPaintEvent>
+#include <QPainter>
 
 #include "config.h"
 #include "statusbox.h"
@@ -25,7 +24,9 @@ using namespace std;
 #include "tv.h"
 #include "jobqueue.h"
 #include "util.h"
-#include "libmythdb/mythdb.h"
+#include "mythdb.h"
+#include "mythverbose.h"
+#include "mythversion.h"
 #include "cardutil.h"
 #include "mythuihelper.h"
 

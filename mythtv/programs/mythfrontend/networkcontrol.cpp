@@ -2,22 +2,24 @@
 #include <iostream>
 using namespace std;
 
-#include <qapplication.h>
-#include <qregexp.h>
-#include <qstringlist.h>
+#include <QApplication>
+#include <QRegExp>
+#include <QStringList>
 #include <q3textstream.h>
-#include <qdir.h>
+#include <QDir>
 #include <QKeyEvent>
 #include <QEvent>
 #include <QMap>
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/mythdialogs.h"
+#include "mythcontext.h"
+#include "mythdialogs.h"
 #include "networkcontrol.h"
 #include "programinfo.h"
 #include "remoteutil.h"
 #include "previewgenerator.h"
 #include "compat.h"
+#include "mythverbose.h"
+#include "mythversion.h"
 #include "mythuihelper.h"
 
 #define LOC QString("NetworkControl: ")

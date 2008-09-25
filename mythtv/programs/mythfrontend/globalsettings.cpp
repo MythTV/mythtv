@@ -8,21 +8,21 @@
 #include <sys/stat.h>
 
 // Qt headers
-#include <qapplication.h>
-#include <qevent.h>
+#include <QApplication>
+#include <QEvent>
 #include <qnamespace.h>
-#include <qstylefactory.h>
-#include <qsqldatabase.h>
-#include <qfile.h>
-#include <qdialog.h>
-#include <qcursor.h>
-#include <qdir.h>
-#include <qimage.h>
+#include <QStyleFactory>
+#include <QFile>
+#include <QDialog>
+#include <QCursor>
+#include <QDir>
+#include <QImage>
 
 // MythTV headers
 #include "mythconfig.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "mythverbose.h"
 #include "dbsettings.h"
 #include "langsettings.h"
 #include "libmythtv/mpeg/iso639.h"

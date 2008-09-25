@@ -2,20 +2,21 @@
 
 /* QT includes */
 #include <qnamespace.h>
-#include <qstringlist.h>
-#include <qapplication.h>
-#include <qdom.h>
-#include <qbuttongroup.h>
-#include <qimage.h>
-#include <qevent.h>
-#include <qdir.h>
-#include <qstring.h>
+#include <QStringList>
+#include <QApplication>
+#include <QDomNode>
+#include <QButtonGroup>
+#include <QImage>
+#include <QEvent>
+#include <QDir>
+#include <QString>
 
 /* MythTV includes */
 #include "mythcontext.h"
 #include "mythmainwindow.h"
 #include "myththemebase.h"
 #include "mythuihelper.h"
+#include "mythverbose.h"
 
 using namespace std;
 

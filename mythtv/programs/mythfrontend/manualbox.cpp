@@ -1,19 +1,23 @@
-#include <qlayout.h>
-#include <qpushbutton.h>
+
+#include <unistd.h>
+#include <iostream>
+using namespace std;
+
+#include <QLayout>
+#include <QPushButton>
 #include <q3buttongroup.h>
-#include <qlabel.h>
-#include <qcursor.h>
+#include <QLabel>
+#include <QCursor>
 #include <q3listview.h>
-#include <qdatetime.h>
+#include <QDateTime>
 #include <q3progressbar.h>
-#include <qapplication.h>
-#include <qtimer.h>
-#include <qimage.h>
-#include <qpainter.h>
+#include <QApplication>
+#include <QTimer>
+#include <QImage>
+#include <QPainter>
 #include <q3header.h>
-#include <qfile.h>
-#include <qsqldatabase.h>
-#include <qregexp.h>
+#include <QFile>
+#include <QRegExp>
 #include <q3hbox.h>
 #include <Q3HBoxLayout>
 #include <Q3Frame>
@@ -22,11 +26,6 @@
 #include <QEvent>
 #include <Q3VBoxLayout>
 
-#include <unistd.h>
-
-#include <iostream>
-using namespace std;
-
 #include "manualbox.h"
 #include "tv.h"
 #include "NuppelVideoPlayer.h"
@@ -34,6 +33,7 @@ using namespace std;
 
 #include "mythcontext.h"
 #include "dialogbox.h"
+#include "mythverbose.h"
 #include "programinfo.h"
 #include "remoteutil.h"
 
