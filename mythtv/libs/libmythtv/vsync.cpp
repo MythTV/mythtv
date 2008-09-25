@@ -33,6 +33,11 @@
 
 #include "libmyth/mythcontext.h"
 #include "libmythdb/mythverbose.h"
+#include "mythmainwindow.h"
+
+#ifdef USING_XV
+#include "videoout_xv.h"
+#endif
 
 #ifdef USING_OPENGL_VSYNC
 #include "util-opengl.h"
