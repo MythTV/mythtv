@@ -58,6 +58,7 @@ class VideoDialog : public MythScreenType
     VideoList *m_videoList;
 
   private slots:
+    void UpdatePosition(void);
     void UpdateText(MythUIButtonListItem*);
     void handleSelect(MythUIButtonListItem *);
     void SetCurrentNode(MythGenericTree*);

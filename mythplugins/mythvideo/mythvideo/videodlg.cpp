@@ -272,6 +272,9 @@ void VideoDialog::loadData()
         if (node == selectedNode)
             m_videoButtonList->SetItemCurrent(item);
     }
+
+    UpdatePosition();
+
 }
 
 void VideoDialog::UpdateItem(MythUIButtonListItem *item)
@@ -572,6 +575,23 @@ void VideoDialog::SetCurrentNode(MythGenericTree *node)
     m_currentNode = node;
 }
 
+void VideoDialog::UpdatePosition(void)
+{
+    //VERBOSE(VB_FILE, "VideoDialog::UpdatePosition");
+    MythUIButtonList *currentList = GetItemCurrent()->parent();
+
+    if (!currentList)
+        return;
+
+    if (m_positionText)
+    {   
+        QString position = QString(tr("%1 of %2"))
+                                .arg(currentList->GetCurrentPos() + 1)
+                                .arg(currentList->GetCount());
+        m_positionText->SetText(position);
+    }
+}
+
 void VideoDialog::UpdateText(MythUIButtonListItem* item)
 {
     if (!item)
@@ -592,13 +612,7 @@ void VideoDialog::UpdateText(MythUIButtonListItem* item)
             m_titleText->SetText(item->text());
     }
 
-    if (m_positionText)
-    {
-        QString position = QString(tr("%1 of %2"))
-                                .arg(currentList->GetCurrentPos() + 1)
-                                .arg(currentList->GetCount());
-        m_positionText->SetText(position);
-    }
+    UpdatePosition();
 
     if (m_crumbText)
     {
