@@ -40,6 +40,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
              curR(0.0),      curG(0.0),      curB(0.0),
              incR(0.0),      incG(0.0),      incB(0.0)
 {
+    SetArea(displayRect);
     *m_Font = font;
 }
 
