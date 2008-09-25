@@ -38,9 +38,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include <qstring.h>
+#include <QString>
 
 #include "mythcontext.h"
+#include "mythverbose.h"
 
 #ifndef MALLOC
 #define MALLOC(type, size)  (type *)malloc(sizeof(type) * (size))
