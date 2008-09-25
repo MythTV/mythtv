@@ -7,7 +7,7 @@
 #include "iptvfeederlive.h"
 
 // MythTV headers
-#include "mythcontext.h"
+#include "libmythdb/mythverbose.h"
 #include "timeoutedtaskscheduler.h"
 
 #define LOC QString("FbFeedLive:")

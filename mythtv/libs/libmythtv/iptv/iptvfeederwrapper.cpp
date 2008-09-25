@@ -16,7 +16,8 @@ using namespace std;
 #include "iptvfeederudp.h"
 #include "iptvfeederrtp.h"
 #include "iptvfeederfile.h"
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythverbose.h"
 
 #define LOC QString("IPTVFeed: ")
 #define LOC_ERR QString("IPTVFeed, Error: ")

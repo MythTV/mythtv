@@ -9,8 +9,9 @@
 #include <QTextStream>
 
 // MythTV headers
-#include "mythcontext.h"
-#include "httpcomms.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/httpcomms.h"
+#include "libmythdb/mythverbose.h"
 #include "cardutil.h"
 #include "channelutil.h"
 #include "iptvchannelfetcher.h"

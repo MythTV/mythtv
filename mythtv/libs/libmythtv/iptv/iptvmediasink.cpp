@@ -5,7 +5,8 @@
  */
 #include <algorithm>
 
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythverbose.h"
 #include "iptvmediasink.h"
 #include "streamlisteners.h"
 

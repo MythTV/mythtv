@@ -23,7 +23,8 @@
 
 // MythTV headers
 #include "iptvmediasink.h"
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythverbose.h"
 #include "tspacket.h"
 
 #define LOC QString("FbFeedFile: ")
