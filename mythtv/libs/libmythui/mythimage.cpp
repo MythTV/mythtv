@@ -27,6 +27,8 @@ MythImage::MythImage(MythPainter *parent)
     m_isReflected = false;
 
     m_imageId = 0;
+
+    m_FileName = "";
 }
 
 MythImage::~MythImage()
