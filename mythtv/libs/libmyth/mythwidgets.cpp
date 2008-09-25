@@ -1,24 +1,24 @@
-#include <qstyle.h>
-#include <qpainter.h>
-#include <qcursor.h>
-#include <qapplication.h>
+#include <iostream>
+using namespace std;
+
+#include <QStyle>
+#include <QPainter>
+#include <QCursor>
+#include <QApplication>
 #include <q3vbox.h>
-#include <qlayout.h>
+#include <QLayout>
 #include <QKeyEvent>
 #include <QHideEvent>
 #include <QFocusEvent>
 #include <QMouseEvent>
 #include <QEvent>
 
-#include <iostream>
-
-using namespace std;
-
 #include "mythwidgets.h"
 #include "mythcontext.h"
 #include "util.h"
 #include "mythdialogs.h"
 #include "virtualkeyboard.h"
+#include "libmythdb/mythverbose.h"
 #include "libmythui/mythmainwindow.h"
 
 typedef VirtualKeyboard* QWidgetP;

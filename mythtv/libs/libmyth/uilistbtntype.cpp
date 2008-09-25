@@ -25,7 +25,8 @@
 #include <Q3PtrList>
 #include <QPixmap>
 
-#include "mythcontext.h"
+#include "libmyth/mythcontext.h"
+#include "libmythdb/mythverbose.h"
 #include "lcddevice.h"
 
 #include "uilistbtntype.h"

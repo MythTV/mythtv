@@ -1,9 +1,11 @@
-#include "mythcdrom.h"
-#include "mythcdrom-freebsd.h"
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/cdio.h>
+
+#include "mythcdrom.h"
+#include "mythcdrom-freebsd.h"
 #include "mythcontext.h"
+#include "libmythdb/mythverbose.h"
 
 
 #define ASSUME_WANT_AUDIO 1

@@ -1,5 +1,4 @@
-#include "mythcdrom.h"
-#include "mythcdrom-linux.h"
+#include <sys/types.h>
 #include <sys/ioctl.h>       // ioctls
 #include <linux/cdrom.h>     // old ioctls for cdrom
 #include <scsi/sg.h>
@@ -7,12 +6,14 @@
 #include <errno.h>
 #include <stdint.h>
 #include <limits.h>
-
-#include "mythconfig.h"      // for WORDS_BIGENDIAN
-#include "mythcontext.h"
-
 #include <linux/iso_fs.h>
 #include <unistd.h>
+
+#include "mythcdrom.h"
+#include "mythcdrom-linux.h"
+#include "mythconfig.h"      // for WORDS_BIGENDIAN
+#include "mythcontext.h"
+#include "libmythdb/mythverbose.h"
 
 #define LOC     QString("MythCDROMLinux:")
 #define LOC_ERR QString("mythcdrom-linux, Error: ")
