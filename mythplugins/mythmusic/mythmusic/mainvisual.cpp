@@ -970,8 +970,11 @@ void LogScale::setMax(int maxscale, int maxrange)
     }
 
     alpha = x;
-    for (i = 1; i < (int) domain; i++) {
+    for (i = 1; i < (int) domain; i++)
+    {
         scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
+        if (scaled < 1)
+            scaled = 1;
         if (indices[scaled - 1] < i)
             indices[scaled - 1] = i;
     }
