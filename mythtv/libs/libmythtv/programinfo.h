@@ -23,9 +23,10 @@ typedef QMap<long long, int> frm_dir_map_t;
    mythplugins/mythweb/includes/mythbackend.php
    mythplugins/mythweb/objects/MythTV.php
    mythtv/bindings/perl/MythTV.pm
-   mythtv/bindings/python/MythTV.py
+   mythtv/bindings/perl/MythTV/Program.pm
+   mythtv/bindings/python/MythTV/MythTV.py
 */
-#define NUMPROGRAMLINES 46
+#define NUMPROGRAMLINES 47
 
 typedef enum {
     MARK_UNSET = -10,
@@ -71,7 +72,7 @@ enum FlagMask {
 };
 
 // if AudioProps changes, the audioprop column in program and
-// recordedprogram has to changed accordingly 
+// recordedprogram has to changed accordingly
 enum AudioProps {
     AUD_UNKNOWN       = 0x00, // For backwards compatibility do not change 0 or 1
     AUD_STEREO        = 0x01,
@@ -83,7 +84,7 @@ enum AudioProps {
 };
 
 // if VideoProps changes, the audioprop column in program and
-// recordedprogram has to changed accordingly 
+// recordedprogram has to changed accordingly
 enum VideoProps {
     VID_UNKNOWN       = 0x00, // For backwards compatibility do not change 0 or 1
     VID_HDTV          = 0x01,
@@ -92,7 +93,7 @@ enum VideoProps {
 };
 
 // if SubtitleTypes changes, the audioprop column in program and
-// recordedprogram has to changed accordingly 
+// recordedprogram has to changed accordingly
 enum SubtitleTypes {
     SUB_UNKNOWN       = 0x00, // For backwards compatibility do not change 0 or 1
     SUB_HARDHEAR      = 0x01,
@@ -167,14 +168,14 @@ class MPUBLIC ProgramInfo
     // Constructors and bulk set methods.
     ProgramInfo(void);
     ProgramInfo(const ProgramInfo &other);
-    static ProgramInfo *GetProgramAtDateTime(const QString &channel, 
-                                             const QDateTime &dtime, 
-                                             bool genUnknown = false, 
+    static ProgramInfo *GetProgramAtDateTime(const QString &channel,
+                                             const QDateTime &dtime,
+                                             bool genUnknown = false,
                                              int clampHoursMax = 0);
     static ProgramInfo *GetProgramFromBasename(const QString filename);
-    static ProgramInfo *GetProgramFromRecorded(const QString &channel, 
+    static ProgramInfo *GetProgramFromRecorded(const QString &channel,
                                                const QString &starttime);
-    static ProgramInfo *GetProgramFromRecorded(const QString &channel, 
+    static ProgramInfo *GetProgramFromRecorded(const QString &channel,
                                                const QDateTime &dtime);
 
     ProgramInfo& operator=(const ProgramInfo &other);
@@ -184,14 +185,14 @@ class MPUBLIC ProgramInfo
     bool FromStringList(const QStringList &list, uint offset);
 
     bool FillInRecordInfo(const vector<ProgramInfo *> &reclist);
-    
+
     // Destructor
     ~ProgramInfo();
 
     // Serializers
     void Save() const;
     void ToStringList(QStringList &list) const;
-    void ToMap(QMap<QString, QString> &progMap, 
+    void ToMap(QMap<QString, QString> &progMap,
                bool showrerecord = false) const;
 
     // Used for scheduling recordings
@@ -338,8 +339,8 @@ class MPUBLIC ProgramInfo
     QString chanstr;
     QString chansign;
     QString channame;
-    
-    
+
+
     int recpriority;
     QString recgroup;
     QString playgroup;
@@ -356,17 +357,17 @@ class MPUBLIC ProgramInfo
     QDateTime recendts;
 
     AvailableStatusType availableStatus;
-    
+
     bool isVideo;
     int lenMins;
-    
+
     QString year;
     float stars;
 
     QDate originalAirDate;
     QDateTime lastmodified;
     QDateTime lastInUseTime;
-    
+
     bool hasAirDate;
     bool repeat;
 

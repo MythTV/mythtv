@@ -925,7 +925,7 @@ void MainServer::HandleVersion(MythSocket *socket, QString version)
  * \addtogroup myth_network_protocol
  * \par        ANN Playback \e host \e wantevents
  * Register \e host as a client, and prevent shutdown of the socket.
- * 
+ *
  * \par        ANN Monitor  \e host \e wantevents
  * Register \e host as a client, and allow shutdown of the socket
  * \par        ANN SlaveBackend \e IPaddress
@@ -1169,7 +1169,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         "recordedprogram.audioprop+0, recordedprogram.videoprop+0, "
         "recordedprogram.subtitletypes+0, transcoded, "
         "recorded.recpriority, watched, recorded.preserve, "
-        "recorded.storagegroup "
+        "recorded.storagegroup, recordedprogram.airdate "
         "FROM recorded "
         "LEFT JOIN record ON recorded.recordid = record.recordid "
         "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -1314,6 +1314,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                 query.value(39).toString();
 
             proginfo->recpriority = query.value(36).toInt();
+            proginfo->year = query.value(40).toString();
 
             proginfo->recstatus = rsRecorded;
             if (proginfo->recendts > rectime)

@@ -374,6 +374,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
     INT_TO_LIST(audioproperties)
     INT_TO_LIST(videoproperties)
     INT_TO_LIST(subtitleType)
+    STR_TO_LIST(year)
 /* do not forget to update the NUMPROGRAMLINES defines! */
 }
 
@@ -487,6 +488,7 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(audioproperties)
     INT_FROM_LIST(videoproperties)
     INT_FROM_LIST(subtitleType)
+    STR_FROM_LIST(year)
 
     return true;
 }

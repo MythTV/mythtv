@@ -44,8 +44,8 @@ RECSTATUS = {
 		}
 
 BACKEND_SEP = '[]:[]'
-PROTO_VERSION = 40
-PROGRAM_FIELDS = 46
+PROTO_VERSION = 41
+PROGRAM_FIELDS = 47
 
 class MythTV:
 	"""
@@ -302,6 +302,7 @@ class Program:
 		self.audio_props = data[43]
 		self.video_props = data[44]
 		self.subtitle_type = data[45]
+		self.year = data[46]
 
 if __name__ == '__main__':
 	banner = '\'m\' is a MythTV instance.'
