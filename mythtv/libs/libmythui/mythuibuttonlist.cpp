@@ -1007,7 +1007,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
                                        CheckState state, bool showArrow)
 {
     if (!lbtype)
-        cerr << "Cannot add a button to a non-existant list!";
+        VERBOSE(VB_IMPORTANT, "Cannot add a button to a non-existant list!");
 
     m_parent    = lbtype;
     m_text      = text;
@@ -1028,7 +1028,8 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
                                        const QString& text,
                                        QVariant data)
 {
-    assert(lbtype);
+    if (!lbtype)
+        VERBOSE(VB_IMPORTANT, "Cannot add a button to a non-existant list!");
 
     m_parent    = lbtype;
     m_text      = text;
@@ -1101,6 +1102,15 @@ void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
         m_image = image;
         image->UpRef();
     }
+
+    m_parent->Update();
+}
+
+void MythUIButtonListItem::DisplayState(const QString &state,
+                                        const QString &name)
+{
+    if (!name.isEmpty())
+        m_states.insert(name, state);
 
     m_parent->Update();
 }
@@ -1263,6 +1273,17 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
         if (image)
             image->SetImage(image_it.value());
         ++image_it;
+    }
+
+    MythUIStateType *statetype;
+    QMap<QString, QString>::iterator state_it = m_states.begin();
+    while (state_it != m_states.end())
+    {
+        statetype = dynamic_cast<MythUIStateType *>
+                                    (buttonstate->GetChild(state_it.key()));
+        if (statetype)
+            statetype->DisplayState(state_it.value());
+        ++state_it;
     }
 }
 

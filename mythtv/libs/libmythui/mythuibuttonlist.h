@@ -39,6 +39,8 @@ class MythUIButtonListItem
     void setImage(MythImage *image, const QString &name="");
     const MythImage *image() const;
 
+    void DisplayState(const QString &state, const QString &name);
+
     bool checkable() const;
     void setCheckable(bool flag);
 
@@ -74,6 +76,7 @@ class MythUIButtonListItem
 
     QMap<QString, QString> m_strings;
     QMap<QString, MythImage*> m_images;
+    QMap<QString, QString> m_states;
 
     friend class MythUIButtonList;
 };
