@@ -16,16 +16,17 @@
 #include <sys/time.h>
 
 // Qt headers
-#include <qstringlist.h>
-#include <quuid.h> 
-#include <qdom.h> 
-#include <qfile.h>
+#include <QStringList>
+#include <QUuid> 
+#include <QFile>
 
 // MythTV headers
 #include "upnp.h"
 #include "multicast.h"
 #include "broadcast.h"
-#include "compat.h"
+
+#include "libmythdb/compat.h"
+#include "libmythdb/mythverbose.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

@@ -8,17 +8,16 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+#include <QStringList>
+#include <QFile>
+
 #include "upnp.h"
 #include "upnptasksearch.h"
 #include "compat.h"
-
-#include <unistd.h>
-#include <stdlib.h>
-#include <qstringlist.h>
-#include <quuid.h> 
-#include <qdom.h> 
-#include <qfile.h>
-#include <sys/time.h>
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

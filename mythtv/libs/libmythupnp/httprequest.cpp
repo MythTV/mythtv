@@ -33,9 +33,10 @@
 #include <netinet/tcp.h>
 #endif
 
-#include "mythverbose.h"
 #include "upnp.h"
-#include "compat.h"
+
+#include "libmythdb/compat.h"
+#include "libmythdb/mythverbose.h"
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
