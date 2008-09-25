@@ -5,17 +5,23 @@
 using namespace std;
 
 #include "managedlist.h"
-#include "mythcontext.h"
+#include "mythverbose.h"
 #include "xmlparse.h"
 #include "mythfontproperties.h"
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define LOC      QString("ManagedList*: ")
+#define LOC_WARN QString("ManagedList*, Warning: ")
+#define LOC_ERR  QString("ManagedList*, Error: ")
+
+///////////////////////////////////////////////////////////////////////////////
 //
 // ManagedListItem
 //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ManagedListItem::ManagedListItem(const QString& startingText, ManagedList* _parentList, QObject* _parent, const char* _name)
-               : QObject(_parent, _name)
+///////////////////////////////////////////////////////////////////////////////
+ManagedListItem::ManagedListItem(
+    const QString& startingText, ManagedList* _parentList,
+    QObject* _parent, const char* _name)
+    : QObject(_parent, _name)
 {
     text = startingText;
     listIndex = 0;
@@ -28,28 +34,31 @@ ManagedListItem::ManagedListItem(const QString& startingText, ManagedList* _pare
 void ManagedListItem::setParentList(ManagedList* _parentList)
 {
     parentList = _parentList;
-    connect(this, SIGNAL(changed(ManagedListItem*)), parentList, SLOT(itemChanged(ManagedListItem*)));
+    connect(this,       SIGNAL(changed(ManagedListItem*)),
+            parentList, SLOT(itemChanged(ManagedListItem*)));
 }
 
 
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //
 // BoolManagedListItem
 //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 
-BoolManagedListItem::BoolManagedListItem(bool _initialValue, ManagedListGroup* pGroup,
-                                         ManagedList* pList, QObject* _parent, const char* _name)
-                   : SelectManagedListItem("", pGroup, pList, _parent, _name)
+BoolManagedListItem::BoolManagedListItem(
+    bool _initialValue, ManagedListGroup* pGroup,
+    ManagedList* pList, QObject* _parent, const char* _name)
+    : SelectManagedListItem("", pGroup, pList, _parent, _name)
 {
     initialValue = _initialValue;
     listBuilt = false;
 }
 
-void BoolManagedListItem::setLabels(const QString& _trueLabel, const QString& _falseLabel)
+void BoolManagedListItem::setLabels(const QString& _trueLabel,
+                                    const QString& _falseLabel)
 {
     trueLabel = _trueLabel;
     falseLabel = _falseLabel;
@@ -68,13 +77,15 @@ void BoolManagedListItem::generateList()
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //
 // IntegerListItem
 //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IntegerManagedListItem::IntegerManagedListItem(int _bigStep, int _step, ManagedList* pList, QObject* _parent, const char* _name)
-                      : ManagedListItem("", pList, _parent, _name)
+///////////////////////////////////////////////////////////////////////////////
+IntegerManagedListItem::IntegerManagedListItem(
+    int _bigStep, int _step, ManagedList* pList,
+    QObject* _parent, const char* _name)
+    : ManagedListItem("", pList, _parent, _name)
 {
     step = _step;
     bigStep = _bigStep;
@@ -86,8 +97,9 @@ IntegerManagedListItem::IntegerManagedListItem(int _bigStep, int _step, ManagedL
 }
 
 
-void IntegerManagedListItem::setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
-                                          const QString& oneStr, const QString& posStr)
+void IntegerManagedListItem::setTemplates(
+    const QString& negStr, const QString& negOneStr,
+    const QString& zeroStr, const QString& oneStr, const QString& posStr)
 {
     negTemplate = negStr;
     negOneTemplate = negOneStr;
@@ -97,8 +109,9 @@ void IntegerManagedListItem::setTemplates(const QString& negStr, const QString& 
     syncTextToValue();
 }
 
-void IntegerManagedListItem::setShortTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
-                                               const QString& oneStr, const QString& posStr)
+void IntegerManagedListItem::setShortTemplates(
+    const QString& negStr, const QString& negOneStr,
+    const QString& zeroStr, const QString& oneStr, const QString& posStr)
 {
     shortNegTemplate = negStr;
     shortNegOneTemplate = negOneStr;
@@ -149,17 +162,16 @@ void IntegerManagedListItem::syncTextToValue()
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //
 // BoundedIntegerListItem
 //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-BoundedIntegerManagedListItem::BoundedIntegerManagedListItem(int _minVal, int _maxVal, int _bigStep,
-                                                             int _step, ManagedListGroup* _group,
-                                                             ManagedList* _list,
-                                                             QObject* _parent, const char* _name,
-                                                             bool _invert)
-                             : SelectManagedListItem("", _group,  _list, _parent, _name)
+///////////////////////////////////////////////////////////////////////////////
+BoundedIntegerManagedListItem::BoundedIntegerManagedListItem(
+    int _minVal, int _maxVal, int _bigStep, int _step,
+    ManagedListGroup* _group, ManagedList* _list,
+    QObject* _parent, const char* _name, bool _invert)
+    : SelectManagedListItem("", _group,  _list, _parent, _name)
 {
     step = _step;
     bigStep = _bigStep;
@@ -171,9 +183,9 @@ BoundedIntegerManagedListItem::BoundedIntegerManagedListItem(int _minVal, int _m
 }
 
 
-void BoundedIntegerManagedListItem::setTemplates(const QString& negStr, const QString& negOneStr,
-                                                 const QString& zeroStr,
-                                                 const QString& oneStr, const QString& posStr)
+void BoundedIntegerManagedListItem::setTemplates(
+    const QString& negStr, const QString& negOneStr,
+    const QString& zeroStr, const QString& oneStr, const QString& posStr)
 {
     negTemplate = negStr;
     negOneTemplate = negOneStr;
@@ -237,25 +249,30 @@ QString BoundedIntegerManagedListItem::numericToString(int v)
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //
 // ManagedListGroup
 //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ManagedListGroup::ManagedListGroup(const QString& txt, ManagedListGroup* pGroup, ManagedList* pList,
-                                   QObject* _parent, const char* _name)
-                : ManagedListItem(txt, pList, _parent, _name)
+///////////////////////////////////////////////////////////////////////////////
+ManagedListGroup::ManagedListGroup(
+    const QString& txt, ManagedListGroup* pGroup, ManagedList* pList,
+    QObject* _parent, const char* _name)
+    : ManagedListItem(txt, pList, _parent, _name)
 {
     parentGroup = pGroup;
     if (pGroup)
     {
-        goBack = new ManagedListItem(QString("[ %1 ]").arg(QObject::tr("Go Back")), parentList, this, "goBack");
+        goBack = new ManagedListItem(
+            QString("[ %1 ]").arg(QObject::tr("Go Back")),
+            parentList, this, "goBack");
         goBack->setValue("__NO_VALUE__");
         goBack->setState(MLS_BOLD);
         goBack->setEnabled(true);
         addItem(goBack);
-        connect(goBack, SIGNAL(selected(ManagedListItem*)), this, SLOT(doGoBack()));
-        connect(goBack, SIGNAL(canceled(ManagedListItem*)), this, SLOT(doGoBack()));
+        connect(goBack, SIGNAL(selected(ManagedListItem*)),
+                this,   SLOT(doGoBack()));
+        connect(goBack, SIGNAL(canceled(ManagedListItem*)),
+                this,   SLOT(doGoBack()));
     }
     else
         goBack = NULL;
@@ -313,7 +330,8 @@ bool ManagedListGroup::addItem(ManagedListItem* item, int where)
 
     itemCount = itemList.count();
     if (parentList)
-        connect(item, SIGNAL(changed(ManagedListItem*)), parentList, SLOT(itemChanged(ManagedListItem*)));
+        connect(item,       SIGNAL(changed(ManagedListItem*)),
+                parentList, SLOT(itemChanged(ManagedListItem*)));
     return true;
 }
 
@@ -347,11 +365,15 @@ void ManagedListGroup::clear()
 
     if (parentGroup)
     {
-        goBack = new ManagedListItem(QString("[ %1 ]").arg(QObject::tr("Go Back")), parentList, this, "goBack");
+        goBack = new ManagedListItem(
+            QString("[ %1 ]").arg(QObject::tr("Go Back")),
+            parentList, this, "goBack");
         goBack->setValue("__NO_VALUE__");
         addItem(goBack);
-        connect(goBack, SIGNAL(selected(ManagedListItem*)), this, SLOT(doGoBack()));
-        connect(goBack, SIGNAL(canceled(ManagedListItem*)), this, SLOT(doGoBack()));
+        connect(goBack, SIGNAL(selected(ManagedListItem*)),
+                this,   SLOT(doGoBack()));
+        connect(goBack, SIGNAL(canceled(ManagedListItem*)),
+                this,   SLOT(doGoBack()));
     }
 
 }
@@ -367,20 +389,23 @@ void ManagedListGroup::setParentList(ManagedList* _parent)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //
 // SelectManagedListItem
 //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SelectManagedListItem::SelectManagedListItem(const QString& baseTxt, ManagedListGroup* pGroup, ManagedList* pList,
-                                             QObject* _parent, const char* _name)
-                     : ManagedListGroup(baseTxt, pGroup, pList, _parent, _name)
+///////////////////////////////////////////////////////////////////////////////
+SelectManagedListItem::SelectManagedListItem(
+    const QString& baseTxt, ManagedListGroup* pGroup, ManagedList* pList,
+    QObject* _parent, const char* _name)
+    : ManagedListGroup(baseTxt, pGroup, pList, _parent, _name)
 {
     baseText = baseTxt;
     goBack->setText(QString("[ %1 ]").arg(QObject::tr("No Change")));
 }
 
-ManagedListItem* SelectManagedListItem::addSelection(const QString& label, QString value, bool selectit)
+ManagedListItem* SelectManagedListItem::addSelection(const QString& label,
+                                                     QString value,
+                                                     bool selectit)
 {
     ManagedListItem* ret = NULL;
 
@@ -404,14 +429,17 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label, QStri
 
     if (!found)
     {
-        ManagedListItem* newItem = new ManagedListItem(label, parentList, this, label);
+        ManagedListItem* newItem = new ManagedListItem(
+            label, parentList, this, label);
         newItem->setValue(value);
         addItem(newItem);
         ret = newItem;
-        connect(newItem, SIGNAL(selected(ManagedListItem*)), this, SLOT(itemSelected(ManagedListItem* )));
+        connect(newItem, SIGNAL(selected(ManagedListItem*)),
+                this,    SLOT(itemSelected(ManagedListItem*)));
     }
 
-    //cerr << "adding '" << label << "' value == " << value << " curval == " << valueText << endl;
+    //cerr << "adding '" << label << "' value == "
+    //     << value << " curval == " << valueText << endl;
 
     // If we're adding an item with the same value as what we have selected
     // go trhough the selection process so the list gets updated.
@@ -436,14 +464,17 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label, QStri
     return ret;
 }
 
-ManagedListItem* SelectManagedListItem::addButton(const QString& label, QString value, bool selectit)
+ManagedListItem* SelectManagedListItem::addButton(const QString& label,
+                                                  QString value, bool selectit)
 {
-    ManagedListItem* newItem = new ManagedListItem(label, parentList, this, label);
+    ManagedListItem* newItem = new ManagedListItem(
+        label, parentList, this, label);
     newItem->setValue(value);
     addItem(newItem);
 
 
-    connect(newItem, SIGNAL(selected(ManagedListItem*)), this, SLOT(buttonSelected(ManagedListItem* )));
+    connect(newItem, SIGNAL(selected(ManagedListItem*)),
+            this,    SLOT(buttonSelected(ManagedListItem*)));
     if (selectit)
         selectValue(value);
     return newItem;
@@ -556,12 +587,13 @@ void SelectManagedListItem::buttonSelected(ManagedListItem* itm)
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //
 // ManagedList
 //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ManagedList::ManagedList(MythDialog* parent, const char* name) : QObject(parent, name)
+///////////////////////////////////////////////////////////////////////////////
+ManagedList::ManagedList(MythDialog* parent, const char* name)
+           : QObject(parent, name)
 {
     listRect = QRect(0, 0, 0, 0);
     theme = NULL;
@@ -650,9 +682,10 @@ void ManagedList::update(QPainter *p)
                 {
                     QString fntName;
                     if (itm->getEnabled())
-                        fntName = QString("enabled_state_%1").arg(state - MLS_BOLD);
+                        fntName = QString("enabled_state_%1");
                     else
-                        fntName = QString("disabled_state_%1").arg(state - MLS_BOLD);
+                        fntName = QString("disabled_state_%1");
+                    fntName = fntName.arg(state - MLS_BOLD);
 
                     ltype->EnableForcedFont(i, fntName);
                 }
@@ -755,7 +788,10 @@ void ManagedList::itemChanged(ManagedListItem* itm)
 }
 
 
-bool ManagedList::init(XMLParse *themeIn, const QString& containerNameIn, const QString& listNameIn, const QRect& r)
+bool ManagedList::init(XMLParse       *themeIn,
+                       const QString& containerNameIn,
+                       const QString& listNameIn,
+                       const QRect&   r)
 {
     UIListType *ltype = NULL;
     LayerSet *container = NULL;
@@ -763,7 +799,7 @@ bool ManagedList::init(XMLParse *themeIn, const QString& containerNameIn, const 
 
     if (!themeIn || containerNameIn.isEmpty() || listNameIn.isEmpty())
     {
-        cerr << "sanity check failed" << endl;
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "sanity check failed");
         return false;
     }
 
@@ -773,7 +809,8 @@ bool ManagedList::init(XMLParse *themeIn, const QString& containerNameIn, const 
     container = theme->GetSet(containerName);
     if (!container)
     {
-        cerr << "Failed to get container " << (const char *)containerName << endl;
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to get container %1")
+                                        .arg(containerName));
         return false;
     }
 
@@ -782,7 +819,8 @@ bool ManagedList::init(XMLParse *themeIn, const QString& containerNameIn, const 
     ltype = (UIListType *)container->GetType(listName);
     if (!ltype)
     {
-        cerr << "Failed to get list " << (const char *)listName << endl;
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to get list %1")
+                                        .arg(listName));
         return false;
     }
 
