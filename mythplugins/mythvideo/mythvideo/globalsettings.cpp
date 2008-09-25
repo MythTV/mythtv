@@ -45,6 +45,8 @@ HostComboBox *VideoDefaultView()
                      QString::number(DLG_BROWSER));
     gc->addSelection(QObject::tr("Listings"),
                      QString::number(DLG_TREE));
+    gc->addSelection(QObject::tr("Manager"),
+                     QString::number(DLG_MANAGER));
     gc->setHelpText(QObject::tr("The default view for MythVideo. "
                     "Other views can be reached via the popup menu available "
                     "via the MENU key."));
@@ -278,32 +280,6 @@ HostLineEdit *VideoDefaultPlayer()
     return gc;
 }
 
-HostSpinBox *VideoGalleryRows()
-{
-    HostSpinBox *gc = new HostSpinBox("VideoGalleryRowsPerPage", 2, 5, 1);
-    gc->setLabel(QObject::tr("Rows to display"));
-    gc->setValue(3);
-    return gc;
-}
-
-HostSpinBox *VideoGalleryColumns()
-{
-    HostSpinBox *gc = new HostSpinBox("VideoGalleryColsPerPage", 2, 6, 1);
-    gc->setLabel(QObject::tr("Columns to display"));
-    gc->setValue(4);
-    return gc;
-}
-
-HostCheckBox *VideoGallerySubtitle()
-{
-    HostCheckBox *gc = new HostCheckBox("VideoGallerySubtitle");
-    gc->setLabel(QObject::tr("Show title below thumbnails"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If set, the additional text will make the "
-                    "thumbnails smaller."));
-    return gc;
-}
-
 ///////////////////////////////////////////////////////////
 //// DVD Settings
 ///////////////////////////////////////////////////////////
@@ -415,7 +391,6 @@ HostLineEdit *PlayerCommand()
 {
     HostLineEdit *gc = new HostLineEdit("mythdvd.DVDPlayerCommand");
     gc->setLabel(QObject::tr("DVD Player Command"));
-//    gc->setValue("mplayer dvd:// -dvd-device %d -fs -zoom -vo xv");
     gc->setValue("Internal");
     gc->setHelpText(QObject::tr("This can be any command to launch a DVD "
                     " player (e.g. MPlayer, ogle, etc.). If present, %d will "
@@ -718,16 +693,6 @@ VideoGeneralSettings::VideoGeneralSettings()
     page4->addChild(vman);
 
     // page 5
-    VerticalConfigurationGroup *vgal =
-            new VerticalConfigurationGroup(true, false);
-    vgal->setLabel(QObject::tr("Video Gallery"));
-    vgal->addChild(VideoGalleryColumns());
-    vgal->addChild(VideoGalleryRows());
-    vgal->addChild(VideoGallerySubtitle());
-    VConfigPage page5(pages, false);
-    page5->addChild(vgal);
-
-    // page 6
     VerticalConfigurationGroup *pctrl =
             new VerticalConfigurationGroup(true, false);
     pctrl->addChild(VideoDefaultParentalLevel());
@@ -735,11 +700,11 @@ VideoGeneralSettings::VideoGeneralSettings()
     pctrl->addChild(VideoAdminPasswordThree());
     pctrl->addChild(VideoAdminPasswordTwo());
     pctrl->addChild(VideoAggressivePC());
-    VConfigPage page6(pages, false);
-    page6->addChild(pctrl);
+    VConfigPage page5(pages, false);
+    page5->addChild(pctrl);
 
-    VConfigPage page7(pages, false);
-    page7->addChild(new RatingsToPL());
+    VConfigPage page6(pages, false);
+    page6->addChild(new RatingsToPL());
 
     int page_num = 1;
     for (ConfigPage::PageList::const_iterator p = pages.begin();
