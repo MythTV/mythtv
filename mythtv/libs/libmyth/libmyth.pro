@@ -118,6 +118,8 @@ macx {
     SOURCES += audiooutputca.cpp
 
     darwin_da {
+        SOURCES -= mediamonitor-unix.cpp
+        HEADERS -= mediamonitor-unix.h
         HEADERS += mediamonitor-darwin.h
         SOURCES += mediamonitor-darwin.cpp
         DEFINES += USING_DARWIN_DA
