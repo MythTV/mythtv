@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: httprequest.cpp
-//                                                                            
-// Purpose - Http Request/Response 
-//                                                                            
+//
+// Purpose - Http Request/Response
+//
 // Created By  : David Blain	                Created On : Oct. 21, 2005
-// Modified By :                                Modified On:                  
-//                                                                            
+// Modified By :                                Modified On:
+//
 //////////////////////////////////////////////////////////////////////////////
 
 #include "httprequest.h"
@@ -42,7 +42,7 @@
 #define O_LARGEFILE 0
 #endif
 
-static MIMETypes g_MIMETypes[] = 
+static MIMETypes g_MIMETypes[] =
 {
     { "gif" , "image/gif"                  },
     { "jpg" , "image/jpeg"                 },
@@ -109,7 +109,7 @@ HTTPRequest::HTTPRequest() : m_procReqLineExp ( "[ \r\n][ \r\n]*"  ),
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  
+//
 /////////////////////////////////////////////////////////////////////////////
 
 void HTTPRequest::Reset()
@@ -167,13 +167,13 @@ RequestType HTTPRequest::SetRequestType( const QString &sType )
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  
+//
 /////////////////////////////////////////////////////////////////////////////
 
 QString HTTPRequest::BuildHeader( long long nSize )
 {
     QString sHeader;
-    QString sContentType = (m_eResponseType == ResponseTypeOther) ? 
+    QString sContentType = (m_eResponseType == ResponseTypeOther) ?
                             m_sResponseTypeText : GetResponseType();
 
     sHeader = QString( "HTTP/%1.%2 %3\r\n"
@@ -200,7 +200,7 @@ QString HTTPRequest::BuildHeader( long long nSize )
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//  
+//
 /////////////////////////////////////////////////////////////////////////////
 
 long HTTPRequest::SendResponse( void )
@@ -223,7 +223,7 @@ long HTTPRequest::SendResponse( void )
 
             return( SendResponseFile( m_sFileName ));
 
-        case ResponseTypeXML: 
+        case ResponseTypeXML:
         case ResponseTypeHTML:
         case ResponseTypeOther:
         default:
@@ -301,10 +301,10 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
     /*
         Dump request header
-    for ( QStringMap::iterator it  = m_mapHeaders.begin(); 
-                               it != m_mapHeaders.end(); 
-                             ++it ) 
-    {  
+    for ( QStringMap::iterator it  = m_mapHeaders.begin();
+                               it != m_mapHeaders.end();
+                             ++it )
+    {
         cout << it.key().toLatin1().constData() << ": "
              << (*it).toLatin1().constData() << endl;
     }
@@ -338,7 +338,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
         // ------------------------------------------------------------------
 
         bool    bRange = false;
-        QString sRange = GetHeaderValue( "range", "" ); 
+        QString sRange = GetHeaderValue( "range", "" );
 
         if (sRange.length() > 0)
         {
@@ -359,7 +359,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
             {
                 m_nResponseStatus = 416;
                 llSize = 0;
-                VERBOSE(VB_UPNP, 
+                VERBOSE(VB_UPNP,
                     QString("HTTPRequest::SendResponseFile(%1) - invalid byte range %2-%3/%4")
                             .arg(sFileName)
                             .arg(llStart)
@@ -367,7 +367,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
                             .arg(llSize));
             }
         }
-        
+
         // DSM-?20 specific response headers
 
         if (bRange == false)
@@ -405,7 +405,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     {
         __off64_t  offset = llStart;
         int        file   = tmpFile.handle( );
-        ssize_t    sent   = 0;  
+        ssize_t    sent   = 0;
 
         if ( file == -1 )
         {
@@ -426,18 +426,18 @@ long HTTPRequest::SendResponseFile( QString sFileName )
                     getSocketHandle(), file, &offset,
                     (size_t) ((llSize > INT_MAX) ? INT_MAX : llSize));
 
-                llSize  = llEnd - offset;  
+                llSize  = llEnd - offset;
                 //VERBOSE(VB_UPNP, QString("SendResponseFile : --- "
                 //"size = %1, offset = %2, sent = %3")
                 //.arg(llSize).arg(offset).arg(sent));
-            } 
-            while (( sent >= 0 ) && ( llSize > 0 ));  
+            }
+            while (( sent >= 0 ) && ( llSize > 0 ));
         }
 
         if (sent == -1)
         {
             VERBOSE(VB_UPNP,QString("SendResponseFile( %1 ) Error: %2 [%3]" )
-                               .arg( sFileName ) 
+                               .arg( sFileName )
                                .arg( errno     )
                                .arg( strerror( errno ) ));
 
@@ -448,23 +448,23 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     // ----------------------------------------------------------------------
     // Turn off the option so any small remaining packets will be sent
     // ----------------------------------------------------------------------
-    
+
 #ifdef USE_SETSOCKOPT
     setsockopt( getSocketHandle(), SOL_TCP, TCP_CORK, &g_off, sizeof( g_off ));
 #endif
 
-    // -=>TODO: Only returns header length... 
+    // -=>TODO: Only returns header length...
     //          should we change to return total bytes?
 
-    return nBytes;   
+    return nBytes;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void HTTPRequest::FormatErrorResponse( bool  bServerError, 
-                                       const QString &sFaultString, 
+void HTTPRequest::FormatErrorResponse( bool  bServerError,
+                                       const QString &sFaultString,
                                        const QString &sDetails )
 {
     m_eResponseType   = ResponseTypeXML;
@@ -478,7 +478,7 @@ void HTTPRequest::FormatErrorResponse( bool  bServerError,
     {
         m_mapRespHeaders[ "EXT" ] = "";
 
-        m_response << SOAP_ENVELOPE_BEGIN 
+        m_response << SOAP_ENVELOPE_BEGIN
                    << "<s:Fault>"
                    << "<faultcode>"   << sWhere       << "</faultcode>"
                    << "<faultstring>" << sFaultString << "</faultstring>";
@@ -508,7 +508,7 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
     {
         m_mapRespHeaders[ "EXT" ] = "";
 
-        m_response << SOAP_ENVELOPE_BEGIN 
+        m_response << SOAP_ENVELOPE_BEGIN
                    << "<u:" << m_sMethod << "Response xmlns:u=\""
                    << m_sNameSpace << "\">\r\n";
     }
@@ -540,8 +540,8 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
         m_response << "</" << (*nit).sName << ">\r\n";
     }
 
-    if (m_bSOAPRequest) 
-    { 
+    if (m_bSOAPRequest)
+    {
         m_response << "</u:" << m_sMethod << "Response>\r\n"
                    << SOAP_ENVELOPE_END;
     }
@@ -550,7 +550,7 @@ void HTTPRequest::FormatActionResponse(const NameValues &args)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-//                  
+//
 /////////////////////////////////////////////////////////////////////////////
 
 void HTTPRequest::FormatFileResponse( const QString &sFileName )
@@ -734,11 +734,11 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
     sParams.replace( "%26", "&" );
 
     if (sParams.length() > 0)
-    { 
+    {
         QStringList params = sParams.split("&", QString::SkipEmptyParts);
-    
-        for ( QStringList::Iterator it  = params.begin(); 
-                                    it != params.end();  ++it ) 
+
+        for ( QStringList::Iterator it  = params.begin();
+                                    it != params.end();  ++it )
         {
             QString sName  = (*it).section( '=', 0, 0 );
             QString sValue = (*it).section( '=', 1 );
@@ -781,9 +781,9 @@ QString HTTPRequest::GetAdditionalHeaders( void )
 {
     QString sHeader = m_szServerHeaders;
 
-    for ( QStringMap::iterator it  = m_mapRespHeaders.begin(); 
-                               it != m_mapRespHeaders.end(); 
-                             ++it ) 
+    for ( QStringMap::iterator it  = m_mapRespHeaders.begin();
+                               it != m_mapRespHeaders.end();
+                             ++it )
     {
         sHeader += it.key()  + ": ";
         sHeader += *it + "\r\n";
@@ -814,7 +814,7 @@ bool HTTPRequest::GetKeepAlive()
     else if (sConnection == "keep-alive")
         bKeepAlive = true;
 
-   return bKeepAlive;     
+   return bKeepAlive;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -825,7 +825,7 @@ bool HTTPRequest::ParseRequest()
 {
     bool bSuccess = false;
 
-    try 
+    try
     {
         // Read first line to determin requestType
 
@@ -846,9 +846,9 @@ bool HTTPRequest::ParseRequest()
         m_mapHeaders[ "content-length" ] = "0";
         m_mapHeaders[ "content-type"   ] = "unknown";
 
-        // Read Header 
+        // Read Header
 
-        bool    bDone = false;         
+        bool    bDone = false;
         QString sLine = ReadLine( 2000 );
 
         while (( sLine.length() > 0 ) && !bDone )
@@ -882,9 +882,9 @@ bool HTTPRequest::ParseRequest()
             return false;
         }
 
-        bSuccess = true;      
+        bSuccess = true;
 
-        SetContentType( m_mapHeaders[ "content-type" ] ); 
+        SetContentType( m_mapHeaders[ "content-type" ] );
 
         // Lets load payload if any.
 
@@ -955,7 +955,7 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
 
     // ----------------------------------------------------------------------
 
-    if ( sLine.startsWith( "HTTP/" )) 
+    if ( sLine.startsWith( "HTTP/" ))
         m_eType = RequestTypeResponse;
     else
         m_eType = RequestTypeUnknown;
@@ -1010,21 +1010,21 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-bool HTTPRequest::ParseRange( QString sRange, 
-                              long long   llSize, 
-                              long long *pllStart, 
+bool HTTPRequest::ParseRange( QString sRange,
+                              long long   llSize,
+                              long long *pllStart,
                               long long *pllEnd   )
 {
-    // ----------------------------------------------------------------------        
+    // ----------------------------------------------------------------------
     // -=>TODO: Only handle 1 range at this time... should make work with full spec.
-    // ----------------------------------------------------------------------        
+    // ----------------------------------------------------------------------
 
     if (sRange.length() == 0)
         return false;
 
-    // ----------------------------------------------------------------------        
+    // ----------------------------------------------------------------------
     // remove any "bytes="
-    // ----------------------------------------------------------------------        
+    // ----------------------------------------------------------------------
     int nIdx = sRange.indexOf(m_parseRangeExp);
 
     if (nIdx < 0)
@@ -1033,30 +1033,30 @@ bool HTTPRequest::ParseRange( QString sRange,
     if (nIdx > 0)
         sRange.remove( 0, nIdx );
 
-    // ----------------------------------------------------------------------        
+    // ----------------------------------------------------------------------
     // Split multiple ranges
-    // ----------------------------------------------------------------------        
+    // ----------------------------------------------------------------------
 
     QStringList ranges = sRange.split(",", QString::SkipEmptyParts);
 
     if (ranges.count() == 0)
         return false;
 
-    // ----------------------------------------------------------------------        
+    // ----------------------------------------------------------------------
     // Split first range into its components
-    // ----------------------------------------------------------------------        
+    // ----------------------------------------------------------------------
 
     QStringList parts = ranges[0].split("-");
 
-    if (parts.count() != 2) 
+    if (parts.count() != 2)
         return false;
 
     if (parts[0].isNull() && parts[1].isNull())
         return false;
 
-    // ----------------------------------------------------------------------        
-    // 
-    // ----------------------------------------------------------------------        
+    // ----------------------------------------------------------------------
+    //
+    // ----------------------------------------------------------------------
 
     if (parts[0].isNull())
     {
@@ -1111,7 +1111,7 @@ bool HTTPRequest::ParseRange( QString sRange,
 void HTTPRequest::ExtractMethodFromURL()
 {
     QStringList sList = m_sBaseUrl.split("/", QString::SkipEmptyParts);
-    
+
     m_sMethod = "";
 
     if (sList.size() > 0)
@@ -1120,7 +1120,7 @@ void HTTPRequest::ExtractMethodFromURL()
         sList.pop_back();
     }
 
-    m_sBaseUrl = "/" + sList.join( "/" ); 
+    m_sBaseUrl = "/" + sList.join( "/" );
     //VERBOSE(VB_UPNP, QString("ExtractMethodFromURL : %1 : ").arg(m_sMethod));
 }
 
@@ -1153,7 +1153,7 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
     }
 
     // --------------------------------------------------------------
-    // XML Document Loaded... now parse it 
+    // XML Document Loaded... now parse it
     // --------------------------------------------------------------
 
     m_sNameSpace    = sSOAPAction.section( "#", 0, 0).remove( 0, 1);
@@ -1170,7 +1170,7 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
         {
             m_bSOAPRequest = true;
 
-            for ( QDomNode oNode = oMethod.firstChild(); !oNode.isNull(); 
+            for ( QDomNode oNode = oMethod.firstChild(); !oNode.isNull();
                            oNode = oNode.nextSibling() )
             {
                 QDomElement e = oNode.toElement();
@@ -1179,12 +1179,12 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
                 {
                     QString sName  = e.tagName();
                     QString sValue = "";
-            
+
                     QDomText  oText = oNode.firstChild().toText();
 
                     if (!oText.isNull())
                         sValue = oText.nodeValue();
-                     
+
                     sName  = QUrl::fromPercentEncoding(sName.toLatin1());
                     sValue = QUrl::fromPercentEncoding(sValue.toLatin1());
 
@@ -1207,7 +1207,7 @@ QString HTTPRequest::Encode(const QString &sIn)
 {
     QString sStr = sIn;
     //VERBOSE(VB_UPNP, QString("HTTPRequest::Encode Input : %1").arg(sStr));
-    sStr.replace("&",  "&amp;" ); // This _must_ come first
+    sStr.replace("&(?!(amp|lt|gt|quot|apos);)",  "&amp;" ); // This _must_ come first
     sStr.replace("<",  "&lt;"  );
     sStr.replace(">",  "&gt;"  );
     sStr.replace("\"", "&quot;");
@@ -1218,7 +1218,7 @@ QString HTTPRequest::Encode(const QString &sIn)
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
-// 
+//
 // BufferedSocketDeviceRequest Class Implementation
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -1338,7 +1338,7 @@ qlonglong BufferedSocketDeviceRequest::WriteBlockDirect(
 
 QString BufferedSocketDeviceRequest::GetHostAddress()
 {
-    return( m_pSocket->SocketDevice()->address().toString() );    
+    return( m_pSocket->SocketDevice()->address().toString() );
 }
 
 /////////////////////////////////////////////////////////////////////////////
