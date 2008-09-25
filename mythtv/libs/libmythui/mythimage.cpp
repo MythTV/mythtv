@@ -185,6 +185,7 @@ MythImage *MythImage::FromQImage(QImage **img)
 bool MythImage::Load(const QString &filename)
 {
     QImage *im = GetMythUI()->LoadScaleImage(filename);
+    SetFileName(filename);
     if (im)
     {
         Assign(*im);

@@ -50,6 +50,9 @@ class MythImage : public QImage
     void SetID(unsigned int id) { m_imageId = id; }
     unsigned int GetID(void) { return m_imageId; }
 
+    void SetFileName(QString fname) { m_FileName = fname; }
+    QString GetFileName(void) { return m_FileName; }
+
   protected:
     static void MakeGradient(QImage &image, const QColor &begin,
                              const QColor &end, int alpha,
@@ -72,6 +75,8 @@ class MythImage : public QImage
     bool m_isReflected;
 
     unsigned int m_imageId;
+
+    QString m_FileName;
 };
 
 #endif
