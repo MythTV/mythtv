@@ -6,19 +6,19 @@ using namespace std;
 #include <unistd.h>
 
 // Qt widgets
-#include <qlineedit.h>
+#include <QLineEdit>
 #include <q3hbox.h>
 #include <q3vbox.h>
-#include <qlabel.h>
-#include <qslider.h>
-#include <qlcdnumber.h>
-#include <qbuttongroup.h>
-#include <qradiobutton.h>
+#include <QLabel>
+#include <QSlider>
+#include <QLCDNumber>
+#include <QButtonGroup>
+#include <QRadioButton>
 
 // Qt utils
-#include <qfile.h>
-#include <qdatetime.h>
-#include <qdir.h>
+#include <QFile>
+#include <QDateTime>
+#include <QDir>
 
 // MythTV headers
 #define MYTHCONFIG
@@ -29,6 +29,7 @@ using namespace std;
 #include "mythwidgets.h"
 #include "mythcontext.h"
 #include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 #include "libmythui/DisplayRes.h"
 #include "libmythui/mythuihelper.h"
 

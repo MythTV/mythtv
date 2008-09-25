@@ -1,11 +1,11 @@
 #include <QPixmap>
 #include <QImage>
-#include <qurl.h>
-#include <qapplication.h>
-#include <qdir.h>
-#include <qfileinfo.h>
-#include <qdesktopwidget.h>
-#include <qpainter.h>
+#include <QUrl>
+#include <QApplication>
+#include <QDir>
+#include <QFileInfo>
+#include <QDesktopWidget>
+#include <QPainter>
 #include <QDebug>
 
 #ifdef QT3SUPPORT
@@ -30,7 +30,6 @@
 #include "backendselect.h"
 #include "dbsettings.h"
 #include "langsettings.h"
-#include "mythdbcon.h"
 #include "util-x11.h"
 #include "mythsocket.h"
 #include "themeinfo.h"
@@ -38,6 +37,7 @@
 
 #include "libmythdb/mythdb.h"
 #include "libmythdb/mythdirs.h"
+#include "libmythdb/mythversion.h"
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythuihelper.h"

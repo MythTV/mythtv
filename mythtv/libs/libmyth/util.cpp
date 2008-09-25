@@ -13,6 +13,7 @@ using namespace std;
 
 // System specific C headers
 #include "compat.h"
+
 #ifdef USING_MINGW
 # include <sys/types.h>
 # include <sys/stat.h>   // for S_IREAD and S_IWRITE
@@ -31,13 +32,21 @@ using namespace std;
 # endif
 #endif //MINGW
 
+#ifdef CONFIG_DARWIN
+#include <mach/mach.h> 
+#include <sys/mount.h>  // for struct statfs
+#include <sys/sysctl.h>
+#include <sys/stat.h>   // for umask()
+#endif
+
+
 // Qt headers
-#include <qapplication.h>
-#include <qimage.h>
-#include <qpainter.h>
-#include <qpixmap.h>
-#include <qfont.h>
-#include <qfile.h>
+#include <QApplication>
+#include <QImage>
+#include <QPainter>
+#include <QPixmap>
+#include <QFont>
+#include <QFile>
 
 // Myth headers
 #include "mythconfig.h"
@@ -45,13 +54,7 @@ using namespace std;
 #include "util.h"
 #include "util-x11.h"
 #include "mythmediamonitor.h"
-
-#ifdef CONFIG_DARWIN
-#include <mach/mach.h> 
-#include <sys/mount.h>  // for struct statfs
-#include <sys/sysctl.h>
-#include <sys/stat.h>   // for umask()
-#endif
+#include "libmythdb/mythverbose.h"
 
 /** \fn mythCurrentDateTime()
  *  \brief Returns the current QDateTime object, stripped of its msec component

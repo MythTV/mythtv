@@ -2,9 +2,9 @@
 #include <iostream>
 #include <math.h>
 
-#include <qapplication.h>
+#include <QApplication>
 #include <q3simplerichtext.h>
-#include <qbitmap.h>
+#include <QBitmap>
 #include <QLabel>
 #include <QPixmap>
 #include <QKeyEvent>
@@ -22,6 +22,8 @@ using namespace std;
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
 #include "x11colors.h"
+
+#include "libmythdb/mythverbose.h"
 
 #ifdef USING_MINGW
 #undef LoadImage

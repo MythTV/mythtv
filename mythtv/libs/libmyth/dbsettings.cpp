@@ -1,8 +1,10 @@
-#include "mythcontext.h"
-#include "mythdbcon.h"
+#include <QFile>
+#include <QDir>
+
 #include "dbsettings.h"
-#include <qfile.h>
-#include <qdir.h>
+#include "mythcontext.h"
+#include "libmythdb/mythdbcon.h"
+#include "libmythdb/mythdbparams.h"
 
 class MythDbSettings1: public VerticalConfigurationGroup {
 public:

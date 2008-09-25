@@ -6,11 +6,11 @@
 #include "mythcdrom-freebsd.h"
 #endif
 
-#include "mythconfig.h"
-#include "mythcontext.h"
-
 #include <qdir.h>
 #include <qfileinfo.h>
+
+#include "mythconfig.h"
+#include "libmythdb/mythverbose.h"
 
 
 // If your DVD has directories in lowercase, then it is wrongly mounted!

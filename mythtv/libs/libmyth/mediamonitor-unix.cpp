@@ -37,6 +37,7 @@ using namespace std;
 #include "mythconfig.h"
 #include "mythcdrom.h"
 #include "mythhdd.h"
+#include "libmythdb/mythverbose.h"
 
 #ifndef MNTTYPE_ISO9660
 #ifdef linux

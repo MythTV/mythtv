@@ -1,17 +1,14 @@
-#include <qcursor.h>
-#include <qdialog.h>
-#include <qdir.h>
+#include <QCursor>
+#include <QDialog>
+#include <QDir>
 #include <q3vbox.h>
-#include <qapplication.h>
-#include <qlayout.h>
-#include <qdir.h>
-#include <qregexp.h>
+#include <QApplication>
+#include <QLayout>
+#include <QRegExp>
 #include <q3accel.h>
 #include <q3dict.h>
-#include <qsqldatabase.h>
-#include <qobject.h>
 #include <QImageReader>
-#include <qeventloop.h>
+#include <QEventLoop>
 #include <QLabel>
 #include <QPixmap>
 #include <QKeyEvent>
@@ -32,7 +29,8 @@ using namespace std;
 #include "xmlparse.h"
 #include "mythdialogs.h"
 #include "lcddevice.h"
-#include "mythdbcon.h"
+#include "libmythdb/mythdbcon.h"
+#include "libmythdb/mythverbose.h"
 
 #include "mythfontproperties.h"
 #include "mythuihelper.h"

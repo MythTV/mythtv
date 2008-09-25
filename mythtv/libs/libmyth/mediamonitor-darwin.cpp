@@ -5,12 +5,15 @@
  * \author   Andrew Kimpton, Nigel Pearson
  */
 
+#include <QApplication>
+#include <QMetaType>
+
 #include "mythmediamonitor.h"
 #include "mediamonitor-darwin.h"
 #include "mythcdrom.h"
 #include "mythhdd.h"
 
-#include "mythcontext.h"  // For VERBOSE
+#include "mythverbose.h"
 
 #include <IOKit/IOKitLib.h>
 #include <IOKit/storage/IOMedia.h>
@@ -20,7 +23,6 @@
 #include <IOKit/storage/IOStorageDeviceCharacteristics.h>
 #include <IOKit/storage/IOStorageProtocolCharacteristics.h>
 #include <DiskArbitration/DiskArbitration.h>
-#include <qapplication.h>
 
 
 // These aren't external, they are defined in this file.

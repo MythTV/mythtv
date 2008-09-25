@@ -11,6 +11,7 @@
 #include "mythcontext.h"
 #include "mythcdrom.h"
 #include "mythhdd.h"
+#include "libmythdb/mythverbose.h"
 
 
 /**

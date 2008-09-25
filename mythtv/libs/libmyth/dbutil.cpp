@@ -4,17 +4,18 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <qdir.h>
-#include <qfile.h>
-#include <qregexp.h>
-#include <qdatetime.h>
+#include <QDir>
+#include <QFile>
+#include <QRegExp>
+#include <QDateTime>
 
 #include "dbutil.h"
 #include "mythcontext.h"
-#include "mythdb.h"
 #include "storagegroup.h"
 #include "util.h"
-#include "mythdirs.h"
+#include "libmythdb/mythdb.h"
+#include "libmythdb/mythdirs.h"
+#include "libmythdb/mythverbose.h"
 
 #define LOC QString("DBUtil: ")
 #define LOC_ERR QString("DBUtil Error: ")

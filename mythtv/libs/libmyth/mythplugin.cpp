@@ -6,14 +6,16 @@
 #endif
 
 // Qt includes
-#include <qdir.h>
+#include <QDir>
 
 // MythTV includes
 #include "mythplugin.h"
 #include "mythcontext.h"
 #include "langsettings.h"
 
-#include "mythdirs.h"
+#include "libmythdb/mythdirs.h"
+#include "libmythdb/mythversion.h"
+#include "libmythdb/mythverbose.h"
 
 using namespace std;
 

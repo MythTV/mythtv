@@ -5,6 +5,7 @@
 #include "storagegroup.h"
 #include "mythcontext.h"
 #include "libmythdb/mythdb.h"
+#include "libmythdb/mythverbose.h"
 #include "util.h"
 
 #define LOC QString("SG(%1): ").arg(m_groupname)

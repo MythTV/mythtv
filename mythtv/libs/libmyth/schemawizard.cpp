@@ -7,6 +7,7 @@
 #include "util.h"
 
 #include "libmythdb/mythtimer.h"
+#include "libmythdb/mythverbose.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythuihelper.h"
 
