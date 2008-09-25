@@ -1,9 +1,12 @@
+#include <unistd.h>
+
+#include <QTextCodec>
+
 #include "dvbdescriptors.h"
 #include "iso6937tables.h"
 #include "freesat_huffman.h"
+#include "libmythdb/mythverbose.h"
 
-#include <unistd.h>
-#include <qtextcodec.h>
 
 // Only some of the QTextCodec calls are reenterant.
 // If you use this please verify that you are using a reenterant call.

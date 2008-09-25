@@ -7,10 +7,9 @@
 #include <vector>
 using namespace std;
 
-#include <qstring.h>
-#include <qmap.h>
+#include <QString>
+#include <QMap>
 
-#include "mythcontext.h"
 #include "mpegdescriptors.h"
 
 using namespace std;

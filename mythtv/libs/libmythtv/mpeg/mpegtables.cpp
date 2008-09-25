@@ -2,6 +2,7 @@
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 #include "mpegtables.h"
 #include "atscdescriptors.h"
+#include "libmythdb/mythverbose.h"
 
 const unsigned char DEFAULT_PAT_HEADER[8] =
 {

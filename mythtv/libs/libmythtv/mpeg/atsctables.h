@@ -3,10 +3,11 @@
 #ifndef _ATSC_TABLES_H_
 #define _ATSC_TABLES_H_
 
+#include <stdint.h>  // uint32_t
+#include <QString>
 #include "mpegtables.h"
 #include "atscdescriptors.h"
-#include <qstring.h>
-#include <stdint.h>  // uint32_t
+#include "libmythdb/mythverbose.h"
 
 // Some sample code is in pcHDTV's dtvscan.c,
 // accum_sect/dequeue_buf/atsc_tables.  We should stuff
