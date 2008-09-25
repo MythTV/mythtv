@@ -122,7 +122,7 @@ void MythUIImage::SetDelay(int delayms)
 
 void MythUIImage::SetImage(MythImage *img)
 {
-    m_Filename = "";
+    m_Filename = img->GetFileName();
 
     if (!img)
     {
@@ -132,8 +132,6 @@ void MythUIImage::SetImage(MythImage *img)
 
     Clear();
     m_Delay = -1;
-
-    //m_Filename = img->GetFilename();
 
     img->UpRef();
 
