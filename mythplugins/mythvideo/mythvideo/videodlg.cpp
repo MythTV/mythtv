@@ -231,11 +231,11 @@ void VideoDialog::reloadData()
 
 void VideoDialog::loadData()
 {
-    if (!m_treeLoaded)
-        return;
-
     if (m_videoButtonList)
         m_videoButtonList->Reset();
+
+    if (!m_treeLoaded)
+        return;
 
     QList<MythGenericTree*> *children = m_currentNode->getAllChildren();
     MythGenericTree *node;
@@ -351,7 +351,7 @@ void VideoDialog::fetchVideos()
         MythGenericTree *node = m_rootNode->getChildAt(0);
         if (node->getInt() == kSubFolder && node->childCount() > 1)
             m_rootNode = node;
-        else
+        else if (node->getInt() == kUpFolder)
             m_treeLoaded = false;
     }
     else if (m_rootNode->childCount() == 0)
