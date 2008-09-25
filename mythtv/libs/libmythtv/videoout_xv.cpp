@@ -26,6 +26,7 @@ using namespace std;
 // Qt headers
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QTextStream>
 
 // MythTV OSD headers
 #include "yuv2rgb.h"
@@ -44,6 +45,7 @@ using namespace std;
 // MythTV General headers
 #include "mythconfig.h"
 #include "mythcontext.h"
+#include "mythverbose.h"
 #include "filtermanager.h"
 #include "videodisplayprofile.h"
 #define IGNORE_TV_PLAY_REC
