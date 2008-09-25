@@ -16,8 +16,8 @@ using namespace std;
 #include "nuppeldecoder.h"
 #include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"
-#include "libmythdb/mythdbcon.h"
-#include "libmythdb/mythverbose.h"
+#include "mythcontext.h"
+#include "mythverbose.h"
 
 #include "minilzo.h"
 
@@ -425,7 +425,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 GetNVP()->SetFileLength(totalLength, totalFrames);
 
                 adjust = 0;
-                for (int i=0; i < m_positionMap.size(); i++) 
+                for (uint i=0; i < m_positionMap.size(); i++) 
                 {
                     if (keyFrameAdjustMap.contains(m_positionMap[i].adjFrame))
                         adjust += keyFrameAdjustMap[m_positionMap[i].adjFrame];
