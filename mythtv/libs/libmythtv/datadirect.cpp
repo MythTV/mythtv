@@ -431,8 +431,10 @@ bool DDStructureParser::characters(const QString& pchars)
             QString ExtractDateFromMessage = pchars.right(20);
             QDateTime EDFM = QDateTime::fromString(ExtractDateFromMessage,
                                                    Qt::ISODate);
-            QString ExpirationDate =
-            EDFM.toString(GetMythDB()->GetSetting("DateFormat", "ddd d MMMM"));
+            QString dateFormat = QString("%1 %2")
+                    .arg(GetMythDB()->GetSetting("DateFormat", "ddd d MMMM"))
+                    .arg(GetMythDB()->GetSetting("TimeFormat", "hh:mm"));
+            QString ExpirationDate = EDFM.toString(dateFormat);
 
             QString ExpirationDateMessage = "Your subscription expires on " +
                 ExpirationDate;
