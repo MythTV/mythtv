@@ -13,6 +13,7 @@ using namespace std;
 
 #include "mythcontext.h"
 #include "mythdialogs.h"
+#include "mythversion.h"
 #include "networkcontrol.h"
 #include "programinfo.h"
 #include "remoteutil.h"
