@@ -35,7 +35,8 @@ const int kNetworkControlCloseEvent     = 35672;
  * @param minchars the minimum length of test in order to declare a match
  * @return true if @p test is the initial substring of @p command
  */
-static bool is_abbrev(QString const& command, QString const& test, int minchars = 1)
+static bool is_abbrev(QString const& command,
+                      QString const& test, int minchars = 1)
 {
     if (test.length() < minchars)
         return command.lower() == test.lower();
@@ -85,7 +86,7 @@ NetworkControl::NetworkControl(int port)
     jumpMap["zoneminderconsole"]     = "ZoneMinder Console";
     jumpMap["zoneminderliveview"]    = "ZoneMinder Live View";
     jumpMap["zoneminderevents"]      = "ZoneMinder Events";
-    jumpMap["snapshot"]              = "ScreenShot"; 
+    jumpMap["snapshot"]              = "ScreenShot";
 
     // These jump point names match the (lowercased) locations from gContext
     jumpMap["channelrecpriority"]    = "Channel Recording Priorities";
@@ -235,7 +236,7 @@ void NetworkControl::RunCommandThread(void)
                 return;
             }
         }
-        command = networkControlCommands.front(); 
+        command = networkControlCommands.front();
         networkControlCommands.pop_front();
         ncLock.unlock();
 
@@ -744,7 +745,7 @@ QString NetworkControl::processHelp(QStringList tokens)
             command = tokens[0];
         }
     }
-        
+
     if (is_abbrev("jump", command))
     {
         QMap<QString, QString>::Iterator it;
@@ -851,14 +852,14 @@ QString NetworkControl::processHelp(QStringList tokens)
 
 void NetworkControl::notifyDataAvailable(void)
 {
-    QApplication::postEvent(this,
-                            new QEvent((QEvent::Type)kNetworkControlDataReadyEvent));
+    QApplication::postEvent(this, new QEvent(
+        (QEvent::Type)kNetworkControlDataReadyEvent));
 }
 
 void NetworkControl::customEvent(QEvent *e)
-{       
+{
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
-    {   
+    {
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();
 

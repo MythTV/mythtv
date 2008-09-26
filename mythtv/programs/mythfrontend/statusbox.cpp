@@ -1,3 +1,4 @@
+
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -25,7 +26,6 @@ using namespace std;
 #include "jobqueue.h"
 #include "util.h"
 #include "mythdb.h"
-#include "mythverbose.h"
 #include "mythversion.h"
 #include "cardutil.h"
 #include "mythuihelper.h"

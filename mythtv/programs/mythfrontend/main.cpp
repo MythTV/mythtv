@@ -1,13 +1,3 @@
-#include <qapplication.h>
-#include <qsqldatabase.h>
-#include <qfile.h>
-#include <qfileinfo.h>
-#include <qmap.h>
-#include <QKeyEvent>
-#include <QEvent>
-#include <qdir.h>
-#include <qtextcodec.h>
-#include <qwidget.h>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -18,6 +8,16 @@
 
 #include <iostream>
 using namespace std;
+
+#include <QApplication>
+#include <QFile>
+#include <QFileInfo>
+#include <QMap>
+#include <QKeyEvent>
+#include <QEvent>
+#include <QDir>
+#include <QTextCodec>
+#include <QWidget>
 
 #include "mythconfig.h"
 #include "tv.h"

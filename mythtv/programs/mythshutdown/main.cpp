@@ -1,15 +1,18 @@
-#include <qapplication.h>
-#include <qfile.h>
-#include <q3textstream.h>
 
 #include <iostream>
 #include <cstdlib>
 using namespace std;
 #include <unistd.h>
 
-#include <exitcodes.h>
-#include <mythcontext.h>
-#include <mythdb.h>
+#include <QApplication>
+#include <QFile>
+#include <q3textstream.h>
+
+#include "exitcodes.h"
+#include "mythcontext.h"
+#include "mythdb.h"
+#include "mythverbose.h"
+#include "mythversion.h"
 #include "libmythtv/programinfo.h"
 #include "libmythtv/jobqueue.h"
 #include "tv.h"
@@ -186,10 +189,12 @@ bool isRecording()
 {
     if (!gContext->IsConnectedToMaster())
     {
-        VERBOSE(VB_IMPORTANT, "isRecording: Attempting to connect to master server...");
+        VERBOSE(VB_IMPORTANT,
+                "isRecording: Attempting to connect to master server...");
         if (!gContext->ConnectToMasterServer(false))
         {
-            VERBOSE(VB_IMPORTANT, "isRecording: Could not connect to master server!");
+            VERBOSE(VB_IMPORTANT,
+                    "isRecording: Could not connect to master server!");
             return false;
         }
     }
@@ -316,7 +321,8 @@ int getStatus(bool bWantRecStatus)
 
 int checkOKShutdown(bool bWantRecStatus)
 {
-    // mythbackend wants 0=ok to shutdown, 1=reset idle count, 2=wait for frontend
+    // mythbackend wants 0=ok to shutdown,
+    // 1=reset idle count, 2=wait for frontend
 
     VERBOSE(VB_GENERAL, "Mythshutdown: --check");
 
@@ -342,7 +348,8 @@ int setWakeupTime(QString sWakeupTime)
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --setwakeup");
 
-    VERBOSE(VB_IMPORTANT, "Mythshutdown: wakeup time given is: " << sWakeupTime);
+    VERBOSE(VB_IMPORTANT,
+            "Mythshutdown: wakeup time given is: " << sWakeupTime);
 
     // check time given is valid
     QDateTime dtWakeupTime;
@@ -357,7 +364,8 @@ int setWakeupTime(QString sWakeupTime)
         return 1;
     }
 
-    setGlobalSetting("MythShutdownNextScheduled", dtWakeupTime.toString(Qt::ISODate));
+    setGlobalSetting("MythShutdownNextScheduled",
+                     dtWakeupTime.toString(Qt::ISODate));
 
     return 0;
 }
@@ -366,10 +374,12 @@ int setScheduledWakeupTime()
 {
     if (!gContext->IsConnectedToMaster())
     {
-        VERBOSE(VB_IMPORTANT, "setScheduledWakeupTime: Attempting to connect to master server...");
+        VERBOSE(VB_IMPORTANT, "setScheduledWakeupTime: "
+                              "Attempting to connect to master server...");
         if (!gContext->ConnectToMasterServer(false))
         {
-            VERBOSE(VB_IMPORTANT, "setScheduledWakeupTime: Could not connect to master server!");
+            VERBOSE(VB_IMPORTANT, "setScheduledWakeupTime: "
+                                  "Could not connect to master server!");
             return false;
         }
     }
@@ -446,8 +456,9 @@ int shutdown()
         }
     }
 
-    // if we have at least one valid daily wakeup time and dtNextDailyWakeup is
-    // still not valid then next daily wakeup is tomorrow
+    // if we have at least one valid daily wakeup time
+    // and dtNextDailyWakeup is still not valid
+    // then next daily wakeup is tomorrow
     if (!dtNextDailyWakeup.isValid())
     {
         if (dtPeriod1Start != dtPeriod1End)
@@ -487,8 +498,8 @@ int shutdown()
 
         if (delta < 0)
         {
-            VERBOSE(VB_IMPORTANT, "scheduled recording time has already passed. "
-                                  "schedule deleted");
+            VERBOSE(VB_IMPORTANT, "Scheduled recording time has"
+                                  " already passed. Schedule deleted");
 
             dtNextRecordingStart = QDateTime();
             setGlobalSetting("MythShutdownNextScheduled", "");
@@ -543,7 +554,8 @@ int shutdown()
     }
 
     // save the next wakuptime in the db
-    setGlobalSetting("MythShutdownWakeupTime", dtWakeupTime.toString(Qt::ISODate));
+    setGlobalSetting("MythShutdownWakeupTime",
+                     dtWakeupTime.toString(Qt::ISODate));
 
     // stop here to debug
     //return 0;
@@ -560,25 +572,29 @@ int shutdown()
             QString nvramCommand = gContext->GetSetting("MythShutdownNvramCmd",
                      "/usr/bin/nvram-wakeup --settime $time");
 
-            QString wakeup_timeformat = gContext->GetSetting("MythShutdownWakeupTimeFmt", "time_t");
+            QString wakeup_timeformat = gContext->GetSetting(
+                "MythShutdownWakeupTimeFmt", "time_t");
 
             if (wakeup_timeformat == "time_t")
             {
                 QString time_ts;
-                nvramCommand.replace("$time", time_ts.setNum(dtWakeupTime.toTime_t()));
+                nvramCommand.replace(
+                    "$time", time_ts.setNum(dtWakeupTime.toTime_t()));
             }
             else
-                nvramCommand.replace("$time", dtWakeupTime.toString(wakeup_timeformat));
+                nvramCommand.replace(
+                    "$time", dtWakeupTime.toString(wakeup_timeformat));
 
-            VERBOSE(VB_IMPORTANT, QString("sending command to set time in bios\n\t\t\t%1")
-                            .arg(nvramCommand));
+            VERBOSE(VB_IMPORTANT,
+                    "sending command to set time in bios\n\t\t\t"
+                    + nvramCommand);
 
             shutdownmode = system(nvramCommand);
             if (WIFEXITED(shutdownmode))
                 shutdownmode = WEXITSTATUS(shutdownmode);
 
-            VERBOSE(VB_IMPORTANT, QString("%1 exited with code %2").arg(nvramCommand)
-                                                             .arg(shutdownmode));
+            VERBOSE(VB_IMPORTANT, (nvramCommand + " exited with code %2")
+                                  .arg(shutdownmode));
 
             if (shutdownmode == 2)
             {
@@ -595,8 +611,8 @@ int shutdown()
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "The next wakeup time is less than 15 mins away,"
-                                  "not shutting down");
+            VERBOSE(VB_IMPORTANT, "The next wakeup time is less than"
+                                  " 15 mins away, not shutting down");
             return 0;
         }
     }
@@ -608,8 +624,8 @@ int shutdown()
         case 0:
         {
             VERBOSE(VB_IMPORTANT, "everything looks fine, shutting down ...");
-            QString poweroffCmd =
-                    gContext->GetSetting("MythShutdownPoweroff", "/sbin/poweroff");
+            QString poweroffCmd = gContext->GetSetting(
+                "MythShutdownPoweroff", "/sbin/poweroff");
             VERBOSE(VB_IMPORTANT, "..");
             VERBOSE(VB_IMPORTANT, ".");
             VERBOSE(VB_IMPORTANT, "shutting down ...");
@@ -620,7 +636,8 @@ int shutdown()
         }
         case 1:
         {
-            VERBOSE(VB_IMPORTANT, "everything looks fine, but reboot is needed");
+            VERBOSE(VB_IMPORTANT,
+                    "everything looks fine, but reboot is needed");
             VERBOSE(VB_IMPORTANT, "sending command to bootloader ...");
             VERBOSE(VB_IMPORTANT, nvramRestartCmd);
 

@@ -1,5 +1,3 @@
-#include <qapplication.h>
-#include <qdir.h>
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -9,11 +7,16 @@
 #include <fstream>
 using namespace std;
 
+#include <QApplication>
+#include <QDir>
+
 #include "exitcodes.h"
 #include "programinfo.h"
 #include "jobqueue.h"
 #include "mythcontext.h"
 #include "mythdb.h"
+#include "mythverbose.h"
+#include "mythversion.h"
 #include "transcode.h"
 #include "mpeg2fix.h"
 
@@ -21,8 +24,9 @@ void StoreTranscodeState(ProgramInfo *pginfo, int status, bool useCutlist);
 void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
                        ProgramInfo *pginfo);
 int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
-                        QMap <long long, long long> &posMap, int jobID);
-void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCode);
+                       QMap <long long, long long> &posMap, int jobID);
+void CompleteJob(int jobID, ProgramInfo *pginfo,
+                 bool useCutlist, int &resultCode);
 void UpdateJobQueue(float percent_done);
 int CheckJobQueue();
 static int glbl_jobID = -1;

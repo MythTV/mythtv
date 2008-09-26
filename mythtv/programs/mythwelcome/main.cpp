@@ -1,4 +1,3 @@
-#include <qapplication.h>
 #include <cstdlib>
 #include <signal.h>
 #include <sys/types.h>
@@ -6,7 +5,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <QApplication>
+
 #include "mythcontext.h"
+#include "mythverbose.h"
+#include "mythversion.h"
 #include "settings.h"
 #include "langsettings.h"
 #include "mythdbcon.h"
@@ -42,7 +45,7 @@ int main(int argc, char **argv)
 
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init()) 
+    if (!gContext->Init())
     {
         VERBOSE(VB_IMPORTANT, "mythwelcome: Could not initialize myth context. "
                         "Exiting.");
@@ -69,7 +72,7 @@ int main(int argc, char **argv)
                     return FRONTEND_EXIT_INVALID_CMDLINE;
 
                 ++argpos;
-            } 
+            }
             else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
@@ -163,7 +166,7 @@ static bool log_rotate(bool report_error)
 {
     int new_logfd = open(logfile, O_WRONLY|O_CREAT|O_APPEND, 0664);
 
-    if (new_logfd < 0) 
+    if (new_logfd < 0)
     {
         /* If we can't open the new logfile, send data to /dev/null */
         if (report_error)

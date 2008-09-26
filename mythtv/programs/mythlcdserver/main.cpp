@@ -5,20 +5,21 @@
 
 */
 
-#include <qapplication.h>
-#include <qsqldatabase.h>
-#include <qfile.h>
-#include <q3textstream.h>
-
 #include <iostream>
 using namespace std;
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
 
+#include <QApplication>
+#include <QFile>
+#include <q3textstream.h>
+
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "mythverbose.h"
+#include "mythversion.h"
 #include "tv_play.h"
 #include "compat.h"
 
@@ -31,18 +32,17 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv, false);
     bool daemon_mode = false;
-    int  special_port = -1;    
+    int  special_port = -1;
     QString startup_message = "";          // default to no startup message
-    int message_time = 30;                 // time to display startup message  
+    int message_time = 30;                 // time to display startup message
     print_verbose_messages = VB_IMPORTANT; // only show important messages
     QString logfile = "";
-    
-    debug_level = 0;                       // don't show any debug messages by default 
-    
+
+    debug_level = 0;  // don't show any debug messages by default
+
     //  Check command line arguments
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
-        
         if (!strcmp(a.argv()[argpos],"-d") ||
             !strcmp(a.argv()[argpos],"--daemon"))
         {
@@ -66,8 +66,8 @@ int main(int argc, char **argv)
                     VERBOSE(VB_IMPORTANT, "lcdserver: Bad port number");
                     return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
-            } 
-            else 
+            }
+            else
             {
                 VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
                                 "-p/--port option");
@@ -81,8 +81,8 @@ int main(int argc, char **argv)
             {
                 startup_message = a.argv()[argpos+1];
                 ++argpos;
-            } 
-            else 
+            }
+            else
             {
                 VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
                                 "-m/--startupmessage");
@@ -102,8 +102,8 @@ int main(int argc, char **argv)
                     VERBOSE(VB_IMPORTANT, "lcdserver: Bad show message time");
                     return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
-            } 
-            else 
+            }
+            else
             {
                 VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
                                 "-t/--messagetime");
@@ -120,13 +120,13 @@ int main(int argc, char **argv)
                     return FRONTEND_EXIT_INVALID_CMDLINE;
 
                 ++argpos;
-            } 
+            }
             else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
-        }    
+        }
         else if (!strcmp(a.argv()[argpos],"-l") ||
             !strcmp(a.argv()[argpos],"--logfile"))
         {
@@ -155,7 +155,7 @@ int main(int argc, char **argv)
             if (a.argc() > argpos)
             {
                 QString sTemp = a.argv()[argpos+1];
-                
+
                 ++argpos;
                 debug_level = sTemp.toInt();
                 if (debug_level < 0 || debug_level > 10)
@@ -163,8 +163,8 @@ int main(int argc, char **argv)
                     VERBOSE(VB_IMPORTANT, "lcdserver: Bad debug level");
                     return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
-            } 
-            else 
+            }
+            else
             {
                 VERBOSE(VB_IMPORTANT, "lcdserver: Missing argument to "
                                 "-x/--debuglevel");
@@ -173,21 +173,30 @@ int main(int argc, char **argv)
         }
         else
         {
-            cerr << "Invalid argument: " << a.argv()[argpos] << endl <<
-                    "Valid options are: " << endl <<
-                    "-p or --port number           A port number to listen on (default is 6545) " << endl <<
-                    "-d or --daemon                Runs lcd server as a daemon " << endl <<
-                    "-n or --nodaemon              Does not run lcd server as a daemon (default)" << endl <<
-                    "-m or --startupmessage        Message to show at startup" << endl <<
-                    "-t or --messagetime           How long to show startup message (default 30 seconds)" << endl << 
-                    "-l or --logfile filename      Writes STDERR and STDOUT messages to filename" << endl <<
-                    "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
-                    "-x or --debuglevel level      Control how much debug messages to show" << endl <<
-                    "                              [number between 0 and 10] (default 0)" << endl;
+            cerr << "Invalid argument: " << a.argv()[argpos] << endl
+                 << "Valid options are: " << endl <<
+"-p or --port number           A port number to listen on (default is 6545) "
+                 << endl <<
+"-d or --daemon                Runs lcd server as a daemon "
+                 << endl <<
+"-n or --nodaemon              Does not run lcd server as a daemon (default)"
+                 << endl <<
+"-m or --startupmessage        Message to show at startup"
+                 << endl <<
+"-t or --messagetime           How long to show startup message (default 30 seconds)"
+                 << endl <<
+"-l or --logfile filename      Writes STDERR and STDOUT messages to filename"
+                 << endl <<
+"-v or --verbose debug-level   Use '-v help' for level info"
+                 << endl <<
+"-x or --debuglevel level      Control how much debug messages to show"
+                 << endl <<
+"                              [number between 0 and 10] (default 0)"
+                 << endl;
             return FRONTEND_EXIT_INVALID_CMDLINE;
         }
     }
-    
+
     // set up log file
     int logfd = -1;
 
@@ -195,7 +204,7 @@ int main(int argc, char **argv)
     {
         QByteArray tmp = logfile.toAscii();
         logfd = open(tmp.constData(), O_WRONLY|O_CREAT|O_APPEND, 0664);
- 
+
         if (logfd < 0)
         {
             perror("open(logfile)");
@@ -247,11 +256,11 @@ int main(int argc, char **argv)
     {
         assigned_port = special_port;
     }
-   
+
     new LCDServer(assigned_port, startup_message, message_time);
-    
+
     a.exec();
-                                
+
     delete gContext;
     return FRONTEND_EXIT_OK;
 }

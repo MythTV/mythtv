@@ -6,12 +6,14 @@
 using namespace std;
 
 // Qt headers
-#include <qapplication.h>
+#include <QApplication>
 
 // libmyth headers
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdb.h"
+#include "mythverbose.h"
+#include "mythversion.h"
 
 // libmythtv headers
 #include "scheduledrecording.h"

@@ -1,9 +1,3 @@
-#include <qapplication.h>
-#include <qstring.h>
-#include <qregexp.h>
-#include <qsqldatabase.h>
-#include <qsqlquery.h>
-#include <qdir.h>
 
 #include <iostream>
 #include <fstream>
@@ -14,10 +8,17 @@
 #include <ctime>
 #include <cmath>
 
+#include <QApplication>
+#include <QString>
+#include <QRegExp>
+#include <QDir>
+
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "jobqueue.h"
 #include "mythdbcon.h"
+#include "mythverbose.h"
+#include "mythversion.h"
 
 using namespace std;
 
@@ -30,7 +31,7 @@ int main(int argc, char *argv[])
     int argpos = 1;
 
     QString filename;
-        
+
     QFileInfo finfo(a.argv()[0]);
 
     QString binname = finfo.baseName();
@@ -64,8 +65,8 @@ int main(int argc, char *argv[])
                     cerr << "Invalid or missing argument to "
                             "-O/--override-setting option\n";
                     return BACKEND_EXIT_INVALID_CMDLINE;
-                } 
- 
+                }
+
                 QStringList pairs = QStringList::split(",", tmpArg);
                 for (int index = 0; index < pairs.size(); ++index)
                 {
@@ -78,7 +79,7 @@ int main(int argc, char *argv[])
                 }
             }
             else
-            { 
+            {
                 cerr << "Invalid or missing argument to -O/--override-setting "
                         "option\n";
                 return GENERIC_EXIT_INVALID_CMDLINE;

@@ -1,19 +1,6 @@
 // POSIX headers
 #include <sys/time.h>     // for setpriority
 
-#include <qapplication.h>
-#include <qsqldatabase.h>
-#include <qfile.h>
-#include <qmap.h>
-#include <qregexp.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <libgen.h>
-#include <signal.h>
-#include <cerrno>
-
 #include "mythconfig.h"
 #ifdef CONFIG_DARWIN
     #include <sys/aio.h>    // O_SYNC
@@ -22,7 +9,20 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <libgen.h>
+#include <signal.h>
+#include <cerrno>
 using namespace std;
+
+#include <QApplication>
+#include <QFile>
+#include <QMap>
+#include <QRegExp>
 
 #include "tv_rec.h"
 #include "autoexpire.h"
@@ -33,6 +33,8 @@ using namespace std;
 #include "housekeeper.h"
 
 #include "mythcontext.h"
+#include "mythverbose.h"
+#include "mythversion.h"
 #include "mythdb.h"
 #include "exitcodes.h"
 #include "compat.h"
@@ -51,14 +53,14 @@ using namespace std;
 #define LOC_ERR  QString("MythBackend, Error: ")
 
 QMap<int, EncoderLink *> tvList;
-AutoExpire *expirer = NULL;
-Scheduler *sched = NULL;
-JobQueue *jobqueue = NULL;
-QString pidfile;
+AutoExpire  *expirer      = NULL;
+Scheduler   *sched        = NULL;
+JobQueue    *jobqueue     = NULL;
+QString      pidfile;
 HouseKeeper *housekeeping = NULL;
-QString logfile = "";
+QString      logfile      = QString::null;
 
-MediaServer *g_pUPnp       = NULL;
+MediaServer *g_pUPnp      = NULL;
 
 bool setupTVs(bool ismaster, bool &error)
 {

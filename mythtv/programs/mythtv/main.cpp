@@ -1,10 +1,11 @@
 #include <unistd.h>
+#include <iostream>
+using namespace std;
 
-#include <qapplication.h>
-#include <qsqldatabase.h>
-#include <qstring.h>
-#include <qregexp.h>
-#include <qdir.h>
+#include <QApplication>
+#include <QString>
+#include <QRegExp>
+#include <QDir>
 
 #include "tv_play.h"
 #include "programinfo.h"
@@ -12,14 +13,13 @@
 
 #include "exitcodes.h"
 #include "mythcontext.h"
+#include "mythverbose.h"
+#include "mythversion.h"
 #include "mythdbcon.h"
 #include "mythdialogs.h"
 #include "compat.h"
 #include "mythuihelper.h"
 #include "dbcheck.h"
-
-#include <iostream>
-using namespace std;
 
 static void *run_priv_thread(void *data)
 {
@@ -75,7 +75,7 @@ static void *run_priv_thread(void *data)
 
 int main(int argc, char *argv[])
 {
-bool cmdline_err;
+    bool cmdline_err;
     MythCommandLineParser cmdline(
         kCLPOverrideSettings     |
         kCLPWindowed             |

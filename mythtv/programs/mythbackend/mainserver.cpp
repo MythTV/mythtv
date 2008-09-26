@@ -3,18 +3,6 @@
 #include <algorithm>
 using namespace std;
 
-#include <qapplication.h>
-#include <qsqldatabase.h>
-#include <qdatetime.h>
-#include <qfile.h>
-#include <qdir.h>
-#include <qthread.h>
-#include <qwaitcondition.h>
-#include <qregexp.h>
-#include <QEvent>
-#include <QUrl>
-#include <QTcpServer>
-
 #include <cstdlib>
 #include <cerrno>
 #include <math.h>
@@ -40,10 +28,23 @@ using namespace std;
 #  endif // USING_MINGW
 #endif // !__linux__
 
-#include "libmythdb/exitcodes.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/util.h"
-#include "libmythdb/mythdb.h"
+#include <QApplication>
+#include <QDateTime>
+#include <QFile>
+#include <QDir>
+#include <QThread>
+#include <QWaitCondition>
+#include <QRegExp>
+#include <QEvent>
+#include <QUrl>
+#include <QTcpServer>
+
+#include "exitcodes.h"
+#include "mythcontext.h"
+#include "mythverbose.h"
+#include "mythversion.h"
+#include "util.h"
+#include "mythdb.h"
 
 #include "mainserver.h"
 #include "server.h"

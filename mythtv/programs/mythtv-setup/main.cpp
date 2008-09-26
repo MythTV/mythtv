@@ -1,12 +1,3 @@
-#include <qapplication.h>
-#include <qsqldatabase.h>
-#include <qsqlquery.h>
-#include <qstring.h>
-#include <qdir.h>
-#include <qfile.h>
-#include <qstringlist.h>
-#include <qregexp.h>
-#include <qmap.h>
 
 #include <unistd.h>
 #include <cstdio>
@@ -16,9 +7,19 @@
 
 #include <iostream>
 
+#include <QApplication>
+#include <QString>
+#include <QDir>
+#include <QFile>
+#include <QStringList>
+#include <QRegExp>
+#include <QMap>
+
 #include "mythconfig.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "mythverbose.h"
+#include "mythversion.h"
 #include "langsettings.h"
 #include "dialogbox.h"
 #include "exitcodes.h"
@@ -76,7 +77,7 @@ void SetupMenuCallback ( void* data, QString& selection )
     }
 }
 
-void SetupMenu(MythMainWindow *win) 
+void SetupMenu(MythMainWindow *win)
 {
     QString theme = gContext->GetSetting("Theme", "blue");
 
@@ -149,7 +150,7 @@ int main(int argc, char *argv[])
             }
         }
         else if (!strcmp(a.argv()[argpos],"-geometry") ||
-                 !strcmp(a.argv()[argpos],"--geometry"))      
+                 !strcmp(a.argv()[argpos],"--geometry"))
         {
             if (a.argc()-1 > argpos)
             {
@@ -159,15 +160,15 @@ int main(int argc, char *argv[])
                     cerr << "Invalid or missing argument to "
                         "-geometry option\n";
                     return BACKEND_EXIT_INVALID_CMDLINE;
-                }                      
+                }
                 else
                     ++argpos;
-            }            
+            }
             else
-            {            
-                cerr << "Missing argument to -geometry option\n"; 
+            {
+                cerr << "Missing argument to -geometry option\n";
                 return BACKEND_EXIT_INVALID_CMDLINE;
-            }            
+            }
         }
         else if (!strcmp(a.argv()[argpos],"-v") ||
                   !strcmp(a.argv()[argpos],"--verbose"))
@@ -176,9 +177,9 @@ int main(int argc, char *argv[])
             {
                 if (parse_verbose_arg(a.argv()[argpos+1]) ==
                         GENERIC_EXIT_INVALID_CMDLINE)
-                    return BACKEND_EXIT_INVALID_CMDLINE;                        
+                    return BACKEND_EXIT_INVALID_CMDLINE;
                 ++argpos;
-            } 
+            }
             else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
@@ -195,8 +196,8 @@ int main(int argc, char *argv[])
                 {
                     cerr << "Invalid or missing argument to -O/--override-setting option\n";
                     return BACKEND_EXIT_INVALID_CMDLINE;
-                } 
- 
+                }
+
                 QStringList pairs = QStringList::split(",", tmpArg);
                 for (int index = 0; index < pairs.size(); ++index)
                 {
@@ -224,14 +225,14 @@ int main(int argc, char *argv[])
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
 
             cerr << "Valid options are: "<<endl
-#ifdef USING_X11 
+#ifdef USING_X11
                  <<"-display X-server              Create GUI on X-server, not localhost"<<endl
-#endif          
+#endif
                  <<"-geometry or --geometry WxH    Override window size settings"<<endl
                  <<"-geometry WxH+X+Y              Override window size and position"<<endl
                  <<"-O or "<<endl
                  <<"  --override-setting KEY=VALUE Force the setting named 'KEY' to value 'VALUE'"<<endl
-                 <<"-v or --verbose debug-level    Use '-v help' for level info"<<endl 
+                 <<"-v or --verbose debug-level    Use '-v help' for level info"<<endl
                  <<endl;
             return -1;
         }
@@ -266,7 +267,7 @@ int main(int argc, char *argv[])
                                           .arg(it.key()).arg(it.data()));
             gContext->OverrideSettingForSession(it.key(), it.data());
         }
-    }   
+    }
 
     if (!MSqlQuery::testDBConnection())
     {
@@ -308,7 +309,7 @@ int main(int argc, char *argv[])
     LanguageSettings::prompt();
     LanguageSettings::load("mythfrontend");
 
-    QString warn = 
+    QString warn =
         QObject::tr("WARNING") + ": " +
         QObject::tr("MythTV has detected that the backend is running.")+"\n\n"+
         QObject::tr("Changing existing card inputs, deleting anything, "
