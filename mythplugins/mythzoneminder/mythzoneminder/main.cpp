@@ -17,6 +17,8 @@
 
 // qt
 #include <QApplication>
+#include <QSqlDatabase>
+#include <QSqlError>
 #include <QObject>
 
 // myth
