@@ -5,7 +5,6 @@
 using namespace std;
 
 #include <QThread>
-#include <QWaitCondition>
 
 #include "settings.h"
 #include "datadirect.h"
@@ -216,18 +215,24 @@ class XMLTVFindGrabbers : public QThread
     Q_OBJECT
 
   public:
+    XMLTVFindGrabbers() : find_grabber_proc(0) {}
+
     virtual void run(void);
-    virtual void kill(void) { find_grabber_proc.kill(); }
+    virtual void kill(void)
+    {
+        QMutexLocker qml(&find_grabber_proc_lock);
+        if (find_grabber_proc)
+            find_grabber_proc->kill();
+    }
 
   signals:
     void FoundXMLTVGrabbers(QStringList,QStringList);
 
   private:
-    QProcess find_grabber_proc;
+    QProcess *find_grabber_proc;
+    QMutex find_grabber_proc_lock;
 
     static QMutex      list_lock;
-    static QStringList name_list;
-    static QStringList prog_list;
 };
 
 class XMLTVGrabber;
@@ -251,9 +256,6 @@ class XMLTVConfig : public TriggeredConfigurationGroup
     const VideoSource &parent;
     XMLTVGrabber      *grabber;
     XMLTVFindGrabbers  findGrabbers;
-    QMutex             load_lock;
-    QWaitCondition     load_wait;
-    bool               loaded;
 };
 
 class VideoSource : public ConfigurationWizard {

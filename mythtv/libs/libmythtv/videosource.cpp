@@ -48,9 +48,7 @@ using namespace std;
 #include "videodev_myth.h"
 #endif
 
-QMutex      XMLTVFindGrabbers::list_lock;
-QStringList XMLTVFindGrabbers::name_list;
-QStringList XMLTVFindGrabbers::prog_list;
+QMutex XMLTVFindGrabbers::list_lock;
 
 VideoSourceSelector::VideoSourceSelector(uint           _initial_sourceid,
                                          const QString &_card_types,
@@ -523,10 +521,19 @@ Loading_config::Loading_config(const VideoSource& _parent) :
 
 void XMLTVFindGrabbers::run(void)
 {
+    {
+        QMutexLocker qml(&find_grabber_proc_lock);
+        find_grabber_proc = new QProcess(this);
+    }
+
     QString loc = "XMLTVFindGrabbers: ";
     QString loc_err = "XMLTVFindGrabbers, Error: ";
 
     QMutexLocker locker(&list_lock);
+
+    static QStringList name_list;
+    static QStringList prog_list;
+
     if (name_list.size())
     {
         VERBOSE(VB_GENERAL, loc + "Using existing list");
@@ -537,11 +544,11 @@ void XMLTVFindGrabbers::run(void)
     QStringList args;
     args += "baseline";
     args += "manualconfig";
-    find_grabber_proc.start("tv_find_grabbers", args);
-    bool ok = find_grabber_proc.waitForStarted(250 /* milliseconds */);
+    find_grabber_proc->start("tv_find_grabbers", args);
+    bool ok = find_grabber_proc->waitForStarted(250 /* milliseconds */);
     if (!ok)
     {
-        find_grabber_proc.kill();
+        find_grabber_proc->kill();
         VERBOSE(VB_IMPORTANT, loc + "Failed to run tv_find_grabbers");
         emit FoundXMLTVGrabbers(name_list, prog_list);
         return;
@@ -550,20 +557,20 @@ void XMLTVFindGrabbers::run(void)
     VERBOSE(VB_GENERAL,
             loc + "Running 'tv_find_grabbers " + args.join(" ") + "'.");
 
-    ok = find_grabber_proc.waitForFinished(25 * 1000);
+    ok = find_grabber_proc->waitForFinished(25 * 1000);
     if (!ok)
     {
-        find_grabber_proc.kill();
+        find_grabber_proc->kill();
         VERBOSE(VB_IMPORTANT, loc + "We timed out waiting");
         emit FoundXMLTVGrabbers(name_list, prog_list);
         return;
     }
 
-    find_grabber_proc.setReadChannel(QProcess::StandardOutput);
+    find_grabber_proc->setReadChannel(QProcess::StandardOutput);
 
-    while (find_grabber_proc.canReadLine())
+    while (find_grabber_proc->canReadLine())
     {
-        QByteArray tmp = find_grabber_proc.readLine();
+        QByteArray tmp = find_grabber_proc->readLine();
         QString grabber_list(tmp);
         grabber_list = grabber_list.left(grabber_list.size() - 1);
         QStringList grabber_split =
@@ -584,8 +591,7 @@ void XMLTVFindGrabbers::run(void)
 
 XMLTVConfig::XMLTVConfig(const VideoSource &aparent) :
     TriggeredConfigurationGroup(false, true, false, false),
-    parent(aparent), grabber(new XMLTVGrabber(parent)),
-    loaded(false)
+    parent(aparent), grabber(new XMLTVGrabber(parent))
 {
     addChild(grabber);
     setTrigger(grabber);
@@ -596,8 +602,6 @@ XMLTVConfig::XMLTVConfig(const VideoSource &aparent) :
     connect(&findGrabbers, SIGNAL(FoundXMLTVGrabbers(QStringList,QStringList)),
             this,          SLOT  (FoundXMLTVGrabbers(QStringList,QStringList)),
             Qt::BlockingQueuedConnection);
-
-    findGrabbers.start();
 }
 
 XMLTVConfig::~XMLTVConfig()
@@ -610,13 +614,10 @@ void XMLTVConfig::Stop(void)
     findGrabbers.disconnect();
     findGrabbers.kill();
     findGrabbers.wait();
-    QMutexLocker locker(&load_lock);
 }
 
 void XMLTVConfig::Load(void)
 {
-    QMutexLocker locker(&load_lock);
-
     addTarget("schedulesdirect1",
               new DataDirect_config(parent, DD_SCHEDULES_DIRECT));
     addTarget("eitonly",   new EITOnly_config(parent));
@@ -652,8 +653,7 @@ void XMLTVConfig::Load(void)
 
     TriggeredConfigurationGroup::Load();
 
-    loaded = true;
-    load_wait.wakeAll();
+    findGrabbers.start();
 }
 
 void XMLTVConfig::FoundXMLTVGrabbers(
@@ -661,12 +661,6 @@ void XMLTVConfig::FoundXMLTVGrabbers(
 {
     if (name_list.size() != prog_list.size())
         return;
-
-    QMutexLocker locker(&load_lock);
-
-    QWaitCondition cond;
-    while (!loaded)
-        load_wait.wait(&load_lock, 500);
 
     QString selValue = grabber->getValue();
     int     selIndex = grabber->getValueIndex(selValue);
