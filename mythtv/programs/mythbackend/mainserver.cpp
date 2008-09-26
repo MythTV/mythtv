@@ -3378,17 +3378,20 @@ void MainServer::HandleCutMapQuery(const QString &chanid,
     ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid,
                                                               startdt);
 
-    if (commbreak)
-        pginfo->GetCommBreakList(markMap);
-    else
-        pginfo->GetCutList(markMap);
-
-    for (it = markMap.begin(); it != markMap.end(); ++it)
+    if (pginfo)
     {
-        rowcnt++;
-        QString intstr = QString("%1").arg(it.data());
-        retlist << intstr;
-        encodeLongLong(retlist,it.key());
+        if (commbreak)
+            pginfo->GetCommBreakList(markMap);
+        else
+            pginfo->GetCutList(markMap);
+
+        for (it = markMap.begin(); it != markMap.end(); ++it)
+        {
+            rowcnt++;
+            QString intstr = QString("%1").arg(it.data());
+            retlist << intstr;
+            encodeLongLong(retlist,it.key());
+        }
     }
 
     if (rowcnt > 0)
@@ -3450,11 +3453,12 @@ void MainServer::HandleBookmarkQuery(const QString &chanid,
     QDateTime startdt;
     startdt.setTime_t((uint)atoi(starttime));
     QStringList retlist;
-    long long bookmark;
+    long long bookmark = 0;
 
     ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid,
                                                               startdt);
-    bookmark = pginfo->GetBookmark();
+    if (pginfo)
+        bookmark = pginfo->GetBookmark();
 
     encodeLongLong(retlist,bookmark);
 
@@ -3492,9 +3496,14 @@ void MainServer::HandleSetBookmark(QStringList &tokens,
 
     ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid,
                                                               startdt);
-    pginfo->SetBookmark(bookmark);
+    if (pginfo)
+    {
+        pginfo->SetBookmark(bookmark);
+        retlist << "OK";
+    }
+    else
+        retlist << "FAILED";
 
-    retlist << "OK";
     if (pbssock)
         SendResponse(pbssock, retlist);
 
