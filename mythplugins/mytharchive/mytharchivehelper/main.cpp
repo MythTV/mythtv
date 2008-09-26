@@ -19,7 +19,7 @@ using namespace std;
 #include <QApplication>
 #include <QFile>
 #include <QDir>
-#include <QDom>
+#include <QDomElement>
 #include <QImage>
 
 // MythTV headers
