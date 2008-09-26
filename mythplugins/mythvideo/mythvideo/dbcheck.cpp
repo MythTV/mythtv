@@ -4,6 +4,7 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/mythdbparams.h>
 
 #include "dbcheck.h"
 #include "videodlg.h"
