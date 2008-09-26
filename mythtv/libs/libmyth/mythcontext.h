@@ -17,9 +17,7 @@
 #include "mythobservable.h"
 #include "mythsocket.h"
 
-#include "libmythdb/mythverbose.h"
-#include "libmythdb/mythdbparams.h"
-#include "libmythdb/mythversion.h"
+#include "mythverbose.h"
 
 using namespace std;
 
@@ -28,16 +26,12 @@ class QImage;
 class QPixmap;
 
 class Settings;
-class QSqlDatabase;
-class QSqlQuery;
-class QSqlError;
 class MythMainWindow;
 class MythPluginManager;
-class MediaMonitor;
-class MythMediaDevice;
 class MDBManager;
 class MythContextPrivate;
 class UPnp;
+struct DatabaseParams;
 
 /// These are the database logging priorities used for filterig the logs.
 enum LogPriorities
@@ -129,8 +123,6 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     void RefreshBackendConfig(void);
 
     MDBManager *GetDBManager(void);
-    static void DBError(const QString &where, const QSqlQuery &query);
-    static QString DBErrorMessage(const QSqlError& err);
 
     DatabaseParams GetDatabaseParams(void);
     bool SaveDatabaseParams(const DatabaseParams &params);

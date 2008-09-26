@@ -1604,16 +1604,6 @@ MDBManager *MythContext::GetDBManager(void)
     return d->m_database->GetDBManager();
 }
 
-void MythContext::DBError(const QString &where, const QSqlQuery& query)
-{
-    MythDB::DBError(where, query);
-}
-
-QString MythContext::DBErrorMessage(const QSqlError &err)
-{
-    return MythDB::DBErrorMessage(err);
-}
-
 /** /brief Returns true if database is being ignored.
  *
  *  This was created for some command line only programs which
