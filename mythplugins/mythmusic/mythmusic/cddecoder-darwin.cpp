@@ -2,20 +2,22 @@
 #include <stdlib.h>
 #include <iostream>
 #include <string>
-#include <qobject.h>
-#include <qiodevice.h>
-#include <qdir.h>
-#include <qfile.h>
 using namespace std;
 
-#include <mythtv/mythconfig.h>   // For CONFIG_DARWIN
+#include <QObject>
+#include <QIODevice>
+#include <QDir>
+#include <QFile>
+
+#include <mythconfig.h>   // For CONFIG_DARWIN
 #include "cddecoder.h"
 #include "constants.h"
-#include <mythtv/audiooutput.h>
+#include <audiooutput.h>
 #include "metadata.h"
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythmediamonitor.h>
+#include <mythtv/mythversion.h>
 #include <mythtv/httpcomms.h>
 
 CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
