@@ -16,13 +16,12 @@
 #include <unistd.h>
 
 // qt
-#include <qapplication.h>
-#include <qsqldatabase.h>
-#include <qsqlerror.h>
+#include <QApplication>
 #include <QObject>
 
 // myth
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythversion.h>
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/libmythui/myththemedmenu.h>

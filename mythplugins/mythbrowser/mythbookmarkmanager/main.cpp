@@ -2,10 +2,11 @@
 #include <unistd.h>
 
 // qt
-#include <qapplication.h>
+#include <QApplication>
 
 // myth
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythversion.h>
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/langsettings.h>

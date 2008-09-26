@@ -8,16 +8,17 @@
 
 */
 
+#include <unistd.h>
+
 #include <QApplication>
 #include <QSqlDatabase>
 #include <QFile>
 #include <Q3TextStream>
 
-#include <unistd.h>
-
 #include <mythtv/exitcodes.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/mythversion.h>
 #include <mythtv/langsettings.h>
 #include <mythtv/compat.h>
 
@@ -30,14 +31,13 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv, false);
     bool daemon_mode = false;
-    int  special_port = -1;    
+    int  special_port = -1;
     //
     //  Check command line arguments
     //
-    
+
     for(int argpos = 1; argpos < a.argc(); ++argpos)
     {
-        
         if (!strcmp(a.argv()[argpos],"-d") ||
             !strcmp(a.argv()[argpos],"--daemon"))
         {
@@ -62,8 +62,8 @@ int main(int argc, char **argv)
                     VERBOSE(VB_IMPORTANT, "mtd: Bad port number");
                     return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
-            } 
-            else 
+            }
+            else
             {
                 VERBOSE(VB_IMPORTANT, "mtd: Missing argument to -p/--port option");
                 return FRONTEND_EXIT_INVALID_CMDLINE;
@@ -94,11 +94,11 @@ int main(int argc, char **argv)
             return FRONTEND_EXIT_INVALID_CMDLINE;
         }
     }
-    
+
     //
     //  Switch to daemon mode?
     //
-    
+
     if(daemon_mode)
     {
         if(daemon(0, 1) < 0)
@@ -111,8 +111,8 @@ int main(int argc, char **argv)
 
     //
     //  Get the Myth context and db hooks
-    //    
-    
+    //
+
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
@@ -130,7 +130,7 @@ int main(int argc, char **argv)
     gContext->ActivateSettingsCache(false);
     UpgradeVideoDatabaseSchema();
     gContext->ActivateSettingsCache(true);
- 
+
     //
     //  Figure out port to listen on
     //
@@ -146,12 +146,12 @@ int main(int argc, char **argv)
     //
     //  Where to log
     //
-   
+
     bool log_stdout = false;
     if(gContext->GetNumSetting("MTDLogFlag", 0))
     {
         log_stdout = true;
-    } 
+    }
     if(!daemon_mode)
     {
         log_stdout = true;
@@ -160,13 +160,13 @@ int main(int argc, char **argv)
     //
     //  Nice ourself
     //
-   
+
     LanguageSettings::load("mythdvd");
-    
+
     new MTD(assigned_port, log_stdout);
-    
+
     a.exec();
-                                
+
     delete gContext;
     return FRONTEND_EXIT_OK;
 }

@@ -95,7 +95,7 @@ int main(int argc, char **argv)
                 }
                 ++argpos;
             }
-            else 
+            else
             {
                 cout << "Missing argument to -p/--port option\n";
                 return EXIT_INVALID_CMDLINE;
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
 
     map<int, ZMServer*> serverList; // list of ZMServers
 
-    // load the config 
+    // load the config
     loadZMConfig(zmconfig);
 
     cout << "ZM is version '" << g_zmversion << "'" << endl;
@@ -214,7 +214,7 @@ int main(int argc, char **argv)
     FD_ZERO(&read_fds);
 
     // get the listener
-    if ((listener = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
+    if ((listener = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
         perror("socket");
         return EXIT_SOCKET_ERROR;
@@ -222,7 +222,7 @@ int main(int argc, char **argv)
 
     // lose the pesky "address already in use" error message
     if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes,
-                                                        sizeof(int)) == -1) 
+                                                        sizeof(int)) == -1)
     {
         perror("setsockopt");
         return EXIT_SOCKET_ERROR;
@@ -233,14 +233,14 @@ int main(int argc, char **argv)
     myaddr.sin_addr.s_addr = INADDR_ANY;
     myaddr.sin_port = htons(port);
     memset(&(myaddr.sin_zero), '\0', 8);
-    if (bind(listener, (struct sockaddr *)&myaddr, sizeof(myaddr)) == -1) 
+    if (bind(listener, (struct sockaddr *)&myaddr, sizeof(myaddr)) == -1)
     {
         perror("bind");
         return EXIT_SOCKET_ERROR;
     }
 
     // listen
-    if (listen(listener, 10) == -1) 
+    if (listen(listener, 10) == -1)
     {
         perror("listen");
         return EXIT_SOCKET_ERROR;
@@ -255,7 +255,7 @@ int main(int argc, char **argv)
     fdmax = listener; // so far, it's this one
 
     // main loop
-    while (!quit) 
+    while (!quit)
     {
         // the maximum time select() should wait
         timeout.tv_sec = DB_CHECK_TIME;
@@ -278,25 +278,26 @@ int main(int argc, char **argv)
         }
 
         // run through the existing connections looking for data to read
-        for (i = 0; i <= fdmax; i++) 
+        for (i = 0; i <= fdmax; i++)
         {
-            if (FD_ISSET(i, &read_fds)) 
+            if (FD_ISSET(i, &read_fds))
             {
                 // we got one!!
                 if (i == listener) 
                 {
                     // handle new connections
                     addrlen = sizeof(remoteaddr);
-                    if ((newfd = accept(listener, (struct sockaddr *) &remoteaddr,
-                                                               &addrlen)) == -1) 
+                    if ((newfd = accept(listener,
+                                        (struct sockaddr *) &remoteaddr,
+                                                               &addrlen)) == -1)
                     {
                         perror("accept");
                     }
-                    else 
+                    else
                     {
                         // add to master set
                         FD_SET(newfd, &master);
-                        if (newfd > fdmax) 
+                        if (newfd > fdmax)
                         {    // keep track of the maximum
                             fdmax = newfd;
                         }
@@ -315,12 +316,12 @@ int main(int argc, char **argv)
                     if ((nbytes = recv(i, buf, sizeof(buf), 0)) <= 0)
                     {
                         // got error or connection closed by client
-                        if (nbytes == 0) 
+                        if (nbytes == 0)
                         {
                             // connection closed
                             printf("socket %d hung up\n", i);
-                        } 
-                        else 
+                        }
+                        else
                         {
                             perror("recv");
                         }
@@ -336,7 +337,7 @@ int main(int argc, char **argv)
                             delete server;
                         serverList.erase(i);
                     }
-                    else 
+                    else
                     {
                         ZMServer *server = serverList[i];
                         server->processRequest(buf, nbytes);

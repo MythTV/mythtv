@@ -14,12 +14,13 @@
 using namespace std;
 
 // Qt
-#include <qapplication.h>
-#include <qdir.h>
-#include <qtimer.h>
+#include <QApplication>
+#include <QDir>
+#include <QTimer>
 
 // mythtv
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythversion.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/dialogbox.h>
 #include <mythtv/util.h>
@@ -36,7 +37,7 @@ using namespace std;
 #include "dbcheck.h"
 #include "archiveutil.h"
 
-#ifdef CREATE_DVD 
+#ifdef CREATE_DVD
     #include "mythburnwizard.h"
 #endif
 
@@ -50,7 +51,7 @@ bool checkProcess(const QString &lockFile)
 {
     // read the PID from the lock file
     QFile file(lockFile);
-    
+
     bool bOK = file.open(QIODevice::ReadOnly);
 
     if (!bOK)
@@ -109,7 +110,7 @@ bool checkLockFile(const QString &lockFile)
 
 void runCreateDVD(void)
 {
-#ifdef CREATE_DVD 
+#ifdef CREATE_DVD
     QString commandline;
     QString tempDir = getTempDirectory(true);
 
@@ -353,7 +354,7 @@ void runBurnDVD(void)
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
     int state = system(commandline);
 
-    if (state != 0) 
+    if (state != 0)
     {
         showWarningDialog(QObject::tr("It was not possible to run mytharchivehelper to burn the DVD."));
         return;

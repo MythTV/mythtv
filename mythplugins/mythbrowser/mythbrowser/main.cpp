@@ -6,10 +6,11 @@
 #include <unistd.h>
 
 // qt
-#include <qapplication.h>
+#include <QApplication>
 
 // myth
 #include "mythcontext.h"
+#include "mythversion.h"
 #include "settings.h"
 #include "langsettings.h"
 #include "mythdbcon.h"
@@ -53,7 +54,7 @@ int main(int argc, char **argv)
 
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    if (!gContext->Init()) 
+    if (!gContext->Init())
     {
         VERBOSE(VB_IMPORTANT, "mythbrowser: Could not initialize myth context. "
                               "Exiting.");

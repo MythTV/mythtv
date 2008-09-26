@@ -11,16 +11,19 @@
 #include <cstdlib>
 using namespace std;
 
-#include <qapplication.h>
-#include <qdir.h>
-#include <qmutex.h>
-#include <qregexp.h>
 #include <unistd.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <net/if.h>
 #include <linux/videodev.h>
+
+#include <QApplication>
+#include <QDir>
+#include <QMutex>
+#include <QRegExp>
+
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythversion.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdb.h>
 #include <mythtv/mythplugin.h>
@@ -88,7 +91,7 @@ void runMenu(QString which_menu)
 {
     QString themedir = gContext->GetThemeDir();
 
-    ThemedMenu *diag = new ThemedMenu(themedir, which_menu, 
+    ThemedMenu *diag = new ThemedMenu(themedir, which_menu,
                                       gContext->GetMainWindow(), "phone menu");
 
     diag->setCallback(PhoneCallback, NULL);
@@ -228,7 +231,7 @@ char myHostname[64];
             // See if the user has changed their display name
             // or the IP address has changed
 
-            if ((query.value(1).toString() != NickName) || 
+            if ((query.value(1).toString() != NickName) ||
                 (query.value(2).toString() != Uri))
             {
                 VERBOSE(VB_IMPORTANT, QString(

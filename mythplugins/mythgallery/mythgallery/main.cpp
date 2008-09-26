@@ -2,12 +2,13 @@
 #include <iostream>
 
 // qt
-#include <qapplication.h>
-#include <qimage.h>
-#include <qdir.h>
+#include <QApplication>
+#include <QImage>
+#include <QDir>
 
 // myth
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythversion.h>
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/dialogbox.h>

@@ -1,6 +1,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythpluginapi.h>
+#include <mythtv/mythversion.h>
 
 #include "moviesui.h"
 #include "moviessettings.h"
@@ -54,7 +55,7 @@ int mythplugin_run(void)
     gContext->ActivateSettingsCache(false);
     if (gContext->GetSetting("MythMovies.ZipCode") == "" ||
         gContext->GetSetting("MythMovies.Radius") == "" ||
-        gContext->GetSetting("MythMovies.Grabber") == "") 
+        gContext->GetSetting("MythMovies.Grabber") == "")
     {
         runConfig();
     }

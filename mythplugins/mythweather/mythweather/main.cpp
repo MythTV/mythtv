@@ -1,13 +1,15 @@
-// QT headers
-#include <qapplication.h>
 
 #include <unistd.h>
+
+// QT headers
+#include <QApplication>
 
 // MythTV headers
 #include <mythtv/lcddevice.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/mythpluginapi.h>
+#include <mythtv/mythversion.h>
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/libmythui/mythmainwindow.h>
 #include <mythtv/libmythui/mythuihelper.h>

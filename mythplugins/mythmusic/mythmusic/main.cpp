@@ -5,9 +5,9 @@
 #include <unistd.h>
 
 // Qt headers
-#include <qdir.h>
-#include <qapplication.h>
-#include <qregexp.h>
+#include <QDir>
+#include <QApplication>
+#include <QRegExp>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
@@ -15,6 +15,7 @@
 #include <mythtv/mythmediamonitor.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythpluginapi.h>
+#include <mythtv/mythversion.h>
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/compat.h>
 #include <mythtv/libmythui/mythuihelper.h>
@@ -52,9 +53,9 @@ QString chooseCD(void)
 {
     if (gCDdevice.length())
         return gCDdevice;
-        
+
     return MediaMonitor::defaultCDdevice();
-}   
+}
 
 void CheckFreeDBServerFile(void)
 {
@@ -112,7 +113,7 @@ void SavePending(int pending)
         query.bindValue(":DATA", pending);
         query.bindValue(":HOST", gContext->GetHostName());
 
-        query.exec(); 
+        query.exec();
     }
     else if (query.size() == 1)
     {
@@ -128,7 +129,7 @@ void SavePending(int pending)
     }
     else
     {
-        //  correct thor's diabolical plot to 
+        //  correct thor's diabolical plot to
         //  consume all table space
 
         query.prepare("DELETE FROM settings WHERE "
@@ -136,7 +137,7 @@ void SavePending(int pending)
                          "AND hostname = :HOST ;");
         query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
         query.bindValue(":HOST", gContext->GetHostName());
-        query.exec(); 
+        query.exec();
 
         query.prepare("INSERT INTO settings (value,data,hostname) VALUES "
                          "(:LASTPUSH, :DATA, :HOST );");
@@ -310,18 +311,18 @@ void handleMedia(MythMediaDevice *cd)
     // Note that we should deal with other disks that may contain music.
     // e.g. MEDIATYPE_MMUSIC or MEDIATYPE_MIXED
 
-    if (!cd) 
+    if (!cd)
         return;
 
     if (cd->isUsable())
-    { 
+    {
         QString newDevice;
 
-#ifdef Q_OS_MAC 
+#ifdef Q_OS_MAC
         newDevice = cd->getMountPath();
 #else
-        newDevice = cd->getDevicePath(); 
-#endif 
+        newDevice = cd->getDevicePath();
+#endif
 
         if (gCDdevice.length() && gCDdevice != newDevice)
         {
@@ -434,7 +435,7 @@ static void preMusic()
     bool musicdata_exists = false;
     if (count_query.isActive())
     {
-        if(count_query.next() && 
+        if(count_query.next() &&
            0 != count_query.value(0).toInt())
         {
             musicdata_exists = true;

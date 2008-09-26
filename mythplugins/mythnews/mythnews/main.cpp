@@ -9,6 +9,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/mythpluginapi.h>
+#include <mythtv/mythversion.h>
 
 // MythUI headers
 #include <mythtv/libmythui/mythmainwindow.h>

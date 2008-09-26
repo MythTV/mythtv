@@ -16,16 +16,16 @@ using namespace std;
 
 
 // Qt headers
-#include <qapplication.h>
-#include <qfile.h>
-#include <qdir.h>
-#include <qdom.h>
-#include <qimage.h>
+#include <QApplication>
+#include <QFile>
+#include <QDir>
+#include <QDom>
+#include <QImage>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/util.h>
-#include <mythtv/mythcontext.h>
+#include <mythtv/mythversion.h>
 #include <mythtv/exitcodes.h>
 #include <mythtv/libmythdb/mythdb.h>
 #include <mythtv/libmythtv/programinfo.h>

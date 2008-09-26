@@ -20,13 +20,14 @@
  * ============================================================ */
 
 #include <iostream>
+#include <unistd.h>
 
 // QT headers
-#include <qapplication.h>
-#include <unistd.h>
+#include <QApplication>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythversion.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/mythpluginapi.h>
 #include <mythtv/libmythui/myththemedmenu.h>

@@ -1,9 +1,10 @@
-#include <qdir.h>
 #include <iostream>
 using namespace std;
 
-#include <qapplication.h>
 #include <unistd.h>
+
+#include <QDir>
+#include <QApplication>
 
 #include "gamehandler.h"
 #include "rominfo.h"
@@ -13,6 +14,7 @@ using namespace std;
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/mythversion.h>
 #include <mythtv/lcddevice.h>
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/mythpluginapi.h>
@@ -33,15 +35,15 @@ void GameCallback(void *data, QString &selection)
     (void)ddata;
 
     if (sel == "game_settings")
-    {   
+    {
         MythGameGeneralSettings settings;
         settings.exec();
     }
 
     if (sel == "game_players")
     {
-	MythGamePlayerEditor mgpe;
-	mgpe.exec();
+        MythGamePlayerEditor mgpe;
+        mgpe.exec();
     }
     else if (sel == "search_for_games")
     {
@@ -76,8 +78,8 @@ void runMenu(QString which_menu)
     }
     else
     {
-	VERBOSE(VB_GENERAL, LOC_ERR + QString("Couldn't find theme %1")
-			              .arg(themedir));
+        VERBOSE(VB_GENERAL, LOC_ERR + QString("Couldn't find theme %1")
+                                      .arg(themedir));
         delete diag;
     }
 }
@@ -88,10 +90,12 @@ void setupKeys(void)
 {
     REG_JUMP("MythGame", "Game frontend", "", runGames);
 
-    REG_KEY("Game", "TOGGLEFAV", "Toggle the current game as a favorite", 
+    REG_KEY("Game", "TOGGLEFAV",     "Toggle the current game as a favorite",
             "?,/");
-    REG_KEY("Game", "INCSEARCH",     "Show incremental search dialog",     "Ctrl+S");
-    REG_KEY("Game", "INCSEARCHNEXT", "Incremental search find next match", "Ctrl+N");
+    REG_KEY("Game", "INCSEARCH",     "Show incremental search dialog",
+            "Ctrl+S");
+    REG_KEY("Game", "INCSEARCHNEXT", "Incremental search find next match",
+            "Ctrl+N");
 
 }
 

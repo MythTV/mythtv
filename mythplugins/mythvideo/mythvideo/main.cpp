@@ -4,6 +4,7 @@
 
 // myth headers
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythversion.h>
 #include <mythtv/lcddevice.h>
 #include <mythtv/mythpluginapi.h>
 #include <mythtv/mythmediamonitor.h>
