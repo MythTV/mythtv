@@ -25,9 +25,9 @@
 
 LircThread::LircThread(QObject *main_window)
     : QThread(),
-      lircConfig(NULL), mainWindow(main_window),
-      bStop(false),     fd(-1),
-      external_app("")
+      m_lircConfig(NULL), m_mainWindow(main_window),
+      bStop(false),     m_fd(-1),
+      m_externalApp("")
 {
 }
 
@@ -35,8 +35,8 @@ int LircThread::Init(const QString &config_file, const QString &program,
                         bool ignoreExtApp)
 {
     /* Connect the unix socket */
-    fd = lirc_init((char *)qPrintable(program), 1);
-    if (fd == -1)
+    m_fd = lirc_init((char *)qPrintable(program), 1);
+    if (m_fd == -1)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("lirc_init failed for %1, see preceding messages")
@@ -45,7 +45,7 @@ int LircThread::Init(const QString &config_file, const QString &program,
     }
 
     /* parse the config file */
-    if (lirc_readconfig((char *)qPrintable(config_file), &lircConfig, NULL))
+    if (lirc_readconfig((char *)qPrintable(config_file), &m_lircConfig, NULL))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Failed to read lirc config %1 for %2")
@@ -55,7 +55,7 @@ int LircThread::Init(const QString &config_file, const QString &program,
     }
 
     if (!ignoreExtApp)
-        external_app = GetMythDB()->GetSetting("LircKeyPressedApp", "");
+        m_externalApp = GetMythDB()->GetSetting("LircKeyPressedApp", "");
 
     VERBOSE(VB_GENERAL,
             QString("lirc init success using configuration file: %1")
@@ -67,8 +67,8 @@ int LircThread::Init(const QString &config_file, const QString &program,
 LircThread::~LircThread()
 {
     lirc_deinit();
-    if (lircConfig)
-        lirc_freeconfig(lircConfig);
+    if (m_lircConfig)
+        lirc_freeconfig(m_lircConfig);
 }
 
 void LircThread::run(void)
@@ -80,16 +80,16 @@ void LircThread::run(void)
     struct timeval timeout;
 
     /* Process all events read */
-    while (!bStop)
+    while (!m_bStop)
     {
         FD_ZERO(&readfds);
-        FD_SET(fd, &readfds);
+        FD_SET(m_fd, &readfds);
 
         // the maximum time select() should wait
         timeout.tv_sec = 0;
         timeout.tv_usec = 100000;
 
-        ret = select(fd + 1, &readfds, NULL, NULL, &timeout);
+        ret = select(m_fd + 1, &readfds, NULL, NULL, &timeout);
 
         if (ret == 0)
             continue;
@@ -107,15 +107,16 @@ void LircThread::run(void)
             if (ret == -1)
             {
                 if (errno != 0)
-                    VERBOSE(VB_IMPORTANT, QString("LircThread: lirc_nextcode failed"
-                                                  "last error was: %1").arg(errno));
+                    VERBOSE(VB_IMPORTANT,
+                                QString("LircThread: lirc_nextcode failed"
+                                        "last error was: %1").arg(errno));
                 return;
             }
 
             if (!ir)
                 continue;
 
-            while ((ret = lirc_code2char(lircConfig, ir, &code)) == 0 &&
+            while ((ret = lirc_code2char(m_lircConfig, ir, &code)) == 0 &&
                 code != NULL)
             {
                 QKeySequence a(code);
@@ -126,17 +127,20 @@ void LircThread::run(void)
                 // This is done so the main code can output a warning for bad
                 // mappings.
                 if (!a.count())
-                    QApplication::postEvent(mainWindow, new LircKeycodeEvent(code, 
-                                            keycode, true));
+                    QApplication::postEvent(m_mainWindow,
+                                            new LircKeycodeEvent(code, keycode,
+                                                                 true));
 
                 for (unsigned int i = 0; i < a.count(); i++)
                 {
                     keycode = a[i];
 
-                    QApplication::postEvent(mainWindow, new LircKeycodeEvent(code, 
-                                            keycode, true));
-                    QApplication::postEvent(mainWindow, new LircKeycodeEvent(code, 
-                                            keycode, false));
+                    QApplication::postEvent(m_mainWindow,
+                                            new LircKeycodeEvent(code, keycode,
+                                                                 true));
+                    QApplication::postEvent(m_mainWindow,
+                                            new LircKeycodeEvent(code, keycode,
+                                                                 false));
 
                     SpawnApp();
                 }
@@ -149,15 +153,14 @@ void LircThread::run(void)
     }
 }
 
-
 void LircThread::SpawnApp(void)
 {
     // Spawn app to illuminate led (or what ever the user has picked if
     // anything) to give positive feedback that a key was received
-    if (external_app.isEmpty())
+    if (m_externalApp.isEmpty())
         return;
 
-    QString command = external_app + " &";
+    QString command = m_externalApp + " &";
 
     int status = myth_system(command);
 
@@ -168,4 +171,3 @@ void LircThread::SpawnApp(void)
                 .arg(status));
     }
 }
-

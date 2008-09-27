@@ -16,18 +16,18 @@ class MPUBLIC LircThread : public QThread
     ~LircThread();
     int Init(const QString &config_file, const QString &program,
                 bool ignoreExtApp=false);
-    void Stop(void) { bStop = true; }
+    void Stop(void) { m_bStop = true; }
 
   private:
     void run(void);
     void SpawnApp(void);
 
-    struct lirc_config *lircConfig;
-    QObject *mainWindow;
-    volatile bool bStop;
-    int fd;
+    struct lirc_config *m_lircConfig;
+    QObject *m_mainWindow;
+    volatile bool m_bStop;
+    int m_fd;
 
-    QString external_app;
+    QString m_externalApp;
 };
 
 #endif
