@@ -329,6 +329,15 @@ static void init_freq_tables(freq_table_map_t &fmap)
         DTVGuardInterval::kGuardInterval_1_16, DTVHierarchy::kHierarchyNone,
         DTVModulation::kModulationQAM64, 0 , 0); // UHF 21-69
 
+    // france
+    fmap["dvbt_ofdm_fr0"] = new FrequencyTable(
+        474000000, 850000000, 8000000, "" , 0, DTVInversion::kInversionOff,
+        DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        DTVTransmitMode::kTransmissionMode8K,
+        DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulationQAMAuto, 167000, -166000);
+    
 //#define DEBUG_DVB_OFFSETS
 #ifdef DEBUG_DVB_OFFSETS
     // UHF 14-69
