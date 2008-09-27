@@ -1021,7 +1021,8 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
     if (state >= NotChecked)
         m_checkable = true;
 
-    m_parent->InsertItem(this);
+    if (m_parent)
+        m_parent->InsertItem(this);
 }
 
 MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
@@ -1041,7 +1042,8 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
     m_showArrow = false;
     m_overrideInactive = false;
 
-    m_parent->InsertItem(this);
+    if (m_parent)
+        m_parent->InsertItem(this);
 }
 
 MythUIButtonListItem::~MythUIButtonListItem()
@@ -1072,7 +1074,8 @@ void MythUIButtonListItem::setText(const QString &text, const QString &name)
     else
         m_text = text;
 
-    m_parent->Update();
+    if (m_parent)
+        m_parent->Update();
 }
 
 const MythImage* MythUIButtonListItem::image() const
@@ -1103,7 +1106,8 @@ void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
         image->UpRef();
     }
 
-    m_parent->Update();
+    if (m_parent)
+        m_parent->Update();
 }
 
 void MythUIButtonListItem::DisplayState(const QString &state,
@@ -1112,7 +1116,8 @@ void MythUIButtonListItem::DisplayState(const QString &state,
     if (!name.isEmpty())
         m_states.insert(name, state);
 
-    m_parent->Update();
+    if (m_parent)
+        m_parent->Update();
 }
 
 bool MythUIButtonListItem::checkable() const
@@ -1135,7 +1140,8 @@ void MythUIButtonListItem::setChecked(MythUIButtonListItem::CheckState state)
     if (!m_checkable)
         return;
     m_state = state;
-    m_parent->Update();
+    if (m_parent)
+        m_parent->Update();
 }
 
 void MythUIButtonListItem::setCheckable(bool flag)
@@ -1181,11 +1187,17 @@ bool MythUIButtonListItem::getOverrideInactive(void)
 
 bool MythUIButtonListItem::moveUpDown(bool flag)
 {
-    return m_parent->MoveItemUpDown(this, flag);
+    if (m_parent)
+        return m_parent->MoveItemUpDown(this, flag);
+    else
+        return false;
 }
 
 void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_on)
 {
+    if (!m_parent)
+        return;
+
     if (this == m_parent->m_selItem)
     {
         if (m_parent->m_active && !m_overrideInactive && active_on)
