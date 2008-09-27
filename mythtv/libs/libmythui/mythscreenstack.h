@@ -33,14 +33,14 @@ class MythScreenStack : public QObject
     QVector<MythScreenType *> m_Children;
     QVector<MythScreenType *> m_DrawOrder;
 
-    MythScreenType *topScreen;
+    MythScreenType *m_topScreen;
 
     bool m_DoTransitions;
     bool m_InNewTransition;
-    MythScreenType *newTop;
+    MythScreenType *m_newTop;
 
     QVector<MythScreenType *> m_ToDelete;
 };
-  
+
 #endif
-  
+
