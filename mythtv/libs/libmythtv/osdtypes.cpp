@@ -21,7 +21,7 @@ using namespace std;
 
 #ifdef USING_FRIBIDI
     #include "fribidi/fribidi.h"
-    #include <qtextcodec.h> 
+    #include <QTextCodec>
 #endif // USING_FRIBIDI
 
 /// Shared OSD image cache
@@ -850,7 +850,7 @@ QString OSDTypeText::ConvertFromRtoL(const QString &text) const
     if (!codeci)
         return output;
 
-    QCString temp = codeci->fromUnicode(output);
+    QByteArray temp = codeci->fromUnicode(output);
 
     FriBidiCharType base;
     size_t len;
@@ -858,19 +858,20 @@ QString OSDTypeText::ConvertFromRtoL(const QString &text) const
     bool fribidi_flip_commas = true;
     base = (fribidi_flip_commas) ? FRIBIDI_TYPE_ON : FRIBIDI_TYPE_L;
 
-    const char *ip = temp;
-    FriBidiChar logical[strlen(ip) + 1], visual[strlen(ip) + 1];
+    std::vector<FriBidiChar> logical(temp.length() + 1);
+    std::vector<FriBidiChar> visual(temp.length() + 1);
 
     int char_set_num = fribidi_parse_charset("UTF-8");
 
-    len = fribidi_charset_to_unicode(
-        (FriBidiCharSet) char_set_num, ip, strlen(ip), logical);
+    len = fribidi_charset_to_unicode((FriBidiCharSet) char_set_num,
+                                     temp.constData(), temp.length(),
+                                     &logical[0]);
 
-    bool log2vis = fribidi_log2vis(
-        logical, len, &base, visual, NULL, NULL, NULL); // output
+    bool log2vis = fribidi_log2vis(&logical[0], len, &base, &visual[0], NULL,
+                                   NULL, NULL); // output
 
     if (log2vis)
-        len = fribidi_remove_bidi_marks(visual, len, NULL, NULL, NULL);
+        len = fribidi_remove_bidi_marks(&visual[0], len, NULL, NULL, NULL);
  
     output = "";
     for (size_t i = 0; i < len ; i++)
