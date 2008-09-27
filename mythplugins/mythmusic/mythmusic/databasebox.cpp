@@ -33,7 +33,7 @@ using namespace std;
 #endif
 
 DatabaseBox::DatabaseBox(MythMainWindow *parent,
-                         const QString dev, const QString &window_name, 
+                         const QString dev, const QString &window_name,
                          const QString &theme_filename, const char *name)
            : MythThemedDialog(parent, window_name, theme_filename, name)
 {
@@ -56,7 +56,7 @@ DatabaseBox::DatabaseBox(MythMainWindow *parent,
 
     active_popup = NULL;
     active_pl_edit = NULL;
- 
+
     playlist_popup = NULL;
 
     cditem = NULL;
@@ -123,7 +123,7 @@ DatabaseBox::DatabaseBox(MythMainWindow *parent,
     cd_reader_thread = NULL;
     if (cd_checking_flag)
     {
-        // Start the CD checking thread, and set up a timer to make it check 
+        // Start the CD checking thread, and set up a timer to make it check
         // occasionally
 
         cd_reader_thread = new ReadCDThread(m_CDdevice);
@@ -138,7 +138,7 @@ DatabaseBox::DatabaseBox(MythMainWindow *parent,
         cd_watcher->start(1000); // Every second?
     }
 
-    // Set a timer to keep redoing the fillList stuff until the metadata and 
+    // Set a timer to keep redoing the fillList stuff until the metadata and
     // playlist loading threads are done
 
     wait_counter = 0;
@@ -164,6 +164,7 @@ DatabaseBox::~DatabaseBox()
     gMusicData->all_music->resetListings();
 
     gMusicData->all_playlists->getActive()->removeAllWidgets();
+    gMusicData->all_playlists->getActive()->fillSonglistFromSongs();
 
     if (class LCD * lcd = LCD::Get())
         lcd->switchToTime();
@@ -180,7 +181,7 @@ void DatabaseBox::showWaiting()
     if (wait_counter > 10)
     {
         wait_counter = 0;
-        ++numb_wait_dots; 
+        ++numb_wait_dots;
         if (numb_wait_dots > 3)
             numb_wait_dots = 1;
 
@@ -191,7 +192,7 @@ void DatabaseBox::showWaiting()
             // Set Loading Message on the LCD
             QList<LCDTextItem> textItems;
 
-            textItems.append(LCDTextItem(1, ALIGN_CENTERED, 
+            textItems.append(LCDTextItem(1, ALIGN_CENTERED,
                              tr("Loading Music Data"), "Generic", false));
             lcd->switchToGeneric(textItems);
         }
@@ -228,7 +229,7 @@ void DatabaseBox::keepFilling()
             showWaiting();
     }
     else
-        showWaiting(); 
+        showWaiting();
 }
 
 void DatabaseBox::occasionallyCheckCD()
@@ -277,7 +278,7 @@ void DatabaseBox::renamePlaylist()
 {
     if (!playlist_popup)
         return;
- 
+
     if (playlist_rename->text().length() < 1)
     {
         closePlaylistPopup();
@@ -285,15 +286,15 @@ void DatabaseBox::renamePlaylist()
     }
 
     UIListGenericTree *item = tree->GetCurrentPosition();
-    
+
     if (TreeCheckItem *rename_item = dynamic_cast<TreeCheckItem*>(item) )
     {
         if (rename_item->getID() < 0)
         {
-            if (gMusicData->all_playlists->nameIsUnique(playlist_rename->text(), 
+            if (gMusicData->all_playlists->nameIsUnique(playlist_rename->text(),
                                             rename_item->getID() * -1))
             {
-                gMusicData->all_playlists->renamePlaylist(rename_item->getID() * -1, 
+                gMusicData->all_playlists->renamePlaylist(rename_item->getID() * -1,
                                               playlist_rename->text());
                 rename_item->setText(playlist_rename->text());
                 tree->Redraw();
@@ -415,14 +416,14 @@ void DatabaseBox::BlankCDRW()
     closeActivePopup();
 
     // Check & get global settings
-    if (!gContext->GetNumSetting("CDWriterEnabled")) 
+    if (!gContext->GetNumSetting("CDWriterEnabled"))
     {
         VERBOSE(VB_GENERAL, "Writer is not enabled. We cannot be here!");
         return;
     }
 
     QString scsidev = gContext->GetSetting("CDWriterDevice");
-    if (scsidev.length()==0) 
+    if (scsidev.length()==0)
     {
         VERBOSE(VB_GENERAL, "We don't have SCSI devices");
         return;
@@ -456,9 +457,9 @@ void DatabaseBox::deletePlaylist()
 
     //  Delete currently selected
 
-    closePlaylistPopup(); 
+    closePlaylistPopup();
 
-    UIListGenericTree *item = tree->GetCurrentPosition(); 
+    UIListGenericTree *item = tree->GetCurrentPosition();
 
     if (TreeCheckItem *check_item = dynamic_cast<TreeCheckItem*>(item) )
     {
@@ -527,28 +528,28 @@ void DatabaseBox::fillCD(void)
                 tree->MoveLeft();
         }
 
-        // Delete anything that might be there  
+        // Delete anything that might be there
 
         while (cditem->childCount())
         {
-            CDCheckItem *track_ptr = 
+            CDCheckItem *track_ptr =
                 static_cast<CDCheckItem*>(cditem->getChildAt(0));
             track_ptr->RemoveFromParent();
         }
-    
+
         // Put on whatever all_music tells us is there
-    
+
         cditem->setText(gMusicData->all_music->getCDTitle());
         cditem->setCheck(0);
         cditem->setCheckable(false);
 
         gMusicData->all_music->putCDOnTheListView(cditem);
-        
+
         //  reflect selections in cd playlist
 
         Q3PtrListIterator<GenericTree> it = cditem->getFirstChildIterator();
         UIListGenericTree *uit;
-                
+
         while ((uit = (UIListGenericTree *)it.current()))
         {
             if (CDCheckItem *track_ptr = dynamic_cast<CDCheckItem*>(uit))
@@ -561,7 +562,7 @@ void DatabaseBox::fillCD(void)
         }
 
         // Can't check what ain't there
-    
+
         if (cditem->childCount() > 0)
         {
             cditem->setCheckable(true);
@@ -597,7 +598,7 @@ void DatabaseBox::alternateDoMenus(UIListGenericTree *item, int keypad_number)
         {
             int a_number = item->getParent()->childCount();
             a_number = (int)(a_number * ( keypad_number / 10.0));
-           
+
             tree->MoveUp(UIListTreeType::MoveMax);
             tree->MoveDown(a_number);
         }
@@ -618,7 +619,7 @@ void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
 
     TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item);
 
-    if (item_ptr 
+    if (item_ptr
         && item->childCount() == 0
         && item_ptr->getLevel() == "title")
     {
@@ -631,7 +632,7 @@ void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
             if (!mdata)
                 return;
         }
-        else 
+        else
         {
             // Need to allocate storage for CD Metadata
             mdata = new Metadata;
@@ -713,8 +714,8 @@ void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
     int dispat = 0;
     QString data = "";
 
-    for (QStringList::Iterator it = pathto.begin(); 
-         it != pathto.end(); ++it) 
+    for (QStringList::Iterator it = pathto.begin();
+         it != pathto.end(); ++it)
     {
         if (it == pathto.begin())
             continue;
@@ -742,21 +743,21 @@ void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
         if (m_lines.at(dispat))
         {
             m_lines.at(dispat)->SetText(data);
-        } 
+        }
         dispat++;
     }
 
     for (unsigned int i = dispat; i < m_lines.count(); i++)
         m_lines.at(i)->SetText("");
 }
-    
+
 void DatabaseBox::selected(UIListGenericTree *item)
 {
     if (!item)
         return;
 
-    UIListGenericTree *parent = (UIListGenericTree *)item->getParent(); 
-    
+    UIListGenericTree *parent = (UIListGenericTree *)item->getParent();
+
     if (CDCheckItem *item_ptr = dynamic_cast<CDCheckItem*>(item))
     {
         // Something to do with a CD
@@ -771,7 +772,7 @@ void DatabaseBox::selected(UIListGenericTree *item)
                 checkParent(item_ptr);
             tree->Redraw();
         }
-        
+
     }
     else if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item))
     {
@@ -786,7 +787,7 @@ void DatabaseBox::selected(UIListGenericTree *item)
                 checkParent(item_ptr);
             tree->Redraw();
         }
-    } 
+    }
     else if (PlaylistItem *item_ptr = dynamic_cast<PlaylistTrack*>(item))
         dealWithTracks(item_ptr);
     else if (PlaylistTitle *item_ptr = dynamic_cast<PlaylistTitle*>(item))
@@ -805,13 +806,13 @@ void DatabaseBox::doPlaylistPopup(TreeCheckItem *item_ptr)
         return;
 
     // Popup for all other playlists (up top)
-    playlist_popup = new MythPopupBox(gContext->GetMainWindow(), 
+    playlist_popup = new MythPopupBox(gContext->GetMainWindow(),
                                       "playlist_popup");
 
     QAbstractButton *mac_b = playlist_popup->addButton(tr("Move to Active Play Queue"),
                                                this, SLOT(copyToActive()));
 
-    playlist_popup->addButton(tr("Delete This Playlist"), this, 
+    playlist_popup->addButton(tr("Delete This Playlist"), this,
                               SLOT(deletePlaylist()));
 
     playlist_rename = new MythRemoteLineEdit(playlist_popup);
@@ -848,20 +849,20 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
     active_popup->addWidget(active_pl_edit);
     active_pl_edit->setFocus();
 
-    active_popup->addButton(tr("Copy To New Playlist"), this, 
+    active_popup->addButton(tr("Copy To New Playlist"), this,
                             SLOT(copyNewPlaylist()));
 
-    active_popup->addButton(tr("Clear the Active Play Queue"), this, 
+    active_popup->addButton(tr("Clear the Active Play Queue"), this,
                             SLOT(clearActive()));
 
-    QAbstractButton *pb = active_popup->addButton(tr("Save Back to Playlist Tree"), 
+    QAbstractButton *pb = active_popup->addButton(tr("Save Back to Playlist Tree"),
                                           this, SLOT(popBackPlaylist()));
 
     // CD writing
-    
+
     bool cdwriter = false;
 
-    if (gContext->GetNumSetting("CDWriterEnabled")) 
+    if (gContext->GetNumSetting("CDWriterEnabled"))
     {
         QString scsidev = gContext->GetSetting("CDWriterDevice");
         if (!scsidev.isEmpty() && !scsidev.isNull())
@@ -898,12 +899,12 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
         double max_size_in_MB;
         double max_size_in_min;
 
-        if (disksize == 1) 
+        if (disksize == 1)
         {
             max_size_in_MB = 650;
             max_size_in_min = 75;
-        } 
-        else 
+        }
+        else
         {
             max_size_in_MB = 700;
             max_size_in_min = 80;
@@ -917,7 +918,7 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
 
         label1.sprintf("Size: %dMB (%02d%%)", (int)(size_in_MB),
                        (int)(ratio_MB));
-        label2.sprintf("Duration: %3dmin (%02d%%)", 
+        label2.sprintf("Duration: %3dmin (%02d%%)",
                        (int)(size_in_sec / 60.0 / 1000.0), (int)(ratio_sec));
 
         active_popup->addLabel(label1);
@@ -931,9 +932,9 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
             cdaudiob->setEnabled(false);
         }
     }
- 
+
     (void)item_ptr;
-  
+
     active_pl_edit->setText("");
 
     active_popup->ShowPopup(this, SLOT(closeActivePopup()));
@@ -957,7 +958,7 @@ void DatabaseBox::closeActivePopup(void)
 void DatabaseBox::dealWithTracks(PlaylistItem *item_ptr)
 {
     // Logic to handle the start of moving/deleting songs from playlist
-    
+
     if (holding_track)
     {
         VERBOSE(VB_IMPORTANT, "dealWithTracks() - Holding track. This is not "
@@ -998,7 +999,7 @@ void DatabaseBox::doSelected(UIListGenericTree *item, bool cd_flag)
     {
         Q3PtrListIterator<GenericTree> it = tcitem->getFirstChildIterator();
         TreeCheckItem *child;
-        while ((child = (TreeCheckItem *)it.current())) 
+        while ((child = (TreeCheckItem *)it.current()))
         {
             if (child->getCheck() != tcitem->getCheck())
             {
@@ -1008,7 +1009,7 @@ void DatabaseBox::doSelected(UIListGenericTree *item, bool cd_flag)
             ++it;
         }
     }
-    else 
+    else
     {
         if (tcitem->getCheck() == 2)
             active_playlist->addTrack(tcitem->getID(), true, cd_flag);
@@ -1134,7 +1135,7 @@ void DatabaseBox::deleteTrack(UIListGenericTree *item)
 
 void DatabaseBox::moveHeldUpDown(bool flag)
 {
-    track_held->moveUpDown(flag);  
+    track_held->moveUpDown(flag);
     tree->RedrawCurrent();
     //XXX listview->ensureItemVisible(track_held);
     //XXX listview->setCurrentItem(track_held);
@@ -1234,7 +1235,7 @@ void DatabaseBox::checkTree(UIListGenericTree *startingpoint)
     Q3PtrListIterator<GenericTree> it = startingpoint->getFirstChildIterator();
     UIListGenericTree *uit;
 
-    // Using the current playlist metadata, check the boxes on the ListView 
+    // Using the current playlist metadata, check the boxes on the ListView
     // tree appropriately.
 
     while ((uit = (UIListGenericTree *)it.current()))
@@ -1302,7 +1303,7 @@ void ReadCDThread::run()
     }
     else if (tracknum > 0)
     {
-        // Check the last track to see if it's differen than whatever it was 
+        // Check the last track to see if it's differen than whatever it was
         // before
         Metadata *checker = decoder->getLastMetadata();
         if (checker)
@@ -1328,7 +1329,7 @@ void ReadCDThread::run()
     int tracks = decoder->getNumTracks();
     bool setTitle = false;
 
-    for (int actual_tracknum = 1; 
+    for (int actual_tracknum = 1;
          redo && actual_tracknum <= tracks; actual_tracknum++)
     {
         Metadata *track = decoder->getMetadata(actual_tracknum);
@@ -1338,12 +1339,12 @@ void ReadCDThread::run()
 
             if (!setTitle)
             {
-            
+
                 QString parenttitle = " ";
                 if (track->FormatArtist().length() > 0)
                 {
                     parenttitle += track->FormatArtist();
-                    parenttitle += " ~ "; 
+                    parenttitle += " ~ ";
                 }
 
                 if (track->Album().length() > 0)
