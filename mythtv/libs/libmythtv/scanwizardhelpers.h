@@ -104,7 +104,7 @@ class ScannerEvent : public QEvent
     friend class QObject; // quiet OSX gcc warning
 
   public:
-    enum TYPE 
+    enum TYPE
     {
         ScanComplete,
         ScanShutdown,
@@ -221,6 +221,7 @@ class ScanCountry : public ComboBoxSetting, public TransientStorage
         DE,
         ES,
         NZ,
+        FR,
     };
 
     ScanCountry();
@@ -263,7 +264,7 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
     uint    hw_cardid;
 };
 
-class ScanOptionalConfig : public TriggeredConfigurationGroup 
+class ScanOptionalConfig : public TriggeredConfigurationGroup
 {
     Q_OBJECT
 
@@ -681,7 +682,7 @@ class OFDMPane : public HorizontalConfigurationGroup
 class DVBS2Pane : public HorizontalConfigurationGroup
 {
   public:
-    DVBS2Pane() : HorizontalConfigurationGroup(false,false,true,false) 
+    DVBS2Pane() : HorizontalConfigurationGroup(false,false,true,false)
     {
         setUseFrame(false);
         VerticalConfigurationGroup *left =
@@ -695,7 +696,7 @@ class DVBS2Pane : public HorizontalConfigurationGroup
         right->addChild(pmodulation = new ScanModulation());
         right->addChild(pinversion  = new ScanInversion());
         addChild(left);
-        addChild(right);     
+        addChild(right);
     }
 
     QString frequency(void)  const { return pfrequency->getValue();  }
@@ -730,7 +731,7 @@ class QPSKPane : public HorizontalConfigurationGroup
         right->addChild(pfec       = new ScanFec());
         right->addChild(pinversion = new ScanInversion());
         addChild(left);
-        addChild(right);     
+        addChild(right);
     }
 
     QString frequency(void)  const { return pfrequency->getValue();  }
@@ -763,7 +764,7 @@ class QAMPane : public HorizontalConfigurationGroup
         right->addChild(pmodulation = new ScanModulation());
         right->addChild(pfec        = new ScanFec());
         addChild(left);
-        addChild(right);     
+        addChild(right);
     }
 
     QString frequency(void)  const { return pfrequency->getValue();  }
