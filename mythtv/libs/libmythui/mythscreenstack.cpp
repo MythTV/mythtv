@@ -66,36 +66,46 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
     m_topScreen = screen;
 }
 
-void MythScreenStack::PopScreen(bool allowFade, bool deleteScreen)
+void MythScreenStack::PopScreen(bool allowFade,
+                                bool deleteScreen)
 {
-    if (m_Children.isEmpty())
+    PopScreen(m_topScreen, allowFade, deleteScreen);
+}
+
+void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
+                                bool deleteScreen)
+{
+    if (!screen || screen->IsDeleting())
         return;
 
-    MythScreenType *top = m_topScreen;
-
-    if (!top || top->IsDeleting())
+    if (m_Children.isEmpty())
         return;
 
     MythMainWindow *mainwindow = GetMythMainWindow();
 
-    top->setParent(0);
-    if (allowFade && m_DoTransitions && !mainwindow->IsExitingToMain())
+    screen->setParent(0);
+    if ((screen == m_topScreen) && allowFade && m_DoTransitions
+        && !mainwindow->IsExitingToMain())
     {
-        top->SetFullscreen(false);
+        screen->SetFullscreen(false);
         if (deleteScreen)
         {
-            top->SetDeleting(true);
-            m_ToDelete.push_back(top);
+            screen->SetDeleting(true);
+            m_ToDelete.push_back(screen);
         }
-        top->AdjustAlpha(1, -kFadeVal);
+        screen->AdjustAlpha(1, -kFadeVal);
     }
     else
     {
-        m_Children.pop_back();
+        for (int i = 0; i < m_Children.size(); ++i)
+        {
+            if (m_Children.at(i) == screen)
+                m_Children.remove(i);
+        }
         if (deleteScreen)
-            delete top;
+            delete screen;
 
-        top = NULL;
+        screen = NULL;
 
         mainwindow->update();
         if (mainwindow->IsExitingToMain())
@@ -107,15 +117,15 @@ void MythScreenStack::PopScreen(bool allowFade, bool deleteScreen)
     RecalculateDrawOrder();
 
     // If we're fading it, we still want to draw it.
-    if (top)
-        m_DrawOrder.push_back(top);
+    if (screen)
+        m_DrawOrder.push_back(screen);
 
     if (!m_Children.isEmpty())
     {
         QVector<MythScreenType *>::Iterator it;
         for (it = m_DrawOrder.begin(); it != m_DrawOrder.end(); ++it)
         {
-            if (*it != top && !(*it)->IsDeleting())
+            if (*it != screen && !(*it)->IsDeleting())
             {
                 m_topScreen = (*it);
                 (*it)->SetAlpha(255);

@@ -16,6 +16,8 @@ class MythScreenStack : public QObject
 
     void AddScreen(MythScreenType *screen, bool allowFade = true);
     void PopScreen(bool allowFade = true, bool deleteScreen = true);
+    void PopScreen(MythScreenType *screen, bool allowFade = true,
+                   bool deleteScreen = true);
 
     MythScreenType *GetTopScreen(void);
 

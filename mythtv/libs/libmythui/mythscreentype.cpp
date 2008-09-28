@@ -186,7 +186,7 @@ bool MythScreenType::Create(void)
 
 void MythScreenType::Close(void)
 {
-    GetScreenStack()->PopScreen();
+    GetScreenStack()->PopScreen(this);
 }
 
 bool MythScreenType::keyPressEvent(QKeyEvent *event)
