@@ -48,7 +48,7 @@ $| = 1; # autoflush stdout;
                           # (included below). This is the last version that is
                           # Qt 3 based. Qt 4 merges began immediately after.
 #my $SVNRELEASE = '17190'; # Recent 0-21-fixes
-my $SVNRELEASE = '18315'; # Recent trunk
+my $SVNRELEASE = '18442'; # Recent trunk
 #my $SVNRELEASE = 'HEAD'; # If you are game, go forth and test the latest!
 
 
@@ -1327,7 +1327,8 @@ push @{$expect},
   shell => ['source '.$unixmythtv.'make_clean.sh',
             'touch '.$unixmythtv.'mythtv/last_build.txt',
             'cat '.$unixmythtv.'mythtv/svn_info.new >'.$unixmythtv.'mythtv/svn_info.txt',
-            'touch -r '.$unixmythtv.'mythtv/svn_info.txt '.$unixmythtv.'mythtv/svn_info.new'], 
+            'touch -r '.$unixmythtv.'mythtv/svn_info.txt '.$unixmythtv.'mythtv/svn_info.new',
+            'sleep 5'], 
   comment => 'if the SVN number is changed, then remember that, AND arrange for a full re-make of mythtv. (overkill, I know, but safer)' ], 
 
 # open up the permissions:
@@ -1747,7 +1748,8 @@ push @{$expect},
              ' --disable-mythcontrols'.
              ' --disable-mythzoneminder --disable-mythweb --enable-aac'.
              ' --enable-libvisual --enable-fftw --compile-type='.$compile_type,
-             'touch '.$unixmythtv.'mythplugins/cleanup/cleanup.pro'], 
+             #'touch '.$unixmythtv.'mythplugins/cleanup/cleanup.pro'
+             ], 
   comment => 'do we already have a Makefile for myth plugins?' ],
   
 #[ pause => 'how does the mythplugins Makefile look? (did we get any errors on screen?)'],
@@ -1772,12 +1774,12 @@ push @{$expect},
 comment => 'PLUGINS! redo make if we need to (see the  last_build.txt identifier)' ],
 
 # make cleanup/cleanup.pro as install fails without it
-[ file    => $mythtv.'mythplugins/cleanup/cleanup.pro', 
-  shell   => ['touch '.$unixmythtv.'mythplugins/cleanup/cleanup.pro', 'nocheck'], 
-  comment => 'make cleanup.pro'],
+#[ file    => $mythtv.'mythplugins/cleanup/cleanup.pro', 
+#  shell   => ['touch '.$unixmythtv.'mythplugins/cleanup/cleanup.pro', 'nocheck'], 
+#  comment => 'make cleanup.pro'],
 
 # make install
-[ newer => [$mythtv.'build/lib/mythtv/plugins/libmythmovies.dll',
+[ newer => [$mythtv.'build/bin/mythtv/plugins/libmythmovies.dll',
             $mythtv.'mythplugins/mythmovies/mythmovies/libmythmovies.dll'],
   shell => ['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
             'cd '.$unixmythtv.'mythplugins','make install'],
@@ -2238,6 +2240,7 @@ sub fileinfo {
         	$md5=rand(999);
         }
 		
+		   #print "compared: $size,$mtime,$md5\n";
 		   return ($size,$mtime,$md5);
 	}
 
