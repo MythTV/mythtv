@@ -26,7 +26,7 @@
 LircThread::LircThread(QObject *main_window)
     : QThread(),
       m_lircConfig(NULL), m_mainWindow(main_window),
-      bStop(false),     m_fd(-1),
+      m_bStop(false),     m_fd(-1),
       m_externalApp("")
 {
 }
