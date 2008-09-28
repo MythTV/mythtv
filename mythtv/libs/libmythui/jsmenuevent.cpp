@@ -9,8 +9,8 @@
 
 #include "jsmenuevent.h"
 
-JoystickMenuEventLock::JoystickMenuEventLock(bool lock_events) 
-             : events_locked(false)
+JoystickMenuEventLock::JoystickMenuEventLock(bool lock_events)
+             : m_eventsLocked(false)
 {
     if (lock_events)
         lock();
@@ -18,7 +18,7 @@ JoystickMenuEventLock::JoystickMenuEventLock(bool lock_events)
 
 JoystickMenuEventLock::~JoystickMenuEventLock()
 {
-    if (events_locked)
+    if (m_eventsLocked)
         unlock();
 }
 
@@ -27,9 +27,9 @@ void JoystickMenuEventLock::lock()
     MythMainWindow *mw = GetMythMainWindow();
     if (mw)
     {
-        events_locked = true;
+        m_eventsLocked = true;
         QApplication::postEvent((QObject *)mw,
-                                new JoystickMenuMuteEvent(events_locked));
+                                new JoystickMenuMuteEvent(m_eventsLocked));
     }
 }
 
@@ -38,8 +38,8 @@ void JoystickMenuEventLock::unlock()
     MythMainWindow *mw = GetMythMainWindow();
     if (mw)
     {
-        events_locked = false;
+        m_eventsLocked = false;
         QApplication::postEvent((QObject *)mw,
-                                new JoystickMenuMuteEvent(events_locked));
+                                new JoystickMenuMuteEvent(m_eventsLocked));
     }
 }

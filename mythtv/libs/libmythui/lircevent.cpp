@@ -4,8 +4,8 @@
 #include "mythmainwindow.h"
 #include "lircevent.h"
 
-LircEventLock::LircEventLock(bool lock_events) 
-             : events_locked(false)
+LircEventLock::LircEventLock(bool lock_events)
+             : m_eventsLocked(false)
 {
     if (lock_events)
         lock();
@@ -13,7 +13,7 @@ LircEventLock::LircEventLock(bool lock_events)
 
 LircEventLock::~LircEventLock()
 {
-    if (events_locked)
+    if (m_eventsLocked)
         unlock();
 }
 
@@ -22,9 +22,9 @@ void LircEventLock::lock()
     MythMainWindow *mw = GetMythMainWindow();
     if (mw)
     {
-        events_locked = true;
+        m_eventsLocked = true;
         QApplication::postEvent((QObject *)mw,
-                                new LircMuteEvent(events_locked));
+                                new LircMuteEvent(m_eventsLocked));
     }
 }
 
@@ -33,8 +33,8 @@ void LircEventLock::unlock()
     MythMainWindow *mw = GetMythMainWindow();
     if (mw)
     {
-        events_locked = false;
+        m_eventsLocked = false;
         QApplication::postEvent((QObject *)mw,
-                                new LircMuteEvent(events_locked));
+                                new LircMuteEvent(m_eventsLocked));
     }
 }

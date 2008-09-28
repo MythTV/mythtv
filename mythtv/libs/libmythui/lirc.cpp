@@ -16,13 +16,6 @@
 #include "lirc.h"
 #include "lircevent.h"
 
-/** \class LircThread
- *  \brief Interface between mythtv and lircd
- *
- *   Create connection to the lircd daemon and translate remote keypresses
- *   into custom events which are posted to the mainwindow.
- */
-
 LircThread::LircThread(QObject *main_window)
     : QThread(),
       m_lircConfig(NULL), m_mainWindow(main_window),
@@ -31,6 +24,10 @@ LircThread::LircThread(QObject *main_window)
 {
 }
 
+/**
+ *  \brief Initialise the class variables, read the lirc config and user
+ *         settings
+ */
 int LircThread::Init(const QString &config_file, const QString &program,
                         bool ignoreExtApp)
 {
@@ -71,6 +68,9 @@ LircThread::~LircThread()
         lirc_freeconfig(m_lircConfig);
 }
 
+/**
+ *  \brief Main thread loop
+ */
 void LircThread::run(void)
 {
     char *code = 0;
@@ -153,10 +153,12 @@ void LircThread::run(void)
     }
 }
 
+/**
+ *  \brief Spawn a user defined application which might do something like
+ *         illuminating an led to give positive feedback that a key was received
+ */
 void LircThread::SpawnApp(void)
 {
-    // Spawn app to illuminate led (or what ever the user has picked if
-    // anything) to give positive feedback that a key was received
     if (m_externalApp.isEmpty())
         return;
 

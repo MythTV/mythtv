@@ -6,33 +6,24 @@
 #ifndef JSMENU_H_
 #define JSMENU_H_
 
+// C++ headers
 #include <vector>
 using namespace std;
 
+// QT headers
 #include <QObject>
 #include <QString>
 #include <QThread>
+
+// Myth headers
 #include "mythexp.h"
 
-/*----------------------------------------------------------------------------
-** JoystickMap related information
-**  We build a map of how joystick buttons and axes (axes are for sticks
-** and thumb controllers) are mapped into keystrokes.
-**  For buttons, it's mostly very simple:  joystick button number 
-** corresponds to a key sequence that is sent to MythTV.
-**  We complicate it a little by allowing for 'chords', which
-** means that if you hold down the 'chord' button while pressing
-** the other button, we use the alternate mapping
-**  For axes, it's not very complicated.  For each axis (ie up/down or
-** left/right), we define a range; the first time the joystick moves
-** into that range, we send the assigned keystring.  
-**--------------------------------------------------------------------------*/
 typedef struct
 {
     int button;
     QString keystring;
     int chord;
-}  button_map_type;
+}  buttonMapType;
 
 typedef struct
 {
@@ -40,32 +31,53 @@ typedef struct
     int from;
     int to;
     QString keystring;
-} axis_map_type;
+} axisMapType;
 
+/**
+ *  \class JoystickMap
+ *
+ *  \brief Holds the buttonMapType and axisMapType structs which map actions
+ *         to events.
+ *
+ *  We build a map of how joystick buttons and axes (axes are for sticks
+ *  and thumb controllers) are mapped into keystrokes.
+ *  For buttons, it's mostly very simple:  joystick button number
+ *  corresponds to a key sequence that is sent to MythTV.
+ *  We complicate it a little by allowing for 'chords', which
+ *  means that if you hold down the 'chord' button while pressing
+ *  the other button, we use the alternate mapping
+ *  For axes, it's not very complicated.  For each axis (ie up/down or
+ *  left/right), we define a range; the first time the joystick moves
+ *  into that range, we send the assigned keystring.
+ *
+ */
 class JoystickMap
 {
     public:
         void AddButton(int in_button, QString in_keystr, int in_chord = -1)
         {
-            button_map_type new_button = { in_button, in_keystr, in_chord };
-            button_map.push_back(new_button);
+            buttonMapType new_button = { in_button, in_keystr, in_chord };
+            m_buttonMap.push_back(new_button);
         }
 
         void AddAxis(int in_axis, int in_from, int in_to, QString in_keystr)
         {
-            axis_map_type new_axis = { in_axis, in_from, in_to, in_keystr};
-            axis_map.push_back(new_axis);
+            axisMapType new_axis = { in_axis, in_from, in_to, in_keystr};
+            m_axisMap.push_back(new_axis);
         }
 
+        vector<buttonMapType> buttonMap(void) { return m_buttonMap; }
+        vector<axisMapType> axisMap(void) { return m_axisMap; }
 
-        vector<button_map_type> button_map;
-        vector<axis_map_type> axis_map;
+        vector<buttonMapType> m_buttonMap;
+        vector<axisMapType> m_axisMap;
 };
 
-/*----------------------------------------------------------------------------
-** JoystickMenuThread
-**  Main object for injecting key strokes based on joystick movements
-**--------------------------------------------------------------------------*/
+/**
+ *  \class JoystickMenuThread
+ *
+ *  \brief Main object for injecting key strokes based on joystick movements
+ */
 class MPUBLIC JoystickMenuThread : public QThread
 {
   public:
@@ -77,30 +89,32 @@ class MPUBLIC JoystickMenuThread : public QThread
     void AxisChange(int axis, int value);
     void EmitKey(QString code);
     int  ReadConfig(QString config_file);
-    void Stop(void) { bStop = true; }
+    void Stop(void) { m_bStop = true; }
 
   private:
     void run(void);
 
-    QObject *mainWindow;
+    QObject *m_mainWindow;
+    QString m_devicename;
+    int m_fd;
+    JoystickMap m_map;
 
-    QString devicename;
+    /**
+     * Track the status of the joystick buttons as we do depend slightly on
+     * state
+     */
+    unsigned char m_buttonCount;
 
-    int fd;
+    /**
+     * Track the status of the joystick axes as we do depend slightly on
+     * state
+     */
+    unsigned char m_axesCount;
 
-    JoystickMap map;
+    int *m_buttons;
+    int *m_axes;
 
-    /*------------------------------------------------------------------------
-    ** These two arrays and their related counts track the status of the
-    **   joystick buttons and axes, as we do depend slightly on state
-    **----------------------------------------------------------------------*/
-    unsigned char button_count;
-    unsigned char axes_count;
-
-    int *buttons;
-    int *axes;
-
-    volatile bool bStop;
+    volatile bool m_bStop;
 };
 
 #endif

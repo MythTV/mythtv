@@ -15,44 +15,33 @@ const int kJoystickMuteEventType = 24426;
 class JoystickKeycodeEvent : public QEvent
 {
   public:
-    JoystickKeycodeEvent(const QString &jsmenuevent_text, int key_code, bool key_down) :
-            QEvent((QEvent::Type)kJoystickKeycodeEventType), jsmenueventtext(jsmenuevent_text),
-            keycode(key_code), keydown(key_down) {}
+    JoystickKeycodeEvent(const QString &jsmenuevent_text, int key_code,
+                         bool key_down) :
+                         QEvent((QEvent::Type)kJoystickKeycodeEventType),
+                            m_jsmenueventtext(jsmenuevent_text),
+                            m_keycode(key_code), m_keydown(key_down) {}
 
-    QString getJoystickMenuText()
-    {
-        return jsmenueventtext;
-    }
-
-    int getKeycode()
-    {
-        return keycode;
-    }
-
-    bool isKeyDown()
-    {
-        return keydown;
-    }
+    QString getJoystickMenuText() const { return m_jsmenueventtext; }
+    int getKeycode() const { return m_keycode; }
+    bool isKeyDown() const { return m_keydown; }
 
   private:
-    QString jsmenueventtext;
-    int keycode;
-    bool keydown;
+    QString m_jsmenueventtext;
+    int m_keycode;
+    bool m_keydown;
 };
 
 class JoystickMenuMuteEvent : public QEvent
 {
   public:
-    JoystickMenuMuteEvent(bool mute_events) : QEvent((QEvent::Type)kJoystickMuteEventType),
-            mute_jsmenu_events(mute_events) {}
+    JoystickMenuMuteEvent(bool mute_events) :
+            QEvent((QEvent::Type)kJoystickMuteEventType),
+            m_muteJsmenuEvents(mute_events) {}
 
-    bool eventsMuted()
-    {
-        return mute_jsmenu_events;
-    }
+    bool eventsMuted() const { return m_muteJsmenuEvents; }
 
   private:
-    bool mute_jsmenu_events;
+    bool m_muteJsmenuEvents;
 };
 
 class JoystickMenuEventLock
@@ -64,7 +53,7 @@ class JoystickMenuEventLock
     void unlock();
 
   private:
-    bool events_locked;
+    bool m_eventsLocked;
 };
 
 #endif
