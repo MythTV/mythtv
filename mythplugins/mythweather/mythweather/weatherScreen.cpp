@@ -325,8 +325,9 @@ void AnimatedImageScreen::prepareWidget(MythUIType *widget)
 {
     if (widget->objectName() == "animatedimage")
     {
+        MythUIImage *img = (MythUIImage *) widget;
+
         img->SetImageCount(0, m_count);
-        // TODO this slows things down A LOT!!
         img->Load();
     }
     return;
