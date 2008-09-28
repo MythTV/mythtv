@@ -34,15 +34,6 @@ class MythUIButton : public MythUIType
     virtual void gestureEvent(MythUIType *uitype, MythGestureEvent *event);
     virtual bool keyPressEvent(QKeyEvent *);
 
-    void SetBackgroundImage(StateType state, MythImage *image);
-    void SetCheckImage(MythUIStateType::StateType state, MythImage *image);
-    void SetTextRect(const QRect &textRect);
-    void SetFont(StateType state, MythFontProperties &prop);
-    void SetButtonImage(MythImage *image);
-    void SetRightArrowImage(MythImage *image);
-    void SetPaddingMargin(int marginx, int marginy = 0);
-    void SetImageAlignment(int imagealign);
-
     void SetText(const QString &msg, int textFlags = -1);
     QString GetText() const { return m_Text->GetText(); }
 
@@ -68,6 +59,15 @@ class MythUIButton : public MythUIType
 
     void Init(void);
 
+    void SetBackgroundImage(StateType state, MythImage *image);
+    void SetCheckImage(MythUIStateType::StateType state, MythImage *image);
+    void SetTextRect(const QRect &textRect);
+    void SetFont(StateType state, MythFontProperties &prop);
+    void SetButtonImage(MythImage *image);
+    void SetRightArrowImage(MythImage *image);
+    void SetPaddingMargin(int marginx, int marginy = 0);
+    void SetImageAlignment(int imagealign);
+
     MythImage* LoadImage(QDomElement element);
 
     MythUIStateType *m_BackgroundImage;
@@ -86,6 +86,9 @@ class MythUIButton : public MythUIType
     int m_PaddingMarginY;
     int m_textFlags;
     int m_imageAlign;
+
+    friend class MythListButton;
+    friend class MythListButtonItem;
 };
 
 #endif
