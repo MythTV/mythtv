@@ -1085,15 +1085,13 @@ const MythImage* MythUIButtonListItem::image() const
 
 void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
 {
-    if (!image)
-        return;
-
     if (!name.isEmpty())
     {
         if (m_images.contains(name))
             m_images.value(name)->DownRef();
         m_images.insert(name, image);
-        image->UpRef();
+        if (image)
+            image->UpRef();
     }
     else
     {
@@ -1103,7 +1101,8 @@ void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
         if (m_image)
             m_image->DownRef();
         m_image = image;
-        image->UpRef();
+        if (image)
+            image->UpRef();
     }
 
     if (m_parent)
