@@ -1,16 +1,26 @@
 #ifndef MYTHUI_TEXT_H_
 #define MYTHUI_TEXT_H_
 
-#include "mythuitype.h"
-#include "mythstorage.h"
-
+// QT headers
 #include <QImage>
 #include <QColor>
 
+// Mythdb headers
+#include "mythstorage.h"
+
+// Mythui headers
 #include "mythuitype.h"
 
 class MythFontProperties;
 
+/**
+ *  \class MythUIText
+ *
+ *  \brief All purpose text widget, displays a text string
+ *
+ *  Font, alignment, scrolling and color cycling effects may be applied to
+ *  the text in this widget.
+ */
 class MythUIText : public MythUIType, public StorageUser
 {
   public:

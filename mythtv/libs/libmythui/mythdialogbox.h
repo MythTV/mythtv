@@ -13,6 +13,15 @@ class MythUIButtonList;
 
 const int kMythDialogBoxCompletionEventType = 34111;
 
+/**
+ *  \class DialogCompletionEvent
+ *
+ *  \brief Event dispatched from MythUI modal dialogs to a listening class
+ *         containing a result of some form
+ *
+ *  The result may be in the format of an int, text or a void pointer
+ *  dependant on the dialog type and information it is conveying.
+ */
 class DialogCompletionEvent : public QEvent
 {
   public:
@@ -32,7 +41,14 @@ class DialogCompletionEvent : public QEvent
     void *m_resultData;
 };
 
-// Sends out an event with 'resultid' as the id when done.
+/**
+ *  \class MythDialogBox
+ *
+ *  \brief Basic menu dialog, message and a list of options
+ *
+ *  Sends out a DialogCompletionEvent event and the Selected() signal
+ *  containing the result when the user selects the Ok button.
+ */
 class MythDialogBox : public MythScreenType
 {
     Q_OBJECT
@@ -67,6 +83,14 @@ class MythDialogBox : public MythScreenType
     QString m_text;
 };
 
+/**
+ *  \class MythConfirmationDialog
+ *
+ *  \brief Dialog asking for user confirmation. Ok and optional Cancel button.
+ *
+ *  Sends out a DialogCompletionEvent event and the haveResult() signal
+ *  containing the result.
+ */
 class MythConfirmationDialog : public MythScreenType
 {
     Q_OBJECT
@@ -93,6 +117,14 @@ class MythConfirmationDialog : public MythScreenType
     void Cancel();
 };
 
+/**
+ *  \class MythTextInputDialog
+ *
+ *  \brief Dialog prompting the user to enter a text string
+ *
+ *  Sends out a DialogCompletionEvent event and the haveResult() signal
+ *  containing the result when the user selects the Ok button.
+ */
 class MythTextInputDialog : public MythScreenType
 {
     Q_OBJECT

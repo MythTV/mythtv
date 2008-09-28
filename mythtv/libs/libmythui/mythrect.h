@@ -10,8 +10,8 @@ class MythPoint;
 
 /** \class MythRect
  *
- * \brief Wrapper around QRect allowing us to handle percentage and other
- *        relative values for areas in mythui
+ *  \brief Wrapper around QRect allowing us to handle percentage and other
+ *         relative values for areas in mythui
  */
 class MythRect : public QRect
 {

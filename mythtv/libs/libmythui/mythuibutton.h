@@ -14,8 +14,9 @@
 /** \class MythUIButton
  *
  *  \brief Single button widget
- *         Has a multiple states with backgrounds and fonts, text and optional
- *         checkbox (dual/tri state)
+ *
+ *  Has multiple states with backgrounds and fonts, text and optional
+ *  checkbox (dual/tri state)
  *
  */
 class MythUIButton : public MythUIType
