@@ -8,6 +8,11 @@
 
 class MythScreenType;
 
+/**
+ * \class MythUIImage
+ *
+ * \brief Image widget, displays a single image or multiple images in sequence
+ */
 class MythUIImage : public MythUIType
 {
   public:
@@ -22,20 +27,13 @@ class MythUIImage : public MythUIType
     void SetFilepattern(const QString &filepattern, int low, int high);
 
     void SetImageCount(int low, int high);
-    void SetDelay(int delayms);
     void SetImage(MythImage *img);
     void SetImages(QVector<MythImage *> &images);
-
-    void SetSize(int width, int height);
-    void SetSize(const QSize &size);
-    void ForceSize(const QSize &size);
-    void SetCropRect(int x, int y, int width, int height);
-    void SetCropRect(const MythRect &rect);
 
     void Reset(void);
     bool Load(void);
 
-    bool IsGradient(void) { return m_gradient; }
+    bool IsGradient(void) const { return m_gradient; }
 
     virtual void Pulse(void);
 
@@ -50,6 +48,15 @@ class MythUIImage : public MythUIType
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
     virtual void Finalize(void);
+
+    void SetDelay(int delayms);
+
+    void SetSize(int width, int height);
+    void SetSize(const QSize &size);
+    void ForceSize(const QSize &size);
+
+    void SetCropRect(int x, int y, int width, int height);
+    void SetCropRect(const MythRect &rect);
 
     QString m_Filename;
     QString m_OrigFilename;
@@ -81,6 +88,10 @@ class MythUIImage : public MythUIType
     FillDirection m_gradientDirection;
 
     bool m_preserveAspect;
+
+    friend class MythThemeBase;
+    friend class MythUIButtonListItem;
+    friend class MythUIProgressBar;
 };
 
 #endif

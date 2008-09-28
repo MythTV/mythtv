@@ -53,6 +53,9 @@ MythUIImage::~MythUIImage()
     Clear();
 }
 
+/**
+ *  \brief Remove all images from the widget
+ */
 void MythUIImage::Clear(void)
 {
     while (!m_Images.isEmpty())
@@ -62,6 +65,9 @@ void MythUIImage::Clear(void)
     }
 }
 
+/**
+ *  \brief Reset the image back to the default defined in the theme
+ */
 void MythUIImage::Reset(void)
 {
     if (m_Filename != m_OrigFilename)
@@ -72,6 +78,9 @@ void MythUIImage::Reset(void)
     MythUIType::Reset();
 }
 
+/**
+ *  \brief Initialises the class
+ */
 void MythUIImage::Init(void)
 {
     m_cropRect = MythRect(0,0,0,0);
@@ -94,11 +103,18 @@ void MythUIImage::Init(void)
     m_preserveAspect = false;
 }
 
+/**
+ *  \brief Set the image filename, does not load the image. See Load()
+ */
 void MythUIImage::SetFilename(const QString &filename)
 {
     m_Filename = filename;
 }
 
+/**
+ *  \brief Set the image filename pattern and integer range for an animated
+ *         image, does not load the image. See Load()
+ */
 void MythUIImage::SetFilepattern(const QString &filepattern, int low,
                                  int high)
 {
@@ -107,12 +123,18 @@ void MythUIImage::SetFilepattern(const QString &filepattern, int low,
     m_HighNum = high;
 }
 
+/**
+ *  \brief Set the integer range for an animated image pattern
+ */
 void MythUIImage::SetImageCount(int low, int high)
 {
     m_LowNum = low;
     m_HighNum = high;
 }
 
+/**
+ *  \brief Set the delay between each image in an animation
+ */
 void MythUIImage::SetDelay(int delayms)
 {
     m_Delay = delayms;
@@ -120,6 +142,10 @@ void MythUIImage::SetDelay(int delayms)
     m_CurPos = 0;
 }
 
+/**
+ *  \brief Assign a MythImage to the widget. Discouraged, use SetFilename()
+ *         instead.
+ */
 void MythUIImage::SetImage(MythImage *img)
 {
     if (!img)
@@ -152,6 +178,10 @@ void MythUIImage::SetImage(MythImage *img)
     SetRedraw();
 }
 
+/**
+ *  \brief Assign a set of MythImages to the widget for animation.
+ *         Discouraged, use SetFilePattern() instead.
+ */
 void MythUIImage::SetImages(QVector<MythImage *> &images)
 {
     Clear();
@@ -188,6 +218,9 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
     SetRedraw();
 }
 
+/**
+ *  \brief Force the dimensions of the widget and image to the given size.
+ */
 void MythUIImage::ForceSize(const QSize &size)
 {
     if (m_ForceSize == size)
@@ -215,28 +248,45 @@ void MythUIImage::ForceSize(const QSize &size)
     SetSize(m_ForceSize);
 }
 
+/**
+ *  \brief Set the size of the widget
+ */
 void MythUIImage::SetSize(int width, int height)
 {
     SetSize(QSize(width,height));
 }
 
+/**
+ *  \brief Set the size of the widget
+ */
 void MythUIImage::SetSize(const QSize &size)
 {
     MythUIType::SetSize(size);
     m_NeedLoad = true;
 }
 
+/**
+ *  \brief Crop the image using the given rectangle, useful for removing
+ *         unsightly edges from imported images or zoom effects
+ */
 void MythUIImage::SetCropRect(int x, int y, int width, int height)
 {
     SetCropRect(MythRect(x, y, width, height));
 }
 
+/**
+ *  \brief Crop the image using the given rectangle, useful for removing
+ *         unsightly edges from imported images or zoom effects
+ */
 void MythUIImage::SetCropRect(const MythRect &rect)
 {
     m_cropRect = rect;
     SetRedraw();
 }
 
+/**
+ *  \brief Load the image(s)
+ */
 bool MythUIImage::Load(void)
 {
     Clear();
@@ -303,6 +353,9 @@ bool MythUIImage::Load(void)
     return true;
 }
 
+/**
+ *  \copydoc See MythUIType::Pulse()
+ */
 void MythUIImage::Pulse(void)
 {
     if (m_Delay > 0 &&
@@ -319,6 +372,9 @@ void MythUIImage::Pulse(void)
     MythUIType::Pulse();
 }
 
+/**
+ *  \copydoc See MythUIType::DrawSelf()
+ */
 void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                            int alphaMod, QRect clipRect)
 {
@@ -357,6 +413,9 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     }
 }
 
+/**
+ *  \copydoc See MythUIType::ParseElement()
+ */
 bool MythUIImage::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "filename")
@@ -422,6 +481,9 @@ bool MythUIImage::ParseElement(QDomElement &element)
     return true;
 }
 
+/**
+ *  \copydoc MythUIType::CopyFrom()
+ */
 void MythUIImage::CopyFrom(MythUIType *base)
 {
     MythUIImage *im = dynamic_cast<MythUIImage *>(base);
@@ -463,12 +525,18 @@ void MythUIImage::CopyFrom(MythUIType *base)
     MythUIType::CopyFrom(base);
 }
 
+/**
+ *  \copydoc MythUIType::CreateCopy()
+ */
 void MythUIImage::CreateCopy(MythUIType *parent)
 {
     MythUIImage *im = new MythUIImage(parent, objectName());
     im->CopyFrom(this);
 }
 
+/**
+ *  \copydoc MythUIType::Finalize()
+ */
 void MythUIImage::Finalize(void)
 {
     if (m_NeedLoad)
