@@ -20,10 +20,10 @@ class MythImage : public QImage
     bool DownRef(void);
 
     virtual void SetChanged(bool change = true) { m_Changed = change; }
-    bool IsChanged() { return m_Changed; }
+    bool IsChanged() const { return m_Changed; }
 
-    bool IsGradient() { return m_isGradient; }
-    bool IsReflected() { return m_isReflected; }
+    bool IsGradient() const { return m_isGradient; }
+    bool IsReflected() const { return m_isReflected; }
 
     void Assign(const QImage &img);
     void Assign(const QPixmap &pix);
@@ -48,10 +48,10 @@ class MythImage : public QImage
                                FillDirection direction = FillTopToBottom);
 
     void SetID(unsigned int id) { m_imageId = id; }
-    unsigned int GetID(void) { return m_imageId; }
+    unsigned int GetID(void) const { return m_imageId; }
 
     void SetFileName(QString fname) { m_FileName = fname; }
-    QString GetFileName(void) { return m_FileName; }
+    QString GetFileName(void) const { return m_FileName; }
 
   protected:
     static void MakeGradient(QImage &image, const QColor &begin,
