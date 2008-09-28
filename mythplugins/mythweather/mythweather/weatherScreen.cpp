@@ -282,31 +282,7 @@ QString StaticImageScreen::prepareDataItem(const QString &key,
 
 void StaticImageScreen::prepareWidget(MythUIType *widget)
 {
-    if (widget->objectName() == "map")
-    {
-        /*
-         * Scaling the image down and centering it
-         */
-        MythUIImage *img = (MythUIImage *) widget;
-        QRect max = img->GetArea();
 
-        if (m_imgsize.width() > -1 && m_imgsize.height() > -1)
-        {
-            if (max.width() > -1 && max.height() > -1)
-            {
-                m_imgsize.scale(QSize(max.width(),max.height()),
-                                Qt::KeepAspectRatio);
-
-                QPoint orgPos = img->GetPosition();
-
-                int newx = orgPos.x() + (max.width() - m_imgsize.width()) / 2;
-                int newy = orgPos.y() + (max.height() - m_imgsize.height()) / 2;
-                img->SetPosition(QPoint(newx, newy));
-            }
-            img->SetSize(m_imgsize.width(), m_imgsize.height());
-        }
-        img->Load();
-    }
 }
 
 AnimatedImageScreen::AnimatedImageScreen(MythScreenStack *parent, const char *name,
@@ -349,30 +325,7 @@ void AnimatedImageScreen::prepareWidget(MythUIType *widget)
 {
     if (widget->objectName() == "animatedimage")
     {
-        /*
-         * Scaling the image down and centering it
-         */
-        MythUIImage *img = (MythUIImage *) widget;
-        QRect max = img->GetArea();
-
-        if (m_imgsize.width() > -1 && m_imgsize.height() > -1)
-        {
-            if (max.width() > -1 && max.height() > -1)
-            {
-                m_imgsize.scale(QSize(max.width(),max.height()),
-                                Qt::KeepAspectRatio);
-
-                QPoint orgPos = img->GetPosition();
-
-                int newx = orgPos.x() + (max.width() - m_imgsize.width()) / 2;
-                int newy = orgPos.y() + (max.height() - m_imgsize.height()) / 2;
-                img->SetPosition(QPoint(newx, newy));
-            }
-            img->SetSize(m_imgsize.width(), m_imgsize.height());
-        }
-
         img->SetImageCount(0, m_count);
-        img->SetDelay(200);
         // TODO this slows things down A LOT!!
         img->Load();
     }
