@@ -472,7 +472,7 @@ bool MythNews::keyPressEvent(QKeyEvent *event)
             if (httpGrabber)
                 abortHttp = true;
 
-            GetScreenStack()->PopScreen();
+            Close();
         }
         else
             handled = false;

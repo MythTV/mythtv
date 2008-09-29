@@ -53,7 +53,6 @@ private:
 
 private slots:
     void Save(void);
-    void Exit(void);
 };
 
 #endif /* MYTHNEWSEDITOR_H */

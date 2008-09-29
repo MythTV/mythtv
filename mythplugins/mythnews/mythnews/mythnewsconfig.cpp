@@ -244,24 +244,8 @@ bool MythNewsConfig::keyPressEvent(QKeyEvent *event)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("News", event, actions);
 
-    for (int i = 0; i < actions.size() && !handled; i++)
-    {
-        QString action = actions[i];
+    if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;
-
-        if (action == "LEFT")
-        {
-            NextPrevWidgetFocus(false);
-        }
-        else if (action == "RIGHT")
-        {
-            NextPrevWidgetFocus(true);
-        }
-        else if (action == "ESCAPE")
-            GetMythMainWindow()->GetMainStack()->PopScreen();
-        else
-            handled = false;
-    }
 
     return handled;
 }

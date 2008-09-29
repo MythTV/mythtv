@@ -88,7 +88,7 @@ bool MythNewsEditor::Create()
     m_cancelButton->SetText(tr("Cancel"));
 
     connect(m_okButton, SIGNAL(buttonPressed()), this, SLOT(Save()));
-    connect(m_cancelButton, SIGNAL(buttonPressed()), this, SLOT(Exit()));
+    connect(m_cancelButton, SIGNAL(buttonPressed()), this, SLOT(Close()));
 
     if (m_editing)
     {
@@ -122,11 +122,6 @@ bool MythNewsEditor::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void MythNewsEditor::Exit()
-{
-    GetScreenStack()->PopScreen();
-}
-
 void MythNewsEditor::Save()
 {
     QDateTime time;
@@ -137,5 +132,5 @@ void MythNewsEditor::Save()
     insertInDB(m_nameEdit->GetText(), m_urlEdit->GetText(),
                m_iconEdit->GetText(), "custom", m_podcastCheck->GetCheckState());
 
-    Exit();
+    Close();
 }
