@@ -43,7 +43,7 @@ class GLSDialog : public MythDialog
   public:  
     GLSDialog(const ThumbList& itemList,
               int *pos, int slideShow, int sortOrder,
-              MythMainWindow *parent, const char *name=0);
+              MythMainWindow *parent, const char *name="GLSDialog");
 
   protected:
     void closeEvent(QCloseEvent *e);

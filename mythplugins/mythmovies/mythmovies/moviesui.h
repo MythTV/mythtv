@@ -17,8 +17,10 @@ class MoviesUI : public MythThemedDialog
   public:
     typedef Q3ValueVector<int> IntVector;
 
-    MoviesUI(MythMainWindow *parent, QString windowName,
-             QString themeFilename, const char *name = 0);
+    MoviesUI(MythMainWindow *parent,
+             const QString  &windowName,
+             const QString  &themeFilename,
+             const char     *name = "MoviesUI");
     ~MoviesUI();
 
   protected:

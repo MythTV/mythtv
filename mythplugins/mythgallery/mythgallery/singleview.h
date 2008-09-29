@@ -48,7 +48,7 @@ class SingleView : public MythDialog, public ImageView
     
   public:
     SingleView(ThumbList itemList, int *pos, int slideShow, int sortorder,
-               MythMainWindow *parent, const char *name=0);
+               MythMainWindow *parent, const char *name="SingleView");
     ~SingleView();
 
     // Effect subtype enumeration

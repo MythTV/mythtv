@@ -1,7 +1,6 @@
-#include <qtimer.h>
-#include <qapplication.h>
-//Added by qt3to4:
+#include <QApplication>
 #include <QKeyEvent>
+#include <QTimer>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/uitypes.h>
@@ -132,8 +131,10 @@ namespace
     }
 }
 
-MoviesUI::MoviesUI(MythMainWindow *parent, QString windowName,
-                   QString themeFilename, const char *name)
+MoviesUI::MoviesUI(MythMainWindow *parent,
+                   const QString  &windowName,
+                   const QString  &themeFilename,
+                   const char     *name)
     : MythThemedDialog(parent, windowName, themeFilename, name)
 {
     query = new MSqlQuery(MSqlQuery::InitCon());
