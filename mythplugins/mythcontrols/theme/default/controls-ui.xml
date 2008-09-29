@@ -29,19 +29,19 @@
             <align>center</align>
         </textarea>
 
-        <buttonlist name="leftlist" from="basebuttonlist">
+        <buttonlist2 name="leftlist" from="basebuttonlist2">
             <area>20,50,370,410</area>
             <showarrow>no</showarrow>
-        </buttonlist>
+        </buttonlist2>
 
         <textarea name="rightdesc" from="leftdesc">
             <area>410,20,370,20</area>
             <value>Actions</value>
         </textarea>
 
-        <buttonlist name="rightlist" from="leftlist">
+        <buttonlist2 name="rightlist" from="leftlist">
             <area>410,50,370,410</area>
-        </buttonlist>
+        </buttonlist2>
 
         <button name="action_0" from="basebutton">
             <position>40,450</position>

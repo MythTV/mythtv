@@ -26,17 +26,18 @@
 
 #include <mythtv/libmythui/mythscreentype.h>
 #include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuibuttonlist.h>
 #include <mythtv/libmythui/mythuiimage.h>
 #include <mythtv/libmythui/mythdialogbox.h>
 
 #include "keybindings.h"
 #include <Q3PtrList>
 
-
 typedef enum { kActionsByContext, kKeysByContext, kContextsByKey, } ViewType;
 
-/** \class MythControls
+/**
+ *  \class MythControls
+ *
  *  \brief The myth controls configuration class.
  */
 class MythControls : public MythScreenType
@@ -72,7 +73,7 @@ class MythControls : public MythScreenType
     void    LoadData(const QString &hostname);
     void    ChangeButtonFocus(int direction);
     void    ChangeView(void);
-    void    SetListContents(MythListButton *uilist,
+    void    SetListContents(MythUIButtonList *uilist,
                             const QStringList & contents,
                             bool arrows = false);
     void    UpdateRightList(void);
@@ -90,10 +91,10 @@ class MythControls : public MythScreenType
     QString GetTypeDesc(ListType type) const;
 
   private slots:
-    void LeftSelected(MythListButtonItem*);
-    void RightSelected(MythListButtonItem*);
-    void LeftPressed(MythListButtonItem*);
-    void RightPressed(MythListButtonItem*);
+    void LeftSelected(MythUIButtonListItem*);
+    void RightSelected(MythUIButtonListItem*);
+    void LeftPressed(MythUIButtonListItem*);
+    void RightPressed(MythUIButtonListItem*);
     void ActionButtonPressed();
     void RefreshKeyInformation(void);
     void AddKeyToAction(QString key, bool ignoreconflict = false);
@@ -101,8 +102,8 @@ class MythControls : public MythScreenType
   private:
     ViewType          m_currentView;
     MythUIType        *m_focusedUIElement;
-    MythListButton    *m_leftList;
-    MythListButton    *m_rightList;
+    MythUIButtonList    *m_leftList;
+    MythUIButtonList    *m_rightList;
     MythUIText        *m_description;
     MythUIText        *m_leftDescription;
     MythUIText        *m_rightDescription;

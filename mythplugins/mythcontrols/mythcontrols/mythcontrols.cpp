@@ -48,7 +48,7 @@
 #define CAPTION_ACTION QString("Actions")
 #define CAPTION_KEY QString("Keys")
 
-/** \fn MythControls::MythControls(MythMainWindow*, bool&)
+/**
  *  \brief Creates a new MythControls wizard
  *  \param parent Pointer to the screen stack
  *  \param name The name of the window
@@ -85,7 +85,7 @@ void MythControls::Teardown(void)
     m_contexts.clear();
 }
 
-/** \fn MythControls::Create(void)
+/**
  *  \brief Loads UI elements from theme
  *
  *  \return true if all UI elements load successfully.
@@ -102,9 +102,9 @@ bool MythControls::Create(void)
 
     m_description = dynamic_cast<MythUIText *>
                 (GetChild("description"));
-    m_leftList = dynamic_cast<MythListButton *>
+    m_leftList = dynamic_cast<MythUIButtonList *>
                 (GetChild("leftlist"));
-    m_rightList = dynamic_cast<MythListButton *>
+    m_rightList = dynamic_cast<MythUIButtonList *>
                 (GetChild("rightlist"));
     m_leftDescription = dynamic_cast<MythUIText *>
                 (GetChild("leftdesc"));
@@ -118,15 +118,15 @@ bool MythControls::Create(void)
         return false;
     }
 
-    connect(m_leftList,  SIGNAL(itemSelected(MythListButtonItem*)),
-            this, SLOT(LeftSelected(MythListButtonItem*)));
-    connect(m_leftList,  SIGNAL(itemClicked(MythListButtonItem*)),
-            this, SLOT(LeftPressed(MythListButtonItem*)));
+    connect(m_leftList,  SIGNAL(itemSelected(MythUIButtonListItem*)),
+            this, SLOT(LeftSelected(MythUIButtonListItem*)));
+    connect(m_leftList,  SIGNAL(itemClicked(MythUIButtonListItem*)),
+            this, SLOT(LeftPressed(MythUIButtonListItem*)));
 
-    connect(m_rightList, SIGNAL(itemSelected(MythListButtonItem*)),
-            this, SLOT(RightSelected(MythListButtonItem*)));
-    connect(m_rightList,  SIGNAL(itemClicked(MythListButtonItem*)),
-            this, SLOT(RightPressed(MythListButtonItem*)));
+    connect(m_rightList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            this, SLOT(RightSelected(MythUIButtonListItem*)));
+    connect(m_rightList,  SIGNAL(itemClicked(MythUIButtonListItem*)),
+            this, SLOT(RightPressed(MythUIButtonListItem*)));
     connect(m_rightList, SIGNAL(TakingFocus()),
             this, SLOT(RefreshKeyInformation()));
 
@@ -168,7 +168,7 @@ bool MythControls::Create(void)
     return true;
 }
 
-/** \fn MythControls::ChangeButtonFocus(int)
+/**
  *  \brief Change button focus in a particular direction
  *  \param direction +1 moves focus to the right, -1 moves to the left,
  *                   and 0 changes the focus to the first button.
@@ -189,7 +189,7 @@ void MythControls::ChangeButtonFocus(int direction)
 /**
  *  \brief Slot handling a button being pressed in the left list
  */
-void MythControls::LeftPressed(MythListButtonItem *item)
+void MythControls::LeftPressed(MythUIButtonListItem *item)
 {
     (void) item;
     NextPrevWidgetFocus(true);
@@ -198,7 +198,7 @@ void MythControls::LeftPressed(MythListButtonItem *item)
 /**
  *  \brief Slot handling a button being pressed in the left list
  */
-void MythControls::RightPressed(MythListButtonItem *item)
+void MythControls::RightPressed(MythUIButtonListItem *item)
 {
     (void) item;
     if (m_currentView == kActionsByContext)
@@ -234,7 +234,9 @@ void MythControls::ActionButtonPressed()
         GrabKey();
 }
 
-/// \brief Change the view.
+/**
+ *  \brief Change the view.
+ */
 void MythControls::ChangeView(void)
 {
     QString label = tr("Change View");
@@ -317,7 +319,7 @@ bool MythControls::keyPressEvent(QKeyEvent *event)
                 m_menuPopup->AddButton(tr("Exit without saving changes"));
             }
             else
-                GetScreenStack()->PopScreen();
+                handled = false;
         }
         else
             handled = false;
@@ -329,32 +331,33 @@ bool MythControls::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-/** \fn MythControls::LeftSelected(MythListButtonItem*)
+/**
  *  \brief Refreshes the right list when an item in the
  *         left list is selected
  */
-void MythControls::LeftSelected(MythListButtonItem*)
+void MythControls::LeftSelected(MythUIButtonListItem*)
 {
     UpdateRightList();
 }
 
-/** \fn MythControls::RightSelected(MythListButtonItem*)
+/**
  *  \brief Refreshes key information when an item in the
  *         right list is selected
  */
-void MythControls::RightSelected(MythListButtonItem*)
+void MythControls::RightSelected(MythUIButtonListItem*)
 {
     RefreshKeyInformation();
 }
 
 
-/** \brief Set the contents of a list.
+/**
+ *  \brief Set the contents of a list.
  *  \param uilist The list being changed.
  *  \param contents The contents of the list.
  *  \param arrows True to draw with arrows, otherwise arrows are not drawn.
  */
 void MythControls::SetListContents(
-    MythListButton *uilist, const QStringList &contents, bool arrows)
+    MythUIButtonList *uilist, const QStringList &contents, bool arrows)
 {
     // remove all strings from the current list
     uilist->Reset();
@@ -362,16 +365,18 @@ void MythControls::SetListContents(
     // add each new string
     for (int i = 0; i < contents.size(); i++)
     {
-        MythListButtonItem *item = new MythListButtonItem(uilist, contents[i]);
+        MythUIButtonListItem *item = new MythUIButtonListItem(uilist, contents[i]);
         item->setDrawArrow(arrows);
     }
 }
 
-/** \brief Update the right list. */
+/**
+ *  \brief Update the right list.
+ */
 void MythControls::UpdateRightList(void)
 {
     // get the selected item in the right list.
-    MythListButtonItem *item = m_leftList->GetItemCurrent();
+    MythUIButtonListItem *item = m_leftList->GetItemCurrent();
 
     if (item)
     {
@@ -392,7 +397,7 @@ void MythControls::UpdateRightList(void)
     }
 }
 
-/** \fn MythControls::RefreshKeyInformation(void)
+/**
  *  \brief Updates the list of keys that are shown and the
  *         description of the action.
  */
@@ -422,7 +427,8 @@ void MythControls::RefreshKeyInformation(void)
 }
 
 
-/** \brief Get the currently selected context string.
+/**
+ * \brief Get the currently selected context string.
  *
  *   If no context is selected, an empty string is returned.
  *
@@ -447,7 +453,8 @@ QString MythControls::GetCurrentContext(void)
     return desc.mid(loc + 4);
 }
 
-/** \brief Get the currently selected action string.
+/**
+ *  \brief Get the currently selected action string.
  *
  *   If no action is selected, an empty string is returned.
  *
@@ -486,7 +493,8 @@ QString MythControls::GetCurrentAction(void)
     return rv;
 }
 
-/** \brief Returns the focused button, or
+/**
+ *  \brief Returns the focused button, or
  *         Action::kMaximumNumberOfBindings if no buttons are focued.
  */
 uint MythControls::GetCurrentButton(void)
@@ -502,7 +510,8 @@ uint MythControls::GetCurrentButton(void)
     return Action::kMaximumNumberOfBindings;
 }
 
-/** \brief Get the currently selected key string
+/**
+ *  \brief Get the currently selected key string
  *
  *   If no key is selected, an empty string is returned.
  *
@@ -541,7 +550,7 @@ QString MythControls::GetCurrentKey(void)
     return desc.mid(loc + 4);
 }
 
-/** \fn MythControls::LoadData(const QString&)
+/**
  *  \brief Load the settings for a particular host.
  *  \param hostname The host to load settings for.
  */
@@ -569,7 +578,7 @@ void MythControls::LoadData(const QString &hostname)
     }
 }
 
-/** \fn MythControls::DeleteKey(void)
+/**
  *  \brief Delete the currently active key to action mapping
  *
  *   TODO FIXME This code needs work to support deleteKey
@@ -610,7 +619,7 @@ void MythControls::DeleteKey(void)
     m_menuPopup->AddButton(tr("Ok"));
 }
 
-/** \fn ResolveConflict(ActionID*, int, key)
+/**
  *  \brief Resolve a potential conflict
  *  \return true if the conflict should be bound, false otherwise.
  */
@@ -667,7 +676,7 @@ void MythControls::GrabKey(void)
             SLOT(AddKeyToAction(QString)), Qt::QueuedConnection);
 }
 
-/** \fn MythControls::AddKeyToAction(void)
+/**
  *  \brief Add a key to the currently selected action.
  *
  *  TODO FIXME This code needs work to support deleteKey
@@ -741,7 +750,7 @@ void MythControls::customEvent(QEvent *event)
             if (buttonnum == 0)
                 Save();
 
-            GetScreenStack()->PopScreen();
+            Close();
         }
         else if (resultid == "view")
         {
