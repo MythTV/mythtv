@@ -344,8 +344,9 @@ class MPUBLIC MythThemedDialog : public MythDialog
     Q_OBJECT
 
   public:
-    MythThemedDialog(MythMainWindow *parent, QString window_name,
-                     QString         theme_filename = "",
+    MythThemedDialog(MythMainWindow *parent,
+                     const QString  &window_name,
+                     const QString  &theme_filename = QString(),
                      const char     *name = "MythThemedDialog",
                      bool            setsize = true);
     MythThemedDialog(MythMainWindow *parent,
@@ -512,7 +513,7 @@ class MPUBLIC MythImageFileDialog: public MythThemedDialog
                         QString         top_directory,
                         MythMainWindow *parent,
                         QString         window_name,
-                        QString         theme_filename = "",
+                        QString         theme_filename = QString(),
                         const char     *name = "MythImageFileDialog",
                         bool            setsize=true);
   public slots:

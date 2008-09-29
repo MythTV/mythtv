@@ -796,7 +796,7 @@ QString MythPopupBox::showPasswordPopup(MythMainWindow *parent,
                              popup, SLOT(accept()));
     entry->setFocus();
 
-    QString password = QString::null;
+    QString password = QString();
     if (popup->ExecPopup() == Accepted)
         password = entry->text();
 
@@ -1033,9 +1033,11 @@ void MythBusyDialog::timeout(void)
     setProgress();
 }
 
-MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
-                                   QString theme_filename, const char* name,
-                                   bool setsize)
+MythThemedDialog::MythThemedDialog(MythMainWindow *parent,
+                                   const QString  &window_name,
+                                   const QString  &theme_filename,
+                                   const char     *name,
+                                   bool            setsize)
                 : MythDialog(parent, name, setsize)
 {
     setNoErase();
