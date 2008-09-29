@@ -8,10 +8,10 @@
             <filename>mv-mselect.png</filename>
         </imagetype>
 
-        <buttonlist2 name="results" from="basebuttonlist2">
+        <buttonlist name="results" from="basebuttonlist">
             <area>20,22,357,378</area>
             <showarrow>no</showarrow>
-        </buttonlist2>
+        </buttonlist>
     </window>
 
     <window name="castpopup">
@@ -21,10 +21,10 @@
             <filename>mv-mselect.png</filename>
         </imagetype>
 
-        <buttonlist2 name="cast" from="basebuttonlist2">
+        <buttonlist name="cast" from="basebuttonlist">
             <area>18,18,360,325</area>
             <showarrow>no</showarrow>
-        </buttonlist2>
+        </buttonlist>
 
         <button name="ok" from="basebutton">
             <position>119,350</position>
@@ -231,7 +231,7 @@
             <filename>cr-lines.png</filename>
         </imagetype>
 
-        <buttonlist2 name="videos">
+        <buttonlist name="videos">
             <area>20,282,760,242</area>
             <layout>vertical</layout>
             <spacing>5</spacing>
@@ -282,7 +282,7 @@
                     </imagetype>
                 </state>
             </statetype>
-        </buttonlist2>
+        </buttonlist>
 
         <textarea name="keyslbl_one" from="basetextarea">
             <area>15,560,200,30</area>
@@ -309,7 +309,7 @@
             <filename>browse_background.png</filename>
         </imagetype>
 
-        <buttonlist2 name="videos">
+        <buttonlist name="videos">
             <area>15,440,770,150</area>
             <layout>horizontal</layout>
             <scrollstyle>center</scrollstyle>
@@ -353,7 +353,7 @@
                     </imagetype>
                 </state>
             </statetype>
-        </buttonlist2>
+        </buttonlist>
 
         <textarea name="title" from="basetextarea">
             <area>40,20,700,100</area>
@@ -469,7 +469,7 @@
             <font>baselarge</font>
         </textarea>
 
-        <buttonlist2 name="videos">
+        <buttonlist name="videos">
             <area>15,0,770,585</area>
             <layout>grid</layout>
             <spacing>5</spacing>
@@ -517,7 +517,7 @@
                     </imagetype>
                 </state>
             </statetype>
-        </buttonlist2>
+        </buttonlist>
 
         <textarea name="position" from="basetextarea">
             <area>530,20,110,40</area>
@@ -583,7 +583,7 @@
             <area>40,50,720,260</area>
             <numlists>3</numlists>
             <spacing>10</spacing>
-            <buttonlist2 name="listtemplate">
+            <buttonlist name="listtemplate">
                 <spacing>5</spacing>
                 <buttonarea>0,0,100%,97%</buttonarea>
                 <showarrow>yes</showarrow>
@@ -665,7 +665,7 @@
                         </imagetype>
                     </state>
                 </statetype>
-            </buttonlist2>
+            </buttonlist>
         </buttontree>
 
         <textarea name="title" from="basetextarea">
@@ -770,9 +770,9 @@
             <value>Ignore:</value>
         </textarea>
 
-        <buttonlist2 name="extension_select" from="baseselector">
+        <buttonlist name="extension_select" from="baseselector">
             <position>300,195</position>
-        </buttonlist2>
+        </buttonlist>
 
         <textedit name="command" from="basetextedit">
             <position>300,255</position>
@@ -852,17 +852,17 @@
             <position>310,125</position>
         </textedit>
 
-        <buttonlist2 name="category_select" from="baseselector">
+        <buttonlist name="category_select" from="baseselector">
             <position>310,190</position>
-        </buttonlist2>
+        </buttonlist>
 
-        <buttonlist2 name="level_select" from="baseselector">
+        <buttonlist name="level_select" from="baseselector">
             <position>310,240</position>
-        </buttonlist2>
+        </buttonlist>
 
-        <buttonlist2 name="child_select" from="baseselector">
+        <buttonlist name="child_select" from="baseselector">
             <position>310,285</position>
-        </buttonlist2>
+        </buttonlist>
 
         <checkbox name="browse_check" from="basecheckbox">
             <position>310,335</position>
@@ -981,49 +981,49 @@
 
         <!-- Widgets -->
 
-        <buttonlist2 name="category_select" from="baseselector">
+        <buttonlist name="category_select" from="baseselector">
             <position>160,120</position>
-        </buttonlist2>
+        </buttonlist>
 
-        <buttonlist2 name="genre_select" from="baseselector">
+        <buttonlist name="genre_select" from="baseselector">
             <position>160,164</position>
-        </buttonlist2>
+        </buttonlist>
 
-        <buttonlist2 name="country_select" from="baseselector">
+        <buttonlist name="country_select" from="baseselector">
             <position>160,208</position>
-        </buttonlist2>
+        </buttonlist>
 
-        <buttonlist2 name="cast_select" from="baseselector">
+        <buttonlist name="cast_select" from="baseselector">
             <position>160,252</position>
-        </buttonlist2>
+        </buttonlist>
 
-        <buttonlist2 name="year_select" from="baseselector">
+        <buttonlist name="year_select" from="baseselector">
             <position>160,296</position>
-        </buttonlist2>
+        </buttonlist>
 
-        <buttonlist2 name="runtime_select" from="baseselector">
+        <buttonlist name="runtime_select" from="baseselector">
             <position>160,340</position>
-        </buttonlist2>
+        </buttonlist>
 
-        <buttonlist2 name="userrating_select" from="baseselector">
+        <buttonlist name="userrating_select" from="baseselector">
             <position>550,120</position>
-        </buttonlist2>
+        </buttonlist>
 
-        <buttonlist2 name="browse_select" from="baseselector">
+        <buttonlist name="browse_select" from="baseselector">
             <position>550,164</position>
-        </buttonlist2>
+        </buttonlist>
 
-        <buttonlist2 name="inetref_select" from="baseselector">
+        <buttonlist name="inetref_select" from="baseselector">
             <position>550,208</position>
-        </buttonlist2>
+        </buttonlist>
 
-        <buttonlist2 name="coverfile_select" from="baseselector">
+        <buttonlist name="coverfile_select" from="baseselector">
             <position>550,252</position>
-        </buttonlist2>
+        </buttonlist>
 
-        <buttonlist2 name="orderby_select" from="baseselector">
+        <buttonlist name="orderby_select" from="baseselector">
             <position>550,296</position>
-        </buttonlist2>
+        </buttonlist>
 
         <textarea name="numvideos_text" from="basetextarea">
             <area>20,430,760,30</area>

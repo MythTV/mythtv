@@ -28,7 +28,7 @@ class ParentalLevel : public QObject
     bool good() const { return !m_hitlimit; }
 
   protected slots:
-    bool verifyPassword(const QString &password);
+    bool verifyPassword(const QString &password="");
 
   signals:
     void LevelChanged();

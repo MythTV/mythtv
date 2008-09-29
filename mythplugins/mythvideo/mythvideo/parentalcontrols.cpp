@@ -296,6 +296,7 @@ void ParentalLevel::checkPassword()
                                                 FilterNone, true);
 
     connect(pwd, SIGNAL(haveResult(QString)), SLOT(verifyPassword(QString)));
+    connect(pwd, SIGNAL(Exiting()), SLOT(verifyPassword()));
 
     if (pwd->Create())
         popupStack->AddScreen(pwd, false);
