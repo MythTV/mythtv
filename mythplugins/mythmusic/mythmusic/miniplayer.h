@@ -15,10 +15,8 @@ class MPUBLIC MiniPlayer : public MythThemedDialog
   Q_OBJECT
 
   public:
-    MiniPlayer(MythMainWindow *parent, 
-                    MusicPlayer *parentPlayer,
-                    const char *name = 0,
-                    bool setsize = true);
+    MiniPlayer(MythMainWindow *parent, MusicPlayer *parentPlayer,
+               const char *name = "MiniPlayer", bool setsize = true);
     ~MiniPlayer();
 
   public slots:
