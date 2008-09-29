@@ -3,14 +3,14 @@
 
     <window name="browse">
 
-        <buttonlist name="siteslist" from="basebuttonlist">
+        <buttonlist2 name="siteslist" from="basebuttonlist2">
             <area>20,20,200,300</area>
-        </buttonlist>
+        </buttonlist2>
 
-        <buttonlist name="articleslist" from="basebuttonlist">
+        <buttonlist2 name="articleslist" from="basebuttonlist2">
             <area>250,20,530,300</area>
             <showarrow>no</showarrow>
-        </buttonlist>
+        </buttonlist2>
 
         <textarea name="title" from="basetextarea">
             <area>20,350,670,35</area>
@@ -46,10 +46,10 @@
             <multiline>no</multiline>
         </textarea>
 
-        <buttonlist name="articleslist" from="basebuttonlist">
+        <buttonlist2 name="articleslist" from="basebuttonlist2">
             <area>20,50,760,270</area>
             <showarrow>no</showarrow>
-        </buttonlist>
+        </buttonlist2>
 
         <textarea name="title" from="basetextarea">
             <area>20,350,670,35</area>
@@ -79,14 +79,14 @@
 
     <window name="config">
 
-        <buttonlist name="sites" from="basebuttonlist">
+        <buttonlist2 name="sites" from="basebuttonlist2">
             <area>340,40,440,500</area>
             <showarrow>no</showarrow>
-        </buttonlist>
+        </buttonlist2>
 
-        <buttonlist name="category" from="basebuttonlist">
+        <buttonlist2 name="category" from="basebuttonlist2">
             <area>20,40,300,500</area>
-        </buttonlist>
+        </buttonlist2>
 
         <textarea name="context_switch" from="basetextarea">
             <area>20,550,760,50</area>
