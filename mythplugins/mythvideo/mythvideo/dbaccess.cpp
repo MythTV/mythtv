@@ -632,60 +632,56 @@ class FileAssociationsImp
   public:
     FileAssociationsImp() : m_ready(false) {}
 
-    unsigned int add(const QString &ext, const QString &playcommand,
-                     bool ignore, bool use_default)
+    bool add(file_association &fa)
     {
-        file_association fa;
-        file_association *fap = &fa;
-        bool inserting = true;
-        association_list::iterator p = find(ext);
+        file_association ret_fa(fa);
+
+        file_association *existing_fa = 0;
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        association_list::iterator p = find(ret_fa.extension);
         if (p != m_file_associations.end())
         {
-            inserting = false;
-            fap = &(*p);
-        }
+            ret_fa.id = p->id;
+            existing_fa = &(*p);
 
-        fap->playcommand = playcommand;
-        fap->ignore = ignore;
-        fap->use_default = use_default;
-
-        MSqlQuery query(MSqlQuery::InitCon());
-        if (inserting)
-        {
-            fap->extension = ext;
-            query.prepare("INSERT INTO videotypes (extension, playcommand, "
-                          "f_ignore, use_default) VALUES "
-                          "(:EXT, :PLAYCMD, :IGNORED, :USEDEFAULT)");
-        }
-        else
-        {
             query.prepare("UPDATE videotypes SET extension = :EXT, "
                           "playcommand = :PLAYCMD, f_ignore = :IGNORED, "
                           "use_default = :USEDEFAULT WHERE intid = :ID");
-            query.bindValue(":ID", fap->id);
+            query.bindValue(":ID", ret_fa.id);
         }
-        query.bindValue(":EXT", fap->extension);
-        query.bindValue(":PLAYCMD", fap->playcommand);
-        query.bindValue(":IGNORED", fap->ignore);
-        query.bindValue(":USEDEFAULT", fap->use_default);
+        else
+            query.prepare("INSERT INTO videotypes (extension, playcommand, "
+                          "f_ignore, use_default) VALUES "
+                          "(:EXT, :PLAYCMD, :IGNORED, :USEDEFAULT)");
+
+        query.bindValue(":EXT", ret_fa.extension);
+        query.bindValue(":PLAYCMD", ret_fa.playcommand);
+        query.bindValue(":IGNORED", ret_fa.ignore);
+        query.bindValue(":USEDEFAULT", ret_fa.use_default);
 
         if (query.exec() && query.isActive())
         {
-            if (inserting)
+            if (!existing_fa)
             {
                 query.exec("SELECT LAST_INSERT_ID()");
                 if (query.isActive() && query.size() > 0)
                 {
                     query.next();
-                    fap->id = query.value(0).toUInt();
-                    m_file_associations.push_back(fa);
-                    return fa.id;
+                    ret_fa.id = query.value(0).toUInt();
+                    m_file_associations.push_back(ret_fa);
                 }
+                else
+                    return false;
             }
-            return fap->id;
+            else
+                *existing_fa = ret_fa;
+
+            fa = ret_fa;
+            return true;
         }
 
-        return 0;
+        return false;
     }
 
     bool get(unsigned int id, file_association &val) const
@@ -845,11 +841,9 @@ FileAssociations::file_association::file_association(unsigned int l_id,
 {
 }
 
-unsigned int FileAssociations::add(const QString &ext,
-                                   const QString &playcommand, bool ignore,
-                                   bool use_default)
+bool FileAssociations::add(file_association &fa)
 {
-    return m_imp->add(ext, playcommand, ignore, use_default);
+    return m_imp->add(fa);
 }
 
 bool FileAssociations::get(unsigned int id, file_association &val) const

@@ -150,8 +150,7 @@ class FileAssociations
     static FileAssociations &getFileAssociation();
 
   public:
-    unsigned int add(const QString &ext, const QString &playcommand,
-                     bool ignore, bool use_default);
+    bool add(file_association &fa);
     bool get(unsigned int id, file_association &val) const;
     bool get(const QString &ext, file_association &val) const;
     bool remove(unsigned int id);

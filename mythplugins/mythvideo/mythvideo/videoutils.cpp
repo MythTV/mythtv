@@ -1,22 +1,16 @@
-
-// C++ headers
 #include <cstdlib>
 #include <set>
 
-// QT headers
 #include <QDir>
 #include <QImageReader>
 
-// Myth headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdirs.h>
 
-// MythUI headers
 #include <mythtv/libmythui/mythmainwindow.h>
 #include <mythtv/libmythui/mythsystem.h>
 #include <mythtv/libmythui/mythdialogbox.h>
 
-// MythVideo headers
 #include "globals.h"
 #include "videoutils.h"
 #include "metadata.h"
@@ -70,6 +64,86 @@ void PlayVideo(const QString &filename, const MetadataListManager &video_list)
         }
     }
     while (item && playing_time.elapsed() > WATCHED_WATERMARK);
+}
+
+void checkedSetText(MythUIType *container, const QString &item_name,
+                    const QString &text)
+{
+    if (container)
+    {
+        MythUIText *uit = dynamic_cast<MythUIText *>
+                (container->GetChild(item_name));
+        if (uit)
+            uit->SetText(text);
+    }
+}
+
+void ETNop::Child(QString container_name, QString child_name)
+{
+    (void) container_name;
+    (void) child_name;
+}
+
+void ETNop::Container(QString child_name)
+{
+    (void) child_name;
+}
+
+void ETPrintWarning::Child(QString container_name, QString child_name)
+{
+    VERBOSE(VB_IMPORTANT, QString(QObject::tr("Warning: container '%1' is "
+                            "missing child '%2'"))
+            .arg(container_name).arg(child_name));
+}
+
+void ETPrintWarning::Container(QString child_name)
+{
+    VERBOSE(VB_IMPORTANT, QString(QObject::tr("Warning: no valid container "
+                            "to search for child '%1'")).arg(child_name));
+}
+
+struct UIAssignChildError : public UIAssignException
+{
+    UIAssignChildError(QString container, QString child)
+    {
+        m_what = QString(QObject::tr("Error: container '%1' is missing a child "
+                        "element named '%2'")).arg(container).arg(child);
+    }
+
+    QString What()
+    {
+        return m_what;
+    }
+
+  private:
+    QString m_what;
+};
+
+struct UIAssignContainerError : public UIAssignException
+{
+    UIAssignContainerError(QString child)
+    {
+        m_what = QString(QObject::tr("Error: an invalid container was passed "
+                        "while searching for child element '%1'")).arg(child);
+    }
+
+    QString What()
+    {
+        return m_what;
+    }
+
+  private:
+    QString m_what;
+};
+
+void ETErrorException::Child(QString container_name, QString child_name)
+{
+    throw UIAssignChildError(container_name, child_name);
+}
+
+void ETErrorException::Container(QString child_name)
+{
+    throw UIAssignContainerError(child_name);
 }
 
 QStringList GetVideoDirs()
@@ -345,6 +419,9 @@ void ExecuteExternalCommand::OnProcessExit()
 void ExecuteExternalCommand::OnExecDone(bool normal_exit, const QStringList &out,
                                         const QStringList &err)
 {
+    (void) normal_exit;
+    (void) out;
+    (void) err;
 }
 
 void ExecuteExternalCommand::ShowError(const QString &error_msg)

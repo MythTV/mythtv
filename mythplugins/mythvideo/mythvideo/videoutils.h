@@ -20,8 +20,67 @@ void checkedSetText(T *item, const QString &text)
     if (item) item->SetText(text);
 }
 
-void checkedSetText(class LayerSet *container, const QString &item_name,
-                           const QString &text);
+void checkedSetText(class MythUIType *container, const QString &item_name,
+                    const QString &text);
+
+struct UIAssignException
+{
+    virtual QString What() = 0;
+};
+
+struct ETNop
+{
+    static void Child(QString container_name, QString child_name);
+    static void Container(QString child_name);
+};
+
+struct ETPrintWarning
+{
+    static void Child(QString container_name, QString child_name);
+    static void Container(QString child_name);
+};
+
+struct ETErrorException
+{
+    static void Child(QString container_name, QString child_name);
+    static void Container(QString child_name);
+};
+
+template <typename ContainerType, typename UIType,
+    typename ErrorTraits>
+void UIAssign(ContainerType *container, UIType *&item, const QString &name)
+{
+    item = dynamic_cast<UIType *>(container->GetChild(name));
+
+    if (item)
+        return;
+
+    if (!container)
+    {
+        ErrorTraits::Container(name);
+        return;
+    }
+
+    ErrorTraits::Child(container->objectName(), name);
+}
+
+template <typename ContainerType, typename UIType>
+void UIAssign(ContainerType *container, UIType *&item, const QString &name)
+{
+    UIAssign<ContainerType, UIType, ETPrintWarning>(container, item, name);
+}
+
+template <typename ContainerType, typename UIType>
+void EUIAssign(ContainerType *container, UIType *&item, const QString &name)
+{
+    UIAssign<ContainerType, UIType, ETErrorException>(container, item, name);
+}
+
+template <typename ContainerType, typename UIType>
+void NOPUIAssign(ContainerType *container, UIType *&item, const QString &name)
+{
+    UIAssign<ContainerType, UIType, ETNop>(container, item, name);
+}
 
 QStringList GetVideoDirs();
 

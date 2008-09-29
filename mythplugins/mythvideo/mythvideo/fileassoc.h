@@ -1,57 +1,51 @@
 #ifndef FILEASSOC_H_
 #define FILEASSOC_H_
 
-// QT headers
-#include <QList>
-
-// MythUI headers
 #include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythlistbutton.h>
-#include <mythtv/libmythui/mythuitextedit.h>
-#include <mythtv/libmythui/mythuicheckbox.h>
-#include <mythtv/libmythui/mythuibutton.h>
 
-class FileAssociation;
+class MythScreenStack;
+class MythListButtonItem;
+class MythUITextEdit;
+class MythListButton;
+class MythUICheckBox;
+class MythUIButton;
 
 class FileAssocDialog : public MythScreenType
 {
-
   Q_OBJECT
 
   public:
-
-    FileAssocDialog(MythScreenStack *parent, const QString &name);
+    FileAssocDialog(MythScreenStack *screeParent, const QString &lname);
     ~FileAssocDialog();
 
     bool Create();
 
-    void loadFileAssociations();
-    void saveFileAssociations();
-    void showCurrentFA();
-
   public slots:
+    void OnFASelected(MythListButtonItem *item);
 
-    void switchToFA(MythListButtonItem*);
-    void saveAndExit();
-    void toggleDefault();
-    void toggleIgnore();
-    void setPlayerCommand();
-    void deleteCurrent();
-    void makeNewExtension();
-    void createExtension(QString);
+    void OnUseDefaltChanged();
+    void OnIgnoreChanged();
+    void OnPlayerCommandChanged();
+
+    void OnDonePressed();
+    void OnDeletePressed();
+    void OnNewExtensionPressed();
+
+    void OnNewExtensionComplete(QString newExtension);
 
   private:
+    void UpdateScreen(bool useSelectionOverride = false);
 
-    QList<FileAssociation*>     m_fileAssociations;
-    FileAssociation             *m_currentFileAssociation;
+  private:
+    MythUITextEdit *m_commandEdit;
+    MythListButton *m_extensionList;
+    MythUICheckBox *m_defaultCheck;
+    MythUICheckBox *m_ignoreCheck;
+    MythUIButton *m_doneButton;
+    MythUIButton *m_newButton;
+    MythUIButton *m_deleteButton;
 
-    MythUITextEdit      *m_commandEdit;
-    MythListButton      *m_extensionList;
-    MythUICheckBox      *m_defaultCheck;
-    MythUICheckBox      *m_ignoreCheck;
-    MythUIButton        *m_doneButton;
-    MythUIButton        *m_newButton;
-    MythUIButton        *m_deleteButton;
+    class FileAssocDialogPrivate *m_private;
 };
 
 #endif
