@@ -3,7 +3,7 @@
 
 // MythUI headers
 #include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuibuttonlist.h>
 #include <mythtv/libmythui/mythuitextedit.h>
 
 // MythVideo headers
@@ -56,10 +56,10 @@ class SearchResultsDialog : public MythScreenType
 
   private:
     SearchListResults m_results;
-    MythListButton *m_resultsList;
+    MythUIButtonList *m_resultsList;
 
   private slots:
-    void sendResult(MythListButtonItem *item);
+    void sendResult(MythUIButtonListItem *item);
 };
 
 #endif

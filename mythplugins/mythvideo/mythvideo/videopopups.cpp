@@ -30,7 +30,7 @@ bool CastDialog::Create(void)
     if (!foundtheme)
         return false;
 
-    MythListButton *castList = dynamic_cast<MythListButton *>
+    MythUIButtonList *castList = dynamic_cast<MythUIButtonList *>
                                                         (GetChild("cast"));
     MythUIButton *okButton = dynamic_cast<MythUIButton *>
                                                         (GetChild("ok"));
@@ -49,7 +49,7 @@ bool CastDialog::Create(void)
     QStringListIterator castIterator(cast);
     while (castIterator.hasNext())
     {
-        new MythListButtonItem(castList, castIterator.next());
+        new MythUIButtonListItem(castList, castIterator.next());
     }
 
     if (!BuildFocusList())
@@ -118,7 +118,7 @@ bool SearchResultsDialog::Create(void)
     if (!foundtheme)
         return false;
 
-    m_resultsList = dynamic_cast<MythListButton *> (GetChild("results"));
+    m_resultsList = dynamic_cast<MythUIButtonList *> (GetChild("results"));
 //     MythUIButton *cancelButton = dynamic_cast<MythUIButton *>
 //                                         (GetChild("cancel"));
 
@@ -132,14 +132,14 @@ bool SearchResultsDialog::Create(void)
     while (resultsIterator.hasNext())
     {
         resultsIterator.next();
-        MythListButtonItem *button =
-            new MythListButtonItem(m_resultsList, resultsIterator.value());
+        MythUIButtonListItem *button =
+            new MythUIButtonListItem(m_resultsList, resultsIterator.value());
         QString key = resultsIterator.key();
         button->SetData(key);
     }
 
-     connect(m_resultsList, SIGNAL(itemClicked(MythListButtonItem*)),
-             this, SLOT(sendResult(MythListButtonItem*)));
+     connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+             this, SLOT(sendResult(MythUIButtonListItem*)));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
@@ -147,7 +147,7 @@ bool SearchResultsDialog::Create(void)
     return true;
 }
 
-void SearchResultsDialog::sendResult(MythListButtonItem* item)
+void SearchResultsDialog::sendResult(MythUIButtonListItem* item)
 {
     QString video_uid = item->GetData().toString();
     emit haveResult(video_uid);

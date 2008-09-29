@@ -8,10 +8,10 @@
             <filename>mv-mselect.png</filename>
         </imagetype>
 
-        <buttonlist name="results" from="basebuttonlist">
+        <buttonlist2 name="results" from="basebuttonlist2">
             <area>20,22,357,378</area>
             <showarrow>no</showarrow>
-        </buttonlist>
+        </buttonlist2>
     </window>
 
     <window name="castpopup">
@@ -21,10 +21,10 @@
             <filename>mv-mselect.png</filename>
         </imagetype>
 
-        <buttonlist name="cast" from="basebuttonlist">
+        <buttonlist2 name="cast" from="basebuttonlist2">
             <area>18,18,360,325</area>
             <showarrow>no</showarrow>
-        </buttonlist>
+        </buttonlist2>
 
         <button name="ok" from="basebutton">
             <position>119,350</position>
