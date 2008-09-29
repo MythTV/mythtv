@@ -52,7 +52,7 @@
         <color>#666666</color>
     </font>
 
-    <buttonlist2 name="basebuttonlist2">
+    <buttonlist name="basebuttonlist">
         <area>0,0,300,250</area>
         <layout>vertical</layout>
         <spacing>5</spacing>
@@ -132,7 +132,10 @@
                 </imagetype>
             </state>
         </statetype>
-    </buttonlist2>
+    </buttonlist>
+
+    <!-- TODO: Remove this once all themes are altered. -->
+    <buttonlist name="basebuttonlist2" from="basebuttonlist" />
 
     <!-- Base definition of a button -->
     <button name="basebutton">
@@ -216,7 +219,7 @@
     </spinbox>
 
     <!-- Base definition of a list in 'selector' configuration -->
-    <buttonlist2 name="baseselector">
+    <buttonlist name="baseselector">
         <area>0,0,220,40</area>
         <layout>horizontal</layout>
         <buttonarea>0,0,200,100%</buttonarea>
@@ -270,7 +273,7 @@
                 </imagetype>
             </state>
         </statetype>
-    </buttonlist2>
+    </buttonlist>
 
     <!-- Base definition of a textarea -->
     <textarea name="basetextarea">
@@ -315,7 +318,7 @@
             <align>allcenter</align>
         </textarea>
 
-        <buttonlist2 name="list" from="basebuttonlist2">
+        <buttonlist name="list" from="basebuttonlist">
             <area>12,230,470,250</area>
             <drawfrombottom>yes</drawfrombottom>
             <align>center</align>
@@ -340,7 +343,7 @@
                     </textarea>
                 </state>
             </statetype>
-        </buttonlist2>
+        </buttonlist>
     </window>
 
     <window name="MythBusyDialog">
@@ -438,7 +441,7 @@
             <position>58,85</position>
         </textedit>
 
-        <buttonlist2 name="itemlist" from="basebuttonlist2">
+        <buttonlist name="itemlist" from="basebuttonlist">
             <area>12,150,470,270</area>
             <align>left,vcenter</align>
             <showarrow>no</showarrow>
@@ -459,7 +462,7 @@
                     </textarea>
                 </state>
             </statetype>
-        </buttonlist2>
+        </buttonlist>
 
         <button name="cancel" from="basebutton">
             <position>30,435</position>
