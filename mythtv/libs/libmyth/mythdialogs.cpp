@@ -324,7 +324,7 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
         GetMythUI()->ThemeWidget(this);
 
     QPalette palette;
-    palette.setColor(backgroundRole(), popupBackground);
+    palette.setColor(backgroundRole(), popupHighlight);
     setPalette(palette);
 
     popupForegroundColor = popupForeground;
