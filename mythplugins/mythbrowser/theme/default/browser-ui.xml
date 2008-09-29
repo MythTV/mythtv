@@ -7,9 +7,9 @@
     </font>
 
     <window name="browser">
-        <buttonlist2 name="pagelist" from="baseselector">
+        <buttonlist name="pagelist" from="baseselector">
             <area>20,10,760,45</area>
-        </buttonlist2>
+        </buttonlist>
 
         <webbrowser name="webbrowser">
             <area>20,55,760,490</area>
@@ -54,7 +54,7 @@
             <value>Category</value>
         </textarea>
 
-        <buttonlist2 name="grouplist">
+        <buttonlist name="grouplist">
             <area>75,120,660,40</area>
             <layout>horizontal</layout>
             <spacing>10</spacing>
@@ -108,7 +108,7 @@
                     </imagetype>
                 </state>
             </statetype>
-        </buttonlist2>
+        </buttonlist>
 
         <textarea name="label">
             <area>45,200,130,30</area>
@@ -136,7 +136,7 @@
             <area>25,220,760,335</area>
         </imagetype>
 
-        <buttonlist2 name="bookmarklist" from="basebuttonlist2">
+        <buttonlist name="bookmarklist" from="basebuttonlist">
             <area>40,230,720,280</area>
             <spacing>4</spacing>
             <layout>vertical</layout>
@@ -188,7 +188,7 @@
                     </textarea>
                 </state>
             </statetype>
-        </buttonlist2>
+        </buttonlist>
 
         <textarea name="messagetext" from="basetextarea">
             <font>basemedium</font>

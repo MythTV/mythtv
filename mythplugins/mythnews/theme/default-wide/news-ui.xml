@@ -3,15 +3,15 @@
 
     <window name="news">
 
-        <buttonlist2 name="siteslist" from="basebuttonlist2">
+        <buttonlist name="siteslist" from="basebuttonlist">
             <area>20,20,200,300</area>
             <showarrow>yes</showarrow>
-        </buttonlist2>
+        </buttonlist>
 
-        <buttonlist2 name="articleslist" from="basebuttonlist2">
+        <buttonlist name="articleslist" from="basebuttonlist">
             <area>250,20,530,300</area>
             <showarrow>no</showarrow>
-        </buttonlist2>
+        </buttonlist>
 
         <textarea name="title" from="basetextarea">
             <area>20,350,670,35</area>
@@ -104,14 +104,14 @@
 
     <window name="config">
 
-        <buttonlist2 name="category" from="basebuttonlist2">
+        <buttonlist name="category" from="basebuttonlist">
             <area>20,40,300,500</area>
-        </buttonlist2>
+        </buttonlist>
 
-        <buttonlist2 name="sites" from="basebuttonlist2">
+        <buttonlist name="sites" from="basebuttonlist">
             <area>340,40,440,500</area>
             <showarrow>no</showarrow>
-        </buttonlist2>
+        </buttonlist>
 
         <textarea name="context_switch" from="basetextarea">
             <area>20,550,760,50</area>

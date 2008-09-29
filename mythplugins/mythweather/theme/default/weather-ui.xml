@@ -577,7 +577,7 @@
         </textarea>
 
         <spinbox name="timeout_spinbox" from="basespinbox">
-            <area>600,105,60,30</area>
+            <position>600,105</position>
         </spinbox>
 
         <textarea name="backgroundlbl" from="basetextarea">
@@ -610,17 +610,17 @@
             <align>allcenter</align>
         </textarea>
 
-        <buttonlist2 name="inactivelist" from="basebuttonlist2">
+        <buttonlist name="inactivelist" from="basebuttonlist">
             <area>30,170,300,240</area>
-        </buttonlist2>
+        </buttonlist>
 
         <textarea name="activehdr" from="inactivehdr">
             <position>400,135</position>
         </textarea>
 
-        <buttonlist2 name="activelist" from="basebuttonlist2">
+        <buttonlist name="activelist" from="basebuttonlist">
             <area>400,170,300,240</area>
-        </buttonlist2>
+        </buttonlist>
 
         <textarea name="helptxt" from="basetextarea">
             <area>50,420,700,150</area>
@@ -643,12 +643,12 @@
             <align>allcenter</align>
         </textarea>
 
-        <buttonlist2 name="srclist" from="basebuttonlist2">
+        <buttonlist name="srclist" from="basebuttonlist">
             <area>30,145,220,348</area>
-        </buttonlist2>
+        </buttonlist>
 
         <imagetype name="srclines">
-            <area>315,95,500,370</area>
+            <area>285,95,500,370</area>
             <filename>cr-lines.png</filename>
         </imagetype>
 
@@ -665,15 +665,15 @@
         </textarea>
 
         <spinbox name="update_spinbox" from="basespinbox">
-            <area>600,150,70,30</area>
+            <position>600,150</position>
         </spinbox>
 
         <spinbox name="retrieve_spinbox" from="basespinbox">
-            <area>600,260,70,30</area>
+            <position>600,260</position>
         </spinbox>
 
         <textarea name="srcinfo" from="basetextarea">
-            <area>290,390,450,90</area>
+            <area>290,340,450,90</area>
             <multiline>yes</multiline>
         </textarea>
 
@@ -712,9 +712,9 @@
             <position>610,120</position>
         </button>
 
-        <buttonlist2 name="results" from="basebuttonlist2">
+        <buttonlist name="results" from="basebuttonlist">
             <area>25,190,700,380</area>
-        </buttonlist2>
+        </buttonlist>
 
         <textarea name="numresults" from="basetextarea">
             <area>200,550,400,40</area>
