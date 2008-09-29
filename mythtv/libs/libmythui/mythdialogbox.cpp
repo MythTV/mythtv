@@ -158,7 +158,7 @@ bool MythConfirmationDialog::Create(void)
 
     connect(okButton, SIGNAL(buttonPressed()), SLOT(Confirm()));
 
-    okButton->SetText(tr("Ok"));
+    okButton->SetText(tr("OK"));
     cancelButton->SetText(tr("Cancel"));
 
     messageText->SetText(m_message);
@@ -287,7 +287,7 @@ bool MythTextInputDialog::Create(void)
     m_textEdit->SetPassword(m_isPassword);
 
     messageText->SetText(m_message);
-    okButton->SetText(tr("Ok"));
+    okButton->SetText(tr("OK"));
 
     m_textEdit->SetText("");
 
@@ -394,7 +394,7 @@ bool MythUISearchDialog::Create(void)
     if (m_matchesText)
         m_matchesText->SetText(tr("0 matches"));
 
-    okButton->SetText(tr("Ok"));
+    okButton->SetText(tr("OK"));
 
     BuildFocusList();
 
