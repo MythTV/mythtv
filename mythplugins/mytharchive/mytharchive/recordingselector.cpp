@@ -13,8 +13,7 @@
 using namespace std;
 
 // qt
-#include <qdir.h>
-#include <qdom.h>
+#include <QDir>
 #include <QKeyEvent>
 
 // mythtv
@@ -29,8 +28,8 @@ using namespace std;
 #include "archiveutil.h"
 
 RecordingSelector::RecordingSelector(MythMainWindow *parent,
-                                     QString         window_name,
-                                     QString         theme_filename,
+                                     const QString  &window_name,
+                                     const QString  &theme_filename,
                                      const char     *name)
     : MythThemedDialog(parent, window_name, theme_filename, name, true)
 {

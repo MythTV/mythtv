@@ -2,10 +2,9 @@
 #include <cstdlib>
 
 // qt
-#include <qdir.h>
-#include <qapplication.h>
-#include <qfileinfo.h>
-#include <qsqldatabase.h>
+#include <QApplication>
+#include <QDir>
+#include <QFileInfo>
 #include <QPainter>
 
 // myth

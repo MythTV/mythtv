@@ -4,9 +4,9 @@
 #include <iostream>
 
 // qt
-#include <qthread.h>
-#include <qstring.h>
-#include <qstringlist.h>
+#include <QThread>
+#include <QString>
+#include <QStringList>
 
 // mythtv
 #include <mythtv/mythdialogs.h>
@@ -39,7 +39,8 @@ class ThumbFinder : public MythThemedDialog
 
       ThumbFinder(ArchiveItem *archiveItem, const QString &menuTheme,
                   MythMainWindow *parent, const QString &window_name,
-                  const QString &theme_filename, const char *name = 0);
+                  const QString &theme_filename,
+                  const char *name = "ThumbFinder");
     ~ThumbFinder();
 
 

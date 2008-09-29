@@ -26,12 +26,13 @@ typedef struct
 
 class VideoSelector : public MythThemedDialog
 {
-
-  Q_OBJECT
+    Q_OBJECT
 
   public:
-    VideoSelector(MythMainWindow *parent, QString window_name,
-                    QString theme_filename, const char *name = 0);
+    VideoSelector(MythMainWindow *parent,
+                  const QString  &window_name,
+                  const QString  &theme_filename,
+                  const char     *name = "VideoSelector");
 
     ~VideoSelector(void);
 

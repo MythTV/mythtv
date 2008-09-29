@@ -4,8 +4,8 @@
 #include <iostream>
 
 // qt
-#include <qstring.h>
-#include <qstringlist.h>
+#include <QString>
+#include <QStringList>
 #include <QKeyEvent>
 
 // myth
@@ -39,7 +39,7 @@ class FileSelector : public MythThemedDialog
       FileSelector(FSTYPE type, const QString &startDir, 
                    const QString &filemask, MythMainWindow *parent,
                    const QString &window_name, const QString &theme_filename,
-                   const char *name = 0);
+                   const char *name = "FileSelector");
       ~FileSelector();
 
       QString getSelected(void);

@@ -20,8 +20,10 @@ class RecordingSelector : public MythThemedDialog
   Q_OBJECT
 
   public:
-    RecordingSelector(MythMainWindow *parent, QString window_name,
-                    QString theme_filename, const char *name = 0);
+    RecordingSelector(MythMainWindow *parent,
+                      const QString  &window_name,
+                      const QString  &theme_filename,
+                      const char     *name = "RecordingSelector");
 
     ~RecordingSelector(void);
 

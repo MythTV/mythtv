@@ -4,8 +4,8 @@
 #include <iostream>
 
 // qt
-#include <qstring.h>
-#include <qstringlist.h>
+#include <QString>
+#include <QStringList>
 #include <QKeyEvent>
 #include <QList>
 
@@ -23,15 +23,13 @@ typedef struct
 
 class ImportNativeWizard : public MythThemedDialog
 {
-
-  Q_OBJECT
+    Q_OBJECT
 
   public:
-
       ImportNativeWizard(const QString &startDir, 
                    const QString &filemask, MythMainWindow *parent,
                    const QString &window_name, const QString &theme_filename,
-                   const char *name = 0);
+                   const char *name = "ImportNativeWizard");
       ~ImportNativeWizard();
 
   private slots:

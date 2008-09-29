@@ -1,9 +1,9 @@
 #include <cstdlib>
+
 // Qt
-#include <qdir.h>
-#include <qapplication.h>
-#include <qfileinfo.h>
-#include <qsqldatabase.h>
+#include <QApplication>
+#include <QDir>
+#include <QFileInfo>
 
 // Myth
 #include <mythtv/mythcontext.h>

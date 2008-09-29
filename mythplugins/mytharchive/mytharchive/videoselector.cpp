@@ -11,8 +11,7 @@
 #include <iostream>
 
 // qt
-#include <qdir.h>
-#include <qdom.h>
+#include <QDir>
 
 // mythtv
 #include <mythtv/mythcontext.h>
@@ -25,8 +24,10 @@
 
 using namespace std;
 
-VideoSelector::VideoSelector(MythMainWindow *parent, QString window_name,
-                                 QString theme_filename, const char *name)
+VideoSelector::VideoSelector(MythMainWindow *parent,
+                             const QString  &window_name,
+                             const QString  &theme_filename,
+                             const char     *name)
     : MythThemedDialog(parent, window_name, theme_filename, name, true)
 {
     currentParentalLevel = 1;
