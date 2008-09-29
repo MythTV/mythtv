@@ -186,6 +186,14 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
 {
     Clear();
 
+    // HACK: This is just a workaround for the buttonlist inheritance problem
+    //       until the image cache is completed.
+    if (m_gradient)
+    {
+        Load();
+        return;
+    }
+
     QSize aSize = m_Area.size();
 
     QVector<MythImage *>::iterator it;
