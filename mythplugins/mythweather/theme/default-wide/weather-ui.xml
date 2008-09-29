@@ -705,7 +705,7 @@
         </textarea>
 
         <textedit name="loc-edit" from="basetextedit">
-            <area>215,110,375,50</area>
+            <position>215,110</position>
         </textedit>
 
         <button name="searchbtn" from="basebutton">

@@ -69,7 +69,7 @@
         </textarea>
 
         <textedit name="name" from="basetextedit">
-            <area>235,140,375,50</area>
+            <position>235,140</position>
         </textedit>
 
         <textarea name="urllabel" from="basetextarea">
@@ -78,7 +78,7 @@
         </textarea>
 
         <textedit name="url" from="basetextedit">
-            <area>235,240,375,50</area>
+            <position>235,240</position>
         </textedit>
 
         <textarea name="iconlabel" from="basetextarea">
@@ -87,7 +87,7 @@
         </textarea>
 
         <textedit name="icon" from="basetextedit">
-            <area>235,340,375,50</area>
+            <position>235,340</position>
         </textedit>
 
         <checkbox name="podcast_check" from="basecheckbox">
