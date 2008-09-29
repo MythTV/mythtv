@@ -1,6 +1,13 @@
 // POSIX headers
 #include <sys/time.h>     // for setpriority
 
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <libgen.h>
+#include <signal.h>
+
 #include "mythconfig.h"
 #ifdef CONFIG_DARWIN
     #include <sys/aio.h>    // O_SYNC
@@ -9,13 +16,6 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
-
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <libgen.h>
-#include <signal.h>
 #include <cerrno>
 using namespace std;
 
