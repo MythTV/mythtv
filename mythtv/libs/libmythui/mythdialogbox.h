@@ -102,6 +102,8 @@ class MythConfirmationDialog : public MythScreenType
     bool Create(void);
     void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
 
+    bool keyPressEvent(QKeyEvent *event);
+
  signals:
      void haveResult(bool);
 

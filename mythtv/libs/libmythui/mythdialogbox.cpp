@@ -168,6 +168,33 @@ bool MythConfirmationDialog::Create(void)
     return true;
 }
 
+bool MythConfirmationDialog::keyPressEvent(QKeyEvent *event)
+{
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
+    bool handled = false;
+    QStringList actions;
+    if (GetMythMainWindow()->TranslateKeyPress("qt", event, actions))
+    {
+        for (int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            handled = true;
+
+            if (action == "ESCAPE")
+            {
+                sendResult(false);
+                handled = false;
+            }
+            else
+                handled = false;
+        }
+    }
+
+    return handled;
+}
+
 void MythConfirmationDialog::SetReturnEvent(MythScreenType *retscreen,
                                             const QString &resultid)
 {
