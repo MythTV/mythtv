@@ -1,3 +1,8 @@
+
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
 #include <QCursor>
 #include <QDialog>
 #include <QDir>
@@ -13,7 +18,7 @@
 #include <QPixmap>
 #include <QKeyEvent>
 #include <Q3VBoxLayout>
-#include <Q3Frame>
+#include <QFrame>
 #include <QPaintEvent>
 #include <Q3PtrList>
 
@@ -21,19 +26,15 @@
 #include <qwindowsystem_qws.h>
 #endif
 
-#include <iostream>
-using namespace std;
-
 #include "uitypes.h"
 #include "uilistbtntype.h"
 #include "xmlparse.h"
 #include "mythdialogs.h"
 #include "lcddevice.h"
-#include "libmythdb/mythdbcon.h"
-#include "libmythdb/mythverbose.h"
-
+#include "mythdbcon.h"
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
+#include "mythverbose.h"
 
 #ifdef USING_MINGW
 #undef LoadImage
@@ -44,11 +45,12 @@ using namespace std;
  */
 
 MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)
-    : QFrame(parent, name), rescode(kDialogCodeAccepted)
+    : QFrame(parent), rescode(kDialogCodeAccepted)
 {
+    setObjectName(name);
     if (!parent)
     {
-        cerr << "Trying to create a dialog without a parent.\n";
+        VERBOSE(VB_IMPORTANT, "Trying to create a dialog without a parent.");
         return;
     }
 
@@ -268,16 +270,18 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
 
     setLineWidth(3);
     setMidLineWidth(3);
-    setFrameShape(Q3Frame::Panel);
-    setFrameShadow(Q3Frame::Raised);
+    setFrameShape(QFrame::Panel);
+    setFrameShadow(QFrame::Raised);
     setPalette(parent->palette());
-    popupForegroundColor = foregroundColor ();
+    popupForegroundColor = palette().color(foregroundRole());
     setFont(parent->font());
 
     hpadding = gContext->GetNumSetting("PopupHeightPadding", 120);
     wpadding = gContext->GetNumSetting("PopupWidthPadding", 80);
 
-    vbox = new Q3VBoxLayout(this, (int)(10 * hmult));
+    vbox = new QVBoxLayout(this);
+    vbox->setMargin((int)(10 * hmult));
+
     setAutoFillBackground(true);
     setWindowFlags(Qt::FramelessWindowHint);
 }
@@ -298,22 +302,30 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
 
     setLineWidth(3);
     setMidLineWidth(3);
-    setFrameShape(Q3Frame::Panel);
-    setFrameShadow(Q3Frame::Raised);
-    setFrameStyle(Q3Frame::Box | Q3Frame::Plain);
+    setFrameShape(QFrame::Panel);
+    setFrameShadow(QFrame::Raised);
+    setFrameStyle(QFrame::Box | QFrame::Plain);
     setPalette(parent->palette());
     setFont(parent->font());
 
     hpadding = gContext->GetNumSetting("PopupHeightPadding", 120);
     wpadding = gContext->GetNumSetting("PopupWidthPadding", 80);
 
-    vbox = new Q3VBoxLayout(this, (int)(10 * hmult));
+    vbox = new QVBoxLayout(this);
+    vbox->setMargin((int)(10 * hmult));
 
     if (!graphicPopup)
-        setPaletteBackgroundColor(popupBackground);
+    {
+        QPalette palette;
+        palette.setColor(backgroundRole(), popupBackground);
+        setPalette(palette);
+    }
     else
         GetMythUI()->ThemeWidget(this);
-    setPaletteForegroundColor(popupHighlight);
+
+    QPalette palette;
+    palette.setColor(backgroundRole(), popupBackground);
+    setPalette(palette);
 
     popupForegroundColor = popupForeground;
     setAutoFillBackground(true);
@@ -823,10 +835,12 @@ DialogCode MythPopupBox::ShowButtonPopup(
     return ret;
 }
 
-MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps,
-                                         bool cancelButton, const QObject *target, const char *slot)
-                  : MythDialog(gContext->GetMainWindow(), "progress", false)
+MythProgressDialog::MythProgressDialog(
+    const QString &message, int totalSteps,
+    bool cancelButton, const QObject *target, const char *slot)
+    : MythDialog(gContext->GetMainWindow(), "progress", false)
 {
+    setObjectName("MythProgressDialog");
     int screenwidth, screenheight;
     float wmult, hmult;
 
@@ -954,8 +968,8 @@ void MythProgressDialog::setTotalSteps(int totalSteps)
         steps = 1;
 }
 
-MythBusyDialog::MythBusyDialog(const QString &title,
-                               bool cancelButton, const QObject *target, const char *slot)
+MythBusyDialog::MythBusyDialog(const QString &title, bool cancelButton,
+                               const QObject *target, const char *slot)
     : MythProgressDialog(title, 0,
                          cancelButton, target, slot),
                          timer(NULL)
@@ -1232,8 +1246,8 @@ void MythThemedDialog::parsePopup(QDomElement &element)
     //  theme doesn't know how to do this yet
     //
     element = element;
-    cerr << "I don't know how to handle popops yet (I'm going to try and "
-            "just ignore it)\n";
+    VERBOSE(VB_IMPORTANT,
+            "MythThemedDialog cannot parse popups yet - ignoring");
 }
 
 void MythThemedDialog::initForeground()
@@ -1285,16 +1299,16 @@ void MythThemedDialog::updateForeground()
     updateForeground(r);
 }
 
+QString ZeroSizedRect = QString("MythThemedDialog - Something is requesting"
+" a screen update of zero size. A widget probably has not done"
+" calculateScreeArea(). Will redraw the whole screen (inefficient!).");
+
 void MythThemedDialog::updateForeground(const QRect &r)
 {
     QRect rect_to_update = r;
     if (r.width() == 0 || r.height() == 0)
     {
-        cerr << "MythThemedDialog.o: something is requesting a screen update of zero size. "
-             << "A widget probably has not done a calculateScreeArea(). Will redraw "
-             << "the whole screen (inefficient!)."
-             << endl;
-
+        VERBOSE(VB_IMPORTANT, ZeroSizedRect);
         rect_to_update = this->geometry();
     }
 
@@ -1308,11 +1322,7 @@ void MythThemedDialog::ReallyUpdateForeground(const QRect &r)
     QRect rect_to_update = r;
     if (r.width() == 0 || r.height() == 0)
     {
-        cerr << "MythThemedDialog.o: something is requesting a screen update of zero size. "
-             << "A widget probably has not done a calculateScreeArea(). Will redraw "
-             << "the whole screen (inefficient!)."
-             << endl;
-
+        VERBOSE(VB_IMPORTANT, ZeroSizedRect);
         rect_to_update = this->geometry();
     }
 
@@ -1517,8 +1527,8 @@ void MythThemedDialog::activateCurrent()
     }
     else
     {
-        cerr << "dialogbox.o: Something asked me activate the current widget, "
-                "but there is no current widget\n";
+        VERBOSE(VB_IMPORTANT, "MythThemedDialog::activateCurrent() - "
+                              "there is no current widget!");
     }
 }
 
@@ -1720,18 +1730,20 @@ MythPasswordDialog::MythPasswordDialog(QString message,
     this->setGeometry((screenwidth - 250 ) / 2,
                       (screenheight - 50 ) / 2,
                       totalWidth,50);
-    Q3Frame *outside_border = new Q3Frame(this);
+    QFrame *outside_border = new QFrame(this);
+    outside_border->setObjectName(objectName() + "_outside_border");
     outside_border->setGeometry(0,0,totalWidth,50);
-    outside_border->setFrameStyle(Q3Frame::Panel | Q3Frame::Raised );
+    outside_border->setFrameStyle(QFrame::Panel | QFrame::Raised );
     outside_border->setLineWidth(4);
+
     QLabel *message_label = new QLabel(message, this);
+    outside_border->setObjectName(objectName() + "_message_label");
     message_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     message_label->setGeometry(15,10,textWidth,30);
-    message_label->setBackgroundOrigin(ParentOrigin);
-    password_editor = new MythLineEdit(this);
+
+    password_editor = new MythLineEdit(this, objectName()+"_password_editor");
     password_editor->setEchoMode(QLineEdit::Password);
     password_editor->setGeometry(textWidth + 20,10,135,30);
-    password_editor->setBackgroundOrigin(ParentOrigin);
     password_editor->setAllowVirtualKeyboard(false);
     connect(password_editor, SIGNAL(textChanged(const QString &)),
             this, SLOT(checkPassword(const QString &)));
@@ -1966,7 +1978,7 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     //  Make a nice border
     //
 
-    this->setFrameStyle(Q3Frame::Panel | Q3Frame::Raised );
+    this->setFrameStyle(QFrame::Panel | QFrame::Raised );
     this->setLineWidth(4);
 
 
@@ -2078,7 +2090,8 @@ void MythImageFileDialog::buildTree(QString starting_where)
 
         if (prefix.length() < 1)
         {
-            cerr << "mythdialogs.o: Seems unlikely that this is going to work" << endl;
+            VERBOSE(VB_IMPORTANT,
+                    "MythImageFileDialog::buildTree() - empty initial dir?");
         }
         file_string.remove(0, prefix.length());
         QStringList list = file_string.split("/", QString::SkipEmptyParts);
@@ -2091,7 +2104,8 @@ void MythImageFileDialog::buildTree(QString starting_where)
             if (a_counter + 1 >= (int) list.count())
             {
                 QString title = (*an_it);
-                GenericTree *added_node = where_to_add->addNode(title.section(".",0,0), i, true);
+                GenericTree *added_node = where_to_add->addNode(
+                    title.section(".",0,0), i, true);
                 if (make_active)
                 {
                     initial_node = added_node;
@@ -2255,7 +2269,7 @@ MythScrollDialog::MythScrollDialog(MythMainWindow *parent,
     setFont(m_defaultMediumFont);
     setCursor(QCursor(Qt::ArrowCursor));
 
-    setFrameShape(Q3Frame::NoFrame);
+    setFrameShape(QFrame::NoFrame);
     setHScrollBarMode(Q3ScrollView::AlwaysOff);
     setVScrollBarMode(Q3ScrollView::AlwaysOff);
     setFixedSize(QSize(m_screenWidth, m_screenHeight));
@@ -2365,8 +2379,8 @@ DialogCode MythScrollDialog::exec(void)
 {
     if (m_inLoop)
     {
-        std::cerr << "MythScrollDialog::exec: Recursive call detected."
-                  << std::endl;
+        VERBOSE(VB_IMPORTANT,
+                "MythScrollDialog::exec() Recursive call detected.");
         return kDialogCodeRejected;
     }
 
