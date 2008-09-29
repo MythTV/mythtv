@@ -1,9 +1,9 @@
 #ifndef MYTHDIALOGS_H_
 #define MYTHDIALOGS_H_
 
-#include <qdialog.h>
-#include <qlabel.h>
-#include <qabstractbutton.h>
+#include <QDialog>
+#include <QLabel>
+#include <QAbstractButton>
 #include <QObject>
 #include <Q3VBoxLayout>
 #include <Q3ProgressBar>
@@ -75,8 +75,9 @@ inline bool operator!=(const QDialog::DialogCode &a, const DialogCode &b)
 class MPUBLIC MythDialog : public QFrame
 {
     Q_OBJECT
+
   public:
-    MythDialog(MythMainWindow *parent, const char *name = 0,
+    MythDialog(MythMainWindow *parent, const char *name = "MythDialog",
                bool setsize = true);
 
     // these are for backward compatibility..
@@ -133,11 +134,12 @@ class MPUBLIC MythDialog : public QFrame
 class MPUBLIC MythPopupBox : public MythDialog
 {
     Q_OBJECT
+
   public:
-    MythPopupBox(MythMainWindow *parent, const char *name = 0);
+    MythPopupBox(MythMainWindow *parent, const char *name = "MythPopupBox");
     MythPopupBox(MythMainWindow *parent, bool graphicPopup,
                  QColor popupForeground, QColor popupBackground,
-                 QColor popupHighlight, const char *name = 0);
+                 QColor popupHighlight, const char *name = "MythPopupBox");
 
     void addWidget(QWidget *widget, bool setAppearance = true);
     void addLayout(QLayout *layout, int stretch = 0);
@@ -231,6 +233,7 @@ class MPUBLIC MythPopupBox : public MythDialog
 class MPUBLIC MythProgressDialog: public MythDialog
 {
     Q_OBJECT
+
   public:
     /** Create a progress bar dialog.
 
@@ -289,6 +292,7 @@ class MPUBLIC MythProgressDialog: public MythDialog
 class MPUBLIC MythBusyDialog : public MythProgressDialog
 {
     Q_OBJECT
+
   public:
     /** \brief Create the busy indicator.
 
@@ -338,12 +342,15 @@ class MPUBLIC MythBusyDialog : public MythProgressDialog
 class MPUBLIC MythThemedDialog : public MythDialog
 {
     Q_OBJECT
+
   public:
     MythThemedDialog(MythMainWindow *parent, QString window_name,
-                     QString theme_filename = "", const char *name = 0,
-                     bool setsize = true);
-    MythThemedDialog(MythMainWindow *parent, const char *name = 0,
-                     bool setsize = true);
+                     QString         theme_filename = "",
+                     const char     *name = "MythThemedDialog",
+                     bool            setsize = true);
+    MythThemedDialog(MythMainWindow *parent,
+                     const char     *name = "MythThemedDialog",
+                     bool            setsize = true);
 
     virtual bool loadThemedWindow(QString window_name, QString theme_filename);
     virtual void loadWindow(QDomElement &);
@@ -432,12 +439,12 @@ class MPUBLIC MythPasswordDialog: public MythDialog
 
   public:
 
-    MythPasswordDialog( QString message,
-                        bool *success,
-                        QString target,
-                        MythMainWindow *parent,
-                        const char *name = 0,
-                        bool setsize = true);
+    MythPasswordDialog(QString         message,
+                       bool           *success,
+                       QString         target,
+                       MythMainWindow *parent,
+                       const char     *name = "MythPasswordDialog",
+                       bool            setsize = true);
   public slots:
 
     void checkPassword(const QString &);
@@ -449,17 +456,18 @@ class MPUBLIC MythPasswordDialog: public MythDialog
   private:
 
     MythLineEdit        *password_editor;
-    QString             target_text;
+    QString              target_text;
     bool                *success_flag;
 };
 
 class MPUBLIC MythSearchDialog: public MythPopupBox
 {
-  Q_OBJECT
+    Q_OBJECT
 
   public:
 
-    MythSearchDialog(MythMainWindow *parent, const char *name = 0);
+    MythSearchDialog(MythMainWindow *parent,
+                     const char     *name = "MythSearchDialog");
 
   public:
     void setCaption(QString text);
@@ -500,13 +508,13 @@ class MPUBLIC MythImageFileDialog: public MythThemedDialog
 
     typedef QVector<int> IntVector;
 
-    MythImageFileDialog(QString *result,
-                        QString top_directory,
+    MythImageFileDialog(QString        *result,
+                        QString         top_directory,
                         MythMainWindow *parent,
-                        QString window_name,
-                        QString theme_filename = "",
-                        const char *name = 0,
-                        bool setsize=true);
+                        QString         window_name,
+                        QString         theme_filename = "",
+                        const char     *name = "MythImageFileDialog",
+                        bool            setsize=true);
   public slots:
 
     void handleTreeListSelection(int, IntVector*);
@@ -544,7 +552,7 @@ class MPUBLIC MythScrollDialog : public Q3ScrollView
     };
 
     MythScrollDialog(MythMainWindow *parent, ScrollMode mode=HScroll,
-                     const char *name = 0);
+                     const char *name = "MythScrollDialog");
 
     void setArea(int w, int h);
     void setAreaMultiplied(int areaWTimes, int areaHTimes);
