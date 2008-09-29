@@ -80,11 +80,10 @@ class ZMLivePlayer : public MythThemedDialog
 {
     Q_OBJECT
 
-public:
-
+  public:
     ZMLivePlayer(int monitorID, int eventID, MythMainWindow *parent,
              const QString &window_name, const QString &theme_filename,
-             const char *name = 0);
+             const char *name = "ZMLivePlayer");
     ~ZMLivePlayer();
 
     void setMonitorLayout(int layout, bool restore = false);

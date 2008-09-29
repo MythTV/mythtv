@@ -38,14 +38,15 @@ class PhoneUIStatusBar;
 
 class PhoneUIBox : public MythThemedDialog
 {
-  Q_OBJECT
+    Q_OBJECT
 
   public:
-
     typedef QVector<int> IntVector;
 
-    PhoneUIBox(MythMainWindow *parent, QString window_name,
-               QString theme_filename, const char *name = 0);
+    PhoneUIBox(MythMainWindow *parent,
+               const QString  &window_name,
+               const QString  &theme_filename,
+               const char     *name = "PhoneUIBox");
 
     ~PhoneUIBox(void);
 

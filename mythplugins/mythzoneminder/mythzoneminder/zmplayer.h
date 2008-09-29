@@ -42,11 +42,11 @@ class ZMPlayer : public MythThemedDialog
 {
     Q_OBJECT
 
-public:
-
-    ZMPlayer(vector<Event *> *eventList, int *currentEvent, MythMainWindow *parent,
+  public:
+    ZMPlayer(vector<Event *> *eventList, int *currentEvent,
+             MythMainWindow *parent,
              const QString &window_name, const QString &theme_filename,
-             const char *name = 0);
+             const char *name = "ZMPlayer");
     ~ZMPlayer();
 
   private slots:

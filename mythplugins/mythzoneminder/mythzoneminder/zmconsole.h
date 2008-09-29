@@ -31,11 +31,10 @@ class ZMConsole : public MythThemedDialog
 {
     Q_OBJECT
 
-public:
-
+  public:
     ZMConsole(MythMainWindow *parent,
               const QString &window_name, const QString &theme_filename,
-              const char *name = 0);
+              const char *name = "ZMConsole");
     ~ZMConsole();
 
   private slots:
