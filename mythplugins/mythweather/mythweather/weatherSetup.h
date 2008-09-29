@@ -76,7 +76,7 @@ class ScreenSetup : public MythScreenType
   protected slots:
     void updateHelpText(void);
     void saveData(void);
-    void doListSelect(MythListButtonItem *selected);
+    void doListSelect(MythUIButtonListItem *selected);
 
   private:
     void loadData(void);
@@ -90,8 +90,8 @@ class ScreenSetup : public MythScreenType
     SourceManager *m_sourceManager;
     bool m_createdSrcMan;
     MythUIText *m_helpText;
-    MythListButton *m_activeList;
-    MythListButton *m_inactiveList;
+    MythUIButtonList *m_activeList;
+    MythUIButtonList *m_inactiveList;
     MythUIButton *m_finishButton;
 };
 
@@ -108,7 +108,7 @@ class SourceSetup : public MythScreenType
     bool loadData(void);
 
   protected slots:
-    void sourceListItemSelected(MythListButtonItem *itm = 0);
+    void sourceListItemSelected(MythUIButtonListItem *itm = 0);
     void updateSpinboxUpdate(void);
     void retrieveSpinboxUpdate(void);
     void saveData(void);
@@ -116,7 +116,7 @@ class SourceSetup : public MythScreenType
   private:
     MythUISpinBox *m_updateSpinbox;
     MythUISpinBox *m_retrieveSpinbox;
-    MythListButton *m_sourceList;
+    MythUIButtonList *m_sourceList;
     MythUIButton *m_finishButton;
     MythUIText *m_sourceText;
 };
@@ -141,8 +141,8 @@ class LocationDialog : public MythScreenType
 
   protected slots:
     void doSearch(void);
-    void itemSelected(MythListButtonItem *item);
-    void itemClicked(MythListButtonItem *item);
+    void itemSelected(MythUIButtonListItem *item);
+    void itemClicked(MythUIButtonListItem *item);
 
   private:
     Q3Dict<Q3ValueList<ScriptInfo *> > m_cache;
@@ -152,7 +152,7 @@ class LocationDialog : public MythScreenType
 
     MythScreenType *m_retScreen;
 
-    MythListButton *m_locationList;
+    MythUIButtonList *m_locationList;
     MythUITextEdit *m_locationEdit;
     MythUIButton *m_searchButton;
     MythUIText *m_resultsText;
