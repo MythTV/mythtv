@@ -4,7 +4,7 @@
 #include <QUrl>
 
 #include <libmythui/mythuiwebbrowser.h>
-#include <libmythui/mythlistbutton.h>
+#include <libmythui/mythuibuttonlist.h>
 #include <libmythui/mythscreentype.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythuiprogressbar.h>
@@ -48,7 +48,7 @@ class MythBrowser : public MythScreenType
     void slotLoadProgress(int progress);
     void slotTitleChanged(const QString &title);
     void slotStatusBarMessage(const QString &text);
-    void slotTabSelected(MythListButtonItem *item);
+    void slotTabSelected(MythUIButtonListItem *item);
     void slotTabLosingFocus(void);
     void slotIconChanged(void);
     void slotExitingMenu(void);
@@ -60,7 +60,7 @@ class MythBrowser : public MythScreenType
 
     QStringList               m_urlList;
 
-    MythListButton           *m_pageList;
+    MythUIButtonList         *m_pageList;
     QList<WebPage*>           m_browserList;
     MythUIProgressBar        *m_progressBar;
     MythUIText               *m_titleText;

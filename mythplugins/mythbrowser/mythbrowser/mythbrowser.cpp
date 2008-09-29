@@ -47,7 +47,7 @@ bool MythBrowser::Create(void)
     m_progressBar = dynamic_cast<MythUIProgressBar *>(GetChild("progressbar"));
     m_statusText = dynamic_cast<MythUIText *>(GetChild("status"));
     m_titleText = dynamic_cast<MythUIText *>(GetChild("title"));
-    m_pageList = dynamic_cast<MythListButton *>(GetChild("pagelist"));
+    m_pageList = dynamic_cast<MythUIButtonList *>(GetChild("pagelist"));
 
     if (!browser || !m_pageList)
     {
@@ -55,8 +55,8 @@ bool MythBrowser::Create(void)
         return false;
     }
 
-    connect(m_pageList, SIGNAL(itemSelected(MythListButtonItem*)),
-            this, SLOT(slotTabSelected(MythListButtonItem*)));
+    connect(m_pageList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            this, SLOT(slotTabSelected(MythUIButtonListItem*)));
 
     // this is the template for all other browser tabs
     WebPage *page = new WebPage(this, browser);
@@ -252,7 +252,7 @@ void MythBrowser::slotAddBookmark()
 
 void MythBrowser::slotLoadStarted(void)
 {
-    MythListButtonItem *item = m_pageList->GetItemCurrent();
+    MythUIButtonListItem *item = m_pageList->GetItemCurrent();
     if (item)
     {
         item->setText(tr("Loading..."));
@@ -278,7 +278,7 @@ void MythBrowser::slotLoadProgress(int progress)
 
 void MythBrowser::slotTitleChanged(const QString &title)
 {
-    MythListButtonItem *item = m_pageList->GetItemCurrent();
+    MythUIButtonListItem *item = m_pageList->GetItemCurrent();
     if (item)
     {
         item->setText(title);
@@ -288,7 +288,7 @@ void MythBrowser::slotTitleChanged(const QString &title)
 
 void MythBrowser::slotIconChanged(void)
 {
-    MythListButtonItem *item = m_pageList->GetItemCurrent();
+    MythUIButtonListItem *item = m_pageList->GetItemCurrent();
     if (!item)
         return;
 
@@ -322,7 +322,7 @@ void MythBrowser::slotStatusBarMessage(const QString &text)
         m_statusText->SetText(text);
 }
 
-void MythBrowser::slotTabSelected(MythListButtonItem *item)
+void MythBrowser::slotTabSelected(MythUIButtonListItem *item)
 {
     if (!item)
         return;

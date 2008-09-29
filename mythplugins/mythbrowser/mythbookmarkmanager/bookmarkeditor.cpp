@@ -5,7 +5,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 
-// mythbrowser 
+// mythbrowser
 #include "bookmarkeditor.h"
 #include "bookmarkmanager.h"
 #include "browserdbutil.h"
@@ -114,7 +114,7 @@ bool BookmarkEditor::keyPressEvent(QKeyEvent *event)
 
 void BookmarkEditor::Exit()
 {
-    GetScreenStack()->PopScreen();
+    Close();
 }
 
 void BookmarkEditor::Save()

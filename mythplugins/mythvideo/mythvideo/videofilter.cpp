@@ -425,20 +425,20 @@ bool VideoFilterDialog::Create()
     if (!foundtheme)
         return false;
 
-    m_yearList = dynamic_cast<MythListButton *> (GetChild("year_select"));
-    m_userratingList = dynamic_cast<MythListButton *>
+    m_yearList = dynamic_cast<MythUIButtonList *> (GetChild("year_select"));
+    m_userratingList = dynamic_cast<MythUIButtonList *>
                                                 (GetChild("userrating_select"));
-    m_categoryList = dynamic_cast<MythListButton *>
+    m_categoryList = dynamic_cast<MythUIButtonList *>
                                                 (GetChild("category_select"));
-    m_countryList = dynamic_cast<MythListButton *> (GetChild("country_select"));
-    m_genreList = dynamic_cast<MythListButton *> (GetChild("genre_select"));
-    m_castList = dynamic_cast<MythListButton *> (GetChild("cast_select"));
-    m_runtimeList = dynamic_cast<MythListButton *> (GetChild("runtime_select"));
-    m_browseList = dynamic_cast<MythListButton *> (GetChild("browse_select"));
-    m_inetrefList = dynamic_cast<MythListButton *> (GetChild("inetref_select"));
-    m_coverfileList = dynamic_cast<MythListButton *>
+    m_countryList = dynamic_cast<MythUIButtonList *> (GetChild("country_select"));
+    m_genreList = dynamic_cast<MythUIButtonList *> (GetChild("genre_select"));
+    m_castList = dynamic_cast<MythUIButtonList *> (GetChild("cast_select"));
+    m_runtimeList = dynamic_cast<MythUIButtonList *> (GetChild("runtime_select"));
+    m_browseList = dynamic_cast<MythUIButtonList *> (GetChild("browse_select"));
+    m_inetrefList = dynamic_cast<MythUIButtonList *> (GetChild("inetref_select"));
+    m_coverfileList = dynamic_cast<MythUIButtonList *>
                                                 (GetChild("coverfile_select"));
-    m_orderbyList = dynamic_cast<MythListButton *> (GetChild("orderby_select"));
+    m_orderbyList = dynamic_cast<MythUIButtonList *> (GetChild("orderby_select"));
 
     m_doneButton = dynamic_cast<MythUIButton *> (GetChild("done_button"));
     m_saveButton = dynamic_cast<MythUIButton *> (GetChild("save_button"));
@@ -463,28 +463,28 @@ bool VideoFilterDialog::Create()
     fillWidgets();
     update_numvideo();
 
-    connect(m_yearList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setYear(MythListButtonItem*)));
-    connect(m_userratingList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setUserRating(MythListButtonItem*)));
-    connect(m_categoryList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setCategory(MythListButtonItem*)));
-    connect(m_countryList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setCountry(MythListButtonItem*)));
-    connect(m_genreList,SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setGenre(MythListButtonItem*)));
-    connect(m_castList,SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setCast(MythListButtonItem*)));
-    connect(m_runtimeList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setRunTime(MythListButtonItem*)));
-    connect(m_browseList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setBrowse(MythListButtonItem*)));
-    connect(m_inetrefList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setInetRef(MythListButtonItem*)));
-    connect(m_coverfileList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setCoverFile(MythListButtonItem*)));
-    connect(m_orderbyList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setOrderby(MythListButtonItem*)));
+    connect(m_yearList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setYear(MythUIButtonListItem*)));
+    connect(m_userratingList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setUserRating(MythUIButtonListItem*)));
+    connect(m_categoryList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setCategory(MythUIButtonListItem*)));
+    connect(m_countryList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setCountry(MythUIButtonListItem*)));
+    connect(m_genreList,SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setGenre(MythUIButtonListItem*)));
+    connect(m_castList,SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setCast(MythUIButtonListItem*)));
+    connect(m_runtimeList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setRunTime(MythUIButtonListItem*)));
+    connect(m_browseList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setBrowse(MythUIButtonListItem*)));
+    connect(m_inetrefList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setInetRef(MythUIButtonListItem*)));
+    connect(m_coverfileList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setCoverFile(MythUIButtonListItem*)));
+    connect(m_orderbyList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setOrderby(MythUIButtonListItem*)));
 
     connect(m_saveButton, SIGNAL(buttonPressed()), SLOT(saveAsDefault()));
     connect(m_doneButton, SIGNAL(buttonPressed()), SLOT(saveAndExit()));
@@ -540,7 +540,7 @@ void VideoFilterDialog::fillWidgets()
     }
 
     // Category
-    new MythListButtonItem(m_categoryList, QObject::tr("All"),
+    new MythUIButtonListItem(m_categoryList, QObject::tr("All"),
                            kCategoryFilterAll);
 
     const VideoCategory::entry_list &vcl =
@@ -548,73 +548,73 @@ void VideoFilterDialog::fillWidgets()
     for (VideoCategory::entry_list::const_iterator p = vcl.begin();
             p != vcl.end(); ++p)
     {
-        new MythListButtonItem(m_categoryList, p->second, p->first);
+        new MythUIButtonListItem(m_categoryList, p->second, p->first);
     }
 
-    new MythListButtonItem(m_categoryList, VIDEO_CATEGORY_UNKNOWN,
+    new MythUIButtonListItem(m_categoryList, VIDEO_CATEGORY_UNKNOWN,
                            kCategoryFilterUnknown);
     m_categoryList->SetValueByData(m_settings.getCategory());
 
     // Genre
-    new MythListButtonItem(m_genreList, QObject::tr("All"), kGenreFilterAll);
+    new MythUIButtonListItem(m_genreList, QObject::tr("All"), kGenreFilterAll);
 
     const VideoGenre::entry_list &gl = VideoGenre::getGenre().getList();
     for (VideoGenre::entry_list::const_iterator p = gl.begin();
             p != gl.end(); ++p)
     {
-        new MythListButtonItem(m_genreList, p->second, p->first);
+        new MythUIButtonListItem(m_genreList, p->second, p->first);
     }
 
-    new MythListButtonItem(m_genreList, VIDEO_GENRE_UNKNOWN, kGenreFilterUnknown);
+    new MythUIButtonListItem(m_genreList, VIDEO_GENRE_UNKNOWN, kGenreFilterUnknown);
     m_genreList->SetValueByData(m_settings.getGenre());
 
     // Cast
-    new MythListButtonItem(m_castList, QObject::tr("All"), kCastFilterAll);
+    new MythUIButtonListItem(m_castList, QObject::tr("All"), kCastFilterAll);
 
     const VideoCast::entry_list &cl = VideoCast::getCast().getList();
     for (VideoCast::entry_list::const_iterator p = cl.begin();
             p != cl.end(); ++p)
     {
-        new MythListButtonItem(m_castList, p->second, p->first);
+        new MythUIButtonListItem(m_castList, p->second, p->first);
     }
 
-    new MythListButtonItem(m_castList, VIDEO_CAST_UNKNOWN, kCastFilterUnknown);
+    new MythUIButtonListItem(m_castList, VIDEO_CAST_UNKNOWN, kCastFilterUnknown);
     m_castList->SetValueByData(m_settings.getCast());
 
     // Country
-    new MythListButtonItem(m_countryList, QObject::tr("All"), kCountryFilterAll);
+    new MythUIButtonListItem(m_countryList, QObject::tr("All"), kCountryFilterAll);
 
     const VideoCountry::entry_list &cnl = VideoCountry::getCountry().getList();
     for (VideoCountry::entry_list::const_iterator p = cnl.begin();
             p != cnl.end(); ++p)
     {
-        new MythListButtonItem(m_countryList, p->second, p->first);
+        new MythUIButtonListItem(m_countryList, p->second, p->first);
     }
 
-    new MythListButtonItem(m_countryList, VIDEO_COUNTRY_UNKNOWN,
+    new MythUIButtonListItem(m_countryList, VIDEO_COUNTRY_UNKNOWN,
                            kCountryFilterUnknown);
     m_countryList->SetValueByData(m_settings.getCountry());
 
     // Year
-    new MythListButtonItem(m_yearList, QObject::tr("All"), kYearFilterAll);
+    new MythUIButtonListItem(m_yearList, QObject::tr("All"), kYearFilterAll);
 
     for (int_list::const_reverse_iterator p = years.rbegin();
             p != years.rend(); ++p)
     {
-        new MythListButtonItem(m_yearList, QString::number(*p), *p);
+        new MythUIButtonListItem(m_yearList, QString::number(*p), *p);
     }
 
     if (have_unknown_year)
-        new MythListButtonItem(m_yearList, VIDEO_YEAR_UNKNOWN,
+        new MythUIButtonListItem(m_yearList, VIDEO_YEAR_UNKNOWN,
                                kYearFilterUnknown);
 
     m_yearList->SetValueByData(m_settings.getYear());
 
     // Runtime
-    new MythListButtonItem(m_runtimeList, QObject::tr("All"), kRuntimeFilterAll);
+    new MythUIButtonListItem(m_runtimeList, QObject::tr("All"), kRuntimeFilterAll);
 
     if (have_unknown_runtime)
-        new MythListButtonItem(m_runtimeList, VIDEO_RUNTIME_UNKNOWN,
+        new MythUIButtonListItem(m_runtimeList, VIDEO_RUNTIME_UNKNOWN,
                                kRuntimeFilterUnknown);
 
     for (int_list::const_iterator p = runtimes.begin();
@@ -622,19 +622,19 @@ void VideoFilterDialog::fillWidgets()
     {
         QString s = QString("%1 %2 ~ %3 %4").arg(*p * 30).arg(tr("minutes"))
                 .arg((*p + 1) * 30).arg(tr("minutes"));
-        new MythListButtonItem(m_runtimeList, s, *p);
+        new MythUIButtonListItem(m_runtimeList, s, *p);
     }
 
     m_runtimeList->SetValueByData(m_settings.getRuntime());
 
     // User Rating
-    new MythListButtonItem(m_userratingList, QObject::tr("All"),
+    new MythUIButtonListItem(m_userratingList, QObject::tr("All"),
                            kUserRatingFilterAll);
 
     for (int_list::const_reverse_iterator p = user_ratings.rbegin();
             p != user_ratings.rend(); ++p)
     {
-        new MythListButtonItem(m_userratingList,
+        new MythUIButtonListItem(m_userratingList,
                                QString(">= %1").arg(QString::number(*p)),
                                *p);
     }
@@ -642,37 +642,37 @@ void VideoFilterDialog::fillWidgets()
     m_userratingList->SetValueByData(m_settings.getUserrating());
 
     // Browsable
-    new MythListButtonItem(m_browseList, QObject::tr("All"), kBrowseFilterAll);
-    new MythListButtonItem(m_browseList, QObject::tr("Yes"), 1);
-    new MythListButtonItem(m_browseList, QObject::tr("No"), 0);
+    new MythUIButtonListItem(m_browseList, QObject::tr("All"), kBrowseFilterAll);
+    new MythUIButtonListItem(m_browseList, QObject::tr("Yes"), 1);
+    new MythUIButtonListItem(m_browseList, QObject::tr("No"), 0);
     m_browseList->SetValueByData(m_settings.getBrowse());
 
     // Inet Reference
-    new MythListButtonItem(m_inetrefList, QObject::tr("All"),
+    new MythUIButtonListItem(m_inetrefList, QObject::tr("All"),
                            kInetRefFilterAll);
-    new MythListButtonItem(m_inetrefList, QObject::tr("Unknown"),
+    new MythUIButtonListItem(m_inetrefList, QObject::tr("Unknown"),
                            kInetRefFilterUnknown);
     m_inetrefList->SetValueByData(m_settings.getInteRef());
 
     // Coverfile
-    new MythListButtonItem(m_coverfileList, QObject::tr("All"),
+    new MythUIButtonListItem(m_coverfileList, QObject::tr("All"),
                            kCoverFileFilterAll);
-    new MythListButtonItem(m_coverfileList, QObject::tr("None"),
+    new MythUIButtonListItem(m_coverfileList, QObject::tr("None"),
                            kCoverFileFilterNone);
     m_coverfileList->SetValueByData(m_settings.getCoverFile());
 
     // Order by
-    new MythListButtonItem(m_orderbyList, QObject::tr("Title"),
+    new MythUIButtonListItem(m_orderbyList, QObject::tr("Title"),
                            VideoFilterSettings::kOrderByTitle);
-    new MythListButtonItem(m_orderbyList, QObject::tr("Year"),
+    new MythUIButtonListItem(m_orderbyList, QObject::tr("Year"),
                            VideoFilterSettings::kOrderByYearDescending);
-    new MythListButtonItem(m_orderbyList, QObject::tr("User Rating"),
+    new MythUIButtonListItem(m_orderbyList, QObject::tr("User Rating"),
                            VideoFilterSettings::kOrderByUserRatingDescending);
-    new MythListButtonItem(m_orderbyList, QObject::tr("Runtime"),
+    new MythUIButtonListItem(m_orderbyList, QObject::tr("Runtime"),
                            VideoFilterSettings::kOrderByLength);
-    new MythListButtonItem(m_orderbyList, QObject::tr("Filename"),
+    new MythUIButtonListItem(m_orderbyList, QObject::tr("Filename"),
                            VideoFilterSettings::kOrderByFilename);
-    new MythListButtonItem(m_orderbyList, QObject::tr("Video ID"),
+    new MythUIButtonListItem(m_orderbyList, QObject::tr("Video ID"),
                            VideoFilterSettings::kOrderByID);
     m_orderbyList->SetValueByData(m_settings.getOrderby());
 }
@@ -692,77 +692,77 @@ void VideoFilterDialog::saveAndExit()
     Close();
 }
 
-void VideoFilterDialog::setYear(MythListButtonItem *item)
+void VideoFilterDialog::setYear(MythUIButtonListItem *item)
 {
     int new_year = item->GetData().toInt();
     m_settings.setYear(new_year);
     update_numvideo();
 }
 
-void VideoFilterDialog::setUserRating(MythListButtonItem *item)
+void VideoFilterDialog::setUserRating(MythUIButtonListItem *item)
 {
     int new_userrating = item->GetData().toInt();
     m_settings.setUserrating(new_userrating);
     update_numvideo();
 }
 
-void VideoFilterDialog::setCategory(MythListButtonItem *item)
+void VideoFilterDialog::setCategory(MythUIButtonListItem *item)
 {
     int new_category = item->GetData().toInt();
     m_settings.setCategory(new_category);
     update_numvideo();
 }
 
-void VideoFilterDialog::setCountry(MythListButtonItem *item)
+void VideoFilterDialog::setCountry(MythUIButtonListItem *item)
 {
     int new_country = item->GetData().toInt();
     m_settings.setCountry(new_country);
     update_numvideo();
 }
 
-void VideoFilterDialog::setGenre(MythListButtonItem *item)
+void VideoFilterDialog::setGenre(MythUIButtonListItem *item)
 {
     int new_genre = item->GetData().toInt();
     m_settings.setGenre(new_genre);
     update_numvideo();
 }
 
-void VideoFilterDialog::setCast(MythListButtonItem *item)
+void VideoFilterDialog::setCast(MythUIButtonListItem *item)
 {
     int new_cast = item->GetData().toInt();
     m_settings.setCast(new_cast);
     update_numvideo();
 }
 
-void VideoFilterDialog::setRunTime(MythListButtonItem *item)
+void VideoFilterDialog::setRunTime(MythUIButtonListItem *item)
 {
     int new_runtime = item->GetData().toInt();
     m_settings.setRuntime(new_runtime);
     update_numvideo();
 }
 
-void VideoFilterDialog::setBrowse(MythListButtonItem *item)
+void VideoFilterDialog::setBrowse(MythUIButtonListItem *item)
 {
     int new_browse = item->GetData().toInt();
     m_settings.setBrowse(new_browse);
     update_numvideo();
 }
 
-void VideoFilterDialog::setInetRef(MythListButtonItem *item)
+void VideoFilterDialog::setInetRef(MythUIButtonListItem *item)
 {
     int new_inetref = item->GetData().toInt();
     m_settings.setInetRef(new_inetref);
     update_numvideo();
 }
 
-void VideoFilterDialog::setCoverFile(MythListButtonItem *item)
+void VideoFilterDialog::setCoverFile(MythUIButtonListItem *item)
 {
     int new_coverfile = item->GetData().toInt();
     m_settings.setCoverFile(new_coverfile);
     update_numvideo();
 }
 
-void VideoFilterDialog::setOrderby(MythListButtonItem *item)
+void VideoFilterDialog::setOrderby(MythUIButtonListItem *item)
 {
     int new_orderby = item->GetData().toInt();
     m_settings.setOrderby(

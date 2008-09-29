@@ -12,7 +12,7 @@
 
 // Mythui headers
 #include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuibuttonlist.h>
 #include <mythtv/libmythui/mythuitext.h>
 #include <mythtv/libmythui/mythuitextedit.h>
 #include <mythtv/libmythui/mythuibutton.h>
@@ -45,9 +45,9 @@ class TitleDialog : public MythScreenType
     void gotoTitle(uint title_number);
     void toggleTitle();
     void changeName();
-    void setAudio(MythListButtonItem *);
-    void setQuality(MythListButtonItem *);
-    void setSubTitle(MythListButtonItem *);
+    void setAudio(MythUIButtonListItem *);
+    void setQuality(MythUIButtonListItem *);
+    void setSubTitle(MythUIButtonListItem *);
     void toggleAC3();
     void ripTitles();
 
@@ -59,9 +59,9 @@ class TitleDialog : public MythScreenType
     Q3Socket                *m_socketToMtd;
 
     MythUITextEdit      *m_nameEdit;
-    MythListButton      *m_audioList;
-    MythListButton      *m_qualityList;
-    MythListButton      *m_subtitleList;
+    MythUIButtonList      *m_audioList;
+    MythUIButtonList      *m_qualityList;
+    MythUIButtonList      *m_subtitleList;
     MythUICheckBox      *m_ripCheck;
     MythUICheckBox      *m_ripacthreeCheck;
     MythUIText          *m_playlengthText;

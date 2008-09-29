@@ -52,78 +52,6 @@
         <color>#666666</color>
     </font>
 
-    <!-- Base definition of a buttonlist in vertical configuration -->
-    <buttonlist name="basebuttonlist">
-        <area>0,0,10,10</area>
-        <layout>vertical</layout>
-        <activefont>basesmall</activefont>
-        <inactivefont>basesmallgrey</inactivefont>>
-        <statetype name="upscrollarrow">
-            <state type="off">
-                <imagetype name="upon">
-                    <filename>lb-uparrow-reg.png</filename>
-                </imagetype>
-            </state>
-            <state type="full">
-                <imagetype name="upoff">
-                    <filename>lb-uparrow-sel.png</filename>
-                </imagetype>
-            </state>
-        </statetype>
-        <statetype name="downscrollarrow">
-            <state type="off">
-                <imagetype name="dnon">
-                    <filename>lb-dnarrow-reg.png</filename>
-                </imagetype>
-            </state>
-            <state type="full">
-                <imagetype name="dnoff">
-                    <filename>lb-dnarrow-sel.png</filename>
-                </imagetype>
-            </state>
-        </statetype>
-        <showarrow>yes</showarrow>
-        <arrow filename="lb-arrow.png"/>
-        <check-empty filename="lb-check-empty.png"/>
-        <check-half filename="lb-check-half.png"/>
-        <check-full filename="lb-check-full.png"/>
-        <regular-background gradientstart="#505050" gradientend="#000000" gradientalpha="200"/>
-        <selected-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
-        <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="100"/>
-        <spacing>5</spacing>
-        <margin>5,2</margin>
-        <align>left,vcenter</align>
-    </buttonlist>
-
-    <!-- Base definition of a buttonlist in horizontal configuration -->
-    <buttonlist name="basehorizontalbuttonlist" from="basebuttonlist">
-        <layout>horizontal</layout>
-        <statetype name="upscrollarrow">
-            <state type="off">
-                <imagetype name="upon">
-                    <filename>lb-ltarrow-reg.png</filename>
-                </imagetype>
-            </state>
-            <state type="full">
-                <imagetype name="upoff">
-                    <filename>lb-ltarrow-sel.png</filename>
-                </imagetype>
-            </state>
-        </statetype>
-        <statetype name="downscrollarrow">
-            <state type="off">
-                <imagetype name="dnon">
-                    <filename>lb-rtarrow-reg.png</filename>
-                </imagetype>
-            </state>
-            <state type="full">
-                <imagetype name="dnoff">
-                    <filename>lb-rtarrow-sel.png</filename>
-                </imagetype>
-            </state>
-        </statetype>
-    </buttonlist>
-
     <buttonlist2 name="basebuttonlist2">
         <area>0,0,300,250</area>
         <layout>vertical</layout>
@@ -270,13 +198,61 @@
     </spinbox>
 
     <!-- Base definition of a list in 'selector' configuration -->
-    <buttonlist name="baseselector" from="basehorizontalbuttonlist">
-        <area>310,190,230,40</area>
-        <showarrow>no</showarrow>
-        <regular-background filename="selector_background.png" />
-        <selected-background filename="selector_background_selected.png" />
-        <inactive-background filename="selector_background.png" />
-    </buttonlist>
+    <buttonlist2 name="baseselector">
+        <area>0,0,220,40</area>
+        <layout>horizontal</layout>
+        <buttonarea>0,0,200,100%</buttonarea>
+        <statetype name="buttonitem">
+            <state name="active">
+                <area>0,0,200,40</area>
+                <imagetype name="buttonbackground">
+                    <filename>selector_background.png</filename>
+                </imagetype>
+                <textarea name="buttontext">
+                    <area>5,5,85%,30</area>
+                    <font>basesmall</font>
+                    <cutdown>yes</cutdown>
+                    <align>left,vcenter</align>
+                </textarea>
+            </state>
+            <state name="selected" from="active">
+                <imagetype name="buttonbackground">
+                    <filename>selector_background_selected.png</filename>
+                </imagetype>
+            </state>
+            <state name="inactive" from="active">
+                <imagetype name="buttonbackground">
+                    <filename>selector_background_inactive.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>205,2</position>
+            <state type="off">
+                <imagetype name="dnon">
+                    <filename>lb-rtarrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="dnoff">
+                    <filename>lb-rtarrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <statetype name="upscrollarrow">
+            <position>205,21</position>
+            <state type="off">
+                <imagetype name="upon">
+                    <filename>lb-ltarrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="upoff">
+                    <filename>lb-ltarrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+    </buttonlist2>
 
     <!-- Base definition of a textarea -->
     <textarea name="basetextarea">

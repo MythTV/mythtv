@@ -4,9 +4,9 @@
 #include <mythtv/libmythui/mythscreentype.h>
 
 class MythScreenStack;
-class MythListButtonItem;
+class MythUIButtonListItem;
 class MythUITextEdit;
-class MythListButton;
+class MythUIButtonList;
 class MythUICheckBox;
 class MythUIButton;
 
@@ -21,7 +21,7 @@ class FileAssocDialog : public MythScreenType
     bool Create();
 
   public slots:
-    void OnFASelected(MythListButtonItem *item);
+    void OnFASelected(MythUIButtonListItem *item);
 
     void OnUseDefaltChanged();
     void OnIgnoreChanged();
@@ -38,7 +38,7 @@ class FileAssocDialog : public MythScreenType
 
   private:
     MythUITextEdit *m_commandEdit;
-    MythListButton *m_extensionList;
+    MythUIButtonList *m_extensionList;
     MythUICheckBox *m_defaultCheck;
     MythUICheckBox *m_ignoreCheck;
     MythUIButton *m_doneButton;

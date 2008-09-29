@@ -90,9 +90,9 @@ bool TitleDialog::Create()
     m_viewButton = dynamic_cast<MythUIButton *> (GetChild("view"));
     m_ripawayButton = dynamic_cast<MythUIButton *> (GetChild("ripaway"));
 
-    m_audioList = dynamic_cast<MythListButton *> (GetChild("audio"));
-    m_qualityList = dynamic_cast<MythListButton *> (GetChild("quality"));
-    m_subtitleList = dynamic_cast<MythListButton *> (GetChild("subtitle"));
+    m_audioList = dynamic_cast<MythUIButtonList *> (GetChild("audio"));
+    m_qualityList = dynamic_cast<MythUIButtonList *> (GetChild("quality"));
+    m_subtitleList = dynamic_cast<MythUIButtonList *> (GetChild("subtitle"));
 
     if (!m_nameEdit || !m_playlengthText || !m_numbtitlesText || !m_ripCheck ||
         !m_ripacthreeCheck || !m_nexttitleButton || !m_prevtitleButton ||
@@ -114,12 +114,12 @@ bool TitleDialog::Create()
 
     connect(m_nameEdit, SIGNAL(valueChanged()), SLOT(changeName()));
 
-    connect(m_audioList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setAudio(MythListButtonItem*)));
-    connect(m_qualityList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setQuality(MythListButtonItem*)));
-    connect(m_subtitleList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setSubTitle(MythListButtonItem*)));
+    connect(m_audioList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setAudio(MythUIButtonListItem*)));
+    connect(m_qualityList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setQuality(MythUIButtonListItem*)));
+    connect(m_subtitleList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setSubTitle(MythUIButtonListItem*)));
 
     connect(m_ripacthreeCheck, SIGNAL(valueChanged()), SLOT(toggleAC3()));
     connect(m_ripCheck, SIGNAL(valueChanged()), SLOT(toggleTitle()));
@@ -157,14 +157,14 @@ void TitleDialog::showCurrentTitle()
         QList<DVDAudioInfo*> *audio_tracks = m_currentTitle->getAudioTracks();
         for(int j = 0; j < audio_tracks->size(); j++)
         {
-            new MythListButtonItem(m_audioList,
+            new MythUIButtonListItem(m_audioList,
                                 audio_tracks->at(j)->getAudioString(), j + 1);
         }
         m_audioList->SetValueByData(m_currentTitle->getAudio());
 
         m_qualityList->Reset();
-        new MythListButtonItem(m_qualityList, tr("ISO Image"), -1);
-        new MythListButtonItem(m_qualityList, tr("Perfect"), 0);
+        new MythUIButtonListItem(m_qualityList, tr("ISO Image"), -1);
+        new MythUIButtonListItem(m_qualityList, tr("Perfect"), 0);
         QString q_string = QString("SELECT name,intid FROM dvdtranscode "
                                     "WHERE input = %1 ;")
                                     .arg(m_currentTitle->getInputID());
@@ -176,18 +176,18 @@ void TitleDialog::showCurrentTitle()
         {
             while(a_query.next())
             {
-                new MythListButtonItem(m_qualityList,
+                new MythUIButtonListItem(m_qualityList,
                     a_query.value(0).toString(), a_query.value(1).toInt());
             }
         }
         m_qualityList->SetValueByData(m_currentTitle->getQuality());
 
         m_subtitleList->Reset();
-        new MythListButtonItem(m_subtitleList, tr("None"), -1);
+        new MythUIButtonListItem(m_subtitleList, tr("None"), -1);
         QList<DVDSubTitleInfo*> *subtitles = m_currentTitle->getSubTitles();
         for(int j = 0; j < subtitles->size(); ++j)
         {
-            new MythListButtonItem(m_subtitleList, subtitles->at(j)->getName(),
+            new MythUIButtonListItem(m_subtitleList, subtitles->at(j)->getName(),
                                    subtitles->at(j)->getID());
         }
         m_subtitleList->SetValueByData(m_currentTitle->getSubTitle());
@@ -237,19 +237,19 @@ void TitleDialog::gotoTitle(uint title_number)
     }
 }
 
-void TitleDialog::setQuality(MythListButtonItem *item)
+void TitleDialog::setQuality(MythUIButtonListItem *item)
 {
     int which_quality = item->GetData().toInt();
     m_currentTitle->setQuality(which_quality);
 }
 
-void TitleDialog::setSubTitle(MythListButtonItem *item)
+void TitleDialog::setSubTitle(MythUIButtonListItem *item)
 {
     int which_subtitle = item->GetData().toInt();
     m_currentTitle->setSubTitle(which_subtitle);
 }
 
-void TitleDialog::setAudio(MythListButtonItem *item)
+void TitleDialog::setAudio(MythUIButtonListItem *item)
 {
     int audio_index = item->GetData().toInt();
     m_currentTitle->setAudio(audio_index);

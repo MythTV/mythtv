@@ -2,10 +2,9 @@
 <mythuitheme>
 
     <window name="browser">
-        <buttonlist name="pagelist" from="baseselector">
+        <buttonlist2 name="pagelist" from="baseselector">
             <area>20,10,1240,45</area>
-            <inactive-background filename="selector_background_inactive.png" />
-        </buttonlist>
+        </buttonlist2>
 
         <webbrowser name="webbrowser">
             <area>20,55,1240,600</area>

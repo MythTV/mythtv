@@ -153,7 +153,7 @@ bool BookmarkManager::Create(void)
     if (!foundtheme)
         return false;
 
-    m_groupList = dynamic_cast<MythListButton *>(GetChild("grouplist"));
+    m_groupList = dynamic_cast<MythUIButtonList *>(GetChild("grouplist"));
     m_bookmarkList = dynamic_cast<MythUIButtonList *>(GetChild("bookmarklist"));
 
     // optional text area warning user hasn't set any bookmarks yet
@@ -175,8 +175,8 @@ bool BookmarkManager::Create(void)
     UpdateGroupList();
     UpdateURLList();
 
-    connect(m_groupList, SIGNAL(itemSelected(MythListButtonItem*)),
-            this, SLOT(slotGroupSelected(MythListButtonItem*)));
+    connect(m_groupList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            this, SLOT(slotGroupSelected(MythUIButtonListItem*)));
 
     connect(m_bookmarkList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             this, SLOT(slotBookmarkClicked(MythUIButtonListItem*)));
@@ -208,7 +208,7 @@ void BookmarkManager::UpdateGroupList(void)
         if (groups.indexOf(site->category) == -1)
         {
             groups.append(site->category);
-            new MythListButtonItem(m_groupList, site->category);
+            new MythUIButtonListItem(m_groupList, site->category);
         }
     }
 }
@@ -220,7 +220,7 @@ void BookmarkManager::UpdateURLList(void)
     if (m_messageText)
         m_messageText->SetVisible((m_siteList.count() == 0));
 
-    MythListButtonItem *item = m_groupList->GetItemCurrent();
+    MythUIButtonListItem *item = m_groupList->GetItemCurrent();
     if (!item)
         return;
 
@@ -237,7 +237,7 @@ void BookmarkManager::UpdateURLList(void)
             item->setText(site->name, "name");
             item->setText(site->url, "url");
             item->setData((void*) site);
-            item->setChecked(site->selected ? 
+            item->setChecked(site->selected ?
                     MythUIButtonListItem::FullChecked : MythUIButtonListItem::NotChecked);
         }
     }
@@ -351,7 +351,7 @@ bool BookmarkManager::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void BookmarkManager::slotGroupSelected(MythListButtonItem *item)
+void BookmarkManager::slotGroupSelected(MythUIButtonListItem *item)
 {
     (void) item;
 
@@ -370,9 +370,9 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
 
 #ifdef MYTHBROWSER_STANDALONE
     m_browser->slotOpenURL(site->url);
-    GetScreenStack()->PopScreen();
+    Close();
 #else
-    QString cmd = gContext->GetSetting("WebBrowserCommand", 
+    QString cmd = gContext->GetSetting("WebBrowserCommand",
                     GetInstallPrefix() + "/bin/mythbrowser");
     cmd += QString(" -z %1 ").arg(
                     gContext->GetSetting("WebBrowserZoomLevel", "1.4"));
@@ -387,7 +387,7 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
     gContext->GetMainWindow()->AllowInput(true);
 
     // we need to reload the bookmarks incase the user added/deleted
-    // any while in MythBrowser 
+    // any while in MythBrowser
     ReloadBookmarks();
 #endif
 }
@@ -563,7 +563,7 @@ void BookmarkManager::slotShowMarked(void)
     if (item && item->getData())
     {
        Bookmark *site = (Bookmark*) item->getData();
-       m_savedBookmark = *site; 
+       m_savedBookmark = *site;
     }
 
     QString cmd = gContext->GetSetting("WebBrowserCommand", GetInstallPrefix() + "/bin/mythbrowser");
@@ -584,7 +584,7 @@ void BookmarkManager::slotShowMarked(void)
     gContext->GetMainWindow()->AllowInput(true);
 
     // we need to reload the bookmarks incase the user added/deleted
-    // any while in MythBrowser 
+    // any while in MythBrowser
     ReloadBookmarks();
 }
 

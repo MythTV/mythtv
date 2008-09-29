@@ -852,17 +852,17 @@
             <position>310,125</position>
         </textedit>
 
-        <buttonlist name="category_select" from="baseselector">
+        <buttonlist2 name="category_select" from="baseselector">
             <position>310,190</position>
-        </buttonlist>
+        </buttonlist2>
 
-        <buttonlist name="level_select" from="baseselector">
+        <buttonlist2 name="level_select" from="baseselector">
             <position>310,240</position>
-        </buttonlist>
+        </buttonlist2>
 
-        <buttonlist name="child_select" from="baseselector">
+        <buttonlist2 name="child_select" from="baseselector">
             <position>310,285</position>
-        </buttonlist>
+        </buttonlist2>
 
         <checkbox name="browse_check" from="basecheckbox">
             <position>310,335</position>
@@ -981,49 +981,49 @@
 
         <!-- Widgets -->
 
-        <buttonlist name="category_select" from="baseselector">
+        <buttonlist2 name="category_select" from="baseselector">
             <position>160,120</position>
-        </buttonlist>
+        </buttonlist2>
 
-        <buttonlist name="genre_select" from="baseselector">
+        <buttonlist2 name="genre_select" from="baseselector">
             <position>160,164</position>
-        </buttonlist>
+        </buttonlist2>
 
-        <buttonlist name="country_select" from="baseselector">
+        <buttonlist2 name="country_select" from="baseselector">
             <position>160,208</position>
-        </buttonlist>
+        </buttonlist2>
 
-        <buttonlist name="cast_select" from="baseselector">
+        <buttonlist2 name="cast_select" from="baseselector">
             <position>160,252</position>
-        </buttonlist>
+        </buttonlist2>
 
-        <buttonlist name="year_select" from="baseselector">
+        <buttonlist2 name="year_select" from="baseselector">
             <position>160,296</position>
-        </buttonlist>
+        </buttonlist2>
 
-        <buttonlist name="runtime_select" from="baseselector">
+        <buttonlist2 name="runtime_select" from="baseselector">
             <position>160,340</position>
-        </buttonlist>
+        </buttonlist2>
 
-        <buttonlist name="userrating_select" from="baseselector">
+        <buttonlist2 name="userrating_select" from="baseselector">
             <position>550,120</position>
-        </buttonlist>
+        </buttonlist2>
 
-        <buttonlist name="browse_select" from="baseselector">
+        <buttonlist2 name="browse_select" from="baseselector">
             <position>550,164</position>
-        </buttonlist>
+        </buttonlist2>
 
-        <buttonlist name="inetref_select" from="baseselector">
+        <buttonlist2 name="inetref_select" from="baseselector">
             <position>550,208</position>
-        </buttonlist>
+        </buttonlist2>
 
-        <buttonlist name="coverfile_select" from="baseselector">
+        <buttonlist2 name="coverfile_select" from="baseselector">
             <position>550,252</position>
-        </buttonlist>
+        </buttonlist2>
 
-        <buttonlist name="orderby_select" from="baseselector">
+        <buttonlist2 name="orderby_select" from="baseselector">
             <position>550,296</position>
-        </buttonlist>
+        </buttonlist2>
 
         <textarea name="numvideos_text" from="basetextarea">
             <area>20,430,760,30</area>

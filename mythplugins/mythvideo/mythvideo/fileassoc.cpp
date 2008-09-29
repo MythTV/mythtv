@@ -6,7 +6,7 @@
 #include <mythtv/mythverbose.h>
 #include <mythtv/libmythui/mythmainwindow.h>
 #include <mythtv/libmythui/mythdialogbox.h>
-#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuibuttonlist.h>
 #include <mythtv/libmythui/mythuitextedit.h>
 #include <mythtv/libmythui/mythuicheckbox.h>
 #include <mythtv/libmythui/mythuibutton.h>
@@ -233,9 +233,9 @@ class FileAssocDialogPrivate
         return ret;
     }
 
-    FileAssociationWrap *GetCurrentFA(MythListButton *buttonList)
+    FileAssociationWrap *GetCurrentFA(MythUIButtonList *buttonList)
     {
-        MythListButtonItem *item = buttonList->GetItemCurrent();
+        MythUIButtonListItem *item = buttonList->GetItemCurrent();
         if (item)
         {
             UIDToFAPair key = item->GetData().value<UIDToFAPair>();
@@ -359,8 +359,8 @@ bool FileAssocDialog::Create()
         return false;
     }
 
-    connect(m_extensionList, SIGNAL(itemSelected(MythListButtonItem *)),
-            SLOT(OnFASelected(MythListButtonItem *)));
+    connect(m_extensionList, SIGNAL(itemSelected(MythUIButtonListItem *)),
+            SLOT(OnFASelected(MythUIButtonListItem *)));
     connect(m_commandEdit, SIGNAL(valueChanged()),
             SLOT(OnPlayerCommandChanged()));
     connect(m_defaultCheck, SIGNAL(valueChanged()), SLOT(OnUseDefaltChanged()));
@@ -383,7 +383,7 @@ bool FileAssocDialog::Create()
     return true;
 }
 
-void FileAssocDialog::OnFASelected(MythListButtonItem *item)
+void FileAssocDialog::OnFASelected(MythUIButtonListItem *item)
 {
     (void) item;
     UpdateScreen();
@@ -420,7 +420,7 @@ void FileAssocDialog::OnDonePressed()
 
 void FileAssocDialog::OnDeletePressed()
 {
-    MythListButtonItem *item = m_extensionList->GetItemCurrent();
+    MythUIButtonListItem *item = m_extensionList->GetItemCurrent();
     if (item)
     {
         UIDToFAPair key = item->GetData().value<UIDToFAPair>();
@@ -479,7 +479,7 @@ void FileAssocDialog::UpdateScreen(bool useSelectionOverride /* = false*/)
     else
     {
         UIDToFAPair::UID_type selected_id = 0;
-        MythListButtonItem *current_item = m_extensionList->GetItemCurrent();
+        MythUIButtonListItem *current_item = m_extensionList->GetItemCurrent();
         if (current_item)
         {
             UIDToFAPair key = current_item->GetData().value<UIDToFAPair>();
@@ -500,8 +500,8 @@ void FileAssocDialog::UpdateScreen(bool useSelectionOverride /* = false*/)
         {
             if (p->m_file_assoc)
             {
-                MythListButtonItem *new_item =
-                        new MythListButtonItem(m_extensionList,
+                MythUIButtonListItem *new_item =
+                        new MythUIButtonListItem(m_extensionList,
                                 p->m_file_assoc->GetExtension(),
                                 QVariant::fromValue(*p));
                 if (selected_id && p->m_uid == selected_id)

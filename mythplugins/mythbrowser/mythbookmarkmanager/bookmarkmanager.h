@@ -8,7 +8,6 @@
 #include <mythtv/mythdialogs.h>
 
 // libmythui
-#include <libmythui/mythlistbutton.h>
 #include <libmythui/mythuibuttonlist.h>
 #include <libmythui/mythscreentype.h>
 #include <libmythui/mythdialogbox.h>
@@ -80,7 +79,7 @@ class BookmarkManager : public MythScreenType
 #endif
 
   private slots:
-    void slotGroupSelected(MythListButtonItem *item);
+    void slotGroupSelected(MythUIButtonListItem *item);
     void slotBookmarkClicked(MythUIButtonListItem *item);
     void slotEditDialogExited(void);
     void slotDoDeleteCurrent(bool doDelete);
@@ -110,7 +109,7 @@ class BookmarkManager : public MythScreenType
     Bookmark          m_savedBookmark;
 
     MythUIButtonList *m_bookmarkList;
-    MythListButton   *m_groupList;
+    MythUIButtonList   *m_groupList;
     MythUIText       *m_messageText;
 
     MythDialogBox    *m_menuPopup;

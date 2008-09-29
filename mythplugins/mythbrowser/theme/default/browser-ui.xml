@@ -7,10 +7,9 @@
     </font>
 
     <window name="browser">
-        <buttonlist name="pagelist" from="baseselector">
+        <buttonlist2 name="pagelist" from="baseselector">
             <area>20,10,760,45</area>
-            <inactive-background filename="selector_background_inactive.png" />
-        </buttonlist>
+        </buttonlist2>
 
         <webbrowser name="webbrowser">
             <area>20,55,760,490</area>
@@ -55,11 +54,61 @@
             <value>Category</value>
         </textarea>
 
-        <buttonlist name="grouplist" from="basehorizontalbuttonlist">
-            <area>60,125,690,35</area>
-            <showarrow>no</showarrow>
-            <margin>5,5</margin>
-        </buttonlist>
+        <buttonlist2 name="grouplist">
+            <area>75,120,660,40</area>
+            <layout>horizontal</layout>
+            <spacing>10</spacing>
+            <buttonarea>0,0,630,100%</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,150,40</area>
+                    <imagetype name="buttonbackground">
+                        <gradient start="#505050" end="#000000" alpha="200" />
+                    </imagetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>5,5,130,30</area>
+                        <cutdown>yes</cutdown>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="buttonbackground">
+                        <gradient start="#52CA38" end="#349838" alpha="255" />
+                    </imagetype>
+                </state>
+                <state name="inactive" from="active">
+                    <imagetype name="buttonbackground">
+                        <gradient start="#52CA38" end="#349838" alpha="100" />
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>640,2</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-rtarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-rtarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>640,21</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-ltarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-ltarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist2>
 
         <textarea name="label">
             <area>45,200,130,30</area>

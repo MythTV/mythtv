@@ -6,7 +6,7 @@
 
 // myth
 #include <libmythui/mythuiwebbrowser.h>
-#include <libmythui/mythlistbutton.h>
+#include <libmythui/mythuibuttonlist.h>
 #include <libmythui/mythscreentype.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythuiprogressbar.h>
@@ -26,7 +26,7 @@ class WebPage : public QObject
     void SetActive(bool active);
 
     MythUIWebBrowser   *getBrowser()  { return m_browser; }
-    MythListButtonItem *getListItem() { return m_listItem; }
+    MythUIButtonListItem *getListItem() { return m_listItem; }
 
   signals:
     void loadProgress(int progress);
@@ -47,7 +47,7 @@ class WebPage : public QObject
 
     MythBrowser        *m_parent;
     MythUIWebBrowser   *m_browser;
-    MythListButtonItem *m_listItem;
+    MythUIButtonListItem *m_listItem;
 };
 
 #endif

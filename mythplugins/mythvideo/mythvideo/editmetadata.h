@@ -3,7 +3,7 @@
 
 // MythUI headers
 #include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuibuttonlist.h>
 #include <mythtv/libmythui/mythuitext.h>
 #include <mythtv/libmythui/mythuitextedit.h>
 #include <mythtv/libmythui/mythuibutton.h>
@@ -34,10 +34,10 @@ class EditMetadataDialog : public MythScreenType
 
     void saveAndExit();
     void setTitle();
-    void setCategory(MythListButtonItem*);
+    void setCategory(MythUIButtonListItem*);
     void setPlayer();
-    void setLevel(MythListButtonItem*);
-    void setChild(MythListButtonItem*);
+    void setLevel(MythUIButtonListItem*);
+    void setChild(MythUIButtonListItem*);
     void toggleBrowse();
     void findCoverArt();
     void NewCategoryPopup();
@@ -54,9 +54,9 @@ class EditMetadataDialog : public MythScreenType
 
     MythUITextEdit      *m_titleEdit;
     MythUITextEdit      *m_playerEdit;
-    MythListButton      *m_categoryList;
-    MythListButton      *m_levelList;
-    MythListButton      *m_childList;
+    MythUIButtonList      *m_categoryList;
+    MythUIButtonList      *m_levelList;
+    MythUIButtonList      *m_childList;
     MythUICheckBox      *m_browseCheck;
     MythUIButton        *m_coverartButton;
     MythUIText          *m_coverartText;

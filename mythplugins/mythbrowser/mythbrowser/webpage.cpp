@@ -19,8 +19,8 @@ WebPage::WebPage(MythBrowser *parent, QRect area, const char* name)
 {
     m_parent = parent;
 
-    m_listItem = new MythListButtonItem(parent->m_pageList, "", NULL, false,
-                                        MythListButtonItem::CantCheck, false);
+    m_listItem = new MythUIButtonListItem(parent->m_pageList, "", NULL, false,
+                                        MythUIButtonListItem::CantCheck, false);
 
     m_browser = new MythUIWebBrowser(parent, name);
     m_browser->SetArea(area);
@@ -46,7 +46,7 @@ WebPage::WebPage(MythBrowser *parent, MythUIWebBrowser *browser)
 {
     m_parent = parent;
 
-    m_listItem = new MythListButtonItem(parent->m_pageList, "");
+    m_listItem = new MythUIButtonListItem(parent->m_pageList, "");
 
     m_browser = browser;
 

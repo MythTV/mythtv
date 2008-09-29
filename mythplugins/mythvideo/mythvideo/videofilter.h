@@ -3,7 +3,7 @@
 
 // Mythui headers
 #include "mythtv/libmythui/mythscreentype.h"
-#include "mythtv/libmythui/mythlistbutton.h"
+#include "mythtv/libmythui/mythuibuttonlist.h"
 #include "mythtv/libmythui/mythuibutton.h"
 #include "mythtv/libmythui/mythuitext.h"
 
@@ -211,34 +211,34 @@ class VideoFilterDialog : public MythScreenType
   public slots:
     void saveAndExit(void);
     void saveAsDefault(void);
-    void setYear(MythListButtonItem *item);
-    void setUserRating(MythListButtonItem *item);
-    void setCategory(MythListButtonItem *item);
-    void setCountry(MythListButtonItem *item);
-    void setGenre(MythListButtonItem *item);
-    void setCast(MythListButtonItem *item);
-    void setRunTime(MythListButtonItem *item);
-    void setBrowse(MythListButtonItem *item);
-    void setInetRef(MythListButtonItem *item);
-    void setCoverFile(MythListButtonItem *item);
-    void setOrderby(MythListButtonItem *item);
+    void setYear(MythUIButtonListItem *item);
+    void setUserRating(MythUIButtonListItem *item);
+    void setCategory(MythUIButtonListItem *item);
+    void setCountry(MythUIButtonListItem *item);
+    void setGenre(MythUIButtonListItem *item);
+    void setCast(MythUIButtonListItem *item);
+    void setRunTime(MythUIButtonListItem *item);
+    void setBrowse(MythUIButtonListItem *item);
+    void setInetRef(MythUIButtonListItem *item);
+    void setCoverFile(MythUIButtonListItem *item);
+    void setOrderby(MythUIButtonListItem *item);
 
  private:
     void fillWidgets(void);
     void update_numvideo(void);
     VideoFilterSettings m_settings;
 
-    MythListButton  *m_browseList;
-    MythListButton  *m_orderbyList;
-    MythListButton  *m_yearList;
-    MythListButton  *m_userratingList;
-    MythListButton  *m_categoryList;
-    MythListButton  *m_countryList;
-    MythListButton  *m_genreList;
-    MythListButton  *m_castList;
-    MythListButton  *m_runtimeList;
-    MythListButton  *m_inetrefList;
-    MythListButton  *m_coverfileList;
+    MythUIButtonList  *m_browseList;
+    MythUIButtonList  *m_orderbyList;
+    MythUIButtonList  *m_yearList;
+    MythUIButtonList  *m_userratingList;
+    MythUIButtonList  *m_categoryList;
+    MythUIButtonList  *m_countryList;
+    MythUIButtonList  *m_genreList;
+    MythUIButtonList  *m_castList;
+    MythUIButtonList  *m_runtimeList;
+    MythUIButtonList  *m_inetrefList;
+    MythUIButtonList  *m_coverfileList;
     MythUIButton    *m_saveButton;
     MythUIButton    *m_doneButton;
     MythUIText      *m_numvideosText;

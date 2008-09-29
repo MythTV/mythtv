@@ -72,9 +72,9 @@ bool EditMetadataDialog::Create(void)
 
     m_coverartText = dynamic_cast<MythUIText *> (GetChild("coverart_text"));
 
-    m_categoryList = dynamic_cast<MythListButton *>(GetChild("category_select"));
-    m_levelList = dynamic_cast<MythListButton *>(GetChild("level_select"));
-    m_childList = dynamic_cast<MythListButton *>(GetChild("child_select"));
+    m_categoryList = dynamic_cast<MythUIButtonList *>(GetChild("category_select"));
+    m_levelList = dynamic_cast<MythUIButtonList *>(GetChild("level_select"));
+    m_childList = dynamic_cast<MythUIButtonList *>(GetChild("child_select"));
 
     m_browseCheck = dynamic_cast<MythUICheckBox *>(GetChild("browse_check"));
 
@@ -105,13 +105,13 @@ bool EditMetadataDialog::Create(void)
 
     connect(m_browseCheck, SIGNAL(valueChanged()), SLOT(toggleBrowse()));
 
-    connect(m_childList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setChild(MythListButtonItem*)));
-    connect(m_levelList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setLevel(MythListButtonItem*)));
-    connect(m_categoryList, SIGNAL(itemSelected(MythListButtonItem*)),
-            SLOT(setCategory(MythListButtonItem*)));
-    connect(m_categoryList, SIGNAL(itemClicked(MythListButtonItem*)),
+    connect(m_childList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setChild(MythUIButtonListItem*)));
+    connect(m_levelList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setLevel(MythUIButtonListItem*)));
+    connect(m_categoryList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setCategory(MythUIButtonListItem*)));
+    connect(m_categoryList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(NewCategoryPopup()));
 
     return true;
@@ -133,14 +133,14 @@ void EditMetadataDialog::fillWidgets()
 {
     m_titleEdit->SetText(m_workingMetadata->Title());
 
-    MythListButtonItem *button =
-        new MythListButtonItem(m_categoryList, VIDEO_CATEGORY_UNKNOWN);
+    MythUIButtonListItem *button =
+        new MythUIButtonListItem(m_categoryList, VIDEO_CATEGORY_UNKNOWN);
     const VideoCategory::entry_list &vcl =
             VideoCategory::getCategory().getList();
     for (VideoCategory::entry_list::const_iterator p = vcl.begin();
             p != vcl.end(); ++p)
     {
-        button = new MythListButtonItem(m_categoryList, p->second);
+        button = new MythUIButtonListItem(m_categoryList, p->second);
         button->SetData(p->first);
     }
     m_categoryList->SetValueByData(m_workingMetadata->getCategoryID());
@@ -148,7 +148,7 @@ void EditMetadataDialog::fillWidgets()
     for (ParentalLevel i = ParentalLevel::plLowest;
             i <= ParentalLevel::plHigh && i.good(); ++i)
     {
-        button = new MythListButtonItem(m_levelList,
+        button = new MythUIButtonListItem(m_levelList,
                                     QString(tr("Level %1")).arg(i.GetLevel()));
         button->SetData(i.GetLevel());
     }
@@ -163,7 +163,7 @@ void EditMetadataDialog::fillWidgets()
     QString caught_name = "";
     int possible_starting_point = 0;
 
-    button = new MythListButtonItem(m_childList,tr("None"));
+    button = new MythUIButtonListItem(m_childList,tr("None"));
 
     // TODO: maybe make the title list have the same sort order
     // as elsewhere.
@@ -215,7 +215,7 @@ void EditMetadataDialog::fillWidgets()
 
         if (p->first != m_workingMetadata->ID())
         {
-            button = new MythListButtonItem(m_childList,p->second);
+            button = new MythUIButtonListItem(m_childList,p->second);
             button->SetData(p->first);
         }
         else
@@ -267,7 +267,7 @@ void EditMetadataDialog::AddCategory(QString category)
 {
     int id = VideoCategory::getCategory().add(category);
     m_workingMetadata->setCategoryID(id);
-    new MythListButtonItem(m_categoryList, category, id);
+    new MythUIButtonListItem(m_categoryList, category, id);
     m_categoryList->SetValueByData(id);
 }
 
@@ -292,7 +292,7 @@ void EditMetadataDialog::setTitle()
     m_workingMetadata->setTitle(m_titleEdit->GetText());
 }
 
-void EditMetadataDialog::setCategory(MythListButtonItem *item)
+void EditMetadataDialog::setCategory(MythUIButtonListItem *item)
 {
     m_workingMetadata->setCategoryID(item->GetData().toInt());
 }
@@ -302,13 +302,13 @@ void EditMetadataDialog::setPlayer()
     m_workingMetadata->setPlayCommand(m_playerEdit->GetText());
 }
 
-void EditMetadataDialog::setLevel(MythListButtonItem *item)
+void EditMetadataDialog::setLevel(MythUIButtonListItem *item)
 {
     ParentalLevel nl(item->GetData().toInt());
     m_workingMetadata->setShowLevel(nl.GetLevel());
 }
 
-void EditMetadataDialog::setChild(MythListButtonItem *item)
+void EditMetadataDialog::setChild(MythUIButtonListItem *item)
 {
     int new_child = item->GetData().toInt();
     m_workingMetadata->setChildID(new_child);
