@@ -355,9 +355,11 @@ RemoteEncoder *RemoteRequestNextFreeRecorder(int curr)
     return new RemoteEncoder(num, hostname, port);
 }
 
-// Takes a QStringList of recorder numbers. Returns the first available
-// free recorder from this list.
-RemoteEncoder *RemoteRequestFreeRecorderFromList(QStringList &qualifiedRecorders)
+/**
+ * Given a list of recorder numbers, return the first available.
+ */
+RemoteEncoder *RemoteRequestFreeRecorderFromList(
+    QStringList &qualifiedRecorders)
 {
     QStringList strlist( "GET_FREE_RECORDER_LIST" );
 
@@ -633,8 +635,13 @@ int RemoteGetFreeRecorderCount(void)
     return strlist[0].toInt();
 }
 
+/**
+ * Get recorder for a programme.
+ *
+ * \return recordernum if pginfo recording in progress, else 0
+ */
 int RemoteCheckForRecording(ProgramInfo *pginfo)
-{  //returns recordernum if pginfo recording in progress, else 0
+{
     QStringList strlist( QString("CHECK_RECORDING") );
     pginfo->ToStringList(strlist);
 
@@ -643,9 +650,17 @@ int RemoteCheckForRecording(ProgramInfo *pginfo)
     return strlist[0].toInt();
 }
 
+/**
+ * Get status of an individual programme (with pre-post roll?).
+ *
+ * \retval  0  Not Recording
+ * \retval  1  Recording
+ * \retval  2  Under-Record
+ * \retval  3  Over-Record
+ */
 int RemoteGetRecordingStatus(ProgramInfo *pginfo, int overrecsecs,
                              int underrecsecs)
-{ //returns 0: not recording, 1: recording, 2: underrecord, 3: overrecord
+{
     QDateTime curtime = QDateTime::currentDateTime();
 
     int retval = 0;
@@ -750,7 +765,7 @@ bool RemoteGetRecordingStatus(
 }
 
 
-/*
+/**
  * \brief return list of currently recording shows
  */
 vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
