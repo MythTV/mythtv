@@ -302,6 +302,9 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     if (img && !img->isNull())
         item->setImage(img);
 
+    if (img)
+        img->DownRef();
+
     int nodeInt = node->getInt();
     if (nodeInt == kSubFolder)
         item->setText(QString("%1").arg(node->childCount()-1), "childcount");
