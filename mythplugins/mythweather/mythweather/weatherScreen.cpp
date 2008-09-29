@@ -185,14 +185,14 @@ QString CurrCondScreen::prepareDataItem(const QString &key,
         return value + (m_units == ENG_UNITS ? " mi" : " km");
 
     if (key == "appt")
-        return value == "NA" ? value : value + (m_units == ENG_UNITS ? "째F" : "째C");
+        return value == "NA" ? value : value + (m_units == ENG_UNITS ? "캟" : "캜");
 
     if (key == "temp")
     {
        if ( (value == "NA") || (value == "N/A") )
           return value;
        else
-          return value + (m_units == ENG_UNITS ? "째F" : "째C");
+          return value + (m_units == ENG_UNITS ? "캟" : "캜");
     }
 
     if (key == "wind_gust" || key == "wind_spdgst" || key == "wind_speed")
@@ -216,7 +216,7 @@ QString ThreeDayForecastScreen::prepareDataItem(const QString &key,
        if ( (value == "NA") || (value == "N/A") )
           return value;
        else
-          return value + (m_units == ENG_UNITS ? "째F" : "째C");
+          return value + (m_units == ENG_UNITS ? "캟" : "캜");
     }
 
     return value;
@@ -237,7 +237,7 @@ QString SixDayForecastScreen::prepareDataItem(const QString &key,
        if ( (value == "NA") || (value == "N/A") )
           return value;
        else
-          return value + (m_units == ENG_UNITS ? "째F" : "째C");
+          return value + (m_units == ENG_UNITS ? "캟" : "캜");
     }
 
     return value;
