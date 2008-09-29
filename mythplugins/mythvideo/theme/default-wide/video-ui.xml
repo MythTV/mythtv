@@ -770,9 +770,9 @@
             <value>Ignore:</value>
         </textarea>
 
-        <spinbox name="extension_select" from="basespinbox">
+        <buttonlist2 name="extension_select" from="baseselector">
             <area>300,195,200,40</area>
-        </spinbox>
+        </buttonlist2>
 
         <textedit name="command" from="basetextedit">
             <position>300,255</position>
