@@ -19,7 +19,6 @@
 Weather::Weather(MythScreenStack *parent, const char *name, SourceManager *srcMan)
     : MythScreenType(parent, name)
 {
-    m_mainStack = parent;
     m_weatherStack = new MythScreenStack(GetMythMainWindow(), "weather stack");
 
     m_paused = false;
@@ -228,7 +227,7 @@ bool Weather::keyPressEvent(QKeyEvent *event)
         {
             m_nextpage_Timer->stop();
             hideScreen();
-            m_mainStack->PopScreen();
+            Close();
         }
         else
             handled = false;

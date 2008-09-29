@@ -46,7 +46,6 @@ class Weather : public MythScreenType
     void showScreen(WeatherScreen *ws);
     void hideScreen(void);
 
-    MythScreenStack *m_mainStack;
     MythScreenStack *m_weatherStack;
     int m_timeoutCounter;
     int m_wantAnimated;
