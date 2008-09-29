@@ -1594,6 +1594,10 @@ void VideoDialog::OnVideoSearchByTitleDone(bool normal_exit,
         }
         StartVideoSearchByUID(results.begin().key(), metadata);
     }
+    else if (results.size() < 1)
+    {
+        createOkDialog(tr("No matches were found."));
+    }
     else
     {
         SearchResultsDialog *resultsdialog = new SearchResultsDialog(m_popupStack,
