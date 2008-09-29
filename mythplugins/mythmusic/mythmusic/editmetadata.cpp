@@ -12,12 +12,12 @@
 #include "genres.h"
 #include "metadata.h"
 
-EditMetadataDialog::EditMetadataDialog(Metadata *source_metadata,
-                                 MythMainWindow *parent,
-                                 QString window_name,
-                                 QString theme_filename,
-                                 const char* name)
-                :MythThemedDialog(parent, window_name, theme_filename, name)
+EditMetadataDialog::EditMetadataDialog(Metadata       *source_metadata,
+                                       MythMainWindow *parent,
+                                       const QString  &window_name,
+                                       const QString  &theme_filename,
+                                       const char     *name)
+    : MythThemedDialog(parent, window_name, theme_filename, name)
 {
     // make a copy so we can abandon changes
     m_metadata = new Metadata(*source_metadata);

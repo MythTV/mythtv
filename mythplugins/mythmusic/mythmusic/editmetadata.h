@@ -15,16 +15,14 @@ class AlbumArtImages;
 
 class EditMetadataDialog : public MythThemedDialog
 {
-
-  Q_OBJECT
+    Q_OBJECT
 
   public:
-
-    EditMetadataDialog(Metadata *source_metadata,
+    EditMetadataDialog(Metadata       *source_metadata,
                        MythMainWindow *parent,
-                       QString window_name,
-                       QString theme_filename,
-                       const char* name = 0);
+                       const QString  &window_name,
+                       const QString  &theme_filename,
+                       const char     *name = "EditMetadataDialog");
     ~EditMetadataDialog();
 
     void keyPressEvent(QKeyEvent *e);
