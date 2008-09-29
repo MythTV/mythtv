@@ -3716,7 +3716,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
     if (!ok)
     {
-        if (!(request.flags & kFlagLiveTV))
+        if (!(request.flags & kFlagLiveTV) || !(request.flags & kFlagEITScan))
         {
             if (curRecording)
                 curRecording->recstatus = rsFailed;
