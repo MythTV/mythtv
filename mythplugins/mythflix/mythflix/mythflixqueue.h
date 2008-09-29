@@ -1,24 +1,3 @@
-/* ============================================================
- * File  : mythflixbrowse.h
- * Author: John Petrocik <john@petrocik.net>
- * Date  : 2005-10-28
- * Description :
- *
- * Copyright 2005 by John Petrocik
-
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General
- * Public License as published bythe Free Software Foundation;
- * either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * ============================================================ */
-
 #ifndef MYTHFLIXQUEUE_H
 #define MYTHFLIXQUEUE_H
 
@@ -29,7 +8,7 @@
 // MythTV headers
 #include <mythtv/libmythui/mythscreentype.h>
 #include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuibuttonlist.h>
 #include <mythtv/libmythui/mythuiimage.h>
 #include <mythtv/libmythui/mythdialogbox.h>
 
@@ -64,7 +43,7 @@ public:
 
     QString executeExternal(const QStringList& args, const QString& purpose);
 
-    MythListButton *m_articlesList;
+    MythUIButtonList *m_articlesList;
 
     MythUIText *m_nameText;
     MythUIText *m_titleText;
@@ -82,7 +61,7 @@ public:
     Q3Http         *http;
 
 private slots:
-    void updateInfoView(MythListButtonItem*);
+    void updateInfoView(MythUIButtonListItem*);
     void slotRetrieveNews();
     void slotNewsRetrieved(NewsSite* site);
 

@@ -1,24 +1,4 @@
-/* ============================================================
- * File  : main.cpp
- * Author: John Petrocik <john@petrocik.net>
- * Date  : 2005-10-28
- * Description :
- *
- * Copyright 2005 by John Petrocik
-
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General
- * Public License as published bythe Free Software Foundation;
- * either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * ============================================================ */
-
+// C++ headers
 #include <iostream>
 #include <unistd.h>
 
@@ -30,6 +10,8 @@
 #include <mythtv/mythversion.h>
 #include <mythtv/mythplugin.h>
 #include <mythtv/mythpluginapi.h>
+
+// MythUI headers
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/libmythui/mythmainwindow.h>
 #include <mythtv/libmythui/mythuihelper.h>

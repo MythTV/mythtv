@@ -1,23 +1,3 @@
-/* ============================================================
- * File  : mythflix.cpp
- * Author: John Petrocik <john@petrocik.net>
- * Date  : 2005-10-28
- * Description :
- *
- * Copyright 2005 by John Petrocik
-
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General
- * Public License as published bythe Free Software Foundation;
- * either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * ============================================================ */
 
 // C headers
 #include <unistd.h>
@@ -87,13 +67,13 @@ bool MythFlix::Create()
     if (!foundtheme)
         return false;
 
-    m_sitesList = dynamic_cast<MythListButton *>
+    m_sitesList = dynamic_cast<MythUIButtonList *>
                 (GetChild("siteslist"));
 
-    connect(m_sitesList, SIGNAL(itemSelected(MythListButtonItem*)),
-            this, SLOT(slotSiteSelected(MythListButtonItem*)));
+    connect(m_sitesList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            this, SLOT(slotSiteSelected(MythUIButtonListItem*)));
 
-    m_articlesList = dynamic_cast<MythListButton *>
+    m_articlesList = dynamic_cast<MythUIButtonList *>
                 (GetChild("articleslist"));
 
     m_statusText = dynamic_cast<MythUIText *>
@@ -114,10 +94,10 @@ bool MythFlix::Create()
         return false;
     }
 
-    connect(m_sitesList, SIGNAL(itemSelected( MythListButtonItem*)),
-            this, SLOT(  updateInfoView(MythListButtonItem*)));
-    connect(m_articlesList, SIGNAL(itemSelected( MythListButtonItem*)),
-            this, SLOT(  updateInfoView(MythListButtonItem*)));
+    connect(m_sitesList, SIGNAL(itemSelected( MythUIButtonListItem*)),
+            this, SLOT(  updateInfoView(MythUIButtonListItem*)));
+    connect(m_articlesList, SIGNAL(itemSelected( MythUIButtonListItem*)),
+            this, SLOT(  updateInfoView(MythUIButtonListItem*)));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
@@ -156,8 +136,8 @@ void MythFlix::loadData()
 
     for (NewsSite *site = m_NewsSites.first(); site; site = m_NewsSites.next())
     {
-        MythListButtonItem* item =
-            new MythListButtonItem(m_sitesList, site->name());
+        MythUIButtonListItem* item =
+            new MythUIButtonListItem(m_sitesList, site->name());
         item->setData(site);
     }
 
@@ -173,7 +153,7 @@ void MythFlix::loadData()
 
 }
 
-void MythFlix::updateInfoView(MythListButtonItem* selected)
+void MythFlix::updateInfoView(MythUIButtonListItem* selected)
 {
     if (!selected)
         return;
@@ -313,7 +293,7 @@ void MythFlix::processAndShowNews(NewsSite* site)
 
     site->process();
 
-    MythListButtonItem *siteListItem = m_sitesList->GetItemCurrent();
+    MythUIButtonListItem *siteListItem = m_sitesList->GetItemCurrent();
     if (!siteListItem || !siteListItem->getData())
         return;
 
@@ -323,8 +303,8 @@ void MythFlix::processAndShowNews(NewsSite* site)
 
         for (NewsArticle* article = site->articleList().first(); article;
              article = site->articleList().next()) {
-            MythListButtonItem* item =
-                new MythListButtonItem(m_articlesList, article->title());
+            MythUIButtonListItem* item =
+                new MythUIButtonListItem(m_articlesList, article->title());
             item->setData(article);
         }
     }
@@ -333,7 +313,7 @@ void MythFlix::processAndShowNews(NewsSite* site)
 void MythFlix::slotShowNetFlixPage()
 {
 
-    MythListButtonItem *articleListItem = m_articlesList->GetItemCurrent();
+    MythUIButtonListItem *articleListItem = m_articlesList->GetItemCurrent();
     if (articleListItem && articleListItem->getData())
     {
         NewsArticle *article = (NewsArticle*) articleListItem->getData();
@@ -352,7 +332,7 @@ void MythFlix::slotShowNetFlixPage()
     }
 }
 
-void MythFlix::slotSiteSelected(MythListButtonItem *item)
+void MythFlix::slotSiteSelected(MythUIButtonListItem *item)
 {
     if (!item || !item->getData())
         return;
@@ -362,7 +342,7 @@ void MythFlix::slotSiteSelected(MythListButtonItem *item)
 
 void MythFlix::InsertMovieIntoQueue(QString queueName, bool atTop)
 {
-    MythListButtonItem *articleListItem = m_articlesList->GetItemCurrent();
+    MythUIButtonListItem *articleListItem = m_articlesList->GetItemCurrent();
 
     if (!articleListItem)
         return;

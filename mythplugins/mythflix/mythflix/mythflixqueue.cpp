@@ -1,24 +1,3 @@
-/* ============================================================
- * File  : mythflix.cpp
- * Author: John Petrocik <john@petrocik.net>
- * Date  : 2005-10-28
- * Description :
- *
- * Copyright 2005 by John Petrocik
-
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General
- * Public License as published bythe Free Software Foundation;
- * either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * ============================================================ */
-
 // C headers
 #include <unistd.h>
 
@@ -85,7 +64,7 @@ bool MythFlixQueue::Create()
     if (!foundtheme)
         return false;
 
-    m_articlesList = dynamic_cast<MythListButton *>
+    m_articlesList = dynamic_cast<MythUIButtonList *>
                 (GetChild("articleslist"));
 
     m_nameText = dynamic_cast<MythUIText *>
@@ -108,8 +87,8 @@ bool MythFlixQueue::Create()
         return false;
     }
 
-    connect(m_articlesList, SIGNAL(itemSelected(MythListButtonItem*)),
-            this, SLOT(updateInfoView(MythListButtonItem*)));
+    connect(m_articlesList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            this, SLOT(updateInfoView(MythUIButtonListItem*)));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
@@ -234,7 +213,7 @@ MythImage* MythFlixQueue::LoadPosterImage(QString location)
     return img;
 }
 
-void MythFlixQueue::updateInfoView(MythListButtonItem* selected)
+void MythFlixQueue::updateInfoView(MythUIButtonListItem* selected)
 {
     NewsArticle *article  = 0;
 
@@ -327,8 +306,8 @@ void MythFlixQueue::processAndShowNews(NewsSite* site)
 
         for (NewsArticle* article = site->articleList().first(); article;
              article = site->articleList().next()) {
-            MythListButtonItem* item =
-                new MythListButtonItem(m_articlesList, article->title());
+            MythUIButtonListItem* item =
+                new MythUIButtonListItem(m_articlesList, article->title());
             item->setData(article);
             //MythImage *posterImage = LoadPosterImage(article->articleURL());
             //if (posterImage)
@@ -342,7 +321,7 @@ void MythFlixQueue::processAndShowNews(NewsSite* site)
 void MythFlixQueue::slotMoveToTop()
 {
 
-    MythListButtonItem *articleListItem = m_articlesList->GetItemCurrent();
+    MythUIButtonListItem *articleListItem = m_articlesList->GetItemCurrent();
 
     if (articleListItem && articleListItem->getData())
     {
@@ -379,7 +358,7 @@ void MythFlixQueue::slotMoveToTop()
 void MythFlixQueue::slotRemoveFromQueue()
 {
 
-    MythListButtonItem *articleListItem = m_articlesList->GetItemCurrent();
+    MythUIButtonListItem *articleListItem = m_articlesList->GetItemCurrent();
 
     if (articleListItem && articleListItem->getData())
     {
@@ -417,7 +396,7 @@ void MythFlixQueue::slotRemoveFromQueue()
 void MythFlixQueue::slotMoveToQueue()
 {
 
-    MythListButtonItem *articleListItem = m_articlesList->GetItemCurrent();
+    MythUIButtonListItem *articleListItem = m_articlesList->GetItemCurrent();
 
     if (articleListItem && articleListItem->getData())
     {
@@ -478,7 +457,7 @@ void MythFlixQueue::slotMoveToQueue()
 void MythFlixQueue::slotShowNetFlixPage()
 {
 
-    MythListButtonItem *articleListItem = m_articlesList->GetItemCurrent();
+    MythUIButtonListItem *articleListItem = m_articlesList->GetItemCurrent();
     if (articleListItem && articleListItem->getData())
     {
         NewsArticle *article = (NewsArticle*) articleListItem->getData();

@@ -1,23 +1,3 @@
-/* ============================================================
- * File  : mythflixconfig.cpp
- * Author: John Petrocik <john@petrocik.net>
- * Date  : 2005-10-28
- * Description :
- *
- * Copyright 2005 by John Petrocik
-
- * This program is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General
- * Public License as published bythe Free Software Foundation;
- * either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * ============================================================ */
 
 // QT headers
 #include <qapplication.h>
@@ -189,10 +169,10 @@ bool MythFlixConfig::Create()
     if (!foundtheme)
         return false;
 
-    m_genresList = dynamic_cast<MythListButton *>
+    m_genresList = dynamic_cast<MythUIButtonList *>
                 (GetChild("sites"));
 
-    m_siteList = dynamic_cast<MythListButton *>
+    m_siteList = dynamic_cast<MythUIButtonList *>
                 (GetChild("category"));
 
     if (!m_genresList || !m_siteList)
@@ -201,10 +181,10 @@ bool MythFlixConfig::Create()
         return false;
     }
 
-    connect(m_siteList, SIGNAL(itemSelected(MythListButtonItem*)),
-            this, SLOT(slotCategoryChanged(MythListButtonItem*)));
-    connect(m_genresList, SIGNAL(itemClicked(MythListButtonItem*)),
-            this, SLOT(toggleItem(MythListButtonItem*)));
+    connect(m_siteList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            this, SLOT(slotCategoryChanged(MythUIButtonListItem*)));
+    connect(m_genresList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+            this, SLOT(toggleItem(MythUIButtonListItem*)));
 
     m_siteList->SetCanTakeFocus(false);
 
@@ -225,35 +205,35 @@ void MythFlixConfig::loadData()
 
     for (NewsCategory* cat = m_priv->categoryList.first();
          cat; cat = m_priv->categoryList.next() ) {
-        MythListButtonItem* item =
-            new MythListButtonItem(m_siteList, cat->name);
+        MythUIButtonListItem* item =
+            new MythUIButtonListItem(m_siteList, cat->name);
         item->setData(cat);
     }
     slotCategoryChanged(m_siteList->GetItemFirst());
 
 }
 
-void MythFlixConfig::toggleItem(MythListButtonItem *item)
+void MythFlixConfig::toggleItem(MythUIButtonListItem *item)
 {
     if (!item || !item->getData())
         return;
 
     NewsSiteItem* site = (NewsSiteItem*) item->getData();
 
-    bool checked = (item->state() == MythListButtonItem::FullChecked);
+    bool checked = (item->state() == MythUIButtonListItem::FullChecked);
 
     if (!checked) {
         if (insertInDB(site))
         {
             site->inDB = true;
-            item->setChecked(MythListButtonItem::FullChecked);
+            item->setChecked(MythUIButtonListItem::FullChecked);
         }
     }
     else {
         if (removeFromDB(site))
         {
             site->inDB = false;
-            item->setChecked(MythListButtonItem::NotChecked);
+            item->setChecked(MythUIButtonListItem::NotChecked);
         }
     }
 }
@@ -309,7 +289,7 @@ bool MythFlixConfig::removeFromDB(NewsSiteItem* site)
 }
 
 
-void MythFlixConfig::slotCategoryChanged(MythListButtonItem *item)
+void MythFlixConfig::slotCategoryChanged(MythUIButtonListItem *item)
 {
     if (!item)
         return;
@@ -320,14 +300,13 @@ void MythFlixConfig::slotCategoryChanged(MythListButtonItem *item)
     if (cat)
     {
         for (NewsSiteItem* site = cat->siteList.first();
-             site;
-             site = cat->siteList.next())
+             site; site = cat->siteList.next() )
         {
-            MythListButtonItem* newItem =
-                new MythListButtonItem(m_genresList, site->name, 0, true,
+            MythUIButtonListItem* newItem =
+                new MythUIButtonListItem(m_genresList, site->name, 0, true,
                                       site->inDB ?
-                                      MythListButtonItem::FullChecked :
-                                      MythListButtonItem::NotChecked);
+                                      MythUIButtonListItem::FullChecked :
+                                      MythUIButtonListItem::NotChecked);
             newItem->setData(site);
         }
     }
