@@ -15,7 +15,6 @@
 #include "mythuitext.h"
 #include "mythuitextedit.h"
 #include "mythuiclock.h"
-#include "mythlistbutton.h"
 #include "mythuibuttonlist.h"
 #include "mythuibutton.h"
 #include "mythuispinbox.h"
@@ -287,9 +286,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         uitype = new MythUITextEdit(parent, name, needInit);
     else if (type == "button")
         uitype = new MythUIButton(parent, name, needInit);
-    else if (type == "buttonlist")
-        uitype = new MythListButton(parent, name);
-    else if (type == "buttonlist2")
+    else if (type == "buttonlist2" || type == "buttonlist")
         uitype = new MythUIButtonList(parent, name);
     else if (type == "buttontree")
         uitype = new MythUIButtonTree(parent, name);

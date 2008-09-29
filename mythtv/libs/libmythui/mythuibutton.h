@@ -86,9 +86,6 @@ class MythUIButton : public MythUIType
     int m_PaddingMarginY;
     int m_textFlags;
     int m_imageAlign;
-
-    friend class MythListButton;
-    friend class MythListButtonItem;
 };
 
 #endif
