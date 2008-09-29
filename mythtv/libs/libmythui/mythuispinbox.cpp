@@ -2,7 +2,7 @@
 #include "mythuispinbox.h"
 
 MythUISpinBox::MythUISpinBox(MythUIType *parent, const QString &name)
-              : MythListButton(parent, name)
+              : MythUIButtonList(parent, name)
 {
 }
 
@@ -21,7 +21,7 @@ void MythUISpinBox::SetRange(int low, int high, int step)
 
     while (value <= high)
     {
-        new MythListButtonItem(this, QString::number(value));
+        new MythUIButtonListItem(this, QString::number(value));
         value = value + step;
     }
 
@@ -40,5 +40,5 @@ void MythUISpinBox::CopyFrom(MythUIType *base)
     if (!spinbox)
         return;
 
-    MythListButton::CopyFrom(base);
+    MythUIButtonList::CopyFrom(base);
 }

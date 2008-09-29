@@ -1,7 +1,7 @@
 #ifndef MYTHUISPINBOX_H_
 #define MYTHUISPINBOX_H_
 
-#include "mythlistbutton.h"
+#include "mythuibuttonlist.h"
 
 /** \class MythUISpinBox
  *
@@ -12,7 +12,7 @@
  * instead.
  *
  */
-class MythUISpinBox : public MythListButton
+class MythUISpinBox : public MythUIButtonList
 {
     Q_OBJECT
   public:

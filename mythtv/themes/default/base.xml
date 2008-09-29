@@ -161,23 +161,34 @@
 
     <!-- Base definition of a spinbox -->
     <spinbox name="basespinbox">
-        <area>0,0,100,40</area>
+        <area>0,0,90,40</area>
         <layout>horizontal</layout>
-        <activefont>basesmall</activefont>
-        <inactivefont>basesmallgrey</inactivefont>
-        <statetype name="upscrollarrow">
-            <state type="off">
-                <imagetype name="upon">
-                    <filename>lb-ltarrow-reg.png</filename>
+        <statetype name="buttonitem">
+            <state name="active">
+                <area>0,0,70,40</area>
+                <imagetype name="buttonbackground">
+                    <filename>spinbox_background.png</filename>
+                </imagetype>
+                <textarea name="buttontext">
+                    <area>5,5,55,30</area>
+                    <font>basesmall</font>
+                    <cutdown>yes</cutdown>
+                    <align>right,vcenter</align>
+                </textarea>
+            </state>
+            <state name="selected" from="active">
+                <imagetype name="buttonbackground">
+                    <filename>spinbox_background_selected.png</filename>
                 </imagetype>
             </state>
-            <state type="full">
-                <imagetype name="upoff">
-                    <filename>lb-ltarrow-sel.png</filename>
+            <state name="inactive" from="active">
+                <imagetype name="buttonbackground">
+                    <filename>spinbox_background_inactive.png</filename>
                 </imagetype>
             </state>
         </statetype>
         <statetype name="downscrollarrow">
+            <position>75,2</position>
             <state type="off">
                 <imagetype name="dnon">
                     <filename>lb-rtarrow-reg.png</filename>
@@ -189,12 +200,19 @@
                 </imagetype>
             </state>
         </statetype>
-        <regular-background gradientstart="#505050" gradientend="#000000" gradientalpha="200"/>
-        <selected-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="255"/>
-        <inactive-background gradientstart="#52CA38" gradientend="#349838" gradientalpha="100"/>
-        <spacing>5</spacing>
-        <margin>5,2</margin>
-        <align>right,vcenter</align>
+        <statetype name="upscrollarrow">
+            <position>75,21</position>
+            <state type="off">
+                <imagetype name="upon">
+                    <filename>lb-ltarrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="upoff">
+                    <filename>lb-ltarrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
     </spinbox>
 
     <!-- Base definition of a list in 'selector' configuration -->
