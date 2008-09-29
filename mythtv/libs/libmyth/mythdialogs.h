@@ -8,7 +8,6 @@
 #include <Q3VBoxLayout>
 #include <Q3ProgressBar>
 #include <QFrame>
-#include <Q3ScrollView>
 #include <QVector>
 #include <Q3PtrList>
 
@@ -539,82 +538,4 @@ class MPUBLIC MythImageFileDialog: public MythThemedDialog
     QString               initialDir;
 };
 
-// ---------------------------------------------------------------------------
-
-class MPUBLIC MythScrollDialog : public Q3ScrollView
-{
-    Q_OBJECT
-
-  public:
-
-    enum ScrollMode {
-        HScroll=0,
-        VScroll
-    };
-
-    MythScrollDialog(MythMainWindow *parent, ScrollMode mode=HScroll,
-                     const char *name = "MythScrollDialog");
-
-    void setArea(int w, int h);
-    void setAreaMultiplied(int areaWTimes, int areaHTimes);
-
-    DialogCode result(void) const;
-
-  signals:
-    void leaveModality();
-
-  public slots:
-
-    DialogCode exec(void);
-    virtual void done(int);
-    virtual void show();
-    virtual void hide();
-    virtual void setContentsPos(int x, int y);
-
-  protected slots:
-
-    virtual void accept();
-    virtual void reject();
-
-  protected:
-    ~MythScrollDialog(); // use deleteLater() instead for thread safety
-    void         keyPressEvent(QKeyEvent *e);
-    virtual void paintEvent(QRegion& region, int x, int y, int w, int h);
-
-    void setResult(DialogCode r);
-    void viewportPaintEvent(QPaintEvent *pe);
-
-    MythMainWindow *m_parent;
-    int             m_screenWidth, m_screenHeight;
-    int             m_xbase, m_ybase;
-    float           m_wmult, m_hmult;
-
-    ScrollMode      m_scrollMode;
-
-    QFont           m_defaultBigFont;
-    QFont           m_defaultMediumFont;
-    QFont           m_defaultSmallFont;
-
-    DialogCode      m_resCode;
-    bool            m_inLoop;
-
-    QPixmap        *m_bgPixmap;
-
-    QPixmap        *m_upArrowPix;
-    QPixmap        *m_dnArrowPix;
-    QPixmap        *m_rtArrowPix;
-    QPixmap        *m_ltArrowPix;
-
-    bool            m_showUpArrow;
-    bool            m_showDnArrow;
-    bool            m_showLtArrow;
-    bool            m_showRtArrow;
-
-    QRect           m_upArrowRect;
-    QRect           m_dnArrowRect;
-    QRect           m_rtArrowRect;
-    QRect           m_ltArrowRect;
-};
-
 #endif
-
