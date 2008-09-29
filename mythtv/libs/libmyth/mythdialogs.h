@@ -209,10 +209,10 @@ class MPUBLIC MythPopupBox : public MythDialog
     void defaultButtonPressedHandler(void);
 
   private:
-    Q3VBoxLayout *vbox;
-    QColor popupForegroundColor;
-    int hpadding, wpadding;
-    bool arrowAccel;
+    QVBoxLayout *vbox;
+    QColor       popupForegroundColor;
+    int          hpadding, wpadding;
+    bool         arrowAccel;
 };
 
 /** The MythTV progress bar dialog.
