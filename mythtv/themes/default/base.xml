@@ -41,15 +41,23 @@
     </font>
 
     <font name="basesmallgreen" from="basesmall">
-        <color>#33CC33</color>
+        <color>#80d400</color>
     </font>
 
     <font name="basesmallred" from="basesmall">
-        <color>#DD3333</color>
+        <color>#800900</color>
     </font>
 
     <font name="basemediumgrey" from="basemedium">
         <color>#666666</color>
+    </font>
+
+    <font name="basemediumgreen" from="basemedium">
+        <color>#80d400</color>
+    </font>
+
+    <font name="basemediumred" from="basemedium">
+        <color>#800900</color>
     </font>
 
     <buttonlist name="basebuttonlist">
@@ -397,10 +405,12 @@
 
         <button name="cancel" from="basebutton">
             <position>90,110</position>
+            <activefont>basemediumred</activefont>
         </button>
 
         <button name="ok" from="basebutton">
             <position>338,110</position>
+            <activefont>basemediumgreen</activefont>
         </button>
     </window>
 
@@ -422,6 +432,7 @@
 
         <button name="ok" from="basebutton">
             <position>109,110</position>
+            <activefont>basemediumgreen</activefont>
         </button>
     </window>
 
@@ -466,10 +477,12 @@
 
         <button name="cancel" from="basebutton">
             <position>30,435</position>
+            <activefont>basemediumred</activefont>
         </button>
 
         <button name="ok" from="basebutton">
             <position>315,435</position>
+            <activefont>basemediumgreen</activefont>
         </button>
 
     </window>
