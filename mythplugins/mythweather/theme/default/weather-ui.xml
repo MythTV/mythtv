@@ -610,17 +610,17 @@
             <align>allcenter</align>
         </textarea>
 
-        <buttonlist name="inactivelist" from="basebuttonlist">
+        <buttonlist2 name="inactivelist" from="basebuttonlist2">
             <area>30,170,300,240</area>
-        </buttonlist>
+        </buttonlist2>
 
         <textarea name="activehdr" from="inactivehdr">
             <position>400,135</position>
         </textarea>
 
-        <buttonlist name="activelist" from="basebuttonlist">
+        <buttonlist2 name="activelist" from="basebuttonlist2">
             <area>400,170,300,240</area>
-        </buttonlist>
+        </buttonlist2>
 
         <textarea name="helptxt" from="basetextarea">
             <area>50,420,700,150</area>
@@ -643,9 +643,9 @@
             <align>allcenter</align>
         </textarea>
 
-        <buttonlist name="srclist" from="basebuttonlist">
+        <buttonlist2 name="srclist" from="basebuttonlist2">
             <area>30,145,220,348</area>
-        </buttonlist>
+        </buttonlist2>
 
         <imagetype name="srclines">
             <area>315,95,500,370</area>
@@ -712,9 +712,9 @@
             <position>610,120</position>
         </button>
 
-        <buttonlist name="results" from="basebuttonlist">
+        <buttonlist2 name="results" from="basebuttonlist2">
             <area>25,190,700,380</area>
-        </buttonlist>
+        </buttonlist2>
 
         <textarea name="numresults" from="basetextarea">
             <area>200,550,400,40</area>

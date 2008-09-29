@@ -9,7 +9,7 @@
 // MythTV headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythlistbutton.h>
+#include <mythtv/libmythui/mythuibuttonlist.h>
 #include <mythtv/libmythui/mythuibutton.h>
 #include <mythtv/libmythui/mythuitext.h>
 #include <mythtv/libmythui/mythuitextedit.h>

@@ -81,7 +81,7 @@ void GlobalSetup::saveData()
     if (m_backgroundCheckbox->GetCheckState() == MythUIStateType::Full)
         checkstate = 1;
     gContext->SaveSetting("weatherbackgroundfetch", checkstate);
-    GetScreenStack()->PopScreen();
+    Close();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -125,8 +125,8 @@ bool ScreenSetup::Create()
 
     m_helpText = dynamic_cast<MythUIText *> (GetChild("helptxt"));
 
-    m_activeList = dynamic_cast<MythListButton *> (GetChild("activelist"));
-    m_inactiveList = dynamic_cast<MythListButton *> (GetChild("inactivelist"));
+    m_activeList = dynamic_cast<MythUIButtonList *> (GetChild("activelist"));
+    m_inactiveList = dynamic_cast<MythUIButtonList *> (GetChild("inactivelist"));
 
     m_finishButton = dynamic_cast<MythUIButton *> (GetChild("finishbutton"));
 
@@ -146,14 +146,14 @@ bool ScreenSetup::Create()
 
     BuildFocusList();
 
-    connect(m_activeList, SIGNAL(itemSelected(MythListButtonItem *)),
+    connect(m_activeList, SIGNAL(itemSelected(MythUIButtonListItem *)),
             this, SLOT(updateHelpText()));
-    connect(m_activeList, SIGNAL(itemClicked(MythListButtonItem *)),
-            this, SLOT(doListSelect(MythListButtonItem *)));
-    connect(m_inactiveList, SIGNAL(itemSelected(MythListButtonItem *)),
+    connect(m_activeList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+            this, SLOT(doListSelect(MythUIButtonListItem *)));
+    connect(m_inactiveList, SIGNAL(itemSelected(MythUIButtonListItem *)),
             this, SLOT(updateHelpText()));
-    connect(m_inactiveList, SIGNAL(itemClicked(MythListButtonItem *)),
-            this, SLOT(doListSelect(MythListButtonItem *)));
+    connect(m_inactiveList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+            this, SLOT(doListSelect(MythUIButtonListItem *)));
 
     SetFocusWidget(m_inactiveList);
 
@@ -204,7 +204,7 @@ void ScreenSetup::updateHelpText()
     if (list == m_inactiveList)
     {
 
-        MythListButtonItem *item = m_inactiveList->GetItemCurrent();
+        MythUIButtonListItem *item = m_inactiveList->GetItemCurrent();
         if (!item)
             return;
 
@@ -222,7 +222,7 @@ void ScreenSetup::updateHelpText()
     }
     else if (list == m_activeList)
     {
-        MythListButtonItem *item = m_activeList->GetItemCurrent();
+        MythUIButtonListItem *item = m_activeList->GetItemCurrent();
         if (!item)
             return;
 
@@ -293,8 +293,8 @@ void ScreenSetup::loadData()
                 script = scriptList.at(x);
                 si->sources.append(script->name);
             }
-            MythListButtonItem *item =
-                    new MythListButtonItem(m_inactiveList, i.key());
+            MythUIButtonListItem *item =
+                    new MythUIButtonListItem(m_inactiveList, i.key());
             item->setData(si);
         }
 
@@ -341,7 +341,7 @@ void ScreenSetup::loadData()
 
         if (!active_screens.find(draworder))
         {
-            MythListButtonItem *item = new MythListButtonItem(m_activeList, name);
+            MythUIButtonListItem *item = new MythUIButtonListItem(m_activeList, name);
             si->units = units;
 
             // Only insert types meant for this screen
@@ -381,7 +381,7 @@ void ScreenSetup::saveData()
 
     for (int i=0; i < m_activeList->GetCount(); i++)
     {
-        MythListButtonItem *item = m_activeList->GetItemAt(i);
+        MythUIButtonListItem *item = m_activeList->GetItemAt(i);
         ScreenListInfo *si = (ScreenListInfo *) item->getData();
         Q3DictIterator<TypeListInfo> it(si->types);
         for (; it.current(); ++it)
@@ -416,7 +416,7 @@ void ScreenSetup::saveData()
     int draworder = 0;
     for (int i=0; i < m_activeList->GetCount(); i++)
     {
-        MythListButtonItem *item = m_activeList->GetItemAt(i);
+        MythUIButtonListItem *item = m_activeList->GetItemAt(i);
         ScreenListInfo *si = (ScreenListInfo *) item->getData();
         db.bindValue(":DRAW", draworder);
         db.bindValue(":CONT", item->text());
@@ -471,10 +471,10 @@ void ScreenSetup::saveData()
         ++draworder;
     }
 
-    GetScreenStack()->PopScreen();
+    Close();
 }
 
-void ScreenSetup::doListSelect(MythListButtonItem *selected)
+void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
 {
     if (!selected)
         return;
@@ -602,7 +602,7 @@ void ScreenSetup::customEvent(QEvent *event)
 
         if (resultid == "options")
         {
-            MythListButtonItem *item = (MythListButtonItem *)dce->GetResultData();
+            MythUIButtonListItem *item = (MythUIButtonListItem *)dce->GetResultData();
             ScreenListInfo *si = (ScreenListInfo *) item->getData();
 
             if (buttonnum == 0)
@@ -653,7 +653,7 @@ void ScreenSetup::customEvent(QEvent *event)
 
             QString txt = si->name;
 
-            MythListButtonItem *item = new MythListButtonItem(m_activeList, txt);
+            MythUIButtonListItem *item = new MythUIButtonListItem(m_activeList, txt);
             item->setData(si);
             if (m_activeList->GetCount())
                 m_activeList->SetActive(true);
@@ -678,7 +678,7 @@ SourceSetup::~SourceSetup()
 {
     for (int i=0; i < m_sourceList->GetCount(); i++)
     {
-        MythListButtonItem *item = m_sourceList->GetItemAt(i);
+        MythUIButtonListItem *item = m_sourceList->GetItemAt(i);
         if (item->getData())
             delete (SourceListInfo *) item->getData();
     }
@@ -694,7 +694,7 @@ bool SourceSetup::Create()
     if (!foundtheme)
         return false;
 
-    m_sourceList = dynamic_cast<MythListButton *> (GetChild("srclist"));
+    m_sourceList = dynamic_cast<MythUIButtonList *> (GetChild("srclist"));
     m_updateSpinbox = dynamic_cast<MythUISpinBox *> (GetChild("update_spinbox"));
     m_retrieveSpinbox = dynamic_cast<MythUISpinBox *> (GetChild("retrieve_spinbox"));
     m_finishButton = dynamic_cast<MythUIButton *> (GetChild("finishbutton"));
@@ -710,8 +710,8 @@ bool SourceSetup::Create()
     BuildFocusList();
     SetFocusWidget(m_sourceList);
 
-    connect(m_sourceList, SIGNAL(itemSelected(MythListButtonItem *)),
-            this, SLOT(sourceListItemSelected(MythListButtonItem *)));
+    connect(m_sourceList, SIGNAL(itemSelected(MythUIButtonListItem *)),
+            this, SLOT(sourceListItemSelected(MythUIButtonListItem *)));
 //     connect(m_sourceList, SIGNAL(TakingFocus()),
 //             this, SLOT(sourceListItemSelected()));
 
@@ -765,8 +765,8 @@ bool SourceSetup::loadData()
         si->email = db.value(5).toString();
         si->version = db.value(6).toString();
 
-        MythListButtonItem *item =
-            new MythListButtonItem(m_sourceList, tr(si->name));
+        MythUIButtonListItem *item =
+            new MythUIButtonListItem(m_sourceList, tr(si->name));
         item->setData(si);
     }
 
@@ -790,7 +790,7 @@ void SourceSetup::saveData()
 
     for (int i=0; i < m_sourceList->GetCount(); i++)
     {
-        MythListButtonItem *item = m_sourceList->GetItemAt(i);
+        MythUIButtonListItem *item = m_sourceList->GetItemAt(i);
         si = (SourceListInfo *) item->getData();
         db.bindValue(":ID", si->id);
         db.bindValue(":UPDATE", si->update_timeout * 60);
@@ -802,7 +802,7 @@ void SourceSetup::saveData()
         }
     }
 
-    GetScreenStack()->PopScreen();
+    Close();
 }
 
 void SourceSetup::updateSpinboxUpdate()
@@ -819,7 +819,7 @@ void SourceSetup::retrieveSpinboxUpdate()
     si->retrieve_timeout = m_retrieveSpinbox->GetItemCurrent()->text().toInt();
 }
 
-void SourceSetup::sourceListItemSelected(MythListButtonItem *item)
+void SourceSetup::sourceListItemSelected(MythUIButtonListItem *item)
 {
     if (!item)
         item = m_sourceList->GetItemCurrent();
@@ -881,7 +881,7 @@ bool LocationDialog::Create()
     m_sourceText = dynamic_cast<MythUIText *> (GetChild("source"));
     m_resultsText = dynamic_cast<MythUIText *> (GetChild("numresults"));
     m_locationEdit = dynamic_cast<MythUITextEdit *> (GetChild("loc-edit"));
-    m_locationList = dynamic_cast<MythListButton *> (GetChild("results"));
+    m_locationList = dynamic_cast<MythUIButtonList *> (GetChild("results"));
     m_searchButton = dynamic_cast<MythUIButton *> (GetChild("searchbtn"));
 
 
@@ -897,10 +897,10 @@ bool LocationDialog::Create()
 
     connect(m_searchButton, SIGNAL(buttonPressed()), this, SLOT(doSearch()));
     m_searchButton->SetText(tr("Search"));
-    connect(m_locationList, SIGNAL(itemSelected(MythListButtonItem *)),
-            this, SLOT(itemSelected(MythListButtonItem *)));
-    connect(m_locationList, SIGNAL(itemClicked(MythListButtonItem *)),
-            this, SLOT(itemClicked(MythListButtonItem *)));
+    connect(m_locationList, SIGNAL(itemSelected(MythUIButtonListItem *)),
+            this, SLOT(itemSelected(MythUIButtonListItem *)));
+    connect(m_locationList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+            this, SLOT(itemClicked(MythUIButtonListItem *)));
 
     return true;
 }
@@ -952,7 +952,7 @@ void LocationDialog::doSearch()
         for (int ii = 0; ii < results.size(); ++ii)
         {
             QStringList tmp = QStringList::split("::", results[ii]);
-            MythListButtonItem *item = new MythListButtonItem(m_locationList, tmp[1]);
+            MythUIButtonListItem *item = new MythUIButtonListItem(m_locationList, tmp[1]);
             ResultListInfo *ri = new ResultListInfo;
             ri->idstr = tmp[0];
             ri->src = si;
@@ -975,14 +975,14 @@ void LocationDialog::doSearch()
     }
 }
 
-void LocationDialog::itemSelected(MythListButtonItem *item)
+void LocationDialog::itemSelected(MythUIButtonListItem *item)
 {
     ResultListInfo *ri = (ResultListInfo *)item->getData();
     if (ri)
         m_sourceText->SetText(tr("Source: %1").arg(ri->src->name));
 }
 
-void LocationDialog::itemClicked(MythListButtonItem *item)
+void LocationDialog::itemClicked(MythUIButtonListItem *item)
 {
     ResultListInfo *ri = (ResultListInfo *) item->getData();
 
@@ -1001,5 +1001,5 @@ void LocationDialog::itemClicked(MythListButtonItem *item)
                 new DialogCompletionEvent("location", 0, "", m_screenListInfo);
     QApplication::postEvent(m_retScreen, dce);
 
-    GetScreenStack()->PopScreen();
+    Close();
 }
