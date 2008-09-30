@@ -48,7 +48,6 @@ private:
     MythUIButton *m_okButton;
     MythUIButton *m_cancelButton;
 
-    MythUIText *m_podcastText;
     MythUICheckBox *m_podcastCheck;
 
 private slots:

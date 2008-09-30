@@ -65,13 +65,12 @@ bool MythNewsEditor::Create()
     m_iconEdit = dynamic_cast<MythUITextEdit *> (GetChild("icon"));
 
     m_podcastCheck = dynamic_cast<MythUICheckBox *> (GetChild("podcast_check"));
-    m_podcastText = dynamic_cast<MythUIText *> (GetChild("podcast_text"));
 
     m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
     if (!m_nameEdit || !m_urlEdit || !m_iconEdit || !m_okButton
-        || !m_cancelButton)
+        || !m_cancelButton || !m_podcastCheck)
     {
         VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
         return false;

@@ -20,7 +20,7 @@
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>20,390,610,150</area>
+            <area>20,390,570,150</area>
             <multiline>yes</multiline>
         </textarea>
 
@@ -34,7 +34,7 @@
         </imagetype>
 
         <imagetype name="thumbnail">
-            <area>660,390,120,90</area>
+            <area>600,390,160,120</area>
             <preserveaspect>true</preserveaspect>
         </imagetype>
 
@@ -89,6 +89,15 @@
         <textedit name="icon" from="basetextedit">
             <position>235,340</position>
         </textedit>
+
+        <checkbox name="podcast_check" from="basecheckbox">
+            <position>340,465</position>
+        </checkbox>
+
+        <textarea name="podcast_text" from="basetextarea">
+              <area>380,465,500,50</area>
+              <value>Podcast feed</value>
+        </textarea>
 
         <button name="cancel" from="basebutton">
             <position>60,480</position>
