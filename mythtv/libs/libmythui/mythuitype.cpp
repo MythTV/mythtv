@@ -10,7 +10,7 @@ using namespace std;
 #include "mythfontproperties.h"
 
 MythUIType::MythUIType(QObject *parent, const QString &name)
-    : QObject(parent), helptext(QString::null)
+    : QObject(parent), m_helptext(QString::null)
 {
     setObjectName(name);
 
@@ -435,58 +435,6 @@ MythRect MythUIType::GetArea(void) const
 QRegion MythUIType::GetDirtyArea(void) const
 {
     return m_DirtyRegion;
-}
-
-QString MythUIType::cutDown(const QString &data, QFont *font,
-                            bool multiline, int overload_width,
-                            int overload_height)
-{
-    int length = data.length();
-    if (length == 0)
-        return data;
-
-    int maxwidth = m_Area.width();
-    if (overload_width != -1)
-        maxwidth = overload_width;
-    int maxheight = m_Area.height();
-    if (overload_height != -1)
-        maxheight = overload_height;
-
-    int justification = Qt::AlignLeft | Qt::TextWordWrap;
-    QFontMetrics fm(*font);
-
-    int margin = length - 1;
-    int index = 0;
-    int diff = 0;
-
-    while (margin > 0)
-    {
-        if (multiline)
-            diff = maxheight - fm.boundingRect(0, 0, maxwidth, maxheight,
-                                               justification, data,
-                                               index + margin, 0).height();
-        else
-            diff = maxwidth - fm.width(data, index + margin);
-        if (diff >= 0)
-            index += margin;
-
-        margin /= 2;
-
-        if (index + margin >= length - 1)
-            margin = (length - 1) - index;
-    }
-
-    if (index < length - 1)
-    {
-        QString tmpStr(data);
-        tmpStr.truncate(index);
-        if (index >= 3)
-            tmpStr.replace(index - 3, 3, "...");
-        return tmpStr;
-    }
-
-    return data;
-
 }
 
 bool MythUIType::IsVisible(void) const

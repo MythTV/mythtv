@@ -41,16 +41,6 @@ class MythUIText : public MythUIType, public StorageUser
 
     void UseAlternateArea(bool useAlt);
 
-    void SetJustification(int just);
-    int GetJustification(void);
-    void SetCutDown(bool cut);
-
-    void SetArea(const MythRect &rect);
-    void SetPosition(const MythPoint &pos);
-    MythRect GetDrawRect(void) { return m_drawRect; }
-    void SetStartPosition(const int x, const int y);
-    void MoveStartPosition(const int x, const int y);
-
     virtual void Pulse(void);
 
     void CycleColor(QColor startColor, QColor endColor, int numSteps);
@@ -69,6 +59,23 @@ class MythUIText : public MythUIType, public StorageUser
     virtual void CreateCopy(MythUIType *parent);
     virtual void Finalize(void);
 
+    void SetJustification(int just);
+    int GetJustification(void);
+    void SetCutDown(bool cut);
+    bool GetCutDown(void) const { return m_Cutdown; }
+    void SetMultiLine(bool multiline);
+    bool GetMultiLine(void) const { return m_MultiLine; }
+
+    void SetArea(const MythRect &rect);
+    void SetPosition(const MythPoint &pos);
+    MythRect GetDrawRect(void) { return m_drawRect; }
+    void SetStartPosition(const int x, const int y);
+    void MoveStartPosition(const int x, const int y);
+
+    QString cutDown(const QString &data, QFont *font,
+                    bool multiline = false, int overload_width = -1,
+                    int overload_height = -1);
+
     int m_Justification;
     MythRect m_OrigDisplayRect;
     MythRect m_AltDisplayRect;
@@ -79,6 +86,7 @@ class MythUIText : public MythUIType, public StorageUser
     QString m_DefaultMessage;
 
     bool m_Cutdown;
+    bool m_MultiLine;
 
     MythFontProperties* m_Font;
 
@@ -87,6 +95,11 @@ class MythUIText : public MythUIType, public StorageUser
     int m_numSteps, m_curStep;
     float curR, curG, curB;
     float incR, incG, incB;
+
+    friend class MythUITextEdit;
+    friend class MythUIButton;
+    friend class MythThemedMenu;
+    friend class MythThemedMenuPrivate;
 };
 
 #endif

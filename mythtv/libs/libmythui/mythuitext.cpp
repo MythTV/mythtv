@@ -23,6 +23,7 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
             curR(0.0),              curG(0.0),             curB(0.0),
             incR(0.0),              incG(0.0),             incB(0.0)
 {
+    m_MultiLine = false;
 }
 
 MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
@@ -40,6 +41,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
              curR(0.0),      curG(0.0),      curB(0.0),
              incR(0.0),      incG(0.0),      incB(0.0)
 {
+    m_MultiLine = false;
     SetArea(displayRect);
     *m_Font = font;
 }
@@ -121,6 +123,16 @@ void MythUIText::SetCutDown(bool cut)
 {
     m_Cutdown = cut;
     m_CutMessage = "";
+    SetRedraw();
+}
+
+void MythUIText::SetMultiLine(bool multiline)
+{
+    m_MultiLine = multiline;
+    if (m_MultiLine)
+        m_Justification |= Qt::TextWordWrap;
+    else
+        m_Justification &= ~Qt::TextWordWrap;
     SetRedraw();
 }
 
@@ -243,6 +255,58 @@ void MythUIText::StopCycling(void)
     SetRedraw();
 }
 
+QString MythUIText::cutDown(const QString &data, QFont *font,
+                            bool multiline, int overload_width,
+                            int overload_height)
+{
+    int length = data.length();
+    if (length == 0)
+        return data;
+
+    int maxwidth = m_Area.width();
+    if (overload_width != -1)
+        maxwidth = overload_width;
+    int maxheight = m_Area.height();
+    if (overload_height != -1)
+        maxheight = overload_height;
+
+    int justification = Qt::AlignLeft | Qt::TextWordWrap;
+    QFontMetrics fm(*font);
+
+    int margin = length - 1;
+    int index = 0;
+    int diff = 0;
+
+    while (margin > 0)
+    {
+        if (multiline)
+            diff = maxheight - fm.boundingRect(0, 0, maxwidth, maxheight,
+                                               justification, data,
+                                               index + margin, 0).height();
+        else
+            diff = maxwidth - fm.width(data, index + margin);
+        if (diff >= 0)
+            index += margin;
+
+        margin /= 2;
+
+        if (index + margin >= length - 1)
+            margin = (length - 1) - index;
+    }
+
+    if (index < length - 1)
+    {
+        QString tmpStr(data);
+        tmpStr.truncate(index);
+        if (index >= 3)
+            tmpStr.replace(index - 3, 3, "...");
+        return tmpStr;
+    }
+
+    return data;
+
+}
+
 bool MythUIText::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "area")
@@ -280,14 +344,11 @@ bool MythUIText::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "cutdown")
     {
-        m_Cutdown = parseBool(element);
+        SetCutDown(parseBool(element));
     }
     else if (element.tagName() == "multiline")
     {
-        if (parseBool(element))
-            m_Justification |= Qt::TextWordWrap;
-        else
-            m_Justification &= ~Qt::TextWordWrap;
+        SetMultiLine(parseBool(element));
     }
     else if (element.tagName() == "align")
     {
@@ -346,6 +407,7 @@ void MythUIText::CopyFrom(MythUIType *base)
     m_DefaultMessage = text->m_DefaultMessage;
 
     m_Cutdown = text->m_Cutdown;
+    m_MultiLine = text->m_MultiLine;
 
     *m_Font = *(text->m_Font);
 

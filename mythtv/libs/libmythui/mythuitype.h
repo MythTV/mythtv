@@ -70,10 +70,6 @@ class MythUIType : public QObject, public XMLParseBase
 
     virtual QRegion GetDirtyArea(void) const;
 
-    QString cutDown(const QString &data, QFont *font,
-                    bool multiline = false, int overload_width = -1,
-                    int overload_height = -1);
-
     bool IsVisible(void) const;
     void SetVisible(bool visible);
 
@@ -90,8 +86,8 @@ class MythUIType : public QObject, public XMLParseBase
     MythFontProperties *GetFont(const QString &text);
     bool AddFont(const QString &text, MythFontProperties *fontProp);
 
-    void SetHelpText(const QString &text) { helptext = text; }
-    QString GetHelpText(void) const { return helptext; }
+    void SetHelpText(const QString &text) { m_helptext = text; }
+    QString GetHelpText(void) const { return m_helptext; }
 
   protected:
     virtual void customEvent(QEvent *);
@@ -162,7 +158,7 @@ class MythUIType : public QObject, public XMLParseBase
 
     MythUIType *m_Parent;
 
-    QString helptext;
+    QString m_helptext;
 
   friend class XMLParseBase;
 };
