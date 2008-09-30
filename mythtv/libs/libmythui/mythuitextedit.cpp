@@ -35,6 +35,8 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name,
     connect(this, SIGNAL(LosingFocus()), SLOT(Deselect()));
 
     m_CanHaveFocus = true;
+
+    m_initialized = false;
 }
 
 MythUITextEdit::~MythUITextEdit()
@@ -103,6 +105,11 @@ void MythUITextEdit::Finalize()
 
 void MythUITextEdit::SetInitalStates()
 {
+    if (m_initialized)
+        return;
+
+    m_initialized = true;
+
     m_backgroundState = dynamic_cast<MythUIStateType *>
                                                     (GetChild("background"));
     m_cursorImage = dynamic_cast<MythUIImage *> (GetChild("cursor"));
@@ -360,6 +367,8 @@ void MythUITextEdit::CopyFrom(MythUIType *base)
     m_Filter = textedit->m_Filter;
 
     MythUIType::CopyFrom(base);
+
+    SetInitalStates();
 }
 
 void MythUITextEdit::CreateCopy(MythUIType *parent)

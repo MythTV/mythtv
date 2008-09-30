@@ -70,6 +70,8 @@ class MythUITextEdit : public MythUIType, public StorageUser
 
     void SetMaxLength(const int length);
 
+    bool m_initialized;
+
     int m_blinkInterval;
     int m_cursorBlinkRate;
 
