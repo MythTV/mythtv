@@ -179,17 +179,17 @@ bool MythUITextEdit::InsertCharacter(const QString character)
     QString newmessage = m_Message;
 
     const QChar *unichar = character.unicode();
-    if (!(unichar->isLetterOrNumber() || unichar->isPunct()
-        || unichar->isSpace() || unichar->isSymbol()))
+    // Filter all non printable characters
+    if (!unichar->isPrint())
         return false;
 
-    if ((m_Filter & FilterAlpha) & unichar->isLetter())
+    if ((m_Filter & FilterAlpha) && unichar->isLetter())
         return false;
-    if ((m_Filter & FilterNumeric) & unichar->isNumber())
+    if ((m_Filter & FilterNumeric) && unichar->isNumber())
         return false;
-    if ((m_Filter & FilterSymbols) & unichar->isSymbol())
+    if ((m_Filter & FilterSymbols) && unichar->isSymbol())
         return false;
-    if ((m_Filter & FilterPunct) & unichar->isPunct())
+    if ((m_Filter & FilterPunct) && unichar->isPunct())
         return false;
 
     newmessage.insert(m_Position+1, character);
