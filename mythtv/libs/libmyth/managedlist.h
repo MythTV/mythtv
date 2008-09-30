@@ -2,7 +2,8 @@
 #define  MANAGED_LIST_H
 
 #include <vector>
-#include <qpointer.h>
+
+#include <QPointer>
 #include <Q3PtrList>
 
 using namespace std;
@@ -16,411 +17,440 @@ enum ManagedListItemStates{MLS_NORMAL, MLS_BOLD, MLS_USER};
 class ManagedList;
 class ManagedListGroup;
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// A ManagedListItem represents, an item within a ManagedList (oddly enough).
-//
-// This is an abstract base class that defines the interface.
-//
+/**
+ * This is an abstract base class that defines the interface.
+ */
 class MPUBLIC ManagedListItem : public QObject
 {
     Q_OBJECT
 
-    public:
-        ManagedListItem(const QString& startingText = "", ManagedList* _parentList=NULL,
-                        QObject* _parent=NULL, const char* _name=0);
+  public:
+    ManagedListItem(const QString &startingText = "",
+                    ManagedList   *_parentList=NULL,
+                    QObject       *_parent=NULL,
+                    const char    *_name=0);
 
-        virtual bool hasLeft(){ return false; }
-        virtual bool hasRight(){ return false; }
+    virtual bool hasLeft()  { return false; }
+    virtual bool hasRight() { return false; }
 
-        int getState(void) const { return curState; }
-        void setState(int val) { curState = val; emit changed(this); }
+    int getState(void) const { return curState; }
+    void setState(int val)   { curState = val; emit changed(this); }
 
-        bool getEnabled(void) const { return enabled; }
-        virtual void setEnabled(bool val) { enabled = val; }
+    bool getEnabled(void) const       { return enabled; }
+    virtual void setEnabled(bool val) { enabled = val; }
 
-        ManagedList* getParentList() { return parentList; }
-        virtual void setParentList(ManagedList* _parent);
+    ManagedList* getParentList() { return parentList; }
+    virtual void setParentList(ManagedList* _parent);
+
+    virtual void setValue(const QString& val)
+    { valueText = val; syncTextToValue(); }
+    //virtual void setValue(const char* val) { setValue(QString(val)); }
+    virtual const QString& getValue() const  { return valueText; }
+
+    virtual const QString& getText() const { return text; }
+    void setText(const QString& newText)
+    { text = newText; emit changed(this); }
 
 
+  public slots:
+    virtual void cursorLeft(bool)  { canceled(); }
+    virtual void cursorRight(bool) { selected(); }
+    virtual void select()          { selected(); }
+    virtual void gotFocus() {}
+    virtual void slotGuiActivate(ManagedListGroup*) {};
 
-        virtual void setValue(const QString& val) { valueText = val; syncTextToValue(); }
-        //virtual void setValue(const char* val) { setValue(QString(val)); }
-        virtual const QString& getValue() const { return valueText; }
+  signals:
+    void selected(ManagedListItem*);
+    void changed(ManagedListItem*);
+    void canceled(ManagedListItem*);
 
-        virtual const QString& getText() const { return text; }
-        void setText(const QString& newText) { text = newText; emit changed(this); }
+  protected:
+    virtual void syncTextToValue() { changed(); }
+    virtual void selected() { if (enabled) emit selected(this); }
+    virtual void canceled() { if (enabled) emit canceled(this); }
+    virtual void changed()  { emit(changed(this)); }
+    int curState;
+    int listIndex;
+    bool enabled;
+    QPointer<ManagedList> parentList;
 
-    public slots:
-        virtual void cursorLeft(bool) { canceled(); }
-        virtual void cursorRight(bool) { selected(); }
-        virtual void select() { selected(); }
-        virtual void gotFocus() {}
-        virtual void slotGuiActivate(ManagedListGroup*) {};
-
-    signals:
-        void selected(ManagedListItem*);
-        void changed(ManagedListItem*);
-        void canceled(ManagedListItem*);
-
-    protected:
-        virtual void syncTextToValue() { changed(); }
-        virtual void selected() { if (enabled) emit selected(this); }
-        virtual void canceled() { if (enabled) emit canceled(this); }
-        virtual void changed() { emit(changed(this)); }
-        int curState;
-        int listIndex;
-        bool enabled;
-        QPointer<ManagedList> parentList;
-
-        QString text;
-        QString valueText;
+    QString text;
+    QString valueText;
 };
 
 
 class MPUBLIC DialogDoneListItem : public ManagedListItem
 {
     Q_OBJECT
-    public:
-        DialogDoneListItem(const QString& startingText, int _result, MythDialog* _dialog = NULL, ManagedList* _parentList=NULL,
-                           QObject* _parent=NULL, const char* _name=0)
-                         : ManagedListItem(startingText, _parentList, _parent, _name)
-        {
-            dialog = _dialog;
-            resultValue = _result;
-        }
 
-        virtual bool hasLeft(){ return false; }
-        virtual bool hasRight(){ return false; }
+  public:
+    DialogDoneListItem(const QString &startingText, int _result,
+                       MythDialog    *_dialog = NULL,
+                       ManagedList   *_parentList=NULL,
+                       QObject       *_parent=NULL,
+                       const char    *_name="DialogDoneListItem")
+        : ManagedListItem(startingText, _parentList, _parent, _name)
+    {
+        dialog = _dialog;
+        resultValue = _result;
+    }
 
-        virtual void selected() { if (enabled && dialog) dialog->done(resultValue); }
+    virtual bool hasLeft()  { return false; }
+    virtual bool hasRight() { return false; }
 
-        void setDialog(MythDialog* dlg) { dialog = dlg;}
+    virtual void selected()
+    { if (enabled && dialog) dialog->done(resultValue); }
 
-        MythDialog* getDialog() { return dialog;}
+    void setDialog(MythDialog* dlg) { dialog = dlg;}
+    MythDialog* getDialog()         { return dialog;}
 
-    protected:
-        QPointer<MythDialog> dialog;
-        int resultValue;
+  protected:
+    QPointer<MythDialog> dialog;
+    int resultValue;
 };
 
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// An integer value within a ManagedList.
-//
-// String templates are used to convert the value into a string. Defaults to "%1"
-//
+/**
+ * An integer value within a ManagedList.
+ *
+ * String templates are used to convert the value into a string.
+ * Defaults to "%1"
+ */
 class IntegerManagedListItem : public ManagedListItem
 {
     Q_OBJECT
 
-    public:
-        IntegerManagedListItem(int bigStepAmt = 10, int stepAmt=1,  ManagedList* parentList=NULL,
-                               QObject* _parent=NULL, const char* _name=0);
-        void setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
-                          const QString& oneStr, const QString& posStr);
-        void setShortTemplates(const QString& negStr, const QString& negOneStr,
-                               const QString& zeroStr, const QString& oneStr,
-                               const QString& posStr);
+  public:
+    IntegerManagedListItem(int bigStepAmt = 10, int stepAmt=1,
+                           ManagedList *parentList=NULL,
+                           QObject     *_parent=NULL,
+                           const char  *_name="IntergerManagedListItem");
+    void setTemplates(const QString& negStr,  const QString& negOneStr,
+                      const QString& zeroStr, const QString& oneStr,
+                      const QString& posStr);
+    void setShortTemplates(const QString& negStr, const QString& negOneStr,
+                           const QString& zeroStr, const QString& oneStr,
+                           const QString& posStr);
 
-        int intValue() const { return valueText.toInt();}
+    int intValue() const { return valueText.toInt();}
 
-        virtual void setValue(int newVal) { ManagedListItem::setValue(QString::number(newVal));}
+    virtual void setValue(int newVal)
+    { ManagedListItem::setValue(QString::number(newVal));}
 
-        virtual void changeValue(int amount) { setValue(intValue() + amount); }
+    virtual void changeValue(int amount) { setValue(intValue() + amount); }
 
-        const QString& getShortText() const { return shortText; }
-        virtual bool hasLeft(){ return true; }
-        virtual bool hasRight(){ return true; }
-    public slots:
-        virtual void cursorLeft(bool page = false) { if (enabled) changeValue(page ? (0 - bigStep) : (0 - step)); }
-        virtual void cursorRight(bool page = false) { if (enabled) changeValue(page ? bigStep : step); }
+    const QString& getShortText() const { return shortText; }
+    virtual bool hasLeft()  { return true; }
+    virtual bool hasRight() { return true; }
 
-    protected:
-        virtual void syncTextToValue();
-        void setText(const QString& newText) { text = newText; }
-        int step;
-        int bigStep;
-        QString negTemplate;
-        QString negOneTemplate;
-        QString posTemplate;
-        QString posOneTemplate;
-        QString zeroTemplate;
-        QString shortNegTemplate;
-        QString shortNegOneTemplate;
-        QString shortPosOneTemplate;
-        QString shortPosTemplate;
-        QString shortZeroTemplate;
+  public slots:
+    virtual void cursorLeft(bool page = false)
+    { if (enabled) changeValue(page ? (0 - bigStep) : (0 - step)); }
+    virtual void cursorRight(bool page = false)
+    { if (enabled) changeValue(page ? bigStep : step); }
 
-        QString shortText;
+  protected:
+    virtual void syncTextToValue();
+    void setText(const QString& newText) { text = newText; }
+    int step;
+    int bigStep;
+    QString negTemplate;
+    QString negOneTemplate;
+    QString posTemplate;
+    QString posOneTemplate;
+    QString zeroTemplate;
+    QString shortNegTemplate;
+    QString shortNegOneTemplate;
+    QString shortPosOneTemplate;
+    QString shortPosTemplate;
+    QString shortZeroTemplate;
+
+    QString shortText;
 };
 
-
-
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// A list item that can contain more items.
-//
+/**
+ * A list item that can contain more items.
+ */
 class MPUBLIC ManagedListGroup : public ManagedListItem
 {
     Q_OBJECT
 
-    public:
-        ManagedListGroup(const QString& txt, ManagedListGroup* pGroup, ManagedList* parentList=NULL,
-                         QObject* _parent=NULL, const char* _name=0);
+  public:
+    ManagedListGroup(const QString    &txt,
+                     ManagedListGroup *pGroup,
+                     ManagedList      *parentList=NULL,
+                     QObject          *_parent=NULL,
+                     const char       *_name="ManagedListGroup");
 
-        const Q3PtrList<ManagedListItem>* getItems() const { return &itemList;}
-        bool addItem(ManagedListItem* item, int where = -1);
+    const Q3PtrList<ManagedListItem>* getItems() const { return &itemList;}
+    bool addItem(ManagedListItem* item, int where = -1);
 
-        int getItemCount(void) const { return itemCount; }
+    int getItemCount(void) const { return itemCount; }
 
-        virtual bool hasLeft(){ return false; }
-        virtual bool hasRight(){ return (itemCount > 0); }
+    virtual bool hasLeft()  { return false; }
+    virtual bool hasRight() { return (itemCount > 0); }
 
-        ManagedListGroup* getParentGroup() { return parentGroup; }
-        void setParentGroup(ManagedListGroup* pGroup) { parentGroup = pGroup; }
+    ManagedListGroup* getParentGroup()            { return parentGroup; }
+    void setParentGroup(ManagedListGroup* pGroup) { parentGroup = pGroup; }
 
 
-        virtual void cursorRight(bool page = false);
-        virtual void select();
+    virtual void cursorRight(bool page = false);
+    virtual void select();
 
-        int getCurIndex() const { return curItem; }
-        void setCurIndex(int newVal);
+    int getCurIndex() const { return curItem; }
+    void setCurIndex(int newVal);
 
-        ManagedListItem* getItem(int index) { return itemList.at(index); }
-        ManagedListItem* getCurItem() { return itemList.at(curItem); }
+    ManagedListItem* getItem(int index) { return itemList.at(index); }
+    ManagedListItem* getCurItem()       { return itemList.at(curItem); }
 
-        const QString getCurItemValue() { return getItemValue(curItem); }
-        const QString getItemValue(int which) { ManagedListItem *itm = getItem(which);
-                                                return itm ? itm->getValue() : QString(); }
+    const QString getCurItemValue() { return getItemValue(curItem); }
+    const QString getItemValue(int which)
+    {
+        ManagedListItem *itm = getItem(which);
+        return itm ? itm->getValue() : QString();
+    }
 
-        const QString getCurItemText() { return getItemText(curItem); }
-        const QString getItemText(int which) { ManagedListItem *itm = getItem(which);
-                                               return itm ? itm->getText() : ""; }
+    const QString getCurItemText() { return getItemText(curItem); }
+    const QString getItemText(int which)
+    {
+        ManagedListItem *itm = getItem(which);
+        return itm ? itm->getText() : QString();
+    }
 
-        virtual void setParentList(ManagedList* _parent);
+    virtual void setParentList(ManagedList* _parent);
 
-        virtual void clear();
+    virtual void clear();
 
-    public slots:
-        virtual void doGoBack();
-        virtual void slotGuiActivate(ManagedListGroup*);
-    signals:
-        void goingBack();
-        void wentBack();
+  public slots:
+    virtual void doGoBack();
+    virtual void slotGuiActivate(ManagedListGroup*);
 
-    protected:
-        Q3PtrList<ManagedListItem> itemList;
-        int curItem;
-        int itemCount;
-        QPointer<ManagedListGroup> parentGroup;
-        QPointer<ManagedListItem> goBack;
+  signals:
+    void goingBack();
+    void wentBack();
+
+  protected:
+    Q3PtrList<ManagedListItem> itemList;
+    int curItem;
+    int itemCount;
+    QPointer<ManagedListGroup> parentGroup;
+    QPointer<ManagedListItem> goBack;
 };
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// A specialized version of the ManagedListGroup that allows for swtiching the
-// values using left/right without having to pop up the list.
-//
+/**
+ * A specialized version of the ManagedListGroup.
+ *
+ * Allows for switching the values using left/right
+ * without having to pop up the list.
+ */
 class MPUBLIC SelectManagedListItem : public ManagedListGroup
 {
     Q_OBJECT
 
-    public:
-        SelectManagedListItem(const QString& baseText, ManagedListGroup* pGroup, ManagedList* parentList,
-                              QObject* _parent=NULL, const char* _name=0);
-        virtual ManagedListItem* addSelection(const QString& label, QString value=QString::null, bool selectit=false);
-        virtual ManagedListItem* addButton(const QString& label, QString value=QString::null, bool selectit=false);
+  public:
+    SelectManagedListItem(const QString    &baseText,
+                          ManagedListGroup *pGroup,
+                          ManagedList      *parentList,
+                          QObject          *_parent=NULL,
+                          const char       *_name="SelectManagedListItem");
 
-        virtual void clearSelections(void);
+    virtual ManagedListItem* addSelection(
+        const QString& label, QString value=QString(), bool selectit=false);
+    virtual ManagedListItem* addButton(
+        const QString& label, QString value=QString(), bool selectit=false);
 
-        virtual void cursorRight(bool page = false);
-        virtual void cursorLeft(bool page = false);
-        virtual void select();
+    virtual void clearSelections(void);
 
-        virtual void selectValue(const QString& newValue) { select(newValue, true);}
-        virtual void setValue(const QString& newValue);
-        virtual void selectText(const QString& newValue) { select(newValue, false);}
-        virtual void selectItem(int index) { curItem = index; changed(); }
-        virtual void select(const QString& newValue, bool bValue);
+    virtual void cursorRight(bool page = false);
+    virtual void cursorLeft(bool page = false);
+    virtual void select();
 
-        virtual bool hasLeft(){ return true; }
-        virtual bool hasRight(){ return true; }
+    virtual void selectValue(const QString& newValue) { select(newValue, true);}
+    virtual void setValue(const QString& newValue);
+    virtual void selectText(const QString& newValue) { select(newValue, false);}
+    virtual void selectItem(int index) { curItem = index; changed(); }
+    virtual void select(const QString& newValue, bool bValue);
+
+    virtual bool hasLeft(){ return true; }
+    virtual bool hasRight(){ return true; }
 
 
-        virtual int getValueIndex(QString value)  {
-           int i = -1;
-           for(ManagedListItem* tempItem = itemList.first(); tempItem; tempItem = itemList.next() )
-            {
-                i++;
-                if (tempItem->getValue() == value)
-                    return i;
-            }
-            return -1;
-        };
+    virtual int getValueIndex(QString value)
+    {
+        int i = -1;
+        for (ManagedListItem* tempItem = itemList.first();
+             tempItem; tempItem = itemList.next() )
+        {
+            i++;
+            if (tempItem->getValue() == value)
+                return i;
+        }
+        return -1;
+    }
 
-        virtual int getTextIndex(QString txt)  {
-           int i = -1;
-           for(ManagedListItem* tempItem = itemList.first(); tempItem; tempItem = itemList.next() )
-            {
-                i++;
-                if (tempItem->getText() == txt)
-                    return i;
-            }
+    virtual int getTextIndex(QString txt)
+    {
+        int i = -1;
+        for (ManagedListItem* tempItem = itemList.first();
+             tempItem; tempItem = itemList.next() )
+        {
+            i++;
+            if (tempItem->getText() == txt)
+                return i;
+        }
+        return -1;
+    };
 
-            return -1;
-        };
+  signals:
+    void selectionAdded(const QString& label, QString value,
+                        bool select = false);
+    void selectionsCleared(void);
+    void buttonPressed(ManagedListItem* itm, ManagedListItem* button);
 
-    signals:
-        void selectionAdded(const QString& label, QString value, bool select = false);
-        void selectionsCleared(void);
-        void buttonPressed(ManagedListItem* itm, ManagedListItem* button);
+  public slots:
+    virtual void buttonSelected(ManagedListItem* itm);
+    virtual void itemSelected(ManagedListItem* itm);
+    virtual void doGoBack();
 
-    public slots:
-        virtual void buttonSelected(ManagedListItem* itm);
-        virtual void itemSelected(ManagedListItem* itm);
-        virtual void doGoBack();
-
-    protected:
-        bool isSet;
-        QString baseText;
-        int lastItem;
+  protected:
+    bool isSet;
+    QString baseText;
+    int lastItem;
 };
 
 
 class MPUBLIC BoolManagedListItem : public SelectManagedListItem
 {
     Q_OBJECT
-    public:
-        BoolManagedListItem(bool initialValue, ManagedListGroup* pGroup=NULL, ManagedList* parentList=NULL,
-                            QObject* _parent=NULL, const char* _name=0);
-        void setLabels(const QString& trueLbl, const QString& falseLbl);
-        virtual bool hasLeft(){ return true; }
-        virtual bool hasRight(){ return true; }
+  public:
+    BoolManagedListItem(bool              initialValue,
+                        ManagedListGroup *pGroup=NULL,
+                        ManagedList      *parentList=NULL,
+                        QObject          *_parent=NULL,
+                        const char       *_name="BoolManagedListItem");
+    void setLabels(const QString& trueLbl, const QString& falseLbl);
+    virtual bool hasLeft()  { return true; }
+    virtual bool hasRight() { return true; }
 
 
-        virtual void setValue(bool val)
-        {
-            // DS note: using QString::number(val) blows up...
-            if (val)
-                SelectManagedListItem::setValue("1");
-            else
-                SelectManagedListItem::setValue("0");
-        }
+    virtual void setValue(bool val)
+    {
+        // DS note: using QString::number(val) blows up...
+        if (val)
+            SelectManagedListItem::setValue("1");
+        else
+            SelectManagedListItem::setValue("0");
+    }
+
+    bool boolValue() const { return (bool)valueText.toInt(); }
 
 
-        bool boolValue() const {return (bool)valueText.toInt();}
 
+  public slots:
+    virtual void cursorLeft(bool)  { if (enabled) setValue(!boolValue()); }
+    virtual void cursorRight(bool) { if (enabled) setValue(!boolValue()); }
+    virtual void slotGuiActivate(ManagedListGroup*) { generateList(); }
 
+  protected:
+    void generateList();
+    void setText(const QString & newText)
+    { text = newText; emit(changed(this)); }
 
-    public slots:
-        virtual void cursorLeft(bool) { if (enabled) setValue(!boolValue()); }
-        virtual void cursorRight(bool) { if (enabled) setValue(!boolValue()); }
-        virtual void slotGuiActivate(ManagedListGroup*) { generateList(); }
-
-    protected:
-        void generateList();
-        void setText(const QString& newText) { text = newText; emit(changed(this)); }
-        QString trueLabel;
-        QString falseLabel;
-        bool initialValue;
-        bool listBuilt;
+    QString trueLabel;
+    QString falseLabel;
+    bool initialValue;
+    bool listBuilt;
 };
 
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// An IntegerManagedListItem with a minimum and maximum value.
-//
+/**
+ * An IntegerManagedListItem with a minimum and maximum value.
+ */
 class MPUBLIC BoundedIntegerManagedListItem : public SelectManagedListItem
 {
     Q_OBJECT
 
-    public:
-        BoundedIntegerManagedListItem(int minValIn, int maxValIn, int _bigStep, int _step = 1,
-                                      ManagedListGroup* _group=NULL, ManagedList* parentList=NULL,
-                                      QObject* _parent=NULL, const char* _name=0, bool _invert = false);
+  public:
+    BoundedIntegerManagedListItem(
+        int minValIn, int maxValIn, int _bigStep, int _step = 1,
+        ManagedListGroup* _group=NULL, ManagedList* parentList=NULL,
+        QObject *_parent=NULL, const char *_name="BoundedIntManagedList",
+        bool _invert = false);
 
 
-        virtual bool hasLeft()
+    virtual bool hasLeft()
+    {
+        if (inverted)
+            return intValue() < maxVal;
+        else
+            return intValue() > minVal;
+    }
+
+    virtual bool hasRight()
+    {
+        if (inverted)
+            return intValue() > minVal;
+        else
+            return intValue() < maxVal;
+    }
+
+    void setTemplates(const QString& negStr, const QString& negOneStr,
+                      const QString& zeroStr,
+                      const QString& oneStr, const QString& posStr);
+
+    int intValue() const { return valueText.toInt();}
+
+    virtual void setValue(int newVal);
+
+    virtual void changeValue(int amount) { setValue(intValue() + amount); }
+
+    QString numericToString(int v);
+
+
+  public slots:
+    virtual void cursorLeft(bool page = false)
+    {
+        if (enabled)
         {
             if (inverted)
-                return intValue() < maxVal;
+                changeValue(page ? bigStep : step);
             else
-                return intValue() > minVal;
+                changeValue(page ? (0 - bigStep) : (0 - step));
         }
+    }
 
-        virtual bool hasRight()
+    virtual void cursorRight(bool page = false)
+    {
+        if (enabled)
         {
             if (inverted)
-                return intValue() > minVal;
+                changeValue(page ? (0 - bigStep) : (0 - step));
             else
-                return intValue() < maxVal;
+                changeValue(page ? bigStep : step);
         }
+    }
 
-        void setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
-                          const QString& oneStr, const QString& posStr);
-
-        int intValue() const { return valueText.toInt();}
-
-        virtual void setValue(int newVal);
-
-        virtual void changeValue(int amount) { setValue(intValue() + amount); }
+    virtual void slotGuiActivate(ManagedListGroup*) { generateList(); }
 
 
-        QString numericToString(int v);
+  protected:
+    void generateList();
+    int step;
+    int bigStep;
+    QString negTemplate;
+    QString negOneTemplate;
+    QString posTemplate;
+    QString posOneTemplate;
+    QString zeroTemplate;
 
-
-    public slots:
-        virtual void cursorLeft(bool page = false)
-        {
-            if (enabled)
-            {
-                if (inverted)
-                    changeValue(page ? bigStep : step);
-                else
-                    changeValue(page ? (0 - bigStep) : (0 - step));
-            }
-        }
-
-        virtual void cursorRight(bool page = false)
-        {
-            if (enabled)
-            {
-                if (inverted)
-                    changeValue(page ? (0 - bigStep) : (0 - step));
-                else
-                    changeValue(page ? bigStep : step);
-            }
-        }
-
-
-        virtual void slotGuiActivate(ManagedListGroup*) { generateList(); }
-
-    protected:
-        void generateList();
-        int step;
-        int bigStep;
-        QString negTemplate;
-        QString negOneTemplate;
-        QString posTemplate;
-        QString posOneTemplate;
-        QString zeroTemplate;
-
-    protected:
-        int maxVal;
-        int minVal;
-        bool listBuilt;
-        bool inverted;
+  protected:
+    int maxVal;
+    int minVal;
+    bool listBuilt;
+    bool inverted;
 };
 
 
@@ -430,262 +460,279 @@ class MPUBLIC ManagedListSetting : public Setting, public SimpleDBStorage
 
   protected:
     ManagedListSetting(QString _table, QString _column,
-                       ManagedList *_parentList = NULL) :
-        Setting(this), SimpleDBStorage(this, _table, _column),
-        parentList(_parentList), listItem(NULL) { }
+                       ManagedList *_parentList = NULL)
+        : Setting(this), SimpleDBStorage(this, _table, _column),
+        parentList(_parentList), listItem(NULL) {}
 
     QPointer<ManagedList> parentList;
     QPointer<ManagedListItem> listItem;
 
-    public slots:
-        void itemChanged(ManagedListItem*) { syncDBFromItem(); }
+  public slots:
+    void itemChanged(ManagedListItem*) { syncDBFromItem(); }
 
+  public:
+    virtual void Load(void)
+    {
+        SimpleDBStorage::Load();
+        syncItemFromDB();
+    }
 
+    virtual void setValue(int val) { setValue(QString::number(val)); }
 
-    public:
-
-        virtual void Load(void)
+    virtual void setValue(const QString& val)
+    {
+        if (listItem)
         {
-            SimpleDBStorage::Load();
-            syncItemFromDB();
+            listItem->setValue(val);
+            syncDBFromItem();
         }
-
-        virtual void setValue(int val) {setValue(QString::number(val));}
-
-        virtual void setValue(const QString& val) {
-            if (listItem)
-            {
-                listItem->setValue(val);
-                syncDBFromItem();
-            }
-            else
-            {
-                Setting::setValue(val);
-            }
-        }
-
-        virtual QString getValue(void) const
+        else
         {
-            if (listItem)
-            {
-                ManagedListSetting* th = const_cast<ManagedListSetting*>(this);
-                th->syncDBFromItem();
-                return listItem->getValue();
-            }
-            else
-            {
-                return Setting::getValue();
-            }
-
+            Setting::setValue(val);
         }
+    }
 
-        virtual void syncDBFromItem()
+    virtual QString getValue(void) const
+    {
+        if (listItem)
         {
-            if (listItem)
-                Setting::setValue(listItem->getValue());
+            ManagedListSetting* th = const_cast<ManagedListSetting*>(this);
+            th->syncDBFromItem();
+            return listItem->getValue();
         }
-
-        virtual void syncItemFromDB()
+        else
         {
-            if (listItem)
-                listItem->setValue(settingValue);
+            return Setting::getValue();
         }
 
-        ManagedListItem* getItem() { return listItem; }
-        operator ManagedListItem*() { return listItem; }
+    }
+
+    virtual void syncDBFromItem()
+    {
+        if (listItem)
+            Setting::setValue(listItem->getValue());
+    }
+
+    virtual void syncItemFromDB()
+    {
+        if (listItem)
+            listItem->setValue(settingValue);
+    }
+
+    ManagedListItem* getItem()  { return listItem; }
+    operator ManagedListItem*() { return listItem; }
 };
 
 
 class MPUBLIC SelectManagedListSetting : public ManagedListSetting
 {
-    protected:
-        SelectManagedListSetting(const QString& listName,  const QString& listText, ManagedListGroup* _group,
-                                 QString _table, QString _column, ManagedList* _parentList=NULL)
-                               : ManagedListSetting(_table, _column, _parentList)
-        {
-            constructListItem(listText, _group, _parentList, listName);
-            listItem = selectItem;
+  protected:
+    SelectManagedListSetting(
+        const QString& listName, const QString& listText,
+        ManagedListGroup* _group, QString _table,
+        QString _column, ManagedList* _parentList=NULL)
+        : ManagedListSetting(_table, _column, _parentList)
+    {
+        constructListItem(listText, _group, _parentList, listName);
+        listItem = selectItem;
+        connect(listItem, SIGNAL(changed(ManagedListItem*)),
+                this,     SLOT(itemChanged(ManagedListItem*)));
+    }
 
-            connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
-        }
+    QPointer<SelectManagedListItem> selectItem;
 
-        QPointer<SelectManagedListItem> selectItem;
+    virtual void constructListItem(
+        const QString& listText, ManagedListGroup* _group,
+        ManagedList* _parentList, const QString& listName)
+    {
+        selectItem = new SelectManagedListItem(listText, _group,
+                                               _parentList, this, listName);
+    }
 
-        virtual void constructListItem(const QString& listText, ManagedListGroup* _group,
-                                                         ManagedList* _parentList, const QString& listName)
-        {
-            selectItem = new SelectManagedListItem(listText, _group, _parentList, this, listName);
-        }
+  public:
+    ManagedListItem* addSelection(const QString& label, const QString& value)
+    {
+        if (selectItem)
+            return selectItem->addSelection(label, value);
 
-    public:
-        ManagedListItem* addSelection(const QString& label, const QString& value)
-        {
-            if (selectItem)
-                return selectItem->addSelection(label, value);
+        return NULL;
+    }
 
-            return NULL;
-        }
+    ManagedListItem* addButton(const QString& label, const QString& value)
+    {
+        if (selectItem)
+            return selectItem->addButton(label, value);
 
-        ManagedListItem* addButton(const QString& label, const QString& value)
-        {
-            if (selectItem)
-                return selectItem->addButton(label, value);
+        return NULL;
+    }
 
-            return NULL;
-        }
+    ManagedListItem* addSelection(const QString& label, int value)
+    {
+        if (selectItem)
+            return selectItem->addSelection(label, QString::number(value));
 
-        ManagedListItem* addSelection(const QString& label, int value)
-        {
-            if (selectItem)
-                return selectItem->addSelection(label, QString::number(value));
+        return NULL;
+    }
 
-            return NULL;
-        }
+    void clearSelections()
+    {
+        if (selectItem)
+            selectItem->clearSelections();
+    }
 
-        void clearSelections() {
-            if (selectItem)
-                selectItem->clearSelections();
-        }
-
-        operator SelectManagedListItem* () { return selectItem; }
+    operator SelectManagedListItem* () { return selectItem; }
 };
 
 
 class MPUBLIC BoolManagedListSetting : public ManagedListSetting
 {
-    public:
-        BoolManagedListSetting(const QString& trueText, const QString& falseText, const QString& ItemName,
-                               QString _table, QString _column, ManagedListGroup* _group,
-                               ManagedList* _parentList=NULL)
-                            : ManagedListSetting(_table, _column, _parentList)
-        {
-            boolListItem = new BoolManagedListItem(false, _group, _parentList, this, ItemName);
-            listItem = boolListItem;
-            boolListItem->setLabels(trueText, falseText);
-            connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
-        }
+  public:
+    BoolManagedListSetting(
+        const QString& trueText, const QString& falseText,
+        const QString& ItemName, QString _table, QString _column,
+        ManagedListGroup* _group, ManagedList* _parentList=NULL)
+        : ManagedListSetting(_table, _column, _parentList)
+    {
+        boolListItem = new BoolManagedListItem(false, _group,
+                                               _parentList, this, ItemName);
+        listItem = boolListItem;
+        boolListItem->setLabels(trueText, falseText);
+        connect(listItem, SIGNAL(changed(ManagedListItem*)),
+                this,     SLOT(itemChanged(ManagedListItem*)));
+    }
 
-        operator BoolManagedListItem* () { return boolListItem; }
+    operator BoolManagedListItem* () { return boolListItem; }
 
-    protected:
-        BoolManagedListItem* boolListItem;
+  protected:
+    BoolManagedListItem* boolListItem;
 };
 
 
 class MPUBLIC IntegerManagedListSetting : public ManagedListSetting
 {
-    public:
-        IntegerManagedListSetting(int _bigStep, int _step, const QString& ItemName, QString _table,
-                                  QString _column, ManagedList* _parentList=NULL)
-                            : ManagedListSetting(_table, _column, _parentList)
-        {
-            IntegerListItem = new IntegerManagedListItem(_bigStep, _step, _parentList, this, ItemName);
+  public:
+    IntegerManagedListSetting(
+        int _bigStep, int _step, const QString& ItemName,
+        QString _table, QString _column, ManagedList* _parentList=NULL)
+        : ManagedListSetting(_table, _column, _parentList)
+    {
+        IntegerListItem = new IntegerManagedListItem(
+            _bigStep, _step, _parentList, this, ItemName);
             listItem = IntegerListItem;
-            connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
-        }
+        connect(listItem, SIGNAL(changed(ManagedListItem*)),
+                this,     SLOT(itemChanged(ManagedListItem*)));
+    }
 
-        operator IntegerManagedListItem* () { return IntegerListItem; }
+    operator IntegerManagedListItem* () { return IntegerListItem; }
 
-        void setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
-                          const QString& oneStr, const QString& posStr)
-        {
-            IntegerListItem->setTemplates(negStr, negOneStr, zeroStr, oneStr, posStr);
-        }
+    void setTemplates(const QString& negStr, const QString& negOneStr,
+                      const QString& zeroStr,
+                      const QString& oneStr, const QString& posStr)
+    {
+        IntegerListItem->setTemplates(negStr, negOneStr,
+                                      zeroStr, oneStr, posStr);
+    }
 
-        void setShortTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
-                               const QString& oneStr, const QString& posStr)
-        {
-            IntegerListItem->setShortTemplates(negStr, negOneStr, zeroStr, oneStr, posStr);
-        }
-    protected:
-        IntegerManagedListItem* IntegerListItem;
+    void setShortTemplates(const QString& negStr, const QString& negOneStr,
+                           const QString& zeroStr,
+                           const QString& oneStr, const QString& posStr)
+    {
+        IntegerListItem->setShortTemplates(negStr, negOneStr,
+                                           zeroStr, oneStr, posStr);
+    }
+
+  protected:
+    IntegerManagedListItem* IntegerListItem;
 };
 
 class MPUBLIC BoundedIntegerManagedListSetting : public ManagedListSetting
 {
-    public:
-        BoundedIntegerManagedListSetting(int _min, int _max, int _bigStep, int _step, const QString& ItemName,
-                                  QString _table, QString _column, ManagedListGroup* _group,
-                                  ManagedList* _parentList=NULL, bool _invert = false)
-                            : ManagedListSetting(_table, _column, _parentList)
-        {
-            BoundedIntegerListItem = new BoundedIntegerManagedListItem(_min, _max, _bigStep, _step,
-                                                                       _group, _parentList, this, ItemName,
-                                                                       _invert);
-            listItem = BoundedIntegerListItem;
-            connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
-        }
+  public:
+    BoundedIntegerManagedListSetting(
+        int _min, int _max, int _bigStep, int _step, const QString& ItemName,
+        QString _table, QString _column, ManagedListGroup* _group,
+        ManagedList* _parentList=NULL, bool _invert = false)
+        : ManagedListSetting(_table, _column, _parentList)
+    {
+        BoundedIntegerListItem = new BoundedIntegerManagedListItem(
+            _min, _max, _bigStep, _step, _group,
+            _parentList, this, ItemName, _invert);
+        listItem = BoundedIntegerListItem;
+        connect(listItem, SIGNAL(changed(ManagedListItem*)),
+                this,     SLOT(itemChanged(ManagedListItem*)));
+    }
 
-        operator BoundedIntegerManagedListItem* () { return BoundedIntegerListItem; }
+    operator BoundedIntegerManagedListItem* ()
+    { return BoundedIntegerListItem; }
 
-        void setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
-                          const QString& oneStr, const QString& posStr)
-        {
-            BoundedIntegerListItem->setTemplates(negStr, negOneStr, zeroStr, oneStr, posStr);
-        }
+    void setTemplates(const QString& negStr, const QString& negOneStr,
+                      const QString& zeroStr,
+                      const QString& oneStr, const QString& posStr)
+    {
+        BoundedIntegerListItem->setTemplates(negStr, negOneStr,
+                                             zeroStr, oneStr, posStr);
+    }
 
-    protected:
-        BoundedIntegerManagedListItem* BoundedIntegerListItem;
+  protected:
+    BoundedIntegerManagedListItem* BoundedIntegerListItem;
 };
 
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// The ManagedList takes care of the heavy lifting when using a UIListType.
-//
+/**
+ * The ManagedList takes care of the heavy lifting when using a UIListType.
+ */
 class MPUBLIC ManagedList : public QObject
 {
     Q_OBJECT
 
-    public:
-        ManagedList(MythDialog* parent, const char* name=0);
+  public:
+    ManagedList(MythDialog* parent, const char* name="ManagedList");
 
-        void paintEvent(const QRect& r, QPainter *p, bool force=NULL);
-        void update(QPainter *p);
+    void paintEvent(const QRect& r, QPainter *p, bool force=NULL);
+    void update(QPainter *p);
 
-        const XMLParse* getTheme() const { return theme; }
-        void setTheme(XMLParse* newTheme) { theme = newTheme; }
+    const XMLParse* getTheme() const  { return theme; }
+    void setTheme(XMLParse* newTheme) { theme = newTheme; }
 
-        const QString& getContainerName() const { return containerName; }
-        void setContainerName(const QString& newStr) { containerName = newStr; }
+    const QString& getContainerName() const      { return containerName; }
+    void setContainerName(const QString& newStr) { containerName = newStr; }
 
 
-        ManagedListItem* getItem(const QString& itemName) { return (ManagedListItem*)child(itemName);}
-        MythDialog* getParent() { return (MythDialog*)parent();}
+    ManagedListItem* getItem(const QString& itemName)
+    { return (ManagedListItem*)child(itemName);}
+    MythDialog* getParent() { return (MythDialog*)parent();}
 
-        bool init(XMLParse *theme, const QString& containerNameIn, const QString& listNameIn, const QRect& r);
+    bool init(XMLParse *theme, const QString& containerNameIn,
+              const QString& listNameIn, const QRect& r);
 
-        ManagedListGroup* getCurGroup() { return curGroup; }
-        void setCurGroup(ManagedListGroup* newGroup);
+    ManagedListGroup* getCurGroup() { return curGroup; }
+    void setCurGroup(ManagedListGroup* newGroup);
 
-        bool goBack();
-        bool getLocked() const { return locked; }
-        void setLocked(bool val = true) { locked = val; }
-        
-        
+    bool goBack();
+    bool getLocked() const          { return locked; }
+    void setLocked(bool val = true) { locked = val; }
 
-    public slots:
-        void cursorDown(bool page = false);
-        void cursorUp(bool page = false);
-        void cursorLeft(bool page = false);
-        void cursorRight(bool page = false);
-        void select();
-        void itemChanged(ManagedListItem* itm);
-        //void itemCanceled(ManagedListItem* itm);
-        //void itemSelected(ManagedListItem* itm);
-        
 
-    protected:
-        QPointer<ManagedListGroup> curGroup;
-        XMLParse* theme;
-        int listSize;
-        QString containerName;
-        QString listName;
-        QRect listRect;
-        bool locked;
+  public slots:
+    void cursorDown(bool page = false);
+    void cursorUp(bool page = false);
+    void cursorLeft(bool page = false);
+    void cursorRight(bool page = false);
+    void select();
+    void itemChanged(ManagedListItem* itm);
+    //void itemCanceled(ManagedListItem* itm);
+    //void itemSelected(ManagedListItem* itm);
+
+
+  protected:
+    QPointer<ManagedListGroup> curGroup;
+    XMLParse* theme;
+    int listSize;
+    QString containerName;
+    QString listName;
+    QRect listRect;
+    bool locked;
 };
-
-
 
 #endif
