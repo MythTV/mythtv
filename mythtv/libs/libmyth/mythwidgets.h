@@ -1,24 +1,23 @@
 #ifndef MYTHWIDGETS_H_
 #define MYTHWIDGETS_H_
 
-//#include <qbutton.h>
-#include <qcombobox.h>
-#include <qspinbox.h>
-#include <qslider.h>
-#include <qlineedit.h>
+#include <QComboBox>
+#include <QSpinBox>
+#include <QSlider>
+#include <QLineEdit>
 #include <q3textedit.h>
-#include <qpushbutton.h>
-#include <qtoolbutton.h>
-#include <qdialog.h>
+#include <QPushButton>
+#include <QToolButton>
+#include <QDialog>
 #include <q3listview.h>
 #include <q3header.h>
 #include <q3buttongroup.h>
 #include <q3listbox.h>
-#include <qcheckbox.h>
-#include <qradiobutton.h>
-#include <qimage.h>
-#include <qlabel.h>
-#include <qtimer.h>
+#include <QCheckBox>
+#include <QRadioButton>
+#include <QImage>
+#include <QLabel>
+#include <QTimer>
 #include <QFocusEvent>
 #include <QMouseEvent>
 #include <QHideEvent>
@@ -44,17 +43,18 @@ using namespace std;
 class MPUBLIC MythComboBox: public QComboBox
 {
     Q_OBJECT
+
   public:
-    MythComboBox(bool rw, QWidget* parent=0, const char* name=0);
+    MythComboBox(bool rw, QWidget* parent=0, const char* name="MythComboBox");
 
     void setHelpText(const QString &help);
 
-    void setAcceptOnSelect(bool Accept) { AcceptOnSelect = Accept; }
-    void setStep(int _step = 1) { step = _step; }
+    void setAcceptOnSelect(bool Accept)      { AcceptOnSelect = Accept; }
+    void setStep(int _step = 1)              { step = _step; }
     void setAllowVirtualKeyboard(bool allowKbd = true)
-        { allowVirtualKeyboard = allowKbd; }
+    { allowVirtualKeyboard = allowKbd; }
     void setPopupPosition(PopupPosition pos) { popupPosition = pos; }
-    PopupPosition getPopupPosition(void) { return popupPosition; }
+    PopupPosition getPopupPosition(void)     { return popupPosition; }
 
   signals:
     void changeHelpText(QString);
@@ -89,15 +89,20 @@ class MPUBLIC MythComboBox: public QComboBox
 class MPUBLIC MythSpinBox: public QSpinBox
 {
     Q_OBJECT
+
   public:
-    MythSpinBox(QWidget* parent = NULL, const char* widgetName = 0,
-                bool allow_single_step = false) :
-        QSpinBox(parent, widgetName),
-        singlestep(allow_single_step) { if (singlestep) setLineStep(10); }
+    MythSpinBox(QWidget* parent = NULL, const char* name = "MythSpinBox",
+                bool allow_single_step = false)
+        : QSpinBox(parent), singlestep(allow_single_step)
+    {
+        setObjectName(name);
+        if (singlestep)
+            setLineStep(10);
+    }
 
     void setHelpText(const QString&);
 
-    bool singleStep(void) { return singlestep; }
+    bool singleStep(void)               { return singlestep; }
     void setSingleStep(bool arg = true) { singlestep = arg; }
 
   signals:
@@ -116,9 +121,10 @@ class MPUBLIC MythSpinBox: public QSpinBox
 class MPUBLIC MythSlider: public QSlider
 {
     Q_OBJECT
+
   public:
-    MythSlider(QWidget* parent=0, const char* name=0):
-        QSlider(parent, name) {};
+    MythSlider(QWidget* parent=0, const char* name="MythSlider")
+        : QSlider(parent) { setObjectName(name); };
 
     void setHelpText(const QString&);
 
@@ -137,15 +143,21 @@ class MPUBLIC MythSlider: public QSlider
 class MPUBLIC MythLineEdit : public QLineEdit
 {
     Q_OBJECT
+
   public:
-    MythLineEdit(QWidget *parent=NULL, const char* widgetName=0);
-    MythLineEdit(const QString &text, QWidget *p=NULL, const char *name=0);
+    MythLineEdit(QWidget *parent=NULL, const char *name="MythLineEdit");
+    MythLineEdit(const QString &text,
+                 QWidget *parent=NULL, const char *name="MythLineEdit");
 
     void setHelpText(const QString&);;
     void setRW(bool readwrite = true) { rw = readwrite; };
     void setRO() { rw = false; };
     void setAllowVirtualKeyboard(bool allowKbd = true)
 	       { allowVirtualKeyboard = allowKbd; }
+    // muthui's MythUITextEdit m_Filter & FilterNumeric
+    // may be a better way to do it
+    //void setSmartVirtualKeyboard(bool allowKbd = true)
+	//       { allowSmartKeyboard   = allowKbd; }
     void setPopupPosition(PopupPosition pos) { popupPosition = pos; }
     PopupPosition getPopupPosition(void) { return popupPosition; }
 
@@ -185,12 +197,16 @@ class MPUBLIC MythLineEdit : public QLineEdit
 class MPUBLIC MythRemoteLineEdit : public Q3TextEdit
 {
     Q_OBJECT
-  public:
 
-    MythRemoteLineEdit( QWidget * parent, const char * name = 0 );
-    MythRemoteLineEdit( const QString & contents, QWidget * parent, const char * name = 0 );
-    MythRemoteLineEdit( QFont *a_font, QWidget * parent, const char * name = 0 );
-    MythRemoteLineEdit( int lines, QWidget * parent, const char * name = 0 );
+  public:
+    MythRemoteLineEdit(QWidget *parent,
+                       const char *name = "MythRemoteLineEdit");
+    MythRemoteLineEdit(const QString &contents, QWidget *parent,
+                       const char *name = "MythRemoteLineEdit");
+    MythRemoteLineEdit(QFont *a_font, QWidget *parent,
+                       const char *name = "MythRemoteLineEdit");
+    MythRemoteLineEdit(int lines, QWidget *parent,
+                       const char *name = "MythRemoteLineEdit");
 
     void setHelpText(const QString&);
     void setCycleTime(float desired_interval); // in seconds
@@ -199,12 +215,11 @@ class MPUBLIC MythRemoteLineEdit : public Q3TextEdit
     void backspace();
     void del();
     void setPopupPosition(PopupPosition pos) { popupPosition = pos; };
-    PopupPosition getPopupPosition(void) { return popupPosition; };
+    PopupPosition getPopupPosition(void)     { return popupPosition; };
 
     virtual QString text();
 
   signals:
-
     void    shiftState(bool);
     void    cycleState(QString current_choice, QString set);
     void    changeHelpText(QString);
@@ -226,13 +241,11 @@ class MPUBLIC MythRemoteLineEdit : public Q3TextEdit
     virtual void popupVirtualKeyboard(void);
 
   private slots:
-
     void    startCycle(QString current_choice, QString set);
     void    updateCycle(QString current_choice, QString set);
     void    endCycle();
 
   private:
-
     QFont   *my_font;
     void    Init(void);
     void    cycleKeys(QString cycleList);
@@ -270,16 +283,24 @@ class MPUBLIC MythRemoteLineEdit : public Q3TextEdit
 class MPUBLIC MythPushButton : public QPushButton
 {
     Q_OBJECT
+
   public:
-    MythPushButton(QWidget *parent, const char *name = 0, bool aa = false)
-                 : QPushButton(parent, name)
-                  { setBackgroundOrigin(WindowOrigin); arrowAccel = aa;
-                    setToggleButton(false); }
+    MythPushButton(QWidget *parent, const char *name = "MythPushButton",
+                   bool aa = false)
+        : QPushButton(parent), arrowAccel(aa)
+    {
+        setObjectName(name);
+        //setBackgroundOrigin(WindowOrigin);
+        setToggleButton(false);
+    }
 
     MythPushButton(const QString &text, QWidget *parent, bool aa = false)
-                 : QPushButton(text, parent)
-                  { setBackgroundOrigin(WindowOrigin); arrowAccel = aa;
-                    setToggleButton(false); }
+        : QPushButton(text, parent), arrowAccel(aa)
+    {
+        setObjectName("MythPushButton");
+        //setBackgroundOrigin(WindowOrigin);
+        setToggleButton(false);
+    }
 
     MythPushButton(const QString &ontext, const QString &offtext,
                    QWidget *parent, bool isOn = true, bool aa = false);
@@ -311,11 +332,13 @@ class MPUBLIC MythPushButton : public QPushButton
 class MPUBLIC MythCheckBox: public QCheckBox
 {
     Q_OBJECT
+
   public:
-    MythCheckBox(QWidget* parent = 0, const char* name = 0):
-        QCheckBox(parent, name) {};
-    MythCheckBox(const QString &text, QWidget* parent = 0, const char* name = 0):
-        QCheckBox(text, parent, name) {};
+    MythCheckBox(QWidget *parent = 0, const char *name = "MythCheckBox")
+        : QCheckBox(parent)       { setObjectName(name); };
+    MythCheckBox(const QString &text,
+                 QWidget *parent = 0, const char *name = "MythCheckBox")
+        : QCheckBox(text, parent) { setObjectName(name); };
 
     void setHelpText(const QString&);
 
@@ -334,9 +357,10 @@ class MPUBLIC MythCheckBox: public QCheckBox
 class MPUBLIC MythRadioButton: public QRadioButton
 {
     Q_OBJECT
+
   public:
-    MythRadioButton(QWidget* parent = 0, const char* name = 0):
-        QRadioButton(parent, name) {};
+    MythRadioButton(QWidget* parent = 0, const char* name = "MythRadioButton")
+        : QRadioButton(parent) { setObjectName(name); };
 
     void setHelpText(const QString&);
 
@@ -355,6 +379,7 @@ class MPUBLIC MythRadioButton: public QRadioButton
 class MPUBLIC MythListView : public Q3ListView
 {
     Q_OBJECT
+
   public:
     MythListView(QWidget *parent);
 
@@ -367,6 +392,7 @@ class MPUBLIC MythListView : public Q3ListView
 
 class MPUBLIC MythListBox: public Q3ListBox {
     Q_OBJECT
+
   public:
     MythListBox(QWidget* parent);
 
