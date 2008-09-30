@@ -205,7 +205,6 @@ void DVDRipBox::Init()
     //  timer to query whether the thread is done or not
     //
 
-    QString dvd_device = MediaMonitor::defaultDVDdevice();
     m_dvdInfo = NULL;
     m_discCheckingTimer = new QTimer();
     connect(m_discCheckingTimer, SIGNAL(timeout()), this, SLOT(checkDisc()));
