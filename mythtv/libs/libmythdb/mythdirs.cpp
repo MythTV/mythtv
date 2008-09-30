@@ -25,7 +25,14 @@ void InitializeMythDirs(void)
     if (tmp_installprefix)
         installprefix = tmp_installprefix;
 
+#ifdef CONFIG_DARWIN
+    // Work around bug in OS X where applicationDirPath() can crash
+    // (if binary is not in a bundle, and is daemon()ized)
+
+    QDir prefixDir = QFileInfo(qApp->argv()[0]).dir();
+#else
     QDir prefixDir = qApp->applicationDirPath();
+#endif
 
     if (QDir(installprefix).isRelative())
     {
