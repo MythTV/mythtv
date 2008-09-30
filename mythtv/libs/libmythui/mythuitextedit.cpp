@@ -20,22 +20,19 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name,
 
     m_isPassword = false;
 
-    m_Justification = (Qt::AlignLeft | Qt::AlignTop);
-
-    m_showCursor = false;
     m_blinkInterval = 0;
     m_cursorBlinkRate = 40;
 
     m_Position = -1;
 
-    m_PaddingMargin = 0;
     m_maxLength = 0;
 
-    m_backgroundImage = m_cursorImage = NULL;
+    m_backgroundState = NULL;
+    m_cursorImage = NULL;
     m_Text = NULL;
 
-    if (doInit)
-        Init();
+    connect(this, SIGNAL(TakingFocus()), SLOT(Select()));
+    connect(this, SIGNAL(LosingFocus()), SLOT(Deselect()));
 
     m_CanHaveFocus = true;
 }
@@ -44,29 +41,32 @@ MythUITextEdit::~MythUITextEdit()
 {
 }
 
-void MythUITextEdit::Init(void)
+void MythUITextEdit::Select()
 {
-    m_backgroundImage = new MythUIImage(this, "backgroundimage");
-    m_Text = new MythUIText(this, "textarea");
-    m_cursorImage = new MythUIImage(this, "cursorimage");
-    m_Text->SetCutDown(false);
+    if (m_backgroundState && !m_backgroundState->DisplayState("selected"))
+        VERBOSE(VB_IMPORTANT, "MythUITextEdit: selected state doesn't exist");
+}
+
+void MythUITextEdit::Deselect()
+{
+    if (m_backgroundState && !m_backgroundState->DisplayState("active"))
+        VERBOSE(VB_IMPORTANT, "MythUITextEdit: active state doesn't exist");
 }
 
 void MythUITextEdit::Pulse(void)
 {
-    if (m_showCursor && m_HasFocus)
+    if (!m_cursorImage)
+        return;
+
+    if (m_HasFocus)
     {
         if (m_blinkInterval > m_cursorBlinkRate)
         {
             m_blinkInterval = 0;
             if (m_cursorImage->IsVisible())
-            {
                 m_cursorImage->SetVisible(false);
-            }
             else
-            {
                 m_cursorImage->SetVisible(true);
-            }
         }
 
         m_blinkInterval++;
@@ -84,93 +84,11 @@ bool MythUITextEdit::ParseElement(QDomElement &element)
     if (element.tagName() == "area")
     {
         SetArea(parseRect(element));
-        SetTextRect(m_Area);
-    }
-    else if (element.tagName() == "font")
-    {
-        QString fontname = getFirstText(element);
-        MythFontProperties *fp = GetFont(fontname);
-        if (!fp)
-            fp = GetGlobalFontMap()->GetFont(fontname);
-        if (fp)
-            m_Text->SetFontProperties(*fp);
-    }
-    else if (element.tagName() == "value")
-    {
-        if (element.attribute("lang","").isEmpty())
-        {
-            m_Message = qApp->translate("ThemeUI", qPrintable(getFirstText(element)));
-        }
-        else if (element.attribute("lang","").toLower() ==
-                 GetMythUI()->GetLanguageAndVariant())
-        {
-            m_Message = getFirstText(element);
-        }
-        else if (element.attribute("lang","").toLower() ==
-                 GetMythUI()->GetLanguage())
-        {
-            m_Message = getFirstText(element);
-        }
-    }
-    else if (element.tagName() == "multiline")
-    {
-        if (parseBool(element))
-            m_Justification |= Qt::TextWordWrap;
-        else
-            m_Justification &= ~Qt::TextWordWrap;
-
-        m_Text->SetJustification(m_Justification);
-    }
-    else if (element.tagName() == "align")
-    {
-        QString align = getFirstText(element).toLower();
-
-        // preserve the wordbreak attribute, drop everything else
-        m_Justification = m_Justification & Qt::TextWordWrap;
-
-        m_Justification |= parseAlignment(align);
-
-        m_Text->SetJustification(m_Justification);
     }
     else if (element.tagName() == "maxlength")
     {
         QString maxlength = getFirstText(element);
         SetMaxLength(maxlength.toInt());
-    }
-    else if (element.tagName() == "margin")
-    {
-        int paddingMargin = NormX(getFirstText(element).toInt());
-        SetPaddingMargin(paddingMargin);
-    }
-    else if (element.tagName() == "cursor")
-    {
-        MythImage *tmp;
-        QString filename = element.attribute("filename");
-
-        if (!filename.isEmpty())
-        {
-            tmp = GetMythPainter()->GetFormatImage();
-            tmp->Load(filename);
-            SetCursorImage(tmp);
-        }
-    }
-    else if (element.tagName() == "background")
-    {
-        MythImage *tmp;
-        QString filename = element.attribute("filename");
-
-        tmp = GetMythPainter()->GetFormatImage();
-
-        if (filename.isEmpty() || !tmp->Load(filename))
-        {
-            QColor startcol = QColor("#EEEEEE");
-            QColor endcol = QColor("#AEAEAE");
-            int alpha = 255;
-            tmp = MythImage::Gradient(QSize(10,10), startcol,
-                            endcol, alpha);
-        }
-
-        SetBackgroundImage(tmp);
     }
     else
         return MythUIType::ParseElement(element);
@@ -178,33 +96,52 @@ bool MythUITextEdit::ParseElement(QDomElement &element)
     return parsed;
 }
 
-void MythUITextEdit::SetCursorImage(MythImage *image)
+void MythUITextEdit::Finalize()
 {
-    if (image && !image->isNull())
-    {
-        QFontMetrics fm(m_Text->GetFontProperties()->face());
-        int height = fm.height();
-        if (height > 0)
-        {
-            int width = int(((float)height / (float)image->height())
-                            * (float)image->width());
-            image->Resize(QSize(width,height));
-        }
-        m_cursorImage->SetImage(image);
-
-        m_showCursor = true;
-        SetTextRect();
-    }
+    SetInitalStates();
 }
 
-void MythUITextEdit::SetBackgroundImage(MythImage *image)
+void MythUITextEdit::SetInitalStates()
 {
-    if (image)
+    m_backgroundState = dynamic_cast<MythUIStateType *>
+                                                    (GetChild("background"));
+    m_cursorImage = dynamic_cast<MythUIImage *> (GetChild("cursor"));
+    m_Text = dynamic_cast<MythUIText *> (GetChild("text"));
+
+    if (!m_Text || !m_cursorImage || !m_backgroundState)
     {
-        image->Resize(QSize(m_Area.width(), m_Area.height()));
-        m_backgroundImage->SetPosition(0,0);
-        m_backgroundImage->SetImage(image);
+        VERBOSE(VB_IMPORTANT, "MythUITextEdit: Missing required element.");
+        return;
     }
+
+    if (m_backgroundState && !m_backgroundState->DisplayState("active"))
+        VERBOSE(VB_IMPORTANT, "MythUITextEdit: active state doesn't exist");
+
+    QFontMetrics fm(m_Text->GetFontProperties()->face());
+    int height = fm.height();
+    if (height > 0)
+    {
+        MythRect imageArea = m_cursorImage->GetArea();
+        int width = int(((float)height / (float)imageArea.height())
+                        * (float)imageArea.width());
+        if (width <= 0)
+            width = 1;
+        m_cursorImage->ForceSize(QSize(width,height));
+    }
+
+    MythRect textrect = m_Text->GetArea();
+
+    if (textrect.isNull())
+        textrect = MythRect(5,5,m_Area.width()-10,m_Area.height()-10);
+
+    textrect.setWidth(textrect.width() - m_cursorImage->GetArea().width());
+
+    if (textrect.isValid())
+        m_Text->SetArea(textrect);
+
+    m_Text->SetCutDown(false);
+
+    m_cursorImage->SetPosition(textrect.x(),textrect.y());
 }
 
 void MythUITextEdit::SetMaxLength(const int length)
@@ -212,38 +149,9 @@ void MythUITextEdit::SetMaxLength(const int length)
     m_maxLength = length;
 }
 
-void MythUITextEdit::SetPaddingMargin(const int margin)
-{
-    m_PaddingMargin = margin;
-
-    SetTextRect();
-    m_cursorImage->SetPosition(margin,margin);
-}
-
-void MythUITextEdit::SetTextRect(const MythRect &area)
-{
-    MythRect textrect;
-
-    if (area.isNull() || area.isEmpty())
-        textrect = m_Area;
-    else
-        textrect = area;
-
-    textrect = MythRect( m_PaddingMargin,
-                      m_PaddingMargin,
-                      textrect.width() - m_PaddingMargin * 2,
-                      textrect.height() - m_PaddingMargin * 2);
-
-    if (m_cursorImage)
-        textrect.setWidth(textrect.width() - m_cursorImage->GetArea().width());
-
-    if (textrect.isValid())
-        m_Text->SetArea(textrect);
-}
-
 void MythUITextEdit::SetText(const QString text, bool moveCursor)
 {
-    if (m_Message == text)
+    if (!m_Text || (m_Message == text))
         return;
 
     m_Message = text;
@@ -305,6 +213,9 @@ void MythUITextEdit::RemoveCharacter()
 
 bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
 {
+    if (!m_Text || !m_cursorImage)
+        return false;
+
     QFontMetrics fm(m_Text->GetFontProperties()->face());
 
     int cursorPos = m_cursorImage->GetArea().x();
@@ -334,9 +245,9 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
 
             newcursorPos = cursorPos - size.width();
 
-            if (newcursorPos < m_PaddingMargin)
+            if (newcursorPos < textRect.x())
             {
-                newcursorPos = m_PaddingMargin;
+                newcursorPos = textRect.x();
                 if (m_Position == 0)
                     m_Text->SetStartPosition(0, 0);
                 else
@@ -372,15 +283,15 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
                 int newx = drawRect.width() -
                            (messageWidth + cursorWidth);
                 m_Text->MoveStartPosition(newx, 0);
-                newcursorPos = messageWidth + newx + m_PaddingMargin;
+                newcursorPos = messageWidth + newx + textRect.x();
             }
             else
             {
                 m_Text->SetStartPosition(0,0);
                 if (messageWidth <= 0)
-                    newcursorPos = m_PaddingMargin;
+                    newcursorPos = textRect.x();
                 else
-                    newcursorPos = messageWidth + m_PaddingMargin;
+                    newcursorPos = messageWidth + textRect.x();
             }
 
             m_Position = string.size() - 1;
@@ -445,18 +356,10 @@ void MythUITextEdit::CopyFrom(MythUIType *base)
 
     m_blinkInterval = textedit->m_blinkInterval;
     m_cursorBlinkRate = textedit->m_cursorBlinkRate;
-    m_showCursor = textedit->m_showCursor;
     m_maxLength = textedit->m_maxLength;
-    m_Justification = textedit->m_Justification;
-    m_PaddingMargin = textedit->m_PaddingMargin;
     m_Filter = textedit->m_Filter;
 
     MythUIType::CopyFrom(base);
-
-    m_backgroundImage = dynamic_cast<MythUIImage *>
-                                            (GetChild("backgroundimage"));
-    m_Text = dynamic_cast<MythUIText *> (GetChild("textarea"));
-    m_cursorImage = dynamic_cast<MythUIImage *> (GetChild("cursorimage"));
 }
 
 void MythUITextEdit::CreateCopy(MythUIType *parent)

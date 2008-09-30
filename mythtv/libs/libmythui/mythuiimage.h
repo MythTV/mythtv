@@ -92,6 +92,7 @@ class MythUIImage : public MythUIType
     friend class MythThemeBase;
     friend class MythUIButtonListItem;
     friend class MythUIProgressBar;
+    friend class MythUITextEdit;
 };
 
 #endif

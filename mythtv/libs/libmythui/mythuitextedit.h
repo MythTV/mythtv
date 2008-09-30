@@ -5,6 +5,7 @@
 
 #include "mythuitype.h"
 #include "mythuitext.h"
+#include "mythuistatetype.h"
 #include "mythuiimage.h"
 
 class MythFontProperties;
@@ -21,7 +22,7 @@ enum InputFilter
 
 /** \class MythUITextEdit
  *
- * \brief A text entry and edit widget
+ *  \brief A text entry and edit widget
  *
  */
 class MythUITextEdit : public MythUIType, public StorageUser
@@ -51,30 +52,28 @@ class MythUITextEdit : public MythUIType, public StorageUser
   signals:
     void valueChanged();
 
+  public slots:
+    void Select();
+    void Deselect();
+
   protected:
     virtual bool ParseElement(QDomElement &element);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
+    virtual void Finalize(void);
 
     void Init(void);
+    void SetInitalStates(void);
 
     bool InsertCharacter(const QString character);
     void RemoveCharacter(void);
 
-    void SetBackgroundImage(MythImage *);
-    void SetCursorImage(MythImage *);
     void SetMaxLength(const int length);
-    void SetPaddingMargin(const int margin);
-    void SetTextRect(const MythRect &area=MythRect(0,0,0,0));
 
     int m_blinkInterval;
     int m_cursorBlinkRate;
-    bool m_showCursor;
 
     int m_maxLength;
-
-    int m_Justification;
-    int m_PaddingMargin;
 
     QString m_Message;
     InputFilter m_Filter;
@@ -82,7 +81,7 @@ class MythUITextEdit : public MythUIType, public StorageUser
 
     bool m_isPassword;
 
-    MythUIImage *m_backgroundImage;
+    MythUIStateType *m_backgroundState;
     MythUIImage *m_cursorImage;
     MythUIText  *m_Text;
 };

@@ -294,10 +294,30 @@
     <!-- Base definition of a textedit -->
     <textedit name="basetextedit">
         <area>0,0,375,50</area>
-        <font>basesmallblack</font>
-        <cursor filename="cursor.png" />
-        <margin>11</margin>
-        <background filename="textedit_background.png" />
+        <statetype name="background">
+            <state name="active">
+                <imagetype name="background">
+                    <filename>textedit_background.png</filename>
+                </imagetype>
+            </state>
+            <state name="selected">
+                <imagetype name="background">
+                    <filename>textedit_background_selected.png</filename>
+                </imagetype>
+            </state>
+            <state name="inactive">
+                <imagetype name="background">
+                    <filename>textedit_background.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <imagetype name="cursor">
+            <filename>cursor.png</filename>
+        </imagetype>
+        <textarea name="text">
+            <area>12,13,351,35</area>
+            <font>basesmallblack</font>
+        </textarea>
     </textedit>
 
     <!-- Base definition of a progressbar -->
