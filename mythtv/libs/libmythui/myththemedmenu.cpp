@@ -1424,12 +1424,9 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
         }
         else
         {
-#if 0
-            parent->GetScreenStack()->PopScreen();
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("No Menu File"),
-                                      QObject::tr(QString("Myth could not locate the menu file %1.\n\n"
-                                      "We will now return to the main menu.").arg(menuname)));
-#endif
+            ShowOkPopup(QObject::tr("Myth could not locate the menu file %1\n\n"
+                                    "We will now return to the main menu.")
+                        .arg(menuname));
             return false;
         }
         
@@ -1452,15 +1449,9 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
             return false;
         }
 
-#if 0
-        parent->GetScreenStack()->PopScreen();
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
-                                  QObject::tr("Bad Menu File"),
-                                  QObject::tr(QString("The menu file %1 is "
-                                              "incomplete.\n\nWe will now "
-                                              "return to the main menu.")
-                                              .arg(menuname)));
-#endif
+        ShowOkPopup(QObject::tr("The menu file %1 is incomplete.\n\n"
+                                "We will now return to the main menu.")
+                    .arg(menuname));
         return false;
     }
 
