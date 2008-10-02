@@ -20,7 +20,7 @@ extern const uint8_t *ff_find_start_code(const uint8_t * restrict p, const uint8
 #define LOC QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum())
 #define LOC_ERR QString("DTVRec(%1) Error: ").arg(tvrec->GetCaptureCardNum())
 
-const uint DTVRecorder::kMaxKeyFrameDistance = 32;
+const uint DTVRecorder::kMaxKeyFrameDistance = 80;
 
 /** \class DTVRecorder
  *  \brief This is a specialization of RecorderBase used to
