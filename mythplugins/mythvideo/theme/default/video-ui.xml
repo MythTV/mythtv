@@ -5,7 +5,7 @@
         <area>193,87,413,426</area>
 
         <imagetype name="box">
-            <filename>mv-mselect.png</filename>
+            <filename>mv_results_popup.png</filename>
         </imagetype>
 
         <buttonlist name="results" from="basebuttonlist">
@@ -18,7 +18,7 @@
         <area>193,87,413,426</area>
 
         <imagetype name="box">
-            <filename>mv-mselect.png</filename>
+            <filename>mv_results_popup.png</filename>
         </imagetype>
 
         <buttonlist name="cast" from="basebuttonlist">
@@ -35,7 +35,7 @@
         <area>193,87,413,426</area>
 
         <imagetype name="box">
-            <filename>mv-mselect.png</filename>
+            <filename>mv_results_popup.png</filename>
         </imagetype>
 
         <textarea name="plot" from="basetextarea">
@@ -51,32 +51,31 @@
     <!-- Main Windows -->
     <window name="manager">
 
-
         <statetype name="parentallevel">
             <position>740,10</position>
             <state name="None">
                 <imagetype name="icon">
-                    <filename>level_none.png</filename>
+                    <filename>mv_level_none.png</filename>
                 </imagetype>
             </state>
             <state name="Lowest">
                 <imagetype name="icon">
-                    <filename>level_lowest.png</filename>
+                    <filename>mv_level_lowest.png</filename>
                 </imagetype>
             </state>
             <state name="Low">
                 <imagetype name="icon">
-                    <filename>level_low.png</filename>
+                    <filename>mv_level_low.png</filename>
                 </imagetype>
             </state>
             <state name="Medium">
                 <imagetype name="icon">
-                    <filename>level_medium.png</filename>
+                    <filename>mv_level_medium.png</filename>
                 </imagetype>
             </state>
             <state name="High">
                 <imagetype name="icon">
-                    <filename>level_high.png</filename>
+                    <filename>mv_level_high.png</filename>
                 </imagetype>
             </state>
         </statetype>
@@ -132,7 +131,7 @@
             <state name="Lowest">
                 <imagetype name="icon">
                     <area>0,2,30,30</area>
-                    <filename>level_lowest.png</filename>
+                    <filename>mv_level_lowest.png</filename>
                 </imagetype>
                 <textarea name="label">
                     <area>35,6,100,35</area>
@@ -142,7 +141,7 @@
             </state>
             <state name="Low" from="Lowest">
                 <imagetype name="icon">
-                    <filename>level_low.png</filename>
+                    <filename>mv_level_low.png</filename>
                 </imagetype>
                 <textarea name="label">
                     <value>Low</value>
@@ -150,7 +149,7 @@
             </state>
             <state name="Medium" from="Lowest">
                 <imagetype name="icon">
-                    <filename>level_medium.png</filename>
+                    <filename>mv_level_medium.png</filename>
                 </imagetype>
                 <textarea name="label">
                     <value>Medium</value>
@@ -158,7 +157,7 @@
             </state>
             <state name="High" from="High">
                 <imagetype name="icon">
-                    <filename>level_high.png</filename>
+                    <filename>mv_level_high.png</filename>
                 </imagetype>
                 <textarea name="label">
                     <value>High</value>
@@ -268,7 +267,7 @@
             </statetype>
             <statetype name="upscrollarrow">
                 <position>240,270</position>
-                <state type="off">
+                <state type="on">
                     <imagetype name="upon">
                         <filename>up_arrow.png</filename>
                     </imagetype>
@@ -276,7 +275,7 @@
             </statetype>
             <statetype name="downscrollarrow">
                 <position>456,270</position>
-                <state type="off">
+                <state type="on">
                     <imagetype name="dnon">
                         <filename>down_arrow.png</filename>
                     </imagetype>
@@ -306,7 +305,7 @@
 
         <imagetype name="filler">
             <position>0,0</position>
-            <filename>browse_background.png</filename>
+            <filename>mv_browse_background.png</filename>
         </imagetype>
 
         <buttonlist name="videos">
@@ -322,7 +321,7 @@
                     <imagetype name="buttonimage">
                         <area>10,15,80,120</area>
                         <preserveaspect>true</preserveaspect>
-                        <filename>browse_nocover.png</filename>
+                        <filename>mv_browse_nocover.png</filename>
                     </imagetype>
                     <textarea name="childcount" from="basetextarea">
                         <area>15,70,70,20</area>
@@ -333,13 +332,13 @@
                 <state name="selected" from="active">
                     <imagetype name="buttonbackground">
                         <position>5,7</position>
-                        <filename>browse_selector.png</filename>
+                        <filename>mv_browse_selector.png</filename>
                     </imagetype>
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
                 <position>0,42</position>
-                <state type="off">
+                <state type="on">
                     <imagetype name="upon">
                         <filename>left_arrow.png</filename>
                     </imagetype>
@@ -347,7 +346,7 @@
             </statetype>
             <statetype name="downscrollarrow">
                 <position>730,42</position>
-                <state type="off">
+                <state type="on">
                     <imagetype name="dnon">
                         <filename>right_arrow.png</filename>
                     </imagetype>
@@ -436,27 +435,27 @@
             <position>740,20</position>
             <state name="None">
                 <imagetype name="icon">
-                    <filename>level_none.png</filename>
+                    <filename>mv_level_none.png</filename>
                 </imagetype>
             </state>
             <state name="Lowest">
                 <imagetype name="icon">
-                    <filename>level_lowest.png</filename>
+                    <filename>mv_level_lowest.png</filename>
                 </imagetype>
             </state>
             <state name="Low">
                 <imagetype name="icon">
-                    <filename>level_low.png</filename>
+                    <filename>mv_level_low.png</filename>
                 </imagetype>
             </state>
             <state name="Medium">
                 <imagetype name="icon">
-                    <filename>level_medium.png</filename>
+                    <filename>mv_level_medium.png</filename>
                 </imagetype>
             </state>
             <state name="High">
                 <imagetype name="icon">
-                    <filename>level_high.png</filename>
+                    <filename>mv_level_high.png</filename>
                 </imagetype>
             </state>
         </statetype>
@@ -503,7 +502,7 @@
             </statetype>
             <statetype name="upscrollarrow">
                 <position>640,20</position>
-                <state type="off">
+                <state type="on">
                     <imagetype name="upon">
                         <filename>up_arrow.png</filename>
                     </imagetype>
@@ -511,7 +510,7 @@
             </statetype>
             <statetype name="downscrollarrow">
                 <position>700,20</position>
-                <state type="off">
+                <state type="on">
                     <imagetype name="dnon">
                         <filename>down_arrow.png</filename>
                     </imagetype>
@@ -541,27 +540,27 @@
             <position>20,20</position>
             <state name="None">
                 <imagetype name="icon">
-                    <filename>level_none.png</filename>
+                    <filename>mv_level_none.png</filename>
                 </imagetype>
             </state>
             <state name="Lowest">
                 <imagetype name="icon">
-                    <filename>level_lowest.png</filename>
+                    <filename>mv_level_lowest.png</filename>
                 </imagetype>
             </state>
             <state name="Low">
                 <imagetype name="icon">
-                    <filename>level_low.png</filename>
+                    <filename>mv_level_low.png</filename>
                 </imagetype>
             </state>
             <state name="Medium">
                 <imagetype name="icon">
-                    <filename>level_medium.png</filename>
+                    <filename>mv_level_medium.png</filename>
                 </imagetype>
             </state>
             <state name="High">
                 <imagetype name="icon">
-                    <filename>level_high.png</filename>
+                    <filename>mv_level_high.png</filename>
                 </imagetype>
             </state>
         </statetype>
@@ -629,27 +628,27 @@
             <position>740,553</position>
             <state name="None">
                 <imagetype name="icon">
-                    <filename>level_none.png</filename>
+                    <filename>mv_level_none.png</filename>
                 </imagetype>
             </state>
             <state name="Lowest">
                 <imagetype name="icon">
-                    <filename>level_lowest.png</filename>
+                    <filename>mv_level_lowest.png</filename>
                 </imagetype>
             </state>
             <state name="Low">
                 <imagetype name="icon">
-                    <filename>level_low.png</filename>
+                    <filename>mv_level_low.png</filename>
                 </imagetype>
             </state>
             <state name="Medium">
                 <imagetype name="icon">
-                    <filename>level_medium.png</filename>
+                    <filename>mv_level_medium.png</filename>
                 </imagetype>
             </state>
             <state name="High">
                 <imagetype name="icon">
-                    <filename>level_high.png</filename>
+                    <filename>mv_level_high.png</filename>
                 </imagetype>
             </state>
         </statetype>
@@ -803,6 +802,8 @@
 
     </window>
 
+    <!-- TODO - Incomplete, replace with a global file selection dialog in
+                mythdialogbox.cpp and base.xml -->
     <window name="file_chooser">
 
         <imagetype name="file_browser_background">
@@ -812,16 +813,6 @@
         <imagetype name="image_box">
             <area>19,20,143,209</area>
         </imagetype>
-
-        <!--        <managedtreelist name="file_browser" bins="2">
-            <area>185,20,400,210</area>
-            <bin number="1">
-                <area>185,20,145,210</area>
-            </bin>
-            <bin number="2">
-                <area>350,20,235,210</area>
-            </bin>
-        </managedtreelist>-->
 
     </window>
 
