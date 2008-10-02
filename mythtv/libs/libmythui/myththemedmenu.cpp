@@ -2129,7 +2129,8 @@ bool MythThemedMenuPrivate::gestureEvent(MythUIType *origtype,
         }
         else
         {
-            if (ThemedButton *button = reinterpret_cast<ThemedButton*>(origtype))
+            ThemedButton *button = dynamic_cast<ThemedButton*>(origtype);
+            if (button)
             {
                 ThemedButton *lastbutton = activebutton;
                 activebutton = button;
