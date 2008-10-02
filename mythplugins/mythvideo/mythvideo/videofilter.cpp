@@ -289,7 +289,7 @@ bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
     {
         if (runtime == kRuntimeFilterUnknown)
         {
-            matches = mdata.Length() < 0;
+            matches = mdata.Length() == 0;
         }
         else
         {
