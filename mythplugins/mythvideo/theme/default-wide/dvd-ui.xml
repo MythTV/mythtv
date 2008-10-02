@@ -59,15 +59,15 @@
 
         <button name="next">
             <position>485,435</position>
-            <regular-background filename="md_job_next_off.png" />
-            <selected-background filename="md_job_next_on.png" />
+            <regular-background filename="right_arrow.png" />
+            <selected-background filename="right_arrow_selected.png.png" />
             <showarrow>no</showarrow>
         </button>
 
         <button name="prev">
             <position>255,435</position>
-            <regular-background filename="md_job_prev_off.png" />
-            <selected-background filename="md_job_prev_on.png" />
+            <regular-background filename="left_arrow.png" />
+            <selected-background filename="left_arrow_selected.png" />
             <showarrow>no</showarrow>
         </button>
 
@@ -78,25 +78,6 @@
         <button name="cancel" from="basebutton">
             <position>425,530</position>
         </button>
-
-        <!--
-            Context 4
-            Browse DVD, start a job
-
-            Right now this is a HACK, because the widgets
-            used are actually Qt-derived widgets not theme-able
-            Myth widgets. This will change.
-        -->
-
-        <!--
-            Context 4
-            Want to rip, no DVD
-
-        <textarea name="nodvd_text" align="center" from="basetextarea">
-            <multiline>yes</multiline>
-            <area>100,220,600,300</area>
-        </textarea>
-        -->
     </window>
 
     <window name="title_dialog">
@@ -204,14 +185,14 @@
 
         <button name="prev_title" from="basebutton">
             <position>255,435</position>
-            <regular-background filename="md_job_prev_off.png" />
-            <selected-background filename="md_job_prev_on.png" />
+            <regular-background filename="left_arrow.png" />
+            <selected-background filename="left_arrow_selected.png" />
         </button>
 
         <button name="next_title" from="basebutton">
             <position>485,435</position>
-            <regular-background filename="md_job_next_off.png" />
-            <selected-background filename="md_job_next_on.png" />
+            <regular-background filename="right_arrow.png" />
+            <selected-background filename="right_arrow_selected.png.png" />
         </button>
 
         <button name="ripaway" from="basebutton">

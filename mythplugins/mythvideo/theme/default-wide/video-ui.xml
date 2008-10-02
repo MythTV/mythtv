@@ -569,11 +569,6 @@
 
     <window name="tree">
 
-        <imagetype name="morefiller">
-            <filename>mv_other_background.png</filename>
-            <position>624,335</position>
-        </imagetype>
-
        <textarea name="breadcrumbs" from="basetextarea">
             <area>50,20,700,40</area>
             <font>basemedium</font>
@@ -583,89 +578,7 @@
             <area>40,50,720,260</area>
             <numlists>3</numlists>
             <spacing>10</spacing>
-            <buttonlist name="listtemplate">
-                <spacing>5</spacing>
-                <buttonarea>0,0,100%,97%</buttonarea>
-                <showarrow>yes</showarrow>
-                <statetype name="buttonitem">
-                    <state name="active">
-                        <area>0,0,100%,30</area>
-                        <imagetype name="buttonbackground">
-                            <gradient start="#505050" end="#000000" alpha="200" />
-                        </imagetype>
-                        <imagetype name="buttonimage">
-                            <area>2,5,20,20</area>
-                        </imagetype>
-                        <textarea name="buttontext">
-                            <area>25,0,85%,30</area>
-                            <font>basesmall</font>
-                            <cutdown>yes</cutdown>
-                            <align>left,vcenter</align>
-                        </textarea>
-                        <statetype name="buttoncheck">
-                            <position>91%,5</position>
-                            <state type="off">
-                                <imagetype name="checkoff">
-                                    <filename>lb-check-empty.png</filename>
-                                </imagetype>
-                            </state>
-                            <state type="half">
-                                <imagetype name="checkhalf">
-                                    <filename>lb-check-half.png</filename>
-                                </imagetype>
-                            </state>
-                            <state type="full">
-                                <imagetype name="checkfull">
-                                    <filename>lb-check-full.png</filename>
-                                </imagetype>
-                            </state>
-                        </statetype>
-                        <imagetype name="buttonarrow">
-                            <position>90%,7</position>
-                            <filename>lb-arrow.png</filename>
-                        </imagetype>
-                    </state>
-                    <state name="selected" from="active">
-                        <imagetype name="buttonbackground">
-                            <gradient start="#52CA38" end="#349838" alpha="255" />
-                        </imagetype>
-                    </state>
-                    <state name="inactive" from="active">
-                        <imagetype name="buttonbackground">
-                            <gradient start="#52CA38" end="#349838" alpha="100" />
-                        </imagetype>
-                        <textarea name="buttontext">
-                            <font>basesmallgrey</font>
-                        </textarea>
-                    </state>
-                </statetype>
-                <statetype name="upscrollarrow">
-                    <position>10,97%</position>
-                    <state type="off">
-                        <imagetype name="upon">
-                            <filename>lb-uparrow-reg.png</filename>
-                        </imagetype>
-                    </state>
-                    <state type="full">
-                        <imagetype name="upoff">
-                            <filename>lb-uparrow-sel.png</filename>
-                        </imagetype>
-                    </state>
-                </statetype>
-                <statetype name="downscrollarrow">
-                    <position>40,97%</position>
-                    <state type="off">
-                        <imagetype name="dnon">
-                            <filename>lb-dnarrow-reg.png</filename>
-                        </imagetype>
-                    </state>
-                    <state type="full">
-                        <imagetype name="dnoff">
-                            <filename>lb-dnarrow-sel.png</filename>
-                        </imagetype>
-                    </state>
-                </statetype>
-            </buttonlist>
+            <buttonlist name="listtemplate" from="basebuttonlist" />
         </buttontree>
 
         <textarea name="title" from="basetextarea">
