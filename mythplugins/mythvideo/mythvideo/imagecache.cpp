@@ -4,7 +4,7 @@
 #include <QPixmap>
 #include <QImage>
 
-#include "mythtv/mythcontext.h"
+#include <mythtv/mythcontext.h>
 
 #include "cleanup.h"
 #include "imagecache.h"

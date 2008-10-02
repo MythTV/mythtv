@@ -1,4 +1,3 @@
-#include <cstdlib>
 #include <set>
 
 #include <QDir>
@@ -10,10 +9,10 @@
 #include <mythtv/libmythui/mythmainwindow.h>
 #include <mythtv/libmythui/mythsystem.h>
 #include <mythtv/libmythui/mythdialogbox.h>
+#include <mythtv/libmythui/mythuistatetype.h>
 
 #include "globals.h"
 #include "videoutils.h"
-#include "metadata.h"
 #include "metadatalistmanager.h"
 
 namespace
@@ -66,15 +65,20 @@ void PlayVideo(const QString &filename, const MetadataListManager &video_list)
     while (item && playing_time.elapsed() > WATCHED_WATERMARK);
 }
 
-void checkedSetText(MythUIType *container, const QString &item_name,
-                    const QString &text)
+template <>
+void CheckedSet(MythUIStateType *ui_item, QString state)
+{
+    if (ui_item)
+        ui_item->DisplayState(state);
+}
+
+void CheckedSet(MythUIType *container, QString itemName, QString text)
 {
     if (container)
     {
-        MythUIText *uit = dynamic_cast<MythUIText *>
-                (container->GetChild(item_name));
-        if (uit)
-            uit->SetText(text);
+        MythUIText *uit =
+                dynamic_cast<MythUIText *>(container->GetChild(itemName));
+        CheckedSet(uit, text);
     }
 }
 
@@ -102,9 +106,9 @@ void ETPrintWarning::Container(QString child_name)
                             "to search for child '%1'")).arg(child_name));
 }
 
-struct UIAssignChildError : public UIAssignException
+struct UIUtilChildError : public UIUtilException
 {
-    UIAssignChildError(QString container, QString child)
+    UIUtilChildError(QString container, QString child)
     {
         m_what = QString(QObject::tr("Error: container '%1' is missing a child "
                         "element named '%2'")).arg(container).arg(child);
@@ -119,9 +123,9 @@ struct UIAssignChildError : public UIAssignException
     QString m_what;
 };
 
-struct UIAssignContainerError : public UIAssignException
+struct UIUtilContainerError : public UIUtilException
 {
-    UIAssignContainerError(QString child)
+    UIUtilContainerError(QString child)
     {
         m_what = QString(QObject::tr("Error: an invalid container was passed "
                         "while searching for child element '%1'")).arg(child);
@@ -138,12 +142,12 @@ struct UIAssignContainerError : public UIAssignException
 
 void ETErrorException::Child(QString container_name, QString child_name)
 {
-    throw UIAssignChildError(container_name, child_name);
+    throw UIUtilChildError(container_name, child_name);
 }
 
 void ETErrorException::Container(QString child_name)
 {
-    throw UIAssignContainerError(child_name);
+    throw UIUtilContainerError(child_name);
 }
 
 QStringList GetVideoDirs()
@@ -259,295 +263,4 @@ bool GetLocalVideoPoster(const QString &video_uid, const QString &filename,
     }
 
     return false;
-}
-
-//////////////////////////////////////////
-
-TimeoutSignalProxy::TimeoutSignalProxy()
-{
-    m_item = 0;
-    connect(&m_timer, SIGNAL(timeout()), SLOT(OnTimeout()));
-}
-
-void TimeoutSignalProxy::start(int timeout, Metadata *item, const QString &url)
-{
-    m_item = item;
-    m_url = url;
-    m_timer.start(timeout, true);
-}
-
-void TimeoutSignalProxy::stop()
-{
-    if (m_timer.isActive())
-        m_timer.stop();
-}
-
-void TimeoutSignalProxy::OnTimeout()
-{
-    emit SigTimeout(m_url, m_item);
-}
-
-//////////////////////////////////////////
-
-URLOperationProxy::URLOperationProxy()
-{
-    m_item = 0;
-    connect(&m_url_op, SIGNAL(finished(Q3NetworkOperation *)),
-            SLOT(OnFinished(Q3NetworkOperation *)));
-}
-
-void URLOperationProxy::copy(const QString &uri, const QString &dest, Metadata *item)
-{
-    m_item = item;
-    m_url_op.copy(uri, dest, false, false);
-}
-
-void URLOperationProxy::stop()
-{
-    m_url_op.stop();
-}
-
-void URLOperationProxy::OnFinished(Q3NetworkOperation *op)
-{
-    emit SigFinished(op, m_item);
-}
-
-//////////////////////////////////////////
-
-ExecuteExternalCommand::ExecuteExternalCommand(QObject *oparent)
-                        : QObject(oparent)
-{
-    m_purpose = QObject::tr("Command");
-
-    connect(&m_process, SIGNAL(readyReadStdout()),
-            SLOT(OnReadReadyStdout()));
-    connect(&m_process, SIGNAL(readyReadStderr()),
-            SLOT(OnReadReadyStderr()));
-    connect(&m_process, SIGNAL(processExited()),
-            SLOT(OnProcessExit()));
-}
-
-ExecuteExternalCommand::~ExecuteExternalCommand()
-{
-}
-
-void ExecuteExternalCommand::StartRun(const QString &command, const QStringList &args,
-                const QString &purpose)
-{
-    m_purpose = purpose;
-
-    // TODO: punting on spaces in path to command
-    QStringList split_args = command.split(' ', QString::SkipEmptyParts);
-    split_args += args;
-
-    m_process.clearArguments();
-    m_process.setArguments(split_args);
-
-    VERBOSE(VB_GENERAL, QString("%1: Executing '%2'").arg(purpose)
-            .arg(split_args.join(" ")));
-
-    m_raw_cmd = split_args[0];
-    QFileInfo fi(m_raw_cmd);
-
-    QString err_msg;
-
-    if (!fi.exists())
-    {
-        err_msg = QString("\"%1\" failed: does not exist")
-                .arg(m_raw_cmd);
-    }
-    else if (!fi.isExecutable())
-    {
-        err_msg = QString("\"%1\" failed: not executable")
-                .arg(m_raw_cmd);
-    }
-    else if (!m_process.start())
-    {
-        err_msg = QString("\"%1\" failed: Could not start process")
-                .arg(m_raw_cmd);
-    }
-
-    if (err_msg.length())
-    {
-        ShowError(err_msg);
-    }
-}
-
-void ExecuteExternalCommand::OnReadReadyStdout()
-{
-    QByteArray buf = m_process.readStdout();
-    m_std_out += QString::fromUtf8(buf.data(), buf.size());
-}
-
-void ExecuteExternalCommand::OnReadReadyStderr()
-{
-    QByteArray buf = m_process.readStderr();
-    m_std_error += QString::fromUtf8(buf.data(), buf.size());
-}
-
-void ExecuteExternalCommand::OnProcessExit()
-{
-    if (!m_process.normalExit())
-    {
-        ShowError(QString("\"%1\" failed: Process exited abnormally")
-                    .arg(m_raw_cmd));
-    }
-
-    if (m_std_error.length())
-    {
-        ShowError(m_std_error);
-    }
-
-    QStringList std_out = m_std_out.split("\n", QString::SkipEmptyParts);
-    for (QStringList::iterator p = std_out.begin();
-            p != std_out.end(); )
-    {
-        QString check = (*p).trimmed();
-        if (check.at(0) == '#' || !check.length())
-        {
-            p = std_out.erase(p);
-        }
-        else
-            ++p;
-    }
-
-    VERBOSE(VB_IMPORTANT, m_std_out);
-
-    OnExecDone(m_process.normalExit(), std_out, m_std_error.split("\n"));
-}
-
-void ExecuteExternalCommand::OnExecDone(bool normal_exit, const QStringList &out,
-                                        const QStringList &err)
-{
-    (void) normal_exit;
-    (void) out;
-    (void) err;
-}
-
-void ExecuteExternalCommand::ShowError(const QString &error_msg)
-{
-    VERBOSE(VB_IMPORTANT, error_msg);
-
-    QString message = QString(QObject::tr("%1 failed\n\n%2\n\nCheck VideoManager Settings"))
-                                .arg(m_purpose).arg(error_msg);
-
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-    MythConfirmationDialog *okPopup = new MythConfirmationDialog(popupStack, message, false);
-
-    if (okPopup->Create())
-        popupStack->AddScreen(okPopup, false);
-}
-
-//////////////////////////////////////////
-
-VideoTitleSearch::VideoTitleSearch(QObject *oparent)
-                 : ExecuteExternalCommand(oparent)
-{
-    m_item = 0;
-}
-
-void VideoTitleSearch::Run(const QString &title, Metadata *item)
-{
-    m_item = item;
-
-    QString def_cmd = QDir::cleanDirPath(QString("%1/%2")
-            .arg(GetShareDir())
-            .arg("mythvideo/scripts/imdb.pl -M tv=no;video=no"));
-
-    QString cmd = gContext->GetSetting("MovieListCommandLine", def_cmd);
-
-    QStringList args;
-    args += title;
-    StartRun(cmd, args, "Video Search");
-}
-
-void VideoTitleSearch::OnExecDone(bool normal_exit, const QStringList &out,
-                                  const QStringList &err)
-{
-    (void) err;
-
-    SearchListResults results;
-    if (normal_exit)
-    {
-        for (QStringList::const_iterator p = out.begin();
-                p != out.end(); ++p)
-        {
-            results.insert((*p).section(':', 0, 0), (*p).section(':', 1));
-        }
-    }
-
-    emit SigSearchResults(normal_exit, results, m_item);
-    deleteLater();
-}
-
-//////////////////////////////////////////
-
-VideoUIDSearch::VideoUIDSearch(QObject *oparent)
-               : ExecuteExternalCommand(oparent)
-{
-}
-
-void VideoUIDSearch::Run(const QString &video_uid, Metadata *item)
-{
-    m_item = item;
-    m_video_uid = video_uid;
-
-    const QString def_cmd = QDir::cleanDirPath(QString("%1/%2")
-            .arg(GetShareDir())
-            .arg("mythvideo/scripts/imdb.pl -D"));
-    const QString cmd = gContext->GetSetting("MovieDataCommandLine",
-                                                def_cmd);
-
-    StartRun(cmd, QStringList(video_uid), "Video Data Query");
-}
-
-void VideoUIDSearch::OnExecDone(bool normal_exit, const QStringList &out,
-                                const QStringList &err)
-{
-    (void) err;
-    emit SigSearchResults(normal_exit, out, m_item, m_video_uid);
-    deleteLater();
-}
-
-//////////////////////////////////////////
-
-VideoPosterSearch::VideoPosterSearch(QObject *oparent)
-                  : ExecuteExternalCommand(oparent)
-{
-}
-
-void VideoPosterSearch::Run(const QString &video_uid, Metadata *item)
-{
-    m_item = item;
-
-    const QString default_cmd =
-            QDir::cleanPath(QString("%1/%2")
-                                .arg(GetShareDir())
-                                .arg("mythvideo/scripts/imdb.pl -P"));
-    const QString cmd = gContext->GetSetting("MoviePosterCommandLine",
-                                                default_cmd);
-    StartRun(cmd, QStringList(video_uid), "Poster Query");
-}
-
-void VideoPosterSearch::OnExecDone(bool normal_exit, const QStringList &out,
-                                   const QStringList &err)
-{
-    (void) err;
-    QString url;
-    if (normal_exit && out.size())
-    {
-        for (QStringList::const_iterator p = out.begin();
-                p != out.end(); ++p)
-        {
-            if ((*p).length())
-            {
-                url = *p;
-                break;
-            }
-        }
-    }
-
-    emit SigPosterURL(url, m_item);
-    deleteLater();
 }

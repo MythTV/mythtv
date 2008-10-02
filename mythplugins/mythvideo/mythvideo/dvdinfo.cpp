@@ -1,25 +1,9 @@
-/*
-    dvdinfo.cpp
-
-    (c) 2003 Thor Sigvaldason and Isaac Richards
-    Part of the mythTV project
-
-    implementation for dvd "struct"
-*/
-
-#include <iostream>
-
 #include <mythtv/mythcontext.h>
 
 #include "dvdinfo.h"
 
-DVDAudioInfo::DVDAudioInfo(int track_number, const QString &audio_description)
-{
-    track = track_number;
-    description = audio_description;
-}
-
-DVDAudioInfo::~DVDAudioInfo()
+DVDAudioInfo::DVDAudioInfo(int track_number, const QString &audio_description) :
+    description(audio_description), track(track_number), channels(0)
 {
 }
 
@@ -27,24 +11,11 @@ DVDAudioInfo::~DVDAudioInfo()
 ---------------------------------------------------------------------
 */
 
-DVDTitleInfo::DVDTitleInfo()
+DVDTitleInfo::DVDTitleInfo() : numb_chapters(0), numb_angles(0),
+    track_number(0), hours(0), minutes(0), seconds(0), is_selected(false),
+    selected_quality(-1), selected_audio(1), selected_subtitle(-1)
 {
-    numb_chapters = 0;
-    numb_angles = 0;
-    track_number = 0;
-    hours = 0;
-    minutes = 0;
-    seconds = 0;
-    audio_tracks.clear();
-    subtitles.clear();
-
-    is_selected = false;
-    selected_quality = -1;
-
-    selected_audio = 1;
-    selected_subtitle = -1;
     use_ac3 = gContext->GetNumSetting("MTDac3flag");
-    name = "";
 }
 
 void DVDTitleInfo::setTime(uint h, uint m, uint s)
@@ -91,15 +62,8 @@ DVDTitleInfo::~DVDTitleInfo()
 */
 
 
-DVDInfo::DVDInfo(const QString &new_name)
+DVDInfo::DVDInfo(const QString &new_name) : volume_name(new_name)
 {
-    //
-    //  This object just figures out what's on a disc
-    //  and tells whoever asks about it.
-    //
-
-    titles.clear();
-    volume_name = new_name;
 }
 
 DVDTitleInfo* DVDInfo::getTitle(uint which_one)
@@ -123,6 +87,3 @@ DVDInfo::~DVDInfo()
         delete titles.takeFirst();
     titles.clear();
 }
-
-
-

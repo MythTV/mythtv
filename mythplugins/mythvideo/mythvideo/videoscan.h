@@ -2,13 +2,14 @@
 #define VIDEO_SCANNER_H
 
 #include <map>
+#include <vector>
 
-#include <QStringList> // optional
+#include <QStringList>
 #include <QThread>
 
-#include <mythtv/libmythui/mythprogressdialog.h>
+class MetadataListManager;
 
-#include "metadatalistmanager.h"
+class MythUIProgressDialog;
 
 class VideoScannerThread : public QThread
 {
@@ -51,10 +52,10 @@ class VideoScanner : public QObject
     void doScan(const QStringList &dirs);
 
   signals:
-    void finished(void);
+    void finished();
 
   public slots:
-    void finishedScan(void);
+    void finishedScan();
 
   private:
     VideoScannerThread *m_scanThread;

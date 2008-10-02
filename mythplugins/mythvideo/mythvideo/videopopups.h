@@ -1,28 +1,23 @@
 #ifndef VIDEOPOPUPS_H_
 #define VIDEOPOPUPS_H_
 
-// MythUI headers
 #include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuitextedit.h>
 
-// MythVideo headers
-#include "parentalcontrols.h"
 #include "videoutils.h"
-#include "metadata.h"
 
 class Metadata;
-class VideoList;
-class ParentalLevel;
+
+class MythUIButtonList;
+class MythUIButtonListItem;
 
 class CastDialog : public MythScreenType
 {
     Q_OBJECT
 
   public:
-    CastDialog(MythScreenStack *parent, Metadata *metadata);
+    CastDialog(MythScreenStack *lparent, Metadata *metadata);
 
-    bool Create(void);
+    bool Create();
 
   private:
     Metadata *m_metadata;
@@ -33,9 +28,9 @@ class PlotDialog : public MythScreenType
     Q_OBJECT
 
   public:
-    PlotDialog(MythScreenStack *parent, Metadata *metadata);
+    PlotDialog(MythScreenStack *lparent, Metadata *metadata);
 
-    bool Create(void);
+    bool Create();
 
   private:
     Metadata *m_metadata;
@@ -46,10 +41,10 @@ class SearchResultsDialog : public MythScreenType
     Q_OBJECT
 
   public:
-    SearchResultsDialog(MythScreenStack *parent,
-                                            const SearchListResults &results);
+    SearchResultsDialog(MythScreenStack *lparent,
+            const SearchListResults &results);
 
-    bool Create(void);
+    bool Create();
 
  signals:
     void haveResult(QString);

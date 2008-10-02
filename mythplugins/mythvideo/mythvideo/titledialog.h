@@ -1,25 +1,20 @@
 #ifndef TITLEDIALOG_H_
 #define TITLEDIALOG_H_
 
-// QT headers
-#include <QTimer>
-#include <Q3Socket>
 #include <QList>
 
-// Myth headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-
-// Mythui headers
 #include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuitextedit.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuicheckbox.h>
 
-// Mythvideo headers
 #include "dvdinfo.h"
+
+class Q3Socket;
+
+class MythUIButtonList;
+class MythUIButtonListItem;
+class MythUIText;
+class MythUITextEdit;
+class MythUIButton;
+class MythUICheckBox;
 
 class TitleDialog : public MythScreenType
 {
@@ -27,14 +22,13 @@ class TitleDialog : public MythScreenType
 
   public:
 
-    TitleDialog(MythScreenStack *parent,
-                const QString &name,
+    TitleDialog(MythScreenStack *lparent,
+                QString lname,
                 Q3Socket *a_socket,
                 QString d_name,
                 QList<DVDTitleInfo*> *titles);
-   ~TitleDialog();
 
-    bool Create(void);
+    bool Create();
 
   public slots:
 
@@ -52,9 +46,8 @@ class TitleDialog : public MythScreenType
     void ripTitles();
 
   private:
-    QTimer                  *m_checkDvdTimer;
     QString                  m_discName;
-    QList<DVDTitleInfo*>    *m_dvdTitles;
+    QList<DVDTitleInfo *>   *m_dvdTitles;
     DVDTitleInfo            *m_currentTitle;
     Q3Socket                *m_socketToMtd;
 

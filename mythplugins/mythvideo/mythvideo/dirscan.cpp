@@ -1,10 +1,8 @@
+#include <map>
+
 #include <QDir>
 
-#include <map>
-#include <vector>
-
 #include "dbaccess.h"
-
 #include "dirscan.h"
 
 DirectoryHandler::~DirectoryHandler()

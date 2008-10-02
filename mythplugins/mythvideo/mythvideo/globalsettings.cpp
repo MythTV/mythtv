@@ -1,19 +1,13 @@
-// C++ headers
 #include <map>
 #include <vector>
 
-// QT headers
 #include <QDir>
 
-// Myth headers
-#include <mythtv/mythcontext.h>
 #include <mythtv/mythdirs.h>
 
-// Mythvideo headers
 #include "globalsettings.h"
 #include "globals.h"
 #include "videodlg.h"
-#include "parentalcontrols.h"
 
 namespace
 {
@@ -40,13 +34,13 @@ HostComboBox *VideoDefaultView()
     HostComboBox *gc = new HostComboBox("Default MythVideo View");
     gc->setLabel(QObject::tr("Default View"));
     gc->addSelection(QObject::tr("Gallery"),
-                     QString::number(DLG_GALLERY));
+                     QString::number(VideoDialog::DLG_GALLERY));
     gc->addSelection(QObject::tr("Browser"),
-                     QString::number(DLG_BROWSER));
+                     QString::number(VideoDialog::DLG_BROWSER));
     gc->addSelection(QObject::tr("Listings"),
-                     QString::number(DLG_TREE));
+                     QString::number(VideoDialog::DLG_TREE));
     gc->addSelection(QObject::tr("Manager"),
-                     QString::number(DLG_MANAGER));
+                     QString::number(VideoDialog::DLG_MANAGER));
     gc->setHelpText(QObject::tr("The default view for MythVideo. "
                     "Other views can be reached via the popup menu available "
                     "via the MENU key."));

@@ -1,92 +1,62 @@
-// C++ headers
-#include <iostream>
 #include <algorithm>
 
-// Myth headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdirs.h>
-#include <mythtv/mythverbose.h>
 
-// MythUI headers
 #include <mythtv/libmythui/mythmainwindow.h>
 #include <mythtv/libmythui/mythdialogbox.h>
+#include <mythtv/libmythui/mythuibuttonlist.h>
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythuitextedit.h>
+#include <mythtv/libmythui/mythuibutton.h>
+#include <mythtv/libmythui/mythuicheckbox.h>
 
-// MythVideo headers
 #include "globals.h"
 #include "editmetadata.h"
-#include "metadata.h"
 #include "dbaccess.h"
 #include "metadatalistmanager.h"
 #include "videoutils.h"
-#include "parentalcontrols.h"
-#include "videopopups.h"
 
-
-EditMetadataDialog::EditMetadataDialog(MythScreenStack *parent,
-                                       const QString &name,
-                                       Metadata *source_metadata,
-                                       const MetadataListManager &cache)
-    : MythScreenType(parent, name), m_origMetadata(source_metadata),
-    m_metaCache(cache)
+EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
+        QString lname, Metadata *source_metadata,
+        const MetadataListManager &cache) : MythScreenType(lparent, lname),
+    m_origMetadata(source_metadata), m_titleEdit(0), m_playerEdit(0),
+    m_categoryList(0), m_levelList(0), m_childList(0), m_browseCheck(0),
+    m_coverartButton(0), m_coverartText(0), m_doneButton(0),
+    cachedChildSelection(0), m_metaCache(cache)
 {
-    //
-    //  The only thing this screen does is let the
-    //  user set (some) metadata information. It only
-    //  works on a single metadata entry.
-    //
-
-    //
-    //  Make a copy, so we can abandon changes if desired
-    //
-
     m_workingMetadata = new Metadata(*m_origMetadata);
-
-    m_categoryList = m_levelList = m_childList = NULL;
-    m_browseCheck = NULL;
-    m_coverartButton = m_doneButton = NULL;
-    m_coverartText = NULL;
-    m_titleEdit = m_playerEdit = NULL;
 }
 
 EditMetadataDialog::~EditMetadataDialog()
 {
-    if (m_workingMetadata)
-    {
-        delete m_workingMetadata;
-        m_workingMetadata = NULL;
-    }
+    delete m_workingMetadata;
 }
 
-bool EditMetadataDialog::Create(void)
+bool EditMetadataDialog::Create()
 {
-    bool foundtheme = false;
-
-    // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("video-ui.xml", "edit_metadata", this);
-
-    if (!foundtheme)
+    if (!LoadWindowFromXML("video-ui.xml", "edit_metadata", this))
         return false;
 
-    m_titleEdit = dynamic_cast<MythUITextEdit *> (GetChild("title_edit"));
-    m_playerEdit = dynamic_cast<MythUITextEdit *> (GetChild("player_edit"));
-
-    m_coverartText = dynamic_cast<MythUIText *> (GetChild("coverart_text"));
-
-    m_categoryList = dynamic_cast<MythUIButtonList *>(GetChild("category_select"));
-    m_levelList = dynamic_cast<MythUIButtonList *>(GetChild("level_select"));
-    m_childList = dynamic_cast<MythUIButtonList *>(GetChild("child_select"));
-
-    m_browseCheck = dynamic_cast<MythUICheckBox *>(GetChild("browse_check"));
-
-    m_coverartButton = dynamic_cast<MythUIButton *>
-                                         (GetChild("coverart_button"));
-    m_doneButton = dynamic_cast<MythUIButton *> (GetChild("done_button"));
-
-    if (!m_titleEdit || !m_playerEdit || !m_categoryList || !m_levelList
-        || !m_childList || !m_browseCheck
-        || !m_coverartButton || !m_doneButton || !m_coverartText)
+    try
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical elements.");
+        UIUtilE::Assign(this, m_titleEdit, "title_edit");
+        UIUtilE::Assign(this, m_playerEdit, "player_edit");
+
+        UIUtilE::Assign(this, m_coverartText, "coverart_text");
+
+        UIUtilE::Assign(this, m_categoryList, "category_select");
+        UIUtilE::Assign(this, m_levelList, "level_select");
+        UIUtilE::Assign(this, m_childList, "child_select");
+
+        UIUtilE::Assign(this, m_browseCheck, "browse_check");
+
+        UIUtilE::Assign(this, m_coverartButton, "coverart_button");
+        UIUtilE::Assign(this, m_doneButton, "done_button");
+    }
+    catch (UIUtilException &e)
+    {
+        VERBOSE(VB_IMPORTANT, e.What());
         return false;
     }
 
@@ -273,16 +243,9 @@ void EditMetadataDialog::AddCategory(QString category)
 
 void EditMetadataDialog::saveAndExit()
 {
-    //
-    //  Persist to database
-    //
-
     *m_origMetadata = *m_workingMetadata;
     m_origMetadata->updateDatabase();
 
-    //
-    //  All done
-    //
     emit Finished();
     Close();
 }
@@ -304,24 +267,20 @@ void EditMetadataDialog::setPlayer()
 
 void EditMetadataDialog::setLevel(MythUIButtonListItem *item)
 {
-    ParentalLevel nl(item->GetData().toInt());
-    m_workingMetadata->setShowLevel(nl.GetLevel());
+    m_workingMetadata->
+            setShowLevel(ParentalLevel(item->GetData().toInt()).GetLevel());
 }
 
 void EditMetadataDialog::setChild(MythUIButtonListItem *item)
 {
-    int new_child = item->GetData().toInt();
-    m_workingMetadata->setChildID(new_child);
-    cachedChildSelection = new_child;
+    cachedChildSelection = item->GetData().toInt();
+    m_workingMetadata->setChildID(cachedChildSelection);
 }
 
 void EditMetadataDialog::toggleBrowse()
 {
-    MythUIStateType::StateType state = m_browseCheck->GetCheckState();
-    if (state == MythUIStateType::Off)
-        m_workingMetadata->setBrowse(false);
-    else if (state == MythUIStateType::Full)
-        m_workingMetadata->setBrowse(true);
+    m_workingMetadata->
+            setBrowse(m_browseCheck->GetCheckState() != MythUIStateType::Off);
 }
 
 void EditMetadataDialog::findCoverArt()
@@ -363,7 +322,7 @@ void EditMetadataDialog::findCoverArt()
 //     if (new_coverart_file.length() > 0)
 //     {
 //         m_workingMetadata->setCoverFile(new_coverart_file);
-//         checkedSetText(m_coverartText, new_coverart_file);
+//         CheckedSet(m_coverartText, new_coverart_file);
 //     }
 //
 //     nca->deleteLater();

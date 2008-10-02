@@ -1,8 +1,8 @@
-#include <mythtv/mythdb.h>
-
 #include <algorithm>
 #include <vector>
 #include <map>
+
+#include <mythtv/mythdb.h>
 
 #include "dbaccess.h"
 #include "cleanup.h"

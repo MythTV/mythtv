@@ -1,49 +1,42 @@
-// C++ headers
-#include <iostream>
-
-// QT headers
 #include <QStringList>
 
-// Myth headers
 #include <mythtv/libmythdb/mythverbose.h>
 
-// Mythui headers
+#include <mythtv/libmythui/mythuibuttonlist.h>
 #include <mythtv/libmythui/mythuitext.h>
 #include <mythtv/libmythui/mythuibutton.h>
 
-// Mythvideo headers
 #include "videopopups.h"
+#include "metadata.h"
+#include "videoutils.h"
 
-CastDialog::CastDialog(MythScreenStack *parent, Metadata *metadata)
-           : MythScreenType(parent, "videocastpopup")
+CastDialog::CastDialog(MythScreenStack *lparent, Metadata *metadata) :
+    MythScreenType(lparent, "videocastpopup"), m_metadata(metadata)
 {
-    m_metadata = metadata;
 }
 
-bool CastDialog::Create(void)
+bool CastDialog::Create()
 {
-    bool foundtheme = false;
-
-    // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("video-ui.xml", "castpopup", this);
-
-    if (!foundtheme)
+    if (!LoadWindowFromXML("video-ui.xml", "castpopup", this))
         return false;
 
-    MythUIButtonList *castList = dynamic_cast<MythUIButtonList *>
-                                                        (GetChild("cast"));
-    MythUIButton *okButton = dynamic_cast<MythUIButton *>
-                                                        (GetChild("ok"));
+    MythUIButtonList *castList;
+    MythUIButton *okButton;
 
-    if (!castList || !okButton)
+    try
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical elements.");
+        UIUtilE::Assign(this, castList, "cast");
+        UIUtilE::Assign(this, okButton, "ok");
+    }
+    catch (UIUtilException &e)
+    {
+        VERBOSE(VB_IMPORTANT, e.What());
         return false;
     }
 
-    connect(okButton, SIGNAL(buttonPressed()), this, SLOT(Close()));
+    connect(okButton, SIGNAL(buttonPressed()), SLOT(Close()));
 
-    okButton->SetText(tr("Ok"));
+    okButton->SetText(tr("OK"));
 
     QStringList cast = GetCastList(*m_metadata);
     QStringListIterator castIterator(cast);
@@ -60,37 +53,34 @@ bool CastDialog::Create(void)
 
 /////////////////////////////////////////////////////////////
 
-PlotDialog::PlotDialog(MythScreenStack *parent, Metadata *metadata)
-           : MythScreenType(parent, "videoplotpopup")
+PlotDialog::PlotDialog(MythScreenStack *lparent, Metadata *metadata) :
+    MythScreenType(lparent, "videoplotpopup"), m_metadata(metadata)
 {
-    m_metadata = metadata;
 }
 
-bool PlotDialog::Create(void)
+bool PlotDialog::Create()
 {
-    bool foundtheme = false;
-
-    // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("video-ui.xml", "plotpopup", this);
-
-    if (!foundtheme)
+    if (!LoadWindowFromXML("video-ui.xml", "plotpopup", this))
         return false;
 
-    MythUIText *plotText = dynamic_cast<MythUIText *>
-                                            (GetChild("plot"));
-    MythUIButton *okButton = dynamic_cast<MythUIButton *>
-                                        (GetChild("ok"));
+    MythUIText *plotText;
+    MythUIButton *okButton;
 
-    if (!plotText || !okButton)
+    try
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical elements.");
+        UIUtilE::Assign(this, plotText, "plot");
+        UIUtilE::Assign(this, okButton, "ok");
+    }
+    catch (UIUtilException &e)
+    {
+        VERBOSE(VB_IMPORTANT, e.What());
         return false;
     }
 
     plotText->SetText(m_metadata->Plot());
-    okButton->SetText(tr("Ok"));
+    okButton->SetText(tr("OK"));
 
-    connect(okButton, SIGNAL(buttonPressed()), this, SLOT(Close()));
+    connect(okButton, SIGNAL(buttonPressed()), SLOT(Close()));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
@@ -100,31 +90,25 @@ bool PlotDialog::Create(void)
 
 /////////////////////////////////////////////////////////////
 
-SearchResultsDialog::SearchResultsDialog(MythScreenStack *parent,
-                                         const SearchListResults &results)
-           : MythScreenType(parent, "videosearchresultspopup")
+SearchResultsDialog::SearchResultsDialog(MythScreenStack *lparent,
+        const SearchListResults &results) :
+    MythScreenType(lparent, "videosearchresultspopup"), m_results(results),
+    m_resultsList(0)
 {
-    m_results = results;
-    m_resultsList = NULL;
 }
 
-bool SearchResultsDialog::Create(void)
+bool SearchResultsDialog::Create()
 {
-    bool foundtheme = false;
-
-    // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("video-ui.xml", "moviesel", this);
-
-    if (!foundtheme)
+    if (!LoadWindowFromXML("video-ui.xml", "moviesel", this))
         return false;
 
-    m_resultsList = dynamic_cast<MythUIButtonList *> (GetChild("results"));
-//     MythUIButton *cancelButton = dynamic_cast<MythUIButton *>
-//                                         (GetChild("cancel"));
-
-    if (!m_resultsList)
+    try
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical elements.");
+        UIUtilE::Assign(this, m_resultsList, "results");
+    }
+    catch (UIUtilException &e)
+    {
+        VERBOSE(VB_IMPORTANT, e.What());
         return false;
     }
 
@@ -138,8 +122,8 @@ bool SearchResultsDialog::Create(void)
         button->SetData(key);
     }
 
-     connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem*)),
-             this, SLOT(sendResult(MythUIButtonListItem*)));
+    connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+            SLOT(sendResult(MythUIButtonListItem *)));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
@@ -149,7 +133,6 @@ bool SearchResultsDialog::Create(void)
 
 void SearchResultsDialog::sendResult(MythUIButtonListItem* item)
 {
-    QString video_uid = item->GetData().toString();
-    emit haveResult(video_uid);
+    emit haveResult(item->GetData().toString());
     Close();
 }

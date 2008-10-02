@@ -1,14 +1,14 @@
 #ifndef VIDEOFILTER_H_
 #define VIDEOFILTER_H_
 
-// Mythui headers
-#include "mythtv/libmythui/mythscreentype.h"
-#include "mythtv/libmythui/mythuibuttonlist.h"
-#include "mythtv/libmythui/mythuibutton.h"
-#include "mythtv/libmythui/mythuitext.h"
+#include <mythtv/libmythui/mythscreentype.h>
 
-// Mythvideo headers
 #include "parentalcontrols.h"
+
+class MythUIButtonList;
+class MythUIButtonListItem;
+class MythUIButton;
+class MythUIText;
 
 class Metadata;
 class VideoList;
@@ -199,18 +199,18 @@ class VideoFilterDialog : public MythScreenType
   Q_OBJECT
 
   public:
-    VideoFilterDialog( MythScreenStack *parent, QString name,
+    VideoFilterDialog( MythScreenStack *lparent, QString lname,
                        VideoList *video_list);
     ~VideoFilterDialog();
 
-    bool Create(void);
+    bool Create();
 
   signals:
-    void filterChanged(void);
+    void filterChanged();
 
   public slots:
-    void saveAndExit(void);
-    void saveAsDefault(void);
+    void saveAndExit();
+    void saveAsDefault();
     void setYear(MythUIButtonListItem *item);
     void setUserRating(MythUIButtonListItem *item);
     void setCategory(MythUIButtonListItem *item);
@@ -224,8 +224,8 @@ class VideoFilterDialog : public MythScreenType
     void setOrderby(MythUIButtonListItem *item);
 
  private:
-    void fillWidgets(void);
-    void update_numvideo(void);
+    void fillWidgets();
+    void update_numvideo();
     VideoFilterSettings m_settings;
 
     MythUIButtonList  *m_browseList;

@@ -1,40 +1,32 @@
+#include <unistd.h> // for usleep
 
 #include <QApplication>
-
-#include <stdlib.h>
-#include <unistd.h>
-#include <iostream>
+#include <QRegExp>
+#include <QTimer>
+#include <Q3Socket>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythmediamonitor.h>
-#include <mythtv/compat.h>
+#include <mythtv/compat.h> // for usleep
 #include <mythtv/mythdirs.h>
 
 #include <mythtv/libmythui/mythscreenstack.h>
+#include <mythtv/libmythui/mythuibutton.h>
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythuiprogressbar.h>
 
 #include "dvdripbox.h"
 #include "titledialog.h"
+#include "videoutils.h"
 
-MTDJob::MTDJob()
-       :QObject(NULL)
+MTDJob::MTDJob() : job_number(-1), overall_progress(0.0), subjob_progress(0.0),
+    cancelled(false)
 {
-    init();
 }
 
-MTDJob::MTDJob(const QString &a_name)
+MTDJob::MTDJob(QString lname) : job_number(-1), job_name(lname),
+    overall_progress(0.0), subjob_progress(0.0), cancelled(false)
 {
-    init();
-    job_name = a_name;
-}
-
-void MTDJob::init()
-{
-    job_number = -1;
-    job_name = "";
-    current_activity = "";
-    overall_progress = 0.0;
-    subjob_progress = 0.0;
-    cancelled = false;
 }
 
 void MTDJob::SetName(const QString &a_name)
@@ -67,9 +59,15 @@ void MTDJob::setSubjob(double a_number)
 ---------------------------------------------------------------------
 */
 
-DVDRipBox::DVDRipBox(MythScreenStack *parent, const QString &name,
-                     const QString &device)
-          : MythScreenType(parent, name)
+DVDRipBox::DVDRipBox(MythScreenStack *lparent, QString lname, QString device) :
+    MythScreenType(lparent, lname), m_clientSocket(0), m_statusTimer(0),
+    m_triedMTD(false), m_connected(false), m_firstRun(true), m_haveDisc(false),
+    m_firstDiscFound(false), m_blockMediaRequests(false), m_jobCount(0),
+    m_currentJob(-1), m_ignoreCancels(false), m_device(device), m_dvdInfo(0),
+    m_warningText(0), m_overallText(0), m_jobText(0),
+    m_numjobsText(0), m_overallProgress(0), m_jobProgress(0),
+    m_ripscreenButton(0), m_cancelButton(0), m_nextjobButton(0),
+    m_prevjobButton(0)
 {
     //
     //  A DVDRipBox is a single dialog that does a bunch of things
@@ -88,27 +86,9 @@ DVDRipBox::DVDRipBox(MythScreenStack *parent, const QString &name,
     //
     //  Set some startup defaults
     //
-
-    m_clientSocket = NULL;
-    m_triedMTD = false;
-    m_connected = false;
-    m_jobs.clear();
-    m_jobCount = 0;
-    m_currentJob = -1;
-    m_firstRun = true;
-    m_haveDisc = false;
-    m_firstDiscFound = false;
-    m_blockMediaRequests = false;
-    m_ignoreCancels = false;
-    m_device = device;
-
-    m_warningText = m_overallText = m_jobText = m_numjobsText = NULL;
-    m_overallProgress = m_jobProgress = NULL;
-    m_ripscreenButton = m_cancelButton = NULL;
-    m_nextjobButton = m_prevjobButton = NULL;
 }
 
-DVDRipBox::~DVDRipBox(void)
+DVDRipBox::~DVDRipBox()
 {
     if(m_clientSocket)
     {
@@ -124,33 +104,28 @@ DVDRipBox::~DVDRipBox(void)
 
 bool DVDRipBox::Create()
 {
-    bool foundtheme = false;
-
-    // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("dvd-ui.xml", "dvd_rip", this);
-
-    if (!foundtheme)
+    if (!LoadWindowFromXML("dvd-ui.xml", "dvd_rip", this))
         return false;
 
-    m_warningText = dynamic_cast<MythUIText*> (GetChild("warning"));
-    m_overallText = dynamic_cast<MythUIText*> (GetChild("overall_text"));
-    m_jobText = dynamic_cast<MythUIText*> (GetChild("job_text"));
-    m_numjobsText = dynamic_cast<MythUIText*> (GetChild("numbjobs"));
-
-    m_overallProgress = dynamic_cast<MythUIProgressBar*> (GetChild("overall_progress"));
-    m_jobProgress = dynamic_cast<MythUIProgressBar*> (GetChild("job_progress"));
-
-    m_ripscreenButton = dynamic_cast<MythUIButton*> (GetChild("ripscreen"));
-    m_cancelButton = dynamic_cast<MythUIButton*> (GetChild("cancel"));
-
-    m_nextjobButton = dynamic_cast<MythUIButton*> (GetChild("next"));
-    m_prevjobButton = dynamic_cast<MythUIButton*> (GetChild("prev"));
-
-    if (!m_warningText || !m_overallText || !m_jobText || !m_numjobsText ||
-        !m_overallProgress || !m_jobProgress || !m_ripscreenButton ||
-        !m_cancelButton || !m_nextjobButton || !m_prevjobButton)
+    try
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical elements.");
+        UIUtilE::Assign(this, m_warningText, "warning");
+        UIUtilE::Assign(this, m_overallText, "overall_text");
+        UIUtilE::Assign(this, m_jobText, "job_text");
+        UIUtilE::Assign(this, m_numjobsText, "numbjobs");
+
+        UIUtilE::Assign(this, m_overallProgress, "overall_progress");
+        UIUtilE::Assign(this, m_jobProgress, "job_progress");
+
+        UIUtilE::Assign(this, m_ripscreenButton, "ripscreen");
+        UIUtilE::Assign(this, m_cancelButton, "cancel");
+
+        UIUtilE::Assign(this, m_nextjobButton, "next");
+        UIUtilE::Assign(this, m_prevjobButton, "prev");
+    }
+    catch (UIUtilException &e)
+    {
+        VERBOSE(VB_IMPORTANT, e.What());
         return false;
     }
 
@@ -190,7 +165,7 @@ void DVDRipBox::Init()
     //
 
     m_statusTimer = new QTimer(this);
-    connect(m_statusTimer, SIGNAL(timeout()), this, SLOT(pollStatus()));
+    connect(m_statusTimer, SIGNAL(timeout()), SLOT(pollStatus()));
 
     //
     //  Set our initial context and try to connect
@@ -205,10 +180,8 @@ void DVDRipBox::Init()
     //  timer to query whether the thread is done or not
     //
 
-    m_dvdInfo = NULL;
-    m_discCheckingTimer = new QTimer();
-    connect(m_discCheckingTimer, SIGNAL(timeout()), this, SLOT(checkDisc()));
-    m_discCheckingTimer->start(600);
+    connect(&m_discCheckingTimer, SIGNAL(timeout()), SLOT(checkDisc()));
+    m_discCheckingTimer.start(600);
 
 }
 
@@ -233,7 +206,7 @@ void DVDRipBox::checkDisc()
             //  probably has what they want.
             //
 
-            m_discCheckingTimer->changeInterval(4000);
+            m_discCheckingTimer.changeInterval(4000);
         }
 
     }
@@ -253,10 +226,11 @@ void DVDRipBox::createSocket()
         delete m_clientSocket;
 
     m_clientSocket = new Q3Socket(this);
-    connect(m_clientSocket, SIGNAL(error(int)), this, SLOT(connectionError(int)));
-    connect(m_clientSocket, SIGNAL(connected()), this, SLOT(connectionMade()));
-    connect(m_clientSocket, SIGNAL(readyRead()), this, SLOT(readFromServer()));
-    connect(m_clientSocket, SIGNAL(connectionClosed()), this, SLOT(connectionClosed()));
+    connect(m_clientSocket, SIGNAL(error(int)), SLOT(connectionError(int)));
+    connect(m_clientSocket, SIGNAL(connected()), SLOT(connectionMade()));
+    connect(m_clientSocket, SIGNAL(readyRead()), SLOT(readFromServer()));
+    connect(m_clientSocket, SIGNAL(connectionClosed()),
+            SLOT(connectionClosed()));
 }
 
 void DVDRipBox::connectionClosed()
@@ -855,7 +829,7 @@ void DVDRipBox::adjustJobs(uint new_number)
         for(uint i = 0; i < (new_number - m_jobCount); i++)
         {
             MTDJob *new_one = new MTDJob("I am a job");
-            connect(new_one, SIGNAL(toggledCancelled()), this, SLOT(toggleCancel()));
+            connect(new_one, SIGNAL(toggledCancelled()), SLOT(toggleCancel()));
             m_jobs.append(new_one);
         }
         if(m_currentJob < 0)

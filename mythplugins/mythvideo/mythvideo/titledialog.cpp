@@ -1,26 +1,30 @@
-// C++ headers
-#include <iostream>
-
-// QT headers
 #include <QRegExp>
+#include <Q3Socket>
 
-// Myth headers
 #include <mythtv/util.h>
+#include <mythtv/mythcontext.h>
 #include <mythtv/mythmediamonitor.h>
 
-// MythVideo headers
-#include "titledialog.h"
+#include <mythtv/libmythui/mythuitext.h>
+#include <mythtv/libmythui/mythuitextedit.h>
+#include <mythtv/libmythui/mythuibutton.h>
+#include <mythtv/libmythui/mythuibuttonlist.h>
+#include <mythtv/libmythui/mythuicheckbox.h>
 
-TitleDialog::TitleDialog(MythScreenStack *parent, const QString &name,
-                         Q3Socket *a_socket, QString d_name,
-                         QList<DVDTitleInfo*> *titles)
-            :MythScreenType(parent, name)
+#include "titledialog.h"
+#include "videoutils.h"
+
+TitleDialog::TitleDialog(MythScreenStack *lparent, QString lname,
+        Q3Socket *a_socket, QString d_name, QList<DVDTitleInfo*> *titles) :
+    MythScreenType(lparent, lname), m_discName(d_name), m_dvdTitles(titles),
+    m_currentTitle(0), m_socketToMtd(a_socket), m_nameEdit(0),
+    m_audioList(0), m_qualityList(0), m_subtitleList(0),
+    m_ripCheck(0), m_ripacthreeCheck(0), m_playlengthText(0),
+    m_numbtitlesText(0), m_viewButton(0), m_nexttitleButton(0),
+    m_prevtitleButton(0), m_ripawayButton(0)
 {
-    m_socketToMtd = a_socket;
-    m_discName = d_name;
     if(m_discName.length() < 1)
         m_discName = tr("Unknown");
-    m_dvdTitles = titles;
 
     //
     //  Find the longest title and set some defaults
@@ -28,7 +32,6 @@ TitleDialog::TitleDialog(MythScreenStack *parent, const QString &name,
 
     uint longest = 0;
     uint longest_time = 0;
-    m_currentTitle = NULL;
 
     for(int i = 0; i < m_dvdTitles->size(); i++)
     {
@@ -49,57 +52,39 @@ TitleDialog::TitleDialog(MythScreenStack *parent, const QString &name,
         }
         else
         {
-            m_dvdTitles->at(i)->setName(QString(tr("%1 - Title %2")).arg(m_discName).arg(i + 1));
+            m_dvdTitles->at(i)->setName(QString(tr("%1 - Title %2"))
+                    .arg(m_discName).arg(i + 1));
         }
     }
-
-    m_nameEdit = NULL;
-    m_audioList = m_qualityList = m_subtitleList = NULL;
-    m_ripCheck = m_ripacthreeCheck = NULL;
-    m_playlengthText = m_numbtitlesText = NULL;
-    m_viewButton = m_nexttitleButton = m_prevtitleButton = NULL;
-    m_ripawayButton = NULL;
 }
-
-TitleDialog::~TitleDialog()
-{
-}
-
 
 bool TitleDialog::Create()
 {
-    bool foundtheme = false;
-
-
-    // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("dvd-ui.xml", "title_dialog", this);
-
-    if (!foundtheme)
+    if (!LoadWindowFromXML("dvd-ui.xml", "title_dialog", this))
         return false;
 
-    m_nameEdit = dynamic_cast<MythUITextEdit *> (GetChild("name"));
-
-    m_playlengthText = dynamic_cast<MythUIText *> (GetChild("playlength"));
-    m_numbtitlesText = dynamic_cast<MythUIText *> (GetChild("numb_titles"));
-
-    m_ripCheck = dynamic_cast<MythUICheckBox *> (GetChild("ripcheck"));
-    m_ripacthreeCheck = dynamic_cast<MythUICheckBox *> (GetChild("ripacthree"));
-
-    m_nexttitleButton = dynamic_cast<MythUIButton *> (GetChild("next_title"));
-    m_prevtitleButton = dynamic_cast<MythUIButton *> (GetChild("prev_title"));
-    m_viewButton = dynamic_cast<MythUIButton *> (GetChild("view"));
-    m_ripawayButton = dynamic_cast<MythUIButton *> (GetChild("ripaway"));
-
-    m_audioList = dynamic_cast<MythUIButtonList *> (GetChild("audio"));
-    m_qualityList = dynamic_cast<MythUIButtonList *> (GetChild("quality"));
-    m_subtitleList = dynamic_cast<MythUIButtonList *> (GetChild("subtitle"));
-
-    if (!m_nameEdit || !m_playlengthText || !m_numbtitlesText || !m_ripCheck ||
-        !m_ripacthreeCheck || !m_nexttitleButton || !m_prevtitleButton ||
-        !m_viewButton || !m_ripawayButton || !m_audioList || !m_qualityList ||
-        !m_subtitleList)
+    try
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical elements.");
+        UIUtilE::Assign(this, m_nameEdit, "name");
+
+        UIUtilE::Assign(this, m_playlengthText, "playlength");
+        UIUtilE::Assign(this, m_numbtitlesText, "numb_titles");
+
+        UIUtilE::Assign(this, m_ripCheck, "ripcheck");
+        UIUtilE::Assign(this, m_ripacthreeCheck, "ripacthree");
+
+        UIUtilE::Assign(this, m_nexttitleButton, "next_title");
+        UIUtilE::Assign(this, m_prevtitleButton, "prev_title");
+        UIUtilE::Assign(this, m_viewButton, "view");
+        UIUtilE::Assign(this, m_ripawayButton, "ripaway");
+
+        UIUtilE::Assign(this, m_audioList, "audio");
+        UIUtilE::Assign(this, m_qualityList, "quality");
+        UIUtilE::Assign(this, m_subtitleList, "subtitle");
+    }
+    catch (UIUtilException &e)
+    {
+        VERBOSE(VB_IMPORTANT, e.What());
         return false;
     }
 
@@ -239,33 +224,26 @@ void TitleDialog::gotoTitle(uint title_number)
 
 void TitleDialog::setQuality(MythUIButtonListItem *item)
 {
-    int which_quality = item->GetData().toInt();
-    m_currentTitle->setQuality(which_quality);
+    m_currentTitle->setQuality(item->GetData().toInt());
 }
 
 void TitleDialog::setSubTitle(MythUIButtonListItem *item)
 {
-    int which_subtitle = item->GetData().toInt();
-    m_currentTitle->setSubTitle(which_subtitle);
+    m_currentTitle->setSubTitle(item->GetData().toInt());
 }
 
 void TitleDialog::setAudio(MythUIButtonListItem *item)
 {
-    int audio_index = item->GetData().toInt();
-    m_currentTitle->setAudio(audio_index);
+    m_currentTitle->setAudio(item->GetData().toInt());
 }
 
 void TitleDialog::toggleTitle()
 {
-    if (m_ripCheck->GetCheckState() == MythUIStateType::Full)
-        m_currentTitle->setSelected(true);
-    else
-        m_currentTitle->setSelected(false);
+    m_currentTitle->setSelected(m_ripCheck->GetCheckState() ==
+            MythUIStateType::Full);
 
-    if (m_ripacthreeCheck->GetCheckState() == MythUIStateType::Full)
-        m_currentTitle->setAC3(true);
-    else
-        m_currentTitle->setAC3(false);
+    m_currentTitle->setAC3(m_ripacthreeCheck->GetCheckState() ==
+            MythUIStateType::Full);
 
     //
     //  Should we be showing the Process Title(s)
@@ -294,16 +272,13 @@ void TitleDialog::toggleTitle()
 
 void TitleDialog::changeName()
 {
-    QString new_name = m_nameEdit->GetText();
-    m_currentTitle->setName(new_name);
+    m_currentTitle->setName(m_nameEdit->GetText());
 }
 
 void TitleDialog::toggleAC3()
 {
-    if (m_ripacthreeCheck->GetCheckState() == MythUIStateType::Full)
-        m_currentTitle->setAC3(true);
-    else
-        m_currentTitle->setAC3(false);
+    m_currentTitle->setAC3(m_ripacthreeCheck->GetCheckState() ==
+            MythUIStateType::Full);
 }
 
 void TitleDialog::viewTitle()

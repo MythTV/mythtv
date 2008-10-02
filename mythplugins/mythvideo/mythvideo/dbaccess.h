@@ -1,6 +1,9 @@
 #ifndef DBACCESS_H_
 #define DBACCESS_H_
 
+#include <vector>
+#include <utility>
+
 class SingleValueImp;
 
 class SingleValue

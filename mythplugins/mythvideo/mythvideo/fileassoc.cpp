@@ -133,31 +133,32 @@ namespace
       private:
         list_type m_objects;
     };
+
+    struct UIDToFAPair
+    {
+        typedef unsigned int UID_type;
+
+        UIDToFAPair() : m_uid(0), m_file_assoc(0) {}
+
+        UIDToFAPair(UID_type uid, FileAssociationWrap *assoc) :
+            m_uid(uid), m_file_assoc(assoc) {}
+
+        UID_type m_uid;
+        FileAssociationWrap *m_file_assoc;
+    };
+
+
+    bool operator<(const UIDToFAPair &lhs, const UIDToFAPair &rhs)
+    {
+        if (lhs.m_file_assoc && rhs.m_file_assoc)
+            return QString::localeAwareCompare(lhs.m_file_assoc->GetExtension(),
+                    rhs.m_file_assoc->GetExtension()) < 0;
+
+        return rhs.m_file_assoc;
+    }
 }
-
-struct UIDToFAPair
-{
-    typedef unsigned int UID_type;
-
-    UIDToFAPair() : m_uid(0), m_file_assoc(0) {}
-
-    UIDToFAPair(UID_type uid, FileAssociationWrap *assoc) :
-        m_uid(uid), m_file_assoc(assoc) {}
-
-    UID_type m_uid;
-    FileAssociationWrap *m_file_assoc;
-};
 
 Q_DECLARE_METATYPE(UIDToFAPair);
-
-bool operator<(const UIDToFAPair &lhs, const UIDToFAPair &rhs)
-{
-    if (lhs.m_file_assoc && rhs.m_file_assoc)
-        return QString::localeAwareCompare(lhs.m_file_assoc->GetExtension(),
-                rhs.m_file_assoc->GetExtension()) < 0;
-
-    return rhs.m_file_assoc;
-}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -334,7 +335,6 @@ FileAssocDialog::FileAssocDialog(MythScreenStack *screenParent,
 FileAssocDialog::~FileAssocDialog()
 {
     delete m_private;
-    m_private = 0;
 }
 
 bool FileAssocDialog::Create()
@@ -344,16 +344,16 @@ bool FileAssocDialog::Create()
 
     try
     {
-        EUIAssign(this, m_extensionList, "extension_select");
-        EUIAssign(this, m_commandEdit, "command");
-        EUIAssign(this, m_ignoreCheck, "ignore_check");
-        EUIAssign(this, m_defaultCheck, "default_check");
+        UIUtilE::Assign(this, m_extensionList, "extension_select");
+        UIUtilE::Assign(this, m_commandEdit, "command");
+        UIUtilE::Assign(this, m_ignoreCheck, "ignore_check");
+        UIUtilE::Assign(this, m_defaultCheck, "default_check");
 
-        EUIAssign(this, m_doneButton, "done_button");
-        EUIAssign(this, m_newButton, "new_button");
-        EUIAssign(this, m_deleteButton, "delete_button");
+        UIUtilE::Assign(this, m_doneButton, "done_button");
+        UIUtilE::Assign(this, m_newButton, "new_button");
+        UIUtilE::Assign(this, m_deleteButton, "delete_button");
     }
-    catch (UIAssignException &e)
+    catch (UIUtilException &e)
     {
         VERBOSE(VB_IMPORTANT, e.What());
         return false;

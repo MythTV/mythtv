@@ -1,26 +1,20 @@
-// C++ headers
 #include <set>
 
-// QT headers
-#include <QImage>
 #include <QImageReader>
 #include <QApplication>
 
-// Myth headers
 #include <mythtv/mythcontext.h>
 
-// MythUI headers
 #include <mythtv/libmythui/mythscreenstack.h>
+#include <mythtv/libmythui/mythprogressdialog.h>
 
-// Mythvideo headers
 #include "globals.h"
 #include "videoscan.h"
-#include "metadata.h"
 #include "dbaccess.h"
 #include "dirscan.h"
+#include "metadatalistmanager.h"
 
 VideoScanner::VideoScanner()
-             : QObject()
 {
     m_scanThread = new VideoScannerThread();
 }
@@ -39,8 +33,7 @@ void VideoScanner::doScan(const QStringList &dirs)
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
     MythUIProgressDialog *progressDlg = new MythUIProgressDialog("",
-                                                    popupStack,
-                                                    "videoscanprogressdialog");
+            popupStack, "videoscanprogressdialog");
 
     if (progressDlg->Create())
     {
@@ -48,7 +41,7 @@ void VideoScanner::doScan(const QStringList &dirs)
         connect(m_scanThread, SIGNAL(finished()),
                 progressDlg, SLOT(Close()));
         connect(m_scanThread, SIGNAL(finished()),
-                this, SLOT(finishedScan()));
+                SLOT(finishedScan()));
     }
     else
     {
@@ -68,8 +61,7 @@ void VideoScanner::finishedScan()
 
 ///////////////////////////////////////////////////////////////
 
-VideoScannerThread::VideoScannerThread()
-                   : QThread(), m_RemoveAll(false), m_KeepAll(false)
+VideoScannerThread::VideoScannerThread() : m_RemoveAll(false), m_KeepAll(false)
 {
     m_dbmetadata = new MetadataListManager;
     MetadataListManager::metadata_list ml;
@@ -132,7 +124,8 @@ void VideoScannerThread::run()
     updateDB(fs_files, db_remove);
 }
 
-void VideoScannerThread::promptForRemoval(unsigned int id, const QString &filename)
+void VideoScannerThread::promptForRemoval(unsigned int id,
+        const QString &filename)
 {
     // TODO: use single DB connection for all calls
     if (m_RemoveAll)
@@ -177,7 +170,7 @@ void VideoScannerThread::promptForRemoval(unsigned int id, const QString &filena
 }
 
 void VideoScannerThread::updateDB(const FileCheckList &add,
-                               const PurgeList &remove)
+        const PurgeList &remove)
 {
     uint counter = 0;
     SendProgressEvent(counter, (uint)(add.size() + remove.size()),
@@ -220,10 +213,10 @@ void VideoScannerThread::verifyFiles(FileCheckList &files, PurgeList &remove)
          m_dbmetadata->getList().begin();
          p != m_dbmetadata->getList().end(); ++p)
     {
-        QString name = (*p)->Filename();
-        if (name != QString::null)
+        QString lname = (*p)->Filename();
+        if (lname != QString::null)
         {
-            iter = files.find(name);
+            iter = files.find(lname);
             if (iter != files.end())
             {
                 // If it's both on disk and in the database we're done with it.
@@ -233,7 +226,7 @@ void VideoScannerThread::verifyFiles(FileCheckList &files, PurgeList &remove)
             {
                 // If it's only in the database mark it as such for removal
                 // later
-                remove.push_back(std::make_pair((*p)->ID(), name));
+                remove.push_back(std::make_pair((*p)->ID(), lname));
             }
         }
 
@@ -261,8 +254,8 @@ namespace
         DirectoryHandler *newDir(const QString &dir_name,
                                  const QString &fq_dir_name)
         {
-            (void)dir_name;
-            (void)fq_dir_name;
+            (void) dir_name;
+            (void) fq_dir_name;
             return this;
         }
 
@@ -271,7 +264,7 @@ namespace
                         const QString &extension)
 
         {
-            (void)file_name;
+            (void) file_name;
             if (m_image_ext.find(extension.toLower()) == m_image_ext.end())
                 m_video_files[fq_file_name] = false;
         }

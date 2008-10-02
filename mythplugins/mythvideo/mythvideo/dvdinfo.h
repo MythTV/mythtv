@@ -1,50 +1,34 @@
 #ifndef DVDINFO_H_
 #define DVDINFO_H_
 
-// Qt headers
 #include <QString>
 #include <QList>
 
 class DVDSubTitleInfo
 {
-    //
-    //  Holds information about available
-    //  subtitles
-
   public:
+    DVDSubTitleInfo(int subtitle_id, const QString &subtitle_name) :
+        id(subtitle_id), name(subtitle_name) {}
 
-    DVDSubTitleInfo(int subtitle_id, const QString &subtitle_name)
-                   {id = subtitle_id; name = subtitle_name;}
-
-    int     getID(){return id;}
-    QString getName(){return name;}
+    int     getID() { return id; }
+    QString getName() { return name; }
 
   private:
-
     int     id;
     QString name;
 };
 
 class DVDAudioInfo
 {
-    //
-    //  A DVDTitleInfo (see below) holds a pointer list
-    //  of zero or more DVDAudioInfo objects (one per audio
-    //  track)
-    //
-
   public:
-
      DVDAudioInfo(int track_number, const QString &audio_description);
-    ~DVDAudioInfo();
 
-    QString getAudioString(){return description;}
-    void    setChannels(int a_number){channels = a_number;}
-    int     getChannels(){return channels;}
-    int     getTrack(){return track;}
+    QString getAudioString() { return description; }
+    void    setChannels(int a_number) { channels = a_number; }
+    int     getChannels() { return channels; }
+    int     getTrack() { return track; }
 
   private:
-
     QString description;
     int     track;
     int     channels;
@@ -52,21 +36,9 @@ class DVDAudioInfo
 
 class DVDTitleInfo
 {
-    //
-    //  A little "struct" class that holds
-    //  DVD Title information
-    //  (n.b. a DVD "title" is a logically distinct section
-    //  of video, i.e. A movie, a special, a featurette, etc.)
-    //
-
   public:
-
      DVDTitleInfo();
     ~DVDTitleInfo();
-
-    //
-    //  Set
-    //
 
     void    setChapters(uint a_uint){numb_chapters = a_uint;}
     void    setAngles(uint a_uint){numb_angles = a_uint;}
@@ -79,10 +51,6 @@ class DVDTitleInfo
     void    setName(QString a_name){name = a_name;}
     void    setInputID(uint a_uint){dvdinput_id = a_uint;}
     void    setAC3(bool y_or_n){use_ac3 = y_or_n;}
-
-    //
-    //  Get
-    //
 
     uint    getChapters(){return numb_chapters;}
     uint    getAngles(){return numb_angles;}
@@ -97,14 +65,16 @@ class DVDTitleInfo
     uint    getInputID(){return dvdinput_id;}
     bool    getAC3(){return use_ac3;}
 
-    void                       addAudio(DVDAudioInfo *new_audio_track);
-    void                       addSubTitle(DVDSubTitleInfo *new_subtitle);
-    QList<DVDAudioInfo*>*    getAudioTracks(){return &audio_tracks;}
-    QList<DVDSubTitleInfo*>* getSubTitles(){return &subtitles;}
-    DVDAudioInfo*              getAudioTrack(int which_one){return audio_tracks.at(which_one);}
+    void addAudio(DVDAudioInfo *new_audio_track);
+    void addSubTitle(DVDSubTitleInfo *new_subtitle);
+    QList<DVDAudioInfo *> *getAudioTracks(){return &audio_tracks;}
+    QList<DVDSubTitleInfo *> *getSubTitles(){return &subtitles;}
+    DVDAudioInfo *getAudioTrack(int which_one)
+    {
+        return audio_tracks.at(which_one);
+    }
 
   private:
-
     uint    numb_chapters;
     uint    numb_angles;
     uint    track_number;
@@ -113,8 +83,8 @@ class DVDTitleInfo
     uint    minutes;
     uint    seconds;
 
-    QList<DVDAudioInfo*>    audio_tracks;
-    QList<DVDSubTitleInfo*> subtitles;
+    QList<DVDAudioInfo *>    audio_tracks;
+    QList<DVDSubTitleInfo *> subtitles;
 
     bool    is_selected;
     int     selected_quality;
@@ -124,32 +94,23 @@ class DVDTitleInfo
     QString name;
 
     uint    dvdinput_id;
-
 };
 
 class DVDInfo
 {
-    //
-    //  A little class that holds info about a DVD
-    //  (info passed in from the mtd)
-    //
-
   public:
-
     DVDInfo(const QString &new_name);
     ~DVDInfo();
 
     void  addTitle(DVDTitleInfo *new_title){titles.append(new_title);}
-    DVDTitleInfo*           getTitle(uint which_one);
+    DVDTitleInfo *getTitle(uint which_one);
 
     QString                 getName(){return volume_name;}
-    QList<DVDTitleInfo*>* getTitles(){return &titles;}
+    QList<DVDTitleInfo *> *getTitles(){return &titles;}
 
   private:
-
-    QList<DVDTitleInfo*>  titles;
-    QString             volume_name;
+    QList<DVDTitleInfo *> titles;
+    QString volume_name;
 };
 
 #endif  // dvdinfo_h_
-

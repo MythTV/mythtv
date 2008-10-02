@@ -1,15 +1,15 @@
-// C++ headers
 #include <set>
 
-// Myth headers
 #include <mythtv/mythcontext.h>
 
-// MythVideo headers
+#include <mythtv/libmythui/mythuibuttonlist.h>
+#include <mythtv/libmythui/mythuibutton.h>
+#include <mythtv/libmythui/mythuitext.h>
+
 #include "globals.h"
 #include "videofilter.h"
 #include "videolist.h"
 #include "dbaccess.h"
-#include "metadata.h"
 #include "metadatalistmanager.h"
 #include "videoutils.h"
 
@@ -395,62 +395,49 @@ bool VideoFilterSettings::meta_less_than(const Metadata &lhs,
 /////////////////////////////////
 // VideoFilterDialog
 /////////////////////////////////
-VideoFilterDialog::VideoFilterDialog(MythScreenStack *parent, QString name,
-                                     VideoList *video_list)
-                  : MythScreenType(parent, name), m_videoList(*video_list)
+VideoFilterDialog::VideoFilterDialog(MythScreenStack *lparent, QString lname,
+        VideoList *video_list) : MythScreenType(lparent, lname),
+    m_browseList(0), m_orderbyList(0), m_yearList(0), m_userratingList(0),
+    m_categoryList(0), m_countryList(0), m_genreList(0), m_castList(0),
+    m_runtimeList(0), m_inetrefList(0), m_coverfileList(0), m_saveButton(0),
+    m_doneButton(0), m_numvideosText(0), m_videoList(*video_list)
 {
     m_fsp = new BasicFilterSettingsProxy<VideoList>(*video_list);
-    m_browseList = m_orderbyList = m_yearList = m_userratingList = NULL;
-    m_categoryList =  m_countryList = m_genreList = m_castList = NULL;
-    m_runtimeList = m_inetrefList = m_coverfileList = NULL;
-    m_saveButton = m_doneButton = NULL;
-    m_numvideosText = NULL;
-
     m_settings = m_fsp->getSettings();
 }
 
 VideoFilterDialog::~VideoFilterDialog()
 {
-    if (m_fsp)
-        delete m_fsp;
+    delete m_fsp;
 }
 
 bool VideoFilterDialog::Create()
 {
-    bool foundtheme = false;
-
-    // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("video-ui.xml", "filter", this);
-
-    if (!foundtheme)
+    if (!LoadWindowFromXML("video-ui.xml", "filter", this))
         return false;
 
-    m_yearList = dynamic_cast<MythUIButtonList *> (GetChild("year_select"));
-    m_userratingList = dynamic_cast<MythUIButtonList *>
-                                                (GetChild("userrating_select"));
-    m_categoryList = dynamic_cast<MythUIButtonList *>
-                                                (GetChild("category_select"));
-    m_countryList = dynamic_cast<MythUIButtonList *> (GetChild("country_select"));
-    m_genreList = dynamic_cast<MythUIButtonList *> (GetChild("genre_select"));
-    m_castList = dynamic_cast<MythUIButtonList *> (GetChild("cast_select"));
-    m_runtimeList = dynamic_cast<MythUIButtonList *> (GetChild("runtime_select"));
-    m_browseList = dynamic_cast<MythUIButtonList *> (GetChild("browse_select"));
-    m_inetrefList = dynamic_cast<MythUIButtonList *> (GetChild("inetref_select"));
-    m_coverfileList = dynamic_cast<MythUIButtonList *>
-                                                (GetChild("coverfile_select"));
-    m_orderbyList = dynamic_cast<MythUIButtonList *> (GetChild("orderby_select"));
-
-    m_doneButton = dynamic_cast<MythUIButton *> (GetChild("done_button"));
-    m_saveButton = dynamic_cast<MythUIButton *> (GetChild("save_button"));
-
-    m_numvideosText = dynamic_cast<MythUIText *> (GetChild("numvideos_text"));
-
-    if (!m_browseList || !m_orderbyList || !m_yearList || !m_userratingList ||
-        !m_categoryList || ! m_countryList || !m_genreList || !m_castList ||
-        !m_runtimeList || !m_inetrefList || !m_coverfileList ||
-        !m_saveButton || !m_doneButton || !m_numvideosText)
+    try
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical elements.");
+        UIUtilE::Assign(this, m_yearList, "year_select");
+        UIUtilE::Assign(this, m_userratingList, "userrating_select");
+        UIUtilE::Assign(this, m_categoryList, "category_select");
+        UIUtilE::Assign(this, m_countryList, "country_select");
+        UIUtilE::Assign(this, m_genreList, "genre_select");
+        UIUtilE::Assign(this, m_castList, "cast_select");
+        UIUtilE::Assign(this, m_runtimeList, "runtime_select");
+        UIUtilE::Assign(this, m_browseList, "browse_select");
+        UIUtilE::Assign(this, m_inetrefList, "inetref_select");
+        UIUtilE::Assign(this, m_coverfileList, "coverfile_select");
+        UIUtilE::Assign(this, m_orderbyList, "orderby_select");
+
+        UIUtilE::Assign(this, m_doneButton, "done_button");
+        UIUtilE::Assign(this, m_saveButton, "save_button");
+
+        UIUtilE::Assign(this, m_numvideosText, "numvideos_text");
+    }
+    catch (UIUtilException &e)
+    {
+        VERBOSE(VB_IMPORTANT, e.What());
         return false;
     }
 
@@ -685,8 +672,8 @@ void VideoFilterDialog::saveAsDefault()
 
 void VideoFilterDialog::saveAndExit()
 {
-    if (m_fsp)
-        m_fsp->setSettings(m_settings);
+    m_fsp->setSettings(m_settings);
+
     if (m_settings.getChangedState() > 0)
         emit filterChanged();
     Close();
@@ -701,71 +688,61 @@ void VideoFilterDialog::setYear(MythUIButtonListItem *item)
 
 void VideoFilterDialog::setUserRating(MythUIButtonListItem *item)
 {
-    int new_userrating = item->GetData().toInt();
-    m_settings.setUserrating(new_userrating);
+    m_settings.setUserrating(item->GetData().toInt());
     update_numvideo();
 }
 
 void VideoFilterDialog::setCategory(MythUIButtonListItem *item)
 {
-    int new_category = item->GetData().toInt();
-    m_settings.setCategory(new_category);
+    m_settings.setCategory(item->GetData().toInt());
     update_numvideo();
 }
 
 void VideoFilterDialog::setCountry(MythUIButtonListItem *item)
 {
-    int new_country = item->GetData().toInt();
-    m_settings.setCountry(new_country);
+    m_settings.setCountry(item->GetData().toInt());
     update_numvideo();
 }
 
 void VideoFilterDialog::setGenre(MythUIButtonListItem *item)
 {
-    int new_genre = item->GetData().toInt();
-    m_settings.setGenre(new_genre);
+    m_settings.setGenre(item->GetData().toInt());
     update_numvideo();
 }
 
 void VideoFilterDialog::setCast(MythUIButtonListItem *item)
 {
-    int new_cast = item->GetData().toInt();
-    m_settings.setCast(new_cast);
+    m_settings.setCast(item->GetData().toInt());
     update_numvideo();
 }
 
 void VideoFilterDialog::setRunTime(MythUIButtonListItem *item)
 {
-    int new_runtime = item->GetData().toInt();
-    m_settings.setRuntime(new_runtime);
+    m_settings.setRuntime(item->GetData().toInt());
     update_numvideo();
 }
 
 void VideoFilterDialog::setBrowse(MythUIButtonListItem *item)
 {
-    int new_browse = item->GetData().toInt();
-    m_settings.setBrowse(new_browse);
+    m_settings.setBrowse(item->GetData().toInt());
     update_numvideo();
 }
 
 void VideoFilterDialog::setInetRef(MythUIButtonListItem *item)
 {
-    int new_inetref = item->GetData().toInt();
-    m_settings.setInetRef(new_inetref);
+    m_settings.setInetRef(item->GetData().toInt());
     update_numvideo();
 }
 
 void VideoFilterDialog::setCoverFile(MythUIButtonListItem *item)
 {
-    int new_coverfile = item->GetData().toInt();
-    m_settings.setCoverFile(new_coverfile);
+    m_settings.setCoverFile(item->GetData().toInt());
     update_numvideo();
 }
 
 void VideoFilterDialog::setOrderby(MythUIButtonListItem *item)
 {
-    int new_orderby = item->GetData().toInt();
-    m_settings.setOrderby(
-            (VideoFilterSettings::ordering)new_orderby);
+    m_settings
+            .setOrderby((VideoFilterSettings::ordering)item->GetData().toInt());
     update_numvideo();
 }

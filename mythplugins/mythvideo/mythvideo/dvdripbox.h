@@ -1,41 +1,25 @@
 #ifndef DVDRIPBOX_H_
 #define DVDRIPBOX_H_
 
-// QT headers
-#include <QRegExp>
+#include <QStringList>
 #include <QTimer>
-#include <QThread>
-#include <Q3Socket>
-#include <QVector>
 
-// Mythui headers
 #include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuiprogressbar.h>
 
-// Mythvideo headers
 #include "dvdinfo.h"
+
+class Q3Socket;
+class MythUIButton;
+class MythUIText;
+class MythUIProgressBar;
 
 class MTDJob : public QObject
 {
     Q_OBJECT
 
-    //
-    //  A little class that stores
-    //  data about jobs running on the
-    //  mtd
-    //
-
   public:
     MTDJob();
-    MTDJob(const QString &a_name_);
-
-    void init();
-
-    //
-    //  Set
-    //
+    MTDJob(QString lname);
 
     void setNumber(int a_number) { job_number = a_number; }
     void SetName(const QString &a_name);
@@ -44,10 +28,6 @@ class MTDJob : public QObject
     void setSubjob(double a_number);
     void setCancelled(bool yes_or_no) { cancelled = yes_or_no; }
 
-    //
-    //  Get
-    //
-
     int     getNumber() { return job_number; }
     QString getName() { return job_name; }
     QString getActivity() { return current_activity; }
@@ -55,11 +35,9 @@ class MTDJob : public QObject
     double  getSubjob() { return subjob_progress; }
 
   signals:
-
     void    toggledCancelled();
 
   private:
-
     int      job_number;
     QString  job_name;
     QString  current_activity;
@@ -73,12 +51,10 @@ class DVDRipBox : public MythScreenType
     Q_OBJECT
 
   public:
-    typedef QVector<int> IntVector;
+    DVDRipBox(MythScreenStack *lparent, QString lname, QString dev);
+    ~DVDRipBox();
 
-    DVDRipBox(MythScreenStack *parent, const QString &name, const QString &dev);
-    ~DVDRipBox(void);
-
-    bool Create(void);
+    bool Create();
 
     void connectToMtd();
 
@@ -130,7 +106,7 @@ class DVDRipBox : public MythScreenType
 
     QString          m_device;       ///> The most recent usable DVD drive
     DVDInfo          *m_dvdInfo;
-    QTimer           *m_discCheckingTimer;
+    QTimer           m_discCheckingTimer;
 
     MythUIText        *m_warningText;
     MythUIText        *m_overallText;
@@ -143,6 +119,5 @@ class DVDRipBox : public MythScreenType
     MythUIButton      *m_nextjobButton;
     MythUIButton      *m_prevjobButton;
 };
-
 
 #endif

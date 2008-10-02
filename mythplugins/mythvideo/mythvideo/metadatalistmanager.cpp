@@ -1,12 +1,7 @@
-// C++ headers
-#include <list>
 #include <map>
 
-// Myth headers
 #include <mythtv/mythdb.h>
 
-// Mythvideo headers
-#include "metadata.h"
 #include "metadatalistmanager.h"
 
 class MetadataListManagerImp

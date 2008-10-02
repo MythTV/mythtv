@@ -1,32 +1,18 @@
-// TODO
-// This needs a complete re-write, it's overly complex and doesn't make good
-// use of MythGenericTree e.g. the flat view
-//
-// A schema change, to match mythmusic would make everything faster, allow
-// browsing by metadata and all sorts of interesting stuff whilst keeping
-// things fast
-
-// C++ headers
 #include <memory>
 #include <algorithm>
 #include <iterator>
 #include <map>
 
-// QT headers
 #include <QFileInfo>
 #include <QList>
 
-// Myth headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythmediamonitor.h>
 
-// Mythui headers
 #include <mythtv/libmythui/mythgenerictree.h>
 
-// Mythvideo headers
 #include "videolist.h"
 #include "videofilter.h"
-#include "metadata.h"
 #include "metadatalistmanager.h"
 #include "dbaccess.h"
 #include "quicksp.h"
@@ -664,7 +650,7 @@ MythGenericTree *VideoList::GetTreeRoot()
 // VideoListImp
 //////////////////////////////
 VideoListImp::VideoListImp() : m_metadata_view_tree("", "top"),
-    m_metadata_list_type(ltNone)
+    m_metadata_list_type(ltNone), m_folder_id(0)
 {
     m_ListUnknown = gContext->GetNumSetting("VideoListUnknownFileTypes", 1);
 
@@ -1167,7 +1153,7 @@ namespace fake_unnamed
         DirectoryHandler *newDir(const QString &dir_name,
                                  const QString &fq_dir_name)
         {
-            (void)fq_dir_name;
+            (void) fq_dir_name;
             smart_dir_node dir = m_directory->addSubDir(dir_name);
             DirectoryHandler *dh = new dirhandler(dir, m_prefix, m_metalist,
                                                   m_dh_free_list,
@@ -1180,8 +1166,8 @@ namespace fake_unnamed
                         const QString &fq_file_name,
                         const QString &extension)
         {
-            (void)file_name;
-            (void)extension;
+            (void) file_name;
+            (void) extension;
             QString file_string(fq_file_name);
 
             MetadataListManager::MetadataPtr myData(new Metadata(file_string));

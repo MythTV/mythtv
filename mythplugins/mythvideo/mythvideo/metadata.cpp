@@ -1,22 +1,16 @@
-// C++ headers
 #include <cmath>
 
-// QT headers
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
 #include <QRegExp>
 
-// Myth headers
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdb.h>
 
-// Mythvideo headers
 #include "globals.h"
-#include "metadata.h"
 #include "metadatalistmanager.h"
 #include "dbaccess.h"
-#include "videoutils.h"
 
 struct SortData
 {
@@ -123,40 +117,40 @@ class MetadataImp
 
     MetadataImp(const MetadataImp &other)
     {
-        if (this != &other)
-        {
-            *this = other;
-        }
+        *this = other;
     }
 
     MetadataImp &operator=(const MetadataImp &rhs)
     {
-        m_title = rhs.m_title;
-        m_inetref = rhs.m_inetref;
-        m_director = rhs.m_director;
-        m_plot = rhs.m_plot;
-        m_rating = rhs.m_rating;
-        m_playcommand = rhs.m_playcommand;
-        m_category = rhs.m_category;
-        m_genres = rhs.m_genres;
-        m_countries = rhs.m_countries;
-        m_cast = rhs.m_cast;
-        m_filename = rhs.m_filename;
-        m_coverfile = rhs.m_coverfile;
+        if (this != &rhs)
+        {
+            m_title = rhs.m_title;
+            m_inetref = rhs.m_inetref;
+            m_director = rhs.m_director;
+            m_plot = rhs.m_plot;
+            m_rating = rhs.m_rating;
+            m_playcommand = rhs.m_playcommand;
+            m_category = rhs.m_category;
+            m_genres = rhs.m_genres;
+            m_countries = rhs.m_countries;
+            m_cast = rhs.m_cast;
+            m_filename = rhs.m_filename;
+            m_coverfile = rhs.m_coverfile;
 
-        m_categoryID = rhs.m_categoryID;
-        m_childID = rhs.m_childID;
-        m_year = rhs.m_year;
-        m_length = rhs.m_length;
-        m_showlevel = rhs.m_showlevel;
-        m_browse = rhs.m_browse;
-        m_id = rhs.m_id;
-        m_userrating = rhs.m_userrating;
+            m_categoryID = rhs.m_categoryID;
+            m_childID = rhs.m_childID;
+            m_year = rhs.m_year;
+            m_length = rhs.m_length;
+            m_showlevel = rhs.m_showlevel;
+            m_browse = rhs.m_browse;
+            m_id = rhs.m_id;
+            m_userrating = rhs.m_userrating;
 
-        // No DB vars
-        m_sort_key = rhs.m_sort_key;
-        m_prefix = rhs.m_prefix;
-        m_flat_index = rhs.m_flat_index;
+            // No DB vars
+            m_sort_key = rhs.m_sort_key;
+            m_prefix = rhs.m_prefix;
+            m_flat_index = rhs.m_flat_index;
+        }
 
         return *this;
     }

@@ -1,34 +1,34 @@
 #ifndef EDITMETADATA_H_
 #define EDITMETADATA_H_
 
-// MythUI headers
 #include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuitextedit.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuicheckbox.h>
 
 class Metadata;
 class MetadataListManager;
+class MythUIButtonList;
+class MythUIButtonListItem;
+class MythUIText;
+class MythUITextEdit;
+class MythUIButton;
+class MythUICheckBox;
 
 class EditMetadataDialog : public MythScreenType
 {
     Q_OBJECT
 
   public:
-     EditMetadataDialog(MythScreenStack *parent,
-                       const QString &name,
+     EditMetadataDialog(MythScreenStack *lparent,
+                       QString lname,
                        Metadata *source_metadata,
                        const MetadataListManager &cache);
     ~EditMetadataDialog();
 
-    bool Create(void);
+    bool Create();
 
     void fillWidgets();
 
   signals:
-    void Finished(void);
+    void Finished();
 
   public slots:
 
