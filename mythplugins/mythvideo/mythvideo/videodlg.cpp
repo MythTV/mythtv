@@ -567,11 +567,102 @@ namespace
 
 class VideoDialogPrivate
 {
+  private:
+    typedef std::list<std::pair<QString, ParentalLevel::Level> >
+            parental_level_map;
+
+    struct rating_to_pl_less :
+        public std::binary_function<parental_level_map::value_type,
+                                    parental_level_map::value_type, bool>
+    {
+        bool operator()(const parental_level_map::value_type &lhs,
+                    const parental_level_map::value_type &rhs) const
+        {
+            return lhs.first.length() < rhs.first.length();
+        }
+    };
+
+  public:
+    VideoDialogPrivate() : m_switchingLayout(false)
+    {
+        if (gContext->GetNumSetting("mythvideo.ParentalLevelFromRating", 0))
+        {
+            for (ParentalLevel sl(ParentalLevel::plLowest);
+                sl.GetLevel() <= ParentalLevel::plHigh && sl.good(); ++sl)
+            {
+                QString ratingstring = gContext->GetSetting(
+                                QString("mythvideo.AutoR2PL%1").arg(sl.GetLevel()));
+                QStringList ratings =
+                        ratingstring.split(':', QString::SkipEmptyParts);
+
+                for (QStringList::const_iterator p = ratings.begin();
+                    p != ratings.end(); ++p)
+                {
+                    m_rating_to_pl.push_back(
+                        parental_level_map::value_type(*p, sl.GetLevel()));
+                }
+            }
+            m_rating_to_pl.sort(std::not2(rating_to_pl_less()));
+        }
+    }
+
+    void AutomaticParentalAdjustment(Metadata *metadata)
+    {
+        if (metadata && m_rating_to_pl.size())
+        {
+            QString rating = metadata->Rating();
+            for (parental_level_map::const_iterator p = m_rating_to_pl.begin();
+                    rating.length() && p != m_rating_to_pl.end(); ++p)
+            {
+                if (rating.find(p->first) != -1)
+                {
+                    metadata->setShowLevel(p->second);
+                    break;
+                }
+            }
+        }
+    }
+
+    void DelayVideoListDestruction(VideoDialog::VideoListPtr videoList)
+    {
+        m_savedPtr = new VideoListDeathDelay(videoList);
+    }
+
   public:
     URLOperationProxy m_url_operator;
     TimeoutSignalProxy m_url_dl_timer;
     ParentalLevelNotifyContainer m_parentalLevel;
+    bool m_switchingLayout;
+
+    static VideoDialog::VideoListDeathDelayPtr m_savedPtr;
+
+  private:
+    parental_level_map m_rating_to_pl;
+
 };
+
+VideoDialog::VideoListDeathDelayPtr VideoDialogPrivate::m_savedPtr;
+
+VideoListDeathDelay::VideoListDeathDelay(VideoDialog::VideoListPtr toSave) :
+    m_savedList(toSave)
+{
+    QTimer::singleShot(3000, this, SLOT(OnTimeUp()));
+}
+
+VideoDialog::VideoListPtr VideoListDeathDelay::GetSaved()
+{
+    return m_savedList;
+}
+
+void VideoListDeathDelay::OnTimeUp()
+{
+    deleteLater();
+}
+
+VideoDialog::VideoListDeathDelayPtr &VideoDialog::GetSavedVideoList()
+{
+    return VideoDialogPrivate::m_savedPtr;
+}
 
 VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
                          VideoListPtr video_list, DialogType type)
@@ -596,26 +687,6 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     m_rememberPosition =
             gContext->GetNumSetting("mythvideo.VideoTreeRemember", 0);
 
-    if (gContext->GetNumSetting("mythvideo.ParentalLevelFromRating", 0))
-    {
-        for (ParentalLevel sl(ParentalLevel::plLowest);
-            sl.GetLevel() <= ParentalLevel::plHigh && sl.good(); ++sl)
-        {
-            QString ratingstring = gContext->GetSetting(
-                            QString("mythvideo.AutoR2PL%1").arg(sl.GetLevel()));
-            QStringList ratings =
-                    ratingstring.split(':', QString::SkipEmptyParts);
-
-            for (QStringList::const_iterator p = ratings.begin();
-                p != ratings.end(); ++p)
-            {
-                m_rating_to_pl.push_back(
-                    parental_level_map::value_type(*p, sl.GetLevel()));
-            }
-        }
-        m_rating_to_pl.sort(std::not2(rating_to_pl_less()));
-    }
-
     connect(&m_private->m_url_dl_timer,
             SIGNAL(SigTimeout(QString, Metadata *)),
             SLOT(OnPosterDownloadTimeout(QString, Metadata *)));
@@ -638,6 +709,9 @@ VideoDialog::~VideoDialog()
 
     if (m_scanner)
         delete m_scanner;
+
+    if (!m_private->m_switchingLayout)
+        m_private->DelayVideoListDestruction(m_videoList);
 
     delete m_private;
 }
@@ -1406,6 +1480,7 @@ void VideoDialog::SwitchManager()
 
 void VideoDialog::SwitchLayout(DialogType type)
 {
+    m_private->m_switchingLayout = true;
     LayoutSwitchHelper::Create(type, m_videoList, GetScreenStack());
 }
 
@@ -1596,19 +1671,7 @@ void VideoDialog::OnVideoSearchListSelection(QString video_uid)
 
 void VideoDialog::AutomaticParentalAdjustment(Metadata *metadata)
 {
-    if (metadata && m_rating_to_pl.size())
-    {
-        QString rating = metadata->Rating();
-        for (parental_level_map::const_iterator p = m_rating_to_pl.begin();
-            rating.length() && p != m_rating_to_pl.end(); ++p)
-        {
-            if (rating.find(p->first) != -1)
-            {
-                metadata->setShowLevel(p->second);
-                break;
-            }
-        }
-    }
+    m_private->AutomaticParentalAdjustment(metadata);
 }
 
 void VideoDialog::OnParentalChange(int amount)

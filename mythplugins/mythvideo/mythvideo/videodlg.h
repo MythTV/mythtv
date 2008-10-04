@@ -1,6 +1,8 @@
 #ifndef VIDEODLG_H_
 #define VIDEODLG_H_
 
+#include <QPointer>
+
 #include <mythtv/libmythui/mythscreentype.h>
 
 #include "parentalcontrols.h"
@@ -25,28 +27,17 @@ class VideoScanner;
 
 class VideoDialog : public MythScreenType
 {
-  private:
     Q_OBJECT
-
-    typedef std::list<std::pair<QString, ParentalLevel::Level> >
-            parental_level_map;
-
-    struct rating_to_pl_less :
-        public std::binary_function<parental_level_map::value_type,
-                                    parental_level_map::value_type, bool>
-    {
-        bool operator()(const parental_level_map::value_type &lhs,
-                    const parental_level_map::value_type &rhs) const
-        {
-            return lhs.first.length() < rhs.first.length();
-        }
-    };
 
   public:
     enum DialogType { DLG_DEFAULT = 0, DLG_BROWSER = 0x1, DLG_GALLERY = 0x2,
                       DLG_TREE = 0x4, DLG_MANAGER = 0x8, dtLast };
 
     typedef simple_ref_ptr<VideoList> VideoListPtr;
+
+    typedef QPointer<class VideoListDeathDelay> VideoListDeathDelayPtr;
+
+    static VideoListDeathDelayPtr &GetSavedVideoList();
 
   public:
     VideoDialog(MythScreenStack *lparent, QString lname,
@@ -141,7 +132,6 @@ class VideoDialog : public MythScreenType
     int m_type;
 
     QString m_artDir;
-    parental_level_map m_rating_to_pl;
     VideoScanner *m_scanner;
 
     MythDialogBox    *m_menuPopup;
@@ -215,6 +205,22 @@ class VideoDialog : public MythScreenType
                                 Metadata *metadata, QString video_uid);
 
 // End asynchronous functions.
+};
+
+class VideoListDeathDelay : public QObject
+{
+    Q_OBJECT
+
+  public:
+    VideoListDeathDelay(VideoDialog::VideoListPtr toSave);
+
+    VideoDialog::VideoListPtr GetSaved();
+
+  private slots:
+    void OnTimeUp();
+
+  private:
+    VideoDialog::VideoListPtr m_savedList;
 };
 
 #endif

@@ -26,7 +26,7 @@
 
 namespace
 {
-    void runScreen(VideoDialog::DialogType type)
+    void runScreen(VideoDialog::DialogType type, bool fromJump = false)
     {
         QString message = QObject::tr("Loading videos ...");
 
@@ -41,8 +41,22 @@ namespace
 
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
+        VideoDialog::VideoListPtr video_list;
+        if (fromJump)
+        {
+            VideoDialog::VideoListDeathDelayPtr &saved =
+                    VideoDialog::GetSavedVideoList();
+            if (!saved.isNull())
+            {
+                video_list = saved->GetSaved();
+            }
+        }
+
+        if (!video_list)
+            video_list = new VideoList;
+
         VideoDialog *mythvideo =
-                new VideoDialog(mainStack, "mythvideo", new VideoList, type);
+                new VideoDialog(mainStack, "mythvideo", video_list, type);
 
         if (mythvideo->Create())
         {
@@ -53,11 +67,11 @@ namespace
             busyPopup->Close();
     }
 
-    void screenVideoManager() { runScreen(VideoDialog::DLG_MANAGER); }
-    void screenVideoBrowser() { runScreen(VideoDialog::DLG_BROWSER); }
-    void screenVideoTree()    { runScreen(VideoDialog::DLG_TREE);    }
-    void screenVideoGallery() { runScreen(VideoDialog::DLG_GALLERY); }
-    void screenVideoDefault() { runScreen(VideoDialog::DLG_DEFAULT); }
+    void jumpScreenVideoManager() { runScreen(VideoDialog::DLG_MANAGER, true); }
+    void jumpScreenVideoBrowser() { runScreen(VideoDialog::DLG_BROWSER, true); }
+    void jumpScreenVideoTree()    { runScreen(VideoDialog::DLG_TREE, true);    }
+    void jumpScreenVideoGallery() { runScreen(VideoDialog::DLG_GALLERY, true); }
+    void jumpScreenVideoDefault() { runScreen(VideoDialog::DLG_DEFAULT, true); }
 
     ///////////////////////////////////////
     // MythDVD functions
@@ -284,15 +298,15 @@ namespace
     void setupKeys()
     {
         REG_JUMP(JUMP_VIDEO_DEFAULT, "The MythVideo default view", "",
-                    screenVideoDefault);
+                    jumpScreenVideoDefault);
         REG_JUMP(JUMP_VIDEO_MANAGER, "The MythVideo video manager", "",
-                    screenVideoManager);
+                    jumpScreenVideoManager);
         REG_JUMP(JUMP_VIDEO_BROWSER, "The MythVideo video browser", "",
-                    screenVideoBrowser);
+                    jumpScreenVideoBrowser);
         REG_JUMP(JUMP_VIDEO_TREE, "The MythVideo video listings", "",
-                    screenVideoTree);
+                    jumpScreenVideoTree);
         REG_JUMP(JUMP_VIDEO_GALLERY, "The MythVideo video gallery", "",
-                    screenVideoGallery);
+                    jumpScreenVideoGallery);
 
         REG_KEY("Video","FILTER","Open video filter dialog","F");
 
@@ -377,13 +391,13 @@ namespace
         QString sel = selection.toLower();
 
         if (sel == "manager")
-            screenVideoManager();
+            runScreen(VideoDialog::DLG_MANAGER);
         else if (sel == "browser")
-            screenVideoBrowser();
+            runScreen(VideoDialog::DLG_BROWSER);
         else if (sel == "listing")
-            screenVideoTree();
+            runScreen(VideoDialog::DLG_TREE);
         else if (sel == "gallery")
-            screenVideoGallery();
+            runScreen(VideoDialog::DLG_GALLERY);
         else if (sel == "settings_general")
         {
             RunSettingsCompletion::Create(gContext->
