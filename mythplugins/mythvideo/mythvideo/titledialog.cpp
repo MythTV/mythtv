@@ -109,10 +109,10 @@ bool TitleDialog::Create()
     connect(m_ripacthreeCheck, SIGNAL(valueChanged()), SLOT(toggleAC3()));
     connect(m_ripCheck, SIGNAL(valueChanged()), SLOT(toggleTitle()));
 
-    connect(m_ripawayButton, SIGNAL(buttonPressed()), SLOT(ripTitles()));
-    connect(m_viewButton, SIGNAL(buttonPressed()), SLOT(viewTitle()));
-    connect(m_nexttitleButton, SIGNAL(buttonPressed()), SLOT(nextTitle()));
-    connect(m_prevtitleButton, SIGNAL(buttonPressed()), SLOT(prevTitle()));
+    connect(m_ripawayButton, SIGNAL(Clicked()), SLOT(ripTitles()));
+    connect(m_viewButton, SIGNAL(Clicked()), SLOT(viewTitle()));
+    connect(m_nexttitleButton, SIGNAL(Clicked()), SLOT(nextTitle()));
+    connect(m_prevtitleButton, SIGNAL(Clicked()), SLOT(prevTitle()));
 
     return true;
 }

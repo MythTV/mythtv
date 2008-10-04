@@ -129,10 +129,10 @@ bool DVDRipBox::Create()
         return false;
     }
 
-    connect(m_ripscreenButton, SIGNAL(buttonPressed()), SLOT(goRipScreen()));
-    connect(m_cancelButton, SIGNAL(buttonPressed()), SLOT(cancelJob()));
-    connect(m_nextjobButton, SIGNAL(buttonPressed()), SLOT(nextJob()));
-    connect(m_prevjobButton, SIGNAL(buttonPressed()), SLOT(prevJob()));
+    connect(m_ripscreenButton, SIGNAL(Clicked()), SLOT(goRipScreen()));
+    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(cancelJob()));
+    connect(m_nextjobButton, SIGNAL(Clicked()), SLOT(nextJob()));
+    connect(m_prevjobButton, SIGNAL(Clicked()), SLOT(prevJob()));
 
     m_ripscreenButton->SetText(tr("New Rip"));
     m_cancelButton->SetText(tr("Cancel Job"));

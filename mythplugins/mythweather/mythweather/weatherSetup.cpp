@@ -54,7 +54,7 @@ bool GlobalSetup::Create()
     BuildFocusList();
 
     m_finishButton->SetText(tr("Finish"));
-    connect(m_finishButton, SIGNAL(buttonPressed()), this, SLOT(saveData()));
+    connect(m_finishButton, SIGNAL(Clicked()), this, SLOT(saveData()));
 
     loadData();
 
@@ -158,7 +158,7 @@ bool ScreenSetup::Create()
     SetFocusWidget(m_inactiveList);
 
     m_finishButton->SetText(tr("Finish"));
-    connect(m_finishButton, SIGNAL(buttonPressed()), this, SLOT(saveData()));
+    connect(m_finishButton, SIGNAL(Clicked()), this, SLOT(saveData()));
 
     loadData();
 
@@ -726,7 +726,7 @@ bool SourceSetup::Create()
             this, SLOT(retrieveSpinboxUpdate()));
 
     m_finishButton->SetText(tr("Finish"));
-    connect(m_finishButton, SIGNAL(buttonPressed()), this, SLOT(saveData()));
+    connect(m_finishButton, SIGNAL(Clicked()), this, SLOT(saveData()));
 
     loadData();
 
@@ -895,7 +895,7 @@ bool LocationDialog::Create()
     BuildFocusList();
     SetFocusWidget(m_locationEdit);
 
-    connect(m_searchButton, SIGNAL(buttonPressed()), this, SLOT(doSearch()));
+    connect(m_searchButton, SIGNAL(Clicked()), this, SLOT(doSearch()));
     m_searchButton->SetText(tr("Search"));
     connect(m_locationList, SIGNAL(itemSelected(MythUIButtonListItem *)),
             this, SLOT(itemSelected(MythUIButtonListItem *)));

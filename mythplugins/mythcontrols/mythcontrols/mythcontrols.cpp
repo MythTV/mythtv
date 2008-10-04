@@ -143,7 +143,7 @@ bool MythControls::Create(void)
             return false;
         }
 
-        connect(button, SIGNAL(buttonPressed()),
+        connect(button, SIGNAL(Clicked()),
                 this, SLOT(ActionButtonPressed()));
 
         m_actionButtons.append(button);

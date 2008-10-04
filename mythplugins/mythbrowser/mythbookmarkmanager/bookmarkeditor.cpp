@@ -78,9 +78,9 @@ bool BookmarkEditor::Create()
     m_cancelButton->SetText(tr("Cancel"));
     m_findCategoryButton->SetText(tr("Find..."));
 
-    connect(m_okButton, SIGNAL(buttonPressed()), this, SLOT(Save()));
-    connect(m_cancelButton, SIGNAL(buttonPressed()), this, SLOT(Exit()));
-    connect(m_findCategoryButton, SIGNAL(buttonPressed()), this, SLOT(slotFindCategory()));
+    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(Save()));
+    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Exit()));
+    connect(m_findCategoryButton, SIGNAL(Clicked()), this, SLOT(slotFindCategory()));
 
     if (m_editing && m_site)
     {

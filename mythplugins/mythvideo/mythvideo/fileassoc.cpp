@@ -366,10 +366,10 @@ bool FileAssocDialog::Create()
     connect(m_defaultCheck, SIGNAL(valueChanged()), SLOT(OnUseDefaltChanged()));
     connect(m_ignoreCheck, SIGNAL(valueChanged()), SLOT(OnIgnoreChanged()));
 
-    connect(m_doneButton, SIGNAL(buttonPressed()), SLOT(OnDonePressed()));
-    connect(m_newButton, SIGNAL(buttonPressed()),
+    connect(m_doneButton, SIGNAL(Clicked()), SLOT(OnDonePressed()));
+    connect(m_newButton, SIGNAL(Clicked()),
             SLOT(OnNewExtensionPressed()));
-    connect(m_deleteButton, SIGNAL(buttonPressed()), SLOT(OnDeletePressed()));
+    connect(m_deleteButton, SIGNAL(Clicked()), SLOT(OnDeletePressed()));
 
     m_deleteButton->SetText(tr("Delete"));
     m_doneButton->SetText(tr("Done"));

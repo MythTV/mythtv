@@ -34,7 +34,7 @@ bool CastDialog::Create()
         return false;
     }
 
-    connect(okButton, SIGNAL(buttonPressed()), SLOT(Close()));
+    connect(okButton, SIGNAL(Clicked()), SLOT(Close()));
 
     okButton->SetText(tr("OK"));
 
@@ -80,7 +80,7 @@ bool PlotDialog::Create()
     plotText->SetText(m_metadata->Plot());
     okButton->SetText(tr("OK"));
 
-    connect(okButton, SIGNAL(buttonPressed()), SLOT(Close()));
+    connect(okButton, SIGNAL(Clicked()), SLOT(Close()));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");

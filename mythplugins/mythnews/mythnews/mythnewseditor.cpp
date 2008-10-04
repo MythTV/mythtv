@@ -86,8 +86,8 @@ bool MythNewsEditor::Create()
     m_okButton->SetText(tr("Ok"));
     m_cancelButton->SetText(tr("Cancel"));
 
-    connect(m_okButton, SIGNAL(buttonPressed()), this, SLOT(Save()));
-    connect(m_cancelButton, SIGNAL(buttonPressed()), this, SLOT(Close()));
+    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(Save()));
+    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
 
     if (m_editing)
     {

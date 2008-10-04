@@ -66,8 +66,8 @@ bool BrowserConfig::Create()
     m_okButton->SetText(tr("Ok"));
     m_cancelButton->SetText(tr("Cancel"));
 
-    connect(m_okButton, SIGNAL(buttonPressed()), this, SLOT(slotSave()));
-    connect(m_cancelButton, SIGNAL(buttonPressed()), this, SLOT(Close()));
+    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
+    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
 
     connect(m_commandEdit,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
     connect(m_zoomEdit   ,  SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));

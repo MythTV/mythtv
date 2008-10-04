@@ -47,8 +47,8 @@ bool KeyGrabPopupBox::Create(void)
     m_okButton->SetText(tr("Ok"));
     m_cancelButton->SetText(tr("Cancel"));
 
-    connect(m_okButton, SIGNAL(buttonPressed()), SLOT(SendResult()));
-    connect(m_cancelButton, SIGNAL(buttonPressed()), SLOT(Close()));
+    connect(m_okButton, SIGNAL(Clicked()), SLOT(SendResult()));
+    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
 
     m_okButton->SelectState(MythUIButton::Disabled);
     m_cancelButton->SelectState(MythUIButton::Disabled);

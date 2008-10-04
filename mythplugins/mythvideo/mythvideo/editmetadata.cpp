@@ -70,8 +70,8 @@ bool EditMetadataDialog::Create()
     connect(m_titleEdit, SIGNAL(valueChanged()), SLOT(setTitle()));
     connect(m_playerEdit, SIGNAL(valueChanged()), SLOT(setPlayer()));
 
-    connect(m_doneButton, SIGNAL(buttonPressed()), SLOT(saveAndExit()));
-    connect(m_coverartButton, SIGNAL(buttonPressed()), SLOT(findCoverArt()));
+    connect(m_doneButton, SIGNAL(Clicked()), SLOT(saveAndExit()));
+    connect(m_coverartButton, SIGNAL(Clicked()), SLOT(findCoverArt()));
 
     connect(m_browseCheck, SIGNAL(valueChanged()), SLOT(toggleBrowse()));
 

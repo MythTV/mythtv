@@ -473,8 +473,8 @@ bool VideoFilterDialog::Create()
     connect(m_orderbyList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(setOrderby(MythUIButtonListItem*)));
 
-    connect(m_saveButton, SIGNAL(buttonPressed()), SLOT(saveAsDefault()));
-    connect(m_doneButton, SIGNAL(buttonPressed()), SLOT(saveAndExit()));
+    connect(m_saveButton, SIGNAL(Clicked()), SLOT(saveAsDefault()));
+    connect(m_doneButton, SIGNAL(Clicked()), SLOT(saveAndExit()));
 
     return true;
 }
