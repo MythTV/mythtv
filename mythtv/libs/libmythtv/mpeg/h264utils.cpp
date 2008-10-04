@@ -272,6 +272,8 @@ void KeyframeSequencer::decode_Header(GetBitContext *gb)
                 prev_bottom_field_flag = bottom_field_flag;
             }
         }
+        else
+            new_VLC_NAL = true; 
     }
 }
 
