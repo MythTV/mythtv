@@ -50,7 +50,8 @@ class MythUIButton : public MythUIType
     void Deselect() { SelectState(Normal); }
 
   signals:
-    void buttonPressed();
+    void buttonPressed(); // Deprecated, use Clicked()
+    void Clicked();
 
   protected:
     virtual bool ParseElement(QDomElement &element);

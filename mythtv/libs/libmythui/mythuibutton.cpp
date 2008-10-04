@@ -170,6 +170,7 @@ void MythUIButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
     if (event->gesture() == MythGestureEvent::Click)
     {
         emit buttonPressed();
+        emit Clicked();
     }
 }
 
@@ -462,6 +463,7 @@ bool MythUIButton::keyPressEvent(QKeyEvent *e)
         if (action == "SELECT")
         {
             emit buttonPressed();
+            emit Clicked();
         }
         else
             handled = false;
