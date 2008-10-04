@@ -842,13 +842,6 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     // Premiere
     fix[133 << 16] = EITFixUp::kEFixForceISO8859_15;
 
-    // DVB-T Spain
-    fix[       10LL << 32 | 8916 << 16 ] = // national multiplex
-        fix[   12LL << 32 | 8916 << 16 ] = // national multiplex
-        fix[   13LL << 32 | 8916 << 16 ] = // national multiplex
-        fix[ 6200LL << 32 | 8916 << 16 ] = // Madrid (TeleMadrid)
-        EITFixUp::kEFixForceISO8859_15;
-
     // DVB-S Astra 19.2E French channels
     fix[     1022LL << 32 | 1 << 16 |  6901 ] = // DIRECT 8
         fix[ 1022LL << 32 | 1 << 16 |  6905 ] = // France 24 (en Francais)
