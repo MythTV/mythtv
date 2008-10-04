@@ -89,6 +89,8 @@ void MythUIImage::Init(void)
     m_CurPos = 0;
     m_LastDisplay = QTime::currentTime();
 
+    m_NeedLoad = false;
+
     m_isReflected = false;
     m_reflectShear = 0;
     m_reflectScale = m_reflectLength = 100;
