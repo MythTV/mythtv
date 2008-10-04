@@ -326,6 +326,7 @@ bool MythUIImage::Load(void)
 
             if (!image->Load(filename))
             {
+                image->DownRef();
                 SetRedraw();
                 return false;
             }
