@@ -5,6 +5,7 @@
 
 #include "parentalcontrols.h"
 #include "videoutils.h"
+#include "quicksp.h"
 
 class Q3NetworkOperation;
 class MythUIText;
@@ -45,9 +46,11 @@ class VideoDialog : public MythScreenType
     enum DialogType { DLG_DEFAULT = 0, DLG_BROWSER = 0x1, DLG_GALLERY = 0x2,
                       DLG_TREE = 0x4, DLG_MANAGER = 0x8, dtLast };
 
+    typedef simple_ref_ptr<VideoList> VideoListPtr;
+
   public:
     VideoDialog(MythScreenStack *lparent, QString lname,
-                VideoList *video_list, DialogType type=DLG_GALLERY);
+            VideoListPtr video_list, DialogType type=DLG_GALLERY);
     ~VideoDialog();
 
     bool Create();
@@ -159,7 +162,7 @@ class VideoDialog : public MythScreenType
     MythUIStateType  *m_parentalLevelState;
     MythUIStateType  *m_videoLevelState;
 
-    VideoList *m_videoList;
+    VideoListPtr m_videoList;
 
     bool m_rememberPosition;
 

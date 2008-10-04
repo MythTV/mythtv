@@ -1,3 +1,5 @@
+#include <QApplication>
+
 #include <Q3NetworkOperation>
 
 #include <QStringList>
@@ -495,6 +497,72 @@ namespace
         ParentalLevel m_level;
         ParentalLevelChangeChecker m_levelCheck;
     };
+
+
+    // Note: no data here because there isn't another good QObject to listen
+    // for this event.
+    struct SwitchLayoutEvent : public QEvent
+    {
+        enum EventID { eID = QEvent::User + 10308 };
+        SwitchLayoutEvent() : QEvent(static_cast<QEvent::Type>(eID)) {}
+    };
+
+    // TODO: Make a way to remove a screen from the screen stack without
+    // deleting it (but allow it to be deleted later). This is all to stop
+    // VideoDialog from deleting itself when creating a new view.
+    class LayoutSwitchHelper : public QObject
+    {
+        Q_OBJECT
+
+      public:
+        static void Create(VideoDialog::DialogType type,
+                VideoDialog::VideoListPtr videoList,
+                MythScreenStack *screenStack)
+        {
+            new LayoutSwitchHelper(type, videoList, screenStack);
+        }
+
+      private:
+        LayoutSwitchHelper(VideoDialog::DialogType type,
+                VideoDialog::VideoListPtr videoList,
+                MythScreenStack *screenStack) : m_type(type),
+            m_videoList(videoList), m_screenStack(screenStack)
+        {
+            qApp->postEvent(this, new SwitchLayoutEvent);
+        }
+
+        ~LayoutSwitchHelper() {}
+
+      protected:
+        void customEvent(QEvent *levent)
+        {
+            if (levent->type() ==
+                    static_cast<QEvent::Type>(SwitchLayoutEvent::eID))
+            {
+                m_screenStack->PopScreen(false);
+
+                VideoDialog *mythvideo =
+                        new VideoDialog(GetMythMainWindow()->GetMainStack(),
+                                "mythvideo", m_videoList, m_type);
+
+                if (mythvideo->Create())
+                {
+                    m_screenStack->AddScreen(mythvideo, false);
+                }
+                else
+                {
+                    ShowOkPopup(tr("An error occurred when switching views."));
+                }
+
+                deleteLater();
+            }
+        }
+
+      private:
+        VideoDialog::DialogType m_type;
+        VideoDialog::VideoListPtr m_videoList;
+        MythScreenStack *m_screenStack;
+    };
 }
 
 class VideoDialogPrivate
@@ -506,7 +574,7 @@ class VideoDialogPrivate
 };
 
 VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
-                         VideoList *video_list, DialogType type)
+                         VideoListPtr video_list, DialogType type)
             : MythScreenType(lparent, lname), m_rootNode(0), m_currentNode(0),
             m_treeLoaded(false), m_isFlatList(false), m_type(type),
             m_scanner(0), m_menuPopup(0), m_busyPopup(0), m_videoButtonList(0),
@@ -1338,16 +1406,7 @@ void VideoDialog::SwitchManager()
 
 void VideoDialog::SwitchLayout(DialogType type)
 {
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-
-    VideoDialog *mythvideo =
-            new VideoDialog(mainStack, "mythvideo", m_videoList, type);
-
-    if (mythvideo->Create())
-    {
-        GetScreenStack()->PopScreen(false);
-        GetScreenStack()->AddScreen(mythvideo, false);
-    }
+    LayoutSwitchHelper::Create(type, m_videoList, GetScreenStack());
 }
 
 void VideoDialog::ViewPlot()
@@ -1398,7 +1457,7 @@ void VideoDialog::ChangeFilter()
     MythScreenStack *mainStack = GetScreenStack();
 
     VideoFilterDialog *filterdialog = new VideoFilterDialog(mainStack,
-            "videodialogfilters", m_videoList);
+            "videodialogfilters", m_videoList.get());
 
     if (filterdialog->Create())
         mainStack->AddScreen(filterdialog);

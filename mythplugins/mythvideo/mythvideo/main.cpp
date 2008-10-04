@@ -26,8 +26,6 @@
 
 namespace
 {
-    VideoList *videoList = 0;
-
     void runScreen(VideoDialog::DialogType type)
     {
         QString message = QObject::tr("Loading videos ...");
@@ -35,19 +33,16 @@ namespace
         MythScreenStack *popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
 
-        MythUIBusyDialog *busyPopup =
-                new MythUIBusyDialog(message, popupStack, "mythvideobusydialog");
+        MythUIBusyDialog *busyPopup = new MythUIBusyDialog(message,
+                popupStack, "mythvideobusydialog");
 
         if (busyPopup->Create())
             popupStack->AddScreen(busyPopup, false);
 
-        if (!videoList)
-            videoList = new VideoList;
-
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
         VideoDialog *mythvideo =
-                new VideoDialog(mainStack, "mythvideo", videoList, type);
+                new VideoDialog(mainStack, "mythvideo", new VideoList, type);
 
         if (mythvideo->Create())
         {
@@ -498,8 +493,6 @@ int mythplugin_config()
 
 void mythplugin_destroy()
 {
-    delete videoList;
-
     CleanupHooks::getInstance()->cleanup();
 #if defined(AEW_VG)
     // valgrind forgets symbols of unloaded modules
