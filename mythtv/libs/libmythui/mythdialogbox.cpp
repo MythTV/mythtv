@@ -151,12 +151,12 @@ bool MythConfirmationDialog::Create(void)
 
     if (m_showCancel)
     {
-        connect(cancelButton, SIGNAL(buttonPressed()), SLOT(Cancel()));
+        connect(cancelButton, SIGNAL(Clicked()), SLOT(Cancel()));
     }
     else
         cancelButton->SetVisible(false);
 
-    connect(okButton, SIGNAL(buttonPressed()), SLOT(Confirm()));
+    connect(okButton, SIGNAL(Clicked()), SLOT(Confirm()));
 
     okButton->SetText(tr("OK"));
     cancelButton->SetText(tr("Cancel"));
@@ -306,8 +306,8 @@ bool MythTextInputDialog::Create(void)
         return false;
 
     if (cancelButton)
-        connect(cancelButton, SIGNAL(buttonPressed()), SLOT(Close()));
-    connect(okButton, SIGNAL(buttonPressed()), SLOT(sendResult()));
+        connect(cancelButton, SIGNAL(Clicked()), SLOT(Close()));
+    connect(okButton, SIGNAL(Clicked()), SLOT(sendResult()));
 
     m_textEdit->SetFilter(m_filter);
     m_textEdit->SetText(m_defaultValue);
@@ -315,8 +315,6 @@ bool MythTextInputDialog::Create(void)
 
     messageText->SetText(m_message);
     okButton->SetText(tr("OK"));
-
-    m_textEdit->SetText("");
 
     BuildFocusList();
 
@@ -407,10 +405,10 @@ bool MythUISearchDialog::Create(void)
     if (cancelButton)
     {
         cancelButton->SetText(tr("Cancel"));
-        connect(cancelButton, SIGNAL(buttonPressed()), SLOT(Close()));
+        connect(cancelButton, SIGNAL(Clicked()), SLOT(Close()));
     }
 
-    connect(okButton, SIGNAL(buttonPressed()), SLOT(slotSendResult()));
+    connect(okButton, SIGNAL(Clicked()), SLOT(slotSendResult()));
 
     connect(m_itemList, SIGNAL(itemClicked(MythUIButtonListItem*)), SLOT(slotSendResult()));
 
