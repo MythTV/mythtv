@@ -145,6 +145,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       m_playbackinfo(NULL),
       // Window stuff
       parentWidget(NULL), embedid(0), embx(-1), emby(-1), embw(-1), embh(-1),
+      embed_saved_scan_type((FrameScanType)-2),
+      embed_saved_scan_lock(false),
       // State
       eof(false),
       m_double_framerate(false),    m_double_process(false),
@@ -1591,6 +1593,16 @@ void NuppelVideoPlayer::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
     if (videoOutput)
     {
+        // BEGIN HACK -- Temporarily disable deinterlacing
+        // Note: this should no longer be needed after mythtv-vid merge
+        if ((int)embed_saved_scan_type <= kScan_Ignore)
+        {
+            embed_saved_scan_type = m_scan;
+            embed_saved_scan_lock = m_scan_locked;
+            SetScanType(kScan_Progressive);
+        }
+        // END HACK
+
         videoOutput->EmbedInWidget(wid, x, y, w, h);
     }
     else
@@ -1608,6 +1620,17 @@ void NuppelVideoPlayer::StopEmbedding(void)
     if (videoOutput)
     {
         videoOutput->StopEmbedding();
+
+        // BEGIN HACK -- Temporarily disable deinterlacing
+        // Note: this should no longer be needed after mythtv-vid merge
+        if ((int)embed_saved_scan_type >= kScan_Ignore)
+        {
+            SetScanType(embed_saved_scan_type);
+            m_scan_locked = embed_saved_scan_lock;
+            embed_saved_scan_type = (FrameScanType) -2;
+        }
+        // END HACK
+
         ReinitOSD();
     }
 }

@@ -527,7 +527,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     QWidget *parentWidget;
     WId embedid;
     int embx, emby, embw, embh;
-
+    FrameScanType embed_saved_scan_type;
+    bool          embed_saved_scan_lock;
 
     // State
     QWaitCondition decoderThreadPaused;
