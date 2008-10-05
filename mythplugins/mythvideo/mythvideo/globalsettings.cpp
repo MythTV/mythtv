@@ -185,18 +185,6 @@ HostCheckBox *VideoDBFolderView()
     return hcb;
 }
 
-HostSpinBox *VideoImageCacheSize()
-{
-    HostSpinBox *hsb = new HostSpinBox("mythvideo.ImageCacheSize", 10,
-                                       1000, 10);
-    hsb->setValue(50);
-    hsb->setLabel(QObject::tr("Image cache size"));
-    hsb->setHelpText(QObject::tr("This setting determines the number "
-                                 "of images MythVideo will cache for "
-                                 "views."));
-    return hsb;
-}
-
 HostCheckBox *VideoTreeRemeber()
 {
     HostCheckBox *gc = new HostCheckBox("mythvideo.VideoTreeRemember");
@@ -666,7 +654,6 @@ VideoGeneralSettings::VideoGeneralSettings()
     page2->addChild(VideoSortIgnoresCase());
     page2->addChild(VideoDBFolderView());
     page2->addChild(VideoTreeRemeber());
-    page2->addChild(VideoImageCacheSize());
 
     VConfigPage page3(pages, false);
     page3->addChild(SetDVDDevice());

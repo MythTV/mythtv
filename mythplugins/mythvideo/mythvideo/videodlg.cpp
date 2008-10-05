@@ -19,7 +19,6 @@
 #include <mythtv/libmythui/mythuiimage.h>
 #include <mythtv/libmythui/mythuistatetype.h>
 #include <mythtv/libmythui/mythdialogbox.h>
-#include <mythtv/libmythui/mythimage.h>
 #include <mythtv/libmythui/mythgenerictree.h>
 
 #include "videodlg.h"
@@ -917,13 +916,10 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     item->setText(metadata ? metadata->Title() : node->getString());
 
-    MythImage *img = GetCoverImage(node);
+    QString imgFilename = GetCoverImage(node);
 
-    if (img && !img->isNull())
-        item->setImage(img);
-
-    if (img)
-        img->DownRef();
+    if (!imgFilename.isEmpty())
+        item->setImage(imgFilename);
 
     int nodeInt = node->getInt();
     if (nodeInt == kSubFolder)
@@ -988,7 +984,7 @@ void VideoDialog::fetchVideos()
         SetCurrentNode(m_rootNode);
 }
 
-MythImage *VideoDialog::GetCoverImage(MythGenericTree *node)
+QString VideoDialog::GetCoverImage(MythGenericTree *node)
 {
     int nodeInt = node->getInt();
 
@@ -1044,38 +1040,20 @@ MythImage *VideoDialog::GetCoverImage(MythGenericTree *node)
     else if (nodeInt == kUpFolder) // up-directory
     {
         icon_file = "mv_gallery_dir_up.png";
-
-//         // prime the cache
-//         if (!ImageCache::getImageCache().hitTest(icon_file))
-//         {
-//             std::auto_ptr<QImage> image(GetMythUI()->
-//                                         LoadScaleImage(icon_file));
-//             if (image.get())
-//             {
-//                 QPixmap pm(*image.get());
-//                 ImageCache::getImageCache().load(icon_file, &pm);
-//             }
-//         }
     }
     else
     {
         Metadata *metadata = NULL;
         metadata = m_videoList->getVideoListMetadata(nodeInt);
 
-        // load video icon
         if (metadata)
             icon_file = metadata->CoverFile();
     }
 
-    MythImage *image = NULL;
+    if (icon_file == "No Cover")
+        icon_file = "";
 
-    if (!icon_file.isEmpty() && icon_file != "No Cover")
-    {
-        image = GetMythPainter()->GetFormatImage();
-        image->Load(icon_file);
-    }
-
-    return image;
+    return icon_file;
 }
 
 bool VideoDialog::keyPressEvent(QKeyEvent *levent)

@@ -18,7 +18,6 @@ class MythUIBusyDialog;
 class MythUIImage;
 class MythUIStateType;
 class MythDialogBox;
-class MythImage;
 class MythGenericTree;
 
 class Metadata;
@@ -104,7 +103,7 @@ class VideoDialog : public MythScreenType
 
     virtual void loadData();
     void fetchVideos();
-    MythImage *GetCoverImage(MythGenericTree *node);
+    QString GetCoverImage(MythGenericTree *node);
 
     Metadata *GetMetadata(MythUIButtonListItem *item);
 
