@@ -31,6 +31,7 @@ class MythImage : public QImage
     // *NOTE* *DELETES* img!
     static MythImage *FromQImage(QImage **img);
 
+    bool LoadNoScale(const QString &filename);
     bool Load(const QString &filename);
 
     void Resize(const QSize &newSize, bool preserveAspect = false);

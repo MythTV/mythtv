@@ -34,6 +34,7 @@ class MPUBLIC MythUIHelper
 
     QImage *GetImageFromCache(const QString &url);
     QImage *CacheImage(const QString &url, QImage &im);
+    QString GetThemeCacheDir(void);
 
     Settings *qtconfig(void);
 

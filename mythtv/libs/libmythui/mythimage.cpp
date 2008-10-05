@@ -183,6 +183,22 @@ MythImage *MythImage::FromQImage(QImage **img)
     return ret;
 }
 
+// TODO : Almost time to looad to get rid of the LoadScaleXXX routines altogether?
+bool MythImage::LoadNoScale(const QString &filename)
+{
+    QImage *im = new QImage(filename);
+
+    SetFileName(filename);
+    if (im)
+    {
+        Assign(*im);
+        delete im;
+        return true;
+    }
+
+    return false;
+}
+
 // FIXME: Get rid of LoadScaleImage
 bool MythImage::Load(const QString &filename)
 {

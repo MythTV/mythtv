@@ -439,13 +439,22 @@ QImage *MythUIHelper::CacheImage(const QString &url, QImage &im)
     return &(d->imageCache[url]);
 }
 
+QString MythUIHelper::GetThemeCacheDir(void)
+{
+    QString cachedirname = GetConfDir() + "/themecache/";
+
+    QString tmpcachedir = cachedirname + GetMythDB()->GetSetting("Theme") + "." +
+                          QString::number(d->m_screenwidth) + "." +
+                          QString::number(d->m_screenheight); 
+
+    return tmpcachedir;
+}
+
 void MythUIHelper::ClearOldImageCache(void)
 {
     QString cachedirname = GetConfDir() + "/themecache/";
 
-    d->themecachedir = cachedirname + GetMythDB()->GetSetting("Theme") + "." +
-                       QString::number(d->m_screenwidth) + "." +
-                       QString::number(d->m_screenheight);
+    d->themecachedir = GetThemeCacheDir();
 
     QDir dir(cachedirname);
 
@@ -542,7 +551,6 @@ void MythUIHelper::CacheThemeImages(void)
         d->m_screenheight == d->m_baseHeight)
         return;
 
-    CacheThemeImagesDirectory(d->m_themepathname);
     if (d->IsWideMode())
         CacheThemeImagesDirectory(GetThemesParentDir() + "default-wide/");
     CacheThemeImagesDirectory(GetThemesParentDir() + "default/");
@@ -563,7 +571,7 @@ void MythUIHelper::CacheThemeImagesDirectory(const QString &dirname,
     {
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-        QString message = QObject::tr("Pre-scaling theme images");
+        QString message = QObject::tr("Initializing MythTV");
         caching = new MythUIProgressDialog(message, popupStack,
                                                     "scalingprogressdialog");
 
@@ -580,6 +588,14 @@ void MythUIHelper::CacheThemeImagesDirectory(const QString &dirname,
     }
     uint progress = 0;
 
+    // This is just to make the progressbar show activity
+    for (progress = 0; progress <= list.count(); progress++) {
+        if (caching)
+            caching->SetProgress(progress);
+        qApp->processEvents();
+    }
+
+/*
     QString destdir = d->themecachedir;
     if (subdirname.length() > 0)
         destdir += subdirname + "/";
@@ -642,7 +658,7 @@ void MythUIHelper::CacheThemeImagesDirectory(const QString &dirname,
             }
         }
     }
-
+*/
     if (caching)
         caching->Close();
 }

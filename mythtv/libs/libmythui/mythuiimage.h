@@ -30,6 +30,9 @@ class MythUIImage : public MythUIType
     void SetImage(MythImage *img);
     void SetImages(QVector<MythImage *> &images);
 
+    QString GenImageLabel(const QString &filename, int w, int h);
+    QString GenImageLabel(int w, int h);
+
     void Reset(void);
     bool Load(void);
 
