@@ -260,8 +260,15 @@ void startManual(void)
 
 void startManualSchedule(void)
 {
-    ManualSchedule mansched(gContext->GetMainWindow(), "manual schedule");
-    mansched.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    ManualSchedule *mansched= new ManualSchedule(mainStack,
+                                                        "ManualSchedule");
+
+    if (mansched->Create())
+        mainStack->AddScreen(mansched);
+    else
+        delete mansched;
 }
 
 void startTVInGuide(void)

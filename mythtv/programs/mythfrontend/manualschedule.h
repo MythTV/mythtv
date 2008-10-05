@@ -1,60 +1,54 @@
 #ifndef MANUALSCHEDULE_H_
 #define MANUALSCHEDULE_H_
 
-#include <qdatetime.h>
-#include <q3hbox.h>
-#include <QLabel>
+#include <QDateTime>
+#include <QStringList>
 
-#include "libmyth/mythwidgets.h"
-#include "tv.h"
-#include "NuppelVideoPlayer.h"
-#include "yuv2rgb.h"
+#include "mythscreentype.h"
 
-#include <pthread.h>
-
-class Q3ListViewItem;
-class QLabel;
-class Q3ProgressBar;
-class NuppelVideoPlayer;
-class RingBuffer;
 class QTimer;
 class ProgramInfo;
 
-class ManualSchedule : public MythDialog
+class MythUIButton;
+class MythUIButtonList;
+class MythUISpinBox;
+class MythUITextEdit;
+
+class ManualSchedule : public MythScreenType
 {
     Q_OBJECT
   public:
 
-    ManualSchedule(MythMainWindow *parent, const char *name = 0);
-   ~ManualSchedule(void);
-   
-  signals:
-    void dismissWindow();
+    ManualSchedule(MythScreenStack *parent, QString name);
+   ~ManualSchedule(void) {};
+
+    bool Create(void);
 
   protected slots:
     void dateChanged(void);
-    void hourChanged(void);
-    void minuteChanged(void);
+    void hourRollover(void);
+    void minuteRollover(void);
     void recordClicked(void);
-    void cancelClicked(void);
 
   private:
+    void connectSignals();
+    void disconnectSignals();
     int daysahead;
     int prev_weekday;
 
-    Q3HBox *m_boxframe;
-    QLabel *m_pixlabel;
-    MythRemoteLineEdit *m_title;
-    MythComboBox *m_channel;
     QStringList m_chanids;
-    MythComboBox *m_duration;
-    MythPushButton *m_recordButton;
-    MythPushButton *m_cancelButton;
-    MythComboBox *m_startdate;
-    MythComboBox *m_starthour;
-    MythComboBox *m_startminute;
 
-    MythRemoteLineEdit *m_descString;
+    MythUITextEdit *m_title;
+
+    MythUIButtonList *m_channel;
+    MythUIButtonList *m_startdate;
+
+    MythUISpinBox *m_starthour;
+    MythUISpinBox *m_startminute;
+    MythUISpinBox *m_duration;
+
+    MythUIButton *m_recordButton;
+    MythUIButton *m_cancelButton;
 
     QDateTime m_nowDateTime;
     QDateTime m_startDateTime;
@@ -62,9 +56,9 @@ class ManualSchedule : public MythDialog
     QString m_startString;
     QString m_chanidString;
 
-    QString dateformat;
-    QString timeformat;
-    QString shortdateformat;
+    QString m_dateformat;
+    QString m_timeformat;
+    QString m_shortdateformat;
 };
 
 #endif

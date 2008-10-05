@@ -3,77 +3,68 @@
 #include <iostream>
 using namespace std;
 
-#include <QLayout>
-#include <QPushButton>
-#include <q3buttongroup.h>
-#include <QLabel>
-#include <QCursor>
-#include <q3listview.h>
 #include <QDateTime>
-#include <q3progressbar.h>
-#include <QApplication>
-#include <QTimer>
-#include <QImage>
-#include <QPainter>
-#include <q3header.h>
-#include <QFile>
-#include <QRegExp>
-#include <q3hbox.h>
-#include <q3datetimeedit.h>
-#include <Q3HBoxLayout>
-#include <Q3VBoxLayout>
 
-#include "tv.h"
-#include "NuppelVideoPlayer.h"
-#include "yuv2rgb.h"
 #include "manualschedule.h"
 
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
-#include "dialogbox.h"
 #include "programinfo.h"
 #include "scheduledrecording.h"
 #include "recordingtypes.h"
-#include "remoteutil.h"
+// #include "remoteutil.h"
 #include "channelutil.h"
 
-ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
-              : MythDialog(parent, name)
+#include "mythuitextedit.h"
+#include "mythuibutton.h"
+#include "mythuibuttonlist.h"
+#include "mythuispinbox.h"
+
+ManualSchedule::ManualSchedule(MythScreenStack *parent, QString name)
+               : MythScreenType(parent, name)
 {
     m_nowDateTime = QDateTime::currentDateTime();
     m_startDateTime = m_nowDateTime;
-    daysahead = 0;
-    
-    Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(20 * wmult));
 
-    dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-    shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
-    timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    m_dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    m_timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
+    m_title = NULL;
+    m_channel = NULL;
+    m_recordButton = m_cancelButton = NULL;
+    m_startdate = NULL;
+    m_duration = m_starthour = m_startminute = NULL;
 
-    // Window title
-    QString message = tr("Manual Recording Scheduler");
-    QLabel *label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    vbox->addWidget(label);
+    m_categoryString = "";
+    m_startString = "";
+    m_chanidString = "";
+}
 
-    Q3VBoxLayout *vkbox = new Q3VBoxLayout(vbox, (int)(1 * wmult));
-    Q3HBoxLayout *hbox = new Q3HBoxLayout(vkbox, (int)(1 * wmult));
+bool ManualSchedule::Create(void)
+{
+    if (!LoadWindowFromXML("schedule-ui.xml", "manualschedule", this))
+        return false;
 
-    // Channel
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
+    m_channel = dynamic_cast<MythUIButtonList *>(GetChild("channel"));
+    m_startdate = dynamic_cast<MythUIButtonList *>(GetChild("startdate"));
 
-    message = tr("Channel:");
-    label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
+    m_starthour = dynamic_cast<MythUISpinBox *>(GetChild("starthour"));
+    m_startminute = dynamic_cast<MythUISpinBox *>(GetChild("startminute"));
+    m_duration = dynamic_cast<MythUISpinBox *>(GetChild("duration"));
 
-    m_channel = new MythComboBox( false, this, "channel");
-    m_channel->setBackgroundOrigin(WindowOrigin);
+    m_title = dynamic_cast<MythUITextEdit *>(GetChild("title"));
 
+    m_recordButton = dynamic_cast<MythUIButton *>(GetChild("next"));
+    m_cancelButton = dynamic_cast<MythUIButton *>(GetChild("cancel"));
+
+    if (!m_channel || !m_startdate || !m_starthour || !m_startminute ||
+        !m_duration || !m_title || !m_recordButton || !m_cancelButton)
+    {
+        VERBOSE(VB_IMPORTANT, "ManualSchedule, theme is missing "
+                              "required elements");
+        return false;
+    }
 
     QString longChannelFormat = gContext->GetSetting("LongChannelFormat",
                                                      "<num> <name>");
@@ -89,204 +80,110 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
             .replace("<sign>", channels[i].callsign)
             .replace("<name>", channels[i].name);
         chantext.detach();
-        m_channel->insertItem(chantext);
+        new MythUIButtonListItem(m_channel, chantext);
         m_chanids << QString::number(channels[i].chanid);
     }
 
-    hbox->addWidget(m_channel);
-
-    // Program Date
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-
-    message = tr("Date or day of the week") + ": ";
-    label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
-
-    m_startdate = new MythComboBox(false, this, "startdate");
-
-    for(int m_index = 0; m_index <= 60; m_index++)
+    for(int index = 0; index <= 60; index++)
     {
-        QString dinfo = m_nowDateTime.addDays(m_index).toString(dateformat);
-        if (m_nowDateTime.addDays(m_index).date().dayOfWeek() < 6)
+        QString dinfo = m_nowDateTime.addDays(index).toString(m_dateformat);
+        if (m_nowDateTime.addDays(index).date().dayOfWeek() < 6)
             dinfo += QString(" (%1)").arg(tr("5 weekdays if daily"));
         else
             dinfo += QString(" (%1)").arg(tr("7 days per week if daily"));
-        m_startdate->insertItem(dinfo);
-        if (m_nowDateTime.addDays(m_index).toString("MMdd") ==
+        new MythUIButtonListItem(m_startdate, dinfo);
+        if (m_nowDateTime.addDays(index).toString("MMdd") ==
             m_startDateTime.toString("MMdd"))
-            m_startdate->setCurrentItem(m_startdate->count() - 1);
+            m_startdate->SetItemCurrent(m_startdate->GetCount() - 1);
     }
-    hbox->addWidget(m_startdate);
 
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-
-    QTime thisTime = m_nowDateTime.time();
-    thisTime = thisTime.addSecs((30 - thisTime.minute() % 30) * 60);
-    
+     QTime thisTime = m_nowDateTime.time();
+     thisTime = thisTime.addSecs((30 - (thisTime.minute() % 30)) * 60);
     if (thisTime < QTime(0,30))
-        m_startdate->setCurrentItem(m_startdate->currentItem() + 1);
+        m_startdate->SetItemCurrent(m_startdate->GetCurrentPos() + 1);
 
-    message = tr("Time:");
-    label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
+    m_starthour->SetRange(0,23,1);
+    m_starthour->SetValue(thisTime.hour());
+    m_startminute->SetRange(0,55,5);
+    m_startminute->SetValue((thisTime.minute()/5)*5);
+    m_duration->SetRange(5,360,5);
+    m_duration->SetValue(60);
 
-    QString hr_format = "h";
-    if (timeformat.contains("hh"))
-        hr_format = "hh";
-    if (timeformat.contains("AP"))
-        hr_format += " AP";
-    if (timeformat.contains("ap"))
-        hr_format += " ap";
+    connectSignals();
+    connect(m_recordButton, SIGNAL(Clicked()), SLOT(recordClicked()));
+    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
 
-    m_starthour = new MythComboBox(false, this, "starthour");
+    BuildFocusList();
 
-    for(int m_index = -1; m_index <= 24; m_index++)
-    {
-        m_starthour->insertItem(QTime((m_index + 24) % 24, 0)
-                                      .toString(hr_format));
-        if (thisTime.hour() == m_index)
-            m_starthour->setCurrentItem(m_starthour->count() - 1);
-    }
-    hbox->addWidget(m_starthour);
-
-    m_startminute = new MythComboBox(false, this, "startminute");
-
-    for(int m_index = -5; m_index <= 60; m_index += 5)
-    {
-        m_startminute->insertItem(QTime(0, (m_index + 60) % 60)
-                                       .toString(":mm"));
-        if (m_index == thisTime.minute())
-            m_startminute->setCurrentItem(m_startminute->count() - 1);
-    }
-    hbox->addWidget(m_startminute);
-    dateChanged();
-
-    // Duration spin box
-    message = tr("Duration:");
-    label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
-
-    m_duration = new MythComboBox(false, this, "duration");
-
-    m_duration->insertItem(QString(" 1 %2").arg(tr("minute")));
-    for(int m_index = 5; m_index <= 360; m_index += 5)
-    {
-        m_duration->insertItem(QString(" %1 %2").arg(m_index)
-                                               .arg(tr("minutes")));
-    }
-    m_duration->setCurrentItem(12);
-    hbox->addWidget(m_duration);
-
-    // Title edit box
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-
-    message = tr("Title (optional):");
-    label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
-
-    m_title = new MythRemoteLineEdit( this, "title" );
-    m_title->setBackgroundOrigin(WindowOrigin);
-    hbox->addWidget(m_title);
-
-    //  Record Button
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-
-    m_recordButton = new MythPushButton( this, "Program" );
-    m_recordButton->setBackgroundOrigin(WindowOrigin);
-    m_recordButton->setText( tr( "Set Recording Options" ) );
-    m_recordButton->setEnabled(true);
-
-    hbox->addWidget(m_recordButton);
-
-    //  Cancel Button
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-
-    m_cancelButton = new MythPushButton( this, "Program" );
-    m_cancelButton->setBackgroundOrigin(WindowOrigin);
-    m_cancelButton->setText( tr( "Cancel" ) );
-    m_cancelButton->setEnabled(true);
-
-    hbox->addWidget(m_cancelButton);
-
-
-
-    connect(this, SIGNAL(dismissWindow()), this, SLOT(accept()));
-
-     
-    connect(m_startdate, SIGNAL(activated(int)), this, SLOT(dateChanged(void)));
-    connect(m_startdate, SIGNAL(highlighted(int)), this, SLOT(dateChanged(void)));
-    connect(m_starthour, SIGNAL(activated(int)), this, SLOT(hourChanged(void)));
-    connect(m_starthour, SIGNAL(highlighted(int)), this, SLOT(hourChanged(void)));
-    connect(m_startminute, SIGNAL(activated(int)), this, SLOT(minuteChanged(void)));
-    connect(m_startminute, SIGNAL(highlighted(int)), this, SLOT(minuteChanged(void)));
-    connect(m_recordButton, SIGNAL(clicked()), this, SLOT(recordClicked()));
-    connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-
-    m_channel->setFocus();
-    
-    gContext->addListener(this);
-    gContext->addCurrentLocation("ManualSchedule");
+    return true;
 }
 
-ManualSchedule::~ManualSchedule(void)
+void ManualSchedule::connectSignals()
 {
-    gContext->removeListener(this);
-    gContext->removeCurrentLocation();
+    connect(m_startdate, SIGNAL(itemSelected(MythUIButtonListItem*)),
+                         SLOT(dateChanged(void)));
+    connect(m_starthour, SIGNAL(itemSelected(MythUIButtonListItem*)),
+                         SLOT(dateChanged(void)));
+    connect(m_startminute, SIGNAL(itemSelected(MythUIButtonListItem*)),
+                           SLOT(dateChanged(void)));
 }
 
-void ManualSchedule::minuteChanged(void)
+void ManualSchedule::disconnectSignals()
 {
-    if (m_startminute->currentItem() == 0 ) {
-        m_startminute->setCurrentItem(12);
-        m_starthour->setCurrentItem(m_starthour->currentItem() - 1);
-    }
-    if (m_startminute->currentItem() == 13 ) {
-        m_starthour->setCurrentItem(m_starthour->currentItem() + 1);
-        m_startminute->setCurrentItem(1);
-    }
-    dateChanged();
+    disconnect(m_startdate, 0, this, 0);
+    disconnect(m_starthour, 0, this, 0);
+    disconnect(m_startminute, 0, this, 0);
 }
 
-void ManualSchedule::hourChanged(void)
+void ManualSchedule::hourRollover(void)
 {
-    if (m_starthour->currentItem() == 0 ) {
-        m_starthour->setCurrentItem(24);
-        m_startdate->setCurrentItem(m_startdate->currentItem() - 1);
+    if (m_startminute->GetCurrentPos() == 0 )
+    {
+        m_startminute->SetItemCurrent(12);
+        m_starthour->SetItemCurrent(m_starthour->GetCurrentPos() - 1);
     }
-    if (m_starthour->currentItem() == 25 ) {
-        m_startdate->setCurrentItem(m_startdate->currentItem() + 1);
-        m_starthour->setCurrentItem(1);
+    if (m_startminute->GetCurrentPos() == 13 )
+    {
+        m_starthour->SetItemCurrent(m_starthour->GetCurrentPos() + 1);
+        m_startminute->SetItemCurrent(1);
     }
-    dateChanged();
+}
+
+void ManualSchedule::minuteRollover(void)
+{
+    if (m_starthour->GetCurrentPos() == 0 )
+    {
+        m_starthour->SetItemCurrent(24);
+        m_startdate->SetItemCurrent(m_startdate->GetCurrentPos() - 1);
+    }
+    if (m_starthour->GetCurrentPos() == 25 )
+    {
+        m_startdate->SetItemCurrent(m_startdate->GetCurrentPos() + 1);
+        m_starthour->SetItemCurrent(1);
+    }
 }
 
 void ManualSchedule::dateChanged(void)
 {
-   daysahead = m_startdate->currentItem();
-   m_startDateTime.setDate(m_nowDateTime.addDays(daysahead).date());
+    disconnectSignals();
+    daysahead = m_startdate->GetCurrentPos();
+    m_startDateTime.setDate(m_nowDateTime.addDays(daysahead).date());
 
-   int hr = (m_starthour->currentItem() - 1) % 24;
-   int min = (m_startminute->currentItem() - 1) * 5 % 60;
-   m_startDateTime.setTime(QTime(hr, min));
+    int hr = m_starthour->GetItemCurrent()->text().toInt();
+    int min = m_startminute->GetItemCurrent()->text().toInt();
+    m_startDateTime.setTime(QTime(hr, min));
 
-   VERBOSE(VB_SCHEDULE, QString("Start Date Time: %1")
-                                .arg(m_startDateTime.toString()));
+    VERBOSE(VB_SCHEDULE, QString("Start Date Time: %1")
+                                    .arg(m_startDateTime.toString()));
 
-   if (m_startDateTime < m_nowDateTime)
-   {
+    if (m_startDateTime < m_nowDateTime)
+    {
         QTime thisTime = m_nowDateTime.time();
-        m_starthour->setCurrentItem(thisTime.hour() + 1);
+        m_starthour->SetItemCurrent(thisTime.hour() + 1);
         m_startDateTime.setDate(m_nowDateTime.date());
         m_startDateTime.setTime(QTime(hr, min));
-   }
+    }
+    connectSignals();
 }
 
 void ManualSchedule::recordClicked(void)
@@ -294,7 +191,7 @@ void ManualSchedule::recordClicked(void)
     ProgramInfo p;
 
     QString channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
-    p.chanid = m_chanids[m_channel->currentItem()];
+    p.chanid = m_chanids[m_channel->GetCurrentPos()];
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, callsign, name "
@@ -303,7 +200,7 @@ void ManualSchedule::recordClicked(void)
 
     query.exec();
 
-    if (query.isActive() && query.size()) 
+    if (query.isActive() && query.size())
     {
         query.next();
         p.chanstr = query.value(1).toString();
@@ -311,7 +208,7 @@ void ManualSchedule::recordClicked(void)
         p.channame = query.value(3).toString();
     }
 
-    int addsec = m_duration->currentItem() * 300;
+    int addsec = m_duration->GetItemCurrent()->text().toInt() * 60;
 
     if (!addsec)
         addsec = 60;
@@ -319,11 +216,11 @@ void ManualSchedule::recordClicked(void)
     p.startts = m_startDateTime;
     p.endts = p.startts.addSecs(addsec);
 
-    if (m_title->text() > "")
-        p.title = m_title->text();
+    if (m_title->GetText() > "")
+        p.title = m_title->GetText();
     else
-        p.title = p.ChannelText(channelFormat) + " - " + 
-                  p.startts.toString(timeformat);
+        p.title = p.ChannelText(channelFormat) + " - " +
+                  p.startts.toString(m_timeformat);
 
     p.title += " (" + tr("Manual Record") + ")";
     p.description = p.title; p.description.detach();
@@ -334,14 +231,7 @@ void ManualSchedule::recordClicked(void)
     record->exec();
 
     if (record->getRecordID())
-        accept();
-    else
-        m_recordButton->setFocus();
+        Close();
 
     record->deleteLater();
-}
-
-void ManualSchedule::cancelClicked(void)
-{
-    accept();
 }
