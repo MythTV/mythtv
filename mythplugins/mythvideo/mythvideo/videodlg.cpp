@@ -919,7 +919,7 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     QString imgFilename = GetCoverImage(node);
 
     if (!imgFilename.isEmpty())
-        item->setImage(imgFilename);
+        item->SetImage(imgFilename);
 
     int nodeInt = node->getInt();
     if (nodeInt == kSubFolder)
