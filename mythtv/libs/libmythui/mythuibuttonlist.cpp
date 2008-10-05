@@ -1012,6 +1012,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
     m_parent    = lbtype;
     m_text      = text;
     m_image     = image;
+    m_imageFilename = "";
     m_checkable = checkable;
     m_state     = state;
     m_showArrow = showArrow;
@@ -1037,6 +1038,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
     m_data      = data;
 
     m_image     = NULL;
+    m_imageFilename = "";
     m_checkable = false;
     m_state     = CantCheck;
     m_showArrow = false;
@@ -1050,6 +1052,7 @@ MythUIButtonListItem::~MythUIButtonListItem()
 {
     if (m_parent)
         m_parent->RemoveItem(this);
+
     if (m_image)
         m_image->DownRef();
 
@@ -1078,9 +1081,9 @@ void MythUIButtonListItem::setText(const QString &text, const QString &name)
         m_parent->Update();
 }
 
-const MythImage* MythUIButtonListItem::image() const
+const QString MythUIButtonListItem::Image() const
 {
-    return m_image;
+    return m_imageFilename;
 }
 
 void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
@@ -1103,6 +1106,22 @@ void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
         m_image = image;
         if (image)
             image->UpRef();
+    }
+
+    if (m_parent)
+        m_parent->Update();
+}
+
+void MythUIButtonListItem::SetImage(const QString &filename, const QString &name)
+{
+    if (!name.isEmpty())
+        m_imageFilenames.insert(name, filename);
+    else
+    {
+        if (filename == m_imageFilename)
+            return;
+
+        m_imageFilename = filename;
     }
 
     if (m_parent)
@@ -1240,7 +1259,15 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
     MythUIImage *buttonimage = dynamic_cast<MythUIImage *>
                                         (buttonstate->GetChild("buttonimage"));
     if (buttonimage)
-        buttonimage->SetImage(m_image);
+    {
+        if (!m_imageFilename.isEmpty())
+        {
+            buttonimage->SetFilename(m_imageFilename);
+            buttonimage->Load();
+        }
+        else if (m_image)
+            buttonimage->SetImage(m_image);
+    }
 
     MythUIImage *buttonarrow = dynamic_cast<MythUIImage *>
                                         (buttonstate->GetChild("buttonarrow"));
@@ -1276,6 +1303,19 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
     }
 
     MythUIImage *image;
+    QMap<QString, QString>::iterator imagefile_it = m_imageFilenames.begin();
+    while (imagefile_it != m_imageFilenames.end())
+    {
+        image = dynamic_cast<MythUIImage *>
+                                    (buttonstate->GetChild(imagefile_it.key()));
+        if (image)
+        {
+            image->SetFilename(imagefile_it.value());
+            image->Load();
+        }
+        ++imagefile_it;
+    }
+
     QMap<QString, MythImage*>::iterator image_it = m_images.begin();
     while (image_it != m_images.end())
     {

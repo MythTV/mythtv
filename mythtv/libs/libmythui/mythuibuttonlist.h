@@ -25,7 +25,7 @@ class MythUIButtonListItem
     };
 
     MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,
-                         MythImage *image = 0, bool checkable = false,
+                         MythImage *image = NULL, bool checkable = false,
                          CheckState state = CantCheck, bool showArrow = false);
     MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,
                          QVariant data);
@@ -36,8 +36,10 @@ class MythUIButtonListItem
     void setText(const QString &text, const QString &name="");
     QString text() const;
 
-    void setImage(MythImage *image, const QString &name="");
-    const MythImage *image() const;
+    void setImage(MythImage *image, const QString &name="") __attribute__ ((deprecated));
+
+    void SetImage(const QString &filename, const QString &name="");
+    const QString Image() const;
 
     void DisplayState(const QString &state, const QString &name);
 
@@ -68,6 +70,7 @@ class MythUIButtonListItem
     MythUIButtonList *m_parent;
     QString         m_text;
     MythImage      *m_image;
+    QString         m_imageFilename;
     bool            m_checkable;
     CheckState      m_state;
     QVariant        m_data;
@@ -76,6 +79,7 @@ class MythUIButtonListItem
 
     QMap<QString, QString> m_strings;
     QMap<QString, MythImage*> m_images;
+    QMap<QString, QString> m_imageFilenames;
     QMap<QString, QString> m_states;
 
     friend class MythUIButtonList;
@@ -153,7 +157,6 @@ class MythUIButtonList : public MythUIType
                           int alphaMod, QRect clipRect);
     void Const();
     virtual void Init();
-    void LoadPixmap(MythImage **pix, QDomElement &element);
 
     void InsertItem(MythUIButtonListItem *item);
     void RemoveItem(MythUIButtonListItem *item);
