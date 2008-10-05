@@ -238,7 +238,7 @@
                     <filename>selector_background.png</filename>
                 </imagetype>
                 <textarea name="buttontext">
-                    <area>5,5,85%,30</area>
+                    <area>5,5,190,30</area>
                     <font>basesmall</font>
                     <cutdown>yes</cutdown>
                     <align>left,vcenter</align>
@@ -270,6 +270,63 @@
         </statetype>
         <statetype name="upscrollarrow">
             <position>205,21</position>
+            <state type="off">
+                <imagetype name="upon">
+                    <filename>lb-ltarrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="upoff">
+                    <filename>lb-ltarrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+    </buttonlist>
+
+    <!-- Base definition of a list in wide 'selector' configuration -->
+    <buttonlist name="basewideselector">
+        <area>0,0,395,40</area>
+        <layout>horizontal</layout>
+        <buttonarea>0,0,375,100%</buttonarea>
+        <statetype name="buttonitem">
+            <state name="active">
+                <area>0,0,375,40</area>
+                <imagetype name="buttonbackground">
+                    <filename>selector_wide_background.png</filename>
+                </imagetype>
+                <textarea name="buttontext">
+                    <area>5,5,365,30</area>
+                    <font>basesmall</font>
+                    <cutdown>yes</cutdown>
+                    <align>left,vcenter</align>
+                </textarea>
+            </state>
+            <state name="selected" from="active">
+                <imagetype name="buttonbackground">
+                    <filename>selector_wide_background_selected.png</filename>
+                </imagetype>
+            </state>
+            <state name="inactive" from="active">
+                <imagetype name="buttonbackground">
+                    <filename>selector_wide_background_inactive.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>380,2</position>
+            <state type="off">
+                <imagetype name="dnon">
+                    <filename>lb-rtarrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="dnoff">
+                    <filename>lb-rtarrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <statetype name="upscrollarrow">
+            <position>380,21</position>
             <state type="off">
                 <imagetype name="upon">
                     <filename>lb-ltarrow-reg.png</filename>
