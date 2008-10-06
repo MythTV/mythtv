@@ -69,11 +69,13 @@ void MythUIText::Reset()
 
 void MythUIText::SetText(const QString &text)
 {
+    text.replace(QRegExp("\\\\n"), "\n");
+    text = text.trimmed();
+
     if (text == m_Message)
         return;
 
-    m_Message.replace(QRegExp("\\\\n"), "\n");
-    m_Message = text.trimmed();
+    m_Message = text;
     m_CutMessage = "";
     SetRedraw();
 }
