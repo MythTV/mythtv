@@ -321,12 +321,14 @@ sub getMoviePoster {
       if ($1 ne "") {
          if (defined $opt_d) { print "# found nexbase poster page: $1 \n"; }
          my $cinres = get $1;
-         if (defined $opt_d) { printf("# got %i bytes\n", length($cinres)); }
-         if (defined $opt_r) { printf("%s", $cinres); }
+         if (defined $cinres) {
+            if (defined $opt_d) { printf("# got %i bytes\n", length($cinres)); }
+            if (defined $opt_r) { printf("%s", $cinres); }
 
-         if ($cinres =~ m/<a id="photo_url" href="([^"]*?)" ><\/a>/i) {
-            if (defined $opt_d) { print "# nexbase url retreived\n"; }
-            $uri = $1;
+            if ($cinres =~ m/<a id="photo_url" href="([^"]*?)" ><\/a>/i) {
+               if (defined $opt_d) { print "# nexbase url retreived\n"; }
+               $uri = $1;
+            }
          }
       }
    }
@@ -453,7 +455,7 @@ sub getMovieList {
    # check to see if we got a results page or a movie page
    #    looking for 'add=<movieid>" target=' which only exists
    #    in a movie description page
-   my $movienum = parseBetween($response, "add=", "\" ");
+   my $movienum = parseBetween($response, "add=", "\"");
    if (!$movienum) {
       $movienum = parseBetween($response, ";add=", "'");
    }
