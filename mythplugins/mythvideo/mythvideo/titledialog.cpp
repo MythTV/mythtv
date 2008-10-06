@@ -1,5 +1,6 @@
 #include <QRegExp>
-#include <Q3Socket>
+
+#include <QTcpSocket>
 
 #include <mythtv/util.h>
 #include <mythtv/mythcontext.h>
@@ -15,7 +16,7 @@
 #include "videoutils.h"
 
 TitleDialog::TitleDialog(MythScreenStack *lparent, QString lname,
-        Q3Socket *a_socket, QString d_name, QList<DVDTitleInfo*> *titles) :
+        QTcpSocket *a_socket, QString d_name, QList<DVDTitleInfo*> *titles) :
     MythScreenType(lparent, lname), m_discName(d_name), m_dvdTitles(titles),
     m_currentTitle(0), m_socketToMtd(a_socket), m_nameEdit(0),
     m_audioList(0), m_qualityList(0), m_subtitleList(0),

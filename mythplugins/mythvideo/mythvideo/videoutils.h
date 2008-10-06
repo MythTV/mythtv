@@ -1,10 +1,6 @@
 #ifndef VIDEOUTILS_H_
 #define VIDEOUTILS_H_
 
-#include <Q3UrlOperator>
-#include <Q3Process>
-#include <QTimer>
-
 class Metadata;
 class MetadataListManager;
 

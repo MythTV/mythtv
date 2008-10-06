@@ -7,7 +7,7 @@
 
 #include "dvdinfo.h"
 
-class Q3Socket;
+class QTcpSocket;
 
 class MythUIButtonList;
 class MythUIButtonListItem;
@@ -24,7 +24,7 @@ class TitleDialog : public MythScreenType
 
     TitleDialog(MythScreenStack *lparent,
                 QString lname,
-                Q3Socket *a_socket,
+                QTcpSocket *a_socket,
                 QString d_name,
                 QList<DVDTitleInfo*> *titles);
 
@@ -49,7 +49,7 @@ class TitleDialog : public MythScreenType
     QString                  m_discName;
     QList<DVDTitleInfo *>   *m_dvdTitles;
     DVDTitleInfo            *m_currentTitle;
-    Q3Socket                *m_socketToMtd;
+    QTcpSocket              *m_socketToMtd;
 
     MythUITextEdit      *m_nameEdit;
     MythUIButtonList      *m_audioList;

@@ -1,13 +1,10 @@
-#include <unistd.h> // for usleep
-
 #include <QApplication>
+#include <QProcess>
 #include <QRegExp>
 #include <QTimer>
-#include <Q3Socket>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythmediamonitor.h>
-#include <mythtv/compat.h> // for usleep
 #include <mythtv/mythdirs.h>
 
 #include <mythtv/libmythui/mythscreenstack.h>
@@ -59,9 +56,47 @@ void MTDJob::setSubjob(double a_number)
 ---------------------------------------------------------------------
 */
 
+namespace
+{
+    class LaunchMTD : public QObject
+    {
+        Q_OBJECT
+
+      public:
+        static LaunchMTD *Create()
+        {
+            return new LaunchMTD;
+        }
+
+      private:
+        LaunchMTD()
+        {
+            QStringList args;
+            args << "-d";
+
+            QProcess::startDetached(QString("%1/bin/mtd")
+                    .arg(GetInstallPrefix()), args);
+            QTimer::singleShot(2000, this, SLOT(OnLaunchWaitDone()));
+        }
+
+        ~LaunchMTD() {}
+
+      signals:
+        void SigLaunchAttemptComplete();
+
+      private slots:
+        void OnLaunchWaitDone()
+        {
+            emit SigLaunchAttemptComplete();
+            deleteLater();
+        }
+    };
+}
+
 DVDRipBox::DVDRipBox(MythScreenStack *lparent, QString lname, QString device) :
-    MythScreenType(lparent, lname), m_clientSocket(0), m_statusTimer(0),
-    m_triedMTD(false), m_connected(false), m_firstRun(true), m_haveDisc(false),
+    MythScreenType(lparent, lname), m_clientSocket(this),
+    m_triedMTDLaunch(false), m_connected(false), m_firstRun(true),
+    m_haveDisc(false),
     m_firstDiscFound(false), m_blockMediaRequests(false), m_jobCount(0),
     m_currentJob(-1), m_ignoreCancels(false), m_device(device), m_dvdInfo(0),
     m_warningText(0), m_overallText(0), m_jobText(0),
@@ -69,7 +104,6 @@ DVDRipBox::DVDRipBox(MythScreenStack *lparent, QString lname, QString device) :
     m_ripscreenButton(0), m_cancelButton(0), m_nextjobButton(0),
     m_prevjobButton(0)
 {
-    //
     //  A DVDRipBox is a single dialog that does a bunch of things
     //  depending on the MythThemedDialog "context"
     //
@@ -82,20 +116,18 @@ DVDRipBox::DVDRipBox(MythScreenStack *lparent, QString lname, QString device) :
     //          4 - browse through a DVD and (possibly) launch a transcoding job
     //              (^^ this is "temporarily" launching a new dialog)
     //
+    connect(&m_statusTimer, SIGNAL(timeout()), SLOT(pollStatus()));
 
-    //
-    //  Set some startup defaults
-    //
+    connect(&m_clientSocket, SIGNAL(error(QAbstractSocket::SocketError)),
+            SLOT(OnConnectionError(QAbstractSocket::SocketError)));
+    connect(&m_clientSocket, SIGNAL(connected()), SLOT(connectionMade()));
+    connect(&m_clientSocket, SIGNAL(readyRead()), SLOT(readFromServer()));
+    connect(&m_clientSocket, SIGNAL(disconnected()),
+            SLOT(OnMTDConnectionDisconnected()));
 }
 
 DVDRipBox::~DVDRipBox()
 {
-    if(m_clientSocket)
-    {
-        m_clientSocket->close();
-        delete m_clientSocket;
-    }
-
     while (!m_jobs.isEmpty())
         delete m_jobs.takeFirst();
 
@@ -158,36 +190,19 @@ bool DVDRipBox::Create()
 
 void DVDRipBox::Init()
 {
-
-    //
-    //  Set up the timer which kicks off polling
-    //  the mtd for status information
-    //
-
-    m_statusTimer = new QTimer(this);
-    connect(m_statusTimer, SIGNAL(timeout()), SLOT(pollStatus()));
-
-    //
-    //  Set our initial context and try to connect
-    //
-
-    createSocket();
     connectToMtd();
 
-    //
     //  Create (but do not open) the DVD probing object
     //  and then ask a thread to check it for us. Make a
     //  timer to query whether the thread is done or not
-    //
 
     connect(&m_discCheckingTimer, SIGNAL(timeout()), SLOT(checkDisc()));
     m_discCheckingTimer.start(600);
-
 }
 
 void DVDRipBox::checkDisc()
 {
-    if(!m_connected)
+    if (!m_connected)
         return;
 
     if(m_blockMediaRequests)
@@ -201,11 +216,6 @@ void DVDRipBox::checkDisc()
         {
             m_firstDiscFound = true;
 
-            //
-            //  If we got the first disc, the user
-            //  probably has what they want.
-            //
-
             m_discCheckingTimer.changeInterval(4000);
         }
 
@@ -213,34 +223,12 @@ void DVDRipBox::checkDisc()
     else
         m_ripscreenButton->SetVisible(false);
 
-    //
-    //  Ask the mtd to send us info about
-    //  current media (DVD) information
-    //
     sendToServer("media");
 }
 
-void DVDRipBox::createSocket()
+void DVDRipBox::OnMTDConnectionDisconnected()
 {
-    if(m_clientSocket)
-        delete m_clientSocket;
-
-    m_clientSocket = new Q3Socket(this);
-    connect(m_clientSocket, SIGNAL(error(int)), SLOT(connectionError(int)));
-    connect(m_clientSocket, SIGNAL(connected()), SLOT(connectionMade()));
-    connect(m_clientSocket, SIGNAL(readyRead()), SLOT(readFromServer()));
-    connect(m_clientSocket, SIGNAL(connectionClosed()),
-            SLOT(connectionClosed()));
-}
-
-void DVDRipBox::connectionClosed()
-{
-    if(m_clientSocket)
-    {
-        delete m_clientSocket;
-        m_clientSocket = NULL;
-        m_connected = false;
-    }
+    m_connected = false;
 
     stopStatusPolling();
     m_context = RIPSTATE_UNKNOWN;
@@ -257,81 +245,51 @@ void DVDRipBox::connectionClosed()
 
 void DVDRipBox::connectToMtd()
 {
-    if(!m_triedMTD)
-    {
-        //
-        //  it should daemonize itself and then return
-        //
-        system(QString("%1/bin/mtd -d").arg(GetInstallPrefix()));
-
-        //
-        //  but we need to wait a wee bit for the
-        //  socket to open up
-        //
-        usleep(200000);
-        m_triedMTD = true;
-    }
-
-    int a_port = gContext->GetNumSetting("MTDPort", 2442);
-    if(a_port > 0 && a_port < 65536)
-    {
-        m_clientSocket->connectToHost("localhost", a_port);
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, "dvdripbox.o: Can't get a reasonable port number");
-        Close();
-    }
+    m_clientSocket.connectToHost("localhost",
+            gContext->GetNumSetting("MTDPort", 2442));
 }
 
-void DVDRipBox::connectionError(int error_id)
+void DVDRipBox::OnConnectionError(QAbstractSocket::SocketError error_id)
 {
-    //
-    //  Close and recycle the socket object
-    //  (in case the user wants to try again)
-    //
-
-    createSocket();
     m_context = RIPSTATE_NOCONNECT;
-    //
-    //  Can't connect. User probably hasn't run mtd
-    //
-    if(error_id == Q3Socket::ErrConnectionRefused)
-    {
-        // *****
-        // Try to reconnect here
-        // *****
-        QString warning = tr("Cannot connect to your Myth "
-                             "Transcoding Daemon.");
-        m_warningText->SetText(warning);
-    }
-    else if(error_id == Q3Socket::ErrHostNotFound)
-    {
-        QString warning = tr("Attempting to connect to your "
-                             "mtd said host not found. "
-                             "Unable to recover.");
-        m_warningText->SetText(warning);
-    }
-    else if(error_id == Q3Socket::ErrSocketRead)
-    {
-        QString warning = tr("Socket communication errors. "
-                             "Unable to recover. ");
-        m_warningText->SetText(warning);
-    }
-    else
-    {
-        QString warning = tr("Unknown connection Error");
-        m_warningText->SetText(warning);
 
+    switch (error_id)
+    {
+        case QAbstractSocket::ConnectionRefusedError:
+        {
+            if (!m_triedMTDLaunch)
+            {
+                m_triedMTDLaunch = true;
+                LaunchMTD *tmp = LaunchMTD::Create();
+                connect(tmp, SIGNAL(SigLaunchAttemptComplete()),
+                        SLOT(OnMTDLaunchAttemptComplete()));
+
+                m_warningText->SetText(tr("Attempting to launch mtd..."));
+            }
+            else
+            {
+                m_warningText->SetText(tr("Cannot connect to your Myth "
+                                "Transcoding Daemon."));
+            }
+
+            break;
+        }
+        case QAbstractSocket::HostNotFoundError:
+        {
+            m_warningText->SetText(tr("Attempting to connect to your mtd said "
+                            "host not found. Unable to recover."));
+            break;
+        }
+        default:
+        {
+            m_warningText->SetText(tr("Unknown connection error."));
+            break;
+        }
     }
 }
 
 void DVDRipBox::connectionMade()
 {
-    //
-    //  All is well and good
-    //
-
     m_context = RIPSTATE_NOJOBS;
     m_connected = true;
     sendToServer("hello");
@@ -340,9 +298,10 @@ void DVDRipBox::connectionMade()
 
 void DVDRipBox::readFromServer()
 {
-    while(m_clientSocket->canReadLine())
+    while (m_clientSocket.canReadLine())
     {
-        QString line_from_server = QString::fromUtf8(m_clientSocket->readLine());
+        QString line_from_server =
+                QString::fromUtf8(m_clientSocket.readLine());
         line_from_server = line_from_server.replace( QRegExp("\n"), "" );
         line_from_server = line_from_server.replace( QRegExp("\r"), "" );
         line_from_server.simplified();
@@ -357,9 +316,9 @@ void DVDRipBox::readFromServer()
 
 void DVDRipBox::sendToServer(const QString &some_text)
 {
-    if(m_connected)
+    if (m_connected)
     {
-        QTextStream os(m_clientSocket);
+        QTextStream os(&m_clientSocket);
         os << some_text << "\n";
     }
     else
@@ -388,12 +347,12 @@ void DVDRipBox::parseTokens(QStringList tokens)
 
 void DVDRipBox::startStatusPolling()
 {
-    m_statusTimer->start(1000);
+    m_statusTimer.start(1000);
 }
 
 void DVDRipBox::stopStatusPolling()
 {
-    m_statusTimer->stop();
+    m_statusTimer.stop();
 }
 
 void DVDRipBox::pollStatus()
@@ -488,9 +447,8 @@ void DVDRipBox::showCurrentJob()
         an_int = (int) (a_job->getSubjob() * 1000);
         m_jobProgress->SetUsed(an_int);
 
-        m_numjobsText->SetText(QString(tr("Job %1 of %2"))
-                                    .arg(m_currentJob + 1)
-                                    .arg(m_jobCount));
+        m_numjobsText->SetText(tr("Job %1 of %2").arg(m_currentJob + 1)
+                .arg(m_jobCount));
     }
 }
 
@@ -541,7 +499,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
 
     if(m_context < RIPSTATE_HAVEJOBS)
     {
-        if((tokens[2] == "summary" &&
+        if ((tokens[2] == "summary" &&
            tokens[3].toInt() > 0) ||
            (tokens[2] == "job"))
         {
@@ -863,7 +821,7 @@ void DVDRipBox::goRipScreen()
     MythScreenStack *screenStack = GetScreenStack();
 
     TitleDialog *title_dialog = new TitleDialog(screenStack, "title dialog",
-                                                m_clientSocket,
+                                                &m_clientSocket,
                                                 m_dvdInfo->getName(),
                                                 m_dvdInfo->getTitles());
 
@@ -880,6 +838,11 @@ void DVDRipBox::ExitingRipScreen()
     showCurrentJob();
     m_warningText->SetText("");
     startStatusPolling();
+}
+
+void DVDRipBox::OnMTDLaunchAttemptComplete()
+{
+    connectToMtd();
 }
 
 void DVDRipBox::cancelJob()
@@ -908,3 +871,5 @@ void DVDRipBox::toggleCancel()
 {
     m_ignoreCancels = false;
 }
+
+#include "dvdripbox.moc"

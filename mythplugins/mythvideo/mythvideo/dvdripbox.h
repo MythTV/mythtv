@@ -3,12 +3,12 @@
 
 #include <QStringList>
 #include <QTimer>
+#include <QTcpSocket>
 
 #include <mythtv/libmythui/mythscreentype.h>
 
 #include "dvdinfo.h"
 
-class Q3Socket;
 class MythUIButton;
 class MythUIText;
 class MythUIProgressBar;
@@ -58,13 +58,13 @@ class DVDRipBox : public MythScreenType
 
     void connectToMtd();
 
-    enum RipState { RIPSTATE_UNKNOWN=0, RIPSTATE_NOCONNECT, RIPSTATE_NOJOBS,
-                   RIPSTATE_HAVEJOBS };
+    enum RipState { RIPSTATE_UNKNOWN = 0, RIPSTATE_NOCONNECT, RIPSTATE_NOJOBS,
+        RIPSTATE_HAVEJOBS };
 
-  public slots:
-    void connectionError(int error_id);
+  private slots:
+    void OnConnectionError(QAbstractSocket::SocketError error_id);
     void connectionMade();
-    void connectionClosed();
+    void OnMTDConnectionDisconnected();
     void readFromServer();
     void parseTokens(QStringList tokens);
     void sendToServer(const QString &some_text);
@@ -86,13 +86,14 @@ class DVDRipBox : public MythScreenType
     void toggleCancel();
     void ExitingRipScreen();
 
+    void OnMTDLaunchAttemptComplete();
+
   private:
     void Init();
-    void createSocket();
 
-    Q3Socket         *m_clientSocket;
-    QTimer           *m_statusTimer;
-    bool             m_triedMTD;
+    QTcpSocket       m_clientSocket;
+    QTimer           m_statusTimer;
+    bool             m_triedMTDLaunch;
     bool             m_connected;
     bool             m_firstRun;
     bool             m_haveDisc;

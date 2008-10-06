@@ -2,14 +2,15 @@
 #define VIDEODLG_H_
 
 #include <QPointer>
+#include <QStringList>
 
 #include <mythtv/libmythui/mythscreentype.h>
 
 #include "parentalcontrols.h"
 #include "videoutils.h"
 #include "quicksp.h"
+#include "videolist.h"
 
-class Q3NetworkOperation;
 class MythUIText;
 class MythUIButtonList;
 class MythUIButtonTree;
@@ -21,7 +22,6 @@ class MythDialogBox;
 class MythGenericTree;
 
 class Metadata;
-class VideoList;
 class VideoScanner;
 
 class VideoDialog : public MythScreenType
@@ -185,7 +185,7 @@ class VideoDialog : public MythScreenType
   private slots:
     // called during StartVideoPosterSet
     void OnPosterURL(QString uri, Metadata *metadata);
-    void OnPosterCopyFinished(Q3NetworkOperation *op, Metadata *metadata);
+    void OnPosterCopyFinished(bool error, QString errorMsg, Metadata *metadata);
     void OnPosterDownloadTimeout(QString url, Metadata *metadata);
 
     // called during StartVideoSearchByTitle

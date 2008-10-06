@@ -1,11 +1,12 @@
 #include <QApplication>
-
-#include <Q3NetworkOperation>
-
-#include <QStringList>
+#include <QTimer>
 #include <QList>
 #include <QFile>
 #include <QDir>
+#include <QProcess>
+#include <QHttp>
+#include <QBuffer>
+#include <QUrl>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/compat.h>
@@ -25,7 +26,6 @@
 #include "videoscan.h"
 #include "globals.h"
 #include "videofilter.h"
-#include "videolist.h"
 #include "editmetadata.h"
 #include "metadatalistmanager.h"
 #include "videopopups.h"
@@ -106,45 +106,80 @@ namespace
         QTimer m_timer;
     };
 
-    /** \class URLOperationProxy
-     *
-     * \brief Wrapper for Q3UrlOperator used to download the cover image.
-     *
-     */
-    class URLOperationProxy : public QObject
+    class CoverDownloadProxy : public QObject
     {
         Q_OBJECT
 
       signals:
-        void SigFinished(Q3NetworkOperation *op, Metadata *item);
+        void SigFinished(bool error, QString errorMsg, Metadata *item);
 
       public:
-        URLOperationProxy() : m_item(0)
+        CoverDownloadProxy() : m_item(0), m_id(0)
         {
-            connect(&m_url_op, SIGNAL(finished(Q3NetworkOperation *)),
-                    SLOT(OnFinished(Q3NetworkOperation *)));
+            connect(&m_http, SIGNAL(requestFinished(int, bool)),
+                    SLOT(OnFinished(int, bool)));
         }
 
-        void copy(QString uri, QString dest, Metadata *item)
+        void Copy(QString fromUri, QString dest, Metadata *item)
         {
+            m_dest_file = dest;
             m_item = item;
-            m_url_op.copy(uri, dest, false, false);
+            QUrl url(fromUri);
+            m_http.setHost(url.host());
+
+            m_id = m_http.get(fromUri, &m_data_buffer);
         }
 
-        void stop()
+        void Stop()
         {
-            m_url_op.stop();
+            VERBOSE(VB_GENERAL, tr("Cover download stopped."));
+            m_http.abort();
         }
 
       private slots:
-        void OnFinished(Q3NetworkOperation *op)
+        void OnFinished(int id, bool error)
         {
-            emit SigFinished(op, m_item);
+            QString errorMsg;
+            if (error)
+                errorMsg = m_http.errorString();
+
+            if (id == m_id)
+            {
+                if (!error)
+                {
+                    QFile dest_file(m_dest_file);
+                    if (dest_file.exists())
+                        dest_file.remove();
+
+                    if (dest_file.open(QIODevice::WriteOnly))
+                    {
+                        const QByteArray &data = m_data_buffer.data();
+                        qint64 size = dest_file.write(data);
+                        if (size != data.size())
+                        {
+                            errorMsg = tr("Error writing data to file %1.")
+                                    .arg(m_dest_file);
+                            error = true;
+                        }
+                    }
+                    else
+                    {
+                        errorMsg = tr("Error: file error '%1' for file %2").
+                                arg(dest_file.errorString()).arg(m_dest_file);
+                        error = true;
+                    }
+                }
+
+                emit SigFinished(error, errorMsg, m_item);
+            }
         }
 
       private:
         Metadata *m_item;
-        Q3UrlOperator m_url_op;
+        QHttp m_http;
+        QBuffer m_data_buffer;
+        QString m_dest_file;
+        int m_id;
     };
 
     /** \class ExecuteExternalCommand
@@ -162,53 +197,62 @@ namespace
             QObject(oparent), m_purpose(QObject::tr("Command"))
         {
 
-            connect(&m_process, SIGNAL(readyReadStdout()),
-                    SLOT(OnReadReadyStdout()));
-            connect(&m_process, SIGNAL(readyReadStderr()),
-                    SLOT(OnReadReadyStderr()));
-            connect(&m_process, SIGNAL(processExited()),
-                    SLOT(OnProcessExit()));
+            connect(&m_process, SIGNAL(readyReadStandardOutput()),
+                    SLOT(OnReadReadyStandardOutput()));
+            connect(&m_process, SIGNAL(readyReadStandardError()),
+                    SLOT(OnReadReadyStandardError()));
+            connect(&m_process, SIGNAL(finished(int, QProcess::ExitStatus)),
+                    SLOT(OnProcessFinished(int, QProcess::ExitStatus)));
+            connect(&m_process, SIGNAL(error(QProcess::ProcessError)),
+                    SLOT(OnProcessError(QProcess::ProcessError)));
         }
 
-        void StartRun(QString command, QStringList args, QString purpose)
+        void StartRun(QString command, QStringList extra_args, QString purpose)
         {
             m_purpose = purpose;
 
             // TODO: punting on spaces in path to command
-            QStringList split_args =
-                    command.split(' ', QString::SkipEmptyParts);
-            split_args += args;
+            QStringList args = command.split(' ', QString::SkipEmptyParts);
+            args += extra_args;
 
-            m_process.clearArguments();
-            m_process.setArguments(split_args);
-
-            VERBOSE(VB_GENERAL, QString("%1: Executing '%2'").arg(purpose)
-                    .arg(split_args.join(" ")));
-
-            m_raw_cmd = split_args[0];
-            QFileInfo fi(m_raw_cmd);
-
-            QString err_msg;
-
-            if (!fi.exists())
+            if (args.size())
             {
-                err_msg = QString("\"%1\" failed: does not exist")
-                        .arg(m_raw_cmd);
+                m_raw_cmd = args[0];
+                args.pop_front();
+
+                VERBOSE(VB_GENERAL, QString("%1: Executing \"'%2' %3\"")
+                        .arg(purpose).arg(m_raw_cmd).arg(args.join(" ")));
+
+                QFileInfo fi(m_raw_cmd);
+
+                QString err_msg;
+
+                if (!fi.exists())
+                {
+                    err_msg = QString("\"%1\" failed: does not exist")
+                            .arg(m_raw_cmd);
+                }
+                else if (!fi.isExecutable())
+                {
+                    err_msg = QString("\"%1\" failed: not executable")
+                            .arg(m_raw_cmd);
+                }
+
+                m_process.start(m_raw_cmd, args);
+                if (!m_process.waitForStarted())
+                {
+                    err_msg = QString("\"%1\" failed: Could not start process")
+                            .arg(m_raw_cmd);
+                }
+
+                if (err_msg.length())
+                {
+                    ShowError(err_msg);
+                }
             }
-            else if (!fi.isExecutable())
+            else
             {
-                err_msg = QString("\"%1\" failed: not executable")
-                        .arg(m_raw_cmd);
-            }
-            else if (!m_process.start())
-            {
-                err_msg = QString("\"%1\" failed: Could not start process")
-                        .arg(m_raw_cmd);
-            }
-
-            if (err_msg.length())
-            {
-                ShowError(err_msg);
+                ShowError(tr("No command to run."));
             }
         }
 
@@ -216,21 +260,23 @@ namespace
                 QStringList err) = 0;
 
       private slots:
-        void OnReadReadyStdout()
+        void OnReadReadyStandardOutput()
         {
-            QByteArray buf = m_process.readStdout();
+            QByteArray buf = m_process.readAllStandardOutput();
             m_std_out += QString::fromUtf8(buf.data(), buf.size());
         }
 
-        void OnReadReadyStderr()
+        void OnReadReadyStandardError()
         {
-            QByteArray buf = m_process.readStderr();
+            QByteArray buf = m_process.readAllStandardError();
             m_std_error += QString::fromUtf8(buf.data(), buf.size());
         }
 
-        void OnProcessExit()
+        void OnProcessFinished(int exitCode, QProcess::ExitStatus status)
         {
-            if (!m_process.normalExit())
+            (void) exitCode;
+
+            if (status != QProcess::NormalExit)
             {
                 ShowError(QString("\"%1\" failed: Process exited abnormally")
                             .arg(m_raw_cmd));
@@ -255,10 +301,17 @@ namespace
                     ++p;
             }
 
-            VERBOSE(VB_IMPORTANT, m_std_out);
+            VERBOSE(VB_GENERAL|VB_EXTRA, m_std_out);
 
-            OnExecDone(m_process.normalExit(), std_out,
+            OnExecDone(status == QProcess::NormalExit, std_out,
                     m_std_error.split("\n"));
+        }
+
+        void OnProcessError(QProcess::ProcessError error)
+        {
+            ShowError(QString("\"%1\" failed: Process error %2")
+                    .arg(m_raw_cmd).arg(error));
+            OnExecDone(false, m_std_out.split("\n"), m_std_error.split("\n"));
         }
 
       private:
@@ -283,7 +336,7 @@ namespace
       private:
         QString m_std_error;
         QString m_std_out;
-        Q3Process m_process;
+        QProcess m_process;
         QString m_purpose;
         QString m_raw_cmd;
     };
@@ -628,7 +681,7 @@ class VideoDialogPrivate
     }
 
   public:
-    URLOperationProxy m_url_operator;
+    CoverDownloadProxy m_download_proxy;
     TimeoutSignalProxy m_url_dl_timer;
     ParentalLevelNotifyContainer m_parentalLevel;
     bool m_switchingLayout;
@@ -643,7 +696,7 @@ class VideoDialogPrivate
 VideoDialog::VideoListDeathDelayPtr VideoDialogPrivate::m_savedPtr;
 
 VideoListDeathDelay::VideoListDeathDelay(VideoDialog::VideoListPtr toSave) :
-    m_savedList(toSave)
+    QObject(qApp), m_savedList(toSave)
 {
     QTimer::singleShot(3000, this, SLOT(OnTimeUp()));
 }
@@ -689,9 +742,9 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     connect(&m_private->m_url_dl_timer,
             SIGNAL(SigTimeout(QString, Metadata *)),
             SLOT(OnPosterDownloadTimeout(QString, Metadata *)));
-    connect(&m_private->m_url_operator,
-            SIGNAL(SigFinished(Q3NetworkOperation *, Metadata *)),
-            SLOT(OnPosterCopyFinished(Q3NetworkOperation *, Metadata *)));
+    connect(&m_private->m_download_proxy,
+            SIGNAL(SigFinished(bool, QString, Metadata *)),
+            SLOT(OnPosterCopyFinished(bool, QString, Metadata *)));
 }
 
 VideoDialog::~VideoDialog()
@@ -1864,9 +1917,9 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
             if (!dir.exists())
                 dir.mkdir(fileprefix);
 
-            Q3Url url(uri);
+            QUrl url(uri);
 
-            QString ext = QFileInfo(url.fileName()).extension(false);
+            QString ext = QFileInfo(url.path()).extension(false);
             QString dest_file = QString("%1/%2.%3").arg(fileprefix)
                     .arg(metadata->InetRef()).arg(ext);
             VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
@@ -1874,10 +1927,7 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
 
             metadata->setCoverFile(dest_file);
 
-            m_private->m_url_operator.copy(uri, QString("file:%1")
-                    .arg(dest_file), metadata);
-            VERBOSE(VB_IMPORTANT,
-                    QString("dest_file = %1").arg(dest_file));
+            m_private->m_download_proxy.Copy(uri, dest_file, metadata);
 
             const int nTimeout =
                     gContext->GetNumSetting("PosterDownloadTimeout", 30)
@@ -1894,62 +1944,16 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
         OnVideoPosterSetDone(metadata);
 }
 
-void VideoDialog::OnPosterCopyFinished(Q3NetworkOperation *op,
-                                        Metadata *item)
+void VideoDialog::OnPosterCopyFinished(bool error, QString errorMsg,
+        Metadata *item)
 {
     m_private->m_url_dl_timer.stop();
-    QString state, operation;
-    switch(op->operation())
-    {
-        case Q3NetworkProtocol::OpMkDir:
-            operation = "MkDir";
-            break;
-        case Q3NetworkProtocol::OpRemove:
-            operation = "Remove";
-            break;
-        case Q3NetworkProtocol::OpRename:
-            operation = "Rename";
-            break;
-        case Q3NetworkProtocol::OpGet:
-            operation = "Get";
-            break;
-        case Q3NetworkProtocol::OpPut:
-            operation = "Put";
-            break;
-        default:
-            operation = "Uknown";
-            break;
-    }
 
-    switch(op->state())
-    {
-        case Q3NetworkProtocol::StWaiting:
-            state = "The operation is in the QNetworkProtocol's queue "
-                    "waiting to be prcessed.";
-            break;
-        case Q3NetworkProtocol::StInProgress:
-            state = "The operation is being processed.";
-            break;
-        case Q3NetworkProtocol::StDone:
-            state = "The operation has been processed succesfully.";
-            break;
-        case Q3NetworkProtocol::StFailed:
-            state = "The operation has been processed but an error "
-                    "occurred.";
-            if (item)
-                item->setCoverFile("");
-            break;
-        case Q3NetworkProtocol::StStopped:
-            state = "The operation has been processed but has been stopped "
-                    "before it finished, and is waiting to be processed.";
-            break;
-        default:
-            state = "Unknown";
-            break;
-    }
+    if (error && item)
+        item->setCoverFile("");
 
-    VERBOSE(VB_IMPORTANT, QString("%1: %2: %3").arg(operation).arg(state)
-            .arg(op->protocolDetail()));
+    VERBOSE(VB_IMPORTANT, tr("Poster download finished: %1 %2")
+            .arg(errorMsg).arg(error));
 
     OnVideoPosterSetDone(item);
 }
@@ -1961,7 +1965,7 @@ void VideoDialog::OnPosterDownloadTimeout(QString url, Metadata *item)
     if (item)
         item->setCoverFile("");
 
-    m_private->m_url_operator.stop(); // results in OnPosterCopyFinished
+    m_private->m_download_proxy.Stop(); // results in OnPosterCopyFinished
 
     createOkDialog(tr("A poster exists for this item but could not be "
                         "retrieved within the timeout period.\n"));
