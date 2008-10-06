@@ -73,6 +73,7 @@ void MythUIText::SetText(const QString &text)
         return;
 
     m_Message = text.trimmed();
+    m_Message.replace(QRegExp("\\\\n"), "\n");
     m_CutMessage = "";
     SetRedraw();
 }
@@ -342,7 +343,7 @@ bool MythUIText::ParseElement(QDomElement &element)
             m_Message = getFirstText(element);
         }
 
-        m_Message = m_Message.trimmed();
+        SetText(m_Message);
         m_DefaultMessage = m_Message;
     }
     else if (element.tagName() == "cutdown")
