@@ -635,7 +635,7 @@ class VideoDialogPrivate
     };
 
   public:
-    VideoDialogPrivate() : m_switchingLayout(false)
+    VideoDialogPrivate() : m_switchingLayout(false), m_firstLoadPass(true)
     {
         if (gContext->GetNumSetting("mythvideo.ParentalLevelFromRating", 0))
         {
@@ -687,6 +687,8 @@ class VideoDialogPrivate
     bool m_switchingLayout;
 
     static VideoDialog::VideoListDeathDelayPtr m_savedPtr;
+
+    bool m_firstLoadPass;
 
   private:
     parental_level_map m_rating_to_pl;
@@ -848,14 +850,6 @@ bool VideoDialog::Create()
         SetFocusWidget(m_videoButtonTree);
         m_videoButtonTree->SetActive(true);
 
-        if (m_rememberPosition)
-        {
-            QStringList route =
-                    gContext->GetSetting("mythvideo.VideoTreeLastActive", "")
-                    .split("\n");
-            m_videoButtonTree->SetNodeByString(route);
-        }
-
         connect(m_videoButtonTree, SIGNAL(itemClicked(MythUIButtonListItem *)),
                 SLOT(handleSelect(MythUIButtonListItem *)));
         connect(m_videoButtonTree, SIGNAL(itemSelected(MythUIButtonListItem *)),
@@ -907,6 +901,18 @@ void VideoDialog::loadData()
     if (m_type == DLG_TREE)
     {
         m_videoButtonTree->AssignTree(m_rootNode);
+        if (m_private->m_firstLoadPass)
+        {
+            m_private->m_firstLoadPass = false;
+
+            if (m_rememberPosition)
+            {
+                QStringList route =
+                        gContext->GetSetting("mythvideo.VideoTreeLastActive",
+                                "").split("\n");
+                m_videoButtonTree->SetNodeByString(route);
+            }
+        }
     }
     else
     {
