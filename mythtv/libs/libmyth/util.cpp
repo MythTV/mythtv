@@ -69,8 +69,8 @@ QDateTime mythCurrentDateTime()
 
 int calc_utc_offset(void)
 {
-    QDateTime loc = QDateTime::currentDateTime(Qt::LocalTime);
-    QDateTime utc = QDateTime::currentDateTime(Qt::UTC);
+    QDateTime loc = QDateTime::currentDateTime();
+    QDateTime utc = QDateTime::currentDateTime().toUTC();
 
     int utc_offset = MythSecsTo(utc, loc);
 
@@ -717,7 +717,7 @@ long long copy(QFile &dst, QFile &src, uint block_size)
     while (ok)
     {
         long long rlen, wlen, off = 0;
-        rlen = src.readBlock(buf, buflen);
+        rlen = src.read(buf, buflen);
         if (rlen<0)
         {
             VERBOSE(VB_IMPORTANT, "util.cpp:copy: read error");
@@ -731,7 +731,7 @@ long long copy(QFile &dst, QFile &src, uint block_size)
 
         while ((rlen-off>0) && ok)
         {
-            wlen = dst.writeBlock(buf + off, rlen - off);
+            wlen = dst.write(buf + off, rlen - off);
             if (wlen>=0)
                 off+= wlen;
             if (wlen<0)
@@ -816,17 +816,19 @@ double MythGetPixelAspectRatio(void)
  */
 QString getResponse(const QString &query, const QString &def)
 {
-    cout << (const char *)query;
+    QByteArray tmp_query = query.toLatin1();
+    cout << tmp_query.constData();
 
+    QByteArray tmp_def = def.toLatin1();
     if (def != "")
-        cout << " [" << (const char *)def << "]  ";
+        cout << " [" << tmp_def.constData() << "]  ";
     else
         cout << "  ";
 
     if (!isatty(fileno(stdin)) || !isatty(fileno(stdout)))
     {
         cout << endl << "[console is not interactive, using default '"
-             << (const char *)def  << "']" << endl;
+             <<  tmp_def.constData() << "']" << endl;
         return def;
     }
 
