@@ -32,7 +32,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
            : MythUIType(parent, name),
              m_Justification(Qt::AlignLeft | Qt::AlignTop),
              m_OrigDisplayRect(displayRect), m_AltDisplayRect(altDisplayRect),
-             m_drawRect(displayRect),        m_Message(text),
+             m_drawRect(displayRect),        m_Message(text.trimmed()),
              m_CutMessage(""),               m_DefaultMessage(text),
              m_Cutdown(true),                m_Font(new MythFontProperties()),
              m_colorCycling(false),          m_startColor(),
@@ -72,7 +72,7 @@ void MythUIText::SetText(const QString &text)
     if (text == m_Message)
         return;
 
-    m_Message = text;
+    m_Message = text.trimmed();
     m_CutMessage = "";
     SetRedraw();
 }
@@ -342,6 +342,7 @@ bool MythUIText::ParseElement(QDomElement &element)
             m_Message = getFirstText(element);
         }
 
+        m_Message = m_Message.trimmed();
         m_DefaultMessage = m_Message;
     }
     else if (element.tagName() == "cutdown")
