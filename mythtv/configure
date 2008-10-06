@@ -1140,26 +1140,26 @@ if test -f /proc/cpuinfo ; then
 fi
 
 # Mac OS X equivalent
-if test -f /usr/bin/hostinfo ; then 
+if test -f /usr/bin/hostinfo ; then
     if test x"$processor" = x"" -o x"$processor" = x"$arch_raw" -o \
-            x"$processor" = x"unknown" -o x"$processor" = x"powerpc" ; then 
-        processor=`/usr/bin/hostinfo | grep "Processor type:"` 
-        processor=${processor#Processor type: *} 
-        processor=${processor% (*} 
+            x"$processor" = x"unknown" -o x"$processor" = x"powerpc" ; then
+        processor=`/usr/bin/hostinfo | grep "Processor type:"`
+        processor=${processor#Processor type: *}
+        processor=${processor% (*}
         if test x"`echo $processor | cut -c1-3`" = x"ppc" ; then
-            tune=$processor 
-        else 
+            tune=$processor
+        else
             # 10.4 only:
             processor=`/usr/sbin/sysctl -n machdep.cpu.model_string 2>/dev/null`
             if test x"$processor" = x"" ; then
                 # On 10.5, this contains the type of CPU also:
                 processor=`/usr/sbin/sysctl -n machdep.cpu.brand_string`
             fi
-            processor_flags=`/usr/sbin/sysctl -n machdep.cpu.features` 
-            processor_flags=`echo $processor_flags | tr "[A-Z]" "[a-z]"` 
-        fi 
-    fi 
-fi 
+            processor_flags=`/usr/sbin/sysctl -n machdep.cpu.features`
+            processor_flags=`echo $processor_flags | tr "[A-Z]" "[a-z]"`
+        fi
+    fi
+fi
 
 # OS
 targetos=$(tolower $(uname -s))
@@ -1200,7 +1200,7 @@ enable xvmc
 enable xvmc_vld
 enable xvmcw
 
-# mythtv paths 
+# mythtv paths
 dvb_path="/usr/include"
 x11_include_path="/usr/X11R6/include"
 xvmc_lib=""
@@ -1633,7 +1633,7 @@ case $targetos in
         disable mmx
         echo "You have a broken ld. Playback of HD videos may be very poor"
         echo "See http://svn.mythtv.org/trac/ticket/4200 for intelleopardmmx.patch"
-    fi 
+    fi
     disable opengl_video
     disable opengl_vsync
     enable  proc_opt
@@ -2056,11 +2056,11 @@ enabled armv5te && check_asm armv5te '"qadd r0, r0, r0"'
 enabled armv6   && check_asm armv6   '"sadd16 r0, r0, r0"'
 enabled iwmmxt  && check_asm iwmmxt  '"wunpckelub wr6, wr4"'
 enabled mmi     && check_asm mmi     '"lq $2, 0($2)"'
-enabled vis     && 
+enabled vis     &&
                   (check_asm vis     '"pdist %f0, %f0, %f0"' -mtune=ultrasparc ||
                    check_asm vis     '"pdist %f0, %f0, %f0"' -mcpu=ultrasparc)
 
-# if no tune setting and we know cpu class look at $processor 
+# if no tune setting and we know cpu class look at $processor
 if disabled cpu_override && enabled proc_opt; then
 # first try to tune based on processor info
 # EM64T era Intel Xeon
@@ -2100,8 +2100,8 @@ if disabled cpu_override && enabled proc_opt; then
        ARCHFLAGS="-march=pentium4"
        enable small
 # P6, which includes Intel Core
-   elif expr "$processor" : ".*Intel P6 Family" > /dev/null ; then 
-       ARCHFLAGS="-march=pentium4" 
+   elif expr "$processor" : ".*Intel P6 Family" > /dev/null ; then
+       ARCHFLAGS="-march=pentium4"
 # P3
    elif expr "$processor" : "pentium3" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
@@ -2144,7 +2144,7 @@ if disabled cpu_override && enabled proc_opt; then
    elif expr "$processor" : ".*AMD Athlon(tm) 64" > /dev/null ; then
        ARCHFLAGS="-march=k8"
 # AMD Opteron
-   elif expr "$processor" : ".*AMD Opteron(tm)" >/dev/null ; then 
+   elif expr "$processor" : ".*AMD Opteron(tm)" >/dev/null ; then
        ARCHFLAGS="-march=k8"
 # Athlon XP
    elif expr "$processor" : "athlon-xp" > /dev/null ; then
@@ -2783,13 +2783,13 @@ fi
 
 # Ubuntu Dapper installs NVIDIA GL headers to a weird location in order
 # not to overwrite the headers installed from Mesa, etc. We need to
-# add that path to include paths if that's the case. 
-if test -d /usr/share/doc/nvidia-glx-dev/include; then 
+# add that path to include paths if that's the case.
+if test -d /usr/share/doc/nvidia-glx-dev/include; then
     CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH /usr/share/doc/nvidia-glx-dev/include"
 fi
 
 # Same for Debian Sid.
-if test -d /usr/share/nvidia/include/GL; then 
+if test -d /usr/share/nvidia/include/GL; then
     CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH /usr/share/nvidia/include"
 fi
 
@@ -3260,7 +3260,7 @@ enabled asmalign_pot &&
 for opt in $MYTHTV_CONFIG_LIST $USING_LIST; do
     enabled $opt && append CCONFIG "using_$opt"
 done
-  
+
 enabled threads && append CCONFIG "using_ffmpeg_threads"
 
 
@@ -3459,7 +3459,7 @@ if [ ! -e config ] ; then
 fi
 cat - > config/Makefile <<END
 
-all:	
+all:
 qmake_all:
 	\$(NONE)
 
@@ -3476,7 +3476,7 @@ uninstall:
 	-rmdir \$(INSTALL_ROOT)/$PREFIX/share/mythtv
 
 distclean: clean
-	-rm -f ../$MYTH_CONFIG_MAK  ../config.mak 
+	-rm -f ../$MYTH_CONFIG_MAK  ../config.mak
 	-rm -f ../$MYTH_CONFIG_H    ../config.h
 	-rm -f ../Makefile          ../config.err
 
