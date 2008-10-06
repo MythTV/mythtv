@@ -41,7 +41,11 @@ typedef enum {
     MARK_GOP_START = 6,
     MARK_KEYFRAME = 7,
     MARK_SCENE_CHANGE = 8,
-    MARK_GOP_BYFRAME = 9
+    MARK_GOP_BYFRAME = 9,
+    MARK_ASPECT_1_1 = 10,
+    MARK_ASPECT_4_3 = 11,
+    MARK_ASPECT_16_9 = 12,
+    MARK_ASPECT_21_1_1 = 13
 } MarkTypes;
 MPUBLIC QString toString(MarkTypes type);
 
@@ -307,6 +311,9 @@ class MPUBLIC ProgramInfo
     void SetPositionMapDBReplacement(PMapDBReplacement *pmap)
         { positionMapDBReplacement = pmap; }
 
+    // Aspect Ratio map
+    void SetAspectChange(MarkTypes type, long long frame);
+
     // GUI stuff
     void showDetails(void) const;
     void EditRecording(void);
@@ -418,6 +425,8 @@ class MPUBLIC ProgramInfo
     QString inUseForWhat;
     PMapDBReplacement *positionMapDBReplacement;
 };
+
+Q_DECLARE_METATYPE(ProgramInfo*)
 
 class MPUBLIC ProgramDetail
 {

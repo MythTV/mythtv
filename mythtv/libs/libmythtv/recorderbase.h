@@ -212,6 +212,14 @@ class MPUBLIC RecorderBase
      */
     void SavePositionMap(bool force = false);
 
+    enum AspectRatio {
+        ASPECT_UNKNOWN       = 0x00,
+        ASPECT_1_1           = 0x01,
+        ASPECT_4_3           = 0x02,
+        ASPECT_16_9          = 0x03,
+        ASPECT_21_1_1         = 0x04
+    };
+
   protected:
     /** \brief Convenience function used to set integer options from a profile.
      *  \sa SetOption(const QString&, int)
@@ -231,6 +239,10 @@ class MPUBLIC RecorderBase
      */
     void SetPositionMapType(int type) { positionMapType = type; }
 
+    /** \brief Note a change in aspect ratio in the recordedmark table
+     */
+    void AspectChange(AspectRatio ratio, long long frame);
+
     TVRec         *tvrec;
     RingBuffer    *ringBuffer;
     bool           weMadeBuffer;
@@ -244,6 +256,8 @@ class MPUBLIC RecorderBase
     bool           ntsc;
     bool           ntsc_framerate;
     double         video_frame_rate;
+
+    uint           m_videoAspect; // AspectRatio
 
     ProgramInfo   *curRecording;
 
@@ -263,6 +277,7 @@ class MPUBLIC RecorderBase
     QMutex                     positionMapLock;
     QMap<long long, long long> positionMap;
     QMap<long long, long long> positionMapDelta;
+
 };
 
 #endif

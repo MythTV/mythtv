@@ -2945,6 +2945,32 @@ void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
     }
 }
 
+/**
+ *  \brief Store a change in aspect ratio in the recordedmark table
+ */
+void ProgramInfo::SetAspectChange(MarkTypes type, long long frame)
+{
+    if (isVideo)
+        return;
+
+    VERBOSE(VB_GENERAL, QString("Set Aspect Change: %1").arg((int)type));
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("INSERT INTO recordedmarkup"
+                    " (chanid, starttime, mark, type)"
+                    " VALUES"
+                    " ( :CHANID , :STARTTIME , :MARK , :TYPE );");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+
+    query.bindValue(":MARK", frame);
+    query.bindValue(":TYPE", type);
+
+    if (!query.exec() || !query.isActive())
+        MythDB::DBError("aspect ratio change insert", query);
+}
+
 /** \fn ProgramInfo::ReactivateRecording(void)
  *  \brief Asks the scheduler to restart this recording if possible.
  */

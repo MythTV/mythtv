@@ -5,8 +5,8 @@ using namespace std;
 #include "tv_rec.h"
 #include "libmythdb/mythverbose.h"
 #include "RingBuffer.h"
-#include "programinfo.h"
 #include "recordingprofile.h"
+#include "programinfo.h"
 #include "util.h"
 
 #define TVREC_CARDNUM \
@@ -23,7 +23,7 @@ RecorderBase::RecorderBase(TVRec *rec)
     : tvrec(rec), ringBuffer(NULL), weMadeBuffer(true), videocodec("rtjpeg"),
       audiodevice("/dev/dsp"), videodevice("/dev/video"), vbidevice("/dev/vbi"),
       vbimode(0), ntsc(true), ntsc_framerate(true), video_frame_rate(29.97),
-      curRecording(NULL), request_pause(false), paused(false),
+      m_videoAspect(0), curRecording(NULL), request_pause(false), paused(false),
       nextRingBuffer(NULL), nextRecording(NULL),
       positionMapType(MARK_GOP_BYFRAME), positionMapLock(false)
 {
@@ -237,6 +237,9 @@ void RecorderBase::CheckForRingBufferSwitch(void)
 
     if (rb_changed && tvrec)
         tvrec->RingBufferChanged(ringBuffer, curRecording);
+
+    if (rb_changed)
+        m_videoAspect = 0;
 }
 
 /** \fn RecorderBase::SavePositionMap(bool)
@@ -272,6 +275,31 @@ void RecorderBase::SavePositionMap(bool force)
     }
     else
         positionMapLock.unlock();
+}
+
+void RecorderBase::AspectChange(AspectRatio aspect, long long frame)
+{
+    MarkTypes mark;
+    switch (aspect)
+    {
+        case ASPECT_1_1 :
+            mark = MARK_ASPECT_1_1;
+            break;
+        case ASPECT_4_3 :
+            mark = MARK_ASPECT_4_3;
+            break;
+        case ASPECT_16_9 :
+            mark = MARK_ASPECT_16_9;
+            break;
+        case ASPECT_21_1_1 :
+            mark = MARK_ASPECT_21_1_1;
+            break;
+        default :
+            mark = MARK_ASPECT_4_3;
+    }
+
+    if (curRecording)
+        curRecording->SetAspectChange(mark, frame);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

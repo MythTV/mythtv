@@ -1,6 +1,6 @@
 /**
  *  DTVRecorder -- base class for Digital Televison recorders
- *  Copyright 2003-2004 by Brandon Beattie, Doug Larrick, 
+ *  Copyright 2003-2004 by Brandon Beattie, Doug Larrick,
  *    Jason Hoos, and Daniel Thor Kristjansson
  *  Distributed as part of MythTV under GPL v2 and later.
  */
@@ -30,7 +30,7 @@ const uint DTVRecorder::kMaxKeyFrameDistance = 80;
         HDHRRecoreder, IPTVRecorder
  */
 
-DTVRecorder::DTVRecorder(TVRec *rec) : 
+DTVRecorder::DTVRecorder(TVRec *rec) :
     RecorderBase(rec),
     // file handle for stream
     _stream_fd(-1),
@@ -102,7 +102,7 @@ void DTVRecorder::SetOption(const QString &name, int value)
             _buffer_size = newsize;
         }
         else
-            VERBOSE(VB_IMPORTANT, LOC_ERR + 
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Could not allocate new packet buffer.");
     }
 }
@@ -129,10 +129,10 @@ void DTVRecorder::FinishRecording(void)
             curRecording->SetFilesize(ringBuffer->GetRealFileSize());
         SavePositionMap(true);
     }
-    positionMapLock.lock();
-    positionMap.clear();
-    positionMapDelta.clear();
-    positionMapLock.unlock();
+//     positionMapLock.lock();
+//     positionMap.clear();
+//     positionMapDelta.clear();
+//     positionMapLock.unlock();
 }
 
 // documented in recorderbase.h
@@ -222,7 +222,7 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
  *   The picture start code 0x00000100, the GOP code 0x000001B8,
  *   and the sequence start code 0x000001B3. The GOP code is
  *   prefered, but is only required of MPEG1 streams, the
- *   sequence start code is a decent fallback for MPEG2 
+ *   sequence start code is a decent fallback for MPEG2
  *   streams, and if all else fails we just look for the picture
  *   start codes and call every 16th frame a keyframe.
  *
@@ -261,6 +261,8 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     bool hasFrame     = false;
     bool hasKeyFrame  = false;
 
+    uint aspectRatio;
+
     // Scan for PES header codes; specifically picture_start
     // sequence_start (SEQ) and group_start (GOP).
     //   00 00 01 00: picture_start_code
@@ -289,6 +291,10 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
             {
                 _last_seq_seen  = _frames_seen_count;
                 hasKeyFrame    |= (_last_gop_seen + maxKFD)<_frames_seen_count;
+
+                // Look for aspectRatio changes and store them in the database
+                aspectRatio = (bufptr[3] >> 4);
+                //int frameRate = (bufptr[3] & 0x0000000f);
             }
         }
     }
@@ -315,6 +321,12 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
         _frames_seen_count++;
         if (!_wait_for_keyframe_option || _first_keyframe>=0)
             _frames_written_count++;
+    }
+
+    if ((aspectRatio > 0) && (aspectRatio != m_videoAspect))
+    {
+        m_videoAspect = aspectRatio;
+        AspectChange((AspectRatio)aspectRatio, _frames_written_count);
     }
 
     return hasKeyFrame || (_payload_buffer.size() >= (188*50));
@@ -477,8 +489,8 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
             }
 
             // must find the PES start code
-            if (tspacket->data()[i++] != 0x00 || 
-                tspacket->data()[i++] != 0x00 || 
+            if (tspacket->data()[i++] != 0x00 ||
+                tspacket->data()[i++] != 0x00 ||
                 tspacket->data()[i++] != 0x01)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
