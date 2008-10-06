@@ -107,10 +107,10 @@ bool MythUIStateType::DisplayState(const QString &name)
     {
         if (m_ShowEmpty || m_CurrentState != NULL)
         {
-            if (m_CurrentState)
-                m_CurrentState->SetVisible(true);
             if (old)
                 old->SetVisible(false);
+            if (m_CurrentState)
+                m_CurrentState->SetVisible(true);
         }
     }
 
@@ -180,6 +180,9 @@ void MythUIStateType::Clear()
 
 void MythUIStateType::Reset()
 {
+    if (m_CurrentState)
+        m_CurrentState->SetVisible(false);
+    m_CurrentState = NULL;
     MythUIType::Reset();
 }
 
