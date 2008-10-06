@@ -341,6 +341,8 @@ bool MythUIText::ParseElement(QDomElement &element)
         {
             m_Message = getFirstText(element);
         }
+
+        m_DefaultMessage = m_Message;
     }
     else if (element.tagName() == "cutdown")
     {
