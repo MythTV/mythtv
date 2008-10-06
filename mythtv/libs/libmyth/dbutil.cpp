@@ -617,7 +617,7 @@ bool DBUtil::ParseDBMSVersion()
     int version[3] = {-1, -1, -1};
     QRegExp digits("(\\d+)");
 
-    while ((i < 3) && ((pos = digits.search(m_versionString, pos)) > -1))
+    while ((i < 3) && ((pos = digits.indexIn(m_versionString, pos)) > -1))
     {
         section = digits.cap(1);
         pos += digits.matchedLength();
