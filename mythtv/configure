@@ -715,11 +715,11 @@ x86_mmx_cpus="$x86_mmx_cpus,c3,c3-2,k6,k6-2,k6-3"
 
 x86_cpus="i386,i486,i586,i686,pentium,pentiumpro,${x86_mmx_cpus}"
 
-x86_64_cpus="x86-64,athlon64,k8,opteron,athlon-fx,nocona,core2"
+x86_64_cpus="x86-64,athlon64,k8,opteron,barcelona,athlon-fx,nocona,core2"
 
-x86_slow_cmov_cpus="pentium4,pentium4m,prescott,nocona,core2"
+x86_slow_cmov_cpus="pentium4,pentium4m,prescott,nocona"
 
-x86_cmov_cpus="i686,pentiumpro,pentium2,pentium3,pentium3m,pentium-m,"
+x86_cmov_cpus="i686,pentiumpro,pentium2,pentium3,pentium3m,pentium-m,core2,"
 x86_cmov_cpus="$x86_cmov_cpus,athlon,athlon-xp,athlon-tbird,athlon-4,"
 x86_cmov_cpus="$x86_cmov_cpus,athlon-mp,c3-2,$x86_slow_cmov_cpus"
 
@@ -1126,7 +1126,6 @@ fi
 arch=`uname -m`
 arch_raw="$arch"
 cpu="generic"
-disable cpu_override
 processor=`uname -p 2>/dev/null`
 processor_flags=""
 tune="generic"
@@ -1264,10 +1263,6 @@ enable $ARCH_EXT_LIST
 # disable unneeded ffmpeg parts
 disable "bktr_demuxer v4l_demuxer v4l2_demuxer x11_grab_device_demuxer"
 
-# set cmov and mmx to default for our autodetection
-cmov="default"
-mmx="default"
-
 die_unknown(){
     echo "Unknown option \"$1\"."
     echo "See $0 --help for available options."
@@ -1354,7 +1349,6 @@ for opt do
   ;;
   --cpu=*) cpu="$optval" && enable cpu_override
   ;;
-
   --tune=*)
           tune="$optval"
   ;;
@@ -1487,7 +1481,7 @@ is_x86_64_cpu "$arch" && arch="x86_64"
 case "$arch" in
   x86_32)
     arch="x86_32"
-    disabled cpu_override && ARCHFLAGS="-march=pentiumpro"
+    ! enabled cpu_override && ARCHFLAGS="-march=pentiumpro"
     enable fast_unaligned
   ;;
   x86_64|amd64)
@@ -1497,11 +1491,11 @@ case "$arch" in
     if [ x"$canon_arch" = x"x86_64" -o x"$canon_arch" = x"amd64" ]; then
       if [ -z "`echo $CFLAGS | grep -- -m32`"  ]; then
         arch="x86_64"
-        disabled cpu_override && ARCHFLAGS="-march=k8"
+        ! enabled cpu_override && ARCHFLAGS="-march=k8"
         enable fast_64bit
       fi
     fi
-    cmov="yes"
+    enable cmov
   ;;
   # armv4l is a subset of armv[567]*l
   arm|armv[4567]*l)
@@ -1523,7 +1517,7 @@ case "$arch" in
   ;;
   sun4u|sparc64)
     arch="sparc64"
-    disabled cpu_override && check_mtune_mcpu "ultrasparc" "-mvis"
+    ! enabled cpu_override && check_mtune_mcpu "ultrasparc" "-mvis"
     enable fast_64bit
   ;;
   sparc)
@@ -1838,27 +1832,24 @@ fi
 check_deps $ARCH_EXT_LIST
 
 # compute mmx state
-if test x"$mmx" = x"default"; then
-    mmx="no"
+if ! disabled mmx ; then
     if test x"$arch" = x"x86_64"; then
-        mmx="yes"
+        enable mmx
     elif enabled cpu_override; then
-        is_x86_mmx "$cpu" && mmx="yes"
+        is_x86_mmx "$cpu" && enable mmx
     else
-        is_x86_mmx "$arch_raw" && mmx="yes"
+        is_x86_mmx "$arch_raw" && enable mmx
     fi
 
     # if !arch && !tune && !cpu & processor_flags, then...
-    if disabled cpu_override && test x"$processor_flags" != x"" ; then
-        mmx="no"
+    if ! disabled mmx && ! enabled cpu_override && test x"$processor_flags" != x"" ; then
         if expr "$processor_flags" : ".*mmx" > /dev/null ; then
-            mmx="yes"
+            enable mmx
         fi
     fi
 fi
 
-if test x"$cmov" = x"default"; then
-    disable cmov
+if ! disabled cmov ; then
     if enabled cpu_override; then
         is_x86_cmov_cpu "$cpu" && enable cmov
         disabled cmov || is_x86_slow_cmov_cpu "$cpu" || enable fast_cmov
@@ -1868,7 +1859,7 @@ if test x"$cmov" = x"default"; then
 fi
 
 # use different default ARCHFLAGS for CPU missing cmov (Via C3 ...)
-if test x"$arch" = x"x86_32" && disabled cmov && disabled cpu_override; then
+if test x"$arch" = x"x86_32" && disabled cmov && ! enabled cpu_override; then
     ARCHFLAGS="-march=i586"
 fi
 
@@ -2061,7 +2052,7 @@ enabled vis     &&
                    check_asm vis     '"pdist %f0, %f0, %f0"' -mcpu=ultrasparc)
 
 # if no tune setting and we know cpu class look at $processor
-if disabled cpu_override && enabled proc_opt; then
+if ! enabled cpu_override && enabled proc_opt; then
 # first try to tune based on processor info
 # EM64T era Intel Xeon
    if expr "$processor" : ".*Intel(R) Xeon(R) CPU.*5110" > /dev/null ; then
@@ -3117,9 +3108,6 @@ BLOCK_QUOTE
 if enabled bigendian; then
   echo "WORDS_BIGENDIAN=yes" >> $MYTH_CONFIG_MAK
   echo "#define WORDS_BIGENDIAN 1" >> $TMPH
-fi
-if enabled mmx; then
-  echo "#define __CPU__ 586" >> $TMPH
 fi
 
 if enabled cpuclipspositive; then
