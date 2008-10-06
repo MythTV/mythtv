@@ -1064,12 +1064,12 @@ else
     TMPDIR1="/tmp"
 fi
 
-TMPC="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.c"
-TMPCXX="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.cpp"
-TMPO="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.o"
-TMPE="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}"
-TMPS="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.S"
-TMPH="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.h"
+TMPC="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.c"
+TMPCXX="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.cpp"
+TMPO="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.o"
+TMPE="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}"
+TMPS="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.S"
+TMPH="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.h"
 
 # default parameters
 enable logging
@@ -3497,7 +3497,7 @@ distclean: clean
 END
 
 rm -f $TMPO $TMPC $TMPE $TMPS $TMPH
-
+rm -f $TMPCXX
 
 $qmake QMAKE=$(which $qmake) mythtv.pro
 
