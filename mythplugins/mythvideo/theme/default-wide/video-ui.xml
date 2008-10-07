@@ -283,22 +283,6 @@
             </statetype>
         </buttonlist>
 
-        <textarea name="keyslbl_one" from="basetextarea">
-            <area>15,560,200,30</area>
-            <value>SELECT: Edit</value>
-        </textarea>
-
-        <textarea name="keyslbl_two" from="basetextarea">
-            <area>280,560,240,30</area>
-            <align>hcenter,vcenter</align>
-        </textarea>
-
-        <textarea name="keyslbl_three" from="basetextarea">
-            <area>580,560,200,30</area>
-            <value>INFO - Action Menu</value>
-            <align>right,vcenter</align>
-        </textarea>
-
     </window>
 
     <window name="browser">
