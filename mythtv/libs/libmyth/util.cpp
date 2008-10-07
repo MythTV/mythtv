@@ -443,7 +443,7 @@ bool checkTimeZone(void)
         {
             VERBOSE(VB_IMPORTANT,
                     QString("Warning! Time difference between the master "
-                            "backend and this system is %d seconds.")
+                            "backend and this system is %1 seconds.")
                     .arg(timediff));
         }
     }
