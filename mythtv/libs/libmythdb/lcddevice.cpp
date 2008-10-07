@@ -303,7 +303,7 @@ void LCD::readyRead(MythSocket *sock)
     else if (aList[0] == "HUH?")
     {
         VERBOSE(VB_IMPORTANT, LOC + "WARNING: Something is getting passed"
-                        "to LCDServer that it doesn't understand");
+                        "to LCDServer that it does not understand");
         VERBOSE(VB_IMPORTANT, QString(LOC + "last command: %1").arg( last_command ));
     }
     else if (aList[0] == "KEY")

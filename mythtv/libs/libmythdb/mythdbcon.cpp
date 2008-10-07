@@ -469,11 +469,11 @@ void MSqlQuery::bindValue (const QString  & placeholder,
     // XXX - HACK BEGIN
     QMutexLocker lock(&prepareLock);
 
-    // qt4 doesn't like to bind values without occurance in the prepared query
+    // qt4 doesn't like to bind values without occurrence in the prepared query
     if (!m_last_prepared_query.contains(placeholder))
     {
         VERBOSE(VB_IMPORTANT, "Trying to bind a value to placeholder "
-                + placeholder + " without occurance in the prepared query."
+                + placeholder + " without occurrence in the prepared query."
                 " Ignoring it.\nQuery was: \"" + m_last_prepared_query + "\"");
         return;
     }
