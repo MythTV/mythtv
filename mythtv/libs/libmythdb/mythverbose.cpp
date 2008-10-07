@@ -40,7 +40,7 @@ int parse_verbose_arg(QString arg)
             {
                 QString m_verbose = verboseString;
                 m_verbose.replace(QRegExp(" "), ",");
-                m_verbose.replace(QRegExp("^,"), "");
+                m_verbose.remove(QRegExp("^,"));
                 qDebug() <<
                   "Verbose debug levels.\n" <<
                   "Accepts any combination (separated by comma) of:\n\n" <<
