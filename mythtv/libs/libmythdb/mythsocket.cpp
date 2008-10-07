@@ -678,7 +678,7 @@ void MythSocketThread::StartReadyReadThread(void)
         if (m_readyread_run == false)
         {
 #ifdef USING_MINGW
-            readyreadevent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+            readyreadevent = ::CreateEvent(NULL, false, false, NULL);
             assert(readyreadevent);
 #else
             int ret = pipe(m_readyread_pipe);
@@ -816,7 +816,7 @@ void MythSocketThread::run(void)
             if (sock->state() == MythSocket::Connected
                 && !sock->m_notifyread && !isLocked(sock->m_lock))
             {
-                HANDLE hEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+                HANDLE hEvent = ::CreateEvent(NULL, false, false, NULL);
                 if (!hEvent)
                 {
                     VERBOSE(VB_IMPORTANT, "MythSocket: CreateEvent failed");
@@ -843,7 +843,7 @@ void MythSocketThread::run(void)
         }
 
         hEvents[n++] = readyreadevent;
-        int rval = ::WaitForMultipleObjects(n, hEvents, FALSE, INFINITE);
+        int rval = ::WaitForMultipleObjects(n, hEvents, false, INFINITE);
 
         for (int i = 0; i < (n - 1); i++)
             ::CloseHandle(hEvents[i]);
