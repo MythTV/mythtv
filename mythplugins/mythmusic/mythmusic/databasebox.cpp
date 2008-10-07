@@ -547,18 +547,20 @@ void DatabaseBox::fillCD(void)
 
         //  reflect selections in cd playlist
 
-        Q3PtrListIterator<GenericTree> it = cditem->getFirstChildIterator();
-        UIListGenericTree *uit;
-
-        while ((uit = (UIListGenericTree *)it.current()))
+        GenericTree::iterator it;
+        for (it = cditem->begin(); it != cditem->end(); ++it)
         {
+            UIListGenericTree *uit = (UIListGenericTree*)(*it);
+
             if (CDCheckItem *track_ptr = dynamic_cast<CDCheckItem*>(uit))
             {
                 track_ptr->setCheck(0);
-                if (gMusicData->all_playlists->checkCDTrack(track_ptr->getID() * -1))
+                if (gMusicData->all_playlists->checkCDTrack(
+                        track_ptr->getID() * -1))
+                {
                     track_ptr->setCheck(2);
+                }
             }
-            ++it;
         }
 
         // Can't check what ain't there
@@ -997,16 +999,15 @@ void DatabaseBox::doSelected(UIListGenericTree *item, bool cd_flag)
 
     if (keep_going)
     {
-        Q3PtrListIterator<GenericTree> it = tcitem->getFirstChildIterator();
-        TreeCheckItem *child;
-        while ((child = (TreeCheckItem *)it.current()))
+        GenericTree::iterator it;
+        for (it = tcitem->begin(); it != tcitem->end(); ++it)
         {
+            TreeCheckItem *child = (TreeCheckItem*)(*it);
             if (child->getCheck() != tcitem->getCheck())
             {
                 child->setCheck(tcitem->getCheck());
                 doSelected(child, cd_flag);
             }
-            ++it;
         }
     }
     else
@@ -1046,16 +1047,14 @@ void DatabaseBox::checkParent(UIListGenericTree *item)
         bool allon = true;
         bool oneon = false;
 
-        Q3PtrListIterator<GenericTree> it = tcitem->getFirstChildIterator();
-
-        while ((child = (TreeCheckItem *)it.current()))
+        GenericTree::iterator it;
+        for (it = tcitem->begin(); it != tcitem->end(); ++it)
         {
+            child = (TreeCheckItem*)(*it);
             if (child->getCheck() > 0)
                 oneon = true;
             if (child->getCheck() == 0)
                 allon = false;
-
-            ++it;
         }
 
         if (allon)
@@ -1232,14 +1231,10 @@ void DatabaseBox::checkTree(UIListGenericTree *startingpoint)
         startingpoint = rootNode;
     }
 
-    Q3PtrListIterator<GenericTree> it = startingpoint->getFirstChildIterator();
-    UIListGenericTree *uit;
-
-    // Using the current playlist metadata, check the boxes on the ListView
-    // tree appropriately.
-
-    while ((uit = (UIListGenericTree *)it.current()))
+    GenericTree::iterator it;
+    for (it = startingpoint->begin(); it != startingpoint->end(); ++it)
     {
+        UIListGenericTree *uit = (UIListGenericTree*)(*it);
         //  Only check things which are TreeCheckItem's
         if (TreeCheckItem *item = dynamic_cast<TreeCheckItem*>(uit))
         {
@@ -1255,8 +1250,6 @@ void DatabaseBox::checkTree(UIListGenericTree *startingpoint)
             if (item->childCount() > 0)
                 checkTree(item);
         }
-
-        ++it;
     }
 
     if (toplevel)

@@ -81,7 +81,7 @@ inc.files += visual.h volumebase.h output.h langsettings.h
 inc.files += virtualkeyboard.h
 inc.files += mythexp.h mythpluginapi.h storagegroup.h
 inc.files += mythconfigdialogs.h mythconfiggroups.h
-inc.files += mythterminal.h
+inc.files += mythterminal.h mythdeque.h
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmyth

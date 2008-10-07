@@ -1,81 +1,22 @@
 #include <iostream>
-#include <Q3PtrList>
+#include <algorithm>
 using namespace std;
 
 #include "generictree.h"
+#include "mythverbose.h"
 
-class SortableGenericTreeList : public Q3PtrList<GenericTree>
+#define LOC      QString("*TreeList: ")
+#define LOC_WARN QString("*TreeList, Warning: ")
+#define LOC_ERR  QString("*TreeList, Error: ")
+
+class SortableGenericTreeList : public vector<GenericTree*>
 {
   public:
     void SetSortType(int stype) { sort_type = stype; }
     void SetOrderingIndex(int oindex) 
     { ordering_index = (oindex >= 0) ? oindex : 0; }
 
-    int compareItems(Q3PtrCollection::Item item1, Q3PtrCollection::Item item2)
-    {
-        GenericTree *one = (GenericTree *)item1;
-        GenericTree *two = (GenericTree *)item2;
-
-        if (sort_type == 0)
-        {
-            int onea = one->getAttribute(ordering_index);
-            int twoa = two->getAttribute(ordering_index);
-
-            if (onea == twoa)
-                return 0;
-            else if (onea < twoa)
-                return -1;
-            else
-                return 1;
-        }
-        else if (sort_type == 1)
-        {
-            QString ones = one->getString().toLower();
-            QString twos = two->getString().toLower();
-            return QString::localeAwareCompare(ones, twos);
-        }
-        else if (sort_type == 2)
-        {
-            bool onesel = one->isSelectable();
-            bool twosel = two->isSelectable();
-
-            if (onesel == twosel)
-                return 0;
-            else if (onesel && !twosel)
-                return 1;
-            else
-                return -1;
-        }
-        if (sort_type == 3)
-        {
-            //
-            //  Sort by attribute (ordering index), but, it if those are
-            //  equal, then sort by string
-            //
-
-            int onea = one->getAttribute(ordering_index);
-            int twoa = two->getAttribute(ordering_index);
-
-            if (onea == twoa)
-            {
-                QString ones = one->getString().toLower();
-                QString twos = two->getString().toLower();
-                return QString::localeAwareCompare(ones, twos);
-            }
-            else if (onea < twoa)
-                return -1;
-            else
-                return 1;
-        }
-        else
-        {
-            cerr << "generictree.o: SortableGenericTreeList was asked to "
-                 << "compare items (probably inside a sort()), but the "
-                 << "sort_type is not set to anything recognizable"
-                 << endl;
-            return 0;
-        }
-    }
+    void sort(void);
 
   private:
     int sort_type; // 0 - getAttribute
@@ -85,14 +26,94 @@ class SortableGenericTreeList : public Q3PtrList<GenericTree>
     int ordering_index; // for getAttribute
 };
 
+static int compareItems(
+    int sort_type, int ordering_index,
+    const GenericTree *one, const GenericTree *two)
+{
+    if (sort_type == 0)
+    {
+        int onea = one->getAttribute(ordering_index);
+        int twoa = two->getAttribute(ordering_index);
+
+        if (onea == twoa)
+            return 0;
+        else if (onea < twoa)
+            return -1;
+        else
+            return 1;
+    }
+    else if (sort_type == 1)
+    {
+        QString ones = one->getString().toLower();
+        QString twos = two->getString().toLower();
+        return QString::localeAwareCompare(ones, twos);
+    }
+    else if (sort_type == 2)
+    {
+        bool onesel = one->isSelectable();
+        bool twosel = two->isSelectable();
+
+        if (onesel == twosel)
+            return 0;
+        else if (onesel && !twosel)
+            return 1;
+        else
+            return -1;
+    }
+    if (sort_type == 3)
+    {
+        //
+        //  Sort by attribute (ordering index), but, it if those are
+        //  equal, then sort by string
+        //
+
+        int onea = one->getAttribute(ordering_index);
+        int twoa = two->getAttribute(ordering_index);
+
+        if (onea == twoa)
+        {
+            QString ones = one->getString().toLower();
+            QString twos = two->getString().toLower();
+            return QString::localeAwareCompare(ones, twos);
+        }
+        else if (onea < twoa)
+            return -1;
+        else
+            return 1;
+    }
+    else
+    {
+        cerr << "generictree.o: SortableGenericTreeList was asked to "
+             << "compare items (probably inside a sort()), but the "
+             << "sort_type is not set to anything recognizable"
+             << endl;
+        return 0;
+    }
+}
+
+static QMutex global_generic_sort_lock;
+static int global_stype;
+static int global_oindex;
+
+static inline bool generic_tree_lt(const GenericTree *a, const GenericTree *b)
+{
+    return compareItems(global_stype, global_oindex, a, b) < 0;
+}
+
+void SortableGenericTreeList::sort(void)
+{
+    QMutexLocker locker(&global_generic_sort_lock);
+    global_stype  = sort_type;
+    global_oindex = ordering_index;
+    std::stable_sort(begin(), end(), generic_tree_lt);
+}
+
 GenericTree::GenericTree(const QString &a_string, int an_int, 
                          bool selectable_flag)
 {
     m_subnodes = new SortableGenericTreeList;
     m_ordered_subnodes = new SortableGenericTreeList;
     m_flatened_subnodes = new SortableGenericTreeList;
-
-    m_subnodes->setAutoDelete(true);
 
     m_parent = NULL;
     m_selected_subnode = NULL;
@@ -108,6 +129,7 @@ GenericTree::GenericTree(const QString &a_string, int an_int,
 
 GenericTree::~GenericTree()
 {
+    deleteAllChildren(true);
     delete m_subnodes;
     delete m_ordered_subnodes;
     delete m_flatened_subnodes;
@@ -126,8 +148,8 @@ GenericTree* GenericTree::addNode(const QString &a_string, int an_int,
 GenericTree *GenericTree::addNode(GenericTree *child)
 {
     child->setParent(this);
-    m_subnodes->append(child);
-    m_ordered_subnodes->append(child);
+    m_subnodes->push_back(child);
+    m_ordered_subnodes->push_back(child);
 
     return child;
 }
@@ -137,25 +159,32 @@ void GenericTree::removeNode(GenericTree *child)
     if (m_selected_subnode == child)
         m_selected_subnode = NULL;
 
-    m_ordered_subnodes->removeRef(child);
-    m_flatened_subnodes->removeRef(child);
-    m_subnodes->removeRef(child);
+    vector<GenericTree*>::iterator oit =
+        std::find(m_ordered_subnodes->begin(),
+                  m_ordered_subnodes->end(), child);
+    vector<GenericTree*>::iterator fit =
+        std::find(m_flatened_subnodes->begin(),
+                  m_flatened_subnodes->end(), child);
+    vector<GenericTree*>::iterator it =
+        std::find(m_subnodes->begin(), m_subnodes->end(), child);
+
+    m_ordered_subnodes->erase(oit);
+    m_flatened_subnodes->erase(fit);
+    delete *it;
+    m_subnodes->erase(it);
 }
 
 int GenericTree::calculateDepth(int start)
 {
-    int current_depth;
+    int current_depth = start + 1;
     int found_depth;
-    current_depth = start + 1;
-    Q3PtrListIterator<GenericTree> it(*m_subnodes);
-    GenericTree *child;
 
-    while ((child = it.current()) != 0)
+    vector<GenericTree*>::iterator it = m_subnodes->begin();
+    for (; it != m_subnodes->end(); ++it)
     {
-        found_depth = child->calculateDepth(start + 1);
+        found_depth = (*it)->calculateDepth(start + 1);
         if (found_depth > current_depth)
             current_depth = found_depth;
-        ++it;
     }
 
     return current_depth;
@@ -163,10 +192,10 @@ int GenericTree::calculateDepth(int start)
 
 GenericTree* GenericTree::findLeaf(int ordering_index)
 {
-    if (m_subnodes->count() > 0)
+    if (!m_subnodes->empty())
     {
         if (ordering_index == -1)
-            return m_subnodes->getFirst()->findLeaf();
+            return m_subnodes->front()->findLeaf();
 
         GenericTree *first_child = getChildAt(0, ordering_index);
 
@@ -193,20 +222,13 @@ GenericTree* GenericTree::recursiveNodeFinder(QList<int> route_of_branches)
 {
     if (checkNode(route_of_branches))
         return this;
-    else
-    {
-        Q3PtrListIterator<GenericTree> it(*m_subnodes);
-        GenericTree *child;
 
-        while ((child = it.current()) != 0)
-        {
-            GenericTree *sub_checker;
-            sub_checker = child->recursiveNodeFinder(route_of_branches);
-            if (sub_checker)
-                return sub_checker;
-            else
-                ++it;
-        }
+    vector<GenericTree*>::iterator it = m_subnodes->begin();
+    for (; it != m_subnodes->end(); ++it)
+    {
+        GenericTree *sub_checker=(*it)->recursiveNodeFinder(route_of_branches);
+        if (sub_checker)
+            return sub_checker;
     }
 
     return NULL;
@@ -239,7 +261,11 @@ bool GenericTree::checkNode(QList<int> route_of_branches)
 int GenericTree::getChildPosition(GenericTree *child, int ordering_index)
 {
     if (ordering_index == -1)
-        return m_subnodes->findRef(child);
+    {
+        vector<GenericTree*>::iterator it =
+            std::find(m_subnodes->begin(), m_subnodes->end(), child);
+        return (it != m_subnodes->end()) ? it - m_subnodes->begin() : -1;
+    }
 
     if (m_current_ordering_index != ordering_index)
     {
@@ -247,7 +273,11 @@ int GenericTree::getChildPosition(GenericTree *child, int ordering_index)
         m_current_ordering_index = ordering_index;
     }
 
-    return m_ordered_subnodes->findRef(child);
+    vector<GenericTree*>::iterator it =
+        std::find(m_ordered_subnodes->begin(),
+                  m_ordered_subnodes->end(), child);
+    return (it != m_ordered_subnodes->end()) ?
+        it - m_ordered_subnodes->begin() : -1;
 }
 
 int GenericTree::getPosition()
@@ -266,7 +296,7 @@ int GenericTree::getPosition(int ordering_index)
 
 int GenericTree::childCount(void)
 {
-    return m_subnodes->count();
+    return m_subnodes->size();
 }
 
 int GenericTree::siblingCount(void)
@@ -298,14 +328,14 @@ vector<GenericTree*> GenericTree::getAllChildren(int ordering_index)
 
 GenericTree* GenericTree::getChildAt(uint reference, int ordering_index)
 {
-    if (reference >= m_ordered_subnodes->count())
+    if (reference >= (uint)m_ordered_subnodes->size())
     {
         // cerr << "GenericTree: out of bounds request to getChildAt()\n";
         return NULL;
     }
 
     if (ordering_index == -1)
-        return m_subnodes->at(reference);
+        return (*m_subnodes)[reference];
 
     if (ordering_index != m_current_ordering_index)
     {
@@ -369,18 +399,30 @@ GenericTree* GenericTree::nextSibling(int number_down, int ordering_index)
     return m_parent->getChildAt(position + number_down, ordering_index);
 }
 
-Q3PtrListIterator<GenericTree> GenericTree::getFirstChildIterator(int ordering)
+GenericTree::iterator GenericTree::begin(void)
 {
-    if (ordering == -1)
-        return Q3PtrListIterator<GenericTree>(*m_subnodes);
+    return m_subnodes->begin();
+}
 
-    if (ordering != m_current_ordering_index)
+GenericTree::iterator GenericTree::end(void)
+{
+    return m_subnodes->end();
+}
+
+GenericTree::iterator GenericTree::begin(uint ordering)
+{
+    if ((int)ordering != m_current_ordering_index)
     {
         reorderSubnodes(ordering);
         m_current_ordering_index = ordering;
     }
 
-    return Q3PtrListIterator<GenericTree>(*m_ordered_subnodes);
+    return m_ordered_subnodes->begin();
+}
+
+GenericTree::iterator GenericTree::end(uint ordering)
+{
+    return m_ordered_subnodes->end();
 }
 
 GenericTree* GenericTree::getParent()
@@ -402,7 +444,7 @@ void GenericTree::setAttribute(uint attribute_position, int value_of_attribute)
     (*m_attributes)[attribute_position] = value_of_attribute;
 }
 
-int GenericTree::getAttribute(uint which_one)
+int GenericTree::getAttribute(uint which_one) const
 {
     if (m_attributes->size() < (int)(which_one + 1))
     {
@@ -424,18 +466,14 @@ void GenericTree::reorderSubnodes(int ordering_index)
     m_ordered_subnodes->sort();
 }
 
-void GenericTree::addYourselfIfSelectable(Q3PtrList<GenericTree> *flat_list)
+void GenericTree::addYourselfIfSelectable(vector<GenericTree*> *flat_list)
 {
     if (m_selectable)
-        flat_list->append(this);
+        flat_list->push_back(this);
 
-    Q3PtrListIterator<GenericTree> it(*m_subnodes);
-    GenericTree *child;
-    while ((child = it.current()) != 0)
-    {
-        child->addYourselfIfSelectable(flat_list);
-        ++it;
-    }
+    vector<GenericTree*>::iterator it = m_subnodes->begin();
+    for (; it != m_subnodes->end(); ++it)
+        (*it)->addYourselfIfSelectable(flat_list);
 }
 
 void GenericTree::buildFlatListOfSubnodes(int ordering_index, 
@@ -446,13 +484,9 @@ void GenericTree::buildFlatListOfSubnodes(int ordering_index,
     
     m_flatened_subnodes->clear();
 
-    Q3PtrListIterator<GenericTree> it(*m_subnodes);
-    GenericTree *child;
-    while ((child = it.current()) != 0)
-    {
-        child->addYourselfIfSelectable(m_flatened_subnodes);
-        ++it;
-    }
+    vector<GenericTree*>::iterator it = m_subnodes->begin();
+    for (; it != m_subnodes->end(); ++it)
+        (*it)->addYourselfIfSelectable(m_flatened_subnodes);
 
     if (scrambled_parents)
     {
@@ -467,17 +501,21 @@ GenericTree* GenericTree::nextPrevFromFlatList(bool forward_or_backward,
                                                bool wrap_around, 
                                                GenericTree *active)
 {
-    int i = m_flatened_subnodes->findRef(active);
-    if (i < 0)
+    vector<GenericTree*>::iterator it =
+        std::find(m_flatened_subnodes->begin(),
+                  m_flatened_subnodes->end(), active);
+
+    if (it == m_flatened_subnodes->end())
     {
-        cerr << "Can't find active item on flatened list\n";
+        VERBOSE(VB_IMPORTANT, "Can't find active item on flatened list");
         return NULL;
     }
+    int i = it - m_flatened_subnodes->begin();
 
     if (forward_or_backward)
     {
         ++i;
-        if (i >= (int)m_flatened_subnodes->count())
+        if (i >= (int)m_flatened_subnodes->size())
         {
             if (wrap_around)
                 i = 0;
@@ -491,7 +529,7 @@ GenericTree* GenericTree::nextPrevFromFlatList(bool forward_or_backward,
         if (i < 0)
         {
             if (wrap_around)
-                i = m_flatened_subnodes->count() - 1;
+                i = m_flatened_subnodes->size() - 1;
             else
                 return NULL;
         }
@@ -502,26 +540,22 @@ GenericTree* GenericTree::nextPrevFromFlatList(bool forward_or_backward,
 
 GenericTree* GenericTree::getChildByName(const QString &a_name)
 {
-    Q3PtrListIterator<GenericTree> it(*m_subnodes);
-    GenericTree *child;
-    while ((child = it.current()) != 0)
+    vector<GenericTree*>::iterator it = m_subnodes->begin();
+    for (; it != m_subnodes->end(); ++it)
     {
-        if (child->getString() == a_name)
-            return child;
-        ++it;
+        if ((*it)->getString() == a_name)
+            return (*it);
     }
     return NULL;
 }
 
 GenericTree* GenericTree::getChildByInt(int an_int)
 {
-    Q3PtrListIterator<GenericTree> it(*m_subnodes);
-    GenericTree *child;
-    while ((child = it.current()) != 0)
+    vector<GenericTree*>::iterator it = m_subnodes->begin();
+    for (; it != m_subnodes->end(); ++it)
     {
-        if (child->getInt() == an_int)
-            return child;
-        ++it;
+        if ((*it)->getInt() == an_int)
+            return (*it);
     }
     return NULL;
 }
@@ -533,13 +567,9 @@ void GenericTree::sortByString()
     m_ordered_subnodes->SetSortType(1);
     m_ordered_subnodes->sort();
 
-    Q3PtrListIterator<GenericTree> it(*m_subnodes);
-    GenericTree *child;
-    while ((child = it.current()) != 0)
-    {
-        child->sortByString();
-        ++it;
-    }
+    vector<GenericTree*>::iterator it = m_subnodes->begin();
+    for (; it != m_subnodes->end(); ++it)
+        (*it)->sortByString();
 }
 
 void GenericTree::sortByAttributeThenByString(int which_attribute)
@@ -548,13 +578,9 @@ void GenericTree::sortByAttributeThenByString(int which_attribute)
     m_ordered_subnodes->SetOrderingIndex(which_attribute);
     m_ordered_subnodes->sort();
 
-    Q3PtrListIterator<GenericTree> it(*m_subnodes);
-    GenericTree *child;
-    while ((child = it.current()) != 0)
-    {
-        child->sortByAttributeThenByString(which_attribute);
-        ++it;
-    }
+    vector<GenericTree*>::iterator it = m_subnodes->begin();
+    for (; it != m_subnodes->end(); ++it)
+        (*it)->sortByAttributeThenByString(which_attribute);
 }
 
 void GenericTree::sortBySelectable()
@@ -562,22 +588,30 @@ void GenericTree::sortBySelectable()
     m_ordered_subnodes->SetSortType(2);
     m_ordered_subnodes->sort();
 
-    Q3PtrListIterator<GenericTree> it(*m_subnodes);
-    GenericTree *child;
-    while ((child = it.current()) != 0)
-    {
-        child->sortBySelectable();
-        ++it;
-    }
+    vector<GenericTree*>::iterator it = m_subnodes->begin();
+    for (; it != m_subnodes->end(); ++it)
+        (*it)->sortBySelectable();
 }
 
-void GenericTree::deleteAllChildren()
+void GenericTree::deleteAllChildren(bool actually_delete)
 {
     m_flatened_subnodes->clear();
     m_ordered_subnodes->clear();
     m_selected_subnode = NULL;
     m_current_ordering_index = -1;
-    m_subnodes->clear();
+
+    if (actually_delete)
+    {
+        while (!m_subnodes->empty())
+        {
+            delete m_subnodes->back();
+            m_subnodes->pop_back();
+        }
+    }
+    else
+    {
+        m_subnodes->clear();
+    }
 }
 
 void GenericTree::pruneAllChildren()
@@ -588,9 +622,7 @@ void GenericTree::pruneAllChildren()
     //  don't "own".
     //
 
-    m_subnodes->setAutoDelete(false);
-    deleteAllChildren();
-    m_subnodes->setAutoDelete(true);
+    deleteAllChildren(false); // don't delete the children here...
 }
 
 void GenericTree::reOrderAsSorted()
@@ -600,7 +632,7 @@ void GenericTree::reOrderAsSorted()
     //  subnodes
     //
     
-    if (m_subnodes->count() != m_ordered_subnodes->count())
+    if (m_subnodes->size() != m_ordered_subnodes->size())
     {
         cerr << "generictree.o: Can't reOrderAsSorted(), because the number "
              << "of subnodes is different than the number of ordered subnodes"
@@ -608,38 +640,33 @@ void GenericTree::reOrderAsSorted()
         return;
     }
 
-    m_subnodes->setAutoDelete(false);
-    m_subnodes->clear();    
-    m_subnodes->setAutoDelete(true);
+    m_subnodes->clear(); // don't delete the children here...
     m_current_ordering_index = -1;
     
-
-    Q3PtrListIterator<GenericTree> it(*m_ordered_subnodes);
-    GenericTree *child;
-    while ((child = it.current()) != 0)
+    vector<GenericTree*>::iterator it = m_subnodes->begin();
+    for (; it != m_subnodes->end(); ++it)
     {
-        m_subnodes->append(child);
-        child->reOrderAsSorted();
-        ++it;
+        m_subnodes->push_back(*it);
+        (*it)->reOrderAsSorted();
     }
 }
 
 void GenericTree::MoveItemUpDown(GenericTree *item, bool flag)
 {
-    if (item == m_subnodes->getFirst() && flag)
+    if (item == m_subnodes->front() && flag)
         return;
-    if (item == m_subnodes->getLast() && !flag)
+    if (item == m_subnodes->back() && !flag)
         return;
 
-    int num = m_subnodes->findRef(item);
+    vector<GenericTree*>::iterator it =
+        std::find(m_subnodes->begin(), m_subnodes->end(), item);
 
-    int insertat = 0;
-    if (flag)
-        insertat = num - 1;
-    else
-        insertat = num + 1;
+    if (it == m_subnodes->end())
+        return;
 
-    m_subnodes->take();
-    m_subnodes->insert(insertat, item);
+    int num = it - m_subnodes->begin();
+    int insertat = (flag) ? num - 1 : num + 1;
+
+    m_subnodes->erase(it);
+    m_subnodes->insert(m_subnodes->begin() + insertat, item);
 }
-

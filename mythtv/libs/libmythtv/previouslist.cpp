@@ -16,6 +16,7 @@ using namespace std;
 #include <QEvent>
 #include <QPixmap>
 #include <QPaintEvent>
+#include <QPainter>
 
 #include "exitcodes.h"
 #include "previouslist.h"

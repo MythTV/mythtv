@@ -1,23 +1,19 @@
 #ifndef UIDATATYPES_H_
 #define UIDATATYPES_H_
 
-#include <qobject.h>
-#include <qstring.h>
-#include <qregexp.h>
-#include <qstringlist.h>
-#include <qrect.h>
-#include <qfile.h>
-#include <qmap.h>
-#include <QList>
-#include <QKeyEvent>
 #include <vector>
-#include <QVector>
-#include <qfont.h>
-#include <qpixmap.h>
-#include <qpainter.h>
-#include <q3ptrlist.h>
-#include <q3dict.h>
+using namespace std;
 
+#include <QStringList>
+#include <QKeyEvent>
+#include <QObject>
+#include <QPixmap>
+#include <QVector>
+#include <QList>
+#include <QRect>
+#include <QMap>
+
+#include "mythdeque.h"
 #include "mythwidgets.h"
 #include "util.h"
 #include "mythdialogs.h"
@@ -29,8 +25,8 @@
 #undef LoadImage
 #endif
 
-using namespace std;
-
+class QFont;
+class QPainter;
 class UIType;
 class MythDialog;
 class MythThemedDialog;
@@ -199,28 +195,33 @@ class MPUBLIC UIBarType : public UIType
 class AlphaTable
 {
   public:
-    AlphaTable();
-    ~AlphaTable();
+    AlphaTable() { /* intentionally uninitialized, for QMap efficiency */ }
+    ~AlphaTable() {}
     AlphaTable(const QColor &color, int alpha);
+    AlphaTable(const AlphaTable &other);
 
     unsigned char r[256], g[256], b[256];
 
   private:
     void maketable(unsigned char* data, int channel, int alpha);
 };
+typedef QMap<QString,AlphaTable> AlphaTableMap;
 
 class AlphaBlender
 {
   public:
     AlphaBlender();
     ~AlphaBlender();
-    void init(int alpha = 96, int cacheSize = 30);
+    void init(unsigned char alpha = 96, unsigned int cacheSize = 30);
     void addColor(const QColor &color);
     void blendImage(const QImage &image, const QColor &color);
 
   private:
-    Q3Dict<AlphaTable> alphaTables;
-    int alpha;
+    AlphaTableMap::iterator AddColorInternal(const QColor &color);
+    AlphaTableMap  alphaTables;
+    MythDeque<QString> nextDelete;
+    unsigned int   alpha;
+    unsigned int   maxEntries;
 };
 
 class MPUBLIC UIGuideType : public UIType
@@ -304,7 +305,7 @@ class MPUBLIC UIGuideType : public UIType
     void drawRecType(QPainter *dr, UIGTCon *data);
     void drawCurrent(QPainter *dr, UIGTCon *data);
 
-    Q3PtrList<UIGTCon> *allData;
+    QList<UIGTCon*> *allData;
     UIGTCon selectedItem;
 
     QPixmap recImages[15];
@@ -505,7 +506,7 @@ class MPUBLIC UIImageGridType : public UIType
         QPixmap *dnArrowRegPixmap;
         QPixmap *dnArrowActPixmap;
 
-        Q3PtrList<ImageGridItem> *allData;
+        QList<ImageGridItem*> *allData;
 };
 
 class MPUBLIC UIListType : public UIType
@@ -1031,7 +1032,7 @@ class MPUBLIC UIManagedTreeListType : public UIType
     QPixmap                 down_arrow_image;
     QPixmap                 left_arrow_image;
     QPixmap                 right_arrow_image;
-    Q3PtrList<QPixmap>       resized_highlight_images;
+    QList<QPixmap*>         resized_highlight_images;
     QMap<int, QPixmap*>     highlight_map;
     QList<int>              route_to_active;
     bool                    show_whole_tree;
@@ -1230,7 +1231,7 @@ class MPUBLIC UISelectorType : public UIPushButtonType
 
     QRect                   m_area;
     fontProp                *m_font;
-    Q3PtrList<IntStringPair> my_data;
+    QList<IntStringPair*>    my_data;
     IntStringPair           *current_data;
 
 };
@@ -1280,7 +1281,7 @@ class MPUBLIC UIKeyType : public UIType
                          fontProp *downFocused);
 
     void    SetType(QString type) { m_type = type; }
-    QString GetType() { return m_type; }
+    QString GetType(void) const { return m_type; }
 
     void    SetChars(QString normal, QString shift, QString alt, QString shiftAlt);
     QString GetChar();
@@ -1352,7 +1353,7 @@ class MPUBLIC UIKeyboardType : public UIType
     UIKeyboardType(const QString &, int);
     ~UIKeyboardType();
 
-    typedef Q3PtrList <UIKeyType> KeyList;
+    typedef QList<UIKeyType*> KeyList;
 
     void SetContainer(LayerSet *container) { m_container = container; }
     void SetArea(QRect &area) { m_area = area; }

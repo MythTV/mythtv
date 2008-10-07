@@ -1,5 +1,6 @@
 #include <cstdlib>
 
+#include <QPainter>
 #include <QPixmap>
 
 using namespace std;
@@ -286,11 +287,9 @@ void ManagedListGroup::slotGuiActivate(ManagedListGroup* _group)
     if (_group != this)
         return;
 
-    ManagedListItem* item = NULL;
-    for (item = itemList.first(); item; item = itemList.next())
-    {
-        item->slotGuiActivate(_group);
-    }
+    QList<ManagedListItem*>::iterator it = itemList.begin();
+    for (; it != itemList.end(); ++it)
+        (*it)->slotGuiActivate(_group);
 }
 
 void ManagedListGroup::setCurIndex(int newVal)
@@ -313,11 +312,11 @@ bool ManagedListGroup::addItem(ManagedListItem* item, int where)
     if (!item)
         return false;
 
-    if (QString(item->name()) == "unnamed")
-        item->setName( QString( "ITEM-%1").arg(itemList.count()));
+    if (QString(item->objectName()) == "unnamed")
+        item->setObjectName( QString( "ITEM-%1").arg(itemList.count()));
 
-    if (!child(item->name()) && !item->parent())
-        insertChild(item);
+    if (!child(item->objectName()) && !item->parent())
+        item->setParent(this);
 
     int listSize = itemList.count();
 
@@ -355,13 +354,11 @@ void ManagedListGroup::select()
 
 void ManagedListGroup::clear()
 {
-    ManagedListItem* tempItem = NULL;
-    for(tempItem = itemList.first(); tempItem; tempItem = itemList.next() )
+    while (!itemList.empty())
     {
-        delete tempItem;
+        delete itemList.back();
+        itemList.pop_back();
     }
-
-    itemList.clear();
 
     if (parentGroup)
     {
@@ -381,12 +378,10 @@ void ManagedListGroup::clear()
 
 void ManagedListGroup::setParentList(ManagedList* _parent)
 {
-    ManagedListItem* tempItem = NULL;
     ManagedListItem::setParentList(_parent);
-    for(tempItem = itemList.first(); tempItem; tempItem = itemList.next() )
-    {
-        tempItem->setParentList(_parent);
-    }
+    QList<ManagedListItem*>::iterator it = itemList.begin();
+    for (; it != itemList.end(); ++it)
+        (*it)->setParentList(_parent);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -414,17 +409,17 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label,
 
     bool found = false;
 
-    for(ManagedListItem* tempItem = itemList.first(); tempItem; tempItem = itemList.next() )
+    QList<ManagedListItem*>::iterator it = itemList.begin();
+    for (; it != itemList.end(); ++it)
     {
-        if ((tempItem->getText() == label) || (tempItem->getValue() == value))
+        if (((*it)->getText() == label) || ((*it)->getValue() == value))
         {
             found = true;
-            tempItem->setValue(value);
-            tempItem->setText(label);
-            ret = tempItem;
+            (*it)->setValue(value);
+            (*it)->setText(label);
+            ret = (*it);
             break;
         }
-
     }
 
     if (!found)
@@ -595,6 +590,7 @@ void SelectManagedListItem::buttonSelected(ManagedListItem* itm)
 ManagedList::ManagedList(MythDialog* parent, const char* name)
            : QObject(parent, name)
 {
+    setObjectName(name);
     listRect = QRect(0, 0, 0, 0);
     theme = NULL;
     curGroup = NULL;

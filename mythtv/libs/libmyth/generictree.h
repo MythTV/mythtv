@@ -4,7 +4,6 @@
 #include <QString>
 #include <QVector>
 #include <QList>
-#include <q3ptrlist.h>
 
 #include <vector>
 using namespace std;
@@ -37,7 +36,11 @@ class MPUBLIC GenericTree
     GenericTree *nextSibling(int number_down, int ordering_index = -1);
     GenericTree *prevSibling(int number_up, int ordering_index = -1);
 
-    Q3PtrListIterator<GenericTree> getFirstChildIterator(int ordering = -1);
+    typedef vector<GenericTree*>::iterator iterator;
+    iterator begin(void);
+    iterator end(void);
+    iterator begin(uint ordering);
+    iterator end(uint ordering);
 
     GenericTree *getSelectedChild(int ordering_index);
     GenericTree *getChildAt(uint reference, int ordering_index = -1);
@@ -56,7 +59,7 @@ class MPUBLIC GenericTree
     void setParent(GenericTree* a_parent) { m_parent = a_parent; }
     GenericTree *getParent(void);
 
-    const QString getString(void) { return m_string; }
+    QString getString(void) const { return m_string; }
     void setString(const QString &str) { m_string = str; }
 
     int calculateDepth(int start);
@@ -65,10 +68,10 @@ class MPUBLIC GenericTree
     int siblingCount(void);
 
     void setSelectable(bool flag) { m_selectable = flag; }
-    bool isSelectable() { return m_selectable; }
+    bool isSelectable(void) const { return m_selectable; }
 
     void setAttribute(uint attribute_position, int value_of_attribute);
-    int getAttribute(uint which_one);
+    int getAttribute(uint which_one) const;
     IntVector *getAttributes(void) { return m_attributes; }
 
     void reorderSubnodes(int ordering_index);
@@ -79,7 +82,7 @@ class MPUBLIC GenericTree
     void becomeSelectedChild(void);
     void setSelectedChild(GenericTree* a_node) { m_selected_subnode = a_node; }
 
-    void addYourselfIfSelectable(Q3PtrList<GenericTree> *flat_list);
+    void addYourselfIfSelectable(vector<GenericTree*> *flat_list);
     void buildFlatListOfSubnodes(int ordering_index, bool scrambled_parents);
 
     GenericTree *nextPrevFromFlatList(bool forward_or_back, bool wrap_around, 
@@ -88,7 +91,7 @@ class MPUBLIC GenericTree
     void sortByString();
     void sortByAttributeThenByString(int which_attribute);
     void sortBySelectable();
-    void deleteAllChildren();
+    void deleteAllChildren(bool actually_delete = true);
     void pruneAllChildren();
     void reOrderAsSorted();
 

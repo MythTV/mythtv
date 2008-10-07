@@ -43,7 +43,6 @@
 #include "qlabel.h"
 #include "q3widgetstack.h"
 #include "qapplication.h"
-#include "q3ptrlist.h"
 #include "qpainter.h"
 #include <Q3HBoxLayout>
 #include <QChildEvent>
@@ -74,7 +73,7 @@ public:
     Q3VBoxLayout * v;
     Page * current;
     Q3WidgetStack * ws;
-    Q3PtrList<Page> pages;
+    QList<Page*> pages;
     QLabel * title;
     MythPushButton * backButton;
     MythPushButton * nextButton;
@@ -103,7 +102,6 @@ MythWizard::MythWizard(MythMainWindow *parent, const char *name)
     d = new MythWizardPrivate();
     d->current = 0; // not quite true, but...
     d->ws = new Q3WidgetStack( this, "qt_widgetstack" );
-    d->pages.setAutoDelete( TRUE );
     d->title = new QLabel( this, "title label" );
     d->title->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -140,6 +138,11 @@ MythWizard::MythWizard(MythMainWindow *parent, const char *name)
 
 MythWizard::~MythWizard()
 {
+    while (!d->pages.empty())
+    {
+        delete d->pages.back();
+        d->pages.pop_back();
+    }
     delete d;
 }
 
@@ -148,7 +151,7 @@ void MythWizard::Show()
     if ( d->current )
         showPage( d->current->w );
     else if ( pageCount() > 0 )
-        showPage( d->pages.at( 0 )->w );
+        showPage( d->pages[0]->w );
     else
         showPage( 0 );
 
@@ -171,10 +174,10 @@ void MythWizard::addPage( QWidget * page, const QString & title )
                   className(), name() );
         return;
     }
-    int i = d->pages.count();
+    int i = d->pages.size();
 
     if ( i > 0 )
-        d->pages.at( i - 1 )->nextEnabled = TRUE;
+        d->pages[i - 1]->nextEnabled = TRUE;
 
     MythWizardPrivate::Page * p = new MythWizardPrivate::Page( page, title );
     p->backEnabled = ( i > 0 );
@@ -193,15 +196,15 @@ void MythWizard::insertPage( QWidget * page, const QString & title, int index )
         return;
     }
 
-    if ( index < 0  || index > (int)d->pages.count() )
-        index = d->pages.count();
+    if ( index < 0  || index > (int)d->pages.size() )
+        index = d->pages.size();
 
-    if ( index > 0 && ( index == (int)d->pages.count() ) )
-        d->pages.at( index - 1 )->nextEnabled = TRUE;
+    if ( index > 0 && ( index == (int)d->pages.size() ) )
+        d->pages[index - 1]->nextEnabled = TRUE;
 
     MythWizardPrivate::Page * p = new MythWizardPrivate::Page( page, title );
     p->backEnabled = ( index > 0 );
-    p->nextEnabled = ( index < (int)d->pages.count() );
+    p->nextEnabled = ( index < (int)d->pages.size() );
 
     d->ws->addWidget( page, index );
     d->pages.insert( index, p );
@@ -212,13 +215,15 @@ void MythWizard::showPage( QWidget * page )
     MythWizardPrivate::Page * p = d->page( page );
     if ( p ) {
         int i;
-        for( i = 0; i < (int)d->pages.count() && d->pages.at( i ) != p; i++ );
+        for( i = 0; i < (int)d->pages.size() && d->pages[i] != p; i++ );
         bool notFirst( FALSE );
 
-        if ( i ) {
+        if (i)
+        {
             i--;
-            while( ( i >= 0 ) && !notFirst ) {
-                notFirst |= appropriate( d->pages.at( i )->w );
+            while ((i >= 0) && !notFirst)
+            {
+                notFirst |= appropriate(d->pages[i]->w);
                 i--;
             }
         }
@@ -243,7 +248,7 @@ void MythWizard::showPage( QWidget * page )
 
 int MythWizard::pageCount() const
 {
-    return d->pages.count();
+    return d->pages.size();
 }
 
 int MythWizard::indexOf( QWidget* page ) const
@@ -251,41 +256,41 @@ int MythWizard::indexOf( QWidget* page ) const
     MythWizardPrivate::Page * p = d->page( page );
     if ( !p ) return -1;
 
-    return d->pages.find( p );
+    return d->pages.indexOf( p );
 }
 
 void MythWizard::back()
 {
     int i = 0;
 
-    while( i < (int)d->pages.count() && d->pages.at( i ) &&
-           d->current && d->pages.at( i )->w != d->current->w )
+    while( i < (int)d->pages.size() && d->pages[i] &&
+           d->current && d->pages[i]->w != d->current->w )
         i++;
 
     i--;
     while( i >= 0 &&
-           ( !d->pages.at( i ) || !appropriate( d->pages.at( i )->w ) ) )
+           ( !d->pages[i] || !appropriate( d->pages[i]->w ) ) )
         i--;
 
     if ( i >= 0 )
-       if ( d->pages.at( i ) )
-            showPage( d->pages.at( i )->w );
+       if ( d->pages[i] )
+            showPage( d->pages[i]->w );
 }
 
 void MythWizard::next()
 {
     int i = 0;
-    while( i < (int)d->pages.count() && d->pages.at( i ) &&
-           d->current && d->pages.at( i )->w != d->current->w )
+    while( i < (int)d->pages.size() && d->pages[i] &&
+           d->current && d->pages[i]->w != d->current->w )
         i++;
     i++;
-    while( i <= (int)d->pages.count()-1 &&
-           ( !d->pages.at( i ) || !appropriate( d->pages.at( i )->w ) ) )
+    while( i <= (int)d->pages.size()-1 &&
+           ( !d->pages[i] || !appropriate( d->pages[i]->w ) ) )
         i++;
-    while ( i > 0 && (i >= (int)d->pages.count() || !d->pages.at( i ) ) )
+    while ( i > 0 && (i >= (int)d->pages.size() || !d->pages[i] ) )
         i--;
-    if ( d->pages.at( i ) )
-        showPage( d->pages.at( i )->w );
+    if ( d->pages[i] )
+        showPage( d->pages[i]->w );
 }
 
 void MythWizard::setBackEnabled( bool enable )
@@ -347,12 +352,12 @@ void MythWizard::updateButtons()
         return;
 
     int i;
-    for( i = 0; i < (int)d->pages.count() && d->pages.at( i ) != d->current; i++ );
+    for( i = 0; i < (int)d->pages.size() && d->pages[i] != d->current; i++ );
     bool notFirst( FALSE );
     if ( i ) {
         i--;
         while( ( i >= 0 ) && !notFirst ) {
-            notFirst |= appropriate( d->pages.at( i )->w );
+            notFirst |= appropriate( d->pages[i]->w );
             i--;
         }
     }
@@ -420,10 +425,10 @@ void MythWizard::layOutButtonRow( Q3HBoxLayout * layout )
 {
     bool hasEarlyFinish = FALSE;
 
-    int i = d->pages.count() - 2;
-    while ( !hasEarlyFinish && i >= 0 ) {
-        if ( d->pages.at( i ) && d->pages.at( i )->finishEnabled )
-            hasEarlyFinish = TRUE;
+    int i = d->pages.size() - 2;
+    while ( !hasEarlyFinish && i >= 0 )
+    {
+        hasEarlyFinish |= (d->pages[i] && d->pages[i]->finishEnabled);
         i--;
     }
 
@@ -438,28 +443,34 @@ void MythWizard::layOutButtonRow( Q3HBoxLayout * layout )
 
     h->addSpacing( 6 );
 
-    if ( hasEarlyFinish ) {
+    if (hasEarlyFinish)
+    {
         d->nextButton->show();
         d->finishButton->show();
         h->addWidget( d->nextButton );
         h->addSpacing( 12 );
         h->addWidget( d->finishButton );
-    } else if ( d->pages.count() == 0 ||
-                d->current->finishEnabled ||
-                d->current == d->pages.at( d->pages.count()-1 ) ) {
+    }
+    else if (d->pages.empty() ||
+             d->current->finishEnabled ||
+             d->current == d->pages[d->pages.size() - 1])
+    {
         d->nextButton->hide();
         d->finishButton->show();
         h->addWidget( d->finishButton );
-    } else {
+    }
+    else
+    {
         d->nextButton->show();
         d->finishButton->hide();
         h->addWidget( d->nextButton );
     }
 
     // if last page is disabled - show finished btn. at lastpage-1
-    i = d->pages.count()-1;
-    if ( i >= 0 && !appropriate( d->pages.at( i )->w ) &&
-         d->current == d->pages.at( d->pages.count()-2 ) ) {
+    i = d->pages.size()-1;
+    if (i >= 0 && !appropriate(d->pages[i]->w) &&
+        d->current == d->pages[d->pages.size() - 2])
+    {
         d->nextButton->hide();
         d->finishButton->show();
         h->addWidget( d->finishButton );
@@ -585,13 +596,16 @@ void MythWizard::removePage( QWidget * page )
     if ( !page )
         return;
 
-    int i = d->pages.count();
+    int i = d->pages.size();
     QWidget* cp = currentPage();
-    while( --i >= 0 && d->pages.at( i ) && d->pages.at( i )->w != page ) { }
+    while( --i >= 0 && d->pages[i] && d->pages[i]->w != page ) { }
     if ( i < 0 )
         return;
-    MythWizardPrivate::Page * p = d->pages.at( i );
-    d->pages.removeRef( p );
+
+    MythWizardPrivate::Page *p = d->pages[i];
+    d->pages.removeAll(p);
+    delete p;
+
     d->ws->removeWidget( page );
 
     if ( cp == page ) {
@@ -608,7 +622,7 @@ QWidget* MythWizard::page( int index ) const
     if ( index >= pageCount() || index < 0 )
       return 0;
 
-    return d->pages.at( index )->w;
+    return d->pages[index]->w;
 }
 
 void MythWizard::setHelpText(QString helptext)

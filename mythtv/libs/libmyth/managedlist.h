@@ -4,7 +4,7 @@
 #include <vector>
 
 #include <QPointer>
-#include <Q3PtrList>
+#include <QList>
 
 using namespace std;
 
@@ -183,7 +183,7 @@ class MPUBLIC ManagedListGroup : public ManagedListItem
                      QObject          *_parent=NULL,
                      const char       *_name="ManagedListGroup");
 
-    const Q3PtrList<ManagedListItem>* getItems() const { return &itemList;}
+    const QList<ManagedListItem*>* getItems() const { return &itemList;}
     bool addItem(ManagedListItem* item, int where = -1);
 
     int getItemCount(void) const { return itemCount; }
@@ -231,7 +231,7 @@ class MPUBLIC ManagedListGroup : public ManagedListItem
     void wentBack();
 
   protected:
-    Q3PtrList<ManagedListItem> itemList;
+    QList<ManagedListItem*> itemList;
     int curItem;
     int itemCount;
     QPointer<ManagedListGroup> parentGroup;
@@ -277,27 +277,27 @@ class MPUBLIC SelectManagedListItem : public ManagedListGroup
     virtual bool hasRight(){ return true; }
 
 
-    virtual int getValueIndex(QString value)
+    virtual int getValueIndex(QString value) const
     {
         int i = -1;
-        for (ManagedListItem* tempItem = itemList.first();
-             tempItem; tempItem = itemList.next() )
+        QList<ManagedListItem*>::const_iterator it = itemList.begin();
+        for (; it != itemList.end(); ++it)
         {
             i++;
-            if (tempItem->getValue() == value)
+            if ((*it)->getValue() == value)
                 return i;
         }
         return -1;
     }
 
-    virtual int getTextIndex(QString txt)
+    virtual int getTextIndex(QString txt) const
     {
         int i = -1;
-        for (ManagedListItem* tempItem = itemList.first();
-             tempItem; tempItem = itemList.next() )
+        QList<ManagedListItem*>::const_iterator it = itemList.begin();
+        for (; it != itemList.end(); ++it)
         {
             i++;
-            if (tempItem->getText() == txt)
+            if ((*it)->getText() == txt)
                 return i;
         }
         return -1;
@@ -504,7 +504,6 @@ class MPUBLIC ManagedListSetting : public Setting, public SimpleDBStorage
         {
             return Setting::getValue();
         }
-
     }
 
     virtual void syncDBFromItem()
@@ -562,7 +561,6 @@ class MPUBLIC SelectManagedListSetting : public ManagedListSetting
     {
         if (selectItem)
             return selectItem->addButton(label, value);
-
         return NULL;
     }
 

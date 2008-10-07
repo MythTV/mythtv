@@ -1,15 +1,17 @@
+// ANSI C headers
+#include <cmath> // for ceilf
 
-#include <iostream>
-#include <math.h>
+// C++ headers
+#include <algorithm>
+using namespace std;
 
+// Qt headers
 #include <QApplication>
-#include <q3simplerichtext.h>
-#include <QBitmap>
+#include <QPainter>
 #include <QLabel>
-#include <QPixmap>
-#include <QKeyEvent>
-#include <QEvent>
 #include <Q3PtrList>
+#include <q3simplerichtext.h>
+#include <q3stylesheet.h>
 
 using namespace std;
 
@@ -151,7 +153,7 @@ void LayerSet::SetText(QMap<QString, QString> &infoMap)
                     {
                         full_regex = QString("%") + key + QString("(\\|([^%|]*))?") +
                                      QString("(\\|([^%|]*))?") + QString("(\\|([^%]*))?%");
-                        if (riter.data() != "")
+                        if (*riter != "")
                             new_text.replace(QRegExp(full_regex),
                                              QString("\\2") + data + QString("\\4"));
                         else
@@ -190,8 +192,9 @@ void LayerSet::SetDrawFontShadow(bool state)
 // **************************************************************
 
 UIType::UIType(const QString &name)
-       : QObject(NULL, name)
+       : QObject(NULL)
 {
+    setObjectName(name);
     m_parent = NULL;
     m_name = name;
     m_debug = false;
@@ -615,10 +618,7 @@ UIGuideType::UIGuideType(const QString &name, int order)
     seltype = 1;
     filltype = Alpha;
 
-    allData = new Q3PtrList<UIGTCon>[maxRows];
-
-    for (int i = 0; i < maxRows; i++)
-        allData[i].setAutoDelete(true);
+    allData = new QList<UIGTCon*>[maxRows];
 
     int alphalevel = 80;
     alphaBlender.init(alphalevel, 307);
@@ -627,6 +627,8 @@ UIGuideType::UIGuideType(const QString &name, int order)
 
 UIGuideType::~UIGuideType()
 {
+    for (int i = 0; i < maxRows; i++)
+        ResetRow(i);
     delete [] allData;
 }
 
@@ -644,11 +646,12 @@ void UIGuideType::Draw(QPainter *dr, int drawlayer, int context)
     if ((m_context != context && m_context != -1) || drawlayer != m_order)
         return;
 
-    UIGTCon *data;
     for (int i = 0; i < numRows; i++)
     {
-        for (data = allData[i].first(); data; data = allData[i].next())
+        QList<UIGTCon*>::iterator it = allData[i].begin();
+        for (; it != allData[i].end(); ++it)
         {
+            UIGTCon *data = *it;
             if (data->recStat == 0)
                 drawBackground(dr, data);
             else if (data->recStat == 1)
@@ -662,8 +665,10 @@ void UIGuideType::Draw(QPainter *dr, int drawlayer, int context)
 
     for (int i = 0; i < numRows; i++)
     {
-        for (data = allData[i].first(); data; data = allData[i].next())
+        QList<UIGTCon*>::iterator it = allData[i].begin();
+        for (; it != allData[i].end(); ++it)
         {
+            UIGTCon *data = *it;
             drawText(dr, data);
 
             if (data->recType != 0 || data->arrow != 0)
@@ -902,7 +907,7 @@ void UIGuideType::SetCategoryColors(const QMap<QString, QString> &catC)
     for (QMap<QString, QString>::const_iterator it = catC.begin();
          it != catC.end(); ++it)
     {
-        categoryColors[it.key()] = createColor(it.data());
+        categoryColors[it.key()] = createColor(*it);
     }
 }
 
@@ -934,15 +939,19 @@ void UIGuideType::SetArrow(int direction, const QString &file)
     }
 }
 
-void UIGuideType::ResetData()
+void UIGuideType::ResetData(void)
 {
     for (int i = 0; i < numRows; i++)
-        allData[i].clear();
+        ResetRow(i);
 }
 
 void UIGuideType::ResetRow(int row)
 {
-    allData[row].clear();
+    while (!allData[row].empty())
+    {
+        delete allData[row].back();
+        allData[row].pop_back();
+    }
 }
 
 void UIGuideType::SetProgPast(int ppast)
@@ -960,8 +969,11 @@ AlphaTable::AlphaTable(const QColor &color, int alpha)
     maketable(b, color.blue(), alpha);
 }
 
-AlphaTable::~AlphaTable()
+AlphaTable::AlphaTable(const AlphaTable &other)
 {
+    memcpy(r, other.r, 256);
+    memcpy(g, other.g, 256);
+    memcpy(b, other.b, 256);
 }
 
 void AlphaTable::maketable(unsigned char* data, int channel, int alpha)
@@ -979,32 +991,41 @@ AlphaBlender::~AlphaBlender()
 {
 }
 
-void AlphaBlender::init(int alpha, int cacheSize)
+void AlphaBlender::init(unsigned char _alpha, unsigned int cacheSize)
 {
-    this->alpha = alpha;
-    alphaTables.setAutoDelete(true);
+    alpha      = _alpha;
+    maxEntries = cacheSize;
     alphaTables.clear();
-    alphaTables.resize(cacheSize);
 }
 
 void AlphaBlender::addColor(const QColor &color)
 {
-    if (!alphaTables[color.name()])
-        alphaTables.insert(color.name(), new AlphaTable(color, alpha));
+    AddColorInternal(color);
+}
+
+AlphaTableMap::iterator AlphaBlender::AddColorInternal(const QColor &color)
+{
+    AlphaTableMap::iterator it = alphaTables.find(color.name());
+    if (it == alphaTables.end())
+    {
+        alphaTables[color.name()] = AlphaTable(color, alpha);
+
+        nextDelete.enqueue(color.name());
+        while ((uint)alphaTables.size() + 5 > maxEntries)
+            alphaTables.remove(nextDelete.dequeue());
+
+        return alphaTables.find(color.name());
+    }
+    return it;
 }
 
 void AlphaBlender::blendImage(const QImage &image, const QColor &color)
 {
-    AlphaTable *table = alphaTables.find(color.name());
-    if (!table)
-    {
-        addColor(color);
-        table = alphaTables.find(color.name());
-    }
+    AlphaTableMap::const_iterator table = AddColorInternal(color);
 
-    unsigned char *r = table->r;
-    unsigned char *g = table->g;
-    unsigned char *b = table->b;
+    const unsigned char *r = (*table).r;
+    const unsigned char *g = (*table).g;
+    const unsigned char *b = (*table).b;
 
     int size = image.height() * image.width();
     uchar *data = (uchar *)(*image.jumpTable());
@@ -1157,7 +1178,7 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
                     dr->setFont(tmpfont->face);
                     if (m_debug == true)
                         cerr << "   +UIListType::Draw() Data: "
-                             << (const char *)tempWrite << "\n";
+                             << tempWrite.toLocal8Bit().constData() << "\n";
                     lastShown = true;
                  }
               }
@@ -1714,8 +1735,7 @@ UIImageGridType::UIImageGridType(const QString &name, int order)
     showCheck = false;
     showSelected = false;
 
-    allData = new Q3PtrList<ImageGridItem>;
-    allData->setAutoDelete(true);
+    allData = new QList<ImageGridItem*>;
 }
 
 UIImageGridType::~UIImageGridType(void)
@@ -1745,19 +1765,24 @@ UIImageGridType::~UIImageGridType(void)
     if (upArrowActPixmap)
         delete dnArrowActPixmap;
 
+    reset();
     delete allData;
 }
 
 void UIImageGridType::reset(void)
 {
-    allData->clear();
+    while (!allData->empty())
+    {
+        delete allData->back();
+        allData->pop_back();
+    }
     topRow = itemCount = currentItem = lastRow =
             lastColumn = curColumn = curRow = 0;
 }
 
 void  UIImageGridType::setCurrentPos(int pos)
 {
-    if (pos < 0 || pos > (int) allData->count() - 1)
+    if (pos < 0 || pos > (int) allData->size() - 1)
         return;
 
     currentItem = pos;
@@ -1766,7 +1791,8 @@ void  UIImageGridType::setCurrentPos(int pos)
     if ((currentItem < topRow * columnCount) ||
             (currentItem >= (topRow + rowCount) * columnCount))
     {
-        topRow = QMAX(QMIN(currentItem / columnCount, lastRow - rowCount + 1), 0);
+        topRow = std::max(std::min(currentItem / columnCount,
+                                   lastRow - rowCount + 1), 0);
         curRow = topRow;
     }
 
@@ -1776,12 +1802,11 @@ void  UIImageGridType::setCurrentPos(int pos)
 
 void  UIImageGridType::setCurrentPos(QString value)
 {
-    ImageGridItem *item;
-    for (item = allData->first(); item; item = allData->next())
+    for (uint i = 0; i < (uint)allData->size(); i++)
     {
-        if (item->text == value)
+        if ((*allData)[i]->text == value)
         {
-            setCurrentPos(allData->at());
+            setCurrentPos(i);
             return;
         }
     }
@@ -1794,31 +1819,29 @@ ImageGridItem *UIImageGridType::getCurrentItem(void)
 
 ImageGridItem *UIImageGridType::getItemAt(int pos)
 {
-    if (pos < 0 || pos > (int) allData->count() - 1)
+    if (pos < 0 || pos > (int) allData->size() - 1)
         return NULL;
 
-    return allData->at(pos);
+    return (*allData)[pos];
 }
 
 void UIImageGridType::appendItem(ImageGridItem *item)
 {
     allData->append(item);
-    itemCount = allData->count();
+    itemCount = allData->size();
 }
 
 void UIImageGridType::updateItem(ImageGridItem *item)
 {
-    int itemNo = allData->find(item);
-
-    updateItem(itemNo, item);
+    updateItem(allData->indexOf(item), item);
 }
 
 void UIImageGridType::updateItem(int itemNo, ImageGridItem *item)
 {
-    if (itemNo < 0 || itemNo > (int) allData->count() - 1)
+    if (itemNo < 0 || itemNo > (int) allData->size() - 1)
         return;
 
-    ImageGridItem *gridItem = allData->at(itemNo);
+    ImageGridItem *gridItem = (*allData)[itemNo];
 
     if (gridItem)
     {
@@ -1832,25 +1855,25 @@ void UIImageGridType::updateItem(int itemNo, ImageGridItem *item)
 
 void UIImageGridType::removeItem(ImageGridItem *item)
 {
-    int itemNo = allData->find(item);
-
-    removeItem(itemNo);
+    removeItem(allData->indexOf(item));
 }
 
 void UIImageGridType::removeItem(int itemNo)
 {
-    if (itemNo < 0 || itemNo > (int) allData->count() - 1)
+    if (itemNo < 0 || itemNo > (int) allData->size() - 1)
         return;
 
-    allData->remove(itemNo);
+    delete (*allData)[itemNo];
+    allData->removeAt(itemNo);
 
     itemCount--;
-    lastRow = QMAX((int) ceilf((float) itemCount/columnCount) - 1, 0);
-    lastColumn = QMAX(itemCount - lastRow * columnCount - 1, 0);
+    lastRow = std::max((int) ceilf((float) itemCount/columnCount) - 1, 0);
+    lastColumn = std::max(itemCount - lastRow * columnCount - 1, 0);
 
     // make sure the selected item is still visible
     if (topRow + rowCount > lastRow)
-        topRow = QMAX(QMIN(currentItem / columnCount, lastRow - rowCount + 1), 0);
+        topRow = std::max(std::min(currentItem / columnCount,
+                                   lastRow - rowCount + 1), 0);
 
     if (curRow > lastRow)
         curRow = topRow;
@@ -1902,8 +1925,8 @@ bool UIImageGridType::handleKeyPress(QString action)
         if (curRow == 0)
         {
             curRow = lastRow;
-            curColumn = QMIN(curColumn, lastColumn);
-            topRow  = QMAX(curRow - rowCount + 1,0);
+            curColumn = std::min(curColumn, lastColumn);
+            topRow  = std::max(curRow - rowCount + 1,0);
         }
         else
         {
@@ -1924,7 +1947,7 @@ bool UIImageGridType::handleKeyPress(QString action)
             curRow++;
 
             if (curRow == lastRow)
-                curColumn = QMIN(curColumn, lastColumn);
+                curColumn = std::min(curColumn, lastColumn);
 
             if (curRow >= topRow + rowCount)
                 topRow++;
@@ -1935,7 +1958,7 @@ bool UIImageGridType::handleKeyPress(QString action)
         if (curRow == 0)
             return true;
         else
-            curRow = QMAX(curRow - rowCount, 0);
+            curRow = std::max(curRow - rowCount, 0);
 
         topRow = curRow;
     }
@@ -1949,14 +1972,14 @@ bool UIImageGridType::handleKeyPress(QString action)
         if (curRow >= lastRow)
         {
             curRow = lastRow;
-            curColumn = QMIN(curColumn, lastColumn);
+            curColumn = std::min(curColumn, lastColumn);
         }
 
-        topRow = QMAX(curRow - rowCount + 1,0);
+        topRow = std::max(curRow - rowCount + 1,0);
     }
     else if (action == "SELECT" && showSelected)
     {
-        ImageGridItem *item = allData->at(currentItem);
+        ImageGridItem *item = (*allData)[currentItem];
         if (item)
             item->selected = !item->selected;
     }
@@ -1971,7 +1994,7 @@ bool UIImageGridType::handleKeyPress(QString action)
 
     refresh();
 
-    emit itemChanged(allData->at(currentItem));
+    emit itemChanged((*allData)[currentItem]);
 
     return true;
 }
@@ -2058,7 +2081,7 @@ void UIImageGridType::drawCell(QPainter *p, int curPos, int xpos, int ypos)
     // draw item image
     QPixmap *pixmap = NULL;
     QString filename = "";
-    ImageGridItem *item = allData->at(curPos);
+    ImageGridItem *item = (*allData)[curPos];
 
     // use pixmap stored in item
     if (item)
@@ -2097,7 +2120,7 @@ void UIImageGridType::drawText(QPainter *p, int curPos, int xpos, int ypos)
     }
 
     QString msg = "Invalid Item!!";
-    ImageGridItem * item = allData->at(curPos);
+    ImageGridItem * item = (*allData)[curPos];
     if (item)
     {
         msg = item->text;
@@ -2158,8 +2181,8 @@ void UIImageGridType::recalculateLayout(void)
     cellWidth = (displayRect.width() - (padding * (columnCount -1))) / columnCount;
     cellHeight = (displayRect.height() - arrowHeight -
             (padding * (rowCount -1))) / rowCount;
-    lastRow = QMAX((int) ceilf((float) itemCount/columnCount) - 1, 0);
-    lastColumn = QMAX(itemCount - lastRow * columnCount - 1, 0);
+    lastRow = std::max((int) ceilf((float) itemCount/columnCount) - 1, 0);
+    lastColumn = std::max(itemCount - lastRow * columnCount - 1, 0);
 
 
     // calc image item bounding rect
@@ -2356,9 +2379,10 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
             if (m_debug)
             {
                 cerr << "   +UITextType::Draw() <- inside Layer\n";
-                cerr << "       -Message: " << (const char *)m_message
+                cerr << "       -Message: "
+                     << m_message.toLocal8Bit().constData()
                      << " (cut: "
-                     << (const char *)msg << ")" <<  endl;
+                     << msg.toLocal8Bit().constData() << ")" <<  endl;
             }
         }
         else if (m_debug)
@@ -2885,7 +2909,6 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     bin_corners.clear();
     screen_corners.clear();
     route_to_active.clear();
-    resized_highlight_images.setAutoDelete(true);
     my_tree_data = NULL;
     current_node = NULL;
     active_node = NULL;
@@ -2915,6 +2938,11 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
 
 UIManagedTreeListType::~UIManagedTreeListType()
 {
+    while (!resized_highlight_images.empty())
+    {
+        delete resized_highlight_images.back();
+        resized_highlight_images.pop_back();
+    }
 }
 
 void UIManagedTreeListType::drawText(QPainter *p,
@@ -3565,7 +3593,11 @@ void UIManagedTreeListType::setActiveBin(int a_bin)
 
 void UIManagedTreeListType::makeHighlights()
 {
-    resized_highlight_images.clear();
+    while (!resized_highlight_images.empty())
+    {
+        delete resized_highlight_images.back();
+        resized_highlight_images.pop_back();
+    }
     highlight_map.clear();
 
     //
@@ -4712,8 +4744,6 @@ UISelectorType::UISelectorType(const QString &name,
                :UIPushButtonType(name, on, off, pushed)
 {
     m_area = area;
-    my_data.clear();
-    my_data.setAutoDelete(true);
     current_data = NULL;
 }
 
@@ -4785,11 +4815,11 @@ void UISelectorType::addItem(int an_int, const QString &a_string)
 
 void UISelectorType::setToItem(int which_item)
 {
-    for(uint i = 0; i < my_data.count(); i++)
+    for(uint i = 0; i < (uint)my_data.size(); i++)
     {
-        if (my_data.at(i)->getInt() == which_item)
+        if (my_data[i]->getInt() == which_item)
         {
-            current_data = my_data.at(i);
+            current_data = my_data[i];
             refresh();
         }
     }
@@ -4797,11 +4827,11 @@ void UISelectorType::setToItem(int which_item)
 
 void UISelectorType::setToItem(const QString &which_item)
 {
-    for (uint i = 0; i < my_data.count(); i++)
+    for (uint i = 0; i < (uint)my_data.size(); i++)
     {
-        if (my_data.at(i)->getString() == which_item)
+        if (my_data[i]->getString() == which_item)
         {
-            current_data = my_data.at(i);
+            current_data = my_data[i];
             refresh();
         }
     }
@@ -4835,23 +4865,18 @@ void UISelectorType::push(bool up_or_down)
 
     if (current_data)
     {
-        my_data.find(current_data);
-        if (up_or_down)
-        {
-            if (!(current_data = my_data.next()))
-            {
-                current_data = my_data.first();
-            }
+        int cur_indx = my_data.indexOf(current_data);
+        int next_indx = (up_or_down) ? cur_indx + 1 : cur_indx - 1;
 
-        }
+        if (next_indx >= my_data.size())
+            current_data = my_data.empty() ? NULL : my_data.front();
+        else if (next_indx < 0)
+            current_data = my_data.empty() ? NULL : my_data.back();
         else
-        {
-            if (!(current_data = my_data.prev()))
-            {
-                current_data = my_data.last();
-            }
-        }
-        emit pushed(current_data->getInt());
+            current_data = my_data[next_indx];
+
+        if (current_data)
+            emit pushed(current_data->getInt());
     }
     refresh();
 }
@@ -4864,7 +4889,11 @@ void UISelectorType::unPush()
 
 UISelectorType::~UISelectorType()
 {
-    my_data.clear();
+    while (!my_data.empty())
+    {
+        delete my_data.back();
+        my_data.pop_back();
+    }
 }
 
 // ********************************************************************
@@ -5229,9 +5258,10 @@ void UIKeyboardType::init()
 {
     m_bInitalized = true;
 
-    UIKeyType *key;
-    for (key = m_keyList.first(); key; key = m_keyList.next())
+    KeyList::iterator it = m_keyList.begin();
+    for (; it != m_keyList.end(); ++it)
     {
+        UIKeyType *key = *it;
         if (key->GetType() == "char")
         {
             connect(key, SIGNAL( pushed() ), this, SLOT( charKey() ) );
@@ -5530,11 +5560,9 @@ void UIKeyboardType::updateButtons()
     bool bShift = m_shiftLKey->IsOn();
     bool bAlt = (m_altKey ? m_altKey->IsOn() : false);
 
-    UIKeyType *key;
-    for (key = m_keyList.first(); key; key = m_keyList.next())
-    {
-        key->SetShiftState(bShift, bAlt);
-    }
+    KeyList::iterator it = m_keyList.begin();
+    for (; it != m_keyList.end(); ++it)
+        (*it)->SetShiftState(bShift, bAlt);
 }
 
 void UIKeyboardType::shiftLOnOff()
@@ -5685,13 +5713,11 @@ void UIKeyboardType::moveRight()
 
 UIKeyType *UIKeyboardType::findKey(QString keyName)
 {
-    UIKeyType *key;
-    for (key = m_keyList.first(); key; key = m_keyList.next())
+    KeyList::const_iterator it = m_keyList.begin();
+    for (; it != m_keyList.end(); ++it)
     {
-        if (key->getName() == keyName)
-        {
-            return key;
-        }
+        if ((*it)->getName() == keyName)
+            return (*it);
     }
     return NULL;
 }

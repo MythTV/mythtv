@@ -25,7 +25,7 @@
 #include "uitypes.h"
 
 #include <QPixmap>
-#include <Q3PtrList>
+#include <QList>
 
 class UIListBtnType;
 class UIListBtnTypeItem;
@@ -140,7 +140,7 @@ class MPUBLIC UIListTreeType : public UIType
     UIListGenericTree *treetop;
     UIListGenericTree *currentpos;
 
-    Q3PtrList<UIListBtnType> listLevels;
+    QList<UIListBtnType*> listLevels;
 
     UIListBtnType *currentlevel;
 
@@ -196,7 +196,9 @@ class MPUBLIC UIListBtnType : public UIType
 
     bool  MoveItemUpDown(UIListBtnTypeItem *item, bool flag);
 
-    Q3PtrListIterator<UIListBtnTypeItem> GetIterator();
+    typedef QList<UIListBtnTypeItem*>::iterator iterator;
+    iterator begin() { return m_itemList.begin(); }
+    iterator end()   { return m_itemList.end();   }
 
     int   GetItemPos(UIListBtnTypeItem* item);
     int   GetCount();
@@ -279,14 +281,11 @@ class MPUBLIC UIListBtnType : public UIType
     UIListBtnTypeItem* m_topItem;
     UIListBtnTypeItem* m_selItem;
 
-    Q3PtrListIterator<UIListBtnTypeItem> *m_topIterator;
-    Q3PtrListIterator<UIListBtnTypeItem> *m_selIterator;
-
     int       m_selPosition;
     int       m_topPosition;
     int       m_itemCount;
 
-    Q3PtrList<UIListBtnTypeItem> m_itemList;
+    QList<UIListBtnTypeItem*> m_itemList;
 
     friend class UIListBtnTypeItem;
   

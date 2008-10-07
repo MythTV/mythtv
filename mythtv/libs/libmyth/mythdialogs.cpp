@@ -11,7 +11,6 @@ using namespace std;
 #include <QLayout>
 #include <QRegExp>
 #include <q3accel.h>
-#include <q3dict.h>
 #include <QImageReader>
 #include <QEventLoop>
 #include <QLabel>
@@ -20,7 +19,8 @@ using namespace std;
 #include <Q3VBoxLayout>
 #include <QFrame>
 #include <QPaintEvent>
-#include <Q3PtrList>
+#include <QPainter>
+#include <QProgressBar>
 
 #ifdef QWS
 #include <qwindowsystem_qws.h>
@@ -1092,10 +1092,10 @@ bool MythThemedDialog::loadThemedWindow(QString window_name, QString theme_filen
     //
 
     //  Loop over containers
-    Q3PtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-    while ((looper = an_it.current()) != 0)
+    QList<LayerSet*>::iterator an_it = my_containers.begin();
+    for (; an_it != my_containers.end(); ++an_it)
     {
+        LayerSet *looper = *an_it;
         //  Loop over UITypes within each container
         vector<UIType *> *all_ui_type_objects = looper->getAllTypes();
         vector<UIType *>::iterator i = all_ui_type_objects->begin();
@@ -1109,7 +1109,6 @@ bool MythThemedDialog::loadThemedWindow(QString window_name, QString theme_filen
             connect(type, SIGNAL(requestRegionUpdate(const QRect &)), this,
                     SLOT(updateForegroundRegion(const QRect &)));
         }
-        ++an_it;
     }
 
     buildFocusList();
@@ -1130,30 +1129,26 @@ bool MythThemedDialog::buildFocusList()
 
 
     //  Loop over containers
-    LayerSet *looper;
-    Q3PtrListIterator<LayerSet> another_it(my_containers);
-    while ((looper = another_it.current()) != 0)
+    QList<LayerSet*>::iterator another_it = my_containers.begin();
+    for (; another_it != my_containers.end(); ++another_it)
     {
+        LayerSet *looper = *another_it;
         //  Loop over UITypes within each container
         vector<UIType *> *all_ui_type_objects = looper->getAllTypes();
         vector<UIType *>::iterator i = all_ui_type_objects->begin();
         for (; i != all_ui_type_objects->end(); i++)
         {
             UIType *type = (*i);
-            if (type->canTakeFocus() && !type->isHidden())
+            if (type->canTakeFocus() && !type->isHidden() &&
+                (context == -1 || type->GetContext() == -1 ||
+                 context == type->GetContext()))
             {
-                if (context == -1 || type->GetContext() == -1 ||
-                        context == type->GetContext())
-                    focus_taking_widgets.append(type);
+                focus_taking_widgets.push_back(type);
             }
         }
-        ++another_it;
     }
-    if (focus_taking_widgets.count() > 0)
-    {
-        return true;
-    }
-    return false;
+
+    return !focus_taking_widgets.empty();
 }
 
 MythThemedDialog::~MythThemedDialog()
@@ -1354,11 +1349,10 @@ void MythThemedDialog::UpdateForegroundRect(const QRect &inv_rect)
     whole_dialog_painter.drawPixmap(inv_rect.topLeft(), my_background,
                                     inv_rect);
 
-    Q3PtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while ((looper = an_it.current()) != 0)
+    QList<LayerSet*>::iterator an_it = my_containers.begin();
+    for (; an_it != my_containers.end(); ++an_it)
     {
+        LayerSet *looper = *an_it;
         QRect container_area = looper->GetAreaRect();
 
         //
@@ -1406,7 +1400,6 @@ void MythThemedDialog::UpdateForegroundRect(const QRect &inv_rect)
 
             whole_dialog_painter.restore();
         }
-        ++an_it;
     }
 }
 
@@ -1429,18 +1422,16 @@ bool MythThemedDialog::assignFirstFocus()
         widget_with_current_focus->looseFocus();
     }
 
-    Q3PtrListIterator<UIType> an_it(focus_taking_widgets);
-    UIType *looper;
-
-    while ((looper = an_it.current()) != 0)
+    vector<UIType*>::iterator an_it = focus_taking_widgets.begin();
+    for (; an_it != focus_taking_widgets.end(); ++an_it)
     {
+        UIType *looper = *an_it;
         if (looper->canTakeFocus())
         {
             widget_with_current_focus = looper;
             widget_with_current_focus->takeFocus();
             return true;
         }
-        ++an_it;
     }
 
     return false;
@@ -1451,11 +1442,11 @@ bool MythThemedDialog::nextPrevWidgetFocus(bool up_or_down)
     if (up_or_down)
     {
         bool reached_current = false;
-        Q3PtrListIterator<UIType> an_it(focus_taking_widgets);
-        UIType *looper;
 
-        while ((looper = an_it.current()) != 0)
+        vector<UIType*>::iterator an_it = focus_taking_widgets.begin();
+        for (; an_it != focus_taking_widgets.end(); ++an_it)
         {
+            UIType *looper = *an_it;
             if (reached_current && looper->canTakeFocus())
             {
                 widget_with_current_focus->looseFocus();
@@ -1468,7 +1459,6 @@ bool MythThemedDialog::nextPrevWidgetFocus(bool up_or_down)
             {
                 reached_current= true;
             }
-            ++an_it;
         }
 
         if (assignFirstFocus())
@@ -1480,12 +1470,12 @@ bool MythThemedDialog::nextPrevWidgetFocus(bool up_or_down)
     else
     {
         bool reached_current = false;
-        Q3PtrListIterator<UIType> an_it(focus_taking_widgets);
-        an_it.toLast();
-        UIType *looper;
 
-        while ((looper = an_it.current()) != 0)
+        vector<UIType*>::reverse_iterator an_it = focus_taking_widgets.rbegin();
+        for (; an_it != focus_taking_widgets.rend(); ++an_it)
         {
+            UIType *looper = *an_it;
+
             if (reached_current && looper->canTakeFocus())
             {
                 widget_with_current_focus->looseFocus();
@@ -1498,14 +1488,15 @@ bool MythThemedDialog::nextPrevWidgetFocus(bool up_or_down)
             {
                 reached_current= true;
             }
-            --an_it;
         }
 
         if (reached_current)
         {
-            an_it.toLast();
-            while ((looper = an_it.current()) != 0)
+            an_it = focus_taking_widgets.rbegin();
+            for (; an_it != focus_taking_widgets.rend(); ++an_it)
             {
+                UIType *looper = *an_it;
+
                 if (looper->canTakeFocus())
                 {
                     widget_with_current_focus->looseFocus();
@@ -1513,7 +1504,6 @@ bool MythThemedDialog::nextPrevWidgetFocus(bool up_or_down)
                     widget_with_current_focus->takeFocus();
                     return true;
                 }
-                --an_it;
             }
         }
         return false;
@@ -1561,15 +1551,12 @@ UIType* MythThemedDialog::getUIObject(const QString &name)
     //  UIType objects "owned" by this dialog
     //
 
-    Q3PtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while ((looper = an_it.current()) != 0)
+    QList<LayerSet*>::iterator an_it = my_containers.begin();
+    for (; an_it != my_containers.end(); ++an_it)
     {
-        UIType *hunter = looper->GetType(name);
+        UIType *hunter = (*an_it)->GetType(name);
         if (hunter)
             return hunter;
-        ++an_it;
     }
 
     return NULL;
@@ -1587,7 +1574,10 @@ UIType* MythThemedDialog::getCurrentFocusWidget()
 void MythThemedDialog::setCurrentFocusWidget(UIType* widget)
 {
     // make sure this widget is in the list of widgets that can take focus
-    if (focus_taking_widgets.find(widget) == -1)
+    vector<UIType*>::iterator it =
+        std::find(focus_taking_widgets.begin(),
+                  focus_taking_widgets.end(), widget);
+    if (it == focus_taking_widgets.end())
         return;
 
     if (widget_with_current_focus)
@@ -1677,17 +1667,13 @@ UIImageGridType* MythThemedDialog::getUIImageGridType(const QString &name)
     return GetUIType<UIImageGridType>(this, name);
 }
 
-LayerSet* MythThemedDialog::getContainer(const QString& name)
+LayerSet *MythThemedDialog::getContainer(const QString &name)
 {
-    Q3PtrListIterator<LayerSet> an_it(my_containers);
-    LayerSet *looper;
-
-    while( (looper = an_it.current()) != 0)
+    QList<LayerSet*>::iterator an_it = my_containers.begin();
+    for (; an_it != my_containers.end(); ++an_it)
     {
-        if (looper->GetName() == name)
-            return looper;
-
-        ++an_it;
+        if ((*an_it)->GetName() == name)
+            return *an_it;
     }
 
     return NULL;

@@ -9,7 +9,7 @@
 #include <Q3ProgressBar>
 #include <QFrame>
 #include <QVector>
-#include <Q3PtrList>
+#include <QList>
 
 #include "mythexp.h"
 
@@ -423,8 +423,8 @@ class MPUBLIC MythThemedDialog : public MythDialog
     QDomElement xmldata;
     int context;
 
-    Q3PtrList<LayerSet>  my_containers;
-    Q3PtrList<UIType>    focus_taking_widgets;
+    QList<LayerSet*>  my_containers;
+    vector<UIType*>   focus_taking_widgets;
 
     QRect redrawRect;
 };

@@ -1,29 +1,28 @@
-#include <vector>
-#include <utility>
-
-#include "mythtv/mythcontext.h"
 
 // c/c++
+#include <vector>
+#include <utility>
 #include <unistd.h>
 
 // qt
-#include <qfile.h>
-#include <qdialog.h>
-#include <qcursor.h>
-#include <qdir.h>
-#include <qimage.h>
-#include <qapplication.h>
-#include <qobject.h>
-//Added by qt3to4:
+#include <QFile>
+#include <QDialog>
+#include <QCursor>
+#include <QDir>
+#include <QImage>
+#include <QApplication>
+#include <QObject>
 #include <Q3HBoxLayout>
+#include <Q3VBoxLayout>
+#include <q3header.h>
 #include <QLabel>
 #include <QKeyEvent>
 #include <QEvent>
-#include <Q3VBoxLayout>
 #include <QProcess>
 #include <QStringList>
 
 // mythtv
+#include <mythtv/mythcontext.h>
 #include <mythtv/util.h>
 #include <mythtv/compat.h>
 
