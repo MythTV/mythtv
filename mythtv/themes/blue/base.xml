@@ -25,18 +25,99 @@
             <size:big>22</size:big>
         </font>
 
-        <font name="clock" from="small">
-            <size>22</size>
-            <size:small>18</size:small>
-            <size:big>22</size:big>
+        <font name="basefont"  face="Trebuchet Ms">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>16</size>
+            <size:small>14</size:small>
+            <size:big>18</size:big>
+            <shadow>2,2</shadow>
+            <bold>yes</bold>
         </font>
 
-        <clock name="clock">
-            <area>10,110,790,50</area>
-            <font>clock</font>
-            <align>center</align>
-            <format>%DATE% %TIME%</format>
-        </clock>
+        <font name="title" from="basefont" face="Arial Black">
+            <color>#ffffdd</color>
+            <size>22</size>
+            <bold>no</bold>
+            <size:big>24</size:big>
+            <size:small>18</size:small>
+        </font>
+
+        <font name="subtitle" from="basefont">
+            <color>#ffffdd</color>
+            <size>18</size>
+            <size:big>20</size:big>
+            <size:small>14</size:small>
+        </font>
+
+        <font name="info" from="basefont">
+            <shadow>1,1</shadow>
+        </font>
+
+        <font name="metadata" from="info">
+            <color>#ffffdd</color>
+        </font>
+
+        <font name="help" from="info">
+            <shadow>2,2</shadow>
+            <color>#aaaaee</color>
+        </font>
+
+        <font name="description" from="info">
+            <shadow>1,1</shadow>
+        </font>
+
+        <font name="small-info" from="info">
+            <size>14</size>
+            <size:small>12</size:small>
+            <size:big>17</size:big>
+        </font>
+
+        <font name="list-active" from="basefont" face="Freesans">
+            <size>15</size>
+            <size:small>14</size:small>
+            <size:big>18</size:big>
+            <shadow>1,1</shadow>
+            <color>#ddddff</color>
+        </font>
+
+        <font name="list-inactive" from="list-active">
+            <color>#aaaaee</color>
+        </font>
+
+        <font name="list-record" from="list-active">
+            <color>#33ff33</color>
+        </font>
+
+        <font name="list-recording" from="list-active">
+            <color>#ff5544</color>
+        </font>
+
+        <font name="list-norecord" from="list-active">
+            <color>#999999</color>
+        </font>
+
+        <font name="list-conflict"  from="list-active">
+            <color>#dddd33</color>
+        </font>
+
+        <font name="list-tagged"  from="list-active">
+            <color>#dddd33</color>
+        </font>
+
+        <font name="list-selected"  from="list-active">
+            <color>#ffffff</color>
+        </font>
+
+        <font name="list-selectable" from="list-active">
+            <color>#ddddff</color>
+        </font>
+
+        <font name="recstatus" from="info">
+            <color>#ffff33</color>
+            <shadow>2,2</shadow>
+        </font>
+
     </window>
 
 </mythuitheme>

@@ -1,0 +1,820 @@
+<mythuitheme>
+
+    <window name="mainmenu">
+
+        <font name="clock" from="small">
+            <size>20</size>
+            <size:small>18</size:small>
+            <size:big>22</size:big>
+            <outlinesize>2</outlinesize>
+            <outlinecolor>black</outlinecolor>
+        </font>
+
+        <font name="menufont" face="Trebuchet Ms">
+            <color>#FFFFFF</color>
+            <size>16</size>
+            <bold>yes</bold>
+            <shadowcolor>black</shadowcolor>
+            <shadowoffset>2,2</shadowoffset>
+            <shadowalpha>128</shadowalpha>
+        </font>
+
+        <imagetype name="logo">
+            <filename>myth_tv_logo.png</filename>
+            <position>270,35</position>
+        </imagetype>
+
+        <clock name="clock">
+            <area>100,110,600,40</area>
+            <font>clock</font>
+            <align>hcenter</align>
+            <format>%DATE% %TIME%</format>
+        </clock>
+
+        <statetype name="titles">
+            <position>33,33</position>
+            <state name="TV">
+                <imagetype name="TV">
+                    <filename>watch_tv.png</filename>
+                </imagetype>
+            </state>
+            <state name="MAIN">
+                <imagetype name="MAIN">
+                    <filename>home.png</filename>
+                </imagetype>
+            </state>
+            <state name="MUSIC">
+                <imagetype name="MUSIC">
+                    <filename>playlist.png</filename>
+                </imagetype>
+            </state>
+            <state name="GALLERY">
+                <imagetype name="icon">
+                    <filename>images.png</filename>
+                    <position>30,10</position>
+                </imagetype>
+            </state>
+            <state name="VIDEO">
+                <imagetype name="VIDEO">
+                    <filename>videobutton.png</filename>
+                </imagetype>
+            </state>
+            <state name="SCHEDULE">
+                <imagetype name="SCHEDULE">
+                    <filename>record.png</filename>
+                </imagetype>
+            </state>
+            <state name="SEARCH">
+                <imagetype name="SEARCH">
+                    <filename>FINDER.png</filename>
+                </imagetype>
+            </state>
+            <state name="SETUP">
+                <imagetype name="SETUP">
+                    <filename>SETTINGS.png</filename>
+                </imagetype>
+            </state>
+            <state name="MEDIA_SETUP">
+                <imagetype name="MEDIA_SETUP">
+                    <filename>MEDIA_LIBRARY.png</filename>
+                </imagetype>
+            </state>
+            <state name="INFO_SETUP">
+                <imagetype name="INFO_SETUP">
+                    <filename>news.png</filename>
+                </imagetype>
+            </state>
+            <state name="TVSETUP" from="TV" />
+            <state name="DVD">
+                <imagetype name="DVD">
+                    <filename>watch_dvd.png</filename>
+                </imagetype>
+            </state>
+            <state name="DVD_SETTINGS" from="DVD" />
+            <state name="MUSIC_SETTINGS">
+                <imagetype name="MUSIC_SETTINGS">
+                    <filename>playlist.png</filename>
+                </imagetype>
+            </state>
+            <state name="VIDEO_SETTINGS" FROM="VIDEO" />
+            <state name="GAME_SETTINGS">
+                <imagetype name="icon">
+                    <filename>game.png</filename>
+                    <position>20,10</position>
+                </imagetype>
+            </state>
+            <state name="LIBRARY">
+                <imagetype name="LIBRARY">
+                    <filename>MEDIA_LIBRARY.png</filename>
+                </imagetype>
+            </state>
+            <state name="MANAGE_RECORDINGS">
+                <imagetype name="MANAGE_RECORDINGS">
+                    <filename>record.png</filename>
+                </imagetype>
+            </state>
+            <state name="INFO">
+                <imagetype name="INFO">
+                    <filename>news.png</filename>
+                </imagetype>
+            </state>
+            <state name="OPTICAL_DISK">
+                <imagetype name="OPTICAL_DISK">
+                    <filename>cd.png</filename>
+                </imagetype>
+            </state>
+            <state name="UTIL">
+                <imagetype name="UTIL">
+                    <filename>SETTINGS.png</filename>
+                </imagetype>
+            </state>
+            <state name="WORDS">
+                <imagetype name="WORDS">
+                    <filename>SEARCH_WORDS.png</filename>
+                </imagetype>
+            </state>
+            <state name="LISTS">
+                <imagetype name="LISTS">
+                    <filename>SEARCH_LISTS.png</filename>
+                </imagetype>
+            </state>
+            <state name="NETFLIX" from="DVD" />
+        </statetype>
+
+        <buttonlist name="menu">
+            <area>60,135,680,514</area>
+            <layout>grid</layout>
+            <spacing>30</spacing>
+            <buttonarea>0,22,680,450</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,200,200</area>
+                    <imagetype name="buttonbackground">
+                        <filename>button_off.png</filename>
+                    </imagetype>
+                    <statetype name="icon">
+                        <position>0,10</position>
+                        <state name="DEFAULT">
+                            <imagetype name="icon">
+                                <filename>mv-vmanager.png</filename>
+                                <position>20,20</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV">
+                            <imagetype name="icon">
+                                <filename>watch_tv.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="MUSIC">
+                            <imagetype name="icon">
+                                <filename>MUSIC_PLAY.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="VIDEO">
+                            <imagetype name="icon">
+                                <filename>videobutton.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="DVD">
+                            <imagetype name="icon">
+                                <filename>watch_dvd.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="FM" from="DEFAULT" />
+
+                        <state name="IMAGES">
+                            <imagetype name="icon">
+                                <filename>images.png</filename>
+                                <position>30,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="GAME">
+                            <imagetype name="icon">
+                                <filename>game.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="WEATHER">
+                            <imagetype name="icon">
+                                <filename>weather.png</filename>
+                                <position>16,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="NEWS">
+                            <imagetype name="icon">
+                                <filename>news.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="WEBPAGE">
+                            <imagetype name="icon">
+                                <filename>webpage.png</filename>
+                                <position>22,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="RECIPE" FROM="DEFAULT" />
+                        <state name="SETUP">
+                            <imagetype name="icon">
+                                <filename>SETTINGS.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SHUTDOWN" from="DEFAULT" />
+
+                        <state name="NETFLIX" from="DVD" />
+                        <state name="NETFLIX_QUEUE" from="DVD" />
+                        <state name="NETFLIX_BROWSE" from="DVD" />
+                        <state name="NETFLIX_HISTORY" from="DVD" />
+                        <state name="SETTINGS_NETFLIX" from="DVD" />
+
+                        <state name="SETTINGS_GENERAL">
+                            <imagetype name="icon">
+                                <filename>setup.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETTINGS_APPEARANCE">
+                            <imagetype name="icon">
+                                <filename>APPEARANCE.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SCREENSETUPWIZARD" from="SETTINGS_APPEARANCE" />
+
+                        <state name="SETTINGS_TV" from="TV" />
+
+                        <state name="SETTINGS_MUSIC">
+                            <imagetype name="icon">
+                                <filename>playlist.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETTINGS_VIDEO">
+                            <imagetype name="icon">
+                                <filename>videobutton.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETTINGS_DVD" from="DVD" />
+                        <state name="SETTINGS_FM" from="DEFAULT" />
+
+                        <state name="SETTINGS_IMAGES" from="IMAGES" />
+
+                        <state name="SETTINGS_GAME" from="GAME" />
+
+                        <state name="SETTINGS_WEATHER">
+                            <imagetype name="icon">
+                                <filename>weather.png</filename>
+                                <position>20,20</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETTINGS_NEWS">
+                            <imagetype name="icon">
+                                <filename>news.png</filename>
+                                <position>14,22</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETTINGS_WEBPAGE">
+                            <imagetype name="icon">
+                                <filename>webpage.png</filename>
+                                <position>22,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETTINGS_RECIPE" from="DEFAULT" />
+
+                        <state name="SETTINGS_XBOX" from="DEFAULT" />
+
+                        <state name="DVD_SETTINGS_GENERAL">
+                            <imagetype name="icon">
+                                <filename>setup.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="DVD_SETTINGS_PLAY" from="DVD" />
+                        <state name="DVD_SETTINGS_RIP">
+                            <imagetype name="icon">
+                                <filename>rip_dvd.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="DVD_PLAY" from="DVD" />
+
+                        <state name="VCD_PLAY">
+                            <imagetype name="icon">
+                                <filename>watch_vcd.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="DVD_RIP">
+                            <imagetype name="icon">
+                                <filename>rip_dvd.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="EJECT">
+                            <imagetype name="icon">
+                                <filename>eject.png</filename>
+                                <position>25,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="GAME_SETTINGS_GENERAL">
+                            <imagetype name="icon">
+                                <filename>setup.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="GAME_SCAN">
+                            <imagetype name="icon">
+                                <filename>GAME_SCAN.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="MUSIC_SETTINGS_GENERAL">
+                            <imagetype name="icon">
+                                <filename>setup.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="MUSIC_SETTINGS_PLAYER">
+                            <imagetype name="icon">
+                                <filename>playlist.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="MUSIC_SETTINGS_RIP">
+                            <imagetype name="icon">
+                                <filename>rip_cd.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="MUSIC_PLAY" from="MUSIC" />
+
+                        <state name="MUSIC_PLAYLIST">
+                            <imagetype name="icon">
+                                <filename>playlist.png</filename>
+                                <position>14,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="MUSIC_RIP">
+                            <imagetype name="icon">
+                                <filename>rip_cd.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="MUSIC_SCAN">
+                            <imagetype name="icon">
+                                <filename>MUSIC_SCAN.png</filename>
+                                <position>14,14</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_RECPRIORITIES_SETTINGS_GENERAL">
+                            <imagetype name="icon">
+                                <filename>recpriorities.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_RECPRIORITIES_CHANNEL">
+                            <imagetype name="icon">
+                                <filename>recpriorities.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_RECPRIORITIES_CUSTOM">
+                            <imagetype name="icon">
+                                <filename>recpriorities.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETUP_GENERAL">
+                            <imagetype name="icon">
+                                <filename>setup.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETUP_STORAGE_GROUPS">
+                            <imagetype name="icon">
+                                <filename>setup.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETUP_CAPTURE_CARDS">
+                            <imagetype name="icon">
+                                <filename>setup.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETUP_VIDEO_SOURCES">
+                            <imagetype name="icon">
+                                <filename>setup.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETUP_INPUT_CONNECTIONS">
+                            <imagetype name="icon">
+                                <filename>setup.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETUP_CHANNEL_EDITOR">
+                            <imagetype name="icon">
+                                <filename>setup.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_PROGRAM_GUIDE">
+                            <imagetype name="icon">
+                                <filename>record.png</filename>
+                                <position>30,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_PROGFIND">
+                            <imagetype name="icon">
+                                <filename>FINDER.png</filename>
+                                <position>25,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SEARCH_LISTINGS">
+                            <imagetype name="icon">
+                                <filename>SEARCH_LISTS.png</filename>
+                                <position>25,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SEARCH_WORDS">
+                            <imagetype name="icon">
+                                <filename>SEARCH_WORDS.png</filename>
+                                <position>25,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SEARCH_LISTS">
+                            <imagetype name="icon">
+                                <filename>SEARCH_LISTS.png</filename>
+                                <position>12,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_CUSTOM_RECORD">
+                            <imagetype name="icon">
+                                <filename>record.png</filename>
+                                <position>25,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_MANUAL_SCHEDULE">
+                            <imagetype name="icon">
+                                <filename>MANUAL.png</filename>
+                                <position>25,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_RECPRIORITIES">
+                            <imagetype name="icon">
+                                <filename>recpriorities.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_CONFLICTS">
+                            <imagetype name="icon">
+                                <filename>conflict.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SEARCH_TITLES">
+                            <imagetype name="icon">
+                                <filename>SEARCH_TITLES.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SEARCH_KEYWORDS">
+                            <imagetype name="icon">
+                                <filename>SEARCH_KEYWORDS.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SEARCH_PEOPLE">
+                            <imagetype name="icon">
+                                <filename>SEARCH_PEOPLE.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SEARCH_POWER">
+                            <imagetype name="icon">
+                                <filename>POWER_SEARCH.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SEARCH_NEW_TITLES">
+                            <imagetype name="icon">
+                                <filename>SEARCH_NEW.png</filename>
+                                <position>20,8</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SEARCH_MOVIES">
+                            <imagetype name="icon">
+                                <filename>SEARCH_MOVIES.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SEARCH_CATEGORIES">
+                            <imagetype name="icon">
+                                <filename>SEARCH_CAT.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SEARCH_CHANNELS">
+                            <imagetype name="icon">
+                                <filename>SEARCH_CHAN.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SEARCH_TIMES">
+                            <imagetype name="icon">
+                                <filename>SEARCH_TIME.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SETTINGS_GENERAL">
+                            <imagetype name="icon">
+                                <filename>setup.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SETTINGS_PROGRAM_GUIDE">
+                            <imagetype name="icon">
+                                <filename>record.png</filename>
+                                <position>30,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SETTINGS_PLAYBACK">
+                            <imagetype name="icon">
+                                <filename>play.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SETTINGS_PLAYBACK_OSD">
+                            <imagetype name="icon">
+                                <filename>play.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SETTINGS_PLAYBACK_GROUPS">
+                            <imagetype name="icon">
+                                <filename>play.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SETTINGS_RECORDING_PROFILES">
+                            <imagetype name="icon">
+                                <filename>record.png</filename>
+                                <position>30,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_SETTINGS_RECPRIORITIES">
+                            <imagetype name="icon">
+                                <filename>recpriorities.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_WATCH_TV" from="TV" />
+                        <state name="TV_SCHEDULE_RECORDINGS">
+                            <imagetype name="icon">
+                                <filename>record.png</filename>
+                                <position>25,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_WATCH_RECORDINGS">
+                            <imagetype name="icon">
+                                <filename>play.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_DELETE">
+                            <imagetype name="icon">
+                                <filename>delete.png</filename>
+                                <position>25,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_PREVIOUS">
+                            <imagetype name="icon">
+                                <filename>previous.png</filename>
+                                <position>30,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="TV_STATUS">
+                            <imagetype name="icon">
+                                <filename>showstatus.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="VIDEO_SETTINGS_GENERAL">
+                            <imagetype name="icon">
+                                <filename>setup.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="VIDEO_SETTINGS_PLAYER">
+                            <imagetype name="icon">
+                                <filename>mv-vbrowser.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="VIDEO_FILE_TYPES">
+                            <imagetype name="icon">
+                                <filename>FILE_TYPES.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="VIDEO_BROWSER">
+                            <imagetype name="icon">
+                                <filename>mv-vbrowser.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="VIDEO_LIST">
+                            <imagetype name="icon">
+                                <filename>mv-vlist.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="VIDEO_MANAGER" from="DEFAULT" />
+
+                        <state name="TV_UPCOMING_RECORDINGS">
+                            <imagetype name="icon">
+                                <filename>UPCOMING.png</filename>
+                                <position>30,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETTINGS_MEDIA">
+                            <imagetype name="icon">
+                                <filename>MEDIA_LIBRARY.png</filename>
+                                <position>18,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETTINGS_INFO_CENTER">
+                            <imagetype name="icon">
+                                <filename>news.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="MENU_MEDIA_LIBRARY">
+                            <imagetype name="icon">
+                                <filename>MEDIA_LIBRARY.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="MENU_MANAGE_RECORDINGS">
+                            <imagetype name="icon">
+                                <filename>record.png</filename>
+                                <position>24,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="MENU_INFO_CENTER">
+                            <imagetype name="icon">
+                                <filename>news.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="MENU_OPTICAL_DISKS">
+                            <imagetype name="icon">
+                                <filename>cd.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="MENU_UTILITIES_SETUP">
+                            <imagetype name="icon">
+                                <filename>SETTINGS.png</filename>
+                                <position>20,10</position>
+                            </imagetype>
+                        </state>
+
+                        <state name="SETUP_FRONTEND" from="DEFAULT" />
+
+                        <state name="SETUP_BACKEND" from="DEFAULT" />
+
+                        <state name="SETUP_MENU">
+                            <imagetype name="icon">
+                                <filename>setup.png</filename>
+                                <position>22,10</position>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <textarea name="buttontext">
+                        <area>20,120,160,80</area>
+                        <font>menufont</font>
+                        <align>hcenter,top</align>
+                        <cutdown>yes</cutdown>
+                        <multiline>yes</multiline>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="buttonbackground">
+                        <filename>button_on.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>650,0</position>
+                <showempty>yes</showempty>
+                <state type="full">
+                    <imagetype name="upon">
+                        <filename>uparrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>650,430</position>
+                <showempty>yes</showempty>
+                <state type="full">
+                    <imagetype name="dnon">
+                        <filename>downarrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+    </window>
+
+</mythuitheme>
+
