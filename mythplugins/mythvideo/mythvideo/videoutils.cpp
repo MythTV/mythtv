@@ -95,15 +95,14 @@ void ETNop::Container(QString child_name)
 
 void ETPrintWarning::Child(QString container_name, QString child_name)
 {
-    VERBOSE(VB_GENERAL, QString(QObject::tr("Warning: container '%1' is "
-                            "missing child '%2'")).arg(container_name)
-            .arg(child_name));
+    VERBOSE(VB_GENERAL | VB_EXTRA, QObject::tr("Warning: container '%1' is "
+                    "missing child '%2'").arg(container_name).arg(child_name));
 }
 
 void ETPrintWarning::Container(QString child_name)
 {
-    VERBOSE(VB_GENERAL, QString(QObject::tr("Warning: no valid container "
-                            "to search for child '%1'")).arg(child_name));
+    VERBOSE(VB_GENERAL | VB_EXTRA, QObject::tr("Warning: no valid container to "
+                    "search for child '%1'").arg(child_name));
 }
 
 struct UIUtilChildError : public UIUtilException
