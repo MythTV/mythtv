@@ -2953,8 +2953,6 @@ void ProgramInfo::SetAspectChange(MarkTypes type, long long frame)
     if (isVideo)
         return;
 
-    VERBOSE(VB_GENERAL, QString("Set Aspect Change: %1").arg((int)type));
-
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("INSERT INTO recordedmarkup"
