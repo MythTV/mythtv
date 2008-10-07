@@ -335,10 +335,11 @@ void MythUIButtonList::SetItemCurrent(int current)
         return;
 
     MythUIButtonListItem* item = m_itemList.at(current);
-    if (!item)
-        item = m_itemList.first();
+    if (!item && !m_itemList.empty())
+        item = m_itemList[0];
 
-    SetItemCurrent(item);
+    if (item)
+        SetItemCurrent(item);
 }
 
 MythUIButtonListItem* MythUIButtonList::GetItemCurrent() const
@@ -348,7 +349,9 @@ MythUIButtonListItem* MythUIButtonList::GetItemCurrent() const
 
 MythUIButtonListItem* MythUIButtonList::GetItemFirst() const
 {
-    return m_itemList.first();
+    if (!m_itemList.empty())
+        return m_itemList[0];
+    return NULL;
 }
 
 MythUIButtonListItem* MythUIButtonList::GetItemNext(MythUIButtonListItem *item) const
