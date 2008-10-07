@@ -51,7 +51,7 @@ class NameValue
 
   public:
     NameValue() :
-        sName(QString::null), sValue(QString::null), pAttributes(NULL) { }
+        sName(), sValue(), pAttributes(NULL) { }
     NameValue(const QString &name, const QString &value) :
         sName(name), sValue(value), pAttributes(NULL) { }
     NameValue(const QString &name, const char *value) :

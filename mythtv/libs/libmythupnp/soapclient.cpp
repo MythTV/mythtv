@@ -42,7 +42,7 @@ SOAPClient::~SOAPClient()
 
 QDomNode SOAPClient::FindNode( const QString &sName, QDomNode &baseNode )
 {
-    QStringList parts = sName.split("/", QString::SkipEmptyParts);
+    QStringList parts = sName.split('/', QString::SkipEmptyParts);
 
     return FindNode( parts, baseNode );
 
@@ -88,16 +88,16 @@ bool SOAPClient::GetNodeValue( QDomNode &node, const QString &sName, bool bDefau
     QString sDefault = (bDefault) ? "true" : "false";
     QString sValue   = GetNodeValue( node, sName, sDefault );
 
-    if (sValue.startsWith( "T" , Qt::CaseInsensitive ) || 
-        sValue.startsWith( "Y" , Qt::CaseInsensitive ) ||
-        sValue.startsWith( "1" , Qt::CaseInsensitive ) )
+    if (sValue.startsWith( 'T' , Qt::CaseInsensitive ) || 
+        sValue.startsWith( 'Y' , Qt::CaseInsensitive ) ||
+        sValue.startsWith( '1' , Qt::CaseInsensitive ) )
     {
         return true;
     }
 
-    if (sValue.startsWith( "F" , Qt::CaseInsensitive ) || 
-        sValue.startsWith( "N" , Qt::CaseInsensitive ) ||
-        sValue.startsWith( "0" , Qt::CaseInsensitive ) )
+    if (sValue.startsWith( 'F' , Qt::CaseInsensitive ) || 
+        sValue.startsWith( 'N' , Qt::CaseInsensitive ) ||
+        sValue.startsWith( '0' , Qt::CaseInsensitive ) )
     {
         return false;
     }

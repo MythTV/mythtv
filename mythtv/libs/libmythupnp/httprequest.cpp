@@ -126,21 +126,21 @@ void HTTPRequest::Reset()
     m_response << flush;
     m_aBuffer.truncate( 0 );
 
-    m_sRawRequest = QString();
-    m_sBaseUrl    = QString();
-    m_sMethod     = QString();
+    m_sRawRequest.clear();
+    m_sBaseUrl.clear();
+    m_sMethod.clear();
 
     m_mapParams.clear();
     m_mapHeaders.clear();
 
-    m_sPayload    = QString();
+    m_sPayload.clear();
 
-    m_sProtocol   = QString();
-    m_sNameSpace  = QString();
+    m_sProtocol.clear();
+    m_sNameSpace.clear();
 
     m_mapRespHeaders.clear();
 
-    m_sFileName   = QString();
+    m_sFileName.clear();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -735,7 +735,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
 
     if (sParams.length() > 0)
     {
-        QStringList params = sParams.split("&", QString::SkipEmptyParts);
+        QStringList params = sParams.split('&', QString::SkipEmptyParts);
 
         for ( QStringList::Iterator it  = params.begin();
                                     it != params.end();  ++it )
@@ -1037,7 +1037,7 @@ bool HTTPRequest::ParseRange( QString sRange,
     // Split multiple ranges
     // ----------------------------------------------------------------------
 
-    QStringList ranges = sRange.split(",", QString::SkipEmptyParts);
+    QStringList ranges = sRange.split(',', QString::SkipEmptyParts);
 
     if (ranges.count() == 0)
         return false;
@@ -1046,7 +1046,7 @@ bool HTTPRequest::ParseRange( QString sRange,
     // Split first range into its components
     // ----------------------------------------------------------------------
 
-    QStringList parts = ranges[0].split("-");
+    QStringList parts = ranges[0].split('-');
 
     if (parts.count() != 2)
         return false;
@@ -1110,7 +1110,7 @@ bool HTTPRequest::ParseRange( QString sRange,
 
 void HTTPRequest::ExtractMethodFromURL()
 {
-    QStringList sList = m_sBaseUrl.split("/", QString::SkipEmptyParts);
+    QStringList sList = m_sBaseUrl.split('/', QString::SkipEmptyParts);
 
     m_sMethod = "";
 
@@ -1120,7 +1120,7 @@ void HTTPRequest::ExtractMethodFromURL()
         sList.pop_back();
     }
 
-    m_sBaseUrl = "/" + sList.join( "/" );
+    m_sBaseUrl = '/' + sList.join( "/" );
     //VERBOSE(VB_UPNP, QString("ExtractMethodFromURL : %1 : ").arg(m_sMethod));
 }
 
@@ -1208,10 +1208,10 @@ QString HTTPRequest::Encode(const QString &sIn)
     QString sStr = sIn;
     //VERBOSE(VB_UPNP, QString("HTTPRequest::Encode Input : %1").arg(sStr));
     sStr.replace("&(?!(amp|lt|gt|quot|apos);)",  "&amp;" ); // This _must_ come first
-    sStr.replace("<",  "&lt;"  );
-    sStr.replace(">",  "&gt;"  );
-    sStr.replace("\"", "&quot;");
-    sStr.replace("'",  "&apos;");
+    sStr.replace('<',  "&lt;"  );
+    sStr.replace('>',  "&gt;"  );
+    sStr.replace('"', "&quot;");
+    sStr.replace('\'',  "&apos;");
     //VERBOSE(VB_UPNP, QString("HTTPRequest::Encode Output : %1").arg(sStr));
     return sStr;
 }

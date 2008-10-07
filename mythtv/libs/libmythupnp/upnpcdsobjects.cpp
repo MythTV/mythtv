@@ -226,7 +226,7 @@ void CDSObject::toXml(QTextStream &os) const
             QString sName;
             
             if (pProp->m_sNameSpace.length() > 0)
-                sName = pProp->m_sNameSpace + ":" + pProp->m_sName;
+                sName = pProp->m_sNameSpace + ':' + pProp->m_sName;
             else
                 sName = pProp->m_sName;
 

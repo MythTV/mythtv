@@ -57,7 +57,7 @@ void UPnpCMGR::AddSourceProtocol( const QString &sProtocol )
     QString sValue = GetValue< QString >( "SourceProtocolInfo" );
     
     if (sValue.length() > 0 )
-        sValue += ",";
+        sValue += ',';
 
     sValue += sProtocol;
 
@@ -73,7 +73,7 @@ void UPnpCMGR::AddSinkProtocol( const QString &sProtocol )
     QString sValue = GetValue< QString >( "SinkProtocolInfo" );
     
     if (sValue.length() > 0 )
-        sValue += ",";
+        sValue += ',';
 
     sValue += sProtocol;
 

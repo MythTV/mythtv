@@ -36,15 +36,15 @@
 
 QString LookupUDN( QString sDeviceType )
 {
-    QStringList sList = sDeviceType.split(":", QString::SkipEmptyParts);
-    QString     sLoc  = "LookupUDN(" + sDeviceType + ")";
+    QStringList sList = sDeviceType.split(':', QString::SkipEmptyParts);
+    QString     sLoc  = "LookupUDN(" + sDeviceType + ')';
     QString     sName;
     QString     sUDN;
 
     if (sList.size() <= 2) 
     { 
         VERBOSE(VB_IMPORTANT, sLoc + "- bad device type, not enough tokens"); 
-        return QString::null; 
+        return QString();
     }
 
     sName = "UPnP/UDN/" + sList[ sList.size() - 2 ];

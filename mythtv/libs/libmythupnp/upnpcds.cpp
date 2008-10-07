@@ -614,7 +614,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::Browse( UPnpCDSRequest *pRequest )
             {
                 idPath = idPath[idPath.count() - 2].split(
                     " ", QString::SkipEmptyParts);
-                idPath = idPath[0].split("?", QString::SkipEmptyParts);
+                idPath = idPath[0].split('?', QString::SkipEmptyParts);
 
                 if (idPath[0].startsWith("Id"))
                     idPath[0] = QString("item=%1").arg(idPath[0].right(idPath[0].length() - 2));
@@ -1052,7 +1052,7 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessContainer( UPnpCDSRequest     
 
                 QString sSQL = pInfo->sql;
 
-                sSQL.replace( "%1", "" );
+                sSQL.remove( "%1" );
 
                 sSQL += QString( " LIMIT %2, %3" )
                            .arg( pRequest->m_nStartingIndex  )

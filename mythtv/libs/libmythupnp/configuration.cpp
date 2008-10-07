@@ -36,7 +36,7 @@ XmlConfiguration::XmlConfiguration( const QString &sFileName )
 
 bool XmlConfiguration::Load( void )
 {
-    QString sName = m_sPath + "/" + m_sFileName;
+    QString sName = m_sPath + '/' + m_sFileName;
 
     QFile  file( sName );
 
@@ -87,7 +87,7 @@ bool XmlConfiguration::Save( void )
     if (m_sFileName.isEmpty())   // Special case. No file is created
         return true;
 
-    QString sName = m_sPath + "/" + m_sFileName;
+    QString sName = m_sPath + '/' + m_sFileName;
 
     QFile file( sName );
     
@@ -128,7 +128,7 @@ bool XmlConfiguration::Save( void )
 
 QDomNode XmlConfiguration::FindNode( const QString &sName, bool bCreate )
 {
-    QStringList parts = sName.split("/", QString::SkipEmptyParts);
+    QStringList parts = sName.split('/', QString::SkipEmptyParts);
 
     return FindNode( parts, m_rootNode, bCreate );
 
