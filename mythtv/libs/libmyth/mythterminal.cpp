@@ -23,7 +23,7 @@
 #include "mythcontext.h"
 
 MythTerminal::MythTerminal(QString _program, QStringList _arguments) :
-    lock(QMutex::Recursive), running(false),
+    lock(true), running(false),
     process(new QProcess()), program(_program), arguments(_arguments),
     curLabel(""), curValue(0), filter(new MythTerminalKeyFilter())
 {
@@ -96,11 +96,8 @@ void MythTerminal::AddText(const QString &_str)
             str = "";
         }
     }
-    if (lbwidget)
-    {
-        lbwidget->setEnabled(true);
-        lbwidget->setFocus();
-    }
+    widget->setEnabled(true);
+    widget->setFocus();
 }
 
 void MythTerminal::Start(void)

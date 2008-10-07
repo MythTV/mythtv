@@ -364,19 +364,18 @@ class MPUBLIC ListBoxSetting: public SelectSetting {
 public:
     ListBoxSetting(Storage *_storage) :
         SelectSetting(_storage),
-        bxwidget(NULL), lbwidget(NULL), eventFilter(NULL),
-        selectionMode(MythListBox::SingleSelection) { }
+        bxwidget(NULL), widget(NULL), eventFilter(NULL),
+        selectionMode(MythListBox::Single) { }
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
     virtual void widgetInvalid(QObject *obj);
 
-    void setFocus() { if (lbwidget) lbwidget->setFocus(); }
+    void setFocus() { if (widget) widget->setFocus(); }
     void setSelectionMode(MythListBox::SelectionMode mode);
-    void setCurrentItem(int i) { if (lbwidget) lbwidget->setCurrentRow(i); }
-    void setCurrentItem(const QString& str)
-        { if (lbwidget) lbwidget->setCurrentItem(str, true, false); }
-    int currentItem() { if (lbwidget) return lbwidget->currentRow();
+    void setCurrentItem(int i) { if (widget) widget->setCurrentItem(i); }
+    void setCurrentItem(const QString& str)  { if (widget) widget->setCurrentItem(str); }
+    int currentItem() { if (widget) return widget->currentItem();
                          else return -1; }
 
     virtual void setEnabled(bool b);
@@ -403,7 +402,7 @@ signals:
     void setValueByIndex(int index);
 protected:
     QWidget     *bxwidget;
-    MythListBox *lbwidget;
+    MythListBox *widget;
     QObject     *eventFilter;
     MythListBox::SelectionMode selectionMode;
 };

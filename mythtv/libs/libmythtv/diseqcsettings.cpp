@@ -943,10 +943,12 @@ bool DeviceTree::RunTypeDialog(DiSEqCDevDevice::dvbdev_t &type)
     popup->addLabel(tr("Select Type of Device"));
 
     MythListBox *list = new MythListBox(popup);
+    list->setScrollBar(false);
+    list->setBottomScrollBar(false);
     list->insertItem(tr("Switch"));
     list->insertItem(tr("Rotor"));
     list->insertItem(tr("LNB"));
-    list->setCurrentRow(0, QItemSelectionModel::Select);
+    list->setCurrentItem(0);
 
     popup->addWidget(list);
     connect(list,  SIGNAL(accepted(int)),
@@ -954,7 +956,7 @@ bool DeviceTree::RunTypeDialog(DiSEqCDevDevice::dvbdev_t &type)
     list->setFocus();
 
     DialogCode res = popup->ExecPopup();
-    type = (DiSEqCDevDevice::dvbdev_t)(list->currentRow());
+    type = (DiSEqCDevDevice::dvbdev_t)list->currentItem();
 
     popup->hide();
     popup->deleteLater();

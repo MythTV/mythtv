@@ -39,7 +39,7 @@ SearchDialog::SearchDialog(MythMainWindow *parent, const char *name)
     addWidget(searchText); 
 
     // Listbox for search results
-    listbox = new Q3MythListBox(this);
+    listbox = new MythListBox(this);
     listbox->setScrollBar(false);
     listbox->setBottomScrollBar(false);
     connect(listbox, SIGNAL(accepted(int)), this, SLOT(itemSelected(int)));

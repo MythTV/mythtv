@@ -15,9 +15,7 @@
 #include <mythtv/mythwidgets.h>
 #include <mythtv/mythdialogs.h>
 
-class Q3MythListView;
-class Q3ListBoxItem;
-class Q3MythListBox;
+
 struct SmartPLOperator;
 struct SmartPLField;
 
@@ -177,7 +175,7 @@ class SmartPLResultViewer : public MythDialog
     void exitClicked(void);
 
   private:
-      Q3MythListView *listView;
+      MythListView   *listView;
       MythPushButton *exitButton;  
 };
 
@@ -207,14 +205,14 @@ class SmartPlaylistDialog: public MythPopupBox
     void getSmartPlaylistCategories(void);
     void getSmartPlaylists(QString category);
     
-    Q3VBoxLayout    *vbox;
-    QLabel          *caption;
-    MythComboBox    *categoryCombo;
-    Q3MythListBox   *listbox;  
-    QAbstractButton *selectButton;
-    QAbstractButton *editButton;
-    QAbstractButton *deleteButton;
-    QAbstractButton *newButton;
+    Q3VBoxLayout         *vbox;
+    QLabel              *caption;
+    MythComboBox        *categoryCombo;
+    MythListBox         *listbox;  
+    QAbstractButton             *selectButton;
+    QAbstractButton             *editButton;
+    QAbstractButton             *deleteButton;
+    QAbstractButton             *newButton;
     
 };
 
@@ -246,17 +244,17 @@ class SmartPLOrderByDialog: public MythPopupBox
  private:
     void getOrderByFields(void);
    
-    Q3VBoxLayout        *vbox;
+    Q3VBoxLayout         *vbox;
     QLabel              *caption;
     MythComboBox        *orderByCombo;
-    Q3MythListBox       *listbox;  
-    QAbstractButton     *addButton;
-    QAbstractButton     *deleteButton;
-    QAbstractButton     *moveUpButton;
-    QAbstractButton     *moveDownButton;
-    QAbstractButton     *ascendingButton;
-    QAbstractButton     *descendingButton;
-    QAbstractButton     *okButton;
+    MythListBox         *listbox;  
+    QAbstractButton             *addButton;
+    QAbstractButton             *deleteButton;
+    QAbstractButton             *moveUpButton;
+    QAbstractButton             *moveDownButton;
+    QAbstractButton             *ascendingButton;
+    QAbstractButton             *descendingButton;
+    QAbstractButton             *okButton;
 };
 
 class SmartPLDateDialog: public MythPopupBox
@@ -299,8 +297,8 @@ class SmartPLDateDialog: public MythPopupBox
     MythSpinBox         *addDaysSpinEdit;
     QLabel              *statusLabel;
     
-    QAbstractButton     *cancelButton;
-    QAbstractButton     *okButton;
+    QAbstractButton             *cancelButton;
+    QAbstractButton             *okButton;
 };
 
 #endif

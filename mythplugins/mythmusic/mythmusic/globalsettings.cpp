@@ -29,7 +29,6 @@
 // mythmusic
 #include "globalsettings.h"
 #include "mainvisual.h"
-#include "mythlistview-qt3.h"
 
 // General Settings
 
@@ -733,7 +732,7 @@ VisualizationsEditor::VisualizationsEditor(const QString &currentSelection,
 
     // selected listview
     hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-    selectedList = new Q3MythListView(this);
+    selectedList = new MythListView(this);
     selectedList->addColumn(tr("Name"));
     selectedList->addColumn(tr("Provider"));
     selectedList->setSorting(-1);         // disable sorting
@@ -748,7 +747,7 @@ VisualizationsEditor::VisualizationsEditor(const QString &currentSelection,
     hbox->addWidget(selectedList);
 
     // available listview
-    availableList = new Q3MythListView(this);
+    availableList = new MythListView(this);
     availableList->addColumn(tr("Name"));
     availableList->addColumn(tr("Provider"));
     availableList->setSorting(0);

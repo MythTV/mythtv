@@ -1257,15 +1257,109 @@ void MythPushButton::focusOutEvent(QFocusEvent *e)
     QPushButton::focusOutEvent(e);
 }
 
-MythListBox::MythListBox(QWidget *parent, const QString &name) :
-    QListWidget(parent)
+MythListView::MythListView(QWidget *parent)
+            : Q3ListView(parent)
 {
-    setObjectName(name);
+    viewport()->setPalette(palette());
+    horizontalScrollBar()->setPalette(palette());
+    verticalScrollBar()->setPalette(palette());
+    header()->setPalette(palette());
+    header()->setFont(font());
+
+    setAllColumnsShowFocus(TRUE);
 }
 
-void MythListBox::ensurePolished(void) const
+void MythListView::ensureItemVCentered ( const Q3ListViewItem * i )
 {
-    QListWidget::ensurePolished();
+    if (!i)
+        return;
+
+    int y = itemPos(i);
+    int h = i->height();
+
+    if (y - h / 2 < visibleHeight() / 2 ||
+        y - h / 2 > contentsHeight() - visibleHeight() / 2)
+    {
+        ensureItemVisible(i);
+    }
+    else
+    {
+        ensureVisible(contentsX(), y, 0, visibleHeight() / 2);
+    }
+}
+
+void MythListView::keyPressEvent(QKeyEvent *e)
+{
+    if (currentItem() && !currentItem()->isEnabled())
+    {
+        Q3ListView::keyPressEvent(e);
+        return;
+
+    }
+
+    bool handled = false;
+    QStringList actions;
+    gContext->TranslateKeyPress("qt", e, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "UP" && currentItem() == firstChild())
+        {
+            // Qt::Key_Up at top of list allows focus to move to other widgets
+            clearSelection();
+            if (!focusNextPrevChild(false))
+            {
+                // BUT (if we get here) there was no other widget to take focus
+                setSelected(currentItem(), true);
+            }
+        }
+        else if (action == "DOWN" && currentItem() == lastItem())
+        {
+            // Qt::Key_Down at bottom of list allows focus to move to other widgets
+            clearSelection();
+            if (!focusNextPrevChild(true))
+                setSelected(currentItem(), true);
+        }
+        else if (action == "SELECT")
+        {
+            emit spacePressed(currentItem());
+            return;
+        }
+        else
+            handled = false;
+    }
+
+    Q3ListView::keyPressEvent(e);
+}
+
+void MythListView::focusInEvent(QFocusEvent *e)
+{
+    //
+    //  Let the base class do whatever it is
+    //  it does
+    //
+
+    Q3ListView::focusInEvent(e);
+
+    //
+    //  Always highlight the current item
+    //  as "Selected" in the Qt sense
+    //  (not selected in the box ticked sense
+    //
+
+    setSelected(currentItem(), true);
+}
+
+MythListBox::MythListBox(QWidget* parent): Q3ListBox(parent)
+{
+}
+
+void MythListBox::polish(void)
+{
+    Q3ListBox::polish();
 
     QPalette pal = palette();
     QColorGroup::ColorRole role = QColorGroup::Highlight;
@@ -1273,13 +1367,13 @@ void MythListBox::ensurePolished(void) const
     pal.setColor(QPalette::Inactive, role, pal.active().button());
     pal.setColor(QPalette::Disabled, role, pal.active().button());
 
-    const_cast<MythListBox*>(this)->setPalette(pal);
+    setPalette(pal);
 }
 
 void MythListBox::setCurrentItem(const QString& matchText, bool caseSensitive,
                                  bool partialMatch)
 {
-    for (unsigned i = 0 ; i < (unsigned)count() ; ++i)
+    for (unsigned i = 0 ; i < count() ; ++i)
     {
         if (partialMatch)
         {
@@ -1287,7 +1381,7 @@ void MythListBox::setCurrentItem(const QString& matchText, bool caseSensitive,
             {
                 if (text(i).startsWith(matchText))
                 {
-                    setCurrentRow(i);
+                    setCurrentItem(i);
                     break;
                 }
             }
@@ -1295,7 +1389,7 @@ void MythListBox::setCurrentItem(const QString& matchText, bool caseSensitive,
             {
                 if (text(i).toLower().startsWith(matchText.toLower()))
                 {
-                    setCurrentRow(i);
+                    setCurrentItem(i);
                     break;
                 }
             }
@@ -1306,7 +1400,7 @@ void MythListBox::setCurrentItem(const QString& matchText, bool caseSensitive,
             {
                 if (text(i) == matchText)
                 {
-                    setCurrentRow(i);
+                    setCurrentItem(i);
                     break;
                 }
             }
@@ -1314,7 +1408,7 @@ void MythListBox::setCurrentItem(const QString& matchText, bool caseSensitive,
             {
                 if (text(i).toLower() == matchText.toLower())
                 {
-                    setCurrentRow(i);
+                    setCurrentItem(i);
                     break;
                 }
             }
@@ -1350,7 +1444,7 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
                 else if (action == "DOWN")
                 {
                     // Qt::Key_down at bottom of list allows focus to move to other widgets
-                    if (currentRow() == (int) count() - 1)
+                    if (currentItem() == (int) count() - 1)
                     {
                         focusNextPrevChild(true);
                         handled = true;
@@ -1379,7 +1473,7 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
                     key = Qt::Key_unknown;
 
                 QKeyEvent ev(QEvent::KeyPress, key, 0, Qt::NoButton);
-                QListWidget::keyPressEvent(&ev);
+                Q3ListBox::keyPressEvent(&ev);
                 handled = true;
             }
             else if (action == "0" || action == "1" || action == "2" ||
@@ -1390,42 +1484,42 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
                 int percent = action.toInt() * 10;
                 int nextItem = percent * count() / 100;
                 if (!itemVisible(nextItem))
-                    setTopRow(nextItem);
-                setCurrentRow(nextItem);
+                    setTopItem(nextItem);
+                setCurrentItem(nextItem);
                 handled = true;
             }
             else if (action == "PREVVIEW")
             {
-                int nextItem = currentRow();
+                int nextItem = currentItem();
                 if (nextItem > 0)
                     nextItem--;
                 while (nextItem > 0 && text(nextItem)[0] == ' ')
                     nextItem--;
                 if (!itemVisible(nextItem))
-                    setTopRow(nextItem);
-                setCurrentRow(nextItem);
+                    setTopItem(nextItem);
+                setCurrentItem(nextItem);
                 handled = true;
             }
             else if (action == "NEXTVIEW")
             {
-                int nextItem = currentRow();
+                int nextItem = currentItem();
                 if (nextItem < (int)count() - 1)
                     nextItem++;
                 while (nextItem < (int)count() - 1 && text(nextItem)[0] == ' ')
                     nextItem++;
                 if (!itemVisible(nextItem))
-                    setTopRow(nextItem);
-                setCurrentRow(nextItem);
+                    setTopItem(nextItem);
+                setCurrentItem(nextItem);
                 handled = true;
             }
             else if (action == "MENU")
-                emit menuButtonPressed(currentRow());
+                emit menuButtonPressed(currentItem());
             else if (action == "EDIT")
-                emit editButtonPressed(currentRow());
+                emit editButtonPressed(currentItem());
             else if (action == "DELETE")
-                emit deleteButtonPressed(currentRow());
+                emit deleteButtonPressed(currentItem());
             else if (action == "SELECT")
-                emit accepted(currentRow());
+                emit accepted(currentItem());
         }
     }
 
@@ -1450,64 +1544,15 @@ void MythListBox::focusOutEvent(QFocusEvent *e)
     pal.setColor(QPalette::Disabled, role, pal.active().button());
 
     setPalette(pal);
-    QListWidget::focusOutEvent(e);
+    Q3ListBox::focusOutEvent(e);
 }
 
 void MythListBox::focusInEvent(QFocusEvent *e)
 {
-    setPalette(QPalette());
+    this->unsetPalette();
 
     emit changeHelpText(helptext);
-    QListWidget::focusInEvent(e);
-}
-
-
-void MythListBox::setTopRow(uint row)
-{
-    QListWidgetItem *widget = item(row);
-    if (widget)
-        scrollToItem(widget, QAbstractItemView::PositionAtTop);
-}
-
-void MythListBox::insertItem(const QString &label)
-{
-    addItem(label);
-}
-
-void MythListBox::insertStringList(const QStringList &label_list)
-{
-    addItems(label_list);
-}
-
-void MythListBox::removeRow(uint row)
-{
-    QListWidgetItem *widget = takeItem(row);
-    if (widget)
-        delete widget;
-}
-
-void MythListBox::changeItem(const QString &new_text, uint row)
-{
-    QListWidgetItem *widget = item(row);
-    if (widget)
-        widget->setText(new_text);
-}
-
-int MythListBox::index(const QList<QListWidgetItem*> &list)
-{
-    return (list.empty()) ? -1 : row(list[0]);
-}
-
-QString MythListBox::text(uint row) const
-{
-    QListWidgetItem *widget = item(row);
-    return (widget) ? widget->text() : QString::null;
-}
-
-bool MythListBox::itemVisible(uint row) const
-{
-    QListWidgetItem *widget = item(row);
-    return (widget) ? !isItemHidden(widget) : false;
+    Q3ListBox::focusInEvent(e);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

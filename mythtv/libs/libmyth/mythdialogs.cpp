@@ -1793,6 +1793,8 @@ MythSearchDialog::MythSearchDialog(MythMainWindow *parent, const char *name)
     editor->setPopupPosition(VK_POSBOTTOMDIALOG);
 
     listbox = new MythListBox(this);
+    listbox->setScrollBar(false);
+    listbox->setBottomScrollBar(false);
     connect(listbox, SIGNAL(accepted(int)), this, SLOT(AcceptItem(int)));
     addWidget(listbox);
 
@@ -1855,7 +1857,7 @@ void MythSearchDialog::searchTextChanged(void)
     if (listbox && editor)
     {
         listbox->setCurrentItem(editor->text(), false,  true);
-        listbox->setTopRow(listbox->currentRow());
+        listbox->setTopItem(listbox->currentItem());
     }
 }
 
