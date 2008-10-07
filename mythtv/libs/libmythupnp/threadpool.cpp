@@ -316,7 +316,7 @@ WorkerThread *ThreadPool::GetWorkerThread()
     while (pThread == NULL)
     {
         // --------------------------------------------------------------
-        // See if we have a worker thread availible.
+        // See if we have a worker thread available.
         // --------------------------------------------------------------
         
         m_mList.lock();

@@ -439,7 +439,7 @@ void UPnpDeviceDesc::OutputDevice( QTextStream &os,
         //          as an XBox360 or Windows MediaPlayer.
         //
         //          There is a problem with a DSM-520 with firmware 1.04 and
-        //          the Denon AVR-4306 reciever.
+        //          the Denon AVR-4306 receiver.
         //
         //          If the MSRR Service is exposed, it won't let us browse
         //          any media content.

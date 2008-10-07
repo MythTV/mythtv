@@ -716,7 +716,7 @@ QString HTTPRequest::TestMimeType( const QString &sFileName )
 
             file.close();
         }
-        else VERBOSE(VB_IMPORTANT, sLOC + "Couldn't read file");
+        else VERBOSE(VB_IMPORTANT, sLOC + "Could not read file");
     }
 
     VERBOSE(VB_UPNP, sLOC + "type is " + sMIME);

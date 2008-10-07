@@ -272,7 +272,7 @@ QString UPnp::GetResultDesc( UPnPResultCode eCode )
 
     }
 
-    return "Unkown";
+    return "Unknown";
 }
 
 //////////////////////////////////////////////////////////////////////////////
