@@ -9,10 +9,8 @@
 #include <QPushButton>
 #include <QToolButton>
 #include <QDialog>
-#include <q3listview.h>
 #include <q3header.h>
 #include <q3buttongroup.h>
-#include <q3listbox.h>
 #include <QCheckBox>
 #include <QRadioButton>
 #include <QImage>
@@ -23,6 +21,8 @@
 #include <QHideEvent>
 #include <QKeyEvent>
 #include <QEvent>
+#include <QTextEdit>
+#include <QListWidget>
 
 #include <vector>
 
@@ -376,41 +376,44 @@ class MPUBLIC MythRadioButton: public QRadioButton
     QString helptext;
 };
 
-class MPUBLIC MythListView : public Q3ListView
+class MPUBLIC MythListBox: public QListWidget
 {
     Q_OBJECT
 
   public:
-    MythListView(QWidget *parent);
-
-    void ensureItemVCentered (const Q3ListViewItem *i);
-
-  protected:
-    void keyPressEvent(QKeyEvent *e);
-    void focusInEvent(QFocusEvent *e);
-};
-
-class MPUBLIC MythListBox: public Q3ListBox {
-    Q_OBJECT
-
-  public:
-    MythListBox(QWidget* parent);
+    MythListBox(QWidget       *parent,
+                const QString &name = QString("MythListBox"));
 
     virtual void keyPressEvent(QKeyEvent* e);
 
-    void setHelpText(const QString&);
+    QString currentText(void) const { return text(currentRow()); }
 
-    int currentItem() { return Q3ListBox::currentItem(); }
+    void setTopRow(uint row);
+    void insertItem(const QString&);
+    void insertStringList(const QStringList&);
+    void removeRow(uint row);
+    void changeItem(const QString&, uint row);
+    int  index(const QList<QListWidgetItem*>&);
+    QList<QListWidgetItem*> findItems(
+        const QString &text, Qt::MatchFlags flags = Qt::MatchStartsWith) const
+    {
+        return QListWidget::findItems(text, flags);
+    }
+
+
+    void setHelpText(const QString&);
 
   protected:
     void focusInEvent(QFocusEvent *e);
     void focusOutEvent(QFocusEvent *e);
-    virtual void polish(void);
+    virtual void ensurePolished(void) const;
+
+    bool itemVisible(uint row) const;
+    QString text(uint row) const;
 
   public slots:
-    void setCurrentItem(const QString& matchText, bool caseSensitive = true,
-                        bool partialMatch = false);
-    void setCurrentItem(int index) { Q3ListBox::setCurrentItem(index); };
+    void setCurrentItem(const QString& matchText, bool caseSensitive/*= true*/,
+                        bool partialMatch/* = false*/);
 
   signals:
     void changeHelpText(QString);

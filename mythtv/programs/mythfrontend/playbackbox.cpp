@@ -5247,15 +5247,13 @@ void PlaybackBox::showRecGroupChooser(void)
         dispGroup = recGroup;
 
     // select the recGroup in the dialog
-    int index = recGroupListBox->index(recGroupListBox->findItem(dispGroup));
+    int index = recGroupListBox->index(recGroupListBox->findItems(dispGroup));
     if (index < 0)
         index = 0;
 
-    // HACK make the selection show up by selecting a different item first.
-    recGroupListBox->setCurrentItem((index + 1) % 2);
-    recGroupListBox->setCurrentItem(index);
+    recGroupListBox->setCurrentRow(index, QItemSelectionModel::Select);
 
-    recGroupLastItem = recGroupListBox->currentItem();
+    recGroupLastItem = recGroupListBox->currentRow();
 
     connect(recGroupListBox, SIGNAL(accepted(int)),
             recGroupPopup,   SLOT(AcceptItem(int)));
@@ -5285,15 +5283,20 @@ void PlaybackBox::recGroupChooserListBoxChanged(void)
 
     if (item.left(5) == "-----")
     {
-        int thisItem = recGroupListBox->currentItem();
-        if ((recGroupLastItem > thisItem) &&
-            (thisItem > 0))
-            recGroupListBox->setCurrentItem(thisItem - 1);
+        int thisItem = recGroupListBox->currentRow();
+        if ((recGroupLastItem > thisItem) && (thisItem > 0))
+        {
+            recGroupListBox->setCurrentRow(
+                thisItem - 1, QItemSelectionModel::Select);
+        }
         else if ((thisItem > recGroupLastItem) &&
-                 ((unsigned int)thisItem < (recGroupListBox->count() - 1)))
-            recGroupListBox->setCurrentItem(thisItem + 1);
+                 (thisItem < (recGroupListBox->count() - 1)))
+        {
+            recGroupListBox->setCurrentRow(
+                thisItem + 1, QItemSelectionModel::Select);
+        }
     }
-    recGroupLastItem = recGroupListBox->currentItem();
+    recGroupLastItem = recGroupListBox->currentRow();
 }
 
 void PlaybackBox::setGroupFilter(QString newRecGroup)
@@ -5448,8 +5451,10 @@ void PlaybackBox::showRecGroupChanger(void)
     if (delitem && (delitem->recgroup != "Default"))
     {
         recGroupLineEdit->setText(delitem->recgroup);
-        recGroupListBox->setCurrentItem(
-            recGroupListBox->index(recGroupListBox->findItem(delitem->recgroup)));
+        recGroupListBox->setCurrentRow(
+            recGroupListBox->index(
+                recGroupListBox->findItems(delitem->recgroup)),
+            QItemSelectionModel::Select);
     }
     else
     {
@@ -5463,8 +5468,10 @@ void PlaybackBox::showRecGroupChanger(void)
             dispGroup = tr("Deleted");
 
         recGroupLineEdit->setText(dispGroup);
-        recGroupListBox->setCurrentItem(recGroupListBox->index(
-                                        recGroupListBox->findItem(dispGroup)));
+        recGroupListBox->setCurrentRow(
+            recGroupListBox->index(
+                recGroupListBox->findItems(dispGroup)),
+            QItemSelectionModel::Select);
     }
 
     recGroupOkButton = new MythPushButton(recGroupPopup);
@@ -5516,14 +5523,18 @@ void PlaybackBox::showPlayGroupChanger(void)
 
     if (delitem && (delitem->playgroup != "Default"))
     {
-        recGroupListBox->setCurrentItem(
-            recGroupListBox->index(recGroupListBox->findItem(delitem->playgroup)));
+        recGroupListBox->setCurrentRow(
+            recGroupListBox->index(
+                recGroupListBox->findItems(delitem->playgroup)),
+            QItemSelectionModel::Select);
     }
     else
     {
         QString dispGroup = tr("Default");
-        recGroupListBox->setCurrentItem(recGroupListBox->index(
-                                        recGroupListBox->findItem(dispGroup)));
+        recGroupListBox->setCurrentRow(
+            recGroupListBox->index(
+                recGroupListBox->findItems(dispGroup)),
+            QItemSelectionModel::Select);
     }
 
     recGroupListBox->setFocus();

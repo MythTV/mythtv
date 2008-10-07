@@ -7,6 +7,8 @@
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythwidgets.h>
 
+#include "mythlistbox-qt3.h"
+
 class SearchListBoxItem: public Q3ListBoxText
 {
   public:
@@ -41,10 +43,10 @@ class SearchDialog: public MythPopupBox
     void runQuery(QString searchText);
 
     QLabel              *caption;
-    MythListBox         *listbox;  
+    Q3MythListBox       *listbox;  
     MythLineEdit        *searchText;
-    QAbstractButton             *cancelButton;
-    QAbstractButton             *okButton;
+    QAbstractButton     *cancelButton;
+    QAbstractButton     *okButton;
 
     QString              whereClause;
 };
