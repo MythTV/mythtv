@@ -387,7 +387,16 @@ bool checkTimeZone(void)
         have_zone_IDs = false;
     }
 
-    if (have_zone_IDs && (master_time_zone_ID != local_time_zone_ID))
+    // Some distros use spaces rather than underscores in the zone ID, so
+    // allow matches where the only difference is space vs. underscore.
+    // Rather than modify the original zone ID's, modify a copy for the
+    // comparison so the error message will show a difference in zone ID
+    // as well as offset/current time in case the definitions differ.
+    QString master_zone_compare = master_time_zone_ID;
+    QString local_zone_compare = local_time_zone_ID;
+    master_zone_compare.replace(' ', '_');
+    local_zone_compare.replace(' ', '_');
+    if (have_zone_IDs && (master_zone_compare != local_zone_compare))
     {
         VERBOSE(VB_IMPORTANT, "Time zone settings on the master backend "
                               "differ from those on this system.");
