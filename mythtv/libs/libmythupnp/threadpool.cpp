@@ -27,7 +27,7 @@ using namespace std;
 //
 /////////////////////////////////////////////////////////////////////////////
 
-CEvent::CEvent( bool bInitiallyOwn /*= FALSE */ ) 
+CEvent::CEvent( bool bInitiallyOwn /*= false */ ) 
 {
     m_bSignaled = bInitiallyOwn;
 }

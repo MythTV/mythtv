@@ -137,7 +137,7 @@ class UPnp
         static SSDPCacheEntries *Find( const QString &sURI );
         static DeviceLocation   *Find( const QString &sURI, const QString &sUSN );
 
-        static UPnpDeviceDesc *GetDeviceDesc( QString &sURL, bool bInQtThread = TRUE);
+        static UPnpDeviceDesc *GetDeviceDesc( QString &sURL, bool bInQtThread = true);
 
         static QString         GetResultDesc( UPnPResultCode eCode );
         static void            FormatErrorResponse( HTTPRequest   *pRequest, 

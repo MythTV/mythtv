@@ -214,7 +214,7 @@ int BufferedSocketDevice::ReadBytes()
 bool BufferedSocketDevice::ConsumeWriteBuf( qulonglong nbytes )
 {
     if ( !nbytes || ((qlonglong)nbytes > m_nWriteSize) )
-        return FALSE;
+        return false;
 
     m_nWriteSize -= nbytes;
 
@@ -240,7 +240,7 @@ bool BufferedSocketDevice::ConsumeWriteBuf( qulonglong nbytes )
         }
     }
 
-    return TRUE;
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -253,7 +253,7 @@ void BufferedSocketDevice::Flush()
     if ((m_pSocket == NULL) || !m_pSocket->isValid())
         return;
 
-    bool osBufferFull = FALSE;
+    bool osBufferFull = false;
     int  consumed     = 0;
 
     while ( !osBufferFull && ( m_nWriteSize > 0 ) && m_pSocket->isValid())
@@ -306,7 +306,7 @@ void BufferedSocketDevice::Flush()
         }
 
         if ( nwritten < i )
-            osBufferFull = TRUE;
+            osBufferFull = true;
     }
 }
 
@@ -338,12 +338,12 @@ bool BufferedSocketDevice::At( qlonglong index )
     ReadBytes();
 
     if ( index > m_bufRead.size() )
-        return FALSE;
+        return false;
 
     // throw away data 0..index-1
     m_bufRead.consumeBytes( (qulonglong)index, 0 );
 
-    return TRUE;
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -353,7 +353,7 @@ bool BufferedSocketDevice::At( qlonglong index )
 bool BufferedSocketDevice::AtEnd()
 {
     if ( !m_pSocket->isValid() )
-        return TRUE;
+        return true;
 
     ReadBytes();
 
@@ -590,9 +590,9 @@ bool BufferedSocketDevice::CanReadLine()
     ReadBytes();
 
     if (( BytesAvailable() > 0 ) && m_bufRead.scanNewline( 0 ) )
-        return TRUE;
+        return true;
 
-    return FALSE;
+    return false;
 }
                                
 /////////////////////////////////////////////////////////////////////////////

@@ -181,7 +181,7 @@ class UPnpDeviceDesc
         UPnpDevice *FindDevice( const QString &sURI );
 
         static UPnpDevice     *FindDevice( UPnpDevice *pDevice, const QString &sURI );
-        static UPnpDeviceDesc *Retrieve  ( QString &sURL, bool bInQtThread = TRUE   );
+        static UPnpDeviceDesc *Retrieve  ( QString &sURL, bool bInQtThread = true   );
 
 };
 
@@ -249,7 +249,7 @@ class DeviceLocation : public RefCounted
 
         // ==================================================================
 
-        UPnpDeviceDesc *GetDeviceDesc( bool bInQtThread = TRUE )
+        UPnpDeviceDesc *GetDeviceDesc( bool bInQtThread = true )
         {
             if (m_pDeviceDesc == NULL)
                 m_pDeviceDesc = UPnpDeviceDesc::Retrieve( m_sLocation, bInQtThread );
@@ -259,7 +259,7 @@ class DeviceLocation : public RefCounted
 
         // ==================================================================
 
-        QString GetFriendlyName( bool bInQtThread = TRUE )
+        QString GetFriendlyName( bool bInQtThread = true )
         {
             UPnpDeviceDesc *pDevice = GetDeviceDesc( bInQtThread );
 
@@ -274,7 +274,7 @@ class DeviceLocation : public RefCounted
             return sName;
         }
 
-        QString GetNameAndDetails( bool bInQtThread = TRUE )
+        QString GetNameAndDetails( bool bInQtThread = true )
         {
             UPnpDeviceDesc *pDevice = GetDeviceDesc( bInQtThread );
 

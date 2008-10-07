@@ -52,8 +52,8 @@ class XmlConfiguration : public Configuration
         QDomDocument m_config;
         QDomNode     m_rootNode;
 
-        QDomNode FindNode( const QString &sName, bool bCreate = FALSE );
-        QDomNode FindNode( QStringList &sParts, QDomNode &curNode, bool bCreate = FALSE );
+        QDomNode FindNode( const QString &sName, bool bCreate = false );
+        QDomNode FindNode( QStringList &sParts, QDomNode &curNode, bool bCreate = false );
 
     public:
 

@@ -210,7 +210,7 @@ QString XmlConfiguration::GetValue( const QString &sSetting, QString sDefault )
 void XmlConfiguration::SetValue( const QString &sSetting, int nValue ) 
 {
     QString  sValue = QString::number( nValue );
-    QDomNode node   = FindNode( sSetting, TRUE );
+    QDomNode node   = FindNode( sSetting, true );
 
     if (!node.isNull())
     {
@@ -236,7 +236,7 @@ void XmlConfiguration::SetValue( const QString &sSetting, int nValue )
 
 void XmlConfiguration::SetValue( const QString &sSetting, QString sValue ) 
 {
-    QDomNode node   = FindNode( sSetting, TRUE );
+    QDomNode node   = FindNode( sSetting, true );
 
     if (!node.isNull())
     {

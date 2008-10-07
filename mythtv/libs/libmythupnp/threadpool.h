@@ -39,7 +39,7 @@ class CEvent
 
     public:
 
-                  CEvent( bool bInitiallyOwn = FALSE );
+                  CEvent( bool bInitiallyOwn = false );
          virtual ~CEvent();
 
         bool      SetEvent    ();
