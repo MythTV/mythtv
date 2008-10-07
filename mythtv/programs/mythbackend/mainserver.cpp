@@ -380,6 +380,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandleQueryMemStats(pbs);
     }
+    else if (command == "QUERY_TIME_ZONE")
+    {
+        HandleQueryTimeZone(pbs);
+    }
     else if (command == "QUERY_CHECKFILE")
     {
         HandleQueryCheckFile(listline, pbs);
@@ -2381,6 +2385,21 @@ void MainServer::HandleQueryMemStats(PlaybackSock *pbs)
                 << QString::number(totalVM) << QString::number(freeVM);
     else
         strlist << "Could not determine memory stats.";
+
+    SendResponse(pbssock, strlist);
+}
+
+/**
+ * \addtogroup myth_network_protocol
+ * \par        QUERY_TIME_ZONE
+ * Returns time zone ID, current offset, current time
+ */
+void MainServer::HandleQueryTimeZone(PlaybackSock *pbs)
+{
+    MythSocket *pbssock = pbs->getSocket();
+    QStringList strlist;
+    strlist << getTimeZoneID() << QString::number(calc_utc_offset())
+            << mythCurrentDateTime().toString(Qt::ISODate);
 
     SendResponse(pbssock, strlist);
 }

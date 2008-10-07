@@ -10,6 +10,7 @@ using namespace std;
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <time.h>
 
 // System specific C headers
 #include "compat.h"
@@ -47,6 +48,8 @@ using namespace std;
 #include <QPixmap>
 #include <QFont>
 #include <QFile>
+#include <QDir>
+#include <QFileInfo>
 
 // Myth headers
 #include "mythconfig.h"
@@ -84,6 +87,359 @@ int calc_utc_offset(void)
         utc_offset += 60 - off;
 
     return utc_offset;
+}
+
+#ifndef USING_MINGW
+/* Helper function for getSystemTimeZoneID() that compares the
+   zoneinfo_file_path (regular) file with files in the zoneinfo_dir_path until
+   it finds a match.  The matching file's name is used to determine the time
+   zone ID. */
+static QString findZoneinfoFile(QString zoneinfo_file_path,
+                                QString zoneinfo_dir_path)
+{
+    QString zone_id("UNDEF");
+    QDir zoneinfo_dir(zoneinfo_dir_path);
+    QFileInfoList dirlist = zoneinfo_dir.entryInfoList();
+    QFileInfo info;
+    QString basename;
+    QFile zoneinfo_file(zoneinfo_file_path);
+    qint64 zoneinfo_file_size = zoneinfo_file.size();
+
+    for (QFileInfoList::const_iterator it = dirlist.begin();
+         it != dirlist.end(); it++)
+    {
+        info = *it;
+         // Skip '.' and '..' and other files starting with "." and
+         // skip localtime (which is often a link to zoneinfo_file_path)
+        basename = info.baseName();
+        if (basename.isEmpty() || (basename == "localtime")) {
+            continue;
+        }
+        if (info.isDir())
+        {
+            zone_id = findZoneinfoFile(zoneinfo_file_path,
+                                       info.absoluteFilePath());
+            if (zone_id != "UNDEF")
+                return zone_id;
+        }
+        else if (info.isFile() && (info.size() == zoneinfo_file_size) &&
+                 info.isReadable())
+        {
+            // sanity check - zoneinfo files should typically be less than
+            // about 4kB, but leave room for growth
+            if (zoneinfo_file_size > 200 * 1024)
+                continue;
+            QFile this_file(info.absoluteFilePath());
+            QByteArray zoneinfo_file_data;
+            zoneinfo_file_data.resize(zoneinfo_file_size);
+            QByteArray this_file_data;
+            this_file_data.resize(zoneinfo_file_size);
+            if (zoneinfo_file.open(QIODevice::ReadOnly))
+            {
+                QDataStream in(&zoneinfo_file);
+                if (in.readRawData(zoneinfo_file_data.data(),
+                                   zoneinfo_file_size) != zoneinfo_file_size)
+                {
+                    zoneinfo_file.close();
+                    return zone_id;
+                }
+                zoneinfo_file.close();
+            }
+            if (this_file.open(QIODevice::ReadOnly))
+            {
+                QDataStream in(&this_file);
+                if (in.readRawData(this_file_data.data(),
+                                   zoneinfo_file_size) != zoneinfo_file_size)
+                {
+                    this_file.close();
+                    return zone_id;
+                }
+                this_file.close();
+            }
+            if (zoneinfo_file_data == this_file_data)
+            {
+                zone_id = info.absoluteFilePath();
+                break;
+            }
+        }
+    }
+    return zone_id;
+}
+#endif
+
+/* Helper function for getTimeZoneID() that provides an unprocessed time zone
+   id obtained using system-dependent means of identifying the system's time
+   zone. */
+static QString getSystemTimeZoneID(void)
+{
+    QString zone_id("UNDEF");
+#ifndef USING_MINGW
+    // Try to determine the time zone information by inspecting the system
+    // configuration
+    bool found = false;
+    QString time_zone_file_path("/etc/timezone");
+    QString clock_file_path("/etc/sysconfig/clock");
+    QString zoneinfo_file_path("/etc/localtime");
+    QString zoneinfo_dir_path("/usr/share/zoneinfo");
+
+    // First, check time_zone_file_path (used by Debian-based systems)
+    QFile time_zone_file(time_zone_file_path);
+    QFileInfo info(time_zone_file);
+    if (info.exists() && info.isFile() && info.isReadable())
+    {
+        if (time_zone_file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            QString line;
+            QTextStream in(&time_zone_file);
+            while (!in.atEnd())
+            {
+                line = in.readLine();
+                line = line.trimmed();
+                if (!line.startsWith("#"))
+                {
+                    zone_id = line;
+                    found = true;
+                    break;
+                }
+            }
+            time_zone_file.close();
+            if (found)
+                return zone_id;
+        }
+    }
+
+    // Next, look for the ZONE entry in clock_file_path (used by Red Hat-based
+    // systems)
+    QFile clock_file(clock_file_path);
+    info.setFile(clock_file);
+    if (info.exists() && info.isFile() && info.isReadable())
+    {
+        if (clock_file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            QString line;
+            QTextStream in(&clock_file);
+            // Handle whitespace and quotes
+            QRegExp re("^ZONE\\s*=\\s*(?:'|\")?(.+)$");
+            re.setPatternSyntax(QRegExp::RegExp2);
+            while (!in.atEnd())
+            {
+                line = in.readLine();
+                if (re.indexIn(line) != -1)
+                {
+                    zone_id = re.cap(1);
+                    found = true;
+                    break;
+                }
+            }
+            clock_file.close();
+            if (found)
+                return zone_id;
+        }
+    }
+
+    // Next check zoneinfo_file_path
+    QFile zoneinfo_file(zoneinfo_file_path);
+    info.setFile(zoneinfo_file);
+
+    if (info.exists() && info.isFile())
+    {
+        QString tz;
+        if (info.isSymLink())
+        {
+            // The symlink refers to a file whose name contains the zone ID
+            tz = info.symLinkTarget();
+        }
+        else
+        {
+            // The zoneinfo_file is a copy of the file in the
+            // zoneinfo_dir_path, so search for the same file in
+            // zoneinfo_dir_path
+            tz = findZoneinfoFile(zoneinfo_file_path, zoneinfo_dir_path);
+        }
+        if (tz != "UNDEF")
+        {
+            int pos = 0;
+            // Get the zone ID from the filename
+            // Look for the basename of zoneinfo_dir_path in case it's a
+            // relative link
+            QString zoneinfo_dirname = zoneinfo_dir_path.section('/', -1);
+            if ((pos = tz.indexOf(zoneinfo_dirname)) != -1)
+            {
+                zone_id = tz.right(tz.size() - (pos + 1) -
+                                   zoneinfo_dirname.size());
+            }
+        }
+        else
+        {
+            // If we still haven't found a time zone, try localtime_r() to at
+            // least get the zone name/abbreviation (as opposed to the
+            // identifier for the set of rules governing the zone)
+            char name[64];
+            time_t t;
+            struct tm *result = (struct tm *)malloc(sizeof(*result));
+
+            t = time(NULL);
+            localtime_r(&t, result);
+
+            if (result != NULL)
+            {
+                if (strftime(name, sizeof(name), "%Z", result) > 0)
+                    zone_id = name;
+                free(result);
+            }
+        }
+    }
+
+#endif
+    return zone_id;
+}
+
+/** \fn getTimeZoneID()
+ *  \brief Returns the zoneinfo time zone ID or as much time zone information
+ *         as possible
+ */
+QString getTimeZoneID(void)
+{
+    QString zone_id("UNDEF");
+#ifndef USING_MINGW
+    // First, try the TZ environment variable to check for environment-specific
+    // overrides
+    QString tz = getenv("TZ");
+    if (tz.isEmpty())
+    {
+        // No TZ, so attempt to determine the system-configured time zone ID
+        tz = getSystemTimeZoneID();
+    }
+
+    if (!tz.isEmpty())
+    {
+        zone_id = tz;
+        if (zone_id.startsWith("\"") || zone_id.startsWith("'"))
+                zone_id.remove(0, 1);
+        if (zone_id.endsWith("\"") || zone_id.endsWith("'"))
+                zone_id.chop(1);
+        if (zone_id.startsWith(":"))
+            zone_id.remove(0, 1);
+        // the "posix/" subdirectory typically contains the same files as the
+        // "zoneinfo/" parent directory, but are not typically what are in use
+        if (zone_id.startsWith("posix/"))
+            zone_id.remove(0, 6);
+    }
+
+#endif
+    return zone_id;
+}
+
+static void print_timezone_info(QString master_zone_id, QString local_zone_id,
+                                int master_utc_offset, int local_utc_offset,
+                                QString master_time, QString local_time)
+{
+    VERBOSE(VB_IMPORTANT, QString("Detected time zone settings:\n"
+"    Master: Zone ID: '%1', UTC Offset: '%2', Current Time: '%3'\n"
+"     Local: Zone ID: '%4', UTC Offset: '%5', Current Time: '%6'\n")
+            .arg(master_zone_id).arg(master_utc_offset).arg(master_time)
+            .arg(local_zone_id).arg(local_utc_offset).arg(local_time));
+}
+
+/** \fn checkTimeZone()
+ *  \brief Verifies the time zone settings on this system agree with those
+ *         on the master backend
+ */
+bool checkTimeZone(void)
+{
+    if (gContext->IsMasterBackend())
+        return true;
+
+    QStringList master_settings(QString("QUERY_TIME_ZONE"));
+    if (!gContext->SendReceiveStringList(master_settings))
+    {
+        VERBOSE(VB_IMPORTANT, "Unable to determine master backend time zone "
+                              "settings.  If those settings differ from local "
+                              "settings, some functionality will fail.");
+        return true;
+    }
+
+    QDateTime local_time = mythCurrentDateTime();
+    QString local_time_string = local_time.toString(Qt::ISODate);
+
+    bool have_zone_IDs = true;
+
+    QString master_time_zone_ID = master_settings[0];
+    int master_utc_offset       = master_settings[1].toInt();
+    QString master_time_string  = master_settings[2];
+    QString local_time_zone_ID  = getTimeZoneID();
+    int local_utc_offset        = calc_utc_offset();
+
+    if (master_time_zone_ID == "UNDEF")
+    {
+        VERBOSE(VB_IMPORTANT, "Unable to determine master backend time zone "
+                              "settings. If local time zone settings differ "
+                              "from master backend settings, some "
+                              "functionality will fail.");
+        have_zone_IDs = false;
+    }
+    if (local_time_zone_ID == "UNDEF")
+    {
+        VERBOSE(VB_IMPORTANT, "Unable to determine local time zone settings. "
+                              "If local time zone settings differ from "
+                              "master backend settings, some functionality "
+                              "will fail.");
+        have_zone_IDs = false;
+    }
+
+    if (have_zone_IDs && (master_time_zone_ID != local_time_zone_ID))
+    {
+        VERBOSE(VB_IMPORTANT, "Time zone settings on the master backend "
+                              "differ from those on this system.");
+        print_timezone_info(master_time_zone_ID, local_time_zone_ID,
+                            master_utc_offset, local_utc_offset,
+                            master_time_string, local_time_string);
+        return false;
+    }
+
+    // Verify offset
+    if (master_utc_offset != local_utc_offset)
+    {
+        VERBOSE(VB_IMPORTANT, "UTC offset on the master backend differs "
+                              "from offset on this system.");
+        print_timezone_info(master_time_zone_ID, local_time_zone_ID,
+                            master_utc_offset, local_utc_offset,
+                            master_time_string, local_time_string);
+        return false;
+    }
+
+    // Verify current time
+    if (master_time_string == "UNDEF")
+    {
+        VERBOSE(VB_IMPORTANT, "Unable to determine current time on the master "
+                              "backend . If local time or time zone settings "
+                              "differ from those on the master backend, some "
+                              "functionality will fail.");
+    }
+    else
+    {
+        QDateTime master_time = QDateTime::fromString(master_time_string,
+                                                      Qt::ISODate);
+        uint timediff = abs(master_time.secsTo(local_time));
+        if (timediff > 300)
+        {
+            VERBOSE(VB_IMPORTANT, "Current time on the master backend "
+                                  "differs from time on this system.");
+            print_timezone_info(master_time_zone_ID, local_time_zone_ID,
+                                master_utc_offset, local_utc_offset,
+                                master_time_string, local_time_string);
+            return false;
+        }
+        else if (timediff > 20)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("Warning! Time difference between the master "
+                            "backend and this system is %d seconds.")
+                    .arg(timediff));
+        }
+    }
+
+    return true;
 }
 
 /** \fn encodeLongLong(QStringList&,long long)

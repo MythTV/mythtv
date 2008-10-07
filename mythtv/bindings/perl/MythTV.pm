@@ -93,7 +93,7 @@ package MythTV;
 
 # MYTH_PROTO_VERSION is defined in libmyth in mythtv/libs/libmyth/mythcontext.h
 # and should be the current MythTV protocol version.
-    our $PROTO_VERSION = 41;
+    our $PROTO_VERSION = 42;
 
 # NUMPROGRAMLINES is defined in mythtv/libs/libmythtv/programinfo.h and is
 # the number of items in a ProgramInfo QStringList group used by

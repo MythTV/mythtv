@@ -1261,6 +1261,18 @@ int main(int argc, char **argv)
     }
     setuid(getuid());
 
+    if (!checkTimeZone())
+    {
+        // Check for different time zones, different offsets, different times
+        VERBOSE(VB_IMPORTANT, "The time and/or time zone settings on this "
+                "system do not match those in use on the master backend. "
+                "Please ensure all frontend and backend systems are "
+                "configured to use the same time zone and have the current "
+                "time properly set.");
+        VERBOSE(VB_IMPORTANT, "Unable to run with invalid time settings. "
+                              "Exiting.");
+        return FRONTEND_EXIT_INVALID_TIMEZONE;
+    }
     if (!UpgradeTVDatabaseSchema(upgradeAllowed))
     {
         VERBOSE(VB_IMPORTANT,
