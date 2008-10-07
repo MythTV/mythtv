@@ -226,7 +226,7 @@ void LCD::sendToServer(const QString &someText)
         // Buffer this up in the hope that the connection will open soon
 
         send_buffer += someText;
-        send_buffer += "\n";
+        send_buffer += '\n';
     }
 }
 
@@ -272,7 +272,7 @@ void LCD::readyRead(MythSocket *sock)
         VERBOSE(VB_NETWORK|VB_EXTRA, QString(LOC + "Received from server: %1")
                 .arg(lineFromServer));
 
-    aList = lineFromServer.split(" ");
+    aList = lineFromServer.split(' ');
     if (aList[0] == "CONNECTED")
     {
         // We got "CONNECTED", which is a response to "HELLO"
@@ -413,7 +413,7 @@ void LCD::setMusicProgress(QString time, float value)
         return;
 
     value = min(max(0.0f, value), 1.0f);
-    sendToServer("SET_MUSIC_PROGRESS " + quotedString(time) + " " + 
+    sendToServer("SET_MUSIC_PROGRESS " + quotedString(time) + ' ' + 
             QString().setNum(value));    
 }
 
@@ -485,8 +485,8 @@ void LCD::switchToMusic(const QString &artist, const QString &album, const QStri
 
     VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "switchToMusic");
 
-    sendToServer("SWITCH_TO_MUSIC " + quotedString(artist) + " " 
-            + quotedString(album) + " " 
+    sendToServer("SWITCH_TO_MUSIC " + quotedString(artist) + ' ' 
+            + quotedString(album) + ' ' 
             + quotedString(track));
 }
 
@@ -497,8 +497,8 @@ void LCD::switchToChannel(QString channum, QString title, QString subtitle)
 
     VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "switchToChannel");
 
-    sendToServer("SWITCH_TO_CHANNEL " + quotedString(channum) + " " 
-            + quotedString(title) + " " 
+    sendToServer("SWITCH_TO_CHANNEL " + quotedString(channum) + ' ' 
+            + quotedString(title) + ' ' 
             + quotedString(subtitle));
 }
 
@@ -516,7 +516,7 @@ void LCD::switchToMenu(QList<LCDMenuItem> &menuItems, QString app_name,
     QString s = "SWITCH_TO_MENU ";
 
     s += quotedString(app_name);
-    s += " " + QString(popMenu ? "TRUE" : "FALSE");
+    s += ' ' + QString(popMenu ? "TRUE" : "FALSE");
 
 
     QListIterator<LCDMenuItem> it(menuItems);
@@ -525,7 +525,7 @@ void LCD::switchToMenu(QList<LCDMenuItem> &menuItems, QString app_name,
     while (it.hasNext())
     {
         curItem = &(it.next());
-        s += " " + quotedString(curItem->ItemName());
+        s += ' ' + quotedString(curItem->ItemName());
 
         if (curItem->isChecked() == CHECKED)
             s += " CHECKED";    
@@ -534,11 +534,11 @@ void LCD::switchToMenu(QList<LCDMenuItem> &menuItems, QString app_name,
         else if (curItem->isChecked() == NOTCHECKABLE)
             s += " NOTCHECKABLE";
 
-        s += " " + QString(curItem->isSelected() ? "TRUE" : "FALSE");
-        s += " " + QString(curItem->Scroll() ? "TRUE" : "FALSE");
+        s += ' ' + QString(curItem->isSelected() ? "TRUE" : "FALSE");
+        s += ' ' + QString(curItem->Scroll() ? "TRUE" : "FALSE");
         QString sIndent;
         sIndent.setNum(curItem->getIndent());
-        s += " " + sIndent;
+        s += ' ' + sIndent;
     }
 
     sendToServer(s);
@@ -565,7 +565,7 @@ void LCD::switchToGeneric(QList<LCDTextItem> &textItems)
 
         QString sRow;
         sRow.setNum(curItem->getRow());
-        s += " " + sRow;
+        s += ' ' + sRow;
 
         if (curItem->getAlignment() == ALIGN_LEFT)
             s += " ALIGN_LEFT";    
@@ -574,9 +574,9 @@ void LCD::switchToGeneric(QList<LCDTextItem> &textItems)
         else if (curItem->getAlignment() == ALIGN_CENTERED)
             s += " ALIGN_CENTERED";
 
-        s += " " + quotedString(curItem->getText());
-        s += " " + quotedString(curItem->getScreen());
-        s += " " + QString(curItem->getScroll() ? "TRUE" : "FALSE");
+        s += ' ' + quotedString(curItem->getText());
+        s += ' ' + quotedString(curItem->getScreen());
+        s += ' ' + QString(curItem->getScroll() ? "TRUE" : "FALSE");
     }
 
     sendToServer(s);

@@ -104,24 +104,24 @@ QString MythDB::toCommaList(const QMap<QString, QVariant> &bindings,
     QString str = QString("%1").arg("", indent);
     for (; it != bindings.end(); ++it)
     {
-        const QString curBinding = it.key() + "=" + (*it).toString() + ",";
+        const QString curBinding = it.key() + '=' + (*it).toString() + ',';
         if ((curColumn > indent) &&
             ((curBinding.length() + curColumn) > maxColumn))
         {
-            str += "\n";
+            str += '\n';
             str += QString("%1").arg("", indent);
             curColumn = indent;
         }
         if (curColumn > indent)
         {
-            str += " ";
+            str += ' ';
             curColumn++;
         }
         str += curBinding;
         curColumn += curBinding.length();
     }
     str = str.left(str.length() - 1); // remove trailing comma.
-    str += "\n";
+    str += '\n';
 
     return str;
 }
@@ -131,7 +131,7 @@ void MythDB::DBError(const QString &where, const QSqlQuery& query)
     QString str = QString("DB Error (%1):\n").arg(where);
 
     str += "Query was:\n";
-    str += query.executedQuery() + "\n";
+    str += query.executedQuery() + '\n';
     QString tmp = toCommaList(query.boundValues());
     if (!tmp.isEmpty())
     {
@@ -210,7 +210,7 @@ bool MythDB::SaveSettingOnHost(const QString &key,
     if (d->ignoreDatabase)
     {
         ClearSettingsCache(key, newValue);
-        ClearSettingsCache(host + " " + key, newValue);
+        ClearSettingsCache(host + ' ' + key, newValue);
         return true;
     }
 
@@ -268,7 +268,7 @@ bool MythDB::SaveSettingOnHost(const QString &key,
     }
 
     ClearSettingsCache(key, newValue);
-    ClearSettingsCache(host + " " + key, newValue);
+    ClearSettingsCache(host + ' ' + key, newValue);
 
     return success;
 }
@@ -373,7 +373,7 @@ QString MythDB::GetSettingOnHost(const QString &key, const QString &host,
 {
     bool found = false;
     QString value = defaultval;
-    QString myKey = host + " " + key;
+    QString myKey = host + ' ' + key;
 
     if (d->overriddenSettings.contains(myKey))
     {
@@ -430,7 +430,7 @@ QString MythDB::GetSettingOnHost(const QString &key, const QString &host,
     if (found && d->useSettingsCache)
     {
         d->settingsCacheLock.lock();
-        d->settingsCache[host + " " + key] = value;
+        d->settingsCache[host + ' ' + key] = value;
         d->settingsCacheLock.unlock();
     }
 

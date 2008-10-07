@@ -290,7 +290,7 @@ void MDBManager::CloseDatabases()
     {
         db = *it;
         VERBOSE(VB_IMPORTANT,
-                "Closing DB connection named '" + db->m_name + "'");
+                "Closing DB connection named '" + db->m_name + '\'');
         db->m_db.close();
         ++it;
     }
@@ -420,10 +420,10 @@ bool MSqlQuery::exec()
         while (b.hasNext())
         {
             b.next();
-            str.replace(b.key(), "'" + b.value().toString() + "'");
+            str.replace(b.key(), '\'' + b.value().toString() + '\'');
         }
 
-        VERBOSE(VB_DATABASE, "MSqlQuery::exec() \"" + str + "\"");
+        VERBOSE(VB_DATABASE, "MSqlQuery::exec() \"" + str + '"');
     }
 
     return result;

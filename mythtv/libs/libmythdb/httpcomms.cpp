@@ -70,7 +70,7 @@ void HttpComms::request(QUrl &url, int timeoutms, bool allowGzip)
     QString path = url.path();
 
     if (url.hasQuery())
-        path += "?" + url.encodedQuery();
+        path += '?' + url.encodedQuery();
 
     QHttpRequestHeader header("GET", path);
     QString userAgent = "Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) "
@@ -240,7 +240,7 @@ void HttpComms::headerReceived(const QHttpResponseHeader &resp)
             }
             else
             {
-                QString sUser(m_webCredentials.user + ":" + m_webCredentials.pass);
+                QString sUser(m_webCredentials.user + ':' + m_webCredentials.pass);
                 QByteArray auth = QCodecs::base64Encode(sUser.toLocal8Bit());
                 m_curRequest.setValue( "Authorization", QString( "Basic " ).append( auth ) );
             } 

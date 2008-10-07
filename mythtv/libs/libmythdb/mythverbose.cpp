@@ -16,7 +16,7 @@ int parse_verbose_arg(QString arg)
     QString option;
     bool reverseOption;
 
-    if (arg.startsWith("-"))
+    if (arg.startsWith('-'))
     {
         qDebug() << "Invalid or missing argument to -v/--verbose option\n";
         return GENERIC_EXIT_INVALID_CMDLINE;
@@ -82,7 +82,7 @@ int parse_verbose_arg(QString arg)
                     if (ARG_ADDITIVE) \
                     { \
                         print_verbose_messages |= ARG_VALUE; \
-                        verboseString = verboseString + " " + ARG_STR; \
+                        verboseString = verboseString + ' ' + ARG_STR; \
                     } \
                     else \
                     { \

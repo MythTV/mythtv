@@ -9,9 +9,9 @@ void SimpleDBStorage::Load(void)
     MSqlQuery query(MSqlQuery::InitCon());
     MSqlBindings bindings;
     query.prepare(
-        "SELECT " + GetColumnName() + " "
-        "FROM "   + GetTableName() + " " +
-        "WHERE "  + GetWhereClause(bindings));
+        "SELECT " + GetColumnName() +
+        "  FROM " + GetTableName() +
+        " WHERE " + GetWhereClause(bindings));
     query.bindValues(bindings);
 
     if (!query.exec() || !query.isActive())
@@ -36,7 +36,7 @@ void SimpleDBStorage::Save(QString _table)
 
     MSqlBindings bindings;
     QString querystr = QString("SELECT * FROM " + _table + " WHERE "
-                               + GetWhereClause(bindings) + ";");
+                               + GetWhereClause(bindings) + ';');
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(querystr);
@@ -55,7 +55,7 @@ void SimpleDBStorage::Save(QString _table)
         MSqlBindings bindings;
 
         querystr = QString("UPDATE " + _table + " SET " + GetSetClause(bindings) +
-                           " WHERE " + GetWhereClause(bindings) + ";");
+                           " WHERE " + GetWhereClause(bindings) + ';');
 
         query.prepare(querystr);
         query.bindValues(bindings);
@@ -69,7 +69,7 @@ void SimpleDBStorage::Save(QString _table)
         MSqlBindings bindings;
 
         querystr = QString("INSERT INTO " + _table + " SET "
-                           + GetSetClause(bindings) + ";");
+                           + GetSetClause(bindings) + ';');
 
         query.prepare(querystr);
         query.bindValues(bindings);

@@ -115,7 +115,7 @@ bool Settings::LoadSettingsFiles(QString filename, QString prefix,
 {
     int result = ReadSettings(prefix + "/share/mythtv/" + filename);
     result += ReadSettings(prefix + "/etc/mythtv/" + filename);
-    result += ReadSettings(confdir + "/" + filename);
+    result += ReadSettings(confdir + '/' + filename);
     result += ReadSettings("./" + filename);
     return result;
 }
@@ -159,7 +159,7 @@ bool Settings::ReadSettings(QString pszFile)
 
                 (*m_pSettings)[strKey] = strVal;
 
-                VERBOSE(VB_FILE, LOC + "'" + strKey + "' = '" + strVal + "'.");
+                VERBOSE(VB_FILE, LOC + '\'' + strKey + "' = '" + strVal + "'.");
             }
         }
     } // wend

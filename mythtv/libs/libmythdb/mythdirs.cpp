@@ -60,7 +60,7 @@ void InitializeMythDirs(void)
         confdir = QDir::homePath() + "/.mythtv";
 
     sharedir = installprefix + "/share/mythtv/";
-    libdir = installprefix + "/" + QString(LIBDIRNAME) + "/mythtv/";
+    libdir = installprefix + '/' + QString(LIBDIRNAME) + "/mythtv/";
     themedir = sharedir + "themes/";
     pluginsdir = libdir + "plugins/";
     translationsdir = sharedir + "i18n/";
@@ -91,7 +91,7 @@ static const QString kPluginLibSuffix = ".so";
 
 QString GetPluginsNameFilter(void)
 {
-    return kPluginLibPrefix + "*" + kPluginLibSuffix;
+    return kPluginLibPrefix + '*' + kPluginLibSuffix;
 }
 
 QString FindPluginName(const QString &plugname)
