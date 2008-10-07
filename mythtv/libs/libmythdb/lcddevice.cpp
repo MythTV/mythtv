@@ -39,8 +39,6 @@ LCD::LCD()
 
       retryTimer(new QTimer(this)), LEDTimer(new QTimer(this)),
 
-      send_buffer(""),              last_command(QString::null),
-
       lcd_width(0),                 lcd_height(0),
 
       lcd_ready(false),             lcd_showtime(false),
@@ -51,11 +49,13 @@ LCD::LCD()
 
       lcd_popuptime(0),
 
-      lcd_showmusic_items(QString::null),
-      lcd_keystring(QString::null),
+      lcd_showmusic_items(),
+      lcd_keystring(),
 
       GetLEDMask(NULL)
 {
+    send_buffer.clear(); last_command.clear();
+    lcd_showmusic_items.clear(); lcd_keystring.clear();
 
     setObjectName("LCD");
 

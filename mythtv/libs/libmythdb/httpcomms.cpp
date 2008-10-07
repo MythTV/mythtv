@@ -302,7 +302,7 @@ QString HttpComms::getHttp(QString     &url,
     while (1) 
     {
         QUrl qurl(url);
-        if (hostname == "")
+        if (hostname.isEmpty())
             hostname = qurl.host();  // hold onto original host
         if (qurl.host().isEmpty())   // can occur on redirects to partial paths
             qurl.setHost(hostname);
@@ -394,7 +394,7 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
     while (1)
     {
         QUrl qurl(url);
-        if (hostname == "")
+        if (hostname.isEmpty())
             hostname = qurl.host();  // hold onto original host
         
         if (qurl.host().isEmpty())   // can occur on redirects to partial paths
@@ -547,7 +547,7 @@ QString HttpComms::postHttp(QUrl               &url         ,
 
     while (1) 
     {
-        if (hostname == "")
+        if (hostname.isEmpty())
             hostname = url.host();  // hold onto original host
         if (url.host().isEmpty())   // can occur on redirects to partial paths
             url.setHost(hostname);

@@ -50,7 +50,7 @@ class MPUBLIC SimpleDBStorage : public DBStorage
   public:
     SimpleDBStorage(StorageUser *_user,
                     QString _table, QString _column) :
-        DBStorage(_user, _table, _column), initval(QString::null) {}
+        DBStorage(_user, _table, _column) { initval.clear(); }
     virtual ~SimpleDBStorage() { }
 
     virtual void Load(void);

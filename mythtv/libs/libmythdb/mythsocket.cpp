@@ -257,7 +257,7 @@ bool MythSocket::writeStringList(QStringList &list)
     }
 
     QString str = list.join("[]:[]");
-    if (str == QString::null)
+    if (str.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, LOC +
                 "writeStringList: Error, joined null string.");

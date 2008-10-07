@@ -63,9 +63,10 @@ class MythDBPrivate
 };
 
 MythDBPrivate::MythDBPrivate()
-    : m_localhostname(QString::null), m_settings(new Settings()),
+    : m_settings(new Settings()),
       ignoreDatabase(false), useSettingsCache(false)
 {
+    m_localhostname.clear();
 }
 
 MythDBPrivate::~MythDBPrivate()
@@ -484,7 +485,7 @@ void MythDB::GetResolutionSetting(const QString &type,
 
     QString res = GetSetting(sRes);
 
-    if ("" != res)
+    if (!res.isEmpty())
     {
         QStringList slist = res.split(QString("x"));
         int w = width, h = height;
@@ -543,7 +544,7 @@ void MythDB::OverrideSettingForSession(const QString &key,
 void MythDB::ClearSettingsCache(QString myKey, QString newVal)
 {
     d->settingsCacheLock.lock();
-    if (myKey != "" && d->settingsCache.contains(myKey))
+    if (!myKey.isEmpty() && d->settingsCache.contains(myKey))
     {
         VERBOSE(VB_DATABASE, QString("Clearing Settings Cache for '%1'.")
                                     .arg(myKey));
