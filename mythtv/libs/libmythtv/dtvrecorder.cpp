@@ -261,7 +261,7 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     bool hasFrame     = false;
     bool hasKeyFrame  = false;
 
-    uint aspectRatio;
+    uint aspectRatio = 0;
 
     // Scan for PES header codes; specifically picture_start
     // sequence_start (SEQ) and group_start (GOP).
