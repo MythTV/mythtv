@@ -1861,8 +1861,8 @@ void MythSearchDialog::setSearchText(QString text)
 {
     if (editor)
     {
-        editor->setText(text);
-        editor->setCursorPosition(0, editor->text().length());
+        editor->clear();
+        editor->insertPlainText(text);
     }
 }
 

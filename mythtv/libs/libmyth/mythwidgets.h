@@ -5,12 +5,9 @@
 #include <QSpinBox>
 #include <QSlider>
 #include <QLineEdit>
-#include <q3textedit.h>
 #include <QPushButton>
 #include <QToolButton>
 #include <QDialog>
-#include <q3header.h>
-#include <q3buttongroup.h>
 #include <QCheckBox>
 #include <QRadioButton>
 #include <QImage>
@@ -195,7 +192,7 @@ class MPUBLIC MythLineEdit : public QLineEdit
  * A LineEdit that does special things when you press number keys
  * (enter letters with multiple presses, just like a phone keypad)
  */
-class MPUBLIC MythRemoteLineEdit : public Q3TextEdit
+class MPUBLIC MythRemoteLineEdit : public QTextEdit
 {
     Q_OBJECT
 
@@ -244,14 +241,14 @@ class MPUBLIC MythRemoteLineEdit : public Q3TextEdit
   private slots:
     void    startCycle(QString current_choice, QString set);
     void    updateCycle(QString current_choice, QString set);
-    void    endCycle();
+    void    endCycle(bool select);
+    void    endCycle(void) { endCycle(true); }
 
   private:
     QFont   *my_font;
     void    Init(void);
     void    cycleKeys(QString cycleList);
     void    toggleShift(void);
-    void    assignHexColors();
 
     bool    shift;
     QTimer  *cycle_timer;
@@ -261,10 +258,9 @@ class MPUBLIC MythRemoteLineEdit : public Q3TextEdit
     int     cycle_time;
     QString helptext;
 
-    int     pre_cycle_para;
-    int     pre_cycle_pos;
-    QString pre_cycle_text_upto;
-    QString pre_cycle_text_from;
+    int pre_cycle_pos;
+    QString pre_cycle_text_before_cursor;
+    QString pre_cycle_text_after_cursor;
 
     QColor  col_unselected;
     QColor  col_selected;

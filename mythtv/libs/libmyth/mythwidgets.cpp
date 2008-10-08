@@ -577,7 +577,7 @@ void MythLineEdit::mouseDoubleClickEvent(QMouseEvent *e)
 }
 
 MythRemoteLineEdit::MythRemoteLineEdit(QWidget * parent, const char *name) :
-    Q3TextEdit(parent)
+    QTextEdit(parent)
 {
     setObjectName(name);
     my_font = NULL;
@@ -587,7 +587,7 @@ MythRemoteLineEdit::MythRemoteLineEdit(QWidget * parent, const char *name) :
 
 MythRemoteLineEdit::MythRemoteLineEdit(const QString & contents,
                                        QWidget * parent, const char *name) :
-    Q3TextEdit(parent)
+    QTextEdit(parent)
 {
     setObjectName(name);
     my_font = NULL;
@@ -598,7 +598,7 @@ MythRemoteLineEdit::MythRemoteLineEdit(const QString & contents,
 
 MythRemoteLineEdit::MythRemoteLineEdit(QFont *a_font, QWidget * parent,
                                        const char *name) :
-    Q3TextEdit(parent)
+    QTextEdit(parent)
 {
     setObjectName(name);
     my_font = a_font;
@@ -608,7 +608,7 @@ MythRemoteLineEdit::MythRemoteLineEdit(QFont *a_font, QWidget * parent,
 
 MythRemoteLineEdit::MythRemoteLineEdit(int lines, QWidget * parent,
                                        const char *name) :
-    Q3TextEdit(parent)
+    QTextEdit(parent)
 {
     setObjectName(name);
     my_font = NULL;
@@ -625,30 +625,16 @@ void MythRemoteLineEdit::Init()
     current_choice = "";
     current_set = "";
 
-    //  We need to start out in PlainText format
-    //  and only toggle RichText on if we are in
-    //  the middle of a character cycle. That's
-    //  the only way to do all this in a way which
-    //  works across most 3.x.x versions of Qt.
-    setTextFormat(Qt::PlainText);
-
     cycle_time = 3000;
 
-    pre_cycle_text_upto = "";
-    pre_cycle_text_from = "";
-    pre_cycle_para = 0;
-    pre_cycle_pos  = 0;
+    pre_cycle_text_before_cursor = "";
+    pre_cycle_text_after_cursor = "";
 
-    col_unselected.setRgb(100, 100, 100);
-    col_selected.setRgb(0, 255, 255);
-    col_special.setRgb(255, 0, 0);
-
-    assignHexColors();
+    setCharacterColors(
+        QColor(100, 100, 100), QColor(0, 255, 255), QColor(255, 0, 0));
 
     //  Try and make sure it doesn't ever change
-    setWordWrap(Q3TextEdit::NoWrap);
-    Q3ScrollView::setVScrollBarMode(Q3ScrollView::AlwaysOff);
-    Q3ScrollView::setHScrollBarMode(Q3ScrollView::AlwaysOff);
+    setWordWrapMode(QTextOption::NoWrap);
 
     if (my_font)
         setFont(*my_font);
@@ -665,44 +651,60 @@ void MythRemoteLineEdit::Init()
     popupPosition = VK_POSBELOWEDIT;
 }
 
-void MythRemoteLineEdit::startCycle(QString current_choice, QString set)
-{
-    int end_paragraph;
-    int end_position;
-    int dummy;
-    int dummy_two;
 
-    if (active_cycle)
-    {
-        cerr << "libmyth: MythRemoteLineEdit was asked to start a cycle when a cycle was already active." << endl;
-    }
-    else
-    {
-        cycle_timer->start(cycle_time, true);
-        active_cycle = true;
-        //  Amazingly, Qt (version < 3.1.1) only lets us pull
-        //  text out in segments by fiddling around
-        //  with selecting it. Oh well.
-        getCursorPosition(&pre_cycle_para, &pre_cycle_pos);
-        selectAll(true);
-        getSelection(&dummy, &dummy_two, &end_paragraph, &end_position);
-        setSelection(pre_cycle_para, pre_cycle_pos, end_paragraph, end_position, 0);
-        pre_cycle_text_from = selectedText();
-        setSelection(0, 0, pre_cycle_para, pre_cycle_pos, 0);
-        pre_cycle_text_upto = selectedText();
-        selectAll(false);
-        setCursorPosition(pre_cycle_para, pre_cycle_pos);
-        updateCycle(current_choice, set); // Show the user their options
-    }
-}
-
-void MythRemoteLineEdit::setCharacterColors(QColor unselected, QColor selected,
-                                            QColor special)
+void MythRemoteLineEdit::setCharacterColors(
+    QColor unselected, QColor selected, QColor special)
 {
     col_unselected = unselected;
+    hex_unselected = QString("%1%2%3")
+        .arg(col_unselected.red(),   2, 16, QLatin1Char('0'))
+        .arg(col_unselected.green(), 2, 16, QLatin1Char('0'))
+        .arg(col_unselected.blue(),  2, 16, QLatin1Char('0'));
+
     col_selected = selected;
+    hex_selected = QString("%1%2%3")
+        .arg(col_selected.red(),   2, 16, QLatin1Char('0'))
+        .arg(col_selected.green(), 2, 16, QLatin1Char('0'))
+        .arg(col_selected.blue(),  2, 16, QLatin1Char('0'));
+
     col_special = special;
-    assignHexColors();
+    hex_special = QString("%1%2%3")
+        .arg(col_special.red(),   2, 16, QLatin1Char('0'))
+        .arg(col_special.green(), 2, 16, QLatin1Char('0'))
+        .arg(col_special.blue(),  2, 16, QLatin1Char('0'));
+}
+
+void MythRemoteLineEdit::startCycle(QString current_choice, QString set)
+{
+    if (active_cycle)
+    {
+        VERBOSE(VB_IMPORTANT, "MythRemoteLineEdit, Programmer Error: "
+                "startCycle() called, but edit is already in a cycle.");
+        return;
+    }
+
+    cycle_timer->start(cycle_time, true);
+    active_cycle = true;
+
+    QTextCursor pre_cycle_cursor = textCursor();
+
+    QTextCursor upto_cursor_sel = pre_cycle_cursor;
+    upto_cursor_sel.movePosition(
+        QTextCursor::NoMove, QTextCursor::MoveAnchor);
+    upto_cursor_sel.movePosition(
+        QTextCursor::Start,  QTextCursor::KeepAnchor);
+    pre_cycle_text_before_cursor = upto_cursor_sel.selectedText();
+
+    QTextCursor from_cursor_sel = pre_cycle_cursor;
+    from_cursor_sel.movePosition(
+        QTextCursor::NoMove, QTextCursor::MoveAnchor);
+    from_cursor_sel.movePosition(
+        QTextCursor::End,  QTextCursor::KeepAnchor);
+    pre_cycle_text_after_cursor = from_cursor_sel.selectedText();
+
+    pre_cycle_pos = pre_cycle_text_before_cursor.length();
+
+    updateCycle(current_choice, set); // Show the user their options
 }
 
 void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
@@ -757,8 +759,8 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
         set.replace(index, current_choice.length(), bString);
     }
 
-    QString esc_upto =  pre_cycle_text_upto;
-    QString esc_from =  pre_cycle_text_from;
+    QString esc_upto =  pre_cycle_text_before_cursor;
+    QString esc_from =  pre_cycle_text_after_cursor;
 
     esc_upto.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
     esc_from.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
@@ -770,105 +772,97 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
     aString += set;
     aString += "]</FONT>";
     aString += esc_from;
-    setTextFormat(Qt::RichText);
-    setText(aString);
-    setCursorPosition(pre_cycle_para, pre_cycle_pos + set.length());
+    setHtml(aString);
+
+    QTextCursor tmp = textCursor();
+    tmp.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+    tmp.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor,
+                     pre_cycle_pos + set.length());
+    setTextCursor(tmp);
     update();
-    setCursorPosition(pre_cycle_para, pre_cycle_pos);
 
-    //  If current selection is delete,
-    //  select the character that may well
-    //  get deleted
-
-    if (current_choice == "X" && pre_cycle_pos > 0)
+    if (current_choice == "X" && !pre_cycle_text_before_cursor.isEmpty())
     {
-        setSelection(pre_cycle_para, pre_cycle_pos - 1, pre_cycle_para, pre_cycle_pos, 0);
+        //  If current selection is delete, select the character to be deleted
+        QTextCursor tmp = textCursor();
+        tmp.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+        tmp.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor,
+                         pre_cycle_pos - 1);
+        tmp.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor);
+        setTextCursor(tmp);
+    }
+    else
+    {
+        // Restore original cursor location
+        QTextCursor tmp = textCursor();
+        tmp.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+        tmp.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor,
+                         pre_cycle_pos);
+        setTextCursor(tmp);
     }
 }
 
-void MythRemoteLineEdit::assignHexColors()
+void MythRemoteLineEdit::endCycle(bool select)
 {
-    char text[1024];
+    if (!active_cycle)
+        return;
 
-    sprintf(text, "%.2X%.2X%.2X", col_unselected.red(), col_unselected.green(), col_unselected.blue());
-    hex_unselected = text;
+    QString tmpString = "";
+    int pos = pre_cycle_pos;
 
-    sprintf(text, "%.2X%.2X%.2X", col_selected.red(), col_selected.green(), col_selected.blue());
-    hex_selected = text;
-
-    sprintf(text, "%.2X%.2X%.2X", col_special.red(), col_special.green(), col_special.blue());
-    hex_special = text;
-}
-
-void MythRemoteLineEdit::endCycle()
-{
-    QString aString;
-
-    if (active_cycle)
+    //  The timer ran out or the user pressed a key
+    //  outside of the current set of choices
+    if (!select)
     {
-        //  The timer ran out or the user pressed a key
-        //  outside of the current set of choices
-        if (current_choice == "_")       //  Space
-        {
-            aString  = pre_cycle_text_upto;
-            aString += " ";
-            aString += pre_cycle_text_from;
-        }
-        else if (current_choice == "X") // destructive backspace
-        {
-            //  Deal with special case in a way
-            //  that all 3.x.x versions of Qt
-            //  can handle
-
-            if (pre_cycle_text_upto.length() > 0)
-            {
-                aString = pre_cycle_text_upto.left(pre_cycle_text_upto.length() - 1);
-            }
-            else
-            {
-                aString = "";
-            }
-            aString += pre_cycle_text_from;
-            pre_cycle_pos--;
-        }
-        else if (shift)
-        {
-            aString  = pre_cycle_text_upto;
-            aString += current_choice.toUpper();
-            aString += pre_cycle_text_from;
-        }
-        else
-        {
-            aString  = pre_cycle_text_upto;
-            aString += current_choice;
-            aString += pre_cycle_text_from;
-        }
-
-        setTextFormat(Qt::PlainText);
-        setText(aString);
-        setCursorPosition(pre_cycle_para, pre_cycle_pos + 1);
-        active_cycle = false;
-        current_choice = "";
-        current_set = "";
+        tmpString = pre_cycle_text_before_cursor;
     }
-    emit(textChanged(this->text()));
+    else if (current_choice == "X") // destructive backspace
+    {
+        if (!pre_cycle_text_before_cursor.isEmpty())
+        {
+            tmpString = pre_cycle_text_before_cursor.left(
+                pre_cycle_text_before_cursor.length() - 1);
+            pos--;
+        }
+    }
+    else
+    {
+        current_choice = (current_choice == "_") ? " " : current_choice;
+        current_choice = (shift) ? current_choice.toUpper() : current_choice;
+
+        tmpString  = pre_cycle_text_before_cursor;
+        tmpString += current_choice;
+        pos++;
+    }
+
+    tmpString += pre_cycle_text_after_cursor;
+
+    setPlainText(tmpString);
+
+    QTextCursor tmpCursor = textCursor();
+    tmpCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+    tmpCursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, pos);
+    setTextCursor(tmpCursor);
+
+    active_cycle                 = false;
+    current_choice               = "";
+    current_set                  = "";
+    pre_cycle_text_before_cursor = "";
+    pre_cycle_text_after_cursor  = "";
+
+    if (select)
+        emit textChanged(toPlainText());
 }
 
-void MythRemoteLineEdit::setText(const QString& text)
+void MythRemoteLineEdit::setText(const QString &text)
 {
-    int para, pos;
-
-    //  Isaac had this in the original version
-    //  of MythLineEdit, and I'm sure he had
-    //  a reason ...
-    getCursorPosition(&para, &pos);
-    Q3TextEdit::setText(text);
-    setCursorPosition(para, pos);
+    QTextEdit::clear();
+    QTextEdit::insertPlainText(text);
 }
 
 QString MythRemoteLineEdit::text(void)
 {
-    return Q3TextEdit::text();
+    return QTextEdit::toPlainText();
 }
 
 void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
@@ -876,7 +870,7 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
     bool handled = false;
     QStringList actions;
 
-    if ((!popup || !popup->isShown()) &&
+    if ((!popup || popup->isHidden()) &&
           gContext->TranslateKeyPress("qt", e, actions, false))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
@@ -909,6 +903,10 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
                 if (useVirtualKeyboard)
                     popupVirtualKeyboard();
             }
+            else if ((action == "ESCAPE") && active_cycle)
+            {
+                endCycle(false);
+            }
             else
                 handled = false;
         }
@@ -917,11 +915,11 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
     if (handled)
         return;
 
-    if (popup && popup->isShown())
+    if (popup && !popup->isHidden())
     {
         endCycle();
-        Q3TextEdit::keyPressEvent(e);
-        emit textChanged(this->text());
+        QTextEdit::keyPressEvent(e);
+        emit textChanged(toPlainText());
         return;
     }
 
@@ -1002,8 +1000,8 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
     if (!handled)
     {
         endCycle();
-        Q3TextEdit::keyPressEvent(e);
-        emit textChanged(this->text());
+        QTextEdit::keyPressEvent(e);
+        emit textChanged(toPlainText());
     }
 }
 
@@ -1011,12 +1009,15 @@ void MythRemoteLineEdit::setCycleTime(float desired_interval)
 {
     if (desired_interval < 0.5 || desired_interval > 10.0)
     {
-        cerr << "libmyth: Did not accept key cycle interval of " << desired_interval << " seconds" << endl;
+        VERBOSE(VB_IMPORTANT, QString("MythRemoteLineEdit, Programmer Error, ")+
+                QString("cycle interval of %1 milliseconds ")
+                .arg((int) (desired_interval * 1000)) +
+                "\n\t\t\tis outside of the allowed range of "
+                "500 to 10,000 milliseconds");
+        return;
     }
-    else
-    {
-        cycle_time = (int) (desired_interval * 1000.0);
-    }
+
+    cycle_time = (int) (desired_interval * 1000);
 }
 
 void MythRemoteLineEdit::cycleKeys(QString cycle_list)
@@ -1028,7 +1029,7 @@ void MythRemoteLineEdit::cycleKeys(QString cycle_list)
         if (cycle_list == current_set)
         {
             //  Regular movement through existing set
-            cycle_timer->changeInterval(cycle_time);
+            cycle_timer->start(cycle_time);
             index = current_set.indexOf(current_choice);
             int length = current_set.length();
             if (index + 1 >= length)
@@ -1045,7 +1046,7 @@ void MythRemoteLineEdit::cycleKeys(QString cycle_list)
             endCycle();
             current_choice = cycle_list.left(1);
             current_set = cycle_list;
-            cycle_timer->changeInterval(cycle_time);
+            cycle_timer->start(cycle_time);
             startCycle(current_choice, current_set);
         }
     }
@@ -1101,7 +1102,7 @@ void MythRemoteLineEdit::focusInEvent(QFocusEvent *e)
     palette.setColor(backgroundRole(), highlight);
     setPalette(palette);
 
-    Q3TextEdit::focusInEvent(e);
+    QTextEdit::focusInEvent(e);
 }
 
 void MythRemoteLineEdit::focusOutEvent(QFocusEvent *e)
@@ -1112,7 +1113,7 @@ void MythRemoteLineEdit::focusOutEvent(QFocusEvent *e)
         popup->hide();
 
     emit lostFocus();
-    Q3TextEdit::focusOutEvent(e);
+    QTextEdit::focusOutEvent(e);
 }
 
 MythRemoteLineEdit::~MythRemoteLineEdit()
@@ -1123,7 +1124,7 @@ MythRemoteLineEdit::~MythRemoteLineEdit()
 void MythRemoteLineEdit::deleteLater(void)
 {
     Teardown();
-    Q3TextEdit::deleteLater();
+    QTextEdit::deleteLater();
 }
 
 void MythRemoteLineEdit::Teardown(void)
@@ -1151,20 +1152,20 @@ void MythRemoteLineEdit::popupVirtualKeyboard(void)
 
 void MythRemoteLineEdit::insert(QString text)
 {
-    Q3TextEdit::insert(text);
-    emit textChanged(this->text());
+    QTextEdit::insert(text);
+    emit textChanged(toPlainText());
 }
 
 void MythRemoteLineEdit::del()
 {
-    doKeyboardAction(Q3TextEdit::ActionDelete);
-    emit textChanged(this->text());
+    doKeyboardAction(QTextEdit::ActionDelete);
+    emit textChanged(toPlainText());
 }
 
 void MythRemoteLineEdit::backspace()
 {
-    doKeyboardAction(Q3TextEdit::ActionBackspace);
-    emit textChanged(this->text());
+    doKeyboardAction(QTextEdit::ActionBackspace);
+    emit textChanged(toPlainText());
 }
 
 MythPushButton::MythPushButton(const QString &ontext, const QString &offtext,

@@ -13,6 +13,7 @@ using namespace std;
 #include <QButtonGroup>
 #include <QRadioButton>
 #include <QProgressBar>
+#include <Q3ButtonGroup>
 
 // Qt utils
 #include <QFile>

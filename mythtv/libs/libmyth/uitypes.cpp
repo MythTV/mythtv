@@ -2788,7 +2788,9 @@ bool UIRemoteEditType::takeFocus()
 {
     if (edit)
     {
-        edit->setCursorPosition(0, edit->text().length());
+        QTextCursor tmp = edit->textCursor();
+        tmp.movePosition(QTextCursor::End);
+        edit->setTextCursor(tmp);
         edit->setFocus();
     }
 
@@ -5358,8 +5360,8 @@ void UIKeyboardType::leftCursor()
     }
     else if (m_parentEdit->inherits("QTextEdit"))
     {
-        Q3TextEdit *par = (Q3TextEdit *)m_parentEdit;
-        par->moveCursor(Q3TextEdit::MoveBackward, false);
+        QTextEdit *par = (QTextEdit *)m_parentEdit;
+        par->moveCursor(QTextEdit::MoveBackward, false);
     }
     else
     {
@@ -5380,8 +5382,8 @@ void UIKeyboardType::rightCursor()
     }
     else if (m_parentEdit->inherits("QTextEdit"))
     {
-        Q3TextEdit *par = (Q3TextEdit *)m_parentEdit;
-        par->moveCursor(Q3TextEdit::MoveForward, false);
+        QTextEdit *par = (QTextEdit *)m_parentEdit;
+        par->moveCursor(QTextEdit::MoveForward, false);
     }
     else
     {
