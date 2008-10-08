@@ -13,7 +13,6 @@ using namespace std;
 #include <QButtonGroup>
 #include <QRadioButton>
 #include <QProgressBar>
-#include <Q3ButtonGroup>
 
 // Qt utils
 #include <QFile>
@@ -831,9 +830,10 @@ void DateSetting::setValue(const QDate& newValue) {
     Setting::setValue(newValue.toString(Qt::ISODate));
 }
 
-QWidget* RadioSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                    const char* widgetName) {
-    Q3ButtonGroup* widget = new Q3ButtonGroup(parent, widgetName);
+QWidget *RadioSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
+                                    const char* widgetName)
+{
+    QGroupBox* widget = new QGroupBox(parent, widgetName);
     widget->setTitle(getLabel());
 
     for( unsigned i = 0 ; i < labels.size() ; ++i ) {

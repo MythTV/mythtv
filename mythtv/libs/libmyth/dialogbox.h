@@ -3,11 +3,11 @@
 
 #include <QObject>
 #include <QCheckBox>
-#include <Q3ButtonGroup>
 
 #include "mythdialogs.h"
 #include "compat.h" // to undef DialogBox
 class QVBoxLayout;
+class QButtonGroup;
 
 class MPUBLIC DialogBox : public MythDialog
 {
@@ -29,7 +29,7 @@ class MPUBLIC DialogBox : public MythDialog
 
   private:
     QVBoxLayout *box;
-    Q3ButtonGroup *buttongroup;
+    QButtonGroup *buttongroup;
 
     QCheckBox *checkbox;
 };

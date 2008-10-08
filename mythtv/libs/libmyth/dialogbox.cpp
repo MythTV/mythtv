@@ -9,7 +9,7 @@ using namespace std;
 #undef DialogBox
 #endif
 
-#include <Q3ButtonGroup>
+#include <QButtonGroup>
 #include <QBoxLayout>
 
 DialogBox::DialogBox(MythMainWindow *parent, const QString &text, 
@@ -35,30 +35,33 @@ DialogBox::DialogBox(MythMainWindow *parent, const QString &text,
         box->addWidget(checkbox, 0);
     }
 
-    buttongroup = new Q3ButtonGroup(0);
+    buttongroup = new QButtonGroup();
   
     if (checkbox)
-        buttongroup->insert(checkbox);
-    connect(buttongroup, SIGNAL(clicked(int)), this, SLOT(buttonPressed(int)));
+        buttongroup->addButton(checkbox, -2);
+    connect(buttongroup, SIGNAL(buttonClicked(int)),
+            this,        SLOT(  buttonPressed(int)));
 }
 
 void DialogBox::AddButton(const QString &title)
 {
     MythPushButton *button = new MythPushButton(title, this);
 
-    if (buttongroup->count() == 0 ||
-        (checkbox && buttongroup->count() == 1))
+    if (buttongroup->buttons().empty() ||
+        (checkbox && buttongroup->buttons().size() == 1))
     {
         button->setFocus();
     }
 
-    buttongroup->insert(button);
+    int id = buttongroup->buttons().size();
+    id = (checkbox) ? id - 1 : id;
+    buttongroup->addButton(button, id);
 
     box->addWidget(button, 0);
 }
 
 void DialogBox::buttonPressed(int which)
 {
-    if (buttongroup->find(which) != checkbox)
+    if (buttongroup->button(which) != checkbox)
         AcceptItem(which);
 }
