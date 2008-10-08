@@ -221,9 +221,10 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
 
         if (device->eject(false) != MEDIAERR_OK)
         {
-            QString msg = "Unable to open or close the empty drive %1.\n\n";
-            msg += "You may have to use the eject button under its tray.";
-            ShowOkPopup(tr(msg).arg(dev));
+            QString msg = QObject::tr(
+                "Unable to open or close the empty drive %1.\n\n"
+                "You may have to use the eject button under its tray.");
+            ShowOkPopup(msg.arg(dev));
         }
 
         return;
@@ -306,7 +307,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
         {
             QString target = fi->readLink();
 
-            if (m_IgnoreList.grep(target).isEmpty())
+            if (m_IgnoreList.filter(target).isEmpty())
             {
                 VERBOSE(VB_MEDIA, "Also ignoring " + target +
                                   " (symlinked from " + *dev + ").");

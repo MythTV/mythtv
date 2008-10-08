@@ -75,7 +75,8 @@ bool MythMediaDevice::openDevice()
     if (isDeviceOpen())
         return true;
  
-    m_DeviceHandle = open(m_DevicePath, O_RDONLY | O_NONBLOCK);
+    QByteArray dev = m_DevicePath.toLocal8Bit();
+    m_DeviceHandle = open(dev.constData(), O_RDONLY | O_NONBLOCK);
     
     return isDeviceOpen();
 }
@@ -246,11 +247,11 @@ bool MythMediaDevice::ScanMediaType(const QString &directory, ext_cnt_t &cnt)
 
         if (fi.isDir())
         {
-            ScanMediaType(fi.absFilePath(), cnt);
+            ScanMediaType(fi.absoluteFilePath(), cnt);
             continue;
         }
 
-        const QString ext = fi.extension(false);
+        const QString ext = fi.suffix();
         if (!ext.isEmpty())
             cnt[ext.toLower()]++;
     }

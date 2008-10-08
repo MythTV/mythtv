@@ -63,9 +63,10 @@ class MPUBLIC MythComboBox: public QComboBox
 
   public slots:
     virtual void deleteLater(void);
-    void insertItem(const QString& item) {
-        QComboBox::insertItem(item);
-    };
+    void insertItem(const QString &item)
+    {
+        QComboBox::insertItem(count()+1, item);
+    }
 
   protected:
     void Teardown(void);

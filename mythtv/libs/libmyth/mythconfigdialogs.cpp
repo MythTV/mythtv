@@ -49,7 +49,6 @@ MythDialog* ConfigurationPopupDialog::dialogWidget(MythMainWindow* parent,
                                                    const char* widgetName)
 {
     dialog = new ConfigPopupDialogWidget(parent, widgetName);
-    dialog->setBackgroundOrigin(QWidget::WindowOrigin);
 
     if (getLabel() != "")
     {
@@ -60,7 +59,6 @@ MythDialog* ConfigurationPopupDialog::dialogWidget(MythMainWindow* parent,
 
         label = new QLabel(box);
         label->setText(getLabel());
-        label->setBackgroundOrigin(QWidget::WindowOrigin);
         label->setAlignment(Qt::AlignHCenter);
         label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum,
                                          QSizePolicy::Maximum));
@@ -142,7 +140,8 @@ MythDialog* ConfigurationDialog::dialogWidget(MythMainWindow *parent,
 
     GetMythUI()->GetScreenSettings(wmult, hmult);
 
-    QVBoxLayout *layout = new QVBoxLayout(dialog, (int)(20 * hmult));
+    QVBoxLayout *layout = new QVBoxLayout(dialog);
+    layout->setSpacing((int)(20 * hmult));
 
     ChildList::iterator it = cfgChildren.begin();
     childwidget.clear();

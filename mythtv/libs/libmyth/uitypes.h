@@ -172,7 +172,7 @@ class MPUBLIC UIBarType : public UIType
     void SetTextOffset(QPoint to) { m_textoffset = to; }
     void SetIconOffset(QPoint ic) { m_iconoffset = ic; }
     void SetIconSize(QPoint is) { m_iconsize = is; }
-    void ResetImage(int loc) { iconData[loc].resize(0, 0); }
+    void ResetImage(int loc) { iconData[loc] = QPixmap(0,0); }
     int GetSize() { return m_iconsize.x(); }
 
   private:

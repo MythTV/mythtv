@@ -429,10 +429,11 @@ void MythPopupBox::addWidget(QWidget *widget, bool setAppearance)
          widget->setFont(font());
     }
 
-    if (widget->isA("QLabel"))
+    if (widget->metaObject()->className() == QString("QLabel"))
     {
-        widget->setBackgroundOrigin(ParentOrigin);
-        widget->setPaletteForegroundColor(popupForegroundColor);
+        QPalette palette;
+        palette.setColor(widget->foregroundRole(), popupForegroundColor);
+        widget->setPalette(palette);
     }
 
     vbox->addWidget(widget);
@@ -455,9 +456,10 @@ QLabel *MythPopupBox::addLabel(QString caption, LabelSize size, bool wrap)
         // Get a char from within the string to determine direction.
         if (caption.length())
             text_dir = caption[0].direction();
-        int align = (QChar::DirAL == text_dir) ?
-            Qt::WordBreak | Qt::AlignRight : Qt::WordBreak | Qt::AlignLeft;
+        Qt::Alignment align = (QChar::DirAL == text_dir) ?
+            Qt::AlignRight : Qt::AlignLeft;
         label->setAlignment(align);
+        label->setWordWrap(true);
     }
 
     label->setWordWrap(true);
@@ -508,7 +510,7 @@ void MythPopupBox::ShowPopupAtXY(int destx, int desty,
         }
     }
 
-    polish();
+    ensurePolished();
 
     int x = 0, y = 0, maxw = 0, poph = 0;
 
@@ -520,12 +522,15 @@ void MythPopupBox::ShowPopupAtXY(int destx, int desty,
 
         if (objs->isWidgetType())
         {
-            QString objname = objs->name();
+            QString objname = objs->objectName();
             if (objname != "nopopsize")
             {
                 // little extra padding for these guys
-                if (objs->isA("MythListBox"))
+                if (objs->metaObject()->className() ==
+                    QString("MythListBox"))
+                {
                     poph += (int)(25 * hmult);
+                }
 
                 QWidget *widget = (QWidget *)objs;
                 poph += widget->height();
@@ -646,7 +651,8 @@ void MythPopupBox::defaultButtonPressedHandler(void)
         if (objs->isWidgetType())
         {
             QWidget *widget = (QWidget *)objs;
-            if (widget->isA("MythPushButton"))
+            if (widget->metaObject()->className() ==
+                QString("MythPushButton"))
             {
                 if (widget->hasFocus())
                 {
@@ -674,7 +680,8 @@ void MythPopupBox::defaultButtonPressedHandler(void)
         if (objs->isWidgetType())
         {
             QWidget *widget = (QWidget *)objs;
-            if (widget->isA("MythPushButton"))
+            if (widget->metaObject()->className() ==
+                QString("MythPushButton"))
             {
                 MythPushButton *button = dynamic_cast<MythPushButton*>(widget);
                 if (button && button->isDown())
@@ -2164,25 +2171,25 @@ void MythImageFileDialog::buildFileList(QString directory)
 
         if (fi.isDir())
         {
-            buildFileList(fi.absFilePath());
+            buildFileList(fi.absoluteFilePath());
         }
         else
         {
-            r.setPattern("^" + fi.extension() + "$");
-            r.setCaseSensitive(false);
-            QStringList result = imageExtensions.grep(r);
+            r.setPattern("^" + fi.completeSuffix() + "$");
+            r.setCaseSensitivity(Qt::CaseInsensitive);
+            QStringList result = imageExtensions.filter(r);
             if (!result.isEmpty())
             {
-                image_files.append(fi.absFilePath());
+                image_files.append(fi.absoluteFilePath());
             }
             else
             {
-                r.setPattern("^" + fi.extension());
-                r.setCaseSensitive(false);
-                QStringList other_result = imageExtensions.grep(r);
+                r.setPattern("^" + fi.completeSuffix());
+                r.setCaseSensitivity(Qt::CaseInsensitive);
+                QStringList other_result = imageExtensions.filter(r);
                 if (!result.isEmpty())
                 {
-                    image_files.append(fi.absFilePath());
+                    image_files.append(fi.absoluteFilePath());
                 }
             }
         }

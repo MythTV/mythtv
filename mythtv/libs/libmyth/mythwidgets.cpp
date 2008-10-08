@@ -34,11 +34,13 @@ static void qt_delete(QWidgetP &widget)
 }
 
 MythComboBox::MythComboBox(bool rw, QWidget *parent, const char *name) :
-    QComboBox(rw, parent, name),
+    QComboBox(parent),
     popup(NULL), helptext(QString::null), AcceptOnSelect(false),
     useVirtualKeyboard(true), allowVirtualKeyboard(rw),
     popupPosition(VK_POSBELOWEDIT), step(1)
 {
+    setObjectName(name);
+    setEditable(rw);
     useVirtualKeyboard = gContext->GetNumSetting("UseVirtualKeyboard", 1);
 }
 
@@ -82,7 +84,7 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false, updated = false;
     QStringList actions;
-    if ((!popup || !popup->isShown()) &&
+    if ((!popup || popup->isHidden()) &&
         (gContext->TranslateKeyPress("qt", e, actions, !allowVirtualKeyboard)))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
@@ -154,7 +156,7 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
     }
     if (!handled)
     {
-        if (editable())
+        if (isEditable())
             QComboBox::keyPressEvent(e);
         else
             e->ignore();
@@ -166,23 +168,25 @@ void MythComboBox::focusInEvent(QFocusEvent *e)
     emit changeHelpText(helptext);
     emit gotFocus();
 
-    QColor highlight = colorGroup().highlight();
+    QColor highlight = palette().color(QPalette::Highlight);
 
-    this->setPaletteBackgroundColor(highlight);
+    QPalette palette;
+    palette.setColor(backgroundRole(), highlight);
+    setPalette(palette);
 
     if (lineEdit())
-        lineEdit()->setPaletteBackgroundColor(highlight);
+        lineEdit()->setPalette(palette);
 
     QComboBox::focusInEvent(e);
 }
 
 void MythComboBox::focusOutEvent(QFocusEvent *e)
 {
-    this->unsetPalette();
+    setPalette(QPalette());
 
     if (lineEdit())
     {
-        lineEdit()->unsetPalette();
+        lineEdit()->setPalette(QPalette());
 
         // commit change if the user was editting an entry
         QString curText = currentText();
@@ -190,7 +194,7 @@ void MythComboBox::focusOutEvent(QFocusEvent *e)
         bool foundItem = false;
 
         for(i = 0; i < count(); i++)
-            if (curText == text(i))
+            if (curText == itemText(i))
                 foundItem = true;
 
         if (!foundItem)
@@ -241,15 +245,17 @@ void MythCheckBox::focusInEvent(QFocusEvent *e)
 {
     emit changeHelpText(helptext);
 
-    QColor highlight = colorGroup().highlight();
+    QColor highlight = palette().color(QPalette::Highlight);
+    QPalette palette;
+    palette.setColor(backgroundRole(), highlight);
+    setPalette(palette);
 
-    this->setPaletteBackgroundColor(highlight);
     QCheckBox::focusInEvent(e);
 }
 
 void MythCheckBox::focusOutEvent(QFocusEvent *e)
 {
-    this->unsetPalette();
+    setPalette(QPalette());
     QCheckBox::focusOutEvent(e);
 }
 
@@ -291,15 +297,18 @@ void MythRadioButton::focusInEvent(QFocusEvent *e)
 {
     emit changeHelpText(helptext);
 
-    QColor highlight = colorGroup().highlight();
+    QColor highlight = palette().color(QPalette::Highlight);
 
-    this->setPaletteBackgroundColor(highlight);
+    QPalette palette;
+    palette.setColor(backgroundRole(), highlight);
+    setPalette(palette);
+
     QRadioButton::focusInEvent(e);
 }
 
 void MythRadioButton::focusOutEvent(QFocusEvent *e)
 {
-    this->unsetPalette();
+    setPalette(QPalette());
     QRadioButton::focusOutEvent(e);
 }
 
@@ -350,15 +359,18 @@ void MythSpinBox::focusInEvent(QFocusEvent *e)
 {
     emit changeHelpText(helptext);
 
-    QColor highlight = colorGroup().highlight();
+    QColor highlight = palette().color(QPalette::Highlight);
 
-    this->setPaletteBackgroundColor(highlight);
+    QPalette palette;
+    palette.setColor(backgroundRole(), highlight);
+    setPalette(palette);
+
     QSpinBox::focusInEvent(e);
 }
 
 void MythSpinBox::focusOutEvent(QFocusEvent *e)
 {
-    this->unsetPalette();
+    setPalette(QPalette());
     QSpinBox::focusOutEvent(e);
 }
 
@@ -378,9 +390,9 @@ void MythSlider::keyPressEvent(QKeyEvent* e)
             else if (action == "DOWN")
                 focusNextPrevChild(true);
             else if (action == "LEFT")
-                setValue(value() - lineStep());
+                setValue(value() - singleStep());
             else if (action == "RIGHT")
-                setValue(value() + lineStep());
+                setValue(value() + singleStep());
             else if (action == "SELECT")
                 handled = true;
             else
@@ -404,36 +416,41 @@ void MythSlider::focusInEvent(QFocusEvent *e)
 {
     emit changeHelpText(helptext);
 
-    QColor highlight = colorGroup().highlight();
+    QColor highlight = palette().color(QPalette::Highlight);
 
-    this->setPaletteBackgroundColor(highlight);
+    QPalette palette;
+    palette.setColor(backgroundRole(), highlight);
+    setPalette(palette);
+
     QSlider::focusInEvent(e);
 }
 
 void MythSlider::focusOutEvent(QFocusEvent *e)
 {
-    this->unsetPalette();
+    setPalette(QPalette());
     QSlider::focusOutEvent(e);
 }
 
-MythLineEdit::MythLineEdit(QWidget *parent, const char* widgetName) :
-    QLineEdit(parent, widgetName),
+MythLineEdit::MythLineEdit(QWidget *parent, const char *name) :
+    QLineEdit(parent),
     popup(NULL), helptext(QString::null), rw(true),
     useVirtualKeyboard(true),
     allowVirtualKeyboard(true),
     popupPosition(VK_POSBELOWEDIT)
 {
+    setObjectName(name);
     useVirtualKeyboard = gContext->GetNumSetting("UseVirtualKeyboard", 1);
 }
 
 MythLineEdit::MythLineEdit(
-    const QString &contents, QWidget *parent, const char* widgetName) :
-    QLineEdit(contents, parent, widgetName),
+    const QString &contents, QWidget *parent, const char *name) :
+    QLineEdit(contents, parent),
     popup(NULL), helptext(QString::null), rw(true),
     useVirtualKeyboard(true),
     allowVirtualKeyboard(true),
     popupPosition(VK_POSBELOWEDIT)
 {
+    setObjectName(name);
     useVirtualKeyboard = gContext->GetNumSetting("UseVirtualKeyboard", 1);
 }
 
@@ -468,7 +485,7 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if ((!popup || !popup->isShown()) &&
+    if ((!popup || popup->isHidden()) &&
         gContext->TranslateKeyPress("qt", e, actions, false))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
@@ -531,23 +548,26 @@ void MythLineEdit::focusInEvent(QFocusEvent *e)
 {
     emit changeHelpText(helptext);
 
-    QColor highlight = colorGroup().highlight();
+    QColor highlight = palette().color(QPalette::Highlight);
 
-    this->setPaletteBackgroundColor(highlight);
+    QPalette palette;
+    palette.setColor(backgroundRole(), highlight);
+    setPalette(palette);
+
     QLineEdit::focusInEvent(e);
 }
 
 void MythLineEdit::focusOutEvent(QFocusEvent *e)
 {
-    this->unsetPalette();
-    if (popup && popup->isShown() && !popup->hasFocus())
+    setPalette(QPalette());
+    if (popup && !popup->isHidden() && !popup->hasFocus())
         popup->hide();
     QLineEdit::focusOutEvent(e);
 }
 
 void MythLineEdit::hideEvent(QHideEvent *e)
 {
-    if (popup && popup->isShown())
+    if (popup && !popup->isHidden())
         popup->hide();
     QLineEdit::hideEvent(e);
 }
@@ -557,18 +577,20 @@ void MythLineEdit::mouseDoubleClickEvent(QMouseEvent *e)
     QLineEdit::mouseDoubleClickEvent(e);
 }
 
-MythRemoteLineEdit::MythRemoteLineEdit(QWidget * parent, const char * name)
-                  : Q3TextEdit(parent, name)
+MythRemoteLineEdit::MythRemoteLineEdit(QWidget * parent, const char *name) :
+    Q3TextEdit(parent)
 {
+    setObjectName(name);
     my_font = NULL;
     m_lines = 1;
     this->Init();
 }
 
 MythRemoteLineEdit::MythRemoteLineEdit(const QString & contents,
-                                       QWidget * parent, const char * name)
-                  : Q3TextEdit(parent, name)
+                                       QWidget * parent, const char *name) :
+    Q3TextEdit(parent)
 {
+    setObjectName(name);
     my_font = NULL;
     m_lines = 1;
     this->Init();
@@ -576,18 +598,20 @@ MythRemoteLineEdit::MythRemoteLineEdit(const QString & contents,
 }
 
 MythRemoteLineEdit::MythRemoteLineEdit(QFont *a_font, QWidget * parent,
-                                       const char * name)
-                  : Q3TextEdit(parent, name)
+                                       const char *name) :
+    Q3TextEdit(parent)
 {
+    setObjectName(name);
     my_font = a_font;
     m_lines = 1;
     this->Init();
 }
 
 MythRemoteLineEdit::MythRemoteLineEdit(int lines, QWidget * parent,
-                                       const char * name)
-                  : Q3TextEdit(parent, name)
+                                       const char *name) :
+    Q3TextEdit(parent)
 {
+    setObjectName(name);
     my_font = NULL;
     m_lines = lines;
     this->Init();
@@ -722,7 +746,10 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
     int length = set.length();
     if (index < 0 || index > length)
     {
-        cerr << "libmyth: MythRemoteLineEdit passed a choice of \"" << (const char *)current_choice << "\" which is not in set \"" << (const char *)set << "\"" << endl;
+        VERBOSE(VB_IMPORTANT,
+                "MythRemoteLineEdit passed a choice of \""
+                << current_choice << "\" which is not in set \""
+                << set << "\"");
         setText("????");
         return;
     }
@@ -1069,18 +1096,20 @@ void MythRemoteLineEdit::focusInEvent(QFocusEvent *e)
     emit changeHelpText(helptext);
     emit gotFocus();    //perhaps we need to save a playlist?
 
-    QColor highlight = colorGroup().highlight();
+    QColor highlight = palette().color(QPalette::Highlight);
 
-    this->setPaletteBackgroundColor(highlight);
+    QPalette palette;
+    palette.setColor(backgroundRole(), highlight);
+    setPalette(palette);
 
     Q3TextEdit::focusInEvent(e);
 }
 
 void MythRemoteLineEdit::focusOutEvent(QFocusEvent *e)
 {
-    this->unsetPalette();
+    setPalette(QPalette());
 
-    if (popup && popup->isShown() && !popup->hasFocus())
+    if (popup && !popup->isHidden() && !popup->hasFocus())
         popup->hide();
 
     emit lostFocus();
@@ -1143,20 +1172,19 @@ MythPushButton::MythPushButton(const QString &ontext, const QString &offtext,
                                QWidget *parent, bool isOn, bool aa)
                                : QPushButton(ontext, parent)
 {
-    setBackgroundOrigin(WindowOrigin);
     arrowAccel = aa;
 
     onText = ontext;
     offText = offtext;
 
-    setToggleButton(true);
+    setCheckable(true);
 
     if (isOn)
         setText(onText);
     else
         setText(offText);
 
-    setOn(isOn);
+    setChecked(isOn);
 }
 
 void MythPushButton::setHelpText(const QString &help)
@@ -1182,7 +1210,7 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
             QString action = actions[i];
             if (action == "SELECT")
             {
-                if (isToggleButton())
+                if (isCheckable())
                     toggleText();
                 setDown(true);
                 emit pressed();
@@ -1197,7 +1225,7 @@ void MythPushButton::keyPressEvent(QKeyEvent *e)
                 }
                 else if (action == "RIGHT")
                 {
-                    if (isToggleButton())
+                    if (isCheckable())
                         toggleText();
                     setDown(true);
                     emit pressed();
@@ -1232,10 +1260,10 @@ void MythPushButton::keyReleaseEvent(QKeyEvent *e)
 
 void MythPushButton::toggleText(void)
 {
-    if (!isToggleButton())
+    if (!isCheckable())
         return;
 
-    if (isOn())
+    if (isChecked())
         setText(offText);
     else
         setText(onText);
@@ -1245,15 +1273,17 @@ void MythPushButton::focusInEvent(QFocusEvent *e)
 {
     emit changeHelpText(helptext);
 
-    QColor highlight = colorGroup().highlight();
+    QColor highlight = palette().color(QPalette::Highlight);
+    QPalette palette;
+    palette.setColor(backgroundRole(), highlight);
+    setPalette(palette);
 
-    this->setPaletteBackgroundColor(highlight);
     QPushButton::focusInEvent(e);
 }
 
 void MythPushButton::focusOutEvent(QFocusEvent *e)
 {
-    this->unsetPalette();
+    setPalette(QPalette());
     QPushButton::focusOutEvent(e);
 }
 

@@ -168,7 +168,7 @@ void SelectSetting::fillSelectionsFromDir(const QDir& dir, bool absPath)
         QFileInfo &fi = *it;
 
         if (absPath)
-            addSelection( fi.absFilePath() );
+            addSelection( fi.absoluteFilePath() );
         else
             addSelection( fi.fileName() );
     }

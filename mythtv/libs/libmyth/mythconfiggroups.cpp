@@ -304,8 +304,6 @@ QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg,
     connect(widget, SIGNAL(destroyed(QObject*)),
             this,   SLOT(widgetDeleted(QObject*)));
 
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
-
     for (uint i = 0 ; i < children.size() ; ++i)
     {
         if (children[i]->isVisible())
@@ -627,7 +625,6 @@ QWidget* TabbedConfigurationGroup::configWidget(ConfigurationGroup *cg,
                                                 const char* widgetName) 
 {
     Q3TabDialog* widget = new Q3TabDialog(parent, widgetName);
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
     
     for(unsigned i = 0 ; i < children.size() ; ++i)
         if (children[i]->isVisible())

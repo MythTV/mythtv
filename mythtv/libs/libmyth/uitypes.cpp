@@ -393,7 +393,7 @@ void UIBarType::SetIcon(int num, QString myIcon)
 
 void UIBarType::SetIcon(int num, QPixmap myIcon)
 {
-    QImage sourceImg = myIcon.convertToImage();
+    QImage sourceImg = myIcon.toImage();
     if (!sourceImg.isNull())
     {
         QImage scalerImg;
@@ -402,10 +402,10 @@ void UIBarType::SetIcon(int num, QPixmap myIcon)
                                     (int)(m_iconsize.y()),
                                     Qt::IgnoreAspectRatio,
                                     Qt::SmoothTransformation);
-        iconData[num].convertFromImage(scalerImg);
+        iconData[num] = QPixmap::fromImage(scalerImg);
     }
     else
-        iconData[num].resize(0, 0);
+        iconData[num] = QPixmap(0, 0);
 }
 
 void UIBarType::LoadImage(int loc, QString myFile)
@@ -681,7 +681,7 @@ void UIGuideType::drawCurrent(QPainter *dr, UIGTCon *data)
 {
     int breakin = 2;
     QRect area = data->drawArea;
-    area.addCoords(breakin, breakin, -breakin, -breakin);
+    area.adjust(breakin, breakin, -breakin, -breakin);
 
     dr->setBrush(QBrush(Qt::NoBrush));
     dr->setPen(QPen(selcolor, 2));
@@ -701,7 +701,7 @@ void UIGuideType::drawRecType(QPainter *dr, UIGTCon *data)
 {
     int breakin = 1;
     QRect area = data->drawArea;
-    area.addCoords(breakin, breakin, -breakin, -breakin);
+    area.adjust(breakin, breakin, -breakin, -breakin);
 
     int recTypeOffset = 0;
 
@@ -736,7 +736,7 @@ void UIGuideType::drawBox(QPainter *dr, UIGTCon *data, const QColor &color)
 {
     int breakin = 1;
     QRect area = data->drawArea;
-    area.addCoords(breakin, breakin, -breakin, -breakin);
+    area.adjust(breakin, breakin, -breakin, -breakin);
 
     if (filltype == Alpha)
     {
@@ -779,7 +779,7 @@ void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
         if (area.right() < prog_past_col)
         {
             fillColor = fillColor.dark();
-            area.addCoords(breakin, breakin, -breakin, -breakin);
+            area.adjust(breakin, breakin, -breakin, -breakin);
         }
         else
         {
@@ -788,15 +788,15 @@ void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
             int second = area.width() - first;
             overArea = area;
             overArea.setWidth(first);
-            area.moveBy(first, 0);
+            area.translate(first, 0);
             area.setWidth(second);
 
-            area.addCoords(0, breakin, -breakin, -breakin);
-            overArea.addCoords(breakin, breakin, 0, -breakin);
+            area.adjust(0, breakin, -breakin, -breakin);
+            overArea.adjust(breakin, breakin, 0, -breakin);
         }
     }
     else
-        area.addCoords(breakin, breakin, -breakin, -breakin);
+        area.adjust(breakin, breakin, -breakin, -breakin);
 
     if (area.width() <= 1)
         area.setWidth(2);
@@ -808,7 +808,7 @@ void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
         QPixmap orig(area.width(), area.height());
         orig.fill(window, screenloc.x() + area.left(),
                           screenloc.y() + area.top());
-        QImage tmpimg = orig.convertToImage();
+        QImage tmpimg = orig.toImage();
 
         alphaBlender.blendImage(tmpimg, fillColor);
         dr->drawImage(area.left(), area.top(), tmpimg);
@@ -818,7 +818,7 @@ void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
             orig = QPixmap(overArea.width(), overArea.height());
             orig.fill(window, screenloc.x() + overArea.left(),
                               screenloc.y() + overArea.top());
-            tmpimg = orig.convertToImage();
+            tmpimg = orig.toImage();
 
             alphaBlender.blendImage(tmpimg, overColor);
             dr->drawImage(overArea.left(), overArea.top(), tmpimg);
@@ -852,8 +852,8 @@ void UIGuideType::drawText(QPainter *dr, UIGTCon *data)
         msg += " (" + data->category + ")";
 
     QRect area = data->drawArea;
-    area.addCoords(textoffset.x(), textoffset.y(),
-                   -textoffset.x(), -textoffset.y());
+    area.adjust(textoffset.x(), textoffset.y(),
+                -textoffset.x(), -textoffset.y());
 
     if (data->arrow == 1 || data->arrow == 3)
         area.setLeft(area.left() + arrowImages[0].width());
@@ -1345,8 +1345,8 @@ void UIListType::calculateScreenArea()
                m_downarrow.width(), m_downarrow.height());
     r = r.unite(r2);
 
-    r.moveBy(m_parent->GetAreaRect().left(),
-             m_parent->GetAreaRect().top());
+    r.translate(m_parent->GetAreaRect().left(),
+                m_parent->GetAreaRect().top());
     screen_area = r;
 }
 
@@ -1537,8 +1537,8 @@ void UIImageType::refresh()
 
     if (m_parent)
     {
-        r.moveBy(m_parent->GetAreaRect().left(),
-                 m_parent->GetAreaRect().top());
+        r.translate(m_parent->GetAreaRect().left(),
+                    m_parent->GetAreaRect().top());
 
         //
         //  Tell someone who cares
@@ -1692,8 +1692,8 @@ void UIRepeatedImageType::refresh()
     }
     if (m_parent)
     {
-        r.moveBy(m_parent->GetAreaRect().left(),
-                 m_parent->GetAreaRect().top());
+        r.translate(m_parent->GetAreaRect().left(),
+                    m_parent->GetAreaRect().top());
 
         //
         //  Tell someone who cares
@@ -2128,7 +2128,7 @@ void UIImageGridType::drawText(QPainter *p, int curPos, int xpos, int ypos)
         if (showCheck)
         {
             QRect cr(checkRect);
-            cr.moveBy(textRect.x(), textRect.y());
+            cr.translate(textRect.x(), textRect.y());
             if (item->selected)
                 p->drawPixmap(cr, *checkFullPixmap);
             else
@@ -2262,8 +2262,8 @@ void UIImageGridType::loadCellImages(void)
 void UIImageGridType::calculateScreenArea(void)
 {
     QRect r = displayRect;
-    r.moveBy(m_parent->GetAreaRect().left(),
-             m_parent->GetAreaRect().top());
+    r.translate(m_parent->GetAreaRect().left(),
+                m_parent->GetAreaRect().top());
     screen_area = r;
 }
 
@@ -2396,8 +2396,8 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
 void UITextType::calculateScreenArea()
 {
     QRect r = m_displaysize;
-    r.moveBy(m_parent->GetAreaRect().left(),
-             m_parent->GetAreaRect().top());
+    r.translate(m_parent->GetAreaRect().left(),
+                m_parent->GetAreaRect().top());
     screen_area = r;
 }
 
@@ -2771,8 +2771,8 @@ void UIRemoteEditType::Draw(QPainter *dr, int drawlayer, int context)
 void UIRemoteEditType::calculateScreenArea()
 {
     QRect r = m_displaysize;
-    r.moveBy(m_parent->GetAreaRect().left(),
-             m_parent->GetAreaRect().top());
+    r.translate(m_parent->GetAreaRect().left(),
+                m_parent->GetAreaRect().top());
     screen_area = r;
 }
 
@@ -2885,8 +2885,8 @@ void UIStatusBarType::calculateScreenArea()
                     m_location.y(),
                     m_container.width(),
                     m_container.height());
-    r.moveBy(m_parent->GetAreaRect().left(),
-             m_parent->GetAreaRect().top());
+    r.translate(m_parent->GetAreaRect().left(),
+                m_parent->GetAreaRect().top());
     screen_area = r;
 }
 
@@ -4362,8 +4362,8 @@ void UIManagedTreeListType::calculateScreenArea()
     for ( it = bin_corners.begin(); it != bin_corners.end(); ++it )
     {
         QRect r = (*it);
-        r.moveBy(m_parent->GetAreaRect().left(),
-                 m_parent->GetAreaRect().top());
+        r.translate(m_parent->GetAreaRect().left(),
+                    m_parent->GetAreaRect().top());
         ++i;
         screen_corners[i] = r;
     }
@@ -4798,8 +4798,8 @@ void UISelectorType::Draw(QPainter *p, int drawlayer, int context)
 void UISelectorType::calculateScreenArea()
 {
     QRect r = m_area;
-    r.moveBy(m_parent->GetAreaRect().left(),
-             m_parent->GetAreaRect().top());
+    r.translate(m_parent->GetAreaRect().left(),
+                m_parent->GetAreaRect().top());
     screen_area = r;
 }
 
@@ -4906,8 +4906,8 @@ UIBlackHoleType::UIBlackHoleType(const QString &name)
 void UIBlackHoleType::calculateScreenArea()
 {
     QRect r = area;
-    r.moveBy(m_parent->GetAreaRect().left(),
-             m_parent->GetAreaRect().top());
+    r.translate(m_parent->GetAreaRect().left(),
+                m_parent->GetAreaRect().top());
     screen_area = r;
 }
 
@@ -5135,8 +5135,8 @@ void UIKeyType::calculateScreenArea()
     int height = m_normalImg->height();
 
     QRect r = QRect(m_pos.x(), m_pos.y(), width, height);
-    r.moveBy(m_parent->GetAreaRect().left(),
-             m_parent->GetAreaRect().top());
+    r.translate(m_parent->GetAreaRect().left(),
+                m_parent->GetAreaRect().top());
     screen_area = r;
     m_area = r;
 }
@@ -5341,8 +5341,8 @@ void UIKeyboardType::Draw(QPainter *dr, int drawlayer, int context)
 void UIKeyboardType::calculateScreenArea()
 {
     QRect r = m_area;
-    r.moveBy(m_parent->GetAreaRect().left(),
-             m_parent->GetAreaRect().top());
+    r.translate(m_parent->GetAreaRect().left(),
+                m_parent->GetAreaRect().top());
     screen_area = r;
 }
 
