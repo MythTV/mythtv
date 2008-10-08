@@ -23,12 +23,6 @@
 #     - added nexbase poster search
 #     - removed amazon.com searching for now
 
-# changes:
-# 10-26-2007:
-#   Added release date (in ISO 8601 form) to output
-# 9-10-2006: Anduin Withers
-#   Changed output to utf8
-
 use File::Basename;
 use lib dirname($0);
 
@@ -281,7 +275,7 @@ sub getMovieList {
    # check to see if we got a results page or a movie page
    #    looking for 'add=<movieid>" target=' which only exists
    #    in a movie description page
-   my $movienum = parseBetween($response, "add=", "\" ");
+   my $movienum = parseBetween($response, "add=", "\"");
    if (!$movienum) {
       $movienum = parseBetween($response, ";add=", "'");
    }
