@@ -144,6 +144,7 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
 bool MythScreenType::BuildFocusList(void)
 {
     m_FocusWidgetList.clear();
+    m_CurrentFocusWidget = NULL;
 
     AddFocusableChildrenToList(m_FocusWidgetList);
 
