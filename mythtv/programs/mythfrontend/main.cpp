@@ -794,9 +794,18 @@ void reloadTheme(void)
     themeBase->Reload();
     GetMythUI()->UpdateImageCache();
 
-    menu->ReloadTheme();
+    menu->Close();
 
-    if (!menu->foundTheme())
+    QString themename = gContext->GetSetting("Theme", "blue");
+    QString themedir = GetMythUI()->FindThemeDir(themename);
+    if (themedir == "")
+    {
+        cerr << "Couldn't find theme " << (const char *)themename << endl;
+        cleanup();
+        exit(FRONTEND_EXIT_NO_THEME);
+    }
+
+    if (!RunMenu(themedir) || !menu->foundTheme())
         exit(FRONTEND_BUGGY_EXIT_NO_THEME);
 
     LCD::SetupLCD();
