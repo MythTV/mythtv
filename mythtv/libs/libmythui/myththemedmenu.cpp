@@ -680,7 +680,7 @@ bool MythThemedMenu::findDepends(const QString &fileList)
     for (QStringList::Iterator it = files.begin(); it != files.end(); ++it )
     {
         QString filename = findMenuFile(*it);
-        if (filename != "" && filename.endsWith(".xml"))
+        if (!filename.isEmpty() && filename.endsWith(".xml"))
             return true;
 
         QString newname = FindPluginName(*it);

@@ -932,7 +932,7 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
 
     QStringList localActions;
     if (allowJumps && (d->jumpMap.count(keynum) > 0) &&
-        (d->jumpMap[keynum]->localAction != "") &&
+        (!d->jumpMap[keynum]->localAction.isEmpty()) &&
         (d->keyContexts.value(context)) &&
         (d->keyContexts.value(context)->GetMapping(keynum, localActions)))
     {

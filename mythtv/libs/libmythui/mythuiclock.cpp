@@ -55,7 +55,7 @@ void MythUIClock::Pulse(void)
                 m_Flash = true;
         }
 
-        m_CutMessage = "";
+        m_CutMessage.clear();
 
         if (m_Message != newMsg)
         {
