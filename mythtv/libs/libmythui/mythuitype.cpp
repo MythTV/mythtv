@@ -83,7 +83,8 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
         {
             if (obj->isWidgetType() && (!objName || obj->objectName() == oName))
                 return obj;
-        } else if ((!inheritsClass || obj->inherits(inheritsClass))
+        }
+        else if ((!inheritsClass || obj->inherits(inheritsClass))
                    && (!objName || obj->objectName() == oName))
             return obj;
         if (recursiveSearch && (obj = qChildHelper(objName, inheritsClass,
@@ -122,7 +123,8 @@ void MythUIType::DeleteChild(const QString &name)
 void MythUIType::DeleteChild(MythUIType *child)
 {
     QMutableListIterator<MythUIType *> it(m_ChildrenList);
-    while (it.hasNext()) {
+    while (it.hasNext())
+    {
         it.next();
         MythUIType *type = it.value();
         if (type == child)
@@ -602,7 +604,11 @@ void MythUIType::CopyFrom(MythUIType *base)
     for (it = base->m_ChildrenList.begin(); it != base->m_ChildrenList.end();
          ++it)
     {
-        (*it)->CreateCopy(this);
+        MythUIType *child = GetChild((*it)->objectName());
+        if (child)
+            child->CopyFrom(*it);
+        else
+            (*it)->CreateCopy(this);
     }
 }
 
@@ -708,4 +714,3 @@ bool MythUIType::MoveToTop(void)
 
     return false;
 }
-
