@@ -1,7 +1,5 @@
 #include <QApplication>
-#include <QImage>
 #include <QDir>
-#include <QKeyEvent>
 
 #include <iostream>
 #include <cmath>
@@ -11,12 +9,9 @@ using namespace std;
 
 #include "myththemedmenu.h"
 #include "mythmainwindow.h"
-#include "mythfontproperties.h"
-#include "mythimage.h"
 #include "mythdialogbox.h"
 
 #include "mythgesture.h"
-#include "mythuiimage.h"
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "xmlparsebase.h"
@@ -28,1270 +23,293 @@ using namespace std;
 #include "mythdirs.h"
 #include "lcddevice.h"
 
-struct TextAttributes
+MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
+                                         const QString &name)
+                    : MythScreenType(parent, name)
 {
-    QRect textRect;
-    MythFontProperties font;
-    int textflags;
-};
+    m_loaded = false;
 
-struct ButtonIcon
-{
-    QString name;
-    MythImage *icon;
-    MythImage *activeicon;
-    MythImage *watermark;
-    QPoint offset;
-};
+    m_titleState = m_watermarkState = NULL;
+    m_buttonList = NULL;
 
-class ThemedButton : public MythUIType
-{
-  public:
-    ThemedButton(MythUIType *parent, const QString &name)
-        : MythUIType(parent, name),
-          background(NULL), icon(NULL), text(NULL),
-          row(0), col(0)
-    {
-    }
+    m_callback = NULL;
+    m_callbackdata = NULL;
 
-    void SetActive(bool active)
-    {
-        MythUIStateType::StateType state = MythUIStateType::None;
-        if (active)
-            state = MythUIStateType::Full;
-
-        if (background)
-            background->DisplayState(state);
-        if (icon)
-            icon->DisplayState(state);
-        if (text)
-            text->DisplayState(state);
-    }
-
-    MythUIStateType *background;
-    MythUIStateType *icon;
-    MythUIStateType *text;
-
-    QStringList action;
-    QString message;
-    QString type;
-
-    int row;
-    int col;
-};
-
-struct MenuRow
-{
-    int numitems;
-    bool visible;
-    vector<ThemedButton *> buttons;
-};
-
-class MythThemedMenuPrivate;
-
-/** \class MyththemedMenuState
- *  \brief Private class that controls the settings of buttons, logos,
- *         backgrounds, texts, and more, for the MythThemedMenu class.
- */
-class MythThemedMenuState: public XMLParseBase
-{
-  public:
-    MythThemedMenuState();
-   ~MythThemedMenuState();
-
-    bool parseSettings(const QString &dir, const QString &menuname);
-
-    void parseBackground(const QString &dir, QDomElement &element);
-    void parseLogo(const QString &dir, QDomElement &element);
-    void parseArrow(const QString &dir, QDomElement &element, bool up);
-    void parseTitle(const QString &dir, QDomElement &element);
-    void parseButtonDefinition(const QString &dir, QDomElement &element);
-    void parseButton(const QString &dir, QDomElement &element);
-
-    void parseText(TextAttributes &attributes, QDomElement &element);
-    void parseOutline(TextAttributes &attributes, QDomElement &element);
-    void parseShadow(TextAttributes &attributes, QDomElement &element);
-
-    void Reset(void);
-    void setDefaults(void);
-
-    ButtonIcon *getButtonIcon(const QString &type);
-
-    QRect buttonArea;
-
-    QRect logoRect;
-    MythImage *logo;
-
-    MythImage *buttonnormal;
-    MythImage *buttonactive;
-
-    QMap<QString, ButtonIcon> allButtonIcons;
-
-    TextAttributes normalAttributes;
-    TextAttributes activeAttributes;
-
-    void (*callback)(void *, QString &);
-    void *callbackdata;
-
-    bool killable;
-
-    bool balancerows;
-    bool spreadbuttons;
-    bool buttoncenter;
-
-    QMap<QString, MythImage *> titleIcons;
-    QMap<QString, MythImage *> m_loadedImages;
-    QString titleText;
-    QPoint titlePos;
-
-    MythImage *buttonBackground;
-
-    MythImage *uparrow;
-    QRect uparrowRect;
-    MythImage *downarrow;
-    QRect downarrowRect;
-
-    QPoint watermarkPos;
-    QRect watermarkRect;
-
-    bool allowreorder;
-    int maxColumns;
-
-    int visiblerowlimit;
-
-    bool loaded;
-
-    QString themeDir;
-
-    /* FIXME, remove */
-    static bool parseFonts;
-};
-
-bool MythThemedMenuState::parseFonts = true;
-
-static QString LOC = "MythThemedMenuPrivate: ";
-
-class MythThemedMenuPrivate: public XMLParseBase
-{
-  public:
-    MythThemedMenuPrivate(MythThemedMenu *lparent, const QString &cdir, 
-                          MythThemedMenuState *lstate);
-   ~MythThemedMenuPrivate();
-
-    bool keyPressHandler(QKeyEvent *e);
-    bool keyHandler(QStringList &actions, bool fullexit);
-
-    bool ReloadTheme(void);
-
-    bool parseMenu(const QString &menuname);
-
-    void parseThemeButton(QDomElement &element);
-
-    void addButton(const QString &type, const QString &text,
-                   const QString &alttext, const QStringList &action);
-    bool layoutButtons(void);
-    void positionButtons(bool resetpos);
-    bool makeRowVisible(int newrow, int oldrow);
-
-    bool handleAction(const QString &action);
-    bool findDepends(const QString &fileList);
-    QString findMenuFile(const QString &menuname);
-
-    void checkScrollArrows(void);
-
-    bool checkPinCode(const QString &timestamp_setting,
-                      const QString &password_setting,
-                      const QString &text);
- 
-    void SetupBackground();
-    void SetupUITypes();
-
-    bool gestureEvent(MythUIType *origtype, MythGestureEvent *ge);
-
-    void updateLCD(void);
-
-    MythThemedMenu *parent;
-
-    MythThemedMenuState *m_state;
-    bool allocedstate;
-
-    vector<ThemedButton *> buttonList;
-    ThemedButton *activebutton;
-    int currentrow;
-    int currentcolumn;
-
-    vector<MenuRow> buttonRows;
-
-    QString selection;
-    bool foundtheme;
-
-    int exitModifier;
-
-    bool ignorekeys;
-
-    int maxrows;
-    int visiblerows;
-    int columns;
-
-    bool wantpop;
-
-    QString titleText;
-    QString menumode;
-
-    MythUIStateType *watermark;
-    MythUIImage *uparrow;
-    MythUIImage *downarrow;
-};
-
-/////////////////////////////////////////////////////////////////////////////
-
-MythThemedMenuState::MythThemedMenuState() :
-    logo(NULL),          buttonnormal(NULL),
-    buttonactive(NULL),  callback(NULL),
-    callbackdata(NULL),  killable(false),
-    balancerows(true),   spreadbuttons(false),
-    buttoncenter(false), buttonBackground(NULL),
-    uparrow(NULL),       downarrow(NULL),
-    allowreorder(true),  maxColumns(20),
-    visiblerowlimit(6),  loaded(false)
-{
+    m_killable = false;
 }
 
 MythThemedMenuState::~MythThemedMenuState()
 {
-    Reset();
-}
-
-void MythThemedMenuState::Reset(void)
-{
-    if (logo)
-        logo->DownRef();
-    if (buttonnormal)
-        buttonnormal->DownRef();
-    if (buttonactive)
-        buttonactive->DownRef();
-    if (uparrow)
-        uparrow->DownRef();
-    if (downarrow)
-        downarrow->DownRef();
-    if (buttonBackground)
-        buttonBackground->DownRef();
-
-    logo = NULL;
-    buttonnormal = NULL;
-    buttonactive = NULL;
-    uparrow = NULL;
-    downarrow = NULL;
-    buttonBackground = NULL;
-
     QMap<QString, ButtonIcon>::Iterator it;
-    for (it = allButtonIcons.begin(); it != allButtonIcons.end(); ++it)
+    for (it = m_allButtonIcons.begin(); it != m_allButtonIcons.end(); ++it)
     {
         if (it.value().icon)
             it.value().icon->DownRef();
         if (it.value().activeicon)
             it.value().activeicon->DownRef();
-        if (it.value().watermark)
-            it.value().watermark->DownRef();
     }
-    allButtonIcons.clear();
+    m_allButtonIcons.clear();
 
     QMap<QString, MythImage *>::Iterator jt;
-    for (jt = titleIcons.begin(); jt != titleIcons.end(); ++jt)
+    for (jt = m_titleIcons.begin(); jt != m_titleIcons.end(); ++jt)
     {
         jt.value()->DownRef();
     }
-    titleIcons.clear();
-    m_loadedImages.clear();
+    m_titleIcons.clear();
+}
 
-    normalAttributes = activeAttributes = TextAttributes();
-    setDefaults();
+bool MythThemedMenuState::Create(void)
+{
+    bool foundtheme = false;
 
-    loaded = false;
+    foundtheme = LoadWindowFromXML("menu-ui.xml", "mainmenu", this);
+
+    if (!foundtheme)
+        return false;
+
+    m_titleState = dynamic_cast<MythUIStateType *> (GetChild("titles"));
+    m_watermarkState = dynamic_cast<MythUIStateType *> (GetChild("watermarks"));
+    m_buttonList = dynamic_cast<MythUIButtonList *> (GetChild("menu"));
+
+    if (!m_buttonList)
+    {
+        VERBOSE(VB_IMPORTANT, "Missing 'menu' buttonlist.");
+        return false;
+    }
+
+    m_buttonList->SetActive(true);
+
+    m_loaded = true;
+
+    return foundtheme;
+}
+
+void MythThemedMenu::setButtonActive(MythUIButtonListItem* item)
+{
+    ThemedButton button = item->GetData().value<ThemedButton>();
+    if (m_watermarkState)
+    {
+        if (!(m_watermarkState->DisplayState(button.type)))
+            m_watermarkState->DisplayState("DEFAULT");
+    }
 }
 
 ButtonIcon *MythThemedMenuState::getButtonIcon(const QString &type)
 {
-    if (allButtonIcons.find(type) != allButtonIcons.end())
-        return &(allButtonIcons[type]);
+    if (m_allButtonIcons.find(type) != m_allButtonIcons.end())
+        return &(m_allButtonIcons[type]);
     return NULL;
 }
 
-/** \brief Parse through the element's tags and set the button's 
- *         area, spread, center, rows, columns and visible lower limit.
- *  \param dir     the directory path of background
- *  \param element QDomElement with information about the background
- */
-void MythThemedMenuState::parseBackground(
-    const QString &dir, QDomElement &element)
+void MythThemedMenuState::CopyFrom(MythUIType *base)
 {
-    QString path;
-
-    bool hasarea = false;
-
-    buttoncenter = true;
-    spreadbuttons = true;
-    maxColumns = 20;        // Arbitrary number
-    visiblerowlimit = 6;    // the old default
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
+    MythThemedMenuState *st = dynamic_cast<MythThemedMenuState *>(base);
+    if (!st)
     {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "buttonarea")
-            {
-                buttonArea = parseRect(info);
-                hasarea = true;
-
-                if (info.hasAttribute("background"))
-                {
-                    QString bPath = dir + info.attribute("background");
-                    QImage *image = GetMythUI()->LoadScaleImage(bPath);
-                    buttonBackground = MythImage::FromQImage(&image);
-                }
-            }
-            else if (info.tagName() == "buttonspread")
-            {
-                QString val = getFirstText(info);
-                if (val == "no")
-                    spreadbuttons = false;
-            }
-            else if (info.tagName() == "buttoncenter")
-            {
-                QString val = getFirstText(info);
-                if (val == "no")
-                    buttoncenter = false;
-            }
-            else if (info.tagName() == "balancerows")
-            {
-                QString val = getFirstText(info);
-                if (val == "no")
-                    balancerows = false;
-            }
-            else if (info.tagName() == "columns")
-            {
-                QString val = getFirstText(info);
-                maxColumns = val.toInt();
-            }
-            else if (info.tagName() == "visiblerowlimit")
-            {
-                visiblerowlimit = getFirstText(info).toInt();
-            }
-            else
-            {
-                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in background")
-                                    .arg(info.tagName()));
-            }
-        }
-    }
-
-    if (!hasarea)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing button area in background");
+        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
         return;
     }
+
+    m_loaded = st->m_loaded;
+
+    MythScreenType::CopyFrom(base);
+
+    m_titleState = dynamic_cast<MythUIStateType *> (GetChild("titles"));
+    m_watermarkState = dynamic_cast<MythUIStateType *> (GetChild("watermarks"));
+    m_buttonList = dynamic_cast<MythUIButtonList *> (GetChild("menu"));
 }
 
-/** \brief Parse through the element's tags and set the shadow's color,
- *         offset, and alpha.
- *  \param attributes text attributes whose font shadow will be set
- *  \param element    DOM dealing with shadow
- */
-void MythThemedMenuState::parseShadow(TextAttributes &attributes, 
-                                      QDomElement &element)
-{
-    QPoint offset;
-    QColor color;
-    int alpha = 255;
+////////////////////////////////////////////////////////////////////////////
 
-    bool hascolor = false;
-    bool hasoffset = false;
-    bool hasalpha = false;
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "color")
-            {
-                // workaround alpha bug with named colors
-                QColor temp(getFirstText(info));
-                color = QColor(temp.name());
-                hascolor = true;
-            }
-            else if (info.tagName() == "offset")
-            {
-                offset = parsePoint(info);
-                hasoffset = true;
-            }
-            else if (info.tagName() == "alpha")
-            {
-                alpha = getFirstText(info).toInt();
-                hasalpha = true;
-            }
-            else
-            {
-                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in text/shadow")
-                                    .arg(info.tagName()));
-            }
-        }
-    }
-
-    if (!hascolor)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing color tag in shadow");
-        return;
-    }
-
-    if (!hasalpha)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing alpha tag in shadow");
-        return;
-    }
-
-    if (!hasoffset)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing offset tag in shadow");
-        return;
-    }
-
-    attributes.font.SetShadow(true, offset, color, alpha);
-}
-
-/** \brief Parse through the element's tags and set the outline's
- *         color and size.
+/** \brief Creates a themed menu.
  *
- *  \param attributes text attributes whose font outline will be set
- *  \param element    DOM element dealing with outline
+ *  \param menufile     file name of menu definition file
+ *  \param parent       the screen stack that owns this UI type
+ *  \param name         the name of this UI type
+ *  \param state        theme state associated with this menu
  */
-void MythThemedMenuState::parseOutline(TextAttributes &attributes, 
-                                       QDomElement &element)
+MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
+                               MythScreenStack *parent, const QString &name,
+                               bool allowreorder, MythThemedMenuState *state)
+              : MythThemedMenuState(parent, name)
 {
-    QColor color;
-    int size = 0, alpha = 255;
+    m_state = state;
+    m_allocedstate = m_foundtheme = m_ignorekeys = m_wantpop = false;
+    m_exitModifier = -1;
+    m_menumode = "";
 
-    bool hascolor = false;
-    bool hassize = false;
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "color")
-            {
-                // workaround alpha bug with named colors
-                QColor temp(getFirstText(info));
-                color = QColor(temp.name());
-                hascolor = true;
-            }
-            else if (info.tagName() == "size")
-            {
-                int lsize = getFirstText(info).toInt();
-                size = GetMythMainWindow()->NormY(lsize);
-                hassize = true;
-            }
-            else
-            {
-                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in text/shadow")
-                                    .arg(info.tagName()));
-            }
-        }
-    }
-
-    if (!hassize)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing size in outline");
-        return;
-    }
-
-    if (!hascolor)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing color in outline");
-        return;
-    }
-
-    attributes.font.SetOutline(true, color, size, alpha);
-}
-
-/** \brief Parse through the element's tags and set the text's area,
- *          fontsize, fontname, positioning, and decorations.
- *
- *  \param attributes text attributes whose font face will be set
- *  \param element    DOM element dealing with text
- */
-void MythThemedMenuState::parseText(TextAttributes &attributes, 
-                                    QDomElement &element)
-{
-    bool hasarea = false;
-
-    int weight = QFont::Normal;
-    int fontsize = 14;
-    QString fontname = "Arial";
-    bool italic = false;
-
-    attributes.textflags = Qt::TextWordWrap;
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "area") 
-            {
-                hasarea = true;
-                attributes.textRect = parseRect(info);
-                attributes.textRect = QRect(attributes.textRect.x(), 
-                                            attributes.textRect.y(),
-                                            buttonnormal->width() - 
-                                            attributes.textRect.width() - 
-                                            attributes.textRect.x(), 
-                                            buttonnormal->height() - 
-                                            attributes.textRect.height() - 
-                                            attributes.textRect.y());
-            }
-            else if (info.tagName() == "fontsize")
-            {
-                fontsize = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "fontname")
-            { 
-                fontname = getFirstText(info);
-            }
-            else if (info.tagName() == "bold")
-            {
-                if (getFirstText(info) == "yes")
-                    weight = QFont::Bold;
-            }
-            else if (info.tagName() == "italics")
-            {
-                if (getFirstText(info) == "yes")
-                    italic = true;
-            }
-            else if (info.tagName() == "color")
-            {
-                // workaround alpha bug with named colors
-                QColor temp(getFirstText(info));
-                attributes.font.SetColor(QColor(temp.name()));
-            }
-            else if (info.tagName() == "centered")
-            {
-                if (getFirstText(info) == "yes")
-                {
-                    if (GetMythUI()->GetLanguage() == "ja")
-                    {
-                        attributes.textflags = Qt::AlignVCenter | 
-                                               Qt::AlignHCenter |
-                                               Qt::TextWordWrap;
-                    }
-                    else
-                    {
-                        attributes.textflags = Qt::AlignTop | 
-                                               Qt::AlignHCenter |
-                                               Qt::TextWordWrap;
-                    }
-                }
-            } 
-            // halign has three possible values: center, left, and right. //
-            else if (info.tagName() == "halign")
-            {
-                if (getFirstText(info) == "center")
-                {
-                    // Apparently Japanese is drawn along a _center_ line //
-                    if (GetMythUI()->GetLanguage() == "ja")
-                    {
-                        attributes.textflags =
-                            (attributes.textflags & ~Qt::AlignHorizontal_Mask) |
-                            Qt::AlignCenter;
-                    }
-                    else
-                    {
-                        attributes.textflags =
-                            (attributes.textflags & ~Qt::AlignHorizontal_Mask) |
-                            Qt::AlignHCenter;
-                    }
-                }
-                else if (getFirstText(info) == "left")
-                {
-                    attributes.textflags =
-                        (attributes.textflags & ~Qt::AlignHorizontal_Mask) |
-                        Qt::AlignLeft | Qt::TextWordWrap;
-                }
-                else if (getFirstText(info) == "right")
-                {
-                    attributes.textflags =
-                        (attributes.textflags & ~Qt::AlignHorizontal_Mask) |
-                        Qt::AlignRight | Qt::TextWordWrap;
-                }
-                else
-                {
-                    VERBOSE(VB_GENERAL, (LOC + "Unknown value %1 for halign")
-                                        .arg(getFirstText(info)));
-                }
-            }
-            // valign has three possible values: center, top, and bottom. //
-            else if (info.tagName() == "valign")
-            {
-                if (getFirstText(info) == "center")
-                {
-                    attributes.textflags =
-                        (attributes.textflags & ~Qt::AlignVertical_Mask) |
-                        Qt::AlignVCenter;
-                }
-                else if (getFirstText(info) == "top")
-                {
-                    attributes.textflags =
-                        (attributes.textflags & ~Qt::AlignVertical_Mask) |
-                        Qt::AlignTop;
-                }
-                else if (getFirstText(info) == "bottom")
-                {
-                    attributes.textflags =
-                        (attributes.textflags & ~Qt::AlignVertical_Mask) |
-                        Qt::AlignBottom;
-                }
-                else
-                {
-                    VERBOSE(VB_GENERAL, (LOC + "Unknown value %1 for valign")
-                                        .arg(getFirstText(info)));
-                }
-            }
-            else if (info.tagName() == "outline")
-            {
-                parseOutline(attributes, info);
-            }
-            else if (info.tagName() == "shadow")
-            {
-                parseShadow(attributes, info);
-            }
-            else
-            {
-                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in text")
-                                    .arg(info.tagName()));
-                return;
-            }
-        }
-    }
-
-    QFont font = GetMythMainWindow()->CreateQFont(
-        fontname, fontsize, weight, italic);
-
-    attributes.font.SetFace(font);
-
-    if (!hasarea)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing 'area' "
-                "tag in 'text' element of 'genericbutton'");
-        return;
-    }
-}
-
-void MythThemedMenuState::parseButtonDefinition(const QString &dir, 
-                                                QDomElement &element)
-{
-    bool hasnormal = false;
-    bool hasactive = false;
-    bool hasactivetext = false;
-
-    QString setting;
-
-    QImage *tmp;
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "normal")
-            {
-                setting = dir + getFirstText(info);
-                tmp = GetMythUI()->LoadScaleImage(setting);
-                if (tmp)
-                {
-                    buttonnormal = MythImage::FromQImage(&tmp);
-                    hasnormal = true;
-                }
-            }
-            else if (info.tagName() == "active")
-            {
-                setting = dir + getFirstText(info);
-                tmp = GetMythUI()->LoadScaleImage(setting);
-                if (tmp)
-                {
-                    buttonactive = MythImage::FromQImage(&tmp);
-                    hasactive = true;
-                }
-            }
-            else if (info.tagName() == "text")
-            {
-                if (!hasnormal)
-                {
-                    VERBOSE(VB_IMPORTANT, LOC + "The 'normal' "
-                            "tag needs to come before the 'text' tag");
-                    return;
-                }
-                parseText(normalAttributes, info);
-            }
-            else if (info.tagName() == "activetext")
-            {
-                if (!hasactive)
-                {
-                    VERBOSE(VB_IMPORTANT, LOC + "The 'active' "
-                            "tag needs to come before the 'activetext' tag");
-                    return;
-                }
-                parseText(activeAttributes, info);
-                hasactivetext = true;
-            }
-            else if (info.tagName() == "watermarkposition")
-            {
-                watermarkPos = parsePoint(info);
-            }
-            else
-            {
-                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in "
-                                "genericbutton").arg(info.tagName()));
-            }
-        }
-    }
-
-    if (!hasnormal)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "No normal button image defined");
-        return;
-    }
-
-    if (!hasactive)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "No active button image defined");
-        return;
-    }
-
-    if (!hasactivetext)
-    {
-        activeAttributes = normalAttributes;
-    }
-
-    watermarkRect = QRect(watermarkPos, QSize(0, 0));
-}
-
-/** \brief Parse through the element's tags and set the logo's
- *         image and position.
- *
- *  \param dir     directory where logo images may be found
- *  \param element DOM element whose nodes describe the logo
- */
-void MythThemedMenuState::parseLogo(const QString &dir, QDomElement &element)
-{
-    bool hasimage = false;
-    bool hasposition = false;
-
-    QPoint logopos;
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "image")
-            {
-                QString logopath = dir + getFirstText(info);
-                QImage *tmp = GetMythUI()->LoadScaleImage(logopath); 
-                if (tmp)
-                {
-                    logo = MythImage::FromQImage(&tmp);
-                    hasimage = true;
-                }
-            }
-            else if (info.tagName() == "position")
-            {
-                logopos = parsePoint(info);
-                hasposition = true;
-            }
-            else
-            {
-                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in logo")
-                                    .arg(info.tagName()));
-            }
-        }
-    }
-
-    if (!hasimage)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing image tag in logo");
-        return;
-    }
-
-    if (!hasposition)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing position tag in logo");
-        return;
-    }
-
-    logoRect = QRect(logopos.x(), logopos.y(), logo->width(),
-                     logo->height());
-}
-
-/** \brief Parse through the element's tags and set the title's image
- *         (and subsequent mode) and position.
- *
- *  \param dir     directory where title images may be found
- *  \param element DOM element dealing with the title
- */ 
-void MythThemedMenuState::parseTitle(const QString &dir, QDomElement &element)
-{
-    bool hasimage = false;
-    bool hasposition = false;
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "image")
-            {
-
-                QString titlepath = dir + getFirstText(info);
-
-                QString name = info.attribute("mode", "");
-                if (name != "")
-                {
-                    MythImage *icon;
-                    QImage *tmppix;
-
-                    if (m_loadedImages[titlepath])
-                    {
-                        icon = m_loadedImages[titlepath];
-                        icon->UpRef();
-                    }
-                    else
-                    {
-                        tmppix = GetMythUI()->LoadScaleImage(titlepath);
-
-                        if (!tmppix)
-                            continue;
-
-                        icon = MythImage::FromQImage(&tmppix);
-                        m_loadedImages.insert(titlepath, icon);
-                    }
-
-                    titleIcons[name] = icon;
-                }
-                else
-                {
-                    VERBOSE(VB_IMPORTANT, LOC +
-                            "Missing mode in titles/image");
-                    return;
-                }
-
-                hasimage = true;
-            }
-            else if (info.tagName() == "position")
-            {
-                titlePos = parsePoint(info);
-                hasposition = true;
-            }
-            else
-            {
-                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in logo")
-                                    .arg(info.tagName()));
-            }
-        }
-    }
-
-    if (!hasimage)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing image tag in titles");
-        return;
-    }
-
-    if (!hasposition)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing position tag in titles");
-        return;
-    }
-}
-
-/** \brief Parse through the element's tags to set the arrows
- *         image and position.
- *
- *  \param dir     directory where arrow images may be found
- *  \param element DOM element dealing with arrow image and position
- */
-void MythThemedMenuState::parseArrow(const QString &dir, QDomElement &element, 
-                                     bool up)
-{
-    QRect arrowrect;
-    QPoint arrowpos;
-    QImage *pix = NULL;    
-
-    bool hasimage = false;
-    bool hasposition = false;
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "image")
-            {
-                QString arrowpath = dir + getFirstText(info);
-                pix = GetMythUI()->LoadScaleImage(arrowpath);
-                if (pix)
-                    hasimage = true;
-            }
-            else if (info.tagName() == "position")
-            {
-                arrowpos = parsePoint(info);
-                hasposition = true;
-            }
-            else
-            {
-                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in arrow")
-                                    .arg(info.tagName()));
-            }
-        }
-    }
-
-    if (!hasimage)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing image tag in arrow");
-        return;
-    }
-
-    if (!hasposition)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing position tag in arrow");
-        return;
-    }
-
-    arrowrect = QRect(arrowpos.x(), arrowpos.y(), pix->width(),
-                      pix->height());
-
-    if (up)
-    {
-        uparrow = MythImage::FromQImage(&pix);
-        uparrowRect = arrowrect;
-    }
-    else
-    {
-        downarrow = MythImage::FromQImage(&pix);
-        downarrowRect = arrowrect;
-    }
-}
-
-/** \brief Parse through the element's tags and set the button's
- *         definition as normal, active, text, or activetext.
- *
- *  \param dir     directory where the button images may be found
- *  \param element DOM element whose nodes define Buttons
- */
-void MythThemedMenuState::parseButton(const QString &dir, QDomElement &element)
-{
-    bool hasname = false;
-    bool hasoffset = false;
-    bool hasicon = false;
-
-    QString name = "";
-    QImage *tmpimg = NULL;
-    MythImage *image = NULL;
-    MythImage *activeimage = NULL;
-    MythImage *watermark = NULL;
-    QPoint offset;
-
-    name = element.attribute("name", "");
-    if (name != "")
-        hasname = true;
-
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement info = child.toElement();
-        if (!info.isNull())
-        {
-            if (info.tagName() == "image")
-            {
-                QString imagepath = dir + getFirstText(info);
-
-                if (m_loadedImages[imagepath])
-                {
-                    image = m_loadedImages[imagepath];
-                    image->UpRef();
-                }
-                else
-                {
-                    tmpimg = GetMythUI()->LoadScaleImage(imagepath);
-                    image = MythImage::FromQImage(&tmpimg);
-                    m_loadedImages.insert(imagepath, image);
-                }
-
-                if (image)
-                    hasicon = true;
-            }
-            else if (info.tagName() == "activeimage")
-            {
-                QString imagepath = dir + getFirstText(info);
-
-                if (m_loadedImages[imagepath])
-                {
-                    activeimage = m_loadedImages[imagepath];
-                    activeimage->UpRef();
-                }
-                else
-                {
-                    tmpimg = GetMythUI()->LoadScaleImage(imagepath);
-                    activeimage = MythImage::FromQImage(&tmpimg);
-                    m_loadedImages.insert(imagepath, activeimage);
-                }
-            }
-            else if (info.tagName() == "offset")
-            {
-                offset = parsePoint(info);
-                hasoffset = true;
-            }
-            else if (info.tagName() == "watermarkimage")
-            {
-                QString imagepath = dir + getFirstText(info);
-
-                if (m_loadedImages[imagepath])
-                {
-                    watermark = m_loadedImages[imagepath];
-                    watermark->UpRef();
-                }
-                else
-                {
-                    tmpimg = GetMythUI()->LoadScaleImage(imagepath);
-                    watermark = MythImage::FromQImage(&tmpimg);
-                    m_loadedImages.insert(imagepath, watermark);
-                }
-            }
-            else
-            {
-                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in buttondef")
-                                    .arg(info.tagName()));
-            }
-        }
-    }
-
-    if (!hasname)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing name in button");
-        return;
-    }
-
-    if (!hasoffset)
-    {
-        VERBOSE(VB_IMPORTANT, (LOC + "Missing offset in buttondef %1")
-                              .arg(name));
-        return;
-    }
-
-    if (!hasicon) 
-    {
-        VERBOSE(VB_IMPORTANT, (LOC + "Missing image in buttondef %1")
-                              .arg(name));
-        return;
-    }
-
-    ButtonIcon newbutton;
-
-    newbutton.name = name;
-    newbutton.icon = image;
-    newbutton.offset = offset;
-    newbutton.activeicon = activeimage;
-
-    if (watermark)
-    {
-        if (watermark->width() > watermarkRect.width())
-            watermarkRect.setWidth(watermark->width());
-
-        if (watermark->height() > watermarkRect.height())
-            watermarkRect.setHeight(watermark->height());
-    }
-
-    newbutton.watermark = watermark;
-
-    allButtonIcons[name] = newbutton;
-
-    if (tmpimg)
-        delete tmpimg;
-}
-
-/** \brief Set buttons, logo, title icons and text, arrows and
- *         watermarks back to the defaults.
- */
-void MythThemedMenuState::setDefaults(void)
-{
-    logo = NULL;
-    buttonnormal = buttonactive = NULL;
-    balancerows = true;
-
-    normalAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | Qt::TextWordWrap;
-    activeAttributes.textflags = Qt::AlignTop | Qt::AlignLeft | Qt::TextWordWrap;
-
-    titleIcons.clear();
-    titleText = "";
-    uparrow = NULL;
-    downarrow = NULL;
-    watermarkPos = QPoint(0, 0);
-    watermarkRect = QRect(0, 0, 0, 0);
-}
-
-/** \brief Parse the menu from the given dir for background, button,
- *         logo, arrow, and font settings.
- *  \param dir      directory where setting may be found
- *  \param menuname file name of menu file from which settings are parsed
- *  \return true iff file exists, opens, and parses correctly
- */
-bool MythThemedMenuState::parseSettings(
-    const QString &dir, const QString &menuname)
-{
-    QString filename = dir + menuname;
-
-    QDomDocument doc;
-    QFile f(filename);
-
-    if (!f.open(QIODevice::ReadOnly))
-    {
-        VERBOSE(VB_IMPORTANT, (LOC + ":parseSettings(): Can't open: %1")
-                              .arg(filename));
-        return false;
-    }
-
-    QString errorMsg;
-    int errorLine = 0;
-    int errorColumn = 0;
-
-    if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
-    {
-        VERBOSE(VB_IMPORTANT, (LOC + "Error, parsing %1\n"
-                                      "at line: %2  column: %3 msg: %4").
-                arg(filename).arg(errorLine).arg(errorColumn).arg(errorMsg));
-        f.close();
-        return false;
-    }
-
-    f.close();
-
-    bool setbackground = false;
-    bool setbuttondef = false;
-
-    setDefaults();
-
-    QDomElement docElem = doc.documentElement();
-    QDomNode n = docElem.firstChild();
-    while (!n.isNull())
-    {
-        QDomElement e = n.toElement();
-        if (!e.isNull())
-        {
-            if (e.tagName() == "background")
-            {
-                parseBackground(dir, e);
-                setbackground = true;
-            }
-            else if (e.tagName() == "genericbutton")
-            {
-                parseButtonDefinition(dir, e);
-                setbuttondef = true;
-            }
-            else if (e.tagName() == "logo")
-            {
-                parseLogo(dir, e);
-            }
-            else if (e.tagName() == "buttondef")
-            {
-                parseButton(dir, e);
-            }
-            else if (e.tagName() == "titles")
-            {
-                parseTitle(dir, e);
-            }
-            else if (e.tagName() == "uparrow")
-            {
-                parseArrow(dir, e, true);
-            }
-            else if (e.tagName() == "downarrow")
-            {
-                parseArrow(dir, e, false);
-            }
-            else if (e.tagName() == "font")
-            {
-                if (parseFonts)
-                {
-                    MythFontProperties *font;
-                    font = MythFontProperties::ParseFromXml(e, NULL, true);
-                    delete font;
-                }
-            }
-            else
-            {
-                VERBOSE(VB_GENERAL, (LOC + "Unknown element %1")
-                                    .arg(e.tagName()));
-            }
-        }
-        n = n.nextSibling();
-    }
-
-    if (!setbackground)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing background element");
-        return false;
-    }
-
-    if (!setbuttondef)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing genericbutton definition");
-        return false;
-    }
-
-    parseFonts = false;
-    loaded = true;
-    return true;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-
-/** \brief Constructor, Init() must be called before class can be used.
- *
- *  \param lparent menu that owns this instance
- *  \param cdir    directory where theme is stored
- *  \param lstate  corresponding settings of the theme
- */
-MythThemedMenuPrivate::MythThemedMenuPrivate(MythThemedMenu *lparent, 
-                                             const QString &cdir,
-                                             MythThemedMenuState *lstate) :
-    parent(lparent),     m_state(lstate),
-    allocedstate(false), activebutton(NULL),
-    currentrow(0),       currentcolumn(0),
-    foundtheme(false),   exitModifier(-1),
-    ignorekeys(false),   maxrows(0),
-    visiblerows(0),      columns(0),
-    wantpop(false),      watermark(NULL),
-    uparrow(NULL),       downarrow(NULL)
-{
     if (!m_state)
     {
-        m_state = new MythThemedMenuState();
-        allocedstate = true;
+        m_state = new MythThemedMenuState(parent, "themedmenustate");
+        m_allocedstate = true;
     }
 
-    m_state->themeDir = cdir;
+    Init(menufile);
 }
 
-MythThemedMenuPrivate::~MythThemedMenuPrivate()
+/** \brief Loads the main UI theme, and a menu theme.
+ *
+ *  See also foundtheme(void), it will return true when called after
+ *  this method if this method was successful.
+ *
+ *  See also ReloadTheme(void) which you can use to load a generic theme,
+ *  if foundtheme(void) returns false after calling this.
+ *
+ *  \param menufile name of menu item xml file
+ */
+void MythThemedMenu::Init(const QString &menufile)
 {
-    if (allocedstate)
+    ReloadExitKey();
+
+    if (!m_state->m_loaded)
+    {
+        if (m_state->Create())
+            m_foundtheme = true;
+    }
+    else
+        m_foundtheme = true;
+
+    if (!m_foundtheme)
+        return;
+
+    CopyFrom(m_state);
+
+    connect(m_buttonList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(setButtonActive(MythUIButtonListItem*)));
+    connect(m_buttonList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+            SLOT(buttonAction(MythUIButtonListItem*)));
+
+    parseMenu(menufile);
+
+    m_buttonList->SetActive(true);
+}
+
+MythThemedMenu::~MythThemedMenu(void)
+{
+    if (m_allocedstate)
         delete m_state;
+}
+
+/// \brief Returns true iff a theme has been found by a previous call to
+///        Init(const char*,const char*) or ReloadTheme().
+bool MythThemedMenu::foundTheme(void)
+{
+    return m_foundtheme;
+}
+
+/// \brief Set the themed menus callback function and data for that function
+void MythThemedMenu::setCallback(void (*lcallback)(void *, QString &), void *data)
+{
+    m_state->m_callback = lcallback;
+    m_state->m_callbackdata = data;
+}
+
+void MythThemedMenu::setKillable(void)
+{
+    m_state->m_killable = true;
+}
+
+QString MythThemedMenu::getSelection(void)
+{
+    return m_selection;
+}
+
+/** \brief Looks at "AllowQuitShutdown" setting in DB, in order to
+ *         determine what to show to user on exit from the frontend.
+ */
+void MythThemedMenu::ReloadExitKey(void)
+{
+    int allowsd = GetMythDB()->GetNumSetting("AllowQuitShutdown");
+
+    if (allowsd == 1)
+        m_exitModifier = Qt::ControlModifier;
+    else if (allowsd == 2)
+        m_exitModifier = Qt::MetaModifier;
+    else if (allowsd == 3)
+        m_exitModifier = Qt::AltModifier;
+    else if (allowsd == 4)
+        m_exitModifier = 0;
+    else
+        m_exitModifier = -1;
+}
+
+/** \brief keyboard/LIRC event handler.
+ *
+ *  This translates key presses through the "menu" context into MythTV
+ *  actions and then handles them as appropriate.
+ */
+bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
+{
+    if (m_ignorekeys)
+        return false;
+
+    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
+        return true;
+
+    m_ignorekeys = true;
+
+    QStringList actions;
+    GetMythMainWindow()->TranslateKeyPress("menu", event, actions);
+
+    bool fullexit = false;
+    if (event->modifiers() == m_exitModifier)
+        fullexit = true;
+
+    bool handled = false;
+
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "RIGHT")
+        {
+            MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
+            buttonAction(item);
+        }
+        else if (action == "LEFT" || action == "ESCAPE")
+        {
+            QString menuaction = "UPMENU";
+            if (!m_allocedstate)
+                handleAction(menuaction);
+            else if (m_state->m_killable)
+            {
+                m_wantpop = true;
+                if (m_state->m_callback)
+                {
+                    QString sel = "EXITING_MENU";
+                    m_state->m_callback(m_state->m_callbackdata, sel);
+                }
+
+                if (GetMythMainWindow()->GetMainStack()->TotalScreens() == 1)
+                    QApplication::exit();
+            }
+            else if (m_exitModifier >= 0 && fullexit &&
+                     GetMythMainWindow()->GetMainStack()->TotalScreens() == 1)
+            {
+                QApplication::exit();
+                m_wantpop = true;
+            }
+        }
+        else
+            handled = false;
+    }
+
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    m_ignorekeys = false;
+
+    if (m_wantpop)
+        m_ScreenStack->PopScreen();
+
+    return handled;
+}
+
+void MythThemedMenu::aboutToShow()
+{
+    MythScreenType::aboutToShow();
+//     updateLCD();
 }
 
 /** \brief Parses the element's tags and set the ThemeButton's type,
@@ -1299,7 +317,7 @@ MythThemedMenuPrivate::~MythThemedMenuPrivate()
  *
  *  \param element DOM element describing features of the themeButton
  */
-void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
+void MythThemedMenu::parseThemeButton(QDomElement &element)
 {
     QString type = "";
     QString text = "";
@@ -1320,17 +338,18 @@ void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "text")
             {
-                if ((text.isNull() || text.isEmpty()) && 
-                    info.attribute("lang","") == "")
+                if ((text.isNull() || text.isEmpty()) &&
+                    info.attribute("lang","").isEmpty())
                 {
-                    text = getFirstText(info);
+                    text = qApp->translate("ThemeUI",
+                                            qPrintable(getFirstText(info)));
                 }
-                else if (info.attribute("lang","").toLower() == 
+                else if (info.attribute("lang","").toLower() ==
                          GetMythUI()->GetLanguageAndVariant())
                 {
                     text = getFirstText(info);
                 }
-                else if (info.attribute("lang","").toLower() == 
+                else if (info.attribute("lang","").toLower() ==
                          GetMythUI()->GetLanguage())
                 {
                     text = getFirstText(info);
@@ -1339,11 +358,12 @@ void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
             else if (info.tagName() == "alttext")
             {
                 if ((alttext.isNull() || alttext.isEmpty()) &&
-                    info.attribute("lang","") == "")
+                    info.attribute("lang","").isEmpty())
                 {
-                    alttext = getFirstText(info);
+                    alttext = qApp->translate("ThemeUI",
+                                            qPrintable(getFirstText(info)));
                 }
-                else if (info.attribute("lang","").toLower() == 
+                else if (info.attribute("lang","").toLower() ==
                          GetMythUI()->GetLanguageAndVariant())
                 {
                     alttext = getFirstText(info);
@@ -1372,21 +392,21 @@ void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
             }
             else
             {
-                VERBOSE(VB_GENERAL, (LOC + "Unknown tag %1 in button")
-                                    .arg(info.tagName()));
+                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
+                                            "in button").arg(info.tagName()));
             }
         }
     }
 
-    if (text == "")
+    if (text.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing 'text' in button");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing 'text' in button");
         return;
     }
-   
+
     if (action.empty())
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Missing 'action' in button");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing 'action' in button");
         return;
     }
 
@@ -1407,7 +427,7 @@ void MythThemedMenuPrivate::parseThemeButton(QDomElement &element)
  *  non-essential portion of MythTV which the theme does not support.
  *
  */
-bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
+bool MythThemedMenu::parseMenu(const QString &menuname)
 {
     QString filename = findMenuFile(menuname);
 
@@ -1416,8 +436,8 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
 
     if (!f.exists() || !f.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, (LOC + "Couldn't read menu file %1")
-                              .arg(menuname));
+        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Couldn't read "
+                                      "menu file %1").arg(menuname));
         if (menuname == "mainmenu.xml" )
         {
             return false;
@@ -1427,10 +447,9 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
             ShowOkPopup(QObject::tr("Myth could not locate the menu file %1\n\n"
                                     "We will now return to the main menu.")
                         .arg(menuname));
+            GetScreenStack()->PopScreen();
             return false;
         }
-        
-        
     }
 
     QString errorMsg;
@@ -1452,19 +471,15 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
         ShowOkPopup(QObject::tr("The menu file %1 is incomplete.\n\n"
                                 "We will now return to the main menu.")
                     .arg(menuname));
+        GetScreenStack()->PopScreen();
         return false;
     }
 
     f.close();
 
-    buttonList.clear();
-    buttonRows.clear();
-
-    SetupBackground();
-
     QDomElement docElem = doc.documentElement();
 
-    menumode = docElem.attribute("name", "");
+    m_menumode = docElem.attribute("name", "MAIN");
 
     QDomNode n = docElem.firstChild();
     while (!n.isNull())
@@ -1478,105 +493,35 @@ bool MythThemedMenuPrivate::parseMenu(const QString &menuname)
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, (LOC + "Unknown element %1")
-                                      .arg(e.tagName()));
+                VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Unknown "
+                                              "element %1").arg(e.tagName()));
                 return false;
             }
         }
         n = n.nextSibling();
     }
 
-    if (buttonList.size() == 0)
+    if (m_buttonList->GetCount() == 0)
     {
-        VERBOSE(VB_IMPORTANT, (LOC + "No buttons for menu %1").arg(menuname));
+        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: No buttons "
+                                      "for menu %1").arg(menuname));
         return false;
     }
-
-    if (!layoutButtons())
-        return false;
-    activebutton = NULL;
-    positionButtons(true);
-
-    SetupUITypes();
 
     if (LCD::Get())
     {
-        titleText = "MYTH-";
-        titleText += menumode;
+        m_titleText = "MYTH-";
+        m_titleText += m_menumode;
     }
 
-    selection = "";
+    if (m_titleState)
+        m_titleState->DisplayState(m_menumode);
+
+    m_selection = "";
     return true;
 }
 
-/// \brief Sets up menu background, must be done before the buttons are parsed
-void MythThemedMenuPrivate::SetupBackground(void)
-{
-
-    if (m_state->buttonBackground)
-    {
-        MythUIImage *buttonBackground;
-        buttonBackground = new MythUIImage(parent, "menu button background");
-        buttonBackground->SetImage(m_state->buttonBackground);
-        buttonBackground->SetPosition(m_state->buttonArea.topLeft());
-    }
-
-}
-
-/// \brief Sets up UI according to the corresponding mythThemedMenuState.
-void MythThemedMenuPrivate::SetupUITypes(void)
-{
-    if (m_state->titleIcons.contains(menumode))
-    {
-        MythUIImage *curTitle;
-        curTitle = new MythUIImage(parent, "menu title image");
-        curTitle->SetImage(m_state->titleIcons[menumode]);
-        curTitle->SetPosition(m_state->titlePos);
-    }
-
-    if (m_state->logo)
-    {
-        MythUIImage *logo;
-        logo = new MythUIImage(parent, "menu logo");
-        logo->SetImage(m_state->logo);
-        logo->SetPosition(m_state->logoRect.topLeft());
-    }
-
-    watermark = new MythUIStateType(parent, "menu watermarks");
-    watermark->SetArea(m_state->watermarkRect);
-    watermark->SetShowEmpty(true);
-    QMap<QString, ButtonIcon>::Iterator it = m_state->allButtonIcons.begin();
-    for (; it != m_state->allButtonIcons.end(); ++it)
-    {
-        ButtonIcon *icon = &(it.value());
-        if (icon->watermark)
-            watermark->AddImage(icon->name, icon->watermark);
-    }
-
-    watermark->DisplayState(activebutton->type);
-
-    uparrow = new MythUIImage(parent, "menu up arrow");
-    if (m_state->uparrow)
-    {
-        uparrow->SetArea(m_state->uparrowRect);
-        uparrow->SetImage(m_state->uparrow);
-    }
-    uparrow->SetVisible(false);
-    uparrow->SetCanTakeFocus(true);
-
-    downarrow = new MythUIImage(parent, "menu down arrow");
-    if (m_state->downarrow)
-    {
-        downarrow->SetArea(m_state->downarrowRect);
-        downarrow->SetImage(m_state->downarrow);
-    }
-    downarrow->SetVisible(false);
-    downarrow->SetCanTakeFocus(true);
-
-    checkScrollArrows();
-}
-
-void MythThemedMenuPrivate::updateLCD(void)
+void MythThemedMenu::updateLCD(void)
 {
     LCD *lcddev = LCD::Get();
     if (lcddev == NULL)
@@ -1584,22 +529,22 @@ void MythThemedMenuPrivate::updateLCD(void)
 
     // Build a list of the menu items
     QList<LCDMenuItem> menuItems;
-    bool selected;
-
-    for (int r = 0; r < (int)buttonRows.size(); r++)
-    {
-        if (r == currentrow)
-            selected = true;
-        else
-            selected = false;
-
-        if (currentcolumn < buttonRows[r].numitems)
-            menuItems.append(LCDMenuItem(selected, NOTCHECKABLE,
-                             buttonRows[r].buttons[currentcolumn]->message));
-    }
-
-    if (!menuItems.isEmpty())
-        lcddev->switchToMenu(menuItems, titleText);
+//    bool selected;
+//
+//     for (int r = 0; r < (int)buttonRows.size(); r++)
+//     {
+//         if (r == currentrow)
+//             selected = true;
+//         else
+//             selected = false;
+//
+//         if (currentcolumn < buttonRows[r].numitems)
+//             menuItems.append(LCDMenuItem(selected, NOTCHECKABLE,
+//                              buttonRows[r].buttons[currentcolumn]->message));
+//     }
+//
+//     if (!menuItems.isEmpty())
+//         lcddev->switchToMenu(menuItems, m_titleText);
 }
 
 /** \brief Create a new MythThemedButton based on the MythThemedMenuState
@@ -1611,309 +556,20 @@ void MythThemedMenuPrivate::updateLCD(void)
  *  \param alttext alternate text to appear when required
  *  \param action  actions to be associated with button
  */
-void MythThemedMenuPrivate::addButton(const QString &type, const QString &text, 
-                                      const QString &alttext, 
+void MythThemedMenu::addButton(const QString &type, const QString &text,
+                                      const QString &alttext,
                                       const QStringList &action)
 {
-    ThemedButton *newbutton = new ThemedButton(parent, type);
+    ThemedButton newbutton;
+    newbutton.type = type;
+    newbutton.action = action;
+    newbutton.text = text;
 
-    newbutton->type = type;
-    newbutton->action = action;
-    newbutton->message = text;
+    MythUIButtonListItem *listbuttonitem =
+                                new MythUIButtonListItem(m_buttonList, text,
+                                                qVariantFromValue(newbutton));
 
-    newbutton->SetCanTakeFocus(true);
-    newbutton->background = new MythUIStateType(newbutton, "button background");
-    if (m_state->buttonnormal)
-        newbutton->background->AddImage(MythUIStateType::None, 
-                                        m_state->buttonnormal);
-    if (m_state->buttonactive)
-        newbutton->background->AddImage(MythUIStateType::Full, 
-                                        m_state->buttonactive);
-    newbutton->background->DisplayState(MythUIStateType::None);
-
-    newbutton->SetArea(QRect(0, 0, m_state->buttonnormal->width(),
-                             m_state->buttonnormal->height()));
-
-    newbutton->icon = NULL;
-    ButtonIcon *buttonicon = m_state->getButtonIcon(type);
-    if (buttonicon)
-    {
-        newbutton->icon = new MythUIStateType(newbutton, "button icon");
-        newbutton->icon->SetPosition(buttonicon->offset);
-        if (buttonicon->icon)
-            newbutton->icon->AddImage(MythUIStateType::None,
-                                      buttonicon->icon);
-        if (buttonicon->activeicon)
-            newbutton->icon->AddImage(MythUIStateType::Full,
-                                      buttonicon->activeicon);
-        newbutton->icon->DisplayState(MythUIStateType::None);
-    }
-
-    newbutton->text = new MythUIStateType(newbutton, "button text state");
-    {
-        QString msg = text;
-        QRect buttonTextRect = m_state->normalAttributes.textRect;
-        QRect testBoundRect = buttonTextRect;
-        testBoundRect.setWidth(testBoundRect.width() + 40);
-
-        QFontMetrics tmp(m_state->normalAttributes.font.face());
-        QRect testBound = tmp.boundingRect(testBoundRect.x(), testBoundRect.y(),
-                                           testBoundRect.width(),
-                                           testBoundRect.height(),
-                                           m_state->normalAttributes.textflags,
-                                           text);
-        if (testBound.height() > buttonTextRect.height() && alttext != "")
-            msg = alttext;
-
-        MythUIText *txt = new MythUIText(msg, m_state->normalAttributes.font,
-                                         buttonTextRect, buttonTextRect,
-                                         newbutton->text, "button normal text");
-        txt->SetJustification(m_state->normalAttributes.textflags);
-        newbutton->text->AddObject(MythUIStateType::None, txt);
-    }
-    {
-        QString msg = text;
-        QRect buttonTextRect = m_state->activeAttributes.textRect;
-        QRect testBoundRect = buttonTextRect;
-        testBoundRect.setWidth(testBoundRect.width() + 40);
-
-        QFontMetrics tmp(m_state->activeAttributes.font.face());
-        QRect testBound = tmp.boundingRect(testBoundRect.x(), testBoundRect.y(),
-                                           testBoundRect.width(),
-                                           testBoundRect.height(),
-                                           m_state->activeAttributes.textflags,
-                                           text);
-        if (testBound.height() > buttonTextRect.height() && alttext != "")
-            msg = alttext;
-
-        MythUIText *txt = new MythUIText(msg, m_state->activeAttributes.font,
-                                         buttonTextRect, buttonTextRect,
-                                         newbutton->text, "button normal text");
-        txt->SetJustification(m_state->activeAttributes.textflags);
-        newbutton->text->AddObject(MythUIStateType::Full, txt);
-    }
-    newbutton->text->DisplayState(MythUIStateType::None);
-
-    newbutton->SetVisible(false);
-
-    buttonList.push_back(newbutton);
-}
-
-/** \brief Properly lay out all of the buttons that were added with addButton
- *  \return true iff there are more than 0 rows or columns
- */
-bool MythThemedMenuPrivate::layoutButtons(void)
-{
-    int numbuttons = buttonList.size();
-  
-    columns = m_state->buttonArea.width() / m_state->buttonnormal->width();
-    columns = columns > m_state->maxColumns ? m_state->maxColumns : columns;
-
-    maxrows = m_state->buttonArea.height() / m_state->buttonnormal->height();
-
-    if (maxrows < 1)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Must have "
-                "room for at least 1 row of buttons");
-        return false;
-    }
-    
-    if (columns < 1)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Must have "
-                "room for at least 1 column of buttons");
-        return false;
-    }
-
-    if (m_state->balancerows)
-    {
-        // keep the rows balanced
-        if (numbuttons <= 4)
-        {
-            if (columns > 2)
-                columns = 2;
-        }
-        else
-        {
-            if (columns > 3)
-                columns = 3;
-        }
-    }    
-
-    // limit it to 6 items displayed at one time
-    if (columns * maxrows > m_state->visiblerowlimit)
-    {
-        maxrows = m_state->visiblerowlimit / columns;
-    }
-                             
-    vector<ThemedButton *>::iterator iter = buttonList.begin();
-
-    int rows = numbuttons / columns;
-    rows++;
-
-    visiblerows = 0;
-
-    for (int i = 0; i < rows; i++)
-    {
-        MenuRow newrow;
-        newrow.numitems = 0;
-
-        for (int j = 0; j < columns && iter != buttonList.end(); 
-             j++, iter++)
-        {
-            if (columns == 3 && j == 1 && m_state->allowreorder)
-                newrow.buttons.insert(newrow.buttons.begin(), *iter);
-            else
-                newrow.buttons.push_back(*iter);
-            newrow.numitems++;
-        }
-
-        if (i < maxrows && newrow.numitems > 0)
-        {
-            newrow.visible = true;
-            visiblerows++;
-        }
-        else
-            newrow.visible = false;
- 
-        if (newrow.numitems > 0)
-            buttonRows.push_back(newrow);
-    }           
-
-    return true; 
-}
-
-/** \brief Place buttons in position and set them visible and active.
- *
- *  \param resetpos whether or not to reset the active button to the
- *                  first one on the buttonlist.
- */
-void MythThemedMenuPrivate::positionButtons(bool resetpos)
-{
-    QRect buttonArea = m_state->buttonArea;
-    int buttonHeight = m_state->buttonnormal->height();
-    int buttonWidth = m_state->buttonnormal->width();
-
-    int rows = visiblerows;
-    int yspacing = (buttonArea.height() - buttonHeight * rows) /
-                   (rows + 1);
-    int ystart = 0;
-    
-    if (!m_state->spreadbuttons)
-    {
-        yspacing = 0;
-        if (m_state->buttoncenter)
-            ystart = (buttonArea.height() - buttonHeight * rows) / 2;
-    }
-
-    int row = 1;
-
-    vector<MenuRow>::iterator menuiter = buttonRows.begin();
-    for (; menuiter != buttonRows.end(); menuiter++)
-    {
-        if (!(*menuiter).visible)
-        {
-            vector<ThemedButton *>::iterator biter;
-            biter = (*menuiter).buttons.begin();
-            for (; biter != (*menuiter).buttons.end(); biter++)
-            {
-                ThemedButton *tbutton = (*biter);
-                tbutton->SetVisible(false);
-                tbutton->SetActive(false);
-            }
-            continue;
-        }
-
-        int ypos = yspacing * row + (buttonHeight * (row - 1));
-        ypos += buttonArea.y() + ystart;
-
-        int xspacing = (buttonArea.width() - buttonWidth *
-                       (*menuiter).numitems) / ((*menuiter).numitems + 1);
-        int col = 1;
-        vector<ThemedButton *>::iterator biter = (*menuiter).buttons.begin();
-        for (; biter != (*menuiter).buttons.end(); biter++)
-        {
-            int xpos = xspacing * col + (buttonWidth * (col - 1));
-            xpos = (m_state->maxColumns == 1) ? 0 : xpos;
-            xpos += buttonArea.x();
-
-            ThemedButton *tbutton = (*biter);
-
-            tbutton->SetVisible(true);
-            tbutton->SetActive(false);
-            tbutton->row = row;
-            tbutton->col = col;
-            tbutton->SetPosition(xpos, ypos);
-
-            col++;
-        }
-
-        row++;
-    }
-
-    if (resetpos)
-    {
-        ThemedButton *old = activebutton;
-        activebutton = (*(buttonList.begin()));
-
-        if (activebutton != old && old)
-            old->SetActive(false);
-
-        activebutton->SetActive(true);
-
-        currentrow = activebutton->row - 1;
-        currentcolumn = activebutton->col - 1;
-    }
-}
-
-bool MythThemedMenuPrivate::makeRowVisible(int newrow, int oldrow)
-{
-    if (buttonRows[newrow].visible)
-        return true;
-
-    if (newrow > oldrow)
-    {
-        int row;
-        for (row = newrow; row >= 0; row--)
-        {
-            if (row > newrow - visiblerows)
-                buttonRows[row].visible = true;
-            else
-                buttonRows[row].visible = false;
-        }
-    }
-    else
-    {
-        int row;
-        for (row = newrow; row < (int)buttonRows.size(); row++)
-        {
-            if (row < newrow + visiblerows)
-                buttonRows[row].visible = true;
-            else
-                buttonRows[row].visible = false;
-        }
-    }
-
-    positionButtons(false);
-
-    checkScrollArrows();
-
-    return true;
-}
-
-/// \brief Add or remove scroll arrows as needed.
-void MythThemedMenuPrivate::checkScrollArrows(void)
-{
-    bool needup = false;
-    bool needdown = false;
-
-    if (!buttonRows.front().visible)
-        needup = true;
-    if (!buttonRows.back().visible)
-        needdown = true;
-
-    uparrow->SetVisible(needup);
-    downarrow->SetVisible(needdown);
+    listbuttonitem->DisplayState(type, "icon");
 }
 
 /** \brief Reset and reparse everything.
@@ -1921,251 +577,32 @@ void MythThemedMenuPrivate::checkScrollArrows(void)
  *  Note: this does not use the theme or menu file chosen in Init(), but
  *  instead uses defaults which should work if MythTV was properly installed.
  */
-bool MythThemedMenuPrivate::ReloadTheme(void)
+void MythThemedMenu::ReloadTheme(void)
 {
+    m_foundtheme = false;
+
     GetGlobalFontMap()->Clear();
-    m_state->parseFonts = true;
 
-    buttonList.clear();
-    buttonRows.clear();
+    m_buttonList->Reset();
 
-    parent->ReloadExitKey();
- 
-    m_state->Reset();
+    ReloadExitKey();
 
-    parent->DeleteAllChildren();
- 
-    QString themedir = GetMythUI()->GetThemeDir();
-    bool ok = m_state->parseSettings(themedir, "theme.xml");
-    if (!ok)
-        return ok;
+    DeleteAllChildren();
 
-    return parseMenu("mainmenu.xml");
+    if (parseMenu("mainmenu.xml"))
+        m_foundtheme = true;
 }
 
-/** \brief Delegate key event to appropriate action for keyHandler()
- *
- *  \return true iff key event was properly handled
- */
-bool MythThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
+void MythThemedMenu::buttonAction(MythUIButtonListItem *item)
 {
-    QStringList actions;
-    GetMythMainWindow()->TranslateKeyPress("menu", e, actions);
+    ThemedButton button = item->GetData().value<ThemedButton>();
 
-    return keyHandler(actions, e->modifiers() == exitModifier);
-}
-
-/** \brief Interpret key presses on the menu into the appropriate actions
- *
- *  \param actions list of MythTV actions to be handled.
- */
-bool MythThemedMenuPrivate::keyHandler(QStringList &actions,
-                                       bool fullexit)
-{
-    ThemedButton *lastbutton = activebutton;
-    int oldrow = currentrow;
-    int oldcolumn = currentcolumn;
-    bool handled = false;
-
-    for (int i = 0; i < actions.size() && !handled; i++)
+    QStringList::Iterator it = button.action.begin();
+    for (; it != button.action.end(); it++)
     {
-        QString action = actions[i];
-        handled = true;
-
-        if (columns == 1)
-        {
-            if (action == "LEFT")
-                action = "ESCAPE";
-            else if (action == "RIGHT")
-                action = "SELECT";
-        }
-
-        if (action == "UP")
-        {
-            if (currentrow > 0)
-                currentrow--;
-            else if (columns == 1)
-                currentrow = buttonRows.size() - 1;
-
-            if (currentcolumn >= buttonRows[currentrow].numitems)
-                currentcolumn = buttonRows[currentrow].numitems - 1;
-            
-            if (currentrow == oldrow && currentcolumn == oldcolumn)
-            {
-                handled = false;
-            }
-        }
-        else if (action == "PAGEUP")
-        {
-            currentrow = max(currentrow - m_state->visiblerowlimit, 0);
-
-            if (currentcolumn >= buttonRows[currentrow].numitems)
-                currentcolumn = buttonRows[currentrow].numitems - 1;
-        }
-        else if (action == "LEFT")
-        {
-            if (currentcolumn > 0)
-                currentcolumn--;
-            else
-                currentcolumn = buttonRows[currentrow].numitems - 1;
-        }
-        else if (action == "DOWN")
-        {
-            if (currentrow < (int)buttonRows.size() - 1)
-                currentrow++;
-            else if (columns == 1)
-                currentrow = 0;
-
-            if (currentcolumn >= buttonRows[currentrow].numitems)
-                currentcolumn = buttonRows[currentrow].numitems - 1;
-
-            if (currentrow == oldrow && currentcolumn == oldcolumn)
-            {
-                handled = false;
-            }
-        }
-        else if (action == "PAGEDOWN")
-        {
-            currentrow = min(currentrow + m_state->visiblerowlimit,
-                             (int)buttonRows.size() - 1);
-
-            if (currentcolumn >= buttonRows[currentrow].numitems)
-                currentcolumn = buttonRows[currentrow].numitems - 1;
-        }
-        else if (action == "RIGHT")
-        {
-            if (currentcolumn < buttonRows[currentrow].numitems - 1)
-                currentcolumn++;
-            else
-                currentcolumn = 0;
-        }
-        else if (action == "SELECT")
-        {
-            lastbutton = activebutton;
-            activebutton = NULL;
-
-            QStringList::Iterator it = lastbutton->action.begin();
-            for (; it != lastbutton->action.end(); it++)
-            {
-                if (handleAction(*it))
-                    break;
-            }
-
-            lastbutton = NULL;
-        }
-        else if (action == "ESCAPE")
-        {
-            QString action = "UPMENU";
-            if (!allocedstate)
-                handleAction(action);
-            else if (m_state->killable)
-            {
-                wantpop = true;
-                if (m_state->callback != NULL)
-                {
-                    QString sel = "EXITING_MENU";
-                    m_state->callback(m_state->callbackdata, sel);
-                }
-
-                if (GetMythMainWindow()->GetMainStack()->TotalScreens() == 1)
-                    QApplication::exit();
-            }
-            else if (exitModifier >= 0 && fullexit &&
-                     GetMythMainWindow()->GetMainStack()->TotalScreens() == 1)
-            {
-                QApplication::exit();
-                wantpop = true;
-            }
-            lastbutton = NULL;
-        }
-        else
-            handled = false;
+        if (handleAction(*it))
+            break;
     }
-
-    if (!handled)
-        return false;
-
-    if (!buttonRows[currentrow].visible)
-    {
-        makeRowVisible(currentrow, oldrow);
-    }
-
-    activebutton = buttonRows[currentrow].buttons[currentcolumn];
-    watermark->DisplayState(activebutton->type);
-
-    if (lastbutton != activebutton && lastbutton && activebutton)
-    {
-        lastbutton->SetActive(false);
-        activebutton->SetActive(true);
-    }
-
-    // only update the LCD if we are still on the top of the stack
-    if (parent->GetScreenStack()->GetTopScreen() == (MythScreenType*) parent)
-        updateLCD();
-
-    return true;
-} 
-
-/** \brief Interprets mouse gestures as MythTV action events
- *
- *  \param origtype originating element type for the gesture
- *  \param ge       mouse gesture event
- *  \return true iff a gesture was handled here.
- */
-bool MythThemedMenuPrivate::gestureEvent(MythUIType *origtype,
-                                         MythGestureEvent *ge)
-{
-    if (ge->gesture() == MythGestureEvent::Click)
-    {
-        if (origtype == uparrow)
-        {
-            QStringList action("PAGEUP");
-            keyHandler(action, false);
-        }
-        else if (origtype == downarrow)
-        {
-            QStringList action("PAGEDOWN");
-            keyHandler(action, false);
-        }
-        else
-        {
-            ThemedButton *button = dynamic_cast<ThemedButton*>(origtype);
-            if (button)
-            {
-                ThemedButton *lastbutton = activebutton;
-                activebutton = button;
-
-                if (LCD *lcddev = LCD::Get())
-                    lcddev->switchToTime();
-
-                QStringList::Iterator it = button->action.begin();
-                for (; it != button->action.end(); it++)
-                {
-                    if (handleAction(*it))
-                        break;
-                }
-
-                watermark->DisplayState(activebutton->type);
-
-                if (lastbutton != activebutton && lastbutton && activebutton)
-                {
-                    lastbutton->SetActive(false);
-                    activebutton->SetActive(true);
-                }
-            }
-        }
-       
-        return true;
-    }
-
-    if (ge->gesture() == MythGestureEvent::Left)
-    {
-        QStringList action("ESCAPE");
-        keyHandler(action, true);
-        return true;
-    }
-
-    return false;
 }
 
 /** \brief Locates the appropriate menu file from which to parse the menu
@@ -2173,7 +610,7 @@ bool MythThemedMenuPrivate::gestureEvent(MythUIType *origtype,
  *  \param menuname file name of the menu you want to find
  *  \return the directory in which the menu file is found
  */
-QString MythThemedMenuPrivate::findMenuFile(const QString &menuname)
+QString MythThemedMenu::findMenuFile(const QString &menuname)
 {
     QString testdir = GetConfDir() + "/" + menuname;
     QFile file(testdir);
@@ -2185,22 +622,21 @@ QString MythThemedMenuPrivate::findMenuFile(const QString &menuname)
     if (file.exists())
         return testdir;
 
-        
     testdir = GetMythUI()->GetThemeDir() + "/" + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
-        
+
     testdir = GetShareDir() + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
-        
+
     testdir = "../mythfrontend/" + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
-        
+
     return "";
 }
 
@@ -2209,7 +645,7 @@ QString MythThemedMenuPrivate::findMenuFile(const QString &menuname)
  *  \param action single action to be handled
  *  \return true if the action is not to EXEC another program
  */
-bool MythThemedMenuPrivate::handleAction(const QString &action)
+bool MythThemedMenu::handleAction(const QString &action)
 {
     MythUIMenuCallbacks *cbs = GetMythUI()->GetMenuCBs();
 
@@ -2218,7 +654,7 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
         QString rest = action.right(action.length() - 5);
         if (cbs && cbs->exec_program)
             cbs->exec_program(rest);
-        
+
         return false;
     }
     else if (action.left(7) == "EXECTV ")
@@ -2229,26 +665,24 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
     }
     else if (action.left(5) == "MENU ")
     {
-        QString rest = action.right(action.length() - 5);
+        QString menu = action.right(action.length() - 5);
 
-        if (rest == "main_settings.xml" && 
+        if (menu == "main_settings.xml" &&
             GetMythDB()->GetNumSetting("SetupPinCodeRequired", 0) &&
             !checkPinCode("SetupPinCodeTime", "SetupPinCode", "Setup Pin:"))
         {
             return true;
         }
 
-        MythScreenStack *stack = parent->GetScreenStack();
+        MythScreenStack *stack = GetScreenStack();
 
-        MythThemedMenu *newmenu = new MythThemedMenu(m_state->themeDir,
-                                                     rest, stack, rest, 
-                                                     m_state->allowreorder, 
-                                                     m_state);
+        MythThemedMenu *newmenu = new MythThemedMenu("", menu, stack, menu,
+                                                     false, m_state);
         stack->AddScreen(newmenu);
     }
     else if (action.left(6) == "UPMENU")
     {
-        wantpop = true;
+        m_wantpop = true;
     }
     else if (action.left(12) == "CONFIGPLUGIN")
     {
@@ -2264,9 +698,9 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
     }
     else if (action.left(8) == "SHUTDOWN")
     {
-        if (allocedstate)
+        if (m_allocedstate)
         {
-            wantpop = true;
+            m_wantpop = true;
         }
     }
     else if (action.left(5) == "EJECT")
@@ -2281,21 +715,20 @@ bool MythThemedMenuPrivate::handleAction(const QString &action)
     }
     else
     {
-        selection = action;
-        if (m_state->callback != NULL)
-            m_state->callback(m_state->callbackdata, selection);
+        m_selection = action;
+        if (m_state->m_callback)
+            m_state->m_callback(m_state->m_callbackdata, m_selection);
     }
 
-    return true;   
+    return true;
 }
 
-
-bool MythThemedMenuPrivate::findDepends(const QString &fileList)
+bool MythThemedMenu::findDepends(const QString &fileList)
 {
     QStringList files = fileList.split(" ");
     QString filename;
 
-    for (QStringList::Iterator it = files.begin(); it != files.end(); ++it ) 
+    for (QStringList::Iterator it = files.begin(); it != files.end(); ++it )
     {
         QString filename = findMenuFile(*it);
         if (filename != "" && filename.endsWith(".xml"))
@@ -2319,9 +752,9 @@ bool MythThemedMenuPrivate::findDepends(const QString &fileList)
  *  \param text              the message text to be displayed
  *  \return true if password checks out or is not needed.
  */
-bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
-                                         const QString &password_setting,
-                                         const QString &text)
+bool MythThemedMenu::checkPinCode(const QString &timestamp_setting,
+                                    const QString &password_setting,
+                                    const QString &text)
 {
     QDateTime curr_time = QDateTime::currentDateTime();
     QString last_time_stamp = GetMythDB()->GetSetting(timestamp_setting);
@@ -2333,12 +766,12 @@ bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
     if (last_time_stamp.length() < 1)
     {
         VERBOSE(VB_IMPORTANT,
-                LOC + "Could not read password/pin time stamp.\n"
+                "MythThemedMenuPrivate: Could not read password/pin time stamp.\n"
                 "This is only an issue if it happens repeatedly.");
     }
     else
     {
-        QDateTime last_time = QDateTime::fromString(last_time_stamp, 
+        QDateTime last_time = QDateTime::fromString(last_time_stamp,
                                                     Qt::TextDate);
         if (last_time.secsTo(curr_time) < 120)
         {
@@ -2366,173 +799,7 @@ bool MythThemedMenuPrivate::checkPinCode(const QString &timestamp_setting,
         }
     }
     else
-    {
         return true;
-    }
 
     return false;
-}
-
-////////////////////////////////////////////////////////////////////////////
-
-/** \brief Creates a themed menu.
- *
- *  \param cdir         directory where theme is stored
- *  \param menufile     file name of menu definition file
- *  \param parent       the screen stack that owns this UI type
- *  \param name         the name of this UI type
- *  \param allowreorder will buttons be inserted into new rows or pushed back
- *  \param state        theme state associated with this menu
- */
-MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
-                               MythScreenStack *parent, const QString &name,
-                               bool allowreorder, MythThemedMenuState *state)
-              : MythScreenType(parent, name)
-{
-    d = new MythThemedMenuPrivate(this, cdir, state);
-    d->m_state->allowreorder = allowreorder;
-
-    Init(cdir, menufile);
-}
-
-/** \brief Loads the main UI theme, and a menu theme.
- *
- *  See also foundTheme(void), it will return true when called after
- *  this method if this method was successful.
- *
- *  See also ReloadTheme(void) which you can use to load a generic theme,
- *  if foundTheme(void) returns false after calling this.
- *
- *  \param cdir directory where theme.xml is stored
- *  \param menufile name of menu item xml file
- */
-void MythThemedMenu::Init(const QString &cdir, const QString &menufile)
-{
-    QString dir = QString(cdir) + "/";
-    QString filename = dir + "theme.xml";
-
-    d->foundtheme = true;
-    QFile filetest(filename);
-    if (!filetest.exists())
-    {
-        d->foundtheme = false;
-        return;
-    }
-
-    ReloadExitKey();
-
-    if (!d->m_state->loaded)
-        d->foundtheme = d->m_state->parseSettings(dir, "theme.xml");
-
-    if (d->foundtheme)
-        d->foundtheme = d->parseMenu(menufile);
-}
-
-MythThemedMenu::~MythThemedMenu(void)
-{
-    if (d)
-        delete d;
-}
-
-/// \brief Returns true iff a theme has been found by a previous call to
-///        Init(const char*,const char*) or ReloadTheme().
-bool MythThemedMenu::foundTheme(void)
-{
-    return d->foundtheme;
-}
-
-/// \brief Set the themed menus callback function and data for that function
-void MythThemedMenu::setCallback(void (*lcallback)(void *, QString &), void *data)
-{
-    d->m_state->callback = lcallback;
-    d->m_state->callbackdata = data;
-}
-
-void MythThemedMenu::setKillable(void)
-{
-    d->m_state->killable = true;
-}
-
-QString MythThemedMenu::getSelection(void)
-{
-    return d->selection;
-}
-
-/** \brief Looks at "AllowQuitShutdown" setting in DB, in order to 
- *         determine what to show to user on exit from the frontend.
- */
-void MythThemedMenu::ReloadExitKey(void)
-{
-    int allowsd = GetMythDB()->GetNumSetting("AllowQuitShutdown");
-
-    if (allowsd == 1)
-        d->exitModifier = Qt::ControlModifier;
-    else if (allowsd == 2)
-        d->exitModifier = Qt::MetaModifier;
-    else if (allowsd == 3)
-        d->exitModifier = Qt::AltModifier;
-    else if (allowsd == 4)
-        d->exitModifier = 0;
-    else
-        d->exitModifier = -1;
-}
-
-/** \brief Reset and reparse everything, check foundTheme(void) for success.
- *
- *  Note: this does not use the theme or menu file chosen in Init(), but
- *  instead uses defaults which should work if MythTV was properly installed.
- */
-void MythThemedMenu::ReloadTheme(void)
-{
-    if (!d->ReloadTheme())
-        d->foundtheme = false;
-}
-
-/** \brief keyboard/LIRC event handler.
- *
- *  This translates key presses through the "menu" context into MythTV
- *  actions and then handles them as appropriate.
- */
-bool MythThemedMenu::keyPressEvent(QKeyEvent *e)
-{
-    if (d->ignorekeys)
-        return false;
-
-    d->ignorekeys = true;
-
-    bool ret = true;
-    if (!d->keyPressHandler(e))
-    {
-        ret = MythScreenType::keyPressEvent(e);
-    }
-
-    d->ignorekeys = false;
-
-
-    if (d->wantpop)
-        m_ScreenStack->PopScreen();
-
-    return ret;
-}
-
-/** \brief Interprets mouse gestures as MythTV action events
- *
- *  \param origtype originating element type from the screen
- *  \param ge       mouse gesture event
- */
-void MythThemedMenu::gestureEvent(MythUIType *origtype, MythGestureEvent *ge)
-{
-    if (d->gestureEvent(origtype, ge))
-    {
-        if (d->wantpop)
-            m_ScreenStack->PopScreen();
-    }
-    else
-        MythScreenType::gestureEvent(origtype, ge);
-}
-
-void MythThemedMenu::aboutToShow()
-{
-    MythScreenType::aboutToShow();
-    d->updateLCD();
 }
