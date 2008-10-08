@@ -383,6 +383,14 @@ class MPUBLIC MythListBox: public QListWidget
 
     virtual void keyPressEvent(QKeyEvent* e);
 
+#if QT_VERSION < 0x040400
+    void setCurrentRow(int row) { QListWidget::setCurrentRow(row); }
+    void setCurrentRow(int row, QItemSelectionModel::SelectionFlags command)
+    {
+        selectionModel()->setCurrentIndex(indexFromItem(item(row)), command);
+    }
+#endif
+
     QString currentText(void) const { return text(currentRow()); }
 
     void setTopRow(uint row);
