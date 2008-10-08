@@ -348,8 +348,8 @@ bool MythUIHelper::IsScreenSetup(void)
 
 void MythUIHelper::LoadQtConfig(void)
 {
-    d->language = "";
-    d->themecachedir = "";
+    d->language.clear();
+    d->themecachedir.clear();
 
     DisplayRes *dispRes = DisplayRes::GetDisplayRes(); // create singleton
     if (dispRes && GetMythDB()->GetNumSetting("UseVideoModes", 0))
@@ -372,7 +372,7 @@ void MythUIHelper::LoadQtConfig(void)
     d->m_qtThemeSettings = new Settings;
 
     QString style = GetMythDB()->GetSetting("Style", "");
-    if (style != "")
+    if (!style.isEmpty())
         qApp->setStyle(style);
 
     QString themename = GetMythDB()->GetSetting("Theme");
@@ -445,7 +445,7 @@ QString MythUIHelper::GetThemeCacheDir(void)
 
     QString tmpcachedir = cachedirname + GetMythDB()->GetSetting("Theme") + "." +
                           QString::number(d->m_screenwidth) + "." +
-                          QString::number(d->m_screenheight); 
+                          QString::number(d->m_screenheight);
 
     return tmpcachedir;
 }
@@ -557,7 +557,7 @@ void MythUIHelper::CacheThemeImages(void)
 }
 
 void MythUIHelper::CacheThemeImagesDirectory(const QString &dirname,
-                                            const QString &subdirname)
+                                             const QString &subdirname)
 {
     QDir dir(dirname);
 
@@ -824,7 +824,7 @@ QString MythUIHelper::FindThemeDir(const QString &themename)
         VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " + dir.absolutePath());
 
     VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1").arg(themename));
-    return "";
+    return QString();
 }
 
 /** \fn FindMenuThemeDir(const QString &menuname)
@@ -872,7 +872,7 @@ QString MythUIHelper::FindMenuThemeDir(const QString &menuname)
         VERBOSE(VB_IMPORTANT, QString("Could not find menu theme: %1 - Fallback to default failed.").arg(menuname));
     }
 
-    return "";
+    return QString();
 }
 
 QString MythUIHelper::GetMenuThemeDir(void)
@@ -910,7 +910,7 @@ void MythUIHelper::SetPalette(QWidget *widget)
     for (int i = 0; i < 13; i++)
     {
         QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
-        if (color != "")
+        if (!color.isEmpty())
             pal.setColor(QPalette::Active, (QPalette::ColorRole) i,
                          createColor(color));
     }
@@ -919,7 +919,7 @@ void MythUIHelper::SetPalette(QWidget *widget)
     for (int i = 0; i < 13; i++)
     {
         QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
-        if (color != "")
+        if (!color.isEmpty())
             pal.setColor(QPalette::Disabled, (QPalette::ColorRole) i,
                          createColor(color));
     }
@@ -928,7 +928,7 @@ void MythUIHelper::SetPalette(QWidget *widget)
     for (int i = 0; i < 13; i++)
     {
         QString color = d->m_qtThemeSettings->GetSetting(type + names[i]);
-        if (color != "")
+        if (!color.isEmpty())
             pal.setColor(QPalette::Inactive, (QPalette::ColorRole) i,
                          createColor(color));
     }
@@ -949,7 +949,7 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
 
     QPixmap *bgpixmap = NULL;
 
-    if (d->m_qtThemeSettings->GetSetting("BackgroundPixmap") != "")
+    if (!d->m_qtThemeSettings->GetSetting("BackgroundPixmap").isEmpty())
     {
         QString pmapname = d->m_themepathname +
                            d->m_qtThemeSettings->GetSetting("BackgroundPixmap");
@@ -961,7 +961,7 @@ void MythUIHelper::ThemeWidget(QWidget *widget)
             widget->setPalette(d->m_palette);
         }
     }
-    else if (d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap") != "")
+    else if (!d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap").isEmpty())
     {
         QString pmapname = d->m_themepathname +
                       d->m_qtThemeSettings->GetSetting("TiledBackgroundPixmap");
