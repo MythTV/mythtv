@@ -43,12 +43,6 @@ class MythThemedMenuState : public MythScreenType
 
     bool Create(void);
 
-    ButtonIcon *getButtonIcon(const QString &type);
-
-    QMap<QString, ButtonIcon> m_allButtonIcons;
-    QMap<QString, MythImage *> m_titleIcons;
-    QString m_titleText;
-
     void (*m_callback)(void *, QString &);
     void *m_callbackdata;
 
@@ -80,7 +74,6 @@ class MythThemedMenu : public MythThemedMenuState
 
     QString getSelection(void);
 
-    void ReloadTheme(void);
     void ReloadExitKey(void);
     virtual void aboutToShow(void);
 

@@ -40,31 +40,11 @@ MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
 
 MythThemedMenuState::~MythThemedMenuState()
 {
-    QMap<QString, ButtonIcon>::Iterator it;
-    for (it = m_allButtonIcons.begin(); it != m_allButtonIcons.end(); ++it)
-    {
-        if (it.value().icon)
-            it.value().icon->DownRef();
-        if (it.value().activeicon)
-            it.value().activeicon->DownRef();
-    }
-    m_allButtonIcons.clear();
-
-    QMap<QString, MythImage *>::Iterator jt;
-    for (jt = m_titleIcons.begin(); jt != m_titleIcons.end(); ++jt)
-    {
-        jt.value()->DownRef();
-    }
-    m_titleIcons.clear();
 }
 
 bool MythThemedMenuState::Create(void)
 {
-    bool foundtheme = false;
-
-    foundtheme = LoadWindowFromXML("menu-ui.xml", "mainmenu", this);
-
-    if (!foundtheme)
+    if (!LoadWindowFromXML("menu-ui.xml", "mainmenu", this))
         return false;
 
     m_titleState = dynamic_cast<MythUIStateType *> (GetChild("titles"));
@@ -77,28 +57,9 @@ bool MythThemedMenuState::Create(void)
         return false;
     }
 
-    m_buttonList->SetActive(true);
-
     m_loaded = true;
 
-    return foundtheme;
-}
-
-void MythThemedMenu::setButtonActive(MythUIButtonListItem* item)
-{
-    ThemedButton button = item->GetData().value<ThemedButton>();
-    if (m_watermarkState)
-    {
-        if (!(m_watermarkState->DisplayState(button.type)))
-            m_watermarkState->DisplayState("DEFAULT");
-    }
-}
-
-ButtonIcon *MythThemedMenuState::getButtonIcon(const QString &type)
-{
-    if (m_allButtonIcons.find(type) != m_allButtonIcons.end())
-        return &(m_allButtonIcons[type]);
-    return NULL;
+    return true;
 }
 
 void MythThemedMenuState::CopyFrom(MythUIType *base)
@@ -137,6 +98,7 @@ MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
     m_allocedstate = m_foundtheme = m_ignorekeys = m_wantpop = false;
     m_exitModifier = -1;
     m_menumode = "";
+    m_buttonList = NULL;
 
     if (!m_state)
     {
@@ -151,9 +113,6 @@ MythThemedMenu::MythThemedMenu(const QString &cdir, const QString &menufile,
  *
  *  See also foundtheme(void), it will return true when called after
  *  this method if this method was successful.
- *
- *  See also ReloadTheme(void) which you can use to load a generic theme,
- *  if foundtheme(void) returns false after calling this.
  *
  *  \param menufile name of menu item xml file
  */
@@ -180,8 +139,6 @@ void MythThemedMenu::Init(const QString &menufile)
             SLOT(buttonAction(MythUIButtonListItem*)));
 
     parseMenu(menufile);
-
-    m_buttonList->SetActive(true);
 }
 
 MythThemedMenu::~MythThemedMenu(void)
@@ -191,7 +148,7 @@ MythThemedMenu::~MythThemedMenu(void)
 }
 
 /// \brief Returns true iff a theme has been found by a previous call to
-///        Init(const char*,const char*) or ReloadTheme().
+///        Init(const char*,const char*)
 bool MythThemedMenu::foundTheme(void)
 {
     return m_foundtheme;
@@ -212,6 +169,16 @@ void MythThemedMenu::setKillable(void)
 QString MythThemedMenu::getSelection(void)
 {
     return m_selection;
+}
+
+void MythThemedMenu::setButtonActive(MythUIButtonListItem* item)
+{
+    ThemedButton button = item->GetData().value<ThemedButton>();
+    if (m_watermarkState)
+    {
+        if (!(m_watermarkState->DisplayState(button.type)))
+            m_watermarkState->DisplayState("DEFAULT");
+    }
 }
 
 /** \brief Looks at "AllowQuitShutdown" setting in DB, in order to
@@ -243,10 +210,14 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
     if (m_ignorekeys)
         return false;
 
-    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
-        return true;
-
     m_ignorekeys = true;
+
+    MythUIType *type = GetFocusWidget();
+    if (type && type->keyPressEvent(event))
+    {
+        m_ignorekeys = false;
+        return true;
+    }
 
     QStringList actions;
     GetMythMainWindow()->TranslateKeyPress("menu", event, actions);
@@ -309,7 +280,7 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
 void MythThemedMenu::aboutToShow()
 {
     MythScreenType::aboutToShow();
-//     updateLCD();
+    updateLCD();
 }
 
 /** \brief Parses the element's tags and set the ThemeButton's type,
@@ -529,22 +500,21 @@ void MythThemedMenu::updateLCD(void)
 
     // Build a list of the menu items
     QList<LCDMenuItem> menuItems;
-//    bool selected;
-//
-//     for (int r = 0; r < (int)buttonRows.size(); r++)
-//     {
-//         if (r == currentrow)
-//             selected = true;
-//         else
-//             selected = false;
-//
-//         if (currentcolumn < buttonRows[r].numitems)
-//             menuItems.append(LCDMenuItem(selected, NOTCHECKABLE,
-//                              buttonRows[r].buttons[currentcolumn]->message));
-//     }
-//
-//     if (!menuItems.isEmpty())
-//         lcddev->switchToMenu(menuItems, m_titleText);
+    bool selected;
+
+    for (int r = 0; r < m_buttonList->GetCount(); r++)
+    {
+        if (r == m_buttonList->GetCurrentPos())
+            selected = true;
+        else
+            selected = false;
+
+        MythUIButtonListItem *item = m_buttonList->GetItemAt(r);
+        menuItems.append(LCDMenuItem(selected, NOTCHECKABLE,item->text()));
+    }
+
+    if (!menuItems.isEmpty())
+        lcddev->switchToMenu(menuItems, m_titleText);
 }
 
 /** \brief Create a new MythThemedButton based on the MythThemedMenuState
@@ -570,27 +540,6 @@ void MythThemedMenu::addButton(const QString &type, const QString &text,
                                                 qVariantFromValue(newbutton));
 
     listbuttonitem->DisplayState(type, "icon");
-}
-
-/** \brief Reset and reparse everything.
- *
- *  Note: this does not use the theme or menu file chosen in Init(), but
- *  instead uses defaults which should work if MythTV was properly installed.
- */
-void MythThemedMenu::ReloadTheme(void)
-{
-    m_foundtheme = false;
-
-    GetGlobalFontMap()->Clear();
-
-    m_buttonList->Reset();
-
-    ReloadExitKey();
-
-    DeleteAllChildren();
-
-    if (parseMenu("mainmenu.xml"))
-        m_foundtheme = true;
 }
 
 void MythThemedMenu::buttonAction(MythUIButtonListItem *item)
