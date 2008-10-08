@@ -778,7 +778,8 @@ void ProgLister::chooseView(void)
         connect(chooseListBox, SIGNAL(accepted(int)),
                 this,          SLOT(setViewFromList(int)));
         connect(chooseListBox, SIGNAL(menuButtonPressed(int)), chooseLineEdit, SLOT(setFocus()));
-        connect(chooseListBox, SIGNAL(selectionChanged()), this, SLOT(chooseListBoxChanged()));
+        connect(chooseListBox, SIGNAL(itemSelectionChanged()),
+                this,          SLOT(  chooseListBoxChanged()));
         connect(chooseLineEdit, SIGNAL(textChanged()), this, SLOT(chooseEditChanged()));
         connect(chooseOkButton, SIGNAL(clicked()), this, SLOT(setViewFromEdit()));
         connect(chooseDeleteButton, SIGNAL(clicked()), this, SLOT(deleteKeyword()));
@@ -846,8 +847,8 @@ void ProgLister::chooseView(void)
                 this,          SLOT(setViewFromList(int)));
         connect(chooseListBox, SIGNAL(menuButtonPressed(int)),chooseEditButton,
                                SLOT(setFocus()));
-        connect(chooseListBox, SIGNAL(selectionChanged()), this,
-                               SLOT(chooseListBoxChanged()));
+        connect(chooseListBox, SIGNAL(itemSelectionChanged()),
+                this,          SLOT(  chooseListBoxChanged()));
         connect(chooseEditButton, SIGNAL(clicked()), this, 
                                   SLOT(powerEdit()));
         connect(chooseDeleteButton, SIGNAL(clicked()), this,
