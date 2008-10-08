@@ -2,6 +2,7 @@
 
 #include <q3widgetstack.h>
 #include <q3tabdialog.h>
+#include <QGroupBox>
 
 #include "mythconfiggroups.h"
 #include "mythcontext.h"
@@ -28,7 +29,7 @@ ConfigurationGroup::ConfigurationGroup(bool luselabel,   bool luseframe,
     // Pre-calculate the margin and spacing that all sub-classes will use:
 
     if (lzeroMargin)
-        margin = 4;
+        margin = 4 * 0.5;
     else
     {
         float wmult = 0, hmult = 0;
@@ -36,12 +37,12 @@ ConfigurationGroup::ConfigurationGroup(bool luselabel,   bool luseframe,
         GetMythUI()->GetScreenSettings(wmult, hmult);
 
         if (luselabel)
-            margin = (int)(28 * hmult);
+            margin = (int)(28 * hmult * 0.5);
         else
-            margin = (int)(10 * hmult);
+            margin = (int)(10 * hmult * 0.5);
     }
 
-    space = (lzeroSpace) ? 4 : -1;
+    space = (lzeroSpace) ? 4 * 0.5 : -1;
 }
 
 ConfigurationGroup::~ConfigurationGroup()
@@ -107,31 +108,22 @@ void ConfigurationGroup::Save(QString destination)
             (*it)->GetStorage()->Save(destination);
 }
 
-QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg, 
-                                                  QWidget* parent,
-                                                  const char* widgetName) 
+QWidget *VerticalConfigurationGroup::configWidget(
+    ConfigurationGroup *cg, 
+    QWidget            *parent,
+    const char         *widgetName) 
 {
-    widget = new Q3GroupBox(parent, widgetName);
-    connect(widget, SIGNAL(destroyed(QObject*)),
-            this,   SLOT(widgetDeleted(QObject*)));
-
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
-
-    if (!useframe)
-        widget->setFrameShape(Q3GroupBox::NoFrame);
-
-    layout = new QVBoxLayout(widget, margin, space);
-
-    if (uselabel)
-        widget->setTitle(getLabel());
+    layout = new QVBoxLayout();
+    layout->setMargin(margin);
+    layout->setSpacing((space<0) ? margin : space);
 
     childwidget.resize(children.size());
     for (uint i = 0; i < children.size(); i++)
     {
         if (children[i] && children[i]->isVisible())
         {
-            childwidget[i] = children[i]->configWidget(cg, widget, NULL);
-            layout->add(childwidget[i]);
+            childwidget[i] = children[i]->configWidget(cg, NULL, NULL);
+            layout->addWidget(childwidget[i]);
             children[i]->setEnabled(children[i]->isEnabled());
         }
     }
@@ -143,6 +135,30 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
         confgrp = cg;
     } 
 
+    QWidget *widget = NULL;
+    if (uselabel)
+    {
+        QGroupBox *groupbox = new QGroupBox(parent);
+        groupbox->setObjectName(QString("VCG(%1)_groupbox").arg(widgetName));
+        groupbox->setTitle(getLabel());
+        widget = groupbox;
+    }
+    else if (useframe)
+    {
+        QFrame *frame = new QFrame(parent);
+        frame->setFrameStyle(QFrame::Box);
+        frame->setObjectName(QString("VCG(%1)_frame").arg(widgetName));
+        widget = frame;
+    }
+    else
+    {
+        widget = new QWidget(parent);
+        widget->setObjectName(QString("VCG(%1)_widget").arg(widgetName));
+    }
+
+    widget->setLayout(layout);
+    connect(widget, SIGNAL(destroyed(QObject*)),
+            this,   SLOT(widgetDeleted(QObject*)));
     return widget;
 }
 
@@ -177,7 +193,7 @@ bool VerticalConfigurationGroup::replaceChild(
         if (childwidget[i])
         {
             old_child->widgetInvalid(childwidget[i]);
-            layout->remove(childwidget[i]);
+            layout->removeWidget(childwidget[i]);
             childwidget[i]->deleteLater();
             childwidget[i] = NULL;
         }
@@ -190,7 +206,7 @@ bool VerticalConfigurationGroup::replaceChild(
         if (was_visible)
         {
             childwidget[i] = new_child->configWidget(confgrp, widget, NULL);
-            layout->add(childwidget[i]);
+            layout->addWidget(childwidget[i]);
             new_child->setEnabled(was_enabled);
             childwidget[i]->resize(1,1);
             childwidget[i]->show();
@@ -208,78 +224,103 @@ void VerticalConfigurationGroup::repaint(void)
         widget->repaint();
 }
 
-QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg, 
-                                                    QWidget* parent, 
-                                                    const char* widgetName) 
+QWidget *HorizontalConfigurationGroup::configWidget(
+    ConfigurationGroup *cg, 
+    QWidget            *parent, 
+    const char         *widgetName) 
 {
-    Q3GroupBox* widget = new Q3GroupBox(parent, widgetName);
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
+    QHBoxLayout *layout = new QHBoxLayout();
+    layout->setMargin(margin);
+    layout->setSpacing((space<0) ? margin : space);
 
-    if (!useframe)
-        widget->setFrameShape(Q3GroupBox::NoFrame);
-
-    QHBoxLayout *layout = new QHBoxLayout(widget, margin, space);
-
-    if (uselabel)
+    for (uint i = 0 ; i < children.size() ; ++i)
     {
-        // This makes weird and bad things happen in qt -mdz 2002/12/28
-        //widget->setInsideMargin(20);
-        widget->setTitle(getLabel());
-    }
-
-    for(unsigned i = 0 ; i < children.size() ; ++i)
-        if (children[i]->isVisible())
+        if (children[i] && children[i]->isVisible())
         {
-            QWidget *child = children[i]->configWidget(cg, widget, NULL);
-            layout->add(child);
+            QWidget *child = children[i]->configWidget(cg, NULL, NULL);
+            layout->addWidget(child);
             children[i]->setEnabled(children[i]->isEnabled());
         }
+    }
 
     if (cg)
     {
-        connect(this, SIGNAL(changeHelpText(QString)), cg,
-                SIGNAL(changeHelpText(QString)));
+        connect(this, SIGNAL(changeHelpText(QString)),
+                cg,   SIGNAL(changeHelpText(QString)));
     }
 
+    QWidget *widget = NULL;
+    if (uselabel)
+    {
+        QGroupBox *groupbox = new QGroupBox(parent);
+        groupbox->setObjectName(QString("HCG(%1)_groupbox").arg(widgetName));
+        groupbox->setTitle(getLabel());
+        widget = groupbox;
+    }
+    else if (useframe)
+    {
+        QFrame *frame = new QFrame(parent);
+        frame->setFrameStyle(QFrame::Box);
+        frame->setObjectName(QString("HCG(%1)_frame").arg(widgetName));
+        widget = frame;
+    }
+    else
+    {
+        widget = new QWidget(parent);
+        widget->setObjectName(QString("HCG(%1)_widget").arg(widgetName));
+    }
+
+    widget->setLayout(layout);
     return widget;
 }
 
-QWidget* GridConfigurationGroup::configWidget(ConfigurationGroup *cg, 
-                                              QWidget* parent, 
-                                              const char* widgetName)
+QWidget* GridConfigurationGroup::configWidget(
+    ConfigurationGroup *cg,
+    QWidget            *parent,
+    const char         *widgetName)
 {
-    Q3GroupBox* widget = new Q3GroupBox(parent, widgetName);
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
+    QGridLayout *layout = new QGridLayout();
+    layout->setMargin(margin);
+    layout->setSpacing(space < 0 ? margin : space);
 
-    if (!useframe)
-        widget->setFrameShape(Q3GroupBox::NoFrame);
-
-    QGridLayout *layout = NULL;
-
-    int rows = (children.size()+columns-1) / columns;
-
-    layout = new QGridLayout(widget, rows, columns, margin, space);
-
-    if (uselabel)
+    for (uint i = 0; i < children.size(); i++)
     {
-        // This makes weird and bad things happen in qt -mdz 2002/12/28
-        //widget->setInsideMargin(20);
-        widget->setTitle(getLabel());
-    }
-
-    for (unsigned i = 0 ; i < children.size() ; ++i)
-        if (children[i]->isVisible())
+        if (children[i] && children[i]->isVisible())
         {
-            QWidget *child = children[i]->configWidget(cg, widget, NULL);
+            QWidget *child = children[i]->configWidget(cg, NULL, NULL);
             layout->addWidget(child, i / columns, i % columns);
             children[i]->setEnabled(children[i]->isEnabled());
         }
+    }
 
     if (cg)
     {
-        connect(this, SIGNAL(changeHelpText(QString)), cg,
-                SIGNAL(changeHelpText(QString)));
+        connect(this, SIGNAL(changeHelpText(QString)),
+                cg,   SIGNAL(changeHelpText(QString)));
     }
+
+    QWidget *widget = NULL;
+    if (uselabel)
+    {
+        QGroupBox *groupbox = new QGroupBox(parent);
+        groupbox->setObjectName(QString("GCG(%1)_groupbox").arg(widgetName));
+        groupbox->setTitle(getLabel());
+        widget = groupbox;
+    }
+    else if (useframe)
+    {
+        QFrame *frame = new QFrame(parent);
+        frame->setFrameStyle(QFrame::Box);
+        frame->setObjectName(QString("GCG(%1)_frame").arg(widgetName));
+        widget = frame;
+    }
+    else
+    {
+        widget = new QWidget(parent);
+        widget->setObjectName(QString("GCG(%1)_widget").arg(widgetName));
+    }
+
+    widget->setLayout(layout);
 
     return widget;
 }

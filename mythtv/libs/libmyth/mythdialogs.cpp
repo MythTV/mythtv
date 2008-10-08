@@ -6,17 +6,13 @@ using namespace std;
 #include <QCursor>
 #include <QDialog>
 #include <QDir>
-#include <q3vbox.h>
 #include <QApplication>
 #include <QLayout>
 #include <QRegExp>
-#include <q3accel.h>
 #include <QImageReader>
-#include <QEventLoop>
 #include <QLabel>
 #include <QPixmap>
 #include <QKeyEvent>
-#include <Q3VBoxLayout>
 #include <QFrame>
 #include <QPaintEvent>
 #include <QPainter>
@@ -862,32 +858,24 @@ MythProgressDialog::MythProgressDialog(
     setGeometry(xoff, yoff, screenwidth - xoff * 2, yoff);
     setFixedSize(QSize(screenwidth - xoff * 2, yoff));
 
-    Q3VBoxLayout *lay = new Q3VBoxLayout(this, 0);
-
-    Q3VBox *vbox = new Q3VBox(this);
-    lay->addWidget(vbox);
-
-    vbox->setLineWidth(3);
-    vbox->setMidLineWidth(3);
-    vbox->setFrameShape(Q3Frame::Panel);
-    vbox->setFrameShadow(Q3Frame::Raised);
-    vbox->setMargin((int)(15 * wmult));
-
-    msglabel = new QLabel(vbox);
-    msglabel->setBackgroundOrigin(ParentOrigin);
+    msglabel = new QLabel();
     msglabel->setText(message);
-    vbox->setStretchFactor(msglabel, 5);
 
-    Q3HBox *hbox = new Q3HBox(vbox);
-    hbox->setSpacing(5);
+    QVBoxLayout *vlayout = new QVBoxLayout();
+    vlayout->addWidget(msglabel);
 
-    progress = new Q3ProgressBar(totalSteps, hbox);
-    progress->setBackgroundOrigin(ParentOrigin);
+    progress = new QProgressBar();
+    progress->setRange(0, totalSteps);
+
+    QHBoxLayout *hlayout = new QHBoxLayout();
+    hlayout->addWidget(progress);
 
     if (cancelButton && slot && target)
     {
-        MythPushButton *button = new MythPushButton("Cancel", hbox, 0);
+        MythPushButton *button = new MythPushButton(
+            NULL, QObject::tr("Cancel"));
         button->setFocus();
+        hlayout->addWidget(button);
         connect(button, SIGNAL(pressed()), target, slot);
     }
 
@@ -901,6 +889,27 @@ MythProgressDialog::MythProgressDialog(
                                      false));
         lcddev->switchToGeneric(textItems);
     }
+
+    hlayout->setSpacing(5);
+
+    vlayout->setMargin((int)(15 * wmult));
+    vlayout->setStretchFactor(msglabel, 5);
+
+    QWidget *hbox = new QWidget();
+    hbox->setLayout(hlayout);
+    hlayout->addWidget(hbox);
+
+    QFrame *vbox = new QFrame(this);
+    vbox->setObjectName(objectName() + "_vbox");
+    vbox->setLineWidth(3);
+    vbox->setMidLineWidth(3);
+    vbox->setFrameShape(QFrame::Panel);
+    vbox->setFrameShadow(QFrame::Raised);
+    vbox->setLayout(vlayout);
+
+    QVBoxLayout *lay = new QVBoxLayout();
+    lay->addWidget(vbox);
+    setLayout(lay);
 
     show();
 
@@ -931,7 +940,7 @@ void MythProgressDialog::Close(void)
 
 void MythProgressDialog::setProgress(int curprogress)
 {
-    progress->setProgress(curprogress);
+    progress->setValue(curprogress);
     if (curprogress % steps == 0)
     {
         qApp->processEvents();
@@ -969,7 +978,7 @@ void MythProgressDialog::keyPressEvent(QKeyEvent *e)
 void MythProgressDialog::setTotalSteps(int totalSteps)
 {
     m_totalSteps = totalSteps;
-    progress->setTotalSteps(totalSteps);
+    progress->setRange(0, totalSteps);
     steps = totalSteps / 1000;
     if (steps == 0)
         steps = 1;
@@ -981,6 +990,7 @@ MythBusyDialog::MythBusyDialog(const QString &title, bool cancelButton,
                          cancelButton, target, slot),
                          timer(NULL)
 {
+    setObjectName("MythBusyDialog");
 }
 
 MythBusyDialog::~MythBusyDialog()
@@ -1029,7 +1039,7 @@ void MythBusyDialog::Close(void)
 
 void MythBusyDialog::setProgress(void)
 {
-    progress->setProgress(progress->progress () + 10);
+    progress->setValue(progress->value() + 10);
     qApp->processEvents();
     if (LCD *lcddev = LCD::Get())
         lcddev->setGenericBusy();
@@ -1415,9 +1425,8 @@ void MythThemedDialog::paintEvent(QPaintEvent *e)
     if (redrawRect.width() > 0 && redrawRect.height() > 0)
         ReallyUpdateForeground(redrawRect);
 
-    bitBlt(this, e->rect().left(), e->rect().top(),
-           &my_foreground, e->rect().left(), e->rect().top(),
-           e->rect().width(), e->rect().height());
+    QPainter p(this);
+    p.drawPixmap(e->rect().topLeft(), my_foreground, e->rect());
 
     MythDialog::paintEvent(e);
 }

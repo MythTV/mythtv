@@ -42,10 +42,10 @@
 #include "mythdialogs.h"
 
 #include <QEvent>
-#include <Q3HBoxLayout>
 #include <QKeyEvent>
 
 class MythWizardPrivate;
+class QHBoxLayout;
 
 class MPUBLIC MythWizard : public MythDialog
 {
@@ -104,8 +104,8 @@ signals:
     void selected(const QString&);
 
 protected:
-    virtual void layOutButtonRow(Q3HBoxLayout *);
-    virtual void layOutTitleRow(Q3HBoxLayout *, const QString &);
+    virtual void layOutButtonRow(QHBoxLayout *);
+    virtual void layOutTitleRow(QHBoxLayout *, const QString &);
 
     void setBackEnabled(bool);
     void setNextEnabled(bool);

@@ -3,6 +3,9 @@
 #ifndef MYTH_CONFIG_GROUPS_H
 #define MYTH_CONFIG_GROUPS_H
 
+#include <QVBoxLayout>
+#include <QGroupBox>
+
 // MythTV headers
 #include "mythexp.h"
 #include "mythstorage.h"
@@ -87,7 +90,7 @@ class MPUBLIC VerticalConfigurationGroup : public ConfigurationGroup
 
   private:
     vector<QWidget*>    childwidget;
-    Q3GroupBox          *widget;
+    QGroupBox          *widget;
     ConfigurationGroup *confgrp;
     QVBoxLayout        *layout;
 };

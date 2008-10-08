@@ -6,7 +6,8 @@
 
 #include "mythuihelper.h"
 
-#include <q3hbox.h>
+#include <QWidget>
+#include <QHBoxLayout>
 
 static void clear_widgets(vector<Configurable*> &children,
                           vector<QWidget*>      &childwidget)
@@ -52,16 +53,19 @@ MythDialog* ConfigurationPopupDialog::dialogWidget(MythMainWindow* parent,
 
     if (getLabel() != "")
     {
-        Q3HBox* box = new Q3HBox(dialog);
-        box->setBackgroundOrigin(QWidget::WindowOrigin);
-        box->setSizePolicy(QSizePolicy(QSizePolicy::Minimum,
-                                       QSizePolicy::Maximum));
-
-        label = new QLabel(box);
+        label = new QLabel();
         label->setText(getLabel());
         label->setAlignment(Qt::AlignHCenter);
         label->setSizePolicy(QSizePolicy(QSizePolicy::Minimum,
                                          QSizePolicy::Maximum));
+
+        QHBoxLayout *layout = new QHBoxLayout;
+        layout->addWidget(label);
+
+        QWidget *box = new QWidget(dialog);
+        box->setSizePolicy(QSizePolicy(QSizePolicy::Minimum,
+                                       QSizePolicy::Maximum));
+        box->setLayout(layout);
 
         dialog->addWidget(box);
     }

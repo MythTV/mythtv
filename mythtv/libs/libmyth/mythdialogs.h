@@ -5,8 +5,6 @@
 #include <QLabel>
 #include <QAbstractButton>
 #include <QObject>
-#include <Q3VBoxLayout>
-#include <Q3ProgressBar>
 #include <QFrame>
 #include <QVector>
 #include <QList>
@@ -42,6 +40,8 @@ class MythRemoteLineEdit;
 class MythListBox;
 struct fontProp;
 class MythMainWindow;
+class QVBoxLayout;
+class QProgressBar;
 
 #include "libmythui/mythmainwindow.h"
 
@@ -273,7 +273,7 @@ class MPUBLIC MythProgressDialog: public MythDialog
 
   protected:
     ~MythProgressDialog(); // use deleteLater() instead for thread safety
-    Q3ProgressBar *progress;
+    QProgressBar *progress;
     QLabel *msglabel;
 
   private:

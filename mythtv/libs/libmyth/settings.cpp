@@ -7,13 +7,12 @@ using namespace std;
 
 // Qt widgets
 #include <QLineEdit>
-#include <q3hbox.h>
-#include <q3vbox.h>
 #include <QLabel>
 #include <QSlider>
 #include <QLCDNumber>
 #include <QButtonGroup>
 #include <QRadioButton>
+#include <QProgressBar>
 
 // Qt utils
 #include <QFile>
@@ -250,56 +249,62 @@ QWidget* LabelSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                     const char* widgetName) {
     (void)cg;
 
-    QWidget* widget = new Q3HBox(parent, widgetName);
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
+    QWidget *widget = new QWidget(parent);
+    widget->setObjectName(widgetName);
+
+    QHBoxLayout *layout = new QHBoxLayout();
 
     if (getLabel() != "")
     {
-        QLabel* label = new QLabel(widget);
+        QLabel *label = new QLabel();
         label->setText(getLabel() + ":     ");
-        label->setBackgroundOrigin(QWidget::WindowOrigin);
+        layout->addWidget(label);
     }
 
-    QLabel* value = new QLabel(widget);
+    QLabel *value = new QLabel();
     value->setText(getValue());
-    value->setBackgroundOrigin(QWidget::WindowOrigin);
+    layout->addWidget(value);
 
     connect(this, SIGNAL(valueChanged(const QString&)),
             value, SLOT(setText(const QString&)));
+
+    widget->setLayout(layout);
 
     return widget;
 }
 
 QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                       const char *widgetName) {
-    Q3HBox *widget;
+                                       const char *widgetName)
+{
+    QWidget *widget = new QWidget(parent);
+    widget->setObjectName(widgetName);
 
+    QBoxLayout *layout = NULL;
     if (labelAboveWidget)
     {
-        widget = dynamic_cast<Q3HBox*>(new Q3VBox(parent, widgetName));
+        layout = new QVBoxLayout();
         widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
                                           QSizePolicy::Maximum));
     }
     else
-        widget = new Q3HBox(parent, widgetName);
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
+        layout = new QHBoxLayout();
 
     if (getLabel() != "")
     {
-        QLabel* label = new QLabel(widget);
+        QLabel *label = new QLabel();
         label->setText(getLabel() + ":     ");
-        label->setBackgroundOrigin(QWidget::WindowOrigin);
+        layout->addWidget(label);
     }
 
     bxwidget = widget;
     connect(bxwidget, SIGNAL(destroyed(QObject*)),
             this,     SLOT(widgetDeleted(QObject*)));
 
-    edit = new MythLineEdit(settingValue, widget,
-                                          QString(widgetName) + "-edit");
+    edit = new MythLineEdit(settingValue, NULL,
+                            QString(widgetName) + "-edit");
     edit->setHelpText(getHelpText());
-    edit->setBackgroundOrigin(QWidget::WindowOrigin);
     edit->setText( getValue() );
+    layout->addWidget(edit);
 
     connect(this, SIGNAL(valueChanged(const QString&)),
             edit, SLOT(setText(const QString&)));
@@ -313,7 +318,9 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     setRW(rw);
     SetPasswordEcho(password_echo);
 
-    return bxwidget;
+    widget->setLayout(layout);
+
+    return widget;
 }
 
 void LineEditSetting::widgetInvalid(QObject *obj)
@@ -366,40 +373,44 @@ void BoundedIntegerSetting::setValue(int newValue)
 }
 
 QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                     const char* widgetName) {
-    Q3HBox* widget;
-    if (labelAboveWidget) 
+                                     const char* widgetName)
+{
+    QWidget *widget = new QWidget(parent);
+    widget->setObjectName(widgetName);
+
+    QBoxLayout *layout = NULL;
+    if (labelAboveWidget)
     {
-        widget = dynamic_cast<Q3HBox*>(new Q3VBox(parent, widgetName));
+        layout = new QVBoxLayout();
         widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
                                           QSizePolicy::Maximum));
-    } 
+    }
     else
-        widget = new Q3HBox(parent, widgetName);
-
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
+        layout = new QHBoxLayout();
 
     if (getLabel() != "")
     {
-        QLabel* label = new QLabel(widget, QString(widgetName) + "-label");
+        QLabel *label = new QLabel();
+        label->setObjectName(QString(widgetName) + "-label");
         label->setText(getLabel() + ":     ");
-        label->setBackgroundOrigin(QWidget::WindowOrigin);
+        layout->addWidget(label);
     }
 
-    MythSlider* slider = new MythSlider(widget, 
-                                        QString(widgetName) + "-slider");
+    MythSlider *slider = new MythSlider(
+        NULL, QString(widgetName) + "-slider");
     slider->setHelpText(getHelpText());
     slider->setMinValue(min);
     slider->setMaxValue(max);
     slider->setOrientation( Qt::Horizontal );
     slider->setLineStep(step);
     slider->setValue(intValue());
-    slider->setBackgroundOrigin(QWidget::WindowOrigin);
+    layout->addWidget(slider);
 
-    QLCDNumber* lcd = new QLCDNumber(widget, QString(widgetName) + "-lcd");
+    QLCDNumber *lcd = new QLCDNumber(NULL, QString(widgetName) + "-lcd");
     lcd->setMode(QLCDNumber::DEC);
     lcd->setSegmentStyle(QLCDNumber::Flat);
     lcd->display(intValue());
+    layout->addWidget(lcd);
 
     connect(slider, SIGNAL(valueChanged(int)), lcd, SLOT(display(int)));
     connect(slider, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
@@ -408,6 +419,8 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (cg)
         connect(slider, SIGNAL(changeHelpText(QString)), cg,
                 SIGNAL(changeHelpText(QString)));
+
+    widget->setLayout(layout);
 
     return widget;
 }
@@ -428,34 +441,38 @@ SpinBoxSetting::SpinBoxSetting(
 }
 
 QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                      const char* widgetName) {
-    Q3HBox* box;
-    if (labelAboveWidget) 
+                                      const char* widgetName)
+{
+    QWidget *widget = new QWidget(parent);
+    widget->setObjectName(widgetName);
+
+    QBoxLayout *layout = NULL;
+    if (labelAboveWidget)
     {
-        box = dynamic_cast<Q3HBox*>(new Q3VBox(parent, widgetName));
-        box->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
-                                       QSizePolicy::Maximum));
-    } 
+        layout = new QVBoxLayout();
+        widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
+                                          QSizePolicy::Maximum));
+    }
     else
-        box = new Q3HBox(parent, widgetName);
-    box->setBackgroundOrigin(QWidget::WindowOrigin);
+        layout = new QHBoxLayout();
 
     if (getLabel() != "")
     {
-        QLabel* label = new QLabel(box);
-        label->setBackgroundOrigin(QWidget::WindowOrigin);
+        QLabel *label = new QLabel();
         label->setText(getLabel() + ":     ");
+        layout->addWidget(label);
     }
 
-    bxwidget = box;
+    bxwidget = widget;
     connect(bxwidget, SIGNAL(destroyed(QObject*)),
             this,     SLOT(widgetDeleted(QObject*)));
 
-    spinbox = new MythSpinBox(box, QString(widgetName) + "MythSpinBox", sstep);
+    spinbox = new MythSpinBox(NULL, QString(widgetName) + "MythSpinBox", sstep);
     spinbox->setHelpText(getHelpText());
-    spinbox->setBackgroundOrigin(QWidget::WindowOrigin);
     spinbox->setMinValue(min);
     spinbox->setMaxValue(max);
+    layout->addWidget(spinbox);
+
     // only set step size if greater than default (1), otherwise
     // this will screw up the single-step/jump behavior of the MythSpinBox
     if (1 < step)
@@ -470,7 +487,9 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         connect(spinbox, SIGNAL(changeHelpText(QString)), cg,
                 SIGNAL(changeHelpText(QString)));
 
-    return bxwidget;
+    widget->setLayout(layout);
+
+    return widget;
 }
 
 void SpinBoxSetting::widgetInvalid(QObject *obj)
@@ -530,104 +549,113 @@ void SpinBoxSetting::setHelpText(const QString &str)
 }
 
 QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
-                                          QWidget* parent,
-                                          const char* widgetName) {
+                                          QWidget    *parent,
+                                          const char *widgetName)
+{
     (void)cg;
 
-    Q3HBox* widget;
-    if (labelAboveWidget) 
+    QWidget *widget = new QWidget(parent);
+    widget->setObjectName(widgetName);
+
+    QBoxLayout *layout = NULL;
+    if (labelAboveWidget)
     {
-        widget = dynamic_cast<Q3HBox*>(new Q3VBox(parent, widgetName));
+        layout = new QVBoxLayout();
         widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
                                           QSizePolicy::Maximum));
-    } 
+    }
     else
-        widget = new Q3HBox(parent, widgetName);
-
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
+        layout = new QHBoxLayout();
 
     if (getLabel() != "")
     {
-        QLabel* label = new QLabel(widget);
+        QLabel *label = new QLabel();
         label->setText(getLabel() + ":     ");
-        label->setBackgroundOrigin(QWidget::WindowOrigin);
+        layout->addWidget(label);
     }
 
-    QLabel* value = new QLabel(widget);
+
+    QLabel *value = new QLabel();
     value->setText(labels[current]);
-    value->setBackgroundOrigin(QWidget::WindowOrigin);
+    layout->addWidget(value);
 
     connect(this, SIGNAL(valueChanged(const QString&)),
             value, SLOT(setText(const QString&)));
+
+    widget->setLayout(layout);
 
     return widget;
 }
 
 QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                       const char* widgetName) {
-    Q3HBox* box;
-    if (labelAboveWidget) 
-    {
-        box = dynamic_cast<Q3HBox*>(new Q3VBox(parent, widgetName));
-        box->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
-                                       QSizePolicy::Maximum));
-    } 
-    else
-        box = new Q3HBox(parent, widgetName);
+                                       const char* widgetName)
+{
+    QWidget *widget = new QWidget(parent);
+    widget->setObjectName(widgetName);
 
-    box->setBackgroundOrigin(QWidget::WindowOrigin);
+    QBoxLayout *layout = NULL;
+    if (labelAboveWidget)
+    {
+        layout = new QVBoxLayout();
+        widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
+                                          QSizePolicy::Maximum));
+    }
+    else
+        layout = new QHBoxLayout();
 
     if (getLabel() != "")
     {
-        QLabel* label = new QLabel(box);
+        QLabel *label = new QLabel();
         label->setText(getLabel() + ":     ");
-        label->setBackgroundOrigin(QWidget::WindowOrigin);
-        box->setStretchFactor(label, 0);
+        layout->addWidget(label);
     }
 
-    bxwidget = box;
+    bxwidget = widget;
     connect(bxwidget, SIGNAL(destroyed(QObject*)),
             this,     SLOT(widgetDeleted(QObject*)));
 
-    widget = new MythComboBox(rw, box);
-    widget->setHelpText(getHelpText());
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
-    box->setStretchFactor(widget, 1);
+    cbwidget = new MythComboBox(rw);
+    cbwidget->setHelpText(getHelpText());
 
     for(unsigned int i = 0 ; i < labels.size() ; ++i)
-        widget->insertItem(labels[i]);
+        cbwidget->insertItem(labels[i]);
 
     if (isSet)
-        widget->setCurrentItem(current);
+        cbwidget->setCurrentItem(current);
 
     if (1 < step)
-        widget->setStep(step);
+        cbwidget->setStep(step);
 
     if (rw)
     {
-        connect(widget, SIGNAL(highlighted(const QString &)),
+        connect(cbwidget, SIGNAL(highlighted(const QString &)),
                 this, SLOT(setValue(const QString &)));
-        connect(widget, SIGNAL(activated(const QString &)),
+        connect(cbwidget, SIGNAL(activated(const QString &)),
                 this, SLOT(setValue(const QString &)));
-        connect(widget, SIGNAL(editTextChanged(const QString &)),
+        connect(cbwidget, SIGNAL(editTextChanged(const QString &)),
                 this, SLOT(setValue(const QString &)));
     }
     else
     {
-        connect(widget, SIGNAL(highlighted(int)),
+        connect(cbwidget, SIGNAL(highlighted(int)),
                 this, SLOT(setValue(int)));
-        connect(widget, SIGNAL(activated(int)),
+        connect(cbwidget, SIGNAL(activated(int)),
                 this, SLOT(setValue(int)));
     }
 
     connect(this, SIGNAL(selectionsCleared()),
-            widget, SLOT(clear()));
+            cbwidget, SLOT(clear()));
 
     if (cg)
-        connect(widget, SIGNAL(changeHelpText(QString)), cg,
+        connect(cbwidget, SIGNAL(changeHelpText(QString)), cg,
                 SIGNAL(changeHelpText(QString)));
 
-    return bxwidget;
+    layout->addWidget(cbwidget);
+    layout->setStretchFactor(cbwidget, 1);
+
+    widget->setLayout(layout);
+
+    return widget;
 }
 
 void ComboBoxSetting::widgetInvalid(QObject *obj)
@@ -635,27 +663,26 @@ void ComboBoxSetting::widgetInvalid(QObject *obj)
     if (bxwidget == obj)
     {
         bxwidget = NULL;
-        widget   = NULL;
+        cbwidget = NULL;
     }
 }
 
 void ComboBoxSetting::setEnabled(bool b)
 {
     Configurable::setEnabled(b);
-    if (widget)
-        widget->setEnabled(b);
+    if (cbwidget)
+        cbwidget->setEnabled(b);
 }
 
 void ComboBoxSetting::setVisible(bool b)
 {
     Configurable::setVisible(b);
-    if (widget)
+    if (cbwidget)
     {
-        //QWidget *parent = widget->parentWidget();
         if (b)
-            widget->show();
+            cbwidget->show();
         else
-            widget->hide();
+            cbwidget->hide();
     }
 }
 
@@ -673,45 +700,45 @@ void ComboBoxSetting::setValue(QString newValue)
     if (rw)
     {
         Setting::setValue(newValue);
-        if (widget)
-            widget->setCurrentItem(current);
+        if (cbwidget)
+            cbwidget->setCurrentItem(current);
     }
 };
 
 void ComboBoxSetting::setValue(int which)
 {
-    if (widget)
-        widget->setCurrentItem(which);
+    if (cbwidget)
+        cbwidget->setCurrentItem(which);
     SelectSetting::setValue(which);
 };
 
 void ComboBoxSetting::addSelection(
     const QString &label, QString value, bool select)
 {
-    if ((findSelection(label, value) < 0) && widget)
+    if ((findSelection(label, value) < 0) && cbwidget)
     {
-        widget->insertItem(label);
+        cbwidget->insertItem(label);
     }
 
     SelectSetting::addSelection(label, value, select);
 
-    if (widget && isSet)
-        widget->setCurrentItem(current);
+    if (cbwidget && isSet)
+        cbwidget->setCurrentItem(current);
 }
 
 bool ComboBoxSetting::removeSelection(const QString &label, QString value)
 {
     SelectSetting::removeSelection(label, value);
-    if (!widget)
+    if (!cbwidget)
         return true;
 
-    for (uint i = 0; ((int) i) < widget->count(); i++)
+    for (uint i = 0; ((int) i) < cbwidget->count(); i++)
     {
-        if (widget->text(i) == label)
+        if (cbwidget->text(i) == label)
         {
-            widget->removeItem(i);
+            cbwidget->removeItem(i);
             if (isSet)
-                widget->setCurrentItem(current);
+                cbwidget->setCurrentItem(current);
             return true;
         }
     }
@@ -721,8 +748,8 @@ bool ComboBoxSetting::removeSelection(const QString &label, QString value)
 
 void ComboBoxSetting::setHelpText(const QString &str)
 {
-    if (widget)
-        widget->setHelpText(str);
+    if (cbwidget)
+        cbwidget->setHelpText(str);
     SelectSetting::setHelpText(str);
 }
 
@@ -806,12 +833,10 @@ void DateSetting::setValue(const QDate& newValue) {
 QWidget* RadioSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                     const char* widgetName) {
     Q3ButtonGroup* widget = new Q3ButtonGroup(parent, widgetName);
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
     widget->setTitle(getLabel());
 
     for( unsigned i = 0 ; i < labels.size() ; ++i ) {
         QRadioButton* button = new QRadioButton(widget, NULL);
-        button->setBackgroundOrigin(QWidget::WindowOrigin);
         button->setText(labels[i]);
         if (isSet && i == current)
             button->setDown(true);
@@ -829,7 +854,6 @@ QWidget* CheckBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
             this,   SLOT(widgetDeleted(QObject*)));
 
     widget->setHelpText(getHelpText());
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
     widget->setText(getLabel());
     widget->setChecked(boolValue());
 
@@ -1097,45 +1121,45 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
 
     GetMythUI()->GetScreenSettings(width, m_wmult, height, m_hmult);
 
-    Q3HBox* box;
-    if (labelAboveWidget) 
-    {
-        box = dynamic_cast<Q3HBox*>(new Q3VBox(parent, widgetName));
-        box->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
-                                       QSizePolicy::Maximum));
-    } 
-    else
-        box = new Q3HBox(parent, widgetName);
+    QWidget *widget = new QWidget(parent);
+    widget->setObjectName(widgetName);
 
-    box->setBackgroundOrigin(QWidget::WindowOrigin);
+    QBoxLayout *layout = NULL;
+    if (labelAboveWidget)
+    {
+        layout = new QVBoxLayout();
+        widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
+                                          QSizePolicy::Maximum));
+    }
+    else
+        layout = new QHBoxLayout();
 
     if (getLabel() != "")
     {
-        QLabel* label = new QLabel(box);
+        QLabel *label = new QLabel();
         label->setText(getLabel() + ":");
-        label->setBackgroundOrigin(QWidget::WindowOrigin);
+        layout->addWidget(label);
     }
 
-    MythComboBox *widget = new MythComboBox(false, box);
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
-    combo = widget;
+    combo = new MythComboBox(false);
+    layout->addWidget(combo);
 
-    QLabel *testlabel = new QLabel(box);
+    QLabel *testlabel = new QLabel();
     testlabel->setText("  ");
-    testlabel->setBackgroundOrigin(QWidget::WindowOrigin);
+    layout->addWidget(testlabel);
 
-    bxwidget = box;
+    bxwidget = widget;
     connect(bxwidget, SIGNAL(destroyed(QObject*)),
             this,     SLOT(widgetDeleted(QObject*)));
 
-    imagelabel = new QLabel(box);
-    imagelabel->setBackgroundOrigin(QWidget::WindowOrigin);
+    imagelabel = new QLabel();
+    layout->addWidget(imagelabel);
 
     for (unsigned int i = 0 ; i < images.size() ; ++i)
-        widget->insertItem(labels[i]);
+        combo->insertItem(labels[i]);
 
     if (isSet)
-        widget->setCurrentItem(current);
+        combo->setCurrentItem(current);
     else
         current = 0;
 
@@ -1156,16 +1180,16 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
         imagelabel->setPixmap(tmppix);
     }
 
-    connect(widget, SIGNAL(highlighted(int)), this, SLOT(setValue(int)));
-    connect(widget, SIGNAL(highlighted(int)), this, SLOT(imageSet(int)));
-    connect(widget, SIGNAL(activated(int)), this, SLOT(setValue(int)));
-    connect(widget, SIGNAL(activated(int)), this, SLOT(imageSet(int)));
+    connect(combo, SIGNAL(highlighted(int)), this, SLOT(setValue(int)));
+    connect(combo, SIGNAL(highlighted(int)), this, SLOT(imageSet(int)));
+    connect(combo, SIGNAL(activated(int)), this, SLOT(setValue(int)));
+    connect(combo, SIGNAL(activated(int)), this, SLOT(imageSet(int)));
 
     connect(this, SIGNAL(selectionsCleared()),
-            widget, SLOT(clear()));
+            combo, SLOT(clear()));
 
     if (cg)
-        connect(widget, SIGNAL(changeHelpText(QString)), cg, 
+        connect(combo, SIGNAL(changeHelpText(QString)), cg, 
                 SIGNAL(changeHelpText(QString)));
 
     return bxwidget;
@@ -1257,20 +1281,27 @@ void ButtonSetting::setHelpText(const QString &str)
 QWidget* ProgressSetting::configWidget(ConfigurationGroup* cg, QWidget* parent,
                                        const char* widgetName) {
     (void)cg;
-
-    Q3HBox* widget = new Q3HBox(parent,widgetName);
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
+    QWidget *widget = new QWidget(parent);
+    widget->setObjectName(widgetName);
+    QBoxLayout *layout = new QHBoxLayout();
 
     if (getLabel() != "")
     {
-        QLabel* label = new QLabel(getLabel() + "     :", widget, widgetName);
-        label->setBackgroundOrigin(QWidget::WindowOrigin);
+        QLabel* label = new QLabel();
+        label->setObjectName(QString(widgetName) + "_label");
+        label->setText(getLabel() + ":     ");
+        layout->addWidget(label);
     }
 
-    Q3ProgressBar* progress = new Q3ProgressBar(totalSteps, widget, widgetName);
-    progress->setBackgroundOrigin(QWidget::WindowOrigin);
+    QProgressBar *progress = new QProgressBar(NULL);
+    progress->setObjectName(widgetName);
+    progress->setRange(0,totalSteps);
+    layout->addWidget(progress);
 
-    connect(this, SIGNAL(valueChanged(int)), progress, SLOT(setProgress(int)));
-    progress->setProgress(intValue());
+    connect(this, SIGNAL(valueChanged(int)), progress, SLOT(setValue(int)));
+    progress->setValue(intValue());
+
+    widget->setLayout(layout);
+
     return widget;
 }

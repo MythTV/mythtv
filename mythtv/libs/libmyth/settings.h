@@ -326,7 +326,7 @@ class MPUBLIC ComboBoxSetting: public SelectSetting {
 protected:
     ComboBoxSetting(Storage *_storage, bool _rw = false, int _step = 1) :
         SelectSetting(_storage), rw(_rw),
-        bxwidget(NULL), widget(NULL), step(_step) { }
+        bxwidget(NULL), cbwidget(NULL), step(_step) { }
 
 public:
     virtual void setValue(QString newValue);
@@ -336,7 +336,7 @@ public:
                                   const char* widgetName = 0);
     virtual void widgetInvalid(QObject *obj);
 
-    void setFocus() { if (widget) widget->setFocus(); }
+    void setFocus() { if (cbwidget) cbwidget->setFocus(); }
 
     virtual void setEnabled(bool b);
     virtual void setVisible(bool b);
@@ -353,7 +353,7 @@ public slots:
 private:
     bool rw;
     QWidget      *bxwidget;
-    MythComboBox *widget;
+    MythComboBox *cbwidget;
 
 protected:
     int step;

@@ -41,15 +41,15 @@
 #include "qpushbutton.h"
 #include "qcursor.h"
 #include "qlabel.h"
-#include "q3widgetstack.h"
 #include "qapplication.h"
 #include "qpainter.h"
-#include <Q3HBoxLayout>
 #include <QChildEvent>
-#include <Q3Frame>
 #include <QKeyEvent>
 #include <QEvent>
-#include <Q3VBoxLayout>
+
+#include <q3widgetstack.h>
+#include <QGroupBox>
+#include <QBoxLayout>
 
 #include "mythcontext.h"
 
@@ -70,7 +70,7 @@ public:
         bool appropriate;
     };
 
-    Q3VBoxLayout * v;
+    QVBoxLayout * v;
     Page * current;
     Q3WidgetStack * ws;
     QList<Page*> pages;
@@ -80,10 +80,10 @@ public:
     MythPushButton * finishButton;
     MythPushButton * cancelButton;
 
-    Q3GroupBox *helpgroup;
+    QGroupBox *helpgroup;
     QLabel *help;
 
-    Q3Frame * hbar1, * hbar2;
+    QFrame * hbar1, * hbar2;
 
     Page * page( const QWidget * w )
     {
@@ -421,7 +421,7 @@ MythPushButton * MythWizard::cancelButton() const
     return d->cancelButton;
 }
 
-void MythWizard::layOutButtonRow( Q3HBoxLayout * layout )
+void MythWizard::layOutButtonRow( QHBoxLayout * layout )
 {
     bool hasEarlyFinish = FALSE;
 
@@ -432,7 +432,8 @@ void MythWizard::layOutButtonRow( Q3HBoxLayout * layout )
         i--;
     }
 
-    Q3BoxLayout * h = new Q3BoxLayout( Q3BoxLayout::LeftToRight );
+    QHBoxLayout *h = new QHBoxLayout();
+    h->setSpacing(QBoxLayout::LeftToRight);
     layout->addLayout( h );
 
     h->addWidget( d->cancelButton );
@@ -477,7 +478,7 @@ void MythWizard::layOutButtonRow( Q3HBoxLayout * layout )
     }
 }
 
-void MythWizard::layOutTitleRow( Q3HBoxLayout * layout, const QString & title )
+void MythWizard::layOutTitleRow( QHBoxLayout * layout, const QString & title )
 {
     d->title->setText( title );
     layout->addWidget( d->title, 10 );
@@ -486,17 +487,17 @@ void MythWizard::layOutTitleRow( Q3HBoxLayout * layout, const QString & title )
 void MythWizard::layOut()
 {
     delete d->v;
-    d->v = new Q3VBoxLayout( this, 6, 0, "top-level layout" );
+    d->v = new QVBoxLayout( this, 6, 0, "top-level layout" );
 
-    Q3HBoxLayout * l;
-    l = new Q3HBoxLayout( 6 );
+    QHBoxLayout * l;
+    l = new QHBoxLayout( 6 );
     d->v->addLayout( l, 0 );
     layOutTitleRow( l, d->current ? d->current->t : QString::null );
 
     if ( ! d->hbar1 ) {
-        d->hbar1 = new Q3Frame( this, "<hr>", 0 );
+        d->hbar1 = new QFrame( this, "<hr>", 0 );
         d->hbar1->setBackgroundOrigin(QWidget::WindowOrigin);
-        d->hbar1->setFrameStyle( Q3Frame::Sunken + Q3Frame::HLine );
+        d->hbar1->setFrameStyle(QFrame::Sunken | QFrame::HLine);
         d->hbar1->setFixedHeight( 12 );
     }
 
@@ -506,7 +507,7 @@ void MythWizard::layOut()
 
     if (!d->helpgroup)
     {
-        d->helpgroup = new Q3GroupBox(this, "help-group-box");
+        d->helpgroup = new QGroupBox(this, "help-group-box");
         d->helpgroup->setBackgroundOrigin(QWidget::WindowOrigin);
 
         d->help = new QLabel(d->helpgroup, "help text");
@@ -519,7 +520,7 @@ void MythWizard::layOut()
         d->help->setMaximumHeight((int)(80 * hmult));
         d->help->setMinimumHeight((int)(80 * hmult));
     
-        Q3VBoxLayout *helplayout = new Q3VBoxLayout(d->helpgroup, 10);
+        QVBoxLayout *helplayout = new QVBoxLayout(d->helpgroup, 10);
         helplayout->add(d->help);
     }
     else
@@ -530,14 +531,14 @@ void MythWizard::layOut()
     d->v->addWidget(d->helpgroup);
 
     if ( ! d->hbar2 ) {
-        d->hbar2 = new Q3Frame( this, "<hr>", 0 );
+        d->hbar2 = new QFrame( this, "<hr>", 0 );
         d->hbar2->setBackgroundOrigin(QWidget::WindowOrigin);
-        d->hbar2->setFrameStyle( Q3Frame::Sunken + Q3Frame::HLine );
+        d->hbar2->setFrameStyle(QFrame::Sunken | QFrame::HLine);
         d->hbar2->setFixedHeight( 12 );
     }
     d->v->addWidget( d->hbar2 );
 
-    l = new Q3HBoxLayout( 6 );
+    l = new QHBoxLayout( 6 );
     d->v->addLayout( l );
     layOutButtonRow( l );
     d->v->activate();

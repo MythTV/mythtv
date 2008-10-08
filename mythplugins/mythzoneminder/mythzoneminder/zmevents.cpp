@@ -607,8 +607,8 @@ void ZMEvents::showMenu()
 
     QLabel *splitter = popup->addLabel(" ", MythPopupBox::Small);
     splitter->setLineWidth(2);
-    splitter->setFrameShape(Q3Frame::HLine);
-    splitter->setFrameShadow(Q3Frame::Sunken);
+    splitter->setFrameShape(QLabel::HLine);
+    splitter->setFrameShadow(QLabel::Sunken);
     splitter->setMinimumHeight((int) (25 * hmult));
     splitter->setMaximumHeight((int) (25 * hmult));
 
