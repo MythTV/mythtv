@@ -174,7 +174,7 @@ bool MediaMonitorUnix::CheckMountable(void)
             {
                 VERBOSE(VB_MEDIA+VB_EXTRA, msg + c);
                 if (c == '1')
-                    FindPartitions(sysfs.absPath(), true);
+                    FindPartitions(sysfs.absolutePath(), true);
             }
             else
             {
@@ -226,7 +226,7 @@ QString MediaMonitorUnix::GetDeviceFile(const QString &sysfs)
         return ret;
     }
 
-    if ((print_verbose_messages & VB_MEDIA+VB_EXTRA) == VB_MEDIA+VB_EXTRA)
+    if ((print_verbose_messages & (VB_MEDIA|VB_EXTRA)) == (VB_MEDIA|VB_EXTRA))
     {
         udevinfo->setReadChannel(QProcess::StandardError);
 
@@ -337,7 +337,7 @@ static void LookupModel(MythMediaDevice* device)
     }
 #endif
 
-    device->setDeviceModel(desc);
+    device->setDeviceModel(desc.toAscii().constData());
 }
 
 /**
@@ -553,7 +553,8 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
         QString device_file = GetDeviceFile(dev);
         if (!device_file.isNull())
         {
-            pDevice = MythCDROM::get(this, device_file, false, m_AllowEject);
+            pDevice = MythCDROM::get(
+                this, device_file.toAscii().constData(), false, m_AllowEject);
 
             if (AddDevice(pDevice))
                 return true;
@@ -565,7 +566,8 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
         QString device_file = GetDeviceFile(dev);
         if (!device_file.isNull())
         {
-            pDevice = MythHDD::Get(this, device_file, false, false);
+            pDevice = MythHDD::Get(
+                this, device_file.toAscii().constData(), false, false);
             if (AddDevice(pDevice))
                 return true;
         }

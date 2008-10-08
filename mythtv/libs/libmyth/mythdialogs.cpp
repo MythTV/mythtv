@@ -709,7 +709,7 @@ bool MythPopupBox::showOkPopup(
     if (button_msg.isEmpty())
         button_msg = QObject::tr("OK");
 
-    MythPopupBox *popup = new MythPopupBox(parent, title);
+    MythPopupBox *popup = new MythPopupBox(parent, title.toAscii().constData());
 
     popup->addLabel(message, MythPopupBox::Medium, true);
     QAbstractButton *okButton = popup->addButton(button_msg, popup, SLOT(accept()));
@@ -725,7 +725,7 @@ bool MythPopupBox::showOkPopup(
 bool MythPopupBox::showOkCancelPopup(MythMainWindow *parent, QString title,
                                      QString message, bool focusOk)
 {
-    MythPopupBox *popup = new MythPopupBox(parent, title);
+    MythPopupBox *popup = new MythPopupBox(parent, title.toAscii().constData());
 
     popup->addLabel(message, Medium, true);
     QAbstractButton *okButton     = popup->addButton(tr("OK"),     popup, SLOT(accept()));
@@ -747,7 +747,7 @@ bool MythPopupBox::showOkCancelPopup(MythMainWindow *parent, QString title,
 bool MythPopupBox::showGetTextPopup(MythMainWindow *parent, QString title,
                                     QString message, QString& text)
 {
-    MythPopupBox *popup = new MythPopupBox(parent, title);
+    MythPopupBox *popup = new MythPopupBox(parent, title.toAscii().constData());
 
     popup->addLabel(message, Medium, true);
 
@@ -782,7 +782,7 @@ QString MythPopupBox::showPasswordPopup(MythMainWindow *parent,
                                         QString        title,
                                         QString        message)
 {
-    MythPopupBox *popup = new MythPopupBox(parent, title);
+    MythPopupBox *popup = new MythPopupBox(parent, title.toAscii().constData());
 
     popup->addLabel(message, Medium, true);
 
@@ -817,7 +817,7 @@ DialogCode MythPopupBox::ShowButtonPopup(
     const QStringList &buttonmsgs,
     DialogCode         default_button)
 {
-    MythPopupBox *popup = new MythPopupBox(parent, title);
+    MythPopupBox *popup = new MythPopupBox(parent, title.toAscii().constData());
 
     popup->addLabel(message, Medium, true);
     popup->addLabel("");
@@ -873,7 +873,7 @@ MythProgressDialog::MythProgressDialog(
     if (cancelButton && slot && target)
     {
         MythPushButton *button = new MythPushButton(
-            NULL, QObject::tr("Cancel"));
+            QObject::tr("Cancel"), NULL);
         button->setFocus();
         hlayout->addWidget(button);
         connect(button, SIGNAL(pressed()), target, slot);
@@ -1304,7 +1304,9 @@ void MythThemedDialog::updateBackground()
     //
 
     my_background = bground;
-    setPaletteBackgroundPixmap(my_background);
+    QPalette palette;
+    palette.setBrush(backgroundRole(), QBrush(my_background));
+    setPalette(palette);
 }
 
 void MythThemedDialog::updateForeground()
@@ -1745,14 +1747,15 @@ MythPasswordDialog::MythPasswordDialog(QString message,
     message_label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     message_label->setGeometry(15,10,textWidth,30);
 
-    password_editor = new MythLineEdit(this, objectName()+"_password_editor");
+    password_editor = new MythLineEdit(
+        this, QString(objectName()+"_password_editor").toAscii().constData());
     password_editor->setEchoMode(QLineEdit::Password);
     password_editor->setGeometry(textWidth + 20,10,135,30);
     password_editor->setAllowVirtualKeyboard(false);
     connect(password_editor, SIGNAL(textChanged(const QString &)),
             this, SLOT(checkPassword(const QString &)));
 
-    this->setActiveWindow();
+    activateWindow();
     password_editor->setFocus();
 }
 

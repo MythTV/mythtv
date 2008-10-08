@@ -329,7 +329,7 @@ void BackendSelect::RemoveItem(QString USN)
 
     if (it != m_devices.end())
     {
-        ListBoxDevice *item = it.data();
+        ListBoxDevice *item = *it;
 
         if (item != NULL)
             delete item;

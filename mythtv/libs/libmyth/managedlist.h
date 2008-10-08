@@ -544,8 +544,9 @@ class MPUBLIC SelectManagedListSetting : public ManagedListSetting
         const QString& listText, ManagedListGroup* _group,
         ManagedList* _parentList, const QString& listName)
     {
-        selectItem = new SelectManagedListItem(listText, _group,
-                                               _parentList, this, listName);
+        selectItem = new SelectManagedListItem(
+            listText, _group, _parentList, this,
+            listName.toAscii().constData());
     }
 
   public:
@@ -591,8 +592,9 @@ class MPUBLIC BoolManagedListSetting : public ManagedListSetting
         ManagedListGroup* _group, ManagedList* _parentList=NULL)
         : ManagedListSetting(_table, _column, _parentList)
     {
-        boolListItem = new BoolManagedListItem(false, _group,
-                                               _parentList, this, ItemName);
+        boolListItem = new BoolManagedListItem(
+            false, _group, _parentList, this,
+            ItemName.toAscii().constData());
         listItem = boolListItem;
         boolListItem->setLabels(trueText, falseText);
         connect(listItem, SIGNAL(changed(ManagedListItem*)),
@@ -615,8 +617,9 @@ class MPUBLIC IntegerManagedListSetting : public ManagedListSetting
         : ManagedListSetting(_table, _column, _parentList)
     {
         IntegerListItem = new IntegerManagedListItem(
-            _bigStep, _step, _parentList, this, ItemName);
-            listItem = IntegerListItem;
+            _bigStep, _step, _parentList, this,
+            ItemName.toAscii().constData());
+        listItem = IntegerListItem;
         connect(listItem, SIGNAL(changed(ManagedListItem*)),
                 this,     SLOT(itemChanged(ManagedListItem*)));
     }
@@ -654,7 +657,7 @@ class MPUBLIC BoundedIntegerManagedListSetting : public ManagedListSetting
     {
         BoundedIntegerListItem = new BoundedIntegerManagedListItem(
             _min, _max, _bigStep, _step, _group,
-            _parentList, this, ItemName, _invert);
+            _parentList, this, ItemName.toAscii().constData(), _invert);
         listItem = BoundedIntegerListItem;
         connect(listItem, SIGNAL(changed(ManagedListItem*)),
                 this,     SLOT(itemChanged(ManagedListItem*)));
@@ -697,8 +700,7 @@ class MPUBLIC ManagedList : public QObject
     void setContainerName(const QString& newStr) { containerName = newStr; }
 
 
-    ManagedListItem* getItem(const QString& itemName)
-    { return (ManagedListItem*)child(itemName);}
+    ManagedListItem* getItem(const QString& itemName);
     MythDialog* getParent() { return (MythDialog*)parent();}
 
     bool init(XMLParse *theme, const QString& containerNameIn,

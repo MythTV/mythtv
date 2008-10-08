@@ -608,10 +608,10 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
 
     while (itr != m_handlerMap.end())
     {
-        if ((itr.data().MediaType & (int)pMedia->getMediaType()))
+        if (((*itr).MediaType & (int)pMedia->getMediaType()))
         {
             VERBOSE(VB_IMPORTANT, "Found a handler - '" + itr.key() + "'");
-            handlers.append(itr.data());
+            handlers.append(*itr);
         }
         itr++;
     }
@@ -725,8 +725,8 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
             QMap<QString, MHData>::Iterator itr = m_handlerMap.begin();
             while (itr != m_handlerMap.end())
             {
-                if (itr.data().MediaType & (int)pDev->getMediaType())
-                    itr.data().callback(pDev);
+                if ((*itr).MediaType & (int)pDev->getMediaType())
+                    (*itr).callback(pDev);
                 itr++;
             }
         }

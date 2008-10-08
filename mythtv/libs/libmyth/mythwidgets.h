@@ -95,7 +95,7 @@ class MPUBLIC MythSpinBox: public QSpinBox
     {
         setObjectName(name);
         if (singlestep)
-            setLineStep(10);
+            setSingleStep(10);
     }
 
     void setHelpText(const QString&);
@@ -287,16 +287,14 @@ class MPUBLIC MythPushButton : public QPushButton
         : QPushButton(parent), arrowAccel(aa)
     {
         setObjectName(name);
-        //setBackgroundOrigin(WindowOrigin);
-        setToggleButton(false);
+        setCheckable(false);
     }
 
     MythPushButton(const QString &text, QWidget *parent, bool aa = false)
         : QPushButton(text, parent), arrowAccel(aa)
     {
         setObjectName("MythPushButton");
-        //setBackgroundOrigin(WindowOrigin);
-        setToggleButton(false);
+        setCheckable(false);
     }
 
     MythPushButton(const QString &ontext, const QString &offtext,

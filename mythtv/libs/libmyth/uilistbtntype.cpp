@@ -284,8 +284,9 @@ void UIListTreeType::CreateLevel(int level)
             QString levelname = QString("level%1").arg(i + 1);
 
             QRect curlevelarea = m_levelsize;
-            curlevelarea.moveBy(m_totalarea.x(), m_totalarea.y());
-            curlevelarea.moveBy((m_levelsize.width() + m_levelspacing) * i, 0);
+            curlevelarea.translate(m_totalarea.x(), m_totalarea.y());
+            curlevelarea.translate(
+                (m_levelsize.width() + m_levelspacing) * i, 0);
 
             UIListBtnType *newlevel = new UIListBtnType(levelname, curlevelarea,
                                                         m_order, false, true);
@@ -379,9 +380,9 @@ void UIListTreeType::DrawRegion(QPainter *p, QRect &area, int order, int context
         (*it)->SetDrawOffset(offset);
 
         QRect drawRect = (*it)->GetArea();
-        drawRect.moveBy(offset, 0);
-        drawRect.moveBy(m_parent->GetAreaRect().x(), 
-                        m_parent->GetAreaRect().y());
+        drawRect.translate(offset, 0);
+        drawRect.translate(m_parent->GetAreaRect().x(), 
+                           m_parent->GetAreaRect().y());
 
         if ((*it)->GetArea().right() + offset > m_totalarea.left() &&
             drawRect == area)
@@ -499,8 +500,8 @@ void UIListTreeType::RedrawCurrent(void)
         return;
     }
     QRect dr = currentlevel->GetArea();
-    dr.moveBy(currentlevel->GetDrawOffset(), 0);
-    dr.moveBy(m_parent->GetAreaRect().x(), m_parent->GetAreaRect().y());
+    dr.translate(currentlevel->GetDrawOffset(), 0);
+    dr.translate(m_parent->GetAreaRect().x(), m_parent->GetAreaRect().y());
 
     emit requestRegionUpdate(dr);
 }
@@ -609,8 +610,8 @@ bool UIListTreeType::MoveRight(bool do_refresh)
 void UIListTreeType::calculateScreenArea()
 {
     QRect r = m_totalarea; 
-    r.moveBy(m_parent->GetAreaRect().left(),
-             m_parent->GetAreaRect().top());
+    r.translate(m_parent->GetAreaRect().left(),
+                m_parent->GetAreaRect().top());
     screen_area = r;
 
 }
@@ -1041,7 +1042,7 @@ void UIListBtnType::RemoveItem(UIListBtnTypeItem *item)
         }
     }
 
-    m_itemList.remove(item);
+    m_itemList.removeAll(item);
     delete item;
 
     m_itemCount--;
@@ -1468,7 +1469,7 @@ bool UIListBtnType::incSearchStart(void)
     if (kDialogCodeButton0 == res)
     {
         m_incSearch = searchEdit->text();
-        m_bIncSearchContains = (modeCombo->currentItem() == 1);
+        m_bIncSearchContains = (modeCombo->currentIndex() == 1);
         incSearchNext();
     }
 
@@ -1739,8 +1740,7 @@ void UIListBtnType::Init()
     
     LoadPixmap(m_arrowPix, "arrow");
 
-    QImage img(m_rect.width(), m_itemHeight, 32);
-    img.setAlphaBuffer(true);
+    QImage img(m_rect.width(), m_itemHeight, QImage::Format_ARGB32);
 
     for (int y = 0; y < img.height(); y++) 
     {
@@ -1790,7 +1790,7 @@ void UIListBtnType::Init()
         float bstep = float(m_itemSelEnd.blue() - m_itemSelBeg.blue()) /
                       float(m_itemHeight);
 
-        m_itemSelInactPix = QPixmap(img);
+        m_itemSelInactPix = QPixmap::fromImage(img);
         QPainter p(&m_itemSelInactPix);
 
         float r = m_itemSelBeg.red();
@@ -1814,7 +1814,7 @@ void UIListBtnType::Init()
 
         img.setAlphaBuffer(false);
         
-        m_itemSelActPix = QPixmap(img);
+        m_itemSelActPix = QPixmap::fromImage(img);
         p.begin(&m_itemSelActPix);
 
         r = m_itemSelBeg.red();

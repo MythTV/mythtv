@@ -159,7 +159,7 @@ bool MythCommandLineParser::Parse(
 
         QString filename = QString::fromLocal8Bit(argv[++argpos]);
         QFile f(filename);
-        if (!f.open(IO_ReadOnly))
+        if (!f.open(QIODevice::ReadOnly))
         {
             QByteArray tmp = filename.toAscii();
             cerr << "Failed to open the override settings file: '"
@@ -285,7 +285,7 @@ bool MythCommandLineParser::Parse(
 QString MythCommandLineParser::GetHelpString(bool with_header) const
 {
     QString str;
-    QTextStream msg(&str, IO_WriteOnly);
+    QTextStream msg(&str, QIODevice::WriteOnly);
 
     if (with_header)
         msg << "Valid options are: " << endl;

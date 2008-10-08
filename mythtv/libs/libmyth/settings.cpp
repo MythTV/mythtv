@@ -300,8 +300,9 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     connect(bxwidget, SIGNAL(destroyed(QObject*)),
             this,     SLOT(widgetDeleted(QObject*)));
 
-    edit = new MythLineEdit(settingValue, NULL,
-                            QString(widgetName) + "-edit");
+    edit = new MythLineEdit(
+        settingValue, NULL,
+        QString(QString(widgetName) + "-edit").toAscii().constData());
     edit->setHelpText(getHelpText());
     edit->setText( getValue() );
     layout->addWidget(edit);
@@ -397,17 +398,19 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     }
 
     MythSlider *slider = new MythSlider(
-        NULL, QString(widgetName) + "-slider");
+        NULL, QString(QString(widgetName) + "-slider").toAscii().constData());
     slider->setHelpText(getHelpText());
-    slider->setMinValue(min);
-    slider->setMaxValue(max);
+    slider->setMinimum(min);
+    slider->setMaximum(max);
     slider->setOrientation( Qt::Horizontal );
-    slider->setLineStep(step);
+    slider->setSingleStep(step);
     slider->setValue(intValue());
     layout->addWidget(slider);
 
-    QLCDNumber *lcd = new QLCDNumber(NULL, QString(widgetName) + "-lcd");
-    lcd->setMode(QLCDNumber::DEC);
+    QLCDNumber *lcd = new QLCDNumber();
+    lcd->setObjectName(QString(QString(widgetName) + "-lcd")
+                       .toAscii().constData());
+    lcd->setMode(QLCDNumber::Dec);
     lcd->setSegmentStyle(QLCDNumber::Flat);
     lcd->display(intValue());
     layout->addWidget(lcd);
@@ -467,16 +470,17 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     connect(bxwidget, SIGNAL(destroyed(QObject*)),
             this,     SLOT(widgetDeleted(QObject*)));
 
-    spinbox = new MythSpinBox(NULL, QString(widgetName) + "MythSpinBox", sstep);
+    QString sbname = QString(widgetName) + "MythSpinBox";
+    spinbox = new MythSpinBox(NULL, sbname.toAscii().constData(), sstep);
     spinbox->setHelpText(getHelpText());
-    spinbox->setMinValue(min);
-    spinbox->setMaxValue(max);
+    spinbox->setMinimum(min);
+    spinbox->setMaximum(max);
     layout->addWidget(spinbox);
 
     // only set step size if greater than default (1), otherwise
     // this will screw up the single-step/jump behavior of the MythSpinBox
     if (1 < step)
-        spinbox->setLineStep(step);
+        spinbox->setSingleStep(step);
     spinbox->setValue(intValue());
     if (!svtext.isEmpty())
         spinbox->setSpecialValueText(svtext);
@@ -621,7 +625,7 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
         cbwidget->insertItem(labels[i]);
 
     if (isSet)
-        cbwidget->setCurrentItem(current);
+        cbwidget->setCurrentIndex(current);
 
     if (1 < step)
         cbwidget->setStep(step);
@@ -701,14 +705,14 @@ void ComboBoxSetting::setValue(QString newValue)
     {
         Setting::setValue(newValue);
         if (cbwidget)
-            cbwidget->setCurrentItem(current);
+            cbwidget->setCurrentIndex(current);
     }
 };
 
 void ComboBoxSetting::setValue(int which)
 {
     if (cbwidget)
-        cbwidget->setCurrentItem(which);
+        cbwidget->setCurrentIndex(which);
     SelectSetting::setValue(which);
 };
 
@@ -723,7 +727,7 @@ void ComboBoxSetting::addSelection(
     SelectSetting::addSelection(label, value, select);
 
     if (cbwidget && isSet)
-        cbwidget->setCurrentItem(current);
+        cbwidget->setCurrentIndex(current);
 }
 
 bool ComboBoxSetting::removeSelection(const QString &label, QString value)
@@ -734,11 +738,11 @@ bool ComboBoxSetting::removeSelection(const QString &label, QString value)
 
     for (uint i = 0; ((int) i) < cbwidget->count(); i++)
     {
-        if (cbwidget->text(i) == label)
+        if (cbwidget->itemText(i) == label)
         {
             cbwidget->removeItem(i);
             if (isSet)
-                cbwidget->setCurrentItem(current);
+                cbwidget->setCurrentIndex(current);
             return true;
         }
     }
@@ -833,11 +837,14 @@ void DateSetting::setValue(const QDate& newValue) {
 QWidget *RadioSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                     const char* widgetName)
 {
-    QGroupBox* widget = new QGroupBox(parent, widgetName);
+    QGroupBox* widget = new QGroupBox(parent);
+    widget->setObjectName(widgetName);
     widget->setTitle(getLabel());
 
     for( unsigned i = 0 ; i < labels.size() ; ++i ) {
-        QRadioButton* button = new QRadioButton(widget, NULL);
+        QRadioButton *button = new QRadioButton(widget);
+        button->setObjectName(
+            (QString(widgetName) + QString::number(i)).toAscii().constData());
         button->setText(labels[i]);
         if (isSet && i == current)
             button->setDown(true);
@@ -1110,7 +1117,7 @@ void ImageSelectSetting::imageSet(int num)
     temp = temp.scaled((int)(184 * m_hmult), (int)(138 * m_hmult),
                         Qt::KeepAspectRatio);
 
-    QPixmap tmppix(temp);
+    QPixmap tmppix = QPixmap::fromImage(temp);
     imagelabel->setPixmap(tmppix);
 }
 
@@ -1160,7 +1167,7 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
         combo->insertItem(labels[i]);
 
     if (isSet)
-        combo->setCurrentItem(current);
+        combo->setCurrentIndex(current);
     else
         current = 0;
 
@@ -1170,7 +1177,7 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
         temp = temp.scaled((int)(184 * m_hmult), (int)(138 * m_hmult),
                             Qt::KeepAspectRatio);
  
-        QPixmap tmppix(temp);
+        QPixmap tmppix = QPixmap::fromImage(temp);
         imagelabel->setPixmap(tmppix);
     }
     else

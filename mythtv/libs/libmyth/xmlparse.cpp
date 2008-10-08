@@ -821,7 +821,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
 
     int jst = Qt::AlignLeft | Qt::AlignTop;
     if (multiline == true)
-        jst = Qt::WordBreak;
+        jst = Qt::TextWordWrap;
 
     if (!align.isNull() && !align.isEmpty())
     {
@@ -1063,7 +1063,7 @@ void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
 
     int jst = Qt::AlignLeft | Qt::AlignTop;
     if (multiline == true)
-        jst = Qt::WordBreak;
+        jst = Qt::TextWordWrap;
 
     if (!align.isNull() && !align.isEmpty())
     {
@@ -1246,7 +1246,7 @@ void XMLParse::normalizeRect(QRect &rect)
     rect.setHeight((int)(rect.height() * hmult));
     rect.moveTopLeft(QPoint((int)(rect.x() * wmult),
                              (int)(rect.y() * hmult)));
-    rect = rect.normalize();
+    rect = rect.normalized();
 }
 
 QPoint XMLParse::parsePoint(QString text)
@@ -1529,7 +1529,7 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
         text->SetContext(context);
     }
     if (multiline.toLower() == "yes")
-        text->SetJustification(Qt::WordBreak);
+        text->SetJustification(Qt::TextWordWrap);
     if (!value.isNull() && !value.isEmpty())
         text->SetText(value);
     if (cutdown.toLower() == "no")
@@ -1541,7 +1541,7 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
         int jst = (Qt::AlignTop | Qt::AlignLeft);
         if (multiline.toLower() == "yes")
         {
-            jst = Qt::WordBreak;
+            jst = Qt::TextWordWrap;
         }
         if (align.toLower() == "center")
             text->SetJustification(jst | Qt::AlignCenter);

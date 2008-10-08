@@ -683,7 +683,8 @@ void MythRemoteLineEdit::startCycle(QString current_choice, QString set)
         return;
     }
 
-    cycle_timer->start(cycle_time, true);
+    cycle_timer->setSingleShot(true);
+    cycle_timer->start(cycle_time);
     active_cycle = true;
 
     QTextCursor pre_cycle_cursor = textCursor();
@@ -1248,7 +1249,8 @@ void MythPushButton::keyReleaseEvent(QKeyEvent *e)
         QString action = actions[i];
         if (action == "SELECT")
         {
-            QKeyEvent tempe(QEvent::KeyRelease, Qt::Key_Space, ' ', 0, " ");
+            QKeyEvent tempe(QEvent::KeyRelease, Qt::Key_Space,
+                            Qt::NoModifier, " ");
             QPushButton::keyReleaseEvent(&tempe);
             handled = true;
         }
@@ -1418,7 +1420,7 @@ void MythListBox::keyPressEvent(QKeyEvent* e)
                 else
                     key = Qt::Key_unknown;
 
-                QKeyEvent ev(QEvent::KeyPress, key, 0, Qt::NoButton);
+                QKeyEvent ev(QEvent::KeyPress, key, Qt::NoModifier);
                 QListWidget::keyPressEvent(&ev);
                 handled = true;
             }

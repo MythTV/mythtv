@@ -214,7 +214,7 @@ class AlphaBlender
     ~AlphaBlender();
     void init(unsigned char alpha = 96, unsigned int cacheSize = 30);
     void addColor(const QColor &color);
-    void blendImage(const QImage &image, const QColor &color);
+    void blendImage(QImage &image, const QColor &color);
 
   private:
     AlphaTableMap::iterator AddColorInternal(const QColor &color);

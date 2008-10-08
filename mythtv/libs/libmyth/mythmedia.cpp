@@ -383,7 +383,8 @@ bool MythMediaDevice::findMountPath()
             if (link[0] == '/') // absolute link
                 deviceNames.push_back(link);
             else // relative link..
-                deviceNames.push_back(fi.dir(true).absPath() + "/" + link);
+                deviceNames.push_back(fi.absoluteDir().absolutePath()
+                                      + "/" + link);
         }
 
 

@@ -22,8 +22,9 @@ using namespace std;
 ManagedListItem::ManagedListItem(
     const QString& startingText, ManagedList* _parentList,
     QObject* _parent, const char* _name)
-    : QObject(_parent, _name)
+    : QObject(_parent)
 {
+    setObjectName(_name);
     text = startingText;
     listIndex = 0;
     curState = MLS_NORMAL;
@@ -425,7 +426,7 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label,
     if (!found)
     {
         ManagedListItem* newItem = new ManagedListItem(
-            label, parentList, this, label);
+            label, parentList, this, label.toAscii().constData());
         newItem->setValue(value);
         addItem(newItem);
         ret = newItem;
@@ -463,7 +464,7 @@ ManagedListItem* SelectManagedListItem::addButton(const QString& label,
                                                   QString value, bool selectit)
 {
     ManagedListItem* newItem = new ManagedListItem(
-        label, parentList, this, label);
+        label, parentList, this, label.toAscii().constData());
     newItem->setValue(value);
     addItem(newItem);
 
@@ -587,8 +588,8 @@ void SelectManagedListItem::buttonSelected(ManagedListItem* itm)
 // ManagedList
 //
 ///////////////////////////////////////////////////////////////////////////////
-ManagedList::ManagedList(MythDialog* parent, const char* name)
-           : QObject(parent, name)
+ManagedList::ManagedList(MythDialog* parent, const char* name) :
+    QObject(parent)
 {
     setObjectName(name);
     listRect = QRect(0, 0, 0, 0);
@@ -597,6 +598,10 @@ ManagedList::ManagedList(MythDialog* parent, const char* name)
     locked = false;
 }
 
+ManagedListItem *ManagedList::getItem(const QString &itemName)
+{
+    return (ManagedListItem*)child(itemName);
+}
 
 void ManagedList::paintEvent(const QRect& r, QPainter *p, bool force)
 {

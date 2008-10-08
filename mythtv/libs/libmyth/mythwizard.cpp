@@ -1,3 +1,5 @@
+#ifdef QT3SUPPORT
+
 /****************************************************************************
 ** 
 **
@@ -644,3 +646,4 @@ MythJumpWizard::MythJumpWizard(MythMainWindow *parent, const char *name) :
 MythJumpWizard::~MythJumpWizard()
 {
 }
+#endif // QT3SUPPORT

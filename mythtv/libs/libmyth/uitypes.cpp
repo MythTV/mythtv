@@ -9,9 +9,11 @@ using namespace std;
 #include <QApplication>
 #include <QPainter>
 #include <QLabel>
-#include <Q3PtrList>
+
+#ifdef QT3SUPPORT
 #include <q3simplerichtext.h>
 #include <q3stylesheet.h>
+#endif // QT3SUPPORT
 
 using namespace std;
 
@@ -321,7 +323,7 @@ QString UIType::cutDown(const QString &data, QFont *testFont, bool multiline,
     if (overload_height != -1)
         maxheight = overload_height;
 
-    int justification = Qt::AlignLeft | Qt::WordBreak;
+    int justification = Qt::AlignLeft | Qt::TextWordWrap;
     QFontMetrics fm(*testFont);
 
     int margin = length - 1;
@@ -450,9 +452,9 @@ void UIBarType::LoadImage(int loc, QString myFile)
     scalerImg = sourceImg.scaled(doX, doY, Qt::IgnoreAspectRatio,
                                 Qt::SmoothTransformation);
     if (loc == -1)
-        m_image.convertFromImage(scalerImg);
+        m_image = QPixmap::fromImage(scalerImg);
     else
-        iconData[loc].convertFromImage(scalerImg);
+        iconData[loc] = QPixmap::fromImage(scalerImg);
 
     if (m_debug == true)
         VERBOSE(VB_IMPORTANT, "     -Image: " << file << " loaded.");
@@ -461,7 +463,7 @@ void UIBarType::LoadImage(int loc, QString myFile)
 error:
     if (m_debug == true)
         VERBOSE(VB_IMPORTANT, "     -Image: " << file << " failed to load.");
-    iconData[loc].resize(0, 0);
+    iconData[loc] = QPixmap(0,0);
 }
 
 void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
@@ -578,7 +580,7 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
         if (m_debug == true)
         {
             cerr << "    +UIBarType::Drawing @ (" << drawx << ", " << drawy << ")" << endl;
-            cerr << "     +UIBarType::Data = " << (const char *)msg << endl;
+            cerr << "     +UIBarType::Data = " << msg.toAscii().constData() << endl;
         }
         dr->drawText(drawx + m_textoffset.x(), drawy + m_textoffset.y(),
                      xdrop - m_textoffset.x(), ydrop - (int)(2 * m_textoffset.y()),
@@ -635,7 +637,7 @@ UIGuideType::~UIGuideType()
 void UIGuideType::SetJustification(int jst)
 {
     justification = jst;
-    multilineText = (justification & Qt::WordBreak) > 0;
+    multilineText = (justification & Qt::TextWordWrap) > 0;
 }
 
 void UIGuideType::Draw(QPainter *dr, int drawlayer, int context)
@@ -743,7 +745,7 @@ void UIGuideType::drawBox(QPainter *dr, UIGTCon *data, const QColor &color)
         QPixmap orig(area.width(), area.height());
         orig.fill(window, screenloc.x() + area.left(),
                             screenloc.y() + area.top());
-        QImage tmpimg = orig.convertToImage();
+        QImage tmpimg = orig.toImage();
 
         alphaBlender.blendImage(tmpimg, color);
         dr->drawImage(area.left(), area.top(), tmpimg);
@@ -1019,7 +1021,7 @@ AlphaTableMap::iterator AlphaBlender::AddColorInternal(const QColor &color)
     return it;
 }
 
-void AlphaBlender::blendImage(const QImage &image, const QColor &color)
+void AlphaBlender::blendImage(QImage &image, const QColor &color)
 {
     AlphaTableMap::const_iterator table = AddColorInternal(color);
 
@@ -1028,7 +1030,7 @@ void AlphaBlender::blendImage(const QImage &image, const QColor &color)
     const unsigned char *b = (*table).b;
 
     int size = image.height() * image.width();
-    uchar *data = (uchar *)(*image.jumpTable());
+    uchar *data = image.bits();
 
     for (int i = 0; i < size; i++)
     {
@@ -1468,7 +1470,7 @@ void UIImageType::LoadImage()
                                             Qt::IgnoreAspectRatio,
                                             Qt::SmoothTransformation);
             m_show = true;
-            img.convertFromImage(scalerImg);
+            img = QPixmap::fromImage(scalerImg);
             if (m_debug == true)
                 VERBOSE(VB_GENERAL, "     -Image: " << file << " loaded.");
         }
@@ -1884,7 +1886,7 @@ void UIImageGridType::removeItem(int itemNo)
 void UIImageGridType::setJustification(int jst)
 {
     justification = jst;
-    multilineText = (justification & Qt::WordBreak) > 0;
+    multilineText = (justification & Qt::TextWordWrap) > 0;
 }
 
 bool UIImageGridType::handleKeyPress(QString action)
@@ -2215,13 +2217,15 @@ QPixmap *UIImageGridType::createScaledPixmap(QString filename,
         QImage *img = GetMythUI()->LoadScaleImage(filename);
         if (!img)
         {
-            cout << "Failed to load image" << (const char *)filename << endl;
+            cout << "Failed to load image"
+                 << filename.toAscii().constData() << endl;
             return NULL;
         }
         else
         {
-            pixmap = new QPixmap(img->scaled(width, height, mode,
-                                            Qt::SmoothTransformation));
+            img->scaled(width, height, mode,
+                        Qt::SmoothTransformation);
+            pixmap = new QPixmap(QPixmap::fromImage(*img));
             delete img;
         }
     }
@@ -2331,7 +2335,7 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
         if (drawlayer == m_order)
         {
             bool m_multi = false;
-            if ((m_justification & Qt::WordBreak) > 0)
+            if ((m_justification & Qt::TextWordWrap) > 0)
                 m_multi = true;
             QPoint fontdrop = m_font->shadowOffset;
             QString msg = m_message;
@@ -2403,6 +2407,7 @@ void UITextType::calculateScreenArea()
 
 // ******************************************************************
 
+#ifdef QT3SUPPORT
 UIRichTextType::UIRichTextType(const QString &name, fontProp *font,
                        const QString &text, int dorder, QRect displayrect,
                        QRect textrect)
@@ -2645,6 +2650,7 @@ void UIRichTextType::looseFocus()
     loadBackgroundImg(needreload);
     if (needreload) updateBackground();
 }
+#endif // QT3SUPPORT
 
 // ******************************************************************
 
@@ -3610,18 +3616,20 @@ void UIManagedTreeListType::makeHighlights()
     {
         if (selectScale)
         {
-            QImage temp_image = highlight_image.convertToImage();
-            QPixmap *temp_pixmap = new QPixmap();
+            QImage temp_image = highlight_image.toImage();
             fontProp *tmpfont = NULL;
             QString a_string = QString("bin%1-active").arg(i);
             tmpfont = &m_fontfcns[m_fonts[a_string]];
-            temp_pixmap->convertFromImage(
-                    temp_image.scaled(bin_corners[i].width(),
-                        QFontMetrics(tmpfont->face).height() + selectPadding,
-                        Qt::IgnoreAspectRatio,
-                        Qt::SmoothTransformation));
-            resized_highlight_images.append(temp_pixmap);
-            highlight_map[i] = temp_pixmap;
+            QPixmap temp_pixmap = QPixmap::fromImage(
+                temp_image.scaled(
+                    bin_corners[i].width(),
+                    QFontMetrics(tmpfont->face).height() + selectPadding,
+                    Qt::IgnoreAspectRatio,
+                    Qt::SmoothTransformation));
+
+            QPixmap *new_pixmap = new QPixmap(temp_pixmap);
+            resized_highlight_images.append(new_pixmap);
+            highlight_map[i] = new_pixmap;
         }
         else
         {
@@ -3635,19 +3643,19 @@ void UIManagedTreeListType::makeHighlights()
 
     if (selectScale)
     {
-        QImage temp_image = highlight_image.convertToImage();
-        QPixmap *temp_pixmap = new QPixmap();
+        QImage temp_image = highlight_image.toImage();
         fontProp *tmpfont = NULL;
         QString a_string = QString("bin%1-active").arg(bins);
         tmpfont = &m_fontfcns[m_fonts[a_string]];
-        temp_pixmap->convertFromImage(
+        QPixmap temp_pixmap = QPixmap::fromImage(
             temp_image.scaled(
                 area.width(),
                 QFontMetrics(tmpfont->face).height() + selectPadding,
                 Qt::IgnoreAspectRatio,
                 Qt::SmoothTransformation));
-        resized_highlight_images.append(temp_pixmap);
-        highlight_map[0] = temp_pixmap;
+        QPixmap *new_pixmap = new QPixmap(temp_pixmap);
+        resized_highlight_images.append(new_pixmap);
+        highlight_map[0] = new_pixmap;
     }
     else
     {
@@ -3920,7 +3928,7 @@ bool UIManagedTreeListType::incSearchStart(void)
     if (kDialogCodeButton0 == res)
     {
         incSearch = searchEdit->text();
-        bIncSearchContains = (modeCombo->currentItem() == 1);
+        bIncSearchContains = (modeCombo->currentIndex() == 1);
         incSearchNext();
     }
 
@@ -4454,7 +4462,8 @@ void UIPushButtonType::push()
         return;
     }
 
-    push_timer.start(300, TRUE);
+    push_timer.setSingleShot(true);
+    push_timer.start(300);
 
     emit pushed();
 }
@@ -4573,7 +4582,8 @@ void UITextButtonType::push()
         return;
     }
     currently_pushed = true;
-    push_timer.start(300, TRUE);
+    push_timer.setSingleShot(true);
+    push_timer.start(300);
     refresh();
     emit pushed();
 }
@@ -4863,7 +4873,8 @@ void UISelectorType::push(bool up_or_down)
         return;
     }
     currently_pushed = true;
-    push_timer.start(300, TRUE);
+    push_timer.setSingleShot(true);
+    push_timer.start(300);
 
     if (current_data)
     {
@@ -5093,7 +5104,7 @@ QString UIKeyType::decodeChar(QString c)
             }
             else
                 cout <<  "UIKeyType::decodeChar - bad char code "
-                     <<  "(" << (const char *)sCode << ")" << endl;
+                     <<  "(" << sCode.toAscii().constData() << ")" << endl;
         }
         else
         {
@@ -5165,7 +5176,8 @@ void UIKeyType::push()
         return;
 
     m_bDown = true;
-    m_pushTimer.start(300, TRUE);
+    m_pushTimer.setSingleShot(true);
+    m_pushTimer.start(300);
     refresh();
     emit pushed();
 }
@@ -5365,7 +5377,8 @@ void UIKeyboardType::leftCursor()
     }
     else
     {
-        QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Left, 0, 0, "", false, 1);
+        QKeyEvent *key = new QKeyEvent(
+            QEvent::KeyPress, Qt::Key_Left, Qt::NoModifier, "", false, 1);
         QApplication::postEvent(m_parentEdit, key);
     }
 }
@@ -5387,7 +5400,8 @@ void UIKeyboardType::rightCursor()
     }
     else
     {
-        QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Right, 0, 0, "", false, 1);
+        QKeyEvent *key = new QKeyEvent(
+            QEvent::KeyPress, Qt::Key_Right, Qt::NoModifier, "", false, 1);
         QApplication::postEvent(m_parentEdit, key);
     }
 }
@@ -5409,7 +5423,8 @@ void UIKeyboardType::backspaceKey()
     }
     else
     {
-        QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Backspace, 0, 0, "", false, 1);
+        QKeyEvent *key = new QKeyEvent(
+            QEvent::KeyPress, Qt::Key_Backspace, Qt::NoModifier, "", false, 1);
         QApplication::postEvent(m_parentEdit, key);
     }
 }
@@ -5431,7 +5446,8 @@ void UIKeyboardType::delKey()
     }
     else
     {
-        QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Qt::Key_Delete, 0, 0, "", false, 1);
+        QKeyEvent *key = new QKeyEvent(
+            QEvent::KeyPress, Qt::Key_Delete, Qt::NoModifier, "", false, 1);
         QApplication::postEvent(m_parentEdit, key);
     }
 }
@@ -5479,7 +5495,11 @@ void UIKeyboardType::insertChar(QString c)
         }
         else
         {
+#ifdef QT3_SUPPORT
             QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, 0, 0, 0, c, false, c.length());
+#else // if !QT3_SUPPORT
+            QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier, c, false, c.length());
+#endif //!QT3_SUPPORT
             QApplication::postEvent(m_parentEdit, key);
         }
     }
@@ -5505,7 +5525,15 @@ void UIKeyboardType::insertChar(QString c)
                     }
                     else
                     {
-                        QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, 0, 0, 0, comps[i][2], false, comps[i][2].length());
+#ifdef QT3_SUPPORT
+                        QKeyEvent *key = new QKeyEvent(
+                            QEvent::KeyPress, 0, 0, 0,
+                            comps[i][2], false, comps[i][2].length());
+#else // if !QT3_SUPPORT
+                        QKeyEvent *key = new QKeyEvent(
+                            QEvent::KeyPress, 0, Qt::NoModifier,
+                            comps[i][2], false, comps[i][2].length());
+#endif // !QT3_SUPPORT
                         QApplication::postEvent(m_parentEdit, key);
                     }
 

@@ -289,7 +289,7 @@ void StorageGroup::CheckAllStorageGroupDirs(void)
         else
         {
             testFile.setFileName(dirname + "/.test");
-            if (testFile.open(IO_WriteOnly))
+            if (testFile.open(QIODevice::WriteOnly))
                 testFile.remove();
             else
                 VERBOSE(VB_IMPORTANT,
@@ -344,7 +344,7 @@ class StorageGroupPopup
 SGPopupResult StorageGroupPopup::showPopup(MythMainWindow *parent,
                                  QString title, QString message, QString& text)
 {
-    MythPopupBox *popup = new MythPopupBox(parent, title);
+    MythPopupBox *popup = new MythPopupBox(parent, title.toAscii().constData());
     popup->addLabel(message);
 
     MythLineEdit *textEdit = new MythLineEdit(popup, "chooseEdit");

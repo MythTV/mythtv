@@ -1,8 +1,10 @@
 #include <algorithm>
+#include <QGroupBox>
 
+#ifdef QT3SUPPORT
 #include <q3widgetstack.h>
 #include <q3tabdialog.h>
-#include <QGroupBox>
+#endif // QT3SUPPORT
 
 #include "mythconfiggroups.h"
 #include "mythcontext.h"
@@ -325,6 +327,7 @@ QWidget* GridConfigurationGroup::configWidget(
     return widget;
 }
 
+#ifdef QT3SUPPORT
 StackedConfigurationGroup::~StackedConfigurationGroup()
 {
     clear_widgets(children, childwidget);
@@ -446,6 +449,7 @@ void StackedConfigurationGroup::Save(QString destination)
     else if (top < children.size())
         children[top]->GetStorage()->Save(destination);
 }
+#endif // QT3SUPPORT
 
 void TriggeredConfigurationGroup::addChild(Configurable* child)
 {
@@ -661,6 +665,7 @@ void TriggeredConfigurationGroup::widgetInvalid(QObject *obj)
     widget = (widget == obj) ? NULL : widget;
 }
 
+#ifdef QT3SUPPORT
 QWidget* TabbedConfigurationGroup::configWidget(ConfigurationGroup *cg, 
                                                 QWidget* parent,
                                                 const char* widgetName) 
@@ -680,6 +685,7 @@ QWidget* TabbedConfigurationGroup::configWidget(ConfigurationGroup *cg,
 
     return widget;
 };
+#endif
 
 JumpPane::JumpPane(const QStringList &labels, const QStringList &helptext) :
     VerticalConfigurationGroup(true, false, true, true)
