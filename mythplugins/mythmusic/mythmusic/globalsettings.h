@@ -3,9 +3,11 @@
 
 #include "mythtv/settings.h"
 #include "mythtv/mythcontext.h"
-//Added by qt3to4:
-#include <QKeyEvent>
-#include <QEvent>
+
+class QKeyEvent;
+class QEvent;
+class Q3MythListView;
+class Q3ListViewItem;
 
 class MusicGeneralSettings : public ConfigurationWizard
 {
@@ -63,8 +65,8 @@ class VisualizationsEditor : public MythDialog
     private:
     void fillWidgets(const QString &currentSelection);
 
-    MythListView   *availableList;
-    MythListView   *selectedList;
+    Q3MythListView *availableList;
+    Q3MythListView *selectedList;
 };
 
 #endif

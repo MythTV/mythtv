@@ -177,10 +177,11 @@ void LogViewer::updateClicked(void)
 
     if (list.count() > 0)
     {
-        bool bUpdateCurrent = m_listbox->currentItem() == (int) m_listbox->count() - 1;
+        bool bUpdateCurrent = m_listbox->currentRow() ==
+            (int) m_listbox->count() - 1;
         m_listbox->insertStringList(list);
         if (bUpdateCurrent)
-            m_listbox->setCurrentItem(m_listbox->count() - 1);
+            m_listbox->setCurrentRow(m_listbox->count() - 1);
     }
 
     bool bRunning = (getSetting("MythArchiveLastRunStatus") == "Running");

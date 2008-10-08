@@ -19,6 +19,8 @@ using namespace std;
 
 #include "smartplaylist.h"
 #include "metadata.h"
+#include "mythlistview-qt3.h"
+#include "mythlistbox-qt3.h"
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/dialogbox.h>
@@ -1692,7 +1694,7 @@ SmartPLResultViewer::SmartPLResultViewer(MythMainWindow *parent, const char *nam
 
     // listview
     hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-    listView = new MythListView(this);
+    listView = new Q3MythListView(this);
     listView->addColumn(tr("ID"));
     listView->addColumn(tr("Artist"));
     listView->addColumn(tr("Album"));
@@ -1794,7 +1796,7 @@ SmartPlaylistDialog::SmartPlaylistDialog(MythMainWindow *parent, const char *nam
 
     // listbox
     hbox = new Q3HBoxLayout(vbox, (int)(5 * hmult));
-    listbox = new MythListBox(this);
+    listbox = new Q3MythListBox(this);
     listbox->setScrollBar(false);
     listbox->setBottomScrollBar(false);
     hbox->addWidget(listbox);
@@ -2104,7 +2106,7 @@ SmartPLOrderByDialog::SmartPLOrderByDialog(MythMainWindow *parent, const char *n
 
     // listbox
     hbox = new Q3HBoxLayout(vbox, (int)(5 * hmult));
-    listbox = new MythListBox(this);
+    listbox = new Q3MythListBox(this);
     listbox->setScrollBar(false);
     listbox->setBottomScrollBar(false);
     hbox->addWidget(listbox);
