@@ -1837,6 +1837,9 @@ if ! enabled cpu_override && enabled proc_opt; then
 # Reportedly Intel Duo, but we assume 32 bit P3 due to generic name
    elif expr "$processor" : ".*Genuine.*Intel.*CPU" > /dev/null ; then
        cpu="pentium3"
+# Pentium-M derivative in AppleTV, assume 32 bit P3 due to generic name
+   elif expr "$processor" : ".*Genuine.*Intel.*processor" > /dev/null ; then
+       cpu="pentium3"
 # P4
    elif expr "$processor" : ".*Xeon(TM) CPU" > /dev/null ; then
        cpu="pentium4"
