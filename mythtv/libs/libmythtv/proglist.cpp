@@ -457,7 +457,7 @@ void ProgLister::chooseListBoxChanged(void)
     if (!chooseListBox)
         return;
 
-    int view = chooseListBox->currentItem() - 1;
+    int view = chooseListBox->currentRow() - 1;
 
     if (chooseLineEdit)
     {
@@ -477,7 +477,7 @@ void ProgLister::chooseListBoxChanged(void)
 
 void ProgLister::updateKeywordInDB(const QString &text)
 {
-    int oldview = chooseListBox->currentItem() - 1;
+    int oldview = chooseListBox->currentRow() - 1;
     int newview = viewList.findIndex(text);
 
     QString qphrase = NULL;
@@ -629,7 +629,7 @@ void ProgLister::deleteKeyword(void)
     if (!chooseDeleteButton || !chooseListBox)
         return;
 
-    int view = chooseListBox->currentItem() - 1;
+    int view = chooseListBox->currentRow() - 1;
 
     if (view < 0)
         return;
@@ -644,7 +644,7 @@ void ProgLister::deleteKeyword(void)
     query.bindValue(":TYPE", searchtype);
     query.exec();
 
-    chooseListBox->removeItem(view + 1);
+    chooseListBox->removeRow(view + 1);
     viewList.remove(text);
     viewTextList.remove(text);
 
@@ -656,7 +656,7 @@ void ProgLister::deleteKeyword(void)
     if (view >= (int)chooseListBox->count() - 1)
         view = chooseListBox->count() - 2;
 
-    chooseListBox->setSelected(view + 1, true);
+    chooseListBox->setCurrentRow(view + 1, QItemSelectionModel::Select);
 
     if (viewList.count() < 1 && chooseLineEdit)
         chooseLineEdit->setFocus();
@@ -711,13 +711,11 @@ void ProgLister::chooseView(void)
         choosePopup->addLabel(msg);
 
         chooseListBox = new MythListBox(choosePopup);
-        chooseListBox->setScrollBar(false);
-        chooseListBox->setBottomScrollBar(false);
         chooseListBox->insertStringList(viewTextList);
         if (curView < 0)
-            chooseListBox->setCurrentItem(0);
+            chooseListBox->setCurrentRow(0, QItemSelectionModel::Select);
         else
-            chooseListBox->setCurrentItem(curView);
+            chooseListBox->setCurrentRow(curView, QItemSelectionModel::Select);
         choosePopup->addWidget(chooseListBox);
 
         if (type == plCategory)
@@ -744,14 +742,12 @@ void ProgLister::chooseView(void)
         choosePopup->addLabel(tr("Select Phrase"));
 
         chooseListBox = new MythListBox(choosePopup);
-        chooseListBox->setScrollBar(false);
-        chooseListBox->setBottomScrollBar(false);
         chooseListBox->insertItem(tr("<New Phrase>"));
         chooseListBox->insertStringList(viewTextList);
         if (curView < 0)
-            chooseListBox->setCurrentItem(0);
+            chooseListBox->setCurrentRow(0);
         else
-            chooseListBox->setCurrentItem(curView + 1);
+            chooseListBox->setCurrentRow(curView + 1);
         choosePopup->addWidget(chooseListBox);
 
         chooseLineEdit = new MythRemoteLineEdit(choosePopup);
@@ -821,14 +817,14 @@ void ProgLister::chooseView(void)
         choosePopup->addLabel(tr("Select Search"));
 
         chooseListBox = new MythListBox(choosePopup);
-        chooseListBox->setScrollBar(false);
-        chooseListBox->setBottomScrollBar(false);
         chooseListBox->insertItem(tr("<New Search>"));
         chooseListBox->insertStringList(viewTextList);
         if (curView < 0)
-            chooseListBox->setCurrentItem(0);
+            chooseListBox->setCurrentRow(0, QItemSelectionModel::Select);
         else
-            chooseListBox->setCurrentItem(curView + 1);
+            chooseListBox->setCurrentRow(
+                curView + 1, QItemSelectionModel::Select);
+
         choosePopup->addWidget(chooseListBox);
 
         chooseEditButton = new MythPushButton(choosePopup);
@@ -934,7 +930,7 @@ void ProgLister::chooseView(void)
 
 void ProgLister::powerEdit()
 {
-    int view = chooseListBox->currentItem() - 1;
+    int view = chooseListBox->currentRow() - 1;
     QString text = ":::::";
 
     if (view >= 0)

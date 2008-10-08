@@ -337,7 +337,7 @@ void PreviousList::setViewFromList(void)
     if (!choosePopup || !chooseListBox)
         return;
 
-    int view = chooseListBox->currentItem();
+    int view = chooseListBox->currentRow();
 
     choosePopup->AcceptItem(view);
 
@@ -359,13 +359,11 @@ void PreviousList::chooseView(void)
     choosePopup->addLabel(tr("Select Sort Order"));
 
     chooseListBox = new MythListBox(choosePopup);
-    chooseListBox->setScrollBar(false);
-    chooseListBox->setBottomScrollBar(false);
     chooseListBox->insertStringList(viewTextList);
     if (curView < 0)
-        chooseListBox->setCurrentItem(0);
+        chooseListBox->setCurrentRow(0);
     else
-        chooseListBox->setCurrentItem(curView);
+        chooseListBox->setCurrentRow(curView);
     choosePopup->addWidget(chooseListBox);
 
     connect(chooseListBox, SIGNAL(accepted(int)), this, SLOT(setViewFromList()));

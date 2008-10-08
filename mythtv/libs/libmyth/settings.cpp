@@ -916,25 +916,25 @@ void AutoIncrementDBSetting::Save(void)
 void ListBoxSetting::setEnabled(bool b)
 {
     Configurable::setEnabled(b);
-    if (widget)
-        widget->setEnabled(b);
+    if (lbwidget)
+        lbwidget->setEnabled(b);
 }
 
 void ListBoxSetting::clearSelections(void)
 {
     SelectSetting::clearSelections();
-    if (widget)
-        widget->clear();
+    if (lbwidget)
+        lbwidget->clear();
 }
 
 void ListBoxSetting::addSelection(
     const QString &label, QString value, bool select)
 {
     SelectSetting::addSelection(label, value, select);
-    if (widget)
+    if (lbwidget)
     {
-        widget->insertItem(label);
-        //widget->triggerUpdate(true);
+        lbwidget->insertItem(label);
+        //lbwidget->triggerUpdate(true);
     }
 };
 
@@ -943,9 +943,9 @@ bool ListBoxSetting::ReplaceLabel(
 {
     int i = getValueIndex(value);
 
-    if ((i >= 0) && SelectSetting::ReplaceLabel(label, value) && widget)
+    if ((i >= 0) && SelectSetting::ReplaceLabel(label, value) && lbwidget)
     {
-        widget->changeItem(new_label, i);
+        lbwidget->changeItem(new_label, i);
         return true;
     }
 
@@ -955,55 +955,61 @@ bool ListBoxSetting::ReplaceLabel(
 QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                       const char* widgetName)
 {
-    QWidget* box = new Q3VBox(parent, widgetName);
-    box->setBackgroundOrigin(QWidget::WindowOrigin);
+    QWidget *widget = new QWidget(parent);
+    widget->setObjectName(widgetName);
+
+    QVBoxLayout *layout = new QVBoxLayout();
 
     if (getLabel() != "")
     {
-        QLabel* label = new QLabel(box);
+        QLabel *label = new QLabel();
         label->setText(getLabel());
-        label->setBackgroundOrigin(QWidget::WindowOrigin);
+        layout->addWidget(label);
     }
 
-    bxwidget = box;
+    bxwidget = widget;
     connect(bxwidget, SIGNAL(destroyed(QObject*)),
             this,     SLOT(widgetDeleted(QObject*)));
 
-    widget = new MythListBox(box);
-    widget->setBackgroundOrigin(QWidget::WindowOrigin);
-    widget->setHelpText(getHelpText());
+    lbwidget = new MythListBox(NULL);
+    lbwidget->setHelpText(getHelpText());
     if (eventFilter)
-        widget->installEventFilter(eventFilter);
+        lbwidget->installEventFilter(eventFilter);
 
     for(unsigned int i = 0 ; i < labels.size() ; ++i) {
-        widget->insertItem(labels[i]);
+        lbwidget->insertItem(labels[i]);
         if (isSet && current == i)
-            widget->setCurrentItem(i);
+            lbwidget->setCurrentRow(i);
     }
 
-    connect(this, SIGNAL(selectionsCleared()),
-            widget, SLOT(clear()));
-    connect(widget, SIGNAL(accepted(int)),
-            this, SIGNAL(accepted(int)));
-    connect(widget, SIGNAL(menuButtonPressed(int)),
-            this, SIGNAL(menuButtonPressed(int)));
-    connect(widget, SIGNAL(editButtonPressed(int)),
-            this, SIGNAL(editButtonPressed(int)));
-    connect(widget, SIGNAL(deleteButtonPressed(int)),
-            this, SIGNAL(deleteButtonPressed(int)));
-    connect(this, SIGNAL(valueChanged(const QString&)),
-            widget, SLOT(setCurrentItem(const QString&)));
-    connect(widget, SIGNAL(highlighted(int)),
-            this, SLOT(setValueByIndex(int)));
+    connect(this,     SIGNAL(selectionsCleared()),
+            lbwidget, SLOT(  clear()));
+    connect(this,     SIGNAL(valueChanged(const QString&)),
+            lbwidget, SLOT(  setCurrentItem(const QString&)));
+
+    connect(lbwidget, SIGNAL(accepted(int)),
+            this,     SIGNAL(accepted(int)));
+    connect(lbwidget, SIGNAL(menuButtonPressed(int)),
+            this,     SIGNAL(menuButtonPressed(int)));
+    connect(lbwidget, SIGNAL(editButtonPressed(int)),
+            this,     SIGNAL(editButtonPressed(int)));
+    connect(lbwidget, SIGNAL(deleteButtonPressed(int)),
+            this,     SIGNAL(deleteButtonPressed(int)));
+
+    connect(lbwidget, SIGNAL(highlighted(int)),
+            this,     SLOT(  setValueByIndex(int)));
 
     if (cg)
-        connect(widget, SIGNAL(changeHelpText(QString)), cg,
+        connect(lbwidget, SIGNAL(changeHelpText(QString)), cg,
                 SIGNAL(changeHelpText(QString)));
 
-    widget->setFocus();
-    widget->setSelectionMode(selectionMode);
+    lbwidget->setFocus();
+    lbwidget->setSelectionMode(selectionMode);
+    layout->addWidget(lbwidget);
 
-    return bxwidget;
+    widget->setLayout(layout);
+
+    return widget;
 }
 
 void ListBoxSetting::widgetInvalid(QObject *obj)
@@ -1011,15 +1017,15 @@ void ListBoxSetting::widgetInvalid(QObject *obj)
     if (bxwidget == obj)
     {
         bxwidget = NULL;
-        widget   = NULL;
+        lbwidget = NULL;
     }
 }
 
 void ListBoxSetting::setSelectionMode(MythListBox::SelectionMode mode)
 {
    selectionMode = mode;
-   if (widget)
-       widget->setSelectionMode(selectionMode);
+   if (lbwidget)
+       lbwidget->setSelectionMode(selectionMode);
 }
 
 void ListBoxSetting::setValueByIndex(int index)
@@ -1030,8 +1036,8 @@ void ListBoxSetting::setValueByIndex(int index)
 
 void ListBoxSetting::setHelpText(const QString &str)
 {
-    if (widget)
-        widget->setHelpText(str);
+    if (lbwidget)
+        lbwidget->setHelpText(str);
     SelectSetting::setHelpText(str);
 }
 
