@@ -296,7 +296,7 @@ void MythUIImage::SetCropRect(const MythRect &rect)
     SetRedraw();
 }
 
-QString MythUIImage::GenImageLabel(const QString &filename, int w, int h) 
+QString MythUIImage::GenImageLabel(const QString &filename, int w, int h)
 {
     QString imagelabel;
     QString s_Attrib;
@@ -314,7 +314,7 @@ QString MythUIImage::GenImageLabel(const QString &filename, int w, int h)
     return imagelabel;
 }
 
-QString MythUIImage::GenImageLabel(int w, int h) 
+QString MythUIImage::GenImageLabel(int w, int h)
 {
     return GenImageLabel(m_Filename, w, h);
 }
@@ -382,7 +382,7 @@ bool MythUIImage::Load(void)
             }
         }
 
-        if (bNeedLoad) 
+        if (bNeedLoad)
         {
 
             QString filename = m_Filename;
@@ -394,10 +394,10 @@ bool MythUIImage::Load(void)
             dstfile = GetMythUI()->GetThemeCacheDir() + "/" + imagelabel;
 
             QFile cachecheck(dstfile);
-            if (!cachecheck.exists()) 
+            if (!cachecheck.exists())
             {
                 if (!image->Load(filename))
-                {   
+                {
                     //VERBOSE(VB_FILE, QString("MythUIImage::Load Could not load :%1:").arg(filename));
                     image->DownRef();
                     SetRedraw();
@@ -421,12 +421,12 @@ bool MythUIImage::Load(void)
         {
             imagelabel = GenImageLabel(w,h);
         }
- 
+
         if (m_isReflected)
             image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
                            m_reflectLength);
 
-        if (bForceResize) 
+        if (bForceResize)
         {
             image->Resize(QSize(w, h), m_preserveAspect);
         }
@@ -438,13 +438,15 @@ bool MythUIImage::Load(void)
         }
 
         //Save scaled copy to disk, and cache
-        if ((!bFoundInCache) && (bNeedLoad)) {
+        if ((!bFoundInCache) && (bNeedLoad))
+        {
             VERBOSE(VB_FILE, QString("MythUIImage::Load Saved to Cache (%1)").arg(dstfile));
 
-	    // This would probably be better off somewhere else before any Load() calls at all.
+            // This would probably be better off somewhere else before any
+            // Load() calls at all.
             QDir themedir(GetMythUI()->GetThemeCacheDir());
-	    if (!themedir.exists())
-	        themedir.mkdir(GetMythUI()->GetThemeCacheDir());
+            if (!themedir.exists())
+                themedir.mkdir(GetMythUI()->GetThemeCacheDir());
 
             image->save(dstfile,"PNG");
         }
