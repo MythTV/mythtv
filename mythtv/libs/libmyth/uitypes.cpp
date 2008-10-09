@@ -5373,7 +5373,8 @@ void UIKeyboardType::leftCursor()
     else if (m_parentEdit->inherits("QTextEdit"))
     {
         QTextEdit *par = (QTextEdit *)m_parentEdit;
-        par->moveCursor(QTextEdit::MoveBackward, false);
+        par->textCursor().movePosition(
+            QTextCursor::PreviousCharacter, QTextCursor::MoveAnchor);
     }
     else
     {
@@ -5396,7 +5397,8 @@ void UIKeyboardType::rightCursor()
     else if (m_parentEdit->inherits("QTextEdit"))
     {
         QTextEdit *par = (QTextEdit *)m_parentEdit;
-        par->moveCursor(QTextEdit::MoveForward, false);
+        par->textCursor().movePosition(
+            QTextCursor::NextCharacter, QTextCursor::MoveAnchor);
     }
     else
     {

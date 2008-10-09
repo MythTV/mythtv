@@ -28,6 +28,9 @@ MythPlugin::MythPlugin(const QString &libname)
 
 MythPlugin::~MythPlugin()
 {
+    // Commented out because it causes segfaults... dtk 2008-10-08
+    //if (isLoaded())
+    //    unload();
 }
 
 int MythPlugin::init(const char *libversion)
@@ -156,7 +159,6 @@ bool MythPluginManager::init_plugin(const QString &plugname)
     if (!m_dict[newname])
     {
         m_dict.insert(newname, new MythPlugin(newname));
-        m_dict[newname]->setAutoUnload(true);
     }
    
     int result = m_dict[newname]->init(MYTH_BINARY_VERSION);

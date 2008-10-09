@@ -1153,19 +1153,19 @@ void MythRemoteLineEdit::popupVirtualKeyboard(void)
 
 void MythRemoteLineEdit::insert(QString text)
 {
-    QTextEdit::insert(text);
+    QTextEdit::insertPlainText(text);
     emit textChanged(toPlainText());
 }
 
 void MythRemoteLineEdit::del()
 {
-    doKeyboardAction(QTextEdit::ActionDelete);
+    textCursor().deleteChar();
     emit textChanged(toPlainText());
 }
 
 void MythRemoteLineEdit::backspace()
 {
-    doKeyboardAction(QTextEdit::ActionBackspace);
+    textCursor().deletePreviousChar();
     emit textChanged(toPlainText());
 }
 
@@ -1302,10 +1302,12 @@ void MythListBox::ensurePolished(void) const
     QListWidget::ensurePolished();
 
     QPalette pal = palette();
-    QColorGroup::ColorRole role = QColorGroup::Highlight;
-    pal.setColor(QPalette::Active, role, pal.active().button());
-    pal.setColor(QPalette::Inactive, role, pal.active().button());
-    pal.setColor(QPalette::Disabled, role, pal.active().button());
+    QPalette::ColorRole  nR = QPalette::Highlight;
+    QPalette::ColorGroup oA = QPalette::Active;
+    QPalette::ColorRole  oR = QPalette::Button;
+    pal.setColor(QPalette::Active,   nR, pal.color(oA,oR));
+    pal.setColor(QPalette::Inactive, nR, pal.color(oA,oR));
+    pal.setColor(QPalette::Disabled, nR, pal.color(oA,oR));
 
     const_cast<MythListBox*>(this)->setPalette(pal);
 }
@@ -1486,11 +1488,12 @@ void MythListBox::setHelpText(const QString &help)
 void MythListBox::focusOutEvent(QFocusEvent *e)
 {
     QPalette pal = palette();
-    QColorGroup::ColorRole role = QColorGroup::Highlight;
-    pal.setColor(QPalette::Active, role, pal.active().button());
-    pal.setColor(QPalette::Inactive, role, pal.active().button());
-    pal.setColor(QPalette::Disabled, role, pal.active().button());
-
+    QPalette::ColorRole  nR = QPalette::Highlight;
+    QPalette::ColorGroup oA = QPalette::Active;
+    QPalette::ColorRole  oR = QPalette::Button;
+    pal.setColor(QPalette::Active,   nR, pal.color(oA,oR));
+    pal.setColor(QPalette::Inactive, nR, pal.color(oA,oR));
+    pal.setColor(QPalette::Disabled, nR, pal.color(oA,oR));
     setPalette(pal);
     QListWidget::focusOutEvent(e);
 }

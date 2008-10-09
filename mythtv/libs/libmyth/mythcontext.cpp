@@ -1348,9 +1348,10 @@ MythSocket *MythContext::ConnectServer(MythSocket *eventSock,
                 if (d->m_ui && d->m_ui->IsScreenSetup() && d->mainWindow)
                 {
                     bool manageLock = false;
-                    if (!blockingClient && d->serverSockLock.locked())
+                    if (!blockingClient)
                     {
-                        manageLock = true;
+                        if (!d->serverSockLock.tryLock())
+                            manageLock = true;
                         d->serverSockLock.unlock();
                     }
                     MythPopupBox::showOkPopup(d->mainWindow,

@@ -1812,7 +1812,7 @@ void UIListBtnType::Init()
         p.drawLine(img.width() - 1, 0, img.width() - 1, img.height() - 1);
         p.end();
 
-        img.setAlphaBuffer(false);
+        //img.setAlphaBuffer(false);
         
         m_itemSelActPix = QPixmap::fromImage(img);
         p.begin(&m_itemSelActPix);

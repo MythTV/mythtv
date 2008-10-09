@@ -316,7 +316,7 @@ bool ManagedListGroup::addItem(ManagedListItem* item, int where)
     if (QString(item->objectName()) == "unnamed")
         item->setObjectName( QString( "ITEM-%1").arg(itemList.count()));
 
-    if (!child(item->objectName()) && !item->parent())
+    if (!findChild<ManagedListItem*>(item->objectName()) && !item->parent())
         item->setParent(this);
 
     int listSize = itemList.count();
@@ -600,7 +600,7 @@ ManagedList::ManagedList(MythDialog* parent, const char* name) :
 
 ManagedListItem *ManagedList::getItem(const QString &itemName)
 {
-    return (ManagedListItem*)child(itemName);
+    return findChild<ManagedListItem*>(itemName);
 }
 
 void ManagedList::paintEvent(const QRect& r, QPainter *p, bool force)
