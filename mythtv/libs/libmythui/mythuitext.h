@@ -69,8 +69,10 @@ class MythUIText : public MythUIType, public StorageUser
     void SetArea(const MythRect &rect);
     void SetPosition(const MythPoint &pos);
     MythRect GetDrawRect(void) { return m_drawRect; }
-    void SetStartPosition(const int x, const int y);
-    void MoveStartPosition(const int x, const int y);
+
+    void SetDrawRectSize(const int width, const int height);
+    void SetDrawRectPosition(const int x, const int y);
+    void MoveDrawRect(const int x, const int y);
 
     QString cutDown(const QString &data, QFont *font,
                     bool multiline = false, int overload_width = -1,
@@ -95,6 +97,11 @@ class MythUIText : public MythUIType, public StorageUser
     int m_numSteps, m_curStep;
     float curR, curG, curB;
     float incR, incG, incB;
+
+    enum ScrollDir {ScrollLeft, ScrollRight, ScrollUp, ScrollDown};
+
+    bool m_scrolling;
+    ScrollDir m_scrollDirection;
 
     friend class MythUITextEdit;
     friend class MythUIButton;

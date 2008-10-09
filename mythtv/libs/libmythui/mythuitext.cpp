@@ -24,6 +24,8 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
             incR(0.0),              incG(0.0),             incB(0.0)
 {
     m_MultiLine = false;
+    m_scrolling = false;
+    m_scrollDirection = ScrollLeft;
 }
 
 MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
@@ -44,6 +46,9 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
     m_MultiLine = false;
     SetArea(displayRect);
     *m_Font = font;
+
+    m_scrolling = false;
+    m_scrollDirection = ScrollLeft;
 }
 
 MythUIText::~MythUIText()
@@ -59,7 +64,7 @@ void MythUIText::Reset()
 {
     if (m_Message != m_DefaultMessage)
     {
-        m_Message = m_DefaultMessage;
+        SetText(m_DefaultMessage);
         m_CutMessage = "";
         SetRedraw();
     }
@@ -75,6 +80,13 @@ void MythUIText::SetText(const QString &text)
 
     if (newtext == m_Message)
         return;
+
+//     if (m_scrolling)
+//     {
+//         QFontMetrics fm(GetFontProperties()->face());
+//         QSize stringSize = fm.size(Qt::TextSingleLine, m_Message);
+//         SetDrawRectSize(stringSize.width(), m_Area.height());
+//     }
 
     m_Message = newtext;
     m_CutMessage = "";
@@ -153,25 +165,33 @@ void MythUIText::SetPosition(const MythPoint &pos)
     m_drawRect.moveTopLeft(m_Area.topLeft());
 }
 
-void MythUIText::SetStartPosition(const int x, const int y)
+void MythUIText::SetDrawRectSize(const int width, const int height)
 {
-    int startx = m_Area.x() + x;
-    int starty = m_Area.y() + y;
-    m_drawRect.setTopLeft(QPoint(startx,starty));
+    m_drawRect.setSize(QSize(width,height));
     SetRedraw();
 }
 
-void MythUIText::MoveStartPosition(const int x, const int y)
+void MythUIText::SetDrawRectPosition(const int x, const int y)
+{
+    int startx = m_Area.x() + x;
+    int starty = m_Area.y() + y;
+    m_drawRect.moveTopLeft(QPoint(startx,starty));
+    SetRedraw();
+}
+
+void MythUIText::MoveDrawRect(const int x, const int y)
 {
     int newx = m_drawRect.x() + x;
     int newy = m_drawRect.y() + y;
-    m_drawRect.setTopLeft(QPoint(newx,newy));
+    m_drawRect.moveTopLeft(QPoint(newx,newy));
     SetRedraw();
 }
 
 void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect)
 {
+    bool multiline = (m_Justification & Qt::TextWordWrap);
+
     QRect area = m_Area.toQRect();
     area.translate(xoffset, yoffset);
     QRect drawrect = m_drawRect.toQRect();
@@ -181,8 +201,6 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
     if (m_CutMessage.isEmpty())
     {
-        bool multiline = (m_Justification & Qt::TextWordWrap);
-
         if (m_Cutdown)
         {
             QFont font = m_Font->face();
@@ -204,27 +222,61 @@ void MythUIText::Pulse(void)
 
     MythUIType::Pulse();
 
-    if (!m_colorCycling)
-        return;
-
-    curR += incR;
-    curG += incG;
-    curB += incB;
-
-    m_curStep++;
-    if (m_curStep >= m_numSteps)
+    if (m_colorCycling)
     {
-        m_curStep = 0;
-        incR *= -1;
-        incG *= -1;
-        incB *= -1;
+        curR += incR;
+        curG += incG;
+        curB += incB;
+
+        m_curStep++;
+        if (m_curStep >= m_numSteps)
+        {
+            m_curStep = 0;
+            incR *= -1;
+            incG *= -1;
+            incB *= -1;
+        }
+
+        QColor newColor = QColor((int)curR, (int)curG, (int)curB);
+        if (newColor != m_Font->color())
+        {
+            m_Font->SetColor(newColor);
+            SetRedraw();
+        }
     }
 
-    QColor newColor = QColor((int)curR, (int)curG, (int)curB);
-    if (newColor != m_Font->color())
+    if (m_scrolling)
     {
-        m_Font->SetColor(newColor);
-        SetRedraw();
+        switch (m_scrollDirection)
+        {
+            case ScrollLeft :
+                MoveDrawRect(-1, 0);
+                if ((m_drawRect.x() + m_drawRect.width()) < 0)
+                {
+                    VERBOSE(VB_IMPORTANT, QString("DR Left X %1 width %2").arg(m_drawRect.x()).arg(m_Area.width()));
+                    SetDrawRectPosition(m_Area.width(),0);
+                    VERBOSE(VB_IMPORTANT, QString("DR Left X %1 width %2").arg(m_drawRect.x()).arg(m_Area.width()));
+                }
+                break;
+            case ScrollRight :
+                MoveDrawRect(1, 0);
+                if (m_drawRect.x() > m_Area.width())
+                {
+                    VERBOSE(VB_IMPORTANT, QString("DR Right X %1 width %2").arg(m_drawRect.x()).arg(m_Area.width()));
+                    SetDrawRectPosition(-m_Area.width(),0);
+                }
+                break;
+            case ScrollUp :
+                MoveDrawRect(0, -1);
+                if (m_drawRect.y() > m_Area.height())
+                    SetDrawRectPosition(0,-(m_Area.height()));
+                break;
+            case ScrollDown :
+                MoveDrawRect(0, 1);
+                if ((m_drawRect.y() + m_Area.height()) < 0)
+                    SetDrawRectPosition(0,m_Area.height()-1);
+                break;
+        }
     }
 }
 
@@ -389,6 +441,29 @@ bool MythUIText::ParseElement(QDomElement &element)
         if (!element.attribute("disable").isEmpty())
             m_colorCycling = false;
     }
+    else if (element.tagName() == "scroll")
+    {
+        if (GetMythPainter()->SupportsAnimation())
+        {
+            QString tmp = element.attribute("direction");
+            if (!tmp.isEmpty())
+            {
+                tmp = tmp.toLower();
+                if (tmp == "left")
+                    m_scrollDirection = ScrollLeft;
+                else if (tmp == "right")
+                    m_scrollDirection = ScrollRight;
+                else if (tmp == "up")
+                    m_scrollDirection = ScrollUp;
+                else if (tmp == "down")
+                    m_scrollDirection = ScrollDown;
+            }
+
+            m_scrolling = true;
+        }
+        else
+            m_scrolling = false;
+    }
     else
         return MythUIType::ParseElement(element);
 
@@ -409,7 +484,7 @@ void MythUIText::CopyFrom(MythUIType *base)
     m_AltDisplayRect = text->m_AltDisplayRect;
     m_drawRect = text->m_drawRect;
 
-    m_Message = text->m_Message;
+    SetText(text->m_Message);
     m_CutMessage = text->m_CutMessage;
     m_DefaultMessage = text->m_DefaultMessage;
 
@@ -429,6 +504,9 @@ void MythUIText::CopyFrom(MythUIType *base)
     incR = text->incR;
     incG = text->incG;
     incB = text->incB;
+
+    m_scrolling = text->m_scrolling;
+    m_scrollDirection = text->m_scrollDirection;
 
     MythUIType::CopyFrom(base);
 }

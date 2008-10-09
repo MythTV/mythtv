@@ -230,7 +230,6 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
     MythRect textRect = m_Text->GetArea();
     MythRect drawRect = m_Text->GetDrawRect();
     int newcursorPos = 0;
-    QSize size;
 
     QString string;
 
@@ -242,23 +241,29 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
     else
         string = m_Message;
 
+    QSize stringSize = fm.size(Qt::TextSingleLine, string);
+    m_Text->SetDrawRectSize(stringSize.width(), textRect.height());
+    QSize charSize;
+
     switch (moveDir)
     {
         case MoveLeft:
             if (m_Position < 0)
                 return false;
 
-            size = fm.size(Qt::TextSingleLine, string.mid(m_Position,1));
+            charSize = fm.size(Qt::TextSingleLine, string.mid(m_Position,1));
 
-            newcursorPos = cursorPos - size.width();
+            newcursorPos = cursorPos - charSize.width();
 
-            if (newcursorPos < textRect.x())
+            if (newcursorPos < (textRect.x() + (textRect.width()/2)))
             {
-                newcursorPos = textRect.x();
-                if (m_Position == 0)
-                    m_Text->SetStartPosition(0, 0);
+                if (m_Position == 0 || (drawRect.x() + charSize.width() > textRect.x()))
+                    m_Text->SetDrawRectPosition(0,0);
                 else
-                    m_Text->MoveStartPosition(size.width(), 0);
+                    m_Text->MoveDrawRect(charSize.width(), 0);
+
+                if (drawRect.x() < textRect.x())
+                    newcursorPos = cursorPos;
             }
 
             m_Position--;
@@ -267,34 +272,32 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
             if (m_Position == (string.size() - 1))
                 return false;
 
-            size = fm.size(Qt::TextSingleLine, string.mid(m_Position+1,1));
+            charSize = fm.size(Qt::TextSingleLine, string.mid(m_Position+1,1));
 
-            newcursorPos = cursorPos + size.width();
+            newcursorPos = cursorPos + charSize.width();
 
             if (newcursorPos > textRect.width())
             {
-                m_Text->MoveStartPosition(-(size.width()), 0);
+                m_Text->MoveDrawRect(-(charSize.width()), 0);
                 newcursorPos = cursorPos;
             }
 
             m_Position++;
             break;
         case MoveEnd:
-            size = fm.size(Qt::TextSingleLine, string);
-
-            int messageWidth = size.width();
+            int messageWidth = stringSize.width();
 
             if ((messageWidth + cursorWidth)
                 >= textRect.width())
             {
                 int newx = drawRect.width() -
                            (messageWidth + cursorWidth);
-                m_Text->MoveStartPosition(newx, 0);
+                m_Text->MoveDrawRect(newx, 0);
                 newcursorPos = messageWidth + newx + textRect.x();
             }
             else
             {
-                m_Text->SetStartPosition(0,0);
+                m_Text->SetDrawRectPosition(0, 0);
                 if (messageWidth <= 0)
                     newcursorPos = textRect.x();
                 else
@@ -358,7 +361,7 @@ void MythUITextEdit::CopyFrom(MythUIType *base)
         return;
     }
 
-    m_Message = "";
+    m_Message.clear();
     m_Position = -1;
 
     m_blinkInterval = textedit->m_blinkInterval;
