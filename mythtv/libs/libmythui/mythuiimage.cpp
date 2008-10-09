@@ -406,7 +406,7 @@ bool MythUIImage::Load(void)
             }
             else
             {
-                //VERBOSE(VB_FILE, QString("MythUIImage::Load found in cache :%1:").arg(dstfile));
+                VERBOSE(VB_FILE, QString("MythUIImage::Load found in cache :%1:").arg(dstfile));
                 bFoundInCache = true;
                 if (!image->LoadNoScale(dstfile))
                 {
@@ -422,19 +422,24 @@ bool MythUIImage::Load(void)
             imagelabel = GenImageLabel(w,h);
         }
 
-        if (m_isReflected)
-            image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
-                           m_reflectLength);
+        if (!bFoundInCache)
+        {
+            if (m_isReflected)
+                image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
+                            m_reflectLength);
 
-        if (bForceResize)
-        {
-            image->Resize(QSize(w, h), m_preserveAspect);
-        }
-        else
-        {
-            QSize aSize = m_Area.size();
-            aSize = aSize.expandedTo(image->size());
-            SetSize(aSize);
+            if (bForceResize)
+            {
+                image->Resize(QSize(w, h), m_preserveAspect);
+            }
+            else
+            {
+                QSize aSize = m_Area.size();
+                aSize = aSize.expandedTo(image->size());
+                SetSize(aSize);
+            }
+
+            image->SetChanged();
         }
 
         //Save scaled copy to disk, and cache
@@ -450,8 +455,6 @@ bool MythUIImage::Load(void)
 
             image->save(dstfile,"PNG");
         }
-
-        image->SetChanged();
 
         if (image->isNull())
             image->DownRef();
