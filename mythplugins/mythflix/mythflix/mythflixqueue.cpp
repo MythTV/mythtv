@@ -305,7 +305,8 @@ void MythFlixQueue::processAndShowNews(NewsSite* site)
         m_articlesList->Reset();
 
         for (NewsArticle* article = site->articleList().first(); article;
-             article = site->articleList().next()) {
+             article = site->articleList().next())
+        {
             MythUIButtonListItem* item =
                 new MythUIButtonListItem(m_articlesList, article->title());
             item->setData(article);

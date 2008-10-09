@@ -32,7 +32,7 @@
         </imagetype>
 
         <imagetype name="background">
-            <filename>news-info-bg.png</filename>
+            <filename>mythflix_background.png</filename>
             <position>0,340</position>
         </imagetype>
 
@@ -71,7 +71,7 @@
         </imagetype>
 
         <imagetype name="background">
-            <filename>news-info-bg.png</filename>
+            <filename>mythflix_background.png</filename>
             <position>0,340</position>
         </imagetype>
 
