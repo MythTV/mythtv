@@ -184,11 +184,12 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     else
     {
         newFont->m_face.setFamily(face);
-        if (!newFont->m_face.exactMatch())
-        {
-            QFont tmp = QApplication::font();
-            newFont->m_face.setFamily(QFontInfo(tmp).family());
-        }
+        // NOTE: exactMatch() is broken and always returns false
+//         if (!newFont->m_face.exactMatch())
+//         {
+//             QFont tmp = QApplication::font();
+//             newFont->m_face.setFamily(tmp.family());
+//         }
     }
 
     QString hint = element.attribute("stylehint", "");
