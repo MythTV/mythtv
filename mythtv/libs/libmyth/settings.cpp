@@ -1129,15 +1129,15 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
 
     GetMythUI()->GetScreenSettings(width, m_wmult, height, m_hmult);
 
-    QWidget *widget = new QWidget(parent);
-    widget->setObjectName(widgetName);
+    bxwidget = new QWidget(parent);
+    bxwidget->setObjectName(widgetName);
 
     QBoxLayout *layout = NULL;
     if (labelAboveWidget)
     {
         layout = new QVBoxLayout();
-        widget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
-                                          QSizePolicy::Maximum));
+        bxwidget->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, 
+                                            QSizePolicy::Maximum));
     }
     else
         layout = new QHBoxLayout();
@@ -1156,7 +1156,6 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
     testlabel->setText("  ");
     layout->addWidget(testlabel);
 
-    bxwidget = widget;
     connect(bxwidget, SIGNAL(destroyed(QObject*)),
             this,     SLOT(widgetDeleted(QObject*)));
 
@@ -1199,6 +1198,8 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
     if (cg)
         connect(combo, SIGNAL(changeHelpText(QString)), cg, 
                 SIGNAL(changeHelpText(QString)));
+
+    bxwidget->setLayout(layout);
 
     return bxwidget;
 }
