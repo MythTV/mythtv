@@ -252,19 +252,12 @@ void MythUIText::Pulse(void)
             case ScrollLeft :
                 MoveDrawRect(-1, 0);
                 if ((m_drawRect.x() + m_drawRect.width()) < 0)
-                {
-                    VERBOSE(VB_IMPORTANT, QString("DR Left X %1 width %2").arg(m_drawRect.x()).arg(m_Area.width()));
                     SetDrawRectPosition(m_Area.width(),0);
-                    VERBOSE(VB_IMPORTANT, QString("DR Left X %1 width %2").arg(m_drawRect.x()).arg(m_Area.width()));
-                }
                 break;
             case ScrollRight :
                 MoveDrawRect(1, 0);
                 if (m_drawRect.x() > m_Area.width())
-                {
-                    VERBOSE(VB_IMPORTANT, QString("DR Right X %1 width %2").arg(m_drawRect.x()).arg(m_Area.width()));
                     SetDrawRectPosition(-m_Area.width(),0);
-                }
                 break;
             case ScrollUp :
                 MoveDrawRect(0, -1);
