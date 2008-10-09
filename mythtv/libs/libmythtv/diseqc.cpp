@@ -1404,6 +1404,8 @@ bool DiSEqCDevSwitch::ShouldSwitch(const DiSEqCDevSettings &settings,
         if (horizontal != m_last_horizontal)
             return true;
     }
+    else if (kTypeTone == m_type)
+        return true;
 
     return m_last_pos != (uint)pos;
 }
