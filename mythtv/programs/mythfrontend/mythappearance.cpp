@@ -286,6 +286,11 @@ void MythAppearance::doMenu()
 
     if (m_menuPopup->Create())
         popupStack->AddScreen(m_menuPopup);
+    else
+    {
+        delete m_menuPopup;
+        return;
+    }
 
     if (m_changed)
     {
@@ -298,8 +303,6 @@ void MythAppearance::doMenu()
     m_menuPopup->AddButton("Reset Screen Size Settings and Quit");
     m_menuPopup->AddButton("Coarse/Fine adjustment");
     m_menuPopup->AddButton("Close Menu");
-
-    updateScreen();
 }
 
 void MythAppearance::slotSaveSettings()
