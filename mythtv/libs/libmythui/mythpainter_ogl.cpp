@@ -25,7 +25,7 @@ using namespace std;
 #define MAX_STRING_ITEMS 48
 
 #ifndef GL_TEXTURE_RECTANGLE_ARB
-#define GL_TEXTURE_RECTANGLE_ARB 0x84F5 
+#define GL_TEXTURE_RECTANGLE_ARB 0x84F5
 #endif
 
 #ifndef GL_TEXTURE_RECTANGLE_EXT
@@ -92,9 +92,9 @@ int MythOpenGLPainter::NearestGLTextureSize(int v)
     int n = 0, last = 0;
     int s;
 
-    for (s = 0; s < 32; ++s) 
+    for (s = 0; s < 32; ++s)
     {
-        if (((v >> s) & 1) == 1) 
+        if (((v >> s) & 1) == 1)
         {
             ++n;
             last = s;
@@ -123,7 +123,7 @@ void MythOpenGLPainter::RemoveImageFromCache(MythImage *im)
     }
 }
 
-void MythOpenGLPainter::BindTextureFromCache(MythImage *im, 
+void MythOpenGLPainter::BindTextureFromCache(MythImage *im,
                                              bool alphaonly)
 {
     static bool init_extensions = true;
@@ -209,7 +209,7 @@ void MythOpenGLPainter::BindTextureFromCache(MythImage *im,
     glBindTexture(q_gl_texture, tx_id);
     glTexParameteri(q_gl_texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    if (generate_mipmaps) 
+    if (generate_mipmaps)
     {
         glHint(GL_GENERATE_MIPMAP_HINT_SGIS, GL_NICEST);
         glTexParameteri(q_gl_texture, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
@@ -232,7 +232,7 @@ void MythOpenGLPainter::BindTextureFromCache(MythImage *im,
     }
 }
 
-void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im, 
+void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im,
                                   const QRect &src, int alpha)
 {
     double x1, y1, x2, y2;
@@ -287,8 +287,8 @@ int MythOpenGLPainter::CalcAlpha(int alpha1, int alpha2)
     return (int)(alpha1 * (alpha2 / 255.0));
 }
 
-MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg, 
-                                                 int flags, const QRect &r, 
+MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
+                                                 int flags, const QRect &r,
                                                  const MythFontProperties &font,
                                                  const QRect &boundRect)
 {
@@ -296,7 +296,7 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
                        QString::number(r.y()) +
                        QString::number(boundRect.width()) +
                        QString::number(boundRect.height()) +
-                       QString::number(flags) + 
+                       QString::number(flags) +
                        QString::number(font.color().rgba()) + msg;
 
     if (m_StringToImageMap.contains(incoming))
@@ -351,7 +351,7 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
         font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
 
         QRect a = QRect(0, 0, r.width(), r.height());
-        a.translate(shadowOffset.x() + drawOffset.x(), 
+        a.translate(shadowOffset.x() + drawOffset.x(),
                     shadowOffset.y() + drawOffset.y());
 
         shadowColor.setAlpha(shadowAlpha);
@@ -374,7 +374,7 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
                     -outlineSize + drawOffset.y());
 
         outlineColor.setAlpha(outalpha);
-        tmp.setPen(outlineColor); 
+        tmp.setPen(outlineColor);
         tmp.drawText(a, flags, msg);
 
         for (int i = (0 - outlineSize + 1); i <= outlineSize; i++)
@@ -403,7 +403,7 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
     }
 
     tmp.setPen(font.color());
-    tmp.drawText(drawOffset.x(), drawOffset.y(), r.width(), r.height(), 
+    tmp.drawText(drawOffset.x(), drawOffset.y(), r.width(), r.height(),
                  flags, msg);
 
     tmp.end();
@@ -442,9 +442,14 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
             height = NearestGLTextureSize(height);
         }
 
-        QImage newpm(QSize(width,height), QImage::Format_ARGB32);
-        newpm = pm.copy(x, y, width, height);
-        pm = newpm;
+        if (width > 0 && height > 0)
+        {
+            QImage newpm(QSize(width,height), QImage::Format_ARGB32);
+            newpm = pm.copy(x, y, width, height);
+            pm = newpm;
+        }
+        else
+            pm = QImage();
     }
 
     im->Assign(pm);
@@ -471,7 +476,7 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
 }
 
 void MythOpenGLPainter::DrawText(const QRect &r, const QString &msg,
-                                 int flags, const MythFontProperties &font, 
+                                 int flags, const MythFontProperties &font,
                                  int alpha, const QRect &boundRect)
 {
     glClearDepth(1.0f);
@@ -481,7 +486,13 @@ void MythOpenGLPainter::DrawText(const QRect &r, const QString &msg,
     if (!im)
         return;
 
-    DrawImage(boundRect, im, im->rect(), alpha);
+    QRect newRect(boundRect);
+    if (r.x() > boundRect.x())
+        newRect.setX(r.x());
+    if (r.y() > boundRect.y())
+        newRect.setY(r.y());
+
+    DrawImage(newRect, im, im->rect(), alpha);
 }
 
 MythImage *MythOpenGLPainter::GetFormatImage()
