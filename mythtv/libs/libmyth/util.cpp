@@ -167,6 +167,38 @@ static QString findZoneinfoFile(QString zoneinfo_file_path,
 }
 #endif
 
+/* helper fuction to read time zone id from a file
+   Debian's /etc/timezone or Red Hat's /etc/sysconfig/clock */
+static bool read_time_zone_id(QString filename, QString& zone_id)
+{
+    bool found = false;
+    QFile file(filename);
+    QFileInfo info(file);
+    if (info.exists() && info.isFile() && info.isReadable())
+    {
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            QString line;
+            QTextStream in(&file);
+            // Handle whitespace and quotes
+            QRegExp re("^(?:ZONE\\s*=)?\\s*(['\"]?)([\\w\\s/-]+)\\1\\s*$");
+            re.setPatternSyntax(QRegExp::RegExp2);
+            while (!in.atEnd())
+            {
+                line = in.readLine();
+                if (re.indexIn(line) != -1)
+                {
+                    zone_id = re.cap(2);
+                    found = true;
+                    break;
+                }
+            }
+            file.close();
+        }
+    }
+    return found;
+}
+
 /* Helper function for getTimeZoneID() that provides an unprocessed time zone
    id obtained using system-dependent means of identifying the system's time
    zone. */
@@ -176,70 +208,25 @@ static QString getSystemTimeZoneID(void)
 #ifndef USING_MINGW
     // Try to determine the time zone information by inspecting the system
     // configuration
-    bool found = false;
     QString time_zone_file_path("/etc/timezone");
     QString clock_file_path("/etc/sysconfig/clock");
     QString zoneinfo_file_path("/etc/localtime");
     QString zoneinfo_dir_path("/usr/share/zoneinfo");
 
     // First, check time_zone_file_path (used by Debian-based systems)
-    QFile time_zone_file(time_zone_file_path);
-    QFileInfo info(time_zone_file);
-    if (info.exists() && info.isFile() && info.isReadable())
-    {
-        if (time_zone_file.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            QString line;
-            QTextStream in(&time_zone_file);
-            while (!in.atEnd())
-            {
-                line = in.readLine();
-                line = line.trimmed();
-                if (!line.startsWith("#"))
-                {
-                    zone_id = line;
-                    found = true;
-                    break;
-                }
-            }
-            time_zone_file.close();
-            if (found)
-                return zone_id;
-        }
-    }
+    if (read_time_zone_id(time_zone_file_path, zone_id))
+        return zone_id;
 
     // Next, look for the ZONE entry in clock_file_path (used by Red Hat-based
     // systems)
-    QFile clock_file(clock_file_path);
-    info.setFile(clock_file);
-    if (info.exists() && info.isFile() && info.isReadable())
-    {
-        if (clock_file.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            QString line;
-            QTextStream in(&clock_file);
-            // Handle whitespace and quotes
-            QRegExp re("^ZONE\\s*=\\s*(?:'|\")?(.+)$");
-            re.setPatternSyntax(QRegExp::RegExp2);
-            while (!in.atEnd())
-            {
-                line = in.readLine();
-                if (re.indexIn(line) != -1)
-                {
-                    zone_id = re.cap(1);
-                    found = true;
-                    break;
-                }
-            }
-            clock_file.close();
-            if (found)
-                return zone_id;
-        }
-    }
+    if (read_time_zone_id(clock_file_path, zone_id))
+        return zone_id;
+
+    return zone_id;
 
     // Next check zoneinfo_file_path
     QFile zoneinfo_file(zoneinfo_file_path);
-    info.setFile(zoneinfo_file);
+    QFileInfo info(zoneinfo_file);
 
     if (info.exists() && info.isFile())
     {
