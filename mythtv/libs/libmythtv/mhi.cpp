@@ -1,6 +1,9 @@
 #include <unistd.h>
 
+#include <QRegion>
 #include <qbitarray.h>
+
+#include <Q3MemArray>
 
 #include "mhi.h"
 #include "osd.h"
@@ -41,9 +44,6 @@ MHIContext::MHIContext(InteractiveTV *parent)
       m_tuningTo(-1),       m_lastNbiVersion(NBI_VERSION_UNSET),
       m_videoRect(0, 0, StdDisplayWidth, StdDisplayHeight)
 {
-    m_display.setAutoDelete(true);
-    m_dsmccQueue.setAutoDelete(true);
-
     if (!ft_loaded)
     {
         FT_Error error = FT_Init_FreeType(&ft_library);
@@ -96,6 +96,25 @@ MHIContext::~MHIContext()
     delete(m_engine);
     delete(m_dsmcc);
     if (m_face_loaded) FT_Done_Face(m_face);
+
+    ClearDisplay();
+    ClearQueue();
+}
+
+void MHIContext::ClearDisplay(void)
+{
+    list<MHIImageData*>::iterator it = m_display.begin();
+    for (; it != m_display.end(); ++it)
+        delete *it;
+    m_display.clear();
+}
+
+void MHIContext::ClearQueue(void)
+{
+    MythDeque<DSMCCPacket*>::iterator it = m_dsmccQueue.begin();
+    for (; it != m_dsmccQueue.end(); ++it)
+        delete *it;
+    m_dsmccQueue.clear();
 }
 
 // Ask the engine to stop and block until it has.
@@ -131,7 +150,7 @@ void MHIContext::Restart(uint chanid, uint cardid, bool isLive)
         {
             QMutexLocker locker(&m_dsmccLock);
             m_dsmcc->Reset();
-            m_dsmccQueue.clear();
+            ClearQueue();
         }
     }
     else
@@ -144,7 +163,7 @@ void MHIContext::Restart(uint chanid, uint cardid, bool isLive)
         {
             QMutexLocker locker(&m_dsmccLock);
             m_dsmcc->Reset();
-            m_dsmccQueue.clear();
+            ClearQueue();
         }
 
         {
@@ -156,7 +175,7 @@ void MHIContext::Restart(uint chanid, uint cardid, bool isLive)
             m_engine = MHCreateEngine(this);
 
         m_engine->SetBooting();
-        m_display.clear();
+        ClearDisplay();
         m_updated = true;
         m_stop = false;
         m_isLive = isLive;
@@ -198,13 +217,7 @@ void MHIContext::RunMHEGEngine(void)
             ProcessDSMCCQueue();
             {
                 QMutexLocker locker(&m_keyLock);
-                if (m_keyQueue.empty())
-                    key = 0;
-                else
-                {
-                    key = m_keyQueue.last();
-                    m_keyQueue.pop_back();
-                }
+                key = m_keyQueue.dequeue();
             }
 
             if (key != 0)
@@ -270,7 +283,9 @@ void MHIContext::SetNetBootInfo(const unsigned char *data, uint length)
     if (length < 2) return; // Temporary hack? -- dtk May 5th, 2008.
     QMutexLocker locker(&m_dsmccLock);
     // Save the data from the descriptor.
-    m_nbiData.duplicate(data, length);
+    m_nbiData.resize(0);
+    m_nbiData.reserve(length);
+    m_nbiData.insert(m_nbiData.begin(), data, data+length);
     // If there is no Network Boot Info or we're setting it
     // for the first time just update the "last version".
     if (length < 2)
@@ -291,7 +306,7 @@ void MHIContext::NetworkBootRequested(void)
         {
             m_dsmcc->Reset();
             m_engine->SetBooting();
-            m_display.clear();
+            ClearDisplay();
             m_updated = true;
         }
         // TODO: else if it is 2 generate an EngineEvent.
@@ -406,7 +421,7 @@ bool MHIContext::OfferKey(QString key)
 
     if (action != 0)
     {
-        m_keyQueue.push_front(action);
+        m_keyQueue.enqueue(action);
         VERBOSE(VB_IMPORTANT, "Adding MHEG key "<<key<<":"<<action
                 <<":"<<m_keyQueue.size());
         m_engine_wait.wakeAll();
@@ -438,9 +453,10 @@ void MHIContext::UpdateOSD(OSDSet *osdSet)
     m_updated = false;
     osdSet->Clear();
     // Copy all the display items into the display.
-    for (MHIImageData *data = m_display.first(); data;
-         data = m_display.next())
+    list<MHIImageData*>::iterator it = m_display.begin();
+    for (; it != m_display.end(); ++it)
     {
+        MHIImageData *data = *it;
         OSDTypeImage* image = new OSDTypeImage();
         image->SetPosition(QPoint(data->m_x, data->m_y), 1.0, 1.0);
         image->Load(data->m_image);
@@ -461,7 +477,7 @@ void MHIContext::GetInitialStreams(int &audioTag, int &videoTag)
 void MHIContext::RequireRedraw(const QRegion &)
 {
     m_display_lock.lock();
-    m_display.clear();
+    ClearDisplay();
     m_display_lock.unlock();
     // Always redraw the whole screen
     m_engine->DrawDisplay(QRegion(0, 0, StdDisplayWidth, StdDisplayHeight));
@@ -518,7 +534,7 @@ void MHIContext::AddToDisplay(const QImage &image, int x, int y)
     data->m_x = x;
     data->m_y = y;
     QMutexLocker locker(&m_display_lock);
-    m_display.append(data);
+    m_display.push_back(data);
 }
 
 // In MHEG the video is just another item in the display stack 
@@ -550,18 +566,20 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
                       dispRect.width() * m_displayWidth/StdDisplayWidth,
                       dispRect.height() * m_displayHeight/StdDisplayHeight);
 
-    for (uint i = 0; i < m_display.count(); i++)
+    list<MHIImageData*>::iterator it = m_display.begin();
+    for (; it != m_display.end(); ++it)
     {
-        MHIImageData *data = m_display.at(i);
+        MHIImageData *data = *it;
         QRect imageRect(data->m_x, data->m_y,
                         data->m_image.width(), data->m_image.height());
         if (displayRect.intersects(imageRect))
         {
             // Replace this item with a set of cut-outs.
-            (void)m_display.take(i--);
-            Q3MemArray<QRect> rects = (QRegion(imageRect)
-                                      - QRegion(displayRect)).rects();
-            for (uint j = 0; j < rects.size(); j++)
+            it = m_display.erase(it);
+
+            QVector<QRect> rects =
+                (QRegion(imageRect) - QRegion(displayRect)).rects();
+            for (uint j = 0; j < (uint)rects.size(); j++)
             {
                 QRect &rect = rects[j];
                 QImage image =
@@ -571,9 +589,10 @@ void MHIContext::DrawVideo(const QRect &videoRect, const QRect &dispRect)
                 newData->m_image = image;
                 newData->m_x = rect.x();
                 newData->m_y = rect.y();
-                m_display.insert(++i, newData);
+                m_display.insert(it, newData);
+                ++it;
             }
-            delete(data);
+            delete data;
         }
     }
 }

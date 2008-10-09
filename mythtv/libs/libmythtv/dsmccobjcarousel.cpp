@@ -22,14 +22,20 @@ DSMCCCacheModuleData::DSMCCCacheModuleData(DsmccDii *dii,
       m_moduleSize(info->module_size), m_receivedData(0),
       m_completed(false)
 {
-    m_blocks.setAutoDelete(true);
-
     // The number of blocks needed to hold this module.
     int num_blocks = (m_moduleSize + dii->block_size - 1) / dii->block_size;
-    m_blocks.fill(NULL, num_blocks); // Set it to all zeros
+    m_blocks.resize(num_blocks, NULL); // Set it to all zeros
 
     // Copy the descriptor information.
     m_descriptorData = info->modinfo.descriptorData;
+}
+
+DSMCCCacheModuleData::~DSMCCCacheModuleData()
+{
+    vector<QByteArray*>::iterator it = m_blocks.begin();
+    for (; it != m_blocks.end(); ++it)
+        delete *it;
+    m_blocks.clear();
 }
 
 /** \fn DSMCCCacheModuleData::AddModuleData(DsmccDb*,const unsigned char*)
@@ -64,7 +70,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
         QByteArray *block = new QByteArray;
         block->duplicate((char*) data, ddb->len);
         // Add this to our set of blocks.
-        m_blocks.insert(ddb->block_number, block);
+        m_blocks[ddb->block_number] = block;
         m_receivedData += ddb->len;
     }
 
@@ -90,6 +96,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
         uint size = block->size();
         memcpy(tmp_data + curp, block->data(), size);
         curp += size;
+        delete block;
     }
     m_blocks.clear(); // No longer required: free the space.
 
@@ -126,7 +133,14 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
 ObjCarousel::ObjCarousel(Dsmcc *dsmcc)
     : filecache(dsmcc), m_id(0)
 {
-    m_Cache.setAutoDelete(true);
+}
+
+ObjCarousel::~ObjCarousel()
+{
+    QLinkedList<DSMCCCacheModuleData*>::iterator it = m_Cache.begin();
+    for (; it != m_Cache.end(); ++it)
+        delete *it;
+    m_Cache.clear();
 }
 
 void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
@@ -134,13 +148,14 @@ void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
 {
     for (int i = 0; i < dii->number_modules; i++)
     {
-        DSMCCCacheModuleData *cachep;
         DsmccModuleInfo *info = &(dii->modules[i]);
         // Do we already know this module?
         // If so and it is the same version we don't need to do anything.
         // If the version has changed we have to replace it.
-        for (cachep = m_Cache.first(); cachep; cachep = m_Cache.next())
+        QLinkedList<DSMCCCacheModuleData*>::iterator it = m_Cache.begin();
+        for ( ; it != m_Cache.end(); ++it)
         {
+            DSMCCCacheModuleData *cachep = *it;
             if (cachep->CarouselId() == dii->download_id &&
                     cachep->ModuleId() == info->module_id)
             {
@@ -168,7 +183,8 @@ void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
                         .arg(info->module_id));
 
                 // Remove and delete the cache object.
-                m_Cache.remove();
+                m_Cache.erase(it);
+                delete cachep;
                 break;
             }
         }
@@ -177,7 +193,7 @@ void ObjCarousel::AddModuleInfo(DsmccDii *dii, Dsmcc *status,
                 .arg(dii->modules[i].module_id));
 
         // Create a new cache module data object.
-        cachep = new DSMCCCacheModuleData(dii, info, streamTag);
+        DSMCCCacheModuleData *cachep = new DSMCCCacheModuleData(dii, info, streamTag);
 
         int tag = info->modinfo.tap.assoc_tag;
         VERBOSE(VB_DSMCC, QString("[dsmcc] Module info tap "
@@ -203,10 +219,11 @@ void ObjCarousel::AddModuleData(unsigned long carousel, DsmccDb *ddb,
     VERBOSE(VB_DSMCC, QString("[dsmcc] Data block on carousel %1").arg(m_id));
 
     // Search the saved module info for this module
-    Q3PtrListIterator<DSMCCCacheModuleData> it(m_Cache);
-    DSMCCCacheModuleData *cachep;
-    for (; (cachep = it.current()) != 0; ++it)
+    QLinkedList<DSMCCCacheModuleData*>::iterator it = m_Cache.begin();
+    DSMCCCacheModuleData *cachep = NULL;
+    for (; it != m_Cache.end(); ++it)
     {
+        cachep = *it;
         if (cachep->CarouselId() == carousel &&
             (cachep->ModuleId() == ddb->module_id))
         {

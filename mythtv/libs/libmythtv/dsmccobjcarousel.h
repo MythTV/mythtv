@@ -5,11 +5,10 @@
 #ifndef DSMCC_OBJCAROUSEL_H
 #define DSMCC_OBJCAROUSEL_H
 
+#include <QLinkedList>
 
-#include <q3ptrlist.h>
-#include <q3valuevector.h>
-#include <q3cstring.h>
-#include <q3ptrvector.h>
+#include <vector>
+using namespace std;
 
 class DsmccDii;
 class Dsmcc;
@@ -28,6 +27,7 @@ class DSMCCCacheModuleData
   public:
     DSMCCCacheModuleData(DsmccDii *dii, DsmccModuleInfo *info,
                     unsigned short streamTag);
+    ~DSMCCCacheModuleData();
 
     unsigned char *AddModuleData(DsmccDb *ddb, const unsigned char *Data);
 
@@ -55,7 +55,7 @@ class DSMCCCacheModuleData
     unsigned long  m_receivedData; ///< Size received so far.
 
     /// Block table.  As blocks are received they are added to this table. 
-    Q3PtrVector<QByteArray> m_blocks;
+    vector<QByteArray*> m_blocks;
     /// True if we have completed this module.
     bool                   m_completed;
     ModuleDescriptorData   m_descriptorData;
@@ -65,14 +65,15 @@ class ObjCarousel
 {
   public:
     ObjCarousel(Dsmcc*);
+    ~ObjCarousel();
     void AddModuleInfo(DsmccDii *dii, Dsmcc *status, unsigned short streamTag);
     void AddModuleData(unsigned long carousel, DsmccDb *ddb,
                        const unsigned char *data);
 
     DSMCCCache                     filecache;
-    Q3PtrList<DSMCCCacheModuleData> m_Cache;
+    QLinkedList<DSMCCCacheModuleData*> m_Cache;
     /// Component tags matched to this carousel.
-    Q3ValueVector<unsigned short>   m_Tags;
+    vector<unsigned short>         m_Tags;
     unsigned long                  m_id;
 };
 

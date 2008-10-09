@@ -5,8 +5,8 @@
 #ifndef LIBDSMCC_H
 #define LIBDSMCC_H
 
-#include <q3ptrlist.h>
-#include <qstringlist.h>
+#include <QLinkedList>
+#include <QStringList>
 
 #include "dsmccreceiver.h"
 #include "dsmccobjcarousel.h"
@@ -76,6 +76,7 @@ class Dsmcc
 {
   public:
     Dsmcc();
+    ~Dsmcc();
     // Reset the object carousel and clear the caches.
     void Reset();
     // Process an incoming DSMCC carousel table
@@ -107,7 +108,7 @@ class Dsmcc
     ObjCarousel *GetCarouselById(unsigned int carId);
 
     // Known carousels.
-    Q3PtrList<ObjCarousel> carousels;
+    QLinkedList<ObjCarousel*> carousels;
 
     // Initial stream
     unsigned short m_startTag;

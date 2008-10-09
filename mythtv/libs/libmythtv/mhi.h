@@ -8,17 +8,17 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+// STL headers
+#include <list>
+#include <vector>
+using namespace std;
+
 // Qt headers
-#include <qmutex.h>
-#include <q3cstring.h>
-#include <qstring.h>
-#include <q3ptrlist.h>
-#include <qwaitcondition.h>
-#include <qimage.h>
-#include <q3valuelist.h>
-#include <q3ptrqueue.h>
-#include <Q3PointArray>
-#include <Q3MemArray>
+#include <QMutex>
+#include <QString>
+#include <QWaitCondition>
+#include <QImage>
+#include <q3pointarray.h>
 
 // MythTV headers
 #include "../libmythfreemheg/freemheg.h"
@@ -28,6 +28,7 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "NuppelVideoPlayer.h"
+#include "mythdeque.h"
 
 extern "C" {
 #include "../libavcodec/avcodec.h" // to decode single MPEG I-frames
@@ -143,15 +144,17 @@ class MHIContext : public MHContext
     void RunMHEGEngine(void);
     void ProcessDSMCCQueue(void);
     void NetworkBootRequested(void);
+    void ClearDisplay(void);
+    void ClearQueue(void);
 
     InteractiveTV   *m_parent;
 
     Dsmcc           *m_dsmcc;  // Pointer to the DSMCC object carousel.
     QMutex           m_dsmccLock;
-    Q3PtrQueue<DSMCCPacket> m_dsmccQueue;
+    MythDeque<DSMCCPacket*> m_dsmccQueue;
 
     QMutex           m_keyLock;
-    Q3ValueList<int>  m_keyQueue;
+    MythDeque<int>   m_keyQueue;
     int              m_keyProfile;
 
     MHEG            *m_engine; // Pointer to the MHEG engine
@@ -165,7 +168,7 @@ class MHIContext : public MHContext
     int              m_displayHeight;
 
 
-    Q3PtrList<MHIImageData> m_display; // List of items to display
+    list<MHIImageData*> m_display; // List of items to display
 
     FT_Face          m_face;
     bool             m_face_loaded;
@@ -181,7 +184,7 @@ class MHIContext : public MHContext
     int              m_tuningTo;
 
     uint             m_lastNbiVersion;
-    Q3MemArray<unsigned char> m_nbiData;
+    vector<unsigned char> m_nbiData;
 
     QRect            m_videoRect;
 };
