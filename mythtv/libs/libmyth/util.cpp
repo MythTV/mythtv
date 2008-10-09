@@ -222,8 +222,6 @@ static QString getSystemTimeZoneID(void)
     if (read_time_zone_id(clock_file_path, zone_id))
         return zone_id;
 
-    return zone_id;
-
     // Next check zoneinfo_file_path
     QFile zoneinfo_file(zoneinfo_file_path);
     QFileInfo info(zoneinfo_file);
