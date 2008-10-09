@@ -1,4 +1,4 @@
-<myththeme>
+<mythuitheme>
 
     <window name="mainmenu">
         <font name="menufont" face="Arial">
@@ -169,7 +169,7 @@
             </state>
         </statetype>
 
-        <buttonlist2 name="menu">
+        <buttonlist name="menu">
             <area>95,120,470,470</area>
             <layout>vertical</layout>
             <spacing>9</spacing>
@@ -208,7 +208,7 @@
                     </imagetype>
                 </state>
             </statetype>
-        </buttonlist2>
+        </buttonlist>
 
         <statetype name="watermarks">
             <position>524,100</position>
@@ -522,4 +522,4 @@
         </statetype>
 
     </window>
-</myththeme>
+</mythuitheme>

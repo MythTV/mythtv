@@ -95,8 +95,8 @@
                         </imagetype>
                     </state>
                 </statetype>
-                <imagetype name="buttonarrow">
-                    <position>91%,7</position>
+                <imagetype name="somearrow">
+                    <position>94%,7</position>
                     <filename>lb-arrow.png</filename>
                 </imagetype>
             </state>
@@ -141,9 +141,6 @@
             </state>
         </statetype>
     </buttonlist>
-
-    <!-- TODO: Remove this once all themes are altered. -->
-    <buttonlist name="basebuttonlist2" from="basebuttonlist" />
 
     <!-- Base definition of a button -->
     <button name="basebutton">
