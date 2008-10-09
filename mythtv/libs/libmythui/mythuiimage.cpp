@@ -422,24 +422,19 @@ bool MythUIImage::Load(void)
             imagelabel = GenImageLabel(w,h);
         }
 
-        if (!bFoundInCache)
+        if (!bFoundInCache && m_isReflected)
+            image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
+                        m_reflectLength);
+
+        if (!bFoundInCache && bForceResize)
         {
-            if (m_isReflected)
-                image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
-                            m_reflectLength);
-
-            if (bForceResize)
-            {
-                image->Resize(QSize(w, h), m_preserveAspect);
-            }
-            else
-            {
-                QSize aSize = m_Area.size();
-                aSize = aSize.expandedTo(image->size());
-                SetSize(aSize);
-            }
-
-            image->SetChanged();
+            image->Resize(QSize(w, h), m_preserveAspect);
+        }
+        else
+        {
+            QSize aSize = m_Area.size();
+            aSize = aSize.expandedTo(image->size());
+            SetSize(aSize);
         }
 
         //Save scaled copy to disk, and cache
@@ -455,6 +450,8 @@ bool MythUIImage::Load(void)
 
             image->save(dstfile,"PNG");
         }
+
+        image->SetChanged();
 
         if (image->isNull())
             image->DownRef();
