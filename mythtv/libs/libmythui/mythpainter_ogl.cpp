@@ -424,7 +424,7 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
         }
         else if (r.x() > boundRect.x())
         {
-            width = boundRect.width()-r.x();
+            width = (boundRect.x() + boundRect.width()) - r.x();
         }
 
         if (boundRect.y() > r.y())
@@ -433,7 +433,7 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
         }
         else if (r.y() > boundRect.y())
         {
-            height = boundRect.height()-r.y();
+            height = (boundRect.y() + boundRect.height()) - r.y();
         }
 
         if (!texture_rects)
