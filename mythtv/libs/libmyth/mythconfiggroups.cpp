@@ -1,8 +1,9 @@
 #include <algorithm>
+
 #include <QGroupBox>
+#include <QStackedWidget>
 
 #ifdef QT3SUPPORT
-#include <q3widgetstack.h>
 #include <q3tabdialog.h>
 #endif // QT3SUPPORT
 
@@ -344,23 +345,28 @@ QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg,
                                                  QWidget* parent,
                                                  const char* widgetName) 
 {
-    widget = new Q3WidgetStack(parent, widgetName);
+    widget = new QStackedWidget(parent);
+    widget->setObjectName(widgetName);
+
     connect(widget, SIGNAL(destroyed(QObject*)),
-            this,   SLOT(widgetDeleted(QObject*)));
+            this,   SLOT(  widgetDeleted(QObject*)));
 
     for (uint i = 0 ; i < children.size() ; ++i)
     {
-        if (children[i]->isVisible())
-        {
-            childwidget[i] = children[i]->configWidget(cg, widget, NULL);
-            widget->addWidget(childwidget[i], i);
-        }
+        if (!children[i]->isVisible())
+            continue;
+
+        childwidget[i] = children[i]->configWidget(cg, widget, NULL);
+        if (!childwidget[i])
+            continue;
+
+        connect(childwidget[i], SIGNAL(destroyed(    QObject*)),
+                this,           SLOT(  widgetInvalid(QObject*)));
+        widget->addWidget(childwidget[i]);
     }
 
-    widget->raiseWidget(top);
-
-    connect(this, SIGNAL(raiseWidget(int)),
-            widget, SLOT(raiseWidget(int)));
+    if (childwidget[top])
+        widget->setCurrentWidget(childwidget[top]);
 
     if (cg)
     {
@@ -375,6 +381,11 @@ QWidget* StackedConfigurationGroup::configWidget(ConfigurationGroup *cg,
 void StackedConfigurationGroup::widgetInvalid(QObject *obj)
 {
     widget = (widget == obj) ? NULL : widget;
+    for (uint i = 0; i < childwidget.size(); i++)
+    {
+        if ((QObject*)childwidget[i] == obj)
+            childwidget[i] = NULL;
+    }
 }
 
 void StackedConfigurationGroup::addChild(Configurable *child)
@@ -388,7 +399,7 @@ void StackedConfigurationGroup::addChild(Configurable *child)
     if ((i < children.size()) && children[i]->isVisible())
     {
         childwidget[i] = children[i]->configWidget(confgrp, widget, NULL);
-        widget->addWidget(childwidget[i], i);
+        widget->addWidget(childwidget[i]);
         childwidget[i]->resize(1,1);
         childwidget[i]->show();
     }
@@ -424,7 +435,8 @@ void StackedConfigurationGroup::raise(Configurable* child)
         if (children[i] == child)
         {
             top = i;
-            emit raiseWidget((int)i);
+            if (widget && childwidget[top])
+                widget->setCurrentWidget(childwidget[top]);
             return;
         }
     }

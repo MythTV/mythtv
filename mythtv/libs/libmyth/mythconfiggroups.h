@@ -14,6 +14,8 @@
 #include "settings.h"
 #undef MYTHCONFIG
 
+class QStackedWidget;
+
 class MPUBLIC ConfigurationGroup : public Setting, public Storage
 {
     Q_OBJECT
@@ -154,7 +156,6 @@ class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
 
     virtual QWidget *configWidget(ConfigurationGroup *cg, QWidget *parent,
                                   const char *widgetName = 0);
-    virtual void widgetInvalid(QObject *obj);
 
     void raise(Configurable *child);
     virtual void Save(void);
@@ -166,8 +167,8 @@ class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
     void addChild(Configurable*);
     void removeChild(Configurable*);
 
-  signals:
-    void raiseWidget(int);
+  public slots:
+    virtual void widgetInvalid(QObject *obj);
 
   protected:
     /// You need to call deleteLater to delete QObject
@@ -175,7 +176,7 @@ class MPUBLIC StackedConfigurationGroup : public ConfigurationGroup
 
   protected:
     vector<QWidget*>    childwidget;
-    Q3WidgetStack       *widget;
+    QStackedWidget     *widget;
     ConfigurationGroup *confgrp;
     uint                top;
     bool                saveAll;
