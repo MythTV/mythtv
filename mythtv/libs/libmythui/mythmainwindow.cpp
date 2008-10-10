@@ -544,6 +544,10 @@ void MythMainWindow::animate(void)
 
 void MythMainWindow::drawScreen(void)
 {
+    /* FIXME: remove */
+    if (currentWidget())
+        return;
+
     if (!d->painter->SupportsClipping())
         d->repaintRegion = d->repaintRegion.unite(d->uiScreenRect);
     else
