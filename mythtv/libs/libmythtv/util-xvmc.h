@@ -34,9 +34,9 @@ static uint calcBPM(int chroma)
     int ret;
     switch (chroma)
     {
-        case XVMC_CHROMA_FORMAT_420: ret = 6;
-        case XVMC_CHROMA_FORMAT_422: ret = 4+2;
-        case XVMC_CHROMA_FORMAT_444: ret = 4+4;
+        case XVMC_CHROMA_FORMAT_420: ret = 6;   break;
+        case XVMC_CHROMA_FORMAT_422: ret = 4+2; break;
+        case XVMC_CHROMA_FORMAT_444: ret = 4+4; break;
         default: ret = 6;
         // default unless gray, then 4 is the right number,
         // a bigger number just wastes a little memory.
