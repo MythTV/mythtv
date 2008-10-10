@@ -3103,16 +3103,20 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
         if (gotvideo)
         {
-            if (lowbuffers && onlyvideo == 0 && 
+            if (lowbuffers && onlyvideo == 0 &&
+                storedPackets.count() < 75 &&
                 lastapts < lastvpts + 100 &&
-                lastapts > lastvpts - 10000 && 
                 !ringBuffer->InDVDMenuOrStillFrame())
             {
-                //cout << "behind: " << lastapts << " " << lastvpts << endl;
                 storevideoframes = true;
             }
             else if (onlyvideo >= 0)
             {
+                if (storedPackets.count() >=75)
+                    VERBOSE(VB_IMPORTANT,
+                            QString("Audio %1 ms behind video but already %2 "
+                               "video frames queued. AV-Sync might be broken.")
+                            .arg(lastvpts-lastapts).arg(storedPackets.count()));
                 allowedquit = true;
                 continue;
             }
