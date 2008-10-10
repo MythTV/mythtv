@@ -744,7 +744,7 @@ void MythMainWindow::Init(void)
     setFixedSize(QSize(d->screenwidth, d->screenheight));
 
     /* FIXME these two lines should go away */
-    setFont(GetMythUI()->GetMediumFont());
+    //setFont(GetMythUI()->GetMediumFont());
     GetMythUI()->ThemeWidget(this);
 
     Show();
