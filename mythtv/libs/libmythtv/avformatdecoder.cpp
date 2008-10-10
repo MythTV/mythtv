@@ -1,6 +1,7 @@
 // C headers
 #include <cassert>
 #include <unistd.h>
+#include <cmath>
 
 // C++ headers
 #include <algorithm>
@@ -51,6 +52,8 @@ extern const uint8_t *ff_find_start_code(const uint8_t * restrict p, const uint8
 #define LOC_WARN QString("AFD Warning: ")
 
 #define MAX_AC3_FRAME_SIZE 6144
+
+static const float eps = 1E-5;
 
 static int cc608_parity(uint8_t byte);
 static int cc608_good_parity(const int *parity_table, uint16_t data);
@@ -2357,7 +2360,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             bool changed = (seqFPS > fps+0.01) || (seqFPS < fps-0.01);
             changed |= (width  != (uint)current_width );
             changed |= (height != (uint)current_height);
-            changed |= (aspect != current_aspect);
+            changed |= fabs(aspect - current_aspect) > eps;
 
             if (changed)
             {
@@ -2434,7 +2437,7 @@ void AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         bool changed = (seqFPS > fps+0.01) || (seqFPS < fps-0.01);
         changed |= (width  != (uint)current_width );
         changed |= (height != (uint)current_height);
-        changed |= (aspect_ratio != current_aspect);
+        changed |= fabs(aspect_ratio - current_aspect) > eps;
 
         if (changed)
         {
