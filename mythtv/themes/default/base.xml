@@ -471,20 +471,18 @@
         </imagetype>
 
         <textarea name="message" from="basetextarea">
-            <area>20,20,540,80</area>
+            <area>15,15,550,90</area>
             <align>allcenter</align>
             <multiline>yes</multiline>
-            <cutdown>yes</cutdown>
+            <cutdown>no</cutdown>
         </textarea>
 
         <button name="cancel" from="basebutton">
             <position>90,110</position>
-            <activefont>basemediumred</activefont>
         </button>
 
         <button name="ok" from="basebutton">
             <position>338,110</position>
-            <activefont>basemediumgreen</activefont>
         </button>
     </window>
 
@@ -506,7 +504,6 @@
 
         <button name="ok" from="basebutton">
             <position>109,110</position>
-            <activefont>basemediumgreen</activefont>
         </button>
     </window>
 
@@ -551,12 +548,10 @@
 
         <button name="cancel" from="basebutton">
             <position>30,435</position>
-            <activefont>basemediumred</activefont>
         </button>
 
         <button name="ok" from="basebutton">
             <position>315,435</position>
-            <activefont>basemediumgreen</activefont>
         </button>
 
     </window>
