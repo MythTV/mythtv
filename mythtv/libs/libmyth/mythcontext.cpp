@@ -1229,8 +1229,8 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
 {
     if (app_binary_version != MYTH_BINARY_VERSION)
     {
-        QString warning = tr("This application (%1) is not compatible\n" 
-                             "with the installed MythTV libraries (%2).\n" 
+        QString warning = tr("This application (%1) is not compatible"
+                             "with the installed MythTV libraries (%2)."
                              "Please recompile after a make distclean")
                 .arg(app_binary_version).arg(MYTH_BINARY_VERSION);
         if (gui)
@@ -1935,7 +1935,7 @@ bool MythContext::TestPopupVersion(const QString &name,
     if (libversion == pluginversion)
         return true;
 
-    QString err = tr("Plugin %1 (%2) is not compatible\n"
+    QString err = tr("Plugin %1 (%2) is not compatible"
                      "with the installed MythTV libraries (%3).\n"
                      "Please recompile the plugin after a make distclean");
 
