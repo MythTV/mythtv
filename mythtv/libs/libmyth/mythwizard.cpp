@@ -103,8 +103,8 @@ MythWizard::MythWizard(MythMainWindow *parent, const char *name)
     d->current = 0; // not quite true, but...
     d->ws = new QStackedWidget(this);
     d->ws->setObjectName("MythWizard - stacked widget");
-    d->title = new QLabel( this, "title label" );
-    d->title->setBackgroundOrigin(QWidget::WindowOrigin);
+    d->title = new QLabel(this);
+    d->ws->setObjectName("MythWizard - title label");
 
     // create in nice tab order
     d->nextButton = new MythPushButton( this, "next" );
@@ -161,7 +161,7 @@ void MythWizard::Show()
 
 void MythWizard::setFont( const QFont & font )
 {
-    QApplication::postEvent( this, new QEvent( QEvent::LayoutHint ) );
+    QApplication::postEvent( this, new QEvent( QEvent::LayoutRequest ) );
     setFont( font );
 }
 
@@ -171,8 +171,8 @@ void MythWizard::addPage( QWidget * page, const QString & title )
         return;
     if ( d->page( page ) ) {
         qWarning( "MythWizard::addPage(): already added %s/%s to %s/%s",
-                  page->className(), page->name(),
-                  className(), name() );
+                  page->metaObject()->className(), qPrintable(page->objectName()),
+                  metaObject()->className(), qPrintable(objectName()) );
         return;
     }
     int i = d->pages.size();
@@ -192,8 +192,8 @@ void MythWizard::insertPage( QWidget * page, const QString & title, int index )
         return;
     if ( d->page( page ) ) {
         qWarning( "MythWizard::insertPage(): already added %s/%s to %s/%s",
-                  page->className(), page->name(),
-                  className(), name() );
+                  page->metaObject()->className(), qPrintable(page->objectName()),
+                  metaObject()->className(), qPrintable(objectName()) );
         return;
     }
 
@@ -488,16 +488,20 @@ void MythWizard::layOutTitleRow( QHBoxLayout * layout, const QString & title )
 void MythWizard::layOut()
 {
     delete d->v;
-    d->v = new QVBoxLayout( this, 6, 0, "top-level layout" );
+    d->v = new QVBoxLayout( this);
+    d->v->setMargin(6);
+    d->v->setSpacing(0);
+    d->v->setObjectName("top-level layout");
 
     QHBoxLayout * l;
-    l = new QHBoxLayout( 6 );
+    l = new QHBoxLayout();
+    l->setMargin(6);
     d->v->addLayout( l, 0 );
     layOutTitleRow( l, d->current ? d->current->t : QString::null );
 
     if ( ! d->hbar1 ) {
-        d->hbar1 = new QFrame( this, "<hr>", 0 );
-        d->hbar1->setBackgroundOrigin(QWidget::WindowOrigin);
+        d->hbar1 = new QFrame(this, 0);
+        d->hbar1->setObjectName("MythWizard - hbar1");
         d->hbar1->setFrameStyle(QFrame::Sunken | QFrame::HLine);
         d->hbar1->setFixedHeight( 12 );
     }
@@ -508,21 +512,22 @@ void MythWizard::layOut()
 
     if (!d->helpgroup)
     {
-        d->helpgroup = new QGroupBox(this, "help-group-box");
-        d->helpgroup->setBackgroundOrigin(QWidget::WindowOrigin);
+        d->helpgroup = new QGroupBox(this);
+        d->helpgroup->setObjectName("MythWizard -- help group box");
 
-        d->help = new QLabel(d->helpgroup, "help text");
-        d->help->setBackgroundOrigin(QWidget::WindowOrigin);
+        d->help = new QLabel(d->helpgroup);
+        d->help->setObjectName("MythWizard -- help text");
 
-        d->help->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
+        d->help->setAlignment(Qt::AlignLeft | Qt::AlignTop);
         d->help->setWordWrap(true);
 
         d->help->setMinimumWidth(screenwidth - (int)(40 * wmult));
         d->help->setMaximumHeight((int)(80 * hmult));
         d->help->setMinimumHeight((int)(80 * hmult));
     
-        QVBoxLayout *helplayout = new QVBoxLayout(d->helpgroup, 10);
-        helplayout->add(d->help);
+        QVBoxLayout *helplayout = new QVBoxLayout(d->helpgroup);
+        helplayout->setMargin(10);
+        helplayout->addWidget(d->help);
     }
     else
     {
@@ -532,14 +537,15 @@ void MythWizard::layOut()
     d->v->addWidget(d->helpgroup);
 
     if ( ! d->hbar2 ) {
-        d->hbar2 = new QFrame( this, "<hr>", 0 );
-        d->hbar2->setBackgroundOrigin(QWidget::WindowOrigin);
+        d->hbar2 = new QFrame( this, 0 );
+        d->hbar2->setObjectName("MythWizard - hbar2"); 
         d->hbar2->setFrameStyle(QFrame::Sunken | QFrame::HLine);
         d->hbar2->setFixedHeight( 12 );
     }
     d->v->addWidget( d->hbar2 );
 
-    l = new QHBoxLayout( 6 );
+    l = new QHBoxLayout();
+    l->setMargin(6);
     d->v->addLayout( l );
     layOutButtonRow( l );
     d->v->activate();
