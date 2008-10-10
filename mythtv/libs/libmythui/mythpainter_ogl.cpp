@@ -289,13 +289,10 @@ int MythOpenGLPainter::CalcAlpha(int alpha1, int alpha2)
 
 MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
                                                  int flags, const QRect &r,
-                                                 const MythFontProperties &font,
-                                                 const QRect &boundRect)
+                                                 const MythFontProperties &font)
 {
-    QString incoming = font.GetHash() + QString::number(r.x()) +
-                       QString::number(r.y()) +
-                       QString::number(boundRect.width()) +
-                       QString::number(boundRect.height()) +
+    QString incoming = font.GetHash() + QString::number(r.width()) +
+                       QString::number(r.height()) +
                        QString::number(flags) +
                        QString::number(font.color().rgba()) + msg;
 
@@ -408,50 +405,6 @@ MythImage *MythOpenGLPainter::GetImageFromString(const QString &msg,
 
     tmp.end();
 
-    // If the boundary rect is not the same as the drawing rect
-    // then crop/clip the image
-    if (!boundRect.isEmpty() && boundRect != r)
-    {
-        int x = 0;
-        int y = 0;
-        int width = boundRect.width();
-        int height = boundRect.height();
-
-
-        if (boundRect.x() > r.x())
-        {
-            x = boundRect.x()-r.x();
-        }
-        else if (r.x() > boundRect.x())
-        {
-            width = (boundRect.x() + boundRect.width()) - r.x();
-        }
-
-        if (boundRect.y() > r.y())
-        {
-            y = boundRect.y()-r.y();
-        }
-        else if (r.y() > boundRect.y())
-        {
-            height = (boundRect.y() + boundRect.height()) - r.y();
-        }
-
-        if (!texture_rects)
-        {
-            width  = NearestGLTextureSize(width);
-            height = NearestGLTextureSize(height);
-        }
-
-        if (width > 0 && height > 0)
-        {
-            QImage newpm(QSize(width,height), QImage::Format_ARGB32);
-            newpm = pm.copy(x, y, width, height);
-            pm = newpm;
-        }
-        else
-            pm = QImage();
-    }
-
     im->Assign(pm);
 
     m_StringToImageMap[incoming] = im;
@@ -481,18 +434,53 @@ void MythOpenGLPainter::DrawText(const QRect &r, const QString &msg,
 {
     glClearDepth(1.0f);
 
-    MythImage *im = GetImageFromString(msg, flags, r, font, boundRect);
+    MythImage *im = GetImageFromString(msg, flags, r, font);
 
     if (!im)
         return;
 
-    QRect newRect(boundRect);
-    if (r.x() > boundRect.x())
-        newRect.setX(r.x());
-    if (r.y() > boundRect.y())
-        newRect.setY(r.y());
+    QRect destRect(boundRect);
+    QRect srcRect(0,0,r.width(),r.height());
+    if (!boundRect.isEmpty() && boundRect != r)
+    {
+        int x = 0;
+        int y = 0;
+        int width = boundRect.width();
+        int height = boundRect.height();
 
-    DrawImage(newRect, im, im->rect(), alpha);
+        if (boundRect.x() > r.x())
+        {
+            x = boundRect.x()-r.x();
+        }
+        else if (r.x() > boundRect.x())
+        {
+            destRect.setX(r.x());
+            width = (boundRect.x() + boundRect.width()) - r.x();
+        }
+
+        if (boundRect.y() > r.y())
+        {
+            y = boundRect.y()-r.y();
+        }
+        else if (r.y() > boundRect.y())
+        {
+            destRect.setY(r.y());
+            height = (boundRect.y() + boundRect.height()) - r.y();
+        }
+
+        if (!texture_rects)
+        {
+            width  = NearestGLTextureSize(width);
+            height = NearestGLTextureSize(height);
+        }
+
+        if (width <= 0 || height <= 0)
+            return;
+
+        srcRect.setRect(x,y,width,height);
+    }
+
+    DrawImage(destRect, im, srcRect, alpha);
 }
 
 MythImage *MythOpenGLPainter::GetFormatImage()

@@ -81,12 +81,12 @@ void MythUIText::SetText(const QString &text)
     if (newtext == m_Message)
         return;
 
-//     if (m_scrolling)
-//     {
-//         QFontMetrics fm(GetFontProperties()->face());
-//         QSize stringSize = fm.size(Qt::TextSingleLine, m_Message);
-//         SetDrawRectSize(stringSize.width(), m_Area.height());
-//     }
+    if (m_scrolling)
+    {
+        QFontMetrics fm(GetFontProperties()->face());
+        QSize stringSize = fm.size(Qt::TextSingleLine, m_Message);
+        SetDrawRectSize(stringSize.width(), m_Area.height());
+    }
 
     m_Message = newtext;
     m_CutMessage = "";
@@ -156,7 +156,14 @@ void MythUIText::SetArea(const MythRect &rect)
 {
     MythUIType::SetArea(rect);
     m_CutMessage = "";
+
     m_drawRect = m_Area;
+    if (m_scrolling)
+    {
+        QFontMetrics fm(GetFontProperties()->face());
+        QSize stringSize = fm.size(Qt::TextSingleLine, m_Message);
+        SetDrawRectSize(stringSize.width(), m_Area.height());
+    }
 }
 
 void MythUIText::SetPosition(const MythPoint &pos)
@@ -167,7 +174,12 @@ void MythUIText::SetPosition(const MythPoint &pos)
 
 void MythUIText::SetDrawRectSize(const int width, const int height)
 {
-    m_drawRect.setSize(QSize(width,height));
+    QSize newsize(width,height);
+
+    if (newsize == m_drawRect.size())
+        return;
+
+    m_drawRect.setSize(newsize);
     SetRedraw();
 }
 
@@ -175,6 +187,11 @@ void MythUIText::SetDrawRectPosition(const int x, const int y)
 {
     int startx = m_Area.x() + x;
     int starty = m_Area.y() + y;
+
+    QPoint newpoint(startx,starty);
+    if (newpoint == m_drawRect.topLeft())
+        return;
+
     m_drawRect.moveTopLeft(QPoint(startx,starty));
     SetRedraw();
 }
@@ -183,6 +200,11 @@ void MythUIText::MoveDrawRect(const int x, const int y)
 {
     int newx = m_drawRect.x() + x;
     int newy = m_drawRect.y() + y;
+
+    QPoint newpoint(newx,newy);
+    if (newpoint == m_drawRect.topLeft())
+        return;
+
     m_drawRect.moveTopLeft(QPoint(newx,newy));
     SetRedraw();
 }
