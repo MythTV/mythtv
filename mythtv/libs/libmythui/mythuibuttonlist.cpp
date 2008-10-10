@@ -152,6 +152,8 @@ void MythUIButtonList::SetPositionArrowStates(void)
     if (!m_initialized)
         Init();
 
+    m_needsUpdate = false;
+
     if (m_ButtonList.size() > 0)
     {
         int button = 0;
@@ -204,8 +206,6 @@ void MythUIButtonList::SetPositionArrowStates(void)
         else
             m_downArrow->DisplayState(MythUIStateType::Off);
     }
-
-    m_needsUpdate = false;
 }
 
 void MythUIButtonList::InsertItem(MythUIButtonListItem *item)
