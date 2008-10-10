@@ -10,11 +10,6 @@ using namespace std;
 #include <QPainter>
 #include <QLabel>
 
-#ifdef QT3SUPPORT
-#include <q3simplerichtext.h>
-#include <q3stylesheet.h>
-#endif // QT3SUPPORT
-
 using namespace std;
 
 #include "uitypes.h"
@@ -2407,21 +2402,16 @@ void UITextType::calculateScreenArea()
 
 // ******************************************************************
 
-#ifdef QT3SUPPORT
 UIRichTextType::UIRichTextType(const QString &name, fontProp *font,
                        const QString &text, int dorder, QRect displayrect,
                        QRect textrect)
     : UIType(name)
 {
 
-    m_name = name;
+    m_name = name; m_name.detach();
     takes_focus = true;
 
-    if (Q3StyleSheet::mightBeRichText(text))
-        m_message = text;
-    else
-        m_message = Q3StyleSheet::convertFromPlainText(text, Q3StyleSheetItem::WhiteSpaceNormal);
-
+    m_message = text; m_message.detach();
     m_font = font;
     m_displayArea = displayrect;
     m_yPos = 0;
@@ -2454,10 +2444,9 @@ UIRichTextType::~UIRichTextType()
 
 void UIRichTextType::SetText(const QString &text)
 {
-    if (Q3StyleSheet::mightBeRichText(text))
-        m_message = text;
-    else
-        m_message = Q3StyleSheet::convertFromPlainText(text, Q3StyleSheetItem::WhiteSpaceNormal);
+    QString tmp = text;
+    tmp.detach();
+    m_message = tmp;
 
     m_yPos = 0;
     m_showUpArrow = false;
@@ -2476,9 +2465,10 @@ void UIRichTextType::SetBackgroundImages(QString bgImageReg, QString bgImageSel)
 
 void UIRichTextType::SetBackground(QPixmap *background)
 {
-    copyBlt(m_background, 0, 0, background, m_displayArea.x(), m_displayArea.y(),
-            m_displayArea.width(), m_displayArea.height());
-
+    QPixmap tmp = background->copy(m_displayArea);
+    QPixmap *old_bg = m_background;
+    m_background = new QPixmap(tmp);
+    delete old_bg;
     updateBackground();
 }
 
@@ -2524,12 +2514,15 @@ void UIRichTextType::refreshImage()
     QPainter p(m_image);
     QBrush brush;
 
-    brush.setPixmap(*m_compBackground);
+    brush.setTexture(*m_compBackground);
     p.fillRect(0, 0, m_displayArea.width(), m_displayArea.height() , brush);
     p.translate(m_textArea.x() - m_displayArea.x() , m_textArea.y() - m_displayArea.y());
-    Q3SimpleRichText richText(m_message, m_font->face);
-    richText.setWidth(m_textArea.width());
-    richText.draw(&p, 0, -m_yPos, clipRect, gContext->GetMainWindow()->colorGroup(), 0);
+    QTextEdit richText(m_message);
+    richText.setCurrentFont(m_font->face); 
+    richText.setMinimumWidth(m_textArea.width());
+    richText.setMaximumWidth(m_textArea.width());
+    p.end();
+    richText.render(m_image, QPoint(0, /*-m_yPos*/0), clipRect);
     m_textHeight = richText.height();
 
     // do we need to show scroll arrows
@@ -2579,8 +2572,8 @@ void UIRichTextType::Draw(QPainter *dr, int drawlayer, int context)
 void UIRichTextType::calculateScreenArea()
 {
     QRect r = m_displayArea;
-    r.moveBy(m_parent->GetAreaRect().left(),
-             m_parent->GetAreaRect().top());
+    r.translate(m_parent->GetAreaRect().left(),
+                m_parent->GetAreaRect().top());
     screen_area = r;
 }
 
@@ -2650,7 +2643,6 @@ void UIRichTextType::looseFocus()
     loadBackgroundImg(needreload);
     if (needreload) updateBackground();
 }
-#endif // QT3SUPPORT
 
 // ******************************************************************
 
