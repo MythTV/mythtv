@@ -159,6 +159,9 @@ MythUIType *MythUIStateType::GetState(StateType state)
 
 void MythUIStateType::Clear()
 {
+    if (m_ObjectsByName.isEmpty() && m_ObjectsByState.isEmpty())
+        return;
+
     QMap<QString, MythUIType *>::Iterator i;
     for (i = m_ObjectsByName.begin(); i != m_ObjectsByName.end(); ++i)
     {
@@ -195,7 +198,7 @@ bool MythUIStateType::ParseElement(QDomElement &element)
         QString name = element.attribute("name", "");
         QString type = element.attribute("type", "");
 
-        QString statename = "";
+        QString statename;
 
         if (!type.isEmpty())
             statename = type;

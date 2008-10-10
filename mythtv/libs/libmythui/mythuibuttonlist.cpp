@@ -111,6 +111,9 @@ void MythUIButtonList::SetDrawFromBottom(bool draw)
 
 void MythUIButtonList::SetActive(bool active)
 {
+    if (m_active == active)
+        return;
+
     m_active = active;
     if (m_initialized)
         Update();
@@ -118,6 +121,9 @@ void MythUIButtonList::SetActive(bool active)
 
 void MythUIButtonList::Reset()
 {
+    if (m_itemList.isEmpty())
+        return;
+
     m_clearing = true;
 
     while (!m_itemList.isEmpty())
@@ -297,6 +303,9 @@ void MythUIButtonList::SetItemCurrent(MythUIButtonListItem* item)
 {
     if (!m_initialized)
         Init();
+
+    if (m_selItem == item)
+        return;
 
     m_selPosition = m_itemList.indexOf(item);
 
@@ -538,10 +547,7 @@ bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
     if (!m_initialized)
         Init();
 
-    if (m_selPosition < 0)
-        return false;
-
-    if (m_itemList.isEmpty())
+    if (m_selPosition < 0 || m_itemList.isEmpty())
         return false;
 
     bool found_it = false;
@@ -558,7 +564,7 @@ bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
         ++selectedPosition;
     }
 
-    if (!found_it)
+    if (!found_it || m_selPosition == selectedPosition)
         return false;
 
     m_selPosition = selectedPosition;
@@ -1134,8 +1140,10 @@ void MythUIButtonListItem::SetImage(const QString &filename, const QString &name
 void MythUIButtonListItem::DisplayState(const QString &state,
                                         const QString &name)
 {
-    if (!name.isEmpty())
-        m_states.insert(name, state);
+    if (name.isEmpty())
+        return;
+
+    m_states.insert(name, state);
 
     if (m_parent)
         m_parent->Update();
@@ -1158,7 +1166,7 @@ MythUIButtonList* MythUIButtonListItem::parent() const
 
 void MythUIButtonListItem::setChecked(MythUIButtonListItem::CheckState state)
 {
-    if (!m_checkable)
+    if (!m_checkable || m_state == state)
         return;
     m_state = state;
     if (m_parent)
