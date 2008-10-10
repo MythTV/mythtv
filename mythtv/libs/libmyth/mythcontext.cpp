@@ -8,12 +8,6 @@
 #include <QPainter>
 #include <QDebug>
 
-#ifdef QT3SUPPORT
-#include <q3network.h>
-#else
-#warning Qt3 networking disabled...
-#endif // !QT3SUPPORT
-
 #include <cmath>
 #include <queue>
 #include <cassert>
@@ -1213,10 +1207,6 @@ MythContext::MythContext(const QString &binversion)
         VERBOSE(VB_SOCKET, QString("WSAStartup returned %1").arg(res));
     }
 #endif
-
-#ifdef QT3SUPPORT
-    q3InitNetworkProtocols();
-#endif // QT3SUPPORT
 
     d = new MythContextPrivate(this);
     assert(d);
