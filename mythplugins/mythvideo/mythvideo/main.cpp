@@ -441,7 +441,7 @@ namespace
         QString themedir = GetMythUI()->GetThemeDir();
 
         MythThemedMenu *diag =
-                new MythThemedMenu(themedir.ascii(), menuname,
+                new MythThemedMenu(themedir, menuname,
                                     GetMythMainWindow()->GetMainStack(),
                                     "video menu");
 

@@ -24,6 +24,8 @@ class MythGenericTree;
 class Metadata;
 class VideoScanner;
 
+class QUrl;
+
 class VideoDialog : public MythScreenType
 {
     Q_OBJECT
@@ -186,7 +188,7 @@ class VideoDialog : public MythScreenType
     // called during StartVideoPosterSet
     void OnPosterURL(QString uri, Metadata *metadata);
     void OnPosterCopyFinished(bool error, QString errorMsg, Metadata *metadata);
-    void OnPosterDownloadTimeout(QString url, Metadata *metadata);
+    void OnPosterDownloadTimeout(const QUrl &url, Metadata *metadata);
 
     // called during StartVideoSearchByTitle
     void OnVideoSearchByTitleDone(bool normal_exit,

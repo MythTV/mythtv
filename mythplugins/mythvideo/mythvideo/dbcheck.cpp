@@ -291,7 +291,8 @@ namespace
             MSqlQuery query(MSqlQuery::InitCon());
             query.exec("SELECT extension, playcommand FROM videotypes");
 
-            QRegExp extChange("^(img|vob|mpeg|mpg|iso|VIDEO_TS)$", false);
+            QRegExp extChange("^(img|vob|mpeg|mpg|iso|VIDEO_TS)$",
+                              Qt::CaseInsensitive);
             QStringList updates;
             if (query.isActive() && query.size())
             {
@@ -300,7 +301,7 @@ namespace
                     QString extension = query.value(0).toString();
                     QString playcommand = query.value(1).toString();
                     if (playcommand != "Internal" &&
-                        extension.find(extChange) == 0)
+                        extension.indexOf(extChange) == 0)
                     {
                         updates.append(QString(
 "UPDATE videotypes SET extension = '%1_old' WHERE extension = '%2';")

@@ -48,4 +48,4 @@ macx {
 
 mingw:DEFINES += USING_MINGW
 
-QT += opengl sql xml network qt3support
+QT += opengl sql xml network

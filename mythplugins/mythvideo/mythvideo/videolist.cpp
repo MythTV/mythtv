@@ -356,7 +356,7 @@ namespace fake_unnamed
     QString path_to_node_name(const QString &path)
     {
         QString ret;
-        int slashLoc = path.findRev("/", -2) + 1;
+        int slashLoc = path.lastIndexOf('/', -2) + 1;
         if (path.right(1) == "/")
             ret = path.mid(slashLoc, path.length() - slashLoc - 2);
         else
@@ -1172,7 +1172,7 @@ namespace fake_unnamed
 
             MetadataListManager::MetadataPtr myData(new Metadata(file_string));
             QFileInfo qfi(file_string);
-            QString title = qfi.baseName(true);
+            QString title = qfi.completeBaseName();
             if (m_infer_title)
             {
                 QString tmptitle(Metadata::FilenameToTitle(file_string));

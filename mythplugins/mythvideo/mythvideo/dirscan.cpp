@@ -63,7 +63,7 @@ namespace
             }
 
             if (!p->isDir() &&
-                ext_settings.extension_ignored(p->extension(false))) continue;
+                ext_settings.extension_ignored(p->suffix())) continue;
 
             bool add_as_file = true;
 
@@ -71,23 +71,24 @@ namespace
             {
                 add_as_file = false;
 
-                dir_tester.setPath(p->absFilePath() + "/VIDEO_TS");
+                dir_tester.setPath(p->absoluteFilePath() + "/VIDEO_TS");
                 if (dir_tester.exists())
                 {
                     add_as_file = true;
                 }
                 else
                 {
-                    DirectoryHandler *dh = handler->newDir(p->fileName(),
-                                                           p->absFilePath());
-                    scan_dir(p->absFilePath(), dh, ext_settings);
+                    DirectoryHandler *dh =
+                            handler->newDir(p->fileName(),
+                                            p->absoluteFilePath());
+                    scan_dir(p->absoluteFilePath(), dh, ext_settings);
                 }
             }
 
             if (add_as_file)
             {
-                handler->handleFile(p->fileName(), p->absFilePath(),
-                                    p->extension(false));
+                handler->handleFile(p->fileName(), p->absoluteFilePath(),
+                                    p->suffix());
             }
         }
     }

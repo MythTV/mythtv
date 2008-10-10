@@ -216,7 +216,7 @@ void DVDRipBox::checkDisc()
         {
             m_firstDiscFound = true;
 
-            m_discCheckingTimer.changeInterval(4000);
+            m_discCheckingTimer.setInterval(4000);
         }
 
     }
@@ -793,12 +793,15 @@ void DVDRipBox::adjustJobs(uint new_number)
         if(m_currentJob < 0)
             m_currentJob = 0;
     }
-    else if(new_number < m_jobCount)
+    else if (new_number < m_jobCount)
     {
-        for(uint i = 0; i < (m_jobCount - new_number); i++)
+        int new_last = m_jobCount - new_number;
+        if (new_last > 0)
         {
-            m_jobs.remove(m_jobs.last());
+            // TODO: fix m_jobs, it doesn't free members correctly
+            m_jobs.erase(m_jobs.begin() + new_last, m_jobs.end());
         }
+
         if(m_currentJob >= (int) m_jobs.count())
             m_currentJob = m_jobs.count() - 1;
     }

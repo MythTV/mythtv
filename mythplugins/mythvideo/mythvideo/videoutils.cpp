@@ -155,7 +155,7 @@ QStringList GetVideoDirs()
                 DEFAULT_VIDEOSTARTUP_DIR).split(":", QString::SkipEmptyParts);
     for (QStringList::iterator p = tmp.begin(); p != tmp.end(); ++p)
     {
-        *p = QDir::cleanDirPath(*p);
+        *p = QDir::cleanPath(*p);
     }
     return tmp;
 }
@@ -221,9 +221,9 @@ bool GetLocalVideoPoster(const QString &video_uid, const QString &filename,
     QStringList search_dirs(in_dirs);
 
     QFileInfo qfi(filename);
-    search_dirs += qfi.dirPath(true);
+    search_dirs += qfi.absolutePath();
 
-    const QString base_name = qfi.baseName(true);
+    const QString base_name = qfi.completeBaseName();
     QList<QByteArray> image_types = QImageReader::supportedImageFormats();
 
     typedef std::set<QString> image_type_list;

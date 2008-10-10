@@ -778,7 +778,7 @@ class FileAssociationsImp
              p != m_file_associations.end(); ++p)
         {
             if (p->extension.length() == ext.length() &&
-                ext.find(p->extension) == 0)
+                ext.indexOf(p->extension) == 0)
             {
                 return p;
             }
@@ -802,7 +802,7 @@ class FileAssociationsImp
              p != m_file_associations.end(); ++p)
         {
             if (p->extension.length() == ext.length() &&
-                ext.find(p->extension) == 0)
+                ext.indexOf(p->extension) == 0)
             {
                 return p;
             }

@@ -73,7 +73,7 @@ namespace
         Q_OBJECT
 
       signals:
-        void SigTimeout(QString url, Metadata *item);
+        void SigTimeout(const QUrl &url, Metadata *item);
 
       public:
         TimeoutSignalProxy() : m_item(0)
@@ -81,11 +81,12 @@ namespace
             connect(&m_timer, SIGNAL(timeout()), SLOT(OnTimeout()));
         }
 
-        void start(int timeout, Metadata *item, QString url)
+        void start(int timeout, Metadata *item, const QUrl &url)
         {
             m_item = item;
             m_url = url;
-            m_timer.start(timeout, true);
+            m_timer.setSingleShot(true);
+            m_timer.start(timeout);
         }
 
         void stop()
@@ -102,7 +103,7 @@ namespace
 
       private:
         Metadata *m_item;
-        QString m_url;
+        QUrl m_url;
         QTimer m_timer;
     };
 
@@ -362,7 +363,7 @@ namespace
         {
             m_item = item;
 
-            QString def_cmd = QDir::cleanDirPath(QString("%1/%2")
+            QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
                     .arg("mythvideo/scripts/imdb.pl -M tv=no;video=no"));
 
@@ -421,7 +422,7 @@ namespace
             m_item = item;
             m_video_uid = video_uid;
 
-            const QString def_cmd = QDir::cleanDirPath(QString("%1/%2")
+            const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
                     .arg("mythvideo/scripts/imdb.pl -D"));
             const QString cmd = gContext->GetSetting("MovieDataCommandLine",
@@ -666,7 +667,7 @@ class VideoDialogPrivate
             for (parental_level_map::const_iterator p = m_rating_to_pl.begin();
                     rating.length() && p != m_rating_to_pl.end(); ++p)
             {
-                if (rating.find(p->first) != -1)
+                if (rating.indexOf(p->first) != -1)
                 {
                     metadata->setShowLevel(p->second);
                     break;
@@ -742,8 +743,8 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
             gContext->GetNumSetting("mythvideo.VideoTreeRemember", 0);
 
     connect(&m_private->m_url_dl_timer,
-            SIGNAL(SigTimeout(QString, Metadata *)),
-            SLOT(OnPosterDownloadTimeout(QString, Metadata *)));
+            SIGNAL(SigTimeout(const QUrl &, Metadata *)),
+            SLOT(OnPosterDownloadTimeout(const QUrl &, Metadata *)));
     connect(&m_private->m_download_proxy,
             SIGNAL(SigFinished(bool, QString, Metadata *)),
             SLOT(OnPosterCopyFinished(bool, QString, Metadata *)));
@@ -1925,7 +1926,7 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
 
             QUrl url(uri);
 
-            QString ext = QFileInfo(url.path()).extension(false);
+            QString ext = QFileInfo(url.path()).suffix();
             QString dest_file = QString("%1/%2.%3").arg(fileprefix)
                     .arg(metadata->InetRef()).arg(ext);
             VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
@@ -1964,9 +1965,10 @@ void VideoDialog::OnPosterCopyFinished(bool error, QString errorMsg,
     OnVideoPosterSetDone(item);
 }
 
-void VideoDialog::OnPosterDownloadTimeout(QString url, Metadata *item)
+void VideoDialog::OnPosterDownloadTimeout(const QUrl &url, Metadata *item)
 {
-    VERBOSE(VB_IMPORTANT, QString("Copying of '%1' timed out").arg(url));
+    VERBOSE(VB_IMPORTANT, QString("Copying of '%1' timed out")
+            .arg(url.toString()));
 
     if (item)
         item->setCoverFile("");

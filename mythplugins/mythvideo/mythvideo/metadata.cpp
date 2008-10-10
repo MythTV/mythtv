@@ -356,9 +356,7 @@ bool MetadataImp::deleteFile()
     }
     else
     {
-        QFile videofile;
-        videofile.setName(m_filename);
-        isremoved = videofile.remove();
+        isremoved = QFile::remove(m_filename);
     }
 
     if (!isremoved)
@@ -721,8 +719,8 @@ namespace
 
         while (keep_checking)
         {
-            int left_position = ret.find(left_brace);
-            int right_position = ret.find(right_brace);
+            int left_position = ret.indexOf(left_brace);
+            int right_position = ret.indexOf(right_brace);
             if (left_position == -1 || right_position == -1)
             {
                 //
@@ -761,10 +759,10 @@ namespace
 QString Metadata::FilenameToTitle(const QString &file_name)
 {
     QString title = file_name.right(file_name.length() -
-                                    file_name.findRev("/") - 1);
+                                    file_name.lastIndexOf('/') - 1);
     title.replace(QRegExp("_"), " ");
     title.replace(QRegExp("%20"), " ");
-    title = title.left(title.findRev("."));
+    title = title.left(title.lastIndexOf('.'));
     title.replace(QRegExp("\\."), " ");
 
     title = eatBraces(title, "[", "]");
@@ -779,8 +777,8 @@ namespace
     const QRegExp &getTitleTrim(bool ignore_case)
     {
         static QString pattern(QObject::tr("^(The |A |An )"));
-        static QRegExp prefixes_case(pattern, true);
-        static QRegExp prefixes_nocase(pattern, false);
+        static QRegExp prefixes_case(pattern, Qt::CaseSensitive);
+        static QRegExp prefixes_nocase(pattern, Qt::CaseInsensitive);
         return ignore_case ? prefixes_nocase : prefixes_case;
     }
 }
