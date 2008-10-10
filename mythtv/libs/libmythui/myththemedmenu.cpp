@@ -179,6 +179,8 @@ void MythThemedMenu::setButtonActive(MythUIButtonListItem* item)
         if (!(m_watermarkState->DisplayState(button.type)))
             m_watermarkState->DisplayState("DEFAULT");
     }
+
+    updateLCD();
 }
 
 /** \brief Looks at "AllowQuitShutdown" setting in DB, in order to
