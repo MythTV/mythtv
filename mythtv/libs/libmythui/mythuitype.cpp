@@ -319,6 +319,9 @@ void MythUIType::HandleAlphaPulse(void)
 
 void MythUIType::Pulse(void)
 {
+    if (!m_Visible)
+        return;
+
     HandleMovementPulse();
     HandleAlphaPulse();
 
