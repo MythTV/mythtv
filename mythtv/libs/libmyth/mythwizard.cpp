@@ -1,5 +1,3 @@
-#ifdef QT3SUPPORT
-
 /****************************************************************************
 ** 
 **
@@ -39,19 +37,19 @@
 
 #include "mythwizard.h"
 
-#include "qlayout.h"
-#include "qpushbutton.h"
-#include "qcursor.h"
-#include "qlabel.h"
-#include "qapplication.h"
-#include "qpainter.h"
-#include <QChildEvent>
-#include <QKeyEvent>
-#include <QEvent>
+#include <QApplication>
 
-#include <q3widgetstack.h>
-#include <QGroupBox>
+#include <QLayout>
+#include <QKeyEvent>
+#include <QChildEvent>
+#include <QCursor>
+#include <QPainter>
+
+#include <QStackedWidget>
+#include <QPushButton>
 #include <QBoxLayout>
+#include <QGroupBox>
+#include <QLabel>
 
 #include "mythcontext.h"
 
@@ -74,7 +72,7 @@ public:
 
     QVBoxLayout * v;
     Page * current;
-    Q3WidgetStack * ws;
+    QStackedWidget * ws;
     QList<Page*> pages;
     QLabel * title;
     MythPushButton * backButton;
@@ -103,7 +101,8 @@ MythWizard::MythWizard(MythMainWindow *parent, const char *name)
 {
     d = new MythWizardPrivate();
     d->current = 0; // not quite true, but...
-    d->ws = new Q3WidgetStack( this, "qt_widgetstack" );
+    d->ws = new QStackedWidget(this);
+    d->ws->setObjectName("MythWizard - stacked widget");
     d->title = new QLabel( this, "title label" );
     d->title->setBackgroundOrigin(QWidget::WindowOrigin);
 
@@ -183,7 +182,7 @@ void MythWizard::addPage( QWidget * page, const QString & title )
 
     MythWizardPrivate::Page * p = new MythWizardPrivate::Page( page, title );
     p->backEnabled = ( i > 0 );
-    d->ws->addWidget( page, i );
+    d->ws->addWidget(page);
     d->pages.append( p );
 }
 
@@ -208,7 +207,7 @@ void MythWizard::insertPage( QWidget * page, const QString & title, int index )
     p->backEnabled = ( index > 0 );
     p->nextEnabled = ( index < (int)d->pages.size() );
 
-    d->ws->addWidget( page, index );
+    d->ws->addWidget(page);
     d->pages.insert( index, p );
 }
 
@@ -231,7 +230,7 @@ void MythWizard::showPage( QWidget * page )
         }
         setBackEnabled( notFirst );
         setNextEnabled( TRUE );
-        d->ws->raiseWidget( page );
+        d->ws->setCurrentWidget(page);
         d->current = p;
     }
 
@@ -375,7 +374,7 @@ void MythWizard::updateButtons()
 
 QWidget * MythWizard::currentPage() const
 {
-    return d->ws->visibleWidget();
+    return d->ws->currentWidget();
 }
 
 QString MythWizard::title( QWidget * page ) const
@@ -609,7 +608,7 @@ void MythWizard::removePage( QWidget * page )
     d->pages.removeAll(p);
     delete p;
 
-    d->ws->removeWidget( page );
+    d->ws->removeWidget(page);
 
     if ( cp == page ) {
         i--;
@@ -646,4 +645,4 @@ MythJumpWizard::MythJumpWizard(MythMainWindow *parent, const char *name) :
 MythJumpWizard::~MythJumpWizard()
 {
 }
-#endif // QT3SUPPORT
+

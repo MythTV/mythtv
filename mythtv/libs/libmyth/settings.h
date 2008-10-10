@@ -20,7 +20,6 @@ using namespace std;
 class QWidget;
 class ConfigurationGroup;
 class QDir;
-class Q3WidgetStack;
 class Setting;
 
 class MPUBLIC Configurable : public QObject

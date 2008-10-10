@@ -3,10 +3,6 @@
 #include <QGroupBox>
 #include <QStackedWidget>
 
-#ifdef QT3SUPPORT
-#include <q3tabdialog.h>
-#endif // QT3SUPPORT
-
 #include "mythconfiggroups.h"
 #include "mythcontext.h"
 #include "libmythdb/mythverbose.h"
@@ -328,7 +324,6 @@ QWidget* GridConfigurationGroup::configWidget(
     return widget;
 }
 
-#ifdef QT3SUPPORT
 StackedConfigurationGroup::~StackedConfigurationGroup()
 {
     clear_widgets(children, childwidget);
@@ -461,7 +456,6 @@ void StackedConfigurationGroup::Save(QString destination)
     else if (top < children.size())
         children[top]->GetStorage()->Save(destination);
 }
-#endif // QT3SUPPORT
 
 void TriggeredConfigurationGroup::addChild(Configurable* child)
 {
@@ -676,28 +670,6 @@ void TriggeredConfigurationGroup::widgetInvalid(QObject *obj)
 {
     widget = (widget == obj) ? NULL : widget;
 }
-
-#ifdef QT3SUPPORT
-QWidget* TabbedConfigurationGroup::configWidget(ConfigurationGroup *cg, 
-                                                QWidget* parent,
-                                                const char* widgetName) 
-{
-    Q3TabDialog* widget = new Q3TabDialog(parent, widgetName);
-    
-    for(unsigned i = 0 ; i < children.size() ; ++i)
-        if (children[i]->isVisible())
-            widget->addTab(children[i]->configWidget(cg, widget), 
-                           children[i]->getLabel());
-
-    if (cg)
-    {
-        connect(this, SIGNAL(changeHelpText(QString)), cg,
-                SIGNAL(changeHelpText(QString)));
-    }
-
-    return widget;
-};
-#endif
 
 JumpPane::JumpPane(const QStringList &labels, const QStringList &helptext) :
     VerticalConfigurationGroup(true, false, true, true)

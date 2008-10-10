@@ -256,19 +256,6 @@ class MPUBLIC TriggeredConfigurationGroup : public ConfigurationGroup
     QWidget                     *widget;
 };
 
-class MPUBLIC TabbedConfigurationGroup : public ConfigurationGroup
-{
-    Q_OBJECT
-
-  public:
-    TabbedConfigurationGroup() :
-        ConfigurationGroup(true, true, false, false) { }
-
-    virtual QWidget *configWidget(ConfigurationGroup *cg,
-                                  QWidget            *parent,
-                                  const char         *widgetName);
-};
-
 class MPUBLIC JumpPane : public VerticalConfigurationGroup
 {
     Q_OBJECT
