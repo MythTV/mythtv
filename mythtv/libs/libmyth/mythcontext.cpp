@@ -1229,10 +1229,14 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
 {
     if (app_binary_version != MYTH_BINARY_VERSION)
     {
-        QString warning = tr("This application (%1) is not compatible"
-                             "with the installed MythTV libraries (%2)."
-                             "Please recompile after a make distclean")
-                .arg(app_binary_version).arg(MYTH_BINARY_VERSION);
+        VERBOSE(VB_GENERAL, QString("Application binary version (%1) does not "
+                                    "match libraries (%2)")
+                                    .arg(app_binary_version)
+                                    .arg(MYTH_BINARY_VERSION));
+
+        QString warning = tr("This application is not compatible "
+                             "with the installed MythTV libraries. "
+                             "Please recompile after a make distclean");
         if (gui)
         {
             d->TempMainWindow(false);
@@ -1935,12 +1939,16 @@ bool MythContext::TestPopupVersion(const QString &name,
     if (libversion == pluginversion)
         return true;
 
-    QString err = tr("Plugin %1 (%2) is not compatible"
-                     "with the installed MythTV libraries (%3).\n"
-                     "Please recompile the plugin after a make distclean");
+    QString err = tr("Plugin %1 is not compatible with the installed MythTV "
+                     "libraries. Please recompile the plugin after a make "
+                     "distclean");
+
+    VERBOSE(VB_GENERAL, QString("Plugin %1 (%2) binary version does not "
+                                "match libraries (%3)")
+                                .arg(name).arg(pluginversion).arg(libversion));
 
     if (GetMainWindow() && !d->disablelibrarypopup)
-        ShowOkPopup(err.arg(name).arg(pluginversion).arg(libversion));
+        ShowOkPopup(err.arg(name));
 
     return false;
 }
