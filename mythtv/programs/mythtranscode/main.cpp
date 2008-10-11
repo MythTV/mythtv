@@ -479,7 +479,7 @@ int main(int argc, char *argv[])
          cerr << "Cannot specify both --fifodir and --allkeys\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
-    if (fifosync && !fifodir.isEmpty())
+    if (fifosync && fifodir.isEmpty())
     {
          cerr << "Must specify --fifodir to use --fifosync\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
