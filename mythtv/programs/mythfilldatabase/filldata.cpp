@@ -342,7 +342,7 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
 
     QString filename = QString(tempfilename);
 
-    QString home = QDir::homeDirPath();
+    QString home = QDir::homePath();
     QString configfile = QString("%1/%2.xmltv").arg(GetConfDir())
                                                .arg(source.name);
 

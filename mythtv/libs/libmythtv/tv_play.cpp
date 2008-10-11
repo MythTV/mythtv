@@ -2384,7 +2384,7 @@ void TV::TVEventThreadChecks(void)
     if (update_osd_pos && GetOSD())
     {
         OSDSet *oset = GetOSD()->GetSet("status");
-        if (oset && oset->Displaying() && 
+        if (oset && oset->Displaying() &&
             (StateIsLiveTV(internalState) ||
              StateIsPlaying(internalState)))
         {
@@ -8414,7 +8414,7 @@ bool TV::ScreenShot(long long frameNumber)
 
     QString outFile =
         QString("%1/.mythtv/%2_%3_%4.png")
-        .arg(QDir::homeDirPath()).arg(playbackinfo->chanid)
+        .arg(QDir::homePath()).arg(playbackinfo->chanid)
         .arg(playbackinfo->recstartts.toString("yyyyMMddhhmmss"))
         .arg((long)frameNumber);
 

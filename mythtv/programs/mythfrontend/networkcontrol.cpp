@@ -1061,7 +1061,7 @@ QString NetworkControl::saveScreenshot(QStringList tokens)
         if (!pginfo)
             return "ERROR: Unable to find program info for current program";
 
-        QString outFile = QDir::homeDirPath() + "/.mythtv/screenshot.png";
+        QString outFile = QDir::homePath() + "/.mythtv/screenshot.png";
 
         if (tokens.size() >= 4)
             outFile = tokens[3];

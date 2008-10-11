@@ -38,7 +38,7 @@ static HostLineEdit *SetMusicDirectory()
     HostLineEdit *gc = new HostLineEdit("MusicLocation");
     gc->setLabel(QObject::tr("Directory to hold music"));
 #ifdef Q_WS_MACX
-    gc->setValue(QDir::homeDirPath() + "/Music");
+    gc->setValue(QDir::homePath() + "/Music");
 #else
     gc->setValue("/mnt/store/music/");
 #endif
@@ -434,7 +434,7 @@ static HostCheckBox *VisualRandomize()
     gc->setValue(false);
     gc->setHelpText(QObject::tr("On changing the visualizer pick "
                      "a new one at random."));
-    return gc; 
+    return gc;
 };
 
 static HostSpinBox *VisualScaleWidth()

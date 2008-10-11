@@ -16,7 +16,7 @@ static HostLineEdit *MythGalleryDir()
     HostLineEdit *gc = new HostLineEdit("GalleryDir");
     gc->setLabel(QObject::tr("Directory that holds images"));
 #ifdef Q_WS_MACX
-    gc->setValue(QDir::homeDirPath() + "/Pictures");
+    gc->setValue(QDir::homePath() + "/Pictures");
 #else
     gc->setValue("/var/lib/pictures");
 #endif
@@ -126,7 +126,7 @@ static HostComboBox *SlideshowTransition()
     HostComboBox *gc = new HostComboBox("SlideshowTransition");
     gc->setLabel(QObject::tr("Type of transition"));
     gc->addSelection("none");
-    gc->addSelection("chess board"); 
+    gc->addSelection("chess board");
     gc->addSelection("melt down");
     gc->addSelection("sweep");
     gc->addSelection("noise");
