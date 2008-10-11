@@ -398,7 +398,7 @@ HostLineEdit *SetRipDirectory()
     HostLineEdit *gc = new HostLineEdit("DVDRipLocation");
     gc->setLabel(QObject::tr("Directory to hold temporary files"));
 #ifdef Q_WS_MACX
-    gc->setValue(QDir::homeDirPath() + "/Library/Application Support");
+    gc->setValue(QDir::homePath() + "/Library/Application Support");
 #else
     gc->setValue("/var/lib/mythdvd/temp");
 #endif
