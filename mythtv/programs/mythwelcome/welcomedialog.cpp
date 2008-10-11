@@ -98,7 +98,7 @@ DialogCode WelcomeDialog::exec(void)
     bool bAutoStartFrontend = gContext->GetNumSetting("AutoStartFrontend", 1);
 
     if (state == 1 && bAutoStartFrontend)
-        startFrontend();
+        QTimer::singleShot(500, this, SLOT(startFrontend()));
 
     // update status now
     updateAll();
