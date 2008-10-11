@@ -55,24 +55,7 @@ our @targetsBE = ( 'MythBackend',   'MythFillDatabase',
                    'MythTranscode', 'MythTV-Setup');
 
 # Patches for MythTV source
-our %patches = (
-  'mythtv' => 'Index: libs/libmythui/mythmainwindow.cpp
-===================================================================
---- libs/libmythui/mythmainwindow.cpp  (revision 12154)
-+++ libs/libmythui/mythmainwindow.cpp  (working copy)
-@@ -1094,6 +1094,10 @@
-         {
-             QKeyEvent *ke = dynamic_cast<QKeyEvent*>(e);
- 
-+            // Work around weird GCC run-time bug. Only manifest on Mac OS X
-+            if (!ke)
-+                ke = (QKeyEvent *)e;
-+
-             if (currentWidget())
-             {
-                 ke->accept();
-'
-);
+our %patches = (); 
 
 our %depend_order = (
   'mythtv'
