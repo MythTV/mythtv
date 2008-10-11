@@ -1367,7 +1367,7 @@ void UIListBtnType::MoveDown(int count)
 bool UIListBtnType::MoveToNamedPosition(const QString &position_name)
 {
     if (m_itemList.isEmpty())
-        return;
+        return false;
 
     if (m_selPosition < 0)
     {
@@ -1416,7 +1416,7 @@ bool UIListBtnType::MoveToNamedPosition(const QString &position_name)
 bool UIListBtnType::MoveItemUpDown(UIListBtnTypeItem *item, bool flag)
 {
     if (m_itemList.isEmpty())
-        return;
+        return false;
 
     if (item != m_selItem)
     {
