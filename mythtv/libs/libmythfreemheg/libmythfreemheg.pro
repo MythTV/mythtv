@@ -25,6 +25,6 @@ HEADERS += DynamicLineArt.h TokenGroup.h Link.h Logging.h freemheg.h
 LIBS += $$EXTRA_LIBS
 
 #The following line was inserted by qt3to4
-QT += network xml  sql opengl qt3support
+QT += network xml sql qt3support
 
 include ( ../libs-targetfix.pro )
