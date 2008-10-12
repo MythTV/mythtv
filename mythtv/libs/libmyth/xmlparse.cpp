@@ -1433,7 +1433,7 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
     }
 
     QString layerNum = element.attribute("draworder", "");
-    if (layerNum.isNull() && layerNum.isEmpty())
+    if (layerNum.isNull() || layerNum.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Text area needs a draworder");
         return;
@@ -1587,7 +1587,7 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
     }
 
     QString layerNum = element.attribute("draworder", "");
-    if (layerNum.isNull() && layerNum.isEmpty())
+    if (layerNum.isNull() || layerNum.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Rich Text area needs a draworder");
         return;
@@ -1671,7 +1671,7 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
                 }
 
                 imgpoint = info.attribute("location", "");
-                if (imgpoint.isNull() && imgpoint.isEmpty())
+                if (imgpoint.isNull() || imgpoint.isEmpty())
                 {
                     VERBOSE(VB_IMPORTANT, LOC_WARN + "Image needs a location");
                     return;
@@ -1782,7 +1782,7 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
     }
 
     QString layerNum = element.attribute("draworder", "");
-    if (layerNum.isNull() && layerNum.isEmpty())
+    if (layerNum.isNull() || layerNum.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN + "RemoteEdit needs a draworder");
         return;
@@ -1920,7 +1920,7 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
     }
 
     QString layerNum = element.attribute("draworder", "");
-    if (layerNum.isNull() && layerNum.isEmpty())
+    if (layerNum.isNull() || layerNum.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN + "List area needs a draworder");
         return;
@@ -2041,7 +2041,7 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
 
 
                 imgpoint = info.attribute("location", "");
-                if (imgpoint.isNull() && imgpoint.isEmpty())
+                if (imgpoint.isNull() || imgpoint.isEmpty())
                 {
                     VERBOSE(VB_IMPORTANT, LOC_WARN + "Image needs a location");
                     return;
@@ -2097,7 +2097,7 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                 }
 
                 colwidth = info.attribute("width", "");
-                if (colwidth.isNull() && colwidth.isEmpty())
+                if (colwidth.isNull() || colwidth.isEmpty())
                 {
                     VERBOSE(VB_IMPORTANT, LOC_WARN + "Column needs a width");
                     return;
