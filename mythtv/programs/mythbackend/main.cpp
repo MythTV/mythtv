@@ -822,6 +822,10 @@ int main(int argc, char **argv)
                               "Exiting.");
         return BACKEND_EXIT_INVALID_TIMEZONE;
     }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("Backend is running in %1 time zone.").arg(getTimeZoneID()));
+    }
     if (!UpgradeTVDatabaseSchema(true, true))
     {
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema");
