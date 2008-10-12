@@ -545,33 +545,28 @@ bool MediaMonitorUnix::FindPartitions(const QString &dev, bool checkPartitions)
         return found_partitions;
     }
 
+    QString device_file = GetDeviceFile(dev);
+
+    if (device_file.isNull())
+        return false;
+
     QStringList cdroms = GetCDROMBlockDevices();
 
     if (cdroms.contains(dev.section('/', -1)))
     {
         // found cdrom device
-        QString device_file = GetDeviceFile(dev);
-        if (!device_file.isNull())
-        {
             pDevice = MythCDROM::get(
                 this, device_file.toAscii().constData(), false, m_AllowEject);
-
-            if (AddDevice(pDevice))
-                return true;
-        }
     }
     else
     {
         // found block or partition device
-        QString device_file = GetDeviceFile(dev);
-        if (!device_file.isNull())
-        {
             pDevice = MythHDD::Get(
                 this, device_file.toAscii().constData(), false, false);
-            if (AddDevice(pDevice))
-                return true;
-        }
     }
+
+    if (AddDevice(pDevice))
+        return true;
 
     if (pDevice)
         pDevice->deleteLater();
