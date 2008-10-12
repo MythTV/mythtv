@@ -1663,7 +1663,7 @@ double MythContext::GetFloatSettingOnHost(
 QImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
 {
     QUrl qurl = url;
-    if (qurl.host() == "")
+    if (qurl.host().isEmpty())
         return NULL;
 
     QImage *im;

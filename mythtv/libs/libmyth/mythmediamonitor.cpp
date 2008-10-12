@@ -92,7 +92,7 @@ static const QString DevName(MythMediaDevice *d)
 {
     QString str = d->getVolumeID();  // First choice, the name of the media 
 
-    if (str == "")
+    if (str.isEmpty())
     {
         str = d->getDeviceModel();   // otherwise, the drive manufacturer/model
 

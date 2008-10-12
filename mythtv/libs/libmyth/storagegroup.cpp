@@ -410,7 +410,7 @@ void StorageGroupEditor::open(QString name)
         if (result == SGPopup_CANCEL)
             return;
 
-        if (name == "")
+        if (name.isEmpty())
             return;
 
         if (name.right(1) != "/")

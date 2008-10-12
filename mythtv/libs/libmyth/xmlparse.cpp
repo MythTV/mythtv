@@ -805,7 +805,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     guide->SetArea(area);
     guide->SetCategoryColors(catColors);
     guide->SetTextOffset(textoff);
-    if (concolor == "")
+    if (concolor.isEmpty())
         concolor = reccolor;
     guide->SetRecordingColors(reccolor, concolor);
     guide->SetSelectorColor(selcolor);
@@ -840,8 +840,6 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     }
     else
         guide->SetJustification(jst);
-
-    align = "";
 
     if (context != -1)
     {
@@ -1080,8 +1078,6 @@ void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
     }
     else
         grid->setJustification(jst);
-
-    align = "";
 
     if (textposition == "top")
         grid->setTextPosition(UIImageGridType::textPosTop);
@@ -1472,7 +1468,7 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
             else if (info.tagName() == "value")
             {
                 if ((value.isNull() || value.isEmpty()) &&
-                    info.attribute("lang","") == "")
+                    info.attribute("lang","").isEmpty())
                 {
                     value = qApp->translate(
                         "ThemeUI", getFirstText(info).toLatin1().constData());
@@ -1639,7 +1635,7 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
             else if (info.tagName() == "value")
             {
                 if ((value.isNull() || value.isEmpty()) &&
-                     info.attribute("lang","") == "")
+                     info.attribute("lang","").isEmpty())
                 {
                     value = qApp->translate(
                         "ThemeUI", getFirstText(info).toLatin1().constData());
@@ -1816,7 +1812,7 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
             else if (info.tagName() == "value")
             {
                 if ((value.isNull() || value.isEmpty()) &&
-                    info.attribute("lang","") == "")
+                    info.attribute("lang","").isEmpty())
                 {
                     value = qApp->translate(
                         "ThemeUI", getFirstText(info).toLatin1().constData());
@@ -4032,19 +4028,19 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
         }
     }
 
-    if (normalFontName == "")
+    if (normalFontName.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, LOC_WARN + "Keyboard need a normal font" );
         return;
     }
 
-    if (focusedFontName == "")
+    if (focusedFontName.isEmpty())
         focusedFontName = normalFontName;
 
-    if (downFontName == "")
+    if (downFontName.isEmpty())
         downFontName = normalFontName;
 
-    if (downFocusedFontName == "")
+    if (downFocusedFontName.isEmpty())
         downFocusedFontName = normalFontName;
 
     fontProp *normalFont = GetFont(normalFontName);
