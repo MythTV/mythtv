@@ -1876,7 +1876,7 @@ push @{$expect},
   
 # install fixup for redundant themes folders/folders/folders:
 [ always => '',
-  shell => [ 'cd /c/mythtv/build/share/mythtv/themes',
+  shell => [ "cd $unixbuild/share/mythtv/themes",
              'for f in *; do mv $f/$f/* ./$f; done' ],
   comment => 'relocate badly installed THEMES! ' ],
 
