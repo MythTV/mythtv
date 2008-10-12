@@ -178,7 +178,7 @@ void XMLParse::parseFont(QDomElement &element)
     }
 
     QString base =  element.attribute("base", "");
-    if (!base.isNull() && !base.isEmpty())
+    if (base.size())
     {
         baseFont = GetFont(base);
         if (!baseFont)
@@ -206,7 +206,7 @@ void XMLParse::parseFont(QDomElement &element)
     }
 
     hint = element.attribute("stylehint", "");
-    if (!hint.isNull() && !hint.isEmpty())
+    if (hint.size())
     {
         styleHint = (QFont::StyleHint)hint.toInt();
     }
@@ -443,7 +443,7 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
         image->SetSize(scale.x(), scale.y());
     image->SetSkip(skipin.x(), skipin.y());
     QString flex = element.attribute("fleximage", "");
-    if (!flex.isNull() && !flex.isEmpty())
+    if (flex.size())
     {
         if (flex.toLower() == "yes")
             image->SetFlex(true);
@@ -454,7 +454,7 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
     image->LoadImage();
 
     QString visible = element.attribute("visible", "");
-    if (!visible.isNull() && !visible.isEmpty())
+    if (visible.size())
     {
         if (visible.toLower() == "yes")
             image->show();
@@ -561,7 +561,7 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
         image->SetSize(scale.x(), scale.y());
     image->SetSkip(skipin.x(), skipin.y());
     QString flex = element.attribute("fleximage", "");
-    if (!flex.isNull() && !flex.isEmpty())
+    if (flex.size())
     {
         if (flex.toLower() == "yes")
             image->SetFlex(true);
@@ -823,7 +823,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     if (multiline == true)
         jst = Qt::TextWordWrap;
 
-    if (!align.isNull() && !align.isEmpty())
+    if (align.size())
     {
         if (align.toLower() == "center")
             guide->SetJustification(Qt::AlignCenter | jst);
@@ -1063,7 +1063,7 @@ void XMLParse::parseImageGrid(LayerSet *container, QDomElement &element)
     if (multiline == true)
         jst = Qt::TextWordWrap;
 
-    if (!align.isNull() && !align.isEmpty())
+    if (align.size())
     {
         if (align.toLower() == "center")
             grid->setJustification(Qt::AlignCenter | jst);
@@ -1197,7 +1197,7 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
     else if (orientation == "vertical")
        bar->SetOrientation(2);
 
-    if (!align.isNull() && !align.isEmpty())
+    if (align.size())
     {
         if (align.toLower() == "center")
             bar->SetJustification(Qt::AlignCenter);
@@ -1213,7 +1213,6 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
             bar->SetJustification(Qt::AlignHCenter);
 
     }
-    align = "";
 
     if (context != -1)
     {
@@ -1526,13 +1525,13 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
     }
     if (multiline.toLower() == "yes")
         text->SetJustification(Qt::TextWordWrap);
-    if (!value.isNull() && !value.isEmpty())
+    if (value.size())
         text->SetText(value);
     if (cutdown.toLower() == "no")
         text->SetCutDown(false);
 
     QString align = element.attribute("align", "");
-    if (!align.isNull() && !align.isEmpty())
+    if (align.size())
     {
         int jst = (Qt::AlignTop | Qt::AlignLeft);
         if (multiline.toLower() == "yes")
@@ -1733,7 +1732,7 @@ void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
     {
         text->SetContext(context);
     }
-    if (!value.isNull() && !value.isEmpty())
+    if (value.size())
         text->SetText(value);
 
     if (upArrowReg)
@@ -1872,7 +1871,7 @@ void XMLParse::parseRemoteEdit(LayerSet *container, QDomElement &element)
     {
         edit->SetContext(context);
     }
-    if (!value.isNull() && !value.isEmpty())
+    if (value.size())
         edit->setText(value);
 
     edit->SetParent(container);
@@ -2105,7 +2104,7 @@ void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
                 }
 
                 colcontext = info.attribute("context", "");
-                if (!colcontext.isNull() && !colcontext.isEmpty())
+                if (colcontext.size())
                 {
                     columnContexts[colnum.toInt()] = colcontext.toInt();
                 }
@@ -2245,7 +2244,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
             {
                 QString confile = getFirstText(info);
                 QString flex = info.attribute("fleximage", "");
-                if (!flex.isNull() && !flex.isEmpty())
+                if (flex.size())
                 {
                     if (flex.toLower() == "yes")
                     {
@@ -2287,7 +2286,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
                 imgFillSpace = info.attribute("whitespace", "").toInt();
 
                 QString flex = info.attribute("fleximage", "");
-                if (!flex.isNull() && !flex.isEmpty())
+                if (flex.size())
                 {
                     if (flex.toLower() == "yes")
                     {
@@ -2461,11 +2460,11 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
 
                 if (imgname.toLower() == "selectionbar")
                 {
-                    QString imgpoint = "";
-                    QString imgPad = "";
-                    QString imgScale = "";
+                    QString imgpoint;
+                    QString imgPad;
+                    QString imgScale;
                     imgpoint = info.attribute("location", "");
-                    if (!imgpoint.isNull() && !imgpoint.isEmpty())
+                    if (imgpoint.size())
                     {
                         selectPoint = parsePoint(imgpoint);
                         selectPoint.setX((int)(selectPoint.x() * wmult));
@@ -2473,7 +2472,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                     }
 
                     imgPad = info.attribute("padding", "");
-                    if (!imgPad.isNull() && !imgPad.isEmpty())
+                    if (imgPad.size())
                     {
                         selectPadding = (int)(imgPad.toInt() * hmult);
                     }
@@ -2494,9 +2493,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 }
                 else if (imgname.toLower() == "uparrow")
                 {
-                    QString imgpoint = "";
+                    QString imgpoint;
                     imgpoint = info.attribute("location", "");
-                    if (!imgpoint.isNull() && !imgpoint.isEmpty())
+                    if (imgpoint.size())
                     {
                         upArrowPoint = parsePoint(imgpoint);
                         upArrowPoint.setX((int)(upArrowPoint.x() * wmult));
@@ -2513,9 +2512,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 }
                 else if (imgname.toLower() == "downarrow")
                 {
-                    QString imgpoint = "";
+                    QString imgpoint;
                     imgpoint = info.attribute("location", "");
-                    if (!imgpoint.isNull() && !imgpoint.isEmpty())
+                    if (imgpoint.size())
                     {
                         downArrowPoint = parsePoint(imgpoint);
                         downArrowPoint.setX((int)(downArrowPoint.x() * wmult));
@@ -2531,9 +2530,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 }
                 else if (imgname.toLower() == "leftarrow")
                 {
-                    QString imgpoint = "";
+                    QString imgpoint;
                     imgpoint = info.attribute("location", "");
-                    if (!imgpoint.isNull() && !imgpoint.isEmpty())
+                    if (imgpoint.size())
                     {
                         leftArrowPoint = parsePoint(imgpoint);
                         leftArrowPoint.setX((int)(leftArrowPoint.x() * wmult));
@@ -2549,9 +2548,9 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 }
                 else if (imgname.toLower() == "rightarrow")
                 {
-                    QString imgpoint = "";
+                    QString imgpoint;
                     imgpoint = info.attribute("location", "");
-                    if (!imgpoint.isNull() && !imgpoint.isEmpty())
+                    if (imgpoint.size())
                     {
                         rightArrowPoint = parsePoint(imgpoint);
                         rightArrowPoint.setX((int)(rightArrowPoint.x() * wmult));
