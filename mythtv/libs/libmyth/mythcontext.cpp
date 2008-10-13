@@ -1250,7 +1250,7 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
         if (!home)
             home = ".";  // getenv("TEMP")?
 
-        _putenv(QString("HOME=%1").arg(home));
+        _putenv(QString("HOME=%1").arg(home).toLocal8Bit().constData());
     }
 #endif
 
