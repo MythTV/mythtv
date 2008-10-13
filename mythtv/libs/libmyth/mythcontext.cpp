@@ -157,7 +157,7 @@ static void exec_program_tv_cb(const QString &cmd)
     else
     {
         if (cardid == -2)
-            VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Card %1 is "
+            VERBOSE(VB_IMPORTANT, QString("exec_program_tv: Card %1 is "
                                           "already locked").arg(cardid));
 
 #if 0
