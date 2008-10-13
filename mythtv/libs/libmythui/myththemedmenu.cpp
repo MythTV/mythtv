@@ -47,9 +47,9 @@ bool MythThemedMenuState::Create(void)
     if (!LoadWindowFromXML("menu-ui.xml", "mainmenu", this))
         return false;
 
-    m_titleState = dynamic_cast<MythUIStateType *> (GetChild("titles"));
+    m_titleState     = dynamic_cast<MythUIStateType *> (GetChild("titles"));
     m_watermarkState = dynamic_cast<MythUIStateType *> (GetChild("watermarks"));
-    m_buttonList = dynamic_cast<MythUIButtonList *> (GetChild("menu"));
+    m_buttonList     = dynamic_cast<MythUIButtonList *> (GetChild("menu"));
 
     if (!m_buttonList)
     {
@@ -75,9 +75,9 @@ void MythThemedMenuState::CopyFrom(MythUIType *base)
 
     MythScreenType::CopyFrom(base);
 
-    m_titleState = dynamic_cast<MythUIStateType *> (GetChild("titles"));
+    m_titleState     = dynamic_cast<MythUIStateType *> (GetChild("titles"));
     m_watermarkState = dynamic_cast<MythUIStateType *> (GetChild("watermarks"));
-    m_buttonList = dynamic_cast<MythUIButtonList *> (GetChild("menu"));
+    m_buttonList     = dynamic_cast<MythUIButtonList *> (GetChild("menu"));
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -147,15 +147,15 @@ MythThemedMenu::~MythThemedMenu(void)
         delete m_state;
 }
 
-/// \brief Returns true iff a theme has been found by a previous call to
-///        Init(const char*,const char*)
+/// \brief Returns true iff a theme has been found by a previous call to Init()
 bool MythThemedMenu::foundTheme(void)
 {
     return m_foundtheme;
 }
 
 /// \brief Set the themed menus callback function and data for that function
-void MythThemedMenu::setCallback(void (*lcallback)(void *, QString &), void *data)
+void MythThemedMenu::setCallback(void (*lcallback)(void *, QString &),
+                                 void *data)
 {
     m_state->m_callback = lcallback;
     m_state->m_callbackdata = data;
@@ -361,11 +361,12 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "dependjumppoint")
             {
-                addit = GetMythMainWindow()->DestinationExists(getFirstText(info));
+                addit = GetMythMainWindow()->DestinationExists(
+                            getFirstText(info));
             }
             else
             {
-                VERBOSE(VB_GENERAL, QString("MythThemedMenuPrivate: Unknown tag %1 "
+                VERBOSE(VB_GENERAL, QString("MythThemedMenu: Unknown tag %1 "
                                             "in button").arg(info.tagName()));
             }
         }
@@ -373,13 +374,13 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
 
     if (text.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing 'text' in button");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenu: Missing 'text' in button");
         return;
     }
 
     if (action.empty())
     {
-        VERBOSE(VB_IMPORTANT, "MythThemedMenuPrivate: Missing 'action' in button");
+        VERBOSE(VB_IMPORTANT, "MythThemedMenu: Missing 'action' in button");
         return;
     }
 
@@ -395,7 +396,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
  *  find the menu it will pop up an error dialog and then return false.
  *
  *  The idea behind this is that if we can't parse the main menu we
- *  have to exit from the fronend entirely. But in all other cases
+ *  have to exit from the frontend entirely. But in all other cases
  *  we can simply return to the main menu and hope that it is a
  *  non-essential portion of MythTV which the theme does not support.
  *
@@ -409,7 +410,7 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
 
     if (!f.exists() || !f.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Couldn't read "
+        VERBOSE(VB_IMPORTANT, QString("MythThemedMenu: Couldn't read "
                                       "menu file %1").arg(menuname));
         if (menuname == "mainmenu.xml" )
         {
@@ -466,7 +467,7 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: Unknown "
+                VERBOSE(VB_IMPORTANT, QString("MythThemedMenu: Unknown "
                                               "element %1").arg(e.tagName()));
                 return false;
             }
@@ -476,7 +477,7 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
 
     if (m_buttonList->GetCount() == 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("MythThemedMenuPrivate: No buttons "
+        VERBOSE(VB_IMPORTANT, QString("MythThemedMenu: No buttons "
                                       "for menu %1").arg(menuname));
         return false;
     }
@@ -704,8 +705,8 @@ bool MythThemedMenu::findDepends(const QString &fileList)
  *  \return true if password checks out or is not needed.
  */
 bool MythThemedMenu::checkPinCode(const QString &timestamp_setting,
-                                    const QString &password_setting,
-                                    const QString &text)
+                                  const QString &password_setting,
+                                  const QString &text)
 {
     QDateTime curr_time = QDateTime::currentDateTime();
     QString last_time_stamp = GetMythDB()->GetSetting(timestamp_setting);
@@ -717,7 +718,7 @@ bool MythThemedMenu::checkPinCode(const QString &timestamp_setting,
     if (last_time_stamp.length() < 1)
     {
         VERBOSE(VB_IMPORTANT,
-                "MythThemedMenuPrivate: Could not read password/pin time stamp.\n"
+                "MythThemedMenu: Could not read password/pin time stamp.\n"
                 "This is only an issue if it happens repeatedly.");
     }
     else
