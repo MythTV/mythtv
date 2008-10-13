@@ -77,23 +77,26 @@ bool MediaMonitorWindows::AddDevice(MythMediaDevice *pDevice)
         return false;
     }
 
+    QString path = pDevice->getDevicePath();
+
     //
     // Check if this is a duplicate of a device we have already added
     //
     QList<MythMediaDevice*>::const_iterator itr = m_Devices.begin();
     for (; itr != m_Devices.end(); ++itr)
     {
-        if ((*itr)->getDevicePath() == pDevice->getDevicePath())
+        if ((*itr)->getDevicePath() == path)
         {
             VERBOSE(VB_MEDIA, "MediamonitorWindows::AddDevice() -- " +
                     QString("Not adding '%1', it appears to be a duplicate.")
-                    .arg(pDevice->getDevicePath()));
+                    .arg(path));
 
             return false;
         }
     }
 
-    pDevice->setDeviceModel(pDevice->getDevicePath());
+    // TODO - either look up the model, or leave blank
+    pDevice->setDeviceModel(path.toLocal8Bit().constData());
 
     QMutexLocker locker(&m_DevicesLock);
     connect(pDevice, SIGNAL(statusChanged(   MediaStatus, MythMediaDevice*)),
