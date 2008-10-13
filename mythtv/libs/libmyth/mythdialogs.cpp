@@ -897,7 +897,7 @@ MythProgressDialog::MythProgressDialog(
 
     QWidget *hbox = new QWidget();
     hbox->setLayout(hlayout);
-    hlayout->addWidget(hbox);
+    vlayout->addWidget(hbox);
 
     QFrame *vbox = new QFrame(this);
     vbox->setObjectName(objectName() + "_vbox");
