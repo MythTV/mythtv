@@ -945,7 +945,7 @@ bool ping(const QString &host, int timeout)
         return false;
     }
 
-    lpHost = gethostbyname(host);
+    lpHost = gethostbyname(host.toLocal8Bit().constData());
     if (!lpHost)
     {
         VERBOSE(VB_SOCKET, "Ping: gethostbyname failed");
