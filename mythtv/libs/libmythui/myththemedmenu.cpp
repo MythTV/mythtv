@@ -138,7 +138,8 @@ void MythThemedMenu::Init(const QString &menufile)
     connect(m_buttonList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(buttonAction(MythUIButtonListItem*)));
 
-    parseMenu(menufile);
+    if (!parseMenu(menufile))
+        m_foundtheme = false;
 }
 
 MythThemedMenu::~MythThemedMenu(void)
@@ -630,7 +631,10 @@ bool MythThemedMenu::handleAction(const QString &action)
 
         MythThemedMenu *newmenu = new MythThemedMenu("", menu, stack, menu,
                                                      false, m_state);
-        stack->AddScreen(newmenu);
+        if (newmenu->foundTheme())
+            stack->AddScreen(newmenu);
+        else
+            delete newmenu;
     }
     else if (action.left(6) == "UPMENU")
     {
