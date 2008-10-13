@@ -13,7 +13,7 @@ class SortableGenericTreeList : public vector<GenericTree*>
 {
   public:
     void SetSortType(int stype) { sort_type = stype; }
-    void SetOrderingIndex(int oindex) 
+    void SetOrderingIndex(int oindex)
     { ordering_index = (oindex >= 0) ? oindex : 0; }
 
     void sort(void);
@@ -108,7 +108,7 @@ void SortableGenericTreeList::sort(void)
     std::stable_sort(begin(), end(), generic_tree_lt);
 }
 
-GenericTree::GenericTree(const QString &a_string, int an_int, 
+GenericTree::GenericTree(const QString &a_string, int an_int,
                          bool selectable_flag)
 {
     m_subnodes = new SortableGenericTreeList;
@@ -121,7 +121,7 @@ GenericTree::GenericTree(const QString &a_string, int an_int,
 
     // Use 6 here, because we know that's what mythmusic wants (limits resizing)
     m_attributes = new IntVector(6);
-    
+
     m_string = a_string;
     m_int = an_int;
     m_selectable = selectable_flag;
@@ -136,7 +136,7 @@ GenericTree::~GenericTree()
     delete m_attributes;
 }
 
-GenericTree* GenericTree::addNode(const QString &a_string, int an_int, 
+GenericTree* GenericTree::addNode(const QString &a_string, int an_int,
                                   bool selectable_flag)
 {
     GenericTree *new_node = new GenericTree(
@@ -168,10 +168,15 @@ void GenericTree::removeNode(GenericTree *child)
     vector<GenericTree*>::iterator it =
         std::find(m_subnodes->begin(), m_subnodes->end(), child);
 
-    m_ordered_subnodes->erase(oit);
-    m_flatened_subnodes->erase(fit);
-    delete *it;
-    m_subnodes->erase(it);
+    if (oit != m_ordered_subnodes->end())
+        m_ordered_subnodes->erase(oit);
+    if (fit != m_flatened_subnodes->end())
+        m_flatened_subnodes->erase(fit);
+    if (it != m_subnodes->end())
+    {
+        delete *it;
+        m_subnodes->erase(it);
+    }
 }
 
 int GenericTree::calculateDepth(int start)
@@ -207,12 +212,12 @@ GenericTree* GenericTree::findLeaf(int ordering_index)
 
 GenericTree* GenericTree::findNode(QList<int> route_of_branches)
 {
-    // Starting from *this* node (which will often be root) find a set of 
-    // branches that have id's that match the collection passed in 
-    // route_of_branches. Return the end point of those branches (which will 
+    // Starting from *this* node (which will often be root) find a set of
+    // branches that have id's that match the collection passed in
+    // route_of_branches. Return the end point of those branches (which will
     // often be a leaf node).
     //
-    // In practical terms, mythmusic will use this to force the playback 
+    // In practical terms, mythmusic will use this to force the playback
     // screen's ManagedTreeList to move to a given track in a given playlist
 
     return recursiveNodeFinder(route_of_branches);
@@ -395,7 +400,7 @@ GenericTree* GenericTree::nextSibling(int number_down, int ordering_index)
         // not enough siblings "below" me
         return NULL;
     }
-   
+
     return m_parent->getChildAt(position + number_down, ordering_index);
 }
 
@@ -434,10 +439,10 @@ GenericTree* GenericTree::getParent()
 
 void GenericTree::setAttribute(uint attribute_position, int value_of_attribute)
 {
-    // You can use attibutes for anything you like. Mythmusic, for example, 
+    // You can use attibutes for anything you like. Mythmusic, for example,
     // stores a value for random ordering in the first "column" (0) and a value
     // for "intelligent" (1) ordering in the second column
-    
+
     while ((uint)m_attributes->size() < (attribute_position + 1))
         m_attributes->push_back(-1);
 
@@ -457,7 +462,7 @@ int GenericTree::getAttribute(uint which_one) const
 
 void GenericTree::reorderSubnodes(int ordering_index)
 {
-    // The nodes are there, we just want to re-order them according to 
+    // The nodes are there, we just want to re-order them according to
     // attribute column defined by ordering_index
 
     m_ordered_subnodes->SetSortType(0);
@@ -476,12 +481,12 @@ void GenericTree::addYourselfIfSelectable(vector<GenericTree*> *flat_list)
         (*it)->addYourselfIfSelectable(flat_list);
 }
 
-void GenericTree::buildFlatListOfSubnodes(int ordering_index, 
+void GenericTree::buildFlatListOfSubnodes(int ordering_index,
                                           bool scrambled_parents)
 {
-    // This builds a flat list of every selectable child according to some 
+    // This builds a flat list of every selectable child according to some
     // some_ordering index.
-    
+
     m_flatened_subnodes->clear();
 
     vector<GenericTree*>::iterator it = m_subnodes->begin();
@@ -497,8 +502,8 @@ void GenericTree::buildFlatListOfSubnodes(int ordering_index,
     }
 }
 
-GenericTree* GenericTree::nextPrevFromFlatList(bool forward_or_backward, 
-                                               bool wrap_around, 
+GenericTree* GenericTree::nextPrevFromFlatList(bool forward_or_backward,
+                                               bool wrap_around,
                                                GenericTree *active)
 {
     vector<GenericTree*>::iterator it =
@@ -631,7 +636,7 @@ void GenericTree::reOrderAsSorted()
     //  Arrange (recursively) my subnodes in the same order as my ordered
     //  subnodes
     //
-    
+
     if (m_subnodes->size() != m_ordered_subnodes->size())
     {
         cerr << "generictree.o: Can't reOrderAsSorted(), because the number "
@@ -642,7 +647,7 @@ void GenericTree::reOrderAsSorted()
 
     m_subnodes->clear(); // don't delete the children here...
     m_current_ordering_index = -1;
-    
+
     vector<GenericTree*>::iterator it = m_subnodes->begin();
     for (; it != m_subnodes->end(); ++it)
     {
