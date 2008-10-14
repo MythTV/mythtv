@@ -126,7 +126,7 @@ int mythplugin_config()
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
                               .arg(menuname).arg(themedir));
-        delete diag;
+        delete menu;
     }
 
     return 0;
