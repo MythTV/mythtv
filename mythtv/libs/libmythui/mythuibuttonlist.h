@@ -136,9 +136,10 @@ class MythUIButtonList : public MythUIType
     int GetCount() const;
     bool IsEmpty() const;
 
-    enum ScrollStyle { ScrollFree, ScrollCenter };
-    enum LayoutType { LayoutVertical, LayoutHorizontal, LayoutGrid };
+    enum ScrollStyle  { ScrollFree, ScrollCenter };
+    enum LayoutType   { LayoutVertical, LayoutHorizontal, LayoutGrid };
     enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax };
+    enum WrapStyle    { WrapNone, WrapSelect, WrapItems };
 
     void MoveDown(MovementUnit unit = MoveItem);
     void MoveUp(MovementUnit unit = MoveItem);
@@ -176,6 +177,7 @@ class MythUIButtonList : public MythUIType
 
     LayoutType m_layout;
     ScrollStyle m_scrollStyle;
+    WrapStyle m_wrapStyle;
 
     MythRect m_contentsRect;
 
