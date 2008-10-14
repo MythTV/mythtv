@@ -28,7 +28,7 @@ ConfigurationGroup::ConfigurationGroup(bool luselabel,   bool luseframe,
     // Pre-calculate the margin and spacing that all sub-classes will use:
 
     if (lzeroMargin)
-        margin = 4 * 0.5;
+        margin = 2;
     else
     {
         float wmult = 0, hmult = 0;
@@ -41,7 +41,7 @@ ConfigurationGroup::ConfigurationGroup(bool luselabel,   bool luseframe,
             margin = (int)(10 * hmult * 0.5);
     }
 
-    space = (lzeroSpace) ? 4 * 0.5 : -1;
+    space = (lzeroSpace) ? 2 : -1;
 }
 
 ConfigurationGroup::~ConfigurationGroup()

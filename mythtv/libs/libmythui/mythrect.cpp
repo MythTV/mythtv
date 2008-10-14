@@ -48,13 +48,13 @@ void MythRect::CalculateArea(MythRect parentArea)
     int Y = y();
 
     if (m_percentX > 0.0)
-        X = m_percentX * (float)(m_parentArea.width());
+        X = (int) (m_percentX * (float)m_parentArea.width());
     if (m_percentY > 0.0)
-        Y = m_percentY * (float)(m_parentArea.height());
+        Y = (int) (m_percentY * (float)m_parentArea.height());
     if (m_percentWidth > 0.0)
-        w = m_percentWidth * (float)(m_parentArea.width() - X);
+        w = (int) (m_percentWidth * (float)(m_parentArea.width() - X));
     if (m_percentHeight > 0.0)
-        h = m_percentHeight * (float)(m_parentArea.height() - Y);
+        h = (int) (m_percentHeight * (float)(m_parentArea.height() - Y));
 
     QRect::setRect(X,Y,w,h);
 
@@ -275,9 +275,9 @@ void MythPoint::CalculatePoint(MythRect parentArea)
     int Y = y();
 
     if (m_percentX > 0.0)
-        X = m_percentX * (float)(m_parentArea.width());
+        X = (int) (m_percentX * (float)m_parentArea.width());
     if (m_percentY > 0.0)
-        Y = m_percentY * (float)(m_parentArea.height());
+        Y = (int) (m_percentY * (float)m_parentArea.height());
 
     QPoint::setX(X);
     QPoint::setY(Y);

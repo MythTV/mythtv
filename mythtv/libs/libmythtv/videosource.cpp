@@ -3026,7 +3026,7 @@ void TunerCardAudioInput::fillSelections(const QString &device)
     QStringList inputs =
         CardUtil::ProbeAudioInputs(device, last_cardtype);
 
-    for (uint i = 0; i < inputs.size(); i++)
+    for (int i = 0; i < inputs.size(); i++)
     {
         addSelection(inputs[i], QString::number(i),
                      last_device == QString::number(i));

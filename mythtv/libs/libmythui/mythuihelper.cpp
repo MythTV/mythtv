@@ -586,7 +586,7 @@ void MythUIHelper::CacheThemeImagesDirectory(const QString &dirname,
             caching = NULL;
         }
     }
-    uint progress = 0;
+    int progress = 0;
 
     // This is just to make the progressbar show activity
     for (progress = 0; progress <= list.count(); progress++) {
