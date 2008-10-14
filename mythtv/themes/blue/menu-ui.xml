@@ -145,6 +145,7 @@
             <area>60,135,680,514</area>
             <layout>grid</layout>
             <spacing>30</spacing>
+            <wrapstyle>selection</wrapstyle>
             <buttonarea>0,22,680,450</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
