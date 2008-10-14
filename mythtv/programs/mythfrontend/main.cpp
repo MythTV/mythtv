@@ -72,9 +72,9 @@ using namespace std;
 static MythThemedMenu *menu;
 static MythThemeBase  *themeBase = NULL;
 
-XBox                  *xbox      = NULL;
-QString                logfile   = "";
-MediaRenderer         *g_pUPnp   = NULL;
+static XBox           *xbox      = NULL;
+static QString         logfile;
+static MediaRenderer  *g_pUPnp   = NULL;
 
 void cleanup(void)
 {
@@ -222,7 +222,7 @@ void startPlaybackWithGroup(QString recGroup = "")
     PlaybackBox pbb(PlaybackBox::Play, gContext->GetMainWindow(),
                     "tvplayselect");
 
-    if (recGroup != "")
+    if (recGroup.size())
         pbb.displayRecGroup(recGroup);
 
     pbb.exec();
@@ -798,7 +798,7 @@ void reloadTheme(void)
 
     QString themename = gContext->GetSetting("Theme", "blue");
     QString themedir = GetMythUI()->FindThemeDir(themename);
-    if (themedir == "")
+    if (themedir.isEmpty())
     {
         cerr << "Couldn't find theme " << (const char *)themename << endl;
         cleanup();
@@ -1027,7 +1027,7 @@ int main(int argc, char **argv)
 #endif
     QApplication a(argc, argv);
 
-    QString pluginname = "";
+    QString pluginname;
 
     QFileInfo finfo(a.argv()[0]);
 
@@ -1202,7 +1202,7 @@ int main(int argc, char **argv)
         return FRONTEND_EXIT_OK;
     }
 
-    if (logfile != "")
+    if (logfile.size())
     {
         if (log_rotate(1) < 0)
             cerr << "cannot open logfile; using stdout/stderr" << endl;
@@ -1296,7 +1296,7 @@ int main(int argc, char **argv)
         themename = RandTheme(themename);
 
     QString themedir = GetMythUI()->FindThemeDir(themename);
-    if (themedir == "")
+    if (themedir.isEmpty())
     {
         cerr << "Couldn't find theme " << (const char *)themename << endl;
         cleanup();
@@ -1350,9 +1350,10 @@ int main(int argc, char **argv)
     if (gContext->GetNumSetting("idleTimeoutSecs",0) > 0)
         gContext->ConnectToMasterServer();
 
-    if (pluginname != "")
+    if (pluginname.size())
     {
-        if (pmanager->run_plugin(pluginname))
+        if (pmanager->run_plugin(pluginname) ||
+            pmanager->run_plugin("myth" + pluginname))
         {
             qApp->setMainWidget(mainWindow);
             qApp->exec();
@@ -1361,17 +1362,7 @@ int main(int argc, char **argv)
             return FRONTEND_EXIT_OK;
         }
         else
-        {
-            pluginname = "myth" + pluginname;
-            if (pmanager->run_plugin(pluginname))
-            {
-                qApp->setMainWidget(mainWindow);
-                qApp->exec();
-
-                cleanup();
-                return FRONTEND_EXIT_OK;
-            }
-        }
+            return FRONTEND_EXIT_INVALID_CMDLINE;
     }
 
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
@@ -1400,7 +1391,7 @@ int main(int argc, char **argv)
     {
         themename = gContext->GetSetting("Theme", "blue");
         themedir = GetMythUI()->FindThemeDir(themename);
-        if (themedir == "")
+        if (themedir.isEmpty())
         {
             cerr << "Couldn't find theme " << (const char *)themename << endl;
             cleanup();
