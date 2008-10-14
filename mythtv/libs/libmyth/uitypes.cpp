@@ -327,8 +327,9 @@ QString UIType::cutDown(const QString &data, QFont *testFont, bool multiline,
     {
         if (multiline)
             diff = maxheight - fm.boundingRect(0, 0, maxwidth, maxheight,
-                                               justification, data,
-                                               index + margin, 0).height();
+                                               justification,
+                                               data.left(index + margin)
+                                               ).height();
         else
             diff = maxwidth - fm.width(data, index + margin);
         if (diff >= 0)
@@ -2516,7 +2517,7 @@ void UIRichTextType::refreshImage()
     p.fillRect(0, 0, m_displayArea.width(), m_displayArea.height() , brush);
     p.translate(m_textArea.x() - m_displayArea.x() , m_textArea.y() - m_displayArea.y());
     QTextEdit richText(m_message);
-    richText.setCurrentFont(m_font->face); 
+    richText.setCurrentFont(m_font->face);
     richText.setMinimumWidth(m_textArea.width());
     richText.setMaximumWidth(m_textArea.width());
     p.end();
