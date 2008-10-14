@@ -148,7 +148,7 @@ linux {
 freebsd {
     SOURCES += mythcdrom-freebsd.cpp
     HEADERS += mythcdrom-freebsd.h
-    LIBS    += -ldl
+    LIBS    -= -ldl
 }
 
 INSTALLS += inc inc2
