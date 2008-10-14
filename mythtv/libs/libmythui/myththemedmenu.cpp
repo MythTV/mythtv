@@ -413,18 +413,11 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
     {
         VERBOSE(VB_IMPORTANT, QString("MythThemedMenu: Couldn't read "
                                       "menu file %1").arg(menuname));
-        if (menuname == "mainmenu.xml" )
-        {
-            return false;
-        }
-        else
-        {
-            ShowOkPopup(QObject::tr("Myth could not locate the menu file %1\n\n"
-                                    "We will now return to the main menu.")
+
+        if (menuname != "mainmenu.xml")
+            ShowOkPopup(QObject::tr("Myth could not locate the menu file %1")
                         .arg(menuname));
-            GetScreenStack()->PopScreen();
-            return false;
-        }
+        return false;
     }
 
     QString errorMsg;
@@ -438,15 +431,9 @@ bool MythThemedMenu::parseMenu(const QString &menuname)
                 arg(filename).arg(errorLine).arg(errorColumn).arg(errorMsg));
         f.close();
 
-        if (menuname == "mainmenu.xml" )
-        {
-            return false;
-        }
-
-        ShowOkPopup(QObject::tr("The menu file %1 is incomplete.\n\n"
-                                "We will now return to the main menu.")
-                    .arg(menuname));
-        GetScreenStack()->PopScreen();
+        if (menuname != "mainmenu.xml")
+            ShowOkPopup(QObject::tr("The menu file %1 is incomplete.")
+                        .arg(menuname));
         return false;
     }
 
