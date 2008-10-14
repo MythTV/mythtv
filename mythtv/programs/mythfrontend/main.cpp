@@ -459,15 +459,6 @@ int handleExit(void)
     // first of all find out, if this is a frontend only host...
     bool frontendOnly = gContext->IsFrontendOnly();
 
-// That may have triggered a popup when it failed to communicate
-// with a local backend. We don't care, so just delete it.
-    MythScreenStack  *ss = GetMythMainWindow()->GetStack("popup stack");
-    while (ss->TotalScreens())
-    {
-puts("Popping a screen we don't care about");
-        ss->PopScreen();
-    }
-
 
     // how do you want to quit today?
     int  exitMenuStyle = gContext->GetNumSetting("OverrideExitMenu", 0);
@@ -1406,7 +1397,6 @@ int main(int argc, char **argv)
 
         qApp->setMainWidget(mainWindow);
         qApp->exec();
-puts("Leaving qApp->exec()");
     } while (!(exitstatus = handleExit()));
 
     if (exitstatus == HALT)
