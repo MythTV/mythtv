@@ -1540,7 +1540,8 @@ QString MythContext::GetMasterHostPrefix(void)
     if (!d->serverSock)
     {
         d->serverSockLock.lock();
-        ConnectToMasterServer();
+        bool blockingClient = gContext->GetNumSetting("idleTimeoutSecs",0) > 0;
+        ConnectToMasterServer(blockingClient);
         d->serverSockLock.unlock();
     }
 
@@ -1712,7 +1713,8 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
 
     if (!d->serverSock)
     {
-        ConnectToMasterServer(false);
+        bool blockingClient = gContext->GetNumSetting("idleTimeoutSecs",0) > 0;
+        ConnectToMasterServer(blockingClient);
         // should clear popup if it is currently active here.
         // Not sure of the correct way. TBD
     }
@@ -1730,7 +1732,8 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
             d->serverSock->DownRef();
             d->serverSock = NULL;
 
-            ConnectToMasterServer(false);
+            bool blockingClient = gContext->GetNumSetting("idleTimeoutSecs",0) > 0;
+            ConnectToMasterServer(blockingClient);
 
             if (d->serverSock)
             {
