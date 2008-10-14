@@ -1315,6 +1315,11 @@ int main(int argc, char **argv)
 
     LanguageSettings::prompt();
 
+    // this direct connect is only necessary, if the user wants to use the
+    // auto shutdown/wakeup feature
+    if (gContext->GetNumSetting("idleTimeoutSecs",0) > 0)
+        gContext->ConnectToMasterServer(true);
+
     if (!checkTimeZone())
     {
         // Check for different time zones, different offsets, different times
@@ -1344,11 +1349,6 @@ int main(int argc, char **argv)
     }
     else
         xbox = NULL;
-
-    // this direct connect is only necessary, if the user wants to use the
-    // auto shutdown/wakeup feature
-    if (gContext->GetNumSetting("idleTimeoutSecs",0) > 0)
-        gContext->ConnectToMasterServer();
 
     if (pluginname.size())
     {
