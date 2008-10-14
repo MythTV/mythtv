@@ -106,8 +106,11 @@ void WeatherCallback(void *data, QString &selection)
 
 int mythplugin_config()
 {
+    QString menuname = "weather_settings.xml";
+    QString themedir = GetMythUI()->GetThemeDir();
+
     MythThemedMenu *menu = new MythThemedMenu(
-        GetMythUI()->GetThemeDir(), "weather_settings.xml",
+        themedir, menuname,
         gContext->GetMainWindow()->GetMainStack(), "weather menu");
 
     menu->setCallback(WeatherCallback, 0);
@@ -120,7 +123,11 @@ int mythplugin_config()
         GetMythMainWindow()->GetMainStack()->AddScreen(menu);
     }
     else
-        VERBOSE(VB_IMPORTANT, "Couldn't find theme weather_settings.xml");
+    {
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
+                              .arg(menuname).arg(themedir));
+        delete diag;
+    }
 
     return 0;
 }

@@ -76,10 +76,11 @@ void NetFlixCallback(void *data, QString &selection)
 
 void runMenu()
 {
+    QString menuname = "netflix_menu.xml";
     QString themedir = GetMythUI()->GetThemeDir();
 
     MythThemedMenu *diag = new MythThemedMenu(
-        themedir, "netflix_menu.xml", GetMythMainWindow()->GetMainStack(),
+        themedir, menuname, GetMythMainWindow()->GetMainStack(),
         "netflix menu");
 
     diag->setCallback(NetFlixCallback, NULL);
@@ -91,7 +92,8 @@ void runMenu()
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("MythFlix: Couldn't find theme %1").arg(themedir));
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
+                              .arg(menuname).arg(themedir));
         delete diag;
     }
 }

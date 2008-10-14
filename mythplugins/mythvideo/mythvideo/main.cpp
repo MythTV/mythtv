@@ -458,8 +458,8 @@ namespace
         }
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Couldn't find theme %1").arg(themedir));
+            VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
+                                  .arg(menuname).arg(themedir));
             delete diag;
         }
     }

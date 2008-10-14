@@ -433,8 +433,9 @@ void runSelectMenu(QString which_menu)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme %1")
-                .arg(themedir.toLocal8Bit().constData()));
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
+                              .arg(which_menu).arg(themedir));
+        delete diag;
     }
 }
 
@@ -467,8 +468,9 @@ void runFormatMenu(QString which_menu)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme %1")
-                .arg(themedir.toLocal8Bit().constData()));
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
+                              .arg(which_menu).arg(themedir));
+        delete diag;
     }
 }
 
@@ -508,8 +510,9 @@ void runMenu(QString which_menu)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme %1")
-                .arg(themedir.toLocal8Bit().constData()));
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
+                              .arg(which_menu).arg(themedir));
+        delete diag;
     }
 }
 
