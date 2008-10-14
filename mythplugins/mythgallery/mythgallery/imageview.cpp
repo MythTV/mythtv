@@ -86,7 +86,7 @@ ImageView::ImageView(const ThumbList &itemList,
             if (recurse)
                 GalleryUtil::LoadDirectory(m_itemList, item->GetPath(),
                                            sortorder, recurse, NULL, NULL);
-            delete m_itemList.takeAt(x);
+            m_itemList.takeAt(x);
         }
     }
 
