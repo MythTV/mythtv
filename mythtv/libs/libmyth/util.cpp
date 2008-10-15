@@ -1197,7 +1197,7 @@ int intResponse(const QString &query, int def)
 {
     QString str_resp = getResponse(query, QString("%1").arg(def));
     if (str_resp.isEmpty())
-        return false;
+        return def;
     bool ok;
     int resp = str_resp.toInt(&ok);
     return (ok ? resp : def);
