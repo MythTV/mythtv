@@ -21,7 +21,7 @@ using namespace std;
 #endif
 
 #ifdef CONFIG_DARWIN
-#include <mach/mach.h> 
+#include <mach/mach.h>
 #endif
 
 #ifdef BSD
@@ -509,7 +509,7 @@ long long decodeLongLong(QStringList &list, QStringList::const_iterator &it)
         ok = false;
     else
         l2 = (*(it++)).toInt();
- 
+
     if (!ok)
     {
         VERBOSE(VB_IMPORTANT,
@@ -521,7 +521,7 @@ long long decodeLongLong(QStringList &list, QStringList::const_iterator &it)
     retval = ((long long)(l2) & 0xffffffffLL) | ((long long)(l1) << 32);
 
     return retval;
-} 
+}
 
 /** \fn blendColors(QRgb source, QRgb add, int alpha)
  *  \brief Inefficient alpha blending function.
@@ -557,7 +557,7 @@ QString cutDownString(const QString &text, QFont *testFont, uint maxwidth)
     uint curFontWidth = fm.width(text);
     if (curFontWidth > maxwidth)
     {
-        QString testInfo = "";
+        QString testInfo;
         curFontWidth = fm.width(testInfo);
         int tmaxwidth = maxwidth - fm.width("LLL");
         int count = 0;
@@ -598,7 +598,7 @@ QDateTime MythUTCToLocal(const QDateTime &utc)
 
     return localdt;
 }
-    
+
 /** \fn stringToLongLong(const QString &str)
  *  \brief Converts QString representing long long to a long long.
  *
@@ -737,9 +737,9 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     mach_port_t             mp;
     mach_msg_type_number_t  count, pageSize;
     vm_statistics_data_t    s;
-    
+
     mp = mach_host_self();
-    
+
     // VM page size
     if (host_page_size(mp, &pageSize) != KERN_SUCCESS)
         pageSize = 4096;   // If we can't look it up, 4K is a good guess
@@ -858,14 +858,14 @@ u_short in_cksum(u_short *addr, int len)
      *  back all the carry bits from the top 16 bits into the lower
      *  16 bits.
      */
-    while( nleft > 1 )
+    while (nleft > 1)
     {
         sum += *w++;
         nleft -= 2;
     }
 
     /* mop up an odd byte, if necessary */
-    if( nleft == 1 )
+    if (nleft == 1)
     {
         u_short u = 0;
 
@@ -1006,7 +1006,7 @@ bool ping(const QString &host, int timeout)
 bool telnet(const QString &host, int port)
 {
     MythSocket *s = new MythSocket();
-    
+
     if (s->connect(host, port))
     {
         s->close();
@@ -1156,19 +1156,19 @@ double MythGetPixelAspectRatio(void)
  */
 QString getResponse(const QString &query, const QString &def)
 {
-    QByteArray tmp_query = query.toLatin1();
-    cout << tmp_query.constData();
+    QByteArray tmp = query.toLocal8Bit();
+    cout << tmp.constData();
 
-    QByteArray tmp_def = def.toLatin1();
-    if (def != "")
-        cout << " [" << tmp_def.constData() << "]  ";
+    tmp = def.toLatin1();
+    if (def.size())
+        cout << " [" << tmp.toLocal8Bit() << "]  ";
     else
         cout << "  ";
 
     if (!isatty(fileno(stdin)) || !isatty(fileno(stdout)))
     {
         cout << endl << "[console is not interactive, using default '"
-             <<  tmp_def.constData() << "']" << endl;
+             << tmp.constData() << "']" << endl;
         return def;
     }
 

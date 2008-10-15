@@ -1,11 +1,11 @@
-// Qt headers
-#include <qregexp.h>
-#include <qdir.h>
-#include <qfile.h>
-
 // C++ headers
 #include <iostream>
 #include <cstdlib>
+
+// Qt headers
+#include <QRegExp>
+#include <QDir>
+#include <QFile>
 
 // libmyth headers
 #include "mythverbose.h"
@@ -74,28 +74,6 @@ bool ChannelData::insert_chan(uint sourceid)
     return insert_channels;
 }
 
-
-QString getResponse(const QString &query, const QString &def)
-{
-    QByteArray aquery = query.toLocal8Bit();
-    cout << aquery.constData();
-
-    if (!def.isEmpty())
-    {
-        QByteArray adef = def.toLocal8Bit();
-        cout << " [" << adef.constData() << "]  ";
-    }
-
-    char response[80];
-    cin.getline(response, 80);
-
-    QString qresponse = QString::fromLocal8Bit(response);
-
-    if (qresponse.isEmpty())
-        qresponse = def;
-
-    return qresponse;
-}
 
 unsigned int ChannelData::promptForChannelUpdates(
     QList<ChanInfo>::iterator chaninfo, unsigned int chanid)
