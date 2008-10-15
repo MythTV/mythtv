@@ -15,26 +15,16 @@ using namespace std;
 // System specific C headers
 #include "compat.h"
 
-#ifdef USING_MINGW
-# include <sys/types.h>
-# include <sys/stat.h>   // for S_IREAD and S_IWRITE
-# include <sys/param.h>
-#else
-# include <sys/types.h>
-# include <sys/wait.h>
-# ifdef linux
-#   include <sys/vfs.h>
-#   include <sys/sysinfo.h>
-# else
-#   include <sys/param.h>
-#   ifdef __FreeBSD__ 
-#     include <sys/mount.h> 
-#   endif
-# endif
-#endif //MINGW
+#ifdef linux
+#include <sys/vfs.h>
+#include <sys/sysinfo.h>
+#endif
 
 #ifdef CONFIG_DARWIN
 #include <mach/mach.h> 
+#endif
+
+#ifdef BSD
 #include <sys/mount.h>  // for struct statfs
 #include <sys/sysctl.h>
 #include <sys/stat.h>   // for umask()

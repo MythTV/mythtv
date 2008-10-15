@@ -260,6 +260,10 @@ inline const char *dlerror(void)
 #endif // USING_MINGW
 
 
+#include <sys/param.h>  // Defines BSD on FreeBSD, Mac OS X
+#include <sys/stat.h>   // S_IREAD/WRITE on MinGW, umask() on BSD
+
+
 // suseconds_t
 #include <sys/types.h>
 
@@ -272,16 +276,11 @@ inline const char *dlerror(void)
     typedef int32_t suseconds_t;   // 10.3 or earlier don't have this
 #endif
 
-// Libdvdnav now uses off64_t lseek64(), which Darwin doesn't have.
+// Libdvdnav now uses off64_t lseek64(), which BSD/Darwin doesn't have.
 // Luckily, its lseek() is already 64bit compatible
-#ifdef CONFIG_DARWIN
+#ifdef BSD
     typedef off_t off64_t;
     #define lseek64(f,o,w) lseek(f,o,w)
 #endif
-
-#ifdef __FreeBSD__
-    typedef off_t off64_t;
-#endif
-
 
 #endif // __COMPAT_H__
