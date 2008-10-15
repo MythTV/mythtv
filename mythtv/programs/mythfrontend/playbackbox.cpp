@@ -8,20 +8,14 @@
 using namespace std;
 
 #include <QPushButton>
-#include <q3buttongroup.h>
-#include <q3button.h>
 #include <QLabel>
 #include <QCursor>
-#include <q3accel.h>
-#include <q3listview.h>
 #include <QDateTime>
-#include <q3progressbar.h>
 #include <QLayout>
 #include <QApplication>
 #include <QTimer>
 #include <QImage>
 #include <QPainter>
-#include <q3header.h>
 #include <QFile>
 #include <QFileInfo>
 #include <QMap>
@@ -31,7 +25,7 @@ using namespace std;
 #include <QKeyEvent>
 #include <QEvent>
 #include <QPaintEvent>
-#include <Q3PtrList>
+
 #include "playbackbox.h"
 #include "proglist.h"
 #include "tv.h"

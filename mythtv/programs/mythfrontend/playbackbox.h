@@ -28,9 +28,7 @@ using namespace std;
 #include <q3valuelist.h>
 #include <pthread.h>
 
-class Q3ListViewItem;
 class QLabel;
-class Q3ProgressBar;
 class NuppelVideoPlayer;
 class RingBuffer;
 class QTimer;
