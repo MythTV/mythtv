@@ -1,10 +1,6 @@
 #ifndef MYTHFLIXQUEUE_H
 #define MYTHFLIXQUEUE_H
 
-// QT headers
-#include <q3http.h>
-#include <QKeyEvent>
-
 // MythTV headers
 #include <mythtv/libmythui/mythscreentype.h>
 #include <mythtv/libmythui/mythuitext.h>
@@ -21,8 +17,7 @@ class MythFlixQueue : public MythScreenType
 {
     Q_OBJECT
 
-public:
-
+  public:
     MythFlixQueue(MythScreenStack *, const char *);
     ~MythFlixQueue();
 
@@ -32,7 +27,7 @@ public:
 
   private:
     void loadData();
-    MythImage* LoadPosterImage(QString location);
+    QString LoadPosterImage(const QString &location) const;
 
     void UpdateNameText();
 
@@ -52,15 +47,13 @@ public:
     MythUIImage *m_boxshotImage;
 
     MythDialogBox  *m_menuPopup;
-    QString        zoom;
-    QString        browser;
+    QString        m_zoom;
+    QString        m_browser;
     NewsSite::List m_NewsSites;
 
     QString        m_queueName;
 
-    Q3Http         *http;
-
-private slots:
+  private slots:
     void updateInfoView(MythUIButtonListItem*);
     void slotRetrieveNews();
     void slotNewsRetrieved(NewsSite* site);

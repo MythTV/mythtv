@@ -3,13 +3,10 @@
 
 // Qt headers
 #include <q3network.h>
-#include <qapplication.h>
-#include <qdatetime.h>
-#include <qpainter.h>
-#include <qdir.h>
-#include <qregexp.h>
-#include <q3process.h>
-#include <QKeyEvent>
+#include <Q3Process>
+#include <QApplication>
+#include <QDateTime>
+#include <QDir>
 
 // MythTV headers
 #include <mythtv/util.h>
@@ -40,9 +37,9 @@ MythFlixQueue::MythFlixQueue(MythScreenStack *parent, const char *name)
         dir.mkdir(fileprefix);
 
     // Initialize variables
-    zoom = QString("-z %1")
+    m_zoom = QString("-z %1")
                    .arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
-    browser = gContext->GetSetting("WebBrowserCommand",
+    m_browser = gContext->GetSetting("WebBrowserCommand",
                                    GetInstallPrefix() +
                                       "/bin/mythbrowser");
     m_articlesList = NULL;
@@ -165,7 +162,7 @@ void MythFlixQueue::UpdateNameText()
     }
 }
 
-MythImage* MythFlixQueue::LoadPosterImage(QString location)
+QString MythFlixQueue::LoadPosterImage(const QString &location) const
 {
     QString imageLoc = location;
     int length = imageLoc.length();
@@ -207,18 +204,15 @@ MythImage* MythFlixQueue::LoadPosterImage(QString location)
                                     "(%1)").arg(imageLoc));
     }
 
-    MythImage *img = GetMythPainter()->GetFormatImage();
-    img->Load(sFilename);
-
-    return img;
+    return sFilename;
 }
 
 void MythFlixQueue::updateInfoView(MythUIButtonListItem* selected)
 {
-    NewsArticle *article  = 0;
+    NewsArticle *article = NULL;
 
-    if (selected && selected->getData())
-        article = (NewsArticle*) selected->getData();
+    if (selected && !selected->GetData().isNull())
+        article = qVariantValue<NewsArticle*>(selected->GetData());
 
     if (article)
     {
@@ -231,9 +225,9 @@ void MythFlixQueue::updateInfoView(MythUIButtonListItem* selected)
 
         if (m_boxshotImage)
         {
-            MythImage *posterImage = LoadPosterImage(article->articleURL());
-            m_boxshotImage->SetImage(posterImage);
-            posterImage->DownRef();
+            QString posterImage = LoadPosterImage(article->articleURL());
+            m_boxshotImage->SetFilename(posterImage);
+            m_boxshotImage->Load();
 
             if (!m_boxshotImage->IsVisible())
                 m_boxshotImage->Show();
@@ -287,10 +281,6 @@ void MythFlixQueue::slotRetrieveNews()
 void MythFlixQueue::slotNewsRetrieved(NewsSite* site)
 {
     processAndShowNews(site);
-    // A temporary? workaround for the problem caused by updateInfoView()
-    // depending on data which isn't set until after itemSelected has been
-    // issued
-    m_articlesList->SetItemCurrent(0);
 }
 
 void MythFlixQueue::processAndShowNews(NewsSite* site)
@@ -300,21 +290,19 @@ void MythFlixQueue::processAndShowNews(NewsSite* site)
 
     site->process();
 
-    if (site) {
-
+    if (site)
+    {
         m_articlesList->Reset();
 
         for (NewsArticle* article = site->articleList().first(); article;
              article = site->articleList().next())
         {
             MythUIButtonListItem* item =
-                new MythUIButtonListItem(m_articlesList, article->title());
-            item->setData(article);
-            //MythImage *posterImage = LoadPosterImage(article->articleURL());
-            //if (posterImage)
-            //    item->setImage(posterImage);
-            //posterImage->DownRef();
-            //item->setText(article->description(), "description");
+                new MythUIButtonListItem(m_articlesList, article->title(),
+                                         qVariantFromValue(article));
+            QString posterImage = LoadPosterImage(article->articleURL());
+            item->SetImage(posterImage);
+            item->setText(article->description(), "description");
         }
     }
 }
@@ -324,9 +312,10 @@ void MythFlixQueue::slotMoveToTop()
 
     MythUIButtonListItem *articleListItem = m_articlesList->GetItemCurrent();
 
-    if (articleListItem && articleListItem->getData())
+    if (articleListItem && !articleListItem->GetData().isNull())
     {
-        NewsArticle *article = (NewsArticle*) articleListItem->getData();
+        NewsArticle *article =
+                        qVariantValue<NewsArticle*>(articleListItem->GetData());
         if(article)
         {
 
@@ -361,9 +350,10 @@ void MythFlixQueue::slotRemoveFromQueue()
 
     MythUIButtonListItem *articleListItem = m_articlesList->GetItemCurrent();
 
-    if (articleListItem && articleListItem->getData())
+    if (articleListItem && !articleListItem->GetData().isNull())
     {
-        NewsArticle *article = (NewsArticle*) articleListItem->getData();
+        NewsArticle *article =
+                        qVariantValue<NewsArticle*>(articleListItem->GetData());
         if(article)
         {
 
@@ -399,9 +389,10 @@ void MythFlixQueue::slotMoveToQueue()
 
     MythUIButtonListItem *articleListItem = m_articlesList->GetItemCurrent();
 
-    if (articleListItem && articleListItem->getData())
+    if (articleListItem && !articleListItem->GetData().isNull())
     {
-        NewsArticle *article = (NewsArticle*) articleListItem->getData();
+        NewsArticle *article =
+                        qVariantValue<NewsArticle*>(articleListItem->GetData());
         if(article)
         {
 
@@ -459,16 +450,17 @@ void MythFlixQueue::slotShowNetFlixPage()
 {
 
     MythUIButtonListItem *articleListItem = m_articlesList->GetItemCurrent();
-    if (articleListItem && articleListItem->getData())
+    if (articleListItem && !articleListItem->GetData().isNull())
     {
-        NewsArticle *article = (NewsArticle*) articleListItem->getData();
+        NewsArticle *article =
+                        qVariantValue<NewsArticle*>(articleListItem->GetData());
         if(article)
         {
             QString cmdUrl(article->articleURL());
             cmdUrl.replace('\'', "%27");
 
             QString cmd = QString("%1 %2 '%3'")
-                                  .arg(browser).arg(zoom).arg(cmdUrl);
+                                  .arg(m_browser).arg(m_zoom).arg(cmdUrl);
             VERBOSE(VB_GENERAL,
                   QString("MythFlixQueue: Opening Neflix site: (%1)").arg(cmd));
             myth_system(cmd);

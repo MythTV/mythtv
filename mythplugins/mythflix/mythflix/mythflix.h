@@ -37,6 +37,8 @@ class MythFlix : public MythScreenType
 
     QString executeExternal(const QStringList& args, const QString& purpose);
 
+    QString LoadPosterImage(const QString &location) const;
+
     MythUIButtonList *m_sitesList;
     MythUIButtonList *m_articlesList;
 
@@ -47,8 +49,8 @@ class MythFlix : public MythScreenType
     MythUIImage *m_boxshotImage;
 
     MythDialogBox  *m_menuPopup;
-    QString        zoom;
-    QString        browser;
+    QString        m_zoom;
+    QString        m_browser;
     NewsSite::List m_NewsSites;
 
 private slots:

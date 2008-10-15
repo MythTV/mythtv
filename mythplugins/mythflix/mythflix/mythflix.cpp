@@ -3,10 +3,9 @@
 #include <unistd.h>
 
 // Qt headers
-#include <qapplication.h>
-#include <qdir.h>
-#include <qregexp.h>
-#include <q3process.h>
+#include <QApplication>
+#include <QDir>
+#include <Q3Process>
 
 // MythTV headers
 #include <mythtv/util.h>
@@ -41,8 +40,8 @@ MythFlix::MythFlix(MythScreenStack *parent, const char *name)
         dir.mkdir(fileprefix);
 
     // Initialize variables
-    zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
-    browser = gContext->GetSetting("WebBrowserCommand",
+    m_zoom = QString("-z %1").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
+    m_browser = gContext->GetSetting("WebBrowserCommand",
                                    GetInstallPrefix() +
                                       "/bin/mythbrowser");
 
@@ -137,8 +136,8 @@ void MythFlix::loadData()
     for (NewsSite *site = m_NewsSites.first(); site; site = m_NewsSites.next())
     {
         MythUIButtonListItem* item =
-            new MythUIButtonListItem(m_sitesList, site->name());
-        item->setData(site);
+            new MythUIButtonListItem(m_sitesList, site->name(),
+                                        qVariantFromValue(site));
     }
 
 
@@ -153,6 +152,52 @@ void MythFlix::loadData()
 
 }
 
+
+QString MythFlix::LoadPosterImage(const QString &location) const
+{
+    QString imageLoc = location;
+    int length = imageLoc.length();
+    int index = imageLoc.findRev("/");
+    imageLoc = imageLoc.mid(index,length) + ".jpg";
+
+    QString fileprefix = GetConfDir();
+
+    QDir dir(fileprefix);
+    if (!dir.exists())
+        dir.mkdir(fileprefix);
+
+    fileprefix += "/MythFlix";
+
+    dir = QDir(fileprefix);
+    if (!dir.exists())
+        dir.mkdir(fileprefix);
+
+    VERBOSE(VB_FILE, QString("MythFlix: Boxshot File Prefix: %1")
+                            .arg(fileprefix));
+
+    QString sFilename(fileprefix + "/" + imageLoc);
+
+    bool exists = QFile::exists(sFilename);
+    if (!exists)
+    {
+        VERBOSE(VB_NETWORK, QString("MythFlix: Copying boxshot file "
+                                    "from server (%1)").arg(imageLoc));
+
+        QString sURL = QString("http://cdn.nflximg.com/us/boxshots/"
+                                "large/%1").arg(imageLoc);
+
+        if (!HttpComms::getHttpFile(sFilename, sURL, 20000))
+            VERBOSE(VB_NETWORK, QString("MythFlix: Failed to download "
+                                        "image from: %1").arg(sURL));
+
+        VERBOSE(VB_NETWORK, QString("MythFlix: Finished copying "
+                                    "boxshot file from server "
+                                    "(%1)").arg(imageLoc));
+    }
+
+    return sFilename;
+}
+
 void MythFlix::updateInfoView(MythUIButtonListItem* selected)
 {
     if (!selected)
@@ -161,7 +206,7 @@ void MythFlix::updateInfoView(MythUIButtonListItem* selected)
     if (GetFocusWidget() == m_articlesList)
     {
 
-        NewsArticle *article = (NewsArticle*) selected->getData();
+        NewsArticle *article = qVariantValue<NewsArticle*>(selected->GetData());
 
         if (article)
         {
@@ -172,49 +217,11 @@ void MythFlix::updateInfoView(MythUIButtonListItem* selected)
             if (m_descText)
                 m_descText->SetText(article->description());
 
-            QString imageLoc = article->articleURL();
-            int length = imageLoc.length();
-            int index = imageLoc.findRev("/");
-            imageLoc = imageLoc.mid(index,length) + ".jpg";
-
-            QString fileprefix = GetConfDir();
-
-            QDir dir(fileprefix);
-            if (!dir.exists())
-                dir.mkdir(fileprefix);
-
-            fileprefix += "/MythFlix";
-
-            dir = QDir(fileprefix);
-            if (!dir.exists())
-                dir.mkdir(fileprefix);
-
-            VERBOSE(VB_FILE, QString("MythFlix: Boxshot File Prefix: %1")
-                                    .arg(fileprefix));
-
-            QString sFilename(fileprefix + "/" + imageLoc);
-
-            bool exists = QFile::exists(sFilename);
-            if (!exists)
-            {
-                VERBOSE(VB_NETWORK, QString("MythFlix: Copying boxshot file "
-                                            "from server (%1)").arg(imageLoc));
-
-                QString sURL = QString("http://cdn.nflximg.com/us/boxshots/"
-                                       "large/%1").arg(imageLoc);
-
-                if (!HttpComms::getHttpFile(sFilename, sURL, 20000))
-                    VERBOSE(VB_NETWORK, QString("MythFlix: Failed to download "
-                                                "image from: %1").arg(sURL));
-
-                VERBOSE(VB_NETWORK, QString("MythFlix: Finished copying "
-                                            "boxshot file from server "
-                                            "(%1)").arg(imageLoc));
-            }
+            QString posterImage = LoadPosterImage(article->articleURL());
 
             if (m_boxshotImage)
             {
-                m_boxshotImage->SetFilename(sFilename);
+                m_boxshotImage->SetFilename(posterImage);
                 m_boxshotImage->Load();
 
                 if (!m_boxshotImage->IsVisible())
@@ -223,9 +230,10 @@ void MythFlix::updateInfoView(MythUIButtonListItem* selected)
 
         }
     }
-    else {
+    else
+    {
 
-        NewsSite *site = (NewsSite*) selected->getData();
+        NewsSite *site = qVariantValue<NewsSite*>(selected->GetData());
 
         if (site)
         {
@@ -294,18 +302,23 @@ void MythFlix::processAndShowNews(NewsSite* site)
     site->process();
 
     MythUIButtonListItem *siteListItem = m_sitesList->GetItemCurrent();
-    if (!siteListItem || !siteListItem->getData())
+    if (!siteListItem || siteListItem->GetData().isNull())
         return;
 
-    if (site == (NewsSite*) siteListItem->getData()) {
+    if (site == qVariantValue<NewsSite*>(siteListItem->GetData()))
+    {
 
         m_articlesList->Reset();
 
         for (NewsArticle* article = site->articleList().first(); article;
-             article = site->articleList().next()) {
+             article = site->articleList().next())
+        {
             MythUIButtonListItem* item =
-                new MythUIButtonListItem(m_articlesList, article->title());
-            item->setData(article);
+                new MythUIButtonListItem(m_articlesList, article->title(),
+                                            qVariantFromValue(article));
+            QString posterImage = LoadPosterImage(article->articleURL());
+            item->SetImage(posterImage);
+            item->setText(article->description(), "description");
         }
     }
 }
@@ -314,17 +327,18 @@ void MythFlix::slotShowNetFlixPage()
 {
 
     MythUIButtonListItem *articleListItem = m_articlesList->GetItemCurrent();
-    if (articleListItem && articleListItem->getData())
+    if (articleListItem && !articleListItem->GetData().isNull())
     {
-        NewsArticle *article = (NewsArticle*) articleListItem->getData();
+        NewsArticle *article =
+                        qVariantValue<NewsArticle*>(articleListItem->GetData());
         if(article)
         {
             QString cmdUrl(article->articleURL());
             cmdUrl.replace('\'', "%27");
 
             QString cmd = QString("%1 %2 '%3'")
-                 .arg(browser)
-                 .arg(zoom)
+                 .arg(m_browser)
+                 .arg(m_zoom)
                  .arg(cmdUrl);
             VERBOSE(VB_GENERAL, QString("MythFlixBrowse: Opening Neflix site: (%1)").arg(cmd));
             myth_system(cmd);
@@ -334,10 +348,10 @@ void MythFlix::slotShowNetFlixPage()
 
 void MythFlix::slotSiteSelected(MythUIButtonListItem *item)
 {
-    if (!item || !item->getData())
+    if (!item || item->GetData().isNull())
         return;
 
-    processAndShowNews((NewsSite*) item->getData());
+    processAndShowNews(qVariantValue<NewsSite*>(item->GetData()));
 }
 
 void MythFlix::InsertMovieIntoQueue(QString queueName, bool atTop)
@@ -347,7 +361,8 @@ void MythFlix::InsertMovieIntoQueue(QString queueName, bool atTop)
     if (!articleListItem)
         return;
 
-    NewsArticle *article = (NewsArticle*) articleListItem->getData();
+    NewsArticle *article =
+                        qVariantValue<NewsArticle*>(articleListItem->GetData());
     if(!article)
         return;
 

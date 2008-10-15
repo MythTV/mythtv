@@ -22,10 +22,11 @@
 #ifndef NEWSENGINE_H
 #define NEWSENGINE_H
 
-#include <qstring.h>
-#include <q3ptrlist.h>
-#include <qobject.h>
-#include <qdatetime.h>
+#include <QString>
+#include <Q3PtrList>
+#include <QObject>
+#include <QDateTime>
+#include <QMetaType>
 
 class Q3UrlOperator;
 class Q3NetworkOperation;
@@ -120,5 +121,8 @@ private slots:
     void slotGotData(const QByteArray& data,
                      Q3NetworkOperation* op);
 };
+
+Q_DECLARE_METATYPE(NewsArticle*)
+Q_DECLARE_METATYPE(NewsSite*)
 
 #endif /* NEWSENGINE_H */
