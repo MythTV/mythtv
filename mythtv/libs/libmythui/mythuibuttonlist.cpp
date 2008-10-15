@@ -1045,17 +1045,17 @@ void MythUIButtonList::Finalize(void)
 //////////////////////////////////////////////////////////////////////////////
 
 MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
-                                       const QString& text,
-                                       MythImage *image, bool checkable,
-                                       CheckState state, bool showArrow)
+                                      const QString& text, const QString& image,
+                                      bool checkable, CheckState state,
+                                      bool showArrow)
 {
     if (!lbtype)
         VERBOSE(VB_IMPORTANT, "Cannot add a button to a non-existant list!");
 
     m_parent    = lbtype;
     m_text      = text;
-    m_image     = image;
-    m_imageFilename = "";
+    m_image     = NULL;
+    m_imageFilename = image;
     m_checkable = checkable;
     m_state     = state;
     m_showArrow = showArrow;
@@ -1081,7 +1081,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
     m_data      = data;
 
     m_image     = NULL;
-    m_imageFilename = "";
+    m_imageFilename;
     m_checkable = false;
     m_state     = CantCheck;
     m_showArrow = false;

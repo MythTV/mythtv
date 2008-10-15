@@ -65,7 +65,7 @@ bool MythBrowser::Create(void)
     page->getBrowser()->SetZoom(m_zoom);
     page->SetActive(true);
 
-    connect(page, SIGNAL(loadProgress(int)), 
+    connect(page, SIGNAL(loadProgress(int)),
             this, SLOT(slotLoadProgress(int)));
     connect(page, SIGNAL(statusBarMessage(const QString&)),
             this, SLOT(slotStatusBarMessage(const QString&)));
@@ -240,7 +240,7 @@ void MythBrowser::slotAddBookmark()
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    BookmarkEditor *editor = new BookmarkEditor(&m_editBookmark, 
+    BookmarkEditor *editor = new BookmarkEditor(&m_editBookmark,
             true, mainStack, "bookmarkeditor");
 
 

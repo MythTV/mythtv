@@ -233,7 +233,7 @@ void BookmarkManager::UpdateURLList(void)
         if (group == site->category)
         {
             MythUIButtonListItem *item = new MythUIButtonListItem(
-                    m_bookmarkList, "", NULL, true, MythUIButtonListItem::NotChecked);
+                    m_bookmarkList, "", "", true, MythUIButtonListItem::NotChecked);
             item->setText(site->name, "name");
             item->setText(site->url, "url");
             item->setData((void*) site);

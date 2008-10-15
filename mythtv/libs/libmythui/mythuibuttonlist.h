@@ -25,7 +25,7 @@ class MythUIButtonListItem
     };
 
     MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,
-                         MythImage *image = NULL, bool checkable = false,
+                         const QString& image = "", bool checkable = false,
                          CheckState state = CantCheck, bool showArrow = false);
     MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,
                          QVariant data);
