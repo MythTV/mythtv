@@ -10,6 +10,7 @@
 // libmyth headers
 #include "mythverbose.h"
 #include "mythdb.h"
+#include "util.h"
 
 // libmythtv headers
 #include "channelutil.h"
