@@ -149,8 +149,9 @@ void TitleDialog::showCurrentTitle()
         m_audioList->SetValueByData(m_currentTitle->getAudio());
 
         m_qualityList->Reset();
-        new MythUIButtonListItem(m_qualityList, tr("ISO Image"), -1);
-        new MythUIButtonListItem(m_qualityList, tr("Perfect"), 0);
+        new MythUIButtonListItem(m_qualityList, tr("ISO Image"),                                                 qVariantFromValue(-1));
+        new MythUIButtonListItem(m_qualityList, tr("Perfect"),
+                                    qVariantFromValue(0));
         QString q_string = QString("SELECT name,intid FROM dvdtranscode "
                                     "WHERE input = %1 ;")
                                     .arg(m_currentTitle->getInputID());

@@ -630,8 +630,10 @@ void VideoFilterDialog::fillWidgets()
 
     // Browsable
     new MythUIButtonListItem(m_browseList, QObject::tr("All"), kBrowseFilterAll);
-    new MythUIButtonListItem(m_browseList, QObject::tr("Yes"), 1);
-    new MythUIButtonListItem(m_browseList, QObject::tr("No"), 0);
+    new MythUIButtonListItem(m_browseList, QObject::tr("Yes"),
+                                qVariantFromValue(1));
+    new MythUIButtonListItem(m_browseList, QObject::tr("No"),
+                                qVariantFromValue(0));
     m_browseList->SetValueByData(m_settings.getBrowse());
 
     // Inet Reference
