@@ -11,10 +11,10 @@
 #ifndef WEBCAMSETTINGS_H_
 #define WEBCAMSETTINGS_H_
 
-#include <qregexp.h>
-#include <qtimer.h>
-#include <qptrlist.h>
-#include <qthread.h>
+#include <QRegExp>
+#include <QTimer>
+#include <QPtrList>
+#include <QThread>
 
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>

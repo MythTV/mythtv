@@ -9,11 +9,10 @@
 #ifndef TONE_H_
 #define TONE_H_
 
-#include <qsqldatabase.h>
-#include <qregexp.h>
-#include <qtimer.h>
+#include <QRegExp>
+#include <QTimer>
 #include <q3ptrlist.h>
-#include <qthread.h>
+#include <QThread>
 
 #ifndef WIN32
 #include <mythtv/mythwidgets.h>

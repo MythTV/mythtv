@@ -2,15 +2,14 @@
 #define RTP_H_
 
 #include <q3socketdevice.h>
-#include <qsqldatabase.h>
-#include <qregexp.h>
-#include <qtimer.h>
+#include <QRegExp>
+#include <QTimer>
 #include <q3ptrlist.h>
-#include <qthread.h>
-#include <qdatetime.h>
+#include <QThread>
+#include <QDateTime>
 
 #include <QEvent>
-#include <qwaitcondition.h>
+#include <QWaitCondition>
 
 #ifdef WIN32
 #include <windows.h>

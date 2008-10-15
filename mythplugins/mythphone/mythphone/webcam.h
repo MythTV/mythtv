@@ -9,12 +9,11 @@
 #ifndef WEBCAM_H_
 #define WEBCAM_H_
 
-#include <qsqldatabase.h>
-#include <qregexp.h>
-#include <qtimer.h>
+#include <QRegExp>
+#include <QTimer>
 #include <q3ptrlist.h>
-#include <qthread.h>
-#include <qdatetime.h>
+#include <QThread>
+#include <QDateTime>
 #include <QEvent>
 #include <QMutex>
 

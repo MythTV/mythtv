@@ -6,15 +6,13 @@
 #ifndef SIPFSM_H_
 #define SIPFSM_H_
 
-#include <qsqldatabase.h>
-#include <qregexp.h>
-#include <qtimer.h>
+#include <QRegExp>
+#include <QTimer>
 #include <q3ptrlist.h>
-#include <qthread.h>
-#include <qwidget.h>
+#include <QThread>
+#include <QWidget>
 #include <q3socketdevice.h>
-#include <qdatetime.h>
-//Added by qt3to4:
+#include <QDateTime>
 #include <QStringList>
 #include <QEvent>
 
