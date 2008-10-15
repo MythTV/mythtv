@@ -233,29 +233,19 @@ bool setupTVs(bool ismaster, bool &error)
 
 void cleanup(void)
 {
-    if (sched)
-    {
-        delete sched;
-        sched = NULL;
-    }
+    delete sched;
+    sched = NULL;
 
-    if (g_pUPnp)
-    {
-        delete g_pUPnp;
-        g_pUPnp = NULL;
-    }
+    delete g_pUPnp;
+    g_pUPnp = NULL;
 
-    if (gContext)
-    {
-        delete gContext;
-        gContext = NULL;
-    }
+    delete gContext;
+    gContext = NULL;
 
-    if (!pidfile.isEmpty())
+    if (pidfile.size())
     {
-        QByteArray tmp = pidfile.toAscii();
-        unlink(tmp.constData());
-        pidfile = "";
+        unlink(pidfile.toAscii().constData());
+        pidfile.clear();
     }
 
     signal(SIGHUP, SIG_DFL);
@@ -417,6 +407,27 @@ bool parse_preview_info(const QString &param,
     }
 
     return ok;
+}
+
+namespace
+{
+    class CleanupGuard
+    {
+      public:
+        typedef void (*CleanupFunc)();
+
+      public:
+        CleanupGuard(CleanupFunc cleanFunction) :
+            m_cleanFunction(cleanFunction) {}
+
+        ~CleanupGuard()
+        {
+            m_cleanFunction();
+        }
+
+      private:
+        CleanupFunc m_cleanFunction;
+    };
 }
 
 int main(int argc, char **argv)
@@ -723,11 +734,12 @@ int main(int argc, char **argv)
             signal(SIGHUP, &log_rotate_handler);
     }
 
+    CleanupGuard callCleanup(cleanup);
+
     ofstream pidfs;
-    if (pidfile != "")
+    if (pidfile.size())
     {
-        QByteArray tmp = pidfile.toAscii();
-        pidfs.open(tmp.constData());
+        pidfs.open(pidfile.toAscii().constData());
         if (!pidfs)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -760,7 +772,6 @@ int main(int argc, char **argv)
                             .arg(myth_source_path)
                             .arg(myth_source_version));
 
-    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
@@ -776,7 +787,6 @@ int main(int argc, char **argv)
         UPnpMedia *rebuildit = new UPnpMedia(false,false);
         rebuildit->BuildMediaMap();
 
-        cleanup();
         return BACKEND_EXIT_OK;
     }
 
@@ -786,14 +796,12 @@ int main(int argc, char **argv)
         {
             RemoteSendMessage("CLEAR_SETTINGS_CACHE");
             VERBOSE(VB_IMPORTANT, "Sent CLEAR_SETTINGS_CACHE message");
-            cleanup();
             return BACKEND_EXIT_OK;
         }
         else
         {
             VERBOSE(VB_IMPORTANT, "Unable to connect to backend, settings "
                     "cache will not be cleared.");
-            cleanup();
             return BACKEND_EXIT_NO_CONNECT;
         }
     }
@@ -829,7 +837,6 @@ int main(int argc, char **argv)
     if (!UpgradeTVDatabaseSchema(true, true))
     {
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema");
-        cleanup();
         return BACKEND_EXIT_DB_OUTOFDATE;
     }
 
@@ -854,7 +861,6 @@ int main(int argc, char **argv)
 
         print_verbose_messages |= VB_SCHEDULE;
         sched->PrintList(true);
-        cleanup();
         return BACKEND_EXIT_OK;
     }
 
@@ -872,7 +878,6 @@ int main(int argc, char **argv)
         else
             VERBOSE(VB_IMPORTANT, "Cannot connect to master for reschedule");
 
-        cleanup();
         return (ok) ? BACKEND_EXIT_OK : BACKEND_EXIT_NO_CONNECT;
     }
 
@@ -880,7 +885,6 @@ int main(int argc, char **argv)
     {
         expirer = new AutoExpire();
         expirer->PrintExpireList(printexpire);
-        cleanup();
         return BACKEND_EXIT_OK;
     }
 
@@ -890,7 +894,6 @@ int main(int argc, char **argv)
             chanid, starttime,
             previewFrameNumber, previewSeconds, previewSize,
             infile, outfile);
-        cleanup();
         return ret;
     }
 
@@ -902,7 +905,6 @@ int main(int argc, char **argv)
         cerr << "No setting found for this machine's BackendServerIP.\n"
              << "Please run setup on this machine and modify the first page\n"
              << "of the general settings.\n";
-        cleanup();
         return BACKEND_EXIT_NO_IP_ADDRESS;
     }
 
@@ -945,7 +947,6 @@ int main(int argc, char **argv)
     bool runsched = setupTVs(ismaster, fatal_error);
     if (fatal_error)
     {
-        cleanup();
         return BACKEND_EXIT_CAP_CARD_SETUP_ERROR;
     }
 
@@ -955,7 +956,6 @@ int main(int argc, char **argv)
         int err = sched->GetError();
         if (err)
         {
-            cleanup();
             return err;
         }
 
@@ -1021,7 +1021,6 @@ int main(int argc, char **argv)
     a.exec();
 
     gContext->LogEntry("mythbackend", LP_INFO, "MythBackend exiting", "");
-    cleanup();
 
     return BACKEND_EXIT_OK;
 }
