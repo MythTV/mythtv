@@ -29,7 +29,6 @@ using namespace std;
 #include <QDir>
 #include <QMatrix>
 #include <QList>
-#include <QPixmap>
 #include <QFileInfo>
 
 // MythTV headers
@@ -216,15 +215,8 @@ void IconView::LoadDirectory(const QString &dir)
 
         LoadThumbnail(thumbitem);
 
-        MythImage *image = GetMythPainter()->GetFormatImage();
-        QPixmap *pixmap = thumbitem->GetPixmap();
-        if (pixmap)
-        {
-            image->Assign(*pixmap);
-            thumbitem->SetPixmap(NULL);
-
-            item->setImage(image);
-        }
+        if (QFile(thumbitem->GetImageFilename()).exists())
+            item->SetImage(thumbitem->GetImageFilename());
 
         if (m_itemMarked.contains(thumbitem->GetPath()))
             item->setChecked(MythUIButtonListItem::FullChecked);
@@ -248,8 +240,8 @@ void IconView::LoadThumbnail(ThumbItem *item)
         return;
 
     bool canLoadGallery = m_isGallery;
-    QImage image;
 
+    QString imagePath;
     if (canLoadGallery)
     {
         if (item->IsDir())
@@ -264,8 +256,7 @@ void IconView::LoadThumbnail(ThumbItem *item)
                 QFileInfoList::const_iterator it = subdir.entryInfoList().begin();
                 if (it != subdir.entryInfoList().end())
                 {
-                    QString path = it->absFilePath();
-                    image.load(path);
+                    imagePath = it->absFilePath();
                 }
             }
         }
@@ -276,40 +267,30 @@ void IconView::LoadThumbnail(ThumbItem *item)
             if (firstDot > 0)
             {
                 fn.insert(firstDot, ".thumb");
-                QString galThumbPath(m_currDir + "/" + fn);
-                image.load(galThumbPath);
+                imagePath = QString("%1/%2").arg(m_currDir).arg(fn);
             }
         }
 
-        canLoadGallery = !(image.isNull());
+        canLoadGallery = !(QFile(imagePath).exists());
     }
 
     if (!canLoadGallery)
-    {
-        QString cachePath = QString("%1%2.jpg")
-                                .arg(ThumbGenerator::getThumbcacheDir(m_currDir))
-                                .arg(item->GetName());
+        imagePath = QString("%1%2.jpg")
+                            .arg(ThumbGenerator::getThumbcacheDir(m_currDir))
+                            .arg(item->GetName());
 
-        if (!image.load(cachePath))
-            VERBOSE(VB_IMPORTANT, QString("Could not load thumbnail: %1")
-                                            .arg(cachePath));
-    }
+//         int rotateAngle = 0;
+//
+//         rotateAngle = item->GetRotationAngle();
+//
+//         if (rotateAngle != 0)
+//         {
+//             QMatrix matrix;
+//             matrix.rotate(rotateAngle);
+//             image = image.xForm(matrix);
+//         }
 
-    if (!image.isNull())
-    {
-        int rotateAngle = 0;
-
-        rotateAngle = item->GetRotationAngle();
-
-        if (rotateAngle != 0)
-        {
-            QMatrix matrix;
-            matrix.rotate(rotateAngle);
-            image = image.xForm(matrix);
-        }
-
-        item->SetPixmap(new QPixmap(image));
-    }
+    item->SetImageFilename(imagePath);
 }
 
 void IconView::SetupMediaMonitor(void)
@@ -416,7 +397,7 @@ bool IconView::keyPressEvent(QKeyEvent *event)
         else if (action == "ESCAPE")
         {
             if (!HandleEscape())
-                GetScreenStack()->PopScreen();
+                handled = false;
         }
         else
             handled = false;
@@ -479,7 +460,7 @@ bool IconView::HandleMediaDeviceSelect(ThumbItem *item)
     else
     {
         // device was removed
-        QString msg = tr("Error") + '\n' + 
+        QString msg = tr("Error") + '\n' +
                 tr("The selected device is no longer available");
         ShowOKDialog(msg, SLOT(HandleShowDevices()));
     }
@@ -647,13 +628,12 @@ void IconView::customEvent(QEvent *event)
         ThumbGenEvent *tge = (ThumbGenEvent *)event;
 
         ThumbData *td = tge->thumbData;
-        if (!td) return;
+        if (!td)
+            return;
 
         ThumbItem *thumbitem = m_itemHash.value(td->fileName);
         if (thumbitem)
         {
-            thumbitem->SetPixmap(NULL);
-
             int rotateAngle = thumbitem->GetRotationAngle();
 
             if (rotateAngle)
@@ -667,17 +647,8 @@ void IconView::customEvent(QEvent *event)
 
             LoadThumbnail(thumbitem);
 
-            MythImage *image = GetMythPainter()->GetFormatImage();
-            QPixmap *pixmap = thumbitem->GetPixmap();
-            if (pixmap)
-            {
-                image->Assign(*pixmap);
-
-                MythUIButtonListItem *item = m_imageList->GetItemAt(pos);
-                item->setImage(image);
-            }
-
-            thumbitem->SetPixmap(NULL);
+            MythUIButtonListItem *item = m_imageList->GetItemAt(pos);
+            item->SetImage(thumbitem->GetImageFilename());
         }
         delete td;
     }
@@ -1098,7 +1069,7 @@ void IconView::HandleDelete(void)
 
 void IconView::HandleDeleteMarked(void)
 {
-    QString msg = /*tr("Delete Marked Files") + "\n\n" +*/ 
+    QString msg = /*tr("Delete Marked Files") + "\n\n" +*/
             tr("Deleting %1 images and folders, including "
                "any subfolders and files.").arg(m_itemMarked.count());
     ShowOKDialog(msg, SLOT(DoDeleteMarked(bool)), true);

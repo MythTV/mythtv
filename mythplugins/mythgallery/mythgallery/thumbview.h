@@ -35,6 +35,8 @@ class ThumbItem
         { m_caption = caption; m_caption.detach(); }
     void SetPath(const QString &path, bool isDir)
         { m_path = path; m_path.detach(), m_isDir = isDir; }
+    void SetImageFilename(const QString &filename)
+        { m_imageFilename = filename; m_imageFilename.detach(); }
     void SetPixmap(QPixmap *pixmap);
     void SetMediaDevice(MythMediaDevice *dev)
         { m_mediaDevice = dev; }
@@ -44,6 +46,7 @@ class ThumbItem
     QString GetName(void)    const { return m_name;               }
     bool    HasCaption(void) const { return !m_caption.isEmpty(); }
     QString GetCaption(void) const { return m_caption;            }
+    QString GetImageFilename(void) const { return m_imageFilename; }
     QString GetPath(void)    const { return m_path;               }
     bool    IsDir(void)      const { return m_isDir;              }
     QString GetDescription(const QString &status,
@@ -57,6 +60,7 @@ class ThumbItem
     QString  m_name;
     QString  m_caption;
     QString  m_path;
+    QString  m_imageFilename;
     bool     m_isDir;
     QPixmap *m_pixmap;
     MythMediaDevice *m_mediaDevice;
