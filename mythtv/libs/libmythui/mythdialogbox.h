@@ -78,7 +78,7 @@ class MythDialogBox : public MythScreenType
     MythUIButtonList *m_buttonList;
     MythScreenType *m_retScreen;
     QString m_id;
-    bool    m_useSlots;
+    bool m_useSlots;
 
     QString m_text;
 };
@@ -101,6 +101,7 @@ class MythConfirmationDialog : public MythScreenType
 
     bool Create(void);
     void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
+    void SetData(void *data) { m_resultData = data; }
 
     bool keyPressEvent(QKeyEvent *event);
 
@@ -113,6 +114,7 @@ class MythConfirmationDialog : public MythScreenType
     bool m_showCancel;
     MythScreenType *m_retScreen;
     QString m_id;
+    void *m_resultData;
 
   private slots:
     void Confirm(void);

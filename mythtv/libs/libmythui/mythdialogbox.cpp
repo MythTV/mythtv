@@ -132,6 +132,7 @@ MythConfirmationDialog::MythConfirmationDialog(MythScreenStack *parent,
 
     m_id = "";
     m_retScreen = NULL;
+    m_resultData = NULL;
 }
 
 bool MythConfirmationDialog::Create(void)
@@ -223,7 +224,7 @@ void MythConfirmationDialog::sendResult(bool ok)
             res = 1;
 
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, res, "",
-                                                               NULL);
+                                                               m_resultData);
         QApplication::postEvent(m_retScreen, dce);
     }
 
