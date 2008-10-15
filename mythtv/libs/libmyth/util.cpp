@@ -1159,9 +1159,9 @@ QString getResponse(const QString &query, const QString &def)
     QByteArray tmp = query.toLocal8Bit();
     cout << tmp.constData();
 
-    tmp = def.toLatin1();
+    tmp = def.toLocal8Bit();
     if (def.size())
-        cout << " [" << tmp.toLocal8Bit() << "]  ";
+        cout << " [" << tmp.constData() << "]  ";
     else
         cout << "  ";
 
