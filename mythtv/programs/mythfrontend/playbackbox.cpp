@@ -5257,8 +5257,8 @@ void PlaybackBox::showRecGroupChooser(void)
 
     connect(recGroupListBox, SIGNAL(accepted(int)),
             recGroupPopup,   SLOT(AcceptItem(int)));
-    connect(recGroupListBox, SIGNAL(currentChanged(Q3ListBoxItem *)), this,
-            SLOT(recGroupChooserListBoxChanged()));
+    connect(recGroupListBox, SIGNAL(currentRowChanged(int)),
+            this, SLOT(recGroupChooserListBoxChanged()));
 
     DialogCode result = recGroupPopup->ExecPopup();
 
@@ -5482,8 +5482,8 @@ void PlaybackBox::showRecGroupChanger(void)
 
     connect(recGroupListBox, SIGNAL(accepted(int)),
             recGroupPopup,   SLOT(AcceptItem(int)));
-    connect(recGroupListBox, SIGNAL(currentChanged(Q3ListBoxItem *)), this,
-            SLOT(recGroupChangerListBoxChanged()));
+    connect(recGroupListBox, SIGNAL(currentRowChanged(int)),
+            this,            SLOT(recGroupChangerListBoxChanged()));
     connect(recGroupOkButton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
 
     DialogCode result = recGroupPopup->ExecPopup();
