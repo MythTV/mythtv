@@ -76,26 +76,45 @@ static XBox           *xbox      = NULL;
 static QString         logfile;
 static MediaRenderer  *g_pUPnp   = NULL;
 
-void cleanup(void)
+namespace
 {
-    //signal(SIGHUP, SIG_DFL); ???
-
-    if (themeBase)
+    void cleanup()
+    {
         delete themeBase;
+        themeBase = NULL;
 
-    if (g_pUPnp)
-    {
-        // This takes a few seconds, so inform the user:
-        VERBOSE(VB_GENERAL, "Deleting UPnP client...");
-        delete g_pUPnp;
-        g_pUPnp = NULL;
-    }
+        if (g_pUPnp)
+        {
+            // This takes a few seconds, so inform the user:
+            VERBOSE(VB_GENERAL, "Deleting UPnP client...");
+            delete g_pUPnp;
+            g_pUPnp = NULL;
+        }
 
-    if (gContext)
-    {
         delete gContext;
         gContext = NULL;
+
+        signal(SIGHUP, SIG_DFL);
+        signal(SIGUSR1, SIG_DFL);
     }
+
+    class CleanupGuard
+    {
+      public:
+        typedef void (*CleanupFunc)();
+
+      public:
+        CleanupGuard(CleanupFunc cleanFunction) :
+            m_cleanFunction(cleanFunction) {}
+
+        ~CleanupGuard()
+        {
+            m_cleanFunction();
+        }
+
+      private:
+        CleanupFunc m_cleanFunction;
+    };
 }
 
 void startAppearWiz(void)
@@ -797,7 +816,11 @@ void reloadTheme(void)
     }
 
     if (!RunMenu(themedir) || !menu->foundTheme())
+    {
+        cleanup();
         exit(FRONTEND_BUGGY_EXIT_NO_THEME);
+    }
+
 
     LCD::SetupLCD();
     if (LCD *lcd = LCD::Get())
@@ -1087,13 +1110,14 @@ int main(int argc, char **argv)
         MythUIHelper::SetX11Display(cmdline.GetDisplay());
     }
 
+    CleanupGuard callCleanup(cleanup);
+
     gContext = new MythContext(MYTH_BINARY_VERSION);
     g_pUPnp  = new MediaRenderer();
 
     if (!gContext->Init(true, g_pUPnp, bPromptForBackend, bBypassAutoDiscovery))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        cleanup();
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -1108,7 +1132,6 @@ int main(int argc, char **argv)
                 if (logfile.startsWith("-"))
                 {
                     cerr << "Invalid or missing argument to -l/--logfile option\n";
-                    cleanup();
                     return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
                 else
@@ -1119,7 +1142,6 @@ int main(int argc, char **argv)
             else
             {
                 cerr << "Missing argument to -l/--logfile option\n";
-                cleanup();
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
         } else if (!strcmp(a.argv()[argpos],"-v") ||
@@ -1150,13 +1172,11 @@ int main(int argc, char **argv)
         {
             if (cmdline_err)
             {
-                cleanup();
                 return FRONTEND_EXIT_INVALID_CMDLINE;
             }
 
             if (cmdline.WantsToExit())
             {
-                cleanup();
                 return FRONTEND_EXIT_OK;
             }
         }
@@ -1172,7 +1192,6 @@ int main(int argc, char **argv)
                 !strcmp(a.argv()[argpos],"--usage")))
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
             PrintHelp(cmdline);
-            cleanup();
             return FRONTEND_EXIT_INVALID_CMDLINE;
         }
     }
@@ -1189,7 +1208,6 @@ int main(int argc, char **argv)
                 .arg(*it).arg(value);
             cout << out.toLocal8Bit().constData() << endl;
         }
-        cleanup();
         return FRONTEND_EXIT_OK;
     }
 
@@ -1221,7 +1239,6 @@ int main(int argc, char **argv)
         query.bindValue(":HOSTNAME", gContext->GetHostName());
         query.exec();
 
-        cleanup();
         return FRONTEND_EXIT_OK;
     }
 
@@ -1265,7 +1282,6 @@ int main(int argc, char **argv)
     {
         VERBOSE(VB_IMPORTANT,
                 "Couldn't upgrade database to new schema, exiting.");
-        cleanup();
         return FRONTEND_EXIT_DB_OUTOFDATE;
     }
 
@@ -1290,7 +1306,6 @@ int main(int argc, char **argv)
     if (themedir.isEmpty())
     {
         cerr << "Couldn't find theme " << (const char *)themename << endl;
-        cleanup();
         return FRONTEND_EXIT_NO_THEME;
     }
 
@@ -1349,7 +1364,6 @@ int main(int argc, char **argv)
             qApp->setMainWidget(mainWindow);
             qApp->exec();
 
-            cleanup();
             return FRONTEND_EXIT_OK;
         }
         else
@@ -1385,7 +1399,6 @@ int main(int argc, char **argv)
         if (themedir.isEmpty())
         {
             cerr << "Couldn't find theme " << (const char *)themename << endl;
-            cleanup();
             return FRONTEND_EXIT_NO_THEME;
         }
 
@@ -1419,13 +1432,10 @@ int main(int argc, char **argv)
         pthread_join(priv_thread, NULL);
     }
 
-    signal(SIGHUP, SIG_DFL);
-
     if (networkControl)
         delete networkControl;
 
     DestroyMythMainWindow();
-    cleanup();
 
     return FRONTEND_EXIT_OK;
 
