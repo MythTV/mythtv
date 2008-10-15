@@ -19,7 +19,7 @@
 #include "libmythdb/mythverbose.h"
 #include "viewschdiff.h"
 
-// NOTE: if this changes, you _MUST_ update the RecTypePriority function 
+// NOTE: if this changes, you _MUST_ update the RecTypePriority function
 // in recordingtypes.cpp.
 
 class ScheduledRecordingDialog : public ConfigurationDialog
@@ -79,15 +79,15 @@ ScheduledRecording::ScheduledRecording() :
     inactive = NULL;
     searchType = "";
     searchForWhat = "";
-        
+
     longChannelFormat = gContext->GetSetting("LongChannelFormat", "<num> <name>");
     channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
     timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     shortDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
-    
+
     addChild(id = new ID());
-    
+
     channel = new SRChannel(this);
     station = new SRStation(this);
     title = new SRTitle(this);
@@ -119,7 +119,7 @@ void ScheduledRecording::Load(void)
     if (getRecordID())
     {
         ConfigurationGroup::Load();
-        
+
         QString tmpType = type->getValue();
         type->clearSelections();
         if (tmpType.toInt() == kOverrideRecord ||
@@ -128,7 +128,7 @@ void ScheduledRecording::Load(void)
         else
             type->addNormalSelections(!station->getValue().isEmpty(),
                                       search->intValue() == kManualSearch);
-       
+
         type->setValue(tmpType);
         type->setUnchanged();
 
@@ -138,10 +138,10 @@ void ScheduledRecording::Load(void)
 
 
 
-void ScheduledRecording::loadByProgram(const ProgramInfo* proginfo) 
+void ScheduledRecording::loadByProgram(const ProgramInfo* proginfo)
 {
     m_pginfo = proginfo;
-    
+
     if (proginfo->recordid)
         loadByID(proginfo->recordid);
     else
@@ -191,7 +191,7 @@ void ScheduledRecording::loadBySearch(RecSearchType lsearch,
         setDefault(false);
         search->setValue(lsearch);
         searchForWhat = forwhat;
-        
+
         switch (lsearch)
         {
         case kPowerSearch:
@@ -217,7 +217,7 @@ void ScheduledRecording::loadBySearch(RecSearchType lsearch,
         findday->setValue((startDate->dateValue().dayOfWeek() + 1) % 7);
         QDate epoch(1970, 1, 1);
         findid->setValue(epoch.daysTo(startDate->dateValue()) + 719528);
-    } 
+    }
 }
 
 void ScheduledRecording::modifyPowerSearchByID(int rid,
@@ -248,16 +248,16 @@ void ScheduledRecording::modifyPowerSearchByID(int rid,
 
 void ScheduledRecording::fetchChannelInfo()
 {
-    
+
     if (channel->getValue().toInt() > 0)
     {
         MSqlQuery query(MSqlQuery::InitCon());
 
         QString queryStr(QString("SELECT channum, callsign, name FROM channel "
                                  "WHERE chanid = '%1';").arg(channel->getValue()));
-    
+
         query.prepare(queryStr);
-        
+
         if (query.exec() && query.isActive() && query.size() > 0)
         {
             query.next();
@@ -301,46 +301,46 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
         progMap["title"] = title->getValue();
         progMap["subtitle"] = subtitle->getValue();
         progMap["description"] = description->getValue();
-        
+
         progMap["category"] = category->getValue();
         progMap["callsign"] = station->getValue();
-        
+
         progMap["starttime"] = startTime->getValue();
         progMap["startdate"] = startDate->getValue();
         progMap["endtime"] = endTime->getValue();
         progMap["enddate"] = endTime->getValue();
-        
-        
+
+
         if (chanstr.isEmpty())
         {
             progMap["channum"] = QObject::tr("Any");
             progMap["longchannel"] = QObject::tr("Any");
-            
+
         }
         else
         {
             progMap["channum"] = chanstr;
             progMap["longchannel"] = ChannelText(longChannelFormat);
         }
-        
+
         progMap["chanid"] = channel->getValue();
         progMap["channel"] = station->getValue();
-        
+
         QDateTime startts(startDate->dateValue(), startTime->timeValue());
         QDateTime endts(endDate->dateValue(), endTime->timeValue());
-        
+
         QString length;
         int hours, minutes, seconds;
         seconds = startts.secsTo(endts);
-        
+
         minutes = seconds / 60;
         progMap["lenmins"] = QString("%1 %2").arg(minutes).arg(QObject::tr("minutes"));
         hours   = minutes / 60;
         minutes = minutes % 60;
         length.sprintf("%d:%02d", hours, minutes);
-        
+
         progMap["lentime"] = length;
-        
+
         progMap["timedate"] = startts.date().toString(dateFormat) + ", " +
                               startts.time().toString(timeFormat) + " - " +
                               endts.time().toString(timeFormat);
@@ -389,24 +389,29 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
 }
 
 
-void ScheduledRecording::loadByID(int recordID) {
+void ScheduledRecording::loadByID(int recordID)
+{
     id->setValue(recordID);
     Load();
 }
 
-RecordingType ScheduledRecording::getRecordingType(void) const {
+RecordingType ScheduledRecording::getRecordingType(void) const
+{
     return (RecordingType)(type->getValue().toInt());
 }
 
-void ScheduledRecording::setRecordingType(RecordingType newType) {
+void ScheduledRecording::setRecordingType(RecordingType newType)
+{
     type->setValue(QString::number(newType));
 }
 
-RecSearchType ScheduledRecording::getSearchType(void) const {
+RecSearchType ScheduledRecording::getSearchType(void) const
+{
     return (RecSearchType)(search->intValue());
 }
 
-void ScheduledRecording::setSearchType(RecSearchType newType) {
+void ScheduledRecording::setSearchType(RecSearchType newType)
+{
     if (type->getValue().toInt() == kOverrideRecord ||
         type->getValue().toInt() == kDontRecord)
     {
@@ -420,19 +425,23 @@ void ScheduledRecording::setSearchType(RecSearchType newType) {
                               search->intValue() == kManualSearch);
 }
 
-int ScheduledRecording::GetAutoExpire(void) const {
+int ScheduledRecording::GetAutoExpire(void) const
+{
     return(autoexpire->getValue().toInt());
 }
 
-void ScheduledRecording::SetAutoExpire(int expire) {
+void ScheduledRecording::SetAutoExpire(int expire)
+{
     autoexpire->setValue(expire);
 }
 
-int ScheduledRecording::GetTranscoder(void) const {
+int ScheduledRecording::GetTranscoder(void) const
+{
     return transcoder->getValue().toInt();
 }
 
-int ScheduledRecording::GetAutoRunJobs(void) const {
+int ScheduledRecording::GetAutoRunJobs(void) const
+{
     int result = 0;
 
     if (autotranscode->getValue().toInt())
@@ -451,18 +460,20 @@ int ScheduledRecording::GetAutoRunJobs(void) const {
     return result;
 }
 
-int ScheduledRecording::GetMaxEpisodes(void) const {
+int ScheduledRecording::GetMaxEpisodes(void) const
+{
     return(maxepisodes->getValue().toInt());
 }
 
-bool ScheduledRecording::GetMaxNewest(void) const {
+bool ScheduledRecording::GetMaxNewest(void) const
+{
     return(maxnewest->getValue().toInt());
 }
 
 void ScheduledRecording::Save(void)
 {
     // NOTE: we can not use a default value for send(bool) because
-    // anyone calling save on a parent type pointer will then not 
+    // anyone calling save on a parent type pointer will then not
     // use our version of the virtual funcation.
     save(true);
 }
@@ -507,7 +518,7 @@ void ScheduledRecording::Save(QString destination)
     }
 }
 
-void ScheduledRecording::remove() 
+void ScheduledRecording::remove()
 {
     int rid = getRecordID();
 
@@ -525,7 +536,7 @@ void ScheduledRecording::remove()
     query.exec();
 }
 
-void ScheduledRecording::signalChange(int recordid) 
+void ScheduledRecording::signalChange(int recordid)
 {
     if (gContext->IsBackend())
     {
@@ -543,7 +554,7 @@ void ScheduledRecording::signalChange(int recordid)
     }
 }
 
-void ScheduledRecording::doneRecording(ProgramInfo& proginfo) 
+void ScheduledRecording::doneRecording(ProgramInfo& proginfo)
 {
     proginfo.recstatus = rsRecorded;
 
@@ -622,13 +633,13 @@ void ScheduledRecording::runShowDetails(void)
         m_pginfo->showDetails();
 }
 
-void ScheduledRecording::fillSelections(SelectSetting* setting) 
+void ScheduledRecording::fillSelections(SelectSetting* setting)
 {
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT recordid FROM record");
     if (result.exec() && result.isActive() && result.size() > 0)
     {
-        while (result.next()) 
+        while (result.next())
         {
             int recid = result.value(0).toInt();
 
@@ -638,48 +649,51 @@ void ScheduledRecording::fillSelections(SelectSetting* setting)
             QString label;
             QString weekly = "";
 
-            switch (sr.getRecordingType()) {
-            case kAllRecord:
-                label = QString("%1").arg(sr.title->getValue());
-                break;
-            case kFindOneRecord:
-                label = QString("%1").arg(sr.title->getValue());
-                break;
-            case kFindWeeklyRecord:
-                weekly = QDate(sr.startDate->dateValue()).toString("dddd")+"s ";
-            case kFindDailyRecord:
-                label = QString("%1 (after %2%3")
-                    .arg(sr.title->getValue())
-                    .arg(weekly)
-                    .arg(sr.findtime->timeValue().toString());
-                break;
-            case kChannelRecord:
-                label = QString("%1 on channel %2")
-                    .arg(sr.title->getValue())
-                    .arg(sr.channel->getSelectionLabel());
-                break;
-            case kWeekslotRecord:
-                weekly = QDate(sr.startDate->dateValue()).toString("dddd")+"s ";
-            case kTimeslotRecord:
-                label = QString("%1 on channel %2 (%3%4 - %5)")
-                    .arg(sr.title->getValue())
-                    .arg(sr.channel->getSelectionLabel())
-                    .arg(weekly)
-                    .arg(sr.startTime->timeValue().toString())
-                    .arg(sr.endTime->timeValue().toString());
-                break;
-            case kSingleRecord:
-            case kOverrideRecord:
-            case kDontRecord:
-                label = QString("%1 on channel %2 (%3 %4 - %5)")
-                    .arg(sr.title->getValue())
-                    .arg(sr.channel->getSelectionLabel())
-                    .arg(sr.startDate->dateValue().toString())
-                    .arg(sr.startTime->timeValue().toString())
-                    .arg(sr.endTime->timeValue().toString());
-                break;
-            default:
-                label = "You should not see this";
+            switch (sr.getRecordingType())
+            {
+                case kAllRecord:
+                    label = QString("%1").arg(sr.title->getValue());
+                    break;
+                case kFindOneRecord:
+                    label = QString("%1").arg(sr.title->getValue());
+                    break;
+                case kFindWeeklyRecord:
+                    weekly = QDate(sr.startDate->dateValue())
+                                .toString("dddd")+"s ";
+                case kFindDailyRecord:
+                    label = QString("%1 (after %2%3")
+                        .arg(sr.title->getValue())
+                        .arg(weekly)
+                        .arg(sr.findtime->timeValue().toString());
+                    break;
+                case kChannelRecord:
+                    label = QString("%1 on channel %2")
+                        .arg(sr.title->getValue())
+                        .arg(sr.channel->getSelectionLabel());
+                    break;
+                case kWeekslotRecord:
+                    weekly = QDate(sr.startDate->dateValue())
+                                    .toString("dddd")+"s ";
+                case kTimeslotRecord:
+                    label = QString("%1 on channel %2 (%3%4 - %5)")
+                        .arg(sr.title->getValue())
+                        .arg(sr.channel->getSelectionLabel())
+                        .arg(weekly)
+                        .arg(sr.startTime->timeValue().toString())
+                        .arg(sr.endTime->timeValue().toString());
+                    break;
+                case kSingleRecord:
+                case kOverrideRecord:
+                case kDontRecord:
+                    label = QString("%1 on channel %2 (%3 %4 - %5)")
+                        .arg(sr.title->getValue())
+                        .arg(sr.channel->getSelectionLabel())
+                        .arg(sr.startDate->dateValue().toString())
+                        .arg(sr.startTime->timeValue().toString())
+                        .arg(sr.endTime->timeValue().toString());
+                    break;
+                default:
+                    label = "You should not see this";
             }
 
             setting->addSelection(label, QString::number(recid));
@@ -731,7 +745,8 @@ DialogCode ScheduledRecordingEditor::exec(void)
     return kDialogCodeRejected;
 }
 
-void ScheduledRecordingEditor::open(int id) {
+void ScheduledRecordingEditor::open(int id)
+{
     ScheduledRecording* sr = new ScheduledRecording();
 
     if (id != 0)
@@ -752,61 +767,75 @@ DialogCode ScheduledRecording::exec(bool saveOnExec, bool doLoad)
     return dialog->exec(saveOnExec, doLoad);
 }
 
-void ScheduledRecording::setStart(const QDateTime& start) {
+void ScheduledRecording::setStart(const QDateTime& start)
+{
     startTime->setValue(start.time());
     startDate->setValue(start.date());
 }
 
-void ScheduledRecording::setEnd(const QDateTime& end) {
+void ScheduledRecording::setEnd(const QDateTime& end)
+{
     endTime->setValue(end.time());
     endDate->setValue(end.date());
 }
 
-void ScheduledRecording::setEndOffset(int endminutes) {
+void ScheduledRecording::setEndOffset(int endminutes)
+{
     endoffset->setValue(endminutes);
 }
 
-int ScheduledRecording::getRecPriority(void) const {
+int ScheduledRecording::getRecPriority(void) const
+{
     return recpriority->getValue().toInt();
 }
 
-void ScheduledRecording::setRecPriority(int newrecpriority) {
+void ScheduledRecording::setRecPriority(int newrecpriority)
+{
     recpriority->setValue(newrecpriority);
 }
 
-void ScheduledRecording::setRecGroup(const QString& newrecgroup) {
+void ScheduledRecording::setRecGroup(const QString& newrecgroup)
+{
     recgroup->setValue(newrecgroup);
 }
 
-QString ScheduledRecording::GetRecGroup(void) const {
+QString ScheduledRecording::GetRecGroup(void) const
+{
     return recgroup->getValue();
 }
 
-void ScheduledRecording::setStorageGroup(const QString& newstoragegroup) {
+void ScheduledRecording::setStorageGroup(const QString& newstoragegroup)
+{
     storagegroup->setValue(newstoragegroup);
 }
 
-QString ScheduledRecording::GetStorageGroup(void) const {
+QString ScheduledRecording::GetStorageGroup(void) const
+{
     return storagegroup->getValue();
 }
 
-void ScheduledRecording::setPlayGroup(const QString& newplaygroup) {
+void ScheduledRecording::setPlayGroup(const QString& newplaygroup)
+{
     playgroup->setValue(newplaygroup);
 }
 
-QString ScheduledRecording::getProfileName(void) const {
+QString ScheduledRecording::getProfileName(void) const
+{
     return profile->getValue();
 }
 
-QString ScheduledRecording::getRecordTitle(void) const {
+QString ScheduledRecording::getRecordTitle(void) const
+{
     return title->getValue();
 }
 
-QString ScheduledRecording::getRecordSubTitle(void) const {
+QString ScheduledRecording::getRecordSubTitle(void) const
+{
     return subtitle->getValue();
 }
 
-QString ScheduledRecording::getRecordDescription(void) const {
+QString ScheduledRecording::getRecordDescription(void) const
+{
     return description->getValue();
 }
 
@@ -834,20 +863,20 @@ void ScheduledRecording::setDefault(bool haschannel)
     parentid->setValue(0);
     category->setValue("");
     search->setValue(kNoSearch);
-    
-    if (!type)   
+
+    if (!type)
     {
         cerr << "No type object" << endl;
         return;
     }
-    
+
     type->clearSelections();
     type->addNormalSelections(haschannel, search->intValue() == kManualSearch);
     type->setValue(kNotRecording);
-    
+
     profile->fillSelections();
     profile->setValue(QObject::tr("Default"));
-    
+
     dupin->setValue(kDupsInAll);
     dupmethod->setValue(kDupCheckSubDesc);
     maxepisodes->setValue(0);
@@ -855,7 +884,7 @@ void ScheduledRecording::setDefault(bool haschannel)
     endoffset->setValue(gContext->GetNumSetting("DefaultEndOffset", 0));
     maxnewest->setValue(0);
     recpriority->setValue(0);
-    
+
     autoexpire->setValue(gContext->GetNumSetting("AutoExpireDefault", 0));
 
     autotranscode->setValue(gContext->GetNumSetting("AutoTranscode", 0));
@@ -868,13 +897,13 @@ void ScheduledRecording::setDefault(bool haschannel)
     autouserjob3->setValue(gContext->GetNumSetting("AutoRunUserJob3", 0));
     autouserjob4->setValue(gContext->GetNumSetting("AutoRunUserJob4", 0));
 
-    recgroup->fillSelections();    
+    recgroup->fillSelections();
     recgroup->setValue("Default");
-    storagegroup->fillSelections();    
+    storagegroup->fillSelections();
     storagegroup->setValue("Default");
-    playgroup->fillSelections();    
+    playgroup->fillSelections();
     playgroup->setValue("Default");
-    prefinput->fillSelections();    
+    prefinput->fillSelections();
     prefinput->setValue(0);
 
     inactive->setValue(0);
@@ -916,7 +945,7 @@ void ScheduledRecording::setProgram(const ProgramInfo *proginfo)
             }
         }
         category->setValue(proginfo->category);
-        
+
         fetchChannelInfo();
     }
 }
@@ -1017,7 +1046,8 @@ ScheduledRecording::testRecording()
     }
 
     bool resetID = false;
-    if (getRecordID() == 0) {
+    if (getRecordID() == 0)
+    {
         thequery = QString("SELECT MAX(recordid) FROM %1 ORDER BY recordid;")
                            .arg(ttable);
         query.prepare(thequery);
