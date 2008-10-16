@@ -118,7 +118,7 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
 {
     QMutexLocker locker(&m_lock);
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
-    db_vdisp_profile->SetVideoRenderer("didect3d");
+    db_vdisp_profile->SetVideoRenderer("direct3d");
 
     if (video_dim.width() == m_InputCX && video_dim.height() == m_InputCY)
     {
