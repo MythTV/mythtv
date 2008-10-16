@@ -169,6 +169,8 @@ bool MythConfirmationDialog::Create(void)
 
     BuildFocusList();
 
+    SetFocusWidget(okButton);
+
     return true;
 }
 
