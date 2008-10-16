@@ -108,6 +108,9 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
         }
     }
 
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
     return handled;
 }
 
@@ -192,6 +195,9 @@ bool MythConfirmationDialog::keyPressEvent(QKeyEvent *event)
                 handled = false;
         }
     }
+
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
 
     return handled;
 }
