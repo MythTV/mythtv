@@ -93,9 +93,6 @@ macx {
     }
 
     QMAKE_LFLAGS_SHLIB += -flat_namespace
-
-    # Horrible hack to work around bug in Apple's recent 10.5 headers:
-    contains(ARCH_X86, yes) : QMAKE_CXXFLAGS += -msse2
 }
 
 using_joystick_menu {

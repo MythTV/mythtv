@@ -1125,14 +1125,13 @@ fi
 
 # Mac OS X equivalent
 if test -f /usr/bin/hostinfo ; then
-    if test x"$processor" = x"" -o x"$processor" = x"$arch_raw" -o \
-            x"$processor" = x"unknown" -o x"$processor" = x"powerpc" ; then
+    arch=`arch`
+    if test x"$arch" = x"ppc" -o x"$arch" = x"ppc64" ; then
         processor=`/usr/bin/hostinfo | grep "Processor type:"`
         processor=${processor#Processor type: *}
         processor=${processor% (*}
-        if test x"`echo $processor | cut -c1-3`" = x"ppc" ; then
-            tune=$processor
-        else
+        tune=$processor
+    else
             # 10.4 only:
             processor=`/usr/sbin/sysctl -n machdep.cpu.model_string 2>/dev/null`
             if test x"$processor" = x"" ; then
@@ -1141,7 +1140,6 @@ if test -f /usr/bin/hostinfo ; then
             fi
             processor_flags=`/usr/sbin/sysctl -n machdep.cpu.features`
             processor_flags=`echo $processor_flags | tr "[A-Z]" "[a-z]"`
-        fi
     fi
 fi
 
@@ -2018,6 +2016,10 @@ if test $targetos = darwin; then
         check_cflags "-Wno-sign-compare"
         disabled shared && add_cflags -mdynamic-no-pic
     fi
+    # Apple GCC doesn't support march=core2 yet:
+    if test $cpu == "core2"; then
+        cpu="nocona"
+    fi
 fi
 
 disabled optimizations || add_optflags -fomit-frame-pointer
@@ -2033,7 +2035,6 @@ if test $cpu != "generic"; then
             check_archflags "-march=$cpu"
             disable cmov
         ;;
-        # targets that do support conditional mov (cmov)
         i686|pentiumpro|pentium[23]|pentium-m|athlon|athlon-tbird|athlon-4|athlon-[mx]p|athlon64|k8|opteron|athlon-fx|core2|c3-2)
             check_archflags "-march=$cpu"
             enable cmov
@@ -3450,6 +3451,7 @@ cat <<EOF >> $MYTH_CONFIG_MAK
 # Note: Qt uses QMAKE_INCDIR_QT to build an absolute path for include
 #       directories, it cannot be modified.
 QMAKE_LIBDIR_QT -= $libdir
+LIBS            += -L$libdir
 EOF
 
 diff $TMPH $MYTH_CONFIG_H >/dev/null 2>&1
