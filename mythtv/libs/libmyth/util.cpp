@@ -1,8 +1,6 @@
 // C++ headers
 #include <iostream>
 
-#include "mythcontext.h"
-
 using namespace std;
 
 // C headers
@@ -27,7 +25,6 @@ using namespace std;
 #ifdef BSD
 #include <sys/mount.h>  // for struct statfs
 #include <sys/sysctl.h>
-#include <sys/stat.h>   // for umask()
 #endif
 
 
@@ -42,12 +39,12 @@ using namespace std;
 #include <QFileInfo>
 
 // Myth headers
-#include "mythconfig.h"
+#include "mythcontext.h"
 #include "exitcodes.h"
 #include "util.h"
 #include "util-x11.h"
 #include "mythmediamonitor.h"
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 
 /** \fn mythCurrentDateTime()
  *  \brief Returns the current QDateTime object, stripped of its msec component
@@ -195,7 +192,14 @@ static bool read_time_zone_id(QString filename, QString& zone_id)
 static QString getSystemTimeZoneID(void)
 {
     QString zone_id("UNDEF");
-#ifndef USING_MINGW
+#ifdef USING_MINGW
+    // typedef struct _TIME_ZONE_INFORMATION { ...
+    // GetTimeZoneInformation();
+    // ...
+    // Sadly, Windows zone names are different to the (probably Unix)
+    // backend's names - "AUS Eastern Standard Time" vs "Australia/Sydney".
+    // Translation is not worthwhile. Leave it as UNDEF to check the offset.
+#else
     // Try to determine the time zone information by inspecting the system
     // configuration
     QString time_zone_file_path("/etc/timezone");
