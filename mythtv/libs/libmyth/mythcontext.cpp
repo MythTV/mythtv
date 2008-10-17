@@ -692,22 +692,21 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
     else
     {
         DatabaseParams params = parent->GetDatabaseParams();
-        QString response;
+        QString        response;
 
         // give user chance to skip config
         cout << endl << error.toLocal8Bit().constData() << endl << endl;
         response = getResponse("Would you like to configure the database "
                                "connection now?",
                                "yes");
-        if (response.isEmpty() || response.left(1).toLower() != "y")
+        if (!response.startsWith('y', Qt::CaseInsensitive))
             return false;
 
         params.dbHostName = getResponse("Database host name:",
                                         params.dbHostName);
         response = getResponse("Should I test connectivity to this host "
                                "using the ping command?", "yes");
-        params.dbHostPing = (response.isEmpty() ||
-                             response.left(1).toLower() != "y");
+        params.dbHostPing = response.startsWith('y', Qt::CaseInsensitive);
 
         params.dbPort     = intResponse("Database non-default port:",
                                         params.dbPort);
@@ -727,8 +726,7 @@ bool MythContextPrivate::PromptForDatabaseParams(const QString &error)
         response = getResponse("Would you like to use Wake-On-LAN to retry "
                                "database connections?",
                                (params.wolEnabled ? "yes" : "no"));
-        if (!response.isEmpty())
-            params.wolEnabled  = (response.left(1).toLower() == "y");
+        params.wolEnabled = response.startsWith('y', Qt::CaseInsensitive);
 
         if (params.wolEnabled)
         {
@@ -1535,7 +1533,7 @@ bool MythContext::IsFrontendOnly(void)
 
 QString MythContext::GetMasterHostPrefix(void)
 {
-    QString ret = "";
+    QString ret;
 
     if (!d->serverSock)
     {
