@@ -3,20 +3,8 @@
 #include <iostream>
 using namespace std;
 
-#include <QLayout>
-#include <QPushButton>
-#include <q3buttongroup.h>
-#include <QLabel>
-#include <QCursor>
 #include <QDateTime>
-#include <QApplication>
 #include <QRegExp>
-#include <q3header.h>
-#include <QEvent>
-#include <QPaintEvent>
-#include <QPainter>
-#include <QPixmap>
-#include <QKeyEvent>
 
 #include "viewscheduled.h"
 #include "scheduledrecording.h"
@@ -24,667 +12,393 @@ using namespace std;
 #include "proglist.h"
 #include "tv_play.h"
 
-#include "exitcodes.h"
-#include "libmyth/dialogbox.h"
 #include "libmyth/mythcontext.h"
 #include "libmythdb/mythverbose.h"
 #include "remoteutil.h"
 
+#include "mythuitext.h"
+#include "mythuistatetype.h"
+#include "mythuibuttonlist.h"
+#include "mythdialogbox.h"
 
 void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 {
-    ViewScheduled *vsb = new ViewScheduled(gContext->GetMainWindow(),
-                            "view scheduled", (TV*)player, showTV);
-    vsb->Show();
-    vsb->exec();
-    delete vsb;
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ViewScheduled *vsb = new ViewScheduled(mainStack,"ViewScheduled",
+                                           (TV*)player, showTV);
+
+    if (vsb->Create())
+        mainStack->AddScreen(vsb);
+    else
+        delete vsb;
 
     return NULL;
 }
 
-ViewScheduled::ViewScheduled(MythMainWindow *parent, const char *name,
-                            TV* player, bool showTV)
-             : MythDialog(parent, name)
+ViewScheduled::ViewScheduled(MythScreenStack *parent, QString name,
+                             TV* player, bool showTV)
+             : MythScreenType(parent, name)
 {
-    dateformat = gContext->GetSetting("ShortDateFormat", "M/d");
-    timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
-    showAll = !gContext->GetNumSetting("ViewSchedShowLevel", 0);
-
-    fullRect = QRect(0, 0, size().width(), size().height());
-    listRect = QRect(0, 0, 0, 0);
-    infoRect = QRect(0, 0, 0, 0);
-    conflictRect = QRect(0, 0, 0, 0);
-    showLevelRect = QRect(0, 0, 0, 0);
-    recStatusRect = QRect(0, 0, 0, 0);
+    m_dateformat = gContext->GetSetting("ShortDateFormat", "M/d");
+    m_timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    m_channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
+    m_showAll = !gContext->GetNumSetting("ViewSchedShowLevel", 0);
 
     m_player = player;
-    theme = new XMLParse();
-    theme->SetWMult(wmult);
-    theme->SetHMult(hmult);
-    if (m_player && m_player->IsRunning() && showTV)
-    {
-        if (!theme->LoadTheme(xmldata, "conflict-video"))
-            theme->LoadTheme(xmldata, "conflict");
-    }
-    else
-        theme->LoadTheme(xmldata, "conflict");
-    LoadWindow(xmldata);
 
-    if (m_player)
-        EmbedTVWindow();
+    m_inEvent = false;
+    m_inFill = false;
+    m_needFill = false;
 
-    LayerSet *container = theme->GetSet("selector");
-    if (container)
-    {
-        UIListType *ltype = (UIListType *)container->GetType("conflictlist");
-        if (ltype)
-            listsize = ltype->GetItems();
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, "ViewScheduled::ViewScheduled(): "
-                "Failed to get selector object.");
-        exit(FRONTEND_BUGGY_EXIT_NO_SELECTOR);
-    }
-
-    updateBackground();
-
-    inEvent = false;
-    inFill = false;
-    needFill = false;
-
-    curcard  = 0;
-    maxcard  = 0;
-    curinput = 0;
-    maxinput = 0;
-    listPos  = 0;
-    FillList();
- 
-    setNoErase();
+    m_curcard  = 0;
+    m_maxcard  = 0;
+    m_curinput = 0;
+    m_maxinput = 0;
 
     gContext->addListener(this);
-    gContext->addCurrentLocation("ViewScheduled");
 }
 
 ViewScheduled::~ViewScheduled()
 {
-    gContext->SaveSetting("ViewSchedShowLevel", !showAll);
     gContext->removeListener(this);
-    gContext->removeCurrentLocation();
-
-    delete theme;
+    gContext->SaveSetting("ViewSchedShowLevel", !m_showAll);
 }
 
-void ViewScheduled::keyPressEvent(QKeyEvent *e)
+bool ViewScheduled::Create()
 {
-    if (inEvent)
-        return;
+    if (!LoadWindowFromXML("schedule-ui.xml", "viewscheduled", this))
+        return false;
 
-    inEvent = true;
+    //if (m_player && m_player->IsRunning() && showTV)
+
+    m_schedulesList = dynamic_cast<MythUIButtonList *> (GetChild("schedules"));
+
+    if (!m_schedulesList)
+    {
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        return false;
+    }
+
+    connect(m_schedulesList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(updateInfo(MythUIButtonListItem*)));
+    connect(m_schedulesList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+            SLOT(selected(MythUIButtonListItem*)));
+
+    FillList();
+
+    if (m_player)
+        EmbedTVWindow();
+
+    BuildFocusList();
+
+    return true;
+}
+
+bool ViewScheduled::keyPressEvent(QKeyEvent *event)
+{
+    // FIXME: Blackholes keypresses, not good
+    if (m_inEvent)
+        return true;
+
+    m_inEvent = true;
+
+    if (GetFocusWidget()->keyPressEvent(event))
+    {
+        m_inEvent = false;
+        return true;
+    }
 
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions))
-    {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
+    gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", event, actions);
 
-            if (action == "SELECT")
-                selected();
-            else if (action == "MENU" || action == "INFO")
-                edit();
-            else if (action == "CUSTOMEDIT")
-                customEdit();
-            else if (action == "DELETE")
-                remove();
-            else if (action == "UPCOMING")
-                upcoming();
-            else if (action == "DETAILS")
-                details();
-            else if (action == "ESCAPE" || action == "LEFT")
-                done(MythDialog::Accepted);
-            else if (action == "UP")
-                cursorUp();
-            else if (action == "DOWN")
-                cursorDown();
-            else if (action == "PAGEUP")
-                pageUp();
-            else if (action == "PAGEDOWN")
-                pageDown();
-            else if (action == "1")
-                setShowAll(true);
-            else if (action == "2")
-                setShowAll(false);
-            else if (action == "PREVVIEW" || action == "NEXTVIEW")
-                setShowAll(!showAll);
-            else if (action == "VIEWCARD")
-                viewCards();
-            else if (action == "VIEWINPUT")
-                viewInputs();
-            else
-                handled = false;
-        }
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "MENU" || action == "INFO")
+            edit();
+        else if (action == "CUSTOMEDIT")
+            customEdit();
+        else if (action == "DELETE")
+            deleteRule();
+        else if (action == "UPCOMING")
+            upcoming();
+        else if (action == "DETAILS")
+            details();
+        else if (action == "1")
+            setShowAll(true);
+        else if (action == "2")
+            setShowAll(false);
+        else if (action == "PREVVIEW" || action == "NEXTVIEW")
+            setShowAll(!m_showAll);
+        else if (action == "VIEWCARD")
+            viewCards();
+        else if (action == "VIEWINPUT")
+            viewInputs();
+        else
+            handled = false;
     }
 
-    if (!handled)
-        MythDialog::keyPressEvent(e);
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
 
-    if (needFill)
-    {
-        do
-        {
-            needFill = false;
-            FillList();
-        } while (needFill);
+    if (m_needFill)
+        FillList();
 
-        update(fullRect);
-    }
+    m_inEvent = false;
 
-    inEvent = false;
-}
-
-void ViewScheduled::LoadWindow(QDomElement &element)
-{
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement e = child.toElement();
-        if (!e.isNull())
-        {
-            if (e.tagName() == "font")
-                theme->parseFont(e);
-            else if (e.tagName() == "container")
-                parseContainer(e);
-            else
-            {
-                VERBOSE(VB_IMPORTANT,
-                        QString("ViewScheduled: Unknown child element: %1. "
-                                "Ignoring.").arg(e.tagName()));
-            }
-        }
-    }
-}
-
-void ViewScheduled::parseContainer(QDomElement &element)
-{
-    QRect area;
-    QString name;
-    int context;
-    theme->parseContainer(element, name, context, area);
-
-    if (name.lower() == "selector")
-        listRect = area;
-    if (name.lower() == "program_info")
-        infoRect = area;
-    if (name.lower() == "conflict_info")
-        conflictRect = area;
-    if (name.lower() == "showlevel_info")
-        showLevelRect = area;
-    if (name.lower() == "status_info")
-        recStatusRect = area;
-    if (name.lower() == "tv_video")
-        tvRect = area;
-}
-
-void ViewScheduled::updateBackground(void)
-{
-    QPixmap bground(size());
-    bground.fill(this, 0, 0);
-
-    QPainter tmp(&bground);
-
-    LayerSet *container = theme->GetSet("background");
-    if (!container)
-        return;
-
-    container->Draw(&tmp, 0, 0);
-
-    tmp.end();
-    myBackground = bground;
-
-    setPaletteBackgroundPixmap(myBackground);
-}
-
-void ViewScheduled::paintEvent(QPaintEvent *e)
-{
-    if (inFill)
-        return;
-
-    QRect r = e->rect();
-    QPainter p(this);
- 
-    if (r.intersects(listRect))
-        updateList(&p);
-    if (r.intersects(infoRect))
-        updateInfo(&p);
-    if (r.intersects(conflictRect))
-        updateConflict(&p);
-    if (r.intersects(showLevelRect))
-        updateShowLevel(&p);
-    if (r.intersects(recStatusRect))
-        updateRecStatus(&p);
-}
-
-void ViewScheduled::cursorDown(bool page)
-{
-    if (listPos < (int)recList.count() - 1)
-    {
-        listPos += (page ? listsize : 1);
-        if (listPos > (int)recList.count() - 1)
-            listPos = recList.count() - 1;
-        update(fullRect);
-    }
-}
-
-void ViewScheduled::cursorUp(bool page)
-{
-    if (listPos > 0)
-    {
-        listPos -= (page ? listsize : 1);
-        if (listPos < 0)
-            listPos = 0;
-        update(fullRect);
-    }
+    return handled;
 }
 
 void ViewScheduled::FillList(void)
 {
-    inFill = true;
+    if (m_inFill)
+        return;
+
+    m_inFill = true;
+
+    int listPos = m_schedulesList->GetCurrentPos();
+
+    m_schedulesList->Reset();
 
     QString callsign;
     QDateTime startts, recstartts;
 
-    if (recList[listPos])
+    if (m_recList[listPos])
     {
-        callsign = recList[listPos]->chansign;
-        startts = recList[listPos]->startts;
-        recstartts = recList[listPos]->recstartts;
+        callsign = m_recList[listPos]->chansign;
+        startts = m_recList[listPos]->startts;
+        recstartts = m_recList[listPos]->recstartts;
     }
 
-    recList.FromScheduler(conflictBool);
+    m_recList.FromScheduler(m_conflictBool);
 
     QDateTime now = QDateTime::currentDateTime();
 
     QMap<int, int> toomanycounts;
 
-    ProgramList::iterator pit = recList.begin();
-    while (pit != recList.end())
-    {
-        ProgramInfo *p = *pit;
-        if ((p->recendts >= now || p->endts >= now) && 
-            (showAll || p->recstatus <= rsWillRecord || 
-             p->recstatus == rsDontRecord ||
-             (p->recstatus == rsTooManyRecordings && 
-              ++toomanycounts[p->recordid] <= 1) ||
-             (p->recstatus > rsTooManyRecordings && 
-              p->recstatus != rsRepeat &&
-              p->recstatus != rsNeverRecord)))
-        {
-            cardref[p->cardid]++;
-            if (p->cardid > maxcard)
-                maxcard = p->cardid;
+    MythUIText *norecordingText = dynamic_cast<MythUIText*>
+                                                (GetChild("norecordings_info"));
 
-            inputref[p->inputid]++;
-            if (p->inputid > maxinput)
-                maxinput = p->inputid;
+    if (norecordingText)
+        norecordingText->SetVisible(m_recList.isEmpty());
+
+    if (m_recList.isEmpty())
+        return;
+
+    ProgramList::iterator pit = m_recList.begin();
+    while (pit != m_recList.end())
+    {
+        ProgramInfo *pginfo = *pit;
+        if ((pginfo->recendts >= now || pginfo->endts >= now) &&
+            (m_showAll || pginfo->recstatus <= rsWillRecord ||
+             pginfo->recstatus == rsDontRecord ||
+             (pginfo->recstatus == rsTooManyRecordings &&
+              ++toomanycounts[pginfo->recordid] <= 1) ||
+             (pginfo->recstatus > rsTooManyRecordings &&
+              pginfo->recstatus != rsRepeat &&
+              pginfo->recstatus != rsNeverRecord)))
+        {
+            m_cardref[pginfo->cardid]++;
+            if (pginfo->cardid > m_maxcard)
+                m_maxcard = pginfo->cardid;
+
+            m_inputref[pginfo->inputid]++;
+            if (pginfo->inputid > m_maxinput)
+                m_maxinput = pginfo->inputid;
 
             ++pit;
         }
         else
         {
-            pit = recList.erase(pit);
+            pit = m_recList.erase(pit);
+            continue;
         }
+
+        QString state;
+
+        if (pginfo->recstatus == rsRecording)
+            state = "recording";
+        else if (pginfo->recstatus == rsConflict ||
+                    pginfo->recstatus == rsOffLine ||
+                    pginfo->recstatus == rsAborted)
+            state = "conflict";
+        else if (pginfo->recstatus == rsWillRecord)
+        {
+            if ((m_curcard == 0 && m_curinput == 0) ||
+                pginfo->cardid == m_curcard || pginfo->inputid == m_curinput)
+                state = "record";
+        }
+        else if (pginfo->recstatus == rsRepeat ||
+                    pginfo->recstatus == rsOtherShowing ||
+                    pginfo->recstatus == rsNeverRecord ||
+                    pginfo->recstatus == rsDontRecord ||
+                    (pginfo->recstatus != rsDontRecord &&
+                    pginfo->recstatus <= rsEarlierShowing))
+            state = "disabled";
+
+        MythUIButtonListItem *item =
+                                new MythUIButtonListItem(m_schedulesList,"");
+
+        QString temp;
+        temp = (pginfo->recstartts).toString(m_dateformat);
+        temp += " " + (pginfo->recstartts).toString(m_timeformat);
+        item->setText(temp, "time", state); //,font
+
+        item->setText(pginfo->ChannelText(m_channelFormat), "channel", state);
+
+        temp = pginfo->title;
+        if ((pginfo->subtitle).stripWhiteSpace().length() > 0)
+            temp += " - \"" + pginfo->subtitle + "\"";
+        item->setText(temp, "title", state); //,font
+
+        temp = pginfo->RecStatusChar();
+        item->setText(temp, "card", state); //,font
+
+        item->SetData(qVariantFromValue(pginfo));
+        item->DisplayState(state, "status");
     }
 
+    // Restore position after a list update
     if (!callsign.isNull())
     {
-        listPos = recList.count() - 1;
+        listPos = m_recList.count() - 1;
         int i;
         for (i = listPos; i >= 0; i--)
         {
-            if (callsign == recList[i]->chansign &&
-                startts == recList[i]->startts)
+            if (callsign == m_recList[i]->chansign &&
+                startts == m_recList[i]->startts)
             {
                 listPos = i;
                 break;
             }
-            else if (recstartts <= recList[i]->recstartts)
+            else if (recstartts <= m_recList[i]->recstartts)
                 listPos = i;
         }
+        m_schedulesList->SetItemCurrent(listPos);
     }
 
-    if (conflictBool)
+    MythUIText *statusText = dynamic_cast<MythUIText*>(GetChild("status"));
+    if (statusText)
     {
-        // Find first conflict and store in conflictDate field
-        for (uint i = 0; i < recList.count(); i++)
+        if (m_conflictBool)
         {
-            ProgramInfo *p = recList[i];
-            if (p->recstatus == rsConflict)
+            // Find first conflict and store in m_conflictDate field
+            for (uint i = 0; i < m_recList.count(); i++)
             {
-                conflictDate = p->recstartts.date();
-                break;
-            }
-        }
-    }
-
-    inFill = false;
-}
-
-void ViewScheduled::updateList(QPainter *p)
-{
-    QRect pr = listRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
-    
-    LayerSet *container = theme->GetSet("selector");
-    if (container)
-    {
-        UIListType *ltype = (UIListType *)container->GetType("conflictlist");
-        if (ltype)
-        {
-            ltype->ResetList();
-            ltype->SetActive(true);
-
-            int listCount = recList.count();
-
-            int skip;
-            if (listCount <= listsize || listPos <= listsize / 2)
-                skip = 0;
-            else if (listPos >= listCount - listsize + listsize / 2)
-                skip = listCount - listsize;
-            else
-                skip = listPos - listsize / 2;
-
-            ltype->SetUpArrow(skip > 0);
-            ltype->SetDownArrow(skip + listsize < listCount);
-
-            int i;
-            for (i = 0; i < listsize; i++)
-            {
-                if (i + skip >= listCount)
+                ProgramInfo *p = m_recList[i];
+                if (p->recstatus == rsConflict)
+                {
+                    m_conflictDate = p->recstartts.date();
                     break;
-
-                ProgramInfo *pginfo = recList[skip+i];
-
-                QString temp;
-
-                temp = (pginfo->recstartts).toString(dateformat);
-                temp += " " + (pginfo->recstartts).toString(timeformat);
-                ltype->SetItemText(i, 1, temp);
-
-                ltype->SetItemText(i, 2, pginfo->ChannelText(channelFormat));
-
-                temp = pginfo->title;
-                if ((pginfo->subtitle).stripWhiteSpace().length() > 0)
-                    temp += " - \"" + pginfo->subtitle + "\"";
-                ltype->SetItemText(i, 3, temp);
-
-                temp = pginfo->RecStatusChar();
-                ltype->SetItemText(i, 4, temp);
-
-                if (i + skip == listPos)
-                    ltype->SetItemCurrent(i);
-
-                if (pginfo->recstatus == rsRecording)
-                    ltype->EnableForcedFont(i, "recording");
-                else if (pginfo->recstatus == rsConflict ||
-                         pginfo->recstatus == rsOffLine ||
-                         pginfo->recstatus == rsAborted)
-                    ltype->EnableForcedFont(i, "conflictingrecording");
-                else if (pginfo->recstatus == rsWillRecord)
-                    {
-                    if ((curcard == 0 && curinput == 0) || 
-                        pginfo->cardid == curcard || pginfo->inputid == curinput)
-                        ltype->EnableForcedFont(i, "record");
-                    }
-                else if (pginfo->recstatus == rsRepeat ||
-                         pginfo->recstatus == rsOtherShowing ||
-                         pginfo->recstatus == rsNeverRecord ||
-                         (pginfo->recstatus != rsDontRecord &&
-                          pginfo->recstatus <= rsEarlierShowing))
-                    ltype->EnableForcedFont(i, "disabledrecording"); 
+                }
             }
+
+            // figure out caption based on m_conflictDate
+            QString cstring = tr("Time Conflict");
+            QDate now = QDate::currentDate();
+            int daysToConflict = now.daysTo(m_conflictDate);
+
+            if (daysToConflict == 0)
+                cstring = tr("Conflict Today");
+            else if (daysToConflict > 0)
+                cstring = QString(tr("Conflict %1"))
+                                .arg(m_conflictDate.toString(m_dateformat));
+
+            statusText->SetText(cstring);
         }
+        else
+            statusText->SetText(tr("No Conflicts"));
     }
 
-    if (recList.count() == 0)
-        container = theme->GetSet("norecordings_list");
-
-    if (container)
+    MythUIText *filterText = dynamic_cast<MythUIText*>(GetChild("filter"));
+    if (filterText)
     {
-       container->Draw(&tmp, 0, 0);
-       container->Draw(&tmp, 1, 0);
-       container->Draw(&tmp, 2, 0);
-       container->Draw(&tmp, 3, 0);
-       container->Draw(&tmp, 4, 0);
-       container->Draw(&tmp, 5, 0);
-       container->Draw(&tmp, 6, 0);
-       container->Draw(&tmp, 7, 0);
-       container->Draw(&tmp, 8, 0);
+        if (m_showAll)
+            filterText->SetText(tr("All"));
+        else
+            filterText->SetText(tr("Important"));
     }
 
-    tmp.end();
-    p->drawPixmap(pr.topLeft(), pix);
+    m_inFill = false;
+    m_needFill = false;
 }
 
-void ViewScheduled::updateConflict(QPainter *p)
+void ViewScheduled::updateInfo(MythUIButtonListItem *item)
 {
-    QRect pr = conflictRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
+    if (!item)
+        return;
 
-    LayerSet *container = theme->GetSet("conflict_info");
-    if (container)
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*> (item->GetData());
+    if (pginfo)
     {
-        UITextType *wtype = (UITextType *)container->GetType("warning");
-        UITextType *stype = (UITextType *)container->GetType("status");
-
-        /* if wtype doesn't exist in the theme, use stype instead */
-        if (!wtype)
-            wtype = stype;
-
-        if (stype)
-        {
-            if (conflictBool)
-            {
-                // figure out caption based on conflictDate
-                QString cstring = tr("Time Conflict");
-                QDate now = QDate::currentDate();
-                int daysToConflict = now.daysTo(conflictDate);
-
-                if (daysToConflict == 0)
-                    cstring = tr("Conflict Today");
-                else if (daysToConflict > 0)
-                    cstring = QString(tr("Conflict ")) + 
-                            conflictDate.toString(dateformat);
-
-                stype->SetText("");
-                wtype->SetText(cstring);
-            }
-            else
-            {
-                wtype->SetText("");
-                stype->SetText(tr("No Conflicts"));
-            }
-        }
+        QMap<QString, QString> infoMap;
+        pginfo->ToMap(infoMap);
+        SetTextFromMap(this, infoMap);
     }
-
-    if (container)
-    {
-        container->Draw(&tmp, 4, 0);
-        container->Draw(&tmp, 5, 0);
-        container->Draw(&tmp, 6, 0);
-        container->Draw(&tmp, 7, 0);
-        container->Draw(&tmp, 8, 0);
-    }
-
-    tmp.end();
-    p->drawPixmap(pr.topLeft(), pix);
-}
-
-void ViewScheduled::updateShowLevel(QPainter *p)
-{
-    QRect pr = showLevelRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
-
-    LayerSet *container = theme->GetSet("showlevel_info");
-    if (container)
-    {
-        UITextType *type = (UITextType *)container->GetType("showlevel");
-        if (type)
-        {
-            if (showAll)
-                type->SetText(tr("All"));
-            else
-                type->SetText(tr("Important"));
-        }
-    }
-
-    if (container)
-    {
-        container->Draw(&tmp, 4, 0);
-        container->Draw(&tmp, 5, 0);
-        container->Draw(&tmp, 6, 0);
-        container->Draw(&tmp, 7, 0);
-        container->Draw(&tmp, 8, 0);
-    }
-
-    tmp.end();
-    p->drawPixmap(pr.topLeft(), pix);
-}
-
-void ViewScheduled::updateInfo(QPainter *p)
-{
-    QRect pr = infoRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
-    QMap<QString, QString> infoMap;
-
-    LayerSet *container = theme->GetSet("program_info");
-    if (container)
-    {
-        ProgramInfo *pginfo = recList[listPos];
-        if (pginfo)
-        {
-            pginfo->ToMap(infoMap);
-            container->ClearAllText();
-            container->SetText(infoMap);
-        }
-    }
-
-    if (recList.count() == 0)
-        container = theme->GetSet("norecordings_info");
-
-    if (container)
-    {
-        container->Draw(&tmp, 4, 0);
-        container->Draw(&tmp, 5, 0);
-        container->Draw(&tmp, 6, 0);
-        container->Draw(&tmp, 7, 0);
-        container->Draw(&tmp, 8, 0);
-    }
-
-    tmp.end();
-    p->drawPixmap(pr.topLeft(), pix);
-}
-
-void ViewScheduled::updateRecStatus(QPainter *p)
-{
-    QRect pr = recStatusRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
-    QMap<QString, QString> infoMap;
-
-    LayerSet *container = theme->GetSet("status_info");
-    if (container)
-    {
-        ProgramInfo *pginfo = recList[listPos];
-        if (pginfo)
-        {
-            pginfo->ToMap(infoMap);
-            container->ClearAllText();
-            container->SetText(infoMap);
-        }
-    }
-
-    if (container)
-    {
-        container->Draw(&tmp, 4, 0);
-        container->Draw(&tmp, 5, 0);
-        container->Draw(&tmp, 6, 0);
-        container->Draw(&tmp, 7, 0);
-        container->Draw(&tmp, 8, 0);
-    }
-
-    tmp.end();
-    p->drawPixmap(pr.topLeft(), pix);
 }
 
 void ViewScheduled::edit()
 {
-    ProgramInfo *p = recList[listPos];
-    if (!p)
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>
+                                (m_schedulesList->GetItemCurrent()->GetData());
+    if (!pginfo)
         return;
 
-    p->EditScheduled();
+    pginfo->EditScheduled();
 }
 
 void ViewScheduled::customEdit()
 {
-    ProgramInfo *p = recList[listPos];
-    if (!p)
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>
+                                (m_schedulesList->GetItemCurrent()->GetData());
+    if (!pginfo)
         return;
 
     CustomEdit *ce = new CustomEdit(gContext->GetMainWindow(),
-                                    "customedit", p);
+                                    "customedit", pginfo);
     ce->exec();
     delete ce;
 }
 
-void ViewScheduled::remove()
+void ViewScheduled::deleteRule()
 {
-    ProgramInfo *p = recList[listPos];
-    if (!p)
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>
+                                (m_schedulesList->GetItemCurrent()->GetData());
+    if (!pginfo)
         return;
 
     ScheduledRecording *record = new ScheduledRecording();
-    int recid = p->recordid;
+    int recid = pginfo->recordid;
     record->loadByID(recid);
 
     QString message =
         tr("Delete '%1' %2 rule?").arg(record->getRecordTitle())
-                                  .arg(p->RecTypeText());
+                                  .arg(pginfo->RecTypeText());
 
-    bool ok = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), "",
-                                              message, false);
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    if (ok)
-    {
-        record->remove();
-        ScheduledRecording::signalChange(recid);
-    }
-    record->deleteLater();
+    MythConfirmationDialog *okPopup = new MythConfirmationDialog(popupStack,
+                                                                 message, true);
 
-    EmbedTVWindow();
+    okPopup->SetReturnEvent(this, "deleterule");
+    okPopup->SetData(record);
+
+    if (okPopup->Create())
+        popupStack->AddScreen(okPopup);
 }
 
 void ViewScheduled::upcoming()
 {
-    ProgramInfo *p = recList[listPos];
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>
+                                (m_schedulesList->GetItemCurrent()->GetData());
 
-    if (!p)
+    if (!pginfo)
         return;
 
-    ProgLister *pl = new ProgLister(plTitle, p->title, "",
+    ProgLister *pl = new ProgLister(plTitle, pginfo->title, "",
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
@@ -694,97 +408,169 @@ void ViewScheduled::upcoming()
 
 void ViewScheduled::details()
 {
-    ProgramInfo *p = recList[listPos];
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>
+                                (m_schedulesList->GetItemCurrent()->GetData());
 
-    if (p)
-        p->showDetails();
- 
-    EmbedTVWindow();
-}
-
-void ViewScheduled::selected()
-{
-    ProgramInfo *p = recList[listPos];
-    if (!p)
-        return;
-
-    p->EditRecording();
+    if (pginfo)
+        pginfo->showDetails();
 
     EmbedTVWindow();
 }
 
-void ViewScheduled::customEvent(QEvent *e)
+void ViewScheduled::selected(MythUIButtonListItem *item)
 {
-    if ((MythEvent::Type)(e->type()) != MythEvent::MythEventMessage)
+    if (!item)
         return;
 
-    MythEvent *me = (MythEvent *)e;
-    QString message = me->Message();
-    if (message != "SCHEDULE_CHANGE")
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*> (item->GetData());
+    if (!pginfo)
         return;
 
-    if (inEvent)
-    {
-        needFill = true;
-        return;
-    }
+    pginfo->EditRecording();
 
-    inEvent = true;
-
-    do
-    {
-        needFill = false;
-        FillList();
-    } while (needFill);
-
-    update(fullRect);
-
-    inEvent = false;
+    EmbedTVWindow();
 }
 
 void ViewScheduled::setShowAll(bool all)
 {
-    showAll = all;
-
-    needFill = true;
+    m_showAll = all;
+    m_needFill = true;
 }
 
 void ViewScheduled::viewCards()
 {
-    curinput = 0;
-    needFill = true;
+    m_curinput = 0;
+    m_needFill = true;
 
-    curcard++;
-    while (curcard <= maxcard)
+    m_curcard++;
+    while (m_curcard <= m_maxcard)
     {
-        if (cardref[curcard] > 0)
+        if (m_cardref[m_curcard] > 0)
             return;
-        curcard++;
+        m_curcard++;
     }
-    curcard = 0;
+    m_curcard = 0;
 }
 
 void ViewScheduled::viewInputs()
 {
-    curcard = 0;
-    needFill = true;
+    m_curcard = 0;
+    m_needFill = true;
 
-    curinput++;
-    while (curinput <= maxinput)
+    m_curinput++;
+    while (m_curinput <= m_maxinput)
     {
-        if (inputref[curinput] > 0)
+        if (m_inputref[m_curinput] > 0)
             return;
-        curinput++;
+        m_curinput++;
     }
-    curinput = 0;
+    m_curinput = 0;
 }
 
 void ViewScheduled::EmbedTVWindow(void)
 {
     if (m_player)
     {
-        m_player->EmbedOutput(this->winId(), tvRect.x(), tvRect.y(),
-                            tvRect.width(), tvRect.height());
+//         m_player->EmbedOutput(this->winId(), m_tvRect.x(), m_tvRect.y(),
+//                             m_tvRect.width(), m_tvRect.height());
     }
 }
-        
+
+void ViewScheduled::customEvent(QEvent *event)
+{
+    if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)event;
+        QString message = me->Message();
+
+        if (message != "SCHEDULE_CHANGE")
+            return;
+
+        m_needFill = true;
+
+        if (m_inEvent)
+            return;
+
+        m_inEvent = true;
+
+        FillList();
+
+        m_inEvent = false;
+    }
+    else if (event->type() == kMythDialogBoxCompletionEventType)
+    {
+        DialogCompletionEvent *dce =
+                                dynamic_cast<DialogCompletionEvent*>(event);
+
+        QString resultid= dce->GetId();
+        int buttonnum  = dce->GetResult();
+
+        if (resultid == "deleterule")
+        {
+            ScheduledRecording *record =
+                                    (ScheduledRecording *)dce->GetResultData();
+            if (record)
+            {
+                if (buttonnum > 0)
+                {
+                    record->remove();
+                    ScheduledRecording::signalChange(record->getRecordID());
+                }
+                record->deleteLater();
+            }
+
+            EmbedTVWindow();
+        }
+    }
+
+}
+
+void ViewScheduled::SetTextFromMap(MythUIType *parent,
+                                   QMap<QString, QString> &infoMap)
+{
+    if (!parent)
+        return;
+
+    QList<MythUIType *> *children = parent->GetAllChildren();
+
+    MythUIText *textType;
+    QMutableListIterator<MythUIType *> i(*children);
+    while (i.hasNext())
+    {
+        MythUIType *type = i.next();
+        if (!type->IsVisible())
+            continue;
+
+        textType = dynamic_cast<MythUIText *> (type);
+        if (textType && infoMap.contains(textType->objectName()))
+        {
+            QString newText = textType->GetDefaultText();
+            QRegExp regexp("%(\\|(.))?([^\\|]+)(\\|(.))?%");
+            regexp.setMinimal(true);
+            if (newText.contains(regexp))
+            {
+                int pos = 0;
+                QString tempString = newText;
+                while ((pos = regexp.indexIn(newText, pos)) != -1)
+                {
+                    QString key = regexp.cap(3).toLower().trimmed();
+                    QString replacement;
+                    if (!infoMap.value(key).isEmpty())
+                    {
+                        replacement = QString("%1%2%3")
+                                                .arg(regexp.cap(2))
+                                                .arg(infoMap.value(key))
+                                                .arg(regexp.cap(5));
+                    }
+                    tempString.replace(regexp.cap(0), replacement);
+                    pos += regexp.matchedLength();
+                }
+                newText = tempString;
+            }
+            else
+                newText = infoMap.value(textType->objectName());
+
+            textType->SetText(newText);
+        }
+    }
+}

@@ -214,8 +214,14 @@ void startSearchTime(void)
 
 void startManaged(void)
 {
-    ViewScheduled vsb(gContext->GetMainWindow(), "view scheduled");
-    vsb.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    ViewScheduled *viewsched = new ViewScheduled(mainStack, "ViewScheduled");
+
+    if (viewsched->Create())
+        mainStack->AddScreen(viewsched);
+    else
+        delete viewsched;
 }
 
 void startProgramRecPriorities(void)

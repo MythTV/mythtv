@@ -1,47 +1,42 @@
 #ifndef VIEWSCHEDULED_H_
 #define VIEWSCHEDULED_H_
 
-#include <qdatetime.h>
-#include <qdom.h>
-#include <QPixmap>
-#include <QEvent>
-#include <QKeyEvent>
-#include <QPaintEvent>
+#include <QDateTime>
 
-#include "mythwidgets.h"
-#include "mythdialogs.h"
-#include "uitypes.h"
-#include "xmlparse.h"
 #include "programinfo.h"
+
+#include "mythscreentype.h"
 
 class TV;
 class Timer;
 
-class ViewScheduled : public MythDialog
+class MythUIText;
+class MythUIStateType;
+class MythUIButtonList;
+class MythUIButtonListItem;
+
+class ViewScheduled : public MythScreenType
 {
     Q_OBJECT
   public:
-    ViewScheduled(MythMainWindow *parent, const char *name = 0,
+    ViewScheduled(MythScreenStack *parent, QString name,
                     TV *player = NULL, bool showTV = false);
     ~ViewScheduled();
+
     static void * RunViewScheduled(void *player, bool);
+
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
+    void customEvent(QEvent*);
 
   protected slots:
     void edit();
     void customEdit();
-    void remove();
+    void deleteRule();
     void upcoming();
     void details();
-    void selected();
-    void cursorDown(bool page = false);
-    void cursorUp(bool page = false);
-    void pageDown() { cursorDown(true); }
-    void pageUp() { cursorUp(true); }
-
-  protected:
-    void paintEvent(QPaintEvent *);
-    void keyPressEvent(QKeyEvent *e);
-    void customEvent(QEvent *e);
+    void selected(MythUIButtonListItem *);
+    void updateInfo(MythUIButtonListItem *);
 
   private:
     void FillList(void);
@@ -49,53 +44,36 @@ class ViewScheduled : public MythDialog
     void viewCards(void);
     void viewInputs(void);
 
-    void updateBackground(void);
-    void updateList(QPainter *);
-    void updateConflict(QPainter *);
-    void updateShowLevel(QPainter *);
-    void updateInfo(QPainter *);
-    void updateRecStatus(QPainter *);
-
-    void LoadWindow(QDomElement &);
-    void parseContainer(QDomElement &);
     void EmbedTVWindow(void);
-    XMLParse *theme;
-    QDomElement xmldata;
 
-    QPixmap myBackground;
+    void SetTextFromMap(MythUIType *parent, QMap<QString, QString> &infoMap);
 
-    bool conflictBool;
-    QDate conflictDate;
-    QString dateformat;
-    QString timeformat;
-    QString channelFormat;
+    bool m_conflictBool;
+    QDate m_conflictDate;
+    QString m_dateformat;
+    QString m_timeformat;
+    QString m_channelFormat;
 
-    QRect listRect;
-    QRect infoRect;
-    QRect conflictRect;
-    QRect showLevelRect;
-    QRect recStatusRect;
-    QRect fullRect;
-    QRect tvRect;
+    QRect m_tvRect;
 
-    int listsize;
+    MythUIButtonList *m_schedulesList;
 
-    bool showAll;
+    bool m_showAll;
 
-    bool inEvent;
-    bool inFill;
-    bool needFill;
+    bool m_inEvent;
+    bool m_inFill;
+    bool m_needFill;
 
-    int listPos;
-    ProgramList recList;
+    int m_listPos;
+    ProgramList m_recList;
 
-    QMap<int, int> cardref;
-    int maxcard;
-    int curcard;
+    QMap<int, int> m_cardref;
+    int m_maxcard;
+    int m_curcard;
 
-    QMap<int, int> inputref;
-    int maxinput;
-    int curinput;
+    QMap<int, int> m_inputref;
+    int m_maxinput;
+    int m_curinput;
 
     TV *m_player;
 };

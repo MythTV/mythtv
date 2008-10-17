@@ -44,6 +44,10 @@
         <color>#80d400</color>
     </font>
 
+    <font name="basesmallblue" base="basesmall">
+        <color>#0492A7</color>
+    </font>
+
     <font name="basesmallred" from="basesmall">
         <color>#800900</color>
     </font>

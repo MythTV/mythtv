@@ -82,4 +82,172 @@
 
     </window>
 
+    <window name="viewscheduled">
+
+        <textarea name="pagetitle">
+            <area>20,8,800,40</area>
+            <font>baselarge</font>
+            <value>Scheduled Recordings</value>
+        </textarea>
+
+        <imagetype name="filler">
+            <filename>trans-cr-background.png</filename>
+            <position>0,39</position>
+        </imagetype>
+
+        <imagetype name="showinglines">
+            <filename>cr-lines.png</filename>
+            <position>0,39</position>
+        </imagetype>
+
+        <textarea name="status" from="basetextarea">
+            <area>400,10,380,30</area>
+            <align>right</align>
+            <font>basemedium</font>
+            <font state="warning">basemediumred</font>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="filterlabel" from="basetextarea">
+            <area>10,330,105,30</area>
+            <value>Showing:</value>
+        </textarea>
+
+        <textarea name="filter" from="basetextarea">
+            <area>120,330,150,30</area>
+        </textarea>
+
+        <buttonlist name="schedules">
+            <area>20,51,760,300</area>
+            <layout>vertical</layout>
+            <spacing>4</spacing>
+            <buttonarea>0,0,760,280</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,760,25</area>
+                <state name="active">
+                    <statetype name="status">
+                        <position>0,0</position>
+                        <state name="disabled">
+                            <imagetype name="statusimage">
+                                <filename>schedule_disabled.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="conflict">
+                            <imagetype name="statusimage">
+                                <filename>schedule_conflict.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="record">
+                            <imagetype name="statusimage">
+                                <filename>schedule_record.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="recording">
+                            <imagetype name="statusimage">
+                                <filename>schedule_recording.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <textarea name="time" from="basetextarea">
+                        <area>32,1,148,24</area>
+                        <font>basesmallgrey</font>
+                        <font state="conflict">basesmallred</font>
+                        <font state="disabled">basesmallgrey</font>
+                        <font state="record">basesmallblue</font>
+                        <font state="recording">basesmallgreen</font>
+                    </textarea>
+                    <textarea name="channel" from="time">
+                        <area>170,1,140,24</area>
+                    </textarea>
+                    <textarea name="title" from="time">
+                        <area>340,1,380,24</area>
+                    </textarea>
+                    <textarea name="card" from="time">
+                        <area>730,1,20,24</area>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="selectbar">
+                        <position>27,0</position>
+                        <filename>schedule_selectbar.png</filename>
+                    </imagetype>
+                </state>
+                <state name="inactive" from="active" />
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>710,285</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>740,285</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+        <!--
+        <fcnfont name="conflict_font" function="conflictingrecording">
+        <fcnfont name="norecordfnt" function="disabledrecording">
+        <fcnfont name="record_font" function="record">
+        <fcnfont name="recording_font" function="recording">
+        -->
+
+        <textarea name="title" from="basetextarea">
+            <area>20,360,800,40</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="channel" from="basetextarea">
+            <area>20,400,160,30</area>
+        </textarea>
+
+        <textarea name="timedate" from="basetextarea">
+            <area>200,400,420,30</area>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>20,430,720,140</area>
+            <multiline>yes</multiline>
+            <cutdown>yes</cutdown>
+            <value>%|"SUBTITLE|"%\n%STARS%%DESCRIPTION%</value>
+        </textarea>
+
+        <textarea name="recordingstatus" from="basetextarea">
+            <area>300,330,420,30</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="norecordings_info">
+            <area>0,110,800,70</area>
+            <font>basemedium</font>
+            <value>You Haven't Scheduled Any Programs To Be Recorded\n
+                To schedule a recording, exit this screen and
+                Select 'Program Guide' or 'Program Finder'</value>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
+        </textarea>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>0,570,800,30</area>
+            <value>(1) All  (2) Important</value>
+            <align>center</align>
+        </textarea>
+    </window>
+
 </mythuitheme>
