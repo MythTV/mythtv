@@ -197,3 +197,5 @@ contains( CONFIG_LIBFFTW3, yes ) {
 }
 
 include ( ../libs-targetfix.pro )
+
+LIBS += $$LATE_LIBS

@@ -52,3 +52,5 @@ mingw:LIBS += -lpthread -lws2_32
 QT += sql network
 
 include ( ../libs-targetfix.pro )
+
+LIBS += $$LATE_LIBS

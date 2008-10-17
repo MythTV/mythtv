@@ -3451,7 +3451,7 @@ cat <<EOF >> $MYTH_CONFIG_MAK
 # Note: Qt uses QMAKE_INCDIR_QT to build an absolute path for include
 #       directories, it cannot be modified.
 QMAKE_LIBDIR_QT -= $libdir
-# LIBS            += -L$libdir
+LATE_LIBS            += -L$libdir
 EOF
 
 diff $TMPH $MYTH_CONFIG_H >/dev/null 2>&1

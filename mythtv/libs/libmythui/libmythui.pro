@@ -135,3 +135,5 @@ using_qtwebkit {
 }
 
 include ( ../libs-targetfix.pro )
+
+LIBS += $$LATE_LIBS

@@ -42,3 +42,5 @@ CONFIG += opengl
 
 macx:using_firewire:using_backend:LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
 macx:using_dvdv:LIBS += -lobjc
+
+LIBS += $$LATE_LIBS

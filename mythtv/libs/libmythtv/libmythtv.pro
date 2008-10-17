@@ -540,3 +540,5 @@ INSTALLS += inc
 QT += network xml  sql opengl qt3support
 
 include ( ../libs-targetfix.pro )
+
+LIBS += $$LATE_LIBS

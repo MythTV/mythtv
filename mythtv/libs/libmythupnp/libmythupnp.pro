@@ -71,3 +71,5 @@ macx {
 QT += network xml sql
 
 include ( ../libs-targetfix.pro )
+
+LIBS += $$LATE_LIBS
