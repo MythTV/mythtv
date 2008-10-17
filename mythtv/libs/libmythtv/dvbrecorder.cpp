@@ -98,7 +98,7 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       dvbchannel(advbchannel),
       _stream_handler(NULL),
       _stream_data(NULL),
-      _pid_lock(true),
+      _pid_lock(QMutex::Recursive),
       _input_pat(NULL),
       _input_pmt(NULL),
       _has_no_av(false),

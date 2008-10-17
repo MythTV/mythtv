@@ -15,9 +15,6 @@
 #include <algorithm>
 using namespace std;
 
-// Qt headers
-#include <q3deepcopy.h>
-
 // MythTV headers
 #include "videodev_myth.h"
 #include "channelbase.h"
@@ -138,7 +135,10 @@ bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
                 {
                     inputname = *it;
                     if (mplexid_restriction)
-                        startchannel = Q3DeepCopy<QString>((*cit).channum);
+                    {
+                        startchannel = (*cit).channum;
+                        startchannel.detach();
+                    }
                     msg2 = QString("selected to '%1' on input '%2' instead.")
                         .arg(startchannel).arg(inputname);
                     msg_error = false;

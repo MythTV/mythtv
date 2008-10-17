@@ -242,7 +242,7 @@ int DBox2Recorder::OpenStream(void)
 
     VERBOSE(VB_RECORD, LOC + "Opening pids " + message);
 
-    struct hostent *hp = gethostbyname(ip);
+    struct hostent *hp = gethostbyname(ip.toLocal8Bit().constData());
     if (!hp)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +

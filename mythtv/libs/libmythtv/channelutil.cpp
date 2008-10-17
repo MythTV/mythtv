@@ -4,7 +4,6 @@
 #include <set>
 using namespace std;
 
-#include <q3deepcopy.h>
 #include <qregexp.h>
 #include <stdint.h>
 #include <qimage.h>
@@ -996,7 +995,9 @@ bool ChannelUtil::SetChannelValue(const QString &field_name,
 
 QString ChannelUtil::GetUnknownCallsign(void)
 {
-    return Q3DeepCopy<QString>(QObject::tr("UNKNOWN", "Synthesized callsign"));
+    QString tmp = QObject::tr("UNKNOWN", "Synthesized callsign");
+    tmp.detach();
+    return tmp;
 }
 
 int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
@@ -1128,7 +1129,7 @@ int ChannelUtil::CreateChanID(uint sourceid, const QString &chan_num)
 {
     // first try to base it on the channel number for human readability
     uint chanid = 0;
-    int chansep = chan_num.find(QRegExp("\\D"));
+    int chansep = chan_num.indexOf(QRegExp("\\D"));
     if (chansep > 0)
     {
         chanid =
@@ -1577,8 +1578,8 @@ inline bool lt_smart(const DBChannel &a, const DBChannel &b)
     int idxA, idxB;
     {
         QMutexLocker locker(&sepExprLock);
-        idxA = a.channum.find(sepExpr);
-        idxB = b.channum.find(sepExpr);
+        idxA = a.channum.indexOf(sepExpr);
+        idxB = b.channum.indexOf(sepExpr);
     }
     if (idxA >= 0)
     {
@@ -1681,7 +1682,7 @@ void ChannelUtil::EliminateDuplicateChanNum(DBChanList &list)
 
     while (it != list.end())
     {
-        QString tmp = Q3DeepCopy<QString>(it->channum);
+        QString tmp = it->channum; tmp.detach();
         std::pair<seen_set::iterator, bool> insret = seen.insert(tmp);
         if (insret.second)
             ++it;

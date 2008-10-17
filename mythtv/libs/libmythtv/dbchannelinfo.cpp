@@ -1,7 +1,6 @@
 // -*- Mode: c++ -*-
 
 // Qt headers
-#include <Q3DeepCopy>
 #include <QFile>
 
 // MythTV headers
@@ -19,28 +18,32 @@ DBChannel::DBChannel(
     uint _chanid, uint _major_chan, uint _minor_chan,
     uint _favorite, uint _mplexid, bool _visible,
     const QString &_name, const QString &_icon) :
-    channum(Q3DeepCopy<QString>(_channum)),
-    callsign(Q3DeepCopy<QString>(_callsign)), chanid(_chanid),
+    channum(_channum),
+    callsign(_callsign), chanid(_chanid),
     major_chan(_major_chan), minor_chan(_minor_chan),
     favorite(_favorite), mplexid(_mplexid), visible(_visible),
-    name(Q3DeepCopy<QString>(_name)), icon(Q3DeepCopy<QString>(_icon))
+    name(_name), icon(_icon)
 {
+    channum.detach();
+    callsign.detach();
+    name.detach();
+    icon.detach();
     mplexid = (mplexid == 32767) ? 0 : mplexid;
     icon = (icon == "none") ? QString::null : icon;
 }
 
 DBChannel &DBChannel::operator=(const DBChannel &other)
 {
-    channum    = Q3DeepCopy<QString>(other.channum);
-    callsign   = Q3DeepCopy<QString>(other.callsign);
+    channum    = other.channum;  channum.detach();
+    callsign   = other.callsign; callsign.detach();
     chanid     = other.chanid;
     major_chan = other.major_chan;
     minor_chan = other.minor_chan;
     favorite   = other.favorite;
     mplexid    = (other.mplexid == 32767) ? 0 : other.mplexid;
     visible    = other.visible;
-    name       = Q3DeepCopy<QString>(other.name);
-    icon       = Q3DeepCopy<QString>(other.icon);
+    name       = other.name; name.detach();
+    icon       = other.icon; icon.detach();
 
     return *this;
 }
@@ -83,10 +86,10 @@ bool PixmapChannel::LoadChannelIcon(uint size) const
             QImage tmp2;
             tmp2 = tempimage.scaled(size, size,
                     Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-            iconPixmap.convertFromImage(tmp2);
+            iconPixmap = QPixmap::fromImage(tmp2);
         }
         else
-            iconPixmap.convertFromImage(tempimage);
+            iconPixmap = QPixmap::fromImage(tempimage);
     }
 
     return iconLoaded;
@@ -214,26 +217,26 @@ ChannelInsertInfo::ChannelInsertInfo(
     db_mplexid(_db_mplexid),
     source_id(_source_id),
     channel_id(_channel_id),
-    callsign(Q3DeepCopy<QString>(_callsign)),
-    service_name(Q3DeepCopy<QString>(_service_name)),
-    chan_num(Q3DeepCopy<QString>(_chan_num)),
+    callsign(_callsign),
+    service_name(_service_name),
+    chan_num(_chan_num),
     service_id(_service_id),
     atsc_major_channel(_atsc_major_channel),
     atsc_minor_channel(_atsc_minor_channel),
     use_on_air_guide(_use_on_air_guide),
     hidden(_hidden),
     hidden_in_guide(_hidden_in_guide),
-    freqid(Q3DeepCopy<QString>(_freqid)),
-    icon(Q3DeepCopy<QString>(_icon)),
-    format(Q3DeepCopy<QString>(_format)),
-    xmltvid(Q3DeepCopy<QString>(_xmltvid)),
+    freqid(_freqid),
+    icon(_icon),
+    format(_format),
+    xmltvid(_xmltvid),
     pat_tsid(_pat_tsid),
     vct_tsid(_vct_tsid),
     vct_chan_tsid(_vct_chan_tsid),
     sdt_tsid(_sdt_tsid),
     orig_netid(_orig_netid),
     netid(_netid),
-    si_standard(Q3DeepCopy<QString>(_si_standard)),
+    si_standard(_si_standard),
     in_channels_conf(_in_channels_conf),
     in_pat(_in_pat),
     in_pmt(_in_pmt),
@@ -247,6 +250,14 @@ ChannelInsertInfo::ChannelInsertInfo(
     could_be_opencable(_could_be_opencable),
     decryption_status(_decryption_status)
 {
+    callsign.detach();
+    service_name.detach();
+    chan_num.detach();
+    freqid.detach();
+    icon.detach();
+    format.detach();
+    xmltvid.detach();
+    si_standard.detach();
 }
 
 ChannelInsertInfo &ChannelInsertInfo::operator=(
@@ -255,19 +266,19 @@ ChannelInsertInfo &ChannelInsertInfo::operator=(
     db_mplexid         = other.db_mplexid;
     source_id          = other.source_id;
     channel_id         = other.channel_id;
-    callsign           = Q3DeepCopy<QString>(other.callsign);
-    service_name       = Q3DeepCopy<QString>(other.service_name);
-    chan_num           = Q3DeepCopy<QString>(other.chan_num);
+    callsign           = other.callsign;     callsign.detach();
+    service_name       = other.service_name; service_name.detach();
+    chan_num           = other.chan_num;     chan_num.detach();
     service_id         = other.service_id;
     atsc_major_channel = other.atsc_major_channel;
     atsc_minor_channel = other.atsc_minor_channel;
     use_on_air_guide   = other.use_on_air_guide;
     hidden             = other.hidden;
     hidden_in_guide    = other.hidden_in_guide;
-    freqid             = Q3DeepCopy<QString>(other.freqid);
-    icon               = Q3DeepCopy<QString>(other.icon);
-    format             = Q3DeepCopy<QString>(other.format);
-    xmltvid            = Q3DeepCopy<QString>(other.xmltvid);
+    freqid             = other.freqid;      freqid.detach();
+    icon               = other.icon;        icon.detach();
+    format             = other.format;      format.detach();
+    xmltvid            = other.xmltvid;     xmltvid.detach();
 
     // non-DB info
     pat_tsid           = other.pat_tsid;
@@ -276,7 +287,7 @@ ChannelInsertInfo &ChannelInsertInfo::operator=(
     sdt_tsid           = other.sdt_tsid;
     orig_netid         = other.orig_netid;
     netid              = other.netid;
-    si_standard        = Q3DeepCopy<QString>(other.si_standard);
+    si_standard        = other.si_standard; si_standard.detach();
     in_channels_conf   = other.in_channels_conf;
     in_pat             = other.in_pat;
     in_pmt             = other.in_pmt;

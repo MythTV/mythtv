@@ -5,8 +5,6 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
-#include <Q3DeepCopy>
-
 #include "libmythdb/mythverbose.h"
 #include "tv_rec.h"
 #include "linuxfirewiredevice.h"
@@ -108,8 +106,11 @@ bool FirewireChannel::SetChannelByString(const QString &channum)
     if (ok)
     {
         // Set the current channum to the new channel's channum
-        curchannelname = Q3DeepCopy<QString>(channum);
-        (*it)->startChanNum = Q3DeepCopy<QString>(channum);
+        QString tmp = channum;
+        tmp.detach();
+        curchannelname = tmp;
+        tmp.detach();
+        (*it)->startChanNum = tmp;
     }
 
     VERBOSE(VB_CHANNEL, loc + " " + ((ok) ? "success" : "failure"));

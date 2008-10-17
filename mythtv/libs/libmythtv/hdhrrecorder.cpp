@@ -39,7 +39,7 @@ HDHRRecorder::HDHRRecorder(TVRec *rec, HDHRChannel *channel)
       _channel(channel),        _video_socket(NULL),
       _stream_data(NULL),
       _input_pat(NULL),         _input_pmt(NULL),
-      _reset_pid_filters(false),_pid_lock(true)
+      _reset_pid_filters(false),_pid_lock(QMutex::Recursive)
 {
 }
 

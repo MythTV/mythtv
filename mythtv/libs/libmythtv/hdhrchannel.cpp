@@ -18,9 +18,6 @@
 #include <algorithm>
 using namespace std;
 
-// Qt includes
-#include <q3deepcopy.h>
-
 // MythTV includes
 #include "libmyth/mythcontext.h"
 #include "libmythdb/mythdbcon.h"
@@ -38,7 +35,7 @@ using namespace std;
 HDHRChannel::HDHRChannel(TVRec *parent, const QString &device, uint tuner)
     : DTVChannel(parent),       _control_socket(NULL),
       _device_id(0),            _device_ip(0),
-      _tuner(tuner),            _lock(true)
+      _tuner(tuner),            _lock(QMutex::Recursive)
 {
     bool valid;
     _device_id = device.toUInt(&valid, 16);
@@ -48,7 +45,7 @@ HDHRChannel::HDHRChannel(TVRec *parent, const QString &device, uint tuner)
 
     /* Otherwise, is it a valid IP address? */
     struct in_addr address;
-    if (inet_aton(device, &address)) 
+    if (inet_aton(device.toLatin1().constData(), &address)) 
     {
 	_device_ip = ntohl(address.s_addr);
 	return;
@@ -157,7 +154,8 @@ QString HDHRChannel::DeviceGet(const QString &name, bool report_error_return)
 
     char *value = NULL;
     char *error = NULL;
-    if (hdhomerun_control_get(_control_socket, name, &value, &error) < 0)
+    if (hdhomerun_control_get(_control_socket, name.toLatin1().constData(),
+                              &value, &error) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Get request failed" + ENO);
         return QString::null;
@@ -187,7 +185,8 @@ QString HDHRChannel::DeviceSet(const QString &name, const QString &val,
 
     char *value = NULL;
     char *error = NULL;
-    if (hdhomerun_control_set(_control_socket, name, val, &value, &error) < 0)
+    if (hdhomerun_control_set(_control_socket, name.toLatin1().constData(),
+                              val.toAscii().constData(), &value, &error) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Set request failed" + ENO);
 
@@ -339,13 +338,15 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
         return false;
 
     // Set the current channum to the new channel's channum
-    curchannelname = Q3DeepCopy<QString>(channum);
+    QString tmp = channum; tmp.detach();
+    curchannelname = tmp;
 
     // Set the major and minor channel for any additional multiplex tuning
     SetDTVInfo(atsc_major, atsc_minor, netid, tsid, mpeg_prog_num);
 
     // Set this as the future start channel for this source
-    inputs[currentInputID]->startChanNum = Q3DeepCopy<QString>(curchannelname);
+    QString tmpX = curchannelname; tmpX.detach();
+    inputs[currentInputID]->startChanNum = tmpX;
 
     // Turn on the HDHomeRun program filtering if it is supported
     // and we are tuning to an MPEG program number.

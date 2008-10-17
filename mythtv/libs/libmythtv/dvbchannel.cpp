@@ -39,9 +39,6 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
-// Qt headers
-#include <q3deepcopy.h>
-
 // MythTV headers
 #include "mythdb.h"
 #include "cardutil.h"
@@ -74,7 +71,7 @@ DVBChannel::DVBChannel(const QString &aDevice, TVRec *parent)
       // Device info
       frontend_name(QString::null), card_type(DTVTunerType::kTunerTypeUnknown),
       // Tuning
-      tune_lock(false),             hw_lock(false),
+      tune_lock(),                  hw_lock(),
       last_lnb_dev_id(-1),
       tuning_delay(0),              sigmon_delay(25),
       first_tune(true),
@@ -121,7 +118,7 @@ void DVBChannel::Close(DVBChannel *who)
     if (it == is_open.end())
         return; // this caller didn't have it open in the first place..
 
-    is_open.remove(it);
+    is_open.erase(it);
 
     if (master)
     {
@@ -415,12 +412,14 @@ bool DVBChannel::SetChannelByString(const QString &channum)
         return false;
     }
 
-    curchannelname = Q3DeepCopy<QString>(channum);
+    QString tmpX = channum; tmpX.detach();
+    curchannelname = tmpX;
 
     VERBOSE(VB_CHANNEL, loc + "Tuned to frequency.");
 
     currentInputID = nextInputID;
-    inputs[currentInputID]->startChanNum = Q3DeepCopy<QString>(curchannelname);
+    QString tmpY = curchannelname; tmpY.detach();
+    inputs[currentInputID]->startChanNum = tmpY;
 
     return true;
 }
@@ -806,7 +805,9 @@ bool DVBChannel::Retune(void)
 
 QString DVBChannel::GetFrontendName(void) const
 {
-    return Q3DeepCopy<QString>(frontend_name);
+    QString tmp = frontend_name;
+    tmp.detach();
+    return tmp;
 }
 
 /** \fn DVBChannel::IsTuningParamsProbeSupported(void) const
@@ -877,7 +878,7 @@ bool DVBChannel::ProbeTuningParams(DTVMultiplex &tuning) const
     }
 
     uint    mplex      = tuning.mplex;
-    QString sistandard = Q3DeepCopy<QString>(tuning.sistandard);
+    QString sistandard = tuning.sistandard; sistandard.detach();
 
     tuning = dvbparams_to_dtvmultiplex(card_type, params);
 

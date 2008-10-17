@@ -6,8 +6,6 @@
 
 #include "iptvchannel.h"
 
-#include <q3deepcopy.h>
-
 // MythTV headers
 #include "libmythdb/mythdb.h"
 #include "libmythdb/mythverbose.h"
@@ -20,10 +18,11 @@
 IPTVChannel::IPTVChannel(TVRec         *parent,
                          const QString &videodev)
     : DTVChannel(parent),
-      m_videodev(Q3DeepCopy<QString>(videodev)),
+      m_videodev(videodev),
       m_feeder(new IPTVFeederWrapper()),
-      m_lock(true)
+      m_lock(QMutex::Recursive)
 {
+    m_videodev.detach();
     VERBOSE(VB_CHANNEL, LOC + "ctor");
 }
 
@@ -111,7 +110,8 @@ bool IPTVChannel::SetChannelByString(const QString &channum)
         return false;
 
     // Set the current channum to the new channel's channum
-    curchannelname = Q3DeepCopy<QString>(channum);
+    QString tmp = channum; tmp.detach();
+    curchannelname = tmp;
 
     // Set the dtv channel info for any additional multiplex tuning
     SetDTVInfo(/*atsc_major*/ 0, /*atsc_minor*/ 0,

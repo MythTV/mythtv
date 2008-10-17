@@ -1,8 +1,5 @@
 #include "dtvchannel.h"
 
-// Qt headers
-#include <q3deepcopy.h>
-
 // MythTV headers
 #include "libmythdb/mythdb.h"
 #include "cardutil.h"
@@ -118,13 +115,15 @@ void DTVChannel::SetDTVInfo(uint atsc_major, uint atsc_minor,
 QString DTVChannel::GetSIStandard(void) const
 {
     QMutexLocker locker(&dtvinfo_lock);
-    return Q3DeepCopy<QString>(sistandard);
+    QString tmp = sistandard; tmp.detach();
+    return tmp;
 }
 
 void DTVChannel::SetSIStandard(const QString &si_std)
 {
     QMutexLocker locker(&dtvinfo_lock);
-    sistandard = Q3DeepCopy<QString>(si_std.toLower());
+    sistandard = si_std.toLower();
+    sistandard.detach();
 }
 
 QString DTVChannel::GetSuggestedTuningMode(bool is_live_tv) const
@@ -140,7 +139,10 @@ QString DTVChannel::GetSuggestedTuningMode(bool is_live_tv) const
 
     QMutexLocker locker(&dtvinfo_lock);
     if (!useQuickTuning && ((sistandard == "atsc") || (sistandard == "dvb")))
-        return Q3DeepCopy<QString>(sistandard);
+    {
+        QString tmp = sistandard; tmp.detach();
+        return tmp;
+    }
 
     return "mpeg";
 }
@@ -148,13 +150,15 @@ QString DTVChannel::GetSuggestedTuningMode(bool is_live_tv) const
 QString DTVChannel::GetTuningMode(void) const
 {
     QMutexLocker locker(&dtvinfo_lock);
-    return Q3DeepCopy<QString>(tuningMode);
+    QString tmp = tuningMode; tmp.detach();
+    return tmp;
 }
 
 void DTVChannel::SetTuningMode(const QString &tuning_mode)
 {
     QMutexLocker locker(&dtvinfo_lock);
-    tuningMode = Q3DeepCopy<QString>(tuning_mode.toLower());
+    tuningMode = tuning_mode.toLower();
+    tuningMode.detach();
 }
 
 DTVChannel *DTVChannel::GetMaster(const QString &videodevice)
@@ -165,7 +169,8 @@ DTVChannel *DTVChannel::GetMaster(const QString &videodevice)
     if (it != master_map.end())
         return *it;
 
-    master_map[Q3DeepCopy<QString>(videodevice)] = this;
+    QString tmp = videodevice; tmp.detach();
+    master_map[tmp] = this;
 
     return this;
 }
@@ -178,7 +183,8 @@ const DTVChannel *DTVChannel::GetMaster(const QString &videodevice) const
     if (it != master_map.end())
         return *it;
 
-    master_map[Q3DeepCopy<QString>(videodevice)] = (DTVChannel*) this;
+    QString tmp = videodevice; tmp.detach();
+    master_map[tmp] = (DTVChannel*) this;
 
     return this;
 }

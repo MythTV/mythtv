@@ -9,7 +9,6 @@
 using namespace std;
 
 // Qt headers
-#include <q3deepcopy.h>
 #include <q3http.h>
 
 // MythTV headers
@@ -125,11 +124,12 @@ bool DBox2Channel::SetChannelByString(const QString &newChan)
         VERBOSE(VB_CHANNEL, LOC + "Channel list not received yet. \n\t\t\t" +
                 QString("Will switch to channel %1 later...").arg(newChan));
 
-        m_requestChannel = Q3DeepCopy<QString>(newChan);
+        QString tmp = newChan; tmp.detach();
+        m_requestChannel = tmp;
         return true;
     }
 
-    QString chan = Q3DeepCopy<QString>(newChan);
+    QString chan = newChan; chan.detach();
     if (chan.isEmpty())
     {
         VERBOSE(VB_CHANNEL, LOC + "Empty channel name has been provided. "
