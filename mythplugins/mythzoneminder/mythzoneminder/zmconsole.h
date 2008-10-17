@@ -18,24 +18,48 @@
 // qt
 #include <QKeyEvent>
 
-// mythtv
-#include <mythtv/uitypes.h>
-#include <mythtv/uilistbtntype.h>
-#include <mythtv/xmlparse.h>
-#include <mythtv/mythdialogs.h>
+// libmythui
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuicheckbox.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythdialogbox.h>
 
 // zm
 #include "zmdefines.h"
 
-class ZMConsole : public MythThemedDialog
+class FunctionDialog : public MythScreenType
 {
     Q_OBJECT
 
   public:
-    ZMConsole(MythMainWindow *parent,
-              const QString &window_name, const QString &theme_filename,
-              const char *name = "ZMConsole");
+    FunctionDialog(MythScreenStack *parent, Monitor *monitor);
+
+    bool Create();
+
+  signals:
+     void haveResult(bool);
+
+  private slots:
+    void setMonitorFunction(void);
+
+  private:
+    Monitor          *m_monitor;
+    MythUIText       *m_captionText;
+    MythUIButtonList *m_functionList;
+    MythUICheckBox   *m_enabledCheck;
+    MythUIButton     *m_okButton;
+};
+
+class ZMConsole : public MythScreenType
+{
+    Q_OBJECT
+
+  public:
+    ZMConsole(MythScreenStack *parent, const char *name = "ZMConsole");
     ~ZMConsole();
+
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
 
   private slots:
     void updateTime();
@@ -43,32 +67,26 @@ class ZMConsole : public MythThemedDialog
     void getDaemonStatus();
     void getMonitorStatus(void);
     void showEditFunctionPopup();
+    void functionChanged(bool changed);
 
   private:
-    void wireUpTheme(void);
-    UITextType* getTextType(QString name);
-    void keyPressEvent(QKeyEvent *e);
     void updateMonitorList();
-    void monitorListDown(bool page);
-    void monitorListUp(bool page);
-
-    void setMonitorFunction(const QString &function, const int enabled);
+    void setMonitorFunction(const QString &function, int enabled);
 
     int                m_currentMonitor;
     int                m_monitorListSize;
     vector<Monitor *> *m_monitorList;
-    UIListType        *m_monitor_list;
 
-    vector<QString>  *m_functionList;
+    MythUIButtonList  *m_monitor_list;
+    MythUIText        *m_running_text;
+    MythUIText        *m_status_text;
+    MythUIText        *m_time_text;
+    MythUIText        *m_date_text;
+    MythUIText        *m_load_text;
+    MythUIText        *m_disk_text;
 
-    UITextType        *m_status_text;
-    UITextType        *m_time_text;
-    UITextType        *m_date_text;
-    UITextType        *m_load_text;
-    UITextType        *m_disk_text;
-
-    fontProp          *m_runningFont;
-    fontProp          *m_stoppedFont;
+    FunctionDialog    *m_functionDialog;
+    MythScreenStack   *m_popupStack;
 
     QTimer            *m_timeTimer;
     QString            m_timeFormat;

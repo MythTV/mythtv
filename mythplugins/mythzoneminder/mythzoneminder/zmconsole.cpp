@@ -17,17 +17,13 @@
 #include <cstdlib>
 
 // qt
-#include <qdatetime.h>
-#include <qpainter.h>
-#include <qdir.h>
-#include <qtimer.h>
-#include <qapplication.h>
-#include <QGridLayout>
 #include <QKeyEvent>
+#include <QTimer>
 
 // myth
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
+#include <libmythui/mythmainwindow.h>
 
 // zoneminder
 #include "zmconsole.h"
@@ -36,14 +32,90 @@
 const int STATUS_UPDATE_TIME = 1000 * 10; // update the status every 10 seconds
 const int TIME_UPDATE_TIME = 1000 * 1;    // update the time every 1 second
 
-ZMConsole::ZMConsole(MythMainWindow *parent, 
-                const QString &window_name, const QString &theme_filename, 
-                const char *name)
-    :MythThemedDialog(parent, window_name, theme_filename, name)
+FunctionDialog::FunctionDialog(MythScreenStack *parent, Monitor *monitor)
+               : MythScreenType(parent, "functionpopup"), m_monitor(monitor)
 {
+}
+
+bool FunctionDialog::Create()
+{
+    if (!LoadWindowFromXML("zoneminder-ui.xml", "functionpopup", this))
+        return false;
+
+    m_captionText = dynamic_cast<MythUIText *> (GetChild("caption_text"));
+    m_functionList = dynamic_cast<MythUIButtonList *> (GetChild("function_list"));
+    m_enabledCheck = dynamic_cast<MythUICheckBox *> (GetChild("enable_check"));
+    m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok_button"));
+
+    if (!m_captionText || !m_functionList || !m_enabledCheck || !m_okButton)
+    {
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        return false;
+    }
+
+    new MythUIButtonListItem(m_functionList, "Monitor");
+    new MythUIButtonListItem(m_functionList, "Modect");
+    new MythUIButtonListItem(m_functionList, "Nodect");
+    new MythUIButtonListItem(m_functionList, "Record");
+    new MythUIButtonListItem(m_functionList, "Mocord");
+    new MythUIButtonListItem(m_functionList, "None");
+
+    m_functionList->MoveToNamedPosition(m_monitor->function);
+
+    m_captionText->SetText(m_monitor->name);
+
+    m_okButton->SetText(tr("Ok"));
+
+    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(setMonitorFunction()));
+
+    if (m_monitor->enabled)
+        m_enabledCheck->SetCheckState(MythUIStateType::Full);
+    else
+        m_enabledCheck->SetCheckState(MythUIStateType::Off);
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+
+    SetFocusWidget(m_functionList);
+
+    return true;
+}
+
+void FunctionDialog::setMonitorFunction(void)
+{
+    QString function = m_functionList->GetValue();
+    bool enabled = (m_enabledCheck->GetCheckState() == MythUIStateType::Full);
+
+    VERBOSE(VB_GENERAL, "Monitor id : " + QString::number(m_monitor->id) +
+            " function change " + m_monitor->function + " -> " + function +
+            ", enable value " + QString::number(m_monitor->enabled) + " -> " +
+            QString::number(enabled));
+
+    if (m_monitor->function == function && m_monitor->enabled == enabled)
+    {
+        VERBOSE(VB_IMPORTANT, "Monitor Function/Enable values not changed so not updating.");
+        emit haveResult(false);
+        Close();
+        return;
+    }
+
+    if (class ZMClient *zm = ZMClient::get())
+        zm->setMonitorFunction(m_monitor->id, function, enabled);
+
+    emit haveResult(true);
+
+    Close();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ZMConsole::ZMConsole(MythScreenStack *parent, const char *name)
+          :MythScreenType(parent, name)
+{
+    gContext->addCurrentLocation("zoneminderconsole");
+
     m_monitorListSize = 0;
     m_currentMonitor = 0;
-    wireUpTheme();
 
     m_monitorList = NULL;
 
@@ -52,22 +124,13 @@ ZMConsole::ZMConsole(MythMainWindow *parent,
     m_timeTimer = new QTimer(this);
     connect(m_timeTimer, SIGNAL(timeout()), this,
             SLOT(updateTime()));
-    m_timeTimer->start(TIME_UPDATE_TIME);
 
     m_updateTimer = new QTimer(this);
     connect(m_updateTimer, SIGNAL(timeout()), this,
             SLOT(updateStatus()));
-    m_updateTimer->start(100);
 
-    m_functionList = new vector<QString>;
-    m_functionList->push_back(FUNCTION_NONE);
-    m_functionList->push_back(FUNCTION_MONITOR);
-    m_functionList->push_back(FUNCTION_MODECT);
-    m_functionList->push_back(FUNCTION_RECORD);
-    m_functionList->push_back(FUNCTION_MOCORD);
-    m_functionList->push_back(FUNCTION_MODECT);
-
-    updateTime();
+    m_popupStack = GetMythMainWindow()->GetStack("popup stack");
+    m_functionDialog = NULL;
 }
 
 ZMConsole::~ZMConsole()
@@ -77,8 +140,46 @@ ZMConsole::~ZMConsole()
     if (m_monitorList)
         delete m_monitorList;
 
-    if (m_functionList)
-        delete m_functionList;
+    gContext->removeCurrentLocation();
+}
+
+bool ZMConsole::Create(void)
+{
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("zoneminder-ui.xml", "zmconsole", this);
+
+    if (!foundtheme)
+        return false;
+
+    m_monitor_list = dynamic_cast<MythUIButtonList *> (GetChild("monitor_list"));
+
+    m_status_text = dynamic_cast<MythUIText *> (GetChild("status_text"));
+    m_time_text = dynamic_cast<MythUIText *> (GetChild("time_text"));
+    m_date_text = dynamic_cast<MythUIText *> (GetChild("date_text"));
+    m_load_text = dynamic_cast<MythUIText *> (GetChild("load_text"));
+    m_disk_text = dynamic_cast<MythUIText *> (GetChild("disk_text"));
+
+    if (!m_monitor_list || !m_status_text || !m_time_text || 
+        !m_date_text || !m_load_text || !m_disk_text)
+    {
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        return false;
+    }
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+
+    SetFocusWidget(m_monitor_list);
+    m_monitor_list->SetActive(true);
+
+    m_timeTimer->start(TIME_UPDATE_TIME);
+    m_updateTimer->start(100);
+
+    updateTime();
+
+    return true;
 }
 
 void ZMConsole::updateTime(void)
@@ -110,13 +211,13 @@ void ZMConsole::getDaemonStatus(void)
 
         if (m_daemonStatus.left(7) == "running")
         {
+            m_status_text->SetFontState("running");
             m_status_text->SetText(tr("Running"));
-            m_status_text->SetFont(m_runningFont);
         }
         else
         {
+            m_status_text->SetFontState("stopped");
             m_status_text->SetText(tr("Stopped"));
-            m_status_text->SetFont(m_stoppedFont);
         }
 
         m_load_text->SetText("Load: " + m_cpuStat);
@@ -136,60 +237,21 @@ void ZMConsole::getMonitorStatus(void)
     }
 }
 
-void ZMConsole::keyPressEvent(QKeyEvent *e)
+bool ZMConsole::keyPressEvent(QKeyEvent *event)
 {
-    if (!e) return;
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
-        if (action == "UP")
-        {
-            if (getCurrentFocusWidget() == m_monitor_list)
-            {
-                monitorListUp(false);
-            }
-            else
-                nextPrevWidgetFocus(true);
-        }
-        else if (action == "DOWN")
-        {
-            if (getCurrentFocusWidget() == m_monitor_list)
-            {
-                monitorListDown(false);
-            }
-            else
-                nextPrevWidgetFocus(true);
-        }
-        else if (action == "PAGEUP")
-        {
-            if (getCurrentFocusWidget() == m_monitor_list)
-            {
-                monitorListUp(true);
-            }
-            else
-                nextPrevWidgetFocus(true);
-        }
-        else if (action == "PAGEDOWN")
-        {
-            if (getCurrentFocusWidget() == m_monitor_list)
-            {
-                monitorListDown(true);
-            }
-            else
-                nextPrevWidgetFocus(true);
-        }
-        else if (action == "ESCAPE")
-        {
-            handled = false;
-        }
-        else if (action == "SELECT" || action == "MENU")
+        if (action == "MENU")
         {
             showEditFunctionPopup();
         }
@@ -197,8 +259,10 @@ void ZMConsole::keyPressEvent(QKeyEvent *e)
             handled = false;
     }
 
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
 void ZMConsole::showEditFunctionPopup()
@@ -208,202 +272,42 @@ void ZMConsole::showEditFunctionPopup()
     if (m_currentMonitor < (int) m_monitorList->size())
         currentMonitor = m_monitorList->at(m_currentMonitor);
 
-    MythPopupBox *popup = new MythPopupBox(GetMythMainWindow(), "edit monitor function");
+    if (!currentMonitor)
+        return;
 
-    QGridLayout *grid = new QGridLayout(2, 2, (int)(10 * wmult));
+    m_functionDialog = new FunctionDialog(m_popupStack, currentMonitor);
 
-    QString title;
-    title = tr("Edit Function - ");
-    title += currentMonitor->name;
-
-    QLabel *label = new QLabel(title, popup);
-    QFont font = label->font();
-    font.setPointSize(int (font.pointSize() * 1.8));
-    font.setBold(true);
-    label->setFont(font);
-    label->setPaletteForegroundColor(QColor("white"));
-    label->setAlignment(Qt::AlignCenter);
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred)));
-    label->setMinimumWidth((int)(250 * wmult));
-    label->setMaximumWidth((int)(250 * wmult));
-    popup->addWidget(label);
-
-    label = new QLabel(tr("Function:"), popup);
-    label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
-    label->setBackgroundOrigin(ParentOrigin);
-    label->setPaletteForegroundColor(Qt::white);
-    grid->addWidget(label, 0, 0, Qt::AlignLeft);
-
-    MythComboBox *functions = new MythComboBox(false, popup);
-    grid->addWidget(functions, 0, 1, Qt::AlignLeft);
-
-    label = new QLabel(tr("Enable:"), popup);
-    label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
-    label->setBackgroundOrigin(ParentOrigin);
-    label->setPaletteForegroundColor(Qt::white);
-    grid->addWidget(label, 1, 0, Qt::AlignLeft);
-
-    MythCheckBox *enable = new MythCheckBox(popup);
-    grid->addWidget(enable, 1, 1, Qt::AlignLeft);
-
-    // Populate the combox box
-    int selectedFunction = 0;
-    for (int i = 0; i < (int) m_functionList->size(); i++)
+    if (m_functionDialog->Create())
     {
-        functions->insertItem(m_functionList->at(i));
-        if (m_functionList->at(i) == currentMonitor->function)
-            selectedFunction = i;
+        m_popupStack->AddScreen(m_functionDialog, false);
+        connect(m_functionDialog, SIGNAL(haveResult(bool)),
+                this, SLOT(functionChanged(bool)));
     }
-
-    // Set defaults
-    functions->setCurrentItem(selectedFunction);
-    enable->setChecked(currentMonitor->enabled);
-
-    functions->setFocus();
-
-    popup->addLayout(grid, 0);
-
-    popup->addButton(tr("OK"),     popup, SLOT(accept()));
-    popup->addButton(tr("Cancel"), popup, SLOT(reject()));
-
-    DialogCode res = popup->ExecPopup();
-
-    if (kDialogCodeAccepted == res)
-        setMonitorFunction(functions->currentText(), enable->isChecked());
-
-    popup->deleteLater();
-}
-
-UITextType* ZMConsole::getTextType(QString name)
-{
-    UITextType* type = getUITextType(name);
-
-    if (!type)
-    {
-        VERBOSE(VB_IMPORTANT, "ERROR: Failed to find '" + name + "' UI element in theme file\n" +
-                "              Bailing out!");
-        exit(0);
-    }
-
-    return type;
-}
-
-void ZMConsole::wireUpTheme()
-{
-    m_status_text = getTextType("status_text");
-    m_time_text = getTextType("time_text");
-    m_date_text = getTextType("date_text");
-    m_load_text = getTextType("load_text");
-    m_disk_text = getTextType("disk_text");
-
-    m_runningFont = getFont("running");
-    m_stoppedFont = getFont("stopped");
-
-    // monitor list
-    m_monitor_list = (UIListType*) getUIObject("monitor_list");
-    if (m_monitor_list)
-    {
-        m_monitorListSize = m_monitor_list->GetItems();
-        m_monitor_list->SetItemCurrent(0);
-    }
-
-    buildFocusList();
-    assignFirstFocus();
 }
 
 void ZMConsole::updateMonitorList()
 {
-    QString tmptitle;
-    if (m_monitor_list)
+    int pos = m_monitor_list->GetCurrentPos();
+    m_monitor_list->Reset();
+
+    for (uint x = 0; x < m_monitorList->size(); x++)
     {
-        m_monitor_list->ResetList();
-        if (m_monitor_list->isFocused())
-            m_monitor_list->SetActive(true);
+        Monitor *monitor = m_monitorList->at(x);
 
-        int skip;
-        if ((int)m_monitorList->size() <= m_monitorListSize || 
-                m_currentMonitor <= m_monitorListSize / 2)
-            skip = 0;
-        else if (m_currentMonitor >= (int)m_monitorList->size() - 
-                 m_monitorListSize + m_monitorListSize / 2)
-            skip = m_monitorList->size() - m_monitorListSize;
-        else
-            skip = m_currentMonitor - m_monitorListSize / 2;
-        m_monitor_list->SetUpArrow(skip > 0);
-        m_monitor_list->SetDownArrow(skip + m_monitorListSize < (int)m_monitorList->size());
-
-        int i;
-        for (i = 0; i < m_monitorListSize; i++)
-        {
-            if (i + skip >= (int)m_monitorList->size())
-                break;
-
-            Monitor *monitor = m_monitorList->at(i + skip);
-
-            m_monitor_list->SetItemText(i, 1, monitor->name);
-            m_monitor_list->SetItemText(i, 2, monitor->zmcStatus);
-            m_monitor_list->SetItemText(i, 3, monitor->zmaStatus);
-            m_monitor_list->SetItemText(i, 4, QString::number(monitor->events));
-
-            if (i + skip == m_currentMonitor)
-                m_monitor_list->SetItemCurrent(i);
-        }
-
-        m_monitor_list->refresh();
+        MythUIButtonListItem *item = new MythUIButtonListItem(m_monitor_list,
+                "", NULL, true, MythUIButtonListItem::NotChecked);
+        item->setText(monitor->name, "name");
+        item->setText(monitor->zmcStatus, "zmcstatus");
+        item->setText(monitor->zmaStatus, "zmastatus");
+        item->setText(QString("%1").arg(monitor->events), "eventcount");
+        item->setData((void*) monitor);
     }
+
+    m_monitor_list->SetItemCurrent(pos);
 }
 
-void ZMConsole::monitorListDown(bool page)
+void ZMConsole::functionChanged(bool changed)
 {
-    if (m_currentMonitor < (int)m_monitorList->size() - 1)
-    {
-        m_currentMonitor += (page ? m_monitorListSize : 1);
-        if (m_currentMonitor > (int)m_monitorList->size() - 1)
-            m_currentMonitor = m_monitorList->size() - 1;
-
-        updateMonitorList();
-    }
-}
-
-void ZMConsole::monitorListUp(bool page)
-{
-    if (m_currentMonitor > 0)
-    {
-        m_currentMonitor -= (page ? m_monitorListSize : 1);
-        if (m_currentMonitor < 0)
-            m_currentMonitor = 0;
-
-        updateMonitorList();
-    }
-}
-
-void ZMConsole::setMonitorFunction(const QString &function, const int enabled)
-{
-    Monitor *currentMonitor = NULL;
-
-    if (m_currentMonitor < (int) m_monitorList->size())
-        currentMonitor = m_monitorList->at(m_currentMonitor);
-
-    if (currentMonitor == NULL)
-    {
-        VERBOSE(VB_IMPORTANT, "Monitor not found error");
-        return;
-    }
-
-    VERBOSE(VB_GENERAL, "Monitor id : " + QString::number(currentMonitor->id) +
-            " function change " + currentMonitor->function + " -> " + function +
-            ", enable value " + QString::number(currentMonitor->enabled) + " -> " +
-            QString::number(enabled));
-
-    if (currentMonitor->function == function && currentMonitor->enabled == enabled)
-    {
-        VERBOSE(VB_IMPORTANT, "Monitor Function/Enable values not changed so not updating.");
-        return;
-    }
-
-    if (class ZMClient *zm = ZMClient::get())
-        zm->setMonitorFunction(currentMonitor->id, function, enabled);
-
-    updateStatus();
+    if (changed)
+        updateStatus();
 }

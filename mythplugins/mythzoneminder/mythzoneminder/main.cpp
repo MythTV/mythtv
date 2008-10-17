@@ -80,11 +80,12 @@ void runZMConsole(void)
     if (!checkConnection())
         return;
 
-    gContext->addCurrentLocation("zoneminderconsole");
-    ZMConsole console(gContext->GetMainWindow(), "zmconsole",
-                      "zoneminder-", "zmconsole");
-    console.exec();
-    gContext->removeCurrentLocation();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    ZMConsole *console = new ZMConsole(mainStack, "ZMConsole");
+
+    if (console->Create())
+        mainStack->AddScreen(console);
 }
 
 void runZMLiveView(void)

@@ -1,197 +1,276 @@
 <mythuitheme>
 
-  <window name="zmconsole">
+    <window name="functionpopup">
+        <font name="title" from="basesmall">
+            <color>#ffff00</color>
+            <size>14</size>
+            <bold>yes</bold>
+        </font>
 
-    <font name="active" face="Arial">
-        <color>#ffffff</color>
-        <size>18</size>
-        <bold>yes</bold>
-    </font>
+        <area>193,87,413,426</area>
 
-    <font name="inactive" face="Arial">
-        <color>#9999cc</color>
-        <size>18</size>
-        <bold>yes</bold>
-    </font>
+        <imagetype name="box">
+            <filename>mz_function_popup.png</filename>
+        </imagetype>
 
-    <font name="selected" face="Arial">
+        <textarea name="title" from="basetextarea">
+            <area>20,20,360,40</area>
+            <font>title</font>
+            <align>hcenter,top</align>
+            <value>Edit Monitor Function</value>
+        </textarea>
+
+        <textarea name="caption_text" from="basetextarea">
+            <area>20,100,360,100</area>
+            <align>hcenter,top</align>
+        </textarea>
+
+        <buttonlist name="function_list" from="baseselector">
+            <position>90,200</position>
+        </buttonlist>
+
+        <checkbox name="enable_check" from="basecheckbox">
+            <position>90,270</position>
+        </checkbox>
+
+        <textarea name="enable_text" from="basetextarea">
+            <area>130,270,200,30</area>
+            <align>left,vcenter</align>
+            <value>Enabled</value>
+        </textarea>
+
+        <button name="ok_button" from="basebutton">
+            <position>125,350</position>
+        </button>
+    </window>
+
+
+    <window name="zmconsole">
+
+        <font name="title" from="baselarge">
+            <color>#ffff00</color>
+            <bold>yes</bold>
+        </font>
+
+        <font name="heading" from="basesmall">
+            <color>#ffff00</color>
+            <size>18</size>
+            <shadow>2,2</shadow>
+            <bold>yes</bold>
+        </font>
+
+        <font name="listlabel" from="basesmall">
+            <color>#ffff00</color>
+            <size>14</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="date" from="basesmall">
+            <color>#9999cc</color>
+            <size>14</size>
+            <bold>no</bold>
+        </font>
+
+        <font name="running" from="basesmall">
         <color>#00ff00</color>
-        <size>18</size>
-        <bold>yes</bold>
-    </font>
-
-    <font name="title" face="Arial">
-        <color>#ffff00</color>
-        <dropcolor>#000000</dropcolor>
-        <size>24</size>
-        <shadow>3,3</shadow>
-        <bold>yes</bold>
-    </font>
-
-    <font name="heading" face="Arial">
-        <color>#ffff00</color>
-        <size>18</size>
-        <shadow>2,2</shadow>
-        <bold>yes</bold>
-    </font>
-
-    <font name="listlabel" face="Arial">
-        <color>#ffff00</color>
-        <size>14</size>
-        <bold>yes</bold>
-    </font>
-
-    <font name="date" face="Arial">
-        <color>#9999cc</color>
-        <size>14</size>
-        <bold>no</bold>
-    </font>
-
-    <font name="running" face="Arial Narrow">
-      <color>#00ff00</color>
-      <size>16</size>
-      <bold>no</bold>
-    </font>
-
-    <font name="stopped" face="Arial Narrow">
-        <color>#ff0000</color>
         <size>16</size>
         <bold>no</bold>
-    </font>
+        </font>
 
-    <font name="footer" face="Arial Narrow">
-        <color>#ffffff</color>
-        <size>16</size>
-        <bold>no</bold>
-    </font>
+        <font name="stopped" from="running">
+            <color>#ff0000</color>
+        </font>
 
-    <font name="info" face="Arial Narrow">
-        <color>#ffffff</color>
-        <size>14</size>
-        <bold>no</bold>
-    </font>
+        <font name="footer" from="basesmall">
+            <color>#ffffff</color>
+            <size>16</size>
+            <bold>no</bold>
+        </font>
 
-    <container name="info"> 
+        <font name="info" from="basesmall">
+            <color>#ffffff</color>
+            <size>14</size>
+            <bold>no</bold>
+        </font>
 
-      <area>0,0,800,600</area>
+        <textarea name="title" from="basetextarea">
+            <area>20,10,760,50</area>
+            <font>title</font>
+            <align>allcenter</align>
+            <value>Zone Minder Console</value>
+        </textarea>
 
-      <textarea name="title" draworder="0" align="center">
-        <area>20,10,760,50</area>
-        <font>title</font>
-        <multiline>no</multiline>
-        <value>Zone Minder Console</value>
-      </textarea>
+        <imagetype name="topimage">
+            <area>25,75,750,110</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
 
-      <image name="image" draworder="0">
-          <position>25,75</position>
-          <filename>trans-cr-background.png</filename>
-          <staticsize>750,110</staticsize>
-      </image>
+        <textarea name="date_text" from="basetextarea">
+            <area>40,80,200,80</area>
+            <font>date</font>
+            <multiline>yes</multiline>
+            <value></value>
+        </textarea>
 
-      <textarea name="date_text" draworder="0" align="left">
-          <area>40,80,200,80</area>
-          <font>date</font>
-          <multiline>yes</multiline>
-          <value></value>
-      </textarea>
+        <textarea name="time_text" from="basetextarea">
+            <area>550,80,200,40</area>
+            <font>date</font>
+            <align>right</align>
+        </textarea>
 
-      <textarea name="time_text" draworder="0" align="right">
-          <area>550,80,200,40</area>
-          <font>date</font>
-          <multiline>no</multiline>
-          <value></value>
-      </textarea>
+        <textarea name="label" from="basetextarea">
+            <area>250,90,300,40</area>
+            <font>basesmallyellow</font>
+            <value>Status</value>
+        </textarea>
 
-      <textarea name="label" draworder="0" align="hcenter">
-          <area>250,90,300,40</area>
-          <font>heading</font>
-          <multiline>no</multiline>
-          <value>Status</value>
-      </textarea>
+        <textarea name="status_text" from="basetextarea">
+            <area>250,110,300,40</area>
+            <align>allcenter</align>
+            <font>running</font> 
+            <font state="running">running</font> 
+            <font state="stopped">stopped</font> 
+            <multiline>no</multiline>
+            <value></value>
+        </textarea>
 
-      <textarea name="status_text" draworder="0" align="center">
-          <area>250,110,300,40</area>
-          <font>stopped</font>
-          <multiline>no</multiline>
-          <value></value>
-      </textarea>
+        <textarea name="load_text" from="basetextarea">
+            <area>40,145,200,40</area>
+            <font>info</font>
+            <multiline>no</multiline>
+            <value>Load: 0.12</value>
+        </textarea>
 
-      <textarea name="load_text" draworder="0" align="left">
-          <area>40,145,200,40</area>
-          <font>info</font>
-          <multiline>no</multiline>
-          <value>Load: 0.12</value>
-      </textarea>
+        <textarea name="disk_text" from="basetextarea">
+            <area>550,145,200,40</area>
+            <align>right</align>
+            <font>info</font>
+            <multiline>no</multiline>
+            <value>Disk: 100%</value>
+        </textarea>
 
-      <textarea name="disk_text" draworder="0" align="right">
-          <area>550,145,200,40</area>
-          <font>info</font>
-          <multiline>no</multiline>
-          <value>Disk: 100%</value>
-      </textarea>
+        <textarea name="label1" from="basetextarea">
+            <area>40,200,130,30</area>
+            <font>basesmallyellow</font>
+            <value>Camera</value>
+        </textarea>
 
-      <textarea name="title" draworder="4" align="left">
-          <area>40,200,130,30</area>
-          <font>listlabel</font>
-          <value>Camera</value>
-      </textarea>
+        <textarea name="label2" from="basetextarea">
+            <area>250,200,130,30</area>
+            <font>basesmallyellow</font>
+            <value>Function</value>
+        </textarea>
 
-      <textarea name="title" draworder="4" align="left">
-          <area>250,200,130,30</area>
-          <font>listlabel</font>
-          <value>Function</value>
-      </textarea>
+        <textarea name="label3" from="basetextarea">
+            <area>420,200,130,30</area>
+            <font>basesmallyellow</font>
+            <value>Source</value>
+        </textarea>
 
-      <textarea name="title" draworder="4" align="left">
-          <area>420,200,130,30</area>
-          <font>listlabel</font>
-          <value>Source</value>
-      </textarea>
+        <textarea name="label4" from="basetextarea">
+            <area>690,200,130,30</area>
+            <font>basesmallyellow</font>
+            <value>Events</value>
+        </textarea>
 
-      <textarea name="title" draworder="4" align="left">
-          <area>690,200,130,30</area>
-          <font>listlabel</font>
-          <value>Events</value>
-      </textarea>
+        <imagetype name="bottomimage">
+            <area>25,215,750,370</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
 
-      <image name="image" draworder="0">
-          <position>25,220</position>
-          <filename>trans-cr-background.png</filename>
-          <staticsize>750,375</staticsize>
-      </image>
+        <buttonlist name="monitor_list">
+            <area>20,225,760,242</area>
+            <layout>vertical</layout>
+            <spacing>5</spacing>
+            <buttonarea>0,0,760,250</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,760,25</area>
+                <state name="active">
+                    <imagetype name="buttonimage">
+                        <area>0,2,25,25</area>
+                        <preserveaspect>yes</preserveaspect>
+                    </imagetype>
+                    <imagetype name="buttonbackground">
+                        <area>15,0,720,25</area>
+                        <gradient start="#505050" end="#000000" alpha="200" />
+                    </imagetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>30,4,250,30</area>
+                        <font>basesmallgrey</font>
+                    </textarea>
+                    <textarea name="name" from="buttontext">
+                        <area>25,4,170,25</area>
+                    </textarea>
+                    <textarea name="zmcstatus" from="buttontext">
+                        <area>230,4,160,25</area>
+                    </textarea>
+                    <textarea name="zmastatus" from="buttontext">
+                        <area>400,4,260,25</area>
+                    </textarea>
+                    <textarea name="eventcount" from="buttontext">
+                        <area>670,4,50,25</area>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="buttonbackground">
+                        <gradient start="#52CA38" end="#349838" alpha="255" />
+                    </imagetype>
 
-      <listarea name="monitor_list" draworder="4">
-          <area>40,232,740,300</area>
-          <fcnfont name="active" function="active"></fcnfont>
-          <fcnfont name="inactive" function="inactive"></fcnfont>
-          <fcnfont name="selected" function="selected"></fcnfont>
-          <columnpadding>10</columnpadding>
-          <column number="1" width="200" context="-1"></column>
-          <column number="2" width="160" context="-1"></column>
-          <column number="3" width="260" context="-1"></column>
-          <column number="4" width="50" context="-1"></column>
-          <items>9</items>
-          <image function="selectionbar" filename="selectbar.png" location="-2,0"></image>
-          <image function="uparrow" filename="uparrow.png" location="735,222"></image>
-          <image function="downarrow" filename="downarrow.png" location="735,450"></image>
-      </listarea>
+                    <textarea name="buttontext">
+                        <font>basesmall</font>
+                    </textarea>
+                    <textarea name="name">
+                        <font>basesmall</font>
+                    </textarea>
+                    <textarea name="zmcstatus">
+                        <font>basesmall</font>
+                    </textarea>
+                    <textarea name="zmastatus">
+                        <font>basesmall</font>
+                    </textarea>
+                    <textarea name="eventcount">
+                        <font>basesmall</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>240,270</position>
+                <state type="on">
+                    <imagetype name="upon">
+                        <filename>up_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>456,270</position>
+                <state type="on">
+                    <imagetype name="dnon">
+                        <filename>down_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
 
-      <image name="showinglines" draworder="5" fleximage="no">
-          <filename>rk-lines.png</filename>
-          <position>25,220</position>
-          <staticsize>750,335</staticsize>
-      </image>
+        <textarea name="label">
+            <area>45,200,130,30</area>
+            <font>basesmallyellow</font>
+            <value>[x]</value>
+        </textarea>
 
-      <textarea name="label" draworder="0" align="allcenter">
-          <area>100,550,600,40</area>
-          <font>footer</font>
-          <multiline>no</multiline>
-          <value>[R] = Running [S] = Stopped</value>
-      </textarea>
+        <imagetype name="showinglines">
+            <area>25,220,750,335</area>
+            <filename>rk-lines.png</filename>
+        </imagetype>
 
-    </container>
+        <textarea name="label">
+            <area>100,550,600,40</area>
+            <align>allcenter</align>
+            <font>footer</font>
+            <multiline>no</multiline>
+            <value>[R] = Running [S] = Stopped</value>
+        </textarea>
 
-  </window>
+    </window>
 
   <window name="zmevents">
 
