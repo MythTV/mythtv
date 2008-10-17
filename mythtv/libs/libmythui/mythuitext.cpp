@@ -26,6 +26,9 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
     m_MultiLine = false;
     m_scrolling = false;
     m_scrollDirection = ScrollLeft;
+
+    m_FontStates.insert("default", MythFontProperties());
+    *m_Font = m_FontStates["default"];
 }
 
 MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
@@ -45,7 +48,8 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
 {
     m_MultiLine = false;
     SetArea(displayRect);
-    *m_Font = font;
+    m_FontStates.insert("default", font);
+    *m_Font = m_FontStates["default"];
 
     m_scrolling = false;
     m_scrollDirection = ScrollLeft;
@@ -54,10 +58,15 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
 MythUIText::~MythUIText()
 {
     if (m_Font)
-    {
         delete m_Font;
-        m_Font = NULL;
-    }
+    m_Font = NULL;
+//     QMutableMapIterator<QString, MythFontProperties> it(m_FontStates);
+//     while (it.hasNext())
+//     {
+//         it.next();
+//         delete it.value();
+//         it.remove();
+//     }
 }
 
 void MythUIText::Reset()
@@ -68,6 +77,8 @@ void MythUIText::Reset()
         m_CutMessage = "";
         SetRedraw();
     }
+
+    SetFontState("default");
 
     MythUIType::Reset();
 }
@@ -105,8 +116,18 @@ QString MythUIText::GetDefaultText(void) const
 
 void MythUIText::SetFontProperties(const MythFontProperties &fontProps)
 {
-    if (m_Font)
-        *m_Font = fontProps;
+    m_FontStates.insert("default", fontProps);
+    *m_Font = m_FontStates["default"];
+    SetRedraw();
+}
+
+void MythUIText::SetFontState(const QString &state)
+{
+    if (m_FontStates.contains(state))
+        *m_Font = m_FontStates[state];
+    else
+        *m_Font = m_FontStates["default"];
+
     SetRedraw();
 }
 
@@ -212,8 +233,6 @@ void MythUIText::MoveDrawRect(const int x, const int y)
 void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect)
 {
-    bool multiline = (m_Justification & Qt::TextWordWrap);
-
     QRect area = m_Area.toQRect();
     area.translate(xoffset, yoffset);
     QRect drawrect = m_drawRect.toQRect();
@@ -224,10 +243,7 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     if (m_CutMessage.isEmpty())
     {
         if (m_Cutdown)
-        {
-            QFont font = m_Font->face();
-            m_CutMessage = cutDown(m_Message, &font, multiline);
-        }
+            m_CutMessage = cutDown(m_Message, m_Font, m_MultiLine);
         else
             m_CutMessage = m_Message;
     }
@@ -326,7 +342,7 @@ void MythUIText::StopCycling(void)
     SetRedraw();
 }
 
-QString MythUIText::cutDown(const QString &data, QFont *font,
+QString MythUIText::cutDown(const QString &data, MythFontProperties *font,
                             bool multiline, int overload_width,
                             int overload_height)
 {
@@ -342,7 +358,7 @@ QString MythUIText::cutDown(const QString &data, QFont *font,
         maxheight = overload_height;
 
     int justification = Qt::AlignLeft | Qt::TextWordWrap;
-    QFontMetrics fm(*font);
+    QFontMetrics fm(font->face());
 
     int margin = length - 1;
     int index = 0;
@@ -395,7 +411,18 @@ bool MythUIText::ParseElement(QDomElement &element)
         if (!fp)
             fp = GetGlobalFontMap()->GetFont(fontname);
         if (fp)
-            *m_Font = *fp;
+        {
+            QString state = element.attribute("state","");
+            if (!state.isEmpty())
+            {
+                m_FontStates.insert(state, *fp);
+            }
+            else
+            {
+                m_FontStates.insert("default", *fp);
+                *m_Font = m_FontStates["default"];
+            }
+        }
     }
     else if (element.tagName() == "value")
     {
@@ -507,7 +534,14 @@ void MythUIText::CopyFrom(MythUIType *base)
     m_Cutdown = text->m_Cutdown;
     m_MultiLine = text->m_MultiLine;
 
-    *m_Font = *(text->m_Font);
+    QMutableMapIterator<QString, MythFontProperties> it(text->m_FontStates);
+    while (it.hasNext())
+    {
+        it.next();
+        m_FontStates.insert(it.key(), it.value());
+    }
+
+    *m_Font = m_FontStates["default"];
 
     m_colorCycling = text->m_colorCycling;
     m_startColor = text->m_startColor;

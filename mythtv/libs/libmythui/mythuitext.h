@@ -36,19 +36,15 @@ class MythUIText : public MythUIType, public StorageUser
     QString GetText(void) const;
     QString GetDefaultText(void) const;
 
-    void SetFontProperties(const MythFontProperties &fontProps);
-    const MythFontProperties* GetFontProperties() { return m_Font; }
-
     void UseAlternateArea(bool useAlt);
 
     virtual void Pulse(void);
 
-    void CycleColor(QColor startColor, QColor endColor, int numSteps);
-    void StopCycling();
-
     // StorageUser
     void SetDBValue(const QString &text) { SetText(text); }
     QString GetDBValue(void) const { return GetText(); }
+
+    void SetFontState(const QString&);
 
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
@@ -58,6 +54,12 @@ class MythUIText : public MythUIType, public StorageUser
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
     virtual void Finalize(void);
+
+    void SetFontProperties(const MythFontProperties &fontProps);
+    const MythFontProperties* GetFontProperties() { return m_Font; }
+
+    void CycleColor(QColor startColor, QColor endColor, int numSteps);
+    void StopCycling();
 
     void SetJustification(int just);
     int GetJustification(void);
@@ -74,7 +76,7 @@ class MythUIText : public MythUIType, public StorageUser
     void SetDrawRectPosition(const int x, const int y);
     void MoveDrawRect(const int x, const int y);
 
-    QString cutDown(const QString &data, QFont *font,
+    QString cutDown(const QString &data, MythFontProperties *font,
                     bool multiline = false, int overload_width = -1,
                     int overload_height = -1);
 
@@ -91,6 +93,7 @@ class MythUIText : public MythUIType, public StorageUser
     bool m_MultiLine;
 
     MythFontProperties* m_Font;
+    QMap<QString, MythFontProperties> m_FontStates;
 
     bool m_colorCycling;
     QColor m_startColor, m_endColor;

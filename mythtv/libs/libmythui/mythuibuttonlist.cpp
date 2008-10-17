@@ -1081,7 +1081,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
     m_data      = data;
 
     m_image     = NULL;
-    m_imageFilename;
+
     m_checkable = false;
     m_state     = CantCheck;
     m_showArrow = false;
@@ -1111,14 +1111,37 @@ QString MythUIButtonListItem::text() const
     return m_text;
 }
 
-void MythUIButtonListItem::setText(const QString &text, const QString &name)
+void MythUIButtonListItem::setText(const QString &text, const QString &name,
+                                   const QString &state)
 {
     if (!name.isEmpty())
     {
-        m_strings.insert(name, text);
+        TextProperties textprop;
+        textprop.text = text;
+        textprop.state = state;
+        m_strings.insert(name, textprop);
     }
     else
         m_text = text;
+
+    if (m_parent)
+        m_parent->Update();
+}
+
+void MythUIButtonListItem::SetFontState(const QString &state,
+                                        const QString &name)
+{
+    if (!name.isEmpty())
+    {
+        if (m_strings.contains(name))
+        {
+            TextProperties textprop = m_strings[name];
+            textprop.state = state;
+            m_strings.insert(name, textprop);
+        }
+    }
+    else
+        m_fontState = state;
 
     if (m_parent)
         m_parent->Update();
@@ -1160,12 +1183,7 @@ void MythUIButtonListItem::SetImage(const QString &filename, const QString &name
     if (!name.isEmpty())
         m_imageFilenames.insert(name, filename);
     else
-    {
-        if (filename == m_imageFilename)
-            return;
-
         m_imageFilename = filename;
-    }
 
     if (m_parent)
         m_parent->Update();
@@ -1299,7 +1317,10 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
     MythUIText *buttontext = dynamic_cast<MythUIText *>
                                         (buttonstate->GetChild("buttontext"));
     if (buttontext)
+    {
         buttontext->SetText(m_text);
+        buttontext->SetFontState(m_fontState);
+    }
 
     MythUIImage *buttonimage = dynamic_cast<MythUIImage *>
                                         (buttonstate->GetChild("buttonimage"));
@@ -1337,13 +1358,17 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
     }
 
     MythUIText *text;
-    QMap<QString, QString>::iterator string_it = m_strings.begin();
+    QMap<QString, TextProperties>::iterator string_it = m_strings.begin();
     while (string_it != m_strings.end())
     {
         text = dynamic_cast<MythUIText *>
                                     (buttonstate->GetChild(string_it.key()));
         if (text)
-            text->SetText(string_it.value());
+        {
+            TextProperties textprop = string_it.value();
+            text->SetText(textprop.text);
+            text->SetFontState(textprop.state);
+        }
         ++string_it;
     }
 

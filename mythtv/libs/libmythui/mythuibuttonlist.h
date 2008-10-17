@@ -24,6 +24,11 @@ class MythUIButtonListItem
         FullChecked
     };
 
+    struct TextProperties {
+        QString text;
+        QString state;
+    };
+
     MythUIButtonListItem(MythUIButtonList *lbtype, const QString& text,
                          const QString& image = "", bool checkable = false,
                          CheckState state = CantCheck, bool showArrow = false);
@@ -33,8 +38,11 @@ class MythUIButtonListItem
 
     MythUIButtonList *parent() const;
 
-    void setText(const QString &text, const QString &name="");
+    void setText(const QString &text, const QString &name="",
+                 const QString &state="");
     QString text() const;
+
+    void SetFontState(const QString &state, const QString &name="");
 
     void setImage(MythImage *image, const QString &name="") __attribute__ ((deprecated));
 
@@ -69,6 +77,7 @@ class MythUIButtonListItem
   protected:
     MythUIButtonList *m_parent;
     QString         m_text;
+    QString         m_fontState;
     MythImage      *m_image;
     QString         m_imageFilename;
     bool            m_checkable;
@@ -77,7 +86,7 @@ class MythUIButtonListItem
     bool            m_showArrow;
     bool            m_overrideInactive;
 
-    QMap<QString, QString> m_strings;
+    QMap<QString, TextProperties> m_strings;
     QMap<QString, MythImage*> m_images;
     QMap<QString, QString> m_imageFilenames;
     QMap<QString, QString> m_states;
