@@ -436,11 +436,11 @@ Vill du fortsätta att spela musik i bakgrunden?</translation>
     </message>
     <message>
         <source>No - Exit, Stop Playing</source>
-        <translation>Nej- Avsluta nu och sluta spela nu</translation>
+        <translation>Nej - Avsluta nu och sluta spela nu</translation>
     </message>
     <message>
         <source>Yes - Exit, Continue Playing</source>
-        <translation>Ja-Avsluta och fortsätt spela</translation>
+        <translation>Ja - Avsluta och fortsätt spela</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1176,7 +1176,7 @@ Vill du fortsätta att spela musik i bakgrunden?</translation>
     <name>RipStatus</name>
     <message>
         <source>Stop Rip?</source>
-        <translation>Stoppa kopiering?</translation>
+        <translation type="obsolete">Stoppa kopiering?</translation>
     </message>
     <message>
         <source>Are you sure you want to cancel ripping the CD?</source>
@@ -1270,7 +1270,7 @@ Vill du ta bort det existerande spåret?</translation>
     </message>
     <message>
         <source>Encoding Failed</source>
-        <translation>Kodningen misslyckades</translation>
+        <translation type="obsolete">Kodningen misslyckades</translation>
     </message>
     <message>
         <source>Encoding failed with the following error:-

@@ -6,12 +6,14 @@
         <comment>PL 1 default search string.</comment>
         <translation type="unfinished">G
 
-PL 1  förvald söksträng.</translation>
+PL 1  förvald sök sträng.
+</translation>
     </message>
     <message>
         <source>PG</source>
         <comment>PL 2 default search string.</comment>
         <translation type="unfinished">PG
+
 PL 2 förvald söksträng.</translation>
     </message>
     <message>

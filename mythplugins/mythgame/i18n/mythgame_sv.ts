@@ -3,32 +3,32 @@
 <context>
     <name>GameTree</name>
     <message>
-        <location filename="../mythgame/gametree.cpp" line="230"/>
+        <location filename="../mythgame/gametree.cpp" line="226"/>
         <source>All Games</source>
         <translation>Alla spel</translation>
     </message>
     <message>
-        <location filename="../mythgame/gametree.cpp" line="214"/>
+        <location filename="../mythgame/gametree.cpp" line="212"/>
         <source>Favourites</source>
         <translation>Favoriter</translation>
     </message>
     <message>
-        <location filename="../mythgame/gametree.cpp" line="245"/>
+        <location filename="../mythgame/gametree.cpp" line="241"/>
         <source>-   By Name</source>
         <translation>-   Efter namn</translation>
     </message>
     <message>
-        <location filename="../mythgame/gametree.cpp" line="240"/>
+        <location filename="../mythgame/gametree.cpp" line="236"/>
         <source>-   By Year</source>
         <translation>-   Efter år</translation>
     </message>
     <message>
-        <location filename="../mythgame/gametree.cpp" line="235"/>
+        <location filename="../mythgame/gametree.cpp" line="231"/>
         <source>-   By Genre</source>
         <translation>-   Efter genre</translation>
     </message>
     <message>
-        <location filename="../mythgame/gametree.cpp" line="388"/>
+        <location filename="../mythgame/gametree.cpp" line="387"/>
         <source>Players Available. 
 
  Please pick one.</source>
@@ -37,7 +37,7 @@
 Välj en.</translation>
     </message>
     <message>
-        <location filename="../mythgame/gametree.cpp" line="250"/>
+        <location filename="../mythgame/gametree.cpp" line="246"/>
         <source>-   By Publisher</source>
         <translation>Efter utgivare</translation>
     </message>
@@ -374,7 +374,7 @@ att du vill göra detta?</translation>
         <translation>Scanna för %1 spel...</translation>
     </message>
     <message>
-        <location filename="../mythgame/gametree.cpp" line="384"/>
+        <location filename="../mythgame/gametree.cpp" line="383"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
