@@ -66,7 +66,7 @@
     <name>BackendSelect</name>
     <message>
         <source>Please select default Myth Backend Server</source>
-        <translation>Var god välj Myth Backend Server</translation>
+        <translation>Var god välj en förinställd Myth Backend Server</translation>
     </message>
     <message>
         <source>OK</source>
@@ -79,6 +79,10 @@
     <message>
         <source>Configure Manually</source>
         <translation>Konfigurera Manuellt</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Sök</translation>
     </message>
 </context>
 <context>
@@ -274,6 +278,17 @@
     <message>
         <source>OK</source>
         <translation type="obsolete">OK</translation>
+    </message>
+</context>
+<context>
+    <name>ChannelScannerGUI</name>
+    <message>
+        <source>Scanning</source>
+        <translation>Söker</translation>
+    </message>
+    <message>
+        <source>ScanWizard</source>
+        <translation>Sökguide</translation>
     </message>
 </context>
 <context>
@@ -485,6 +500,169 @@
     <message>
         <source>Exclude H.264 encoded streams (EIT only)</source>
         <translation>Uteslut H.264 kodade strömmar (endast EIT)</translation>
+    </message>
+</context>
+<context>
+    <name>CustomPriority</name>
+    <message>
+        <source>Add</source>
+        <translation>Lägg till</translation>
+    </message>
+    <message>
+        <source>Edit Priority Rule</source>
+        <translation>Ändra prioritetsläge</translation>
+    </message>
+    <message>
+        <source>&lt;New priority rule&gt;</source>
+        <translation>&lt;Ny prioritetsläge&gt;</translation>
+    </message>
+    <message>
+        <source>Priority Rule Name</source>
+        <translation>Prioritets regel namn</translation>
+    </message>
+    <message>
+        <source>Priority Value</source>
+        <translation>Prioritets värde</translation>
+    </message>
+    <message>
+        <source>Modify priority for an input (Input priority)</source>
+        <translation>Ändra prioritet för en ingång (ingångsprioritet)</translation>
+    </message>
+    <message>
+        <source>Modify priority for all inputs on a card</source>
+        <translation>Ändra prioritet för alla ingångar på ett kort</translation>
+    </message>
+    <message>
+        <source>Modify priority for every card on a host</source>
+        <translation>Ändra prioritet för alla kort på en värd</translation>
+    </message>
+    <message>
+        <source>Only one specific channel ID (Channel priority)</source>
+        <translation>Bara en specifik kanal ID (Kanalprioritet)</translation>
+    </message>
+    <message>
+        <source>Only a certian channel number</source>
+        <translation>Endast en viss kanalnummer</translation>
+    </message>
+    <message>
+        <source>Only channels that carry a specific station</source>
+        <translation>Endast kanaler som kan leverera en specifik station</translation>
+    </message>
+    <message>
+        <source>Match related callsigns</source>
+        <translation>Matcha relaterade ringsingaler</translation>
+    </message>
+    <message>
+        <source>Only channels marked as commercial free</source>
+        <translation>Endast kanaler markerade som reklamfria</translation>
+    </message>
+    <message>
+        <source>Modify priority for a station on an input</source>
+        <translation>Ändra prioritet för en kanal för en ingång</translation>
+    </message>
+    <message>
+        <source>Priority for all matching titles</source>
+        <translation>Prioritet för alla matchande titlar</translation>
+    </message>
+    <message>
+        <source>Only shows marked as HDTV</source>
+        <translation>Endast visningar markerade som HDTV</translation>
+    </message>
+    <message>
+        <source>Close Captioned priority</source>
+        <translation>Textnings prioritet</translation>
+    </message>
+    <message>
+        <source>New episodes only</source>
+        <translation>Endast nya avsnitt</translation>
+    </message>
+    <message>
+        <source>Modify unidentified episodes</source>
+        <translation>Ändra oidentifierade avsnitt</translation>
+    </message>
+    <message>
+        <source>First showing of each episode</source>
+        <translation>Första visning av varje avsnitt</translation>
+    </message>
+    <message>
+        <source>Last showing of each episode</source>
+        <translation>Sista visning av varje avsnitt</translation>
+    </message>
+    <message>
+        <source>Priority for any show with End Late time</source>
+        <translation>Prioritet för alla avsnitt med förlängd sluttid</translation>
+    </message>
+    <message>
+        <source>Priority for a category</source>
+        <translation>Prioritet för en kategori</translation>
+    </message>
+    <message>
+        <source>Priority for a category type</source>
+        <translation>Prioritet för en kategorityp</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>eller</translation>
+    </message>
+    <message>
+        <source>Modify priority by star rating (0.0 to 1.0 for movies only)</source>
+        <translation>Ändra prioritet med betyg (0.0 till 1.0 endast för filmer)</translation>
+    </message>
+    <message>
+        <source>Priority when shown once (complete example)</source>
+        <translation>Prioritet vid en visning (komplett exempel)</translation>
+    </message>
+    <message>
+        <source>Prefer a host for a storage group (complete example)</source>
+        <translation>Föredra en värd för en arkiveringsgrupp (komplett exempel)</translation>
+    </message>
+    <message>
+        <source>Priority for HD shows under two hours (complete example)</source>
+        <translation>Prioritet för HD visningar under two timmar (komplett exempel)</translation>
+    </message>
+    <message>
+        <source>Priority for movies by the year of release (complete example)</source>
+        <translation>Prioritet för filmer sorterat efter årlig utgivning (komplett exempel)</translation>
+    </message>
+    <message>
+        <source>Prefer movies when shown at night (complete example)</source>
+        <translation>Föredra filmer som visas nattetid (komplett exempel)</translation>
+    </message>
+    <message>
+        <source>Prefer a host for live sports with overtime (complete example)</source>
+        <translation>Föredra en värd för direktsänd sport med övertid (komplett exempel)</translation>
+    </message>
+    <message>
+        <source>Avoid poor signal quality (complete example)</source>
+        <translation>Undvik dålig signalkvalitet (komplett exempel)</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation>Testa</translation>
+    </message>
+    <message>
+        <source>Install</source>
+        <translation>Installera</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Radera</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>An error was found when checking</source>
+        <translation>Ett fel hittades vid kontroll</translation>
+    </message>
+    <message>
+        <source>The database error was</source>
+        <translation>Databasfelet var</translation>
+    </message>
+    <message>
+        <source>Power Priority</source>
+        <translation>Effektiv prioritet</translation>
     </message>
 </context>
 <context>
@@ -919,6 +1097,49 @@ VARNING: Tryck inte på knappen om du använder ett Air2PC HD-5000 eller Avermed
     </message>
 </context>
 <context>
+    <name>IPTVChannelFetcher</name>
+    <message>
+        <source>Downloading Playlist</source>
+        <translation>Laddar ner spellista</translation>
+    </message>
+    <message>
+        <source>Processing Playlist</source>
+        <translation>Behandlar spellista</translation>
+    </message>
+    <message>
+        <source>Adding Channels</source>
+        <translation>Lägger till kanaler</translation>
+    </message>
+    <message>
+        <source>Channel #%1 : %2</source>
+        <translation>Kanal #%1 : %2</translation>
+    </message>
+    <message>
+        <source>Adding %1</source>
+        <translation>Lägger till %1</translation>
+    </message>
+    <message>
+        <source>Updating %1</source>
+        <translation>Uppdaterar %1</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Klart</translation>
+    </message>
+    <message>
+        <source>ERROR: M3U channel list is malformed</source>
+        <translation>FEL: M3U kanallista är förvrängd</translation>
+    </message>
+    <message>
+        <source>Encountered malformed channel</source>
+        <translation>Påträffade förvrängd kanal</translation>
+    </message>
+    <message>
+        <source>Parsing Channel #%1 : %2 : %3</source>
+        <translation>Analysera kanal #%1 : %2 : %3</translation>
+    </message>
+</context>
+<context>
     <name>InfoDialog</name>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
@@ -993,6 +1214,17 @@ VARNING: Tryck inte på knappen om du använder ett Air2PC HD-5000 eller Avermed
     <message>
         <source>Undefined</source>
         <translation>Odefinierad</translation>
+    </message>
+</context>
+<context>
+    <name>LCDProcClient</name>
+    <message>
+        <source>RECORDING</source>
+        <translation>SPELAR IN</translation>
+    </message>
+    <message>
+        <source>RECORDING|</source>
+        <translation>SPELAR IN|</translation>
     </message>
 </context>
 <context>
@@ -1147,6 +1379,17 @@ VARNING: Tryck inte på knappen om du använder ett Air2PC HD-5000 eller Avermed
     </message>
 </context>
 <context>
+    <name>MythConfirmationDialog</name>
+    <message>
+        <source>Ok</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+</context>
+<context>
     <name>MythContext</name>
     <message>
         <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
@@ -1196,6 +1439,26 @@ Var god och stäng av dom andar klienterna före uppgradering.</translation>
         <source>This cannot be un-done, so having a database backup would be a good idea.</source>
         <translation type="obsolete">Detta kan inte ångras, så att ha en säkerhetskopia av databasen vore en god ide&apos;.</translation>
     </message>
+    <message>
+        <source>This application (%1) is not compatible
+with the installed MythTV libraries (%2).
+Please recompile after a make distclean</source>
+        <translation>Dethär programmet (%1) är inte kompatibelt
+med de installerade MythTV biblioteken (%2).
+Vänligen omkompilera efter make distclean</translation>
+    </message>
+    <message>
+        <source>The server uses network protocol version %1, but this client only understands version %2.  Make sure you are running compatible versions of the backend and frontend.</source>
+        <translation>Servern använder nätverks protokoll version %1, men denhär klienten förstår endast version %2.  Var säker på att du kör en kompatibel version av backend och frontend.</translation>
+    </message>
+    <message>
+        <source>Plugin %1 (%2) is not compatible
+with the installed MythTV libraries (%3).
+Please recompile the plugin after a make distclean</source>
+        <translation>Plugin %1 (%2) är inte kompatibel
+med det installerade MythTV biblioteket (%3)
+Vänligen omkompilera plugin efter make distclean</translation>
+    </message>
 </context>
 <context>
     <name>MythImageFileDialog</name>
@@ -1243,6 +1506,20 @@ Returning to the previous menu.</source>
     </message>
 </context>
 <context>
+    <name>MythTerminal</name>
+    <message>
+        <source>*** Exited with status: %1 ***</source>
+        <translation>*** Slutade med status: %1 ***</translation>
+    </message>
+</context>
+<context>
+    <name>MythTextInputDialog</name>
+    <message>
+        <source>Ok</source>
+        <translation>OK</translation>
+    </message>
+</context>
+<context>
     <name>MythThemedDialog</name>
     <message>
         <source>Missing UI Element</source>
@@ -1255,6 +1532,39 @@ Returning to the previous menu.</source>
         <translation>Hittade inte &apos;%1&apos; i tema &apos;%2&apos;.
 
 Återvänder till föregående meny.</translation>
+    </message>
+</context>
+<context>
+    <name>MythUIBusyDialog</name>
+    <message>
+        <source>Please Wait ...</source>
+        <translation>Vänligen vänta...</translation>
+    </message>
+</context>
+<context>
+    <name>MythUISearchDialog</name>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>0 matches</source>
+        <translation>0 träffar</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>%1 matches</source>
+        <translation>%1 träffar</translation>
+    </message>
+</context>
+<context>
+    <name>MythWebView</name>
+    <message>
+        <source>Error loading page: %1</source>
+        <translation>Fel vid laddning av sida: %1</translation>
     </message>
 </context>
 <context>
@@ -2364,7 +2674,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Pre-scaling theme images</source>
-        <translation type="obsolete">Skalar om bilder för temat</translation>
+        <translation>Skalar om bilder för temat</translation>
     </message>
     <message>
         <source>Audio output device</source>
@@ -2428,11 +2738,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Blank Frame + Scene Change</source>
-        <translation type="obsolete">Svart bild + scenbyte</translation>
+        <translation>Svart bild + scenbyte</translation>
     </message>
     <message>
         <source>Scene Change Detection</source>
-        <translation type="obsolete">Scenbyte</translation>
+        <translation>Scenbyte detektering</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -3114,7 +3424,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>PIP Video Location</source>
-        <translation>PIP-placering</translation>
+        <translation>PIP Video Placering</translation>
     </message>
     <message>
         <source>Top Left</source>
@@ -3861,7 +4171,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Logo Detection</source>
-        <translation type="obsolete">Logodetektering</translation>
+        <translation>Logodetektering</translation>
     </message>
     <message>
         <source>Skip %1</source>
@@ -4318,7 +4628,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Commercial Free</source>
-        <translation type="obsolete">Reklamfri</translation>
+        <translation>Reklamfri</translation>
     </message>
     <message>
         <source>Title Search</source>
@@ -7359,11 +7669,11 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>All Available Methods</source>
-        <translation type="obsolete">Alla tillgängliga metoder</translation>
+        <translation>Alla tillgängliga metoder</translation>
     </message>
     <message>
         <source>Blank Frame Detection</source>
-        <translation type="obsolete">Svart bild</translation>
+        <translation>Svart bild detektering</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.</source>
@@ -8260,7 +8570,7 @@ Kontrollera om videon existerar</translation>
     </message>
     <message>
         <source>Experimental</source>
-        <translation type="obsolete">Experimentell</translation>
+        <translation>Experimentell</translation>
     </message>
     <message>
         <source>Use Xv picture controls</source>
@@ -8789,7 +9099,7 @@ Frekvensen för denna kanal i</translation>
     </message>
     <message>
         <source>Use Global Setting</source>
-        <translation type="obsolete">Använd global inställning</translation>
+        <translation>Använd global inställning</translation>
     </message>
     <message>
         <source>Channel Options - Filters</source>
@@ -8869,11 +9179,11 @@ Frekvensen för denna kanal i</translation>
     </message>
     <message>
         <source>Upgrade</source>
-        <translation type="obsolete">Uppgradera</translation>
+        <translation>Uppgradera</translation>
     </message>
     <message>
         <source>Use current schema</source>
-        <translation type="obsolete">Använd nuvarande schema</translation>
+        <translation>Använd nuvarande schema</translation>
     </message>
     <message>
         <source>Subtitle</source>
@@ -10702,6 +11012,313 @@ Vill ni fortsätta att titta?</translation>
         <source>UPNP Server Settings</source>
         <translation>UPNP server inställningar</translation>
     </message>
+    <message>
+        <source>Channel Importer</source>
+        <translation>Kanal importerare</translation>
+    </message>
+    <message>
+        <source>Failed to find any channels</source>
+        <translation>Misslyckades hitta några kanaler</translation>
+    </message>
+    <message>
+        <source>Found %1 new non-conflicting %2 channels.</source>
+        <translation>Hittade %1 ny icke-motstridig %2 kanaler.</translation>
+    </message>
+    <message>
+        <source>Found %1 old %2 channels.</source>
+        <translation>Hittade %1 gammal %2 kanaler.</translation>
+    </message>
+    <message>
+        <source>Found %1 new conflicting %2 channels.</source>
+        <translation>Hittade %1 ny motstridig %2 kanaler.</translation>
+    </message>
+    <message>
+        <source>Found %1 conflicting old %2 channels.</source>
+        <translation>Hittade %1 motstridig gammal %2 kanaler.</translation>
+    </message>
+    <message>
+        <source>Found %1 transports:
+</source>
+        <translation>Hittade %1 förflyttningar:
+</translation>
+    </message>
+    <message>
+        <source>Channels: FTA Enc Dec
+</source>
+        <translation>Kanaler: FTA Enc Dec
+</translation>
+    </message>
+    <message>
+        <source>Unique: prog %1 atsc %2 atsc minor %3 channum %4
+</source>
+        <translation>Unik: prog %1 atsc%2 atsc mindre %3 channum %4
+</translation>
+    </message>
+    <message>
+        <source>Max atsc major count: %1</source>
+        <translation>Max atsc större värde: %1</translation>
+    </message>
+    <message>
+        <source>Insert all</source>
+        <translation>Infoga alla</translation>
+    </message>
+    <message>
+        <source>Insert manually</source>
+        <translation>Infoga manuellt</translation>
+    </message>
+    <message>
+        <source>Ignore all</source>
+        <translation>Ignorera alla</translation>
+    </message>
+    <message>
+        <source>Update all</source>
+        <translation>Uppdatera alla</translation>
+    </message>
+    <message>
+        <source>Update manually</source>
+        <translation>Uppdatera manuellt</translation>
+    </message>
+    <message>
+        <source>Please enter either 1, 2, or 3:</source>
+        <translation>Vänligen ange antingen1, 2, or eller 3:</translation>
+    </message>
+    <message>
+        <source>This channel was found to be in conflict with other channels</source>
+        <translation>Denhär kanalen är i konflikt med andra kanaler</translation>
+    </message>
+    <message>
+        <source>Please enter a non-conflicting channel number:</source>
+        <translation>Vänligen ange ett icke-konfliktigt nummer:</translation>
+    </message>
+    <message>
+        <source>Updated Channel %1</source>
+        <translation>Uppdaterad Kanal %1</translation>
+    </message>
+    <message>
+        <source>Added Channel %1</source>
+        <translation>Tillagd Kanal %1</translation>
+    </message>
+    <message>
+        <source>Failed to add channel %1</source>
+        <translation>Misslyckades att lägga till kanal %1</translation>
+    </message>
+    <message>
+        <source>%1 -- Testing decryption of program %2</source>
+        <translation>%1 -- Testar avkodning för program %2</translation>
+    </message>
+    <message>
+        <source>Program %1</source>
+        <translation>Program %1</translation>
+    </message>
+    <message>
+        <source>Unknown decryption status</source>
+        <translation>Okänd avkodning status</translation>
+    </message>
+    <message>
+        <source>Encrypted</source>
+        <translation>Kodad</translation>
+    </message>
+    <message>
+        <source>Decrypted</source>
+        <translation>Avkodad</translation>
+    </message>
+    <message>
+        <source>%1 -- Timed out</source>
+        <translation>%1 -- Tiden ute</translation>
+    </message>
+    <message>
+        <source>%1 possible channels</source>
+        <translation>%1 möjliga kanaler</translation>
+    </message>
+    <message>
+        <source>no channels</source>
+        <translation>Inga kanaler</translation>
+    </message>
+    <message>
+        <source>%1, no signal</source>
+        <translation>%1, ingen signal</translation>
+    </message>
+    <message>
+        <source>%1 -- Found %2 probable channels</source>
+        <translation>%1 -- Hittade %2 rimliga kanaler</translation>
+    </message>
+    <message>
+        <source>Processing NIT %1</source>
+        <translation>Bearbetar NIT %1</translation>
+    </message>
+    <message>
+        <source>: Found %1</source>
+        <translation>: Hittade %1</translation>
+    </message>
+    <message>
+        <source>Frequency %1</source>
+        <translation>Frekvens %1</translation>
+    </message>
+    <message>
+        <source>as</source>
+        <translation>som</translation>
+    </message>
+    <message>
+        <source>Skipping %1, not in imported channel map</source>
+        <translation>skippar %1, inte i importerad kanalkarta</translation>
+    </message>
+    <message>
+        <source>Error tuning to transport</source>
+        <translation>Fel vid justering till transport</translation>
+    </message>
+    <message>
+        <source>Programmer Error: Failed to handle tune complete.</source>
+        <translation>Programfel: Misslyckades att ställa in frekvens fullständigt.</translation>
+    </message>
+    <message>
+        <source>Failed to parse &apos;%1&apos;</source>
+        <translation>Kan inte tolka &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Failed to open &apos;%1&apos;</source>
+        <translation>Kan inte öppna &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Error starting scan</source>
+        <translation>Fel vid start av sökning</translation>
+    </message>
+    <message>
+        <source>Programmer Error: No Device</source>
+        <translation>Programfel: Ingen Enhet</translation>
+    </message>
+    <message>
+        <source>Programmer Error: Channel not created</source>
+        <translation>Programfel: Kanalen skapades inte</translation>
+    </message>
+    <message>
+        <source>Channel could not be opened.</source>
+        <translation>Kanalen kunde inte öppnas.</translation>
+    </message>
+    <message>
+        <source>Blank Frame + Logo Detection</source>
+        <translation>Svart bild + Logo detektering</translation>
+    </message>
+    <message>
+        <source>Scene Change + Logo Detection</source>
+        <translation>Scenbyte + Logo detektering</translation>
+    </message>
+    <message>
+        <source>UNKNOWN</source>
+        <comment>Synthesized callsign</comment>
+        <translation>OKÄND
+
+Synthesized ringsignal</translation>
+    </message>
+    <message>
+        <source>Name of the icon file</source>
+        <translation>Namnet på ikonfilen</translation>
+    </message>
+    <message>
+        <source>List of possible icon files</source>
+        <translation>Lista på möjliga ikonfiler</translation>
+    </message>
+    <message>
+        <source>Enter text here for the manual search</source>
+        <translation>Ange text här för manuell sökning</translation>
+    </message>
+    <message>
+        <source>&amp;Search</source>
+        <translation>&amp;Sök</translation>
+    </message>
+    <message>
+        <source>Manually search for the text</source>
+        <translation>Manuell sökning för text</translation>
+    </message>
+    <message>
+        <source>S&amp;kip</source>
+        <translation>H&amp;oppa</translation>
+    </message>
+    <message>
+        <source>Skip this icon</source>
+        <translation>Hoppa över ikonen</translation>
+    </message>
+    <message>
+        <source>S&amp;elect</source>
+        <translation>V&amp;älj</translation>
+    </message>
+    <message>
+        <source>Select this icon</source>
+        <translation>Välj denhär ikonen</translation>
+    </message>
+    <message>
+        <source>Error downloading</source>
+        <translation>Fel i nedladdning</translation>
+    </message>
+    <message>
+        <source>Failed to download the icon file</source>
+        <translation>Misslyckades ladda ner ikonfilen</translation>
+    </message>
+    <message>
+        <source>Icon is blocked</source>
+        <translation>Ikonen är blockerad</translation>
+    </message>
+    <message>
+        <source>This combination of channel and icon has been blocked by the MythTV admins. The most common reason for this is that there is a better match available.
+ Are you still sure that you want to use this icon?</source>
+        <translation>Denhär kombinationen av kanaler och ikoner är blockerade av MythTv admin. Mest enkla orsaken är att det finns en bättre träff tillgänglig.
+Är du säker på att du vill använda denhär kanalen?</translation>
+    </message>
+    <message>
+        <source>Submit information</source>
+        <translation>Avge information</translation>
+    </message>
+    <message>
+        <source>You now have the opportunity to transmit your choices  back to mythtv.org so that others can benefit from your selections.</source>
+        <translation>Du har nu möjlighet att överföra dina val  tillbaka till mythtv.org så andra kan dra nytta av dina val.</translation>
+    </message>
+    <message>
+        <source>Error querying recorder state</source>
+        <translation>Fel bryta inspelningsstatus</translation>
+    </message>
+    <message>
+        <source>master</source>
+        <translation>övervinna</translation>
+    </message>
+    <message>
+        <source>%1% Completed @ %2 fps.</source>
+        <translation>%1% Fullständigt @ %2 fps.</translation>
+    </message>
+    <message>
+        <source>%1 Frames Completed @ %2 fps.</source>
+        <translation>%1 Rutor fullständigt @ %2 fps.</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation>Pausad</translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation>Körs</translation>
+    </message>
+    <message>
+        <source>Finished, %1 break(s) found.</source>
+        <translation>Slutfört, %1 avbrott hittade.</translation>
+    </message>
+    <message>
+        <source>mythfilldatabase ran, but did not insert any new data into the Guide.  This can indicate a potential problem with the XML file used for the update.</source>
+        <translation>mythfilldatabas kördes, men inget nyttt data blev inmatat till Guiden.  Dethär kan indikera ett potentiellt problem med XML filen som används för uppdateringen.</translation>
+    </message>
+    <message>
+        <source>Overrides for specific video sizes</source>
+        <translation>Åsidosätta för en specifik bildstorlek</translation>
+    </message>
+    <message>
+        <source>Generating Keyframe Index</source>
+        <translation>Generera delbilds index</translation>
+    </message>
+    <message>
+        <source>Transcode Completed</source>
+        <translation>Omkodning fullständig</translation>
+    </message>
+    <message>
+        <source>Completed</source>
+        <translation>Fullständig</translation>
+    </message>
 </context>
 <context>
     <name>RecOptDialog</name>
@@ -10834,6 +11451,13 @@ Nästa bild kommer att vara tom.  Tryck EXIT för att gå tillbaka till menyn.</
     </message>
 </context>
 <context>
+    <name>ScanMonitor</name>
+    <message>
+        <source>Scanning</source>
+        <translation>Söker</translation>
+    </message>
+</context>
+<context>
     <name>ScanProgressPopup</name>
     <message>
         <source>Scan Progress</source>
@@ -10870,6 +11494,10 @@ Nästa bild kommer att vara tom.  Tryck EXIT för att gå tillbaka till menyn.</
     <message>
         <source>No Lock</source>
         <translation>Inget lås</translation>
+    </message>
+    <message>
+        <source>Rotor Movement</source>
+        <translation>Svängmaskinens rörelse</translation>
     </message>
 </context>
 <context>
@@ -10949,6 +11577,73 @@ Nästa bild kommer att vara tom.  Tryck EXIT för att gå tillbaka till menyn.</
     <message>
         <source>or later</source>
         <translation>eller senare</translation>
+    </message>
+</context>
+<context>
+    <name>SchemaUpgradeWizard</name>
+    <message>
+        <source>There are also other clients using this database. They should be shut down first.</source>
+        <translation>Andra klienter använder databasen. Dessa borde stängas av först.</translation>
+    </message>
+    <message>
+        <source>Error: This version of Myth%1 requires MySQL %2.%3.%4 or later.  You seem to be running MySQL version %5.</source>
+        <translation>Fel: Denhär versionen av Myth%1 behöver MySQL %2.%3.%4 eller senare.  Det verkar som du använder MySQL version %5.</translation>
+    </message>
+    <message>
+        <source>Error: MythTV cannot upgrade the schema of this datatase because other clients are using it.
+
+Please shut them down before upgrading.</source>
+        <translation>Fel: MythTV kan inte uppgradera schemat för denna databas eftersom andra klienter använder den.
+
+Var god och stäng av dom andar klienterna före uppgradering.</translation>
+    </message>
+    <message>
+        <source>Warning: MythTV wants to upgrade your database,</source>
+        <translation>Varning: MythTV vill uppgradera din databas,</translation>
+    </message>
+    <message>
+        <source>for the %1 schema, from %2 to %3.</source>
+        <translation>för %1 schemat, från %2 till %3.</translation>
+    </message>
+    <message>
+        <source>You can try using the old schema, but that may cause problems.</source>
+        <translation>Du kan försöka använda det gamla schemat, men det kan orsaka problem.</translation>
+    </message>
+    <message>
+        <source>This version of MythTV requires an updated database. </source>
+        <translation>Denhär versionen av MythTV kräver en uppdaterad databas. </translation>
+    </message>
+    <message>
+        <source>(schema is %1 versions behind)</source>
+        <translation>(schemat är %1 version efter)</translation>
+    </message>
+    <message>
+        <source>Please run mythtv-setup or mythbackend to update your database.</source>
+        <translation>Vänligen kör mythtv-setup eller mythbackend för att uppgradera din databas.</translation>
+    </message>
+    <message>
+        <source>Warning: MythTV database has newer %1 schema (%2) than expected (%3).</source>
+        <translation>Varning: MythTv databas har aldrig %1 schema (%2) än väntat (%3).</translation>
+    </message>
+    <message>
+        <source>Error: MythTV database has newer %1 schema (%2) than expected (%3).</source>
+        <translation>Fel: MythTV databasen har aldrig %1 schema  (%2) än väntat (%3).</translation>
+    </message>
+    <message>
+        <source>MythTV was unable to backup your database.</source>
+        <translation>MythTV kunde inte säkerhetskopiera din databas.</translation>
+    </message>
+    <message>
+        <source>If your system becomes unstable, a database backup file called
+%1
+is located in %2</source>
+        <translation>Om systemet blir ostabilt, en databas backupfil kallat
+%1
+är lokaliserat i %2</translation>
+    </message>
+    <message>
+        <source>This cannot be un-done, so having a database backup would be a good idea.</source>
+        <translation>Detta kan inte ångras, så att ha en säkerhetskopia av databasen vore en god ide&apos;.</translation>
     </message>
 </context>
 <context>
@@ -11899,6 +12594,46 @@ Välj ett inspelat program</translation>
     <message>
         <source>No</source>
         <translation>Nej</translation>
+    </message>
+    <message>
+        <source>Live TV</source>
+        <translation>Direktsänd TV</translation>
+    </message>
+    <message>
+        <source>this DVD</source>
+        <translation>Denhär DVD</translation>
+    </message>
+    <message>
+        <source>this Video</source>
+        <translation>Denhär Video</translation>
+    </message>
+    <message>
+        <source>this recording</source>
+        <translation>Denhär inspelningen</translation>
+    </message>
+    <message>
+        <source>Delete it, but allow it to re-record</source>
+        <translation>Radera, men tillåt återinspelning</translation>
+    </message>
+    <message>
+        <source>Delete it</source>
+        <translation>Radera det</translation>
+    </message>
+    <message>
+        <source>Save it so I can watch it again</source>
+        <translation>Spara så jan kan se igen</translation>
+    </message>
+    <message>
+        <source>Yes, and allow re-record</source>
+        <translation>Ja, och tillåt återinspelning</translation>
+    </message>
+    <message>
+        <source>Yes, delete it</source>
+        <translation>Ja, ta bort det</translation>
+    </message>
+    <message>
+        <source>No, keep it, I changed my mind</source>
+        <translation>Nej, behåll den, jag ångrade mig</translation>
     </message>
 </context>
 <context>
