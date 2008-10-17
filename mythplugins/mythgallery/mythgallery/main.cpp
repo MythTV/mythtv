@@ -2,16 +2,12 @@
 #include <iostream>
 
 // qt
-#include <QApplication>
-#include <QImage>
 #include <QDir>
 
 // myth
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythversion.h>
 #include <mythtv/mythdialogs.h>
-#include <mythtv/mythplugin.h>
-#include <mythtv/dialogbox.h>
 #include <mythtv/mythmediamonitor.h>
 #include <mythtv/mythpluginapi.h>
 
@@ -22,15 +18,24 @@
 
 static void run(MythMediaDevice *dev)
 {
-    QString startdir = gContext->GetSetting("GalleryDir");
+    QDir startdir(gContext->GetSetting("GalleryDir"));
+    if (startdir.exists() && startdir.isReadable())
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        IconView *iconview = new IconView(mainStack, "mythgallery",
+                                          startdir.absolutePath(), dev);
 
-    IconView *iconview = new IconView(mainStack, "mythgallery",
-                                      startdir, dev);
-
-    if (iconview->Create())
-        mainStack->AddScreen(iconview);
+        if (iconview->Create())
+            mainStack->AddScreen(iconview);
+    }
+    else
+    {
+        ShowOkPopup(QObject::tr("MythGallery cannot find its start directory.\n"
+                                "Check the directory exists, is readable and "
+                                "the setting is correct on MythGallery's "
+                                "settings page."));
+    }
 }
 
 void runGallery(void)

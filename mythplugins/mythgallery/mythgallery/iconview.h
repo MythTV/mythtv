@@ -114,6 +114,7 @@ class IconView : public MythScreenType
 
     MythUIButtonList   *m_imageList;
     MythUIText         *m_captionText;
+    MythUIText         *m_noImagesText;
     MythDialogBox      *m_menuPopup;
     MythScreenStack    *m_popupStack;
 

@@ -117,6 +117,7 @@ IconView::IconView(MythScreenStack *parent, const char *name,
     m_errorStr = QString::null;
 
     m_captionText = NULL;
+    m_noImagesText = NULL; 
 
     m_menuPopup = NULL;
 
@@ -157,6 +158,9 @@ bool IconView::Create(void)
     m_captionText = dynamic_cast<MythUIText *>
                 (GetChild("text"));
 
+    m_noImagesText = dynamic_cast<MythUIText *>
+                (GetChild("noimages"));
+
     if (!m_imageList)
     {
         VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
@@ -167,6 +171,12 @@ bool IconView::Create(void)
             this, SLOT( HandleItemSelect(MythUIButtonListItem*)));
     connect(m_imageList, SIGNAL(itemSelected( MythUIButtonListItem*)),
             this, SLOT( UpdateText(MythUIButtonListItem*)));
+
+    if (m_noImagesText)
+    {
+        m_noImagesText->SetText(tr("No images found in this directory."));
+        m_noImagesText->SetVisible(false);
+    }
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
@@ -221,6 +231,9 @@ void IconView::LoadDirectory(const QString &dir)
         if (m_itemMarked.contains(thumbitem->GetPath()))
             item->setChecked(MythUIButtonListItem::FullChecked);
     }
+
+    if (m_noImagesText)
+        m_noImagesText->SetVisible((m_itemList.size() == 0));
 
     // TODO Not accurate, the image may be smaller than the button
     uint buttonwidth = m_imageList->ItemWidth();

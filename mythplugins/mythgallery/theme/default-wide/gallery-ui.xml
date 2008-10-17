@@ -64,6 +64,14 @@
             <align>allcenter</align>
         </textarea>-->
 
+        <!-- optional - shows a message when no images are available
+             in the current directory -->
+        <textarea name="noimages" from="basetextarea">
+            <area>15,20,770,560</area>
+            <font>basemedium</font>
+            <align>allcenter</align>
+        </textarea>
+
     </window>
 
 </mythuitheme>
