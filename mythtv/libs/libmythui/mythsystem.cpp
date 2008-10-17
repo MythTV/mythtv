@@ -9,20 +9,12 @@
 #include "mythsystem.h"
 
 #include "compat.h"
-#ifdef USING_MINGW
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <sys/param.h>
-#else
-# include <sys/types.h>
 # include <sys/wait.h>
-# include <sys/stat.h>
 # ifdef linux
 #   include <sys/vfs.h>
 #   include <sys/statvfs.h>
 #   include <sys/sysinfo.h>
 # else
-#   include <sys/param.h>
 #   ifdef __FreeBSD__
 #     include <sys/mount.h>
 #   endif
@@ -32,7 +24,6 @@
 #     include <sys/sysctl.h>
 #   endif // !CONFIG_CYGWIN
 # endif
-#endif //MINGW
 
 #include "mythverbose.h"
 #include "mythmainwindow.h"
@@ -69,7 +60,7 @@ uint myth_system(const QString &command, int flags)
     JoystickMenuEventLock joystick_lock(joy_lock_flag && ready_to_lock);
 #endif
 
-#ifdef CONFIG_DARWIN
+#ifdef BSD
     // Darwin waitpid() frequently fails EINTR (interrupted system call) -
     // I think because the parent is being toggled between kernel sleep/wake.
     // This seems to work around whatever is causing this 
@@ -115,7 +106,7 @@ uint myth_system(const QString &command, int flags)
         }
 
         /* Run command */
-        execl("/bin/sh", "sh", "-c", command.toUtf8().constData(), NULL);
+        execl("/bin/sh", "sh", "-c", command.toUtf8().constData(), (char *)0);
         if (errno)
         {
             VERBOSE(VB_IMPORTANT, (LOC_ERR + "execl() failed because %1")
