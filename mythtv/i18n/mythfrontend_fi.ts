@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="fi">
-<defaultcodec></defaultcodec>
+<!DOCTYPE TS><TS>
 <context>
     <name>@default</name>
     <message>
@@ -279,6 +277,17 @@
     </message>
 </context>
 <context>
+    <name>ChannelScannerGUI</name>
+    <message>
+        <source>Scanning</source>
+        <translation>Hakee</translation>
+    </message>
+    <message>
+        <source>ScanWizard</source>
+        <translation>Hakuvelho</translation>
+    </message>
+</context>
+<context>
     <name>CustomEdit</name>
     <message>
         <source>stored example</source>
@@ -482,11 +491,174 @@
     </message>
     <message>
         <source>SportsCenter Overnight (complete example - use FindDaily)</source>
-        <translation type="unfinished"></translation>
+        <translation>SportsCenter Overnight (täydellinen esimerkki - käytä FindDaily)</translation>
     </message>
     <message>
         <source>Movie of the Week (complete example - use FindWeekly)</source>
-        <translation type="unfinished"></translation>
+        <translation>Movie of the Week (täydellinen esimerkki - käytä FindWeekly)</translation>
+    </message>
+</context>
+<context>
+    <name>CustomPriority</name>
+    <message>
+        <source>Add</source>
+        <translation>Lisää</translation>
+    </message>
+    <message>
+        <source>Edit Priority Rule</source>
+        <translation>Muokkaa prioriteettisääntöä</translation>
+    </message>
+    <message>
+        <source>&lt;New priority rule&gt;</source>
+        <translation>&lt;Uusi prioriteettisääntö&gt;</translation>
+    </message>
+    <message>
+        <source>Priority Rule Name</source>
+        <translation>Prioriteettisäännön nimi</translation>
+    </message>
+    <message>
+        <source>Priority Value</source>
+        <translation>Prioriteetin arvo</translation>
+    </message>
+    <message>
+        <source>Modify priority for an input (Input priority)</source>
+        <translation>Muokkaa sisääntulon prioriteettiä (Sisääntuloprioriteetti)</translation>
+    </message>
+    <message>
+        <source>Modify priority for all inputs on a card</source>
+        <translation>Muokkaa kortin prioriteettejä kaikille sisääntuloille </translation>
+    </message>
+    <message>
+        <source>Modify priority for every card on a host</source>
+        <translation>Muokkaa palvelimen jokaisen kortin prioriteettiä </translation>
+    </message>
+    <message>
+        <source>Only one specific channel ID (Channel priority)</source>
+        <translation>Vain tietty kanavatunnus (Kanavaprioriteetti)</translation>
+    </message>
+    <message>
+        <source>Only a certian channel number</source>
+        <translation>Vain tietty kanavanumero</translation>
+    </message>
+    <message>
+        <source>Only channels that carry a specific station</source>
+        <translation>Vain tietyn aseman kanavat</translation>
+    </message>
+    <message>
+        <source>Match related callsigns</source>
+        <translation>Yhtäläisyydet nimikkeissä</translation>
+    </message>
+    <message>
+        <source>Only channels marked as commercial free</source>
+        <translation>Vain mainosvapaat kanavat </translation>
+    </message>
+    <message>
+        <source>Modify priority for a station on an input</source>
+        <translation>Muokkaa aseman prioriteettiä sisääntulossa</translation>
+    </message>
+    <message>
+        <source>Priority for all matching titles</source>
+        <translation>Prioriteetti kaikilla yhteensopivilla nimikkeillä</translation>
+    </message>
+    <message>
+        <source>Only shows marked as HDTV</source>
+        <translation>Vain HDTV -ohjelmat</translation>
+    </message>
+    <message>
+        <source>Close Captioned priority</source>
+        <translation>Sulje otsikoitu prioriteetti</translation>
+    </message>
+    <message>
+        <source>New episodes only</source>
+        <translation>Vain uudet jaksot</translation>
+    </message>
+    <message>
+        <source>Modify unidentified episodes</source>
+        <translation>Muokkaa tunnistamattomia jaksoja</translation>
+    </message>
+    <message>
+        <source>First showing of each episode</source>
+        <translation>Jokaisen jakson ensimmäinen esitys</translation>
+    </message>
+    <message>
+        <source>Last showing of each episode</source>
+        <translation>Jokaisen jakson viimeinen esitys</translation>
+    </message>
+    <message>
+        <source>Priority for any show with End Late time</source>
+        <translation>Prioriteetti jokaiselle Loppuu myöhään -ohjelmalle</translation>
+    </message>
+    <message>
+        <source>Priority for a category</source>
+        <translation>Prioriteetti tietylle kategorialle</translation>
+    </message>
+    <message>
+        <source>Priority for a category type</source>
+        <translation>Prioriteetti tietylle kategoriatyypille</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>tai</translation>
+    </message>
+    <message>
+        <source>Modify priority by star rating (0.0 to 1.0 for movies only)</source>
+        <translation>Muokkaa prioriteettiä tähtiluokituksella (0.0 - 1.0 elokuville)</translation>
+    </message>
+    <message>
+        <source>Priority when shown once (complete example)</source>
+        <translation>Prioriteetti kun esitetty kerran (täydellinen esimerkki)</translation>
+    </message>
+    <message>
+        <source>Prefer a host for a storage group (complete example)</source>
+        <translation>Suosi palvelinta tallennusjoukolle (täydellinen esimerkki)</translation>
+    </message>
+    <message>
+        <source>Priority for HD shows under two hours (complete example)</source>
+        <translation>Prioriteetti alle kaksituntisille HD -ohjelmille (täydellinen esimerkki)</translation>
+    </message>
+    <message>
+        <source>Priority for movies by the year of release (complete example)</source>
+        <translation>Prioriteetti elokuville julkaisuvuoden mukaan (ttäydellinen esimerkki)</translation>
+    </message>
+    <message>
+        <source>Prefer movies when shown at night (complete example)</source>
+        <translation>Suosi elokuvia, joita näytetään iltaisin (täydellinen esimerkki)</translation>
+    </message>
+    <message>
+        <source>Prefer a host for live sports with overtime (complete example)</source>
+        <translation>Suosi palvelinta suoralla urheilulähetyksellä ja jatkoajalla (täydellinen esimerkki)</translation>
+    </message>
+    <message>
+        <source>Avoid poor signal quality (complete example)</source>
+        <translation>Vältä heikkoa signaalin laatua (täydellinen esimerkki)</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation>Kokeile</translation>
+    </message>
+    <message>
+        <source>Install</source>
+        <translation>Asenna</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Poista</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Peruuta</translation>
+    </message>
+    <message>
+        <source>An error was found when checking</source>
+        <translation>Virhe löydetty tarkistuksessa</translation>
+    </message>
+    <message>
+        <source>The database error was</source>
+        <translation>Tietokannan virhe oli</translation>
+    </message>
+    <message>
+        <source>Power Priority</source>
+        <translation>Tehoprioriteetti</translation>
     </message>
 </context>
 <context>
@@ -762,11 +934,11 @@
     <name>DeviceTree</name>
     <message>
         <source>The Cartesian latitude for your location.</source>
-        <translation type="unfinished">Karteesinen koordinaatisto (leveysaste) sijainnille.</translation>
+        <translation>Karteesinen leveysaste sijainnillesi.</translation>
     </message>
     <message>
         <source>The Cartesian longitude for your location.</source>
-        <translation type="unfinished">Karteesinen koordinaatisto (pituusaste) sijainnille.</translation>
+        <translation>Karteesinen pituusaste sijainnillesi.</translation>
     </message>
     <message>
         <source>Description</source>
@@ -788,7 +960,7 @@
     </message>
     <message>
         <source>Use negative numbers for southern and western coordinates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä negatiivisiä numeroita osoittamaan eteläiset ja läntiset koordinaatit.  </translation>
     </message>
     <message>
         <source>Device Type</source>
@@ -796,67 +968,67 @@
     </message>
     <message>
         <source>Switch</source>
-        <translation type="unfinished"></translation>
+        <translation>Kytkin</translation>
     </message>
     <message>
         <source>Rotor</source>
-        <translation type="unfinished"></translation>
+        <translation>Kääntömoottori</translation>
     </message>
     <message>
         <source>LNB</source>
-        <translation type="unfinished"></translation>
+        <translation>LNB</translation>
     </message>
     <message>
         <source>Optional descriptive name for this device, to make it easier to configure settings later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vapaaehtoinen kuvaava nimi tälle laitteelle, jotta sen asennus olisi myöhemmin helpompaa.</translation>
     </message>
     <message>
         <source>Repeat Count</source>
-        <translation type="unfinished"></translation>
+        <translation>Toista laskenta</translation>
     </message>
     <message>
         <source>Number of times to repeat DiSEqC commands sent to this device. Larger values may help with less reliable devices.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämän laitteen DiSEqC -komentojen toistomäärä . Suuremmat arvot voivat auttaa vähemmän käyttövarmojen laitteiden kanssa.</translation>
     </message>
     <message>
         <source>Switch Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Kytkintyyppi</translation>
     </message>
     <message>
         <source>Select the type of switch from the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse kytkimen tyyppi listasta.</translation>
     </message>
     <message>
         <source>Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Äänenväri</translation>
     </message>
     <message>
         <source>Voltage</source>
-        <translation type="unfinished"></translation>
+        <translation>Jännite</translation>
     </message>
     <message>
         <source>Mini DiSEqC</source>
-        <translation type="unfinished"></translation>
+        <translation>Mini DiSEqC</translation>
     </message>
     <message>
         <source>DiSEqC</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC</translation>
     </message>
     <message>
         <source>DiSEqC (Uncommitted)</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC (Toteuttamaton)</translation>
     </message>
     <message>
         <source>Legacy SW21</source>
-        <translation type="unfinished"></translation>
+        <translation>Legacy SW21</translation>
     </message>
     <message>
         <source>Legacy SW42</source>
-        <translation type="unfinished"></translation>
+        <translation>Legacy SW42</translation>
     </message>
     <message>
         <source>Legacy SW64</source>
-        <translation type="unfinished"></translation>
+        <translation>Legacy SW64</translation>
     </message>
     <message>
         <source>Number of ports</source>
@@ -872,171 +1044,171 @@
     </message>
     <message>
         <source>Rotor Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Kääntömoottorin tyyppi</translation>
     </message>
     <message>
         <source>Select the type of rotor from the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse kääntömoottorin tyyppi listasta.</translation>
     </message>
     <message>
         <source>DiSEqC 1.2</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC 1.2</translation>
     </message>
     <message>
         <source>DiSEqC 1.3 (GotoX/USALS)</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC 1.3 (GotoX/USALS)</translation>
     </message>
     <message>
         <source>Rotor Low Speed (deg/sec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kääntömoottorin matalanopeus (astetta/sekunnissa) </translation>
     </message>
     <message>
         <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 13V.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mahdollistaaksesi kääntömoottorin nopeuden valvonta, syötä kääntömoottorin arvioitu kääntönopeus 13V voimalla.</translation>
     </message>
     <message>
         <source>Rotor High Speed (deg/sec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kääntömoottorin korkeanopeus (astetta/sekunnissa)</translation>
     </message>
     <message>
         <source>To allow the approximate monitoring of rotor movement, enter the rated angular speed of the rotor when powered at 18V.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mahdollistaaksesi kääntömoottorin nopeuden valvonta, syötä kääntömoottorin arvioitu kääntönopeus 18V voimalla.</translation>
     </message>
     <message>
         <source>Position Index %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Paikka indeksi %1</translation>
     </message>
     <message>
         <source>Orbital Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Paikka kiertoradalla</translation>
     </message>
     <message>
         <source>Position #%1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Paikka #%1 (%2)</translation>
     </message>
     <message>
         <source>Rotor Position Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Kääntömoottorin paikkakartta</translation>
     </message>
     <message>
         <source>Rotor Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Kääntömoottorin asennus</translation>
     </message>
     <message>
         <source>Positions</source>
-        <translation type="unfinished"></translation>
+        <translation>Asennot</translation>
     </message>
     <message>
         <source>Rotor position setup.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kääntömoottorin asennon asennus.</translation>
     </message>
     <message>
         <source>Single (Europe)</source>
-        <translation type="unfinished"></translation>
+        <translation>Single (Europpa)</translation>
     </message>
     <message>
         <source>Universal (Europe)</source>
-        <translation type="unfinished"></translation>
+        <translation>Universal (Eurooppa)</translation>
     </message>
     <message>
         <source>Circular (N. America)</source>
-        <translation type="unfinished"></translation>
+        <translation>Circular (P-Amerikka)</translation>
     </message>
     <message>
         <source>Linear (N. America)</source>
-        <translation type="unfinished"></translation>
+        <translation>Linear (P-Amerikka)</translation>
     </message>
     <message>
         <source>C Band</source>
-        <translation type="unfinished"></translation>
+        <translation>C Band</translation>
     </message>
     <message>
         <source>DishPro Bandstacked</source>
-        <translation type="unfinished"></translation>
+        <translation>DishPro Bandstacked</translation>
     </message>
     <message>
         <source>LNB Preset</source>
-        <translation type="unfinished"></translation>
+        <translation>LNB:n esiasetukset</translation>
     </message>
     <message>
         <source>Select the LNB preset from the list, or choose &apos;Custom&apos; and set the advanced settings below.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse LNB:n esiasetukset listasta tai valitse &quot;Mukautetut asetukset&quot; ja syötä kehittyneet asetukset alle.</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation>Mukautetut asetukset</translation>
     </message>
     <message>
         <source>LNB Type</source>
-        <translation type="unfinished"></translation>
+        <translation>LNB Tyyppi</translation>
     </message>
     <message>
         <source>Select the type of LNB from the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse LNB:n tyyppi listasta.</translation>
     </message>
     <message>
         <source>Legacy (Fixed)</source>
-        <translation type="unfinished"></translation>
+        <translation>Legacy (Kiinteä)</translation>
     </message>
     <message>
         <source>Standard (Voltage)</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard (Jännite)</translation>
     </message>
     <message>
         <source>Universal (Voltage &amp; Tone)</source>
-        <translation type="unfinished"></translation>
+        <translation>Universal (Jännite &amp; äänenväri)</translation>
     </message>
     <message>
         <source>Bandstacked</source>
-        <translation type="unfinished"></translation>
+        <translation>Bandstacked</translation>
     </message>
     <message>
         <source>LNB LOF Switch (MHz)</source>
-        <translation type="unfinished"></translation>
+        <translation>LNB:n LOF -kytkin (MHz)</translation>
     </message>
     <message>
         <source>This defines at what frequency the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä määrittää taajuuden, jolla LNB vaihtaa kytkimen &apos;Korkea&apos; -asennosta &apos;Matala&apos; -asentoon, ja päinvastoin.</translation>
     </message>
     <message>
         <source>LNB LOF Low (MHz)</source>
-        <translation type="unfinished"></translation>
+        <translation>LNB:n LOF -kytkimen Matala -asento (MHz)</translation>
     </message>
     <message>
         <source>This defines the offset the frequency coming from the LNB will be in low setting. For bandstacked LNBs this is the vertical/right polarization band.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä määrittää LNB:stä saatavan suhteellisen referenssin, LNB:n ollessa Matala -asennossa. Bandstacked LNB -järjestelmille tämä on vertikaalinen/oikea polarisointikaista.</translation>
     </message>
     <message>
         <source>LNB LOF High (MHz)</source>
-        <translation type="unfinished"></translation>
+        <translation>LNB:n LOF -kytkimen Korkea -asento (MHz)</translation>
     </message>
     <message>
         <source>This defines the offset the frequency coming from the LNB will be in high setting. For bandstacked LNBs this is the horizontal/left polarization band.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä määrittää LNB:stä saatavan suhteellisen referenssin, LNB:n ollessa Korkea -asennossa. Bandstacked LNB -järjestelmille tämä on horisontaalinen/vasen polarisointikaista.</translation>
     </message>
     <message>
         <source>LNB Reversed</source>
-        <translation type="unfinished"></translation>
+        <translation>LNB:n polariteetin vaihto</translation>
     </message>
     <message>
         <source>This defines whether the signal reaching the LNB is reversed from normal polarization. This happens to circular signals bouncing twice on a toroidal dish.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä määrittelee onko LNB:n vastaanottama singaali käänetty päinvastaiseksi normaalista polariteetistä. Tätä tapahtuu kiertosignaalien (Circular signal) kilpistyessä kahdesti toroidiantennissa.</translation>
     </message>
     <message>
         <source>LNB Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>LNB asetukset</translation>
     </message>
     <message>
         <source>Select Type of Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse laitteen tyyppi</translation>
     </message>
     <message>
         <source>DiSEqC Device Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC laitteistopuu</translation>
     </message>
     <message>
         <source>Choose a port to use for this switch.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse portti, jolla käyttää tätä kytkintä.</translation>
     </message>
     <message>
         <source>Port %1</source>
@@ -1048,11 +1220,11 @@
     </message>
     <message>
         <source>Locates the satellite you wish to point to with the longitude along the Clarke Belt of the satellite [-180..180] and its hemisphere.</source>
-        <translation type="unfinished"></translation>
+        <translation>Paikallistaa sateelliitin, johonka haluat osoittaa, pituusasteiden mukaan Clarken raadalla  [-180..180] ja sateelliitin pallonpuoliskon.</translation>
     </message>
     <message>
         <source>Longitude (degrees)</source>
-        <translation type="unfinished"></translation>
+        <translation>Pituuasaste</translation>
     </message>
     <message>
         <source>Hemisphere</source>
@@ -1068,7 +1240,7 @@
     </message>
     <message>
         <source>DTV Device Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>DTV -laitteen asetukset</translation>
     </message>
 </context>
 <context>
@@ -1083,6 +1255,64 @@
     <message>
         <source>Delete &apos;%1&apos; %2 rule?</source>
         <translation>Haluatko varmasti poistaa säännön &apos;%1&apos; %2?</translation>
+    </message>
+</context>
+<context>
+    <name>HDPVRConfigurationGroup</name>
+    <message>
+        <source>Probed info</source>
+        <translation>Haettu tieto</translation>
+    </message>
+    <message>
+        <source>Failed to open</source>
+        <translation>Avaaminen epäonnistui</translation>
+    </message>
+    <message>
+        <source>Failed to probe</source>
+        <translation>Haku epäonnistui</translation>
+    </message>
+</context>
+<context>
+    <name>IPTVChannelFetcher</name>
+    <message>
+        <source>Downloading Playlist</source>
+        <translation>Ladataan soittolistaa</translation>
+    </message>
+    <message>
+        <source>Processing Playlist</source>
+        <translation>Käsitellään soittolistaa</translation>
+    </message>
+    <message>
+        <source>Adding Channels</source>
+        <translation>Lisätään kanavia</translation>
+    </message>
+    <message>
+        <source>Channel #%1 : %2</source>
+        <translation>Kanava #%1 : %2</translation>
+    </message>
+    <message>
+        <source>Adding %1</source>
+        <translation>Lisätään kanava %1</translation>
+    </message>
+    <message>
+        <source>Updating %1</source>
+        <translation>Päivitetään kanava %1</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Valmis</translation>
+    </message>
+    <message>
+        <source>ERROR: M3U channel list is malformed</source>
+        <translation>VIRHE: M3U kanavalista on epämuodostunut</translation>
+    </message>
+    <message>
+        <source>Encountered malformed channel</source>
+        <translation>Löydettiin epämuodostunut kanava</translation>
+    </message>
+    <message>
+        <source>Parsing Channel #%1 : %2 : %3</source>
+        <translation>Jäsentää kanavaa #%1 : %2 : %3</translation>
     </message>
 </context>
 <context>
@@ -1160,6 +1390,17 @@
     <message>
         <source>Undefined</source>
         <translation>Määrittelemätön</translation>
+    </message>
+</context>
+<context>
+    <name>LCDProcClient</name>
+    <message>
+        <source>RECORDING</source>
+        <translation>TALLENTAA</translation>
+    </message>
+    <message>
+        <source>RECORDING|</source>
+        <translation>TALLENTAA|</translation>
     </message>
 </context>
 <context>
@@ -1314,6 +1555,17 @@
     </message>
 </context>
 <context>
+    <name>MythConfirmationDialog</name>
+    <message>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Peruuta</translation>
+    </message>
+</context>
+<context>
     <name>MythContext</name>
     <message>
         <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
@@ -1325,42 +1577,54 @@
     </message>
     <message>
         <source>There are also other clients using this database. They should be shut down first.</source>
-        <translation>Tietokanta on käytössä jollain muulla ohjelmalla. Sulje muut tietokantaa käyttävät ohjelmat ensin.</translation>
+        <translation type="obsolete">Tietokanta on käytössä jollain muulla ohjelmalla. Sulje muut tietokantaa käyttävät ohjelmat ensin.</translation>
     </message>
     <message>
         <source>Error: MythTV cannot upgrade the schema of this datatase because other clients are using it.
 
 Please shut them down before upgrading.</source>
-        <translation>Virhe:Ei voida päivittää tätä tietokantaa, koska muut ohjelmat käyttävät sitä.
+        <translation type="obsolete">Virhe:Ei voida päivittää tätä tietokantaa, koska muut ohjelmat käyttävät sitä.
 Sammuta tietokantaa käyttävät ohjelmat ennen jatkamista.</translation>
     </message>
     <message>
         <source>Warning: MythTV wants to upgrade your database schema, from %1 to %2.</source>
-        <translation>Varoitus: MythTV haluaa päivittää tietokannan versiosta %1 versioon %2.</translation>
+        <translation type="obsolete">Varoitus: MythTV haluaa päivittää tietokannan versiosta %1 versioon %2.</translation>
     </message>
     <message>
         <source>You can try using the old schema, but that may cause problems.</source>
-        <translation>Voit yrittää käyttää vanhaa tietokantaa, mutta se voi aiheuttaa ongelmia.</translation>
+        <translation type="obsolete">Voit yrittää käyttää vanhaa tietokantaa, mutta se voi aiheuttaa ongelmia.</translation>
     </message>
     <message>
         <source>Warning: MythTV database has newer schema (%1) than expected (%2).</source>
-        <translation>Varoitus: MythTV-tietokanta on uudempi (%1) kuin mitä odotettiin (%2).</translation>
+        <translation type="obsolete">Varoitus: MythTV-tietokanta on uudempi (%1) kuin mitä odotettiin (%2).</translation>
     </message>
     <message>
         <source>Error: MythTV database has newer schema (%1) than expected (%2).</source>
-        <translation>Virhe: MythTV-tietokanta on uudempi (%1) kuin mitä odotettiin (%2).</translation>
+        <translation type="obsolete">Virhe: MythTV-tietokanta on uudempi (%1) kuin mitä odotettiin (%2).</translation>
     </message>
     <message>
         <source>MythTV was unable to backup your database.</source>
-        <translation>MythTV ei saanut varmuuskopioitua tietokantaa.</translation>
+        <translation type="obsolete">MythTV ei saanut varmuuskopioitua tietokantaa.</translation>
     </message>
     <message>
         <source>If your system becomes unstable, a database backup file called %1 is located in %2.</source>
-        <translation>Jos järjestelmä muuttuu epävakaaksi, varmuuskopio tietokannasta löytyy tiedostosta %1, joka sijaitsee hakemistossa %2.</translation>
+        <translation type="obsolete">Jos järjestelmä muuttuu epävakaaksi, varmuuskopio tietokannasta löytyy tiedostosta %1, joka sijaitsee hakemistossa %2.</translation>
     </message>
     <message>
         <source>This cannot be un-done, so having a database backup would be a good idea.</source>
-        <translation>Tätä toimintoa ei voida peruuttaa, joten tietokannasta on hyvä tehdä varmuuskopio.</translation>
+        <translation type="obsolete">Tätä toimintoa ei voida peruuttaa, joten tietokannasta on hyvä tehdä varmuuskopio.</translation>
+    </message>
+    <message>
+        <source>The server uses network protocol version %1, but this client only understands version %2.  Make sure you are running compatible versions of the backend and frontend.</source>
+        <translation>Palvelin käyttää verkostoprotokolan verrsiota %1, mutta tämä asiakasohjelma ymmärtää vain versiota %2.  Varmista ohjelmistoversioiden yhteensopivuus.</translation>
+    </message>
+    <message>
+        <source>Plugin %1 (%2) is not compatible
+with the installed MythTV libraries (%3).
+Please recompile the plugin after a make distclean</source>
+        <translation>Liitännäinen %1 (%2) ei ole yhteensopiva
+asennettujen MythTV -kirjastojen (%3) kanssa.
+Ole hyvä ja uudelleenkoosta liitännäinen distcleanin jälkeen</translation>
     </message>
 </context>
 <context>
@@ -1409,6 +1673,20 @@ Palataan edelliseen valikkoon.</translation>
     </message>
 </context>
 <context>
+    <name>MythTerminal</name>
+    <message>
+        <source>*** Exited with status: %1 ***</source>
+        <translation>*** Poistui tilanteessa: %1 ***</translation>
+    </message>
+</context>
+<context>
+    <name>MythTextInputDialog</name>
+    <message>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+</context>
+<context>
     <name>MythThemedDialog</name>
     <message>
         <source>Missing UI Element</source>
@@ -1421,6 +1699,39 @@ Returning to the previous menu.</source>
         <translation>Teemasta &apos;%2&apos; puuttuu käyttöliittymäelementti &apos;%1&apos;.
 
 Palataan edelliseen valikkoon.</translation>
+    </message>
+</context>
+<context>
+    <name>MythUIBusyDialog</name>
+    <message>
+        <source>Please Wait ...</source>
+        <translation>Odota ...</translation>
+    </message>
+</context>
+<context>
+    <name>MythUISearchDialog</name>
+    <message>
+        <source>Cancel</source>
+        <translation>Peruuta</translation>
+    </message>
+    <message>
+        <source>0 matches</source>
+        <translation>0 osumaa</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <source>%1 matches</source>
+        <translation>%1 osumaa</translation>
+    </message>
+</context>
+<context>
+    <name>MythWebView</name>
+    <message>
+        <source>Error loading page: %1</source>
+        <translation>Virhe ladatessa sivua: %1</translation>
     </message>
 </context>
 <context>
@@ -2084,11 +2395,11 @@ kun jaksojen lukumäärän rajoitus on päällä.</translation>
     </message>
     <message>
         <source> Multithreaded decoding disabled-only one CPU will be used, please recompile with --enable-ffmpeg-pthreads to enable.</source>
-        <translation type="unfinished"></translation>
+        <translation> Monisuoritettu koodinpurku kytketty pois päältä - vain yhtä prosessoria käytetään, ole ystävällinen ja  uudelleenkoosta -enable-ffmpeg-pthreads- kanssa, jotta monisuoritus voidaan kytkeeä uudelleen päälle.</translation>
     </message>
     <message>
         <source>When unchecked the OSD will not fade away but instead will disappear abruptly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun valinta on poistettu OSD ei haihdu pois, vaan katoaa äkillisesti.</translation>
     </message>
     <message>
         <source>Uncheck this if the video studders while the OSD is fading away.</source>
@@ -2491,7 +2802,7 @@ kun jaksojen lukumäärän rajoitus on päällä.</translation>
     </message>
     <message>
         <source> + %1 automatic priority (%2hr)</source>
-        <translation type="unfinished"></translation>
+        <translation> + %1 automaattinen prioriteetti (%2hr)</translation>
     </message>
 </context>
 <context>
@@ -2618,7 +2929,7 @@ kun jaksojen lukumäärän rajoitus on päällä.</translation>
     </message>
     <message>
         <source>Pre-scaling theme images</source>
-        <translation type="obsolete">Sovitetaan teeman kuvia</translation>
+        <translation>Sovitetaan teeman kuvia</translation>
     </message>
     <message>
         <source>Audio output device</source>
@@ -2686,11 +2997,11 @@ kun jaksojen lukumäärän rajoitus on päällä.</translation>
     </message>
     <message>
         <source>Blank Frame + Scene Change</source>
-        <translation type="obsolete">Tyhjän Ruudun Ja Mainosten Alun Havaitseminen</translation>
+        <translation>Tyhjän ruudun ja mainosten alun havaitseminen</translation>
     </message>
     <message>
         <source>Scene Change Detection</source>
-        <translation type="obsolete">Mainosten Alun Havaitseminen</translation>
+        <translation>Mainosten alun havaitseminen</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -3218,7 +3529,7 @@ kun jaksojen lukumäärän rajoitus on päällä.</translation>
     </message>
     <message>
         <source>Maximum Bitrate in kilobits/second.  2200Kbps is approximately 1 Gigabyte per hour.</source>
-        <translation>Paras näytteenottotaajuus kilobittiä sekunnissa. 2200 kb/s vie tilaa noin yhden gigatavun verran tunnissa.</translation>
+        <translation type="obsolete">Paras näytteenottotaajuus kilobittiä sekunnissa. 2200 kb/s vie tilaa noin yhden gigatavun verran tunnissa.</translation>
     </message>
     <message>
         <source>Stream Type</source>
@@ -3715,7 +4026,7 @@ kun jaksojen lukumäärän rajoitus on päällä.</translation>
     </message>
     <message>
         <source>Symbol Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbolitaajuus</translation>
     </message>
     <message>
         <source>Polarity</source>
@@ -3731,11 +4042,11 @@ kun jaksojen lukumäärän rajoitus on päällä.</translation>
     </message>
     <message>
         <source>Right Circular</source>
-        <translation type="unfinished"></translation>
+        <translation>Oikeanpuoleinen pyörivä</translation>
     </message>
     <message>
         <source>Left Circular</source>
-        <translation type="unfinished"></translation>
+        <translation>Vasemmanpuoleinen pyörivä</translation>
     </message>
     <message>
         <source>Inversion</source>
@@ -3759,7 +4070,7 @@ kun jaksojen lukumäärän rajoitus on päällä.</translation>
     </message>
     <message>
         <source>Constellation</source>
-        <translation type="unfinished"></translation>
+        <translation>Konstellaatio</translation>
     </message>
     <message>
         <source>FEC</source>
@@ -3775,7 +4086,7 @@ kun jaksojen lukumäärän rajoitus on päällä.</translation>
     </message>
     <message>
         <source>Guard Interval</source>
-        <translation type="unfinished"></translation>
+        <translation>Suojaväli</translation>
     </message>
     <message>
         <source>Trans. Mode</source>
@@ -4153,7 +4464,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Find One Recordings Priority</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Pre Shutdown check-command</source>
@@ -4225,7 +4536,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Logo Detection</source>
-        <translation type="obsolete">Logon Tunnistus</translation>
+        <translation>Logon havaitseminen</translation>
     </message>
     <message>
         <source>Unable to create AudioOutput.</source>
@@ -4501,11 +4812,11 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Data Direct Lineup</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Retrieve Lineups</source>
-        <translation type="unfinished"></translation>
+        <translation>Hae kanavalinjaukset</translation>
     </message>
     <message>
         <source>While selecting a group, show a group summary instead of showing info about the first episode in that group.</source>
@@ -4685,7 +4996,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Commercial Free</source>
-        <translation type="obsolete">Mainosvapaa</translation>
+        <translation>Mainosvapaa</translation>
     </message>
     <message>
         <source>Startup command</source>
@@ -6129,15 +6440,15 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Low Priority Code Rate (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Matalaprioriteettinen kooditaajuus (Oletus: Auto)</translation>
     </message>
     <message>
         <source>High Priority Code Rate (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Korkeaprioriteettinen kooditaajuus (Oletus: Auto)</translation>
     </message>
     <message>
         <source>Guard Interval (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Suojaväli (Oletus: Auto)</translation>
     </message>
     <message>
         <source>Transmission Mode (Default: Auto)</source>
@@ -6229,7 +6540,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Run Transcode Jobs before Auto-Commercial Flagging</source>
-        <translation>Ajetaan jälkikäsittelytyöt ennen automaattista mainosten tunnistamista</translation>
+        <translation>Ajetaan jälkikäsittelytyöt ennen Automaattista mainosten tunnistamista</translation>
     </message>
     <message>
         <source>Start Auto-Commercial Flagging jobs when the recording starts</source>
@@ -7436,11 +7747,11 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>All Available Methods</source>
-        <translation type="obsolete">Kaikki mahdolliset metodit</translation>
+        <translation>Kaikki mahdolliset metodit</translation>
     </message>
     <message>
         <source>Blank Frame Detection</source>
-        <translation type="obsolete">Tyhjän ruudun havaitseminen</translation>
+        <translation>Tyhjän ruudun havaitseminen</translation>
     </message>
     <message>
         <source>Maximum commercial skip (in seconds)</source>
@@ -8154,7 +8465,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>Use Global Setting</source>
-        <translation type="obsolete">Käytä yleisiä asetuksia</translation>
+        <translation>Käytä yleisiä asetuksia</translation>
     </message>
     <message>
         <source>Channel Options - Filters</source>
@@ -8262,7 +8573,7 @@ Check if the video exists</source>
     </message>
     <message>
         <source>Mythtv has been idle for %1 minutes and will exit in %2 seconds. Are you still watching?</source>
-        <translation>MythTV on ollut toimeton %1 minuuttia ja sammuu %2 sekunnin kuluttua. Haluatko jatkaa katsomista?</translation>
+        <translation type="obsolete">MythTV on ollut toimeton %1 minuuttia ja sammuu %2 sekunnin kuluttua. Haluatko jatkaa katsomista?</translation>
     </message>
     <message>
         <source>On known multiplex...</source>
@@ -8857,7 +9168,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>TXT CAP</source>
-        <translation type="unfinished"></translation>
+        <translation>TXT CAP</translation>
     </message>
     <message>
         <source>New Input</source>
@@ -8865,7 +9176,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Anthology</source>
-        <translation type="unfinished"></translation>
+        <translation>Antologia</translation>
     </message>
     <message>
         <source>Baseball</source>
@@ -8901,39 +9212,39 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Offset (in minutes) to apply to the program guide data during import.  This can be used when the listings for a particular channel are in a different time zone.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kompensaation (minuuteissa) lisäys ohjelmaoppaaseen latauksen aikana.  Tätä voidaan käyttää kun ohjelmatiedot tietylle kanavalle ovat eri aikavyöhykkeellä.</translation>
     </message>
     <message>
         <source>(Works for DataDirect listings only.)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Toimii vain DataDirect ohjelmatiedoissa.)</translation>
     </message>
     <message>
         <source>Number of priority points to be added to any recording on this channel during scheduling.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämän kanavan prioriteettipisteiden lisäämismäärä mihinkä tahansa nauhoitukseen aikataulutuksen ohessa.</translation>
     </message>
     <message>
         <source>Use a positive number as the priority if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä positiivista lukua prioritetin määritykseen, jos haluat asettaa kanavan etusijalle, ja negatiivista jos haluat asettaa sen taka-alalle.</translation>
     </message>
     <message>
         <source>Image file to use as the icon for this channel on various MythTV displays.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvatiedosto jota käyttää kuvakkeena tälle kanavalle MythTV:n näytöissä.</translation>
     </message>
     <message>
         <source>ID used by listing services to get an exact correspondance between a channel in your line-up and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tunnistuskoodi, jota listauspalvelut käyttävät löytääkseen tarkan vastaavuuden tietylle kanavalle järjestelmäsi ja tietokantansa välillä. Tavallisesti tämä on automaattisesti asetettu kun &apos;mythfilldatabase&apos; ajetaan.</translation>
     </message>
     <message>
         <source>Changes the method of commercial detection used for recordings on this channel or skips detection by marking the channel as Commercial Free.</source>
-        <translation type="unfinished"></translation>
+        <translation>Muuttaa tämän kanavan nauhoituksissa käytettävää mainosten tunnistustapaa tai ohittaa tunnistuksen merkitsemällä kanava mainosvapaaksi.</translation>
     </message>
     <message>
         <source>Specify either the exact frequency in kHz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Määritä joko tarkka taajuus (kHz) tai voimassa oleva kanava &apos;TV formaatillesi&apos;.</translation>
     </message>
     <message>
         <source>Value to be added to your desired frequency in kHz, for &apos;fine tuning&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Arvo jonka haluat lisätä taajuuteesi (kHz) &apos;hienosäätöä&apos; varten.</translation>
     </message>
     <message>
         <source>Seen</source>
@@ -8957,7 +9268,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Rotor Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Kääntömoottorin edistyminen</translation>
     </message>
     <message>
         <source>[Reserved]</source>
@@ -8977,19 +9288,19 @@ name can not be blank.</source>
     </message>
     <message>
         <source>ATSC 8-VSB</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC 8-VSB</translation>
     </message>
     <message>
         <source>ATSC 16-VSB</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC 16-VSB</translation>
     </message>
     <message>
         <source>Intelligent Programmes</source>
-        <translation type="unfinished"></translation>
+        <translation>Älyohjelmat</translation>
     </message>
     <message>
         <source>Equestrian</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Pre-School Children&apos;s Programmes</source>
@@ -9013,7 +9324,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Experimental Film/Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Koekäyttöinen elokuva/video</translation>
     </message>
     <message>
         <source>Page Not Available</source>
@@ -9022,15 +9333,17 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Automatically set new recording rules to use this group if the title matches this regular expression.  For example, &quot;(News|CNN)&quot; would match any title in which &quot;News&quot; or &quot;CNN&quot; appears.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseta automaattisesti uusia nauhoitussääntöjä joita tämä joukko käyttää, jos otsikot vastaavat tätä määritelmää.  Esimerkiksi, &quot;(News|CNN)&quot; vastaisi jokaista otsikkoa jossa esiintyy &quot;News&quot; tai &quot;CNN&quot;.</translation>
     </message>
     <message>
         <source>Initial playback speed with adjusted audio.  Use 100 for normal speed, 50 for half speed and 200 for double speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alkutoistonopeus muokatun äänen kanssa.  Käytä 100 normaalinopeudelle, 50 puolinopeudelle ja 200 tuplanopeudelle.</translation>
     </message>
     <message>
         <source>The theme you are using does not contain the %1 element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Teema jota käytät ei sisällä %1elementtiä. Ole hyvä ja ota yhteys teeman tekijään ja kysy jos he voisivat mahdollisesti päivittää sen.
+
+Seuraava kuva on tyhjä. Poistu siitä ja palaa valikkoon.</translation>
     </message>
     <message>
         <source>c</source>
@@ -9083,63 +9396,63 @@ name can not be blank.</source>
     </message>
     <message>
         <source>Dual</source>
-        <translation type="unfinished"></translation>
+        <translation>Dual</translation>
     </message>
     <message>
         <source>Chooses the language(s) to record when two languages are broadcast. Only Layer II supports the recording of two languages (Dual).Requires ivtv 0.4.0 or later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse kieli(et) jolla nauhoittaa kun kahta kieltä lähetetään. Vain Layer II tukee kahden kielen nauhoitusta (Dual). Vaatii ivtv 0.4.0 tai myöhemmän.</translation>
     </message>
     <message>
         <source>If set, the bitrate specified will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, kyseistä bittinopeutta käytetään resoluutiolle 640x480.  Jos muita resoluutioita käytetään, bittinopeus säädetään vastaavaan skaalaan.</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, MPEG4 enkooderi käyttää lomitettua DCT enkoodausta. Voit halutessasi käyttää tätä enkoodatessasi lomittaista videota, mutta tämä on kokeellinen ja voi aiheuttaa vahinkoa videolle.</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation. You may want this when encoding interlaced video, however, this is experimental and may cause damaged video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, MPEG4 enkooderi käyttää lomitettua liikken arviointia. Voit halutessasi käyttää tätä enkoodatessasi lomittaista videota, mutta tämä on kokeellinen ja voi aiheuttaa vahinkoa videolle.</translation>
     </message>
     <message>
         <source>Threads to use for software encoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohjelmiston enkoodaukseen käytettävä säiemäärä.</translation>
     </message>
     <message>
         <source>Set to a value less than or equal to the number of processors on the backend that will be doing the encoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseta arvo joka on vähemmän tai yhtä paljon kuin käytettävien prosessorien lukumäärämäärä enkoodausta tehtäessä.</translation>
     </message>
     <message>
         <source>Automatically transcode when a recording is made using this profile and the recording&apos;s schedule is configured to allow transcoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automaattisesti trnaskoodaa kun nauhoitusta käytetään tällä profiililla ja nauhoituksen ajastus on asetettu sallimaan transkoodaus.</translation>
     </message>
     <message>
         <source>Only reencode where absolutely needed (normally only around cutpoints).  Otherwise keep audio and video formats identical to the source.  This should result in the highest quality, but won&apos;t save as much space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uudelleenenkoodaa vain kun välttämätön pakko (tavallisesti vain katkaisupisteiden ympärillä)  Muuten pidä ääni- ja kuvaformaatit identtisinä lähteen kanssa.  Tämän pitäisi johtaa korkeimpaan kuvalaatuun, mutta ei säästä yhtä paljon kovalevytilaa.</translation>
     </message>
     <message>
         <source>This option allows you to filter out unwanted streams. &apos;Normal&apos; will record all relevant streams including interactive television data. &apos;TV Only&apos; will record only audio, video and subtitle streams. </source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä valinta mahdollistaa ei-haluttujen suoratoistojen filtteröinnin. &apos;Normaali&apos; nauhoittaa kaikki oleelliset suoratoistot, mukaanlukien interaktiivisen televisiotiedon. &apos;Vain TV&apos; nauhoittaa vain ääni-, video- ja tekstisuoratoistot.</translation>
     </message>
     <message>
         <source>Filters used when transcoding with this profile. This value must be blank to perform lossless transcoding.  Format: [[&lt;filter&gt;=&lt;options&gt;,]...]</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytetyt filtterit tämän profiilin transkoodauksessa. Tämä arvo pitää jättää tyhjäksi hävikittömän transkoodauksen tekemiseksi.  Format: [[&lt;filter&gt;=&lt;options&gt;,]...]</translation>
     </message>
     <message>
         <source>If the width is set to &apos;Auto&apos;, the width will be calculated based on the height and the recording&apos;s physical aspect ratio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos leveys on asetettu &apos;Auto&apos; -kohtaan, leveys lasketaan korkeuden ja nauhoituksen fyysisen kuvasuhteen avulla.</translation>
     </message>
     <message>
         <source>Width to use for encoding. Note: PVR-x50 cards may produce ghosting if this is not set to 720 or 768 for NTSC and PAL, respectively.</source>
-        <translation type="unfinished"></translation>
+        <translation>Leveys enkoodauksen käyttöön. Huom! PVR-x50 kortit voivat aiheuttaa varjokuvan, jos tätä ei ole asetettu NTCS:llä 720 ja PAL:lla 768.</translation>
     </message>
     <message>
         <source>If the height is set to &apos;Auto&apos;, the height will be calculated based on the width and the recording&apos;s physical aspect ratio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos korkeus on asetettu &apos;Auto&apos; -kohtaan, korkeus lasketaan leveyden ja nauhoituksen fyysisen kuvasuhteen avulla.</translation>
     </message>
     <message>
         <source>Height to use for encoding. Note: PVR-x50 cards may produce ghosting if this is not set to 480 or 576 for NTSC and PAL, respectively.</source>
-        <translation type="unfinished"></translation>
+        <translation>Korkeus enkoodauksen käyttöön. Huom! PVR-x50 kortit voivat aiheuttaa varjokuvan, jos tätä ei ole asetettu NTCS:llä 480 ja PAL:lla 576.</translation>
     </message>
     <message>
         <source>New Zealand</source>
@@ -9147,7 +9460,7 @@ name can not be blank.</source>
     </message>
     <message>
         <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä valinta mahdollistaa rikkinäisten ajureiden etsinnän hidastuksen, kuten DVB -ajurit Leadtek LR6650 DVB -korteille.</translation>
     </message>
     <message>
         <source>Frequency table to use.</source>
@@ -9155,23 +9468,23 @@ name can not be blank.</source>
     </message>
     <message>
         <source>The option of scanning only &quot;High&quot; frequency channels is useful because most digital channels are on the higher frequencies.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valinta etsiä vain &quot;Korkea&quot; taajuisilta kanavilta on hyödyllinen, koska useimmat kanavat ovat korkeilla taajuuksilla.</translation>
     </message>
     <message>
         <source>Modulation, 8-VSB, QAM-256, etc.</source>
-        <translation type="unfinished"></translation>
+        <translation>Modulaation, 8-VSB, QAM-256, etc.</translation>
     </message>
     <message>
         <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Useimmat kaapelijärjestelmät Yhdysvalloissa käyttävät QAM-256 tai QAM-64, mutta jotkin sekoitetut järjestelmät voivat käyttää 8-VSB:tä over-the-air -kanaville.</translation>
     </message>
     <message>
         <source>ATSC Channel Separator</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC kanavaerotin</translation>
     </message>
     <message>
         <source>What to use to separate ATSC major and minor channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mitä käyttää suurten ja pienten ATSC -kanavien erottamiseen.</translation>
     </message>
     <message>
         <source>How to treat existing channels.</source>
@@ -9184,20 +9497,22 @@ name can not be blank.</source>
     <message>
         <source>Frequency (Option has no default).
 The frequency for this channel in %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Taajuus (Valinnalla ei ole oletusarvoa)
+Taajuus tälle kanavalle %1:ssa.</translation>
     </message>
     <message>
         <source>Symbol Rate (symbols/second).
 Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
-        <translation type="unfinished"></translation>
+        <translation>Symboolitaajuus (symbolia/sekunnissa)
+Useimmat dvb-s transponderit lähettävät 27.5 miljoonaa symbolia sekunnissa.</translation>
     </message>
     <message>
         <source>Timeout Scanning %1 -- no tables</source>
-        <translation type="unfinished"></translation>
+        <translation>Aikakatkaisu etsittäessä %1 - ei taulukkoja</translation>
     </message>
     <message>
         <source>Timeout Scanning %1 -- no signal</source>
-        <translation type="unfinished"></translation>
+        <translation>Aikakatkaisu etsittäessä %1 - ei signaalia</translation>
     </message>
     <message>
         <source>Select Playback Group</source>
@@ -9205,19 +9520,19 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>This section lists each transport that MythTV currently knows about. The display fields are video source, modulation, frequency, and when relevant symbol rate, network id, and transport id.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä osio sisältää kaikki lähetysvirrat, jotka MythTV tuntee tällä hetkellä. Näytettävät kentät ovat videolähde, modulaatio, taajuus, ja kun aiheellista, symbolitaajuus, verkkotunnus ja lähetystunnus.</translation>
     </message>
     <message>
         <source>Sorry, the Transport Editor can only be used to edit transports which are connected to a card input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pahoittelemme, Lähetysvirtaeditoria voi käyttää vain muokkaamaan lähetyksiä, jotka on yhdistetty korttiin.</translation>
     </message>
     <message>
         <source>Failed to probe a capture card connected to this transport&apos;s video source. Please make sure the backend is not running.</source>
-        <translation type="unfinished"></translation>
+        <translation>Haku yhdistettyjen TV-korttien löytämiseksi tämän laitteen vidolähteestä epäonnistui. Ole hyvä ja tarkista, ettei ohjelmiston taustaosa ole päällä.</translation>
     </message>
     <message>
         <source>The Video Sources to which this Transport is connected are incompatible, please create seperate video sources for these cards. </source>
-        <translation type="unfinished"></translation>
+        <translation>Vidoelähteet, joihin tämä laite on yhdistetty eivät ole yhteensopivia, ole hyvä ja luo erilliset  videolähteet näille korteille. </translation>
     </message>
     <message>
         <source>Digital TV Standard</source>
@@ -9225,7 +9540,7 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     </message>
     <message>
         <source>Guiding standard to use for making sense of the data streams after they have been demodulated, error corrected and demultiplexed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohjaava standardi, jota käytetään tietovirtojen selvittämiseen, sen jälkeen kun tietovirrat on demoduloitu, virhekorjattu ja demultiplexoitu.</translation>
     </message>
     <message>
         <source>OpenCable</source>
@@ -9238,7 +9553,8 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     <message>
         <source>Frequency (Option has no default).
 The frequency for this channel in</source>
-        <translation type="unfinished"></translation>
+        <translation>Taajuus (Tällä valinnalla ei ole oletusarvoa)
+Taajuus tälle kanavalle %1:ssa</translation>
     </message>
     <message>
         <source>Modulation, aka Constellation</source>
@@ -9246,123 +9562,118 @@ The frequency for this channel in</source>
     </message>
     <message>
         <source>QAM Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Mythtv has was set to sleep for %1 minutes and will exit in %2 seconds.
-Do you wish to continue watching?</source>
-        <translation type="unfinished"></translation>
+        <translation>QAM Auto</translation>
     </message>
     <message>
         <source>Mac hardware acceleration</source>
-        <translation type="unfinished"></translation>
+        <translation>Laitteiston nopeutus Macintoshilla</translation>
     </message>
     <message>
         <source>PVR-350 decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>PVR-350 koodinpurkaja</translation>
     </message>
     <message>
         <source>Decoder to use to play back MPEG2 video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Koodinpurkaja, jolal toistetaan MPEG2 videoita.</translation>
     </message>
     <message>
         <source>Standard will use ffmpeg library.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardi käyttää ffmpeg -kirjastoa.</translation>
     </message>
     <message>
         <source>libmpeg2 will use mpeg2 library; this is faster on some 32 bit AMD processors.</source>
-        <translation type="unfinished"></translation>
+        <translation>libmpeg2 käyttää mpeg2 kirjastoa; tämä on nopeampi joillakin 32 bittisillä AMD -prosessoreilla.</translation>
     </message>
     <message>
         <source>Note: Closed caption decoding will not work with libmpeg2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Huom! Valinnanvaraisen tekstityksen koodinpurku ei toimi libmpeg2:n kanssa.</translation>
     </message>
     <message>
         <source>Standard XvMC will use XvMC API 1.0 to play back video; this is fast, but does not work well with HDTV sized frames.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardi XvMC käyttää XvMC API 1.0 toistaakseen videota; tämä on nopea, mutta se ei toimi hyvin HDTV -kokoisilla kuvakoilla.</translation>
     </message>
     <message>
         <source>VIA XvMC will use the VIA VLD XvMC extension.</source>
-        <translation type="unfinished"></translation>
+        <translation>VIA XvMC toimii VIA VLD XvMC laajennuksen kautta.</translation>
     </message>
     <message>
         <source>Mac hardware will try to use the graphics processor - this may hang or crash your Mac!</source>
-        <translation type="unfinished"></translation>
+        <translation>Mac-laitteisto yrittää käyttää grafiikkaprosessoria - tämä voi hidastaa tai kaataa Macisi!</translation>
     </message>
     <message>
         <source>MythTV can use the PVR-350&apos;s TV out and MPEG decoder for high quality playback.  This requires that the ivtv-fb kernel module is also loaded and configured properly.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV voi käyttää PVR-530:n TV-ulostuloa ja MPEG purkajaa korkeatasoiseen toistoon.  Tämä vaatii, että ivtv-fb kernel -moduli on myös ladattu ja konfiguroitu oikein.</translation>
     </message>
     <message>
         <source>Kernel</source>
-        <translation>Ydin</translation>
+        <translation>Kernel</translation>
     </message>
     <message>
         <source>Greedy HighMotion</source>
-        <translation type="unfinished"></translation>
+        <translation>Greedy HighMotion</translation>
     </message>
     <message>
         <source>Greedy HighMotion (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation>Greedy HighMotion (2x)</translation>
     </message>
     <message>
         <source>Yadif</source>
-        <translation type="unfinished"></translation>
+        <translation>Yadif</translation>
     </message>
     <message>
         <source>Yadif (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation>Yadif (2x)</translation>
     </message>
     <message>
         <source>Bob (2x)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bob (2x)</translation>
     </message>
     <message>
         <source>Linear blend (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Linear blend (HW)</translation>
     </message>
     <message>
         <source>Kernel (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kernel (HW)</translation>
     </message>
     <message>
         <source>Bob (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bob (2x, HW)</translation>
     </message>
     <message>
         <source>One field (HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>One field (HW)</translation>
     </message>
     <message>
         <source>One Field (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>One Field (2x, HW)</translation>
     </message>
     <message>
         <source>Kernel (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kernel (2x, HW)</translation>
     </message>
     <message>
         <source>Linear blend (2x, HW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Linear blend (2x, HW)</translation>
     </message>
     <message>
         <source>Interlaced (2x, Hw)</source>
-        <translation type="unfinished"></translation>
+        <translation>Interlaced (2x, Hw)</translation>
     </message>
     <message>
         <source>CPU++</source>
         <comment>Sample: No hardware assist</comment>
-        <translation type="unfinished"></translation>
+        <translation>CPU++</translation>
     </message>
     <message>
         <source>CPU+</source>
         <comment>Sample: Hardware assist HD only</comment>
-        <translation type="unfinished"></translation>
+        <translation>CPU++</translation>
     </message>
     <message>
         <source>CPU--</source>
         <comment>Sample: Hardware assist all</comment>
-        <translation type="unfinished"></translation>
+        <translation>CPU--</translation>
     </message>
     <message>
         <source>High Quality</source>
@@ -9381,447 +9692,447 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Video rendering method</source>
-        <translation type="unfinished"></translation>
+        <translation>Videon renderointitapa</translation>
     </message>
     <message>
         <source>Render video offscreen. Used internally.</source>
-        <translation type="unfinished"></translation>
+        <translation>Renderoi videon kuvan ulkoupolella. Käytetään sisäisesti.</translation>
     </message>
     <message>
         <source>Use X11 pixel copy to render video. This is not recommended if any other option is available. The video will not be scaled to fit the screen. This will work with all X11 servers, local and remote.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä X11 -pikselinkopiointia videon renderointiin. Tätä suositellaan vain, jos mitään muuta valintaa ole saatavilla. Videota ei soviteta ruudulle. Tämä toimii kaikkien X11 -palvelimien kanssa, niin paikallisten, kuin etäisten.</translation>
     </message>
     <message>
         <source>Use X11 shared memory pixel transfer to render video. This is only recommended over the X11 pixel copy renderer. The video will not be scaled to fit the screen. This works with most local X11 servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä X11 jaetun muistin pikselinsiirtoa renderoidaksesi videota. Tätä suositellaan vain X11 -pikselinkopioinnin kanssa. Videota ei soviteta ruudulle. Tämä toimii useimpien paikallisten X11 -palvelimien kanssa.</translation>
     </message>
     <message>
         <source>This is the standard video renderer for X11 systems. It uses XVideo hardware assist for scaling, color conversion. If the hardware offers picture controls the renderer supports them.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä on standardi videorenderoija X11 -järjestelmille. Se käyttää XVideo -laitteistoa skaalaukseen ja värienmuokkaukseen. Jos laitteisto tarjoaa kuvakontrolleja, renderoija tukee niitä.</translation>
     </message>
     <message>
         <source>This is the standard video renderer for XvMC decoders. It uses XVideo hardware assist for scaling, color conversion and when available offers XVideo picture controls.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä on staandardi videorenderoija XvMC -purkajille. Se käyttää XVideo -laitteistoa skaalaukseen, värienmuokkaukseen ja, kun mahdollista, tarjoaa XVideo -kuvakontolleja.</translation>
     </message>
     <message>
         <source>This video renderer for XvMC on nVidia cards uses XVideo for color conversion and OpenGL for scaling. The main benefit of this renderer is that it allows OpenGL OSD rendering, which frees two XvMC buffers for decoding. It requires a reasonably fast nVidia card.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä nVidia -korttien videorenderoija XvMC -järjestelmälle käyttää XVideota värienmuokkaukseen ja OpenGL:ää skaalaukseen. Tämän renderoijan suurin etu on OpenGL OSD -renderointi, joka vapauttaa kaksi XvMC -puskuria koodinpurusta. Se vaatii suhteellisen nopean nVidia -kortin.</translation>
     </message>
     <message>
         <source>This video renderer uses DirectFB for scaling and color conversion. It is not as feature rich as the standard video renderer, but can run on Linux hardware without an X11 server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä videorenderoija käyttää DirectFB:tä skaalaukseen ja värienmuokkaukseen. Sillä ei ole yhtä laajat ominaisuudet kuin standardi videorenderoijalla, mutta se voi käyttää Linux -ohjelmistoa ilman X11 -palvelinta.</translation>
     </message>
     <message>
         <source>Windows video renderer based on overlays. Not compatible with Vista Aero Glass.</source>
-        <translation type="unfinished"></translation>
+        <translation>Windows videorenderoija, joka perustuu peittotasoihin. Yhteensopimaton Vista Aero Glassin kanssa.</translation>
     </message>
     <message>
         <source>Windows video renderer based on Direct3D. Requires video card compatible with Direct3D 9. This is the preferred renderer for current Windows systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Windows videorenderoija., joka perustuu Direct3D:n. Vaatii grafiikkakortin joka on yhteensopiva Direct3D 9:n kanssa. Tämä on suositeltu renderoija nykyisillä Windows -järjestelmillä.</translation>
     </message>
     <message>
         <source>This is the standard video render for Macintosh OS X systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä on standardi videomallintaja Macintosh OS X -järjestelmillä.</translation>
     </message>
     <message>
         <source>This is the only video renderer for the MacAccel decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä on ainoa videorenderoija MacAccel koodinpurkajalle.</translation>
     </message>
     <message>
         <source>This is only video renderer for the PVR-350 decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä on ainoa videorenderoija PVR-350 koodinpurkajalle.</translation>
     </message>
     <message>
         <source>This video renderer uses OpenGL for scaling and color conversion and can offer limited picture contols. This requires a faster GPU than XVideo. Also, when enabled, picture controls consume additional resources.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä videorenderoija käyttää OpenGL:ää skaalaukseen ja värienmuokkaukseen ja voi tarjota rajoitettuja kuvakontrolleja. Tämä vaatii XVideota nopeamman GPU:n. Lisäksi, kun tämä valinta on mahdollistettu, kuvakontrollti käyttävät ylimääräisiä resursseja.</translation>
     </message>
     <message>
         <source>This deinterlacer requires the display to be capable of twice the frame rate as the source video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä lomituksen poisto vaatii näytön, joka pystyy tuottamaan kaksi kertaa lähdevideota nopeamman kuvanopeuden.</translation>
     </message>
     <message>
         <source>Perform no deinterlacing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Älä suorita lomituksen poistoa.</translation>
     </message>
     <message>
         <source>Use this with an interlaced display whose resolution exactly matches the video size. This is incompatible with MythTV zoom modes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä tätä lomitetun näyttölaitteen kanssa, jonka resoluutio täsmää täydellisesti videon kokoa. Tämä on yhteensopimaton MythTV:n zoomaustilojen kanssa.</translation>
     </message>
     <message>
         <source>Shows only one of the two fields in the frame. This looks good when displaying a high motion 1080i video on a 720p display.</source>
-        <translation type="unfinished"></translation>
+        <translation>Näyttää vain yhden kahdesta alueesta kuvassa. Tämä näyttää hyvältä, kun nopealiikkeistä 1080i videokuvaa näytetään 720p näytöllä.</translation>
     </message>
     <message>
         <source>Shows one field of the frame followed by the other field displaced vertically.</source>
-        <translation type="unfinished"></translation>
+        <translation>Näyttää yhden alueen kuvasta, toisen seuratessa pystysuorasti siirtyneenä.</translation>
     </message>
     <message>
         <source>Blends the odd and even fields linearly into one frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sulauttaa parilliset ja parittomat alueet lineaarisesti yhdeksi kuvaksi.</translation>
     </message>
     <message>
         <source>This filter disables deinterlacing when the two fields are similar, and performs linear deinterlacing otherwise.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä filtteri sulkee lomituksenpoiston kun kaksi aluetta ovat samanlaisia, mutta muuten suorittaa lineaarisen lomituksenpoiston.</translation>
     </message>
     <message>
         <source>(Hardware Accelerated)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Laitteistonopeutettu)</translation>
     </message>
     <message>
         <source>With workaround for broken interlaced modelines.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rikkinäisten lomituslinjojen ohittamisen kanssa.</translation>
     </message>
     <message>
         <source>This deinterlacer uses several fields to reduce motion blur. It has increased CPU requirements.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä lomituksenpoistaja käyttää useita alueita vähentääkseen liikkesumeutta. Sillä on korotetut CPU -vaatimukset. </translation>
     </message>
     <message>
         <source>&apos;%1&apos; has not been documented yet.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; ei ole vielä dokumentoitu.</translation>
     </message>
     <message>
         <source>OSD rendering method</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD renderointimetodi</translation>
     </message>
     <message>
         <source>Render the OSD using the XVideo chromakey feature.This renderer does not alpha blend. But it is the fastest OSD renderer; and is particularly efficient compared to the ia44blend OSD renderer for XvMC.</source>
-        <translation type="unfinished"></translation>
+        <translation>Renderoi OSD käyttämällä XVideon kromakey ominaisuutta. Tämä renderointi ei tue alpha blendiä. Se on silti nopein OSD -renderoija ja on erittäin tehokas verrattuna XvMC:n ia44blend OSD -renderoijaan.</translation>
     </message>
     <message>
         <source>Note: nVidia hardware after the 5xxx series does not have XVideo chromakey support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Huom! nVidia laitteistot 5xxx -sarjan jälkeen eivät sisällä tukea XVideon kromakeyhyn.</translation>
     </message>
     <message>
         <source>Software OSD rendering uses your CPU to alpha blend the OSD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohjelmiston OSD -renderöinti käyttää CPU:ta OSD:n alpha blendaukseen.</translation>
     </message>
     <message>
         <source>Uses hardware support for 16 color alpha-blend surfaces for rendering the OSD. Because of the limited color range, MythTV renders the OSD in 16 level grayscale.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käyttää laitteistotukea 16 värin alpha-blendattuihin pintoihin OSD:tä renderoidessa. Rajoitetun väriskaalan takia MythTV renderoi OSD:n 16 tason harmaasävytyksellä.</translation>
     </message>
     <message>
         <source>Note: Not recommended for nVidia or Intel chipsets. This removes two of the limited XvMC buffers from decoding duty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Huom! Ei suositella nVidian tai Intelin piirilevyillä. Tämä poistaa kaksi puskuria pois koodinpurkutyöstä rajoitetusta XvMC -puskureiden määrästä.</translation>
     </message>
     <message>
         <source>Renders the OSD using the PVR-350 chromakey feature.</source>
-        <translation type="unfinished"></translation>
+        <translation>Renderoi OSD:n käyttämällä PVR-350 kromakey ominaisuutta.</translation>
     </message>
     <message>
         <source>Uses OpenGL to alpha blend the OSD onto the video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käyttää OpenGL:a OSD:n alpha blendaamiseen videolle.</translation>
     </message>
     <message>
         <source>Max recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimimäärä tallenteita</translation>
     </message>
     <message>
         <source>Maximum number of simultaneous recordings this device should make. Some digital transmitters transmit multiple programs on a multiplex, if this is set to a value greater than one MythTV can sometimes take advantage of this.</source>
-        <translation type="unfinished"></translation>
+        <translation>Suuin määrä yhtäaikaisia tallenteita, joita tämän laitteen tulis itehdä. Jotkin digitaaliset lähettimet lähettävät useita ohjelmia limitetyssä signaalissa, jos tämä arvo asetetaan suuremmaksi kuin yksi, voi MythTV käyttää sitä joskus hyödykseen.</translation>
     </message>
     <message>
         <source>If this is enabled the data in this source will be updated with listing data provided by the channels themselves &apos;over-the-air&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos tämä valinta on mahdollistettu, tästä kohteesta tulevat tiedot päivititetään tiedolla, jota kanavat itse toimittavat lähetyksen ohessa.</translation>
     </message>
     <message>
         <source>This will usually only work with ATSC or DVB channels,</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä toimii yleensä vain ATSC tai DVB-kanavilla,</translation>
     </message>
     <message>
         <source>and generally provides data only for the next few days.</source>
-        <translation type="unfinished"></translation>
+        <translation>ja yleensä antaa tietoa vain muutamaksi päiväksi.</translation>
     </message>
     <message>
         <source>Maximum time MythTV waits for any signal when scanning for channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimiaika, jonka MythTV odottaa signaalia kun haetaan kanavia.</translation>
     </message>
     <message>
         <source>Maximum time MythTV waits for a channel lock when scanning for channels. Or, for issuing a warning in LiveTV mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimiaika, jonka MythTV odotta kanavalukitusta kun haetaan kanavia. Tai antamalla varoituksen LiveTV -tilassa.</translation>
     </message>
     <message>
         <source>If other than None, override the audio sampling rate in the recording profile when this card is used.  Use this if your capture card does not support all of the standard rates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos muuta kuin tyhjä, ohita äänen samplaustaajuus nauhoitusprofiilista kun tämä kortti on käytetty.  Käytä tätä, jos TV-korttisi ei tue kaikkia standarditaajuuksia.</translation>
     </message>
     <message>
         <source>Enable this option for budget BT878 based DVB-T cards such as the AverTV DVB-T which require the audio volume to be left alone.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mahdollista tämä valinta halvoilla BT878 -pohjaisilla DVB-T -korteilla, kuten AverTV DVB-T, joka vaatii että äänenvoimakkuus jätetään rauhaan.</translation>
     </message>
     <message>
         <source>Make the dvb-recording drop packets from the card until a sequence start header is seen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anna dvb-nauhoituksen tiputtaa paketteja kortista, kunnes sekvenssin aloitusotsikko tulee näkyviin.</translation>
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use, leaving it free for other programs at other times.</source>
-        <translation type="unfinished"></translation>
+        <translation>Laita dvb-nauhoitin avaamaan kortti vain silloin kun kortti on käytössä, jotta muut ohjelmat voivat käyttää sitä muina aikoina.</translation>
     </message>
     <message>
         <source>Use DVB Card for active EIT scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä DVB-korttia aktiiviseen EIT-hakuun</translation>
     </message>
     <message>
         <source>This option activates the active scan for program data (EIT). With this option enabled the DVB card is constantly in-use.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä valinta käynnistää ohjelmatietojen aktiivisen etsinnän (EIT). Tämä valinnan ollessa päällä DVB-kortti on jatkuvassa käytössä.</translation>
     </message>
     <message>
         <source>Some Linux DVB drivers, in particular for the Hauppauge Nova-T, require that we slow down the tuning process.</source>
-        <translation type="unfinished"></translation>
+        <translation>jotkin Linuxin DVB-ajureista, etenkin Hauppauge Nova-T, vaatii, että hidastamme haun nopeutta.</translation>
     </message>
     <message>
         <source>GUID</source>
-        <translation type="unfinished"></translation>
+        <translation>GUID</translation>
     </message>
     <message>
         <source>Choose the model that most closely resembles your set top box. Depending on firmware revision SA4200HD may work better for a SA3250HD box.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse malli, joka eniten muistuttaa sovittimesi mallia. Riippuen firmwaresta, revisio SA4200HD saattaa toimia paremmin SA3250HD sovittimella.</translation>
     </message>
     <message>
         <source>DBOX2 streaming port on your DBOX2.</source>
-        <translation type="unfinished"></translation>
+        <translation>DBOX2 lähetysportti DBOX2:llasi.</translation>
     </message>
     <message>
         <source>DBOX2 http port on your DBOX2.</source>
-        <translation type="unfinished"></translation>
+        <translation>DBOX2 http-portti DBOX2:llasi.</translation>
     </message>
     <message>
         <source>DBOX2 Host IP is the remote device.</source>
-        <translation type="unfinished"></translation>
+        <translation>DBOX2-isäntäkoneen IP etälaitteessa.</translation>
     </message>
     <message>
         <source>IP address or Device ID from the bottom of the HDHomeRun.  You may use &apos;FFFFFFFF&apos; if there is only one unit on your your network.</source>
-        <translation type="unfinished"></translation>
+        <translation>IP-osoite tai laitekoodi HDHomeRunin pohjasta.  Voit käyttää &apos;FFFFFFFF&apos; jos verkossasi on vain yksi laite.</translation>
     </message>
     <message>
         <source>M3U URL</source>
-        <translation type="unfinished"></translation>
+        <translation>M3U URL</translation>
     </message>
     <message>
         <source>URL of M3U containing IPTV channel URLs.</source>
-        <translation type="unfinished"></translation>
+        <translation>URL tai M3U, joka sisältää IPTV kanavien URL:ä.</translation>
     </message>
     <message>
         <source>HDHomeRun DTV tuner box</source>
-        <translation type="unfinished"></translation>
+        <translation>HDHomeRun DTV vastaanottolaatikko</translation>
     </message>
     <message>
         <source>Network Recorder</source>
-        <translation type="unfinished"></translation>
+        <translation>Verkko nauhoitin</translation>
     </message>
     <message>
         <source>This name is displayed on screen when live TV begins and when changing the selected input or card. If you use this, make sure the information is unique for each input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä nimi näytetään kuvassa kun suora TV-lähetys alkaa ja kun vaihdat valitun sisääntulon tai kortin. Jos käytät tätä, varmista, että tieto on yksilöllinen jokaisella sisääntulolla.</translation>
     </message>
     <message>
         <source>Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Sisääntulojoukko</translation>
     </message>
     <message>
         <source>Leave as &apos;Generic&apos; unless this input is shared with another device. Only one of the inputs in an input group will be allowed to record at any given time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jätä &apos;Yleiseksi&apos;, paitsi jos tämä sisääntulo on jaettu toisen laitteen kanssa. Vain yhden sisääntulon sallitaan nauhoittaa sisääntulojoukossa kerrallaan.</translation>
     </message>
     <message>
         <source>Unencrypted channels only</source>
-        <translation type="unfinished"></translation>
+        <translation>Vain salaamattomat kanavat</translation>
     </message>
     <message>
         <source>If set, only unencrypted channels will be tuned to by MythTV or not be ignored by the MythTV channel scanner.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, MythTV virittyy vain salaamattomiin kanaviin ja MythTV:n kanavaetsin lisää myös nämä kanavat kanavalistan.</translation>
     </message>
     <message>
         <source>If set, audio only channels will not be ignored by the MythTV channel scanner.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, MythTV:n kanavaetsin lisää vain ääntä sisältävät kanavat kanavalistaan.</translation>
     </message>
     <message>
         <source>Use quick tuning</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä pikaviritystä</translation>
     </message>
     <message>
         <source>Live TV only</source>
-        <translation type="unfinished"></translation>
+        <translation>Vain Live TV</translation>
     </message>
     <message>
         <source>If enabled MythTV will tune using only the MPEG program number. The program numbers change more often than DVB or ATSC tuning parameters, so this is slightly less reliable. This will also inhibit EIT gathering during Live TV and recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, MythTV virittyy käyttämällä vain MPEG -ohjelmanumeroa. Ohjelmanumerot vaihtelevat useammin kuin DVB- tai ATSC-viritysparametrit, joten se on vähemän luotettava. Tämä myös rajoittaa EIT:n keräämistä Live TV:n ja nauhoitusten ohessa.</translation>
     </message>
     <message>
         <source>Input priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Sisääntuloprioriteetti</translation>
     </message>
     <message>
         <source>If the input priority is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos sisääntuloprioriteetti ei ole sama kaikilla sisääntuloilla, ajastin voi valita nauhoittavansa ohjelman myöhempänä aikana, jolloin se voi nauhoittaa korkeampiarvoisella sisääntulolla.</translation>
     </message>
     <message>
         <source>Use DishNet Long-term EIT Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä DishNet:n pitkäkestoista EIT tietoa</translation>
     </message>
     <message>
         <source>If you point your satellite dish toward DishNet&apos;s birds, you may wish to enable this feature. For best results, enable general EIT collection as well.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos kohdistat sateelliittiantennisi DishNetin sateelliitteja kohti, voit haluta mahdollistaa tämän vaihtoehdon. Parhaita tuloksia varten, mahdollista yleinen EIT:n keruu myös.</translation>
     </message>
     <message>
         <source>Interactions between inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>Sisääntulojen välinen vuorovaikutus</translation>
     </message>
     <message>
         <source>Create a New Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Luo uusi sisääntulojoukko</translation>
     </message>
     <message>
         <source>Input groups are only needed when two or more cards share the same resource such as a firewire card and an analog card input controlling the same set top box.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sisääntulojoukkoja tarvitaan vain, jos kaksi tai useampi korttia jakavat saman lähteen, kuten esimerkiksi jos firewirekortti ja analoginen syöttökortti hallitsevat samaa sovitinta.</translation>
     </message>
     <message>
         <source>(Delete all capture cards on %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Poista 1%:n kaikki TV-kortit)</translation>
     </message>
     <message>
         <source>This is updated on every successful channel change.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä päivitetään jokaisessa onnistuneessa kanavamuutoksessa.</translation>
     </message>
     <message>
         <source>Set the maximum number of audio channels to be decoded. This is for multi-channel/surround audio playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseta maksimimäärä audiokanavia joita puretaan. Tämä on monikanava/surround äänentoistoa varten.</translation>
     </message>
     <message>
         <source>Upmix</source>
-        <translation type="unfinished"></translation>
+        <translation>Upmix</translation>
     </message>
     <message>
         <source>Passive</source>
-        <translation type="unfinished"></translation>
+        <translation>Passiivi</translation>
     </message>
     <message>
         <source>Active Simple</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiivinen yksinkertainen</translation>
     </message>
     <message>
         <source>Active Linear</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiivinen lineaarinen</translation>
     </message>
     <message>
         <source>Set the audio upmix type for 2ch to 6ch conversion. This is for multi-channel/surround audio playback. &apos;Passive&apos; is the least demanding on the CPU. &apos;Active Simple&apos; is more demanding and &apos;Active Linear&apos; is the most demanding (but highest quality).</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseta äänen upmix -tyyppi kaksikanavaisesta kuuteen kanavaan. Tämä on monikanava/surround äänentoistoon. &apos;Passiivi&apos; vaatii vähiten tehoa prosessorilta. &apos;Aktiivinen yksinkertainen&apos; on vaativampi ja &apos;Aktiivinen lineaarinen&apos; on kaikkein vaativin (mutta korkealaatuisin).</translation>
     </message>
     <message>
         <source>Passthrough output device</source>
-        <translation type="unfinished"></translation>
+        <translation>Läpisyötön ulostulolaite</translation>
     </message>
     <message>
         <source>Audio output device to use for AC3 and DTS passthrough. Default is the same as Audio output device. This value is currently only used with ALSA sound output.</source>
-        <translation type="unfinished"></translation>
+        <translation>Äänilaite, jota käyttää AC3 ja DTS läpvientiin. Vakio on sama kuin Äänilaite. Tätä käytetään tällähetkellä vain ALSA ääniulostulon kanssa.</translation>
     </message>
     <message>
         <source>Initial volume for the Master Mixer.  This affects all sound created by the sound card.  Note: Do not set this too low.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alkuperäinen äänenvoimakkuus Master Mixerille.  Tämä vaikuttaa kaikkeen ääneen, jota tuotetaan äänikortilla.  Huom! Älä laita liian matalaksi.</translation>
     </message>
     <message>
         <source>Enable sending DTS audio directly to your sound card&apos;s SPDIF output, on sources which contain DTS soundtracks (usually DVDs).  Requires that the audio output device be set to something suitable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mahdollista DTS -äänen lähetys suoraan äänikorttisi SPDIF ulostuloon lähteissä, jotka sisältävät DTS ääniraitoja (yleensä DVD:t).  Vaatii, että äänilaite on asetettu johonkin sopivaan.</translation>
     </message>
     <message>
         <source>Default group filter to apply on the View Recordings screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vakio joukkosuodatin, jota käyttää Katso nauhoituksia valikossa.</translation>
     </message>
     <message>
         <source>Always prompt the user for the initial filter to apply when entering the Watch Recordings screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kysy aina käyttäjältä alkusuodatinta, jota käyttää kun tullaan Katso nauhoituksia valikkoon.</translation>
     </message>
     <message>
         <source>Remember the last selected filter instead of displaying the default filter whenever you enter the playback screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Muista viimeinen valittu suodatin sen sijaan, että näyttäisit vakiosuodattimen kun astut toistovalikkoon.</translation>
     </message>
     <message>
         <source>Select what type of grouping to show on the Watch Recordings screen by default.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse minkätyyppisen vakioryhmityksen näytät Katso nauhoituksia valikossa.</translation>
     </message>
     <message>
         <source>Use the name of the display filter currently applied in place of the term &quot;All Programs&quot; in the playback screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä nykyisen näyttöfiltterin nimeä termin &quot;Kaikki ohjelmat&quot; sijaan Toisto -valikossa.</translation>
     </message>
     <message>
         <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot; Recording Group.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos tämä asetus on mahdollistettu, LiveTV-nauhoitukset ovat näkyvissä erityisen &quot;LiveTV&quot; Tallennusryhmän kautta.</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä määrittää metodin, jota MythTV käyttää havaitakseen mainosten alun ja lopun.</translation>
     </message>
     <message>
         <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä on oletusarvo, jota käytetään Automaattinen mainosten tunnistus -asetuksessa, kun luodaan uusia ajastettuja nauhoituksia.</translation>
     </message>
     <message>
         <source>This is the default value used for the Auto-Transcode setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä on oletusarvo, jota käytetään Jälkikäsittely -asetuksessa, kun luodaan uusia ajastettuja nauhoituksia.</translation>
     </message>
     <message>
         <source>This is the default value used for the transcoder setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tätä oletusarvoa käytetään jälkikäsittelijän asetuksessa, kun luodaan uusia ajastettuja nauhoituksia.</translation>
     </message>
     <message>
         <source>Deferral days for Auto-Transcode jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Päivien lykkäysmäärä Jälkikäsittelytöissä</translation>
     </message>
     <message>
         <source>If non-zero, Auto-Transcode jobs will be scheduled to run this many days after a recording completes instead of immediately afterwards.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos muuta kuin nolla, Jälkikäsittelytyöt ajastetaan tehtäväksi näin monta päivää nauhoituksen päätyttyä sen sijaan, että ne tehtäisi heti nauhoituksen jälkeen.</translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run %1&apos; setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä on oletusarvo, jota käytetään &apos;Käynnistä %1&apos; -asetuksessa, kun luodaan uusia ajastettuja nauhoituksia.</translation>
     </message>
     <message>
         <source>If set, MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, MythTV kelaa automaattisesti näin monta sekuntia taaksepäin mainosten ohituksen jälkeen.</translation>
     </message>
     <message>
         <source>MythTV will discourage long manual commercial skips.  Skips which are longer than this will require the user to hit the SKIP key twice.  Automatic commercial skipping is not affected by this limit.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV ei suosittele pitkiä manuaalisia kelauksia mainosten ohituksen jälkeen.  Ohitukset jotka ovat pidempiä kuin tämä, vaati, että Ohita -napia painetaan kahdesti.  Tämä rajoitus ei vaikuta automaattista mainosten ohitusta.</translation>
     </message>
     <message>
         <source>Treat consecutive commercial breaks shorter than this as one break when skipping forward. Useful if you have to skip a few times during breaks. Applies to automatic skipping as well. Set to 0 to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käsittele perättäisi mainostaukoja, jotka ovat lyhyempiä kuin tämä, kuin jos taukoja olisi yksi mainosten ohituksen yhteydessä. Käytännöllinen, jos joudut ohittamaan useasti mainostaukojen aikana. Pätee myös automaattisessa ohituksessa. Kytkeäksesi tämän pois päältä, aseta 0.</translation>
     </message>
     <message>
         <source>Extra Disk Space</source>
-        <translation type="unfinished"></translation>
+        <translation>Ylimääräinen kovalevytila</translation>
     </message>
     <message>
         <source>Extra disk space (in Gigabytes) that you want to keep free on the recording file systems beyond what MythTV requires.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ylimääräinen kovalevytila (Gigatavuissa), jonka haluat pitää vapaana tallennusjärjestelmässä, MythTV:n vaatimusten jälkeen..</translation>
     </message>
     <message>
         <source>Auto Expire Instead of Delete Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Automaattinen vanheneminen nauhoituksen poistamisen sijaan</translation>
     </message>
     <message>
         <source>Instead of deleting a recording, move recording to the &apos;Deleted&apos; recgroup and turn on autoexpire.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sen sijaan, että nauhoitus poistetaan, siirrä nauhoitus &apos;Poistetut&apos; nauhoitusryhmään ja laita automaattinen vanhentuminen päälle.</translation>
     </message>
     <message>
         <source>Deleted Max Age</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistettujen maksimi ikä</translation>
     </message>
     <message>
         <source>When set to a number greater than zero, AutoExpire will force expiration of Deleted recordings when they are this many days old.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun asetettu numeroksi, joka on suurempi kuin nolla, Automaattinen vanhentuminen pakottaa poistettujen nauhoitusten erääntymisen, kun nauhoitukset ovat näin monta päivää vanhoja.</translation>
     </message>
     <message>
         <source>Expire in deleted order</source>
-        <translation type="unfinished"></translation>
+        <translation>Mahdollista vanhentuminen poistetussa järjestyksessä</translation>
     </message>
     <message>
         <source>Expire Deleted recordings in the order which they were originally deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mahdollista poistettujen nauhoitusten vanhentuminen siinä järjestyksessä, kuin ne oli alunperin poistettu.</translation>
     </message>
     <message>
         <source>DeletedExpireOptions</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistettujen vanhentumisasetukset</translation>
     </message>
     <message>
         <source>Method used to determine which recorded shows to delete first.  LiveTV recordings will always expire before normal recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Metodi, jolla määritellään mitkä nauhoitukset poistetaan ensin.  LiveTV nauhoitukset vanhentuvat aina ennen normaaleja nauhoituksia.</translation>
     </message>
     <message>
         <source>Watched before UNwatched</source>
@@ -9829,456 +10140,456 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>If set, programs that have been marked as watched will be expired before programs that have not been watched.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, ohjelmat, jotka on merkitty katsotuiksi, vanhentuvat ennen ohjelmia joita ei ole katsottu.</translation>
     </message>
     <message>
         <source>Priority Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioriteettipaino</translation>
     </message>
     <message>
         <source>The number of days bonus a program gets for each priority point. This is only used when the Weighted Time/Priority Auto Expire Method is selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bonuspäivien lukumäärä, joita kukin ohjelma saa prioriteettipisteestä. Tätä käytetään vain kun Painoitettu aika/tärkeys/Automaattinen vanhentuminen on valittuna.</translation>
     </message>
     <message>
         <source>When enabled, any new recording schedules will be marked as eligible for Auto-Expiration. Existing schedules will keep their current value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun mahdollistettu, kaikku uudet nauhoitusajastukset merkitään kelpaaviksi Automaattiselle vanhentumiselle. Jo olemassa olevat ajastukset pitävät nykyiset arvonsa.</translation>
     </message>
     <message>
         <source>LiveTV Max Age</source>
-        <translation type="unfinished"></translation>
+        <translation>LiveTV maksimi ikä</translation>
     </message>
     <message>
         <source>AutoExpire will force expiration of LiveTV recordings when they are this many days old. LiveTV recordings may also be expired early if necessary to free up disk space.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automaattinen vanhentuminen pakottaa LiveTV -nauhoitusten vanhentumisen, kun ne ovat näin monta päivää vanhoja. Jos kovalvytilan vapautus on tarpeellista, LiveTV -nauhoitukset voivat vanhentua aiemmin.</translation>
     </message>
     <message>
         <source>Re-record Watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Uudelleen nauhoitetut katsotut</translation>
     </message>
     <message>
         <source>If set, programs that have been marked as watched and are auto-expired will be re-recorded if they are shown again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, ohjelmat, jotka on merkitty katsotuiksi ja ovat automaattisesti vanhentuneet, tullaan nauhoittamaan uudelleen, jos niitä näytetään uudelleen.</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä yleisasetus mahdollistaa nauhoittajan aloittamaan ennen ajastettua aloitusaikaa. Se ei vaikuta ajastajaan. Asetus jätetään huomiotta, kun kaksi ohjelmaa on ajastettu ilman riittävää aikaa ohjelmien välissä.</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä yleisasetus mahdollistaa nauhoittimen nauhoittamaan ajastetun lopetusajan jälkeen. Se ei vaikuta ajastajaan. Asetus jätetään huomiotta, kun kaksi ohjelmaa on ajastettu ilman riittävää aikaa ohjelmien välissä.</translation>
     </message>
     <message>
         <source>Category of shows to be extended</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategoria ohjelmista, joita pidennetään</translation>
     </message>
     <message>
         <source>For a special category (e.g. &quot;Sports event&quot;), request that shows be autoextended. Only works if a show&apos;s category can be determined.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erikoiselle kategorialle (esim. &quot;Urheilutapahtumat&quot;), pyydä, että ohjelmia pidennetään automaattisesti. Toimii vain jos ohjelman kategoria voidaan määrittää.</translation>
     </message>
     <message>
         <source>For the specified category, an attempt will be made to extend the recording by the specified time.  It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>Määritetylle kategorialle, tehdään yritys pidentää nauhoitusta määritetyllä ajalla.  Asetus jätetään huomiotta, kun kaksi ohjelmaa on ajastettu ilman riittävää aikaa ohjelmien välissä.</translation>
     </message>
     <message>
         <source>Category record over-time</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorian nauhoituksen yliaika</translation>
     </message>
     <message>
         <source>Profile Item</source>
-        <translation type="unfinished"></translation>
+        <translation>Profiilikohde</translation>
     </message>
     <message>
         <source>Example Custom filter list: &apos;ivtc,denoise3d&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Mukautetun suodatinlistan esimerkki: &apos;ivtc, denoise3d&apos;</translation>
     </message>
     <message>
         <source>Main deinterlacing method.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lomituksenpoiston päämetodi.</translation>
     </message>
     <message>
         <source>Fallback deinterlacing method.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lomituksenpoiston varametodi.</translation>
     </message>
     <message>
         <source>&amp;</source>
         <comment>and</comment>
-        <translation type="unfinished"></translation>
+        <translation>&amp;</translation>
     </message>
     <message>
         <source>if rez</source>
-        <translation type="unfinished"></translation>
+        <translation>jos rez</translation>
     </message>
     <message>
         <source>Sort all sub-titles/multi-titles Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>Lajittele kaikki tekstitykset nousevasti</translation>
     </message>
     <message>
         <source>Sort all sub-titles/multi-titles Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>Lajittele kaikki tekstitykset laskevasti</translation>
     </message>
     <message>
         <source>Sort sub-titles Descending, multi-titles Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>Lajittele tekstitykset alenevasti, moni-tekstitykset nousevasti</translation>
     </message>
     <message>
         <source>Sort sub-titles Ascending, multi-titles Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>Lajittele tekstitykset nousevasti, moni-tekstitykset alenevasti</translation>
     </message>
     <message>
         <source>Selects how to sort show episodes. Sub-titles refers to the episodes listed under a specific show title. Multi-title refers to sections (e.g. &quot;All Programs&quot;) which list multiple titles. Sections in parentheses are not affected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse kuinka lajitella lyhyitä jaksoja. Tekstitykset viittaavat jaksoihin, jotka on listattu tietyn ohjelmanimikkeen alle. Moni-tekstitys viittaa osioihin (esim. &quot;Kaikki ohjelmat&quot;), jotka sisältävät monta nimikettä. Tämä ei vaikuta osioihin, jotka ovat suluissa.</translation>
     </message>
     <message>
         <source>Episode sort orderings</source>
-        <translation type="unfinished"></translation>
+        <translation>Jaksojen lajittelu järjestykset</translation>
     </message>
     <message>
         <source>When exiting sticky keys fast forward/rewind mode, reposition this many 1/100th seconds before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun kelaus on &quot;tahma&quot; -tilassa, udelleensijoita kelaus näin monta sadasosasekuntia, ennen kuin palataan normaaliin toistonopeuteen. Tällä kompensoidaan reaktioaikaa, jolla nähdään milloin palataan normaaliin toistoon ja milloin oikeasti poistutaan hakutilasta.</translation>
     </message>
     <message>
         <source>Length of time an on-screen display window will be visible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuinka kauan tietoikkuna on näkyvissä näytöllä.</translation>
     </message>
     <message>
         <source>Length of time the on-screen display will display program information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuinka kauan tietoikkuna näyttää tietoa ohjelmasta.</translation>
     </message>
     <message>
         <source>How many seconds an on-screen display will be active for UDP Notify events.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuinka monta sekuntia tietoikkuna on aktiivinen UDP ilmoituksille.</translation>
     </message>
     <message>
         <source>Theme cache size</source>
-        <translation type="unfinished"></translation>
+        <translation>Teeman välimuistin koko</translation>
     </message>
     <message>
         <source>Maximum number of prescaled themes to cache.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimimäärä esiskaalattuja teemoja, joita ladata välimuistiin.</translation>
     </message>
     <message>
         <source>Text zoom percentage</source>
-        <translation type="unfinished"></translation>
+        <translation>Textizooin prosenttimäärä</translation>
     </message>
     <message>
         <source>Use this to enlarge or shrink captions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä tätä suurentamaan tai pienentämään kuvatekstiä.</translation>
     </message>
     <message>
         <source>Default Caption Font Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvatekstin oletusfontti</translation>
     </message>
     <message>
         <source>This allows you to set which font type to use when the broadcaster does not specify a font.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä antaa sinun asetta käytettävän fontin, jos ohjelman lähettäjä ei ole määrittänyt fonttia.</translation>
     </message>
     <message>
         <source>Monospaced serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Tasavälinen serif</translation>
     </message>
     <message>
         <source>Proportional serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Verrannollinen serif</translation>
     </message>
     <message>
         <source>Monospaced sans serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Tasavälinen sans serif</translation>
     </message>
     <message>
         <source>Proportional sans serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Verrannollinen sans serif</translation>
     </message>
     <message>
         <source>Casual</source>
-        <translation type="unfinished"></translation>
+        <translation>Epämuodollinen</translation>
     </message>
     <message>
         <source>Cursive</source>
-        <translation type="unfinished"></translation>
+        <translation>Kursiivinen</translation>
     </message>
     <message>
         <source>Capitals</source>
-        <translation type="unfinished"></translation>
+        <translation>Suuret kirjaimet</translation>
     </message>
     <message>
         <source>ATSC Caption Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC tekstiasetukset</translation>
     </message>
     <message>
         <source>ATSC %1 closed caption font.</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC %1 tekstityksen fontti.</translation>
     </message>
     <message>
         <source>ATSC Caption Fonts</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC tekstityksen fontit</translation>
     </message>
     <message>
         <source>Monospaced Serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Tasavälinen Serif</translation>
     </message>
     <message>
         <source>Proportional Serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Verrannollinen Serif</translation>
     </message>
     <message>
         <source>Monospaced Sans Serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Tasavälinen Sans Serif</translation>
     </message>
     <message>
         <source>Proportional Sans Serif</source>
-        <translation type="unfinished"></translation>
+        <translation>Verrannollinen Sans Serif</translation>
     </message>
     <message>
         <source>Regular Font</source>
-        <translation type="unfinished"></translation>
+        <translation>Normaali fontti</translation>
     </message>
     <message>
         <source>Italic Font</source>
-        <translation type="unfinished"></translation>
+        <translation>Kursivoitu fontti</translation>
     </message>
     <message>
         <source>Italic</source>
-        <translation type="unfinished"></translation>
+        <translation>Kursiivi</translation>
     </message>
     <message>
         <source>Vertical scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Pystysuora skaalaus</translation>
     </message>
     <message>
         <source>Adjust this if the image does not fill your screen vertically. Range -100% to 100%</source>
-        <translation type="unfinished"></translation>
+        <translation>Säädä tätä jos kuva ei täytä näyttöäsi pystysuorasti. Alue: -100% - 100%</translation>
     </message>
     <message>
         <source>Horizontal scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Leveyssuuntainen skaalaus</translation>
     </message>
     <message>
         <source>Adjust this if the image does not fill your screen horizontally. Range -100% to 100%</source>
-        <translation type="unfinished"></translation>
+        <translation>Säädä tätä jos kuva ei täytä näyttöäsi vaakasuorasti. Alue: -100% - 100%</translation>
     </message>
     <message>
         <source>Always stream recordings from the backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Aina virtaa lähetykset nauhoituspalvelimelta</translation>
     </message>
     <message>
         <source>Enable this setting if you want MythTV to always stream files from a remote backend instead of directly reading a recording file if it is accessible locally.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mahdollista tämä asetus, jos haluat MythTV:n aina virtaavan tiedostoja etäpalvelimelta, sen sijaan että lukisit nauhoitustiedoston suoraan, jos se on saatavilla paikallisesti.</translation>
     </message>
     <message>
         <source>Black background for analog closed captioning</source>
-        <translation type="unfinished"></translation>
+        <translation>Tummenna tausta analogisella tekstityksellä</translation>
     </message>
     <message>
         <source>If enabled, analog captions will be displayed over a black space for maximum contrast. Otherwise, captions will use outlined text over the picture.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos mahdollistettu, analogitekstitys näytetään tummalla alueella parhaimman kontrastin luomiseksi. Muuten tekstitykset näytetään rajattuna tekstinä kuvan päällä.</translation>
     </message>
     <message>
         <source>Always display closed captioning or subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä aina tekstiykset</translation>
     </message>
     <message>
         <source>Prefer EIA-708 over EIA-608 captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Suosi EIA-708 -tekstitystä EIA-608 -tekstityksen yli</translation>
     </message>
     <message>
         <source>When enabled the new EIA-708 captions will be preferred over the old EIA-608 captions in ATSC streams.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun mahdollistettu, uudet EIA-708 tektityksiä tullaan suosimaan vanhojen EIA-608 -tekstitysten yli ATSC -virroissa.</translation>
     </message>
     <message>
         <source>This is the default, but as of early 2008 most stations are not broadcasting useable EIA-708 captions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä on oletusarvo, mutta 2008 alun jälkeen useimmat asemat eivät lähetä käyttökelpoisia EIA-708 tekstityksiä.</translation>
     </message>
     <message>
         <source>Enable Interactive TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Mahdollista Interaktiivinen-TV</translation>
     </message>
     <message>
         <source>If enabled, interactive TV applications (MHEG) will be activated.  This is used for teletext and logos for radio and channels that are currently off-air.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos mahdollistettu, interaktiivisen TV:n ohjelmistot (MHEG) tullaan käynnistämään  Tätä käytetään teletekstille,  radioiden logoille ja kanaville, jotka eivät lähetä tällä hetkellä.</translation>
     </message>
     <message>
         <source>If enabled, MythTV will pretend to have a smaller sound card buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos mahdollistettu, MythTV teeskentelee, että se omaa pienemmän äänikorttipuskurin kuin mitä sillä oikeasti on käytettävissä.  Tämä voi nopeuttaa hakua, mutta voi myös aiheuttaa toisto-ongelmia.</translation>
     </message>
     <message>
         <source>Enable picture controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Mahdollista kuvakontrollit</translation>
     </message>
     <message>
         <source>If enabled, MythTV attempts to initialize picture controls (brightness, contrast, etc.) that are applied during playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos, mahdollistettu, MythTV yrittää alustaa kuvakontrollit (valoisuus, kontrasti, jne.), joita käytetään toiston yhteydessä.</translation>
     </message>
     <message>
         <source>Warn on no audio output</source>
-        <translation type="unfinished"></translation>
+        <translation>Varoita, kun ääniulostuloja ei ole</translation>
     </message>
     <message>
         <source>If enabled, MythTV will warn you if it can&apos;t access the soundcard.</source>
-        <translation type="unfinished"></translation>
+        <translation>jos mahdollistettu, MythTV varoittaa , jos se ei pääse käyttämään äänikorttia.</translation>
     </message>
     <message>
         <source>Always prompt (excluding Live TV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kysy aina (poislukien Live TV)</translation>
     </message>
     <message>
         <source>Always prompt (including Live TV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kysy aina (mukaanlukien Live TV)</translation>
     </message>
     <message>
         <source>Prompt for Live TV only</source>
-        <translation type="unfinished"></translation>
+        <translation>Kysy vain Live TV:llä</translation>
     </message>
     <message>
         <source>Jump to Program OSD</source>
-        <translation type="unfinished"></translation>
+        <translation>Hyppää ohjelman tietoikkunaan</translation>
     </message>
     <message>
         <source>Set the choice between viewing the current recording group in the OSD, or showing the &apos;Watch Recording&apos; screen when &apos;Jump to Program&apos; is activated. If set, the recordings are shown in the OSD</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseta valinta nykyisen nauhoitusryhmän näyttäminen tietoikkunassa tai &quot;Katso nauhoituksia&quot; -valikon näyttäminen kun &apos;Hyppää ohjelmaan&apos; käynnistetään. Jos asetettu, nauhoitukset näytetään tietoikkunassa</translation>
     </message>
     <message>
         <source>Continue Playback When Embedded</source>
-        <translation type="unfinished"></translation>
+        <translation>Jatka toistoa kun sulautettu</translation>
     </message>
     <message>
         <source>This option continues TV playback when the TV window is embedded in the upcoming program list or recorded list. The default is to pause the recorded show when embedded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä valinta jatkaa TV:n toistoa kun TV -ikkuna on sulautettu tulevaan ohjelmalistaan tai nauhoituslistaan. Oletus on pysäyttää toisto kun sulautus on tehty.</translation>
     </message>
     <message>
         <source>Automatically mark a recording as watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Automaattisesti merkitse nauhoitus katsotuksi</translation>
     </message>
     <message>
         <source>If set, when you exit near the end of a recording it will be marked as watched. The automatic detection is not foolproof, so do not enable this setting if you don&apos;t want an unwatched recording marked as watched.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, kun poistut nauhoituksen lopun lähettyvillä, nauhoitus merkitään katsotuksi. Automaattinen havainnointi ei oli idioottivartmaa, joten älä mahdollista tätä asetusta, jos et halua merkitä katsoamtonta nauhoitusta katsotuksi.</translation>
     </message>
     <message>
         <source>MythTV will use this offset to make a thumbnail image this many seconds from the beginning of the recording, unless this offset happens to be between cutpoints or inside a flagged advertisement.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV luo kuvakkeen näin monta sekuntia nauhoituksen alun jälkeen, paitsi jos tämä aika sattuu osumaan katkaisupisteiden väliin tai merkityn mainoskatkon väliin.</translation>
     </message>
     <message>
         <source>If enabled, MythTV will ignore the above time offset, and use the bookmark inside the recording as the offset for creating a thumbnail image. As with the above, MythTV will honour cutlists and increase this offset if necessary.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos mahdollistettu, MythTV jättää yllä mainitun aikavälin huomiotta ja käyttää nauhoituksen sisältämää merkintää aikavälinä, kun kuvaketta tehdään. Kuten yllä, MythTV kunnioittaa leikkauslistoja ja nostaa tätä aikaväliä jos tarvetta.</translation>
     </message>
     <message>
         <source>Allows you to use a virtual keyboard in Myth line edit boxes.  To use, hit OK/Select while a line edit is in focus.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mahdollistaa sinun käyttää virtuaalista näppäimistöä Mythin kirjoituspalkeissa.  Käyttääksesi, paina OK/Select kun kirjoituspalkki on kohdistettuna.</translation>
     </message>
     <message>
         <source>Customise exit menu options</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa sulkemisvalikon asetuksia</translation>
     </message>
     <message>
         <source>Show quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä Lopetus</translation>
     </message>
     <message>
         <source>Show quit and shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä Lopeta ja Sulje laitteisto</translation>
     </message>
     <message>
         <source>Show quit, reboot and shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä Lopeta, Käynnistä uudelleen ja Sulje laitteisto</translation>
     </message>
     <message>
         <source>Show shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä Sulje laitteisto</translation>
     </message>
     <message>
         <source>Show reboot</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä Käynnistä uudelleen</translation>
     </message>
     <message>
         <source>Show reboot and shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä Käynnistä uudelleen ja Sulje laitteisto</translation>
     </message>
     <message>
         <source>By default, only remote frontends are shown the shutdown option on the exit menu. Here you can force specific shutdown and reboot options to be displayed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Oletusasetuksena, vain etäkäyttöjärjestelmille annetaan Sulje laitteisto -vaihtoehto Poistu -valikossa. Tässä voit pakottaa tietyt sulkemis ja uudelleenkäynnistys asetukset näytettäviksi.</translation>
     </message>
     <message>
         <source>Reboot command</source>
-        <translation type="unfinished"></translation>
+        <translation>Uudelleenkäynnistyskäsky</translation>
     </message>
     <message>
         <source>Command or script to run if you select the reboot option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Komento tai komentojoukko ajettavaksi kun haluat käynnistä laitteiston uudelleen Sulje -valikossa, jos tämä asetus on mahdollistettu. Sinun täytyy valita sulkemisnappi, jolla Sulje -valikko tulee näkyviin.</translation>
     </message>
     <message>
         <source>Command or script to run if you select the shutdown option from the exit menu, if the option is displayed. You must configure an exit key to display the exit menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Komento tai komentojoukko ajettavaksi kun haluat sulkea laitteiston Sulje -valikossa, jos tämä asetus on mahdollistettu. Sinun täytyy valita sulkemisnappi, jolla Sulje -valikko tulee näkyviin.</translation>
     </message>
     <message>
         <source>ScreenShotPath</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvakaappausten paikka</translation>
     </message>
     <message>
         <source>Path to screenshot storage location. Should be writable by the frontend</source>
-        <translation type="unfinished"></translation>
+        <translation>Määritä paikka, johon haluat tallentaa kuvankaappaukset. Pitää olla kirjoitettavassa muodossa käyttöjärjestelmälle</translation>
     </message>
     <message>
         <source>Display on screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä tietoikkunassa</translation>
     </message>
     <message>
         <source>The aspect ratio of a Xinerama display can not be queried from the display, so it must be specified.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xinerma näytön kuvasuhdetta ei voitu tiedustella näytöstä. Määritä näytön kuvasuhde.</translation>
     </message>
     <message>
         <source>Letterboxing Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Määritä kuvasuhdemuutoksissa ilmestyvän ylä- ja alapalkin väri</translation>
     </message>
     <message>
         <source>By default MythTV uses black letterboxing to match broadcaster letterboxing, but those with plasma screens may prefer gray to minimize burn-in.</source>
-        <translation type="unfinished"></translation>
+        <translation>Oletuksena MythTV käyttää mustaa ylä- ja alapalkkia, jotta se sopii lähettäjän standardeihin, mutta Plasma-TV:n omistajat voivat haluta käyttää harmaata vähentääkseen kuvan palamista.</translation>
     </message>
     <message>
         <source>Currently only works with XVideo video renderer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tällä hetkellä toimii vain XVideo -videorenderöijien kanssa.</translation>
     </message>
     <message>
         <source>Video Aspect Override</source>
-        <translation type="unfinished"></translation>
+        <translation>Videokuvasuhteen ohitus</translation>
     </message>
     <message>
         <source>When enabled, these will override the aspect ratio specified by any broadcaster for all video streams.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun mahdollistettu, nämä ohittavat ohjelmanlähettäjien määrittämät kuvasuhteet kaikissa videovirroissa.</translation>
     </message>
     <message>
         <source>Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoomaa</translation>
     </message>
     <message>
         <source>When enabled, these will apply a predefined zoom to all video playback in MythTV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun mahdollistettu, nämä lisäävät ennaltamääritellyn zoomauksen kaikkiin videotoistoihin MythTV:ssä.</translation>
     </message>
     <message>
         <source>The horizontal offset the GUI will be displayed at.  May only work if run in a window.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaakasuora etäisyys, jolla graafinen käyttöliittymä näytetään.  Voi toimia vain ikkunassa. </translation>
     </message>
     <message>
         <source>Horizontal size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>TV:n tai näytön vaakasuora koko. Käytetään laskemaan näytön todellinen kuvasuhde. </translation>
     </message>
     <message>
         <source>Vertical size of the monitor or TV. Used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>TV:n tai näytön pystysuora koko. Käytetään laskemaan näytön todellinen kuvasuhde.</translation>
     </message>
     <message>
         <source>Horizontal resolution of video which needs a special output resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Resoluutio vaakasuoralle videolle, joka vaatii erityisen ulostuloresoluution.</translation>
     </message>
     <message>
         <source>Vertical resolution of video which needs a special output resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Resoluutio pystysuoralle videolle, joka vaatii erityisen ulostuloresoluution.</translation>
     </message>
     <message>
         <source>Aspect ratio when watching a video at a specific resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvasuhde kun katsotaan videota tietyllä resoluutiolla.</translation>
     </message>
     <message>
         <source>Leave at &quot;Default&quot; to use ratio reported by the monitor.  Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jätä &quot;Oletus&quot; käyttääksesi näytön raportoitua kuvasuhdetta.  Aseta 16:9 tai 4:3 pakottaaksesi tietty kuvasuhde.</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in MythTV</source>
@@ -10286,11 +10597,11 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Toggles mouse cursor visibility. Most of the MythTV GUI does not respond to mouse clicks. Use this option to avoid &quot;losing&quot; your mouse cursor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaihtaa hiiren osoittimen näkyvyyttä. Suurin osa MythTV:n graafisesta käyttöliittymästä ei reagoi hiiren painalluksiin. Käytä tätä vaihtoehtoa estääksesi &quot;kadottamasta&quot; hiiresi osoitinta.</translation>
     </message>
     <message>
         <source>Your preferred time format.  You must choose a format with &quot;AM&quot; or &quot;PM&quot; in it, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Suosimasi aikamuoto.  Sinun täytyy valita muoto, joka sisältää on joko &quot;AM&quot; tai &quot;PM, muutoin aikasi näytetään 24-tuntisena.</translation>
     </message>
     <message>
         <source>Paint Engine</source>
@@ -10306,7 +10617,7 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>This selects what MythTV uses to draw.  If you have decent hardware, select OpenGL. Changing this requires a restart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä valitsee, millä MythTV piirtää.  Jos sinulla on kunnollinen laitteisto, valitse OpenGL. Tämä vaatii uudelleenkäynnistyksen.</translation>
     </message>
     <message>
         <source>UI Theme</source>
@@ -10322,11 +10633,11 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Avoid conflicts between live TV and scheduled shows</source>
-        <translation type="unfinished"></translation>
+        <translation>Vältä konflikteja Live TV:n ja ajastettujen ohjelmien välillä</translation>
     </message>
     <message>
         <source>Allow live TV to move scheduled shows</source>
-        <translation type="unfinished"></translation>
+        <translation>Anna Live TV:n siirtää ajastettuja ohjelmia</translation>
     </message>
     <message>
         <source>If enabled, scheduled recordings will be moved to other cards (where possible), so that live TV will not be interrupted.</source>
@@ -10334,11 +10645,11 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Fine tune font size (%)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hienosäädä fontin kokoa (%)</translation>
     </message>
     <message>
         <source>Fine tune all font sizes by this percentage. Font sizes should be the correct relative size if the X11 DPI (dots per inch) is set to 100.</source>
-        <translation type="unfinished"></translation>
+        <translation>hienosäädä kaikkia fontinkokoja tällä prosenttimäärällä. Fonttien koot tulisi olla oikea suhteellista kokoa, jos X11:a DPI (pistettä per tuuma) on asetettu 100:ksi.</translation>
     </message>
     <message>
         <source>Display the channel icons</source>
@@ -10350,119 +10661,119 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos mahdollistettu, voit painaa numeroita ja hypätä valinnasta suoraan mille tahansa kanavalle, jonka syötät.</translation>
     </message>
     <message>
         <source>Avoid back to back recordings from different channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Vältä peräkkäistä nauhoitusta eri kanavilta</translation>
     </message>
     <message>
         <source>If set, the scheduler will avoid assigning shows from different channels to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, ajastin välttää eri kanavien ajastusten antamista samalle kortille, jos ohjelmien loppumisaika ja alkamisaika on sama. Tämä mahdollistetaan, kun se on välttämätöntä, konfliktien ratkaisemiseksi.</translation>
     </message>
     <message>
         <source>Default &apos;Start Early&apos; minutes for new recording rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Oletus &apos;Aloita aikaisin&apos; -minuutit uusille nauhoitussäännöille</translation>
     </message>
     <message>
         <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial start early or start late time when rules are created. These can then be adjusted per recording rule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseta tämä &apos;0&apos; ellet odota, että suurin osa ohjelmien aloitusajoistasi ei vastaa TV -tietojasi. Tämä asettaa alkuperäisen &apos;Aloita aikaisin&apos; tai &apos;Aloita myöhemmin&apos; -ajan, kun sääntöä luodaan. Näitä voidaan muokata erikseen jokaiselle nauhoitukselle.</translation>
     </message>
     <message>
         <source>Default &apos;End Late&apos; minutes for new recording rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Oletus &apos;Lopeta myöhemmin&apos; -minuutit uusille nauhoitussäännöille</translation>
     </message>
     <message>
         <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial end late or end early time when rules are created. These can then be adjusted per recording rule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseta tämä &apos;0&apos; ellet odota, että suurin osa ohjelmien aloitusajoistasi ei vastaa TV -tietojasi. Tämä asettaa alkuperäisen &apos;Lopeta myöhemmin&apos; tai &apos;Lopeta aiemmin&apos; -ajan, kun sääntöä luodaan. Näitä voidaan muokata erikseen jokaiselle nauhoitukselle.</translation>
     </message>
     <message>
         <source>Complex Prioritization</source>
-        <translation type="unfinished"></translation>
+        <translation>Monitahoinen tärkeysjärjestys</translation>
     </message>
     <message>
         <source>If set, per rule plus type priorities will be used for primary prioritization with all other priorities having a secondary effect. Unset so that all are treated equally in a single total priority as described in the HOWTO.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, käytä sääntö- ja tyyppiprioriteettejä pääpriorisointiin kaikkien prioriteettien sisältäessä toissijaisen vaikutuksen. Aseta pois, jotta kaikkia käsitellään yhtä arvokkaina, yhdessä yksittäisessä prioriteetissä, joka kuvaillaan HOWTO -tekstissä.</translation>
     </message>
     <message>
         <source>Preferred Input Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Etusijalle asetettu sisääntuloprioriteetti</translation>
     </message>
     <message>
         <source>Additional priority when a showing matches the preferred input selected in the &apos;Scheduling Options&apos; section of the recording rule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisätty prioriteettis kun ohjelma täsmää etusijalle asetetun sisääntulon kanssa nauhoitussääntöjen &apos;Ajastusasetukset&apos; -osiossa.</translation>
     </message>
     <message>
         <source>HDTV Recording Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>HDTV:n nauhoitusprioriteetti</translation>
     </message>
     <message>
         <source>Additional priority when a showing is marked as an HDTV broadcast in the TV listings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisätty prioriteetti kun ohjelma on merkitty HDTV -lähetykseksi TV-ohjelmassa.</translation>
     </message>
     <message>
         <source>Automatic Priority Range (+/-)</source>
-        <translation type="unfinished"></translation>
+        <translation>Automaattinen prioriteettialue (+/-)</translation>
     </message>
     <message>
         <source>Up to this number of priority points may be added for titles that are usually watched soon after recording or subtracted for titles that are often watched several days or weeks later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämän luvun verran voidaan prioriteettipisteitä lisätä nimikkeisiin, jotka yleensä katsotaan heti nauhoituksen jälkeen tai poistaa nimikkeiltä, jotka yleensä katsotaan monta päivää tai viikkoa nauhoituksen jälkeen.</translation>
     </message>
     <message>
         <source>The &apos;All&apos; Recording type will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Kaikki&apos;-nauhoitustyyppi saa tämän verran lisää nauhoitusprioriteettiarvoa.</translation>
     </message>
     <message>
         <source>Your #%1 preferred language for Program Guide Data and captions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sinun #%1 suosima kieli ohjelmatiedoille ja tekstiykselle.</translation>
     </message>
     <message>
         <source>This enables support for Xbox specific hardware. Requires a frontend restart for changes to take effect.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä mahdollistaa ten Xbox -laitteistolle. Vaatii järjestelmän uudelleenkäynnistyksen.</translation>
     </message>
     <message>
         <source>Enable Network Remote Control interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Mahdollista kauko-ohjauksen verkkokäyttöliittymä </translation>
     </message>
     <message>
         <source>This enables support for controlling mythfrontend over the network.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä mahdollistaa mythfrontendin hallinnan verkon välityksellä.</translation>
     </message>
     <message>
         <source>This specifies what port the Network Remote Control interface will listen on for new connections.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä määrittää, mitä porttia kauko-ohjaus kuuntelee uusissa yhteyksissä.</translation>
     </message>
     <message>
         <source>Ignore LiveTV Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohita LiveTV nauhoitukset</translation>
     </message>
     <message>
         <source>Recording monitoring will ignore LiveTV recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nauhoitusten seuranta ohittaa LiveTV:n nauhtoitukset.</translation>
     </message>
     <message>
         <source> (and other removable devices)</source>
-        <translation type="unfinished"></translation>
+        <translation> (ja muut irroitettavat laitteet)</translation>
     </message>
     <message>
         <source>Use new media</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä uutta mediaa</translation>
     </message>
     <message>
         <source>This will cause MythTV to jump, to an appropriate plugin, when new media is inserted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä aiheuttaa MythTV:n hyppäämisen oikeanlaiseen liitäntään, kun uusi media on syötetty.</translation>
     </message>
     <message>
         <source>Ignore Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohita l aitteet</translation>
     </message>
     <message>
         <source>If there are any devices that you do not want to be monitored, list them here with commas in-between. The plugins will ignore them</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos sinulla on laitteita joita et halua seurattavan, luettele ne tähän pilkkujen väliin. Liitännät ohittavat ne silloin</translation>
     </message>
     <message>
         <source>MythMediaMonitor</source>
-        <translation type="unfinished"></translation>
+        <translation>MythMediaMonitor</translation>
     </message>
     <message>
         <source>Sort Titles</source>
@@ -10478,529 +10789,894 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Sets the Title sorting order when the view is set to Titles only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Asettaa otsikoiden lajittelujärjestyksen kun näkymä on laitettu Vain otsikot -tilaan.</translation>
     </message>
     <message>
         <source>Include the &apos;Watch List&apos; group</source>
-        <translation type="unfinished"></translation>
+        <translation>Sisällä &quot;Katselulista&quot; </translation>
     </message>
     <message>
         <source>The &apos;Watch List&apos; is an abbreviated list of recordings sorted to highlight series and shows that need attention in order to keep up to date.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Katselulista&apos; on lyhennetty luettelo nauhoituksista, jotka on lajiteltu painottamaan sarjoja ja ohjelmia, jotka vaativat huomiota pysyäkseen päivitettyinä.</translation>
     </message>
     <message>
         <source>Start from the Watch List view</source>
-        <translation type="unfinished"></translation>
+        <translation>Aloita Katselulistasta</translation>
     </message>
     <message>
         <source>If set, the &apos;Watch List&apos; will be the initial view each time you enter the Watch Recordings screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, &apos;Katselulista&apos; on alkunäkymänä kun menet Katso nauhoitteita näyttöön</translation>
     </message>
     <message>
         <source>Exclude recordings not set for Auto-Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Poissulje nauhoitukset joita ei ole asetettu Automaattiseen vanhentumiseen</translation>
     </message>
     <message>
         <source>Set this if you turn off auto-expire only for recordings that you&apos;ve seen and intend to keep. This option will exclude these recordings from the &apos;Watch List&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseta tämä, jos haluat ottaa automaattisen vanhentumisen pois päälä vain nauhoituksilta, jotka olet nähny ja haluat pitää. Tämä valinta poissulkee tällaiset nauhoitukset &apos;Katselulistasta&apos;.</translation>
     </message>
     <message>
         <source>Maximum days counted in the score</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimimäärä laskettuja päiviä pisteissä</translation>
     </message>
     <message>
         <source>The &apos;Watch List&apos; scores are based on 1 point equals one day since recording. This option limits the maximum score due to age and affects other weighting factors.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Katselulistan&apos; pisteytys perustuu järjestelmään yksi piste per päivää nauhoituksesta. Tämä valinta rajoittaa maksimipisteiden määrää iän ja muiden vaikutusten perustella.</translation>
     </message>
     <message>
         <source>Days to exclude weekly episodes after delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuinka monen päivän jälkeen poissuljetaan viikoittaiset jaksot poiston jälkeen</translation>
     </message>
     <message>
         <source>When an episode is deleted or marked as watched, other episodes of the series are excluded from the &apos;Watch List&apos; for this interval of time. Daily shows also have a smaller interval based on this setting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun jakso poistetaan tai merkitään katsotuksi, muut jaksot kyseisestä sarjasta poissuljetaan &apos;Katselulistalta&apos; näin monen päivän jälkeen. Päivittäisillä jaksoilla on myös pienempi poissulkemisaika tähän aikaan perustuen.</translation>
     </message>
     <message>
         <source>Normally, PVR-350 audio is looped into a sound card; here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Normaalisti PVR-350 ääni kierretään äänikorttiin; tässä voit määrittää, milloin näin EI tehdä. MythTV ei pysty kontrolloimaan TV:n äänentasoa kun tämä on valittu.</translation>
     </message>
     <message>
         <source>If it is supported by your hardware/drivers, MythTV will use OpenGL vertical syncing for video timing, reducing frame jitter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos sinun laitteistosi ja ajurisi tukevat OpenGL:ää, MythTV käyttää sitä vertikaaliseen synkronointiin, vähentäen näytön tärinää.</translation>
     </message>
     <message>
         <source>PVR-350 Hardware Decoder Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>PVR-350 Laitteiston dekoodausasetukset</translation>
     </message>
     <message>
         <source>This setting allows a DataDirect guide data provider to specify the next download time in order to distribute load on their servers. If this setting is enabled, mythfilldatabase Execution Start/End times are ignored.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä asetus mahdollistaa DataDirect ohjelmatietotarjoajan määrittelemään seuraavan latausajan pienentääkseen servereidensä kuormitusta. Jos tämä asetus on mahdollistettu, mythfilldatabasen käynnistyksen/lopetuksen ajankohdat ohitetaan.</translation>
     </message>
     <message>
         <source>mythfilldatabase Program</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase ohjelma</translation>
     </message>
     <message>
         <source>Use &apos;mythfilldatabase&apos; or the name of a custom script that will populate the program guide info for all your video sources.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä &apos;mythfilldatabase&apos; tai oman komentosarjasi nimeä täyttääksesi ohjelmatiedot kaikille videolähteillesi. </translation>
     </message>
     <message>
         <source>File or directory to use for logging output from the mythfilldatabase program.  Leave blank to disable logging.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiedosto tai hakemisto johon tallentaa lokitietoa mythfilldatabase -ohjelmasta.  Jätä tyhjäksi kytkeäksesi lokien teon pois päältä.</translation>
     </message>
     <message>
         <source>Display Large Clock</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä suurta kelloa</translation>
     </message>
     <message>
         <source>On multiline displays try and display the time as large as possible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Monilinjanäytöissä yritä näyttää aika mahdollisimman suurena.</translation>
     </message>
     <message>
         <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
-        <translation type="unfinished"></translation>
+        <translation>Syötä LCD-näppäimistösi ne 6 koodia, jotka haluat toimivan komennoille ylös/alas/vasen/oikea/kyllä/ei. (Katso lcdproc/server/drivers/hd44780.c/keyMapMatrix[] tai oman näyttösi matriisi)</translation>
     </message>
     <message>
         <source>If checked, QuickTime will correct the gamma of the video to match your monitor.  Turning this off can save some CPU cycles.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos mahdollistettu, QuickTime korjaa videon valoisuutta vastatakseen monitorisi omaan.  Tämän sulkeminen voi vähentää prosessorin kuormaa.</translation>
     </message>
     <message>
         <source>If checked, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos mahdollistettu, video skaalautuu mahtumaan ikkunaan tai näyttöösi. Jos ei mahdollistettu, videota ei koskaan tehä suuremmaksi kuin mitä sen oikea pikselikoko on.</translation>
     </message>
     <message>
         <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video, jota näytetään kokonäytöllä tai ei-ikkunoidussa tilassa hyppää näin monen kuvan yli jokaista piirrettyä kuvaa kohden. Aseta 0, jotta jokainen kuva näytetään. Vain mahdollista, kun joko &quot;Käytä käyttöliittymän kokoa TV-toistoon&quot; tai &quot;Aja käyttöliittymää ikkunassa&quot; ei ole valittuna.</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos mahdollistettu, video näytetään päägrafiikkaikkunassa. Ota pois päältä kun haluat nähdä videota työpöydällä tai ikkunassa. Vain mahdollista, kun &quot;Käytä käyttöliittymän kokoa TV-toistoon&quot; ja  &quot;Aja käyttöliittymää ikkunassa&quot; on valittuna.</translation>
     </message>
     <message>
         <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video pääikkunassa hyppää näin monen kuvan yli jokaista piirrettyä kuvaa kohden. Aseta 0, jotta jokainen kuva näytetään.</translation>
     </message>
     <message>
         <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pääikkunan läpikuultavuus. Aseta 100, jotta kuvasta ei näy yhtään läpi, aseta 0, jotta kuvan läpi näkee täysin.</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos mahdollistettu, video näytetään liikkuvassa ikkunassa. Vain mahdollista, kun &quot;Käytä käyttöliittymän kokoa TV-toistoon&quot; ja  &quot;Aja käyttöliittymää ikkunassa&quot; on valittuna.</translation>
     </message>
     <message>
         <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video liikkuvassa ikkunassa hyppää näin monen kuvan yli jokaista piirrettyä kuvaa kohden. Aseta 0, jotta jokainen kuva näytetään.</translation>
     </message>
     <message>
         <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
-        <translation type="unfinished"></translation>
+        <translation>Liikkuvan ikkunan läpikuultavuus. Aseta 100, jotta kuvasta ei näy yhtään läpi, aseta 0, jotta kuvan läpi näkee täysin.</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos mahdollistettu, video näytetään ohjelmiston telakointi-ikonissa.  Vain mahdollista, kun &quot;Käytä käyttöliittymän kokoa TV-toistoon&quot; ja  &quot;Aja käyttöliittymää ikkunassa&quot; on valittuna.</translation>
     </message>
     <message>
         <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Video telakointi-ikonissa hyppää näin monen kuvan yli jokaista piirrettyä kuvaa kohden. Aseta 0, jotta jokainen kuva näytetään.</translation>
     </message>
     <message>
         <source>If checked, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos mahdollistettu, videonäytetään työpöydällä ikonien takana. Vain mahdollista, kun &quot;Käytä käyttöliittymän kokoa TV-toistoon&quot; ja  &quot;Aja käyttöliittymää ikkunassa&quot; on valittuna.</translation>
     </message>
     <message>
         <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>video työpöydällä hyppää näin monen kuvan yli jokaista piirrettyä kuvaa kohden. Aseta 0, jotta jokainen kuva näytetään.</translation>
     </message>
     <message>
         <source>Miscellaneous</source>
-        <translation type="unfinished"></translation>
+        <translation>Sekalaista</translation>
     </message>
     <message>
         <source>Settings Access</source>
-        <translation type="unfinished"></translation>
+        <translation>Pääsy asetuksiin</translation>
     </message>
     <message>
         <source>Shutdown/Reboot Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Sulkemis/Uudelleenkäynnistysasetukset</translation>
     </message>
     <message>
         <source>General Playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Yleinen toisto</translation>
     </message>
     <message>
         <source>Recording Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Nauoitusryhmät</translation>
     </message>
     <message>
         <source>UDP OSD Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>UDP-tiedoitukset tietoikkunassa</translation>
     </message>
     <message>
         <source>Analog Closed Captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Analooginen tekstityts</translation>
     </message>
     <message>
         <source>General (AutoExpire)</source>
-        <translation type="unfinished"></translation>
+        <translation>Yleinen (Automaattinen vanhentuminen)</translation>
     </message>
     <message>
         <source>Default JobQueue settings for new scheduled recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Oletus Työjärjestysasetukset uusille ajastetuille nauhoituksille</translation>
     </message>
     <message>
         <source>Recording Type Priority Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Nauhoituksen tyyppiprioriteettiasetukset</translation>
     </message>
     <message>
         <source>MythTV Frontend</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV:n käyttöliittymä</translation>
     </message>
     <message>
         <source>Pin code required for a frontend to connect to the backend. Blank prevents all connections, 0000 allows any client to connect.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pin-koodia vaaditaan, kun käyttöliittymä muodostaa yhteyden taustaohjelmistoon. Tyhjä koodi estää kaikkien yhteyksien muodostamisen, 0000 sallii kaikki yhteydenotot.</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original files will be renamed to .old once the transcoding is complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun transkooderi käynnistetään, alkuperäiset tiedostot tullaan nimeämään .old -nimisiksi kun transkoodaus on valmis.</translation>
     </message>
     <message>
         <source>Delete files slowly</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista tiedostot hitaasti</translation>
     </message>
     <message>
         <source>Some filesystems use a lot of resources when deleting large recording files.  This option makes Myth delete the file slowly on this backend to lessen the impact.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jotkin tiedostojärjestelmät käyttävät paljon resursseja poistaessa suuria nauhoitustiedostoja.  Tämä valinta laittaa Mythin poistamaan tiedostoja hitaasti tällä tiedostojärjestelmällä, vähentäen resurssienkäyttöä.</translation>
     </message>
     <message>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä laittaa Mythin seuramaan symboolisia linkkejä, kun nauhoituksia ja vastaavia tiedostja poistetaan, sen sijaan, että poistaisi vain linkit ja jättäisi tiedoston koneelle.</translation>
     </message>
     <message>
         <source>The HD device ringbuffer allows the backend to weather moments of stress. The larger the ringbuffer, the longer the moments of stress can be. However, setting the size too large can cause swapping, which is detrimental.</source>
-        <translation type="unfinished"></translation>
+        <translation>HD -laitteen rengaspuskuri mahdollistaa järjestelmän kestämään hetkittäisiä stressitilanteita. Mitä isompi rengaspuskuri, sitä pidempiä nämä stressitilanteet voivat olla. Liian suuri puskurimusiti voi kuitenkin aiehuttaa virtuaalimuistin käyttöä, joka on vahingollista.</translation>
     </message>
     <message>
         <source>Disable Firewire Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Kytke Firewiren uudelleenkäynnistys pois päältä</translation>
     </message>
     <message>
         <source>By default MythTV will reset the firewire bus when a firewire recorder stops responding to commands. But if this causes problems you can disable this here for Linux firewire recorders.</source>
-        <translation type="unfinished"></translation>
+        <translation>Oletuksena MythTV käynnistää Firewire -väylän uudelleen kun firewire nauhoitin lakkaa vastaamasta komentoihin. Jos tämä aiheuttaa ongelmia, voit kytkeä tämän pois päältä Linuxin firewire nauhoittimilta.</translation>
     </message>
     <message>
         <source>Miscellaneous Status Application</source>
-        <translation type="unfinished"></translation>
+        <translation>Sekalaiset tilannetieto laitteet</translation>
     </message>
     <message>
         <source>External application or script that outputs extra information for inclusion in the backend status page.  See contrib/misc_status_info/README</source>
-        <translation type="unfinished"></translation>
+        <translation>Ulkoinen laitteisto tai komentokoodi, joka tuottaa ylimääräistä tietoa, jota lisätä järjestelmän tilannetietosivulle.  Katso contrib/misc_status_info/README</translation>
     </message>
     <message>
         <source>Your Local Timezone (for XMLTV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sinun paikallinen aikavyöhykkeesi (XMLTV:tä varten)</translation>
     </message>
     <message>
         <source>Used if the XMLTV data comes from a different timezone than your own. This adjust the times in the XMLTV EPG data to compensate. &apos;Auto&apos; converts the XMLTV time to local time using your computer&apos;s timezone.  &apos;None&apos; ignores the XMLTV timezone, interpreting times as local.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytetään, jos XMLTV -tieto tulee eri aikavyöhykkeeltä kuin missä sinä olet. Tämä säätää XMLTV:n EPG -tietojen aikoja. &apos;Auto&apos; muuttaa XMLTV -ajan käyttäen tietokoneellesi asetettua aikavyöhykettä.  &apos;EI ollenkaan&apos; ohittaa XMLTV:n aikavyöhykkeet, tulkiten ajan olevan saman kuin lähetetyssä tiedossa.</translation>
     </message>
     <message>
         <source>Time offset for EIT listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Aikaero EIT -luettelolle</translation>
     </message>
     <message>
         <source>Adjust the relative timezone of the EIT EPG data.  &apos;Auto&apos; converts the EIT time to local time using your computer&apos;s timezone.  &apos;None&apos; ignores the EIT timezone, interpreting times as local.</source>
-        <translation type="unfinished"></translation>
+        <translation>Säädä aikavyöhykkeitä EIT:N EPG -tiedoille.  &apos;Auto&apos; muuttaa XMLTV -ajan käyttäen tietokoneellesi asetettua aikavyöhykettä.  &apos;EI ollenkaan&apos; ohittaa EIT:n aikavyöhykeet, tulkiten ajan olevan saman kuin lähetetyssä tiedossa.</translation>
     </message>
     <message>
         <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimiaika, joka odotetaan ohjelmatietoja yhdeltä DTV -kanavalta, ennen kuin siirrytään tarkistamaan seuraavan kanavan tietoja.</translation>
     </message>
     <message>
         <source>Cross Source EIT</source>
-        <translation type="unfinished"></translation>
+        <translation>Ristitarkista EIT -lähteet</translation>
     </message>
     <message>
         <source>If enabled, listings data collected on one Video Source will be applied to the first matching DVB channel on any Video Source. This is sometimes useful for DVB-S, but may insert bogus data into any ATSC listings stored in the same database.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos mahdollistettu, yhden videolähteen keräämät ohjelmatiedot lisätään ensimmäiseen täsmäävään DVB -kanvaan millä tahansa videolähteellä. Tämä on joskus hyödyllinen DVB-S:llä, mutta se voi lisätä väärää tietoa samaan tietokantaan tallennettuihin ATSC -tietoihin.</translation>
     </message>
     <message>
         <source>Backend Idle Before EIT Crawl (seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Järjestelmän toimeettomusaika ennen EIT -hakua (sekunteina)</translation>
     </message>
     <message>
         <source>The minimum number of seconds after a recorder becomes idle to wait before MythTV begins collecting EIT listings data.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vähimmäismäärä sekunteja, jonka MythTV odottaa, sen jälkeen kun nauhoitin on tullut toimeettomaksi, ennen kuin se alkaa keräämään EIT -ohjelmatietoja nauhoituksen jälkeen.</translation>
     </message>
     <message>
         <source>Delay between wake attempts (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Herätysyritysten välinen odotusaika (sekunteina)</translation>
     </message>
     <message>
         <source>Length of time the frontend waits between tries to wake up the master backend. This should be the time your master backend needs to startup. Set 0 to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aika, jonka käyttöliittymä odottaa ennen kuin se yrittää herättää pääjärjestelmän. Tämän pitäisi olla se aika, joka pääjärjestelmällä kestää käynnistyä. Aseta 0 kytkeäksesi pois päältä.</translation>
     </message>
     <message>
         <source>Wake Attempts</source>
-        <translation type="unfinished"></translation>
+        <translation>Herätysyritykset</translation>
     </message>
     <message>
         <source>The command used to wake up your master backend server
 (eg. sudo /etc/init.d/mythtv-backend restart).</source>
-        <translation type="unfinished"></translation>
+        <translation>Komento, jolla pääjärjestelmäserveri herätetään
+(esim. sudo /etc/init.d/mythtv-backend restart).</translation>
     </message>
     <message>
         <source>Idle shutdown timeout (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Toimeettomuuden odotusaika, ennen sulkemista (sekunteina)</translation>
     </message>
     <message>
         <source>Command to set Wakeup Time</source>
-        <translation type="unfinished"></translation>
+        <translation>komento, jolla asettaa herätysaika</translation>
     </message>
     <message>
         <source>The command used to set the wakeup time (passed as $time) for the Master Backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Komento, jolla asetetaan herätysaika (lähetetään $time:nä) pääjärjestelmälle</translation>
     </message>
     <message>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idling, 2 - reset the backend to wait for a frontend.</source>
-        <translation type="unfinished"></translation>
+        <translation>Komento, joka suoritetaan ennen kuin järjestelmä sulkeutuu. Palautusarvo määrittää jos järjestelmä voi sulkeutua. 0 - kyllä, 1 - uudelleenkäynnistys odottaa, 2 - käynnistää järjestelmän uudellee, odottaakseen käyttöliittymää.</translation>
     </message>
     <message>
         <source>The Job Queue will be limited to running this many simultaneous jobs on this backend.</source>
-        <translation type="unfinished"></translation>
+        <translation>Työjono tullaan rajoittamaan ajamaan näin monta yhtäaikaista työtä tällä järjestelmällä.</translation>
     </message>
     <message>
         <source>When looking for new jobs to process, the Job Queue will wait this long between checks.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun haetaan uusia töitä, joita prosessoida, Työjono odottaa näin kauan ennen tarkistusten välillä.</translation>
     </message>
     <message>
         <source>This setting controls approximately how much CPU jobs in the queue may consume. On &apos;High&apos;, all available CPU time may be used which could cause problems on slower systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä asetus hallitsee kuinka paljon prosessoritehoa jonossa olevat työt saavat suunnilleen kuluttaa. &apos;Korkea&apos; asetuksella kaikki käytettävissä oleva prosessoriaika käytetään, mikä saattaa aiheuttaa ongelmia hitaammilla järjestelmillä.</translation>
     </message>
     <message>
         <source>This setting controls the start of the Job Queue time window which determines when new jobs will be started.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä asetus hallitsee Työjonon työaikataulun alkamisaikaa, joka määrittää milloin uudet työt alkavat.</translation>
     </message>
     <message>
         <source>This setting controls the end of the Job Queue time window which determines when new jobs will be started.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä asetus hallitsee Työjonon työaikataulun loppumisaikaa, joka määrittää milloin uudet työt loppuvat.</translation>
     </message>
     <message>
         <source>Run Jobs only on original recording backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Aja työt vain alkuperäisessä nauhoitusjärjestelmässä</translation>
     </message>
     <message>
         <source>If set, jobs in the queue will be required to run on the backend that made the original recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, jonotettujen töiden vaaditaan suoritettavan järjestelmässä, joka alunperin teki nauhoituksen.</translation>
     </message>
     <message>
         <source>If set, if both auto-transcode and auto commercial flagging are turned ON for a recording, transcoding will run first, otherwise, commercial flagging runs first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, niin automaattinen transkoodaus, kuin automaattinen mainosten tunnistus kytketään päälle nauhoituksissa. Transkoodaus ajetaan ensin, muutoin mainosten tunnistus ajetaan ensin.</translation>
     </message>
     <message>
         <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, automaattinen mainosten tunnistus on päällä nauhoituksissa, tunnistus aloitetaan heti, kun nauhoitus alkaa.  Ei suositella alitehoisilla järjestelmillä.</translation>
     </message>
     <message>
         <source>User Job #%1 Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Käyttäjän työkomento  #%1</translation>
     </message>
     <message>
         <source>The command to run whenever this User Job number is scheduled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Komento, joka ajetaan, aina kun tämä käyttäjän työkomentonumero on ajastettu. </translation>
     </message>
     <message>
         <source>User Job #%1 Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Käyttäjän #%1 työnkuvaus</translation>
     </message>
     <message>
         <source>The Description for this User Job.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämän käyttäjän työn kuvaus.</translation>
     </message>
     <message>
         <source>The program used to transcode recordings. The default is &apos;mythtranscode&apos; if this setting is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohjelma jolla transkoodataan nauhoituksia. Oletus on &apos;mythtranscode&apos;, jos tämä asetus jätetään tyhjäksi.</translation>
     </message>
     <message>
         <source>Commercial Flagger command</source>
-        <translation type="unfinished"></translation>
+        <translation>Mainosten tunnistuksen komento</translation>
     </message>
     <message>
         <source>The program used to detect commercials in a recording.  The default is &apos;mythcommflag&apos; if this setting is empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohjelma, jolla tunnistetaan mainoksia nauhoituksessa.  Oletus on &apos;mythcommflag&apos;, jos tämä asetus jätetään tyhjäksi.</translation>
     </message>
     <message>
         <source>Include Recordings in Video List</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisää nauhoitukset videolistaan</translation>
     </message>
     <message>
         <source>If enabled, the master backend will include the  list of recorded shows in the list of videos  This is mainly to accommodate UPnP players which do not allow more than 1 video section.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos mahdollistettu, pääjärjestelmä lisää listan nauhoitetuista ohjelmista videolistaan.   Tämä on lähinnä mukautus UPnP -soittimille, jotka eivät salli kuin yhden video-osaston.</translation>
     </message>
     <message>
         <source>Upnp Media Update Time</source>
-        <translation type="unfinished"></translation>
+        <translation>UPnP Median päivitysaika</translation>
     </message>
     <message>
         <source>The number of minutes between mythbackend checking  for new videos to serve via upnp. 0 = Off. </source>
-        <translation type="unfinished"></translation>
+        <translation>Minuutit, jotka myhtbackend odottaa tarkistusten välissä, löytääkseen uusia videoita UPnP:lle. 0 = Off. </translation>
     </message>
     <message>
         <source>Video content to show a WMP Client</source>
-        <translation type="unfinished"></translation>
+        <translation>Videosisältö, jota näytetään Windows Media Playerillä</translation>
     </message>
     <message>
         <source>Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Nauhoitukset</translation>
     </message>
     <message>
         <source>Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Videot</translation>
     </message>
     <message>
         <source>This lets decided to map a WMP  client to the Recordings tree or to the Video tree when  it requests a list of videos </source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä antaa sinun lisätä WMP -soittimen Nauhoitus puuhun ja video puuhun, kun videolistaa kysytään</translation>
     </message>
     <message>
         <source>Local Backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Paikallinen järjestelmä</translation>
     </message>
     <message>
         <source>Miscellaneous Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Sekalaiset asetukset</translation>
     </message>
     <message>
         <source>File Management Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiedostohallinnan asetukset</translation>
     </message>
     <message>
         <source>EIT Scanner Options</source>
-        <translation type="unfinished"></translation>
+        <translation>EIT -skannerin asetukset
+</translation>
     </message>
     <message>
         <source>Backend Wakeup settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Järjestelmän Herätysasetukset</translation>
     </message>
     <message>
         <source>UPNP Server Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>UPnP -serverin asetukset</translation>
     </message>
     <message>
         <source>No Storage Group directories are defined.  You must add at least one directory to the Default Storage Group where new recordings will be stored.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallennusryhmien hakemistoja ei ole määritelty.  Sinun täytyy lisätä ainakin yksi hakemisto, oleteus tallennusryhmälle, johon uudet nauhoitukset tullaan tallentamaan.</translation>
     </message>
     <message>
         <source>MythTV Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV:n asetukset</translation>
     </message>
     <message>
         <source>Defines a period the master backend should be awake</source>
-        <translation type="unfinished"></translation>
+        <translation>Määrittää ajanjakson, jonka pääjärjestelmän tulisi olla hereillä</translation>
     </message>
     <message>
         <source>Set both Start &amp; End times to 00:00 to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseta Alku- &amp; Loppuaika 00:00 kytkeäksesi pois päältä.</translation>
     </message>
     <message>
         <source>Mythwelcome will automatically start the mythfrontend if it is determined that it was not started to record a program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythwelcome käynnistää automaattisesti mythfrontendin, jos se päättelee, että sitä ei käynnistetty nauhoittamaan ohjelmaa.</translation>
     </message>
     <message>
         <source>Mythwelcome will automatically shutdown this computer when the master backend shuts down. Should only be set on frontend only machines</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythwelcome sulkee tämän tietokoneen automaattisesti kun pääjärjestelmä sammuu. Tulisi käyttää vain käyttöliittymäkoneissa</translation>
     </message>
     <message>
         <source>This is the format to use to display the date. See http://doc.trolltech.com/3.3/qdate.html#toString for a list of valid format specifiers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä on muoto, jolla aika näytetään. Katso http://doc.trolltech.com/3.3/qdate.html#toString mähdäksesi listan mahdollisista muotovaihtoehdoista.</translation>
     </message>
     <message>
         <source>Command to Set Wakeup Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Komento, jolla asetetaan heräämisaika</translation>
     </message>
     <message>
         <source>Command to set the wakeup time in the BIOS. See the README file for more examples.</source>
-        <translation type="unfinished"></translation>
+        <translation>Komento, jolla asetetaan BIOS:n heräämisaika. Katso README -tiedosto nähdäksesi lisää esimerkkejä.</translation>
     </message>
     <message>
         <source>The format of the time string passed to the &apos;Set Wakeup Time Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch (use time_t for nvram_wakeup).</source>
-        <translation type="unfinished"></translation>
+        <translation>Muoto, jolla aikakomento lähetetään &apos;Aseta herätysaika&apos; $time -komennolla. Katso QT::QDateTime.toString() nähdäksesi lisää yksityiskohtia. Aseta &apos;time_t&apos; sekunneiksi, ajanjakson jälkeen. (käytä time_t nvram_wakeup:lle).</translation>
     </message>
     <message>
         <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. Leave blank if your bios does not require a reboot. See the README file for more examples.</source>
-        <translation type="unfinished"></translation>
+        <translation>Komento joka ajetaan, jos BIOS vaatii uudelleenkäynnistyksen mahdollistaakseen nvram-wakeup -asetusten voimaan tulemisen. Jätä tyhjäksi, jos BIOS ei vaadi uudelleenkäynnistystä. Katso README -tiedosto nähdäksesi lisää esimerkkejä.</translation>
     </message>
     <message>
         <source>Command to reboot computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Komento jolla tietokone käynnistetään uudelleen.</translation>
     </message>
     <message>
         <source>Command to shutdown computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Komento, jolla tietokone suljetaan.</translation>
     </message>
     <message>
         <source>Command to start an Xterm. Can be disabled by leaving this setting blank.</source>
-        <translation type="unfinished"></translation>
+        <translation>Komento, jolla käynnistetään Xterm. Voidaan ottaa pois käytöstä jättämällä tyhjäksi.</translation>
     </message>
     <message>
         <source>TXT File</source>
         <comment>Text File</comment>
-        <translation type="unfinished"></translation>
+        <translation>TXT -tiedosto</translation>
     </message>
     <message>
         <source>Do not configure a grabber</source>
-        <translation type="unfinished"></translation>
+        <translation>Älä muokkaa tarttujaa</translation>
     </message>
     <message>
         <source>Loading XMLTV configuration...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lataa XMLTV asetuksia...</translation>
     </message>
     <message>
         <source>North America (SchedulesDirect.org) (Internal)</source>
-        <translation type="unfinished"></translation>
+        <translation>Pohjois-Amerikka (SchedulesDirect.org) (Sisäinen)</translation>
     </message>
     <message>
         <source>Transmitted guide only (EIT)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vain välitetty opas (EIT)</translation>
     </message>
     <message>
         <source>No grabber</source>
-        <translation type="unfinished"></translation>
+        <translation>E itarttujaa</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lataa...</translation>
     </message>
     <message>
         <source>Decode VBI format</source>
-        <translation type="unfinished"></translation>
+        <translation>Pura DBI -formaatti</translation>
     </message>
     <message>
         <source>PAL Teletext</source>
-        <translation type="unfinished"></translation>
+        <translation>PAL Teletext</translation>
     </message>
     <message>
         <source>NTSC Closed Caption</source>
-        <translation type="unfinished"></translation>
+        <translation>NTSC -tekstitys</translation>
     </message>
     <message>
         <source>If set, this overrides the mythtv-setup setting used during recording when decoding captions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asetettu, tämä ohittaa mythtv-setup -asetukset, joita käytetään tekstityksen purkamiseen nauhoituksen aikana.</translation>
     </message>
     <message>
         <source>Subtitle Codec</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekstityksen pakkauksenhallitsija</translation>
     </message>
     <message>
         <source>External Subtitle Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ulkoiset tekstitysasetukset</translation>
     </message>
     <message>
         <source>Disable Automatic Database Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Kytke automaattiset tietokannan varmuuskopioinnit pois päältä</translation>
     </message>
     <message>
         <source>This will prevent Myth from backing up the database before upgrades.  If disabled, you should have your own backup strategy in place.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä estää Mythiä varmuuskopioimasta tietokantaa ennen päivityksiä.  Jos otettu pois päältä, sinulla pitäisi olla oma varmuuskopiointistrategia käytössä.</translation>
+    </message>
+    <message>
+        <source>Cannot login to database?</source>
+        <translation>Etkö voi kirjautua sisään tietokantaan?</translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with V4L support to query audio inputs</source>
+        <translation>ERROR, Koosta V4L -tuen kanssa, jotta voidaan kysellä äänilähteet</translation>
+    </message>
+    <message>
+        <source>Channel Importer</source>
+        <translation>Kanavien sisääntuoja</translation>
+    </message>
+    <message>
+        <source>Failed to find any channels</source>
+        <translation>Ei onnistunut löytämään yhtään kanavaa</translation>
+    </message>
+    <message>
+        <source>Found %1 new non-conflicting %2 channels.</source>
+        <translation>Löytyi %1 uutta ei-ristiriitaista %2 kanavaa.</translation>
+    </message>
+    <message>
+        <source>Found %1 old %2 channels.</source>
+        <translation>löytyi %1 vanhaa %2 kanavaa.</translation>
+    </message>
+    <message>
+        <source>Found %1 new conflicting %2 channels.</source>
+        <translation>Löytyi %1 uutta ristiriidassa olevaa %2 kanavaa.</translation>
+    </message>
+    <message>
+        <source>Found %1 conflicting old %2 channels.</source>
+        <translation>Löytyi %1 ristiriidassa olevaa vanhaa %2 kanavaa.</translation>
+    </message>
+    <message>
+        <source>Found %1 transports:
+</source>
+        <translation>Löytyi %1 uutta lähetysvirtaa:
+</translation>
+    </message>
+    <message>
+        <source>Channels: FTA Enc Dec
+</source>
+        <translation>Kanavat: FTA Enc Dec
+</translation>
+    </message>
+    <message>
+        <source>Unique: prog %1 atsc %2 atsc minor %3 channum %4
+</source>
+        <translation>Uniikki: prog %1 atsc %2 atsc minor %3 kanavanumero %4
+</translation>
+    </message>
+    <message>
+        <source>Max atsc major count: %1</source>
+        <translation>Maksimi atsc major luku: %1</translation>
+    </message>
+    <message>
+        <source>Insert all</source>
+        <translation>Syötä kaikki</translation>
+    </message>
+    <message>
+        <source>Insert manually</source>
+        <translation>Syötä manuaalisesti</translation>
+    </message>
+    <message>
+        <source>Ignore all</source>
+        <translation>Ohita kaikki</translation>
+    </message>
+    <message>
+        <source>Update all</source>
+        <translation>Päivitä kaikki</translation>
+    </message>
+    <message>
+        <source>Update manually</source>
+        <translation>Päivitä manuaalisesti</translation>
+    </message>
+    <message>
+        <source>Please enter either 1, 2, or 3:</source>
+        <translation>Ole hyvä ja syötä joko 1, 2, tai 3:</translation>
+    </message>
+    <message>
+        <source>This channel was found to be in conflict with other channels</source>
+        <translation>Tämä kanava on ristiriidassa muiden kanavien kanssa</translation>
+    </message>
+    <message>
+        <source>Please enter a non-conflicting channel number:</source>
+        <translation>Ole hyvä ja syötä ei-ristiriidassa oleva kanavanumero:</translation>
+    </message>
+    <message>
+        <source>Updated Channel %1</source>
+        <translation>Kanava %1 päivitetty</translation>
+    </message>
+    <message>
+        <source>Added Channel %1</source>
+        <translation>Kanava %1 lisätty</translation>
+    </message>
+    <message>
+        <source>Failed to add channel %1</source>
+        <translation>Kanavan %1 lisäys epäonnistui</translation>
+    </message>
+    <message>
+        <source>%1 -- Testing decryption of program %2</source>
+        <translation>%1 -- Kokeilee koodinpurkua ohjelmalle %2</translation>
+    </message>
+    <message>
+        <source>Program %1</source>
+        <translation>Ohjelma %1</translation>
+    </message>
+    <message>
+        <source>Unknown decryption status</source>
+        <translation>Koodinpurun tila tuntematon</translation>
+    </message>
+    <message>
+        <source>Encrypted</source>
+        <translation>Salattu</translation>
+    </message>
+    <message>
+        <source>Decrypted</source>
+        <translation>Purettu</translation>
+    </message>
+    <message>
+        <source>%1 -- Timed out</source>
+        <translation>%1 -- Aikakatkaisu</translation>
+    </message>
+    <message>
+        <source>%1 possible channels</source>
+        <translation>%1 mahdollista kanavaa</translation>
+    </message>
+    <message>
+        <source>no channels</source>
+        <translation>Ei kanavia</translation>
+    </message>
+    <message>
+        <source>%1, no signal</source>
+        <translation>%1, ei signaalia</translation>
+    </message>
+    <message>
+        <source>%1 -- Found %2 probable channels</source>
+        <translation>%1 -- Löysi %2 mahdollista kanavaa</translation>
+    </message>
+    <message>
+        <source>Processing NIT %1</source>
+        <translation>Käsitellään NIT %1</translation>
+    </message>
+    <message>
+        <source>: Found %1</source>
+        <translation>: Löytyi %1</translation>
+    </message>
+    <message>
+        <source>Frequency %1</source>
+        <translation>Taajuus %1</translation>
+    </message>
+    <message>
+        <source>as</source>
+        <translation>nimellä</translation>
+    </message>
+    <message>
+        <source>Skipping %1, not in imported channel map</source>
+        <translation>Ohitetaan %1, ei ole tuotujen kanavien kartassa</translation>
+    </message>
+    <message>
+        <source>Error tuning to transport</source>
+        <translation>Virhe lähetysvirran virittämisessä</translation>
+    </message>
+    <message>
+        <source>Programmer Error: Failed to handle tune complete.</source>
+        <translation>Virhe koodaajassa: Epäonnistui käsittelemään äänitaajuutta kokonaan.</translation>
+    </message>
+    <message>
+        <source>Failed to parse &apos;%1&apos;</source>
+        <translation>Ei saatu jäsenneltyä tiedostoa &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Failed to open &apos;%1&apos;</source>
+        <translation>Ei saatu avattua tiedostoa &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Error starting scan</source>
+        <translation>Virhe etsinnän aloittamisessa</translation>
+    </message>
+    <message>
+        <source>Programmer Error: No Device</source>
+        <translation>Koodaajan virhe: Ei laitetta</translation>
+    </message>
+    <message>
+        <source>Programmer Error: Channel not created</source>
+        <translation>Koodaajan virhe: Kanavaa ei luotu</translation>
+    </message>
+    <message>
+        <source>Channel could not be opened.</source>
+        <translation>Kanavaa ei voitu avata.</translation>
+    </message>
+    <message>
+        <source>Blank Frame + Logo Detection</source>
+        <translation>Tyhjän kuvan + Logon havaitseminen</translation>
+    </message>
+    <message>
+        <source>Scene Change + Logo Detection</source>
+        <translation>Kohtuaksen vaihuminen ja logon havaitsemine</translation>
+    </message>
+    <message>
+        <source>Experimental</source>
+        <translation>Koekäyttöinen</translation>
+    </message>
+    <message>
+        <source>UNKNOWN</source>
+        <comment>Synthesized callsign</comment>
+        <translation>TUNTEMATON</translation>
+    </message>
+    <message>
+        <source>Name of the icon file</source>
+        <translation>Ikonitiedoston nimi</translation>
+    </message>
+    <message>
+        <source>List of possible icon files</source>
+        <translation>Luettelo mahdollisista ikoneista</translation>
+    </message>
+    <message>
+        <source>Enter text here for the manual search</source>
+        <translation>Syötä teksti tähän manuaalista etsintää varten</translation>
+    </message>
+    <message>
+        <source>&amp;Search</source>
+        <translation>&amp;Etsi</translation>
+    </message>
+    <message>
+        <source>Manually search for the text</source>
+        <translation>Etsi tekstiä manuaalisesti</translation>
+    </message>
+    <message>
+        <source>S&amp;kip</source>
+        <translation>Ohita (&amp;k)</translation>
+    </message>
+    <message>
+        <source>Skip this icon</source>
+        <translation>Ohita tämä ikoni</translation>
+    </message>
+    <message>
+        <source>S&amp;elect</source>
+        <translation>Valits&amp;e</translation>
+    </message>
+    <message>
+        <source>Select this icon</source>
+        <translation>valitse tämä ikoni</translation>
+    </message>
+    <message>
+        <source>Error downloading</source>
+        <translation>Virhe ladatessa</translation>
+    </message>
+    <message>
+        <source>Failed to download the icon file</source>
+        <translation>Ikonin lataus epäonnistui</translation>
+    </message>
+    <message>
+        <source>Icon is blocked</source>
+        <translation>Ikoni on estetty</translation>
+    </message>
+    <message>
+        <source>This combination of channel and icon has been blocked by the MythTV admins. The most common reason for this is that there is a better match available.
+ Are you still sure that you want to use this icon?</source>
+        <translation>Tämä kanavan ja ikonin yhdistelmä on estetty MythTV:n adminien toimesta. Yleisin syy tälle on, että parempi yhdistelmä on valittavissa.
+Oletko varma, että haluat käyttää tätä ikonia?</translation>
+    </message>
+    <message>
+        <source>Submit information</source>
+        <translation>Esitöä tieto</translation>
+    </message>
+    <message>
+        <source>You now have the opportunity to transmit your choices  back to mythtv.org so that others can benefit from your selections.</source>
+        <translation>Sinulla on nyt mahdollisuus lähettää valintasi  takaisin mythtv.org:iin, jotta muut voivat hyötyä valinnoistasi. </translation>
+    </message>
+    <message>
+        <source>Avg. Bitrate</source>
+        <translation>Keskimääräinen bittinopeus</translation>
+    </message>
+    <message>
+        <source>Average bit rate in kilobits/second. 2200Kbps is approximately 1 Gigabyte per hour.</source>
+        <translation>Keskimääräinen bittinopeus kilobitteinä/sekunti. 275 kB/s lataa suunnilleen 1 gigatavun tunnissa.</translation>
+    </message>
+    <message>
+        <source>Maximum bit rate in kilobits/second. 2200Kbps is approximately 1 Gigabyte per hour.</source>
+        <translation>Maksimi bittinopeus kilobitteinä/sekunti. 275 kB/s lataa suunnilleen 1 gigatavun tunnissa.</translation>
+    </message>
+    <message>
+        <source>MPEG-4 AVC Hardware Encoder</source>
+        <translation>MPEG-4 AVC laitteistokoodaaja</translation>
+    </message>
+    <message>
+        <source>Low Resolution</source>
+        <translation>Alhainen resoluutio</translation>
+    </message>
+    <message>
+        <source>Medium Resolution</source>
+        <translation>Keskitasoinen resoluutio</translation>
+    </message>
+    <message>
+        <source>High Resolution</source>
+        <translation>Korkea resoluutio</translation>
+    </message>
+    <message>
+        <source>Error querying recorder state</source>
+        <translation>Virhe kyseltäessä nauhoittimen tilaa</translation>
+    </message>
+    <message>
+        <source>MythTV has was set to sleep for %1 minutes and will exit in %2 seconds.
+Do you wish to continue watching?</source>
+        <translation>MythTV on asetettu torkkumaan %1 minuutiksi ja poistuu %2 sekunnissa.
+Halutako jatkaa katsomista?</translation>
+    </message>
+    <message>
+        <source>MythTV has been idle for %1 minutes and will exit in %2 seconds. Are you still watching?</source>
+        <translation>MythTV on ollut toimeeton %1 minuuttia ja poistuu %2 sekunnissa. Katsotko vieläkin?</translation>
+    </message>
+    <message>
+        <source>H.264 encoder card (HD-PVR)</source>
+        <translation>H.264 koodauskortti (HD-PVR)</translation>
+    </message>
+    <message>
+        <source>Audio input</source>
+        <translation>Äänisyöttö</translation>
+    </message>
+    <message>
+        <source>master</source>
+        <translation>pää</translation>
+    </message>
+    <message>
+        <source>%1% Completed @ %2 fps.</source>
+        <translation>%1% Suoritettu loppuun @ %2 kehysnopeudella.</translation>
+    </message>
+    <message>
+        <source>%1 Frames Completed @ %2 fps.</source>
+        <translation>%1 kuvaa suoritettu loppuun @ %2 kehysnopeudella.</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation>Tauko</translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation>Ajossa</translation>
+    </message>
+    <message>
+        <source>Finished, %1 break(s) found.</source>
+        <translation>Suoritettu, %1 virhettä löytyi.</translation>
+    </message>
+    <message>
+        <source>mythfilldatabase ran, but did not insert any new data into the Guide.  This can indicate a potential problem with the XML file used for the update.</source>
+        <translation>Suoritettiin mythfilldatabase, mutta uutta tietoa ei syötetty Ohjelmatietoihin.  Tämä voi tarkoittaa mahdollista ongelmaa XML -päivitystiedostossa.</translation>
+    </message>
+    <message>
+        <source>Overrides for specific video sizes</source>
+        <translation>Ohittaa kyseisen videokoon</translation>
+    </message>
+    <message>
+        <source>Generating Keyframe Index</source>
+        <translation>KEhittää Keyframe -indeksiä</translation>
+    </message>
+    <message>
+        <source>Transcode Completed</source>
+        <translation>Transkoodaus suoritettu</translation>
+    </message>
+    <message>
+        <source>Completed</source>
+        <translation>Suoritettu</translation>
     </message>
 </context>
 <context>
@@ -11073,11 +11749,11 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Skipping %1, not in imported channel map</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohitetaan %1, puuttuu syötettystä kanavakartasta</translation>
     </message>
     <message>
         <source>%1%2%3 on %4 (%5)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1%2%3 %4:ssä (%5)</translation>
     </message>
     <message>
         <source>Adding %1</source>
@@ -11093,15 +11769,15 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>on %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1:ssä</translation>
     </message>
     <message>
         <source>Data Only Channel (off-air?)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vain tietoa sisältävä kanava (ei vastaanota?)</translation>
     </message>
     <message>
         <source>Empty Channel (off-air?)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tyhjä kanava (ei vastaanota?)</translation>
     </message>
     <message>
         <source>Audio Only Channel</source>
@@ -11113,15 +11789,15 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>%1 %2-%3 as %4 on %5 (%6)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2-%3 on %4 %5:ssä (%6)</translation>
     </message>
     <message>
         <source>Found channel, but it doesn&apos;t match existing tsid. You may wish to delete existing channels and do a full scan.</source>
-        <translation type="unfinished"></translation>
+        <translation>Löydettiin kanava, mutta se ei vastaa käytettyä tsid:tä. Voit halutessasi poistaa käytössä olevat kanavat ja tehdä täyden haun.</translation>
     </message>
     <message>
         <source>Skipping %1 - already in DB, and we don&apos;t have better data.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohitetaan %1 - löytyy jo tietokannasta, eikä meillä ole parempaa tietoa.</translation>
     </message>
 </context>
 <context>
@@ -11129,6 +11805,13 @@ Do you wish to continue watching?</source>
     <message>
         <source>Country</source>
         <translation>Maa</translation>
+    </message>
+</context>
+<context>
+    <name>ScanMonitor</name>
+    <message>
+        <source>Scanning</source>
+        <translation>Etsii</translation>
     </message>
 </context>
 <context>
@@ -11168,6 +11851,10 @@ Do you wish to continue watching?</source>
     <message>
         <source>No Lock</source>
         <translation>Ei Lukitusta</translation>
+    </message>
+    <message>
+        <source>Rotor Movement</source>
+        <translation>Kääntömoottorin liike</translation>
     </message>
 </context>
 <context>
@@ -11266,6 +11953,73 @@ Do you wish to continue watching?</source>
     <message>
         <source>or later</source>
         <translation>tai myöhemmin</translation>
+    </message>
+</context>
+<context>
+    <name>SchemaUpgradeWizard</name>
+    <message>
+        <source>There are also other clients using this database. They should be shut down first.</source>
+        <translation>Tietokantaa käytetään muilla asiakasohjelmilla. Sulje muut tietokantaa käyttävät ohjelmat ensin.</translation>
+    </message>
+    <message>
+        <source>Error: This version of Myth%1 requires MySQL %2.%3.%4 or later.  You seem to be running MySQL version %5.</source>
+        <translation>Virhe: Tämä versio Myth%1 vaatii MySQL %2.%3.%4 tai myöhemmän. Sinä näytät käyttävän MySQL:n versiota %5.</translation>
+    </message>
+    <message>
+        <source>Error: MythTV cannot upgrade the schema of this datatase because other clients are using it.
+
+Please shut them down before upgrading.</source>
+        <translation>Virhe: Ei voida päivittää tämän tietokannan mallia, koska muut asiakasohjelmat käyttävät sitä.
+
+Sammuta tietokantaa käyttävät ohjelmat ennen päivitystä.</translation>
+    </message>
+    <message>
+        <source>Warning: MythTV wants to upgrade your database,</source>
+        <translation>Varoitus: MythTV haluaa päivittää tietokantasi,</translation>
+    </message>
+    <message>
+        <source>for the %1 schema, from %2 to %3.</source>
+        <translation>mallille %1, malleista %2 - %3.</translation>
+    </message>
+    <message>
+        <source>You can try using the old schema, but that may cause problems.</source>
+        <translation>Voit yrittää käyttää vanhaa mallia, mutta se voi aiheuttaa ongelmia.</translation>
+    </message>
+    <message>
+        <source>This version of MythTV requires an updated database. </source>
+        <translation>Tämä MythTV:n versio vaatii päivitetyn tietokannan. </translation>
+    </message>
+    <message>
+        <source>(schema is %1 versions behind)</source>
+        <translation>(malli on %1 versiota jäljessä)</translation>
+    </message>
+    <message>
+        <source>Please run mythtv-setup or mythbackend to update your database.</source>
+        <translation>Ole hyvä ja suorita mythtv-setup tai mythbackend päivittääksesi tietokantasi.</translation>
+    </message>
+    <message>
+        <source>Warning: MythTV database has newer %1 schema (%2) than expected (%3).</source>
+        <translation>Varoitus: MythTV:n tietokannalla on uudempi %1 malli (%2) kuin odotettiin (%3).</translation>
+    </message>
+    <message>
+        <source>Error: MythTV database has newer %1 schema (%2) than expected (%3).</source>
+        <translation>Virhe: MythTV:n tietokannalla on uudempi %1 malli (%2) kuin odotettiin (%3).</translation>
+    </message>
+    <message>
+        <source>MythTV was unable to backup your database.</source>
+        <translation>MythTV epäonnistui tietokantasi varmuuskopioinnissa.</translation>
+    </message>
+    <message>
+        <source>If your system becomes unstable, a database backup file called
+%1
+is located in %2</source>
+        <translation>Jos järjestelmästäsi tulee epävakaa, tietokannan varmuuskopio nimeltään
+%1
+löytyy %2</translation>
+    </message>
+    <message>
+        <source>This cannot be un-done, so having a database backup would be a good idea.</source>
+        <translation>Tätä toimintoa ei voi peruuttaa, joten tietokannasta on hyvä tehdä varmuuskopio.</translation>
     </message>
 </context>
 <context>
@@ -12246,7 +13000,7 @@ Valitse nykyinen nauhoitus</translation>
     </message>
     <message>
         <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change video source (%3), inputs (%4), etc.</source>
-        <translation>Kanava olisi pitänyt virittäytyä jo. Kanavaa voidaan vaihtaa (%1 -- %2).</translation>
+        <translation type="obsolete">Kanava olisi pitänyt virittäytyä jo. Kanavaa voidaan vaihtaa (%1 -- %2).</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -12316,6 +13070,50 @@ Valitse nykyinen nauhoitus</translation>
     <message>
         <source>MythTV has no capture cards defined. Please run the mythtv-setup program.</source>
         <translation>TV-kortteja ei ole määritelty. Suorita mythtv-setup-ohjelma.</translation>
+    </message>
+    <message>
+        <source>You should have received a channel lock by now. You can continue to wait for a signal, or you can change the channel with %1 or %2, change video source (%3), inputs (%4), etc.</source>
+        <translation>Sinun olisi pitänyt vastaanottaa kanavalukitus tähän mennessä. Voit jatkaa singnaalin odottomaist tai voit vaihtaa kanavan %1 tai %2, vaihtaa videon lähdettä (%3), sisääntuloja (4%), jne.</translation>
+    </message>
+    <message>
+        <source>Live TV</source>
+        <translation>Live TV</translation>
+    </message>
+    <message>
+        <source>this DVD</source>
+        <translation>tämä DVD</translation>
+    </message>
+    <message>
+        <source>this Video</source>
+        <translation>tämä Video</translation>
+    </message>
+    <message>
+        <source>this recording</source>
+        <translation>tämä tallennus</translation>
+    </message>
+    <message>
+        <source>Delete it, but allow it to re-record</source>
+        <translation>Poista, mutta salli uudelleennauhoitukset</translation>
+    </message>
+    <message>
+        <source>Delete it</source>
+        <translation>Poista</translation>
+    </message>
+    <message>
+        <source>Save it so I can watch it again</source>
+        <translation>Tallenna uutta katselukertaa varten</translation>
+    </message>
+    <message>
+        <source>Yes, and allow re-record</source>
+        <translation>Kyllä, ja salli uudelleennauhoitus</translation>
+    </message>
+    <message>
+        <source>Yes, delete it</source>
+        <translation>Kyllä, poista</translation>
+    </message>
+    <message>
+        <source>No, keep it, I changed my mind</source>
+        <translation>Ei, säilytä se, muutin mieltäni</translation>
     </message>
 </context>
 <context>
