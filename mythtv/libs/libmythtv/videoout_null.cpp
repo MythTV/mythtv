@@ -13,7 +13,7 @@ const int kPrebufferFramesSmall = 4;
 const int kKeepPrebuffer = 2;
 
 VideoOutputNull::VideoOutputNull(void) :
-    VideoOutput(), global_lock(true)
+    VideoOutput(), global_lock(QMutex::Recursive)
 {
     VERBOSE(VB_PLAYBACK, "VideoOutputNull()");
     memset(&av_pause_frame, 0, sizeof(av_pause_frame));

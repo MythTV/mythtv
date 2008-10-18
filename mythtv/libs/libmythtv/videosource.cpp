@@ -800,7 +800,7 @@ class VideoDevice : public PathSetting, public CaptureCardDBStorage
 
         // /dev/dtv*
         dev.setPath("/dev");
-        dev.setNameFilter("dtv*");
+        dev.setNameFilters(QStringList("dtv*"));
         fillSelectionsFromDir(dev, minor_min, minor_max,
                               card, driver, false);
     };
@@ -824,8 +824,8 @@ class VideoDevice : public PathSetting, public CaptureCardDBStorage
             QFileInfo &fi = *it;
 
             struct stat st;
-            QString filepath = fi.absFilePath();
-            int err = lstat(filepath, &st);
+            QString filepath = fi.absoluteFilePath();
+            int err = lstat(filepath.toLocal8Bit().constData(), &st);
 
             if (0 != err)
             {
@@ -909,7 +909,7 @@ class VBIDevice : public PathSetting, public CaptureCardDBStorage
         {
             QFileInfo &fi = *it;
 
-            QString    device = fi.absFilePath();
+            QString    device = fi.absoluteFilePath();
             QByteArray adevice = device.toAscii();
             int vbifd = open(adevice.constData(), O_RDWR);
             if (vbifd < 0)
@@ -1571,7 +1571,7 @@ void HDPVRConfigurationGroup::probeCard(const QString &device)
 {
     QString cn = tr("Failed to open"), ci = cn, dn = QString::null;
 
-    int videofd = open(device.ascii(), O_RDWR);
+    int videofd = open(device.toLocal8Bit().constData(), O_RDWR);
     if (videofd >= 0)
     {
         if (!CardUtil::GetV4LInfo(videofd, cn, dn))
@@ -2258,7 +2258,7 @@ CardInput::CardInput(bool isDTVcard,  bool isDVBcard,
 
     addChild(interact);
 
-    setName("CardInput");
+    setObjectName("CardInput");
     SetSourceID("-1");
 
     connect(scan,     SIGNAL(pressed()), SLOT(channelScanner()));
@@ -2914,7 +2914,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
             cardname->setValue(frontend_name);
             signal_timeout->setValue(500);
             channel_timeout->setValue(3000);
-            if (frontend_name.toLower().find("usb") >= 0)
+            if (frontend_name.toLower().indexOf("usb") >= 0)
             {
                 signal_timeout->setValue(40000);
                 channel_timeout->setValue(42500);
@@ -2954,7 +2954,7 @@ void DVBConfigurationGroup::probeCard(const QString &videodevice)
             }
 
 #if 0 // frontends on hybrid DVB-T/Analog cards
-            if (frontend_name.toLower().find("usb") < 0)
+            if (frontend_name.toLower().indexOf("usb") < 0)
             {
                 buttonAnalog->setVisible(
                     short_name.left(6).toLower() == "pchdtv" ||
@@ -3026,7 +3026,7 @@ void TunerCardAudioInput::fillSelections(const QString &device)
     QStringList inputs =
         CardUtil::ProbeAudioInputs(device, last_cardtype);
 
-    for (int i = 0; i < inputs.size(); i++)
+    for (uint i = 0; i < (uint)inputs.size(); i++)
     {
         addSelection(inputs[i], QString::number(i),
                      last_device == QString::number(i));

@@ -191,7 +191,8 @@ class XvMCSurfaceTypes
 
     static QString XvMCDescription(Display *pdisp = NULL);
     QString toString(Display *pdisp = NULL, XvPortID p = 0) const;
-    ostream& operator<<(ostream& os) const { return os << (const char *)toString(); }
+    ostream& operator<<(ostream& os) const
+        { return os << toString().toLocal8Bit().constData(); }
 
   private:
     int num;

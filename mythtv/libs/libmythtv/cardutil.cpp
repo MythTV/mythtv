@@ -309,7 +309,7 @@ bool CardUtil::HasDVBCRCBug(const QString &device)
 uint CardUtil::GetMinSignalMonitoringDelay(const QString &device)
 {
     QString name = ProbeDVBFrontendName(device);
-    if (name.find("DVB-S") >= 0)
+    if (name.indexOf("DVB-S") >= 0)
         return 300;
     if (name == "DiBcom 3000P/M-C DVB-T")
         return 100;
@@ -1412,15 +1412,15 @@ bool CardUtil::GetV4LInfo(
     bzero(&capability, sizeof(struct v4l2_capability));
     if (ioctl(videofd, VIDIOC_QUERYCAP, &capability) >= 0)
     {
-        card.setAscii((char*)capability.card);
-        driver.setAscii((char*)capability.driver);
+        card = QString::fromAscii((const char*)capability.card);
+        driver = QString::fromAscii((const char*)capability.driver);
         version = capability.version;
     }
     else // Fallback to V4L1 query
     {
         struct video_capability capability;
         if (ioctl(videofd, VIDIOCGCAP, &capability) >= 0)
-            card.setAscii((char*)capability.name);
+            card = QString::fromAscii((const char*)capability.name);
     }
 #endif // !USING_V4L
 
@@ -1612,7 +1612,7 @@ QStringList CardUtil::ProbeV4LAudioInputs(QString device)
 
     bool ok;
     QStringList ret;
-    int videofd = open(device.ascii(), O_RDWR);
+    int videofd = open(device.toAscii().constData(), O_RDWR);
     if (videofd < 0)
     {
         VERBOSE(VB_IMPORTANT, QString("ProbeAudioInputs() -> couldn't open device"));
@@ -1884,15 +1884,15 @@ QString CardUtil::GetDeviceName(dvb_dev_type_t type, const QString &device)
     if (DVB_DEV_FRONTEND == type)
         return devname;
     else if (DVB_DEV_DVR == type)
-        return devname.replace(devname.find("frontend"), 8, "dvr");
+        return devname.replace(devname.indexOf("frontend"), 8, "dvr");
     else if (DVB_DEV_DEMUX == type)
-        return devname.replace(devname.find("frontend"), 8, "demux");
+        return devname.replace(devname.indexOf("frontend"), 8, "demux");
     else if (DVB_DEV_CA == type)
-        return devname.replace(devname.find("frontend"), 8, "ca");
+        return devname.replace(devname.indexOf("frontend"), 8, "ca");
     else if (DVB_DEV_AUDIO == type)
-        return devname.replace(devname.find("frontend"), 8, "audio");
+        return devname.replace(devname.indexOf("frontend"), 8, "audio");
     else if (DVB_DEV_VIDEO == type)
-        return devname.replace(devname.find("frontend"), 8, "video");
+        return devname.replace(devname.indexOf("frontend"), 8, "video");
 
     return "";
 }

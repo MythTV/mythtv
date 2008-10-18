@@ -27,7 +27,7 @@ FirewireDevice::FirewireDevice(uint64_t guid, uint subunitid, uint speed) :
     m_speed(speed),
     m_last_channel(0),      m_last_crc(0),
     m_buffer_cleared(true), m_open_port_cnt(0),
-    m_lock(false)
+    m_lock()
 {
 }
 

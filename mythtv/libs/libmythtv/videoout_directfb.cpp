@@ -21,10 +21,9 @@ extern "C" {
 using namespace std;
 
 // Qt headers
-#include <qapplication.h>
-#include <qwidget.h>
-#include <qevent.h>
-#include <qmutex.h>
+#include <QApplication>
+#include <QWidget>
+#include <QMutex>
 #include <QKeyEvent>
 
 // MythTV headers
@@ -76,7 +75,8 @@ class DirectfbData
         primarySurface(NULL), videoLayer(NULL),
         videoSurface(NULL),   inputbuf(NULL),
         screen_width(0),      screen_height(0),
-        bufferLock(true),     has_blit(false)
+        bufferLock(QMutex::Recursive),
+        has_blit(false)
     {
         bzero(&videoLayerDesc,           sizeof(DFBDisplayLayerDescription));
         bzero(&videoLayerConfig,         sizeof(DFBDisplayLayerConfig));
@@ -812,10 +812,23 @@ void VideoOutputDirectfb::Show(FrameScanType)
     QtKey      key      = *it;
     QKeyEvent *keyevent = NULL;
 
+#ifdef QT3_SUPPORT
     if (event.type == DIET_KEYPRESS)
         keyevent = new QKeyEvent(QEvent::KeyPress,   key.key, key.ascii, 0);
     else if (event.type == DIET_KEYRELEASE)
         keyevent = new QKeyEvent(QEvent::KeyRelease, key.key, key.ascii, 0);
+#else
+    if (event.type == DIET_KEYPRESS)
+    {
+        keyevent = new QKeyEvent(QEvent::KeyPress,   key.key, 0,
+                                 QString((char)key.ascii));
+    }
+    else if (event.type == DIET_KEYRELEASE)
+    {
+        keyevent = new QKeyEvent(QEvent::KeyRelease, key.key, 0,
+                                 QString((char)key.ascii));
+    }
+#endif
 
     if (keyevent)
         QApplication::postEvent(widget, keyevent);

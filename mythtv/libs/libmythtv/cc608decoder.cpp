@@ -23,7 +23,7 @@ CC608Decoder::CC608Decoder(CC608Reader *ccr)
       vps_l(0),
       wss_flags(0),                 wss_valid(false),
       xds_crc_passed(0),            xds_crc_failed(0),
-      xds_lock(true),
+      xds_lock(QMutex::Recursive),
       xds_net_call(QString::null),  xds_net_name(QString::null),
       xds_tsid(0)
 {
@@ -1322,7 +1322,7 @@ bool CC608Decoder::XDSPacketParseChannel(const vector<unsigned char> &xds_buf)
     else if ((b2 == 0x02) && (xds_buf.size() >= 6))
     {
         QString tmp = XDSDecodeString(xds_buf, 2, xds_buf.size() - 2);
-        if (is_better(tmp, xds_net_call) && (tmp.find(" ") < 0))
+        if (is_better(tmp, xds_net_call) && (tmp.indexOf(" ") < 0))
         {
             VERBOSE(VB_VBI, QString("XDS: Network Call '%1'").arg(tmp));
             xds_net_call = tmp;

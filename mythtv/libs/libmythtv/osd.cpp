@@ -476,7 +476,7 @@ bool OSD::InitMenu(void)
 
     normalizeRect(area);
     normalizeRect(listarea);
-    listarea.moveBy((int)(-xoffset*hmult+0.5), (int)(-yoffset*hmult+0.5));
+    listarea.translate((int)(-xoffset*hmult+0.5), (int)(-yoffset*hmult+0.5));
 
     OSDListTreeType *lb = new OSDListTreeType("menu", area, listarea, 10,
                                               wmult, hmult);
@@ -501,7 +501,7 @@ bool OSD::InitMenu(void)
     if (!actfont)
     {
         QMap<QString, TTFFont *>::Iterator it = fontMap.begin();
-        actfont = it.data();
+        actfont = *it;
     }
 
     if (!inactfont)
@@ -1321,7 +1321,7 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
             {
                 listsize = parseRect(getFirstText(info));
                 normalizeRect(listsize);
-                listsize.moveBy(-xoffset, -yoffset);
+                listsize.translate(-xoffset, -yoffset);
             }
             else if (info.tagName() == "leveloffset")
             {
@@ -1598,7 +1598,7 @@ void OSD::normalizeRect(QRect &rect)
     rect.setHeight((int)(rect.height() * hmult));
     rect.moveTopLeft(QPoint((int)(xoffset + rect.x() * wmult),
                             (int)(yoffset + rect.y() * hmult)));
-    rect = rect.normalize();
+    rect = rect.normalized();
 }       
 
 QPoint OSD::parsePoint(QString text)
@@ -2284,7 +2284,7 @@ int OSD::GetDialogResponse(const QString &name)
     if (dialogResponseList.contains(name))
     {
         int ret = dialogResponseList[name] + 1;
-        dialogResponseList.erase(name);
+        dialogResponseList.remove(name);
 
         return ret;
     }
@@ -2474,7 +2474,7 @@ void OSD::DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
             for (; i != deleteMap.end(); ++i)
             {
                 long long frame = i.key();
-                int direction = i.data();
+                int direction = *i;
 
                 if (direction == 0 && !indelete && first)
                 {
@@ -2668,7 +2668,7 @@ void OSD::AddSet(OSDSet *set, QString name, bool withlock)
 
 void OSD::RemoveSet(OSDSet *set)
 {
-    setMap.erase(set->GetName());
+    setMap.remove(set->GetName());
     vector<OSDSet *>::iterator i = setList->begin();
     for (; i != setList->end(); i++)
         if (*i == set)
@@ -2813,6 +2813,8 @@ QRect OSD::GetSubtitleBounds()
     return QRect(xoffset, yoffset, displaywidth, displayheight);
 }
 
+#define OSD_STRDUP(X) strdup(gContext->GetSetting(X).toLocal8Bit().constData())
+
 static void initialize_osd_fonts(void)
 {
     QMutexLocker locker(&cc708_init_lock);
@@ -2824,50 +2826,52 @@ static void initialize_osd_fonts(void)
         "OSDCC708DefaultFontType", "MonoSerif");
 
     // 0
-    cc708_default_font_names[0]  = strdup(gContext->GetSetting(
-        QString("OSDCC708%1Font").arg(default_font_type)));
-    cc708_default_font_names[1]  = strdup(gContext->GetSetting(
-        QString("OSDCC708%1ItalicFont").arg(default_font_type)));
+    cc708_default_font_names[0]  =
+        OSD_STRDUP(QString("OSDCC708%1Font").arg(default_font_type));
+    cc708_default_font_names[1]  =
+        OSD_STRDUP(QString("OSDCC708%1ItalicFont").arg(default_font_type));
 
     // 1
-    cc708_default_font_names[2]  = strdup(gContext->GetSetting(
-        "OSDCC708MonoSerifFont"));
-    cc708_default_font_names[3]  = strdup(gContext->GetSetting(
-        "OSDCC708MonoSerifItalicFont"));
+    cc708_default_font_names[2]  =
+        OSD_STRDUP("OSDCC708MonoSerifFont");
+    cc708_default_font_names[3]  =
+        OSD_STRDUP("OSDCC708MonoSerifItalicFont");
 
     // 2
-    cc708_default_font_names[4]  = strdup(gContext->GetSetting(
-        "OSDCC708PropSerifFont"));
-    cc708_default_font_names[5]  = strdup(gContext->GetSetting(
-        "OSDCC708PropSerifItalicFont"));
+    cc708_default_font_names[4]  =
+        OSD_STRDUP("OSDCC708PropSerifFont");
+    cc708_default_font_names[5]  =
+        OSD_STRDUP("OSDCC708PropSerifItalicFont");
 
     // 3
-    cc708_default_font_names[6]  = strdup(gContext->GetSetting(
-        "OSDCC708MonoSansSerifFont"));
-    cc708_default_font_names[7]  = strdup(gContext->GetSetting(
-        "OSDCC708MonoSansSerifItalicFont"));
+    cc708_default_font_names[6]  =
+        OSD_STRDUP("OSDCC708MonoSansSerifFont");
+    cc708_default_font_names[7]  =
+        OSD_STRDUP("OSDCC708MonoSansSerifItalicFont");
 
     // 4
-    cc708_default_font_names[8]  = strdup(gContext->GetSetting(
-        "OSDCC708PropSansSerifFont"));
-    cc708_default_font_names[9]  = strdup(gContext->GetSetting(
-        "OSDCC708PropSansSerifItalicFont"));
+    cc708_default_font_names[8]  =
+        OSD_STRDUP("OSDCC708PropSansSerifFont");
+    cc708_default_font_names[9]  =
+        OSD_STRDUP("OSDCC708PropSansSerifItalicFont");
 
     // 5
-    cc708_default_font_names[10]  = strdup(gContext->GetSetting(
-        "OSDCC708CasualFont"));
-    cc708_default_font_names[11]  = strdup(gContext->GetSetting(
-        "OSDCC708CasualItalicFont"));
+    cc708_default_font_names[10]  =
+        OSD_STRDUP("OSDCC708CasualFont");
+    cc708_default_font_names[11]  =
+        OSD_STRDUP("OSDCC708CasualItalicFont");
 
     // 6
-    cc708_default_font_names[12] = strdup(gContext->GetSetting(
-        "OSDCC708CursiveFont"));
-    cc708_default_font_names[13] = strdup(gContext->GetSetting(
-        "OSDCC708CursiveItalicFont"));
+    cc708_default_font_names[12] =
+        OSD_STRDUP("OSDCC708CursiveFont");
+    cc708_default_font_names[13] =
+        OSD_STRDUP("OSDCC708CursiveItalicFont");
 
     // 7
-    cc708_default_font_names[14] = strdup(gContext->GetSetting(
-        "OSDCC708CapitalsFont"));
-    cc708_default_font_names[15] = strdup(gContext->GetSetting(
-        "OSDCC708CapitalsItalicFont"));
+    cc708_default_font_names[14] =
+        OSD_STRDUP("OSDCC708CapitalsFont");
+    cc708_default_font_names[15] =
+        OSD_STRDUP("OSDCC708CapitalsItalicFont");
 }
+
+#undef OSD_STRDUP

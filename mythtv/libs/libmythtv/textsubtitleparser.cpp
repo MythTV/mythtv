@@ -110,7 +110,7 @@ void TextSubtitles::Clear(void)
 bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
 {
     demux_sputext_t sub_data;
-    sub_data.file_ptr = fopen(fileName, "r");
+    sub_data.file_ptr = fopen(fileName.toLocal8Bit().constData(), "r");
     
     if (!sub_data.file_ptr)
         return false;
@@ -127,7 +127,7 @@ bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
     QTextCodec *textCodec = NULL;
     QString codec = gContext->GetSetting("SubtitleCodec", "");
     if (!codec.isEmpty())
-        textCodec = QTextCodec::codecForName(codec);
+        textCodec = QTextCodec::codecForName(codec.toLatin1());
     if (!textCodec)
         textCodec = QTextCodec::codecForName("utf-8");
     if (!textCodec)

@@ -282,7 +282,7 @@ void OSDSet::SetText(const QMap<QString, QString> &infoMap)
             for (; riter != infoMap.end(); riter++)
             {
                 QString key  = riter.key().toUpper();
-                QString data = riter.data();
+                QString data = *riter;
 
                 if (new_text.contains(key))
                 {
@@ -292,7 +292,7 @@ void OSDSet::SetText(const QMap<QString, QString> &infoMap)
                         QString("(\\|([^%|]*))?") +
                         QString("(\\|([^%]*))?%"));
 
-                    if (riter.data() != "")
+                    if ((*riter) != "")
                     {
                         new_text.replace(full_regex,
                                          QString("\\2") + data + "\\4");
@@ -387,7 +387,7 @@ bool OSDSet::HandleKey(const QKeyEvent *e, bool *focus_change,
     }
     else if (Qt::Key_Down == key || Qt::Key_Tab == key)
         field_move = +1;
-    else if (Qt::Key_Up == key || Qt::Key_BackTab == key)
+    else if (Qt::Key_Up == key || Qt::Key_Backtab == key)
         field_move = -1;
     else if (Qt::Key_Right == key)
         move = +1;
@@ -395,9 +395,9 @@ bool OSDSet::HandleKey(const QKeyEvent *e, bool *focus_change,
         move = -1;
     else if (Qt::Key_Delete == key)
         del = +1;
-    else if (Qt::Key_BackSpace == key)
+    else if (Qt::Key_Backspace == key)
         del = -1;
-    else if (e->state() == Qt::ControlButton)
+    else if (e->modifiers() == Qt::ControlModifier)
     {
         if (Qt::Key_A == key)
             move = -1000;
@@ -486,7 +486,7 @@ bool OSDSet::HandleKey(const QKeyEvent *e, bool *focus_change,
 
 static int extract_hot_key(const QString &text)
 {
-    int i = text.find("[");
+    int i = text.indexOf("[");
     if ((i < 0) || ((i + 1) >= (int)text.length()))
         return 0;
     int ch = text.at(i + 1).toUpper().toAscii() - 'A' + Qt::Key_A;
@@ -657,7 +657,7 @@ bool OSDSet::CanShowWith(const QString &name) const
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
 
 OSDType::OSDType(const QString &name) :
-    m_lock(true),
+    m_lock(QMutex::Recursive),
     m_hidden(false),
     m_name(name),
     m_parent(NULL)
@@ -1119,7 +1119,7 @@ void OSDTypeText::DrawHiLiteString(OSDSurface *surface, QRect rect,
         while (!str.isEmpty())
         {
             QString tmp = str;
-            int loc = str.find((in_hilite) ? "]" : "[");
+            int loc = str.indexOf((in_hilite) ? "]" : "[");
 
             if (loc < 0)
             {
@@ -1152,10 +1152,10 @@ void OSDTypeText::DrawHiLiteString(OSDSurface *surface, QRect rect,
             xoffset /= 2;
 
         if (xoffset > 0)
-            rect.moveBy(xoffset, 0);
+            rect.translate(xoffset, 0);
     }
 
-    rect.moveBy(xoff, yoff);
+    rect.translate(xoff, yoff);
     rect.setRight( min(rect.right(),  surface->width));
     rect.setBottom(min(rect.bottom(), surface->height));
 
@@ -1175,7 +1175,7 @@ void OSDTypeText::DrawHiLiteString(OSDSurface *surface, QRect rect,
                              off_rect.right(), off_rect.bottom(),
                              alphamod, double_size);
 
-            off_rect.moveBy(m_draw_info[i].width, 0);
+            off_rect.translate(m_draw_info[i].width, 0);
             rect.setRight( min(rect.right(),  surface->width));
             rect.setBottom(min(rect.bottom(), surface->height));
         }
@@ -1232,10 +1232,10 @@ void OSDTypeText::DrawString(OSDSurface *surface, QRect rect,
             xoffset /= 2;
 
         if (xoffset > 0)
-            rect.moveBy(xoffset, 0);
+            rect.translate(xoffset, 0);
     }
 
-    rect.moveBy(xoff, yoff);
+    rect.translate(xoff, yoff);
     rect.setRight( min(rect.right(),  surface->width));
     rect.setBottom(min(rect.bottom(), surface->height));
 
@@ -2091,7 +2091,7 @@ void OSDTypeBox::Draw(OSDSurface *surface, int fade, int maxfade,
     unsigned char alpha = xalpha & 0xff;
 
     QRect disprect = size;
-    disprect.moveBy(xoff, yoff);
+    disprect.translate(xoff, yoff);
 
     int xstart = clamp(disprect.left(),   0, surface->width);
     int xend   = clamp(disprect.right(),  0, surface->width);

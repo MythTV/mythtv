@@ -131,9 +131,9 @@ VideoOutput *VideoOutput::Create(
     {
         VERBOSE(VB_PLAYBACK, LOC +
                 QString("Trying video renderer: '%1'").arg(renderer));
-        QStringList::iterator it = renderers.find(renderer);
-        if (it != renderers.end())
-            renderers.erase(it);
+        int index = renderers.indexOf(renderer);
+        if (index >= 0)
+            renderers.removeAt(index);
         else
             break;
 
@@ -1363,7 +1363,7 @@ QRect VideoOutput::GetPIPRect(int location, NuppelVideoPlayer *pipplayer)
             yoff = display_visible_rect.height() - position.height() - yoff;
             break;
     }
-    position.moveBy(xoff, yoff);
+    position.translate(xoff, yoff);
     return position;
 }
 

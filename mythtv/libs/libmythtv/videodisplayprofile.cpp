@@ -119,7 +119,7 @@ bool ProfileItem::IsValid(QString *reason) const
         if (reason)
         {
             if (deint1.contains("bobdeint") || deint1.contains("doublerate"))
-                deints.remove(deint1);
+                deints.removeAll(deint1);
 
             *reason = QString("deinterlacer %1 is not supported w/renderer %2 "
                               "as second deinterlacer (supported: %3)")
@@ -194,7 +194,7 @@ QString ProfileItem::toString(void) const
 #define LOC     QString("VDP: ")
 #define LOC_ERR QString("VDP, Error: ")
 
-QMutex      VideoDisplayProfile::safe_lock(true);
+QMutex      VideoDisplayProfile::safe_lock(QMutex::Recursive);
 bool        VideoDisplayProfile::safe_initialized = false;
 safe_map_t  VideoDisplayProfile::safe_renderer;
 safe_map_t  VideoDisplayProfile::safe_deint;
@@ -205,7 +205,7 @@ priority_map_t VideoDisplayProfile::safe_renderer_priority;
 pref_map_t  VideoDisplayProfile::dec_name;
 
 VideoDisplayProfile::VideoDisplayProfile()
-    : lock(true), last_size(0,0), last_rate(0.0f),
+    : lock(QMutex::Recursive), last_size(0,0), last_rate(0.0f),
       last_video_renderer(QString::null)
 {
     QMutexLocker locker(&safe_lock);

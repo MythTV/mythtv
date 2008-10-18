@@ -64,7 +64,7 @@ OSDImageCacheValue::~OSDImageCacheValue()
  *  \brief Constructor, initializes the internal cache structures.
  */
 OSDImageCache::OSDImageCache() : 
-    m_cacheLock(true),
+    m_cacheLock(QMutex::Recursive),
     m_memHits(0), m_diskHits(0), m_misses(0), m_cacheSize(0)
 {
 }
@@ -135,7 +135,7 @@ bool OSDImageCache::InFileCache(const QString &key) const
     // if cache file is older than backing file, delete cache file
     if (cFile.lastModified() < oFile.lastModified())
     {
-        cFile.dir().remove(cFile.baseName(true));
+        cFile.dir().remove(cFile.completeBaseName());
         return false;
     } 
 
@@ -173,7 +173,7 @@ OSDImageCacheValue *OSDImageCache::Get(const QString &key, bool useFile)
     QDir dir(GetConfDir() + "/osdcache/");
     QString fname = QString("%1/%2").arg(dir.path()).arg(key);
     QFile cacheFile(fname);
-    if (!cacheFile.open(QIODevice::IO_ReadOnly))
+    if (!cacheFile.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Failed to open read-only cache file '" + fname + "'");
@@ -199,8 +199,8 @@ OSDImageCacheValue *OSDImageCache::Get(const QString &key, bool useFile)
 
     unsigned char *yuv = new unsigned char[yuv_size];
     unsigned char *alpha = new unsigned char[imwidth * imheight];
-    stream.readRawBytes((char*)yuv,   yuv_size);
-    stream.readRawBytes((char*)alpha, imwidth * imheight);
+    stream.readRawData((char*)yuv,   yuv_size);
+    stream.readRawData((char*)alpha, imwidth * imheight);
     cacheFile.close();
 
     OSDImageCacheValue* value = 
@@ -306,8 +306,8 @@ void OSDImageCache::SaveToDisk(const OSDImageCacheValue *value)
 
     QDataStream stream(&cacheFile);
     stream << imwidth << imheight;   
-    stream.writeRawBytes((const char*)value->m_yuv, yuv_size);
-    stream.writeRawBytes((const char*)value->m_alpha, imwidth * imheight);
+    stream.writeRawData((const char*)value->m_yuv, yuv_size);
+    stream.writeRawData((const char*)value->m_alpha, imwidth * imheight);
     cacheFile.close();
 }
 
@@ -327,7 +327,7 @@ QString OSDImageCache::CreateKey(const QString &filename, float wmult,
 QString OSDImageCache::ExtractOriginal(const QString &key)
 {
     QString tmp0 = key.mid(6);
-    QString tmp1 = tmp0.left(tmp0.find("@"));
+    QString tmp1 = tmp0.left(tmp0.indexOf("@"));
     QString tmp2 = tmp1.replace(QChar('+'), "/");
     return tmp2;
 }

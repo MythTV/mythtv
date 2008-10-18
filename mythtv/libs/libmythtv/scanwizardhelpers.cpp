@@ -406,7 +406,7 @@ bool InputSelector::Parse(const QString &cardid_inputname,
     cardid    = 0;
     inputname = QString::null;
 
-    int sep0 = cardid_inputname.find(':');
+    int sep0 = cardid_inputname.indexOf(':');
     if (sep0 < 1)
         return false;
 

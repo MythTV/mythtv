@@ -109,7 +109,7 @@ const char *vr_str[] =
 VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     : VideoOutput(),
       myth_codec_id(codec_id), video_output_subtype(XVUnknown),
-      display_res(NULL), global_lock(true),
+      display_res(NULL), global_lock(QMutex::Recursive),
 
       XJ_root(0),  XJ_win(0), XJ_curwin(0), XJ_gc(0), XJ_screen(NULL),
       XJ_disp(NULL), XJ_screen_num(0),
@@ -121,14 +121,14 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
 
       xvmc_buf_attr(new XvMCBufferSettings()),
       xvmc_chroma(XVMC_CHROMA_FORMAT_420), xvmc_ctx(NULL),
-      xvmc_osd_lock(false),
+      xvmc_osd_lock(),
       xvmc_tex(NULL),
 
       xv_port(-1),      xv_hue_base(0),
       xv_colorkey(0),   xv_draw_colorkey(false),
       xv_chroma(0),
 
-      gl_context_lock(false), gl_context(NULL),
+      gl_context_lock(), gl_context(NULL),
       gl_videochain(NULL), gl_pipchain(NULL),
       gl_osdchain(NULL),
 
@@ -4186,7 +4186,7 @@ QRect VideoOutputXv::GetPIPRect(int location, NuppelVideoPlayer *pipplayer)
             break;
     }
 
-    position.moveBy(xoff, yoff);
+    position.translate(xoff, yoff);
     return position;
 }
 

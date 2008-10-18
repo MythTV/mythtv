@@ -277,16 +277,17 @@ QString XvMCSurfaceTypes::toString(Display *pdisp, XvPortID p) const
         flags += (copytop) ? ", copy_to_pbuf" : "";
 
         os<<"\t\t"
-          << (const char *)QString("type_id: 0x%1").arg(surfaceTypeID(j))
-          <<"  chroma: "<< (const char *)chroma
+          << (QString("type_id: 0x%1").arg(surfaceTypeID(j)))
+            .toLocal8Bit().constData()
+          <<"  chroma: "<< chroma.toLocal8Bit().constData()
           <<"  max_size: "
           <<maxWidth(j)<<"x"<<maxHeight(j)
           <<"  sub_max_size: "
           <<maxSubpictureWidth(j)<<"x"
           <<maxSubpictureHeight(j)
           <<endl<<"\t\t"
-          <<"accel: "<< (const char *)accel
-          <<"  flags: "<< (const char *)flags<<endl;
+          <<"accel: "<< accel.toLocal8Bit().constData()
+          <<"  flags: "<< flags.toLocal8Bit().constData()<<endl;
 
         if (pdisp && p)
         {
@@ -296,7 +297,9 @@ QString XvMCSurfaceTypes::toString(Display *pdisp, XvPortID p) const
                                                  surfaceTypeID(j),
                                                  &num));
             for (int k = (xvfmv) ? 0 : num; k < num; k++)
-                os<<"\t\t\t"<< (const char *)XvImageFormatToString(xvfmv[k]) <<endl;
+                os << "\t\t\t"
+                   << XvImageFormatToString(xvfmv[k]).toLocal8Bit().constData()
+                   << endl;
 
             if (xvfmv)
                 X11S(XFree(xvfmv));
@@ -343,19 +346,21 @@ QString XvMCSurfaceTypes::XvMCDescription(Display *pdisp)
         type += (ai[i].type & XvOutputMask) ? "output, " : "";
         type += (ai[i].type & XvImageMask)  ? "image, " : "";
 
-        os<< (const char *)QString("Adaptor #%1  ").arg(i)
-          << (const char *)QString("name: %1  base_id: %2  num_ports: %3  type: %4"
-                    "num_fmt: %5")
-            .arg(ai[i].name).arg(ai[i].base_id)
-            .arg(ai[i].num_ports).arg(type)
-            .arg(ai[i].num_formats)<<endl;
+        os<< (QString("Adaptor #%1  ").arg(i)).toLocal8Bit().constData()
+          << (QString("name: %1  base_id: %2  num_ports: %3  type: %4"
+                      "num_fmt: %5")
+              .arg(ai[i].name).arg(ai[i].base_id)
+              .arg(ai[i].num_ports).arg(type)
+              .arg(ai[i].num_formats)).toLocal8Bit().constData()<<endl;
 
         for (uint j = 0; j < ai[i].num_formats; j++)
         {
             XvFormat &fmt = ai[i].formats[j];
-            os << (const char *)QString("\tFormat #%1  ").arg(j,2)
-               << (const char *)QString("depth: %1  ").arg((int)fmt.depth,2)
-               << (const char *)QString("visual id: 0x%1").arg(fmt.visual_id,0,16)<<endl;
+            os << (QString("\tFormat #%1  ").arg(j,2) +
+                   QString("depth: %1  ").arg((int)fmt.depth,2) +
+                   QString("visual id: 0x%1").arg(fmt.visual_id,0,16))
+                .toLocal8Bit().constData()
+               << endl;
         }
         os<<endl;
 
@@ -365,7 +370,7 @@ QString XvMCSurfaceTypes::XvMCDescription(Display *pdisp)
         {
             XvMCSurfaceTypes surf(pdisp, p);
             os<<"\tPort #"<<p<<"  size: "<<surf.size()<<endl;
-            os<< (const char *)surf.toString(pdisp, p);
+            os<< surf.toString(pdisp, p).toLocal8Bit().constData();
         }
         os<<endl<<endl;
     }

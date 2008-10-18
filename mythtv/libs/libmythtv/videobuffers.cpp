@@ -115,8 +115,8 @@ VideoBuffers::VideoBuffers()
     : numbuffers(0), needfreeframes(0), needprebufferframes(0),
       needprebufferframes_normal(0), needprebufferframes_small(0),
       keepprebufferframes(0), need_extra_for_pause(false), rpos(0), vpos(0),
-      global_lock(true), use_frame_locks(true),
-      frame_lock(true)
+      global_lock(QMutex::Recursive), use_frame_locks(true),
+      frame_lock(QMutex::Recursive)
 {
 }
 
@@ -782,7 +782,7 @@ void VideoBuffers::LockFrame(const VideoFrame *frame, const char* owner)
 
     frame_lock_map_t::iterator it = frame_locks.find(frame);
     if (it == frame_locks.end())
-        mutex = frame_locks[frame] = new QMutex(true);
+        mutex = frame_locks[frame] = new QMutex(QMutex::Recursive);
     else
         mutex = it->second;
 
@@ -846,7 +846,7 @@ bool VideoBuffers::TryLockFrame(const VideoFrame *frame, const char* owner)
 
     frame_lock_map_t::iterator it = frame_locks.find(frame);
     if (it == frame_locks.end())
-        mutex = frame_locks[frame] = new QMutex(true);
+        mutex = frame_locks[frame] = new QMutex(QMutex::Recursive);
     else
         mutex = it->second;
 
@@ -1064,7 +1064,7 @@ VideoFrame* VideoBuffers::GetOSDFrame(const VideoFrame *frame)
     if (f)
         dbg_str.append(DebugString(f, true));
 #endif
-    UnlockFrame(frame, dbg_str);
+    UnlockFrame(frame, dbg_str.toLocal8Bit().constData());
 
     return f;
 }

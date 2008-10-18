@@ -116,7 +116,7 @@ CC708Window::CC708Window()
 
       true_row_count(0),        true_column_count(0),
       text(NULL),               exists(false),
-      lock(true)
+      lock(QMutex::Recursive)
 {
 }
 

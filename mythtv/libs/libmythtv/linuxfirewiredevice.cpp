@@ -105,7 +105,7 @@ static void add_handle(raw1394handle_t handle, LinuxFirewireDevice *dev)
 static void remove_handle(raw1394handle_t handle)
 {
     QMutexLocker slocker(&LFDPriv::s_lock);
-    LFDPriv::s_handle_info.erase(handle);
+    LFDPriv::s_handle_info.remove(handle);
 }
 
 const uint LinuxFirewireDevice::kBroadcastChannel    = 63;

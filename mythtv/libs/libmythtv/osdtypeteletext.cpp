@@ -45,7 +45,7 @@ OSDTypeTeletext::OSDTypeTeletext(const QString &name, TTFFont *font,
                                  QRect displayrect, float wmult, float hmult,
                                  OSD *osd)
     : OSDType(name),
-      m_lock(true),
+      m_lock(QMutex::Recursive),
       m_displayrect(displayrect),       m_unbiasedrect(0,0,0,0),
       m_box(NULL),
 

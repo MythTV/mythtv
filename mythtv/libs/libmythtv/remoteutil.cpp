@@ -369,7 +369,7 @@ RemoteEncoder *RemoteRequestFreeRecorderFromList(
     for (QStringList::iterator recIter = qualifiedRecorders.begin();
          recIter != qualifiedRecorders.end(); ++recIter) 
     {
-        if (strlist.find(*recIter) == strlist.end()) 
+        if (!strlist.contains(*recIter))
         {
             // did not find it in the free recorder list. We
             // move on to check the next recorder

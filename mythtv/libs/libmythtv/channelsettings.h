@@ -10,6 +10,7 @@
 #include "mythwidgets.h"
 #include "mythwizard.h"
 #include "libmythdb/mythdb.h"
+#include "mythverbose.h"
 
 class ChannelID : public IntegerSetting, public TransientStorage
 {
@@ -52,7 +53,10 @@ class ChannelID : public IntegerSetting, public TransientStorage
                 MythDB::DBError("ChannelID::save", query);
 
             if (query.numRowsAffected() != 1)
-                cerr << "ChannelID:Failed to insert into: " << (const char *)table << endl;
+            {
+                VERBOSE(VB_IMPORTANT, QString("ChannelID, Error: ") +
+                        QString("Failed to insert into: %1").arg(table));
+            }
         }
     }
     void Save(void)

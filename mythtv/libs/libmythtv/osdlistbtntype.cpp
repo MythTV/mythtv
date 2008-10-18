@@ -143,8 +143,8 @@ void OSDListTreeType::SetAsTree(OSDGenericTree *toplevel,
     {
         QString levelname = QString("level%1").arg(i + 1);
         QRect curlevelarea = m_levelsize;
-        curlevelarea.moveBy(m_totalarea.x(), m_totalarea.y());
-        curlevelarea.moveBy((m_levelsize.width() + m_levelspacing) * i, 0);
+        curlevelarea.translate(m_totalarea.x(), m_totalarea.y());
+        curlevelarea.translate((m_levelsize.width() + m_levelspacing) * i, 0);
 
         OSDListBtnType *newlevel = new OSDListBtnType(
             levelname, curlevelarea, m_wmult, m_hmult, true);
@@ -360,7 +360,7 @@ OSDListBtnType::OSDListBtnType(const QString &name, const QRect &area,
       m_itemRegAlpha(100),              m_itemSelAlpha(255),
       m_fontActive(NULL),               m_fontInactive(NULL),
       m_topIndx(0),                     m_selIndx(0),
-      m_update(true)
+      m_update(QMutex::Recursive)
 {
 }
 
@@ -711,8 +711,11 @@ void OSDListBtnType::InitItem(
         *ptr = black;
 
     {
-        QImage img(data, width, height, QImage::Format_RGB32);
-        img.setAlphaBuffer(alpha<255);
+        QImage img;
+        img = (alpha<255) ?
+            QImage(data, width, height, QImage::Format_ARGB32) :
+            QImage(data, width, height, QImage::Format_RGB32);
+
         osdImg.Load(img);
     }
     delete[] data;
@@ -794,7 +797,7 @@ void OSDListBtnTypeItem::paint(OSDSurface *surface, TTFFont *font,
         if (m_showArrow)
         {
             QRect ar(m_arrowRect);
-            ar.moveBy(x, y);
+            ar.translate(x, y);
             m_parent->m_arrowPix.Draw(surface, fade, maxfade, ar.x(), ar.y());
         }
     }
@@ -809,7 +812,7 @@ void OSDListBtnTypeItem::paint(OSDSurface *surface, TTFFont *font,
     if (m_checkable)
     {
         QRect cr(m_checkRect);
-        cr.moveBy(x, y);
+        cr.translate(x, y);
         
         if (m_state == HalfChecked)
             m_parent->m_checkHalfPix.Draw(surface, fade, maxfade,
@@ -825,12 +828,12 @@ void OSDListBtnTypeItem::paint(OSDSurface *surface, TTFFont *font,
     if (m_pixmap)
     {
         QRect pr(m_pixmapRect);
-        pr.moveBy(x, y);
+        pr.translate(x, y);
         m_pixmap->Draw(surface, fade, maxfade, pr.x(), pr.y());
     }
 
     QRect tr(m_textRect);
-    tr.moveBy(x, y);
-    tr.moveBy(0, font->Size() / 4);
+    tr.translate(x, y);
+    tr.translate(0, font->Size() / 4);
     font->DrawString(surface, tr.x(), tr.y(), m_text, tr.right(), tr.bottom());
 }
