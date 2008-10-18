@@ -25,7 +25,7 @@ RecorderBase::RecorderBase(TVRec *rec)
       vbimode(0), ntsc(true), ntsc_framerate(true), video_frame_rate(29.97),
       m_videoAspect(0), curRecording(NULL), request_pause(false), paused(false),
       nextRingBuffer(NULL), nextRecording(NULL),
-      positionMapType(MARK_GOP_BYFRAME), positionMapLock(false)
+      positionMapType(MARK_GOP_BYFRAME), positionMapLock()
 {
     QMutexLocker locker(&avcodeclock);
     avcodec_init(); // init CRC's

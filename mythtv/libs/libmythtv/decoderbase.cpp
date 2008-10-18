@@ -166,7 +166,7 @@ bool DecoderBase::PosMapFromDb(void)
     for (QMap<long long,long long>::const_iterator it = posMap.begin();
          it != posMap.end(); it++) 
     {
-        PosMapEntry e = {it.key(), it.key() * keyframedist, it.data()};
+        PosMapEntry e = {it.key(), it.key() * keyframedist, *it};
         m_positionMap.push_back(e);
     }
     if (!m_positionMap.empty())
@@ -246,7 +246,7 @@ bool DecoderBase::PosMapFromEnc(void)
     for (QMap<long long,long long>::const_iterator it = posMap.begin();
          it != posMap.end(); it++) 
     {
-        PosMapEntry e = {it.key(), it.key() * keyframedist, it.data()};
+        PosMapEntry e = {it.key(), it.key() * keyframedist, *it};
         m_positionMap.push_back(e);
     }
     if (!m_positionMap.empty())

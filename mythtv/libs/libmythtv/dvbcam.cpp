@@ -213,7 +213,7 @@ void DVBCam::HandlePMT(void)
         {
             pmt_list_t::iterator it = PMTAddList.begin();
             const ChannelBase *chan = it.key();
-            ProgramMapTable *pmt = it.data();
+            ProgramMapTable *pmt = (*it);
             PMTList[chan] = pmt;
             PMTAddList.erase(it);
             SendPMT(*pmt, CPLM_ADD);
@@ -229,7 +229,7 @@ void DVBCam::HandlePMT(void)
     {
         pmt_list_t::iterator it = PMTAddList.begin();
         const ChannelBase *chan = it.key();
-        ProgramMapTable *pmt = it.data();
+        ProgramMapTable *pmt = (*it);
         PMTList[chan] = pmt;
         PMTAddList.erase(it);
     }
@@ -286,20 +286,20 @@ void DVBCam::SetPMT(const ChannelBase *chan, const ProgramMapTable *pmt)
     pmt_list_t::iterator it2 = PMTAddList.find(chan);
     if (!pmt && (it != PMTList.end()))
     {
-        delete it.data();
+        delete *it;
         PMTList.erase(it);
         pmt_updated = true;
     }
     else if (!pmt && (it2 != PMTAddList.end()))
     {
-        delete it2.data();
+        delete *it2;
         PMTAddList.erase(it2);
         pmt_added = !PMTAddList.empty();
     }
     else if (pmt && (PMTList.empty() || (it != PMTList.end())))
     {
         if (it != PMTList.end())
-            delete it.data();
+            delete *it;
         PMTList[chan] = new ProgramMapTable(*pmt);
         have_pmt    = true;
         pmt_updated = true;

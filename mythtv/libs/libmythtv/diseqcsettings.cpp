@@ -436,7 +436,7 @@ void RotorPosMap::edit(void)
 void RotorPosMap::del(void)
 {
     uint id = getValue().toUInt();
-    m_posmap.erase(id);
+    m_posmap.erase(m_posmap.find(id));
     PopulateList();
 }
 
@@ -1009,7 +1009,7 @@ void DeviceTree::CreateNewNodeDialog(uint parentid, uint child_num)
 void DeviceTree::edit(void)
 {
     QString id = getValue();
-    if (id.find(':') == -1)
+    if (id.indexOf(':') == -1)
     {
         EditNodeDialog(id.toUInt());
     }
@@ -1028,7 +1028,7 @@ void DeviceTree::del(void)
 {
     QString id = getValue();
 
-    if (id.find(':') == -1)
+    if (id.indexOf(':') == -1)
     {
         uint nodeid = id.toUInt();
         DiSEqCDevDevice *dev = m_tree.FindDevice(nodeid);

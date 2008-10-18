@@ -534,14 +534,14 @@ void TTFFont::KillFace(void)
     for (QMap<ushort, Raster_Map*>::Iterator it = glyphs_cached.begin();
          it != glyphs_cached.end(); it++)
     {
-        destroy_font_raster(it.data());
+        destroy_font_raster(*it);
     }
     glyphs_cached.clear();
 
     for (QMap<ushort, FT_Glyph>::Iterator it = glyphs.begin();
          it != glyphs.end(); it++)
     {
-        FT_Done_Glyph(it.data());
+        FT_Done_Glyph(*it);
     }
     glyphs.clear();
 }
@@ -610,7 +610,7 @@ void TTFFont::Init(void)
    int xdpi = 96, ydpi = 96;
    unsigned short i, n;
 
-   error = FT_New_Face(the_library, m_file, 0, &face);
+   error = FT_New_Face(the_library, m_file.toLocal8Bit().constData(), 0, &face);
    if (error)
    {
 	return;

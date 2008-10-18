@@ -168,18 +168,18 @@ void PreviousList::keyPressEvent(QKeyEvent *e)
         else if (action == "1")
         {
             if (viewList[curView] == "sort by time")
-                curView = viewList.findIndex("reverse time");
+                curView = viewList.indexOf("reverse time");
             else
-                curView = viewList.findIndex("sort by time");
+                curView = viewList.indexOf("sort by time");
 
             refillAll = true;
         }
         else if (action == "2")
         {
             if (viewList[curView] == "sort by title")
-                curView = viewList.findIndex("reverse title");
+                curView = viewList.indexOf("reverse title");
             else
-                curView = viewList.findIndex("sort by title");
+                curView = viewList.indexOf("sort by title");
 
             refillAll = true;
         }
@@ -260,7 +260,9 @@ void PreviousList::updateBackground(void)
 
     tmp.end();
 
-    setPaletteBackgroundPixmap(bground);
+    QPalette p = palette();
+    p.setBrush(backgroundRole(), QBrush(bground));
+    setPalette(p);
 }
 
 void PreviousList::paintEvent(QPaintEvent *e)
@@ -442,7 +444,7 @@ void PreviousList::fillViewList(const QString &view)
     viewList << "reverse title";
     viewTextList << tr("Reverse Title");
 
-    curView = viewList.findIndex(view);
+    curView = viewList.indexOf(view);
 
     if (curView < 0)
         curView = 0;

@@ -223,10 +223,10 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
         // Process Events
         while (tv->GetState() != kState_None)
         {
-            qApp->unlock();
+            //qApp->unlock();
             qApp->processEvents();
             usleep(100000);
-            qApp->lock();
+            //qApp->lock();
         }
 
         if (tv->getJumpToProgram())
@@ -254,10 +254,10 @@ bool TV::StartTV (ProgramInfo *tvrec, bool startInGuide,
 
     while (tv->IsMenuRunning())
     {
-        qApp->unlock();
+        //qApp->unlock();
         qApp->processEvents();
         usleep(100000);
-        qApp->lock();
+        //qApp->lock();
     }
 
     // check if the show has reached the end.
@@ -562,10 +562,11 @@ TV::TV(void)
       queuedTranscode(false), getRecorderPlaybackInfo(false),
       adjustingPicture(kAdjustingPicture_None),
       adjustingPictureAttribute(kPictureAttribute_None),
-      askAllowType(kAskAllowCancel), askAllowLock(true),
+      askAllowType(kAskAllowCancel), askAllowLock(QMutex::Recursive),
       ignoreKeys(false), needToSwapPIP(false), needToJumpMenu(false),
       // Channel Editing
-      chanEditMapLock(true), ddMapSourceId(0), ddMapLoaderRunning(false),
+      chanEditMapLock(QMutex::Recursive),
+      ddMapSourceId(0), ddMapLoaderRunning(false),
       // Sleep Timer
       sleep_index(0), sleepTimerTimeout(0),
       // Fast forward state
@@ -603,13 +604,14 @@ TV::TV(void)
       // RingBuffers
       prbuffer(NULL), piprbuffer(NULL), activerbuffer(NULL),
       // OSD info
-      dialogname(""), treeMenu(NULL), udpnotify(NULL), osdlock(true),
+      dialogname(""), treeMenu(NULL), udpnotify(NULL),
+      osdlock(QMutex::Recursive),
       // LCD Info
       lcdTitle(""), lcdSubtitle(""), lcdCallsign(""),
       // Window info (GUI is optional, transcoding, preview img, etc)
       myWindow(NULL), embedWinID(0), embedBounds(0,0,0,0)
 {
-    setName("TV");
+    setObjectName("TV");
     keyRepeatTimer.start();
     for (uint i = 0; i < 2; i++)
     {
@@ -769,7 +771,9 @@ bool TV::Init(bool createWindow)
 
         // finally we put the player window on screen...
         myWindow->show();
-        myWindow->setBackgroundColor(Qt::black);
+        QPalette p = myWindow->palette();
+        p.setColor(myWindow->backgroundRole(), Qt::black);
+        myWindow->setPalette(p);
         qApp->processEvents();
     }
 
@@ -1257,10 +1261,10 @@ void TV::UpdateOSDAskAllowDialog(void)
     while (!GetOSD())
     {
         //cerr<<":";
-        qApp->unlock();
+        //qApp->unlock();
         qApp->processEvents();
         usleep(1000);
-        qApp->lock();
+        //qApp->lock();
     }
 
     //VERBOSE(VB_IMPORTANT, LOC + "UpdateOSDAskAllowDialog -- waiting done");
@@ -1406,10 +1410,10 @@ int TV::PlayFromRecorder(int recordernum)
         getRecorderPlaybackInfo = true;
         while (getRecorderPlaybackInfo)
         {
-            qApp->unlock();
+            //qApp->unlock();
             qApp->processEvents();
             usleep(1000);
-            qApp->lock();
+            //qApp->lock();
         }
     }
 
@@ -1476,6 +1480,14 @@ TVState TV::RemovePlaying(TVState state)
 
 #define SET_NEXT() do { nextState = desiredNextState; changed = true; } while(0);
 #define SET_LAST() do { nextState = internalState; changed = true; } while(0);
+
+static QString tv_i18n(const QString &msg)
+{
+    QByteArray msg_arr = msg.toLatin1();
+    QString msg_i18n = QObject::tr(msg_arr.constData());
+    QByteArray msg_i18n_arr = msg_i18n.toLatin1();
+    return (msg_arr == msg_i18n_arr) ? msg_i18n : msg;
+}
 
 /** \fn TV::HandleStateChange(void)
  *  \brief Changes the state to the state on the front of the
@@ -1707,8 +1719,9 @@ void TV::HandleStateChange(void)
     else if (StateIsPlaying(internalState) && lastState == kState_None)
     {
         if (GetOSD() && (PlayGroup::GetCount() > 0))
-            GetOSD()->SetSettingsText(tr("%1 Settings")
-                                      .arg(tr(playbackinfo->playgroup)), 3);
+            GetOSD()->SetSettingsText(
+                tr("%1 Settings")
+                .arg(tv_i18n(playbackinfo->playgroup)), 3);
         ITVRestart(false);
     }
     if (prbuffer && prbuffer->isDVD()) {
@@ -7169,7 +7182,7 @@ void TV::ChannelEditXDSFill(InfoMap &infoMap) const
             continue;
 
         if ((xds_keys[i] == "callsign") &&
-            ((tmp.length() > 5) || (tmp.find(" ") >= 0)))
+            ((tmp.length() > 5) || (tmp.indexOf(" ") >= 0)))
         {
             continue;
         }
@@ -7274,7 +7287,7 @@ QString TV::GetDataDirect(QString key, QString value, QString field,
     int best_match_idx = INT_MAX, best_match_len = INT_MAX;
     for (it_val = (*it_key).begin(); it_val != (*it_key).end(); ++it_val)
     {
-        int match_idx = it_val.key().find(value);
+        int match_idx = it_val.key().indexOf(value);
         if (match_idx < 0)
             continue;
 
@@ -7808,7 +7821,7 @@ void TV::FillMenuLiveTV(OSDGenericTree *treeMenu)
         // Source switching
 
         // delete current source from list
-        sources.erase(sourceid);
+        sources.remove(sourceid);
 
         // create menu if we have any sources left
         OSDGenericTree *sit_item = NULL;
@@ -8091,7 +8104,7 @@ void TV::SetJumpToProgram(QString progKey, int progIndex)
 {
     QMap<QString,ProgramList>::Iterator Iprog;
     Iprog = progLists.find(progKey);
-    ProgramList plist = Iprog.data();
+    ProgramList plist = *Iprog;
     ProgramInfo *p = plist.at(progIndex);
     VERBOSE(VB_IMPORTANT, QString("Switching to program: %1: %2").arg(p->title).arg(p->subtitle));
     setLastProgram(p);
@@ -8451,7 +8464,7 @@ bool TV::LoadExternalSubtitles(NuppelVideoPlayer *nvp,
     QString fileName = videoFile;
     QString dirName  = ".";
 
-    int dirPos = videoFile.findRev(QChar('/'));
+    int dirPos = videoFile.lastIndexOf(QChar('/'));
     if (dirPos > 0)
     {
         fileName = videoFile.mid(dirPos + 1);
@@ -8459,7 +8472,7 @@ bool TV::LoadExternalSubtitles(NuppelVideoPlayer *nvp,
     }
 
     QString baseName = fileName;
-    int suffixPos = fileName.findRev(QChar('.'));
+    int suffixPos = fileName.lastIndexOf(QChar('.'));
     if (suffixPos > 0)
         baseName = fileName.left(suffixPos);
 
@@ -8475,8 +8488,11 @@ bool TV::LoadExternalSubtitles(NuppelVideoPlayer *nvp,
 
     // Try to find files with the same base name, but ending with
     // '.srt', '.sub', or '.txt'
-    QStringList candidates = dir.entryList(
-        baseName + "*.srt; " + baseName + "*.sub; " + baseName + "*.txt;");
+    QStringList el;
+    el += baseName + "*.srt";
+    el += baseName + "*.sub";
+    el += baseName + "*.txt";
+    QStringList candidates = dir.entryList(el);
 
     bool found = false;
     QString candidate = "";
@@ -8729,7 +8745,7 @@ bool TV::PromptRecGroupPassword(void)
     recGroupPassword = ProgramInfo::GetRecGroupPassword(lastProgram->recgroup);
     if (recGroupPassword != "")
     {
-        qApp->lock();
+        //qApp->lock();
         bool ok = false;
         QString text = tr("'%1' Group Password:")
             .arg(lastProgram->recgroup);
@@ -8740,7 +8756,7 @@ bool TV::PromptRecGroupPassword(void)
         pwd->deleteLater();
         pwd = NULL;
 
-        qApp->unlock();
+        //qApp->unlock();
         if (!ok)
         {
             if (GetOSD())
@@ -8788,27 +8804,27 @@ void TV::DoDisplayJumpMenu(void)
         QMap<QString,ProgramList>::Iterator Iprog;
         for (Iprog = progLists.begin(); Iprog != progLists.end(); Iprog++)
         {
-            ProgramList plist = Iprog.data();
+            ProgramList plist = *Iprog;
             int progIndex = plist.count();
             if (progIndex == 1)
             {
                 new OSDGenericTree(
-                    treeMenu, tr(Iprog.key()),
+                    treeMenu, Iprog.key(),
                     QString("JUMPPROG %1 0").arg(Iprog.key()));
             }
             else
             {
                 OSDGenericTree *j_item =
-                    new OSDGenericTree(treeMenu, tr(Iprog.key()));
+                    new OSDGenericTree(treeMenu, Iprog.key());
 
                 for (int i = 0; i < progIndex; i++)
                 {
                     p = plist.at(i);
                     if (p->subtitle != "")
-                        new OSDGenericTree(j_item, tr(p->subtitle),
+                        new OSDGenericTree(j_item, p->subtitle,
                             QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i));
                     else
-                        new OSDGenericTree(j_item, tr(p->title),
+                        new OSDGenericTree(j_item, p->title,
                             QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i));
                 }
             }

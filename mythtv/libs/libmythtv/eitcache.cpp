@@ -23,7 +23,7 @@ EITCache::EITCache()
       entryCnt(0), pruneCnt(0), prunedHitCnt(0), wrongChannelHitCnt(0)
 {
     // 24 hours ago
-    lastPruneTime = QDateTime::currentDateTime(Qt::UTC).toTime_t() - 86400;
+    lastPruneTime = QDateTime::currentDateTime().toUTC().toTime_t() - 86400;
 }
 
 EITCache::~EITCache()
@@ -267,7 +267,7 @@ void EITCache::WriteChannelToDB(uint chanid)
 
     if (!eventMap)
     {
-        channelMap.erase(chanid);
+        channelMap.remove(chanid);
         return;
     }
 

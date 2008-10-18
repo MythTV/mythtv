@@ -199,17 +199,17 @@ static int score_match(const QString &a, const QString &b)
     else if (a == b)
         return 1000;
 
-    QString A = a.trimmed().toUpper();
-    QString B = b.trimmed().toUpper();
+    QString A = a.simplified().toUpper();
+    QString B = b.simplified().toUpper();
     if (A == B)
         return 1000;
 
     QStringList al, bl;
-    al.split("", A);
+    al = A.split(" ", QString::SkipEmptyParts);
     if (!al.size())
         return 0;
 
-    bl.split("", B);
+    bl = B.split(" ", QString::SkipEmptyParts);
     if (!bl.size())
         return 0;
 

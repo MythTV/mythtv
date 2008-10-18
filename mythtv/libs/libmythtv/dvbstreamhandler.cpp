@@ -87,7 +87,7 @@ DVBStreamHandler::DVBStreamHandler(const QString &dvb_device) :
     _needs_buffering(false),
     _allow_retune(false),
 
-    _start_stop_lock(true),
+    _start_stop_lock(QMutex::Recursive),
     _running(false),
     _using_section_reader(false),
 
@@ -95,9 +95,9 @@ DVBStreamHandler::DVBStreamHandler(const QString &dvb_device) :
     _sigmon(NULL),
     _dvbchannel(NULL),
 
-    _pid_lock(true),
+    _pid_lock(QMutex::Recursive),
     _open_pid_filters(0),
-    _listener_lock(true)
+    _listener_lock(QMutex::Recursive)
 {
 }
 
@@ -686,7 +686,7 @@ bool DVBStreamHandler::UpdateFiltersFromStreamData(void)
         pid_map_t::const_iterator lit = pids.constBegin();
         for (; lit != pids.constEnd(); ++lit)
         {
-            if (lit.data() && (_pid_info.find(lit.key()) == _pid_info.end()))
+            if (*lit && (_pid_info.find(lit.key()) == _pid_info.end()))
             {
                 add_pids[lit.key()] = new PIDInfo(
                     lit.key(), StreamID::PrivSec,  DMX_PES_OTHER);

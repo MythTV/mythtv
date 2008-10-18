@@ -1206,7 +1206,7 @@ bool JobQueue::HasRunningOrPendingJobs(int startingWithinMins)
     if (jobs.size()) {
         for (it = jobs.begin(); it != jobs.end(); ++it)
         {
-            tmpStatus = it.data().status;
+            tmpStatus = (*it).status;
             if (tmpStatus == JOB_RUNNING) {
                 VERBOSE(VB_JOBQUEUE, LOC +
                         QString("HasRunningOrPendingJobs: found running job"));
@@ -1221,11 +1221,11 @@ bool JobQueue::HasRunningOrPendingJobs(int startingWithinMins)
                                     "found pending job"));
                         return true;
                     }
-                    else if (it.data().schedruntime <= maxSchedRunTime) {
+                    else if ((*it).schedruntime <= maxSchedRunTime) {
                         VERBOSE(VB_JOBQUEUE, LOC +
                             QString("HasRunningOrPendingJobs: found pending "
                                     "job scheduled to start at: %1")
-                                    .arg(it.data().schedruntime.toString()));
+                                    .arg((*it).schedruntime.toString()));
                         return true;
                     }
                 }
@@ -1551,8 +1551,8 @@ void JobQueue::RecoverQueue(bool justOld)
 
         for (it = jobs.begin(); it != jobs.end(); ++it)
         {
-            tmpCmds = it.data().cmds;
-            tmpStatus = it.data().status;
+            tmpCmds = (*it).cmds;
+            tmpStatus = (*it).status;
 
             if (((tmpStatus == JOB_STARTING) ||
                  (tmpStatus == JOB_RUNNING) ||
@@ -1560,30 +1560,30 @@ void JobQueue::RecoverQueue(bool justOld)
                  (tmpCmds & JOB_STOP) ||
                  (tmpStatus == JOB_STOPPING)) &&
                 (((!justOld) &&
-                  (it.data().hostname == hostname)) ||
-                 (it.data().statustime < oldDate)))
+                  ((*it).hostname == hostname)) ||
+                 ((*it).statustime < oldDate)))
             {
                 msg = QString("RecoverQueue: Recovering '%1' %2 @ %3 "
                               "from '%4' state.")
-                              .arg(JobText(it.data().type))
-                              .arg(it.data().chanid)
-                              .arg(it.data().startts)
-                              .arg(StatusText(it.data().status));
+                              .arg(JobText((*it).type))
+                              .arg((*it).chanid)
+                              .arg((*it).startts)
+                              .arg(StatusText((*it).status));
                 VERBOSE(VB_JOBQUEUE, LOC + msg);
 
-                ChangeJobStatus(it.data().id, JOB_QUEUED, "");
-                ChangeJobCmds(it.data().id, JOB_RUN);
+                ChangeJobStatus((*it).id, JOB_QUEUED, "");
+                ChangeJobCmds((*it).id, JOB_RUN);
                 if (!gContext->GetNumSetting("JobsRunOnRecordHost", 0))
-                    ChangeJobHost(it.data().id, "");
+                    ChangeJobHost((*it).id, "");
             }
             else
             {
                 msg = QString("RecoverQueue: Ignoring '%1' %2 @ %3 "
                               "in '%4' state.")
-                              .arg(JobText(it.data().type))
-                              .arg(it.data().chanid)
-                              .arg(it.data().startts)
-                              .arg(StatusText(it.data().status));
+                              .arg(JobText((*it).type))
+                              .arg((*it).chanid)
+                              .arg((*it).startts)
+                              .arg(StatusText((*it).status));
 
                 // VERBOSE(VB_JOBQUEUE, LOC + msg);
             }
@@ -1673,10 +1673,10 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
     {
         ChangeJobStatus(id, JOB_ERRORED,
                         "UNKNOWN JobType, unable to process!");
-        runningJobTypes.erase(key);
-        runningJobIDs.erase(key);
-        runningJobDescs.erase(key);
-        runningJobCommands.erase(key);
+        runningJobTypes.remove(key);
+        runningJobIDs.remove(key);
+        runningJobDescs.remove(key);
+        runningJobCommands.remove(key);
     }
 
     controlFlagsLock.unlock();
@@ -1757,7 +1757,7 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
         else
         {
             QFileInfo dirInfo(pburl);
-            command.replace(QRegExp("%DIR%"), dirInfo.dirPath());
+            command.replace(QRegExp("%DIR%"), dirInfo.path());
         }
 
         command.replace(QRegExp("%FILE%"), tmpInfo->GetRecordBasename(true));
@@ -1999,11 +1999,11 @@ void JobQueue::DoTranscodeThread(void)
                     if (filesize > 0)
                         program_info->SetFilesize(filesize);
 
-                    details = QString("%1%2: %3 (%4)")
-                                      .arg(program_info->title)
-                                      .arg(subtitle)
-                                      .arg(transcoderName)
-                                      .arg(PrettyPrint(filesize));
+                    details = (QString("%1%2: %3 (%4)")
+                               .arg(program_info->title)
+                               .arg(subtitle)
+                               .arg(transcoderName)
+                               .arg(PrettyPrint(filesize))).toLocal8Bit();
                 }
                 else
                 {
@@ -2012,10 +2012,10 @@ void JobQueue::DoTranscodeThread(void)
 
                     ChangeJobStatus(jobID, JOB_FINISHED, comment);
 
-                    details = QString("%1%2: %3")
-                                      .arg(program_info->title)
-                                      .arg(subtitle)
-                                      .arg(comment);
+                    details = (QString("%1%2: %3")
+                               .arg(program_info->title)
+                               .arg(subtitle)
+                               .arg(comment)).toLocal8Bit();
                 }
 
                 MythEvent me("RECORDING_LIST_CHANGE");
@@ -2034,11 +2034,11 @@ void JobQueue::DoTranscodeThread(void)
 
                 ChangeJobStatus(jobID, JOB_ERRORED, comment);
 
-                details = QString("%1%2: %3 (%4)")
-                          .arg(program_info->title)
-                          .arg(subtitle)
-                          .arg(transcoderName)
-                          .arg(comment);
+                details = (QString("%1%2: %3 (%4)")
+                           .arg(program_info->title)
+                           .arg(subtitle)
+                           .arg(transcoderName)
+                           .arg(comment)).toLocal8Bit().constData();
             }
 
             msg = QString("Transcode %1").arg(StatusText(GetJobStatus(jobID)));
@@ -2055,10 +2055,10 @@ void JobQueue::DoTranscodeThread(void)
     }
 
     controlFlagsLock.lock();
-    runningJobIDs.erase(key);
-    runningJobTypes.erase(key);
-    runningJobDescs.erase(key);
-    runningJobCommands.erase(key);
+    runningJobIDs.remove(key);
+    runningJobTypes.remove(key);
+    runningJobDescs.remove(key);
+    runningJobCommands.remove(key);
     controlFlagsLock.unlock();
 }
 
@@ -2188,11 +2188,11 @@ void JobQueue::DoFlagCommercialsThread(void)
     if (priority <= LP_WARNING)
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg + ": " + logDesc);
 
-    jobControlFlags.erase(key);
-    runningJobIDs.erase(key);
-    runningJobTypes.erase(key);
-    runningJobDescs.erase(key);
-    runningJobCommands.erase(key);
+    jobControlFlags.remove(key);
+    runningJobIDs.remove(key);
+    runningJobTypes.remove(key);
+    runningJobDescs.remove(key);
+    runningJobCommands.remove(key);
     controlFlagsLock.unlock();
 
     delete program_info;
@@ -2286,10 +2286,10 @@ void JobQueue::DoUserJobThread(void)
     }
 
     controlFlagsLock.lock();
-    runningJobIDs.erase(key);
-    runningJobTypes.erase(key);
-    runningJobDescs.erase(key);
-    runningJobCommands.erase(key);
+    runningJobIDs.remove(key);
+    runningJobTypes.remove(key);
+    runningJobDescs.remove(key);
+    runningJobCommands.remove(key);
     controlFlagsLock.unlock();
 }
 

@@ -96,7 +96,7 @@ bool HDHRSignalMonitor::UpdateFiltersFromStreamData(void)
     // PIDs that need to be added..
     pid_map_t::const_iterator lit = listening.constBegin();
     for (; lit != listening.constEnd(); ++lit)
-        if (lit.data() && (filters.find(lit.key()) == filters.end()))
+        if (*lit && (filters.find(lit.key()) == filters.end()))
             add_pids.push_back(lit.key());
 
     // PIDs that need to be removed..
@@ -216,8 +216,8 @@ void HDHRSignalMonitor::UpdateValues(void)
     //ss  = signal strength,        [0,100]
     //snq = signal to noise quality [0,100]
     //seq = signal error quality    [0,100]
-    int loc_sig = msg.find("ss="),  loc_snq = msg.find("snq=");
-    int loc_seq = msg.find("seq="), loc_end = msg.length();
+    int loc_sig = msg.indexOf("ss="),  loc_snq = msg.indexOf("snq=");
+    int loc_seq = msg.indexOf("seq="), loc_end = msg.length();
     bool ok0, ok1, ok2;
     uint sig = msg.mid(loc_sig + 3, loc_snq - loc_sig - 4).toUInt(&ok0);
     uint snq = msg.mid(loc_snq + 4, loc_seq - loc_snq - 5).toUInt(&ok1);

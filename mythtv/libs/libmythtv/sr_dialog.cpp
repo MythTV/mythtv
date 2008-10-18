@@ -215,5 +215,7 @@ void RecOptDialog::updateBackground(void)
     tmp.end();
     myBackground = bground;
 
-    setPaletteBackgroundPixmap(myBackground);
+    QPalette p = palette();
+    p.setBrush(backgroundRole(), QBrush(myBackground));
+    setPalette(p);
 }

@@ -1128,7 +1128,8 @@ class RecordingProfilePopup
     static RPPopupResult showPopup(MythMainWindow *parent, QString title,
                                    QString message, QString& text)
     {
-        MythPopupBox *popup = new MythPopupBox(parent, title);
+        MythPopupBox *popup = new MythPopupBox(
+            parent, title.toLatin1().constData());
         popup->addLabel(message);
 
         MythLineEdit *textEdit = new MythLineEdit(popup, "chooseEdit");
@@ -1253,13 +1254,13 @@ void RecordingProfile::loadByID(int profileId)
     if (isEncoder)
     {
         QString tvFormat = gContext->GetSetting("TVFormat");
-        if (type.upper() != "HDPVR")
+        if (type.toUpper() != "HDPVR")
             addChild(new ImageSize(*this, tvFormat, profileName));
 
         videoSettings = new VideoCompressionSettings(*this, profileName);
         addChild(videoSettings);
 
-        if (type.upper() != "HDPVR")
+        if (type.toUpper() != "HDPVR")
         {
             audioSettings = new AudioCompressionSettings(*this, profileName);
             addChild(audioSettings);

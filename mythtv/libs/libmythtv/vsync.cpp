@@ -449,7 +449,7 @@ OpenGLVideoSync::OpenGLVideoSync(VideoOutput *video_output,
                                  int frame_interval, int refresh_interval,
                                  bool interlaced)
     : VideoSync(video_output, frame_interval, refresh_interval, interlaced),
-      m_drawable(0), m_context(0), m_lock(false)
+      m_drawable(0), m_context(0), m_lock()
 {
     VERBOSE(VB_IMPORTANT, "OpenGLVideoSync()");
 }

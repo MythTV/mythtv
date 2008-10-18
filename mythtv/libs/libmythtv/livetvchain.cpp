@@ -10,9 +10,10 @@
 /** \class LiveTVChain
  *  \brief Keeps track of recordings in a current LiveTV instance
  */
-LiveTVChain::LiveTVChain()
-           : m_id(""), m_maxpos(0), m_lock(true), m_curpos(0), m_cur_chanid(""),
-             m_switchid(-1), m_jumppos(0)
+LiveTVChain::LiveTVChain() :
+    m_id(""), m_maxpos(0), m_lock(QMutex::Recursive),
+    m_curpos(0), m_cur_chanid(""),
+    m_switchid(-1), m_jumppos(0)
 {
 }
 
@@ -159,7 +160,7 @@ void LiveTVChain::DeleteProgram(ProgramInfo *pginfo)
             query.bindValue(":CHAINID", m_id);
             query.exec();
 
-            m_chain.remove(del);
+            m_chain.erase(del);
 
             BroadcastUpdate();
             break;

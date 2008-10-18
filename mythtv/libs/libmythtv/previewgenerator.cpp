@@ -78,7 +78,7 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
 
     // Try to find a local means to access file...
     QString localFN  = programInfo.GetPlaybackURL(false, true);
-    QString localFNdir = QFileInfo(localFN).dirPath();
+    QString localFNdir = QFileInfo(localFN).path();
     if (!(localFN.left(1) == "/" &&
           QFileInfo(localFN).exists() &&
           QFileInfo(localFNdir).isWritable()))
@@ -393,7 +393,7 @@ bool PreviewGenerator::RemotePreviewRun(void)
         uint failure_cnt = 0;
         while ((remaining > 0) && (failure_cnt < 5))
         {
-            ssize_t written = file.writeBlock(data.data() + offset, remaining);
+            ssize_t written = file.write(data.data() + offset, remaining);
             if (written < 0)
             {
                 failure_cnt++;
@@ -551,7 +551,7 @@ QString PreviewGenerator::CreateAccessibleFilename(
         }
         else
         {
-            dir = QFileInfo(pathname).dirPath();
+            dir = QFileInfo(pathname).path();
         }
         outname = dir  + "/" + fi.fileName();
         VERBOSE(VB_IMPORTANT, LOC + QString("outfile '%1' -> '%2'")
@@ -563,7 +563,7 @@ QString PreviewGenerator::CreateAccessibleFilename(
 
 bool PreviewGenerator::IsLocal(void) const
 {
-    QString pathdir = QFileInfo(pathname).dirPath();
+    QString pathdir = QFileInfo(pathname).path();
     return (QFileInfo(pathname).exists() && QFileInfo(pathdir).isWritable());
 }
 
@@ -652,7 +652,7 @@ char *PreviewGenerator::GetScreenGrab(
         VERBOSE(VB_GENERAL, LOC +
                 QString("Grabbed preview '%0' %1x%2@%3%4")
                 .arg(filename).arg(video_width).arg(video_height)
-                .arg((Q_LLONG)seektime).arg((time_in_secs) ? "s" : "f"));
+                .arg(seektime).arg((time_in_secs) ? "s" : "f"));
     }
 
     return retbuf;

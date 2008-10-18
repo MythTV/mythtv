@@ -43,10 +43,14 @@ using namespace std;
 #include "mythuihelper.h"
 #include "mythdirs.h"
 
+#define LOC      QString("ProgFinder: ")
+#define LOC_ERR  QString("ProgFinder, Error: ")
+#define LOC_WARN QString("ProgFinder, Warning: ")
+
 void RunProgramFind(bool thread, bool ggActive)
 {
-    if (thread)
-        qApp->lock();
+    //if (thread)
+    //    qApp->lock();
 
     gContext->addCurrentLocation("ProgFinder");
 
@@ -68,7 +72,7 @@ void RunProgramFind(bool thread, bool ggActive)
 
     if (thread)
     {
-        qApp->unlock();
+        //qApp->unlock();
 
         while (programFind->isVisible())
             usleep(50);
@@ -258,7 +262,9 @@ void ProgFinder::updateBackground(void)
 
     tmp.end();
 
-    setPaletteBackgroundPixmap(bground);
+    QPalette p = palette();
+    p.setBrush(backgroundRole(), QBrush(bground));
+    setPalette(p);
 }
 
 void ProgFinder::paintEvent(QPaintEvent *e)
@@ -446,7 +452,7 @@ void ProgFinder::LoadWindow(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown element: " << (const char *)e.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, LOC + "Unknown element: " +e.tagName());
                 continue;
             }
         }
@@ -487,7 +493,7 @@ void ProgFinder::getInfo(bool toggle)
 
         selectShowData(curPick->title, curShow);
 
-        setActiveWindow();
+        activateWindow();
         setFocus();
     }
 }
@@ -1114,7 +1120,7 @@ void ProgFinder::selectSearchData()
         ShowData::Iterator it;
         for (it = tempList.begin(); it != tempList.end(); ++it)
         {
-            QString tmpProgData = it.data();
+            QString tmpProgData = *it;
             restoreSelectedData(tmpProgData);
 
             progData[cnt] = tmpProgData;
@@ -1244,8 +1250,9 @@ void ProgFinder::getSearchData(int charNum)
 
     if (rows == -1)
     {
-        cerr << "MythProgFind: Error executing query! (getSearchData)\n";
-        cerr << "MythProgFind: QUERY = " << (const char *)thequery << endl;
+        VERBOSE(VB_IMPORTANT, LOC_ERR + 
+                "Error executing query! (getSearchData)\n\t\t\t"
+                "QUERY = " + thequery);
         return;
     }
 
@@ -1276,7 +1283,7 @@ void ProgFinder::getSearchData(int charNum)
         {
             if (cnt <= (int)(showsPerListing / 2))
             {
-                data = it.data();
+                data = (*it);
                 restoreSelectedData(data);
                 initData[startPlace + dataNum] = data;
                 dataNum++;
@@ -1285,7 +1292,7 @@ void ProgFinder::getSearchData(int charNum)
             if (cnt >= (cnts - (int)(showsPerListing / 2)) &&
                 rows >= showsPerListing)
             {
-                data = it.data();
+                data = (*it);
                 restoreSelectedData(data);
                 initData[startPlace + dNum] = data;
                 dNum++;

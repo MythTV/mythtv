@@ -811,7 +811,7 @@ bool SIScan::ScanTransports(int SourceID,
         while (freq <= ft.frequencyEnd)
         {
             name = strNameFormat;
-            if (strNameFormat.find("%") >= 0)
+            if (strNameFormat.indexOf("%") >= 0)
                 name = strNameFormat.arg(name_num);
 
             TransportScanItem item(SourceID, si_std, name, name_num,

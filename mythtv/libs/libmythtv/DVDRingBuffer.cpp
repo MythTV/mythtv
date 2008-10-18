@@ -113,7 +113,7 @@ long long DVDRingBufferPriv::Seek(long long time)
     if (ffrewSkip != 1 && time != 0)
     {
         QMap<uint, uint>::const_iterator it = seekSpeedMap.find(labs(time));
-        seekSpeed = it.data();
+        seekSpeed = *it;
         if (time < 0)
             seekSpeed = -seekSpeed;
         dvdRet = dvdnav_time_search_within_cell(this->dvdnav, seekSpeed);
@@ -1153,7 +1153,7 @@ int DVDRingBufferPriv::GetSubTrackNum(uint stream_id)
     for (; it != subTrackMap.end(); ++it)
     {
         if (it.key() == stream_id)
-            return (int)it.data();
+            return (int)(*it);
     }
     return 33;
 }
@@ -1170,7 +1170,7 @@ int DVDRingBufferPriv::GetAudioTrackNum(uint stream_id)
     for (; it != audioTrackMap.end(); ++it)
     {
         if (it.key() == stream_id)
-            return (int)it.data();
+            return (int)(*it);
     }
     return 10;
 }
@@ -1356,7 +1356,7 @@ void DVDRingBufferPriv::SetDVDSpeed(void)
  */
 void DVDRingBufferPriv::SetDVDSpeed(int speed)
 {
-    MediaMonitor::SetCDSpeed(dvdFilename, speed);
+    MediaMonitor::SetCDSpeed(dvdFilename.toLocal8Bit().constData(), speed);
 }
 
 /**\brief returns seconds left in the title

@@ -115,7 +115,7 @@ TVRec::TVRec(int capturecardnum)
       // Configuration variables from setup rutines
       cardid(capturecardnum), ispip(false),
       // State variables
-      stateChangeLock(true),
+      stateChangeLock(QMutex::Recursive),
       internalState(kState_None), desiredNextState(kState_None),
       changeState(false), pauseNotify(true),
       stateFlags(0), lastTuningRequest(0),
@@ -124,7 +124,7 @@ TVRec::TVRec(int capturecardnum)
       curRecording(NULL), autoRunJobs(JOB_NONE),
       // Pseudo LiveTV recording
       pseudoLiveTVRecording(NULL),
-      nextLiveTVDir(""),            nextLiveTVDirLock(false),
+      nextLiveTVDir(""),            nextLiveTVDirLock(),
       // tvchain
       tvchain(NULL),
       // RingBuffer info
@@ -272,7 +272,7 @@ bool TVRec::Init(void)
 TVRec::~TVRec()
 {
     QMutexLocker locker(&cardsLock);
-    cards.erase(cardid);
+    cards.remove(cardid);
     TeardownAll();
 }
 
@@ -3368,7 +3368,7 @@ QString TVRec::TuningGetChanNum(const TuningRequest &request,
     if (request.flags & kFlagLiveTV)
         channel->Init(input, channum, false);
 
-    if (channel && !channum.isEmpty() && (channum.find("NextChannel") >= 0))
+    if (channel && !channum.isEmpty() && (channum.indexOf("NextChannel") >= 0))
     {
         int dir     = channum.right(channum.length() - 12).toInt();
         uint chanid = channel->GetNextChannel(0, dir);

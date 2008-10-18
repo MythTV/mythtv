@@ -51,7 +51,8 @@ void XBox::CheckRec(void)
 
     if (color != PhaseCache)
     {
-        system(BlinkBIN + " " + color);
+        QString tmp = BlinkBIN + " " + color;
+        system(tmp.toAscii().constData());
         PhaseCache = color;
     }
 }

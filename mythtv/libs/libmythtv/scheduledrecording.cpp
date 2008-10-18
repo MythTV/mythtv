@@ -1005,7 +1005,7 @@ ScheduledRecording::testRecording()
     query.prepare(thequery);
     query.bindValue(":LOCK", "DiffSchedule");
     query.exec();
-    if (query.lastError().type() != QSqlError::None)
+    if (query.lastError().type() != QSqlError::NoError)
     {
         QString msg =
             QString("DB Error (Obtaining lock in testRecording): \n"
@@ -1020,7 +1020,7 @@ ScheduledRecording::testRecording()
     thequery = QString("DROP TABLE IF EXISTS %1;").arg(ttable);
     query.prepare(thequery);
     query.exec();
-    if (query.lastError().type() != QSqlError::None)
+    if (query.lastError().type() != QSqlError::NoError)
     {
         QString msg =
             QString("DB Error (deleting old table in testRecording): \n"
@@ -1034,7 +1034,7 @@ ScheduledRecording::testRecording()
     thequery = QString("CREATE TABLE %1 SELECT * FROM record;").arg(ttable);
     query.prepare(thequery);
     query.exec();
-    if (query.lastError().type() != QSqlError::None)
+    if (query.lastError().type() != QSqlError::NoError)
     {
         QString msg =
             QString("DB Error (create new table): \n"
@@ -1066,7 +1066,7 @@ ScheduledRecording::testRecording()
     query.prepare(thequery);
     query.bindValue(":LOCK", "DiffSchedule");
     query.exec();
-    if (query.lastError().type() != QSqlError::None)
+    if (query.lastError().type() != QSqlError::NoError)
     {
         QString msg =
             QString("DB Error (free lock): \n"

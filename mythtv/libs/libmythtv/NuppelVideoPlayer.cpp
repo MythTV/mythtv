@@ -143,7 +143,7 @@ uint track_type_to_display_mode[kTrackTypeCount+2] =
 };
 
 NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
-    : decoder(NULL),                decoder_change_lock(true),
+    : decoder(NULL),                decoder_change_lock(QMutex::Recursive),
       videoOutput(NULL),            nvr_enc(NULL), 
       m_playbackinfo(NULL),
       // Window stuff
@@ -238,7 +238,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       commBreakIter(commBreakMap.end()),
       forcePositionMapSync(false),
       // Playback (output) speed control
-      decoder_lock(true),
+      decoder_lock(QMutex::Recursive),
       next_play_speed(1.0f),        next_normal_speed(true),
       play_speed(1.0f),             normal_speed(true),
       frame_interval((int)(1000000.0f / 30)), ffrew_skip(1),
@@ -626,9 +626,8 @@ bool NuppelVideoPlayer::InitVideo(void)
             MythMainWindow *window = gContext->GetMainWindow();
             assert(window);
 
-            QObject *playbackwin = window->child("video playback window");
-
-            QWidget *widget = (QWidget *)playbackwin;
+            QWidget *widget = 
+                window->findChild<QWidget*>("video playback window");
 
             if (!widget)
             {
@@ -3677,7 +3676,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         if (!hasdeletetable && autocommercialskip)
             AutoCommercialSkip();
 
-        if (hasdeletetable && deleteIter.data() == 1 &&
+        if (hasdeletetable && *deleteIter == 1 &&
             framesPlayed >= deleteIter.key())
         {
             ++deleteIter;
@@ -4590,7 +4589,7 @@ void NuppelVideoPlayer::SetDeleteIter(void)
         if (deleteIter != deleteMap.begin())
             --deleteIter;
 
-        if (deleteIter.data() == 0)
+        if (*deleteIter == 0)
             ++deleteIter;
     }
 }
@@ -4611,7 +4610,7 @@ void NuppelVideoPlayer::SetCommBreakIter(void)
         }
 
         VERBOSE(VB_COMMFLAG, LOC + QString("new commBreakIter = %1 @ frame %2")
-                                           .arg(commBreakIter.data())
+                                           .arg(*commBreakIter)
                                            .arg(commBreakIter.key()));
     }
 }
@@ -4688,13 +4687,13 @@ bool NuppelVideoPlayer::EnableEdit(void)
     if (hasdeletetable)
     {
         if (deleteMap.contains(0))
-            deleteMap.erase(0);
+            deleteMap.erase(deleteMap.find(0));
         if (deleteMap.contains(totalFrames))
-            deleteMap.erase(totalFrames);
+            deleteMap.erase(deleteMap.find(totalFrames));
 
         QMap<long long, int>::Iterator it;
         for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
-             AddMark(it.key(), it.data());
+             AddMark(it.key(), *it);
     }
 
     m_playbackinfo->SetEditing(true);
@@ -4711,7 +4710,7 @@ void NuppelVideoPlayer::DisableEdit(void)
 
     QMap<long long, int>::Iterator i = deleteMap.begin();
     for (; i != deleteMap.end(); ++i)
-        osd->HideEditArrow(i.key(), i.data());
+        osd->HideEditArrow(i.key(), *i);
     osd->HideSet("editmode");
 
     timedisplay = NULL;
@@ -4814,7 +4813,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
         {
             QMap<long long, int>::Iterator it;
             for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
-                osd->HideEditArrow(it.key(), it.data());
+                osd->HideEditArrow(it.key(), *it);
 
             deleteMap.clear();
             UpdateEditSlider();
@@ -4838,7 +4837,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
                 {
                     if (!deleteMap.contains(it.key()))
                     {
-                        if (it.data() == MARK_COMM_START)
+                        if (*it == MARK_COMM_START)
                             AddMark(it.key(), MARK_CUT_START);
                         else
                             AddMark(it.key(), MARK_CUT_END);
@@ -5057,21 +5056,21 @@ void NuppelVideoPlayer::HandleSelect(bool allowSelectNear)
         if (iter == deleteMap.end())
         {
             --iter;
-            cut_after = !iter.data();
+            cut_after = !(*iter);
         }
         else if((iter != deleteMap.begin()) && (iter.key() != framesPlayed))
         {
             long long value = iter.key();
             if((framesPlayed - (--iter).key()) > (value - framesPlayed))
             {
-                cut_after = !iter.data();
+                cut_after = !(*iter);
                 ++iter;
             }
             else
-                cut_after = !iter.data();
+                cut_after = !(*iter);
         }
 
-        direction = iter.data();
+        direction = (*iter);
         deleteframe = iter.key();
 
         if ((absLongLong(deleteframe - framesPlayed) <
@@ -5277,7 +5276,7 @@ bool NuppelVideoPlayer::IsInDelete(long long testframe) const
             break;
 
         long long frame = i.key();
-        int direction = i.data();
+        int direction = *i;
 
         if (direction == 0 && !indelete && first)
         {
@@ -5337,7 +5336,7 @@ void NuppelVideoPlayer::SaveCutList(void)
     for (i = deleteMap.begin(); i != deleteMap.end();)
     {
         long long frame = i.key();
-        int direction = i.data();
+        int direction = *i;
 
         if (direction == 0 && !indelete && first)
         {
@@ -5417,7 +5416,7 @@ bool NuppelVideoPlayer::FrameIsInMap(long long frameNumber,
     {
         if (it.key() > frameNumber)
         {
-            int type = it.data();
+            int type = *it;
 
             if (((type == MARK_COMM_END) ||
                  (type == MARK_CUT_END)) &&
@@ -5430,7 +5429,7 @@ bool NuppelVideoPlayer::FrameIsInMap(long long frameNumber,
                 return false;
         }
 
-        lastType = it.data();
+        lastType = *it;
     }
 
     return false;
@@ -5793,7 +5792,7 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
         if ((lastDecodedFrameNumber >= dm_iter.key()) ||
             (lastDecodedFrameNumber == -1 && dm_iter.key() == 0))
         {
-            while((dm_iter.data() == 1) && (dm_iter != deleteMap.end()))
+            while(((*dm_iter) == 1) && (dm_iter != deleteMap.end()))
             {
                 QString msg = QString("Fast-Forwarding from %1")
                               .arg((int)dm_iter.key());
@@ -5810,7 +5809,7 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
                 GetDecoder()->GetFrame(0);
                 *did_ff = 1;
             }
-            while((dm_iter.data() == 0) && (dm_iter != deleteMap.end()))
+            while(((*dm_iter) == 0) && (dm_iter != deleteMap.end()))
             {
                 dm_iter++;
             }
@@ -5833,7 +5832,7 @@ void NuppelVideoPlayer::SetCutList(QMap<long long, int> newCutList)
 
     deleteMap.clear();
     for (i = newCutList.begin(); i != newCutList.end(); ++i)
-        deleteMap[i.key()] = i.data();
+        deleteMap[i.key()] = *i;
 }
 
 bool NuppelVideoPlayer::WriteStoredData(RingBuffer *outRingBuffer,
@@ -6143,7 +6142,7 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
     commBreakMapLock.lock();
     if (hascommbreaktable)
     {
-        if (commBreakIter.data() == MARK_COMM_END)
+        if (*commBreakIter == MARK_COMM_END)
             commBreakIter++;
 
         if (commBreakIter == commBreakMap.end())
@@ -6152,7 +6151,7 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
             return;
         }
 
-        if ((commBreakIter.data() == MARK_COMM_START) &&
+        if ((*commBreakIter == MARK_COMM_START) &&
             (((autocommercialskip == 1) &&
               (framesPlayed >= commBreakIter.key())) ||
              ((autocommercialskip == 2) &&
@@ -6173,7 +6172,7 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                 VERBOSE(VB_COMMFLAG, LOC + "AutoCommercialSkip(), at "
                         "end of commercial break list, will not skip.");
             }
-            else if (commBreakIter.data() == MARK_COMM_START)
+            else if (*commBreakIter == MARK_COMM_START)
             {
                 VERBOSE(VB_COMMFLAG, LOC + "AutoCommercialSkip(), new "
                         "commBreakIter mark is another start, will not skip.");
@@ -6346,7 +6345,7 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
                 commBreakIter--;
         }
     }
-    else if (commBreakIter.data() == MARK_COMM_START)
+    else if (*commBreakIter == MARK_COMM_START)
     {
         int skipped_seconds = (int)((commBreakIter.key() -
                 framesPlayed) / video_frame_rate);
@@ -6769,8 +6768,7 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
             {
                 // AVSubtitleRect's image data's not guaranteed to be 4 byte
                 // aligned.
-                QImage qImage(rect->w, rect->h, 32);
-                qImage.setAlphaBuffer(true);
+                QImage qImage(rect->w, rect->h, QImage::Format_ARGB32);
                 for (int y = 0; y < rect->h; ++y) 
                 {
                     for (int x = 0; x < rect->w; ++x) 
@@ -7086,8 +7084,7 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
         int x1 = hl_button->x;
         int y1 = hl_button->y;
         QRect buttonPos = ringBuffer->DVD()->GetButtonCoords();
-        QImage hl_image(w, h, 32);
-        hl_image.setAlphaBuffer(true);
+        QImage hl_image(w, h, QImage::Format_ARGB32);
         uint8_t color;
         uint32_t pixel;
         QPoint currentPos = QPoint(0,0);

@@ -158,7 +158,7 @@ void FIFOWriter::FIFOWriteThread(void)
     if (fd != -1)
         close(fd);
 
-    unlink(filename[id]);
+    unlink(filename[id].toLocal8Bit().constData());
 
     while (fifo_buf[id]->next != fifo_buf[id])
     {

@@ -552,7 +552,7 @@ void EITHelper::CompleteEvent(uint atsc_major, uint atsc_minor,
     }
     else
     {
-        starttime.setTime_t(tmp - utc_offset, Qt::LocalTime);
+        starttime.setTime_t(tmp - utc_offset);
     }
 
     EITFixUp::TimeFix(starttime);

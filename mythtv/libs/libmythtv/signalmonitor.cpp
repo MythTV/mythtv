@@ -164,7 +164,7 @@ SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
                      1, true, 0,   1, 0),
       signalStrength(QObject::tr("Signal Power"), "signal",
                      0, true, 0, 100, 0),
-      statusLock(true)
+      statusLock(QMutex::Recursive)
 {
 }
 

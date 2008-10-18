@@ -42,17 +42,17 @@ void ChannelInfo::LoadChannelIcon(int width, int height)
         {
             tmp2 = tempimage.scaled(width, width,
                 Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-            icon.convertFromImage(tmp2);
+            icon = QPixmap::fromImage(tmp2);
         }
         else if ((height > 0) && (tempimage.width() != width
                                 || tempimage.height() != height))
         {
             tmp2 = tempimage.scaled(width, height,
                 Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-            icon.convertFromImage(tmp2);
+            icon = QPixmap::fromImage(tmp2);
         }
         else
-            icon.convertFromImage(tempimage);
+            icon = QPixmap::fromImage(tempimage);
     }
 }
 

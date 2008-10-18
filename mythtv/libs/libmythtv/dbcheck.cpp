@@ -360,7 +360,7 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
     query.prepare(thequery);
     query.exec();
 
-    if (query.lastError().type() != QSqlError::None)
+    if (query.lastError().type() != QSqlError::NoError)
     {
         QString msg =
             QString("DB Error (Deleting old DB version number): \n"
@@ -378,7 +378,7 @@ static bool UpdateDBVersionNumber(const QString &newnumber)
     query.prepare(thequery);
     query.exec();
 
-    if (query.lastError().type() != QSqlError::None)
+    if (query.lastError().type() != QSqlError::NoError)
     {
         QString msg =
             QString("DB Error (Setting new DB version number): \n"
@@ -416,7 +416,7 @@ static bool performActualUpdate(
     {
         query.exec(thequery);
 
-        if (query.lastError().type() != QSqlError::None)
+        if (query.lastError().type() != QSqlError::NoError)
         {
             QString msg =
                 QString("DB Error (Performing database upgrade): \n"
@@ -2776,7 +2776,7 @@ NULL
         }
 
         const char *updates[] = {
-thequery,
+thequery.toAscii().constData(),
 NULL
 };
 
@@ -2897,7 +2897,7 @@ NULL
 
         const char *updates[] = {
 "DELETE FROM capturecard WHERE cardtype = 'FIREWIRE';",
-thequery,
+thequery.toAscii().constData(),
 NULL
 };
         if (!performActualUpdate(updates, "1176", dbver))
@@ -3287,7 +3287,7 @@ NULL
 
         const char *updates[] = {
 "DELETE FROM capturecard WHERE cardtype = 'HDTV';",
-thequery,
+thequery.toAscii().constData(),
 NULL
 };
         if (!performActualUpdate(updates, "1198", dbver))
