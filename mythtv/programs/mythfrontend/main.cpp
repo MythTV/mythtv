@@ -277,12 +277,6 @@ void startCustomEdit(void)
     custom.exec();
 }
 
-void startManual(void)
-{
-    ManualBox manbox(gContext->GetMainWindow(), "manual box");
-    manbox.exec();
-}
-
 void startManualSchedule(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -350,8 +344,6 @@ void TVMenuCallback(void *data, QString &selection)
         startGuide();
     else if (sel == "tv_delete")
         startDelete();
-    else if (sel == "tv_manual")
-        startManual();
     else if (sel == "tv_manualschedule")
         startManualSchedule();
     else if (sel == "tv_custom_record")
