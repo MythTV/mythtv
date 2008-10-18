@@ -118,7 +118,7 @@
         </textarea>
 
         <buttonlist name="schedules">
-            <area>20,51,760,300</area>
+            <area>20,51,760,305</area>
             <layout>vertical</layout>
             <spacing>4</spacing>
             <buttonarea>0,0,760,280</buttonarea>
