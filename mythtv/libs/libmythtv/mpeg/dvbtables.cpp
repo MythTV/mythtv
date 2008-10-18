@@ -190,6 +190,7 @@ QDateTime dvbdate2qt(const unsigned char *buf)
     if (mjd >= 40587)
     {
         QDateTime result;
+        result.setTimeSpec(Qt::UTC);
  	// Modified Julian date as number of days since 17th November 1858.
  	// 1st Jan 1970 was date 40587.
  	uint secsSince1970 = (mjd - 40587)   * 86400;
@@ -220,7 +221,7 @@ QDateTime dvbdate2qt(const unsigned char *buf)
     QTime time(byteBCD2int(buf[2]), byteBCD2int(buf[3]),
                byteBCD2int(buf[4]));
 
-    return QDateTime(date, time);
+    return QDateTime(date, time, Qt::UTC);
 }
 
 /** \fn dvbdate2unix(const unsigned char*)
