@@ -259,7 +259,8 @@ DialogCode ProfileGroupEditor::exec(void)
         float wmult = 0.0f, hmult  = 0.0f;
         GetMythUI()->GetScreenSettings(width, wmult, height, hmult);
 
-        QVBoxLayout *layout = new QVBoxLayout(dialog, (int)(20 * hmult));
+        QVBoxLayout *layout = new QVBoxLayout(dialog);
+        layout->setMargin((int)(20 * hmult));
         layout->addWidget(listbox->configWidget(NULL, dialog));
 
         dialog->Show();

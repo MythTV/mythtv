@@ -36,6 +36,9 @@ static const uint kUnknownProgramLength = 30;
 static bool insert_program(const ProgramInfo*,
                            const ScheduledRecording*);
 
+static int init_tr(void);
+static QString pi_i18n(const QString&);
+
 /** \fn StripHTMLTags(const QString&)
  *  \brief Returns a copy of "src" with all the HTML tags removed.
  *
@@ -72,7 +75,7 @@ static QString StripHTMLTags(const QString& src)
  *  \brief Null constructor.
  */
 ProgramInfo::ProgramInfo(void) :
-    regExpLock(false), regExpSeries("0000$"),
+    regExpLock(QMutex::NonRecursive), regExpSeries("0000$"),
     positionMapDBReplacement(NULL)
 {
     spread = -1;
@@ -147,13 +150,16 @@ ProgramInfo::ProgramInfo(void) :
     inUseForWhat = "";
 
     record = NULL;
+
+    if (init_tr() <= 0)
+        VERBOSE(VB_IMPORTANT, LOC + "Failed to init i18n");
 }
 
 /** \fn ProgramInfo::ProgramInfo(const ProgramInfo &other)
  *  \brief Copy constructor.
  */
 ProgramInfo::ProgramInfo(const ProgramInfo &other) :
-    record(NULL), regExpLock(false), regExpSeries("0000$")
+    record(NULL), regExpLock(QMutex::NonRecursive), regExpSeries("0000$")
 {
     clone(other);
 }
@@ -503,7 +509,7 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     QString fullDateFormat = dateFormat;
-    if (fullDateFormat.find(QRegExp("yyyy")) < 0)
+    if (!fullDateFormat.contains("yyyy"))
         fullDateFormat += " yyyy";
     QString shortDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
     QString channelFormat =
@@ -2598,7 +2604,7 @@ void ProgramInfo::SetMarkupMap(frm_dir_map_t &marks,
         if (type != -100)
             mark_type = type;
         else
-            mark_type = i.data();
+            mark_type = *i;
 
         if (isVideo)
         {
@@ -2793,7 +2799,7 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
                     continue;
                 if ((min_frame >= 0) && (frame <= max_frame))
                     continue;
-                new_map.insert(it.key(), it.data());
+                new_map.insert(it.key(), *it);
             }
             positionMapDBReplacement->map[(MarkTypes)type] = new_map;
         }
@@ -2813,7 +2819,7 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
                 continue;
 
             positionMapDBReplacement->map[(MarkTypes)type]
-                .insert(frame, it.data());
+                .insert(frame, *it);
         }
 
         return;
@@ -2865,7 +2871,7 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
         if ((max_frame >= 0) && (frame > max_frame))
             continue;
 
-        long long offset = i.data();
+        long long offset = *i;
 
         if (isVideo)
         {
@@ -2905,7 +2911,7 @@ void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
         for (; it != it_end; ++it)
         {
             positionMapDBReplacement->map[(MarkTypes)type]
-                .insert(it.key(), it.data());
+                .insert(it.key(), *it);
         }
 
         return;
@@ -2917,7 +2923,7 @@ void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
     for (i = posMap.begin(); i != posMap.end(); ++i)
     {
         long long frame = i.key();
-        long long offset = i.data();
+        long long offset = *i;
 
         if (isVideo)
         {
@@ -3653,9 +3659,10 @@ static QString get_ratings(bool recorded, uint chanid, QDateTime startts)
     return ratings + "Advisory" + advisory;
 }
 
-#define ADD_PAR(title,text,result)                                    \
-    result += details_dialog->themeText("heading", title + ":  ", 3)  \
-           +  details_dialog->themeText("body", text, 3) + "<br>";
+#define ADD_PAR(title,text,result)                                        \
+    do { result += details_dialog->themeText("heading", title + ":  ", 3) \
+            +  details_dialog->themeText("body", text, 3) + "<br>"; }     \
+    while (false)
 
 /** \fn ProgramInfo::showDetails(void) const
  *  \brief Pops up a DialogBox with program info, blocking until user exits
@@ -3665,7 +3672,7 @@ void ProgramInfo::showDetails(void) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
     QString fullDateFormat = gContext->GetSetting("DateFormat", "M/d/yyyy");
-    if (fullDateFormat.find(QRegExp("yyyy")) < 0)
+    if (!fullDateFormat.contains("yyyy"))
         fullDateFormat += " yyyy";
     QString category_type, showtype, year, epinum, rating, colorcode,
             title_pronounce;
@@ -3745,10 +3752,10 @@ void ProgramInfo::showDetails(void) const
     s = title;
     if (subtitle != "")
         s += " - \"" + subtitle + "\"";
-    ADD_PAR(QObject::tr("Title"), s, msg)
+    ADD_PAR(QObject::tr("Title"), s, msg);
 
     if (title_pronounce != "")
-        ADD_PAR(QObject::tr("Title Pronounce"), title_pronounce, msg)
+        ADD_PAR(QObject::tr("Title Pronounce"), title_pronounce, msg);
 
     s = description;
 
@@ -3812,12 +3819,12 @@ void ProgramInfo::showDetails(void) const
 
     if (attr != "")
     {
-        attr.truncate(attr.findRev(','));
+        attr.truncate(attr.lastIndexOf(','));
         s += " (" + attr + ")";
     }
 
     if (s != "")
-        ADD_PAR(QObject::tr("Description"), s, msg)
+        ADD_PAR(QObject::tr("Description"), s, msg);
 
     if (category != "")
     {
@@ -3835,7 +3842,7 @@ void ProgramInfo::showDetails(void) const
             while (query.next())
                 s += ", " + query.value(0).toString();
         }
-        ADD_PAR(QObject::tr("Category"), s, msg)
+        ADD_PAR(QObject::tr("Category"), s, msg);
     }
 
     if (category_type  != "")
@@ -3845,19 +3852,19 @@ void ProgramInfo::showDetails(void) const
             s += "  (" + seriesid + ")";
         if (showtype != "")
             s += "  " + showtype;
-        ADD_PAR(QObject::tr("Type","category_type"), s, msg)
+        ADD_PAR(QObject::tr("Type","category_type"), s, msg);
     }
 
     if (epinum != "")
-        ADD_PAR(QObject::tr("Episode Number"), epinum, msg)
+        ADD_PAR(QObject::tr("Episode Number"), epinum, msg);
 
     if (hasAirDate && category_type != "movie")
     {
         ADD_PAR(QObject::tr("Original Airdate"),
-                originalAirDate.toString(fullDateFormat), msg)
+                originalAirDate.toString(fullDateFormat), msg);
     }
     if (programid  != "")
-        ADD_PAR(QObject::tr("Program ID"), programid, msg)
+        ADD_PAR(QObject::tr("Program ID"), programid, msg);
 
     QString role = "", pname = "";
 
@@ -3893,54 +3900,54 @@ void ProgramInfo::showDetails(void) const
                 else
                 {
                     if (rstr == "actor")
-                        ADD_PAR(QObject::tr("Actors"), plist, msg)
+                        ADD_PAR(QObject::tr("Actors"), plist, msg);
                     else if (rstr == "director")
-                        ADD_PAR(QObject::tr("Director"), plist, msg)
+                        ADD_PAR(QObject::tr("Director"), plist, msg);
                     else if (rstr == "producer")
-                        ADD_PAR(QObject::tr("Producer"), plist, msg)
+                        ADD_PAR(QObject::tr("Producer"), plist, msg);
                     else if (rstr == "executive_producer")
-                        ADD_PAR(QObject::tr("Executive Producer"), plist, msg)
+                        ADD_PAR(QObject::tr("Executive Producer"), plist, msg);
                     else if (rstr == "writer")
-                        ADD_PAR(QObject::tr("Writer"), plist, msg)
+                        ADD_PAR(QObject::tr("Writer"), plist, msg);
                     else if (rstr == "guest_star")
-                        ADD_PAR(QObject::tr("Guest Star"), plist, msg)
+                        ADD_PAR(QObject::tr("Guest Star"), plist, msg);
                     else if (rstr == "host")
-                        ADD_PAR(QObject::tr("Host"), plist, msg)
+                        ADD_PAR(QObject::tr("Host"), plist, msg);
                     else if (rstr == "adapter")
-                        ADD_PAR(QObject::tr("Adapter"), plist, msg)
+                        ADD_PAR(QObject::tr("Adapter"), plist, msg);
                     else if (rstr == "presenter")
-                        ADD_PAR(QObject::tr("Presenter"), plist, msg)
+                        ADD_PAR(QObject::tr("Presenter"), plist, msg);
                     else if (rstr == "commentator")
-                        ADD_PAR(QObject::tr("Commentator"), plist, msg)
+                        ADD_PAR(QObject::tr("Commentator"), plist, msg);
                     else if (rstr == "guest")
-                        ADD_PAR(QObject::tr("Guest"), plist, msg)
+                        ADD_PAR(QObject::tr("Guest"), plist, msg);
 
                     rstr = role;
                     plist = pname;
                 }
             }
             if (rstr == "actor")
-                ADD_PAR(QObject::tr("Actors"), plist, msg)
+                ADD_PAR(QObject::tr("Actors"), plist, msg);
             else if (rstr == "director")
-                ADD_PAR(QObject::tr("Director"), plist, msg)
+                ADD_PAR(QObject::tr("Director"), plist, msg);
             else if (rstr == "producer")
-                ADD_PAR(QObject::tr("Producer"), plist, msg)
+                ADD_PAR(QObject::tr("Producer"), plist, msg);
             else if (rstr == "executive_producer")
-                ADD_PAR(QObject::tr("Executive Producer"), plist, msg)
+                ADD_PAR(QObject::tr("Executive Producer"), plist, msg);
             else if (rstr == "writer")
-                ADD_PAR(QObject::tr("Writer"), plist, msg)
+                ADD_PAR(QObject::tr("Writer"), plist, msg);
             else if (rstr == "guest_star")
-                ADD_PAR(QObject::tr("Guest Star"), plist, msg)
+                ADD_PAR(QObject::tr("Guest Star"), plist, msg);
             else if (rstr == "host")
-                ADD_PAR(QObject::tr("Host"), plist, msg)
+                ADD_PAR(QObject::tr("Host"), plist, msg);
             else if (rstr == "adapter")
-                ADD_PAR(QObject::tr("Adapter"), plist, msg)
+                ADD_PAR(QObject::tr("Adapter"), plist, msg);
             else if (rstr == "presenter")
-                ADD_PAR(QObject::tr("Presenter"), plist, msg)
+                ADD_PAR(QObject::tr("Presenter"), plist, msg);
             else if (rstr == "commentator")
-                ADD_PAR(QObject::tr("Commentator"), plist, msg)
+                ADD_PAR(QObject::tr("Commentator"), plist, msg);
             else if (rstr == "guest")
-                ADD_PAR(QObject::tr("Guest"), plist, msg)
+                ADD_PAR(QObject::tr("Guest"), plist, msg);
         }
     }
 
@@ -3998,7 +4005,7 @@ void ProgramInfo::showDetails(void) const
     s = p->RecStatusText();
     if (statusDate.isValid())
         s += " " + statusDate.toString(fullDateFormat);
-    ADD_PAR(QString("MythTV " + QObject::tr("Status")), s, msg)
+    ADD_PAR(QString("MythTV " + QObject::tr("Status")), s, msg);
     delete p;
 
     if (recordid)
@@ -4008,7 +4015,7 @@ void ProgramInfo::showDetails(void) const
             s += RecTypeText();
         if (!(record->getRecordTitle().isEmpty()))
             s += QString(" \"%2\"").arg(record->getRecordTitle());
-        ADD_PAR(QObject::tr("Recording Rule"), s, msg)
+        ADD_PAR(QObject::tr("Recording Rule"), s, msg);
 
         query.prepare("SELECT last_record, next_record, avg_delay "
                       "FROM record WHERE recordid = :RECORDID");
@@ -4019,22 +4026,22 @@ void ProgramInfo::showDetails(void) const
             query.next();
             if (query.value(0).toDateTime().isValid())
                 ADD_PAR(QObject::tr("Last Recorded"),
-                        QObject::tr(query.value(0).toDateTime()
-                                    .toString(fullDateFormat)), msg)
+                        query.value(0).toDateTime()
+                        .toString(fullDateFormat), msg);
             if (query.value(1).toDateTime().isValid())
                 ADD_PAR(QObject::tr("Next Recording"),
-                        QObject::tr(query.value(1).toDateTime()
-                                    .toString(fullDateFormat)), msg)
+                        query.value(1).toDateTime()
+                        .toString(fullDateFormat), msg);
             if (query.value(2).toInt() > 0)
                 ADD_PAR(QObject::tr("Average Time Shift"),
                         QString("%1 %2").arg(query.value(2).toInt())
-                                        .arg(QObject::tr("hours")), msg)
+                                        .arg(QObject::tr("hours")), msg);
         }
         if (recorded)
         {
             if (recpriority2 > 0)
                 ADD_PAR(QObject::tr("Watch List Score"),
-                        QString("%1").arg(recpriority2), msg)
+                        QString("%1").arg(recpriority2), msg);
 
             if (recpriority2 < 0)
             {
@@ -4055,7 +4062,7 @@ void ProgramInfo::showDetails(void) const
                     st = QObject::tr("Recently deleted episode");
                     break;
                 }
-                ADD_PAR(QObject::tr("Watch List Status"), st, msg)
+                ADD_PAR(QObject::tr("Watch List Status"), st, msg);
             }
         }
         if (record->getSearchType() &&
@@ -4063,24 +4070,24 @@ void ProgramInfo::showDetails(void) const
             record->getRecordDescription() != description)
             ADD_PAR(QObject::tr("Search Phrase"),
                     record->getRecordDescription().replace("<", "&lt;")
-                            .replace(">", "&gt;").replace("\n", " "), msg)
+                            .replace(">", "&gt;").replace("\n", " "), msg);
     }
     if (findid > 0)
     {
         QDate fdate(1970, 1, 1);
         fdate = fdate.addDays(findid - 719528);
         ADD_PAR(QObject::tr("Find ID"), QString("%1 (%2)").arg(findid)
-                .arg(fdate.toString(fullDateFormat)), msg)
+                .arg(fdate.toString(fullDateFormat)), msg);
     }
     if (recorded)
     {
-        ADD_PAR(QObject::tr("Recording Host"), hostname, msg)
-        ADD_PAR(QObject::tr("Recorded File Name"), GetRecordBasename(), msg)
+        ADD_PAR(QObject::tr("Recording Host"), hostname, msg);
+        ADD_PAR(QObject::tr("Recorded File Name"), GetRecordBasename(), msg);
 
         QString tmpSize;
         tmpSize.sprintf("%0.2f ", filesize / 1024.0 / 1024.0 / 1024.0);
         tmpSize += QObject::tr("GB", "GigaBytes");
-        ADD_PAR(QObject::tr("Recorded File Size"), tmpSize, msg)
+        ADD_PAR(QObject::tr("Recorded File Size"), tmpSize, msg);
 
         query.prepare("SELECT profile FROM recorded"
                       " WHERE chanid = :CHANID"
@@ -4088,20 +4095,22 @@ void ProgramInfo::showDetails(void) const
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", recstartts);
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
-            if (query.value(0).toString() > "")
+            QString rec_prof = query.value(0).toString();
+            if (!rec_prof.isEmpty())
+            {
                 ADD_PAR(QObject::tr("Recording Profile"),
-                        QObject::tr(query.value(0).toString()), msg)
+                        pi_i18n(rec_prof), msg);
+            }
         }
-        ADD_PAR(QObject::tr("Recording Group"), QObject::tr(recgroup), msg)
-        ADD_PAR(QObject::tr("Storage Group"), QObject::tr(storagegroup), msg)
-        ADD_PAR(QObject::tr("Playback Group"), QObject::tr(playgroup), msg)
+        ADD_PAR(QObject::tr("Recording Group"), pi_i18n(recgroup),     msg);
+        ADD_PAR(QObject::tr("Storage Group"),   pi_i18n(storagegroup), msg);
+        ADD_PAR(QObject::tr("Playback Group"),  pi_i18n(playgroup),    msg);
     }
     else if (recordid)
     {
-        ADD_PAR(QObject::tr("Recording Profile"), record->getProfileName(),msg)
+        ADD_PAR(QObject::tr("Recording Profile"), record->getProfileName(),msg);
     }
     msg.remove(QRegExp("<br>$"));
     details_dialog->setDetails(msg);
@@ -4292,19 +4301,20 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
                 testFile.setFile(testFile.readLink());
 
             if (testFile.isFile())
-                recDir = testFile.dirPath();
+                recDir = testFile.path();
             else if (testFile.isDir())
                 recDir = testFile.filePath();
         }
         else
         {
-            testFile.setFile(testFile.dirPath());
+            testFile.setFile(testFile.absolutePath());
             if (testFile.exists())
             {
-                while(testFile.isSymLink())
+                uint i = 0;
+                for (; (i < 256) && testFile.isSymLink(); i++)
                     testFile.setFile(testFile.readLink());
 
-                if (testFile.isDir())
+                if ((256 != i) && testFile.isDir())
                     recDir = testFile.filePath();
             }
         }
@@ -5264,4 +5274,72 @@ bool ProgramList::GetProgramDetailList(
     return true;
 }
 
+static int init_tr(void)
+{
+    static bool done = false;
+    static QMutex init_tr_lock;
+    QMutexLocker locker(&init_tr_lock);
+    if (done)
+        return 1;
+
+    QString rec_profile_names =
+        QObject::tr("Default",        "Recording Profile Name") +
+        QObject::tr("High Quality",   "Recording Profile Name") +
+        QObject::tr("Live TV",        "Recording Profile Name") +
+        QObject::tr("Low Quality",    "Recording Profile Name") +
+        QObject::tr("Medium Quality", "Recording Profile Name") +
+        QObject::tr("MPEG2",          "Recording Profile Name") +
+        QObject::tr("RTjpeg/MPEG4",   "Recording Profile Name");
+
+    QString rec_profile_groups =
+        QObject::tr("CRC IP Recorders",
+                    "Recording Profile Group Name") +
+        QObject::tr("DBOX2 Input",
+                    "Recording Profile Group Name") +
+        QObject::tr("FireWire Input",
+                    "Recording Profile Group Name") +
+        QObject::tr("Freebox Input",
+                    "Recording Profile Group Name") +
+        QObject::tr("Hardware DVB Encoders",
+                    "Recording Profile Group Name") +
+        QObject::tr("Hardware HDTV",
+                    "Recording Profile Group Name") +
+        QObject::tr("Hardware MJPEG Encoders (Matrox G200-TV, Miro DC10, etc)",
+                    "Recording Profile Group Name") +
+        QObject::tr("HD-PVR Recorders",
+                    "Recording Profile Group Name") +
+        QObject::tr("HDHomeRun Recorders",
+                    "Recording Profile Group Name") +
+        QObject::tr("MPEG-2 Encoders (PVR-x50, PVR-500)",
+                    "Recording Profile Group Name") +
+        QObject::tr("Software Encoders (v4l based)",
+                    "Recording Profile Group Name") +
+        QObject::tr("Transcoders",
+                    "Recording Profile Group Name") +
+        QObject::tr("USB Mpeg-4 Encoder (Plextor ConvertX, etc)",
+                    "Recording Profile Group Name");
+
+    QString storage_groups =
+        QObject::tr("Default",   "Storage Group Name") +
+        QObject::tr("LiveTV",    "Storage Group Name") +
+        QObject::tr("Thumbnails","Storage Group Name") +
+        QObject::tr("DB Backups","Storage Group Name");
+
+    QString play_groups =
+        QObject::tr("Default",   "Playback Group Name");
+
+    done = true;
+    return (rec_profile_names.length() +
+            rec_profile_groups.length() +
+            storage_groups.length() +
+            play_groups.length());
+}
+
+static QString pi_i18n(const QString &msg)
+{
+    QByteArray msg_arr = msg.toLatin1();
+    QString msg_i18n = QObject::tr(msg_arr.constData());
+    QByteArray msg_i18n_arr = msg_i18n.toLatin1();
+    return (msg_arr == msg_i18n_arr) ? msg_i18n : msg;
+}
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
