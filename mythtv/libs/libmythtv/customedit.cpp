@@ -47,18 +47,18 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     exSuffix = QString(" (%1)").arg(tr("stored example"));
     addString = tr("Add");
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
-
-    QVBoxLayout *vkbox = new QVBoxLayout(vbox, (int)(1 * wmult));
-    QHBoxLayout *hbox = new QHBoxLayout(vkbox, (int)(1 * wmult));
+    QVBoxLayout *vbox = new QVBoxLayout();
+    vbox->setMargin((int)(20 * wmult));
+    setLayout(vbox);
 
     // Edit selection
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    QHBoxLayout *edit_hbox = new QHBoxLayout();
+    edit_hbox->setMargin((int)(10 * wmult));
 
     QString message = tr("Edit Rule") + ": ";
     QLabel *label = new QLabel(message, this);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
+    edit_hbox->addWidget(label);
 
     m_rule = new MythComboBox( false, this, "rule");
 
@@ -93,19 +93,29 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     else
         MythDB::DBError("Get power search rules query", result);
 
-    hbox->addWidget(m_rule);
+    edit_hbox->addWidget(m_rule);
+
+    QWidget *edit_widget = new QWidget();
+    edit_widget->setLayout(edit_hbox);
+    vbox->addWidget(edit_widget);
 
     // Title edit box
-    hbox = new QHBoxLayout(vbox);
-    hbox->setMargin((int)(10 * wmult));
+    QHBoxLayout *title_hbox = new QHBoxLayout();
+    title_hbox->setMargin((int)(10 * wmult));
 
     message = tr("Rule Name") + ": ";
     label = new QLabel(message, this);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
+    title_hbox->addWidget(label);
 
     m_title = new MythRemoteLineEdit( this, "title" );
-    hbox->addWidget(m_title);
+    title_hbox->addWidget(m_title);
+
+    QWidget *title_widget = new QWidget();
+    title_widget->setLayout(title_hbox);
+    vbox->addWidget(title_widget);
+
+    // Clause selection box
 
     m_clause = new MythComboBox( false, this, "clause");
 
@@ -361,51 +371,61 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     vbox->addWidget(m_addButton);
 
     // Subtitle edit box
-    hbox = new QHBoxLayout(vbox);
-    hbox->setMargin((int)(10 * wmult));
+    QHBoxLayout *subtitle_hbox = new QHBoxLayout();
+    subtitle_hbox->setMargin((int)(10 * wmult));
 
     message = tr("Additional Tables") + ": ";
     label = new QLabel(message, this);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
+    subtitle_hbox->addWidget(label);
 
     m_subtitle = new MythRemoteLineEdit(this, "subtitle" );
-    hbox->addWidget(m_subtitle);
+    subtitle_hbox->addWidget(m_subtitle);
 
     // Description edit box
     m_description = new MythRemoteLineEdit(5, this, "description" );
     vbox->addWidget(m_description);
 
+    QWidget *subtitle_widget = new QWidget();
+    subtitle_widget->setLayout(subtitle_hbox);
+    vbox->addWidget(subtitle_widget);
+
+    // Bottom row buttons
+    QHBoxLayout *buttons_hbox = new QHBoxLayout();
+
     //  Test Button
-    hbox = new QHBoxLayout(vbox);
-    hbox->setMargin((int)(10 * wmult));
+    buttons_hbox->setMargin((int)(10 * wmult));
 
     m_testButton = new MythPushButton( this, "test" );
     m_testButton->setText( tr( "Test" ) );
     m_testButton->setEnabled(false);
 
-    hbox->addWidget(m_testButton);
+    buttons_hbox->addWidget(m_testButton);
 
     //  Record Button
     m_recordButton = new MythPushButton( this, "record" );
     m_recordButton->setText( tr( "Record" ) );
     m_recordButton->setEnabled(false);
 
-    hbox->addWidget(m_recordButton);
+    buttons_hbox->addWidget(m_recordButton);
 
     //  Store Button
     m_storeButton = new MythPushButton( this, "store" );
     m_storeButton->setText( tr( "Store" ) );
     m_storeButton->setEnabled(false);
 
-    hbox->addWidget(m_storeButton);
+    buttons_hbox->addWidget(m_storeButton);
 
     //  Cancel Button
     m_cancelButton = new MythPushButton( this, "cancel" );
     m_cancelButton->setText( tr( "Cancel" ) );
     m_cancelButton->setEnabled(true);
 
-    hbox->addWidget(m_cancelButton);
+    buttons_hbox->addWidget(m_cancelButton);
+
+    QWidget *buttons_widget = new QWidget();
+    buttons_widget->setLayout(buttons_hbox);
+    vbox->addWidget(buttons_widget);
 
     connect(this, SIGNAL(dismissWindow()), this, SLOT(accept()));
      
