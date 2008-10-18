@@ -57,12 +57,10 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     QString message = tr("Edit Rule") + ": ";
     QLabel *label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(label);
 
     m_rule = new MythComboBox( false, this, "rule");
-    m_rule->setBackgroundOrigin(WindowOrigin);
 
     m_rule->insertItem(tr("<New rule>"));
     m_recid   << "0";
@@ -98,20 +96,18 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
     hbox->addWidget(m_rule);
 
     // Title edit box
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new QHBoxLayout(vbox);
+    hbox->setMargin((int)(10 * wmult));
 
     message = tr("Rule Name") + ": ";
     label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(label);
 
     m_title = new MythRemoteLineEdit( this, "title" );
-    m_title->setBackgroundOrigin(WindowOrigin);
     hbox->addWidget(m_title);
 
     m_clause = new MythComboBox( false, this, "clause");
-    m_clause->setBackgroundOrigin(WindowOrigin);
 
     m_clause->insertItem(tr("Match an exact title"));
     m_cfrom << "";
@@ -359,35 +355,32 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     //  Add Button
     m_addButton = new MythPushButton( this, "add" );
-    m_addButton->setBackgroundOrigin(WindowOrigin);
     m_addButton->setText(addString);
     m_addButton->setEnabled(true);
 
     vbox->addWidget(m_addButton);
 
     // Subtitle edit box
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new QHBoxLayout(vbox);
+    hbox->setMargin((int)(10 * wmult));
 
     message = tr("Additional Tables") + ": ";
     label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(label);
 
     m_subtitle = new MythRemoteLineEdit(this, "subtitle" );
-    m_subtitle->setBackgroundOrigin(WindowOrigin);
     hbox->addWidget(m_subtitle);
 
     // Description edit box
     m_description = new MythRemoteLineEdit(5, this, "description" );
-    m_description->setBackgroundOrigin(WindowOrigin);
     vbox->addWidget(m_description);
 
     //  Test Button
-    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+    hbox = new QHBoxLayout(vbox);
+    hbox->setMargin((int)(10 * wmult));
 
     m_testButton = new MythPushButton( this, "test" );
-    m_testButton->setBackgroundOrigin(WindowOrigin);
     m_testButton->setText( tr( "Test" ) );
     m_testButton->setEnabled(false);
 
@@ -395,7 +388,6 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     //  Record Button
     m_recordButton = new MythPushButton( this, "record" );
-    m_recordButton->setBackgroundOrigin(WindowOrigin);
     m_recordButton->setText( tr( "Record" ) );
     m_recordButton->setEnabled(false);
 
@@ -403,7 +395,6 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     //  Store Button
     m_storeButton = new MythPushButton( this, "store" );
-    m_storeButton->setBackgroundOrigin(WindowOrigin);
     m_storeButton->setText( tr( "Store" ) );
     m_storeButton->setEnabled(false);
 
@@ -411,7 +402,6 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     //  Cancel Button
     m_cancelButton = new MythPushButton( this, "cancel" );
-    m_cancelButton->setBackgroundOrigin(WindowOrigin);
     m_cancelButton->setText( tr( "Cancel" ) );
     m_cancelButton->setEnabled(true);
 
@@ -437,7 +427,7 @@ CustomEdit::CustomEdit(MythMainWindow *parent, const char *name,
 
     if (titlematch >= 0)
     {
-        m_rule->setCurrentItem(titlematch);
+        m_rule->setCurrentIndex(titlematch);
         ruleChanged();
     }
     else if (p->title > "")
@@ -464,7 +454,7 @@ CustomEdit::~CustomEdit(void)
 
 void CustomEdit::ruleChanged(void)
 {
-    int curItem = m_rule->currentItem();
+    int curItem = m_rule->currentIndex();
     if (curItem == prevItem)
         return;
 
@@ -487,13 +477,13 @@ void CustomEdit::textChanged(void)
 
     m_testButton->setEnabled(hasdesc);
     m_recordButton->setEnabled(hastitle && hasdesc);
-    m_storeButton->setEnabled(m_clause->currentItem() >= maxex ||
+    m_storeButton->setEnabled(m_clause->currentIndex() >= maxex ||
                               (hastitle && hasdesc));
 }
 
 void CustomEdit::clauseChanged(void)
 {
-    QString msg = m_csql[m_clause->currentItem()];
+    QString msg = m_csql[m_clause->currentIndex()];
     msg.replace("\n", " ");
     msg.replace(QRegExp(" [ ]*"), " ");
     msg = QString("%1: \"%2\"").arg(addString).arg(msg);
@@ -507,7 +497,7 @@ void CustomEdit::clauseChanged(void)
     bool hastitle = !m_title->text().isEmpty();
     bool hasdesc = !m_description->text().isEmpty();
 
-    m_storeButton->setEnabled(m_clause->currentItem() >= maxex ||
+    m_storeButton->setEnabled(m_clause->currentIndex() >= maxex ||
                               (hastitle && hasdesc));
 }
 
@@ -518,9 +508,9 @@ void CustomEdit::addClicked(void)
     if (m_description->text().contains(QRegExp("\\S")))
         clause = "AND ";
 
-    clause += m_csql[m_clause->currentItem()];
+    clause += m_csql[m_clause->currentIndex()];
     m_description->append(clause);
-    m_subtitle->append(m_cfrom[m_clause->currentItem()]);
+    m_subtitle->append(m_cfrom[m_clause->currentIndex()]);
 }
 
 void CustomEdit::testClicked(void)
@@ -550,7 +540,7 @@ void CustomEdit::recordClicked(void)
 
     ScheduledRecording *record = new ScheduledRecording();
 
-    int cur_recid = m_recid[m_rule->currentItem()].toInt();
+    int cur_recid = m_recid[m_rule->currentIndex()].toInt();
 
     if (cur_recid > 0)
         record->modifyPowerSearchByID(cur_recid, m_title->text(),
@@ -612,7 +602,7 @@ void CustomEdit::storeClicked(void)
         storediag->AddButton(str2);
         exbtn = button++;
     }
-    if (m_clause->currentItem() >= maxex)
+    if (m_clause->currentIndex() >= maxex)
     {
         str = QString("%1 \"%2\"").arg(QObject::tr("Delete"))
                                   .arg(m_clause->currentText());
@@ -678,7 +668,7 @@ void CustomEdit::storeClicked(void)
         else
         {
             // remove item
-            int i = m_clause->currentItem();
+            int i = m_clause->currentIndex();
             m_clause->removeItem(i);
             i++;
             while (i < m_csql.count())
@@ -707,11 +697,11 @@ bool CustomEdit::checkSyntax(void)
 
     QString desc = m_description->text();
     QString from = m_subtitle->text();
-    if (desc.contains(QRegExp("^\\s*AND\\s", false)))
+    if (desc.contains(QRegExp("^\\s*AND\\s", Qt::CaseInsensitive)))
     {
         msg = "Power Search rules no longer reqiure a leading \"AND\".";
     }
-    else if (desc.contains(";", false))
+    else if (desc.contains(";"))
     {
         msg  = "Power Search rules can not include semicolon ( ; ) ";
         msg += "statement terminators.";
