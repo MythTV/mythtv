@@ -16,10 +16,6 @@
 #include <iostream>
 using namespace std;
 
-// Qt headers
-#include <qsqldatabase.h>
-#include <q3deepcopy.h>
-
 // MythTV headers
 #include "videodev_myth.h"
 #include "v4lchannel.h"
@@ -505,8 +501,8 @@ bool V4LChannel::SetChannelByString(const QString &channum)
     // Tune to proper frequency
     if ((*it)->externalChanger.isEmpty())
     {
-        if ((*it)->name.contains("composite", false) ||
-            (*it)->name.contains("s-video", false))
+        if ((*it)->name.contains("composite", Qt::CaseInsensitive) ||
+            (*it)->name.contains("s-video", Qt::CaseInsensitive))
         {
             VERBOSE(VB_GENERAL, LOC_WARN + "You have not set "
                     "an external channel changing"
@@ -530,7 +526,8 @@ bool V4LChannel::SetChannelByString(const QString &channum)
         return false;
 
     // Set the current channum to the new channel's channum
-    curchannelname = Q3DeepCopy<QString>(channum);
+    QString tmp = channum; tmp.detach();
+    curchannelname = tmp;
 
     // Setup filters & recording picture attributes for framegrabing recorders
     // now that the new curchannelname has been established.
@@ -542,7 +539,8 @@ bool V4LChannel::SetChannelByString(const QString &channum)
     SetDTVInfo(atsc_major, atsc_minor, netid, tsid, mpeg_prog_num);
 
     // Set this as the future start channel for this source
-    inputs[currentInputID]->startChanNum = Q3DeepCopy<QString>(curchannelname);
+    QString tmpX = curchannelname; tmpX.detach();
+    inputs[currentInputID]->startChanNum = tmpX;
 
     return true;
 }

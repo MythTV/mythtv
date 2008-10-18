@@ -196,7 +196,7 @@ QDateTime dvbdate2qt(const unsigned char *buf)
  	secsSince1970 += byteBCD2int(buf[2]) * 3600;
         secsSince1970 += byteBCD2int(buf[3]) * 60;
         secsSince1970 += byteBCD2int(buf[4]);
- 	result.setTime_t(secsSince1970, Qt::UTC);
+ 	result.setTime_t(secsSince1970);
  	return result;
     }
 

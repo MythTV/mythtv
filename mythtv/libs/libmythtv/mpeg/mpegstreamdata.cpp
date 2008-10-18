@@ -66,8 +66,8 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
       _local_utc_offset(0), _si_time_offset_cnt(0),
       _si_time_offset_indx(0),
       _eit_helper(NULL), _eit_rate(0.0f),
-      _encryption_lock(true), _listener_lock(true),
-      _cache_tables(cacheTables), _cache_lock(true),
+      _encryption_lock(QMutex::Recursive), _listener_lock(QMutex::Recursive),
+      _cache_tables(cacheTables), _cache_lock(QMutex::Recursive),
       // Single program stuff
       _desired_program(desiredProgram),
       _recording_type("all"),
@@ -810,7 +810,7 @@ void MPEGStreamData::ProcessPMT(const ProgramMapTable *pmt)
 
 double MPEGStreamData::TimeOffset(void) const
 {
-    QMutex locker(&_si_time_lock);
+    QMutexLocker locker(&_si_time_lock);
     if (!_si_time_offset_cnt)
         return 0.0;
 
@@ -831,7 +831,7 @@ void MPEGStreamData::UpdateTimeOffset(uint64_t _si_utc_time)
     double utc_time = tm.tv_sec + (tm.tv_usec * 0.000001);
     double si_time  = _si_utc_time;
 
-    QMutex locker(&_si_time_lock);
+    QMutexLocker locker(&_si_time_lock);
     _si_time_offsets[_si_time_offset_indx] = si_time - utc_time;
 
     if (_si_time_offset_indx + 1 > _si_time_offset_cnt)
@@ -1098,7 +1098,8 @@ void MPEGStreamData::SavePartialPES(uint pid, PESPacket* packet)
     else
     {
         PESPacket *old = *it;
-        _partial_pes_packet_cache.replace(pid, packet);
+        _partial_pes_packet_cache.remove(pid);
+        _partial_pes_packet_cache.insert(pid, packet);
         delete old;
     }
 }
@@ -1618,13 +1619,13 @@ void MPEGStreamData::RemoveEncryptionTestPIDs(uint pnum)
 
             if ((*list).empty())
             {
-                _encryption_pid_to_pnums.erase(pid);
-                _encryption_pid_to_info.erase(pid);
+                _encryption_pid_to_pnums.remove(pid);
+                _encryption_pid_to_info.remove(pid);
             }
         }
     }
 
-    _encryption_pnum_to_pids.erase(pnum);
+    _encryption_pnum_to_pids.remove(pnum);
 }
 
 bool MPEGStreamData::IsEncryptionTestPID(uint pid) const

@@ -309,7 +309,9 @@ void ProgLister::updateBackground(void)
 
     tmp.end();
 
-    setPaletteBackgroundPixmap(bground);
+    QPalette p = palette();
+    p.setBrush(backgroundRole(), QBrush(bground));
+    setPalette(p);
 }
 
 void ProgLister::paintEvent(QPaintEvent *e)
@@ -478,7 +480,7 @@ void ProgLister::chooseListBoxChanged(void)
 void ProgLister::updateKeywordInDB(const QString &text)
 {
     int oldview = chooseListBox->currentRow() - 1;
-    int newview = viewList.findIndex(text);
+    int newview = viewList.indexOf(text);
 
     QString qphrase = NULL;
 
@@ -539,14 +541,14 @@ void ProgLister::setViewFromPowerEdit()
     text += powerSubtitleEdit->text().replace(":","%").replace("*","%") + ":";
     text +=     powerDescEdit->text().replace(":","%").replace("*","%") + ":";
 
-    if (powerCatType->currentItem() > 0)
-        text += typeList[powerCatType->currentItem()];
+    if (powerCatType->currentIndex() > 0)
+        text += typeList[powerCatType->currentIndex()];
     text += ":";
-    if (powerGenre->currentItem() > 0)
-        text += genreList[powerGenre->currentItem()];
+    if (powerGenre->currentIndex() > 0)
+        text += genreList[powerGenre->currentIndex()];
     text += ":";
-    if (powerStation->currentItem() > 0)
-        text += stationList[powerStation->currentItem()];
+    if (powerStation->currentIndex() > 0)
+        text += stationList[powerStation->currentIndex()];
 
     if (text == ":::::")
         return;
@@ -557,7 +559,7 @@ void ProgLister::setViewFromPowerEdit()
 
     fillViewList(text);
 
-    curView = viewList.findIndex(text);
+    curView = viewList.indexOf(text);
 
     curItem = -1;
     refillAll = true;
@@ -645,8 +647,8 @@ void ProgLister::deleteKeyword(void)
     query.exec();
 
     chooseListBox->removeRow(view + 1);
-    viewList.remove(text);
-    viewTextList.remove(text);
+    viewList.removeAll(text);
+    viewTextList.removeAll(text);
 
     if (view < curView)
         curView--;
@@ -669,11 +671,11 @@ void ProgLister::setViewFromTime(void)
     if (!choosePopup || !chooseDay || !chooseHour)
         return;
 
-    int dayOffset = chooseDay->currentItem() - 1;
+    int dayOffset = chooseDay->currentIndex() - 1;
     searchTime.setDate(startTime.addDays(dayOffset).date());
 
     QTime m_hr;
-    m_hr.setHMS(chooseHour->currentItem(), 0, 0);
+    m_hr.setHMS(chooseHour->currentIndex(), 0, 0);
     searchTime.setTime(m_hr);
 
     curView = 0;
@@ -893,7 +895,7 @@ void ProgLister::chooseView(void)
                                   .toString(dayFormat));
             if (startTime.addDays(m_index).toString("MMdd") ==
                                 searchTime.toString("MMdd"))
-                chooseDay->setCurrentItem(chooseDay->count() - 1);
+                chooseDay->setCurrentIndex(chooseDay->count() - 1);
         }
         choosePopup->addWidget(chooseDay);
 
@@ -905,7 +907,7 @@ void ProgLister::chooseView(void)
             m_hr.setHMS(m_index, 0, 0);
             chooseHour->insertItem(m_hr.toString(hourFormat));
             if (m_hr.toString("hh") == searchTime.toString("hh"))
-                chooseHour->setCurrentItem(m_index);
+                chooseHour->setCurrentIndex(m_index);
         }
         choosePopup->addWidget(chooseHour);
 
@@ -972,7 +974,7 @@ void ProgLister::powerEdit()
     typeList << "tvshow";
     powerCatType->insertItem(tr("Sports"));
     typeList << "sports";
-    powerCatType->setCurrentItem(typeList.findIndex(field[3]));
+    powerCatType->setCurrentIndex(typeList.indexOf(field[3]));
     powerPopup->addWidget(powerCatType);
 
     powerGenre = new MythComboBox(false, powerPopup);
@@ -996,7 +998,7 @@ void ProgLister::powerEdit()
             powerGenre->insertItem(category);
             genreList << category;
             if (category == field[4])
-                powerGenre->setCurrentItem(powerGenre->count() - 1);
+                powerGenre->setCurrentIndex(powerGenre->count() - 1);
         }
     }
     powerPopup->addWidget(powerGenre);
@@ -1023,7 +1025,7 @@ void ProgLister::powerEdit()
         powerStation->insertItem(chantext);
         stationList << channels[i].callsign;
         if (channels[i].callsign == field[5])
-            powerStation->setCurrentItem(powerStation->count() - 1);
+            powerStation->setCurrentIndex(powerStation->count() - 1);
     }
 
     powerPopup->addWidget(powerStation);
@@ -1243,7 +1245,7 @@ void ProgLister::fillViewList(const QString &view)
         }
 
         if (!view.isEmpty())
-            curView = viewList.findIndex(view);
+            curView = viewList.indexOf(view);
     }
     else if (type == plCategory) // list by category
     {
@@ -1315,7 +1317,7 @@ void ProgLister::fillViewList(const QString &view)
         }
 
         if (view != "")
-            curView = viewList.findIndex(view);
+            curView = viewList.indexOf(view);
     }
     else if (type == plTitleSearch || type == plKeywordSearch ||
              type == plPeopleSearch || type == plPowerSearch)
@@ -1340,7 +1342,7 @@ void ProgLister::fillViewList(const QString &view)
         }
         if (view != "")
         {
-            curView = viewList.findIndex(view);
+            curView = viewList.indexOf(view);
 
             if (curView < 0)
             {
@@ -1482,7 +1484,7 @@ void ProgLister::fillViewList(const QString &view)
             }
         }
         if (view != "")
-            curView = viewList.findIndex(view);
+            curView = viewList.indexOf(view);
     }
 
     if (curView >= (int)viewList.count())
@@ -1634,7 +1636,7 @@ void ProgLister::fillItemList(void)
     }
     else if (type == plSQLSearch) // complex search
     {
-        qphrase.remove(QRegExp("^\\s*AND\\s+", false));
+        qphrase.remove(QRegExp("^\\s*AND\\s+", Qt::CaseInsensitive));
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > :PGILSTART "
                         "  AND ( %1 ) ").arg(qphrase);
@@ -1658,7 +1660,7 @@ void ProgLister::fillItemList(void)
                     "  AND program.category = :PGILPHRASE3 ";
             bindings[":PGILPHRASE3"] = qphrase;
         }
-        else if (viewList[curView].find(":/:") < 0)
+        else if (viewList[curView].indexOf(":/:") < 0)
         {
             where = "JOIN programgenres g ON "
                     "  program.chanid = g.chanid AND "

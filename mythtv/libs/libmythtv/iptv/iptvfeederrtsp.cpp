@@ -79,7 +79,7 @@ IPTVFeederRTSP::~IPTVFeederRTSP()
 
 bool IPTVFeederRTSP::IsRTSP(const QString &url)
 {
-    return url.startsWith("rtsp://", false);
+    return url.startsWith("rtsp://", Qt::CaseInsensitive);
 }
 
 bool IPTVFeederRTSP::Open(const QString &url)
@@ -110,7 +110,9 @@ bool IPTVFeederRTSP::Open(const QString &url)
     }
 
     // Setup URL for the current session
-    char *sdpDescription = _rtsp_client->describeURL(url);
+    char *sdpDescription = _rtsp_client->describeURL(
+        url.toLatin1().constData());
+
     _rtsp_client->describeStatus();
 
     if (!sdpDescription)

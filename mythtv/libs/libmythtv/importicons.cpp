@@ -39,17 +39,18 @@ int ImportIconsWizard::exec()
     QDir configDir(dirpath);
     if (!configDir.exists())
     {
-        if (!configDir.mkdir(dirpath, true))
+        if (!configDir.mkdir(dirpath))
         {
             VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg(dirpath));
         }
     }
 
-    m_strChannelDir = QString("%1/%2").arg(configDir.absPath()).arg("/channels");
+    m_strChannelDir = QString("%1/%2")
+        .arg(configDir.absolutePath()).arg("/channels");
     QDir strChannelDir(m_strChannelDir);
     if (!strChannelDir.exists())
     {
-        if (!strChannelDir.mkdir(m_strChannelDir, true))
+        if (!strChannelDir.mkdir(m_strChannelDir))
         {
             VERBOSE(VB_IMPORTANT, QString("Could not create %1").arg(m_strChannelDir));
         }
@@ -463,7 +464,7 @@ bool ImportIconsWizard::checkAndDownload(const QString& str, const QString& loca
 {
     // Do not try and access dialog within this function
 
-    int iIndex = str.findRev('/');
+    int iIndex = str.lastIndexOf('/');
     QString str2;
     if (iIndex < 0)
         str2=str;
@@ -502,12 +503,11 @@ bool ImportIconsWizard::checkAndDownload(const QString& str, const QString& loca
 
 bool ImportIconsWizard::isBlocked(const QString& strParam)
 {
-    QString strParam1 = strParam;
-    QUrl::encode(strParam1);
+    QString strParam1 = QUrl::toPercentEncoding(strParam);
     QUrl url(ImportIconsWizard::url+"/checkblock");
     QString str = wget(url,"csv="+strParam1);
 
-    if (str.startsWith("Error",false))
+    if (str.startsWith("Error", Qt::CaseInsensitive))
     {
         VERBOSE(VB_IMPORTANT, QString("Error from isBlocked : %1").arg(str));
         return true;
@@ -538,12 +538,11 @@ bool ImportIconsWizard::isBlocked(const QString& strParam)
 
 bool ImportIconsWizard::lookup(const QString& strParam)
 {
-    QString strParam1 = "callsign="+strParam;
-    QUrl::encode(strParam1);
+    QString strParam1 = QUrl::toPercentEncoding("callsign="+strParam);
     QUrl url(ImportIconsWizard::url+"/lookup");
 
     QString str = wget(url,strParam1);
-    if (str.isEmpty() || str.startsWith("Error",false))
+    if (str.isEmpty() || str.startsWith("Error", Qt::CaseInsensitive))
     {
         VERBOSE(VB_IMPORTANT, QString("Error from icon lookup : %1").arg(str));
         return true;
@@ -557,17 +556,17 @@ bool ImportIconsWizard::lookup(const QString& strParam)
 
 bool ImportIconsWizard::search(const QString& strParam)
 {
-    QString strParam1 = strParam;
+    QString strParam1 = QUrl::toPercentEncoding(strParam);
     bool retVal = false;
     enableControls(STATE_SEARCHING);
-    QUrl::encode(strParam1);
     QUrl url(ImportIconsWizard::url+"/search");
 
     QString str = wget(url,"s="+strParam1);
     m_listSearch.clear();
     m_listIcons->clearSelections();
 
-    if (str.isEmpty() || str.startsWith("#") || str.startsWith("Error",false))
+    if (str.isEmpty() || str.startsWith("#") ||
+        str.startsWith("Error", Qt::CaseInsensitive))
     {
         VERBOSE(VB_IMPORTANT, QString("Error from search : %1").arg(str));
         retVal = false;
@@ -616,13 +615,13 @@ bool ImportIconsWizard::search(const QString& strParam)
 
 bool ImportIconsWizard::findmissing(const QString& strParam)
 {
-    QString strParam1 = strParam;
-    QUrl::encode(strParam1);
+    QString strParam1 = QUrl::toPercentEncoding(strParam);
     QUrl url(ImportIconsWizard::url+"/findmissing");
 
     QString str = wget(url,"csv="+strParam1);
     VERBOSE(VB_CHANNEL, QString("Icon Import: findmissing : strParam1 = %1. str = %2").arg(strParam1).arg(str));
-    if (str.isEmpty() || str.startsWith("#") || str.startsWith("Error",false))
+    if (str.isEmpty() || str.startsWith("#") ||
+        str.startsWith("Error", Qt::CaseInsensitive))
     {
         VERBOSE(VB_IMPORTANT, QString("Error from findmissing : %1").arg(str));
         return false;
@@ -665,12 +664,12 @@ bool ImportIconsWizard::submit(const QString& strParam)
         return false;
     }
 
-    QString strParam1 = strParam;
-    QUrl::encode(strParam1);
+    QString strParam1 = QUrl::toPercentEncoding(strParam);
     QUrl url(ImportIconsWizard::url+"/submit");
 
     QString str = wget(url,"csv="+strParam1);
-    if (str.isEmpty() || str.startsWith("#") || str.startsWith("Error",false))
+    if (str.isEmpty() || str.startsWith("#") ||
+        str.startsWith("Error", Qt::CaseInsensitive))
     {
         VERBOSE(VB_IMPORTANT, QString("Error from submit : %1").arg(str));
         m_listIcons->addSelection("Failed to submit icon choices.");

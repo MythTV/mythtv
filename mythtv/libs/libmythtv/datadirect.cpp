@@ -325,7 +325,7 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
         else if (prefix == "SP")
             cat_type = "sports";
         else if (prefix == "EP" ||
-                 curr_program.showtype.contains("series", false))
+                 curr_program.showtype.contains("series", Qt::CaseInsensitive))
             cat_type = "series";
         else
             cat_type = "tvshow";
@@ -1085,7 +1085,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
         while (!stream.atEnd())
         {
             line = stream.readLine();
-            if (line.contains("<suggestedTime>", false))
+            if (line.contains("<suggestedTime>", Qt::CaseInsensitive))
             {
                 QString tmpStr = line;
                 tmpStr.replace(
@@ -1099,7 +1099,7 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
                         + NextSuggestedTime.toString(Qt::ISODate));
             }
 
-            if (line.contains("<blockedTime>", false))
+            if (line.contains("<blockedTime>", Qt::CaseInsensitive))
             {
                 QString tmpStr = line;
                 tmpStr.replace(
@@ -1226,7 +1226,7 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
         else
         {
             VERBOSE(VB_GENERAL, LOC + "Saving listings to DD cache");
-            ok = in.open(QIODevice::ReadOnly, fp);
+            ok = in.open(fp, QIODevice::ReadOnly);
             out.close(); // let copy routine handle dst file
         }
 
@@ -1265,7 +1265,7 @@ bool DataDirectProcessor::GrabData(const QDateTime pstartDate,
 
     ok = true;
     QFile f;
-    if (f.open(QIODevice::ReadOnly, fp))
+    if (f.open(fp, QIODevice::ReadOnly))
     {
         DDStructureParser ddhandler(*this);
         QXmlInputSource  xmlsource(&f);
@@ -1999,7 +1999,7 @@ bool DataDirectProcessor::ParseLineups(const QString &documentFile)
     {
         QString line = stream.readLine();
         QString llow = line.toLower();
-        int frm = llow.find("<form");
+        int frm = llow.indexOf("<form");
         if (frm >= 0)
         {
             in_form = true;
@@ -2011,7 +2011,7 @@ bool DataDirectProcessor::ParseLineups(const QString &documentFile)
         if (!in_form)
             continue;
 
-        int inp = llow.find("<input");
+        int inp = llow.indexOf("<input");
         if (inp >= 0)
         {
             QString input_line = line.mid(inp + 6);
@@ -2073,7 +2073,7 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
     {
         QString line = stream.readLine();
         QString llow = line.toLower();
-        int frm = llow.find("<form");
+        int frm = llow.indexOf("<form");
         if (frm >= 0)
         {
             in_form = true;
@@ -2084,7 +2084,7 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
         if (!in_form)
             continue;
 
-        int inp = llow.find("<input");
+        int inp = llow.indexOf("<input");
         if (inp >= 0)
         {
             QString in_line = line.mid(inp + 6);
@@ -2095,7 +2095,7 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
             settings["chk_checked"] = has_setting(in_line, "checked")?"1":"0";
         }
 
-        int lbl = llow.find("<label");
+        int lbl = llow.indexOf("<label");
         if (lbl >= 0)
         {
             QString lbl_line = line.mid(inp + 6);
@@ -2106,20 +2106,20 @@ bool DataDirectProcessor::ParseLineup(const QString &lineupid,
         if (in_label)
         {
             int start = (lbl >= 0) ? lbl + 6 : 0;
-            int beg = llow.find("<td>", start), end = -1;
+            int beg = llow.indexOf("<td>", start), end = -1;
             if (beg)
-                end = llow.find("</td>", beg + 4);
+                end = llow.indexOf("</td>", beg + 4);
 
             if (end >= 0)
             {
                 QString key = (in_label == 1) ? "lbl_ch" : "lbl_callsign";
                 QString val = line.mid(beg + 4, end - beg - 4);
-                settings[key] = val.replace("&nbsp;", "", false);
+                settings[key] = val.replace("&nbsp;", "", Qt::CaseInsensitive);
                 in_label++;
             }
         }
 
-        in_label = (llow.find("</label") >= 0) ? 0 : in_label;
+        in_label = (llow.indexOf("</label") >= 0) ? 0 : in_label;
 
         if (!in_label &&
             !settings["chk_name"].isEmpty() &&
@@ -2175,16 +2175,16 @@ static QString get_setting(QString line, QString key)
 {
     QString llow = line.toLower();
     QString kfind = key + "=\"";
-    int beg = llow.find(kfind), end = -1;
+    int beg = llow.indexOf(kfind), end = -1;
 
     if (beg >= 0)
     {
-        end = llow.find("\"", beg + kfind.length());
+        end = llow.indexOf("\"", beg + kfind.length());
         return line.mid(beg + kfind.length(), end - beg - kfind.length());
     }
 
     kfind = key + "=";
-    beg = llow.find(kfind);
+    beg = llow.indexOf(kfind);
     if (beg < 0)
         return QString::null;
 
@@ -2200,7 +2200,7 @@ static QString get_setting(QString line, QString key)
 
 static bool has_setting(QString line, QString key)
 {
-    return (line.toLower().find(key) >= 0);
+    return (line.toLower().indexOf(key) >= 0);
 }
 
 static void get_atsc_stuff(QString channum, int sourceid, int freqid,
@@ -2209,7 +2209,7 @@ static void get_atsc_stuff(QString channum, int sourceid, int freqid,
     major = freqid;
     minor = 0;
 
-    int chansep = channum.find(QRegExp("\\D"));
+    int chansep = channum.indexOf(QRegExp("\\D"));
     if (chansep < 0)
         return;
 
@@ -2295,7 +2295,7 @@ static uint update_channel_basic(uint    sourceid,   bool    insert,
 
             QString new_callsign = query.value(1).toString();
             new_callsign =
-                (new_callsign.find(ChannelUtil::GetUnknownCallsign()) == 0) ?
+                (new_callsign.indexOf(ChannelUtil::GetUnknownCallsign()) == 0) ?
                 callsign : new_callsign;
 
             QString new_name = query.value(2).toString();

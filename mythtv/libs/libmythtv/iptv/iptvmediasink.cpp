@@ -17,7 +17,7 @@ IPTVMediaSink::IPTVMediaSink(UsageEnvironment &env,
                              unsigned int      bufferSize) :
     MediaSink(env),
     _buf(NULL),         _buf_size(bufferSize),
-    _env(env),          _lock(true)
+    _env(env),          _lock(QMutex::Recursive)
 {
     _buf = new unsigned char[_buf_size];
 }

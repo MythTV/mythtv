@@ -19,7 +19,7 @@ QString freesat_huffman_to_string(const unsigned char *src, uint size)
 {
     if (src[1] == 1 || src[1] == 2)
     {
-        QByteArray uncompressed(size * 3);
+        QByteArray uncompressed(size * 3, '\0');
         int p = 0;
         struct hufftab *table;
         unsigned table_length;

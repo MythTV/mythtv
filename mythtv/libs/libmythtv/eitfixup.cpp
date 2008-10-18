@@ -21,15 +21,15 @@ EITFixUp::EITFixUp()
       m_bellPPVDescriptionAllDay("^\\(.*\\sEastern\\)"),
       m_bellPPVDescriptionAllDay2("^\\([0-9].*am-[0-9].*am\\sET\\)"),
       m_bellPPVDescriptionEventId("\\([0-9]{5}\\)"),
-      m_ukThen("\\s*(Then|Followed by) 60 Seconds\\.", false),
-      m_ukNew("(New\\.|\\s*(Brand New|New)\\s*(Series|Episode)\\s*[:\\.\\-])",false),
+      m_ukThen("\\s*(Then|Followed by) 60 Seconds\\.", Qt::CaseInsensitive),
+      m_ukNew("(New\\.|\\s*(Brand New|New)\\s*(Series|Episode)\\s*[:\\.\\-])",Qt::CaseInsensitive),
       m_ukCEPQ("[:\\!\\.\\?]"),
       m_ukColonPeriod("[:\\.]"),
       m_ukDotSpaceStart("^\\. "),
       m_ukDotEnd("\\.$"),
       m_ukSpaceColonStart("^[ |:]*"),
       m_ukSpaceStart("^ "),
-      m_ukSeries("\\s*\\(?\\s*(?:Episode|Part|Pt)?\\s*(\\d{1,2})\\s*(?:of|/)\\s*(\\d{1,2})\\s*\\)?\\s*(?:\\.|:)?", false),
+      m_ukSeries("\\s*\\(?\\s*(?:Episode|Part|Pt)?\\s*(\\d{1,2})\\s*(?:of|/)\\s*(\\d{1,2})\\s*\\)?\\s*(?:\\.|:)?", Qt::CaseInsensitive),
       m_ukCC("\\[(AD)(,(S)){,1}(,SL){,1}\\]|\\[(S)(,AD){,1}(,SL){,1}\\]|"
              "\\[(SL)(,AD){,1}(,(S)){,1}\\]"),
       m_ukYear("[\\[\\(]([\\d]{4})[\\)\\]]"),
@@ -41,9 +41,9 @@ EITFixUp::EITFixUp()
       m_ukDoubleDotEnd("\\.\\.+$"),
       m_ukDoubleDotStart("^\\.\\.+"),
       m_ukTime("\\d{1,2}[\\.:]\\d{1,2}\\s*(am|pm|)"),
-      m_ukBBC34("BBC (?:THREE|FOUR) on BBC (?:ONE|TWO)\\.",false),
+      m_ukBBC34("BBC (?:THREE|FOUR) on BBC (?:ONE|TWO)\\.",Qt::CaseInsensitive),
       m_ukYearColon("^[\\d]{4}:"),
-      m_ukExclusionFromSubtitle("(starring|stars\\s|drama|series|sitcom)",false),
+      m_ukExclusionFromSubtitle("(starring|stars\\s|drama|series|sitcom)",Qt::CaseInsensitive),
       m_ukCompleteDots("^\\.\\.+$"),
       m_comHemCountry("^(\\(.+\\))?\\s?([^ ]+)\\s([^\\.0-9]+)"
                       "(?:\\sfrån\\s([0-9]{4}))(?:\\smed\\s([^\\.]+))?\\.?"),
@@ -176,7 +176,7 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
 
     // A 0x0D character is present between the content
     // and the subtitle if its present
-    int position = event.description.find(0x0D);
+    int position = event.description.indexOf(0x0D);
 
     if (position != -1)
     {
@@ -189,7 +189,7 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
 
     // Take out the content description which is
     // always next with a period after it
-    position = event.description.find(".");
+    position = event.description.indexOf(".");
     // Make sure they didn't leave it out and
     // you come up with an odd category
     if (position < 10)
@@ -213,7 +213,7 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
 
 
     // See if a year is present as (xxxx)
-    position = event.description.find(m_bellYear);
+    position = event.description.indexOf(m_bellYear);
     if (position != -1 && event.category != "")
     {
         tmp = "";
@@ -240,7 +240,7 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
 
     // Check for (CC) in the decription and
     // set the <subtitles type="teletext"> flag
-    position = event.description.find("(CC)");
+    position = event.description.indexOf("(CC)");
     if (position != -1)
     {
         event.subtitleType |= SUB_HARDHEAR;
@@ -248,7 +248,7 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
     }
 
     // Check for (Stereo) in the decription and set the <audio> tags
-    position = event.description.find("(Stereo)");
+    position = event.description.indexOf("(Stereo)");
     if (position != -1)
     {
         event.audioProps |= AUD_STEREO;
@@ -256,14 +256,14 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
     }
 
     // Check for "title (All Day)" in the title
-    position = event.title.find(m_bellPPVTitleAllDay);
+    position = event.title.indexOf(m_bellPPVTitleAllDay);
     if (position != -1)
     {
         event.title = event.title.replace(m_bellPPVTitleAllDay, "");
     }
 
     // Check for "HD - title" in the title
-    position = event.title.find(m_bellPPVTitleHD);
+    position = event.title.indexOf(m_bellPPVTitleHD);
     if (position != -1)
     {
         event.title = event.title.replace(m_bellPPVTitleHD, "");
@@ -271,28 +271,28 @@ void EITFixUp::FixBellExpressVu(DBEvent &event) const
     }
 
     // Check for subtitle "All Day (... Eastern)" in the subtitle
-    position = event.subtitle.find(m_bellPPVSubtitleAllDay);
+    position = event.subtitle.indexOf(m_bellPPVSubtitleAllDay);
     if (position != -1)
     {
         event.subtitle = event.subtitle.replace(m_bellPPVSubtitleAllDay, "");
     }
 
     // Check for description "(... Eastern)" in the description
-    position = event.description.find(m_bellPPVDescriptionAllDay);
+    position = event.description.indexOf(m_bellPPVDescriptionAllDay);
     if (position != -1)
     {
         event.description = event.description.replace(m_bellPPVDescriptionAllDay, "");
     }
 
     // Check for description "(... ET)" in the description
-    position = event.description.find(m_bellPPVDescriptionAllDay2);
+    position = event.description.indexOf(m_bellPPVDescriptionAllDay2);
     if (position != -1)
     {
         event.description = event.description.replace(m_bellPPVDescriptionAllDay2, "");
     }
 
     // Check for description "(nnnnn)" in the description
-    position = event.description.find(m_bellPPVDescriptionEventId);
+    position = event.description.indexOf(m_bellPPVDescriptionEventId);
     if (position != -1)
     {
         event.description = event.description.replace(m_bellPPVDescriptionEventId, "");
@@ -317,10 +317,10 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
          bool fSingleDot = true;
          int nLength = strListColon[0].length();
 
-         nPosition1 = event.description.find("..");
+         nPosition1 = event.description.indexOf("..");
          if ((nPosition1 < nLength) && (nPosition1 >= 0))
              fDoubleDot = true;
-         nPosition1 = event.description.find(".");
+         nPosition1 = event.description.indexOf(".");
          if (nPosition1==-1)
              fSingleDot = false;
          if (nPosition1 > nLength)
@@ -378,8 +378,8 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
         strListPeriod = event.description.split(".");
         if (strListPeriod.count() >1)
         {
-            nPosition1 = event.description.find(".");
-            int nPosition2 = event.description.find("..");
+            nPosition1 = event.description.indexOf(".");
+            int nPosition2 = event.description.indexOf("..");
             if ((nPosition1 < nPosition2) || (nPosition2==-1))
                 strListEnd = strListPeriod;
         }
@@ -410,7 +410,7 @@ void EITFixUp::SetUKSubtitle(DBEvent &event) const
              return;
         if ((uint)strListSpace.size() > kDotToTitle)
              return;
-        if (strListSpace.grep(m_ukExclusionFromSubtitle).empty())
+        if (strListSpace.filter(m_ukExclusionFromSubtitle).empty())
         {
              event.subtitle = strListEnd[0]+strEnd;
              event.subtitle.remove(m_ukSpaceColonStart);
@@ -431,7 +431,7 @@ void EITFixUp::FixUK(DBEvent &event) const
     int position2;
     QString strFull;
 
-    bool isMovie = event.category.startsWith("Movie",false);
+    bool isMovie = event.category.startsWith("Movie",Qt::CaseInsensitive);
     // BBC three case (could add another record here ?)
     event.description = event.description.remove(m_ukThen);
     event.description = event.description.remove(m_ukNew);
@@ -455,7 +455,7 @@ void EITFixUp::FixUK(DBEvent &event) const
     // Work out the episode numbers (if any)
     bool    series  = false;
     QRegExp tmpExp1 = m_ukSeries;
-    if ((position1 = tmpExp1.search(event.title)) != -1)
+    if ((position1 = tmpExp1.indexIn(event.title)) != -1)
     {
         if ((tmpExp1.cap(1).toUInt() <= tmpExp1.cap(2).toUInt())
             && tmpExp1.cap(2).toUInt()<=50)
@@ -468,7 +468,7 @@ void EITFixUp::FixUK(DBEvent &event) const
             series = true;
         }
     }
-    else if ((position1 = tmpExp1.search(event.description)) != -1)
+    else if ((position1 = tmpExp1.indexIn(event.description)) != -1)
     {
         if ((tmpExp1.cap(1).toUInt() <= tmpExp1.cap(2).toUInt())
             && tmpExp1.cap(2).toUInt()<=50)
@@ -485,7 +485,7 @@ void EITFixUp::FixUK(DBEvent &event) const
         event.category_type = kCategorySeries;
 
     QRegExp tmpStarring = m_ukStarring;
-    if (tmpStarring.search(event.description) != -1)
+    if (tmpStarring.indexIn(event.description) != -1)
     {
         // if we match this we've captured 2 actors and an (optional) airdate
         event.AddPerson(DBPerson::kActor, tmpStarring.cap(1));
@@ -503,13 +503,13 @@ void EITFixUp::FixUK(DBEvent &event) const
     QRegExp tmp24ep = m_uk24ep;
     if (!event.title.startsWith("CSI:") && !event.title.startsWith("CD:"))
     {
-        if (((position1=event.title.find(m_ukDoubleDotEnd)) != -1) &&
-            ((position2=event.description.find(m_ukDoubleDotStart)) != -1))
+        if (((position1=event.title.indexOf(m_ukDoubleDotEnd)) != -1) &&
+            ((position2=event.description.indexOf(m_ukDoubleDotStart)) != -1))
         {
             QString strPart=event.title.remove(m_ukDoubleDotEnd)+" ";
             strFull = strPart + event.description.remove(m_ukDoubleDotStart);
             if (isMovie &&
-                ((position1 = strFull.find(m_ukCEPQ,strPart.length())) != -1))
+                ((position1 = strFull.indexOf(m_ukCEPQ,strPart.length())) != -1))
             {
                  if (strFull[position1] == '!' || strFull[position1] == '?')
                      position1++;
@@ -517,7 +517,7 @@ void EITFixUp::FixUK(DBEvent &event) const
                  event.description = strFull.mid(position1 + 1);
                  event.description.remove(m_ukSpaceStart);
             }
-            else if ((position1 = strFull.find(m_ukCEPQ)) != -1)
+            else if ((position1 = strFull.indexOf(m_ukCEPQ)) != -1)
             {
                  if (strFull[position1] == '!' || strFull[position1] == '?')
                      position1++;
@@ -526,7 +526,7 @@ void EITFixUp::FixUK(DBEvent &event) const
                  event.description.remove(m_ukSpaceStart);
                  SetUKSubtitle(event);
             }
-            if ((position1 = strFull.find(m_ukYear)) != -1)
+            if ((position1 = strFull.indexOf(m_ukYear)) != -1)
             {
                 // Looks like they are using the airdate as a delimiter
                 if ((uint)position1 < SUBTITLE_MAX_LEN)
@@ -536,7 +536,7 @@ void EITFixUp::FixUK(DBEvent &event) const
                 }
             }
         }
-        else if ((position1 = tmp24ep.search(event.description)) != -1)
+        else if ((position1 = tmp24ep.indexIn(event.description)) != -1)
         {
             // Special case for episodes of 24.
             // -2 from the length cause we don't want ": " on the end
@@ -544,18 +544,18 @@ void EITFixUp::FixUK(DBEvent &event) const
                                 tmp24ep.cap(0).length() - 2);
             event.description = event.description.remove(tmp24ep.cap(0));
         }
-        else if ((position1 = event.description.find(m_ukTime)) == -1)
+        else if ((position1 = event.description.indexOf(m_ukTime)) == -1)
         {
-            if (!isMovie && (event.title.find(m_ukYearColon) < 0))
+            if (!isMovie && (event.title.indexOf(m_ukYearColon) < 0))
             {
-                if (((position1 = event.title.find(":")) != -1) &&
-                    (event.description.find(":") < 0 ))
+                if (((position1 = event.title.indexOf(":")) != -1) &&
+                    (event.description.indexOf(":") < 0 ))
                 {
-                    if (event.title.mid(position1+1).find(m_ukCompleteDots)==0)
+                    if (event.title.mid(position1+1).indexOf(m_ukCompleteDots)==0)
                     {
                         SetUKSubtitle(event);
                         QString strTmp = event.title.mid(position1+1);
-                        event.title.setLength(position1);
+                        event.title.resize(position1);
                         event.subtitle = strTmp+event.subtitle;
                     }
                     else if ((uint)position1 < SUBTITLE_MAX_LEN)
@@ -572,13 +572,13 @@ void EITFixUp::FixUK(DBEvent &event) const
 
     if (!isMovie && event.subtitle.isEmpty())
     {
-        if ((position1=event.description.find(m_ukTime)) != -1)
+        if ((position1=event.description.indexOf(m_ukTime)) != -1)
         {
-            position2 = event.description.find(m_ukColonPeriod);
+            position2 = event.description.indexOf(m_ukColonPeriod);
             if ((position2>=0) && (position2 < (position1-2)))
                 SetUKSubtitle(event);
         }
-        else if ((position1=event.title.find("-")) != -1)
+        else if ((position1=event.title.indexOf("-")) != -1)
         {
             if ((uint)position1 < SUBTITLE_MAX_LEN)
             {
@@ -593,7 +593,7 @@ void EITFixUp::FixUK(DBEvent &event) const
 
     // Work out the year (if any)
     QRegExp tmpUKYear = m_ukYear;
-    if ((position1 = tmpUKYear.search(event.description)) != -1)
+    if ((position1 = tmpUKYear.indexIn(event.description)) != -1)
     {
         QString stmp = event.description;
         int     itmp = position1 + tmpUKYear.cap(0).length();
@@ -607,7 +607,7 @@ void EITFixUp::FixUK(DBEvent &event) const
 
     // Trim leading/trailing '.'
     event.subtitle.remove(m_ukDotSpaceStart);
-    if (event.subtitle.findRev("..") != (((int)event.subtitle.length())-2))
+    if (event.subtitle.lastIndexOf("..") != (((int)event.subtitle.length())-2))
         event.subtitle.remove(m_ukDotEnd);
 
     // Reverse the subtitle and empty description
@@ -624,7 +624,7 @@ void EITFixUp::FixUK(DBEvent &event) const
 void EITFixUp::FixPBS(DBEvent &event) const
 {
     /* Used for PBS ATSC Subtitles are seperated by a colon */
-    int position = event.description.find(':');
+    int position = event.description.indexOf(':');
     if (position != -1)
     {
         const QString stmp   = event.description;
@@ -653,13 +653,13 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
     int pos;
     QRegExp tmpSeries1 = m_comHemSeries1;
     QRegExp tmpSeries2 = m_comHemSeries2;
-    if ((pos = tmpSeries2.search(event.title)) != -1)
+    if ((pos = tmpSeries2.indexIn(event.title)) != -1)
     {
         QStringList list = tmpSeries2.capturedTexts();
         event.partnumber = list[2].toUInt();
         event.title = event.title.replace(list[0],"");
     }
-    else if ((pos = tmpSeries1.search(event.description)) != -1)
+    else if ((pos = tmpSeries1.indexIn(event.description)) != -1)
     {
         QStringList list = tmpSeries1.capturedTexts();
         if (!list[1].isEmpty())
@@ -691,7 +691,7 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
 
     // Move subtitle info from title to subtitle
     QRegExp tmpTSub = m_comHemTSub;
-    if (tmpTSub.search(event.title) != -1)
+    if (tmpTSub.indexIn(event.title) != -1)
     {
         event.subtitle = tmpTSub.cap(1);
         event.title = event.title.replace(tmpTSub.cap(0),"");
@@ -704,7 +704,7 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
     // Try to find country category, year and possibly other information
     // from the begining of the description
     QRegExp tmpCountry = m_comHemCountry;
-    pos = tmpCountry.search(event.description);
+    pos = tmpCountry.indexIn(event.description);
     if (pos != -1)
     {
         QStringList list = tmpCountry.capturedTexts();
@@ -734,7 +734,7 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
                 event.category = list[3];
             }
 
-            if(list[3].find("serie")!=-1)
+            if(list[3].indexOf("serie")!=-1)
             {
                 isSeries = true;
             }
@@ -767,7 +767,7 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
 
     // Look for additional persons in the description
     QRegExp tmpPersons = m_comHemPersons;
-    while(pos = tmpPersons.search(event.description),pos!=-1)
+    while(pos = tmpPersons.indexIn(event.description),pos!=-1)
     {
         DBPerson::Role role;
         QStringList list = tmpPersons.capturedTexts();
@@ -775,15 +775,15 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
         QRegExp tmpDirector = m_comHemDirector;
         QRegExp tmpActor = m_comHemActor;
         QRegExp tmpHost = m_comHemHost;
-        if (tmpDirector.search(list[1])!=-1)
+        if (tmpDirector.indexIn(list[1])!=-1)
         {
             role = DBPerson::kDirector;
         }
-        else if(tmpActor.search(list[1])!=-1)
+        else if(tmpActor.indexIn(list[1])!=-1)
         {
             role = DBPerson::kActor;
         }
-        else if(tmpHost.search(list[1])!=-1)
+        else if(tmpHost.indexIn(list[1])!=-1)
         {
             role = DBPerson::kHost;
         }
@@ -809,7 +809,7 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
     // shorter than 55 characters or we risk picking up the wrong thing.
     if (process_subtitle)
     {
-        int pos = event.description.find(m_comHemSub);
+        int pos = event.description.indexOf(m_comHemSub);
         bool pvalid = pos != -1 && pos <= 55;
         if (pvalid && (event.description.length() - (pos + 2)) > 0)
         {
@@ -820,7 +820,7 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
     }
 
     // Teletext subtitles?
-    int position = event.description.find(m_comHemTT);
+    int position = event.description.indexOf(m_comHemTT);
     if (position != -1)
     {
         event.subtitleType |= SUB_NORMAL;
@@ -828,7 +828,7 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
 
     // Try to findout if this is a rerun and if so the date.
     QRegExp tmpRerun1 = m_comHemRerun1;
-    if (tmpRerun1.search(event.description) == -1)
+    if (tmpRerun1.indexIn(event.description) == -1)
         return;
 
     // Rerun from today
@@ -848,7 +848,7 @@ void EITFixUp::FixComHem(DBEvent &event, bool process_subtitle) const
 
     // Rerun with day, month and possibly year specified
     QRegExp tmpRerun2 = m_comHemRerun2;
-    if (tmpRerun2.search(list[1]) != -1)
+    if (tmpRerun2.indexIn(list[1]) != -1)
     {
         QStringList datelist = tmpRerun2.capturedTexts();
         int day   = datelist[1].toInt();
@@ -879,7 +879,7 @@ void EITFixUp::FixAUStar(DBEvent &event) const
 {
     event.category = event.subtitle;
     /* Used for DVB-S Subtitles are seperated by a colon */
-    int position = event.description.find(':');
+    int position = event.description.indexOf(':');
     if (position != -1)
     {
         const QString stmp   = event.description;
@@ -908,22 +908,22 @@ void EITFixUp::FixMCA(DBEvent &event) const
 
     // Replace incomplete title if the full one is in the description
     tmpExp1 = m_mcaIncompleteTitle;
-    if (tmpExp1.search(event.title) != -1)
+    if (tmpExp1.indexIn(event.title) != -1)
     {
         tmpExp1 = QRegExp( QString(m_mcaCompleteTitlea.pattern() + tmpExp1.cap(1) +
                                    m_mcaCompleteTitleb.pattern()));
-        tmpExp1.setCaseSensitive(false);
-        if (tmpExp1.search(event.description) != -1)
+        tmpExp1.setCaseSensitivity(Qt::CaseInsensitive);
+        if (tmpExp1.indexIn(event.description) != -1)
         {
             event.title       = tmpExp1.cap(1).trimmed();
             event.description = tmpExp1.cap(2).trimmed();
         }
-        tmpExp1.setCaseSensitive(true);
+        tmpExp1.setCaseSensitivity(Qt::CaseSensitive);
     }
 
     // Try to find subtitle in description
     tmpExp1 = m_mcaSubtitle;
-    if ((position = tmpExp1.search(event.description)) != -1)
+    if ((position = tmpExp1.indexIn(event.description)) != -1)
     {
         uint tmpExp1Len = tmpExp1.cap(1).length();
         uint evDescLen = max(event.description.length(), 1);
@@ -938,7 +938,7 @@ void EITFixUp::FixMCA(DBEvent &event) const
 
     // Try to find episode numbers in subtitle
     tmpExp1 = m_mcaSeries;
-    if ((position = tmpExp1.search(event.subtitle)) != -1)
+    if ((position = tmpExp1.indexIn(event.subtitle)) != -1)
     {
         uint season    = tmpExp1.cap(1).toUInt();
         uint episode   = tmpExp1.cap(2).toUInt();
@@ -949,7 +949,7 @@ void EITFixUp::FixMCA(DBEvent &event) const
     }
 
     // Close captioned?
-    position = event.description.find(m_mcaCC);
+    position = event.description.indexOf(m_mcaCC);
     if (position > 0)
     {
         event.subtitleType |= SUB_HARDHEAR;
@@ -957,7 +957,7 @@ void EITFixUp::FixMCA(DBEvent &event) const
     }
 
     // Dolby Digital 5.1?
-    position = event.description.find(m_mcaDD);
+    position = event.description.indexOf(m_mcaDD);
     if ((position > 0) && (position > (int) (event.description.length() - 7)))
     {
         event.audioProps |= AUD_STEREO;
@@ -971,7 +971,7 @@ void EITFixUp::FixMCA(DBEvent &event) const
     // Try to find year and director from the end of the description
     bool isMovie = false;
     tmpExp1  = m_mcaCredits;
-    position = tmpExp1.search(event.description);
+    position = tmpExp1.indexIn(event.description);
     if (position != -1)
     {
         isMovie = true;
@@ -983,7 +983,7 @@ void EITFixUp::FixMCA(DBEvent &event) const
     {
         // Try to find year only from the end of the description
         tmpExp1  = m_mcaYear;
-        position = tmpExp1.search(event.description);
+        position = tmpExp1.indexIn(event.description);
         if (position != -1)
         {
             isMovie = true;
@@ -995,7 +995,7 @@ void EITFixUp::FixMCA(DBEvent &event) const
     if (isMovie)
     {
         tmpExp1  = m_mcaActors;
-        position = tmpExp1.search(event.description);
+        position = tmpExp1.indexIn(event.description);
         if (position != -1)
         {
             const QStringList actors = tmpExp1.cap(2).split(
@@ -1026,7 +1026,7 @@ void EITFixUp::FixRTL(DBEvent &event) const
 
     // Repeat
     QRegExp tmpExpRepeat = m_RTLrepeat;
-    if ((pos = tmpExpRepeat.search(event.description)) != -1)
+    if ((pos = tmpExpRepeat.indexIn(event.description)) != -1)
     {
         // remove '.' if it matches at the beginning of the description
         int length = tmpExpRepeat.cap(0).length() + (pos ? 0 : 1);
@@ -1046,7 +1046,7 @@ void EITFixUp::FixRTL(DBEvent &event) const
     QRegExp tmpExpEpisodeNo2 = m_RTLEpisodeNo2;
 
     // subtitle with episode number: "Folge *: 'subtitle'. description
-    if (tmpExpSubtitle1.search(event.description) != -1)
+    if (tmpExpSubtitle1.indexIn(event.description) != -1)
     {
         event.syndicatedepisodenumber = tmpExpSubtitle1.cap(1);
         event.subtitle    = tmpExpSubtitle1.cap(2);
@@ -1054,7 +1054,7 @@ void EITFixUp::FixRTL(DBEvent &event) const
             event.description.remove(0, tmpExpSubtitle1.matchedLength());
     }
     // episode number subtitle 
-    else if (tmpExpSubtitle2.search(event.description) != -1)
+    else if (tmpExpSubtitle2.indexIn(event.description) != -1)
     {
         event.syndicatedepisodenumber = tmpExpSubtitle2.cap(1);
         event.subtitle    = tmpExpSubtitle2.cap(2);
@@ -1062,7 +1062,7 @@ void EITFixUp::FixRTL(DBEvent &event) const
             event.description.remove(0, tmpExpSubtitle2.matchedLength());
     }
     // episode number subtitle 
-    else if (tmpExpSubtitle3.search(event.description) != -1)
+    else if (tmpExpSubtitle3.indexIn(event.description) != -1)
     {
         event.syndicatedepisodenumber = tmpExpSubtitle3.cap(1);
         event.subtitle    = tmpExpSubtitle3.cap(2);
@@ -1070,21 +1070,21 @@ void EITFixUp::FixRTL(DBEvent &event) const
             event.description.remove(0, tmpExpSubtitle3.matchedLength());
     }
     // "Thema..."
-    else if (tmpExpSubtitle4.search(event.description) != -1)
+    else if (tmpExpSubtitle4.indexIn(event.description) != -1)
     {
         event.subtitle    = tmpExpSubtitle4.cap(1);
         event.description =
             event.description.remove(0, tmpExpSubtitle4.matchedLength());
     }
     // "'...'"
-    else if (tmpExpSubtitle5.search(event.description) != -1)
+    else if (tmpExpSubtitle5.indexIn(event.description) != -1)
     {
         event.subtitle    = tmpExpSubtitle5.cap(1);
         event.description =
             event.description.remove(0, tmpExpSubtitle5.matchedLength());
     }
     // episode number
-    else if (tmpExpEpisodeNo1.search(event.description) != -1)
+    else if (tmpExpEpisodeNo1.indexIn(event.description) != -1)
     {
         event.syndicatedepisodenumber = tmpExpEpisodeNo1.cap(2);
         event.subtitle    = tmpExpEpisodeNo1.cap(1);
@@ -1092,7 +1092,7 @@ void EITFixUp::FixRTL(DBEvent &event) const
             event.description.remove(0, tmpExpEpisodeNo1.matchedLength());
     }
     // episode number
-    else if (tmpExpEpisodeNo2.search(event.description) != -1)
+    else if (tmpExpEpisodeNo2.indexIn(event.description) != -1)
     {
         event.syndicatedepisodenumber = tmpExpEpisodeNo2.cap(2);
         event.subtitle    = tmpExpEpisodeNo2.cap(1);
@@ -1104,7 +1104,7 @@ void EITFixUp::FixRTL(DBEvent &event) const
     const uint SUBTITLE_PCT = 35; //% of description to allow subtitle up to
     const uint SUBTITLE_MAX_LEN = 50; // max length of subtitle field in db
 
-    if ((position = tmpExp1.search(event.description)) != -1)
+    if ((position = tmpExp1.indexIn(event.description)) != -1)
     {
         uint tmpExp1Len = tmpExp1.cap(1).length();
         uint evDescLen = max(event.description.length(), 1);
@@ -1123,7 +1123,7 @@ void EITFixUp::FixRTL(DBEvent &event) const
  */
 void EITFixUp::FixFI(DBEvent &event) const
 {
-    int position = event.description.find(m_fiRerun);
+    int position = event.description.indexOf(m_fiRerun);
     if (position != -1)
     {
         event.previouslyshown = true;
@@ -1131,7 +1131,7 @@ void EITFixUp::FixFI(DBEvent &event) const
     }
 
     // Check for (Stereo) in the decription and set the <audio> tags
-    position = event.description.find(m_Stereo);
+    position = event.description.indexOf(m_Stereo);
     if (position != -1)
     {
         event.audioProps |= AUD_STEREO;
@@ -1149,7 +1149,7 @@ void EITFixUp::FixPremiere(DBEvent &event) const
 
     // Find infos about country and year, regisseur and actors
     QRegExp tmpInfos =  m_dePremiereInfos;
-    if (tmpInfos.search(event.description) != -1)
+    if (tmpInfos.indexIn(event.description) != -1)
     {
         country = tmpInfos.cap(1).trimmed();
         event.airdate = tmpInfos.cap(2);
@@ -1164,7 +1164,7 @@ void EITFixUp::FixPremiere(DBEvent &event) const
 
     // move the original titel from the title to subtitle
     QRegExp tmpOTitle = m_dePremiereOTitle;
-    if (tmpOTitle.search(event.title) != -1)
+    if (tmpOTitle.indexIn(event.title) != -1)
     {
         event.subtitle = QString("%1, %2").arg(tmpOTitle.cap(1)).arg(country);
         event.title = event.title.replace(tmpOTitle.cap(0), "");
@@ -1267,33 +1267,33 @@ void EITFixUp::FixNL(DBEvent &event) const
 
     // Get stereo info
     int position;
-    if ((position = fullinfo.find(m_nlStereo)) != -1)
+    if ((position = fullinfo.indexOf(m_nlStereo)) != -1)
     {
         event.audioProps |= AUD_STEREO;
         fullinfo = fullinfo.replace("stereo", ".");
     }
     
     //Get widescreen info
-    if ((position = fullinfo.find(m_nlWide)) != -1)
+    if ((position = fullinfo.indexOf(m_nlWide)) != -1)
     {
         fullinfo = fullinfo.replace("breedbeeld", ".");
     }
 
     // Get repeat info
-    if ((position = fullinfo.find(m_nlRepeat)) != -1)
+    if ((position = fullinfo.indexOf(m_nlRepeat)) != -1)
     {
         fullinfo = fullinfo.replace("herh.", ".");
     }
 
     // Get teletext subtitle info
-    if ((position = fullinfo.find(m_nlTxt)) != -1)
+    if ((position = fullinfo.indexOf(m_nlTxt)) != -1)
     {
         event.subtitleType |= SUB_NORMAL;
         fullinfo = fullinfo.replace("txt", ".");
     }
     
     // Get HDTV information
-    if ((position = event.title.find(m_nlHD)) != -1)
+    if ((position = event.title.indexOf(m_nlHD)) != -1)
     {
         event.videoProps |= VID_HDTV;
         event.title = event.title.replace(m_nlHD, "");
@@ -1302,7 +1302,7 @@ void EITFixUp::FixNL(DBEvent &event) const
     // Try to make subtitle
     QRegExp tmpSub = m_nlSub;
     QString tmpSubString;
-    if (tmpSub.search(fullinfo) != -1)
+    if (tmpSub.indexIn(fullinfo) != -1)
     {
         tmpSubString = tmpSub.cap(0);
         tmpSubString = tmpSubString.right(tmpSubString.length() - 7);
@@ -1312,7 +1312,7 @@ void EITFixUp::FixNL(DBEvent &event) const
     
     // This is trying to catch the case where the subtitle is in the main title
     // but avoid cases where it isn't a subtitle e.g cd:uk
-    if (((position = event.title.find(":")) != -1) &&
+    if (((position = event.title.indexOf(":")) != -1) &&
         (event.title[position + 1].toUpper() == event.title[position + 1]) &&
         (event.subtitle.isEmpty()))
     {
@@ -1323,7 +1323,7 @@ void EITFixUp::FixNL(DBEvent &event) const
     
     // Get the actors
     QRegExp tmpActors = m_nlActors;
-    if (tmpActors.search(fullinfo) != -1)
+    if (tmpActors.indexIn(fullinfo) != -1)
     {
         QString tmpActorsString = tmpActors.cap(0);
         tmpActorsString = tmpActorsString.right(tmpActorsString.length() - 6);
@@ -1338,7 +1338,7 @@ void EITFixUp::FixNL(DBEvent &event) const
 
     // Try to find presenter
     QRegExp tmpPres = m_nlPres;
-    if (tmpPres.search(fullinfo) != -1)
+    if (tmpPres.indexIn(fullinfo) != -1)
     {
         QString tmpPresString = tmpPres.cap(0);
         tmpPresString = tmpPresString.right(tmpPresString.length() - 14);
@@ -1354,7 +1354,7 @@ void EITFixUp::FixNL(DBEvent &event) const
     // Try to find year
     QRegExp tmpYear1 = m_nlYear1;
     QRegExp tmpYear2 = m_nlYear2;
-    if ((position = tmpYear1.search(fullinfo)) != -1)
+    if ((position = tmpYear1.indexIn(fullinfo)) != -1)
     {
         bool ok;
         uint y = tmpYear1.cap(0).toUInt(&ok);
@@ -1362,7 +1362,7 @@ void EITFixUp::FixNL(DBEvent &event) const
             event.originalairdate = QDate(y, 1, 1);
     }
     
-    if ((position = tmpYear2.search(fullinfo)) != -1)
+    if ((position = tmpYear2.indexIn(fullinfo)) != -1)
     {
         bool ok;
         uint y = tmpYear2.cap(2).toUInt(&ok);
@@ -1373,26 +1373,26 @@ void EITFixUp::FixNL(DBEvent &event) const
     // Try to find director
     QRegExp tmpDirector = m_nlDirector;
     QString tmpDirectorString;
-    if ((position = fullinfo.find(m_nlDirector)) != -1)
+    if ((position = fullinfo.indexOf(m_nlDirector)) != -1)
     {
         tmpDirectorString = tmpDirector.cap(0);
         event.AddPerson(DBPerson::kDirector, tmpDirectorString);
     }
 
     // Strip leftovers
-    if ((position = fullinfo.find(m_nlRub)) != -1)
+    if ((position = fullinfo.indexOf(m_nlRub)) != -1)
     {
         fullinfo = fullinfo.replace(m_nlRub, "");
     }
     
     // Strip category info from description
-    if ((position = fullinfo.find(m_nlCat)) != -1)
+    if ((position = fullinfo.indexOf(m_nlCat)) != -1)
     {
         fullinfo = fullinfo.replace(m_nlCat, "");
     }
     
     // Remove omroep from title
-    if ((position = event.title.find(m_nlOmroep)) != -1)
+    if ((position = event.title.indexOf(m_nlOmroep)) != -1)
     {
         event.title = event.title.replace(m_nlOmroep, "");
     }

@@ -15,7 +15,7 @@
 
 
 IPTVFeederLive::IPTVFeederLive() :
-    _live_env(NULL),    _lock(false),
+    _live_env(NULL),    _lock(),
     _abort(0),          _running(false)
 {
 }

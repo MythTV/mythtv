@@ -42,7 +42,7 @@ IPTVChannelFetcher::IPTVChannelFetcher(
     _cardid(cardid),       _inputname(inputname),
     _sourceid(sourceid),
     _chan_cnt(1),          _thread_running(false),
-    _stop_now(false),      _lock(false)
+    _stop_now(false),      _lock()
 {
     _inputname.detach();
 }
@@ -230,7 +230,7 @@ QString IPTVChannelFetcher::DownloadPlaylist(const QString &url,
                 .arg(redirected_url));
     }
 
-    return QString::fromUtf8(tmp);
+    return QString::fromUtf8(tmp.toAscii().constData());
 }
 
 static uint estimate_number_of_channels(const QString &rawdata)
@@ -336,14 +336,14 @@ static bool parse_chan_info(const QString   &rawdata,
         {
             if (line.startsWith("#EXTINF:"))
             {
-                parse_extinf(line.mid(line.find(':')+1), channum, name);
+                parse_extinf(line.mid(line.indexOf(':')+1), channum, name);
             }
             else if (line.startsWith("#EXTMYTHTV:"))
             {
-                QString data = line.mid(line.find(':')+1);
+                QString data = line.mid(line.indexOf(':')+1);
                 if (data.startsWith("xmltvid="))
                 {
-                    xmltvid = data.mid(data.find('=')+1);
+                    xmltvid = data.mid(data.indexOf('=')+1);
                 }
             }
             else
@@ -372,7 +372,7 @@ static bool parse_extinf(const QString &line1,
         .arg(line1);
 
     // Parse extension portion
-    int pos = line1.find(",");
+    int pos = line1.indexOf(",");
     if (pos < 0)
     {
         VERBOSE(VB_IMPORTANT, msg);
@@ -381,7 +381,7 @@ static bool parse_extinf(const QString &line1,
 
     // Parse iptv channel number
     int oldpos = pos + 1;
-    pos = line1.find(" ", pos + 1);
+    pos = line1.indexOf(" ", pos + 1);
     if (pos < 0)
     {
         VERBOSE(VB_IMPORTANT, msg);
@@ -390,7 +390,7 @@ static bool parse_extinf(const QString &line1,
     channum = line1.mid(oldpos, pos - oldpos);
 
     // Parse iptv channel name
-    pos = line1.find("- ", pos + 1);
+    pos = line1.indexOf("- ", pos + 1);
     if (pos < 0)
     {
         VERBOSE(VB_IMPORTANT, msg);

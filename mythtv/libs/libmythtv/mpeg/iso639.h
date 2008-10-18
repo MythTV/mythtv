@@ -86,7 +86,7 @@ static inline int iso639_str2_to_key2(const char *iso639_1)
 
 static inline QString iso639_str_to_canonoical_str(const QString &str3)
 {
-    int key = iso639_str3_to_key(str3.ascii());
+    int key = iso639_str3_to_key(str3.toAscii().constData());
     int can =  iso639_key_to_canonical_key(key);
     return iso639_key_to_str3(can);
 }

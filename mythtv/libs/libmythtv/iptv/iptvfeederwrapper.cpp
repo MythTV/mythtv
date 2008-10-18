@@ -24,7 +24,7 @@ using namespace std;
 
 
 IPTVFeederWrapper::IPTVFeederWrapper() :
-    _feeder(NULL), _url(QString::null), _lock(false)
+    _feeder(NULL), _url(QString::null), _lock()
 {
 }
 

@@ -44,7 +44,7 @@ IPTVFeederFile::~IPTVFeederFile()
 
 bool IPTVFeederFile::IsFile(const QString &url)
 {
-    return url.startsWith("file:", false);
+    return url.startsWith("file:", Qt::CaseInsensitive);
 }
 
 bool IPTVFeederFile::Open(const QString &url)
@@ -60,7 +60,7 @@ bool IPTVFeederFile::Open(const QString &url)
     }
 
     QUrl parse(url);
-    if (!parse.hasPath() || (parse.scheme().toLower() != "file"))
+    if (parse.path().isEmpty() || (parse.scheme().toLower() != "file"))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Open() -- end 2");
         return false;

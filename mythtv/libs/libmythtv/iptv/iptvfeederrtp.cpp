@@ -42,7 +42,7 @@ IPTVFeederRTP::~IPTVFeederRTP()
 
 bool IPTVFeederRTP::IsRTP(const QString &url)
 {
-    return url.startsWith("rtp://", false);
+    return url.startsWith("rtp://", Qt::CaseInsensitive);
 }
 
 bool IPTVFeederRTP::Open(const QString &url)
@@ -58,7 +58,7 @@ bool IPTVFeederRTP::Open(const QString &url)
     }
         
     QUrl parse(url);
-    if (!parse.isValid() || !parse.hasHost() || !parse.hasPort())
+    if (!parse.isValid() || parse.host().isEmpty() || (-1 == parse.port()))
     {
         VERBOSE(VB_RECORD, LOC + "Open() -- end 2");
         return false;

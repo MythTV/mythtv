@@ -123,11 +123,11 @@ class MPEGStreamData : public EITSource
         uint pid, PIDPriority priority = kPIDPriorityHigh)
         { _pids_audio[pid] = priority; }
 
-    virtual void RemoveListeningPID(uint pid) { _pids_listening.erase(pid);  }
+    virtual void RemoveListeningPID(uint pid) { _pids_listening.remove(pid);  }
     virtual void RemoveNotListeningPID(uint pid)
-        { _pids_notlistening.erase(pid); }
-    virtual void RemoveWritingPID(uint pid) { _pids_writing.erase(pid);    }
-    virtual void RemoveAudioPID(uint pid)   { _pids_audio.erase(pid);      }
+        { _pids_notlistening.remove(pid); }
+    virtual void RemoveWritingPID(uint pid) { _pids_writing.remove(pid);    }
+    virtual void RemoveAudioPID(uint pid)   { _pids_audio.remove(pid);      }
 
     virtual bool IsListeningPID(uint pid) const;
     virtual bool IsNotListeningPID(uint pid) const;

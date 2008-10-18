@@ -42,7 +42,7 @@ IPTVFeederUDP::~IPTVFeederUDP()
 
 bool IPTVFeederUDP::IsUDP(const QString &url)
 {
-    return url.startsWith("udp://", false);
+    return url.startsWith("udp://", Qt::CaseInsensitive);
 }
 
 bool IPTVFeederUDP::Open(const QString &url)
@@ -58,7 +58,7 @@ bool IPTVFeederUDP::Open(const QString &url)
     }
         
     QUrl parse(url);
-    if (!parse.isValid() || !parse.hasHost() || !parse.hasPort())
+    if (!parse.isValid() || parse.host().isEmpty() || (-1 == parse.port()))
     {
         VERBOSE(VB_RECORD, LOC + "Open() -- end 2");
         return false;
