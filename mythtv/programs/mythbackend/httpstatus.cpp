@@ -140,7 +140,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 {
     QString   dateFormat   = gContext->GetSetting("DateFormat", "M/d/yyyy");
 
-    if (dateFormat.find(QRegExp("yyyy")) < 0)
+    if (dateFormat.indexOf(QRegExp("yyyy")) < 0)
         dateFormat += " yyyy";
 
     QString   shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
@@ -170,7 +170,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
 
     for (; iter != m_pEncoders->end(); ++iter)
     {
-        EncoderLink *elink = iter.data();
+        EncoderLink *elink = *iter;
 
         if (elink != NULL)
         {
@@ -269,8 +269,8 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         {
             ProgramInfo *pInfo;
 
-            pInfo = ProgramInfo::GetProgramFromRecorded(it.data().chanid,
-                                                        it.data().starttime);
+            pInfo = ProgramInfo::GetProgramFromRecorded((*it).chanid,
+                                                        (*it).starttime);
 
             if (!pInfo)
                 continue;
@@ -278,25 +278,29 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             QDomElement job = pDoc->createElement("Job");
             jobqueue.appendChild(job);
 
-            job.setAttribute("id"        , it.data().id         );
-            job.setAttribute("chanId"    , it.data().chanid     );
-            job.setAttribute("startTime" , it.data().starttime.toString(Qt::ISODate));
-            job.setAttribute("startTs"   , it.data().startts    );
-            job.setAttribute("insertTime", it.data().inserttime.toString(Qt::ISODate));
-            job.setAttribute("type"      , it.data().type       );
-            job.setAttribute("cmds"      , it.data().cmds       );
-            job.setAttribute("flags"     , it.data().flags      );
-            job.setAttribute("status"    , it.data().status     );
-            job.setAttribute("statusTime", it.data().statustime.toString(Qt::ISODate));
-            job.setAttribute("schedTime" , it.data().schedruntime.toString(Qt::ISODate));
-            job.setAttribute("args"      , it.data().args       );
+            job.setAttribute("id"        , (*it).id         );
+            job.setAttribute("chanId"    , (*it).chanid     );
+            job.setAttribute("startTime" ,
+                             (*it).starttime.toString(Qt::ISODate));
+            job.setAttribute("startTs"   , (*it).startts    );
+            job.setAttribute("insertTime",
+                             (*it).inserttime.toString(Qt::ISODate));
+            job.setAttribute("type"      , (*it).type       );
+            job.setAttribute("cmds"      , (*it).cmds       );
+            job.setAttribute("flags"     , (*it).flags      );
+            job.setAttribute("status"    , (*it).status     );
+            job.setAttribute("statusTime",
+                             (*it).statustime.toString(Qt::ISODate));
+            job.setAttribute("schedTime" ,
+                             (*it).schedruntime.toString(Qt::ISODate));
+            job.setAttribute("args"      , (*it).args       );
 
-            if (it.data().hostname == "")
+            if ((*it).hostname.isEmpty())
                 job.setAttribute("hostname", QObject::tr("master"));
             else
-                job.setAttribute("hostname",it.data().hostname);
+                job.setAttribute("hostname",(*it).hostname);
 
-            QDomText textNode = pDoc->createTextNode(it.data().comment);
+            QDomText textNode = pDoc->createTextNode((*it).comment);
             job.appendChild(textNode);
 
             MythXML::FillProgramInfo(pDoc, job, pInfo);
@@ -438,14 +442,14 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             }
             else
             {
-                QStringList output = QStringList::split("\n", input, false);
+                QStringList output = input.split("\n", QString::SkipEmptyParts);
 
                 QStringList::iterator iter = output.begin();
                 for (; iter != output.end(); iter++)
                 {
                     QDomElement info = pDoc->createElement("Information");
 
-                    QStringList list = QStringList::split("[]:[]", *iter, true);
+                    QStringList list = (*iter).split("[]:[]");
                     unsigned int size = list.size();
                     unsigned int hasAttributes = 0;
 
@@ -489,7 +493,7 @@ void HttpStatus::PrintStatus( QTextStream &os, QDomDocument *pDoc )
     QString shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
     QString timeformat      = gContext->GetSetting("TimeFormat", "h:mm AP");
 
-    os.setEncoding(QTextStream::UnicodeUTF8);
+    os.setCodec("UTF-8");
 
     QDateTime qdtNow = QDateTime::currentDateTime();
 
@@ -866,7 +870,7 @@ int HttpStatus::PrintScheduled( QTextStream &os, QDomElement scheduled )
                     // Output HTML
 
                 os << "      <a href=\"#\">";
-                if (shortdateformat.find("ddd") == -1) {
+                if (shortdateformat.indexOf("ddd") == -1) {
                     // If day-of-week not already present somewhere, prepend it.
                     os << recStartTs.addSecs(-nPreRollSecs).toString("ddd")
                         << " ";
@@ -1255,9 +1259,12 @@ int HttpStatus::PrintMiscellaneousInfo( QTextStream &os, QDomElement info )
 
             // Only include HTML line break if display value doesn't already
             // contain breaks.
-            if ((display.contains("<p>", false) > 0) ||
-                (display.contains("<br", false) > 0)) // matches <BR> or <br /
+            if ((display.contains("<p>", Qt::CaseInsensitive) > 0) ||
+                (display.contains("<br", Qt::CaseInsensitive) > 0))
+            {
+                // matches <BR> or <br /
                 linebreak = "\r\n";
+            }
             else
                 linebreak = "<br />\r\n";
 

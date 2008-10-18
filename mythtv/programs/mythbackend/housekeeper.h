@@ -1,15 +1,7 @@
 #ifndef HOUSEKEEPER_H_
 #define HOUSEKEEPER_H_
 
-class QSqlDatabase;
-
-#include <qmutex.h>
-#include <qobject.h>
-#include <qfile.h>
-#include <q3textstream.h>
-#include <q3process.h>
-
-using namespace std;
+#include <QDateTime>
 
 class HouseKeeper
 {

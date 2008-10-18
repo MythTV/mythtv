@@ -326,7 +326,7 @@ void HouseKeeper::RunMFD(void)
 
         if (!dir_writable && !testFile.exists())
         {
-            dir_writable = QFileInfo(testFile.dirPath()).isWritable();
+            dir_writable = QFileInfo(testFile.path()).isWritable();
         }
 
         if (dir_writable || (testFile.exists() && testFile.isWritable()))

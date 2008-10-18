@@ -41,7 +41,7 @@ LIBS += -lmyth-$$LIBVERSION         -lmythavutil-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION  -lmythavformat-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythmpeg2-$$LIBVERSION    -lmythdvdnav-$$LIBVERSION
-LIBS += -lmythfreemheg-$$LIBVERSION -lmythlivemedia-$$LIBVERSION
+LIBS += -lmythlivemedia-$$LIBVERSION
 LIBS += -lmythdb-$$LIBVERSION
 LIBS += -lz $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 

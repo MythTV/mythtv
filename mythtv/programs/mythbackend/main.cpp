@@ -256,7 +256,8 @@ int log_rotate(int report_error)
 {
     /* http://www.gossamer-threads.com/lists/mythtv/dev/110113 */
 
-    int new_logfd = open(logfile, O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0664);
+    int new_logfd = open(logfile.toLocal8Bit().constData(),
+                         O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0664);
     if (new_logfd < 0)
     {
         // If we can't open the new logfile, send data to /dev/null
@@ -360,8 +361,8 @@ bool parse_preview_info(const QString &param,
     if (param.isEmpty())
         return true;
 
-    int xat = param.find("x", 0, false);
-    int aat = param.find("@", 0, false);
+    int xat = param.indexOf("x", 0, Qt::CaseInsensitive);
+    int aat = param.indexOf("@", 0);
     if (xat > 0)
     {
         QString widthStr  = param.left(xat);
@@ -383,7 +384,7 @@ bool parse_preview_info(const QString &param,
     if ((xat > 0) && (aat < xat))
         return true;
 
-    QString lastChar = param.at(param.length() - 1).lower();
+    QString lastChar = param.at(param.length() - 1).toLower();
     QString frameNumStr = QString::null;
     QString secsStr = QString::null;
     if (lastChar == "f")
@@ -813,8 +814,8 @@ int main(int argc, char **argv)
         for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(it.data()));
-            gContext->OverrideSettingForSession(it.key(), it.data());
+                                          .arg(it.key()).arg(*it));
+            gContext->OverrideSettingForSession(it.key(), *it);
         }
     }
 

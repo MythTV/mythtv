@@ -149,7 +149,7 @@ void AutoExpire::CalcParams()
     QMap<int, int>::const_iterator ueit = used_encoders.begin();
     while (ueit != used_encoders.end())
     {
-        fsEncoderMap[ueit.data()].push_back(ueit.key());
+        fsEncoderMap[*ueit].push_back(ueit.key());
         ++ueit;
     }
     instance_lock.unlock();
@@ -190,7 +190,7 @@ void AutoExpire::CalcParams()
                             + QString("Cardid %1: is not recoding, removing it "
                                       "from used list.").arg(*encit));
                     instance_lock.lock();
-                    used_encoders.erase(*encit);
+                    used_encoders.remove(*encit);
                     instance_lock.unlock();
                     continue;
                 }
@@ -241,7 +241,7 @@ void AutoExpire::CalcParams()
     QMap<int, uint64_t>::iterator it = fsMap.begin();
     while (it != fsMap.end())
     {
-        desired_space[it.key()] = (it.data() + it.data()/3) * expireFreq + extraKB;
+        desired_space[it.key()] = (*it + *it/3) * expireFreq + extraKB;
         ++it;
     }
     instance_lock.unlock();
@@ -473,7 +473,7 @@ void AutoExpire::ExpireRecordings(void)
                          encoderList->begin();
                     while (eit != encoderList->end())
                     {
-                        EncoderLink *el = eit.data();
+                        EncoderLink *el = *eit;
                         eit++;
 
                         if ((p->hostname == el->GetHostName()) ||
@@ -510,7 +510,7 @@ void AutoExpire::ExpireRecordings(void)
                 }
 
                 QFileInfo vidFile(p->pathname);
-                if (dirList.contains(p->hostname + ":" + vidFile.dirPath()))
+                if (dirList.contains(p->hostname + ":" + vidFile.path()))
                 {
                     fsit->freeSpaceKB += (p->filesize / 1024);
                     deleteList.push_back(p);
@@ -661,7 +661,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
                 if ((!IsInDontExpireSet(chanid, startts)) &&
                     (!episodeParts.contains(episodeKey)) &&
-                    (found > maxIter.data()))
+                    (found > *maxIter))
                 {
                     long long spaceFreed =
                         stringToLongLong(query.value(5).toString()) >> 20;
@@ -670,7 +670,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                                 "many episodes, we only want to keep %5.")
                             .arg(spaceFreed)
                             .arg(chanid).arg(startts.toString())
-                            .arg(title).arg(maxIter.data());
+                            .arg(title).arg(*maxIter);
 
                     if (print_verbose_messages & VB_IMPORTANT)
                         VERBOSE(VB_IMPORTANT, msg);
@@ -740,10 +740,11 @@ void AutoExpire::PrintExpireList(QString expHost)
 
     FillExpireList(expireList);
 
-    cout << "MythTV AutoExpire List ";
+    QString msg = "MythTV AutoExpire List ";
     if (expHost != "ALL")
-        cout << "for '" << (const char *)expHost << "' ";
-    cout << "(programs listed in order of expiration)\n";
+        msg += QString("for '%1' ").arg(expHost);
+    msg += "(programs listed in order of expiration)";
+    cout << msg.toLocal8Bit().constData() << endl;
 
     pginfolist_t::iterator i = expireList.begin();
     for (; i != expireList.end(); i++)
@@ -758,14 +759,14 @@ void AutoExpire::PrintExpireList(QString expHost)
         if (first->subtitle != "")
             title += ": \"" + first->subtitle + "\"";
 
-        title = title.leftJustify(39, ' ', true);
+        title = title.leftJustified(39, ' ', true);
         QString outstr = QString("%1 %2 MB %3 [%4]")
             .arg(title)
             .arg(QString::number(first->filesize >> 20)
-                 .rightJustify(5, ' ', true))
-            .arg(first->startts.toString().leftJustify(24, ' ', true))
+                 .rightJustified(5, ' ', true))
+            .arg(first->startts.toString().leftJustified(24, ' ', true))
             .arg(QString::number(first->recpriority)
-                 .rightJustify(3, ' ', true));
+                 .rightJustified(3, ' ', true));
         QByteArray out = outstr.toLocal8Bit();
 
         cout << out.constData() << endl;

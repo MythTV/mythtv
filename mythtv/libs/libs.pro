@@ -8,7 +8,8 @@ SUBDIRS += libavutil libavcodec libavformat libmythsamplerate
 SUBDIRS += libmythsoundtouch libmythmpeg2 libmythdvdnav
 SUBDIRS += libmythfreesurround
 SUBDIRS += libmythdb libmythupnp libmythui libmyth
-SUBDIRS += libmythfreemheg libmythlivemedia
+using_mheg:SUBDIRS += libmythfreemheg
+using_live:SUBDIRS += libmythlivemedia
 
 # Libmythtv must be last because it links against everything
 SUBDIRS += libmythtv

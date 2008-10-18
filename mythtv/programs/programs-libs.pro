@@ -5,19 +5,19 @@ INCLUDEPATH += ../../libs/libmythlivemedia ../../libs/libmythdb
 
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv
 LIBS += -L../../libs/libavutil -L../../libs/libavcodec -L../../libs/libavformat
-LIBS += -L../../libs/libmythfreemheg
 LIBS += -L../../libs/libmythdb
 LIBS += -L../../libs/libmythui
 LIBS += -L../../libs/libmythupnp
-LIBS += -L../../libs/libmythlivemedia
 
 LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
 LIBS += -lmythavutil-$$LIBVERSION -lmythavcodec-$$LIBVERSION 
-LIBS += -lmythfreemheg-$$LIBVERSION
 LIBS += -lmythupnp-$$LIBVERSION 
-LIBS += -lmythlivemedia-$$LIBVERSION
 LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION $$EXTRA_LIBS
 LIBS += -lmythdb-$$LIBVERSION
+
+using_live:LIBS += -L../../libs/libmythlivemedia -lmythlivemedia-$$LIBVERSION
+using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION
+
 mingw {
     LIBS += -lpthread
     CONFIG += console

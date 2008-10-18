@@ -127,7 +127,8 @@ void BackendQueryDiskSpace(QStringList &strlist,
                          (!strcmp(statbuf.f_fstypename, "smbfs"))))  // SMB
                         localStr = "0";
 #elif __linux__
-                    if ((statfs(currentDir, &statbuf) == 0) &&
+                    if ((statfs(currentDir.toLocal8Bit().constData(),
+                                &statbuf) == 0) &&
                         ((statbuf.f_type == 0x6969) ||     // NFS
                          (statbuf.f_type == 0x517B) ||     // SMB
                          (statbuf.f_type == (long)0xFF534D42)))  // CIFS
@@ -156,14 +157,14 @@ void BackendQueryDiskSpace(QStringList &strlist,
         QMap<int, EncoderLink *>::Iterator eit = encoderList->begin();
         while (eit != encoderList->end())
         {
-            encoderHost = eit.data()->GetHostName();
-            if (eit.data()->IsConnected() &&
-                !eit.data()->IsLocal() &&
+            encoderHost = (*eit)->GetHostName();
+            if ((*eit)->IsConnected() &&
+                !(*eit)->IsLocal() &&
                 !backendsCounted.contains(encoderHost))
             {
                 backendsCounted[encoderHost] = true;
 
-                eit.data()->GetDiskSpace(strlist);
+                (*eit)->GetDiskSpace(strlist);
 
                 allHostList += "," + encoderHost;
             }
@@ -307,7 +308,9 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
         cout << "--- GetFilesystemInfos directory list start ---" << endl;
         for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
         {
-            cout << "Dir: " << (const char *)it1->hostname << ":" << (const char *)it1->directory << endl;
+            QString msg = QString("Dir: %1:%2")
+                .arg(it1->hostname).arg(it1->directory);
+            cout << msg.toLocal8Bit().constData() << endl;
             cout << "     Location: ";
             if (it1->isLocal)
                 cout << "Local";

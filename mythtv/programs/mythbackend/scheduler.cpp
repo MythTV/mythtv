@@ -87,7 +87,7 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
 
     fsInfoCacheFillTime = QDateTime::currentDateTime().addSecs(-1000);
 
-    reclist_lock = new QMutex(true);
+    reclist_lock = new QMutex(QMutex::Recursive);
 
     if (runthread)
     {
@@ -484,12 +484,12 @@ void Scheduler::PrintRec(const ProgramInfo *p, const char *prefix)
     QString episode = p->title;
     if (!p->subtitle.isEmpty() && (p->subtitle != " "))
         episode = QString("%1 - \"%2\"").arg(p->title).arg(p->subtitle);
-    episode = episode.leftJustify(30, ' ', true);
+    episode = episode.leftJustified(30, ' ', true);
 
     QString outstr = QString("%1 %2 %3 %4%5 %6 %7 %8 ")
         .arg(episode)
-        .arg(p->chanstr.rightJustify(4, ' '))
-        .arg(p->chansign.leftJustify(7, ' ', true))
+        .arg(p->chanstr.rightJustified(4, ' '))
+        .arg(p->chansign.leftJustified(7, ' ', true))
         .arg(p->recstartts.toString("dd hh:mm-"))
         .arg(p->recendts.toString("hh:mm  "))
         .arg(p->sourceid)
@@ -499,7 +499,7 @@ void Scheduler::PrintRec(const ProgramInfo *p, const char *prefix)
         .arg(p->RecTypeChar())
         .arg(p->RecStatusChar())
         .arg(p->recpriority)
-        .arg((QString::number(p->recpriority2)).rightJustify(5, ' '));
+        .arg((QString::number(p->recpriority2)).rightJustified(5, ' '));
 
     QByteArray out = outstr.toLocal8Bit();
 
@@ -1889,7 +1889,7 @@ void Scheduler::RunScheduler(void)
                 for (it = m_tvList->begin(); (it != m_tvList->end()) &&
                      !recording; ++it)
                 {
-                    if (it.data()->IsBusy())
+                    if ((*it)->IsBusy())
                         recording = true;
                 }
 
@@ -2145,10 +2145,10 @@ void Scheduler::UpdateManuals(int recordid)
     RecordingType rectype = RecordingType(query.value(0).toInt());
     QString title = query.value(1).toString();
     QString station = query.value(2).toString() ;
-    QDateTime startdt = QDateTime(query.value(3).asDate(),
-                                  query.value(4).asTime());
-    int duration = startdt.secsTo(QDateTime(query.value(5).asDate(),
-                                            query.value(6).asTime())) / 60;
+    QDateTime startdt = QDateTime(query.value(3).toDate(),
+                                  query.value(4).toTime());
+    int duration = startdt.secsTo(QDateTime(query.value(5).toDate(),
+                                            query.value(6).toTime())) / 60;
 
     query.prepare("SELECT chanid from channel "
                   "WHERE callsign = :STATION");
@@ -2275,8 +2275,8 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         switch (searchtype)
         {
         case kPowerSearch:
-            qphrase.remove(QRegExp("^\\s*AND\\s+", false));
-            qphrase.remove(";", false);
+            qphrase.remove(QRegExp("^\\s*AND\\s+", Qt::CaseInsensitive));
+            qphrase.remove(";");
             from << result.value(2).toString();
             where << (QString("%1.recordid = ").arg(recordTable) + bindrecid +
                       QString(" AND program.manualid = 0 AND ( %2 )")
@@ -2340,7 +2340,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
 
         while (1)
         {
-            int i = s.find("RECTABLE");
+            int i = s.indexOf("RECTABLE");
             if (i == -1) break;
             s = s.replace(i, strlen("RECTABLE"), recordTable);
         }
@@ -2420,8 +2420,11 @@ void Scheduler::UpdateMatches(int recordid) {
     if (print_verbose_messages & VB_SCHEDULE)
     {
         for (clause = 0; clause < fromclauses.count(); clause++)
-            cout << "Query " << clause << ": " << (const char *)fromclauses[clause]
-                 << "/" << (const char *)whereclauses[clause] << endl;
+        {
+            QString msg = QString("Query %1: %2/%3")
+                .arg(clause).arg(fromclauses[clause]).arg(whereclauses[clause]);
+            cout << msg.toLocal8Bit().constData() << endl;
+        }
     }
 
     for (clause = 0; clause < fromclauses.count(); clause++)
@@ -2476,7 +2479,7 @@ void Scheduler::UpdateMatches(int recordid) {
 
         while (1)
         {
-            int i = query.find("RECTABLE");
+            int i = query.indexOf("RECTABLE");
             if (i == -1) break;
             query = query.replace(i, strlen("RECTABLE"), recordTable);
         }
@@ -2524,7 +2527,7 @@ void Scheduler::AddNewRecords(void)
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
     for (; enciter != m_tvList->end(); ++enciter)
     {
-        EncoderLink *enc = enciter.data();
+        EncoderLink *enc = *enciter;
         if (enc->IsConnected())
             cardMap[enc->GetCardID()] = true;
     }
@@ -2678,8 +2681,8 @@ void Scheduler::AddNewRecords(void)
         if (result.value(0).toInt())
         {
             QString sclause = result.value(1).toString();
-            sclause.remove(QRegExp("^\\s*AND\\s+", false));
-            sclause.remove(";", false);
+            sclause.remove(QRegExp("^\\s*AND\\s+", Qt::CaseInsensitive));
+            sclause.remove(";");
             pwrpri += QString(" + (%1) * %2").arg(sclause)
                                              .arg(result.value(0).toInt());
         }
@@ -3045,7 +3048,7 @@ void Scheduler::AddNotListed(void) {
 
     while (1)
     {
-        int i = query.find("RECTABLE");
+        int i = query.indexOf("RECTABLE");
         if (i == -1) break;
         query = query.replace(i, strlen("RECTABLE"), recordTable);
     }
@@ -3166,7 +3169,7 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
 
     while (1)
     {
-        int i = query.find("RECTABLE");
+        int i = query.indexOf("RECTABLE");
         if (i == -1) break;
         query = query.replace(i, strlen("RECTABLE"), recordTable);
     }
@@ -3375,7 +3378,7 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
 
     for (fsit = fsInfoCache.begin(); fsit != fsInfoCache.end(); fsit++)
     {
-        FileSystemInfo *fs = &(fsit.data());
+        FileSystemInfo *fs = &(*fsit);
         int tmpWeight = 0;
 
         QString msg = QString("  %1:%2").arg(fs->hostname)
@@ -3477,7 +3480,7 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
                         for (fsit2 = fsInfoCache.begin();
                              fsit2 != fsInfoCache.end(); fsit2++)
                         {
-                            FileSystemInfo *fs2 = &(fsit2.data());
+                            FileSystemInfo *fs2 = &(*fsit2);
                             if (fs2->fsID == fs->fsID)
                             {
                                 VERBOSE(VB_FILE|VB_SCHEDULE, QString("    "
@@ -3532,7 +3535,7 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
                     for (fsit2 = fsInfoCache.begin();
                          fsit2 != fsInfoCache.end(); fsit2++)
                     {
-                        FileSystemInfo *fs2 = &(fsit2.data());
+                        FileSystemInfo *fs2 = &(*fsit2);
                         if (fs2->fsID == fs->fsID)
                         {
                             VERBOSE(VB_FILE|VB_SCHEDULE, QString("    "
@@ -3559,15 +3562,16 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
              fslistit++)
         {
             FileSystemInfo *fs = *fslistit;
-            cout << (const char *)fs->hostname << ":" << (const char *)fs->directory << endl;
-            cout << "    Location    : ";
-            if (fs->isLocal)
-                cout << "local" << endl;
-            else
-                cout << "remote" << endl;
-            cout << "    weight      : " << fs->weight << endl;
-            cout << "    free space  : " << fs->freeSpaceKB << endl;
-            cout << endl;
+            QString msg = QString(
+                "%1:%2\n"
+                "    Location    : %3\n"
+                "    weight      : %4\n"
+                "    free space  : %5")
+                .arg(fs->hostname).arg(fs->directory)
+                .arg((fs->isLocal) ? "local" : "remote")
+                .arg(fs->weight)
+                .arg(fs->freeSpaceKB);
+            cout << msg.toLocal8Bit().constData() << endl;
         }
         cout << "--- FillRecordingDir Sorted fsInfoList end ---\n";
     }
@@ -3677,7 +3681,7 @@ void Scheduler::SchedPreserveLiveTV(void)
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
     for (; enciter != m_tvList->end(); ++enciter)
     {
-        EncoderLink *enc = enciter.data();
+        EncoderLink *enc = *enciter;
 
         if (kState_WatchingLiveTV != enc->GetState())
             continue;

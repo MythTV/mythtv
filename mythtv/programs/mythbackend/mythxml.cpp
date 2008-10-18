@@ -1229,7 +1229,7 @@ void MythXML::GetRecording( HttpWorkerThread *pThread,
     //          from the RecordedMarkup Table.
     // ----------------------------------------------------------------------
 
-    int nIdxPos = sStartTime.findRev( ".idx", -1, FALSE );
+    int nIdxPos = sStartTime.lastIndexOf(".idx", -1, Qt::CaseInsensitive);
 
     if (nIdxPos >=0 )
     {

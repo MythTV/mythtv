@@ -16,14 +16,16 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
                            bool usereadahead, int retries) :
     readthreadlive(true), readsLocked(false),
     rbuffer(new RingBuffer(filename, false, usereadahead, retries)),
-    sock(remote), ateof(false), lock(false), refLock(false), refCount(0)
+    sock(remote), ateof(false), lock(QMutex::NonRecursive),
+    refLock(QMutex::NonRecursive), refCount(0)
 {
 }
 
 FileTransfer::FileTransfer(QString &filename, MythSocket *remote) :
     readthreadlive(true), readsLocked(false),
     rbuffer(new RingBuffer(filename, false)),
-    sock(remote), ateof(false), lock(false), refLock(false), refCount(0)
+    sock(remote), ateof(false), lock(QMutex::NonRecursive),
+    refLock(QMutex::NonRecursive), refCount(0)
 {
 }
 

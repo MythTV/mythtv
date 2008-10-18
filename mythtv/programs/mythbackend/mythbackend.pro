@@ -3,6 +3,8 @@ include ( ../../settings.pro )
 include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
+QT += network xml sql
+
 TEMPLATE = app
 CONFIG += thread
 TARGET = mythbackend
@@ -34,5 +36,3 @@ using_dvb:DEFINES += USING_DVB
 
 using_valgrind:DEFINES += USING_VALGRIND
 
-#The following line was inserted by qt3to4
-QT += network xml sql opengl qt3support

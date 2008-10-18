@@ -228,7 +228,8 @@ UPnpCDSExtensionResults *UPnpCDSVideo::ProcessItem( UPnpCDSRequest          *pRe
     if (pRequest->m_sObjectId.length() == 0)
         return pResults;
 
-    QStringList tokens = QStringList::split( "/", pRequest->m_sObjectId );
+    QStringList tokens = pRequest->m_sObjectId
+        .split("/", QString::SkipEmptyParts);
     QString     sId    = tokens.last();
 
     if (sId.startsWith("Id"))
@@ -313,7 +314,7 @@ void UPnpCDSVideo::CreateItems( UPnpCDSRequest          *pRequest,
                        .arg( pInfo->column );
         }
 
-        if (pRequest->m_sObjectId.startsWith("Videos", true))
+        if (pRequest->m_sObjectId.startsWith("Videos"))
         {
             if (pRequest->m_sParentId != "") 
             {
@@ -325,7 +326,8 @@ void UPnpCDSVideo::CreateItems( UPnpCDSRequest          *pRequest,
             }
             else 
             {
-                QStringList tokens = QStringList::split( "=", pRequest->m_sObjectId );
+                QStringList tokens =
+                    pRequest->m_sObjectId.split("=", QString::SkipEmptyParts);
                 pRequest->m_sParentId = tokens.last();
             }
 
@@ -334,7 +336,7 @@ void UPnpCDSVideo::CreateItems( UPnpCDSRequest          *pRequest,
             else
                 pRequest->m_sParentId = "8";
 
-            if (pRequest->m_sObjectId.startsWith( "Videos/0", true))
+            if (pRequest->m_sObjectId.startsWith("Videos/0"))
             {
                 pRequest->m_sObjectId = "Videos/0";
             }

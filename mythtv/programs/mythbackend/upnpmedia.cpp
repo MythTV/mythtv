@@ -134,7 +134,7 @@ int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuer
     if (List.isEmpty())
         return itemID;
 
-    for (QFileInfoListIterator it = List.begin(); it != List.end(); ++it)
+    for (QFileInfoList::iterator it = List.begin(); it != List.end(); ++it)
     {
         QFileInfo Info(*it);
         QString fName = Info.fileName();
@@ -246,7 +246,7 @@ void UPnpMedia::BuildMediaMap(void)
             VERBOSE(VB_UPNP, LOC + QString("VideoStartupDir = %1")
                                             .arg(RootVidDir));
 
-            QStringList parts = QStringList::split( ":", RootVidDir );
+            QStringList parts = RootVidDir.split( ":", QString::SkipEmptyParts);
 
             nextID = STARTING_VIDEO_OBJECTID;
 

@@ -120,7 +120,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     // BackendServerIP is only one IP address at this time... Doing Split anyway
     // ----------------------------------------------------------------------
 
-    QStringList sIPAddrList = QStringList::split( ";", sIP );
+    QStringList sIPAddrList = sIP.split(";", QString::SkipEmptyParts);
 
     // ----------------------------------------------------------------------
     // Initialize UPnp Stack
