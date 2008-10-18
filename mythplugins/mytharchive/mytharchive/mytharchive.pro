@@ -10,6 +10,8 @@ include (config.pro)
 INCLUDEPATH += $${PREFIX}/include/mythtv $${PREFIX}/include/mythtv/ffmpeg 
 INCLUDEPATH += $${PREFIX}/include/mythtv/libmythtv
 
+LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
+
 TEMPLATE = lib opengl
 CONFIG += plugin thread
 TARGET = mytharchive

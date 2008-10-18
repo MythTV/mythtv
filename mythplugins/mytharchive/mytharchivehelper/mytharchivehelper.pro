@@ -18,7 +18,6 @@ SOURCES += main.cpp ../mytharchive/archiveutil.cpp pxsup2dast.c
 
 LIBS += -lz
 LIBS += -lmythtv-$$LIBVERSION
-LIBS += -lmythfreemheg-$$LIBVERSION -lmythlivemedia-$$LIBVERSION
 LIBS += -lmythavutil-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION
 LIBS += -lmythavformat-$$LIBVERSION

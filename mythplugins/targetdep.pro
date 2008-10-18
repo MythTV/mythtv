@@ -21,5 +21,3 @@ TARGETDEPS += $${LIBDIR}/libmythupnp-$${MYTH_SHLIB_EXT}
 TARGETDEPS += $${LIBDIR}/libmythavutil-$${MYTH_SHLIB_EXT}
 TARGETDEPS += $${LIBDIR}/libmythavcodec-$${MYTH_SHLIB_EXT}
 TARGETDEPS += $${LIBDIR}/libmythavformat-$${MYTH_SHLIB_EXT}
-TARGETDEPS += $${LIBDIR}/libmythfreemheg-$${MYTH_SHLIB_EXT}
-TARGETDEPS += $${LIBDIR}/libmythlivemedia-$${MYTH_SHLIB_EXT}
