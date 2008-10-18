@@ -154,7 +154,7 @@ BLOCK_QUOTE
   echo "  --disable-joystick-menu  disable joystick menu"
   echo "  --disable-firewire       disable support for FireWire cable boxes"
   echo "  --disable-iptv           disable support for recording RTSP/UDP/RTP streams"
-  echo "  --disable-dbox2          disable support for Nokia DBOX2 DVB boxes (or compatibles)"
+#  echo "  --enable-dbox2           enable support for Nokia DBOX2 DVB boxes (or compatibles)"
   echo "  --disable-hdhomerun      disable support for HDHomeRun boxes"
   echo "  --disable-v4l            disable Video4Linux support"
   echo "  --disable-ivtv           disable ivtv support (PVR-x50) req. v4l support"
@@ -885,6 +885,7 @@ MYTHTV_CONFIG_LIST='
     joystick_menu
     libfftw3
     lirc
+    mheg
     opengl_video
     opengl_vsync
     qtwebkit
@@ -1160,7 +1161,7 @@ audio_jack_libs="-ljack"
 enable audio_oss
 enable bindings_perl
 enable bindings_python
-enable dbox2
+disable dbox2
 enable directfb
 enable dvb
 enable ffmpeg_pthreads
@@ -1172,6 +1173,7 @@ enable iptv
 enable ivtv
 enable lamemp3
 enable lirc
+disable mheg
 enable opengl
 enable qtwebkit
 enable v4l
@@ -3022,7 +3024,7 @@ if enabled backend; then
   echo "HR-PVR support            ${hdpvr-no}"
   echo "FireWire support          ${firewire-no}"
   echo "DVB support               ${dvb-no} [$dvb_path]"
-  echo "DBox2 support             ${dbox2-no}"
+#  echo "DBox2 support             ${dbox2-no}"
   echo "HDHomeRun support         ${hdhomerun-no}"
   echo "IPTV support              ${iptv-no}"
 fi
@@ -3065,6 +3067,7 @@ fi
     echo "Windows (Direct3D)        yes"
   fi
   echo "Fribidi formatting        ${fribidi}"
+  echo "MHEG support              ${mheg}"
   echo
 fi
 
@@ -3374,6 +3377,10 @@ fi
 
 if enabled iptv; then
     append CCONFIG "using_live"
+fi
+
+if enabled mheg; then
+    append CCONFIG "using_mheg"
 fi
 
 if enabled lirc; then

@@ -10,6 +10,7 @@ class NuppelVideoPlayer;
  */
 class InteractiveTV
 {
+#ifdef USING_MHEG
   public:
     // Interface to Myth
     InteractiveTV(NuppelVideoPlayer *nvp);
@@ -43,6 +44,7 @@ class InteractiveTV
   protected:
     MHIContext        *m_context;
     NuppelVideoPlayer *m_nvp;
+#endif
 };
 
 #endif

@@ -1,6 +1,10 @@
 include ( ../../config.mak )
 include ( ../../settings.pro )
 
+QT += network xml sql
+using_dbox2:QT *= qt3support
+using_mheg:QT *= qt3support
+
 TEMPLATE = lib
 TARGET = mythtv-$$LIBVERSION
 CONFIG += thread dll
@@ -31,7 +35,7 @@ DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
 LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat 
 LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythmpeg2 -L../libmythdvdnav
-LIBS += -L../libmythfreemheg -L../libmythlivemedia
+LIBS += -L../libmythlivemedia
 LIBS += -L../libmythdb 
 LIBS += -lmyth-$$LIBVERSION         -lmythavutil-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION  -lmythavformat-$$LIBVERSION
@@ -41,13 +45,15 @@ LIBS += -lmythfreemheg-$$LIBVERSION -lmythlivemedia-$$LIBVERSION
 LIBS += -lmythdb-$$LIBVERSION
 LIBS += -lz $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
+using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
+
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libavutil/libmythavutil-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libavcodec/libmythavcodec-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libavformat/libmythavformat-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
-TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
+using_mheg: TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
 using_live: TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 
 
@@ -330,16 +336,19 @@ using_frontend {
     SOURCES += guidegrid.cpp            infostructs.cpp
     SOURCES += progfind.cpp             ttfont.cpp
 
-    # DSMCC stuff
-    HEADERS += dsmcc.h                  dsmcccache.h
-    HEADERS += dsmccbiop.h              dsmccobjcarousel.h
-    HEADERS += dsmccreceiver.h
-    SOURCES += dsmcc.cpp                dsmcccache.cpp
-    SOURCES += dsmccbiop.cpp            dsmccobjcarousel.cpp
+    using_mheg {
+        # DSMCC stuff
+        HEADERS += dsmcc.h                  dsmcccache.h
+        HEADERS += dsmccbiop.h              dsmccobjcarousel.h
+        HEADERS += dsmccreceiver.h
+        SOURCES += dsmcc.cpp                dsmcccache.cpp
+        SOURCES += dsmccbiop.cpp            dsmccobjcarousel.cpp
 
-    # MHEG/MHI stuff
-    HEADERS += interactivetv.h          mhi.h
-    SOURCES += interactivetv.cpp        mhi.cpp
+        # MHEG/MHI stuff
+        HEADERS += interactivetv.h          mhi.h
+        SOURCES += interactivetv.cpp        mhi.cpp
+        DEFINES += USING_MHEG
+    }
 
     # C stuff
     HEADERS += blend.h
@@ -535,9 +544,6 @@ inc.path = $${PREFIX}/include/mythtv/libmythtv/
 inc.files = programinfo.h remoteutil.h recordingtypes.h
 
 INSTALLS += inc
-
-#The following line was inserted by qt3to4
-QT += network xml  sql opengl qt3support
 
 include ( ../libs-targetfix.pro )
 

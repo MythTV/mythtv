@@ -702,11 +702,13 @@ void NuppelVideoPlayer::ReinitOSD(void)
             osd->Reinit(total, frame_interval, visible, aspect, scaling);
         }
 
+#ifdef USING_MHEG
         if (GetInteractiveTV())
         {
             GetInteractiveTV()->Reinit(total);
             itvVisible = false;
         }
+#endif // USING_MHEG
     }
 }
 
@@ -2729,6 +2731,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
 
     DisplayDVDButton();
 
+#ifdef USING_MHEG
     // handle Interactive TV
     if (GetInteractiveTV() && GetDecoder())
     {
@@ -2754,6 +2757,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
             }
         }
     }
+#endif // USING_MHEG
 
     // handle EIA-608 and Teletext
     if (textDisplayMode & kDisplayNUVCaptions)
@@ -3383,8 +3387,10 @@ void NuppelVideoPlayer::StartPlaying(void)
         }
         GetOSD()->HideSet("teletext");
 
+#ifdef USING_MHEG
         if (GetInteractiveTV())
             GetInteractiveTV()->Reinit(total);
+#endif // USING_MHEG
     }
 
     playing = true;
@@ -6490,13 +6496,16 @@ void NuppelVideoPlayer::TracksChanged(uint trackType)
 
 InteractiveTV *NuppelVideoPlayer::GetInteractiveTV(void)
 {
+#ifdef USING_MHEG
     if (!interactiveTV && osd && itvEnabled)
         interactiveTV = new InteractiveTV(this);
+#endif // USING_MHEG
     return interactiveTV;
 }
 
 bool NuppelVideoPlayer::ITVHandleAction(const QString &action)
 {
+#ifdef USING_MHEG
     if (!GetInteractiveTV())
         return false;
 
@@ -6508,6 +6517,7 @@ bool NuppelVideoPlayer::ITVHandleAction(const QString &action)
         if (GetInteractiveTV())
             return interactiveTV->OfferKey(action);
     }
+#endif // USING_MHEG
 
     return false;
 }
@@ -6517,6 +6527,7 @@ bool NuppelVideoPlayer::ITVHandleAction(const QString &action)
  */
 void NuppelVideoPlayer::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
 {
+#ifdef USING_MHEG
     QMutexLocker locker(&decoder_change_lock);
 
     OSD *osd = GetOSD();
@@ -6539,6 +6550,7 @@ void NuppelVideoPlayer::ITVRestart(uint chanid, uint cardid, bool isLiveTV)
     osd->ClearAll("interactive");
     itvosd->Display();
     osd->SetVisible(itvosd, 0);
+#endif // USING_MHEG
 }
 
 void NuppelVideoPlayer::SetVideoResize(const QRect &videoRect)

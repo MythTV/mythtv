@@ -938,6 +938,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     AutoSelectTracks(); // This is needed for transcoder
 
+#ifdef USING_MHEG
     {
         int initialAudio = -1, initialVideo = -1;
         if (itv || (itv = GetNVP()->GetInteractiveTV()))
@@ -947,6 +948,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         if (initialVideo >= 0)
             SetVideoByComponentTag(initialVideo);
     }
+#endif // USING_MHEG
 
     // Try to get a position map from the recorder if we don't have one yet.
     if (!recordingHasPositionMap)
@@ -1414,6 +1416,7 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
                 uint appTypeCode = desc[0]<<8 | desc[1];
                 desc += 3; // Skip app type code and boot priority hint
                 uint appSpecDataLen = *desc++;
+#ifdef USING_MHEG
                 if (appTypeCode == 0x101) // UK MHEG profile
                 {
                     const unsigned char *subDescEnd = desc + appSpecDataLen;
@@ -1421,12 +1424,19 @@ void AvFormatDecoder::ScanDSMCCStreams(void)
                     {
                         uint sub_desc_tag = *desc++;
                         uint sub_desc_len = *desc++;
-                        if (sub_desc_tag == 1) // Network boot info sub-descriptor.
+                        // Network boot info sub-descriptor.
+                        if (sub_desc_tag == 1)
                             itv->SetNetBootInfo(desc, sub_desc_len);
                         desc += sub_desc_len;
                     }
                 }
-                else desc += appSpecDataLen;
+                else
+#else
+                (void) appTypeCode;
+#endif // USING_MHEG
+                { 
+                    desc += appSpecDataLen;
+                }
             }
         }
     }
@@ -2591,6 +2601,7 @@ void AvFormatDecoder::ProcessDVBDataPacket(
 void AvFormatDecoder::ProcessDSMCCPacket(
     const AVStream *str, const AVPacket *pkt)
 {
+#ifdef USING_MHEG
     if (!itv && ! (itv = GetNVP()->GetInteractiveTV()))
         return;
 
@@ -2615,6 +2626,7 @@ void AvFormatDecoder::ProcessDSMCCPacket(
         length -= sectionLen;
         data += sectionLen;
     }
+#endif // USING_MHEG
 }
 
 int AvFormatDecoder::SetTrack(uint type, int trackNo)
@@ -3326,6 +3338,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             continue;
         }
 
+#ifdef USING_MHEG
         if (len > 0 &&
             curstream->codec->codec_type == CODEC_TYPE_DATA &&
             curstream->codec->codec_id   == CODEC_ID_DSMCC_B)
@@ -3346,6 +3359,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
             continue;
         }
+#endif // USING_MHEG
 
         // we don't care about other data streams
         if (curstream->codec->codec_type == CODEC_TYPE_DATA)
