@@ -23,7 +23,6 @@ using namespace std;
 #include "tv.h"
 #include "proglist.h"
 #include "progfind.h"
-#include "manualbox.h"
 #include "manualschedule.h"
 #include "playbackbox.h"
 #include "previouslist.h"
@@ -848,7 +847,6 @@ void InitJumpPoints(void)
     REG_JUMP("TV Recording Deletion", "", "", startDelete);
     REG_JUMP("Live TV", "", "", startTVNormal);
     REG_JUMP("Live TV In Guide", "", "", startTVInGuide);
-    REG_JUMP("Manual Record Scheduling", "", "", startManual);
     REG_JUMP("Status Screen", "", "", showStatus);
     REG_JUMP("Previously Recorded", "", "", startPrevious);
 
