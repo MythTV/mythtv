@@ -591,8 +591,10 @@ void MythMainWindow::drawScreen(void)
 
 void MythMainWindow::closeEvent(QCloseEvent *e)
 {
-    (void)e;
-    qApp->quit();
+    QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, d->escapekey,
+                                   Qt::NoModifier);
+    QApplication::postEvent(this, key);
+    e->ignore();
 }
 
 bool MythMainWindow::screenShot(QString fname, int x, int y,
