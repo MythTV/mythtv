@@ -140,7 +140,7 @@ class QuartzData
         srcAspect(1.3333f),         srcMode(kAspect_Off),
 
         pixelData(0),               pixelSize(0),
-        pixelLock(false),
+        pixelLock(),
 
         window(0),
         screen(0),                  refreshRate(60.0f),
