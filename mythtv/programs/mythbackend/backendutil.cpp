@@ -119,9 +119,8 @@ void BackendQueryDiskSpace(QStringList &strlist,
                     localStr = "1"; // Assume local
 
 #ifdef CONFIG_DARWIN
-                    // FIXME, Not sure what these strings should be so this
-                    // code is really a placeholder for now.
-                    if ((statfs(currentDir, &statbuf) == 0) &&
+                    if ((statfs(currentDir.toLocal8Bit().constData(),
+                                &statbuf) == 0) &&
                         ((!strcmp(statbuf.f_fstypename, "nfs")) ||   // NFS|FTP
                          (!strcmp(statbuf.f_fstypename, "afpfs")) || // ApplShr
                          (!strcmp(statbuf.f_fstypename, "smbfs"))))  // SMB
