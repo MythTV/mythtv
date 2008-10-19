@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
 #
-# database_mythconverg_restore.pl
+# mythconverg_restore.pl
 #
 # Restores a backup of the MythTV database.
 #
 # For details, see:
-#   database_mythconverg_restore.pl --help
+#   mythconverg_restore.pl --help
 
 # Includes
     use Getopt::Long;
@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.1';
+    $VERSION        = '1.0.2';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -116,11 +116,11 @@ Restores a backup of the MythTV database.
 DETAILED DESCRIPTION:
 
 This script is used to restore a backup of the MythTV database (as created by
-the database_mythconverg_backup.pl script). It can be called with a single
-command-line argument specifying the name of a "database information file" (see
-DATABASE INFORMATION FILE, below), which contains sufficient information about
-the database and the backup to allow the script to restore a backup without
-needing any additional configuration files. In this mode, all other MythTV
+the mythconverg_backup.pl script). It can be called with a single command-line
+argument specifying the name of a "database information file" (see DATABASE
+INFORMATION FILE, below), which contains sufficient information about the
+database and the backup to allow the script to restore a backup without needing
+any additional configuration files. In this mode, all other MythTV
 configuration files (including config.xml, mysql.txt) are ignored, but the
 backup resource file (see RESOURCE FILE, below) and the MySQL option files
 (i.e. /etc/my.cnf or ~/.my.cnf) will be honored.
@@ -304,7 +304,7 @@ options:
 --restore_xmltvids
 
     Restore channel xmltvids from a backup create with
-    database_mythconverg_backup.pl --backup_xmltvids
+    mythconverg_backup.pl --backup_xmltvids
 
 --mysql_client [path]
 
@@ -778,7 +778,7 @@ EOF
             }
             else
             {
-                my @sorted_files = sort { lc($b) cmp lc($0) } @files;
+                my @sorted_files = sort { lc($b) cmp lc($a) } @files;
                 $backup_conf{'filename'} = $sorted_files[0];
                 $backup_conf{'filename'} =~ s#^$backup_conf{'directory'}/?##;
                 verbose($verbose_level_debug,

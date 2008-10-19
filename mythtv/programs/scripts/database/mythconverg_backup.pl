@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
 #
-# database_mythconverg_backup.pl
+# mythconverg_backup.pl
 #
 # Creates a backup of the MythTV database.
 #
 # For details, see:
-#   database_mythconverg_backup.pl --help
+#   mythconverg_backup.pl --help
 
 # Includes
     use Getopt::Long;
@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Backup Script';
-    $VERSION        = '1.0.1';
+    $VERSION        = '1.0.2';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
