@@ -1,3 +1,4 @@
+include (../config.mak)
 include (../settings.pro)
 
 TEMPLATE = subdirs
