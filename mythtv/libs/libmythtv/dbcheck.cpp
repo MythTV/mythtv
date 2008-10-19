@@ -840,7 +840,7 @@ NULL
 "ALTER TABLE recorded CHANGE title title VARCHAR(128) NOT NULL DEFAULT '';",
 "ALTER TABLE recorded CHANGE subtitle subtitle VARCHAR(128) NOT NULL DEFAULT '';",
 "ALTER TABLE recorded CHANGE description description TEXT NOT NULL DEFAULT '';",
-"ALTER TABLE recorded CHANGE hostname hostname VARCHAR(255) NOT NULL DEFAULT '';",
+"ALTER TABLE recorded CHANGE hostname hostname varchar(64) NOT NULL DEFAULT '';",
 "ALTER TABLE recorded CHANGE category category VARCHAR(64) NOT NULL DEFAULT '';",
 "ALTER TABLE recorded CHANGE recgroup recgroup VARCHAR(32) NOT NULL DEFAULT 'Default';",
 "ALTER TABLE recorded CHANGE seriesid seriesid VARCHAR(12) NOT NULL DEFAULT '';",
@@ -1031,7 +1031,7 @@ NULL
 "    flags INTEGER NOT NULL DEFAULT 0,"
 "    status INTEGER NOT NULL DEFAULT 0,"
 "    statustime TIMESTAMP NOT NULL,"
-"    hostname VARCHAR(255) NOT NULL DEFAULT '',"
+"    hostname varchar(64) NOT NULL DEFAULT '',"
 "    args BLOB NOT NULL DEFAULT '',"
 "    comment VARCHAR(128) NOT NULL DEFAULT '',"
 "    PRIMARY KEY(id),"
@@ -1853,7 +1853,7 @@ NULL
     if (dbver == "1106")
     {
         const char *updates[] = {
-"ALTER TABLE inuseprograms ADD COLUMN hostname VARCHAR(255) NOT NULL DEFAULT '';",
+"ALTER TABLE inuseprograms ADD COLUMN hostname varchar(64) NOT NULL DEFAULT '';",
 "ALTER TABLE inuseprograms CHANGE playid recusage VARCHAR(128) NOT NULL DEFAULT '';",
 NULL
 };
@@ -2791,7 +2791,7 @@ NULL
 "    id           INT(11) NOT NULL auto_increment, "
 "    groupname    VARCHAR(32) NOT NULL, "
 "    hostname     VARCHAR(64) NOT NULL DEFAULT '', "
-"    dirname      VARCHAR(255) NOT NULL DEFAULT '', "
+"    dirname      VARCHAR(235) NOT NULL DEFAULT '', "
 "    PRIMARY KEY (id), "
 "    UNIQUE KEY grouphostdir (groupname, hostname, dirname)"
 "    );",
@@ -3172,7 +3172,7 @@ NULL
 "DROP TABLE IF EXISTS displayprofiles;",
 "CREATE TABLE IF NOT EXISTS displayprofilegroups ("
 "  name varchar(128) NOT NULL,"
-"  hostname  varchar(255) NOT NULL,"
+"  hostname  varchar(64) NOT NULL,"
 "  profilegroupid int(10) unsigned NOT NULL auto_increment,"
 "  PRIMARY KEY nameid (name,hostname),"
 "  UNIQUE KEY (profilegroupid)"
@@ -4346,7 +4346,7 @@ tmp.constData(),
 "  cardtype varchar(32) default 'V4L',"
 "  defaultinput varchar(32) default 'Television',"
 "  audioratelimit int(11) default NULL,"
-"  hostname varchar(255) default NULL,"
+"  hostname varchar(64) default NULL,"
 "  dvb_swfilter int(11) default '0',"
 "  dvb_recordts int(11) default '1',"
 "  dvb_sat_type int(11) NOT NULL default '0',"
@@ -4476,7 +4476,7 @@ tmp.constData(),
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
 "  recusage varchar(128) NOT NULL default '',"
 "  lastupdatetime datetime NOT NULL default '0000-00-00 00:00:00',"
-"  hostname varchar(255) NOT NULL default '',"
+"  hostname varchar(64) NOT NULL default '',"
 "  KEY chanid (chanid,starttime)"
 ");",
 "CREATE TABLE IF NOT EXISTS jobqueue ("
@@ -4489,7 +4489,7 @@ tmp.constData(),
 "  flags int(11) NOT NULL default '0',"
 "  status int(11) NOT NULL default '0',"
 "  statustime timestamp NOT NULL,"
-"  hostname varchar(255) NOT NULL default '',"
+"  hostname varchar(64) NOT NULL default '',"
 "  args blob NOT NULL,"
 "  comment varchar(128) NOT NULL default '',"
 "  PRIMARY KEY  (id),"
@@ -4499,7 +4499,7 @@ tmp.constData(),
 "  destination varchar(128) NOT NULL default '',"
 "  description varchar(255) default NULL,"
 "  keylist varchar(32) default NULL,"
-"  hostname varchar(255) NOT NULL default '',"
+"  hostname varchar(64) NOT NULL default '',"
 "  PRIMARY KEY  (destination,hostname)"
 ");",
 "CREATE TABLE IF NOT EXISTS keybindings ("
@@ -4507,7 +4507,7 @@ tmp.constData(),
 "  action varchar(32) NOT NULL default '',"
 "  description varchar(255) default NULL,"
 "  keylist varchar(32) default NULL,"
-"  hostname varchar(255) NOT NULL default '',"
+"  hostname varchar(64) NOT NULL default '',"
 "  PRIMARY KEY  (context,action,hostname)"
 ");",
 "CREATE TABLE IF NOT EXISTS keyword ("
@@ -4593,7 +4593,7 @@ tmp.constData(),
 "  name varchar(128) default NULL,"
 "  cardtype varchar(32) NOT NULL default 'V4L',"
 "  is_default int(1) default '0',"
-"  hostname varchar(255) default NULL,"
+"  hostname varchar(64) default NULL,"
 "  PRIMARY KEY  (id),"
 "  UNIQUE KEY name (name,hostname)"
 ");",
@@ -4707,7 +4707,7 @@ tmp.constData(),
 "  subtitle varchar(128) NOT NULL default '',"
 "  description text NOT NULL,"
 "  category varchar(64) NOT NULL default '',"
-"  hostname varchar(255) NOT NULL default '',"
+"  hostname varchar(64) NOT NULL default '',"
 "  bookmark varchar(128) default NULL,"
 "  editing int(10) unsigned NOT NULL default '0',"
 "  cutlist text,"
@@ -4819,7 +4819,7 @@ tmp.constData(),
 "CREATE TABLE IF NOT EXISTS settings ("
 "  value varchar(128) NOT NULL default '',"
 "  data text,"
-"  hostname varchar(255) default NULL,"
+"  hostname varchar(64) default NULL,"
 "  KEY value (value,hostname)"
 ");",
 "CREATE TABLE IF NOT EXISTS tvchain ("
