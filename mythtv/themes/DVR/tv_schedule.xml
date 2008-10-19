@@ -127,37 +127,6 @@
       <action>MENU tv_lists.xml</action>
    </button>
 
-<!--
-   <button>
-      <type>TV_SCHEDULE</type>
-      <text>Instant Recording</text>
-      <text lang="IT">Registrazione manuale</text>
-      <text lang="ES">Grabación Instanánea</text>
-      <text lang="CA">Gravar ara</text>
-      <text lang="NL">Instant Opname</text>
-      <text lang="FR">Enregistrement manuel</text>
-      <text lang="DE">Sofortige Aufnahme</text>
-      <text lang="DA">Optag lige nu</text>
-      <text lang="PT">Gravação Imediata</text>
-      <text lang="SV">Omedelbar inspelning</text>
-      <text lang="JA">簡単録画</text>
-      <text lang="FI">Välitön Nauhoitus</text>
-      <text lang="ET">Kohene salvestamine</text>
-      <text lang="RU">Немедленая запись</text>
-      <alttext>Instant Record</alttext>
-      <alttext lang="FR">Enreg. manuel</alttext>
-      <alttext lang="ES">Grab. inst.</alttext>
-      <alttext lang="CA">Grav. inst.</alttext>
-      <alttext lang="DA">Optag nu</alttext>
-      <alttext lang="NL">Instant</alttext>
-      <alttext lang="PT">Gravação Imediata</alttext>
-      <alttext lang="SV">Omedelbar</alttext>
-      <alttext lang="JA">簡単録画</alttext>
-      <alttext lang="RU">Немедленно</alttext>
-      <action>TV_MANUAL</action>
-   </button>
--->
-   
    <button>
       <type>TV_CUSTOM_RECORD</type>
       <text>Custom Record</text>

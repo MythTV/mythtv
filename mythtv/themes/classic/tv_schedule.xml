@@ -97,7 +97,7 @@
       <text lang="HE">חיפוש ברשימות</text>
       <alttext>Search</alttext>
       <alttext lang="SV">Sök tablå</alttext>
-      <alttext lang="NL">Zoeken Gids</alttext>      
+      <alttext lang="NL">Zoeken Gids</alttext>
       <alttext lang="SL">Iskanje</alttext>
       <alttext lang="DA">Lister</alttext>
       <alttext lang="PT">Pesquisar</alttext>
@@ -107,39 +107,6 @@
       <alttext lang="HE">חיפוש</alttext>
       <action>MENU tv_search.xml</action>
    </button>
-
-<!--
-   <button>
-      <type>TV_SCHEDULE</type>
-      <text>Instant Recording</text>
-      <text lang="IT">Registrazione manuale</text>
-      <text lang="ES">Grabación Instanánea</text>
-      <text lang="CA">Gravar ara</text>
-      <text lang="NL">Instant Opname</text>
-      <text lang="FR">Enregistrement manuel</text>
-      <text lang="DE">Sofortige Aufnahme</text>
-      <text lang="DA">Optag lige nu</text>
-      <text lang="PT">Gravação Imediata</text>
-      <text lang="SV">Omedelbar inspelning</text>
-      <text lang="JA">簡単録画</text>
-      <text lang="ET">Kohene salvestamine</text>
-      <text lang="RU">Немедленая запись</text>
-      <text lang="PL">Natychmiast nagraj</text>
-      <alttext>Instant Record</alttext>
-      <alttext lang="FR">Enreg. manuel</alttext>
-      <alttext lang="ES">Grab. inst.</alttext>
-      <alttext lang="CA">Grav. inst.</alttext>
-      <alttext lang="DA">Optag nu</alttext>
-      <alttext lang="NL">Instant</alttext>
-      <alttext lang="PT">Gravação Imediata</alttext>
-      <alttext lang="SV">Omedelbar</alttext>
-      <alttext lang="JA">簡単録画</alttext>
-      <alttext lang="ET">Kohene salvestamine</alttext>
-      <alttext lang="RU">Немедленно</alttext>
-      <alttext lang="PL">Natychmiastowe nagrywanie</alttext>
-      <action>TV_MANUAL</action>
-   </button>
--->
 
    <button>
       <type>TV_CUSTOM_RECORD</type>
@@ -203,7 +170,7 @@
       <text lang="IT">Priorità Registrazioni</text>
       <text lang="DE">Aufnahmeprioritäten</text>
       <text lang="FR">Priorités d'enregistrement</text>
-      <text lang="NL">Opnameprioriteiten</text>      
+      <text lang="NL">Opnameprioriteiten</text>
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>
       <text lang="SL">Snemalne prioritete</text>
