@@ -4,7 +4,7 @@ mingw {
     dll : contains( TEMPLATE, lib ) {
 
         # Qt under Linux/UnixMac OS X builds libBlah.a and libBlah.so,
-        # but is using the Windows defaults  libBlah.a and    Blah.so.
+        # but is using the Windows defaults  libBlah.a and    Blah.dll.
         #
         # So that our dependency targets work between SUBDIRS, override:
         #
