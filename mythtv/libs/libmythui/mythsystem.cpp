@@ -9,7 +9,7 @@
 #include "mythsystem.h"
 
 #include "compat.h"
-# include <sys/wait.h>
+
 # ifdef linux
 #   include <sys/vfs.h>
 #   include <sys/statvfs.h>
