@@ -15,11 +15,3 @@ QMAKE_CLEAN += $(TARGET)
 # Input
 HEADERS += 
 SOURCES += main.cpp
-
-LIBS -= -lmythavformat-$$LIBVERSION
-LIBS -= -lmythavutil-$$LIBVERSION
-LIBS -= -lmythavcodec-$$LIBVERSION
-LIBS -= -lmythupnp-$$LIBVERSION
-LIBS -= -lmythui-$$LIBVERSION
-LIBS -= -lmythfreemheg-$$LIBVERSION
-LIBS -= -lmythlivemedia-$$LIBVERSION
