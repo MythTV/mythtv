@@ -2,6 +2,9 @@ include ( ../../config.mak )
 include ( ../../settings.pro)
 include ( ../programs-libs.pro)
 
+QT += sql
+CONFIG -= opengl
+
 TEMPLATE = app
 CONFIG += thread
 target.path = $${PREFIX}/bin
@@ -12,5 +15,11 @@ QMAKE_CLEAN += $(TARGET)
 # Input
 SOURCES += main.cpp
 
-#The following line was inserted by qt3to4
-QT += network xml  sql opengl qt3support
+LIBS -= -lmythavformat-$$LIBVERSION
+LIBS -= -lmythavutil-$$LIBVERSION
+LIBS -= -lmythavcodec-$$LIBVERSION
+LIBS -= -lmythupnp-$$LIBVERSION
+LIBS -= -lmythui-$$LIBVERSION
+LIBS -= -lmythfreemheg-$$LIBVERSION
+LIBS -= -lmythlivemedia-$$LIBVERSION
+

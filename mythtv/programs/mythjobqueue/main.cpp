@@ -67,10 +67,10 @@ int main(int argc, char *argv[])
                     return BACKEND_EXIT_INVALID_CMDLINE;
                 }
 
-                QStringList pairs = QStringList::split(",", tmpArg);
+                QStringList pairs = tmpArg.split(",");
                 for (int index = 0; index < pairs.size(); ++index)
                 {
-                    QStringList tokens = QStringList::split("=", pairs[index]);
+                    QStringList tokens = pairs[index].split("=");
                     tokens[0].replace(QRegExp("^[\"']"), "");
                     tokens[0].replace(QRegExp("[\"']$"), "");
                     tokens[1].replace(QRegExp("^[\"']"), "");
@@ -118,8 +118,8 @@ int main(int argc, char *argv[])
         for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(it.data()));
-            gContext->OverrideSettingForSession(it.key(), it.data());
+                                          .arg(it.key()).arg(*it));
+            gContext->OverrideSettingForSession(it.key(), *it);
         }
     }
 
