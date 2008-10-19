@@ -161,8 +161,8 @@ int main(int argc, char *argv[])
         for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(it.data()));
-            gContext->OverrideSettingForSession(it.key(), it.data());
+                                          .arg(it.key()).arg(*it));
+            gContext->OverrideSettingForSession(it.key(), *it);
         }
     }
 
@@ -230,12 +230,13 @@ int main(int argc, char *argv[])
     {
         pginfo = new ProgramInfo();
         pginfo->endts = QDateTime::currentDateTime().addSecs(-180);
-        pginfo->pathname = QString::fromLocal8Bit(filename);
+        pginfo->pathname = QString::fromLocal8Bit(
+            filename.toAscii().constData());
         pginfo->isVideo = true;
 
         // RingBuffer doesn't like relative pathnames
         if (filename.left(1) != "/" && !filename.startsWith("dvd:"))
-            pginfo->pathname.prepend(QDir::currentDirPath() + '/');
+            pginfo->pathname.prepend(QDir::currentPath() + '/');
     }
 
     TV::StartTV(pginfo, false);
