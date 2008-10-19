@@ -35,15 +35,16 @@ DEPENDPATH  += ../libmythlivemedia/UsageEnvironment
 LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat 
 LIBS += -L../libmythui -L../libmythupnp
 LIBS += -L../libmythmpeg2 -L../libmythdvdnav
+LIBS += -L../libmythlivemedia
 LIBS += -L../libmythdb 
 LIBS += -lmyth-$$LIBVERSION         -lmythavutil-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION  -lmythavformat-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythmpeg2-$$LIBVERSION    -lmythdvdnav-$$LIBVERSION
+LIBS += -lmythlivemedia-$$LIBVERSION
 LIBS += -lmythdb-$$LIBVERSION
 LIBS += -lz $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
-using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
