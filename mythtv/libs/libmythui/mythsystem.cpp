@@ -20,9 +20,10 @@
 #   endif
 #   ifdef CONFIG_CYGWIN
 #     include <sys/statfs.h>
-#   else // if !CONFIG_CYGWIN
+#   endif
+#   ifndef _WIN32
 #     include <sys/sysctl.h>
-#   endif // !CONFIG_CYGWIN
+#   endif
 # endif
 
 #include "mythverbose.h"
