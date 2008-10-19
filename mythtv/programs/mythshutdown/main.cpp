@@ -6,7 +6,6 @@ using namespace std;
 
 #include <QApplication>
 #include <QFile>
-#include <q3textstream.h>
 
 #include "exitcodes.h"
 #include "mythcontext.h"
@@ -589,7 +588,7 @@ int shutdown()
                     "sending command to set time in bios\n\t\t\t"
                     + nvramCommand);
 
-            shutdownmode = system(nvramCommand);
+            shutdownmode = system(nvramCommand.toLocal8Bit().constData());
             if (WIFEXITED(shutdownmode))
                 shutdownmode = WEXITSTATUS(shutdownmode);
 
@@ -630,7 +629,7 @@ int shutdown()
             VERBOSE(VB_IMPORTANT, ".");
             VERBOSE(VB_IMPORTANT, "shutting down ...");
 
-            system(poweroffCmd);
+            system(poweroffCmd.toLocal8Bit().constData());
             res = 0;
             break;
         }
@@ -641,7 +640,7 @@ int shutdown()
             VERBOSE(VB_IMPORTANT, "sending command to bootloader ...");
             VERBOSE(VB_IMPORTANT, nvramRestartCmd);
 
-            system(nvramRestartCmd);
+            system(nvramRestartCmd.toLocal8Bit().constData());
 
             VERBOSE(VB_IMPORTANT, "..");
             VERBOSE(VB_IMPORTANT, ".");
@@ -649,7 +648,7 @@ int shutdown()
 
             QString rebootCmd =
                     gContext->GetSetting("MythShutdownReboot", "/sbin/reboot");
-            system(rebootCmd);
+            system(rebootCmd.toLocal8Bit().constData());
             res = 0;
             break;
         }
