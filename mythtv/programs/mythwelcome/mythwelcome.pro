@@ -2,6 +2,8 @@ include ( ../../config.mak )
 include (../../settings.pro)
 include (../programs-libs.pro)
 
+QT += xml sql
+
 TEMPLATE = app
 CONFIG += thread
 TARGET = mythwelcome
@@ -19,6 +21,3 @@ QMAKE_CLEAN += $(TARGET)
 # Input
 HEADERS += welcomedialog.h welcomesettings.h
 SOURCES += main.cpp welcomedialog.cpp welcomesettings.cpp
-
-#The following line was inserted by qt3to4
-QT += network xml  sql opengl qt3support

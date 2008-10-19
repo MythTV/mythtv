@@ -164,7 +164,8 @@ int main(int argc, char **argv)
 
 static bool log_rotate(bool report_error)
 {
-    int new_logfd = open(logfile, O_WRONLY|O_CREAT|O_APPEND, 0664);
+    int new_logfd = open(logfile.toLocal8Bit().constData(),
+                         O_WRONLY|O_CREAT|O_APPEND, 0664);
 
     if (new_logfd < 0)
     {

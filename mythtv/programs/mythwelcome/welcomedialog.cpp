@@ -11,6 +11,7 @@
 #include <QEvent>
 
 // myth
+#include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "lcddevice.h"
@@ -88,7 +89,8 @@ DialogCode WelcomeDialog::exec(void)
 {
     // mythshutdown --startup returns 0 for automatic startup
     //                                1 for manual startup 
-    int state = system(m_installDir + "/bin/mythshutdown --startup");
+    QString mythshutdown_exe = m_installDir + "/bin/mythshutdown --startup";
+    int state = system(mythshutdown_exe.toLocal8Bit().constData());
 
     if (WIFEXITED(state))
         state = WEXITSTATUS(state);
@@ -290,9 +292,11 @@ UITextType* WelcomeDialog::getTextType(QString name)
 
     if (!type)
     {
-        cout << "ERROR: Failed to find '" << (const char *)name <<  "' UI element in theme file\n"
-             << "Bailing out!" << endl;
-        exit(0);
+        VERBOSE(VB_IMPORTANT,
+                QString("ERROR: Failed to find '%1' UI element in theme file\n"
+                        "Bailing out!")
+                .arg(name));
+        exit(WELCOME_BUGGY_EXIT_NO_THEME);
     }
 
     return type;
@@ -467,7 +471,9 @@ void WelcomeDialog::updateScreen(void)
             m_statusListNo = 0;
     }
 
-    m_updateScreenTimer->start(UPDATE_SCREEN_INTERVAL, true);
+    m_updateScreenTimer->stop();
+    m_updateScreenTimer->setSingleShot(true);
+    m_updateScreenTimer->start(UPDATE_SCREEN_INTERVAL);
 }
 
 // taken from housekeeper.cpp
@@ -638,7 +644,8 @@ void WelcomeDialog::showPopup(void)
 
     QAbstractButton *topButton;
     QLabel *label = popup->addLabel(tr("Menu"), MythPopupBox::Large, false);
-    label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+    label->setAlignment(Qt::AlignCenter);
+    label->setWordWrap(true);
 
     QString mythshutdown_status = m_installDir + "/bin/mythshutdown --status 0";
     QByteArray tmpcmd = mythshutdown_status.toAscii();
@@ -674,19 +681,21 @@ void WelcomeDialog::donePopup(int r)
 
 void WelcomeDialog::cancelPopup(void)
 {
-  if (!popup)
-      return;
+    if (!popup)
+        return;
 
-  popup->hide();
-  popup->deleteLater();
-  popup = NULL;
-  setActiveWindow();
+    popup->hide();
+    popup->deleteLater();
+    popup = NULL;
+
+    activateWindow();
 }
 
 void WelcomeDialog::lockShutdown(void)
 {
     cancelPopup();
-    system(m_installDir + "/bin/mythshutdown --lock");
+    QString mythshutdown_exe = m_installDir + "/bin/mythshutdown --lock";
+    system(mythshutdown_exe.toLocal8Bit().constData());
     updateStatusMessage();
     updateScreen();
 }
@@ -694,7 +703,8 @@ void WelcomeDialog::lockShutdown(void)
 void WelcomeDialog::unlockShutdown(void)
 {
     cancelPopup();
-    system(m_installDir + "/bin/mythshutdown --unlock");
+    QString mythshutdown_exe = m_installDir + "/bin/mythshutdown --unlock";
+    system(mythshutdown_exe.toLocal8Bit().constData());
     updateStatusMessage();
     updateScreen();
 }
@@ -746,7 +756,9 @@ void WelcomeDialog::shutdownNow(void)
     }
 
     // don't shutdown if we are about to start a wakeup/shutdown period
-    int statusCode = system(m_installDir + "/bin/mythshutdown --status 0");
+    QString mythshutdown_exe_status =
+        m_installDir + "/bin/mythshutdown --status 0";
+    int statusCode = system(mythshutdown_exe_status.toLocal8Bit().constData());
     if (WIFEXITED(statusCode))
         statusCode = WEXITSTATUS(statusCode);
 
@@ -792,6 +804,8 @@ void WelcomeDialog::shutdownNow(void)
     }
 
     // run command to set wakeuptime in bios and shutdown the system
-    system("sudo " + m_installDir + "/bin/mythshutdown --shutdown");
+    QString mythshutdown_exe =
+        "sudo " + m_installDir + "/bin/mythshutdown --startup";
+    system(mythshutdown_exe.toLocal8Bit().constData());
 }
 

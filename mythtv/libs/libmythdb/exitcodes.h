@@ -116,6 +116,9 @@
 #define TVOSD_EXIT_NO_TEMPLATE                    GENERIC_EXIT_START-1
 #define TVOSD_EXIT_START                          GENERIC_EXIT_START-1
 
+// mythwelcome
+#define WELCOME_BUGGY_EXIT_NO_THEME               GENERIC_EXIT_NO_THEME
+
 // Commercial flagging should return number of breaks,
 // or one of these exit codes
 #define COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS     GENERIC_EXIT_OK
