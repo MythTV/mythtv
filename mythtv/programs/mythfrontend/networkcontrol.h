@@ -1,30 +1,31 @@
 #ifndef NETWORKCONTROL_H_
 #define NETWORKCONTROL_H_
 
+#include <deque>
+using namespace std;
+
 #include <pthread.h>
 
-#include <q3serversocket.h>
-#include <q3textstream.h>
-#include <q3socket.h>
-#include <q3valuelist.h>
-#include <qobject.h>
-#include <qmutex.h>
-#include <qwaitcondition.h>
+#include <QWaitCondition>
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QMutex>
 
 class MainServer;
+class QTextStream;
 
-class NetworkControl : public Q3ServerSocket
+class NetworkControl : public QTcpServer
 {
     Q_OBJECT
   public:
-    NetworkControl(int port);
+    NetworkControl();
     ~NetworkControl();
-
-    void newConnection(int socket);
+    bool listen(const QHostAddress &address = QHostAddress::Any,
+                quint16 port = 0);
 
   private slots:
+    void newConnection();
     void readClient();
-    void discardClient();
 
   protected:
     static void *SocketThread(void *param);
@@ -57,14 +58,14 @@ class NetworkControl : public Q3ServerSocket
     QMap <QString, int> keyMap;
 
     QMutex clientLock;
-    Q3Socket *client;
-    Q3TextStream *cs;
+    QTcpSocket *client;
+    QTextStream *cs;
 
-    Q3ValueList<QString> networkControlCommands;
+    deque<QString> networkControlCommands;
     QMutex ncLock;
     QWaitCondition ncCond;
 
-    Q3ValueList<QString> networkControlReplies;
+    deque<QString> networkControlReplies;
     QMutex nrLock;
 
     pthread_t command_thread;

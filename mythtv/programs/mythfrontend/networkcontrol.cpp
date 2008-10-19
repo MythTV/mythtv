@@ -1,11 +1,9 @@
 #include <unistd.h>
-#include <iostream>
-using namespace std;
 
 #include <QApplication>
 #include <QRegExp>
 #include <QStringList>
-#include <q3textstream.h>
+#include <QTextStream>
 #include <QDir>
 #include <QKeyEvent>
 #include <QEvent>
@@ -45,15 +43,12 @@ static bool is_abbrev(QString const& command,
         return test.lower() == command.left(test.length()).lower();
 }
 
-NetworkControl::NetworkControl(int port)
-          : Q3ServerSocket(port, 1),
+NetworkControl::NetworkControl()
+          : QTcpServer(),
             prompt("# "),
             gotAnswer(false), answer(""),
             client(NULL), cs(NULL)
 {
-    VERBOSE(VB_IMPORTANT, LOC +
-            QString("Listening for remote connections on port %1").arg(port));
-
     // Eventually this map should be in the jumppoints table
     jumpMap["channelpriorities"]     = "Channel Recording Priorities";
     jumpMap["livetv"]                = "Live TV";
@@ -196,6 +191,8 @@ NetworkControl::NetworkControl(int port)
     pthread_create(&command_thread, NULL, CommandThread, this);
 
     gContext->addListener(this);
+    
+    connect(this, SIGNAL(newConnection()), this, SLOT(newConnection()));
 }
 
 NetworkControl::~NetworkControl(void)
@@ -212,6 +209,17 @@ NetworkControl::~NetworkControl(void)
     ncCond.wakeOne();
     ncLock.unlock();
     pthread_join(command_thread, NULL);
+}
+
+bool NetworkControl::listen(const QHostAddress & address, quint16 port)
+{
+    if (QTcpServer::listen(address,port))
+    {
+        VERBOSE(VB_GENERAL, LOC +
+            QString("Listening for remote connections on port %1").arg(port));
+        return true;
+    }
+    return false;
 }
 
 void *NetworkControl::CommandThread(void *param)
@@ -278,33 +286,34 @@ void NetworkControl::processNetworkControlCommand(QString command)
     }
 }
 
-void NetworkControl::newConnection(int socket)
+void NetworkControl::newConnection()
 {
     QString welcomeStr = "";
     bool closedOldConn = false;
-    Q3Socket *s = new Q3Socket(this);
+    QTcpSocket *s = this->nextPendingConnection();
     connect(s, SIGNAL(readyRead()), this, SLOT(readClient()));
-    connect(s, SIGNAL(delayedCloseFinished()), this, SLOT(discardClient()));
-    connect(s, SIGNAL(connectionClosed()), this, SLOT(discardClient()));
-    s->setSocket(socket);
+    connect(s, SIGNAL(disconnected()), s, SLOT(deleteLater()));
 
-    VERBOSE(VB_IMPORTANT, LOC +
-            QString("New connection established. (%1)").arg(socket));
-
-    Q3TextStream *os = new Q3TextStream(s);
-    os->setEncoding(Q3TextStream::UnicodeUTF8);
+    VERBOSE(VB_GENERAL, LOC +
+            QString("New connection established."));
 
     QMutexLocker locker(&clientLock);
+    if (cs)
+    {
+        cs->setDevice(s);
+    }
+    else
+    {
+        cs = new QTextStream(s);
+        cs->setEncoding(QTextStream::UnicodeUTF8);
+    }
+    
     if (client)
     {
         closedOldConn = true;
         client->close();
-        delete client;
-        delete cs;
     }
-
     client = s;
-    cs = os;
 
     ncLock.lock();
     networkControlCommands.clear();
@@ -334,7 +343,7 @@ void NetworkControl::newConnection(int socket)
 
 void NetworkControl::readClient(void)
 {
-    Q3Socket *socket = (Q3Socket *)sender();
+    QTcpSocket *socket = (QTcpSocket *)sender();
     if (!socket)
         return;
 
@@ -357,24 +366,6 @@ void NetworkControl::readClient(void)
         ncCond.wakeOne();
         ncLock.unlock();
     }
-}
-
-void NetworkControl::discardClient(void)
-{
-    Q3Socket *socket = (Q3Socket *)sender();
-    if (!socket)
-        return;
-
-    QMutexLocker locker(&clientLock);
-    if (client == socket)
-    {
-        delete cs;
-        delete client;
-        client = NULL;
-        cs = NULL;
-    }
-    else
-        delete socket;
 }
 
 QString NetworkControl::processJump(QStringList tokens)
@@ -899,13 +890,14 @@ void NetworkControl::customEvent(QEvent *e)
         nrLock.lock();
         replies = networkControlReplies.size();
         while (client && cs && replies > 0 &&
-               client->state() == Q3Socket::Connected)
+               client->state() == QTcpSocket::Connected)
         {
             reply = networkControlReplies.front();
             networkControlReplies.pop_front();
             *cs << reply;
             if (!reply.contains(crlfRegEx) || reply.contains(crlfcrlfRegEx))
                 *cs << "\r\n" << prompt;
+            cs->flush();
             client->flush();
 
             replies = networkControlReplies.size();
@@ -914,7 +906,7 @@ void NetworkControl::customEvent(QEvent *e)
     }
     else if (e->type() == kNetworkControlCloseEvent)
     {
-        if (client && client->state() == Q3Socket::Connected)
+        if (client && client->state() == QTcpSocket::Connected)
         {
             clientLock.lock();
             client->close();

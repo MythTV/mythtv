@@ -1377,8 +1377,8 @@ int main(int argc, char **argv)
     if (gContext->GetNumSetting("NetworkControlEnabled", 0))
     {
         int networkPort = gContext->GetNumSetting("NetworkControlPort", 6545);
-        networkControl = new NetworkControl(networkPort);
-        if (!networkControl->ok())
+        networkControl = new NetworkControl();
+        if (!networkControl->listen(QHostAddress::Any,networkPort))
             VERBOSE(VB_IMPORTANT,
                     QString("NetworkControl failed to bind to port %1.")
                     .arg(networkPort));
