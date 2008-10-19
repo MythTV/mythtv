@@ -2,6 +2,8 @@ include ( ../../config.mak )
 include ( ../../settings.pro )
 include ( ../programs-libs.pro )
 
+QT += network xml sql
+
 TEMPLATE = app
 CONFIG += thread opengl
 TARGET = mythtv-setup
@@ -28,5 +30,3 @@ macx {
 
 using_x11:DEFINES += USING_X11
 
-#The following line was inserted by qt3to4
-QT += network xml  sql opengl qt3support

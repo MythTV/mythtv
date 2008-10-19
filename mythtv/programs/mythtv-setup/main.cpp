@@ -43,7 +43,7 @@ void SetupMenuCallback ( void* data, QString& selection )
 {
     (void)data;
 
-    QString sel = selection.lower();
+    QString sel = selection.toLower();
 
     if ( sel == "general" )
     {
@@ -91,12 +91,11 @@ void SetupMenu(MythMainWindow *win)
     if ( menu->foundTheme() )
     {
         win->GetMainStack()->AddScreen(menu);
-        qApp->setMainWidget(win);
         qApp->exec();
     }
     else
     {
-        cerr << "Couldn't find theme " << (const char *)theme << endl;
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'").arg(theme));
     }
 }
 
@@ -198,10 +197,10 @@ int main(int argc, char *argv[])
                     return BACKEND_EXIT_INVALID_CMDLINE;
                 }
 
-                QStringList pairs = QStringList::split(",", tmpArg);
+                QStringList pairs = tmpArg.split(",");
                 for (int index = 0; index < pairs.size(); ++index)
                 {
-                    QStringList tokens = QStringList::split("=", pairs[index]);
+                    QStringList tokens = pairs[index].split("=");
                     tokens[0].replace(QRegExp("^[\"']"), "");
                     tokens[0].replace(QRegExp("[\"']$"), "");
                     tokens[1].replace(QRegExp("^[\"']"), "");
@@ -253,10 +252,12 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
-    if (geometry != "")
-        if (!GetMythUI()->ParseGeometryOverride(geometry))
-            cerr << "Illegal -geometry argument '"
-                 << (const char *)geometry << "' (ignored)\n";
+    if (!geometry.isEmpty() && !GetMythUI()->ParseGeometryOverride(geometry))
+    {
+        QString msg = QString("Illegal -geometry argument '%1' (ignored)")
+            .arg(geometry);
+        cerr << msg.toLocal8Bit().constData() << endl;
+    }
 
     if (settingsOverride.size())
     {
@@ -264,8 +265,8 @@ int main(int argc, char *argv[])
         for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(it.data()));
-            gContext->OverrideSettingForSession(it.key(), it.data());
+                                          .arg(it.key()).arg(*it));
+            gContext->OverrideSettingForSession(it.key(), *it);
         }
     }
 
