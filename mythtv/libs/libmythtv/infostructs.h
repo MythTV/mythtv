@@ -1,8 +1,9 @@
 #ifndef INFOSTRUCTS_H_
 #define INFOSTRUCTS_H_
 
-#include <qstring.h>
+#include <QString>
 #include <QPixmap>
+#include <QVariant>
 
 #include "mythexp.h"
 
@@ -40,5 +41,7 @@ class TimeInfo
     int hour;
     int min;
 };
+
+Q_DECLARE_METATYPE(ChannelInfo*)
 
 #endif
