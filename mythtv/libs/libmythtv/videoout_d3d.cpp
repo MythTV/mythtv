@@ -49,7 +49,7 @@ const int kKeepPrebuffer = 2;
 
 VideoOutputD3D::VideoOutputD3D(void)
     : VideoOutput(), m_InputCX(0), m_InputCY(0),
-      m_lock(true), m_RefreshRate(60),
+      m_lock(QMutex::Recursive), m_RefreshRate(60),
       m_hWnd(NULL), m_hEmbedWnd(NULL),
       m_ddFormat(D3DFMT_UNKNOWN), m_pD3D(NULL), m_pd3dDevice(NULL),
       m_pSurface(NULL), m_pTexture(NULL), m_pVertexBuffer(NULL)
