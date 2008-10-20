@@ -26,6 +26,7 @@ MPUBLIC QDateTime mythCurrentDateTime();
 MPUBLIC int calc_utc_offset(void);
 MPUBLIC QString getTimeZoneID(void);
 MPUBLIC bool checkTimeZone(void);
+MPUBLIC bool checkTimeZone(const QStringList &master_settings);
 
 // This is necessary for GCC 3.3, which has llabs(long long)
 // but not abs(long long) or std::llabs(long long)

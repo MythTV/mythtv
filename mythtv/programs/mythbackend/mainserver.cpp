@@ -1,10 +1,11 @@
 #include <list>
+#include <cstdlib>
 #include <iostream>
 #include <algorithm>
+#include <cerrno>
+#include <memory>
 using namespace std;
 
-#include <cstdlib>
-#include <cerrno>
 #include <math.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -172,15 +173,12 @@ class ProcessRequestThread : public QThread
 
 MainServer::MainServer(bool master, int port,
                        QMap<int, EncoderLink *> *tvList,
-                       Scheduler *sched, AutoExpire *expirer)
+                       Scheduler *sched, AutoExpire *expirer) :
+    encoderList(tvList), mythserver(NULL), masterServerReconnect(NULL),
+    masterServer(NULL), ismaster(master), masterBackendOverride(false),
+    m_sched(sched), m_expirer(expirer), deferredDeleteTimer(NULL),
+    autoexpireUpdateTimer(NULL), m_exitCode(BACKEND_EXIT_OK)
 {
-    m_sched = sched;
-    m_expirer = expirer;
-
-    ismaster = master;
-    masterServer = NULL;
-
-    encoderList = tvList;
     AutoExpire::Update(true);
 
     for (int i = 0; i < PRT_STARTUP_THREAD_COUNT; i++)
@@ -200,7 +198,8 @@ MainServer::MainServer(bool master, int port,
     {
         VERBOSE(VB_IMPORTANT, QString("Failed to bind port %1. Exiting.")
                 .arg(port));
-        exit(BACKEND_BUGGY_EXIT_NO_BIND_MAIN);
+        SetExitCode(BACKEND_BUGGY_EXIT_NO_BIND_MAIN, false);
+        return;
     }
 
     connect(mythserver, SIGNAL(newConnect(MythSocket *)),
@@ -211,10 +210,9 @@ MainServer::MainServer(bool master, int port,
     if (!ismaster)
     {
         masterServerReconnect = new QTimer(this);
+        masterServerReconnect->setSingleShot(true);
         connect(masterServerReconnect, SIGNAL(timeout()), this,
                 SLOT(reconnectTimeout()));
-        masterServerReconnect->stop();
-        masterServerReconnect->setSingleShot(true);
         masterServerReconnect->start(1000);
     }
 
@@ -226,6 +224,7 @@ MainServer::MainServer(bool master, int port,
     autoexpireUpdateTimer = new QTimer(this);
     connect(autoexpireUpdateTimer, SIGNAL(timeout()), this,
             SLOT(autoexpireUpdate()));
+    autoexpireUpdateTimer->setSingleShot(true);
 
     if (sched)
         sched->SetMainServer(this);
@@ -239,11 +238,6 @@ MainServer::~MainServer()
         mythserver->deleteLater();
         mythserver = NULL;
     }
-
-    if (masterServerReconnect)
-        delete masterServerReconnect;
-    if (deferredDeleteTimer)
-        delete deferredDeleteTimer;
 }
 
 void MainServer::autoexpireUpdate(void)
@@ -340,7 +334,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     PlaybackSock *pbs = getPlaybackBySock(sock);
     if (!pbs)
     {
-        VERBOSE(VB_IMPORTANT, "unknown socket");
+        VERBOSE(VB_IMPORTANT, "ProcessRequest unknown socket");
         return;
     }
 
@@ -1059,8 +1053,6 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         playbackList.push_back(pbs);
         sockListLock.unlock();
 
-        autoexpireUpdateTimer->stop();
-        autoexpireUpdateTimer->setSingleShot(true);
         autoexpireUpdateTimer->start(1000);
     }
     else if (commands[1] == "FileTransfer")
@@ -1538,7 +1530,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     sleep(3);
     usleep(rand()%2000);
 
-    deletelock.lock();
+    QMutexLocker dl(&deletelock);
 
     QString logInfo = QString("chanid %1 at %2")
                               .arg(ds->chanid).arg(ds->recstartts.toString());
@@ -1558,14 +1550,12 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
                                    "Program will NOT be deleted.")
                                    .arg(logInfo));
 
-        deletelock.unlock();
         return;
     }
 
-    ProgramInfo *pginfo;
-    pginfo = ProgramInfo::GetProgramFromRecorded(ds->chanid,
-                                                 ds->recstartts);
-    if (pginfo == NULL)
+    auto_ptr<ProgramInfo> pginfo(
+            ProgramInfo::GetProgramFromRecorded(ds->chanid, ds->recstartts));
+    if (pginfo.get() == NULL)
     {
         QString msg = QString("ERROR retrieving program info when trying to "
                               "delete program for chanid %1 recorded at %2. "
@@ -1577,7 +1567,6 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
                                    "Program will NOT be deleted.")
                                    .arg(logInfo));
 
-        deletelock.unlock();
         return;
     }
 
@@ -1596,20 +1585,17 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
                                    .arg(ds->filename).arg(logInfo));
 
         pginfo->SetDeleteFlag(false);
-        delete pginfo;
-
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
 
-        deletelock.unlock();
         return;
     }
 
     JobQueue::DeleteAllJobs(ds->chanid, ds->recstartts);
 
-    LiveTVChain *tvchain = GetChainWithRecording(pginfo);
+    LiveTVChain *tvchain = GetChainWithRecording(pginfo.get());
     if (tvchain)
-        tvchain->DeleteProgram(pginfo);
+        tvchain->DeleteProgram(pginfo.get());
 
     bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
     bool slowDeletes = gContext->GetNumSetting("TruncateDeletesSlowly", 0);
@@ -1649,12 +1635,10 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
                                    .arg(ds->filename).arg(logInfo));
 
         pginfo->SetDeleteFlag(false);
-        delete pginfo;
 
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
 
-        deletelock.unlock();
         return;
     }
 
@@ -1682,12 +1666,8 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     if (pginfo->recgroup != "LiveTV")
         ScheduledRecording::signalChange(0);
 
-    deletelock.unlock();
-
     if (slowDeletes && fd != -1)
-        TruncateAndClose(pginfo, fd, ds->filename, size);
-
-    delete pginfo;
+        TruncateAndClose(pginfo.get(), fd, ds->filename, size);
 }
 
 void MainServer::DoDeleteInDB(const DeleteStruct *ds)
@@ -4133,8 +4113,6 @@ void MainServer::connectionClosed(MythSocket *socket)
             sockListLock.unlock();
             masterServer->DownRef();
             masterServer = NULL;
-            masterServerReconnect->stop();
-            masterServerReconnect->setSingleShot(true);
             masterServerReconnect->start(1000);
             return;
         }
@@ -4381,6 +4359,13 @@ void MainServer::DeleteChain(LiveTVChain *chain)
     delete chain;
 }
 
+void MainServer::SetExitCode(int exitCode, bool closeApplication)
+{
+    m_exitCode = exitCode;
+    if (closeApplication)
+        QApplication::exit(m_exitCode);
+}
+
 QString MainServer::LocalFilePath(const QUrl &url)
 {
     QString lpath = url.path();
@@ -4481,8 +4466,6 @@ void MainServer::reconnectTimeout(void)
     if (!masterServerSock->connect(server, port))
     {
         VERBOSE(VB_IMPORTANT, "Connection to master server timed out.");
-        masterServerReconnect->stop();
-        masterServerReconnect->setSingleShot(true);
         masterServerReconnect->start(1000);
         masterServerSock->DownRef();
         return;
@@ -4491,8 +4474,6 @@ void MainServer::reconnectTimeout(void)
     if (masterServerSock->state() != MythSocket::Connected)
     {
         VERBOSE(VB_IMPORTANT, "Could not connect to master server.");
-        masterServerReconnect->stop();
-        masterServerReconnect->setSingleShot(true);
         masterServerReconnect->start(1000);
         masterServerSock->DownRef();
         return;
@@ -4537,8 +4518,6 @@ void MainServer::reconnectTimeout(void)
 
     masterServerSock->Unlock();
 
-    autoexpireUpdateTimer->stop();
-    autoexpireUpdateTimer->setSingleShot(true);
     autoexpireUpdateTimer->start(1000);
 }
 

@@ -819,22 +819,48 @@ int main(int argc, char **argv)
         }
     }
 
-    if (!checkTimeZone())
+    if (!gContext->IsMasterHost())
     {
-        // Check for different time zones, different offsets, different times
-        VERBOSE(VB_IMPORTANT, "The time and/or time zone settings on this "
-                "system do not match those in use on the master backend. "
-                "Please ensure all frontend and backend systems are "
-                "configured to use the same time zone and have the current "
-                "time properly set.");
-        VERBOSE(VB_IMPORTANT, "Unable to run with invalid time settings. "
-                              "Exiting.");
-        return BACKEND_EXIT_INVALID_TIMEZONE;
+        MythSocket *tempMonitorConnection = new MythSocket();
+        if (tempMonitorConnection->connect(
+                        gContext->GetSetting("MasterServerIP", "127.0.0.1"),
+                        gContext->GetNumSetting("MasterServerPort", 6543)))
+        {
+            QStringList tempMonitorDone("DONE");
+
+            QStringList tempMonitorAnnounce("ANN Monitor tzcheck 0");
+            tempMonitorConnection->writeStringList(tempMonitorAnnounce);
+            tempMonitorConnection->readStringList(tempMonitorAnnounce);
+
+            QStringList tzCheck("QUERY_TIME_ZONE");
+            tempMonitorConnection->writeStringList(tzCheck);
+            tempMonitorConnection->readStringList(tzCheck);
+            if (tzCheck.size() && !checkTimeZone(tzCheck))
+            {
+                // Check for different time zones, different offsets, different
+                // times
+                VERBOSE(VB_IMPORTANT, "The time and/or time zone settings on "
+                        "this system do not match those in use on the master "
+                        "backend. Please ensure all frontend and backend "
+                        "systems are configured to use the same time zone and "
+                        "have the current time properly set.");
+                VERBOSE(VB_IMPORTANT,
+                        "Unable to run with invalid time settings. Exiting.");
+                tempMonitorConnection->writeStringList(tempMonitorDone);
+                tempMonitorConnection->DownRef();
+                return BACKEND_EXIT_INVALID_TIMEZONE;
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QString("Backend is running in %1 time zone.")
+                        .arg(getTimeZoneID()));
+            }
+            tempMonitorConnection->writeStringList(tempMonitorDone);
+        }
+        tempMonitorConnection->DownRef();
     }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, QString("Backend is running in %1 time zone.").arg(getTimeZoneID()));
-    }
+
     if (!UpgradeTVDatabaseSchema(true, true))
     {
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema");
@@ -1003,7 +1029,16 @@ int main(int argc, char **argv)
 
     VERBOSE(VB_IMPORTANT, QString("Enabled verbose msgs: %1").arg(verboseString));
 
-    new MainServer(ismaster, port, &tvList, sched, expirer);
+    MainServer *mainServer = new MainServer(ismaster, port, &tvList, sched,
+            expirer);
+
+    int exitCode = mainServer->GetExitCode();
+    if (exitCode != BACKEND_EXIT_OK)
+    {
+        VERBOSE(VB_IMPORTANT, "Backend exiting, MainServer initialization "
+                "error.");
+        return exitCode;
+    }
 
     if (ismaster)
     {
@@ -1019,11 +1054,11 @@ int main(int argc, char **argv)
 
     StorageGroup::CheckAllStorageGroupDirs();
 
-    a.exec();
+    exitCode = a.exec();
 
     gContext->LogEntry("mythbackend", LP_INFO, "MythBackend exiting", "");
 
-    return BACKEND_EXIT_OK;
+    return exitCode ? exitCode : BACKEND_EXIT_OK;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

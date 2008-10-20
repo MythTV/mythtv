@@ -338,6 +338,13 @@ bool checkTimeZone(void)
         return true;
     }
 
+    return checkTimeZone(master_settings);
+}
+
+/// This overloaded version allows for the use of an existing (not managed by
+/// MythContext) connection to the backend.
+bool checkTimeZone(const QStringList &master_settings)
+{
     QDateTime local_time = mythCurrentDateTime();
     QString local_time_string = local_time.toString(Qt::ISODate);
 

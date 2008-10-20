@@ -49,6 +49,8 @@ class MainServer : public QObject, public MythSocketCBs
 
     void DeletePBS(PlaybackSock *pbs);
 
+    int GetExitCode() const { return m_exitCode; }
+
   protected slots:
     void reconnectTimeout(void);
     void deferredDeleteSlot(void);
@@ -160,6 +162,8 @@ class MainServer : public QObject, public MythSocketCBs
     void AddToChains(LiveTVChain *chain);
     void DeleteChain(LiveTVChain *chain);
 
+    void SetExitCode(int exitCode, bool closeApplication);
+
     static int  DeleteFile(const QString &filename, bool followLinks);
     static int  OpenAndUnlink(const QString &filename);
     static bool TruncateAndClose(ProgramInfo *pginfo,
@@ -207,6 +211,8 @@ class MainServer : public QObject, public MythSocketCBs
     QTimer *autoexpireUpdateTimer;
 
     static QMutex truncate_and_close_lock;
+
+    int m_exitCode;
 };
 
 #endif
