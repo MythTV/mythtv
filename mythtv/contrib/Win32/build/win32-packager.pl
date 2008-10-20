@@ -737,15 +737,15 @@ push @{$expect},
   shell   => "echo \\#define SIZE_T_MAX UINT_MAX >> $mingw/include/limits.h" ], 
 [ file    => $mingw.'lib/libFLAC.a', 
   shell   => ["cd $unixsources/flac-1.2.1",
-  			      "./configure --prefix=/mingw",
-  			      "make",
-  			      "make install"],
+              "./configure --prefix=/mingw",
+              "make",
+              "make install"],
   comment => 'building and installing: mingw flac/FLAC' ],
 [ file    => $msys.'lib/libFLAC.a', 
   shell   => ["cd $unixsources/flac-1.2.1",
-  			      "./configure --prefix=/usr",
-  			      "make",
-  			      "make install"],
+              "./configure --prefix=/usr",
+              "make",
+              "make install"],
   comment => 'building and installing: msys flac/FLAC' ],
  
  
@@ -753,27 +753,29 @@ push @{$expect},
   fetch   => 'http://'.$sourceforge.'/sourceforge/libcdaudio/libcdaudio-0.99.12p2.tar.gz'],
 [ dir     => $sources.'libcdaudio-0.99.12p2', 
   extract => $sources.'libcdaudio-0.99.12p2.tar' ],
-   			      
+
 [ archive => $sources.'libcdaudio-0.99.12p2-WIN32-support.patch',  
   fetch   => 'http://sourceforge.net/tracker/download.php?group_id=27134&atid=389444&file_id=286748&aid=2035008'],
   
 [ grep => ['ifdef __WIN32', $sources.'libcdaudio-0.99.12p2/src/cddb.c'], 
   shell => ["cd ".$sources.'libcdaudio-0.99.12p2',
-			"patch -p1 < ".$unixsources.'libcdaudio-0.99.12p2-WIN32-support.patch'] ],
+            "patch -p1 < ".$unixsources
+            .'libcdaudio-0.99.12p2-WIN32-support.patch'] ],
  
 [ file    => $msys.'bin/libcdaudio-config', 
   shell   => ["cd ".$unixsources."libcdaudio-0.99.12p2",
-  			      "./configure --prefix=/usr",
-  			      "make",
-  			      "make install"],
+              "./configure --prefix=/usr",
+              "make",
+              "make install"],
   comment => 'building and installing:  msys libcdaudio' ],  
 
 # mingw version is needed, or mythmusic won't build
 [ file    => $mingw.'bin/libcdaudio-config', 
   shell   => ["cd ".$unixsources."libcdaudio-0.99.12p2",
-  			      "./configure --prefix=/mingw",
-  			      "make",
-  			      "make install"],comment => 'building and installing:  mingw libcdaudio' ],  
+              "./configure --prefix=/mingw",
+              "make",
+              "make install"],
+  comment => 'building and installing:  mingw libcdaudio' ],  
   
 #[ pause => 'flac, taglib, lame all done.... press [enter] to continue !'],
 
@@ -1174,12 +1176,12 @@ push @{$expect},
 # later on, we'll also see if the $SVNRELEASE has changed, and triger on that to....
 [ file  => $mythtv.$is_same,
   shell   => ['source '.$unixmythtv.'make_clean.sh',
-    						'nocheck' ],
+              'nocheck' ],
   comment => 'cleaning environment - step 1a' ],
 
 [ file  => $mythtv."delete_to_do_make_clean.txt",
   shell   => ['source '.$unixmythtv.'make_clean.sh',
-    						'nocheck' ],
+              'nocheck' ],
   comment => 'cleaning environment - step 1b' ],
 
 #----------------------------------------
@@ -1296,8 +1298,8 @@ foreach my $comp( @components ) {
   # if we don't have the needed indicator of the branch we are now on, save that info...
   [ file  => $mythtv.$is_same,
   shell   => ['rm -f '.$unixmythtv.'*.same',
-    					'touch '.$unixmythtv.$is_same,
-    					],
+              'touch '.$unixmythtv.$is_same,
+             ],
   comment => 'cleaning environment' ], 
 
   #[ pause => 'press [enter] to continue !'],
@@ -1333,12 +1335,11 @@ push @{$expect},
 
 # open up the permissions:
 [ always   => [],
-    shell   => [
-    						'cd '.$unixmythtv.'mythtv',
+   shell   => ['cd '.$unixmythtv.'mythtv',
                'chmod -R 777 .'
-#    						'cd '.$unixmythtv.'mythplugins',
+#               'cd '.$unixmythtv.'mythplugins',
 #               'chmod -R 777 .'
-#    						'cd '.$unixmythtv.'mythtvthemes',
+#               'cd '.$unixmythtv.'mythtvthemes',
 #               'chmod -R 777 .'
                ],
  comment   => 'loosening permissions on source code:'],
@@ -1439,12 +1440,12 @@ foreach my $comp( @components ) {
     
 # this is now done as part of make_clean.sh, which happens EARLIER in the process, prior to any possible SVN branch changes! 
 #  [ file    => $mythtv.'delete_to_do_make_clean.txt',
-#	  shell   =>['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
+#    shell   =>['source '.$unixmythtv.'qt'.$qtver.'_env.sh',
 #              'cd '.$unixmythtv.$comp,
 #              'make clean',
 #              'rm Makefile',
-#							'nocheck']
-#	];
+#              'nocheck']
+#              ];
 }
 push @{$expect}, 
 
@@ -2079,20 +2080,19 @@ foreach my $dep ( @{$expect} ) {
             effect($effecttype,$cause[1],$cause[0]); 
           } else {
             effect($effecttype,@nocheckeffectparams); # do something else if the files are not 100% identical?
-             	if ( $nocheck == 0 ) {
-	              # now verify the effect was successful at matching the file contents!:
-	              undef $size; undef $size2;
-	              undef $mtime; undef $mtime2;
-	              undef $md5; undef $md5_2;
-	              ( $size,$mtime,$md5)=fileinfo($cause[0]);
-	        			( $size2,$mtime2,$md5_2)=fileinfo($cause[1]);
-	        			if ( $mtime != $mtime2 || $size != $size2 || $md5 ne $md5_2 ) {
-								  die("effect failed, files NOT identical size,mtime, and MD5: ($cause[0] => $cause[1]).\n");
-							  } else {
-							  	print "files ($cause[0] => $cause[1]) now identical - successful! \n";
-							  }
-						 	}
-						  
+            if ( $nocheck == 0 ) {
+              # now verify the effect was successful at matching the file contents!:
+              undef $size; undef $size2;
+              undef $mtime; undef $mtime2;
+              undef $md5; undef $md5_2;
+              ( $size,$mtime,$md5)=fileinfo($cause[0]);
+              ( $size2,$mtime2,$md5_2)=fileinfo($cause[1]);
+              if ( $mtime != $mtime2 || $size != $size2 || $md5 ne $md5_2 ) {
+                die("effect failed, files NOT identical size,mtime, and MD5: ($cause[0] => $cause[1]).\n");
+              } else {
+                print "files ($cause[0] => $cause[1]) now identical - successful! \n";
+              }
+            }
           }  
         }else {
            print "effect not required files already up-to-date/identical: ($cause[0] => $cause[1]).\n";
@@ -2128,7 +2128,7 @@ foreach my $dep ( @{$expect} ) {
         undef $mtime2;
         
     } elsif ( $causetype eq 'grep' ) {
-    	  print "grep-ing for pattern($cause[0]) in file($cause[1]):\n" if $NOISY >0;
+        print "grep-ing for pattern($cause[0]) in file($cause[1]):\n" if $NOISY >0;
         if ( ! _grep($cause[0],$cause[1]) ) { # grep actually needs two parameters on the source side of the action
             effect($effecttype,@nocheckeffectparams);   
         } else {
@@ -2139,7 +2139,7 @@ foreach my $dep ( @{$expect} ) {
         }
 
     } elsif ( $causetype eq 'exists' ) {
-    	  print "testing if '$cause[0]' exists...\n" if $NOISY >0;
+        print "testing if '$cause[0]' exists...\n" if $NOISY >0;
         if ( -e $cause[0] ) {
             effect($effecttype,@nocheckeffectparams);
         }
@@ -2220,29 +2220,29 @@ sub effect {
 #------------------------------------------------------------------------------
 # get info from a file for comparisons
 sub fileinfo {
-	  # filename passed in should be perl compatible path usinjg single FORWARD slashes
-		my $filename = shift;
-		
-	      my ( $size,$mtime,$md5)=(0,0,0);
-	      
-        if ( -f $filename ) {
-          $size = (stat($filename))[7];
-          $mtime  = (stat($filename))[9];
-          my $md5obj = Digest::MD5->new();
-          my $fileh = IO::File->new($filename);
-          binmode($fileh);
-          $md5obj->addfile($fileh);
-          $md5 = $md5obj->digest();
-        }	 else {
-        	warn(" invalid file name provided for testing: ($filename)\n");
-        	$size=rand(99);
-        	$mtime=rand(999);
-        	$md5=rand(999);
+    # filename passed in should be perl compatible path usinjg single FORWARD slashes
+    my $filename = shift;
+
+    my ( $size,$mtime,$md5)=(0,0,0);
+    
+    if ( -f $filename ) {
+        $size = (stat($filename))[7];
+        $mtime  = (stat($filename))[9];
+        my $md5obj = Digest::MD5->new();
+        my $fileh = IO::File->new($filename);
+        binmode($fileh);
+        $md5obj->addfile($fileh);
+        $md5 = $md5obj->digest();
+    } else {
+        warn(" invalid file name provided for testing: ($filename)\n");
+        $size=rand(99);
+        $mtime=rand(999);
+        $md5=rand(999);
         }
-		
-		   #print "compared: $size,$mtime,$md5\n";
-		   return ($size,$mtime,$md5);
-	}
+
+    #print "compared: $size,$mtime,$md5\n";
+    return ($size,$mtime,$md5);
+}
 
 #------------------------------------------------------------------------------
 # kinda like a directory search for blah.tar* but faster/easier.
