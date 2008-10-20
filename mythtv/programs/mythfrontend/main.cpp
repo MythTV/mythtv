@@ -280,8 +280,7 @@ void startManualSchedule(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ManualSchedule *mansched= new ManualSchedule(mainStack,
-                                                        "ManualSchedule");
+    ManualSchedule *mansched= new ManualSchedule(mainStack, "ManualSchedule");
 
     if (mansched->Create())
         mainStack->AddScreen(mansched);
@@ -722,7 +721,8 @@ int internal_play_media(const QString &mrl, const QString &plot,
     pginfo->description = plot;
 
     if (director.length())
-        pginfo->subtitle = QString( "%1: %2" ).arg(QObject::tr("Directed By")).arg(director);
+        pginfo->subtitle = QString( "%1: %2" )
+                           .arg(QObject::tr("Directed By")).arg(director);
 
     pginfo->title = title;
 
@@ -807,7 +807,7 @@ void reloadTheme(void)
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
-        cerr << "Couldn't find theme " << (const char *)themename << endl;
+        VERBOSE(VB_IMPORTANT, "Couldn't find theme " + themename);
         cleanup();
         exit(FRONTEND_EXIT_NO_THEME);
     }
@@ -908,19 +908,21 @@ static void *run_priv_thread(void *data)
                         if (status)
                         {
                             // perror("pthread_setschedparam");
-                            VERBOSE(VB_GENERAL, "Realtime priority would require SUID as root.");
+                            VERBOSE(VB_GENERAL, "Realtime priority would"
+                                                " require SUID as root.");
                         }
                         else
                             VERBOSE(VB_GENERAL, "Using realtime priority.");
                     }
                     else
                     {
-                        VERBOSE(VB_IMPORTANT, "Unexpected NULL thread ptr "
-                                "for MythPrivRequest::MythRealtime");
+                        VERBOSE(VB_IMPORTANT, "Unexpected NULL thread ptr for"
+                                              " MythPrivRequest::MythRealtime");
                     }
                 }
                 else
-                    VERBOSE(VB_GENERAL, "The realtime priority setting is not enabled.");
+                    VERBOSE(VB_GENERAL, "The realtime priority"
+                                        " setting is not enabled.");
                 break;
             case MythPrivRequest::MythExit:
                 pthread_exit(NULL);
@@ -976,7 +978,8 @@ int log_rotate(int report_error)
     if (new_logfd < 0) {
         /* If we can't open the new logfile, send data to /dev/null */
         if (report_error) {
-            cerr << "cannot open logfile " << (const char *)logfile << endl;
+            cerr << "Cannot open logfile "
+                 << logfile.toLocal8Bit().constData() << endl;
             return -1;
         }
 
@@ -1127,7 +1130,8 @@ int main(int argc, char **argv)
                 logfile = a.argv()[argpos+1];
                 if (logfile.startsWith("-"))
                 {
-                    cerr << "Invalid or missing argument to -l/--logfile option\n";
+                    cerr << "Invalid or missing argument"
+                            " to -l/--logfile option\n";
                     return FRONTEND_EXIT_INVALID_CMDLINE;
                 }
                 else
@@ -1301,7 +1305,7 @@ int main(int argc, char **argv)
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
-        cerr << "Couldn't find theme " << (const char *)themename << endl;
+        VERBOSE(VB_IMPORTANT, "Couldn't find theme " + themename);
         return FRONTEND_EXIT_NO_THEME;
     }
 
@@ -1394,7 +1398,7 @@ int main(int argc, char **argv)
         themedir = GetMythUI()->FindThemeDir(themename);
         if (themedir.isEmpty())
         {
-            cerr << "Couldn't find theme " << (const char *)themename << endl;
+            VERBOSE(VB_IMPORTANT, "Couldn't find theme " + themename);
             return FRONTEND_EXIT_NO_THEME;
         }
 
