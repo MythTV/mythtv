@@ -21,8 +21,8 @@ using namespace std;
 #include "mythuibuttonlist.h"
 #include "mythuispinbox.h"
 
-ManualSchedule::ManualSchedule(MythScreenStack *parent, QString name)
-               : MythScreenType(parent, name)
+ManualSchedule::ManualSchedule(MythScreenStack *parent)
+               : MythScreenType(parent, "ManualSchedule")
 {
     m_nowDateTime = QDateTime::currentDateTime();
     m_startDateTime = m_nowDateTime;

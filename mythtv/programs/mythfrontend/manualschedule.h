@@ -19,7 +19,7 @@ class ManualSchedule : public MythScreenType
     Q_OBJECT
   public:
 
-    ManualSchedule(MythScreenStack *parent, QString name);
+    ManualSchedule(MythScreenStack *parent);
    ~ManualSchedule(void) {};
 
     bool Create(void);

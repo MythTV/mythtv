@@ -286,7 +286,7 @@ void startManualSchedule(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ManualSchedule *mansched= new ManualSchedule(mainStack, "ManualSchedule");
+    ManualSchedule *mansched= new ManualSchedule(mainStack);
 
     if (mansched->Create())
         mainStack->AddScreen(mansched);
