@@ -15,12 +15,17 @@ class MythUIStateType;
 class MythUIButtonList;
 class MythUIButtonListItem;
 
+/**
+ * \class ViewScheduled
+ *
+ * \brief Screen for viewing and managing upcoming and conflicted recordings
+ */
 class ViewScheduled : public MythScreenType
 {
     Q_OBJECT
   public:
-    ViewScheduled(MythScreenStack *parent, QString name,
-                    TV *player = NULL, bool showTV = false);
+    ViewScheduled(MythScreenStack *parent, TV *player = NULL,
+                  bool showTV = false);
     ~ViewScheduled();
 
     static void * RunViewScheduled(void *player, bool);

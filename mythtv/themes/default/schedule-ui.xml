@@ -201,12 +201,6 @@
                 </state>
             </statetype>
         </buttonlist>
-        <!--
-        <fcnfont name="conflict_font" function="conflictingrecording">
-        <fcnfont name="norecordfnt" function="disabledrecording">
-        <fcnfont name="record_font" function="record">
-        <fcnfont name="recording_font" function="recording">
-        -->
 
         <textarea name="title" from="basetextarea">
             <area>20,360,800,40</area>
@@ -248,6 +242,157 @@
             <value>(1) All  (2) Important</value>
             <align>center</align>
         </textarea>
+    </window>
+
+    <window name="channelrecpriority">
+
+        <textarea name="sched">
+            <area>20,5,800,40</area>
+            <font>baselarge</font>
+            <value>Channel Recording Priorities</value>
+        </textarea>
+
+        <imagetype name="background">
+            <filename>rk-background.png</filename>
+            <position>0,40</position>
+        </imagetype>
+
+        <imagetype name="showinglines">
+            <filename>rk-lines.png</filename>
+            <position>0,40</position>
+        </imagetype>
+
+        <buttonlist name="channels">
+            <area>20,51,760,370</area>
+            <layout>vertical</layout>
+            <spacing>6</spacing>
+            <wrapstyle>selection</wrapstyle>
+            <buttonarea>0,0,760,340</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,760,25</area>
+                <state name="active">
+                    <imagetype name="icon">
+                        <area>0,0,25,25</area>
+                        <preserveaspect>true</preserveaspect>
+                    </imagetype>
+                    <statetype name="visibility">
+                        <position>30,0</position>
+                        <state name="visible">
+                            <imagetype name="statusimage">
+                                <filename>schedule_recording.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="hidden">
+                            <imagetype name="statusimage">
+                                <filename>schedule_disabled.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <textarea name="channum" from="basetextarea">
+                        <area>60,1,50,24</area>
+                        <font>basesmall</font>
+                        <font state="hidden">basesmallgrey</font>
+                    </textarea>
+                    <textarea name="callsign" from="channum">
+                        <area>120,1,200,24</area>
+                    </textarea>
+                    <textarea name="name" from="channum">
+                        <area>330,1,300,24</area>
+                    </textarea>
+                    <textarea name="priority" from="channum">
+                        <area>720,1,30,24</area>
+                        <align>right</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="selectbar">
+                        <position>27,0</position>
+                        <filename>schedule_selectbar.png</filename>
+                    </imagetype>
+                </state>
+                <state name="inactive" from="active" />
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>710,350</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>740,350</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <imagetype name="icon">
+            <area>30,405,200,150</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
+
+        <textarea name="channame" from="basetextarea">
+            <area>240,402,740,40</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="sourcelabel" from="basetextarea">
+            <area>240,445,100,30</area>
+            <value>Source:</value>
+        </textarea>
+
+        <textarea name="sourcename" from="basetextarea">
+            <area>360,445,400,30</area>
+        </textarea>
+
+        <textarea name="callsignlabel" from="basetextarea">
+            <area>240,480,100,30</area>
+            <value>Callsign:</value>
+        </textarea>
+
+        <textarea name="callsign" from="basetextarea">
+            <area>360,480,400,30</area>
+        </textarea>
+
+        <textarea name="recprioritylabel" from="basetextarea">
+            <area>240,515,100,30</area>
+            <value>Priority:</value>
+        </textarea>
+
+        <textarea name="priority" from="basetextarea">
+            <area>360,515,400,30</area>
+        </textarea>
+
+        <textarea name="norecordings_info">
+            <area>0,110,800,70</area>
+            <font>basemedium</font>
+            <value>You Haven't Scheduled Any Programs To Be Recorded\n
+                To schedule a recording, exit this screen and
+                Select 'Program Guide' or 'Program Finder'</value>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
+        </textarea>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>0,570,800,30</area>
+            <value>(1) Channel (2) Priority</value>
+            <align>center</align>
+        </textarea>
+
     </window>
 
 </mythuitheme>

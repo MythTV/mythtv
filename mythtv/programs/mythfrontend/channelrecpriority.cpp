@@ -1,480 +1,22 @@
 
 #include <iostream>
-#include <map>
 #include <vector>
-#include <algorithm>
 using namespace std;
-
-#include <QLayout>
-#include <QPushButton>
-#include <q3buttongroup.h>
-#include <QLabel>
-#include <QCursor>
-#include <QDateTime>
-#include <QApplication>
-#include <QRegExp>
-#include <q3header.h>
-#include <QPaintEvent>
-#include <QPainter>
-#include <QPixmap>
-#include <QKeyEvent>
 
 #include "channelrecpriority.h"
 #include "tv.h"
 
-#include "exitcodes.h"
-#include "dialogbox.h"
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "scheduledrecording.h"
 #include "proglist.h"
 #include "infostructs.h"
+
 #include "mythuihelper.h"
-
-ChannelRecPriority::ChannelRecPriority(MythMainWindow *parent, const char *name)
-                  : MythDialog(parent, name)
-{
-    curitem = NULL;
-    pageDowner = false;
-    bgTransBackup = NULL;
-
-    listCount = 0;
-    dataCount = 0;
-
-    fullRect = QRect(0, 0, size().width(), size().height());
-    listRect = QRect(0, 0, 0, 0);
-    infoRect = QRect(0, 0, 0, 0);
-
-    theme = new XMLParse();
-    theme->SetWMult(wmult);
-    theme->SetHMult(hmult);
-    if (!theme->LoadTheme(xmldata, "recprioritychannels"))
-    {
-        DialogBox *dlg = new DialogBox(
-            gContext->GetMainWindow(),
-            QObject::tr(
-                "The theme you are using does not contain the "
-                "%1 element. Please contact the theme creator "
-                "and ask if they could please update it.<br><br>"
-                "The next screen will be empty. "
-                "Escape out of it to return to the menu.")
-            .arg("'recprioritychannels'"));
-
-        dlg->AddButton(QObject::tr("OK"));
-        dlg->exec();
-        dlg->deleteLater();
-
-        return;
-    }
-
-    LoadWindow(xmldata);
-
-    LayerSet *container = theme->GetSet("selector");
-    if (container)
-    {
-        UIListType *ltype = (UIListType *)container->GetType("recprioritylist");
-        if (ltype)
-        {
-            listsize = ltype->GetItems();
-        }
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, "MythFrontEnd: ChannelRecPriority - "
-                "Failed to get selector.");
-        exit(FRONTEND_BUGGY_EXIT_NO_SELECTOR);
-    }
-
-    bgTransBackup = GetMythUI()->LoadScalePixmap("trans-backup.png");
-    if (!bgTransBackup)
-        bgTransBackup = new QPixmap();
-
-    updateBackground();
-
-    FillList();
-    sortType = (SortType)gContext->GetNumSetting("ChannelRecPrioritySorting",
-                                                 (int)byChannel);
-
-    SortList();
-    inList = 0;
-    inData = 0;
-    setNoErase();
-
-    longchannelformat =
-        gContext->GetSetting("LongChannelFormat", "<num> <name>");
-
-    gContext->addListener(this);
-    gContext->addCurrentLocation("ChannelRecPriority");
-}
-
-ChannelRecPriority::~ChannelRecPriority()
-{
-    gContext->removeListener(this);
-    gContext->removeCurrentLocation();
-    delete theme;
-    if (bgTransBackup)
-        delete bgTransBackup;
-    if (curitem)
-        delete curitem;
-}
-
-void ChannelRecPriority::keyPressEvent(QKeyEvent *e)
-{
-    bool handled = false;
-    QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions))
-    {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
-
-            if (action == "UP")
-                cursorUp();
-            else if (action == "DOWN")
-                cursorDown();
-            else if (action == "PAGEUP")
-                pageUp();
-            else if (action == "PAGEDOWN")
-                pageDown();
-            else if (action == "SELECT" || action == "MENU" ||
-                     action == "INFO" || action == "CUSTOMEDIT")
-                edit();
-            else if (action == "UPCOMING")
-                upcoming();
-            else if (action == "RANKINC")
-                changeRecPriority(1);
-            else if (action == "RANKDEC")
-                changeRecPriority(-1);
-            else if (action == "ESCAPE" || action == "LEFT")
-            {
-                saveRecPriority();
-                gContext->SaveSetting("ChannelRecPrioritySorting",
-                                      (int)sortType);
-                done(MythDialog::Accepted);
-            }
-            else if (action == "1")
-            {
-                if (sortType != byChannel)
-                {
-                    sortType = byChannel;
-                    SortList();
-                    update(fullRect);
-                }
-            }
-            else if (action == "2")
-            {
-                if (sortType != byRecPriority)
-                {
-                    sortType = byRecPriority;
-                    SortList();
-                    update(fullRect);
-                }
-            }
-            else if (action == "PREVVIEW" || action == "NEXTVIEW")
-            {
-                if (sortType == byChannel)
-                    sortType = byRecPriority;
-                else
-                    sortType = byChannel;
-                SortList();
-                update(fullRect);
-            }
-            else
-                handled = false;
-        }
-    }
-
-    if (!handled)
-        MythDialog::keyPressEvent(e);
-}
-
-void ChannelRecPriority::LoadWindow(QDomElement &element)
-{
-    for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling())
-    {
-        QDomElement e = child.toElement();
-        if (!e.isNull())
-        {
-            if (e.tagName() == "font")
-            {
-                theme->parseFont(e);
-            }
-            else if (e.tagName() == "container")
-            {
-                parseContainer(e);
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, QString("Unknown child element: %1. Ignoring.")
-                        .arg(e.tagName()));
-            }
-        }
-    }
-}
-
-void ChannelRecPriority::parseContainer(QDomElement &element)
-{
-    QRect area;
-    QString name;
-    int context;
-    theme->parseContainer(element, name, context, area);
-
-    if (name.lower() == "selector")
-        listRect = area;
-    if (name.lower() == "channel_info")
-        infoRect = area;
-}
-
-void ChannelRecPriority::updateBackground(void)
-{
-    QPixmap bground(size());
-    bground.fill(this, 0, 0);
-
-    QPainter tmp(&bground);
-
-    LayerSet *container = theme->GetSet("background");
-    if (!container)
-        return;
-
-    container->Draw(&tmp, 0, 0);
-
-    tmp.end();
-    myBackground = bground;
-
-    setPaletteBackgroundPixmap(myBackground);
-}
-
-void ChannelRecPriority::paintEvent(QPaintEvent *e)
-{
-    QRect r = e->rect();
-    QPainter p(this);
-
-    if (r.intersects(listRect))
-    {
-        updateList(&p);
-    }
-    if (r.intersects(infoRect))
-    {
-        updateInfo(&p);
-    }
-}
-
-void ChannelRecPriority::cursorDown(bool page)
-{
-    if (page == false)
-    {
-        if (inList > (int)((int)(listsize / 2) - 1)
-            && ((int)(inData + listsize) <= (int)(dataCount - 1))
-            && pageDowner == true)
-        {
-            inData++;
-            inList = (int)(listsize / 2);
-        }
-        else
-        {
-            inList++;
-
-            if (inList >= listCount)
-                inList = listCount - 1;
-        }
-    }
-    else if (page == true && pageDowner == true)
-    {
-        if (inList >= (int)(listsize / 2) || inData != 0)
-        {
-            inData = inData + listsize;
-        }
-        else if (inList < (int)(listsize / 2) && inData == 0)
-        {
-            inData = (int)(listsize / 2) + inList;
-            inList = (int)(listsize / 2);
-        }
-    }
-    else if (page == true && pageDowner == false)
-    {
-        inList = listsize - 1;
-    }
-
-    if ((int)(inData + inList) >= (int)(dataCount))
-    {
-        inData = dataCount - listsize;
-        inList = listsize - 1;
-    }
-    else if ((int)(inData + listsize) >= (int)dataCount)
-    {
-        inData = dataCount - listsize;
-    }
-
-    if (inData < 0)
-        inData = 0;
-
-    if (inList >= listCount)
-        inList = listCount - 1;
-
-    update(fullRect);
-}
-
-void ChannelRecPriority::cursorUp(bool page)
-{
-    if (page == false)
-    {
-        if (inList < ((int)(listsize / 2) + 1) && inData > 0)
-        {
-            inList = (int)(listsize / 2);
-            inData--;
-            if (inData < 0)
-            {
-                inData = 0;
-                inList--;
-            }
-         }
-         else
-         {
-             inList--;
-         }
-     }
-     else if (page == true && inData > 0)
-     {
-         inData = inData - listsize;
-         if (inData < 0)
-         {
-             inList = inList + inData;
-             inData = 0;
-             if (inList < 0)
-                 inList = 0;
-         }
-
-         if (inList > (int)(listsize / 2))
-         {
-             inList = (int)(listsize / 2);
-             inData = inData + (int)(listsize / 2) - 1;
-         }
-     }
-     else if (page == true)
-     {
-         inData = 0;
-         inList = 0;
-     }
-
-     if (inList > -1)
-     {
-         update(fullRect);
-     }
-     else
-         inList = 0;
-}
-
-void ChannelRecPriority::changeRecPriority(int howMuch)
-{
-    int tempRecPriority, cnt;
-    QPainter p(this);
-    QMap<QString, ChannelInfo>::Iterator it;
-    ChannelInfo *chanInfo;
-
-    // iterate through channelData till we hit the line where
-    // the cursor currently is
-    for (cnt=0, it = channelData.begin(); cnt < inList+inData; cnt++, ++it);
-
-    chanInfo = &(it.data());
-
-    // inc/dec recording priority
-    tempRecPriority = chanInfo->recpriority.toInt() + howMuch;
-    if (tempRecPriority > -100 && tempRecPriority < 100)
-    {
-        chanInfo->recpriority = QString::number(tempRecPriority);
-
-        // order may change if sorting by recoring priority, so resort
-        if (sortType == byRecPriority)
-            SortList();
-        update(fullRect);
-    }
-}
-
-void ChannelRecPriority::applyChannelRecPriorityChange(QString chanid,
-                                                 const QString &newrecpriority)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE channel SET recpriority = :RECPRI "
-                            "WHERE chanid = :CHANID ;");
-    query.bindValue(":RECPRI", newrecpriority);
-    query.bindValue(":CHANID", chanid);
-
-    if (!query.exec() || !query.isActive())
-        MythDB::DBError("Save recpriority update", query);
-}
-
-void ChannelRecPriority::saveRecPriority(void)
-{
-    QMap<QString, ChannelInfo>::Iterator it;
-
-    for (it = channelData.begin(); it != channelData.end(); ++it)
-    {
-        ChannelInfo *chanInfo = &(it.data());
-        QString key = QString::number(chanInfo->chanid);
-
-        // if this channel's recording priority changed from when we entered
-        // save new value out to db
-        if (chanInfo->recpriority != origRecPriorityData[key])
-            applyChannelRecPriorityChange(QString::number(chanInfo->chanid),
-                                          chanInfo->recpriority);
-    }
-    ScheduledRecording::signalChange(0);
-}
-
-void ChannelRecPriority::FillList(void)
-{
-    int cnt = 999;
-
-    QMap<int, QString> srcMap;
-
-    channelData.clear();
-    visMap.clear();
-
-    MSqlQuery result(MSqlQuery::InitCon());
-    result.prepare("SELECT sourceid, name FROM videosource;");
-
-    if (result.exec() && result.isActive() && result.size() > 0)
-    {
-        while (result.next())
-        {
-            srcMap[result.value(0).toInt()] = result.value(1).toString();
-        }
-    }
-    result.prepare("SELECT chanid, channum, sourceid, callsign, "
-                   "icon, recpriority, name, visible FROM channel;");
-
-    if (result.exec() && result.isActive() && result.size() > 0)
-    {
-        while (result.next())
-        {
-            ChannelInfo *chaninfo = new ChannelInfo;
-            chaninfo->chanid = result.value(0).toInt();
-            chaninfo->chanstr = result.value(1).toString();
-            chaninfo->sourceid = result.value(2).toInt();
-            chaninfo->callsign = result.value(3).toString();
-            chaninfo->iconpath = result.value(4).toString();
-            chaninfo->recpriority = result.value(5).toString();
-            chaninfo->channame = result.value(6).toString();
-            if (result.value(7).toInt() > 0)
-                visMap[chaninfo->chanid] = true;
-            chaninfo->sourcename = srcMap[chaninfo->sourceid];
-
-            channelData[QString::number(cnt)] = *chaninfo;
-
-            // save recording priority value in map so we don't have to save
-            // all channel's recording priority values when we exit
-            origRecPriorityData[QString::number(chaninfo->chanid)] =
-                    chaninfo->recpriority;
-
-            cnt--;
-            dataCount++;
-        }
-    }
-    else if (!result.isActive())
-        MythDB::DBError("Get channel recording priorities query", result);
-}
+#include "mythuitext.h"
+#include "mythuiimage.h"
+#include "mythuibuttonlist.h"
+#include "mythdialogbox.h"
 
 typedef struct RecPriorityInfo
 {
@@ -504,269 +46,431 @@ class channelRecPrioritySort
         }
 };
 
+ChannelRecPriority::ChannelRecPriority(MythScreenStack *parent)
+                  : MythScreenType(parent, "ChannelRecPriority")
+{
+    m_sortType = (SortType)gContext->GetNumSetting("ChannelRecPrioritySorting",
+                                                 (int)byChannel);
+
+    m_longchannelformat =
+        gContext->GetSetting("m_longchannelformat", "<num> <name>");
+
+    m_currentItem = NULL;
+
+    gContext->addListener(this);
+}
+
+ChannelRecPriority::~ChannelRecPriority()
+{
+    saveRecPriority();
+    gContext->SaveSetting("ChannelRecPrioritySorting",
+                            (int)m_sortType);
+    gContext->removeListener(this);
+}
+
+bool ChannelRecPriority::Create()
+{
+    if (!LoadWindowFromXML("schedule-ui.xml", "channelrecpriority", this))
+        return false;
+
+    m_channelList = dynamic_cast<MythUIButtonList *> (GetChild("channels"));
+
+    m_chanstringText = dynamic_cast<MythUIText *> (GetChild("chanstring"));
+    m_channameText = dynamic_cast<MythUIText *> (GetChild("channame"));
+    m_channumText = dynamic_cast<MythUIText *> (GetChild("chanstring"));
+    m_callsignText = dynamic_cast<MythUIText *> (GetChild("callsign"));
+    m_sourcenameText = dynamic_cast<MythUIText *> (GetChild("sourcename"));
+    m_sourceidText = dynamic_cast<MythUIText *> (GetChild("sourceid"));
+    m_priorityText = dynamic_cast<MythUIText *> (GetChild("priority"));
+
+    m_iconImage = dynamic_cast<MythUIImage *> (GetChild("icon"));
+
+    if (!m_channelList)
+    {
+        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        return false;
+    }
+
+    connect(m_channelList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            SLOT(updateInfo(MythUIButtonListItem*)));
+    connect(m_channelList, SIGNAL(itemClicked(MythUIButtonListItem*)),
+            SLOT(edit(MythUIButtonListItem*)));
+
+    FillList();
+
+    BuildFocusList();
+
+    return true;
+}
+
+bool ChannelRecPriority::keyPressEvent(QKeyEvent *event)
+{
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", event, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "MENU")
+            menu();
+        else if (action == "INFO" || action == "CUSTOMEDIT")
+            edit(m_channelList->GetItemCurrent());
+        else if (action == "UPCOMING")
+            upcoming(m_channelList->GetItemCurrent());
+        else if (action == "RANKINC")
+            changeRecPriority(1);
+        else if (action == "RANKDEC")
+            changeRecPriority(-1);
+        else if (action == "1")
+        {
+            if (m_sortType != byChannel)
+            {
+                m_sortType = byChannel;
+                SortList();
+            }
+        }
+        else if (action == "2")
+        {
+            if (m_sortType != byRecPriority)
+            {
+                m_sortType = byRecPriority;
+                SortList();
+            }
+        }
+        else if (action == "PREVVIEW" || action == "NEXTVIEW")
+        {
+            if (m_sortType == byChannel)
+                m_sortType = byRecPriority;
+            else
+                m_sortType = byChannel;
+            SortList();
+        }
+        else
+            handled = false;
+    }
+
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
+}
+
+void ChannelRecPriority::menu()
+{
+    MythUIButtonListItem *item = m_channelList->GetItemCurrent();
+
+    if (!item)
+        return;
+
+    QString label = tr("Channel Options");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythDialogBox *menuPopup = new MythDialogBox(label, popupStack,
+                                                 "chanrecmenupopup");
+
+    if (!menuPopup->Create())
+    {
+        delete menuPopup;
+        menuPopup = NULL;
+        return;
+    }
+
+    menuPopup->SetReturnEvent(this, "options");
+
+    menuPopup->AddButton(tr("Edit Channel"));
+    menuPopup->AddButton(tr("Program List"));
+    //menuPopup->AddButton(tr("Reset All Priorities"));
+
+    popupStack->AddScreen(menuPopup);
+}
+
+void ChannelRecPriority::changeRecPriority(int howMuch)
+{
+    MythUIButtonListItem *item = m_channelList->GetItemCurrent();
+
+    if (!item)
+        return;
+
+    ChannelInfo *chanInfo = qVariantValue<ChannelInfo *>(item->GetData());
+
+    // inc/dec recording priority
+    int tempRecPriority = chanInfo->recpriority.toInt() + howMuch;
+    if (tempRecPriority > -100 && tempRecPriority < 100)
+    {
+        chanInfo->recpriority = QString::number(tempRecPriority);
+
+        // order may change if sorting by recoring priority, so resort
+        if (m_sortType == byRecPriority)
+            SortList();
+        else
+        {
+            item->setText(chanInfo->recpriority, "priority");
+            updateInfo(item);
+        }
+    }
+}
+
+void ChannelRecPriority::applyChannelRecPriorityChange(QString chanid,
+                                                 const QString &newrecpriority)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE channel SET recpriority = :RECPRI "
+                            "WHERE chanid = :CHANID ;");
+    query.bindValue(":RECPRI", newrecpriority);
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec() || !query.isActive())
+        MythDB::DBError("Save recpriority update", query);
+}
+
+void ChannelRecPriority::saveRecPriority(void)
+{
+    QMap<QString, ChannelInfo>::Iterator it;
+
+    for (it = m_channelData.begin(); it != m_channelData.end(); ++it)
+    {
+        ChannelInfo *chanInfo = &(it.data());
+        QString key = QString::number(chanInfo->chanid);
+
+        // if this channel's recording priority changed from when we entered
+        // save new value out to db
+        if (chanInfo->recpriority != m_origRecPriorityData[key])
+            applyChannelRecPriorityChange(QString::number(chanInfo->chanid),
+                                          chanInfo->recpriority);
+    }
+    ScheduledRecording::signalChange(0);
+}
+
+void ChannelRecPriority::FillList(void)
+{
+    int cnt = 999;
+
+    QMap<int, QString> srcMap;
+
+    m_channelData.clear();
+    m_sortedChannel.clear();
+    m_visMap.clear();
+
+    MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare("SELECT sourceid, name FROM videosource;");
+
+    if (result.exec() && result.isActive() && result.size() > 0)
+    {
+        while (result.next())
+        {
+            srcMap[result.value(0).toInt()] = result.value(1).toString();
+        }
+    }
+    result.prepare("SELECT chanid, channum, sourceid, callsign, "
+                   "icon, recpriority, name, visible FROM channel;");
+
+    if (result.exec() && result.isActive() && result.size() > 0)
+    {
+        while (result.next())
+        {
+            ChannelInfo *chaninfo = new ChannelInfo;
+            chaninfo->chanid = result.value(0).toInt();
+            chaninfo->chanstr = result.value(1).toString();
+            chaninfo->sourceid = result.value(2).toInt();
+            chaninfo->callsign = result.value(3).toString();
+            chaninfo->iconpath = result.value(4).toString();
+            chaninfo->recpriority = result.value(5).toString();
+            chaninfo->channame = result.value(6).toString();
+            if (result.value(7).toInt() > 0)
+                m_visMap[chaninfo->chanid] = true;
+            chaninfo->sourcename = srcMap[chaninfo->sourceid];
+
+            m_channelData[QString::number(cnt)] = *chaninfo;
+
+            // save recording priority value in map so we don't have to save
+            // all channel's recording priority values when we exit
+            m_origRecPriorityData[QString::number(chaninfo->chanid)] =
+                    chaninfo->recpriority;
+
+            cnt--;
+        }
+    }
+    else if (!result.isActive())
+        MythDB::DBError("Get channel recording priorities query", result);
+
+    SortList();
+}
+
+void ChannelRecPriority::updateList()
+{
+    m_channelList->Reset();
+
+    QMap<QString, ChannelInfo*>::Iterator it;
+    MythUIButtonListItem *item;
+    for (it = m_sortedChannel.begin(); it != m_sortedChannel.end(); ++it)
+    {
+        ChannelInfo *chanInfo = it.data();
+
+        item = new MythUIButtonListItem(m_channelList, "",
+                                                    qVariantFromValue(chanInfo));
+
+        QString fontState = "default";
+        if (!m_visMap[chanInfo->chanid])
+            fontState = "hidden";
+
+        QString stringFormat = item->text();
+        if (stringFormat.isEmpty())
+            stringFormat = "<num>  <sign>  \"<name>\"";
+        item->setText(chanInfo->Text(stringFormat), fontState);
+
+        item->setText(chanInfo->chanstr, "channum", fontState);
+        item->setText(chanInfo->callsign, "callsign", fontState);
+        item->setText(chanInfo->channame, "name", fontState);
+        item->setText(QString().setNum(chanInfo->sourceid), "sourceid",
+                        fontState);
+        item->setText(chanInfo->sourcename, "sourcename", fontState);
+        if (m_visMap[chanInfo->chanid])
+            item->DisplayState("visible", "visibility");
+        else
+            item->DisplayState("hidden", "visibility");
+
+        item->SetImage(chanInfo->iconpath, "icon");
+        item->SetImage(chanInfo->iconpath);
+
+        item->setText(chanInfo->recpriority, "priority",
+                        fontState);
+
+        if (m_currentItem == chanInfo)
+            m_channelList->SetItemCurrent(item);
+    }
+
+    MythUIText *norecordingText = dynamic_cast<MythUIText*>
+                                                (GetChild("norecordings_info"));
+
+    if (norecordingText)
+        norecordingText->SetVisible(m_channelData.isEmpty());
+}
+
+
 void ChannelRecPriority::SortList()
 {
+    MythUIButtonListItem *item = m_channelList->GetItemCurrent();
+
+    if (item)
+    {
+        ChannelInfo *channelItem = qVariantValue<ChannelInfo *>(item->GetData());
+        m_currentItem = channelItem;
+    }
+
     typedef vector<RecPriorityInfo> sortList;
-    typedef QMap<QString, ChannelInfo> chanMap;
 
     int i, j;
-    bool cursorChanged = false;
-    sortList sortedList;
-    chanMap::Iterator pit;
+    sortList sortingList;
+    QMap<QString, ChannelInfo>::iterator pit;
     sortList::iterator sit;
     ChannelInfo *chanInfo;
     RecPriorityInfo *recPriorityInfo;
-    chanMap cdCopy;
 
-    // copy channelData into sortedList and make a copy
-    // of channelData in cdCopy
-    for (i = 0, pit = channelData.begin(); pit != channelData.end(); ++pit, i++)
+    // copy m_channelData into sortingList
+    for (i = 0, pit = m_channelData.begin(); pit != m_channelData.end();
+            ++pit, i++)
     {
         chanInfo = &(pit.data());
         RecPriorityInfo tmp = {chanInfo, i};
-        sortedList.push_back(tmp);
-        cdCopy[pit.key()] = pit.data();
+        sortingList.push_back(tmp);
     }
 
-    switch(sortType)
+    switch(m_sortType)
     {
         case byRecPriority:
-            sort(sortedList.begin(), sortedList.end(),
+            sort(sortingList.begin(), sortingList.end(),
             channelRecPrioritySort());
             break;
         case byChannel:
         default:
-            sort(sortedList.begin(), sortedList.end(),
+            sort(sortingList.begin(), sortingList.end(),
             channelSort());
             break;
     }
 
-    channelData.clear();
+    m_sortedChannel.clear();
 
-    // rebuild channelData in sortedList order from cdCopy
-    for (i = 0, sit = sortedList.begin(); sit != sortedList.end(); i++, ++sit)
+    // rebuild m_channelData in sortingList order from m_sortedChannel
+    for (i = 0, sit = sortingList.begin(); sit != sortingList.end(); i++, ++sit)
     {
         recPriorityInfo = &(*sit);
 
-        // find recPriorityInfo[i] in cdCopy
-        for (j = 0, pit = cdCopy.begin(); j !=recPriorityInfo->cnt; j++, ++pit);
+        // find recPriorityInfo[i] in m_sortedChannel
+        for (j = 0, pit = m_channelData.begin(); j !=recPriorityInfo->cnt; j++, ++pit);
 
-        // put back into channelData
-        channelData[QString::number(999-i)] = pit.data();
-
-        // if recPriorityInfo[i] is the channel where the cursor
-        // was pre-sort then we need to update to cursor
-        // to the ith position
-        if (!cursorChanged && recPriorityInfo->cnt == inList+inData)
-        {
-            inList = dataCount - i - 1;
-            if (inList > (int)((int)(listsize / 2) - 1))
-            {
-                inList = (int)(listsize / 2);
-                inData = dataCount - i - 1 - inList;
-            }
-            else
-                inData = 0;
-
-            if (dataCount > listsize && inData > dataCount - listsize)
-            {
-                inList += inData - (dataCount - listsize);
-                inData = dataCount - listsize;
-            }
-            cursorChanged = true;
-        }
+        m_sortedChannel[QString::number(999-i)] = &pit.data();
     }
+
+    updateList();
 }
 
-void ChannelRecPriority::updateList(QPainter *p)
+void ChannelRecPriority::updateInfo(MythUIButtonListItem *item)
 {
-    QRect pr = listRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
+    if (!item)
+        return;
 
-    int pastSkip = (int)inData;
-    pageDowner = false;
-    listCount = 0;
-
-    LayerSet *container = NULL;
-    container = theme->GetSet("selector");
-    if (container)
+    ChannelInfo *channelItem = qVariantValue<ChannelInfo *>(item->GetData());
+    if (!m_channelData.isEmpty() && channelItem)
     {
-        UIListType *ltype = (UIListType *)container->GetType("recprioritylist");
-        if (ltype)
+        QString rectype;
+        if (m_iconImage)
         {
-            int cnt = 0;
-            ltype->ResetList();
-            ltype->SetActive(true);
-
-            QMap<QString, ChannelInfo>::Iterator it;
-            for (it = channelData.begin(); it != channelData.end(); ++it)
-            {
-                if (cnt < listsize)
-                {
-                    if (pastSkip <= 0)
-                    {
-                        ChannelInfo *chanInfo = &(it.data());
-                        int recPriority = chanInfo->recpriority.toInt();
-
-                        if (cnt == inList)
-                        {
-                            if (curitem)
-                                delete curitem;
-                            curitem = new ChannelInfo(*chanInfo);
-                            ltype->SetItemCurrent(cnt);
-                        }
-
-                        ltype->SetItemText(cnt, 1,
-                            chanInfo->Text(" <num>  <sign>  \"<name>\""));
-
-                        if (chanInfo->recpriority.toInt() > 0)
-                            ltype->SetItemText(cnt, 2, "+");
-                        else if (chanInfo->recpriority.toInt() < 0)
-                            ltype->SetItemText(cnt, 2, "-");
-                        ltype->SetItemText(cnt, 3,
-                                           QString::number(abs(recPriority)));
-
-                        if (!visMap[chanInfo->chanid])
-                            ltype->EnableForcedFont(cnt, "inactive");
-
-                        cnt++;
-                        listCount++;
-                    }
-                    pastSkip--;
-                }
-                else
-                    pageDowner = true;
-            }
-
-            ltype->SetDownArrow(pageDowner);
-            if (inData > 0)
-                ltype->SetUpArrow(true);
-            else
-                ltype->SetUpArrow(false);
+            m_iconImage->SetFilename(channelItem->iconpath);
+            m_iconImage->Load();
         }
+
+        if (m_chanstringText)
+            m_chanstringText->SetText(channelItem->Text(m_longchannelformat));
+        if (m_callsignText)
+            m_callsignText->SetText(channelItem->callsign);
+        if (m_channumText)
+            m_channumText->SetText(channelItem->chanstr);
+        if (m_channameText)
+            m_channameText->SetText(channelItem->channame);
+        if (m_sourcenameText)
+            m_sourcenameText->SetText(channelItem->sourcename);
+        if (m_sourceidText)
+            m_sourceidText->SetText(QString().setNum(channelItem->sourceid));
+        if (m_priorityText)
+            m_priorityText->SetText(channelItem->recpriority);
     }
 
-    if (channelData.count() <= 0)
-        container = theme->GetSet("norecordings_list");
+    MythUIText *norecordingText = dynamic_cast<MythUIText*>
+                                                (GetChild("norecordings_info"));
 
-    if (container)
-    {
-       container->Draw(&tmp, 0, 0);
-       container->Draw(&tmp, 1, 0);
-       container->Draw(&tmp, 2, 0);
-       container->Draw(&tmp, 3, 0);
-       container->Draw(&tmp, 4, 0);
-       container->Draw(&tmp, 5, 0);
-       container->Draw(&tmp, 6, 0);
-       container->Draw(&tmp, 7, 0);
-       container->Draw(&tmp, 8, 0);
-    }
-
-    tmp.end();
-    p->drawPixmap(pr.topLeft(), pix);
+    if (norecordingText)
+        norecordingText->SetVisible(m_channelData.isEmpty());
 }
 
-void ChannelRecPriority::updateInfo(QPainter *p)
+void ChannelRecPriority::edit(MythUIButtonListItem *item)
 {
-    QRect pr = infoRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
-    QString rectype;
-    UIImageType *itype = NULL;
+    if (!item)
+        return;
 
-    if (channelData.count() > 0 && curitem)
-    {
-        LayerSet *container = NULL;
-        container = theme->GetSet("channel_info");
-        if (container)
-        {
-            itype = (UIImageType *)container->GetType("icon");
-            if (itype) {
-                int iconwidth = itype->GetSize().width();
-                int iconheight = itype->GetSize().height();
-                if (curitem->iconpath == "none" || curitem->iconpath == "")
-                    curitem->iconpath = "blankicon.jpg";
-                if (!curitem->iconload)
-                    curitem->LoadChannelIcon(iconwidth, iconheight);
-                if (curitem->iconload)
-                    itype->SetImage(curitem->icon);
-            }
+    ChannelInfo *chanInfo = qVariantValue<ChannelInfo *>(item->GetData());
 
-            UITextType *type = (UITextType *)container->GetType("title");
-            if (type)
-                type->SetText(curitem->Text(longchannelformat));
-
-            type = (UITextType *)container->GetType("source");
-            if (type)
-            {
-                type->SetText(QString("%1 %2").arg(curitem->sourceid)
-                                              .arg(curitem->sourcename));
-            }
-
-            type = (UITextType *)container->GetType("recpriority");
-            if (type) {
-                if (curitem->recpriority.toInt() > 0)
-                    type->SetText("+"+curitem->recpriority);
-                else
-                    type->SetText(curitem->recpriority);
-            }
-        }
-
-        if (container)
-        {
-            container->Draw(&tmp, 4, 0);
-            container->Draw(&tmp, 5, 0);
-            container->Draw(&tmp, 6, 0);
-            container->Draw(&tmp, 7, 0);
-            container->Draw(&tmp, 8, 0);
-        }
-    }
-    else
-    {
-        LayerSet *norec = theme->GetSet("norecordings_info");
-        if (norec)
-        {
-            norec->Draw(&tmp, 4, 0);
-            norec->Draw(&tmp, 5, 0);
-            norec->Draw(&tmp, 6, 0);
-            norec->Draw(&tmp, 7, 0);
-            norec->Draw(&tmp, 8, 0);
-        }
-
-    }
-
-    tmp.end();
-    p->drawPixmap(pr.topLeft(), pix);
-}
-
-void ChannelRecPriority::edit()
-{
-    int cnt;
-    QMap<QString, ChannelInfo>::Iterator it;
-    ChannelInfo *chanInfo;
-
-    // iterate through channelData till we hit the line where
-    // the cursor currently is
-    for (cnt=0, it = channelData.begin(); cnt < inList+inData; cnt++, ++it);
-
-    chanInfo = &(it.data());
+    if (!chanInfo)
+        return;
 
     ChannelWizard cw(chanInfo->chanid, chanInfo->sourceid);
     cw.exec();
 
-    // Make sure that any changes are reflected in channelData.
+    // Make sure that any changes are reflected in m_channelData.
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT chanid, channum, sourceid, callsign, "
                    "icon, recpriority, name, visible FROM channel "
                    "WHERE chanid = :CHANID;");
     result.bindValue(":CHANID", chanInfo->chanid);
 
-    if (result.exec() && result.isActive() && result.size() > 0)
+    if (result.exec() && result.next())
     {
-        result.next();
         chanInfo->chanid = result.value(0).toInt();
         chanInfo->chanstr = result.value(1).toString();
         chanInfo->sourceid = result.value(2).toInt();
@@ -775,28 +479,19 @@ void ChannelRecPriority::edit()
         chanInfo->recpriority = result.value(5).toString();
         chanInfo->channame = result.value(6).toString();
         if (result.value(7).toInt() > 0)
-            visMap[chanInfo->chanid] = true;
+            m_visMap[chanInfo->chanid] = true;
         else
-            visMap[chanInfo->chanid] = false;
+            m_visMap[chanInfo->chanid] = false;
     }
     else if (!result.isActive())
         MythDB::DBError("Get channel priorities update", result);
 
     SortList();
-    update(fullRect);
 }
 
-void ChannelRecPriority::upcoming()
+void ChannelRecPriority::upcoming(MythUIButtonListItem *item)
 {
-    int cnt;
-    QMap<QString, ChannelInfo>::Iterator it;
-    ChannelInfo *chanInfo;
-
-    // iterate through channelData till we hit the line where
-    // the cursor currently is
-    for (cnt=0, it = channelData.begin(); cnt < inList+inData; cnt++, ++it);
-
-    chanInfo = &(it.data());
+    ChannelInfo *chanInfo = qVariantValue<ChannelInfo *>(item->GetData());
 
     if (chanInfo->chanid < 1)
         return;
@@ -807,3 +502,33 @@ void ChannelRecPriority::upcoming()
     pl->exec();
     delete pl;
 }
+
+
+void ChannelRecPriority::customEvent(QEvent *event)
+{
+    if (event->type() == kMythDialogBoxCompletionEventType)
+    {
+        DialogCompletionEvent *dce =
+                                dynamic_cast<DialogCompletionEvent*>(event);
+
+        QString resultid= dce->GetId();
+        int buttonnum  = dce->GetResult();
+
+        if (resultid == "options")
+        {
+            switch (buttonnum)
+            {
+                case 0:
+                    edit(m_channelList->GetItemCurrent());
+                    break;
+                case 1:
+                    upcoming(m_channelList->GetItemCurrent());
+                    break;
+                case 2:
+                    //resetAll();
+                    break;
+            }
+        }
+    }
+}
+

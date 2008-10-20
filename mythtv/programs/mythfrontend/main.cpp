@@ -215,7 +215,7 @@ void startManaged(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ViewScheduled *viewsched = new ViewScheduled(mainStack, "ViewScheduled");
+    ViewScheduled *viewsched = new ViewScheduled(mainStack);
 
     if (viewsched->Create())
         mainStack->AddScreen(viewsched);
@@ -231,8 +231,14 @@ void startProgramRecPriorities(void)
 
 void startChannelRecPriorities(void)
 {
-    ChannelRecPriority rch(gContext->GetMainWindow(), "recpri channels");
-    rch.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    ChannelRecPriority *chanRecPrior = new ChannelRecPriority(mainStack);
+
+    if (chanRecPrior->Create())
+        mainStack->AddScreen(chanRecPrior);
+    else
+        delete chanRecPrior;
 }
 
 void startCustomPriority(void)

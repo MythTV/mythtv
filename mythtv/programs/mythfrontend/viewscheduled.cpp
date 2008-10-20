@@ -24,8 +24,7 @@ using namespace std;
 void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ViewScheduled *vsb = new ViewScheduled(mainStack,"ViewScheduled",
-                                           (TV*)player, showTV);
+    ViewScheduled *vsb = new ViewScheduled(mainStack, (TV*)player, showTV);
 
     if (vsb->Create())
         mainStack->AddScreen(vsb);
@@ -35,9 +34,8 @@ void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
     return NULL;
 }
 
-ViewScheduled::ViewScheduled(MythScreenStack *parent, QString name,
-                             TV* player, bool showTV)
-             : MythScreenType(parent, name)
+ViewScheduled::ViewScheduled(MythScreenStack *parent, TV* player, bool showTV)
+             : MythScreenType(parent, "ViewScheduled")
 {
     m_dateformat = gContext->GetSetting("ShortDateFormat", "M/d");
     m_timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");

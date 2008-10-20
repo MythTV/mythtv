@@ -1,87 +1,79 @@
 #ifndef CHANNELRECPRIORITY_H_
 #define CHANNELRECPRIORITY_H_
 
-#include <qdatetime.h>
-#include <qdom.h>
-#include <QPixmap>
-#include <QKeyEvent>
-#include <QPaintEvent>
+#include "mythscreentype.h"
 
-#include "mythwidgets.h"
-#include "mythdialogs.h"
-#include "uitypes.h"
-#include "xmlparse.h"
 #include "programinfo.h"
 #include "channeleditor.h"
 
 class ChannelInfo;
 
-class ChannelRecPriority : public MythDialog
+class MythUIText;
+class MythUIImage;
+class MythUIStateType;
+class MythUIButtonList;
+class MythUIButtonListItem;
+
+/**
+ * \class ChannelRecPriority
+ *
+ * \brief Screen for managing channel priorities in recording scheduling
+ *        decisions
+ */
+class ChannelRecPriority : public MythScreenType
 {
     Q_OBJECT
   public:
+    ChannelRecPriority(MythScreenStack *parent);
+    ~ChannelRecPriority();
+
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
+    void customEvent(QEvent *event);
+
     enum SortType
     {
         byChannel,
         byRecPriority,
     };
 
-    ChannelRecPriority(MythMainWindow *parent, const char *name = 0);
-    ~ChannelRecPriority();
-
   protected slots:
-    void cursorDown(bool page = false);
-    void cursorUp(bool page = false);
-    void pageDown() { cursorDown(true); }
-    void pageUp() { cursorUp(true); }
-    void edit();
-    void upcoming();
+    void edit(MythUIButtonListItem *);
+    void updateInfo(MythUIButtonListItem *);
+    void upcoming(MythUIButtonListItem *);
     void changeRecPriority(int howMuch);
     void applyChannelRecPriorityChange(QString, const QString&);
 
     void saveRecPriority(void);
 
-  protected:
-    void paintEvent(QPaintEvent *);
-    void keyPressEvent(QKeyEvent *e);
-
   private:
     void FillList(void);
     void SortList();
-    QMap<QString, ChannelInfo> channelData;
-    QMap<QString, QString> origRecPriorityData;
-    QMap<int, bool> visMap;
+    void updateList();
+    void menu();
 
-    void updateBackground(void);
-    void updateList(QPainter *);
-    void updateInfo(QPainter *);
+    QMap<QString, ChannelInfo> m_channelData;
+    QMap<QString, ChannelInfo*> m_sortedChannel;
+    QMap<QString, QString> m_origRecPriorityData;
+    QMap<int, bool> m_visMap;
 
-    void LoadWindow(QDomElement &);
-    void parseContainer(QDomElement &);
-    XMLParse *theme;
-    QDomElement xmldata;
+    MythUIButtonList *m_channelList;
 
-    ChannelInfo *curitem;
+    MythUIText *m_chanstringText;
+    MythUIText *m_channameText;
+    MythUIText *m_channumText;
+    MythUIText *m_callsignText;
+    MythUIText *m_sourcenameText;
+    MythUIText *m_sourceidText;
+    MythUIText *m_priorityText;
 
-    QPixmap myBackground;
-    QPixmap *bgTransBackup;
+    MythUIImage *m_iconImage;
 
-    bool pageDowner;
+    SortType m_sortType;
 
-    int inList;
-    int inData;
-    int listCount;
-    int dataCount;
+    QString m_longchannelformat;
 
-    QRect listRect;
-    QRect infoRect;
-    QRect fullRect;
-
-    int listsize;
-
-    SortType sortType;
-
-    QString longchannelformat;
+    ChannelInfo *m_currentItem;
 };
 
 #endif
