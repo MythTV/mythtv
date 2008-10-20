@@ -99,7 +99,7 @@
                         </imagetype>
                     </state>
                 </statetype>
-                <imagetype name="somearrow">
+                <imagetype name="buttonarrow">
                     <position>94%,7</position>
                     <filename>lb-arrow.png</filename>
                 </imagetype>
