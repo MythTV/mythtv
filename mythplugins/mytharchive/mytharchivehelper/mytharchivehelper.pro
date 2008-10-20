@@ -22,4 +22,7 @@ LIBS += -lmythavutil-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION
 LIBS += -lmythavformat-$$LIBVERSION
 
+using_live: LIBS += -lmythlivemedia-$$LIBVERSION
+using_mheg: LIBS += -lmythfreemheg-$$LIBVERSION
+
 QT += xml sql opengl qt3support
