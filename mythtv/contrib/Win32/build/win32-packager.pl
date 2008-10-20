@@ -47,8 +47,8 @@ $| = 1; # autoflush stdout;
                           # but seems to work best with some patches
                           # (included below). This is the last version that is
                           # Qt 3 based. Qt 4 merges began immediately after.
-#my $SVNRELEASE = '17190'; # Recent 0-21-fixes
-my $SVNRELEASE = '18442'; # Recent trunk
+#my $SVNRELEASE = '18442'; # Recent 0-21-fixes
+my $SVNRELEASE = '18791'; # Recent trunk
 #my $SVNRELEASE = 'HEAD'; # If you are game, go forth and test the latest!
 
 
@@ -84,7 +84,7 @@ my $svnlocation = "trunk";  # defaults to trunk unless -b specified
 my $qtver = 3;              # default to 3 until we can test otherwise below,
                             #  do not change this here.
 my $continuous = 0 ;        # by default the app pauses to notify you what 
-														#it's about to do, -y overrides for batch usage.
+                            #  it's about to do, -y overrides for batch usage.
 
 ##############################################################################
 # get command line options
