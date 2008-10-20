@@ -11,6 +11,8 @@ INCLUDEPATH += $${PREFIX}/include/mythtv $${PREFIX}/include/mythtv/ffmpeg
 INCLUDEPATH += $${PREFIX}/include/mythtv/libmythtv
 
 LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
+using_live: LIBS += -lmythlivemedia-$$LIBVERSION
+using_mheg: LIBS += -lmythfreemheg-$$LIBVERSION
 
 TEMPLATE = lib opengl
 CONFIG += plugin thread
