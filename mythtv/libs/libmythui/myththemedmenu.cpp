@@ -262,7 +262,10 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
                     QApplication::exit();
             }
             else if (m_exitModifier >= 0 && fullexit && lastScreen)
+            {
                 QApplication::exit();
+                m_wantpop = true;
+            }
         }
         else
             handled = false;
