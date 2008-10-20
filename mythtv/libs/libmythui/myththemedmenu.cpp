@@ -243,7 +243,10 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "LEFT" || action == "ESCAPE")
         {
+            bool    lastScreen = (GetMythMainWindow()->GetMainStack()
+                                                     ->TotalScreens() == 1);
             QString menuaction = "UPMENU";
+
             if (!m_allocedstate)
                 handleAction(menuaction);
             else if (m_state->m_killable)
@@ -255,15 +258,11 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
                     m_state->m_callback(m_state->m_callbackdata, sel);
                 }
 
-                if (GetMythMainWindow()->GetMainStack()->TotalScreens() == 1)
+                if (lastScreen)
                     QApplication::exit();
             }
-            else if (m_exitModifier >= 0 && fullexit &&
-                     GetMythMainWindow()->GetMainStack()->TotalScreens() == 1)
-            {
+            else if (m_exitModifier >= 0 && fullexit && lastScreen)
                 QApplication::exit();
-                m_wantpop = true;
-            }
         }
         else
             handled = false;
