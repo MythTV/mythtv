@@ -243,26 +243,34 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "LEFT" || action == "ESCAPE")
         {
+            bool    callbacks  = m_state->m_callback;
             bool    lastScreen = (GetMythMainWindow()->GetMainStack()
                                                      ->TotalScreens() == 1);
             QString menuaction = "UPMENU";
+            QString selExit    = "EXITING_APP";
 
             if (!m_allocedstate)
                 handleAction(menuaction);
             else if (m_state->m_killable)
             {
                 m_wantpop = true;
-                if (m_state->m_callback)
+                if (callbacks)
                 {
                     QString sel = "EXITING_MENU";
                     m_state->m_callback(m_state->m_callbackdata, sel);
                 }
 
                 if (lastScreen)
+                {
+                    if (callbacks)
+                        m_state->m_callback(m_state->m_callbackdata, selExit);
                     QApplication::exit();
+                }
             }
             else if (m_exitModifier >= 0 && fullexit && lastScreen)
             {
+                if (callbacks)
+                    m_state->m_callback(m_state->m_callbackdata, selExit);
                 QApplication::exit();
                 m_wantpop = true;
             }
