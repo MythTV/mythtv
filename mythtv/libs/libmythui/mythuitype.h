@@ -50,6 +50,9 @@ class MythUIType : public QObject, public XMLParseBase
     void SetCanTakeFocus(bool set = true);
     void SetFocusOrder(int);
 
+    bool IsEnabled(void) const { return m_Enabled; }
+    void SetEnabled(bool enable);
+
     bool MoveToTop(void);
     bool MoveChildToTop(MythUIType *child);
 
@@ -108,6 +111,8 @@ class MythUIType : public QObject, public XMLParseBase
     void LosingFocus();
     void Showing();
     void Hiding();
+    void Enabling();
+    void Disabling();
     void FinishedMoving();
     void FinishedFading();
 
@@ -136,6 +141,7 @@ class MythUIType : public QObject, public XMLParseBase
     bool m_Visible;
     bool m_HasFocus;
     bool m_CanHaveFocus;
+    bool m_Enabled;
 
     int m_focusOrder;
 

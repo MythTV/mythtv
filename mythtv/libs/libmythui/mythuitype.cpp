@@ -539,11 +539,27 @@ void MythUIType::Refresh(void)
 
 void MythUIType::SetVisible(bool visible)
 {
-    if (visible != m_Visible)
-    {
-        m_Visible = visible;
-        SetRedraw();
-    }
+    if (visible == m_Visible)
+        return;
+
+    m_Visible = visible;
+    SetRedraw();
+
+    if (m_Visible)
+        emit Showing();
+    else
+        emit Hiding();
+}
+
+void MythUIType::SetEnabled(bool enable)
+{
+    if (m_Enabled != enable)
+        m_Enabled = enable;
+
+    if (enable)
+        emit Enabling();
+    else
+        emit Disabling();
 }
 
 void MythUIType::Hide(void)
