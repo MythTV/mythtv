@@ -41,7 +41,8 @@ bool KeyGrabPopupBox::Create(void)
         return false;
     }
 
-    QString label = QString("%1\n\n%2").arg(tr("Press A Key")).arg(tr("Waiting for key press"));
+    QString label = QString("%1\n\n%2").arg(tr("Press A Key"))
+                                       .arg(tr("Waiting for key press"));
 
     m_messageText->SetText(label);
     m_okButton->SetText(tr("Ok"));
@@ -50,8 +51,12 @@ bool KeyGrabPopupBox::Create(void)
     connect(m_okButton, SIGNAL(Clicked()), SLOT(SendResult()));
     connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
 
-    m_okButton->SelectState(MythUIButton::Disabled);
-    m_cancelButton->SelectState(MythUIButton::Disabled);
+    m_okButton->SetEnabled(false);
+    m_cancelButton->SetEnabled(false);
+
+    BuildFocusList();
+
+    SetFocusWidget(m_okButton);
 
     return true;
 }
@@ -107,12 +112,8 @@ bool KeyGrabPopupBox::keyPressEvent(QKeyEvent *event)
             m_messageText->SetText(tr("Add key '%1'?").arg(key_name));
         }
 
-        m_okButton->SelectState(MythUIButton::Normal);
-        m_cancelButton->SelectState(MythUIButton::Normal);
-
-        BuildFocusList();
-
-        SetFocusWidget(m_okButton);
+        m_okButton->SetEnabled(true);
+        m_cancelButton->SetEnabled(true);
 
         handled = true;
     }
