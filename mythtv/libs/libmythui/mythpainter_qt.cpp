@@ -125,6 +125,8 @@ void MythQtPainter::DrawText(const QRect &r, const QString &msg,
 
         font.GetShadow(shadowOffset, shadowColor, shadowAlpha);
 
+        shadowColor.setAlpha(shadowAlpha);
+
         QRect a = r;
         a.moveBy(shadowOffset.x(), shadowOffset.y());
 
