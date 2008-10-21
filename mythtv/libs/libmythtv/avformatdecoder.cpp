@@ -55,6 +55,8 @@ extern const uint8_t *ff_find_start_code(const uint8_t * restrict p, const uint8
 
 static const float eps = 1E-5;
 
+static const unsigned int max_video_queue_size = 100;
+
 static int cc608_parity(uint8_t byte);
 static int cc608_good_parity(const int *parity_table, uint16_t data);
 static void cc608_build_parity_table(int *parity_table);
@@ -3116,7 +3118,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         if (gotvideo)
         {
             if (lowbuffers && onlyvideo == 0 &&
-                storedPackets.count() < 75 &&
+                storedPackets.count() < max_video_queue_size &&
                 lastapts < lastvpts + 100 &&
                 !ringBuffer->InDVDMenuOrStillFrame())
             {
@@ -3124,7 +3126,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             }
             else if (onlyvideo >= 0)
             {
-                if (storedPackets.count() >=75)
+                if (storedPackets.count() >= max_video_queue_size)
                     VERBOSE(VB_IMPORTANT,
                             QString("Audio %1 ms behind video but already %2 "
                                "video frames queued. AV-Sync might be broken.")
