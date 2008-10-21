@@ -9,8 +9,9 @@
 #include <assert.h>
 
 // qt
-#include <qapplication.h>
-#include <qregexp.h>
+//#include <qapplication.h>
+//#include <qregexp.h>
+#include <QTimer>
 
 //myth
 #include "mythtv/mythcontext.h"
@@ -26,15 +27,16 @@
 #define BUFFER_SIZE  (2048*1536*3)
 
 ZMClient::ZMClient()
-    : QObject(NULL, "ZMClient"),
+    : QObject(NULL),
       m_socket(NULL),
-      m_socketLock(true),
+      m_socketLock(QMutex::Recursive),
       m_hostname("localhost"),
       m_port(6548),
       m_bConnected(false),
       m_retryTimer(new QTimer(this)),
       m_zmclientReady(false)
 {
+    setObjectName("ZMClient");
     connect(m_retryTimer, SIGNAL(timeout()),   this, SLOT(restartConnection()));
 }
 
@@ -193,7 +195,7 @@ bool ZMClient::checkProtoVersion(void)
         VERBOSE(VB_IMPORTANT, QString("Server didn't respond to 'HELLO'!!"));
 
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Connection failure",
-            tr(QString("The mythzmserver didn't respond to our request to get the protocol version!!")));
+            tr("The mythzmserver didn't respond to our request to get the protocol version!!"));
         return false;
     }
 
@@ -203,11 +205,11 @@ bool ZMClient::checkProtoVersion(void)
                 "mythzmserver=%2)").arg(ZM_PROTOCOL_VERSION).arg(strList[1]));
 
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Connection failure",
-                         tr(QString("The mythzmserver uses protocol version %1, "
+                         QString("The mythzmserver uses protocol version %1, "
                                     "but this client only understands version %2. "
                                     "Make sure you are running compatible versions of "
                                     "both the server and plugin.")
-                                    .arg(strList[1]).arg(ZM_PROTOCOL_VERSION)));
+                                    .arg(strList[1]).arg(ZM_PROTOCOL_VERSION));
         return false;
     }
 
@@ -446,7 +448,7 @@ void ZMClient::deleteEventList(vector<Event*> *eventList)
 
 bool ZMClient::readData(unsigned char *data, int dataSize)
 {
-    Q_LONG read = 0;
+    qint64 read = 0;
     int errmsgtime = 0;
     MythTimer timer;
     timer.start();
@@ -454,7 +456,7 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
 
     while (dataSize > 0)
     {
-        Q_LONG sret = m_socket->readBlock((char*) data + read, dataSize);
+        qint64 sret = m_socket->readBlock((char*) data + read, dataSize);
         if (sret > 0)
         {
             read += sret;
@@ -503,17 +505,20 @@ bool ZMClient::readData(unsigned char *data, int dataSize)
     return true;
 }
 
-void ZMClient::getEventFrame(int monitorID, int eventID, int frameNo, QImage &image)
+void ZMClient::getEventFrame(int monitorID, int eventID, int frameNo, MythImage **image)
 {
+    if (*image)
+    {
+        (*image)->DownRef();
+        *image = NULL;
+    }
+
     QStringList strList("GET_EVENT_FRAME");
     strList << QString::number(monitorID);
     strList << QString::number(eventID);
     strList << QString::number(frameNo);
     if (!sendReceiveStringList(strList))
-    {
-        image = QImage();
         return;
-    }
 
     // get frame length from data
     int imageSize = strList[1].toInt();
@@ -523,14 +528,17 @@ void ZMClient::getEventFrame(int monitorID, int eventID, int frameNo, QImage &im
     if (!readData(data, imageSize))
     {
         VERBOSE(VB_GENERAL, "ZMClient::getEventFrame(): Failed to get image data");
-        image = QImage();
+        return;
     }
 
-    // extract the image data and create a QImage from it
-    if (!image.loadFromData(data, imageSize, "JPEG"))
+    // get a MythImage
+    *image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+
+    // extract the image data and create a MythImage from it
+    if (!(*image)->loadFromData(data, imageSize, "JPEG"))
     {
         VERBOSE(VB_GENERAL, "ZMClient::getEventFrame(): Failed to load image from data");
-        image = QImage();
+        return;
     }
 }
 

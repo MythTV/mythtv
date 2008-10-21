@@ -20,66 +20,63 @@
 #include <QKeyEvent>
 
 // mythtv
-#include <mythtv/uitypes.h>
-#include <mythtv/uilistbtntype.h>
-#include <mythtv/xmlparse.h>
-#include <mythtv/mythdialogs.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythdialogbox.h>
 
 // zm
 #include <zmdefines.h>
 
-class ZMEvents : public MythThemedDialog
+class ZMEvents : public MythScreenType
 {
     Q_OBJECT
 
 public:
-    ZMEvents(MythMainWindow *parent,
-             const QString &window_name, const QString &theme_filename,
-             const char *name = 0);
+    ZMEvents(MythScreenStack *parent, const char *name = "ZMEvents");
     ~ZMEvents();
+
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
 
   private slots:
     void getEventList(void);
     void playPressed(void);
     void deletePressed(void);
-    void setCamera(int item);
-    void setDate(int item);
-    void gridItemChanged(ImageGridItem *item);
+    void deleteAll(void);
+    void doDeleteAll(bool doDelete);
+    void changeView(void);
+    void eventChanged(MythUIButtonListItem *item);
+    void cameraChanged(void);
+    void dateChanged(void);
+    void playerExited(void);
 
   private:
-    void wireUpTheme(void);
-    UITextType* getTextType(QString name);
-    void keyPressEvent(QKeyEvent *e);
-
     void updateUIList();
-    void eventListDown(bool page);
-    void eventListUp(bool page);
     void getCameraList(void);
     void getDateList(void);
-    void setView(bool gridView);
     void setGridLayout(int layout);
     void showMenu(void);
 
-    void updateImageGrid();
-    QPixmap *createScaledPixmap(QString filename, int width, int height,
-                                Qt::AspectRatioMode mode);
-
     bool                 m_oldestFirst;
-    int                  m_currentEvent;
-    int                  m_eventListSize;
+    int                  m_layout;
+
     vector<Event *>     *m_eventList;
     QStringList          m_dateList;
+    int                  m_savedPosition;
+    int                  m_currentCamera;
+    int                  m_currentDate;
 
-    UIListType          *m_event_list;
-    UITextType          *m_eventNoText;
+    MythUIText          *m_eventNoText;
 
-    UIImageGridType     *m_eventGrid;
+    MythUIButtonList    *m_eventGrid;
 
-    UITextButtonType    *m_playButton;
-    UITextButtonType    *m_deleteButton;
+    MythUIButton        *m_playButton;
+    MythUIButton        *m_deleteButton;
 
-    UISelectorType      *m_cameraSelector;
-    UISelectorType      *m_dateSelector;
+    MythUIButtonList    *m_cameraSelector;
+    MythUIButtonList    *m_dateSelector;
+
+    MythDialogBox       *m_menuPopup;
 };
 
 #endif

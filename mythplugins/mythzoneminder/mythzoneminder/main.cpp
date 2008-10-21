@@ -16,27 +16,26 @@
 #include <unistd.h>
 
 // qt
-#include <QApplication>
-#include <QSqlDatabase>
-#include <QSqlError>
-#include <QObject>
+//#include <QObject>
+//#include <QSqlDatabase>
+//#include <QSqlError>
+//#include <QObject>
 
 // myth
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythversion.h>
-#include <mythtv/mythdialogs.h>
-#include <mythtv/mythplugin.h>
-#include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/mythpluginapi.h>
+//#include <mythtv/mythdialogs.h>
+//#include <mythtv/mythplugin.h>
+#include <mythtv/libmythui/mythmainwindow.h>
+#include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/libmythui/mythuihelper.h>
 
 //zone minder
-#include "zmconsole.h"
-#include "zmplayer.h"
-#include "zmevents.h"
-#include "zmliveplayer.h"
-//#include "zmutils.h"
 #include "zmsettings.h"
+#include "zmconsole.h"
+#include "zmliveplayer.h"
+#include "zmevents.h"
 #include "zmclient.h"
 
 using namespace std;
@@ -99,27 +98,26 @@ void runZMLiveView(void)
                         "zoneminder-", "zmplayer");
     player.exec();
 
-    gContext->removeCurrentLocation();
-}
+    gContext->removeCurrentLocation();}
 
 void runZMEventView(void)
 {
     if (!checkConnection())
         return;
 
-    gContext->addCurrentLocation("zoneminderevents");
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ZMEvents events(gContext->GetMainWindow(), "zmevents", "zoneminder-", "zmevents");
-    events.exec();
+    ZMEvents *events = new ZMEvents(mainStack, "ZMEvents");
 
-   gContext->removeCurrentLocation();
+    if (events->Create())
+        mainStack->AddScreen(events);
 }
 
 void ZoneMinderCallback(void *data, QString &selection)
 {
     (void) data;
 
-    QString sel = selection.lower();
+    QString sel = selection.toLower();
 
     if (sel == "zm_console")
         runZMConsole();

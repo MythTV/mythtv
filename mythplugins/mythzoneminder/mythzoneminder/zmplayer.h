@@ -19,35 +19,23 @@
 #include <QKeyEvent>
 
 // myth
-#include <mythtv/uitypes.h>
-#include <mythtv/uilistbtntype.h>
-#include <mythtv/xmlparse.h>
-#include <mythtv/mythdialogs.h>
-
-// gl stuff
-#include <GL/glx.h>
-#include <GL/glu.h>
-
-// xlib
-#include <X11/Xlib.h>
-
-// xv stuff
-#include <X11/extensions/Xvlib.h>
-#define RGB24 0x3
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuitext.h>
 
 // zm
 #include "zmdefines.h"
 
-class ZMPlayer : public MythThemedDialog
+class ZMPlayer : public MythScreenType
 {
     Q_OBJECT
 
   public:
-    ZMPlayer(vector<Event *> *eventList, int *currentEvent,
-             MythMainWindow *parent,
-             const QString &window_name, const QString &theme_filename,
-             const char *name = "ZMPlayer");
+    ZMPlayer(MythScreenStack *parent, const char *name, vector<Event *> *eventList, int *currentEvent);
     ~ZMPlayer();
+
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
 
   private slots:
     void updateFrame(void);
@@ -57,9 +45,6 @@ class ZMPlayer : public MythThemedDialog
     void nextPressed(void);
 
   private:
-    void wireUpTheme(void);
-    UITextType* getTextType(QString name);
-    void keyPressEvent(QKeyEvent *e);
     void getEventInfo(void);
     void displayFrame(void);
     void displayFrameGl(void);
@@ -67,52 +52,43 @@ class ZMPlayer : public MythThemedDialog
     void getFrame(void);
     int  getXvPortId(Display *dpy);
 
+    MythUIImage  *GetMythUIImage(const QString &name, bool optional = false);
+    MythUIText   *GetMythUIText(const QString &name, bool optional = false);
+    MythUIButton *GetMythUIButton(const QString &name, bool optional = false);
+
     bool initPlayer(void);
     bool initPlayerGl(void);
     bool initPlayerXv(void);
 
     void stopPlayer(void);
 
-    UIImageType          *m_frameImage;
-    UIImageType          *m_frameFSImage;
+    MythUIImage      *m_frameImage;
 
-    UITextType           *m_noEventsText;
-    UITextType           *m_eventText;
-    UITextType           *m_cameraText;
-    UITextType           *m_frameText;
-    UITextType           *m_dateText;
+    MythUIText       *m_noEventsText;
+    MythUIText       *m_eventText;
+    MythUIText       *m_cameraText;
+    MythUIText       *m_frameText;
+    MythUIText       *m_dateText;
 
-    UITextButtonType     *m_playButton;
-    UITextButtonType     *m_deleteButton;
-    UITextButtonType     *m_nextButton;
-    UITextButtonType     *m_prevButton;
+    MythUIButton     *m_playButton;
+    MythUIButton     *m_deleteButton;
+    MythUIButton     *m_nextButton;
+    MythUIButton     *m_prevButton;
 
-    int                  *m_currentEvent;
-    vector<Event *>      *m_eventList;
+    int              *m_currentEvent;
+    vector<Event *>  *m_eventList;
 
-    vector<Frame *>      *m_frameList;
-    QTimer               *m_frameTimer;
-    int                   m_curFrame;
-    int                   m_lastFrame;
+    vector<Frame *>  *m_frameList;
+    QTimer           *m_frameTimer;
+    int               m_curFrame;
+    int               m_lastFrame;
 
-    QString               m_eventDir;
-    bool                  m_paused;
-    bool                  m_bFullScreen;
+    QString           m_eventDir;
+    bool              m_paused;
+    bool              m_fullScreen;
 
-    bool                  m_initalized;
-    bool                  m_useGL;
-    GLXContext            m_cx;
-    Display              *m_dis;
-    Window                m_win;
-    int                   m_screenNum;
-    QImage                m_image;
-    QRect                 m_displayRect;
-    GC                    m_gc;
-    XImage               *m_XImage;
-    XvImage              *m_XvImage;
-    char                 *m_rgba;
-    int                   m_XVport;
-    bool                  m_haveXV;
+    MythImage        *m_image;
 };
 
 #endif
+

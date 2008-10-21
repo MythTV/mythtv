@@ -6,19 +6,10 @@ using namespace std;
 #include <iostream>
 #include <vector>
 
-// qt
-#include <qobject.h>
-#include <qstringlist.h>
-#include <q3valuevector.h>
-#include <q3socket.h>
-#include <qtimer.h>
-#include <qdatetime.h>
-#include <qmutex.h>
-#include <qimage.h>
-
 // myth
 #include "mythtv/mythsocket.h"
 #include "mythtv/mythexp.h"
+#include <libmythui/mythimage.h>
 
 // zm
 #include "zmdefines.h"
@@ -53,7 +44,7 @@ class MPUBLIC ZMClient : public QObject
     void getMonitorStatus(vector<Monitor*> *monitorList);
     void getEventList(const QString &monitorName, bool oldestFirst,
                       QString date, vector<Event*> *eventList);
-    void getEventFrame(int monitorID, int eventID, int frameNo, QImage &image);
+    void getEventFrame(int monitorID, int eventID, int frameNo, MythImage **image);
     void getAnalyseFrame(int monitorID, int eventID, int frameNo, QImage &image);
     int  getLiveFrame(int monitorID, QString &status, unsigned char* buffer, int bufferSize);
     void getFrameList(int eventID, vector<Frame*> *frameList);
