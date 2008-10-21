@@ -215,22 +215,24 @@ class XMLTVFindGrabbers : public QThread
     Q_OBJECT
 
   public:
-    XMLTVFindGrabbers() : find_grabber_proc(0) {}
+    XMLTVFindGrabbers() : kill_grabber(false) {}
 
     virtual void run(void);
-    virtual void kill(void)
+    virtual void stop()
     {
-        QMutexLocker qml(&find_grabber_proc_lock);
-        if (find_grabber_proc)
-            find_grabber_proc->kill();
+        {
+            QMutexLocker qml(&kill_grabber_search_lock);
+            kill_grabber = true;
+        }
+        wait();
     }
 
   signals:
     void FoundXMLTVGrabbers(QStringList,QStringList);
 
   private:
-    QProcess *find_grabber_proc;
-    QMutex find_grabber_proc_lock;
+    QMutex             kill_grabber_search_lock;
+    bool               kill_grabber;
 
     static QMutex      list_lock;
 };
