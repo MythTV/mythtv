@@ -477,8 +477,16 @@ int handleExit(void)
     if (gContext->GetNumSetting("NoPromptOnExit", 1) == 0)
         return QUIT;
 
+
+    // IsFrontendOnly() triggers a popup if there is no BE connection.
+    // We really don't need that right now. This hack prevents it.
+    gContext->SetMainWindow(NULL);
+
     // first of all find out, if this is a frontend only host...
     bool frontendOnly = gContext->IsFrontendOnly();
+
+    // Undo the hack, just in case we _don't_ quit:
+    gContext->SetMainWindow(MythMainWindow::getMainWindow());
 
 
     // how do you want to quit today?
