@@ -3,7 +3,7 @@
 #include <QRegion>
 #include <qbitarray.h>
 
-#include <Q3MemArray>
+#include <QVector>
 
 #include "mhi.h"
 #include "osd.h"
@@ -847,13 +847,13 @@ void MHIContext::DrawImage(int x, int y, const QRect &clipRect,
                 GetHeight() / MHIContext::StdDisplayHeight,
                 Qt::IgnoreAspectRatio,
                 Qt::SmoothTransformation);
-        AddToDisplay(q_scaled.convertDepth(32),
+        AddToDisplay(q_scaled.convertToFormat(QImage::Format_ARGB32),
                      x * GetWidth() / MHIContext::StdDisplayWidth,
                      y * GetHeight() / MHIContext::StdDisplayHeight);
     }
     else if (!displayRect.isEmpty())
     { // We must clip the image.
-        QImage clipped = qImage.convertDepth(32)
+        QImage clipped = qImage.convertToFormat(QImage::Format_ARGB32)
             .copy(displayRect.x() - x, displayRect.y() - y,
                   displayRect.width(), displayRect.height());
         QImage q_scaled =
@@ -876,7 +876,7 @@ void MHIContext::DrawImage(int x, int y, const QRect &clipRect,
 // the screen that is not covered with other visibles.
 void MHIContext::DrawBackground(const QRegion &reg)
 {
-    if (reg.isNull() || reg.isEmpty())
+    if (reg.isEmpty())
         return;
 
     QRect bounds = reg.boundingRect();
@@ -1312,30 +1312,14 @@ void MHIDLA::DrawBorderedRectangle(int x, int y, int width, int height)
 // Ovals (ellipses)
 void MHIDLA::DrawOval(int x, int y, int width, int height)
 {
-    // Simple but inefficient way of drawing a ellipse.
-    Q3PointArray ellipse;
-    ellipse.makeEllipse(x, y, width, height);
-    DrawPoly(true, ellipse);
+    // Not implemented.  Not actually used in practice.
 }
 
 // Arcs and sectors
 void MHIDLA::DrawArcSector(int x, int y, int width, int height,
                            int start, int arc, bool isSector)
 {
-    Q3PointArray points;
-    // MHEG and Qt both measure arcs as angles anticlockwise from
-    // the 3 o'clock position but MHEG uses 64ths of a degree
-    // whereas Qt uses 16ths.
-    points.makeArc(x, y, width, height, start/4, arc/4);
-    if (isSector)
-    {
-        // Have to add the centre as a point and fill the figure.
-        if (arc != 360*64)
-            points.putPoints(points.size(), 1, x+width/2, y+height/2);
-        DrawPoly(true, points);
-    }
-    else
-        DrawPoly(false, points);
+    // Not implemented.  Not actually used in practice.
 }
 
 // Polygons.  This is used directly and also to draw other figures.
@@ -1344,26 +1328,25 @@ void MHIDLA::DrawArcSector(int x, int y, int width, int height,
 // a result of rounding when drawing ellipses.
 typedef struct { int yBottom, yTop, xBottom; float slope; } lineSeg;
 
-void MHIDLA::DrawPoly(bool isFilled, const Q3PointArray &points)
+void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *yArray)
 {
-    int nPoints = points.size();
     if (nPoints < 2)
         return;
 
     if (isFilled)
     {
-        Q3MemArray <lineSeg> lineArray(nPoints);
+        QVector <lineSeg> lineArray(nPoints);
         int nLines = 0;
         // Initialise the line segment array.  Include all lines
         // apart from horizontal.  Close the polygon by starting
         // with the last point in the array.
-        int lastX = points[nPoints-1].x(); // Last point
-        int lastY = points[nPoints-1].y();
+        int lastX = xArray[nPoints-1]; // Last point
+        int lastY = yArray[nPoints-1];
         int yMin = lastY, yMax = lastY;
         for (int k = 0; k < nPoints; k++)
         {
-            int thisX = points[k].x();
-            int thisY = points[k].y();
+            int thisX = xArray[k];
+            int thisY = yArray[k];
             if (lastY != thisY)
             {
                 if (lastY > thisY)
@@ -1418,18 +1401,20 @@ void MHIDLA::DrawPoly(bool isFilled, const Q3PointArray &points)
         }
 
         // Draw the boundary
-        QPoint last = points[nPoints-1]; // Last point
+        int lastXpoint = xArray[nPoints-1]; // Last point
+        int lastYpoint = yArray[nPoints-1];
         for (int i = 0; i < nPoints; i++)
         {
-            DrawLine(points[i].x(), points[i].y(), last.x(), last.y());
-            last = points[i];
+            DrawLine(xArray[i], yArray[i], lastXpoint, lastYpoint);
+            lastXpoint = xArray[i];
+            lastYpoint = yArray[i];
         }
     }
     else // PolyLine - draw lines between the points but don't close it.
     {
         for (int i = 1; i < nPoints; i++)
         {
-            DrawLine(points[i].x(), points[i].y(), points[i-1].x(), points[i-1].y());
+            DrawLine(xArray[i], yArray[i], xArray[i-1], yArray[i-1]);
         }
     }
 }
@@ -1444,13 +1429,13 @@ void MHIBitmap::Draw(int x, int y, QRect rect, bool tiled)
         // Construct an image the size of the bounding box and tile the
         // bitmap over this.
         QImage tiledImage = QImage(rect.width(), rect.height(),
-                                   m_image.depth());
+                                   QImage::Format_ARGB32);
 
-        for (int i = 0; i < rect.width(); i += m_image.width())
+        for (int i = 0; i < rect.width(); i++)
         {
-            for (int j = 0; j < rect.height(); j += m_image.height())
+            for (int j = 0; j < rect.height(); j++)
             {
-                bitBlt( &tiledImage, i, j, &m_image, 0, 0, -1, -1, (Qt::ImageConversionFlags)0);
+                tiledImage.setPixel(i, j, m_image.pixel(i % m_image.width(), j % m_image.height()));
             }
         }
         m_parent->DrawImage(rect.x(), rect.y(), rect, tiledImage);
@@ -1464,16 +1449,16 @@ void MHIBitmap::Draw(int x, int y, QRect rect, bool tiled)
 // Create a bitmap from PNG.
 void MHIBitmap::CreateFromPNG(const unsigned char *data, int length)
 {
-    m_image.reset();
+    m_image = QImage();
 
     if (!m_image.loadFromData(data, length, "PNG"))
     {
-        m_image.reset();
+        m_image = QImage();
         return;
     }
 
     // Assume that if it has an alpha buffer then it's partly transparent.
-    m_opaque = ! m_image.hasAlphaBuffer();
+    m_opaque = ! m_image.hasAlphaChannel();
 }
 
 // Convert an MPEG I-frame into a bitmap.  This is used as the way of
@@ -1487,7 +1472,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
     AVFrame *picture = NULL;
     uint8_t *buff = NULL, *buffPtr;
     int gotPicture = 0, len;
-    m_image.reset();
+    m_image = QImage();
 
     // Find the mpeg2 video decoder.
     AVCodec *codec = avcodec_find_decoder(CODEC_ID_MPEG2VIDEO);
@@ -1579,7 +1564,7 @@ void MHIBitmap::ScaleImage(int newWidth, int newHeight)
 
     if (newWidth <= 0 || newHeight <= 0)
     { // This would be a bit silly but handle it anyway.
-        m_image.reset();
+        m_image = QImage();
         return;
     }
 

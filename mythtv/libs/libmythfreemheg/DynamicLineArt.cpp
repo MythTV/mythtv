@@ -29,7 +29,6 @@
 #include "ASN1Codes.h"
 #include "Engine.h"
 #include "freemheg.h"
-#include <Q3PointArray>
 
 MHDynamicLineArt::MHDynamicLineArt()
 {
@@ -156,9 +155,9 @@ void MHDynamicLineArt::DrawArcSector(bool fIsSector, int x, int y, int width, in
     engine->Redraw(GetVisibleArea());
 }
 
-void MHDynamicLineArt::DrawPoly(bool fIsPolygon, const Q3PointArray &points, MHEngine *engine)
+void MHDynamicLineArt::DrawPoly(bool fIsPolygon, int nPoints, const int xArray[], const int yArray[], MHEngine *engine)
 {
-    m_picture->DrawPoly(fIsPolygon, points);
+    m_picture->DrawPoly(fIsPolygon, nPoints, xArray, yArray);
     engine->Redraw(GetVisibleArea());
 }
 
@@ -178,12 +177,17 @@ void MHDrawPoly::Initialise(MHParseNode *p, MHEngine *engine)
 
 void MHDrawPoly::Perform(MHEngine *engine)
 {
-    Q3PointArray points(m_Points.Size());
-    for (int i = 0; i < m_Points.Size(); i++) {
+    int nPoints = m_Points.Size();
+    int *xArray = new int[nPoints];
+    int *yArray = new int[nPoints];
+    for (int i = 0; i < nPoints; i++) {
         MHPointArg *pPoint = m_Points[i];
-        points.setPoint(i, pPoint->x.GetValue(engine), pPoint->y.GetValue(engine));
+        xArray[i] = pPoint->x.GetValue(engine);
+        yArray[i] = pPoint->y.GetValue(engine);
     }
-    Target(engine)->DrawPoly(m_fIsPolygon, points, engine);
+    Target(engine)->DrawPoly(m_fIsPolygon, nPoints, xArray, yArray, engine);
+    delete[](xArray);
+    delete[](yArray);
 }
 
 void MHDrawPoly::PrintArgs(FILE *fd, int /*nTabs*/) const

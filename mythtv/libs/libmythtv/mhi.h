@@ -18,7 +18,6 @@ using namespace std;
 #include <QString>
 #include <QWaitCondition>
 #include <QImage>
-#include <q3pointarray.h>
 
 // MythTV headers
 #include "../libmythfreemheg/freemheg.h"
@@ -288,7 +287,7 @@ class MHIDLA : public MHDLADisplay
     virtual void DrawOval(int x, int y, int width, int height);
     virtual void DrawArcSector(int x, int y, int width, int height,
                                int start, int arc, bool isSector);
-    virtual void DrawPoly(bool isFilled, const Q3PointArray &points);
+    virtual void DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *yArray);
 
   protected:
     void DrawRect(int x, int y, int width, int height, MHRgba colour);

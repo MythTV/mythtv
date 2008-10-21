@@ -1173,7 +1173,7 @@ enable iptv
 enable ivtv
 enable lamemp3
 enable lirc
-disable mheg
+enable mheg
 enable opengl
 enable qtwebkit
 enable v4l

@@ -173,7 +173,7 @@ bool BiopMessage::ProcessMsgHdr(unsigned char *data, unsigned long *curp)
                        (buf[off + 2] << 8)  | (buf[off + 3]));
     off += 4;
     uint nObjLen = buf[off++];
-    m_objkey.duplicate((const char*)buf + off, nObjLen);
+    m_objkey = DSMCCCacheKey((const char*)buf + off, nObjLen);
     off += nObjLen;
     m_objkind_len = ((buf[off + 0] << 24) | (buf[off + 1] << 16) |
                      (buf[off + 2] << 8)  | (buf[off + 3]));
@@ -277,8 +277,7 @@ bool BiopMessage::ProcessFile(DSMCCCacheModuleData *cachep, DSMCCCache *filecach
     DSMCCCacheReference ref(cachep->CarouselId(), cachep->ModuleId(),
                             cachep->StreamId(), m_objkey);
 
-    QByteArray filedata;
-    filedata.duplicate((const char *)data+(*curp), content_len);
+    QByteArray filedata = QByteArray((const char *)data+(*curp), content_len);
     filecache->CacheFileData(ref, filedata);
 
     (*curp) += content_len;
@@ -416,7 +415,7 @@ int BiopObjLocation::Process(const unsigned char *data)
     version_major = data[off++];
     version_minor = data[off++];
     uint objKeyLen = data[off++]; /* <= 4 */
-    m_Reference.m_Key.duplicate((char*)data + off, objKeyLen);
+    m_Reference.m_Key = DSMCCCacheKey((char*)data + off, objKeyLen);
     off += objKeyLen;
     return off;
 }

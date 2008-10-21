@@ -218,7 +218,7 @@ bool MHEngine::Launch(const MHObjectRef &target, bool fIsSpawn)
 
         // Save the path we use for this app.
         pProgram->m_Path = csPath; // Record the path
-        int nPos = pProgram->m_Path.findRev('/');
+        int nPos = pProgram->m_Path.lastIndexOf('/');
         if (nPos < 0) pProgram->m_Path = "";
         else pProgram->m_Path = pProgram->m_Path.left(nPos);
        // Have now got the application.
@@ -352,7 +352,7 @@ QString MHEngine::GetPathName(const MHOctetString &str)
     if (str.Size() != 0) csPath = QString::fromUtf8((const char *)str.Bytes(), str.Size());
     if (csPath.left(4) == "DSM:") csPath = csPath.mid(4); // Remove DSM:
     // If it has any other prefix this isn't a request for a carousel object.
-    int firstColon = csPath.find(':'), firstSlash = csPath.find('/');
+    int firstColon = csPath.indexOf(':'), firstSlash = csPath.indexOf('/');
     if (firstColon > 0 && firstSlash > 0 && firstColon < firstSlash)
         return QString();
 
@@ -364,7 +364,7 @@ QString MHEngine::GetPathName(const MHOctetString &str)
     }
     // Remove any occurrences of x/../
     int nPos;
-    while ((nPos = csPath.find("/../")) >= 0) {
+    while ((nPos = csPath.indexOf("/../")) >= 0) {
         int nEnd = nPos+4;
         while (nPos >= 1 && csPath[nPos-1] != '/') nPos--;
         csPath = csPath.left(nPos) + csPath.mid(nEnd);

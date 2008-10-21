@@ -23,7 +23,6 @@
 #define FREEMHEG_H
 
 #include <qregion.h>
-#include <Q3PointArray>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -159,7 +158,7 @@ public:
     virtual void DrawBorderedRectangle(int x, int y, int width, int height) = 0;
     virtual void DrawOval(int x, int y, int width, int height) = 0;
     virtual void DrawArcSector(int x, int y, int width, int height, int start, int arc, bool isSector) = 0;
-    virtual void DrawPoly(bool isFilled, const Q3PointArray &points) = 0;
+    virtual void DrawPoly(bool isFilled, int nPoints, const int xArray[], const int yArray[]) = 0;
 };
 
 class MHTextDisplay {

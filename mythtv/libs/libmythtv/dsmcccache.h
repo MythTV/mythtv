@@ -19,6 +19,8 @@ class DSMCCCacheKey: public QByteArray
 {
   public:
     DSMCCCacheKey() {}
+    DSMCCCacheKey(const char * data, int size):
+        QByteArray(data, size) {}
     QString toString(void) const;
     // Operator used in < for DSMCCCacheReference
     friend bool operator < (const DSMCCCacheKey &key1,

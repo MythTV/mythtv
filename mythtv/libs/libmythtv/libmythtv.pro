@@ -3,7 +3,6 @@ include ( ../../settings.pro )
 
 QT += network xml sql
 using_dbox2:QT *= qt3support
-using_mheg:QT *= qt3support
 
 TEMPLATE = lib
 TARGET = mythtv-$$LIBVERSION

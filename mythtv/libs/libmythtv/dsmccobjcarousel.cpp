@@ -67,8 +67,7 @@ unsigned char *DSMCCCacheModuleData::AddModuleData(DsmccDb *ddb,
 
     if (m_blocks[ddb->block_number] == NULL)
     {   // We haven't seen this block before.
-        QByteArray *block = new QByteArray;
-        block->duplicate((char*) data, ddb->len);
+        QByteArray *block = new QByteArray((char*) data, ddb->len);
         // Add this to our set of blocks.
         m_blocks[ddb->block_number] = block;
         m_receivedData += ddb->len;

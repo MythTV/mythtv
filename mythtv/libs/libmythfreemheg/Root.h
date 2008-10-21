@@ -30,8 +30,6 @@ class MHLink;
 class MHIngredient;
 class MHEngine;
 
-#include <q3pointarray.h>
-
 enum EventType { EventIsAvailable = 1, EventContentAvailable, EventIsDeleted, EventIsRunning, EventIsStopped,
        EventUserInput, EventAnchorFired, EventTimerFired, EventAsyncStopped, EventInteractionCompleted,
        EventTokenMovedFrom, EventTokenMovedTo, EventStreamEvent, EventStreamPlaying, EventStreamStopped,
@@ -165,11 +163,13 @@ public:
     virtual void GetLineStyle(MHRoot */*pResult*/) { InvalidAction("GetLineStyle"); }
     virtual void GetLineColour(MHRoot */*pResult*/) { InvalidAction("GetLineColour"); }
     virtual void GetFillColour(MHRoot */*pResult*/) { InvalidAction("GetFillColour"); }
-    virtual void DrawArcSector(bool /*fIsSector*/, int /*x*/, int /*y*/, int /*width*/, int /*height*/, int /*start*/, int /*arc*/, MHEngine *) { InvalidAction("DrawArc/Sector"); }
+    virtual void DrawArcSector(bool /*fIsSector*/, int /*x*/, int /*y*/, int /*width*/, int /*height*/, int /*start*/,
+        int /*arc*/, MHEngine *) { InvalidAction("DrawArc/Sector"); }
     virtual void DrawLine(int /*x1*/, int /*y1*/, int /*x2*/, int /*y2*/, MHEngine *) { InvalidAction("DrawLine"); }
     virtual void DrawOval(int /*x1*/, int /*y1*/, int /*width*/, int /*height*/, MHEngine *) { InvalidAction("DrawOval"); }
     virtual void DrawRectangle(int /*x1*/, int /*y1*/, int /*x2*/, int /*y2*/, MHEngine *) { InvalidAction("DrawRectangle"); }
-    virtual void DrawPoly(bool /*fIsPolygon*/, const Q3PointArray &/*points*/, MHEngine *) { InvalidAction("DrawPoly(gon/line)"); }
+    virtual void DrawPoly(bool /*fIsPolygon*/, int /*nPoints*/, const int */*xArray*/, const int */*yArray*/, MHEngine *)
+         { InvalidAction("DrawPoly(gon/line)"); }
 
     // Actions on Video streams.
     virtual void ScaleVideo(int /*xScale*/, int /*yScale*/, MHEngine *) { InvalidAction("ScaleVideo"); }
