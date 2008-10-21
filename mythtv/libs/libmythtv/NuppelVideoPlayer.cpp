@@ -5779,7 +5779,10 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
     if (m_playbackinfo)
         m_playbackinfo->UpdateInUseMark();
 
-    if (honorCutList)   //Qt4 port: removed dm_iter == NULL &&
+    long long lastDecodedFrameNumber =
+        videoOutput->GetLastDecodedFrame()->frameNumber;
+
+    if ((lastDecodedFrameNumber == 0) && honorCutList)
         dm_iter = deleteMap.begin();
     
     if (!GetDecoder()->GetFrame(0))
@@ -5789,9 +5792,6 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
 
     if (honorCutList && (!deleteMap.isEmpty()))
     {
-        long long lastDecodedFrameNumber =
-            videoOutput->GetLastDecodedFrame()->frameNumber;
-
         if (totalFrames && lastDecodedFrameNumber >= totalFrames)
             return false;
 
