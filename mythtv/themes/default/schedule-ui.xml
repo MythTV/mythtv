@@ -121,7 +121,7 @@
             <area>20,51,760,305</area>
             <layout>vertical</layout>
             <spacing>4</spacing>
-            <buttonarea>0,0,760,280</buttonarea>
+            <buttonarea>0,0,760,265</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,760,25</area>
                 <state name="active">
