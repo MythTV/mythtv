@@ -293,7 +293,7 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
     else if (type == "spinbox")
         uitype = new MythUISpinBox(parent, name);
     else if (type == "checkbox")
-        uitype = new MythUICheckBox(parent, name, needInit);
+        uitype = new MythUICheckBox(parent, name);
     else if (type == "statetype")
         uitype = new MythUIStateType(parent, name);
     else if (type == "clock")

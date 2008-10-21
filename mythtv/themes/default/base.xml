@@ -162,13 +162,33 @@
     <!-- Base definition of checkbox -->
     <checkbox name="basecheckbox">
         <position>0,0</position>
-        <regular-background filename="checkbox_background_off.png" />
-        <selected-background filename="checkbox_background_selected.png" />
-        <inactive-background filename="checkbox_background_off.png" />
-        <check-empty filename="blank.png"/>
-        <check-half filename="checkbox_halfcheck.png"/>
-        <check-full filename="checkbox_fullcheck.png"/>
-        <margin>3</margin>
+        <statetype name="background">
+            <state name="active">
+                <imagetype name="background">
+                    <filename>checkbox_background_off.png</filename>
+                </imagetype>
+            </state>
+            <state name="selected">
+                <imagetype name="background">
+                    <filename>checkbox_background_selected.png</filename>
+                </imagetype>
+            </state>
+            <state name="disabled" />
+        </statetype>
+        <statetype name="checkstate">
+            <position>3,3</position>
+            <state type="off" />
+            <state type="half">
+                <imagetype name="background">
+                    <filename>checkbox_halfcheck.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="mark">
+                    <filename>schedule_record.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
     </checkbox>
 
     <!-- Base definition of a spinbox -->

@@ -1,27 +1,105 @@
 
-// MythUI headers
 #include "mythuicheckbox.h"
+
+// C/C++ headers
+#include <iostream>
+using namespace std;
+
+// Myth headers
+#include "mythverbose.h"
+
+// MythUI headers
 #include "mythmainwindow.h"
+#include "mythgesture.h"
 
-MythUICheckBox::MythUICheckBox(MythUIType *parent, const QString &name,
-                               bool doInit)
-            : MythUIButton(parent, name, doInit)
+MythUICheckBox::MythUICheckBox(MythUIType *parent, const QString &name)
+            : MythUIType(parent, name)
 {
+    m_currentCheckState = MythUIStateType::Off;
+    m_state = "active";
 
+
+    connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
+    connect(this, SIGNAL(LosingFocus()), this, SLOT(Deselect()));
+    connect(this, SIGNAL(Enabling()), this, SLOT(Enable()));
+    connect(this, SIGNAL(Disabling()), this, SLOT(Disable()));
+
+    SetCanTakeFocus(true);
 }
 
 MythUICheckBox::~MythUICheckBox()
 {
 }
 
+void MythUICheckBox::SetInitialStates()
+{
+    m_BackgroundState = dynamic_cast<MythUIStateType*>(GetChild("background"));
+    m_CheckState = dynamic_cast<MythUIStateType*>(GetChild("checkstate"));
+
+    if (!m_CheckState || !m_BackgroundState)
+        VERBOSE(VB_IMPORTANT, QString("Checkbox %1 is missing required "
+                                      "elements").arg(objectName()));
+
+    if (m_CheckState)
+        m_CheckState->DisplayState(m_currentCheckState);
+
+    if (m_BackgroundState)
+        m_BackgroundState->DisplayState(m_state);
+}
+
+
 void MythUICheckBox::toggleCheckState()
 {
-    if (m_CheckState != MythUIStateType::Full)
-        SetCheckState(MythUIStateType::Full);
+    if (m_currentCheckState != MythUIStateType::Full)
+        m_currentCheckState = MythUIStateType::Full;
     else
-        SetCheckState(MythUIStateType::Off);
+        m_currentCheckState = MythUIStateType::Off;
+
+    if (m_CheckState)
+        m_CheckState->DisplayState(m_currentCheckState);
 
     emit valueChanged();
+}
+
+void MythUICheckBox::SetCheckState(MythUIStateType::StateType state)
+{
+    m_currentCheckState = state;
+    m_CheckState->DisplayState(state);
+}
+
+MythUIStateType::StateType MythUICheckBox::GetCheckState()
+{
+    return m_currentCheckState;
+}
+
+void MythUICheckBox::Select()
+{
+    if (!IsEnabled())
+        return;
+
+    m_state = "selected";
+    m_BackgroundState->DisplayState(m_state);
+}
+
+void MythUICheckBox::Deselect()
+{
+    if (IsEnabled())
+        m_state = "active";
+    else
+        m_state = "disabled";
+    m_BackgroundState->DisplayState(m_state);
+}
+
+void MythUICheckBox::Enable()
+{
+    m_state = "active";
+    m_BackgroundState->DisplayState(m_state);
+}
+
+void MythUICheckBox::Disable()
+{
+    m_state = "disabled";
+    m_BackgroundState->DisplayState(m_state);
 }
 
 /** \brief Mouse click/movement handler, recieves mouse gesture events from the
@@ -34,7 +112,8 @@ void MythUICheckBox::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
 {
     if (event->gesture() == MythGestureEvent::Click)
     {
-        toggleCheckState();
+        if (IsEnabled())
+            toggleCheckState();
     }
 }
 
@@ -62,11 +141,6 @@ bool MythUICheckBox::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void MythUICheckBox::Finalize(void)
-{
-    EnableCheck(true);
-}
-
 void MythUICheckBox::CreateCopy(MythUIType *parent)
 {
     MythUICheckBox *checkbox = new MythUICheckBox(parent, objectName());
@@ -75,11 +149,32 @@ void MythUICheckBox::CreateCopy(MythUIType *parent)
 
 void MythUICheckBox::CopyFrom(MythUIType *base)
 {
-    MythUICheckBox *checkbox = dynamic_cast<MythUICheckBox *>(base);
-    if (!checkbox)
+    MythUICheckBox *button = dynamic_cast<MythUICheckBox *>(base);
+    if (!button)
+    {
+        VERBOSE(VB_IMPORTANT, "MythUICheckBox::CopyFrom: Dynamic cast of base "
+                              "failed");
         return;
+    }
 
-    MythUIButton::CopyFrom(base);
+    MythUIType::CopyFrom(base);
 
-    EnableCheck(true);
+    m_BackgroundState = dynamic_cast<MythUIStateType *>
+                    (GetChild("background"));
+    m_CheckState = dynamic_cast<MythUIStateType *>
+                    (GetChild("checkstate"));
+
+    if (!m_BackgroundState || !m_CheckState)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "MythUICheckBox::CopyFrom: Dynamic cast of a child failed");
+        return;
+    }
+
+    SetInitialStates();
+}
+
+void MythUICheckBox::Finalize()
+{
+    SetInitialStates();
 }
