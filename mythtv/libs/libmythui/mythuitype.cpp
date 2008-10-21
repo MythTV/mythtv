@@ -15,6 +15,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
     setObjectName(name);
 
     m_Visible = true;
+    m_Enabled = true;
     m_CanHaveFocus = m_HasFocus = false;
     m_Area = MythRect(0, 0, 0, 0);
     m_NeedsRedraw = false;
@@ -605,6 +606,7 @@ int MythUIType::NormY(const int y)
 void MythUIType::CopyFrom(MythUIType *base)
 {
     m_Visible = base->m_Visible;
+    m_Enabled = base->m_Enabled;
     m_CanHaveFocus = base->m_CanHaveFocus;
     m_focusOrder = base->m_focusOrder;
 
