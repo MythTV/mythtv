@@ -1178,6 +1178,21 @@ void MythUIButtonListItem::setImage(MythImage *image, const QString &name)
         m_parent->Update();
 }
 
+MythImage* MythUIButtonListItem::getImage(const QString &name)
+{
+    if (!name.isEmpty())
+    {
+        if (m_images.contains(name))
+            return m_images.value(name);
+    }
+    else
+    {
+        return m_image;
+    }
+
+    return NULL;
+}
+
 void MythUIButtonListItem::SetImage(const QString &filename, const QString &name)
 {
     if (!name.isEmpty())

@@ -45,6 +45,7 @@ class MythUIButtonListItem
     void SetFontState(const QString &state, const QString &name="");
 
     void setImage(MythImage *image, const QString &name="") __attribute__ ((deprecated));
+    MythImage *getImage(const QString &name="");
 
     void SetImage(const QString &filename, const QString &name="");
     const QString Image() const;
@@ -142,7 +143,9 @@ class MythUIButtonList : public MythUIType
 
     int GetCurrentPos() const { return m_selPosition; }
     int GetItemPos(MythUIButtonListItem* item) const;
+    int GetTopItemPos(void) const { return m_topPosition; }
     int GetCount() const;
+    uint GetVisibleCount() const { return m_itemsVisible; }
     bool IsEmpty() const;
 
     enum ScrollStyle  { ScrollFree, ScrollCenter };
