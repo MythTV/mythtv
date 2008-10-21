@@ -11,8 +11,7 @@
 #include "mythverbose.h"
 #include "mythuihelper.h"
 
-MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name,
-                               bool doInit)
+MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
            : MythUIType(parent, name)
 {
     m_Message = "";
@@ -100,10 +99,10 @@ bool MythUITextEdit::ParseElement(QDomElement &element)
 
 void MythUITextEdit::Finalize()
 {
-    SetInitalStates();
+    SetInitialStates();
 }
 
-void MythUITextEdit::SetInitalStates()
+void MythUITextEdit::SetInitialStates()
 {
     if (m_initialized)
         return;
@@ -371,11 +370,11 @@ void MythUITextEdit::CopyFrom(MythUIType *base)
 
     MythUIType::CopyFrom(base);
 
-    SetInitalStates();
+    SetInitialStates();
 }
 
 void MythUITextEdit::CreateCopy(MythUIType *parent)
 {
-    MythUITextEdit *textedit = new MythUITextEdit(parent, objectName(), false);
+    MythUITextEdit *textedit = new MythUITextEdit(parent, objectName());
     textedit->CopyFrom(this);
 }

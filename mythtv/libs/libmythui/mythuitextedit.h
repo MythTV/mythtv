@@ -30,7 +30,7 @@ class MythUITextEdit : public MythUIType, public StorageUser
     Q_OBJECT
 
   public:
-    MythUITextEdit(MythUIType *parent, const QString &name, bool doInit = true);
+    MythUITextEdit(MythUIType *parent, const QString &name);
    ~MythUITextEdit();
 
     virtual void Pulse(void);
@@ -63,7 +63,7 @@ class MythUITextEdit : public MythUIType, public StorageUser
     virtual void Finalize(void);
 
     void Init(void);
-    void SetInitalStates(void);
+    void SetInitialStates(void);
 
     bool InsertCharacter(const QString character);
     void RemoveCharacter(void);

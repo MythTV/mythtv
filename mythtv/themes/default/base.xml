@@ -149,14 +149,26 @@
     <!-- Base definition of a button -->
     <button name="basebutton">
         <position>0,0</position>
-        <activefont>basemedium</activefont>
-        <inactivefont>basemediumgrey</inactivefont>
-        <showarrow>no</showarrow>
-        <regular-background filename="button_background.png" />
-        <selected-background filename="button_selected_background.png" />
-        <inactive-background filename="button_background.png" />
-        <margin>5</margin>
-        <align>center</align>
+        <statetype name="background">
+            <state name="active">
+                <imagetype name="background">
+                    <filename>button_background.png</filename>
+                </imagetype>
+            </state>
+            <state name="selected">
+                <imagetype name="background">
+                    <filename>button_selected_background.png</filename>
+                </imagetype>
+            </state>
+            <state name="disabled" from="active" />
+        </statetype>
+        <textarea name="text">
+            <area>5,5,140,30</area>
+            <align>allcenter</align>
+            <font state="active">basemedium</font>
+            <font state="selected">basemedium</font>
+            <font state="disabled">basemediumgrey</font>
+        </textarea>
     </button>
 
     <!-- Base definition of checkbox -->

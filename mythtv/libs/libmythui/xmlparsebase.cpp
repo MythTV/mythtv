@@ -23,6 +23,7 @@
 #include "mythuigroup.h"
 #include "mythuiwebbrowser.h"
 #include "mythuibuttontree.h"
+#include "mythfontproperties.h"
 
 QString XMLParseBase::getFirstText(QDomElement &element)
 {
@@ -283,9 +284,9 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
     else if (type == "group")
         uitype = new MythUIGroup(parent, name);
     else if (type == "textedit")
-        uitype = new MythUITextEdit(parent, name, needInit);
+        uitype = new MythUITextEdit(parent, name);
     else if (type == "button")
-        uitype = new MythUIButton(parent, name, needInit);
+        uitype = new MythUIButton(parent, name);
     else if (type == "buttonlist2" || type == "buttonlist")
         uitype = new MythUIButtonList(parent, name);
     else if (type == "buttontree")
