@@ -39,6 +39,7 @@ MythScreenType::MythScreenType(MythUIType *parent, const QString &name,
 
 MythScreenType::~MythScreenType()
 {
+    m_CurrentFocusWidget = NULL;
     emit Exiting();
 }
 
