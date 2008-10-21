@@ -10,7 +10,7 @@ using namespace std;
 
 // Qt headers
 #include <qapplication.h>
-#include <q3socketdevice.h>
+#include <QUdpSocket>
 #include <qstring.h>
 #include <qfile.h>
 #include <qhostaddress.h>
@@ -18,6 +18,12 @@ using namespace std;
 // MythTV headers
 #include "exitcodes.h"
 #include "compat.h"
+
+#ifndef VERBOSE
+#define VB_IMPORTANT 0
+#define VERBOSE(LEVEL, MSG) \
+    do { cout << QString(MSG).toLocal8Bit().constData() << endl; } while (0)
+#endif
 
 const QString kalert =
 "<mythnotify version=\"1\">\n"
@@ -83,8 +89,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv, false);
 
-    QHostAddress address;
-    address.setAddress("255.255.255.255");
+    QHostAddress address = QHostAddress::Broadcast;
     unsigned short port = 6948;
 
     QString message = "";
@@ -198,22 +203,13 @@ int main(int argc, char *argv[])
         cout << "output:\n" << tmp_message.constData() << endl;
     }
 
-    Q3SocketDevice sock(Q3SocketDevice::Datagram);
-
-    int yes = 1;
-    if (setsockopt(sock.socket(), SOL_SOCKET, SO_BROADCAST, &yes, sizeof(int))
-        < 0)
-    {
-        perror("Set broadcast");
-        return TVOSD_EXIT_SOCKET_ERROR;
-    }
-
+    QUdpSocket *sock = new QUdpSocket();
     QByteArray utf8 = message.toUtf8();
     int size = utf8.length();
 
-    if (sock.writeBlock(utf8.constData(), size, address, port) < 0)
+    if (sock->writeDatagram(utf8.constData(), size, address, port) < 0)
     {
-        perror("sendto");
+        VERBOSE(VB_IMPORTANT, "Failed to send UDP/XML packet");
     }
     else
     {
@@ -221,6 +217,8 @@ int main(int argc, char *argv[])
              << address.toString().toLocal8Bit().constData()
              << " and port: " << port << endl;
     }
+
+    sock->deleteLater();
    
     return TVOSD_EXIT_OK;
 }

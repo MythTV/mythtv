@@ -1,6 +1,8 @@
 include ( ../../config.mak )
 include ( ../../settings.pro )
 
+QT += network
+
 TEMPLATE = app
 CONFIG += thread
 TARGET = mythtvosd
@@ -16,6 +18,3 @@ QMAKE_CLEAN += $(TARGET)
 SOURCES += main.cpp
 
 mingw: LIBS += -lpthread -lwinmm -lws2_32
-
-#The following line was inserted by qt3to4
-QT += network qt3support
