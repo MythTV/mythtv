@@ -1599,6 +1599,7 @@ case $targetos in
     ;;
   freebsd)
     append CCONFIG "freebsd"
+    disable ivtv
     disable need_memalign
     backend="yes"
     ;;
