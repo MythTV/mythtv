@@ -189,10 +189,7 @@ bool MythConfirmationDialog::keyPressEvent(QKeyEvent *event)
             handled = true;
 
             if (action == "ESCAPE")
-            {
                 sendResult(false);
-                handled = false;
-            }
             else
                 handled = false;
         }
