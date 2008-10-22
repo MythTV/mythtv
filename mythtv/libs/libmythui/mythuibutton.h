@@ -2,6 +2,7 @@
 #define MYTHUI_BUTTON_H_
 
 #include <QString>
+#include <QTimer>
 
 #include "mythuitype.h"
 #include "mythuistatetype.h"
@@ -30,29 +31,40 @@ class MythUIButton : public MythUIType
     virtual bool keyPressEvent(QKeyEvent *);
 
     void SetText(const QString &msg);
-    QString GetText() const { return m_Text->GetText(); }
+    QString GetText() const;
+
+    void Push(bool lock=false);
+
+    void SetLockable(bool lockable) { m_Lockable = lockable; };
 
   protected slots:
     void Select();
     void Deselect();
     void Enable();
     void Disable();
+    void UnPush();
 
   signals:
     void Clicked();
 
   protected:
-    virtual bool ParseElement(QDomElement &element);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
     virtual void Finalize(void);
 
     void SetInitialStates(void);
+    void SetState(QString state);
+
+    QString m_Message;
 
     MythUIStateType *m_BackgroundState;
     MythUIText *m_Text;
 
     QString m_state;
+
+    bool m_Pushed;
+    bool m_Lockable;
+    QTimer *m_clickTimer;
 };
 
 #endif

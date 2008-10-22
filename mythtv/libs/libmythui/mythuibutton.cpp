@@ -5,43 +5,55 @@
 #include <iostream>
 using namespace std;
 
+// QT
+#include <QTimer>
+
 // Myth headers
 #include "mythverbose.h"
 
 // MythUI headers
 #include "mythmainwindow.h"
+#include "mythuigroup.h"
 
 MythUIButton::MythUIButton(MythUIType *parent, const QString &name)
             : MythUIType(parent, name)
 {
-    m_state = "active";
+    m_clickTimer = new QTimer();
+    m_clickTimer->setSingleShot(true);
 
-    connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
-    connect(this, SIGNAL(LosingFocus()), this, SLOT(Deselect()));
-    connect(this, SIGNAL(Enabling()), this, SLOT(Enable()));
-    connect(this, SIGNAL(Disabling()), this, SLOT(Disable()));
+    m_Pushed = false;
+
+    m_Text = NULL;
+    m_BackgroundState = NULL;
+
+    connect(m_clickTimer, SIGNAL(timeout()), SLOT(UnPush()));
+
+    connect(this, SIGNAL(TakingFocus()), SLOT(Select()));
+    connect(this, SIGNAL(LosingFocus()), SLOT(Deselect()));
+    connect(this, SIGNAL(Enabling()), SLOT(Enable()));
+    connect(this, SIGNAL(Disabling()), SLOT(Disable()));
 
     SetCanTakeFocus(true);
 }
 
 MythUIButton::~MythUIButton()
 {
+    if (m_clickTimer)
+        delete m_clickTimer;
 }
 
 void MythUIButton::SetInitialStates()
 {
-    m_Text = dynamic_cast<MythUIText*>(GetChild("text"));
-    m_BackgroundState = dynamic_cast<MythUIStateType*>(GetChild("background"));
+    m_BackgroundState = dynamic_cast<MythUIStateType*>(GetChild("buttonstate"));
 
-    if (!m_Text || !m_BackgroundState)
+    if (!m_BackgroundState)
         VERBOSE(VB_IMPORTANT, QString("Button %1 is missing required "
                                       "elements").arg(objectName()));
 
-    if (m_BackgroundState)
-        m_BackgroundState->DisplayState(m_state);
+    SetState("active");
 
     if (m_Text)
-        m_Text->SetFontState(m_state);
+        m_Message = m_Text->GetDefaultText();
 }
 
 void MythUIButton::Reset()
@@ -54,46 +66,52 @@ void MythUIButton::Select()
     if (!IsEnabled())
         return;
 
-    m_state = "selected";
-    m_BackgroundState->DisplayState(m_state);
-    m_Text->SetFontState(m_state);
+    SetState("selected");
 }
 
 void MythUIButton::Deselect()
 {
     if (IsEnabled())
-        m_state = "active";
+        SetState("active");
     else
-        m_state = "disabled";
-    m_BackgroundState->DisplayState(m_state);
-    m_Text->SetFontState(m_state);
+        SetState("disabled");
 }
 
 void MythUIButton::Enable()
 {
-    m_state = "active";
-    m_BackgroundState->DisplayState(m_state);
-    m_Text->SetFontState(m_state);
+    SetState("active");
 }
 
 void MythUIButton::Disable()
 {
-    m_state = "disabled";
-    m_BackgroundState->DisplayState(m_state);
-    m_Text->SetFontState(m_state);
+    SetState("disabled");
 }
 
-bool MythUIButton::ParseElement(QDomElement &element)
+void MythUIButton::SetState(QString state)
 {
-    if (element.tagName() == "value")
-    {
-        QString msg = getFirstText(element);
-        m_Text->SetText(msg);
-    }
-    else
-        return MythUIType::ParseElement(element);
+    if (m_state == state)
+        return;
 
-    return true;
+    if (m_Pushed && state != "pushed")
+        UnPush();
+
+    m_state = state;
+
+    if (!m_BackgroundState)
+        return;
+
+    m_BackgroundState->DisplayState(m_state);
+
+    MythUIGroup *activeState = dynamic_cast<MythUIGroup*>
+                                    (m_BackgroundState->GetCurrentState());
+    if (activeState)
+        m_Text = dynamic_cast<MythUIText*>(activeState->GetChild("text"));
+
+    if (m_Text)
+    {
+        m_Text->SetFontState(m_state);
+        m_Text->SetText(m_Message);
+    }
 }
 
 bool MythUIButton::keyPressEvent(QKeyEvent *e)
@@ -108,7 +126,15 @@ bool MythUIButton::keyPressEvent(QKeyEvent *e)
         handled = true;
 
         if (action == "SELECT")
-            emit Clicked();
+        {
+            if (!IsEnabled())
+                return false;
+
+            if (m_Pushed)
+                UnPush();
+            else
+                Push();
+        }
         else
             handled = false;
     }
@@ -126,15 +152,68 @@ void MythUIButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
 {
     if (event->gesture() == MythGestureEvent::Click)
     {
-        if (IsEnabled())
-            emit Clicked();
+        if (!IsEnabled())
+            return;
+
+        if (m_Pushed)
+            UnPush();
+        else
+            Push();
     }
+}
+
+void MythUIButton::Push(bool lock)
+{
+    m_Pushed = true;
+    SetState("pushed");
+    if (!lock && !m_Lockable)
+        m_clickTimer->start(500);
+    emit Clicked();
+}
+
+void MythUIButton::UnPush()
+{
+    if (!m_Pushed)
+        return;
+
+    m_clickTimer->stop();
+
+    m_Pushed = false;
+
+    if (m_HasFocus)
+        SetState("selected");
+    else if (m_Enabled)
+        SetState("active");
+    else
+        SetState("disabled");
 }
 
 void MythUIButton::SetText(const QString &msg)
 {
-    m_Text->SetText(msg);
+    if (m_Message == msg)
+        return;
+
+    m_Message = msg;
+
+    MythUIGroup *activeState = dynamic_cast<MythUIGroup*>
+                                    (m_BackgroundState->GetCurrentState());
+    if (activeState)
+        m_Text = dynamic_cast<MythUIText*>(activeState->GetChild("text"));
+
+    if (m_Text)
+        m_Text->SetText(msg);
 }
+
+QString MythUIButton::GetText() const
+{
+    QString text;
+
+    if (m_Text)
+        text = m_Text->GetText();
+
+    return m_Message;
+}
+
 
 void MythUIButton::CreateCopy(MythUIType *parent)
 {
@@ -151,6 +230,8 @@ void MythUIButton::CopyFrom(MythUIType *base)
                         "MythUIButton::CopyFrom: Dynamic cast of base failed");
         return;
     }
+
+    m_Message = button->m_Message;
 
     MythUIType::CopyFrom(base);
 
