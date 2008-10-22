@@ -1,11 +1,9 @@
 #ifndef CUSTOMPRIORITY_H_
 #define CUSTOMPRIORITY_H_
 
-#include "NuppelVideoPlayer.h"
+#include "programinfo.h"
 
 #include "mythscreentype.h"
-
-class ProgramInfo;
 
 class MythUITextEdit;
 class MythUIButton;

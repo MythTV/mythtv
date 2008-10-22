@@ -5,11 +5,12 @@ using namespace std;
 #include "custompriority.h"
 
 #include "mythcontext.h"
-#include "programinfo.h"
-#include "scheduledrecording.h"
-#include "viewschdiff.h"
 #include "mythdb.h"
 #include "mythverbose.h"
+
+#include "scheduledrecording.h"
+#include "viewschdiff.h"
+#include "channelutil.h"
 
 #include "mythuibuttonlist.h"
 #include "mythuispinbox.h"
