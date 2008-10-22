@@ -1346,6 +1346,8 @@ MythSocket *MythContext::ConnectServer(MythSocket *eventSock,
                             manageLock = true;
                         d->serverSockLock.unlock();
                     }
+                  // HACK. TODO: Remove when all old-style widgets are gone
+                  if (d->mainWindow->currentWidget())
                     MythPopupBox::showOkPopup(d->mainWindow,
                                               "connection failure",
                                               tr("Could not connect to the "
@@ -1353,6 +1355,11 @@ MythSocket *MythContext::ConnectServer(MythSocket *eventSock,
                                                  "it running?  Is the IP "
                                                  "address set for it in the "
                                                  "setup program correct?"));
+                  else
+                    ShowOkPopup(tr("Could not connect to the master"
+                                   " backend server -- is it running?"
+                                   "  Is the IP address set for it in the "
+                                   "setup program correct?"));
                     if (manageLock)
                         d->serverSockLock.lock();
                 }
@@ -1768,8 +1775,14 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
             VERBOSE(VB_IMPORTANT,
                     QString("Reconnection to backend server failed"));
             if (d->m_ui && d->m_ui->IsScreenSetup())
+              // HACK. TODO: Remove when all old-style widgets are gone
+              if (d->mainWindow->currentWidget())
                 MythPopupBox::showOkPopup(d->mainWindow, "connection failure",
                              tr("The connection to the master backend "
+                                "server has gone away for some reason.. "
+                                "Is it running?"));
+              else
+                ShowOkPopup(tr("The connection to the master backend "
                                 "server has gone away for some reason.. "
                                 "Is it running?"));
 
