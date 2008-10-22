@@ -1,41 +1,40 @@
 #ifndef NEWSENGINE_H
 #define NEWSENGINE_H
 
+#include <vector>
+using namespace std;
+
 // QT headers
 #include <QString>
-#include <Q3PtrList>
 #include <QObject>
 #include <QDateTime>
+#include <QDomDocument>
 
 class Q3UrlOperator;
 class Q3NetworkOperation;
 class NewsSite;
-class QDomDocument;
 
 class NewsArticle
 {
-public:
+  public:
+    typedef vector<NewsArticle> List;
 
-    typedef Q3PtrList<NewsArticle> List;
+    NewsArticle(const QString &title,
+                const QString &desc, const QString &artURL,
+                const QString &thumbnail, const QString &mediaURL,
+                const QString &enclosure);
+    NewsArticle(const QString &title);
 
-    NewsArticle(NewsSite *parent, const QString& title,
-                const QString& desc, const QString& artURL,
-                const QString& thumbnail, const QString& mediaURL,
-                const QString& enclosure);
-    ~NewsArticle();
+    QString title(void)       const { return m_title;      }
+    QString description(void) const { return m_desc;       }
+    QString articleURL(void)  const { return m_articleURL; }
+    QString thumbnail(void)   const { return m_thumbnail;  }
+    QString mediaURL(void)    const { return m_mediaURL;   }
+    QString enclosure(void)   const { return m_enclosure;  }
 
-    const QString& title() const { return m_title; }
-    const QString& description() const { return m_desc; }
-    const QString& articleURL() const { return m_articleURL; }
-    const QString& thumbnail() const { return m_thumbnail; }
-    const QString& mediaURL() const { return m_mediaURL; }
-    const QString& enclosure() const { return m_enclosure; }
-
-private:
-
+  private:
     QString   m_title;
     QString   m_desc;
-    NewsSite *m_parent;
     QString   m_articleURL;
     QString   m_thumbnail;
     QString   m_mediaURL;
@@ -58,34 +57,46 @@ public:
         Success
     };
 
-    typedef Q3PtrList<NewsSite> List;
+    class List : public vector<NewsSite*>
+    {
+      public:
+        void clear(void)
+        {
+            while (size())
+            {
+                NewsSite *tmp = back();
+                pop_back();
+                tmp->deleteLater();
+            }
+        }
+    };
 
-    NewsSite(const QString& name, const QString& url,
-             const QDateTime& updated, const bool& podcast);
-    ~NewsSite();
+    NewsSite(const QString &name, const QString &url,
+             const QDateTime &updated, const bool &podcast);
 
-    const QString&   url()  const;
-    const QString&   name() const;
-    QString          description() const;
-    const QDateTime& lastUpdated() const;
-    const QString&   imageURL() const;
-    const bool&      podcast() const;
-    unsigned int timeSinceLastUpdate() const; // in minutes
+    QString   url(void)  const;
+    QString   name(void) const;
+    QString   description(void) const;
+    QDateTime lastUpdated(void) const;
+    QString   imageURL(void) const;
+    bool      podcast(void) const;
+    unsigned int timeSinceLastUpdate(void) const; // in minutes
 
-    void insertNewsArticle(NewsArticle* item);
-    void clearNewsArticles();
-    NewsArticle::List& articleList();
+    void insertNewsArticle(const NewsArticle &item);
+    void clearNewsArticles(void);
+    NewsArticle::List &articleList(void);
 
-    void retrieve();
-    void stop();
-    void process();
+    void retrieve(void);
+    void stop(void);
+    void process(void);
     void parseRSS(QDomDocument domDoc);
     void parseAtom(QDomDocument domDoc);
 
-    bool     successful() const;
-    QString  errorMsg() const;
+    bool     successful(void) const;
+    QString  errorMsg(void) const;
 
 private:
+    ~NewsSite();
 
     QString    m_name;
     QString    m_url;
@@ -110,7 +121,7 @@ signals:
 private slots:
 
     void slotFinished(Q3NetworkOperation*);
-    void slotGotData(const QByteArray& data,
+    void slotGotData(const QByteArray &data,
                      Q3NetworkOperation* op);
 };
 
@@ -118,7 +129,7 @@ class NewsSiteItem
 {
 public:
 
-    typedef Q3PtrList<NewsSiteItem> List;
+    typedef vector<NewsSiteItem> List;
 
     QString name;
     QString category;
@@ -131,27 +142,13 @@ public:
 
 class NewsCategory
 {
-public:
-
-    typedef Q3PtrList<NewsCategory> List;
+  public:
+    typedef vector<NewsCategory> List;
 
     QString             name;
     NewsSiteItem::List  siteList;
 
-    NewsCategory()
-    {
-        siteList.setAutoDelete(true);
-    }
-
-    ~NewsCategory()
-    {
-        siteList.clear();
-    }
-
-    void clear()
-    {
-        siteList.clear();
-    };
+    void clear(void) { siteList.clear(); }
 };
 
 #endif /* NEWSENGINE_H */

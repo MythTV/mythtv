@@ -1,6 +1,5 @@
 // QT Headers
 #include <QApplication>
-#include <Q3PtrList>
 #include <QString>
 #include <QFile>
 
@@ -20,21 +19,9 @@ using namespace std;
 
 class MythNewsConfigPriv
 {
-public:
-
+  public:
     NewsCategory::List categoryList;
     QStringList selectedSitesList;
-
-    MythNewsConfigPriv()
-    {
-        categoryList.setAutoDelete(true);
-    }
-
-    ~MythNewsConfigPriv()
-    {
-        categoryList.clear();
-    }
-
 };
 
 // ---------------------------------------------------
@@ -99,10 +86,10 @@ void MythNewsConfig::populateSites()
     {
         catNode = catList.item(i);
 
-        NewsCategory *cat = new NewsCategory();
-        cat->name = catNode.toElement().attribute("name");
+        NewsCategory cat;
+        cat.name = catNode.toElement().attribute("name");
 
-        m_priv->categoryList.append(cat);
+        m_priv->categoryList.push_back(cat);
 
         QDomNodeList siteList = catNode.childNodes();
 
@@ -110,19 +97,19 @@ void MythNewsConfig::populateSites()
         {
             siteNode = siteList.item(j);
 
-            NewsSiteItem *site = new NewsSiteItem();
-            site->name =
+            NewsSiteItem site = NewsSiteItem();
+            site.name =
                 siteNode.namedItem(QString("title")).toElement().text();
-            site->category =
-                cat->name;
-            site->url =
+            site.category =
+                cat.name;
+            site.url =
                 siteNode.namedItem(QString("url")).toElement().text();
-            site->ico =
+            site.ico =
                 siteNode.namedItem(QString("ico")).toElement().text();
 
-            site->inDB = findInDB(site->name);
+            site.inDB = findInDB(site.name);
 
-            cat->siteList.append(site);
+            cat.siteList.push_back(site);
         }
 
     }
@@ -184,18 +171,16 @@ bool MythNewsConfig::Create()
 
 void MythNewsConfig::loadData()
 {
-
-    for (NewsCategory* cat = m_priv->categoryList.first();
-         cat; cat = m_priv->categoryList.next() )
+    NewsCategory::List::iterator it = m_priv->categoryList.begin();
+    for (; it != m_priv->categoryList.end(); ++it)
     {
-        MythUIButtonListItem* item =
-            new MythUIButtonListItem(m_categoriesList, cat->name);
-        item->setData(cat);
-        if (cat->siteList.count() > 0)
+        MythUIButtonListItem *item =
+            new MythUIButtonListItem(m_categoriesList, (*it).name);
+        item->setData(&(*it));
+        if (!(*it).siteList.empty())
             item->setDrawArrow(true);
     }
     slotCategoryChanged(m_categoriesList->GetItemFirst());
-
 }
 
 void MythNewsConfig::toggleItem(MythUIButtonListItem *item)
@@ -203,7 +188,7 @@ void MythNewsConfig::toggleItem(MythUIButtonListItem *item)
     if (!item || !item->getData())
         return;
 
-    NewsSiteItem* site = (NewsSiteItem*) item->getData();
+    NewsSiteItem *site = (NewsSiteItem*) item->getData();
 
     bool checked = (item->state() == MythUIButtonListItem::FullChecked);
 
@@ -232,20 +217,19 @@ void MythNewsConfig::slotCategoryChanged(MythUIButtonListItem *item)
 
     m_siteList->Reset();
 
-    NewsCategory* cat = (NewsCategory*) item->getData();
-    if (cat)
-    {
+    NewsCategory *cat = (NewsCategory*) item->getData();
+    if (!cat)
+        return;
 
-        for (NewsSiteItem* site = cat->siteList.first();
-             site; site = cat->siteList.next() )
-        {
-            MythUIButtonListItem* newitem =
-                new MythUIButtonListItem(m_siteList, site->name, 0, true,
-                                      site->inDB ?
-                                      MythUIButtonListItem::FullChecked :
-                                      MythUIButtonListItem::NotChecked);
-            newitem->setData(site);
-        }
+    NewsSiteItem::List::iterator it = cat->siteList.begin();
+    for (; it != cat->siteList.end(); ++it)
+    {
+        MythUIButtonListItem *newitem =
+            new MythUIButtonListItem(m_siteList, (*it).name, 0, true,
+                                     (*it).inDB ?
+                                     MythUIButtonListItem::FullChecked :
+                                     MythUIButtonListItem::NotChecked);
+        newitem->setData(&(*it));
     }
 }
 

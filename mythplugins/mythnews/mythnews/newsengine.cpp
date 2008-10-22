@@ -1,15 +1,14 @@
-// C/C++ headers
-#include <iostream>
+// C headers
+#include <cstdlib>
 
-extern "C" {
-#include <stdlib.h>
-}
+// C++ headers
+#include <iostream>
+using namespace std;
 
 // QT headers
 #include <QFile>
 #include <QDataStream>
-#include <QDomAttr>
-#include <Q3UrlOperator>
+#include <q3urloperator.h>
 #include <q3network.h>
 
 // Myth headers
@@ -19,32 +18,33 @@ extern "C" {
 // MythNews headers
 #include "newsengine.h"
 
-using namespace std;
-
-NewsArticle::NewsArticle(NewsSite *parent, const QString& title,
-                         const QString& desc, const QString& articleURL,
-                         const QString& thumbnail, const QString& mediaURL,
-                         const QString& enclosure)
+NewsArticle::NewsArticle(const QString &title,
+                         const QString &desc, const QString &articleURL,
+                         const QString &thumbnail, const QString &mediaURL,
+                         const QString &enclosure) :
+    m_title(title),
+    m_desc(desc),
+    m_articleURL(articleURL),
+    m_thumbnail(thumbnail),
+    m_mediaURL(mediaURL),
+    m_enclosure(enclosure)
 {
-    parent->insertNewsArticle(this);
-    m_title  = title;
-    m_desc   = desc;
-    m_parent = parent;
-    m_articleURL = articleURL;
-    m_thumbnail = thumbnail;
-    m_mediaURL = mediaURL;
-    m_enclosure = enclosure;
 }
 
-NewsArticle::~NewsArticle()
+NewsArticle::NewsArticle(const QString &title) :
+    m_title(title),
+    m_desc(QString::null),
+    m_articleURL(QString::null),
+    m_thumbnail(QString::null),
+    m_mediaURL(QString::null),
+    m_enclosure(QString::null)
 {
-
 }
 
-NewsSite::NewsSite(const QString& name,
-                   const QString& url,
-                   const QDateTime& updated,
-                   const bool& podcast)
+NewsSite::NewsSite(const QString &name,
+                   const QString &url,
+                   const QDateTime &updated,
+                   const bool &podcast)
     : QObject()
 {
     m_url     = url;
@@ -56,11 +56,9 @@ NewsSite::NewsSite(const QString& name,
     m_destDir  = GetConfDir();
     m_destDir += "/MythNews";
 
-    m_articleList.setAutoDelete(true);
     m_articleList.clear();
 
     m_data.resize(0);
-    q3InitNetworkProtocols();
     m_urlOp = new Q3UrlOperator(m_url);
 
     connect(m_urlOp, SIGNAL(data(const QByteArray&, Q3NetworkOperation*)),
@@ -77,60 +75,60 @@ NewsSite::~NewsSite()
     m_articleList.clear();
 }
 
-void NewsSite::insertNewsArticle(NewsArticle* item)
+void NewsSite::insertNewsArticle(const NewsArticle &item)
 {
-    m_articleList.append(item);
+    m_articleList.push_back(item);
 }
 
-void NewsSite::clearNewsArticles()
+void NewsSite::clearNewsArticles(void)
 {
     m_articleList.clear();
 }
 
-const QString& NewsSite::url() const
+QString NewsSite::url(void) const
 {
     return m_url;
 }
 
-const QString& NewsSite::name() const
+QString NewsSite::name(void) const
 {
     return m_name;
 }
 
-const bool& NewsSite::podcast() const
+bool NewsSite::podcast(void) const
 {
     return m_podcast;
 }
 
-QString NewsSite::description() const
+QString NewsSite::description(void) const
 {
     QString desc(m_desc+"\n"+m_errorString);
     return desc;
 }
 
-const QString& NewsSite::imageURL() const
+QString NewsSite::imageURL(void) const
 {
     return m_imageURL;
 }
 
-const QDateTime& NewsSite::lastUpdated() const
+QDateTime NewsSite::lastUpdated(void) const
 {
     return m_updated;
 }
 
-unsigned int NewsSite::timeSinceLastUpdate() const
+unsigned int NewsSite::timeSinceLastUpdate(void) const
 {
     QDateTime curTime(QDateTime::currentDateTime());
     unsigned int min = m_updated.secsTo(curTime)/60;
     return min;
 }
 
-NewsArticle::List& NewsSite::articleList()
+NewsArticle::List &NewsSite::articleList(void)
 {
     return m_articleList;
 }
 
-void NewsSite::retrieve()
+void NewsSite::retrieve(void)
 {
     stop();
 
@@ -140,17 +138,17 @@ void NewsSite::retrieve()
     m_urlOp->get(m_url);
 }
 
-void NewsSite::stop()
+void NewsSite::stop(void)
 {
     m_urlOp->stop();
 }
 
-bool NewsSite::successful() const
+bool NewsSite::successful(void) const
 {
     return (m_state == NewsSite::Success);
 }
 
-QString NewsSite::errorMsg() const
+QString NewsSite::errorMsg(void) const
 {
     return m_errorString;
 }
@@ -164,7 +162,7 @@ void NewsSite::slotFinished(Q3NetworkOperation* op)
         QFile xmlFile(m_destDir+QString("/")+m_name);
         if (xmlFile.open( QIODevice::WriteOnly )) {
             QDataStream stream( &xmlFile );
-            stream.writeRawBytes(m_data.data(), m_data.size());
+            stream.writeRawData(m_data.constData(), m_data.size());
             xmlFile.close();
             m_updated = QDateTime::currentDateTime();
             m_state = NewsSite::Success;
@@ -183,7 +181,7 @@ void NewsSite::slotFinished(Q3NetworkOperation* op)
     emit finished(this);
 }
 
-void NewsSite::process()
+void NewsSite::process(void)
 {
     m_articleList.clear();
 
@@ -195,21 +193,25 @@ void NewsSite::process()
     QDomDocument domDoc;
 
     QFile xmlFile(m_destDir+QString("/")+m_name);
-    if (!xmlFile.exists()) {
-        new NewsArticle(this, tr("Failed to retrieve news"), "", "", "", "", "");
+    if (!xmlFile.exists())
+    {
+        insertNewsArticle(NewsArticle(tr("Failed to retrieve news")));
         m_errorString += tr("No Cached News");
         return;
     }
 
-    if (!xmlFile.open(QIODevice::ReadOnly)) {
-        new NewsArticle(this, tr("Failed to retrieve news"), "", "", "", "", "");
+    if (!xmlFile.open(QIODevice::ReadOnly))
+    {
+        insertNewsArticle(NewsArticle(tr("Failed to retrieve news")));
         VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: failed to open xmlfile");
         return;
     }
 
-    if (!domDoc.setContent(&xmlFile)) {
-        new NewsArticle(this, tr("Failed to retrieve news"), "", "", "", "", "");
-        VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: failed to set content from xmlfile");
+    if (!domDoc.setContent(&xmlFile))
+    {
+        insertNewsArticle(NewsArticle(tr("Failed to retrieve news")));
+        VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: "
+                "failed to set content from xmlfile");
         m_errorString += tr("Failed to read downloaded file");
         return;
     }
@@ -243,26 +245,26 @@ void NewsSite::parseRSS(QDomDocument domDoc)
 {
     QDomNode channelNode = domDoc.documentElement().namedItem(QString::fromLatin1("channel"));
 
-    m_desc = channelNode.namedItem(QString::fromLatin1("description")).toElement().text().simplifyWhiteSpace();
+    m_desc = channelNode.namedItem(QString::fromLatin1("description")).toElement().text().simplified();
 
     QDomNode imageNode = channelNode.namedItem(QString::fromLatin1("image"));
     if (!imageNode.isNull())
-        m_imageURL = imageNode.namedItem(QString::fromLatin1("url")).toElement().text().simplifyWhiteSpace();
+        m_imageURL = imageNode.namedItem(QString::fromLatin1("url")).toElement().text().simplified();
 
     QDomNodeList items = domDoc.elementsByTagName(QString::fromLatin1("item"));
 
     QDomNode itemNode;
     QString title, description, url, thumbnail, mediaurl, enclosure, imageURL, enclosure_type;
-    for (unsigned int i = 0; i < items.count(); i++) {
+    for (unsigned int i = 0; i < (unsigned) items.count(); i++) {
         itemNode = items.item(i);
-        title    = itemNode.namedItem(QString::fromLatin1("title")).toElement().text().simplifyWhiteSpace();
+        title    = itemNode.namedItem(QString::fromLatin1("title")).toElement().text().simplified();
         if (!title.isNull())
             ReplaceHtmlChar(title);
 
         QDomNode descNode = itemNode.namedItem(QString::fromLatin1("description"));
         if (!descNode.isNull())
         {
-            description = descNode.toElement().text().simplifyWhiteSpace();
+            description = descNode.toElement().text().simplified();
             ReplaceHtmlChar(description);
         }
         else
@@ -270,7 +272,7 @@ void NewsSite::parseRSS(QDomDocument domDoc)
 
         QDomNode linkNode = itemNode.namedItem(QString::fromLatin1("link"));
         if (!linkNode.isNull())
-            url = linkNode.toElement().text().simplifyWhiteSpace();
+            url = linkNode.toElement().text().simplified();
         else
             url = QString::null;
 
@@ -320,7 +322,7 @@ void NewsSite::parseRSS(QDomDocument domDoc)
         // If present, the media:description superscedes the RSS description
         descNode = itemNode.namedItem(QString::fromLatin1("media:description"));
         if (!descNode.isNull())
-            description = descNode.toElement().text().simplifyWhiteSpace();
+            description = descNode.toElement().text().simplified();
 
         if (enclosure.isEmpty())
         {
@@ -359,7 +361,8 @@ void NewsSite::parseRSS(QDomDocument domDoc)
                 */
             }
         }
-        new NewsArticle(this, title, description, url, thumbnail, mediaurl, enclosure);
+        insertNewsArticle(NewsArticle(title, description, url,
+                                      thumbnail, mediaurl, enclosure));
     }
 }
 
@@ -369,16 +372,16 @@ void NewsSite::parseAtom(QDomDocument domDoc)
 
     QDomNode itemNode;
     QString title, description, url, thumbnail, mediaurl, enclosure, imageURL, enclosure_type;
-    for (unsigned int i = 0; i < entries.count(); i++) {
+    for (unsigned int i = 0; i < (unsigned) entries.count(); i++) {
         itemNode = entries.item(i);
-        title    = itemNode.namedItem(QString::fromLatin1("title")).toElement().text().simplifyWhiteSpace();
+        title    = itemNode.namedItem(QString::fromLatin1("title")).toElement().text().simplified();
         if (!title.isNull())
             ReplaceHtmlChar(title);
 
         QDomNode summNode = itemNode.namedItem(QString::fromLatin1("summary"));
         if (!summNode.isNull())
         {
-            description = summNode.toElement().text().simplifyWhiteSpace();
+            description = summNode.toElement().text().simplified();
             ReplaceHtmlChar(description);
         }
         else
@@ -393,11 +396,13 @@ void NewsSite::parseAtom(QDomDocument domDoc)
         else
             url = QString::null;
 
-        new NewsArticle(this, title, description, url, QString::null, QString::null, QString::null);
+        insertNewsArticle(NewsArticle(title, description, url,
+                                      QString::null, QString::null,
+                                      QString::null));
     }
 }
 
-void NewsSite::slotGotData(const QByteArray& data,
+void NewsSite::slotGotData(const QByteArray &data,
                            Q3NetworkOperation* op)
 {
     if (op)

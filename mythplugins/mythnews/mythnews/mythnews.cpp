@@ -5,7 +5,6 @@
 
 // QT headers
 #include <QApplication>
-#include <q3network.h>
 #include <QDateTime>
 #include <QDir>
 #include <QTimer>
@@ -71,9 +70,9 @@ MythNews::MythNews(MythScreenStack *parent, QString name)
             this, SLOT(slotRetrieveNews()));
     m_UpdateFreq = gContext->GetNumSetting("NewsUpdateFrequency", 30);
 
-    m_NewsSites.setAutoDelete(true);
-
-    m_RetrieveTimer->start(m_TimerTimeout, false);
+    m_RetrieveTimer->stop();
+    m_RetrieveTimer->setSingleShot(false);
+    m_RetrieveTimer->start(m_TimerTimeout);
 }
 
 MythNews::~MythNews()
@@ -139,42 +138,43 @@ void MythNews::loadSites(void)
     m_sitesList->Reset();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT name, url, ico, updated, podcast"
-               " FROM newssites ORDER BY name");
+    query.prepare(
+        "SELECT name, url, ico, updated, podcast "
+        "FROM newssites "
+        "ORDER BY name");
 
-    if (!query.isActive()) {
+    if (!query.exec())
+    {
         VERBOSE(VB_IMPORTANT, "MythNews: Error in loading Sites from DB");
     }
-    else {
-        QString name;
-        QString url;
-        QString icon;
-        QDateTime time;
-        bool podcast;
-        while ( query.next() ) {
-            name = query.value(0).toString();
-            url  = query.value(1).toString();
-            icon = query.value(2).toString();
-            time.setTime_t(query.value(3).toUInt());
-            podcast = query.value(4).toInt();
-            m_NewsSites.append(new NewsSite(name,url,time,podcast));
+    else
+    {
+        while (query.next())
+        {
+            QString name = query.value(0).toString();
+            QString url  = query.value(1).toString();
+            QString icon = query.value(2).toString();
+            QDateTime time; time.setTime_t(query.value(3).toUInt());
+            bool podcast = query.value(4).toInt();
+            m_NewsSites.push_back(new NewsSite(name, url, time, podcast));
         }
     }
 
-    for (NewsSite *site = m_NewsSites.first(); site; site = m_NewsSites.next())
+    NewsSite::List::iterator it = m_NewsSites.begin();
+    for (; it != m_NewsSites.end(); ++it)
     {
-        MythUIButtonListItem* item =
-            new MythUIButtonListItem(m_sitesList, site->name());
-        item->setData(site);
+        MythUIButtonListItem *item =
+            new MythUIButtonListItem(m_sitesList, (*it)->name());
+        item->setData(*it);
 
-        connect(site, SIGNAL(finished(NewsSite*)),
+        connect(*it, SIGNAL(finished(NewsSite*)),
                 this, SLOT(slotNewsRetrieved(NewsSite*)));
     }
 
     slotRetrieveNews();
 }
 
-void MythNews::updateInfoView(MythUIButtonListItem* selected)
+void MythNews::updateInfoView(MythUIButtonListItem *selected)
 {
     if (!selected)
         return;
@@ -209,7 +209,7 @@ void MythNews::updateInfoView(MythUIButtonListItem* selected)
             {
                 QString artText = article->description();
                 // Replace paragraph and break HTML with newlines
-                if( artText.find(QRegExp("</(p|P)>")) )
+                if( artText.indexOf(QRegExp("</(p|P)>")) )
                 {
                     artText.replace( QRegExp("<(p|P)>"), "");
                     artText.replace( QRegExp("</(p|P)>"), "\n\n");
@@ -233,7 +233,7 @@ void MythNews::updateInfoView(MythUIButtonListItem* selected)
                 QRegExp removeHTML(QRegExp("</?.+>"));
                 removeHTML.setMinimal(true);
                 artText.remove((const QRegExp&) removeHTML);
-                artText = artText.stripWhiteSpace();
+                artText = artText.trimmed();
                 m_descText->SetText(artText);
             }
 
@@ -253,7 +253,9 @@ void MythNews::updateInfoView(MythUIButtonListItem* selected)
 
                 QString url = article->thumbnail();
                 QString sFilename = QString("%1/%2")
-                        .arg(fileprefix).arg(qChecksum(url,url.length()));
+                    .arg(fileprefix)
+                    .arg(qChecksum(url.toLocal8Bit().constData(),
+                                   url.toLocal8Bit().size()));
 
                 bool exists = QFile::exists(sFilename);
                 if (!exists)
@@ -486,23 +488,26 @@ bool MythNews::keyPressEvent(QKeyEvent *event)
 
 void MythNews::slotRetrieveNews()
 {
-    if (m_NewsSites.count() == 0)
+    if (m_NewsSites.empty())
         return;
 
     m_RetrieveTimer->stop();
 
-    for (NewsSite* site = m_NewsSites.first(); site; site = m_NewsSites.next())
+    NewsSite::List::iterator it = m_NewsSites.begin();
+    for (; it != m_NewsSites.end(); ++it)
     {
-        if (site->timeSinceLastUpdate() > m_UpdateFreq)
-            site->retrieve();
+        if ((*it)->timeSinceLastUpdate() > m_UpdateFreq)
+            (*it)->retrieve();
         else
-            processAndShowNews(site);
+            processAndShowNews(*it);
     }
 
-    m_RetrieveTimer->start(m_TimerTimeout, false);
+    m_RetrieveTimer->stop();
+    m_RetrieveTimer->setSingleShot(false);
+    m_RetrieveTimer->start(m_TimerTimeout);
 }
 
-void MythNews::slotNewsRetrieved(NewsSite* site)
+void MythNews::slotNewsRetrieved(NewsSite *site)
 {
     unsigned int updated = site->lastUpdated().toTime_t();
 
@@ -519,14 +524,15 @@ void MythNews::slotNewsRetrieved(NewsSite* site)
 
 void MythNews::cancelRetrieve()
 {
-    for (NewsSite* site = m_NewsSites.first(); site;
-         site = m_NewsSites.next()) {
-        site->stop();
-        processAndShowNews(site);
+    NewsSite::List::iterator it = m_NewsSites.begin();
+    for (; it != m_NewsSites.end(); ++it)
+    {
+        (*it)->stop();
+        processAndShowNews(*it);
     }
 }
 
-void MythNews::processAndShowNews(NewsSite* site)
+void MythNews::processAndShowNews(NewsSite *site)
 {
     if (!site)
         return;
@@ -537,16 +543,17 @@ void MythNews::processAndShowNews(NewsSite* site)
     if (!siteUIItem || !siteUIItem->getData())
         return;
 
-    if (site == (NewsSite*) siteUIItem->getData()) {
+    if (site != (NewsSite*) siteUIItem->getData())
+        return;
 
-        m_articlesList->Reset();
+    m_articlesList->Reset();
 
-        for (NewsArticle* article = site->articleList().first(); article;
-             article = site->articleList().next()) {
-            MythUIButtonListItem* item =
-                new MythUIButtonListItem(m_articlesList, article->title());
-            item->setData(article);
-        }
+    NewsArticle::List::iterator it = site->articleList().begin();
+    for (; it != site->articleList().end(); ++it)
+    {
+        MythUIButtonListItem *item =
+            new MythUIButtonListItem(m_articlesList, (*it).title());
+        item->setData(&(*it));
     }
 }
 
@@ -559,11 +566,12 @@ void MythNews::slotSiteSelected(MythUIButtonListItem *item)
 
     m_articlesList->Reset();
 
-    for (NewsArticle* article = site->articleList().first(); article;
-         article = site->articleList().next()) {
-        MythUIButtonListItem* articleitem =
-            new MythUIButtonListItem(m_articlesList, article->title());
-        articleitem->setData(article);
+    NewsArticle::List::iterator it = site->articleList().begin();
+    for (; it != site->articleList().end(); ++it)
+    {
+        MythUIButtonListItem *item =
+            new MythUIButtonListItem(m_articlesList, (*it).title());
+        item->setData(&(*it));
     }
 
     updateInfoView(item);
@@ -603,10 +611,10 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
     while (1)
     {
         QUrl qurl(cmdURL);
-        if (hostname == "")
+        if (hostname.isEmpty())
             hostname = qurl.host();  // hold onto original host
 
-        if (!qurl.hasHost())        // can occur on redirects to partial paths
+        if (qurl.host().isEmpty()) // can occur on redirects to partial paths
             qurl.setHost(hostname);
 
         if (httpGrabber != NULL)
@@ -700,17 +708,17 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
                         // to download a video.  At this time, this requires
                         // the video_id and the t argument
                         // from the source HTML of the page
-                        int playerPos = mediaPage.find("swfArgs") + 7;
+                        int playerPos = mediaPage.indexOf("swfArgs") + 7;
 
-                        int tArgStart = mediaPage.find("\"t\": \"",
+                        int tArgStart = mediaPage.indexOf("\"t\": \"",
                                                        playerPos) + 6;
-                        int tArgEnd = mediaPage.find("\"", tArgStart);
+                        int tArgEnd = mediaPage.indexOf("\"", tArgStart);
                         QString tArgString = mediaPage.mid(tArgStart,
                                                            tArgEnd - tArgStart);
 
-                        int vidStart = mediaPage.find("\"video_id\": \"",
+                        int vidStart = mediaPage.indexOf("\"video_id\": \"",
                                                       playerPos) + 13;
-                        int vidEnd = mediaPage.find("\"", vidStart);
+                        int vidEnd = mediaPage.indexOf("\"", vidStart);
                         QString vidString = mediaPage.mid(vidStart,
                                                           vidEnd - vidStart);
 
@@ -825,7 +833,7 @@ void MythNews::playVideo(const QString &filename)
 
     gContext->sendPlaybackStart();
 
-    if ((command_string.find("Internal", 0, false) > -1) ||
+    if ((command_string.indexOf("Internal", 0, Qt::CaseInsensitive) > -1) ||
         (command_string.length() < 1))
     {
         command_string = "Internal";
@@ -834,7 +842,7 @@ void MythNews::playVideo(const QString &filename)
     else
     {
         if (command_string.contains("%s"))
-            command_string = command_string.replace(QRegExp("%s"), filename);
+            command_string = command_string.replace("%s", filename);
 
         myth_system(command_string);
     }

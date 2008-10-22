@@ -15,5 +15,3 @@ trans.files += mythnews_cs.qm
 INSTALLS += trans
 
 SOURCES += dummy.c
-#The following line was inserted by qt3to4
-QT += xml  qt3support 
