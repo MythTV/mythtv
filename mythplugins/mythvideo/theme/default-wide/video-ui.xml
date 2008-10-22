@@ -509,7 +509,7 @@
             <align>hcenter,vcenter</align>
         </textarea>
 
-       <!-- <textarea name="breadcrumbs" from="basetextarea">
+        <!-- <textarea name="breadcrumbs" from="basetextarea">
             <area>500,20,280,30</area>
             <font>basemedium</font>
             <align>right,vcenter</align>
@@ -547,7 +547,7 @@
 
     <window name="tree">
 
-       <textarea name="breadcrumbs" from="basetextarea">
+        <textarea name="breadcrumbs" from="basetextarea">
             <area>50,20,700,40</area>
             <font>basemedium</font>
         </textarea>
@@ -761,9 +761,24 @@
 
         <button name="coverart_button">
             <area>310,385,32,32</area>
-            <regular-background filename="blankbutton_off.png" />
-            <selected-background filename="blankbutton_on.png" />
-            <showarrow>no</showarrow>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_pushed.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
         </button>
 
         <textarea name="coverart_text" from="basetextarea">
@@ -782,7 +797,7 @@
     </window>
 
     <!-- TODO - Incomplete, replace with a global file selection dialog in
-                mythdialogbox.cpp and base.xml -->
+         mythdialogbox.cpp and base.xml -->
     <window name="file_chooser">
 
         <imagetype name="file_browser_background">

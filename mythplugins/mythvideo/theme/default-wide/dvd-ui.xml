@@ -20,7 +20,7 @@
         <!--
             Context 1 & 2
             Warnings or Status Messages
-        -->
+            -->
 
         <textarea name="warning" from="basetextarea">
             <multiline>yes</multiline>
@@ -31,7 +31,7 @@
         <!--
             Context 3
             Browse active jobs
-        -->
+            -->
 
         <textarea name="overall_text" from="basetextarea">
             <area>50,150,700,30</area>
@@ -58,17 +58,47 @@
         </progressbar>
 
         <button name="next">
-            <position>485,435</position>
-            <regular-background filename="right_arrow.png" />
-            <selected-background filename="right_arrow_selected.png.png" />
-            <showarrow>no</showarrow>
+            <area>485,435,37,64</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>right_arrow.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>right_arrow_selected.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>right_arrow_pushed.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
         </button>
 
         <button name="prev">
-            <position>255,435</position>
-            <regular-background filename="left_arrow.png" />
-            <selected-background filename="left_arrow_selected.png" />
-            <showarrow>no</showarrow>
+            <area>255,435,37,64</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>left_arrow.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>left_arrow_selected.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>left_arrow_pushed.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
         </button>
 
         <button name="ripscreen" from="basebutton">
@@ -172,9 +202,24 @@
 
         <button name="view">
             <area>330,435,32,32</area>
-            <regular-background filename="blankbutton_off.png" />
-            <selected-background filename="blankbutton_on.png" />
-            <showarrow>no</showarrow>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_pushed.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
         </button>
 
         <textarea name="numb_titles" from="basetextarea">
