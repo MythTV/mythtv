@@ -30,7 +30,7 @@
  *  \param parent Pointer to the screen stack
  *  \param name The name of the window
  */
-MythNews::MythNews(MythScreenStack *parent, const char *name)
+MythNews::MythNews(MythScreenStack *parent, QString name)
     : MythScreenType (parent, name)
 {
     // Setup cache directory
@@ -441,7 +441,7 @@ QString MythNews::formatSize(long long bytes, int prec)
 
 bool MythNews::keyPressEvent(QKeyEvent *event)
 {
-    if (GetFocusWidget()->keyPressEvent(event))
+    if (GetFocusWidget() && GetFocusWidget()->keyPressEvent(event))
         return true;
 
     bool handled = false;

@@ -25,11 +25,13 @@ public:
     NewsCategory::List categoryList;
     QStringList selectedSitesList;
 
-    MythNewsConfigPriv() {
+    MythNewsConfigPriv()
+    {
         categoryList.setAutoDelete(true);
     }
 
-    ~MythNewsConfigPriv() {
+    ~MythNewsConfigPriv()
+    {
         categoryList.clear();
     }
 
@@ -51,7 +53,8 @@ MythNewsConfig::~MythNewsConfig()
 {
     delete m_priv;
 
-//     if (m_SpinBox) {
+//     if (m_SpinBox)
+//     {
 //         gContext->SaveSetting("NewsUpdateFrequency",
 //                               m_SpinBox->value());
 //     }
@@ -63,7 +66,8 @@ void MythNewsConfig::populateSites()
                        + "mythnews/news-sites.xml";
     QFile xmlFile(filename);
 
-    if (!xmlFile.exists() || !xmlFile.open(QIODevice::ReadOnly)) {
+    if (!xmlFile.exists() || !xmlFile.open(QIODevice::ReadOnly))
+    {
         VERBOSE(VB_IMPORTANT, "MythNews: Cannot open news-sites.xml");
         return;
     }
@@ -91,7 +95,8 @@ void MythNewsConfig::populateSites()
 
     QDomNode catNode;
     QDomNode siteNode;
-    for (int i = 0; i < catList.count(); i++) {
+    for (int i = 0; i < catList.count(); i++)
+    {
         catNode = catList.item(i);
 
         NewsCategory *cat = new NewsCategory();
@@ -101,7 +106,8 @@ void MythNewsConfig::populateSites()
 
         QDomNodeList siteList = catNode.childNodes();
 
-        for (int j = 0; j < siteList.count(); j++) {
+        for (int j = 0; j < siteList.count(); j++)
+        {
             siteNode = siteList.item(j);
 
             NewsSiteItem *site = new NewsSiteItem();
@@ -163,7 +169,8 @@ bool MythNewsConfig::Create()
 
     loadData();
 
-//    if (m_helpText) {
+//    if (m_helpText)
+//    {
 //        m_helpText->SetText(tr("Set update frequency by using the up/down arrows."
 //                          "Minimum value is 30 Minutes."));
 //    }
@@ -179,10 +186,13 @@ void MythNewsConfig::loadData()
 {
 
     for (NewsCategory* cat = m_priv->categoryList.first();
-         cat; cat = m_priv->categoryList.next() ) {
+         cat; cat = m_priv->categoryList.next() )
+    {
         MythUIButtonListItem* item =
             new MythUIButtonListItem(m_categoriesList, cat->name);
         item->setData(cat);
+        if (cat->siteList.count() > 0)
+            item->setDrawArrow(true);
     }
     slotCategoryChanged(m_categoriesList->GetItemFirst());
 
@@ -197,14 +207,16 @@ void MythNewsConfig::toggleItem(MythUIButtonListItem *item)
 
     bool checked = (item->state() == MythUIButtonListItem::FullChecked);
 
-    if (!checked) {
+    if (!checked)
+    {
         if (insertInDB(site))
         {
             site->inDB = true;
             item->setChecked(MythUIButtonListItem::FullChecked);
         }
     }
-    else {
+    else
+    {
         if (removeFromDB(site))
         {
             site->inDB = false;
@@ -221,10 +233,12 @@ void MythNewsConfig::slotCategoryChanged(MythUIButtonListItem *item)
     m_siteList->Reset();
 
     NewsCategory* cat = (NewsCategory*) item->getData();
-    if (cat) {
+    if (cat)
+    {
 
         for (NewsSiteItem* site = cat->siteList.first();
-             site; site = cat->siteList.next() ) {
+             site; site = cat->siteList.next() )
+        {
             MythUIButtonListItem* newitem =
                 new MythUIButtonListItem(m_siteList, site->name, 0, true,
                                       site->inDB ?

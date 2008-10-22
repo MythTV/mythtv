@@ -26,7 +26,7 @@ class MythNews : public MythScreenType
 
   public:
 
-    MythNews(MythScreenStack *parent, const char *name);
+    MythNews(MythScreenStack *parent, QString name);
     ~MythNews();
 
     bool Create(void);

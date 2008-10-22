@@ -138,15 +138,18 @@ public:
     QString             name;
     NewsSiteItem::List  siteList;
 
-    NewsCategory() {
+    NewsCategory()
+    {
         siteList.setAutoDelete(true);
     }
 
-    ~NewsCategory() {
+    ~NewsCategory()
+    {
         siteList.clear();
     }
 
-    void clear() {
+    void clear()
+    {
         siteList.clear();
     };
 };

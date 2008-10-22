@@ -4,12 +4,12 @@
     <window name="news">
 
         <buttonlist name="siteslist" from="basebuttonlist">
-            <area>20,20,200,300</area>
+            <area>20,20,200,290</area>
             <showarrow>yes</showarrow>
         </buttonlist>
 
         <buttonlist name="articleslist" from="basebuttonlist">
-            <area>250,20,530,300</area>
+            <area>250,20,530,290</area>
             <showarrow>no</showarrow>
         </buttonlist>
 
@@ -115,11 +115,11 @@
 
         <buttonlist name="category" from="basebuttonlist">
             <area>20,40,300,500</area>
+            <showarrow>yes</showarrow>
         </buttonlist>
 
         <buttonlist name="sites" from="basebuttonlist">
             <area>340,40,440,500</area>
-            <showarrow>no</showarrow>
         </buttonlist>
 
         <textarea name="context_switch" from="basetextarea">
