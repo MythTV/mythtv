@@ -1395,7 +1395,7 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
     grouptrigger->setLabel(QObject::tr("Current Video Playback Profile"));
     QStringList::const_iterator it;
     for (it = profiles.begin(); it != profiles.end(); it++)
-        grouptrigger->addSelection(QObject::tr(*it), *it);
+        grouptrigger->addSelection(ProgramInfo::i18n(*it), *it);
 
     HorizontalConfigurationGroup *grp =
         new HorizontalConfigurationGroup(false, false, true, true);

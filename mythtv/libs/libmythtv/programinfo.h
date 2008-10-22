@@ -326,6 +326,9 @@ class MPUBLIC ProgramInfo
     static QString GetRecGroupPassword(QString group);
     void   UpdateRecGroup(void);
 
+    // Translations for play,recording, & storage groups + 
+    static QString i18n(const QString&);
+
   private:
     // GUI helper functions
     bool IsFindApplicable(void) const;

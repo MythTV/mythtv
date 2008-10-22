@@ -270,7 +270,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       arrowAccel(true),                 ignoreKeyPressEvents(false),
       listOrder(1),                     listsize(0),
       // Recording Group settings
-      groupDisplayName(tr("All Programs")),
+      groupDisplayName(ProgramInfo::i18n("All Programs")),
       recGroup("All Programs"),
       recGroupPassword(""),             curGroupPassword(""),
       watchGroupName(" " + tr("Watch List")),
@@ -369,19 +369,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     recGroupType.clear();
     recGroupType[recGroup] = (displayCat) ? "category" : "recgroup";
     if (groupnameAsAllProg)
-    {
-        if (recGroup == "All Programs")
-            groupDisplayName = tr("All Programs",
-                                  "Recording Group All Programs");
-        else if (recGroup == "Default")
-            groupDisplayName = tr("Default", "Recording Group Default");
-        else if (recGroup == "LiveTV")
-            groupDisplayName = tr("LiveTV", "Recording Group LiveTV");
-        else if (recGroup == "Deleted")
-            groupDisplayName = tr("Deleted", "Recording Group Deleted");
-        else
-            groupDisplayName = recGroup;
-    }
+        groupDisplayName = ProgramInfo::i18n(recGroup);
 
     if (!m_player)
         recGroupPassword = getRecGroupPassword(recGroup);
@@ -830,7 +818,7 @@ void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr,
            countInGroup = progLists[""].count();
            infoMap["title"] = groupDisplayName;
            infoMap["group"] = groupDisplayName;
-           infoMap["show"] = QObject::tr("All Programs");
+           infoMap["show"] = ProgramInfo::i18n("All Programs");
         }
         else
         {
@@ -5203,8 +5191,9 @@ void PlaybackBox::showRecGroupChooser(void)
 
     // Create and add the "All Programs" entry
     itemStr = (totalItems == 1) ? tr("item") : tr("items");
-    recGroupListBox->insertItem(QString("%1 [%2 %3]").arg(tr("All Programs"))
-                                        .arg(totalItems).arg(itemStr));
+    recGroupListBox->insertItem(QString("%1 [%2 %3]")
+                                .arg(ProgramInfo::i18n("All Programs"))
+                                .arg(totalItems).arg(itemStr));
     recGroupType["All Programs"] = "recgroup";
 
     // Add the group entries
@@ -5270,16 +5259,7 @@ void PlaybackBox::showRecGroupChooser(void)
     recGroupListBox->setFocus();
 
     // figure out what our recGroup is called in the recGroupPopup
-    if (recGroup == "All Programs")
-        dispGroup = tr("All Programs");
-    else if (recGroup == "Default")
-        dispGroup = tr("Default");
-    else if (recGroup == "LiveTV")
-        dispGroup = tr("LiveTV");
-    else if (recGroup == "Deleted")
-        dispGroup = tr("Deleted");
-    else
-        dispGroup = recGroup;
+    dispGroup = ProgramInfo::i18n(recGroup);
 
     // select the recGroup in the dialog
     int index = recGroupListBox->index(recGroupListBox->findItems(dispGroup));
@@ -5346,13 +5326,13 @@ void PlaybackBox::setGroupFilter(QString newRecGroup)
     else
         return;
 
-    if (recGroup == tr("Default"))
+    if (recGroup == ProgramInfo::i18n("Default"))
         recGroup = "Default";
-    else if (recGroup == tr("All Programs"))
+    else if (recGroup == ProgramInfo::i18n("All Programs"))
         recGroup = "All Programs";
-    else if (recGroup == tr("LiveTV"))
+    else if (recGroup == ProgramInfo::i18n("LiveTV"))
         recGroup = "LiveTV";
-    else if (recGroup == tr("Deleted"))
+    else if (recGroup == ProgramInfo::i18n("Deleted"))
         recGroup = "Deleted";
 
     recGroupPassword = getRecGroupPassword(recGroup);
@@ -5380,19 +5360,7 @@ void PlaybackBox::setGroupFilter(QString newRecGroup)
         curGroupPassword = "";
 
     if (groupnameAsAllProg)
-    {
-        if (recGroup == "All Programs")
-            groupDisplayName = tr("All Programs",
-                                  "Recording Group All Programs");
-        else if (recGroup == "Default")
-            groupDisplayName = tr("Default", "Recording Group Default");
-        else if (recGroup == "LiveTV")
-            groupDisplayName = tr("LiveTV", "Recording Group LiveTV");
-        else if (recGroup == "Deleted")
-            groupDisplayName = tr("Deleted", "Recording Group Deleted");
-        else
-            groupDisplayName = recGroup;
-    }
+        groupDisplayName = ProgramInfo::i18n(recGroup);
 
     // Don't save anything if we forced a new group
     if (newRecGroup != "")
@@ -5766,19 +5734,7 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
     label->setPalette(p);
     grid->addWidget(label, 0, 0, Qt::AlignLeft);
 
-    QString gdn;
-    if (recGroup == "All Programs")
-        gdn = tr("All Programs",
-                              "Recording Group All Programs");
-    else if (recGroup == "Default")
-        gdn = tr("Default", "Recording Group Default");
-    else if (recGroup == "LiveTV")
-        gdn = tr("LiveTV", "Recording Group LiveTV");
-    else if (recGroup == "Deleted")
-        gdn = tr("Deleted", "Recording Group Deleted");
-    else
-        gdn = recGroup;
-
+    QString gdn = ProgramInfo::i18n(recGroup);
     label = new QLabel(gdn, recGroupPopup);
 
     label->setAlignment(Qt::AlignLeft);

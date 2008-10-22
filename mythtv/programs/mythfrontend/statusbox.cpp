@@ -7,10 +7,6 @@
 using namespace std;
 
 #include <QLayout>
-#include <q3iconview.h>
-#include <q3widgetstack.h>
-#include <q3vbox.h>
-#include <q3grid.h>
 #include <QRegExp>
 #include <QHostAddress>
 #include <QKeyEvent>
@@ -1669,11 +1665,7 @@ void StatusBox::doAutoExpireList()
         pginfo = *it;
         contentLine = pginfo->recstartts.toString(dateFormat) + " - ";
 
-        if ((pginfo->recgroup == "LiveTV") ||
-            (pginfo->recgroup == "Deleted"))
-            contentLine += "(" + tr(pginfo->recgroup) + ") ";
-        else
-            contentLine += "(" + pginfo->recgroup + ") ";
+        contentLine += "(" + ProgramInfo::i18n(pginfo->recgroup) + ") ";
 
         contentLine += pginfo->title +
                        " (" + sm_str(pginfo->filesize / 1024) + ")";
@@ -1684,11 +1676,7 @@ void StatusBox::doAutoExpireList()
 
         detailInfo += " (" + sm_str(pginfo->filesize / 1024) + ")";
 
-        if ((pginfo->recgroup == "LiveTV") ||
-            (pginfo->recgroup == "Deleted"))
-            detailInfo += " (" + tr(pginfo->recgroup) + ")";
-        else
-            detailInfo += " (" + pginfo->recgroup + ")";
+        detailInfo += "(" + ProgramInfo::i18n(pginfo->recgroup) + ") ";
 
         detailInfo += "\n" + pginfo->title;
 

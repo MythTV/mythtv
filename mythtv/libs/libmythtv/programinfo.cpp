@@ -150,9 +150,6 @@ ProgramInfo::ProgramInfo(void) :
     inUseForWhat = "";
 
     record = NULL;
-
-    if (init_tr() <= 0)
-        VERBOSE(VB_IMPORTANT, LOC + "Failed to init i18n");
 }
 
 /** \fn ProgramInfo::ProgramInfo(const ProgramInfo &other)
@@ -4101,12 +4098,12 @@ void ProgramInfo::showDetails(void) const
             if (!rec_prof.isEmpty())
             {
                 ADD_PAR(QObject::tr("Recording Profile"),
-                        pi_i18n(rec_prof), msg);
+                        i18n(rec_prof), msg);
             }
         }
-        ADD_PAR(QObject::tr("Recording Group"), pi_i18n(recgroup),     msg);
-        ADD_PAR(QObject::tr("Storage Group"),   pi_i18n(storagegroup), msg);
-        ADD_PAR(QObject::tr("Playback Group"),  pi_i18n(playgroup),    msg);
+        ADD_PAR(QObject::tr("Recording Group"), i18n(recgroup),     msg);
+        ADD_PAR(QObject::tr("Storage Group"),   i18n(storagegroup), msg);
+        ADD_PAR(QObject::tr("Playback Group"),  i18n(playgroup),    msg);
     }
     else if (recordid)
     {
@@ -5283,13 +5280,14 @@ static int init_tr(void)
         return 1;
 
     QString rec_profile_names =
-        QObject::tr("Default",        "Recording Profile Name") +
-        QObject::tr("High Quality",   "Recording Profile Name") +
-        QObject::tr("Live TV",        "Recording Profile Name") +
-        QObject::tr("Low Quality",    "Recording Profile Name") +
-        QObject::tr("Medium Quality", "Recording Profile Name") +
-        QObject::tr("MPEG2",          "Recording Profile Name") +
-        QObject::tr("RTjpeg/MPEG4",   "Recording Profile Name");
+        QObject::tr("Default",        "Recording Profile Default") +
+        QObject::tr("High Quality",   "Recording Profile High Quality") +
+        QObject::tr("Live TV",        "Recording Profile Live TV") +
+        QObject::tr("Low Quality",    "Recording Profile Low Quality") +
+        QObject::tr("Medium Quality", "Recording Profile Medium Quality") +
+        QObject::tr("MPEG2",          "Recording Profile MPEG2") +
+        QObject::tr("RTjpeg/MPEG4",   "Recording Profile RTjpeg/MPEG4");
+
 
     QString rec_profile_groups =
         QObject::tr("CRC IP Recorders",
@@ -5319,24 +5317,32 @@ static int init_tr(void)
         QObject::tr("USB Mpeg-4 Encoder (Plextor ConvertX, etc)",
                     "Recording Profile Group Name");
 
+    QString display_rec_groups =
+        QObject::tr("All Programs",   "Recording Group All Programs") +
+        QObject::tr("LiveTV",         "Recording Group LiveTV") +
+        QObject::tr("Default",        "Recording Group Default") +
+        QObject::tr("Deleted",        "Recording Group Deleted");
+
     QString storage_groups =
-        QObject::tr("Default",   "Storage Group Name") +
-        QObject::tr("LiveTV",    "Storage Group Name") +
-        QObject::tr("Thumbnails","Storage Group Name") +
-        QObject::tr("DB Backups","Storage Group Name");
+        QObject::tr("Default",        "Storage Group Name") +
+        QObject::tr("LiveTV",         "Storage Group Name") +
+        QObject::tr("Thumbnails",     "Storage Group Name") +
+        QObject::tr("DB Backups",     "Storage Group Name");
 
     QString play_groups =
-        QObject::tr("Default",   "Playback Group Name");
+        QObject::tr("Default",        "Playback Group Name");
 
     done = true;
     return (rec_profile_names.length() +
             rec_profile_groups.length() +
+            display_rec_groups.length() +
             storage_groups.length() +
             play_groups.length());
 }
 
-static QString pi_i18n(const QString &msg)
+QString ProgramInfo::i18n(const QString &msg)
 {
+    init_tr();
     QByteArray msg_arr = msg.toLatin1();
     QString msg_i18n = QObject::tr(msg_arr.constData());
     QByteArray msg_i18n_arr = msg_i18n.toLatin1();

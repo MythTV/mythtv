@@ -440,7 +440,6 @@ QString NetworkControl::processKey(QStringList tokens)
         {
             QKeySequence a(tokens[curToken]);
             int keyCode = a[0];
-            int ch = tokens[curToken][tokenLen - 1].toAscii();
             Qt::KeyboardModifiers modifiers = Qt::NoModifier;
 
             if (tokenLen > 1)
@@ -470,11 +469,11 @@ QString NetworkControl::processKey(QStringList tokens)
 
             GetMythUI()->ResetScreensaver();
 
-            event = new QKeyEvent(QEvent::KeyPress, keyCode, ch, modifiers,
+            event = new QKeyEvent(QEvent::KeyPress, keyCode, modifiers,
                                   tokens[curToken]);
             QApplication::postEvent(keyDest, event);
 
-            event = new QKeyEvent(QEvent::KeyRelease, keyCode, ch, modifiers,
+            event = new QKeyEvent(QEvent::KeyRelease, keyCode, modifiers,
                                   tokens[curToken]);
             QApplication::postEvent(keyDest, event);
         }

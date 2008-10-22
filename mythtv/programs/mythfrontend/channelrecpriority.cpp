@@ -311,7 +311,7 @@ void ChannelRecPriority::updateList()
     MythUIButtonListItem *item;
     for (it = m_sortedChannel.begin(); it != m_sortedChannel.end(); ++it)
     {
-        ChannelInfo *chanInfo = it.data();
+        ChannelInfo *chanInfo = *it;
 
         item = new MythUIButtonListItem(m_channelList, "",
                                                     qVariantFromValue(chanInfo));
@@ -405,7 +405,7 @@ void ChannelRecPriority::SortList()
         // find recPriorityInfo[i] in m_sortedChannel
         for (j = 0, pit = m_channelData.begin(); j !=recPriorityInfo->cnt; j++, ++pit);
 
-        m_sortedChannel[QString::number(999-i)] = &pit.data();
+        m_sortedChannel[QString::number(999-i)] = &(*pit);
     }
 
     updateList();
