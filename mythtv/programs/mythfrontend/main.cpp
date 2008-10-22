@@ -243,8 +243,14 @@ void startChannelRecPriorities(void)
 
 void startCustomPriority(void)
 {
-    CustomPriority custom(gContext->GetMainWindow(), "custom priority");
-    custom.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    CustomPriority *custom = new CustomPriority(mainStack);
+
+    if (custom->Create())
+        mainStack->AddScreen(custom);
+    else
+        delete custom;
 }
 
 void startPlaybackWithGroup(QString recGroup = "")

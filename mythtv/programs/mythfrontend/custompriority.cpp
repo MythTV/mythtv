@@ -2,26 +2,9 @@
 #include <iostream>
 using namespace std;
 
-#include <QLayout>
-#include <QPushButton>
-#include <q3buttongroup.h>
-#include <QLabel>
-#include <QCursor>
-#include <q3listview.h>
-#include <QDateTime>
-#include <QApplication>
-#include <QImage>
-#include <QPainter>
-#include <q3header.h>
-#include <q3hbox.h>
-#include <Q3HBoxLayout>
-#include <Q3VBoxLayout>
-#include <QSqlError>
-
 #include "custompriority.h"
 
 #include "mythcontext.h"
-#include "dialogbox.h"
 #include "programinfo.h"
 #include "proglist.h"
 #include "scheduledrecording.h"
@@ -30,350 +13,279 @@ using namespace std;
 #include "mythdb.h"
 #include "mythverbose.h"
 
-CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
-                       ProgramInfo *pginfo)
-              : MythDialog(parent, name)
-{
-    ProgramInfo *p = new ProgramInfo();
+#include "mythuibuttonlist.h"
+#include "mythuispinbox.h"
+#include "mythuitextedit.h"
+#include "mythuibutton.h"
+#include "mythdialogbox.h"
 
-    if (pginfo)
+CustomPriority::CustomPriority(MythScreenStack *parent, ProgramInfo *proginfo)
+              : MythScreenType(parent, "CustomPriority")
+{
+    if (proginfo)
+        m_pginfo = new ProgramInfo(*proginfo);
+    else
+        m_pginfo = new ProgramInfo();
+
+    gContext->addListener(this);
+}
+
+CustomPriority::~CustomPriority(void)
+{
+    if (m_pginfo)
+        delete m_pginfo;
+
+    gContext->removeListener(this);
+}
+
+bool CustomPriority::Create()
+{
+    if (!LoadWindowFromXML("schedule-ui.xml", "custompriority", this))
+        return false;
+
+    m_ruleList = dynamic_cast<MythUIButtonList *>(GetChild("rules"));
+    m_clauseList = dynamic_cast<MythUIButtonList *>(GetChild("clauses"));
+
+    m_prioritySpin = dynamic_cast<MythUISpinBox *>(GetChild("priority"));
+
+    m_titleEdit = dynamic_cast<MythUITextEdit *>(GetChild("title"));
+    m_descriptionEdit = dynamic_cast<MythUITextEdit *>(GetChild("description"));
+
+    m_addButton = dynamic_cast<MythUIButton *>(GetChild("add"));
+    m_installButton = dynamic_cast<MythUIButton *>(GetChild("install"));
+    m_testButton = dynamic_cast<MythUIButton *>(GetChild("test"));
+    m_deleteButton = dynamic_cast<MythUIButton *>(GetChild("delete"));
+    m_cancelButton = dynamic_cast<MythUIButton *>(GetChild("cancel"));
+
+    if (!m_ruleList || !m_clauseList || !m_prioritySpin || !m_titleEdit ||
+        !m_descriptionEdit || !m_addButton || !m_installButton ||
+        !m_testButton || !m_deleteButton || !m_cancelButton)
     {
-        delete p;
-        p = pginfo;
+        VERBOSE(VB_IMPORTANT, "CustomPriority, theme is missing "
+                              "required elements");
+        return false;
     }
 
-    QString baseTitle = p->title;
+    connect(m_ruleList, SIGNAL(itemSelected(MythUIButtonListItem *)),
+                SLOT(ruleChanged(MythUIButtonListItem *)));
+
+    connect(m_titleEdit, SIGNAL(valueChanged()), SLOT(textChanged()));
+    connect(m_descriptionEdit, SIGNAL(valueChanged()), SLOT(textChanged()));
+
+    connect(m_addButton, SIGNAL(Clicked()), SLOT(addClicked()));
+    connect(m_testButton, SIGNAL(Clicked()), SLOT(testClicked()));
+    connect(m_installButton, SIGNAL(Clicked()), SLOT(installClicked()));
+    connect(m_deleteButton, SIGNAL(Clicked()), SLOT(deleteClicked()));
+    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
+
+    loadData();
+
+    BuildFocusList();
+
+    return true;
+}
+
+void CustomPriority::loadData()
+{
+    QString baseTitle = m_pginfo->title;
     baseTitle.remove(QRegExp(" \\(.*\\)$"));
 
     QString quoteTitle = baseTitle;
     quoteTitle.replace("\'","\'\'");
 
-    prevItem = 0;
-    addString = tr("Add");
+    m_prioritySpin->SetRange(-99,99,1);
+    m_prioritySpin->SetValue(1);
 
-    Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(20 * wmult));
+    RuleInfo rule;
+    rule.title = "";
+    rule.priority = QString().setNum(1);
+    rule.description = "";
 
-    Q3VBoxLayout *vkbox = new Q3VBoxLayout(vbox, (int)(1 * wmult));
-    Q3HBoxLayout *hbox = new Q3HBoxLayout(vkbox, (int)(1 * wmult));
-
-    // Edit selection
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-
-    QString message = tr("Edit Priority Rule") + ": ";
-    QLabel *label = new QLabel(message, this);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
-
-    m_rule = new MythComboBox( false, this, "rule");
-
-    m_rule->insertItem(tr("<New priority rule>"));
-    m_recpri   << "1";
-    m_recdesc << "";
+    MythUIButtonListItem *item = NULL;
+    item = new MythUIButtonListItem(m_ruleList, tr("<New priority rule>"),
+                                    qVariantFromValue(rule));
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT priorityname, recpriority, selectclause "
                    "FROM powerpriority ORDER BY priorityname;");
 
-    int titlematch = -1;
-    if (result.exec() && result.isActive())
+    if (result.exec())
     {
         while (result.next())
         {
             QString trimTitle = result.value(0).toString();
             trimTitle.remove(QRegExp(" \\(.*\\)$"));
 
-            m_rule->insertItem(trimTitle);
-            m_recpri   << result.value(1).toString();
-            m_recdesc << result.value(2).toString();
+            rule.title = trimTitle;
+            rule.priority = result.value(1).toString();
+            rule.description = result.value(2).toString();
+
+            item = new MythUIButtonListItem(m_ruleList, rule.title,
+                                            qVariantFromValue(rule));
 
             if (trimTitle == baseTitle)
-                titlematch = m_rule->count() - 1;
+                m_ruleList->SetItemCurrent(item);
         }
     }
     else
         MythDB::DBError("Get power search rules query", result);
 
-    hbox->addWidget(m_rule);
+    loadExampleRules();
 
-    // Title edit box
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-
-    message = tr("Priority Rule Name") + ": ";
-    label = new QLabel(message, this);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
-
-    m_title = new MythRemoteLineEdit( this, "title" );
-    hbox->addWidget(m_title);
-
-    // Value edit box
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-
-    message = tr("Priority Value") + ": ";
-    label = new QLabel(message, this);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
-
-    m_value = new MythSpinBox( this, "value" );
-    m_value->setMinimum(-99);
-    m_value->setMaximum(99);
-    m_value->setValue(1);
-    hbox->addWidget(m_value);
-
-    // Example clause combo box
-    m_clause = new MythComboBox( false, this, "clause");
-
-    m_clause->insertItem(tr("Modify priority for an input (Input priority)"));
-    m_csql << "cardinput.cardinputid = 1";
-
-    m_clause->insertItem(tr("Modify priority for all inputs on a card"));
-    m_csql << "cardinput.cardid = 2";
-
-    m_clause->insertItem(tr("Modify priority for every card on a host"));
-    m_csql << "capturecard.hostname = 'mythbox'";
-
-    m_clause->insertItem(tr("Only one specific channel ID (Channel priority)"));
-    m_csql << "channel.chanid = '1003' ";
-
-    m_clause->insertItem(tr("Only a certian channel number"));
-    m_csql << "channel.channum = '3' ";
-
-    m_clause->insertItem(tr("Only channels that carry a specific station"));
-    m_csql << "channel.callsign = 'ESPN' ";
-
-    m_clause->insertItem(tr("Match related callsigns"));
-    m_csql << "channel.callsign LIKE 'HBO%' ";
-
-    m_clause->insertItem(tr("Only channels marked as commercial free"));
-    m_csql << QString("channel.commmethod = %1 ").arg(COMM_DETECT_COMMFREE);
-
-    m_clause->insertItem(tr("Modify priority for a station on an input"));
-    m_csql << "channel.callsign = 'ESPN' AND cardinput.cardinputid = 2";
-
-    m_clause->insertItem(tr("Priority for all matching titles"));
-    m_csql << "program.title LIKE 'CSI: %' ";
-
-    m_clause->insertItem(tr("Only shows marked as HDTV"));
-    m_csql << "program.hdtv > 0 ";
-
-    m_clause->insertItem(tr("Close Captioned priority"));
-    m_csql << "program.closecaptioned > 0 ";
-
-    m_clause->insertItem(tr("New episodes only"));
-    m_csql << "program.previouslyshown = 0 ";
-
-    m_clause->insertItem(tr("Modify unidentified episodes"));
-    m_csql << "program.generic = 0 ";
-
-    m_clause->insertItem(tr("First showing of each episode"));
-    m_csql << "program.first > 0 ";
-
-    m_clause->insertItem(tr("Last showing of each episode"));
-    m_csql << "program.last > 0 ";
-
-    m_clause->insertItem(tr("Priority for any show with End Late time"));
-    m_csql << "RECTABLE.endoffset > 0 ";
-
-    m_clause->insertItem(tr("Priority for a category"));
-    m_csql << "program.category = 'Reality' ";
-
-    m_clause->insertItem(QString(tr("Priority for a category type") +
-            " ('movie', 'series', 'sports' " + tr("or") + " 'tvshow')"));
-    m_csql << "program.category_type = 'sports' ";
-
-    m_clause->insertItem(tr("Modify priority by star rating (0.0 to 1.0 for movies only)"));
-    m_csql << "program.stars >= 0.75 ";
-
-    m_clause->insertItem(tr("Priority when shown once (complete example)"));
-    m_csql << "program.first > 0 AND program.last > 0";
-
-    m_clause->insertItem(tr("Prefer a host for a storage group (complete example)"));
-    m_csql << QString("RECTABLE.storagegroup = 'Archive' \n"
-                      "AND capturecard.hostname = 'mythbox' ");
-
-    m_clause->insertItem(tr("Priority for HD shows under two hours (complete example)"));
-    m_csql << QString("program.hdtv > 0 AND \nprogram.starttime > "
-                      "DATE_SUB(program.endtime, INTERVAL 2 HOUR) ");
-
-    m_clause->insertItem(tr("Priority for movies by the year of release (complete example)"));
-    m_csql << "program.category_type = 'movie' AND program.airdate >= 2006 ";
-
-    m_clause->insertItem(tr("Prefer movies when shown at night (complete example)"));
-    m_csql << QString("program.category_type = 'movie' \n"
-                      "AND HOUR(program.starttime) < 6 ");
-
-    m_clause->insertItem(tr("Prefer a host for live sports with overtime (complete example)"));
-    m_csql << QString("RECTABLE.endoffset > 0 \n"
-                      "AND program.category = 'Sports event' \n"
-                      "AND capturecard.hostname = 'mythbox' ");
-
-    m_clause->insertItem(tr("Avoid poor signal quality (complete example)"));
-    m_csql << QString("cardinput.cardinputid = 1 AND \n"
-                      "channel.channum IN (3, 5, 39, 66) ");
-
-    vbox->addWidget(m_clause);
-
-    //  Add Button
-    m_addButton = new MythPushButton( this, "add" );
-    m_addButton->setText(addString);
-    m_addButton->setEnabled(true);
-
-    vbox->addWidget(m_addButton);
-
-    // Description edit box
-    m_description = new MythRemoteLineEdit(5, this, "description" );
-    vbox->addWidget(m_description);
-
-    //  Test Button
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-
-    m_testButton = new MythPushButton( this, "test" );
-    m_testButton->setText( tr( "Test" ) );
-    m_testButton->setEnabled(false);
-
-    hbox->addWidget(m_testButton);
-
-    //  Install Button
-    m_installButton = new MythPushButton( this, "install" );
-    m_installButton->setText( tr( "Install" ) );
-    m_installButton->setEnabled(false);
-
-    hbox->addWidget(m_installButton);
-
-    //  Delete Button
-    m_deleteButton = new MythPushButton( this, "delete" );
-    m_deleteButton->setText( tr( "Delete" ) );
-    m_deleteButton->setEnabled(false);
-
-    hbox->addWidget(m_deleteButton);
-
-    //  Cancel Button
-    m_cancelButton = new MythPushButton( this, "cancel" );
-    m_cancelButton->setText( tr( "Cancel" ) );
-    m_cancelButton->setEnabled(true);
-
-    hbox->addWidget(m_cancelButton);
-
-    connect(this, SIGNAL(dismissWindow()), this, SLOT(accept()));
-
-    connect(m_rule, SIGNAL(activated(int)), this, SLOT(ruleChanged(void)));
-    connect(m_rule, SIGNAL(highlighted(int)), this, SLOT(ruleChanged(void)));
-    connect(m_title, SIGNAL(textChanged(void)), this, SLOT(textChanged(void)));
-    connect(m_addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(m_clause, SIGNAL(activated(int)), this, SLOT(clauseChanged(void)));
-    connect(m_clause, SIGNAL(highlighted(int)), this, SLOT(clauseChanged(void)));
-    connect(m_description, SIGNAL(textChanged(void)), this,
-            SLOT(textChanged(void)));
-    connect(m_testButton, SIGNAL(clicked()), this, SLOT(testClicked()));
-    connect(m_installButton, SIGNAL(clicked()), this, SLOT(installClicked()));
-    connect(m_deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-    connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-
-    gContext->addListener(this);
-    gContext->addCurrentLocation("CustomPriority");
-
-    if (titlematch >= 0)
+    if (!m_pginfo->title.isEmpty())
     {
-        m_rule->setCurrentIndex(titlematch);
-        ruleChanged();
-    }
-    else if (p->title > "")
-    {
-        m_title->setText(baseTitle);
-        //m_value->setText("");
-        m_description->setText("program.title = '" + quoteTitle + "' ");
+        m_titleEdit->SetText(baseTitle);
+        m_descriptionEdit->SetText("program.title = '" + quoteTitle + "' ");
         textChanged();
     }
 
-    if (m_title->text().isEmpty())
-        m_rule->setFocus();
+    if (m_titleEdit->GetText().isEmpty())
+        SetFocusWidget(m_ruleList);
     else
-        m_clause->setFocus();
-
-    clauseChanged();
+        SetFocusWidget(m_clauseList);
 }
 
-CustomPriority::~CustomPriority(void)
+void CustomPriority::loadExampleRules()
 {
-    gContext->removeListener(this);
-    gContext->removeCurrentLocation();
+    QMap<QString, QString> examples;
+    examples.insert(tr("Modify priority for an input (Input priority)"),
+                    "cardinput.cardinputid = 1");
+    examples.insert(tr("Modify priority for all inputs on a card"),
+                    "cardinput.cardid = 2");
+    examples.insert(tr("Modify priority for every card on a host"),
+                    "capturecard.hostname = 'mythbox'");
+    examples.insert(tr("Only one specific channel ID (Channel priority)"),
+                    "channel.chanid = '1003' ");
+    examples.insert(tr("Only a certain channel number"),
+                    "channel.channum = '3' ");
+    examples.insert(tr("Only channels that carry a specific station"),
+                    "channel.callsign = 'ESPN' ");
+    examples.insert(tr("Match related callsigns"),
+                    "channel.callsign LIKE 'HBO%' ");
+    examples.insert(tr("Only channels marked as commercial free"),
+                    QString("channel.commmethod = %1 ")
+                        .arg(COMM_DETECT_COMMFREE));
+    examples.insert(tr("Modify priority for a station on an input"),
+                    "channel.callsign = 'ESPN' AND cardinput.cardinputid = 2");
+    examples.insert(tr("Priority for all matching titles"),
+                    "program.title LIKE 'CSI: %' ");
+    examples.insert(tr("Only shows marked as HDTV"),
+                    "program.hdtv > 0 ");
+    examples.insert(tr("Close Captioned priority"),
+                    "program.closecaptioned > 0 ");
+    examples.insert(tr("New episodes only"),
+                    "program.previouslyshown = 0 ");
+    examples.insert(tr("Modify unidentified episodes"),
+                    "program.generic = 0 ");
+    examples.insert(tr("First showing of each episode"),
+                    "program.first > 0 ");
+    examples.insert(tr("Last showing of each episode"),
+                    "program.last > 0 ");
+    examples.insert(tr("Priority for any show with End Late time"),
+                    "RECTABLE.endoffset > 0 ");
+    examples.insert(tr("Priority for a category"),
+                    "program.category = 'Reality' ");
+    examples.insert(QString("%1 ('movie', 'series', 'sports', 'tvshow')")
+                    .arg(tr("Priority for a category type")),
+                    "program.category_type = 'sports' ");
+    examples.insert(tr("Modify priority by star rating (0.0 to 1.0 for "
+                       "movies only)"),
+                    "program.stars >= 0.75 ");
+    examples.insert(tr("Priority when shown once (complete example)"),
+                    "program.first > 0 AND program.last > 0");
+    examples.insert(tr("Prefer a host for a storage group (complete example)"),
+                    QString("RECTABLE.storagegroup = 'Archive' "
+                            "AND capturecard.hostname = 'mythbox' "));
+    examples.insert(tr("Priority for HD shows under two hours (complete "
+                       "example)"),
+                    "program.hdtv > 0 AND program.starttime > "
+                    "DATE_SUB(program.endtime, INTERVAL 2 HOUR) ");
+    examples.insert(tr("Priority for movies by the year of release (complete "
+                       "example)"),
+                    "program.category_type = 'movie' "
+                    "AND program.airdate >= 2006 ");
+    examples.insert(tr("Prefer movies when shown at night (complete example)"),
+                    "program.category_type = 'movie' "
+                    "AND HOUR(program.starttime) < 6 ");
+    examples.insert(tr("Prefer a host for live sports with overtime (complete "
+                    "example)"),
+                    "RECTABLE.endoffset > 0 "
+                    "AND program.category = 'Sports event' "
+                    "AND capturecard.hostname = 'mythbox' ");
+    examples.insert(tr("Avoid poor signal quality (complete example)"),
+                    "cardinput.cardinputid = 1 AND "
+                    "channel.channum IN (3, 5, 39, 66) ");
+
+    QMapIterator<QString, QString> it(examples);
+    while (it.hasNext())
+    {
+        it.next();
+        new MythUIButtonListItem(m_clauseList, it.key(),
+                                 qVariantFromValue(it.value()));
+    }
 }
 
-void CustomPriority::ruleChanged(void)
+void CustomPriority::ruleChanged(MythUIButtonListItem *item)
 {
-    int curItem = m_rule->currentIndex();
-    if (curItem == prevItem)
+    if (!item)
         return;
 
-    prevItem = curItem;
+    RuleInfo rule = qVariantValue<RuleInfo>(item->GetData());
 
-    if (curItem > 0)
-        m_title->setText(m_rule->currentText());
-    else
-        m_title->setText("");
+    m_titleEdit->SetText(rule.title);
 
-    m_description->setText(m_recdesc[curItem]);
-    m_value->setValue(m_recpri[curItem].toInt());
-    m_deleteButton->setEnabled((bool) curItem);
+    m_descriptionEdit->SetText(rule.description);
+    m_prioritySpin->SetValue(rule.priority);
+    m_deleteButton->SetEnabled((bool)m_ruleList->GetCurrentPos());
     textChanged();
 }
 
 void CustomPriority::textChanged(void)
 {
-    bool hastitle = !m_title->text().isEmpty();
-    bool hasdesc = !m_description->text().isEmpty();
+    bool hastitle = !m_titleEdit->GetText().isEmpty();
+    bool hasdesc = !m_descriptionEdit->GetText().isEmpty();
 
-    m_testButton->setEnabled(hasdesc);
-    m_installButton->setEnabled(hastitle && hasdesc);
-}
-
-void CustomPriority::clauseChanged(void)
-{
-    QString msg = m_csql[m_clause->currentIndex()];
-    msg.replace("\n", " ");
-    msg.replace(QRegExp(" [ ]*"), " ");
-    msg = QString("%1: \"%2\"").arg(addString).arg(msg);
-    if (msg.length() > 50)
-    {
-        msg.truncate(48);
-        msg += "...\"";
-    }
-    m_addButton->setText(msg);
+    m_testButton->SetEnabled(hasdesc);
+    m_installButton->SetEnabled(hastitle && hasdesc);
 }
 
 void CustomPriority::addClicked(void)
 {
-    QString clause = "";
+    MythUIButtonListItem *item = m_clauseList->GetItemCurrent();
 
-    if (m_description->text().contains(QRegExp("\\S")))
+    if (!item)
+        return;
+
+    QString clause;
+
+    QString desc = m_descriptionEdit->GetText();
+
+    if (desc.contains(QRegExp("\\S")))
         clause = "AND ";
-
-    clause += m_csql[m_clause->currentIndex()];
-    m_description->append(clause);
+    clause = item->GetData().toString();
+    m_descriptionEdit->SetText(desc.append(clause));
 }
 
 void CustomPriority::testClicked(void)
 {
     if (!checkSyntax())
-    {
-        m_testButton->setFocus();
         return;
-    }
+
     testSchedule();
-    m_testButton->setFocus();
 }
 
 void CustomPriority::installClicked(void)
 {
     if (!checkSyntax())
-    {
-        m_installButton->setFocus();
         return;
-    }
+
+    MythUIButtonListItem *item = m_prioritySpin->GetItemCurrent();
+    if (!item)
+        return;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM powerpriority WHERE priorityname = :NAME;");
-    query.bindValue(":NAME", m_title->text());
+    query.bindValue(":NAME", m_titleEdit->GetText());
 
     if (!query.exec())
         MythDB::DBError("Install power search delete", query);
@@ -381,68 +293,60 @@ void CustomPriority::installClicked(void)
     query.prepare("INSERT INTO powerpriority "
                   "(priorityname, recpriority, selectclause) "
                   "VALUES(:NAME,:VALUE,:CLAUSE);");
-    query.bindValue(":NAME", m_title->text());
-    query.bindValue(":VALUE", m_value->value());
-    query.bindValue(":CLAUSE", m_description->text());
+    query.bindValue(":NAME", m_titleEdit->GetText());
+    query.bindValue(":VALUE", item->text());
+    query.bindValue(":CLAUSE", m_descriptionEdit->GetText());
 
     if (!query.exec())
         MythDB::DBError("Install power search insert", query);
     else
         ScheduledRecording::signalChange(0);
 
-    accept();
+    Close();
 }
 
 void CustomPriority::deleteClicked(void)
 {
     if (!checkSyntax())
-    {
-        m_deleteButton->setFocus();
         return;
-    }
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM powerpriority "
                    "WHERE priorityname=:NAME;");
-    query.bindValue(":NAME", m_title->text());
+    query.bindValue(":NAME", m_titleEdit->GetText());
 
     if (!query.exec())
         MythDB::DBError("Delete power search query", query);
     else
         ScheduledRecording::signalChange(0);
 
-    accept();
-}
-
-void CustomPriority::cancelClicked(void)
-{
-    accept();
+    Close();
 }
 
 bool CustomPriority::checkSyntax(void)
 {
     bool ret = false;
-    QString msg = "";
+    QString msg;
 
-    QString desc = m_description->text();
+    QString desc = m_descriptionEdit->GetText();
 
-    if (desc.contains(QRegExp("^\\s*AND\\s", Qt::CaseInsensitive)))
+    if (desc.contains(QRegExp("^\\s*AND\\s", false)))
     {
         msg = "Power Priority rules do not reqiure a leading \"AND\"";
     }
-    else if (desc.contains(";"))
+    else if (desc.contains(";", false))
     {
         msg  = "Power Priority rules can not include semicolon ( ; ) ";
         msg += "statement terminators.";
     }
     else
     {
-        QString qstr = QString("SELECT (%1)\nFROM (recordmatch, record, "
+        QString qstr = QString("SELECT (%1) FROM (recordmatch, record, "
                                "program, channel, cardinput, capturecard, "
                                "oldrecorded) WHERE NULL").arg(desc);
         while (1)
         {
-            int i = qstr.indexOf("RECTABLE");
+            int i = qstr.find("RECTABLE");
             if (i == -1) break;
             qstr = qstr.replace(i, strlen("RECTABLE"), "record");
         }
@@ -465,17 +369,16 @@ bool CustomPriority::checkSyntax(void)
     }
 
     if (!msg.isEmpty())
-    {
-        DialogBox *errdiag = new DialogBox(gContext->GetMainWindow(), msg);
-        errdiag->AddButton(QObject::tr("OK"));
-        errdiag->exec();
-        errdiag->deleteLater();
-    }
+        ShowOkPopup(msg);
+
     return ret;
 }
 
 void CustomPriority::testSchedule(void)
 {
+    MythUIButtonListItem *item = m_prioritySpin->GetItemCurrent();
+    if (!item)
+        return;
 
     QString ttable = "powerpriority_tmp";
 
@@ -483,7 +386,7 @@ void CustomPriority::testSchedule(void)
     MSqlQuery query(dbcon);
     QString thequery;
 
-    thequery ="SELECT GET_LOCK(:LOCK, 2);";
+    thequery = "SELECT GET_LOCK(:LOCK, 2);";
     query.prepare(thequery);
     query.bindValue(":LOCK", "DiffSchedule");
     query.exec();
@@ -529,7 +432,7 @@ void CustomPriority::testSchedule(void)
 
     query.prepare(QString("DELETE FROM %1 WHERE priorityname = :NAME;")
                           .arg(ttable));
-    query.bindValue(":NAME", m_title->text());
+    query.bindValue(":NAME", m_titleEdit->GetText());
 
     if (!query.exec())
         MythDB::DBError("Test power search delete", query);
@@ -538,16 +441,16 @@ void CustomPriority::testSchedule(void)
                        "(priorityname, recpriority, selectclause) "
                        "VALUES(:NAME,:VALUE,:CLAUSE);").arg(ttable);
     query.prepare(thequery);
-    query.bindValue(":NAME", m_title->text());
-    query.bindValue(":VALUE", m_value->value());
-    query.bindValue(":CLAUSE", m_description->text());
+    query.bindValue(":NAME", m_titleEdit->GetText());
+    query.bindValue(":VALUE", item->text());
+    query.bindValue(":CLAUSE", m_descriptionEdit->GetText());
 
     if (!query.exec())
         MythDB::DBError("Test power search insert", query);
 
     QString ltitle = tr("Power Priority");
-    if (!m_title->text().isEmpty())
-        ltitle = m_title->text();
+    if (!m_titleEdit->GetText().isEmpty())
+        ltitle = m_titleEdit->GetText();
 
     ViewScheduleDiff vsd(gContext->GetMainWindow(), "Preview Schedule Changes",
                          ttable, 0, ltitle);

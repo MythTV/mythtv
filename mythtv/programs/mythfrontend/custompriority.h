@@ -1,56 +1,66 @@
 #ifndef CUSTOMPRIORITY_H_
 #define CUSTOMPRIORITY_H_
 
-#include "libmyth/mythwidgets.h"
 #include "NuppelVideoPlayer.h"
+
+#include "mythscreentype.h"
 
 class ProgramInfo;
 
-class MPUBLIC CustomPriority : public MythDialog
+class MythUITextEdit;
+class MythUIButton;
+class MythUIButtonList;
+class MythUIButtonListItem;
+class MythUISpinBox;
+
+class MPUBLIC CustomPriority : public MythScreenType
 {
     Q_OBJECT
   public:
+    CustomPriority(MythScreenStack *parent, ProgramInfo *proginfo = NULL);
+   ~CustomPriority();
 
-    CustomPriority(MythMainWindow *parent, const char *name = 0,
-                   ProgramInfo *m_pginfo = NULL);
-   ~CustomPriority(void);
-   
-  signals:
-    void dismissWindow();
+    bool Create();
 
   protected slots:
-    void ruleChanged(void);
-    void textChanged(void);
-    void clauseChanged(void);
+    void ruleChanged(MythUIButtonListItem *item);
+
+    void textChanged();
+
     void addClicked(void);
     void testClicked(void);
     void installClicked(void);
     void deleteClicked(void);
-    void cancelClicked(void);
-    void testSchedule(void);
 
   private:
+    void loadData(void);
+    void loadExampleRules(void);
     bool checkSyntax(void);
+    void testSchedule(void);
 
-    int prevItem;
+    ProgramInfo *m_pginfo;
 
-    QString addString;
+    MythUIButtonList *m_ruleList;
+    MythUIButtonList *m_clauseList;
 
-    QStringList m_recpri;
-    QStringList m_recdesc;
+    MythUITextEdit *m_titleEdit;
+    MythUITextEdit *m_descriptionEdit;
 
-    QStringList m_csql;
+    MythUISpinBox *m_prioritySpin;
 
-    MythComboBox *m_rule;
-    MythRemoteLineEdit *m_title;
-    MythComboBox *m_clause;
-    MythSpinBox *m_value;
-    MythRemoteLineEdit *m_description;
-    MythPushButton *m_addButton;
-    MythPushButton *m_testButton;
-    MythPushButton *m_installButton;
-    MythPushButton *m_deleteButton;
-    MythPushButton *m_cancelButton;
+    MythUIButton *m_addButton;
+    MythUIButton *m_testButton;
+    MythUIButton *m_installButton;
+    MythUIButton *m_deleteButton;
+    MythUIButton *m_cancelButton;
 };
+
+struct RuleInfo {
+    QString title;
+    QString priority;
+    QString description;
+};
+
+Q_DECLARE_METATYPE(RuleInfo)
 
 #endif
