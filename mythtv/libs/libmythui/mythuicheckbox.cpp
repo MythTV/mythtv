@@ -18,6 +18,7 @@ MythUICheckBox::MythUICheckBox(MythUIType *parent, const QString &name)
     m_currentCheckState = MythUIStateType::Off;
     m_state = "active";
 
+    m_BackgroundState = m_CheckState = NULL;
 
     connect(this, SIGNAL(TakingFocus()), this, SLOT(Select()));
     connect(this, SIGNAL(LosingFocus()), this, SLOT(Deselect()));
@@ -158,18 +159,6 @@ void MythUICheckBox::CopyFrom(MythUIType *base)
     }
 
     MythUIType::CopyFrom(base);
-
-    m_BackgroundState = dynamic_cast<MythUIStateType *>
-                    (GetChild("background"));
-    m_CheckState = dynamic_cast<MythUIStateType *>
-                    (GetChild("checkstate"));
-
-    if (!m_BackgroundState || !m_CheckState)
-    {
-        VERBOSE(VB_IMPORTANT,
-                "MythUICheckBox::CopyFrom: Dynamic cast of a child failed");
-        return;
-    }
 
     SetInitialStates();
 }
