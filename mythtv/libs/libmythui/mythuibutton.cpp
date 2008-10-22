@@ -206,11 +206,6 @@ void MythUIButton::SetText(const QString &msg)
 
 QString MythUIButton::GetText() const
 {
-    QString text;
-
-    if (m_Text)
-        text = m_Text->GetText();
-
     return m_Message;
 }
 
