@@ -39,7 +39,9 @@ void MythUIButton::SetInitialStates()
 
     if (m_BackgroundState)
         m_BackgroundState->DisplayState(m_state);
-    m_Text->SetFontState(m_state);
+
+    if (m_Text)
+        m_Text->SetFontState(m_state);
 }
 
 void MythUIButton::Reset()
