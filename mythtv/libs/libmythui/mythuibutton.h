@@ -48,6 +48,7 @@ class MythUIButton : public MythUIType
     void Clicked();
 
   protected:
+    virtual bool ParseElement(QDomElement &element);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
     virtual void Finalize(void);

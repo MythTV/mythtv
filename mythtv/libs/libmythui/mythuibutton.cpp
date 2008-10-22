@@ -52,7 +52,7 @@ void MythUIButton::SetInitialStates()
 
     SetState("active");
 
-    if (m_Text)
+    if (m_Text && m_Message.isEmpty())
         m_Message = m_Text->GetDefaultText();
 }
 
@@ -214,6 +214,18 @@ QString MythUIButton::GetText() const
     return m_Message;
 }
 
+bool MythUIButton::ParseElement(QDomElement &element)
+{
+    if (element.tagName() == "value")
+    {
+        QString message = getFirstText(element);
+        SetText(message);
+    }
+    else
+        return MythUIType::ParseElement(element);
+
+    return true;
+}
 
 void MythUIButton::CreateCopy(MythUIType *parent)
 {
