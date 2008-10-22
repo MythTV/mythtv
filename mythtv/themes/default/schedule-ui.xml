@@ -91,12 +91,7 @@
         </textarea>
 
         <imagetype name="filler">
-            <filename>trans-cr-background.png</filename>
-            <position>0,39</position>
-        </imagetype>
-
-        <imagetype name="showinglines">
-            <filename>cr-lines.png</filename>
+            <filename>cr-background.png</filename>
             <position>0,39</position>
         </imagetype>
 

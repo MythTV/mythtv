@@ -222,12 +222,7 @@
 
         <imagetype name="menu_background">
             <position>0,270</position>
-            <filename>solid-cr-background.png</filename>
-        </imagetype>
-
-        <imagetype name="menu_outline">
-            <position>0,270</position>
-            <filename>cr-lines.png</filename>
+            <filename>cr-background.png</filename>
         </imagetype>
 
         <buttonlist name="videos">

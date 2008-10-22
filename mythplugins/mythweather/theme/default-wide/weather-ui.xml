@@ -649,7 +649,7 @@
 
         <imagetype name="srclines">
             <area>315,95,500,370</area>
-            <filename>cr-lines.png</filename>
+            <filename>cr-background.png</filename>
         </imagetype>
 
         <textarea name="updatetxt" from="basetextarea">
