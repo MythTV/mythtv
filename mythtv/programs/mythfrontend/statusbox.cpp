@@ -137,7 +137,9 @@ void StatusBox::updateBackground(void)
     tmp.end();
     m_background = bground;
 
-    setPaletteBackgroundPixmap(m_background);
+    QPalette p = palette();
+    p.setBrush(backgroundRole(), QBrush(m_background));
+    setPalette(p);
 }
 
 void StatusBox::updateContent()
@@ -282,11 +284,11 @@ void StatusBox::LoadTheme()
                 int context;
                 theme->parseContainer(e, name, context, area);
 
-                if (name.lower() == "topbar")
+                if (name.toLower() == "topbar")
                     TopRect = area;
-                if (name.lower() == "selector")
+                if (name.toLower() == "selector")
                     SelectRect = area;
-                if (name.lower() == "content")
+                if (name.toLower() == "content")
                     ContentRect = area;
             }
             else {
@@ -478,7 +480,7 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
             }
         }
         else if ((currentItem == QObject::tr("Log Entries")) &&
-                 (logNumberKeys.search(action) == 0))
+                 (logNumberKeys.indexIn(action) == 0))
         {
             min_level = action.toInt();
             helptext->SetText(QObject::tr("Setting priority level to %1")
@@ -1169,8 +1171,8 @@ void StatusBox::doJobQueueStatus()
     {
         for (it = jobs.begin(); it != jobs.end(); ++it)
         {
-            QString chanid = it.data().chanid;
-            QDateTime starttime = it.data().starttime;
+            QString chanid = (*it).chanid;
+            QDateTime starttime = (*it).starttime;
             ProgramInfo *pginfo;
 
             pginfo = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
@@ -1181,28 +1183,28 @@ void StatusBox::doJobQueueStatus()
             detail = pginfo->title + "\n" +
                      pginfo->channame + " " + pginfo->chanstr +
                          " @ " + starttime.toString(timeDateFormat) + "\n" +
-                     tr("Job:") + " " + JobQueue::JobText(it.data().type) +
+                     tr("Job:") + " " + JobQueue::JobText((*it).type) +
                      "     " + tr("Status: ") +
-                     JobQueue::StatusText(it.data().status);
+                     JobQueue::StatusText((*it).status);
 
-            if (it.data().status != JOB_QUEUED)
-                detail += " (" + it.data().hostname + ")";
+            if ((*it).status != JOB_QUEUED)
+                detail += " (" + (*it).hostname + ")";
 
-            if (it.data().schedruntime > QDateTime::currentDateTime())
+            if ((*it).schedruntime > QDateTime::currentDateTime())
                 detail += "\n" + tr("Scheduled Run Time:") + " " +
-                    it.data().schedruntime.toString(timeDateFormat);
+                    (*it).schedruntime.toString(timeDateFormat);
             else
-                detail += "\n" + it.data().comment;
+                detail += "\n" + (*it).comment;
 
             contentLines[count] = pginfo->title + " @ " +
                                   starttime.toString(timeDateFormat);
 
             contentDetail[count] = detail;
-            contentData[count] = QString("%1").arg(it.data().id);
+            contentData[count] = QString("%1").arg((*it).id);
 
-            if (it.data().status == JOB_ERRORED)
+            if ((*it).status == JOB_ERRORED)
                 contentFont[count] = "error";
-            else if (it.data().status == JOB_ABORTED)
+            else if ((*it).status == JOB_ABORTED)
                 contentFont[count] = "warning";
 
             count++;
@@ -1285,9 +1287,9 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
     for (; it != prof2bps.end(); ++it)
     {
         const QString pro =
-                tail.arg(it.key()).arg((int)((float)it.data() / 1024.0));
+                tail.arg(it.key()).arg((int)((float)(*it) / 1024.0));
 
-        long long bytesPerMin = (it.data() >> 1) * 15;
+        long long bytesPerMin = ((*it) >> 1) * 15;
         uint minLeft = ((free<<5)/bytesPerMin)<<5;
         minLeft = (minLeft/15)*15;
         uint hoursLeft = minLeft/60;
@@ -1568,7 +1570,7 @@ void StatusBox::doMachineStatus()
             detailString += contentLines[count] + "\n";
             count++;
 
-            QStringList tokens = QStringList::split(",", fsInfos[i].directory);
+            QStringList tokens = fsInfos[i].directory.split(",");
 
             if (tokens.size() > 1)
             {

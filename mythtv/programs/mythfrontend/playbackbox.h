@@ -25,7 +25,6 @@ using namespace std;
 #include "jobqueue.h"
 #include "tv_play.h"
 
-#include <q3valuelist.h>
 #include <pthread.h>
 
 class QLabel;
@@ -505,7 +504,7 @@ class PlaybackBox : public MythDialog
 
     // Network Control Variables //////////////////////////////////////////////
     mutable QMutex      ncLock;
-    Q3ValueList<QString> networkControlCommands;
+    deque<QString>      networkControlCommands;
     bool                underNetworkControl;
     
     TV                  *m_player;

@@ -324,7 +324,7 @@ void showStatus(void)
 void TVMenuCallback(void *data, QString &selection)
 {
     (void)data;
-    QString sel = selection.lower();
+    QString sel = selection.toLower();
 
     if (sel.left(9) == "settings ")
     {
@@ -613,21 +613,27 @@ void rebootnow()
     }
 }
 
-bool RunMenu(QString themedir)
+bool RunMenu(QString themedir, QString themename)
 {
     QByteArray tmp = themedir.toLocal8Bit();
     menu = new MythThemedMenu(
         QString(tmp.constData()), "mainmenu.xml",
         GetMythMainWindow()->GetMainStack(), "mainmenu");
-    menu->setCallback(TVMenuCallback, gContext);
 
     if (menu->foundTheme())
     {
+        VERBOSE(VB_IMPORTANT, QString("Found mainmenu.xml for theme '%1'")
+                .arg(themename));
+        menu->setCallback(TVMenuCallback, gContext);
         GetMythMainWindow()->GetMainStack()->AddScreen(menu);
         return true;
     }
 
-    cerr << "Couldn't find theme " << tmp.constData() << endl;
+    VERBOSE(VB_IMPORTANT, QString("Couldn't find mainmenu.xml for theme '%1'")
+            .arg(themename));
+    delete menu;
+    menu = NULL;
+
     return false;
 }
 
@@ -677,7 +683,7 @@ QString RandTheme(QString &themename)
         if (theme.fileName() == "." || theme.fileName() =="..")
             continue;
 
-        QFileInfo xml(theme.absFilePath() + "/theme.xml");
+        QFileInfo xml(theme.absoluteFilePath() + "/theme.xml");
 
         if (!xml.exists())
             continue;
@@ -725,8 +731,10 @@ int internal_play_media(const QString &mrl, const QString &plot,
     pginfo->pathname = mrl;
 
     QDir d(mrl + "/VIDEO_TS");
-    if (mrl.findRev(".iso", -1, false) == (int)mrl.length() - 4 ||
-        mrl.findRev(".img", -1, false) == (int)mrl.length() - 4 ||
+    if (mrl.lastIndexOf(".iso", -1, Qt::CaseInsensitive) ==
+        (int)mrl.length() - 4 ||
+        mrl.lastIndexOf(".img", -1, Qt::CaseInsensitive) ==
+        (int)mrl.length() - 4 ||
         d.exists())
     {
         pginfo->pathname = QString("dvd:%1").arg(mrl);
@@ -801,11 +809,11 @@ void gotoMainMenu(void)
     // If we got to this callback, we're back on the menu.  So, send a CTRL-L
     // to cause the menu to reload
     QKeyEvent *event =
-        new QKeyEvent(QEvent::KeyPress, Qt::Key_L, 0, Qt::ControlButton);
+        new QKeyEvent(QEvent::KeyPress, Qt::Key_L, Qt::ControlModifier);
     QApplication::postEvent((QObject*)(gContext->GetMainWindow()), event);
 }
 
-void reloadTheme(void)
+int reloadTheme(void)
 {
     LanguageSettings::reload();
 
@@ -821,15 +829,37 @@ void reloadTheme(void)
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "Couldn't find theme " + themename);
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
+                .arg(themename));
         cleanup();
-        exit(FRONTEND_EXIT_NO_THEME);
+        return FRONTEND_BUGGY_EXIT_NO_THEME;
     }
 
-    if (!RunMenu(themedir) || !menu->foundTheme())
+    if (!RunMenu(themedir, themename) || !menu->foundTheme())
     {
-        cleanup();
-        exit(FRONTEND_BUGGY_EXIT_NO_THEME);
+        if (themename == "blue")
+        {
+            cleanup();
+            return FRONTEND_BUGGY_EXIT_NO_THEME;
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("Overridding broken theme '%1' with 'blue'")
+                    .arg(themename));
+            gContext->OverrideSettingForSession("Theme", "blue");
+            themename = gContext->GetSetting("Theme", "blue");
+            themedir = GetMythUI()->FindThemeDir(themename);
+
+            LanguageSettings::reload();
+            GetMythUI()->LoadQtConfig();
+            GetMythMainWindow()->Init();
+            themeBase->Reload();
+            GetMythUI()->UpdateImageCache();
+
+            if (!RunMenu(themedir, themename) || !menu->foundTheme())
+                return FRONTEND_BUGGY_EXIT_NO_THEME;
+        }
     }
 
 
@@ -839,6 +869,15 @@ void reloadTheme(void)
         lcd->setupLEDs(RemoteGetRecordingMask);
         lcd->resetServer();
     }
+
+    return 0;
+}
+
+void reloadTheme_void(void)
+{
+    int err = reloadTheme();
+    if (err)
+        exit(err);
 }
 
 void getScreenShot(void)
@@ -848,7 +887,7 @@ void getScreenShot(void)
 
 void InitJumpPoints(void)
 {
-    REG_JUMP("Reload Theme", "", "", reloadTheme);
+    REG_JUMP("Reload Theme", "", "", reloadTheme_void);
     REG_JUMP("Main Menu", "", "", gotoMainMenu);
     REG_JUMPLOC("Program Guide", "", "", startGuide, "GUIDE");
     REG_JUMPLOC("Program Finder", "", "", startFinder, "FINDER");
@@ -987,13 +1026,15 @@ void PrintHelp(const MythCommandLineParser &cmdlineparser)
 
 int log_rotate(int report_error)
 {
-    int new_logfd = open(logfile, O_WRONLY|O_CREAT|O_APPEND, 0664);
+    int new_logfd = open(logfile.toLocal8Bit().constData(),
+                         O_WRONLY|O_CREAT|O_APPEND, 0664);
 
     if (new_logfd < 0) {
         /* If we can't open the new logfile, send data to /dev/null */
-        if (report_error) {
-            cerr << "Cannot open logfile "
-                 << logfile.toLocal8Bit().constData() << endl;
+        if (report_error)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Can not open logfile '%1'")
+                    .arg(logfile));
             return -1;
         }
 
@@ -1070,7 +1111,7 @@ int main(int argc, char **argv)
 
     bool ResetSettings = false;
 
-    if (binname.lower() != "mythfrontend")
+    if (binname.toLower() != "mythfrontend")
         pluginname = binname;
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
@@ -1270,8 +1311,8 @@ int main(int argc, char **argv)
         for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(it.data()));
-            gContext->OverrideSettingForSession(it.key(), it.data());
+                                          .arg(it.key()).arg(*it));
+            gContext->OverrideSettingForSession(it.key(), *it);
         }
     }
 
@@ -1319,7 +1360,8 @@ int main(int argc, char **argv)
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "Couldn't find theme " + themename);
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
+                .arg(themename));
         return FRONTEND_EXIT_NO_THEME;
     }
 
@@ -1375,7 +1417,6 @@ int main(int argc, char **argv)
         if (pmanager->run_plugin(pluginname) ||
             pmanager->run_plugin("myth" + pluginname))
         {
-            qApp->setMainWidget(mainWindow);
             qApp->exec();
 
             return FRONTEND_EXIT_OK;
@@ -1412,17 +1453,42 @@ int main(int argc, char **argv)
         themedir = GetMythUI()->FindThemeDir(themename);
         if (themedir.isEmpty())
         {
-            VERBOSE(VB_IMPORTANT, "Couldn't find theme " + themename);
+            VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
+                    .arg(themename));
             return FRONTEND_EXIT_NO_THEME;
         }
 
-        if (!RunMenu(themedir))
-            break;
+        if (!RunMenu(themedir, themename) || !menu->foundTheme())
+        {
+            if (themename == "blue")
+            {
+                cleanup();
+                return FRONTEND_EXIT_NO_THEME;
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QString("Overridding broken theme '%1' with 'blue'")
+                        .arg(themename));
+                gContext->OverrideSettingForSession("Theme", "blue");
+                themename = gContext->GetSetting("Theme", "blue");
+                themedir = GetMythUI()->FindThemeDir(themename);
+
+                LanguageSettings::reload();
+                GetMythUI()->LoadQtConfig();
+                GetMythMainWindow()->Init();
+                themeBase->Reload();
+                GetMythUI()->UpdateImageCache();
+
+                if (!RunMenu(themedir, themename) || !menu->foundTheme())
+                    return FRONTEND_EXIT_NO_THEME;
+            }
+        }
+
 
         // Setup handler for USR1 signals to reload theme
         signal(SIGUSR1, &signal_USR1_handler);
 
-        qApp->setMainWidget(mainWindow);
         qApp->exec();
     } while (!(exitstatus = handleExit()));
 

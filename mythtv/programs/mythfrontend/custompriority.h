@@ -1,16 +1,9 @@
 #ifndef CUSTOMPRIORITY_H_
 #define CUSTOMPRIORITY_H_
 
-#include <qdatetime.h>
-#include <q3hbox.h>
-#include <QLabel>
-
 #include "libmyth/mythwidgets.h"
 #include "NuppelVideoPlayer.h"
 
-#include <pthread.h>
-
-class QLabel;
 class ProgramInfo;
 
 class MPUBLIC CustomPriority : public MythDialog
@@ -19,7 +12,7 @@ class MPUBLIC CustomPriority : public MythDialog
   public:
 
     CustomPriority(MythMainWindow *parent, const char *name = 0,
-                 ProgramInfo *m_pginfo = NULL);
+                   ProgramInfo *m_pginfo = NULL);
    ~CustomPriority(void);
    
   signals:

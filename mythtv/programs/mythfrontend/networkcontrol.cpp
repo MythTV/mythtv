@@ -38,9 +38,9 @@ static bool is_abbrev(QString const& command,
                       QString const& test, int minchars = 1)
 {
     if (test.length() < minchars)
-        return command.lower() == test.lower();
+        return command.toLower() == test.toLower();
     else
-        return test.lower() == command.left(test.length()).lower();
+        return test.toLower() == command.left(test.length()).toLower();
 }
 
 NetworkControl::NetworkControl()
@@ -104,8 +104,8 @@ NetworkControl::NetworkControl()
     keyMap["end"]                    = Qt::Key_End;
     keyMap["enter"]                  = Qt::Key_Enter;
     keyMap["return"]                 = Qt::Key_Return;
-    keyMap["pageup"]                 = Qt::Key_Prior;
-    keyMap["pagedown"]               = Qt::Key_Next;
+    keyMap["pageup"]                 = Qt::Key_PageUp;
+    keyMap["pagedown"]               = Qt::Key_PageDown;
     keyMap["escape"]                 = Qt::Key_Escape;
     keyMap["tab"]                    = Qt::Key_Tab;
     keyMap["backtab"]                = Qt::Key_Backtab;
@@ -257,7 +257,7 @@ void NetworkControl::processNetworkControlCommand(QString command)
 {
     QMutexLocker locker(&clientLock);
     QString result = "";
-    QStringList tokens = QStringList::split(" ", command);
+    QStringList tokens = command.simplified().split(" ");
 
     if (is_abbrev("jump", tokens[0]))
         result = processJump(tokens);
@@ -269,7 +269,7 @@ void NetworkControl::processNetworkControlCommand(QString command)
         result = processQuery(tokens);
     else if (is_abbrev("help", tokens[0]))
         result = processHelp(tokens);
-    else if ((tokens[0].lower() == "exit") || (tokens[0].lower() == "quit"))
+    else if ((tokens[0].toLower() == "exit") || (tokens[0].toLower() == "quit"))
         QApplication::postEvent(this,
                                 new QEvent((QEvent::Type)kNetworkControlCloseEvent));
     else if (! tokens[0].isEmpty())
@@ -305,7 +305,7 @@ void NetworkControl::newConnection()
     else
     {
         cs = new QTextStream(s);
-        cs->setEncoding(QTextStream::UnicodeUTF8);
+        cs->setCodec("UTF-8");
     }
     
     if (client)
@@ -359,7 +359,7 @@ void NetworkControl::readClient(void)
         if (lineIn.isEmpty())
             continue;
 
-        tokens = QStringList::split(" ", lineIn);
+        tokens = lineIn.simplified().split(" ");
 
         ncLock.lock();
         networkControlCommands.push_back(lineIn);
@@ -383,7 +383,7 @@ QString NetworkControl::processJump(QStringList tokens)
     QTime timer;
     timer.start();
     while ((timer.elapsed() < 2000) &&
-           (gContext->getCurrentLocation().lower() != tokens[1]))
+           (gContext->getCurrentLocation().toLower() != tokens[1]))
         usleep(10000);
 
     return result;
@@ -427,10 +427,10 @@ QString NetworkControl::processKey(QStringList tokens)
 
             GetMythUI()->ResetScreensaver();
 
-            event = new QKeyEvent(QEvent::KeyPress, keyCode, 0, Qt::NoButton);
+            event = new QKeyEvent(QEvent::KeyPress, keyCode, Qt::NoModifier);
             QApplication::postEvent(keyDest, event);
 
-            event = new QKeyEvent(QEvent::KeyRelease, keyCode, 0, Qt::NoButton);
+            event = new QKeyEvent(QEvent::KeyRelease, keyCode, Qt::NoModifier);
             QApplication::postEvent(keyDest, event);
         }
         else if (((tokenLen == 1) &&
@@ -441,41 +441,40 @@ QString NetworkControl::processKey(QStringList tokens)
             QKeySequence a(tokens[curToken]);
             int keyCode = a[0];
             int ch = tokens[curToken][tokenLen - 1].toAscii();
-            int buttons = Qt::NoButton;
+            Qt::KeyboardModifiers modifiers = Qt::NoModifier;
 
             if (tokenLen > 1)
             {
-                QStringList tokenParts =
-                    QStringList::split("+", tokens[curToken]);
+                QStringList tokenParts = tokens[curToken].split("+");
 
                 int partNum = 0;
                 while (partNum < (tokenParts.size() - 1))
                 {
-                    if (tokenParts[partNum].upper() == "CTRL")
-                        buttons |= Qt::ControlButton;
-                    if (tokenParts[partNum].upper() == "SHIFT")
-                        buttons |= Qt::ShiftButton;
-                    if (tokenParts[partNum].upper() == "ALT")
-                        buttons |= Qt::AltButton;
-                    if (tokenParts[partNum].upper() == "META")
-                        buttons |= Qt::MetaButton;
+                    if (tokenParts[partNum].toUpper() == "CTRL")
+                        modifiers |= Qt::ControlModifier;
+                    if (tokenParts[partNum].toUpper() == "SHIFT")
+                        modifiers |= Qt::ShiftModifier;
+                    if (tokenParts[partNum].toUpper() == "ALT")
+                        modifiers |= Qt::AltModifier;
+                    if (tokenParts[partNum].toUpper() == "META")
+                        modifiers |= Qt::MetaModifier;
 
                     partNum++;
                 }
             }
             else
             {
-                if (tokens[curToken] == tokens[curToken].upper())
-                    buttons = Qt::ShiftButton;
+                if (tokens[curToken] == tokens[curToken].toUpper())
+                    modifiers = Qt::ShiftModifier;
             }
 
             GetMythUI()->ResetScreensaver();
 
-            event = new QKeyEvent(QEvent::KeyPress, keyCode, ch, buttons,
+            event = new QKeyEvent(QEvent::KeyPress, keyCode, ch, modifiers,
                                   tokens[curToken]);
             QApplication::postEvent(keyDest, event);
 
-            event = new QKeyEvent(QEvent::KeyRelease, keyCode, ch, buttons,
+            event = new QKeyEvent(QEvent::KeyRelease, keyCode, ch, modifiers,
                                   tokens[curToken]);
             QApplication::postEvent(keyDest, event);
         }
@@ -537,7 +536,7 @@ QString NetworkControl::processPlay(QStringList tokens)
 
             QString message = QString("NETWORK_CONTROL %1 PROGRAM %2 %3")
                                       .arg(action).arg(tokens[2])
-                                      .arg(tokens[3].upper());
+                                      .arg(tokens[3].toUpper());
             MythEvent me(message);
             gContext->dispatch(me);
 
@@ -552,7 +551,7 @@ QString NetworkControl::processPlay(QStringList tokens)
     }
     // Everything below here requires us to be in playback mode so check to
     // see if we are
-    else if (gContext->getCurrentLocation().lower() != "playback")
+    else if (gContext->getCurrentLocation().toLower() != "playback")
     {
         return QString("ERROR: You are in %1 mode and this command is only "
                        "for playback mode")
@@ -612,7 +611,7 @@ QString NetworkControl::processPlay(QStringList tokens)
             return QString("ERROR: See 'help %1' for usage information")
                            .arg(tokens[0]);
 
-        tokens[2] = tokens[2].lower();
+        tokens[2] = tokens[2].toLower();
         if ((tokens[2].contains(QRegExp("^\\-*\\d+x$"))) ||
             (tokens[2].contains(QRegExp("^\\-*\\d+\\/\\d+x$"))) ||
             (tokens[2].contains(QRegExp("^\\d*\\.\\d+x$"))))
@@ -708,7 +707,7 @@ QString NetworkControl::processQuery(QStringList tokens)
              (tokens[2].contains(QRegExp("^\\d+$"))) &&
              (tokens[3].contains(QRegExp(
                          "^\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d$"))))
-        return listRecordings(tokens[2], tokens[3].upper());
+        return listRecordings(tokens[2], tokens[3].toUpper());
     else if (is_abbrev("recordings", tokens[1]))
         return listRecordings();
     else
@@ -748,8 +747,8 @@ QString NetworkControl::processHelp(QStringList tokens)
 
         for (it = jumpMap.begin(); it != jumpMap.end(); ++it)
         {
-            helpText += it.key().leftJustify(20, ' ', true) + " - " +
-                        it.data() + "\r\n";
+            helpText += it.key().leftJustified(20, ' ', true) + " - " +
+                        *it + "\r\n";
         }
     }
     else if (is_abbrev("key", command))
@@ -858,7 +857,7 @@ void NetworkControl::customEvent(QEvent *e)
         if (message.left(15) != "NETWORK_CONTROL")
             return;
 
-        QStringList tokens = QStringList::split(" ", message);
+        QStringList tokens = message.simplified().split(" ");
         if ((tokens.size() >= 3) &&
             (tokens[1] == "ANSWER"))
         {
@@ -890,7 +889,7 @@ void NetworkControl::customEvent(QEvent *e)
         nrLock.lock();
         replies = networkControlReplies.size();
         while (client && cs && replies > 0 &&
-               client->state() == QTcpSocket::Connected)
+               client->state() == QTcpSocket::ConnectedState)
         {
             reply = networkControlReplies.front();
             networkControlReplies.pop_front();
@@ -906,7 +905,7 @@ void NetworkControl::customEvent(QEvent *e)
     }
     else if (e->type() == kNetworkControlCloseEvent)
     {
-        if (client && client->state() == QTcpSocket::Connected)
+        if (client && client->state() == QTcpSocket::ConnectedState)
         {
             clientLock.lock();
             client->close();
@@ -955,7 +954,7 @@ QString NetworkControl::listSchedule(const QString& chanID) const
             result +=
                 QString("%1 %2 %3 %4")
                         .arg(QString::number(query.value(0).toInt())
-                             .rightJustify(5, ' '))
+                             .rightJustified(5, ' '))
                         .arg(query.value(1).toDateTime().toString(Qt::ISODate))
                         .arg(query.value(2).toDateTime().toString(Qt::ISODate))
                         .arg(atitle.constData());
@@ -1048,7 +1047,7 @@ QString NetworkControl::saveScreenshot(QStringList tokens)
     ProgramInfo *pginfo = NULL;
     if (gotAnswer)
     {
-        QStringList results = QStringList::split(" ", answer);
+        QStringList results = answer.simplified().split(" ");
         pginfo = ProgramInfo::GetProgramFromRecorded(results[5], results[6]);
         if (!pginfo)
             return "ERROR: Unable to find program info for current program";
@@ -1060,7 +1059,7 @@ QString NetworkControl::saveScreenshot(QStringList tokens)
 
         if (tokens.size() >= 5)
         {
-            QStringList size = QStringList::split("x", tokens[4]);
+            QStringList size = tokens[4].split("x");
             width  = size[0].toInt();
             height = size[1].toInt();
         }

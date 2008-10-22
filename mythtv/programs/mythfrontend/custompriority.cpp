@@ -61,12 +61,10 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
 
     QString message = tr("Edit Priority Rule") + ": ";
     QLabel *label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(label);
 
     m_rule = new MythComboBox( false, this, "rule");
-    m_rule->setBackgroundOrigin(WindowOrigin);
 
     m_rule->insertItem(tr("<New priority rule>"));
     m_recpri   << "1";
@@ -102,12 +100,10 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
 
     message = tr("Priority Rule Name") + ": ";
     label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(label);
 
     m_title = new MythRemoteLineEdit( this, "title" );
-    m_title->setBackgroundOrigin(WindowOrigin);
     hbox->addWidget(m_title);
 
     // Value edit box
@@ -115,20 +111,17 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
 
     message = tr("Priority Value") + ": ";
     label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(label);
 
     m_value = new MythSpinBox( this, "value" );
-    m_value->setMinValue(-99);
-    m_value->setMaxValue(99);
+    m_value->setMinimum(-99);
+    m_value->setMaximum(99);
     m_value->setValue(1);
-    m_value->setBackgroundOrigin(WindowOrigin);
     hbox->addWidget(m_value);
 
     // Example clause combo box
     m_clause = new MythComboBox( false, this, "clause");
-    m_clause->setBackgroundOrigin(WindowOrigin);
 
     m_clause->insertItem(tr("Modify priority for an input (Input priority)"));
     m_csql << "cardinput.cardinputid = 1";
@@ -222,7 +215,6 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
 
     //  Add Button
     m_addButton = new MythPushButton( this, "add" );
-    m_addButton->setBackgroundOrigin(WindowOrigin);
     m_addButton->setText(addString);
     m_addButton->setEnabled(true);
 
@@ -230,14 +222,12 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
 
     // Description edit box
     m_description = new MythRemoteLineEdit(5, this, "description" );
-    m_description->setBackgroundOrigin(WindowOrigin);
     vbox->addWidget(m_description);
 
     //  Test Button
     hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
 
     m_testButton = new MythPushButton( this, "test" );
-    m_testButton->setBackgroundOrigin(WindowOrigin);
     m_testButton->setText( tr( "Test" ) );
     m_testButton->setEnabled(false);
 
@@ -245,7 +235,6 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
 
     //  Install Button
     m_installButton = new MythPushButton( this, "install" );
-    m_installButton->setBackgroundOrigin(WindowOrigin);
     m_installButton->setText( tr( "Install" ) );
     m_installButton->setEnabled(false);
 
@@ -253,7 +242,6 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
 
     //  Delete Button
     m_deleteButton = new MythPushButton( this, "delete" );
-    m_deleteButton->setBackgroundOrigin(WindowOrigin);
     m_deleteButton->setText( tr( "Delete" ) );
     m_deleteButton->setEnabled(false);
 
@@ -261,7 +249,6 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
 
     //  Cancel Button
     m_cancelButton = new MythPushButton( this, "cancel" );
-    m_cancelButton->setBackgroundOrigin(WindowOrigin);
     m_cancelButton->setText( tr( "Cancel" ) );
     m_cancelButton->setEnabled(true);
 
@@ -287,7 +274,7 @@ CustomPriority::CustomPriority(MythMainWindow *parent, const char *name,
 
     if (titlematch >= 0)
     {
-        m_rule->setCurrentItem(titlematch);
+        m_rule->setCurrentIndex(titlematch);
         ruleChanged();
     }
     else if (p->title > "")
@@ -314,7 +301,7 @@ CustomPriority::~CustomPriority(void)
 
 void CustomPriority::ruleChanged(void)
 {
-    int curItem = m_rule->currentItem();
+    int curItem = m_rule->currentIndex();
     if (curItem == prevItem)
         return;
 
@@ -342,7 +329,7 @@ void CustomPriority::textChanged(void)
 
 void CustomPriority::clauseChanged(void)
 {
-    QString msg = m_csql[m_clause->currentItem()];
+    QString msg = m_csql[m_clause->currentIndex()];
     msg.replace("\n", " ");
     msg.replace(QRegExp(" [ ]*"), " ");
     msg = QString("%1: \"%2\"").arg(addString).arg(msg);
@@ -361,7 +348,7 @@ void CustomPriority::addClicked(void)
     if (m_description->text().contains(QRegExp("\\S")))
         clause = "AND ";
 
-    clause += m_csql[m_clause->currentItem()];
+    clause += m_csql[m_clause->currentIndex()];
     m_description->append(clause);
 }
 
@@ -439,11 +426,11 @@ bool CustomPriority::checkSyntax(void)
 
     QString desc = m_description->text();
 
-    if (desc.contains(QRegExp("^\\s*AND\\s", false)))
+    if (desc.contains(QRegExp("^\\s*AND\\s", Qt::CaseInsensitive)))
     {
         msg = "Power Priority rules do not reqiure a leading \"AND\"";
     }
-    else if (desc.contains(";", false))
+    else if (desc.contains(";"))
     {
         msg  = "Power Priority rules can not include semicolon ( ; ) ";
         msg += "statement terminators.";
@@ -455,7 +442,7 @@ bool CustomPriority::checkSyntax(void)
                                "oldrecorded) WHERE NULL").arg(desc);
         while (1)
         {
-            int i = qstr.find("RECTABLE");
+            int i = qstr.indexOf("RECTABLE");
             if (i == -1) break;
             qstr = qstr.replace(i, strlen("RECTABLE"), "record");
         }

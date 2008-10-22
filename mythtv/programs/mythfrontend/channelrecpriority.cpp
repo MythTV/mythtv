@@ -236,7 +236,7 @@ void ChannelRecPriority::saveRecPriority(void)
 
     for (it = m_channelData.begin(); it != m_channelData.end(); ++it)
     {
-        ChannelInfo *chanInfo = &(it.data());
+        ChannelInfo *chanInfo = &(*it);
         QString key = QString::number(chanInfo->chanid);
 
         // if this channel's recording priority changed from when we entered
@@ -377,7 +377,7 @@ void ChannelRecPriority::SortList()
     for (i = 0, pit = m_channelData.begin(); pit != m_channelData.end();
             ++pit, i++)
     {
-        chanInfo = &(pit.data());
+        chanInfo = &(*pit);
         RecPriorityInfo tmp = {chanInfo, i};
         sortingList.push_back(tmp);
     }

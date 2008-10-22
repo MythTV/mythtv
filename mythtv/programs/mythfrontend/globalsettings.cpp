@@ -17,6 +17,7 @@
 #include <QCursor>
 #include <QDir>
 #include <QImage>
+#include <QTextCodec>
 
 // MythTV headers
 #include "mythconfig.h"
@@ -56,15 +57,15 @@ static HostComboBox *AudioOutputDevice()
 #ifdef USING_OSS
     QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
     gc->fillSelectionsFromDir(dev);
-    dev.setNameFilter("adsp*");
+    dev.setNameFilters(QStringList("adsp*"));
     gc->fillSelectionsFromDir(dev);
 
     dev.setPath("/dev/sound");
     if (dev.exists())
     {
-        dev.setNameFilter("dsp*");
+        dev.setNameFilters(QStringList("dsp*"));
         gc->fillSelectionsFromDir(dev);
-        dev.setNameFilter("adsp*");
+        dev.setNameFilters(QStringList("adsp*"));
         gc->fillSelectionsFromDir(dev);
     }
 #endif
@@ -789,8 +790,8 @@ static GlobalComboBox *OverTimeCategory()
     {
         while (query.next())
         {
-            QString key = QString::fromUtf8(query.value(0).toString());
-            if (!key.stripWhiteSpace().isEmpty())
+            QString key = query.value(0).toString();
+            if (!key.trimmed().isEmpty())
                 gc->addSelection(key, key);
         }
     }
@@ -953,7 +954,7 @@ void PlaybackProfileItemConfig::Load(void)
     for (uint i = 0; i < 2; i++)
     {
         QString     pcmp  = item.Get(QString("pref_cmp%1").arg(i));
-        QStringList clist = QStringList::split(" ", pcmp);
+        QStringList clist = pcmp.split(" ");
 
         if (clist.size() == 0)
             clist<<((i) ? "" : ">");
@@ -1625,7 +1626,7 @@ static HostComboBox *MenuTheme()
     {
         QFileInfo  &theme = *it;
 
-        QFileInfo xml(theme.absFilePath() + "/mainmenu.xml");
+        QFileInfo xml(theme.absoluteFilePath() + "/mainmenu.xml");
 
         if (theme.fileName()[0] != '.' && xml.exists())
             gc->addSelection(theme.fileName());
@@ -1658,7 +1659,7 @@ static HostComboBox *OSDCCFont()
 static HostComboBox __attribute__ ((unused)) *DecodeVBIFormat()
 {
     QString beVBI = gContext->GetSetting("VbiFormat");
-    QString fmt = beVBI.lower().left(4);
+    QString fmt = beVBI.toLower().left(4);
     int sel = (fmt == "pal ") ? 1 : ((fmt == "ntsc") ? 2 : 0);
 
     HostComboBox *gc = new HostComboBox("DecodeVBIFormat");
@@ -1814,7 +1815,7 @@ static HostComboBox *SubtitleCodec()
     for (uint i = 0; i < (uint) list.size(); i++)
     {
         QString val = QString(list[i]);
-        gc->addSelection(val, val, val.lower() == "utf-8");
+        gc->addSelection(val, val, val.toLower() == "utf-8");
     }
 
     return gc;
@@ -2858,7 +2859,7 @@ ThemeSelector::ThemeSelector(QString label):
         QFileInfo preview;
         QString name;
 
-        ThemeInfo *themeinfo = new ThemeInfo(theme.absFilePath());
+        ThemeInfo *themeinfo = new ThemeInfo(theme.absoluteFilePath());
 
         if (!themeinfo)
             continue;
@@ -2879,7 +2880,7 @@ ThemeSelector::ThemeSelector(QString label):
         {
             VERBOSE(VB_IMPORTANT, QString("Theme %1 missing preview image.")
                                     .arg(theme.fileName()));
-            QString defaultpreview = themes.absPath();
+            QString defaultpreview = themes.absolutePath();
             if (themeinfo->IsWide())
             {
                 defaultpreview += "/default-wide/preview.png";
@@ -2893,7 +2894,7 @@ ThemeSelector::ThemeSelector(QString label):
 
         delete themeinfo;
 
-        QImage* previewImage = new QImage(preview.absFilePath());
+        QImage* previewImage = new QImage(preview.absoluteFilePath());
         if (previewImage->width() == 0 || previewImage->height() == 0)
             VERBOSE(VB_IMPORTANT, QString("Problem reading theme preview image"
                                           " %1").arg(preview.filePath()));
@@ -3434,12 +3435,12 @@ static void ISO639_fill_selections(SelectSetting *widget, uint i)
 {
     widget->clearSelections();
     QString q = QString("ISO639Language%1").arg(i);
-    QString lang = gContext->GetSetting(q, "").lower();
+    QString lang = gContext->GetSetting(q, "").toLower();
 
     if ((lang.isEmpty() || lang == "aar") && 
         !gContext->GetSetting("Language", "").isEmpty())
     {
-        lang = iso639_str2_to_str3(GetMythUI()->GetLanguage().lower());
+        lang = iso639_str2_to_str3(GetMythUI()->GetLanguage().toLower());
     }
 
     QMap<int,QString>::iterator it  = _iso639_key_to_english_name.begin();
@@ -3448,7 +3449,7 @@ static void ISO639_fill_selections(SelectSetting *widget, uint i)
     for (; it != ite; ++it)
     {
         QString desc = (*it);
-        int idx = desc.find(";");
+        int idx = desc.indexOf(";");
         if (idx > 0)
             desc = desc.left(idx);
 
@@ -3794,8 +3795,8 @@ uint PVR350VideoDevice::fillSelectionsFromDir(const QDir &dir,
         QFileInfo  &fi = *it;
 
         struct stat st;
-        QString filepath = fi.absFilePath();
-        int err = lstat(filepath, &st);
+        QString filepath = fi.absoluteFilePath();
+        int err = lstat(filepath.toLocal8Bit().constData(), &st);
 
         if (0 != err)
         {

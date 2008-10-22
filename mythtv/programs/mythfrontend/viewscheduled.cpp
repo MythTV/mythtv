@@ -248,7 +248,7 @@ void ViewScheduled::FillList(void)
         item->setText(pginfo->ChannelText(m_channelFormat), "channel", state);
 
         temp = pginfo->title;
-        if ((pginfo->subtitle).stripWhiteSpace().length() > 0)
+        if ((pginfo->subtitle).trimmed().length() > 0)
             temp += " - \"" + pginfo->subtitle + "\"";
         item->setText(temp, "title", state); //,font
 

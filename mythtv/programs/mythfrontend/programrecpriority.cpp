@@ -7,13 +7,11 @@ using namespace std;
 
 #include <QLayout>
 #include <QPushButton>
-#include <q3buttongroup.h>
 #include <QLabel>
 #include <QCursor>
 #include <QDateTime>
 #include <QApplication>
 #include <QRegExp>
-#include <q3header.h>
 #include <QKeyEvent>
 #include <QPixmap>
 #include <QPaintEvent>
@@ -385,9 +383,9 @@ void ProgramRecPriority::parseContainer(QDomElement &element)
     int context;
     theme->parseContainer(element, name, context, area);
 
-    if (name.lower() == "selector")
+    if (name.toLower() == "selector")
         listRect = area;
-    if (name.lower() == "program_info")
+    if (name.toLower() == "program_info")
         infoRect = area;
 }
 
@@ -407,7 +405,9 @@ void ProgramRecPriority::updateBackground(void)
     tmp.end();
     myBackground = bground;
 
-    setPaletteBackgroundPixmap(myBackground);
+    QPalette p = palette();
+    p.setBrush(backgroundRole(), QBrush(myBackground));
+    setPalette(p);
 }
 
 void ProgramRecPriority::paintEvent(QPaintEvent *e)
@@ -578,7 +578,7 @@ void ProgramRecPriority::edit(void)
                 // the cursor currently is
                 for (cnt = 0, it = programData.begin(); cnt < inList+inData;
                      cnt++, ++it);
-                progInfo = &(it.data());
+                progInfo = &(*it);
 
                 int rtRecPriors[11];
                 rtRecPriors[0] = 0;
@@ -717,7 +717,7 @@ void ProgramRecPriority::deactivate(void)
                     // the cursor currently is
                     for (cnt = 0, it = programData.begin(); cnt < inList+inData;
                          cnt++, ++it);
-                    progInfo = &(it.data());
+                    progInfo = &(*it);
                     progInfo->recstatus = inactive ? rsInactive : rsUnknown;
                 } else
                     MythDB::DBError("Update recording schedule inactive query", query);
@@ -768,7 +768,7 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
     // iterate through programData till we hit the line where
     // the cursor currently is
     for (cnt = 0, it = programData.begin(); cnt < inList+inData; cnt++, ++it);
-    progInfo = &(it.data());
+    progInfo = &(*it);
 
     // inc/dec recording priority
     tempRecPriority = progInfo->recpriority + howMuch;
@@ -789,7 +789,7 @@ void ProgramRecPriority::saveRecPriority(void)
 
     for (it = programData.begin(); it != programData.end(); ++it)
     {
-        ProgramRecPriorityInfo *progInfo = &(it.data());
+        ProgramRecPriorityInfo *progInfo = &(*it);
         int key = progInfo->recordid;
 
         // if this program's recording priority changed from when we entered
@@ -882,7 +882,7 @@ void ProgramRecPriority::FillList(void)
             QMap<QString, ProgramRecPriorityInfo>::Iterator it;
             for (it = programData.begin(); it != programData.end(); ++it)
             {
-                ProgramRecPriorityInfo *progInfo = &(it.data());
+                ProgramRecPriorityInfo *progInfo = &(*it);
 
                 if (progInfo->recordid == recordid)
                 {
@@ -1213,10 +1213,10 @@ void ProgramRecPriority::SortList()
     // of programData in pdCopy
     for (i = 0, pit = programData.begin(); pit != programData.end(); ++pit, i++)
     {
-        ProgramRecPriorityInfo *progInfo = &(pit.data());
+        ProgramRecPriorityInfo *progInfo = &(*pit);
         RecPriorityInfo tmp = {progInfo, i};
         sortedList.push_back(tmp);
-        pdCopy[pit.key()] = pit.data();
+        pdCopy[pit.key()] = *pit;
     }
 
     // sort sortedList
@@ -1290,7 +1290,7 @@ void ProgramRecPriority::SortList()
         for (j = 0,pit = pdCopy.begin(); j != recPriorityInfo->cnt; j++, ++pit);
 
         // put back into programData
-        programData[QString::number(999-i)] = pit.data();
+        programData[QString::number(999-i)] = *pit;
 
         // if recPriorityInfo[i] is the program where the cursor
         // was pre-sort then we need to update to cursor
@@ -1325,7 +1325,7 @@ void ProgramRecPriority::RemoveCurItemFromList(void)
     QMap<QString, ProgramRecPriorityInfo>::Iterator it;
     for (cnt = 0, it = programData.begin(); cnt < inList+inData;
          cnt++, ++it);
-    programData.remove(it);
+    programData.erase(it);
     SortList();
     delete curitem;
     curitem = NULL;
@@ -1371,7 +1371,7 @@ void ProgramRecPriority::updateList(QPainter *p)
                 {
                     if (pastSkip <= 0)
                     {
-                        ProgramRecPriorityInfo *progInfo = &(it.data());
+                        ProgramRecPriorityInfo *progInfo = &(*it);
 
                         int progRecPriority = progInfo->recpriority;
                         int finalRecPriority = progRecPriority +
@@ -1382,7 +1382,7 @@ void ProgramRecPriority::updateList(QPainter *p)
                         if ((progInfo->rectype == kSingleRecord ||
                              progInfo->rectype == kOverrideRecord ||
                              progInfo->rectype == kDontRecord) &&
-                            (progInfo->subtitle).stripWhiteSpace().length() > 0)
+                            (progInfo->subtitle).trimmed().length() > 0)
                             tempSubTitle = tempSubTitle + " - \"" +
                                            progInfo->subtitle + "\"";
 

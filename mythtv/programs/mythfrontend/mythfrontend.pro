@@ -3,6 +3,8 @@ include ( ../../settings.pro )
 include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
+QT += network xml sql opengl qt3support
+
 TEMPLATE = app
 CONFIG += thread
 TARGET = mythfrontend
@@ -66,6 +68,3 @@ using_arts:DEFINES += USING_ARTS
 using_jack:DEFINES += USING_JACK
 using_oss: DEFINES += USING_OSS
 macx:      DEFINES += USING_COREAUDIO
-
-#The following line was inserted by qt3to4
-QT += network xml  sql opengl qt3support
