@@ -33,5 +33,4 @@ TARGETDEPS += ../../../libs/libavutil/libmythavutil-$${LIBVERSION}.$${QMAKE_EXTE
 
 DEPENDPATH += ../../../libs/libavutil ../../../libs/libavformat ../../../libs/libsavcodec
 
-#The following line was inserted by qt3to4
-QT += network xml  sql opengl qt3support
+CONFIG  -= qt
