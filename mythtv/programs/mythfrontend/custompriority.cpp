@@ -6,9 +6,7 @@ using namespace std;
 
 #include "mythcontext.h"
 #include "programinfo.h"
-#include "proglist.h"
 #include "scheduledrecording.h"
-#include "recordingtypes.h"
 #include "viewschdiff.h"
 #include "mythdb.h"
 #include "mythverbose.h"
