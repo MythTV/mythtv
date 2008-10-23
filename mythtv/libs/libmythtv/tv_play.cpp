@@ -8274,7 +8274,8 @@ void TV::ShowNoRecorderDialog(NoRecorderMsg msgType)
                            "menu.");
             break;
         case kNoCurrRec:
-            errorText = tr("MythTV is using all inputs for Live TV?");
+            errorText = tr("Error: MythTV is using all inputs, "
+                           "but there are no active recordings?");
             break;
         case kNoTuners:
             errorText = tr("MythTV has no capture cards defined. "
