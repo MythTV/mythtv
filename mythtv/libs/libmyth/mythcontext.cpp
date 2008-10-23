@@ -1775,7 +1775,8 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
             VERBOSE(VB_IMPORTANT,
                     QString("Reconnection to backend server failed"));
             if (d->m_ui && d->m_ui->IsScreenSetup())
-              // HACK. TODO: Remove when all old-style widgets are gone
+            {
+                // HACK. TODO: Remove when all old-style widgets are gone
               if (d->mainWindow->currentWidget())
                 MythPopupBox::showOkPopup(d->mainWindow, "connection failure",
                              tr("The connection to the master backend "
@@ -1785,6 +1786,7 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
                 ShowOkPopup(tr("The connection to the master backend "
                                 "server has gone away for some reason.. "
                                 "Is it running?"));
+            }
 
             if (!block)
                 d->serverSockLock.lock();
