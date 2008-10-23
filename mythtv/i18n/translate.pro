@@ -94,7 +94,6 @@ SOURCES += ../programs/mythfrontend/channelrecpriority.cpp
 SOURCES += ../programs/mythfrontend/custompriority.cpp
 SOURCES += ../programs/mythfrontend/globalsettings.cpp
 SOURCES += ../programs/mythfrontend/main.cpp
-SOURCES += ../programs/mythfrontend/manualbox.cpp
 SOURCES += ../programs/mythfrontend/manualschedule.cpp
 SOURCES += ../programs/mythfrontend/playbackbox.cpp
 SOURCES += ../programs/mythfrontend/programrecpriority.cpp
