@@ -790,7 +790,8 @@ vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void)
     for ( ; it != info->end(); it++)
     {
         p = *it;
-        if (p->recstatus == rsRecording)
+        if (p->recstatus == rsRecording || (p->recstatus == rsRecorded
+                                            && p->recgroup == "LiveTV"))
             reclist->push_back(new ProgramInfo(*p));
     }
     
