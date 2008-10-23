@@ -841,7 +841,7 @@ int reloadTheme(void)
         return FRONTEND_BUGGY_EXIT_NO_THEME;
     }
 
-    if (!RunMenu(themedir, themename) || !menu->foundTheme())
+    if (!RunMenu(themedir, themename))
     {
         if (themename == "blue")
         {
@@ -863,7 +863,7 @@ int reloadTheme(void)
             themeBase->Reload();
             GetMythUI()->UpdateImageCache();
 
-            if (!RunMenu(themedir, themename) || !menu->foundTheme())
+            if (!RunMenu(themedir, themename))
                 return FRONTEND_BUGGY_EXIT_NO_THEME;
         }
     }
@@ -1464,7 +1464,7 @@ int main(int argc, char **argv)
             return FRONTEND_EXIT_NO_THEME;
         }
 
-        if (!RunMenu(themedir, themename) || !menu->foundTheme())
+        if (!RunMenu(themedir, themename))
         {
             if (themename == "blue")
             {
@@ -1486,7 +1486,7 @@ int main(int argc, char **argv)
                 themeBase->Reload();
                 GetMythUI()->UpdateImageCache();
 
-                if (!RunMenu(themedir, themename) || !menu->foundTheme())
+                if (!RunMenu(themedir, themename))
                     return FRONTEND_EXIT_NO_THEME;
             }
         }
