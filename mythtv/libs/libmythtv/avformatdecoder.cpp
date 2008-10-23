@@ -989,13 +989,12 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         // set the gop interval to 15 frames.  if we guess wrong, the
         // auto detection will change it.
         keyframedist = 15;
-        positionMapType = MARK_GOP_START;
+        positionMapType = MARK_GOP_BYFRAME;
 
         if (!strcmp(fmt->name, "avi"))
         {
             // avi keyframes are too irregular
             keyframedist = 1;
-            positionMapType = MARK_GOP_BYFRAME;
         }
 
         dontSyncPositionMap = true;
@@ -2271,10 +2270,6 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
             keyframedist    = tempKeyFrameDist;
             maxkeyframedist = max(keyframedist, maxkeyframedist);
 
-            // FIXME: this needs to go
-            bool is_ivtv    = (keyframedist == 15) || (keyframedist == 12);
-            positionMapType = (is_ivtv) ? MARK_GOP_START : MARK_GOP_BYFRAME;
-
             GetNVP()->SetKeyframeDistance(keyframedist);
 
 #if 0
@@ -2297,8 +2292,6 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
         long long last_frame = 0;
         if (!m_positionMap.empty())
             last_frame = m_positionMap.back().index;
-        if (keyframedist > 1)
-            last_frame *= keyframedist;
 
         //cerr << "framesRead: " << framesRead << " last_frame: " << last_frame
         //    << " keyframedist: " << keyframedist << endl;
@@ -2310,11 +2303,9 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
 
             VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC + 
                     QString("positionMap[ %1 ] == %2.")
-                    .arg(prevgoppos / keyframedist)
-                    .arg(startpos));
+                    .arg(framesRead).arg(startpos));
 
-            PosMapEntry entry = {prevgoppos / keyframedist,
-                                 prevgoppos, startpos};
+            PosMapEntry entry = {framesRead, framesRead, startpos};
             m_positionMap.push_back(entry);
         }
 
