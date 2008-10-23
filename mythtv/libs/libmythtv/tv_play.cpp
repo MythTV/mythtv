@@ -2294,7 +2294,7 @@ void TV::TVEventThreadChecks(void)
             jumped_back = false;
 
         if (internalState == kState_WatchingPreRecorded && !inPlaylist &&
-            dialogname == "" && isnearend && !exitPlayer
+            dialogname.isEmpty() && isnearend && !exitPlayer
             && !underNetworkControl &&
             (gContext->GetNumSetting("EndOfRecordingExitPrompt") == 1) &&
             !jumped_back && !editmode && !IsEmbedding() && !paused)
@@ -2850,7 +2850,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             return;
     }
 
-    if (dialogname != "" && GetOSD() && GetOSD()->DialogShowing(dialogname))
+    if (dialogname.size() && GetOSD() && GetOSD()->DialogShowing(dialogname))
     {
         for (int i = 0; i < actions.size() && !handled; i++)
         {
@@ -8045,7 +8045,7 @@ void TV::ToggleAutoExpire(void)
 
     pbinfoLock.unlock();
 
-    if (GetOSD() && activenvp == nvp && desc != "" )
+    if (GetOSD() && activenvp == nvp && desc.size())
     {
         struct StatusPosInfo posInfo;
         nvp->calcSliderPos(posInfo);
@@ -8069,7 +8069,7 @@ void TV::SetAutoCommercialSkip(enum commSkipMode skipMode)
 
     nvp->SetAutoCommercialSkip((int)autoCommercialSkip);
 
-    if (GetOSD() && activenvp == nvp && desc != "" )
+    if (GetOSD() && activenvp == nvp && desc.size())
     {
         struct StatusPosInfo posInfo;
         nvp->calcSliderPos(posInfo);
@@ -8091,7 +8091,7 @@ void TV::SetManualZoom(bool zoomON)
     else
         desc = tr("Zoom Mode OFF");
 
-    if (GetOSD() && activenvp == nvp && desc != "" )
+    if (GetOSD() && activenvp == nvp && desc.size())
     {
         struct StatusPosInfo posInfo;
         nvp->calcSliderPos(posInfo);
@@ -8676,7 +8676,7 @@ void TV::PromptDeleteRecording(QString title)
 
     dialogboxTimer.restart();
 
-    if (dialogname == "")
+    if (dialogname.isEmpty())
     {
         QMap<QString, QString> infoMap;
         playbackinfo->ToMap(infoMap);
@@ -8706,7 +8706,7 @@ void TV::PromptDeleteRecording(QString title)
 
 bool TV::IsVideoExitDialog(void)
 {
-    if (dialogname == "")
+    if (dialogname.isEmpty())
         return false;
 
     return (dialogname == "askdeleterecording" ||
@@ -8743,7 +8743,7 @@ bool TV::PromptRecGroupPassword(void)
     QString recGroupPassword;
     lastProgram->UpdateRecGroup();
     recGroupPassword = ProgramInfo::GetRecGroupPassword(lastProgram->recgroup);
-    if (recGroupPassword != "")
+    if (recGroupPassword.size())
     {
         //qApp->lock();
         bool ok = false;
@@ -8820,7 +8820,7 @@ void TV::DoDisplayJumpMenu(void)
                 for (int i = 0; i < progIndex; i++)
                 {
                     p = plist.at(i);
-                    if (p->subtitle != "")
+                    if (p->subtitle.size())
                         new OSDGenericTree(j_item, p->subtitle,
                             QString("JUMPPROG %1 %2").arg(Iprog.key()).arg(i));
                     else
