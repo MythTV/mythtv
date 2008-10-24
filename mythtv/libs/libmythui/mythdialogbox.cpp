@@ -62,11 +62,10 @@ void MythDialogBox::SetReturnEvent(MythScreenType *retscreen,
     m_id = resultid;
 }
 
-void MythDialogBox::AddButton(const QString &title, void *data)
+void MythDialogBox::AddButton(const QString &title, QVariant data)
 {
     MythUIButtonListItem *button = new MythUIButtonListItem(m_buttonList, title);
-    if (data)
-        button->setData(data);
+    button->SetData(data);
 }
 
 void MythDialogBox::AddButton(const QString &title, const char *slot)
@@ -135,7 +134,6 @@ MythConfirmationDialog::MythConfirmationDialog(MythScreenStack *parent,
 
     m_id = "";
     m_retScreen = NULL;
-    m_resultData = NULL;
 }
 
 bool MythConfirmationDialog::Create(void)
@@ -143,12 +141,10 @@ bool MythConfirmationDialog::Create(void)
     if (!CopyWindowFromBase("MythConfirmationDialog", this))
         return false;
 
-    MythUIText *messageText = dynamic_cast<MythUIText *>
-                                            (GetChild("message"));
-    MythUIButton *okButton = dynamic_cast<MythUIButton *>
-                                         (GetChild("ok"));
+    MythUIText *messageText = dynamic_cast<MythUIText *>(GetChild("message"));
+    MythUIButton *okButton = dynamic_cast<MythUIButton *>(GetChild("ok"));
     MythUIButton *cancelButton = dynamic_cast<MythUIButton *>
-                                         (GetChild("cancel"));
+                                                        (GetChild("cancel"));
 
     if (!messageText || !okButton || !cancelButton)
         return false;
@@ -342,7 +338,7 @@ void MythTextInputDialog::sendResult()
     if (m_retScreen)
     {
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
-                                                            inputString, NULL);
+                                                            inputString, "");
         QApplication::postEvent(m_retScreen, dce);
     }
 
@@ -453,7 +449,7 @@ void MythUISearchDialog::slotSendResult()
     if (m_retScreen)
     {
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
-                                                            result, NULL);
+                                                            result, "");
         QApplication::postEvent(m_retScreen, dce);
     }
 

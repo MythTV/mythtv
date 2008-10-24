@@ -25,20 +25,22 @@ const int kMythDialogBoxCompletionEventType = 34111;
 class DialogCompletionEvent : public QEvent
 {
   public:
-    DialogCompletionEvent(const QString &id, int result, QString text, void *data)
+    DialogCompletionEvent(const QString &id, int result, QString text,
+                          QVariant data)
         : QEvent((QEvent::Type)kMythDialogBoxCompletionEventType),
           m_id(id), m_result(result), m_resultText(text), m_resultData(data) { }
 
     QString GetId() { return m_id; }
     int GetResult() { return m_result; }
     QString GetResultText() { return m_resultText; }
-    void *GetResultData() { return m_resultData; }
+    void *GetResultData() { return m_resultData.value<void *>(); }
+    QVariant GetData() { return m_resultData; }
 
   private:
     QString m_id;
     int m_result;
     QString m_resultText;
-    void *m_resultData;
+    QVariant m_resultData;
 };
 
 /**
@@ -60,7 +62,7 @@ class MythDialogBox : public MythScreenType
 
     void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
 
-    void AddButton(const QString &title, void *data = 0);
+    void AddButton(const QString &title, QVariant data = 0);
     void AddButton(const QString &title, const char *slot);
 
     virtual bool keyPressEvent(QKeyEvent *event);
@@ -101,7 +103,7 @@ class MythConfirmationDialog : public MythScreenType
 
     bool Create(void);
     void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
-    void SetData(void *data) { m_resultData = data; }
+    void SetData(QVariant data) { m_resultData = data; }
 
     bool keyPressEvent(QKeyEvent *event);
 
@@ -114,7 +116,7 @@ class MythConfirmationDialog : public MythScreenType
     bool m_showCancel;
     MythScreenType *m_retScreen;
     QString m_id;
-    void *m_resultData;
+    QVariant m_resultData;
 
   private slots:
     void Confirm(void);
