@@ -312,19 +312,14 @@ void startTVNormal(void)
 
 void showStatus(void)
 {
-    StatusBox statusbox(gContext->GetMainWindow(), "status box");
-    if (statusbox.IsErrored())
-    {
-        MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(), QObject::tr("Theme Error"),
-            QString(QObject::tr(
-                        "Your theme does not contain elements required "
-                        "to display the status screen.")));
-    }
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    StatusBox *statusbox = new StatusBox(mainStack);
+
+    if (statusbox->Create())
+        mainStack->AddScreen(statusbox);
     else
-    {
-        statusbox.exec();
-    }
+        delete statusbox;
 }
 
 void TVMenuCallback(void *data, QString &selection)

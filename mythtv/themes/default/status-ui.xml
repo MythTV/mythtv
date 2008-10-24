@@ -1,116 +1,134 @@
 <mythuitheme>
 
-  <window name="status">
+    <window name="status">
 
-    <font name="active" face="Arial">
-      <color>#ffffff</color>
-      <size>17</size>
-      <bold>yes</bold>
-    </font>
+        <textarea name="heading">
+            <area>30,10,740,40</area>
+            <font>baselarge</font>
+            <value>System Status</value>
+        </textarea>
 
-    <font name="title" face="Arial">
-      <color>#ffffff</color>
-      <size>18</size>
-      <bold>yes</bold>
-      <shadow>2,2</shadow>
-    </font>
+        <imagetype name="datalines">
+            <position>0,95</position>
+            <filename>cr-background.png</filename>
+        </imagetype>
 
-    <font name="selected" face="Arial">
-      <color>#ffff33</color>
-      <size>17</size>
-      <bold>yes</bold>
-      <shadow>2,1</shadow>
-    </font>
+        <buttonlist name="category">
+            <area>15,50,770,30</area>
+            <layout>horizontal</layout>
+            <spacing>6</spacing>
+            <buttonarea>15,0,740,40</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,180,40</area>
+                <state name="active">
+                    <imagetype name="buttonbackground">
+                        <filename>horiz_selector.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>0,0,180,40</area>
+                        <font>basesmall</font>
+                        <font state="error">basesmallred</font>
+                        <font state="warning">basesmallyellow</font>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="buttonbackground">
+                        <filename>horiz_selector_selected.png</filename>
+                    </imagetype>
+                </state>
+                <state name="inactive" from="active">
+                    <imagetype name="buttonbackground">
+                        <filename>horiz_selector_inactive.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>756,10</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-rtarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-rtarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>0,10</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-ltarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-ltarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+        </statetype>
+        </buttonlist>
 
-    <font name="status" face="Arial">
-      <color>#ffffff</color>
-      <size>14</size>
-      <bold>yes</bold>
-    </font>
+        <buttonlist name="log">
+            <area>19,108,770,300</area>
+            <layout>vertical</layout>
+            <spacing>4</spacing>
+            <buttonarea>0,0,770,260</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,490,25</area>
+                <state name="active">
+                    <statetype name="severity">
+                        <position>0,0</position>
+                        <state name="error">
+                            <imagetype name="statusimage">
+                                <filename>schedule_conflict.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="warning">
+                            <imagetype name="statusimage">
+                                <filename>schedule_other.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>33,1,730,24</area>
+                        <font>basesmall</font>
+                        <font state="error">basesmallred</font>
+                        <font state="warning">basesmallyellow</font>
+                        <align>vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="selectbar">
+                        <position>25,0</position>
+                        <filename>schedule_selectbar.png</filename>
+                    </imagetype>
+                </state>
+                <state name="inactive" from="active" />
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>710,285</position>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>740,285</position>
+            </statetype>
+        </buttonlist>
 
-    <font name="status_selected" face="Arial">
-      <color>#ffff33</color>
-      <size>14</size>
-      <bold>yes</bold>
-    </font>
+        <textarea name="helplabel">
+            <area>30,390,740,30</area>
+            <value>Details</value>
+            <font>basemedium</font>
+        </textarea>
 
-    <font name="status_error" face="Arial">
-      <color>#ff0000</color>
-      <size>14</size>
-      <bold>yes</bold>
-    </font>
+        <textarea name="helptext">
+            <area>40,430,730,150</area>
+            <value>This screen displays the status of various system components</value>
+            <multiline>yes</multiline>
+        </textarea>
 
-    <font name="status_warning" face="Arial">
-      <color>#ff8429</color>
-      <size>14</size>
-      <bold>yes</bold>
-    </font>
-
-    <container name="topbar">
-      <area>0,0,800,200</area>
-      <textarea name="heading" draworder="0">
-        <area>30,10,740,40</area>
-        <font>title</font>
-        <value>System Status - Select a category to view the status</value>
-      </textarea>
-      <textarea name="helptext" draworder="0">
-        <area>30,60,740,150</area>
-        <font>title</font>
-        <value>This screen displays the status of various system components</value>
-        <multiline>yes</multiline>
-      </textarea>
-    </container>
-
-    <container name="selector">
-      <area>0,201,255,600</area>
-      <listarea name="icon_list" draworder="2">
-       <area>40,30,235,350</area>
-       <fcnfont name="active" function="active"></fcnfont>
-       <fcnfont name="active" function="inactive"></fcnfont>
-       <fcnfont name="selected" function="selected"></fcnfont>
-       <column number="1" width="200" context="-1"></column>
-       <items>8</items>
-      </listarea>
-      <image name="iconlines" draworder="0" fleximage="no">
-        <filename>cr-lines.png</filename>
-        <position>20,0</position>
-        <staticsize>235,410</staticsize>
-      </image>
-      <image name="iconbg" draworder="1" fleximage="no">
-        <filename>trans-cr-background.png</filename>
-        <position>20,0</position>
-        <staticsize>235,410</staticsize>
-      </image>
-    </container>
-
-    <container name="content">
-      <area>265,201,535,600</area>
-      <listarea name="list_area" draworder="2">
-       <area>15,20,490,345</area>
-       <fcnfont name="status" function="active"></fcnfont>
-       <fcnfont name="status" function="inactive"></fcnfont>
-       <fcnfont name="status_selected" function="selected"></fcnfont>
-       <fcnfont name="status_error" function="error"></fcnfont>
-       <fcnfont name="status_warning" function="warning"></fcnfont>
-       <column number="1" width="480" context="-1"></column>
-       <items>11</items>
-       <image function="selectionbar" filename="status-bar.png" location="-3,-2"></image>
-       <image function="uparrow" filename="uparrow.png" location="475,18"></image>
-       <image function="downarrow" filename="downarrow.png" location="475,305"></image>
-      </listarea>
-      <image name="datalines" draworder="0" fleximage="no">
-        <filename>cr-lines.png</filename>
-        <position>0,0</position>
-        <staticsize>510,410</staticsize>
-      </image>
-      <image name="databg" draworder="1" fleximage="no">
-        <filename>trans-cr-background.png</filename>
-        <position>0,0</position>
-        <staticsize>510,410</staticsize>
-      </image>
-    </container>
-
-  </window>
+    </window>
 
 </mythuitheme>
 

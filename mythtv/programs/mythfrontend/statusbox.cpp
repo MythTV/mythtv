@@ -1,37 +1,47 @@
 
+#include "statusbox.h"
+
 #include <unistd.h>
 #include <stdlib.h>
 
 #include <iostream>
-#include <cerrno>
 using namespace std;
 
-#include <QLayout>
 #include <QRegExp>
 #include <QHostAddress>
-#include <QKeyEvent>
-#include <QPixmap>
-#include <QPaintEvent>
-#include <QPainter>
 
-#include "config.h"
-#include "statusbox.h"
-#include "remoteutil.h"
-#include "programinfo.h"
-#include "tv.h"
-#include "jobqueue.h"
-#include "util.h"
+#include "mythcontext.h"
+
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "mythversion.h"
+#include "util.h"
+
+#include "config.h"
+#include "remoteutil.h"
+#include "tv.h"
+#include "jobqueue.h"
 #include "cardutil.h"
+
 #include "mythuihelper.h"
+#include "mythuibuttonlist.h"
+#include "mythuitext.h"
+#include "mythuistatetype.h"
+#include "mythdialogbox.h"
 
 #define REC_CAN_BE_DELETED(rec) \
     ((((rec)->programflags & FL_INUSEPLAYING) == 0) && \
      ((((rec)->programflags & FL_INUSERECORDING) == 0) || \
       ((rec)->recgroup != "LiveTV")))
 
+struct LogLine {
+    QString line;
+    QString detail;
+    QString data;
+    QString state;
+};
+
+Q_DECLARE_METATYPE(LogLine)
 
 /** \class StatusBox
  *  \brief Reports on various status items.
@@ -42,33 +52,18 @@ using namespace std;
  *  of the job queue, and the machine status.
  */
 
-StatusBox::StatusBox(MythMainWindow *parent, const char *name)
-    : MythDialog(parent, name), errored(false)
+StatusBox::StatusBox(MythScreenStack *parent)
+          : MythScreenType(parent, "StatusBox")
 {
-    // Set this value to the number of items in icon_list
-    // to prevent scrolling off the bottom
-    int item_count = 0;
-    dateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
-    timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    timeDateFormat = timeFormat + " " + dateFormat;
+    m_dateFormat = gContext->GetSetting("Shortm_dateFormat", "M/d");
+    m_timeFormat = gContext->GetSetting("m_timeFormat", "h:mm AP");
+    m_timeDateFormat = QString("%1 %2").arg(m_timeFormat).arg(m_dateFormat);
 
-    setNoErase();
-    LoadTheme();
-    if (IsErrored())
-        return;
+    m_minLevel = gContext->GetNumSetting("LogDefaultView",5);
 
-    updateBackground();
-
-    icon_list->SetItemText(item_count++, QObject::tr("Listings Status"));
-    icon_list->SetItemText(item_count++, QObject::tr("Schedule Status"));
-    icon_list->SetItemText(item_count++, QObject::tr("Tuner Status"));
-    icon_list->SetItemText(item_count++, QObject::tr("Log Entries"));
-    icon_list->SetItemText(item_count++, QObject::tr("Job Queue"));
-    icon_list->SetItemText(item_count++, QObject::tr("Machine Status"));
-    icon_list->SetItemText(item_count++, QObject::tr("AutoExpire List"));
-    itemCurrent = gContext->GetNumSetting("StatusBoxItemCurrent", 0);
-    icon_list->SetItemCurrent(itemCurrent);
-    icon_list->SetActive(true);
+    m_iconState = NULL;
+    m_categoryList = m_logList = NULL;
+    m_helpText = NULL;
 
     QStringList strlist;
     strlist << "QUERY_IS_ACTIVE_BACKEND";
@@ -76,686 +71,421 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
 
     gContext->SendReceiveStringList(strlist);
 
-    if (QString(strlist[0]) == "FALSE")
-        isBackend = false;
-    else if (QString(strlist[0]) == "TRUE")
-        isBackend = true;
+    if (QString(strlist[0]) == "TRUE")
+        m_isBackendActive = true;
     else
-        isBackend = false;
+        m_isBackendActive = false;
 
-    VERBOSE(VB_NETWORK, QString("QUERY_IS_ACTIVE_BACKEND=%1").arg(strlist[0]));
-
-    max_icons = item_count;
-    inContent = false;
-    doScroll = false;
-    contentPos = 0;
-    contentTotalLines = 0;
-    contentSize = 0;
-    contentMid = 0;
-    min_level = gContext->GetNumSetting("LogDefaultView",5);
-    my_parent = parent;
-    clicked();
-
-    gContext->addCurrentLocation("StatusBox");
+    m_popupStack = GetMythMainWindow()->GetStack("popup stack");
 }
 
 StatusBox::~StatusBox(void)
 {
-    gContext->SaveSetting("StatusBoxItemCurrent", itemCurrent);
-    gContext->removeCurrentLocation();
+    if (m_logList)
+        gContext->SaveSetting("StatusBoxItemCurrent",
+                                                    m_logList->GetCurrentPos());
 }
 
-void StatusBox::paintEvent(QPaintEvent *e)
+bool StatusBox::Create()
 {
-    QRect r = e->rect();
+    if (!LoadWindowFromXML("status-ui.xml", "status", this))
+        return false;
 
-    if (r.intersects(TopRect))
-        updateTopBar();
-    if (r.intersects(SelectRect))
-        updateSelector();
-    if (r.intersects(ContentRect))
-        updateContent();
+    m_categoryList = dynamic_cast<MythUIButtonList *>(GetChild("category"));
+    m_logList = dynamic_cast<MythUIButtonList *>(GetChild("log"));
+
+    m_iconState = dynamic_cast<MythUIStateType *>(GetChild("icon"));
+    m_helpText = dynamic_cast<MythUIText *>(GetChild("helptext"));
+
+    if (!m_categoryList || !m_logList || !m_helpText)
+    {
+        VERBOSE(VB_IMPORTANT, "StatusBox, theme is missing "
+                              "required elements");
+        return false;
+    }
+
+    connect(m_categoryList, SIGNAL(itemSelected(MythUIButtonListItem *)),
+                SLOT(updateLogList(MythUIButtonListItem *)));
+    connect(m_logList, SIGNAL(itemSelected(MythUIButtonListItem *)),
+                SLOT(setHelpText(MythUIButtonListItem *)));
+    connect(m_logList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+                SLOT(clicked(MythUIButtonListItem *)));
+
+    BuildFocusList();
+
+    Load();
+
+    return true;
 }
 
-void StatusBox::updateBackground(void)
+void StatusBox::Load()
 {
-    QPixmap bground(size());
-    bground.fill(this, 0, 0);
+    MythUIButtonListItem *item;
 
-    QPainter tmp(&bground);
+    item = new MythUIButtonListItem(m_categoryList, tr("Listings Status"),
+                            qVariantFromValue((void*)SLOT(doListingsStatus())));
+    item->DisplayState("listings", "icon");
 
-    LayerSet *container = theme->GetSet("background");
-    if (container)
-    {
-        container->Draw(&tmp, 0, 0);
-    }
+    item = new MythUIButtonListItem(m_categoryList, tr("Schedule Status"),
+                            qVariantFromValue((void*)SLOT(doScheduleStatus())));
+    item->DisplayState("schedule", "icon");
 
-    tmp.end();
-    m_background = bground;
+    item = new MythUIButtonListItem(m_categoryList, tr("Tuner Status"),
+                            qVariantFromValue((void*)SLOT(doTunerStatus())));
+    item->DisplayState("tuner", "icon");
 
-    QPalette p = palette();
-    p.setBrush(backgroundRole(), QBrush(m_background));
-    setPalette(p);
+    item = new MythUIButtonListItem(m_categoryList, tr("Log Entries"),
+                            qVariantFromValue((void*)SLOT(doLogEntries())));
+    item->DisplayState("log", "icon");
+
+    item = new MythUIButtonListItem(m_categoryList, tr("Job Queue"),
+                            qVariantFromValue((void*)SLOT(doJobQueueStatus())));
+    item->DisplayState("jobqueue", "icon");
+
+    item = new MythUIButtonListItem(m_categoryList, tr("Machine Status"),
+                            qVariantFromValue((void*)SLOT(doMachineStatus())));
+    item->DisplayState("machine", "icon");
+
+    item = new MythUIButtonListItem(m_categoryList, tr("AutoExpire List"),
+                            qVariantFromValue((void*)SLOT(doAutoExpireList())));
+    item->DisplayState("autoexpire", "icon");
+
+    int itemCurrent = gContext->GetNumSetting("StatusBoxItemCurrent", 0);
+    m_categoryList->SetItemCurrent(itemCurrent);
 }
 
-void StatusBox::updateContent()
+MythUIButtonListItem* StatusBox::AddLogLine(QString line, QString detail,
+                                            QString state, QString data)
 {
-    QRect pr = ContentRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
-    QPainter p(this);
 
-    // Normalize the variables here and set the contentMid
-    contentSize = list_area->GetItems();
-    if (contentSize > contentTotalLines)
-        contentSize = contentTotalLines;
-    contentMid = contentSize / 2;
+    LogLine logline;
+    logline.line = line;
+    logline.detail = detail;
+    logline.state = state;
+    logline.data = data;
 
-    int startPos = 0;
-    int highlightPos = 0;
-
-    if (contentPos < contentMid)
+    MythUIButtonListItem *item = new MythUIButtonListItem(m_logList, line,
+                                                qVariantFromValue(logline));
+    if (!state.isEmpty())
     {
-        startPos = 0;
-        highlightPos = contentPos;
-    }
-    else if (contentPos >= (contentTotalLines - contentMid))
-    {
-        startPos = contentTotalLines - contentSize;
-        highlightPos = contentSize - (contentTotalLines - contentPos);
-    }
-    else if (contentPos >= contentMid)
-    {
-        startPos = contentPos - contentMid;
-        highlightPos = contentMid;
+        item->SetFontState(state);
+        item->DisplayState(state, "severity");
     }
 
-    if (content  == NULL) return;
-    LayerSet *container = content;
-
-    list_area->ResetList();
-    for (int x = startPos; (x - startPos) <= contentSize; x++)
-    {
-        if (contentLines.contains(x))
-        {
-            list_area->SetItemText(x - startPos, contentLines[x]);
-            if (contentFont.contains(x))
-                list_area->EnableForcedFont(x - startPos, contentFont[x]);
-        }
-    }
-
-    list_area->SetItemCurrent(highlightPos);
-
-    if (inContent)
-    {
-        helptext->SetText(contentDetail[contentPos]);
-        update(TopRect);
-    }
-
-    list_area->SetUpArrow((startPos > 0) && (contentSize < contentTotalLines));
-    list_area->SetDownArrow((startPos + contentSize) < contentTotalLines);
-
-    container->Draw(&tmp, 0, 0);
-    container->Draw(&tmp, 1, 0);
-    container->Draw(&tmp, 2, 0);
-    container->Draw(&tmp, 3, 0);
-    container->Draw(&tmp, 4, 0);
-    container->Draw(&tmp, 5, 0);
-    container->Draw(&tmp, 6, 0);
-    container->Draw(&tmp, 7, 0);
-    container->Draw(&tmp, 8, 0);
-    tmp.end();
-    p.drawPixmap(pr.topLeft(), pix);
+    return item;
 }
 
-void StatusBox::updateSelector()
+bool StatusBox::keyPressEvent(QKeyEvent *event)
 {
-    QRect pr = SelectRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
-    QPainter p(this);
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
 
-    if (selector == NULL) return;
-    LayerSet *container = selector;
-
-    container->Draw(&tmp, 0, 0);
-    container->Draw(&tmp, 1, 0);
-    container->Draw(&tmp, 2, 0);
-    container->Draw(&tmp, 3, 0);
-    container->Draw(&tmp, 4, 0);
-    container->Draw(&tmp, 5, 0);
-    container->Draw(&tmp, 6, 0);
-    container->Draw(&tmp, 7, 0);
-    container->Draw(&tmp, 8, 0);
-    tmp.end();
-    p.drawPixmap(pr.topLeft(), pix);
-}
-
-void StatusBox::updateTopBar()
-{
-    QRect pr = TopRect;
-    QPixmap pix(pr.size());
-    pix.fill(this, pr.topLeft());
-    QPainter tmp(&pix);
-    QPainter p(this);
-
-    if (topbar == NULL) return;
-    LayerSet *container = topbar;
-
-    container->Draw(&tmp, 0, 0);
-    tmp.end();
-    p.drawPixmap(pr.topLeft(), pix);
-}
-
-void StatusBox::LoadTheme()
-{
-    int screenheight = 0, screenwidth = 0;
-    float wmult = 0, hmult = 0;
-
-    GetMythUI()->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    theme = new XMLParse();
-    theme->SetWMult(wmult);
-    theme->SetHMult(hmult);
-    if (!theme->LoadTheme(xmldata, "status", "status-"))
-    {
-        VERBOSE(VB_IMPORTANT, "StatusBox: Unable to load theme.");
-        errored = true;
-        return;
-    }
-
-    for (QDomNode child = xmldata.firstChild(); !child.isNull();
-         child = child.nextSibling()) {
-
-        QDomElement e = child.toElement();
-        if (!e.isNull()) {
-            if (e.tagName() == "font") {
-                theme->parseFont(e);
-            }
-            else if (e.tagName() == "container") {
-                QRect area;
-                QString name;
-                int context;
-                theme->parseContainer(e, name, context, area);
-
-                if (name.toLower() == "topbar")
-                    TopRect = area;
-                if (name.toLower() == "selector")
-                    SelectRect = area;
-                if (name.toLower() == "content")
-                    ContentRect = area;
-            }
-            else {
-                QString msg =
-                    QString(tr("The theme you are using contains an "
-                               "unknown element ('%1').  It will be ignored"))
-                    .arg(e.tagName());
-                VERBOSE(VB_IMPORTANT, msg);
-                errored = true;
-            }
-        }
-    }
-
-    selector = theme->GetSet("selector");
-    if (!selector)
-    {
-        VERBOSE(VB_IMPORTANT, "StatusBox: Failed to get selector container.");
-        errored = true;
-    }
-
-    icon_list = (UIListType*)selector->GetType("icon_list");
-    if (!icon_list)
-    {
-        VERBOSE(VB_IMPORTANT, "StatusBox: Failed to get icon list area.");
-        errored = true;
-    }
-
-    content = theme->GetSet("content");
-    if (!content)
-    {
-        VERBOSE(VB_IMPORTANT, "StatusBox: Failed to get content container.");
-        errored = true;
-    }
-
-    list_area = (UIListType*)content->GetType("list_area");
-    if (!list_area)
-    {
-        VERBOSE(VB_IMPORTANT, "StatusBox: Failed to get list area.");
-        errored = true;
-    }
-
-    topbar = theme->GetSet("topbar");
-    if (!topbar)
-    {
-        VERBOSE(VB_IMPORTANT, "StatusBox: Failed to get topbar container.");
-        errored = true;
-    }
-
-    helptext = (UITextType*)topbar->GetType("helptext");
-    if (!helptext)
-    {
-        VERBOSE(VB_IMPORTANT, "StatusBox: Failed to get helptext area.");
-        errored = true;
-    }
-}
-
-void StatusBox::keyPressEvent(QKeyEvent *e)
-{
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Status", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Status", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
+
         QString currentItem;
         QRegExp logNumberKeys( "^[12345678]$" );
 
-        currentItem = icon_list->GetItemText(icon_list->GetCurrentItem());
+        currentItem = m_categoryList->GetItemCurrent()->text();
         handled = true;
 
-        if (action == "SELECT")
+        if (action == "MENU")
         {
-            clicked();
-        }
-        else if (action == "MENU")
-        {
-            if ((inContent) &&
-                (currentItem == QObject::tr("Log Entries")))
+            if (currentItem == tr("Log Entries"))
             {
-                DialogCode retval = MythPopupBox::Show2ButtonPopup(
-                    my_parent, QString("AckLogEntry"),
-                    QObject::tr("Acknowledge all log entries at "
-                                "this priority level or lower?"),
-                    QObject::tr("Yes"), QObject::tr("No"),
-                    kDialogCodeButton0);
+                QString message = tr("Acknowledge all log entries at "
+                                     "this priority level or lower?");
 
-                if (kDialogCodeButton0 == retval)
-                {
-                    MSqlQuery query(MSqlQuery::InitCon());
-                    query.prepare("UPDATE mythlog SET acknowledged = 1 "
-                                  "WHERE priority <= :PRIORITY ;");
-                    query.bindValue(":PRIORITY", min_level);
-                    query.exec();
-                    doLogEntries();
-                }
-            }
-            else if ((inContent) &&
-                     (currentItem == QObject::tr("Job Queue")))
-            {
-                clicked();
-            }
-        }
-        else if (action == "UP")
-        {
-            if (inContent)
-            {
-                if (contentPos > 0)
-                    contentPos--;
-                update(ContentRect);
-            }
-            else
-            {
-                if (icon_list->GetCurrentItem() > 0)
-                    itemCurrent = icon_list->GetCurrentItem()-1;
-                else
-                    itemCurrent = max_icons - 1;
-                icon_list->SetItemCurrent(itemCurrent);
-                clicked();
-                setHelpText();
-                update(SelectRect);
-            }
+                MythConfirmationDialog *confirmPopup =
+                        new MythConfirmationDialog(m_popupStack, message);
 
-        }
-        else if (action == "DOWN")
-        {
-            if (inContent)
-            {
-                if (contentPos < (contentTotalLines - 1))
-                    contentPos++;
-                update(ContentRect);
-            }
-            else
-            {
-                if (icon_list->GetCurrentItem() < (max_icons - 1))
-                    itemCurrent = icon_list->GetCurrentItem()+1;
-                else
-                    itemCurrent = 0;
-                icon_list->SetItemCurrent(itemCurrent);
-                clicked();
-                setHelpText();
-                update(SelectRect);
+                confirmPopup->SetReturnEvent(this, "LogAckAll");
+
+                if (confirmPopup->Create())
+                    m_popupStack->AddScreen(confirmPopup, false);
             }
         }
-        else if (action == "PAGEUP" && inContent)
+        else if ((currentItem == tr("Log Entries")) &&
+                 (logNumberKeys.search(action) == 0))
         {
-            contentPos -= contentSize;
-            if (contentPos < 0)
-                contentPos = 0;
-            update(ContentRect);
-        }
-        else if (action == "PAGEDOWN" && inContent)
-        {
-            contentPos += contentSize;
-            if (contentPos > (contentTotalLines - 1))
-                contentPos = contentTotalLines - 1;
-            update(ContentRect);
-        }
-        else if ((action == "RIGHT") &&
-                 (!inContent) &&
-                 (((contentSize > 0) &&
-                   (contentTotalLines > contentSize)) ||
-                  (doScroll)))
-        {
-            clicked();
-            inContent = true;
-            contentPos = 0;
-            icon_list->SetActive(false);
-            list_area->SetActive(true);
-            update(SelectRect);
-            update(ContentRect);
-        }
-        else if (action == "LEFT")
-        {
-            if (inContent)
-            {
-                inContent = false;
-                contentPos = 0;
-                list_area->SetActive(false);
-                icon_list->SetActive(true);
-                setHelpText();
-                update(SelectRect);
-                update(ContentRect);
-            }
-            else
-            {
-                if (gContext->GetNumSetting("UseArrowAccels", 1))
-                    accept();
-            }
-        }
-        else if ((currentItem == QObject::tr("Log Entries")) &&
-                 (logNumberKeys.indexIn(action) == 0))
-        {
-            min_level = action.toInt();
-            helptext->SetText(QObject::tr("Setting priority level to %1")
-                                          .arg(min_level));
-            update(TopRect);
+            m_minLevel = action.toInt();
+            m_helpText->SetText(tr("Setting priority level to %1")
+                                          .arg(m_minLevel));
             doLogEntries();
         }
         else
             handled = false;
     }
 
-    if (!handled)
-        MythDialog::keyPressEvent(e);
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
-void StatusBox::setHelpText()
+void StatusBox::setHelpText(MythUIButtonListItem *item)
 {
-    if (inContent)
+    if (!item || GetFocusWidget() != m_logList)
+        return;
+
+    LogLine logline = qVariantValue<LogLine>(item->GetData());
+    m_helpText->SetText(logline.detail);
+}
+
+void StatusBox::updateLogList(MythUIButtonListItem *item)
+{
+    if (!item)
+        return;
+
+    disconnect(this, SIGNAL(updateLog()),0,0);
+
+    const char *slot = (const char *)qVariantValue<void*>(item->GetData());
+
+    connect(this, SIGNAL(updateLog()), slot);
+    emit updateLog();
+}
+
+void StatusBox::clicked(MythUIButtonListItem *item)
+{
+    if (!item)
+        return;
+
+    LogLine logline = qVariantValue<LogLine>(item->GetData());
+
+    QString currentItem = m_categoryList->GetItemCurrent()->text();
+
+    // FIXME: Comparisons against strings here is not great, changing names
+    //        breaks everything and it's inefficient
+    if (currentItem == tr("Log Entries"))
     {
-        helptext->SetText(contentDetail[contentPos]);
-    } else {
-        topbar->ClearAllText();
-        QString currentItem;
+        QString message = tr("Acknowledge this log entry?");
 
-        currentItem = icon_list->GetItemText(icon_list->GetCurrentItem());
+        MythConfirmationDialog *confirmPopup =
+                new MythConfirmationDialog(m_popupStack, message);
 
-        if (currentItem == QObject::tr("Listings Status"))
-            helptext->SetText(QObject::tr("Listings Status shows the latest "
-                                          "status information from "
-                                          "mythfilldatabase"));
+        confirmPopup->SetReturnEvent(this, "LogAck");
+        confirmPopup->SetData(logline.data);
 
-        if (currentItem == QObject::tr("Schedule Status"))
-            helptext->SetText(QObject::tr("Schedule Status shows current "
-                                          "statistics from the scheduler."));
-
-        if (currentItem == QObject::tr("Tuner Status"))
-            helptext->SetText(QObject::tr("Tuner Status shows the current "
-                                          "information about the state of "
-                                          "backend tuner cards"));
-
-        if (currentItem == QObject::tr("DVB Status"))
-            helptext->SetText(QObject::tr("DVB Status shows the quality "
-                                          "statistics of all DVB cards, if "
-                                          "present"));
-
-        if (currentItem == QObject::tr("Log Entries"))
-            helptext->SetText(QObject::tr("Log Entries shows any unread log "
-                                          "entries from the system if you "
-                                          "have logging enabled"));
-        if (currentItem == QObject::tr("Job Queue"))
-            helptext->SetText(QObject::tr("Job Queue shows any jobs currently "
-                                          "in Myth's Job Queue such as a "
-                                          "commercial flagging job."));
-        if (currentItem == QObject::tr("Machine Status"))
-        {
-            QString machineStr = QObject::tr("Machine Status shows "
-                                             "some operating system "
-                                             "statistics of this machine");
-            if (!isBackend)
-                machineStr.append(" " + QObject::tr("and the MythTV server"));
-
-            helptext->SetText(machineStr);
-        }
-
-        if (currentItem == QObject::tr("AutoExpire List"))
-            helptext->SetText(QObject::tr("The AutoExpire List shows all "
-                "recordings which may be expired and the order of their "
-                "expiration. Recordings at the top of the list will be "
-                "expired first."));
+        if (confirmPopup->Create())
+            m_popupStack->AddScreen(confirmPopup, false);
     }
-    update(TopRect);
+    else if (currentItem == tr("Job Queue"))
+    {
+        QStringList msgs;
+        int jobStatus;
+
+        jobStatus = JobQueue::GetJobStatus(logline.data.toInt());
+
+        if (jobStatus == JOB_QUEUED)
+        {
+            QString message = tr("Delete Job?");
+
+            MythConfirmationDialog *confirmPopup =
+                    new MythConfirmationDialog(m_popupStack, message);
+
+            confirmPopup->SetReturnEvent(this, "JobDelete");
+            confirmPopup->SetData(logline.data);
+
+            if (confirmPopup->Create())
+                m_popupStack->AddScreen(confirmPopup, false);
+        }
+        else if ((jobStatus == JOB_PENDING) ||
+                (jobStatus == JOB_STARTING) ||
+                (jobStatus == JOB_RUNNING)  ||
+                (jobStatus == JOB_PAUSED))
+        {
+            QString label = tr("Job Queue Actions:");
+
+            MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
+                                                            "statusboxpopup");
+
+            if (menuPopup->Create())
+                m_popupStack->AddScreen(menuPopup, false);
+
+            menuPopup->SetReturnEvent(this, "JobModify");
+
+            QVariant data = qVariantFromValue(logline.data);
+
+            if (jobStatus == JOB_PAUSED)
+                menuPopup->AddButton(tr("Resume"), data);
+            else
+                menuPopup->AddButton(tr("Pause"), data);
+            menuPopup->AddButton(tr("Stop"), data);
+            menuPopup->AddButton(tr("No Change"), data);
+        }
+        else if (jobStatus & JOB_DONE)
+        {
+            QString message = tr("Requeue Job?");
+
+            MythConfirmationDialog *confirmPopup =
+                    new MythConfirmationDialog(m_popupStack, message);
+
+            confirmPopup->SetReturnEvent(this, "JobRequeue");
+            confirmPopup->SetData(logline.data);
+
+            if (confirmPopup->Create())
+                m_popupStack->AddScreen(confirmPopup, false);
+        }
+    }
+    else if (currentItem == tr("AutoExpire List"))
+    {
+        ProgramInfo* rec = m_expList[m_logList->GetCurrentPos()];
+
+        if (rec)
+        {
+            QString label = tr("AutoExpire Actions:");
+
+            MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
+                                                            "statusboxpopup");
+
+            if (menuPopup->Create())
+                m_popupStack->AddScreen(menuPopup, false);
+
+            menuPopup->SetReturnEvent(this, "AutoExpireManage");
+
+            menuPopup->AddButton(tr("Delete Now"), qVariantFromValue(rec));
+            if ((rec)->recgroup == "LiveTV")
+            {
+                menuPopup->AddButton(tr("Move to Default group"),
+                                                       qVariantFromValue(rec));
+            }
+            else if ((rec)->recgroup == "Deleted")
+                menuPopup->AddButton(tr("Undelete"), qVariantFromValue(rec));
+            else
+                menuPopup->AddButton(tr("Disable AutoExpire"),
+                                                        qVariantFromValue(rec));
+            menuPopup->AddButton(tr("No Change"), qVariantFromValue(rec));
+
+        }
+    }
 }
 
-void StatusBox::clicked()
+void StatusBox::customEvent(QEvent *event)
 {
-    QString currentItem = icon_list->GetItemText(icon_list->GetCurrentItem());
-
-    if (inContent)
+    if (event->type() == kMythDialogBoxCompletionEventType)
     {
-        if (currentItem == QObject::tr("Log Entries"))
-        {
-            DialogCode retval = MythPopupBox::Show2ButtonPopup(
-                my_parent,
-                QString("AckLogEntry"),
-                QObject::tr("Acknowledge this log entry?"),
-                QObject::tr("Yes"), QObject::tr("No"), kDialogCodeButton0);
+        DialogCompletionEvent *dce =
+                                dynamic_cast<DialogCompletionEvent*>(event);
 
-            if (kDialogCodeButton0 == retval)
+        QString resultid = dce->GetId();
+        int buttonnum  = dce->GetResult();
+
+        if (resultid == "LogAck")
+        {
+            if (buttonnum == 1)
             {
+                QString sql = dce->GetData().toString();
                 MSqlQuery query(MSqlQuery::InitCon());
                 query.prepare("UPDATE mythlog SET acknowledged = 1 "
-                              "WHERE logid = :LOGID ;");
-                query.bindValue(":LOGID", contentData[contentPos]);
+                            "WHERE logid = :LOGID ;");
+                query.bindValue(":LOGID", sql);
                 query.exec();
                 doLogEntries();
             }
         }
-        else if (currentItem == QObject::tr("Job Queue"))
+        else if (resultid == "LogAckAll")
         {
-            QStringList msgs;
-            int jobStatus;
-
-            jobStatus = JobQueue::GetJobStatus(
-                                contentData[contentPos].toInt());
-
-            if (jobStatus == JOB_QUEUED)
+            if (buttonnum == 1)
             {
-                DialogCode retval = MythPopupBox::Show2ButtonPopup(
-                    my_parent,
-                    QString("JobQueuePopup"), QObject::tr("Delete Job?"),
-                    QObject::tr("Yes"), QObject::tr("No"), kDialogCodeButton1);
-                if (kDialogCodeButton0 == retval)
-                {
-                    JobQueue::DeleteJob(contentData[contentPos].toInt());
-                    doJobQueueStatus();
-                }
-            }
-            else if ((jobStatus == JOB_PENDING) ||
-                     (jobStatus == JOB_STARTING) ||
-                     (jobStatus == JOB_RUNNING))
-            {
-                msgs << QObject::tr("Pause");
-                msgs << QObject::tr("Stop");
-                msgs << QObject::tr("No Change");
-                DialogCode retval = MythPopupBox::ShowButtonPopup(
-                    my_parent,
-                    QString("JobQueuePopup"),
-                    QObject::tr("Job Queue Actions:"),
-                    msgs, kDialogCodeButton2);
-                if (kDialogCodeButton0 == retval)
-                {
-                    JobQueue::PauseJob(contentData[contentPos].toInt());
-                    doJobQueueStatus();
-                }
-                else if (kDialogCodeButton1 == retval)
-                {
-                    JobQueue::StopJob(contentData[contentPos].toInt());
-                    doJobQueueStatus();
-                }
-            }
-            else if (jobStatus == JOB_PAUSED)
-            {
-                msgs << QObject::tr("Resume");
-                msgs << QObject::tr("Stop");
-                msgs << QObject::tr("No Change");
-                DialogCode retval = MythPopupBox::ShowButtonPopup(
-                    my_parent,
-                    QString("JobQueuePopup"),
-                    QObject::tr("Job Queue Actions:"),
-                    msgs, kDialogCodeButton2);
-
-                if (kDialogCodeButton0 == retval)
-                {
-                    JobQueue::ResumeJob(contentData[contentPos].toInt());
-                    doJobQueueStatus();
-                }
-                else if (kDialogCodeButton1 == retval)
-                {
-                    JobQueue::StopJob(contentData[contentPos].toInt());
-                    doJobQueueStatus();
-                }
-            }
-            else if (jobStatus & JOB_DONE)
-            {
-                DialogCode retval = MythPopupBox::Show2ButtonPopup(
-                    my_parent,
-                    QString("JobQueuePopup"),
-                    QObject::tr("Requeue Job?"),
-                    QObject::tr("Yes"), QObject::tr("No"), kDialogCodeButton0);
-
-                if (kDialogCodeButton0 == retval)
-                {
-                    JobQueue::ChangeJobStatus(contentData[contentPos].toInt(),
-                                              JOB_QUEUED);
-                    doJobQueueStatus();
-                }
+                MSqlQuery query(MSqlQuery::InitCon());
+                query.prepare("UPDATE mythlog SET acknowledged = 1 "
+                                "WHERE priority <= :PRIORITY ;");
+                query.bindValue(":PRIORITY", m_minLevel);
+                query.exec();
+                doLogEntries();
             }
         }
-        else if (currentItem == QObject::tr("AutoExpire List"))
+        else if (resultid == "JobDelete")
         {
-            ProgramInfo* rec;
-
-            rec = expList[contentPos];
-
-            if (rec)
+            if (buttonnum == 1)
             {
-                QStringList msgs;
-
-                msgs << QObject::tr("Delete Now");
-                if ((rec)->recgroup == "LiveTV")
-                    msgs << QObject::tr("Move to Default group");
-                else if ((rec)->recgroup == "Deleted")
-                    msgs << QObject::tr("Undelete");
+                int jobID = dce->GetData().toInt();
+                JobQueue::DeleteJob(jobID);
+                doJobQueueStatus();
+            }
+        }
+        else if (resultid == "JobRequeue")
+        {
+            if (buttonnum == 1)
+            {
+                int jobID = dce->GetData().toInt();
+                JobQueue::ChangeJobStatus(jobID, JOB_QUEUED);
+                doJobQueueStatus();
+            }
+        }
+        else if (resultid == "JobModify")
+        {
+            int jobID = dce->GetData().toInt();
+            if (buttonnum == 0)
+            {
+                if (JobQueue::GetJobStatus(jobID) == JOB_PAUSED)
+                    JobQueue::ResumeJob(jobID);
                 else
-                    msgs << QObject::tr("Disable AutoExpire");
-                msgs << QObject::tr("No Change");
-
-                DialogCode retval = MythPopupBox::ShowButtonPopup(
-                    my_parent,
-                    QString("AutoExpirePopup"),
-                    QObject::tr("AutoExpire Actions:"),
-                    msgs, kDialogCodeButton2);
-
-                if ((kDialogCodeButton0 == retval) && REC_CAN_BE_DELETED(rec))
-                {
-                    RemoteDeleteRecording(rec, false, false);
-                }
-                else if (kDialogCodeButton1 == retval)
-                {
-                    if ((rec)->recgroup == "Deleted")
-                        RemoteUndeleteRecording(rec);
-                    else
-                    {
-                        rec->SetAutoExpire(0);
-
-                        if ((rec)->recgroup == "LiveTV")
-                            rec->ApplyRecordRecGroupChange("Default");
-                    }
-                }
-
-                // Update list, prevent selected item going off bottom
-                doAutoExpireList();
-                if (contentPos >= (int)expList.size())
-                    contentPos = max((int)expList.size()-1,0);
+                    JobQueue::PauseJob(jobID);
             }
+            else if (buttonnum == 1)
+            {
+                JobQueue::StopJob(jobID);
+            }
+
+            doJobQueueStatus();
         }
-        return;
+        else if (resultid == "AutoExpireManage")
+        {
+            ProgramInfo* rec = qVariantValue<ProgramInfo*>(dce->GetData());
+            if (!rec)
+                return;
+
+            if ((buttonnum == 0) && REC_CAN_BE_DELETED(rec))
+            {
+                RemoteDeleteRecording(rec, false, false);
+            }
+            else if (buttonnum == 1)
+            {
+                if ((rec)->recgroup == "Deleted")
+                    RemoteUndeleteRecording(rec);
+                else
+                {
+                    rec->SetAutoExpire(0);
+
+                    if ((rec)->recgroup == "LiveTV")
+                        rec->ApplyRecordRecGroupChange("Default");
+                }
+            }
+            doAutoExpireList();
+        }
+
     }
-
-    // Clear all visible content elements here
-    // I'm sure there's a better way to do this but I can't find it
-    content->ClearAllText();
-    list_area->ResetList();
-    contentLines.clear();
-    contentDetail.clear();
-    contentFont.clear();
-    contentData.clear();
-
-    if (currentItem == QObject::tr("Listings Status"))
-        doListingsStatus();
-    else if (currentItem == QObject::tr("Schedule Status"))
-        doScheduleStatus();
-    else if (currentItem == QObject::tr("Tuner Status"))
-        doTunerStatus();
-    else if (currentItem == QObject::tr("Log Entries"))
-        doLogEntries();
-    else if (currentItem == QObject::tr("Job Queue"))
-        doJobQueueStatus();
-    else if (currentItem == QObject::tr("Machine Status"))
-        doMachineStatus();
-    else if (currentItem == QObject::tr("AutoExpire List"))
-        doAutoExpireList();
 }
 
 void StatusBox::doListingsStatus()
 {
+    if (m_iconState)
+        m_iconState->DisplayState("listings");
+    m_logList->Reset();
+    m_helpText->SetText(tr("Listings Status shows the latest "
+                                    "status information from "
+                                    "mythfilldatabase"));
+
     QString mfdLastRunStart, mfdLastRunEnd, mfdLastRunStatus, mfdNextRunStart;
     QString querytext, Status, DataDirectMessage;
     int DaysOfData;
     QDateTime qdtNow, GuideDataThrough;
-    int count = 0;
-
-    contentLines.clear();
-    contentDetail.clear();
-    contentFont.clear();
-    doScroll = false;
 
     qdtNow = QDateTime::currentDateTime();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT max(endtime) FROM program WHERE manualid=0;");
-    query.exec();
 
-    if (query.isActive() && query.size())
-    {
-        query.next();
+    if (query.exec() && query.next())
         GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
                                                  Qt::ISODate);
-    }
 
     mfdLastRunStart = gContext->GetSetting("mythfilldatabaseLastRunStart");
     mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
@@ -766,109 +496,90 @@ void StatusBox::doListingsStatus()
     mfdNextRunStart.replace("T", " ");
 
     extern const char *myth_source_version;
-    contentLines[count++] = QObject::tr("Myth version:") + " " +
-                                        MYTH_BINARY_VERSION + "   " +
-                                        myth_source_version;
-    contentLines[count++] = QObject::tr("Last mythfilldatabase guide update:");
-    contentLines[count++] = QObject::tr("Started:   ") + mfdLastRunStart;
+    extern const char *myth_source_path;
+    AddLogLine(tr("Mythfrontend version: %1 (%2)").arg(myth_source_path)
+                                                  .arg(myth_source_version));
+    AddLogLine(tr("Last mythfilldatabase guide update:"));
+    AddLogLine(tr("Started:   %1").arg(mfdLastRunStart));
 
-    if (mfdLastRunEnd >= mfdLastRunStart) //if end < start, it's still running.
-        contentLines[count++] = QObject::tr("Finished: ") + mfdLastRunEnd;
+    if (mfdLastRunEnd >= mfdLastRunStart)
+        AddLogLine(tr("Finished: %1").arg(mfdLastRunEnd));
 
-    contentLines[count++] = QObject::tr("Result: ") + mfdLastRunStatus;
+    AddLogLine(tr("Result: %1").arg(mfdLastRunStatus));
 
 
     if (mfdNextRunStart >= mfdLastRunStart)
-        contentLines[count++] = QObject::tr("Suggested Next: ") +
-                                mfdNextRunStart;
+        AddLogLine(tr("Suggested Next: %1").arg(mfdNextRunStart));
 
     DaysOfData = qdtNow.daysTo(GuideDataThrough);
 
     if (GuideDataThrough.isNull())
     {
-        contentLines[count++] = "";
-        contentLines[count++] = QObject::tr("There's no guide data available!");
-        contentLines[count++] = QObject::tr("Have you run mythfilldatabase?");
+        AddLogLine(tr("There's no guide data available!"), "", "warning");
+        AddLogLine(tr("Have you run mythfilldatabase?"), "", "warning");
     }
     else
     {
-        contentLines[count++] = QObject::tr("There is guide data until ") +
-                                QDateTime(GuideDataThrough)
-                                          .toString("yyyy-MM-dd hh:mm");
+        AddLogLine(tr("There is guide data until %1")
+                        .arg(QDateTime(GuideDataThrough)
+                            .toString("yyyy-MM-dd hh:mm")));
 
         if (DaysOfData > 0)
         {
-            Status = QString("(%1 ").arg(DaysOfData);
-            if (DaysOfData >1)
-                Status += QObject::tr("days");
-            else
-                Status += QObject::tr("day");
-            Status += ").";
-            contentLines[count++] = Status;
+            QString daystring = tr("day");
+            if (DaysOfData > 1)
+                daystring = tr("days");
+
+            Status = QString("(%1 %2).").arg(DaysOfData).arg(daystring);
+            AddLogLine(Status);
         }
     }
 
     if (DaysOfData <= 3)
+        AddLogLine(tr("WARNING: is mythfilldatabase running?"), "", "warning");
+
+    if (!DataDirectMessage.isEmpty())
     {
-        contentLines[count++] = QObject::tr("WARNING: is mythfilldatabase "
-                                            "running?");
+        AddLogLine(tr("DataDirect Status: "));
+        AddLogLine(DataDirectMessage);
     }
 
-    if (!DataDirectMessage.isNull())
-    {
-        contentLines[count++] = QObject::tr("DataDirect Status: ");
-        contentLines[count++] = DataDirectMessage;
-    }
-
-    contentTotalLines = count;
-    update(ContentRect);
 }
 
 void StatusBox::doScheduleStatus()
 {
-    doScroll = true;
-    contentLines.clear();
-    contentDetail.clear();
-    contentFont.clear();
-
-    uint count = 0;
+    if (m_iconState)
+        m_iconState->DisplayState("schedule");
+    m_logList->Reset();
+    m_helpText->SetText(tr("Schedule Status shows current statistics from the "
+                           "scheduler."));
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT COUNT(*) FROM record WHERE search = 0");
 
-    if (!query.exec() || !query.isActive())
+    query.prepare("SELECT COUNT(*) FROM record WHERE search = 0");
+    if (query.exec() && query.next())
     {
-        MythDB::DBError("StatusBox::doScheduleStatus()", query);
-        contentTotalLines = 0;
-        update(ContentRect);
-        return;
-    }
-    else
-    {
-        query.next();
         QString rules = QString("%1 %2").arg(query.value(0).toInt())
                                         .arg(tr("standard rules are defined"));
-        contentLines[count]  = rules;
-        contentDetail[count] = rules;
-        count++;
-    }
-    query.prepare("SELECT COUNT(*) FROM record WHERE search > 0");
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythDB::DBError("StatusBox::doScheduleStatus()", query);
-        contentTotalLines = 0;
-        update(ContentRect);
-        return;
+        AddLogLine(rules, rules);
     }
     else
     {
-        query.next();
+        MythDB::DBError("StatusBox::doScheduleStatus()", query);
+        return;
+    }
+
+    query.prepare("SELECT COUNT(*) FROM record WHERE search > 0");
+    if (query.exec() && query.next())
+    {
         QString rules = QString("%1 %2").arg(query.value(0).toInt())
                                         .arg(tr("search rules are defined"));
-        contentLines[count]  = rules;
-        contentDetail[count] = rules;
-        count++;
+        AddLogLine(rules, rules);
+    }
+    else
+    {
+        MythDB::DBError("StatusBox::doScheduleStatus()", query);
+        return;
     }
 
     QMap<RecStatusType, int> statusMatch;
@@ -883,29 +594,29 @@ void StatusBox::doScheduleStatus()
     int hdflag = 0;
 
     query.prepare("SELECT MAX(sourceid) FROM videosource");
-    if (query.exec() && query.isActive() && query.size())
+    if (query.exec())
     {
-        query.next();
-        maxSource = query.value(0).toInt();
+        if (query.next())
+            maxSource = query.value(0).toInt();
     }
 
     query.prepare("SELECT sourceid,name FROM videosource");
-    if (query.exec() && query.isActive() && query.size())
+    if (query.exec())
     {
         while (query.next())
             sourceText[query.value(0).toInt()] = query.value(1).toString();
     }
 
     query.prepare("SELECT MAX(cardinputid) FROM cardinput");
-    if (query.exec() && query.isActive() && query.size())
+    if (query.exec())
     {
-        query.next();
-        maxInput = query.value(0).toInt();
+        if (query.next())
+            maxInput = query.value(0).toInt();
     }
 
     query.prepare("SELECT cardinputid,cardid,inputname,displayname "
                   "FROM cardinput");
-    if (query.exec() && query.isActive() && query.size())
+    if (query.exec())
     {
         while (query.next())
         {
@@ -922,9 +633,7 @@ void StatusBox::doScheduleStatus()
     schedList.FromScheduler();
 
     tmpstr = QString("%1 %2").arg(schedList.count()).arg("matching showings");
-    contentLines[count]  = tmpstr;
-    contentDetail[count] = tmpstr;
-    count++;
+    AddLogLine(tmpstr, tmpstr);
 
     ProgramList::const_iterator it = schedList.begin();
     for (; it != schedList.end(); ++it)
@@ -954,17 +663,19 @@ void StatusBox::doScheduleStatus()
     statusMap[i++] = rsNotListed;
     int j = i;
 
+    QString fontstate;
     for (i = 0; i < j; i++)
     {
         RecStatusType type = statusMap[i];
 
+        fontstate = "";
         if (statusMatch[type] > 0)
         {
             tmpstr = QString("%1 %2").arg(statusMatch[type])
                                      .arg(statusText[type]);
-            contentLines[count]  = tmpstr;
-            contentDetail[count] = tmpstr;
-            count++;
+            if (type == rsConflict)
+                fontstate = "warning";
+            AddLogLine(tmpstr, tmpstr, fontstate);
         }
     }
 
@@ -974,9 +685,7 @@ void StatusBox::doScheduleStatus()
     {
         tmpstr = QString("%1 %2 %3").arg(hdflag).arg(willrec)
                                     .arg(tr("marked as HDTV"));
-        contentLines[count]  = tmpstr;
-        contentDetail[count] = tmpstr;
-        count++;
+        AddLogLine(tmpstr, tmpstr);
     }
     for (i = 1; i <= maxSource; i++)
     {
@@ -985,9 +694,7 @@ void StatusBox::doScheduleStatus()
             tmpstr = QString("%1 %2 %3 %4 \"%5\"")
                              .arg(sourceMatch[i]).arg(willrec)
                              .arg(tr("from source")).arg(i).arg(sourceText[i]);
-            contentLines[count]  = tmpstr;
-            contentDetail[count] = tmpstr;
-            count++;
+            AddLogLine(tmpstr, tmpstr);
         }
     }
     for (i = 1; i <= maxInput; i++)
@@ -997,21 +704,18 @@ void StatusBox::doScheduleStatus()
             tmpstr = QString("%1 %2 %3 %4 \"%5\"")
                              .arg(inputMatch[i]).arg(willrec)
                              .arg(tr("on input")).arg(i).arg(inputText[i]);
-            contentLines[count]  = tmpstr;
-            contentDetail[count] = tmpstr;
-            count++;
+            AddLogLine(tmpstr, tmpstr);
         }
     }
-    contentTotalLines = count;
-    update(ContentRect);
 }
 
 void StatusBox::doTunerStatus()
 {
-    doScroll = true;
-    contentLines.clear();
-    contentDetail.clear();
-    contentFont.clear();
+    if (m_iconState)
+        m_iconState->DisplayState("tuner");
+    m_logList->Reset();
+    m_helpText->SetText(tr("Tuner Status shows the current information about "
+                           "the state of backend tuner cards"));
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -1021,12 +725,9 @@ void StatusBox::doTunerStatus()
     if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("StatusBox::doTunerStatus()", query);
-        contentTotalLines = 0;
-        update(ContentRect);
         return;
     }
 
-    uint count = 0;
     while (query.next())
     {
         int cardid = query.value(0).toInt();
@@ -1038,9 +739,13 @@ void StatusBox::doTunerStatus()
         gContext->SendReceiveStringList(strlist);
         int state = strlist[0].toInt();
 
-        QString status = "";
+        QString status;
+        QString fontstate;
         if (state == kState_Error)
+        {
             status = tr("is unavailable");
+            fontstate = "warning";
+        }
         else if (state == kState_WatchingLiveTV)
             status = tr("is watching live TV");
         else if (state == kState_RecordingOnly ||
@@ -1049,12 +754,12 @@ void StatusBox::doTunerStatus()
         else
             status = tr("is not recording");
 
-        QString tun = tr("Tuner %1 ").arg(cardid);
+        QString tun = tr("Tuner %1 %2 %3");
         QString devlabel = CardUtil::GetDeviceLabel(
             cardid, query.value(1).toString(), query.value(2).toString());
 
-        contentLines[count]  = tun + status;
-        contentDetail[count] = tun + devlabel + " " + status;
+        QString shorttuner = tun.arg(cardid).arg("").arg(status);
+        QString longtuner = tun.arg(cardid).arg(devlabel).arg(status);
 
         if (state == kState_RecordingOnly ||
             state == kState_WatchingRecording)
@@ -1068,107 +773,91 @@ void StatusBox::doTunerStatus()
             status += " " + proginfo->title;
             status += "\n";
             status += proginfo->subtitle;
-            contentDetail[count] = tun + devlabel + " " + status;
+            longtuner = tun.arg(cardid).arg(devlabel).arg(status);
         }
-        count++;
+
+        AddLogLine(shorttuner, longtuner, fontstate);
     }
-    contentTotalLines = count;
-    update(ContentRect);
 }
 
 void StatusBox::doLogEntries(void)
 {
-    QString line;
-    int count = 0;
-
-    doScroll = true;
-
-    contentLines.clear();
-    contentDetail.clear();
-    contentFont.clear();
-    contentData.clear();
+    if (m_iconState)
+        m_iconState->DisplayState("log");
+    m_logList->Reset();
+    m_helpText->SetText(tr("Log Entries shows any unread log entries from the "
+                           "system if you have logging enabled"));
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT logid, module, priority, logdate, host, "
                   "message, details "
                   "FROM mythlog WHERE acknowledged = 0 "
                   "AND priority <= :PRIORITY ORDER BY logdate DESC;");
-    query.bindValue(":PRIORITY", min_level);
-    query.exec();
+    query.bindValue(":PRIORITY", m_minLevel);
 
-    if (query.isActive())
+    if (query.exec())
     {
+        QString line;
+        QString detail;
         while (query.next())
         {
             line = QString("%1").arg(query.value(5).toString());
-            contentLines[count] = line;
 
             if (query.value(6).toString() != "")
-                line = tr("On %1 %2 from %3.%4\n%5\n%6")
+                detail = tr("On %1 %2 from %3.%4\n%5\n%6")
                                .arg(query.value(3).toDateTime()
-                                         .toString(dateFormat))
+                                         .toString(m_dateFormat))
                                .arg(query.value(3).toDateTime()
-                                         .toString(timeFormat))
+                                         .toString(m_timeFormat))
                                .arg(query.value(4).toString())
                                .arg(query.value(1).toString())
                                .arg(query.value(5).toString())
                                .arg(query.value(6).toString());
             else
-                line = tr("On %1 %2 from %3.%4\n%5\nNo other details")
+                detail = tr("On %1 %2 from %3.%4\n%5\nNo other details")
                                .arg(query.value(3).toDateTime()
-                                         .toString(dateFormat))
+                                         .toString(m_dateFormat))
                                .arg(query.value(3).toDateTime()
-                                         .toString(timeFormat))
+                                         .toString(m_timeFormat))
                                .arg(query.value(4).toString())
                                .arg(query.value(1).toString())
                                .arg(query.value(5).toString());
-            contentDetail[count] = line;
-            contentData[count++] = query.value(0).toString();
+            AddLogLine(line, detail, "", query.value(0).toString());
+        }
+
+        if (query.size() == 0)
+        {
+            AddLogLine(tr("No items found at priority level %1 or lower.")
+                                                            .arg(m_minLevel));
+            AddLogLine(tr("Use 1-8 to change priority level."));
         }
     }
-
-    if (!count)
-    {
-        doScroll = false;
-        contentLines[count++] = QObject::tr("No items found at priority "
-                                            "level %1 or lower.")
-                                            .arg(min_level);
-        contentLines[count++] = QObject::tr("Use 1-8 to change priority "
-                                            "level.");
-    }
-
-    contentTotalLines = count;
-    if (contentPos > (contentTotalLines - 1))
-        contentPos = contentTotalLines - 1;
-
-    update(ContentRect);
 }
 
 void StatusBox::doJobQueueStatus()
 {
+    if (m_iconState)
+        m_iconState->DisplayState("jobqueue");
+    m_logList->Reset();
+    m_helpText->SetText(tr("Job Queue shows any jobs currently in Myth's Job "
+                           "Queue such as a commercial flagging job."));
+
     QMap<int, JobQueueEntry> jobs;
     QMap<int, JobQueueEntry>::Iterator it;
-    int count = 0;
-
-    QString detail;
 
     JobQueue::GetJobsInQueue(jobs,
                              JOB_LIST_NOT_DONE | JOB_LIST_ERROR |
                              JOB_LIST_RECENT);
 
-    doScroll = true;
-
-    contentLines.clear();
-    contentDetail.clear();
-    contentFont.clear();
-    contentData.clear();
-
     if (jobs.size())
     {
+        QString detail;
+        QString line;
+
         for (it = jobs.begin(); it != jobs.end(); ++it)
         {
-            QString chanid = (*it).chanid;
-            QDateTime starttime = (*it).starttime;
+            QString chanid = it.data().chanid;
+            QDateTime starttime = it.data().starttime;
             ProgramInfo *pginfo;
 
             pginfo = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
@@ -1176,46 +865,41 @@ void StatusBox::doJobQueueStatus()
             if (!pginfo)
                 continue;
 
-            detail = pginfo->title + "\n" +
-                     pginfo->channame + " " + pginfo->chanstr +
-                         " @ " + starttime.toString(timeDateFormat) + "\n" +
-                     tr("Job:") + " " + JobQueue::JobText((*it).type) +
-                     "     " + tr("Status: ") +
-                     JobQueue::StatusText((*it).status);
+            detail = QString("%1\n%2 %3 @ %4\n%5 %6     %7 %8")
+                    .arg(pginfo->title)
+                    .arg(pginfo->channame)
+                    .arg(pginfo->chanstr)
+                    .arg(starttime.toString(m_timeDateFormat))
+                    .arg(tr("Job:"))
+                    .arg(JobQueue::JobText(it.data().type))
+                    .arg(tr("Status: "))
+                    .arg(JobQueue::StatusText(it.data().status));
 
-            if ((*it).status != JOB_QUEUED)
-                detail += " (" + (*it).hostname + ")";
+            if (it.data().status != JOB_QUEUED)
+                detail += " (" + it.data().hostname + ")";
 
-            if ((*it).schedruntime > QDateTime::currentDateTime())
+            if (it.data().schedruntime > QDateTime::currentDateTime())
                 detail += "\n" + tr("Scheduled Run Time:") + " " +
-                    (*it).schedruntime.toString(timeDateFormat);
+                    it.data().schedruntime.toString(m_timeDateFormat);
             else
-                detail += "\n" + (*it).comment;
+                detail += "\n" + it.data().comment;
 
-            contentLines[count] = pginfo->title + " @ " +
-                                  starttime.toString(timeDateFormat);
+            line = QString("%1 @ %2").arg(pginfo->title)
+                                     .arg(starttime.toString(m_timeDateFormat));
 
-            contentDetail[count] = detail;
-            contentData[count] = QString("%1").arg((*it).id);
+            QString font;
+            if (it.data().status == JOB_ERRORED)
+                font = "error";
+            else if (it.data().status == JOB_ABORTED)
+                font = "warning";
 
-            if ((*it).status == JOB_ERRORED)
-                contentFont[count] = "error";
-            else if ((*it).status == JOB_ABORTED)
-                contentFont[count] = "warning";
-
-            count++;
-
+            AddLogLine(line, detail, font, QString("%1").arg(it.data().id));
             delete pginfo;
         }
     }
     else
-    {
-        contentLines[count++] = QObject::tr("Job Queue is currently empty.");
-        doScroll = false;
-    }
+        AddLogLine(tr("Job Queue is currently empty."));
 
-    contentTotalLines = count;
-    update(ContentRect);
 }
 
 // Some helper routines for doMachineStatus() that format the output strings
@@ -1283,9 +967,9 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
     for (; it != prof2bps.end(); ++it)
     {
         const QString pro =
-                tail.arg(it.key()).arg((int)((float)(*it) / 1024.0));
+                tail.arg(it.key()).arg((int)((float)it.data() / 1024.0));
 
-        long long bytesPerMin = ((*it) >> 1) * 15;
+        long long bytesPerMin = (it.data() >> 1) * 15;
         uint minLeft = ((free<<5)/bytesPerMin)<<5;
         minLeft = (minLeft/15)*15;
         uint hoursLeft = minLeft/60;
@@ -1359,10 +1043,10 @@ void StatusBox::getActualRecordedBPS(QString hostnames)
 
     query.prepare(querystr.arg(hostnames));
 
-    if (query.exec() && query.isActive() && query.size() > 0 && query.next() &&
+    if (query.exec() && query.next() &&
         query.value(0).toDouble() > 0)
     {
-        recordingProfilesBPS[QObject::tr("average")] =
+        recordingProfilesBPS[tr("average")] =
             (int)(query.value(0).toDouble());
     }
 
@@ -1375,10 +1059,10 @@ void StatusBox::getActualRecordedBPS(QString hostnames)
 
     query.prepare(querystr.arg(hostnames));
 
-    if (query.exec() && query.isActive() && query.size() > 0 && query.next() &&
+    if (query.exec() && query.next() &&
         query.value(0).toDouble() > 0)
     {
-        recordingProfilesBPS[QObject::tr("maximum")] =
+        recordingProfilesBPS[tr("maximum")] =
             (int)(query.value(0).toDouble());
     }
 }
@@ -1393,57 +1077,51 @@ void StatusBox::getActualRecordedBPS(QString hostnames)
  */
 void StatusBox::doMachineStatus()
 {
-    int           count(0);
+    if (m_iconState)
+        m_iconState->DisplayState("machine");
+    m_logList->Reset();
+    QString machineStr = tr("Machine Status shows some operating system "
+                            "statistics of this machine");
+    if (!m_isBackendActive)
+        machineStr.append(" " + tr("and the MythTV server"));
+
+    m_helpText->SetText(machineStr);
+
     int           totalM, usedM, freeM;    // Physical memory
     int           totalS, usedS, freeS;    // Virtual  memory (swap)
     time_t        uptime;
-    int           detailBegin;
-    QString       detailString;
-    int           detailLoop;
 
-    contentLines.clear();
-    contentDetail.clear();
-    contentFont.clear();
-    doScroll = true;
-
-    detailBegin = count;
-    detailString = "";
-
-    if (isBackend)
-        contentLines[count] = QObject::tr("System") + ":";
+    QString line;
+    if (m_isBackendActive)
+        line = tr("System:");
     else
-        contentLines[count] = QObject::tr("This machine") + ":";
-    detailString += contentLines[count] + "\n";
-    count++;
+        line = tr("This machine:");
+    AddLogLine(line, QString("%1\n").arg(line));
 
     // uptime
     if (!getUptime(uptime))
         uptime = 0;
-    contentLines[count] = uptimeStr(uptime);
+    line = uptimeStr(uptime);
 
     // weighted average loads
-    contentLines[count].append(".   " + QObject::tr("Load") + ": ");
+    line.append(".   " + tr("Load") + ": ");
 
 #ifdef _WIN32
-    contentLines[count].append(
-        QObject::tr("unknown") + " - getloadavg() " + QObject::tr("failed"));
+    line.append(tr("unknown") + " - getloadavg() " + tr("failed"));
 #else // if !_WIN32
     double loads[3];
     if (getloadavg(loads,3) == -1)
-        contentLines[count].append(QObject::tr("unknown") +
-                                   " - getloadavg() " + QObject::tr("failed"));
+        line.append(tr("unknown") + " - getloadavg() " + tr("failed"));
     else
     {
         char buff[30];
 
         sprintf(buff, "%0.2lf, %0.2lf, %0.2lf", loads[0], loads[1], loads[2]);
-        contentLines[count].append(QString(buff));
+        line.append(QString(buff));
     }
 #endif // _WIN32
 
-    detailString += contentLines[count] + "\n";
-    count++;
-
+    AddLogLine(line, QString("%1\n").arg(line));
 
     // memory usage
     if (getMemStats(totalM, freeM, totalS, freeS))
@@ -1451,53 +1129,42 @@ void StatusBox::doMachineStatus()
         usedM = totalM - freeM;
         if (totalM > 0)
         {
-            contentLines[count] = "   " + QObject::tr("RAM") +
-                                  ": "  + usage_str_mb(totalM, usedM, freeM);
-            detailString += contentLines[count] + "\n";
-            count++;
+            line = "   " + tr("RAM") + ": " + usage_str_mb(totalM, usedM, freeM);
+            AddLogLine(line, QString("%1\n").arg(line));
         }
         usedS = totalS - freeS;
         if (totalS > 0)
         {
-            contentLines[count] = "   " + QObject::tr("Swap") +
+            line = "   " + tr("Swap") +
                                   ": "  + usage_str_mb(totalS, usedS, freeS);
-            detailString += contentLines[count] + "\n";
-            count++;
+            AddLogLine(line, QString("%1\n").arg(line));
         }
     }
 
-    for (detailLoop = detailBegin; detailLoop < count; detailLoop++)
-        contentDetail[detailLoop] = detailString;
-
-    detailBegin = count;
-    detailString = "";
-
-    if (!isBackend)
+    if (!m_isBackendActive)
     {
-        contentLines[count] = QObject::tr("MythTV server") + ":";
-        detailString += contentLines[count] + "\n";
-        count++;
+        line = tr("MythTV server") + ":";
+        AddLogLine(line, QString("%1\n").arg(line));
 
         // uptime
         if (!RemoteGetUptime(uptime))
             uptime = 0;
-        contentLines[count] = uptimeStr(uptime);
+        line = uptimeStr(uptime);
 
         // weighted average loads
-        contentLines[count].append(".   " + QObject::tr("Load") + ": ");
+        line.append(".   " + tr("Load") + ": ");
         float loads[3];
         if (RemoteGetLoad(loads))
         {
             char buff[30];
 
             sprintf(buff, "%0.2f, %0.2f, %0.2f", loads[0], loads[1], loads[2]);
-            contentLines[count].append(QString(buff));
+            line.append(QString(buff));
         }
         else
-            contentLines[count].append(QObject::tr("unknown"));
+            line.append(tr("unknown"));
 
-        detailString += contentLines[count] + "\n";
-        count++;
+        AddLogLine(line, QString("%1\n").arg(line));
 
         // memory usage
         if (RemoteGetMemStats(totalM, freeM, totalS, freeS))
@@ -1505,28 +1172,20 @@ void StatusBox::doMachineStatus()
             usedM = totalM - freeM;
             if (totalM > 0)
             {
-                contentLines[count] = "   " + QObject::tr("RAM") +
-                                      ": "  + usage_str_mb(totalM, usedM, freeM);
-                detailString += contentLines[count] + "\n";
-                count++;
+                line = "   " + tr("RAM") +
+                                     ": "  + usage_str_mb(totalM, usedM, freeM);
+                AddLogLine(line, QString("%1\n").arg(line));
             }
 
             usedS = totalS - freeS;
             if (totalS > 0)
             {
-                contentLines[count] = "   " + QObject::tr("Swap") +
-                                      ": "  + usage_str_mb(totalS, usedS, freeS);
-                detailString += contentLines[count] + "\n";
-                count++;
+                line = "   " + tr("Swap") +
+                                     ": "  + usage_str_mb(totalS, usedS, freeS);
+                AddLogLine(line, QString("%1\n").arg(line));
             }
         }
     }
-
-    for (detailLoop = detailBegin; detailLoop < count; detailLoop++)
-        contentDetail[detailLoop] = detailString;
-
-    detailBegin = count;
-    detailString = "";
 
     // get free disk space
     QString hostnames;
@@ -1554,54 +1213,39 @@ void StatusBox::doMachineStatus()
 
         if (fsInfos[i].directory == "TotalDiskSpace")
         {
-            contentLines[count] = QObject::tr("Total Disk Space:");
-            detailString += contentLines[count] + "\n";
-            count++;
+            line = tr("Total Disk Space:");
+            AddLogLine(line, QString("%1\n").arg(line));
         }
         else
         {
-            contentLines[count] =
-                QObject::tr("MythTV Drive #%1:")
-                            .arg(fsInfos[i].fsID);
-            detailString += contentLines[count] + "\n";
-            count++;
+            line = tr("MythTV Drive #%1:").arg(fsInfos[i].fsID);
+            AddLogLine(line, QString("%1\n").arg(line));
 
-            QStringList tokens = fsInfos[i].directory.split(",");
+            QStringList tokens = QStringList::split(",", fsInfos[i].directory);
 
             if (tokens.size() > 1)
             {
-                contentLines[count++] +=
-                    QString("   ") + QObject::tr("Directories:");
+                AddLogLine(QString("   ") + tr("Directories:"));
 
                 int curToken = 0;
                 while (curToken < tokens.size())
-                    contentLines[count++] =
-                        QString("      ") + tokens[curToken++];
+                    AddLogLine(QString("      ") + tokens[curToken++]);
             }
             else
             {
-                contentLines[count++] += QString("   " ) +
-                    QObject::tr("Directory:") + " " + fsInfos[i].directory;
+                AddLogLine(QString("   " ) + tr("Directory:") + " " +
+                            fsInfos[i].directory);
             }
         }
 
         QStringList::iterator it = list.begin();
         for (;it != list.end(); ++it)
         {
-            contentLines[count] =  QString("   ") + (*it);
-            detailString += contentLines[count] + "\n";
-            count++;
+            line = QString("   ") + (*it);
+            AddLogLine(line, QString("%1\n").arg(line));
         }
-
-        for (detailLoop = detailBegin; detailLoop < count; detailLoop++)
-            contentDetail[detailLoop] = detailString;
-
-        detailBegin = count;
-        detailString = "";
     }
 
-    contentTotalLines = count;
-    update(ContentRect);
 }
 
 /** \fn StatusBox::doAutoExpireList()
@@ -1609,7 +1253,14 @@ void StatusBox::doMachineStatus()
  */
 void StatusBox::doAutoExpireList()
 {
-    int                   count(0);
+    if (m_iconState)
+        m_iconState->DisplayState("autoexpire");
+    m_logList->Reset();
+    m_helpText->SetText(tr("The AutoExpire List shows all recordings which "
+                           "may be expired and the order of their expiration. "
+                           "Recordings at the top of the list will be expired "
+                           "first."));
+
     ProgramInfo*          pginfo;
     QString               contentLine;
     QString               detailInfo;
@@ -1620,19 +1271,14 @@ void StatusBox::doAutoExpireList()
     long long             deletedGroupSize(0);
     int                   deletedGroupCount(0);
 
-    contentLines.clear();
-    contentDetail.clear();
-    contentFont.clear();
-    doScroll = true;
-
     vector<ProgramInfo *>::iterator it;
-    for (it = expList.begin(); it != expList.end(); it++)
+    for (it = m_expList.begin(); it != m_expList.end(); it++)
         delete *it;
-    expList.clear();
+    m_expList.clear();
 
-    RemoteGetAllExpiringRecordings(expList);
+    RemoteGetAllExpiringRecordings(m_expList);
 
-    for (it = expList.begin(); it != expList.end(); it++)
+    for (it = m_expList.begin(); it != m_expList.end(); it++)
     {
         pginfo = *it;
 
@@ -1650,7 +1296,7 @@ void StatusBox::doAutoExpireList()
     }
 
     staticInfo = tr("%1 recordings consuming %2 are allowed to expire")
-                    .arg(expList.size()).arg(sm_str(totalSize / 1024)) + "\n";
+                    .arg(m_expList.size()).arg(sm_str(totalSize / 1024)) + "\n";
 
     if (liveTVCount)
         staticInfo += tr("%1 of these are LiveTV and consume %2")
@@ -1660,36 +1306,40 @@ void StatusBox::doAutoExpireList()
         staticInfo += tr("%1 of these are Deleted and consume %2")
                 .arg(deletedGroupCount).arg(sm_str(deletedGroupSize / 1024)) + "\n";
 
-    for (it = expList.begin(); it != expList.end(); it++)
+    for (it = m_expList.begin(); it != m_expList.end(); it++)
     {
         pginfo = *it;
-        contentLine = pginfo->recstartts.toString(dateFormat) + " - ";
+        contentLine = pginfo->recstartts.toString(m_dateFormat) + " - ";
 
-        contentLine += "(" + ProgramInfo::i18n(pginfo->recgroup) + ") ";
+        if ((pginfo->recgroup == "LiveTV") ||
+            (pginfo->recgroup == "Deleted"))
+            contentLine += "(" + tr(pginfo->recgroup) + ") ";
+        else
+            contentLine += "(" + pginfo->recgroup + ") ";
 
         contentLine += pginfo->title +
                        " (" + sm_str(pginfo->filesize / 1024) + ")";
 
         detailInfo = staticInfo;
-        detailInfo += pginfo->recstartts.toString(timeDateFormat) + " - " +
-                      pginfo->recendts.toString(timeDateFormat);
+        detailInfo += pginfo->recstartts.toString(m_timeDateFormat) + " - " +
+                      pginfo->recendts.toString(m_timeDateFormat);
 
         detailInfo += " (" + sm_str(pginfo->filesize / 1024) + ")";
 
-        detailInfo += "(" + ProgramInfo::i18n(pginfo->recgroup) + ") ";
+        if ((pginfo->recgroup == "LiveTV") ||
+            (pginfo->recgroup == "Deleted"))
+            detailInfo += " (" + tr(pginfo->recgroup) + ")";
+        else
+            detailInfo += " (" + pginfo->recgroup + ")";
 
         detailInfo += "\n" + pginfo->title;
 
         if (pginfo->subtitle != "")
             detailInfo += " - " + pginfo->subtitle + "";
 
-        contentLines[count] = contentLine;
-        contentDetail[count] = detailInfo;
-        count++;
+        AddLogLine(contentLine, detailInfo);
     }
 
-    contentTotalLines = count;
-    update(ContentRect);
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

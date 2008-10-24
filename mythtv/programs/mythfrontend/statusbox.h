@@ -1,42 +1,36 @@
 #ifndef STATUSBOX_H_
 #define STATUSBOX_H_
 
-#include <qstringlist.h>
-#include <QPixmap>
-#include <QKeyEvent>
-#include <QPaintEvent>
+#include "mythscreentype.h"
 
-#include "mythwidgets.h"
-#include "mythdialogs.h"
-#include "uitypes.h"
-#include "xmlparse.h"
 #include "programinfo.h"
+
+class MythUIText;
+class MythUIButtonList;
+class MythUIButtonListItem;
+class MythUIStateType;
 
 typedef QMap<QString, unsigned int> recprof2bps_t;
 
-class LayerSet;
-
-class StatusBox : public MythDialog
+class StatusBox : public MythScreenType
 {
     Q_OBJECT
   public:
-    StatusBox(MythMainWindow *parent, const char *name = 0);
+    StatusBox(MythScreenStack *parent);
    ~StatusBox(void);
 
-   bool IsErrored() const { return errored; }
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
+    void customEvent(QEvent*);
 
-  protected slots:
+  signals:
+    void updateLog();
 
-  protected:
-    void keyPressEvent(QKeyEvent *e);
-    void paintEvent(QPaintEvent *e);
+  private slots:
+    void setHelpText(MythUIButtonListItem *item);
+    void updateLogList(MythUIButtonListItem *item);
+    void clicked(MythUIButtonListItem *item);
 
-  private:
-    void updateBackground();
-    void updateTopBar();
-    void updateSelector();
-    void updateContent();
-    void LoadTheme();
     void doListingsStatus();
     void doScheduleStatus();
     void doTunerStatus();
@@ -44,42 +38,32 @@ class StatusBox : public MythDialog
     void doJobQueueStatus();
     void doMachineStatus();
     void doAutoExpireList();
-    void clicked();
-    void setHelpText();
+
+  private:
+    void Load();
+
+    MythUIButtonListItem* AddLogLine(QString line, QString detail="",
+                                     QString state="", QString data="");
+
     void getActualRecordedBPS(QString hostnames);
 
-    XMLParse *theme;
-    QDomElement xmldata;
-    QRect TopRect, SelectRect, ContentRect;
-    UITextType *heading, *helptext;
-    UIListType *icon_list, *list_area;
-    LayerSet *selector, *topbar, *content;
+    MythUIText *m_helpText;
+    MythUIButtonList *m_categoryList;
+    MythUIButtonList *m_logList;
+    MythUIStateType *m_iconState;
 
-    int max_icons;
+    QString m_dateFormat, m_timeFormat, m_timeDateFormat;
 
-    bool inContent, doScroll;
-    int contentTotalLines;
-    int contentSize;
-    int contentPos;
-    int contentMid;
-    int itemCurrent;
-    int min_level;
-    QString dateFormat, timeFormat, timeDateFormat;
-
-    QMap<int, QString> contentLines;
-    QMap<int, QString> contentDetail;
-    QMap<int, QString> contentFont;
     QMap<int, QString> contentData;
     recprof2bps_t      recordingProfilesBPS;
 
-    vector<ProgramInfo *> expList;
+    vector<ProgramInfo *> m_expList;
 
-    MythMainWindow *my_parent;
+    MythScreenStack *m_popupStack;
 
-    QPixmap m_background;
+    int m_minLevel;
 
-    bool isBackend;
-    bool errored;
+    bool m_isBackendActive;
 };
 
 #endif
