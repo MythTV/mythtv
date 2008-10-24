@@ -819,6 +819,31 @@ void gotoMainMenu(void)
     QApplication::postEvent((QObject*)(gContext->GetMainWindow()), event);
 }
 
+// If the theme specified in the DB is somehow broken, try a standard one:
+//
+bool resetTheme(QString themedir, const QString badtheme)
+{
+    QString themename = "blue";
+
+    if (badtheme == "blue")
+        themename = "G.A.N.T";
+
+    VERBOSE(VB_IMPORTANT,
+                QString("Overridding broken theme '%1' with '%2'")
+                .arg(badtheme).arg(themename));
+
+    gContext->OverrideSettingForSession("Theme", themename);
+    themedir = GetMythUI()->FindThemeDir(themename);
+
+    LanguageSettings::reload();
+    GetMythUI()->LoadQtConfig();
+    GetMythMainWindow()->Init();
+    themeBase->Reload();
+    GetMythUI()->UpdateImageCache();
+
+    return RunMenu(themedir, themename);
+}
+
 int reloadTheme(void)
 {
     LanguageSettings::reload();
@@ -841,32 +866,8 @@ int reloadTheme(void)
         return FRONTEND_BUGGY_EXIT_NO_THEME;
     }
 
-    if (!RunMenu(themedir, themename))
-    {
-        if (themename == "blue")
-        {
-            cleanup();
-            return FRONTEND_BUGGY_EXIT_NO_THEME;
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Overridding broken theme '%1' with 'blue'")
-                    .arg(themename));
-            gContext->OverrideSettingForSession("Theme", "blue");
-            themename = gContext->GetSetting("Theme", "blue");
-            themedir = GetMythUI()->FindThemeDir(themename);
-
-            LanguageSettings::reload();
-            GetMythUI()->LoadQtConfig();
-            GetMythMainWindow()->Init();
-            themeBase->Reload();
-            GetMythUI()->UpdateImageCache();
-
-            if (!RunMenu(themedir, themename))
-                return FRONTEND_BUGGY_EXIT_NO_THEME;
-        }
-    }
+    if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
+        return FRONTEND_BUGGY_EXIT_NO_THEME;
 
 
     LCD::SetupLCD();
@@ -1464,32 +1465,8 @@ int main(int argc, char **argv)
             return FRONTEND_EXIT_NO_THEME;
         }
 
-        if (!RunMenu(themedir, themename))
-        {
-            if (themename == "blue")
-            {
-                cleanup();
-                return FRONTEND_EXIT_NO_THEME;
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT,
-                        QString("Overridding broken theme '%1' with 'blue'")
-                        .arg(themename));
-                gContext->OverrideSettingForSession("Theme", "blue");
-                themename = gContext->GetSetting("Theme", "blue");
-                themedir = GetMythUI()->FindThemeDir(themename);
-
-                LanguageSettings::reload();
-                GetMythUI()->LoadQtConfig();
-                GetMythMainWindow()->Init();
-                themeBase->Reload();
-                GetMythUI()->UpdateImageCache();
-
-                if (!RunMenu(themedir, themename))
-                    return FRONTEND_EXIT_NO_THEME;
-            }
-        }
+        if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
+            return FRONTEND_EXIT_NO_THEME;
 
 
         // Setup handler for USR1 signals to reload theme
