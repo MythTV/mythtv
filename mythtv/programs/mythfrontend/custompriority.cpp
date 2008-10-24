@@ -333,7 +333,7 @@ bool CustomPriority::checkSyntax(void)
     {
         msg = "Power Priority rules do not reqiure a leading \"AND\"";
     }
-    else if (desc.contains(";", false))
+    else if (desc.contains(';'))
     {
         msg  = "Power Priority rules can not include semicolon ( ; ) ";
         msg += "statement terminators.";
