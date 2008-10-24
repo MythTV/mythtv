@@ -239,15 +239,16 @@ void SingleView::paintEvent(QPaintEvent *)
             if (m_pixmap->width() <= screenwidth &&
                 m_pixmap->height() <= screenheight)
             {
-                bitBlt(&pix,
-                       (screenwidth  - m_pixmap->width())  >> 1,
-                       (screenheight - m_pixmap->height()) >> 1,
-                       m_pixmap,0,0,-1,-1);
+                QPainter p(&pix);
+                p.drawPixmap(QPoint((screenwidth  - m_pixmap->width())  >> 1,
+                                    (screenheight - m_pixmap->height()) >> 1),
+                             *m_pixmap, QRect(0,0,-1,-1));
             }
             else
             {
-                bitBlt(&pix, QPoint(0, 0),
-                       m_pixmap, QRect(m_source_loc, pix.size()));
+                QPainter p(&pix);
+                p.drawPixmap(QPoint(0,0),
+                             *m_pixmap, QRect(m_source_loc, pix.size()));
             }
 
             if (m_caption_show && !m_caption_timer->isActive())
@@ -259,12 +260,19 @@ void SingleView::paintEvent(QPaintEvent *)
                 if (item->HasCaption())
                 {
                     // Store actual background to restore later
-                    bitBlt(m_caption_restore_pixmap, QPoint(0, 0), &pix,
-                           QRect(0, screenheight - 100, screenwidth, 100));
+                    QPainter sb(m_caption_restore_pixmap);
+                    sb.drawPixmap(QPoint(0, 0),
+                                  pix,
+                                  QRect(0, screenheight - 100,
+                                        screenwidth, 100));
+                    sb.end();
 
                     // Blit semi-transparent background into place
-                    bitBlt(&pix, QPoint(0, screenheight - 100),
-                           m_caption_pixmap, QRect(0, 0, screenwidth, 100));
+                    QPainter pbg(&pix);
+                    pbg.drawPixmap(QPoint(0, screenheight - 100),
+                                   *m_caption_pixmap,
+                                   QRect(0, 0, screenwidth, 100));
+                    pbg.end();
 
                     // Draw caption
                     QPainter p(&pix);
@@ -297,8 +305,9 @@ void SingleView::paintEvent(QPaintEvent *)
                         screenheight - 2 * screenheight / 10));
                 }
 
-                bitBlt(&pix, QPoint(screenwidth / 10, screenheight / 10),
-                       m_info_pixmap, QRect(0,0,-1,-1));
+                QPainter ip(&pix);
+                ip.drawPixmap(QPoint(screenwidth / 10, screenheight / 10),
+                              *m_info_pixmap, QRect(0,0,-1,-1));
 
                 QPainter p(&pix);
                 p.initFrom(this);
@@ -322,8 +331,9 @@ void SingleView::paintEvent(QPaintEvent *)
             }
 
         }
-        
-        bitBlt(this, QPoint(0,0), &pix, QRect(0,0,-1,-1));
+
+        QPainter p(this);
+        p.drawPixmap(QPoint(0,0), pix, QRect(0,0,-1,-1));
     }
     else if (!m_effect_method.isEmpty())
         RunEffect(m_effect_method);
@@ -784,8 +794,8 @@ void SingleView::CreateEffectPixmap(void)
     {
         QPoint src_loc((m_effect_pixmap->width()  - m_pixmap->width() ) >> 1,
                        (m_effect_pixmap->height() - m_pixmap->height()) >> 1);
-        bitBlt(m_effect_pixmap, src_loc,
-               m_pixmap, QRect(0, 0, -1, -1));
+        QPainter p(m_effect_pixmap);
+        p.drawPixmap(src_loc, *m_pixmap, QRect(0, 0, -1, -1));
     }
 }
 

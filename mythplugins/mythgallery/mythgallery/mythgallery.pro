@@ -37,6 +37,6 @@ opengl {
 
 
 #The following line was inserted by qt3to4
-QT += network opengl sql xml qt3support
+QT += network opengl sql xml
 
 include ( ../../libs-targetfix.pro )
