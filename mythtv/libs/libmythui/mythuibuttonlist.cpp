@@ -405,7 +405,7 @@ int MythUIButtonList::GetItemPos(MythUIButtonListItem* item) const
 void MythUIButtonList::MoveUp(MovementUnit unit)
 {
     int pos = m_selPosition;
-    if (pos == -1 || m_itemList.isEmpty())
+    if (pos == -1 || m_itemList.isEmpty() || !m_initialized)
         return;
 
     switch (unit)
@@ -491,7 +491,7 @@ void MythUIButtonList::MoveUp(MovementUnit unit)
 void MythUIButtonList::MoveDown(MovementUnit unit)
 {
     int pos = m_selPosition;
-    if (pos == -1 || m_itemList.isEmpty())
+    if (pos == -1 || m_itemList.isEmpty() || !m_initialized)
         return;
 
     switch (unit)
@@ -571,7 +571,7 @@ bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
     if (!m_initialized)
         Init();
 
-    if (m_selPosition < 0 || m_itemList.isEmpty())
+    if (m_selPosition < 0 || m_itemList.isEmpty() || !m_initialized)
         return false;
 
     bool found_it = false;
@@ -683,8 +683,6 @@ void MythUIButtonList::Init()
     if (m_initialized)
         return;
 
-    m_initialized = true;
-
     m_upArrow = dynamic_cast<MythUIStateType *>(GetChild("upscrollarrow"));
     m_downArrow = dynamic_cast<MythUIStateType *>(GetChild("downscrollarrow"));
 
@@ -766,6 +764,8 @@ void MythUIButtonList::Init()
             m_itemWidth = itemArea.width();
     }
     // End Hack
+
+    m_initialized = true;
 }
 
 bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
