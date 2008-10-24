@@ -51,7 +51,7 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
         emit Selected();
     }
 
-    SendEvent(m_buttonList->GetItemPos(item), item->text(), item->getData());
+    SendEvent(m_buttonList->GetItemPos(item), item->text(), item->GetData());
     m_ScreenStack->PopScreen(false);
 }
 
@@ -113,7 +113,7 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void MythDialogBox::SendEvent(int res, QString text, void *data)
+void MythDialogBox::SendEvent(int res, QString text, QVariant data)
 {
     if (!m_retScreen)
         return;

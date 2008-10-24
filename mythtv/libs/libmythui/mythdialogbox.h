@@ -74,7 +74,7 @@ class MythDialogBox : public MythScreenType
     void Selected();
 
   protected:
-    void SendEvent(int res, QString text = "", void *data = 0);
+    void SendEvent(int res, QString text = "", QVariant data = 0);
 
     MythUIText     *m_textarea;
     MythUIButtonList *m_buttonList;
