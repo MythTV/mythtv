@@ -36,7 +36,6 @@
 // mythgallery
 #include "config.h"
 #include "thumbgenerator.h"
-#include "constants.h"
 #include "galleryutil.h"
 
 #ifdef EXIF_SUPPORT
@@ -149,7 +148,7 @@ void ThumbGenerator::run()
                     continue; // give up;
 
                 // if the file is a movie save the image to use as a screenshot
-                if (GalleryUtil::isMovie(fileInfo.filePath()))
+                if (GalleryUtil::IsMovie(fileInfo.filePath()))
                 {
                     QString screenshotPath = QString("%1%2-screenshot.jpg")
                             .arg(getThumbcacheDir(dir))
@@ -187,13 +186,13 @@ bool ThumbGenerator::moreWork()
 bool ThumbGenerator::checkGalleryDir(const QFileInfo& fi)
 {
     // try to find a highlight
-    QDir subdir(fi.absFilePath(), "*.highlight.*", QDir::Name,
+    QDir subdir(fi.absoluteFilePath(), "*.highlight.*", QDir::Name,
                 QDir::Files);
 
 
     if (subdir.count() > 0) {
         // check if the image format is understood
-        QString path(subdir.entryInfoList().begin()->absFilePath());
+        QString path(subdir.entryInfoList().begin()->absoluteFilePath());
         QImageReader testread(path);
         return testread.canRead();
     }
@@ -206,14 +205,14 @@ bool ThumbGenerator::checkGalleryFile(const QFileInfo& fi)
     // if the image name is xyz.jpg, then look
     // for a file named xyz.thumb.jpg.
     QString fn = fi.fileName();
-    int firstDot = fn.find('.');
+    int firstDot = fn.indexOf('.');
     if (firstDot > 0)
     {
         fn.insert(firstDot, ".thumb");
-        QFileInfo galThumb(fi.dirPath(true) + "/" + fn);
+        QFileInfo galThumb(fi.absolutePath() + "/" + fn);
         if (galThumb.exists())
         {
-            QImageReader testread(galThumb.absFilePath());
+            QImageReader testread(galThumb.absoluteFilePath());
             return testread.canRead();
         }
         else
@@ -224,7 +223,7 @@ bool ThumbGenerator::checkGalleryFile(const QFileInfo& fi)
 
 void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
 {
-    QDir dir(fi.absFilePath());
+    QDir dir(fi.absoluteFilePath());
     dir.setFilter(QDir::Files);
     QFileInfoList list = dir.entryInfoList();
     if (list.isEmpty())
@@ -236,7 +235,7 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
     bool found = false;
     while (it != list.end()) {
         f = &(*it);
-        QImageReader testread(f->absFilePath());
+        QImageReader testread(f->absoluteFilePath());
         if (testread.canRead()) {
             found = true;
             break;
@@ -275,30 +274,30 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
 
 void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 {
-    if (GalleryUtil::isMovie(fi.filePath()))
+    if (GalleryUtil::IsMovie(fi.filePath()))
     {
         bool thumbnailCreated = false;
         QDir tmpDir("/tmp/mythgallery");
         if (!tmpDir.exists())
         {
-            if (!tmpDir.mkdir(tmpDir.absPath()))
+            if (!tmpDir.mkdir(tmpDir.absolutePath()))
             {
                 VERBOSE(VB_IMPORTANT, "Unable to create temp dir for movie "
-                        "thumbnail creation: " + tmpDir.absPath());
+                        "thumbnail creation: " + tmpDir.absolutePath());
             }
         }
 
         if (tmpDir.exists())
         {
-            QString cmd = "cd \"" + tmpDir.absPath() +
+            QString cmd = "cd \"" + tmpDir.absolutePath() +
                           "\"; mplayer -nosound -frames 1 -vo png:z=6 \"" +
-                          fi.absFilePath() + "\"";
+                          fi.absoluteFilePath() + "\"";
             if (myth_system(cmd) == 0)
             {
                 QFileInfo thumb(tmpDir.filePath("00000001.png"));
                 if (thumb.exists())
                 {
-                    QImage img(thumb.absFilePath());
+                    QImage img(thumb.absoluteFilePath());
                     image = img;
                     thumbnailCreated = true;
                 }
@@ -318,7 +317,8 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
     {
 #ifdef EXIF_SUPPORT
         // Try to get thumbnail from exif data
-        ExifData *ed = exif_data_new_from_file(fi.absFilePath());
+        ExifData *ed = exif_data_new_from_file(fi.absoluteFilePath()
+                                               .toLocal8Bit().constData());
         if (ed && ed->data)
         {
             image.loadFromData(ed->data, ed->size);
@@ -331,7 +331,7 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
             return;
 #endif
 
-        image.load(fi.absFilePath());
+        image.load(fi.absoluteFilePath());
     }
 }
 

@@ -129,7 +129,9 @@ GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
     if (slideShow)
     {
         m_slideshow_running = true;
-        m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
+        m_slideshow_timer->stop();
+        m_slideshow_timer->setSingleShot(true);
+        m_slideshow_timer->start(m_slideshow_frame_delay_state);
         GetMythUI()->DisableScreensaver();
     }
 }
@@ -203,7 +205,7 @@ void GLSingleView::paintGL(void)
             ThumbItem* item = m_itemList.at(m_pos);
             QString cmd = gContext->GetSetting("GalleryMoviePlayerCmd");
 
-            if ((cmd.find("internal", 0, false) > -1) ||
+            if ((cmd.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
                 (cmd.length() < 1))
             {
                 cmd = "Internal";
@@ -469,7 +471,9 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
 
     if (m_slideshow_running || m_info_show_short)
     {
-        m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
+        m_slideshow_timer->stop();
+        m_slideshow_timer->setSingleShot(true);
+        m_slideshow_timer->start(m_slideshow_frame_delay_state);
     }
 
     if (m_slideshow_running)
@@ -619,7 +623,7 @@ void GLSingleView::Load(void)
         return;
     }
 
-    if (GalleryUtil::isMovie(item->GetPath()))
+    if (GalleryUtil::IsMovie(item->GetPath()))
     {
         m_movieState = 1;
         return;
@@ -1265,7 +1269,9 @@ void GLSingleView::SlideTimeout(void)
     updateGL();
     if (m_slideshow_running)
     {
-        m_slideshow_timer->start(max(0, m_slideshow_frame_delay_state), true);
+        m_slideshow_timer->stop();
+        m_slideshow_timer->setSingleShot(true);
+        m_slideshow_timer->start(max(0, m_slideshow_frame_delay_state));
 
         // If transitioning to/from a movie, no effect is running so
         // next timeout should trigger proper immage delay.
@@ -1296,8 +1302,8 @@ void GLSingleView::createTexInfo(void)
                Qt::AlignLeft, info);
     p.end();
 
-    QImage img(pix.convertToImage());
-    img = img.convertDepth(32);
+    QImage img = pix.toImage();
+    img = img.convertToFormat(QImage::Format_ARGB32);
 
     QImage tex = convertToGLFormat(img);
 

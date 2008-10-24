@@ -21,7 +21,6 @@ HEADERS += iconview.h          singleview.h
 HEADERS += imageview.h
 HEADERS += gallerysettings.h   dbcheck.h
 HEADERS += galleryutil.h
-HEADERS += constants.h
 HEADERS += thumbgenerator.h    thumbview.h
 SOURCES += iconview.cpp        singleview.cpp
 SOURCES += imageview.cpp

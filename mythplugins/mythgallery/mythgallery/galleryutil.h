@@ -27,9 +27,13 @@
 class GalleryUtil
 {
  public:
-    static bool isImage(const char *filePath);
-    static bool isMovie(const char *filePath);
-    static long GetNaturalRotation(const char *filePath);
+    static QStringList GetImageFilter(void);
+    static QStringList GetMovieFilter(void);
+    static QStringList GetMediaFilter(void);
+
+    static bool IsImage(const QString &filePath);
+    static bool IsMovie(const QString &filePath);
+    static long GetNaturalRotation(const QString &filePath);
 
     static QString GetCaption(const QString &filePath);
 

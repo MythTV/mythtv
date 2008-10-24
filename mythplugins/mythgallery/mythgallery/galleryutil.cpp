@@ -27,7 +27,6 @@
 
 // mythgallery
 #include "config.h"
-#include "constants.h"
 #include "galleryutil.h"
 #include "thumbgenerator.h"
 
@@ -46,21 +45,88 @@ static bool FileCopy(const QFileInfo &src, const QFileInfo &dst);
 static bool FileMove(const QFileInfo &src, const QFileInfo &dst);
 static bool FileDelete(const QFileInfo &file);
 
-bool GalleryUtil::isImage(const char* filePath)
+QStringList GalleryUtil::GetImageFilter(void)
 {
-    QFileInfo fi(filePath);
-    return !fi.isDir() && IMAGE_FILENAMES.find(fi.extension(FALSE)) != -1;
+    QStringList filt;
+    filt.push_back("*.jpg");
+    filt.push_back("*.JPG");
+    filt.push_back("*.jpeg");
+    filt.push_back("*.JPEG");
+    filt.push_back("*.png");
+    filt.push_back("*.PNG");
+    filt.push_back("*.tif");
+    filt.push_back("*.TIF");
+    filt.push_back("*.tiff");
+    filt.push_back("*.TIFF");
+    filt.push_back("*.bmp");
+    filt.push_back("*.BMP");
+    filt.push_back("*.gif");
+    filt.push_back("*.GIF");
+    return filt;
 }
 
-bool GalleryUtil::isMovie(const char* filePath)
+QStringList GalleryUtil::GetMovieFilter(void)
 {
-    QFileInfo fi(filePath);
-    return !fi.isDir() && MOVIE_FILENAMES.find(fi.extension(FALSE)) != -1;
+    QStringList filt;
+    filt.push_back("*.avi");
+    filt.push_back("*.AVI");
+    filt.push_back("*.mpg");
+    filt.push_back("*.MPG");
+    filt.push_back("*.mpeg");
+    filt.push_back("*.MPEG");
+    filt.push_back("*.mov");
+    filt.push_back("*.MOV");
+    filt.push_back("*.wmv");
+    filt.push_back("*.WMV");
+    return filt;
 }
 
-long GalleryUtil::GetNaturalRotation(const char* filePath)
+QStringList GalleryUtil::GetMediaFilter(void)
+{
+    QStringList filt = GetImageFilter();
+    filt << GetMovieFilter();
+    return filt;
+}
+
+bool GalleryUtil::IsImage(const QString &filePath)
+{
+    QFileInfo fi(filePath);
+    if (fi.isDir())
+        return false;
+
+    QStringList filt = GetImageFilter();
+    QStringList::const_iterator it = filt.begin();
+    for (; it != filt.end(); ++it)
+    {
+        if ((*it).contains(fi.suffix()))
+            return true;
+    }
+
+    return false;
+}
+
+bool GalleryUtil::IsMovie(const QString &filePath)
+{
+    QFileInfo fi(filePath);
+    if (fi.isDir())
+        return false;
+
+    QStringList filt = GetMovieFilter();
+    QStringList::const_iterator it = filt.begin();
+    for (; it != filt.end(); ++it)
+    {
+        if ((*it).contains(fi.suffix()))
+            return true;
+    }
+
+    return false;
+}
+
+long GalleryUtil::GetNaturalRotation(const QString &filePathString)
 {
     long rotateAngle = 0;
+    QByteArray filePathBA = filePathString.toLocal8Bit();
+    const char *filePath = filePathBA.constData();
 
     try
     {
@@ -134,7 +200,7 @@ long GalleryUtil::GetNaturalRotation(const char* filePath)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Failed to extract EXIF headers from '%1'")
-                .arg(filePath));
+                .arg(filePathString));
     }
 
     return rotateAngle;
@@ -146,21 +212,20 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
 {
     QString blah = dir;
     QDir d(blah);
-    QString currDir = d.absPath();
+    QString currDir = d.absolutePath();
 
     bool isGallery;
-    QFileInfoList gList = d.entryInfoList("serial*.dat", QDir::Files);
+    QFileInfoList gList = d.entryInfoList(QStringList("serial*.dat"),
+                                          QDir::Files);
     isGallery = (gList.count() != 0);
 
     // Create .thumbcache dir if neccesary
     if (thumbGen)
         thumbGen->getThumbcacheDir(currDir);
 
-    d.setNameFilter(MEDIA_FILENAMES);
-    d.setSorting((QDir::SortFlag)sortorder);
-
-    d.setMatchAllDirs(true);
-    QFileInfoList list = d.entryInfoList();
+    QFileInfoList list = d.entryInfoList(GetMediaFilter(),
+                                         QDir::Files | QDir::AllDirs,
+                                         (QDir::SortFlag)sortorder);
 
     if (list.isEmpty())
         return false;
@@ -183,22 +248,22 @@ bool GalleryUtil::LoadDirectory(ThumbList& itemList, const QString& dir,
 
         // remove these already-resized pictures.
         if (isGallery && (
-                (fi->fileName().find(".thumb.") > 0) ||
-                (fi->fileName().find(".sized.") > 0) ||
-                (fi->fileName().find(".highlight.") > 0)))
+                (fi->fileName().indexOf(".thumb.") > 0) ||
+                (fi->fileName().indexOf(".sized.") > 0) ||
+                (fi->fileName().indexOf(".highlight.") > 0)))
             continue;
 
         if (fi->isDir() && recurse) 
         {
             GalleryUtil::LoadDirectory(
-                itemList, QDir::cleanDirPath(fi->absFilePath()),
+                itemList, QDir::cleanPath(fi->absoluteFilePath()),
                 sortorder, true, itemHash, thumbGen);
         }
         else 
         {
             ThumbItem *item = new ThumbItem(
                 fi->fileName(),
-                QDir::cleanDirPath(fi->absFilePath()), fi->isDir());
+                QDir::cleanPath(fi->absoluteFilePath()), fi->isDir());
 
             itemList.append(item);
 
@@ -221,7 +286,8 @@ QString GalleryUtil::GetCaption(const QString &filePath)
     {
 #ifdef EXIF_SUPPORT
         char *exifvalue = new char[1024];
-        ExifData *data = exif_data_new_from_file (filePath);
+        ExifData *data = exif_data_new_from_file(
+            filePath.toLocal8Bit().constData());
         if (data)
         {
             for (int i = 0; i < EXIF_IFD_COUNT; i++)
@@ -293,8 +359,8 @@ bool GalleryUtil::Copy(const QFileInfo &src, QFileInfo &dst)
                   "SELECT :IMAGENEW , angle "
                   "FROM gallerymetadata "
                   "WHERE image = :IMAGEOLD");
-    query.bindValue(":IMAGENEW", dst.absFilePath());
-    query.bindValue(":IMAGEOLD", src.absFilePath());
+    query.bindValue(":IMAGENEW", dst.absoluteFilePath());
+    query.bindValue(":IMAGEOLD", src.absoluteFilePath());
     if (query.exec())
         return true;
 
@@ -317,8 +383,8 @@ bool GalleryUtil::Move(const QFileInfo &src, QFileInfo &dst)
     query.prepare("UPDATE gallerymetadata "
                   "SET image = :IMAGENEW "
                   "WHERE image = :IMAGEOLD");
-    query.bindValue(":IMAGENEW", dst.absFilePath());
-    query.bindValue(":IMAGEOLD", src.absFilePath());
+    query.bindValue(":IMAGENEW", dst.absoluteFilePath());
+    query.bindValue(":IMAGEOLD", src.absoluteFilePath());
     if (query.exec())
         return true;
 
@@ -338,7 +404,7 @@ bool GalleryUtil::Delete(const QFileInfo &file)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM gallerymetadata "
                   "WHERE image = :IMAGE ;");
-    query.bindValue(":IMAGE", file.absFilePath());
+    query.bindValue(":IMAGE", file.absoluteFilePath());
     if (query.exec())
         return FileDelete(file);
 
@@ -439,12 +505,12 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, bool scaleMa
 
 bool GalleryUtil::CopyDirectory(const QFileInfo src, QFileInfo &dst)
 {
-    QDir srcDir(src.absFilePath());
+    QDir srcDir(src.absoluteFilePath());
 
     dst = MakeUniqueDirectory(dst);
     if (!dst.exists())
     {
-        srcDir.mkdir(dst.absFilePath());
+        srcDir.mkdir(dst.absoluteFilePath());
         dst.refresh();
     }
 
@@ -452,7 +518,7 @@ bool GalleryUtil::CopyDirectory(const QFileInfo src, QFileInfo &dst)
         return false;
 
     bool ok = true;
-    QDir dstDir(dst.absFilePath());
+    QDir dstDir(dst.absoluteFilePath());
     QFileInfoList list = srcDir.entryInfoList();
     QFileInfoList::const_iterator it = list.begin();
     for (; it != list.end(); ++it)
@@ -470,12 +536,12 @@ bool GalleryUtil::CopyDirectory(const QFileInfo src, QFileInfo &dst)
 
 bool GalleryUtil::MoveDirectory(const QFileInfo src, QFileInfo &dst)
 {
-    QDir srcDir(src.absFilePath());
+    QDir srcDir(src.absoluteFilePath());
 
     dst = MakeUniqueDirectory(dst);
     if (!dst.exists())
     {
-        srcDir.mkdir(dst.absFilePath());
+        srcDir.mkdir(dst.absoluteFilePath());
         dst.refresh();
     }
 
@@ -483,7 +549,7 @@ bool GalleryUtil::MoveDirectory(const QFileInfo src, QFileInfo &dst)
         return false;
 
     bool ok = true;
-    QDir dstDir(dst.absFilePath());
+    QDir dstDir(dst.absoluteFilePath());
     QFileInfoList list = srcDir.entryInfoList();
     QFileInfoList::const_iterator it = list.begin();
     for (; it != list.end(); ++it)
@@ -504,7 +570,7 @@ bool GalleryUtil::DeleteDirectory(const QFileInfo &dir)
     if (!dir.exists())
         return false;
 
-    QDir srcDir(dir.absFilePath());
+    QDir srcDir(dir.absoluteFilePath());
     QFileInfoList list = srcDir.entryInfoList();
     QFileInfoList::const_iterator it = list.begin();
     for (; it != list.end(); ++it)
@@ -559,7 +625,7 @@ bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName
     {
         while (query.next())
         {
-            QString oldImage = query.value(0).asString();
+            QString oldImage = query.value(0).toString();
             QString newImage = oldImage;
             newImage = newImage.replace(currDir + '/' + oldName,
                                         currDir + '/' + newName);
@@ -584,13 +650,13 @@ static QFileInfo MakeUnique(const QFileInfo &dest)
     for (uint i = 0; newDest.exists(); i++)
     {
         QString basename = QString("%1_%2.%3")
-            .arg(dest.baseName()).arg(i).arg(dest.extension());
+            .arg(dest.baseName()).arg(i).arg(dest.completeSuffix());
 
         newDest.setFile(dest.dir(), basename);
 
         VERBOSE(VB_GENERAL, LOC_ERR +
                 QString("Need to find a new name for '%1' trying '%2'")
-                .arg(dest.absFilePath()).arg(newDest.absFilePath()));
+                .arg(dest.absoluteFilePath()).arg(newDest.absoluteFilePath()));
     }
 
     return newDest;
@@ -602,12 +668,12 @@ static QFileInfo MakeUniqueDirectory(const QFileInfo &dest)
 
     for (uint i = 0; newDest.exists() && !newDest.isDir(); i++)
     {
-        QString fullname = QString("%1_%2").arg(dest.absFilePath()).arg(i);
+        QString fullname = QString("%1_%2").arg(dest.absoluteFilePath()).arg(i);
         newDest.setFile(fullname);
 
         VERBOSE(VB_GENERAL, LOC_ERR +
                 QString("Need to find a new name for '%1' trying '%2'")
-                .arg(dest.absFilePath()).arg(newDest.absFilePath()));
+                .arg(dest.absoluteFilePath()).arg(newDest.absoluteFilePath()));
     }
 
     return newDest;
@@ -617,8 +683,8 @@ static bool FileCopy(const QFileInfo &src, const QFileInfo &dst)
 {
     const int bufferSize = 16*1024;
 
-    QFile s(src.absFilePath());
-    QFile d(dst.absFilePath());
+    QFile s(src.absoluteFilePath());
+    QFile d(dst.absoluteFilePath());
     char buffer[bufferSize];
     int len;
 
@@ -631,11 +697,11 @@ static bool FileCopy(const QFileInfo &src, const QFileInfo &dst)
         return false;
     }
 
-    len = s.readBlock(buffer, bufferSize);
+    len = s.read(buffer, bufferSize);
     do
     {
-        d.writeBlock(buffer, len);
-        len = s.readBlock(buffer, bufferSize);
+        d.write(buffer, len);
+        len = s.read(buffer, bufferSize);
     } while (len > 0);
 
     s.close();
@@ -648,8 +714,8 @@ static bool FileMove(const QFileInfo &src, const QFileInfo &dst)
 {
     // attempt to rename the file,
     // this will fail if files are on different partitions
-    QByteArray source = src.absFilePath().toLocal8Bit();
-    QByteArray dest   = dst.absFilePath().toLocal8Bit();
+    QByteArray source = src.absoluteFilePath().toLocal8Bit();
+    QByteArray dest   = dst.absoluteFilePath().toLocal8Bit();
     if (rename(source.constData(), dest.constData()) == 0)
     {
         return true;
@@ -668,14 +734,14 @@ static bool FileMove(const QFileInfo &src, const QFileInfo &dst)
 static bool FileDelete(const QFileInfo &file)
 {
     if (!file.isDir())
-        return QFile::remove(file.absFilePath());
+        return QFile::remove(file.absoluteFilePath());
 
     // delete .thumbcache
-    QDir srcDir(file.absFilePath());
+    QDir srcDir(file.absoluteFilePath());
     QFileInfo tc(srcDir, ".thumbcache");
     GalleryUtil::Delete(tc);
 
-    srcDir.rmdir(srcDir.absPath());
+    srcDir.rmdir(srcDir.absolutePath());
 
     return true;
 }

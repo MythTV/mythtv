@@ -48,8 +48,6 @@ using namespace std;
 #include "singleview.h"
 #include "glsingleview.h"
 
-#include "constants.h"
-
 #define LOC QString("IconView: ")
 #define LOC_ERR QString("IconView, Error: ")
 
@@ -112,8 +110,7 @@ IconView::IconView(MythScreenStack *parent, const char *name,
     m_sortorder = gContext->GetNumSetting("GallerySortOrder", 0);
     m_useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL", 0);
     m_recurse = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
-    m_paths = QStringList::split(
-                ":", gContext->GetSetting("GalleryImportDirs"));
+    m_paths = gContext->GetSetting("GalleryImportDirs").split(":");
     m_errorStr = QString::null;
 
     m_captionText = NULL;
@@ -201,7 +198,7 @@ void IconView::LoadDirectory(const QString &dir)
 
     m_showDevices = false;
 
-    m_currDir = d.absPath();
+    m_currDir = d.absolutePath();
 
     while (!m_itemList.isEmpty())
         delete m_itemList.takeFirst();
@@ -242,7 +239,7 @@ void IconView::LoadDirectory(const QString &dir)
     if (m_thumbGen)
     {
         m_thumbGen->setSize((int)buttonwidth, (int)buttonheight);
-        if (!m_thumbGen->running())
+        if (!m_thumbGen->isRunning())
             m_thumbGen->start();
     }
 }
@@ -269,14 +266,14 @@ void IconView::LoadThumbnail(ThumbItem *item)
                 QFileInfoList::const_iterator it = subdir.entryInfoList().begin();
                 if (it != subdir.entryInfoList().end())
                 {
-                    imagePath = it->absFilePath();
+                    imagePath = it->absoluteFilePath();
                 }
             }
         }
         else
         {
             QString fn = item->GetName();
-            int firstDot = fn.find('.');
+            int firstDot = fn.indexOf('.');
             if (firstDot > 0)
             {
                 fn.insert(firstDot, ".thumb");
@@ -398,7 +395,7 @@ bool IconView::keyPressEvent(QKeyEvent *event)
                 }
                 else
                 {
-                    m_itemMarked.remove(thumbitem->GetPath());
+                    m_itemMarked.removeAll(thumbitem->GetPath());
                     item->setChecked(MythUIButtonListItem::NotChecked);
                 }
             }
@@ -578,7 +575,7 @@ static bool is_subdir(const QDir &parent, const QDir &subdir)
 {
     QString pstr = parent.canonicalPath();
     QString cstr = subdir.canonicalPath();
-    bool ret = !cstr.find(pstr);
+    bool ret = !cstr.indexOf(pstr);
 
     return ret;
 }
@@ -593,7 +590,7 @@ bool IconView::HandleSubDirEscape(const QString &parent)
     {
         QString oldDirName = curdir.dirName();
         curdir.cdUp();
-        LoadDirectory(curdir.absPath());
+        LoadDirectory(curdir.absolutePath());
 
         int pos = m_history.back();
         m_history.pop_back();
@@ -653,7 +650,8 @@ void IconView::customEvent(QEvent *event)
             {
                 QMatrix matrix;
                 matrix.rotate(rotateAngle);
-                td->thumb = td->thumb.xForm(matrix);
+                td->thumb = td->thumb.transformed(
+                    matrix, Qt::SmoothTransformation);
             }
 
             int pos = m_itemList.indexOf(thumbitem);
@@ -915,8 +913,7 @@ void IconView::HandleSettings(void)
     m_sortorder   = gContext->GetNumSetting("GallerySortOrder", 0);
     m_useOpenGL   = gContext->GetNumSetting("SlideshowUseOpenGL", 0);
     m_recurse     = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
-    m_paths       = QStringList::split(
-        ":", gContext->GetSetting("GalleryImportDirs"));
+    m_paths       = gContext->GetSetting("GalleryImportDirs").split(":");
 
     // reload directory
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
@@ -962,12 +959,12 @@ void IconView::HandleImport(void)
         path.setFile(*it);
         if (path.isDir() && path.isReadable())
         {
-            ImportFromDir(*it, importdir.absPath());
+            ImportFromDir(*it, importdir.absolutePath());
         }
         else if (path.isFile() && path.isExecutable())
         {
             // TODO this should not be enabled by default!!!
-            QString cmd = *it + " " + importdir.absPath();
+            QString cmd = *it + " " + importdir.absolutePath();
             VERBOSE(VB_GENERAL, LOC + QString("Executing %1").arg(cmd));
             myth_system(cmd);
         }
@@ -993,12 +990,12 @@ void IconView::HandleImport(void)
     }
 
     ThumbItem *item = new ThumbItem(importdir.dirName(),
-                                    importdir.absPath(), true);
+                                    importdir.absolutePath(), true);
     m_itemList.append(item);
     m_itemHash.insert(item->GetName(), item);
     m_thumbGen->addFile(item->GetName());
 
-    if (!m_thumbGen->running())
+    if (!m_thumbGen->isRunning())
     {
         m_thumbGen->start();
     }
@@ -1206,10 +1203,10 @@ void IconView::ImportFromDir(const QString &fromDir, const QString &toDir)
     if (!d.exists())
         return;
 
-    d.setNameFilter(MEDIA_FILENAMES);
+    d.setNameFilters(GalleryUtil::GetMediaFilter());
     d.setSorting((QDir::SortFlag)m_sortorder);
-    d.setFilter(QDir::Files | QDir::Dirs | QDir::NoSymLinks  | QDir::Readable);
-    d.setMatchAllDirs(true);
+    d.setFilter(QDir::Files       | QDir::AllDirs |
+                QDir::NoSymLinks  | QDir::Readable);
     QFileInfoList list = d.entryInfoList();
     QFileInfoList::const_iterator it = list.begin();
     const QFileInfo *fi;
@@ -1225,17 +1222,17 @@ void IconView::ImportFromDir(const QString &fromDir, const QString &toDir)
         {
             QString newdir(toDir + "/" + fi->fileName());
             d.mkdir(newdir);
-            ImportFromDir(fi->absFilePath(), newdir);
+            ImportFromDir(fi->absoluteFilePath(), newdir);
         }
         else
         {
             VERBOSE(VB_GENERAL, LOC + QString("Copying %1 to %2")
-                    .arg(fi->absFilePath())
+                    .arg(fi->absoluteFilePath())
                     .arg(toDir));
 
             // TODO FIXME, we shouldn't need a myth_system call here
             QString cmd = QString("cp \"%1\" \"%2\"")
-                .arg(fi->absFilePath()).arg(toDir);
+                .arg(fi->absoluteFilePath()).arg(toDir);
             cmd = QString(cmd.toLocal8Bit().constData());
             myth_system(cmd);
         }

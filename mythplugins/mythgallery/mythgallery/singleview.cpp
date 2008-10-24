@@ -42,7 +42,6 @@ using namespace std;
 
 // MythGallery headers
 #include "singleview.h"
-#include "constants.h"
 #include "galleryutil.h"
 
 #define LOC QString("QtView: ")
@@ -143,7 +142,9 @@ SingleView::SingleView(
     if (slideShow)
     {
         m_slideshow_running = true;
-        m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
+        m_slideshow_timer->stop();
+        m_slideshow_timer->setSingleShot(true);
+        m_slideshow_timer->start(m_slideshow_frame_delay_state);
         GetMythUI()->DisableScreensaver();
     }
 }
@@ -187,7 +188,7 @@ void SingleView::paintEvent(QPaintEvent *)
             ThumbItem *item = m_itemList.at(m_pos);
             QString cmd = gContext->GetSetting("GalleryMoviePlayerCmd");
 
-            if ((cmd.find("internal", 0, false) > -1) ||
+            if ((cmd.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
                 (cmd.length() < 1))
             {
                 cmd = "Internal";
@@ -272,7 +273,9 @@ void SingleView::paintEvent(QPaintEvent *)
                                Qt::AlignCenter, item->GetCaption());
                     p.end();
 
-                    m_caption_timer->start(m_caption_show * 1000, true);
+                    m_caption_timer->stop();
+                    m_caption_timer->setSingleShot(true);
+                    m_caption_timer->start(m_caption_show * 1000);
                 }
             }
 
@@ -351,7 +354,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
     int scrollX = screenwidth / 10;
     int scrollY = screenheight / 10;
 
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    for (unsigned int i = 0; i < (unsigned int) actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
@@ -515,7 +518,9 @@ void SingleView::keyPressEvent(QKeyEvent *e)
 
     if (m_slideshow_running || m_info_show_short)
     {
-        m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
+        m_slideshow_timer->stop();
+        m_slideshow_timer->setSingleShot(true);
+        m_slideshow_timer->start(m_slideshow_frame_delay_state);
     }
     if (m_slideshow_running)
     {
@@ -615,7 +620,7 @@ void SingleView::Load(void)
         return;
     }
 
-    if (GalleryUtil::isMovie(item->GetPath()))
+    if (GalleryUtil::IsMovie(item->GetPath()))
     {
         m_movieState = 1;
         return;
@@ -630,7 +635,7 @@ void SingleView::Load(void)
     {
         QMatrix matrix;
         matrix.rotate(m_angle);
-        m_image = m_image.xForm(matrix);
+        m_image = m_image.transformed(matrix, Qt::SmoothTransformation);
     }
 
     SetZoom(m_zoom);
@@ -654,7 +659,7 @@ void SingleView::Rotate(int angle)
 
     QMatrix matrix;
     matrix.rotate(angle);
-    m_image = m_image.xForm(matrix);
+    m_image = m_image.transformed(matrix, Qt::SmoothTransformation);
 
     SetZoom(m_zoom);
 }
@@ -675,7 +680,7 @@ void SingleView::SetZoom(float zoom)
     if ((sz.width() > 0) && (sz.height() > 0))
         img = m_image.scaled(sz, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-    SetPixmap(new QPixmap(img));
+    SetPixmap(new QPixmap(QPixmap::fromImage(img)));
 }
 
 void SingleView::SetPixmap(QPixmap *pixmap)
@@ -690,8 +695,7 @@ void SingleView::SetPixmap(QPixmap *pixmap)
 
 QPixmap *SingleView::CreateBackground(const QSize &sz)
 {
-    QImage img(sz.width(), sz.height(), 32);
-    img.setAlphaBuffer(true);
+    QImage img(sz.width(), sz.height(), QImage::Format_ARGB32);
 
     for (int y = 0; y < img.height(); y++) 
     {
@@ -702,7 +706,7 @@ QPixmap *SingleView::CreateBackground(const QSize &sz)
         }
     }
 
-    return new QPixmap(img);
+    return new QPixmap(QPixmap::fromImage(img));
 }
 
 void SingleView::RegisterEffects(void)
@@ -762,7 +766,7 @@ void SingleView::StartPainter(void)
 
     QBrush brush;
     if (m_effect_pixmap)
-        brush.setPixmap(*m_effect_pixmap);
+        brush.setTexture(*m_effect_pixmap);
 
     m_effect_painter->begin(this);
     m_effect_painter->setBrush(brush);
@@ -1421,7 +1425,9 @@ void SingleView::SlideTimeout(void)
 
     if (m_slideshow_running)
     {
-        m_slideshow_timer->start(m_slideshow_frame_delay_state, true);
+        m_slideshow_timer->stop();
+        m_slideshow_timer->setSingleShot(true);
+        m_slideshow_timer->start(m_slideshow_frame_delay_state);
 
         // If transitioning to/from a movie, no effect is running so 
         // next timeout should trigger proper immage delay.
