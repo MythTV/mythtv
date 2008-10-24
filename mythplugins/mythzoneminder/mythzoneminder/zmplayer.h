@@ -21,6 +21,7 @@
 // myth
 #include <libmythui/mythscreentype.h>
 #include <libmythui/mythuibutton.h>
+#include <libmythui/mythuiimage.h>
 #include <libmythui/mythuitext.h>
 
 // zm
@@ -31,7 +32,8 @@ class ZMPlayer : public MythScreenType
     Q_OBJECT
 
   public:
-    ZMPlayer(MythScreenStack *parent, const char *name, vector<Event *> *eventList, int *currentEvent);
+    ZMPlayer(MythScreenStack *parent, const char *name,
+             vector<Event *> *eventList, int *currentEvent);
     ~ZMPlayer();
 
     bool Create(void);
