@@ -165,13 +165,13 @@ void MythUIStateType::Clear()
     QMap<QString, MythUIType *>::Iterator i;
     for (i = m_ObjectsByName.begin(); i != m_ObjectsByName.end(); ++i)
     {
-        delete i.value();
+        DeleteChild(i.value());
     }
 
     QMap<int, MythUIType *>::Iterator j;
     for (j = m_ObjectsByState.begin(); j != m_ObjectsByState.end(); ++j)
     {
-        delete j.value();
+        DeleteChild(j.value());
     }
 
     m_ObjectsByName.clear();
@@ -240,8 +240,6 @@ void MythUIStateType::CopyFrom(MythUIType *base)
     MythUIStateType *st = dynamic_cast<MythUIStateType *>(base);
     if (!st)
         return;
-
-    Clear();
 
     m_ShowEmpty = st->m_ShowEmpty;
 
