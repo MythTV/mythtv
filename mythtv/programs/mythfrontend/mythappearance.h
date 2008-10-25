@@ -8,7 +8,6 @@
 #include "mythuitext.h"
 #include "mythuibutton.h"
 #include "mythuiimage.h"
-//#include "mythgesture.h"
 #include "mythdialogbox.h"
 
 class XMLParse;
@@ -25,7 +24,7 @@ class MythAppearance : public MythScreenType
     bool keyPressEvent(QKeyEvent *);
     void customEvent(QEvent *event);
 
-  protected: 
+  protected:
     void doMenu();
   private:
     int m_x_offset;
