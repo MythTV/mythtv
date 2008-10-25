@@ -9,6 +9,7 @@ using namespace std;
 #include <QObject>
 #include <QDateTime>
 #include <QDomDocument>
+#include <QVariant>
 
 class Q3UrlOperator;
 class Q3NetworkOperation;
@@ -48,7 +49,7 @@ class NewsSite : public QObject
 {
     Q_OBJECT
 
-public:
+  public:
 
     enum State {
         Retrieving = 0,
@@ -95,7 +96,7 @@ public:
     bool     successful(void) const;
     QString  errorMsg(void) const;
 
-private:
+  private:
     ~NewsSite();
 
     QString    m_name;
@@ -114,11 +115,11 @@ private:
 
     void ReplaceHtmlChar( QString &s);
 
-signals:
+  signals:
 
     void finished(NewsSite* item);
 
-private slots:
+  private slots:
 
     void slotFinished(Q3NetworkOperation*);
     void slotGotData(const QByteArray &data,
@@ -139,7 +140,6 @@ public:
     bool    podcast;
 };
 
-
 class NewsCategory
 {
   public:
@@ -150,5 +150,10 @@ class NewsCategory
 
     void clear(void) { siteList.clear(); }
 };
+
+Q_DECLARE_METATYPE(NewsArticle*)
+Q_DECLARE_METATYPE(NewsSite*)
+Q_DECLARE_METATYPE(NewsSiteItem*)
+Q_DECLARE_METATYPE(NewsCategory*)
 
 #endif /* NEWSENGINE_H */

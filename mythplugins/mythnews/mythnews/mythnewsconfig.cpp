@@ -162,7 +162,7 @@ bool MythNewsConfig::Create()
 //                          "Minimum value is 30 Minutes."));
 //    }
 
-//     m_SpinBox = new MythNewsSpinBox(this);
+//     m_SpinBox = new MythUISpinBox(this);
 //     m_SpinBox->setRange(30,1000);
 //     m_SpinBox->setLineStep(10);
 
@@ -176,7 +176,7 @@ void MythNewsConfig::loadData()
     {
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_categoriesList, (*it).name);
-        item->setData(&(*it));
+        item->SetData(qVariantFromValue(&(*it)));
         if (!(*it).siteList.empty())
             item->setDrawArrow(true);
     }
@@ -188,7 +188,7 @@ void MythNewsConfig::toggleItem(MythUIButtonListItem *item)
     if (!item || !item->getData())
         return;
 
-    NewsSiteItem *site = (NewsSiteItem*) item->getData();
+    NewsSiteItem *site = qVariantValue<NewsSiteItem*>(item->GetData());
 
     bool checked = (item->state() == MythUIButtonListItem::FullChecked);
 
@@ -217,7 +217,7 @@ void MythNewsConfig::slotCategoryChanged(MythUIButtonListItem *item)
 
     m_siteList->Reset();
 
-    NewsCategory *cat = (NewsCategory*) item->getData();
+    NewsCategory *cat = qVariantValue<NewsCategory*>(item->GetData());
     if (!cat)
         return;
 
@@ -229,7 +229,7 @@ void MythNewsConfig::slotCategoryChanged(MythUIButtonListItem *item)
                                      (*it).inDB ?
                                      MythUIButtonListItem::FullChecked :
                                      MythUIButtonListItem::NotChecked);
-        newitem->setData(&(*it));
+        newitem->SetData(qVariantFromValue(&(*it)));
     }
 }
 

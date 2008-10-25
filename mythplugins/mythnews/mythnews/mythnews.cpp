@@ -165,7 +165,7 @@ void MythNews::loadSites(void)
     {
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_sitesList, (*it)->name());
-        item->setData(*it);
+        item->SetData(qVariantFromValue(*it));
 
         connect(*it, SIGNAL(finished(NewsSite*)),
                 this, SLOT(slotNewsRetrieved(NewsSite*)));
@@ -184,16 +184,17 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
 
     if (GetFocusWidget() == m_articlesList)
     {
-        article = (NewsArticle*) selected->getData();
+        article = qVariantValue<NewsArticle*>(selected->GetData());
         if (m_sitesList->GetItemCurrent())
-            site = (NewsSite*) m_sitesList->GetItemCurrent()->getData();
+            site = qVariantValue<NewsSite*>
+                                (m_sitesList->GetItemCurrent()->GetData());
     }
     else
     {
-        site = (NewsSite*) selected->getData();
+        site = qVariantValue<NewsSite*>(selected->GetData());
         if (m_articlesList->GetItemCurrent())
-            article = (NewsArticle*)
-                      m_articlesList->GetItemCurrent()->getData();
+            article = qVariantValue<NewsArticle*>
+                                (m_articlesList->GetItemCurrent()->GetData());
     }
 
     if (GetFocusWidget() == m_articlesList)
@@ -540,10 +541,10 @@ void MythNews::processAndShowNews(NewsSite *site)
     site->process();
 
     MythUIButtonListItem *siteUIItem = m_sitesList->GetItemCurrent();
-    if (!siteUIItem || !siteUIItem->getData())
+    if (!siteUIItem)
         return;
 
-    if (site != (NewsSite*) siteUIItem->getData())
+    if (site != qVariantValue<NewsSite*>(siteUIItem->GetData()))
         return;
 
     m_articlesList->Reset();
@@ -553,16 +554,16 @@ void MythNews::processAndShowNews(NewsSite *site)
     {
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_articlesList, (*it).title());
-        item->setData(&(*it));
+        item->SetData(qVariantFromValue(&(*it)));
     }
 }
 
 void MythNews::slotSiteSelected(MythUIButtonListItem *item)
 {
-    if (!item || !item->getData())
+    if (!item || !item->GetData().isNull())
         return;
 
-    NewsSite *site = (NewsSite*)item->getData();
+    NewsSite *site = qVariantValue<NewsSite*>(item->GetData());
 
     m_articlesList->Reset();
 
@@ -571,7 +572,7 @@ void MythNews::slotSiteSelected(MythUIButtonListItem *item)
     {
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_articlesList, (*it).title());
-        item->setData(&(*it));
+        item->SetData(qVariantFromValue(&(*it)));
     }
 
     updateInfoView(item);
@@ -688,9 +689,10 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
 
 void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
 {
-    if (articlesListItem && articlesListItem->getData())
+    if (articlesListItem && !articlesListItem->GetData().isNull())
     {
-        NewsArticle *article = (NewsArticle*) articlesListItem->getData();
+        NewsArticle *article = qVariantValue<NewsArticle*>
+                                                (articlesListItem->GetData());
         if(article)
         {
             if (!article->enclosure().isEmpty())
@@ -773,8 +775,8 @@ void MythNews::ShowEditDialog(bool edit)
     {
         MythUIButtonListItem *siteListItem = m_sitesList->GetItemCurrent();
 
-        if (siteListItem && siteListItem->getData())
-            site = (NewsSite*) siteListItem->getData();
+        if (siteListItem && !siteListItem->GetData().isNull())
+            site = qVariantValue<NewsSite*>(siteListItem->GetData());
     }
 
 
@@ -814,9 +816,9 @@ void MythNews::deleteNewsSite()
     MythUIButtonListItem *siteUIItem = m_sitesList->GetItemCurrent();
 
     QString siteName;
-    if (siteUIItem && siteUIItem->getData())
+    if (siteUIItem && !siteUIItem->GetData().isNull())
     {
-        NewsSite *site = (NewsSite*) siteUIItem->getData();
+        NewsSite *site = qVariantValue<NewsSite*>(siteUIItem->GetData());
         if(site)
         {
             siteName = site->name();
