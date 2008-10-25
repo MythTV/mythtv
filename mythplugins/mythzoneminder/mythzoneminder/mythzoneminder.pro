@@ -3,7 +3,7 @@ include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
 TEMPLATE = lib
-CONFIG += plugin thread warn_on debug
+CONFIG += plugin thread
 TARGET = mythzoneminder
 target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
@@ -16,6 +16,6 @@ SOURCES += main.cpp zmconsole.cpp zmplayer.cpp zmevents.cpp zmliveplayer.cpp
 SOURCES += zmsettings.cpp zmclient.cpp
 
 
-QT += opengl sql xml qt3support
+QT += sql xml
 
 include ( ../../libs-targetfix.pro )

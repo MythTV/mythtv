@@ -15,18 +15,10 @@
 #include <iostream>
 #include <unistd.h>
 
-// qt
-//#include <QObject>
-//#include <QSqlDatabase>
-//#include <QSqlError>
-//#include <QObject>
-
 // myth
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythversion.h>
 #include <mythtv/mythpluginapi.h>
-//#include <mythtv/mythdialogs.h>
-//#include <mythtv/mythplugin.h>
 #include <mythtv/libmythui/mythmainwindow.h>
 #include <mythtv/libmythui/myththemedmenu.h>
 #include <mythtv/libmythui/mythuihelper.h>
@@ -92,13 +84,14 @@ void runZMLiveView(void)
     if (!checkConnection())
         return;
 
-    gContext->addCurrentLocation("zoneminderliveview");
 
-    ZMLivePlayer player(1, 1, gContext->GetMainWindow(), "zmliveplayer",
-                        "zoneminder-", "zmplayer");
-    player.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    gContext->removeCurrentLocation();}
+    ZMLivePlayer *player = new ZMLivePlayer(mainStack, "ZMLivePlayer");
+
+    if (player->Create())
+        mainStack->AddScreen(player);
+}
 
 void runZMEventView(void)
 {

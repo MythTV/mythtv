@@ -16,15 +16,7 @@
 #define ZMDEFINES_H
 
 // qt
-#include <qstring.h>
-#include <qrect.h>
-
-const QString FUNCTION_MONITOR = "Monitor";
-const QString FUNCTION_MODECT  = "Modect";
-const QString FUNCTION_NODECT  = "Nodect";
-const QString FUNCTION_RECORD  = "Record";
-const QString FUNCTION_MOCORD  = "Mocord";
-const QString FUNCTION_NONE    = "None";
+#include <QString>
 
 // event details
 typedef struct

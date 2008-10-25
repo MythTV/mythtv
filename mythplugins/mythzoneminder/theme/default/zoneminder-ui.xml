@@ -812,7 +812,7 @@
 
     <window name="zmliveplayer">
 
-        <font name="title" face="Arial">
+        <font name="title" from="basesmall">
             <color>#ffff00</color>
             <dropcolor>#000000</dropcolor>
             <size>24</size>
@@ -820,205 +820,152 @@
             <bold>yes</bold>
         </font>
 
-        <font name="monitor" face="Arial">
+        <font name="monitor" from="basesmall">
             <color>#ffff00</color>
             <size>16</size>
             <bold>no</bold>
         </font>
 
-        <font name="idle" face="Arial">
+        <font name="idle" from="basesmall">
             <color>#ffff00</color>
             <size>16</size>
             <bold>no</bold>
         </font>
 
-        <font name="alarm" face="Arial">
+        <font name="alarm" from="basesmall">
             <color>#ff0000</color>
             <size>16</size>
             <bold>no</bold>
         </font>
 
-        <font name="alert" face="Arial">
+        <font name="alert" from="basesmall">
             <color>#ffa500</color>
             <size>16</size>
             <bold>no</bold>
         </font>
 
-        <container name="info"> 
-            <area>0,0,800,600</area>
-            <textarea name="title" draworder="0" align="center">
-                <area>10,10,760,50</area>
-                <font>title</font>
-                <multiline>no</multiline>
-                <value>Zone Minder Live Player</value>
-            </textarea>
+        <textarea name="title" from="basetextarea">
+            <area>10,10,760,50</area>
+            <font>title</font>
+            <align>hcenter,top</align>
+            <value>Zone Minder Live Player</value>
+        </textarea>
 
-            <!-- one monitor view -->
-            <textarea name="name1-1" draworder="0" align="left">
-                <context>1</context>
-                <area>100,75,300,70</area>
-                <font>monitor</font>
-                <multiline>no</multiline>
-                <value>Monitor 1</value>
-            </textarea>
+        <!-- one monitor view -->
+        <textarea name="name1-1" from="basetextarea">
+            <area>100,75,300,70</area>
+            <font>monitor</font>
+            <value>Monitor 1</value>
+        </textarea>
 
-            <textarea name="status1-1" draworder="0" align="right">
-                <context>1</context>
-                <area>400,75,300,70</area>
-                <font>idle</font>
-                <multiline>no</multiline>
-                <value></value>
-            </textarea>
+        <textarea name="status1-1" from="basetextarea">
+            <area>400,75,300,70</area>
+            <align>right</align>
+            <font>idle</font>
+            <font state="idle">idle</font> 
+            <font state="alarm">alarm</font> 
+            <font state="alert">alert</font> 
+            <value></value>
+        </textarea>
 
-            <image name="frame1-1" draworder="0">
-                <context>1</context>
-                <position>100,100</position>
-                <staticsize>600,450</staticsize>
-                <filename>mz_testcard.png</filename>
-            </image>
+        <imagetype name="frame1-1">
+            <area>100,105,600,450</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
 
-            <!-- two monitor view -->
-            <textarea name="name2-1" draworder="0" align="left">
-                <context>2</context>
-                <area>20,75,185,30</area>
-                <font>monitor</font>
-                <multiline>no</multiline>
-                <value>Monitor 1</value>
-            </textarea>
+        <!-- two monitor view -->
+        <textarea name="name2-1" from="basetextarea">
+            <area>20,70,185,30</area>
+            <font>monitor</font>
+            <value>Monitor 1</value>
+        </textarea>
 
-            <textarea name="status2-1" draworder="0" align="right">
-                <context>2</context>
-                <area>205,75,185,70</area>
-                <font>idle</font>
-                <multiline>no</multiline>
-                <value></value>
-            </textarea>
+        <textarea name="status2-1" from="status1-1">
+            <area>205,75,185,70</area>
+        </textarea>
 
-            <image name="frame2-1" draworder="0">
-                <context>2</context>
-                <position>20,100</position>
-                <staticsize>370,280</staticsize>
-                <filename>mz_testcard.png</filename>
-            </image>
+        <imagetype name="frame2-1">
+            <area>20,105,370,280</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
 
-            <textarea name="name2-2" draworder="0" align="left">
-                <context>2</context>
-                <area>410,75,185,30</area>
-                <font>monitor</font>
-                <multiline>no</multiline>
-                <value>Monitor 2</value>
-            </textarea>
+        <textarea name="name2-2" from="basetextarea">
+            <area>410,75,185,30</area>
+            <font>monitor</font>
+            <value>Monitor 2</value>
+        </textarea>
 
-            <textarea name="status2-2" draworder="0" align="right">
-                <context>2</context>
-                <area>595,75,185,70</area>
-                <font>idle</font>
-                <multiline>no</multiline>
-                <value></value>
-            </textarea>
+        <textarea name="status2-2" from="status1-1">
+            <area>595,75,185,70</area>
+        </textarea>
 
-            <image name="frame2-2" draworder="0">
-                <context>2</context>
-                <position>410,100</position>
-                <staticsize>370,280</staticsize>
-                <filename>mz_testcard.png</filename>
-            </image>
+        <imagetype name="frame2-2">
+            <area>410,105,370,280</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
 
-            <!-- four monitor view -->
+        <!-- four monitor view -->
 
-            <textarea name="name3-1" draworder="0" align="left">
-                <context>3</context>
-                <area>50,75,162,30</area>
-                <font>monitor</font>
-                <multiline>no</multiline>
-                <value>Monitor 1</value>
-            </textarea>
+        <textarea name="name3-1" from="basetextarea">
+            <area>50,70,162,30</area>
+            <font>monitor</font>
+            <multiline>no</multiline>
+            <value>Monitor 1</value>
+        </textarea>
 
-            <textarea name="status3-1" draworder="0" align="right">
-                <context>3</context>
-                <area>212,75,162,30</area>
-                <font>idle</font>
-                <multiline>no</multiline>
-                <value></value>
-            </textarea>
+        <textarea name="status3-1" from="status1-1">
+            <area>212,70,162,30</area>
+        </textarea>
 
-            <image name="frame3-1" draworder="0">
-                <context>3</context>
-                <position>50,100</position>
-                <staticsize>325,215</staticsize>
-                <filename>mz_testcard.png</filename>
-            </image>
+        <imagetype name="frame3-1">
+            <area>50,100,325,215</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
 
-            <textarea name="name3-2" draworder="0" align="left">
-                <context>3</context>
-                <area>425,75,162,30</area>
-                <font>monitor</font>
-                <multiline>no</multiline>
-                <value>Monitor 2</value>
-            </textarea>
+        <textarea name="name3-2" from="basetextarea">
+            <area>425,70,162,30</area>
+            <font>monitor</font>
+            <value>Monitor 2</value>
+        </textarea>
 
-            <textarea name="status3-2" draworder="0" align="right">
-                <context>3</context>
-                <area>587,75,162,30</area>
-                <font>idle</font>
-                <multiline>no</multiline>
-                <value></value>
-            </textarea>
+        <textarea name="status3-2" from="status1-1">
+            <area>587,70,162,30</area>
+        </textarea>
 
-            <image name="frame3-2" draworder="0">
-                <context>3</context>
-                <position>425,100</position>
-                <staticsize>325,215</staticsize>
-                <filename>mz_testcard.png</filename>
-            </image>
+        <imagetype name="frame3-2">
+            <area>425,100,325,215</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
 
-            <textarea name="name3-3" draworder="0" align="left">
-                <context>3</context>
-                <area>50,325,162,30</area>
-                <font>monitor</font>
-                <multiline>no</multiline>
-                <value>Monitor 3</value>
-            </textarea>
+        <textarea name="name3-3" from="basetextarea">
+            <area>50,320,162,30</area>
+            <font>monitor</font>
+            <value>Monitor 3</value>
+        </textarea>
 
-            <textarea name="status3-3" draworder="0" align="right">
-                <context>3</context>
-                <area>212,325,162,30</area>
-                <font>idle</font>
-                <multiline>no</multiline>
-                <value></value>
-            </textarea>
+        <textarea name="status3-3" from="status1-1">
+            <area>212,320,162,30</area>
+        </textarea>
 
-            <image name="frame3-3" draworder="0">
-                <context>3</context>
-                <position>50,350</position>
-                <staticsize>325,215</staticsize>
-                <filename>mz_testcard.png</filename>
-            </image>
+        <imagetype name="frame3-3">
+            <area>50,350,325,215</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
 
-            <textarea name="name3-4" draworder="0" align="left">
-                <context>3</context>
-                <area>425,325,162,30</area>
-                <font>monitor</font>
-                <multiline>no</multiline>
-                <value>Monitor 4</value>
-            </textarea>
+        <textarea name="name3-4" from="basetextarea">
+            <area>425,320,162,30</area>
+            <font>monitor</font>
+            <value>Monitor 4</value>
+        </textarea>
 
-            <textarea name="status3-4" draworder="0" align="right">
-                <context>3</context>
-                <area>587,325,162,30</area>
-                <font>idle</font>
-                <multiline>no</multiline>
-                <value></value>
-            </textarea>
+        <textarea name="status3-4" from="status1-1">
+            <area>587,320,162,30</area>
+        </textarea>
 
-            <image name="frame3-4" draworder="0">
-                <context>3</context>
-                <position>425,350</position>
-                <staticsize>325,215</staticsize>
-                <filename>mz_testcard.png</filename>
-            </image>
-
-        </container>
+        <imagetype name="frame3-4">
+            <area>425,350,325,215</area>
+            <filename>mz_testcard.png</filename>
+        </imagetype>
 
     </window>
 

@@ -15,25 +15,17 @@
 #ifndef ZMLIVEPLAYER_H
 #define ZMLIVEPLAYER_H
 
+// c++
+#include <vector>
+using namespace std;
+
 // qt
-#include <QKeyEvent>
+//#include <QKeyEvent>
 
 // mythtv
-#include <mythtv/uitypes.h>
-#include <mythtv/uilistbtntype.h>
-#include <mythtv/xmlparse.h>
-#include <mythtv/mythdialogs.h>
-
-//gl stuff
-#include <GL/glx.h>
-#include <GL/glu.h>
-
-// xlib
-#include <X11/Xlib.h>
-
-// xv stuff
-#include <X11/extensions/Xvlib.h>
-#define RGB24 0x3
+#include <libmythui/mythscreentype.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuitext.h>
 
 // mythzoneminder
 #include "zmdefines.h"
@@ -44,77 +36,61 @@ class Player
     Player(void);
     ~Player(void);
 
-    bool startPlayer(Monitor *mon, Window winID);
-    void stopPlaying(void);
-    void updateScreen(const uchar* buffer);
-    void setMonitor(Monitor *mon, Window winID);
+    void updateFrame(const uchar* buffer);
+    void updateStatus(void);
+    void updateCamera();
+
+    void setMonitor(Monitor *mon);
+    void setWidgets(MythUIImage *image, MythUIText *status,
+                    MythUIText  *camera);
+
     Monitor *getMonitor(void) { return &m_monitor; }
-    void setDisplayRect(QRect displayRect) { m_displayRect = displayRect; }
 
   private:
     void getMonitorList(void);
-    bool startPlayerGL(Monitor *mon, Window winID);
-    bool startPlayerXv(Monitor *mon, Window winID);
-    void updateScreenGL(const uchar* buffer);
-    void updateScreenXv(const uchar* buffer);
-    int  getXvPortId(Display *dpy);
 
-    Monitor     m_monitor;
-    bool        m_initalized;
-    GLXContext  m_cx;
-    Display    *m_dis;
-    Window      m_win;
-    int         m_screenNum;
+    MythUIImage *m_frameImage;
+    MythUIText  *m_statusText;
+    MythUIText  *m_cameraText;
 
-    QRect       m_displayRect;
-    bool        m_useGL;
-    GC          m_gc;
-    XImage     *m_XImage;
-    XvImage    *m_XvImage;
-    char       *m_rgba;
-    int         m_XVport;
-    bool        m_haveXV;
+    MythImage   *m_image;
+
+    uchar       *m_rgba;
+
+    Monitor      m_monitor;
 };
 
-class ZMLivePlayer : public MythThemedDialog
+class ZMLivePlayer : public MythScreenType
 {
     Q_OBJECT
 
   public:
-    ZMLivePlayer(int monitorID, int eventID, MythMainWindow *parent,
-             const QString &window_name, const QString &theme_filename,
-             const char *name = "ZMLivePlayer");
+    ZMLivePlayer(MythScreenStack *parent, const char *name);
     ~ZMLivePlayer();
+
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
 
     void setMonitorLayout(int layout, bool restore = false);
 
   private slots:
     void updateFrame(void);
-    void updateMonitorStatus(void);
     void initMonitorLayout(void);
     void getMonitorList(void);
 
   private:
-    void wireUpTheme(void);
-    UITextType* getTextType(QString name);
-    void keyPressEvent(QKeyEvent *e);
+    MythUIType* GetMythUIType(const QString &name, bool optional = false);
+    void hideAll();
     void stopPlayers(void);
     void changePlayerMonitor(int playerNo);
 
     QTimer               *m_frameTimer;
-    QTimer               *m_statusTimer;
     bool                  m_paused;
-    int                   m_eventID;
-    int                   m_monitorID;
     int                   m_monitorLayout;
     int                   m_monitorCount;
 
     vector<Player *>     *m_players;
     vector<Monitor *>    *m_monitors;
-
-    fontProp             *m_idleFont;
-    fontProp             *m_alarmFont;
-    fontProp             *m_alertFont;
 };
 
 #endif
