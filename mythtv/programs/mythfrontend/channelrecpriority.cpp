@@ -318,7 +318,7 @@ void ChannelRecPriority::updateList()
 
         QString fontState = "default";
         if (!m_visMap[chanInfo->chanid])
-            fontState = "hidden";
+            fontState = "disabled";
 
         QString stringFormat = item->text();
         if (stringFormat.isEmpty())
@@ -332,9 +332,9 @@ void ChannelRecPriority::updateList()
                         fontState);
         item->setText(chanInfo->sourcename, "sourcename", fontState);
         if (m_visMap[chanInfo->chanid])
-            item->DisplayState("visible", "visibility");
+            item->DisplayState("normal", "status");
         else
-            item->DisplayState("hidden", "visibility");
+            item->DisplayState("disabled", "status");
 
         item->SetImage(chanInfo->iconpath, "icon");
         item->SetImage(chanInfo->iconpath);

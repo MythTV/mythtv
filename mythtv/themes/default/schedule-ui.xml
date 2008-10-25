@@ -112,88 +112,26 @@
             <area>120,330,150,30</area>
         </textarea>
 
-        <buttonlist name="schedules">
-            <area>20,51,760,305</area>
-            <layout>vertical</layout>
-            <spacing>4</spacing>
-            <buttonarea>0,0,760,265</buttonarea>
+        <buttonlist name="schedules" from="basebuttonlist2">
+            <position>20,51</position>
             <statetype name="buttonitem">
                 <area>0,0,760,25</area>
                 <state name="active">
-                    <statetype name="status">
-                        <position>0,0</position>
-                        <state name="disabled">
-                            <imagetype name="statusimage">
-                                <filename>schedule_disabled.png</filename>
-                            </imagetype>
-                        </state>
-                        <state name="conflict">
-                            <imagetype name="statusimage">
-                                <filename>schedule_conflict.png</filename>
-                            </imagetype>
-                        </state>
-                        <state name="record">
-                            <imagetype name="statusimage">
-                                <filename>schedule_record.png</filename>
-                            </imagetype>
-                        </state>
-                        <state name="recording">
-                            <imagetype name="statusimage">
-                                <filename>schedule_recording.png</filename>
-                            </imagetype>
-                        </state>
-                    </statetype>
-                    <textarea name="time" from="basetextarea">
+                    <textarea name="time" from="buttontext">
                         <area>32,1,148,24</area>
-                        <font>basesmallgrey</font>
-                        <font state="conflict">basesmallred</font>
-                        <font state="disabled">basesmallgrey</font>
-                        <font state="record">basesmallblue</font>
-                        <font state="recording">basesmallgreen</font>
                     </textarea>
                     <textarea name="channel" from="time">
-                        <area>170,1,140,24</area>
+                        <area>190,1,140,24</area>
                     </textarea>
                     <textarea name="title" from="time">
                         <area>340,1,380,24</area>
                     </textarea>
                     <textarea name="card" from="time">
-                        <area>730,1,20,24</area>
+                        <area>730,1,30,24</area>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
-                    <imagetype name="selectbar">
-                        <position>27,0</position>
-                        <filename>schedule_selectbar.png</filename>
-                    </imagetype>
-                </state>
+                <state name="selected" from="active" />
                 <state name="inactive" from="active" />
-            </statetype>
-            <statetype name="upscrollarrow">
-                <position>710,285</position>
-                <state type="off">
-                    <imagetype name="upon">
-                        <filename>lb-uparrow-reg.png</filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="upoff">
-                        <filename>lb-uparrow-sel.png</filename>
-                    </imagetype>
-                </state>
-            </statetype>
-            <statetype name="downscrollarrow">
-                <position>740,285</position>
-                <state type="off">
-                    <imagetype name="dnon">
-                        <filename>lb-dnarrow-reg.png</filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="dnoff">
-                        <filename>lb-dnarrow-sel.png</filename>
-                    </imagetype>
-                </state>
             </statetype>
         </buttonlist>
 
@@ -257,36 +195,20 @@
             <position>0,40</position>
         </imagetype>
 
-        <buttonlist name="channels">
-            <area>20,51,760,370</area>
-            <layout>vertical</layout>
-            <spacing>6</spacing>
-            <wrapstyle>selection</wrapstyle>
+        <buttonlist name="channels" from="basebuttonlist2">
+            <area>20,59,760,370</area>
             <buttonarea>0,0,760,340</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,760,25</area>
                 <state name="active">
                     <imagetype name="icon">
                         <area>0,0,25,25</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
-                    <statetype name="visibility">
+                    <statetype name="status">
                         <position>30,0</position>
-                        <state name="visible">
-                            <imagetype name="statusimage">
-                                <filename>schedule_recording.png</filename>
-                            </imagetype>
-                        </state>
-                        <state name="hidden">
-                            <imagetype name="statusimage">
-                                <filename>schedule_disabled.png</filename>
-                            </imagetype>
-                        </state>
                     </statetype>
-                    <textarea name="channum" from="basetextarea">
+                    <textarea name="channum" from="buttontext">
                         <area>60,1,50,24</area>
-                        <font>basesmall</font>
-                        <font state="hidden">basesmallgrey</font>
                     </textarea>
                     <textarea name="callsign" from="channum">
                         <area>120,1,200,24</area>
@@ -299,39 +221,14 @@
                         <align>right</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
-                    <imagetype name="selectbar">
-                        <position>27,0</position>
-                        <filename>schedule_selectbar.png</filename>
-                    </imagetype>
-                </state>
+                <state name="selected" from="active" />
                 <state name="inactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
-                <position>710,350</position>
-                <state type="off">
-                    <imagetype name="upon">
-                        <filename>lb-uparrow-reg.png</filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="upoff">
-                        <filename>lb-uparrow-sel.png</filename>
-                    </imagetype>
-                </state>
+                <position>710,340</position>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>740,350</position>
-                <state type="off">
-                    <imagetype name="dnon">
-                        <filename>lb-dnarrow-reg.png</filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="dnoff">
-                        <filename>lb-dnarrow-sel.png</filename>
-                    </imagetype>
-                </state>
+                <position>740,340</position>
             </statetype>
         </buttonlist>
 

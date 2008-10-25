@@ -218,16 +218,16 @@ void ViewScheduled::FillList(void)
         QString state;
 
         if (pginfo->recstatus == rsRecording)
-            state = "recording";
+            state = "running";
         else if (pginfo->recstatus == rsConflict ||
                     pginfo->recstatus == rsOffLine ||
                     pginfo->recstatus == rsAborted)
-            state = "conflict";
+            state = "error";
         else if (pginfo->recstatus == rsWillRecord)
         {
             if ((m_curcard == 0 && m_curinput == 0) ||
                 pginfo->cardid == m_curcard || pginfo->inputid == m_curinput)
-                state = "record";
+                state = "normal";
         }
         else if (pginfo->recstatus == rsRepeat ||
                     pginfo->recstatus == rsOtherShowing ||
@@ -236,6 +236,8 @@ void ViewScheduled::FillList(void)
                     (pginfo->recstatus != rsDontRecord &&
                     pginfo->recstatus <= rsEarlierShowing))
             state = "disabled";
+        else
+            state = "warning";
 
         MythUIButtonListItem *item =
                                 new MythUIButtonListItem(m_schedulesList,"");

@@ -71,49 +71,8 @@
         </statetype>
         </buttonlist>
 
-        <buttonlist name="log">
-            <area>19,108,770,300</area>
-            <layout>vertical</layout>
-            <spacing>4</spacing>
-            <buttonarea>0,0,770,260</buttonarea>
-            <statetype name="buttonitem">
-                <area>0,0,490,25</area>
-                <state name="active">
-                    <statetype name="severity">
-                        <position>0,0</position>
-                        <state name="error">
-                            <imagetype name="statusimage">
-                                <filename>schedule_conflict.png</filename>
-                            </imagetype>
-                        </state>
-                        <state name="warning">
-                            <imagetype name="statusimage">
-                                <filename>schedule_other.png</filename>
-                            </imagetype>
-                        </state>
-                    </statetype>
-                    <textarea name="buttontext" from="basetextarea">
-                        <area>33,1,730,24</area>
-                        <font>basesmall</font>
-                        <font state="error">basesmallred</font>
-                        <font state="warning">basesmallyellow</font>
-                        <align>vcenter</align>
-                    </textarea>
-                </state>
-                <state name="selected" from="active">
-                    <imagetype name="selectbar">
-                        <position>25,0</position>
-                        <filename>schedule_selectbar.png</filename>
-                    </imagetype>
-                </state>
-                <state name="inactive" from="active" />
-            </statetype>
-            <statetype name="upscrollarrow">
-                <position>710,285</position>
-            </statetype>
-            <statetype name="downscrollarrow">
-                <position>740,285</position>
-            </statetype>
+        <buttonlist name="log" from="basebuttonlist2">
+            <position>19,108</position>
         </buttonlist>
 
         <textarea name="helplabel">
