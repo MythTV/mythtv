@@ -1,0 +1,93 @@
+<mythuitheme>
+
+    <window name="status">
+
+        <textarea name="heading">
+            <area>30,10,740,40</area>
+            <font>baselarge</font>
+            <value>System Status</value>
+        </textarea>
+
+        <imagetype name="datalines">
+            <position>0,95</position>
+            <filename>cr-background.png</filename>
+        </imagetype>
+
+        <buttonlist name="category">
+            <area>15,50,770,30</area>
+            <layout>horizontal</layout>
+            <spacing>6</spacing>
+            <buttonarea>15,0,740,40</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,180,40</area>
+                <state name="active">
+                    <imagetype name="buttonbackground">
+                        <filename>horiz_selector.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>0,0,180,40</area>
+                        <font>basesmall</font>
+                        <font state="error">basesmallred</font>
+                        <font state="warning">basesmallyellow</font>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="buttonbackground">
+                        <filename>horiz_selector_selected.png</filename>
+                    </imagetype>
+                </state>
+                <state name="inactive" from="active">
+                    <imagetype name="buttonbackground">
+                        <filename>horiz_selector_inactive.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>756,10</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-rtarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-rtarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>0,10</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-ltarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-ltarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <buttonlist name="log" from="basebuttonlist2">
+            <position>19,108</position>
+        </buttonlist>
+
+        <textarea name="helplabel">
+            <area>30,390,740,30</area>
+            <value>Details</value>
+            <font>basemedium</font>
+        </textarea>
+
+        <textarea name="helptext">
+            <area>40,430,730,150</area>
+            <value>This screen displays the status of various system components</value>
+            <multiline>yes</multiline>
+        </textarea>
+
+    </window>
+
+</mythuitheme>
+
