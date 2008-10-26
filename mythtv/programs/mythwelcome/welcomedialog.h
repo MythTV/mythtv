@@ -1,79 +1,73 @@
 #ifndef WELCOMEDIALOG_H_
 #define WELCOMEDIALOG_H_
 
-#include <iostream>
+// qt
+#include <QDateTime>
 
-#include <qmutex.h>
-#include <qobject.h>
-
-using namespace std;
-
-#include <qdatetime.h>
-
-#include "mythdialogs.h"
+// myth
 #include "remoteutil.h"
 #include "programinfo.h"
+#include "mythscreentype.h"
+#include "mythuibutton.h"
+#include "mythuitext.h"
+#include "mythdialogbox.h"
 
-class WelcomeDialog : public MythThemedDialog
+class WelcomeDialog : public MythScreenType
 {
 
   Q_OBJECT
 
   public:
 
-    WelcomeDialog(MythMainWindow *parent,
-                       QString window_name,
-                       QString theme_filename,
-                       const char* name = 0);
+    WelcomeDialog(MythScreenStack *parent, const char *name);
     ~WelcomeDialog();
 
-    void keyPressEvent(QKeyEvent *e);
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *event);
     void customEvent(QEvent *e);
-    void wireUpTheme();
-    DialogCode exec(void);
-    
+
   protected slots:
     void startFrontendClick(void);
     void startFrontend(void);
     void updateAll(void);
     void updateStatus(void);
     void updateScreen(void);
-    void closeDialog();
-    void updateTime();  
-    void showPopup();
-    void donePopup(int);
-    void cancelPopup();
-    void shutdownNow();
+    void closeDialog(void);
+    void updateTime(void);
+    void showMenu(void);
+    void shutdownNow(void);
     void runEPGGrabber(void);
-    void lockShutdown();
-    void unlockShutdown();
+    void lockShutdown(void);
+    void unlockShutdown(void);
     bool updateRecordingList(void);
     bool updateScheduledList(void);
-     
+
   private:
     void updateStatusMessage(void);
     bool checkConnectionToServer(void);
+    void checkAutoStart(void);
     void runMythFillDatabase(void);
-        
-    UITextType* getTextType(QString name);
-    
-    MythPopupBox *popup;
-    
+
+    MythUIText   *GetMythUIText(const QString &name, bool optional = false);
+    MythUIButton *GetMythUIButton(const QString &name, bool optional = false);
+
     //
     //  GUI stuff
     //
-    UITextType          *m_status_text;
-    UITextType          *m_recording_text;
-    UITextType          *m_scheduled_text;
-    UITextType          *m_warning_text;
-    UITextType          *m_time_text;
-    UITextType          *m_date_text;
-    
-    UITextButtonType    *m_startfrontend_button;
-    
-    QTimer         *m_updateStatusTimer;
-    QTimer         *m_updateScreenTimer;
-    QTimer         *m_timeTimer;
+    MythUIText    *m_status_text;
+    MythUIText    *m_recording_text;
+    MythUIText    *m_scheduled_text;
+    MythUIText    *m_warning_text;
+    MythUIText    *m_time_text;
+    MythUIText    *m_date_text;
+
+    MythUIButton  *m_startfrontend_button;
+
+    MythDialogBox *m_menuPopup;
+
+    QTimer        *m_updateStatusTimer;
+    QTimer        *m_updateScreenTimer;
+    QTimer        *m_timeTimer;
 
     QString        m_installDir;
     QString        m_timeFormat;
@@ -89,7 +83,7 @@ class WelcomeDialog : public MythThemedDialog
     uint           m_screenScheduledNo;
     uint           m_statusListNo;
     QStringList    m_statusList;
-     
+
     vector<TunerStatus> m_tunerList;
     ProgramDetailList   m_scheduledList;
 
@@ -98,13 +92,13 @@ class WelcomeDialog : public MythThemedDialog
 
     bool pendingRecListUpdate() const           { return m_pendingRecListUpdate; }
     void setPendingRecListUpdate(bool newState) { m_pendingRecListUpdate = newState; }
-       
+
     QMutex      m_SchedUpdateMuxtex;
     bool        m_pendingSchedUpdate;
 
     bool pendingSchedUpdate() const           { return m_pendingSchedUpdate; }
     void setPendingSchedUpdate(bool newState) { m_pendingSchedUpdate = newState; }
-	   
+
 };
 
 #endif

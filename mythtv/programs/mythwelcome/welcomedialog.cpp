@@ -28,11 +28,8 @@
 #define UPDATE_SCREEN_INTERVAL   15000
 
 
-WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
-                                 QString window_name,
-                                 QString theme_filename,
-                                 const char* name)
-                :MythThemedDialog(parent, window_name, theme_filename, name)
+WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
+              :MythScreenType(parent, name)
 {
     gContext->addListener(this);
 
@@ -49,9 +46,6 @@ WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
     m_bWillShutdown = (gContext->GetNumSetting("idleTimeoutSecs", 0) != 0);
     m_secondsToShutdown = -1;
 
-    wireUpTheme();
-    assignFirstFocus();
-
     m_updateStatusTimer = new QTimer(this);
     connect(m_updateStatusTimer, SIGNAL(timeout()), this,
                                  SLOT(updateStatus()));
@@ -66,9 +60,74 @@ WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
                                  SLOT(updateTime()));
     m_timeTimer->start(1000);
 
-    popup = NULL;
+    m_menuPopup = NULL;
+}
 
+bool WelcomeDialog::Create(void)
+{
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("welcome-ui.xml", "welcome_screen", this);
+
+    if (!foundtheme)
+        return false;
+
+    try
+    {
+        m_status_text = GetMythUIText("status_text");
+        m_recording_text = GetMythUIText("recording_text");
+        m_scheduled_text = GetMythUIText("scheduled_text");
+        m_time_text = GetMythUIText("time_text");
+        m_date_text = GetMythUIText("date_text");
+
+        m_warning_text = GetMythUIText("conflicts_text");
+        m_warning_text->SetVisible(false);
+
+        m_startfrontend_button = GetMythUIButton("startfrontend_button");
+
+    }
+    catch (const QString name)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Theme is missing a critical theme element ('%1')")
+                                      .arg(name));
+        return false;
+    }
+
+    m_startfrontend_button->SetText(tr("Start Frontend"));
+    connect(m_startfrontend_button, SIGNAL(Clicked()),
+            this, SLOT(startFrontendClick()));
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+
+    SetFocusWidget(m_startfrontend_button);
+
+    updateTime();
     checkConnectionToServer();
+    checkAutoStart();
+
+    return true;
+}
+
+MythUIText* WelcomeDialog::GetMythUIText(const QString &name, bool optional)
+{
+    MythUIText *text = dynamic_cast<MythUIText *> (GetChild(name));
+
+    if (!optional && !text)
+        throw name;
+
+    return text;
+}
+
+MythUIButton* WelcomeDialog::GetMythUIButton(const QString &name, bool optional)
+{
+    MythUIButton *button = dynamic_cast<MythUIButton *> (GetChild(name));
+
+    if (!optional && !button)
+        throw name;
+
+    return button;
 }
 
 void WelcomeDialog::startFrontend(void)
@@ -85,7 +144,7 @@ void WelcomeDialog::startFrontendClick(void)
     QTimer::singleShot(500, this, SLOT(startFrontend()));
 }
 
-DialogCode WelcomeDialog::exec(void)
+void WelcomeDialog::checkAutoStart(void)
 {
     // mythshutdown --startup returns 0 for automatic startup
     //                                1 for manual startup 
@@ -104,18 +163,6 @@ DialogCode WelcomeDialog::exec(void)
 
     // update status now
     updateAll();
-
-    setResult(kDialogCodeRejected);
-
-    Show();
-
-    do
-    {
-        qApp->processEvents();
-        usleep(250000);
-    } while (!result());
-
-    return kDialogCodeAccepted;
 }
 
 void WelcomeDialog::customEvent(QEvent *e)
@@ -187,12 +234,14 @@ void WelcomeDialog::customEvent(QEvent *e)
     }
 }
 
-void WelcomeDialog::keyPressEvent(QKeyEvent *e)
+bool WelcomeDialog::keyPressEvent(QKeyEvent *event)
 {
-    bool handled = false;
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
 
+    bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Welcome", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Welcome", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -201,19 +250,15 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
 
         if (action == "ESCAPE")
         {
-            return; // eat escape key
+            return true; // eat escape key
         }
         else if (action == "MENU")
         {
-            showPopup();
+            showMenu();
         }
         else if (action == "NEXTVIEW")
         {
-            accept();
-        }
-        else if (action == "SELECT")
-        {
-            activateCurrent();
+            Close();
         }
         else if (action == "INFO")
         {
@@ -282,58 +327,15 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
             handled = false;
     }
 
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
-}
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
 
-UITextType* WelcomeDialog::getTextType(QString name)
-{
-    UITextType* type = getUITextType(name);
-
-    if (!type)
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("ERROR: Failed to find '%1' UI element in theme file\n"
-                        "Bailing out!")
-                .arg(name));
-        exit(WELCOME_BUGGY_EXIT_NO_THEME);
-    }
-
-    return type;
-}
-
-void WelcomeDialog::wireUpTheme()
-{
-    m_status_text = getTextType("status_text");
-    m_recording_text = getTextType("recording_text");
-    m_scheduled_text = getTextType("scheduled_text");
-    m_time_text = getTextType("time_text");
-    m_date_text = getTextType("date_text");
-
-    m_warning_text = getTextType("conflicts_text");
-    m_warning_text->hide();
-
-    m_startfrontend_button = getUITextButtonType("startfrontend_button");
-    if (m_startfrontend_button)
-    {
-        m_startfrontend_button->setText(tr("Start Frontend"));
-        connect(m_startfrontend_button, SIGNAL(pushed()), this, 
-                                      SLOT(startFrontendClick()));
-    }
-    else
-    {
-        cout << "ERROR: Failed to find 'startfrontend_button' "
-             << "UI element in theme file\n"
-             << "Bailing out!" << endl;
-        exit(0);
-    }
-
-    buildFocusList();
+    return handled;
 }
 
 void WelcomeDialog::closeDialog()
 {
-    done(kDialogCodeAccepted);
+    Close();
 }
 
 WelcomeDialog::~WelcomeDialog()
@@ -378,7 +380,7 @@ void WelcomeDialog::updateScreen(void)
     {
         m_recording_text->SetText(tr("Cannot connect to server!"));
         m_scheduled_text->SetText(tr("Cannot connect to server!"));
-        m_warning_text->hide();
+        m_warning_text->SetVisible(false);
     }
     else
     {
@@ -602,10 +604,7 @@ void WelcomeDialog::updateStatusMessage(void)
             m_statusList.append(tr("MythTV is idle."));
     }
 
-    if (m_hasConflicts)
-        m_warning_text->show();
-    else
-        m_warning_text->hide();
+    m_warning_text->SetVisible(m_hasConflicts);
 }
 
 bool WelcomeDialog::checkConnectionToServer(void)
@@ -635,17 +634,16 @@ bool WelcomeDialog::checkConnectionToServer(void)
     return bRes;
 }
 
-void WelcomeDialog::showPopup(void)
+void WelcomeDialog::showMenu(void)
 {
-    if (popup)
-        return;
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    popup = new MythPopupBox(gContext->GetMainWindow(), "Menu");
+    m_menuPopup = new MythDialogBox("Menu", popupStack, "actionmenu");
 
-    QAbstractButton *topButton;
-    QLabel *label = popup->addLabel(tr("Menu"), MythPopupBox::Large, false);
-    label->setAlignment(Qt::AlignCenter);
-    label->setWordWrap(true);
+    if (m_menuPopup->Create())
+        popupStack->AddScreen(m_menuPopup);
+
+    m_menuPopup->SetReturnEvent(this, "action");
 
     QString mythshutdown_status = m_installDir + "/bin/mythshutdown --status 0";
     QByteArray tmpcmd = mythshutdown_status.toAscii();
@@ -654,46 +652,18 @@ void WelcomeDialog::showPopup(void)
         statusCode = WEXITSTATUS(statusCode);
 
     if (statusCode & 16)
-        topButton = popup->addButton(tr("Unlock Shutdown"), this,
-                         SLOT(unlockShutdown()));
+        m_menuPopup->AddButton(tr("Unlock Shutdown"), SLOT(unlockShutdown()));
     else
-        topButton = popup->addButton(tr("Lock Shutdown"), this,
-                         SLOT(lockShutdown()));
+        m_menuPopup->AddButton(tr("Lock Shutdown"), SLOT(lockShutdown()));
 
-    popup->addButton(tr("Run mythfilldatabase"), this,
-                         SLOT(runEPGGrabber()));
-    popup->addButton(tr("Shutdown Now"), this,
-                         SLOT(shutdownNow()));
-    popup->addButton(tr("Exit"), this,
-                         SLOT(closeDialog()));
-    popup->addButton(tr("Cancel"), popup, SLOT(reject()));
-
-    popup->ShowPopup(this, SLOT(donePopup(int)));
-
-    topButton->setFocus();
-}
-
-void WelcomeDialog::donePopup(int r)
-{
-    if (MythDialog::Rejected == r)
-        cancelPopup();
-}
-
-void WelcomeDialog::cancelPopup(void)
-{
-    if (!popup)
-        return;
-
-    popup->hide();
-    popup->deleteLater();
-    popup = NULL;
-
-    activateWindow();
+    m_menuPopup->AddButton(tr("Run mythfilldatabase"), SLOT(runEPGGrabber()));
+    m_menuPopup->AddButton(tr("Shutdown Now"), SLOT(shutdownNow()));
+    m_menuPopup->AddButton(tr("Exit"), SLOT(closeDialog()));
+    m_menuPopup->AddButton(tr("Cancel"), SLOT(Close()));
 }
 
 void WelcomeDialog::lockShutdown(void)
 {
-    cancelPopup();
     QString mythshutdown_exe = m_installDir + "/bin/mythshutdown --lock";
     system(mythshutdown_exe.toLocal8Bit().constData());
     updateStatusMessage();
@@ -702,7 +672,6 @@ void WelcomeDialog::lockShutdown(void)
 
 void WelcomeDialog::unlockShutdown(void)
 {
-    cancelPopup();
     QString mythshutdown_exe = m_installDir + "/bin/mythshutdown --unlock";
     system(mythshutdown_exe.toLocal8Bit().constData());
     updateStatusMessage();
@@ -711,7 +680,6 @@ void WelcomeDialog::unlockShutdown(void)
 
 void WelcomeDialog::runEPGGrabber(void)
 {
-    cancelPopup();
     runMythFillDatabase();
     sleep(1);
     updateStatusMessage();
@@ -720,8 +688,6 @@ void WelcomeDialog::runEPGGrabber(void)
 
 void WelcomeDialog::shutdownNow(void)
 {
-    cancelPopup();
-
     // if this is a frontend only machine just shut down now
     if (gContext->IsFrontendOnly())
     {

@@ -5,8 +5,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+// qt
 #include <QApplication>
 
+// myth
 #include "mythcontext.h"
 #include "mythverbose.h"
 #include "mythversion.h"
@@ -17,9 +19,11 @@
 #include "compat.h"
 #include "mythuihelper.h"
 #include "lcddevice.h"
+#include "myththemebase.h"
 
 #include "libmythtv/tv.h"
 
+// mythwelcome
 #include "welcomedialog.h"
 #include "welcomesettings.h"
 
@@ -138,6 +142,8 @@ int main(int argc, char **argv)
     mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
 
+    MythThemeBase *themeBase = new MythThemeBase();
+
     initKeys();
 
     if (bShowSettings)
@@ -147,15 +153,25 @@ int main(int argc, char **argv)
     }
     else
     {
-        WelcomeDialog *mythWelcome = new WelcomeDialog(mainWindow,
-            "welcome_screen", "welcome-", "welcome_screen");
-        mythWelcome->exec();
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        delete mythWelcome;
+        WelcomeDialog *welcome = new WelcomeDialog(mainStack, "mythwelcome");
+
+        if (welcome->Create())
+            mainStack->AddScreen(welcome, false);
+        else
+            return -1;
+
+        do
+        {
+            qApp->processEvents();
+            usleep(5000);
+        } while (mainStack->TotalScreens() > 0);
     }
 
     DestroyMythMainWindow();
 
+    delete themeBase;
     delete gContext;
 
     return 0;
