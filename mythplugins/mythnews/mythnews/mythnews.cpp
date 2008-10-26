@@ -9,7 +9,6 @@
 #include <QDir>
 #include <QTimer>
 #include <QRegExp>
-//Added by qt3to4:
 #include <QUrl>
 
 // MythTV headers
@@ -560,10 +559,12 @@ void MythNews::processAndShowNews(NewsSite *site)
 
 void MythNews::slotSiteSelected(MythUIButtonListItem *item)
 {
-    if (!item || !item->GetData().isNull())
+    if (!item || item->GetData().isNull())
         return;
 
     NewsSite *site = qVariantValue<NewsSite*>(item->GetData());
+    if (!site)
+        return;
 
     m_articlesList->Reset();
 
@@ -664,10 +665,9 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
         if (data.size() > 0)
         {
             QFile file(sFilename);
-            if (file.open( QIODevice::WriteOnly ))
+            if (file.open(QIODevice::WriteOnly))
             {
-                QDataStream stream(& file);
-                stream.writeRawBytes( (const char*) (data), data.size() );
+                file.write(data);
                 file.close();
                 res = true;
             }
