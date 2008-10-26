@@ -27,6 +27,7 @@ HEADERS += uilistbtntype.h uitypes.h util.h
 HEADERS += volumebase.h virtualkeyboard.h visual.h xmlparse.h
 HEADERS += mythhdd.h mythcdrom.h storagegroup.h dbutil.h
 HEADERS += mythcommandlineparser.h mythterminal.h
+HEADERS += mythhttppool.h mythhttphandler.h
 
 SOURCES += audiooutput.cpp audiooutputbase.cpp audiooutputnull.cpp
 SOURCES += audiooutputdigitalencoder.cpp audiosettings.cpp
@@ -43,6 +44,8 @@ SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp
 SOURCES += volumebase.cpp virtualkeyboard.cpp xmlparse.cpp
 SOURCES += mythhdd.cpp mythcdrom.cpp storagegroup.cpp dbutil.cpp
 SOURCES += mythcommandlineparser.cpp mythterminal.cpp
+SOURCES += mythhttppool.cpp mythhttphandler.cpp
+
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../libmythfreesurround
 INCLUDEPATH += ../libavcodec ../libavutil ../libmythdb
@@ -81,6 +84,7 @@ inc.files += virtualkeyboard.h
 inc.files += mythexp.h mythpluginapi.h storagegroup.h
 inc.files += mythconfigdialogs.h mythconfiggroups.h
 inc.files += mythterminal.h mythdeque.h
+inc.files += mythhttppool.h
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmyth
