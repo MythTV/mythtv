@@ -234,11 +234,13 @@ bool ZMPlayer::keyPressEvent(QKeyEvent *event)
 
         if (action == "PAUSE")
         {
-            playPressed();
+            if (m_playButton)
+                m_playButton->Push();
         }
         else if (action == "DELETE")
         {
-            deletePressed();
+            if (m_deleteButton)
+                m_deleteButton->Push();
         }
         else if (action == "LEFT")
         {
@@ -260,11 +262,13 @@ bool ZMPlayer::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "PAGEUP")
         {
-            prevPressed();
+            if (m_prevButton)
+                m_prevButton->Push();
         }
         else if (action == "PAGEDOWN")
         {
-            nextPressed();
+            if (m_nextButton)
+                m_nextButton->Push();
         }
         else if (action == "TOGGLEASPECT")
         {

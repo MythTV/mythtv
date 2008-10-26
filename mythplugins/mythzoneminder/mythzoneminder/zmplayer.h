@@ -48,19 +48,11 @@ class ZMPlayer : public MythScreenType
 
   private:
     void getEventInfo(void);
-    void displayFrame(void);
-    void displayFrameGl(void);
-    void displayFrameXv(void);
     void getFrame(void);
-    int  getXvPortId(Display *dpy);
 
     MythUIImage  *GetMythUIImage(const QString &name, bool optional = false);
     MythUIText   *GetMythUIText(const QString &name, bool optional = false);
     MythUIButton *GetMythUIButton(const QString &name, bool optional = false);
-
-    bool initPlayer(void);
-    bool initPlayerGl(void);
-    bool initPlayerXv(void);
 
     void stopPlayer(void);
 
@@ -85,7 +77,6 @@ class ZMPlayer : public MythScreenType
     int               m_curFrame;
     int               m_lastFrame;
 
-    QString           m_eventDir;
     bool              m_paused;
     bool              m_fullScreen;
 

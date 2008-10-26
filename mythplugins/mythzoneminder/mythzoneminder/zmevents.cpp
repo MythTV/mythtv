@@ -136,11 +136,13 @@ bool ZMEvents::keyPressEvent(QKeyEvent *event)
 
         else if (action == "DELETE")
         {
-            deletePressed();
+            if (m_deleteButton)
+                m_deleteButton->Push();
         }
         else if (action == "PAUSE")
         {
-            playPressed();
+            if (m_playButton)
+                m_playButton->Push();
         }
         else if (action == "INFO")
         {
