@@ -225,8 +225,14 @@ void startManaged(void)
 
 void startProgramRecPriorities(void)
 {
-    ProgramRecPriority rsb(gContext->GetMainWindow(), "recpri scheduled");
-    rsb.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    ProgramRecPriority *progRecPrior = new ProgramRecPriority(mainStack);
+
+    if (progRecPrior->Create())
+        mainStack->AddScreen(progRecPrior);
+    else
+        delete progRecPrior;
 }
 
 void startChannelRecPriorities(void)
