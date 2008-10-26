@@ -15,7 +15,7 @@
 
 // myth
 #include <mythtv/mythcontext.h>
-#include <libmythtv/programinfo.h>
+#include <mythtv/libmythtv/programinfo.h>
 #include <mythtv/dialogbox.h>
 
 // mytharchive
