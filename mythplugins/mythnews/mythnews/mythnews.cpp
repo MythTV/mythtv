@@ -1,7 +1,8 @@
-
-// C/C++ Headers
+// POSIX headers
 #include <unistd.h>
-#include <math.h>
+
+// C headers
+#include <cmath>
 
 // QT headers
 #include <QApplication>
@@ -12,12 +13,12 @@
 #include <QUrl>
 
 // MythTV headers
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/util.h>
-#include <mythtv/httpcomms.h>
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdb.h>
-#include <mythtv/mythdirs.h>
+#include <mythmainwindow.h>
+#include <util.h>
+#include <httpcomms.h>
+#include <mythcontext.h>
+#include <mythdb.h>
+#include <mythdirs.h>
 
 // MythNews headers
 #include "mythnews.h"
@@ -179,35 +180,33 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
         return;
 
     NewsSite *site = NULL;
-    NewsArticle *article = NULL;
+    NewsArticle article;
 
     if (GetFocusWidget() == m_articlesList)
     {
-        article = qVariantValue<NewsArticle*>(selected->GetData());
+        article = m_articles[selected];
         if (m_sitesList->GetItemCurrent())
             site = qVariantValue<NewsSite*>
-                                (m_sitesList->GetItemCurrent()->GetData());
+                (m_sitesList->GetItemCurrent()->GetData());
     }
     else
     {
         site = qVariantValue<NewsSite*>(selected->GetData());
         if (m_articlesList->GetItemCurrent())
-            article = qVariantValue<NewsArticle*>
-                                (m_articlesList->GetItemCurrent()->GetData());
+            article = m_articles[m_articlesList->GetItemCurrent()];
     }
 
     if (GetFocusWidget() == m_articlesList)
     {
-
-        if (article)
+        if (!article.title().isEmpty())
         {
 
             if (m_titleText)
-                m_titleText->SetText(article->title());
+                m_titleText->SetText(article.title());
 
             if (m_descText)
             {
-                QString artText = article->description();
+                QString artText = article.description();
                 // Replace paragraph and break HTML with newlines
                 if( artText.indexOf(QRegExp("</(p|P)>")) )
                 {
@@ -237,7 +236,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                 m_descText->SetText(artText);
             }
 
-            if (!article->thumbnail().isEmpty())
+            if (!article.thumbnail().isEmpty())
             {
                 QString fileprefix = GetConfDir();
 
@@ -251,7 +250,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                 if (!dir.exists())
                     dir.mkdir(fileprefix);
 
-                QString url = article->thumbnail();
+                QString url = article.thumbnail();
                 QString sFilename = QString("%1/%2")
                     .arg(fileprefix)
                     .arg(qChecksum(url.toLocal8Bit().constData(),
@@ -309,7 +308,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                 }
             }
 
-            if (!article->enclosure().isEmpty())
+            if (!article.enclosure().isEmpty())
             {
                 if (!m_downloadImage->IsVisible())
                     m_downloadImage->Show();
@@ -317,7 +316,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             else
                 m_downloadImage->Hide();
 
-            if (!article->enclosure().isEmpty())
+            if (!article.enclosure().isEmpty())
             {
                 if (!m_enclosureImage->IsVisible())
                     m_enclosureImage->Show();
@@ -547,13 +546,14 @@ void MythNews::processAndShowNews(NewsSite *site)
         return;
 
     m_articlesList->Reset();
+    m_articles.clear();
 
     NewsArticle::List::iterator it = site->articleList().begin();
     for (; it != site->articleList().end(); ++it)
     {
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_articlesList, (*it).title());
-        item->SetData(qVariantFromValue(&(*it)));
+        m_articles[item] = *it;
     }
 }
 
@@ -567,13 +567,14 @@ void MythNews::slotSiteSelected(MythUIButtonListItem *item)
         return;
 
     m_articlesList->Reset();
+    m_articles.clear();
 
     NewsArticle::List::iterator it = site->articleList().begin();
     for (; it != site->articleList().end(); ++it)
     {
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_articlesList, (*it).title());
-        item->SetData(qVariantFromValue(&(*it)));
+        m_articles[item] = *it;
     }
 
     updateInfoView(item);
@@ -689,82 +690,84 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
 
 void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
 {
-    if (articlesListItem && !articlesListItem->GetData().isNull())
+    QMap<MythUIButtonListItem*,NewsArticle>::const_iterator it =
+        m_articles.find(articlesListItem);
+
+    if (it == m_articles.end())
+        return;
+
+    if ((*it).title().isEmpty())
+        return;
+
+    const NewsArticle article = *it;
+
+    if (article.enclosure().isEmpty())
     {
-        NewsArticle *article = qVariantValue<NewsArticle*>
-                                                (articlesListItem->GetData());
-        if(article)
+        QString cmdUrl(article.articleURL());
+        cmdUrl.replace('\'', "%27");
+
+        QString cmd = QString("%1 %2 '%3'")
+            .arg(browser)
+            .arg(zoom)
+            .arg(cmdUrl);
+        gContext->GetMainWindow()->AllowInput(false);
+        myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
+        gContext->GetMainWindow()->AllowInput(true);
+        return;
+    }
+
+    QString cmdURL(article.enclosure());
+
+    // Handle special cases for media here
+    // YouTube: Fetch the mediaURL page and parse out the video URL
+    if (cmdURL.contains("youtube.com"))
+    {
+        cmdURL = QString(article.mediaURL());
+        QString mediaPage = HttpComms::getHttp(cmdURL);
+        if (!mediaPage.isEmpty())
         {
-            if (!article->enclosure().isEmpty())
-            {
-                QString cmdURL(article->enclosure());
-                // Handle special cases for media here
-                // YouTube: Fetch the mediaURL page and parse out the video URL
-                if (cmdURL.contains("youtube.com"))
-                {
-                    cmdURL = QString(article->mediaURL());
-                    QString mediaPage = HttpComms::getHttp(cmdURL);
-                    if (!mediaPage.isEmpty())
-                    {
-                        // If this breaks in the future, we are building the URL
-                        // to download a video.  At this time, this requires
-                        // the video_id and the t argument
-                        // from the source HTML of the page
-                        int playerPos = mediaPage.indexOf("swfArgs") + 7;
+            // If this breaks in the future, we are building the URL
+            // to download a video.  At this time, this requires
+            // the video_id and the t argument
+            // from the source HTML of the page
+            int playerPos = mediaPage.indexOf("swfArgs") + 7;
 
-                        int tArgStart = mediaPage.indexOf("\"t\": \"",
-                                                       playerPos) + 6;
-                        int tArgEnd = mediaPage.indexOf("\"", tArgStart);
-                        QString tArgString = mediaPage.mid(tArgStart,
-                                                           tArgEnd - tArgStart);
+            int tArgStart = mediaPage.indexOf("\"t\": \"",
+                                              playerPos) + 6;
+            int tArgEnd = mediaPage.indexOf("\"", tArgStart);
+            QString tArgString = mediaPage.mid(tArgStart,
+                                               tArgEnd - tArgStart);
 
-                        int vidStart = mediaPage.indexOf("\"video_id\": \"",
-                                                      playerPos) + 13;
-                        int vidEnd = mediaPage.indexOf("\"", vidStart);
-                        QString vidString = mediaPage.mid(vidStart,
-                                                          vidEnd - vidStart);
+            int vidStart = mediaPage.indexOf("\"video_id\": \"",
+                                             playerPos) + 13;
+            int vidEnd = mediaPage.indexOf("\"", vidStart);
+            QString vidString = mediaPage.mid(vidStart,
+                                              vidEnd - vidStart);
 
-                        cmdURL = QString("http://youtube.com/get_video.php"
-                                         "?video_id=%2&t=%1")
-                                 .arg(tArgString).arg(vidString);
-                        VERBOSE(VB_GENERAL,
-                                QString("MythNews: VideoURL %1").arg(cmdURL));
-                    }
-                }
-
-                QString fileprefix = GetConfDir();
-
-                QDir dir(fileprefix);
-                if (!dir.exists())
-                     dir.mkdir(fileprefix);
-
-                fileprefix += "/MythNews";
-
-                dir = QDir(fileprefix);
-                if (!dir.exists())
-                    dir.mkdir(fileprefix);
-
-                QString sFilename(fileprefix + "/newstempfile");
-
-                if (getHttpFile(sFilename, cmdURL))
-                {
-                    playVideo(sFilename);
-                }
-            }
-            else {
-                QString cmdUrl(article->articleURL());
-                cmdUrl.replace('\'', "%27");
-
-                QString cmd = QString("%1 %2 '%3'")
-                     .arg(browser)
-                     .arg(zoom)
-                     .arg(cmdUrl);
-                gContext->GetMainWindow()->AllowInput(false);
-                myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
-                gContext->GetMainWindow()->AllowInput(true);
-            }
+            cmdURL = QString("http://youtube.com/get_video.php"
+                             "?video_id=%2&t=%1")
+                .arg(tArgString).arg(vidString);
+            VERBOSE(VB_GENERAL,
+                    QString("MythNews: VideoURL %1").arg(cmdURL));
         }
     }
+
+    QString fileprefix = GetConfDir();
+
+    QDir dir(fileprefix);
+    if (!dir.exists())
+        dir.mkdir(fileprefix);
+
+    fileprefix += "/MythNews";
+
+    dir = QDir(fileprefix);
+    if (!dir.exists())
+        dir.mkdir(fileprefix);
+
+    QString sFilename(fileprefix + "/newstempfile");
+
+    if (getHttpFile(sFilename, cmdURL))
+        playVideo(sFilename);
 }
 
 void MythNews::ShowEditDialog(bool edit)

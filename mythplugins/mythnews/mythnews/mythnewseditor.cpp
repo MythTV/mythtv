@@ -1,10 +1,10 @@
 
 // MythTV headers
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/libmythui/mythdialogbox.h>
-#include <mythtv/util.h>
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythmainwindow.h>
+#include <mythdialogbox.h>
+#include <util.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
 
 // MythNews headers
 #include "mythnewseditor.h"

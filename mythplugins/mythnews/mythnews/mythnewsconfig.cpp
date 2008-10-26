@@ -4,10 +4,10 @@
 #include <QFile>
 
 // MythTV headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/mythdirs.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <mythmainwindow.h>
+#include <mythdirs.h>
 
 // MythNews headers
 #include "mythnewsconfig.h"

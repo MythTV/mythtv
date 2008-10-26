@@ -1,6 +1,8 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
+
+QT += network sql xml
  
 TEMPLATE = lib
 CONFIG += plugin thread warn_on debug
@@ -9,6 +11,8 @@ target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
 INCLUDEPATH += $${PREFIX}/include/mythtv
+INCLUDEPATH += $${PREFIX}/include/mythtv/libmythui
+INCLUDEPATH += $${PREFIX}/include/mythtv/libmythdb
 
 installfiles.path = $${PREFIX}/share/mythtv/mythnews
 installfiles.files = news-sites.xml
@@ -20,8 +24,5 @@ HEADERS += mythnews.h mythnewsconfig.h mythnewseditor.h newsengine.h
 HEADERS += newsdbutil.h dbcheck.h
 SOURCES += main.cpp mythnews.cpp mythnewsconfig.cpp mythnewseditor.cpp
 SOURCES += newsengine.cpp newsdbutil.cpp dbcheck.cpp
-
-#The following line was inserted by qt3to4
-QT += network sql xml qt3support
 
 include ( ../../libs-targetfix.pro )

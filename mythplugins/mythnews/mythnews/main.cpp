@@ -5,14 +5,12 @@
 // QT headers
 #include <QApplication>
 
-// Myth headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythplugin.h>
-#include <mythtv/mythpluginapi.h>
-#include <mythtv/mythversion.h>
-
-// MythUI headers
-#include <mythtv/libmythui/mythmainwindow.h>
+// MythTV headers
+#include <mythcontext.h>
+#include <mythplugin.h>
+#include <mythpluginapi.h>
+#include <mythversion.h>
+#include <mythmainwindow.h>
 
 // MythNews headers
 #include "dbcheck.h"

@@ -2,14 +2,11 @@
 #define MYTHNEWSEDITOR_H
 
 // MythTV headers
-#include <mythtv/httpcomms.h>
-
-// MythUI headers
-#include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuitextedit.h>
-#include <mythtv/libmythui/mythuicheckbox.h>
+#include <mythscreentype.h>
+#include <mythuibutton.h>
+#include <mythuitext.h>
+#include <mythuitextedit.h>
+#include <mythuicheckbox.h>
 
 // MythNews headers
 #include "newsengine.h"

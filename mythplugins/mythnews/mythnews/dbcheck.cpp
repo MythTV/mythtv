@@ -6,8 +6,8 @@
 #include <QSqlError>
 
 // Myth headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdb.h>
+#include <mythcontext.h>
+#include <mythdb.h>
 
 // MythNews headers
 #include "dbcheck.h"

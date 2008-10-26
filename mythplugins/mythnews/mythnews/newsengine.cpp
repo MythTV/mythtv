@@ -8,12 +8,10 @@ using namespace std;
 // QT headers
 #include <QFile>
 #include <QDataStream>
-#include <q3urloperator.h>
-#include <q3network.h>
 
 // Myth headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdirs.h>
+#include <mythcontext.h>
+#include <mythdirs.h>
 
 // MythNews headers
 #include "newsengine.h"
@@ -41,38 +39,42 @@ NewsArticle::NewsArticle(const QString &title) :
 {
 }
 
-NewsSite::NewsSite(const QString &name,
-                   const QString &url,
-                   const QDateTime &updated,
-                   const bool &podcast)
-    : QObject()
+NewsArticle::NewsArticle() :
+    m_title(QString::null),
+    m_desc(QString::null),
+    m_articleURL(QString::null),
+    m_thumbnail(QString::null),
+    m_mediaURL(QString::null),
+    m_enclosure(QString::null)
 {
-    m_url     = url;
-    m_name    = name;
-    m_updated = updated;
-    m_podcast = podcast;
-    m_state   = NewsSite::Success;
+}
 
-    m_destDir  = GetConfDir();
-    m_destDir += "/MythNews";
+NewsSite::NewsSite(const QString   &name,
+                   const QString   &url,
+                   const QDateTime &updated,
+                   const bool       podcast) :
+    QObject(), m_name(name),  m_url(url), m_urlReq(url),
+    m_desc(QString::null), m_updated(updated),
+    m_destDir(GetConfDir()+"/MythNews"),
+    /*m_data(),*/
+    m_state(NewsSite::Success),
+    m_errorString(QString::null),
+    m_updateErrorString(QString::null),
+    m_imageURL(""),
+    m_podcast(podcast)
+{
+}
 
+void NewsSite::deleteLater()
+{
+    MythHttpPool::GetSingleton()->RemoveListener(this);
     m_articleList.clear();
-
-    m_data.resize(0);
-    m_urlOp = new Q3UrlOperator(m_url);
-
-    connect(m_urlOp, SIGNAL(data(const QByteArray&, Q3NetworkOperation*)),
-            this, SLOT(slotGotData(const QByteArray&, Q3NetworkOperation*)));
-    connect(m_urlOp, SIGNAL(finished(Q3NetworkOperation*)),
-            this, SLOT(slotFinished(Q3NetworkOperation*)));
+    QObject::deleteLater();
 }
 
 NewsSite::~NewsSite()
 {
-    m_urlOp->disconnect(this, 0, 0, 0);
-    m_urlOp->stop();
-    m_urlOp->deleteLater();
-    m_articleList.clear();
+    MythHttpPool::GetSingleton()->RemoveListener(this);
 }
 
 void NewsSite::insertNewsArticle(const NewsArticle &item)
@@ -128,19 +130,25 @@ NewsArticle::List &NewsSite::articleList(void)
     return m_articleList;
 }
 
+#define LOC      QString("NewsSite: ")
+#define LOC_WARN QString("NewsSite, Warning: ")
+#define LOC_ERR  QString("NewsSite, Error: ")
+
 void NewsSite::retrieve(void)
 {
     stop();
-
     m_state = NewsSite::Retrieving;
     m_data.resize(0);
+    m_errorString = QString::null;
+    m_updateErrorString = QString::null;
     m_articleList.clear();
-    m_urlOp->get(m_url);
+    m_urlReq = QUrl(m_url);
+    MythHttpPool::GetSingleton()->AddUrlRequest(m_urlReq, this);
 }
 
 void NewsSite::stop(void)
 {
-    m_urlOp->stop();
+    MythHttpPool::GetSingleton()->RemoveUrlRequest(m_urlReq, this);
 }
 
 bool NewsSite::successful(void) const
@@ -153,16 +161,56 @@ QString NewsSite::errorMsg(void) const
     return m_errorString;
 }
 
-void NewsSite::slotFinished(Q3NetworkOperation* op)
+void NewsSite::Update(QHttp::Error      error,
+                      const QString    &error_str,
+                      const QUrl       &url,
+                      uint              http_status_id,
+                      const QString    &http_status_str,
+                      const QByteArray &data)
 {
-    if (op->state() == Q3NetworkProtocol::StDone &&
-        op->errorCode() == Q3NetworkProtocol::NoError)
+    if (url != m_urlReq)
     {
+        return;
+    }
 
-        QFile xmlFile(m_destDir+QString("/")+m_name);
-        if (xmlFile.open( QIODevice::WriteOnly )) {
-            QDataStream stream( &xmlFile );
-            stream.writeRawData(m_data.constData(), m_data.size());
+    if (QHttp::NoError != error)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "HTTP Connection Error" +
+                QString("\n\t\t\tExplanation: %1: %2")
+                .arg(error).arg(error_str));
+
+        m_state = NewsSite::RetrieveFailed;
+        m_updateErrorString = QString("%1: %2").arg(error).arg(error_str);
+        emit finished(this);
+        return;
+    }
+
+    if (200 != http_status_id)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "HTTP Protocol Error" +
+                QString("\n\t\t\tExplanation: %1: %2")
+                .arg(http_status_id).arg(http_status_str));
+
+        m_state = NewsSite::RetrieveFailed;
+        m_updateErrorString =
+            QString("%1: %2").arg(http_status_id).arg(http_status_str);
+        emit finished(this);
+        return;
+    }
+
+    m_updateErrorString = QString::null;
+    m_data = data;
+
+    if (m_name.isEmpty())
+    {
+        m_state = NewsSite::WriteFailed;
+    }
+    else
+    {
+        QFile xmlFile(QString("%1/%2").arg(m_destDir).arg(m_name));
+        if (xmlFile.open(QIODevice::WriteOnly))
+        {
+            xmlFile.write(m_data);
             xmlFile.close();
             m_updated = QDateTime::currentDateTime();
             m_state = NewsSite::Success;
@@ -170,13 +218,11 @@ void NewsSite::slotFinished(Q3NetworkOperation* op)
         else
         {
             m_state = NewsSite::WriteFailed;
-            VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: Write failed");
         }
     }
-    else
-    {
-        m_state = NewsSite::RetrieveFailed;
-    }
+
+    if (NewsSite::WriteFailed == m_state)
+        VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: Write failed");
 
     emit finished(this);
 }
@@ -185,18 +231,19 @@ void NewsSite::process(void)
 {
     m_articleList.clear();
 
-    if (m_state == RetrieveFailed)
-        m_errorString = tr("Retrieve Failed. ");
-    else
-        m_errorString = "";
-
+    m_errorString = "";
+    if (RetrieveFailed == m_state)
+        m_errorString = tr("Retrieve Failed. ")+"\n";
+ 
     QDomDocument domDoc;
 
     QFile xmlFile(m_destDir+QString("/")+m_name);
     if (!xmlFile.exists())
     {
         insertNewsArticle(NewsArticle(tr("Failed to retrieve news")));
-        m_errorString += tr("No Cached News");
+        m_errorString += tr("No Cached News.");
+        if (!m_updateErrorString.isEmpty())
+            m_errorString += "\n" + m_updateErrorString;
         return;
     }
 
@@ -204,6 +251,8 @@ void NewsSite::process(void)
     {
         insertNewsArticle(NewsArticle(tr("Failed to retrieve news")));
         VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: failed to open xmlfile");
+        if (!m_updateErrorString.isEmpty())
+            m_errorString += "\n" + m_updateErrorString;
         return;
     }
 
@@ -212,13 +261,18 @@ void NewsSite::process(void)
         insertNewsArticle(NewsArticle(tr("Failed to retrieve news")));
         VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: "
                 "failed to set content from xmlfile");
-        m_errorString += tr("Failed to read downloaded file");
+        m_errorString += tr("Failed to read downloaded file.");
+        if (!m_updateErrorString.isEmpty())
+            m_errorString += "\n" + m_updateErrorString;
         return;
     }
 
-
-    if (m_state == RetrieveFailed)
-        m_errorString += tr("Showing Cached News");
+    if (RetrieveFailed == m_state)
+    {
+        m_errorString += tr("Showing Cached News.");
+        if (!m_updateErrorString.isEmpty())
+            m_errorString += "\n" + m_updateErrorString;
+    }
 
     //Check the type of the feed
     QString rootName = domDoc.documentElement().nodeName();
@@ -399,20 +453,6 @@ void NewsSite::parseAtom(QDomDocument domDoc)
         insertNewsArticle(NewsArticle(title, description, url,
                                       QString::null, QString::null,
                                       QString::null));
-    }
-}
-
-void NewsSite::slotGotData(const QByteArray &data,
-                           Q3NetworkOperation* op)
-{
-    if (op)
-    {
-        const char *charData = data.data();
-        int len = data.count();
-
-        int size = m_data.size();
-        m_data.resize(size + len);
-        memcpy(m_data.data()+size, charData, len);
     }
 }
 

@@ -2,20 +2,19 @@
 #define MYTHNEWS_H
 
 // MythTV headers
-#include <mythtv/httpcomms.h>
-
-// MythUI headers
-#include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuiimage.h>
-#include <mythtv/libmythui/mythdialogbox.h>
-#include <mythtv/libmythui/mythprogressdialog.h>
+#include <httpcomms.h>
+#include <mythscreentype.h>
+#include <mythuitext.h>
+#include <mythuibuttonlist.h>
+#include <mythuiimage.h>
+#include <mythdialogbox.h>
+#include <mythprogressdialog.h>
 
 // MythNews headers
 #include "newsengine.h"
 
 class QTimer;
+class HtppComms;
 
 /** \class MythNews
  *  \brief Plugin for browsing RSS news feeds.
@@ -69,6 +68,7 @@ private:
 
     MythUIButtonList *m_sitesList;
     MythUIButtonList *m_articlesList;
+    QMap<MythUIButtonListItem*,NewsArticle> m_articles;
 
     MythUIText *m_updatedText;
     MythUIText *m_titleText;

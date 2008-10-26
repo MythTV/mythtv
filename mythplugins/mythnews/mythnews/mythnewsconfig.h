@@ -1,10 +1,10 @@
 #ifndef MYTHNEWSCONFIG_H
 #define MYTHNEWSCONFIG_H
 
-// MythUI headers
-#include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
+// MythTV headers
+#include <mythscreentype.h>
+#include <mythuitext.h>
+#include <mythuibuttonlist.h>
 
 // MythNews headers
 #include "newsengine.h"

@@ -1,8 +1,12 @@
 #ifndef NEWSENGINE_H
 #define NEWSENGINE_H
 
+// C++ headers
 #include <vector>
 using namespace std;
+
+// MythTV headers
+#include <mythhttppool.h>
 
 // QT headers
 #include <QString>
@@ -25,6 +29,7 @@ class NewsArticle
                 const QString &thumbnail, const QString &mediaURL,
                 const QString &enclosure);
     NewsArticle(const QString &title);
+    NewsArticle();
 
     QString title(void)       const { return m_title;      }
     QString description(void) const { return m_desc;       }
@@ -45,7 +50,7 @@ class NewsArticle
 
 // -------------------------------------------------------
 
-class NewsSite : public QObject
+class NewsSite : public QObject, public MythHttpListener
 {
     Q_OBJECT
 
@@ -72,8 +77,9 @@ class NewsSite : public QObject
         }
     };
 
-    NewsSite(const QString &name, const QString &url,
-             const QDateTime &updated, const bool &podcast);
+    NewsSite(const QString   &name,    const QString &url,
+             const QDateTime &updated, const bool     podcast);
+    virtual void deleteLater();
 
     QString   url(void)  const;
     QString   name(void) const;
@@ -96,34 +102,35 @@ class NewsSite : public QObject
     bool     successful(void) const;
     QString  errorMsg(void) const;
 
+    virtual void Update(QHttp::Error      error,
+                        const QString    &error_str,
+                        const QUrl       &url,
+                        uint              http_status_id,
+                        const QString    &http_status_str,
+                        const QByteArray &data);
+
   private:
     ~NewsSite();
 
     QString    m_name;
     QString    m_url;
+    QUrl       m_urlReq;
     QString    m_desc;
     QDateTime  m_updated;
     QString    m_destDir;
     QByteArray m_data;
     State      m_state;
     QString    m_errorString;
+    QString    m_updateErrorString;
     QString    m_imageURL;
     bool       m_podcast;
 
     NewsArticle::List m_articleList;
-    Q3UrlOperator     *m_urlOp;
-
     void ReplaceHtmlChar( QString &s);
 
   signals:
 
     void finished(NewsSite* item);
-
-  private slots:
-
-    void slotFinished(Q3NetworkOperation*);
-    void slotGotData(const QByteArray &data,
-                     Q3NetworkOperation* op);
 };
 
 class NewsSiteItem
