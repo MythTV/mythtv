@@ -15,6 +15,10 @@
 #include <mythtv/mythdirs.h>
 #include <mythtv/util.h>
 
+#ifndef INT64_C    // Used in ffmpeg headers to define some constants
+#define INT64_C(v)   (v ## LL)
+#endif
+
 // mytharchive
 #include "thumbfinder.h"
 
