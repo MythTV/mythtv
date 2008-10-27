@@ -12,6 +12,7 @@
 // MythNews headers
 #include "mythnewsconfig.h"
 #include "newsdbutil.h"
+#include "newssite.h"
 
 using namespace std;
 

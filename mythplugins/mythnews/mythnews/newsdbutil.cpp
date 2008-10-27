@@ -3,6 +3,7 @@
 
 // MythNews headers
 #include "newsdbutil.h"
+#include "newssite.h"
 
 bool findInDB(const QString& name)
 {
@@ -27,7 +28,7 @@ bool insertInDB(NewsSiteItem* site)
 
 bool insertInDB(const QString &name, const QString &url,
                           const QString &icon, const QString &category,
-                          const bool &podcast)
+                          const bool podcast)
 {
     if (findInDB(name))
         return false;

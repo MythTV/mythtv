@@ -1,53 +1,16 @@
-// C headers
-#include <cstdlib>
-
-// C++ headers
-#include <iostream>
-using namespace std;
-
 // QT headers
 #include <QFile>
-#include <QDataStream>
 
-// Myth headers
-#include <mythcontext.h>
+// MythTV headers
+#include <mythverbose.h>
 #include <mythdirs.h>
 
 // MythNews headers
-#include "newsengine.h"
+#include "newssite.h"
 
-NewsArticle::NewsArticle(const QString &title,
-                         const QString &desc, const QString &articleURL,
-                         const QString &thumbnail, const QString &mediaURL,
-                         const QString &enclosure) :
-    m_title(title),
-    m_desc(desc),
-    m_articleURL(articleURL),
-    m_thumbnail(thumbnail),
-    m_mediaURL(mediaURL),
-    m_enclosure(enclosure)
-{
-}
-
-NewsArticle::NewsArticle(const QString &title) :
-    m_title(title),
-    m_desc(QString::null),
-    m_articleURL(QString::null),
-    m_thumbnail(QString::null),
-    m_mediaURL(QString::null),
-    m_enclosure(QString::null)
-{
-}
-
-NewsArticle::NewsArticle() :
-    m_title(QString::null),
-    m_desc(QString::null),
-    m_articleURL(QString::null),
-    m_thumbnail(QString::null),
-    m_mediaURL(QString::null),
-    m_enclosure(QString::null)
-{
-}
+#define LOC      QString("NewsSite: ")
+#define LOC_WARN QString("NewsSite, Warning: ")
+#define LOC_ERR  QString("NewsSite, Error: ")
 
 NewsSite::NewsSite(const QString   &name,
                    const QString   &url,
@@ -87,53 +50,6 @@ void NewsSite::clearNewsArticles(void)
     m_articleList.clear();
 }
 
-QString NewsSite::url(void) const
-{
-    return m_url;
-}
-
-QString NewsSite::name(void) const
-{
-    return m_name;
-}
-
-bool NewsSite::podcast(void) const
-{
-    return m_podcast;
-}
-
-QString NewsSite::description(void) const
-{
-    QString desc(m_desc+"\n"+m_errorString);
-    return desc;
-}
-
-QString NewsSite::imageURL(void) const
-{
-    return m_imageURL;
-}
-
-QDateTime NewsSite::lastUpdated(void) const
-{
-    return m_updated;
-}
-
-unsigned int NewsSite::timeSinceLastUpdate(void) const
-{
-    QDateTime curTime(QDateTime::currentDateTime());
-    unsigned int min = m_updated.secsTo(curTime)/60;
-    return min;
-}
-
-NewsArticle::List &NewsSite::articleList(void)
-{
-    return m_articleList;
-}
-
-#define LOC      QString("NewsSite: ")
-#define LOC_WARN QString("NewsSite, Warning: ")
-#define LOC_ERR  QString("NewsSite, Error: ")
-
 void NewsSite::retrieve(void)
 {
     stop();
@@ -159,6 +75,49 @@ bool NewsSite::successful(void) const
 QString NewsSite::errorMsg(void) const
 {
     return m_errorString;
+}
+
+QString NewsSite::url(void) const
+{
+    return m_url;
+}
+
+QString NewsSite::name(void) const
+{
+    return m_name;
+}
+
+bool NewsSite::podcast(void) const
+{
+    return m_podcast;
+}
+
+QString NewsSite::description(void) const
+{
+    QString desc = QString("%1\n%2").arg(m_desc).arg(m_errorString);
+    return desc;
+}
+
+QString NewsSite::imageURL(void) const
+{
+    return m_imageURL;
+}
+
+NewsArticle::List &NewsSite::articleList(void)
+{
+    return m_articleList;
+}
+
+QDateTime NewsSite::lastUpdated(void) const
+{
+    return m_updated;
+}
+
+unsigned int NewsSite::timeSinceLastUpdate(void) const
+{
+    QDateTime curTime(QDateTime::currentDateTime());
+    unsigned int min = m_updated.secsTo(curTime)/60;
+    return min;
 }
 
 void NewsSite::Update(QHttp::Error      error,
@@ -482,4 +441,3 @@ void NewsSite::ReplaceHtmlChar(QString &s)
     s.replace("&Uuml;", QChar(0x00dc));
     s.replace("&szlig;", QChar(0x00df));
 }
-

@@ -6,9 +6,6 @@
 #include <mythuitext.h>
 #include <mythuibuttonlist.h>
 
-// MythNews headers
-#include "newsengine.h"
-
 class MythNewsConfigPriv;
 
 class MythNewsConfig : public MythScreenType

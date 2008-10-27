@@ -1,5 +1,9 @@
 
 // MythTV headers
+#include <mythuibutton.h>
+#include <mythuitext.h>
+#include <mythuitextedit.h>
+#include <mythuicheckbox.h>
 #include <mythmainwindow.h>
 #include <mythdialogbox.h>
 #include <util.h>
@@ -8,6 +12,8 @@
 
 // MythNews headers
 #include "mythnewseditor.h"
+#include "newsdbutil.h"
+#include "newssite.h"
 
 /** \brief Creates a new MythNewsEditor Screen
  *  \param parent Pointer to the screen stack

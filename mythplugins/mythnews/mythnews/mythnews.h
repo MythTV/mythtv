@@ -11,7 +11,7 @@
 #include <mythprogressdialog.h>
 
 // MythNews headers
-#include "newsengine.h"
+#include "newssite.h"
 
 class QTimer;
 class HtppComms;

@@ -20,9 +20,12 @@ installfiles.files = news-sites.xml
 INSTALLS += installfiles
 
 # Input
-HEADERS += mythnews.h mythnewsconfig.h mythnewseditor.h newsengine.h
-HEADERS += newsdbutil.h dbcheck.h
-SOURCES += main.cpp mythnews.cpp mythnewsconfig.cpp mythnewseditor.cpp
-SOURCES += newsengine.cpp newsdbutil.cpp dbcheck.cpp
+HEADERS += mythnews.h     mythnewsconfig.h   mythnewseditor.h
+HEADERS += newssite.h     newsarticle.h
+HEADERS += newsdbutil.h   dbcheck.h
+SOURCES += mythnews.cpp   mythnewsconfig.cpp mythnewseditor.cpp
+SOURCES += newssite.cpp   newsarticle.cpp
+SOURCES += newsdbutil.cpp dbcheck.cpp
+SOURCES += main.cpp
 
 include ( ../../libs-targetfix.pro )

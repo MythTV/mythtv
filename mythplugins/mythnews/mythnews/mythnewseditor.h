@@ -1,16 +1,13 @@
 #ifndef MYTHNEWSEDITOR_H
 #define MYTHNEWSEDITOR_H
 
-// MythTV headers
 #include <mythscreentype.h>
-#include <mythuibutton.h>
-#include <mythuitext.h>
-#include <mythuitextedit.h>
-#include <mythuicheckbox.h>
 
-// MythNews headers
-#include "newsengine.h"
-#include "newsdbutil.h"
+class MythUIText;
+class MythUITextEdit;
+class MythUIButton;
+class MythUICheckBox;
+class NewsSite;
 
 /** \class MythNewsEdit
  *  \brief Site name, URL and icon edit screen.
