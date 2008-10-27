@@ -188,6 +188,7 @@ void MythHttpHandler::RequestFinished(int id, bool error)
             QString urlStr = extract_url(QString(m_qhttp->readAll()));
             if (!urlStr.isEmpty() && m_cur_redirect_cnt < kMaxRedirectCount)
             {
+                m_cur_redirect_cnt++;
                 QUrl url = QUrl(urlStr);
                 m_qhttp->setHost(url.host());
                 QString path = url.path().isEmpty() ? "/" : url.path();
