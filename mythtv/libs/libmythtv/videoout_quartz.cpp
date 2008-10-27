@@ -86,6 +86,7 @@ class VideoOutputQuartzView
     virtual void InputChanged(int width, int height, float aspect,
                               MythCodecID av_codec_id);
     virtual void VideoAspectRatioChanged(float aspect);
+    virtual void MoveResize(QRect newRect);
     virtual void Zoom(ZoomDirection direction);
 
     virtual void EmbedChanged(bool embedded);
@@ -105,10 +106,7 @@ class VideoOutputQuartzView
     QuartzData *       parentData;    // information about video source is here
 
     CGrafPtr           thePort;       // QuickDraw graphics port
-    int                desiredWidth,
-                       desiredHeight,
-                       desiredXoff,
-                       desiredYoff;   // output size characteristics
+    QRect              m_desired;     // Desired output size characteristics
     ImageSequence      theCodec;      // QuickTime sequence ID
     RgnHandle          theMask;       // clipping region
 
@@ -205,14 +203,9 @@ class QuartzData
 };
 
 VideoOutputQuartzView::VideoOutputQuartzView(QuartzData *pData)
+    : name(NULL), parentData(pData),
+    thePort(NULL), theCodec(0), theMask(NULL)
 {
-    parentData = pData;
-
-    thePort = NULL;
-    desiredWidth = desiredHeight = desiredXoff = desiredYoff = 0;
-    theCodec = 0;
-    theMask = NULL;
-
     frameSkip = 1;
     frameCounter = 0;
     drawBlank = true;
@@ -240,9 +233,13 @@ bool VideoOutputQuartzView::Begin(void)
         return false;
     }
 
+#if 0
     // Set output size and clipping mask (if necessary)
     Rect portBounds;
     GetPortBounds(thePort, &portBounds);
+    VERBOSE(VB_PLAYBACK, QString("%0Viewport currently %1,%2 -> %3,%4")
+                         .arg(name).arg(portBounds.left).arg(portBounds.top)
+                         .arg(portBounds.right).arg(portBounds.bottom));
     desiredXoff += portBounds.left;
     desiredYoff += portBounds.top;
 
@@ -261,6 +258,7 @@ bool VideoOutputQuartzView::Begin(void)
                    desiredXoff + desiredWidth,
                    desiredYoff + desiredHeight);
     }
+#endif
 
     // create the decompressor
     if (DecompressSequenceBeginS(&theCodec,
@@ -323,10 +321,10 @@ void VideoOutputQuartzView::Transform(void)
     SetIdentityMatrix(&matrix);
 
     int x, y, w, h, sw, sh;
-    x = desiredXoff;
-    y = desiredYoff;
-    w = desiredWidth;
-    h = desiredHeight;
+    x = m_desired.left();
+    y = m_desired.top();
+    w = m_desired.width();
+    h = m_desired.height();
     sw = parentData->srcWidth;
     sh = parentData->srcHeight;
     float aspect = parentData->srcAspect;
@@ -532,12 +530,12 @@ void VideoOutputQuartzView::BlankScreen(bool deferred)
 
         // set clipping rectangle
         Rect clipRect;
-        if (desiredWidth && desiredHeight)
+        if (m_desired.width() && m_desired.height())
         {
-            clipRect.left   = desiredXoff;
-            clipRect.top    = desiredYoff;
-            clipRect.right  = desiredWidth - desiredXoff;
-            clipRect.bottom = desiredHeight - desiredYoff;
+            clipRect.left   = m_desired.left();
+            clipRect.top    = m_desired.top();
+            clipRect.right  = m_desired.right();
+            clipRect.bottom = m_desired.bottom();
         }
         else
         {
@@ -614,6 +612,14 @@ void VideoOutputQuartzView::InputChanged(int width, int height, float aspect,
 void VideoOutputQuartzView::VideoAspectRatioChanged(float aspect)
 {
     (void)aspect;
+
+    // need to redo transformation matrix
+    Transform();
+}
+
+void VideoOutputQuartzView::MoveResize(QRect newRect)
+{
+    m_desired = newRect;
 
     // need to redo transformation matrix
     Transform();
@@ -724,10 +730,7 @@ class VoqvEmbedded : public VideoOutputQuartzView
     VoqvEmbedded(QuartzData *pData, int x, int y, int w, int h)
     : VideoOutputQuartzView(pData)
     {
-        desiredXoff = x;
-        desiredYoff = y;
-        desiredWidth = w;
-        desiredHeight = h;
+        m_desired = QRect(x, y, w, h);
         name = "Embedded window: ";
     };
 
@@ -938,8 +941,8 @@ class VoqvFloater : public VideoOutputQuartzView
             // Resize complete, reset the window drawing transformation
             Rect curBounds;
             GetPortBounds(thePort, &curBounds);
-            desiredWidth  = curBounds.right - curBounds.left;
-            desiredHeight = curBounds.bottom - curBounds.top;
+            m_desired.setWidth(curBounds.right - curBounds.left);
+            m_desired.setHeight(curBounds.bottom - curBounds.top);
             Transform();
         }
         resizing = startResizing;
@@ -1261,6 +1264,19 @@ void VideoOutputQuartz::Zoom(ZoomDirection direction)
     vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
     for (; it != data->views.end(); ++it)
         (*it)->Zoom(direction);
+}
+
+void VideoOutputQuartz::MoveResize(void)
+{
+    // This recalculates the desired output rectangle, based on
+    // the user's current aspect/fill/letterbox/zoom settings.
+    VideoOutput::MoveResize();
+
+    vector<VideoOutputQuartzView*>::iterator it;
+    for (it = data->views.begin(); it != data->views.end(); ++it)
+    {
+        (*it)->MoveResize(display_video_rect);
+    }
 }
 
 bool VideoOutputQuartz::InputChanged(const QSize &input_size,
