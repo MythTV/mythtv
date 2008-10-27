@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2008-06-04, v0.21.02
+<date>2008-10-27, v0.21.03
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -7385,8 +7385,8 @@ Upper Case = seen & good
 <sect1>What is the difference between the various Hauppauge PVR models?
 <p>This is covered in the hardware section, and extensively covered on the
 Hauppauge website.  (<url
-url="http://www.hauppauge.com/pages/compare_pvr.html"
-name="http://www.hauppauge.com/pages/compare_pvr.html">) Please check the
+url="http://www.hauppauge.com/site/compare/compare_pvr.html"
+name="http://www.hauppauge.com/site/compare/compare_pvr.html">) Please check the
 Hauppauge website for the most accurate information.
 
 A PVR-150 comes in a number of versions:
@@ -7943,6 +7943,7 @@ mini-distribution site appears dead.  Update information on HVR-1600.
 Update minimum MySQL version.
 v0.21.01, 2008-06-03.  Add mythbuntu.
 v0.21.02, 2008-06-04.  Update minimyth link.
+v0.21.03, 2008-10-27.  Update Hauppauge link.
 -->
 
 <!--

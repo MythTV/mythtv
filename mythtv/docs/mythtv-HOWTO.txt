@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2008-06-04, v0.21.02
+  2008-10-27, v0.21.03
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -8622,9 +8622,9 @@
 
   This is covered in the hardware section, and extensively covered on
   the Hauppauge website.
-  (http://www.hauppauge.com/pages/compare_pvr.html
-  <http://www.hauppauge.com/pages/compare_pvr.html>) Please check the
-  Hauppauge website for the most accurate information.
+  (http://www.hauppauge.com/site/compare/compare_pvr.html
+  <http://www.hauppauge.com/site/compare/compare_pvr.html>) Please check
+  the Hauppauge website for the most accurate information.
 
   A PVR-150 comes in a number of versions:
 
