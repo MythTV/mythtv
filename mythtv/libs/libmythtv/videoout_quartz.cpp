@@ -125,8 +125,8 @@ class VideoOutputQuartzView
 /*
  * The floating window class needs an event callback.
  */
-OSStatus VoqvFloater_Callback(EventHandlerCallRef inHandlerCallRef, 
-                              EventRef inEvent, 
+OSStatus VoqvFloater_Callback(EventHandlerCallRef inHandlerCallRef,
+                              EventRef inEvent,
                               void *inUserData);
 
 /*
@@ -149,7 +149,7 @@ class QuartzData
         scaleUpVideo(false),        correctGamma(false),
         convertI420to2VUY(NULL),
 
-	ZoomedH(1.0f), ZoomedV(1.0f),
+        ZoomedH(1.0f), ZoomedV(1.0f),
         ZoomedUp(0),                ZoomedRight(0),
 
         embeddedView(NULL),         dvdv(NULL)
@@ -188,7 +188,7 @@ class QuartzData
     bool               scaleUpVideo;      // Enlarge video as needed?
     bool               correctGamma;      // Video gamma correction
     conv_i420_2vuy_fun convertI420to2VUY; // I420 -> 2VUY conversion function
-    
+
     // Zoom preferences:
     float              ZoomedH;           // VideoOutputBase::mz_scale_h
     float              ZoomedV;           // VideoOutputBase::mz_scale_v
@@ -281,12 +281,12 @@ bool VideoOutputQuartzView::Begin(void)
         viewLock.unlock();
         return false;
     }
-    
+
     // Turn off gamma correction unless requested
     if (!parentData->correctGamma)
         QTSetPixMapHandleRequestedGammaLevel(GetPortPixMap(thePort),
                                              kQTUseSourceGammaLevel);
-    
+
     SetDSequenceFlags(theCodec,
                       codecDSequenceFlushInsteadOfDirtying,
                       codecDSequenceFlushInsteadOfDirtying);
@@ -298,7 +298,7 @@ bool VideoOutputQuartzView::Begin(void)
     return true;
 }
 
-/// Clean up the codec.  
+/// Clean up the codec.
 void VideoOutputQuartzView::End(void)
 {
     viewLock.lock();
@@ -437,7 +437,7 @@ void VideoOutputQuartzView::Transform(void)
     if ((h != sh) || (w != sw))
     {
         VERBOSE(VB_PLAYBACK, QString("%0Centering with %1, %2")
-                                    .arg(name).arg((w - sw)/2.0).arg((h - sh)/2.0));
+                             .arg(name).arg((w - sw)/2.0).arg((h - sh)/2.0));
         TranslateMatrix(&matrix, X2Fix((w - sw) / 2.0), X2Fix((h - sh) / 2.0));
     }
 
@@ -464,7 +464,7 @@ void VideoOutputQuartzView::Transform(void)
         {
             hscan *= 2;
         }
-        
+
         VERBOSE(VB_PLAYBACK, QString("%0Overscanning to %1, %2")
                                     .arg(name).arg(hscan).arg(vscan));
         ScaleMatrix(&matrix,
@@ -481,22 +481,22 @@ void VideoOutputQuartzView::Transform(void)
         int tv_yoff = gContext->GetNumSetting("yScanDisplacement", 0);
         if (tv_xoff || tv_yoff)
         {
-            VERBOSE(VB_PLAYBACK,
-                    QString("%0TV offset by %1, %2").arg(name).arg(tv_xoff).arg(tv_yoff));
+            VERBOSE(VB_PLAYBACK, QString("%0TV offset by %1, %2")
+                                 .arg(name).arg(tv_xoff).arg(tv_yoff));
             TranslateMatrix(&matrix, Long2Fix(tv_xoff), Long2Fix(tv_yoff));
         }
     }
-    
+
     // apply zoomed offsets
     if ((parentData->ZoomedH != 1.0f) || (parentData->ZoomedV != 1.0f))
-    { 
+    {
         // calculate original vs. zoomed dimensions
         int zw = (int)(sw / (1.0 + (parentData->ZoomedH)));
         int zh = (int)(sh / (1.0 + (parentData->ZoomedV)));
-                
+
         int zoomx = (int)((sw - zw) * parentData->ZoomedRight * .005);
         int zoomy = (int)((sh - zh) * parentData->ZoomedUp    * .005);
-        
+
         VERBOSE(VB_PLAYBACK, QString("%0Zoom translating to %1, %2")
                                     .arg(name).arg(zoomx).arg(zoomy));
         TranslateMatrix(&matrix, Long2Fix(zoomx), Long2Fix(zoomy));
@@ -529,7 +529,7 @@ void VideoOutputQuartzView::BlankScreen(bool deferred)
     if (thePort)
     {
         SetPort(thePort);
-        
+
         // set clipping rectangle
         Rect clipRect;
         if (desiredWidth && desiredHeight)
@@ -551,7 +551,7 @@ void VideoOutputQuartzView::BlankScreen(bool deferred)
         RGBBackColor(&rgbBlack);
         EraseRect(&clipRect);
         QDFlushPortBuffer(thePort, clipRgn);
-        
+
         drawBlank = false;
     }
     viewLock.unlock();
@@ -748,7 +748,7 @@ class VoqvEmbedded : public VideoOutputQuartzView
             viewLock.unlock();
             return false;
         }
-        
+
         // Ensure Qt updates by invalidating the window.
         Rect portBounds;
         GetPortBounds(thePort, &portBounds);
@@ -801,7 +801,7 @@ class VoqvFullscreen : public VideoOutputQuartzView
             viewLock.unlock();
             return false;
         }
-        
+
         // switch screen resolution if desired
         if (gContext->GetNumSetting("UseVideoModes", 0))
         {
@@ -831,7 +831,7 @@ class VoqvFullscreen : public VideoOutputQuartzView
             DisposePort(thePort);
             thePort = NULL;
         }
-        
+
         // return screen resolution to normal
         if (gContext->GetNumSetting("UseVideoModes", 0))
             DisplayRes::GetDisplayRes()->SwitchToGUI();
@@ -930,7 +930,7 @@ class VoqvFloater : public VideoOutputQuartzView
 
         VideoOutputQuartzView::Show();
     }
-    
+
     void ResizeChanged(bool startResizing)
     {
         if (!startResizing)
@@ -958,7 +958,7 @@ class VoqvFloater : public VideoOutputQuartzView
         bounds.top = bounds.left = bounds.right = bounds.bottom = 50;
         bounds.right  += CGDisplayPixelsWide(parentData->screen) / 3;
         bounds.bottom += CGDisplayPixelsHigh(parentData->screen) / 3;
-        
+
         // custom window definition
         EventHandlerUPP myUPP = NewEventHandlerUPP(VoqvFloater_Callback);
         EventTypeSpec defEvents[] =
@@ -991,7 +991,7 @@ class VoqvFloater : public VideoOutputQuartzView
         SetWindowAlpha(window, alpha);
         RGBColor black = { 0, 0, 0 };
         SetWindowContentColor(window, &black);
-        
+
         thePort = GetWindowPort(window);
         if (!thePort)
         {
@@ -1052,8 +1052,8 @@ class VoqvFloater : public VideoOutputQuartzView
 };
 
 // The event callback for the floating window above
-OSStatus VoqvFloater_Callback(EventHandlerCallRef inHandlerCallRef, 
-                              EventRef inEvent, 
+OSStatus VoqvFloater_Callback(EventHandlerCallRef inHandlerCallRef,
+                              EventRef inEvent,
                               void *inUserData)
 {
     (void)inHandlerCallRef;
@@ -1062,7 +1062,7 @@ OSStatus VoqvFloater_Callback(EventHandlerCallRef inHandlerCallRef,
     Point mouseLoc;
     Rect winLoc;
     WindowDefPartCode where;
-    
+
     switch (GetEventKind(inEvent))
     {
         case kEventWindowHitTest:
@@ -1081,7 +1081,7 @@ OSStatus VoqvFloater_Callback(EventHandlerCallRef inHandlerCallRef,
                               sizeof(mouseLoc),
                               NULL,
                               &mouseLoc);
-            
+
             // see if user hit grow area
             GetWindowBounds(window,
                             kWindowGlobalPortRgn,
@@ -1098,7 +1098,7 @@ OSStatus VoqvFloater_Callback(EventHandlerCallRef inHandlerCallRef,
                               sizeof(WindowDefPartCode),
                               &where);
             break;
-            
+
         case kEventWindowClickResizeRgn:
             // gather info about window and click
             GetEventParameter(inEvent,
@@ -1355,8 +1355,8 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
         return false;
     }
 
-    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames, 
-                  kPrebufferFramesNormal, kPrebufferFramesSmall, 
+    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
+                  kPrebufferFramesNormal, kPrebufferFramesSmall,
                   kKeepPrebuffer);
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, embedid);
@@ -1428,7 +1428,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     data->drawInWindow = gContext->GetNumSetting("GuiSizeForTV", 0);
     data->windowedMode = gContext->GetNumSetting("RunFrontendInWindow", 0);
     data->correctGamma = gContext->GetNumSetting("MacGammaCorrect", 0);
-    
+
     data->convertI420to2VUY = get_i420_2vuy_conv();
 
     if (!CreateQuartzBuffers())
@@ -1464,12 +1464,12 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
             data->views.push_back(tmp);
         }
         else
-        {   
+        {
             // If video in the main window is not enabled,
-            // hide (shrink) it so it is not in the way 
+            // hide (shrink) it so it is not in the way
             VERBOSE(VB_PLAYBACK, QString("Shrinking Main Window to 1x1"));
-            SizeWindow(data->window, 1, 1, true); 
-        } 
+            SizeWindow(data->window, 1, 1, true);
+        }
         if (gContext->GetNumSetting("MacFloatEnabled", 0))
         {
             float opacity =
@@ -1485,7 +1485,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
             data->views.push_back(tmp);
         }
         if (gContext->GetNumSetting("MacDockEnabled", 1))
-        { 
+        {
             tmp = new VoqvDock(data);
             tmp->SetFrameSkip(gContext->GetNumSetting("MacDockSkip", 3));
             data->views.push_back(tmp);
@@ -1564,14 +1564,14 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
     VERBOSE(VB_IMPORTANT, LOC + "VProf: " + db_vdisp_profile->toString());
 
     vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
-  
+
     // Set up pause frame
     if (pauseFrame.buf)
         delete [] pauseFrame.buf;
 
     VideoFrame *scratch = vbuffers.GetScratchFrame();
-  
-    init(&pauseFrame, FMT_YV12, new unsigned char[scratch->size], 
+
+    init(&pauseFrame, FMT_YV12, new unsigned char[scratch->size],
          scratch->width, scratch->height, scratch->bpp, scratch->size);
 
     pauseFrame.frameNumber = scratch->frameNumber;
@@ -1606,13 +1606,13 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
     desc->frameCount = 0;
     desc->dataSize = 0;
     desc->clutID = -1;
-    
+
     HUnlock((Handle)(data->imgDesc));
 
     // Set up storage area for one YUV frame
     data->pixelSize = width * height * 2;
     data->pixelData = new char[data->pixelSize];
-    
+
     data->pixelLock.unlock();
 
     return true;
@@ -1620,21 +1620,21 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
 
 void VideoOutputQuartz::Exit(void)
 {
-    if (Started) 
+    if (Started)
     {
         Started = false;
 
         // Restore main window
         // (assuming it was shrunk i.e. we were not in full screen mode)
         if (data->windowedMode)
-        { 
+        {
             VERBOSE(VB_PLAYBACK,
-                    QString("Restoring Main Window to %1x%2")  
+                    QString("Restoring Main Window to %1x%2")
                     .arg(data->windowBounds.right - data->windowBounds.left)
                     .arg(data->windowBounds.bottom - data->windowBounds.top));
             SetWindowBounds(data->window, kWindowStructureRgn,
                             &(data->windowBounds));
-        } 
+        }
 
         data->ClearViews();
         DeleteQuartzBuffers();
@@ -1668,19 +1668,15 @@ void VideoOutputQuartz::DeleteQuartzBuffers()
 
 void VideoOutputQuartz::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
-    VERBOSE(VB_PLAYBACK,
-            QString("VideoOutputQuartz::EmbedInWidget(wid=%1, x=%2, y=%3, w=%4, h=%5)")
-                   .arg(wid)
-                   .arg(x)
-                   .arg(y)
-                   .arg(w)
-                   .arg(h));
+    VERBOSE(VB_PLAYBACK, "VideoOutputQuartz::EmbedInWidget(" +
+            QString("wid=%1, x=%2, y=%3, w=%4, h=%5)")
+            .arg(wid).arg(x).arg(y).arg(w).arg(h));
 
     if (embedding)
         return;
 
     VideoOutput::EmbedInWidget(wid, x, y, w, h);
-    
+
     data->pixelLock.lock();
 
     // warn other views that embedding is starting
@@ -1697,7 +1693,7 @@ void VideoOutputQuartz::EmbedInWidget(WId wid, int x, int y, int w, int h)
         data->embeddedView->Init();
         data->views.push_back(data->embeddedView);
     }
-    
+
     data->pixelLock.unlock();
 }
 
@@ -1712,7 +1708,7 @@ void VideoOutputQuartz::StopEmbedding(void)
     VideoOutput::StopEmbedding();
 
     data->pixelLock.lock();
-    
+
     // delete embedded widget
     if (data->embeddedView)
     {
@@ -1730,7 +1726,7 @@ void VideoOutputQuartz::StopEmbedding(void)
     vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
     for (; it != data->views.end(); ++it)
         (*it)->EmbedChanged(false);
-    
+
     data->pixelLock.unlock();
 }
 
