@@ -2295,6 +2295,7 @@ if test $tune != "generic"; then
     esac
 fi
 
+<<BLOCK_QUOTE
 gnu_make(){
     $1 --version 2>&1 | grep -q GNU
 }
@@ -2302,6 +2303,7 @@ gnu_make(){
 if ! gnu_make $make; then
     gnu_make gmake && make=gmake || die "GNU make not found."
 fi
+BLOCK_QUOTE
 
 is_qmake4(){
     $1 --version 2>&1 | grep -q "Qt version 4"
