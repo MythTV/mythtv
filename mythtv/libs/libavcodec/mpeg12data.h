@@ -25,11 +25,15 @@
  * MPEG1/2 tables.
  */
 
-#ifndef FFMPEG_MPEG12DATA_H
-#define FFMPEG_MPEG12DATA_H
+#ifndef AVCODEC_MPEG12DATA_H
+#define AVCODEC_MPEG12DATA_H
 
 #include <stdint.h>
-#include "mpegvideo.h"
+#include "libavutil/rational.h"
+#include "rl.h"
+
+extern const uint16_t ff_mpeg1_default_intra_matrix[64];
+extern const uint16_t ff_mpeg1_default_non_intra_matrix[64];
 
 extern const uint16_t ff_mpeg12_vlc_dc_lum_code[12];
 extern const unsigned char ff_mpeg12_vlc_dc_lum_bits[12];
@@ -44,7 +48,9 @@ extern const uint8_t ff_mpeg12_mbPatTable[64][2];
 
 extern const uint8_t ff_mpeg12_mbMotionVectorTable[17][2];
 
+extern const AVRational ff_frame_rate_tab[];
+
 extern const float ff_mpeg1_aspect[16];
 extern const AVRational ff_mpeg2_aspect[16];
 
-#endif /* FFMPEG_MPEG12DATA_H */
+#endif /* AVCODEC_MPEG12DATA_H */

@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_ASF_H
-#define FFMPEG_ASF_H
+#ifndef AVFORMAT_ASF_H
+#define AVFORMAT_ASF_H
 
 #include <stdint.h>
 #include "avformat.h"
@@ -56,7 +56,7 @@ typedef struct {
     uint64_t send_time;         /**< time to send file, in 100-nanosecond units
                                  *   invalid if broadcasting (could be ignored) */
     uint32_t preroll;           /**< timestamp of the first packet, in milliseconds
-                                 *   if nonzero - substract from time */
+                                 *   if nonzero - subtract from time */
     uint32_t ignore;            ///< preroll is 64bit - but let's just ignore it
     uint32_t flags;             /**< 0x01 - broadcast
                                  *   0x02 - seekable
@@ -97,7 +97,7 @@ typedef struct {
     uint8_t packet_buf[PACKET_SIZE];
     ByteIOContext pb;
     /* only for reading */
-    uint64_t data_offset;                ///< begining of the first data packet
+    uint64_t data_offset;                ///< beginning of the first data packet
     uint64_t data_object_offset;         ///< data object offset (excl. GUID & size)
     uint64_t data_object_size;           ///< size of the data object
     int index_read;
@@ -286,4 +286,4 @@ static const GUID my_guid = {
 
 #define ASF_PL_FLAG_KEY_FRAME 0x80 //1000 0000
 
-#endif /* FFMPEG_ASF_H */
+#endif /* AVFORMAT_ASF_H */

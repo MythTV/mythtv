@@ -18,9 +18,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "dsputil.h"
-#include "mpegvideo.h"
-#include "avcodec.h"
+#include "libavcodec/avcodec.h"
+#include "libavcodec/dsputil.h"
+#include "libavcodec/mpegvideo.h"
 
 static void dct_unquantize_h263_intra_iwmmxt(MpegEncContext *s,
                                              DCTELEM *block, int n, int qscale)
@@ -48,7 +48,7 @@ static void dct_unquantize_h263_intra_iwmmxt(MpegEncContext *s,
     else
         nCoeffs= s->inter_scantable.raster_end[ s->block_last_index[n] ];
 
-    __asm__ __volatile__ (
+    asm volatile (
 /*      "movd %1, %%mm6                 \n\t" //qmul */
 /*      "packssdw %%mm6, %%mm6          \n\t" */
 /*      "packssdw %%mm6, %%mm6          \n\t" */

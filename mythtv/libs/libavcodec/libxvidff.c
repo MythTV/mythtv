@@ -38,19 +38,17 @@
 #define BUFFER_CAT(x)               (&((x)[strlen(x)]))
 
 /* For PPC Use */
-#if HAVE_ALTIVEC==1
 extern int has_altivec(void);
-#endif
 
 /**
- * Structure for the private XviD context.
+ * Structure for the private Xvid context.
  * This stores all the private context for the codec.
  */
 typedef struct xvid_context {
-    void *encoder_handle;          /** Handle for XviD Encoder */
+    void *encoder_handle;          /** Handle for Xvid encoder */
     int xsize, ysize;              /** Frame size */
-    int vop_flags;                 /** VOP flags for XviD Encoder */
-    int vol_flags;                 /** VOL flags for XviD Encoder */
+    int vop_flags;                 /** VOP flags for Xvid encoder */
+    int vol_flags;                 /** VOL flags for Xvid encoder */
     int me_flags;                  /** Motion Estimation flags */
     int qscale;                    /** Do we use constant scale? */
     int quicktime_format;          /** Are we in a QT-based format? */
@@ -66,7 +64,7 @@ typedef struct xvid_context {
  * Structure for the private first-pass plugin.
  */
 typedef struct xvid_ff_pass1 {
-    int     version;                /** XviD version */
+    int     version;                /** Xvid version */
     xvid_context_t *context;        /** Pointer to private context */
 } xvid_ff_pass1_t;
 
@@ -83,7 +81,7 @@ void xvid_correct_framerate(AVCodecContext *avctx);
  * @param avctx AVCodecContext pointer to context
  * @return Returns 0 on success, -1 on failure
  */
-int ff_xvid_encode_init(AVCodecContext *avctx)  {
+av_cold int ff_xvid_encode_init(AVCodecContext *avctx)  {
     int xerr, i;
     int xvid_flags = avctx->flags;
     xvid_context_t *x = avctx->priv_data;
@@ -101,7 +99,11 @@ int ff_xvid_encode_init(AVCodecContext *avctx)  {
     x->vop_flags = XVID_VOP_HALFPEL; /* Bare minimum quality */
     if( xvid_flags & CODEC_FLAG_4MV )
         x->vop_flags |= XVID_VOP_INTER4V; /* Level 3 */
-    if( xvid_flags & CODEC_FLAG_TRELLIS_QUANT)
+    if( avctx->trellis
+#if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
+        || xvid_flags & CODEC_FLAG_TRELLIS_QUANT
+#endif
+        )
         x->vop_flags |= XVID_VOP_TRELLISQUANT; /* Level 5 */
     if( xvid_flags & CODEC_FLAG_AC_PRED )
         x->vop_flags |= XVID_VOP_HQACPRED; /* Level 6 */
@@ -168,15 +170,15 @@ int ff_xvid_encode_init(AVCodecContext *avctx)  {
     xvid_gbl_init.debug = 0;
 
 #ifdef ARCH_POWERPC
-    /* XviD's PPC support is borked, use libavcodec to detect */
-#if HAVE_ALTIVEC==1
+    /* Xvid's PPC support is borked, use libavcodec to detect */
+#ifdef HAVE_ALTIVEC
     if( has_altivec() ) {
         xvid_gbl_init.cpu_flags = XVID_CPU_FORCE | XVID_CPU_ALTIVEC;
     } else
 #endif
         xvid_gbl_init.cpu_flags = XVID_CPU_FORCE;
 #else
-    /* XviD can detect on x86 */
+    /* Xvid can detect on x86 */
     xvid_gbl_init.cpu_flags = 0;
 #endif
 
@@ -191,13 +193,14 @@ int ff_xvid_encode_init(AVCodecContext *avctx)  {
     xvid_enc_create.width = x->xsize = avctx->width;
     xvid_enc_create.height = x->ysize = avctx->height;
 
-    /* XviD can determine the proper profile to use */
+    /* Xvid can determine the proper profile to use */
     /* xvid_enc_create.profile = XVID_PROFILE_S_L3; */
 
-    /* We don't use zones or threads */
+    /* We don't use zones */
     xvid_enc_create.zones = NULL;
     xvid_enc_create.num_zones = 0;
-    xvid_enc_create.num_threads = 0;
+
+    xvid_enc_create.num_threads = avctx->thread_count;
 
     xvid_enc_create.plugins = plugins;
     xvid_enc_create.num_plugins = 0;
@@ -215,7 +218,7 @@ int ff_xvid_encode_init(AVCodecContext *avctx)  {
         x->old_twopassbuffer = av_malloc(BUFFER_SIZE);
         if( x->twopassbuffer == NULL || x->old_twopassbuffer == NULL ) {
             av_log(avctx, AV_LOG_ERROR,
-                "XviD: Cannot allocate 2-pass log buffers\n");
+                "Xvid: Cannot allocate 2-pass log buffers\n");
             return -1;
         }
         x->twopassbuffer[0] = x->old_twopassbuffer[0] = 0;
@@ -231,13 +234,13 @@ int ff_xvid_encode_init(AVCodecContext *avctx)  {
         fd = av_tempfile("xvidff.", &(x->twopassfile));
         if( fd == -1 ) {
             av_log(avctx, AV_LOG_ERROR,
-                "XviD: Cannot write 2-pass pipe\n");
+                "Xvid: Cannot write 2-pass pipe\n");
             return -1;
         }
 
         if( avctx->stats_in == NULL ) {
             av_log(avctx, AV_LOG_ERROR,
-                "XviD: No 2-pass information loaded for second pass\n");
+                "Xvid: No 2-pass information loaded for second pass\n");
             return -1;
         }
 
@@ -245,7 +248,7 @@ int ff_xvid_encode_init(AVCodecContext *avctx)  {
               write(fd, avctx->stats_in, strlen(avctx->stats_in)) ) {
             close(fd);
             av_log(avctx, AV_LOG_ERROR,
-                "XviD: Cannot write to 2-pass pipe\n");
+                "Xvid: Cannot write to 2-pass pipe\n");
             return -1;
         }
 
@@ -279,7 +282,7 @@ int ff_xvid_encode_init(AVCodecContext *avctx)  {
     if( avctx->gop_size > 0 )
         xvid_enc_create.max_key_interval = avctx->gop_size;
     else
-        xvid_enc_create.max_key_interval = 240; /* XviD's best default */
+        xvid_enc_create.max_key_interval = 240; /* Xvid's best default */
 
     /* Quants */
     if( xvid_flags & CODEC_FLAG_QSCALE ) x->qscale = 1;
@@ -332,7 +335,7 @@ int ff_xvid_encode_init(AVCodecContext *avctx)  {
         x->quicktime_format = 1;
         avctx->codec_id = CODEC_ID_MPEG4;
     } else {
-        /* We are claiming to be XviD */
+        /* We are claiming to be Xvid */
         x->quicktime_format = 0;
         if(!avctx->codec_tag)
             avctx->codec_tag = ff_get_fourcc("xvid");
@@ -347,7 +350,7 @@ int ff_xvid_encode_init(AVCodecContext *avctx)  {
     /* Create encoder context */
     xerr = xvid_encore(NULL, XVID_ENC_CREATE, &xvid_enc_create, NULL);
     if( xerr ) {
-        av_log(avctx, AV_LOG_ERROR, "XviD: Could not create encoder reference\n");
+        av_log(avctx, AV_LOG_ERROR, "Xvid: Could not create encoder reference\n");
         return -1;
     }
 
@@ -384,13 +387,13 @@ int ff_xvid_encode_frame(AVCodecContext *avctx,
     xvid_enc_stats.version = XVID_VERSION;
     *p = *picture;
 
-    /* Let XviD know where to put the frame. */
+    /* Let Xvid know where to put the frame. */
     xvid_enc_frame.bitstream = frame;
     xvid_enc_frame.length = buf_size;
 
     /* Initialize input image fields */
     if( avctx->pix_fmt != PIX_FMT_YUV420P ) {
-        av_log(avctx, AV_LOG_ERROR, "XviD: Color spaces other than 420p not supported\n");
+        av_log(avctx, AV_LOG_ERROR, "Xvid: Color spaces other than 420p not supported\n");
         return -1;
     }
 
@@ -406,6 +409,17 @@ int ff_xvid_encode_frame(AVCodecContext *avctx,
     xvid_enc_frame.vol_flags = x->vol_flags;
     xvid_enc_frame.motion = x->me_flags;
     xvid_enc_frame.type = XVID_TYPE_AUTO;
+
+    /* Pixel aspect ratio setting */
+    if (avctx->sample_aspect_ratio.num < 1 || avctx->sample_aspect_ratio.num > 255 ||
+        avctx->sample_aspect_ratio.den < 1 || avctx->sample_aspect_ratio.den > 255) {
+        av_log(avctx, AV_LOG_ERROR, "Invalid pixel aspect ratio %i/%i\n",
+               avctx->sample_aspect_ratio.num, avctx->sample_aspect_ratio.den);
+        return -1;
+    }
+    xvid_enc_frame.par = XVID_PAR_EXT;
+    xvid_enc_frame.par_width  = avctx->sample_aspect_ratio.num;
+    xvid_enc_frame.par_height = avctx->sample_aspect_ratio.den;
 
     /* Quant Setting */
     if( x->qscale ) xvid_enc_frame.quant = picture->quality / FF_QP2LAMBDA;
@@ -451,19 +465,19 @@ int ff_xvid_encode_frame(AVCodecContext *avctx,
 
         return xerr;
     } else {
-        av_log(avctx, AV_LOG_ERROR, "XviD: Encoding Error Occurred: %i\n", xerr);
+        av_log(avctx, AV_LOG_ERROR, "Xvid: Encoding Error Occurred: %i\n", xerr);
         return -1;
     }
 }
 
 /**
  * Destroys the private context for the encoder.
- * All buffers are freed, and the XviD encoder context is destroyed.
+ * All buffers are freed, and the Xvid encoder context is destroyed.
  *
  * @param avctx AVCodecContext pointer to context
  * @return Returns 0, success guaranteed
  */
-int ff_xvid_encode_close(AVCodecContext *avctx) {
+av_cold int ff_xvid_encode_close(AVCodecContext *avctx) {
     xvid_context_t *x = avctx->priv_data;
 
     xvid_encore(x->encoder_handle, XVID_ENC_DESTROY, NULL, NULL);
@@ -486,7 +500,7 @@ int ff_xvid_encode_close(AVCodecContext *avctx) {
 
 /**
  * Routine to create a global VO/VOL header for MP4 container.
- * What we do here is extract the header from the XviD bitstream
+ * What we do here is extract the header from the Xvid bitstream
  * as it is encoded. We also strip the repeated headers from the
  * bitstream when a global header is requested for MPEG-4 ISO
  * compliance.
@@ -530,7 +544,7 @@ int xvid_strip_vol_header(AVCodecContext *avctx,
 
 /**
  * Routine to correct a possibly erroneous framerate being fed to us.
- * XviD currently chokes on framerates where the ticks per frame is
+ * Xvid currently chokes on framerates where the ticks per frame is
  * extremely large. This function works to correct problems in this area
  * by estimating a new framerate and taking the simpler fraction of
  * the two presented.
@@ -578,7 +592,7 @@ void xvid_correct_framerate(AVCodecContext *avctx) {
         avctx->time_base.den = est_frate;
         avctx->time_base.num = est_fbase;
         av_log(avctx, AV_LOG_DEBUG,
-            "XviD: framerate re-estimated: %.2f, %.3f%% correction\n",
+            "Xvid: framerate re-estimated: %.2f, %.3f%% correction\n",
             est_fps, (((est_fps - fps)/fps) * 100.0));
     } else {
         avctx->time_base.den = frate;
@@ -587,12 +601,12 @@ void xvid_correct_framerate(AVCodecContext *avctx) {
 }
 
 /*
- * XviD 2-Pass Kludge Section
+ * Xvid 2-Pass Kludge Section
  *
- * XviD's default 2-pass doesn't allow us to create data as we need to, so
+ * Xvid's default 2-pass doesn't allow us to create data as we need to, so
  * this section spends time replacing the first pass plugin so we can write
  * statistic information as libavcodec requests in. We have another kludge
- * that allows us to pass data to the second pass in XviD without a custom
+ * that allows us to pass data to the second pass in Xvid without a custom
  * rate-control plugin.
  */
 
@@ -720,7 +734,7 @@ static int xvid_ff_2pass_after(xvid_context_t *ref,
 
 /**
  * Dispatch function for our custom plugin.
- * This handles the dispatch for the XviD plugin. It passes data
+ * This handles the dispatch for the Xvid plugin. It passes data
  * on to other functions for actual processing.
  *
  * @param ref Context pointer for the plugin
@@ -753,7 +767,7 @@ int xvid_ff_2pass(void *ref, int cmd, void *p1, void *p2) {
 }
 
 /**
- * XviD codec definition for libavcodec.
+ * Xvid codec definition for libavcodec.
  */
 AVCodec libxvid_encoder = {
     "libxvid",
@@ -763,5 +777,6 @@ AVCodec libxvid_encoder = {
     ff_xvid_encode_init,
     ff_xvid_encode_frame,
     ff_xvid_encode_close,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
+    .long_name= NULL_IF_CONFIG_SMALL("libxvidcore MPEG-4 part 2"),
 };

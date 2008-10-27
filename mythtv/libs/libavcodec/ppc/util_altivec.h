@@ -21,8 +21,16 @@
  * Contains misc utility macros and inline functions
  */
 
-#ifndef FFMPEG_UTIL_ALTIVEC_H
-#define FFMPEG_UTIL_ALTIVEC_H
+#ifndef AVCODEC_PPC_UTIL_ALTIVEC_H
+#define AVCODEC_PPC_UTIL_ALTIVEC_H
+
+#include <stdint.h>
+
+#include "config.h"
+
+#ifdef HAVE_ALTIVEC_H
+#include <altivec.h>
+#endif
 
 // used to build registers permutation vectors (vcprm)
 // the 's' are for words in the _s_econd vector
@@ -35,11 +43,8 @@
 #define WORD_s2 0x18,0x19,0x1a,0x1b
 #define WORD_s3 0x1c,0x1d,0x1e,0x1f
 
-#ifdef __APPLE_CC__
-#define vcprm(a,b,c,d) (const vector unsigned char)(WORD_ ## a, WORD_ ## b, WORD_ ## c, WORD_ ## d)
-#else
 #define vcprm(a,b,c,d) (const vector unsigned char){WORD_ ## a, WORD_ ## b, WORD_ ## c, WORD_ ## d}
-#endif
+#define vcii(a,b,c,d) (const vector float){FLOAT_ ## a, FLOAT_ ## b, FLOAT_ ## c, FLOAT_ ## d}
 
 // vcprmle is used to keep the same index as in the SSE version.
 // it's the same as vcprm, with the index inversed
@@ -51,12 +56,6 @@
 #define FLOAT_n -1.
 #define FLOAT_p 1.
 
-
-#ifdef __APPLE_CC__
-#define vcii(a,b,c,d) (const vector float)(FLOAT_ ## a, FLOAT_ ## b, FLOAT_ ## c, FLOAT_ ## d)
-#else
-#define vcii(a,b,c,d) (const vector float){FLOAT_ ## a, FLOAT_ ## b, FLOAT_ ## c, FLOAT_ ## d}
-#endif
 
 // Transpose 8x8 matrix of 16-bit elements (in-place)
 #define TRANSPOSE8(a,b,c,d,e,f,g,h) \
@@ -103,4 +102,4 @@ static inline vector unsigned char unaligned_load(int offset, uint8_t *src)
     return vec_perm(first, second, mask);
 }
 
-#endif /* FFMPEG_UTIL_ALTIVEC_H */
+#endif /* AVCODEC_PPC_UTIL_ALTIVEC_H */

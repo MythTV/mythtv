@@ -37,7 +37,7 @@ typedef struct
     short lastSample[2];
 } ROQDPCMContext_t;
 
-static void roq_dpcm_table_init(void)
+static av_cold void roq_dpcm_table_init(void)
 {
     int i;
 
@@ -158,7 +158,7 @@ static int roq_dpcm_encode_frame(AVCodecContext *avctx,
     return out - frame;
 }
 
-static int roq_dpcm_encode_close(AVCodecContext *avctx)
+static av_cold int roq_dpcm_encode_close(AVCodecContext *avctx)
 {
     av_freep(&avctx->coded_frame);
 
@@ -174,4 +174,6 @@ AVCodec roq_dpcm_encoder = {
     roq_dpcm_encode_frame,
     roq_dpcm_encode_close,
     NULL,
+    .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .long_name = NULL_IF_CONFIG_SMALL("id RoQ DPCM"),
 };

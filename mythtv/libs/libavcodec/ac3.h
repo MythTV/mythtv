@@ -1,5 +1,5 @@
 /*
- * Common code between AC3 encoder and decoder
+ * Common code between the AC-3 encoder and decoder
  * Copyright (c) 2000, 2001, 2002 Fabrice Bellard.
  *
  * This file is part of FFmpeg.
@@ -21,18 +21,18 @@
 
 /**
  * @file ac3.h
- * Common code between AC3 encoder and decoder.
+ * Common code between the AC-3 encoder and decoder.
  */
 
-#ifndef FFMPEG_AC3_H
-#define FFMPEG_AC3_H
+#ifndef AVCODEC_AC3_H
+#define AVCODEC_AC3_H
 
 #include "ac3tab.h"
 
 #define AC3_MAX_CODED_FRAME_SIZE 3840 /* in bytes */
 #define AC3_MAX_CHANNELS 6 /* including LFE channel */
 
-#define NB_BLOCKS 6 /* number of PCM blocks inside an AC3 frame */
+#define NB_BLOCKS 6 /* number of PCM blocks inside an AC-3 frame */
 #define AC3_FRAME_SIZE (NB_BLOCKS * 256)
 
 /* exponent encoding strategy */
@@ -53,21 +53,21 @@ typedef enum {
 
 /** Channel mode (audio coding mode) */
 typedef enum {
-    AC3_ACMOD_DUALMONO = 0,
-    AC3_ACMOD_MONO,
-    AC3_ACMOD_STEREO,
-    AC3_ACMOD_3F,
-    AC3_ACMOD_2F1R,
-    AC3_ACMOD_3F1R,
-    AC3_ACMOD_2F2R,
-    AC3_ACMOD_3F2R
+    AC3_CHMODE_DUALMONO = 0,
+    AC3_CHMODE_MONO,
+    AC3_CHMODE_STEREO,
+    AC3_CHMODE_3F,
+    AC3_CHMODE_2F1R,
+    AC3_CHMODE_3F1R,
+    AC3_CHMODE_2F2R,
+    AC3_CHMODE_3F2R
 } AC3ChannelMode;
 
 typedef struct AC3BitAllocParameters {
-    int fscod; /* frequency */
-    int halfratecod;
-    int sgain, sdecay, fdecay, dbknee, floor;
-    int cplfleak, cplsleak;
+    int sr_code;
+    int sr_shift;
+    int slow_gain, slow_decay, fast_decay, db_per_bit, floor;
+    int cpl_fast_leak, cpl_slow_leak;
 } AC3BitAllocParameters;
 
 /**
@@ -80,21 +80,22 @@ typedef struct {
      */
     uint16_t sync_word;
     uint16_t crc1;
-    uint8_t fscod;
-    uint8_t frmsizecod;
-    uint8_t bsid;
-    uint8_t bsmod;
-    uint8_t acmod;
-    uint8_t cmixlev;
-    uint8_t surmixlev;
-    uint8_t dsurmod;
-    uint8_t lfeon;
+    uint8_t sr_code;
+    uint8_t bitstream_id;
+    uint8_t channel_mode;
+    uint8_t lfe_on;
+    uint8_t frame_type;
+    int substreamid;                        ///< substream identification
+    int center_mix_level;                   ///< Center mix level index
+    int surround_mix_level;                 ///< Surround mix level index
+    uint16_t channel_map;
+    int num_blocks;                         ///< number of audio blocks
     /** @} */
 
     /** @defgroup derived Derived values
      * @{
      */
-    uint8_t halfratecod;
+    uint8_t sr_shift;
     uint16_t sample_rate;
     uint32_t bit_rate;
     uint8_t channels;
@@ -102,6 +103,12 @@ typedef struct {
     /** @} */
 } AC3HeaderInfo;
 
+typedef enum {
+    EAC3_FRAME_TYPE_INDEPENDENT = 0,
+    EAC3_FRAME_TYPE_DEPENDENT,
+    EAC3_FRAME_TYPE_AC3_CONVERT,
+    EAC3_FRAME_TYPE_RESERVED
+} EAC3FrameType;
 
 void ac3_common_init(void);
 
@@ -117,10 +124,10 @@ void ac3_common_init(void);
  * @param[in]  start      starting bin location
  * @param[in]  end        ending bin location
  * @param[out] psd        signal power for each frequency bin
- * @param[out] bndpsd     signal power for each critical band
+ * @param[out] band_psd   signal power for each critical band
  */
 void ff_ac3_bit_alloc_calc_psd(int8_t *exp, int start, int end, int16_t *psd,
-                               int16_t *bndpsd);
+                               int16_t *band_psd);
 
 /**
  * Calculates the masking curve.
@@ -130,23 +137,23 @@ void ff_ac3_bit_alloc_calc_psd(int8_t *exp, int start, int end, int16_t *psd,
  * allocation information is provided, it is used for adjusting the masking
  * curve, usually to give a closer match to a better psychoacoustic model.
  *
- * @param[in]  s          adjustable bit allocation parameters
- * @param[in]  bndpsd     signal power for each critical band
- * @param[in]  start      starting bin location
- * @param[in]  end        ending bin location
- * @param[in]  fgain      fast gain (estimated signal-to-mask ratio)
- * @param[in]  is_lfe     whether or not the channel being processed is the LFE
- * @param[in]  deltbae    delta bit allocation exists (none, reuse, or new)
- * @param[in]  deltnseg   number of delta segments
- * @param[in]  deltoffst  location offsets for each segment
- * @param[in]  deltlen    length of each segment
- * @param[in]  deltba     delta bit allocation for each segment
- * @param[out] mask       calculated masking curve
+ * @param[in]  s            adjustable bit allocation parameters
+ * @param[in]  band_psd     signal power for each critical band
+ * @param[in]  start        starting bin location
+ * @param[in]  end          ending bin location
+ * @param[in]  fast_gain    fast gain (estimated signal-to-mask ratio)
+ * @param[in]  is_lfe       whether or not the channel being processed is the LFE
+ * @param[in]  dba_mode     delta bit allocation mode (none, reuse, or new)
+ * @param[in]  dba_nsegs    number of delta segments
+ * @param[in]  dba_offsets  location offsets for each segment
+ * @param[in]  dba_lengths  length of each segment
+ * @param[in]  dba_values   delta bit allocation for each segment
+ * @param[out] mask         calculated masking curve
  */
-void ff_ac3_bit_alloc_calc_mask(AC3BitAllocParameters *s, int16_t *bndpsd,
-                                int start, int end, int fgain, int is_lfe,
-                                int deltbae, int deltnseg, uint8_t *deltoffst,
-                                uint8_t *deltlen, uint8_t *deltba,
+void ff_ac3_bit_alloc_calc_mask(AC3BitAllocParameters *s, int16_t *band_psd,
+                                int start, int end, int fast_gain, int is_lfe,
+                                int dba_mode, int dba_nsegs, uint8_t *dba_offsets,
+                                uint8_t *dba_lengths, uint8_t *dba_values,
                                 int16_t *mask);
 
 /**
@@ -159,17 +166,20 @@ void ff_ac3_bit_alloc_calc_mask(AC3BitAllocParameters *s, int16_t *bndpsd,
  * @param[in]  psd        signal power for each frequency bin
  * @param[in]  start      starting bin location
  * @param[in]  end        ending bin location
- * @param[in]  snroffset  SNR adjustment
+ * @param[in]  snr_offset SNR adjustment
  * @param[in]  floor      noise floor
+ * @param[in]  bap_tab    look-up table for bit allocation pointers
  * @param[out] bap        bit allocation pointers
  */
 void ff_ac3_bit_alloc_calc_bap(int16_t *mask, int16_t *psd, int start, int end,
-                               int snroffset, int floor, uint8_t *bap);
+                               int snr_offset, int floor,
+                               const uint8_t *bap_tab, uint8_t *bap);
 
 void ac3_parametric_bit_allocation(AC3BitAllocParameters *s, uint8_t *bap,
                                    int8_t *exp, int start, int end,
-                                   int snroffset, int fgain, int is_lfe,
-                                   int deltbae,int deltnseg,
-                                   uint8_t *deltoffst, uint8_t *deltlen, uint8_t *deltba);
+                                   int snr_offset, int fast_gain, int is_lfe,
+                                   int dba_mode, int dba_nsegs,
+                                   uint8_t *dba_offsets, uint8_t *dba_lengths,
+                                   uint8_t *dba_values);
 
-#endif /* FFMPEG_AC3_H */
+#endif /* AVCODEC_AC3_H */

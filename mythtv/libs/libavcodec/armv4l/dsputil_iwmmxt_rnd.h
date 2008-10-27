@@ -19,13 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_DSPUTIL_IWMMXT_RND_H
-#define FFMPEG_DSPUTIL_IWMMXT_RND_H
+/* This header intentionally has no multiple inclusion guards. It is meant to
+ * be included multiple times and generates different code depending on the
+ * value of certain #defines. */
 
 void DEF(put, pixels8)(uint8_t *block, const uint8_t *pixels, const int line_size, int h)
 {
     int stride = line_size;
-    __asm__ __volatile__ (
+    asm volatile (
         "and r12, %[pixels], #7 \n\t"
         "bic %[pixels], %[pixels], #7 \n\t"
         "tmcr wcgr1, r12 \n\t"
@@ -59,7 +60,7 @@ void DEF(put, pixels8)(uint8_t *block, const uint8_t *pixels, const int line_siz
 void DEF(avg, pixels8)(uint8_t *block, const uint8_t *pixels, const int line_size, int h)
 {
     int stride = line_size;
-    __asm__ __volatile__ (
+    asm volatile (
         "and r12, %[pixels], #7 \n\t"
         "bic %[pixels], %[pixels], #7 \n\t"
         "tmcr wcgr1, r12 \n\t"
@@ -101,7 +102,7 @@ void DEF(avg, pixels8)(uint8_t *block, const uint8_t *pixels, const int line_siz
 void DEF(put, pixels16)(uint8_t *block, const uint8_t *pixels, const int line_size, int h)
 {
     int stride = line_size;
-    __asm__ __volatile__ (
+    asm volatile (
         "and r12, %[pixels], #7 \n\t"
         "bic %[pixels], %[pixels], #7 \n\t"
         "tmcr wcgr1, r12 \n\t"
@@ -141,7 +142,7 @@ void DEF(put, pixels16)(uint8_t *block, const uint8_t *pixels, const int line_si
 void DEF(avg, pixels16)(uint8_t *block, const uint8_t *pixels, const int line_size, int h)
 {
     int stride = line_size;
-    __asm__ __volatile__ (
+    asm volatile (
         "pld [%[pixels]]                \n\t"
         "pld [%[pixels], #32]           \n\t"
         "pld [%[block]]                 \n\t"
@@ -200,7 +201,7 @@ void DEF(put, pixels8_x2)(uint8_t *block, const uint8_t *pixels, const int line_
     // [wr0 wr1 wr2 wr3] for previous line
     // [wr4 wr5 wr6 wr7] for current line
     SET_RND(wr15); // =2 for rnd  and  =1 for no_rnd version
-    __asm__ __volatile__(
+    asm volatile(
         "pld [%[pixels]]                \n\t"
         "pld [%[pixels], #32]           \n\t"
         "and r12, %[pixels], #7         \n\t"
@@ -249,7 +250,7 @@ void DEF(put, pixels16_x2)(uint8_t *block, const uint8_t *pixels, const int line
     // [wr0 wr1 wr2 wr3] for previous line
     // [wr4 wr5 wr6 wr7] for current line
     SET_RND(wr15); // =2 for rnd  and  =1 for no_rnd version
-    __asm__ __volatile__(
+    asm volatile(
         "pld [%[pixels]]                \n\t"
         "pld [%[pixels], #32]           \n\t"
         "and r12, %[pixels], #7         \n\t"
@@ -310,7 +311,7 @@ void DEF(avg, pixels8_x2)(uint8_t *block, const uint8_t *pixels, const int line_
     // [wr0 wr1 wr2 wr3] for previous line
     // [wr4 wr5 wr6 wr7] for current line
     SET_RND(wr15); // =2 for rnd  and  =1 for no_rnd version
-    __asm__ __volatile__(
+    asm volatile(
         "pld [%[pixels]]                \n\t"
         "pld [%[pixels], #32]           \n\t"
         "pld [%[block]]                 \n\t"
@@ -371,7 +372,7 @@ void DEF(avg, pixels16_x2)(uint8_t *block, const uint8_t *pixels, const int line
     // [wr0 wr1 wr2 wr3] for previous line
     // [wr4 wr5 wr6 wr7] for current line
     SET_RND(wr15); // =2 for rnd  and  =1 for no_rnd version
-    __asm__ __volatile__(
+    asm volatile(
         "pld [%[pixels]]                \n\t"
         "pld [%[pixels], #32]           \n\t"
         "pld [%[block]]                 \n\t"
@@ -447,7 +448,7 @@ void DEF(avg, pixels8_y2)(uint8_t *block, const uint8_t *pixels, const int line_
     int stride = line_size;
     // [wr0 wr1 wr2 wr3] for previous line
     // [wr4 wr5 wr6 wr7] for current line
-    __asm__ __volatile__(
+    asm volatile(
         "pld            [%[pixels]]                             \n\t"
         "pld            [%[pixels], #32]                        \n\t"
         "and            r12, %[pixels], #7                      \n\t"
@@ -501,7 +502,7 @@ void DEF(put, pixels16_y2)(uint8_t *block, const uint8_t *pixels, const int line
     int stride = line_size;
     // [wr0 wr1 wr2 wr3] for previous line
     // [wr4 wr5 wr6 wr7] for current line
-    __asm__ __volatile__(
+    asm volatile(
         "pld [%[pixels]]                \n\t"
         "pld [%[pixels], #32]           \n\t"
         "and r12, %[pixels], #7         \n\t"
@@ -558,7 +559,7 @@ void DEF(avg, pixels16_y2)(uint8_t *block, const uint8_t *pixels, const int line
     int stride = line_size;
     // [wr0 wr1 wr2 wr3] for previous line
     // [wr4 wr5 wr6 wr7] for current line
-    __asm__ __volatile__(
+    asm volatile(
         "pld [%[pixels]]                \n\t"
         "pld [%[pixels], #32]           \n\t"
         "and r12, %[pixels], #7         \n\t"
@@ -626,7 +627,7 @@ void DEF(put, pixels8_xy2)(uint8_t *block, const uint8_t *pixels, const int line
     // [wr0 wr1 wr2 wr3] for previous line
     // [wr4 wr5 wr6 wr7] for current line
     SET_RND(wr15); // =2 for rnd  and  =1 for no_rnd version
-    __asm__ __volatile__(
+    asm volatile(
         "pld [%[pixels]]                \n\t"
         "mov r12, #2                    \n\t"
         "pld [%[pixels], #32]           \n\t"
@@ -720,7 +721,7 @@ void DEF(put, pixels16_xy2)(uint8_t *block, const uint8_t *pixels, const int lin
     // [wr0 wr1 wr2 wr3] for previous line
     // [wr4 wr5 wr6 wr7] for current line
     SET_RND(wr15); // =2 for rnd  and  =1 for no_rnd version
-    __asm__ __volatile__(
+    asm volatile(
         "pld [%[pixels]]                \n\t"
         "mov r12, #2                    \n\t"
         "pld [%[pixels], #32]           \n\t"
@@ -862,7 +863,7 @@ void DEF(avg, pixels8_xy2)(uint8_t *block, const uint8_t *pixels, const int line
     // [wr0 wr1 wr2 wr3] for previous line
     // [wr4 wr5 wr6 wr7] for current line
     SET_RND(wr15); // =2 for rnd  and  =1 for no_rnd version
-    __asm__ __volatile__(
+    asm volatile(
         "pld [%[block]]                 \n\t"
         "pld [%[block], #32]            \n\t"
         "pld [%[pixels]]                \n\t"
@@ -966,7 +967,7 @@ void DEF(avg, pixels16_xy2)(uint8_t *block, const uint8_t *pixels, const int lin
     // [wr0 wr1 wr2 wr3] for previous line
     // [wr4 wr5 wr6 wr7] for current line
     SET_RND(wr15); // =2 for rnd  and  =1 for no_rnd version
-    __asm__ __volatile__(
+    asm volatile(
         "pld [%[block]]                 \n\t"
         "pld [%[block], #32]            \n\t"
         "pld [%[pixels]]                \n\t"
@@ -1115,5 +1116,3 @@ void DEF(avg, pixels16_xy2)(uint8_t *block, const uint8_t *pixels, const int lin
         : [line_size]"r"(line_size)
         : "r12", "memory");
 }
-
-#endif /* FFMPEG_DSPUTIL_IWMMXT_RND_H */

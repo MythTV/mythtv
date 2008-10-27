@@ -36,7 +36,7 @@ typedef struct WNV1Context{
     GetBitContext gb;
 } WNV1Context;
 
-static uint16_t code_tab[16][2]={
+static const uint16_t code_tab[16][2]={
 {0x1FD,9}, {0xFD,8}, {0x7D,7}, {0x3D,6}, {0x1D,5}, {0x0D,4}, {0x005,3},
 {0x000,1},
 {0x004,3}, {0x0C,4}, {0x1C,5}, {0x3C,6}, {0x7C,7}, {0xFC,8}, {0x1FC,9}, {0xFF,8}
@@ -116,7 +116,7 @@ static int decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int decode_init(AVCodecContext *avctx){
+static av_cold int decode_init(AVCodecContext *avctx){
     WNV1Context * const l = avctx->priv_data;
 
     l->avctx = avctx;
@@ -141,4 +141,5 @@ AVCodec wnv1_decoder = {
     NULL,
     decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("Winnov WNV1"),
 };

@@ -22,21 +22,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "dsputil.h"
-#include "mpegvideo.h"
-#include "avcodec.h"
-#include "x86_cpu.h"
+#include "libavutil/x86_cpu.h"
+#include "libavcodec/avcodec.h"
+#include "libavcodec/dsputil.h"
+#include "libavcodec/mpegvideo.h"
+#include "dsputil_mmx.h"
 
 extern uint16_t inv_zigzag_direct16[64];
-
-static const unsigned long long int mm_wabs __attribute__ ((aligned(8))) = 0xffffffffffffffffULL;
-static const unsigned long long int mm_wone __attribute__ ((aligned(8))) = 0x0001000100010001ULL;
 
 
 static void dct_unquantize_h263_intra_mmx(MpegEncContext *s,
                                   DCTELEM *block, int n, int qscale)
 {
-    long level, qmul, qadd, nCoeffs;
+    x86_reg level, qmul, qadd, nCoeffs;
 
     qmul = qscale << 1;
 
@@ -101,7 +99,7 @@ asm volatile(
 
                 "add $16, %3                    \n\t"
                 "jng 1b                         \n\t"
-                ::"r" (block+nCoeffs), "g"(qmul), "g" (qadd), "r" (2*(-nCoeffs))
+                ::"r" (block+nCoeffs), "rm"(qmul), "rm" (qadd), "r" (2*(-nCoeffs))
                 : "memory"
         );
         block[0]= level;
@@ -111,7 +109,7 @@ asm volatile(
 static void dct_unquantize_h263_inter_mmx(MpegEncContext *s,
                                   DCTELEM *block, int n, int qscale)
 {
-    long qmul, qadd, nCoeffs;
+    x86_reg qmul, qadd, nCoeffs;
 
     qmul = qscale << 1;
     qadd = (qscale - 1) | 1;
@@ -164,7 +162,7 @@ asm volatile(
 
                 "add $16, %3                    \n\t"
                 "jng 1b                         \n\t"
-                ::"r" (block+nCoeffs), "g"(qmul), "g" (qadd), "r" (2*(-nCoeffs))
+                ::"r" (block+nCoeffs), "rm"(qmul), "rm" (qadd), "r" (2*(-nCoeffs))
                 : "memory"
         );
 }
@@ -179,7 +177,7 @@ asm volatile(
                 if (level < -2048 || level > 2047)
                     fprintf(stderr, "unquant error %d %d\n", i, level);
 #endif
-  We can suppose that result of two multiplications can't be greate of 0xFFFF
+  We can suppose that result of two multiplications can't be greater than 0xFFFF
   i.e. is 16-bit, so we use here only PMULLW instruction and can avoid
   a complex multiplication.
 =====================================================
@@ -202,7 +200,7 @@ asm volatile(
 static void dct_unquantize_mpeg1_intra_mmx(MpegEncContext *s,
                                      DCTELEM *block, int n, int qscale)
 {
-    long nCoeffs;
+    x86_reg nCoeffs;
     const uint16_t *quant_matrix;
     int block0;
 
@@ -262,7 +260,7 @@ asm volatile(
 
                 "add $16, %%"REG_a"             \n\t"
                 "js 1b                          \n\t"
-                ::"r" (block+nCoeffs), "r"(quant_matrix+nCoeffs), "g" (qscale), "g" (-2*nCoeffs)
+                ::"r" (block+nCoeffs), "r"(quant_matrix+nCoeffs), "rm" (qscale), "g" (-2*nCoeffs)
                 : "%"REG_a, "memory"
         );
     block[0]= block0;
@@ -271,7 +269,7 @@ asm volatile(
 static void dct_unquantize_mpeg1_inter_mmx(MpegEncContext *s,
                                      DCTELEM *block, int n, int qscale)
 {
-    long nCoeffs;
+    x86_reg nCoeffs;
     const uint16_t *quant_matrix;
 
     assert(s->block_last_index[n]>=0);
@@ -329,7 +327,7 @@ asm volatile(
 
                 "add $16, %%"REG_a"             \n\t"
                 "js 1b                          \n\t"
-                ::"r" (block+nCoeffs), "r"(quant_matrix+nCoeffs), "g" (qscale), "g" (-2*nCoeffs)
+                ::"r" (block+nCoeffs), "r"(quant_matrix+nCoeffs), "rm" (qscale), "g" (-2*nCoeffs)
                 : "%"REG_a, "memory"
         );
 }
@@ -337,7 +335,7 @@ asm volatile(
 static void dct_unquantize_mpeg2_intra_mmx(MpegEncContext *s,
                                      DCTELEM *block, int n, int qscale)
 {
-    long nCoeffs;
+    x86_reg nCoeffs;
     const uint16_t *quant_matrix;
     int block0;
 
@@ -393,7 +391,7 @@ asm volatile(
 
                 "add $16, %%"REG_a"             \n\t"
                 "jng 1b                         \n\t"
-                ::"r" (block+nCoeffs), "r"(quant_matrix+nCoeffs), "g" (qscale), "g" (-2*nCoeffs)
+                ::"r" (block+nCoeffs), "r"(quant_matrix+nCoeffs), "rm" (qscale), "g" (-2*nCoeffs)
                 : "%"REG_a, "memory"
         );
     block[0]= block0;
@@ -403,7 +401,7 @@ asm volatile(
 static void dct_unquantize_mpeg2_inter_mmx(MpegEncContext *s,
                                      DCTELEM *block, int n, int qscale)
 {
-    long nCoeffs;
+    x86_reg nCoeffs;
     const uint16_t *quant_matrix;
 
     assert(s->block_last_index[n]>=0);
@@ -472,97 +470,9 @@ asm volatile(
                 "pxor %%mm7, %%mm0              \n\t"
                 "movd %%mm0, 124(%0, %3)        \n\t"
 
-                ::"r" (block+nCoeffs), "r"(quant_matrix+nCoeffs), "g" (qscale), "r" (-2*nCoeffs)
+                ::"r" (block+nCoeffs), "r"(quant_matrix+nCoeffs), "rm" (qscale), "r" (-2*nCoeffs)
                 : "%"REG_a, "memory"
         );
-}
-
-/* draw the edges of width 'w' of an image of size width, height
-   this mmx version can only handle w==8 || w==16 */
-static void draw_edges_mmx(uint8_t *buf, int wrap, int width, int height, int w)
-{
-    uint8_t *ptr, *last_line;
-    int i;
-
-    last_line = buf + (height - 1) * wrap;
-    /* left and right */
-    ptr = buf;
-    if(w==8)
-    {
-        asm volatile(
-                "1:                             \n\t"
-                "movd (%0), %%mm0               \n\t"
-                "punpcklbw %%mm0, %%mm0         \n\t"
-                "punpcklwd %%mm0, %%mm0         \n\t"
-                "punpckldq %%mm0, %%mm0         \n\t"
-                "movq %%mm0, -8(%0)             \n\t"
-                "movq -8(%0, %2), %%mm1         \n\t"
-                "punpckhbw %%mm1, %%mm1         \n\t"
-                "punpckhwd %%mm1, %%mm1         \n\t"
-                "punpckhdq %%mm1, %%mm1         \n\t"
-                "movq %%mm1, (%0, %2)           \n\t"
-                "add %1, %0                     \n\t"
-                "cmp %3, %0                     \n\t"
-                " jb 1b                         \n\t"
-                : "+r" (ptr)
-                : "r" ((long)wrap), "r" ((long)width), "r" (ptr + wrap*height)
-        );
-    }
-    else
-    {
-        asm volatile(
-                "1:                             \n\t"
-                "movd (%0), %%mm0               \n\t"
-                "punpcklbw %%mm0, %%mm0         \n\t"
-                "punpcklwd %%mm0, %%mm0         \n\t"
-                "punpckldq %%mm0, %%mm0         \n\t"
-                "movq %%mm0, -8(%0)             \n\t"
-                "movq %%mm0, -16(%0)            \n\t"
-                "movq -8(%0, %2), %%mm1         \n\t"
-                "punpckhbw %%mm1, %%mm1         \n\t"
-                "punpckhwd %%mm1, %%mm1         \n\t"
-                "punpckhdq %%mm1, %%mm1         \n\t"
-                "movq %%mm1, (%0, %2)           \n\t"
-                "movq %%mm1, 8(%0, %2)          \n\t"
-                "add %1, %0                     \n\t"
-                "cmp %3, %0                     \n\t"
-                " jb 1b                         \n\t"
-                : "+r" (ptr)
-                : "r" ((long)wrap), "r" ((long)width), "r" (ptr + wrap*height)
-        );
-    }
-
-    for(i=0;i<w;i+=4) {
-        /* top and bottom (and hopefully also the corners) */
-        ptr= buf - (i + 1) * wrap - w;
-        asm volatile(
-                "1:                             \n\t"
-                "movq (%1, %0), %%mm0           \n\t"
-                "movq %%mm0, (%0)               \n\t"
-                "movq %%mm0, (%0, %2)           \n\t"
-                "movq %%mm0, (%0, %2, 2)        \n\t"
-                "movq %%mm0, (%0, %3)           \n\t"
-                "add $8, %0                     \n\t"
-                "cmp %4, %0                     \n\t"
-                " jb 1b                         \n\t"
-                : "+r" (ptr)
-                : "r" ((long)buf - (long)ptr - w), "r" ((long)-wrap), "r" ((long)-wrap*3), "r" (ptr+width+2*w)
-        );
-        ptr= last_line + (i + 1) * wrap - w;
-        asm volatile(
-                "1:                             \n\t"
-                "movq (%1, %0), %%mm0           \n\t"
-                "movq %%mm0, (%0)               \n\t"
-                "movq %%mm0, (%0, %2)           \n\t"
-                "movq %%mm0, (%0, %2, 2)        \n\t"
-                "movq %%mm0, (%0, %3)           \n\t"
-                "add $8, %0                     \n\t"
-                "cmp %4, %0                     \n\t"
-                " jb 1b                         \n\t"
-                : "+r" (ptr)
-                : "r" ((long)last_line - (long)ptr - w), "r" ((long)wrap), "r" ((long)wrap*3), "r" (ptr+width+2*w)
-        );
-    }
 }
 
 static void  denoise_dct_mmx(MpegEncContext *s, DCTELEM *block){
@@ -719,8 +629,6 @@ void MPV_common_init_mmx(MpegEncContext *s)
         if(!(s->flags & CODEC_FLAG_BITEXACT))
             s->dct_unquantize_mpeg2_intra = dct_unquantize_mpeg2_intra_mmx;
         s->dct_unquantize_mpeg2_inter = dct_unquantize_mpeg2_inter_mmx;
-
-        draw_edges = draw_edges_mmx;
 
         if (mm_flags & MM_SSE2) {
             s->denoise_dct= denoise_dct_sse2;

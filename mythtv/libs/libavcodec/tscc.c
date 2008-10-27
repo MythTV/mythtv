@@ -182,10 +182,10 @@ static int decode_rle(CamtasiaContext *c, unsigned int srcsize)
  * Decode a frame
  *
  */
-static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8_t *buf, int buf_size)
+static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, const uint8_t *buf, int buf_size)
 {
     CamtasiaContext * const c = avctx->priv_data;
-    unsigned char *encoded = (unsigned char *)buf;
+    const unsigned char *encoded = buf;
     unsigned char *outptr;
 #ifdef CONFIG_ZLIB
     int zret; // Zlib return code
@@ -253,7 +253,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
  * Init tscc decoder
  *
  */
-static int decode_init(AVCodecContext *avctx)
+static av_cold int decode_init(AVCodecContext *avctx)
 {
     CamtasiaContext * const c = avctx->priv_data;
     int zret; // Zlib return code
@@ -316,7 +316,7 @@ static int decode_init(AVCodecContext *avctx)
  * Uninit tscc decoder
  *
  */
-static int decode_end(AVCodecContext *avctx)
+static av_cold int decode_end(AVCodecContext *avctx)
 {
     CamtasiaContext * const c = avctx->priv_data;
 
@@ -341,5 +341,6 @@ AVCodec tscc_decoder = {
         decode_end,
         decode_frame,
         CODEC_CAP_DR1,
+        .long_name = NULL_IF_CONFIG_SMALL("TechSmith Screen Capture Codec"),
 };
 

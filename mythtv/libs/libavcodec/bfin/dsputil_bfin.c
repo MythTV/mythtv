@@ -22,8 +22,8 @@
  */
 
 #include <unistd.h>
-#include "avcodec.h"
-#include "dsputil.h"
+#include "libavcodec/avcodec.h"
+#include "libavcodec/dsputil.h"
 #include "dsputil_bfin.h"
 
 int off;
@@ -173,7 +173,7 @@ static int bfin_vsad (void *c, uint8_t *blk1, uint8_t *blk2, int stride, int h) 
         + ff_bfin_z_sad16x16 (blk2,blk2+stride,stride<<1,stride<<1,h);
 }
 
-static uint8_t vtmp_blk[256] __attribute__((l1_data_B));
+static uint8_t vtmp_blk[256] attribute_l1_data_b;
 
 static int bfin_pix_abs16_x2 (void *c, uint8_t *blk1, uint8_t *blk2, int line_size, int h)
 {

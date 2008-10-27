@@ -1,7 +1,7 @@
 /*
  * Atrac 3 compatible decoder
- * Copyright (c) 2006-2007 Maxim Poliakovski
- * Copyright (c) 2006-2007 Benjamin Larsson
+ * Copyright (c) 2006-2008 Maxim Poliakovski
+ * Copyright (c) 2006-2008 Benjamin Larsson
  *
  * This file is part of FFmpeg.
  *
@@ -23,12 +23,13 @@
 /**
  * @file atrac3.c
  * Atrac 3 compatible decoder.
- * This decoder handles RealNetworks, RealAudio atrc data.
- * Atrac 3 is identified by the codec name atrc in RealMedia files.
+ * This decoder handles Sony's ATRAC3 data.
+ *
+ * Container formats used to store atrac 3 data:
+ * RealMedia (.rm), RIFF WAV (.wav, .at3), Sony OpenMG (.oma, .aa3).
  *
  * To use this decoder, a calling application must supply the extradata
- * bytes provided from the RealMedia container: 10 bytes or 14 bytes
- * from the WAV container.
+ * bytes provided in the containers above.
  */
 
 #include <math.h>
@@ -107,7 +108,6 @@ typedef struct {
     float               outSamples[2048];
     uint8_t*            decoded_bytes_buffer;
     float               tempBuf[1070];
-    DECLARE_ALIGNED_16(float,mdct_tmp[512]);
     //@}
     //@{
     /** extradata */
@@ -188,10 +188,9 @@ static void iqmf (float *inlo, float *inhi, unsigned int nIn, float *pOut, float
  * @param pInput    float input
  * @param pOutput   float output
  * @param odd_band  1 if the band is an odd band
- * @param mdct_tmp  aligned temporary buffer for the mdct
  */
 
-static void IMLT(float *pInput, float *pOutput, int odd_band, float* mdct_tmp)
+static void IMLT(float *pInput, float *pOutput, int odd_band)
 {
     int     i;
 
@@ -209,7 +208,7 @@ static void IMLT(float *pInput, float *pOutput, int odd_band, float* mdct_tmp)
             FFSWAP(float, pInput[i], pInput[255-i]);
     }
 
-    mdct_ctx.fft.imdct_calc(&mdct_ctx,pOutput,pInput,mdct_tmp);
+    ff_imdct_calc(&mdct_ctx,pOutput,pInput);
 
     /* Perform windowing on the output. */
     dsp.vector_fmul(pOutput,mdct_window,512);
@@ -225,14 +224,14 @@ static void IMLT(float *pInput, float *pOutput, int odd_band, float* mdct_tmp)
  * @param out       pointer to 8 bit array of outdata
  */
 
-static int decode_bytes(uint8_t* inbuffer, uint8_t* out, int bytes){
+static int decode_bytes(const uint8_t* inbuffer, uint8_t* out, int bytes){
     int i, off;
     uint32_t c;
-    uint32_t* buf;
+    const uint32_t* buf;
     uint32_t* obuf = (uint32_t*) out;
 
     off = (int)((long)inbuffer & 3);
-    buf = (uint32_t*) (inbuffer - off);
+    buf = (const uint32_t*) (inbuffer - off);
     c = be2me_32((0x537F6103 >> (off*8)) | (0x537F6103 << (32-(off*8))));
     bytes += 3 + off;
     for (i = 0; i < bytes/4; i++)
@@ -305,7 +304,6 @@ static void readQuantSpectralCoeffs (GetBitContext *gb, int selector, int coding
 
     if (codingFlag != 0) {
         /* constant length coding (CLC) */
-        //FIXME we don't have any samples coded in CLC mode
         numBits = CLCLengthTab[selector];
 
         if (selector > 1) {
@@ -468,7 +466,7 @@ static int decodeTonalComponents (GetBitContext *gb, tonal_component *pComponent
                 pComponent[component_count].numCoefs = coded_values;
 
                 /* inverse quant */
-                pCoef = pComponent[k].coef;
+                pCoef = pComponent[component_count].coef;
                 for (cnt = 0; cnt < coded_values; cnt++)
                     pCoef[cnt] = mantissa[cnt] * scalefactor;
 
@@ -577,24 +575,28 @@ static void gainCompensateAndOverlap (float *pIn, float *pPrev, float *pOut, gai
 
 /**
  * Combine the tonal band spectrum and regular band spectrum
+ * Return position of the last tonal coefficient
  *
  * @param pSpectrum     output spectrum buffer
  * @param numComponents amount of tonal components
  * @param pComponent    tonal components for this band
  */
 
-static void addTonalComponents (float *pSpectrum, int numComponents, tonal_component *pComponent)
+static int addTonalComponents (float *pSpectrum, int numComponents, tonal_component *pComponent)
 {
-    int   cnt, i;
+    int   cnt, i, lastPos = -1;
     float   *pIn, *pOut;
 
     for (cnt = 0; cnt < numComponents; cnt++){
+        lastPos = FFMAX(pComponent[cnt].pos + pComponent[cnt].numCoefs, lastPos);
         pIn = pComponent[cnt].coef;
         pOut = &(pSpectrum[pComponent[cnt].pos]);
 
         for (i=0 ; i<pComponent[cnt].numCoefs ; i++)
             pOut[i] += pIn[i];
     }
+
+    return lastPos;
 }
 
 
@@ -714,7 +716,7 @@ static void channelWeighting (float *su1, float *su2, int *p3)
 
 static int decodeChannelSoundUnit (ATRAC3Context *q, GetBitContext *gb, channel_unit *pSnd, float *pOut, int channelNum, int codingMode)
 {
-    int   band, result=0, numSubbands, numBands;
+    int   band, result=0, numSubbands, lastTonal, numBands;
 
     if (codingMode == JOINT_STEREO && channelNum == 1) {
         if (get_bits(gb,2) != 3) {
@@ -740,18 +742,20 @@ static int decodeChannelSoundUnit (ATRAC3Context *q, GetBitContext *gb, channel_
     numSubbands = decodeSpectrum (gb, pSnd->spectrum);
 
     /* Merge the decoded spectrum and tonal components. */
-    addTonalComponents (pSnd->spectrum, pSnd->numComponents, pSnd->components);
+    lastTonal = addTonalComponents (pSnd->spectrum, pSnd->numComponents, pSnd->components);
 
 
-    /* Convert number of subbands into number of MLT/QMF bands */
+    /* calculate number of used MLT/QMF bands according to the amount of coded spectral lines */
     numBands = (subbandTab[numSubbands] - 1) >> 8;
+    if (lastTonal >= 0)
+        numBands = FFMAX((lastTonal + 256) >> 8, numBands);
 
 
     /* Reconstruct time domain samples. */
     for (band=0; band<4; band++) {
         /* Perform the IMDCT step without overlapping. */
         if (band <= numBands) {
-            IMLT(&(pSnd->spectrum[band*256]), pSnd->IMDCT_buf, band&1,q->mdct_tmp);
+            IMLT(&(pSnd->spectrum[band*256]), pSnd->IMDCT_buf, band&1);
         } else
             memset(pSnd->IMDCT_buf, 0, 512 * sizeof(float));
 
@@ -868,7 +872,7 @@ static int decodeFrame(ATRAC3Context *q, uint8_t* databuf)
 
 static int atrac3_decode_frame(AVCodecContext *avctx,
             void *data, int *data_size,
-            uint8_t *buf, int buf_size) {
+            const uint8_t *buf, int buf_size) {
     ATRAC3Context *q = avctx->priv_data;
     int result = 0, i;
     uint8_t* databuf;
@@ -919,7 +923,7 @@ static int atrac3_decode_frame(AVCodecContext *avctx,
 static int atrac3_decode_init(AVCodecContext *avctx)
 {
     int i;
-    uint8_t *edata_ptr = avctx->extradata;
+    const uint8_t *edata_ptr = avctx->extradata;
     ATRAC3Context *q = avctx->priv_data;
 
     /* Take data from the AVCodecContext (RM container). */
@@ -1052,17 +1056,19 @@ static int atrac3_decode_init(AVCodecContext *avctx)
         return AVERROR(ENOMEM);
     }
 
+    avctx->sample_fmt = SAMPLE_FMT_S16;
     return 0;
 }
 
 
 AVCodec atrac3_decoder =
 {
-    .name = "atrac 3",
+    .name = "atrac3",
     .type = CODEC_TYPE_AUDIO,
     .id = CODEC_ID_ATRAC3,
     .priv_data_size = sizeof(ATRAC3Context),
     .init = atrac3_decode_init,
     .close = atrac3_decode_close,
     .decode = atrac3_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("Atrac 3 (Adaptive TRansform Acoustic Coding 3)"),
 };

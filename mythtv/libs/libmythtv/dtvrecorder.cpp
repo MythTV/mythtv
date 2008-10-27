@@ -13,8 +13,7 @@
 #include "tv_rec.h"
 
 extern "C" {
-// from libavcodec
-extern const uint8_t *ff_find_start_code(const uint8_t * restrict p, const uint8_t *end, uint32_t * restrict state);
+#include "../libavcodec/mpegvideo.h"
 }
 
 #define LOC QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum())

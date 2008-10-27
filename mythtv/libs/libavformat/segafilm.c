@@ -76,7 +76,7 @@ static int film_read_header(AVFormatContext *s,
                             AVFormatParameters *ap)
 {
     FilmDemuxContext *film = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     AVStream *st;
     unsigned char scratch[256];
     int i;
@@ -107,7 +107,7 @@ static int film_read_header(AVFormatContext *s,
         /* normal Saturn .cpk files; 32-byte header */
         if (get_buffer(pb, scratch, 32) != 32)
             return AVERROR(EIO);
-        film->audio_samplerate = AV_RB16(&scratch[24]);;
+        film->audio_samplerate = AV_RB16(&scratch[24]);
         film->audio_channels = scratch[21];
         film->audio_bits = scratch[22];
         if (film->audio_bits == 8)
@@ -204,7 +204,7 @@ static int film_read_packet(AVFormatContext *s,
                             AVPacket *pkt)
 {
     FilmDemuxContext *film = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     film_sample_t *sample;
     int ret = 0;
     int i;
@@ -283,7 +283,7 @@ static int film_read_close(AVFormatContext *s)
 
 AVInputFormat segafilm_demuxer = {
     "film_cpk",
-    "Sega FILM/CPK format",
+    NULL_IF_CONFIG_SMALL("Sega FILM/CPK format"),
     sizeof(FilmDemuxContext),
     film_probe,
     film_read_header,

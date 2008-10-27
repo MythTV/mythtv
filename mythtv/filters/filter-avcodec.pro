@@ -3,7 +3,7 @@
 # This eliminates a linker warning
 CONFIG += qt
 
-INCLUDEPATH += ../../libs/libavcodec ../../libs/libavutil
+INCLUDEPATH += ../../libs/libavcodec ../../libs/libavutil ../../libs ../..
 DEPENDPATH  += ../../libs/libavcodec ../../libs/libavutil
 
 LIBS += -L../../libs/libavutil -lmythavutil-$${LIBVERSION}

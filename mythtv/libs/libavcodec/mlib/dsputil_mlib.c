@@ -19,8 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "dsputil.h"
-#include "mpegvideo.h"
+#include "libavcodec/dsputil.h"
+#include "libavcodec/mpegvideo.h"
 
 #include <mlib_types.h>
 #include <mlib_status.h>
@@ -374,7 +374,7 @@ static void avg_pixels8_xy2_mlib(uint8_t * dest, const uint8_t * ref,
 
 /* swap byte order of a buffer */
 
-static void bswap_buf_mlib(uint32_t *dst, uint32_t *src, int w)
+static void bswap_buf_mlib(uint32_t *dst, const uint32_t *src, int w)
 {
   mlib_VectorReverseByteOrder_U32_U32(dst, src, w);
 }
@@ -455,7 +455,7 @@ void MPV_common_init_mlib(MpegEncContext *s)
         s->dsp.fdct = ff_fdct_mlib;
     }
 
-    if(s->avctx->idct_algo==FF_IDCT_AUTO || s->avctx->idct_algo==FF_IDCT_MLIB){
+    if(s->avctx->idct_algo==FF_IDCT_MLIB){
         s->dsp.idct_put= ff_idct_put_mlib;
         s->dsp.idct_add= ff_idct_add_mlib;
         s->dsp.idct    = ff_idct_mlib;

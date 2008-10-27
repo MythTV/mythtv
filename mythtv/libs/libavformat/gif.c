@@ -40,7 +40,7 @@
  */
 
 #include "avformat.h"
-#include "bitstream.h"
+#include "libavcodec/bitstream.h"
 
 /* bitstream minipacket size */
 #define GIF_CHUNKS 100
@@ -137,7 +137,7 @@ static void gif_put_bits_rev(PutBitContext *s, int n, unsigned int value)
         //printf("bitbuf = %08x\n", bit_buf);
         s->buf_ptr+=4;
         if (s->buf_ptr >= s->buf_end)
-            puts("bit buffer overflow !!"); // should never happen ! who got rid of the callback ???
+            abort();
 //            flush_buffer_rev(s);
         bit_cnt=bit_cnt + n - 32;
         if (bit_cnt == 0) {
@@ -236,7 +236,7 @@ static int gif_image_write_header(ByteIOContext *pb,
 /* this is maybe slow, but allows for extensions */
 static inline unsigned char gif_clut_index(uint8_t r, uint8_t g, uint8_t b)
 {
-    return ((((r)/47)%6)*6*6+(((g)/47)%6)*6+(((b)/47)%6));
+    return (((r) / 47) % 6) * 6 * 6 + (((g) / 47) % 6) * 6 + (((b) / 47) % 6);
 }
 
 
@@ -313,7 +313,7 @@ typedef struct {
 static int gif_write_header(AVFormatContext *s)
 {
     GIFContext *gif = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     AVCodecContext *enc, *video_enc;
     int i, width, height, loop_count /*, rate*/;
 
@@ -348,14 +348,14 @@ static int gif_write_header(AVFormatContext *s)
 
     gif_image_write_header(pb, width, height, loop_count, NULL);
 
-    put_flush_packet(&s->pb);
+    put_flush_packet(s->pb);
     return 0;
 }
 
 static int gif_write_video(AVFormatContext *s,
                            AVCodecContext *enc, const uint8_t *buf, int size)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     GIFContext *gif = s->priv_data;
     int jiffies;
     int64_t delay;
@@ -383,7 +383,7 @@ static int gif_write_video(AVFormatContext *s,
     gif_image_write_image(pb, 0, 0, enc->width, enc->height,
                           buf, enc->width * 3, PIX_FMT_RGB24);
 
-    put_flush_packet(&s->pb);
+    put_flush_packet(s->pb);
     return 0;
 }
 
@@ -398,16 +398,16 @@ static int gif_write_packet(AVFormatContext *s, AVPacket *pkt)
 
 static int gif_write_trailer(AVFormatContext *s)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
 
     put_byte(pb, 0x3b);
-    put_flush_packet(&s->pb);
+    put_flush_packet(s->pb);
     return 0;
 }
 
 AVOutputFormat gif_muxer = {
     "gif",
-    "GIF Animation",
+    NULL_IF_CONFIG_SMALL("GIF Animation"),
     "image/gif",
     "gif",
     sizeof(GIFContext),

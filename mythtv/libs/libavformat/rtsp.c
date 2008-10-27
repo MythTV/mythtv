@@ -18,15 +18,21 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+/* needed by inet_aton() */
+#define _SVID_SOURCE
+
+#include "libavutil/avstring.h"
 #include "avformat.h"
 
 #include <sys/time.h>
 #include <unistd.h> /* for select() prototype */
+#include <strings.h>
 #include "network.h"
-#include "avstring.h"
 #include "rtsp.h"
 
 #include "rtp_internal.h"
+#include "rdt.h"
 
 //#define DEBUG
 //#define DEBUG_RTP_TCP
@@ -35,6 +41,12 @@ enum RTSPClientState {
     RTSP_STATE_IDLE,
     RTSP_STATE_PLAYING,
     RTSP_STATE_PAUSED,
+};
+
+enum RTSPServerType {
+    RTSP_SERVER_RTP, /*< Standard-compliant RTP-server */
+    RTSP_SERVER_RDT, /*< Realmedia-style server */
+    RTSP_SERVER_LAST
 };
 
 typedef struct RTSPState {
@@ -50,8 +62,10 @@ typedef struct RTSPState {
     int seq;        /* RTSP command sequence number */
     char session_id[512];
     enum RTSPProtocol protocol;
+    enum RTSPServerType server_type;
     char last_reply[2048]; /* XXX: allocate ? */
     RTPDemuxContext *cur_rtp;
+    int need_subscription;
 } RTSPState;
 
 typedef struct RTSPStream {
@@ -77,7 +91,9 @@ static int rtsp_read_play(AVFormatContext *s);
 /* XXX: currently, the only way to change the protocols consists in
    changing this variable */
 
+#if LIBAVFORMAT_VERSION_INT < (53 << 16)
 int rtsp_default_protocols = (1 << RTSP_PROTOCOL_RTP_UDP);
+#endif
 
 static int rtsp_probe(AVProbeData *p)
 {
@@ -88,7 +104,7 @@ static int rtsp_probe(AVProbeData *p)
 
 static int redir_isspace(int c)
 {
-    return (c == ' ' || c == '\t' || c == '\n' || c == '\r');
+    return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 }
 
 static void skip_spaces(const char **pp)
@@ -520,6 +536,12 @@ static void sdp_parse_line(AVFormatContext *s, SDPParseState *s1,
             rtsp_parse_range_npt(p, &start, &end);
             s->start_time= start;
             s->duration= (end==AV_NOPTS_VALUE)?AV_NOPTS_VALUE:end-start; // AV_NOPTS_VALUE means live broadcast (and can't seek)
+        } else if (s->nb_streams > 0) {
+            rtsp_st = s->streams[s->nb_streams - 1]->priv_data;
+            if (rtsp_st->dynamic_handler &&
+                rtsp_st->dynamic_handler->parse_sdp_a_line)
+                rtsp_st->dynamic_handler->parse_sdp_a_line(s->streams[s->nb_streams - 1],
+                    rtsp_st->dynamic_protocol_context, buf);
         }
         break;
     }
@@ -529,7 +551,7 @@ static int sdp_parse(AVFormatContext *s, const char *content)
 {
     const char *p;
     int letter;
-    char buf[1024], *q;
+    char buf[2048], *q;
     SDPParseState sdp_parse_state, *s1 = &sdp_parse_state;
 
     memset(s1, 0, sizeof(SDPParseState));
@@ -604,12 +626,19 @@ static void rtsp_parse_transport(RTSPHeader *reply, const char *p)
                      "/", &p);
         if (*p == '/')
             p++;
-        get_word_sep(profile, sizeof(profile), "/;,", &p);
-        lower_transport[0] = '\0';
-        if (*p == '/') {
-            p++;
-            get_word_sep(lower_transport, sizeof(lower_transport),
-                         ";,", &p);
+        if (!strcasecmp (transport_protocol, "rtp")) {
+            get_word_sep(profile, sizeof(profile), "/;,", &p);
+            lower_transport[0] = '\0';
+            /* rtp/avp/<protocol> */
+            if (*p == '/') {
+                p++;
+                get_word_sep(lower_transport, sizeof(lower_transport),
+                             ";,", &p);
+                }
+        } else if (!strcasecmp (transport_protocol, "x-pn-tng")) {
+            /* x-pn-tng/<protocol> */
+            get_word_sep(lower_transport, sizeof(lower_transport), "/;,", &p);
+            profile[0] = '\0';
         }
         if (!strcasecmp(lower_transport, "TCP"))
             th->protocol = RTSP_PROTOCOL_RTP_TCP;
@@ -690,6 +719,9 @@ void rtsp_parse_line(RTSPHeader *reply, const char *buf)
         reply->seq = strtol(p, NULL, 10);
     } else if (av_stristart(p, "Range:", &p)) {
         rtsp_parse_range_npt(p, &reply->range_start, &reply->range_end);
+    } else if (av_stristart(p, "RealChallenge1:", &p)) {
+        skip_spaces(&p);
+        av_strlcpy(reply->real_challenge, p, sizeof(reply->real_challenge));
     }
 }
 
@@ -832,83 +864,29 @@ static void rtsp_close_streams(RTSPState *rt)
             if (rtsp_st->dynamic_handler && rtsp_st->dynamic_protocol_context)
                 rtsp_st->dynamic_handler->close(rtsp_st->dynamic_protocol_context);
         }
-        av_free(rtsp_st);
     }
     av_free(rt->rtsp_streams);
 }
 
-static int rtsp_read_header(AVFormatContext *s,
-                            AVFormatParameters *ap)
+/**
+ * @returns 0 on success, <0 on error, 1 if protocol is unavailable.
+ */
+static int
+make_setup_request (AVFormatContext *s, const char *host, int port,
+                    int protocol, const char *real_challenge)
 {
     RTSPState *rt = s->priv_data;
-    char host[1024], path[1024], tcpname[1024], cmd[2048], *option_list, *option;
-    URLContext *rtsp_hd;
-    int port, i, j, ret, err;
-    RTSPHeader reply1, *reply = &reply1;
-    unsigned char *content = NULL;
+    int j, i, err;
     RTSPStream *rtsp_st;
-    int protocol_mask = 0;
     AVStream *st;
+    RTSPHeader reply1, *reply = &reply1;
+    char cmd[2048];
+    const char *trans_pref;
 
-    /* extract hostname and port */
-    url_split(NULL, 0, NULL, 0,
-              host, sizeof(host), &port, path, sizeof(path), s->filename);
-    if (port < 0)
-        port = RTSP_DEFAULT_PORT;
-
-    /* search for options */
-    option_list = strchr(path, '?');
-    if (option_list) {
-        /* remove the options from the path */
-        *option_list++ = 0;
-        while(option_list) {
-            /* move the option pointer */
-            option = option_list;
-            option_list = strchr(option_list, '&');
-            if (option_list)
-                *(option_list++) = 0;
-            /* handle the options */
-            if (strcmp(option, "udp") == 0)
-                protocol_mask = (1<< RTSP_PROTOCOL_RTP_UDP);
-            else if (strcmp(option, "multicast") == 0)
-                protocol_mask = (1<< RTSP_PROTOCOL_RTP_UDP_MULTICAST);
-            else if (strcmp(option, "tcp") == 0)
-                protocol_mask = (1<< RTSP_PROTOCOL_RTP_TCP);
-        }
-    }
-
-    if (!protocol_mask)
-        protocol_mask = rtsp_default_protocols;
-
-    /* open the tcp connexion */
-    snprintf(tcpname, sizeof(tcpname), "tcp://%s:%d", host, port);
-    if (url_open(&rtsp_hd, tcpname, URL_RDWR) < 0)
-        return AVERROR(EIO);
-    rt->rtsp_hd = rtsp_hd;
-    rt->seq = 0;
-
-    /* describe the stream */
-    snprintf(cmd, sizeof(cmd),
-             "DESCRIBE %s RTSP/1.0\r\n"
-             "Accept: application/sdp\r\n",
-             s->filename);
-    rtsp_send_cmd(s, cmd, reply, &content);
-    if (!content) {
-        err = AVERROR_INVALIDDATA;
-        goto fail;
-    }
-    if (reply->status_code != RTSP_STATUS_OK) {
-        err = AVERROR_INVALIDDATA;
-        goto fail;
-    }
-
-    /* now we got the SDP description, we parse it */
-    ret = sdp_parse(s, (const char *)content);
-    av_freep(&content);
-    if (ret < 0) {
-        err = AVERROR_INVALIDDATA;
-        goto fail;
-    }
+    if (rt->server_type == RTSP_SERVER_RDT)
+        trans_pref = "x-pn-tng";
+    else
+        trans_pref = "RTP/AVP";
 
     /* for each stream, make the setup request */
     /* XXX: we assume the same server is used for the control of each
@@ -919,11 +897,8 @@ static int rtsp_read_header(AVFormatContext *s,
 
         rtsp_st = rt->rtsp_streams[i];
 
-        /* compute available transports */
-        transport[0] = '\0';
-
         /* RTP/UDP */
-        if (protocol_mask & (1 << RTSP_PROTOCOL_RTP_UDP)) {
+        if (protocol == RTSP_PROTOCOL_RTP_UDP) {
             char buf[256];
 
             /* first try in specified port range */
@@ -946,35 +921,44 @@ static int rtsp_read_header(AVFormatContext *s,
 
         rtp_opened:
             port = rtp_get_local_port(rtsp_st->rtp_handle);
-            if (transport[0] != '\0')
-                av_strlcat(transport, ",", sizeof(transport));
-            snprintf(transport + strlen(transport), sizeof(transport) - strlen(transport) - 1,
-                     "RTP/AVP/UDP;unicast;client_port=%d-%d",
-                     port, port + 1);
+            snprintf(transport, sizeof(transport) - 1,
+                     "%s/UDP;unicast;client_port=%d",
+                     trans_pref, port);
+            if (rt->server_type == RTSP_SERVER_RTP)
+                av_strlcatf(transport, sizeof(transport), "-%d", port + 1);
         }
 
         /* RTP/TCP */
-        else if (protocol_mask & (1 << RTSP_PROTOCOL_RTP_TCP)) {
-            if (transport[0] != '\0')
-                av_strlcat(transport, ",", sizeof(transport));
-            snprintf(transport + strlen(transport), sizeof(transport) - strlen(transport) - 1,
-                     "RTP/AVP/TCP");
+        else if (protocol == RTSP_PROTOCOL_RTP_TCP) {
+            snprintf(transport, sizeof(transport) - 1,
+                     "%s/TCP", trans_pref);
         }
 
-        else if (protocol_mask & (1 << RTSP_PROTOCOL_RTP_UDP_MULTICAST)) {
-            if (transport[0] != '\0')
-                av_strlcat(transport, ",", sizeof(transport));
-            snprintf(transport + strlen(transport),
-                     sizeof(transport) - strlen(transport) - 1,
-                     "RTP/AVP/UDP;multicast");
+        else if (protocol == RTSP_PROTOCOL_RTP_UDP_MULTICAST) {
+            snprintf(transport, sizeof(transport) - 1,
+                     "%s/UDP;multicast", trans_pref);
         }
+        if (rt->server_type == RTSP_SERVER_RDT)
+            av_strlcat(transport, ";mode=play", sizeof(transport));
         snprintf(cmd, sizeof(cmd),
                  "SETUP %s RTSP/1.0\r\n"
                  "Transport: %s\r\n",
                  rtsp_st->control_url, transport);
+        if (i == 0 && rt->server_type == RTSP_SERVER_RDT) {
+            char real_res[41], real_csum[9];
+            ff_rdt_calc_response_and_checksum(real_res, real_csum,
+                                              real_challenge);
+            av_strlcatf(cmd, sizeof(cmd),
+                        "If-Match: %s\r\n"
+                        "RealChallenge2: %s, sd=%s\r\n",
+                        rt->session_id, real_res, real_csum);
+        }
         rtsp_send_cmd(s, cmd, reply, NULL);
-        if (reply->status_code != RTSP_STATUS_OK ||
-            reply->nb_transports != 1) {
+        if (reply->status_code == 461 /* Unsupported protocol */ && i == 0) {
+            err = 1;
+            goto fail;
+        } else if (reply->status_code != RTSP_STATUS_OK ||
+                   reply->nb_transports != 1) {
             err = AVERROR_INVALIDDATA;
             goto fail;
         }
@@ -991,7 +975,7 @@ static int rtsp_read_header(AVFormatContext *s,
 
         /* close RTP connection if not choosen */
         if (reply->transports[0].protocol != RTSP_PROTOCOL_RTP_UDP &&
-            (protocol_mask & (1 << RTSP_PROTOCOL_RTP_UDP))) {
+            (protocol == RTSP_PROTOCOL_RTP_UDP)) {
             url_close(rtsp_st->rtp_handle);
             rtsp_st->rtp_handle = NULL;
         }
@@ -1021,7 +1005,7 @@ static int rtsp_read_header(AVFormatContext *s,
                 struct in_addr in;
 
                 in.s_addr = htonl(reply->transports[0].destination);
-                snprintf(url, sizeof(url), "rtp://%s:%d?multicast=1&ttl=%d",
+                snprintf(url, sizeof(url), "rtp://%s:%d?ttl=%d",
                          inet_ntoa(in),
                          reply->transports[0].port_min,
                          reply->transports[0].ttl);
@@ -1050,6 +1034,153 @@ static int rtsp_read_header(AVFormatContext *s,
             }
         }
     }
+
+    if (rt->server_type == RTSP_SERVER_RDT)
+        rt->need_subscription = 1;
+
+    return 0;
+
+fail:
+    for (i=0; i<rt->nb_rtsp_streams; i++) {
+        if (rt->rtsp_streams[i]->rtp_handle) {
+            url_close(rt->rtsp_streams[i]->rtp_handle);
+            rt->rtsp_streams[i]->rtp_handle = NULL;
+        }
+    }
+    return err;
+}
+
+static int rtsp_read_header(AVFormatContext *s,
+                            AVFormatParameters *ap)
+{
+    RTSPState *rt = s->priv_data;
+    char host[1024], path[1024], tcpname[1024], cmd[2048], *option_list, *option;
+    URLContext *rtsp_hd;
+    int port, ret, err;
+    RTSPHeader reply1, *reply = &reply1;
+    unsigned char *content = NULL;
+    int protocol_mask = 0;
+    char real_challenge[64];
+
+    /* extract hostname and port */
+    url_split(NULL, 0, NULL, 0,
+              host, sizeof(host), &port, path, sizeof(path), s->filename);
+    if (port < 0)
+        port = RTSP_DEFAULT_PORT;
+
+    /* search for options */
+    option_list = strchr(path, '?');
+    if (option_list) {
+        /* remove the options from the path */
+        *option_list++ = 0;
+        while(option_list) {
+            /* move the option pointer */
+            option = option_list;
+            option_list = strchr(option_list, '&');
+            if (option_list)
+                *(option_list++) = 0;
+            /* handle the options */
+            if (strcmp(option, "udp") == 0)
+                protocol_mask = (1<< RTSP_PROTOCOL_RTP_UDP);
+            else if (strcmp(option, "multicast") == 0)
+                protocol_mask = (1<< RTSP_PROTOCOL_RTP_UDP_MULTICAST);
+            else if (strcmp(option, "tcp") == 0)
+                protocol_mask = (1<< RTSP_PROTOCOL_RTP_TCP);
+        }
+    }
+
+    if (!protocol_mask)
+        protocol_mask = (1 << RTSP_PROTOCOL_RTP_LAST) - 1;
+
+    /* open the tcp connexion */
+    snprintf(tcpname, sizeof(tcpname), "tcp://%s:%d", host, port);
+    if (url_open(&rtsp_hd, tcpname, URL_RDWR) < 0)
+        return AVERROR(EIO);
+    rt->rtsp_hd = rtsp_hd;
+    rt->seq = 0;
+
+    /* request options supported by the server; this also detects server type */
+    for (rt->server_type = RTSP_SERVER_RTP;;) {
+        snprintf(cmd, sizeof(cmd),
+                 "OPTIONS %s RTSP/1.0\r\n", s->filename);
+        if (rt->server_type == RTSP_SERVER_RDT)
+            av_strlcat(cmd,
+                       /**
+                        * The following entries are required for proper
+                        * streaming from a Realmedia server. They are
+                        * interdependent in some way although we currently
+                        * don't quite understand how. Values were copied
+                        * from mplayer SVN r23589.
+                        * @param CompanyID is a 16-byte ID in base64
+                        * @param ClientChallenge is a 16-byte ID in hex
+                        */
+                       "ClientChallenge: 9e26d33f2984236010ef6253fb1887f7\r\n"
+                       "PlayerStarttime: [28/03/2003:22:50:23 00:00]\r\n"
+                       "CompanyID: KnKV4M4I/B2FjJ1TToLycw==\r\n"
+                       "GUID: 00000000-0000-0000-0000-000000000000\r\n",
+                       sizeof(cmd));
+        rtsp_send_cmd(s, cmd, reply, NULL);
+        if (reply->status_code != RTSP_STATUS_OK) {
+            err = AVERROR_INVALIDDATA;
+            goto fail;
+        }
+
+        /* detect server type if not standard-compliant RTP */
+        if (rt->server_type != RTSP_SERVER_RDT && reply->real_challenge[0]) {
+            rt->server_type = RTSP_SERVER_RDT;
+            continue;
+        } else if (rt->server_type == RTSP_SERVER_RDT) {
+            strcpy(real_challenge, reply->real_challenge);
+        }
+        break;
+    }
+
+    /* describe the stream */
+    snprintf(cmd, sizeof(cmd),
+             "DESCRIBE %s RTSP/1.0\r\n"
+             "Accept: application/sdp\r\n",
+             s->filename);
+    if (rt->server_type == RTSP_SERVER_RDT) {
+        /**
+         * The Require: attribute is needed for proper streaming from
+         * Realmedia servers.
+         */
+        av_strlcat(cmd,
+                   "Require: com.real.retain-entity-for-setup\r\n",
+                   sizeof(cmd));
+    }
+    rtsp_send_cmd(s, cmd, reply, &content);
+    if (!content) {
+        err = AVERROR_INVALIDDATA;
+        goto fail;
+    }
+    if (reply->status_code != RTSP_STATUS_OK) {
+        err = AVERROR_INVALIDDATA;
+        goto fail;
+    }
+
+    /* now we got the SDP description, we parse it */
+    ret = sdp_parse(s, (const char *)content);
+    av_freep(&content);
+    if (ret < 0) {
+        err = AVERROR_INVALIDDATA;
+        goto fail;
+    }
+
+    do {
+        int protocol = ff_log2_tab[protocol_mask & ~(protocol_mask - 1)];
+
+        err = make_setup_request(s, host, port, protocol,
+                                 rt->server_type == RTSP_SERVER_RDT ?
+                                     real_challenge : NULL);
+        if (err < 0)
+            goto fail;
+        protocol_mask &= ~(1 << protocol);
+        if (protocol_mask == 0 && err == 1) {
+            err = AVERROR(FF_NETERROR(EPROTONOSUPPORT));
+            goto fail;
+        }
+    } while (err);
 
     rt->state = RTSP_STATE_IDLE;
     rt->seek_timestamp = 0; /* default is to start stream at position
@@ -1130,7 +1261,7 @@ static int udp_read_packet(AVFormatContext *s, RTSPStream **prtsp_st,
 
     for(;;) {
         if (url_interrupt_cb())
-            return -1;
+            return AVERROR(EINTR);
         FD_ZERO(&rfds);
         fd_max = -1;
         for(i = 0; i < rt->nb_rtsp_streams; i++) {
@@ -1168,9 +1299,37 @@ static int rtsp_read_packet(AVFormatContext *s,
     int ret, len;
     uint8_t buf[RTP_MAX_PACKET_LENGTH];
 
+    if (rt->server_type == RTSP_SERVER_RDT && rt->need_subscription) {
+        int i;
+        RTSPHeader reply1, *reply = &reply1;
+        char cmd[1024];
+
+        snprintf(cmd, sizeof(cmd),
+                 "SET_PARAMETER %s RTSP/1.0\r\n"
+                 "Subscribe: ",
+                 s->filename);
+        for (i = 0; i < rt->nb_rtsp_streams; i++) {
+            if (i != 0) av_strlcat(cmd, ",", sizeof(cmd));
+            ff_rdt_subscribe_rule(
+                rt->rtsp_streams[i]->rtp_ctx,
+                cmd, sizeof(cmd), i, 0);
+        }
+        av_strlcat(cmd, "\r\n", sizeof(cmd));
+        rtsp_send_cmd(s, cmd, reply, NULL);
+        if (reply->status_code != RTSP_STATUS_OK)
+            return AVERROR_INVALIDDATA;
+        rt->need_subscription = 0;
+
+        if (rt->state == RTSP_STATE_PLAYING)
+            rtsp_read_play (s);
+    }
+
     /* get next frames from the same RTP packet */
     if (rt->cur_rtp) {
-        ret = rtp_parse_packet(rt->cur_rtp, pkt, NULL, 0);
+        if (rt->server_type == RTSP_SERVER_RDT)
+            ret = ff_rdt_parse_packet(rt->cur_rtp, pkt, NULL, 0);
+        else
+            ret = rtp_parse_packet(rt->cur_rtp, pkt, NULL, 0);
         if (ret == 0) {
             rt->cur_rtp = NULL;
             return 0;
@@ -1196,8 +1355,11 @@ static int rtsp_read_packet(AVFormatContext *s,
         break;
     }
     if (len < 0)
-        return AVERROR(EIO);
-    ret = rtp_parse_packet(rtsp_st->rtp_ctx, pkt, buf, len);
+        return len;
+    if (rt->server_type == RTSP_SERVER_RDT)
+        ret = ff_rdt_parse_packet(rtsp_st->rtp_ctx, pkt, buf, len);
+    else
+        ret = rtp_parse_packet(rtsp_st->rtp_ctx, pkt, buf, len);
     if (ret < 0)
         goto redo;
     if (ret == 1) {
@@ -1215,24 +1377,25 @@ static int rtsp_read_play(AVFormatContext *s)
 
     av_log(s, AV_LOG_DEBUG, "hello state=%d\n", rt->state);
 
-    if (rt->state == RTSP_STATE_PAUSED) {
-        snprintf(cmd, sizeof(cmd),
-                 "PLAY %s RTSP/1.0\r\n",
-                 s->filename);
-    } else {
-        snprintf(cmd, sizeof(cmd),
-                 "PLAY %s RTSP/1.0\r\n"
-                 "Range: npt=%0.3f-\r\n",
-                 s->filename,
-                 (double)rt->seek_timestamp / AV_TIME_BASE);
+    if (!(rt->server_type == RTSP_SERVER_RDT && rt->need_subscription)) {
+        if (rt->state == RTSP_STATE_PAUSED) {
+            snprintf(cmd, sizeof(cmd),
+                     "PLAY %s RTSP/1.0\r\n",
+                     s->filename);
+        } else {
+            snprintf(cmd, sizeof(cmd),
+                     "PLAY %s RTSP/1.0\r\n"
+                     "Range: npt=%0.3f-\r\n",
+                     s->filename,
+                     (double)rt->seek_timestamp / AV_TIME_BASE);
+        }
+        rtsp_send_cmd(s, cmd, reply, NULL);
+        if (reply->status_code != RTSP_STATUS_OK) {
+            return -1;
+        }
     }
-    rtsp_send_cmd(s, cmd, reply, NULL);
-    if (reply->status_code != RTSP_STATUS_OK) {
-        return -1;
-    } else {
-        rt->state = RTSP_STATE_PLAYING;
-        return 0;
-    }
+    rt->state = RTSP_STATE_PLAYING;
+    return 0;
 }
 
 /* pause the stream */
@@ -1246,17 +1409,17 @@ static int rtsp_read_pause(AVFormatContext *s)
 
     if (rt->state != RTSP_STATE_PLAYING)
         return 0;
-
-    snprintf(cmd, sizeof(cmd),
-             "PAUSE %s RTSP/1.0\r\n",
-             s->filename);
-    rtsp_send_cmd(s, cmd, reply, NULL);
-    if (reply->status_code != RTSP_STATUS_OK) {
-        return -1;
-    } else {
-        rt->state = RTSP_STATE_PAUSED;
-        return 0;
+    else if (!(rt->server_type == RTSP_SERVER_RDT && rt->need_subscription)) {
+        snprintf(cmd, sizeof(cmd),
+                 "PAUSE %s RTSP/1.0\r\n",
+                 s->filename);
+        rtsp_send_cmd(s, cmd, reply, NULL);
+        if (reply->status_code != RTSP_STATUS_OK) {
+            return -1;
+        }
     }
+    rt->state = RTSP_STATE_PAUSED;
+    return 0;
 }
 
 static int rtsp_read_seek(AVFormatContext *s, int stream_index,
@@ -1305,7 +1468,7 @@ static int rtsp_read_close(AVFormatContext *s)
 #ifdef CONFIG_RTSP_DEMUXER
 AVInputFormat rtsp_demuxer = {
     "rtsp",
-    "RTSP input format",
+    NULL_IF_CONFIG_SMALL("RTSP input format"),
     sizeof(RTSPState),
     rtsp_probe,
     rtsp_read_header,
@@ -1351,7 +1514,7 @@ static int sdp_read_header(AVFormatContext *s,
     /* read the whole sdp file */
     /* XXX: better loading */
     content = av_malloc(SDP_MAX_SIZE);
-    size = get_buffer(&s->pb, content, SDP_MAX_SIZE - 1);
+    size = get_buffer(s->pb, content, SDP_MAX_SIZE - 1);
     if (size <= 0) {
         av_free(content);
         return AVERROR_INVALIDDATA;
@@ -1365,8 +1528,9 @@ static int sdp_read_header(AVFormatContext *s,
     for(i=0;i<rt->nb_rtsp_streams;i++) {
         rtsp_st = rt->rtsp_streams[i];
 
-        snprintf(url, sizeof(url), "rtp://%s:%d?multicast=1&ttl=%d",
+        snprintf(url, sizeof(url), "rtp://%s:%d?localport=%d&ttl=%d",
                  inet_ntoa(rtsp_st->sdp_ip),
+                 rtsp_st->sdp_port,
                  rtsp_st->sdp_port,
                  rtsp_st->sdp_ttl);
         if (url_open(&rtsp_st->rtp_handle, url, URL_RDWR) < 0) {
@@ -1412,7 +1576,7 @@ static int sdp_read_close(AVFormatContext *s)
 #ifdef CONFIG_SDP_DEMUXER
 AVInputFormat sdp_demuxer = {
     "sdp",
-    "SDP",
+    NULL_IF_CONFIG_SMALL("SDP"),
     sizeof(RTSPState),
     sdp_probe,
     sdp_read_header,
@@ -1435,12 +1599,12 @@ static int redir_probe(AVProbeData *pd)
     return 0;
 }
 
-/* called from utils.c */
-int redir_open(AVFormatContext **ic_ptr, ByteIOContext *f)
+static int redir_read_header(AVFormatContext *s, AVFormatParameters *ap)
 {
     char buf[4096], *q;
     int c;
     AVFormatContext *ic = NULL;
+    ByteIOContext *f = s->pb;
 
     /* parse each URL and try to open it */
     c = url_fgetc(f);
@@ -1468,19 +1632,21 @@ int redir_open(AVFormatContext **ic_ptr, ByteIOContext *f)
         if (av_open_input_file(&ic, buf, NULL, 0, NULL) == 0)
             break;
     }
-    *ic_ptr = ic;
     if (!ic)
         return AVERROR(EIO);
-    else
-        return 0;
+
+    *s = *ic;
+    url_fclose(f);
+
+    return 0;
 }
 
 AVInputFormat redir_demuxer = {
     "redir",
-    "Redirector format",
+    NULL_IF_CONFIG_SMALL("Redirector format"),
     0,
     redir_probe,
-    NULL,
+    redir_read_header,
     NULL,
     NULL,
 };

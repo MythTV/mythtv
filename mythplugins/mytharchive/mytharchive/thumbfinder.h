@@ -12,8 +12,8 @@
 #include <mythtv/mythdialogs.h>
 #include <mythtv/uitypes.h>
 extern "C" {
-#include <mythtv/ffmpeg/avcodec.h>
-#include <mythtv/ffmpeg/avformat.h>
+#include <mythtv/libavcodec/avcodec.h>
+#include <mythtv/libavformat/avformat.h>
 }
 
 // mytharchive

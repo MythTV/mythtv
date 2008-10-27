@@ -19,14 +19,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/tree.h"
 #include "nut.h"
-#include "tree.h"
+
+const AVCodecTag ff_nut_subtitle_tags[] = {
+    { CODEC_ID_TEXT        , MKTAG('U', 'T', 'F', '8') },
+    { CODEC_ID_SSA         , MKTAG('S', 'S', 'A',  0 ) },
+    { CODEC_ID_DVD_SUBTITLE, MKTAG('D', 'V', 'D', 'S') },
+    { CODEC_ID_DVB_SUBTITLE, MKTAG('D', 'V', 'B', 'S') },
+    { CODEC_ID_NONE        , 0                         }
+};
 
 void ff_nut_reset_ts(NUTContext *nut, AVRational time_base, int64_t val){
     int i;
     for(i=0; i<nut->avf->nb_streams; i++){
         nut->stream[i].last_pts= av_rescale_rnd(
-            val / nut->time_base_count,
+            val,
             time_base.num * (int64_t)nut->stream[i].time_base->den,
             time_base.den * (int64_t)nut->stream[i].time_base->num,
             AV_ROUND_DOWN);
@@ -48,12 +56,26 @@ int ff_nut_sp_pts_cmp(syncpoint_t *a, syncpoint_t *b){
 }
 
 void ff_nut_add_sp(NUTContext *nut, int64_t pos, int64_t back_ptr, int64_t ts){
-    syncpoint_t *sp2, *sp= av_mallocz(sizeof(syncpoint_t));
+    syncpoint_t *sp= av_mallocz(sizeof(syncpoint_t));
+    struct AVTreeNode *node= av_mallocz(av_tree_node_size);
 
     sp->pos= pos;
     sp->back_ptr= back_ptr;
     sp->ts= ts;
-    sp2= av_tree_insert(&nut->syncpoints, sp, ff_nut_sp_pos_cmp);
-    if(sp2 && sp2 != sp)
+    av_tree_insert(&nut->syncpoints, sp, ff_nut_sp_pos_cmp, &node);
+    if(node){
         av_free(sp);
+        av_free(node);
+    }
 }
+
+const Dispositions ff_nut_dispositions[] = {
+    {"default"     , AV_DISPOSITION_DEFAULT},
+    {"dub"         , AV_DISPOSITION_DUB},
+    {"original"    , AV_DISPOSITION_ORIGINAL},
+    {"comment"     , AV_DISPOSITION_COMMENT},
+    {"lyrics"      , AV_DISPOSITION_LYRICS},
+    {"karaoke"     , AV_DISPOSITION_KARAOKE},
+    {""            , 0}
+};
+

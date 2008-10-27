@@ -31,7 +31,7 @@ typedef struct SgiContext {
     AVFrame picture;
 } SgiContext;
 
-static int encode_init(AVCodecContext *avctx){
+static av_cold int encode_init(AVCodecContext *avctx){
     SgiContext *s = avctx->priv_data;
 
     avcodec_get_frame_defaults(&s->picture);
@@ -151,6 +151,7 @@ AVCodec sgi_encoder = {
     encode_init,
     encode_frame,
     NULL,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_RGB24, PIX_FMT_RGBA, PIX_FMT_PAL8, PIX_FMT_GRAY8, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_RGB24, PIX_FMT_RGBA, PIX_FMT_PAL8, PIX_FMT_GRAY8, PIX_FMT_NONE},
+    .long_name= NULL_IF_CONFIG_SMALL("SGI image"),
 };
 

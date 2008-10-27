@@ -97,16 +97,16 @@ typedef struct {
 /**
  * A node in the subpacket list
  */
-typedef struct _QDM2SubPNode {
+typedef struct QDM2SubPNode {
     QDM2SubPacket *packet;      ///< packet
-    struct _QDM2SubPNode *next; ///< pointer to next packet in the list, NULL if leaf node
+    struct QDM2SubPNode *next; ///< pointer to next packet in the list, NULL if leaf node
 } QDM2SubPNode;
 
 typedef struct {
     float level;
     float *samples_im;
     float *samples_re;
-    float *table;
+    const float *table;
     int   phase;
     int   phase_shift;
     int   duration;
@@ -176,7 +176,7 @@ typedef struct {
     QDM2FFT fft;
 
     /// I/O data
-    uint8_t *compressed_data;
+    const uint8_t *compressed_data;
     int compressed_size;
     float output_buffer[1024];
 
@@ -361,7 +361,7 @@ static void qdm2_init_vlc(void)
 
 
 /* for floating point to fixed point conversion */
-static float f2i_scale = (float) (1 << (FRAC_BITS - 15));
+static const float f2i_scale = (float) (1 << (FRAC_BITS - 15));
 
 
 static int qdm2_get_vlc (GetBitContext *gb, VLC *vlc, int flag, int depth)
@@ -404,7 +404,7 @@ static int qdm2_get_se_vlc (VLC *vlc, GetBitContext *gb, int depth)
  *
  * @return          0 if checksum is OK
  */
-static uint16_t qdm2_packet_checksum (uint8_t *data, int length, int value) {
+static uint16_t qdm2_packet_checksum (const uint8_t *data, int length, int value) {
     int i;
 
     for (i=0; i < length; i++)
@@ -684,7 +684,7 @@ static void fill_coding_method_array (sb_int8_array tone_level_idx, sb_int8_arra
         SAMPLES_NEEDED
         for (ch = 0; ch < nb_channels; ch++)
             for (sb = 0; sb < 30; sb++) {
-                for (j = 1; j < 64; j++) {
+                for (j = 1; j < 63; j++) {  // The loop only iterates to 63 so the code doesn't overflow the buffer
                     add1 = tone_level_idx[ch][sb][j] - 10;
                     if (add1 < 0)
                         add1 = 0;
@@ -1431,17 +1431,17 @@ static void qdm2_decode_fft_packets (QDM2Context *q)
     if (q->sub_packet_list_B[0].packet == NULL)
         return;
 
-    /* reset minimum indices for FFT coefficients */
+    /* reset minimum indexes for FFT coefficients */
     q->fft_coefs_index = 0;
     for (i=0; i < 5; i++)
         q->fft_coefs_min_index[i] = -1;
 
     /* process subpackets ordered by type, largest type first */
     for (i = 0, max = 256; i < q->sub_packets_B; i++) {
-        QDM2SubPacket *packet;
+        QDM2SubPacket *packet= NULL;
 
         /* find subpacket with largest type less than max */
-        for (j = 0, min = 0, packet = NULL; j < q->sub_packets_B; j++) {
+        for (j = 0, min = 0; j < q->sub_packets_B; j++) {
             value = q->sub_packet_list_B[j].packet->type;
             if (value > min && value < max) {
                 min = value;
@@ -1452,6 +1452,9 @@ static void qdm2_decode_fft_packets (QDM2Context *q)
         max = min;
 
         /* check for errors (?) */
+        if (!packet)
+            return;
+
         if (i == 0 && (packet->type < 16 || packet->type >= 48 || fft_subpackets[packet->type - 16]))
             return;
 
@@ -1481,7 +1484,7 @@ static void qdm2_decode_fft_packets (QDM2Context *q)
         }
     } // Loop on B packets
 
-    /* calculate maximum indices for FFT coefficients */
+    /* calculate maximum indexes for FFT coefficients */
     for (i = 0, j = -1; i < 5; i++)
         if (q->fft_coefs_min_index[i] >= 0) {
             if (j >= 0)
@@ -1598,7 +1601,7 @@ static void qdm2_fft_tone_synthesizer (QDM2Context *q, int sub_packet)
                     tone.level = (q->fft_coefs[j].exp < 0) ? 0.0 : fft_tone_level_table[q->superblocktype_2_3 ? 0 : 1][q->fft_coefs[j].exp & 63];
                     tone.samples_im = &q->fft.samples_im[ch][offset];
                     tone.samples_re = &q->fft.samples_re[ch][offset];
-                    tone.table = (float*)fft_tone_sample_table[i][q->fft_coefs[j].offset - (offset << four_i)];
+                    tone.table = fft_tone_sample_table[i][q->fft_coefs[j].offset - (offset << four_i)];
                     tone.phase = 64 * q->fft_coefs[j].phase - (offset << 8) - 128;
                     tone.phase_shift = (2 * q->fft_coefs[j].offset + 1) << (7 - four_i);
                     tone.duration = i;
@@ -1692,11 +1695,11 @@ static void qdm2_synthesis_filter (QDM2Context *q, int index)
  * @param q    context
  */
 static void qdm2_init(QDM2Context *q) {
-    static int inited = 0;
+    static int initialized = 0;
 
-    if (inited != 0)
+    if (initialized != 0)
         return;
-    inited = 1;
+    initialized = 1;
 
     qdm2_init_vlc();
     ff_mpa_synth_init(mpa_window);
@@ -1928,6 +1931,8 @@ static int qdm2_decode_init(AVCodecContext *avctx)
 
     qdm2_init(s);
 
+    avctx->sample_fmt = SAMPLE_FMT_S16;
+
 //    dump_context(s);
     return 0;
 }
@@ -1943,7 +1948,7 @@ static int qdm2_decode_close(AVCodecContext *avctx)
 }
 
 
-static void qdm2_decode (QDM2Context *q, uint8_t *in, int16_t *out)
+static void qdm2_decode (QDM2Context *q, const uint8_t *in, int16_t *out)
 {
     int ch, i;
     const int frame_size = (q->frame_size * q->channels);
@@ -2005,7 +2010,7 @@ static void qdm2_decode (QDM2Context *q, uint8_t *in, int16_t *out)
 
 static int qdm2_decode_frame(AVCodecContext *avctx,
             void *data, int *data_size,
-            uint8_t *buf, int buf_size)
+            const uint8_t *buf, int buf_size)
 {
     QDM2Context *s = avctx->priv_data;
 
@@ -2038,4 +2043,5 @@ AVCodec qdm2_decoder =
     .init = qdm2_decode_init,
     .close = qdm2_decode_close,
     .decode = qdm2_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("QDesign Music Codec 2"),
 };

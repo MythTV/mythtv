@@ -22,15 +22,15 @@
     DEALINGS IN THE SOFTWARE.
 **/
 
-#ifndef FFMPEG_OGGDEC_H
-#define FFMPEG_OGGDEC_H
+#ifndef AVFORMAT_OGGDEC_H
+#define AVFORMAT_OGGDEC_H
 
 #include "avformat.h"
 
 typedef struct ogg_codec {
-    int8_t *magic;
+    const int8_t *magic;
     uint8_t magicsize;
-    int8_t *name;
+    const int8_t *name;
     int (*header)(AVFormatContext *, int);
     int (*packet)(AVFormatContext *, int);
     uint64_t (*gptopts)(AVFormatContext *, int, uint64_t);
@@ -75,14 +75,16 @@ typedef struct ogg {
 #define OGG_FLAG_BOS  2
 #define OGG_FLAG_EOS  4
 
-extern ogg_codec_t vorbis_codec;
-extern ogg_codec_t theora_codec;
-extern ogg_codec_t flac_codec;
-extern ogg_codec_t old_flac_codec;
-extern ogg_codec_t ogm_video_codec;
-extern ogg_codec_t ogm_audio_codec;
-extern ogg_codec_t ogm_old_codec;
+extern const ogg_codec_t ff_flac_codec;
+extern const ogg_codec_t ff_ogm_audio_codec;
+extern const ogg_codec_t ff_ogm_old_codec;
+extern const ogg_codec_t ff_ogm_text_codec;
+extern const ogg_codec_t ff_ogm_video_codec;
+extern const ogg_codec_t ff_old_flac_codec;
+extern const ogg_codec_t ff_speex_codec;
+extern const ogg_codec_t ff_theora_codec;
+extern const ogg_codec_t ff_vorbis_codec;
 
 extern int vorbis_comment(AVFormatContext *ms, uint8_t *buf, int size);
 
-#endif /* FFMPEG_OGGDEC_H */
+#endif /* AVFORMAT_OGGDEC_H */

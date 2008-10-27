@@ -1,24 +1,21 @@
 /*
  * Floating point AAN DCT
- * Copyright (c) 2003 Michael Niedermayer <michaelni@gmx.at>
- *
  * this implementation is based upon the IJG integer AAN DCT (see jfdctfst.c)
  *
- * This file is part of FFmpeg.
+ * Copyright (c) 2003 Michael Niedermayer <michaelni@gmx.at>
+ * Copyright (c) 2003 Roman Shaposhnik
  *
- * FFmpeg is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
  *
- * FFmpeg is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /**
@@ -59,7 +56,7 @@ for(i=0; i<8; i++){
 #define A5 0.38268343236508977170 // cos(pi*6/16)
 #define A4 1.30656296487637652774 // cos(pi*2/16)sqrt(2)
 
-static FLOAT postscale[64]={
+static const FLOAT postscale[64]={
 B0*B0, B0*B1, B0*B2, B0*B3, B0*B4, B0*B5, B0*B6, B0*B7,
 B1*B0, B1*B1, B1*B2, B1*B3, B1*B4, B1*B5, B1*B6, B1*B7,
 B2*B0, B2*B1, B2*B2, B2*B3, B2*B4, B2*B5, B2*B6, B2*B7,
@@ -74,7 +71,8 @@ static av_always_inline void row_fdct(FLOAT temp[64], DCTELEM * data)
 {
     FLOAT tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
     FLOAT tmp10, tmp11, tmp12, tmp13;
-    FLOAT z1, z2, z3, z4, z5, z11, z13;
+    FLOAT z2, z4, z11, z13;
+    FLOAT av_unused z5;
     int i;
 
     for (i=0; i<8*8; i+=8) {
@@ -95,21 +93,27 @@ static av_always_inline void row_fdct(FLOAT temp[64], DCTELEM * data)
         temp[0 + i]= tmp10 + tmp11;
         temp[4 + i]= tmp10 - tmp11;
 
-        z1= (tmp12 + tmp13)*A1;
-        temp[2 + i]= tmp13 + z1;
-        temp[6 + i]= tmp13 - z1;
+        tmp12 += tmp13;
+        tmp12 *= A1;
+        temp[2 + i]= tmp13 + tmp12;
+        temp[6 + i]= tmp13 - tmp12;
 
-        tmp10= tmp4 + tmp5;
-        tmp11= tmp5 + tmp6;
-        tmp12= tmp6 + tmp7;
+        tmp4 += tmp5;
+        tmp5 += tmp6;
+        tmp6 += tmp7;
 
-        z5= (tmp10 - tmp12) * A5;
-        z2= tmp10*A2 + z5;
-        z4= tmp12*A4 + z5;
-        z3= tmp11*A1;
+#if 0
+        z5= (tmp4 - tmp6) * A5;
+        z2= tmp4*A2 + z5;
+        z4= tmp6*A4 + z5;
+#else
+        z2= tmp4*(A2+A5) - tmp6*A5;
+        z4= tmp6*(A4-A5) + tmp4*A5;
+#endif
+        tmp5*=A1;
 
-        z11= tmp7 + z3;
-        z13= tmp7 - z3;
+        z11= tmp7 + tmp5;
+        z13= tmp7 - tmp5;
 
         temp[5 + i]= z13 + z2;
         temp[3 + i]= z13 - z2;
@@ -122,7 +126,8 @@ void ff_faandct(DCTELEM * data)
 {
     FLOAT tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
     FLOAT tmp10, tmp11, tmp12, tmp13;
-    FLOAT z1, z2, z3, z4, z5, z11, z13;
+    FLOAT z2, z4, z11, z13;
+    FLOAT av_unused z5;
     FLOAT temp[64];
     int i;
 
@@ -148,21 +153,27 @@ void ff_faandct(DCTELEM * data)
         data[8*0 + i]= lrintf(SCALE(8*0 + i) * (tmp10 + tmp11));
         data[8*4 + i]= lrintf(SCALE(8*4 + i) * (tmp10 - tmp11));
 
-        z1= (tmp12 + tmp13)* A1;
-        data[8*2 + i]= lrintf(SCALE(8*2 + i) * (tmp13 + z1));
-        data[8*6 + i]= lrintf(SCALE(8*6 + i) * (tmp13 - z1));
+        tmp12 += tmp13;
+        tmp12 *= A1;
+        data[8*2 + i]= lrintf(SCALE(8*2 + i) * (tmp13 + tmp12));
+        data[8*6 + i]= lrintf(SCALE(8*6 + i) * (tmp13 - tmp12));
 
-        tmp10= tmp4 + tmp5;
-        tmp11= tmp5 + tmp6;
-        tmp12= tmp6 + tmp7;
+        tmp4 += tmp5;
+        tmp5 += tmp6;
+        tmp6 += tmp7;
 
-        z5= (tmp10 - tmp12) * A5;
-        z2= tmp10*A2 + z5;
-        z4= tmp12*A4 + z5;
-        z3= tmp11*A1;
+#if 0
+        z5= (tmp4 - tmp6) * A5;
+        z2= tmp4*A2 + z5;
+        z4= tmp6*A4 + z5;
+#else
+        z2= tmp4*(A2+A5) - tmp6*A5;
+        z4= tmp6*(A4-A5) + tmp4*A5;
+#endif
+        tmp5*=A1;
 
-        z11= tmp7 + z3;
-        z13= tmp7 - z3;
+        z11= tmp7 + tmp5;
+        z13= tmp7 - tmp5;
 
         data[8*5 + i]= lrintf(SCALE(8*5 + i) * (z13 + z2));
         data[8*3 + i]= lrintf(SCALE(8*3 + i) * (z13 - z2));
@@ -175,7 +186,6 @@ void ff_faandct248(DCTELEM * data)
 {
     FLOAT tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
     FLOAT tmp10, tmp11, tmp12, tmp13;
-    FLOAT z1;
     FLOAT temp[64];
     int i;
 
@@ -201,9 +211,10 @@ void ff_faandct248(DCTELEM * data)
         data[8*0 + i] = lrintf(SCALE(8*0 + i) * (tmp10 + tmp11));
         data[8*4 + i] = lrintf(SCALE(8*4 + i) * (tmp10 - tmp11));
 
-        z1 = (tmp12 + tmp13)* A1;
-        data[8*2 + i] = lrintf(SCALE(8*2 + i) * (tmp13 + z1));
-        data[8*6 + i] = lrintf(SCALE(8*6 + i) * (tmp13 - z1));
+        tmp12 += tmp13;
+        tmp12 *= A1;
+        data[8*2 + i] = lrintf(SCALE(8*2 + i) * (tmp13 + tmp12));
+        data[8*6 + i] = lrintf(SCALE(8*6 + i) * (tmp13 - tmp12));
 
         tmp10 = tmp4 + tmp7;
         tmp11 = tmp5 + tmp6;
@@ -213,8 +224,9 @@ void ff_faandct248(DCTELEM * data)
         data[8*1 + i] = lrintf(SCALE(8*0 + i) * (tmp10 + tmp11));
         data[8*5 + i] = lrintf(SCALE(8*4 + i) * (tmp10 - tmp11));
 
-        z1 = (tmp12 + tmp13)* A1;
-        data[8*3 + i] = lrintf(SCALE(8*2 + i) * (tmp13 + z1));
-        data[8*7 + i] = lrintf(SCALE(8*6 + i) * (tmp13 - z1));
+        tmp12 += tmp13;
+        tmp12 *= A1;
+        data[8*3 + i] = lrintf(SCALE(8*2 + i) * (tmp13 + tmp12));
+        data[8*7 + i] = lrintf(SCALE(8*6 + i) * (tmp13 - tmp12));
     }
 }

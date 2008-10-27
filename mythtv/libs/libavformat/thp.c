@@ -57,7 +57,7 @@ static int thp_read_header(AVFormatContext *s,
 {
     ThpDemuxContext *thp = s->priv_data;
     AVStream *st;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     int i;
 
     /* Read the file header.  */
@@ -140,7 +140,7 @@ static int thp_read_packet(AVFormatContext *s,
                             AVPacket *pkt)
 {
     ThpDemuxContext *thp = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     int size;
     int ret;
 
@@ -189,7 +189,7 @@ static int thp_read_packet(AVFormatContext *s,
 
 AVInputFormat thp_demuxer = {
     "thp",
-    "THP",
+    NULL_IF_CONFIG_SMALL("THP"),
     sizeof(ThpDemuxContext),
     thp_probe,
     thp_read_header,

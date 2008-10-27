@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2007 Marc Hoffman <marc.hoffman@analog.com>
  *
- * Blackfin Software Video SCALER Operations
+ * Blackfin software video scaler operations
  *
  * This file is part of FFmpeg.
  *
@@ -34,14 +34,19 @@
 #include "swscale.h"
 #include "swscale_internal.h"
 
+#ifdef __FDPIC__
+#define L1CODE __attribute__ ((l1_text))
+#else
+#define L1CODE
+#endif
 
 extern int ff_bfin_uyvytoyv12 (const uint8_t *src, uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
                                long width, long height,
-                               long lumStride, long chromStride, long srcStride) __attribute__ ((l1_text));
+                               long lumStride, long chromStride, long srcStride) L1CODE;
 
 extern int ff_bfin_yuyvtoyv12 (const uint8_t *src, uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
                                long width, long height,
-                               long lumStride, long chromStride, long srcStride) __attribute__ ((l1_text));
+                               long lumStride, long chromStride, long srcStride) L1CODE;
 
 static int uyvytoyv12_unscaled (SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
                                 int srcSliceH, uint8_t* dst[], int dstStride[])

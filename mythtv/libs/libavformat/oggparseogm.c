@@ -23,10 +23,10 @@
 **/
 
 #include <stdlib.h>
+#include "libavutil/intreadwrite.h"
+#include "libavcodec/bitstream.h"
+#include "libavcodec/bytestream.h"
 #include "avformat.h"
-#include "bitstream.h"
-#include "bytestream.h"
-#include "intreadwrite.h"
 #include "oggdec.h"
 #include "riff.h"
 
@@ -36,7 +36,7 @@ ogm_header(AVFormatContext *s, int idx)
     ogg_t *ogg = s->priv_data;
     ogg_stream_t *os = ogg->streams + idx;
     AVStream *st = s->streams[idx];
-    uint8_t *p = os->buf + os->pstart;
+    const uint8_t *p = os->buf + os->pstart;
     uint64_t time_unit;
     uint64_t spu;
     uint32_t default_len;
@@ -55,6 +55,10 @@ ogm_header(AVFormatContext *s, int idx)
         tag = bytestream_get_le32(&p);
         st->codec->codec_id = codec_get_id(codec_bmp_tags, tag);
         st->codec->codec_tag = tag;
+    } else if (*p == 't') {
+        st->codec->codec_type = CODEC_TYPE_SUBTITLE;
+        st->codec->codec_id = CODEC_ID_TEXT;
+        p += 12;
     } else {
         uint8_t acid[5];
         int cid;
@@ -64,6 +68,7 @@ ogm_header(AVFormatContext *s, int idx)
         acid[4] = 0;
         cid = strtol(acid, NULL, 16);
         st->codec->codec_id = codec_get_id(codec_wav_tags, cid);
+        st->need_parsing = AVSTREAM_PARSE_FULL;
     }
 
     p += 4;                     /* useless size field */
@@ -144,21 +149,28 @@ ogm_packet(AVFormatContext *s, int idx)
     return 0;
 }
 
-ogg_codec_t ogm_video_codec = {
+const ogg_codec_t ff_ogm_video_codec = {
     .magic = "\001video",
     .magicsize = 6,
     .header = ogm_header,
     .packet = ogm_packet
 };
 
-ogg_codec_t ogm_audio_codec = {
+const ogg_codec_t ff_ogm_audio_codec = {
     .magic = "\001audio",
     .magicsize = 6,
     .header = ogm_header,
     .packet = ogm_packet
 };
 
-ogg_codec_t ogm_old_codec = {
+const ogg_codec_t ff_ogm_text_codec = {
+    .magic = "\001text",
+    .magicsize = 5,
+    .header = ogm_header,
+    .packet = ogm_packet
+};
+
+const ogg_codec_t ff_ogm_old_codec = {
     .magic = "\001Direct Show Samples embedded in Ogg",
     .magicsize = 35,
     .header = ogm_dshow_header,

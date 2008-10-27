@@ -23,9 +23,9 @@
 **/
 
 #include <stdlib.h>
+#include "libavutil/bswap.h"
+#include "libavcodec/bitstream.h"
 #include "avformat.h"
-#include "bitstream.h"
-#include "bswap.h"
 #include "oggdec.h"
 
 typedef struct theora_params {
@@ -87,8 +87,8 @@ theora_header (AVFormatContext * s, int idx)
         st->codec->time_base.num = get_bits_long(&gb, 32);
         st->time_base = st->codec->time_base;
 
-        st->codec->sample_aspect_ratio.num = get_bits_long(&gb, 24);
-        st->codec->sample_aspect_ratio.den = get_bits_long(&gb, 24);
+        st->sample_aspect_ratio.num = get_bits_long(&gb, 24);
+        st->sample_aspect_ratio.den = get_bits_long(&gb, 24);
 
         if (version >= 0x030200)
             skip_bits(&gb, 38);
@@ -130,7 +130,7 @@ theora_gptopts(AVFormatContext *ctx, int idx, uint64_t gp)
     return iframe + pframe;
 }
 
-ogg_codec_t theora_codec = {
+const ogg_codec_t ff_theora_codec = {
     .magic = "\200theora",
     .magicsize = 7,
     .header = theora_header,

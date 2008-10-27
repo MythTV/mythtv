@@ -198,10 +198,10 @@ static inline int tm2_get_token(GetBitContext *gb, TM2Codes *code)
     return code->recode[val];
 }
 
-static inline int tm2_read_header(TM2Context *ctx, uint8_t *buf)
+static inline int tm2_read_header(TM2Context *ctx, const uint8_t *buf)
 {
     uint32_t magic;
-    uint8_t *obuf;
+    const uint8_t *obuf;
     int length;
 
     obuf = buf;
@@ -232,7 +232,7 @@ static inline int tm2_read_header(TM2Context *ctx, uint8_t *buf)
         return -1;
     }
 
-    return (buf - obuf);
+    return buf - obuf;
 }
 
 static int tm2_read_deltas(TM2Context *ctx, int stream_id) {
@@ -260,7 +260,7 @@ static int tm2_read_deltas(TM2Context *ctx, int stream_id) {
     return 0;
 }
 
-static int tm2_read_stream(TM2Context *ctx, uint8_t *buf, int stream_id) {
+static int tm2_read_stream(TM2Context *ctx, const uint8_t *buf, int stream_id) {
     int i;
     int cur = 0;
     int skip = 0;
@@ -759,7 +759,7 @@ static int tm2_decode_blocks(TM2Context *ctx, AVFrame *p)
 
 static int decode_frame(AVCodecContext *avctx,
                         void *data, int *data_size,
-                        uint8_t *buf, int buf_size)
+                        const uint8_t *buf, int buf_size)
 {
     TM2Context * const l = avctx->priv_data;
     AVFrame * const p= (AVFrame*)&l->pic;
@@ -772,7 +772,7 @@ static int decode_frame(AVCodecContext *avctx,
         return -1;
     }
 
-    l->dsp.bswap_buf((uint32_t*)buf, (uint32_t*)buf, buf_size >> 2);
+    l->dsp.bswap_buf((uint32_t*)buf, (const uint32_t*)buf, buf_size >> 2); //FIXME SERIOUS BUG
     skip = tm2_read_header(l, buf);
 
     if(skip == -1)
@@ -818,7 +818,7 @@ static int decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int decode_init(AVCodecContext *avctx){
+static av_cold int decode_init(AVCodecContext *avctx){
     TM2Context * const l = avctx->priv_data;
     int i;
 
@@ -855,7 +855,7 @@ static int decode_init(AVCodecContext *avctx){
     return 0;
 }
 
-static int decode_end(AVCodecContext *avctx){
+static av_cold int decode_end(AVCodecContext *avctx){
     TM2Context * const l = avctx->priv_data;
     int i;
 
@@ -887,4 +887,5 @@ AVCodec truemotion2_decoder = {
     decode_end,
     decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("Duck TrueMotion 2.0"),
 };

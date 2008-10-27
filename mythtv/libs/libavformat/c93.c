@@ -56,7 +56,7 @@ static int read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
     AVStream *video;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     C93DemuxContext *c93 = s->priv_data;
     int i;
     int framecount = 0;
@@ -84,7 +84,7 @@ static int read_header(AVFormatContext *s,
     video->codec->width = 320;
     video->codec->height = 192;
     /* 4:3 320x200 with 8 empty lines */
-    video->codec->sample_aspect_ratio = (AVRational) { 5, 6 };
+    video->sample_aspect_ratio = (AVRational) { 5, 6 };
     video->time_base = (AVRational) { 2, 25 };
     video->nb_frames = framecount;
     video->duration = framecount;
@@ -101,7 +101,7 @@ static int read_header(AVFormatContext *s,
 
 static int read_packet(AVFormatContext *s, AVPacket *pkt)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     C93DemuxContext *c93 = s->priv_data;
     C93BlockRecord *br = &c93->block_records[c93->current_block];
     int datasize;
@@ -190,7 +190,7 @@ static int read_packet(AVFormatContext *s, AVPacket *pkt)
 
 AVInputFormat c93_demuxer = {
     "c93",
-    "Interplay C93",
+    NULL_IF_CONFIG_SMALL("Interplay C93"),
     sizeof(C93DemuxContext),
     probe,
     read_header,

@@ -30,9 +30,9 @@
 #include <time.h>
 #include <stdarg.h>
 #include "avformat.h"
-#include "dvdata.h"
+#include "libavcodec/dvdata.h"
 #include "dv.h"
-#include "fifo.h"
+#include "libavutil/fifo.h"
 
 struct DVMuxContext {
     const DVprofile*  sys;    /* Current DV profile. E.g.: 525/60, 625/50 */
@@ -253,9 +253,9 @@ int dv_assemble_frame(DVMuxContext *c, AVStream* st,
           /* FIXME: we have to have more sensible approach than this one */
         if (av_fifo_size(&c->audio_data[i]) + data_size >= 100*AVCODEC_MAX_AUDIO_FRAME_SIZE)
             av_log(st->codec, AV_LOG_ERROR, "Can't process DV frame #%d. Insufficient video data or severe sync problem.\n", c->frames);
-        av_fifo_write(&c->audio_data[i], data, data_size);
+        av_fifo_generic_write(&c->audio_data[i], data, data_size, NULL);
 
-        /* Lets see if we've got enough audio for one DV frame */
+        /* Let us see if we've got enough audio for one DV frame. */
         c->has_audio |= ((reqasize <= av_fifo_size(&c->audio_data[i])) << i);
 
         break;
@@ -263,7 +263,7 @@ int dv_assemble_frame(DVMuxContext *c, AVStream* st,
         break;
     }
 
-    /* Lets see if we have enough data to construct one DV frame */
+    /* Let us see if we have enough data to construct one DV frame. */
     if (c->has_video == 1 && c->has_audio + 1 == 1<<c->n_ast) {
         dv_inject_metadata(c, *frame);
         c->has_audio = 0;
@@ -359,7 +359,7 @@ void dv_delete_mux(DVMuxContext *c)
         av_fifo_free(&c->audio_data[i]);
 }
 
-#ifdef CONFIG_MUXERS
+#ifdef CONFIG_DV_MUXER
 static int dv_write_header(AVFormatContext *s)
 {
     if (!dv_init_mux(s)) {
@@ -380,8 +380,8 @@ static int dv_write_packet(struct AVFormatContext *s, AVPacket *pkt)
     fsize = dv_assemble_frame(s->priv_data, s->streams[pkt->stream_index],
                               pkt->data, pkt->size, &frame);
     if (fsize > 0) {
-        put_buffer(&s->pb, frame, fsize);
-        put_flush_packet(&s->pb);
+        put_buffer(s->pb, frame, fsize);
+        put_flush_packet(s->pb);
     }
     return 0;
 }
@@ -397,12 +397,10 @@ static int dv_write_trailer(struct AVFormatContext *s)
     dv_delete_mux(s->priv_data);
     return 0;
 }
-#endif /* CONFIG_MUXERS */
 
-#ifdef CONFIG_DV_MUXER
 AVOutputFormat dv_muxer = {
     "dv",
-    "DV video format",
+    NULL_IF_CONFIG_SMALL("DV video format"),
     NULL,
     "dv",
     sizeof(DVMuxContext),
@@ -412,4 +410,4 @@ AVOutputFormat dv_muxer = {
     dv_write_packet,
     dv_write_trailer,
 };
-#endif
+#endif /* CONFIG_DV_MUXER */

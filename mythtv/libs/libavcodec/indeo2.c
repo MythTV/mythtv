@@ -136,7 +136,7 @@ static int ir2_decode_plane_inter(Ir2Context *ctx, int width, int height, uint8_
 
 static int ir2_decode_frame(AVCodecContext *avctx,
                         void *data, int *data_size,
-                        uint8_t *buf, int buf_size)
+                        const uint8_t *buf, int buf_size)
 {
     Ir2Context * const s = avctx->priv_data;
     AVFrame *picture = data;
@@ -188,7 +188,7 @@ static int ir2_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int ir2_decode_init(AVCodecContext *avctx){
+static av_cold int ir2_decode_init(AVCodecContext *avctx){
     Ir2Context * const ic = avctx->priv_data;
 
     ic->avctx = avctx;
@@ -219,4 +219,5 @@ AVCodec indeo2_decoder = {
     NULL,
     ir2_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("Intel Indeo 2"),
 };

@@ -30,10 +30,10 @@ Only mono files are supported.
 static const char AMR_header [] = "#!AMR\n";
 static const char AMRWB_header [] = "#!AMR-WB\n";
 
-#ifdef CONFIG_MUXERS
+#ifdef CONFIG_AMR_MUXER
 static int amr_write_header(AVFormatContext *s)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     AVCodecContext *enc = s->streams[0]->codec;
 
     s->priv_data = NULL;
@@ -56,11 +56,11 @@ static int amr_write_header(AVFormatContext *s)
 
 static int amr_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
-    put_buffer(&s->pb, pkt->data, pkt->size);
-    put_flush_packet(&s->pb);
+    put_buffer(s->pb, pkt->data, pkt->size);
+    put_flush_packet(s->pb);
     return 0;
 }
-#endif /* CONFIG_MUXERS */
+#endif /* CONFIG_AMR_MUXER */
 
 static int amr_probe(AVProbeData *p)
 {
@@ -78,7 +78,7 @@ static int amr_probe(AVProbeData *p)
 static int amr_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     AVStream *st;
     uint8_t header[9];
 
@@ -120,13 +120,13 @@ static int amr_read_packet(AVFormatContext *s,
     AVCodecContext *enc = s->streams[0]->codec;
     int read, size = 0, toc, mode;
 
-    if (url_feof(&s->pb))
+    if (url_feof(s->pb))
     {
         return AVERROR(EIO);
     }
 
 //FIXME this is wrong, this should rather be in a AVParset
-    toc=get_byte(&s->pb);
+    toc=get_byte(s->pb);
     mode = (toc >> 3) & 0x0F;
 
     if (enc->codec_id == CODEC_ID_AMR_NB)
@@ -152,10 +152,10 @@ static int amr_read_packet(AVFormatContext *s,
     }
 
     pkt->stream_index = 0;
-    pkt->pos= url_ftell(&s->pb);
+    pkt->pos= url_ftell(s->pb);
     pkt->data[0]=toc;
     pkt->duration= enc->codec_id == CODEC_ID_AMR_NB ? 160 : 320;
-    read = get_buffer(&s->pb, pkt->data+1, size-1);
+    read = get_buffer(s->pb, pkt->data+1, size-1);
 
     if (read != size-1)
     {
@@ -169,7 +169,7 @@ static int amr_read_packet(AVFormatContext *s,
 #ifdef CONFIG_AMR_DEMUXER
 AVInputFormat amr_demuxer = {
     "amr",
-    "3gpp amr file format",
+    NULL_IF_CONFIG_SMALL("3GPP AMR file format"),
     0, /*priv_data_size*/
     amr_probe,
     amr_read_header,
@@ -181,7 +181,7 @@ AVInputFormat amr_demuxer = {
 #ifdef CONFIG_AMR_MUXER
 AVOutputFormat amr_muxer = {
     "amr",
-    "3gpp amr file format",
+    NULL_IF_CONFIG_SMALL("3GPP AMR file format"),
     "audio/amr",
     "amr",
     0,

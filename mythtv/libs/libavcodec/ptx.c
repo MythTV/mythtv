@@ -25,21 +25,20 @@ typedef struct PTXContext {
     AVFrame picture;
 } PTXContext;
 
-static int ptx_init(AVCodecContext *avctx) {
+static av_cold int ptx_init(AVCodecContext *avctx) {
     PTXContext *s = avctx->priv_data;
 
-    avcodec_get_frame_defaults((AVFrame*)&s->picture);
-    avctx->coded_frame= (AVFrame*)&s->picture;
-    s->picture.data[0] = NULL;
+    avcodec_get_frame_defaults(&s->picture);
+    avctx->coded_frame= &s->picture;
 
     return 0;
 }
 
 static int ptx_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
-                            uint8_t *buf, int buf_size) {
+                            const uint8_t *buf, int buf_size) {
     PTXContext * const s = avctx->priv_data;
     AVFrame *picture = data;
-    AVFrame * const p = (AVFrame *)&s->picture;
+    AVFrame * const p = &s->picture;
     unsigned int offset, w, h, y, stride, bytes_per_pixel;
     uint8_t *ptr;
 
@@ -89,13 +88,13 @@ static int ptx_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
         buf += w*bytes_per_pixel;
     }
 
-    *picture = *(AVFrame *)&s->picture;
+    *picture = s->picture;
     *data_size = sizeof(AVPicture);
 
     return offset + w*h*bytes_per_pixel;
 }
 
-static int ptx_end(AVCodecContext *avctx) {
+static av_cold int ptx_end(AVCodecContext *avctx) {
     PTXContext *s = avctx->priv_data;
 
     if(s->picture.data[0])
@@ -114,5 +113,6 @@ AVCodec ptx_decoder = {
     ptx_end,
     ptx_decode_frame,
     0,
-    NULL
+    NULL,
+    .long_name = NULL_IF_CONFIG_SMALL("V.Flash PTX image"),
 };

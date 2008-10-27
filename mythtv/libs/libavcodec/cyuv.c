@@ -35,7 +35,6 @@
 
 #include "avcodec.h"
 #include "dsputil.h"
-#include "mpegvideo.h"
 
 
 typedef struct CyuvDecodeContext {
@@ -44,7 +43,7 @@ typedef struct CyuvDecodeContext {
     AVFrame frame;
 } CyuvDecodeContext;
 
-static int cyuv_decode_init(AVCodecContext *avctx)
+static av_cold int cyuv_decode_init(AVCodecContext *avctx)
 {
     CyuvDecodeContext *s = avctx->priv_data;
 
@@ -61,7 +60,7 @@ static int cyuv_decode_init(AVCodecContext *avctx)
 
 static int cyuv_decode_frame(AVCodecContext *avctx,
                              void *data, int *data_size,
-                             uint8_t *buf, int buf_size)
+                             const uint8_t *buf, int buf_size)
 {
     CyuvDecodeContext *s=avctx->priv_data;
 
@@ -73,9 +72,9 @@ static int cyuv_decode_frame(AVCodecContext *avctx,
     int v_ptr;
 
     /* prediction error tables (make it clear that they are signed values) */
-    signed char *y_table = (signed char*)buf +  0;
-    signed char *u_table = (signed char*)buf + 16;
-    signed char *v_table = (signed char*)buf + 32;
+    const signed char *y_table = (const signed char*)buf +  0;
+    const signed char *u_table = (const signed char*)buf + 16;
+    const signed char *v_table = (const signed char*)buf + 32;
 
     unsigned char y_pred, u_pred, v_pred;
     int stream_ptr;
@@ -164,7 +163,7 @@ static int cyuv_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int cyuv_decode_end(AVCodecContext *avctx)
+static av_cold int cyuv_decode_end(AVCodecContext *avctx)
 {
 /*    CyuvDecodeContext *s = avctx->priv_data;*/
 
@@ -181,6 +180,7 @@ AVCodec cyuv_decoder = {
     cyuv_decode_end,
     cyuv_decode_frame,
     CODEC_CAP_DR1,
-    NULL
+    NULL,
+    .long_name = NULL_IF_CONFIG_SMALL("Creative YUV (CYUV)"),
 };
 

@@ -47,8 +47,8 @@ typedef struct GifState {
     int gce_delay;
 
     /* LZW compatible decoder */
-    uint8_t *bytestream;
-    uint8_t *bytestream_end;
+    const uint8_t *bytestream;
+    const uint8_t *bytestream_end;
     LZWState *lzw;
 
     /* aux buffers */
@@ -126,11 +126,8 @@ static int gif_read_image(GifState *s)
                 y1 += 8;
                 ptr += linesize * 8;
                 if (y1 >= height) {
-                    y1 = 4;
-                    if (pass == 0)
-                        ptr = ptr1 + linesize * 4;
-                    else
-                        ptr = ptr1 + linesize * 2;
+                    y1 = pass ? 2 : 4;
+                    ptr = ptr1 + linesize * y1;
                     pass++;
                 }
                 break;
@@ -272,7 +269,7 @@ static int gif_parse_next_image(GifState *s)
     return -1;
 }
 
-static int gif_decode_init(AVCodecContext *avctx)
+static av_cold int gif_decode_init(AVCodecContext *avctx)
 {
     GifState *s = avctx->priv_data;
 
@@ -285,7 +282,7 @@ static int gif_decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-static int gif_decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8_t *buf, int buf_size)
+static int gif_decode_frame(AVCodecContext *avctx, void *data, int *data_size, const uint8_t *buf, int buf_size)
 {
     GifState *s = avctx->priv_data;
     AVFrame *picture = data;
@@ -317,7 +314,7 @@ static int gif_decode_frame(AVCodecContext *avctx, void *data, int *data_size, u
     return s->bytestream - buf;
 }
 
-static int gif_decode_close(AVCodecContext *avctx)
+static av_cold int gif_decode_close(AVCodecContext *avctx)
 {
     GifState *s = avctx->priv_data;
 
@@ -336,4 +333,5 @@ AVCodec gif_decoder = {
     NULL,
     gif_decode_close,
     gif_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("GIF (Graphics Interchange Format)"),
 };

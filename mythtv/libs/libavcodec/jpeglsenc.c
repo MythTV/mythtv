@@ -368,7 +368,7 @@ static int encode_picture_ls(AVCodecContext *avctx, unsigned char *buf, int buf_
     return put_bits_count(&pb) >> 3;
 }
 
-static int encode_init_ls(AVCodecContext *ctx) {
+static av_cold int encode_init_ls(AVCodecContext *ctx) {
     JpeglsContext *c = (JpeglsContext*)ctx->priv_data;
 
     c->avctx = ctx;
@@ -389,5 +389,6 @@ AVCodec jpegls_encoder = { //FIXME avoid MPV_* lossless JPEG should not need the
     encode_init_ls,
     encode_picture_ls,
     NULL,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_BGR24, PIX_FMT_RGB24, PIX_FMT_GRAY8, PIX_FMT_GRAY16, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_BGR24, PIX_FMT_RGB24, PIX_FMT_GRAY8, PIX_FMT_GRAY16, PIX_FMT_NONE},
+    .long_name= NULL_IF_CONFIG_SMALL("JPEG-LS"),
 };

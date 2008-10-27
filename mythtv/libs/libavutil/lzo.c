@@ -29,7 +29,7 @@
 //! define if we may read up to 8 bytes beyond the input buffer
 #define INBUF_PADDED 1
 typedef struct LZOContext {
-    uint8_t *in, *in_end;
+    const uint8_t *in, *in_end;
     uint8_t *out_start, *out, *out_end;
     int error;
 } LZOContext;
@@ -84,7 +84,7 @@ static inline int get_len(LZOContext *c, int x, int mask) {
  * \param cnt number of bytes to copy, must be >= 0
  */
 static inline void copy(LZOContext *c, int cnt) {
-    register uint8_t *src = c->in;
+    register const uint8_t *src = c->in;
     register uint8_t *dst = c->out;
     if (cnt > c->in_end - src) {
         cnt = FFMAX(c->in_end - src, 0);
@@ -106,6 +106,8 @@ static inline void copy(LZOContext *c, int cnt) {
     c->out = dst + cnt;
 }
 
+static inline void memcpy_backptr(uint8_t *dst, int back, int cnt);
+
 /**
  * \brief copy previously decoded bytes to current position
  * \param back how many bytes back we start
@@ -115,7 +117,7 @@ static inline void copy(LZOContext *c, int cnt) {
  * thus creating a repeating pattern with a period length of back.
  */
 static inline void copy_backptr(LZOContext *c, int back, int cnt) {
-    register uint8_t *src = &c->out[-back];
+    register const uint8_t *src = &c->out[-back];
     register uint8_t *dst = c->out;
     if (src < c->out_start || src > dst) {
         c->error |= LZO_INVALID_BACKPTR;
@@ -125,9 +127,14 @@ static inline void copy_backptr(LZOContext *c, int back, int cnt) {
         cnt = FFMAX(c->out_end - dst, 0);
         c->error |= LZO_OUTPUT_FULL;
     }
+    memcpy_backptr(dst, back, cnt);
+    c->out = dst + cnt;
+}
+
+static inline void memcpy_backptr(uint8_t *dst, int back, int cnt) {
+    const uint8_t *src = &dst[-back];
     if (back == 1) {
         memset(dst, *src, cnt);
-        dst += cnt;
     } else {
 #ifdef OUTBUF_PADDED
         COPY2(dst, src);
@@ -155,9 +162,20 @@ static inline void copy_backptr(LZOContext *c, int back, int cnt) {
             }
             memcpy(dst, src, cnt);
         }
-        dst += cnt;
     }
-    c->out = dst;
+}
+
+/**
+ * \brief deliberately overlapping memcpy implementation
+ * \param dst destination buffer; must be padded with 12 additional bytes
+ * \param back how many bytes back we start (the initial size of the overlapping window)
+ * \param cnt number of bytes to copy, must be >= 0
+ *
+ * cnt > back is valid, this will copy the bytes we just copied,
+ * thus creating a repeating pattern with a period length of back.
+ */
+void av_memcpy_backptr(uint8_t *dst, int back, int cnt) {
+    memcpy_backptr(dst, back, cnt);
 }
 
 /**
@@ -171,12 +189,12 @@ static inline void copy_backptr(LZOContext *c, int back, int cnt) {
  * make sure all buffers are appropriately padded, in must provide
  * LZO_INPUT_PADDING, out must provide LZO_OUTPUT_PADDING additional bytes
  */
-int lzo1x_decode(void *out, int *outlen, void *in, int *inlen) {
+int lzo1x_decode(void *out, int *outlen, const void *in, int *inlen) {
     int state= 0;
     int x;
     LZOContext c;
     c.in = in;
-    c.in_end = (uint8_t *)in + *inlen;
+    c.in_end = (const uint8_t *)in + *inlen;
     c.out = c.out_start = out;
     c.out_end = (uint8_t *)out + * outlen;
     c.error = 0;

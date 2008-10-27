@@ -39,15 +39,7 @@
 #include "swscale.h"
 #include "swscale_internal.h"
 
-#ifdef HAVE_VIS
-#include "yuv2rgb_vis.c"
-#endif
-
-#ifdef HAVE_MLIB
-#include "yuv2rgb_mlib.c"
-#endif
-
-#define DITHER1XBPP // only for mmx
+#define DITHER1XBPP // only for MMX
 
 const uint8_t  __attribute__((aligned(8))) dither_2x2_4[2][8]={
 {  1,   3,   1,   3,   1,   3,   1,   3, },
@@ -159,28 +151,16 @@ const uint8_t  __attribute__((aligned(8))) dither_8x8_220[8][8]={
 #ifdef HAVE_MMX
 
 /* hope these constant values are cache line aligned */
-static uint64_t attribute_used __attribute__((aligned(8))) mmx_00ffw   = 0x00ff00ff00ff00ffULL;
-static uint64_t attribute_used __attribute__((aligned(8))) mmx_redmask = 0xf8f8f8f8f8f8f8f8ULL;
-static uint64_t attribute_used __attribute__((aligned(8))) mmx_grnmask = 0xfcfcfcfcfcfcfcfcULL;
+DECLARE_ASM_CONST(8, uint64_t, mmx_00ffw)   = 0x00ff00ff00ff00ffULL;
+DECLARE_ASM_CONST(8, uint64_t, mmx_redmask) = 0xf8f8f8f8f8f8f8f8ULL;
+DECLARE_ASM_CONST(8, uint64_t, mmx_grnmask) = 0xfcfcfcfcfcfcfcfcULL;
 
-static uint64_t attribute_used __attribute__((aligned(8))) M24A=   0x00FF0000FF0000FFULL;
-static uint64_t attribute_used __attribute__((aligned(8))) M24B=   0xFF0000FF0000FF00ULL;
-static uint64_t attribute_used __attribute__((aligned(8))) M24C=   0x0000FF0000FF0000ULL;
-
-// the volatile is required because gcc otherwise optimizes some writes away not knowing that these
-// are read in the asm block
+// The volatile is required because gcc otherwise optimizes some writes away
+// not knowing that these are read in the ASM block.
 static volatile uint64_t attribute_used __attribute__((aligned(8))) b5Dither;
 static volatile uint64_t attribute_used __attribute__((aligned(8))) g5Dither;
 static volatile uint64_t attribute_used __attribute__((aligned(8))) g6Dither;
 static volatile uint64_t attribute_used __attribute__((aligned(8))) r5Dither;
-
-static uint64_t __attribute__((aligned(8))) dither4[2]={
-    0x0103010301030103LL,
-    0x0200020002000200LL,};
-
-static uint64_t __attribute__((aligned(8))) dither8[2]={
-    0x0602060206020602LL,
-    0x0004000400040004LL,};
 
 #undef HAVE_MMX
 
@@ -200,7 +180,7 @@ static uint64_t __attribute__((aligned(8))) dither8[2]={
 #define RENAME(a) a ## _MMX2
 #include "yuv2rgb_template.c"
 
-#endif /* defined(ARCH_X86) */
+#endif /* HAVE_MMX */
 
 const int32_t Inverse_Table_6_9[8][4] = {
     {117504, 138453, 13954, 34903}, /* no sequence_display_extension */
@@ -288,8 +268,7 @@ static int func_name(SwsContext *c, uint8_t* src[], int srcStride[], int srcSlic
             dst_2 += dst_delta;\
         }\
         if (c->dstW & 4) {\
-            int av_unused U, V;\
-            int Y;\
+            int av_unused Y, U, V;\
 
 #define EPILOG2()\
         }\
@@ -621,16 +600,16 @@ SwsFunc yuv2rgb_get_func_ptr (SwsContext *c)
         switch(c->dstFormat){
         case PIX_FMT_RGB32:  return yuv420_rgb32_MMX2;
         case PIX_FMT_BGR24:  return yuv420_rgb24_MMX2;
-        case PIX_FMT_BGR565: return yuv420_rgb16_MMX2;
-        case PIX_FMT_BGR555: return yuv420_rgb15_MMX2;
+        case PIX_FMT_RGB565: return yuv420_rgb16_MMX2;
+        case PIX_FMT_RGB555: return yuv420_rgb15_MMX2;
         }
     }
     if (c->flags & SWS_CPU_CAPS_MMX){
         switch(c->dstFormat){
         case PIX_FMT_RGB32:  return yuv420_rgb32_MMX;
         case PIX_FMT_BGR24:  return yuv420_rgb24_MMX;
-        case PIX_FMT_BGR565: return yuv420_rgb16_MMX;
-        case PIX_FMT_BGR555: return yuv420_rgb15_MMX;
+        case PIX_FMT_RGB565: return yuv420_rgb16_MMX;
+        case PIX_FMT_RGB555: return yuv420_rgb15_MMX;
         }
     }
 #endif
@@ -640,7 +619,7 @@ SwsFunc yuv2rgb_get_func_ptr (SwsContext *c)
         if (t) return t;
     }
 #endif
-#ifdef HAVE_MLIB
+#ifdef CONFIG_MLIB
     {
         SwsFunc t= yuv2rgb_init_mlib(c);
         if (t) return t;
@@ -662,9 +641,11 @@ SwsFunc yuv2rgb_get_func_ptr (SwsContext *c)
     }
 #endif
 
-    av_log(c, AV_LOG_WARNING, "No accelerated colorspace conversion found\n");
+    av_log(c, AV_LOG_WARNING, "No accelerated colorspace conversion found.\n");
 
     switch(c->dstFormat){
+    case PIX_FMT_BGR32_1:
+    case PIX_FMT_RGB32_1:
     case PIX_FMT_BGR32:
     case PIX_FMT_RGB32: return yuv2rgb_c_32;
     case PIX_FMT_RGB24: return yuv2rgb_c_24_rgb;
@@ -696,9 +677,17 @@ static int div_round (int dividend, int divisor)
 
 int yuv2rgb_c_init_tables (SwsContext *c, const int inv_table[4], int fullRange, int brightness, int contrast, int saturation)
 {
-    const int isRgb = isBGR(c->dstFormat);
+    const int isRgb =      c->dstFormat==PIX_FMT_RGB32
+                        || c->dstFormat==PIX_FMT_RGB32_1
+                        || c->dstFormat==PIX_FMT_BGR24
+                        || c->dstFormat==PIX_FMT_RGB565
+                        || c->dstFormat==PIX_FMT_RGB555
+                        || c->dstFormat==PIX_FMT_RGB8
+                        || c->dstFormat==PIX_FMT_RGB4
+                        || c->dstFormat==PIX_FMT_RGB4_BYTE
+                        || c->dstFormat==PIX_FMT_MONOBLACK;
     const int bpp = fmt_depth(c->dstFormat);
-    int i;
+    int i, base;
     uint8_t table_Y[1024];
     uint32_t *table_32 = 0;
     uint16_t *table_16 = 0;
@@ -747,6 +736,7 @@ int yuv2rgb_c_init_tables (SwsContext *c, const int inv_table[4], int fullRange,
     switch (bpp) {
     case 32:
         table_start= table_32 = av_malloc ((197 + 2*682 + 256 + 132) * sizeof (uint32_t));
+        base= (c->dstFormat == PIX_FMT_RGB32_1 || c->dstFormat == PIX_FMT_BGR32_1) ? 8 : 0;
 
         entry_size = sizeof (uint32_t);
         table_r = table_32 + 197;
@@ -754,11 +744,11 @@ int yuv2rgb_c_init_tables (SwsContext *c, const int inv_table[4], int fullRange,
         table_g = table_32 + 197 + 2*682;
 
         for (i = -197; i < 256+197; i++)
-            ((uint32_t *)table_r)[i] = table_Y[i+384] << (isRgb ? 16 : 0);
+            ((uint32_t *)table_r)[i] = table_Y[i+384] << ((isRgb ? 16 : 0) + base);
         for (i = -132; i < 256+132; i++)
-            ((uint32_t *)table_g)[i] = table_Y[i+384] << 8;
+            ((uint32_t *)table_g)[i] = table_Y[i+384] << (8                + base);
         for (i = -232; i < 256+232; i++)
-            ((uint32_t *)table_b)[i] = table_Y[i+384] << (isRgb ? 0 : 16);
+            ((uint32_t *)table_b)[i] = table_Y[i+384] << ((isRgb ? 0 : 16) + base);
         break;
 
     case 24:

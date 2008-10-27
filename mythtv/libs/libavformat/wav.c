@@ -30,11 +30,11 @@ typedef struct {
     int last_duration;
 } WAVContext;
 
-#ifdef CONFIG_MUXERS
+#ifdef CONFIG_WAV_MUXER
 static int wav_write_header(AVFormatContext *s)
 {
     WAVContext *wav = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     offset_t fmt, fact;
 
     put_tag(pb, "RIFF");
@@ -50,7 +50,7 @@ static int wav_write_header(AVFormatContext *s)
     end_tag(pb, fmt);
 
     if(s->streams[0]->codec->codec_tag != 0x01 /* hence for all other than PCM */
-       && !url_is_streamed(&s->pb)) {
+       && !url_is_streamed(s->pb)) {
         fact = start_tag(pb, "fact");
         put_le32(pb, 0);
         end_tag(pb, fact);
@@ -70,7 +70,7 @@ static int wav_write_header(AVFormatContext *s)
 
 static int wav_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     WAVContext *wav = s->priv_data;
     put_buffer(pb, pkt->data, pkt->size);
     if(pkt->pts != AV_NOPTS_VALUE) {
@@ -84,11 +84,11 @@ static int wav_write_packet(AVFormatContext *s, AVPacket *pkt)
 
 static int wav_write_trailer(AVFormatContext *s)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     WAVContext *wav = s->priv_data;
     offset_t file_size;
 
-    if (!url_is_streamed(&s->pb)) {
+    if (!url_is_streamed(s->pb)) {
         end_tag(pb, wav->data);
 
         /* update file size */
@@ -113,7 +113,7 @@ static int wav_write_trailer(AVFormatContext *s)
     }
     return 0;
 }
-#endif //CONFIG_MUXERS
+#endif /* CONFIG_WAV_MUXER */
 
 /* return the size of the found tag */
 /* XXX: > 2GB ? */
@@ -145,7 +145,12 @@ static int wav_probe(AVProbeData *p)
         p->buf[2] == 'F' && p->buf[3] == 'F' &&
         p->buf[8] == 'W' && p->buf[9] == 'A' &&
         p->buf[10] == 'V' && p->buf[11] == 'E')
-        return AVPROBE_SCORE_MAX;
+        /*
+          Since ACT demuxer has standard WAV header at top of it's own,
+          returning score is decreased to avoid probe conflict
+          between ACT and WAV.
+        */
+        return AVPROBE_SCORE_MAX - 1;
     else
         return 0;
 }
@@ -156,7 +161,7 @@ static int wav_read_header(AVFormatContext *s,
 {
     int size;
     unsigned int tag;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     AVStream *st;
     WAVContext *wav = s->priv_data;
 
@@ -199,17 +204,17 @@ static int wav_read_packet(AVFormatContext *s,
     AVStream *st;
     WAVContext *wav = s->priv_data;
 
-    if (url_feof(&s->pb))
+    if (url_feof(s->pb))
         return AVERROR(EIO);
     st = s->streams[0];
 
-    left= wav->data_end - url_ftell(&s->pb);
+    left= wav->data_end - url_ftell(s->pb);
     if(left <= 0){
-        left = find_tag(&(s->pb), MKTAG('d', 'a', 't', 'a'));
+        left = find_tag(s->pb, MKTAG('d', 'a', 't', 'a'));
         if (left < 0) {
             return AVERROR(EIO);
         }
-        wav->data_end= url_ftell(&s->pb) + left;
+        wav->data_end= url_ftell(s->pb) + left;
     }
 
     size = MAX_SIZE;
@@ -219,7 +224,7 @@ static int wav_read_packet(AVFormatContext *s,
         size = (size / st->codec->block_align) * st->codec->block_align;
     }
     size= FFMIN(size, left);
-    ret= av_get_packet(&s->pb, pkt, size);
+    ret= av_get_packet(s->pb, pkt, size);
     if (ret <= 0)
         return AVERROR(EIO);
     pkt->stream_index = 0;
@@ -228,11 +233,6 @@ static int wav_read_packet(AVFormatContext *s,
        packet */
     pkt->size = ret;
     return ret;
-}
-
-static int wav_read_close(AVFormatContext *s)
-{
-    return 0;
 }
 
 static int wav_read_seek(AVFormatContext *s,
@@ -257,21 +257,21 @@ static int wav_read_seek(AVFormatContext *s,
 #ifdef CONFIG_WAV_DEMUXER
 AVInputFormat wav_demuxer = {
     "wav",
-    "wav format",
+    NULL_IF_CONFIG_SMALL("WAV format"),
     sizeof(WAVContext),
     wav_probe,
     wav_read_header,
     wav_read_packet,
-    wav_read_close,
+    NULL,
     wav_read_seek,
     .flags= AVFMT_GENERIC_INDEX,
-    .codec_tag= (const AVCodecTag*[]){codec_wav_tags, 0},
+    .codec_tag= (const AVCodecTag* const []){codec_wav_tags, 0},
 };
 #endif
 #ifdef CONFIG_WAV_MUXER
 AVOutputFormat wav_muxer = {
     "wav",
-    "wav format",
+    NULL_IF_CONFIG_SMALL("WAV format"),
     "audio/x-wav",
     "wav",
     sizeof(WAVContext),
@@ -280,6 +280,6 @@ AVOutputFormat wav_muxer = {
     wav_write_header,
     wav_write_packet,
     wav_write_trailer,
-    .codec_tag= (const AVCodecTag*[]){codec_wav_tags, 0},
+    .codec_tag= (const AVCodecTag* const []){codec_wav_tags, 0},
 };
 #endif

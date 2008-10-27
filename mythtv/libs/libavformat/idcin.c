@@ -1,5 +1,5 @@
 /*
- * Id Quake II CIN File Demuxer
+ * id Quake II CIN File Demuxer
  * Copyright (c) 2003 The ffmpeg Project
  *
  * This file is part of FFmpeg.
@@ -21,8 +21,8 @@
 
 /**
  * @file idcin.c
- * Id Quake II CIN file demuxer by Mike Melanson (melanson@pcisys.net)
- * For more information about the Id CIN format, visit:
+ * id Quake II CIN file demuxer by Mike Melanson (melanson@pcisys.net)
+ * For more information about the id CIN format, visit:
  *   http://www.csse.monash.edu.au/~timf/
  *
  * CIN is a somewhat quirky and ill-defined format. Here are some notes
@@ -53,7 +53,7 @@
  *   audio frame #2: 787 * (bytes/sample) * (# channels) bytes in frame
  *   audio frame #3: 788 * (bytes/sample) * (# channels) bytes in frame
  *
- * Finally, not all Id CIN creation tools agree on the resolution of the
+ * Finally, not all id CIN creation tools agree on the resolution of the
  * color palette, apparently. Some creation tools specify red, green, and
  * blue palette components in terms of 6-bit VGA color DAC values which
  * range from 0..63. Other tools specify the RGB components as full 8-bit
@@ -71,7 +71,7 @@
 #include "avformat.h"
 
 #define HUFFMAN_TABLE_SIZE (64 * 1024)
-#define FRAME_PTS_INC (90000 / 14)
+#define IDCIN_FPS 14
 
 typedef struct IdcinDemuxContext {
     int video_stream_index;
@@ -94,7 +94,7 @@ static int idcin_probe(AVProbeData *p)
     unsigned int number;
 
     /*
-     * This is what you could call a "probabilistic" file check: Id CIN
+     * This is what you could call a "probabilistic" file check: id CIN
      * files don't have a definite file signature. In lieu of such a marker,
      * perform sanity checks on the 5 32-bit header fields:
      *  width, height: greater than 0, less than or equal to 1024
@@ -136,7 +136,7 @@ static int idcin_probe(AVProbeData *p)
 static int idcin_read_header(AVFormatContext *s,
                              AVFormatParameters *ap)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     IdcinDemuxContext *idcin = s->priv_data;
     AVStream *st;
     unsigned int width, height;
@@ -152,7 +152,7 @@ static int idcin_read_header(AVFormatContext *s,
     st = av_new_stream(s, 0);
     if (!st)
         return AVERROR(ENOMEM);
-    av_set_pts_info(st, 33, 1, 90000);
+    av_set_pts_info(st, 33, 1, IDCIN_FPS);
     idcin->video_stream_index = st->index;
     st->codec->codec_type = CODEC_TYPE_VIDEO;
     st->codec->codec_id = CODEC_ID_IDCIN;
@@ -175,7 +175,7 @@ static int idcin_read_header(AVFormatContext *s,
         st = av_new_stream(s, 0);
         if (!st)
             return AVERROR(ENOMEM);
-        av_set_pts_info(st, 33, 1, 90000);
+        av_set_pts_info(st, 33, 1, IDCIN_FPS);
         idcin->audio_stream_index = st->index;
         st->codec->codec_type = CODEC_TYPE_AUDIO;
         st->codec->codec_tag = 1;
@@ -215,13 +215,13 @@ static int idcin_read_packet(AVFormatContext *s,
     unsigned int command;
     unsigned int chunk_size;
     IdcinDemuxContext *idcin = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     int i;
     int palette_scale;
     unsigned char r, g, b;
     unsigned char palette_buffer[768];
 
-    if (url_feof(&s->pb))
+    if (url_feof(s->pb))
         return AVERROR(EIO);
 
     if (idcin->next_chunk_is_video) {
@@ -271,7 +271,7 @@ static int idcin_read_packet(AVFormatContext *s,
         pkt->pts = idcin->pts;
 
         idcin->current_audio_chunk ^= 1;
-        idcin->pts += FRAME_PTS_INC;
+        idcin->pts++;
     }
 
     if (idcin->audio_present)
@@ -280,18 +280,11 @@ static int idcin_read_packet(AVFormatContext *s,
     return ret;
 }
 
-static int idcin_read_close(AVFormatContext *s)
-{
-
-    return 0;
-}
-
 AVInputFormat idcin_demuxer = {
     "idcin",
-    "Id CIN format",
+    NULL_IF_CONFIG_SMALL("id CIN format"),
     sizeof(IdcinDemuxContext),
     idcin_probe,
     idcin_read_header,
     idcin_read_packet,
-    idcin_read_close,
 };

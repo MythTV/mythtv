@@ -19,16 +19,22 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+/* needed by inet_aton() */
+#define _SVID_SOURCE
+
 #include "config.h"
 #include "avformat.h"
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/time.h>
+#include "os_support.h"
 
-#ifdef CONFIG_NETWORK /* moved for MythTV MinGW support, ticket #4270 */
-#ifndef HAVE_SYS_POLL_H
+#ifdef CONFIG_NETWORK
+#ifndef HAVE_POLL_H
 #ifdef HAVE_WINSOCK2_H
 #include <winsock2.h>
-#else
+#elif defined (HAVE_SYS_SELECT_H)
 #include <sys/select.h>
 #endif
 #endif
@@ -63,7 +69,7 @@ int resolve_host(struct in_addr *sin_addr, const char *hostname)
         hp = gethostbyname(hostname);
         if (!hp)
             return -1;
-        memcpy(sin_addr, hp->h_addr, sizeof(struct in_addr));
+        memcpy(sin_addr, hp->h_addr_list[0], sizeof(struct in_addr));
     }
     return 0;
 }
@@ -82,7 +88,7 @@ int ff_socket_nonblock(int socket, int enable)
 #endif /* CONFIG_NETWORK */
 
 #ifdef CONFIG_FFSERVER
-#ifndef HAVE_SYS_POLL_H
+#ifndef HAVE_POLL_H
 int poll(struct pollfd *fds, nfds_t numfds, int timeout)
 {
     fd_set read_set;
@@ -149,6 +155,6 @@ int poll(struct pollfd *fds, nfds_t numfds, int timeout)
 
     return rc;
 }
-#endif /* HAVE_SYS_POLL_H */
+#endif /* HAVE_POLL_H */
 #endif /* CONFIG_FFSERVER */
 

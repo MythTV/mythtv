@@ -21,8 +21,7 @@
 
 #include "matroska.h"
 
-CodecTags ff_mkv_codec_tags[]={
-//    {"V_MS/VFW/FOURCC"  , CODEC_ID_NONE},
+const CodecTags ff_mkv_codec_tags[]={
     {"V_UNCOMPRESSED"   , CODEC_ID_RAWVIDEO},
     {"V_MPEG4/ISO/ASP"  , CODEC_ID_MPEG4},
     {"V_MPEG4/ISO/SP"   , CODEC_ID_MPEG4},
@@ -38,16 +37,21 @@ CodecTags ff_mkv_codec_tags[]={
     {"V_REAL/RV40"      , CODEC_ID_RV40},
     {"V_THEORA"         , CODEC_ID_THEORA},
     {"V_SNOW"           , CODEC_ID_SNOW},
-/* TODO: Real/Quicktime */
 
-//    {"A_MS/ACM"         , CODEC_ID_NONE},
     {"A_MPEG/L3"        , CODEC_ID_MP3},
     {"A_MPEG/L2"        , CODEC_ID_MP2},
     {"A_MPEG/L1"        , CODEC_ID_MP2},
-    {"A_PCM/INT/BIG"    , CODEC_ID_PCM_U16BE},
-    {"A_PCM/INT/LIT"    , CODEC_ID_PCM_U16LE},
-//    {"A_PCM/FLOAT/IEEE" , CODEC_ID_NONE},
+    {"A_PCM/INT/BIG"    , CODEC_ID_PCM_S16BE},
+    {"A_PCM/INT/BIG"    , CODEC_ID_PCM_S24BE},
+    {"A_PCM/INT/BIG"    , CODEC_ID_PCM_S32BE},
+    {"A_PCM/INT/LIT"    , CODEC_ID_PCM_S16LE},
+    {"A_PCM/INT/LIT"    , CODEC_ID_PCM_S24LE},
+    {"A_PCM/INT/LIT"    , CODEC_ID_PCM_S32LE},
+    {"A_PCM/INT/LIT"    , CODEC_ID_PCM_U8},
+    {"A_PCM/FLOAT/IEEE" , CODEC_ID_PCM_F32LE},
+    {"A_PCM/FLOAT/IEEE" , CODEC_ID_PCM_F64LE},
     {"A_AC3"            , CODEC_ID_AC3},
+    {"A_EAC3"           , CODEC_ID_EAC3},
     {"A_DTS"            , CODEC_ID_DTS},
     {"A_VORBIS"         , CODEC_ID_VORBIS},
     {"A_AAC"            , CODEC_ID_AAC},
@@ -59,15 +63,27 @@ CodecTags ff_mkv_codec_tags[]={
     {"A_REAL/ATRC"      , CODEC_ID_ATRAC3},
     {"A_REAL/COOK"      , CODEC_ID_COOK},
 //    {"A_REAL/SIPR"      , CODEC_ID_SIPRO},
+    {"A_QUICKTIME/QDM2" , CODEC_ID_QDM2},
 
     {"S_TEXT/UTF8"      , CODEC_ID_TEXT},
     {"S_TEXT/ASCII"     , CODEC_ID_TEXT},
-    {"S_TEXT/ASS"       , CODEC_ID_TEXT},
-    {"S_TEXT/SSA"       , CODEC_ID_TEXT},
-    {"S_ASS"            , CODEC_ID_TEXT},
-    {"S_SSA"            , CODEC_ID_TEXT},
+    {"S_TEXT/ASS"       , CODEC_ID_SSA},
+    {"S_TEXT/SSA"       , CODEC_ID_SSA},
+    {"S_ASS"            , CODEC_ID_SSA},
+    {"S_SSA"            , CODEC_ID_SSA},
     {"S_VOBSUB"         , CODEC_ID_DVD_SUBTITLE},
 
-    {NULL               , CODEC_ID_NONE}
-/* TODO: AC3-9/10 (?), Real, Musepack, Quicktime */
+    {""                 , CODEC_ID_NONE}
+};
+
+const CodecMime ff_mkv_mime_tags[] = {
+    {"text/plain"                 , CODEC_ID_TEXT},
+    {"image/gif"                  , CODEC_ID_GIF},
+    {"image/jpeg"                 , CODEC_ID_MJPEG},
+    {"image/png"                  , CODEC_ID_PNG},
+    {"image/tiff"                 , CODEC_ID_TIFF},
+    {"application/x-truetype-font", CODEC_ID_TTF},
+    {"application/x-font"         , CODEC_ID_TTF},
+
+    {""                           , CODEC_ID_NONE}
 };

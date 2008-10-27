@@ -133,14 +133,14 @@ ReSampleContext *audio_resample_init(int output_channels, int input_channels,
 
     if ( input_channels > 2)
       {
-        av_log(NULL, AV_LOG_ERROR, "Resampling with input channels greater than 2 unsupported.");
+        av_log(NULL, AV_LOG_ERROR, "Resampling with input channels greater than 2 unsupported.\n");
         return NULL;
       }
 
     s = av_mallocz(sizeof(ReSampleContext));
     if (!s)
       {
-        av_log(NULL, AV_LOG_ERROR, "Can't allocate memory for resample context.");
+        av_log(NULL, AV_LOG_ERROR, "Can't allocate memory for resample context.\n");
         return NULL;
       }
 
@@ -154,7 +154,7 @@ ReSampleContext *audio_resample_init(int output_channels, int input_channels,
         s->filter_channels = s->output_channels;
 
 /*
- * ac3 output is the only case where filter_channels could be greater than 2.
+ * AC-3 output is the only case where filter_channels could be greater than 2.
  * input channels can't be greater than 2, so resample the 2 channels and then
  * expand to 6 channels after the resampling.
  */
@@ -185,15 +185,15 @@ int audio_resample(ReSampleContext *s, short *output, short *input, int nb_sampl
 
     /* XXX: move those malloc to resample init code */
     for(i=0; i<s->filter_channels; i++){
-        bufin[i]= (short*) av_malloc( (nb_samples + s->temp_len) * sizeof(short) );
+        bufin[i]= av_malloc( (nb_samples + s->temp_len) * sizeof(short) );
         memcpy(bufin[i], s->temp[i], s->temp_len * sizeof(short));
         buftmp2[i] = bufin[i] + s->temp_len;
     }
 
     /* make some zoom to avoid round pb */
-    lenout= (int)(4*nb_samples * s->ratio) + 16;
-    bufout[0]= (short*) av_malloc( lenout * sizeof(short) );
-    bufout[1]= (short*) av_malloc( lenout * sizeof(short) );
+    lenout= 4*nb_samples * s->ratio + 16;
+    bufout[0]= av_malloc( lenout * sizeof(short) );
+    bufout[1]= av_malloc( lenout * sizeof(short) );
 
     if (s->input_channels == 2 &&
         s->output_channels == 1) {

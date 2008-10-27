@@ -8,7 +8,9 @@ CONFIG -= qt
 target.path = $${LIBDIR}
 INSTALLS = target
 
-INCLUDEPATH = ../ ../../
+QMAKE_LFLAGS += $$LDFLAGS
+
+INCLUDEPATH = .. ../..
 
 DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 
@@ -21,12 +23,12 @@ debug:contains(ARCH_X86_32, yes) {
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
-SOURCES += adler32.c mathematics.c integer.c lls.c log.c mem.c 
+SOURCES += adler32.c mathematics.c integer.c lfg.c lls.c log.c mem.c utils.c
 SOURCES += rational.c intfloat_readwrite.c crc.c des.c md5.c fifo.c
 SOURCES += aes.c tree.c lzo.c base64.c random.c rc4.c sha1.c string.c
 
-inc.path = $${PREFIX}/include/mythtv/ffmpeg/
-inc.files  = adler32.h avutil.h common.h mathematics.h integer.h internal.h 
+inc.path = $${PREFIX}/include/mythtv/libavutil/
+inc.files  = adler32.h avutil.h common.h crc.h mathematics.h internal.h
 inc.files += lls.h log.h rational.h intfloat_readwrite.h crc.h md5.h x86_cpu.h
 inc.files += softfloat.h fifo.h aes.h tree.h lzo.h base64.h random.h mem.h
 inc.files += sha1.h avstring.h

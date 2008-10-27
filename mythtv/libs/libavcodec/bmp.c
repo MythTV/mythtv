@@ -23,7 +23,7 @@
 #include "bytestream.h"
 #include "bmp.h"
 
-static int bmp_decode_init(AVCodecContext *avctx){
+static av_cold int bmp_decode_init(AVCodecContext *avctx){
     BMPContext *s = avctx->priv_data;
 
     avcodec_get_frame_defaults((AVFrame*)&s->picture);
@@ -34,7 +34,7 @@ static int bmp_decode_init(AVCodecContext *avctx){
 
 static int bmp_decode_frame(AVCodecContext *avctx,
                             void *data, int *data_size,
-                            uint8_t *buf, int buf_size)
+                            const uint8_t *buf, int buf_size)
 {
     BMPContext *s = avctx->priv_data;
     AVFrame *picture = data;
@@ -48,7 +48,7 @@ static int bmp_decode_frame(AVCodecContext *avctx,
     uint32_t rgb[3];
     uint8_t *ptr;
     int dsize;
-    uint8_t *buf0 = buf;
+    const uint8_t *buf0 = buf;
 
     if(buf_size < 14){
         av_log(avctx, AV_LOG_ERROR, "buf size too small (%d)\n", buf_size);
@@ -84,8 +84,16 @@ static int bmp_decode_frame(AVCodecContext *avctx,
         return -1;
     }
 
-    width = bytestream_get_le32(&buf);
-    height = bytestream_get_le32(&buf);
+    if (ihsize == 40) {
+        width = bytestream_get_le32(&buf);
+        height = bytestream_get_le32(&buf);
+    } else if (ihsize == 12) {
+        width  = bytestream_get_le16(&buf);
+        height = bytestream_get_le16(&buf);
+    } else {
+        av_log(avctx, AV_LOG_ERROR, "unsupported BMP file, patch welcome");
+        return -1;
+    }
 
     if(bytestream_get_le16(&buf) != 1){ /* planes */
         av_log(avctx, AV_LOG_ERROR, "invalid BMP header\n");
@@ -94,7 +102,7 @@ static int bmp_decode_frame(AVCodecContext *avctx,
 
     depth = bytestream_get_le16(&buf);
 
-    if(ihsize > 16)
+    if(ihsize == 40)
         comp = bytestream_get_le32(&buf);
     else
         comp = BMP_RGB;
@@ -193,7 +201,7 @@ static int bmp_decode_frame(AVCodecContext *avctx,
         break;
     case 16:
         for(i = 0; i < avctx->height; i++){
-            uint16_t *src = (uint16_t *) buf;
+            const uint16_t *src = (const uint16_t *) buf;
             uint16_t *dst = (uint16_t *) ptr;
 
             for(j = 0; j < avctx->width; j++)
@@ -205,7 +213,7 @@ static int bmp_decode_frame(AVCodecContext *avctx,
         break;
     case 32:
         for(i = 0; i < avctx->height; i++){
-            uint8_t *src = buf;
+            const uint8_t *src = buf;
             uint8_t *dst = ptr;
 
             for(j = 0; j < avctx->width; j++){
@@ -231,7 +239,7 @@ static int bmp_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int bmp_decode_end(AVCodecContext *avctx)
+static av_cold int bmp_decode_end(AVCodecContext *avctx)
 {
     BMPContext* c = avctx->priv_data;
 
@@ -249,5 +257,6 @@ AVCodec bmp_decoder = {
     bmp_decode_init,
     NULL,
     bmp_decode_end,
-    bmp_decode_frame
+    bmp_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("BMP image"),
 };

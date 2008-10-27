@@ -18,8 +18,9 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+#include "libavutil/adler32.h"
 #include "avformat.h"
-#include "adler32.h"
 
 static int framecrc_write_packet(struct AVFormatContext *s, AVPacket *pkt)
 {
@@ -27,14 +28,14 @@ static int framecrc_write_packet(struct AVFormatContext *s, AVPacket *pkt)
     char buf[256];
 
     snprintf(buf, sizeof(buf), "%d, %"PRId64", %d, 0x%08x\n", pkt->stream_index, pkt->dts, pkt->size, crc);
-    put_buffer(&s->pb, buf, strlen(buf));
-    put_flush_packet(&s->pb);
+    put_buffer(s->pb, buf, strlen(buf));
+    put_flush_packet(s->pb);
     return 0;
 }
 
 AVOutputFormat framecrc_muxer = {
     "framecrc",
-    "framecrc testing format",
+    NULL_IF_CONFIG_SMALL("framecrc testing format"),
     NULL,
     "",
     0,

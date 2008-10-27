@@ -38,9 +38,7 @@
 #include "h264utils.h"
 
 extern "C" {
-// from libavcodec
-extern const uint8_t *ff_find_start_code(const uint8_t * p, const uint8_t *end, uint32_t * state);
-#include "avcodec.h"
+#include "../libavcodec/mpegvideo.h"
 }
 
 namespace H264

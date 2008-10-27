@@ -104,9 +104,9 @@ int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
     binfo.picture_structure = s->picture_structure;
     switch (s->pict_type)
     {
-        case I_TYPE:  binfo.picture_coding_type = XVMC_I_PICTURE;  break;
-        case P_TYPE:  binfo.picture_coding_type = XVMC_P_PICTURE;  break;
-        case B_TYPE:  binfo.picture_coding_type = XVMC_B_PICTURE;  break;
+        case FF_I_TYPE:  binfo.picture_coding_type = XVMC_I_PICTURE;  break;
+        case FF_P_TYPE:  binfo.picture_coding_type = XVMC_P_PICTURE;  break;
+        case FF_B_TYPE:  binfo.picture_coding_type = XVMC_B_PICTURE;  break;
         default:      av_log(avctx, AV_LOG_ERROR,
                              "%s: Unknown picture coding type: %d\n",
                              __FUNCTION__, s->pict_type);

@@ -187,7 +187,7 @@ static int decode_13(AVCodecContext *avctx, DxaDecContext *c, uint8_t* dst, uint
     return 0;
 }
 
-static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8_t *buf, int buf_size)
+static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, const uint8_t *buf, int buf_size)
 {
     DxaDecContext * const c = avctx->priv_data;
     uint8_t *outptr, *srcptr, *tmpptr;
@@ -285,7 +285,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
     return orig_buf_size;
 }
 
-static int decode_init(AVCodecContext *avctx)
+static av_cold int decode_init(AVCodecContext *avctx)
 {
     DxaDecContext * const c = avctx->priv_data;
 
@@ -305,7 +305,7 @@ static int decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-static int decode_end(AVCodecContext *avctx)
+static av_cold int decode_end(AVCodecContext *avctx)
 {
     DxaDecContext * const c = avctx->priv_data;
 
@@ -326,6 +326,7 @@ AVCodec dxa_decoder = {
     decode_init,
     NULL,
     decode_end,
-    decode_frame
+    decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("Feeble Files/ScummVM DXA"),
 };
 

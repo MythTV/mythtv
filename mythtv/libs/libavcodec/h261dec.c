@@ -48,7 +48,7 @@ static VLC h261_cbp_vlc;
 
 static int h261_decode_block(H261Context * h, DCTELEM * block, int n, int coded);
 
-static void h261_decode_init_vlc(H261Context *h){
+static av_cold void h261_decode_init_vlc(H261Context *h){
     static int done = 0;
 
     if(!done){
@@ -66,11 +66,11 @@ static void h261_decode_init_vlc(H261Context *h){
                  &h261_cbp_tab[0][1], 2, 1,
                  &h261_cbp_tab[0][0], 2, 1, 1);
         init_rl(&h261_rl_tcoeff, ff_h261_rl_table_store);
-        init_vlc_rl(&h261_rl_tcoeff, 1);
+        INIT_VLC_RL(h261_rl_tcoeff, 552);
     }
 }
 
-static int h261_decode_init(AVCodecContext *avctx){
+static av_cold int h261_decode_init(AVCodecContext *avctx){
     H261Context *h= avctx->priv_data;
     MpegEncContext * const s = &h->s;
 
@@ -97,7 +97,7 @@ static int h261_decode_init(AVCodecContext *avctx){
 
 /**
  * decodes the group of blocks header or slice header.
- * @return <0 if an error occured
+ * @return <0 if an error occurred
  */
 static int h261_decode_gob_header(H261Context *h){
     unsigned int val;
@@ -133,8 +133,11 @@ static int h261_decode_gob_header(H261Context *h){
         skip_bits(&s->gb, 8);
     }
 
-    if(s->qscale==0)
-        return -1;
+    if(s->qscale==0) {
+        av_log(s->avctx, AV_LOG_ERROR, "qscale has forbidden 0 value\n");
+        if (s->avctx->error_resilience >= FF_ER_COMPLIANT)
+            return -1;
+    }
 
     // For the first transmitted macroblock in a GOB, MBA is the absolute address. For
     // subsequent macroblocks, MBA is the difference between the absolute addresses of
@@ -352,7 +355,7 @@ intra:
 
 /**
  * decodes a macroblock
- * @return <0 if an error occured
+ * @return <0 if an error occurred
  */
 static int h261_decode_block(H261Context * h, DCTELEM * block,
                              int n, int coded)
@@ -493,9 +496,9 @@ static int h261_decode_picture_header(H261Context *h){
         skip_bits(&s->gb, 8);
     }
 
-    // h261 has no I-FRAMES, but if we pass I_TYPE for the first frame, the codec crashes if it does
+    // h261 has no I-FRAMES, but if we pass FF_I_TYPE for the first frame, the codec crashes if it does
     // not contain all I-blocks (e.g. when a packet is lost)
-    s->pict_type = P_TYPE;
+    s->pict_type = FF_P_TYPE;
 
     h->gob_number = 0;
     return 0;
@@ -540,7 +543,7 @@ static int get_consumed_bytes(MpegEncContext *s, int buf_size){
 
 static int h261_decode_frame(AVCodecContext *avctx,
                              void *data, int *data_size,
-                             uint8_t *buf, int buf_size)
+                             const uint8_t *buf, int buf_size)
 {
     H261Context *h= avctx->priv_data;
     MpegEncContext *s = &h->s;
@@ -593,12 +596,12 @@ retry:
 
     // for hurry_up==5
     s->current_picture.pict_type= s->pict_type;
-    s->current_picture.key_frame= s->pict_type == I_TYPE;
+    s->current_picture.key_frame= s->pict_type == FF_I_TYPE;
 
     /* skip everything if we are in a hurry>=5 */
     if(avctx->hurry_up>=5) return get_consumed_bytes(s, buf_size);
-    if(  (avctx->skip_frame >= AVDISCARD_NONREF && s->pict_type==B_TYPE)
-       ||(avctx->skip_frame >= AVDISCARD_NONKEY && s->pict_type!=I_TYPE)
+    if(  (avctx->skip_frame >= AVDISCARD_NONREF && s->pict_type==FF_B_TYPE)
+       ||(avctx->skip_frame >= AVDISCARD_NONKEY && s->pict_type!=FF_I_TYPE)
        || avctx->skip_frame >= AVDISCARD_ALL)
         return get_consumed_bytes(s, buf_size);
 
@@ -628,7 +631,7 @@ assert(s->current_picture.pict_type == s->pict_type);
     return get_consumed_bytes(s, buf_size);
 }
 
-static int h261_decode_end(AVCodecContext *avctx)
+static av_cold int h261_decode_end(AVCodecContext *avctx)
 {
     H261Context *h= avctx->priv_data;
     MpegEncContext *s = &h->s;
@@ -647,4 +650,5 @@ AVCodec h261_decoder = {
     h261_decode_end,
     h261_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("H.261"),
 };

@@ -50,7 +50,7 @@
 #define TAG(name, field)  {name, offsetof(AVFormatContext, field), sizeof(((AVFormatContext *)0)->field)}
 
 static const struct {
-    char *name;
+    const char *name;
     int offset;
     int size;
 } tags[] = {
@@ -110,7 +110,7 @@ typedef struct {
 
 static void ape_tag_read_field(AVFormatContext *s)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     uint8_t buf[1024];
     uint32_t size;
     int i;
@@ -143,7 +143,7 @@ static void ape_tag_read_field(AVFormatContext *s)
 
 static void ape_parse_tag(AVFormatContext *s)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     int file_size = url_fsize(pb);
     uint32_t val, fields, tag_bytes;
     uint8_t buf[8];
@@ -156,7 +156,6 @@ static void ape_parse_tag(AVFormatContext *s)
 
     get_buffer(pb, buf, 8);    /* APETAGEX */
     if (strncmp(buf, "APETAGEX", 8)) {
-        av_log(NULL, AV_LOG_ERROR, "Invalid APE Tags\n");
         return;
     }
 
@@ -270,7 +269,7 @@ static void ape_dumpinfo(APEContext * ape_ctx)
 
 static int ape_read_header(AVFormatContext * s, AVFormatParameters * ap)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     APEContext *ape = s->priv_data;
     AVStream *st;
     uint32_t tag;
@@ -456,12 +455,12 @@ static int ape_read_packet(AVFormatContext * s, AVPacket * pkt)
     APEContext *ape = s->priv_data;
     uint32_t extra_size = 8;
 
-    if (url_feof(&s->pb))
+    if (url_feof(s->pb))
         return AVERROR_IO;
     if (ape->currentframe > ape->totalframes)
         return AVERROR_IO;
 
-    url_fseek (&s->pb, ape->frames[ape->currentframe].pos, SEEK_SET);
+    url_fseek (s->pb, ape->frames[ape->currentframe].pos, SEEK_SET);
 
     /* Calculate how many blocks there are in this frame */
     if (ape->currentframe == (ape->totalframes - 1))
@@ -474,7 +473,7 @@ static int ape_read_packet(AVFormatContext * s, AVPacket * pkt)
 
     AV_WL32(pkt->data    , nblocks);
     AV_WL32(pkt->data + 4, ape->frames[ape->currentframe].skip);
-    ret = get_buffer(&s->pb, pkt->data + extra_size, ape->frames[ape->currentframe].size);
+    ret = get_buffer(s->pb, pkt->data + extra_size, ape->frames[ape->currentframe].size);
 
     pkt->pts = ape->frames[ape->currentframe].pts;
     pkt->stream_index = 0;
@@ -512,7 +511,7 @@ static int ape_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp
 
 AVInputFormat ape_demuxer = {
     "ape",
-    "Monkey's Audio",
+    NULL_IF_CONFIG_SMALL("Monkey's Audio"),
     sizeof(APEContext),
     ape_probe,
     ape_read_header,

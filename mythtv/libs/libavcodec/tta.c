@@ -76,7 +76,7 @@ static const uint32_t shift_1[] = {
     0x80000000, 0x80000000, 0x80000000, 0x80000000
 };
 
-static const uint32_t *shift_16 = shift_1 + 4;
+static const uint32_t * const shift_16 = shift_1 + 4;
 #endif
 
 #define MAX_ORDER 16
@@ -87,7 +87,7 @@ typedef struct TTAFilter {
     int32_t dl[MAX_ORDER];
 } TTAFilter;
 
-static int32_t ttafilter_configs[4][2] = {
+static const int32_t ttafilter_configs[4][2] = {
     {10, 1},
     {9, 1},
     {10, 1},
@@ -197,7 +197,7 @@ static int tta_get_unary(GetBitContext *gb)
     return ret;
 }
 
-static int tta_decode_init(AVCodecContext * avctx)
+static av_cold int tta_decode_init(AVCodecContext * avctx)
 {
     TTAContext *s = avctx->priv_data;
     int i;
@@ -287,7 +287,7 @@ static int tta_decode_init(AVCodecContext * avctx)
 
 static int tta_decode_frame(AVCodecContext *avctx,
         void *data, int *data_size,
-        uint8_t *buf, int buf_size)
+        const uint8_t *buf, int buf_size)
 {
     TTAContext *s = avctx->priv_data;
     int i;
@@ -425,7 +425,7 @@ static int tta_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int tta_decode_close(AVCodecContext *avctx) {
+static av_cold int tta_decode_close(AVCodecContext *avctx) {
     TTAContext *s = avctx->priv_data;
 
     if (s->decode_buffer)
@@ -443,4 +443,5 @@ AVCodec tta_decoder = {
     NULL,
     tta_decode_close,
     tta_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("True Audio"),
 };

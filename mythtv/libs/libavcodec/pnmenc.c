@@ -23,7 +23,7 @@
 #include "pnm.h"
 
 
-static int common_init(AVCodecContext *avctx){
+static av_cold int common_init(AVCodecContext *avctx){
     PNMContext *s = avctx->priv_data;
 
     avcodec_get_frame_defaults((AVFrame*)&s->picture);
@@ -34,7 +34,7 @@ static int common_init(AVCodecContext *avctx){
 
 static int pnm_decode_frame(AVCodecContext *avctx,
                         void *data, int *data_size,
-                        uint8_t *buf, int buf_size)
+                        const uint8_t *buf, int buf_size)
 {
     PNMContext * const s = avctx->priv_data;
     AVFrame *picture = data;
@@ -364,7 +364,8 @@ AVCodec pgm_encoder = {
     pnm_encode_frame,
     NULL, //encode_end,
     pnm_decode_frame,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_GRAY8, PIX_FMT_GRAY16BE, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_GRAY8, PIX_FMT_GRAY16BE, PIX_FMT_NONE},
+    .long_name= NULL_IF_CONFIG_SMALL("PGM (Portable GrayMap) image"),
 };
 #endif // CONFIG_PGM_ENCODER
 
@@ -378,7 +379,8 @@ AVCodec pgmyuv_encoder = {
     pnm_encode_frame,
     NULL, //encode_end,
     pnm_decode_frame,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
+    .long_name= NULL_IF_CONFIG_SMALL("PGMYUV (Portable GrayMap YUV) image"),
 };
 #endif // CONFIG_PGMYUV_ENCODER
 
@@ -392,7 +394,8 @@ AVCodec ppm_encoder = {
     pnm_encode_frame,
     NULL, //encode_end,
     pnm_decode_frame,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_RGB24, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_RGB24, PIX_FMT_NONE},
+    .long_name= NULL_IF_CONFIG_SMALL("PPM (Portable PixelMap) image"),
 };
 #endif // CONFIG_PPM_ENCODER
 
@@ -406,7 +409,8 @@ AVCodec pbm_encoder = {
     pnm_encode_frame,
     NULL, //encode_end,
     pnm_decode_frame,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_MONOWHITE, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_MONOWHITE, PIX_FMT_NONE},
+    .long_name= NULL_IF_CONFIG_SMALL("PBM (Portable BitMap) image"),
 };
 #endif // CONFIG_PBM_ENCODER
 
@@ -420,6 +424,7 @@ AVCodec pam_encoder = {
     pam_encode_frame,
     NULL, //encode_end,
     pnm_decode_frame,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_RGB24, PIX_FMT_RGB32, PIX_FMT_GRAY8, PIX_FMT_MONOWHITE, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_RGB24, PIX_FMT_RGB32, PIX_FMT_GRAY8, PIX_FMT_MONOWHITE, PIX_FMT_NONE},
+    .long_name= NULL_IF_CONFIG_SMALL("PAM (Portable AnyMap) image"),
 };
 #endif // CONFIG_PAM_ENCODER

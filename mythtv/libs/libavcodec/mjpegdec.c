@@ -64,16 +64,16 @@ static int build_vlc(VLC *vlc, const uint8_t *bits_table, const uint8_t *val_tab
 
 static void build_basic_mjpeg_vlc(MJpegDecodeContext * s) {
     build_vlc(&s->vlcs[0][0], ff_mjpeg_bits_dc_luminance,
-              ff_mjpeg_val_dc_luminance, 12, 0, 0);
+              ff_mjpeg_val_dc, 12, 0, 0);
     build_vlc(&s->vlcs[0][1], ff_mjpeg_bits_dc_chrominance,
-              ff_mjpeg_val_dc_chrominance, 12, 0, 0);
+              ff_mjpeg_val_dc, 12, 0, 0);
     build_vlc(&s->vlcs[1][0], ff_mjpeg_bits_ac_luminance,
               ff_mjpeg_val_ac_luminance, 251, 0, 1);
     build_vlc(&s->vlcs[1][1], ff_mjpeg_bits_ac_chrominance,
               ff_mjpeg_val_ac_chrominance, 251, 0, 1);
 }
 
-int ff_mjpeg_decode_init(AVCodecContext *avctx)
+av_cold int ff_mjpeg_decode_init(AVCodecContext *avctx)
 {
     MJpegDecodeContext *s = avctx->priv_data;
 
@@ -332,7 +332,7 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
         av_log(s->avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return -1;
     }
-    s->picture.pict_type= I_TYPE;
+    s->picture.pict_type= FF_I_TYPE;
     s->picture.key_frame= 1;
 
     for(i=0; i<3; i++){
@@ -834,7 +834,8 @@ int ff_mjpeg_decode_sos(MJpegDecodeContext *s)
 //            for(){
 //            reset_ls_coding_parameters(s, 0);
 
-            ff_jpegls_decode_picture(s, predictor, point_transform, ilv);
+            if(ff_jpegls_decode_picture(s, predictor, point_transform, ilv) < 0)
+                return -1;
         }else{
             if(s->rgb){
                 if(ljpeg_decode_rgb_scan(s, predictor, point_transform) < 0)
@@ -1073,9 +1074,9 @@ static int valid_marker_list[] =
 
 /* return the 8 bit start code value and update the search
    state. Return -1 if no start code found */
-static int find_marker(uint8_t **pbuf_ptr, uint8_t *buf_end)
+static int find_marker(const uint8_t **pbuf_ptr, const uint8_t *buf_end)
 {
-    uint8_t *buf_ptr;
+    const uint8_t *buf_ptr;
     unsigned int v, v2;
     int val;
 #ifdef DEBUG
@@ -1105,10 +1106,10 @@ found:
 
 int ff_mjpeg_decode_frame(AVCodecContext *avctx,
                               void *data, int *data_size,
-                              uint8_t *buf, int buf_size)
+                              const uint8_t *buf, int buf_size)
 {
     MJpegDecodeContext *s = avctx->priv_data;
-    uint8_t *buf_end, *buf_ptr;
+    const uint8_t *buf_end, *buf_ptr;
     int start_code;
     AVFrame *picture = data;
 
@@ -1136,7 +1137,7 @@ int ff_mjpeg_decode_frame(AVCodecContext *avctx,
                 /* unescape buffer of SOS, use special treatment for JPEG-LS */
                 if (start_code == SOS && !s->ls)
                 {
-                    uint8_t *src = buf_ptr;
+                    const uint8_t *src = buf_ptr;
                     uint8_t *dst = s->buffer;
 
                     while (src<buf_end)
@@ -1163,7 +1164,7 @@ int ff_mjpeg_decode_frame(AVCodecContext *avctx,
                            (buf_end - buf_ptr) - (dst - s->buffer));
                 }
                 else if(start_code == SOS && s->ls){
-                    uint8_t *src = buf_ptr;
+                    const uint8_t *src = buf_ptr;
                     uint8_t *dst = s->buffer;
                     int bit_count = 0;
                     int t = 0, b = 0;
@@ -1284,7 +1285,7 @@ eoi_parser:
                         *data_size = sizeof(AVFrame);
 
                         if(!s->lossless){
-                            picture->quality= FFMAX(FFMAX(s->qscale[0], s->qscale[1]), s->qscale[2]);
+                            picture->quality= FFMAX3(s->qscale[0], s->qscale[1], s->qscale[2]);
                             picture->qstride= 0;
                             picture->qscale_table= s->qscale_table;
                             memset(picture->qscale_table, picture->quality, (s->width+15)/16);
@@ -1338,7 +1339,7 @@ the_end:
     return buf_ptr - buf;
 }
 
-int ff_mjpeg_decode_end(AVCodecContext *avctx)
+av_cold int ff_mjpeg_decode_end(AVCodecContext *avctx)
 {
     MJpegDecodeContext *s = avctx->priv_data;
     int i, j;
@@ -1363,7 +1364,8 @@ AVCodec mjpeg_decoder = {
     ff_mjpeg_decode_end,
     ff_mjpeg_decode_frame,
     CODEC_CAP_DR1,
-    NULL
+    NULL,
+    .long_name = NULL_IF_CONFIG_SMALL("MJPEG (Motion JPEG)"),
 };
 
 AVCodec thp_decoder = {
@@ -1376,5 +1378,6 @@ AVCodec thp_decoder = {
     ff_mjpeg_decode_end,
     ff_mjpeg_decode_frame,
     CODEC_CAP_DR1,
-    NULL
+    NULL,
+    .long_name = NULL_IF_CONFIG_SMALL("Nintendo Gamecube THP video"),
 };

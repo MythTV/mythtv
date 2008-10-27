@@ -18,13 +18,36 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+#include "libavutil/avstring.h"
+#include "libavcodec/opt.h"
 #include "avformat.h"
-#include "avstring.h"
+
+#if LIBAVFORMAT_VERSION_MAJOR >= 53
+/** @name Logging context. */
+/*@{*/
+static const char *urlcontext_to_name(void *ptr)
+{
+    URLContext *h = (URLContext *)ptr;
+    if(h->prot) return h->prot->name;
+    else        return "NULL";
+}
+static const AVOption options[] = {{NULL}};
+static const AVClass urlcontext_class =
+        { "URLContext", urlcontext_to_name, options };
+/*@}*/
+#endif
 
 static int default_interrupt_cb(void);
 
 URLProtocol *first_protocol = NULL;
 URLInterruptCB *url_interrupt_cb = default_interrupt_cb;
+
+URLProtocol *av_protocol_next(URLProtocol *p)
+{
+    if(p) return p->next;
+    else  return first_protocol;
+}
 
 int register_protocol(URLProtocol *protocol)
 {
@@ -36,13 +59,50 @@ int register_protocol(URLProtocol *protocol)
     return 0;
 }
 
-int url_open(URLContext **puc, const char *filename, int flags)
+int url_open_protocol (URLContext **puc, struct URLProtocol *up,
+                       const char *filename, int flags)
 {
     URLContext *uc;
+    int err;
+
+    uc = av_malloc(sizeof(URLContext) + strlen(filename) + 1);
+    if (!uc) {
+        err = AVERROR(ENOMEM);
+        goto fail;
+    }
+#if LIBAVFORMAT_VERSION_MAJOR >= 53
+    uc->av_class = &urlcontext_class;
+#endif
+    uc->filename = (char *) &uc[1];
+    strcpy(uc->filename, filename);
+    uc->prot = up;
+    uc->flags = flags;
+    uc->is_streamed = 0; /* default = not streamed */
+    uc->max_packet_size = 0; /* default: stream file */
+    err = up->url_open(uc, filename, flags);
+    if (err < 0) {
+        av_free(uc);
+        *puc = NULL;
+        return err;
+    }
+
+    //We must be carefull here as url_seek() could be slow, for example for http
+    if(   (flags & (URL_WRONLY | URL_RDWR))
+       || !strcmp(up->name, "file"))
+        if(!uc->is_streamed && url_seek(uc, 0, SEEK_SET) < 0)
+            uc->is_streamed= 1;
+    *puc = uc;
+    return 0;
+ fail:
+    *puc = NULL;
+    return err;
+}
+
+int url_open(URLContext **puc, const char *filename, int flags)
+{
     URLProtocol *up;
     const char *p;
     char proto_str[128], *q;
-    int err;
 
     p = filename;
     q = proto_str;
@@ -65,36 +125,11 @@ int url_open(URLContext **puc, const char *filename, int flags)
     up = first_protocol;
     while (up != NULL) {
         if (!strcmp(proto_str, up->name))
-            goto found;
+            return url_open_protocol (puc, up, filename, flags);
         up = up->next;
     }
-    err = AVERROR(ENOENT);
-    goto fail;
- found:
-    uc = av_malloc(sizeof(URLContext) + strlen(filename) + 1);
-    if (!uc) {
-        err = AVERROR(ENOMEM);
-        goto fail;
-    }
-#if LIBAVFORMAT_VERSION_INT >= (52<<16)
-    uc->filename = (char *) &uc[1];
-#endif
-    strcpy(uc->filename, filename);
-    uc->prot = up;
-    uc->flags = flags;
-    uc->is_streamed = 0; /* default = not streamed */
-    uc->max_packet_size = 0; /* default: stream file */
-    err = up->url_open(uc, filename, flags);
-    if (err < 0) {
-        av_free(uc);
-        *puc = NULL;
-        return err;
-    }
-    *puc = uc;
-    return 0;
- fail:
     *puc = NULL;
-    return err;
+    return AVERROR(ENOENT);
 }
 
 int url_read(URLContext *h, unsigned char *buf, int size)
@@ -106,7 +141,6 @@ int url_read(URLContext *h, unsigned char *buf, int size)
     return ret;
 }
 
-#if defined(CONFIG_MUXERS) || defined(CONFIG_PROTOCOLS)
 int url_write(URLContext *h, unsigned char *buf, int size)
 {
     int ret;
@@ -118,7 +152,6 @@ int url_write(URLContext *h, unsigned char *buf, int size)
     ret = h->prot->url_write(h, buf, size);
     return ret;
 }
-#endif //CONFIG_MUXERS || CONFIG_PROTOCOLS
 
 offset_t url_seek(URLContext *h, offset_t pos, int whence)
 {
@@ -186,4 +219,19 @@ void url_set_interrupt_cb(URLInterruptCB *interrupt_cb)
     if (!interrupt_cb)
         interrupt_cb = default_interrupt_cb;
     url_interrupt_cb = interrupt_cb;
+}
+
+int av_url_read_pause(URLContext *h, int pause)
+{
+    if (!h->prot->url_read_pause)
+        return AVERROR(ENOSYS);
+    return h->prot->url_read_pause(h, pause);
+}
+
+offset_t av_url_read_seek(URLContext *h,
+        int stream_index, int64_t timestamp, int flags)
+{
+    if (!h->prot->url_read_seek)
+        return AVERROR(ENOSYS);
+    return h->prot->url_read_seek(h, stream_index, timestamp, flags);
 }

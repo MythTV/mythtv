@@ -72,8 +72,8 @@ static int vmd_read_header(AVFormatContext *s,
                            AVFormatParameters *ap)
 {
     VmdDemuxContext *vmd = s->priv_data;
-    ByteIOContext *pb = &s->pb;
-    AVStream *st, *vst;
+    ByteIOContext *pb = s->pb;
+    AVStream *st = NULL, *vst;
     unsigned int toc_offset;
     unsigned char *raw_frame_table;
     int raw_frame_table_size;
@@ -146,11 +146,11 @@ static int vmd_read_header(AVFormatContext *s,
     vmd->frame_table = NULL;
     sound_buffers = AV_RL16(&vmd->vmd_header[808]);
     raw_frame_table_size = vmd->frame_count * 6;
-    raw_frame_table = av_malloc(raw_frame_table_size);
     if(vmd->frame_count * vmd->frames_per_block  >= UINT_MAX / sizeof(vmd_frame_t)){
         av_log(s, AV_LOG_ERROR, "vmd->frame_count * vmd->frames_per_block too large\n");
         return -1;
     }
+    raw_frame_table = av_malloc(raw_frame_table_size);
     vmd->frame_table = av_malloc((vmd->frame_count * vmd->frames_per_block + sound_buffers) * sizeof(vmd_frame_t));
     if (!raw_frame_table || !vmd->frame_table) {
         av_free(raw_frame_table);
@@ -181,6 +181,7 @@ static int vmd_read_header(AVFormatContext *s,
                 continue;
             switch(type) {
             case 1: /* Audio Chunk */
+                if (!st) break;
                 /* first audio chunk contains several audio buffers */
                 if(current_audio_pts){
                     vmd->frame_table[total_frames].frame_offset = current_offset;
@@ -245,7 +246,7 @@ static int vmd_read_packet(AVFormatContext *s,
                            AVPacket *pkt)
 {
     VmdDemuxContext *vmd = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     int ret = 0;
     vmd_frame_t *frame;
 
@@ -290,7 +291,7 @@ static int vmd_read_close(AVFormatContext *s)
 
 AVInputFormat vmd_demuxer = {
     "vmd",
-    "Sierra VMD format",
+    NULL_IF_CONFIG_SMALL("Sierra VMD format"),
     sizeof(VmdDemuxContext),
     vmd_probe,
     vmd_read_header,

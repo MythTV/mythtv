@@ -19,8 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_ARMV4L_MATHOPS_H
-#define FFMPEG_ARMV4L_MATHOPS_H
+#ifndef AVCODEC_ARMV4L_MATHOPS_H
+#define AVCODEC_ARMV4L_MATHOPS_H
 
 #ifdef FRAC_BITS
 #   define MULL(a, b) \
@@ -33,10 +33,39 @@
          hi; })
 #endif
 
+#ifdef HAVE_ARMV6
+static inline av_const int MULH(int a, int b)
+{
+    int r;
+    asm ("smmul %0, %1, %2" : "=r"(r) : "r"(a), "r"(b));
+    return r;
+}
+#define MULH MULH
+#else
 #define MULH(a, b) \
     ({ int lo, hi;\
      asm ("smull %0, %1, %2, %3" : "=&r"(lo), "=&r"(hi) : "r"(b), "r"(a));\
      hi; })
+#endif
+
+static inline av_const int64_t MUL64(int a, int b)
+{
+    union { uint64_t x; unsigned hl[2]; } x;
+    asm ("smull %0, %1, %2, %3"
+         : "=r"(x.hl[0]), "=r"(x.hl[1]) : "r"(a), "r"(b));
+    return x.x;
+}
+#define MUL64 MUL64
+
+static inline av_const int64_t MAC64(int64_t d, int a, int b)
+{
+    union { uint64_t x; unsigned hl[2]; } x = { d };
+    asm ("smlal %0, %1, %2, %3"
+         : "+r"(x.hl[0]), "+r"(x.hl[1]) : "r"(a), "r"(b));
+    return x.x;
+}
+#define MAC64(d, a, b) ((d) = MAC64(d, a, b))
+#define MLS64(d, a, b) MAC64(d, -(a), b)
 
 #if defined(HAVE_ARMV5TE)
 
@@ -51,4 +80,4 @@
 
 #endif
 
-#endif /* FFMPEG_ARMV4L_MATHOPS_H */
+#endif /* AVCODEC_ARMV4L_MATHOPS_H */

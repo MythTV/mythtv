@@ -18,21 +18,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_LOG_H
-#define FFMPEG_LOG_H
+#ifndef AVUTIL_LOG_H
+#define AVUTIL_LOG_H
 
 #include <stdarg.h>
 
 /**
- * Used by av_log
+ * Describes the class of an AVClass context structure, that is an
+ * arbitrary struct of which the first field is a pointer to an
+ * AVClass struct (e.g. AVCodecContext, AVFormatContext etc.).
  */
 typedef struct AVCLASS AVClass;
 struct AVCLASS {
+    /**
+     * The name of the class; usually it is the same name as the
+     * context structure type to which the AVClass is associated.
+     */
     const char* class_name;
-    const char* (*item_name)(void*); /* actually passing a pointer to an AVCodecContext
-                                        or AVFormatContext, which begin with an AVClass.
-                                        Needed because av_log is in libavcodec and has no visibility
-                                        of AVIn/OutputFormat */
+
+    /**
+     * a pointer to a function which returns the name of a context
+     * instance \p ctx associated with the class
+     */
+    const char* (*item_name)(void* ctx);
+
+    /**
+     * a pointer to the first option specified in the class if any or NULL
+     *
+     * @see av_set_default_options()
+     */
     const struct AVOption *option;
 };
 
@@ -81,7 +95,10 @@ struct AVCLASS {
  */
 #define AV_LOG_DEBUG    48
 #endif
+
+#if LIBAVUTIL_VERSION_INT < (50<<16)
 extern int av_log_level;
+#endif
 
 /**
  * Send the specified message to the log if the level is less than or equal to
@@ -98,19 +115,15 @@ extern int av_log_level;
  * @see av_vlog
  */
 #ifdef __GNUC__
-extern void av_log(void*, int level, const char *fmt, ...) __attribute__ ((__format__ (__printf__, 3, 4)));
+void av_log(void*, int level, const char *fmt, ...) __attribute__ ((__format__ (__printf__, 3, 4)));
 #else
-extern void av_log(void*, int level, const char *fmt, ...);
+void av_log(void*, int level, const char *fmt, ...);
 #endif
 
-#if LIBAVUTIL_VERSION_INT < (50<<16)
-extern void av_vlog(void*, int level, const char *fmt, va_list);
-extern int av_log_get_level(void);
-extern void av_log_set_level(int);
-extern void av_log_set_callback(void (*)(void*, int, const char*, va_list));
-extern void av_log_default_callback(void* ptr, int level, const char* fmt, va_list vl);
-#else
-extern void (*av_vlog)(void*, int, const char*, va_list);
-#endif
+void av_vlog(void*, int level, const char *fmt, va_list);
+int av_log_get_level(void);
+void av_log_set_level(int);
+void av_log_set_callback(void (*)(void*, int, const char*, va_list));
+void av_log_default_callback(void* ptr, int level, const char* fmt, va_list vl);
 
-#endif /* FFMPEG_LOG_H */
+#endif /* AVUTIL_LOG_H */

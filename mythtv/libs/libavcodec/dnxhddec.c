@@ -26,7 +26,6 @@
 #include "bitstream.h"
 #include "dnxhddata.h"
 #include "dsputil.h"
-#include "mpegvideo.h"
 
 typedef struct {
     AVCodecContext *avctx;
@@ -48,7 +47,7 @@ typedef struct {
 #define DNXHD_VLC_BITS 9
 #define DNXHD_DC_VLC_BITS 7
 
-static int dnxhd_decode_init(AVCodecContext *avctx)
+static av_cold int dnxhd_decode_init(AVCodecContext *avctx)
 {
     DNXHDContext *ctx = avctx->priv_data;
 
@@ -84,7 +83,7 @@ static int dnxhd_init_vlc(DNXHDContext *ctx, int cid)
     return 0;
 }
 
-static int dnxhd_decode_header(DNXHDContext *ctx, uint8_t *buf, int buf_size, int first_field)
+static int dnxhd_decode_header(DNXHDContext *ctx, const uint8_t *buf, int buf_size, int first_field)
 {
     static const uint8_t header_prefix[] = { 0x00, 0x00, 0x02, 0x80, 0x01 };
     int i;
@@ -99,7 +98,7 @@ static int dnxhd_decode_header(DNXHDContext *ctx, uint8_t *buf, int buf_size, in
     if (buf[5] & 2) { /* interlaced */
         ctx->cur_field = buf[5] & 1;
         ctx->picture.interlaced_frame = 1;
-        ctx->picture.top_field_first = first_field && ctx->cur_field == 1;
+        ctx->picture.top_field_first = first_field ^ ctx->cur_field;
         av_log(ctx->avctx, AV_LOG_DEBUG, "interlaced %d, cur field %d\n", buf[5] & 3, ctx->cur_field);
     }
 
@@ -263,7 +262,7 @@ static int dnxhd_decode_macroblock(DNXHDContext *ctx, int x, int y)
     return 0;
 }
 
-static int dnxhd_decode_macroblocks(DNXHDContext *ctx, uint8_t *buf, int buf_size)
+static int dnxhd_decode_macroblocks(DNXHDContext *ctx, const uint8_t *buf, int buf_size)
 {
     int x, y;
     for (y = 0; y < ctx->mb_height; y++) {
@@ -281,7 +280,7 @@ static int dnxhd_decode_macroblocks(DNXHDContext *ctx, uint8_t *buf, int buf_siz
 }
 
 static int dnxhd_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
-                              uint8_t *buf, int buf_size)
+                              const uint8_t *buf, int buf_size)
 {
     DNXHDContext *ctx = avctx->priv_data;
     AVFrame *picture = data;
@@ -321,7 +320,7 @@ static int dnxhd_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
     return buf_size;
 }
 
-static int dnxhd_decode_close(AVCodecContext *avctx)
+static av_cold int dnxhd_decode_close(AVCodecContext *avctx)
 {
     DNXHDContext *ctx = avctx->priv_data;
 
@@ -343,4 +342,5 @@ AVCodec dnxhd_decoder = {
     dnxhd_decode_close,
     dnxhd_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("VC3/DNxHD"),
 };

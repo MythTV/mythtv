@@ -27,14 +27,13 @@
 #include "avcodec.h"
 #include "dsputil.h"
 #include "bitstream.h"
-#include "mpegvideo.h"
 
 #include "vp56.h"
 #include "vp56data.h"
 #include "vp5data.h"
 
 
-static int vp5_parse_header(vp56_context_t *s, uint8_t *buf, int buf_size,
+static int vp5_parse_header(vp56_context_t *s, const uint8_t *buf, int buf_size,
                             int *golden_frame)
 {
     vp56_range_coder_t *c = &s->c;
@@ -266,7 +265,7 @@ static void vp5_default_models_init(vp56_context_t *s)
     memset(model->vector_pdv, 0x80, sizeof(model->vector_pdv));
 }
 
-static int vp5_decode_init(AVCodecContext *avctx)
+static av_cold int vp5_decode_init(AVCodecContext *avctx)
 {
     vp56_context_t *s = avctx->priv_data;
 
@@ -293,4 +292,5 @@ AVCodec vp5_decoder = {
     vp56_free,
     vp56_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("On2 VP5"),
 };

@@ -23,8 +23,8 @@
  * common internal api header.
  */
 
-#ifndef FFMPEG_INTERNAL_H
-#define FFMPEG_INTERNAL_H
+#ifndef AVUTIL_INTERNAL_H
+#define AVUTIL_INTERNAL_H
 
 #if !defined(DEBUG) && !defined(NDEBUG)
 #    define NDEBUG
@@ -48,21 +48,6 @@
 #else
 #    define attribute_used
 #endif
-#endif
-
-/* Use Apple-specific AltiVec syntax for vector declarations when necessary. */
-#ifdef __APPLE_CC__
-#define AVV(x...) (x)
-#else
-#define AVV(x...) {x}
-#endif
-
-#ifndef M_PI
-#define M_PI    3.14159265358979323846
-#endif
-
-#ifndef M_LN10
-#define M_LN10    2.30258509299404568402
 #endif
 
 #ifndef INT16_MIN
@@ -109,6 +94,7 @@
 #    define PIC
 #endif
 
+#include "config.h"
 #include "intreadwrite.h"
 #include "bswap.h"
 
@@ -116,28 +102,14 @@
 #    define offsetof(T,F) ((unsigned int)((char *)&((T *)0)->F))
 #endif
 
-#ifdef USE_FASTMEMCPY
-#    include "libvo/fastmemcpy.h"
-#    define memcpy(a,b,c) fast_memcpy(a,b,c)
+// Use rip-relative addressing if compiling PIC code on x86-64.
+#if defined(ARCH_X86_64) && defined(PIC)
+#    define LOCAL_MANGLE(a) #a "(%%rip)"
+#else
+#    define LOCAL_MANGLE(a) #a
 #endif
 
-// Use rip-relative addressing if compiling PIC code on x86-64.
-#if defined(__MINGW32__) || defined(__CYGWIN__) || \
-    defined(__OS2__) || (defined (__OpenBSD__) && !defined(__ELF__))
-#    if defined(ARCH_X86_64) && defined(PIC)
-#        define MANGLE(a) "_" #a"(%%rip)"
-#    else
-#        define MANGLE(a) "_" #a
-#    endif
-#else
-#    if defined(ARCH_X86_64) && defined(PIC)
-#        define MANGLE(a) #a"(%%rip)"
-#    elif defined(__APPLE__)
-#        define MANGLE(a) "_" #a
-#    else
-#        define MANGLE(a) #a
-#    endif
-#endif
+#define MANGLE(a) EXTERN_PREFIX LOCAL_MANGLE(a)
 
 /* debug stuff */
 
@@ -165,6 +137,16 @@ extern const uint32_t ff_inverse[256];
             );\
         ret;\
     })
+#elif defined(HAVE_ARMV6)
+static inline av_const int FASTDIV(int a, int b)
+{
+    int r;
+    asm volatile("cmp   %2, #0        \n\t"
+                 "smmul %0, %1, %2    \n\t"
+                 "rsblt %0, %0, #0    \n\t"
+                 : "=r"(r) : "r"(a), "r"(ff_inverse[b]));
+    return r;
+}
 #elif defined(ARCH_ARMV4L)
 #    define FASTDIV(a,b) \
     ({\
@@ -182,30 +164,34 @@ extern const uint32_t ff_inverse[256];
 #    define FASTDIV(a,b)   ((a)/(b))
 #endif
 
-extern const uint8_t ff_sqrt_tab[128];
+extern const uint8_t ff_sqrt_tab[256];
 
-static inline int ff_sqrt(int a)
+static inline int av_log2_16bit(unsigned int v);
+
+static inline av_const unsigned int ff_sqrt(unsigned int a)
 {
-    int ret=0;
-    int s, b;
+    unsigned int b;
 
-    if(a<128) return ff_sqrt_tab[a];
-
-    for(s=30; s>=0; s-=2){
-        ret+=ret;
-        b= (1+2*ret)<<s;
-        if(b<=a){
-            a-=b;
-            ret++;
-        }
+    if(a<255) return (ff_sqrt_tab[a+1]-1)>>4;
+    else if(a<(1<<12)) b= ff_sqrt_tab[a>>4 ]>>2;
+#ifndef CONFIG_SMALL
+    else if(a<(1<<14)) b= ff_sqrt_tab[a>>6 ]>>1;
+    else if(a<(1<<16)) b= ff_sqrt_tab[a>>8 ]   ;
+#endif
+    else{
+        int s= av_log2_16bit(a>>16)>>1;
+        unsigned int c= a>>(s+2);
+        b= ff_sqrt_tab[c>>(s+8)];
+        b= FASTDIV(c,b) + (b<<s);
     }
-    return ret;
+
+    return b - (a<b*b);
 }
 
 #if defined(ARCH_X86)
 #define MASK_ABS(mask, level)\
             asm volatile(\
-                "cdq                    \n\t"\
+                "cltd                   \n\t"\
                 "xorl %1, %0            \n\t"\
                 "subl %1, %0            \n\t"\
                 : "+a" (level), "=&d" (mask)\
@@ -256,30 +242,59 @@ if((y)<(x)){\
 #define strcat strcat_is_forbidden_due_to_security_issues_use_av_strlcat
 #undef  exit
 #define exit exit_is_forbidden
-#if !(defined(LIBAVFORMAT_BUILD) || defined(FFMPEG_FRAMEHOOK_H))
+#ifndef LIBAVFORMAT_BUILD
 #undef  printf
 #define printf please_use_av_log
 #undef  fprintf
 #define fprintf please_use_av_log
+#undef  puts
+#define puts please_use_av_log
+#undef  perror
+#define perror please_use_av_log_instead_of_perror
 #endif
 
 #define CHECKED_ALLOCZ(p, size)\
 {\
     p= av_mallocz(size);\
     if(p==NULL && (size)!=0){\
-        perror("malloc");\
+        av_log(NULL, AV_LOG_ERROR, "Cannot allocate memory.");\
         goto fail;\
     }\
 }
 
+#ifndef HAVE_LLRINT
+static av_always_inline av_const long long llrint(double x)
+{
+    return rint(x);
+}
+#endif /* HAVE_LLRINT */
+
+#ifndef HAVE_LRINT
+static av_always_inline av_const long int lrint(double x)
+{
+    return rint(x);
+}
+#endif /* HAVE_LRINT */
+
 #ifndef HAVE_LRINTF
-/* XXX: add ISOC specific test to avoid specific BSD testing. */
-/* better than nothing implementation. */
-/* btw, rintf() is existing on fbsd too -- alex */
-static av_always_inline long int lrintf(float x)
+static av_always_inline av_const long int lrintf(float x)
 {
     return (int)(rint(x));
 }
 #endif /* HAVE_LRINTF */
 
-#endif /* FFMPEG_INTERNAL_H */
+#ifndef HAVE_ROUND
+static av_always_inline av_const double round(double x)
+{
+    return (x > 0) ? floor(x + 0.5) : ceil(x - 0.5);
+}
+#endif /* HAVE_ROUND */
+
+#ifndef HAVE_ROUNDF
+static av_always_inline av_const float roundf(float x)
+{
+    return (x > 0) ? floor(x + 0.5) : ceil(x - 0.5);
+}
+#endif /* HAVE_ROUNDF */
+
+#endif /* AVUTIL_INTERNAL_H */

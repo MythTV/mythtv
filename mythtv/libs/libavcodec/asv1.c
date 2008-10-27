@@ -27,7 +27,7 @@
 #include "avcodec.h"
 #include "bitstream.h"
 #include "dsputil.h"
-#include "mpegvideo.h"
+#include "mpeg12data.h"
 
 //#undef NDEBUG
 //#include <assert.h>
@@ -47,7 +47,7 @@ typedef struct ASV1Context{
     int mb_height;
     int mb_width2;
     int mb_height2;
-    DECLARE_ALIGNED_8(DCTELEM, block[6][64]);
+    DECLARE_ALIGNED_16(DCTELEM, block[6][64]);
     DECLARE_ALIGNED_8(uint16_t, intra_matrix[64]);
     DECLARE_ALIGNED_8(int, q_intra_matrix[64]);
     uint8_t *bitstream_buffer;
@@ -113,7 +113,7 @@ static VLC dc_ccp_vlc;
 static VLC ac_ccp_vlc;
 static VLC asv2_level_vlc;
 
-static void init_vlcs(ASV1Context *a){
+static av_cold void init_vlcs(ASV1Context *a){
     static int done = 0;
 
     if (!done) {
@@ -166,7 +166,7 @@ static inline void asv1_put_level(PutBitContext *pb, int level){
     if(index <= 6) put_bits(pb, level_tab[index][1], level_tab[index][0]);
     else{
         put_bits(pb, level_tab[3][1], level_tab[3][0]);
-        put_bits(pb, 8, level&0xFF);
+        put_sbits(pb, 8, level);
     }
 }
 
@@ -387,7 +387,7 @@ static inline void dct_get(ASV1Context *a, int mb_x, int mb_y){
 
 static int decode_frame(AVCodecContext *avctx,
                         void *data, int *data_size,
-                        uint8_t *buf, int buf_size)
+                        const uint8_t *buf, int buf_size)
 {
     ASV1Context * const a = avctx->priv_data;
     AVFrame *picture = data;
@@ -402,13 +402,13 @@ static int decode_frame(AVCodecContext *avctx,
         av_log(avctx, AV_LOG_ERROR, "get_buffer() failed\n");
         return -1;
     }
-    p->pict_type= I_TYPE;
+    p->pict_type= FF_I_TYPE;
     p->key_frame= 1;
 
     a->bitstream_buffer= av_fast_realloc(a->bitstream_buffer, &a->bitstream_buffer_size, buf_size + FF_INPUT_BUFFER_PADDING_SIZE);
 
     if(avctx->codec_id == CODEC_ID_ASV1)
-        a->dsp.bswap_buf((uint32_t*)a->bitstream_buffer, (uint32_t*)buf, buf_size/4);
+        a->dsp.bswap_buf((uint32_t*)a->bitstream_buffer, (const uint32_t*)buf, buf_size/4);
     else{
         int i;
         for(i=0; i<buf_size; i++)
@@ -465,7 +465,7 @@ for(i=0; i<s->avctx->extradata_size; i++){
     return (get_bits_count(&a->gb)+31)/32*4;
 }
 
-#ifdef CONFIG_ENCODERS
+#if defined(CONFIG_ASV1_ENCODER) || defined(CONFIG_ASV2_ENCODER)
 static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size, void *data){
     ASV1Context * const a = avctx->priv_data;
     AVFrame *pict = data;
@@ -476,7 +476,7 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
     init_put_bits(&a->pb, buf, buf_size);
 
     *p = *pict;
-    p->pict_type= I_TYPE;
+    p->pict_type= FF_I_TYPE;
     p->key_frame= 1;
 
     for(mb_y=0; mb_y<a->mb_height2; mb_y++){
@@ -519,9 +519,9 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
 
     return size*4;
 }
-#endif /* CONFIG_ENCODERS */
+#endif /* defined(CONFIG_ASV1_ENCODER) || defined(CONFIG_ASV2_ENCODER) */
 
-static void common_init(AVCodecContext *avctx){
+static av_cold void common_init(AVCodecContext *avctx){
     ASV1Context * const a = avctx->priv_data;
 
     dsputil_init(&a->dsp, avctx);
@@ -535,7 +535,7 @@ static void common_init(AVCodecContext *avctx){
     a->avctx= avctx;
 }
 
-static int decode_init(AVCodecContext *avctx){
+static av_cold int decode_init(AVCodecContext *avctx){
     ASV1Context * const a = avctx->priv_data;
     AVFrame *p= (AVFrame*)&a->picture;
     int i;
@@ -569,8 +569,8 @@ static int decode_init(AVCodecContext *avctx){
     return 0;
 }
 
-#ifdef CONFIG_ENCODERS
-static int encode_init(AVCodecContext *avctx){
+#if defined(CONFIG_ASV1_ENCODER) || defined(CONFIG_ASV2_ENCODER)
+static av_cold int encode_init(AVCodecContext *avctx){
     ASV1Context * const a = avctx->priv_data;
     int i;
     const int scale= avctx->codec_id == CODEC_ID_ASV1 ? 1 : 2;
@@ -593,9 +593,9 @@ static int encode_init(AVCodecContext *avctx){
 
     return 0;
 }
-#endif
+#endif /* defined(CONFIG_ASV1_ENCODER) || defined(CONFIG_ASV2_ENCODER) */
 
-static int decode_end(AVCodecContext *avctx){
+static av_cold int decode_end(AVCodecContext *avctx){
     ASV1Context * const a = avctx->priv_data;
 
     av_freep(&a->bitstream_buffer);
@@ -615,6 +615,7 @@ AVCodec asv1_decoder = {
     decode_end,
     decode_frame,
     CODEC_CAP_DR1,
+    .long_name= NULL_IF_CONFIG_SMALL("ASUS V1"),
 };
 
 AVCodec asv2_decoder = {
@@ -627,10 +628,10 @@ AVCodec asv2_decoder = {
     decode_end,
     decode_frame,
     CODEC_CAP_DR1,
+    .long_name= NULL_IF_CONFIG_SMALL("ASUS V2"),
 };
 
-#ifdef CONFIG_ENCODERS
-
+#ifdef CONFIG_ASV1_ENCODER
 AVCodec asv1_encoder = {
     "asv1",
     CODEC_TYPE_VIDEO,
@@ -639,9 +640,12 @@ AVCodec asv1_encoder = {
     encode_init,
     encode_frame,
     //encode_end,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
+    .long_name= NULL_IF_CONFIG_SMALL("ASUS V1"),
 };
+#endif
 
+#ifdef CONFIG_ASV2_ENCODER
 AVCodec asv2_encoder = {
     "asv2",
     CODEC_TYPE_VIDEO,
@@ -650,7 +654,7 @@ AVCodec asv2_encoder = {
     encode_init,
     encode_frame,
     //encode_end,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
+    .long_name= NULL_IF_CONFIG_SMALL("ASUS V2"),
 };
-
-#endif //CONFIG_ENCODERS
+#endif

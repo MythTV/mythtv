@@ -31,7 +31,6 @@
 #include "dsputil.h"
 #include "bitstream.h"
 #include "huffman.h"
-#include "mpegvideo.h"
 
 #include "vp56.h"
 #include "vp56data.h"
@@ -41,7 +40,7 @@
 static void vp6_parse_coeff(vp56_context_t *s);
 static void vp6_parse_coeff_huffman(vp56_context_t *s);
 
-static int vp6_parse_header(vp56_context_t *s, uint8_t *buf, int buf_size,
+static int vp6_parse_header(vp56_context_t *s, const uint8_t *buf, int buf_size,
                             int *golden_frame)
 {
     vp56_range_coder_t *c = &s->c;
@@ -138,7 +137,7 @@ static int vp6_parse_header(vp56_context_t *s, uint8_t *buf, int buf_size,
         buf_size -= coeff_offset;
         if (s->use_huffman) {
             s->parse_coeff = vp6_parse_coeff_huffman;
-            init_get_bits(&s->gb, buf, buf_size);
+            init_get_bits(&s->gb, buf, buf_size<<3);
         } else {
             vp56_init_range_decoder(&s->cc, buf, buf_size);
             s->ccp = &s->cc;
@@ -203,10 +202,11 @@ static void vp6_parse_vector_models(vp56_context_t *s)
                 model->vector_fdv[comp][node] = vp56_rac_gets_nn(c, 7);
 }
 
+/* nodes must ascend by count, but with descending symbol order */
 static int vp6_huff_cmp(const void *va, const void *vb)
 {
     const Node *a = va, *b = vb;
-    return a->count >= b->count;
+    return (a->count - b->count)*16 + (b->sym - a->sym);
 }
 
 static void vp6_build_huff_tree(vp56_context_t *s, uint8_t coeff_model[],
@@ -225,7 +225,8 @@ static void vp6_build_huff_tree(vp56_context_t *s, uint8_t coeff_model[],
     }
 
     /* then build the huffman tree accodring to probabilities */
-    ff_huff_build_tree(s->avctx, vlc, size, nodes, vp6_huff_cmp, 1);
+    ff_huff_build_tree(s->avctx, vlc, size, nodes, vp6_huff_cmp,
+                       FF_HUFFMAN_FLAG_HNODE_FIRST);
 }
 
 static void vp6_parse_coeff_models(vp56_context_t *s)
@@ -610,7 +611,7 @@ static void vp6_filter(vp56_context_t *s, uint8_t *dst, uint8_t *src,
     }
 }
 
-static int vp6_decode_init(AVCodecContext *avctx)
+static av_cold int vp6_decode_init(AVCodecContext *avctx)
 {
     vp56_context_t *s = avctx->priv_data;
 
@@ -638,6 +639,7 @@ AVCodec vp6_decoder = {
     vp56_free,
     vp56_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("On2 VP6"),
 };
 
 /* flash version, not flipped upside-down */
@@ -651,6 +653,7 @@ AVCodec vp6f_decoder = {
     vp56_free,
     vp56_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("On2 VP6 (Flash version)"),
 };
 
 /* flash version, not flipped upside-down, with alpha channel */
@@ -664,4 +667,5 @@ AVCodec vp6a_decoder = {
     vp56_free,
     vp56_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("On2 VP6 (Flash version, with alpha channel)"),
 };

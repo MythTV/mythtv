@@ -38,7 +38,7 @@ typedef struct DVBSubParseContext {
     int in_packet;
 } DVBSubParseContext;
 
-static int dvbsub_parse_init(AVCodecParserContext *s)
+static av_cold int dvbsub_parse_init(AVCodecParserContext *s)
 {
     DVBSubParseContext *pc = s->priv_data;
     pc->packet_buf = av_malloc(PARSE_BUF_SIZE);
@@ -80,7 +80,7 @@ static int dvbsub_parse(AVCodecParserContext *s,
 
     s->fetch_timestamp = 1;
 
-    if (s->last_pts != s->pts && s->last_pts != AV_NOPTS_VALUE) /* Start of a new packet */
+    if (s->last_pts != s->pts && s->pts != AV_NOPTS_VALUE) /* Start of a new packet */
     {
         if (pc->packet_index != pc->packet_start)
         {
@@ -175,13 +175,13 @@ static int dvbsub_parse(AVCodecParserContext *s,
         pc->packet_start = *poutbuf_size;
     }
 
-    if (s->last_pts == AV_NOPTS_VALUE)
-        s->last_pts = s->pts;
+    if (s->pts == AV_NOPTS_VALUE)
+        s->pts = s->last_pts;
 
     return buf_size;
 }
 
-static void dvbsub_parse_close(AVCodecParserContext *s)
+static av_cold void dvbsub_parse_close(AVCodecParserContext *s)
 {
     DVBSubParseContext *pc = s->priv_data;
     av_freep(&pc->packet_buf);

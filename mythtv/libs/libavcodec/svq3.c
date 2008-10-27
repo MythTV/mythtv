@@ -411,7 +411,7 @@ static int svq3_decode_mb (H264Context *h, unsigned int mb_type) {
   uint32_t vlc;
   int8_t *top, *left;
   MpegEncContext *const s = (MpegEncContext *) h;
-  const int mb_xy = s->mb_x + s->mb_y*s->mb_stride;
+  const int mb_xy = h->mb_xy;
   const int b_xy = 4*s->mb_x + 4*s->mb_y*h->b_stride;
 
   h->top_samples_available        = (s->mb_y == 0) ? 0x33FF : 0xFFFF;
@@ -419,10 +419,10 @@ static int svq3_decode_mb (H264Context *h, unsigned int mb_type) {
   h->topright_samples_available        = 0xFFFF;
 
   if (mb_type == 0) {           /* SKIP */
-    if (s->pict_type == P_TYPE || s->next_picture.mb_type[mb_xy] == -1) {
+    if (s->pict_type == FF_P_TYPE || s->next_picture.mb_type[mb_xy] == -1) {
       svq3_mc_dir_part (s, 16*s->mb_x, 16*s->mb_y, 16, 16, 0, 0, 0, 0, 0, 0);
 
-      if (s->pict_type == B_TYPE) {
+      if (s->pict_type == FF_B_TYPE) {
         svq3_mc_dir_part (s, 16*s->mb_x, 16*s->mb_y, 16, 16, 0, 0, 0, 0, 1, 1);
       }
 
@@ -483,15 +483,15 @@ static int svq3_decode_mb (H264Context *h, unsigned int mb_type) {
       }else
         memset (&h->ref_cache[m][scan8[0] - 1*8 - 1], PART_NOT_AVAILABLE, 8);
 
-      if (s->pict_type != B_TYPE)
+      if (s->pict_type != FF_B_TYPE)
         break;
     }
 
     /* decode motion vector(s) and form prediction(s) */
-    if (s->pict_type == P_TYPE) {
+    if (s->pict_type == FF_P_TYPE) {
       if(svq3_mc_dir (h, (mb_type - 1), mode, 0, 0) < 0)
         return -1;
-    } else {        /* B_TYPE */
+    } else {        /* FF_B_TYPE */
       if (mb_type != 2) {
         if(svq3_mc_dir (h, 0, mode, 0, 0) < 0)
           return -1;
@@ -590,11 +590,11 @@ static int svq3_decode_mb (H264Context *h, unsigned int mb_type) {
     mb_type = MB_TYPE_INTRA16x16;
   }
 
-  if (!IS_INTER(mb_type) && s->pict_type != I_TYPE) {
+  if (!IS_INTER(mb_type) && s->pict_type != FF_I_TYPE) {
     for (i=0; i < 4; i++) {
       memset (s->current_picture.motion_val[0][b_xy + i*h->b_stride], 0, 4*2*sizeof(int16_t));
     }
-    if (s->pict_type == B_TYPE) {
+    if (s->pict_type == FF_B_TYPE) {
       for (i=0; i < 4; i++) {
         memset (s->current_picture.motion_val[1][b_xy + i*h->b_stride], 0, 4*2*sizeof(int16_t));
       }
@@ -603,12 +603,12 @@ static int svq3_decode_mb (H264Context *h, unsigned int mb_type) {
   if (!IS_INTRA4x4(mb_type)) {
     memset (h->intra4x4_pred_mode[mb_xy], DC_PRED, 8);
   }
-  if (!IS_SKIP(mb_type) || s->pict_type == B_TYPE) {
+  if (!IS_SKIP(mb_type) || s->pict_type == FF_B_TYPE) {
     memset (h->non_zero_count_cache + 8, 0, 4*9*sizeof(uint8_t));
     s->dsp.clear_blocks(h->mb);
   }
 
-  if (!IS_INTRA16x16(mb_type) && (!IS_SKIP(mb_type) || s->pict_type == B_TYPE)) {
+  if (!IS_INTRA16x16(mb_type) && (!IS_SKIP(mb_type) || s->pict_type == FF_B_TYPE)) {
     if ((vlc = svq3_get_ue_golomb (&s->gb)) >= 48){
       av_log(h->s.avctx, AV_LOG_ERROR, "cbp_vlc=%d\n", vlc);
       return -1;
@@ -616,7 +616,7 @@ static int svq3_decode_mb (H264Context *h, unsigned int mb_type) {
 
     cbp = IS_INTRA(mb_type) ? golomb_to_intra4x4_cbp[vlc] : golomb_to_inter_cbp[vlc];
   }
-  if (IS_INTRA16x16(mb_type) || (s->pict_type != I_TYPE && s->adaptive_quant && cbp)) {
+  if (IS_INTRA16x16(mb_type) || (s->pict_type != FF_I_TYPE && s->adaptive_quant && cbp)) {
     s->qscale += svq3_get_se_golomb (&s->gb);
 
     if (s->qscale > 31){
@@ -681,7 +681,7 @@ static int svq3_decode_mb (H264Context *h, unsigned int mb_type) {
 
 static int svq3_decode_slice_header (H264Context *h) {
   MpegEncContext *const s = (MpegEncContext *) h;
-  const int mb_xy = s->mb_x + s->mb_y*s->mb_stride;
+  const int mb_xy = h->mb_xy;
   int i, header;
 
   header = get_bits (&s->gb, 8);
@@ -760,7 +760,7 @@ static int svq3_decode_slice_header (H264Context *h) {
 
 static int svq3_decode_frame (AVCodecContext *avctx,
                               void *data, int *data_size,
-                              uint8_t *buf, int buf_size) {
+                              const uint8_t *buf, int buf_size) {
   MpegEncContext *const s = avctx->priv_data;
   H264Context *const h = avctx->priv_data;
   int m, mb_type;
@@ -835,6 +835,7 @@ static int svq3_decode_frame (AVCodecContext *avctx,
   if (buf_size == 0) {
     if (s->next_picture_ptr && !s->low_delay) {
       *(AVFrame *) data = *(AVFrame *) &s->next_picture;
+      s->next_picture_ptr= NULL;
       *data_size = sizeof(AVFrame);
     }
     return 0;
@@ -842,7 +843,7 @@ static int svq3_decode_frame (AVCodecContext *avctx,
 
   init_get_bits (&s->gb, buf, 8*buf_size);
 
-  s->mb_x = s->mb_y = 0;
+  s->mb_x = s->mb_y = h->mb_xy = 0;
 
   if (svq3_decode_slice_header (h))
     return -1;
@@ -851,29 +852,29 @@ static int svq3_decode_frame (AVCodecContext *avctx,
   s->picture_number = h->slice_num;
 
   if(avctx->debug&FF_DEBUG_PICT_INFO){
-      av_log(h->s.avctx, AV_LOG_DEBUG, "%c hpel:%d, tpel:%d aqp:%d qp:%d\n",
+      av_log(h->s.avctx, AV_LOG_DEBUG, "%c hpel:%d, tpel:%d aqp:%d qp:%d, slice_num:%02X\n",
       av_get_pict_type_char(s->pict_type), h->halfpel_flag, h->thirdpel_flag,
-      s->adaptive_quant, s->qscale
+      s->adaptive_quant, s->qscale, h->slice_num
       );
   }
 
   /* for hurry_up==5 */
   s->current_picture.pict_type = s->pict_type;
-  s->current_picture.key_frame = (s->pict_type == I_TYPE);
+  s->current_picture.key_frame = (s->pict_type == FF_I_TYPE);
 
   /* Skip B-frames if we do not have reference frames. */
-  if (s->last_picture_ptr == NULL && s->pict_type == B_TYPE) return 0;
+  if (s->last_picture_ptr == NULL && s->pict_type == FF_B_TYPE) return 0;
   /* Skip B-frames if we are in a hurry. */
-  if (avctx->hurry_up && s->pict_type == B_TYPE) return 0;
+  if (avctx->hurry_up && s->pict_type == FF_B_TYPE) return 0;
   /* Skip everything if we are in a hurry >= 5. */
   if (avctx->hurry_up >= 5) return 0;
-  if(  (avctx->skip_frame >= AVDISCARD_NONREF && s->pict_type==B_TYPE)
-     ||(avctx->skip_frame >= AVDISCARD_NONKEY && s->pict_type!=I_TYPE)
+  if(  (avctx->skip_frame >= AVDISCARD_NONREF && s->pict_type==FF_B_TYPE)
+     ||(avctx->skip_frame >= AVDISCARD_NONKEY && s->pict_type!=FF_I_TYPE)
      || avctx->skip_frame >= AVDISCARD_ALL)
       return 0;
 
   if (s->next_p_frame_damaged) {
-    if (s->pict_type == B_TYPE)
+    if (s->pict_type == FF_B_TYPE)
       return 0;
     else
       s->next_p_frame_damaged = 0;
@@ -882,7 +883,7 @@ static int svq3_decode_frame (AVCodecContext *avctx,
   if (frame_start (h) < 0)
     return -1;
 
-  if (s->pict_type == B_TYPE) {
+  if (s->pict_type == FF_B_TYPE) {
     h->frame_num_offset = (h->slice_num - h->prev_frame_num);
 
     if (h->frame_num_offset < 0) {
@@ -915,6 +916,7 @@ static int svq3_decode_frame (AVCodecContext *avctx,
 
   for (s->mb_y=0; s->mb_y < s->mb_height; s->mb_y++) {
     for (s->mb_x=0; s->mb_x < s->mb_width; s->mb_x++) {
+      h->mb_xy = s->mb_x + s->mb_y*s->mb_stride;
 
       if ( (get_bits_count(&s->gb) + 7) >= s->gb.size_in_bits &&
           ((get_bits_count(&s->gb) & 7) == 0 || show_bits (&s->gb, (-get_bits_count(&s->gb) & 7)) == 0)) {
@@ -930,9 +932,9 @@ static int svq3_decode_frame (AVCodecContext *avctx,
 
       mb_type = svq3_get_ue_golomb (&s->gb);
 
-      if (s->pict_type == I_TYPE) {
+      if (s->pict_type == FF_I_TYPE) {
         mb_type += 8;
-      } else if (s->pict_type == B_TYPE && mb_type >= 4) {
+      } else if (s->pict_type == FF_B_TYPE && mb_type >= 4) {
         mb_type += 4;
       }
       if (mb_type > 33 || svq3_decode_mb (h, mb_type)) {
@@ -944,9 +946,9 @@ static int svq3_decode_frame (AVCodecContext *avctx,
         hl_decode_mb (h);
       }
 
-      if (s->pict_type != B_TYPE && !s->low_delay) {
+      if (s->pict_type != FF_B_TYPE && !s->low_delay) {
         s->current_picture.mb_type[s->mb_x + s->mb_y*s->mb_stride] =
-                        (s->pict_type == P_TYPE && mb_type < 8) ? (mb_type - 1) : -1;
+                        (s->pict_type == FF_P_TYPE && mb_type < 8) ? (mb_type - 1) : -1;
       }
     }
 
@@ -955,7 +957,7 @@ static int svq3_decode_frame (AVCodecContext *avctx,
 
   MPV_frame_end(s);
 
-  if (s->pict_type == B_TYPE || s->low_delay) {
+  if (s->pict_type == FF_B_TYPE || s->low_delay) {
     *(AVFrame *) data = *(AVFrame *) &s->current_picture;
   } else {
     *(AVFrame *) data = *(AVFrame *) &s->last_picture;
@@ -982,4 +984,5 @@ AVCodec svq3_decoder = {
     decode_end,
     svq3_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 | CODEC_CAP_DELAY,
+    .long_name = NULL_IF_CONFIG_SMALL("Sorenson Vector Quantizer 3"),
 };

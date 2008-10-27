@@ -136,7 +136,7 @@ static unsigned int mszh_decomp(unsigned char * srcptr, int srclen, unsigned cha
         } else {
             ofs = *(srcptr++);
             cnt = *(srcptr++);
-            ofs += cnt * 256;;
+            ofs += cnt * 256;
             cnt = ((cnt >> 3) & 0x1f) + 1;
             ofs &= 0x7ff;
             srclen -= 2;
@@ -161,7 +161,7 @@ static unsigned int mszh_decomp(unsigned char * srcptr, int srclen, unsigned cha
  * Decode a frame
  *
  */
-static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8_t *buf, int buf_size)
+static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, const uint8_t *buf, int buf_size)
 {
     LclDecContext * const c = avctx->priv_data;
     unsigned char *encoded = (unsigned char *)buf;
@@ -302,7 +302,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
             }
         }
         encoded = c->decomp_buf;
-        len = c->decomp_size;;
+        len = c->decomp_size;
 #else
         av_log(avctx, AV_LOG_ERROR, "BUG! Zlib support not compiled in frame decoder.\n");
         return -1;
@@ -514,7 +514,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
  * Init lcl decoder
  *
  */
-static int decode_init(AVCodecContext *avctx)
+static av_cold int decode_init(AVCodecContext *avctx)
 {
     LclDecContext * const c = avctx->priv_data;
     unsigned int basesize = avctx->width * avctx->height;
@@ -673,7 +673,7 @@ static int decode_init(AVCodecContext *avctx)
  * Uninit lcl decoder
  *
  */
-static int decode_end(AVCodecContext *avctx)
+static av_cold int decode_end(AVCodecContext *avctx)
 {
     LclDecContext * const c = avctx->priv_data;
 
@@ -697,6 +697,7 @@ AVCodec mszh_decoder = {
     decode_end,
     decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("LCL (LossLess Codec Library) MSZH"),
 };
 #endif
 
@@ -711,5 +712,6 @@ AVCodec zlib_decoder = {
     decode_end,
     decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("LCL (LossLess Codec Library) ZLIB"),
 };
 #endif

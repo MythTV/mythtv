@@ -43,7 +43,7 @@ typedef struct MsrleContext {
     AVCodecContext *avctx;
     AVFrame frame;
 
-    unsigned char *buf;
+    const unsigned char *buf;
     int size;
 
 } MsrleContext;
@@ -236,7 +236,7 @@ static void msrle_decode_pal8(MsrleContext *s)
             stream_ptr, s->size);
 }
 
-static int msrle_decode_init(AVCodecContext *avctx)
+static av_cold int msrle_decode_init(AVCodecContext *avctx)
 {
     MsrleContext *s = avctx->priv_data;
 
@@ -250,7 +250,7 @@ static int msrle_decode_init(AVCodecContext *avctx)
 
 static int msrle_decode_frame(AVCodecContext *avctx,
                               void *data, int *data_size,
-                              uint8_t *buf, int buf_size)
+                              const uint8_t *buf, int buf_size)
 {
     MsrleContext *s = avctx->priv_data;
 
@@ -283,7 +283,7 @@ static int msrle_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int msrle_decode_end(AVCodecContext *avctx)
+static av_cold int msrle_decode_end(AVCodecContext *avctx)
 {
     MsrleContext *s = avctx->priv_data;
 
@@ -304,4 +304,5 @@ AVCodec msrle_decoder = {
     msrle_decode_end,
     msrle_decode_frame,
     CODEC_CAP_DR1,
+    .long_name= NULL_IF_CONFIG_SMALL("Microsoft RLE"),
 };

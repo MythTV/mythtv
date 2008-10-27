@@ -20,17 +20,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_QTPALETTE_H
-#define FFMPEG_QTPALETTE_H
+#ifndef AVFORMAT_QTPALETTE_H
+#define AVFORMAT_QTPALETTE_H
 
-unsigned char ff_qt_default_palette_4[4 * 4] = {
+#include <inttypes.h>
+
+static const uint8_t ff_qt_default_palette_4[4 * 4] = {
   0x93, 0x65, 0x5E, 0x00,
   0xFF, 0xFF, 0xFF, 0x00,
   0xDF, 0xD0, 0xAB, 0x00,
   0x00, 0x00, 0x00, 0x00
 };
 
-unsigned char ff_qt_default_palette_16[16 * 4] = {
+static const uint8_t ff_qt_default_palette_16[16 * 4] = {
   0xFF, 0xFB, 0xFF, 0x00,
   0xEF, 0xD9, 0xBB, 0x00,
   0xE8, 0xC9, 0xB1, 0x00,
@@ -49,7 +51,7 @@ unsigned char ff_qt_default_palette_16[16 * 4] = {
   0x00, 0x00, 0x00, 0x00
 };
 
-unsigned char ff_qt_default_palette_256[256 * 4] = {
+static const uint8_t ff_qt_default_palette_256[256 * 4] = {
   /*   0, 0x00 */  0xFF, 0xFF, 0xFF, 0x00,
   /*   1, 0x01 */  0xFF, 0xFF, 0xCC, 0x00,
   /*   2, 0x02 */  0xFF, 0xFF, 0x99, 0x00,
@@ -308,4 +310,4 @@ unsigned char ff_qt_default_palette_256[256 * 4] = {
   /* 255, 0xFF */  0x00, 0x00, 0x00, 0x00
 };
 
-#endif /* FFMPEG_QTPALETTE_H */
+#endif /* AVFORMAT_QTPALETTE_H */

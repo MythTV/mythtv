@@ -67,7 +67,7 @@ typedef struct BitBuf {
     } \
 }
 
-static void kmvc_decode_intra_8x8(KmvcContext * ctx, uint8_t * src, int w, int h)
+static void kmvc_decode_intra_8x8(KmvcContext * ctx, const uint8_t * src, int w, int h)
 {
     BitBuf bb;
     int res, val;
@@ -142,7 +142,7 @@ static void kmvc_decode_intra_8x8(KmvcContext * ctx, uint8_t * src, int w, int h
         }
 }
 
-static void kmvc_decode_inter_8x8(KmvcContext * ctx, uint8_t * src, int w, int h)
+static void kmvc_decode_inter_8x8(KmvcContext * ctx, const uint8_t * src, int w, int h)
 {
     BitBuf bb;
     int res, val;
@@ -224,7 +224,7 @@ static void kmvc_decode_inter_8x8(KmvcContext * ctx, uint8_t * src, int w, int h
         }
 }
 
-static int decode_frame(AVCodecContext * avctx, void *data, int *data_size, uint8_t * buf,
+static int decode_frame(AVCodecContext * avctx, void *data, int *data_size, const uint8_t * buf,
                         int buf_size)
 {
     KmvcContext *const ctx = avctx->priv_data;
@@ -338,7 +338,7 @@ static int decode_frame(AVCodecContext * avctx, void *data, int *data_size, uint
 /*
  * Init kmvc decoder
  */
-static int decode_init(AVCodecContext * avctx)
+static av_cold int decode_init(AVCodecContext * avctx)
 {
     KmvcContext *const c = avctx->priv_data;
     int i;
@@ -390,7 +390,7 @@ static int decode_init(AVCodecContext * avctx)
 /*
  * Uninit kmvc decoder
  */
-static int decode_end(AVCodecContext * avctx)
+static av_cold int decode_end(AVCodecContext * avctx)
 {
     KmvcContext *const c = avctx->priv_data;
 
@@ -410,5 +410,6 @@ AVCodec kmvc_decoder = {
     decode_init,
     NULL,
     decode_end,
-    decode_frame
+    decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("Karl Morton's video codec"),
 };

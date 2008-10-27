@@ -147,7 +147,11 @@ bool avfDecoder::initialize()
     // Determine the output format
     // Given we are outputing to a sound card, this will always
     // be a PCM format
-    fmt = guess_format("oss", NULL, NULL);
+#ifdef WORDS_BIGENDIAN
+    fmt = guess_format("pcm_s16be", NULL, NULL);
+#else
+    fmt = guess_format("pcm_s16le", NULL, NULL);
+#endif
     if (!fmt)
     {
         VERBOSE(VB_IMPORTANT, "avfDecoder.o - failed to get output format");

@@ -9,7 +9,8 @@
 extern "C" {
 #include "libavcodec/avcodec.h"
 #ifdef ENABLE_AC3_DECODER
-#include "libavcodec/parser.h"
+#include "libavcodec/ac3.h"
+#include "libavcodec/ac3_parser.h"
 #else
 #include <a52dec/a52.h>
 #endif
@@ -208,11 +209,6 @@ static int dts_syncinfo(uint8_t *indata_ptr, int *flags,
     return fsize;
 }
 
-// until there is an easy way to do this with ffmpeg
-// get the code from libavcodec/parser.c made non static
-extern "C" int ac3_sync(const uint8_t *buf, int *channels, int *sample_rate,
-                        int *bit_rate, int *samples);
-
 // from http://www.ebu.ch/CMSimages/en/tec_AES-EBU_eg_tcm6-11890.pdf
 // http://en.wikipedia.org/wiki/S/PDIF
 typedef struct {
@@ -286,10 +282,24 @@ static int encode_frame(
     else
     {
 #ifdef ENABLE_AC3_DECODER
-        enc_len = ac3_sync(
-            payload, &flags, &sample_rate, &bit_rate, (int*)&block_len);
-        block_len *= 2 * 2;
-#else
+        int err;
+        AC3HeaderInfo hdr;
+        GetBitContext gbc;
+
+        init_get_bits(&gbc, payload, 54);
+        err = ff_ac3_parse_header(&gbc, &hdr);
+
+        if(err < 0)
+            enc_len = 0;
+        else
+        {
+            sample_rate = hdr.sample_rate;
+            bit_rate    = hdr.bit_rate;
+            enc_len     = hdr.frame_size;
+            block_len   = AC3_FRAME_SIZE * 4;
+        }
+
+#elif ENABLE_LIBA52_DECODER
         enc_len = a52_syncinfo(payload, &flags, &sample_rate, &bit_rate);
         block_len = MAX_AC3_FRAME_SIZE;
 #endif

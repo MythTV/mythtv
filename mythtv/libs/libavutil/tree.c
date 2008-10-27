@@ -28,58 +28,97 @@ typedef struct AVTreeNode{
     int state;
 }AVTreeNode;
 
+const int av_tree_node_size = sizeof(AVTreeNode);
+
 void *av_tree_find(const AVTreeNode *t, void *key, int (*cmp)(void *key, const void *b), void *next[2]){
     if(t){
-        unsigned int v= cmp(t->elem, key);
+        unsigned int v= cmp(key, t->elem);
         if(v){
-            if(next) next[(v>>31)^1]= t->elem;
-            return av_tree_find(t->child[v>>31], key, cmp, next);
+            if(next) next[v>>31]= t->elem;
+            return av_tree_find(t->child[(v>>31)^1], key, cmp, next);
         }else{
+            if(next){
+                av_tree_find(t->child[0], key, cmp, next);
+                av_tree_find(t->child[1], key, cmp, next);
+            }
             return t->elem;
         }
     }
     return NULL;
 }
 
-void *av_tree_insert(AVTreeNode **tp, void *key, int (*cmp)(void *key, const void *b)){
+void *av_tree_insert(AVTreeNode **tp, void *key, int (*cmp)(void *key, const void *b), AVTreeNode **next){
     AVTreeNode *t= *tp;
     if(t){
         unsigned int v= cmp(t->elem, key);
-        if(v){
-            int i= v>>31;
+        void *ret;
+        if(!v){
+            if(*next)
+                return t->elem;
+            else if(t->child[0]||t->child[1]){
+                int i= !t->child[0];
+                void *next_elem[2];
+                av_tree_find(t->child[i], key, cmp, next_elem);
+                key= t->elem= next_elem[i];
+                v= -i;
+            }else{
+                *next= t;
+                *tp=NULL;
+                return NULL;
+            }
+        }
+        ret= av_tree_insert(&t->child[v>>31], key, cmp, next);
+        if(!ret){
+            int i= (v>>31) ^ !!*next;
             AVTreeNode **child= &t->child[i];
-            void *ret= av_tree_insert(child, key, cmp);
-            if(!ret){
-                t->state -= ((int)v>>31)|1;
-                if(!(t->state&1)){
-                    if(t->state){
-                        if((*child)->state*2 == t->state){
-                            *tp= *child;
-                            *child= (*child)->child[i^1];
-                            (*tp)->child[i^1]= t;
-                            t->state= 0;
-                        }else{
-                            *tp= (*child)->child[i^1];
-                            (*child)->child[i^1]= (*tp)->child[i];
-                            (*tp)->child[i]= *child;
-                            *child= (*tp)->child[i^1];
-                            (*tp)->child[i^1]= t;
+            t->state += 2*i - 1;
 
-                            i= (*tp)->state > 0;
-                            (*tp)->child[i  ]->state= 0;
-                            (*tp)->child[i^1]->state= -(*tp)->state;
-                        }
-                        (*tp)->state=0;
+            if(!(t->state&1)){
+                if(t->state){
+                    /* The following code is equivalent to
+                    if((*child)->state*2 == -t->state)
+                        rotate(child, i^1);
+                    rotate(tp, i);
+
+                    with rotate():
+                    static void rotate(AVTreeNode **tp, int i){
+                        AVTreeNode *t= *tp;
+
+                        *tp= t->child[i];
+                        t->child[i]= t->child[i]->child[i^1];
+                        (*tp)->child[i^1]= t;
+                        i= 4*t->state + 2*(*tp)->state + 12;
+                          t  ->state=                     ((0x614586 >> i) & 3)-1;
+                        (*tp)->state= ((*tp)->state>>1) + ((0x400EEA >> i) & 3)-1;
                     }
-                    return key;
+                    but such a rotate function is both bigger and slower
+                    */
+                    if((*child)->state*2 == -t->state){
+                        *tp= (*child)->child[i^1];
+                        (*child)->child[i^1]= (*tp)->child[i];
+                        (*tp)->child[i]= *child;
+                        *child= (*tp)->child[i^1];
+                        (*tp)->child[i^1]= t;
+
+                        (*tp)->child[0]->state= -((*tp)->state>0);
+                        (*tp)->child[1]->state=   (*tp)->state<0 ;
+                        (*tp)->state=0;
+                    }else{
+                        *tp= *child;
+                        *child= (*child)->child[i^1];
+                        (*tp)->child[i^1]= t;
+                        if((*tp)->state) t->state  = 0;
+                        else             t->state>>= 1;
+                        (*tp)->state= -t->state;
+                    }
                 }
             }
-            return ret;
-        }else{
-            return t->elem;
+            if(!(*tp)->state ^ !!*next)
+                return key;
         }
+        return ret;
     }else{
-        *tp= av_mallocz(sizeof(AVTreeNode));
+        *tp= *next; *next= NULL;
         (*tp)->elem= key;
         return NULL;
     }
@@ -100,7 +139,7 @@ void av_tree_enumerate(AVTreeNode *t, void *opaque, int (*f)(void *opaque, void 
 #endif
 
 #ifdef TEST
-
+#undef random
 static int check(AVTreeNode *t){
     if(t){
         int left= check(t->child[0]);
@@ -132,19 +171,32 @@ int cmp(const void *a, const void *b){
     return a-b;
 }
 
-int main(){
-    int i,j,k;
-    AVTreeNode *root= NULL;
+int main(void){
+    int i,k;
+    AVTreeNode *root= NULL, *node=NULL;
 
     for(i=0; i<10000; i++){
-        int j= (random()%863294);
+        int j= (random()%86294);
         if(check(root) > 999){
             av_log(NULL, AV_LOG_ERROR, "FATAL error %d\n", i);
         print(root, 0);
             return -1;
         }
         av_log(NULL, AV_LOG_ERROR, "inserting %4d\n", j);
-        av_tree_insert(&root, (void*)(j+1), cmp);
+        if(!node)
+            node= av_mallocz(av_tree_node_size);
+        av_tree_insert(&root, (void*)(j+1), cmp, &node);
+
+        j= (random()%86294);
+        k= av_tree_find(root, (void*)(j+1), cmp, NULL);
+        if(k){
+            AVTreeNode *node2=NULL;
+            av_log(NULL, AV_LOG_ERROR, "removing %4d\n", j);
+            av_tree_insert(&root, (void*)(j+1), cmp, &node2);
+            k= av_tree_find(root, (void*)(j+1), cmp, NULL);
+            if(k)
+                av_log(NULL, AV_LOG_ERROR, "removial failure %d\n", i);
+        }
     }
     return 0;
 }

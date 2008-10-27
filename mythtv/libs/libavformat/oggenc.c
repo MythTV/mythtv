@@ -19,10 +19,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/crc.h"
+#include "libavcodec/xiph.h"
+#include "libavcodec/bytestream.h"
 #include "avformat.h"
-#include "crc.h"
-#include "xiph.h"
-#include "bytestream.h"
 
 typedef struct {
     int64_t duration;
@@ -33,15 +33,16 @@ typedef struct {
     int kfgshift;
     int64_t last_kf_pts;
     int vrev;
+    int eos;
 } OGGStreamContext;
 
 static void ogg_update_checksum(AVFormatContext *s, offset_t crc_offset)
 {
-    offset_t pos = url_ftell(&s->pb);
-    uint32_t checksum = get_checksum(&s->pb);
-    url_fseek(&s->pb, crc_offset, SEEK_SET);
-    put_be32(&s->pb, checksum);
-    url_fseek(&s->pb, pos, SEEK_SET);
+    offset_t pos = url_ftell(s->pb);
+    uint32_t checksum = get_checksum(s->pb);
+    url_fseek(s->pb, crc_offset, SEEK_SET);
+    put_be32(s->pb, checksum);
+    url_fseek(s->pb, pos, SEEK_SET);
 }
 
 static int ogg_write_page(AVFormatContext *s, const uint8_t *data, int size,
@@ -51,27 +52,32 @@ static int ogg_write_page(AVFormatContext *s, const uint8_t *data, int size,
     offset_t crc_offset;
     int page_segments, i;
 
-    size = FFMIN(size, 255*255);
+    if (size >= 255*255) {
+        granule = -1;
+        size = 255*255;
+    } else if (oggstream->eos)
+        flags |= 4;
+
     page_segments = FFMIN((size/255)+!!size, 255);
 
-    init_checksum(&s->pb, ff_crc04C11DB7_update, 0);
-    put_tag(&s->pb, "OggS");
-    put_byte(&s->pb, 0);
-    put_byte(&s->pb, flags);
-    put_le64(&s->pb, granule);
-    put_le32(&s->pb, stream_index);
-    put_le32(&s->pb, oggstream->page_counter++);
-    crc_offset = url_ftell(&s->pb);
-    put_le32(&s->pb, 0); // crc
-    put_byte(&s->pb, page_segments);
+    init_checksum(s->pb, ff_crc04C11DB7_update, 0);
+    put_tag(s->pb, "OggS");
+    put_byte(s->pb, 0);
+    put_byte(s->pb, flags);
+    put_le64(s->pb, granule);
+    put_le32(s->pb, stream_index);
+    put_le32(s->pb, oggstream->page_counter++);
+    crc_offset = url_ftell(s->pb);
+    put_le32(s->pb, 0); // crc
+    put_byte(s->pb, page_segments);
     for (i = 0; i < page_segments-1; i++)
-        put_byte(&s->pb, 255);
+        put_byte(s->pb, 255);
     if (size) {
-        put_byte(&s->pb, size - (page_segments-1)*255);
-        put_buffer(&s->pb, data, size);
+        put_byte(s->pb, size - (page_segments-1)*255);
+        put_buffer(s->pb, data, size);
     }
     ogg_update_checksum(s, crc_offset);
-    put_flush_packet(&s->pb);
+    put_flush_packet(s->pb);
     return size;
 }
 
@@ -82,8 +88,8 @@ static int ogg_build_flac_headers(const uint8_t *extradata, int extradata_size,
     uint8_t *p;
     if (extradata_size != 34)
         return -1;
-    oggstream->header_len[0] = 79;
-    oggstream->header[0] = av_mallocz(79); // per ogg flac specs
+    oggstream->header_len[0] = 51;
+    oggstream->header[0] = av_mallocz(51); // per ogg flac specs
     p = oggstream->header[0];
     bytestream_put_byte(&p, 0x7F);
     bytestream_put_buffer(&p, "FLAC", 4);
@@ -196,6 +202,65 @@ static int ogg_write_packet(AVFormatContext *s, AVPacket *pkt)
     return 0;
 }
 
+int ogg_interleave_per_granule(AVFormatContext *s, AVPacket *out, AVPacket *pkt, int flush)
+{
+    AVPacketList *pktl, **next_point, *this_pktl;
+    int stream_count = 0;
+    int streams[MAX_STREAMS] = {0};
+    int interleaved = 0;
+
+    if (pkt) {
+        AVStream *st = s->streams[pkt->stream_index];
+        this_pktl = av_mallocz(sizeof(AVPacketList));
+        this_pktl->pkt = *pkt;
+        if (pkt->destruct == av_destruct_packet)
+            pkt->destruct = NULL; // not shared -> must keep original from being freed
+        else
+            av_dup_packet(&this_pktl->pkt); // shared -> must dup
+        next_point = &s->packet_buffer;
+        while (*next_point) {
+            AVStream *st2 = s->streams[(*next_point)->pkt.stream_index];
+            AVPacket *next_pkt = &(*next_point)->pkt;
+            int64_t cur_granule, next_granule;
+            next_granule = av_rescale_q(next_pkt->pts + next_pkt->duration,
+                                        st2->time_base, AV_TIME_BASE_Q);
+            cur_granule = av_rescale_q(pkt->pts + pkt->duration,
+                                       st->time_base, AV_TIME_BASE_Q);
+            if (next_granule > cur_granule)
+                break;
+            next_point= &(*next_point)->next;
+        }
+        this_pktl->next= *next_point;
+        *next_point= this_pktl;
+    }
+
+    pktl = s->packet_buffer;
+    while (pktl) {
+        if (streams[pktl->pkt.stream_index] == 0)
+            stream_count++;
+        streams[pktl->pkt.stream_index]++;
+        // need to buffer at least one packet to set eos flag
+        if (streams[pktl->pkt.stream_index] == 2)
+            interleaved++;
+        pktl = pktl->next;
+    }
+
+    if ((s->nb_streams == stream_count && interleaved == stream_count) ||
+        (flush && stream_count)) {
+        pktl= s->packet_buffer;
+        *out= pktl->pkt;
+        s->packet_buffer = pktl->next;
+        if (flush && streams[out->stream_index] == 1) {
+            OGGStreamContext *ogg = s->streams[out->stream_index]->priv_data;
+            ogg->eos = 1;
+        }
+        av_freep(&pktl);
+        return 1;
+    } else {
+        av_init_packet(out);
+        return 0;
+    }
+}
 
 static int ogg_write_trailer(AVFormatContext *s)
 {
@@ -203,7 +268,6 @@ static int ogg_write_trailer(AVFormatContext *s)
     for (i = 0; i < s->nb_streams; i++) {
         AVStream *st = s->streams[i];
         OGGStreamContext *oggstream = st->priv_data;
-        ogg_write_page(s, NULL, 0, oggstream->duration, i, 4); // eos
         if (st->codec->codec_id == CODEC_ID_FLAC) {
             av_free(oggstream->header[0]);
             av_free(oggstream->header[1]);
@@ -215,13 +279,14 @@ static int ogg_write_trailer(AVFormatContext *s)
 
 AVOutputFormat ogg_muxer = {
     "ogg",
-    "Ogg format",
+    NULL_IF_CONFIG_SMALL("Ogg"),
     "application/ogg",
-    "ogg",
+    "ogg,ogv",
     0,
     CODEC_ID_FLAC,
     CODEC_ID_THEORA,
     ogg_write_header,
     ogg_write_packet,
     ogg_write_trailer,
+    .interleave_packet = ogg_interleave_per_granule,
 };

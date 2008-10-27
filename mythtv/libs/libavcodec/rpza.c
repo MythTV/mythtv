@@ -21,7 +21,7 @@
 
 /**
  * @file rpza.c
- * QT RPZA Video Decoder by Roberto Togni <rtogni@bresciaonline.it>
+ * QT RPZA Video Decoder by Roberto Togni
  * For more information about the RPZA format, visit:
  *   http://www.pcisys.net/~melanson/codecs/
  *
@@ -40,15 +40,13 @@
 #include <unistd.h>
 
 #include "avcodec.h"
-#include "dsputil.h"
 
 typedef struct RpzaContext {
 
     AVCodecContext *avctx;
-    DSPContext dsp;
     AVFrame frame;
 
-    unsigned char *buf;
+    const unsigned char *buf;
     int size;
 
 } RpzaContext;
@@ -228,13 +226,12 @@ static void rpza_decode_stream(RpzaContext *s)
     }
 }
 
-static int rpza_decode_init(AVCodecContext *avctx)
+static av_cold int rpza_decode_init(AVCodecContext *avctx)
 {
     RpzaContext *s = avctx->priv_data;
 
     s->avctx = avctx;
     avctx->pix_fmt = PIX_FMT_RGB555;
-    dsputil_init(&s->dsp, avctx);
 
     s->frame.data[0] = NULL;
 
@@ -243,7 +240,7 @@ static int rpza_decode_init(AVCodecContext *avctx)
 
 static int rpza_decode_frame(AVCodecContext *avctx,
                              void *data, int *data_size,
-                             uint8_t *buf, int buf_size)
+                             const uint8_t *buf, int buf_size)
 {
     RpzaContext *s = avctx->priv_data;
 
@@ -266,7 +263,7 @@ static int rpza_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int rpza_decode_end(AVCodecContext *avctx)
+static av_cold int rpza_decode_end(AVCodecContext *avctx)
 {
     RpzaContext *s = avctx->priv_data;
 
@@ -286,4 +283,5 @@ AVCodec rpza_decoder = {
     rpza_decode_end,
     rpza_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("QuickTime video (RPZA)"),
 };

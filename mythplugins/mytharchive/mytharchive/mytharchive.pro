@@ -7,7 +7,7 @@ include (config.pro)
    error(Missing config.pro: please run the configure script)
 }
 
-INCLUDEPATH += $${PREFIX}/include/mythtv $${PREFIX}/include/mythtv/ffmpeg 
+INCLUDEPATH += $${PREFIX}/include/mythtv
 INCLUDEPATH += $${PREFIX}/include/mythtv/libmythtv
 
 LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION

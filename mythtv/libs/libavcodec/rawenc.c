@@ -27,7 +27,7 @@
 #include "avcodec.h"
 #include "raw.h"
 
-static int raw_init_encoder(AVCodecContext *avctx)
+static av_cold int raw_init_encoder(AVCodecContext *avctx)
 {
     avctx->coded_frame = (AVFrame *)avctx->priv_data;
     avctx->coded_frame->pict_type = FF_I_TYPE;
@@ -51,4 +51,5 @@ AVCodec rawvideo_encoder = {
     sizeof(AVFrame),
     raw_init_encoder,
     raw_encode,
+    .long_name = NULL_IF_CONFIG_SMALL("raw video"),
 };

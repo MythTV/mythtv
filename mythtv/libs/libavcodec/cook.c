@@ -46,11 +46,11 @@
 #include <stddef.h>
 #include <stdio.h>
 
+#include "libavutil/random.h"
 #include "avcodec.h"
 #include "bitstream.h"
 #include "dsputil.h"
 #include "bytestream.h"
-#include "random.h"
 
 #include "cookdata.h"
 
@@ -112,7 +112,6 @@ typedef struct cook {
 
     /* transform data */
     MDCTContext         mdct_ctx;
-    DECLARE_ALIGNED_16(FFTSample, mdct_tmp[1024]);  /* temporary storage for imlt */
     float*              mlt_window;
 
     /* gain buffers */
@@ -132,8 +131,6 @@ typedef struct cook {
     /* generatable tables and related variables */
     int                 gain_size_factor;
     float               gain_table[23];
-    float               pow2tab[127];
-    float               rootpow2tab[127];
 
     /* data buffers */
 
@@ -145,8 +142,11 @@ typedef struct cook {
     float               decode_buffer_2[1024];
     float               decode_buffer_0[1060]; /* static allocation for joint decode */
 
-    float               *cplscales[5];
+    const float         *cplscales[5];
 } COOKContext;
+
+static float     pow2tab[127];
+static float rootpow2tab[127];
 
 /* debug functions */
 
@@ -183,22 +183,11 @@ static void dump_short_table(short* table, int size, int delimiter) {
 /*************** init functions ***************/
 
 /* table generator */
-static void init_pow2table(COOKContext *q){
+static void init_pow2table(void){
     int i;
-    q->pow2tab[63] = 1.0;
-    for (i=1 ; i<64 ; i++){
-        q->pow2tab[63+i]=(float)((uint64_t)1<<i);
-        q->pow2tab[63-i]=1.0/(float)((uint64_t)1<<i);
-    }
-}
-
-/* table generator */
-static void init_rootpow2table(COOKContext *q){
-    int i;
-    q->rootpow2tab[63] = 1.0;
-    for (i=1 ; i<64 ; i++){
-        q->rootpow2tab[63+i]=sqrt((float)((uint64_t)1<<i));
-        q->rootpow2tab[63-i]=sqrt(1.0/(float)((uint64_t)1<<i));
+    for (i=-63 ; i<64 ; i++){
+            pow2tab[63+i]=     pow(2, i);
+        rootpow2tab[63+i]=sqrt(pow(2, i));
     }
 }
 
@@ -207,7 +196,7 @@ static void init_gain_table(COOKContext *q) {
     int i;
     q->gain_size_factor = q->samples_per_channel/8;
     for (i=0 ; i<23 ; i++) {
-        q->gain_table[i] = pow((double)q->pow2tab[i+52] ,
+        q->gain_table[i] = pow(pow2tab[i+52] ,
                                (1.0/(double)q->gain_size_factor));
     }
 }
@@ -242,16 +231,15 @@ static int init_cook_vlc_tables(COOKContext *q) {
 
 static int init_cook_mlt(COOKContext *q) {
     int j;
-    float alpha;
     int mlt_size = q->samples_per_channel;
 
     if ((q->mlt_window = av_malloc(sizeof(float)*mlt_size)) == 0)
       return -1;
 
     /* Initialize the MLT window: simple sine window. */
-    alpha = M_PI / (2.0 * (float)mlt_size);
+    ff_sine_window_init(q->mlt_window, mlt_size);
     for(j=0 ; j<mlt_size ; j++)
-        q->mlt_window[j] = sin((j + 0.5) * alpha) * sqrt(2.0 / q->samples_per_channel);
+        q->mlt_window[j] *= sqrt(2.0 / q->samples_per_channel);
 
     /* Initialize the MDCT. */
     if (ff_mdct_init(&q->mdct_ctx, av_log2(mlt_size)+1, 1)) {
@@ -264,7 +252,7 @@ static int init_cook_mlt(COOKContext *q) {
     return 0;
 }
 
-static float *maybe_reformat_buffer32 (COOKContext *q, float *ptr, int n)
+static const float *maybe_reformat_buffer32 (COOKContext *q, const float *ptr, int n)
 {
     if (1)
         return ptr;
@@ -301,10 +289,10 @@ static void init_cplscales_table (COOKContext *q) {
 #define DECODE_BYTES_PAD1(bytes) (3 - ((bytes)+3) % 4)
 #define DECODE_BYTES_PAD2(bytes) ((bytes) % 4 + DECODE_BYTES_PAD1(2 * (bytes)))
 
-static inline int decode_bytes(uint8_t* inbuffer, uint8_t* out, int bytes){
+static inline int decode_bytes(const uint8_t* inbuffer, uint8_t* out, int bytes){
     int i, off;
     uint32_t c;
-    uint32_t* buf;
+    const uint32_t* buf;
     uint32_t* obuf = (uint32_t*) out;
     /* FIXME: 64 bit platforms would be able to do 64 bits at a time.
      * I'm too lazy though, should be something like
@@ -313,7 +301,7 @@ static inline int decode_bytes(uint8_t* inbuffer, uint8_t* out, int bytes){
      * Buffer alignment needs to be checked. */
 
     off = (int)((long)inbuffer & 3);
-    buf = (uint32_t*) (inbuffer - off);
+    buf = (const uint32_t*) (inbuffer - off);
     c = be2me_32((0x37c511f2 >> (off*8)) | (0x37c511f2 << (32-(off*8))));
     bytes += 3 + off;
     for (i = 0; i < bytes/4; i++)
@@ -359,7 +347,7 @@ static int cook_decode_close(AVCodecContext *avctx)
  * Fill the gain array for the timedomain quantization.
  *
  * @param q                 pointer to the COOKContext
- * @param gaininfo[9]       array of gain indices
+ * @param gaininfo[9]       array of gain indexes
  */
 
 static void decode_gain_info(GetBitContext *gb, int *gaininfo)
@@ -553,7 +541,7 @@ static void scalar_dequant_float(COOKContext *q, int index, int quant_index,
             f1 = dither_tab[index];
             if (av_random(&q->random_state) < 0x80000000) f1 = -f1;
         }
-        mlt_p[i] = f1 * q->rootpow2tab[quant_index+63];
+        mlt_p[i] = f1 * rootpow2tab[quant_index+63];
     }
 }
 /**
@@ -681,7 +669,7 @@ static void interpolate_float(COOKContext *q, float* buffer,
                         int gain_index, int gain_index_next){
     int i;
     float fc1, fc2;
-    fc1 = q->pow2tab[gain_index+63];
+    fc1 = pow2tab[gain_index+63];
 
     if(gain_index == gain_index_next){              //static gain
         for(i=0 ; i<q->gain_size_factor ; i++){
@@ -710,7 +698,7 @@ static void interpolate_float(COOKContext *q, float* buffer,
 static void imlt_window_float (COOKContext *q, float *buffer1,
                                cook_gains *gains_ptr, float *previous_buffer)
 {
-    const float fc = q->pow2tab[gains_ptr->previous[0] + 63];
+    const float fc = pow2tab[gains_ptr->previous[0] + 63];
     int i;
     /* The weird thing here, is that the two halves of the time domain
      * buffer are swapped. Also, the newest data, that we save away for
@@ -745,8 +733,7 @@ static void imlt_gain(COOKContext *q, float *inbuffer,
     int i;
 
     /* Inverse modified discrete cosine transform */
-    q->mdct_ctx.fft.imdct_calc(&q->mdct_ctx, q->mono_mdct_output,
-                               inbuffer, q->mdct_tmp);
+    ff_imdct_calc(&q->mdct_ctx, q->mono_mdct_output, inbuffer);
 
     q->imlt_window (q, buffer1, gains_ptr, previous_buffer);
 
@@ -832,7 +819,7 @@ static void joint_decode(COOKContext *q, float* mlt_buffer1,
     float *decode_buffer = q->decode_buffer_0;
     int idx, cpl_tmp;
     float f1,f2;
-    float* cplscale;
+    const float* cplscale;
 
     memset(decouple_tab, 0, sizeof(decouple_tab));
     memset(decode_buffer, 0, sizeof(decode_buffer));
@@ -875,7 +862,7 @@ static void joint_decode(COOKContext *q, float* mlt_buffer1,
  */
 
 static inline void
-decode_bytes_and_gain(COOKContext *q, uint8_t *inbuffer,
+decode_bytes_and_gain(COOKContext *q, const uint8_t *inbuffer,
                       cook_gains *gains_ptr)
 {
     int offset;
@@ -944,7 +931,7 @@ mlt_compensate_output(COOKContext *q, float *decode_buffer,
  */
 
 
-static int decode_subpacket(COOKContext *q, uint8_t *inbuffer,
+static int decode_subpacket(COOKContext *q, const uint8_t *inbuffer,
                             int sub_packet_size, int16_t *outbuffer) {
     /* packet dump */
 //    for (i=0 ; i<sub_packet_size ; i++) {
@@ -989,7 +976,7 @@ static int decode_subpacket(COOKContext *q, uint8_t *inbuffer,
 
 static int cook_decode_frame(AVCodecContext *avctx,
             void *data, int *data_size,
-            uint8_t *buf, int buf_size) {
+            const uint8_t *buf, int buf_size) {
     COOKContext *q = avctx->priv_data;
 
     if (buf_size < avctx->block_align)
@@ -1038,7 +1025,7 @@ static void dump_cook_context(COOKContext *q)
 static int cook_decode_init(AVCodecContext *avctx)
 {
     COOKContext *q = avctx->priv_data;
-    uint8_t *edata_ptr = avctx->extradata;
+    const uint8_t *edata_ptr = avctx->extradata;
 
     /* Take care of the codec specific extradata. */
     if (avctx->extradata_size <= 0) {
@@ -1124,8 +1111,7 @@ static int cook_decode_init(AVCodecContext *avctx)
     q->numvector_size = (1 << q->log2_numvector_size);
 
     /* Generate tables */
-    init_rootpow2table(q);
-    init_pow2table(q);
+    init_pow2table();
     init_gain_table(q);
     init_cplscales_table(q);
 
@@ -1190,6 +1176,8 @@ static int cook_decode_init(AVCodecContext *avctx)
         return -1;
     }
 
+    avctx->sample_fmt = SAMPLE_FMT_S16;
+
 #ifdef COOKDEBUG
     dump_cook_context(q);
 #endif
@@ -1206,4 +1194,5 @@ AVCodec cook_decoder =
     .init = cook_decode_init,
     .close = cook_decode_close,
     .decode = cook_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("COOK"),
 };

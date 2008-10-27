@@ -20,8 +20,8 @@
 
 /**
  * @file roqvideodec.c
- * Id RoQ Video Decoder by Dr. Tim Ferguson
- * For more information about the Id RoQ format, visit:
+ * id RoQ Video Decoder by Dr. Tim Ferguson
+ * For more information about the id RoQ format, visit:
  *   http://www.csse.monash.edu.au/~timf/
  */
 
@@ -32,7 +32,6 @@
 
 #include "avcodec.h"
 #include "bytestream.h"
-#include "dsputil.h"
 #include "roqvideo.h"
 
 static void roqvideo_decode_frame(RoqContext *ri)
@@ -43,8 +42,8 @@ static void roqvideo_decode_frame(RoqContext *ri)
     int vqid, bpos, xpos, ypos, xp, yp, x, y, mx, my;
     int frame_stats[2][4] = {{0},{0}};
     roq_qcell *qcell;
-    unsigned char *buf = ri->buf;
-    unsigned char *buf_end = ri->buf + ri->size;
+    const unsigned char *buf = ri->buf;
+    const unsigned char *buf_end = ri->buf + ri->size;
 
     while (buf < buf_end) {
         chunk_id = bytestream_get_le16(&buf);
@@ -154,7 +153,7 @@ static void roqvideo_decode_frame(RoqContext *ri)
 }
 
 
-static int roq_decode_init(AVCodecContext *avctx)
+static av_cold int roq_decode_init(AVCodecContext *avctx)
 {
     RoqContext *s = avctx->priv_data;
 
@@ -164,14 +163,13 @@ static int roq_decode_init(AVCodecContext *avctx)
     s->last_frame    = &s->frames[0];
     s->current_frame = &s->frames[1];
     avctx->pix_fmt = PIX_FMT_YUV444P;
-    dsputil_init(&s->dsp, avctx);
 
     return 0;
 }
 
 static int roq_decode_frame(AVCodecContext *avctx,
                             void *data, int *data_size,
-                            uint8_t *buf, int buf_size)
+                            const uint8_t *buf, int buf_size)
 {
     RoqContext *s = avctx->priv_data;
     int copy= !s->current_frame->data[0];
@@ -198,7 +196,7 @@ static int roq_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int roq_decode_end(AVCodecContext *avctx)
+static av_cold int roq_decode_end(AVCodecContext *avctx)
 {
     RoqContext *s = avctx->priv_data;
 
@@ -221,4 +219,5 @@ AVCodec roq_decoder = {
     roq_decode_end,
     roq_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("id RoQ video"),
 };

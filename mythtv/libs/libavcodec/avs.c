@@ -44,12 +44,13 @@ typedef enum {
 
 static int
 avs_decode_frame(AVCodecContext * avctx,
-                 void *data, int *data_size, uint8_t * buf, int buf_size)
+                 void *data, int *data_size, const uint8_t * buf, int buf_size)
 {
     avs_context_t *const avs = avctx->priv_data;
     AVFrame *picture = data;
     AVFrame *const p = (AVFrame *) & avs->picture;
-    uint8_t *table, *vect, *out;
+    const uint8_t *table, *vect;
+    uint8_t *out;
     int i, j, x, y, stride, vect_w = 3, vect_h = 3;
     int sub_type;
     avs_block_type_t type;
@@ -141,7 +142,7 @@ avs_decode_frame(AVCodecContext * avctx,
     return buf_size;
 }
 
-static int avs_decode_init(AVCodecContext * avctx)
+static av_cold int avs_decode_init(AVCodecContext * avctx)
 {
     avctx->pix_fmt = PIX_FMT_PAL8;
     return 0;
@@ -157,4 +158,5 @@ AVCodec avs_decoder = {
     NULL,
     avs_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("AVS (Audio Video Standard) video"),
 };

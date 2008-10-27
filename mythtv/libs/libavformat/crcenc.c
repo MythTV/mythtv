@@ -18,8 +18,9 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+#include "libavutil/adler32.h"
 #include "avformat.h"
-#include "adler32.h"
 
 typedef struct CRCState {
     uint32_t crcval;
@@ -48,14 +49,14 @@ static int crc_write_trailer(struct AVFormatContext *s)
     char buf[64];
 
     snprintf(buf, sizeof(buf), "CRC=0x%08x\n", crc->crcval);
-    put_buffer(&s->pb, buf, strlen(buf));
-    put_flush_packet(&s->pb);
+    put_buffer(s->pb, buf, strlen(buf));
+    put_flush_packet(s->pb);
     return 0;
 }
 
 AVOutputFormat crc_muxer = {
     "crc",
-    "crc testing format",
+    NULL_IF_CONFIG_SMALL("CRC testing format"),
     NULL,
     "",
     sizeof(CRCState),

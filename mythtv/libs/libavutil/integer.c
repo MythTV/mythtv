@@ -96,10 +96,10 @@ AVInteger av_shr_i(AVInteger a, int s){
     int i;
 
     for(i=0; i<AV_INTEGER_SIZE; i++){
-        int index= i + (s>>4);
+        unsigned int index= i + (s>>4);
         unsigned int v=0;
-        if(index+1<AV_INTEGER_SIZE && index+1>=0) v = a.v[index+1]<<16;
-        if(index  <AV_INTEGER_SIZE && index  >=0) v+= a.v[index  ];
+        if(index+1<AV_INTEGER_SIZE) v = a.v[index+1]<<16;
+        if(index  <AV_INTEGER_SIZE) v+= a.v[index  ];
         out.v[i]= v >> (s&15);
     }
     return out;
@@ -156,7 +156,7 @@ int64_t av_i2int(AVInteger a){
     return out;
 }
 
-#if 0
+#ifdef TEST
 #undef NDEBUG
 #include <assert.h>
 
@@ -171,7 +171,7 @@ const uint8_t ff_log2_tab[256]={
         7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
 };
 
-main(){
+int main(void){
     int64_t a,b;
 
     for(a=7; a<256*256*256; a+=13215){
@@ -192,5 +192,6 @@ main(){
             assert(av_i2int(av_div_i(ai,bi)) == a/b);
         }
     }
+    return 0;
 }
 #endif

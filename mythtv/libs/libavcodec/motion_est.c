@@ -231,10 +231,21 @@ static int zero_cmp(void *s, uint8_t *a, uint8_t *b, int stride, int h){
 static void zero_hpel(uint8_t *a, const uint8_t *b, int stride, int h){
 }
 
-void ff_init_me(MpegEncContext *s){
+int ff_init_me(MpegEncContext *s){
     MotionEstContext * const c= &s->me;
     int cache_size= FFMIN(ME_MAP_SIZE>>ME_MAP_SHIFT, 1<<ME_MAP_SHIFT);
     int dia_size= FFMAX(FFABS(s->avctx->dia_size)&255, FFABS(s->avctx->pre_dia_size)&255);
+
+    if(FFMIN(s->avctx->dia_size, s->avctx->pre_dia_size) < -ME_MAP_SIZE){
+        av_log(s->avctx, AV_LOG_ERROR, "ME_MAP size is too small for SAB diamond\n");
+        return -1;
+    }
+    //special case of snow is needed because snow uses its own iterative ME code
+    if(s->me_method!=ME_ZERO && s->me_method!=ME_EPZS && s->me_method!=ME_X1 && s->avctx->codec_id != CODEC_ID_SNOW){
+        av_log(s->avctx, AV_LOG_ERROR, "me_method is only allowed to be set to zero and epzs; for hex,umh,full and others see dia_size\n");
+        return -1;
+    }
+
     c->avctx= s->avctx;
 
     if(cache_size < 2*dia_size && !c->stride){
@@ -297,6 +308,8 @@ void ff_init_me(MpegEncContext *s){
     }
 
     c->temp= c->scratchpad;
+
+    return 0;
 }
 
 #if 0
@@ -329,229 +342,6 @@ static inline void no_motion_search(MpegEncContext * s,
     *mx_ptr = 16 * s->mb_x;
     *my_ptr = 16 * s->mb_y;
 }
-
-#if 0  /* the use of these functions is inside #if 0 */
-static int full_motion_search(MpegEncContext * s,
-                              int *mx_ptr, int *my_ptr, int range,
-                              int xmin, int ymin, int xmax, int ymax, uint8_t *ref_picture)
-{
-    int x1, y1, x2, y2, xx, yy, x, y;
-    int mx, my, dmin, d;
-    uint8_t *pix;
-
-    xx = 16 * s->mb_x;
-    yy = 16 * s->mb_y;
-    x1 = xx - range + 1;        /* we loose one pixel to avoid boundary pb with half pixel pred */
-    if (x1 < xmin)
-        x1 = xmin;
-    x2 = xx + range - 1;
-    if (x2 > xmax)
-        x2 = xmax;
-    y1 = yy - range + 1;
-    if (y1 < ymin)
-        y1 = ymin;
-    y2 = yy + range - 1;
-    if (y2 > ymax)
-        y2 = ymax;
-    pix = s->new_picture.data[0] + (yy * s->linesize) + xx;
-    dmin = 0x7fffffff;
-    mx = 0;
-    my = 0;
-    for (y = y1; y <= y2; y++) {
-        for (x = x1; x <= x2; x++) {
-            d = s->dsp.pix_abs[0][0](NULL, pix, ref_picture + (y * s->linesize) + x,
-                             s->linesize, 16);
-            if (d < dmin ||
-                (d == dmin &&
-                 (abs(x - xx) + abs(y - yy)) <
-                 (abs(mx - xx) + abs(my - yy)))) {
-                dmin = d;
-                mx = x;
-                my = y;
-            }
-        }
-    }
-
-    *mx_ptr = mx;
-    *my_ptr = my;
-
-#if 0
-    if (*mx_ptr < -(2 * range) || *mx_ptr >= (2 * range) ||
-        *my_ptr < -(2 * range) || *my_ptr >= (2 * range)) {
-        av_log(NULL, AV_LOG_ERROR, "error %d %d\n", *mx_ptr, *my_ptr);
-    }
-#endif
-    return dmin;
-}
-
-
-static int log_motion_search(MpegEncContext * s,
-                             int *mx_ptr, int *my_ptr, int range,
-                             int xmin, int ymin, int xmax, int ymax, uint8_t *ref_picture)
-{
-    int x1, y1, x2, y2, xx, yy, x, y;
-    int mx, my, dmin, d;
-    uint8_t *pix;
-
-    xx = s->mb_x << 4;
-    yy = s->mb_y << 4;
-
-    /* Left limit */
-    x1 = xx - range;
-    if (x1 < xmin)
-        x1 = xmin;
-
-    /* Right limit */
-    x2 = xx + range;
-    if (x2 > xmax)
-        x2 = xmax;
-
-    /* Upper limit */
-    y1 = yy - range;
-    if (y1 < ymin)
-        y1 = ymin;
-
-    /* Lower limit */
-    y2 = yy + range;
-    if (y2 > ymax)
-        y2 = ymax;
-
-    pix = s->new_picture.data[0] + (yy * s->linesize) + xx;
-    dmin = 0x7fffffff;
-    mx = 0;
-    my = 0;
-
-    do {
-        for (y = y1; y <= y2; y += range) {
-            for (x = x1; x <= x2; x += range) {
-                d = s->dsp.pix_abs[0][0](NULL, pix, ref_picture + (y * s->linesize) + x, s->linesize, 16);
-                if (d < dmin || (d == dmin && (abs(x - xx) + abs(y - yy)) < (abs(mx - xx) + abs(my - yy)))) {
-                    dmin = d;
-                    mx = x;
-                    my = y;
-                }
-            }
-        }
-
-        range = range >> 1;
-
-        x1 = mx - range;
-        if (x1 < xmin)
-            x1 = xmin;
-
-        x2 = mx + range;
-        if (x2 > xmax)
-            x2 = xmax;
-
-        y1 = my - range;
-        if (y1 < ymin)
-            y1 = ymin;
-
-        y2 = my + range;
-        if (y2 > ymax)
-            y2 = ymax;
-
-    } while (range >= 1);
-
-#ifdef DEBUG
-    av_log(s->avctx, AV_LOG_DEBUG, "log       - MX: %d\tMY: %d\n", mx, my);
-#endif
-    *mx_ptr = mx;
-    *my_ptr = my;
-    return dmin;
-}
-
-static int phods_motion_search(MpegEncContext * s,
-                               int *mx_ptr, int *my_ptr, int range,
-                               int xmin, int ymin, int xmax, int ymax, uint8_t *ref_picture)
-{
-    int x1, y1, x2, y2, xx, yy, x, y, lastx, d;
-    int mx, my, dminx, dminy;
-    uint8_t *pix;
-
-    xx = s->mb_x << 4;
-    yy = s->mb_y << 4;
-
-    /* Left limit */
-    x1 = xx - range;
-    if (x1 < xmin)
-        x1 = xmin;
-
-    /* Right limit */
-    x2 = xx + range;
-    if (x2 > xmax)
-        x2 = xmax;
-
-    /* Upper limit */
-    y1 = yy - range;
-    if (y1 < ymin)
-        y1 = ymin;
-
-    /* Lower limit */
-    y2 = yy + range;
-    if (y2 > ymax)
-        y2 = ymax;
-
-    pix = s->new_picture.data[0] + (yy * s->linesize) + xx;
-    mx = 0;
-    my = 0;
-
-    x = xx;
-    y = yy;
-    do {
-        dminx = 0x7fffffff;
-        dminy = 0x7fffffff;
-
-        lastx = x;
-        for (x = x1; x <= x2; x += range) {
-            d = s->dsp.pix_abs[0][0](NULL, pix, ref_picture + (y * s->linesize) + x, s->linesize, 16);
-            if (d < dminx || (d == dminx && (abs(x - xx) + abs(y - yy)) < (abs(mx - xx) + abs(my - yy)))) {
-                dminx = d;
-                mx = x;
-            }
-        }
-
-        x = lastx;
-        for (y = y1; y <= y2; y += range) {
-            d = s->dsp.pix_abs[0][0](NULL, pix, ref_picture + (y * s->linesize) + x, s->linesize, 16);
-            if (d < dminy || (d == dminy && (abs(x - xx) + abs(y - yy)) < (abs(mx - xx) + abs(my - yy)))) {
-                dminy = d;
-                my = y;
-            }
-        }
-
-        range = range >> 1;
-
-        x = mx;
-        y = my;
-        x1 = mx - range;
-        if (x1 < xmin)
-            x1 = xmin;
-
-        x2 = mx + range;
-        if (x2 > xmax)
-            x2 = xmax;
-
-        y1 = my - range;
-        if (y1 < ymin)
-            y1 = ymin;
-
-        y2 = my + range;
-        if (y2 > ymax)
-            y2 = ymax;
-
-    } while (range >= 1);
-
-#ifdef DEBUG
-    av_log(s->avctx, AV_LOG_DEBUG, "phods     - MX: %d\tMY: %d\n", mx, my);
-#endif
-
-    /* half pixel search */
-    *mx_ptr = mx;
-    *my_ptr = my;
-    return dminy;
-}
-#endif /* 0 */
 
 #define Z_THRESHOLD 256
 
@@ -1217,23 +1007,6 @@ void ff_estimate_p_frame_motion(MpegEncContext * s,
         my-= mb_y*16;
         dmin = 0;
         break;
-#if 0
-    case ME_FULL:
-        dmin = full_motion_search(s, &mx, &my, range, ref_picture);
-        mx-= mb_x*16;
-        my-= mb_y*16;
-        break;
-    case ME_LOG:
-        dmin = log_motion_search(s, &mx, &my, range / 2, ref_picture);
-        mx-= mb_x*16;
-        my-= mb_y*16;
-        break;
-    case ME_PHODS:
-        dmin = phods_motion_search(s, &mx, &my, range / 2, ref_picture);
-        mx-= mb_x*16;
-        my-= mb_y*16;
-        break;
-#endif
     case ME_X1:
     case ME_EPZS:
        {
@@ -1505,23 +1278,6 @@ static int ff_estimate_motion_b(MpegEncContext * s,
         mx-= mb_x*16;
         my-= mb_y*16;
         break;
-#if 0
-    case ME_FULL:
-        dmin = full_motion_search(s, &mx, &my, range, ref_picture);
-        mx-= mb_x*16;
-        my-= mb_y*16;
-        break;
-    case ME_LOG:
-        dmin = log_motion_search(s, &mx, &my, range / 2, ref_picture);
-        mx-= mb_x*16;
-        my-= mb_y*16;
-        break;
-    case ME_PHODS:
-        dmin = phods_motion_search(s, &mx, &my, range / 2, ref_picture);
-        mx-= mb_x*16;
-        my-= mb_y*16;
-        break;
-#endif
     case ME_X1:
     case ME_EPZS:
        {
@@ -2026,7 +1782,7 @@ int ff_get_best_fcode(MpegEncContext * s, int16_t (*mv_table)[2], int type)
                             continue;
 
                     for(j=0; j<fcode && j<8; j++){
-                        if(s->pict_type==B_TYPE || s->current_picture.mc_mb_var[xy] < s->current_picture.mb_var[xy])
+                        if(s->pict_type==FF_B_TYPE || s->current_picture.mc_mb_var[xy] < s->current_picture.mb_var[xy])
                             score[j]-= 170;
                     }
                 }
@@ -2058,7 +1814,7 @@ void ff_fix_long_p_mvs(MpegEncContext * s)
     MotionEstContext * const c= &s->me;
     const int f_code= s->f_code;
     int y, range;
-    assert(s->pict_type==P_TYPE);
+    assert(s->pict_type==FF_P_TYPE);
 
     range = (((s->out_format == FMT_MPEG1 || s->msmpeg4_version) ? 8 : 16) << f_code);
 

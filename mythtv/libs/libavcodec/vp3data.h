@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_VP3DATA_H
-#define FFMPEG_VP3DATA_H
+#ifndef AVCODEC_VP3DATA_H
+#define AVCODEC_VP3DATA_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -405,7 +405,7 @@ static const int16_t coeff_table_token_22[1024] = {
     -573, -574, -575, -576, -577, -578, -579, -580
 };
 
-static const int16_t *coeff_tables[32] = {
+static const int16_t *const coeff_tables[32] = {
     NULL,
     NULL,
     NULL,
@@ -3178,4 +3178,4 @@ static const uint16_t ac_bias_3[16][32][2] = {
   }
 };
 
-#endif /* FFMPEG_VP3DATA_H */
+#endif /* AVCODEC_VP3DATA_H */

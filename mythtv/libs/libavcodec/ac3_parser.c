@@ -1,5 +1,5 @@
 /*
- * AC3 parser
+ * AC-3 parser
  * Copyright (c) 2003 Fabrice Bellard.
  * Copyright (c) 2003 Michael Niedermayer.
  *
@@ -34,123 +34,154 @@ static const uint8_t eac3_blocks[4] = {
 };
 
 
-int ff_ac3_parse_header(const uint8_t buf[7], AC3HeaderInfo *hdr)
+int ff_ac3_parse_header(GetBitContext *gbc, AC3HeaderInfo *hdr)
 {
-    GetBitContext gbc;
+    int frame_size_code;
 
     memset(hdr, 0, sizeof(*hdr));
 
-    init_get_bits(&gbc, buf, 54);
-
-    hdr->sync_word = get_bits(&gbc, 16);
+    hdr->sync_word = get_bits(gbc, 16);
     if(hdr->sync_word != 0x0B77)
         return AC3_PARSE_ERROR_SYNC;
 
-    /* read ahead to bsid to make sure this is AC-3, not E-AC-3 */
-    hdr->bsid = show_bits_long(&gbc, 29) & 0x1F;
-    if(hdr->bsid > 10)
+    /* read ahead to bsid to distinguish between AC-3 and E-AC-3 */
+    hdr->bitstream_id = show_bits_long(gbc, 29) & 0x1F;
+    if(hdr->bitstream_id > 16)
         return AC3_PARSE_ERROR_BSID;
 
-    hdr->crc1 = get_bits(&gbc, 16);
-    hdr->fscod = get_bits(&gbc, 2);
-    if(hdr->fscod == 3)
-        return AC3_PARSE_ERROR_SAMPLE_RATE;
+    hdr->num_blocks = 6;
 
-    hdr->frmsizecod = get_bits(&gbc, 6);
-    if(hdr->frmsizecod > 37)
-        return AC3_PARSE_ERROR_FRAME_SIZE;
+    /* set default mix levels */
+    hdr->center_mix_level   = 1;  // -4.5dB
+    hdr->surround_mix_level = 1;  // -6.0dB
 
-    skip_bits(&gbc, 5); // skip bsid, already got it
+    if(hdr->bitstream_id <= 10) {
+        /* Normal AC-3 */
+        hdr->crc1 = get_bits(gbc, 16);
+        hdr->sr_code = get_bits(gbc, 2);
+        if(hdr->sr_code == 3)
+            return AC3_PARSE_ERROR_SAMPLE_RATE;
 
-    hdr->bsmod = get_bits(&gbc, 3);
-    hdr->acmod = get_bits(&gbc, 3);
-    if((hdr->acmod & 1) && hdr->acmod != AC3_ACMOD_MONO) {
-        hdr->cmixlev = get_bits(&gbc, 2);
-    }
-    if(hdr->acmod & 4) {
-        hdr->surmixlev = get_bits(&gbc, 2);
-    }
-    if(hdr->acmod == AC3_ACMOD_STEREO) {
-        hdr->dsurmod = get_bits(&gbc, 2);
-    }
-    hdr->lfeon = get_bits1(&gbc);
+        frame_size_code = get_bits(gbc, 6);
+        if(frame_size_code > 37)
+            return AC3_PARSE_ERROR_FRAME_SIZE;
 
-    hdr->halfratecod = FFMAX(hdr->bsid, 8) - 8;
-    hdr->sample_rate = ff_ac3_freqs[hdr->fscod] >> hdr->halfratecod;
-    hdr->bit_rate = (ff_ac3_bitratetab[hdr->frmsizecod>>1] * 1000) >> hdr->halfratecod;
-    hdr->channels = ff_ac3_channels[hdr->acmod] + hdr->lfeon;
-    hdr->frame_size = ff_ac3_frame_sizes[hdr->frmsizecod][hdr->fscod] * 2;
+        skip_bits(gbc, 5); // skip bsid, already got it
 
-    return 0;
-}
+        skip_bits(gbc, 3); // skip bitstream mode
+        hdr->channel_mode = get_bits(gbc, 3);
 
-/* Made public for MythTV ac3 remixing */
-/*static*/ int ac3_sync(const uint8_t *buf, int *channels, int *sample_rate,
-                    int *bit_rate, int *samples)
-{
-    int err;
-    unsigned int fscod, acmod, bsid, lfeon;
-    unsigned int strmtyp, substreamid, frmsiz, fscod2, numblkscod;
-    GetBitContext bits;
-    AC3HeaderInfo hdr;
-
-    err = ff_ac3_parse_header(buf, &hdr);
-
-    if(err < 0 && err != -2)
-        return 0;
-
-    bsid = hdr.bsid;
-    if(bsid <= 10) {             /* Normal AC-3 */
-        *sample_rate = hdr.sample_rate;
-        *bit_rate = hdr.bit_rate;
-        *channels = hdr.channels;
-        *samples = AC3_FRAME_SIZE;
-        return hdr.frame_size;
-    } else if (bsid > 10 && bsid <= 16) { /* Enhanced AC-3 */
-        init_get_bits(&bits, &buf[2], (AC3_HEADER_SIZE-2) * 8);
-        strmtyp = get_bits(&bits, 2);
-        substreamid = get_bits(&bits, 3);
-
-        if (strmtyp != 0 || substreamid != 0)
-            return 0;   /* Currently don't support additional streams */
-
-        frmsiz = get_bits(&bits, 11) + 1;
-        if(frmsiz*2 < AC3_HEADER_SIZE)
-            return 0;
-
-        fscod = get_bits(&bits, 2);
-        if (fscod == 3) {
-            fscod2 = get_bits(&bits, 2);
-            numblkscod = 3;
-
-            if(fscod2 == 3)
-                return 0;
-
-            *sample_rate = ff_ac3_freqs[fscod2] / 2;
+        if(hdr->channel_mode == AC3_CHMODE_STEREO) {
+            skip_bits(gbc, 2); // skip dsurmod
         } else {
-            numblkscod = get_bits(&bits, 2);
+            if((hdr->channel_mode & 1) && hdr->channel_mode != AC3_CHMODE_MONO)
+                hdr->center_mix_level = get_bits(gbc, 2);
+            if(hdr->channel_mode & 4)
+                hdr->surround_mix_level = get_bits(gbc, 2);
+        }
+        hdr->lfe_on = get_bits1(gbc);
 
-            *sample_rate = ff_ac3_freqs[fscod];
+        hdr->sr_shift = FFMAX(hdr->bitstream_id, 8) - 8;
+        hdr->sample_rate = ff_ac3_sample_rate_tab[hdr->sr_code] >> hdr->sr_shift;
+        hdr->bit_rate = (ff_ac3_bitrate_tab[frame_size_code>>1] * 1000) >> hdr->sr_shift;
+        hdr->channels = ff_ac3_channels_tab[hdr->channel_mode] + hdr->lfe_on;
+        hdr->frame_size = ff_ac3_frame_size_tab[frame_size_code][hdr->sr_code] * 2;
+        hdr->frame_type = EAC3_FRAME_TYPE_AC3_CONVERT; //EAC3_FRAME_TYPE_INDEPENDENT;
+        hdr->substreamid = 0;
+    } else {
+        /* Enhanced AC-3 */
+        hdr->crc1 = 0;
+        hdr->frame_type = get_bits(gbc, 2);
+        if(hdr->frame_type == EAC3_FRAME_TYPE_RESERVED)
+            return AC3_PARSE_ERROR_FRAME_TYPE;
+
+        hdr->substreamid = get_bits(gbc, 3);
+
+        hdr->frame_size = (get_bits(gbc, 11) + 1) << 1;
+        if(hdr->frame_size < AC3_HEADER_SIZE)
+            return AC3_PARSE_ERROR_FRAME_SIZE;
+
+        hdr->sr_code = get_bits(gbc, 2);
+        if (hdr->sr_code == 3) {
+            int sr_code2 = get_bits(gbc, 2);
+            if(sr_code2 == 3)
+                return AC3_PARSE_ERROR_SAMPLE_RATE;
+            hdr->sample_rate = ff_ac3_sample_rate_tab[sr_code2] / 2;
+            hdr->sr_shift = 1;
+        } else {
+            hdr->num_blocks = eac3_blocks[get_bits(gbc, 2)];
+            hdr->sample_rate = ff_ac3_sample_rate_tab[hdr->sr_code];
+            hdr->sr_shift = 0;
         }
 
-        acmod = get_bits(&bits, 3);
-        lfeon = get_bits1(&bits);
+        hdr->channel_mode = get_bits(gbc, 3);
+        hdr->lfe_on = get_bits1(gbc);
 
-        *samples = eac3_blocks[numblkscod] * 256;
-        *bit_rate = frmsiz * (*sample_rate) * 16 / (*samples);
-        *channels = ff_ac3_channels[acmod] + lfeon;
-
-        return frmsiz * 2;
+        hdr->bit_rate = (uint32_t)(8.0 * hdr->frame_size * hdr->sample_rate /
+                        (hdr->num_blocks * 256.0));
+        hdr->channels = ff_ac3_channels_tab[hdr->channel_mode] + hdr->lfe_on;
     }
 
-    /* Unsupported bitstream version */
     return 0;
 }
 
-static int ac3_parse_init(AVCodecParserContext *s1)
+int ff_ac3_parse_header_full(GetBitContext *gbc, AC3HeaderInfo *hdr){
+    int ret, i;
+    ret = ff_ac3_parse_header(gbc, hdr);
+    if(!ret){
+        if(hdr->bitstream_id>10){
+            /* Enhanced AC-3 */
+            skip_bits(gbc, 5); // skip bitstream id
+
+            /* skip dialog normalization and compression gain */
+            for (i = 0; i < (hdr->channel_mode ? 1 : 2); i++) {
+                skip_bits(gbc, 5); // skip dialog normalization
+                if (get_bits1(gbc)) {
+                    skip_bits(gbc, 8); //skip Compression gain word
+                }
+            }
+            /* dependent stream channel map */
+            if (hdr->frame_type == EAC3_FRAME_TYPE_DEPENDENT && get_bits1(gbc)) {
+                    hdr->channel_map = get_bits(gbc, 16); //custom channel map
+                    return 0;
+            }
+        }
+        //default channel map based on acmod and lfeon
+        hdr->channel_map = ff_eac3_default_chmap[hdr->channel_mode];
+        if(hdr->lfe_on)
+            hdr->channel_map |= AC3_CHMAP_LFE;
+    }
+    return ret;
+}
+
+static int ac3_sync(uint64_t state, AACAC3ParseContext *hdr_info,
+        int *need_next_header, int *new_frame_start)
+{
+    int err;
+    uint8_t tmp[8];
+    AC3HeaderInfo hdr;
+    GetBitContext gbc;
+
+    AV_WB64(tmp, state);
+    init_get_bits(&gbc, tmp+8-AC3_HEADER_SIZE, 54);
+    err = ff_ac3_parse_header(&gbc, &hdr);
+
+    if(err < 0)
+        return 0;
+
+    hdr_info->sample_rate = hdr.sample_rate;
+    hdr_info->bit_rate = hdr.bit_rate;
+    hdr_info->channels = hdr.channels;
+    hdr_info->samples = AC3_FRAME_SIZE;
+
+    *need_next_header = (hdr.frame_type != EAC3_FRAME_TYPE_AC3_CONVERT);
+    *new_frame_start  = (hdr.frame_type != EAC3_FRAME_TYPE_DEPENDENT);
+    return hdr.frame_size;
+}
+
+static av_cold int ac3_parse_init(AVCodecParserContext *s1)
 {
     AACAC3ParseContext *s = s1->priv_data;
-    s->inbuf_ptr = s->inbuf;
     s->header_size = AC3_HEADER_SIZE;
     s->sync = ac3_sync;
     return 0;
@@ -158,9 +189,9 @@ static int ac3_parse_init(AVCodecParserContext *s1)
 
 
 AVCodecParser ac3_parser = {
-    { CODEC_ID_AC3 },
+    { CODEC_ID_AC3, CODEC_ID_EAC3 },
     sizeof(AACAC3ParseContext),
     ac3_parse_init,
     ff_aac_ac3_parse,
-    NULL,
+    ff_parse_close,
 };

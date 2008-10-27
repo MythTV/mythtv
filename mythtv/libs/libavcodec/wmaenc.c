@@ -89,7 +89,7 @@ static void apply_window_and_mdct(AVCodecContext * avctx, signed short * audio, 
             s->output[i+window_len]  = audio[j] / n * win[window_len - i - 1];
             s->frame_out[channel][i] = audio[j] / n * win[i];
         }
-        ff_mdct_calc(&s->mdct_ctx[window_index], s->coefs[channel], s->output, s->mdct_tmp);
+        ff_mdct_calc(&s->mdct_ctx[window_index], s->coefs[channel], s->output);
     }
 }
 
@@ -178,7 +178,7 @@ static int encode_block(WMACodecContext *s, float (*src_coefs)[BLOCK_MAX_SIZE], 
     }
 
     for(ch = 0; ch < s->nb_channels; ch++) {
-        if (s->channel_coded[ch]= 1) { //FIXME
+        if ((s->channel_coded[ch]= 1)) { //FIXME only set channel_coded when needed, instead of always
             init_exp(s, ch, fixed_exp);
         }
     }
@@ -387,6 +387,8 @@ AVCodec wmav1_encoder =
     encode_init,
     encode_superframe,
     ff_wma_end,
+    .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .long_name = NULL_IF_CONFIG_SMALL("Windows Media Audio 1"),
 };
 
 AVCodec wmav2_encoder =
@@ -398,4 +400,6 @@ AVCodec wmav2_encoder =
     encode_init,
     encode_superframe,
     ff_wma_end,
+    .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .long_name = NULL_IF_CONFIG_SMALL("Windows Media Audio 2"),
 };

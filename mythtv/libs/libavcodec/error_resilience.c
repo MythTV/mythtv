@@ -561,11 +561,11 @@ static int is_intra_more_likely(MpegEncContext *s){
             undamaged_count++;
     }
 
-    if(undamaged_count < 5) return 0; //allmost all MBs damaged -> use temporal prediction
+    if(undamaged_count < 5) return 0; //almost all MBs damaged -> use temporal prediction
 
 #ifdef HAVE_XVMC
     //prevent dsp.sad() check, that requires access to the image
-    if(s->avctx->xvmc_acceleration && s->pict_type==I_TYPE) return 1;
+    if(s->avctx->xvmc_acceleration && s->pict_type==FF_I_TYPE) return 1;
 #endif
 
     skip_amount= FFMAX(undamaged_count/50, 1); //check only upto 50 MBs
@@ -584,7 +584,7 @@ static int is_intra_more_likely(MpegEncContext *s){
             j++;
             if((j%skip_amount) != 0) continue; //skip a few to speed things up
 
-            if(s->pict_type==I_TYPE){
+            if(s->pict_type==FF_I_TYPE){
                 uint8_t *mb_ptr     = s->current_picture.data[0] + mb_x*16 + mb_y*16*s->linesize;
                 uint8_t *last_mb_ptr= s->last_picture.data   [0] + mb_x*16 + mb_y*16*s->linesize;
 
@@ -613,7 +613,7 @@ void ff_er_frame_start(MpegEncContext *s){
  * adds a slice.
  * @param endx x component of the last macroblock, can be -1 for the last of the previous line
  * @param status the status at the end (MV_END, AC_ERROR, ...), it is assumed that no earlier end or
- *               error of the same type occured
+ *               error of the same type occurred
  */
 void ff_er_add_slice(MpegEncContext *s, int startx, int starty, int endx, int endy, int status){
     const int start_i= av_clip(startx + starty * s->mb_width    , 0, s->mb_num-1);
@@ -769,7 +769,7 @@ void ff_er_frame_end(MpegEncContext *s){
 
             if(   error2==(VP_START|DC_ERROR|AC_ERROR|MV_ERROR|AC_END|DC_END|MV_END)
                && error1!=(VP_START|DC_ERROR|AC_ERROR|MV_ERROR|AC_END|DC_END|MV_END)
-               && ((error1&AC_END) || (error1&DC_END) || (error1&MV_END))){ //end & uninited
+               && ((error1&AC_END) || (error1&DC_END) || (error1&MV_END))){ //end & uninit
                 end_ok=0;
             }
 
@@ -893,7 +893,7 @@ void ff_er_frame_end(MpegEncContext *s){
     }
 
     /* guess MVs */
-    if(s->pict_type==B_TYPE){
+    if(s->pict_type==FF_B_TYPE){
         for(mb_y=0; mb_y<s->mb_height; mb_y++){
             for(mb_x=0; mb_x<s->mb_width; mb_x++){
                 int xy= mb_x*2 + mb_y*2*s->b8_stride;
@@ -1031,7 +1031,7 @@ ec_clean:
         const int mb_xy= s->mb_index2xy[i];
         int error= s->error_status_table[mb_xy];
 
-        if(s->pict_type!=B_TYPE && (error&(DC_ERROR|MV_ERROR|AC_ERROR))){
+        if(s->pict_type!=FF_B_TYPE && (error&(DC_ERROR|MV_ERROR|AC_ERROR))){
             s->mbskip_table[mb_xy]=0;
         }
         s->mbintra_table[mb_xy]=1;

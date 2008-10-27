@@ -21,6 +21,7 @@
 #include "avformat.h"
 #include <unistd.h>
 #include "network.h"
+#include "os_support.h"
 #include <sys/time.h>
 
 typedef struct TCPContext {
@@ -31,39 +32,30 @@ typedef struct TCPContext {
 static int tcp_open(URLContext *h, const char *uri, int flags)
 {
     struct sockaddr_in dest_addr;
-    char hostname[1024], *q;
     int port, fd = -1;
     TCPContext *s = NULL;
     fd_set wfds;
     int fd_max, ret;
     struct timeval tv;
     socklen_t optlen;
-    char proto[1024],path[1024],tmp[1024];  // PETR: protocol and path strings
-
-    url_split(proto, sizeof(proto), NULL, 0, hostname, sizeof(hostname),
-      &port, path, sizeof(path), uri);  // PETR: use url_split
-    if (strcmp(proto,"tcp")) goto fail; // PETR: check protocol
-    if ((q = strchr(hostname,'@'))) { strcpy(tmp,q+1); strcpy(hostname,tmp); } // PETR: take only the part after '@' for tcp protocol
-
-    s = av_malloc(sizeof(TCPContext));
-    if (!s)
-        return AVERROR(ENOMEM);
-    h->priv_data = s;
-
-    if (port <= 0 || port >= 65536)
-        goto fail;
+    char hostname[1024],proto[1024],path[1024];
 
     if(!ff_network_init())
         return AVERROR(EIO);
 
+    url_split(proto, sizeof(proto), NULL, 0, hostname, sizeof(hostname),
+        &port, path, sizeof(path), uri);
+    if (strcmp(proto,"tcp") || port <= 0 || port >= 65536)
+        return AVERROR(EINVAL);
+
     dest_addr.sin_family = AF_INET;
     dest_addr.sin_port = htons(port);
     if (resolve_host(&dest_addr.sin_addr, hostname) < 0)
-        goto fail;
+        return AVERROR(EIO);
 
     fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd < 0)
-        goto fail;
+        return AVERROR(EIO);
     ff_socket_nonblock(fd, 1);
 
  redo:
@@ -98,6 +90,11 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
         if (ret != 0)
             goto fail;
     }
+    s = av_malloc(sizeof(TCPContext));
+    if (!s)
+        return AVERROR(ENOMEM);
+    h->priv_data = s;
+    h->is_streamed = 1;
     s->fd = fd;
     return 0;
 
@@ -106,7 +103,6 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
  fail1:
     if (fd >= 0)
         closesocket(fd);
-    av_free(s);
     return ret;
 }
 

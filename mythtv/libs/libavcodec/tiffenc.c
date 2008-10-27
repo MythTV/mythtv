@@ -133,7 +133,7 @@ static void add_entry1(TiffEncoderContext * s,
                        enum TiffTags tag, enum TiffTypes type, int val){
     uint16_t w = val;
     uint32_t dw= val;
-    add_entry(s, tag, type, 1, type == TIFF_SHORT ? &w : &dw);
+    add_entry(s, tag, type, 1, type == TIFF_SHORT ? (void *)&w : (void *)&dw);
 }
 
 /**
@@ -222,6 +222,7 @@ static int encode_frame(AVCodecContext * avctx, unsigned char *buf,
     *p = *pict;
     p->pict_type = FF_I_TYPE;
     p->key_frame = 1;
+    avctx->coded_frame= &s->picture;
 
     s->compr = TIFF_PACKBITS;
     if (avctx->compression_level == 0) {
@@ -455,7 +456,7 @@ AVCodec tiff_encoder = {
                               PIX_FMT_MONOBLACK, PIX_FMT_MONOWHITE,
                               PIX_FMT_YUV420P, PIX_FMT_YUV422P,
                               PIX_FMT_YUV444P, PIX_FMT_YUV410P,
-                              PIX_FMT_YUV411P
-                              -1}
-
+                              PIX_FMT_YUV411P,
+                              PIX_FMT_NONE},
+    .long_name = NULL_IF_CONFIG_SMALL("TIFF image"),
 };

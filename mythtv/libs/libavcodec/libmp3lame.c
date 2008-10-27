@@ -36,7 +36,7 @@ typedef struct Mp3AudioContext {
     int buffer_index;
 } Mp3AudioContext;
 
-static int MP3lame_encode_init(AVCodecContext *avctx)
+static av_cold int MP3lame_encode_init(AVCodecContext *avctx)
 {
     Mp3AudioContext *s = avctx->priv_data;
 
@@ -50,8 +50,11 @@ static int MP3lame_encode_init(AVCodecContext *avctx)
     lame_set_in_samplerate(s->gfp, avctx->sample_rate);
     lame_set_out_samplerate(s->gfp, avctx->sample_rate);
     lame_set_num_channels(s->gfp, avctx->channels);
-    /* lame 3.91 dies on quality != 5 */
-    lame_set_quality(s->gfp, 5);
+    if(avctx->compression_level == FF_COMPRESSION_DEFAULT) {
+        lame_set_quality(s->gfp, 5);
+    } else {
+        lame_set_quality(s->gfp, avctx->compression_level);
+    }
     /* lame 3.91 doesn't work in mono */
     lame_set_mode(s->gfp, JOINT_STEREO);
     lame_set_brate(s->gfp, avctx->bit_rate/1000);
@@ -61,6 +64,7 @@ static int MP3lame_encode_init(AVCodecContext *avctx)
         lame_set_VBR_q(s->gfp, avctx->global_quality / (float)FF_QP2LAMBDA);
     }
     lame_set_bWriteVbrTag(s->gfp,0);
+    lame_set_disable_reservoir(s->gfp, avctx->flags2 & CODEC_FLAG2_BIT_RESERVOIR ? 0 : 1);
     if (lame_init_params(s->gfp) < 0)
         goto err_close;
 
@@ -197,7 +201,7 @@ static int MP3lame_encode_frame(AVCodecContext *avctx,
             return 0;
 }
 
-static int MP3lame_encode_close(AVCodecContext *avctx)
+static av_cold int MP3lame_encode_close(AVCodecContext *avctx)
 {
     Mp3AudioContext *s = avctx->priv_data;
 
@@ -217,4 +221,6 @@ AVCodec libmp3lame_encoder = {
     MP3lame_encode_frame,
     MP3lame_encode_close,
     .capabilities= CODEC_CAP_DELAY,
+    .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .long_name= NULL_IF_CONFIG_SMALL("libmp3lame MP3 (MPEG audio layer 3)"),
 };

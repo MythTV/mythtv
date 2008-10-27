@@ -25,10 +25,10 @@
  * divided into 32 subbands.
  */
 
+#include "libavutil/random.h"
 #include "avcodec.h"
 #include "bitstream.h"
 #include "dsputil.h"
-#include "random.h"
 
 #ifdef CONFIG_MPEGAUDIO_HP
 #define USE_HIGHPRECISION
@@ -44,13 +44,13 @@
 
 static VLC scfi_vlc, dscf_vlc, hdr_vlc, quant_vlc[MPC7_QUANT_VLC_TABLES][2];
 
-static int mpc7_decode_init(AVCodecContext * avctx)
+static av_cold int mpc7_decode_init(AVCodecContext * avctx)
 {
     int i, j;
     MPCContext *c = avctx->priv_data;
     GetBitContext gb;
     uint8_t buf[16];
-    static int vlc_inited = 0;
+    static int vlc_initialized = 0;
 
     if(avctx->extradata_size < 16){
         av_log(avctx, AV_LOG_ERROR, "Too small extradata size (%i)!\n", avctx->extradata_size);
@@ -59,7 +59,7 @@ static int mpc7_decode_init(AVCodecContext * avctx)
     memset(c->oldDSCF, 0, sizeof(c->oldDSCF));
     av_init_random(0xDEADBEEF, &c->rnd);
     dsputil_init(&c->dsp, avctx);
-    c->dsp.bswap_buf(buf, avctx->extradata, 4);
+    c->dsp.bswap_buf((uint32_t*)buf, (const uint32_t*)avctx->extradata, 4);
     ff_mpc_init();
     init_get_bits(&gb, buf, 128);
 
@@ -77,7 +77,7 @@ static int mpc7_decode_init(AVCodecContext * avctx)
             c->IS, c->MSS, c->gapless, c->lastframelen, c->maxbands);
     c->frames_to_skip = 0;
 
-    if(vlc_inited) return 0;
+    if(vlc_initialized) return 0;
     av_log(avctx, AV_LOG_DEBUG, "Initing VLC\n");
     if(init_vlc(&scfi_vlc, MPC7_SCFI_BITS, MPC7_SCFI_SIZE,
                 &mpc7_scfi[1], 2, 1,
@@ -107,7 +107,8 @@ static int mpc7_decode_init(AVCodecContext * avctx)
             }
         }
     }
-    vlc_inited = 1;
+    vlc_initialized = 1;
+    avctx->sample_fmt = SAMPLE_FMT_S16;
     return 0;
 }
 
@@ -158,7 +159,7 @@ static inline void idx_to_quant(MPCContext *c, GetBitContext *gb, int idx, int *
 
 static int mpc7_decode_frame(AVCodecContext * avctx,
                             void *data, int *data_size,
-                            uint8_t * buf, int buf_size)
+                            const uint8_t * buf, int buf_size)
 {
     MPCContext *c = avctx->priv_data;
     GetBitContext gb;
@@ -175,7 +176,7 @@ static int mpc7_decode_frame(AVCodecContext * avctx,
     }
 
     bits = av_malloc(((buf_size - 1) & ~3) + FF_INPUT_BUFFER_PADDING_SIZE);
-    c->dsp.bswap_buf(bits, buf + 4, (buf_size - 4) >> 2);
+    c->dsp.bswap_buf((uint32_t*)bits, (const uint32_t*)(buf + 4), (buf_size - 4) >> 2);
     init_get_bits(&gb, bits, (buf_size - 4)* 8);
     skip_bits(&gb, buf[0]);
 
@@ -264,7 +265,7 @@ static void mpc7_decode_flush(AVCodecContext *avctx)
 }
 
 AVCodec mpc7_decoder = {
-    "mpc sv7",
+    "mpc7",
     CODEC_TYPE_AUDIO,
     CODEC_ID_MUSEPACK7,
     sizeof(MPCContext),
@@ -273,4 +274,5 @@ AVCodec mpc7_decoder = {
     NULL,
     mpc7_decode_frame,
     .flush = mpc7_decode_flush,
+    .long_name = NULL_IF_CONFIG_SMALL("Musepack SV7"),
 };

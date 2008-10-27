@@ -45,13 +45,13 @@ typedef enum {
 #define C93_HAS_PALETTE 0x01
 #define C93_FIRST_FRAME 0x02
 
-static int decode_init(AVCodecContext *avctx)
+static av_cold int decode_init(AVCodecContext *avctx)
 {
     avctx->pix_fmt = PIX_FMT_PAL8;
     return 0;
 }
 
-static int decode_end(AVCodecContext *avctx)
+static av_cold int decode_end(AVCodecContext *avctx)
 {
     C93DecoderContext * const c93 = avctx->priv_data;
 
@@ -113,7 +113,7 @@ static inline void draw_n_color(uint8_t *out, int stride, int width,
 }
 
 static int decode_frame(AVCodecContext *avctx, void *data,
-                            int *data_size, uint8_t * buf, int buf_size)
+                            int *data_size, const uint8_t * buf, int buf_size)
 {
     C93DecoderContext * const c93 = avctx->priv_data;
     AVFrame * const newpic = &c93->pictures[c93->currentpic];
@@ -144,7 +144,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
 
     if (*buf++ & C93_HAS_PALETTE) {
         uint32_t *palette = (uint32_t *) newpic->data[1];
-        uint8_t *palbuf = buf + buf_size - 768 - 1;
+        const uint8_t *palbuf = buf + buf_size - 768 - 1;
         for (i = 0; i < 256; i++) {
             palette[i] = bytestream_get_be24(&palbuf);
         }
@@ -250,4 +250,5 @@ AVCodec c93_decoder = {
     decode_end,
     decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("Interplay C93"),
 };

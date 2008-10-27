@@ -23,18 +23,18 @@
 **/
 
 #include <stdlib.h>
+#include "libavutil/avstring.h"
+#include "libavutil/bswap.h"
+#include "libavcodec/bitstream.h"
+#include "libavcodec/bytestream.h"
 #include "avformat.h"
-#include "bitstream.h"
-#include "bytestream.h"
-#include "bswap.h"
 #include "oggdec.h"
-#include "avstring.h"
 
 extern int
 vorbis_comment(AVFormatContext * as, uint8_t *buf, int size)
 {
-    uint8_t *p = buf;
-    uint8_t *end = buf + size;
+    const uint8_t *p = buf;
+    const uint8_t *end = buf + size;
     unsigned s, n, j;
 
     if (size < 8) /* must have vendor_length and user_comment_list_length */
@@ -50,7 +50,7 @@ vorbis_comment(AVFormatContext * as, uint8_t *buf, int size)
     n = bytestream_get_le32(&p);
 
     while (p < end && n > 0) {
-        char *t, *v;
+        const char *t, *v;
         int tl, vl;
 
         s = bytestream_get_le32(&p);
@@ -146,7 +146,7 @@ fixup_vorbis_headers(AVFormatContext * as, oggvorbis_private_t *priv,
         memcpy(&ptr[offset], priv->packet[i], priv->len[i]);
         offset += priv->len[i];
     }
-    *buf = av_realloc(*buf, offset);
+    *buf = av_realloc(*buf, offset + FF_INPUT_BUFFER_PADDING_SIZE);
     return offset;
 }
 
@@ -176,7 +176,7 @@ vorbis_header (AVFormatContext * s, int idx)
     priv->packet[os->seq] = av_mallocz(os->psize);
     memcpy(priv->packet[os->seq], os->buf + os->pstart, os->psize);
     if (os->buf[os->pstart] == 1) {
-        uint8_t *p = os->buf + os->pstart + 7; /* skip "\001vorbis" tag */
+        const uint8_t *p = os->buf + os->pstart + 7; /* skip "\001vorbis" tag */
         unsigned blocksize, bs0, bs1;
 
         if (os->psize != 30)
@@ -219,7 +219,7 @@ vorbis_header (AVFormatContext * s, int idx)
     return os->seq < 3;
 }
 
-ogg_codec_t vorbis_codec = {
+const ogg_codec_t ff_vorbis_codec = {
     .magic = "\001vorbis",
     .magicsize = 7,
     .header = vorbis_header

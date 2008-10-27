@@ -97,7 +97,7 @@ static int copy_region_enc(uint8_t *sptr, uint8_t *dptr,
     return 0;
 }
 
-static int flashsv_encode_init(AVCodecContext *avctx)
+static av_cold int flashsv_encode_init(AVCodecContext *avctx)
 {
     FlashSVContext *s = avctx->priv_data;
 
@@ -271,7 +271,7 @@ static int flashsv_encode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_siz
     return res;
 }
 
-static int flashsv_encode_end(AVCodecContext *avctx)
+static av_cold int flashsv_encode_end(AVCodecContext *avctx)
 {
     FlashSVContext *s = avctx->priv_data;
 
@@ -292,6 +292,7 @@ AVCodec flashsv_encoder = {
     flashsv_encode_init,
     flashsv_encode_frame,
     flashsv_encode_end,
-    .pix_fmts = (enum PixelFormat[]){PIX_FMT_BGR24, -1},
+    .pix_fmts = (enum PixelFormat[]){PIX_FMT_BGR24, PIX_FMT_NONE},
+    .long_name = NULL_IF_CONFIG_SMALL("Flash Screen Video"),
 };
 

@@ -29,6 +29,7 @@ struct frame_attributes {
     int top_field_first;
 };
 
+#ifdef CONFIG_YUV4MPEGPIPE_MUXER
 static int yuv4_generate_header(AVFormatContext *s, char* buf)
 {
     AVStream *st;
@@ -43,8 +44,8 @@ static int yuv4_generate_header(AVFormatContext *s, char* buf)
 
     av_reduce(&raten, &rated, st->codec->time_base.den, st->codec->time_base.num, (1UL<<31)-1);
 
-    aspectn = st->codec->sample_aspect_ratio.num;
-    aspectd = st->codec->sample_aspect_ratio.den;
+    aspectn = st->sample_aspect_ratio.num;
+    aspectd = st->sample_aspect_ratio.den;
 
     if ( aspectn == 0 && aspectd == 1 ) aspectd = 0;  // 0:0 means unknown
 
@@ -87,7 +88,7 @@ static int yuv4_generate_header(AVFormatContext *s, char* buf)
 static int yuv4_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     AVStream *st = s->streams[pkt->stream_index];
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     AVPicture *picture;
     int* first_pkt = s->priv_data;
     int width, height, h_chroma_shift, v_chroma_shift;
@@ -166,10 +167,9 @@ static int yuv4_write_header(AVFormatContext *s)
     return 0;
 }
 
-#ifdef CONFIG_YUV4MPEGPIPE_MUXER
 AVOutputFormat yuv4mpegpipe_muxer = {
     "yuv4mpegpipe",
-    "YUV4MPEG pipe format",
+    NULL_IF_CONFIG_SMALL("YUV4MPEG pipe format"),
     "",
     "y4m",
     sizeof(int),
@@ -190,7 +190,7 @@ static int yuv4_read_header(AVFormatContext *s, AVFormatParameters *ap)
     char header[MAX_YUV4_HEADER+10];  // Include headroom for the longest option
     char *tokstart,*tokend,*header_end;
     int i;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     int width=-1, height=-1, raten=0, rated=0, aspectn=0, aspectd=0;
     enum PixelFormat pix_fmt=PIX_FMT_NONE,alt_pix_fmt=PIX_FMT_NONE;
     AVStream *st;
@@ -322,7 +322,8 @@ static int yuv4_read_header(AVFormatContext *s, AVFormatParameters *ap)
     }
 
     st = av_new_stream(s, 0);
-    st = s->streams[0];
+    if(!st)
+        return AVERROR(ENOMEM);
     st->codec->width = width;
     st->codec->height = height;
     av_reduce(&raten, &rated, raten, rated, (1UL<<31)-1);
@@ -330,7 +331,7 @@ static int yuv4_read_header(AVFormatContext *s, AVFormatParameters *ap)
     st->codec->pix_fmt = pix_fmt;
     st->codec->codec_type = CODEC_TYPE_VIDEO;
     st->codec->codec_id = CODEC_ID_RAWVIDEO;
-    st->codec->sample_aspect_ratio= (AVRational){aspectn, aspectd};
+    st->sample_aspect_ratio= (AVRational){aspectn, aspectd};
 
     return 0;
 }
@@ -344,7 +345,7 @@ static int yuv4_read_packet(AVFormatContext *s, AVPacket *pkt)
     struct frame_attributes *s1 = s->priv_data;
 
     for (i=0; i<MAX_FRAME_HEADER; i++) {
-        header[i] = get_byte(&s->pb);
+        header[i] = get_byte(s->pb);
         if (header[i] == '\n') {
             header[i+1] = 0;
             break;
@@ -360,7 +361,7 @@ static int yuv4_read_packet(AVFormatContext *s, AVPacket *pkt)
     if (packet_size < 0)
         return -1;
 
-    if (av_get_packet(&s->pb, pkt, packet_size) != packet_size)
+    if (av_get_packet(s->pb, pkt, packet_size) != packet_size)
         return AVERROR(EIO);
 
     if (s->streams[0]->codec->coded_frame) {
@@ -369,11 +370,6 @@ static int yuv4_read_packet(AVFormatContext *s, AVPacket *pkt)
     }
 
     pkt->stream_index = 0;
-    return 0;
-}
-
-static int yuv4_read_close(AVFormatContext *s)
-{
     return 0;
 }
 
@@ -389,12 +385,11 @@ static int yuv4_probe(AVProbeData *pd)
 #ifdef CONFIG_YUV4MPEGPIPE_DEMUXER
 AVInputFormat yuv4mpegpipe_demuxer = {
     "yuv4mpegpipe",
-    "YUV4MPEG pipe format",
+    NULL_IF_CONFIG_SMALL("YUV4MPEG pipe format"),
     sizeof(struct frame_attributes),
     yuv4_probe,
     yuv4_read_header,
     yuv4_read_packet,
-    yuv4_read_close,
     .extensions = "y4m"
 };
 #endif

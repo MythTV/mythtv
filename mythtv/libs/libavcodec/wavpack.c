@@ -354,32 +354,26 @@ static int wv_unpack_mono(WavpackContext *s, GetBitContext *gb, int16_t *dst)
     return count;
 }
 
-static int wavpack_decode_init(AVCodecContext *avctx)
+static av_cold int wavpack_decode_init(AVCodecContext *avctx)
 {
     WavpackContext *s = avctx->priv_data;
 
     s->avctx = avctx;
     s->stereo = (avctx->channels == 2);
-
-    return 0;
-}
-
-static int wavpack_decode_close(AVCodecContext *avctx)
-{
-//    WavpackContext *s = avctx->priv_data;
+    avctx->sample_fmt = SAMPLE_FMT_S16;
 
     return 0;
 }
 
 static int wavpack_decode_frame(AVCodecContext *avctx,
                             void *data, int *data_size,
-                            uint8_t *buf, int buf_size)
+                            const uint8_t *buf, int buf_size)
 {
     WavpackContext *s = avctx->priv_data;
     int16_t *samples = data;
     int samplecount;
     int got_terms = 0, got_weights = 0, got_samples = 0, got_entropy = 0, got_bs = 0;
-    uint8_t* buf_end = buf + buf_size;
+    const uint8_t* buf_end = buf + buf_size;
     int i, j, id, size, ssize, weights, t;
 
     if (buf_size == 0){
@@ -587,6 +581,7 @@ AVCodec wavpack_decoder = {
     sizeof(WavpackContext),
     wavpack_decode_init,
     NULL,
-    wavpack_decode_close,
+    NULL,
     wavpack_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("WavPack"),
 };

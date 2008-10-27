@@ -54,7 +54,7 @@
  * file. This is an interesting technique, although it makes random file
  * seeking difficult despite the fact that the frames are all intracoded.
  *
- * V1,2 VQA uses 12-bit codebook indices. If the 12-bit indices were
+ * V1,2 VQA uses 12-bit codebook indexes. If the 12-bit indexes were
  * packed into bytes and then RLE compressed, bytewise, the results would
  * be poor. That is why the coding method divides each index into 2 parts,
  * the top 4 bits and the bottom 8 bits, then RL encodes the 4-bit pieces
@@ -69,7 +69,6 @@
 #include <unistd.h>
 
 #include "avcodec.h"
-#include "dsputil.h"
 
 #define PALETTE_COUNT 256
 #define VQA_HEADER_SIZE 0x2A
@@ -101,10 +100,9 @@ static inline void vqa_debug(const char *format, ...) { }
 typedef struct VqaContext {
 
     AVCodecContext *avctx;
-    DSPContext dsp;
     AVFrame frame;
 
-    unsigned char *buf;
+    const unsigned char *buf;
     int size;
 
     uint32_t palette[PALETTE_COUNT];
@@ -129,15 +127,14 @@ typedef struct VqaContext {
 
 } VqaContext;
 
-static int vqa_decode_init(AVCodecContext *avctx)
+static av_cold int vqa_decode_init(AVCodecContext *avctx)
 {
     VqaContext *s = avctx->priv_data;
     unsigned char *vqa_header;
-    int i, j, codebook_index;;
+    int i, j, codebook_index;
 
     s->avctx = avctx;
     avctx->pix_fmt = PIX_FMT_PAL8;
-    dsputil_init(&s->dsp, avctx);
 
     /* make sure the extradata made it */
     if (s->avctx->extradata_size != VQA_HEADER_SIZE) {
@@ -202,7 +199,7 @@ static int vqa_decode_init(AVCodecContext *avctx)
         return; \
     }
 
-static void decode_format80(unsigned char *src, int src_size,
+static void decode_format80(const unsigned char *src, int src_size,
     unsigned char *dest, int dest_size, int check_size) {
 
     int src_index = 0;
@@ -567,7 +564,7 @@ static void vqa_decode_chunk(VqaContext *s)
 
 static int vqa_decode_frame(AVCodecContext *avctx,
                             void *data, int *data_size,
-                            uint8_t *buf, int buf_size)
+                            const uint8_t *buf, int buf_size)
 {
     VqaContext *s = avctx->priv_data;
 
@@ -595,7 +592,7 @@ static int vqa_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int vqa_decode_end(AVCodecContext *avctx)
+static av_cold int vqa_decode_end(AVCodecContext *avctx)
 {
     VqaContext *s = avctx->priv_data;
 
@@ -619,4 +616,5 @@ AVCodec vqa_decoder = {
     vqa_decode_end,
     vqa_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("Westwood Studios VQA (Vector Quantized Animation) video"),
 };

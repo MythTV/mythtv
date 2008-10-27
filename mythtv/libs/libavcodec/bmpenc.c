@@ -23,7 +23,7 @@
 #include "bytestream.h"
 #include "bmp.h"
 
-static int bmp_encode_init(AVCodecContext *avctx){
+static av_cold int bmp_encode_init(AVCodecContext *avctx){
     BMPContext *s = avctx->priv_data;
 
     avcodec_get_frame_defaults((AVFrame*)&s->picture);
@@ -94,5 +94,6 @@ AVCodec bmp_encoder = {
     bmp_encode_init,
     bmp_encode_frame,
     NULL, //encode_end,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_BGR24, -1},
+    .pix_fmts= (enum PixelFormat[]){PIX_FMT_BGR24, PIX_FMT_NONE},
+    .long_name = NULL_IF_CONFIG_SMALL("BMP image"),
 };

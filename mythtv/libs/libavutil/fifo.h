@@ -21,10 +21,11 @@
  * A very simple circular buffer FIFO implementation.
  */
 
-#ifndef FFMPEG_FIFO_H
-#define FFMPEG_FIFO_H
+#ifndef AVUTIL_FIFO_H
+#define AVUTIL_FIFO_H
 
 #include <stdint.h>
+#include "common.h"
 
 typedef struct AVFifoBuffer {
     uint8_t *buffer;
@@ -37,7 +38,7 @@ typedef struct AVFifoBuffer {
  * @param size of FIFO
  * @return <0 for failure >=0 otherwise
  */
-int av_fifo_init(AVFifoBuffer *f, int size);
+int av_fifo_init(AVFifoBuffer *f, unsigned int size);
 
 /**
  * Frees an AVFifoBuffer.
@@ -76,14 +77,39 @@ int av_fifo_generic_read(AVFifoBuffer *f, int buf_size, void (*func)(void*, void
  * @param *buf data source
  * @param size data size
  */
-void av_fifo_write(AVFifoBuffer *f, const uint8_t *buf, int size);
+attribute_deprecated void av_fifo_write(AVFifoBuffer *f, const uint8_t *buf, int size);
+
+/**
+ * Feeds data from a user supplied callback to an AVFifoBuffer.
+ * @param *f AVFifoBuffer to write to
+ * @param *src data source
+ * @param size number of bytes to write
+ * @param *func generic write function. First parameter is src,
+ * second is dest_buf, third is dest_buf_size.
+ * func must return the number of bytes written to dest_buf, or <= 0 to
+ * indicate no more data available to write.
+ * If func is NULL, src is interpreted as a simple byte array for source data.
+ * @return the number of bytes written to the fifo.
+ */
+int av_fifo_generic_write(AVFifoBuffer *f, void *src, int size, int (*func)(void*, void*, int));
+
+#if LIBAVUTIL_VERSION_MAJOR < 50
+/**
+ * Resizes an AVFifoBuffer.
+ * @param *f AVFifoBuffer to resize
+ * @param size new AVFifoBuffer size in bytes
+ * @see av_fifo_realloc2()
+ */
+attribute_deprecated void av_fifo_realloc(AVFifoBuffer *f, unsigned int size);
+#endif
 
 /**
  * Resizes an AVFifoBuffer.
  * @param *f AVFifoBuffer to resize
  * @param size new AVFifoBuffer size in bytes
+ * @return <0 for failure >=0 otherwise
  */
-void av_fifo_realloc(AVFifoBuffer *f, unsigned int size);
+int av_fifo_realloc2(AVFifoBuffer *f, unsigned int size);
 
 /**
  * Reads and discards the specified amount of data from an AVFifoBuffer.
@@ -99,4 +125,4 @@ static inline uint8_t av_fifo_peek(AVFifoBuffer *f, int offs)
         ptr -= f->end - f->buffer;
     return *ptr;
 }
-#endif /* FFMPEG_FIFO_H */
+#endif /* AVUTIL_FIFO_H */

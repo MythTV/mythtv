@@ -30,10 +30,8 @@
 #include <assert.h>
 #include <stdio.h>
 
-#ifdef HAVE_XVMC
-
-//X11 includes are in the xvmc_render.h
-//by replacing it with none-X one
+//X11 includes are in xvmc_render.h
+//by replacing it with non-X one
 //XvMC emulation could be performed
 
 #include "xvmc_render.h"
@@ -93,8 +91,8 @@ const int mb_block_count = 4+(1<<s->chroma_format);
     }
 }
 
-//these functions should be called on every new field or/and frame
-//They should be safe if they are called few times for same field!
+//These functions should be called on every new field and/or frame.
+//They should be safe if they are called a few times for the same field!
 int XVMC_field_start(MpegEncContext*s, AVCodecContext *avctx){
 xvmc_render_state_t * render,* last, * next;
 
@@ -123,9 +121,9 @@ xvmc_render_state_t * render,* last, * next;
 
     render->pict_type=s->pict_type; // for later frame dropping use
     switch(s->pict_type){
-        case  I_TYPE:
+        case  FF_I_TYPE:
             return 0;// no prediction from other frames
-        case  B_TYPE:
+        case  FF_B_TYPE:
             render->p_past_surface = findPastSurface(s, render);
             render->p_future_surface = findFutureSurface(s);
             if (!render->p_past_surface)
@@ -136,7 +134,7 @@ xvmc_render_state_t * render,* last, * next;
                        "B frame and future frame is null!\n");
             else return 0;
             return 0; // pretend things are ok even if they aren't
-        case  P_TYPE:
+        case  FF_P_TYPE:
             render->p_past_surface = findPastSurface(s, render);
             if (!render->p_past_surface)
                 av_log(s->avctx, AV_LOG_ERROR, "XvMC: error, decoding "
@@ -602,5 +600,3 @@ static const char* mv_ffmpeg_to_string[8] =
     "MV_??? 6 unknown",
     "MV_??? 7 unknown"
 };
-
-#endif

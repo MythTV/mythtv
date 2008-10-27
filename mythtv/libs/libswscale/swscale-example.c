@@ -3,18 +3,18 @@
  *
  * This file is part of FFmpeg.
  *
- * FFmpeg is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
  * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with FFmpeg; if not, write to the Free Software
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
@@ -25,7 +25,7 @@
 #include <stdarg.h>
 
 #undef HAVE_AV_CONFIG_H
-#include "avutil.h"
+#include "libavutil/avutil.h"
 #include "swscale.h"
 #include "swscale_internal.h"
 #include "rgb2rgb.h"
@@ -76,7 +76,7 @@ static int doTest(uint8_t *ref[3], int refStride[3], int w, int h, int srcFormat
         src[i]= (uint8_t*) malloc(srcStride[i]*srcH);
         dst[i]= (uint8_t*) malloc(dstStride[i]*dstH);
         out[i]= (uint8_t*) malloc(refStride[i]*h);
-        if ((src[i] == NULL) || (dst[i] == NULL) || (out[i] == NULL)) {
+        if (!src[i] || !dst[i] || !out[i]) {
             perror("Malloc");
             res = -1;
 
@@ -86,7 +86,7 @@ static int doTest(uint8_t *ref[3], int refStride[3], int w, int h, int srcFormat
 
     dstContext = outContext = NULL;
     srcContext= sws_getContext(w, h, PIX_FMT_YUV420P, srcW, srcH, srcFormat, flags, NULL, NULL, NULL);
-    if (srcContext == NULL) {
+    if (!srcContext) {
         fprintf(stderr, "Failed to get %s ---> %s\n",
                 sws_format_name(PIX_FMT_YUV420P),
                 sws_format_name(srcFormat));
@@ -95,7 +95,7 @@ static int doTest(uint8_t *ref[3], int refStride[3], int w, int h, int srcFormat
         goto end;
     }
     dstContext= sws_getContext(srcW, srcH, srcFormat, dstW, dstH, dstFormat, flags, NULL, NULL, NULL);
-    if (dstContext == NULL) {
+    if (!dstContext) {
         fprintf(stderr, "Failed to get %s ---> %s\n",
                 sws_format_name(srcFormat),
                 sws_format_name(dstFormat));
@@ -104,7 +104,7 @@ static int doTest(uint8_t *ref[3], int refStride[3], int w, int h, int srcFormat
         goto end;
     }
     outContext= sws_getContext(dstW, dstH, dstFormat, w, h, PIX_FMT_YUV420P, flags, NULL, NULL, NULL);
-    if (outContext == NULL) {
+    if (!outContext) {
         fprintf(stderr, "Failed to get %s ---> %s\n",
                 sws_format_name(dstFormat),
                 sws_format_name(PIX_FMT_YUV420P));
@@ -139,6 +139,7 @@ static int doTest(uint8_t *ref[3], int refStride[3], int w, int h, int srcFormat
                sws_format_name(dstFormat), dstW, dstH,
                flags,
                ssdY, ssdU, ssdV);
+        fflush(stdout);
     }
 
     end:
@@ -170,6 +171,7 @@ static void selfTest(uint8_t *src[3], int stride[3], int w, int h){
             printf("%s -> %s\n",
                    sws_format_name(srcFormat),
                    sws_format_name(dstFormat));
+            fflush(stdout);
 
             srcW= w;
             srcH= h;
@@ -217,13 +219,13 @@ int main(int argc, char **argv){
 #else
     sws_rgb2rgb_init(0);
 #endif
-    sws_scale(sws, rgb_src, rgb_stride, 0, H   , src, stride);
+    sws_scale(sws, rgb_src, rgb_stride, 0, H, src, stride);
 
 #if defined(ARCH_X86)
     asm volatile ("emms\n\t");
 #endif
 
-    selfTest(src,  stride, W, H);
+    selfTest(src, stride, W, H);
 
     return 123;
 }

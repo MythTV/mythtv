@@ -55,7 +55,7 @@ void *av_malloc(unsigned int size)
     if(!ptr)
         return ptr;
     diff= ((-(long)ptr - 1)&15) + 1;
-    ptr += diff;
+    ptr = (char*)ptr + diff;
     ((char*)ptr)[-1]= diff;
 #elif defined (HAVE_MEMALIGN)
     ptr = memalign(16,size);
@@ -69,10 +69,10 @@ void *av_malloc(unsigned int size)
        But I don't want to code such logic here!
      */
      /* Why 16?
-        because some cpus need alignment, for example SSE2 on P4, & most RISC cpus
+        Because some CPUs need alignment, for example SSE2 on P4, & most RISC CPUs
         it will just trigger an exception and the unaligned load will be done in the
         exception handler or it will just segfault (SSE2 on P4)
-        Why not larger? because i didnt see a difference in benchmarks ...
+        Why not larger? Because I did not see a difference in benchmarks ...
      */
      /* benchmarks with p3
         memalign(64)+1          3071,3051,3032
@@ -105,7 +105,7 @@ void *av_realloc(void *ptr, unsigned int size)
     //FIXME this isn't aligned correctly, though it probably isn't needed
     if(!ptr) return av_malloc(size);
     diff= ((char*)ptr)[-1];
-    return realloc(ptr - diff, size + diff) + diff;
+    return (char*)realloc((char*)ptr - diff, size + diff) + diff;
 #else
     return realloc(ptr, size);
 #endif
@@ -116,7 +116,7 @@ void av_free(void *ptr)
     /* XXX: this test should not be needed on most libcs */
     if (ptr)
 #ifdef CONFIG_MEMALIGN_HACK
-        free(ptr - ((char*)ptr)[-1]);
+        free((char*)ptr - ((char*)ptr)[-1]);
 #else
         free(ptr);
 #endif
@@ -131,9 +131,7 @@ void av_freep(void *arg)
 
 void *av_mallocz(unsigned int size)
 {
-    void *ptr;
-
-    ptr = av_malloc(size);
+    void *ptr = av_malloc(size);
     if (ptr)
         memset(ptr, 0, size);
     return ptr;
@@ -141,12 +139,13 @@ void *av_mallocz(unsigned int size)
 
 char *av_strdup(const char *s)
 {
-    char *ptr;
-    int len;
-    len = strlen(s) + 1;
-    ptr = av_malloc(len);
-    if (ptr)
-        memcpy(ptr, s, len);
+    char *ptr= NULL;
+    if(s){
+        int len = strlen(s) + 1;
+        ptr = av_malloc(len);
+        if (ptr)
+            memcpy(ptr, s, len);
+    }
     return ptr;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Autodesc RLE Decoder
+ * Autodesk RLE Decoder
  * Copyright (C) 2005 the ffmpeg project
  *
  * This file is part of FFmpeg.
@@ -21,7 +21,7 @@
 
 /**
  * @file aasc.c
- * Autodesc RLE Video Decoder by Konstantin Shishkov
+ * Autodesk RLE Video Decoder by Konstantin Shishkov
  */
 
 #include <stdio.h>
@@ -44,7 +44,7 @@ typedef struct AascContext {
     } \
     stream_byte = buf[stream_ptr++];
 
-static int aasc_decode_init(AVCodecContext *avctx)
+static av_cold int aasc_decode_init(AVCodecContext *avctx)
 {
     AascContext *s = avctx->priv_data;
 
@@ -58,7 +58,7 @@ static int aasc_decode_init(AVCodecContext *avctx)
 
 static int aasc_decode_frame(AVCodecContext *avctx,
                               void *data, int *data_size,
-                              uint8_t *buf, int buf_size)
+                              const uint8_t *buf, int buf_size)
 {
     AascContext *s = avctx->priv_data;
     int stream_ptr = 4;
@@ -150,7 +150,7 @@ static int aasc_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int aasc_decode_end(AVCodecContext *avctx)
+static av_cold int aasc_decode_end(AVCodecContext *avctx)
 {
     AascContext *s = avctx->priv_data;
 
@@ -171,4 +171,5 @@ AVCodec aasc_decoder = {
     aasc_decode_end,
     aasc_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("Autodesk RLE"),
 };

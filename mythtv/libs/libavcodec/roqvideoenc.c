@@ -24,7 +24,7 @@
 
 /**
  * @file roqvideoenc.c
- * Id RoQ encoder by Vitor. Based on the Switchblade3 library and the
+ * id RoQ encoder by Vitor. Based on the Switchblade3 library and the
  * Switchblade3 FFmpeg glue by Eric Lasota.
  */
 
@@ -911,6 +911,8 @@ static void roq_encode_video(RoqContext *enc)
     reconstruct_and_encode_image(enc, &tempData, enc->width, enc->height,
                                  enc->width*enc->height/64);
 
+    enc->avctx->coded_frame = enc->current_frame;
+
     /* Rotate frame history */
     FFSWAP(AVFrame *, enc->current_frame, enc->last_frame);
     FFSWAP(motion_vect *, enc->last_motion4, enc->this_motion4);
@@ -1065,5 +1067,6 @@ AVCodec roq_encoder =
     roq_encode_frame,
     roq_encode_end,
     .supported_framerates = (AVRational[]){{30,1}, {0,0}},
-    .pix_fmts = (enum PixelFormat[]){PIX_FMT_YUV444P, -1},
+    .pix_fmts = (enum PixelFormat[]){PIX_FMT_YUV444P, PIX_FMT_NONE},
+    .long_name = NULL_IF_CONFIG_SMALL("id RoQ video"),
 };

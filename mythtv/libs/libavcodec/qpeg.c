@@ -25,7 +25,6 @@
  */
 
 #include "avcodec.h"
-#include "mpegvideo.h"
 
 typedef struct QpegContext{
     AVCodecContext *avctx;
@@ -33,7 +32,7 @@ typedef struct QpegContext{
     uint8_t *refdata;
 } QpegContext;
 
-static void qpeg_decode_intra(uint8_t *src, uint8_t *dst, int size,
+static void qpeg_decode_intra(const uint8_t *src, uint8_t *dst, int size,
                             int stride, int width, int height)
 {
     int i;
@@ -109,15 +108,15 @@ static void qpeg_decode_intra(uint8_t *src, uint8_t *dst, int size,
     }
 }
 
-static int qpeg_table_h[16] =
+static const int qpeg_table_h[16] =
  { 0x00, 0x20, 0x20, 0x20, 0x18, 0x10, 0x10, 0x20, 0x10, 0x08, 0x18, 0x08, 0x08, 0x18, 0x10, 0x04};
-static int qpeg_table_w[16] =
+static const int qpeg_table_w[16] =
  { 0x00, 0x20, 0x18, 0x08, 0x18, 0x10, 0x20, 0x10, 0x08, 0x10, 0x20, 0x20, 0x08, 0x10, 0x18, 0x04};
 
 /* Decodes delta frames */
-static void qpeg_decode_inter(uint8_t *src, uint8_t *dst, int size,
+static void qpeg_decode_inter(const uint8_t *src, uint8_t *dst, int size,
                             int stride, int width, int height,
-                            int delta, uint8_t *ctable, uint8_t *refdata)
+                            int delta, const uint8_t *ctable, uint8_t *refdata)
 {
     int i, j;
     int code;
@@ -249,7 +248,7 @@ static void qpeg_decode_inter(uint8_t *src, uint8_t *dst, int size,
 
 static int decode_frame(AVCodecContext *avctx,
                         void *data, int *data_size,
-                        uint8_t *buf, int buf_size)
+                        const uint8_t *buf, int buf_size)
 {
     QpegContext * const a = avctx->priv_data;
     AVFrame * const p= (AVFrame*)&a->pic;
@@ -285,7 +284,7 @@ static int decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int decode_init(AVCodecContext *avctx){
+static av_cold int decode_init(AVCodecContext *avctx){
     QpegContext * const a = avctx->priv_data;
 
     a->avctx = avctx;
@@ -296,7 +295,7 @@ static int decode_init(AVCodecContext *avctx){
     return 0;
 }
 
-static int decode_end(AVCodecContext *avctx){
+static av_cold int decode_end(AVCodecContext *avctx){
     QpegContext * const a = avctx->priv_data;
     AVFrame * const p= (AVFrame*)&a->pic;
 
@@ -317,4 +316,5 @@ AVCodec qpeg_decoder = {
     decode_end,
     decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("Q-team QPEG"),
 };

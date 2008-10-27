@@ -35,6 +35,7 @@
 
 #define ALT_BITSTREAM_READER_LE
 #include "bitstream.h"
+#include "bytestream.h"
 
 #define SMKTREE_BITS 9
 #define SMK_NODE 0x80000000
@@ -344,7 +345,7 @@ static av_always_inline int smk_get_code(GetBitContext *gb, int *recode, int *la
     return v;
 }
 
-static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8_t *buf, int buf_size)
+static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, const uint8_t *buf, int buf_size)
 {
     SmackVContext * const smk = avctx->priv_data;
     uint8_t *out;
@@ -354,7 +355,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
     int i;
     int stride;
 
-    if(buf_size == 769)
+    if(buf_size <= 769)
         return 0;
     if(smk->pic.data[0])
             avctx->release_buffer(avctx, &smk->pic);
@@ -367,7 +368,6 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
     }
 
     /* make the palette available on the way out */
-    out = buf + 1;
     pal = (uint32_t*)smk->pic.data[1];
     smk->pic.palette_has_changed = buf[0] & 1;
     smk->pic.key_frame = !!(buf[0] & 2);
@@ -376,19 +376,16 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
     else
         smk->pic.pict_type = FF_P_TYPE;
 
-    for(i = 0; i < 256; i++) {
-        int r, g, b;
-        r = *out++;
-        g = *out++;
-        b = *out++;
-        *pal++ = (r << 16) | (g << 8) | b;
-    }
+    buf++;
+    for(i = 0; i < 256; i++)
+        *pal++ = bytestream_get_be24(&buf);
+    buf_size -= 769;
 
     last_reset(smk->mmap_tbl, smk->mmap_last);
     last_reset(smk->mclr_tbl, smk->mclr_last);
     last_reset(smk->full_tbl, smk->full_last);
     last_reset(smk->type_tbl, smk->type_last);
-    init_get_bits(&gb, buf + 769, (buf_size - 769) * 8);
+    init_get_bits(&gb, buf, buf_size * 8);
 
     blk = 0;
     bw = avctx->width >> 2;
@@ -509,7 +506,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
  * Init smacker decoder
  *
  */
-static int decode_init(AVCodecContext *avctx)
+static av_cold int decode_init(AVCodecContext *avctx)
 {
     SmackVContext * const c = avctx->priv_data;
 
@@ -543,7 +540,7 @@ static int decode_init(AVCodecContext *avctx)
  * Uninit smacker decoder
  *
  */
-static int decode_end(AVCodecContext *avctx)
+static av_cold int decode_end(AVCodecContext *avctx)
 {
     SmackVContext * const smk = avctx->priv_data;
 
@@ -559,15 +556,16 @@ static int decode_end(AVCodecContext *avctx)
 }
 
 
-static int smka_decode_init(AVCodecContext *avctx)
+static av_cold int smka_decode_init(AVCodecContext *avctx)
 {
+    avctx->sample_fmt = SAMPLE_FMT_S16;
     return 0;
 }
 
 /**
  * Decode Smacker audio data
  */
-static int smka_decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8_t *buf, int buf_size)
+static int smka_decode_frame(AVCodecContext *avctx, void *data, int *data_size, const uint8_t *buf, int buf_size)
 {
     GetBitContext gb;
     HuffContext h[4];
@@ -700,7 +698,8 @@ AVCodec smacker_decoder = {
     decode_init,
     NULL,
     decode_end,
-    decode_frame
+    decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("Smacker video"),
 };
 
 AVCodec smackaud_decoder = {
@@ -711,6 +710,7 @@ AVCodec smackaud_decoder = {
     smka_decode_init,
     NULL,
     NULL,
-    smka_decode_frame
+    smka_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("Smacker audio"),
 };
 

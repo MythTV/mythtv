@@ -31,10 +31,10 @@
 
 static int mjpegb_decode_frame(AVCodecContext *avctx,
                               void *data, int *data_size,
-                              uint8_t *buf, int buf_size)
+                              const uint8_t *buf, int buf_size)
 {
     MJpegDecodeContext *s = avctx->priv_data;
-    uint8_t *buf_end, *buf_ptr;
+    const uint8_t *buf_end, *buf_ptr;
     AVFrame *picture = data;
     GetBitContext hgb; /* for the header */
     uint32_t dqt_offs, dht_offs, sof_offs, sos_offs, second_field_offs;
@@ -109,7 +109,7 @@ read_header:
     if (s->interlaced) {
         s->bottom_field ^= 1;
         /* if not bottom field, do not output image yet */
-        if (s->bottom_field && second_field_offs)
+        if (s->bottom_field != s->interlace_polarity && second_field_offs)
         {
             buf_ptr = buf + second_field_offs;
             second_field_offs = 0;
@@ -123,7 +123,7 @@ read_header:
     *data_size = sizeof(AVFrame);
 
     if(!s->lossless){
-        picture->quality= FFMAX(FFMAX(s->qscale[0], s->qscale[1]), s->qscale[2]);
+        picture->quality= FFMAX3(s->qscale[0], s->qscale[1], s->qscale[2]);
         picture->qstride= 0;
         picture->qscale_table= s->qscale_table;
         memset(picture->qscale_table, picture->quality, (s->width+15)/16);
@@ -145,5 +145,6 @@ AVCodec mjpegb_decoder = {
     ff_mjpeg_decode_end,
     mjpegb_decode_frame,
     CODEC_CAP_DR1,
-    NULL
+    NULL,
+    .long_name = NULL_IF_CONFIG_SMALL("Apple MJPEG-B"),
 };

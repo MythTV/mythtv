@@ -28,7 +28,7 @@
  */
 
 #include "avformat.h"
-#include "bethsoftvideo.h"
+#include "libavcodec/bethsoftvideo.h"
 
 typedef struct BVID_DemuxContext
 {
@@ -59,7 +59,7 @@ static int vid_read_header(AVFormatContext *s,
                             AVFormatParameters *ap)
 {
     BVID_DemuxContext *vid = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     AVStream *stream;
 
     /* load main header. Contents:
@@ -173,7 +173,7 @@ static int vid_read_packet(AVFormatContext *s,
                            AVPacket *pkt)
 {
     BVID_DemuxContext *vid = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     unsigned char block_type;
     int audio_length;
     int ret_value;
@@ -202,7 +202,7 @@ static int vid_read_packet(AVFormatContext *s,
             audio_length = get_le16(pb);
             ret_value = av_get_packet(pb, pkt, audio_length);
             pkt->stream_index = 1;
-            return (ret_value != audio_length ? AVERROR(EIO) : ret_value);
+            return ret_value != audio_length ? AVERROR(EIO) : ret_value;
 
         case VIDEO_P_FRAME:
         case VIDEO_YOFF_P_FRAME:
@@ -225,7 +225,7 @@ static int vid_read_packet(AVFormatContext *s,
 
 AVInputFormat bethsoftvid_demuxer = {
     "bethsoftvid",
-    "Bethesda Softworks 'Daggerfall' VID format",
+    NULL_IF_CONFIG_SMALL("Bethesda Softworks VID format"),
     sizeof(BVID_DemuxContext),
     vid_probe,
     vid_read_header,

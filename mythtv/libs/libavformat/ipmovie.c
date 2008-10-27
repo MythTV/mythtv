@@ -446,7 +446,7 @@ static int process_ipmovie_chunk(IPMVEContext *s, ByteIOContext *pb,
             last_color = first_color + AV_RL16(&scratch[2]) - 1;
             /* sanity check (since they are 16 bit values) */
             if ((first_color > 0xFF) || (last_color > 0xFF)) {
-                debug_ipmovie("demux_ipmovie: set_palette indices out of range (%d -> %d)\n",
+                debug_ipmovie("demux_ipmovie: set_palette indexes out of range (%d -> %d)\n",
                     first_color, last_color);
                 chunk_type = CHUNK_BAD;
                 break;
@@ -517,7 +517,7 @@ static int ipmovie_read_header(AVFormatContext *s,
                                AVFormatParameters *ap)
 {
     IPMVEContext *ipmovie = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     AVPacket pkt;
     AVStream *st;
     unsigned char chunk_preamble[CHUNK_PREAMBLE_SIZE];
@@ -589,7 +589,7 @@ static int ipmovie_read_packet(AVFormatContext *s,
                                AVPacket *pkt)
 {
     IPMVEContext *ipmovie = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     int ret;
 
     ret = process_ipmovie_chunk(ipmovie, pb, pkt);
@@ -607,19 +607,11 @@ static int ipmovie_read_packet(AVFormatContext *s,
     return ret;
 }
 
-static int ipmovie_read_close(AVFormatContext *s)
-{
-//    IPMVEContext *ipmovie = s->priv_data;
-
-    return 0;
-}
-
 AVInputFormat ipmovie_demuxer = {
     "ipmovie",
-    "Interplay MVE format",
+    NULL_IF_CONFIG_SMALL("Interplay MVE format"),
     sizeof(IPMVEContext),
     ipmovie_probe,
     ipmovie_read_header,
     ipmovie_read_packet,
-    ipmovie_read_close,
 };

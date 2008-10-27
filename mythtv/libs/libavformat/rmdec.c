@@ -18,9 +18,10 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+#include "libavutil/avstring.h"
 #include "avformat.h"
 #include "rm.h"
-#include "avstring.h"
 
 static inline void get_strl(ByteIOContext *pb, char *buf, int buf_size, int len)
 {
@@ -50,7 +51,7 @@ static int rm_read_audio_stream_info(AVFormatContext *s, AVStream *st,
                                       int read_all)
 {
     RMContext *rm = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     char buf[256];
     uint32_t version;
     int i;
@@ -188,15 +189,15 @@ static int rm_read_audio_stream_info(AVFormatContext *s, AVStream *st,
     return 0;
 }
 
-static int
-ff_rm_read_mdpr_codecdata (AVFormatContext *s, AVStream *st)
+int
+ff_rm_read_mdpr_codecdata (AVFormatContext *s, AVStream *st, int codec_data_size)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     unsigned int v;
-    int codec_data_size, size;
+    int size;
     int64_t codec_pos;
 
-    codec_data_size = get_be32(pb);
+    av_set_pts_info(st, 64, 1, 1000);
     codec_pos = url_ftell(pb);
     v = get_be32(pb);
     if (v == MKTAG(0xfd, 'a', 'r', '.')) {
@@ -234,6 +235,8 @@ ff_rm_read_mdpr_codecdata (AVFormatContext *s, AVStream *st)
             return -1;
         }
         st->codec->extradata= av_mallocz(st->codec->extradata_size + FF_INPUT_BUFFER_PADDING_SIZE);
+        if (!st->codec->extradata)
+            return AVERROR(ENOMEM);
         get_buffer(pb, st->codec->extradata, st->codec->extradata_size);
 
 //        av_log(NULL, AV_LOG_DEBUG, "fps= %d fps2= %d\n", fps, fps2);
@@ -272,9 +275,9 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
 {
     RMContext *rm = s->priv_data;
     AVStream *st;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     unsigned int tag;
-    int tag_size, i;
+    int tag_size;
     unsigned int start_time, duration;
     char buf[128];
     int flags = 0;
@@ -294,7 +297,7 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
 
     for(;;) {
         if (url_feof(pb))
-            goto fail;
+            return -1;
         tag = get_le32(pb);
         tag_size = get_be32(pb);
         get_be16(pb);
@@ -308,7 +311,7 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
                tag_size);
 #endif
         if (tag_size < 10 && tag != MKTAG('D', 'A', 'T', 'A'))
-            goto fail;
+            return -1;
         switch(tag) {
         case MKTAG('P', 'R', 'O', 'P'):
             /* file header */
@@ -333,7 +336,7 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
         case MKTAG('M', 'D', 'P', 'R'):
             st = av_new_stream(s, 0);
             if (!st)
-                goto fail;
+                return AVERROR(ENOMEM);
             st->id = get_be16(pb);
             get_be32(pb); /* max bit rate */
             st->codec->bit_rate = get_be32(pb); /* bit rate */
@@ -347,8 +350,7 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
             get_str8(pb, buf, sizeof(buf)); /* desc */
             get_str8(pb, buf, sizeof(buf)); /* mimetype */
             st->codec->codec_type = CODEC_TYPE_DATA;
-            av_set_pts_info(st, 64, 1, 1000);
-            if (ff_rm_read_mdpr_codecdata(s, st) < 0)
+            if (ff_rm_read_mdpr_codecdata(s, st, get_be32(pb)) < 0)
                 return -1;
             break;
         case MKTAG('D', 'A', 'T', 'A'):
@@ -366,12 +368,6 @@ static int rm_read_header(AVFormatContext *s, AVFormatParameters *ap)
     get_be32(pb); /* next data header */
     rm->curpic_num = -1;
     return 0;
-
- fail:
-    for(i=0;i<s->nb_streams;i++) {
-        av_free(s->streams[i]);
-    }
-    return AVERROR(EIO);
 }
 
 static int get_num(ByteIOContext *pb, int *len)
@@ -380,7 +376,7 @@ static int get_num(ByteIOContext *pb, int *len)
 
     n = get_be16(pb);
     (*len)-=2;
-//    n &= 0x7FFF;
+    n &= 0x7FFF;
     if (n >= 0x4000) {
         return n - 0x4000;
     } else {
@@ -395,13 +391,13 @@ static int get_num(ByteIOContext *pb, int *len)
 
 static int sync(AVFormatContext *s, int64_t *timestamp, int *flags, int *stream_index, int64_t *pos){
     RMContext *rm = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     int len, num, res, i;
     AVStream *st;
     uint32_t state=0xFFFFFFFF;
 
     while(!url_feof(pb)){
-        *pos= url_ftell(pb);
+        *pos= url_ftell(pb) - 3;
         if(rm->remaining_len > 0){
             num= rm->current_stream;
             len= rm->remaining_len;
@@ -451,10 +447,9 @@ skip:
 
 static int rm_assemble_video_frame(AVFormatContext *s, RMContext *rm, AVPacket *pkt, int len)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     int hdr, seq, pic_num, len2, pos;
     int type;
-    int ssize;
 
     hdr = get_byte(pb); len--;
     type = hdr >> 6;
@@ -494,18 +489,17 @@ static int rm_assemble_video_frame(AVFormatContext *s, RMContext *rm, AVPacket *
 
     if((seq & 0x7F) == 1 || rm->curpic_num != pic_num){
         rm->slices = ((hdr & 0x3F) << 1) + 1;
-        ssize = len2 + 8*rm->slices + 1;
-        rm->videobuf = av_realloc(rm->videobuf, ssize);
-        rm->videobufsize = ssize;
+        rm->videobufsize = len2 + 8*rm->slices + 1;
+        av_free(rm->videobuf);
+        if(!(rm->videobuf = av_malloc(rm->videobufsize)))
+            return AVERROR(ENOMEM);
         rm->videobufpos = 8*rm->slices + 1;
         rm->cur_slice = 0;
         rm->curpic_num = pic_num;
         rm->pktpos = url_ftell(pb);
     }
-    if(type == 2){
+    if(type == 2)
         len = FFMIN(len, pos);
-        pos = len2 - pos;
-    }
 
     if(++rm->cur_slice > rm->slices)
         return 1;
@@ -515,18 +509,16 @@ static int rm_assemble_video_frame(AVFormatContext *s, RMContext *rm, AVPacket *
         return 1;
     if (get_buffer(pb, rm->videobuf + rm->videobufpos, len) != len)
         return AVERROR(EIO);
-    rm->videobufpos += len,
+    rm->videobufpos += len;
     rm->remaining_len-= len;
 
     if(type == 2 || (rm->videobufpos) == rm->videobufsize){
-         //adjust slice headers
-         memmove(rm->videobuf + 1 + 8*rm->cur_slice, rm->videobuf + 1 + 8*rm->slices, rm->videobufsize - 1 - 8*rm->slices);
-         ssize = rm->videobufsize - 8*(rm->slices - rm->cur_slice);
-
          rm->videobuf[0] = rm->cur_slice-1;
-         if(av_new_packet(pkt, ssize) < 0)
+         if(av_new_packet(pkt, rm->videobufpos - 8*(rm->slices - rm->cur_slice)) < 0)
              return AVERROR(ENOMEM);
-         memcpy(pkt->data, rm->videobuf, ssize);
+         memcpy(pkt->data, rm->videobuf, 1 + 8*rm->cur_slice);
+         memcpy(pkt->data + 1 + 8*rm->cur_slice, rm->videobuf + 1 + 8*rm->slices,
+                rm->videobufpos - 1 - 8*rm->slices);
          pkt->pts = AV_NOPTS_VALUE;
          pkt->pos = rm->pktpos;
          return 0;
@@ -550,11 +542,11 @@ rm_ac3_swap_bytes (AVStream *st, AVPacket *pkt)
     }
 }
 
-static int
+int
 ff_rm_parse_packet (AVFormatContext *s, AVStream *st, int len, AVPacket *pkt,
                     int *seq, int *flags, int64_t *timestamp)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     RMContext *rm = s->priv_data;
 
     if (st->codec->codec_type == CODEC_TYPE_VIDEO) {
@@ -613,10 +605,10 @@ ff_rm_parse_packet (AVFormatContext *s, AVStream *st, int len, AVPacket *pkt,
                 av_get_packet(pb, pkt, rm->sub_packet_lengths[0]);
                 *flags = 2; // Mark first packet as keyframe
             }
-        } else
+        } else {
             av_get_packet(pb, pkt, len);
             rm_ac3_swap_bytes(st, pkt);
-
+        }
     } else
         av_get_packet(pb, pkt, len);
 
@@ -648,10 +640,10 @@ ff_rm_parse_packet (AVFormatContext *s, AVStream *st, int len, AVPacket *pkt,
     return 0;
 }
 
-static void
+void
 ff_rm_retrieve_cache (AVFormatContext *s, AVStream *st, AVPacket *pkt)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     RMContext *rm = s->priv_data;
 
     assert (rm->audio_pkt_cnt > 0);
@@ -672,7 +664,7 @@ ff_rm_retrieve_cache (AVFormatContext *s, AVStream *st, AVPacket *pkt)
 static int rm_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
     RMContext *rm = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     AVStream *st;
     int i, len;
     int64_t timestamp, pos;
@@ -720,10 +712,8 @@ resync:
         if (ff_rm_parse_packet (s, st, len, pkt, &seq, &flags, &timestamp) < 0)
             goto resync;
 
-        if(flags&2){
-            if((seq&0x7F) == 1)
-                av_add_index_entry(st, pos, timestamp, 0, 0, AVINDEX_KEYFRAME);
-        }
+        if((flags&2) && (seq&0x7F) == 1)
+            av_add_index_entry(st, pos, timestamp, 0, 0, AVINDEX_KEYFRAME);
     }
 
     return 0;
@@ -763,7 +753,7 @@ static int64_t rm_read_dts(AVFormatContext *s, int stream_index,
     if(rm->old_format)
         return AV_NOPTS_VALUE;
 
-    url_fseek(&s->pb, pos, SEEK_SET);
+    url_fseek(s->pb, pos, SEEK_SET);
     rm->remaining_len=0;
     for(;;){
         int seq=1;
@@ -775,9 +765,9 @@ static int64_t rm_read_dts(AVFormatContext *s, int stream_index,
 
         st = s->streams[stream_index2];
         if (st->codec->codec_type == CODEC_TYPE_VIDEO) {
-            h= get_byte(&s->pb); len--;
+            h= get_byte(s->pb); len--;
             if(!(h & 0x40)){
-                seq = get_byte(&s->pb); len--;
+                seq = get_byte(s->pb); len--;
             }
         }
 
@@ -788,7 +778,7 @@ static int64_t rm_read_dts(AVFormatContext *s, int stream_index,
                 break;
         }
 
-        url_fskip(&s->pb, len);
+        url_fskip(s->pb, len);
     }
     *ppos = pos;
     return dts;
@@ -796,7 +786,7 @@ static int64_t rm_read_dts(AVFormatContext *s, int stream_index,
 
 AVInputFormat rm_demuxer = {
     "rm",
-    "rm format",
+    NULL_IF_CONFIG_SMALL("RM format"),
     sizeof(RMContext),
     rm_probe,
     rm_read_header,
@@ -804,4 +794,11 @@ AVInputFormat rm_demuxer = {
     rm_read_close,
     NULL,
     rm_read_dts,
+};
+
+AVInputFormat rdt_demuxer = {
+    "rdt",
+    NULL_IF_CONFIG_SMALL("RDT demuxer"),
+    sizeof(RMContext),
+    NULL, NULL, NULL, rm_read_close, NULL, NULL
 };

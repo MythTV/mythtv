@@ -25,10 +25,10 @@
  * divided into 32 subbands.
  */
 
+#include "libavutil/random.h"
 #include "avcodec.h"
 #include "bitstream.h"
 #include "dsputil.h"
-#include "random.h"
 
 #ifdef CONFIG_MPEGAUDIO_HP
 #define USE_HIGHPRECISION
@@ -92,12 +92,12 @@ static int mpc8_get_mask(GetBitContext *gb, int size, int t)
     return mask;
 }
 
-static int mpc8_decode_init(AVCodecContext * avctx)
+static av_cold int mpc8_decode_init(AVCodecContext * avctx)
 {
     int i;
     MPCContext *c = avctx->priv_data;
     GetBitContext gb;
-    static int vlc_inited = 0;
+    static int vlc_initialized = 0;
 
     if(avctx->extradata_size < 2){
         av_log(avctx, AV_LOG_ERROR, "Too small extradata size (%i)!\n", avctx->extradata_size);
@@ -117,7 +117,7 @@ static int mpc8_decode_init(AVCodecContext * avctx)
     c->MSS = get_bits1(&gb);
     c->frames = 1 << (get_bits(&gb, 3) * 2);
 
-    if(vlc_inited) return 0;
+    if(vlc_initialized) return 0;
     av_log(avctx, AV_LOG_DEBUG, "Initing VLC\n");
 
     init_vlc(&band_vlc, MPC8_BANDS_BITS, MPC8_BANDS_SIZE,
@@ -176,13 +176,14 @@ static int mpc8_decode_init(AVCodecContext * avctx)
                  &mpc8_q8_bits[i],  1, 1,
                  &mpc8_q8_codes[i], 1, 1, INIT_VLC_USE_STATIC);
     }
-    vlc_inited = 1;
+    vlc_initialized = 1;
+    avctx->sample_fmt = SAMPLE_FMT_S16;
     return 0;
 }
 
 static int mpc8_decode_frame(AVCodecContext * avctx,
                             void *data, int *data_size,
-                            uint8_t * buf, int buf_size)
+                            const uint8_t * buf, int buf_size)
 {
     MPCContext *c = avctx->priv_data;
     GetBitContext gb2, *gb = &gb2;
@@ -353,7 +354,7 @@ static int mpc8_decode_frame(AVCodecContext * avctx,
 }
 
 AVCodec mpc8_decoder = {
-    "mpc sv8",
+    "mpc8",
     CODEC_TYPE_AUDIO,
     CODEC_ID_MUSEPACK8,
     sizeof(MPCContext),
@@ -361,4 +362,5 @@ AVCodec mpc8_decoder = {
     NULL,
     NULL,
     mpc8_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("Musepack SV8"),
 };

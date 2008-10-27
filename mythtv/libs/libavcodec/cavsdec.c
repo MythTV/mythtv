@@ -116,8 +116,8 @@ static int decode_residual_block(AVSContext *h, GetBitContext *gb,
                                  const dec_2dvlc_t *r, int esc_golomb_order,
                                  int qp, uint8_t *dst, int stride) {
     int i, level_code, esc_code, level, run, mask;
-    DCTELEM level_buf[64];
-    uint8_t run_buf[64];
+    DCTELEM level_buf[65];
+    uint8_t run_buf[65];
     DCTELEM *block = h->block;
 
     for(i=0;i<65;i++) {
@@ -614,7 +614,7 @@ static void cavs_flush(AVCodecContext * avctx) {
 }
 
 static int cavs_decode_frame(AVCodecContext * avctx,void *data, int *data_size,
-                             uint8_t * buf, int buf_size) {
+                             const uint8_t * buf, int buf_size) {
     AVSContext *h = avctx->priv_data;
     MpegEncContext *s = &h->s;
     int input_size;
@@ -699,4 +699,5 @@ AVCodec cavs_decoder = {
     cavs_decode_frame,
     CODEC_CAP_DR1 | CODEC_CAP_DELAY,
     .flush= cavs_flush,
+    .long_name= NULL_IF_CONFIG_SMALL("Chinese AVS video (AVS1-P2, JiZhun profile)"),
 };

@@ -140,7 +140,7 @@ struct nsv_pcm_header {
 #define TB_NSVF MKBETAG('N', 'S', 'V', 'f')
 #define TB_NSVS MKBETAG('N', 'S', 'V', 's')
 
-/* hardcoded stream indices */
+/* hardcoded stream indexes */
 #define NSV_ST_VIDEO 0
 #define NSV_ST_AUDIO 1
 #define NSV_ST_SUBT 2
@@ -180,6 +180,7 @@ typedef struct {
     uint32_t vtag, atag;
     uint16_t vwidth, vheight;
     int16_t avsync;
+    AVRational framerate;
     //DVDemuxContext* dv_demux;
 } NSVContext;
 
@@ -228,7 +229,7 @@ static void print_tag(const char *str, unsigned int tag, int size)
 static int nsv_resync(AVFormatContext *s)
 {
     NSVContext *nsv = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     uint32_t v = 0;
     int i;
 
@@ -275,7 +276,7 @@ static int nsv_resync(AVFormatContext *s)
 static int nsv_parse_NSVf_header(AVFormatContext *s, AVFormatParameters *ap)
 {
     NSVContext *nsv = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     unsigned int file_size, size;
     int64_t duration;
     int strings_size;
@@ -394,7 +395,7 @@ static int nsv_parse_NSVf_header(AVFormatContext *s, AVFormatParameters *ap)
 static int nsv_parse_NSVs_header(AVFormatContext *s, AVFormatParameters *ap)
 {
     NSVContext *nsv = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     uint32_t vtag, atag;
     uint16_t vwidth, vheight;
     AVRational framerate;
@@ -428,6 +429,7 @@ static int nsv_parse_NSVs_header(AVFormatContext *s, AVFormatParameters *ap)
         framerate= (AVRational){i, 1};
 
     nsv->avsync = get_le16(pb);
+    nsv->framerate = framerate;
 #ifdef DEBUG
     print_tag("NSV NSVs vtag", vtag, 0);
     print_tag("NSV NSVs atag", atag, 0);
@@ -533,7 +535,7 @@ static int nsv_read_header(AVFormatContext *s, AVFormatParameters *ap)
 static int nsv_read_chunk(AVFormatContext *s, int fill_header)
 {
     NSVContext *nsv = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     AVStream *st[2] = {NULL, NULL};
     NSVStream *nst;
     AVPacket *pkt;
@@ -647,8 +649,8 @@ null_chunk_retry:
         if( nsv->state == NSV_HAS_READ_NSVS && st[NSV_ST_VIDEO] ) {
             /* on a nsvs frame we have new information on a/v sync */
             pkt->dts = (((NSVStream*)st[NSV_ST_VIDEO]->priv_data)->frame_offset-1);
-            pkt->dts *= (int64_t)1000 * st[NSV_ST_VIDEO]->time_base.num;
-            pkt->dts += (int64_t)nsv->avsync * st[NSV_ST_VIDEO]->time_base.den;
+            pkt->dts *= (int64_t)1000        * nsv->framerate.den;
+            pkt->dts += (int64_t)nsv->avsync * nsv->framerate.num;
             PRINT(("NSV AUDIO: sync:%d, dts:%"PRId64, nsv->avsync, pkt->dts));
         }
         nst->frame_offset++;
@@ -751,7 +753,7 @@ static int nsv_probe(AVProbeData *p)
 
 AVInputFormat nsv_demuxer = {
     "nsv",
-    "NullSoft Video format",
+    NULL_IF_CONFIG_SMALL("NullSoft Video format"),
     sizeof(NSVContext),
     nsv_probe,
     nsv_read_header,

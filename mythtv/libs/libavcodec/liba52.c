@@ -37,9 +37,6 @@ static const char* liba52name = "liba52.so.0";
  * released under the GPL license.
  */
 typedef struct AC3DecodeState {
-    uint8_t inbuf[4096]; /* input buffer */
-    uint8_t *inbuf_ptr;
-    int frame_size;
     int flags;
     int channels;
     a52_state_t* state;
@@ -80,7 +77,7 @@ static void* dlsymm(void* handle, const char* symbol)
 }
 #endif
 
-static int a52_decode_init(AVCodecContext *avctx)
+static av_cold int a52_decode_init(AVCodecContext *avctx)
 {
     AC3DecodeState *s = avctx->priv_data;
 
@@ -114,9 +111,15 @@ static int a52_decode_init(AVCodecContext *avctx)
 #endif
     s->state = s->a52_init(0); /* later use CPU flags */
     s->samples = s->a52_samples(s->state);
-    s->inbuf_ptr = s->inbuf;
-    s->frame_size = 0;
 
+    /* allow downmixing to stereo or mono */
+    if (avctx->channels > 0 && avctx->request_channels > 0 &&
+            avctx->request_channels < avctx->channels &&
+            avctx->request_channels <= 2) {
+        avctx->channels = avctx->request_channels;
+    }
+
+    avctx->sample_fmt = SAMPLE_FMT_S16;
     return 0;
 }
 
@@ -318,7 +321,6 @@ static int a52_decode_frame(AVCodecContext *avctx,
                             uint8_t *buf, int buf_size)
 {
     AC3DecodeState *s = avctx->priv_data;
-    uint8_t *buf_ptr;
     int flags, i, len;
     int sample_rate, bit_rate;
     short *out_samples = data;
@@ -329,93 +331,58 @@ static int a52_decode_frame(AVCodecContext *avctx,
 
     *data_size= 0;
 
-    buf_ptr = buf;
-    while (buf_size > 0) {
-        len = s->inbuf_ptr - s->inbuf;
-        if (s->frame_size == 0) {
-            /* no header seen : find one. We need at least 7 bytes to parse it */
-            len = HEADER_SIZE - len;
-            if (len > buf_size)
-                len = buf_size;
-            memcpy(s->inbuf_ptr, buf_ptr, len);
-            buf_ptr += len;
-            s->inbuf_ptr += len;
-            buf_size -= len;
-            if ((s->inbuf_ptr - s->inbuf) == HEADER_SIZE) {
-                len = s->a52_syncinfo(s->inbuf, &s->flags, &sample_rate, &bit_rate);
-                if (len == 0) {
-                    /* no sync found : move by one byte (inefficient, but simple!) */
-                    memcpy(s->inbuf, s->inbuf + 1, HEADER_SIZE - 1);
-                    s->inbuf_ptr--;
-                } else {
-                    s->frame_size = len;
-                    /* update codec info */
-                    avctx->sample_rate = sample_rate;
-                    s->channels = ac3_channels[s->flags & 7];
-                    if (s->flags & A52_LFE)
-                        s->channels++;
-                    if (avctx->request_channels > 0)
-                    {
-                        avctx->channels = s->channels;
-                        if (s->channels > avctx->channels)
-                            avctx->channels = avctx->request_channels;
-                    }
-                    if (avctx->channels == 0)
-                        /* No specific number of channel requested */
-                        avctx->channels = s->channels;
-                    else if (s->channels < avctx->channels) {
-                        av_log(avctx, AV_LOG_ERROR, "ac3dec: AC3 Source channels are less than specified: output to %d channels.. (frmsize: %d)\n", s->channels, len);
-                        avctx->channels = s->channels;
-                    }
-                    avctx->bit_rate = bit_rate;
-                }
-            }
-        } else if (len < s->frame_size) {
-            len = s->frame_size - len;
-            if (len > buf_size)
-                len = buf_size;
-
-            memcpy(s->inbuf_ptr, buf_ptr, len);
-            buf_ptr += len;
-            s->inbuf_ptr += len;
-            buf_size -= len;
-        } else {
-            int chans;
-            flags = s->flags;
-            if (avctx->channels == 1)
-                flags = A52_MONO;
-            else if (avctx->channels == 2) {
-                if (s->channels>2)
-                    flags = A52_DOLBY;
-                else
-                    flags = A52_STEREO;
-            }
-            else
-                flags |= A52_ADJUST_LEVEL;
-            level = 1;
-            chans = channels_multi(flags);
-            if (s->a52_frame(s->state, s->inbuf, &flags, &level, 384)) {
-            fail:
-                av_log(avctx, AV_LOG_ERROR, "Error decoding frame\n");
-                s->inbuf_ptr = s->inbuf;
-                s->frame_size = 0;
-                continue;
-            }
-            for (i = 0; i < 6; i++) {
-                if (s->a52_block(s->state))
-                    goto fail;
-                float2s16_multi(s->samples, out_samples + i * 256 * chans, flags);
-            }
-            s->inbuf_ptr = s->inbuf;
-            s->frame_size = 0;
-            *data_size = 6 * avctx->channels * 256 * sizeof(int16_t);
-            break;
-        }
+    if (buf_size < HEADER_SIZE) {
+        av_log(avctx, AV_LOG_ERROR, "Error decoding frame, not enough bytes for header\n");
+        return -1;
     }
-    return buf_ptr - buf;
+    len = s->a52_syncinfo(buf, &s->flags, &sample_rate, &bit_rate);
+    if (len == 0) {
+        av_log(avctx, AV_LOG_ERROR, "Error decoding frame, no sync byte at begin\n");
+        return -1;
+    }
+    if (buf_size < len) {
+        av_log(avctx, AV_LOG_ERROR, "Error decoding frame, not enough bytes\n");
+        return -1;
+    }
+    /* update codec info */
+    avctx->sample_rate = sample_rate;
+    s->channels = ac3_channels[s->flags & 7];
+    if (s->flags & A52_LFE)
+            s->channels++;
+    if (avctx->request_channels > 0 &&
+        avctx->request_channels <= 2 &&
+        avctx->request_channels < s->channels) {
+        avctx->channels = avctx->request_channels;
+    } else {
+        avctx->channels = s->channels;
+    }
+    avctx->bit_rate = bit_rate;
+            int chans;
+    flags = s->flags;
+    if (avctx->channels == 1)
+        flags = A52_MONO;
+    else if (avctx->channels == 2)
+        flags = A52_STEREO;
+    else if (s->channels>2)
+        flags = A52_DOLBY;
+    else
+        flags |= A52_ADJUST_LEVEL;
+    level = 1;
+    if (s->a52_frame(s->state, buf, &flags, &level, 384)) {
+    fail:
+        av_log(avctx, AV_LOG_ERROR, "Error decoding frame\n");
+        return -1;
+    }
+    for (i = 0; i < 6; i++) {
+        if (s->a52_block(s->state))
+            goto fail;
+                float2s16_multi(s->samples, out_samples + i * 256 * chans, flags);
+    }
+    *data_size = 6 * avctx->channels * 256 * sizeof(int16_t);
+    return len;
 }
 
-static int a52_decode_end(AVCodecContext *avctx)
+static av_cold int a52_decode_end(AVCodecContext *avctx)
 {
     AC3DecodeState *s = avctx->priv_data;
     s->a52_free(s->state);
@@ -434,4 +401,5 @@ AVCodec liba52_decoder = {
     NULL,
     a52_decode_end,
     a52_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("liba52 ATSC A/52 / AC-3"),
 };

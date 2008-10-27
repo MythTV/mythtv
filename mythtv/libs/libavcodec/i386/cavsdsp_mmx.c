@@ -2,7 +2,7 @@
  * Chinese AVS video (AVS1-P2, JiZhun profile) decoder.
  * Copyright (c) 2006  Stefan Gehrer <stefan.gehrer@gmx.de>
  *
- * MMX optimised DSP functions, based on H.264 optimisations by
+ * MMX-optimized DSP functions, based on H.264 optimizations by
  * Michael Niedermayer and Loren Merritt
  *
  * This file is part of FFmpeg.
@@ -22,37 +22,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "dsputil.h"
-#include "common.h"
-
-DECLARE_ALIGNED_8(static const uint64_t,ff_pw_4 ) = 0x0004000400040004ULL;
-DECLARE_ALIGNED_8(static const uint64_t,ff_pw_5 ) = 0x0005000500050005ULL;
-DECLARE_ALIGNED_8(static const uint64_t,ff_pw_7 ) = 0x0007000700070007ULL;
-DECLARE_ALIGNED_8(static const uint64_t,ff_pw_42) = 0x002A002A002A002AULL;
-DECLARE_ALIGNED_8(static const uint64_t,ff_pw_64) = 0x0040004000400040ULL;
-DECLARE_ALIGNED_8(static const uint64_t,ff_pw_96) = 0x0060006000600060ULL;
+#include "libavutil/common.h"
+#include "libavutil/x86_cpu.h"
+#include "libavcodec/dsputil.h"
+#include "dsputil_mmx.h"
 
 /*****************************************************************************
  *
  * inverse transform
  *
  ****************************************************************************/
-
-#define SUMSUB_BA( a, b ) \
-    "paddw "#b", "#a" \n\t"\
-    "paddw "#b", "#b" \n\t"\
-    "psubw "#a", "#b" \n\t"
-
-#define SBUTTERFLY(a,b,t,n)\
-    "movq " #a ", " #t "              \n\t" /* abcd */\
-    "punpckl" #n " " #b ", " #a "     \n\t" /* aebf */\
-    "punpckh" #n " " #b ", " #t "     \n\t" /* cgdh */
-
-#define TRANSPOSE4(a,b,c,d,t)\
-    SBUTTERFLY(a,b,t,wd) /* a=aebf t=cgdh */\
-    SBUTTERFLY(c,d,b,wd) /* c=imjn b=kolp */\
-    SBUTTERFLY(a,c,d,dq) /* a=aeim d=bfjn */\
-    SBUTTERFLY(t,b,c,dq) /* t=cgko c=dhlp */
 
 static inline void cavs_idct8_1d(int16_t *block, uint64_t bias)
 {
@@ -323,7 +302,7 @@ static void cavs_idct8_add_mmx(uint8_t *dst, int16_t *block, int stride)
         VOP(%%mm1, %%mm2, %%mm3, %%mm4, %%mm5, %%mm0, OP)\
         \
         : "+a"(src), "+c"(dst)\
-        : "S"((long)srcStride), "D"((long)dstStride), "m"(ADD), "m"(MUL1), "m"(MUL2)\
+        : "S"((x86_reg)srcStride), "D"((x86_reg)dstStride), "m"(ADD), "m"(MUL1), "m"(MUL2)\
         : "memory"\
      );\
      if(h==16){\
@@ -338,7 +317,7 @@ static void cavs_idct8_add_mmx(uint8_t *dst, int16_t *block, int stride)
             VOP(%%mm3, %%mm4, %%mm5, %%mm0, %%mm1, %%mm2, OP)\
             \
            : "+a"(src), "+c"(dst)\
-           : "S"((long)srcStride), "D"((long)dstStride), "m"(ADD),  "m"(MUL1), "m"(MUL2)\
+           : "S"((x86_reg)srcStride), "D"((x86_reg)dstStride), "m"(ADD),  "m"(MUL1), "m"(MUL2)\
            : "memory"\
         );\
      }\
@@ -389,7 +368,7 @@ static void OPNAME ## cavs_qpel8_h_ ## MMX(uint8_t *dst, uint8_t *src, int dstSt
         "decl %2                    \n\t"\
         " jnz 1b                    \n\t"\
         : "+a"(src), "+c"(dst), "+m"(h)\
-        : "d"((long)srcStride), "S"((long)dstStride), "m"(ff_pw_5), "m"(ff_pw_4)\
+        : "d"((x86_reg)srcStride), "S"((x86_reg)dstStride), "m"(ff_pw_5), "m"(ff_pw_4)\
         : "memory"\
     );\
 }\

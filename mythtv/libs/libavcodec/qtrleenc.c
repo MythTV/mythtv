@@ -3,13 +3,14 @@
  * Copyright (C) 2007 Clemens Fruhwirth
  * Copyright (C) 2007 Alexis Ballier
  *
- * This file is part of FFmpeg.
+ * This file is based on flashsvenc.c.
  *
- * This file is based on flashsvenc.c
+ * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License, version 2.1, as published by the Free Software Foundation
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
  * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -57,7 +58,7 @@ typedef struct QtrleEncContext {
     uint8_t* skip_table;
 } QtrleEncContext;
 
-static int qtrle_encode_init(AVCodecContext *avctx)
+static av_cold int qtrle_encode_init(AVCodecContext *avctx)
 {
     QtrleEncContext *s = avctx->priv_data;
 
@@ -254,7 +255,7 @@ static int encode_frame(QtrleEncContext *s, AVFrame *p, uint8_t *buf)
 
     bytestream_put_be32(&buf, 0);                         // CHUNK SIZE, patched later
 
-    if (start_line == 0 && end_line == s->avctx->height || start_line == s->avctx->height)
+    if ((start_line == 0 && end_line == s->avctx->height) || start_line == s->avctx->height)
         bytestream_put_be16(&buf, 0);                     // header
     else {
         bytestream_put_be16(&buf, 8);                     // header
@@ -303,7 +304,7 @@ static int qtrle_encode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_size,
     return chunksize;
 }
 
-static int qtrle_encode_end(AVCodecContext *avctx)
+static av_cold int qtrle_encode_end(AVCodecContext *avctx)
 {
     QtrleEncContext *s = avctx->priv_data;
 
@@ -322,5 +323,6 @@ AVCodec qtrle_encoder = {
     qtrle_encode_init,
     qtrle_encode_frame,
     qtrle_encode_end,
-    .pix_fmts = (enum PixelFormat[]){PIX_FMT_RGB24, -1},
+    .pix_fmts = (enum PixelFormat[]){PIX_FMT_RGB24, PIX_FMT_NONE},
+    .long_name = NULL_IF_CONFIG_SMALL("QuickTime Animation (RLE) video"),
 };

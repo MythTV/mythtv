@@ -1,10 +1,10 @@
 /*
- *  rgb2rgb.c, Software RGB to RGB convertor
- *  pluralize by Software PAL8 to RGB convertor
- *               Software YUV to YUV convertor
- *               Software YUV to RGB convertor
- *  Written by Nick Kurshev.
- *  palette & YUV & runtime CPU stuff by Michael (michaelni@gmx.at)
+ * software RGB to RGB converter
+ * pluralize by software PAL8 to RGB converter
+ *              software YUV to YUV converter
+ *              software YUV to RGB converter
+ * Written by Nick Kurshev.
+ * palette & YUV & runtime CPU stuff by Michael (michaelni@gmx.at)
  *
  * This file is part of FFmpeg.
  *
@@ -22,35 +22,35 @@
  * along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
- * the C code (not assembly, mmx, ...) of this file can be used
- * under the LGPL license too
+ * The C code (not assembly, MMX, ...) of this file can be used
+ * under the LGPL license.
  */
 #include <inttypes.h>
 #include "config.h"
+#include "libavutil/x86_cpu.h"
+#include "libavutil/bswap.h"
 #include "rgb2rgb.h"
 #include "swscale.h"
 #include "swscale_internal.h"
-#include "x86_cpu.h"
-#include "bswap.h"
 
-#define FAST_BGR2YV12 // use 7 bit coeffs instead of 15bit
+#define FAST_BGR2YV12 // use 7-bit instead of 15-bit coefficients
 
-void (*rgb24to32)(const uint8_t *src,uint8_t *dst,long src_size);
-void (*rgb24to16)(const uint8_t *src,uint8_t *dst,long src_size);
-void (*rgb24to15)(const uint8_t *src,uint8_t *dst,long src_size);
-void (*rgb32to24)(const uint8_t *src,uint8_t *dst,long src_size);
-void (*rgb32to16)(const uint8_t *src,uint8_t *dst,long src_size);
-void (*rgb32to15)(const uint8_t *src,uint8_t *dst,long src_size);
-void (*rgb15to16)(const uint8_t *src,uint8_t *dst,long src_size);
-void (*rgb15to24)(const uint8_t *src,uint8_t *dst,long src_size);
-void (*rgb15to32)(const uint8_t *src,uint8_t *dst,long src_size);
-void (*rgb16to15)(const uint8_t *src,uint8_t *dst,long src_size);
-void (*rgb16to24)(const uint8_t *src,uint8_t *dst,long src_size);
-void (*rgb16to32)(const uint8_t *src,uint8_t *dst,long src_size);
-//void (*rgb24tobgr32)(const uint8_t *src, uint8_t *dst, long src_size);
-void (*rgb24tobgr24)(const uint8_t *src, uint8_t *dst, long src_size);
+void (*rgb24tobgr32)(const uint8_t *src, uint8_t *dst, long src_size);
 void (*rgb24tobgr16)(const uint8_t *src, uint8_t *dst, long src_size);
 void (*rgb24tobgr15)(const uint8_t *src, uint8_t *dst, long src_size);
+void (*rgb32tobgr24)(const uint8_t *src, uint8_t *dst, long src_size);
+void (*rgb32to16)(const uint8_t *src, uint8_t *dst, long src_size);
+void (*rgb32to15)(const uint8_t *src, uint8_t *dst, long src_size);
+void (*rgb15to16)(const uint8_t *src, uint8_t *dst, long src_size);
+void (*rgb15tobgr24)(const uint8_t *src, uint8_t *dst, long src_size);
+void (*rgb15to32)(const uint8_t *src, uint8_t *dst, long src_size);
+void (*rgb16to15)(const uint8_t *src, uint8_t *dst, long src_size);
+void (*rgb16tobgr24)(const uint8_t *src, uint8_t *dst, long src_size);
+void (*rgb16to32)(const uint8_t *src, uint8_t *dst, long src_size);
+//void (*rgb24tobgr32)(const uint8_t *src, uint8_t *dst, long src_size);
+void (*rgb24tobgr24)(const uint8_t *src, uint8_t *dst, long src_size);
+void (*rgb24to16)(const uint8_t *src, uint8_t *dst, long src_size);
+void (*rgb24to15)(const uint8_t *src, uint8_t *dst, long src_size);
 void (*rgb32tobgr32)(const uint8_t *src, uint8_t *dst, long src_size);
 //void (*rgb32tobgr24)(const uint8_t *src, uint8_t *dst, long src_size);
 void (*rgb32tobgr16)(const uint8_t *src, uint8_t *dst, long src_size);
@@ -63,6 +63,9 @@ void (*yv12touyvy)(const uint8_t *ysrc, const uint8_t *usrc, const uint8_t *vsrc
                    long width, long height,
                    long lumStride, long chromStride, long dstStride);
 void (*yuv422ptoyuy2)(const uint8_t *ysrc, const uint8_t *usrc, const uint8_t *vsrc, uint8_t *dst,
+                      long width, long height,
+                      long lumStride, long chromStride, long dstStride);
+void (*yuv422ptouyvy)(const uint8_t *ysrc, const uint8_t *usrc, const uint8_t *vsrc, uint8_t *dst,
                       long width, long height,
                       long lumStride, long chromStride, long dstStride);
 void (*yuy2toyv12)(const uint8_t *src, uint8_t *ydst, uint8_t *udst, uint8_t *vdst,
@@ -88,52 +91,39 @@ void (*yvu9_to_yuy2)(const uint8_t *src1, const uint8_t *src2, const uint8_t *sr
                      long srcStride3, long dstStride);
 
 #if defined(ARCH_X86) && defined(CONFIG_GPL)
-static const uint64_t mmx_null     __attribute__((aligned(8))) = 0x0000000000000000ULL;
-static const uint64_t mmx_one      __attribute__((aligned(8))) = 0xFFFFFFFFFFFFFFFFULL;
-static const uint64_t mask32b      attribute_used __attribute__((aligned(8))) = 0x000000FF000000FFULL;
-static const uint64_t mask32g      attribute_used __attribute__((aligned(8))) = 0x0000FF000000FF00ULL;
-static const uint64_t mask32r      attribute_used __attribute__((aligned(8))) = 0x00FF000000FF0000ULL;
-static const uint64_t mask32       __attribute__((aligned(8))) = 0x00FFFFFF00FFFFFFULL;
-static const uint64_t mask3216br   __attribute__((aligned(8))) = 0x00F800F800F800F8ULL;
-static const uint64_t mask3216g    __attribute__((aligned(8))) = 0x0000FC000000FC00ULL;
-static const uint64_t mask3215g    __attribute__((aligned(8))) = 0x0000F8000000F800ULL;
-static const uint64_t mul3216      __attribute__((aligned(8))) = 0x2000000420000004ULL;
-static const uint64_t mul3215      __attribute__((aligned(8))) = 0x2000000820000008ULL;
-static const uint64_t mask24b      attribute_used __attribute__((aligned(8))) = 0x00FF0000FF0000FFULL;
-static const uint64_t mask24g      attribute_used __attribute__((aligned(8))) = 0xFF0000FF0000FF00ULL;
-static const uint64_t mask24r      attribute_used __attribute__((aligned(8))) = 0x0000FF0000FF0000ULL;
-static const uint64_t mask24l      __attribute__((aligned(8))) = 0x0000000000FFFFFFULL;
-static const uint64_t mask24h      __attribute__((aligned(8))) = 0x0000FFFFFF000000ULL;
-static const uint64_t mask24hh     __attribute__((aligned(8))) = 0xffff000000000000ULL;
-static const uint64_t mask24hhh    __attribute__((aligned(8))) = 0xffffffff00000000ULL;
-static const uint64_t mask24hhhh   __attribute__((aligned(8))) = 0xffffffffffff0000ULL;
-static const uint64_t mask15b      __attribute__((aligned(8))) = 0x001F001F001F001FULL; /* 00000000 00011111  xxB */
-static const uint64_t mask15rg     __attribute__((aligned(8))) = 0x7FE07FE07FE07FE0ULL; /* 01111111 11100000  RGx */
-static const uint64_t mask15s      __attribute__((aligned(8))) = 0xFFE0FFE0FFE0FFE0ULL;
-static const uint64_t mask15g      __attribute__((aligned(8))) = 0x03E003E003E003E0ULL;
-static const uint64_t mask15r      __attribute__((aligned(8))) = 0x7C007C007C007C00ULL;
+DECLARE_ASM_CONST(8, uint64_t, mmx_null)     = 0x0000000000000000ULL;
+DECLARE_ASM_CONST(8, uint64_t, mmx_one)      = 0xFFFFFFFFFFFFFFFFULL;
+DECLARE_ASM_CONST(8, uint64_t, mask32b)      = 0x000000FF000000FFULL;
+DECLARE_ASM_CONST(8, uint64_t, mask32g)      = 0x0000FF000000FF00ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask32r)      = 0x00FF000000FF0000ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask32)       = 0x00FFFFFF00FFFFFFULL;
+DECLARE_ASM_CONST(8, uint64_t, mask3216br)   = 0x00F800F800F800F8ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask3216g)    = 0x0000FC000000FC00ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask3215g)    = 0x0000F8000000F800ULL;
+DECLARE_ASM_CONST(8, uint64_t, mul3216)      = 0x2000000420000004ULL;
+DECLARE_ASM_CONST(8, uint64_t, mul3215)      = 0x2000000820000008ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask24b)      = 0x00FF0000FF0000FFULL;
+DECLARE_ASM_CONST(8, uint64_t, mask24g)      = 0xFF0000FF0000FF00ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask24r)      = 0x0000FF0000FF0000ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask24l)      = 0x0000000000FFFFFFULL;
+DECLARE_ASM_CONST(8, uint64_t, mask24h)      = 0x0000FFFFFF000000ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask24hh)     = 0xffff000000000000ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask24hhh)    = 0xffffffff00000000ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask24hhhh)   = 0xffffffffffff0000ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask15b)      = 0x001F001F001F001FULL; /* 00000000 00011111  xxB */
+DECLARE_ASM_CONST(8, uint64_t, mask15rg)     = 0x7FE07FE07FE07FE0ULL; /* 01111111 11100000  RGx */
+DECLARE_ASM_CONST(8, uint64_t, mask15s)      = 0xFFE0FFE0FFE0FFE0ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask15g)      = 0x03E003E003E003E0ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask15r)      = 0x7C007C007C007C00ULL;
 #define mask16b mask15b
-static const uint64_t mask16g      __attribute__((aligned(8))) = 0x07E007E007E007E0ULL;
-static const uint64_t mask16r      __attribute__((aligned(8))) = 0xF800F800F800F800ULL;
-static const uint64_t red_16mask   __attribute__((aligned(8))) = 0x0000f8000000f800ULL;
-static const uint64_t green_16mask __attribute__((aligned(8))) = 0x000007e0000007e0ULL;
-static const uint64_t blue_16mask  __attribute__((aligned(8))) = 0x0000001f0000001fULL;
-static const uint64_t red_15mask   __attribute__((aligned(8))) = 0x00007c0000007c00ULL;
-static const uint64_t green_15mask __attribute__((aligned(8))) = 0x000003e0000003e0ULL;
-static const uint64_t blue_15mask  __attribute__((aligned(8))) = 0x0000001f0000001fULL;
-
-#ifdef FAST_BGR2YV12
-static const uint64_t bgr2YCoeff   attribute_used __attribute__((aligned(8))) = 0x000000210041000DULL;
-static const uint64_t bgr2UCoeff   attribute_used __attribute__((aligned(8))) = 0x0000FFEEFFDC0038ULL;
-static const uint64_t bgr2VCoeff   attribute_used __attribute__((aligned(8))) = 0x00000038FFD2FFF8ULL;
-#else
-static const uint64_t bgr2YCoeff   attribute_used __attribute__((aligned(8))) = 0x000020E540830C8BULL;
-static const uint64_t bgr2UCoeff   attribute_used __attribute__((aligned(8))) = 0x0000ED0FDAC23831ULL;
-static const uint64_t bgr2VCoeff   attribute_used __attribute__((aligned(8))) = 0x00003831D0E6F6EAULL;
-#endif
-static const uint64_t bgr2YOffset  attribute_used __attribute__((aligned(8))) = 0x1010101010101010ULL;
-static const uint64_t bgr2UVOffset attribute_used __attribute__((aligned(8))) = 0x8080808080808080ULL;
-static const uint64_t w1111        attribute_used __attribute__((aligned(8))) = 0x0001000100010001ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask16g)      = 0x07E007E007E007E0ULL;
+DECLARE_ASM_CONST(8, uint64_t, mask16r)      = 0xF800F800F800F800ULL;
+DECLARE_ASM_CONST(8, uint64_t, red_16mask)   = 0x0000f8000000f800ULL;
+DECLARE_ASM_CONST(8, uint64_t, green_16mask) = 0x000007e0000007e0ULL;
+DECLARE_ASM_CONST(8, uint64_t, blue_16mask)  = 0x0000001f0000001fULL;
+DECLARE_ASM_CONST(8, uint64_t, red_15mask)   = 0x00007c0000007c00ULL;
+DECLARE_ASM_CONST(8, uint64_t, green_15mask) = 0x000003e0000003e0ULL;
+DECLARE_ASM_CONST(8, uint64_t, blue_15mask)  = 0x0000001f0000001fULL;
 
 #if 0
 static volatile uint64_t __attribute__((aligned(8))) b5Dither;
@@ -162,8 +152,8 @@ static uint64_t __attribute__((aligned(8))) dither8[2]={
 #define RV ((int)( 0.439*(1<<RGB2YUV_SHIFT)+0.5))
 #define RU ((int)(-0.148*(1<<RGB2YUV_SHIFT)+0.5))
 
-//Note: we have C, MMX, MMX2, 3DNOW version therse no 3DNOW+MMX2 one
-//Plain C versions
+//Note: We have C, MMX, MMX2, 3DNOW versions, there is no 3DNOW + MMX2 one.
+//plain C versions
 #undef HAVE_MMX
 #undef HAVE_MMX2
 #undef HAVE_3DNOW
@@ -203,10 +193,10 @@ static uint64_t __attribute__((aligned(8))) dither8[2]={
 #endif //ARCH_X86 || ARCH_X86_64
 
 /*
- rgb15->rgb16 Original by Strepto/Astral
+ RGB15->RGB16 original by Strepto/Astral
  ported to gcc & bugfixed : A'rpi
  MMX2, 3DNOW optimization by Nick Kurshev
- 32bit c version, and and&add trick by Michael Niedermayer
+ 32-bit C version, and and&add trick by Michael Niedermayer
 */
 
 void sws_rgb2rgb_init(int flags){
@@ -231,20 +221,20 @@ void palette8torgb32(const uint8_t *src, uint8_t *dst, long num_pixels, const ui
 
 /*
     for (i=0; i<num_pixels; i++)
-        ((unsigned *)dst)[i] = ((unsigned *)palette)[ src[i] ];
+        ((unsigned *)dst)[i] = ((unsigned *)palette)[src[i]];
 */
 
     for (i=0; i<num_pixels; i++)
     {
         #ifdef WORDS_BIGENDIAN
-            dst[3]= palette[ src[i]*4+2 ];
-            dst[2]= palette[ src[i]*4+1 ];
-            dst[1]= palette[ src[i]*4+0 ];
+            dst[3]= palette[src[i]*4+2];
+            dst[2]= palette[src[i]*4+1];
+            dst[1]= palette[src[i]*4+0];
         #else
         //FIXME slow?
-            dst[0]= palette[ src[i]*4+2 ];
-            dst[1]= palette[ src[i]*4+1 ];
-            dst[2]= palette[ src[i]*4+0 ];
+            dst[0]= palette[src[i]*4+2];
+            dst[1]= palette[src[i]*4+1];
+            dst[2]= palette[src[i]*4+0];
             //dst[3]= 0; /* do we need this cleansing? */
         #endif
         dst+= 4;
@@ -257,14 +247,14 @@ void palette8tobgr32(const uint8_t *src, uint8_t *dst, long num_pixels, const ui
     for (i=0; i<num_pixels; i++)
     {
         #ifdef WORDS_BIGENDIAN
-            dst[3]= palette[ src[i]*4+0 ];
-            dst[2]= palette[ src[i]*4+1 ];
-            dst[1]= palette[ src[i]*4+2 ];
+            dst[3]= palette[src[i]*4+0];
+            dst[2]= palette[src[i]*4+1];
+            dst[1]= palette[src[i]*4+2];
         #else
             //FIXME slow?
-            dst[0]= palette[ src[i]*4+0 ];
-            dst[1]= palette[ src[i]*4+1 ];
-            dst[2]= palette[ src[i]*4+2 ];
+            dst[0]= palette[src[i]*4+0];
+            dst[1]= palette[src[i]*4+1];
+            dst[2]= palette[src[i]*4+2];
             //dst[3]= 0; /* do we need this cleansing? */
         #endif
 
@@ -279,16 +269,16 @@ void palette8torgb24(const uint8_t *src, uint8_t *dst, long num_pixels, const ui
 {
     long i;
 /*
-    writes 1 byte o much and might cause alignment issues on some architectures?
+    Writes 1 byte too much and might cause alignment issues on some architectures?
     for (i=0; i<num_pixels; i++)
-        ((unsigned *)(&dst[i*3])) = ((unsigned *)palette)[ src[i] ];
+        ((unsigned *)(&dst[i*3])) = ((unsigned *)palette)[src[i]];
 */
     for (i=0; i<num_pixels; i++)
     {
         //FIXME slow?
-        dst[0]= palette[ src[i]*4+2 ];
-        dst[1]= palette[ src[i]*4+1 ];
-        dst[2]= palette[ src[i]*4+0 ];
+        dst[0]= palette[src[i]*4+2];
+        dst[1]= palette[src[i]*4+1];
+        dst[2]= palette[src[i]*4+0];
         dst+= 3;
     }
 }
@@ -297,34 +287,34 @@ void palette8tobgr24(const uint8_t *src, uint8_t *dst, long num_pixels, const ui
 {
     long i;
 /*
-    writes 1 byte o much and might cause alignment issues on some architectures?
+    Writes 1 byte too much and might cause alignment issues on some architectures?
     for (i=0; i<num_pixels; i++)
-        ((unsigned *)(&dst[i*3])) = ((unsigned *)palette)[ src[i] ];
+        ((unsigned *)(&dst[i*3])) = ((unsigned *)palette)[src[i]];
 */
     for (i=0; i<num_pixels; i++)
     {
         //FIXME slow?
-        dst[0]= palette[ src[i]*4+0 ];
-        dst[1]= palette[ src[i]*4+1 ];
-        dst[2]= palette[ src[i]*4+2 ];
+        dst[0]= palette[src[i]*4+0];
+        dst[1]= palette[src[i]*4+1];
+        dst[2]= palette[src[i]*4+2];
         dst+= 3;
     }
 }
 
 /**
- * Palette is assumed to contain bgr16, see rgb32to16 to convert the palette
+ * Palette is assumed to contain BGR16, see rgb32to16 to convert the palette.
  */
 void palette8torgb16(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette)
 {
     long i;
     for (i=0; i<num_pixels; i++)
-        ((uint16_t *)dst)[i] = ((uint16_t *)palette)[ src[i] ];
+        ((uint16_t *)dst)[i] = ((const uint16_t *)palette)[src[i]];
 }
 void palette8tobgr16(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette)
 {
     long i;
     for (i=0; i<num_pixels; i++)
-        ((uint16_t *)dst)[i] = bswap_16(((uint16_t *)palette)[ src[i] ]);
+        ((uint16_t *)dst)[i] = bswap_16(((const uint16_t *)palette)[src[i]]);
 }
 
 /**
@@ -334,16 +324,16 @@ void palette8torgb15(const uint8_t *src, uint8_t *dst, long num_pixels, const ui
 {
     long i;
     for (i=0; i<num_pixels; i++)
-        ((uint16_t *)dst)[i] = ((uint16_t *)palette)[ src[i] ];
+        ((uint16_t *)dst)[i] = ((const uint16_t *)palette)[src[i]];
 }
 void palette8tobgr15(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette)
 {
     long i;
     for (i=0; i<num_pixels; i++)
-        ((uint16_t *)dst)[i] = bswap_16(((uint16_t *)palette)[ src[i] ]);
+        ((uint16_t *)dst)[i] = bswap_16(((const uint16_t *)palette)[src[i]]);
 }
 
-void rgb32tobgr24(const uint8_t *src, uint8_t *dst, long src_size)
+void rgb32to24(const uint8_t *src, uint8_t *dst, long src_size)
 {
     long i;
     long num_pixels = src_size >> 2;
@@ -362,7 +352,7 @@ void rgb32tobgr24(const uint8_t *src, uint8_t *dst, long src_size)
     }
 }
 
-void rgb24tobgr32(const uint8_t *src, uint8_t *dst, long src_size)
+void rgb24to32(const uint8_t *src, uint8_t *dst, long src_size)
 {
     long i;
     for (i=0; 3*i<src_size; i++)
@@ -385,8 +375,8 @@ void rgb24tobgr32(const uint8_t *src, uint8_t *dst, long src_size)
 void rgb16tobgr32(const uint8_t *src, uint8_t *dst, long src_size)
 {
     const uint16_t *end;
-    uint8_t *d = (uint8_t *)dst;
-    const uint16_t *s = (uint16_t *)src;
+    uint8_t *d = dst;
+    const uint16_t *s = (const uint16_t *)src;
     end = s + src_size/2;
     while (s < end)
     {
@@ -406,10 +396,10 @@ void rgb16tobgr32(const uint8_t *src, uint8_t *dst, long src_size)
     }
 }
 
-void rgb16tobgr24(const uint8_t *src, uint8_t *dst, long src_size)
+void rgb16to24(const uint8_t *src, uint8_t *dst, long src_size)
 {
     const uint16_t *end;
-    uint8_t *d = (uint8_t *)dst;
+    uint8_t *d = dst;
     const uint16_t *s = (const uint16_t *)src;
     end = s + src_size/2;
     while (s < end)
@@ -429,13 +419,8 @@ void rgb16tobgr16(const uint8_t *src, uint8_t *dst, long src_size)
 
     for (i=0; i<num_pixels; i++)
     {
-        unsigned b,g,r;
-        register uint16_t rgb;
-        rgb = src[2*i];
-        r = rgb&0x1F;
-        g = (rgb&0x7E0)>>5;
-        b = (rgb&0xF800)>>11;
-        dst[2*i] = (b&0x1F) | ((g&0x3F)<<5) | ((r&0x1F)<<11);
+        unsigned rgb = ((const uint16_t*)src)[i];
+        ((uint16_t*)dst)[i] = (rgb>>11) | (rgb&0x7E0) | (rgb<<11);
     }
 }
 
@@ -446,20 +431,15 @@ void rgb16tobgr15(const uint8_t *src, uint8_t *dst, long src_size)
 
     for (i=0; i<num_pixels; i++)
     {
-        unsigned b,g,r;
-        register uint16_t rgb;
-        rgb = src[2*i];
-        r = rgb&0x1F;
-        g = (rgb&0x7E0)>>5;
-        b = (rgb&0xF800)>>11;
-        dst[2*i] = (b&0x1F) | ((g&0x1F)<<5) | ((r&0x1F)<<10);
+        unsigned rgb = ((const uint16_t*)src)[i];
+        ((uint16_t*)dst)[i] = (rgb>>11) | ((rgb&0x7C0)>>1) | ((rgb&0x1F)<<10);
     }
 }
 
 void rgb15tobgr32(const uint8_t *src, uint8_t *dst, long src_size)
 {
     const uint16_t *end;
-    uint8_t *d = (uint8_t *)dst;
+    uint8_t *d = dst;
     const uint16_t *s = (const uint16_t *)src;
     end = s + src_size/2;
     while (s < end)
@@ -480,11 +460,11 @@ void rgb15tobgr32(const uint8_t *src, uint8_t *dst, long src_size)
     }
 }
 
-void rgb15tobgr24(const uint8_t *src, uint8_t *dst, long src_size)
+void rgb15to24(const uint8_t *src, uint8_t *dst, long src_size)
 {
     const uint16_t *end;
-    uint8_t *d = (uint8_t *)dst;
-    const uint16_t *s = (uint16_t *)src;
+    uint8_t *d = dst;
+    const uint16_t *s = (const uint16_t *)src;
     end = s + src_size/2;
     while (s < end)
     {
@@ -503,13 +483,8 @@ void rgb15tobgr16(const uint8_t *src, uint8_t *dst, long src_size)
 
     for (i=0; i<num_pixels; i++)
     {
-        unsigned b,g,r;
-        register uint16_t rgb;
-        rgb = src[2*i];
-        r = rgb&0x1F;
-        g = (rgb&0x3E0)>>5;
-        b = (rgb&0x7C00)>>10;
-        dst[2*i] = (b&0x1F) | ((g&0x3F)<<5) | ((r&0x1F)<<11);
+        unsigned rgb = ((const uint16_t*)src)[i];
+        ((uint16_t*)dst)[i] = ((rgb&0x7C00)>>10) | ((rgb&0x3E0)<<1) | (rgb<<11);
     }
 }
 
@@ -520,17 +495,14 @@ void rgb15tobgr15(const uint8_t *src, uint8_t *dst, long src_size)
 
     for (i=0; i<num_pixels; i++)
     {
-        unsigned b,g,r;
-        register uint16_t rgb;
-        rgb = src[2*i];
-        r = rgb&0x1F;
-        g = (rgb&0x3E0)>>5;
-        b = (rgb&0x7C00)>>10;
-        dst[2*i] = (b&0x1F) | ((g&0x1F)<<5) | ((r&0x1F)<<10);
+        unsigned br;
+        unsigned rgb = ((const uint16_t*)src)[i];
+        br = rgb&0x7c1F;
+        ((uint16_t*)dst)[i] = (br>>10) | (rgb&0x3E0) | (br<<10);
     }
 }
 
-void rgb8tobgr8(const uint8_t *src, uint8_t *dst, long src_size)
+void bgr8torgb8(const uint8_t *src, uint8_t *dst, long src_size)
 {
     long i;
     long num_pixels = src_size;

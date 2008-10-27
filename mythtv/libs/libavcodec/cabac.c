@@ -26,7 +26,7 @@
 
 #include <string.h>
 
-#include "common.h"
+#include "libavutil/common.h"
 #include "bitstream.h"
 #include "cabac.h"
 
@@ -178,13 +178,14 @@ void ff_init_cabac_states(CABACContext *c){
     }
 }
 
-#if 0 //selftest
+#ifdef TEST
 #undef random
 #define SIZE 10240
 
 #include "avcodec.h"
+#include "cabac.h"
 
-int main(){
+int main(void){
     CABACContext c;
     uint8_t b[9*SIZE];
     uint8_t r[9*SIZE];
@@ -192,7 +193,7 @@ int main(){
     uint8_t state[10]= {0};
 
     ff_init_cabac_encoder(&c, b, SIZE);
-    ff_init_cabac_states(&c, ff_h264_lps_range, ff_h264_mps_state, ff_h264_lps_state, 64);
+    ff_init_cabac_states(&c);
 
     for(i=0; i<SIZE; i++){
         r[i]= random()%7;
@@ -262,4 +263,4 @@ STOP_TIMER("get_cabac_ueg")
     return 0;
 }
 
-#endif
+#endif /* TEST */

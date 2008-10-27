@@ -45,7 +45,7 @@ static void rv10_write_header(AVFormatContext *ctx,
                               int data_size, int index_pos)
 {
     RMContext *rm = ctx->priv_data;
-    ByteIOContext *s = &ctx->pb;
+    ByteIOContext *s = ctx->pb;
     StreamInfo *stream;
     unsigned char *data_offset_ptr, *start_ptr;
     const char *desc, *mimetype;
@@ -185,7 +185,7 @@ static void rv10_write_header(AVFormatContext *ctx,
             case 8000:
                 fscode = 3;
             }
-            put_be16(s, fscode); /* codec additional info, for AC3, seems
+            put_be16(s, fscode); /* codec additional info, for AC-3, seems
                                      to be a frequency code */
             /* special hack to compensate rounding errors... */
             if (coded_frame_size == 557)
@@ -253,7 +253,7 @@ static void write_packet_header(AVFormatContext *ctx, StreamInfo *stream,
                                 int length, int key_frame)
 {
     int timestamp;
-    ByteIOContext *s = &ctx->pb;
+    ByteIOContext *s = ctx->pb;
 
     stream->nb_packets++;
     stream->packet_total_size += length;
@@ -308,7 +308,7 @@ static int rm_write_header(AVFormatContext *s)
     }
 
     rv10_write_header(s, 0, 0);
-    put_flush_packet(&s->pb);
+    put_flush_packet(s->pb);
     return 0;
 }
 
@@ -316,7 +316,7 @@ static int rm_write_audio(AVFormatContext *s, const uint8_t *buf, int size, int 
 {
     uint8_t *buf1;
     RMContext *rm = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     StreamInfo *stream = rm->audio_stream;
     int i;
 
@@ -325,7 +325,7 @@ static int rm_write_audio(AVFormatContext *s, const uint8_t *buf, int size, int 
 
     write_packet_header(s, stream, size, !!(flags & PKT_FLAG_KEY));
 
-    /* for AC3, the words seems to be reversed */
+    /* for AC-3, the words seem to be reversed */
     for(i=0;i<size;i+=2) {
         buf1[i] = buf[i+1];
         buf1[i+1] = buf[i];
@@ -340,7 +340,7 @@ static int rm_write_audio(AVFormatContext *s, const uint8_t *buf, int size, int 
 static int rm_write_video(AVFormatContext *s, const uint8_t *buf, int size, int flags)
 {
     RMContext *rm = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     StreamInfo *stream = rm->video_stream;
     int key_frame = !!(flags & PKT_FLAG_KEY);
 
@@ -349,7 +349,7 @@ static int rm_write_video(AVFormatContext *s, const uint8_t *buf, int size, int 
     /* Well, I spent some time finding the meaning of these bits. I am
        not sure I understood everything, but it works !! */
 #if 1
-    write_packet_header(s, stream, size + 7, key_frame);
+    write_packet_header(s, stream, size + 7 + (size >= 0x4000)*4, key_frame);
     /* bit 7: '1' if final packet of a frame converted in several packets */
     put_byte(pb, 0x81);
     /* bit 7: '1' if I frame. bits 6..0 : sequence number in current
@@ -359,8 +359,13 @@ static int rm_write_video(AVFormatContext *s, const uint8_t *buf, int size, int 
     } else {
         put_byte(pb, 0x01);
     }
-    put_be16(pb, 0x4000 + (size)); /* total frame size */
-    put_be16(pb, 0x4000 + (size));              /* offset from the start or the end */
+    if(size >= 0x4000){
+        put_be32(pb, size); /* total frame size */
+        put_be32(pb, size); /* offset from the start or the end */
+    }else{
+        put_be16(pb, 0x4000 | size); /* total frame size */
+        put_be16(pb, 0x4000 | size); /* offset from the start or the end */
+    }
 #else
     /* full frame */
     write_packet_header(s, size + 6);
@@ -390,9 +395,9 @@ static int rm_write_trailer(AVFormatContext *s)
 {
     RMContext *rm = s->priv_data;
     int data_size, index_pos, i;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
 
-    if (!url_is_streamed(&s->pb)) {
+    if (!url_is_streamed(s->pb)) {
         /* end of file: finish to write header */
         index_pos = url_fseek(pb, 0, SEEK_CUR);
         data_size = index_pos - rm->data_pos;
@@ -403,7 +408,7 @@ static int rm_write_trailer(AVFormatContext *s)
         put_be16(pb, 0);
 
         for(i=0;i<s->nb_streams;i++) {
-            put_be32(pb, 0); /* zero indices */
+            put_be32(pb, 0); /* zero indexes */
             put_be16(pb, i); /* stream number */
             put_be32(pb, 0); /* next index */
         }
@@ -427,7 +432,7 @@ static int rm_write_trailer(AVFormatContext *s)
 
 AVOutputFormat rm_muxer = {
     "rm",
-    "rm format",
+    NULL_IF_CONFIG_SMALL("RM format"),
     "application/vnd.rn-realmedia",
     "rm,ra",
     sizeof(RMContext),

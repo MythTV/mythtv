@@ -42,7 +42,7 @@
 
 #ifdef CONFIG_LIBFAADBIN
 #include <dlfcn.h>
-static const char* libfaadname = "libfaad.so.0";
+static const char* libfaadname = "libfaad.so";
 #else
 #define dlopen(a)
 #define dlclose(a)
@@ -58,36 +58,36 @@ typedef struct {
     faacDecHandle FAADAPI (*faacDecOpen)(void);
     faacDecConfigurationPtr FAADAPI (*faacDecGetCurrentConfiguration)(faacDecHandle hDecoder);
 #ifndef FAAD2_VERSION
-        int FAADAPI (*faacDecSetConfiguration)(faacDecHandle hDecoder,
+    int FAADAPI (*faacDecSetConfiguration)(faacDecHandle hDecoder,
                                            faacDecConfigurationPtr config);
-        int FAADAPI (*faacDecInit)(faacDecHandle hDecoder,
-                                unsigned char *buffer,
-                                unsigned long *samplerate,
-                                unsigned long *channels);
-        int FAADAPI (*faacDecInit2)(faacDecHandle hDecoder, unsigned char *pBuffer,
+    int FAADAPI (*faacDecInit)(faacDecHandle hDecoder,
+                               unsigned char *buffer,
+                               unsigned long *samplerate,
+                               unsigned long *channels);
+    int FAADAPI (*faacDecInit2)(faacDecHandle hDecoder, unsigned char *pBuffer,
                                 unsigned long SizeOfDecoderSpecificInfo,
                                 unsigned long *samplerate, unsigned long *channels);
-        int FAADAPI (*faacDecDecode)(faacDecHandle hDecoder,
-                                unsigned char *buffer,
-                                unsigned long *bytesconsumed,
-                                short *sample_buffer,
-                                unsigned long *samples);
+    int FAADAPI (*faacDecDecode)(faacDecHandle hDecoder,
+                                 unsigned char *buffer,
+                                 unsigned long *bytesconsumed,
+                                 short *sample_buffer,
+                                 unsigned long *samples);
 #else
-        unsigned char FAADAPI (*faacDecSetConfiguration)(faacDecHandle hDecoder,
+    unsigned char FAADAPI (*faacDecSetConfiguration)(faacDecHandle hDecoder,
                                                      faacDecConfigurationPtr config);
-        long FAADAPI (*faacDecInit)(faacDecHandle hDecoder,
-                                   unsigned char *buffer,
-                                 unsigned long buffer_size,
-                                 unsigned long *samplerate,
-                                 unsigned char *channels);
-        char FAADAPI (*faacDecInit2)(faacDecHandle hDecoder, unsigned char *pBuffer,
+    long FAADAPI (*faacDecInit)(faacDecHandle hDecoder,
+                                unsigned char *buffer,
+                                unsigned long buffer_size,
+                                unsigned long *samplerate,
+                                unsigned char *channels);
+    char FAADAPI (*faacDecInit2)(faacDecHandle hDecoder, unsigned char *pBuffer,
                                  unsigned long SizeOfDecoderSpecificInfo,
                                  unsigned long *samplerate, unsigned char *channels);
-        void *FAADAPI (*faacDecDecode)(faacDecHandle hDecoder,
-                                         faacDecFrameInfo *hInfo,
-                                         unsigned char *buffer,
-                                                                 unsigned long buffer_size);
-        char* FAADAPI (*faacDecGetErrorMessage)(unsigned char errcode);
+    void *FAADAPI (*faacDecDecode)(faacDecHandle hDecoder,
+                                   faacDecFrameInfo *hInfo,
+                                   unsigned char *buffer,
+                                   unsigned long buffer_size);
+    char* FAADAPI (*faacDecGetErrorMessage)(unsigned char errcode);
 #endif
 
     void FAADAPI (*faacDecClose)(faacDecHandle hDecoder);
@@ -100,6 +100,21 @@ static const unsigned long faac_srates[] =
     96000, 88200, 64000, 48000, 44100, 32000,
     24000, 22050, 16000, 12000, 11025, 8000
 };
+
+static void channel_setup(AVCodecContext *avctx)
+{
+#ifdef FAAD2_VERSION
+    FAACContext *s = avctx->priv_data;
+    if (avctx->request_channels > 0 && avctx->request_channels == 2 &&
+        avctx->request_channels < avctx->channels) {
+        faacDecConfigurationPtr faac_cfg;
+        avctx->channels = 2;
+        faac_cfg = s->faacDecGetCurrentConfiguration(s->faac_handle);
+        faac_cfg->downMatrix = 1;
+        s->faacDecSetConfiguration(s->faac_handle, faac_cfg);
+    }
+#endif
+}
 
 static int faac_init_mp4(AVCodecContext *avctx)
 {
@@ -123,6 +138,7 @@ static int faac_init_mp4(AVCodecContext *avctx)
         } else {
             avctx->sample_rate = samplerate;
             avctx->channels = channels;
+            channel_setup(avctx);
             s->init = 1;
         }
     }
@@ -164,12 +180,12 @@ static int faac_decode_frame(AVCodecContext *avctx,
         unsigned char channels;
         int r = s->faacDecInit(s->faac_handle, buf, buf_size, &srate, &channels);
         if(r < 0){
-            av_log(avctx, AV_LOG_ERROR, "faac: codec init failed: %s\n",
-                   s->faacDecGetErrorMessage(frame_info.error));
+            av_log(avctx, AV_LOG_ERROR, "faac: codec init failed.\n");
             return -1;
         }
         avctx->sample_rate = srate;
         avctx->channels = channels;
+        channel_setup(avctx);
         s->init = 1;
     }
 
@@ -177,10 +193,11 @@ static int faac_decode_frame(AVCodecContext *avctx,
 
     if (frame_info.error > 0) {
         av_log(avctx, AV_LOG_ERROR, "faac: frame decoding failed: %s\n",
-                s->faacDecGetErrorMessage(frame_info.error));
+               s->faacDecGetErrorMessage(frame_info.error));
         return -1;
     }
-
+    if (!avctx->frame_size)
+        avctx->frame_size = frame_info.samples/avctx->channels;
     frame_info.samples *= s->sample_size;
     memcpy(data, out, frame_info.samples); // CHECKME - can we cheat this one
 
@@ -192,7 +209,7 @@ static int faac_decode_frame(AVCodecContext *avctx,
 #endif
 }
 
-static int faac_decode_end(AVCodecContext *avctx)
+static av_cold int faac_decode_end(AVCodecContext *avctx)
 {
     FAACContext *s = avctx->priv_data;
 
@@ -202,7 +219,7 @@ static int faac_decode_end(AVCodecContext *avctx)
     return 0;
 }
 
-static int faac_decode_init(AVCodecContext *avctx)
+static av_cold int faac_decode_init(AVCodecContext *avctx)
 {
     FAACContext *s = avctx->priv_data;
     faacDecConfigurationPtr faac_cfg;
@@ -214,54 +231,39 @@ static int faac_decode_init(AVCodecContext *avctx)
     if (!s->handle)
     {
         av_log(avctx, AV_LOG_ERROR, "FAAD library: %s could not be opened! \n%s\n",
-                libfaadname, dlerror());
+               libfaadname, dlerror());
         return -1;
     }
-#define dfaac(a, b) \
-    do { static const char* n = "faacDec" #a; \
-    if ((s->faacDec ## a = b dlsym( s->handle, n )) == NULL) { err = n; break; } } while(0)
-    for(;;) {
+
+#define dfaac(a) do {                                                   \
+        const char* n = AV_STRINGIFY(faacDec ## a);                     \
+        if (!err && !(s->faacDec ## a = dlsym(s->handle, n))) {         \
+            err = n;                                                    \
+        }                                                               \
+    } while(0)
 #else  /* !CONFIG_LIBFAADBIN */
-#define dfaac(a, b)     s->faacDec ## a = faacDec ## a
+#define dfaac(a)     s->faacDec ## a = faacDec ## a
 #endif /* CONFIG_LIBFAADBIN */
 
-        // resolve all needed function calls
-        dfaac(Open, (faacDecHandle FAADAPI (*)(void)));
-        dfaac(Close, (void FAADAPI (*)(faacDecHandle hDecoder)));
-        dfaac(GetCurrentConfiguration, (faacDecConfigurationPtr
-                                        FAADAPI (*)(faacDecHandle)));
-#ifndef FAAD2_VERSION
-        dfaac(SetConfiguration, (int FAADAPI (*)(faacDecHandle,
-                                                           faacDecConfigurationPtr)));
-
-        dfaac(Init, (int FAADAPI (*)(faacDecHandle, unsigned char*,
-                                     unsigned long*, unsigned long*)));
-    dfaac(Init2, (int FAADAPI (*)(faacDecHandle, unsigned char*,
-                                       unsigned long, unsigned long*,
-                                       unsigned long*)));
-        dfaac(Decode, (int FAADAPI (*)(faacDecHandle, unsigned char*,
-                             unsigned long*, short*, unsigned long*)));
-#else
-        dfaac(SetConfiguration, (unsigned char FAADAPI (*)(faacDecHandle,
-                                                           faacDecConfigurationPtr)));
-        dfaac(Init, (long FAADAPI (*)(faacDecHandle, unsigned char*,
-                                     unsigned long, unsigned long*, unsigned char*)));
-        dfaac(Init2, (char FAADAPI (*)(faacDecHandle, unsigned char*,
-                                       unsigned long, unsigned long*,
-                                       unsigned char*)));
-        dfaac(Decode, (void *FAADAPI (*)(faacDecHandle, faacDecFrameInfo*,
-                             unsigned char*, unsigned long)));
-        dfaac(GetErrorMessage, (char* FAADAPI (*)(unsigned char)));
+    // resolve all needed function calls
+    dfaac(Open);
+    dfaac(Close);
+    dfaac(GetCurrentConfiguration);
+    dfaac(SetConfiguration);
+    dfaac(Init);
+    dfaac(Init2);
+    dfaac(Decode);
+#ifdef FAAD2_VERSION
+    dfaac(GetErrorMessage);
 #endif
-#undef dfacc
+
+#undef dfaac
 
 #ifdef CONFIG_LIBFAADBIN
-        break;
-    }
     if (err) {
         dlclose(s->handle);
         av_log(avctx, AV_LOG_ERROR, "FAAD library: cannot resolve %s in %s!\n",
-                err, libfaadname);
+               err, libfaadname);
         return -1;
     }
 #endif
@@ -308,10 +310,14 @@ static int faac_decode_init(AVCodecContext *avctx)
 
     faac_init_mp4(avctx);
 
+    if(!s->init && avctx->channels > 0)
+        channel_setup(avctx);
+
+    avctx->sample_fmt = SAMPLE_FMT_S16;
     return 0;
 }
 
-#define AAC_CODEC(id, name)     \
+#define AAC_CODEC(id, name, long_name_) \
 AVCodec name ## _decoder = {    \
     #name,                      \
     CODEC_TYPE_AUDIO,           \
@@ -321,13 +327,14 @@ AVCodec name ## _decoder = {    \
     NULL,                       \
     faac_decode_end,            \
     faac_decode_frame,          \
+    .long_name = NULL_IF_CONFIG_SMALL(long_name_), \
 }
 
 // FIXME - raw AAC files - maybe just one entry will be enough
-AAC_CODEC(CODEC_ID_AAC, libfaad);
+AAC_CODEC(CODEC_ID_AAC, libfaad, "libfaad AAC (Advanced Audio Codec)");
 #if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
 // If it's mp4 file - usually embeded into Qt Mov
-AAC_CODEC(CODEC_ID_MPEG4AAC, mpeg4aac);
+AAC_CODEC(CODEC_ID_MPEG4AAC, mpeg4aac, "libfaad AAC (Advanced Audio Codec)");
 #endif
 
 #undef AAC_CODEC

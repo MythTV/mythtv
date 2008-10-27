@@ -43,12 +43,12 @@ typedef struct TrueMotion1Context {
     AVCodecContext *avctx;
     AVFrame frame;
 
-    uint8_t *buf;
+    const uint8_t *buf;
     int size;
 
-    uint8_t *mb_change_bits;
+    const uint8_t *mb_change_bits;
     int mb_change_bits_row_size;
-    uint8_t *index_stream;
+    const uint8_t *index_stream;
     int index_stream_size;
 
     int flags;
@@ -117,7 +117,7 @@ typedef struct comp_types {
 } comp_types;
 
 /* { valid for metatype }, algorithm, num of deltas, vert res, horiz res */
-static comp_types compression_types[17] = {
+static const comp_types compression_types[17] = {
     { ALGO_NOP,    0, 0, 0 },
 
     { ALGO_RGB16V, 4, 4, BLOCK_4x4 },
@@ -176,7 +176,7 @@ static int make_ydt15_entry(int p1, int p2, int16_t *ydt)
     lo += (lo << 5) + (lo << 10);
     hi = ydt[p2];
     hi += (hi << 5) + (hi << 10);
-    return ((lo + (hi << 16)) << 1);
+    return (lo + (hi << 16)) << 1;
 }
 
 #ifdef WORDS_BIGENDIAN
@@ -190,7 +190,7 @@ static int make_cdt15_entry(int p1, int p2, int16_t *cdt)
     b = cdt[p2];
     r = cdt[p1] << 10;
     lo = b + r;
-    return ((lo + (lo << 16)) << 1);
+    return (lo + (lo << 16)) << 1;
 }
 
 #ifdef WORDS_BIGENDIAN
@@ -205,7 +205,7 @@ static int make_ydt16_entry(int p1, int p2, int16_t *ydt)
     lo += (lo << 6) + (lo << 11);
     hi = ydt[p2];
     hi += (hi << 6) + (hi << 11);
-    return ((lo + (hi << 16)) << 1);
+    return (lo + (hi << 16)) << 1;
 }
 
 #ifdef WORDS_BIGENDIAN
@@ -219,7 +219,7 @@ static int make_cdt16_entry(int p1, int p2, int16_t *cdt)
     b = cdt[p2];
     r = cdt[p1] << 11;
     lo = b + r;
-    return ((lo + (lo << 16)) << 1);
+    return (lo + (lo << 16)) << 1;
 }
 
 #ifdef WORDS_BIGENDIAN
@@ -232,7 +232,7 @@ static int make_ydt24_entry(int p1, int p2, int16_t *ydt)
 
     lo = ydt[p1];
     hi = ydt[p2];
-    return ((lo + (hi << 8) + (hi << 16)) << 1);
+    return (lo + (hi << 8) + (hi << 16)) << 1;
 }
 
 #ifdef WORDS_BIGENDIAN
@@ -245,7 +245,7 @@ static int make_cdt24_entry(int p1, int p2, int16_t *cdt)
 
     b = cdt[p2];
     r = cdt[p1]<<16;
-    return ((b+r) << 1);
+    return (b+r) << 1;
 }
 
 static void gen_vector_table15(TrueMotion1Context *s, const uint8_t *sel_vector_table)
@@ -393,7 +393,7 @@ static int truemotion1_decode_header(TrueMotion1Context *s)
         }
     }
 
-    if (header.compression > 17) {
+    if (header.compression >= 17) {
         av_log(s->avctx, AV_LOG_ERROR, "invalid compression type (%d)\n", header.compression);
         return -1;
     }
@@ -461,7 +461,7 @@ static int truemotion1_decode_header(TrueMotion1Context *s)
     return header.header_size;
 }
 
-static int truemotion1_decode_init(AVCodecContext *avctx)
+static av_cold int truemotion1_decode_init(AVCodecContext *avctx)
 {
     TrueMotion1Context *s = avctx->priv_data;
 
@@ -603,7 +603,7 @@ static void truemotion1_decode_16bit(TrueMotion1Context *s)
     int keyframe = s->flags & FLAG_KEYFRAME;
 
     /* these variables are for managing the stream of macroblock change bits */
-    unsigned char *mb_change_bits = s->mb_change_bits;
+    const unsigned char *mb_change_bits = s->mb_change_bits;
     unsigned char mb_change_byte;
     unsigned char mb_change_byte_mask;
     int mb_change_index;
@@ -729,7 +729,7 @@ static void truemotion1_decode_24bit(TrueMotion1Context *s)
     int keyframe = s->flags & FLAG_KEYFRAME;
 
     /* these variables are for managing the stream of macroblock change bits */
-    unsigned char *mb_change_bits = s->mb_change_bits;
+    const unsigned char *mb_change_bits = s->mb_change_bits;
     unsigned char mb_change_byte;
     unsigned char mb_change_byte_mask;
     int mb_change_index;
@@ -846,7 +846,7 @@ static void truemotion1_decode_24bit(TrueMotion1Context *s)
 
 static int truemotion1_decode_frame(AVCodecContext *avctx,
                                     void *data, int *data_size,
-                                    uint8_t *buf, int buf_size)
+                                    const uint8_t *buf, int buf_size)
 {
     TrueMotion1Context *s = avctx->priv_data;
 
@@ -877,7 +877,7 @@ static int truemotion1_decode_frame(AVCodecContext *avctx,
     return buf_size;
 }
 
-static int truemotion1_decode_end(AVCodecContext *avctx)
+static av_cold int truemotion1_decode_end(AVCodecContext *avctx)
 {
     TrueMotion1Context *s = avctx->priv_data;
 
@@ -899,4 +899,5 @@ AVCodec truemotion1_decoder = {
     truemotion1_decode_end,
     truemotion1_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("Duck TrueMotion 1.0"),
 };

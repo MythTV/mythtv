@@ -390,7 +390,7 @@ void avcodec_get_chroma_sub_sample(int pix_fmt, int *h_shift, int *v_shift)
 const char *avcodec_get_pix_fmt_name(int pix_fmt)
 {
     if (pix_fmt < 0 || pix_fmt >= PIX_FMT_NB)
-        return "???";
+        return NULL;
     else
         return pix_fmt_info[pix_fmt].name;
 }
@@ -401,22 +401,22 @@ enum PixelFormat avcodec_get_pix_fmt(const char* name)
 
     for (i=0; i < PIX_FMT_NB; i++)
          if (!strcmp(pix_fmt_info[i].name, name))
-             break;
-    return i;
+             return i;
+    return PIX_FMT_NONE;
 }
 
 void avcodec_pix_fmt_string (char *buf, int buf_size, int pix_fmt)
 {
-    PixFmtInfo info= pix_fmt_info[pix_fmt];
-
-    char is_alpha_char= info.is_alpha ? 'y' : 'n';
-
     /* print header */
     if (pix_fmt < 0)
         snprintf (buf, buf_size,
                   "name      " " nb_channels" " depth" " is_alpha"
             );
-    else
+    else{
+        PixFmtInfo info= pix_fmt_info[pix_fmt];
+
+        char is_alpha_char= info.is_alpha ? 'y' : 'n';
+
         snprintf (buf, buf_size,
                   "%-10s" "      %1d     " "   %2d " "     %c   ",
                   info.name,
@@ -424,19 +424,17 @@ void avcodec_pix_fmt_string (char *buf, int buf_size, int pix_fmt)
                   info.depth,
                   is_alpha_char
             );
+    }
 }
 
-int avpicture_fill(AVPicture *picture, uint8_t *ptr,
-                   int pix_fmt, int width, int height)
+int ff_fill_linesize(AVPicture *picture, int pix_fmt, int width)
 {
-    int size, w2, h2, size2;
+    int w2;
     const PixFmtInfo *pinfo;
 
-    if(avcodec_check_dimensions(NULL, width, height))
-        goto fail;
+    memset(picture->linesize, 0, sizeof(picture->linesize));
 
     pinfo = &pix_fmt_info[pix_fmt];
-    size = width * height;
     switch(pix_fmt) {
     case PIX_FMT_YUV420P:
     case PIX_FMT_YUV422P:
@@ -449,62 +447,33 @@ int avpicture_fill(AVPicture *picture, uint8_t *ptr,
     case PIX_FMT_YUVJ444P:
     case PIX_FMT_YUVJ440P:
         w2 = (width + (1 << pinfo->x_chroma_shift) - 1) >> pinfo->x_chroma_shift;
-        h2 = (height + (1 << pinfo->y_chroma_shift) - 1) >> pinfo->y_chroma_shift;
-        size2 = w2 * h2;
-        picture->data[0] = ptr;
-        picture->data[1] = picture->data[0] + size;
-        picture->data[2] = picture->data[1] + size2;
-        picture->data[3] = NULL;
         picture->linesize[0] = width;
         picture->linesize[1] = w2;
         picture->linesize[2] = w2;
-        picture->linesize[3] = 0;
-        return size + 2 * size2;
+        break;
     case PIX_FMT_YUVA420P:
         w2 = (width + (1 << pinfo->x_chroma_shift) - 1) >> pinfo->x_chroma_shift;
-        h2 = (height + (1 << pinfo->y_chroma_shift) - 1) >> pinfo->y_chroma_shift;
-        size2 = w2 * h2;
-        picture->data[0] = ptr;
-        picture->data[1] = picture->data[0] + size;
-        picture->data[2] = picture->data[1] + size2;
-        picture->data[3] = picture->data[1] + size2 + size2;
         picture->linesize[0] = width;
         picture->linesize[1] = w2;
         picture->linesize[2] = w2;
         picture->linesize[3] = width;
-        return 2 * size + 2 * size2;
+        break;
     case PIX_FMT_NV12:
     case PIX_FMT_NV21:
         w2 = (width + (1 << pinfo->x_chroma_shift) - 1) >> pinfo->x_chroma_shift;
-        h2 = (height + (1 << pinfo->y_chroma_shift) - 1) >> pinfo->y_chroma_shift;
-        size2 = w2 * h2 * 2;
-        picture->data[0] = ptr;
-        picture->data[1] = picture->data[0] + size;
-        picture->data[2] = NULL;
-        picture->data[3] = NULL;
         picture->linesize[0] = width;
         picture->linesize[1] = w2;
-        picture->linesize[2] = 0;
-        picture->linesize[3] = 0;
-        return size + 2 * size2;
+        break;
     case PIX_FMT_RGB24:
     case PIX_FMT_BGR24:
-        picture->data[0] = ptr;
-        picture->data[1] = NULL;
-        picture->data[2] = NULL;
-        picture->data[3] = NULL;
         picture->linesize[0] = width * 3;
-        return size * 3;
+        break;
     case PIX_FMT_RGB32:
     case PIX_FMT_BGR32:
     case PIX_FMT_RGB32_1:
     case PIX_FMT_BGR32_1:
-        picture->data[0] = ptr;
-        picture->data[1] = NULL;
-        picture->data[2] = NULL;
-        picture->data[3] = NULL;
         picture->linesize[0] = width * 4;
-        return size * 4;
+        break;
     case PIX_FMT_GRAY16BE:
     case PIX_FMT_GRAY16LE:
     case PIX_FMT_BGR555:
@@ -512,70 +481,138 @@ int avpicture_fill(AVPicture *picture, uint8_t *ptr,
     case PIX_FMT_RGB555:
     case PIX_FMT_RGB565:
     case PIX_FMT_YUYV422:
-        picture->data[0] = ptr;
-        picture->data[1] = NULL;
-        picture->data[2] = NULL;
-        picture->data[3] = NULL;
         picture->linesize[0] = width * 2;
-        return size * 2;
+        break;
     case PIX_FMT_UYVY422:
-        picture->data[0] = ptr;
-        picture->data[1] = NULL;
-        picture->data[2] = NULL;
-        picture->data[3] = NULL;
         picture->linesize[0] = width * 2;
-        return size * 2;
+        break;
     case PIX_FMT_UYYVYY411:
-        picture->data[0] = ptr;
-        picture->data[1] = NULL;
-        picture->data[2] = NULL;
-        picture->data[3] = NULL;
         picture->linesize[0] = width + width/2;
-        return size + size/2;
+        break;
     case PIX_FMT_RGB8:
     case PIX_FMT_BGR8:
     case PIX_FMT_RGB4_BYTE:
     case PIX_FMT_BGR4_BYTE:
     case PIX_FMT_GRAY8:
-        picture->data[0] = ptr;
-        picture->data[1] = NULL;
-        picture->data[2] = NULL;
-        picture->data[3] = NULL;
         picture->linesize[0] = width;
-        return size;
+        break;
     case PIX_FMT_RGB4:
     case PIX_FMT_BGR4:
+        picture->linesize[0] = width / 2;
+        break;
+    case PIX_FMT_MONOWHITE:
+    case PIX_FMT_MONOBLACK:
+        picture->linesize[0] = (width + 7) >> 3;
+        break;
+    case PIX_FMT_PAL8:
+        picture->linesize[0] = width;
+        picture->linesize[1] = 4;
+        break;
+    default:
+        return -1;
+    }
+    return 0;
+}
+
+int ff_fill_pointer(AVPicture *picture, uint8_t *ptr, int pix_fmt,
+                    int height)
+{
+    int size, h2, size2;
+    const PixFmtInfo *pinfo;
+
+    pinfo = &pix_fmt_info[pix_fmt];
+    size = picture->linesize[0] * height;
+    switch(pix_fmt) {
+    case PIX_FMT_YUV420P:
+    case PIX_FMT_YUV422P:
+    case PIX_FMT_YUV444P:
+    case PIX_FMT_YUV410P:
+    case PIX_FMT_YUV411P:
+    case PIX_FMT_YUV440P:
+    case PIX_FMT_YUVJ420P:
+    case PIX_FMT_YUVJ422P:
+    case PIX_FMT_YUVJ444P:
+    case PIX_FMT_YUVJ440P:
+        h2 = (height + (1 << pinfo->y_chroma_shift) - 1) >> pinfo->y_chroma_shift;
+        size2 = picture->linesize[1] * h2;
         picture->data[0] = ptr;
-        picture->data[1] = NULL;
+        picture->data[1] = picture->data[0] + size;
+        picture->data[2] = picture->data[1] + size2;
+        picture->data[3] = NULL;
+        return size + 2 * size2;
+    case PIX_FMT_YUVA420P:
+        h2 = (height + (1 << pinfo->y_chroma_shift) - 1) >> pinfo->y_chroma_shift;
+        size2 = picture->linesize[1] * h2;
+        picture->data[0] = ptr;
+        picture->data[1] = picture->data[0] + size;
+        picture->data[2] = picture->data[1] + size2;
+        picture->data[3] = picture->data[1] + size2 + size2;
+        return 2 * size + 2 * size2;
+    case PIX_FMT_NV12:
+    case PIX_FMT_NV21:
+        h2 = (height + (1 << pinfo->y_chroma_shift) - 1) >> pinfo->y_chroma_shift;
+        size2 = picture->linesize[1] * h2 * 2;
+        picture->data[0] = ptr;
+        picture->data[1] = picture->data[0] + size;
         picture->data[2] = NULL;
         picture->data[3] = NULL;
-        picture->linesize[0] = width / 2;
-        return size / 2;
+        return size + 2 * size2;
+    case PIX_FMT_RGB24:
+    case PIX_FMT_BGR24:
+    case PIX_FMT_RGB32:
+    case PIX_FMT_BGR32:
+    case PIX_FMT_RGB32_1:
+    case PIX_FMT_BGR32_1:
+    case PIX_FMT_GRAY16BE:
+    case PIX_FMT_GRAY16LE:
+    case PIX_FMT_BGR555:
+    case PIX_FMT_BGR565:
+    case PIX_FMT_RGB555:
+    case PIX_FMT_RGB565:
+    case PIX_FMT_YUYV422:
+    case PIX_FMT_UYVY422:
+    case PIX_FMT_UYYVYY411:
+    case PIX_FMT_RGB8:
+    case PIX_FMT_BGR8:
+    case PIX_FMT_RGB4_BYTE:
+    case PIX_FMT_BGR4_BYTE:
+    case PIX_FMT_GRAY8:
+    case PIX_FMT_RGB4:
+    case PIX_FMT_BGR4:
     case PIX_FMT_MONOWHITE:
     case PIX_FMT_MONOBLACK:
         picture->data[0] = ptr;
         picture->data[1] = NULL;
         picture->data[2] = NULL;
         picture->data[3] = NULL;
-        picture->linesize[0] = (width + 7) >> 3;
-        return picture->linesize[0] * height;
+        return size;
     case PIX_FMT_PAL8:
         size2 = (size + 3) & ~3;
         picture->data[0] = ptr;
         picture->data[1] = ptr + size2; /* palette is stored here as 256 32 bit words */
         picture->data[2] = NULL;
         picture->data[3] = NULL;
-        picture->linesize[0] = width;
-        picture->linesize[1] = 4;
         return size2 + 256 * 4;
     default:
-fail:
         picture->data[0] = NULL;
         picture->data[1] = NULL;
         picture->data[2] = NULL;
         picture->data[3] = NULL;
         return -1;
     }
+}
+
+int avpicture_fill(AVPicture *picture, uint8_t *ptr,
+                   int pix_fmt, int width, int height)
+{
+
+    if(avcodec_check_dimensions(NULL, width, height))
+        return -1;
+
+    if (ff_fill_linesize(picture, pix_fmt, width))
+        return -1;
+
+    return ff_fill_pointer(picture, ptr, pix_fmt, height);
 }
 
 int avpicture_layout(const AVPicture* src, int pix_fmt, int width, int height,
@@ -805,10 +842,9 @@ void ff_img_copy_plane(uint8_t *dst, int dst_wrap,
     }
 }
 
-void av_picture_copy(AVPicture *dst, const AVPicture *src,
-              int pix_fmt, int width, int height)
+int ff_get_plane_bytewidth(enum PixelFormat pix_fmt, int width, int plane)
 {
-    int bwidth, bits, i;
+    int bits;
     const PixFmtInfo *pf = &pix_fmt_info[pix_fmt];
 
     pf = &pix_fmt_info[pix_fmt];
@@ -830,21 +866,42 @@ void av_picture_copy(AVPicture *dst, const AVPicture *src,
             bits = pf->depth * pf->nb_channels;
             break;
         }
-        bwidth = (width * bits + 7) >> 3;
-        ff_img_copy_plane(dst->data[0], dst->linesize[0],
-                       src->data[0], src->linesize[0],
-                       bwidth, height);
+        return (width * bits + 7) >> 3;
         break;
+    case FF_PIXEL_PLANAR:
+            if (plane == 1 || plane == 2)
+                width >>= pf->x_chroma_shift;
+
+            return (width * pf->depth + 7) >> 3;
+        break;
+    case FF_PIXEL_PALETTE:
+        if (plane == 0)
+            return width;
+        break;
+    }
+
+    return -1;
+}
+
+void av_picture_copy(AVPicture *dst, const AVPicture *src,
+              int pix_fmt, int width, int height)
+{
+    int i;
+    const PixFmtInfo *pf = &pix_fmt_info[pix_fmt];
+
+    pf = &pix_fmt_info[pix_fmt];
+    switch(pf->pixel_type) {
+    case FF_PIXEL_PACKED:
     case FF_PIXEL_PLANAR:
         for(i = 0; i < pf->nb_channels; i++) {
             int w, h;
+            int bwidth = ff_get_plane_bytewidth(pix_fmt, width, i);
             w = width;
             h = height;
             if (i == 1 || i == 2) {
                 w >>= pf->x_chroma_shift;
                 h >>= pf->y_chroma_shift;
             }
-            bwidth = (w * pf->depth + 7) >> 3;
             ff_img_copy_plane(dst->data[i], dst->linesize[i],
                            src->data[i], src->linesize[i],
                            bwidth, h);
@@ -1213,140 +1270,6 @@ static void yuv420p_to_uyvy422(AVPicture *dst, const AVPicture *src,
     }
 }
 
-static uint8_t y_ccir_to_jpeg[256];
-static uint8_t y_jpeg_to_ccir[256];
-static uint8_t c_ccir_to_jpeg[256];
-static uint8_t c_jpeg_to_ccir[256];
-
-/* init various conversion tables */
-static void img_convert_init(void)
-{
-    int i;
-    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
-
-    for(i = 0;i < 256; i++) {
-        y_ccir_to_jpeg[i] = Y_CCIR_TO_JPEG(i);
-        y_jpeg_to_ccir[i] = Y_JPEG_TO_CCIR(i);
-        c_ccir_to_jpeg[i] = C_CCIR_TO_JPEG(i);
-        c_jpeg_to_ccir[i] = C_JPEG_TO_CCIR(i);
-    }
-}
-
-/* apply to each pixel the given table */
-static void img_apply_table(uint8_t *dst, int dst_wrap,
-                            const uint8_t *src, int src_wrap,
-                            int width, int height, const uint8_t *table1)
-{
-    int n;
-    const uint8_t *s;
-    uint8_t *d;
-    const uint8_t *table;
-
-    table = table1;
-    for(;height > 0; height--) {
-        s = src;
-        d = dst;
-        n = width;
-        while (n >= 4) {
-            d[0] = table[s[0]];
-            d[1] = table[s[1]];
-            d[2] = table[s[2]];
-            d[3] = table[s[3]];
-            d += 4;
-            s += 4;
-            n -= 4;
-        }
-        while (n > 0) {
-            d[0] = table[s[0]];
-            d++;
-            s++;
-            n--;
-        }
-        dst += dst_wrap;
-        src += src_wrap;
-    }
-}
-
-/* XXX: use generic filter ? */
-/* XXX: in most cases, the sampling position is incorrect */
-
-/* 4x1 -> 1x1 */
-static void shrink41(uint8_t *dst, int dst_wrap,
-                     const uint8_t *src, int src_wrap,
-                     int width, int height)
-{
-    int w;
-    const uint8_t *s;
-    uint8_t *d;
-
-    for(;height > 0; height--) {
-        s = src;
-        d = dst;
-        for(w = width;w > 0; w--) {
-            d[0] = (s[0] + s[1] + s[2] + s[3] + 2) >> 2;
-            s += 4;
-            d++;
-        }
-        src += src_wrap;
-        dst += dst_wrap;
-    }
-}
-
-/* 2x1 -> 1x1 */
-static void shrink21(uint8_t *dst, int dst_wrap,
-                     const uint8_t *src, int src_wrap,
-                     int width, int height)
-{
-    int w;
-    const uint8_t *s;
-    uint8_t *d;
-
-    for(;height > 0; height--) {
-        s = src;
-        d = dst;
-        for(w = width;w > 0; w--) {
-            d[0] = (s[0] + s[1]) >> 1;
-            s += 2;
-            d++;
-        }
-        src += src_wrap;
-        dst += dst_wrap;
-    }
-}
-
-/* 1x2 -> 1x1 */
-static void shrink12(uint8_t *dst, int dst_wrap,
-                     const uint8_t *src, int src_wrap,
-                     int width, int height)
-{
-    int w;
-    uint8_t *d;
-    const uint8_t *s1, *s2;
-
-    for(;height > 0; height--) {
-        s1 = src;
-        s2 = s1 + src_wrap;
-        d = dst;
-        for(w = width;w >= 4; w-=4) {
-            d[0] = (s1[0] + s2[0]) >> 1;
-            d[1] = (s1[1] + s2[1]) >> 1;
-            d[2] = (s1[2] + s2[2]) >> 1;
-            d[3] = (s1[3] + s2[3]) >> 1;
-            s1 += 4;
-            s2 += 4;
-            d += 4;
-        }
-        for(;w > 0; w--) {
-            d[0] = (s1[0] + s2[0]) >> 1;
-            s1++;
-            s2++;
-            d++;
-        }
-        src += 2 * src_wrap;
-        dst += dst_wrap;
-    }
-}
-
 /* 2x2 -> 1x1 */
 void ff_shrink22(uint8_t *dst, int dst_wrap,
                      const uint8_t *src, int src_wrap,
@@ -1433,145 +1356,6 @@ void ff_shrink88(uint8_t *dst, int dst_wrap,
     }
 }
 
-static void grow21_line(uint8_t *dst, const uint8_t *src,
-                        int width)
-{
-    int w;
-    const uint8_t *s1;
-    uint8_t *d;
-
-    s1 = src;
-    d = dst;
-    for(w = width;w >= 4; w-=4) {
-        d[1] = d[0] = s1[0];
-        d[3] = d[2] = s1[1];
-        s1 += 2;
-        d += 4;
-    }
-    for(;w >= 2; w -= 2) {
-        d[1] = d[0] = s1[0];
-        s1 ++;
-        d += 2;
-    }
-    /* only needed if width is not a multiple of two */
-    /* XXX: veryfy that */
-    if (w) {
-        d[0] = s1[0];
-    }
-}
-
-static void grow41_line(uint8_t *dst, const uint8_t *src,
-                        int width)
-{
-    int w, v;
-    const uint8_t *s1;
-    uint8_t *d;
-
-    s1 = src;
-    d = dst;
-    for(w = width;w >= 4; w-=4) {
-        v = s1[0];
-        d[0] = v;
-        d[1] = v;
-        d[2] = v;
-        d[3] = v;
-        s1 ++;
-        d += 4;
-    }
-}
-
-/* 1x1 -> 2x1 */
-static void grow21(uint8_t *dst, int dst_wrap,
-                   const uint8_t *src, int src_wrap,
-                   int width, int height)
-{
-    for(;height > 0; height--) {
-        grow21_line(dst, src, width);
-        src += src_wrap;
-        dst += dst_wrap;
-    }
-}
-
-/* 1x1 -> 1x2 */
-static void grow12(uint8_t *dst, int dst_wrap,
-                   const uint8_t *src, int src_wrap,
-                   int width, int height)
-{
-    for(;height > 0; height-=2) {
-        memcpy(dst, src, width);
-        dst += dst_wrap;
-        memcpy(dst, src, width);
-        dst += dst_wrap;
-        src += src_wrap;
-    }
-}
-
-/* 1x1 -> 2x2 */
-static void grow22(uint8_t *dst, int dst_wrap,
-                   const uint8_t *src, int src_wrap,
-                   int width, int height)
-{
-    for(;height > 0; height--) {
-        grow21_line(dst, src, width);
-        if (height%2)
-            src += src_wrap;
-        dst += dst_wrap;
-    }
-}
-
-/* 1x1 -> 4x1 */
-static void grow41(uint8_t *dst, int dst_wrap,
-                   const uint8_t *src, int src_wrap,
-                   int width, int height)
-{
-    for(;height > 0; height--) {
-        grow41_line(dst, src, width);
-        src += src_wrap;
-        dst += dst_wrap;
-    }
-}
-
-/* 1x1 -> 4x4 */
-static void grow44(uint8_t *dst, int dst_wrap,
-                   const uint8_t *src, int src_wrap,
-                   int width, int height)
-{
-    for(;height > 0; height--) {
-        grow41_line(dst, src, width);
-        if ((height & 3) == 1)
-            src += src_wrap;
-        dst += dst_wrap;
-    }
-}
-
-/* 1x2 -> 2x1 */
-static void conv411(uint8_t *dst, int dst_wrap,
-                    const uint8_t *src, int src_wrap,
-                    int width, int height)
-{
-    int w, c;
-    const uint8_t *s1, *s2;
-    uint8_t *d;
-
-    width>>=1;
-
-    for(;height > 0; height--) {
-        s1 = src;
-        s2 = src + src_wrap;
-        d = dst;
-        for(w = width;w > 0; w--) {
-            c = (s1[0] + s2[0]) >> 1;
-            d[0] = c;
-            d[1] = c;
-            s1++;
-            s2++;
-            d += 2;
-        }
-        src += src_wrap * 2;
-        dst += dst_wrap;
-    }
-}
-
 /* XXX: add jpeg quantize code */
 
 #define TRANSP_INDEX (6*6*6)
@@ -1579,7 +1363,7 @@ static void conv411(uint8_t *dst, int dst_wrap,
 /* this is maybe slow, but allows for extensions */
 static inline unsigned char gif_clut_index(uint8_t r, uint8_t g, uint8_t b)
 {
-    return ((((r)/47)%6)*6*6+(((g)/47)%6)*6+(((b)/47)%6));
+    return (((r) / 47) % 6) * 6 * 6 + (((g) / 47) % 6) * 6 + (((b) / 47) % 6);
 }
 
 static void build_rgb_palette(uint8_t *palette, int has_alpha)
@@ -1901,9 +1685,9 @@ static void gray16_to_gray16(AVPicture *dst, const AVPicture *src,
 {
     int x, y, src_wrap, dst_wrap;
     uint16_t *s, *d;
-    s = src->data[0];
+    s = (uint16_t*)src->data[0];
     src_wrap = (src->linesize[0] - width * 2)/2;
-    d = dst->data[0];
+    d = (uint16_t*)dst->data[0];
     dst_wrap = (dst->linesize[0] - width * 2)/2;
     for(y=0; y<height; y++){
         for(x=0; x<width; x++){
@@ -1935,7 +1719,7 @@ typedef struct ConvertEntry {
 
    - PIX_FMT_422 must convert to and from PIX_FMT_422P.
 
-   The other conversion functions are just optimisations for common cases.
+   The other conversion functions are just optimizations for common cases.
 */
 static const ConvertEntry convert_table[PIX_FMT_NB][PIX_FMT_NB] = {
     [PIX_FMT_YUV420P] = {
@@ -2279,7 +2063,7 @@ int av_picture_pad(AVPicture *dst, const AVPicture *src, int height, int width,
             uint8_t *iptr = src->data[i];
             optr = dst->data[i] + dst->linesize[i] * (padtop >> y_shift) +
                     (padleft >> x_shift);
-            memcpy(optr, iptr, src->linesize[i]);
+            memcpy(optr, iptr, (width - padleft - padright) >> x_shift);
             iptr += src->linesize[i];
             optr = dst->data[i] + dst->linesize[i] * (padtop >> y_shift) +
                 (dst->linesize[i] - (padright >> x_shift));
@@ -2287,7 +2071,7 @@ int av_picture_pad(AVPicture *dst, const AVPicture *src, int height, int width,
             for (y = 0; y < yheight; y++) {
                 memset(optr, color[i], (padleft + padright) >> x_shift);
                 memcpy(optr + ((padleft + padright) >> x_shift), iptr,
-                    src->linesize[i]);
+                       (width - padleft - padright) >> x_shift);
                 iptr += src->linesize[i];
                 optr += dst->linesize[i];
             }
@@ -2324,13 +2108,286 @@ int img_pad(AVPicture *dst, const AVPicture *src, int height, int width,
 }
 #endif
 
-#ifndef CONFIG_SWSCALER
+#ifndef CONFIG_SWSCALE
+static uint8_t y_ccir_to_jpeg[256];
+static uint8_t y_jpeg_to_ccir[256];
+static uint8_t c_ccir_to_jpeg[256];
+static uint8_t c_jpeg_to_ccir[256];
+
+/* init various conversion tables */
+static void img_convert_init(void)
+{
+    int i;
+    uint8_t *cm = ff_cropTbl + MAX_NEG_CROP;
+
+    for(i = 0;i < 256; i++) {
+        y_ccir_to_jpeg[i] = Y_CCIR_TO_JPEG(i);
+        y_jpeg_to_ccir[i] = Y_JPEG_TO_CCIR(i);
+        c_ccir_to_jpeg[i] = C_CCIR_TO_JPEG(i);
+        c_jpeg_to_ccir[i] = C_JPEG_TO_CCIR(i);
+    }
+}
+
+/* apply to each pixel the given table */
+static void img_apply_table(uint8_t *dst, int dst_wrap,
+                            const uint8_t *src, int src_wrap,
+                            int width, int height, const uint8_t *table1)
+{
+    int n;
+    const uint8_t *s;
+    uint8_t *d;
+    const uint8_t *table;
+
+    table = table1;
+    for(;height > 0; height--) {
+        s = src;
+        d = dst;
+        n = width;
+        while (n >= 4) {
+            d[0] = table[s[0]];
+            d[1] = table[s[1]];
+            d[2] = table[s[2]];
+            d[3] = table[s[3]];
+            d += 4;
+            s += 4;
+            n -= 4;
+        }
+        while (n > 0) {
+            d[0] = table[s[0]];
+            d++;
+            s++;
+            n--;
+        }
+        dst += dst_wrap;
+        src += src_wrap;
+    }
+}
+
+/* XXX: use generic filter ? */
+/* XXX: in most cases, the sampling position is incorrect */
+
+/* 4x1 -> 1x1 */
+static void shrink41(uint8_t *dst, int dst_wrap,
+                     const uint8_t *src, int src_wrap,
+                     int width, int height)
+{
+    int w;
+    const uint8_t *s;
+    uint8_t *d;
+
+    for(;height > 0; height--) {
+        s = src;
+        d = dst;
+        for(w = width;w > 0; w--) {
+            d[0] = (s[0] + s[1] + s[2] + s[3] + 2) >> 2;
+            s += 4;
+            d++;
+        }
+        src += src_wrap;
+        dst += dst_wrap;
+    }
+}
+
+/* 2x1 -> 1x1 */
+static void shrink21(uint8_t *dst, int dst_wrap,
+                     const uint8_t *src, int src_wrap,
+                     int width, int height)
+{
+    int w;
+    const uint8_t *s;
+    uint8_t *d;
+
+    for(;height > 0; height--) {
+        s = src;
+        d = dst;
+        for(w = width;w > 0; w--) {
+            d[0] = (s[0] + s[1]) >> 1;
+            s += 2;
+            d++;
+        }
+        src += src_wrap;
+        dst += dst_wrap;
+    }
+}
+
+/* 1x2 -> 1x1 */
+static void shrink12(uint8_t *dst, int dst_wrap,
+                     const uint8_t *src, int src_wrap,
+                     int width, int height)
+{
+    int w;
+    uint8_t *d;
+    const uint8_t *s1, *s2;
+
+    for(;height > 0; height--) {
+        s1 = src;
+        s2 = s1 + src_wrap;
+        d = dst;
+        for(w = width;w >= 4; w-=4) {
+            d[0] = (s1[0] + s2[0]) >> 1;
+            d[1] = (s1[1] + s2[1]) >> 1;
+            d[2] = (s1[2] + s2[2]) >> 1;
+            d[3] = (s1[3] + s2[3]) >> 1;
+            s1 += 4;
+            s2 += 4;
+            d += 4;
+        }
+        for(;w > 0; w--) {
+            d[0] = (s1[0] + s2[0]) >> 1;
+            s1++;
+            s2++;
+            d++;
+        }
+        src += 2 * src_wrap;
+        dst += dst_wrap;
+    }
+}
+
+static void grow21_line(uint8_t *dst, const uint8_t *src,
+                        int width)
+{
+    int w;
+    const uint8_t *s1;
+    uint8_t *d;
+
+    s1 = src;
+    d = dst;
+    for(w = width;w >= 4; w-=4) {
+        d[1] = d[0] = s1[0];
+        d[3] = d[2] = s1[1];
+        s1 += 2;
+        d += 4;
+    }
+    for(;w >= 2; w -= 2) {
+        d[1] = d[0] = s1[0];
+        s1 ++;
+        d += 2;
+    }
+    /* only needed if width is not a multiple of two */
+    /* XXX: veryfy that */
+    if (w) {
+        d[0] = s1[0];
+    }
+}
+
+static void grow41_line(uint8_t *dst, const uint8_t *src,
+                        int width)
+{
+    int w, v;
+    const uint8_t *s1;
+    uint8_t *d;
+
+    s1 = src;
+    d = dst;
+    for(w = width;w >= 4; w-=4) {
+        v = s1[0];
+        d[0] = v;
+        d[1] = v;
+        d[2] = v;
+        d[3] = v;
+        s1 ++;
+        d += 4;
+    }
+}
+
+/* 1x1 -> 2x1 */
+static void grow21(uint8_t *dst, int dst_wrap,
+                   const uint8_t *src, int src_wrap,
+                   int width, int height)
+{
+    for(;height > 0; height--) {
+        grow21_line(dst, src, width);
+        src += src_wrap;
+        dst += dst_wrap;
+    }
+}
+
+/* 1x1 -> 1x2 */
+static void grow12(uint8_t *dst, int dst_wrap,
+                   const uint8_t *src, int src_wrap,
+                   int width, int height)
+{
+    for(;height > 0; height-=2) {
+        memcpy(dst, src, width);
+        dst += dst_wrap;
+        memcpy(dst, src, width);
+        dst += dst_wrap;
+        src += src_wrap;
+    }
+}
+
+/* 1x1 -> 2x2 */
+static void grow22(uint8_t *dst, int dst_wrap,
+                   const uint8_t *src, int src_wrap,
+                   int width, int height)
+{
+    for(;height > 0; height--) {
+        grow21_line(dst, src, width);
+        if (height%2)
+            src += src_wrap;
+        dst += dst_wrap;
+    }
+}
+
+/* 1x1 -> 4x1 */
+static void grow41(uint8_t *dst, int dst_wrap,
+                   const uint8_t *src, int src_wrap,
+                   int width, int height)
+{
+    for(;height > 0; height--) {
+        grow41_line(dst, src, width);
+        src += src_wrap;
+        dst += dst_wrap;
+    }
+}
+
+/* 1x1 -> 4x4 */
+static void grow44(uint8_t *dst, int dst_wrap,
+                   const uint8_t *src, int src_wrap,
+                   int width, int height)
+{
+    for(;height > 0; height--) {
+        grow41_line(dst, src, width);
+        if ((height & 3) == 1)
+            src += src_wrap;
+        dst += dst_wrap;
+    }
+}
+
+/* 1x2 -> 2x1 */
+static void conv411(uint8_t *dst, int dst_wrap,
+                    const uint8_t *src, int src_wrap,
+                    int width, int height)
+{
+    int w, c;
+    const uint8_t *s1, *s2;
+    uint8_t *d;
+
+    width>>=1;
+
+    for(;height > 0; height--) {
+        s1 = src;
+        s2 = src + src_wrap;
+        d = dst;
+        for(w = width;w > 0; w--) {
+            c = (s1[0] + s2[0]) >> 1;
+            d[0] = c;
+            d[1] = c;
+            s1++;
+            s2++;
+            d += 2;
+        }
+        src += src_wrap * 2;
+        dst += dst_wrap;
+    }
+}
+
 /* XXX: always use linesize. Return -1 if not supported */
 int img_convert(AVPicture *dst, int dst_pix_fmt,
                 const AVPicture *src, int src_pix_fmt,
                 int src_width, int src_height)
 {
-    static int inited;
+    static int initialized;
     int i, ret, dst_width, dst_height, int_pix_fmt;
     const PixFmtInfo *src_pix, *dst_pix;
     const ConvertEntry *ce;
@@ -2342,8 +2399,8 @@ int img_convert(AVPicture *dst, int dst_pix_fmt,
     if (src_width <= 0 || src_height <= 0)
         return 0;
 
-    if (!inited) {
-        inited = 1;
+    if (!initialized) {
+        initialized = 1;
         img_convert_init();
     }
 
@@ -2555,6 +2612,8 @@ int img_convert(AVPicture *dst, int dst_pix_fmt,
         else
             int_pix_fmt = PIX_FMT_RGB24;
     }
+    if (src_pix_fmt == int_pix_fmt)
+        return -1;
     if (avpicture_alloc(tmp, int_pix_fmt, dst_width, dst_height) < 0)
         return -1;
     ret = -1;

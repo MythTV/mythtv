@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_AES_H
-#define FFMPEG_AES_H
+#ifndef AVUTIL_AES_H
+#define AVUTIL_AES_H
 
 #include <stdint.h>
 
@@ -28,14 +28,14 @@ extern const int av_aes_size;
 struct AVAES;
 
 /**
- * initializes an AVAES context
+ * Initializes an AVAES context.
  * @param key_bits 128, 192 or 256
  * @param decrypt 0 for encryption, 1 for decryption
  */
 int av_aes_init(struct AVAES *a, const uint8_t *key, int key_bits, int decrypt);
 
 /**
- * encrypts / decrypts.
+ * Encrypts / decrypts.
  * @param count number of 16 byte blocks
  * @param dst destination array, can be equal to src
  * @param src source array, can be equal to dst
@@ -44,4 +44,4 @@ int av_aes_init(struct AVAES *a, const uint8_t *key, int key_bits, int decrypt);
  */
 void av_aes_crypt(struct AVAES *a, uint8_t *dst, uint8_t *src, int count, uint8_t *iv, int decrypt);
 
-#endif /* FFMPEG_AES_H */
+#endif /* AVUTIL_AES_H */

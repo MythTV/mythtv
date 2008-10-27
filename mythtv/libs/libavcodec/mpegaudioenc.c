@@ -61,7 +61,7 @@ typedef struct MpegAudioContext {
 #include "mpegaudiodata.h"
 #include "mpegaudiotab.h"
 
-static int MPA_encode_init(AVCodecContext *avctx)
+static av_cold int MPA_encode_init(AVCodecContext *avctx)
 {
     MpegAudioContext *s = avctx->priv_data;
     int freq = avctx->sample_rate;
@@ -387,7 +387,7 @@ static void compute_scale_factors(unsigned char scale_code[SBLIMIT],
                     vmax = v;
             }
             /* compute the scale factor index using log 2 computations */
-            if (vmax > 0) {
+            if (vmax > 1) {
                 n = av_log2(vmax);
                 /* n is the position of the MSB of vmax. now
                    use at most 2 compares to find the index */
@@ -540,7 +540,7 @@ static void compute_bit_allocation(MpegAudioContext *s,
         /* look for the subband with the largest signal to mask ratio */
         max_sb = -1;
         max_ch = -1;
-        max_smr = 0x80000000;
+        max_smr = INT_MIN;
         for(ch=0;ch<s->nb_channels;ch++) {
             for(i=0;i<s->sblimit;i++) {
                 if (smr[ch][i] > max_smr && subband_status[ch][i] != SB_NOMORE) {
@@ -781,7 +781,7 @@ static int MPA_encode_frame(AVCodecContext *avctx,
     return pbBufPtr(&s->pb) - s->pb.buf;
 }
 
-static int MPA_encode_close(AVCodecContext *avctx)
+static av_cold int MPA_encode_close(AVCodecContext *avctx)
 {
     av_freep(&avctx->coded_frame);
     return 0;
@@ -796,6 +796,8 @@ AVCodec mp2_encoder = {
     MPA_encode_frame,
     MPA_encode_close,
     NULL,
+    .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .long_name = NULL_IF_CONFIG_SMALL("MP2 (MPEG audio layer 2)"),
 };
 
 #undef FIX

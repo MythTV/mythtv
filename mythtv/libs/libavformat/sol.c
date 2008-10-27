@@ -23,10 +23,9 @@
  * Based on documents from Game Audio Player and own research
  */
 
+#include "libavutil/bswap.h"
 #include "avformat.h"
 #include "raw.h"
-#include "riff.h"
-#include "bswap.h"
 
 /* if we don't know the size in advance */
 #define AU_UNKNOWN_SIZE ((uint32_t)(~0))
@@ -88,7 +87,7 @@ static int sol_read_header(AVFormatContext *s,
 {
     int size;
     unsigned int magic,tag;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     unsigned int id, codec, channels, rate, type;
     AVStream *st;
 
@@ -130,9 +129,9 @@ static int sol_read_packet(AVFormatContext *s,
 {
     int ret;
 
-    if (url_feof(&s->pb))
+    if (url_feof(s->pb))
         return AVERROR(EIO);
-    ret= av_get_packet(&s->pb, pkt, MAX_SIZE);
+    ret= av_get_packet(s->pb, pkt, MAX_SIZE);
     pkt->stream_index = 0;
 
     /* note: we need to modify the packet size here to handle the last
@@ -141,18 +140,13 @@ static int sol_read_packet(AVFormatContext *s,
     return 0;
 }
 
-static int sol_read_close(AVFormatContext *s)
-{
-    return 0;
-}
-
 AVInputFormat sol_demuxer = {
     "sol",
-    "Sierra SOL Format",
+    NULL_IF_CONFIG_SMALL("Sierra SOL format"),
     0,
     sol_probe,
     sol_read_header,
     sol_read_packet,
-    sol_read_close,
+    NULL,
     pcm_read_seek,
 };

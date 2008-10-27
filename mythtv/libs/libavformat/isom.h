@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef FFMPEG_ISOM_H
-#define FFMPEG_ISOM_H
+#ifndef AVFORMAT_ISOM_H
+#define AVFORMAT_ISOM_H
 
 #include "riff.h"
 
@@ -30,6 +30,7 @@
 extern const AVCodecTag ff_mp4_obj_type[];
 extern const AVCodecTag codec_movvideo_tags[];
 extern const AVCodecTag codec_movaudio_tags[];
+extern const AVCodecTag ff_codec_movsubtitle_tags[];
 
 int ff_mov_iso639_to_lang(const char *lang, int mp4);
 int ff_mov_lang_to_iso639(int code, char *to);
@@ -39,4 +40,4 @@ typedef struct {
     int duration;
 } MOV_stts_t;
 
-#endif /* FFMPEG_ISOM_H */
+#endif /* AVFORMAT_ISOM_H */

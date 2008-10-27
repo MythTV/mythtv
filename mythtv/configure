@@ -12,14 +12,14 @@
 
 try_exec(){
     echo "Trying shell $1"
-    type "$1" >/dev/null 2>&1 && exec "$@"
+    type "$1" > /dev/null 2>&1 && exec "$@"
 }
 
 unset foo
-(: ${foo%%bar}) 2>/dev/null
+(: ${foo%%bar}) 2> /dev/null
 E1="$?"
 
-(: ${foo?}) 2>/dev/null
+(: ${foo?}) 2> /dev/null
 E2="$?"
 
 if test "$E1" != 0 || test "$E2" = 0; then
@@ -56,18 +56,23 @@ show_help(){
   echo
   echo "Standard options:"
   echo "  --help                   print this message"
+<<BLOCK_QUOTE
+  echo "  --logfile=FILE           log tests and output to FILE [config.err]"
+  echo "  --disable-logging        do not log configure debug information"
+BLOCK_QUOTE
   #echo "  --log[=FILE|yes|no]      log tests and output to FILE [config.err]"
   echo "  --previous               use previous configure parameters if possible"
   echo "  --compile-type=CTYPE     one of release, profile, debug [$compile_type]"
   echo "                           NOTE: profile is for sampling profilers"
-  echo "  --prefix=PREFIX          install in PREFIX [$PREFIX]"
+  echo "  --prefix=PREFIX          install in PREFIX [$prefix]"
   echo "  --libdir-name=LIBNAME    search/install libraries in PREFIX/LIBNAME [$libdir_name]"
   echo "  --disable-ccache         disable compiler cache (ccache)"
   echo "  --disable-distcc         disable distributed compilation (distcc)"
 <<BLOCK_QUOTE
+  echo "  --bindir=DIR             install binaries in DIR [PREFIX/bin]"
   echo "  --libdir=DIR             install libs in DIR [PREFIX/lib]"
   echo "  --shlibdir=DIR           install shared libs in DIR [PREFIX/lib]"
-  echo "  --incdir=DIR             install includes in DIR [PREFIX/include/ffmpeg]"
+  echo "  --incdir=DIR             install includes in DIR [PREFIX/include]"
   echo "  --mandir=DIR             install man page in DIR [PREFIX/share/man]"
   echo "  --enable-static          build static libraries [default=yes]"
   echo "  --disable-static         do not build static libraries [default=no]"
@@ -75,15 +80,20 @@ show_help(){
   echo "  --disable-shared         do not build shared libraries [default=yes]"
   echo "  --enable-gpl             allow use of GPL code, the resulting libav*"
   echo "                           and ffmpeg will be under GPL [default=no]"
-  echo "  --enable-pp              enable GPLed postprocessing support [default=no]"
-  echo "  --enable-swscaler        software scaler support [default=no]"
+  echo "  --enable-nonfree         allow use of nonfree code, the resulting libav*"
+  echo "                           and ffmpeg will be unredistributable [default=no]"
+  echo "  --enable-postproc        enable GPLed postprocessing support [default=no]"
+  echo "  --enable-swscale         software scaler support [default=no]"
+  echo "  --enable-avfilter        video filter support (replaces vhook) [default=no]"
+  echo "  --enable-avfilter-lavf   video filters dependant on avformat [default=no]"
   echo "  --enable-beosthreads     use BeOS threads [default=no]"
+  echo "  --enable-os2threads      use OS/2 threads [default=no]"
   echo "  --enable-pthreads        use pthreads [default=no]"
   echo "  --enable-w32threads      use Win32 threads [default=no]"
   echo "  --enable-x11grab         enable X11 grabbing [default=no]"
   echo
   echo "External library support:"
-  echo "  --enable-sunmlib         use Sun medialib [default=no]"
+  echo "  --enable-mlib            use Sun medialib [default=no]"
   echo "  --enable-liba52          enable GPLed liba52 support [default=no]"
   echo "  --enable-liba52bin       open liba52.so.0 at runtime [default=no]"
   echo "  --enable-avisynth        allow reading AVISynth script files [default=no]"
@@ -91,6 +101,7 @@ show_help(){
   echo "  --enable-libamr-wb       enable libamr-wb floating point audio codec"
   echo "  --enable-libdc1394       enable IIDC-1394 grabbing using libdc1394"
   echo "                           and libraw1394 [default=no]"
+  echo "  --enable-libdirac        enable Dirac support via libdirac [default=no]"
   echo "  --enable-libfaac         enable FAAC support via libfaac [default=no]"
   echo "  --enable-libfaad         enable FAAD support via libfaad [default=no]"
   echo "  --enable-libfaadbin      open libfaad.so.0 at runtime [default=no]"
@@ -98,6 +109,7 @@ show_help(){
   echo "  --enable-libmp3lame      enable MP3 encoding via libmp3lame [default=no]"
   echo "  --enable-libnut          enable NUT (de)muxing via libnut,"
   echo "                           native demuxer exists [default=no]"
+  echo "  --enable-libschroedinger enable Dirac support via libschroedinger [default=no]"
   echo "  --enable-libtheora       enable Theora encoding via libtheora [default=no]"
   echo "  --enable-libvorbis       enable Vorbis encoding via libvorbis,"
   echo "                           native implementation exists [default=no]"
@@ -110,10 +122,9 @@ BLOCK_QUOTE
 <<BLOCK_QUOTE
   echo "  --source-path=PATH       path to source code [$source_path]"
   echo "  --cross-prefix=PREFIX    use PREFIX for compilation tools [$cross_prefix]"
-  echo "  --cross-compile          assume a cross-compiler is used"
-  echo "  --target-os=OS           compiler targets OS [$targetos]"
+  echo "  --enable-cross-compile   assume a cross-compiler is used"
+  echo "  --target-os=OS           compiler targets OS [$target_os]"
   echo "  --cc=CC                  use C compiler CC [$cc]"
-  echo "  --make=MAKE              use specified make [$make]"
 BLOCK_QUOTE
   echo "  --qmake=QMAKE            use specified qmake [$qmake]"
   echo "  --extra-cflags=ECFLAGS   add ECFLAGS to CFLAGS [$CFLAGS]"
@@ -134,9 +145,12 @@ BLOCK_QUOTE
 BLOCK_QUOTE
   echo "  --enable-proc-opt        enable processor specific compilation"
   echo "  --disable-mmx            disable MMX usage"
+  echo "  --disable-mmx2           disable MMX2 usage"
+  echo "  --disable-ssse3          disable SSSE3 usage"
 <<BLOCK_QUOTE
   echo "  --disable-armv5te        disable armv5te usage"
   echo "  --disable-armv6          disable armv6 usage"
+  echo "  --disable-armvfp         disable ARM VFP usage"
   echo "  --disable-iwmmxt         disable iwmmxt usage"
   echo "  --disable-altivec        disable AltiVec usage"
 BLOCK_QUOTE
@@ -191,8 +205,8 @@ BLOCK_QUOTE
   echo "  --disable-network        disable network support [default=no]"
   echo "  --disable-ipv6           disable ipv6 support [default=no]"
   echo "  --disable-zlib           disable zlib [default=no]"
+  echo "  --disable-bzlib          disable bzlib [default=no]"
   echo "  --disable-vhook          disable video hooking support"
-  echo "  --disable-debug          disable debugging symbols"
   echo "  --disable-mpegaudio-hp   faster (but less accurate)"
   echo "                           MPEG audio decoding [default=no]"
   echo "  --enable-gray            enable full grayscale support (slower color)"
@@ -200,6 +214,7 @@ BLOCK_QUOTE
   echo "  --disable-ffserver       disable ffserver build"
   echo "  --disable-ffplay         disable ffplay build"
   echo "  --enable-small           optimize for size instead of speed"
+  echo "  --enable-hardcoded-tables use hardcoded tables instead of runtime generation"
   echo "  --enable-memalign-hack   emulate memalign, interferes with memory debuggers"
   echo "  --disable-encoder=NAME   disables encoder NAME"
   echo "  --enable-encoder=NAME    enables encoder NAME"
@@ -222,6 +237,7 @@ BLOCK_QUOTE
   echo "  --enable-protocol=NAME   enables protocol NAME"
   echo "  --disable-protocol=NAME  disables protocol NAME"
   echo "  --disable-protocols      disables all protocols"
+  echo "  --disable-devices        disables all devices"
   echo "  --list-decoders          show all available decoders"
   echo "  --list-encoders          show all available encoders"
   echo "  --list-muxers            show all available muxers"
@@ -229,12 +245,16 @@ BLOCK_QUOTE
   echo "  --list-parsers           show all available parsers"
   echo "  --list-protocols         show all available protocols"
   echo "  --list-bsfs              show all available bitstream filters"
+  echo "  --list-indevs            show all available input devices"
+  echo "  --list-outdevs           show all available output devices"
   echo
   echo "Developer options (useful when working on FFmpeg itself):"
+  echo "  --disable-debug          disable debugging symbols"
+  echo "  --enable-debug=LEVEL     set the debug level [$debuglevel]"
   echo "  --enable-gprof           enable profiling with gprof [$gprof]"
   echo "  --disable-optimizations  disable compiler optimizations"
   echo "  --enable-extra-warnings  enable more compiler warnings"
-  echo "  --disable-strip          disable stripping of executables and shared libraries"
+  echo "  --disable-stripping      disable stripping of executables and shared libraries"
   echo ""
   echo "NOTE: Object files are built at the place where configure is launched."
 BLOCK_QUOTE
@@ -242,12 +262,12 @@ BLOCK_QUOTE
 }
 
 log(){
-    echo "$@" >>$logfile
+    echo "$@" >> $logfile
 }
 
 log_file(){
     log BEGIN $1
-    pr -n -t $1 >>$logfile
+    pr -n -t $1 >> $logfile
     log END $1
 }
 
@@ -263,28 +283,29 @@ If you think configure made a mistake, make sure you are using the latest
 version from SVN.  If the latest version fails, report the problem to the
 mythtv-dev@mythtv.org mailing list or IRC #mythtv on irc.freenode.net
 EOF
-    if enabled logging; then
+    if disabled logging; then
         cat <<EOF
-Include the log file "$logfile" produced by configure as this will help
-solving the problem.
+Rerun configure with logging enabled (do not use --disable-logging), and
+include the log this produces with your report.
 EOF
     else
 cat <<EOF
-Rerun configure with logging enabled (do not use --log=no), and include the
-log this produces with your report.
+Include the log file "$logfile" produced by configure as this will help
+solving the problem.
 EOF
     fi
-    rm -f $TMPC $TMPCXX $TMPO $TMPE $TMPS $TMPH
+    rm -f $TMPC $TMPE $TMPH $TMPO $TMPS $TMPSH
+    rm -f $TMPCXX
     exit 1
 }
 
-# "tr '[a-z]' '[A-Z]'" is a workaround for Solaris tr not grokking "tr a-z A-Z"
+# Avoid locale weirdness, besides we really just want to translate ASCII.
 toupper(){
-    echo "$@" | tr '[a-z]' '[A-Z]'
+    echo "$@" | tr abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ
 }
 
 tolower(){
-    echo "$@" | tr '[A-Z]' '[a-z]'
+    echo "$@" | tr ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz
 }
 
 set_all(){
@@ -323,11 +344,13 @@ disable(){
 }
 
 enabled(){
-    eval test "x\$$1" = "xyes"
+    test "${1#!}" = "$1" && op== || op=!=
+    eval test "x\$${1#!}" $op "xyes"
 }
 
 disabled(){
-    eval test "x\$$1" = "xno"
+    test "${1#!}" = "$1" && op== || op=!=
+    eval test "x\$${1#!}" $op "xno"
 }
 
 enabled_all(){
@@ -354,6 +377,12 @@ disabled_any(){
     done
 }
 
+set_default(){
+    for opt; do
+        eval test -z "\$$opt" && eval $opt=\$${opt}_default
+    done
+}
+
 is_in(){
     value=$1
     shift
@@ -365,6 +394,7 @@ is_in(){
 
 check_deps(){
     for cfg; do
+        cfg="${cfg#!}"
         enabled ${cfg}_checking && die "Circular dependency for $cfg."
         disabled ${cfg}_checking && continue
         enable ${cfg}_checking
@@ -406,7 +436,7 @@ print_config(){
 }
 
 flags_saved(){
-    (: ${SAVE_CFLAGS?}) 2>/dev/null
+    (: ${SAVE_CFLAGS?}) 2> /dev/null
 }
 
 save_flags(){
@@ -478,19 +508,19 @@ add_extralibs(){
 
 check_cmd(){
     log "$@"
-    "$@" >>$logfile 2>&1
+    "$@" >> $logfile 2>&1
 }
 
 check_cc(){
     log check_cc "$@"
-    cat >$TMPC
+    cat > $TMPC
     log_file $TMPC
     check_cmd $cc $CFLAGS $ECFLAGS $OPTFLAGS "$@" -c -o $TMPO $TMPC
 }
 
 check_cpp(){
     log check_cpp "$@"
-    cat >$TMPCXX
+    cat > $TMPCXX
     log_file $TMPCXX
     check_cmd $cxx $CFLAGS $ECXXFLAGS "$@" -E -o $TMPO $TMPCXX
 }
@@ -501,10 +531,16 @@ check_asm(){
     asm="$2"
     shift 2
     check_cc "$@" <<EOF && enable $name || disable $name
-int foo(void){
-    asm volatile($asm);
-}
+int foo(void){ asm volatile($asm); }
 EOF
+}
+
+check_yasm(){
+    log check_yasm "$@"
+    echo "$1" > $TMPS
+    log_file $TMPS
+    shift 1
+    check_cmd $yasmexe $YASMFLAGS "$@" -o $TMPO $TMPS
 }
 
 check_ld(){
@@ -564,9 +600,7 @@ EOF
 check_ldflags(){
     log check_ldflags "$@"
     check_ld "$@" <<EOF && add_ldflags "$@"
-int main(){
-    return 0;
-}
+int main(void){ return 0; }
 EOF
 }
 
@@ -589,9 +623,7 @@ check_func(){
     disable $func
     check_ld "$@" <<EOF && enable $func
 extern int $func();
-int main(){
-    $func();
-}
+int main(void){ $func(); }
 EOF
 }
 
@@ -608,7 +640,7 @@ check_func2(){
     done
     check_ld "$@" <<EOF && enable $func
 $incs
-int main(){
+int main(int argc, char **argv){
     (void) $func;
     return 0;
 }
@@ -640,7 +672,7 @@ check_lib2(){
 }
 
 check_exec(){
-    check_ld "$@" && { enabled cross_compile || $TMPE >>$logfile 2>&1; }
+    check_ld "$@" && { enabled cross_compile || $TMPE >> $logfile 2>&1; }
 }
 
 check_exec_crash(){
@@ -652,12 +684,12 @@ check_exec_crash(){
     # can redirect the "Terminated" message from the shell.  SIGBUS
     # is not defined by standard C so it is used conditionally.
 
-    (check_exec "$@") >>$logfile 2>&1 <<EOF
+    (check_exec "$@") >> $logfile 2>&1 <<EOF
 #include <signal.h>
 static void sighandler(int sig){
     raise(SIGTERM);
 }
-int main(){
+int main(void){
     signal(SIGILL, sighandler);
     signal(SIGFPE, sighandler);
     signal(SIGSEGV, sighandler);
@@ -666,6 +698,23 @@ int main(){
 #endif
     { $code }
 }
+EOF
+}
+
+check_type(){
+    log check_type "$@"
+    headers=$1
+    type=$2
+    shift 2
+    disable $type
+    incs=""
+    for hdr in $headers; do
+        incs="$incs
+#include <$hdr>"
+    done
+    check_cc "$@" <<EOF && enable $type
+$incs
+$type v;
 EOF
 }
 
@@ -708,6 +757,58 @@ apply(){
     "$@" < "$file" > "$file.tmp" && mv "$file.tmp" "$file" || rm "$file.tmp"
 }
 
+
+#deprecated, use check_lib or check_lib2 instead
+has_library()
+{
+    if test -f /etc/ld.so.conf ; then
+        LIBPATHS=`cat /etc/ld.so.conf | grep -v "#" | grep -v "include"`
+    else
+        LIBPATHS=''
+    fi
+
+    LIBPATHS="$LIBPATHS `echo $LD_LIBRARY_PATH | sed s/':'/' '/g` "
+    # Mac OS X has a different variable for this:
+    LIBPATHS="$LIBPATHS `echo $DYLD_LIBRARY_PATH | sed s/':'/' '/g` "
+
+    # recurse down just one level, should be enough in most cases
+    if test -f /etc/ld.so.conf ; then
+        INCL=`cat /etc/ld.so.conf | grep -v "#" | grep  "^include"`
+        SRCH=`echo "$INCL" | sed '{ s/^include \//\//; s/^include /\/etc\//}'`
+        for x in $SRCH ; do
+            LP_APPEND=`cat $x | grep -v "#" | grep -v "^include"`
+            LIBPATHS="$LIBPATHS $LP_APPEND"
+        done
+    fi
+
+    LIBPATHS="`echo $LIBPATHS /$libdir_name /usr/$libdir_name /usr/local/$libdir_name /usr/X11R6/$libdir_name | sed s/'\/ '/' '/g` "
+
+    HAS_IT="no"
+    for LIBPATH in $LIBPATHS ; do
+        if test x`ls $LIBPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
+            HAS_IT="yes"
+        fi
+    done
+    expr $HAS_IT : "yes" > /dev/null
+}
+
+#deprecated, use check_header instead
+has_header()
+{
+    HPATHS="/usr/local/include /usr/include /usr/include/g++-v3 /usr/X11R6/include"
+    INCL=`echo $DYLD_LIBRARY_PATH $LD_LIBRARY_PATH | sed s/':'/' '/g`
+    HPATHS="$HPATHS "$(echo $INCL | sed "s/$libdir_name/include/g")
+
+    HAS_IT="no"
+    for HPATH in $HPATHS ; do
+        if test x`ls $HPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
+            HAS_IT="yes"
+        fi
+    done
+    expr $HAS_IT : "yes" > /dev/null
+}
+
+
 x86_mmx_cpus="pentium-mmx,pentium2,pentium3,pentium3m,pentium-m"
 x86_mmx_cpus="$x86_mmx_cpus,pentium4,pentium4m,prescott"
 x86_mmx_cpus="$x86_mmx_cpus,athlon,athlon-xp,athlon-tbird,athlon-4,athlon-mp,"
@@ -730,20 +831,30 @@ is_x86_mmx() {
     expr ",${x86_mmx_cpus}," : ".*,$1," > /dev/null || is_x86_64_cpu "$1"
 }
 
+
+# CONFIG_LIST contains configurable options, while HAVE_LIST is for
+# system-dependent things.
+
 COMPONENT_LIST="
     bsfs
     decoders
     demuxers
     encoders
+    filters
+    indevs
     muxers
+    outdevs
     parsers
     protocols
 "
 
 CONFIG_LIST="
     $COMPONENT_LIST
+    avfilter
+    avfilter_lavf
     avisynth
     beos_netserver
+    bzlib
     darwin
     ffmpeg
     ffplay
@@ -751,30 +862,34 @@ CONFIG_LIST="
     gpl
     gprof
     gray
+    hardcoded_tables
     ipv6
     liba52
     liba52bin
-    libamr
     libamr_nb
     libamr_wb
     libdc1394
+    libdirac
     libfaac
     libfaad
     libfaadbin
     libgsm
     libmp3lame
     libnut
+    libschroedinger
     libtheora
     libvorbis
     libx264
     libxvid
     memalign_hack
+    mlib
     mpegaudio_hp
     network
+    nonfree
+    postproc
     powerpc_perf
-    pp
     small
-    swscaler
+    swscale
     vhook
     x11grab
     zlib
@@ -782,6 +897,7 @@ CONFIG_LIST="
 
 THREADS_LIST='
     beosthreads
+    os2threads
     pthreads
     w32threads
 '
@@ -808,9 +924,12 @@ ARCH_EXT_LIST='
     altivec
     armv5te
     armv6
+    armvfp
     iwmmxt
     mmi
     mmx
+    mmx2
+    neon
     ssse3
     vis
 '
@@ -820,6 +939,7 @@ HAVE_LIST="
     $THREADS_LIST
     altivec_h
     arpa_inet_h
+    bswap
     byteswap_h
     closesocket
     cmov
@@ -847,6 +967,10 @@ HAVE_LIST="
     gettimeofday
     imlib2
     inet_aton
+    inline_asm
+    libdc1394_1
+    libdc1394_2
+    llrint
     lrint
     lrintf
     machine_ioctl_bt848_h
@@ -854,18 +978,24 @@ HAVE_LIST="
     malloc_h
     memalign
     mkstemp
-    mlib
+    pld
     ppc64
     round
+    roundf
     sdl
     sdl_video_size
+    socklen_t
     soundcard_h
+    poll_h
     stdint_h
-    sys_poll_h
+    sys_mman_h
+    sys_resource_h
+    sys_select_h
     sys_soundcard_h
     termios_h
     threads
     winsock2_h
+    yasm
 "
 
 MYTHTV_CONFIG_LIST='
@@ -927,13 +1057,38 @@ CMDLINE_SELECT="
     $ARCH_EXT_LIST
     $CONFIG_LIST
     $THREADS_LIST
+    cross_compile
     $MYTHTV_LIST
     $MYTHTV_CONFIG_LIST
     debug
     extra_warnings
+    logging
     optimizations
     shared
     static
+    stripping
+"
+
+PATHS_LIST='
+    bindir
+    incdir
+    libdir
+    mandir
+    prefix
+    runprefix
+    shlibdir
+'
+
+CMDLINE_SET="
+    $PATHS_LIST
+    arch
+    build_suffix
+    cc
+    cpu
+    cross_prefix
+    logging
+    source_path
+    target_os
 "
 
 # code dependency declarations
@@ -942,36 +1097,32 @@ CMDLINE_SELECT="
 altivec_deps="powerpc"
 armv5te_deps="armv4l"
 armv6_deps="armv4l"
+armvfp_deps="armv4l"
 iwmmxt_deps="armv4l"
 mmi_deps="mips"
 mmx_deps="x86"
+mmx2_deps="x86 mmx"
+neon_deps="armv4l"
 ssse3_deps="x86"
 vis_deps="sparc"
 
+# system headers and functions
+byteswap_h_deps="!armv4l"
+
 # decoders / encoders
-ac3_decoder_deps="gpl"
+aac_decoder_deps="!libfaad !libfaadbin"
+ac3_decoder_deps="gpl !liba52"
 dxa_decoder_deps="zlib"
+eac3_decoder_deps="gpl"
 flashsv_decoder_deps="zlib"
 flashsv_encoder_deps="zlib"
-flv_decoder_deps="h263_decoder"
-h263_decoder_deps="h263_parser mpeg4video_parser"
-h263i_decoder_deps="h263_decoder"
-h264_decoder_deps="h264_parser"
+mlp_decoder_deps="mlp_parser"
 mpeg_dvdv_decoder_deps="dvdv"
 mpeg_xvmc_decoder_deps="xvmc"
 mpeg_xvmc_vld_decoder_deps="xvmc_vld"
-mpeg4_decoder_deps="h263_decoder"
-msmpeg4v1_decoder_deps="h263_decoder"
-msmpeg4v2_decoder_deps="h263_decoder"
-msmpeg4v3_decoder_deps="h263_decoder"
 png_decoder_deps="zlib"
 png_encoder_deps="zlib"
 snow_decoder_deps="disabled_in_mythtv"
-svq3_decoder_deps="h264_parser"
-vc1_decoder_deps="h263_decoder"
-wmv1_decoder_deps="h263_decoder"
-wmv2_decoder_deps="h263_decoder"
-wmv3_decoder_deps="h263_decoder"
 zmbv_decoder_deps="zlib"
 zmbv_encoder_deps="zlib"
 
@@ -982,6 +1133,8 @@ libamr_nb_decoder_deps="libamr_nb"
 libamr_nb_encoder_deps="libamr_nb"
 libamr_wb_decoder_deps="libamr_wb"
 libamr_wb_encoder_deps="libamr_wb"
+libdirac_decoder_deps="libdirac !libschroedinger"
+libdirac_encoder_deps="libdirac"
 libfaac_encoder_deps="libfaac"
 libfaad_decoder_deps="libfaad"
 libfaadbin_decoder_extralibs='$ldl'
@@ -990,6 +1143,8 @@ libgsm_encoder_deps="libgsm"
 libgsm_ms_decoder_deps="libgsm"
 libgsm_ms_encoder_deps="libgsm"
 libmp3lame_encoder_deps="libmp3lame"
+libschroedinger_decoder_deps="libschroedinger"
+libschroedinger_encoder_deps="libschroedinger"
 libtheora_encoder_deps="libtheora"
 libvorbis_encoder_deps="libvorbis"
 libx264_encoder_deps="libx264"
@@ -1004,20 +1159,22 @@ audio_beos_muxer_deps="audio_beos"
 audio_beos_muxer_extralibs="-lmedia -lbe"
 avisynth_demuxer_deps="avisynth"
 bktr_demuxer_deps_any="dev_bktr_ioctl_bt848_h machine_ioctl_bt848_h dev_video_bktr_ioctl_bt848_h dev_ic_bt8xx_h"
-dv1394_demuxer_deps="dv1394"
+dirac_demuxer_deps="dirac_parser"
+dv1394_demuxer_deps="dv1394 dv_demuxer"
 libdc1394_demuxer_deps="libdc1394"
 libnut_demuxer_deps="libnut"
 libnut_muxer_deps="libnut"
 mp3_demuxer_deps="mpegaudio_parser"
-mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
 oss_demuxer_deps_any="soundcard_h sys_soundcard_h"
 oss_muxer_deps_any="soundcard_h sys_soundcard_h"
 redir_demuxer_deps="network"
-rtp_muxer_deps="network mpegts_demuxer"
-rtsp_demuxer_deps="rtp_protocol rtp_muxer"
-sdp_demuxer_deps="rtsp_demuxer"
-v4l2_demuxer_deps="linux_videodev2_h"
+rtp_muxer_deps="network rtp_protocol"
+rtsp_demuxer_deps="sdp_demuxer"
+sdp_demuxer_deps="rtp_protocol mpegts_demuxer"
 v4l_demuxer_deps="linux_videodev_h"
+v4l2_demuxer_deps="linux_videodev2_h"
+vfwcap_demuxer_deps="capCreateCaptureWindow"
+vfwcap_demuxer_extralibs="-lvfw32"
 x11_grab_device_demuxer_deps="x11grab XShmCreateImage"
 x11_grab_device_demuxer_extralibs="-lX11 -lXext"
 
@@ -1026,6 +1183,9 @@ http_protocol_deps="network"
 rtp_protocol_deps="udp_protocol"
 tcp_protocol_deps="network"
 udp_protocol_deps="network"
+
+# filters
+movie_filter_deps="avfilter_lavf"
 
 # programs
 ffplay_deps="sdl"
@@ -1042,6 +1202,7 @@ iptv_deps="backend"
 ivtv_deps="backend v4l"
 hdpvr_deps="backend v4l"
 hdhomerun_deps="backend"
+mpegtsraw_demuxer_deps="merge_libavformat_mpegts_c"
 opengl_deps="GL_gl_h"
 opengl_deps_any="windows x11"
 opengl_video_deps="opengl xv"
@@ -1056,50 +1217,33 @@ xvmc_pro_deps="xvmc X11_extensions_vldXvMC_h"
 xvmc_vld_deps="xvmc X11_extensions_vldXvMC_h"
 xvmcw_deps="xvmc"
 
-
-# set temporary file name
-if test ! -z "$TMPDIR" ; then
-    TMPDIR1="${TMPDIR}"
-elif test ! -z "$TEMPDIR" ; then
-    TMPDIR1="${TEMPDIR}"
-else
-    TMPDIR1="/tmp"
-fi
-
-TMPC="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.c"
-TMPCXX="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.cpp"
-TMPO="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.o"
-TMPE="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}"
-TMPS="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.S"
-TMPH="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.h"
-
 # default parameters
-enable logging
 pre_logfile="config.ep"
 logfile="$pre_logfile"
 compile_type="release"
 
 # installation paths
-PREFIX="/usr/local"
+prefix_default="/usr/local"
+bindir_default='${prefix}/bin'
+incdir_default='$(prefix)/include/mythtv'
+mandir_default='$(prefix)/share/man'
+
 libdir_name="lib"
-libdir=""
-shlibdir="$libdir"
-incdir='$(PREFIX)/include/mythtv'
-mandir='$(PREFIX)/share/man'
-bindir='$(PREFIX)/bin'
 
 # toolchain
 cc="gcc"
+yasmexe="yasm"
 cxx="g++"
 ccache="yes"
 distcc="yes"
 ar="ar"
+nm="nm"
 ranlib="ranlib"
-make="make"
 qmake="qmake"
 strip="strip"
 asmalign_pot="unknown"
 ln_s="ln -sf"
+objformat="elf"
 
 if test x"$CC" != x"" ; then
     cc="$CC"
@@ -1146,7 +1290,7 @@ if test -f /usr/bin/hostinfo ; then
 fi
 
 # OS
-targetos=$(tolower $(uname -s))
+target_os=$(tolower $(uname -s))
 
 # mythtv settings
 CONFIG_DEFINES=""
@@ -1191,25 +1335,25 @@ x11_include_path="/usr/X11R6/include"
 xvmc_lib=""
 
 # libraries
+enable bzlib
 enable zlib
 
 # configurable options
-enable dostrip
 enable gpl
 enable ipv6
-enable shared
 enable mpegaudio_hp
 enable network
 enable optimizations
 enable protocols
+enable shared
+enable stripping
 vhook="default"
 
 # build settings
-SHFLAGS='-shared -Wl,-soname,$@'
+add_cflags -D_ISOC99_SOURCE -D_POSIX_C_SOURCE=200112
+SHFLAGS='-shared -Wl,-soname,$$(@F)'
 VHOOKSHFLAGS='$(SHFLAGS)'
-LDLATEFLAGS='-Wl,-rpath-link,\$(BUILD_ROOT)/libavcodec -Wl,-rpath-link,\$(BUILD_ROOT)/libavformat -Wl,-rpath-link,\$(BUILD_ROOT)/libavutil'
 FFSERVERLDFLAGS=-Wl,-E
-LDCONFIG="ldconfig"
 LIBPREF="lib"
 LIBSUF=".a"
 FULLNAME='$(NAME)$(BUILDSUF)'
@@ -1221,6 +1365,9 @@ SLIBNAME_WITH_VERSION='$(SLIBNAME).$(LIBVERSION)'
 SLIBNAME_WITH_MAJOR='$(SLIBNAME).$(LIBMAJOR)'
 LIB_INSTALL_EXTRA_CMD='$(RANLIB) "$(LIBDIR)/$(LIBNAME)"'
 
+# gcc stupidly only outputs the basename of targets with -MM
+DEPEND_CMD='$(CC) $(CFLAGS) -MM -MG $< | sed -e "/^\#.*/d" -e "1s,^,$(@D)/," -e "s,\\([[:space:]]\\)\\(version\\.h\\),\\1\$$(BUILD_ROOT_REL)/\\2,"'
+
 # find source path
 source_path="`dirname \"$0\"`"
 enable source_path_used
@@ -1230,24 +1377,40 @@ if test -z "$source_path" -o "$source_path" = "." ; then
 else
     source_path="`cd \"$source_path\"; pwd`"
     echo "$source_path" | grep -q '[[:blank:]]' &&
-      die "Out of tree builds are impossible with whitespace in source path."
+        die "Out of tree builds are impossible with whitespace in source path."
 fi
 
 FFMPEG_CONFIGURATION="$@"
 
-ENCODER_LIST=`sed -n 's/^[^#]*ENC.*(.*, *\(.*\)).*/\1_encoder/p' "$source_path/libs/libavcodec/allcodecs.c"`
-DECODER_LIST=`sed -n 's/^[^#]*DEC.*(.*, *\(.*\)).*/\1_decoder/p' "$source_path/libs/libavcodec/allcodecs.c"`
-PARSER_LIST=`sed -n 's/^[^#]*PARSER.*(.*, *\(.*\)).*/\1_parser/p' "$source_path/libs/libavcodec/allcodecs.c"`
-BSF_LIST=`sed -n 's/^[^#]*BSF.*(.*, *\(.*\)).*/\1_bsf/p' "$source_path/libs/libavcodec/allcodecs.c"`
-MUXER_LIST=`sed -n 's/^[^#]*_MUX.*(.*, *\(.*\)).*/\1_muxer/p' "$source_path/libs/libavformat/allformats.c"`
-DEMUXER_LIST=`sed -n 's/^[^#]*DEMUX.*(.*, *\(.*\)).*/\1_demuxer/p' "$source_path/libs/libavformat/allformats.c"`
-PROTOCOL_LIST=`sed -n 's/^[^#]*PROTOCOL.*(.*, *\(.*\)).*/\1_protocol/p' "$source_path/libs/libavformat/allformats.c"`
+find_things(){
+    thing=$1
+    pattern=$2
+    file=$source_path/$3
+    sed -n "s/^[^#]*$pattern.*([^,]*, *\([^,]*\)\(,.*\)*).*/\1_$thing/p" "$file"
+}
 
-enable $ENCODER_LIST $DECODER_LIST $PARSER_LIST $MUXER_LIST $DEMUXER_LIST $PROTOCOL_LIST $BSF_LIST
-enable $ARCH_EXT_LIST
+ENCODER_LIST=$(find_things  encoder  ENC      libs/libavcodec/allcodecs.c)
+DECODER_LIST=$(find_things  decoder  DEC      libs/libavcodec/allcodecs.c)
+PARSER_LIST=$(find_things   parser   PARSER   libs/libavcodec/allcodecs.c)
+BSF_LIST=$(find_things      bsf      BSF      libs/libavcodec/allcodecs.c)
+MUXER_LIST=$(find_things    muxer    _MUX     libs/libavformat/allformats.c)
+DEMUXER_LIST=$(find_things  demuxer  DEMUX    libs/libavformat/allformats.c)
+OUTDEV_LIST="" #$(find_things   muxer    _MUX     libs/libavdevice/alldevices.c)
+INDEV_LIST="" #$(find_things    demuxer  DEMUX    libs/libavdevice/alldevices.c)
+PROTOCOL_LIST=$(find_things protocol PROTOCOL libs/libavformat/allformats.c)
+FILTER_LIST="" #$(find_things   filter   FILTER   libs/libavfilter/allfilters.c)
 
-# disable unneeded ffmpeg parts
-disable "bktr_demuxer v4l_demuxer v4l2_demuxer x11_grab_device_demuxer"
+enable $ARCH_EXT_LIST \
+       $DECODER_LIST \
+       $ENCODER_LIST \
+       $PARSER_LIST \
+       $BSF_LIST \
+       $DEMUXER_LIST \
+       $MUXER_LIST \
+       $FILTER_LIST \
+       $PROTOCOL_LIST \
+       $INDEV_LIST \
+       $OUTDEV_LIST \
 
 die_unknown(){
     echo "Unknown option \"$1\"."
@@ -1284,176 +1447,168 @@ if [ -e config.log ] ; then
     fi
 fi
 
+# set temporary file name
+if test ! -z "$TMPDIR" ; then
+    TMPDIR1="${TMPDIR}"
+elif test ! -z "$TEMPDIR" ; then
+    TMPDIR1="${TEMPDIR}"
+else
+    TMPDIR1="/tmp"
+fi
+
+TMPC="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.c"
+TMPE="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}${EXESUF}"
+TMPH="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.h"
+TMPO="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.o"
+TMPS="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.S"
+TMPSH="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.sh"
+TMPCXX="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.c"
+
 for opt do
-  optval="${opt#*=}"
-  case "$opt" in
-  --log)
-  ;;
-  --log=*) logging="$optval"
-  ;;
-  --compile-type=*) compile_type="$optval"
-  ;;
-  --prefix=*) PREFIX="$optval"
-  ;;
-  --libdir-name=*) libdir_name="$optval"
-  ;;
-  --libdir=*) libdir="$optval"
-  ;;
-  --shlibdir=*) shlibdir="$optval"
-  ;;
-  --incdir=*) incdir="$optval"
-  ;;
-  --mandir=*) mandir="$optval"
-  ;;
-  --source-path=*) source_path="$optval"
-  ;;
-  --cross-prefix=*) cross_prefix="$optval"
-  ;;
-  --cross-compile) enable cross_compile
-  ;;
-  --target-os=*) targetos="$optval"
-  ;;
-  --cc=*) cc="$optval"
-  ;;
-  --cxx=*) cxx="$optval"
-  ;;
-  --make=*) make="$optval"
-  ;;
-  --qmake=*) qmake="$optval"
-  ;;
-  --extra-cflags=*) check_ecflags "$optval"
-  ;;
-  --extra-cxxflags=*) check_cppflags "$optval"
-  ;;
-  --extra-ldflags=*) add_ldflags "$optval"
-  ;;
-  --extra-libs=*) add_extralibs "$optval"
-  ;;
-  --build-suffix=*) BUILDSUF="$optval"
-  ;;
-  --arch=*) arch="$optval" && arch_raw="$optval" && enable cpu_override
-  ;;
-  --cpu=*) cpu="$optval" && enable cpu_override
-  ;;
-  --tune=*)
-          tune="$optval"
-  ;;
-  --disable-ccache) ccache="no"
-  ;;
-  --disable-distcc) distcc="no"
-  ;;
-  --enable-sunmlib) enable mlib
-  ;;
-  --disable-strip) disable dostrip
-  ;;
-  --dvb-path=*) dvb_path="$optval"
-  ;;
-  --x11-path=*) x11_include_path="$optval"
-  ;;
-  --xvmc-lib=*) xvmc_lib="$optval"
-  ;;
-  --enable-glx-procaddrarb) glx_proc_addr_arb="yes"
-  ;;
-  --disable-glx-procaddrarb) glx_proc_addr_arb="no"
-  ;;
-  --enable-mac-accel) dvdv="yes"
-  ;;
-  --disable-mac-accel) dvdv="no"
-  ;;
-  --enable-opengl-video) opengl_video="yes"
-  ;;
-  --disable-opengl-video) opengl_video="no"
-  ;;
+    optval="${opt#*=}"
+    case "$opt" in
+    --compile-type=*) compile_type="$optval"
+    ;;
+    --libdir-name=*) libdir_name="$optval"
+    ;;
+    --libdir=*) die_unknown $opt
+    ;;
+    --cxx=*) cxx="$optval"
+    ;;
+    --qmake=*) qmake="$optval"
+    ;;
+    --extra-cflags=*) check_ecflags "$optval"
+    ;;
+    --extra-cxxflags=*) check_cppflags "$optval"
+    ;;
+    --extra-ldflags=*) add_ldflags "$optval"
+    ;;
+    --extra-libs=*) add_extralibs "$optval"
+    ;;
+    --arch=*) arch="$optval" && arch_raw="$optval" && enable cpu_override
+    ;;
+    --cpu=*) cpu="$optval" && enable cpu_override
+    ;;
+    --tune=*) tune="$optval"
+    ;;
+    --disable-ccache) ccache="no"
+    ;;
+    --disable-distcc) distcc="no"
+    ;;
+    --dvb-path=*) dvb_path="$optval"
+    ;;
+    --x11-path=*) x11_include_path="$optval"
+    ;;
+    --xvmc-lib=*) xvmc_lib="$optval"
+    ;;
+    --enable-glx-procaddrarb) glx_proc_addr_arb="yes"
+    ;;
+    --disable-glx-procaddrarb) glx_proc_addr_arb="no"
+    ;;
+    --enable-mac-accel) dvdv="yes"
+    ;;
+    --disable-mac-accel) dvdv="no"
+    ;;
+    --enable-opengl-video) opengl_video="yes"
+    ;;
+    --disable-opengl-video) opengl_video="no"
+    ;;
 # remove after 0.21
-  --enable-*dts)
-      echo "DTS passthrough doesn't requires libdts anymore."
-      echo "--enable-dts and --enable-libdts will be removed."
-  ;;
-  --enable-faad) enable libfaad
-      echo "WARNING! --enable-faad will be removed, use --enable-libfaad"
-  ;;
-  --enable-faadbin) enable libfaadbin
-      echo "WARNING! --enable-faadbin will be removed, use --enable-libfaadbin"
-  ;;
-  --enable-vorbis) enable libvorbis
-      echo "WARNING! --enable-vorbis will be removed, use --enable-libvorbis"
-  ;;
+    --enable-*dts)
+        echo "DTS passthrough doesn't requires libdts anymore."
+        echo "--enable-dts and --enable-libdts will be removed."
+    ;;
+    --enable-faad) enable libfaad
+        echo "WARNING! --enable-faad will be removed, use --enable-libfaad"
+    ;;
+    --enable-faadbin) enable libfaadbin
+        echo "WARNING! --enable-faadbin will be removed, use --enable-libfaadbin"
+    ;;
+    --enable-vorbis) enable libvorbis
+        echo "WARNING! --enable-vorbis will be removed, use --enable-libvorbis"
+    ;;
 # end of compatibility section (0.21)
 # disabled due to abuse in Gentoo ebuild
-  --disable-frontend)
-  ;;
+    --disable-frontend)
+    ;;
 # disabled due to abuse in Gentoo ebuild
-  --disable-backend)
-  ;;
-  --enable-mac-bundle) enable mac_bundle
-  ;;
-  --runtime-prefix=*) RUNPREFIX="$optval"
-  ;;
-  --previous|--prev)
-      echo "No history of previous configure parameters."
-  ;;
-  --with-bindings=*)
-      tmp_bindings=`echo ${optval} | sed -e 's/,/ /g'`
-      for binding in ${tmp_bindings} ; do
-          if test x"${binding}" = x"perl"; then
-              bindings_perl="yes"
-          fi
-          if test x"${binding}" = x"python"; then
-              bindings_python="yes"
-          fi
-      done
-  ;;
-  --without-bindings=*)
-      tmp_bindings=`echo ${optval} | sed -e 's/,/ /g'`
-      for binding in ${tmp_bindings} ; do
-          if test x"${binding}" = x"perl"; then
-              bindings_perl="no"
-          fi
-          if test x"${binding}" = x"python"; then
-              bindings_python="no"
-          fi
-      done
-  ;;
-  --disable-encoders) disable $ENCODER_LIST
-  ;;
-  --disable-decoders) disable $DECODER_LIST
-  ;;
-  --disable-muxers) disable $MUXER_LIST
-  ;;
-  --disable-demuxers) disable $DEMUXER_LIST
-  ;;
-  --disable-parsers) disable $PARSER_LIST
-  ;;
-  --disable-bsfs) disable $BSF_LIST
-  ;;
-  --disable-protocols) disable $PROTOCOL_LIST
-  ;;
-  --enable-*=*|--disable-*=*)
-  eval `echo "$opt" | sed 's/=/-/;s/--/action=/;s/-/ thing=/;s/-/ name=/'`
-  case "$thing" in
-      encoder|decoder|muxer|demuxer|parser|bsf|protocol) $action ${optval}_${thing} ;;
-      *) die_unknown "$opt" ;;
-  esac
-  ;;
-  --enable-?*|--disable-?*)
-  eval `echo "$opt" | sed 's/--/action=/;s/-/ option=/;s/-/_/g'`
-  echo "$CMDLINE_SELECT" | grep -q "^ *$option\$" || die_unknown $opt
-  $action $option
-  ;;
-  --list-*)
-    NAME="${opt#--list-}"
-    is_in $NAME $COMPONENT_LIST || die_unknown $opt
-    NAME=${NAME%s}
-    eval show_list $NAME \$$(toupper $NAME)_LIST
-  ;;
-  --help|-h) show_help
-  ;;
-  *)
-  die_unknown $opt
-  ;;
-  esac
+    --disable-backend)
+    ;;
+    --enable-mac-bundle) enable mac_bundle
+    ;;
+    --previous|--prev)
+        echo "No history of previous configure parameters."
+    ;;
+    --with-bindings=*)
+        tmp_bindings=`echo ${optval} | sed -e 's/,/ /g'`
+        for binding in ${tmp_bindings} ; do
+            if test x"${binding}" = x"perl"; then
+                bindings_perl="yes"
+            fi
+            if test x"${binding}" = x"python"; then
+                bindings_python="yes"
+            fi
+        done
+    ;;
+    --without-bindings=*)
+        tmp_bindings=`echo ${optval} | sed -e 's/,/ /g'`
+        for binding in ${tmp_bindings} ; do
+            if test x"${binding}" = x"perl"; then
+                bindings_perl="no"
+            fi
+            if test x"${binding}" = x"python"; then
+                bindings_python="no"
+            fi
+        done
+    ;;
+    --disable-devices) disable $INDEV_LIST $OUTDEV_LIST
+    ;;
+    --enable-debug=*) debuglevel="$optval"
+    ;;
+    --enable-*=*|--disable-*=*)
+    eval `echo "$opt" | sed 's/=/-/;s/--/action=/;s/-/ thing=/;s/-/ name=/'`
+    case "$thing" in
+        encoder|decoder|muxer|demuxer|parser|bsf|protocol|filter) $action ${optval}_${thing} ;;
+        *) die_unknown "$opt" ;;
+    esac
+    ;;
+    --enable-?*|--disable-?*)
+    eval `echo "$opt" | sed 's/--/action=/;s/-/ option=/;s/-/_/g'`
+    if is_in $option $COMPONENT_LIST; then
+        eval $action \$$(toupper ${option%s})_LIST
+    elif is_in $option $CMDLINE_SELECT; then
+        $action $option
+    else
+        die_unknown $opt
+    fi
+    ;;
+    --list-*)
+        NAME="${opt#--list-}"
+        is_in $NAME $COMPONENT_LIST || die_unknown $opt
+        NAME=${NAME%s}
+        eval show_list $NAME \$$(toupper $NAME)_LIST
+    ;;
+    --help|-h) show_help
+    ;;
+    *)
+    optname="${opt%=*}"
+    optname="${optname#--}"
+    optname=$(echo "$optname" | sed 's/-/_/g')
+    is_in $optname $CMDLINE_SET || die_unknown $opt
+    eval $optname='$optval'
+    ;;
+    esac
 done
 
+
+#setting default runtime prefix and libdir
+libdir_default="${prefix}/${libdir_name}"
+
+if test -n ${prefix}; then
+    runprefix_default=${prefix}
+else
+    runprefix_default=${prefix_default}
+fi
 
 if enabled cpu_override || test x"$tune" != x"generic" && enabled proc_opt; then
     echo "Warning! --enable-proc-opt shouldn't be used with --arch, --cpu or --tune"
@@ -1461,78 +1616,90 @@ if enabled cpu_override || test x"$tune" != x"generic" && enabled proc_opt; then
     disable proc_opt
 fi
 
+disabled logging && logfile=/dev/null
+
+echo "# $0 $@" > $logfile
+set >> $logfile
+
+cc="${cross_prefix}${cc}"
+yasmexe="${cross_prefix}${yasmexe}"
+ar="${cross_prefix}${ar}"
+nm="${cross_prefix}${nm}"
+ranlib="${cross_prefix}${ranlib}"
+strip="${cross_prefix}${strip}"
+
+check_cflags -fasm
+check_cflags -std=c99
+
 is_x86_cpu "$arch" && arch="x86_32"
 is_x86_64_cpu "$arch" && arch="x86_64"
 
+check_cflags -fasm
+check_cflags -std=c99
+
 case "$arch" in
-  x86_32)
-    arch="x86_32"
-    enable fast_unaligned
-  ;;
-  x86_64|amd64)
-    arch="x86_32"
-    enable fast_unaligned
-    canon_arch="`$cc -dumpmachine | sed -e 's,\([^-]*\)-.*,\1,'`"
-    if [ x"$canon_arch" = x"x86_64" -o x"$canon_arch" = x"amd64" ]; then
-      if [ -z "`echo $CFLAGS | grep -- -m32`"  ]; then
-        arch="x86_64"
+    i386|i486|i586|i686|i86pc|BePC|x86_32)
+        arch="x86_32"
+        enable fast_unaligned
+    ;;
+    x86_64|amd64)
+        arch="x86_32"
+        enable fast_unaligned
+        check_cc <<EOF && enable fast_64bit && arch="x86_64"
+        int test[sizeof(char*) - 7];
+EOF
+    ;;
+    # armv4l is a subset of armv[567]*l
+    arm|armv[4567]*l)
+        arch="armv4l"
+    ;;
+    alpha)
+        arch="alpha"
         enable fast_64bit
-      fi
-    fi
-    enable cmov
-  ;;
-  # armv4l is a subset of armv[567]*l
-  arm|armv[4567]*l)
-    arch="armv4l"
-  ;;
-  alpha)
-    arch="alpha"
-    enable fast_64bit
-  ;;
-  "Power Macintosh"|ppc|powerpc)
-    arch="powerpc"
-  ;;
-  ppc64)
-    arch="powerpc"
-    enable fast_64bit
-  ;;
-  mips|mipsel|IP*)
-    arch="mips"
-  ;;
-  sun4u|sparc64)
-    arch="sparc64"
-    ! enabled cpu_override && check_mtune_mcpu "ultrasparc" "-mvis"
-    enable fast_64bit
-  ;;
-  sparc)
-    arch="sparc"
-  ;;
-  sh4)
-    arch="sh4"
-  ;;
-  parisc)
-    arch="parisc"
-  ;;
-  parisc64)
-    arch="parisc"
-    enable fast_64bit
-  ;;
-  s390|s390x)
-    arch="s390"
-  ;;
-  m68k)
-    arch="m68k"
-  ;;
-  ia64)
-    arch="ia64"
-    enable fast_64bit
-  ;;
-  bfin)
-    arch="bfin"
-  ;;
-  *)
-    arch="unknown"
-  ;;
+    ;;
+    "Power Macintosh"|ppc|powerpc)
+        arch="powerpc"
+    ;;
+    ppc64)
+        arch="powerpc"
+        enable fast_64bit
+    ;;
+    mips|mipsel|IP*)
+        arch="mips"
+    ;;
+    sun4u|sparc64)
+        arch="sparc64"
+        enable fast_64bit
+    ;;
+    sparc)
+        arch="sparc"
+    ;;
+    sh4)
+        arch="sh4"
+    ;;
+    parisc)
+        arch="parisc"
+    ;;
+    parisc64)
+        arch="parisc"
+        enable fast_64bit
+    ;;
+    s390|s390x)
+        arch="s390"
+    ;;
+    m68k)
+        arch="m68k"
+    ;;
+    ia64)
+        arch="ia64"
+        enable fast_64bit
+    ;;
+    bfin)
+        arch="bfin"
+    ;;
+    *)
+        arch="unknown"
+    ;;
 esac
 
 enable $arch
@@ -1540,199 +1707,210 @@ enabled_any x86_32 x86_64 && enable x86
 enabled     sparc64       && enable sparc
 
 # OS specific
-case $targetos in
-  beos|haiku|zeta)
-    PREFIX="$HOME/config"
-    # helps building libavcodec
-    add_cflags "-DPIC -fomit-frame-pointer"
-    # 3 gcc releases known for BeOS, each with ugly bugs
-    gcc_version="`$cc -v 2>&1 | grep version | cut -d ' ' -f3-`"
-    case "$gcc_version" in
-      2.9-beos-991026*|2.9-beos-000224*) echo "R5/GG gcc"
-        disable mmx
+case $target_os in
+    beos|haiku|zeta)
+        prefix_default="$HOME/config"
+        # helps building libavcodec
+        add_cflags "-DPIC -fomit-frame-pointer"
+        # 3 gcc releases known for BeOS, each with ugly bugs
+        gcc_version="`$cc -v 2>&1 | grep version | cut -d ' ' -f3-`"
+        case "$gcc_version" in
+          2.9-beos-991026*|2.9-beos-000224*) echo "R5/GG gcc"
+            disable mmx
+            ;;
+          *20010315*) echo "BeBits gcc"
+            add_cflags "-fno-expensive-optimizations"
+            ;;
+        esac
+        SHFLAGS=-nostart
+        # enable BeOS things
+        enable audio_beos
+        # no need for libm, but the inet stuff
+        # Check for BONE
+        # XXX: actually should check for NOT net_server
+        if echo $BEINCLUDES | grep -q 'headers/be/bone'; then
+            network_extralibs="-lbind -lsocket"
+        else
+            enable beos_netserver
+            network_extralibs="-lnet"
+        fi ;;
+    sunos)
+        FFSERVERLDFLAGS=""
+        SHFLAGS='-shared -Wl,-h,$$(@F)'
+        network_extralibs="-lsocket -lnsl"
         ;;
-      *20010315*) echo "BeBits gcc"
-        add_cflags "-fno-expensive-optimizations"
+    netbsd)
+        oss_demuxer_extralibs="-lossaudio"
+        oss_muxer_extralibs="-lossaudio"
         ;;
-    esac
-    LDCONFIG="echo ignoring ldconfig"
-    SHFLAGS=-nostart
-    # enable BeOS things
-    enable audio_beos
-    # no need for libm, but the inet stuff
-    # Check for BONE
-    # XXX: actually should check for NOT net_server
-    if (echo $BEINCLUDES|grep 'headers/be/bone' >/dev/null); then
-        network_extralibs="-lbind -lsocket"
-    else
-        enable beos_netserver
-        network_extralibs="-lnet"
-    fi ;;
-  sunos)
-    FFSERVERLDFLAGS=""
-    SHFLAGS='-shared -Wl,-h,$@'
-    network_extralibs="-lsocket -lnsl"
-    ;;
-  netbsd)
-    oss_demuxer_extralibs="-lossaudio"
-    oss_muxer_extralibs="-lossaudio"
-    ;;
-  openbsd)
-    append CCONFIG "openbsd"
-    disable need_memalign
-    LIBOBJFLAGS='$(PIC)'
-    LDCONFIG='ldconfig -m $(SHLIBDIR)'
-    SHFLAGS='-shared'
-    SLIBNAME='$(SLIBPREF)$(FULLNAME)$(SLIBSUF).$(LIBVERSION)'
-    SLIBNAME_WITH_VERSION='$(SLIBNAME)'
-    SLIBNAME_WITH_MAJOR='$(SLIBNAME)'
-    oss_demuxer_extralibs="-lossaudio"
-    oss_muxer_extralibs="-lossaudio"
-    ;;
-  freebsd)
-    append CCONFIG "freebsd"
+    openbsd)
+        append CCONFIG "openbsd"
+        disable need_memalign
+        LIBOBJFLAGS='$(PIC)'
+        SHFLAGS='-shared'
+        SLIBNAME='$(SLIBPREF)$(FULLNAME)$(SLIBSUF).$(LIBVERSION)'
+        SLIBNAME_WITH_VERSION='$(SLIBNAME)'
+        SLIBNAME_WITH_MAJOR='$(SLIBNAME)'
+        oss_demuxer_extralibs="-lossaudio"
+        oss_muxer_extralibs="-lossaudio"
+        ;;
+    freebsd)
+        append CCONFIG "freebsd"
     disable ivtv
-    disable need_memalign
-    backend="yes"
-    ;;
-  bsd/os)
-    osextralibs="-lpoll -lgnugetopt"
-    strip="strip -d"
-    ;;
-  darwin)
-    enable  appleremote
-    enable  backend
-    enable  darwin
-    disable dvb
-    disable ivtv
-    disable hdpvr
-    ldver=$(ld -v 2>&1 | sed -e s/^[^-]*-//)
-    osxver=$(uname -r | cut -c 1)
-    if [[ ${ldver%.*} -lt "82" && ${osxver} = "9" && ${arch} = "x86_32" ]]; then
-        disable mmx
-        echo "You have a broken ld. Playback of HD videos may be very poor"
-        echo "See http://svn.mythtv.org/trac/ticket/4200 for intelleopardmmx.patch"
-    fi
-    disable opengl_video
-    disable opengl_vsync
-    enable  proc_opt
-    disable v4l
-    disable x11
-    ###### Standard ffmpeg configure stuff follows:
-    disable need_memalign
-    SHFLAGS='-dynamiclib -Wl,-single_module -Wl,-install_name,$(SHLIBDIR)/$(SLIBNAME),-current_version,$(SPPVERSION),-compatibility_version,$(SPPVERSION) -Wl,-read_only_relocs,suppress'
-    VHOOKSHFLAGS='-dynamiclib -Wl,-single_module -flat_namespace -undefined suppress -Wl,-install_name,$(SHLIBDIR)/vhook/$@'
-    strip="strip -x"
-    FFLDFLAGS="-Wl,-dynamic,-search_paths_first"
-    SLIBSUF=".dylib"
-    SLIBNAME_WITH_VERSION='$(SLIBPREF)$(FULLNAME).$(LIBVERSION)$(SLIBSUF)'
-    SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(FULLNAME).$(LIBMAJOR)$(SLIBSUF)'
-    FFSERVERLDFLAGS=-Wl,-bind_at_load
-    ;;
-  mingw32*)
-    enable  backend
-    disable bindings_perl
-    disable bindings_python
-    disable dv1394
-    disable dvb
-    disable ivtv
-    disable hdpvr
-    enable  memalign_hack
-    disable network
-    enable opengl
-    if enabled wince; then
-        disable protocols
-    fi
-    disable v4l
-    enable  windows
-    disable x11
-    ###### Standard ffmpeg configure stuff follows:
-    targetos=mingw32
-    shlibdir="$bindir"
-    VHOOKSHFLAGS='-shared -L$(BUILD_ROOT)/libavformat -L$(BUILD_ROOT)/libavcodec -L$(BUILD_ROOT)/libavutil'
-    VHOOKLIBS='-lavformat$(BUILDSUF) -lavcodec$(BUILDSUF) -lavutil$(BUILDSUF) $(EXTRALIBS)'
-    if enabled swscaler; then
-        VHOOKSHFLAGS="$VHOOKSHFLAGS -L\$(BUILD_ROOT)/libswscale"
-        VHOOKLIBS="$VHOOKLIBS -lswscale\$(BUILDSUF)"
-    fi
-    disable ffserver
-    SLIBPREF="lib"
-    SLIBSUF=".dll"
-    EXESUF=".exe"
-    SLIBNAME_WITH_VERSION='$(SLIBPREF)$(NAME)-$(LIBVERSION)$(SLIBSUF)'
-    SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(NAME)-$(LIBMAJOR)$(SLIBSUF)'
-    SLIB_EXTRA_CMD="-lib /machine:i386 /def:\$(@:${SLIBSUF}=.def)"
-    SLIB_INSTALL_EXTRA_CMD="-install -m 644 \$(SLIBNAME_WITH_MAJOR:\$(SLIBSUF)=.lib) \"\$(shlibdir)/\$(SLIBNAME_WITH_MAJOR:\$(SLIBSUF)=.lib)\""
-    SHFLAGS="-shared -Wl,--output-def,\$(@:${SLIBSUF}=.def),--out-implib,lib\$(SLIBNAME:\$(SLIBSUF)=.a) -Wl,--enable-runtime-pseudo-reloc"
-    add_extralibs -lws2_32
-    ;;
-  cygwin*)
-    targetos=cygwin
-    enable windows
-    shlibdir="$bindir"
-    VHOOKSHFLAGS='-shared -L$(BUILD_ROOT)/libavformat -L$(BUILD_ROOT)/libavcodec -L$(BUILD_ROOT)/libavutil'
-    VHOOKLIBS='-lavformat$(BUILDSUF) -lavcodec$(BUILDSUF) -lavutil$(BUILDSUF) $(EXTRALIBS)'
-    if enabled swscaler; then
-        VHOOKSHFLAGS="$VHOOKSHFLAGS -L\$(BUILD_ROOT)/libswscale"
-        VHOOKLIBS="$VHOOKLIBS -lswscale\$(BUILDSUF)"
-    fi
-    EXESUF=".exe"
-    SLIBPREF="cyg"
-    SLIBSUF=".dll"
-    SLIBNAME_WITH_VERSION='$(SLIBPREF)$(FULLNAME)-$(LIBVERSION)$(SLIBSUF)'
-    SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(FULLNAME)-$(LIBMAJOR)$(SLIBSUF)'
-    SHFLAGS='-shared -Wl,--enable-auto-image-base'
-    ;;
-  linux)
-    append CCONFIG "linux"
-    backend="yes"
-    ! disabled joystick_menu && enable joystick_menu
-    LDLATEFLAGS="-Wl,--as-needed $LDLATEFLAGS"
-    enable dv1394
-    ;;
-  irix*)
-    targetos=irix
-    ranlib="echo ignoring ranlib"
-    ;;
-  *)
-    targetos="${targetos}-UNKNOWN"
-    ;;
+        disable need_memalign
+        backend="yes"
+        ;;
+    bsd/os)
+        osextralibs="-lpoll -lgnugetopt"
+        strip="strip -d"
+        ;;
+    darwin)
+        enable  appleremote
+        enable  backend
+        enable  darwin
+        disable dvb
+        disable ivtv
+        disable hdpvr
+        ldver=$(ld -v 2>&1 | sed -e s/^[^-]*-//)
+        osxver=$(uname -r | cut -c 1)
+        if [[ ${ldver%.*} -lt "82" && ${osxver} = "9" && ${arch} = "x86_32" ]]; then
+            disable mmx
+            echo "You have a broken ld. Playback of HD videos may be very poor"
+            echo "See http://svn.mythtv.org/trac/ticket/4200 for intelleopardmmx.patch"
+        fi 
+        disable opengl_video
+        disable opengl_vsync
+        enable  proc_opt
+        disable v4l
+        disable x11
+        ###### Standard ffmpeg configure stuff follows:
+        disable need_memalign
+        SHFLAGS='-dynamiclib -Wl,-single_module -Wl,-install_name,$(SHLIBDIR)/$(SLIBNAME),-current_version,$(LIBVERSION),-compatibility_version,$(LIBMAJOR) -Wl,-read_only_relocs,suppress'
+        VHOOKSHFLAGS='-dynamiclib -Wl,-single_module -flat_namespace -undefined suppress -Wl,-install_name,$(SHLIBDIR)/vhook/$$(@F)'
+        strip="strip -x"
+        FFLDFLAGS="-Wl,-dynamic,-search_paths_first"
+        SLIBSUF=".dylib"
+        SLIBNAME_WITH_VERSION='$(SLIBPREF)$(FULLNAME).$(LIBVERSION)$(SLIBSUF)'
+        SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(FULLNAME).$(LIBMAJOR)$(SLIBSUF)'
+        FFSERVERLDFLAGS=-Wl,-bind_at_load
+        objformat="macho"
+        enabled x86_64 && objformat="macho64"
+        ;;
+    mingw32*)
+        target_os=mingw32
+        LIBTARGET=i386
+        if test $arch = x86_64; then
+            disable need_memalign
+            LIBTARGET=x64
+        fi
+        shlibdir_default="$bindir_default"
+        enable  backend
+        disable bindings_perl
+        disable bindings_python
+        disable dv1394
+        disable dvb
+        disable ivtv
+        disable hdpvr
+        enable  memalign_hack
+        disable network
+        enable opengl
+        if enabled wince; then
+            disable protocols
+        fi
+        disable v4l
+        enable  windows
+        disable x11
+        ###### Standard ffmpeg configure stuff follows:
+        VHOOKSHFLAGS='-shared -L$(BUILD_ROOT)/libavformat -L$(BUILD_ROOT)/libavcodec -L$(BUILD_ROOT)/libavutil'
+        VHOOKLIBS='-lavformat$(BUILDSUF) -lavcodec$(BUILDSUF) -lavutil$(BUILDSUF) $(EXTRALIBS)'
+        if enabled swscale; then
+            VHOOKSHFLAGS="$VHOOKSHFLAGS -L\$(BUILD_ROOT)/libswscale"
+            VHOOKLIBS="$VHOOKLIBS -lswscale\$(BUILDSUF)"
+        fi
+        disable ffserver
+        SLIBPREF="lib"
+        SLIBSUF=".dll"
+        EXESUF=".exe"
+        SLIBNAME_WITH_VERSION='$(SLIBPREF)$(NAME)-$(LIBVERSION)$(SLIBSUF)'
+        SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(NAME)-$(LIBMAJOR)$(SLIBSUF)'
+        SLIB_EXTRA_CMD='-lib /machine:$(LIBTARGET) /def:$$(@:$(SLIBSUF)=.def) /out:$(SUBDIR)$(SLIBNAME_WITH_MAJOR:$(SLIBSUF)=.lib)'
+        SLIB_INSTALL_EXTRA_CMD='-install -m 644 $(SUBDIR)$(SLIBNAME_WITH_MAJOR:$(SLIBSUF)=.lib) "$(SHLIBDIR)/$(SLIBNAME:$(SLIBSUF)=.lib)"; \
+            install -m 644 $(SUBDIR)$(SLIBNAME_WITH_MAJOR:$(SLIBSUF)=.lib) "$(SHLIBDIR)/$(SLIBNAME_WITH_MAJOR:$(SLIBSUF)=.lib)"'
+        SLIB_UNINSTALL_EXTRA_CMD='rm -f "$(SHLIBDIR)/$(SLIBNAME:$(SLIBSUF)=.lib)"'
+        SHFLAGS='-shared -Wl,--output-def,$$(@:$(SLIBSUF)=.def) -Wl,--enable-runtime-pseudo-reloc -Wl,--enable-auto-image-base'
+        add_extralibs -lws2_32
+        objformat="win32"
+        ;;
+    cygwin*)
+        target_os=cygwin
+        shlibdir_default="$bindir_default"
+        enable windows
+        VHOOKSHFLAGS='-shared -L$(BUILD_ROOT)/libavformat -L$(BUILD_ROOT)/libavcodec -L$(BUILD_ROOT)/libavutil'
+        VHOOKLIBS='-lavformat$(BUILDSUF) -lavcodec$(BUILDSUF) -lavutil$(BUILDSUF) $(EXTRALIBS)'
+        if enabled swscale; then
+            VHOOKSHFLAGS="$VHOOKSHFLAGS -L\$(BUILD_ROOT)/libswscale"
+            VHOOKLIBS="$VHOOKLIBS -lswscale\$(BUILDSUF)"
+        fi
+        EXESUF=".exe"
+        SLIBPREF="cyg"
+        SLIBSUF=".dll"
+        SLIBNAME_WITH_VERSION='$(SLIBPREF)$(FULLNAME)-$(LIBVERSION)$(SLIBSUF)'
+        SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(FULLNAME)-$(LIBMAJOR)$(SLIBSUF)'
+        SHFLAGS='-shared -Wl,--enable-auto-image-base'
+        objformat="win32"
+        ;;
+    *-dos|freedos|opendos)
+        disable ffplay ffserver vhook
+        disable $INDEV_LIST $OUTDEV_LIST
+        network_extralibs="-lsocket"
+        EXESUF=".exe"
+        objformat="win32"
+        ;;
+    linux)
+        append CCONFIG "linux"
+        backend="yes"
+        ! disabled joystick_menu && enable joystick_menu
+        enable dv1394
+        ;;
+    irix*)
+        target_os=irix
+        ranlib="echo ignoring ranlib"
+        ;;
+    os/2*)
+        strip="lxlite"
+        ln_s="cp -f"
+        EXESUF=".exe"
+        FFLDFLAGS="-Zomf -Zbin-files -Zargs-wild -Zmap"
+        SHFLAGS='$(SUBDIR)$(NAME).def -Zdll -Zomf'
+        FFSERVERLDFLAGS=""
+        LIBSUF="_s.a"
+        SLIBPREF=""
+        SLIBSUF=".dll"
+        SLIBNAME_WITH_VERSION='$(SLIBPREF)$(NAME)-$(LIBVERSION)$(SLIBSUF)'
+        SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(shell echo $(NAME) | cut -c1-6)$(LIBMAJOR)$(SLIBSUF)'
+        SLIB_CREATE_DEF_CMD='echo LIBRARY $(SLIBNAME_WITH_MAJOR) INITINSTANCE TERMINSTANCE > $(SUBDIR)$(NAME).def; \
+          echo PROTMODE >> $(SUBDIR)$(NAME).def; \
+          echo CODE PRELOAD MOVEABLE DISCARDABLE >> $(SUBDIR)$(NAME).def; \
+          echo DATA PRELOAD MOVEABLE MULTIPLE NONSHARED >> $(SUBDIR)$(NAME).def; \
+          echo EXPORTS >> $(SUBDIR)$(NAME).def; \
+          emxexp -o $(OBJS) >> $(SUBDIR)$(NAME).def'
+        SLIB_EXTRA_CMD='emximp -o $(SUBDIR)$(LIBPREF)$(NAME)_dll.a $(SUBDIR)$(NAME).def; \
+          emximp -o $(SUBDIR)$(LIBPREF)$(NAME)_dll.lib $(SUBDIR)$(NAME).def;'
+        SLIB_INSTALL_EXTRA_CMD='install -m 644 $(SUBDIR)$(LIBPREF)$(NAME)_dll.a $(SUBDIR)$(LIBPREF)$(NAME)_dll.lib "$(LIBDIR)"'
+        SLIB_UNINSTALL_EXTRA_CMD='rm -f "$(LIBDIR)"/$(LIBPREF)$(NAME)_dll.a "$(LIBDIR)"/$(LIBPREF)$(NAME)_dll.lib'
+        disable vhook
+        ;;
+    interix)
+        disable vhook
+        ;;
+    *)
+        target_os="${target_os}-UNKNOWN"
+        ;;
 esac
 
+set_default $PATHS_LIST
+
 add_extralibs $osextralibs
-
-has_library()
-{
-    if test -f /etc/ld.so.conf ; then
-        LIBPATHS=`cat /etc/ld.so.conf | grep -v "#" | grep -v "include"`
-    else
-        LIBPATHS=''
-    fi
-
-    LIBPATHS="$LIBPATHS `echo $LD_LIBRARY_PATH | sed s/':'/' '/g` "
-    # Mac OS X has a different variable for this:
-    LIBPATHS="$LIBPATHS `echo $DYLD_LIBRARY_PATH | sed s/':'/' '/g` "
-
-    # recurse down just one level, should be enough in most cases
-    if test -f /etc/ld.so.conf ; then
-        INCL=`cat /etc/ld.so.conf | grep -v "#" | grep  "^include"`
-        SRCH=`echo "$INCL" | sed '{ s/^include \//\//; s/^include /\/etc\//}'`
-        for x in $SRCH ; do
-            LP_APPEND=`cat $x | grep -v "#" | grep -v "^include"`
-            LIBPATHS="$LIBPATHS $LP_APPEND"
-        done
-    fi
-
-    LIBPATHS="`echo $LIBPATHS /$libdir_name /usr/$libdir_name /usr/local/$libdir_name /usr/X11R6/$libdir_name | sed s/'\/ '/' '/g` "
-
-    HAS_IT="no"
-    for LIBPATH in $LIBPATHS ; do
-        if test x`ls $LIBPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
-            HAS_IT="yes"
-        fi
-    done
-    expr $HAS_IT : "yes" > /dev/null
-}
 
 append CCONFIG "$compile_type"
 if test x$compile_type = x"profile" ; then
@@ -1746,29 +1924,10 @@ fi
 enabled silent_cc && append CCONFIG "silent"
 
 
-if ! disabled logging ; then
-    oldlogfile="$logfile"
-    enabled logging || logfile="$logging"
-    if [ "x$oldlogfile" = "x$pre_logfile" ]; then
-        test x"$logfile" != x"$logging" && logfile="config.err"
-        mv "$oldlogfile" "$logfile" 2> /dev/null || echo >"$logfile"
-    else
-        echo >"$logfile"
-    fi
-    echo "# $0 $@" >>$logfile
-    set >>$logfile
-else
-    logfile=/dev/null
-fi
-
 # Combine FFLDFLAGS and the LDFLAGS environment variable
 LDFLAGS="$FFLDFLAGS $EXTRALDFLAGS $LDFLAGS"
 
 test -n "$cross_prefix" && enable cross_compile
-cc="${cross_prefix}${cc}"
-ar="${cross_prefix}${ar}"
-ranlib="${cross_prefix}${ranlib}"
-strip="${cross_prefix}${strip}"
 
 # we need to build at least one lib type
 if ! enabled_any static shared; then
@@ -1790,7 +1949,7 @@ if enabled_any libfaad libfaadbin ; then
 #ifndef FAAD2_VERSION
 ok faad1
 #endif
-int main( void ) { return 0; }
+int main(void) { return 0; }
 EOF
         test $? = 0 && enable libfaad2
     else
@@ -1805,14 +1964,20 @@ if ! enabled gpl; then
         shift
         enabled_any $@ && die "$name is under GPL and --enable-gpl is not specified."
     }
-    die_gpl_disabled "The Postprocessing code" pp
+    die_gpl_disabled "The Postprocessing code" postproc
     die_gpl_disabled "liba52"                  liba52
     die_gpl_disabled "libx264"                 libx264
     die_gpl_disabled "libxvidcore"             libxvid
     die_gpl_disabled "FAAD2"                   libfaad2
     die_gpl_disabled "The X11 grabber"         x11grab
-    die_gpl_disabled "The software scaler"     swscaler
+    die_gpl_disabled "The software scaler"     swscale
 fi
+
+if ! enabled nonfree && enabled_any libamr_nb libamr_wb; then
+    die "libamr is nonfree and --enable-nonfree is not specified."
+fi
+
+check_deps $ARCH_EXT_LIST
 
 # if no tune setting and we know cpu class look at $processor
 if ! enabled cpu_override && enabled proc_opt; then
@@ -1981,7 +2146,6 @@ if enabled proc_error_msg; then
     echo ""
 fi
 
-
 # compute mmx state
 if ! disabled mmx ; then
     disable mmx
@@ -2005,19 +2169,17 @@ if test $cpu = "generic"; then
     fi
 fi
 
-check_deps $ARCH_EXT_LIST
-
 test -z "$need_memalign" && need_memalign="$mmx"
 
 #Darwin CC versions
-if test $targetos = darwin; then
-    if test -n "`$cc -v 2>&1 | grep xlc`"; then
+if test $target_os = darwin; then
+    if $cc -v 2>&1 | grep -q xlc; then
         add_cflags "-qpdf2 -qlanglvl=extc99 -qmaxmem=-1 -qarch=auto -qtune=auto"
     else
-        add_cflags "-no-cpp-precomp -pipe"
+        add_cflags "-pipe"
         check_cflags "-force_cpusubtype_ALL"
         check_cflags "-Wno-sign-compare"
-        disabled shared && add_cflags -mdynamic-no-pic
+        enabled shared || check_cflags -mdynamic-no-pic
     fi
     # Apple GCC doesn't support march=core2 yet:
     if test $cpu == "core2"; then
@@ -2025,7 +2187,7 @@ if test $targetos = darwin; then
     fi
 fi
 
-disabled optimizations || add_optflags -fomit-frame-pointer
+disabled optimizations || check_optflags -fomit-frame-pointer
 
 # Add processor-specific flags
 if test $cpu != "generic"; then
@@ -2124,11 +2286,7 @@ if test $tune != "generic"; then
         sparc64)
             check_mtune_mcpu "v9"
         ;;
-        bf*) #bf531 bf532 bf533 bf561 bf5xx all get this config
-            add_cflags "-mfdpic"
-            add_ldflags "-mfdpic"
-        ;;
-        arm*)
+        arm*|cortex*)
             check_mtune_mcpu "$tune"
         ;;
         *)
@@ -2154,11 +2312,11 @@ if ! is_qmake4 $qmake; then
 fi
 
 # make sure we can execute files in $TMPDIR
-cat >$TMPE 2>>$logfile <<EOF
+cat > $TMPSH 2>> $logfile <<EOF
 #! /bin/sh
 EOF
-chmod +x $TMPE >>$logfile 2>&1
-if ! $TMPE >>$logfile 2>&1; then
+chmod +x $TMPSH >> $logfile 2>&1
+if ! $TMPSH >> $logfile 2>&1; then
     cat <<EOF
 Unable to create and execute files in $TMPDIR1.  Set the TMPDIR environment
 variable to another directory and make sure that $TMPDIR1 is not mounted
@@ -2166,22 +2324,28 @@ noexec.
 EOF
     die "Sanity test failed."
 fi
-rm $TMPE
+rm $TMPSH
 
 # compiler sanity check
 check_exec <<EOF
-int main(){
-    return 0;
-}
+int main(void){ return 0; }
 EOF
 if test "$?" != 0; then
     echo "$cc is unable to create an executable file."
     if test -z "$cross_prefix" && ! enabled cross_compile ; then
-        echo "If $cc is a cross-compiler, use the --cross-compile option."
+        echo "If $cc is a cross-compiler, use the --enable-cross-compile option."
         echo "Only do this if you know what cross compiling means."
     fi
     die "C compiler test failed."
 fi
+
+check_cc <<EOF || die "Symbol mangling check failed."
+int ff_extern;
+EOF
+sym=$($nm -P -g $TMPO | grep ff_extern)
+extern_prefix=${sym%%ff_extern*}
+
+check_asm inline_asm '""'
 
 if enabled x86; then
     # check whether EBP is available on x86
@@ -2199,8 +2363,21 @@ EOF
     # check wether EBX is available on x86
     check_asm ebx_available '"":::"%ebx"' -fPIC -DPIC
 
-    # check whether binutils is new enough to compile SSSE3
+    # check whether binutils is new enough to compile SSSE3/MMX2
     enabled ssse3 && check_asm ssse3 '"pabsw %xmm0, %xmm0"'
+    enabled mmx2  && check_asm mmx2  '"movss %xmm0, %xmm0"'
+
+    check_asm bswap '"bswap %%eax" ::: "%eax"'
+
+    YASMFLAGS="-f $objformat -DARCH_$(toupper $arch)"
+    enabled     x86_64        && append YASMFLAGS "-m amd64"
+    enabled_all x86_64 shared && append YASMFLAGS "-DPIC"
+    case "$objformat" in
+        elf) enabled debug && append YASMFLAGS "-g dwarf2" ;;
+        macho64)              append YASMFLAGS "-DPIC -DPREFIX" ;;
+        *)                    append YASMFLAGS "-DPREFIX"  ;;
+    esac
+    check_yasm "pabsw xmm0, xmm0" && enable yasm
 fi
 
 # check for assembler specific support
@@ -2220,17 +2397,14 @@ fi
 
 # AltiVec flags: The FSF version of GCC differs from the Apple version
 if enabled altivec; then
-    test -n "`$cc -v 2>&1 | grep version | grep Apple`" &&
-        add_cflags "-faltivec" && add_cppflags "-faltivec" ||
-        add_cflags "-maltivec -mabi=altivec" &&
-            add_cppflags "-maltivec -mabi=altivec"
-
-    check_header altivec.h
+    check_cflags -maltivec -mabi=altivec &&
+        { check_header altivec.h && inc_altivec_h="#include <altivec.h>" ; } ||
+        check_cflags -faltivec
+    check_cppflags -maltivec -mabi=altivec &&
+        { check_header altivec.h && inc_altivec_h="#include <altivec.h>" ; } ||
+        check_cppflags -faltivec
 
     # check if our compiler supports Motorola AltiVec C API
-    enabled altivec_h &&
-        inc_altivec_h="#include <altivec.h>" ||
-        inc_altivec_h=
     check_cc <<EOF || disable altivec
 $inc_altivec_h
 int main(void) {
@@ -2239,15 +2413,25 @@ int main(void) {
     return 0;
 }
 EOF
+
+    # check if our compiler supports braces for vector declarations
+    check_cc <<EOF || die "You need a compiler that supports {} in AltiVec vector declarations."
+$inc_altivec_h
+int main (void) { (vector int) {1}; return 0; }
+EOF
 fi
 
+# We have to check if pld is a nop and disable it.
+enabled armv4l  && check_asm pld     '"pld [r0]"'
 enabled armv5te && check_asm armv5te '"qadd r0, r0, r0"'
 enabled armv6   && check_asm armv6   '"sadd16 r0, r0, r0"'
+enabled armvfp  && check_asm armvfp  '"fadds s0, s0, s0"'
 enabled iwmmxt  && check_asm iwmmxt  '"wunpckelub wr6, wr4"'
 enabled mmi     && check_asm mmi     '"lq $2, 0($2)"'
-enabled vis     &&
-                  (check_asm vis     '"pdist %f0, %f0, %f0"' -mtune=ultrasparc ||
-                   check_asm vis     '"pdist %f0, %f0, %f0"' -mcpu=ultrasparc)
+enabled neon    && check_asm neon    '"vadd.i16 q0, q0, q0"'
+enabled vis     && check_asm vis     '"pdist %f0, %f0, %f0"' -mcpu=ultrasparc
+
+enabled vis && add_cflags "-mcpu=ultrasparc -mtune=ultrasparc"
 
 
 enabled vis && check_mtune_mcpu "ultrasparc"
@@ -2339,7 +2523,7 @@ fi
 check_cc <<EOF || die "endian test failed"
 unsigned int endian = 'B' << 24 | 'I' << 16 | 'G' << 8 | 'E';
 EOF
-grep -q BIGE $TMPO && enable bigendian
+od -A n -t x1 $TMPO | grep -q '42 *49 *47 *45' && enable bigendian
 
 # ---
 # check availability of some header files
@@ -2350,18 +2534,22 @@ elif check_func dlopen -ldl; then
     ldl=-ldl
 fi
 
-check_func fork
-check_func gethrtime
-check_func getrusage
-check_func inet_aton
-check_func memalign
-check_func mkstemp
+check_func  fork
+check_func  gethrtime
+check_func  getrusage
+check_func  inet_aton $network_extralibs
+check_func  memalign
+check_func  mkstemp
 check_func2 windows.h GetProcessTimes
 
 check_header byteswap.h
 check_header conio.h
 check_header dlfcn.h
 check_header malloc.h
+check_header poll.h
+check_header sys/mman.h
+check_header sys/resource.h
+check_header sys/select.h
 check_header termios.h
 
 check_func posix_fadvise
@@ -2373,13 +2561,8 @@ if ! enabled_any memalign memalign_hack && enabled need_memalign ; then
     die "Error, no memalign() but SSE enabled, disable it or use --enable-memalign-hack."
 fi
 
-enabled zlib && check_lib zlib.h zlibVersion -lz || disable zlib
-
-# ffserver uses poll(),
-# if it's not found we can emulate it using select().
-if enabled ffserver; then
-    check_header sys/poll.h
-fi
+enabled  zlib && check_lib  zlib.h      zlibVersion -lz   || disable  zlib
+enabled bzlib && check_lib bzlib.h BZ2_bzlibVersion -lbz2 || disable bzlib
 
 enabled ffmpeg_pthreads && enable pthreads
 
@@ -2390,10 +2573,12 @@ if enabled pthreads; then
         :
     elif check_func pthread_create -pthread; then
         add_cflags -pthread
-        add_ldflags -pthread
+        add_extralibs -pthread
     elif check_func pthread_create -pthreads; then
         add_cflags -pthreads
-        add_ldflags -pthreads
+        add_extralibs -pthreads
+    elif check_func pthread_create -lpthreadGC2; then
+        add_extralibs -lpthreadGC2
     elif ! check_lib pthread.h pthread_create -lpthread; then
         disable ffmpeg_pthreads pthreads
     fi
@@ -2409,34 +2594,43 @@ done
 
 check_lib math.h sin -lm
 
-# test for lrintf in math.h
-check_exec <<EOF && enable lrintf || disable lrintf
-#define _ISOC9X_SOURCE  1
+# test for C99 functions in math.h
+for func in llrint lrint lrintf round roundf; do
+    check_exec <<EOF && enable $func || disable $func
 #include <math.h>
-int main( void ) { return (lrintf(3.999f) > 0)?0:1; }
+int main(void) { return ($func(3.999f) > 0)?0:1; }
 EOF
-
-enabled_any libamr_nb libamr_wb && enable libamr
+done
 
 # these are off by default, so fail if requested and not available
 enabled avisynth   && require2 vfw32 "windows.h vfw.h" AVIFileInit -lvfw32
-enabled liba52     && require liba52 a52dec/a52.h a52_init -la52
-enabled libamr_nb  && require libamrnb amrnb/interf_dec.h Speech_Decode_Frame_init -lamrnb -lm
-enabled libamr_wb  && require libamrwb amrwb/dec_if.h D_IF_init -lamrwb -lm
-enabled libdc1394  && require libdc1394 libdc1394/dc1394_control.h dc1394_create_handle -ldc1394_control -lraw1394
+enabled liba52     && require  liba52 a52dec/a52.h a52_init -la52
+enabled libamr_nb  && require  libamrnb amrnb/interf_dec.h Speech_Decode_Frame_init -lamrnb -lm
+enabled libamr_wb  && require  libamrwb amrwb/dec_if.h D_IF_init -lamrwb -lm
+enabled libdirac   && add_cflags "$(pkg-config --cflags dirac)" \
+                   && require  libdirac libdirac_decoder/dirac_parser.h dirac_decoder_init -ldirac_decoder \
+                   && require  libdirac libdirac_encoder/dirac_encoder.h dirac_encoder_init -ldirac_encoder
 enabled libfaac    && require2 libfaac "stdint.h faac.h" faacEncGetVersion -lfaac
 enabled libfaad    && require2 libfaad faad.h faacDecOpen -lfaad
-enabled libgsm     && require libgsm gsm.h gsm_create -lgsm
-enabled libmp3lame && require LAME lame/lame.h lame_init -lmp3lame -lm
-enabled libnut     && require libnut libnut.h nut_demuxer_init -lnut
-enabled libtheora  && require libtheora theora/theora.h theora_info_init -ltheora -logg
-enabled libvorbis  && require libvorbis vorbis/vorbisenc.h vorbis_info_init -lvorbisenc -lvorbis -logg
-enabled libx264    && require x264 x264.h x264_encoder_open -lx264
-enabled libxvid    && require Xvid xvid.h xvid_global -lxvidcore
-enabled mlib       && require mediaLib mlib_types.h mlib_VectorSub_S16_U8_Mod -lmlib
+enabled libgsm     && require  libgsm gsm.h gsm_create -lgsm
+enabled libmp3lame && require  LAME lame/lame.h lame_init -lmp3lame -lm
+enabled libnut     && require  libnut libnut.h nut_demuxer_init -lnut
+enabled libschroedinger && add_cflags $(pkg-config --cflags schroedinger-1.0) \
+                        && require libschroedinger schroedinger/schro.h schro_init $(pkg-config --libs schroedinger-1.0)
+enabled libtheora  && require  libtheora theora/theora.h theora_info_init -ltheora -logg
+enabled libvorbis  && require  libvorbis vorbis/vorbisenc.h vorbis_info_init -lvorbisenc -lvorbis -logg
+enabled libx264    && require  x264 x264.h x264_encoder_open -lx264 -lm
+enabled libxvid    && require  Xvid xvid.h xvid_global -lxvidcore
+enabled mlib       && require  mediaLib mlib_types.h mlib_VectorSub_S16_U8_Mod -lmlib
 
-# disable the native AC-3 decoder if liba52 is enabled
-enabled liba52 && disable ac3_decoder
+# libdc1394 check
+if enabled libdc1394; then
+    { check_lib dc1394/dc1394.h dc1394_new -ldc1394 -lraw1394 &&
+        enable libdc1394_2; } ||
+    { check_lib libdc1394/dc1394_control.h dc1394_create_handle -ldc1394_control -lraw1394 &&
+        enable libdc1394_1; } ||
+    die "ERROR: No version of libdc1394 found "
+fi
 
 check_header stdint.h
 
@@ -2477,7 +2671,7 @@ done
 
 test "$vhook" = "default" && vhook="$dlopen"
 
-if test "$targetos" = cygwin -o "$targetos" = mingw32 && enabled_all static vhook ; then
+if test "$target_os" = cygwin -o "$target_os" = mingw32 && enabled_all static vhook ; then
     disable vhook
     echo
     echo "At the moment vhooks don't work on Cygwin or MinGW static builds."
@@ -2523,11 +2717,11 @@ fi
 disable sdl_too_old
 disable sdl
 #SDL_CONFIG="${cross_prefix}sdl-config"
-if "${SDL_CONFIG}" --version >/dev/null 2>&1; then
+if "${SDL_CONFIG}" --version > /dev/null 2>&1; then
     sdl_cflags=`"${SDL_CONFIG}" --cflags`
     temp_cflags $sdl_cflags
     temp_extralibs `"${SDL_CONFIG}" --libs`
-    if check_lib SDL.h SDL_Init; then
+    if check_lib2 SDL.h SDL_Init; then
         _sdlversion=`"${SDL_CONFIG}" --version | sed 's/[^0-9]//g'`
         if test "$_sdlversion" -lt 121 ; then
             enable sdl_too_old
@@ -2535,7 +2729,7 @@ if "${SDL_CONFIG}" --version >/dev/null 2>&1; then
             enable sdl
             check_cc $sdl_cflags <<EOF && enable sdl_video_size
 #include <SDL.h>
-int main(void){
+int main(int argc, char **argv){
     const SDL_VideoInfo *vi = SDL_GetVideoInfo();
     int w = vi->current_w;
     return 0;
@@ -2546,17 +2740,19 @@ EOF
     restore_flags
 fi
 
-texi2html -version >/dev/null 2>&1 && enable texi2html || disable texi2html
+texi2html -version > /dev/null 2>&1 && enable texi2html || disable texi2html
 
 ##########################################
 # Network check
 
 if enabled network; then
+    check_type sys/socket.h socklen_t
     # Prefer arpa/inet.h over winsock2
     if check_header arpa/inet.h ; then
         check_func closesocket
     elif check_header winsock2.h ; then
         network_extralibs="-lws2_32"
+        check_type ws2tcpip.h socklen_t
         check_func2 winsock2.h closesocket
     fi
 fi
@@ -2569,17 +2765,19 @@ enabled network && enabled ipv6 && check_ld <<EOF && enable ipv6 || disable ipv6
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
-int main( void ) {
-  struct sockaddr_storage saddr;
-  struct ipv6_mreq mreq6;
-  getaddrinfo(0,0,0,0);
-  getnameinfo(0,0,0,0,0,0,0);
-  IN6_IS_ADDR_MULTICAST((const struct in6_addr *)0);
+int main(void) {
+    struct sockaddr_storage saddr;
+    struct ipv6_mreq mreq6;
+    getaddrinfo(0,0,0,0);
+    getnameinfo(0,0,0,0,0,0,0);
+    IN6_IS_ADDR_MULTICAST((const struct in6_addr *)0);
 }
 EOF
 
 check_header linux/videodev.h
 check_header linux/videodev2.h
+
+check_func2 "windows.h vfw.h" capCreateCaptureWindow -lvfw32
 
 # check for ioctl_meteor.h, ioctl_bt848.h and alternatives
 { check_header dev/bktr/ioctl_meteor.h &&
@@ -2613,14 +2811,14 @@ check_header soundcard.h
     enable  audio_jack ||
     disable audio_jack
 
-# Deal with the x11 frame grabber
+# deal with the x11 frame grabber
 enabled x11grab                         &&
 check_header X11/Xlib.h                 &&
 check_header X11/extensions/XShm.h      &&
 check_func XOpenDisplay -lX11           &&
 check_func XShmCreateImage -lX11 -lXext
 
-enabled debug && add_cflags -g
+enabled debug && add_cflags -g"$debuglevel"
 enabled debug && add_cppflags -g
 
 # add some useful compiler flags if supported
@@ -2631,7 +2829,10 @@ check_cflags -Wdisabled-optimization
 check_cflags -Wpointer-arith
 check_cflags -Wredundant-decls
 check_cflags -Wno-pointer-sign
+check_cflags -Wcast-qual
 check_cflags -funit-at-a-time
+check_cflags -Wwrite-strings
+check_cflags -Wtype-limits
 enabled extra_warnings && check_cflags -Winline
 # C++ Flags
 check_cppflags -Wall
@@ -2645,7 +2846,9 @@ check_cppflags -D__STDC_CONSTANT_MACROS
 
 # add some linker flags
 check_ldflags -Wl,--warn-common
-check_ldflags $LDLATEFLAGS
+check_ldflags -Wl,--as-needed
+check_ldflags '-Wl,-rpath-link,\$(BUILD_ROOT)/libpostproc -Wl,-rpath-link,\$(BUILD_ROOT)/libswscale -Wl,-rpath-link,\$(BUILD_ROOT)/libavfilter -Wl,-rpath-link,\$(BUILD_ROOT)/libavdevice -Wl,-rpath-link,\$(BUILD_ROOT)/libavformat -Wl,-rpath-link,\$(BUILD_ROOT)/libavcodec -Wl,-rpath-link,\$(BUILD_ROOT)/libavutil'
+check_ldflags -Wl,-Bsymbolic
 
 # GCC version
 gcc_version=$($cc -dumpversion)
@@ -2721,7 +2924,7 @@ if enabled firewire; then
             fi
         fi
     fi
-    if test $targetos = darwin; then
+    if test $target_os = darwin; then
         # This should pick the newest. e.g. FireWireSDK21 instead of 20
         # Unfortunately, the location keeps changing:
         #/Developer/FireWireSDK20/Examples/AVCVideoServices/Framework
@@ -2792,11 +2995,11 @@ enabled xvmc_pro && enable xvmc_vld
 
 
 # Can only do Mac accel on Mac platform
-enabled dvdv && test $targetos = darwin || disable dvdv
+enabled dvdv && test $target_os = darwin || disable dvdv
 
 # CoreVideo in only available on Mac OS 10.4, or on 10.3 with QuickTime 7.
 # This checks for it, and some other calls that the module needs
-if test $targetos = darwin; then
+if test $target_os = darwin; then
     cat > $TMPC << EOF
 #include <QuartzCore/CVDisplayLink.h>
 #include <AGL/agl.h>
@@ -2828,7 +3031,7 @@ if enabled directfb; then
     fi
 fi
 
-if test $targetos = darwin; then
+if test $target_os = darwin; then
     # So far, only OS X 10.4 has this as a non-private framework
     if test -d /System/Library/Frameworks/DiskArbitration.framework/Headers ; then
         darwin_da="yes"
@@ -2839,12 +3042,30 @@ if enabled small; then
     check_cflags -Os            # not all compilers support -Os
     optimizations="small"
 elif enabled optimizations; then
-    if test -n "`$cc -v 2>&1 | grep xlc`"; then
+    if $cc -v 2>&1 | grep -q xlc; then
         add_optflags  "-O5"
         add_ldflags "-O5"
     else
         add_optflags "-O3"
     fi
+fi
+check_cflags -fno-math-errno
+check_cflags -fno-signed-zeros
+
+# add some flags for Intel C Compiler
+if $cc --version | grep -q Intel; then
+  # Just warnings, no remarks
+  check_cflags -w1
+  # -wd: Disable following warnings
+  # 144, 167, 556: -Wno-pointer-sign
+  # 10006: ignoring unknown option -fno-signed-zeros
+  # 10156: ignoring option '-W'; no argument required
+  check_cflags -wd144,167,556,10006,10156
+  # 11030: Warning unknown option --as-needed
+  # 10156: ignoring option '-export'; no argument required
+  check_ldflags -wd10156,11030
+  # Allow to compile with optimizations
+  check_ldflags -march=$cpu
 fi
 
 # PIC flags for shared library objects where they are needed
@@ -2852,7 +3073,7 @@ if enabled shared; then
     # LIBOBJFLAGS may have already been set in the OS configuration
     if test -z "$LIBOBJFLAGS" ; then
         case "$arch" in
-            x86_64|ia64|alpha|sparc*|power*) LIBOBJFLAGS='$(PIC)' ;;
+            x86_64|ia64|alpha|sparc*|power*|parisc*) LIBOBJFLAGS='$(PIC)' ;;
         esac
     fi
 fi
@@ -2870,32 +3091,38 @@ if test $asmalign_pot = "unknown"; then
     echo 'asm (".align 3");' | check_cc && enable asmalign_pot
 fi
 
-enabled_any $ENCODER_LIST  && enable encoders
-enabled_any $DECODER_LIST  && enable decoders
-enabled_any $MUXER_LIST    && enable muxers
-enabled_any $DEMUXER_LIST  && enable demuxers
-enabled_any $PROTOCOL_LIST && enable protocols
-enabled_any $BSF_LIST      && enable bsfs
+enabled_any $DECODER_LIST      && enable decoders
+enabled_any $ENCODER_LIST      && enable encoders
+enabled_any $BSF_LIST          && enable bsfs
+enabled_any $DEMUXER_LIST      && enable demuxers
+enabled_any $MUXER_LIST        && enable muxers
+enabled_any $FILTER_LIST       && enable filters
+enabled_any $INDEV_LIST        && enable demuxers
+enabled_any $OUTDEV_LIST       && enable muxers
+enabled_any $PROTOCOL_LIST     && enable protocols
 
-enabled_any $THREADS_LIST  && enable threads
+enabled_any $THREADS_LIST      && enable threads
 
-check_deps $CONFIG_LIST $HAVE_LIST $DECODER_LIST $ENCODER_LIST $PARSER_LIST \
-    $BSF_LIST $DEMUXER_LIST $MUXER_LIST $PROTOCOL_LIST
-
-check_deps $MYTHTV_LIST $MYTHTV_CONFIG_LIST $USING_LIST
+check_deps $CONFIG_LIST       \
+           $HAVE_LIST         \
+           $DECODER_LIST      \
+           $ENCODER_LIST      \
+           $PARSER_LIST       \
+           $BSF_LIST          \
+           $DEMUXER_LIST      \
+           $MUXER_LIST        \
+           $FILTER_LIST       \
+           $INDEV_LIST        \
+           $OUTDEV_LIST       \
+           $PROTOCOL_LIST     \
+           $MYTHTV_LIST       \
+           $MYTHTV_CONFIG_LIST \
+           $USING_LIST        \
 
 enabled libdc1394 && append pkg_requires "libraw1394"
+enabled libdirac  && append pkg_requires "dirac"
 enabled libtheora && append pkg_requires "theora"
 enabled libvorbis && append pkg_requires "vorbisenc"
-
-
-if test x"$libdir" = x""; then
-    libdir="${PREFIX}/${libdir_name}"
-fi
-
-if test x"$RUNPREFIX" = x""; then
-    RUNPREFIX=$PREFIX
-fi
 
 echo "# Basic Settings"
 echo "Compile type              $compile_type"
@@ -2906,12 +3133,11 @@ fi
 echo "Compiler cache            $ccache$ccache_txt"
 echo "DistCC                    $distcc$distcc_txt"
 echo "qmake                     $(which $qmake)"
-echo "install prefix            $PREFIX"
-echo "runtime prefix            $RUNPREFIX"
+echo "install prefix            $prefix"
+echo "runtime prefix            $runprefix"
 <<BLOCK_QUOTE
 echo "source path               $source_path"
 echo "C compiler                $cc"
-echo "make                      $make"
 echo ".align is power-of-two    $asmalign_pot"
 echo "ARCH                      $arch ($cpu)"
 BLOCK_QUOTE
@@ -2925,12 +3151,13 @@ else
     echo "CPU                       $arch"
 fi
 <<BLOCK_QUOTE
-if test "$BUILDSUF" != ""; then
-    echo "build suffix              $BUILDSUF"
+if test "$build_suffix" != ""; then
+    echo "build suffix              $build_suffix"
 fi
 BLOCK_QUOTE
 echo "big-endian                ${bigendian-no}"
 if test $arch = "x86_32" -o $arch = "x86_64"; then
+    echo "yasm                      ${yasm-no}"
     echo "MMX enabled               ${mmx-no}"
     echo "CMOV enabled              ${cmov-no}"
     echo "CMOV is fast              ${fast_cmov-no}"
@@ -2942,7 +3169,9 @@ fi
 if test $arch = "armv4l"; then
     echo "ARMv5TE enabled           ${armv5te-no}"
     echo "ARMv6 enabled             ${armv6-no}"
+    echo "ARM VFP enabled           ${armvfp-no}"
     echo "IWMMXT enabled            ${iwmmxt-no}"
+    echo "NEON enabled              ${neon-no}"
 fi
 if test $arch = "mips"; then
     echo "MMI enabled               ${mmi-no}"
@@ -2954,12 +3183,14 @@ fi
 <<BLOCK_QUOTE
 echo "gprof enabled             ${gprof-no}"
 echo "debug symbols             ${debug-no}"
-echo "strip symbols             ${dostrip-no}"
+echo "strip symbols             ${stripping-no}"
 echo "optimizations             ${optimizations-no}"
 echo "static                    ${static-no}"
 echo "shared                    ${shared-no}"
-echo "postprocessing support    ${pp-no}"
-echo "software scaler enabled   ${swscaler-no}"
+echo "postprocessing support    ${postproc-no}"
+echo "software scaler enabled   ${swscale-no}"
+echo "new filter support        ${avfilter-no}"
+echo "filters using lavformat   ${avfilter_lavf-no}"
 echo "video hooking             ${vhook-no}"
 if enabled vhook; then
     echo "Imlib2 support            ${imlib2-no}"
@@ -2981,32 +3212,37 @@ echo "liba52 dlopened           ${liba52bin-no}"
 echo "libamr-nb support         ${libamr_nb-no}"
 echo "libamr-wb support         ${libamr_wb-no}"
 echo "libdc1394 support         ${libdc1394-no}"
+echo "libdirac enabled          ${libdirac-no}"
 echo "libfaac enabled           ${libfaac-no}"
 echo "libfaad enabled           ${libfaad-no}"
 echo "libfaad dlopened          ${libfaadbin-no}"
 echo "libgsm enabled            ${libgsm-no}"
 echo "libmp3lame enabled        ${libmp3lame-no}"
 echo "libnut enabled            ${libnut-no}"
+echo "libschroedinger enabled   ${libschroedinger-no}"
 echo "libtheora enabled         ${libtheora-no}"
 echo "libvorbis enabled         ${libvorbis-no}"
-echo "x264 enabled              ${libx264-no}"
-echo "XviD enabled              ${libxvid-no}"
+echo "libx264 enabled           ${libx264-no}"
+echo "libxvid enabled           ${libxvid-no}"
 echo "zlib enabled              ${zlib-no}"
-enabled gpl &&
-    echo "License: GPL" ||
-    echo "License: LGPL"
+echo "bzlib enabled             ${bzlib-no}"
+echo
 
-for type in decoder encoder parser demuxer muxer protocol bsf; do
+for type in decoder encoder parser demuxer muxer protocol filter bsf indev outdev; do
     echo "Enabled ${type}s:"
-    ucname="\$`toupper $type`_LIST"
-    list="`eval echo $ucname`"
-    partlist=""
+    eval list=\$$(toupper $type)_LIST
     for part in $list; do
-        enabled $part && partlist="$partlist $part"
-    done
-    partlist=`echo $partlist | sed s/_$type//g | tr ' ' '\n' | sort`
-    echo $partlist
+        enabled $part && echo ${part%_*}
+    done | sort | pr -3 -t
+    echo
 done
+
+license="LGPL"
+if enabled nonfree; then
+    license="unredistributable"
+elif enabled gpl; then
+    license="GPL"
+fi
 
 BLOCK_QUOTE
 
@@ -3015,7 +3251,7 @@ if enabled frontend; then
   echo "# Input Support"
   echo "Joystick menu             ${joystick_menu-no}"
   echo "lirc support              ${lirc-no}"
-  if test x"$targetos" = x"darwin" ; then
+  if test x"$target_os" = x"darwin" ; then
     echo "Apple Remote              ${appleremote-no}"
   fi
 fi
@@ -3038,7 +3274,7 @@ if enabled frontend; then
   echo "ALSA support              ${audio_alsa-no}"
   echo "aRts support              ${audio_arts-no}"
   echo "JACK support              ${audio_jack-no}"
-  if test x"$targetos" = x"mingw32" ; then
+  if test x"$target_os" = x"mingw32" ; then
     echo "Windows support           yes"
   fi
   echo "libfftw3 support          ${libfftw3-no}"
@@ -3057,7 +3293,7 @@ if test "$VENDOR_XVMC_LIBS" != "" ; then
 fi
 fi
   echo "OpenGL video              ${opengl_video-no}"
-  if test x"$targetos" = x"darwin" ; then
+  if test x"$target_os" = x"darwin" ; then
     echo "Mac acceleration          ${dvdv-no}"
   fi
   echo "OpenGL vsync              ${opengl_vsync-no}"
@@ -3065,7 +3301,7 @@ fi
   if enabled windows ; then
     echo "DirectX                   ${directx-no}"
   fi
-  if test x"$targetos" = x"mingw32" ; then
+  if test x"$target_os" = x"mingw32" ; then
     echo "Windows (Direct3D)        yes"
   fi
   echo "Fribidi formatting        ${fribidi}"
@@ -3096,8 +3332,8 @@ echo "#ifndef FFMPEG_CONFIG_H" >> $TMPH
 echo "#define FFMPEG_CONFIG_H" >> $TMPH
 echo "#define FFMPEG_CONFIGURATION \"$FFMPEG_CONFIGURATION\"" >> $TMPH
 
-echo "RUNPREFIX=$RUNPREFIX" >> $MYTH_CONFIG_MAK
-echo "PREFIX=$PREFIX" >> $MYTH_CONFIG_MAK
+echo "RUNPREFIX=$runprefix" >> $MYTH_CONFIG_MAK
+echo "PREFIX=$prefix" >> $MYTH_CONFIG_MAK
 echo "LIBDIRNAME=$libdir_name" >> $MYTH_CONFIG_MAK
 echo "LIBDIR=$libdir" >> $MYTH_CONFIG_MAK
 <<BLOCK_QUOTE
@@ -3105,33 +3341,36 @@ echo "SHLIBDIR=\$(DESTDIR)$shlibdir" >> config.mak
 echo "INCDIR=\$(DESTDIR)$incdir" >> config.mak
 echo "BINDIR=\$(DESTDIR)$bindir" >> config.mak
 echo "MANDIR=\$(DESTDIR)$mandir" >> config.mak
-echo "MAKE=$make" >> config.mak
 echo "CC=$cc" >> config.mak
+echo "YASM=$yasmexe" >> config.mak
 echo "AR=$ar" >> config.mak
 echo "RANLIB=$ranlib" >> config.mak
-echo "LDCONFIG=$LDCONFIG" >> config.mak
 echo "LN_S=$ln_s" >> config.mak
-enabled dostrip &&
+enabled stripping &&
     echo "STRIP=$strip" >> config.mak ||
     echo "STRIP=echo ignoring strip" >> config.mak
 BLOCK_QUOTE
 echo "QMAKE_CC=$cc" >> $MYTH_CONFIG_MAK
 echo "QMAKE_CXX=$cxx" >> $MYTH_CONFIG_MAK
 echo "QMAKE_LINK=$cxx" >> $MYTH_CONFIG_MAK
+echo "YASM=$yasmexe" >> $MYTH_CONFIG_MAK
 echo "ARCHFLAGS=$ARCHFLAGS" >> $MYTH_CONFIG_MAK
 echo "PROFILEFLAGS=$PROFILEFLAGS" >> $MYTH_CONFIG_MAK
 echo "OPTFLAGS=$OPTFLAGS" >> $MYTH_CONFIG_MAK
 echo "ECFLAGS=$CFLAGS $ECFLAGS" >> $MYTH_CONFIG_MAK
 echo "ECXXFLAGS=$ECXXFLAGS" >> $MYTH_CONFIG_MAK
+echo "LDFLAGS=$LDFLAGS" >> $MYTH_CONFIG_MAK
+echo "YASMFLAGS=$YASMFLAGS" >> $MYTH_CONFIG_MAK
 <<BLOCK_QUOTE
-echo "LDFLAGS=$LDFLAGS" >> config.mak
+echo "VHOOKCFLAGS=$VHOOKCFLAGS" >> config.mak
 echo "FFSERVERLDFLAGS=$FFSERVERLDFLAGS" >> config.mak
 echo "SHFLAGS=$SHFLAGS" >> config.mak
+echo "YASMFLAGS=$YASMFLAGS" >> config.mak
 echo "VHOOKSHFLAGS=$VHOOKSHFLAGS" >> config.mak
 echo "VHOOKLIBS=$VHOOKLIBS" >> config.mak
 echo "LIBOBJFLAGS=$LIBOBJFLAGS" >> config.mak
 echo "BUILD_STATIC=$static" >> config.mak
-echo "BUILDSUF=$BUILDSUF" >> config.mak
+echo "BUILDSUF=$build_suffix" >> config.mak
 echo "FULLNAME=$FULLNAME" >> config.mak
 echo "LIBPREF=$LIBPREF" >> config.mak
 echo "LIBSUF=$LIBSUF" >> config.mak
@@ -3139,68 +3378,80 @@ echo "LIBNAME=$LIBNAME" >> config.mak
 echo "SLIBPREF=$SLIBPREF" >> config.mak
 echo "SLIBSUF=$SLIBSUF" >> config.mak
 echo "EXESUF=$EXESUF" >> config.mak
+echo "DEPEND_CMD=$DEPEND_CMD" >> config.mak
 BLOCK_QUOTE
 
 if enabled bigendian; then
-  echo "WORDS_BIGENDIAN=yes" >> $MYTH_CONFIG_MAK
-  echo "#define WORDS_BIGENDIAN 1" >> $TMPH
+    echo "WORDS_BIGENDIAN=yes" >> $MYTH_CONFIG_MAK
+    echo "#define WORDS_BIGENDIAN 1" >> $TMPH
 fi
 
 if enabled cpuclipspositive; then
-  echo "#define CPU_CLIPS_POSITIVE 1" >> $TMPH
+    echo "#define CPU_CLIPS_POSITIVE 1" >> $TMPH
 else
-  echo "#define CPU_CLIPS_POSITIVE 0" >> $TMPH
+    echo "#define CPU_CLIPS_POSITIVE 0" >> $TMPH
 fi
 if enabled cpuclipsnegative; then
-  echo "#define CPU_CLIPS_NEGATIVE 1" >> $TMPH
+    echo "#define CPU_CLIPS_NEGATIVE 1" >> $TMPH
 else
-  echo "#define CPU_CLIPS_NEGATIVE 0" >> $TMPH
+   echo "#define CPU_CLIPS_NEGATIVE 0" >> $TMPH
 fi
 if enabled freetype2; then
-  echo "HAVE_FREETYPE2=yes" >> $MYTH_CONFIG_MAK
-  echo "FREETYPE_CFLAGS=`freetype-config --cflags`" >> $MYTH_CONFIG_MAK
-  echo "FREETYPE_LIBS=`freetype-config --libs`" >> $MYTH_CONFIG_MAK
+    echo "HAVE_FREETYPE2=yes" >> $MYTH_CONFIG_MAK
+    echo "FREETYPE_CFLAGS=`freetype-config --cflags`" >> $MYTH_CONFIG_MAK
+    echo "FREETYPE_LIBS=`freetype-config --libs`" >> $MYTH_CONFIG_MAK
 fi
 if enabled fribidi; then
-  echo "FRIBIDI_LIBS=`${FRIBIDI_CONFIG} --libs`" >> $MYTH_CONFIG_MAK
-  echo "FRIBIDI_CFLAGS=`${FRIBIDI_CONFIG} --cflags`" >> $MYTH_CONFIG_MAK
+    echo "FRIBIDI_LIBS=`${FRIBIDI_CONFIG} --libs`" >> $MYTH_CONFIG_MAK
+    echo "FRIBIDI_CFLAGS=`${FRIBIDI_CONFIG} --cflags`" >> $MYTH_CONFIG_MAK
 fi
 if enabled sdl; then
-  echo "SDL_LIBS=`"${SDL_CONFIG}" --libs`" >> $MYTH_CONFIG_MAK
-  echo "SDL_CFLAGS=`"${SDL_CONFIG}" --cflags`" >> $MYTH_CONFIG_MAK
+    echo "SDL_LIBS=`"${SDL_CONFIG}" --libs`" >> $MYTH_CONFIG_MAK
+    echo "SDL_CFLAGS=`"${SDL_CONFIG}" --cflags`" >> $MYTH_CONFIG_MAK
 fi
 <<BLOCK_QUOTE
 if enabled texi2html; then
-  echo "BUILD_DOC=yes" >> config.mak
+    echo "BUILD_DOC=yes" >> config.mak
 fi
 BLOCK_QUOTE
 
 echo "#define SIZEOF_INT $_sizeof_int" >> $TMPH
 echo "#define SIZEOF_LONG $_sizeof_long" >> $TMPH
 
+get_version(){
+    name=$1
+    file=$source_path/$2
+    eval $(grep "#define ${name}_VERSION_M" "$file" | awk '{ print $2"="$3 }')
+    eval ${name}_VERSION=\$${name}_VERSION_MAJOR.\$${name}_VERSION_MINOR.\$${name}_VERSION_MICRO
+    lcname=$(tolower $name)
+    eval echo "${lcname}_VERSION=\$${name}_VERSION" >> $MYTH_CONFIG_MAK
+    eval echo "${lcname}_VERSION_MAJOR=\$${name}_VERSION_MAJOR" >> $MYTH_CONFIG_MAK
+}
+
+get_version LIBSWSCALE  libs/libswscale/swscale.h
+get_version LIBPOSTPROC libs/libpostproc/postprocess.h
+get_version LIBAVCODEC  libs/libavcodec/avcodec.h
+#get_version LIBAVDEVICE libs/libavdevice/avdevice.h
+get_version LIBAVFORMAT libs/libavformat/avformat.h
+get_version LIBAVUTIL   libs/libavutil/avutil.h
+#get_version LIBAVFILTER libs/libavfilter/avfilter.h
+
 if enabled shared; then
-  echo "BUILD_SHARED=yes" >> $MYTH_CONFIG_MAK
-  echo "PIC=-fPIC -DPIC" >> $MYTH_CONFIG_MAK
+    echo "BUILD_SHARED=yes" >> $MYTH_CONFIG_MAK
+    echo "PIC=-fPIC -DPIC" >> $MYTH_CONFIG_MAK
 <<BLOCK_QUOTE
-  echo "SPPMAJOR=${pp_version%%.*}" >> config.mak
-  echo "SPPVERSION=$pp_version" >> config.mak
-  echo "LAVCMAJOR=${lavc_version%%.*}" >> config.mak
-  echo "LAVCVERSION=$lavc_version" >> config.mak
-  echo "LAVFMAJOR=${lavf_version%%.*}" >> config.mak
-  echo "LAVFVERSION=$lavf_version" >> config.mak
-  echo "LAVUMAJOR=${lavu_version%%.*}" >> config.mak
-  echo "LAVUVERSION=$lavu_version" >> config.mak
-  echo "SWSMAJOR=${sws_version%%.*}" >> config.mak
-  echo "SWSVERSION=$sws_version" >> config.mak
-  echo "SLIBNAME=${SLIBNAME}" >> config.mak
-  echo "SLIBNAME_WITH_VERSION=${SLIBNAME_WITH_VERSION}" >> config.mak
-  echo "SLIBNAME_WITH_MAJOR=${SLIBNAME_WITH_MAJOR}" >> config.mak
-  echo "SLIB_EXTRA_CMD=${SLIB_EXTRA_CMD}" >> config.mak
-  echo "SLIB_INSTALL_EXTRA_CMD=${SLIB_INSTALL_EXTRA_CMD}" >> config.mak
+    echo "LIBTARGET=${LIBTARGET}" >> config.mak
+    echo "SLIBNAME=${SLIBNAME}" >> config.mak
+    echo "SLIBNAME_WITH_VERSION=${SLIBNAME_WITH_VERSION}" >> config.mak
+    echo "SLIBNAME_WITH_MAJOR=${SLIBNAME_WITH_MAJOR}" >> config.mak
+    echo "SLIB_CREATE_DEF_CMD=${SLIB_CREATE_DEF_CMD}" >> config.mak
+    echo "SLIB_EXTRA_CMD=${SLIB_EXTRA_CMD}" >> config.mak
+    echo "SLIB_INSTALL_EXTRA_CMD=${SLIB_INSTALL_EXTRA_CMD}" >> config.mak
+    echo "SLIB_UNINSTALL_EXTRA_CMD=${SLIB_UNINSTALL_EXTRA_CMD}" >> config.mak
 BLOCK_QUOTE
 fi
 if enabled pthreads; then
-  if test $targetos != freebsd -a $targetos != openbsd ; then
+  if test $target_os != freebsd -a $target_os != openbsd ; then
      extralibs="$extralibs -lpthread"
   fi
 fi
@@ -3230,7 +3481,7 @@ if enabled darwin_da; then
   echo "SLIB_UNINSTALL_EXTRA_CMD=${SLIB_UNINSTALL_EXTRA_CMD}" >> $MYTH_CONFIG_MAK
 fi
 
-if test $targetos = darwin; then
+if test $target_os = darwin; then
   # Qt, by default builds .app bundles everywhere. Prevent this.
   enabled mac_bundle || echo "CONFIG -= app_bundle" >> $MYTH_CONFIG_MAK
 fi
@@ -3239,7 +3490,7 @@ if enabled mac_corevideo; then
   append CCONFIG "using_corevideo"
 fi
 
-if test x"$targetos" = x"cygwin" ; then
+if test x"$target_os" = x"cygwin" ; then
   echo "#define CONFIG_CYGWIN 1" >> $TMPH
   echo "#ifndef llrint" >> $TMPH
   echo "#define llrint llrint  // make sure not to define twice" >> $TMPH
@@ -3259,27 +3510,31 @@ echo "EXTRALIBS=$extralibs" >> $MYTH_CONFIG_MAK
 print_config ARCH_   $TMPH $MYTH_CONFIG_MAK $ARCH_LIST
 print_config HAVE_   $TMPH $MYTH_CONFIG_MAK $HAVE_LIST
 print_config CONFIG_ $TMPH $MYTH_CONFIG_MAK $CONFIG_LIST   \
-                                      $DECODER_LIST  \
-                                      $ENCODER_LIST  \
-                                      $PARSER_LIST   \
-                                      $BSF_LIST      \
-                                      $DEMUXER_LIST  \
-                                      $MUXER_LIST    \
-                                      $PROTOCOL_LIST \
-                                      $MYTHTV_LIST   \
-                                      $MYTHTV_CONFIG_LIST   \
+                                      $DECODER_LIST      \
+                                      $ENCODER_LIST      \
+                                      $PARSER_LIST       \
+                                      $BSF_LIST          \
+                                      $DEMUXER_LIST      \
+                                      $MUXER_LIST        \
+                                      $FILTER_LIST       \
+                                      $PROTOCOL_LIST     \
+                                      $INDEV_LIST        \
+                                      $OUTDEV_LIST       \
+                                      $MYTHTV_LIST       \
+                                      $MYTHTV_CONFIG_LIST \
 
 echo "#define restrict $_restrict" >> $TMPH
 
 if enabled small; then
-  echo "#define av_always_inline"  >> $TMPH
+    echo "#define av_always_inline"  >> $TMPH
 fi
 
 # Apparently it's not possible to portably echo a backslash.
 enabled asmalign_pot &&
-  printf '#define ASMALIGN(ZEROBITS) ".align " #ZEROBITS "\\n\\t"\n' >> $TMPH ||
-  printf '#define ASMALIGN(ZEROBITS) ".align 1<<" #ZEROBITS "\\n\\t"\n' >> $TMPH
+    printf '#define ASMALIGN(ZEROBITS) ".align " #ZEROBITS "\\n\\t"\n' >> $TMPH ||
+    printf '#define ASMALIGN(ZEROBITS) ".align 1<<" #ZEROBITS "\\n\\t"\n' >> $TMPH
 
+echo "#define EXTERN_PREFIX \"${extern_prefix}\"" >> $TMPH
 
 for opt in $MYTHTV_CONFIG_LIST $USING_LIST; do
     enabled $opt && append CCONFIG "using_$opt"
@@ -3288,40 +3543,44 @@ done
 enabled threads && append CCONFIG "using_ffmpeg_threads"
 
 
-
 # build tree in object directory if source path is different from current one
 if enabled source_path_used; then
     DIRS="\
-         doc \
-         libavcodec \
-         libavcodec/alpha \
-         libavcodec/armv4l \
-         libavcodec/bfin \
-         libavcodec/i386 \
-         libavcodec/mlib \
-         libavcodec/ppc \
-         libavcodec/sh4 \
-         libavcodec/sparc \
-         libavformat \
-         libavutil \
-         libpostproc \
-         libswscale \
-         tests \
-         tools \
-         vhook \
-         "
+        doc               \
+        libavcodec        \
+        libavcodec/alpha  \
+        libavcodec/armv4l \
+        libavcodec/bfin   \
+        libavcodec/i386   \
+        libavcodec/mlib   \
+        libavcodec/ppc    \
+        libavcodec/sh4    \
+        libavcodec/sparc  \
+        libavdevice       \
+        libavfilter       \
+        libavformat       \
+        libavutil         \
+        libpostproc       \
+        libswscale        \
+        tests             \
+        tools             \
+        vhook             \
+        "
     FILES="\
-          Makefile \
-          common.mak \
-          doc/texi2pod.pl \
-          libavcodec/Makefile \
-          libavformat/Makefile \
-          libavutil/Makefile \
-          libpostproc/Makefile \
-          libswscale/Makefile \
-          "
+        Makefile             \
+        common.mak           \
+        subdir.mak           \
+        doc/texi2pod.pl      \
+        libavcodec/Makefile  \
+        libavdevice/Makefile \
+        libavfilter/Makefile \
+        libavformat/Makefile \
+        libavutil/Makefile   \
+        libpostproc/Makefile \
+        libswscale/Makefile  \
+        "
     for dir in $DIRS ; do
-            mkdir -p $dir
+        mkdir -p $dir
     done
     for f in $FILES ; do
         $ln_s "$source_path/$f" $f
@@ -3367,7 +3626,7 @@ if enabled mmx; then
 fi
 
 if enabled firewire; then
-  if test $targetos = darwin; then
+  if test $target_os = darwin; then
       echo "CONFIG_MAC_AVC=$mac_avc" >>  $MYTH_CONFIG_MAK
   else
       echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883 -lavc1394 -lrom1394" >>  $MYTH_CONFIG_MAK
@@ -3482,6 +3741,10 @@ fi
 rm -f config.mak
 ln -s $MYTH_CONFIG_MAK config.mak
 
+
+rm -f $TMPC $TMPE $TMPH $TMPO $TMPS $TMPSH
+rm -f $TMPCXX
+
 # Create a special cleanup makefile that will allow make clean to work
 if [ ! -e config ] ; then
   mkdir config
@@ -3500,9 +3763,9 @@ install:
 
 # Hack to remove some empty directories that qmake doesn't create rules for
 uninstall:
-	-rmdir \$(INSTALL_ROOT)/$PREFIX/include/mythtv
-	-rmdir \$(INSTALL_ROOT)/$PREFIX/lib/mythtv
-	-rmdir \$(INSTALL_ROOT)/$PREFIX/share/mythtv
+	-rmdir \$(INSTALL_ROOT)/$prefix/include/mythtv
+	-rmdir \$(INSTALL_ROOT)/$prefix/lib/mythtv
+	-rmdir \$(INSTALL_ROOT)/$prefix/share/mythtv
 
 distclean: clean
 	-rm -f ../$MYTH_CONFIG_MAK  ../config.mak
@@ -3510,9 +3773,6 @@ distclean: clean
 	-rm -f ../Makefile          ../config.err
 
 END
-
-rm -f $TMPO $TMPC $TMPE $TMPS $TMPH
-rm -f $TMPCXX
 
 $qmake QMAKE=$(which $qmake) mythtv.pro
 

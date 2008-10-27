@@ -41,10 +41,10 @@ extern "C" {
 extern "C" {
 #include "../libavutil/avutil.h"
 #include "../libavcodec/ac3_parser.h"
+#include "../libavcodec/mpegvideo.h"
+#include "../libavformat/avio.h"
 #include "../libmythmpeg2/mpeg2.h"
 #include "ivtv_myth.h"
-// from libavcodec
-extern const uint8_t *ff_find_start_code(const uint8_t * restrict p, const uint8_t *end, uint32_t * restrict state);
 }
 
 #define LOC QString("AFD: ")
@@ -412,7 +412,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       itv(NULL),
       selectedVideoIndex(-1),
       // Audio
-      audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
+      audioSamples(NULL),
       allow_ac3_passthru(false),    allow_dts_passthru(false),
       disable_passthru(false),      max_channels(2),
       dummy_frame(NULL),
@@ -423,7 +423,10 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       dvdTitleChanged(false), mpeg_seq_end_seen(false)
 {
     bzero(&params, sizeof(AVFormatParameters));
-    bzero(audioSamples, AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(short int));
+    // using preallocated AVFormatContext for our own ByteIOContext
+    params.prealloced_context = 1;
+    audioSamples = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
+                                           sizeof(*audioSamples));
     ccd608->SetIgnoreTimecode(true);
 
     bool debug = (bool)(print_verbose_messages & VB_LIBAV);
@@ -457,8 +460,7 @@ AvFormatDecoder::~AvFormatDecoder()
     delete ttd;
     delete d;
     delete h264_kf_seq;
-    if (audioSamples)
-        delete [] audioSamples;
+    av_freep((void *)audioSamples);
 
     if (dummy_frame)
     {
@@ -494,7 +496,8 @@ void AvFormatDecoder::CloseContext()
         AVInputFormat *fmt = ic->iformat;
         ic->iformat->flags |= AVFMT_NOFILE;
 
-        av_free(ic->pb.buffer);
+        av_free(ic->pb->buffer);
+        av_free(ic->pb);
         av_close_input_file(ic);
         ic = NULL;
         fmt->flags &= ~AVFMT_NOFILE;
@@ -652,10 +655,10 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         // not when using libavformat's seeking
         if (recordingHasPositionMap || livetv)
         {
-            ic->pb.pos = ringBuffer->GetReadPosition();
-            ic->pb.buf_ptr = ic->pb.buffer;
-            ic->pb.buf_end = ic->pb.buffer;
-            ic->pb.eof_reached = 0;
+            ic->pb->pos = ringBuffer->GetReadPosition();
+            ic->pb->buf_ptr = ic->pb->buffer;
+            ic->pb->buf_end = ic->pb->buffer;
+            ic->pb->eof_reached = 0;
         }
 
         // Flush the avcodec buffers
@@ -798,7 +801,13 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
 void AvFormatDecoder::InitByteContext(void)
 {
     int streamed = 0;
-    if (ringBuffer->isDVD() || ringBuffer->LiveMode())
+    int buffer_size = 32768;
+
+    if (ringBuffer->isDVD()) {
+        streamed = 1;
+        buffer_size = 2048;
+    }
+    else if (ringBuffer->LiveMode())
         streamed = 1;
 
     readcontext.prot = &AVF_RingBuffer_Protocol;
@@ -807,24 +816,15 @@ void AvFormatDecoder::InitByteContext(void)
     readcontext.max_packet_size = 0;
     readcontext.priv_data = avfRingBuffer;
 
-    if (ringBuffer->isDVD())
-        ic->pb.buffer_size = 2048;
-    else
-        ic->pb.buffer_size = 32768;
+    unsigned char* buffer = (unsigned char *)av_malloc(buffer_size);
 
-    ic->pb.buffer = (unsigned char *)av_malloc(ic->pb.buffer_size);
-    ic->pb.buf_ptr = ic->pb.buffer;
-    ic->pb.write_flag = 0;
-    ic->pb.buf_end = ic->pb.buffer;
-    ic->pb.opaque = &readcontext;
-    ic->pb.read_packet = AVF_Read_Packet;
-    ic->pb.write_packet = AVF_Write_Packet;
-    ic->pb.seek = AVF_Seek_Packet;
-    ic->pb.pos = 0;
-    ic->pb.must_flush = 0;
-    ic->pb.eof_reached = 0;
-    ic->pb.is_streamed = streamed;
-    ic->pb.max_packet_size = 0;
+    ic->pb = av_alloc_put_byte(buffer, buffer_size, 0,
+                               &readcontext,
+                               AVF_Read_Packet,
+                               AVF_Write_Packet,
+                               AVF_Seek_Packet);
+
+    ic->pb->is_streamed = streamed;
 }
 
 extern "C" void HandleStreamChange(void* data) {
@@ -893,7 +893,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     InitByteContext();
 
-    int err = av_open_input_file(&ic, filename, fmt, 0, &params);
+    int err = av_open_input_stream(&ic, ic->pb, filename, fmt, &params);
     if (err < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR
@@ -4101,7 +4101,9 @@ static int encode_frame(bool dts, unsigned char *data, int len,
     else
     {
         AC3HeaderInfo hdr;
-        if (!ff_ac3_parse_header(data, &hdr))
+        GetBitContext gbc;
+        init_get_bits(&gbc, data, len * 8); // XXX HACK: assumes 8 bit per char
+        if (!ff_ac3_parse_header(&gbc, &hdr))
         {
             enc_len = hdr.frame_size;
         }

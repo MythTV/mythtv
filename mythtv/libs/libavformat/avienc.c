@@ -105,7 +105,7 @@ static void avi_write_info_tag(ByteIOContext *pb, const char *tag, const char *s
 
 static int avi_write_counters(AVFormatContext* s, int riff_id)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     AVIContext *avi = s->priv_data;
     int n, au_byterate, au_ssize, au_scale, nb_frames = 0;
     offset_t file_size;
@@ -138,7 +138,7 @@ static int avi_write_counters(AVFormatContext* s, int riff_id)
 static int avi_write_header(AVFormatContext *s)
 {
     AVIContext *avi = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     int bitrate, n, i, nb_frames, au_byterate, au_ssize, au_scale;
     AVCodecContext *stream, *video_enc;
     offset_t list1, list2, strh, strf;
@@ -249,7 +249,6 @@ static int avi_write_header(AVFormatContext *s)
             break;
         case CODEC_TYPE_AUDIO:
             if (put_wav_header(pb, stream) < 0) {
-                av_free(avi);
                 return -1;
             }
             break;
@@ -281,6 +280,38 @@ static int avi_write_header(AVFormatContext *s)
             for (j=0; j < AVI_MASTER_INDEX_SIZE * 2; j++)
                  put_le64(pb, 0);
             end_tag(pb, avi->indexes[i].indx_start);
+        }
+
+        if(   stream->codec_type == CODEC_TYPE_VIDEO
+           && s->streams[i]->sample_aspect_ratio.num>0
+           && s->streams[i]->sample_aspect_ratio.den>0){
+            int vprp= start_tag(pb, "vprp");
+            AVRational dar = av_mul_q(s->streams[i]->sample_aspect_ratio,
+                                      (AVRational){stream->width, stream->height});
+            int num, den;
+            av_reduce(&num, &den, dar.num, dar.den, 0xFFFF);
+
+            put_le32(pb, 0); //video format  = unknown
+            put_le32(pb, 0); //video standard= unknown
+            put_le32(pb, lrintf(1.0/av_q2d(stream->time_base)));
+            put_le32(pb, stream->width );
+            put_le32(pb, stream->height);
+            put_le16(pb, den);
+            put_le16(pb, num);
+            put_le32(pb, stream->width );
+            put_le32(pb, stream->height);
+            put_le32(pb, 1); //progressive FIXME
+
+            put_le32(pb, stream->height);
+            put_le32(pb, stream->width );
+            put_le32(pb, stream->height);
+            put_le32(pb, stream->width );
+            put_le32(pb, 0);
+            put_le32(pb, 0);
+
+            put_le32(pb, 0);
+            put_le32(pb, 0);
+            end_tag(pb, vprp);
         }
 
         end_tag(pb, list2);
@@ -332,7 +363,7 @@ static int avi_write_header(AVFormatContext *s)
 
 static int avi_write_ix(AVFormatContext *s)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     AVIContext *avi = s->priv_data;
     char tag[5];
     char ix_tag[] = "ix00";
@@ -389,7 +420,7 @@ static int avi_write_ix(AVFormatContext *s)
 
 static int avi_write_idx1(AVFormatContext *s)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     AVIContext *avi = s->priv_data;
     offset_t idx_chunk;
     int i;
@@ -435,7 +466,7 @@ static int avi_write_idx1(AVFormatContext *s)
 static int avi_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     AVIContext *avi = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     unsigned char tag[5];
     unsigned int flags=0;
     const int stream_index= pkt->stream_index;
@@ -476,7 +507,7 @@ static int avi_write_packet(AVFormatContext *s, AVPacket *pkt)
        avi->audio_strm_length[stream_index] += size;
     }
 
-    if (!url_is_streamed(&s->pb)) {
+    if (!url_is_streamed(s->pb)) {
         AVIIndex* idx = &avi->indexes[stream_index];
         int cl = idx->entry / AVI_INDEX_CLUSTER_SIZE;
         int id = idx->entry % AVI_INDEX_CLUSTER_SIZE;
@@ -509,7 +540,7 @@ static int avi_write_packet(AVFormatContext *s, AVPacket *pkt)
 static int avi_write_trailer(AVFormatContext *s)
 {
     AVIContext *avi = s->priv_data;
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     int res = 0;
     int i, j, n, nb_frames;
     offset_t file_size;
@@ -561,7 +592,7 @@ static int avi_write_trailer(AVFormatContext *s)
 
 AVOutputFormat avi_muxer = {
     "avi",
-    "avi format",
+    NULL_IF_CONFIG_SMALL("AVI format"),
     "video/x-msvideo",
     "avi",
     sizeof(AVIContext),
@@ -570,6 +601,6 @@ AVOutputFormat avi_muxer = {
     avi_write_header,
     avi_write_packet,
     avi_write_trailer,
-    .codec_tag= (const AVCodecTag*[]){codec_bmp_tags, codec_wav_tags, 0},
+    .codec_tag= (const AVCodecTag* const []){codec_bmp_tags, codec_wav_tags, 0},
 };
 #endif //CONFIG_AVI_MUXER

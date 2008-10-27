@@ -4,8 +4,8 @@
 #include "decoder.h"
 
 extern "C" {
-#include <mythtv/ffmpeg/avformat.h>
-#include <mythtv/ffmpeg/avcodec.h>
+#include <mythtv/libavformat/avformat.h>
+#include <mythtv/libavcodec/avcodec.h>
 }
 
 class Metadata;

@@ -69,7 +69,7 @@ enum DCAMode {
 #define HEADER_SIZE 14
 #define CONVERT_BIAS 384
 
-#define DCA_MAX_FRAME_SIZE 16383
+#define DCA_MAX_FRAME_SIZE 16384
 
 /** Bit allocation */
 typedef struct {
@@ -83,9 +83,6 @@ static BitAlloc dca_bitalloc_index;    ///< indexes for samples VLC select
 static BitAlloc dca_tmode;             ///< transition mode VLCs
 static BitAlloc dca_scalefactor;       ///< scalefactor VLCs
 static BitAlloc dca_smpl_bitalloc[11]; ///< samples VLCs
-
-/** Pre-calculated cosine modulation coefs for the QMF */
-static float cos_mod[544];
 
 static av_always_inline int get_bitalloc(GetBitContext *gb, BitAlloc *ba, int idx)
 {
@@ -125,6 +122,7 @@ typedef struct {
 
     /* Primary audio coding header */
     int subframes;              ///< number of subframes
+    int total_channels;         ///< number of channels including extensions
     int prim_channels;          ///< number of primary audio channels
     int subband_activity[DCA_PRIM_CHANNELS_MAX];    ///< subband activity count
     int vq_start_subband[DCA_PRIM_CHANNELS_MAX];    ///< high frequency vq start subband
@@ -156,14 +154,15 @@ typedef struct {
 
     /* Subband samples history (for ADPCM) */
     float subband_samples_hist[DCA_PRIM_CHANNELS_MAX][DCA_SUBBANDS][4];
-    float subband_fir_hist[DCA_PRIM_CHANNELS_MAX][512];
-    float subband_fir_noidea[DCA_PRIM_CHANNELS_MAX][64];
+    DECLARE_ALIGNED_16(float, subband_fir_hist[DCA_PRIM_CHANNELS_MAX][512]);
+    float subband_fir_noidea[DCA_PRIM_CHANNELS_MAX][32];
+    int hist_index[DCA_PRIM_CHANNELS_MAX];
 
     int output;                 ///< type of output
     int bias;                   ///< output bias
 
     DECLARE_ALIGNED_16(float, samples[1536]);  /* 6 * 256 = 1536, might only need 5 */
-    DECLARE_ALIGNED_16(int16_t, tsamples[1536]);
+    const float *samples_chanptr[6];
 
     uint8_t dca_buffer[DCA_MAX_FRAME_SIZE];
     int dca_buffer_size;        ///< how much data is in the dca_buffer
@@ -175,14 +174,15 @@ typedef struct {
 
     int debug_flag;             ///< used for suppressing repeated error messages output
     DSPContext dsp;
+    MDCTContext imdct;
 } DCAContext;
 
-static void dca_init_vlcs(void)
+static av_cold void dca_init_vlcs(void)
 {
-    static int vlcs_inited = 0;
+    static int vlcs_initialized = 0;
     int i, j;
 
-    if (vlcs_inited)
+    if (vlcs_initialized)
         return;
 
     dca_bitalloc_index.offset = 1;
@@ -214,7 +214,7 @@ static void dca_init_vlcs(void)
                      bitalloc_bits[i][j], 1, 1,
                      bitalloc_codes[i][j], 2, 2, 1);
         }
-    vlcs_inited = 1;
+    vlcs_initialized = 1;
 }
 
 static inline void get_array(GetBitContext *gb, int *dst, int len, int bits)
@@ -320,7 +320,10 @@ static int dca_parse_frame_header(DCAContext * s)
 
     /* Primary audio coding header */
     s->subframes         = get_bits(&s->gb, 4) + 1;
-    s->prim_channels     = get_bits(&s->gb, 3) + 1;
+    s->total_channels    = get_bits(&s->gb, 3) + 1;
+    s->prim_channels     = s->total_channels;
+    if (s->prim_channels > DCA_PRIM_CHANNELS_MAX)
+        s->prim_channels = DCA_PRIM_CHANNELS_MAX;   /* We only support DTS core */
 
 
     for (i = 0; i < s->prim_channels; i++) {
@@ -427,7 +430,11 @@ static int dca_subframe_header(DCAContext * s)
                 s->bitalloc[j][k] = get_bits(&s->gb, 5);
             else if (s->bitalloc_huffman[j] == 5)
                 s->bitalloc[j][k] = get_bits(&s->gb, 4);
-            else {
+            else if (s->bitalloc_huffman[j] == 7) {
+                av_log(s->avctx, AV_LOG_ERROR,
+                       "Invalid bit allocation index\n");
+                return -1;
+            } else {
                 s->bitalloc[j][k] =
                     get_bitalloc(&s->gb, &dca_bitalloc_index, s->bitalloc_huffman[j]);
             }
@@ -453,15 +460,15 @@ static int dca_subframe_header(DCAContext * s)
     }
 
     for (j = 0; j < s->prim_channels; j++) {
-        uint32_t *scale_table;
+        const uint32_t *scale_table;
         int scale_sum;
 
         memset(s->scale_factor[j], 0, s->subband_activity[j] * sizeof(s->scale_factor[0][0][0]) * 2);
 
         if (s->scalefactor_huffman[j] == 6)
-            scale_table = (uint32_t *) scale_factor_quant7;
+            scale_table = scale_factor_quant7;
         else
-            scale_table = (uint32_t *) scale_factor_quant6;
+            scale_table = scale_factor_quant6;
 
         /* When huffman coded, only the difference is encoded */
         scale_sum = 0;
@@ -646,69 +653,64 @@ static void qmf_32_subbands(DCAContext * s, int chans,
                             float samples_in[32][8], float *samples_out,
                             float scale, float bias)
 {
-    float *prCoeff;
-    int i, j, k;
-    float praXin[33], *raXin = &praXin[1];
+    const float *prCoeff;
+    int i, j;
+    DECLARE_ALIGNED_16(float, raXin[32]);
 
-    float *subband_fir_hist = s->subband_fir_hist[chans];
+    int hist_index= s->hist_index[chans];
     float *subband_fir_hist2 = s->subband_fir_noidea[chans];
 
-    int chindex = 0, subindex;
+    int subindex;
 
-    praXin[0] = 0.0;
+    scale *= sqrt(1/8.0);
 
     /* Select filter */
     if (!s->multirate_inter)    /* Non-perfect reconstruction */
-        prCoeff = (float *) fir_32bands_nonperfect;
+        prCoeff = fir_32bands_nonperfect;
     else                        /* Perfect reconstruction */
-        prCoeff = (float *) fir_32bands_perfect;
+        prCoeff = fir_32bands_perfect;
 
     /* Reconstructed channel sample index */
     for (subindex = 0; subindex < 8; subindex++) {
-        float t1, t2, sum[16], diff[16];
-
+        float *subband_fir_hist = s->subband_fir_hist[chans] + hist_index;
         /* Load in one sample from each subband and clear inactive subbands */
-        for (i = 0; i < s->subband_activity[chans]; i++)
-            raXin[i] = samples_in[i][subindex];
+        for (i = 0; i < s->subband_activity[chans]; i++){
+            if((i-1)&2) raXin[i] = -samples_in[i][subindex];
+            else        raXin[i] =  samples_in[i][subindex];
+        }
         for (; i < 32; i++)
             raXin[i] = 0.0;
 
-        /* Multiply by cosine modulation coefficients and
-         * create temporary arrays SUM and DIFF */
-        for (j = 0, k = 0; k < 16; k++) {
-            t1 = 0.0;
-            t2 = 0.0;
-            for (i = 0; i < 16; i++, j++){
-                t1 += (raXin[2 * i] + raXin[2 * i + 1]) * cos_mod[j];
-                t2 += (raXin[2 * i] + raXin[2 * i - 1]) * cos_mod[j + 256];
-            }
-            sum[k] = t1 + t2;
-            diff[k] = t1 - t2;
-        }
-
-        j = 512;
-        /* Store history */
-        for (k = 0; k < 16; k++)
-            subband_fir_hist[k] = cos_mod[j++] * sum[k];
-        for (k = 0; k < 16; k++)
-            subband_fir_hist[32-k-1] = cos_mod[j++] * diff[k];
+        ff_imdct_half(&s->imdct, subband_fir_hist, raXin);
 
         /* Multiply by filter coefficients */
-        for (k = 31, i = 0; i < 32; i++, k--)
-            for (j = 0; j < 512; j += 64){
-                subband_fir_hist2[i]    += prCoeff[i+j]  * ( subband_fir_hist[i+j] - subband_fir_hist[j+k]);
-                subband_fir_hist2[i+32] += prCoeff[i+j+32]*(-subband_fir_hist[i+j] - subband_fir_hist[j+k]);
+        for (i = 0; i < 16; i++){
+            float a= subband_fir_hist2[i   ];
+            float b= subband_fir_hist2[i+16];
+            float c= 0;
+            float d= 0;
+            for (j = 0; j < 512-hist_index; j += 64){
+                a += prCoeff[i+j   ]*(-subband_fir_hist[15-i+j]);
+                b += prCoeff[i+j+16]*( subband_fir_hist[   i+j]);
+                c += prCoeff[i+j+32]*( subband_fir_hist[16+i+j]);
+                d += prCoeff[i+j+48]*( subband_fir_hist[31-i+j]);
             }
+            for (     ; j < 512; j += 64){
+                a += prCoeff[i+j   ]*(-subband_fir_hist[15-i+j-512]);
+                b += prCoeff[i+j+16]*( subband_fir_hist[   i+j-512]);
+                c += prCoeff[i+j+32]*( subband_fir_hist[16+i+j-512]);
+                d += prCoeff[i+j+48]*( subband_fir_hist[31-i+j-512]);
+            }
+            samples_out[i   ] = a * scale + bias;
+            samples_out[i+16] = b * scale + bias;
+            subband_fir_hist2[i   ] = c;
+            subband_fir_hist2[i+16] = d;
+        }
+        samples_out+= 32;
 
-        /* Create 32 PCM output samples */
-        for (i = 0; i < 32; i++)
-            samples_out[chindex++] = subband_fir_hist2[i] * scale + bias;
-
-        /* Update working arrays */
-        memmove(&subband_fir_hist[32], &subband_fir_hist[0], (512 - 32) * sizeof(float));
-        memmove(&subband_fir_hist2[0], &subband_fir_hist2[32], 32 * sizeof(float));
-        memset(&subband_fir_hist2[32], 0, 32 * sizeof(float));
+        hist_index = (hist_index-32)&511;
     }
+    s->hist_index[chans]= hist_index;
 }
 
 static void lfe_interpolation_fir(int decimation_select,
@@ -842,7 +844,7 @@ static int dca_subsubframe(DCAContext * s)
     int k, l;
     int subsubframe = s->current_subsubframe;
 
-    float *quant_step_table;
+    const float *quant_step_table;
 
     /* FIXME */
     float subband_samples[DCA_PRIM_CHANNELS_MAX][DCA_SUBBANDS][8];
@@ -853,9 +855,9 @@ static int dca_subsubframe(DCAContext * s)
 
     /* Select quantization step size table */
     if (s->bit_rate == 0x1f)
-        quant_step_table = (float *) lossless_quant_d;
+        quant_step_table = lossless_quant_d;
     else
-        quant_step_table = (float *) lossy_quant_d;
+        quant_step_table = lossy_quant_d;
 
     for (k = 0; k < s->prim_channels; k++) {
         for (l = 0; l < s->vq_start_subband[k]; l++) {
@@ -982,7 +984,7 @@ static int dca_subsubframe(DCAContext * s)
 /*        static float pcm_to_double[8] =
             {32768.0, 32768.0, 524288.0, 524288.0, 0, 8388608.0, 8388608.0};*/
          qmf_32_subbands(s, k, subband_samples[k], &s->samples[256 * k],
-                            2.0 / 3 /*pcm_to_double[s->source_pcm_res] */ ,
+                            M_SQRT1_2 /*pcm_to_double[s->source_pcm_res] */ ,
                             0 /*s->bias */ );
     }
 
@@ -1001,7 +1003,7 @@ static int dca_subsubframe(DCAContext * s)
                               s->lfe_data + lfe_samples +
                               2 * s->lfe * subsubframe,
                               &s->samples[256 * i_channels],
-                              8388608.0, s->bias);
+                              256.0, 0 /* s->bias */);
         /* Outputs 20bits pcm samples */
     }
 
@@ -1091,12 +1093,13 @@ static int dca_decode_block(DCAContext * s)
 /**
  * Convert bitstream to one representation based on sync marker
  */
-static int dca_convert_bitstream(uint8_t * src, int src_size, uint8_t * dst,
+static int dca_convert_bitstream(const uint8_t * src, int src_size, uint8_t * dst,
                           int max_size)
 {
     uint32_t mrk;
     int i, tmp;
-    uint16_t *ssrc = (uint16_t *) src, *sdst = (uint16_t *) dst;
+    const uint16_t *ssrc = (const uint16_t *) src;
+    uint16_t *sdst = (uint16_t *) dst;
     PutBitContext pb;
 
     if((unsigned)src_size > (unsigned)max_size) {
@@ -1107,12 +1110,12 @@ static int dca_convert_bitstream(uint8_t * src, int src_size, uint8_t * dst,
     mrk = AV_RB32(src);
     switch (mrk) {
     case DCA_MARKER_RAW_BE:
-        memcpy(dst, src, FFMIN(src_size, max_size));
-        return FFMIN(src_size, max_size);
+        memcpy(dst, src, src_size);
+        return src_size;
     case DCA_MARKER_RAW_LE:
-        for (i = 0; i < (FFMIN(src_size, max_size) + 1) >> 1; i++)
+        for (i = 0; i < (src_size + 1) >> 1; i++)
             *sdst++ = bswap_16(*ssrc++);
-        return FFMIN(src_size, max_size);
+        return src_size;
     case DCA_MARKER_14B_BE:
     case DCA_MARKER_14B_LE:
         init_put_bits(&pb, dst, max_size);
@@ -1133,10 +1136,10 @@ static int dca_convert_bitstream(uint8_t * src, int src_size, uint8_t * dst,
  */
 static int dca_decode_frame(AVCodecContext * avctx,
                             void *data, int *data_size,
-                            uint8_t * buf, int buf_size)
+                            const uint8_t * buf, int buf_size)
 {
 
-    int i, j, k;
+    int i;
     int16_t *samples = data;
     DCAContext *s = avctx->priv_data;
     int channels;
@@ -1159,77 +1162,32 @@ static int dca_decode_frame(AVCodecContext * avctx,
     avctx->bit_rate = s->bit_rate;
 
     channels = s->prim_channels + !!s->lfe;
-    //avctx->channels = avctx->request_channels;
-    if (avctx->request_channels > 0)
-    {
+    if(avctx->request_channels == 2 && s->prim_channels > 2) {
         avctx->channels = channels;
         if (avctx->channels > avctx->request_channels)
-            avctx->channels = avctx->request_channels;
-    }
-    if(avctx->channels == 0) {
-        avctx->channels = channels;
-    } else if(channels < avctx->channels) {
-        av_log(avctx, AV_LOG_WARNING, "DTS source channels are less than "
-               "specified: output to %d channels.\n", channels);
-        avctx->channels = channels;
-    }
-    if(avctx->channels == 2) {
-        s->output = DCA_STEREO;
-    } else if(avctx->channels != channels) {
-        av_log(avctx, AV_LOG_ERROR, "Cannot downmix DTS to %d channels.\n",
-               avctx->channels);
-        return -1;
+            s->output = DCA_STEREO;
     }
 
-    channels = avctx->channels;
+    /* There is nothing that prevents a dts frame to change channel configuration
+       but FFmpeg doesn't support that so only set the channels if it is previously
+       unset. Ideally during the first probe for channels the crc should be checked
+       and only set avctx->channels when the crc is ok. Right now the decoder could
+       set the channels based on a broken first frame.*/
+    if (!avctx->channels)
+        avctx->channels = channels;
+
     if(*data_size < (s->sample_blocks / 8) * 256 * sizeof(int16_t) * channels)
         return -1;
-    *data_size = 0;
+    *data_size = 256 / 8 * s->sample_blocks * sizeof(int16_t) * channels;
     for (i = 0; i < (s->sample_blocks / 8); i++) {
         dca_decode_block(s);
-        s->dsp.float_to_int16(s->tsamples, s->samples, 256 * channels);
-        /* interleave samples */
-        for (j = 0; j < 256; j++) {
-            for (k = 0; k < channels; k++)
-                samples[k] = s->tsamples[j + k * 256];
-            samples += channels;
-        }
-        *data_size += 256 * sizeof(int16_t) * channels;
+        s->dsp.float_to_int16_interleave(samples, s->samples_chanptr, 256, channels);
+        samples += 256 * channels;
     }
-
+    
     return buf_size;
 }
 
-
-
-/**
- * Build the cosine modulation tables for the QMF
- *
- * @param s     pointer to the DCAContext
- */
-
-static void pre_calc_cosmod(DCAContext * s)
-{
-    int i, j, k;
-    static int cosmod_inited = 0;
-
-    if(cosmod_inited) return;
-    for (j = 0, k = 0; k < 16; k++)
-        for (i = 0; i < 16; i++)
-            cos_mod[j++] = cos((2 * i + 1) * (2 * k + 1) * M_PI / 64);
-
-    for (k = 0; k < 16; k++)
-        for (i = 0; i < 16; i++)
-            cos_mod[j++] = cos((i) * (2 * k + 1) * M_PI / 32);
-
-    for (k = 0; k < 16; k++)
-        cos_mod[j++] = 0.25 / (2 * cos((2 * k + 1) * M_PI / 128));
-
-    for (k = 0; k < 16; k++)
-        cos_mod[j++] = -0.25 / (2.0 * sin((2 * k + 1) * M_PI / 128));
-
-    cosmod_inited = 1;
-}
 
 
 /**
@@ -1238,18 +1196,34 @@ static void pre_calc_cosmod(DCAContext * s)
  * @param avctx     pointer to the AVCodecContext
  */
 
-static int dca_decode_init(AVCodecContext * avctx)
+static av_cold int dca_decode_init(AVCodecContext * avctx)
 {
     DCAContext *s = avctx->priv_data;
+    int i;
 
     s->avctx = avctx;
     dca_init_vlcs();
-    pre_calc_cosmod(s);
 
     dsputil_init(&s->dsp, avctx);
+    ff_mdct_init(&s->imdct, 6, 1);
+
+    /* allow downmixing to stereo */
+    if (avctx->channels > 0 && avctx->request_channels < avctx->channels &&
+            avctx->request_channels == 2) {
+        avctx->channels = avctx->request_channels;
+    }
+    for(i = 0; i < 6; i++)
+        s->samples_chanptr[i] = s->samples + i * 256;
+    avctx->sample_fmt = SAMPLE_FMT_S16;
     return 0;
 }
 
+static av_cold int dca_decode_end(AVCodecContext * avctx)
+{
+    DCAContext *s = avctx->priv_data;
+    ff_mdct_end(&s->imdct);
+    return 0;
+}
 
 AVCodec dca_decoder = {
     .name = "dca",
@@ -1258,4 +1232,6 @@ AVCodec dca_decoder = {
     .priv_data_size = sizeof(DCAContext),
     .init = dca_decode_init,
     .decode = dca_decode_frame,
+    .close = dca_decode_end,
+    .long_name = NULL_IF_CONFIG_SMALL("DCA (DTS Coherent Acoustics)"),
 };

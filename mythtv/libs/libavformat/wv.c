@@ -19,8 +19,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/bswap.h"
 #include "avformat.h"
-#include "bswap.h"
 
 // specs say that maximum block size is 1Mb
 #define WV_BLOCK_LIMIT 1047576
@@ -135,7 +135,7 @@ static int wv_read_block_header(AVFormatContext *ctx, ByteIOContext *pb)
 static int wv_read_header(AVFormatContext *s,
                           AVFormatParameters *ap)
 {
-    ByteIOContext *pb = &s->pb;
+    ByteIOContext *pb = s->pb;
     WVContext *wc = s->priv_data;
     AVStream *st;
 
@@ -164,17 +164,17 @@ static int wv_read_packet(AVFormatContext *s,
     WVContext *wc = s->priv_data;
     int ret;
 
-    if (url_feof(&s->pb))
+    if (url_feof(s->pb))
         return AVERROR(EIO);
     if(wc->block_parsed){
-        if(wv_read_block_header(s, &s->pb) < 0)
+        if(wv_read_block_header(s, s->pb) < 0)
             return -1;
     }
 
     if(av_new_packet(pkt, wc->blksize + WV_EXTRA_SIZE) < 0)
         return AVERROR(ENOMEM);
     memcpy(pkt->data, wc->extra, WV_EXTRA_SIZE);
-    ret = get_buffer(&s->pb, pkt->data + WV_EXTRA_SIZE, wc->blksize);
+    ret = get_buffer(s->pb, pkt->data + WV_EXTRA_SIZE, wc->blksize);
     if(ret != wc->blksize){
         av_free_packet(pkt);
         return AVERROR(EIO);
@@ -184,11 +184,6 @@ static int wv_read_packet(AVFormatContext *s,
     pkt->size = ret + WV_EXTRA_SIZE;
     pkt->pts = wc->soff;
     av_add_index_entry(s->streams[0], wc->pos, pkt->pts, 0, 0, AVINDEX_KEYFRAME);
-    return 0;
-}
-
-static int wv_read_close(AVFormatContext *s)
-{
     return 0;
 }
 
@@ -204,18 +199,18 @@ static int wv_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp,
     /* if found, seek there */
     if (index >= 0){
         wc->block_parsed = 1;
-        url_fseek(&s->pb, st->index_entries[index].pos, SEEK_SET);
+        url_fseek(s->pb, st->index_entries[index].pos, SEEK_SET);
         return 0;
     }
     /* if timestamp is out of bounds, return error */
     if(timestamp < 0 || timestamp >= s->duration)
         return -1;
 
-    pos = url_ftell(&s->pb);
+    pos = url_ftell(s->pb);
     do{
         ret = av_read_frame(s, pkt);
         if (ret < 0){
-            url_fseek(&s->pb, pos, SEEK_SET);
+            url_fseek(s->pb, pos, SEEK_SET);
             return -1;
         }
         pts = pkt->pts;
@@ -226,11 +221,11 @@ static int wv_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp,
 
 AVInputFormat wv_demuxer = {
     "wv",
-    "WavPack",
+    NULL_IF_CONFIG_SMALL("WavPack"),
     sizeof(WVContext),
     wv_probe,
     wv_read_header,
     wv_read_packet,
-    wv_read_close,
+    NULL,
     wv_read_seek,
 };

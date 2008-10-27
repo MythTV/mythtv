@@ -109,9 +109,10 @@ int ff_rac_terminate(RangeCoder *c){
     return c->bytestream - c->bytestream_start;
 }
 
-#if 0 //selftest
+#ifdef TEST
 #define SIZE 10240
-int main(){
+#undef random
+int main(void){
     RangeCoder c;
     uint8_t b[9*SIZE];
     uint8_t r[9*SIZE];
@@ -133,7 +134,7 @@ START_TIMER
 STOP_TIMER("put_rac")
     }
 
-    ff_put_rac_terminate(&c);
+    ff_rac_terminate(&c);
 
     ff_init_range_decoder(&c, b, SIZE);
 
@@ -148,4 +149,4 @@ STOP_TIMER("get_rac")
 
     return 0;
 }
-#endif
+#endif /* TEST */

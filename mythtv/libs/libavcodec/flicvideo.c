@@ -40,8 +40,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "libavutil/bswap.h"
 #include "avcodec.h"
-#include "bswap.h"
 
 #define FLI_256_COLOR 4
 #define FLI_DELTA     7
@@ -76,7 +76,7 @@ typedef struct FlicDecodeContext {
     int fli_type;  /* either 0xAF11 or 0xAF12, affects palette resolution */
 } FlicDecodeContext;
 
-static int flic_decode_init(AVCodecContext *avctx)
+static av_cold int flic_decode_init(AVCodecContext *avctx)
 {
     FlicDecodeContext *s = avctx->priv_data;
     unsigned char *fli_header = (unsigned char *)avctx->extradata;
@@ -127,7 +127,7 @@ static int flic_decode_init(AVCodecContext *avctx)
 
 static int flic_decode_frame_8BPP(AVCodecContext *avctx,
                                   void *data, int *data_size,
-                                  uint8_t *buf, int buf_size)
+                                  const uint8_t *buf, int buf_size)
 {
     FlicDecodeContext *s = avctx->priv_data;
 
@@ -427,7 +427,7 @@ static int flic_decode_frame_8BPP(AVCodecContext *avctx,
 
 static int flic_decode_frame_15_16BPP(AVCodecContext *avctx,
                                       void *data, int *data_size,
-                                      uint8_t *buf, int buf_size)
+                                      const uint8_t *buf, int buf_size)
 {
     /* Note, the only difference between the 15Bpp and 16Bpp */
     /* Format is the pixel format, the packets are processed the same. */
@@ -483,8 +483,9 @@ static int flic_decode_frame_15_16BPP(AVCodecContext *avctx,
         switch (chunk_type) {
         case FLI_256_COLOR:
         case FLI_COLOR:
-            /* For some reason, it seems that non-paletised flics do include one of these */
-            /* chunks in their first frame.  Why i do not know, it seems rather extraneous */
+            /* For some reason, it seems that non-palettized flics do
+             * include one of these chunks in their first frame.
+             * Why I do not know, it seems rather extraneous. */
 /*            av_log(avctx, AV_LOG_ERROR, "Unexpected Palette chunk %d in non-paletised FLC\n",chunk_type);*/
             stream_ptr = stream_ptr + chunk_size - 6;
             break;
@@ -692,7 +693,7 @@ static int flic_decode_frame_15_16BPP(AVCodecContext *avctx,
 
 static int flic_decode_frame_24BPP(AVCodecContext *avctx,
                                    void *data, int *data_size,
-                                   uint8_t *buf, int buf_size)
+                                   const uint8_t *buf, int buf_size)
 {
   av_log(avctx, AV_LOG_ERROR, "24Bpp FLC Unsupported due to lack of test files.\n");
   return -1;
@@ -700,7 +701,7 @@ static int flic_decode_frame_24BPP(AVCodecContext *avctx,
 
 static int flic_decode_frame(AVCodecContext *avctx,
                              void *data, int *data_size,
-                             uint8_t *buf, int buf_size)
+                             const uint8_t *buf, int buf_size)
 {
     if (avctx->pix_fmt == PIX_FMT_PAL8) {
       return flic_decode_frame_8BPP(avctx, data, data_size,
@@ -725,7 +726,7 @@ static int flic_decode_frame(AVCodecContext *avctx,
 }
 
 
-static int flic_decode_end(AVCodecContext *avctx)
+static av_cold int flic_decode_end(AVCodecContext *avctx)
 {
     FlicDecodeContext *s = avctx->priv_data;
 
@@ -748,5 +749,6 @@ AVCodec flic_decoder = {
     NULL,
     NULL,
     NULL,
-    NULL
+    NULL,
+    .long_name = NULL_IF_CONFIG_SMALL("Autodesk Animator Flic video"),
 };

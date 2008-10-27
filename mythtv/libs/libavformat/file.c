@@ -18,12 +18,14 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+#include "libavutil/avstring.h"
 #include "avformat.h"
-#include "avstring.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include <stdlib.h>
+#include "os_support.h"
 
 
 /* standard file protocol */
@@ -91,7 +93,7 @@ URLProtocol file_protocol = {
 static int pipe_open(URLContext *h, const char *filename, int flags)
 {
     int fd;
-    const char * final;
+    char *final;
     av_strstart(filename, "pipe:", &filename);
 
     fd = strtol(filename, &final, 10);

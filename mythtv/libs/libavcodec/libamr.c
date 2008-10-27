@@ -112,7 +112,7 @@ static int getBitrateMode(int bitrate)
     {
         if(rates[i].rate==bitrate)
         {
-            return(rates[i].mode);
+            return rates[i].mode;
         }
     }
     /* no bitrate matching, return an error */
@@ -134,6 +134,7 @@ static void amr_decode_fix_avctx(AVCodecContext * avctx)
     }
 
     avctx->frame_size = 160 * is_amr_wb;
+    avctx->sample_fmt = SAMPLE_FMT_S16;
 }
 
 #ifdef CONFIG_LIBAMR_NB_FIXED
@@ -444,7 +445,7 @@ static int amr_nb_decode_frame(AVCodecContext * avctx,
 {
     AMRContext *s = avctx->priv_data;
     uint8_t*amrData=buf;
-    static short block_size[16]={ 12, 13, 15, 17, 19, 20, 26, 31, 5, 0, 0, 0, 0, 0, 0, 0 };
+    static const uint8_t block_size[16]={ 12, 13, 15, 17, 19, 20, 26, 31, 5, 0, 0, 0, 0, 0, 0, 0 };
     enum Mode dec_mode;
     int packet_size;
 
@@ -503,6 +504,7 @@ AVCodec libamr_nb_decoder =
     NULL,
     amr_nb_decode_close,
     amr_nb_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("libamr-nb Adaptive Multi-Rate (AMR) Narrow-Band"),
 };
 
 AVCodec libamr_nb_encoder =
@@ -515,6 +517,8 @@ AVCodec libamr_nb_encoder =
     amr_nb_encode_frame,
     amr_nb_encode_close,
     NULL,
+    .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .long_name = NULL_IF_CONFIG_SMALL("libamr-nb Adaptive Multi-Rate (AMR) Narrow-Band"),
 };
 
 #endif
@@ -523,7 +527,7 @@ AVCodec libamr_nb_encoder =
 #ifdef CONFIG_LIBAMR_WB
 
 #ifdef _TYPEDEF_H
-//To avoid duplicate typedefs from typdef in amr-nb
+//To avoid duplicate typedefs from typedef in amr-nb
 #define typedef_h
 #endif
 
@@ -557,7 +561,7 @@ static int getWBBitrateMode(int bitrate)
     {
         if(rates[i].rate==bitrate)
         {
-            return(rates[i].mode);
+            return rates[i].mode;
         }
     }
     /* no bitrate matching, return an error */
@@ -656,6 +660,7 @@ static int amr_wb_decode_frame(AVCodecContext * avctx,
     uint8_t*amrData=buf;
     int mode;
     int packet_size;
+    static const uint8_t block_size[16] = {18, 23, 33, 37, 41, 47, 51, 59, 61, 6, 6, 0, 0, 0, 1, 1};
 
     if(buf_size==0) {
         /* nothing to do */
@@ -694,6 +699,7 @@ AVCodec libamr_wb_decoder =
     NULL,
     amr_wb_decode_close,
     amr_wb_decode_frame,
+    .long_name = NULL_IF_CONFIG_SMALL("libamr-wb Adaptive Multi-Rate (AMR) Wide-Band"),
 };
 
 AVCodec libamr_wb_encoder =
@@ -706,6 +712,8 @@ AVCodec libamr_wb_encoder =
     amr_wb_encode_frame,
     amr_wb_encode_close,
     NULL,
+    .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .long_name = NULL_IF_CONFIG_SMALL("libamr-wb Adaptive Multi-Rate (AMR) Wide-Band"),
 };
 
 #endif //CONFIG_LIBAMR_WB
