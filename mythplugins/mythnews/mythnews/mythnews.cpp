@@ -13,6 +13,12 @@
 #include <QUrl>
 
 // MythTV headers
+#include <mythuitext.h>
+#include <mythuiimage.h>
+#include <mythdialogbox.h>
+#include <mythuibuttonlist.h>
+#include <mythprogressdialog.h>
+
 #include <mythmainwindow.h>
 #include <util.h>
 #include <httpcomms.h>
@@ -25,12 +31,17 @@
 #include "mythnewseditor.h"
 #include "newsdbutil.h"
 
+#define LOC      QString("MythNews: ")
+#define LOC_WARN QString("MythNews, Warning: ")
+#define LOC_ERR  QString("MythNews, Error: ")
+
 /** \brief Creates a new MythNews Screen
  *  \param parent Pointer to the screen stack
  *  \param name The name of the window
  */
-MythNews::MythNews(MythScreenStack *parent, QString name)
-    : MythScreenType (parent, name)
+MythNews::MythNews(MythScreenStack *parent, QString name) :
+    MythScreenType(parent, name),
+    m_lock(QMutex::Recursive)
 {
     // Setup cache directory
 
@@ -77,11 +88,12 @@ MythNews::MythNews(MythScreenStack *parent, QString name)
 
 MythNews::~MythNews()
 {
-
+    QMutexLocker locker(&m_lock);
 }
 
-bool MythNews::Create()
+bool MythNews::Create(void)
 {
+    QMutexLocker locker(&m_lock);
 
     bool foundtheme = false;
 
@@ -107,13 +119,16 @@ bool MythNews::Create()
     if (!m_sitesList || !m_articlesList || !m_enclosureImage ||
         !m_downloadImage || !m_podcastImage || !m_titleText || !m_descText)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Theme is missing critical theme elements.");
         return false;
     }
 
     if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT,
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Failed to build a focuslist. Something is wrong");
+    }
 
     SetFocusWidget(m_sitesList);
     m_sitesList->SetActive(true);
@@ -134,6 +149,8 @@ bool MythNews::Create()
 
 void MythNews::loadSites(void)
 {
+    QMutexLocker locker(&m_lock);
+
     m_NewsSites.clear();
     m_sitesList->Reset();
 
@@ -145,19 +162,18 @@ void MythNews::loadSites(void)
 
     if (!query.exec())
     {
-        VERBOSE(VB_IMPORTANT, "MythNews: Error in loading Sites from DB");
+        MythDB::DBError(LOC_ERR + "Could not load sites from DB", query);
+        return;
     }
-    else
+
+    while (query.next())
     {
-        while (query.next())
-        {
-            QString name = query.value(0).toString();
-            QString url  = query.value(1).toString();
-            QString icon = query.value(2).toString();
-            QDateTime time; time.setTime_t(query.value(3).toUInt());
-            bool podcast = query.value(4).toInt();
-            m_NewsSites.push_back(new NewsSite(name, url, time, podcast));
-        }
+        QString name = query.value(0).toString();
+        QString url  = query.value(1).toString();
+        QString icon = query.value(2).toString();
+        QDateTime time; time.setTime_t(query.value(3).toUInt());
+        bool podcast = query.value(4).toInt();
+        m_NewsSites.push_back(new NewsSite(name, url, time, podcast));
     }
 
     NewsSite::List::iterator it = m_NewsSites.begin();
@@ -176,6 +192,8 @@ void MythNews::loadSites(void)
 
 void MythNews::updateInfoView(MythUIButtonListItem *selected)
 {
+    QMutexLocker locker(&m_lock);
+
     if (!selected)
         return;
 
@@ -462,16 +480,20 @@ bool MythNews::keyPressEvent(QKeyEvent *event)
             ShowMenu();
         else if (action == "ESCAPE")
         {
-            if (m_progressPopup)
             {
-                m_progressPopup->Close();
-                m_progressPopup = NULL;
+                QMutexLocker locker(&m_lock);
+
+                if (m_progressPopup)
+                {
+                    m_progressPopup->Close();
+                    m_progressPopup = NULL;
+                }
+
+                m_RetrieveTimer->stop();
+
+                if (httpGrabber)
+                    abortHttp = true;
             }
-
-            m_RetrieveTimer->stop();
-
-            if (httpGrabber)
-                abortHttp = true;
 
             Close();
         }
@@ -485,8 +507,10 @@ bool MythNews::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void MythNews::slotRetrieveNews()
+void MythNews::slotRetrieveNews(void)
 {
+    QMutexLocker locker(&m_lock);
+
     if (m_NewsSites.empty())
         return;
 
@@ -521,8 +545,10 @@ void MythNews::slotNewsRetrieved(NewsSite *site)
     processAndShowNews(site);
 }
 
-void MythNews::cancelRetrieve()
+void MythNews::cancelRetrieve(void)
 {
+    QMutexLocker locker(&m_lock);
+
     NewsSite::List::iterator it = m_NewsSites.begin();
     for (; it != m_NewsSites.end(); ++it)
     {
@@ -533,6 +559,8 @@ void MythNews::cancelRetrieve()
 
 void MythNews::processAndShowNews(NewsSite *site)
 {
+    QMutexLocker locker(&m_lock);
+
     if (!site)
         return;
 
@@ -548,8 +576,9 @@ void MythNews::processAndShowNews(NewsSite *site)
     m_articlesList->Reset();
     m_articles.clear();
 
-    NewsArticle::List::iterator it = site->articleList().begin();
-    for (; it != site->articleList().end(); ++it)
+    NewsArticle::List articles = site->GetArticleList();
+    NewsArticle::List::iterator it = articles.begin();
+    for (; it != articles.end(); ++it)
     {
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_articlesList, (*it).title());
@@ -559,6 +588,8 @@ void MythNews::processAndShowNews(NewsSite *site)
 
 void MythNews::slotSiteSelected(MythUIButtonListItem *item)
 {
+    QMutexLocker locker(&m_lock);
+
     if (!item || item->GetData().isNull())
         return;
 
@@ -569,8 +600,9 @@ void MythNews::slotSiteSelected(MythUIButtonListItem *item)
     m_articlesList->Reset();
     m_articles.clear();
 
-    NewsArticle::List::iterator it = site->articleList().begin();
-    for (; it != site->articleList().end(); ++it)
+    NewsArticle::List articles = site->GetArticleList();
+    NewsArticle::List::iterator it = articles.begin();
+    for (; it != articles.end(); ++it)
     {
         MythUIButtonListItem *item =
             new MythUIButtonListItem(m_articlesList, (*it).title());
@@ -580,13 +612,17 @@ void MythNews::slotSiteSelected(MythUIButtonListItem *item)
     updateInfoView(item);
 }
 
-void MythNews::slotProgressCancelled()
+void MythNews::slotProgressCancelled(void)
 {
+    QMutexLocker locker(&m_lock);
+
     abortHttp = true;
 }
 
 void MythNews::createProgress(QString title)
 {
+    QMutexLocker locker(&m_lock);
+
     if (m_progressPopup)
         return;
 
@@ -603,6 +639,8 @@ void MythNews::createProgress(QString title)
 
 bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
 {
+    QMutexLocker locker(&m_lock);
+
     int redirectCount = 0;
     int timeoutCount = 0;
     QByteArray data(0);
@@ -690,6 +728,8 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
 
 void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
 {
+    QMutexLocker locker(&m_lock);
+
     QMap<MythUIButtonListItem*,NewsArticle>::const_iterator it =
         m_articles.find(articlesListItem);
 
@@ -747,8 +787,7 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
             cmdURL = QString("http://youtube.com/get_video.php"
                              "?video_id=%2&t=%1")
                 .arg(tArgString).arg(vidString);
-            VERBOSE(VB_GENERAL,
-                    QString("MythNews: VideoURL %1").arg(cmdURL));
+            VERBOSE(VB_GENERAL, LOC + QString("VideoURL '%1'").arg(cmdURL));
         }
     }
 
@@ -772,6 +811,8 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
 
 void MythNews::ShowEditDialog(bool edit)
 {
+    QMutexLocker locker(&m_lock);
+
     NewsSite *site = NULL;
 
     if (edit)
@@ -794,8 +835,10 @@ void MythNews::ShowEditDialog(bool edit)
         mainStack->AddScreen(mythnewseditor);
 }
 
-void MythNews::ShowMenu()
+void MythNews::ShowMenu(void)
 {
+    QMutexLocker locker(&m_lock);
+
     QString label = tr("Options");
 
     MythScreenStack *popupStack =
@@ -814,24 +857,24 @@ void MythNews::ShowMenu()
     m_menuPopup->AddButton(tr("Cancel"));
 }
 
-void MythNews::deleteNewsSite()
+void MythNews::deleteNewsSite(void)
 {
+    QMutexLocker locker(&m_lock);
+
     MythUIButtonListItem *siteUIItem = m_sitesList->GetItemCurrent();
 
-    QString siteName;
     if (siteUIItem && !siteUIItem->GetData().isNull())
     {
         NewsSite *site = qVariantValue<NewsSite*>(siteUIItem->GetData());
-        if(site)
+        if (site)
         {
-            siteName = site->name();
-
-            removeFromDB(siteName);
+            removeFromDB(site->name());
             loadSites();
         }
     }
 }
 
+// does not need locking
 void MythNews::playVideo(const QString &filename)
 {
     QString command_string = gContext->GetSetting("VideoDefaultPlayer");
@@ -855,16 +898,19 @@ void MythNews::playVideo(const QString &filename)
     gContext->sendPlaybackEnd();
 }
 
+// does not need locking
 void MythNews::customEvent(QEvent *event)
 {
-
     if (event->type() == kMythDialogBoxCompletionEventType)
     {
         DialogCompletionEvent *dce =
-                                dynamic_cast<DialogCompletionEvent*>(event);
+            dynamic_cast<DialogCompletionEvent*>(event);
 
-        QString resultid= dce->GetId();
-        int buttonnum  = dce->GetResult();
+        if (!dce)
+            return;
+
+        QString resultid = dce->GetId();
+        int buttonnum    = dce->GetResult();
 
         if (resultid == "options")
         {
@@ -884,5 +930,4 @@ void MythNews::customEvent(QEvent *event)
 
         m_menuPopup = NULL;
     }
-
 }

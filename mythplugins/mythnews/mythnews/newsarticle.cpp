@@ -14,6 +14,17 @@ NewsArticle::NewsArticle(const QString &title,
 {
 }
 
+NewsArticle::NewsArticle(const QString &title, const QString &desc,
+                         const QString &articleURL) :
+    m_title(title),
+    m_desc(desc),
+    m_articleURL(articleURL),
+    m_thumbnail(QString::null),
+    m_mediaURL(QString::null),
+    m_enclosure(QString::null)
+{
+}
+
 NewsArticle::NewsArticle(const QString &title) :
     m_title(title),
     m_desc(QString::null),

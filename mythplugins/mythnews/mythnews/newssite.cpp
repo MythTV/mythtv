@@ -16,7 +16,9 @@ NewsSite::NewsSite(const QString   &name,
                    const QString   &url,
                    const QDateTime &updated,
                    const bool       podcast) :
-    QObject(), m_name(name),  m_url(url), m_urlReq(url),
+    QObject(),
+    m_lock(QMutex::Recursive),
+    m_name(name),  m_url(url), m_urlReq(url),
     m_desc(QString::null), m_updated(updated),
     m_destDir(GetConfDir()+"/MythNews"),
     /*m_data(),*/
@@ -30,6 +32,7 @@ NewsSite::NewsSite(const QString   &name,
 
 void NewsSite::deleteLater()
 {
+    QMutexLocker locker(&m_lock);
     MythHttpPool::GetSingleton()->RemoveListener(this);
     m_articleList.clear();
     QObject::deleteLater();
@@ -37,21 +40,26 @@ void NewsSite::deleteLater()
 
 NewsSite::~NewsSite()
 {
+    QMutexLocker locker(&m_lock);
     MythHttpPool::GetSingleton()->RemoveListener(this);
 }
 
 void NewsSite::insertNewsArticle(const NewsArticle &item)
 {
+    QMutexLocker locker(&m_lock);
     m_articleList.push_back(item);
 }
 
 void NewsSite::clearNewsArticles(void)
 {
+    QMutexLocker locker(&m_lock);
     m_articleList.clear();
 }
 
 void NewsSite::retrieve(void)
 {
+    QMutexLocker locker(&m_lock);
+
     stop();
     m_state = NewsSite::Retrieving;
     m_data.resize(0);
@@ -64,57 +72,68 @@ void NewsSite::retrieve(void)
 
 void NewsSite::stop(void)
 {
+    QMutexLocker locker(&m_lock);
     MythHttpPool::GetSingleton()->RemoveUrlRequest(m_urlReq, this);
 }
 
 bool NewsSite::successful(void) const
 {
+    QMutexLocker locker(&m_lock);
     return (m_state == NewsSite::Success);
 }
 
 QString NewsSite::errorMsg(void) const
 {
+    QMutexLocker locker(&m_lock);
     return m_errorString;
 }
 
 QString NewsSite::url(void) const
 {
+    QMutexLocker locker(&m_lock);
     return m_url;
 }
 
 QString NewsSite::name(void) const
 {
+    QMutexLocker locker(&m_lock);
     return m_name;
 }
 
 bool NewsSite::podcast(void) const
 {
+    QMutexLocker locker(&m_lock);
     return m_podcast;
 }
 
 QString NewsSite::description(void) const
 {
-    QString desc = QString("%1\n%2").arg(m_desc).arg(m_errorString);
-    return desc;
+    QMutexLocker locker(&m_lock);
+    return QString("%1\n%2").arg(m_desc).arg(m_errorString);
 }
 
 QString NewsSite::imageURL(void) const
 {
+    QMutexLocker locker(&m_lock);
     return m_imageURL;
 }
 
-NewsArticle::List &NewsSite::articleList(void)
+NewsArticle::List NewsSite::GetArticleList(void) const
 {
+    QMutexLocker locker(&m_lock);
     return m_articleList;
 }
 
 QDateTime NewsSite::lastUpdated(void) const
 {
+    QMutexLocker locker(&m_lock);
     return m_updated;
 }
 
 unsigned int NewsSite::timeSinceLastUpdate(void) const
 {
+    QMutexLocker locker(&m_lock);
+
     QDateTime curTime(QDateTime::currentDateTime());
     unsigned int min = m_updated.secsTo(curTime)/60;
     return min;
@@ -127,6 +146,8 @@ void NewsSite::Update(QHttp::Error      error,
                       const QString    &http_status_str,
                       const QByteArray &data)
 {
+    QMutexLocker locker(&m_lock);
+
     if (url != m_urlReq)
     {
         return;
@@ -181,13 +202,15 @@ void NewsSite::Update(QHttp::Error      error,
     }
 
     if (NewsSite::WriteFailed == m_state)
-        VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: Write failed");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Write failed");
 
     emit finished(this);
 }
 
 void NewsSite::process(void)
 {
+    QMutexLocker locker(&m_lock);
+
     m_articleList.clear();
 
     m_errorString = "";
@@ -209,7 +232,7 @@ void NewsSite::process(void)
     if (!xmlFile.open(QIODevice::ReadOnly))
     {
         insertNewsArticle(NewsArticle(tr("Failed to retrieve news")));
-        VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: failed to open xmlfile");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to open xmlfile");
         if (!m_updateErrorString.isEmpty())
             m_errorString += "\n" + m_updateErrorString;
         return;
@@ -218,8 +241,7 @@ void NewsSite::process(void)
     if (!domDoc.setContent(&xmlFile))
     {
         insertNewsArticle(NewsArticle(tr("Failed to retrieve news")));
-        VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: "
-                "failed to set content from xmlfile");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set content from xmlfile");
         m_errorString += tr("Failed to read downloaded file.");
         if (!m_updateErrorString.isEmpty())
             m_errorString += "\n" + m_updateErrorString;
@@ -235,19 +257,20 @@ void NewsSite::process(void)
 
     //Check the type of the feed
     QString rootName = domDoc.documentElement().nodeName();
-    if(rootName == QString::fromLatin1("rss") ||
-       rootName == QString::fromLatin1("rdf:RDF")) {
+    if (rootName == "rss" || rootName == "rdf:RDF")
+    {
         parseRSS(domDoc);
         xmlFile.close();
         return;
     }
-    else if (rootName == QString::fromLatin1("feed")) {
+    else if (rootName == "feed")
+    {
         parseAtom(domDoc);
         xmlFile.close();
         return;
     }
     else {
-        VERBOSE(VB_IMPORTANT, "MythNews: NewsEngine: XML-file is not valid RSS-feed");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "XML-file is not valid RSS-feed");
         m_errorString += tr("XML-file is not valid RSS-feed");
         return;
     }
@@ -256,124 +279,111 @@ void NewsSite::process(void)
 
 void NewsSite::parseRSS(QDomDocument domDoc)
 {
-    QDomNode channelNode = domDoc.documentElement().namedItem(QString::fromLatin1("channel"));
+    QMutexLocker locker(&m_lock);
 
-    m_desc = channelNode.namedItem(QString::fromLatin1("description")).toElement().text().simplified();
+    QDomNode channelNode = domDoc.documentElement().namedItem("channel");
 
-    QDomNode imageNode = channelNode.namedItem(QString::fromLatin1("image"));
+    m_desc = channelNode.namedItem("description")
+        .toElement().text().simplified();
+
+    QDomNode imageNode = channelNode.namedItem("image");
     if (!imageNode.isNull())
-        m_imageURL = imageNode.namedItem(QString::fromLatin1("url")).toElement().text().simplified();
+        m_imageURL = imageNode.namedItem("url").toElement().text().simplified();
 
-    QDomNodeList items = domDoc.elementsByTagName(QString::fromLatin1("item"));
+    QDomNodeList items = domDoc.elementsByTagName("item");
 
-    QDomNode itemNode;
-    QString title, description, url, thumbnail, mediaurl, enclosure, imageURL, enclosure_type;
-    for (unsigned int i = 0; i < (unsigned) items.count(); i++) {
-        itemNode = items.item(i);
-        title    = itemNode.namedItem(QString::fromLatin1("title")).toElement().text().simplified();
-        if (!title.isNull())
-            ReplaceHtmlChar(title);
+    for (unsigned int i = 0; i < (unsigned) items.count(); i++)
+    {
+        QDomNode itemNode = items.item(i);
+        QString title = ReplaceHtmlChar(itemNode.namedItem("title")
+                                        .toElement().text().simplified());
 
-        QDomNode descNode = itemNode.namedItem(QString::fromLatin1("description"));
+        QDomNode descNode = itemNode.namedItem("description");
+        QString description = QString::null;
         if (!descNode.isNull())
         {
             description = descNode.toElement().text().simplified();
-            ReplaceHtmlChar(description);
+            description = ReplaceHtmlChar(description);
         }
-        else
-            description = QString::null;
 
-        QDomNode linkNode = itemNode.namedItem(QString::fromLatin1("link"));
+        QDomNode linkNode = itemNode.namedItem("link");
+        QString url = QString::null;
         if (!linkNode.isNull())
             url = linkNode.toElement().text().simplified();
-        else
-            url = QString::null;
 
-        QDomNode enclosureNode = itemNode.namedItem(QString::fromLatin1("enclosure"));
+        QDomNode enclosureNode = itemNode.namedItem("enclosure");
+        QString enclosure = QString::null;
+        QString enclosure_type = QString::null;
         if (!enclosureNode.isNull())
         {
-            QDomAttr enclosureURL = enclosureNode.toElement().attributeNode("url");
+            QDomAttr enclosureURL = enclosureNode.toElement()
+                .attributeNode("url");
+
             if (!enclosureURL.isNull())
-               enclosure  = enclosureURL.value();
+                enclosure  = enclosureURL.value();
 
-            QDomAttr enclosureType = enclosureNode.toElement().attributeNode("type");
+            QDomAttr enclosureType = enclosureNode.toElement()
+                .attributeNode("type");
             if (!enclosureType.isNull())
-               enclosure_type  = enclosureType.value();
+                enclosure_type  = enclosureType.value();
+        }
 
-            // VERBOSE(VB_GENERAL, QString("MythNews: Enclosure URL is %1").arg(enclosure));
-        } else
-            enclosure = QString::null;
+        //////////////////////////////////////////////////////////////
+        // From this point forward, we process RSS 2.0 media tags.
+        // Please put all other tag processing before this comment.
+        //////////////////////////////////////////////////////////////
 
-        // From this point forward, we process RSS 2.0 media tags.  Please put all
-        // other tag processing before this
-        // Some media: tags can be enclosed in a media:group item.  If this item is
-        // present, use it to find the media tags, otherwise, proceed.
-        QDomNode mediaGroup = itemNode.namedItem(QString::fromLatin1("media:group"));
+        // Some media: tags can be enclosed in a media:group item.
+        // If this item is present, use it to find the media tags,
+        // otherwise, proceed.
+        QDomNode mediaGroup = itemNode.namedItem("media:group");
         if (!mediaGroup.isNull())
             itemNode = mediaGroup;
 
-        QDomNode thumbNode = itemNode.namedItem(QString::fromLatin1("media:thumbnail"));
+        QDomNode thumbNode = itemNode.namedItem("media:thumbnail");
+        QString thumbnail = QString::null;
         if (!thumbNode.isNull())
         {
             QDomAttr thumburl = thumbNode.toElement().attributeNode("url");
             if (!thumburl.isNull())
                 thumbnail = thumburl.value();
-            // VERBOSE(VB_GENERAL, QString("MythNews: Thumbnail is %1").arg(thumbnail));
-        } else
-            thumbnail = QString::null;
+        }
 
-        QDomNode playerNode = itemNode.namedItem(QString::fromLatin1("media:player"));
+        QDomNode playerNode = itemNode.namedItem("media:player");
+        QString mediaurl = QString::null;
         if (!playerNode.isNull())
         {
             QDomAttr mediaURL = playerNode.toElement().attributeNode("url");
             if (!mediaURL.isNull())
-               mediaurl  = mediaURL.value();
-            // VERBOSE(VB_GENERAL, QString("MythNews: Media URL is %1").arg(mediaurl));
-        } else
-            mediaurl = QString::null;
+                mediaurl = mediaURL.value();
+        }
 
         // If present, the media:description superscedes the RSS description
-        descNode = itemNode.namedItem(QString::fromLatin1("media:description"));
+        descNode = itemNode.namedItem("media:description");
         if (!descNode.isNull())
             description = descNode.toElement().text().simplified();
 
         if (enclosure.isEmpty())
         {
-            QDomNode contentNode = itemNode.namedItem(QString::fromLatin1("media:content"));
+            QDomNode contentNode = itemNode.namedItem("media:content");
             if (!contentNode.isNull())
             {
-                QDomAttr enclosureURL = contentNode.toElement().attributeNode("url");
+                QDomAttr enclosureURL = contentNode.toElement()
+                    .attributeNode("url");
+
                 if (!enclosureURL.isNull())
                    enclosure  = enclosureURL.value();
 
-                QDomAttr enclosureType = contentNode.toElement().attributeNode("type");
+                QDomAttr enclosureType = contentNode.toElement()
+                    .attributeNode("type");
+
                 if (!enclosureType.isNull())
                    enclosure_type  = enclosureType.value();
-                // VERBOSE(VB_GENERAL, QString("MythNews: media:content URL is %1").arg(enclosure));
-
-                // This hack causes the engine to prefer other content over MP4 encoded content
-                // because this can often include AAC audio which requires additional compile options
-                // to enable in MythTV Internal player
-                /*
-                while (enclosure_type == "video/mp4")
-                {
-                    QDomNode altcontentNode = contentNode.nextSibling();
-                    if (altcontentNode.nodeName() != "media:content")
-                        break;
-
-                    QDomAttr enclosureType = altcontentNode.toElement().attributeNode("type");
-                    if (!enclosureType.isNull())
-                    {
-                        enclosure_type  = enclosureType.value();
-
-                        QDomAttr altenclosureURL = altcontentNode.toElement().attributeNode("url");
-                        if (!altenclosureURL.isNull())
-                            enclosure  = altenclosureURL.value();
-                    }
-                }
-                */
             }
         }
+
+        (void) enclosure_type; // not currently used...
+
         insertNewsArticle(NewsArticle(title, description, url,
                                       thumbnail, mediaurl, enclosure));
     }
@@ -381,42 +391,41 @@ void NewsSite::parseRSS(QDomDocument domDoc)
 
 void NewsSite::parseAtom(QDomDocument domDoc)
 {
-    QDomNodeList entries = domDoc.elementsByTagName(QString::fromLatin1("entry"));
+    QDomNodeList entries = domDoc.elementsByTagName("entry");
 
-    QDomNode itemNode;
-    QString title, description, url, thumbnail, mediaurl, enclosure, imageURL, enclosure_type;
-    for (unsigned int i = 0; i < (unsigned) entries.count(); i++) {
-        itemNode = entries.item(i);
-        title    = itemNode.namedItem(QString::fromLatin1("title")).toElement().text().simplified();
-        if (!title.isNull())
-            ReplaceHtmlChar(title);
+    for (unsigned int i = 0; i < (unsigned) entries.count(); i++)
+    {
+        QDomNode itemNode = entries.item(i);
+        QString title =  ReplaceHtmlChar(itemNode.namedItem("title").toElement()
+                                         .text().simplified());
 
-        QDomNode summNode = itemNode.namedItem(QString::fromLatin1("summary"));
+        QDomNode summNode = itemNode.namedItem("summary");
+        QString description = QString::null;
         if (!summNode.isNull())
         {
-            description = summNode.toElement().text().simplified();
-            ReplaceHtmlChar(description);
+            description = ReplaceHtmlChar(
+                summNode.toElement().text().simplified());
         }
-        else
-            description = QString::null;
 
-        QDomNode linkNode = itemNode.namedItem(QString::fromLatin1("link"));
-        if (!linkNode.isNull()){
+        QDomNode linkNode = itemNode.namedItem("link");
+        QString url = QString::null;
+        if (!linkNode.isNull())
+        {
             QDomAttr linkHref = linkNode.toElement().attributeNode("href");
-            if(!linkHref.isNull())
+            if (!linkHref.isNull())
                 url = linkHref.value();
         }
-        else
-            url = QString::null;
 
-        insertNewsArticle(NewsArticle(title, description, url,
-                                      QString::null, QString::null,
-                                      QString::null));
+        insertNewsArticle(NewsArticle(title, description, url));
     }
 }
 
-void NewsSite::ReplaceHtmlChar(QString &s)
+QString NewsSite::ReplaceHtmlChar(const QString &orig)
 {
+    if (orig.isEmpty())
+        return orig;
+
+    QString s = orig;
     s.replace("&amp;", "&");
     s.replace("&lt;", "<");
     s.replace("&gt;", ">");
@@ -440,4 +449,6 @@ void NewsSite::ReplaceHtmlChar(QString &s)
     s.replace("&Ouml;", QChar(0x00d6));
     s.replace("&Uuml;", QChar(0x00dc));
     s.replace("&szlig;", QChar(0x00df));
+
+    return s;
 }

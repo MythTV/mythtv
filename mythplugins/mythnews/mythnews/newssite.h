@@ -14,6 +14,7 @@ using namespace std;
 #include <QDateTime>
 #include <QDomDocument>
 #include <QVariant>
+#include <QByteArray>
 
 // MythNews headers
 #include "newsarticle.h"
@@ -86,7 +87,8 @@ class NewsSite : public QObject, public MythHttpListener
 
     void insertNewsArticle(const NewsArticle &item);
     void clearNewsArticles(void);
-    NewsArticle::List &articleList(void);
+
+    NewsArticle::List GetArticleList(void) const;
 
     void retrieve(void);
     void stop(void);
@@ -107,7 +109,7 @@ class NewsSite : public QObject, public MythHttpListener
   private:
     ~NewsSite();
 
-    QMutex     m_lock;
+    mutable QMutex m_lock;
     QString    m_name;
     QString    m_url;
     QUrl       m_urlReq;
@@ -122,7 +124,7 @@ class NewsSite : public QObject, public MythHttpListener
     bool       m_podcast;
 
     NewsArticle::List m_articleList;
-    void ReplaceHtmlChar(QString &s);
+    static QString ReplaceHtmlChar(const QString &s);
 
   signals:
 

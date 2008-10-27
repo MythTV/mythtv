@@ -4,17 +4,18 @@
 // MythTV headers
 #include <httpcomms.h>
 #include <mythscreentype.h>
-#include <mythuitext.h>
-#include <mythuibuttonlist.h>
-#include <mythuiimage.h>
-#include <mythdialogbox.h>
-#include <mythprogressdialog.h>
 
 // MythNews headers
 #include "newssite.h"
 
 class QTimer;
 class HtppComms;
+class MythUIText;
+class MythUIImage;
+class MythDialogBox;
+class MythUIButtonList;
+class MythUIButtonListItem;
+class MythUIProgressDialog;
 
 /** \class MythNews
  *  \brief Plugin for browsing RSS news feeds.
@@ -24,18 +25,18 @@ class MythNews : public MythScreenType
     Q_OBJECT
 
   public:
-
     MythNews(MythScreenStack *parent, QString name);
-    ~MythNews();
 
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
     void customEvent(QEvent*);
 
-private:
-    void updateInfoView();
+  private:
+    ~MythNews();
 
-    void cancelRetrieve();
+    void updateInfoView(void);
+
+    void cancelRetrieve(void);
     void processAndShowNews(NewsSite *site);
 
     bool getHttpFile(QString sFilename, QString cmdURL);
@@ -44,11 +45,11 @@ private:
     void playVideo(const QString &filename);
 
     // menu stuff
-    void ShowMenu();
-    void deleteNewsSite();
+    void ShowMenu(void);
+    void deleteNewsSite(void);
     void ShowEditDialog(bool edit);
 
-
+    mutable QMutex m_lock;
     NewsSite::List m_NewsSites;
 
     QTimer        *m_RetrieveTimer;
@@ -79,11 +80,11 @@ private:
     MythUIImage *m_enclosureImage;
     MythUIImage *m_podcastImage;
 
-private slots:
-    void loadSites();
+  private slots:
+    void loadSites(void);
     void updateInfoView(MythUIButtonListItem*);
     void slotViewArticle(MythUIButtonListItem*);
-    void slotRetrieveNews();
+    void slotRetrieveNews(void);
     void slotNewsRetrieved(NewsSite*);
     void slotSiteSelected(MythUIButtonListItem*);
 

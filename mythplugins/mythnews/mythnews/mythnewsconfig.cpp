@@ -1,9 +1,11 @@
 // QT Headers
 #include <QApplication>
-#include <QString>
+#include <QStringList>
 #include <QFile>
 
 // MythTV headers
+#include <mythuitext.h>
+#include <mythuibuttonlist.h>
 #include <mythcontext.h>
 #include <mythdbcon.h>
 #include <mythmainwindow.h>
@@ -14,7 +16,9 @@
 #include "newsdbutil.h"
 #include "newssite.h"
 
-using namespace std;
+#define LOC      QString("MythNewsConfig: ")
+#define LOC_WARN QString("MythNewsConfig, Warning: ")
+#define LOC_ERR  QString("MythNewsConfig, Error: ")
 
 // ---------------------------------------------------
 
@@ -27,11 +31,12 @@ class MythNewsConfigPriv
 
 // ---------------------------------------------------
 
-MythNewsConfig::MythNewsConfig(MythScreenStack *parent, const char *name)
+MythNewsConfig::MythNewsConfig(MythScreenStack *parent, const QString name)
     : MythScreenType(parent, name),
+      m_lock(QMutex::Recursive),
       m_priv(new MythNewsConfigPriv), m_categoriesList(NULL),
       m_siteList(NULL),               m_helpText(NULL),
-      m_contextText(NULL),            //m_SpinBox(NULL),
+      m_contextText(NULL),
       m_updateFreq(gContext->GetNumSetting("NewsUpdateFrequency", 30))
 {
     populateSites();
@@ -40,23 +45,20 @@ MythNewsConfig::MythNewsConfig(MythScreenStack *parent, const char *name)
 MythNewsConfig::~MythNewsConfig()
 {
     delete m_priv;
-
-//     if (m_SpinBox)
-//     {
-//         gContext->SaveSetting("NewsUpdateFrequency",
-//                               m_SpinBox->value());
-//     }
 }
 
-void MythNewsConfig::populateSites()
+void MythNewsConfig::populateSites(void)
 {
-    QString filename = GetShareDir()
-                       + "mythnews/news-sites.xml";
+    QMutexLocker locker(&m_lock);
+
+    QString filename = QString("%1%2")
+        .arg(GetShareDir()).arg("mythnews/news-sites.xml");
+
     QFile xmlFile(filename);
 
     if (!xmlFile.exists() || !xmlFile.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, "MythNews: Cannot open news-sites.xml");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot open news-sites.xml");
         return;
     }
 
@@ -66,13 +68,14 @@ void MythNewsConfig::populateSites()
 
     QDomDocument domDoc;
 
-    if (!domDoc.setContent(&xmlFile, false, &errorMsg, &errorLine, &errorColumn))
+    if (!domDoc.setContent(&xmlFile, false, &errorMsg,
+                           &errorLine, &errorColumn))
     {
-        VERBOSE(VB_IMPORTANT, "MythNews: Error in reading content of news-sites.xml");
-        VERBOSE(VB_IMPORTANT, QString("MythNews: Error, parsing %1\n"
-                                      "at line: %2  column: %3 msg: %4")
-                                      .arg(filename).arg(errorLine)
-                                      .arg(errorColumn).arg(errorMsg));
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Could not read content of news-sites.xml" +
+                QString("\n\t\t\tError parsing %1").arg(filename) +
+                QString("\n\t\t\tat line: %1  column: %2 msg: %3")
+                .arg(errorLine).arg(errorColumn).arg(errorMsg));
         return;
     }
 
@@ -118,12 +121,12 @@ void MythNewsConfig::populateSites()
     xmlFile.close();
 }
 
-bool MythNewsConfig::Create()
+bool MythNewsConfig::Create(void)
 {
-    bool foundtheme = false;
+    QMutexLocker locker(&m_lock);
 
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("news-ui.xml", "config", this);
+    bool foundtheme = LoadWindowFromXML("news-ui.xml", "config", this);
 
     if (!foundtheme)
         return false;
@@ -139,7 +142,9 @@ bool MythNewsConfig::Create()
 
     if (!m_categoriesList || !m_siteList)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Theme is missing critical theme elements.");
+
         return false;
     }
 
@@ -149,7 +154,10 @@ bool MythNewsConfig::Create()
             this, SLOT(toggleItem(MythUIButtonListItem*)));
 
     if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Failed to build a focuslist. Something is wrong");
+    }
 
     SetFocusWidget(m_categoriesList);
     m_categoriesList->SetActive(true);
@@ -157,21 +165,13 @@ bool MythNewsConfig::Create()
 
     loadData();
 
-//    if (m_helpText)
-//    {
-//        m_helpText->SetText(tr("Set update frequency by using the up/down arrows."
-//                          "Minimum value is 30 Minutes."));
-//    }
-
-//     m_SpinBox = new MythUISpinBox(this);
-//     m_SpinBox->setRange(30,1000);
-//     m_SpinBox->setLineStep(10);
-
     return true;
 }
 
-void MythNewsConfig::loadData()
+void MythNewsConfig::loadData(void)
 {
+    QMutexLocker locker(&m_lock);
+
     NewsCategory::List::iterator it = m_priv->categoryList.begin();
     for (; it != m_priv->categoryList.end(); ++it)
     {
@@ -186,6 +186,8 @@ void MythNewsConfig::loadData()
 
 void MythNewsConfig::toggleItem(MythUIButtonListItem *item)
 {
+    QMutexLocker locker(&m_lock);
+
     if (!item || !item->getData())
         return;
 
@@ -213,6 +215,8 @@ void MythNewsConfig::toggleItem(MythUIButtonListItem *item)
 
 void MythNewsConfig::slotCategoryChanged(MythUIButtonListItem *item)
 {
+    QMutexLocker locker(&m_lock);
+
     if (!item)
         return;
 

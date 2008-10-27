@@ -17,7 +17,10 @@ class NewsArticle
                 const QString &desc, const QString &artURL,
                 const QString &thumbnail, const QString &mediaURL,
                 const QString &enclosure);
+    NewsArticle(const QString &title,
+                const QString &desc, const QString &artURL);
     NewsArticle(const QString &title);
+
     NewsArticle();
 
     QString title(void)       const { return m_title;      }

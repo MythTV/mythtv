@@ -15,39 +15,43 @@
 #include "newsdbutil.h"
 #include "newssite.h"
 
+#define LOC      QString("MythNewsEditor: ")
+#define LOC_WARN QString("MythNewsEditor, Warning: ")
+#define LOC_ERR  QString("MythNewsEditor, Error: ")
+
 /** \brief Creates a new MythNewsEditor Screen
  *  \param parent Pointer to the screen stack
  *  \param name The name of the window
  */
 MythNewsEditor::MythNewsEditor(NewsSite *site, bool edit,
-                               MythScreenStack *parent, const char *name)
-    : MythScreenType (parent, name)
+                               MythScreenStack *parent,
+                               const QString name) :
+    MythScreenType(parent, name),
+    m_lock(QMutex::Recursive),
+    m_site(site),          m_siteName(QString::null),
+    m_editing(edit),
+    m_titleText(NULL),     m_nameLabelText(NULL),
+    m_urlLabelText(NULL),  m_iconLabelText(NULL),
+    m_nameEdit(NULL),      m_urlEdit(NULL),
+    m_iconEdit(NULL),
+    m_okButton(NULL),      m_cancelButton(NULL),
+    m_podcastCheck(NULL)
 {
-
-    m_titleText = m_nameLabelText = m_urlLabelText = m_iconLabelText = NULL;
-    m_nameEdit = m_urlEdit = m_iconEdit = NULL;
-    m_okButton = m_cancelButton = NULL;
-
-    m_site = site;
-    m_editing = edit;
-
     if (m_editing)
         m_siteName = m_site->name();
-    else
-        m_siteName = "";
 }
 
 MythNewsEditor::~MythNewsEditor()
 {
+    QMutexLocker locker(&m_lock);
 }
 
-bool MythNewsEditor::Create()
+bool MythNewsEditor::Create(void)
 {
-
-    bool foundtheme = false;
+    QMutexLocker locker(&m_lock);
 
     // Load the theme for this screen
-    foundtheme = LoadWindowFromXML("news-ui.xml", "editor", this);
+    bool foundtheme = LoadWindowFromXML("news-ui.xml", "editor", this);
 
     if (!foundtheme)
         return false;
@@ -56,10 +60,8 @@ bool MythNewsEditor::Create()
 
     if (m_titleText)
     {
-      if (m_editing)
-          m_titleText->SetText(tr("Edit Site Details"));
-      else
-          m_titleText->SetText(tr("Enter Site Details"));
+        m_titleText->SetText(
+            (m_editing) ? tr("Edit Site Details") : tr("Enter Site Details"));
     }
 
     m_nameLabelText = dynamic_cast<MythUIText *> (GetChild("namelabel"));
@@ -75,10 +77,12 @@ bool MythNewsEditor::Create()
     m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
-    if (!m_nameEdit || !m_urlEdit || !m_iconEdit || !m_okButton
-        || !m_cancelButton || !m_podcastCheck)
+    if (!m_nameEdit || !m_urlEdit || !m_iconEdit || !m_okButton ||
+        !m_cancelButton || !m_podcastCheck)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Theme is missing critical theme elements.");
+
         return false;
     }
 
@@ -105,7 +109,10 @@ bool MythNewsEditor::Create()
     }
 
     if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Failed to build a focuslist. Something is wrong");
+    }
 
     SetFocusWidget(m_nameEdit);
 
@@ -127,15 +134,17 @@ bool MythNewsEditor::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void MythNewsEditor::Save()
+void MythNewsEditor::Save(void)
 {
-    QDateTime time;
+    {
+        QMutexLocker locker(&m_lock);
 
-    if (m_editing && m_siteName != "")
-        removeFromDB(m_siteName);
+        if (m_editing && !m_siteName.isEmpty())
+            removeFromDB(m_siteName);
 
-    insertInDB(m_nameEdit->GetText(), m_urlEdit->GetText(),
-               m_iconEdit->GetText(), "custom", m_podcastCheck->GetCheckState());
-
+        insertInDB(m_nameEdit->GetText(), m_urlEdit->GetText(),
+                   m_iconEdit->GetText(), "custom",
+                   m_podcastCheck->GetCheckState());
+    }
     Close();
 }
