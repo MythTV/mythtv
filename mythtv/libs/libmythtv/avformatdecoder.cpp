@@ -460,7 +460,7 @@ AvFormatDecoder::~AvFormatDecoder()
     delete ttd;
     delete d;
     delete h264_kf_seq;
-    av_freep((void *)audioSamples);
+    av_freep((void *)&audioSamples);
 
     if (dummy_frame)
     {
