@@ -23,6 +23,7 @@ class VideoOutputQuartz : public VideoOutput
                       MythCodecID  av_codec_id,
                       void        *codec_private);
     void VideoAspectRatioChanged(float aspect);
+    void MoveResize(void);
     void Zoom(ZoomDirection direction);
 
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
