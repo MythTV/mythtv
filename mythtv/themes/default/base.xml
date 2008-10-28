@@ -518,19 +518,19 @@
 
     <!-- Popup Dialogue Box -->
     <window name="MythDialogBox">
-        <area>150,50,500,500</area>
+        <area>-1,-1,500,500</area>
         <imagetype name="backimg">
             <filename>mythdialogbox-background.png</filename>
         </imagetype>
 
         <textarea name="messagearea" from="basetextarea">
-            <area>12,20,470,210</area>
+            <area>12,15,470,210</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
 
         <buttonlist name="list" from="basebuttonlist">
-            <area>12,230,470,250</area>
+            <area>12,225,470,250</area>
             <drawfrombottom>yes</drawfrombottom>
             <align>center</align>
             <showarrow>no</showarrow>
@@ -558,7 +558,7 @@
     </window>
 
     <window name="MythBusyDialog">
-        <area>110,217,580,165</area>
+        <area>-1,-1,580,165</area>
         <imagetype name="backimg">
             <filename>mythprogressdialog-background.png</filename>
         </imagetype>
@@ -574,7 +574,7 @@
     </window>
 
     <window name="MythProgressDialog">
-        <area>110,217,580,165</area>
+        <area>-1,-1,580,165</area>
         <imagetype name="backimg">
             <filename>mythprogressdialog-background.png</filename>
         </imagetype>
@@ -593,7 +593,7 @@
     </window>
 
     <window name="MythConfirmationDialog">
-        <area>110,217,580,165</area>
+        <area>-1,-1,580,165</area>
 
         <imagetype name="backimg">
             <filename>mythprogressdialog-background.png</filename>
@@ -616,7 +616,7 @@
     </window>
 
     <window name="MythTextInputDialog">
-        <area>110,217,580,165</area>
+        <area>-1,-1,580,165</area>
 
         <imagetype name="backimg">
             <filename>mythprogressdialog-background.png</filename>
@@ -637,7 +637,7 @@
     </window>
 
     <window name="MythSearchDialog">
-        <area>150,50,500,500</area>
+        <area>-1,-1,500,500</area>
         <imagetype name="backimg">
             <filename>mythdialogbox-background.png</filename>
         </imagetype>
