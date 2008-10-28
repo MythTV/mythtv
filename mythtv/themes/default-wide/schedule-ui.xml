@@ -1,0 +1,87 @@
+<mythuitheme>
+
+    <window name="manualschedule">
+
+        <textarea name="pagetitle" from="basetextarea">
+            <area>40,40,1200,40</area>
+            <font>baselarge</font>
+            <value>Manual Recording Schedule</value>
+        </textarea>
+
+        <textarea name="titlelabel" from="basetextarea">
+            <area>40,130,400,30</area>
+            <font>basemedium</font>
+            <align>right</align>
+            <value>Title (Optional):</value>
+        </textarea>
+
+        <textedit name="title" from="basetextedit">
+            <position>480,120</position>
+        </textedit>
+
+        <textarea name="channellabel" from="titlelabel">
+            <position>40,208</position>
+            <value>Channel:</value>
+        </textarea>
+
+        <buttonlist name="channel" from="basewideselector">
+            <position>480,200</position>
+        </buttonlist>
+
+        <textarea name="datelabel" from="titlelabel">
+          <!--  <position>40,288</position> -->
+            <area>40,288,400,30</area>
+            <value>Date, or day of week:</value>
+        </textarea>
+
+        <buttonlist name="startdate" from="basewideselector">
+            <position>480,280</position>
+        </buttonlist>
+
+        <textarea name="timelabel" from="titlelabel">
+            <area>40,368,400,30</area>
+            <value>Start Time:</value>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="hourlabel" from="basetextarea">
+            <area>460,370,80,30</area>
+            <value>Hour</value>
+            <align>right</align>
+        </textarea>
+
+        <spinbox name="starthour" from="basespinbox">
+            <position>550,360</position>
+        </spinbox>
+
+        <textarea name="minutelabel" from="hourlabel">
+            <position>700,370</position>
+            <value>Minute</value>
+        </textarea>
+
+        <spinbox name="startminute" from="basespinbox">
+            <position>785,360</position>
+        </spinbox>
+
+        <textarea name="durationlabel" from="titlelabel">
+            <position>40,458</position>
+            <value>Duration:</value>
+        </textarea>
+
+        <spinbox name="duration" from="basespinbox">
+            <position>480,450</position>
+        </spinbox>
+
+        <button name="cancel" from="basebutton">
+            <position>480,580</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="next" from="basebutton">
+            <position>700,580</position>
+            <value>Next</value>
+        </button>
+
+    </window>
+
+</mythuitheme>
