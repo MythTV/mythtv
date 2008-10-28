@@ -250,7 +250,7 @@ void MiniPlayer::keyPressEvent(QKeyEvent *e)
                     if (m_infoText)
                     {
                         m_showingInfo = true;
-                        if (gPlayer->getOutput()->GetMute())
+                        if (gPlayer->IsMuted())
                             m_infoText->SetText(tr("Mute: On"));
                         else
                             m_infoText->SetText(tr("Mute: Off"));
@@ -260,7 +260,7 @@ void MiniPlayer::keyPressEvent(QKeyEvent *e)
 
                     if (m_volText)
                     {
-                        if (gPlayer->getOutput()->GetMute())
+                        if (gPlayer->IsMuted())
                             m_volText->SetText(QString(m_volFormat).arg(0));
                         else
                             m_volText->SetText(QString(m_volFormat)
@@ -702,7 +702,7 @@ void MiniPlayer::showAutoMode(void)
 void MiniPlayer::showVolume(void)
 {
     float level = (float)gPlayer->getOutput()->GetCurrentVolume();
-    bool muted = gPlayer->getOutput()->GetMute();
+    bool muted = gPlayer->IsMuted();
 
     if (m_infoText)
     {

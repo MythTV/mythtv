@@ -6,6 +6,7 @@
 
 #include <sys/time.h>
 
+#include "volumebase.h"
 #include "RingBuffer.h"
 #include "osd.h"
 #include "jitterometer.h"
@@ -126,6 +127,10 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetAudioInfo(const QString &main, const QString &passthru, uint rate);
     void SetAudioParams(int bits, int channels, int samplerate, bool passthru);
     void SetEffDsp(int dsprate);
+    uint AdjustVolume(int change);
+    bool SetMuted(bool mute);
+    MuteState SetMuteState(MuteState);
+    MuteState IncrMuteState(void);
     void SetAudioCodec(void *ac);
 
     // Sets
@@ -180,9 +185,11 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     float   GetVideoAspect(void) const        { return video_aspect; }
     float   GetFrameRate(void) const          { return video_frame_rate; }
 
+    uint    GetVolume(void) const;
     int     GetSecondsBehind(void) const;
     AspectOverrideMode GetAspectOverride(void) const;
     AdjustFillMode     GetAdjustFill(void) const;
+    MuteState          GetMuteState(void) const;
     int     GetFFRewSkip(void) const          { return ffrew_skip; }
     float   GetAudioStretchFactor(void) const { return audio_stretchfactor; }
     float   GetNextPlaySpeed(void) const      { return next_play_speed; }
@@ -208,6 +215,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool    PlayingSlowForPrebuffer(void) const { return m_playing_slower; }
     bool    HasAudioIn(void) const            { return !no_audio_in; }
     bool    HasAudioOut(void) const           { return !no_audio_out; }
+    bool    IsMuted(void) const        { return GetMuteState() == kMuteAll; }
 
     // Complicated gets
     long long CalcMaxFFTime(long long ff, bool setjump = true) const;
@@ -218,7 +226,6 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     /// Non-const gets
     OSD         *GetOSD(void)                 { return osd; }
     VideoOutput *getVideoOutput(void)         { return videoOutput; }
-    AudioOutput *getAudioOutput(void)         { return audioOutput; }
     char        *GetScreenGrabAtFrame(long long frameNum, bool absolute,
                                       int &buflen, int &vw, int &vh, float &ar);
     char        *GetScreenGrab(int secondsin, int &buflen,

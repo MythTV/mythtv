@@ -414,6 +414,66 @@ void NuppelVideoPlayer::SetAudioInfo(const QString &main_device,
     audio_samplerate      = (int)samplerate;
 }
 
+uint NuppelVideoPlayer::GetVolume(void) const
+{
+    if (audioOutput)
+        return audioOutput->GetCurrentVolume();
+    return 0;
+}
+
+bool NuppelVideoPlayer::SetMuted(bool mute)
+{
+    bool is_muted = IsMuted();
+
+    if (audioOutput && !is_muted && mute &&
+        (kMuteAll == SetMuteState(kMuteAll)))
+    {
+        VERBOSE(VB_AUDIO, "muting sound " <<IsMuted());
+        ClearAfterSeek(false);
+        return true;
+    }
+    else if (audioOutput && is_muted && !mute &&
+             (kMuteOff == SetMuteState(kMuteOff)))
+    {
+        VERBOSE(VB_AUDIO, "unmuting sound "<<IsMuted());
+        ClearAfterSeek(false);
+        return true;
+    }
+
+    VERBOSE(VB_AUDIO, "not changing sound mute state "<<IsMuted());
+
+    return false;
+}
+
+MuteState NuppelVideoPlayer::SetMuteState(MuteState mstate)
+{
+    if (audioOutput)
+        return audioOutput->SetMuteState(mstate);
+    return kMuteAll;
+}
+
+MuteState NuppelVideoPlayer::IncrMuteState(void)
+{
+    MuteState mstate = kMuteAll;
+    if (audioOutput)
+        mstate = SetMuteState(VolumeBase::NextMuteState(GetMuteState()));
+    return mstate;
+}
+
+MuteState NuppelVideoPlayer::GetMuteState(void) const
+{
+    if (audioOutput)
+        return audioOutput->GetMuteState();
+    return kMuteAll;
+}
+
+uint NuppelVideoPlayer::AdjustVolume(int change)
+{
+    if (audioOutput)
+        audioOutput->AdjustCurrentVolume(change);
+    return GetVolume();
+}
+
 void NuppelVideoPlayer::PauseDecoder(void)
 {
     decoder_lock.lock();
@@ -613,6 +673,8 @@ bool NuppelVideoPlayer::InitVideo(void)
         if (!videoOutput->Init(video_disp_dim.width(), video_disp_dim.height(),
                                video_aspect, 0, 0, 0, 0, 0, 0))
         {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Unable to create null video out");
             errored = true;
             return false;
         }
@@ -639,6 +701,8 @@ bool NuppelVideoPlayer::InitVideo(void)
 
         if (!widget)
         {
+            VERBOSE(VB_IMPORTANT, "Couldn't find 'tv playback' widget. "
+                    "Current widget doesn't exist. Exiting..");
             errored = true;
             return false;
         }
@@ -3709,6 +3773,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     decoderThreadPaused.wakeAll();
 
+    playing = false;
     killvideo = true;
     pthread_join(output_video, NULL);
 
@@ -3729,8 +3794,6 @@ void NuppelVideoPlayer::StartPlaying(void)
             perror("pthread_setschedparam");
     }
 */
-
-    playing = false;
 
     if (IsErrored() && !using_null_videoout)
     {
@@ -3851,6 +3914,9 @@ void NuppelVideoPlayer::WrapTimecode(long long &timecode, TCTypes tc_type)
  */
 void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 {
+    if (IsMuted())
+        return;
+
     if (!ringBuffer->InDVDMenuOrStillFrame())
         WrapTimecode(timecode, TC_AUDIO);
 
@@ -3918,6 +3984,9 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
                                      int samples, long long timecode)
 {
+    if (IsMuted())
+        return;
+
     char *buffers[2];
 
     WrapTimecode(timecode, TC_AUDIO);

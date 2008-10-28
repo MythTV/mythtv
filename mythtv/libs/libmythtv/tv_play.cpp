@@ -808,6 +808,7 @@ TV::~TV(void)
         if (!gContext->GetNumSetting("GuiSizeForTV", 0))
             mwnd->move(saved_gui_bounds.topLeft());
     }
+
     if (recorderPlaybackInfo)
         delete recorderPlaybackInfo;
 
@@ -2417,12 +2418,8 @@ void TV::TVEventThreadChecks(void)
         (unmuteTimer.elapsed() > unmuteTimeout))
     {
         unmuteTimer.stop();
-        if (nvp)
-        {
-            AudioOutput *aud = nvp->getAudioOutput();
-            if (aud && aud->GetMute())
-                aud->ToggleMute();
-        }
+        if (nvp && nvp->IsMuted())
+            nvp->SetMuted(false);
     }
 
 
@@ -4047,20 +4044,9 @@ void TV::SwapPIP(void)
     if (!pipnvp || !piptvchain || !tvchain)
         return;
 
-    bool muted = false;
-
     // save the mute state so we can restore it later
-    if (nvp)
-    {
-        AudioOutput *aud = nvp->getAudioOutput();
-        if (aud)
-        {
-            muted = aud->GetMute();
-
-            if (!muted)
-                aud->ToggleMute();
-        }
-    }
+    MuteState mctx_mute = nvp->GetMuteState();
+    nvp->SetMuted(true);
 
     lockTimerOn = false;
 
@@ -4107,13 +4093,8 @@ void TV::SwapPIP(void)
     nvp->FastForward(pip.frame/recorder->GetFrameRate());
 
     // if we were muted before swapping PIP we need to restore it here
-    if (muted && nvp)
-    {
-        AudioOutput *aud = nvp->getAudioOutput();
-
-        if (aud && !aud->GetMute())
-            aud->ToggleMute();
-    }
+    if (nvp->GetMuteState() != mctx_mute)
+        nvp->SetMuteState(mctx_mute);
 
     piprbuffer->Seek(0, SEEK_SET);
     piprbuffer->Unpause();
@@ -4252,12 +4233,8 @@ bool TV::DoNVPSeek(float time)
 
     bool muted = false;
 
-    AudioOutput *aud = nvp->getAudioOutput();
-    if (aud && !aud->GetMute())
-    {
-        aud->ToggleMute();
-        muted = true;
-    }
+    if (!activenvp)
+        muted = activenvp->SetMuted(true);
 
     bool res = false;
 
@@ -4500,14 +4477,7 @@ void TV::DoSkipCommercials(int direction)
     if (StateIsLiveTV(GetState()))
         return;
 
-    bool muted = false;
-
-    AudioOutput *aud = nvp->getAudioOutput();
-    if (aud && !aud->GetMute())
-    {
-        aud->ToggleMute();
-        muted = true;
-    }
+    bool muted = activenvp->SetMuted(true);
 
     bool slidertype = false;
 
@@ -4805,15 +4775,8 @@ void TV::ChangeChannel(int direction)
 {
     bool muted = false;
 
-    if (nvp)
-    {
-        AudioOutput *aud = nvp->getAudioOutput();
-        if (aud && !aud->GetMute() && activenvp == nvp)
-        {
-            aud->ToggleMute();
-            muted = true;
-        }
-    }
+    if (activenvp && (activenvp == nvp))
+        muted = activenvp->SetMuted(true);
 
     if (nvp && (activenvp == nvp) && paused)
     {
@@ -5144,15 +5107,8 @@ void TV::ChangeChannel(uint chanid, const QString &chan)
     if (!activerecorder->CheckChannel(channum))
         return;
 
-    if (nvp)
-    {
-        AudioOutput *aud = nvp->getAudioOutput();
-        if (aud && !aud->GetMute() && activenvp == nvp)
-        {
-            aud->ToggleMute();
-            muted = true;
-        }
-    }
+    if (nvp && (activenvp == nvp) && !activenvp->IsMuted())
+        muted = activenvp->SetMuted(true);
 
     if (nvp && (activenvp == nvp) && paused && GetOSD())
     {
@@ -6041,21 +5997,16 @@ void TV::EditSchedule(int editType)
 
 void TV::ChangeVolume(bool up)
 {
-    AudioOutput *aud = nvp->getAudioOutput();
-    if (!aud)
+    if (!activenvp)
         return;
 
-    if (up)
-        aud->AdjustCurrentVolume(2);
-    else
-        aud->AdjustCurrentVolume(-2);
-
-    int curvol = aud->GetCurrentVolume();
+    uint curvol = activenvp->AdjustVolume((up) ? +2 : -2);
     QString text = QString(tr("Volume %1 %")).arg(curvol);
 
-    if (GetOSD() && !browsemode)
+    OSD *osd = GetOSD();
+    if (osd && !browsemode)
     {
-        GetOSD()->ShowStatus(curvol * 10, true, tr("Adjust Volume"), text, 5,
+        osd->ShowStatus(curvol * 10, true, tr("Adjust Volume"), text, 5,
                         kOSDFunctionalType_PictureAdjust);
         update_osd_pos = false;
     }
@@ -6157,31 +6108,28 @@ void TV::ChangeAudioSync(int dir, bool allowEdit)
 
 void TV::ToggleMute(void)
 {
-    kMuteState mute_status;
+    MuteState mute_status;
 
-    AudioOutput *aud = nvp->getAudioOutput();
-    if (!aud)
+    if (!activenvp || !activenvp->HasAudioOut())
         return;
 
     if (!MuteIndividualChannels)
     {
-        aud->ToggleMute();
-        bool muted = aud->GetMute();
-        if (muted)
-            mute_status = MUTE_BOTH;
-        else
-            mute_status = MUTE_OFF;
+        activenvp->SetMuted(!activenvp->IsMuted());
+        mute_status = (activenvp->IsMuted()) ? kMuteAll : kMuteOff;
     }
-    else mute_status = aud->IterateMutedChannels();
-
+    else
+    {
+        mute_status = activenvp->IncrMuteState();
+    }
     QString text;
 
     switch (mute_status)
     {
-       case MUTE_OFF: text = tr("Mute Off"); break;
-       case MUTE_BOTH:  text = tr("Mute On"); break;
-       case MUTE_LEFT: text = tr("Left Channel Muted"); break;
-       case MUTE_RIGHT: text = tr("Right Channel Muted"); break;
+        case kMuteOff:   text = tr("Mute Off"); break;
+        case kMuteAll:   text = tr("Mute On"); break;
+        case kMuteLeft:  text = tr("Left Channel Muted"); break;
+        case kMuteRight: text = tr("Right Channel Muted"); break;
     }
 
     if (GetOSD() && !browsemode)
@@ -6849,7 +6797,7 @@ static PictureAttribute next(
     if ((kAdjustingPicture_Playback == type) && nvp && nvp->getVideoOutput())
     {
         sup = nvp->getVideoOutput()->GetSupportedPictureAttributes();
-        if (nvp->getAudioOutput())
+        if (nvp->HasAudioOut())
             sup |= kPictureAttributeSupported_Volume;
     }
     else if (kAdjustingPicture_Channel == type)
@@ -6893,9 +6841,9 @@ void TV::DoTogglePictureAttribute(PictureAdjustType type)
         {
             value = nvp->getVideoOutput()->GetPictureAttribute(attr);
         }
-        else if (nvp->getAudioOutput())
+        else if (nvp->HasAudioOut())
         {
-            value = nvp->getAudioOutput()->GetCurrentVolume();
+            value = nvp->GetVolume();
             title = tr("Adjust Volume");
         }
     }

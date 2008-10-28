@@ -845,3 +845,17 @@ void MusicPlayer::decSpeed()
     m_playSpeed -= 0.05;
     setSpeed(m_playSpeed);
 }
+
+uint MusicPlayer::GetVolume(void) const
+{
+    if (m_output)
+        return m_output->GetCurrentVolume();
+    return 0;
+}
+
+MuteState MusicPlayer::GetMuteState(void) const
+{
+    if (m_output)
+        return m_output->GetMuteState();
+    return kMuteAll;
+}

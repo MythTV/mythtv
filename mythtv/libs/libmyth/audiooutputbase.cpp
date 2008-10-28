@@ -1138,9 +1138,12 @@ void AudioOutputBase::OutputAudioLoop(void)
             // fragment of zeros -dag
             if (fragment_size >= soundcard_buffer_size - space_on_soundcard)
             {
-                if (fragment_size <= space_on_soundcard) {
+                if (fragment_size <= space_on_soundcard) 
+                {
                     WriteAudio(zeros, fragment_size);
-                } else {
+                }
+                else 
+                {
                     // this should never happen now -dag
                     VERBOSE(VB_AUDIO+VB_TIMESTAMP, LOC +
                             QString("waiting for space on soundcard "
@@ -1268,17 +1271,17 @@ int AudioOutputBase::GetAudioData(unsigned char *buffer, int buf_size, bool full
     audio_buflock.unlock();
 
     // Mute individual channels through mono->stereo duplication
-    kMuteState mute_state = GetMute();
+    MuteState mute_state = GetMuteState();
     if (written_size &&
         audio_channels > 1 &&
-        (mute_state == MUTE_LEFT || mute_state == MUTE_RIGHT))
+        (mute_state == kMuteLeft || mute_state == kMuteRight))
     {
         int offset_src = 0;
         int offset_dst = 0;
  
-        if (mute_state == MUTE_LEFT)
+        if (mute_state == kMuteLeft)
             offset_src = audio_bits / 8;    // copy channel 1 to channel 0
-        else if (mute_state == MUTE_RIGHT)
+        else if (mute_state == kMuteRight)
             offset_dst = audio_bits / 8;    // copy channel 0 to channel 1
      
         for (int i = 0; i < written_size; i += audio_bytes_per_sample)

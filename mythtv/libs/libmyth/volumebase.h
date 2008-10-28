@@ -8,27 +8,29 @@ using namespace std;
 #include "mythcontext.h"
 
 typedef enum {
-    MUTE_OFF = 0,
-    MUTE_LEFT,
-    MUTE_RIGHT,
-    MUTE_BOTH
-} kMuteState;
+    kMuteOff = 0,
+    kMuteLeft,
+    kMuteRight,
+    kMuteAll,
+} MuteState;
 
 class MPUBLIC VolumeBase
 {
- public:
+  public:
     VolumeBase();    
     virtual ~VolumeBase() {};
 
-    virtual int  GetCurrentVolume(void) const;
+    virtual uint GetCurrentVolume(void) const;
     virtual void SetCurrentVolume(int value);
     virtual void AdjustCurrentVolume(int change);
-    virtual void SetMute(bool on);
     virtual void ToggleMute(void);
-    virtual kMuteState GetMute(void) const;
-    virtual kMuteState IterateMutedChannels(void);
 
- protected:
+    virtual MuteState GetMuteState(void) const;
+    virtual MuteState SetMuteState(MuteState);
+
+    static MuteState NextMuteState(MuteState);
+
+  protected:
 
     virtual int GetVolumeChannel(int channel) const = 0; // Returns 0-100
     virtual void SetVolumeChannel(int channel, int volume) = 0; // range 0-100 for vol
@@ -41,7 +43,7 @@ class MPUBLIC VolumeBase
  private:
     
     int volume;
-    kMuteState current_mute_state;
+    MuteState current_mute_state;
 
 };
 

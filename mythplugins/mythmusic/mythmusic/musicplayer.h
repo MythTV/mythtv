@@ -58,6 +58,9 @@ class MusicPlayer : public QObject
 
     Decoder     *getDecoder(void) { return m_decoder; }
     AudioOutput *getOutput(void) { return m_output; }
+    MuteState    GetMuteState(void) const;
+    uint         GetVolume(void) const;
+    bool         IsMuted(void) const { return GetMuteState() == kMuteAll; }
 
     GenericTree *constructPlaylist(void);
     GenericTree *getPlaylistTree() { return m_playlistTree; }

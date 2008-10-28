@@ -193,7 +193,7 @@ generatePrecalCoef ()
  px et py indique la nouvelle position (en sqrtperte ieme de pixel)
  (valeur * 16)
  */
-inline void
+/*inline*/ void
 calculatePXandPY (int x, int y, int *px, int *py)
 {
 	if (theMode == WATER_MODE) {
@@ -316,7 +316,7 @@ calculatePXandPY (int x, int y, int *px, int *py)
 
 //#define _DEBUG
 
-inline void
+/*inline*/ void
 setPixelRGB (Uint * buffer, Uint x, Uint y, Color c)
 {
 	// buffer[ y*WIDTH + x ] = (c.r<<16)|(c.v<<8)|c.b
@@ -332,7 +332,7 @@ setPixelRGB (Uint * buffer, Uint x, Uint y, Color c)
 }
 
 
-inline void
+/*inline*/ void
 setPixelRGB_ (Uint * buffer, Uint x, Color c)
 {
 #ifdef _DEBUG
@@ -368,7 +368,7 @@ getPixelRGB (Uint * buffer, Uint x, Uint y, Color * c)
 }
 
 
-inline void
+/*inline*/ void
 getPixelRGB_ (Uint * buffer, Uint x, Color * c)
 {
 	register unsigned char *tmp8;

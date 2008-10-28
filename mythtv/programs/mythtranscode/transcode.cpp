@@ -185,14 +185,12 @@ class AudioReencodeBuffer : public AudioOutput
     {
         // Do nothing
     }
-    
-
-    virtual int GetCurrentVolume(void) const
+    virtual uint GetCurrentVolume(void) const
     { 
         // Do nothing
         return 100;
     }
-    virtual void SetCurrentVolume(int) 
+    virtual void SetCurrentVolume(int)
     {
         // Do nothing
     }
@@ -208,15 +206,15 @@ class AudioReencodeBuffer : public AudioOutput
     {
         // Do nothing
     }
-    virtual kMuteState GetMute(void) const
+    virtual MuteState GetMuteState(void) const
     {
         // Do nothing
-        return MUTE_OFF;
+        return kMuteOff;
     }
-    virtual kMuteState IterateMutedChannels(void) 
+    virtual MuteState IterateMutedChannels(void)
     {
         // Do nothing
-        return MUTE_OFF;
+        return kMuteOff;
     }
 
     //  These are pure virtual in AudioOutput, but we don't need them here

@@ -1224,11 +1224,8 @@ void PlaybackBoxMusic::showVolume(bool on_or_off)
                 if (class LCD *lcd = LCD::Get())
                     lcd->switchToVolume("Music");
 
-                if (gPlayer->getOutput()->GetMute())
-                    volume_level = 0.0;
-                else
-                    volume_level = (float)gPlayer->getOutput()->GetCurrentVolume() / 
-                                   (float)100;
+                volume_level = 
+                    (gPlayer->IsMuted()) ? 0.0f : gPlayer->GetVolume() * 0.01f;
 
                 if (class LCD *lcd = LCD::Get())
                     lcd->setVolumeLevel(volume_level);

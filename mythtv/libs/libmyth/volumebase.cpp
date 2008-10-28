@@ -2,30 +2,24 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <algorithm>
 using namespace std;
 #include "volumebase.h"
 
 VolumeBase::VolumeBase() :
-    internal_vol(false), volume(80), current_mute_state(MUTE_OFF)
+    internal_vol(false), volume(80), 
+    current_mute_state(kMuteOff)
 {
 }
 
-int VolumeBase::GetCurrentVolume(void) const
+uint VolumeBase::GetCurrentVolume(void) const
 {
     return volume;
 }
 
 void VolumeBase::SetCurrentVolume(int value)
 {
-    volume = value;
-    if (volume < 0)
-    {
-        volume = 0;
-    }
-    else if (volume > 100)
-    {
-        volume = 100;
-    }
+    volume = max(min(value, 100), 0);
     UpdateVolume();
 
     QString controlLabel = gContext->GetSetting("MixerControl", "PCM");
@@ -38,55 +32,52 @@ void VolumeBase::AdjustCurrentVolume(int change)
     SetCurrentVolume(volume + change);
 }
 
-void VolumeBase::SetMute(bool on)
+MuteState VolumeBase::SetMuteState(MuteState mstate)
 {
-    if (on)
-    {
-        current_mute_state = MUTE_BOTH;
-    }
-    else
-    {
-        current_mute_state = MUTE_OFF;
-    }
+    current_mute_state = mstate;
     UpdateVolume();
+    return current_mute_state;
 }
 
 void VolumeBase::ToggleMute(void)
 {
-    SetMute(current_mute_state == MUTE_OFF);
+    VERBOSE(VB_IMPORTANT, "VolumeBase::ToggleMute()");
+    bool is_muted = GetMuteState() == kMuteAll;
+    SetMuteState((is_muted) ? kMuteOff : kMuteAll);
 }
 
-kMuteState VolumeBase::GetMute(void) const
+MuteState VolumeBase::GetMuteState(void) const
 {
     return current_mute_state;
 }
 
-kMuteState VolumeBase::IterateMutedChannels(void)
+MuteState VolumeBase::NextMuteState(MuteState cur)
 {
-    // mute states are checked in GetAudioData
-    switch (current_mute_state)
+    MuteState next = cur;
+
+    switch (cur)
     {
-       case MUTE_OFF:
-           current_mute_state = MUTE_LEFT;
+       case kMuteOff:
+           next = kMuteLeft;
            break;
-       case MUTE_LEFT:
-           current_mute_state = MUTE_RIGHT;
+       case kMuteLeft:
+           next = kMuteRight;
            break;
-       case MUTE_RIGHT:
-           current_mute_state = MUTE_BOTH;
+       case kMuteRight:
+           next = kMuteAll;
            break;
-       case MUTE_BOTH:
-           current_mute_state = MUTE_OFF;
+       case kMuteAll:
+           next = kMuteOff;
            break;
     }
-    UpdateVolume();
-    return (current_mute_state);
+
+    return (next);
 }
 
 void VolumeBase::UpdateVolume(void)
 {
     int new_volume = volume;
-    if (current_mute_state == MUTE_BOTH)
+    if (current_mute_state == kMuteAll)
     {
         new_volume = 0;
     }
@@ -99,11 +90,11 @@ void VolumeBase::UpdateVolume(void)
     
     // Individual channel muting is handled in GetAudioData,
     // this code demonstrates the old method.
-    // if (current_mute_state == MUTE_LEFT)
+    // if (current_mute_state == kMuteLeft)
     // {
     //     SetVolumeChannel(0, 0);
     // }
-    // else if (current_mute_state == MUTE_RIGHT)
+    // else if (current_mute_state == kMuteRight)
     // {
     //     SetVolumeChannel(1, 0);
     // }
