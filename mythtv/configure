@@ -1602,12 +1602,12 @@ done
 
 
 #setting default runtime prefix and libdir
-libdir_default="${prefix}/${libdir_name}"
-
 if test -n ${prefix}; then
     runprefix_default=${prefix}
+    libdir_default="${prefix}/${libdir_name}"
 else
     runprefix_default=${prefix_default}
+    libdir_default="${prefix_default}/${libdir_name}"
 fi
 
 if enabled cpu_override || test x"$tune" != x"generic" && enabled proc_opt; then
