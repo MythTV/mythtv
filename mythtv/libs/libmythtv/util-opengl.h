@@ -8,6 +8,7 @@
 // MythTV headers
 #include "mythcontext.h"
 #include "util-x11.h"
+#include "frame.h"
 
 // GLX headers
 #define GLX_GLXEXT_PROTOTYPES
@@ -77,6 +78,9 @@
 #define GL_FRAMEBUFFER_UNSUPPORTED_EXT    0x8CDD
 #endif
 
+#ifndef GL_NV_fence
+#define GL_ALL_COMPLETED_NV               0x84F2
+#endif
 
 #ifndef GLX_VERSION_1_3
 typedef XID GLXPbuffer;
@@ -113,8 +117,8 @@ GLXPbuffer get_pbuffer(Display     *XJ_disp,
 Window get_gl_window(Display     *XJ_disp,
                      Window       XJ_curwin,
                      XVisualInfo  *visinfo,
-                     const QSize &window_size,
-                     bool         map_window);
+                     const QRect &window_rect,
+                     bool         map_window = true);
 
 GLXWindow get_glx_window(Display     *XJ_disp,
                          GLXFBConfig  glx_fbconfig,
@@ -123,11 +127,18 @@ GLXWindow get_glx_window(Display     *XJ_disp,
                          GLXPbuffer   glx_pbuffer,
                          const QSize &window_size);
 
-void copy_pixels_to_texture(const unsigned char *buf,
-                            int          buffer_format,
-                            const QSize &buffer_size,
-                            int          texture,
-                            int          texture_type);
+void pack_yv12alpha(const unsigned char *source,
+                 const unsigned char *dest,
+                 const int *offsets,
+                 const int *pitches,
+                 const QSize size,
+                 const unsigned char *alpha = NULL);
+
+void pack_yv12interlaced(const unsigned char *source,
+                 const unsigned char *dest,
+                 const int *offsets,
+                 const int *pitches,
+                 const QSize size);
 
 __GLXextFuncPtr get_gl_proc_address(const QString &procName);
 
@@ -135,6 +146,8 @@ int get_gl_texture_rect_type(const QString &extensions);
 bool has_gl_fbuffer_object_support(const QString &extensions);
 bool has_gl_fragment_program_support(const QString &extensions);
 bool has_glx_video_sync_support(const QString &glx_extensions);
+bool has_gl_pixelbuffer_object_support(const QString &extensions);
+bool has_gl_nvfence_support(const QString &extensions);
 
 extern QString                             gMythGLExtensions;
 extern uint                                gMythGLExtSupported;
@@ -145,6 +158,13 @@ extern PFNGLPROGRAMSTRINGARBPROC           gMythGLProgramStringARB;
 extern PFNGLPROGRAMENVPARAMETER4FARBPROC   gMythGLProgramEnvParameter4fARB;
 extern PFNGLDELETEPROGRAMSARBPROC          gMythGLDeleteProgramsARB;
 extern PFNGLGETPROGRAMIVARBPROC            gMythGLGetProgramivARB;
+
+extern PFNGLMAPBUFFERPROC                  gMythGLMapBufferARB;
+extern PFNGLBINDBUFFERARBPROC              gMythGLBindBufferARB;
+extern PFNGLGENBUFFERSARBPROC              gMythGLGenBuffersARB;
+extern PFNGLBUFFERDATAARBPROC              gMythGLBufferDataARB;
+extern PFNGLUNMAPBUFFERARBPROC             gMythGLUnmapBufferARB;
+extern PFNGLDELETEBUFFERSARBPROC           gMythGLDeleteBuffersARB;
 
 // Not all platforms with OpenGL that MythTV supports have the
 // GL_EXT_framebuffer_object extension so we need to define these..
@@ -169,6 +189,10 @@ extern MYTH_GLDELETEFRAMEBUFFERSEXTPROC      gMythGLDeleteFramebuffersEXT;
 extern PFNGLXGETVIDEOSYNCSGIPROC           gMythGLXGetVideoSyncSGI;
 extern PFNGLXWAITVIDEOSYNCSGIPROC          gMythGLXWaitVideoSyncSGI;
 
+extern PFNGLGENFENCESNVPROC                gMythGLGenFencesNV;
+extern PFNGLDELETEFENCESNVPROC             gMythGLDeleteFencesNV;
+extern PFNGLSETFENCENVPROC                 gMythGLSetFenceNV;
+extern PFNGLFINISHFENCENVPROC              gMythGLFinishFenceNV;
 #endif // USING_OPENGL
 
 #endif // _UTIL_OPENGL_H_

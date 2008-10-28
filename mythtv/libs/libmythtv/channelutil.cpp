@@ -940,6 +940,88 @@ bool ChannelUtil::IsOnSameMultiplex(uint srcid,
     return old_mplexid == new_mplexid;
 }
 
+/** \fn get_valid_recorder_list(uint)
+ *  \brief Returns list of the recorders that have chanid in their sources.
+ *  \param chanid  Channel ID of channel we are querying recorders for.
+ *  \return List of cardid's for recorders with channel.
+ */
+static QStringList get_valid_recorder_list(uint chanid)
+{
+    QStringList reclist;
+
+    // Query the database to determine which source is being used currently.
+    // set the EPG so that it only displays the channels of the current source
+    MSqlQuery query(MSqlQuery::InitCon());
+    // We want to get the current source id for this recorder
+    query.prepare(
+            "SELECT cardinput.cardid "
+            "FROM channel "
+            "LEFT JOIN cardinput ON channel.sourceid = cardinput.sourceid "
+            "WHERE channel.chanid = :CHANID");
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("get_valid_recorder_list ChanID", query);
+        return reclist;
+    }
+
+    while (query.next())
+        reclist << query.value(0).toString();
+
+    return reclist;
+}
+
+/** \fn get_valid_recorder_list(const QString&)
+ *  \brief Returns list of the recorders that have channum in their sources.
+ *  \param channum  Channel "number" we are querying recorders for.
+ *  \return List of cardid's for recorders with channel.
+ */
+static QStringList get_valid_recorder_list(const QString &channum)
+{
+    QStringList reclist;
+
+    // Query the database to determine which source is being used currently.
+    // set the EPG so that it only displays the channels of the current source
+    MSqlQuery query(MSqlQuery::InitCon());
+    // We want to get the current source id for this recorder
+    query.prepare(
+        "SELECT cardinput.cardid "
+        "FROM channel "
+        "LEFT JOIN cardinput ON channel.sourceid = cardinput.sourceid "
+        "WHERE channel.channum = :CHANNUM");
+    query.bindValue(":CHANNUM", channum);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythDB::DBError("get_valid_recorder_list ChanNum", query);
+        return reclist;
+    }
+
+    while (query.next())
+        reclist << query.value(0).toString();
+
+    return reclist;
+}
+
+/** \fn TV::GetValidRecorderList(uint, const QString&)
+ *  \brief Returns list of the recorders that have chanid or channum
+ *         in their sources.
+ *  \param chanid   Channel ID of channel we are querying recorders for.
+ *  \param channum  Channel "number" we are querying recorders for.
+ *  \return List of cardid's for recorders with channel.
+ */
+QStringList ChannelUtil::GetValidRecorderList(
+    uint chanid, const QString &channum)
+{
+    if (chanid)
+        return get_valid_recorder_list(chanid);
+    else if (!channum.isEmpty())
+        return get_valid_recorder_list(channum);
+    return QStringList();
+}
+
+
 vector<uint> ChannelUtil::GetConflicting(const QString &channum, uint sourceid)
 {
     MSqlQuery query(MSqlQuery::InitCon());

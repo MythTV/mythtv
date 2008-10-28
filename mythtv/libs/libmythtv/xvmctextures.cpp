@@ -88,7 +88,7 @@ bool XvMCTextures::Init(Display *disp, Window XJ_curwin,
     XVisualInfo *vis_info;
     vis_info = glXGetVisualFromFBConfig(XJ_disp, glx_fbconfig);
     gl_window = get_gl_window(XJ_disp, XJ_curwin, vis_info,
-                              window_size, true);
+                              QRect(QPoint(0,0), window_size));
 
     glx_window = get_glx_window(XJ_disp, glx_fbconfig, gl_window, glx_context,
                                 glx_pbuffer, window_size);

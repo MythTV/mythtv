@@ -128,7 +128,7 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
       xv_colorkey(0),   xv_draw_colorkey(false),
       xv_chroma(0),
 
-      gl_context_lock(), gl_context(NULL),
+      gl_context_lock(QMutex::Recursive), gl_context(NULL),
       gl_videochain(NULL), gl_pipchain(NULL),
       gl_osdchain(NULL),
 
@@ -326,7 +326,10 @@ QRect VideoOutputXv::GetVisibleOSDBounds(
                        display_visible_rect.height() & ~0x1);
 
     if (!chroma_osd && !gl_use_osd_opengl2)
-        return VideoOutput::GetVisibleOSDBounds(visible_aspect, font_scaling, themeaspect);
+    {
+        return VideoOutput::GetVisibleOSDBounds(
+            visible_aspect, font_scaling, themeaspect);
+    }
 
     float dispPixelAdj = 1.0f;
     if (dvr2.height() && dvr2.width())

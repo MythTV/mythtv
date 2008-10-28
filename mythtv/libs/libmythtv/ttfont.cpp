@@ -33,6 +33,7 @@ using namespace std;
 
 bool TTFFont::have_library = false;
 FT_Library TTFFont::the_library;
+QMutex ttfontlock;
 
 #define FT_VALID(handle) ((handle) && (handle)->clazz != NULL)
 
@@ -610,6 +611,7 @@ void TTFFont::Init(void)
    int xdpi = 96, ydpi = 96;
    unsigned short i, n;
 
+   QMutexLocker locker(&ttfontlock);
    error = FT_New_Face(the_library, m_file.toLocal8Bit().constData(), 0, &face);
    if (error)
    {

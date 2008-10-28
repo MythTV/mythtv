@@ -800,6 +800,67 @@ vector<uint> CardUtil::GetCardIDs(uint sourceid)
     return list;
 }
 
+int CardUtil::GetCardInputID(
+    uint cardid, const QString &channum, QString &inputname)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT cardinputid, inputname "
+        "FROM channel, capturecard, cardinput "
+        "WHERE channel.channum      = :CHANNUM           AND "
+        "      channel.sourceid     = cardinput.sourceid AND "
+        "      cardinput.cardid     = capturecard.cardid AND "
+        "      capturecard.cardid   = :CARDID");
+    query.bindValue(":CHANNUM", channum);
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec() || !query.isActive())
+        MythDB::DBError("get_cardinputid", query);
+    else if (query.next())
+    {
+        inputname = query.value(1).toString();
+        return query.value(0).toInt();
+    }
+
+    return -1;
+}
+
+bool CardUtil::SetStartChannel(uint cardinputid, const QString &channum)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE cardinput "
+                  "SET startchan = :CHANNUM "
+                  "WHERE cardinputid = :INPUTID");
+    query.bindValue(":CHANNUM", channum);
+    query.bindValue(":INPUTID", cardinputid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("set_startchan", query);
+        return false;
+    }
+
+    return true;
+}
+
+bool CardUtil::SetStartInput(uint cardid, const QString &inputname)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE capturecard "
+                  "SET defaultinput = :INNAME "
+                  "WHERE cardid = :CARDID");
+    query.bindValue(":INNAME", inputname);
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("set_startinput", query);
+        return false;
+    }
+
+    return true;
+}
+
 /** \fn CardUtil::GetDefaultInput(uint)
  *  \brief Returns the default input for the card
  *  \param nCardID card id to check

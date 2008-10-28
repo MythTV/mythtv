@@ -180,7 +180,8 @@ bool OpenGLContext::Create(
     }
 
     m_priv->m_gl_window = get_gl_window(
-        XJ_disp, XJ_curwin, m_priv->m_vis_info, display_visible_size, visible);
+        XJ_disp, XJ_curwin, m_priv->m_vis_info,
+        QRect(QPoint(0, 0), display_visible_size), visible);
     
     if (!m_priv->m_gl_window)
     {

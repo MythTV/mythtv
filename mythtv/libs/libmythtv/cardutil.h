@@ -168,6 +168,13 @@ class MPUBLIC CardUtil
                                  uint sid, const QString &val)
         { return set_on_source(col, cid, sid, val); }
 
+    static int          GetCardInputID(uint cardid, const QString &channum,
+                                       QString &inputname);
+    static bool         SetStartChannel(uint cardinputid,
+                                        const QString &channum);
+    static bool         SetStartInput(uint cardid,
+                                      const QString &inputname);
+
     // Inputs
     static vector<uint> GetCardIDs(uint sourceid);
     static QString      GetDefaultInput(uint cardid);

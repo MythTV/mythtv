@@ -190,6 +190,9 @@ class MPUBLIC ChannelUtil
                                      const QString &new_channum,
                                      const QString &old_channum);
 
+    static QStringList GetValidRecorderList(uint            chanid,
+                                            const QString &channum);
+
     static bool    IsConflicting(const QString &channum,
                                  uint sourceid = 0, uint excluded_chanid = 0)
     {
