@@ -32,6 +32,10 @@
         <color>#666666</color>
     </font>
 
+    <font name="basesmallpurple" from="basesmall">
+        <color>#9999cc</color>
+    </font>
+
     <font name="basesmallblack" from="basesmall">
         <color>#000000</color>
     </font>
@@ -114,7 +118,7 @@
                     <gradient start="#52CA38" end="#349838" alpha="100" />
                 </imagetype>
                 <textarea name="buttontext">
-                    <font>basesmallgrey</font>
+                    <font>basesmallpurple</font>
                 </textarea>
             </state>
         </statetype>
@@ -187,7 +191,7 @@
                 <textarea name="buttontext">
                     <area>33,1,730,24</area>
                     <font>basesmall</font>
-                    <font state="disabled">basesmallgrey</font>
+                    <font state="disabled">basesmallpurple</font>
                     <font state="error">basesmallred</font>
                     <font state="warning">basesmallyellow</font>
                     <font state="normal">basesmallblue</font>
