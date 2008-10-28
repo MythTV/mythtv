@@ -4,53 +4,53 @@
     <window name="news">
 
         <buttonlist name="siteslist" from="basebuttonlist">
-            <area>20,20,200,300</area>
+            <area>40,20,430,400</area>
             <showarrow>yes</showarrow>
         </buttonlist>
 
         <buttonlist name="articleslist" from="basebuttonlist">
-            <area>250,20,530,300</area>
+            <area>500,20,740,400</area>
             <showarrow>no</showarrow>
         </buttonlist>
 
         <textarea name="title" from="basetextarea">
-            <area>20,350,670,35</area>
+            <area>40,450,1020,70</area>
             <font>baselarge</font>
             <multiline>yes</multiline>
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>20,390,570,150</area>
+            <area>40,515,1020,150</area>
             <multiline>yes</multiline>
         </textarea>
 
         <textarea name="updated" from="basetextarea">
-            <area>20,540,300,35</area>
+            <area>40,660,1080,35</area>
         </textarea>
 
         <imagetype name="background">
             <filename>news-info-bg.png</filename>
-            <position>0,340</position>
+            <area>0,440,1280,280</area>
         </imagetype>
 
         <imagetype name="thumbnail">
-            <area>600,390,160,120</area>
+            <area>1080,515,160,120</area>
             <preserveaspect>true</preserveaspect>
         </imagetype>
 
         <imagetype name="enclosures">
             <filename>enclosures.png</filename>
-            <position>705,350</position>
+            <position>1080,450</position>
         </imagetype>
 
         <imagetype name="download">
             <filename>need-download.png</filename>
-            <position>740,350</position>
+            <position>1208,450</position>
         </imagetype>
 
         <imagetype name="ispodcast">
             <filename>podcast.png</filename>
-            <position>740,350</position>
+            <position>1208,450</position>
         </imagetype>
 
     </window>
