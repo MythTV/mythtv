@@ -65,6 +65,7 @@ BLOCK_QUOTE
   echo "  --compile-type=CTYPE     one of release, profile, debug [$compile_type]"
   echo "                           NOTE: profile is for sampling profilers"
   echo "  --prefix=PREFIX          install in PREFIX [$prefix]"
+  echo "  --runprefix=PREFIX       prefix to be used at runtime (e.g. .. or /myth/latest)"
   echo "  --libdir-name=LIBNAME    search/install libraries in PREFIX/LIBNAME [$libdir_name]"
   echo "  --disable-ccache         disable compiler cache (ccache)"
   echo "  --disable-distcc         disable distributed compilation (distcc)"
@@ -91,8 +92,10 @@ BLOCK_QUOTE
   echo "  --enable-pthreads        use pthreads [default=no]"
   echo "  --enable-w32threads      use Win32 threads [default=no]"
   echo "  --enable-x11grab         enable X11 grabbing [default=no]"
+BLOCK_QUOTE
   echo
   echo "External library support:"
+<<BLOCK_QUOTE
   echo "  --enable-mlib            use Sun medialib [default=no]"
   echo "  --enable-liba52          enable GPLed liba52 support [default=no]"
   echo "  --enable-liba52bin       open liba52.so.0 at runtime [default=no]"
@@ -103,7 +106,9 @@ BLOCK_QUOTE
   echo "                           and libraw1394 [default=no]"
   echo "  --enable-libdirac        enable Dirac support via libdirac [default=no]"
   echo "  --enable-libfaac         enable FAAC support via libfaac [default=no]"
+BLOCK_QUOTE
   echo "  --enable-libfaad         enable FAAD support via libfaad [default=no]"
+<<BLOCK_QUOTE
   echo "  --enable-libfaadbin      open libfaad.so.0 at runtime [default=no]"
   echo "  --enable-libgsm          enable GSM support via libgsm [default=no]"
   echo "  --enable-libmp3lame      enable MP3 encoding via libmp3lame [default=no]"
@@ -154,7 +159,7 @@ BLOCK_QUOTE
   echo "  --disable-iwmmxt         disable iwmmxt usage"
   echo "  --disable-altivec        disable AltiVec usage"
 BLOCK_QUOTE
-  echo "Advanced features (experts only):"
+  echo ""
   echo "  --disable-audio-oss      disable OSS audio support"
   echo "  --disable-audio-alsa     disable ALSA audio support"
   echo "  --disable-audio-arts     disable aRts audio support"
@@ -198,8 +203,6 @@ BLOCK_QUOTE
   echo ""
   echo "  --enable-mac-bundle      produce standalone OS X apps (e.g. mythfrontend.app)"
   echo ""
-  echo "  --runprefix=PREFIX       prefix to be used at runtime"
-  echo "                           (e.g. .. or /myth/latest)"
   echo "  --with-bindings=LIST     install the bindings specified in the"
   echo "                           comma-separated list"
   echo "                           Supported bindings: perl, python"
