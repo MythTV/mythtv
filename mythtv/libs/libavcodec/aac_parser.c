@@ -34,7 +34,22 @@ static int aac_sync(uint64_t state, AACAC3ParseContext *hdr_info,
     int size, rdb, ch, sr;
     uint8_t tmp[8];
 
+    /* HACK: following code is a strict aliasing violation
+     * and miscompiles on x86_32 */
+#if ENABLE_X86_32
+    tmp[0] = state>>56;
+    tmp[1] = state>>48;
+    tmp[2] = state>>40;
+    tmp[3] = state>>32;
+    tmp[4] = state>>24;
+    tmp[5] = state>>16;
+    tmp[6] = state>>8;
+    tmp[7] = state;
+#else
     AV_WB64(tmp, state);
+#endif
+     /* END HACK */
+
     init_get_bits(&bits, tmp+8-AAC_HEADER_SIZE, AAC_HEADER_SIZE * 8);
 
     if(get_bits(&bits, 12) != 0xfff)
