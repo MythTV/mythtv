@@ -67,7 +67,6 @@ our %depend_order = (
       ],
   'mythplugins'
   =>  [
-        'tiff',
         'exif',
         'dvdcss',
 # MythMusic needs these:
@@ -204,6 +203,7 @@ our %depend = (
           '-no-sql-sqlite',
           '-no-sql-odbc',
           '-system-zlib',
+          '-qt-libjpeg',
           '-no-libtiff',
           '-no-libmng',
           '-nomake examples -nomake demos',
@@ -247,11 +247,6 @@ our %depend = (
                    'ln -sf libQtCore.dylib     libQtCore_debug.dylib     ; '.
                    '',
     'parallel-make' => 'yes'
-  },
-  
-  'tiff' =>
-  {
-    'url' => 'http://dl.maptools.org/dl/libtiff/tiff-3.8.2.tar.gz'
   },
   
   'exif' =>
@@ -469,7 +464,7 @@ our %conf = (
   'mythtv'
   =>  [
         '--prefix=' . $PREFIX,
-        '--runtime-prefix=../Resources',
+        '--runprefix=../Resources',
         # To "cross compile" something for a lesser Mac:
         #'--tune=G3',
         #'--disable-altivec',
