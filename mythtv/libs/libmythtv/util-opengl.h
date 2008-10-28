@@ -127,6 +127,12 @@ GLXWindow get_glx_window(Display     *XJ_disp,
                          GLXPbuffer   glx_pbuffer,
                          const QSize &window_size);
 
+void copy_pixels_to_texture(const unsigned char *buf,
+                            int          buffer_format,
+                            const QSize &buffer_size,
+                            int          texture,
+                            int          texture_type);
+
 void pack_yv12alpha(const unsigned char *source,
                  const unsigned char *dest,
                  const int *offsets,

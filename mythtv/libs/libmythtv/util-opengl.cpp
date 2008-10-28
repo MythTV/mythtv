@@ -312,6 +312,41 @@ GLXWindow get_glx_window(Display    *XJ_disp,     GLXFBConfig  glx_fbconfig,
     return glx_window;
 }                       
 
+void copy_pixels_to_texture(const unsigned char *buf,
+                            int                  buffer_format,
+                            const QSize         &buffer_size,
+                            int                  texture,
+                            int                  texture_type)
+{
+    glBindTexture(texture_type, texture);
+
+    uint format;
+    switch (buffer_format)
+    {
+        case FMT_YV12:
+            format = GL_LUMINANCE;
+            break;
+        case FMT_RGB24:
+            format = GL_RGB;
+            break;
+        case FMT_RGBA32:
+            format = GL_RGBA;
+            break;
+        case FMT_ALPHA:
+            format = GL_ALPHA;
+            break;
+        default:
+            return;
+    }
+
+    glTexSubImage2D(
+        texture_type,
+        0, 0, 0,
+        buffer_size.width(), buffer_size.height(),
+        format, GL_UNSIGNED_BYTE,
+        buf);
+}
+
 __GLXextFuncPtr get_gl_proc_address(const QString &procName)
 {
     __GLXextFuncPtr ret = NULL;
