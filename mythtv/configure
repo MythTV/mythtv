@@ -1473,8 +1473,6 @@ for opt do
     ;;
     --libdir-name=*) libdir_name="$optval"
     ;;
-    --libdir=*) die_unknown $opt
-    ;;
     --cxx=*) cxx="$optval"
     ;;
     --qmake=*) qmake="$optval"
