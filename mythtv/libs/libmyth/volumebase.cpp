@@ -41,7 +41,6 @@ MuteState VolumeBase::SetMuteState(MuteState mstate)
 
 void VolumeBase::ToggleMute(void)
 {
-    VERBOSE(VB_IMPORTANT, "VolumeBase::ToggleMute()");
     bool is_muted = GetMuteState() == kMuteAll;
     SetMuteState((is_muted) ? kMuteOff : kMuteAll);
 }
