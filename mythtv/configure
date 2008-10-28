@@ -1602,7 +1602,7 @@ done
 
 
 #setting default runtime prefix and libdir
-if test -n ${prefix}; then
+if test -n "${prefix}"; then
     runprefix_default=${prefix}
     libdir_default="${prefix}/${libdir_name}"
 else
