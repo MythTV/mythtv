@@ -34,7 +34,7 @@ void MythHttpPool::AddUrlRequest(const QUrl &url, MythHttpListener *listener)
     QMutexLocker locker(&m_lock);
 
     VERBOSE(VB_NETWORK, LOC + QString("AddUrlRequest(%1, 0x%2)")
-            .arg(url.toString()).arg((uint64_t)listener,0,16));
+            .arg(url.toString()).arg((quint64)listener,0,16));
 
     bool in_queue = m_urlToListener.find(url) != m_urlToListener.end();
 
@@ -85,7 +85,7 @@ void MythHttpPool::RemoveUrlRequest(const QUrl &url, MythHttpListener *listener)
     QMutexLocker locker(&m_lock);
 
     VERBOSE(VB_NETWORK, LOC + QString("RemoveUrlRequest(%1, 0x%2)")
-            .arg(url.toString()).arg((uint64_t)listener,0,16));
+            .arg(url.toString()).arg((quint64)listener,0,16));
 }
 
 void MythHttpPool::RemoveListener(MythHttpListener *listener)
@@ -93,7 +93,7 @@ void MythHttpPool::RemoveListener(MythHttpListener *listener)
     QMutexLocker locker(&m_lock);
 
     VERBOSE(VB_NETWORK, LOC + QString("RemoveListener(0x%1)")
-            .arg((uint64_t)listener,0,16));
+            .arg((quint64)listener,0,16));
     set<MythHttpListener*>::iterator it = m_listeners.find(listener);
     if (it != m_listeners.end())
         m_listeners.erase(it);
@@ -127,13 +127,13 @@ void MythHttpPool::Done(const QString &host, MythHttpHandler *handler)
     QMutexLocker locker(&m_lock);
 
     VERBOSE(VB_NETWORK, LOC + QString("Done(%1, 0x%2)")
-            .arg(host).arg((uint64_t)handler,0,16));
+            .arg(host).arg((quint64)handler,0,16));
 
     HostToHandler::iterator it = m_hostToHandler.find(host);
     if (handler != *it)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Done(%1, 0x%2)")
-                .arg(host).arg((uint64_t)handler,0,16));
+                .arg(host).arg((quint64)handler,0,16));
         return;
     }
 
