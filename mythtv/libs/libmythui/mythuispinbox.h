@@ -8,8 +8,8 @@
  * \brief A widget for offering a range of numerical values where only the
  *        the bounding values and interval are known.
  *
- * Where a list of specific values is required instead, then use mythlistbutton
- * instead.
+ * Where a list of specific values is required instead, then use
+ * MythUIButtonList instead.
  *
  */
 class MythUISpinBox : public MythUIButtonList
