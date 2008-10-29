@@ -60,7 +60,7 @@ public:
     bool                 m_oldestFirst;
     int                  m_layout;
 
-    vector<Event *>     *m_eventList;
+    std::vector<Event *>     *m_eventList;
     QStringList          m_dateList;
     int                  m_savedPosition;
     int                  m_currentCamera;

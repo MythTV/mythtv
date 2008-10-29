@@ -1,8 +1,5 @@
 // C++ headers
-#include <cassert>
-#include <iostream>
-
-using namespace std;
+#include <algorithm>
 
 // QT headers
 #include <QApplication>
@@ -18,7 +15,6 @@ using namespace std;
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 #include "mythuistatetype.h"
-#include "mythverbose.h"
 
 #define LOC     QString("MythUIButtonList(%1): ").arg(objectName())
 #define LOC_ERR QString("MythUIButtonList(%1), Error: ").arg(objectName())
@@ -440,7 +436,7 @@ void MythUIButtonList::MoveUp(MovementUnit unit)
             }
             break;
         case MovePage:
-            m_selPosition = max(0, m_selPosition - (int)m_itemsVisible);
+            m_selPosition = std::max(0, m_selPosition - (int)m_itemsVisible);
             break;
         case MoveMax:
             m_selPosition = 0;
@@ -522,7 +518,8 @@ void MythUIButtonList::MoveDown(MovementUnit unit)
                 m_selPosition = (pos % m_columns);
             break;
         case MovePage:
-            m_selPosition = min(m_itemCount - 1, m_selPosition + (int)m_itemsVisible);
+            m_selPosition = std::min(m_itemCount - 1,
+                                     m_selPosition + (int)m_itemsVisible);
             break;
         case MoveMax:
             m_selPosition = m_itemCount - 1;
@@ -553,7 +550,7 @@ void MythUIButtonList::MoveDown(MovementUnit unit)
                     m_topPosition = (m_selPosition - m_itemsVisible + m_columns)
                                         / m_columns * m_columns;
 
-                m_topPosition = max(0, m_topPosition);
+                m_topPosition = std::max(0, m_topPosition);
             }
             break;
     }
@@ -611,7 +608,7 @@ bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
                     m_topPosition = (m_selPosition - m_itemsVisible + m_columns)
                                         / m_columns * m_columns;
 
-                m_topPosition = max(0, m_topPosition);
+                m_topPosition = std::max(0, m_topPosition);
             }
             break;
     }

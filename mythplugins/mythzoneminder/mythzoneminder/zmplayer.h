@@ -33,7 +33,7 @@ class ZMPlayer : public MythScreenType
 
   public:
     ZMPlayer(MythScreenStack *parent, const char *name,
-             vector<Event *> *eventList, int *currentEvent);
+             std::vector<Event *> *eventList, int *currentEvent);
     ~ZMPlayer();
 
     bool Create(void);
@@ -70,9 +70,9 @@ class ZMPlayer : public MythScreenType
     MythUIButton     *m_prevButton;
 
     int              *m_currentEvent;
-    vector<Event *>  *m_eventList;
+    std::vector<Event *>  *m_eventList;
 
-    vector<Frame *>  *m_frameList;
+    std::vector<Frame *>  *m_frameList;
     QTimer           *m_frameTimer;
     int               m_curFrame;
     int               m_lastFrame;

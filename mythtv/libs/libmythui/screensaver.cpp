@@ -1,4 +1,3 @@
-using namespace std;
 #include "config.h"
 #include "screensaver.h"
 #include "screensaver-null.h"

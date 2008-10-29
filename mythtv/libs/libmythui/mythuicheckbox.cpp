@@ -1,16 +1,11 @@
-
-#include "mythuicheckbox.h"
-
-// C/C++ headers
-#include <iostream>
-using namespace std;
-
 // Myth headers
 #include "mythverbose.h"
 
 // MythUI headers
 #include "mythmainwindow.h"
 #include "mythgesture.h"
+
+#include "mythuicheckbox.h"
 
 MythUICheckBox::MythUICheckBox(MythUIType *parent, const QString &name)
             : MythUIType(parent, name)

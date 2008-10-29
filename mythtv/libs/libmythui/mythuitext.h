@@ -2,7 +2,6 @@
 #define MYTHUI_TEXT_H_
 
 // QT headers
-#include <QImage>
 #include <QColor>
 
 // Mythdb headers

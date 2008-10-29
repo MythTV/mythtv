@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <QTimer>
 #include <QX11Info>
 

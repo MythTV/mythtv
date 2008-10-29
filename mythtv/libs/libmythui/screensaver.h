@@ -6,30 +6,30 @@
 class ScreenSaverEvent : public QEvent
 {
 public:
-    enum ScreenSaverEventType {ssetDisable, ssetRestore, ssetReset};
+    enum ScreenSaverEventKind {ssetDisable, ssetRestore, ssetReset};
 
-    ScreenSaverEvent(ScreenSaverEventType type) :
-        QEvent((QEvent::Type)kScreenSaverEventType), sset(type)
+    ScreenSaverEvent(ScreenSaverEventKind type) :
+        QEvent((QEvent::Type)ScreenSaverEventType), sset(type)
     {
     }
 
-    ScreenSaverEventType getSSEventType()
+    ScreenSaverEventKind getSSEventType()
     {
         return sset;
     }
 
-    static const int kScreenSaverEventType = 23425;
+    enum EventID { ScreenSaverEventType = 23425 };
 
 protected:
-    ScreenSaverEventType sset;
+    ScreenSaverEventKind sset;
 };
 
-class ScreenSaverControl 
+class ScreenSaverControl
 {
   public:
     // creates one of the concrete subsclasses
     static ScreenSaverControl* get(void);
-    
+
     ScreenSaverControl() { };
     virtual ~ScreenSaverControl() { };
 
@@ -41,4 +41,3 @@ class ScreenSaverControl
 };
 
 #endif // MYTH_SCREENSAVER_H
-

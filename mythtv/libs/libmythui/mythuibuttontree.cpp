@@ -1,6 +1,3 @@
-// C/C++ Headers
-#include <iostream>
-
 // MythDB headers
 #include "mythverbose.h"
 

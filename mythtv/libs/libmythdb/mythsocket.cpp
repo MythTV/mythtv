@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <qapplication.h>
 #include <qstring.h>
 #include <unistd.h>
@@ -905,7 +903,7 @@ void MythSocketThread::run(void)
                 !isLocked(sock->m_lock))
             {
                 FD_SET(sock->socket(), &rfds);
-                maxfd = max(sock->socket(), maxfd);
+                maxfd = std::max(sock->socket(), maxfd);
             }
             ++it;
         }

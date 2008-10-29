@@ -1,13 +1,7 @@
 #ifndef _Display_Res_H_
 #define _Display_Res_H_
 
-using namespace std;
-
-#include <fstream>
-#include <vector>
-#include <map>
 #include "DisplayResScreen.h"
-#include "mythexp.h"
 
 /** \class DisplayRes
  *  \brief The DisplayRes module allows for the display resolution
@@ -108,9 +102,9 @@ class MPUBLIC DisplayRes {
     /// \brief Returns maximum height in pixels supported by display.
     int GetMaxHeight(void)   const { return max_height; }
     /// \brief Returns all video modes supported by the display.
-    virtual const vector<DisplayResScreen>& GetVideoModes() const = 0;
+    virtual const std::vector<DisplayResScreen>& GetVideoModes() const = 0;
     /// \brief Returns refresh rates available at a specific screen resolution.
-    const vector<short> GetRefreshRates(int width, int height) const;
+    const std::vector<short> GetRefreshRates(int width, int height) const;
     /** @} */
 
   protected:
@@ -145,6 +139,6 @@ class MPUBLIC DisplayRes {
  *   class if needed, and returns a copy of vector returned by
  *   GetVideoModes(void).
  */
-MPUBLIC const vector<DisplayResScreen> GetVideoModes(void);
+MPUBLIC const std::vector<DisplayResScreen> GetVideoModes(void);
 
 #endif

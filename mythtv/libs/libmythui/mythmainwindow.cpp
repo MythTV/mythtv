@@ -15,6 +15,7 @@
 #include <QHash>
 #include <QFile>
 #include <QDir>
+#include <QEvent>
 
 #ifdef QWS
 #include <qwindowsystem_qws.h>
@@ -22,8 +23,6 @@
 #ifdef Q_WS_MACX
 #include <HIToolbox/Menus.h>   // For GetMBarHeight()
 #endif
-
-using namespace std;
 
 #ifdef USE_LIRC
 #include "lirc.h"
@@ -159,7 +158,7 @@ class MythMainWindowPrivate
     QTimer *gestureTimer;
 
     /* compatability only, FIXME remove */
-    vector<QWidget *> widgetList;
+    std::vector<QWidget *> widgetList;
 
     bool bUseGL;
     QWidget *paintwin;
@@ -821,7 +820,7 @@ void MythMainWindow::attach(QWidget *child)
 
 void MythMainWindow::detach(QWidget *child)
 {
-    vector<QWidget*>::iterator it =
+    std::vector<QWidget*>::iterator it =
         std::find(d->widgetList.begin(), d->widgetList.end(), child);
 
     if (it == d->widgetList.end())
@@ -1461,7 +1460,8 @@ void MythMainWindow::customEvent(QEvent *ce)
                 if (screen)
                     screen->gestureEvent(NULL, ge);
             }
-            cout << "Gesture: " << QString(*ge).toLocal8Bit().constData() << endl;
+            VERBOSE(VB_IMPORTANT, QString("Gesture: %1")
+                    .arg(QString(*ge).toLocal8Bit().constData()));
         }
     }
     else if (ce->type() == kExitToMainMenuEventType && d->exitingtomain)
@@ -1482,7 +1482,9 @@ void MythMainWindow::customEvent(QEvent *ce)
             QApplication::sendEvent(key_target, &key);
     }
 #if defined(USE_LIRC) || defined(USING_APPLEREMOTE)
-    else if (ce->type() == kLircKeycodeEventType && !d->ignore_lirc_keys)
+    else if (ce->type() ==
+             (QEvent::Type) LircKeycodeEvent::LircKeycodeEventType &&
+             !d->ignore_lirc_keys)
     {
         LircKeycodeEvent *lke = (LircKeycodeEvent *)ce;
         int keycode = lke->getKeycode();
@@ -1519,19 +1521,22 @@ void MythMainWindow::customEvent(QEvent *ce)
         }
         else
         {
-            cerr << "LircClient warning: attempt to convert '"
-                 << lke->getLircText().toLocal8Bit().constData()
-                 << "' to a key sequence failed. Fix your key mappings.\n";
+            VERBOSE(VB_IMPORTANT,
+                    QString("LircClient warning: attempt to convert '%1' to a "
+                            "key sequence failed. Fix your key mappings.")
+                    .arg(lke->getLircText().toLocal8Bit().constData()));
         }
     }
-    else if (ce->type() == kLircMuteEventType)
+    else if (ce->type() == (QEvent::Type) LircMuteEvent::LircMuteEventType)
     {
         LircMuteEvent *lme = (LircMuteEvent *)ce;
         d->ignore_lirc_keys = lme->eventsMuted();
     }
 #endif
 #ifdef USE_JOYSTICK_MENU
-    else if (ce->type() == kJoystickKeycodeEventType && !d->ignore_joystick_keys)
+    else if (ce->type() ==
+             (QEvent::Type) JoystickKeycodeEvent::JoystickKeycodeEventType &&
+             !d->ignore_joystick_keys)
     {
         JoystickKeycodeEvent *jke = (JoystickKeycodeEvent *)ce;
         int keycode = jke->getKeycode();
@@ -1563,18 +1568,22 @@ void MythMainWindow::customEvent(QEvent *ce)
         }
         else
         {
-            cerr << "JoystickMenuClient warning: attempt to convert '"
-                 << jke->getJoystickMenuText().toLocal8Bit().constData()
-                 << "' to a key sequence failed. Fix your key mappings.\n";
+            VERBOSE(VB_IMPORTANT,
+                    QString("JoystickMenuClient warning: attempt to convert "
+                            "'%1' to a key sequence failed. Fix your key "
+                            "mappings.")
+                    .arg(jke->getJoystickMenuText().toLocal8Bit().constData()));
         }
     }
-    else if (ce->type() == kJoystickMuteEventType)
+    else if (ce->type() ==
+             (QEvent::Type) JoystickMenuMuteEvent::JoystickMuteEventType)
     {
         JoystickMenuMuteEvent *jme = (JoystickMenuMuteEvent *)ce;
         d->ignore_joystick_keys = jme->eventsMuted();
     }
 #endif
-    else if (ce->type() == ScreenSaverEvent::kScreenSaverEventType)
+    else if (ce->type() ==
+             (QEvent::Type) ScreenSaverEvent::ScreenSaverEventType)
     {
         ScreenSaverEvent *sse = (ScreenSaverEvent *)ce;
         switch (sse->getSSEventType())
@@ -1596,8 +1605,9 @@ void MythMainWindow::customEvent(QEvent *ce)
             }
             default:
             {
-                cerr << "Unknown ScreenSaverEvent type: " <<
-                        sse->getSSEventType() << std::endl;
+                VERBOSE(VB_IMPORTANT,
+                        QString("Unknown ScreenSaverEvent type: %1")
+                        .arg(sse->getSSEventType()));
             }
         }
     }

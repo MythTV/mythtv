@@ -75,7 +75,7 @@ class ZMConsole : public MythScreenType
 
     int                m_currentMonitor;
     int                m_monitorListSize;
-    vector<Monitor *> *m_monitorList;
+    std::vector<Monitor *> *m_monitorList;
 
     MythUIButtonList  *m_monitor_list;
     MythUIText        *m_running_text;

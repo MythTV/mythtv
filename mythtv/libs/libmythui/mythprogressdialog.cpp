@@ -1,5 +1,3 @@
-#include <iostream>
-
 // MythTV headers
 #include "mythprogressdialog.h"
 #include "mythverbose.h"

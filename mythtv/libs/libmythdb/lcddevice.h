@@ -2,7 +2,6 @@
 #define LCDDEVICE_H_
 
 #include <iostream>
-using namespace std;
 
 #include <QObject>
 #include <QStringList>

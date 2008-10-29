@@ -1,6 +1,4 @@
 #include <cassert>
-#include <iostream>
-using namespace std;
 
 #include "mythverbose.h"
 

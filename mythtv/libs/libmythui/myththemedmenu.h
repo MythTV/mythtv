@@ -6,10 +6,10 @@
 #include "mythuibuttonlist.h"
 #include "xmlparsebase.h"
 
-#include <QKeyEvent>
-
 class MythMainWindow;
 class MythThemedMenuState;
+
+class QKeyEvent;
 
 struct ThemedButton
 {

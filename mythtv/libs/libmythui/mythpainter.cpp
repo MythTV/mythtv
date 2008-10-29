@@ -1,3 +1,5 @@
+#include <QRect>
+
 #include "mythpainter.h"
 #include "mythfontproperties.h"
 #include <cassert>

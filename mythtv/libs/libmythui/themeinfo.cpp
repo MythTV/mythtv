@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <QFile>
 #include <QDir>
 #include <QDomElement>

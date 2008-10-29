@@ -1,11 +1,7 @@
 #include <QApplication>
 #include <QDir>
+#include <QKeyEvent>
 
-#include <iostream>
-#include <cmath>
-#include <cstdlib>
-#include <vector>
-using namespace std;
 
 #include "myththemedmenu.h"
 #include "mythmainwindow.h"

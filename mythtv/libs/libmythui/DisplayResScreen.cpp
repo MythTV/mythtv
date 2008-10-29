@@ -12,7 +12,7 @@ DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
 }
 
 DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
-                                   const vector<short>& rr)
+                                   const std::vector<short>& rr)
     : width(w), height(h), width_mm(mw), height_mm(mh), refreshRates(rr)
 {
     SetAspectRatio(-1.0);
@@ -26,7 +26,7 @@ DisplayResScreen::DisplayResScreen(int w, int h, int mw, int mh,
     for (uint i = 0; i < rr_length; ++i)
         refreshRates.push_back(rr[i]);
 
-    sort(refreshRates.begin(), refreshRates.end());
+    std::sort(refreshRates.begin(), refreshRates.end());
 }
 
 DisplayResScreen::DisplayResScreen(const QString &str)
@@ -65,7 +65,7 @@ QString DisplayResScreen::toString() const
     return str;
 }
 
-QStringList DisplayResScreen::Convert(const vector<DisplayResScreen>& dsr)
+QStringList DisplayResScreen::Convert(const std::vector<DisplayResScreen>& dsr)
 {
     QStringList slist;
     for (uint i=0; i<dsr.size(); ++i)
@@ -75,13 +75,13 @@ QStringList DisplayResScreen::Convert(const vector<DisplayResScreen>& dsr)
 
 DisplayResVector DisplayResScreen::Convert(const QStringList& slist)
 {
-    vector<DisplayResScreen> dsr;
+    std::vector<DisplayResScreen> dsr;
     for (int i=0; i<slist.size(); ++i)
         dsr.push_back(DisplayResScreen(slist[i]));
     return dsr;
 }
 
-int DisplayResScreen::FindBestMatch(const vector<DisplayResScreen>& dsr,
+int DisplayResScreen::FindBestMatch(const std::vector<DisplayResScreen>& dsr,
                                     const DisplayResScreen& d,
                                     short& target_rate)
 {
@@ -89,10 +89,10 @@ int DisplayResScreen::FindBestMatch(const vector<DisplayResScreen>& dsr,
     {
         if (dsr[i].Width()==d.Width() && dsr[i].Height()==d.Height())
         {
-            const vector<short>& rates = dsr[i].RefreshRates();
+            const std::vector<short>& rates = dsr[i].RefreshRates();
             if (rates.size())
             {
-                vector<short>::const_iterator it =
+                std::vector<short>::const_iterator it =
                     find(rates.begin(), rates.end(), d.RefreshRate());
                 target_rate = (it == rates.end()) ? *(--rates.end()) : *it;
                 return i;

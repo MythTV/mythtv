@@ -386,7 +386,7 @@ void LCD::setChannelProgress(float value)
     if (!lcd_ready || !lcd_showchannel)
         return;
 
-    value = min(max(0.0f, value), 1.0f);
+    value = std::min(std::max(0.0f, value), 1.0f);
     sendToServer(QString("SET_CHANNEL_PROGRESS %1").arg(value));
 }
 
@@ -395,7 +395,7 @@ void LCD::setGenericProgress(float value)
     if (!lcd_ready || !lcd_showgeneric)
         return;
 
-    value = min(max(0.0f, value), 1.0f);
+    value = std::min(std::max(0.0f, value), 1.0f);
     sendToServer(QString("SET_GENERIC_PROGRESS 0 %1").arg(value));
 }
 
@@ -412,7 +412,7 @@ void LCD::setMusicProgress(QString time, float value)
     if (!lcd_ready || !lcd_showmusic)
         return;
 
-    value = min(max(0.0f, value), 1.0f);
+    value = std::min(std::max(0.0f, value), 1.0f);
     sendToServer("SET_MUSIC_PROGRESS " + quotedString(time) + ' ' + 
             QString().setNum(value));    
 }

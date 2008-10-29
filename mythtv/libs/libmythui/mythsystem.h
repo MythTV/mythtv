@@ -2,6 +2,7 @@
 #define MYTHSYSTEM_H_
 
 #include <QString>
+
 #include "mythexp.h"
 
 #define MYTH_SYSTEM_DONT_BLOCK_LIRC          0x1 //< myth_system() flag to avoid blocking

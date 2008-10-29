@@ -10,8 +10,6 @@
 
 #include "mythexp.h"
 
-using namespace std;
-
 class SortableMythGenericTreeList;
 
 class MPUBLIC MythGenericTree

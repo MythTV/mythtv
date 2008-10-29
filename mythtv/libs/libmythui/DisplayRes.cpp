@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "config.h"
 #include "DisplayRes.h"
 #include "mythverbose.h"
@@ -76,8 +74,8 @@ bool DisplayRes::Initialize(void)
     const DisplayResVector& screens = GetVideoModes();
     for (uint i=0; i<screens.size(); ++i)
     {
-        max_width = max(max_width, screens[i].Width());
-        max_height = max(max_height, screens[i].Height());
+        max_width = std::max(max_width, screens[i].Width());
+        max_height = std::max(max_height, screens[i].Height());
     }
     VERBOSE(VB_PLAYBACK, QString("max_width: %1 max_height: %2")
             .arg(max_width).arg(max_height));
@@ -161,9 +159,10 @@ bool DisplayRes::SwitchToCustomGUI(int width, int height, short rate)
     return SwitchToGUI(CUSTOM_GUI);
 }
 
-const vector<short> DisplayRes::GetRefreshRates(int width, int height) const {
+const std::vector<short> DisplayRes::GetRefreshRates(int width,
+                                                     int height) const {
     short tr;
-    vector<short> empty;
+    std::vector<short> empty;
 
     const DisplayResScreen drs(width, height, 0, 0, -1.0, 0);
     const DisplayResVector& drv = GetVideoModes();
@@ -181,12 +180,12 @@ const vector<short> DisplayRes::GetRefreshRates(int width, int height) const {
  *   class if needed, and returns a copy of vector returned by
  *   DisplayRes::GetVideoModes(void).
  */
-const vector<DisplayResScreen> GetVideoModes(void)
+const std::vector<DisplayResScreen> GetVideoModes(void)
 {
     DisplayRes *display_res = DisplayRes::GetDisplayRes();
     if (display_res)
         return display_res->GetVideoModes();
 
-    vector<DisplayResScreen> empty;
+    std::vector<DisplayResScreen> empty;
     return empty;
 }

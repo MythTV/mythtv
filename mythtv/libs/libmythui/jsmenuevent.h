@@ -9,15 +9,15 @@
 #include <QEvent>
 #include <QString>
 
-const int kJoystickKeycodeEventType = 24425;
-const int kJoystickMuteEventType = 24426;
-
 class JoystickKeycodeEvent : public QEvent
 {
   public:
+    enum EventID { JoystickKeycodeEventType = 24425 };
+
+  public:
     JoystickKeycodeEvent(const QString &jsmenuevent_text, int key_code,
                          bool key_down) :
-                         QEvent((QEvent::Type)kJoystickKeycodeEventType),
+                         QEvent((QEvent::Type)JoystickKeycodeEventType),
                             m_jsmenueventtext(jsmenuevent_text),
                             m_keycode(key_code), m_keydown(key_down) {}
 
@@ -34,8 +34,11 @@ class JoystickKeycodeEvent : public QEvent
 class JoystickMenuMuteEvent : public QEvent
 {
   public:
+    enum EventID { JoystickMuteEventType = 24426 };
+
+  public:
     JoystickMenuMuteEvent(bool mute_events) :
-            QEvent((QEvent::Type)kJoystickMuteEventType),
+            QEvent((QEvent::Type)JoystickMuteEventType),
             m_muteJsmenuEvents(mute_events) {}
 
     bool eventsMuted() const { return m_muteJsmenuEvents; }
@@ -57,4 +60,3 @@ class JoystickMenuEventLock
 };
 
 #endif
-

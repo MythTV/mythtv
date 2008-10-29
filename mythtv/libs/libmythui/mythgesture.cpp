@@ -27,8 +27,6 @@
  * the appropriate fixes.
  */
 
-
-#include <cstdlib>
 #include <cmath>
 #include <algorithm>
 
@@ -36,8 +34,6 @@
 #include <QMap>
 
 #include "mythgesture.h"
-
-using namespace std;
 
 /**
  * @class MythGesturePrivate
@@ -101,10 +97,10 @@ MythGesture::~MythGesture()
 /* comments in header */
 void MythGesture::adjustExtremes(int x, int y)
 {
-    min_x = min(min_x, x);
-    max_x = max(max_y, x);
-    min_y = min(min_y, y);
-    max_y = max(max_y, y);
+    min_x = std::min(min_x, x);
+    max_x = std::max(max_y, x);
+    min_y = std::min(min_y, y);
+    max_y = std::max(max_y, y);
 }
 
 bool MythGesture::recording(void) const
@@ -297,7 +293,7 @@ bool MythGesture::record(const QPoint & p)
              ix += (delx > 0) ? 1 : -1)
         {
             /* step the other axis by the correct increment */
-            iy += fabs(((float) dely / (float) delx))
+            iy += std::fabs(((float) dely / (float) delx))
                 * (float) ((dely < 0) ? -1.0 : 1.0);
 
             points.push_back(QPoint((int)ix, (int)iy));
@@ -316,7 +312,7 @@ bool MythGesture::record(const QPoint & p)
              iy += (dely > 0) ? 1 : -1)
         {
             /* step the other axis by the correct increment */
-            ix += fabs(((float) delx / (float) dely))
+            ix += std::fabs(((float) delx / (float) dely))
                 * (float) ((delx < 0) ? -1.0 : 1.0);
 
             /* add the interpolated point */

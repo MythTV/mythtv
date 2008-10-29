@@ -1,10 +1,10 @@
 #ifndef LIRC_H_
 #define LIRC_H_
 
-#include <lirc/lirc_client.h>
-#include <QObject>
 #include <QThread>
 #include <QString>
+
+#include <lirc/lirc_client.h>
 
 #include "mythexp.h"
 

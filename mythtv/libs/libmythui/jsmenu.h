@@ -8,10 +8,8 @@
 
 // C++ headers
 #include <vector>
-using namespace std;
 
 // QT headers
-#include <QObject>
 #include <QString>
 #include <QThread>
 
@@ -66,11 +64,11 @@ class JoystickMap
             m_axisMap.push_back(new_axis);
         }
 
-        vector<buttonMapType> buttonMap(void) { return m_buttonMap; }
-        vector<axisMapType> axisMap(void) { return m_axisMap; }
+        std::vector<buttonMapType> buttonMap(void) { return m_buttonMap; }
+        std::vector<axisMapType> axisMap(void) { return m_axisMap; }
 
-        vector<buttonMapType> m_buttonMap;
-        vector<axisMapType> m_axisMap;
+        std::vector<buttonMapType> m_buttonMap;
+        std::vector<axisMapType> m_axisMap;
 };
 
 /**

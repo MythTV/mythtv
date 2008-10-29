@@ -1,7 +1,5 @@
-#include <iostream>
-
 // QT
-#include <qapplication.h>
+#include <QApplication>
 
 // MythDB
 #include "mythverbose.h"

@@ -3,10 +3,10 @@
 
 // Base class, inherited by painter-specific classes.
 
-#include "mythpainter.h"
-
 #include <QImage>
 #include <QPixmap>
+
+#include "mythpainter.h"
 
 enum ReflectAxis {ReflectHorizontal, ReflectVertical};
 enum FillDirection {FillLeftToRight, FillTopToBottom};

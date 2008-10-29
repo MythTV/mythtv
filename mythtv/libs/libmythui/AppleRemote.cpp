@@ -12,9 +12,7 @@
 #include <IOKit/hid/IOHIDKeys.h>
 #include <CoreFoundation/CoreFoundation.h>
 
-#include <map>
 #include <sstream>
-#include <iostream>
 
 #include "mythverbose.h"
 

@@ -1,8 +1,6 @@
 /** This file is intended to hold X11 specific utility functions */
 #include <map>
 #include <vector>
-#include <iostream>
-using namespace std;
 
 #include "config.h" // for CONFIG_DARWIN
 #include "mythverbose.h"
@@ -15,7 +13,7 @@ extern "C" {
 #include <X11/extensions/Xinerama.h>
 }
 typedef int (*XErrorCallbackType)(Display *, XErrorEvent *);
-typedef vector<XErrorEvent>       XErrorVectorType;
+typedef std::vector<XErrorEvent>       XErrorVectorType;
 #else
 #include <QApplication>
 #include <QDesktopWidget>
@@ -25,8 +23,8 @@ typedef vector<XErrorEvent>       XErrorVectorType;
 #include "mythuihelper.h"
 
 #ifdef USING_X11
-map<Display*, XErrorVectorType>   error_map;
-map<Display*, XErrorCallbackType> error_handler_map;
+std::map<Display*, XErrorVectorType>   error_map;
+std::map<Display*, XErrorCallbackType> error_handler_map;
 #endif // USING_X11
 
 /** \fn GetNumberOfXineramaScreens(void)
@@ -91,7 +89,7 @@ void InstallXErrorHandler(Display *d)
     X11U;
 }
 
-void PrintXErrors(Display *d, const vector<XErrorEvent>& events)
+void PrintXErrors(Display *d, const std::vector<XErrorEvent>& events)
 {
     for (int i = events.size() -1; i>=0; --i)
     {
@@ -115,9 +113,9 @@ void PrintXErrors(Display *d, const vector<XErrorEvent>& events)
     }
 }
 
-vector<XErrorEvent> UninstallXErrorHandler(Display *d, bool printErrors)
+std::vector<XErrorEvent> UninstallXErrorHandler(Display *d, bool printErrors)
 {
-    vector<XErrorEvent> events;
+    std::vector<XErrorEvent> events;
     X11L;
     XErrorCallbackType old_handler = error_handler_map[d];
     XSync(d, 0); /* flush pending X calls so we see any errors */

@@ -15,8 +15,6 @@
 
 #include "mythexp.h"
 
-using namespace std;
-
 /**This class contains configuration information.  
   *This object is threadsafe.
   *@author Sean Ward
@@ -49,7 +47,7 @@ public:
         bool ReadSettings(QString pszFile);
 private: // Private attributes
         /** main property-value mapping for strings */
-        map<QString, QString> *m_pSettings;
+        std::map<QString, QString> *m_pSettings;
 };
 
 void LoadSettingsFile(Settings *settings, QString filename);

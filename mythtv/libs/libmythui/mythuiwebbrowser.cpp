@@ -20,6 +20,7 @@
 #include <QDir>
 #include <QBuffer>
 #include <QStyle>
+#include <QKeyEvent>
 
 // myth
 #include "mythpainter.h"

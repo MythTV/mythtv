@@ -2,7 +2,6 @@
 #define MYTHUI_STATETYPE_H_
 
 #include <QString>
-#include <QDateTime>
 #include <QMap>
 
 #include "mythuitype.h"

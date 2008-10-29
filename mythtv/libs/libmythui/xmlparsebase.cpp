@@ -1,4 +1,3 @@
-#include <iostream>
 #include <typeinfo>
 
 #include <QFile>
@@ -436,9 +435,10 @@ bool XMLParseBase::doLoad(const QString &windowname,
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        cerr << "Error parsing: " << qPrintable(filename) << endl;
-        cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
-        cerr << qPrintable(errorMsg) << endl;
+        VERBOSE(VB_IMPORTANT,
+                QString("Error parsing: %1\nat line: %2 column: %3\n%4")
+                .arg(qPrintable(filename)).arg(errorLine).arg(errorColumn)
+                .arg(qPrintable(errorMsg)));
         f.close();
         return false;
     }
@@ -457,7 +457,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 QString name = e.attribute("name", "");
                 if (name.isNull() || name.isEmpty())
                 {
-                    cerr << "Window needs a name\n";
+                    VERBOSE(VB_IMPORTANT, "Window needs a name");
                     return false;
                 }
 

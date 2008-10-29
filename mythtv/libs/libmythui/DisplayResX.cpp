@@ -1,12 +1,13 @@
-#include "DisplayResX.h"
 #include <iostream>
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
 
 #include "util-x11.h"
 
 #include <X11/extensions/Xrandr.h> // this has to be after util-x11.h (Qt bug)
+
+#include "DisplayResX.h"
+
+using std::cerr;
+using std::endl;
 
 static XRRScreenConfiguration *GetScreenConfig(Display*& display);
 
@@ -88,7 +89,7 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
         m_video_modes.push_back(scr);
     }
     m_video_modes_unsorted = m_video_modes;
-    sort(m_video_modes.begin(), m_video_modes.end());
+    std::sort(m_video_modes.begin(), m_video_modes.end());
 
     X11L;
     XRRFreeScreenConfigInfo(cfg);

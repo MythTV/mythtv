@@ -1,8 +1,6 @@
 #ifndef MYTHSCREEN_TYPE_H_
 #define MYTHSCREEN_TYPE_H_
 
-#include <QList>
-
 #include "mythuitype.h"
 
 class MythScreenStack;

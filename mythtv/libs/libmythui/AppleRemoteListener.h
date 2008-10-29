@@ -3,8 +3,6 @@
 
 #include "AppleRemote.h"
 
-#include <iostream>
-
 class AppleRemoteListener: public AppleRemote::Listener
 {
 public:

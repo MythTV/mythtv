@@ -2,7 +2,6 @@
 #define XMLPARSEBASE_H_
 
 #include <QDomElement>
-#include <QPoint>
 #include <QString>
 
 #include "mythrect.h"

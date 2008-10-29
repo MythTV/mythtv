@@ -2,11 +2,10 @@
 #define MYTHUI_TYPES_H_
 
 #include <QObject>
-#include <QImage>
+#include <QRegion>
+#include <QMap>
 #include <QList>
 #include <QFont>
-#include <QEvent>
-#include <QKeyEvent>
 
 #include "xmlparsebase.h"
 #include "mythrect.h"
@@ -16,6 +15,9 @@ class MythPainter;
 class MythGestureEvent;
 class FontMap;
 class MythFontProperties;
+
+class QEvent;
+class QKeyEvent;
 
 /**
  * Base UI type.  Children are drawn/processed in order added

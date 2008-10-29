@@ -1,7 +1,7 @@
-#include <iostream>
 #include <QApplication>
 #include <QRegExp>
 #include <QChar>
+#include <QKeyEvent>
 
 #include "mythuitextedit.h"
 #include "mythpainter.h"

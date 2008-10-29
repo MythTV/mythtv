@@ -1,14 +1,12 @@
 #ifndef MYTHMAINWINDOW_H_
 #define MYTHMAINWINDOW_H_
 
-#include <QEvent>
-#include <QObject>
 #include <QWidget>
-
-#include "mythexp.h"
 
 #include "mythuitype.h"
 #include "mythscreenstack.h"
+
+class QEvent;
 
 class MythMediaDevice;
 

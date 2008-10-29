@@ -1,9 +1,10 @@
 #ifndef MYTHPAINTER_H_
 #define MYTHPAINTER_H_
 
-#include <QRect>
 #include <QString>
 #include <QWidget>
+
+class QRect;
 
 //  #include "mythfontproperties.h"
 

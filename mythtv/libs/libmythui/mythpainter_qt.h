@@ -4,12 +4,9 @@
 #include "mythpainter.h"
 #include "mythimage.h"
 
-#include <QPixmap>
-
 #include "compat.h"
 
 class QPainter;
-class QPixmap;
 
 class MythQtPainter : public MythPainter
 {

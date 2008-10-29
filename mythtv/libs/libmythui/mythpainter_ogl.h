@@ -1,11 +1,10 @@
 #ifndef MYTHPAINTER_OPENGL_H_
 #define MYTHPAINTER_OPENGL_H_
 
+#include <list>
+
 #include "mythpainter.h"
 #include "mythimage.h"
-
-#include <list>
-using namespace std;
 
 class MythOpenGLPainter : public MythPainter
 {
@@ -42,10 +41,10 @@ class MythOpenGLPainter : public MythPainter
                                   const MythFontProperties &font);
 
     QMap<MythImage *, unsigned int> m_ImageIntMap;
-    list<MythImage *> m_ImageExpireList;
+    std::list<MythImage *> m_ImageExpireList;
 
     QMap<QString, MythImage *> m_StringToImageMap;
-    list<QString> m_StringExpireList;
+    std::list<QString> m_StringExpireList;
 
     int q_gl_texture;
     bool texture_rects;

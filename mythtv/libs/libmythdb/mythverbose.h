@@ -7,8 +7,6 @@
 #   include <QTextStream>
 #   include <QMutex>
 #   include <iostream>
-
-    using namespace std;
 #else
 # ifdef HAVE_GETTIMEOFDAY
 #   include <sys/time.h>
@@ -126,8 +124,8 @@ extern MPUBLIC unsigned int print_verbose_messages;
                 QDateTime dtmp = QDateTime::currentDateTime(); \
                 QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
                 verbose_mutex.lock(); \
-                cout << dtime.toLocal8Bit().constData() << " " \
-                     << QString(args).toLocal8Bit().constData() << endl; \
+                std::cout << dtime.toLocal8Bit().constData() << " " \
+                     << QString(args).toLocal8Bit().constData() << std::endl; \
                 verbose_mutex.unlock(); \
             }                                                \
        } while (0)
@@ -173,8 +171,8 @@ extern MPUBLIC unsigned int print_verbose_messages;
                 QDateTime dtmp = QDateTime::currentDateTime(); \
                 QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
                 verbose_mutex.lock(); \
-                cout << dtime.toLocal8Bit().constData() << " " \
-                     << QString(args).toLocal8Bit().constData() << endl; \
+                std::cout << dtime.toLocal8Bit().constData() << " " \
+                     << QString(args).toLocal8Bit().constData() << std::endl; \
                 verbose_mutex.unlock(); \
             } \
         } while (0)
@@ -192,7 +190,8 @@ extern MPUBLIC unsigned int print_verbose_messages;
                 QTextStream ssMsg(&dtime);                  \
                 ssMsg << " " << args;                                   \
                 verbose_mutex.lock();                      \
-                cout << ssMsg.string()->toLocal8Bit().constData() << endl; \
+                std::cout << ssMsg.string()->toLocal8Bit().constData() << \
+                    std::endl; \
                 verbose_mutex.unlock();                    \
             } \
         } while (0)

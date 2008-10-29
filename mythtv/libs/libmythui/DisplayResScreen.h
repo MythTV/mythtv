@@ -9,8 +9,6 @@
 
 #include "mythexp.h"
 
-using namespace std;
-
 class MPUBLIC DisplayResScreen
 {
   public:
@@ -20,7 +18,7 @@ class MPUBLIC DisplayResScreen
     DisplayResScreen(int w, int h, int mw, int mh,
                      double aspectRatio/* = -1.0*/, short refreshRate/* = 0*/);
     DisplayResScreen(int w, int h, int mw, int mh,
-                     const vector<short>& refreshRates);
+                     const std::vector<short>& refreshRates);
     DisplayResScreen(int w, int h, int mw, int mh,
                      const short* refreshRates, uint rr_length);
     DisplayResScreen(const QString &str);
@@ -33,13 +31,13 @@ class MPUBLIC DisplayResScreen
     int Height_mm() const { return height_mm; }
     inline double AspectRatio() const;
     inline short RefreshRate() const;
-    const vector<short>& RefreshRates() const { return refreshRates; }
+    const std::vector<short>& RefreshRates() const { return refreshRates; }
 
     // Sets, adds
     void SetAspectRatio(double a);
     void AddRefreshRate(short rr) {
         refreshRates.push_back(rr);
-        sort(refreshRates.begin(), refreshRates.end());
+        std::sort(refreshRates.begin(), refreshRates.end());
     }
 
     // Converters & comparitors
@@ -48,9 +46,9 @@ class MPUBLIC DisplayResScreen
     inline bool operator == (const DisplayResScreen &b) const;
 
     // Statics
-    static QStringList Convert(const vector<DisplayResScreen>& dsr);
-    static vector<DisplayResScreen> Convert(const QStringList& slist);
-    static int FindBestMatch(const vector<DisplayResScreen>& dsr,
+    static QStringList Convert(const std::vector<DisplayResScreen>& dsr);
+    static std::vector<DisplayResScreen> Convert(const QStringList& slist);
+    static int FindBestMatch(const std::vector<DisplayResScreen>& dsr,
                              const DisplayResScreen& d,
                              short& target_rate);
     static inline int CalcKey(int w, int h, int rate);
@@ -59,14 +57,14 @@ class MPUBLIC DisplayResScreen
     int width, height; // size in pixels
     int width_mm, height_mm; // physical size in millimeters
     double aspect; // aspect ratio, calculated or set
-    vector<short> refreshRates;
+    std::vector<short> refreshRates;
 };
 
-typedef vector<DisplayResScreen>          DisplayResVector;
+typedef std::vector<DisplayResScreen>          DisplayResVector;
 typedef DisplayResVector::iterator        DisplayResVectorIt;
 typedef DisplayResVector::const_iterator  DisplayResVectorCIt;
 
-typedef map<uint, class DisplayResScreen> DisplayResMap;
+typedef std::map<uint, class DisplayResScreen> DisplayResMap;
 typedef DisplayResMap::iterator           DisplayResMapIt;
 typedef DisplayResMap::const_iterator     DisplayResMapCIt;
 

@@ -312,7 +312,7 @@ static int encode_frame(
         return l;
     }
 
-    enc_len = min((uint)enc_len, block_len - 8);
+    enc_len = std::min((uint)enc_len, block_len - 8);
 
     //uint32_t x = *(uint32_t*)payload;
     // in place swab

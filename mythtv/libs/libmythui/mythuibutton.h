@@ -2,7 +2,6 @@
 #define MYTHUI_BUTTON_H_
 
 #include <QString>
-#include <QTimer>
 
 #include "mythuitype.h"
 #include "mythuistatetype.h"
@@ -65,7 +64,7 @@ class MythUIButton : public MythUIType
 
     bool m_Pushed;
     bool m_Lockable;
-    QTimer *m_clickTimer;
+    class QTimer *m_clickTimer;
 };
 
 #endif

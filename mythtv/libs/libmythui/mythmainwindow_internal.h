@@ -2,8 +2,6 @@
 #define MYTHMAINWINDOW_INT
 
 #include <QWidget>
-#include <QObject>
-#include <QEvent>
 
 class MythMainWindow;
 class MythMainWindowPrivate;

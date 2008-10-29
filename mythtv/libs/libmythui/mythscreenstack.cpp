@@ -4,9 +4,7 @@
 #include "mythpainter.h"
 #include "mythevent.h"
 
-#include <iostream>
 #include <cassert>
-using namespace std;
 
 #include <QApplication>
 

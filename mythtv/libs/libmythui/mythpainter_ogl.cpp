@@ -1,7 +1,4 @@
 #include <cassert>
-#include <iostream>
-
-using namespace std;
 
 #include <QApplication>
 #include <QPixmap>
@@ -106,7 +103,7 @@ int MythOpenGLPainter::NearestGLTextureSize(int v)
     else
         s = 1 << last;
 
-    return min(s, m_maxTexDim);
+    return std::min(s, m_maxTexDim);
 }
 
 void MythOpenGLPainter::RemoveImageFromCache(MythImage *im)
@@ -267,8 +264,8 @@ void MythOpenGLPainter::DrawImage(const QRect &r, MythImage *im,
             y2 = y1 + src.height();
         }
 
-        int width = min(src.width(), r.width());
-        int height = min(src.height(), r.height());
+        int width = std::min(src.width(), r.width());
+        int height = std::min(src.height(), r.height());
 
         glTexCoord2f(x1, y2); glVertex2f(r.x(), r.y());
         glTexCoord2f(x2, y2); glVertex2f(r.x() + width, r.y());

@@ -1,5 +1,3 @@
-using namespace std;
-
 #import <CoreGraphics/CGBase.h>
 #import <CoreGraphics/CGDisplayConfiguration.h>
 #import <Carbon/Carbon.h>

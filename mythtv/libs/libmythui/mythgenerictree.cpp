@@ -1,6 +1,3 @@
-// C++/C headers
-#include <iostream>
-
 // Myth headers
 #include "mythverbose.h"
 

@@ -2,7 +2,6 @@
 #define MYTHDBCON_H_
 
 #include <iostream>
-using namespace std;
 
 #include <qsqldatabase.h>
 #include <qvariant.h>

@@ -1,10 +1,3 @@
-
-#include "mythuibutton.h"
-
-// C/C++ headers
-#include <iostream>
-using namespace std;
-
 // QT
 #include <QTimer>
 
@@ -14,6 +7,8 @@ using namespace std;
 // MythUI headers
 #include "mythmainwindow.h"
 #include "mythuigroup.h"
+
+#include "mythuibutton.h"
 
 MythUIButton::MythUIButton(MythUIType *parent, const QString &name)
             : MythUIType(parent, name)

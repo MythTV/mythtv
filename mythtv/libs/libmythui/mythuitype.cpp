@@ -1,6 +1,6 @@
-using namespace std;
+#include <QEvent>
+#include <QKeyEvent>
 
-#include <iostream>
 #include "mythverbose.h"
 
 #include "mythuitype.h"

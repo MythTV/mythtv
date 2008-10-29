@@ -35,8 +35,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <iostream>
-using namespace std;
 
 // Kernel joystick header
 #include <linux/joystick.h>
@@ -335,7 +333,7 @@ void JoystickMenuThread::EmitKey(QString code)
  */
 void JoystickMenuThread::ButtonUp(int button)
 {
-    vector<buttonMapType>::iterator bmap;
+    std::vector<buttonMapType>::iterator bmap;
 
     /*------------------------------------------------------------------------
     ** Process chords first
@@ -366,7 +364,7 @@ void JoystickMenuThread::ButtonUp(int button)
  */
 void JoystickMenuThread::AxisChange(int axis, int value)
 {
-    vector<axisMapType>::iterator amap;
+    std::vector<axisMapType>::iterator amap;
     for (amap = m_map.axisMap().begin(); amap < m_map.axisMap().end(); amap++)
     {
         if (axis == amap->axis)
