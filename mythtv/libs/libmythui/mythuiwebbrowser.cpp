@@ -13,7 +13,6 @@
 
 // qt
 #include <QApplication>
-#include <QUrl>
 #include <QWebFrame>
 #include <QWebHistory>
 #include <QPainter>
@@ -783,7 +782,6 @@ void MythUIWebBrowser::CreateCopy(MythUIType *parent)
 
 // qt
 #include <QPainter>
-#include <QIcon>
 
 // myth
 #include "mythpainter.h"

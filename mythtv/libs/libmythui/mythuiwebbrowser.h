@@ -6,6 +6,7 @@
 #include <QUrl>
 #include <QTime>
 #include <QColor>
+#include <QIcon>
 
 
 #ifdef USING_QTWEBKIT
@@ -18,7 +19,6 @@
 
 
 class MythUIWebBrowser;
-class QIcon;
 
 #ifdef USING_QTWEBKIT
 class MythWebView : public QWebView
