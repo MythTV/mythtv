@@ -756,7 +756,7 @@ void AutoExpire::PrintExpireList(QString expHost)
 
         QString title = first->title;
 
-        if (first->subtitle != "")
+        if (first->subtitle.length())
             title += ": \"" + first->subtitle + "\"";
 
         title = title.leftJustified(39, ' ', true);
