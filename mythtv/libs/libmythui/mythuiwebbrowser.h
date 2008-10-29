@@ -18,6 +18,7 @@
 
 
 class MythUIWebBrowser;
+class QIcon;
 
 #ifdef USING_QTWEBKIT
 class MythWebView : public QWebView
