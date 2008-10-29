@@ -127,8 +127,6 @@ our %depend = (
   'taglib' =>
   {
     'url' => 'http://developer.kde.org/~wheeler/files/src/taglib-1.4.tar.gz',
-    # libtool in taglib has problems with -Z in LDFLAGS
-    'conf-cmd' => 'LDFLAGS="" ./configure -prefix "$PREFIX"'
   },
 
   'libogg' =>
@@ -158,13 +156,8 @@ our %depend = (
   {
     'url' 
     => 'http://mysql.osuosl.org/Downloads/MySQL-4.1/mysql-4.1.22.tar.gz',
-    'conf-cmd'
-    # -Z in LDFLAGS is passed, via mysql_config --libs, to Qt's configure
-    # (which dies when it uses libtool)
-    =>  'LDFLAGS="" ./configure',
     'conf'
     =>  [
-          '-prefix', '"$PREFIX"',
           '--without-debug',
           '--without-docs',
           '--without-man',
@@ -485,16 +478,14 @@ use File::Basename;
 our $svnpath = dirname $svn;
 
 # Clean the environment
-$ENV{'PATH'} = "$PREFIX/bin:/sw/bin:/bin:/usr/bin:/usr/sbin:$svnpath";
-$ENV{'DYLD_LIBRARY_PATH'} = "$PREFIX/lib";
-$ENV{'LD_LIBRARY_PATH'} = "/usr/local/lib";
+$ENV{'PATH'} = "$PREFIX/bin:/bin:/usr/bin:/usr/sbin:$svnpath";
 $ENV{'PKG_CONFIG_PATH'} = "$PREFIX/lib/pkgconfig:";
 delete $ENV{'CC'};
 delete $ENV{'CXX'};
 delete $ENV{'CPP'};
 delete $ENV{'CXXCPP'};
 $ENV{'CFLAGS'} = $ENV{'CXXFLAGS'} = $ENV{'CPPFLAGS'} = "-I$PREFIX/include";
-$ENV{'LDFLAGS'} = "-Z -F/System/Library/Frameworks -L/usr/lib -L$PREFIX/lib";
+$ENV{'LDFLAGS'} = "-F/System/Library/Frameworks -L/usr/lib -L$PREFIX/lib";
 $ENV{'PREFIX'} = $PREFIX;
 
 # set up Qt environment
@@ -521,7 +512,8 @@ my $cpus = `$cmd`; chomp $cpus;
 $cpus =~ s/.*, (\d+) processors$/$1/;
 if ( $cpus gt 1 )
 {
-  &Verbose("Using $cpus parallel CPUs");
+  &Verbose("Using", $cpus+1, "jobs on $cpus parallel CPUs");
+  ++$cpus;
   $parallel_make_flags = "-j$cpus";
 }
 
