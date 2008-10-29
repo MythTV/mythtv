@@ -8,7 +8,6 @@
 #endif
 
 #include "config.h"
-#include "dsputil.h"
 #include "../mm_arch.h"
 #ifdef HAVE_ALTIVEC_H
     #include <altivec.h>

@@ -17,7 +17,7 @@
 #include "frame.h"
 
 #include "config.h"
-#include "dsputil.h"
+#include "../mm_arch.h"
 
 #include "color.h"
 

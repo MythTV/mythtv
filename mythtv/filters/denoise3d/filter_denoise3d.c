@@ -17,7 +17,7 @@
 #include "config.h"
 #include "filter.h"
 #include "frame.h"
-#include "dsputil.h"
+#include "../mm_arch.h"
 
 #define PARAM1_DEFAULT 4.0
 #define PARAM2_DEFAULT 3.0

@@ -14,9 +14,9 @@
 #include "libmythtv/frame.h"
 
 #include "libmythdb/mythconfig.h"
-#include "libavcodec/dsputil.h"
-
 #include "libmythdb/mythverbose.h"
+
+#include "../mm_arch.h"
 
 #undef ABS
 #define ABS(A) ( (A) > 0 ? (A) : -(A) )
