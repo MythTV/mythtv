@@ -312,9 +312,9 @@ HostComboBox *SetOnInsertDVD()
 HostSlider *DVDBookmarkDays()
 {
     HostSlider *gs = new HostSlider("DVDBookmarkDays",5, 50, 5);
-    gs->setLabel(QObject::tr("Remove DVD Bookmarks Older then (days)"));
+    gs->setLabel(QObject::tr("Remove DVD Bookmarks Older than (days)"));
     gs->setValue(10);
-    gs->setHelpText((QObject::tr("Delete DVD Bookmarks that are older then the "
+    gs->setHelpText((QObject::tr("Delete DVD Bookmarks that are older than the "
                                  "Number of days specified")));
     return gs;
 }
