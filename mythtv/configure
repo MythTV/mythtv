@@ -1637,9 +1637,6 @@ check_cflags -std=c99
 is_x86_cpu "$arch" && arch="x86_32"
 is_x86_64_cpu "$arch" && arch="x86_64"
 
-check_cflags -fasm
-check_cflags -std=c99
-
 case "$arch" in
     i386|i486|i586|i686|i86pc|BePC|x86_32)
         arch="x86_32"
