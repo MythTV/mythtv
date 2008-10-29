@@ -7,3 +7,9 @@
 #ifdef mm_flags
 #undef mm_flags
 #endif
+
+#ifdef MMX 
+  #include "x86_cpu.h" 
+#else 
+  #define emms()    ; 
+#endif
