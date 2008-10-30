@@ -1904,7 +1904,7 @@ bool UIImageGridType::handleKeyPress(QString action)
     }
     else if (action == "RIGHT")
     {
-        if (curRow * columnCount + curColumn >= itemCount - 1)
+        if ((curRow * columnCount + curColumn) >= itemCount - 1)
             return true;
 
         curColumn++;
@@ -1975,7 +1975,9 @@ bool UIImageGridType::handleKeyPress(QString action)
     }
     else if (action == "SELECT" && showSelected)
     {
-        ImageGridItem *item = (*allData)[currentItem];
+        ImageGridItem *item = NULL;
+        if (currentItem <  (*allData).size())
+            item = (*allData)[currentItem];
         if (item)
             item->selected = !item->selected;
     }
@@ -1990,7 +1992,8 @@ bool UIImageGridType::handleKeyPress(QString action)
 
     refresh();
 
-    emit itemChanged((*allData)[currentItem]);
+    if (currentItem <  (*allData).size())
+        emit itemChanged((*allData)[currentItem]);
 
     return true;
 }
@@ -2077,7 +2080,10 @@ void UIImageGridType::drawCell(QPainter *p, int curPos, int xpos, int ypos)
     // draw item image
     QPixmap *pixmap = NULL;
     QString filename = "";
-    ImageGridItem *item = (*allData)[curPos];
+    ImageGridItem *item = NULL;
+
+    if (curPos <  (*allData).size())
+        item = (*allData)[curPos];
 
     // use pixmap stored in item
     if (item)
@@ -2116,7 +2122,11 @@ void UIImageGridType::drawText(QPainter *p, int curPos, int xpos, int ypos)
     }
 
     QString msg = "Invalid Item!!";
-    ImageGridItem * item = (*allData)[curPos];
+    ImageGridItem * item = NULL;
+
+    if (curPos <  (*allData).size())
+        item = (*allData)[curPos];
+
     if (item)
     {
         msg = item->text;
