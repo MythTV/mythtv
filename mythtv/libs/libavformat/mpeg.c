@@ -66,35 +66,40 @@ static int check_pes(uint8_t *p, uint8_t *end){
 
 static int mpegps_probe(AVProbeData *p)
 {
+    uint32_t code= -1;
+    int sys=0, pspack=0, priv1=0, vid=0, audio=0, invalid=0;
     int i;
-    int size= FFMIN(2048, p->buf_size);
-    uint32_t code=0xFF;
+    int score=0;
 
-    /* we search the first start code. If it is a packet start code,
-       then we decide it is mpeg ps. We do not send highest value to
-       give a chance to mpegts */
-    /* NOTE: the search range was restricted to avoid too many false
-       detections */
-
-    for (i = 0; i < size; i++) {
-        code = (code << 8) | p->buf[i];
+    for(i=0; i<p->buf_size; i++){
+        code = (code<<8) + p->buf[i];
         if ((code & 0xffffff00) == 0x100) {
-            if (code == PACK_START_CODE ||
-                code == SYSTEM_HEADER_START_CODE ||
-                (code >= 0x1e0 && code <= 0x1ef) ||
-                (code >= 0x1c0 && code <= 0x1df) ||
-                code == PRIVATE_STREAM_2 ||
-                code == PROGRAM_STREAM_MAP ||
-                code == PRIVATE_STREAM_1 ||
-                code == PADDING_STREAM ||
-                code >= 0x100 && code <= 0x1b0)
-                return AVPROBE_SCORE_MAX - 2;
-            else
-                return 0;
+            int pes= check_pes(p->buf+i, p->buf+p->buf_size);
+
+            if(code == SYSTEM_HEADER_START_CODE) sys++;
+            else if(code == PRIVATE_STREAM_1)    priv1++;
+            else if(code == PACK_START_CODE)     pspack++;
+            else if((code & 0xf0) == VIDEO_ID &&  pes) vid++;
+            else if((code & 0xe0) == AUDIO_ID &&  pes) audio++;
+
+            else if((code & 0xf0) == VIDEO_ID && !pes) invalid++;
+            else if((code & 0xe0) == AUDIO_ID && !pes) invalid++;
         }
     }
 
-    return 0;
+    if(vid+audio > invalid)     /* invalid VDR files nd short PES streams */
+        score= AVPROBE_SCORE_MAX/4;
+
+//av_log(NULL, AV_LOG_ERROR, "%d %d %d %d %d len:%d\n", sys, priv1, pspack,vid, audio, p->buf_size);
+    if(sys>invalid && sys*9 <= pspack*10)
+        return AVPROBE_SCORE_MAX/2+2; // +1 for .mpg
+    if(priv1 + vid + audio > invalid && (priv1+vid+audio)*9 <= pspack*10)
+        return AVPROBE_SCORE_MAX/2+2; // +1 for .mpg
+    if((!!vid ^ !!audio) && (audio+vid > 1) && !sys && !pspack && p->buf_size>2048) /* PES stream */
+        return AVPROBE_SCORE_MAX/2+2;
+
+    //02-Penguin.flac has sys:0 priv1:0 pspack:0 vid:0 audio:1
+    return score;
 }
 
 typedef struct MpegDemuxContext {
