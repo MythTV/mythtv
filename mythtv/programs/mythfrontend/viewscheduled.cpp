@@ -139,11 +139,11 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
             handled = false;
     }
 
-    if (!handled && MythScreenType::keyPressEvent(event))
-        handled = true;
-
     if (m_needFill)
         FillList();
+
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
 
     m_inEvent = false;
 
