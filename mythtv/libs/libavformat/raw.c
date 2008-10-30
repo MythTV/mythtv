@@ -1033,7 +1033,7 @@ AVInputFormat vc1_demuxer = {
 
 #define PCMINPUTDEF(name, long_name, ext, codec) \
 AVInputFormat pcm_ ## name ## _demuxer = {\
-    #name,\
+    "pcm_"#name,\
     NULL_IF_CONFIG_SMALL(long_name),\
     0,\
     NULL,\
@@ -1048,7 +1048,7 @@ AVInputFormat pcm_ ## name ## _demuxer = {\
 
 #define PCMOUTPUTDEF(name, long_name, ext, codec) \
 AVOutputFormat pcm_ ## name ## _muxer = {\
-    #name,\
+    "pcm_"#name,\
     NULL_IF_CONFIG_SMALL(long_name),\
     NULL,\
     ext,\
