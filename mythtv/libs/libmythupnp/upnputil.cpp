@@ -25,6 +25,7 @@
 // POSIX headers 2, needs to be after compat.h for OS X
 #ifndef USING_MINGW
 #include <net/if.h>
+#include <sys/ioctl.h>
 #endif // USING_MINGW
 #ifdef HAVE_GETIFADDRS
 #include <ifaddrs.h>

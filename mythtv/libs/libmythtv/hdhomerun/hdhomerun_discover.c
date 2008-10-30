@@ -25,9 +25,12 @@
 #define USE_IPHLPAPI 1
 #endif
 
+#include <sys/param.h>  // Defines BSD on FreeBSD and Mac OS X
+
 #if defined(__linux__) || defined(__APPLE__) || defined(BSD)
 #include <ifaddrs.h>
 #define USE_IFADDRS 1
+#include <sys/select.h>
 #endif
 
 #define HDHOMERUN_DISOCVER_MAX_SOCK_COUNT 16
