@@ -148,9 +148,9 @@ bool avfDecoder::initialize()
     // Given we are outputing to a sound card, this will always
     // be a PCM format
 #ifdef WORDS_BIGENDIAN
-    fmt = guess_format("pcm_s16be", NULL, NULL);
+    fmt = guess_format("s16be", NULL, NULL);
 #else
-    fmt = guess_format("pcm_s16le", NULL, NULL);
+    fmt = guess_format("s16le", NULL, NULL);
 #endif
     if (!fmt)
     {
