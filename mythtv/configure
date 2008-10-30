@@ -1756,6 +1756,8 @@ case $target_os in
         ;;
     freebsd)
         append CCONFIG "freebsd"
+        # Workaround compile errors from missing u_int/uint def
+        CFLAGS=`echo $CFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
     disable ivtv
         disable need_memalign
         backend="yes"
