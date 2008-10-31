@@ -57,7 +57,6 @@ void setupKeys(void)
     REG_KEY("Gallery", "HOME", "Go to the first image in thumbnail view",
             "Home");
     REG_KEY("Gallery", "END", "Go to the last image in thumbnail view", "End");
-    REG_KEY("Gallery", "MENU", "Toggle activating menu in thumbnail view", "M");
     REG_KEY("Gallery", "SLIDESHOW", "Start Slideshow in thumbnail view", "S");
     REG_KEY("Gallery", "RANDOMSHOW", "Start Random Slideshow in thumbnail view", "R");
 
@@ -75,7 +74,6 @@ void setupKeys(void)
             "PgUp");
     REG_KEY("Gallery", "LOWRIGHT", "Go to the lower-right corner of the image",
             "PgDown");
-    REG_KEY("Gallery", "INFO", "Toggle Showing Information about Image", "I");
     REG_KEY("Gallery", "DELETE", "Delete marked images or current image if none are marked", "D");
     REG_KEY("Gallery", "MARK", "Mark image", "T");
     REG_KEY("Gallery", "FULLSCREEN", "Toggle scale to fullscreen/scale to fit", "W");
