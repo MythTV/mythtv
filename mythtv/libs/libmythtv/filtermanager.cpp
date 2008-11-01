@@ -81,7 +81,7 @@ FilterManager::FilterManager()
             if (path.length() <= 1)
                 continue;
 
-            VERBOSE(VB_PLAYBACK, LOC +
+            VERBOSE(VB_PLAYBACK+VB_FILE, LOC +
                     QString("Loading filter '%1'").arg(path));
 
             if (!LoadFilterLib(path))
@@ -172,7 +172,7 @@ bool FilterManager::LoadFilterLib(const QString &path)
         QByteArray libname = path.toAscii();
         newFilter->libname = strdup(libname.constData());
         filters[newFilter->name] = newFilter;
-        VERBOSE(VB_PLAYBACK, LOC + QString("filters[%1] = ")
+        VERBOSE(VB_PLAYBACK+VB_EXTRA, LOC + QString("filters[%1] = ")
                 .arg(newFilter->name) << newFilter);
     }
     return true;
