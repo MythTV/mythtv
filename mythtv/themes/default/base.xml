@@ -8,11 +8,11 @@
     </font>
 
     <font name="basemedium" from="basesmall">
-        <size>17</size>
+        <size>16</size>
     </font>
 
     <font name="baselarge" from="basesmall">
-        <size>20</size>
+        <size>18</size>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
@@ -20,7 +20,7 @@
     </font>
 
     <font name="baseextralarge" from="basesmall">
-        <size>24</size>
+        <size>22</size>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
