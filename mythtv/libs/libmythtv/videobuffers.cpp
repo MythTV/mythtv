@@ -1136,7 +1136,7 @@ bool VideoBuffers::CreateBuffers(int width, int height,
 
         if (bufs.back())
         {
-            VERBOSE(VB_PLAYBACK, "Created data @"
+            VERBOSE(VB_PLAYBACK+VB_EXTRA, "Created data @"
                     <<((void*)data)<<"->"<<((void*)(data+buf_size)));
             allocated_arrays.push_back(bufs.back());
         }
