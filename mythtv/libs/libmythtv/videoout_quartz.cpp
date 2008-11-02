@@ -85,16 +85,14 @@ class VideoOutputQuartzView
 
     virtual void InputChanged(int width, int height, float aspect,
                               MythCodecID av_codec_id);
-    virtual void VideoAspectRatioChanged(float aspect);
     virtual void MoveResize(QRect newRect);
-    virtual void Zoom(ZoomDirection direction);
 
     virtual void EmbedChanged(bool embedded);
 
   protected:
     virtual bool Begin(void);
     virtual void End(void);
-    virtual void Transform(void);
+    virtual void Transform(QRect newRect);
     virtual void BlankScreen(bool deferred);
 
     // Subclasses implement the following methods:
@@ -114,7 +112,10 @@ class VideoOutputQuartzView
     int                frameCounter;  // keep track of skip status
     bool               drawBlank;     // draw a blank frame before next Show
 
-    bool               applyTVoffset; // subclasses set this to affect transform
+    /// Set if this view can use the aspect/fill/zoom calculations
+    /// from the base class (which are passed in by MoveResize()),
+    /// to rescale in the output rectangle via Transform().
+    bool               applyMoveResize;
 
     QMutex             viewLock;
 };
@@ -146,9 +147,6 @@ class QuartzData
         drawInWindow(false),        windowedMode(false),
         scaleUpVideo(false),        correctGamma(false),
         convertI420to2VUY(NULL),
-
-        ZoomedH(1.0f), ZoomedV(1.0f),
-        ZoomedUp(0),                ZoomedRight(0),
 
         embeddedView(NULL),         dvdv(NULL)
     {;}
@@ -187,12 +185,6 @@ class QuartzData
     bool               correctGamma;      // Video gamma correction
     conv_i420_2vuy_fun convertI420to2VUY; // I420 -> 2VUY conversion function
 
-    // Zoom preferences:
-    float              ZoomedH;           // VideoOutputBase::mz_scale_h
-    float              ZoomedV;           // VideoOutputBase::mz_scale_v
-    int                ZoomedUp;          // VideoOutputBase::mz_move.y()
-    int                ZoomedRight;       // VideoOutputBase::mz_move.x()
-
     // Output viewports:
     vector<VideoOutputQuartzView*> views;   // current views
 
@@ -204,16 +196,9 @@ class QuartzData
 
 VideoOutputQuartzView::VideoOutputQuartzView(QuartzData *pData)
     : name(NULL), parentData(pData),
-    thePort(NULL), theCodec(0), theMask(NULL)
+    thePort(NULL), theCodec(0), theMask(NULL), frameSkip(1), frameCounter(0),
+    drawBlank(true), applyMoveResize(false)
 {
-    frameSkip = 1;
-    frameCounter = 0;
-    drawBlank = true;
-
-    // This variable is set by subclasses to indicate whether
-    // to apply the scan displacement TV mode settings.
-    // Embedded or small viewports should set this to false.
-    applyTVoffset = true;
 }
 
 VideoOutputQuartzView::~VideoOutputQuartzView()
@@ -233,31 +218,19 @@ bool VideoOutputQuartzView::Begin(void)
         return false;
     }
 
-#if 0
-    // Set output size and clipping mask (if necessary)
+    // Set initial output size
     Rect portBounds;
     GetPortBounds(thePort, &portBounds);
     VERBOSE(VB_PLAYBACK, QString("%0Viewport currently %1,%2 -> %3,%4")
                          .arg(name).arg(portBounds.left).arg(portBounds.top)
                          .arg(portBounds.right).arg(portBounds.bottom));
-    desiredXoff += portBounds.left;
-    desiredYoff += portBounds.top;
-
-    if (!desiredWidth && !desiredHeight)
-    {
-        // no mask, set width and height to that of port
-        desiredWidth = portBounds.right - portBounds.left;
-        desiredHeight = portBounds.bottom - portBounds.top;
-        theMask = NULL;
-    }
-    else
-    {
-        // mask to requested bounds
-        theMask = NewRgn();
-        SetRectRgn(theMask, desiredXoff, desiredYoff,
-                   desiredXoff + desiredWidth,
-                   desiredYoff + desiredHeight);
-    }
+    m_desired.setCoords(portBounds.left,  portBounds.top,
+                     portBounds.right, portBounds.bottom);
+#if 0
+    // The clipping mask
+    theMask = NewRgn();
+    SetRectRgn(theMask, m_desired.left(),  m_desired.top(),
+                        m_desired.width(), m_desired.height());
 #endif
 
     // create the decompressor
@@ -291,7 +264,7 @@ bool VideoOutputQuartzView::Begin(void)
     viewLock.unlock();
 
     // set transformation matrix
-    Transform();
+    Transform(m_desired);
 
     return true;
 }
@@ -315,16 +288,16 @@ void VideoOutputQuartzView::End(void)
 }
 
 /// Build the transformation matrix to scale the video appropriately.
-void VideoOutputQuartzView::Transform(void)
+void VideoOutputQuartzView::Transform(QRect newRect)
 {
     MatrixRecord matrix;
     SetIdentityMatrix(&matrix);
 
     int x, y, w, h, sw, sh;
-    x = m_desired.left();
-    y = m_desired.top();
-    w = m_desired.width();
-    h = m_desired.height();
+    x = newRect.left();
+    y = newRect.top();
+    w = newRect.width();
+    h = newRect.height();
     sw = parentData->srcWidth;
     sh = parentData->srcHeight;
     float aspect = parentData->srcAspect;
@@ -402,11 +375,6 @@ void VideoOutputQuartzView::Transform(void)
             hscale = vscale = fmin(h * 1.0 / sh, w * 1.0 / sw);
             break;
     }
-    if ((parentData->ZoomedH != 1.0f) || (parentData->ZoomedV != 1.0f))
-    {
-        hscale *= 1 + (parentData->ZoomedH);
-        vscale *= 1 + (parentData->ZoomedV);
-    }
 
     // cap zooming if we requested it
     if (!parentData->scaleUpVideo)
@@ -470,34 +438,6 @@ void VideoOutputQuartzView::Transform(void)
                     X2Fix((double)(1.0 + (vscan / 50.0))),
                     X2Fix(sw / 2.0),
                     X2Fix(sh / 2.0));
-    }
-
-    // apply TV mode offset
-    if (applyTVoffset)
-    {
-        int tv_xoff = gContext->GetNumSetting("xScanDisplacement", 0);
-        int tv_yoff = gContext->GetNumSetting("yScanDisplacement", 0);
-        if (tv_xoff || tv_yoff)
-        {
-            VERBOSE(VB_PLAYBACK, QString("%0TV offset by %1, %2")
-                                 .arg(name).arg(tv_xoff).arg(tv_yoff));
-            TranslateMatrix(&matrix, Long2Fix(tv_xoff), Long2Fix(tv_yoff));
-        }
-    }
-
-    // apply zoomed offsets
-    if ((parentData->ZoomedH != 1.0f) || (parentData->ZoomedV != 1.0f))
-    {
-        // calculate original vs. zoomed dimensions
-        int zw = (int)(sw / (1.0 + (parentData->ZoomedH)));
-        int zh = (int)(sh / (1.0 + (parentData->ZoomedV)));
-
-        int zoomx = (int)((sw - zw) * parentData->ZoomedRight * .005);
-        int zoomy = (int)((sh - zh) * parentData->ZoomedUp    * .005);
-
-        VERBOSE(VB_PLAYBACK, QString("%0Zoom translating to %1, %2")
-                                    .arg(name).arg(zoomx).arg(zoomy));
-        TranslateMatrix(&matrix, Long2Fix(zoomx), Long2Fix(zoomy));
     }
 
     // apply graphics port or embedding offset
@@ -609,28 +549,13 @@ void VideoOutputQuartzView::InputChanged(int width, int height, float aspect,
     Begin();
 }
 
-void VideoOutputQuartzView::VideoAspectRatioChanged(float aspect)
-{
-    (void)aspect;
-
-    // need to redo transformation matrix
-    Transform();
-}
-
 void VideoOutputQuartzView::MoveResize(QRect newRect)
 {
-    m_desired = newRect;
-
-    // need to redo transformation matrix
-    Transform();
-}
-
-void VideoOutputQuartzView::Zoom(ZoomDirection direction)
-{
-    (void)direction;
-
-    // need to redo transformation matrix
-    Transform();
+    if (applyMoveResize)
+    {
+        puts("MoveResize");
+        Transform(newRect);
+    }
 }
 
 /// Subclasses that block the main window should suspend
@@ -651,7 +576,7 @@ class VoqvMainWindow : public VideoOutputQuartzView
     : VideoOutputQuartzView(pData)
     {
         alpha = fminf(1.0, fmaxf(0.0, alphaBlend));
-        applyTVoffset = true;
+        applyMoveResize = true;
         name = "Main window: ";
     };
 
@@ -757,8 +682,7 @@ class VoqvEmbedded : public VideoOutputQuartzView
         GetPortBounds(thePort, &portBounds);
         InvalWindowRect(parentData->window, &portBounds);
 
-        // The main class handles masking and resizing,
-        // since we set the desiredXoff, etc. variables.
+        // The main class handles masking and resizing, since we set m_desired
         viewLock.unlock();
         return true;
     };
@@ -780,7 +704,7 @@ class VoqvFullscreen : public VideoOutputQuartzView
     VoqvFullscreen(QuartzData *pData)
     : VideoOutputQuartzView(pData)
     {
-        applyTVoffset = true;
+        applyMoveResize = true;
         name = "Full screen: ";
     };
 
@@ -943,7 +867,9 @@ class VoqvFloater : public VideoOutputQuartzView
             GetPortBounds(thePort, &curBounds);
             m_desired.setWidth(curBounds.right - curBounds.left);
             m_desired.setHeight(curBounds.bottom - curBounds.top);
-            Transform();
+            SetRectRgn(theMask, m_desired.left(),  m_desired.top(),
+                                m_desired.width(), m_desired.height());
+            Transform(m_desired);
         }
         resizing = startResizing;
     }
@@ -1137,7 +1063,6 @@ class VoqvDesktop : public VideoOutputQuartzView
     VoqvDesktop(QuartzData *pData)
     : VideoOutputQuartzView(pData)
     {
-        applyTVoffset = true;
         name = "Desktop: ";
     };
 
@@ -1242,10 +1167,6 @@ void VideoOutputQuartz::VideoAspectRatioChanged(float aspect)
 
     data->srcAspect = aspect;
     data->srcMode   = db_aspectoverride;
-
-    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
-    for (; it != data->views.end(); ++it)
-        (*it)->VideoAspectRatioChanged(aspect);
 }
 
 // this is documented in videooutbase.cpp
@@ -1256,14 +1177,6 @@ void VideoOutputQuartz::Zoom(ZoomDirection direction)
 
     VideoOutput::Zoom(direction);
     MoveResize();
-    data->ZoomedH     = mz_scale_h;
-    data->ZoomedV     = mz_scale_v;
-    data->ZoomedUp    = mz_move.y();
-    data->ZoomedRight = mz_move.x();
-
-    vector<VideoOutputQuartzView*>::iterator it = data->views.begin();
-    for (; it != data->views.end(); ++it)
-        (*it)->Zoom(direction);
 }
 
 void VideoOutputQuartz::MoveResize(void)
@@ -1381,11 +1294,6 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     data->srcHeight = video_dim.height();
     data->srcAspect = aspect;
     data->srcMode   = db_aspectoverride;
-
-    data->ZoomedH = 1.0f;
-    data->ZoomedV = 1.0f;
-    data->ZoomedUp = 0;
-    data->ZoomedRight = 0;
 
     // Initialize QuickTime
     if (EnterMovies())
