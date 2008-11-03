@@ -553,10 +553,7 @@ void VideoOutputQuartzView::InputChanged(int width, int height, float aspect,
 void VideoOutputQuartzView::MoveResize(QRect newRect)
 {
     if (applyMoveResize)
-    {
-        puts("MoveResize");
         Transform(newRect);
-    }
 }
 
 /// Subclasses that block the main window should suspend
