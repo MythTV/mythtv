@@ -342,8 +342,12 @@ void ViewScheduled::updateInfo(MythUIButtonListItem *item)
 
 void ViewScheduled::edit()
 {
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>
-                                (m_schedulesList->GetItemCurrent()->GetData());
+    MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
+
+    if (!item)
+        return;
+
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
     if (!pginfo)
         return;
 
@@ -352,8 +356,12 @@ void ViewScheduled::edit()
 
 void ViewScheduled::customEdit()
 {
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>
-                                (m_schedulesList->GetItemCurrent()->GetData());
+    MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
+
+    if (!item)
+        return;
+
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
     if (!pginfo)
         return;
 
@@ -365,8 +373,12 @@ void ViewScheduled::customEdit()
 
 void ViewScheduled::deleteRule()
 {
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>
-                                (m_schedulesList->GetItemCurrent()->GetData());
+    MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
+
+    if (!item)
+        return;
+
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
     if (!pginfo)
         return;
 
@@ -392,9 +404,11 @@ void ViewScheduled::deleteRule()
 
 void ViewScheduled::upcoming()
 {
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>
-                                (m_schedulesList->GetItemCurrent()->GetData());
+    MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
+    if (!item)
+        return;
 
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
     if (!pginfo)
         return;
 
@@ -408,9 +422,12 @@ void ViewScheduled::upcoming()
 
 void ViewScheduled::details()
 {
-    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>
-                                (m_schedulesList->GetItemCurrent()->GetData());
+    MythUIButtonListItem *item = m_schedulesList->GetItemCurrent();
 
+    if (!item)
+        return;
+
+    ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
     if (pginfo)
         pginfo->showDetails();
 

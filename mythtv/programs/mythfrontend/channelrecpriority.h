@@ -38,19 +38,19 @@ class ChannelRecPriority : public MythScreenType
     };
 
   protected slots:
-    void edit(MythUIButtonListItem *);
     void updateInfo(MythUIButtonListItem *);
-    void upcoming(MythUIButtonListItem *);
+    void edit(MythUIButtonListItem *);
+
+  private:
+    void FillList(void);
+    void SortList(void);
+    void updateList(void);
+    void menu(void);
+    void upcoming(void);
     void changeRecPriority(int howMuch);
     void applyChannelRecPriorityChange(QString, const QString&);
 
     void saveRecPriority(void);
-
-  private:
-    void FillList(void);
-    void SortList();
-    void updateList();
-    void menu();
 
     QMap<QString, ChannelInfo> m_channelData;
     QMap<QString, ChannelInfo*> m_sortedChannel;

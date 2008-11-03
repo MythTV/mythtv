@@ -122,7 +122,7 @@ bool ChannelRecPriority::keyPressEvent(QKeyEvent *event)
         else if (action == "INFO" || action == "CUSTOMEDIT")
             edit(m_channelList->GetItemCurrent());
         else if (action == "UPCOMING")
-            upcoming(m_channelList->GetItemCurrent());
+            upcoming();
         else if (action == "RANKINC")
             changeRecPriority(1);
         else if (action == "RANKDEC")
@@ -339,8 +339,7 @@ void ChannelRecPriority::updateList()
         item->SetImage(chanInfo->iconpath, "icon");
         item->SetImage(chanInfo->iconpath);
 
-        item->setText(chanInfo->recpriority, "priority",
-                        fontState);
+        item->setText(chanInfo->recpriority, "priority", fontState);
 
         if (m_currentItem == chanInfo)
             m_channelList->SetItemCurrent(item);
@@ -364,12 +363,10 @@ void ChannelRecPriority::SortList()
         m_currentItem = channelItem;
     }
 
-    typedef vector<RecPriorityInfo> sortList;
-
     int i, j;
-    sortList sortingList;
+    vector<RecPriorityInfo> sortingList;
     QMap<QString, ChannelInfo>::iterator pit;
-    sortList::iterator sit;
+    vector<RecPriorityInfo>::iterator sit;
     ChannelInfo *chanInfo;
     RecPriorityInfo *recPriorityInfo;
 
@@ -489,11 +486,16 @@ void ChannelRecPriority::edit(MythUIButtonListItem *item)
     SortList();
 }
 
-void ChannelRecPriority::upcoming(MythUIButtonListItem *item)
+void ChannelRecPriority::upcoming()
 {
+    MythUIButtonListItem *item = m_channelList->GetItemCurrent();
+
+    if (!item)
+        return;
+
     ChannelInfo *chanInfo = qVariantValue<ChannelInfo *>(item->GetData());
 
-    if (chanInfo->chanid < 1)
+    if (!chanInfo || chanInfo->chanid < 1)
         return;
 
     QString chanID = QString("%1").arg(chanInfo->chanid);
@@ -522,7 +524,7 @@ void ChannelRecPriority::customEvent(QEvent *event)
                     edit(m_channelList->GetItemCurrent());
                     break;
                 case 1:
-                    upcoming(m_channelList->GetItemCurrent());
+                    upcoming();
                     break;
                 case 2:
                     //resetAll();
