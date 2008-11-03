@@ -12,9 +12,10 @@
  * - Other viewing options?
  *
  * = KNOWN BUGS
- * - Aspect switching occasionally fails
- * - Floating window needs testing. Resizing, or viewing something
- *   a second time, may cause a crash (backtraces appreciated)
+ * - Drawing on the desktop only updates the main screen?
+ * - The floating window can only be created on the main screen?
+ * - The fullscreen window doesn't display anything when created
+ *   on any screen except, you guessed it, the main screen.
  * 
  * = REVISION
  * $Id$
@@ -875,9 +876,10 @@ class VoqvFloater : public VideoOutputQuartzView
     }
 
   protected:
-    WindowRef window;
-    float alpha;
-    bool resizing;
+    ToolboxObjectClassRef myClass;
+    WindowRef             window;
+    float                 alpha;
+    bool                  resizing;
 
     bool BeginPort(void)
     {
@@ -894,7 +896,6 @@ class VoqvFloater : public VideoOutputQuartzView
             { { kEventClassWindow, kEventWindowHitTest },
               { kEventClassWindow, kEventWindowDrawFrame },
               { kEventClassWindow, kEventWindowClickResizeRgn } };
-        ToolboxObjectClassRef myClass;
         RegisterToolboxObjectClass(CFSTR("org.mythtv.myth.VoqvFloater"),
                                    NULL,
                                    3,
@@ -961,6 +962,7 @@ class VoqvFloater : public VideoOutputQuartzView
             DisposeWindow(window);
             window = NULL;
         }
+        UnregisterToolboxObjectClass(myClass);
         viewLock.unlock();
     };
 
