@@ -1345,6 +1345,9 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     {
         display_dim = QSize((uint) size_in_mm.width, (uint) size_in_mm.height);
         display_aspect = size_in_mm.width / size_in_mm.height;
+        VERBOSE(VB_PLAYBACK, QString("Screen size is %1 x %2 (mm), aspect %3")
+                             .arg(size_in_mm.width).arg(size_in_mm.height)
+                             .arg(display_aspect));
     }
 
     // Global configuration options
@@ -1355,12 +1358,32 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
 
     data->convertI420to2VUY = get_i420_2vuy_conv();
 
+
+    if (data->drawInWindow)
+    {
+        // display_aspect and _dim have to be scaled by window size
+        int dispWidth  = get_int_CF(m, kCGDisplayWidth);
+        int dispHeight = get_int_CF(m, kCGDisplayHeight);
+
+#if 0
+        // the base VideoOutput doesn't actually use this, but if it did...
+        display_dim = QSize(size_in_mm.width  * dispWidth / winw,
+                            size_in_mm.height * dispHeight / winh);
+#endif
+        display_aspect = (size_in_mm.width  * winw / dispWidth) /
+                         (size_in_mm.height * winh / dispHeight);
+        VERBOSE(VB_PLAYBACK,
+                QString("Main window aspect is %1").arg(display_aspect));
+    }
+
     if (!CreateQuartzBuffers())
     {
         puts("CreateQuartzBuffers failed");
         return false;
     }
 
+
+    // Create the output view objects
     VideoOutputQuartzView *tmp;
     if (!data->drawInWindow)
     {
