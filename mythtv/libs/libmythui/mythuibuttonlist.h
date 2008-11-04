@@ -157,6 +157,8 @@ class MythUIButtonList : public MythUIType
     bool MoveUp(MovementUnit unit = MoveItem);
     bool MoveToNamedPosition(const QString &position_name);
 
+    void RemoveItem(MythUIButtonListItem *item);
+
   public slots:
     void Select();
     void Deselect();
@@ -172,7 +174,6 @@ class MythUIButtonList : public MythUIType
     virtual void Init();
 
     void InsertItem(MythUIButtonListItem *item);
-    void RemoveItem(MythUIButtonListItem *item);
 
     void SetPositionArrowStates(void);
 
