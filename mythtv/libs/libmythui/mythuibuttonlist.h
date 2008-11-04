@@ -153,8 +153,8 @@ class MythUIButtonList : public MythUIType
     enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax };
     enum WrapStyle    { WrapNone, WrapSelect, WrapItems };
 
-    void MoveDown(MovementUnit unit = MoveItem);
-    void MoveUp(MovementUnit unit = MoveItem);
+    bool MoveDown(MovementUnit unit = MoveItem);
+    bool MoveUp(MovementUnit unit = MoveItem);
     bool MoveToNamedPosition(const QString &position_name);
 
   public slots:

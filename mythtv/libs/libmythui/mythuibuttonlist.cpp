@@ -398,11 +398,11 @@ int MythUIButtonList::GetItemPos(MythUIButtonListItem* item) const
     return m_itemList.indexOf(item);
 }
 
-void MythUIButtonList::MoveUp(MovementUnit unit)
+bool MythUIButtonList::MoveUp(MovementUnit unit)
 {
     int pos = m_selPosition;
     if (pos == -1 || m_itemList.isEmpty() || !m_initialized)
-        return;
+        return false;
 
     switch (unit)
     {
@@ -482,13 +482,15 @@ void MythUIButtonList::MoveUp(MovementUnit unit)
 
     if (pos != m_selPosition)
         emit itemSelected(m_selItem);
+
+    return true;
 }
 
-void MythUIButtonList::MoveDown(MovementUnit unit)
+bool MythUIButtonList::MoveDown(MovementUnit unit)
 {
     int pos = m_selPosition;
     if (pos == -1 || m_itemList.isEmpty() || !m_initialized)
-        return;
+        return false;
 
     switch (unit)
     {
@@ -561,6 +563,8 @@ void MythUIButtonList::MoveDown(MovementUnit unit)
 
     if (pos != m_selPosition)
         emit itemSelected(m_selItem);
+
+    return true;
 }
 
 bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
@@ -1322,7 +1326,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
     buttonstate->Reset();
 
     MythUIImage *buttonbackground = dynamic_cast<MythUIImage *>
-                                        (buttonstate->GetChild("buttonbackground"));
+                                    (buttonstate->GetChild("buttonbackground"));
     if (buttonbackground && buttonbackground->IsGradient())
         buttonbackground->ForceSize(buttonstate->GetArea().size());
 
