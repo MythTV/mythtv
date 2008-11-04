@@ -288,7 +288,7 @@ int dvdinput_setup(void)
 #else
   /* dlopening libdvdcss */
 
-#if defined(linux) || defined(__FreeBSD__)
+#if defined(__linux__) || defined(__FreeBSD__)
   dvdcss_library = dlopen("libdvdcss.so.2", RTLD_LAZY);
 #endif
 #ifdef CONFIG_DARWIN
