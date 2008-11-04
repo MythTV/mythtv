@@ -1183,42 +1183,47 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     char testbuf[kDecoderProbeBufferSize];
     ringBuffer->Unpause(); // so we can read testbuf if we were paused
 
-    int readsize = 2048;
-    if (ringBuffer->Peek(testbuf, readsize) != readsize)
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("NVP::OpenFile(): Error, couldn't read file: %1")
-                .arg(ringBuffer->GetFilename()));
-        return -1;
-    }
-
     // delete any pre-existing recorder
     SetDecoder(NULL);
+    int testreadsize;
 
-    if (NuppelDecoder::CanHandle(testbuf, readsize))
-        SetDecoder(new NuppelDecoder(this, m_playbackinfo));
+    for (testreadsize = 2048;
+         testreadsize <= kDecoderProbeBufferSize && !GetDecoder();
+         testreadsize <<= 1)
+    {
+        if (ringBuffer->Peek(testbuf, testreadsize) != testreadsize)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("NVP::OpenFile(): Error, couldn't read file: %1")
+                    .arg(ringBuffer->GetFilename()));
+            return -1;
+        }
+
+        if (NuppelDecoder::CanHandle(testbuf, testreadsize))
+            SetDecoder(new NuppelDecoder(this, m_playbackinfo));
 #ifdef USING_IVTV
-    else if (!using_null_videoout && IvtvDecoder::CanHandle(
-                 testbuf, ringBuffer->GetFilename(), readsize))
-    {
-        SetDecoder(new IvtvDecoder(this, m_playbackinfo));
-        no_audio_out = true; // no audio with ivtv.
-        audio_bits = 16;
-        audio_samplerate = 44100;
-        audio_channels = 2;
-    }
-    else if (IsIVTVDecoder())
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("NVP: Couldn't open '%1' with ivtv decoder")
-                .arg(ringBuffer->GetFilename()));
-        return -1;
-    }
+        else if (!using_null_videoout && IvtvDecoder::CanHandle(
+                     testbuf, ringBuffer->GetFilename(), testreadsize))
+        {
+            SetDecoder(new IvtvDecoder(this, m_playbackinfo));
+            no_audio_out = true; // no audio with ivtv.
+            audio_bits = 16;
+            audio_samplerate = 44100;
+            audio_channels = 2;
+        }
+        else if (IsIVTVDecoder())
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("NVP: Couldn't open '%1' with ivtv decoder")
+                    .arg(ringBuffer->GetFilename()));
+            return -1;
+        }
 #endif
-    else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename(),
-                                        readsize))
-        SetDecoder(new AvFormatDecoder(this, m_playbackinfo,
-                                       using_null_videoout, allow_libmpeg2));
+        else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename(),
+                                            testreadsize))
+            SetDecoder(new AvFormatDecoder(this, m_playbackinfo,
+                                           using_null_videoout, allow_libmpeg2));
+    }
 
     if (!GetDecoder())
     {
@@ -1250,7 +1255,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     // We want to locate decoder for video even if using_null_videoout
     // is true, only disable if no_video_decode is true.
     int ret = GetDecoder()->OpenFile(ringBuffer, no_video_decode, testbuf,
-                                     readsize);
+                                     testreadsize);
 
     if (ret < 0)
     {

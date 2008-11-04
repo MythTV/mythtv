@@ -793,7 +793,15 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
     probe.buf = (unsigned char *)testbuf;
     probe.buf_size = testbufsize;
 
-    if (av_probe_input_format(&probe, true))
+    int score = AVPROBE_SCORE_MAX/4;
+
+    if (testbufsize + AVPROBE_PADDING_SIZE > kDecoderProbeBufferSize)
+    {
+        probe.buf_size = kDecoderProbeBufferSize - AVPROBE_PADDING_SIZE;
+        score = 0;
+    }
+
+    if (av_probe_input_format2(&probe, true, &score))
         return true;
     return false;
 }
@@ -871,7 +879,10 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     AVProbeData probe;
     probe.filename = filename;
     probe.buf = (unsigned char *)testbuf;
-    probe.buf_size = testbufsize;
+    if (testbufsize + AVPROBE_PADDING_SIZE <= kDecoderProbeBufferSize)
+        probe.buf_size = testbufsize;
+    else
+        probe.buf_size = kDecoderProbeBufferSize - AVPROBE_PADDING_SIZE;
 
     fmt = av_probe_input_format(&probe, true);
     if (!fmt)

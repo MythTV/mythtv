@@ -719,6 +719,16 @@ AVInputFormat *av_find_input_format(const char *short_name);
 AVInputFormat *av_probe_input_format(AVProbeData *pd, int is_opened);
 
 /**
+ * Guess file format.
+ *
+ * @param is_opened whether the file is already opened, determines whether
+ *                  demuxers with or without AVFMT_NOFILE are probed
+ * @param score_max ignore formats with probe score <= score_max and
+ *                  return the maximal score
+ */
+AVInputFormat *av_probe_input_format2(AVProbeData *pd, int is_opened, int *score_max);
+
+/**
  * Allocates all the structures needed to read an input stream.
  *        This does not open the needed codecs for decoding the stream[s].
  */
