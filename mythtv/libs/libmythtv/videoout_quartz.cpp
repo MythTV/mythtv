@@ -418,29 +418,6 @@ void VideoOutputQuartzView::Transform(QRect newRect)
     }
 #endif // USING_DVDV
 
-    // apply over/underscan
-    int hscan = gContext->GetNumSetting("HorizScanPercentage", 5);
-    int vscan = gContext->GetNumSetting("VertScanPercentage", 5);
-    if (hscan || vscan)
-    {
-        if (vscan > 0)
-        {
-            vscan *= 2;   // Confusing, but matches X behavior
-        }
-        if (hscan > 0)
-        {
-            hscan *= 2;
-        }
-
-        VERBOSE(VB_PLAYBACK, QString("%0Overscanning to %1, %2")
-                                    .arg(name).arg(hscan).arg(vscan));
-        ScaleMatrix(&matrix,
-                    X2Fix((double)(1.0 + (hscan / 50.0))),
-                    X2Fix((double)(1.0 + (vscan / 50.0))),
-                    X2Fix(sw / 2.0),
-                    X2Fix(sh / 2.0));
-    }
-
     // apply graphics port or embedding offset
     if (x || y)
     {
@@ -1360,19 +1337,16 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
 
     if (data->drawInWindow)
     {
-        // display_aspect and _dim have to be scaled by window size
-        int dispWidth  = get_int_CF(m, kCGDisplayWidth);
-        int dispHeight = get_int_CF(m, kCGDisplayHeight);
-
-#if 0
-        // the base VideoOutput doesn't actually use this, but if it did...
-        display_dim = QSize(size_in_mm.width  * dispWidth / winw,
-                            size_in_mm.height * dispHeight / winh);
-#endif
-        display_aspect = (size_in_mm.width  * winw / dispWidth) /
-                         (size_in_mm.height * winh / dispHeight);
-        VERBOSE(VB_PLAYBACK,
-                QString("Main window aspect is %1").arg(display_aspect));
+        // display_aspect and _dim have to be scaled to actual window size
+        float winWidth  = size_in_mm.width  * winw
+                          / get_int_CF(m, kCGDisplayWidth);
+        float winHeight = size_in_mm.height * winh
+                          / get_int_CF(m, kCGDisplayHeight);
+        display_dim     = QSize(winWidth, winHeight);
+        display_aspect  = winWidth / winHeight;
+        VERBOSE(VB_PLAYBACK, QString("Main window is %1 x %2 (mm), aspect %3")
+                             .arg((int)winWidth).arg((int)winHeight)
+                             .arg(display_aspect));
     }
 
     if (!CreateQuartzBuffers())
