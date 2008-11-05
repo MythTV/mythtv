@@ -239,8 +239,7 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
     {
         if (m_topItem != m_itemList.last())
         {
-            ++m_topPosition;
-            m_topItem = *(m_itemList.begin() + m_topPosition);
+            m_topItem = *(m_itemList.begin() + m_topPosition + 1);
         }
         else if (m_topItem != m_itemList.first())
         {
@@ -258,8 +257,7 @@ void MythUIButtonList::RemoveItem(MythUIButtonListItem *item)
     {
         if (m_selItem != m_itemList.last())
         {
-            ++m_selPosition;
-            m_selItem = *(m_itemList.begin() + m_selPosition);
+            m_selItem = *(m_itemList.begin() + m_selPosition + 1);
         }
         else if (m_selItem != m_itemList.first())
         {
