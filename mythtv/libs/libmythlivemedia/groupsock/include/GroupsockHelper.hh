@@ -79,6 +79,7 @@ netAddressBits ourSourceAddressForMulticast(UsageEnvironment& env); // in networ
 // are INADDR_ANY (i.e., 0), specifying the default interface.)
 extern netAddressBits SendingInterfaceAddr;
 extern netAddressBits ReceivingInterfaceAddr;
+extern netAddressBits ReceivingSocketAddr;
 
 // Allocates a randomly-chosen IPv4 SSM (multicast) address:
 netAddressBits chooseRandomIPv4SSMAddress(UsageEnvironment& env);

@@ -34,6 +34,7 @@ extern "C" int initializeWinsockIfNecessary();
 // By default, use INADDR_ANY for the sending and receiving interfaces:
 netAddressBits SendingInterfaceAddr = INADDR_ANY;
 netAddressBits ReceivingInterfaceAddr = INADDR_ANY;
+netAddressBits ReceivingSocketAddr = INADDR_ANY;
 
 static void socketErr(UsageEnvironment& env, char* errorMsg) {
 	env.setResultErrMsg(errorMsg);
@@ -93,7 +94,7 @@ int setupDatagramSocket(UsageEnvironment& env, Port port,
 #else
   if (port.num() != 0 || ReceivingInterfaceAddr != INADDR_ANY) {
 #endif
-    MAKE_SOCKADDR_IN(name, ReceivingInterfaceAddr, port.num());
+    MAKE_SOCKADDR_IN(name, ReceivingSocketAddr, port.num());
     if (bind(newSocket, (struct sockaddr*)&name, sizeof name) != 0) {
       char tmpBuffer[100];
       sprintf(tmpBuffer, "bind() error (port number: %d): ",
@@ -560,6 +561,8 @@ netAddressBits ourSourceAddressForMulticast(UsageEnvironment& env) {
       testAddr.s_addr = our_inet_addr("228.67.43.91"); // arbitrary
       Port testPort(15947); // ditto
       
+      ReceivingSocketAddr = INADDR_ANY;
+
       sock = setupDatagramSocket(env, testPort);
       if (sock < 0) break;
       
