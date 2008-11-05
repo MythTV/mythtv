@@ -220,7 +220,7 @@ const DTVParamHelperStruct DTVModulation::confTable[] =
    { "32APSK",   kModulation32APSK  },
    { "8PSK",     kModulation8PSK    },
    { "16PSK",    kModulation16PSK   },
-   { "analog",   kModulation16PSK   },
+   { "analog",   kModulationAnalog  },
    { NULL,       kModulationQAMAuto },
 };
 
