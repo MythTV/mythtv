@@ -3074,15 +3074,16 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 storevideoframes = false;
                 
-                if (decodeStillFrame && !inDVDStill)
-                    decodeStillFrame = false;
-                
                 if (storedPackets.count() < 2 && !decodeStillFrame)
                     storevideoframes = true;
-
+                
+                VERBOSE(VB_EXTRA, QString("DVD Playback Debugging"
+                    "inDVDMenu %1 storedPacketcount %2 dvdstill %3")
+                    .arg(inDVDMenu).arg(storedPackets.count()).arg(inDVDStill));
+                
                 if (inDVDMenu && storedPackets.count() > 0)
                     ringBuffer->DVD()->SetRunSeekCellStart(false);
-                else if (inDVDStill)
+                else if (storedPackets.count() == 0)
                     ringBuffer->DVD()->RunSeekCellStart();
             }          
             if (GetNVP()->AtNormalSpeed() &&
@@ -3163,6 +3164,14 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 delete pkt;
                 return false;
             }
+            
+            if (ringBuffer->isDVD() && 
+                ringBuffer->DVD()->InStillFrame()) 
+            {
+                mpeg_seq_end_seen = false;
+                decodeStillFrame = false;
+                ringBuffer->DVD()->InStillFrame(false);
+            }
 
             if (waitingForChange && pkt->pos >= readAdjust)
                 FileChanged();
@@ -3191,13 +3200,15 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             curstream->codec->codec_type == CODEC_TYPE_VIDEO)
         {
             MpegPreProcessPkt(curstream, pkt);
-
-            if (mpeg_seq_end_seen && storevideoframes)
-            {
+            
+            if (mpeg_seq_end_seen)
                 ringBuffer->DVD()->InStillFrame(true);
-            }
 
             bool inDVDStill = ringBuffer->DVD()->InStillFrame();
+
+            VERBOSE(VB_EXTRA, QString("DVD Playback Debugging: mpeg seq end %1 "
+                " inDVDStill %2 decodeStillFrame %3")
+                .arg(mpeg_seq_end_seen).arg(inDVDStill).arg(decodeStillFrame));
 
             if (!decodeStillFrame && inDVDStill)
             {
@@ -3206,14 +3217,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 d->ResetMPEG2();
             }
             
-            if (mpeg_seq_end_seen)
-            {
-                mpeg_seq_end_seen = false;
-                av_free_packet(pkt);
-                pkt = NULL;
-                continue;
-            }
-
             if (!d->HasMPEG2Dec())
             {
                 int current_width = curstream->codec->width;
@@ -3791,9 +3794,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     decoded_video_frame = picframe;
                     gotvideo = 1;
                     framesPlayed++;
-
-                    if (decodeStillFrame)
-                        decodeStillFrame = false;
 
                     lastvpts = temppts;
                     break;

@@ -98,7 +98,7 @@ class MPUBLIC DVDRingBufferPriv
     void ActivateButton(void);
     int NumMenuButtons(void) const;
     void IgnoreStillOrWait(bool skip) { skipstillorwait = skip; }
-    void InStillFrame(bool change) { cellHasStillFrame = change; }
+    void InStillFrame(bool change);
     void AudioStreamsChanged(bool change) { audioStreamsChanged = change; }
     uint GetCurrentTime(void) { return (currentTime / 90000); }
     uint TitleTimeLeft(void);

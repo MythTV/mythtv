@@ -338,11 +338,8 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 cellRepeated = false;
                 menupktpts = 0;
                 if (cellHasStillFrame)
-                {
                     GetMythUI()->DisableScreensaver();
-                    VERBOSE(VB_PLAYBACK, LOC + "Leaving DVDNAV_STILL_FRAME");
-                }
-                cellHasStillFrame = false;
+                InStillFrame(false);
 
                 if (parent && IsInMenu())
                 {
@@ -574,9 +571,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
             break;
             case DVDNAV_STILL_FRAME:
             {
-                if (!cellHasStillFrame)
-                    VERBOSE(VB_PLAYBACK, LOC + "Entering DVDNAV_STILL_FRAME");
-                cellHasStillFrame = true;
+                InStillFrame(true);
                 dvdnav_still_event_t* still =
                     (dvdnav_still_event_t*)(blockBuf);
                 usleep(10000);
@@ -1131,6 +1126,21 @@ int DVDRingBufferPriv::NumMenuButtons(void) const
         return numButtons;
     else
         return 0;
+}
+
+void DVDRingBufferPriv::InStillFrame(bool change)
+{
+    QString str;
+    
+    if (change)
+        str = "Entering DVD Still Frame";
+    else
+        str = "Leaving DVD Still Frame";
+    
+    if (cellHasStillFrame != change)
+        VERBOSE(VB_PLAYBACK, str);
+    
+    cellHasStillFrame = change;
 }
 
 /** \brief get the audio language from the dvd
