@@ -72,6 +72,8 @@ bool IPTVFeederUDP::Open(const QString &url)
     if (!InitEnv())
         return false;
     
+    ReceivingSocketAddr = our_inet_addr(parse.host().toLatin1());
+
     Groupsock *socket = new Groupsock(*_live_env, addr, parse.port(), 0);
     if (!socket)
     {
