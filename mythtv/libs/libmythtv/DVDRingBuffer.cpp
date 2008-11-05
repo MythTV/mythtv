@@ -1034,9 +1034,9 @@ bool DVDRingBufferPriv::DecodeSubtitles(AVSubtitle *sub, int *gotSubtitles,
         {
             uint captionmode = parent->GetCaptionMode();
             if (force_subtitle_display && captionmode != kDisplayAVSubtitle)
-                parent->SetCaptionsEnabled(true, false);
+                parent->EnableCaptions(kDisplayAVSubtitle, false);
             else if (!force_subtitle_display && captionmode == kDisplayAVSubtitle)
-                parent->SetCaptionsEnabled(false, false);
+                parent->DisableCaptions(kDisplayAVSubtitle, false);
         }
         return true;
     }
