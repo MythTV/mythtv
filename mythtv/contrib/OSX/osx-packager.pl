@@ -7,7 +7,7 @@
 ### $Id$
 ###
 ### = location
-### http://svn.mythtv.org/svn/trunk/mythtv/contrib/OSX/osx-packager.pl
+### http://svn.mythtv.org/svn/branches/release-0-21-fixes/mythtv/contrib/OSX/osx-packager.pl
 ###
 ### = description
 ### Tool for automating frontend builds on Mac OS X.
