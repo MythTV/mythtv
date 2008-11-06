@@ -208,7 +208,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
             // different than when it is locally mounted because of block sizes
             if (it2->fsID == -1 &&
                 (!HasfsID(it2->fsID) || it1->dirID == it2->dirID) &&
-                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 16) &&
+                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 32) &&
                 ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
                  <= maxWriteFiveSec))
             {
