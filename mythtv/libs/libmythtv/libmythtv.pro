@@ -194,7 +194,7 @@ HEADERS += mpeg/atsc_huffman.h      mpeg/iso639.h
 HEADERS += mpeg/freesat_huffman.h   mpeg/freesat_tables.h
 HEADERS += mpeg/iso6937tables.h
 HEADERS += mpeg/tsstats.h           mpeg/streamlisteners.h
-HEADERS += mpeg/h264utils.h
+HEADERS += mpeg/H264Parser.h
 
 SOURCES += mpeg/tspacket.cpp        mpeg/pespacket.cpp
 SOURCES += mpeg/mpegtables.cpp      mpeg/atsctables.cpp
@@ -207,9 +207,7 @@ SOURCES += mpeg/premieredescriptors.cpp
 SOURCES += mpeg/atsc_huffman.cpp    mpeg/iso639.cpp
 SOURCES += mpeg/freesat_huffman.cpp
 SOURCES += mpeg/iso6937tables.cpp
-SOURCES += mpeg/h264utils.cpp
-
-DEFINES += USING_H264TOOLS
+SOURCES += mpeg/H264Parser.cpp
 
 # Channels, and the multiplexes that transmit them
 HEADERS += frequencies.h            frequencytables.h

@@ -9,7 +9,7 @@
 #include "format.h"
 #include "decoderbase.h"
 #include "vbilut.h"
-#include "h264utils.h"
+#include "H264Parser.h"
 
 extern "C" {
 #include "frame.h"
@@ -213,7 +213,7 @@ class AvFormatDecoder : public DecoderBase
 
     bool is_db_ignored;
 
-    H264::KeyframeSequencer *h264_kf_seq;
+    H264Parser *m_h264_parser;
 
     AVFormatContext *ic;
     AVFormatParameters params;

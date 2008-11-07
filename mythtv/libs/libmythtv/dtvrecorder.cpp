@@ -168,7 +168,7 @@ void DTVRecorder::ResetForNewFile(void)
     _frames_written_count       = 0;
     _pes_synced                 = false;
     _seen_sps                   = false;
-    _h264_kf_seq.Reset();
+    m_h264_parser.Reset();
     positionMap.clear();
     positionMapDelta.clear();
     _payload_buffer.clear();
@@ -535,24 +535,22 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
             break;
 
         // scan for a NAL unit start code
-        uint32_t bytes_used = _h264_kf_seq.AddBytes(tspacket->data() + i,
-                                                   TSPacket::SIZE - i,
-                                                   ringBuffer->GetWritePosition());
+
+        uint32_t bytes_used = m_h264_parser.addBytes(
+            tspacket->data() + i, TSPacket::SIZE - i,
+            ringBuffer->GetWritePosition() + _payload_buffer.size()
+            );
         i += (bytes_used - 1);
 
-        // special handling when we've synced to a NAL unit
-        if (_h264_kf_seq.HasStateChanged())
+        if (m_h264_parser.stateChanged())
         {
-            if (_h264_kf_seq.LastSyncedType() == H264::NALUnitType::SPS)
-                _seen_sps = true;
-
-            if (_h264_kf_seq.IsOnKeyframe())
+            if (m_h264_parser.onFrameStart() &&
+                m_h264_parser.FieldType() != H264Parser::FIELD_BOTTOM)
             {
-                hasKeyFrame = true;
+                hasKeyFrame = m_h264_parser.onKeyFrameStart();
                 hasFrame = true;
+                _seen_sps |= hasKeyFrame;
             }
-            else if (_h264_kf_seq.IsOnFrame())
-                hasFrame = true;
         }
     } // for (; i < TSPacket::SIZE; i++)
 
@@ -586,8 +584,8 @@ void DTVRecorder::HandleH264Keyframe(void)
     positionMapLock.lock();
     if (!positionMap.contains(frameNum))
     {
-        positionMapDelta[frameNum] = _h264_kf_seq.KeyframeAUStreamOffset();
-        positionMap[frameNum]      = _h264_kf_seq.KeyframeAUStreamOffset();
+        positionMapDelta[frameNum] = m_h264_parser.keyframeAUstreamOffset();
+        positionMap[frameNum]      = m_h264_parser.keyframeAUstreamOffset();
     }
     positionMapLock.unlock();
 

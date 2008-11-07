@@ -15,7 +15,7 @@ using namespace std;
 #include <qdatetime.h>
 
 #include "recorderbase.h"
-#include "h264utils.h"
+#include "H264Parser.h"
 
 class MPEGStreamData;
 class TSPacket;
@@ -90,7 +90,7 @@ class DTVRecorder: public RecorderBase
     // H.264 support
     bool _pes_synced;
     bool _seen_sps;
-    H264::KeyframeSequencer _h264_kf_seq;
+    H264Parser m_h264_parser;
 
     /// True if API call has requested a recording be [re]started
     bool _request_recording;

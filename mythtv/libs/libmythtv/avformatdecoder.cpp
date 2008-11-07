@@ -390,7 +390,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
     : DecoderBase(parent, pginfo),
       d(new AvFormatDecoderPrivate(allow_libmpeg2)),
       is_db_ignored(gContext->IsDatabaseIgnored()),
-      h264_kf_seq(new H264::KeyframeSequencer()),
+      m_h264_parser(new H264Parser()),
       ic(NULL),
       frame_decoded(0),             decoded_video_frame(NULL),
       avfRingBuffer(NULL),
@@ -459,7 +459,8 @@ AvFormatDecoder::~AvFormatDecoder()
     delete ccd708;
     delete ttd;
     delete d;
-    delete h264_kf_seq;
+    delete m_h264_parser;
+
     av_freep((void *)&audioSamples);
 
     if (dummy_frame)
@@ -504,7 +505,7 @@ void AvFormatDecoder::CloseContext()
     }
         
     d->DestroyMPEG2();
-    h264_kf_seq->Reset();
+    m_h264_parser->Reset();
 }
 
 static int64_t lsb3full(int64_t lsb, int64_t base_ts, int lsb_bits)
@@ -703,7 +704,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     // Skip all the desired number of skipFrames
     for (;skipFrames > 0 && !ateof; skipFrames--)
     {
-	GetFrame(0);
+        GetFrame(0);
         if (decoded_video_frame)
             GetNVP()->DiscardVideoFrame(decoded_video_frame);
     }
@@ -1511,7 +1512,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     break;
 
                 d->DestroyMPEG2();
-                h264_kf_seq->Reset();
+                m_h264_parser->Reset();
 
                 uint width  = max(enc->width, 16);
                 uint height = max(enc->height, 16);
@@ -2428,10 +2429,10 @@ void AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
     while (buf < buf_end)
     {
-        uint32_t bytes_used = h264_kf_seq->AddBytes(buf, buf_end - buf, 0);
-        buf += bytes_used;
+        buf += m_h264_parser->addBytes(buf, buf_end - buf, 0);
 
-        if (!h264_kf_seq->HasStateChanged() || !h264_kf_seq->IsOnKeyframe())
+        if (!m_h264_parser->stateChanged() || !m_h264_parser->onKeyFrameStart()
+            || m_h264_parser->FieldType() == H264Parser::FIELD_BOTTOM)
             continue;
 
         float aspect_ratio;
