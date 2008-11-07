@@ -40,10 +40,9 @@ LIBS += -lmythavcodec-$$LIBVERSION  -lmythavformat-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythmpeg2-$$LIBVERSION    -lmythdvdnav-$$LIBVERSION
 LIBS += -lmythdb-$$LIBVERSION
-LIBS += -lz $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
-
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
+LIBS += -lz $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libavutil/libmythavutil-$${MYTH_SHLIB_EXT}

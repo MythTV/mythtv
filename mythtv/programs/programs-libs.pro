@@ -12,7 +12,7 @@ LIBS += -L../../libs/libmythupnp
 LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
 LIBS += -lmythavutil-$$LIBVERSION -lmythavcodec-$$LIBVERSION 
 LIBS += -lmythupnp-$$LIBVERSION 
-LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION $$EXTRA_LIBS
+LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION
 LIBS += -lmythdb-$$LIBVERSION
 
 using_live:LIBS += -L../../libs/libmythlivemedia -lmythlivemedia-$$LIBVERSION
@@ -43,4 +43,4 @@ CONFIG += opengl
 macx:using_firewire:using_backend:LIBS += -F$${CONFIG_MAC_AVC} -framework AVCVideoServices
 macx:using_dvdv:LIBS += -lobjc
 
-LIBS += $$LATE_LIBS
+LIBS += $$EXTRA_LIBS $$LATE_LIBS
