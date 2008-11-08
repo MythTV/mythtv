@@ -66,7 +66,7 @@
     <name>BackendSelect</name>
     <message>
         <source>Please select default Myth Backend Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Porfavor seleccione un Myth Backend Server por omisión</translation>
     </message>
     <message>
         <source>OK</source>
@@ -74,18 +74,18 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Configure Manually</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurar Manualmente</translation>
     </message>
 </context>
 <context>
     <name>CaptureCard</name>
     <message>
         <source>Analog Options for</source>
-        <translation type="obsolete">Opciones Analógicas para</translation>
+        <translation>Opciones Análogas para</translation>
     </message>
 </context>
 <context>
@@ -167,23 +167,23 @@
     </message>
     <message>
         <source>Create Input Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear Grupo de Entrada</translation>
     </message>
     <message>
         <source>Enter new group name</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingrese Nombre del Nuevo Grupo</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Error</translation>
     </message>
     <message>
         <source>Sorry, this Input Group name can not be blank.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lo Lamento, Este Nombre de Grupo de Entrada No Puede Estar en Blanco</translation>
     </message>
     <message>
         <source>Sorry, this Input Group name is already in use.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lo Lamento, Este Nombre de Grupo de Entrada Ya Está en Uso</translation>
     </message>
 </context>
 <context>
@@ -241,7 +241,7 @@
     </message>
     <message>
         <source>Are you sure you would like to delete ALL channels?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Seguro que quiere borrar TODOS los canales?</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete all unassigned channels?</source>
@@ -249,15 +249,15 @@
     </message>
     <message>
         <source>Are you sure you would like to delete the channels on %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Seguro que quiere borrar todos los canales en %1?</translation>
     </message>
     <message>
         <source>Add some for channels first!</source>
-        <translation type="unfinished"></translation>
+        <translation>Debe agregar algunos canales antes!</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Download all icons..</source>
@@ -269,7 +269,7 @@
     </message>
     <message>
         <source>Download icon for </source>
-        <translation type="unfinished"></translation>
+        <translation>Bajar ícono para </translation>
     </message>
 </context>
 <context>
@@ -343,7 +343,7 @@
     </message>
     <message>
         <source>or</source>
-        <translation>o</translation>
+        <translation>ó</translation>
     </message>
     <message>
         <source>Limit movies by the year of release</source>
