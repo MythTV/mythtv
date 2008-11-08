@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS><TS version="1.1" language="es">
+<defaultcodec></defaultcodec>
 <context>
     <name>MythNews</name>
     <message>
@@ -13,27 +14,22 @@
         <translation>Desconocido</translation>
     </message>
     <message>
-        <location filename="" line="97"/>
         <source>Edit Site Details</source>
         <translation type="obsolete">Editar Detalles Fuente</translation>
     </message>
     <message>
-        <location filename="" line="97"/>
         <source>Enter Site Details</source>
         <translation type="obsolete">Introducir Detalles Fuente</translation>
     </message>
     <message>
-        <location filename="" line="97"/>
         <source>Name:</source>
         <translation type="obsolete">Nombre:</translation>
     </message>
     <message>
-        <location filename="" line="97"/>
         <source>URL:</source>
         <translation type="obsolete">URL:</translation>
     </message>
     <message>
-        <location filename="" line="97"/>
         <source>Icon:</source>
         <translation type="obsolete">Icono:</translation>
     </message>
@@ -60,32 +56,29 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="795"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Opciones</translation>
     </message>
 </context>
 <context>
     <name>MythNewsConfig</name>
     <message>
-        <location filename="" line="97"/>
         <source>Press MENU to set the update frequency.</source>
         <translation type="obsolete">Pulse MENU para ajustar la frecuencia de actualización.</translation>
     </message>
     <message>
-        <location filename="" line="97"/>
         <source>Set update frequency by using the up/down arrows.
 The minimum allowed value is 30 Minutes.</source>
         <translation type="obsolete">Ajuste la frecuencia de actualización usando las flechas arriba/abajo.
 El valor mínimo permitido es de 30 minutos.</translation>
     </message>
     <message>
-        <location filename="" line="97"/>
         <source>Press MENU to return to feed selection.</source>
         <translation type="obsolete">Pulse MENU para volver a la selección de feeds.</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewsconfig.cpp" line="204"/>
         <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajuste la frecuencia de actualización utilizando las flechas arriba/abajo. 30 minutos es el mismo.</translation>
     </message>
 </context>
 <context>
@@ -119,7 +112,6 @@ El valor mínimo permitido es de 30 minutos.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="" line="97"/>
         <source>Are you sure you want to delete this news site
 
 %1</source>
@@ -130,7 +122,7 @@ El valor mínimo permitido es de 30 minutos.</translation>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="608"/>
         <source>Downloading media...</source>
-        <translation type="unfinished"></translation>
+        <translation>Obteniendo recurso...</translation>
     </message>
 </context>
 <context>
