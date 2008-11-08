@@ -35,7 +35,7 @@
     </message>
     <message>
         <source>Import pictures?</source>
-        <translation>Imporere bilder?</translation>
+        <translation>Importere bilder?</translation>
     </message>
     <message>
         <source>No</source>
@@ -83,7 +83,7 @@
     </message>
     <message>
         <source>Return</source>
-        <translation>Enter</translation>
+        <translation>Tilbake</translation>
     </message>
     <message>
         <source>Clear Marked</source>
