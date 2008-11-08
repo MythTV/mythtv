@@ -147,6 +147,10 @@ class SwitchTypeSetting : public ComboBoxSetting, public Storage
 
         addSelection(DeviceTree::tr("Tone"),
                      QString::number((uint) DiSEqCDevSwitch::kTypeTone));
+        addSelection(DeviceTree::tr("Voltage"),
+                     QString::number((uint) DiSEqCDevSwitch::kTypeVoltage));
+        addSelection(DeviceTree::tr("Mini DiSEqC"),
+                     QString::number((uint) DiSEqCDevSwitch::kTypeMiniDiSEqC));
         addSelection(DeviceTree::tr("DiSEqC"),
                      QString::number((uint)
                                      DiSEqCDevSwitch::kTypeDiSEqCCommitted));
@@ -232,6 +236,8 @@ void SwitchConfig::update(void)
     switch ((DiSEqCDevSwitch::dvbdev_switch_t) m_type->getValue().toUInt())
     {
         case DiSEqCDevSwitch::kTypeTone:
+        case DiSEqCDevSwitch::kTypeVoltage:
+        case DiSEqCDevSwitch::kTypeMiniDiSEqC:
         case DiSEqCDevSwitch::kTypeLegacySW21:
         case DiSEqCDevSwitch::kTypeLegacySW42:
             m_ports->setValue("2");

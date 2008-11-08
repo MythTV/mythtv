@@ -224,6 +224,8 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
         kTypeLegacySW21        = 3,
         kTypeLegacySW42        = 4,
         kTypeLegacySW64        = 5,
+        kTypeVoltage           = 6,
+        kTypeMiniDiSEqC        = 7,
     };
     void SetType(dvbdev_switch_t type)        { m_type = type;      }
     void SetNumPorts(uint num_ports);
@@ -252,9 +254,16 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
 
 
   protected:
-    bool ExecuteLegacy(const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
-    bool ExecuteTone(  const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
-    bool ExecuteDiseqc(const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
+    bool ExecuteLegacy(
+        const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
+    bool ExecuteTone(
+        const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
+    bool ExecuteVoltage(
+        const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
+    bool ExecuteMiniDiSEqC(
+        const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
+    bool ExecuteDiseqc(
+        const DiSEqCDevSettings&, const DTVMultiplex&, uint pos);
 
     int  GetPosition(  const DiSEqCDevSettings&) const;
 
@@ -266,7 +275,7 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
     uint            m_last_horizontal;
     dvbdev_vec_t    m_children;
 
-    static const TypeTable SwitchTypeTable[7];
+    static const TypeTable SwitchTypeTable[9];
 };
 
 class DiSEqCDevRotor : public DiSEqCDevDevice

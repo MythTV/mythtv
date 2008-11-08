@@ -941,7 +941,7 @@ DiSEqCDevDevice *DiSEqCDevDevice::CreateByType(DiSEqCDevTree &tree,
  *  \brief Switch class, including tone, legacy and DiSEqC switches.
  */
 
-const DiSEqCDevDevice::TypeTable DiSEqCDevSwitch::SwitchTypeTable[7] =
+const DiSEqCDevDevice::TypeTable DiSEqCDevSwitch::SwitchTypeTable[9] =
 {
     { "legacy_sw21",  kTypeLegacySW21        },
     { "legacy_sw42",  kTypeLegacySW42        },
@@ -949,7 +949,9 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevSwitch::SwitchTypeTable[7] =
     { "tone",         kTypeTone          },
     { "diseqc",       kTypeDiSEqCCommitted   },
     { "diseqc_uncom", kTypeDiSEqCUncommitted },
-    { QString::null,  kTypeTone          },
+    { "voltage",      kTypeVoltage           },
+    { "mini_diseqc",  kTypeMiniDiSEqC        },
+    { QString::null,  kTypeTone              },
 };
 
 DiSEqCDevSwitch::DiSEqCDevSwitch(DiSEqCDevTree &tree, uint devid)
@@ -1000,6 +1002,12 @@ bool DiSEqCDevSwitch::Execute(const DiSEqCDevSettings &settings,
             case kTypeLegacySW42:
             case kTypeLegacySW64:
                 success = ExecuteLegacy(settings, tuning, pos);
+                break;
+            case kTypeVoltage:
+                success = ExecuteVoltage(settings, tuning, pos);
+                break;
+            case kTypeMiniDiSEqC:
+                success = ExecuteMiniDiSEqC(settings, tuning, pos);
                 break;
             default:
                 success = false;
@@ -1328,6 +1336,56 @@ bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
 }
 
 #ifdef USING_DVB
+static bool set_tone(int fd, fe_sec_tone_mode tone)
+{
+    (void) fd;
+    (void) tone;
+
+    bool success = false;
+
+    for (uint retry = 0; !success && (retry < TIMEOUT_RETRIES); retry++)
+    {
+        if (ioctl(fd, FE_SET_TONE, tone) == 0)
+            success = true;
+        else
+            usleep(TIMEOUT_WAIT);
+    }
+
+    if (!success)
+    {
+        VERBOSE(VB_IMPORTANT, "set_tone failed" + ENO);
+    }
+
+    return success;
+}
+#endif // USING_DVB
+
+#ifdef USING_DVB
+static bool set_voltage(int fd, fe_sec_voltage volt)
+{
+    (void) fd;
+    (void) volt;
+
+    bool success = false;
+
+    for (uint retry = 0; !success && (retry < TIMEOUT_RETRIES); retry++)
+    {
+        if (0 == ioctl(fd, FE_SET_VOLTAGE, volt))
+            success = true;
+        else
+            usleep(TIMEOUT_WAIT);
+    }
+
+    if (!success)
+    {
+        VERBOSE(VB_IMPORTANT, "FE_SET_VOLTAGE failed" + ENO);
+    }
+
+    return success;
+}
+#endif // USING_DVB
+
+#ifdef USING_DVB
 static bool mini_diseqc(int fd, fe_sec_mini_cmd cmd)
 {
     (void) fd;
@@ -1360,11 +1418,53 @@ bool DiSEqCDevSwitch::ExecuteTone(const DiSEqCDevSettings &/*settings*/,
             QString("%1/2").arg(pos + 1));
 
 #ifdef USING_DVB
-    if (mini_diseqc(m_tree.GetFD(), pos == 0 ? SEC_MINI_A : SEC_MINI_B))
+    if (set_tone(m_tree.GetFD(), (0 == pos) ? SEC_TONE_OFF : SEC_TONE_ON))
         return true;
 #endif // USING_DVB
 
     VERBOSE(VB_IMPORTANT, LOC_ERR + "Setting Tone Switch failed." + ENO);
+    return false;
+}
+
+bool DiSEqCDevSwitch::ExecuteVoltage(const DiSEqCDevSettings &settings,
+                                     const DTVMultiplex &tuning, uint pos)
+{
+    (void) settings;
+    (void) tuning;
+
+    VERBOSE(VB_CHANNEL, LOC + "Changing to Voltage Switch port " +
+            QString("%1/2").arg(pos + 1));
+
+#ifdef USING_DVB
+    if (set_voltage(m_tree.GetFD(),
+                    (0 == pos) ? SEC_VOLTAGE_13 : SEC_VOLTAGE_18))
+    {
+        return true;
+    }
+#endif // USING_DVB
+
+    VERBOSE(VB_IMPORTANT, LOC_ERR + "Setting Voltage Switch failed." + ENO);
+
+    return false;
+}
+
+bool DiSEqCDevSwitch::ExecuteMiniDiSEqC(const DiSEqCDevSettings &settings,
+                                        const DTVMultiplex &tuning, uint pos)
+{
+    (void) settings;
+    (void) tuning;
+
+    VERBOSE(VB_CHANNEL, LOC + "Changing to MiniDiSEqC Switch port " +
+            QString("%1/2").arg(pos + 1));
+
+#ifdef USING_DVB
+    if (mini_diseqc(m_tree.GetFD(), (0 == pos) ? SEC_MINI_A : SEC_MINI_B))
+        return true;
+#endif // USING_DVB
+
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
+            "Setting Mini DiSEqC Switch failed." + ENO);
+
     return false;
 }
 
