@@ -45,7 +45,7 @@
     <message>
         <location filename="" line="81"/>
         <source>Import pictures?</source>
-        <translation type="obsolete">Imporere bilder?</translation>
+        <translation type="obsolete">Importere bilder?</translation>
     </message>
     <message>
         <location filename="" line="81"/>
@@ -105,7 +105,7 @@
     <message>
         <location filename="../mythgallery/iconview.cpp" line="764"/>
         <source>Return</source>
-        <translation>Enter</translation>
+        <translation>Tilbake</translation>
     </message>
     <message>
         <location filename="../mythgallery/iconview.cpp" line="747"/>
