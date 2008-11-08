@@ -70,6 +70,7 @@
        <text lang="SL">Uvoz datotek</text>
        <text lang="PL">Importuj muzykę</text>
        <text lang="FI">Tuo Tiedostoja</text>
+       <text lang="DE">Datei-Import</text>
        <action>MUSIC_IMPORT</action>
    </button>
 
@@ -79,7 +80,7 @@
       <text lang="IT">Rileggi lista brani</text>
       <text lang="ES">Actualizar Lista</text>
       <text lang="CA">Actualitzar llista</text>
-      <text lang="DE">Musikdateien suchen</text>
+      <text lang="DE">Sammlung aktualisieren</text>
       <text lang="DA">Søg efter musik</text>
       <text lang="NL">Muziek Zoeken</text>
       <text lang="PT">Refresc. Lista Músicas</text>
@@ -103,6 +104,7 @@
       <text lang="SL">Izvrzi medij</text>
       <text lang="PL">Wysuń tackę</text>
       <text lang="FI">Poista Media</text>
+      <text lang="DE">CD auswerfen</text>
       <action>EJECT</action>
    </button>
 
