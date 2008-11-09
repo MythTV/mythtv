@@ -804,16 +804,6 @@ TDStretch * TDStretch::newInstance()
 
     // Check if MMX/SSE/3DNow! instruction set extensions supported by CPU
 
-#ifdef ALLOW_MMX
-    // MMX routines available only with integer sample types
-    if (uExtensions & MM_MMX)
-    {
-        return ::new TDStretchMMX;
-    }
-    else
-#endif // ALLOW_MMX
-
-
 #ifdef ALLOW_SSE
     if (uExtensions & MM_SSE)
     {
@@ -822,6 +812,16 @@ TDStretch * TDStretch::newInstance()
     }
     else
 #endif // ALLOW_SSE
+
+
+#ifdef ALLOW_MMX
+    // MMX routines available only with integer sample types
+    if (uExtensions & MM_MMX)
+    {
+        return ::new TDStretchMMX;
+    }
+    else
+#endif // ALLOW_MMX
 
 
 #ifdef ALLOW_3DNOW

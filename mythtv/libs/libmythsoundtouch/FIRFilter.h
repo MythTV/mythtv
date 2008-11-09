@@ -137,7 +137,7 @@ public:
 #endif  // ALLOW_3DNOW
 
 
-#ifdef ALLOW_SSE
+#ifdef ALLOW_SSE_FLOAT
     /// Class that implements SSE optimized functions exclusive for floating point samples type.
     class FIRFilterSSE : public FIRFilter
     {
@@ -153,6 +153,6 @@ public:
         virtual void setCoefficients(const float *coeffs, uint newLength, uint uResultDivFactor);
     };
 
-#endif // ALLOW_SSE
+#endif // ALLOW_SSE_FLOAT
 
 #endif  // FIRFilter_H

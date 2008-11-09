@@ -242,14 +242,14 @@ FIRFilter * FIRFilter::newInstance()
     else
 #endif // ALLOW_MMX
 
-#ifdef ALLOW_SSE
+#ifdef ALLOW_SSE_FLOAT
     if (uExtensions & MM_SSE)
     {
         // SSE support
         return ::new FIRFilterSSE;
     }
     else
-#endif // ALLOW_SSE
+#endif // ALLOW_SSE_FLOAT
 
 #ifdef ALLOW_3DNOW
     if (uExtensions & MM_3DNOW)

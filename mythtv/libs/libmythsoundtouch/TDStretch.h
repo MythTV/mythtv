@@ -269,14 +269,16 @@ public:
 
 
 #ifdef ALLOW_SSE
-    /// Class that implements SSE optimized routines for floating point samples type.
+    /// Class that implements SSE optimized routines for 16bit integer samples type.
     class TDStretchSSE : public TDStretch
     {
     protected:
 #ifdef MULTICHANNEL
-        //double calcCrossCorrMulti(const float *mixingPos, const float *compare) const;
+        long calcCrossCorrMulti(const short *mixingPos, const short *compare) const;
+        virtual void overlapMulti(short *output, const short *input) const;
 #endif
-        double calcCrossCorrStereo(const float *mixingPos, const float *compare) const;
+        long calcCrossCorrStereo(const short *mixingPos, const short *compare) const;
+        virtual void overlapStereo(short *output, const short *input) const;
     };
 
 #endif /// ALLOW_SSE
