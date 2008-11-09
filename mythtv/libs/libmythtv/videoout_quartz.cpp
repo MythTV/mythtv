@@ -313,69 +313,8 @@ void VideoOutputQuartzView::Transform(QRect newRect)
     VERBOSE(VB_PLAYBACK, QString("%0Image is %1 x %2")
                                 .arg(name).arg(sw).arg(sh));
 
-    // scale for non-square pixels
-    float realAspect = sw * 1.0 / sh;
-    if (fabsf(aspect - realAspect) > 0.015)
-    {
-        VERBOSE(VB_PLAYBACK, QString("Image aspect doesn't match"
-                                     " its resolution (%1 vs %2).")
-                             .arg(aspect).arg(realAspect));
-
-        if (parentData->scaleUpVideo)
-        {
-            // scale width up, leave height alone
-            double aspectScale = aspect * sh / sw;
-            VERBOSE(VB_PLAYBACK, QString("%0Scaling to %1 of width")
-                                        .arg(name).arg(aspectScale));
-            ScaleMatrix(&matrix,
-                        X2Fix(aspectScale),
-                        one,
-                        zero, zero);
-
-            // reset sw to be apparent width
-            sw = (int)lroundf(sh * aspect);
-        }
-        else
-        {
-            // scale height down
-            double aspectScale = sw / (aspect * sh);
-            VERBOSE(VB_PLAYBACK,
-                    QString("%0Scaling to %1 of height")
-                           .arg(name).arg(aspectScale));
-            ScaleMatrix(&matrix,
-                        one,
-                        X2Fix(aspectScale),
-                        zero, zero);
-
-            // reset sw to be apparent width
-            sh = (int)lroundf(sw / aspect);
-        }
-    }
-
-    // figure out how much zooming we want
-    double hscale, vscale;
-    switch (parentData->srcMode)
-    {
-        case kAdjustFill_Full:
-            // height only fills 3/4 of image, zoom up
-            // (16:9 movie in 4:3 letterbox format on 16:9 screen)
-            hscale = vscale = w * 1.0 / (sw * 0.75);
-            break;
-        case kAdjustFill_Half:
-            // height only fills 3/4 of image, zoom up
-            // (4:3 movie on 16:9 screen - 14:9 zoom is a good compromise)
-            hscale = vscale = w * 7.0 / (sw * 6);
-            break;
-        case kAdjustFill_Stretch:
-            // like 16 x 9 standard, but with a horizontal stretch applied
-            hscale = vscale = fmin(h * 1.0 / sh, w * 1.0 / sw);
-            hscale *= 4.0 / 3.0;
-            break;
-        default:
-            // standard, fill viewport with scaled image
-            hscale = vscale = fmin(h * 1.0 / sh, w * 1.0 / sw);
-            break;
-    }
+    double hscale = (double) w / sw;
+    double vscale = (double) h / sh;
 
     // cap zooming if we requested it
     if (!parentData->scaleUpVideo)
@@ -861,8 +800,21 @@ class VoqvFloater : public VideoOutputQuartzView
 
         Rect bounds;
         bounds.top = bounds.left = bounds.right = bounds.bottom = 50;
-        bounds.right  += CGDisplayPixelsWide(parentData->screen) / 3;
-        bounds.bottom += CGDisplayPixelsHigh(parentData->screen) / 3;
+        switch ((int)(10 * parentData->srcAspect))
+        {
+            case 17:
+            case 18:
+                bounds.right  += 320;
+                bounds.bottom += 180;
+                break;
+            case 13:
+                bounds.right  += 280;
+                bounds.bottom += 210;
+                break;
+            default:
+                bounds.right  += CGDisplayPixelsWide(parentData->screen) / 3;
+                bounds.bottom += CGDisplayPixelsHigh(parentData->screen) / 3;
+        }
 
         // custom window definition
         EventHandlerUPP myUPP = NewEventHandlerUPP(VoqvFloater_Callback);
