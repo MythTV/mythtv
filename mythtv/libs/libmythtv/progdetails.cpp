@@ -52,7 +52,7 @@ QString ProgDetails::themeText(const QString &fontName, const QString &text, int
     if (!font)
         return text;
 
-    QString res = QString("<font color=\"%1\" face=\"%2\" size=\"%3\"</font>")
+    QString res = QString("<font color=\"%1\" face=\"%2\" size=\"%3\">")
             .arg(font->color.name())
             .arg(font->face.family())
             .arg(size);
@@ -76,6 +76,8 @@ QString ProgDetails::themeText(const QString &fontName, const QString &text, int
         res += "</b>";
     if (bUnderline)
         res += "</u>";
+
+    res += "</font>";
 
     return res;
 }

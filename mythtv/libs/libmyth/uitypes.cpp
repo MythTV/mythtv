@@ -2518,7 +2518,7 @@ void UIRichTextType::refreshImage()
     if (!m_background)
         return;
 
-    QRect clipRect(0, 0, m_textArea.width(), m_textArea.height());
+    int margin = 30;
 
     QPainter p(m_image);
     QBrush brush;
@@ -2526,13 +2526,19 @@ void UIRichTextType::refreshImage()
     brush.setTexture(*m_compBackground);
     p.fillRect(0, 0, m_displayArea.width(), m_displayArea.height() , brush);
     p.translate(m_textArea.x() - m_displayArea.x() , m_textArea.y() - m_displayArea.y());
-    QTextEdit richText(m_message);
-    richText.setCurrentFont(m_font->face);
-    richText.setMinimumWidth(m_textArea.width());
-    richText.setMaximumWidth(m_textArea.width());
     p.end();
-    richText.render(m_image, QPoint(0, /*-m_yPos*/0), clipRect);
-    m_textHeight = richText.height();
+    QLabel richText(m_message);
+    richText.setFont(m_font->face);
+    richText.setMinimumWidth(m_textArea.width() - 2*margin);
+    richText.setMaximumWidth(m_textArea.width() - 2*margin);
+    richText.setWordWrap(true);
+
+    QRect clipRect(0, m_yPos, m_textArea.width() - 2*margin,
+                   m_textArea.height() + m_yPos - 2*margin);
+    richText.render(m_image, QPoint(margin, margin), clipRect,
+                    QWidget::RenderFlags());
+
+    m_textHeight = richText.heightForWidth(m_textArea.width()) + 2*margin;
 
     // do we need to show scroll arrows
     if (m_showScrollArrows)
