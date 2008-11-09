@@ -16,6 +16,7 @@
 #include <QImage>
 #include <QMetaType>
 #include <QUrl>
+#include <QDir>
 
 // MythTV headers
 #include "RingBuffer.h"
@@ -137,9 +138,11 @@ void PreviewGenerator::AttachSignals(QObject *obj)
     QMutexLocker locker(&previewLock);
     qRegisterMetaType<bool>("bool &");
     connect(this, SIGNAL(previewThreadDone(const QString&,bool&)),
-            obj,  SLOT(  previewThreadDone(const QString&,bool&)));
+            obj,  SLOT(  previewThreadDone(const QString&,bool&)),
+            Qt::DirectConnection);
     connect(this, SIGNAL(previewReady(const ProgramInfo*)),
-            obj,  SLOT(  previewReady(const ProgramInfo*)));
+            obj,  SLOT(  previewReady(const ProgramInfo*)),
+            Qt::DirectConnection);
     isConnected = true;
 }
 
@@ -355,7 +358,16 @@ bool PreviewGenerator::RemotePreviewRun(void)
     }
 
     if (outFileName.isEmpty())
-        return true;
+    {
+        QString remotecachedirname = QString("%1/remotecache").arg(GetConfDir());
+        QDir remotecachedir(remotecachedirname);
+
+        if (!remotecachedir.exists())
+            remotecachedir.mkdir(remotecachedirname);
+
+        QString filename = programInfo.pathname.section('/',-1) + ".png";
+        outFileName = QString("%1/%2").arg(remotecachedirname).arg(filename);
+    }
 
     // find file, copy/move to output file name & location...
 
@@ -364,7 +376,7 @@ bool PreviewGenerator::RemotePreviewRun(void)
     QByteArray data;
     ok = false;
 
-    QStringList fileNames; 
+    QStringList fileNames;
     fileNames.push_back(CreateAccessibleFilename(programInfo.pathname, fn));
     fileNames.push_back(CreateAccessibleFilename(programInfo.pathname, ""));
 
