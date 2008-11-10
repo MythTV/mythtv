@@ -1054,7 +1054,7 @@ void ProgramRecPriority::SortList()
 
 void ProgramRecPriority::UpdateList()
 {
-    if (!m_currentItem)
+    if (!m_currentItem && m_programList->GetItemCurrent())
         m_currentItem = qVariantValue<ProgramRecPriorityInfo*>
                                 (m_programList->GetItemCurrent()->GetData());
 
