@@ -597,7 +597,7 @@ void CustomEdit::storeClicked(void)
     QString msg = QString("%1: %2\n\n").arg(QObject::tr("Current Example"))
                                        .arg(m_title->text());
 
-    if (m_subtitle->text() != "")
+    if (m_subtitle->text().length())
         msg += m_subtitle->text() + "\n\n";
 
     msg += m_description->text();
@@ -721,7 +721,7 @@ bool CustomEdit::checkSyntax(void)
     {
         msg = "Power Search rules no longer reqiure a leading \"AND\".";
     }
-    else if (desc.contains(";"))
+    else if (desc.contains(';'))
     {
         msg  = "Power Search rules can not include semicolon ( ; ) ";
         msg += "statement terminators.";

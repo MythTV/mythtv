@@ -61,7 +61,7 @@ HttpStatus::~HttpStatus()
 
 HttpStatusMethod HttpStatus::GetMethod( const QString &sURI )
 {
-    if (sURI == ""                     ) return( HSM_GetStatusHTML   );
+    if (sURI.isEmpty()                 ) return( HSM_GetStatusHTML   );
     if (sURI == "GetStatusHTML"        ) return( HSM_GetStatusHTML   );
     if (sURI == "GetStatus"            ) return( HSM_GetStatusXML    );
     if (sURI == "xml"                  ) return( HSM_GetStatusXML    );
@@ -1125,7 +1125,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
                 << "</li>\r\n"
                 << "          <ul>\r\n";
 
-                if (nDir.contains(","))
+                if (nDir.contains(','))
                     os << "            <li>Directories: ";
                 else
                     os << "            <li>Directory: ";

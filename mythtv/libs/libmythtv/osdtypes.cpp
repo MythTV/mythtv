@@ -254,8 +254,7 @@ void OSDSet::ClearAllText(void)
         if (OSDTypeText *item = dynamic_cast<OSDTypeText *>(type))
         {
             QString defText = item->GetDefaultText();
-            if ((defText == "") ||
-                (defText.contains(QRegExp("%"))))
+            if (defText.isEmpty() || defText.contains('%'))
                 item->SetText(QString(""));
         }
     }
@@ -273,7 +272,7 @@ void OSDSet::SetText(const QMap<QString, QString> &infoMap)
         QMap<QString, QString>::const_iterator riter = infoMap.begin();
         QString new_text = item->GetDefaultText();
 
-        if ((new_text == "") && (infoMap.contains(item->Name())))
+        if (new_text.isEmpty() && (infoMap.contains(item->Name())))
         {
             new_text = infoMap[item->Name()];
         }
@@ -292,7 +291,7 @@ void OSDSet::SetText(const QMap<QString, QString> &infoMap)
                         QString("(\\|([^%|]*))?") +
                         QString("(\\|([^%]*))?%"));
 
-                    if ((*riter) != "")
+                    if ((*riter).length())
                     {
                         new_text.replace(full_regex,
                                          QString("\\2") + data + "\\4");
@@ -305,7 +304,7 @@ void OSDSet::SetText(const QMap<QString, QString> &infoMap)
             }
         }
 
-        if (new_text != "")
+        if (new_text.length())
             item->SetText(new_text);
     }
     m_needsupdate = true;
@@ -1089,7 +1088,7 @@ void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
         DrawString(surface, m_displaysize, m_message, fade, maxfade, 
                    xoff + m_scrollposx, yoff + m_scrollposy);
     }
-    else if (!m_message.contains("["))
+    else if (!m_message.contains('['))
     {
         DrawString(surface, m_displaysize, m_message,
                    fade, maxfade, xoff, yoff);

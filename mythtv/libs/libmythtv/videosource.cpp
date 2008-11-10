@@ -186,7 +186,8 @@ class XMLTVGrabber : public ComboBoxSetting, public VideoSourceDBStorage
 {
   public:
     XMLTVGrabber(const VideoSource &parent) :
-        ComboBoxSetting(this), VideoSourceDBStorage(this, parent, "xmltvgrabber")
+        ComboBoxSetting(this),
+        VideoSourceDBStorage(this, parent, "xmltvgrabber")
     {
         setLabel(QObject::tr("Listings grabber"));
     };
@@ -369,7 +370,7 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
 void DataDirect_config::Load()
 {
     VerticalConfigurationGroup::Load();
-    bool is_sd_userid = userid->getValue().contains("@") > 0;
+    bool is_sd_userid = userid->getValue().contains('@') > 0;
     bool match = ((is_sd_userid  && (source == DD_SCHEDULES_DIRECT)) ||
                   (!is_sd_userid && (source == DD_ZAP2IT)));
     if (((userid->getValue() != lastloadeduserid) ||
