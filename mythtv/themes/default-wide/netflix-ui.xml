@@ -266,7 +266,7 @@
       <area>0,400,800,200</area>
 
       <image name="background" draworder="0" fleximage="no">
-        <filename>news-info-bg.png</filename>
+        <filename>mythflix_background.png</filename>
         <position>0,0</position>
       </image>
 
