@@ -389,6 +389,21 @@ MythUIButtonListItem* MythUIButtonList::GetItemAt(int pos) const
     return m_itemList.at(pos);
 }
 
+MythUIButtonListItem* MythUIButtonList::GetItemByData(QVariant data)
+{
+    if (!m_initialized)
+        Init();
+
+    for (int i = 0; i < m_itemList.size(); ++i)
+    {
+        MythUIButtonListItem *item = m_itemList.at(i);
+        if (item->GetData() == data)
+            return item;
+    }
+
+    return NULL;
+}
+
 int MythUIButtonList::GetItemPos(MythUIButtonListItem* item) const
 {
     if (!item)
