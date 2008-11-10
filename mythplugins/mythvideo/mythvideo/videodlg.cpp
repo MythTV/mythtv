@@ -1274,7 +1274,7 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
     if (metadata)
     {
         item->setText(metadata->Filename(), "filename");
-        item->setText("video_player", Metadata::getPlayer(metadata));
+        item->setText(Metadata::getPlayer(metadata), "video_player");
 
         QString coverfile = metadata->CoverFile();
 
