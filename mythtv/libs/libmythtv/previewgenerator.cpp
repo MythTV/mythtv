@@ -566,7 +566,7 @@ QString PreviewGenerator::CreateAccessibleFilename(
             dir = QFileInfo(pathname).path();
         }
         outname = dir  + "/" + fi.fileName();
-        VERBOSE(VB_IMPORTANT, LOC + QString("outfile '%1' -> '%2'")
+        VERBOSE(VB_FILE, LOC + QString("outfile '%1' -> '%2'")
                 .arg(outFileName).arg(outname));
     }
 
