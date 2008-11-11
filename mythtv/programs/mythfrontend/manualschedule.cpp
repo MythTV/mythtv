@@ -84,7 +84,7 @@ bool ManualSchedule::Create(void)
         m_chanids << QString::number(channels[i].chanid);
     }
 
-    for(int index = 0; index <= 60; index++)
+    for (uint index = 0; index <= 60; index++)
     {
         QString dinfo = m_nowDateTime.addDays(index).toString(m_dateformat);
         if (m_nowDateTime.addDays(index).date().dayOfWeek() < 6)
@@ -97,14 +97,17 @@ bool ManualSchedule::Create(void)
             m_startdate->SetItemCurrent(m_startdate->GetCount() - 1);
     }
 
-     QTime thisTime = m_nowDateTime.time();
-     thisTime = thisTime.addSecs((30 - (thisTime.minute() % 30)) * 60);
+    QTime thisTime = m_nowDateTime.time();
+    thisTime = thisTime.addSecs((30 - (thisTime.minute() % 30)) * 60);
+
     if (thisTime < QTime(0,30))
         m_startdate->SetItemCurrent(m_startdate->GetCurrentPos() + 1);
 
     m_starthour->SetRange(0,23,1);
     m_starthour->SetValue(thisTime.hour());
-    m_startminute->SetRange(0,55,5);
+    int minute_increment =
+        gContext->GetNumSetting("ManualScheduleMinuteIncrement", 5);
+    m_startminute->SetRange(0, 60-minute_increment, minute_increment);
     m_startminute->SetValue((thisTime.minute()/5)*5);
     m_duration->SetRange(5,360,5);
     m_duration->SetValue(60);
@@ -176,10 +179,16 @@ void ManualSchedule::dateChanged(void)
     VERBOSE(VB_SCHEDULE, QString("Start Date Time: %1")
                                     .arg(m_startDateTime.toString()));
 
-    if (m_startDateTime < m_nowDateTime)
+    // Note we allow start times up to one hour in the past so
+    // if it is 20:25 the user can start a recording at 20:30
+    // by first setting the hour and then the minute.
+    QDateTime tmp = QDateTime(
+        m_startDateTime.date(),
+        QTime(m_startDateTime.time().hour(),59,59));
+    if (tmp < m_nowDateTime)
     {
-        QTime thisTime = m_nowDateTime.time();
-        m_starthour->SetItemCurrent(thisTime.hour() + 1);
+        hr = m_nowDateTime.time().hour();
+        m_starthour->SetItemCurrent(hr);
         m_startDateTime.setDate(m_nowDateTime.date());
         m_startDateTime.setTime(QTime(hr, min));
     }
