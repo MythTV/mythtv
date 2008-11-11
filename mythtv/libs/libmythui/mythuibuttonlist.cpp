@@ -319,14 +319,21 @@ void MythUIButtonList::SetItemCurrent(MythUIButtonListItem* item)
     {
         case ScrollCenter :
             while (m_topPosition + (int)((float)m_itemsVisible/2) <
-                        m_selPosition + 1)
+                        m_selPosition)
                 ++m_topPosition;
-
             break;
         case ScrollFree :
-            while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1)
-                m_topPosition += m_columns;
+            if (m_topPosition + (int)m_itemsVisible <= m_selPosition ||
+                m_topPosition > m_selPosition)
+            {
+                if (m_layout == LayoutHorizontal)
+                    m_topPosition = m_selPosition - m_itemsVisible + 1;
+                else
+                    m_topPosition = (m_selPosition - m_itemsVisible + m_columns)
+                                        / m_columns * m_columns;
 
+                m_topPosition = std::max(0, m_topPosition);
+            }
             break;
     }
 
@@ -553,7 +560,8 @@ bool MythUIButtonList::MoveDown(MovementUnit unit)
     switch (m_scrollStyle)
     {
         case ScrollCenter :
-            while (m_topPosition + (int)((float)m_itemsVisible/2) < m_selPosition)
+            while (m_topPosition + (int)((float)m_itemsVisible/2) <
+                        m_selPosition)
                 ++m_topPosition;
             break;
         case ScrollFree :
@@ -614,7 +622,8 @@ bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
     switch (m_scrollStyle)
     {
         case ScrollCenter :
-            while (m_topPosition + (int)((float)m_itemsVisible/2) < m_selPosition)
+            while (m_topPosition + (int)((float)m_itemsVisible/2) <
+                        m_selPosition)
                 ++m_topPosition;
             break;
         case ScrollFree :
