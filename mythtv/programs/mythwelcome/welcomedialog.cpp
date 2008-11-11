@@ -659,7 +659,7 @@ void WelcomeDialog::showMenu(void)
     m_menuPopup->AddButton(tr("Run mythfilldatabase"), SLOT(runEPGGrabber()));
     m_menuPopup->AddButton(tr("Shutdown Now"), SLOT(shutdownNow()));
     m_menuPopup->AddButton(tr("Exit"), SLOT(closeDialog()));
-    m_menuPopup->AddButton(tr("Cancel"), SLOT(Close()));
+    m_menuPopup->AddButton(tr("Cancel"));
 }
 
 void WelcomeDialog::lockShutdown(void)
