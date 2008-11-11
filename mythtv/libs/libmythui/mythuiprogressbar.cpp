@@ -1,5 +1,6 @@
 // QT
 #include <QApplication>
+#include <QDomDocument>
 
 // MythDB
 #include "mythverbose.h"

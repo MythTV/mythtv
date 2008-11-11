@@ -1,6 +1,7 @@
 #include <typeinfo>
 
 #include <QFile>
+#include <QDomDocument>
 
 #include "xmlparsebase.h"
 #include "mythmainwindow.h"

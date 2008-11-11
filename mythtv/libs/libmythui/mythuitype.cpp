@@ -1,5 +1,6 @@
 #include <QEvent>
 #include <QKeyEvent>
+#include <QDomDocument>
 
 #include "mythverbose.h"
 

@@ -2,6 +2,7 @@
 #include <QRegExp>
 #include <QChar>
 #include <QKeyEvent>
+#include <QDomDocument>
 
 #include "mythuitextedit.h"
 #include "mythpainter.h"

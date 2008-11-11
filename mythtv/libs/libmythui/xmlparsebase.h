@@ -1,13 +1,13 @@
 #ifndef XMLPARSEBASE_H_
 #define XMLPARSEBASE_H_
 
-#include <QDomElement>
 #include <QString>
 
 #include "mythrect.h"
 
 class MythUIType;
 class MythScreenType;
+class QDomElement;
 
 class XMLParseBase
 {

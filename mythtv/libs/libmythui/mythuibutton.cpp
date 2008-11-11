@@ -1,5 +1,6 @@
 // QT
 #include <QTimer>
+#include <QDomDocument>
 
 // Myth headers
 #include "mythverbose.h"

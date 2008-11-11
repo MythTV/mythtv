@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QKeyEvent>
-
+#include <QDomDocument>
 
 #include "myththemedmenu.h"
 #include "mythmainwindow.h"

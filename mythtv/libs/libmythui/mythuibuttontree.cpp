@@ -1,4 +1,7 @@
-// MythDB headers
+// Qt headers
+#include <QDomDocument>
+#include <QDomDocument>
+
 #include "mythverbose.h"
 
 // Mythui Headers

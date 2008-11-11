@@ -1,6 +1,7 @@
 #ifndef MYTHDIALOGS_H_
 #define MYTHDIALOGS_H_
 
+#include <QDomElement>
 #include <QDialog>
 #include <QLabel>
 #include <QAbstractButton>

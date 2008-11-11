@@ -26,6 +26,7 @@ match they will be ignored.
 */
 
 #include <QUdpSocket>
+#include <QDomDocument>
 
 #include "udpnotify.h"
 #include "libmyth/mythcontext.h"

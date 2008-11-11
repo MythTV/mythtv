@@ -1,3 +1,6 @@
+// Qt headers
+#include <QDomDocument>
+
 // MythUI headers
 #include "mythuistatetype.h"
 #include "mythuiimage.h"

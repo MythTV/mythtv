@@ -2,6 +2,8 @@
 
 #include <QFile>
 #include <QDir>
+#include <QDomDocument>
+
 #include "mythverbose.h"
 
 #include "mythuiimage.h"

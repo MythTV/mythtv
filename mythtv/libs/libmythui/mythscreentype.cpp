@@ -1,5 +1,7 @@
 #include <cassert>
 
+#include <QDomDocument>
+
 #include "mythverbose.h"
 
 #include "mythscreentype.h"

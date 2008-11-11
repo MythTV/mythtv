@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QPainter>
 #include <QPixmap>
+#include <QDomDocument>
 
 // libmyth headers
 #include "mythverbose.h"

@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QDomDocument>
 
 #include "mythuiclock.h"
 #include "mythpainter.h"

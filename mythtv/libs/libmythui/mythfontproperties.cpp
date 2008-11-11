@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QDomDocument>
 
 #include "mythverbose.h"
 #include "mythdb.h"

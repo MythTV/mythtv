@@ -13,14 +13,13 @@ using namespace std;
 #include <QObject>
 #include <QMutex>
 #include <QMap>
-#include <QDomDocument>
 
 class TV;
 class OSD;
 class UDPNotifyOSDTypeText;
-class Q3SocketDevice;
 class QByteArray;
 class QUdpSocket;
+class QDomElement;
 
 class UDPNotifyOSDSet
 {
