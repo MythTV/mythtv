@@ -114,7 +114,7 @@
             <area>120,430,150,30</area>
         </textarea>
 
-        <buttonlist name="schedules" from="basewidebuttonlist2">
+        <buttonlist name="schedules" from="basebuttonlist2">
             <position>20,53</position>
             <statetype name="buttonitem">
                 <area>0,0,1200,25</area>
