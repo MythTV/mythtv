@@ -204,7 +204,7 @@
             <state name="selected" from="active">
                 <imagetype name="selectbar">
                     <position>25,0</position>
-                    <filename>schedule_wideselectbar.png</filename>
+                    <filename>schedule_selectbar.png</filename>
                 </imagetype>
             </state>
             <state name="inactive" from="active" />
