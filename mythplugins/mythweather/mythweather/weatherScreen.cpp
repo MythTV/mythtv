@@ -109,6 +109,14 @@ void WeatherScreen::newData(QString loc, units_t units, DataMap data)
     emit screenReady(this);
 }
 
+QString WeatherScreen::getTemperatureUnit()
+{
+    if (m_units == ENG_UNITS)
+        return QString::fromUtf8("Â°") + "F";
+    else
+        return QString::fromUtf8("Â°") + "C";
+}
+
 void WeatherScreen::prepareScreen()
 {
     QMap<QString, QString>::iterator itr = m_dataValueMap.begin();
@@ -185,14 +193,14 @@ QString CurrCondScreen::prepareDataItem(const QString &key,
         return value + (m_units == ENG_UNITS ? " mi" : " km");
 
     if (key == "appt")
-        return value == "NA" ? value : value + (m_units == ENG_UNITS ? "°F" : "°C");
+        return value == "NA" ? value : value + getTemperatureUnit();
 
     if (key == "temp")
     {
        if ( (value == "NA") || (value == "N/A") )
           return value;
        else
-          return value + (m_units == ENG_UNITS ? "°F" : "°C");
+          return value + getTemperatureUnit();
     }
 
     if (key == "wind_gust" || key == "wind_spdgst" || key == "wind_speed")
@@ -216,7 +224,45 @@ QString ThreeDayForecastScreen::prepareDataItem(const QString &key,
        if ( (value == "NA") || (value == "N/A") )
           return value;
        else
-          return value + (m_units == ENG_UNITS ? "°F" : "°C");
+          return value + getTemperatureUnit();
+    }
+
+    /*The days of the week will be translated if the script sends elements from
+     the enum DaysOfWeek.*/
+    if (key.startsWith("date-"))
+    {
+        bool isNumber;
+        value.toInt( &isNumber);
+
+        if (isNumber)
+        {
+            int dayOfWeek = value.toInt();
+
+            switch (dayOfWeek)
+            {
+                case DAY_SUNDAY :
+                    return tr("Sunday");
+                    break;
+                case DAY_MONDAY :
+                    return tr("Monday");
+                    break;
+                case DAY_TUESDAY :
+                    return tr("Tuesday");
+                    break;
+                case DAY_WENDESDAY :
+                    return tr("Wednesday");
+                    break;
+                case DAY_THURSDAY :
+                    return tr("Thursday");
+                    break;
+                case DAY_FRIDAY :
+                    return tr("Friday");
+                    break;
+                case DAY_SATURDAY :
+                    return tr("Saturday");
+                    break;
+            }
+        }
     }
 
     return value;
@@ -237,7 +283,7 @@ QString SixDayForecastScreen::prepareDataItem(const QString &key,
        if ( (value == "NA") || (value == "N/A") )
           return value;
        else
-          return value + (m_units == ENG_UNITS ? "°F" : "°C");
+          return value + getTemperatureUnit();
     }
 
     return value;

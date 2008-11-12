@@ -16,6 +16,11 @@
 
 class Weather;
 
+enum DaysOfWeek {
+    DAY_SUNDAY, DAY_MONDAY, DAY_TUESDAY, DAY_WENDESDAY, DAY_THURSDAY,
+    DAY_FRIDAY, DAY_SATURDAY
+};
+
 /** \class WeatherScreen
  *  \brief Weather screen
  */
@@ -60,6 +65,7 @@ class WeatherScreen : public MythScreenType
     virtual QString prepareDataItem(const QString &key, const QString &value);
     virtual void prepareWidget(MythUIType *widget);
     virtual void prepareScreen();
+    virtual QString getTemperatureUnit();
 
   private:
     QMap<QString, QString> m_dataValueMap;

@@ -18,7 +18,7 @@ use BBCLocation;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'BBC-3day-XML';
-my $version = 0.1;
+my $version = 0.2;
 my $author = 'Stuart Morgan';
 my $email = 'stuart@tase.co.uk';
 my $updateTimeout = 360*60; # 6 Hours
@@ -114,6 +114,29 @@ foreach $item (@{$xml->{channel}->{item}}) {
 
     my $day = $item_title;
     $day =~ s/^(.*?):.*/$1/;
+
+    if ($day eq 'Sunday') {
+        $day = '0';
+    }
+    elsif ($day eq 'Monday') {
+        $day = '1';
+    }
+    elsif ($day eq 'Tuesday') {
+        $day = '2';
+    }
+    elsif ($day eq 'Wednesday') {
+        $day = '3';
+    }
+    elsif ($day eq 'Thursday') {
+        $day = '4';
+    }
+    elsif ($day eq 'Friday') {
+        $day = '5';
+    }
+    elsif ($day eq 'Saturday') {
+        $day = '6';
+    }
+
     printf "date-" . $i . "::" . $day . "\n";
 
     my $weather_string = $item_title;
