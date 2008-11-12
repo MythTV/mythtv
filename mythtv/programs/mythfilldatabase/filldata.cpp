@@ -15,7 +15,7 @@ using namespace std;
 #include <qdatetime.h>
 #include <qdir.h>
 #include <qfile.h>
-#include <q3process.h>
+#include <QProcess>
 #include <QList>
 
 // libmyth headers
@@ -191,11 +191,8 @@ bool FillData::GrabDDData(Source source, int poffset,
         }
         else
         {
-            QDateTime fromdatetime = QDateTime(pdate);
-            QDateTime todatetime;
-            fromdatetime.setTime_t(QDateTime(pdate).toTime_t(),Qt::UTC);
-            fromdatetime = fromdatetime.addDays(poffset);
-            todatetime = fromdatetime.addDays(1);
+            QDateTime fromdatetime = QDateTime(pdate).toUTC().addDays(poffset);
+            QDateTime todatetime = fromdatetime.addDays(1);
 
             VERBOSE(VB_GENERAL, QString("Grabbing data for %1 offset %2")
                                           .arg(pdate.toString())
@@ -597,30 +594,28 @@ bool FillData::Run(SourceList &sourcelist)
         if (is_grabber_external(xmltv_grabber))
         {
 
-            Q3Process grabber_capabilities_proc(xmltv_grabber);
-            grabber_capabilities_proc.addArgument(QString("--capabilities"));
-            if ( grabber_capabilities_proc.start() )
+            QProcess grabber_capabilities_proc;
+            grabber_capabilities_proc.setProcessChannelMode(
+                QProcess::SeparateChannels);
+            grabber_capabilities_proc.start(
+                xmltv_grabber,
+                QStringList("--capabilities"));
+
+            if (grabber_capabilities_proc.waitForStarted(1000))
             {
+                bool ok = grabber_capabilities_proc.waitForFinished(15*1000);
 
-                int i=0;
-                // Assume it shouldn't take more than 10 seconds
-                // Broken versions of QT cause QProcess::start
-                // and QProcess::isRunning to return true even
-                // when the executable doesn't exist
-                while (grabber_capabilities_proc.isRunning() && i < 100)
-                {
-                    usleep(100000);
-                    ++i;
-                }
-
-                if (grabber_capabilities_proc.normalExit())
+                if (ok && 
+                    QProcess::NormalExit ==
+                    grabber_capabilities_proc.exitStatus())
                 {
                     QString capabilites = "";
-
-                    while (grabber_capabilities_proc.canReadLineStdout())
+                    grabber_capabilities_proc
+                        .setReadChannel(QProcess::StandardOutput);
+                    while (grabber_capabilities_proc.canReadLine())
                     {
                         QString capability
-                            = grabber_capabilities_proc.readLineStdout();
+                            = grabber_capabilities_proc.readLine();
                         capabilites += capability + " ";
 
                         if (capability == "baseline")
@@ -648,7 +643,9 @@ bool FillData::Run(SourceList &sourcelist)
             }
             else
             {
-                QString error = grabber_capabilities_proc.readLineStdout();
+                grabber_capabilities_proc
+                    .setReadChannel(QProcess::StandardOutput);
+                QString error = grabber_capabilities_proc.readLine();
                 VERBOSE(VB_IMPORTANT, QString("Failed to run %1 "
                         "--capabilities").arg(xmltv_grabber));
             }
@@ -657,25 +654,24 @@ bool FillData::Run(SourceList &sourcelist)
         if (hasprefmethod)
         {
 
-            Q3Process grabber_method_proc(xmltv_grabber);
-            grabber_method_proc.addArgument("--preferredmethod");
-            if ( grabber_method_proc.start() )
-            {
-                int i=0;
-                // Assume it shouldn't take more than 10 seconds
-                // Broken versions of QT cause QProcess::start
-                // and QProcess::isRunning to return true even
-                // when the executable doesn't exist
-                while (grabber_method_proc.isRunning() && i < 100)
-                {
-                    usleep(100000);
-                    ++i;
-                }
+            QProcess grabber_method_proc;
+            grabber_method_proc.setProcessChannelMode(
+                QProcess::SeparateChannels);
+            grabber_method_proc.start(
+                xmltv_grabber,
+                QStringList("--preferredmethod"));
 
-                if (grabber_method_proc.normalExit())
+            if (grabber_method_proc.waitForStarted(1000))
+            {
+                bool ok = grabber_method_proc.waitForFinished(15*1000);
+
+                if (ok && 
+                    QProcess::NormalExit == grabber_method_proc.exitStatus())
                 {
+                    grabber_method_proc
+                        .setReadChannel(QProcess::StandardOutput);
                     (*it).xmltvgrabber_prefmethod =
-                        grabber_method_proc.readLineStdout();
+                        grabber_method_proc.readLine();
                 }
                 else
                 {
@@ -689,7 +685,9 @@ bool FillData::Run(SourceList &sourcelist)
             }
             else
             {
-                QString error = grabber_method_proc.readLineStdout();
+                grabber_method_proc
+                    .setReadChannel(QProcess::StandardOutput);
+                QString error = grabber_method_proc.readLine();
                 VERBOSE(VB_IMPORTANT,
                         QString("Failed to run %1 --preferredmethod")
                         .arg(xmltv_grabber));

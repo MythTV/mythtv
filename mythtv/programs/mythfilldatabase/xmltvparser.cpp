@@ -1,7 +1,11 @@
 // Qt headers
-#include <qfile.h>
-#include <qstringlist.h>
-#include <qdatetime.h>
+#include <QFile>
+#include <QStringList>
+#include <QDateTime>
+#include <QUrl>
+#include <QDomDocument>
+
+#include <q3url.h>
 
 // C++ headers
 #include <iostream>
@@ -51,12 +55,12 @@ QString getFirstText(QDomElement element)
     return "";
 }
 
-ChanInfo *XMLTVParser::parseChannel(QDomElement &element, Q3Url baseUrl)
+ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
 {
     ChanInfo *chaninfo = new ChanInfo;
 
     QString xmltvid = element.attribute("id", "");
-    QStringList split = QStringList::split(" ", xmltvid);
+    QStringList split = xmltvid.simplified().split(" ");
 
     chaninfo->callsign = "";
     chaninfo->chanstr = "";
@@ -75,7 +79,8 @@ ChanInfo *XMLTVParser::parseChannel(QDomElement &element, Q3Url baseUrl)
         {
             if (info.tagName() == "icon")
             {
-                Q3Url iconUrl(baseUrl, info.attribute("src", ""), true);
+                Q3Url iconUrl(Q3Url(baseUrl.toString()),
+                              info.attribute("src", ""), true);
                 chaninfo->iconpath = iconUrl.toString();
             }
             else if (info.tagName() == "display-name")
@@ -105,7 +110,7 @@ int TimezoneToInt (QString timezone)
     // we signal an error by setting it invalid (> 840min = 14hr)
     int result = 841;
 
-    if (timezone.upper() == "UTC" || timezone.upper() == "GMT")
+    if (timezone.toUpper() == "UTC" || timezone.toUpper() == "GMT")
         return 0;
 
     if (timezone.length() == 5)
@@ -144,7 +149,7 @@ void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffset = 84
         return;
     }
 
-    QStringList split = QStringList::split(" ", timestr);
+    QStringList split = timestr.split(" ");
     QString ts = split[0];
     bool ok;
     int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
@@ -169,7 +174,8 @@ void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffset = 84
     }
     else
     {
-        cerr << "Ignoring unknown timestamp format: " << (const char *)ts << endl;
+        VERBOSE(VB_IMPORTANT, QString("Ignoring unknown timestamp format: %1")
+                .arg(ts));
         return;
     }
 
@@ -177,8 +183,7 @@ void fromXMLTVDate(QString &timestr, QDateTime &dt, int localTimezoneOffset = 84
 
     if ((split.size() > 1) && (localTimezoneOffset <= 840))
     {
-        QString tmp = split[1];
-        tmp.stripWhiteSpace();
+        QString tmp = split[1].trimmed();
 
         int ts_offset = TimezoneToInt(tmp);
         if (abs(ts_offset) > 840)
@@ -299,14 +304,14 @@ ProgInfo *XMLTVParser::parseProgram(
     pginfo->endts = text;
 
     text = element.attribute("channel", "");
-    QStringList split = QStringList::split(" ", text);
+    QStringList split = text.split(" ");
 
     pginfo->channel = split[0];
 
     text = element.attribute("clumpidx", "");
     if (!text.isEmpty())
     {
-        split = QStringList::split("/", text);
+        split = text.split("/");
         pginfo->clumpidx = split[0];
         pginfo->clumpmax = split[1];
     }
@@ -350,7 +355,7 @@ ProgInfo *XMLTVParser::parseProgram(
             else if (info.tagName() == "category")
             {
                 const QString cat = getFirstText(info);
-                const QString lcat = cat.lower();
+                const QString lcat = cat.toLower();
 
                 if (lcat == "movie" || lcat == "series" ||
                     lcat == "sports" || lcat == "tvshow")
@@ -448,7 +453,7 @@ ProgInfo *XMLTVParser::parseProgram(
             {
                 QString episodenum(getFirstText(info));
                 // if this field includes a dot, strip it out
-                int idx = episodenum.find('.');
+                int idx = episodenum.indexOf('.');
                 if (idx != -1)
                     episodenum.remove(idx, 1);
                 pginfo->programid = episodenum;
@@ -460,11 +465,11 @@ ProgInfo *XMLTVParser::parseProgram(
                 int tmp;
                 QString episodenum(getFirstText(info));
                 episode = episodenum.section('.',1,1);
-                episode = episode.section('/',0,0).stripWhiteSpace();
-                season = episodenum.section('.',0,0).stripWhiteSpace();
+                episode = episode.section('/',0,0).trimmed();
+                season = episodenum.section('.',0,0).trimmed();
                 QString part(episodenum.section('.',2,2));
-                QString partnumber(part.section('/',0,0).stripWhiteSpace());
-                QString parttotal(part.section('/',1,1).stripWhiteSpace());
+                QString partnumber(part.section('/',0,0).trimmed());
+                QString parttotal(part.section('/',1,1).trimmed());
 
                 pginfo->catType = "series";
 
@@ -546,7 +551,8 @@ ProgInfo *XMLTVParser::parseProgram(
     {
         if (seriesid.isEmpty()) //need to hash ourself a seriesid from the title
         {
-            seriesid = QString::number(ELFHash(pginfo->title));
+            seriesid = QString::number(ELFHash(pginfo->title.toLocal8Bit()
+                                               .constData()));
         }
         pginfo->seriesid = seriesid;
         programid.append(seriesid);
@@ -628,9 +634,9 @@ bool XMLTVParser::parseFile(
 
     QDomElement docElem = doc.documentElement();
 
-    Q3Url baseUrl(docElem.attribute("source-data-url", ""));
+    QUrl baseUrl(docElem.attribute("source-data-url", ""));
 
-    Q3Url sourceUrl(docElem.attribute("source-info-url", ""));
+    QUrl sourceUrl(docElem.attribute("source-info-url", ""));
     if (sourceUrl.toString() == "http://labs.zap2it.com/")
     {
         VERBOSE(VB_IMPORTANT, "Don't use tv_grab_na_dd, use the"

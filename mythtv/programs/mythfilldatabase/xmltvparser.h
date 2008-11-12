@@ -2,21 +2,21 @@
 #define _XMLTVPARSER_H_
 
 // Qt headers
+#include <QMap>
 #include <QList>
-#include <qstring.h>
-#include <q3url.h>
-#include <qdom.h>
-#include <qmap.h>
+#include <QString>
 
 class ProgInfo;
 class ChanInfo;
+class QUrl;
+class QDomElement;
 
 class XMLTVParser
 {
   public:
     XMLTVParser() : isJapan(false) {}
 
-    ChanInfo *parseChannel(QDomElement &element, Q3Url baseUrl);
+    ChanInfo *parseChannel(QDomElement &element, QUrl &baseUrl);
     ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset);
     bool parseFile(
         QString filename, QList<ChanInfo> *chanlist,

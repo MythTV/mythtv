@@ -28,7 +28,7 @@ void get_atsc_stuff(QString channum, int sourceid, int freqid,
     major = freqid;
     minor = 0;
 
-    int chansep = channum.find(QRegExp("\\D"));
+    int chansep = channum.indexOf(QRegExp("\\D"));
     if (chansep < 0)
         return;
 
@@ -84,8 +84,8 @@ unsigned int ChannelData::promptForChannelUpdates(
         // Default is 0 to allow rapid skipping of many channels,
         // in some xmltv outputs there may be over 100 channel, but
         // only 10 or so that are available in each area.
-        chanid = atoi(getResponse("Choose a channel ID (positive integer) ",
-                                  "0"));
+        chanid = getResponse("Choose a channel ID (positive integer) ", "0")
+            .toUInt();
 
         // If we wish to skip this channel, use the default 0 and return.
         if (chanid == 0)
@@ -147,7 +147,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
             if (!actualfile.exists())
             {
                 QString command = QString("wget ") + (*i).iconpath;
-                system(command);
+                system(command.toLocal8Bit().constData());
             }
         }
 
@@ -385,7 +385,8 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
 
                 if ((*i).callsign.isEmpty())
                 {
-                    QStringList words = (*i).name.simplifyWhiteSpace().upper().split(" ");
+                    QStringList words = (*i).name.simplified().toUpper()
+                        .split(" ");
                     QString callsign = "";
                     QString w1 = words.size() > 0 ? words[0] : QString();
                     QString w2 = words.size() > 1 ? words[1] : QString();

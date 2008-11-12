@@ -105,7 +105,7 @@ QString expandURLString(const QString &url)
     int start_index = 0;
     while (found_at != -1)
     {
-        found_at = expandtarget.search(retval, start_index);
+        found_at = expandtarget.indexIn(retval, start_index);
         if (found_at != -1)
         {
             QString no_mapping("no_URL_mapping");
@@ -184,7 +184,7 @@ void IconData::UpdateSourceIcons(int sourceid)
                         QString("Attempting to fetch icon with: %1")
                                 .arg(icon_get_command));
 
-                system(icon_get_command);
+                system(icon_get_command.toLocal8Bit().constData());
             }
 
             if (localfile.exists())
@@ -259,8 +259,8 @@ void IconData::ImportIconMap(const QString &filename)
                         QString net = getNamedElementText(e, IM_NET_TAG);
                         QString u = getNamedElementText(e, IM_NET_URL_TAG);
 
-                        nm_query.bindValue(":NETWORK", net.stripWhiteSpace());
-                        nm_query.bindValue(":URL", u.stripWhiteSpace());
+                        nm_query.bindValue(":NETWORK", net.trimmed());
+                        nm_query.bindValue(":URL", u.trimmed());
                         if (!nm_query.exec())
                             MythDB::DBError(
                                     "Inserting network->url mapping", nm_query);
@@ -270,8 +270,8 @@ void IconData::ImportIconMap(const QString &filename)
                         QString cs = getNamedElementText(e, IM_CS_TAG);
                         QString net = getNamedElementText(e, IM_NET_TAG);
 
-                        cm_query.bindValue(":CALLSIGN", cs.stripWhiteSpace());
-                        cm_query.bindValue(":NETWORK", net.stripWhiteSpace());
+                        cm_query.bindValue(":CALLSIGN", cs.trimmed());
+                        cm_query.bindValue(":NETWORK", net.trimmed());
                         if (!cm_query.exec())
                             MythDB::DBError("Inserting callsign->network "
                                     "mapping", cm_query);
@@ -408,7 +408,7 @@ void IconData::ExportIconMap(const QString &filename)
             while (query.next())
             {
                 QString base_stub = query.value(0).toString();
-                if (baseax.search(base_stub) != -1)
+                if (baseax.indexIn(base_stub) != -1)
                 {
                     base_stub = baseax.cap(1);
                 }
