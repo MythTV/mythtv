@@ -1,10 +1,10 @@
 #ifndef DATADIRECT_H_
 #define DATADIRECT_H_
 
-#include <qstringlist.h>
-#include <qdatetime.h>
-#include <qxml.h>
-#include <qmap.h>
+#include <QStringList>
+#include <QDateTime>
+#include <QXmlDefaultHandler>
+#include <QMap>
 
 #include "mythexp.h"
 

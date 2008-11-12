@@ -15,8 +15,9 @@
 #include "frequencytables.h"
 #include "mythwidgets.h"
 #include "mythcontext.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythverbose.h"
+#include "mythversion.h"
 #include "util.h"
 #include "dbutil.h"
 
@@ -25,6 +26,9 @@
 #define LOC QString("DataDirect: ")
 #define LOC_WARN QString("DataDirect, Warning: ")
 #define LOC_ERR QString("DataDirect, Error: ")
+
+static QMutex  user_agent_lock;
+static QString user_agent;
 
 static QMutex lineup_type_lock;
 static QMap<QString,uint> lineupid_to_srcid;
@@ -521,6 +525,8 @@ bool DDStructureParser::characters(const QString& pchars)
     return true;
 }
 
+extern const char *myth_source_version;
+
 DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
     listings_provider(lp % DD_PROVIDER_COUNT),
     userid(user),                   password(pass),
@@ -529,6 +535,12 @@ DataDirectProcessor::DataDirectProcessor(uint lp, QString user, QString pass) :
     tmpResultFile(QString::null),   cookieFile(QString::null),
     cookieFileDT()
 {
+    {
+        QMutexLocker locker(&user_agent_lock);
+        user_agent = QString("MythTV/%1.%2")
+            .arg(MYTH_BINARY_VERSION).arg(myth_source_version);
+    }
+
     DataDirectURLs urls0(
         "Tribune Media Zap2It",
         "http://datadirect.webservices.zap2it.com/tvlistings/xtvdService",
@@ -991,10 +1003,17 @@ FILE *DataDirectProcessor::DDPost(
     // Allow for single quotes in userid and password (shell escape)
     password.replace('\'', "'\\''");
     userid.replace('\'', "'\\''");
-    QString command = QString(
-        "wget --http-user='%1' --http-passwd='%2' --post-file='%3' "
-        "--header='Accept-Encoding:gzip' %4 --output-document=- ")
-        .arg(userid).arg(password).arg(postFilename).arg(ddurl);
+
+    QString command;
+    {
+        QMutexLocker locker(&user_agent_lock);
+        command = QString(
+            "wget --http-user='%1' --http-passwd='%2' --post-file='%3' "
+            "--header='Accept-Encoding:gzip' %4 "
+            "--user-agent='%5' --output-document=- ")
+            .arg(userid).arg(password).arg(postFilename).arg(ddurl)
+            .arg(user_agent);
+    }
 
     // if (!SHOW_WGET_OUTPUT)
     //    command += " 2> /dev/null ";
@@ -1057,11 +1076,16 @@ bool DataDirectProcessor::GrabNextSuggestedTime(void)
     poststream << flush;
     postfile.close();
 
-    QString command = QString("wget --http-user='%1' --http-passwd='%2' "
-                              "--post-file='%3' %4 --output-document='%5'")
-        .arg(GetUserID().replace('\'', "'\\''"))
-        .arg(GetPassword().replace('\'', "'\\''")).arg(postFilename)
-        .arg(ddurl).arg(resultFilename);
+    QString command;
+    {
+        QMutexLocker locker(&user_agent_lock);
+        command = QString(
+            "wget --http-user='%1' --http-passwd='%2' --post-file='%3' %4 "
+            "--user-agent='%5' --output-document='%6'")
+            .arg(GetUserID().replace('\'', "'\\''"))
+            .arg(GetPassword().replace('\'', "'\\''")).arg(postFilename)
+            .arg(ddurl).arg(user_agent).arg(resultFilename);
+    }
 
     if (SHOW_WGET_OUTPUT)
         VERBOSE(VB_GENERAL, "command: "<<command<<endl);
@@ -1957,6 +1981,11 @@ bool DataDirectProcessor::Post(QString url, const PostList &list,
 
     command += url;
     command += " ";
+
+    {
+        QMutexLocker locker(&user_agent_lock);
+        command += QString("--user-agent='%1' ").arg(user_agent);
+    }
 
     command += "--output-document=";
     command += (documentFile.isEmpty()) ? "- " : dfile;
