@@ -230,4 +230,6 @@ class MPUBLIC MythUIButtonList : public MythUIType
     friend class MythUIButtonTree;
 };
 
+Q_DECLARE_METATYPE(MythUIButtonListItem *);
+
 #endif
