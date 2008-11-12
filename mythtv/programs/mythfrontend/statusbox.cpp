@@ -212,7 +212,7 @@ bool StatusBox::keyPressEvent(QKeyEvent *event)
             }
         }
         else if ((currentItem == tr("Log Entries")) &&
-                 (logNumberKeys.search(action) == 0))
+                 (logNumberKeys.indexIn(action) == 0))
         {
             m_minLevel = action.toInt();
             m_helpText->SetText(tr("Setting priority level to %1")
@@ -856,8 +856,8 @@ void StatusBox::doJobQueueStatus()
 
         for (it = jobs.begin(); it != jobs.end(); ++it)
         {
-            QString chanid = it.data().chanid;
-            QDateTime starttime = it.data().starttime;
+            QString chanid = (*it).chanid;
+            QDateTime starttime = (*it).starttime;
             ProgramInfo *pginfo;
 
             pginfo = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
@@ -871,29 +871,29 @@ void StatusBox::doJobQueueStatus()
                     .arg(pginfo->chanstr)
                     .arg(starttime.toString(m_timeDateFormat))
                     .arg(tr("Job:"))
-                    .arg(JobQueue::JobText(it.data().type))
+                    .arg(JobQueue::JobText((*it).type))
                     .arg(tr("Status: "))
-                    .arg(JobQueue::StatusText(it.data().status));
+                    .arg(JobQueue::StatusText((*it).status));
 
-            if (it.data().status != JOB_QUEUED)
-                detail += " (" + it.data().hostname + ")";
+            if ((*it).status != JOB_QUEUED)
+                detail += " (" + (*it).hostname + ")";
 
-            if (it.data().schedruntime > QDateTime::currentDateTime())
+            if ((*it).schedruntime > QDateTime::currentDateTime())
                 detail += "\n" + tr("Scheduled Run Time:") + " " +
-                    it.data().schedruntime.toString(m_timeDateFormat);
+                    (*it).schedruntime.toString(m_timeDateFormat);
             else
-                detail += "\n" + it.data().comment;
+                detail += "\n" + (*it).comment;
 
             line = QString("%1 @ %2").arg(pginfo->title)
                                      .arg(starttime.toString(m_timeDateFormat));
 
             QString font;
-            if (it.data().status == JOB_ERRORED)
+            if ((*it).status == JOB_ERRORED)
                 font = "error";
-            else if (it.data().status == JOB_ABORTED)
+            else if ((*it).status == JOB_ABORTED)
                 font = "warning";
 
-            AddLogLine(line, detail, font, QString("%1").arg(it.data().id));
+            AddLogLine(line, detail, font, QString("%1").arg((*it).id));
             delete pginfo;
         }
     }
@@ -967,9 +967,9 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
     for (; it != prof2bps.end(); ++it)
     {
         const QString pro =
-                tail.arg(it.key()).arg((int)((float)it.data() / 1024.0));
+                tail.arg(it.key()).arg((int)((float)(*it) / 1024.0));
 
-        long long bytesPerMin = (it.data() >> 1) * 15;
+        long long bytesPerMin = ((*it) >> 1) * 15;
         uint minLeft = ((free<<5)/bytesPerMin)<<5;
         minLeft = (minLeft/15)*15;
         uint hoursLeft = minLeft/60;
@@ -1221,7 +1221,7 @@ void StatusBox::doMachineStatus()
             line = tr("MythTV Drive #%1:").arg(fsInfos[i].fsID);
             AddLogLine(line, QString("%1\n").arg(line));
 
-            QStringList tokens = QStringList::split(",", fsInfos[i].directory);
+            QStringList tokens = fsInfos[i].directory.split(",");
 
             if (tokens.size() > 1)
             {
@@ -1311,11 +1311,7 @@ void StatusBox::doAutoExpireList()
         pginfo = *it;
         contentLine = pginfo->recstartts.toString(m_dateFormat) + " - ";
 
-        if ((pginfo->recgroup == "LiveTV") ||
-            (pginfo->recgroup == "Deleted"))
-            contentLine += "(" + tr(pginfo->recgroup) + ") ";
-        else
-            contentLine += "(" + pginfo->recgroup + ") ";
+        contentLine += "(" + ProgramInfo::i18n(pginfo->recgroup) + ") ";
 
         contentLine += pginfo->title +
                        " (" + sm_str(pginfo->filesize / 1024) + ")";
@@ -1326,11 +1322,7 @@ void StatusBox::doAutoExpireList()
 
         detailInfo += " (" + sm_str(pginfo->filesize / 1024) + ")";
 
-        if ((pginfo->recgroup == "LiveTV") ||
-            (pginfo->recgroup == "Deleted"))
-            detailInfo += " (" + tr(pginfo->recgroup) + ")";
-        else
-            detailInfo += " (" + pginfo->recgroup + ")";
+        detailInfo += " (" + ProgramInfo::i18n(pginfo->recgroup) + ")";
 
         detailInfo += "\n" + pginfo->title;
 

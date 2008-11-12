@@ -329,7 +329,7 @@ bool CustomPriority::checkSyntax(void)
 
     QString desc = m_descriptionEdit->GetText();
 
-    if (desc.contains(QRegExp("^\\s*AND\\s", false)))
+    if (desc.contains(QRegExp("^\\s*AND\\s", Qt::CaseInsensitive)))
     {
         msg = "Power Priority rules do not reqiure a leading \"AND\"";
     }
@@ -345,7 +345,7 @@ bool CustomPriority::checkSyntax(void)
                                "oldrecorded) WHERE NULL").arg(desc);
         while (1)
         {
-            int i = qstr.find("RECTABLE");
+            int i = qstr.indexOf("RECTABLE");
             if (i == -1) break;
             qstr = qstr.replace(i, strlen("RECTABLE"), "record");
         }
