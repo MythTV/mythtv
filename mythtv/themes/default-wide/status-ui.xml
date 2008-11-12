@@ -9,15 +9,15 @@
         </textarea>
 
         <imagetype name="datalines">
-            <position>0,95</position>
+            <area>0,95,1280,420</area>
             <filename>cr-background.png</filename>
         </imagetype>
 
         <buttonlist name="category">
-            <area>15,50,770,30</area>
+            <area>70,50,1250,30</area>
             <layout>horizontal</layout>
             <spacing>6</spacing>
-            <buttonarea>15,0,740,40</buttonarea>
+            <buttonarea>15,0,1220,40</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,180,40</area>
                 <state name="active">
@@ -44,7 +44,7 @@
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>756,10</position>
+                <position>1130,10</position>
                 <state type="off">
                     <imagetype name="dnon">
                         <filename>lb-rtarrow-reg.png</filename>
@@ -76,13 +76,13 @@
         </buttonlist>
 
         <textarea name="helplabel">
-            <area>30,390,740,30</area>
+            <area>30,490,740,30</area>
             <value>Details</value>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="helptext">
-            <area>40,430,730,150</area>
+            <area>40,530,1200,150</area>
             <value>This screen displays the status of various system components</value>
             <multiline>yes</multiline>
         </textarea>
