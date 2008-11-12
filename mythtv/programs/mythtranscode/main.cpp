@@ -236,14 +236,14 @@ int main(int argc, char *argv[])
 
             if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
-                QStringList cutlist;
-                cutlist = QStringList::split( " ", a.argv()[argpos + 1]);
+                QStringList cutlist = QString(a.argv()[argpos + 1])
+                    .split(" ", QString::SkipEmptyParts);
                 ++argpos;
                 for (QStringList::Iterator it = cutlist.begin();
                      it != cutlist.end(); ++it )
                 {
-                    QStringList startend;
-                    startend = QStringList::split("-", *it);
+                    QStringList startend = (*it)
+                        .split("-", QString::SkipEmptyParts);
                     if (startend.count() == 2)
                     {
                         cerr << "Cutting from: " << startend.first().toInt()
@@ -273,15 +273,15 @@ int main(int argc, char *argv[])
             if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
                 long long last = 0;
-                QStringList cutlist;
-                cutlist = QStringList::split( " ", a.argv()[argpos + 1]);
+                QStringList cutlist =  QString(a.argv()[argpos + 1])
+                    .split(" ", QString::SkipEmptyParts);
                 ++argpos;
                 deleteMap[0] = 1;
                 for (QStringList::Iterator it = cutlist.begin();
                      it != cutlist.end(); ++it )
                 {
-                    QStringList startend;
-                    startend = QStringList::split("-", *it);
+                    QStringList startend = (*it).split(
+                        "-", QString::SkipEmptyParts);
                     if (startend.count() == 2)
                     {
                         cerr << "Cutting from: " << last
@@ -379,10 +379,12 @@ int main(int argc, char *argv[])
         {
             if (a.argc()-1 > argpos && a.argv()[argpos+1][0] != '-')
             {
-                QStringList pairs = QStringList::split(",", a.argv()[argpos+1]);
+                QStringList pairs = QString(a.argv()[argpos+1]).split(
+                    ",", QString::SkipEmptyParts);
                 for (int index = 0; index < pairs.size(); ++index)
                 {
-                    QStringList tokens = QStringList::split("=", pairs[index]);
+                    QStringList tokens = pairs[index].split(
+                        "=", QString::SkipEmptyParts);
                     tokens[0].replace(QRegExp("^[\"']"), "");
                     tokens[0].replace(QRegExp("[\"']$"), "");
                     tokens[1].replace(QRegExp("^[\"']"), "");
@@ -432,8 +434,8 @@ int main(int argc, char *argv[])
         for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(it.data()));
-            gContext->OverrideSettingForSession(it.key(), it.data());
+                                          .arg(it.key()).arg(*it));
+            gContext->OverrideSettingForSession(it.key(), *it);
         }
     }
 
@@ -498,7 +500,7 @@ int main(int argc, char *argv[])
     {
         // We want the absolute file path for the filemarkup table
         QFileInfo inf(infile);
-        infile = inf.absFilePath();
+        infile = inf.absoluteFilePath();
 
         // Create a new, empty ProgramInfo object
         pginfo = new ProgramInfo;
@@ -511,8 +513,9 @@ int main(int argc, char *argv[])
 
         if (!pginfo)
         {
-            cerr << "Couldn't find recording for chanid " << (const char *)chanid << " @ "
-                 << (const char *)starttime << endl;
+            QString msg = QString("Couldn't find recording for chanid %1 @ %2")
+                .arg(chanid).arg(starttime);
+            cerr << msg.toLocal8Bit().constData() << endl;
             return TRANSCODE_EXIT_NO_RECORDING_DATA;
         }
 
@@ -527,7 +530,7 @@ int main(int argc, char *argv[])
             QString base = inf.baseName();
             QRegExp r(
                "(\\d*)_(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)");
-            int pos = r.search(base);
+            int pos = r.indexIn(base);
             if (pos > -1)
             {
                 chanid = r.cap(1);
@@ -688,7 +691,7 @@ void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
     }
     else if (!mapfile.isEmpty())
     {
-        FILE *mapfh = fopen(mapfile, "w");
+        FILE *mapfh = fopen(mapfile.toLocal8Bit().constData(), "w");
         if (!mapfh)
         {
             VERBOSE(VB_IMPORTANT,
@@ -696,10 +699,10 @@ void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
                     .arg(mapfile) + ENO);
             return;
         }
-        QMap<long long, long long>::Iterator i;
+        QMap<long long, long long>::const_iterator it;
         fprintf (mapfh, "Type: %d\n", MARK_GOP_BYFRAME);
-        for (i = posMap.begin(); i != posMap.end(); ++i)
-            fprintf(mapfh, "%lld %lld\n", i.key(), i.data());
+        for (it = posMap.begin(); it != posMap.end(); ++it)
+            fprintf(mapfh, "%lld %lld\n", it.key(), *it);
         fclose(mapfh);
     }
 }
@@ -809,7 +812,7 @@ int transUnlink(QString filename)
     if (gContext->GetNumSetting("TruncateDeletesSlowly", 0))
         return slowDelete(filename);
 
-    return unlink(filename);
+    return unlink(filename.toLocal8Bit().constData());
 }
 
 void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCode)
@@ -919,7 +922,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             // so replace them with the "match any character" wildcard
             // since mythrename.pl may have included them in filenames
             nameFilter.replace(QRegExp("( |;)"), "?");
-            QDir dir (fInfo.dirPath(), nameFilter);
+            QDir dir (fInfo.path(), nameFilter);
 
             for (uint nIdx = 0; nIdx < dir.count(); nIdx++)
             {
@@ -927,7 +930,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
                 // The RENAME_TO_NUV check below will attempt to rename the
                 // file, if required.
                 const QString oldfileop = QString("%1/%2")
-                    .arg(fInfo.dirPath()).arg(dir[nIdx]);
+                    .arg(fInfo.path()).arg(dir[nIdx]);
                 const QByteArray aoldfileop = oldfile.toLocal8Bit();
                 transUnlink(aoldfileop.constData());
             }
@@ -943,17 +946,17 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             // since mythrename.pl may have included them in filenames
             nameFilter.replace(QRegExp("( |;)"), "?");
 
-            QDir dir (fInfo.dirPath(), nameFilter);
+            QDir dir (fInfo.path(), nameFilter);
 
             for (uint nIdx = 0; nIdx < dir.count(); nIdx++)
             {
                 const QString oldfileprev = QString("%1/%2")
-                    .arg(fInfo.dirPath()).arg(dir[nIdx]);
+                    .arg(fInfo.path()).arg(dir[nIdx]);
                 const QByteArray aoldfileprev = oldfileprev.toLocal8Bit();
 
                 QString newfileprev = oldfileprev;
                 QRegExp re("mpg(\\..*)?\\.png$");
-                if (re.search(newfileprev))
+                if (re.indexIn(newfileprev))
                 {
                     newfileprev.replace(
                         re, QString("nuv%1.png").arg(re.cap(1)));

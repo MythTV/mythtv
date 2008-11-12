@@ -11,7 +11,6 @@
 #include <qstringlist.h>
 #include <qsqldatabase.h>
 #include <qmap.h>
-#include <Q3PtrList>
 #include <qstringlist.h>
 #include <qregexp.h>
 
@@ -273,7 +272,7 @@ void Transcode::ReencoderAddKFA(long curframe, long lastkey, long num_keyframes)
 bool Transcode::GetProfile(QString profileName, QString encodingType,
                            int height, int frameRate)
 {
-    if (profileName.lower() == "autodetect")
+    if (profileName.toLower() == "autodetect")
     {
         if (height == 1088)
             height = 1080;
@@ -425,7 +424,7 @@ int Transcode::TranscodeFile(
 
         for (it = delMap.begin(); it != delMap.end(); ++it)
         {
-            if (it.data())
+            if (*it)
             {
                 if (cutStr != "")
                     cutStr += ",";
@@ -491,11 +490,12 @@ int Transcode::TranscodeFile(
         QMap<QString, QString> recorderOptionsMap;
         if (recorderOptions != "")
         {
-            QStringList options = QStringList::split(",", recorderOptions);
+            QStringList options = recorderOptions
+                .split(",", QString::SkipEmptyParts);
             int loop = 0;
             while (loop < options.size())
             {
-                QStringList tokens = QStringList::split("=", options[loop]);
+                QStringList tokens = options[loop].split("=");
                 recorderOptionsMap[tokens[0]] = tokens[1];
 
                 loop++;
@@ -543,7 +543,7 @@ int Transcode::TranscodeFile(
                 }
             }
 
-            if (encodingType.left(4).lower() == "mpeg")
+            if (encodingType.left(4).toLower() == "mpeg")
             {
                 // make sure dimensions are valid for MPEG codecs
                 newHeight = (newHeight + 15) & ~0xF;
@@ -645,7 +645,7 @@ int Transcode::TranscodeFile(
                  it != recorderOptionsMap.end(); ++it)
             {
                 key   = it.key();
-                value = it.data();
+                value = *it;
 
                 VERBOSE(VB_IMPORTANT,
                         QString("Forcing Recorder option '%1' to '%2'")
@@ -734,7 +734,7 @@ int Transcode::TranscodeFile(
             !fifow->FIFOInit(1, QString("audio"), audfifo, audio_size, 25))
         {
             VERBOSE(VB_IMPORTANT, "Error initializing fifo writer.  Aborting");
-            unlink(outputname);
+            unlink(outputname.toLocal8Bit().constData());
             return REENCODE_ERROR;
         }
         VERBOSE(VB_GENERAL, QString("Video %1x%2@%3fps Audio rate: %4")
@@ -882,7 +882,7 @@ int Transcode::TranscodeFile(
             if (!nvp->GetRawAudioState()) 
             {
                 // The Raw state changed during decode.  This is not good
-                unlink(outputname);
+                unlink(outputname.toLocal8Bit().constData());
                 delete newFrame;
                 VERBOSE(VB_IMPORTANT, "Transcoding aborted, NuppelVideoPlayer "
                                       "is not in raw audio mode.");
@@ -1079,7 +1079,7 @@ int Transcode::TranscodeFile(
             if (honorCutList && m_proginfo &&
                 m_proginfo->CheckMarkupFlag(MARK_UPDATED_CUT))
             {
-                unlink(outputname);
+                unlink(outputname.toLocal8Bit().constData());
                 delete newFrame;
                 VERBOSE(VB_IMPORTANT, "Transcoding aborted, cutlist updated");
                 return REENCODE_CUTLIST_CHANGE;
@@ -1089,7 +1089,7 @@ int Transcode::TranscodeFile(
             {
                 if (JobQueue::GetJobCmd(jobID) == JOB_STOP)
                 {
-                    unlink(outputname);
+                    unlink(outputname.toLocal8Bit().constData());
                     delete newFrame;
                     VERBOSE(VB_IMPORTANT, "Transcoding STOPped by JobQueue");
                     return REENCODE_STOPPED;

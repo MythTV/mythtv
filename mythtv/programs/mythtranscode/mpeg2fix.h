@@ -1,14 +1,8 @@
-#include <stdlib.h> 
+// POSIX
 #include <pthread.h>
-//Qt
-#include <qmap.h>
-#include <q3ptrlist.h>
-#include <q3ptrqueue.h>
-#include <q3valuelist.h>
-#include <qstringlist.h>
-#include <qdatetime.h>
 
-#include "transcodedefs.h"
+// C
+#include <cstdlib>
 
 extern "C"
 {
@@ -23,6 +17,17 @@ extern "C"
 //libmpeg2
 #include "libmythmpeg2/mpeg2.h"
 }
+
+//Qt
+#include <QMap>
+#include <QStringList>
+#include <QDateTime>
+
+#include <q3ptrlist.h>
+#include <q3ptrqueue.h>
+#include <q3valuelist.h>
+
+#include "transcodedefs.h"
 
 enum MPFDisplayMask {
     MPF_IMPORTANT = 0x0001,
@@ -88,15 +93,15 @@ typedef struct {
 class PTSOffsetQueue
 {
   public:
-    PTSOffsetQueue(int vidid, Q3ValueList<int> keys, int64_t initPTS);
+    PTSOffsetQueue(int vidid, QList<int> keys, int64_t initPTS);
     void SetNextPTS(int64_t newPTS, int64_t atPTS);
     void SetNextPos(int64_t newPTS, AVPacket &pkt);
     int64_t Get(int idx, AVPacket *pkt);
     int64_t UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket &pkt);
   private:
-    QMap<int, Q3ValueList<poq_idx_t> > offset;
-    QMap<int, Q3ValueList<poq_idx_t> > orig;
-    Q3ValueList<int> keyList;
+    QMap<int, QList<poq_idx_t> > offset;
+    QMap<int, QList<poq_idx_t> > orig;
+    QList<int> keyList;
     int vid_id;
 };
 
