@@ -158,12 +158,11 @@ static int ac3_sync(uint64_t state, AACAC3ParseContext *hdr_info,
         int *need_next_header, int *new_frame_start)
 {
     int err;
-    uint8_t tmp[8];
+    uint64_t tmp = be2me_64(state);
     AC3HeaderInfo hdr;
     GetBitContext gbc;
 
-    AV_WB64(tmp, state);
-    init_get_bits(&gbc, tmp+8-AC3_HEADER_SIZE, 54);
+    init_get_bits(&gbc, ((uint8_t *)&tmp)+8-AC3_HEADER_SIZE, 54);
     err = ff_ac3_parse_header(&gbc, &hdr);
 
     if(err < 0)
