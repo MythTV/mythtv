@@ -21,7 +21,7 @@ using namespace std;
 #include <QMap>
 #include <QWaitCondition>
 #include <QPixmap>
-#include <Q3GridLayout>
+#include <QGridLayout>
 #include <QKeyEvent>
 #include <QEvent>
 #include <QPaintEvent>
@@ -4865,8 +4865,6 @@ void PlaybackBox::showIconHelp(void)
     if (expectingPopup)
        cancelPopup();
 
-    int curRow = 1;
-    int curCol = 0;
     LayerSet *container = NULL;
     if (type != Delete)
         container = theme->GetSet("program_info_play");
@@ -4876,31 +4874,31 @@ void PlaybackBox::showIconHelp(void)
     if (!container)
         return;
 
-    MythPopupBox *iconhelp = new MythPopupBox(
-        gContext->GetMainWindow(), true, drawPopupFgColor,
-        drawPopupBgColor, drawPopupSelColor, "icon help");
+    QGridLayout *grid = new QGridLayout();
+    grid->setSpacing((int)(5 * wmult));
 
-    Q3GridLayout *grid = new Q3GridLayout(6, 4, (int)(5 * wmult));
-
-    QLabel *label;
-    UIImageType *itype;
-    bool displayme = false;
-
-    label = new QLabel(tr("Status Icons"), iconhelp);
+    QLabel *label = new QLabel(tr("Status Icons"));
     label->setObjectName("status_icons");
+
     QFont font = label->font();
     font.setPointSize(int (font.pointSize() * 1.5));
     font.setBold(true);
     label->setFont(font);
+
     QPalette p = label->palette();
     p.setColor(label->foregroundRole(), drawPopupFgColor);
     label->setPalette(p);
+
     label->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
-    label->setMinimumWidth((int)(600 * wmult));
-    label->setMaximumWidth((int)(600 * wmult));
+    //label->setMinimumWidth((int)(600 * wmult));
+    //label->setMaximumWidth((int)(600 * wmult));
     label->setMinimumHeight((int)(35 * hmult));
     label->setMaximumHeight((int)(35 * hmult));
-    grid->addMultiCellWidget(label, 0, 0, 0, 3, Qt::AlignHCenter);
+
+    grid->addWidget(label,
+                    /*row beg */ 0, /*col beg */ 0,
+                    /*row span*/ 1, /*col span*/ 4,
+                    Qt::AlignHCenter | Qt::AlignVCenter);
 
     QMap <QString, QString>::iterator it;
     QMap <QString, QString> iconMap;
@@ -4927,63 +4925,80 @@ void PlaybackBox::showIconHelp(void)
     iconMap["watched"]     = tr("Recording has been watched");
     iconMap["preserved"]   = tr("Recording is preserved");
 
+    bool displayme = false;
+
+    int curRow = 1;
+    int curCol = 0;
     for (it = iconMap.begin(); it != iconMap.end(); ++it)
     {
-        itype = (UIImageType *)container->GetType(it.key());
-        if (itype)
+        UIImageType *itype = (UIImageType*)container->GetType(it.key());
+        if (!itype)
+            continue;
+
+        displayme = true;
+
+        if (curCol == 0)
         {
-            if (curCol == 0)
-            {
-                label = new QLabel(*it, iconhelp);
-                label->setObjectName("nopopsize0");
-            }
-            else
-            {
-                label = new QLabel(*it, iconhelp);
-                label->setObjectName("nopopsize1");
-            }
-            label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-            QPalette p = label->palette();
-            p.setColor(label->foregroundRole(), drawPopupFgColor);
-            label->setPalette(p);
-            label->setMinimumHeight((int)(50 * hmult));
-            label->setMaximumHeight((int)(50 * hmult));
-
-            grid->addWidget(label, curRow, curCol + 1, Qt::AlignLeft);
-
-            label = new QLabel(iconhelp);
-            label->setObjectName("nopopsize2");
-
-            itype->ResetFilename();
-            itype->LoadImage();
-            label->setPixmap(itype->GetImage());
-            displayme = true;
-
-            p = label->palette();
-            p.setColor(label->foregroundRole(), drawPopupFgColor);
-            label->setPalette(p);
-            grid->addWidget(label, curRow, curCol, Qt::AlignCenter);
-
-            curCol += 2;
-            curCol %= 4;
-            if (curCol == 0)
-                curRow++;
+            label = new QLabel(*it);
+            label->setObjectName("nopopsize0");
         }
+        else
+        {
+            label = new QLabel(*it);
+            label->setObjectName("nopopsize1");
+        }
+
+        label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
+        QPalette p = label->palette();
+        p.setColor(label->foregroundRole(), drawPopupFgColor);
+        label->setPalette(p);
+
+        label->setMinimumHeight((int)(40 * hmult));
+        label->setMaximumHeight((int)(45 * hmult));
+
+        grid->addWidget(label, curRow, curCol + 1, Qt::AlignLeft);
+
+        label = new QLabel();
+        label->setObjectName("nopopsize2");
+
+        itype->ResetFilename();
+        itype->LoadImage();
+
+        label->setPixmap(itype->GetImage());
+
+        p = label->palette();
+        p.setColor(label->foregroundRole(), drawPopupFgColor);
+        label->setPalette(p);
+        grid->addWidget(label, curRow, curCol, Qt::AlignCenter);
+
+        curCol += 2;
+        curCol %= 4;
+        if (curCol == 0)
+            curRow++;
     }
 
     if (!displayme)
     {
-        iconhelp->hide();
-        iconhelp->deleteLater();
+        grid->deleteLater();
         return;
     }
 
     killPlayerSafe();
 
-    iconhelp->addLayout(grid);
+    QFrame *widget = new QFrame();
+    QBoxLayout *blah = new QBoxLayout(QBoxLayout::TopToBottom);
+    blah->addLayout(grid);
+    widget->setLayout(blah);
 
-    QAbstractButton *button = iconhelp->addButton(tr("Ok"),
-                                                  iconhelp, SLOT(accept()));
+    MythPopupBox *iconhelp = new MythPopupBox(
+        gContext->GetMainWindow(), true, drawPopupFgColor,
+        drawPopupBgColor, drawPopupSelColor, "icon help");
+
+    iconhelp->addWidget(widget);
+
+    QAbstractButton *button = iconhelp->addButton(
+        tr("Ok"), iconhelp, SLOT(accept()));
     button->setFocus();
 
     iconhelp->ExecPopup();
@@ -5725,7 +5740,8 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
     initRecGroupPopup(tr("Group Password"),
                       "showRecGroupPasswordChanger");
 
-    Q3GridLayout *grid = new Q3GridLayout(3, 2, (int)(10 * wmult));
+    QGridLayout *grid = new QGridLayout();
+    grid->setSpacing((int)(10 * wmult));
 
     QLabel *label = new QLabel(tr("Recording Group:"), recGroupPopup);
     label->setAlignment(Qt::AlignLeft);

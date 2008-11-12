@@ -3,7 +3,7 @@ include ( ../../settings.pro )
 include ( ../../version.pro )
 include ( ../programs-libs.pro )
 
-QT += network xml sql opengl qt3support
+QT += network xml sql opengl
 
 TEMPLATE = app
 CONFIG += thread
