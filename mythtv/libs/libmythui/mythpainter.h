@@ -10,10 +10,12 @@ class QRect;
 
 #include "compat.h"
 
+#include "mythexp.h"
+
 class MythFontProperties;
 class MythImage;
 
-class MythPainter
+class MPUBLIC MythPainter
 {
   public:
     MythPainter() : m_Parent(0) { }

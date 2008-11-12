@@ -14,7 +14,7 @@ class MythUIButtonList;
 class MythFontProperties;
 class MythUIStateType;
 
-class MythUIButtonListItem
+class MPUBLIC MythUIButtonListItem
 {
   public:
     enum CheckState {
@@ -95,7 +95,7 @@ class MythUIButtonListItem
     friend class MythUIButtonList;
 };
 
-class MythUIButtonList : public MythUIType
+class MPUBLIC MythUIButtonList : public MythUIType
 {
     Q_OBJECT
   public:

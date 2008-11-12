@@ -25,7 +25,7 @@ enum InputFilter
  *  \brief A text entry and edit widget
  *
  */
-class MythUITextEdit : public MythUIType, public StorageUser
+class MPUBLIC MythUITextEdit : public MythUIType, public StorageUser
 {
     Q_OBJECT
 

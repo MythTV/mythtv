@@ -10,7 +10,7 @@
  * \brief A checkbox widget supporting three check states - on,off,half and two
  *        conditions - selected and unselected.
  */
-class MythUICheckBox : public MythUIType
+class MPUBLIC MythUICheckBox : public MythUIType
 {
     Q_OBJECT
 

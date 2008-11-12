@@ -13,7 +13,7 @@ class MythScreenType;
  *
  * \brief Image widget, displays a single image or multiple images in sequence
  */
-class MythUIImage : public MythUIType
+class MPUBLIC MythUIImage : public MythUIType
 {
   public:
     MythUIImage(const QString &filepattern, int low, int high, int delayms,

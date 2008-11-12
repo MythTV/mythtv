@@ -8,7 +8,7 @@ class MythScreenStack;
 /**
  * Base Screen type
  */
-class MythScreenType : public MythUIType
+class MPUBLIC MythScreenType : public MythUIType
 {
     Q_OBJECT
 

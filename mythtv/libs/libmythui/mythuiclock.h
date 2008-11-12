@@ -23,7 +23,7 @@ class MythFontProperties;
  *  %SHORTDATE% - Short date format, as defined in the locale settings
  *
  */
-class MythUIClock : public MythUIText
+class MPUBLIC MythUIClock : public MythUIText
 {
   public:
     MythUIClock(MythUIType *parent, const QString &name);

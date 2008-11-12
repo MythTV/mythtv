@@ -6,15 +6,13 @@
 
 #include <lirc/lirc_client.h>
 
-#include "mythexp.h"
-
 /** \class LircThread
  *  \brief Interface between mythtv and lircd
  *
  *   Create connection to the lircd daemon and translate remote keypresses
  *   into custom events which are posted to the mainwindow.
  */
-class MPUBLIC LircThread : public QThread
+class LircThread : public QThread
 {
     Q_OBJECT
   public:

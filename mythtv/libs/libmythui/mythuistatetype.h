@@ -9,7 +9,7 @@
 
 // Image class that displays one of an array of images (either predefined states
 // or by typename).  Displays nothing if told to display a non-existant state
-class MythUIStateType : public MythUIType
+class MPUBLIC MythUIStateType : public MythUIType
 {
   public:
     enum StateType { None = 0, Off, Half, Full }; // Can be used for tri-state checks, two state toggles, etc.

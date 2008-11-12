@@ -9,7 +9,7 @@ class MythUIType;
 class MythScreenType;
 class QDomElement;
 
-class XMLParseBase
+class MPUBLIC XMLParseBase
 {
   public:
     static QString getFirstText(QDomElement &element);

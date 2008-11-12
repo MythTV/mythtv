@@ -13,9 +13,6 @@
 #include <QString>
 #include <QThread>
 
-// Myth headers
-#include "mythexp.h"
-
 typedef struct
 {
     int button;
@@ -76,7 +73,7 @@ class JoystickMap
  *
  *  \brief Main object for injecting key strokes based on joystick movements
  */
-class MPUBLIC JoystickMenuThread : public QThread
+class JoystickMenuThread : public QThread
 {
   public:
     JoystickMenuThread(QObject *main_window);

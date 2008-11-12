@@ -4,10 +4,12 @@
 #include <QVector>
 #include <QObject>
 
+#include "mythexp.h"
+
 class MythScreenType;
 class MythMainWindow;
 
-class MythScreenStack : public QObject
+class MPUBLIC MythScreenStack : public QObject
 {
   public:
     MythScreenStack(MythMainWindow *parent, const QString &name,

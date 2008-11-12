@@ -22,7 +22,7 @@ class QKeyEvent;
 /**
  * Base UI type.  Children are drawn/processed in order added
  */
-class MythUIType : public QObject, public XMLParseBase
+class MPUBLIC MythUIType : public QObject, public XMLParseBase
 {
     Q_OBJECT
 

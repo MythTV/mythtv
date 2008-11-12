@@ -11,7 +11,7 @@ class MythFontProperties;
  *  \brief Progress bar widget.
  *
  */
-class MythUIProgressBar : public MythUIType
+class MPUBLIC MythUIProgressBar : public MythUIType
 {
   public:
     MythUIProgressBar(MythUIType *parent, const QString &name);

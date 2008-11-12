@@ -1,9 +1,11 @@
 #ifndef MYTHTHEMEBASE_H_
 #define MYTHTHEMEBASE_H_
 
+#include "mythexp.h"
+
 class MythThemeBasePrivate;
 
-class MythThemeBase
+class MPUBLIC MythThemeBase
 {
   public:
     MythThemeBase();

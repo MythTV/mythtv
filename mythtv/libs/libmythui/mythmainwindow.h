@@ -24,7 +24,7 @@ class MythMainWindowPrivate;
 class MythPainterWindowGL;
 class MythPainterWindowQt;
 
-class MythMainWindow : public QWidget
+class MPUBLIC MythMainWindow : public QWidget
 {
     Q_OBJECT
     friend class MythPainterWindowGL;
@@ -126,11 +126,11 @@ class MythMainWindow : public QWidget
     MythMainWindowPrivate *d;
 };
 
-MythMainWindow *GetMythMainWindow();
-bool HasMythMainWindow();
-void DestroyMythMainWindow();
+MPUBLIC MythMainWindow *GetMythMainWindow();
+MPUBLIC bool HasMythMainWindow();
+MPUBLIC void DestroyMythMainWindow();
 
-MythPainter *GetMythPainter();
+MPUBLIC MythPainter *GetMythPainter();
 
 #endif
 

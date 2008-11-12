@@ -22,7 +22,7 @@ const int kMythDialogBoxCompletionEventType = 34111;
  *  The result may be in the format of an int, text or a void pointer
  *  dependant on the dialog type and information it is conveying.
  */
-class DialogCompletionEvent : public QEvent
+class MPUBLIC DialogCompletionEvent : public QEvent
 {
   public:
     DialogCompletionEvent(const QString &id, int result, QString text,
@@ -51,7 +51,7 @@ class DialogCompletionEvent : public QEvent
  *  Sends out a DialogCompletionEvent event and the Selected() signal
  *  containing the result when the user selects the Ok button.
  */
-class MythDialogBox : public MythScreenType
+class MPUBLIC MythDialogBox : public MythScreenType
 {
     Q_OBJECT
   public:
@@ -93,7 +93,7 @@ class MythDialogBox : public MythScreenType
  *  Sends out a DialogCompletionEvent event and the haveResult() signal
  *  containing the result.
  */
-class MythConfirmationDialog : public MythScreenType
+class MPUBLIC MythConfirmationDialog : public MythScreenType
 {
     Q_OBJECT
 
@@ -131,7 +131,7 @@ class MythConfirmationDialog : public MythScreenType
  *  Sends out a DialogCompletionEvent event and the haveResult() signal
  *  containing the result when the user selects the Ok button.
  */
-class MythTextInputDialog : public MythScreenType
+class MPUBLIC MythTextInputDialog : public MythScreenType
 {
     Q_OBJECT
 
@@ -175,7 +175,7 @@ class MythTextInputDialog : public MythScreenType
  * haveResult(QString) signal will be generated. Both pass the selected
  * string back to the caller.
  */
-class MythUISearchDialog : public MythScreenType
+class MPUBLIC MythUISearchDialog : public MythScreenType
 {
   Q_OBJECT
 
@@ -211,6 +211,6 @@ class MythUISearchDialog : public MythScreenType
     void slotUpdateList(void);
 };
 
-extern MPUBLIC void ShowOkPopup(const QString &message);
+MPUBLIC void ShowOkPopup(const QString &message);
 
 #endif

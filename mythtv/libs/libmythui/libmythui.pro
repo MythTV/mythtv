@@ -134,6 +134,10 @@ using_qtwebkit {
         DEFINES += USING_QTWEBKIT
 }
 
+use_hidesyms {
+    QMAKE_CXXFLAGS += -fvisibility=hidden
+}
+
 include ( ../libs-targetfix.pro )
 
 LIBS += $$LATE_LIBS

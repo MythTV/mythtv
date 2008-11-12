@@ -17,7 +17,7 @@
  *  checkbox (dual/tri state)
  *
  */
-class MythUIButton : public MythUIType
+class MPUBLIC MythUIButton : public MythUIType
 {
     Q_OBJECT
   public:

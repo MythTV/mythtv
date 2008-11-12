@@ -11,7 +11,7 @@
 enum ReflectAxis {ReflectHorizontal, ReflectVertical};
 enum FillDirection {FillLeftToRight, FillTopToBottom};
 
-class MythImage : public QImage
+class MPUBLIC MythImage : public QImage
 {
   public:
     MythImage(MythPainter *parent);

@@ -36,7 +36,7 @@ class MythWebView : public QWebView
 };
 #endif
 
-class MythUIWebBrowser : public MythUIType
+class MPUBLIC MythUIWebBrowser : public MythUIType
 {
   Q_OBJECT
 

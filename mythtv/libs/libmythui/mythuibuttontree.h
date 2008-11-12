@@ -12,7 +12,7 @@ class MythUIButtonListItem;
  * \brief A tree widget
  *
  */
-class MythUIButtonTree : public MythUIType
+class MPUBLIC MythUIButtonTree : public MythUIType
 {
     Q_OBJECT
   public:

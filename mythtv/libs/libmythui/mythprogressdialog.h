@@ -10,7 +10,7 @@
 
 const int kProgressUpdateEventType = 35111;
 
-class ProgressUpdateEvent : public QEvent
+class MPUBLIC ProgressUpdateEvent : public QEvent
 {
   public:
     ProgressUpdateEvent(uint count, uint total=0, QString message="")
@@ -27,7 +27,7 @@ class ProgressUpdateEvent : public QEvent
     QString m_message;
 };
 
-class MythUIBusyDialog : public MythScreenType
+class MPUBLIC MythUIBusyDialog : public MythScreenType
 {
     Q_OBJECT
   public:
@@ -43,7 +43,7 @@ class MythUIBusyDialog : public MythScreenType
     MythUIText *m_messageText;
 };
 
-class MythUIProgressDialog : public MythScreenType
+class MPUBLIC MythUIProgressDialog : public MythScreenType
 {
     Q_OBJECT
   public:

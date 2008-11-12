@@ -5,7 +5,8 @@
 #include <QPoint>
 #include <QString>
 
-class MythRect;
+#include "mythexp.h"
+
 class MythPoint;
 
 /** \class MythRect
@@ -13,7 +14,7 @@ class MythPoint;
  *  \brief Wrapper around QRect allowing us to handle percentage and other
  *         relative values for areas in mythui
  */
-class MythRect : public QRect
+class MPUBLIC MythRect : public QRect
 {
 
   public:
@@ -70,7 +71,7 @@ class MythRect : public QRect
  * \brief Wrapper around QPoint allowing us to handle percentage and other
  *        relative values for positioning in mythui
  */
-class MythPoint : public QPoint
+class MPUBLIC MythPoint : public QPoint
 {
 
   public:

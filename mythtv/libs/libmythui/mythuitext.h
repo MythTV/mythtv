@@ -20,7 +20,7 @@ class MythFontProperties;
  *  Font, alignment, scrolling and color cycling effects may be applied to
  *  the text in this widget.
  */
-class MythUIText : public MythUIType, public StorageUser
+class MPUBLIC MythUIText : public MythUIType, public StorageUser
 {
   public:
     MythUIText(MythUIType *parent, const QString &name);

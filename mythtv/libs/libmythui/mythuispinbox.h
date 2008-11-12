@@ -12,7 +12,7 @@
  * MythUIButtonList instead.
  *
  */
-class MythUISpinBox : public MythUIButtonList
+class MPUBLIC MythUISpinBox : public MythUIButtonList
 {
     Q_OBJECT
   public:
