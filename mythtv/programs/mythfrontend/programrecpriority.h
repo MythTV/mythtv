@@ -54,6 +54,7 @@ class ProgramRecPriority : public MythScreenType
   protected slots:
     void updateInfo(MythUIButtonListItem *item);
     void edit(MythUIButtonListItem *item);
+    void doRemove(bool doRemove);
 
   private:
     void FillList(void);

@@ -647,11 +647,32 @@ void ProgramRecPriority::remove(void)
         tr("Delete '%1' %2 rule?").arg(record->getRecordTitle())
                                   .arg(pgRecInfo->RecTypeText());
 
-    bool ok = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), "",
-                                              message, false);
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, message, true);
 
-    if (ok)
+    if (dialog->Create())
+        popupStack->AddScreen(dialog);
+
+    connect(dialog, SIGNAL(haveResult(bool)),
+            this, SLOT(doRemove(bool)));
+
+    record->deleteLater();
+}
+
+void ProgramRecPriority::doRemove(bool doRemove)
+{
+    if (doRemove)
     {
+        MythUIButtonListItem *item = m_programList->GetItemCurrent();
+        if (!item)
+           return;
+
+        ProgramRecPriorityInfo *pgRecInfo =
+                        qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
+
+        ScheduledRecording *record = new ScheduledRecording();
+        int recid = pgRecInfo->recordid;
+
         record->remove();
 
         RemoveItemFromList(item);
@@ -661,8 +682,9 @@ void ProgramRecPriority::remove(void)
         ScheduledRecording::signalChange(recid);
 
         UpdateList();
+
+        record->deleteLater();
     }
-    record->deleteLater();
 }
 
 void ProgramRecPriority::deactivate(void)
