@@ -235,6 +235,92 @@
         </statetype>
     </buttonlist>
 
+    <!-- Base definition of a buttonlist in wide configuration -->
+    <buttonlist name="basewidebuttonlist2">
+        <area>0,0,1240,350</area>
+        <layout>vertical</layout>
+        <spacing>4</spacing>
+        <wrapstyle>selection</wrapstyle>
+        <buttonarea>0,0,1200,350</buttonarea>
+        <statetype name="buttonitem">
+            <area>0,0,1200,25</area>
+            <state name="active">
+                <statetype name="status">
+                    <position>0,0</position>
+                    <state name="disabled">
+                        <imagetype name="statusimage">
+                            <filename>schedule_disabled.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="error">
+                        <imagetype name="statusimage">
+                            <filename>schedule_conflict.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="warning">
+                        <imagetype name="statusimage">
+                            <filename>schedule_other.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="normal">
+                        <imagetype name="statusimage">
+                            <filename>schedule_record.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="running">
+                        <imagetype name="statusimage">
+                            <filename>schedule_recording.png</filename>
+                        </imagetype>
+                    </state>
+                    <state name="marked"></state>
+                </statetype>
+                <textarea name="buttontext">
+                    <area>33,1,1200,24</area>
+                    <font>basesmall</font>
+                    <font state="disabled">basesmallpurple</font>
+                    <font state="error">basesmallred</font>
+                    <font state="warning">basesmallyellow</font>
+                    <font state="normal">basesmallblue</font>
+                    <font state="running">basesmallgreen</font>
+                    <align>vcenter</align>
+                </textarea>
+            </state>
+            <state name="selected" from="active">
+                <imagetype name="selectbar">
+                    <position>25,0</position>
+                    <filename>schedule_wideselectbar.png</filename>
+                </imagetype>
+            </state>
+            <state name="inactive" from="active" />
+        </statetype>
+        <statetype name="upscrollarrow">
+            <position>1190,5</position>
+            <state type="off">
+                <imagetype name="upon">
+                    <filename>lb-uparrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="upoff">
+                    <filename>lb-uparrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>1190,320</position>
+            <state type="off">
+                <imagetype name="dnon">
+                    <filename>lb-dnarrow-reg.png</filename>
+                </imagetype>
+            </state>
+            <state type="full">
+                <imagetype name="dnoff">
+                    <filename>lb-dnarrow-sel.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+    </buttonlist>
+
     <!-- Base definition of a button -->
     <button name="basebutton">
         <position>0,0</position>

@@ -84,4 +84,99 @@
 
     </window>
 
+    <window name="viewscheduled">
+
+        <textarea name="pagetitle">
+            <area>20,5,570,40</area>
+            <font>baselarge</font>
+            <value>Scheduled Recordings</value>
+        </textarea>
+
+        <imagetype name="filler">
+            <filename>cr-background.png</filename>
+            <area>0,39,1280,420</area>
+        </imagetype>
+
+        <textarea name="status" from="basetextarea">
+            <area>770,10,480,30</area>
+            <align>right</align>
+            <font>basemedium</font>
+            <font state="warning">basemediumred</font>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="filterlabel" from="basetextarea">
+            <area>20,430,105,30</area>
+            <value>Showing:</value>
+        </textarea>
+
+        <textarea name="filter" from="basetextarea">
+            <area>120,430,150,30</area>
+        </textarea>
+
+        <buttonlist name="schedules" from="basewidebuttonlist2">
+            <position>20,53</position>
+            <statetype name="buttonitem">
+                <area>0,0,1200,25</area>
+                <state name="active">
+                    <textarea name="time" from="buttontext">
+                        <area>32,1,148,24</area>
+                    </textarea>
+                    <textarea name="channel" from="time">
+                        <area>240,1,140,24</area>
+                    </textarea>
+                    <textarea name="title" from="time">
+                        <area>440,1,380,24</area>
+                    </textarea>
+                    <textarea name="card" from="time">
+                        <area>1160,1,30,24</area>
+                    </textarea>
+                </state>
+                <state name="selected" from="active" />
+                <state name="inactive" from="active" />
+            </statetype>
+        </buttonlist>
+
+        <textarea name="title" from="basetextarea">
+            <area>20,460,1240,40</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="channel" from="basetextarea">
+            <area>20,500,160,30</area>
+        </textarea>
+
+        <textarea name="timedate" from="basetextarea">
+            <area>200,500,420,30</area>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>20,530,1240,160</area>
+            <multiline>yes</multiline>
+            <cutdown>yes</cutdown>
+            <value>%|"SUBTITLE|"%\n%STARS%%DESCRIPTION%</value>
+        </textarea>
+
+        <textarea name="recordingstatus" from="basetextarea">
+            <area>830,430,420,30</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="norecordings_info">
+            <area>0,210,1280,70</area>
+            <font>basemedium</font>
+            <value>You Haven't Scheduled Any Programs To Be Recorded\n
+                To schedule a recording, exit this screen and
+                Select 'Program Guide' or 'Program Finder'</value>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
+        </textarea>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>0,680,1280,30</area>
+            <value>(1) All  (2) Important</value>
+            <align>center</align>
+        </textarea>
+    </window>
+
 </mythuitheme>
