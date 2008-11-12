@@ -949,8 +949,10 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
     }
 
     if (gotostartchannel)
-        m_currentStartChannel = FindChannel(startChanID, startChanNum);
-    m_currentStartChannel = max((uint)0, m_currentStartChannel);
+    {
+        int ch = FindChannel(startChanID, startChanNum);
+        m_currentStartChannel = (uint) max(0, ch);
+    }
 
     if (m_channelInfos.empty())
     {
