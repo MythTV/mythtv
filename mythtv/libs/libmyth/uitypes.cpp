@@ -115,7 +115,7 @@ void LayerSet::ClearAllText(void)
         if (UITextType *item = dynamic_cast<UITextType *>(type))
         {
             QString defText = item->GetDefaultText();
-            if (defText.isEmpty() || defText.contains(QRegExp("%")))
+            if (defText.isEmpty() || defText.contains('%'))
                 item->SetText(QString(""));
         }
     }
@@ -148,7 +148,7 @@ void LayerSet::SetText(QMap<QString, QString> &infoMap)
                     {
                         full_regex = QString("%") + key + QString("(\\|([^%|]*))?") +
                                      QString("(\\|([^%|]*))?") + QString("(\\|([^%]*))?%");
-                        if (*riter != "")
+                        if (data.length())
                             new_text.replace(QRegExp(full_regex),
                                              QString("\\2") + data + QString("\\4"));
                         else
@@ -157,7 +157,7 @@ void LayerSet::SetText(QMap<QString, QString> &infoMap)
                 }
             }
 
-            if (new_text != "")
+            if (new_text.length())
                 item->SetText(new_text);
         }
     }
