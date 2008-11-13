@@ -29,7 +29,7 @@
 
     <item> 
         <title>Scotsman.com Entertainment News</title> 
-        <url>http://news.scotsman.com/entertainment.cfm?format=rss</url> 
+        <url>http://news.scotsman.com/getFeed.aspx?Format=rss&amp;sectionid=7010</url> 
         <ico>http://www.scotsman.com/favicon.ico</ico> 
     </item> 
 
@@ -639,7 +639,7 @@
 
     <item>
         <title>Scotsman.com International News</title>
-        <url>http://news.scotsman.com/international.cfm?format=rss</url>
+        <url>http://news.scotsman.com/getFeed.aspx?Format=rss&amp;sectionid=7000</url>
         <ico>http://www.scotsman.com/favicon.ico</ico>
     </item>
 
@@ -1014,7 +1014,7 @@
 
     <item>
         <title>Scotsman.com Opinion</title>
-        <url>http://news.scotsman.com/opinion.cfm?format=rss</url>
+        <url>http://news.scotsman.com/getFeed.aspx?Format=rss&amp;sectionid=7074</url>
         <ico>http://www.scotsman.com/favicon.ico</ico>
     </item>
     
@@ -1115,13 +1115,13 @@
 
     <item>
         <title>Scotsman.com Headlines</title>
-        <url>http://news.scotsman.com/index.cfm?format=rss</url>
+        <url>http://news.scotsman.com/getFeed.aspx?Format=rss&amp;sectionid=4068</url>
         <ico>http://www.scotsman.com/favicon.ico</ico>
     </item>
 
     <item>
         <title>Scotsman.com UK News</title>
-        <url>http://news.scotsman.com/uk.cfm?format=rss</url>
+        <url>http://news.scotsman.com/getFeed.aspx?Format=rss&amp;sectionid=7071</url>
         <ico>http://www.scotsman.com/favicon.ico</ico>
     </item>
 
