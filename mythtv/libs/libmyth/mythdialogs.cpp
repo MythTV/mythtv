@@ -163,7 +163,7 @@ DialogCode MythDialog::exec(void)
 {
     if (in_loop)
     {
-        qWarning("MythDialog::exec: Recursive call detected.");
+        VERBOSE(VB_IMPORTANT, "MythDialog::exec: Recursive call detected.");
         return kDialogCodeRejected;
     }
 
@@ -331,7 +331,6 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
 
 bool MythPopupBox::focusNextPrevChild(bool next)
 {
-
     // -=>TODO: Temp fix... should re-evalutate/re-code.
 
     QList<QWidget *> objList = qFindChildren<QWidget *>(this);
@@ -577,7 +576,7 @@ void MythPopupBox::keyPressEvent(QKeyEvent *e)
     bool handled = false;
     QStringList actions;
     gContext->TranslateKeyPress("qt", e, actions);
-    for ( int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
 
@@ -1082,9 +1081,9 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, const char* name,
     theme = NULL;
 }
 
-bool MythThemedDialog::loadThemedWindow(QString window_name, QString theme_filename)
+bool MythThemedDialog::loadThemedWindow(QString window_name,
+                                        QString theme_filename)
 {
-
     if (theme)
         delete theme;
 
@@ -1605,7 +1604,8 @@ void MythThemedDialog::setCurrentFocusWidget(UIType* widget)
     widget_with_current_focus->takeFocus();
 }
 
-UIManagedTreeListType* MythThemedDialog::getUIManagedTreeListType(const QString &name)
+UIManagedTreeListType* MythThemedDialog::getUIManagedTreeListType(
+    const QString &name)
 {
     return GetUIType<UIManagedTreeListType>(this, name);
 }
@@ -1635,7 +1635,8 @@ UITextButtonType* MythThemedDialog::getUITextButtonType(const QString &name)
     return GetUIType<UITextButtonType>(this, name);
 }
 
-UIRepeatedImageType* MythThemedDialog::getUIRepeatedImageType(const QString &name)
+UIRepeatedImageType* MythThemedDialog::getUIRepeatedImageType(
+    const QString &name)
 {
     return GetUIType<UIRepeatedImageType>(this, name);
 }
@@ -1928,11 +1929,7 @@ void MythSearchDialog::Teardown(void)
     cancel_button = NULL; // deleted by Qt
 }
 
-/*
----------------------------------------------------------------------
- */
-
-/** \fn MythImageFileDialog::MythImageFileDialog(QString*,QString,MythMainWindow*,QString,QString,const char*,bool)
+/**
  *  \brief Locates an image file dialog in the current theme.
  *
  *   MythImageFileDialog's expect there to be certain
@@ -1949,16 +1946,14 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
                                          QString theme_filename,
                                          const char *name,
                                          bool setsize)
-                   :MythThemedDialog(parent,
-                                     window_name,
-                                     theme_filename,
-                                     name,
-                                     setsize)
+    : MythThemedDialog(parent, window_name,
+                       theme_filename, name, setsize)
 {
     selected_file = result;
     initial_node = NULL;
 
-    UIImageType *file_browser_background = getUIImageType("file_browser_background");
+    UIImageType *file_browser_background
+                     = getUIImageType("file_browser_background");
     if (file_browser_background)
     {
         QPixmap background = file_browser_background->GetImage();
