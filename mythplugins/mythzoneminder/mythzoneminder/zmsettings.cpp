@@ -81,16 +81,6 @@ static HostComboBox *ZMTimeFormat()
     return gc;
 }
 
-static HostCheckBox *ZMServerUseOpenGL()
-{
-    HostCheckBox *gc = new HostCheckBox("ZoneMinderUseOpenGL");
-    gc->setLabel(QObject::tr("Use OpenGL"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If checked OpenGL will be used to render the video frames "
-                               "otherwise Xv will be used."));
-    return gc;
-};
-
 ZMSettings::ZMSettings()
 {
     VerticalConfigurationGroup* vcg1 = new VerticalConfigurationGroup(false);
@@ -99,6 +89,5 @@ ZMSettings::ZMSettings()
     vcg1->addChild(ZMServerPort());
     vcg1->addChild(ZMDateFormat());
     vcg1->addChild(ZMTimeFormat());
-    vcg1->addChild(ZMServerUseOpenGL());
     addChild(vcg1);
 }
