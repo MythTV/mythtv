@@ -187,10 +187,12 @@ void MythNewsConfig::toggleItem(MythUIButtonListItem *item)
 {
     QMutexLocker locker(&m_lock);
 
-    if (!item || !item->getData())
+    if (!item )
         return;
 
     NewsSiteItem *site = qVariantValue<NewsSiteItem*>(item->GetData());
+    if (!site)
+        return;
 
     bool checked = (item->state() == MythUIButtonListItem::FullChecked);
 
