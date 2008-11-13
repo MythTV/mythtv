@@ -454,6 +454,9 @@ bool MythUIButtonList::MoveUp(MovementUnit unit)
                 if ((m_selPosition / m_columns)
                         < ((m_itemList.size()-1)/ m_columns))
                     m_selPosition = m_itemList.size() - 1;
+
+                if (m_layout == LayoutVertical)
+                    m_topPosition = std::max(0, m_selPosition - (int)m_itemsVisible + 1);
             }
             break;
         case MovePage:
