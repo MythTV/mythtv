@@ -93,8 +93,6 @@ void MythNewsConfig::populateSites(void)
         NewsCategory cat;
         cat.name = catNode.toElement().attribute("name");
 
-        m_priv->categoryList.push_back(cat);
-
         QDomNodeList siteList = catNode.childNodes();
 
         for (int j = 0; j < siteList.count(); j++)
@@ -116,6 +114,7 @@ void MythNewsConfig::populateSites(void)
             cat.siteList.push_back(site);
         }
 
+        m_priv->categoryList.push_back(cat);
     }
 
     xmlFile.close();
