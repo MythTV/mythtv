@@ -100,15 +100,11 @@ void MythNewsConfig::populateSites(void)
             siteNode = siteList.item(j);
 
             NewsSiteItem site = NewsSiteItem();
-            site.name =
-                siteNode.namedItem(QString("title")).toElement().text();
-            site.category =
-                cat.name;
-            site.url =
-                siteNode.namedItem(QString("url")).toElement().text();
-            site.ico =
-                siteNode.namedItem(QString("ico")).toElement().text();
-
+            site.name = siteNode.namedItem(QString("title")).toElement().text();
+            site.category = cat.name;
+            site.url = siteNode.namedItem(QString("url")).toElement().text();
+            site.ico = siteNode.namedItem(QString("ico")).toElement().text();
+            site.podcast = false;
             site.inDB = findInDB(site.name);
 
             cat.siteList.push_back(site);
