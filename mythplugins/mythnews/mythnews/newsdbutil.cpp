@@ -34,8 +34,8 @@ bool insertInDB(const QString &name, const QString &url,
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO newssites (name,category,url,ico,podcast) "
-            " VALUES( :NAME, :CATEGORY, :URL, :ICON, :PODCAST );");
+    query.prepare("INSERT INTO newssites (name,category,url,ico,podcast,updated) "
+            " VALUES( :NAME, :CATEGORY, :URL, :ICON, :PODCAST, 0);");
     query.bindValue(":NAME", name);
     query.bindValue(":CATEGORY", category);
     query.bindValue(":URL", url);
