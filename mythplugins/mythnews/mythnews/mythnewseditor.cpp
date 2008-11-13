@@ -67,6 +67,7 @@ bool MythNewsEditor::Create(void)
     m_nameLabelText = dynamic_cast<MythUIText *> (GetChild("namelabel"));
     m_urlLabelText = dynamic_cast<MythUIText *> (GetChild("urllabel"));
     m_iconLabelText = dynamic_cast<MythUIText *> (GetChild("iconlabel"));
+    m_podcastLabelText = dynamic_cast<MythUIText *> (GetChild("podcastlabel"));
 
     m_nameEdit = dynamic_cast<MythUITextEdit *> (GetChild("name"));
     m_urlEdit = dynamic_cast<MythUITextEdit *> (GetChild("url"));
@@ -92,6 +93,8 @@ bool MythNewsEditor::Create(void)
         m_urlLabelText->SetText(tr("URL:"));
     if (m_iconLabelText)
         m_iconLabelText->SetText(tr("Icon:"));
+    if (m_podcastLabelText)
+        m_podcastLabelText->SetText(tr("Podcast:"));
 
     m_okButton->SetText(tr("Ok"));
     m_cancelButton->SetText(tr("Cancel"));

@@ -95,8 +95,7 @@
         </checkbox>
 
         <textarea name="podcast_text" from="basetextarea">
-              <area>380,465,500,50</area>
-              <value>Podcast feed</value>
+            <area>380,465,500,50</area>
         </textarea>
 
         <button name="cancel" from="basebutton">

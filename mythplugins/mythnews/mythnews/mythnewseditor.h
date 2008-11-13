@@ -40,6 +40,7 @@ class MythNewsEditor : public MythScreenType
     MythUIText     *m_nameLabelText;
     MythUIText     *m_urlLabelText;
     MythUIText     *m_iconLabelText;
+    MythUIText     *m_podcastLabelText;
 
     MythUITextEdit *m_nameEdit;
     MythUITextEdit *m_urlEdit;

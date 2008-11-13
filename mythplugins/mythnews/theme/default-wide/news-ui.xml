@@ -59,53 +59,53 @@
 
         <textarea name="title" from="basetextarea">
             <font>baselarge</font>
-            <area>0,50,800,50</area>
+            <area>0,50,1280,50</area>
             <align>center,vcenter</align>
         </textarea>
 
         <textarea name="namelabel" from="basetextarea">
-            <area>120,150,100,30</area>
+            <area>335,150,100,30</area>
             <align>right,vcenter</align>
         </textarea>
 
         <textedit name="name" from="basetextedit">
-            <position>235,140</position>
+            <position>450,140</position>
         </textedit>
 
         <textarea name="urllabel" from="basetextarea">
-            <area>120,250,100,30</area>
+            <area>335,250,100,30</area>
             <align>right,vcenter</align>
         </textarea>
 
         <textedit name="url" from="basetextedit">
-            <position>235,240</position>
+            <position>450,240</position>
         </textedit>
 
         <textarea name="iconlabel" from="basetextarea">
-            <area>120,350,100,30</area>
+            <area>345,350,100,30</area>
             <align>right,vcenter</align>
         </textarea>
 
         <textedit name="icon" from="basetextedit">
-            <position>235,340</position>
+            <position>450,340</position>
         </textedit>
 
         <checkbox name="podcast_check" from="basecheckbox">
-            <position>340,465</position>
+            <position>450,445</position>
         </checkbox>
 
-        <textarea name="podcast_text" from="basetextarea">
-              <area>380,465,500,50</area>
-              <value>Podcast feed</value>
+        <textarea name="podcastlabel" from="basetextarea">
+            <area>285,445,150,30</area>
+            <align>right,vcenter</align>
         </textarea>
 
         <button name="cancel" from="basebutton">
-            <position>60,480</position>
+            <position>275,600</position>
             <value>Cancel</value>
         </button>
 
         <button name="ok" from="basebutton">
-            <position>590,480</position>
+            <position>805,600</position>
             <value>Ok</value>
         </button>
 
