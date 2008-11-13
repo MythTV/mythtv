@@ -147,7 +147,7 @@ void MythNewsEditor::Save(void)
 
         insertInDB(m_nameEdit->GetText(), m_urlEdit->GetText(),
                    m_iconEdit->GetText(), "custom",
-                   m_podcastCheck->GetCheckState());
+                   (m_podcastCheck->GetCheckState() == MythUIStateType::Full));
     }
     Close();
 }
