@@ -99,6 +99,7 @@ class StreamID
         MPEG4Video     = 0x10, ///< ISO 14492-2 (aka MPEG-4)
         H264Video      = 0x1b, ///< ISO 14492-10 & ITU H.264 (aka MPEG-4-AVC)
         OpenCableVideo = 0x80,
+        VC1Video       = 0xea, ///< SMPTE 421M video codec (aka VC1) in Blu-Ray
 
         // audio
         MPEG1Audio     = 0x03, ///< ISO 11172-3
@@ -147,7 +148,8 @@ class StreamID
         return ((StreamID::MPEG1Video == type) ||
                 (StreamID::MPEG2Video == type) ||
                 (StreamID::MPEG4Video == type) ||
-                (StreamID::H264Video  == type) || 
+                (StreamID::H264Video  == type) ||
+                (StreamID::VC1Video   == type) ||
                 (StreamID::OpenCableVideo == type));
     }
     /// Returns true iff audio is MPEG1/2, AAC, AC3 or DTS audio stream.
