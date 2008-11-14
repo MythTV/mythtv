@@ -1,5 +1,10 @@
 CONFIG += $$CCONFIG
 
+#check QT major version
+contains(QT_MAJOR_VERSION, 3) {
+        error("Not building against Qt4")
+}
+
 # Where binaries, includes and runtime assets are installed by 'make install'
 isEmpty( PREFIX ) {
     PREFIX = /usr/local
