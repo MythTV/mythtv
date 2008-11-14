@@ -593,7 +593,6 @@ bool FillData::Run(SourceList &sourcelist)
 
         if (is_grabber_external(xmltv_grabber))
         {
-
             QProcess grabber_capabilities_proc;
             grabber_capabilities_proc.setProcessChannelMode(
                 QProcess::SeparateChannels);
@@ -615,7 +614,7 @@ bool FillData::Run(SourceList &sourcelist)
                     while (grabber_capabilities_proc.canReadLine())
                     {
                         QString capability
-                            = grabber_capabilities_proc.readLine();
+                            = grabber_capabilities_proc.readLine().simplified();
                         capabilites += capability + " ";
 
                         if (capability == "baseline")
