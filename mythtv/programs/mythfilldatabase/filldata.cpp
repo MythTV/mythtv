@@ -670,7 +670,7 @@ bool FillData::Run(SourceList &sourcelist)
                     grabber_method_proc
                         .setReadChannel(QProcess::StandardOutput);
                     (*it).xmltvgrabber_prefmethod =
-                        grabber_method_proc.readLine();
+                        grabber_method_proc.readLine().simplified();
                 }
                 else
                 {
