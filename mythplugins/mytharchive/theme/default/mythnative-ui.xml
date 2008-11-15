@@ -5,421 +5,183 @@ MythTV Archive GUI theme
 -->
 <mythuitheme>
 
-  <!--
+    <!--
       The export native wizard
-  -->
+    -->
 
-  <window name="exportnative_wizard">
+    <window name="exportnative">
 
-      <font name="title" face="Arial">
-          <color>#ffff00</color>
-          <dropcolor>#000000</dropcolor>
-          <size>24</size>
-          <shadow>3,3</shadow>
-          <bold>yes</bold>
-      </font>
+        <font name="title" from="basesmall">
+            <color>#ffff00</color>
+            <dropcolor>#000000</dropcolor>
+            <size>24</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
 
-      <font name="description" face="Arial">
-          <color>#ffffff</color>
-          <size>18</size>
-          <bold>no</bold>
-      </font>
+        <font name="description" from="basesmall">
+            <color>#ffffff</color>
+            <size>18</size>
+            <bold>no</bold>
+        </font>
 
-      <font name="detail" face="Arial">
-          <color>#ffffff</color>
-          <size>14</size>
-          <bold>no</bold>
-      </font>
+        <font name="detail" from="basesmall">
+            <color>#ffffff</color>
+            <size>14</size>
+            <bold>no</bold>
+        </font>
 
-      <font name="detailtitle" face="Arial">
-          <color>#ffff00</color>
-          <size>14</size>
-          <bold>no</bold>
-      </font>
+        <font name="detailtitle" from="basesmall">
+            <color>#ffff00</color>
+            <size>14</size>
+            <bold>no</bold>
+        </font>
 
-      <font name="label" face="Arial">
-          <color>#ffff00</color>
-          <size>16</size>
-          <bold>yes</bold>
-      </font>
+        <font name="label" from="basesmall">
+            <color>#ffff00</color>
+            <size>16</size>
+            <bold>yes</bold>
+        </font>
 
-      <font name="buttons" face="Arial">
-          <color>#ffffff</color>
-          <size>12</size>
-          <bold>yes</bold>
-      </font>
+        <font name="smallstatsfont" from="basesmall">
+            <color>#ffffff</color>
+            <size>10</size>
+            <bold>no</bold>
+        </font>
 
-      <font name="active" face="Arial">
-          <color>#ffffff</color>
-          <size>18</size>
-          <bold>yes</bold>
-      </font>
+        <font name="statserror" from="basesmall">
+            <color>#ff0000</color>
+            <size>10</size>
+            <bold>no</bold>
+        </font>
 
-      <font name="inactive" face="Arial">
-          <color>#9999cc</color>
-          <size>18</size>
-          <bold>yes</bold>
-      </font>
+        <imagetype name="topbgimage">
+            <area>25,60,750,300</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
 
-      <font name="smallstatsfont" face="Arial">
-          <color>#ffffff</color>
-          <size>10</size>
-          <bold>no</bold>
-      </font>
+        <textarea name="title" from="basetextarea">
+            <area>0,10,800,50</area>
+            <font>title</font>
+            <align>allcenter</align>
+            <value>Select Archive Items</value>
+        </textarea>
 
-      <font name="statserror" face="Arial">
-          <color>#ff0000</color>
-          <size>10</size>
-          <bold>no</bold>
-      </font>
+        <buttonlist name="archivelist" from="basebuttonlist">
+            <area>50,80,695,180</area>
+            <showarrow>yes</showarrow>
+        </buttonlist>
 
-      <container name="wizardpages">
-          <area>0,0,800,550</area>
+        <textarea name="nofiles" from="basetextarea">
+            <area>50,80,695,175</area>
+            <align>allcenter</align>
+            <font>description</font>
+            <value>No files are selected for archive</value>
+        </textarea>
 
-          <!--
-              ****************************
-              first page
-              ****************************
-          -->
+        <button name="addrecording_button" from="basebutton">
+            <position>150,270</position>
+        </button>
 
-          <!--
-              destination selector
-          -->
-          <image name="image" draworder="0">
-              <context>1</context>
-              <position>25,55</position>
-              <filename>trans-cr-background.png</filename>
-              <staticsize>750,310</staticsize>
-          </image>
+        <button name="addvideo_button" from="basebutton">
+            <position>490,270</position>
+        </button>
 
-          <textarea name="title" draworder="1" align="center">
-              <context>1</context>
-              <area>0,10,800,50</area>
-              <font>title</font>
-              <value>Select Destination</value>
-          </textarea>
+        <imagetype name="bottombgimage">
+            <area>25,330,650,240</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
 
-          <textarea name="title" draworder="1" align="left">
-              <context>1</context>
-              <area>45,70,500,50</area>
-              <font>label</font>
-              <value>Select Destination</value>
-          </textarea>
+        <textarea name="progtitle" from="basetextarea">
+            <area>40,340,440,30</area>
+            <font>detailtitle</font>
+            <value>title goes here</value>
+            <multiline>no</multiline>
+        </textarea>
 
-          <selector name="destination_selector" draworder="1">
-              <context>1</context>
-              <area>45,100,300,40</area>
-              <font>description</font>
-              <image function="on" filename="leftright_on.png"></image>
-              <image function="off" filename="leftright_off.png"></image>
-              <image function="pushed" filename="leftright_pushed.png"></image>
-          </selector>
+        <textarea name="progdatetime">
+            <area>490,340,165,30</area>
+            <font>detailtitle</font>
+            <align>right</align>
+            <value>sep 13, 2004 11:00 pm (1h 15m)</value>
+            <multiline>no</multiline>
+        </textarea>
 
-          <textarea name="destination_text" draworder="1">
-              <context>1</context>
-              <area>45,140,710,90</area>
-              <font>detail</font>
-              <value>description goes here.</value>
-              <multiline>yes</multiline>
-          </textarea>
+        <textarea name="progdescription" from="basetextarea">
+            <area>40,370,610,130</area>
+            <font>detail</font>
+            <value>description goes here.</value>
+            <multiline>yes</multiline>
+        </textarea>
 
-          <remoteedit name="filename_edit" draworder="1" align="left">
-              <context>1</context>
-              <area>45,220,525,35</area>
-              <font>description</font>
-          </remoteedit>
-          <textbutton name="find_button" draworder="1">
-              <position>590,215</position>
-              <context>1</context>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
-              <font>buttons</font>
-          </textbutton>
+        <textarea name="filesize" from="basetextarea">
+            <context>2</context>
+            <area>550,505,100,40</area>
+            <font>detail</font>
+            <align>right</align>
+            <value>x.xx Gb</value>
+            <multiline>yes</multiline>
+        </textarea>
 
-          <textarea name="freespace_label" draworder="1" align="left">
-              <context>1</context>
-              <area>45,280,150,50</area>
-              <font>label</font>
-              <value>Free Space:</value>
-          </textarea>
-          <textarea name="freespace_text" draworder="1" align="left">
-              <context>1</context>
-              <area>215,280,200,50</area>
-              <font>description</font>
-              <value>0.00Gb</value>
-          </textarea>
+        <progressbar name="size_bar">
+            <area>670,375,10,10</area>
+            <layout>vertical</layout>
+            <style>reveal</style>
+            <imagetype name="background">
+                <filename>ma_progressbar_background.png</filename>
+            </imagetype>
+            <imagetype name="progressimage">
+                <filename>ma_progressbar_fill.png</filename>
+            </imagetype>
+        </progressbar>
 
-          <image name="image" draworder="0">
-              <context>1</context>
-              <position>25,360</position>
-              <filename>trans-cr-background.png</filename>
-              <staticsize>750,190</staticsize>
-          </image>
+        <textarea name="maxsize" from="basetextarea">
+            <area>710,380,100,30</area>
+            <font>smallstatsfont</font>
+            <value>xxxxx mb</value>
+        </textarea>
 
-          <textarea name="title" draworder="1" align="left">
-              <context>1</context>
-              <area>80,375,500,50</area>
-              <font>description</font>
-              <value>Make ISO Image</value>
-          </textarea>
+        <textarea name="minsize" from="basetextarea">
+            <area>710,520,100,30</area>
+            <font>smallstatsfont</font>
+            <value>0 mb</value>
+        </textarea>
 
-          <checkbox name="makeisoimage_check" draworder="1">
-              <context>1</context>
-              <position>45,375</position>
-              <image function="checked" filename="checked.png"></image>
-              <image function="unchecked" filename="unchecked.png"></image>
-              <image function="checked_high" filename="checked_high.png"></image>
-              <image function="unchecked_high" filename="unchecked_high.png"></image>
-          </checkbox>
+        <textarea name="currentsize" from="basetextarea">
+            <area>710,445,100,30</area>
+            <font>smallstatsfont</font>
+            <value>xxxxx mb</value>
+        </textarea>
 
-          <textarea name="burntodvdr_text" draworder="2" align="left">
-              <context>1</context>
-              <area>80,420,500,50</area>
-              <font>description</font>
-              <value>Burn to DVD</value>
-          </textarea>
+        <textarea name="currentsize_error" from="basetextarea">
+            <area>710,445,100,30</area>
+            <font>statserror</font>
+            <value>xxxxx mb</value>
+        </textarea>
 
-          <checkbox name="burntodvdr_check" draworder="2">
-              <context>1</context>
-              <position>45,420</position>
-              <image function="checked" filename="checked.png"></image>
-              <image function="unchecked" filename="unchecked.png"></image>
-              <image function="checked_high" filename="checked_high.png"></image>
-              <image function="unchecked_high" filename="unchecked_high.png"></image>
-          </checkbox>
+        <!--
+            button area shown on all pages
+        -->
+        <button name="cancel_button" from="basebutton">
+            <position>35,550</position>
+        </button>
 
-          <textarea name="erasedvdrw_text" draworder="3" align="left">
-              <context>1</context>
-              <area>80,465,500,50</area>
-              <font>description</font>
-              <value>Force Overwrite of DVD-RW Media</value>
-          </textarea>
+        <button name="prev_button" from="basebutton">
+            <position>440,550</position>
+        </button>
 
-          <checkbox name="erasedvdrw_check" draworder="3">
-              <context>1</context>
-              <position>45,465</position>
-              <image function="checked" filename="checked.png"></image>
-              <image function="unchecked" filename="unchecked.png"></image>
-              <image function="checked_high" filename="checked_high.png"></image>
-              <image function="unchecked_high" filename="unchecked_high.png"></image>
-          </checkbox>
+        <button name="next_button" from="basebutton">
+            <position>610,550</position>
+        </button>
 
-          <!--
-              ****************************
-              second page
-              ****************************
-          -->
-
-          <image name="image" draworder="0">
-              <context>2</context>
-              <position>25,60</position>
-              <filename>trans-cr-background.png</filename>
-              <staticsize>750,300</staticsize>
-          </image>
-
-          <textarea name="title" draworder="1" align="center">
-              <context>2</context>
-              <area>0,10,800,50</area>
-              <font>title</font>
-              <value>Select Archive Items</value>
-          </textarea>
-
-          <listbtnarea name="archivelist"  draworder="1">
-              <area>50,80,695,175</area>
-              <context>2</context>
-              <gradient type="unselected" start="#505050" end="#000000" alpha="100">
-              </gradient>
-              <gradient type="selected" start="#52ca38" end="#349838" alpha="255">
-              </gradient>
-              <fcnfont name="active" function="active"></fcnfont>
-              <fcnfont name="inactive" function="inactive"></fcnfont>
-              <showscrollarrows>yes</showscrollarrows>
-              <showarrow>no</showarrow>
-          </listbtnarea>
-
-          <textarea name="nofiles" draworder="2" align="allcenter">
-              <context>2</context>
-              <area>50,80,695,175</area>
-              <font>description</font>
-              <value>No files are selected for archive</value>
-          </textarea>
-
-          <textbutton name="addrecording_button" draworder="1">
-              <position>150,270</position>
-              <context>2</context>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
-              <font>buttons</font>
-          </textbutton>
-
-          <textbutton name="addvideo_button" draworder="1">
-              <context>2</context>
-              <position>490,270</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
-              <font>buttons</font>
-          </textbutton>
-
-          <image name="image" draworder="0">
-              <context>2</context>
-              <position>25,330</position>
-              <filename>trans-cr-background.png</filename>
-              <staticsize>650,240</staticsize>
-          </image>
-
-          <textarea name="progtitle" draworder="3">
-              <context>2</context>
-              <area>40,340,440,30</area>
-              <font>detailtitle</font>
-              <value>title goes here</value>
-              <multiline>no</multiline>
-          </textarea>
-
-          <textarea name="progdatetime" draworder="4" align="right">
-              <context>2</context>
-              <area>490,340,165,30</area>
-              <font>detailtitle</font>
-              <value>sep 13, 2004 11:00 pm (1h 15m)</value>
-              <multiline>no</multiline>
-          </textarea>
-
-          <textarea name="progdescription" draworder="5">
-              <context>2</context>
-              <area>40,370,610,130</area>
-              <font>detail</font>
-              <value>description goes here.</value>
-              <multiline>yes</multiline>
-          </textarea>
-
-          <textarea name="filesize" draworder="5" align="right">
-              <context>2</context>
-              <area>550,505,100,40</area>
-              <font>detail</font>
-              <value>x.xx Gb</value>
-              <multiline>yes</multiline>
-          </textarea>
-
-          <statusbar name="size_bar" draworder="1" whitespace="5">
-              <context>2</context>
-              <container fleximage="no">ma_size_background.png</container>
-              <fill>ma_size_tick.png</fill>
-              <position>670,375</position>
-              <orientation>bottomtotop</orientation>
-          </statusbar>
-
-          <textarea name="maxsize" draworder="2">
-              <context>2</context>
-              <area>710,380,100,30</area>
-              <font>smallstatsfont</font>
-              <value>xxxxx mb</value>
-          </textarea>
-
-          <textarea name="minsize" draworder="3">
-              <context>2</context>
-              <area>710,520,100,30</area>
-              <font>smallstatsfont</font>
-              <value>0 mb</value>
-          </textarea>
-
-          <textarea name="currentsize" draworder="4">
-              <context>2</context>
-              <area>710,445,100,30</area>
-              <font>smallstatsfont</font>
-              <value>xxxxx mb</value>
-          </textarea>
-
-          <textarea name="currentsize_error" draworder="4">
-              <context>2</context>
-              <area>710,445,100,30</area>
-              <font>statserror</font>
-              <value>xxxxx mb</value>
-          </textarea>
-
-          <!--
-              ****************************
-              third page
-              ****************************
-          -->
-
-          <textarea name="title" draworder="1" align="center">
-              <context>3</context>
-              <area>0,10,800,50</area>
-              <font>title</font>
-              <value>Items Selected for Archive</value>
-          </textarea>
-
-          <image name="image" draworder="0">
-              <context>3</context>
-              <position>25,65</position>
-              <filename>trans-cr-background.png</filename>
-              <staticsize>750,255</staticsize>
-          </image>
-
-          <textarea name="title" draworder="2" align="center">
-              <context>3</context>
-              <area>50,65,690,50</area>
-              <font>detailtitle</font>
-              <value>Selected Items</value>
-          </textarea>
-
-          <listbtnarea name="selectedlist"  draworder="1">
-              <area>50,105,690,170</area>
-              <context>3</context>
-              <gradient type="unselected" start="#505050" end="#000000" alpha="100">
-              </gradient>
-              <gradient type="selected" start="#52ca38" end="#349838" alpha="255">
-              </gradient>
-              <fcnfont name="active" function="active"></fcnfont>
-              <fcnfont name="inactive" function="inactive"></fcnfont>
-              <showscrollarrows>yes</showscrollarrows>
-              <showarrow>no</showarrow>
-          </listbtnarea>
-
-      </container>
-
-      <!--
-          button area shown on all pages
-      -->
-      <container name="buttons">
-          <area>0,550,800,50</area>
-
-          <textbutton name="cancel_button" draworder="1">
-              <position>35,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
-              <font>buttons</font>
-          </textbutton>
-
-          <textbutton name="prev_button" draworder="1">
-              <position>440,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
-              <font>buttons</font>
-          </textbutton>
-
-          <textbutton name="next_button" draworder="1">
-              <position>610,0</position>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
-              <font>buttons</font>
-          </textbutton>
-
-      </container>
-
-  </window>
+    </window>
 
   <!--
       Import Native Wizard
    -->
 
   <window name="import_native_wizard">
-      <font name="title" face="Arial">
+      <font name="title" from="basesmall">
           <color>#ffff00</color>
           <dropcolor>#000000</dropcolor>
           <size>24</size>
@@ -427,37 +189,37 @@ MythTV Archive GUI theme
           <bold>yes</bold>
       </font>
 
-      <font name="buttons" face="Arial">
+      <font name="buttons" from="basesmall">
           <color>#ffffff</color>
           <size>12</size>
           <bold>yes</bold>
       </font>
 
-      <font name="edit" face="Arial">
+      <font name="edit" from="basesmall">
           <color>#ffffff</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="active" face="Arial">
+      <font name="active" from="basesmall">
           <color>#ffffff</color>
           <size>18</size>
           <bold>yes</bold>
       </font>
 
-      <font name="inactive" face="Arial">
+      <font name="inactive" from="basesmall">
           <color>#9999cc</color>
           <size>18</size>
           <bold>yes</bold>
       </font>
 
-      <font name="info" face="Arial">
+      <font name="info" from="basesmall">
           <color>#9999cc</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="label" face="Arial">
+      <font name="label" from="basesmall">
           <color>#ffff00</color>
           <dropcolor>#000000</dropcolor>
           <size>18</size>
@@ -465,13 +227,13 @@ MythTV Archive GUI theme
           <bold>yes</bold>
       </font>
 
-      <font name="detail" face="Arial">
+      <font name="detail" from="basesmall">
           <color>#ffffff</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="detailtitle" face="Arial">
+      <font name="detailtitle" from="basesmall">
           <color>#ffff00</color>
           <size>14</size>
           <bold>no</bold>

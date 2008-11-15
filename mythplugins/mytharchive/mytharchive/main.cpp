@@ -36,13 +36,14 @@ using namespace std;
 #include "videoselector.h"
 #include "dbcheck.h"
 #include "archiveutil.h"
+#include "selectdestination.h"
 
 #ifdef CREATE_DVD
     #include "mythburnwizard.h"
 #endif
 
 #ifdef CREATE_NATIVE
-    #include "exportnativewizard.h"
+    #include "exportnative.h"
     #include "importnativewizard.h"
 #endif
 
@@ -177,17 +178,15 @@ void runCreateArchive(void)
         return;
     }
 
-    // show the export native wizard
-    ExportNativeWizard *nativeWiz;
+    // show the select destination dialog
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    nativeWiz = new ExportNativeWizard(gContext->GetMainWindow(),
-                                 "exportnative_wizard", "mythnative-");
-    DialogCode res = nativeWiz->exec();
-    qApp->processEvents();
-    delete nativeWiz;
+    SelectDestination *dest = new SelectDestination(mainStack, "SelectDestination");
 
-    if (kDialogCodeRejected == res)
-        return;
+    if (dest->Create())
+        mainStack->AddScreen(dest);
+
+    return;
 
     // now show the log viewer
     LogViewer dialog(gContext->GetMainWindow(), "logviewer");

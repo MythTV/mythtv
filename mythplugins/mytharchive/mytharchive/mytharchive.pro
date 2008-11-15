@@ -2,7 +2,7 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 include (config.pro)
- 
+  
 !exists( config.pro ) {
    error(Missing config.pro: please run the configure script)
 }
@@ -25,11 +25,11 @@ INSTALLS += target
 ###############################################
 HEADERS += archivesettings.h logviewer.h fileselector.h
 HEADERS += recordingselector.h videoselector.h dbcheck.h
-HEADERS += archiveutil.h
+HEADERS += archiveutil.h selectdestination.h
 
 SOURCES += main.cpp archivesettings.cpp logviewer.cpp 
 SOURCES += fileselector.cpp recordingselector.cpp videoselector.cpp
-SOURCES += dbcheck.cpp archiveutil.cpp
+SOURCES += dbcheck.cpp archiveutil.cpp selectdestination.cpp
 
 #######################################
 # dvd creation support
@@ -76,9 +76,9 @@ createnative {
 
     INSTALLS += nativeuifiles 
 
-    HEADERS += exportnativewizard.h importnativewizard.h
+    HEADERS += exportnative.h importnativewizard.h
 
-    SOURCES += exportnativewizard.cpp importnativewizard.cpp
+    SOURCES += exportnative.cpp importnativewizard.cpp
 }
 
 #######################################

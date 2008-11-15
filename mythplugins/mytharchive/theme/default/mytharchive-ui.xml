@@ -1,16 +1,151 @@
 <!--
 
-MythTV Archive GUI theme
+Common MythArchive window definitions
 
 -->
 <mythuitheme>
+
+    <window name="selectdestination">
+
+        <font name="title" from="basesmall">
+            <color>#ffff00</color>
+            <dropcolor>#000000</dropcolor>
+            <size>24</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
+
+        <font name="description" from="basesmall">
+            <color>#ffffff</color>
+            <size>18</size>
+            <bold>no</bold>
+        </font>
+
+        <font name="detail" from="basesmall">
+            <color>#ffffff</color>
+            <size>14</size>
+            <bold>no</bold>
+        </font>
+
+        <font name="detailtitle" from="basesmall">
+            <color>#ffff00</color>
+            <size>14</size>
+            <bold>no</bold>
+        </font>
+
+        <font name="label" from="basesmall">
+            <color>#ffff00</color>
+            <size>16</size>
+            <bold>yes</bold>
+        </font>
+
+        <!--
+            destination selector
+        -->
+        <imagetype name="topbgimage">
+            <area>25,55,750,310</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
+
+        <textarea name="title1" from="basetextarea">
+            <area>0,10,800,50</area>
+            <font>title</font>
+            <align>center</align>
+            <value>Select Destination</value>
+        </textarea>
+
+        <textarea name="title2" from="basetextarea">
+            <area>45,70,500,50</area>
+            <font>label</font>
+            <value>Select Destination</value>
+        </textarea>
+
+        <buttonlist name="destination_selector" from="baseselector">
+            <position>45,110</position>
+        </buttonlist>
+
+        <textarea name="destination_text" from="basetextarea">
+            <area>45,160,710,90</area>
+            <font>detail</font>
+            <value>description goes here.</value>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <textedit name="filename_edit" from="basetextedit">
+            <position>45,210</position>
+        </textedit>
+
+        <button name="find_button" from="basebutton">
+            <position>450,215</position>
+        </button>
+
+        <textarea name="freespace_label" from="basetextarea">
+            <area>45,280,150,50</area>
+            <font>label</font>
+            <value>Free Space:</value>
+        </textarea>
+        <textarea name="freespace_text" from="basetextarea">
+            <context>1</context>
+            <area>215,280,200,50</area>
+            <font>description</font>
+            <value>0.00Gb</value>
+        </textarea>
+
+        <imagetype name="bottombgimage">
+            <area>25,360,750,190</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>80,375,500,50</area>
+            <font>description</font>
+            <value>Make ISO Image</value>
+        </textarea>
+
+        <checkbox name="makeisoimage_check" from="basecheckbox">
+            <position>45,375</position>
+        </checkbox>
+
+        <textarea name="burntodvdr_text" from="basetextarea">
+            <area>80,420,500,50</area>
+            <font>description</font>
+            <value>Burn to DVD</value>
+        </textarea>
+
+        <checkbox name="burntodvdr_check" from="basecheckbox">
+            <position>45,420</position>
+        </checkbox>
+
+        <textarea name="erasedvdrw_text" from="basetextarea">
+            <area>80,465,500,50</area>
+            <font>description</font>
+            <value>Force Overwrite of DVD-RW Media</value>
+        </textarea>
+
+        <checkbox name="erasedvdrw_check" from="basecheckbox">
+            <position>45,465</position>
+        </checkbox>
+
+        <button name="cancel_button" from="basebutton">
+            <position>35,550</position>
+        </button>
+
+        <button name="prev_button" from="basebutton">
+            <position>440,550</position>
+        </button>
+
+        <button name="next_button" from="basebutton">
+            <position>610,550</position>
+        </button>
+
+    </window>
 
   <!-- 
       Recording Selector
   -->
   <window name="recording_selector">
 
-      <font name="title" face="Arial">
+      <font name="title" from="basesmall">
           <color>#ffff00</color>
           <dropcolor>#000000</dropcolor>
           <size>24</size>
@@ -18,55 +153,55 @@ MythTV Archive GUI theme
           <bold>yes</bold>
       </font>
 
-      <font name="description" face="Arial">
+      <font name="description" from="basesmall">
           <color>#ffffff</color>
           <size>18</size>
           <bold>no</bold>
       </font>
 
-      <font name="detail" face="Arial">
+      <font name="detail" from="basesmall">
           <color>#ffffff</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="detailtitle" face="Arial">
+      <font name="detailtitle" from="basesmall">
           <color>#ffff00</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="label" face="Arial">
+      <font name="label" from="basesmall">
           <color>#ffff00</color>
           <size>16</size>
           <bold>yes</bold>
       </font>
 
-      <font name="buttons" face="Arial">
+      <font name="buttons" from="basesmall">
           <color>#ffffff</color>
           <size>12</size>
           <bold>yes</bold>
       </font>
 
-      <font name="active" face="Arial">
+      <font name="active" from="basesmall">
           <color>#ffffff</color>
           <size>18</size>
           <bold>yes</bold>
       </font>
 
-      <font name="inactive" face="Arial">
+      <font name="inactive" from="basesmall">
           <color>#9999cc</color>
           <size>18</size>
           <bold>yes</bold>
       </font>
 
-      <font name="smallstatsfont" face="Arial">
+      <font name="smallstatsfont" from="basesmall">
           <color>#ffffff</color>
           <size>10</size>
           <bold>no</bold>
       </font>
 
-      <font name="statserror" face="Arial">
+      <font name="statserror" from="basesmall">
           <color>#ff0000</color>
           <size>10</size>
           <bold>no</bold>
@@ -191,7 +326,7 @@ MythTV Archive GUI theme
   -->
 
   <window name="file_selector">
-      <font name="title" face="Arial">
+      <font name="title" from="basesmall">
           <color>#ffff00</color>
           <dropcolor>#000000</dropcolor>
           <size>24</size>
@@ -199,37 +334,37 @@ MythTV Archive GUI theme
           <bold>yes</bold>
       </font>
 
-      <font name="buttons" face="Arial">
+      <font name="buttons" from="basesmall">
           <color>#ffffff</color>
           <size>12</size>
           <bold>yes</bold>
       </font>
 
-      <font name="edit" face="Arial">
+      <font name="edit" from="basesmall">
           <color>#ffffff</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="active" face="Arial">
+      <font name="active" from="basesmall">
           <color>#ffffff</color>
           <size>18</size>
           <bold>yes</bold>
       </font>
 
-      <font name="inactive" face="Arial">
+      <font name="inactive" from="basesmall">
           <color>#9999cc</color>
           <size>18</size>
           <bold>yes</bold>
       </font>
 
-      <font name="info" face="Arial">
+      <font name="info" from="basesmall">
           <color>#9999cc</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="label" face="Arial">
+      <font name="label" from="basesmall">
           <color>#ffff00</color>
           <dropcolor>#000000</dropcolor>
           <size>18</size>
@@ -319,7 +454,7 @@ MythTV Archive GUI theme
   -->
   <window name="video_selector">
 
-      <font name="title" face="Arial">
+      <font name="title" from="basesmall">
           <color>#ffff00</color>
           <dropcolor>#000000</dropcolor>
           <size>24</size>
@@ -327,55 +462,55 @@ MythTV Archive GUI theme
           <bold>yes</bold>
       </font>
 
-      <font name="description" face="Arial">
+      <font name="description" from="basesmall">
           <color>#ffffff</color>
           <size>18</size>
           <bold>no</bold>
       </font>
 
-      <font name="detail" face="Arial">
+      <font name="detail" from="basesmall">
           <color>#ffffff</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="detailtitle" face="Arial">
+      <font name="detailtitle" from="basesmall">
           <color>#ffff00</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="label" face="Arial">
+      <font name="label" from="basesmall">
           <color>#ffff00</color>
           <size>16</size>
           <bold>yes</bold>
       </font>
 
-      <font name="buttons" face="Arial">
+      <font name="buttons" from="basesmall">
           <color>#ffffff</color>
           <size>12</size>
           <bold>yes</bold>
       </font>
 
-      <font name="active" face="Arial">
+      <font name="active" from="basesmall">
           <color>#ffffff</color>
           <size>18</size>
           <bold>yes</bold>
       </font>
 
-      <font name="inactive" face="Arial">
+      <font name="inactive" from="basesmall">
           <color>#9999cc</color>
           <size>18</size>
           <bold>yes</bold>
       </font>
 
-      <font name="smallstatsfont" face="Arial">
+      <font name="smallstatsfont" from="basesmall">
           <color>#ffffff</color>
           <size>10</size>
           <bold>no</bold>
       </font>
 
-      <font name="statserror" face="Arial">
+      <font name="statserror" from="basesmall">
           <color>#ff0000</color>
           <size>10</size>
           <bold>no</bold>

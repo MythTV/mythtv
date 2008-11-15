@@ -19,6 +19,8 @@ typedef enum
     AD_FILE   = 3
 } ARCHIVEDESTINATION;
 
+Q_DECLARE_METATYPE (ARCHIVEDESTINATION);
+
 typedef struct ArchiveDestination
 {
     ARCHIVEDESTINATION type;
