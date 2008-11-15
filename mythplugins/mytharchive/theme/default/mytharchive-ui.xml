@@ -145,7 +145,7 @@ Common MythArchive window definitions
   -->
   <window name="recording_selector">
 
-      <font name="title" from="basesmall">
+      <font name="title" face="Arial">
           <color>#ffff00</color>
           <dropcolor>#000000</dropcolor>
           <size>24</size>
@@ -153,55 +153,55 @@ Common MythArchive window definitions
           <bold>yes</bold>
       </font>
 
-      <font name="description" from="basesmall">
+      <font name="description" face="Arial">
           <color>#ffffff</color>
           <size>18</size>
           <bold>no</bold>
       </font>
 
-      <font name="detail" from="basesmall">
+      <font name="detail" face="Arial">
           <color>#ffffff</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="detailtitle" from="basesmall">
+      <font name="detailtitle" face="Arial">
           <color>#ffff00</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="label" from="basesmall">
+      <font name="label" face="Arial">
           <color>#ffff00</color>
           <size>16</size>
           <bold>yes</bold>
       </font>
 
-      <font name="buttons" from="basesmall">
+      <font name="buttons" face="Arial">
           <color>#ffffff</color>
           <size>12</size>
           <bold>yes</bold>
       </font>
 
-      <font name="active" from="basesmall">
+      <font name="active" face="Arial">
           <color>#ffffff</color>
           <size>18</size>
           <bold>yes</bold>
       </font>
 
-      <font name="inactive" from="basesmall">
+      <font name="inactive" face="Arial">
           <color>#9999cc</color>
           <size>18</size>
           <bold>yes</bold>
       </font>
 
-      <font name="smallstatsfont" from="basesmall">
+      <font name="smallstatsfont" face="Arial">
           <color>#ffffff</color>
           <size>10</size>
           <bold>no</bold>
       </font>
 
-      <font name="statserror" from="basesmall">
+      <font name="statserror" face="Arial">
           <color>#ff0000</color>
           <size>10</size>
           <bold>no</bold>
@@ -326,7 +326,7 @@ Common MythArchive window definitions
   -->
 
   <window name="file_selector">
-      <font name="title" from="basesmall">
+      <font name="title" face="Arial">
           <color>#ffff00</color>
           <dropcolor>#000000</dropcolor>
           <size>24</size>
@@ -334,37 +334,37 @@ Common MythArchive window definitions
           <bold>yes</bold>
       </font>
 
-      <font name="buttons" from="basesmall">
+      <font name="buttons" face="Arial">
           <color>#ffffff</color>
           <size>12</size>
           <bold>yes</bold>
       </font>
 
-      <font name="edit" from="basesmall">
+      <font name="edit" face="Arial">
           <color>#ffffff</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="active" from="basesmall">
+      <font name="active" face="Arial">
           <color>#ffffff</color>
           <size>18</size>
           <bold>yes</bold>
       </font>
 
-      <font name="inactive" from="basesmall">
+      <font name="inactive" face="Arial">
           <color>#9999cc</color>
           <size>18</size>
           <bold>yes</bold>
       </font>
 
-      <font name="info" from="basesmall">
+      <font name="info" face="Arial">
           <color>#9999cc</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="label" from="basesmall">
+      <font name="label" face="Arial">
           <color>#ffff00</color>
           <dropcolor>#000000</dropcolor>
           <size>18</size>
@@ -454,7 +454,7 @@ Common MythArchive window definitions
   -->
   <window name="video_selector">
 
-      <font name="title" from="basesmall">
+      <font name="title" face="Arial">
           <color>#ffff00</color>
           <dropcolor>#000000</dropcolor>
           <size>24</size>
@@ -462,55 +462,55 @@ Common MythArchive window definitions
           <bold>yes</bold>
       </font>
 
-      <font name="description" from="basesmall">
+      <font name="description" face="Arial">
           <color>#ffffff</color>
           <size>18</size>
           <bold>no</bold>
       </font>
 
-      <font name="detail" from="basesmall">
+      <font name="detail" face="Arial">
           <color>#ffffff</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="detailtitle" from="basesmall">
+      <font name="detailtitle" face="Arial">
           <color>#ffff00</color>
           <size>14</size>
           <bold>no</bold>
       </font>
 
-      <font name="label" from="basesmall">
+      <font name="label" face="Arial">
           <color>#ffff00</color>
           <size>16</size>
           <bold>yes</bold>
       </font>
 
-      <font name="buttons" from="basesmall">
+      <font name="buttons" face="Arial">
           <color>#ffffff</color>
           <size>12</size>
           <bold>yes</bold>
       </font>
 
-      <font name="active" from="basesmall">
+      <font name="active" face="Arial">
           <color>#ffffff</color>
           <size>18</size>
           <bold>yes</bold>
       </font>
 
-      <font name="inactive" from="basesmall">
+      <font name="inactive" face="Arial">
           <color>#9999cc</color>
           <size>18</size>
           <bold>yes</bold>
       </font>
 
-      <font name="smallstatsfont" from="basesmall">
+      <font name="smallstatsfont" face="Arial">
           <color>#ffffff</color>
           <size>10</size>
           <bold>no</bold>
       </font>
 
-      <font name="statserror" from="basesmall">
+      <font name="statserror" face="Arial">
           <color>#ff0000</color>
           <size>10</size>
           <bold>no</bold>
