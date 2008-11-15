@@ -293,7 +293,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
             // Sometimes the space reported for an NFS mounted dir is slightly
             // different than when it is locally mounted because of block sizes
             if (it2->fsID == -1 && !HasfsID(it2->dirID) &&
-                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 16) &&
+                (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 32) &&
                 ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
                  <= maxWriteFiveSec))
             {
