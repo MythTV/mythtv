@@ -1,9 +1,9 @@
-#include <qapplication.h>
-#include <qdom.h>
-#include <qstring.h>
-#include <qmap.h>
-#include <qstringlist.h>
-#include <qtextstream.h>
+#include <QApplication>
+#include <QDomDocument>
+#include <QString>
+#include <QMap>
+#include <QStringList>
+#include <q3textstream.h>
 #include <qfile.h>
 #include <qfileinfo.h>
 #include <iostream>
@@ -28,7 +28,7 @@ QString getFirstText(QDomElement element)
 QString infile = "";
 //QString outfilebase = "";
 QFile fstringout;
-QTextStream fdataout;
+Q3TextStream fdataout;
 //QMap<QString, QFile *> transFiles;
 QString laststring = "";
 
@@ -48,8 +48,8 @@ void parseElement(QDomElement &element)
                 {
                     laststring = getFirstText(info);
                     laststring.replace(QRegExp("\""), QString("\\\""));
-                    fdataout << "    ThemeUI::tr(\"" << laststring.utf8() 
-                             << "\");\n";
+                    fdataout << QString("    ThemeUI::tr(\"%1\");\n")
+                                            .arg(laststring.toUtf8().data());
                 }
                 else
                 {
@@ -87,7 +87,7 @@ void parseElement(QDomElement &element)
     }
 }
 
-                    
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv, false);
@@ -110,25 +110,25 @@ int main(int argc, char *argv[])
     QDomDocument doc;
     QFile fin(infile);
 
-    if (!fin.open(IO_ReadOnly))
+    if (!fin.open(QIODevice::ReadOnly))
     {
-        cerr << "can't open " << infile << endl;
+//         cerr << "can't open " << infile << endl;
         exit(-1);
     }
 
     QFileInfo ininfo(infile);
-    
+
     fstringout.setName("themestrings.h");
 
-    if (!fstringout.open(IO_WriteOnly))
+    if (!fstringout.open(QIODevice::WriteOnly))
     {
-        cerr << "can't open " << ininfo.fileName() << " for writing\n";
+//         cerr << "can't open " << ininfo.fileName() << " for writing\n";
         exit(-1);
     }
 
     fdataout.setDevice(&fstringout);
 
-    fdataout << "void strings_null() {\n";
+    fdataout << QString("void strings_null() {\n");
 
     QString errorMsg;
     int errorLine = 0;
@@ -136,9 +136,9 @@ int main(int argc, char *argv[])
 
     if (!doc.setContent(&fin, false, &errorMsg, &errorLine, &errorColumn))
     {
-        cerr << "Error parsing: " << infile << endl;
-        cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
-        cerr << errorMsg << endl;
+//         cerr << "Error parsing: " << infile << endl;
+//         cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
+//         cerr << errorMsg << endl;
         fin.close();
         return -1;
     }
@@ -156,8 +156,8 @@ int main(int argc, char *argv[])
         }
         n = n.nextSibling();
     }
- 
-    fdataout << "}\n";
+
+    fdataout << QString("}\n");
     fstringout.close();
 
 //    QMap<QString, QFile *>::Iterator it;
