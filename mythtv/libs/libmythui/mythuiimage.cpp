@@ -164,7 +164,7 @@ void MythUIImage::SetImage(MythImage *img)
 
     img->UpRef();
 
-    if (m_isReflected)
+    if (m_isReflected && !img->IsReflected())
         img->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
                         m_reflectLength);
 
@@ -206,7 +206,7 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
         MythImage *im = (*it);
         im->UpRef();
 
-        if (m_isReflected)
+        if (m_isReflected && !im->IsReflected())
             im->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
                          m_reflectLength);
 
