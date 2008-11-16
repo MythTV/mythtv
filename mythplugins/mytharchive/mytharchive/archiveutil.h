@@ -43,7 +43,7 @@ typedef struct ThumbImage
 {
     QString caption;
     QString filename;
-    int64_t frame;
+    qint64  frame;
 } ThumbImage;
 
 typedef struct
