@@ -29,6 +29,9 @@ class Weather : public MythScreenType
 
     bool UpdateData();
 
+  public slots:
+    void setupScreens();
+
   private slots:
     void update_timeout() {}
     void nextpage_timeout();
@@ -40,9 +43,9 @@ class Weather : public MythScreenType
     void screenReady(WeatherScreen *ws);
 
   private:
-    void setupScreens();
     WeatherScreen *nextScreen();
     WeatherScreen *prevScreen();
+    void clearScreens();
     void showScreen(WeatherScreen *ws);
     void hideScreen(void);
 
@@ -59,6 +62,8 @@ class Weather : public MythScreenType
     QTimer *m_nextpage_Timer;
 
     bool m_gotDataHook;
+    
+    bool m_firstSetup;
 
     bool m_createdSrcMan;
     SourceManager *m_srcMan;

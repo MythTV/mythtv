@@ -24,6 +24,7 @@ Weather::Weather(MythScreenStack *parent, const char *name, SourceManager *srcMa
     m_paused = false;
 
     m_firstRun = true;
+    m_firstSetup = true;
 
     if (!srcMan)
     {
@@ -52,14 +53,7 @@ Weather::~Weather()
     if (m_createdSrcMan)
         delete m_srcMan;
 
-    for (WeatherScreen *screen = m_screens.first(); screen;
-         screen = m_screens.next())
-    {
-        if (screen)
-            delete screen;
-    }
-
-    m_screens.clear();
+    clearScreens();
 
     if (m_weatherStack)
         GetMythMainWindow()->PopScreenStack();
@@ -94,17 +88,40 @@ bool Weather::Create()
         m_pauseText->Hide();
     }
 
-    setupScreens();
-
     return true;
+}
+
+void Weather::clearScreens()
+{
+    m_currScreen = NULL;
+
+    while (m_weatherStack->TotalScreens() > 0)
+    {
+        m_weatherStack->PopScreen(false,false);
+    }
+
+    for (WeatherScreen *screen = m_screens.first(); screen;
+         screen = m_screens.next())
+    {
+        if (screen)
+            delete screen;
+    }
+
+    m_screens.clear();    
 }
 
 void Weather::setupScreens()
 {
-    // Deletes screen objects
-    m_screens.clear();
-    // it points to an element of screens, which was just deleted;
-    m_currScreen = NULL;
+    // Delete any existing screens
+    clearScreens();
+    
+    m_paused = false;
+    m_pauseText->Hide();
+    
+    // Refresh sources
+    m_srcMan->clearSources();
+    m_srcMan->findScriptsDB();
+    m_srcMan->setupSources();
 
     MSqlQuery db(MSqlQuery::InitCon());
     QString query =
@@ -120,50 +137,53 @@ void Weather::setupScreens()
 
     if (!db.size())
     {
-        m_srcMan->clearSources();
-        m_srcMan->findScripts();
+        if (m_firstSetup)
+        {
+            // If no screens exist, run the setup
+            MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+            ScreenSetup *ssetup = new ScreenSetup(mainStack, "weatherscreensetup",
+                                                  m_srcMan);
 
-        ScreenSetup *ssetup = new ScreenSetup(mainStack, "weatherscreensetup",
-                                              m_srcMan);
+            connect(ssetup, SIGNAL(Exiting()), this, SLOT(setupScreens()));
 
-        if (ssetup->Create())
-            mainStack->AddScreen(ssetup);
+            if (ssetup->Create())
+            {
+                mainStack->AddScreen(ssetup);
+            }
+            
+            m_firstSetup = false;
+        }
+        else
+        {
+            Close();
+        }
+    }
+    else
+    {
+        while (db.next())
+        {
+            int id = db.value(0).toInt();
+            QString container = db.value(1).toString();
+            units_t units = db.value(2).toUInt();
+            uint draworder = db.value(3).toUInt();
 
-        m_srcMan->clearSources();
-        m_srcMan->findScriptsDB();
-        m_srcMan->setupSources();
+            ScreenListInfo *screenListInfo = m_allScreens[container];
+
+            WeatherScreen *ws = WeatherScreen::loadScreen(m_weatherStack, screenListInfo, id);
+            if (!ws->Create())
+                continue;
+
+            ws->setUnits(units);
+            ws->setInUse(true);
+            m_screens.insert(draworder, ws);
+            connect(ws, SIGNAL(screenReady(WeatherScreen *)), this,
+                    SLOT(screenReady(WeatherScreen *)));
+            m_srcMan->connectScreen(id, ws);
+        }
+        
         m_srcMan->startTimers();
         m_srcMan->doUpdate();
-    }
-
-    // re-execute
-    if (!db.exec())
-    {
-        VERBOSE(VB_IMPORTANT, db.lastError().text());
-        return;
-    }
-
-    while (db.next())
-    {
-        int id = db.value(0).toInt();
-        QString container = db.value(1).toString();
-        units_t units = db.value(2).toUInt();
-        uint draworder = db.value(3).toUInt();
-
-        ScreenListInfo *screenListInfo = m_allScreens[container];
-
-        WeatherScreen *ws = WeatherScreen::loadScreen(m_weatherStack, screenListInfo, id);
-        if (!ws->Create())
-            continue;
-
-        ws->setUnits(units);
-        ws->setInUse(true);
-        m_screens.insert(draworder, ws);
-        connect(ws, SIGNAL(screenReady(WeatherScreen *)), this,
-                SLOT(screenReady(WeatherScreen *)));
-        m_srcMan->connectScreen(id, ws);
     }
 }
 
@@ -288,37 +308,38 @@ void Weather::setupPage()
     ScreenSetup *ssetup = new ScreenSetup(mainStack, "weatherscreensetup",
                                             m_srcMan);
 
-    if (ssetup->Create())
-        mainStack->AddScreen(ssetup);
+    connect(ssetup, SIGNAL(Exiting()), this, SLOT(setupScreens()));
 
+    if (ssetup->Create())
+    {
+        clearScreens();
+        mainStack->AddScreen(ssetup);
+    }
+        
     m_firstRun = true;
-    m_srcMan->clearSources();
-    m_srcMan->findScriptsDB();
-    m_srcMan->setupSources();
-    setupScreens();
-    m_srcMan->startTimers();
-    m_srcMan->doUpdate();
 }
 
 void Weather::cursorRight()
 {
     WeatherScreen *ws = nextScreen();
-    if (ws->canShowScreen())
+    if (ws && ws->canShowScreen())
     {
         hideScreen();
         showScreen(ws);
-        holdPage();
+        if (!m_paused)
+            m_nextpage_Timer->start((int)(1000 * m_nextpageInterval)); 
     }
 }
 
 void Weather::cursorLeft()
 {
     WeatherScreen *ws = prevScreen();
-    if (ws->canShowScreen())
+    if (ws && ws->canShowScreen())
     {
         hideScreen();
         showScreen(ws);
-        holdPage();
+        if (!m_paused)
+            m_nextpage_Timer->start((int)(1000 * m_nextpageInterval)); 
     }
 }
 

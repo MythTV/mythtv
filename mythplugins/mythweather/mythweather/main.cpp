@@ -63,7 +63,10 @@ void runWeather()
     Weather *weather = new Weather(mainStack, "mythweather", srcMan);
 
     if (weather->Create())
+    {
         mainStack->AddScreen(weather);
+        weather->setupScreens();
+    }
 }
 
 int mythplugin_run()

@@ -38,6 +38,8 @@ struct ScreenListInfo
     bool multiLoc;
 };
 
+Q_DECLARE_METATYPE(ScreenListInfo *); 
+
 typedef QMap<QString, ScreenListInfo *> ScreenListMap;
 
 ScreenListMap loadScreens();

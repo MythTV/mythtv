@@ -497,13 +497,13 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
 
         menuPopup->SetReturnEvent(this, "options");
 
-        menuPopup->AddButton(tr("Move Up"), selected);
-        menuPopup->AddButton(tr("Move Down"), selected);
-        menuPopup->AddButton(tr("Remove"), selected);
-        menuPopup->AddButton(tr("Change Location"), selected);
+        menuPopup->AddButton(tr("Move Up"), qVariantFromValue(selected));
+        menuPopup->AddButton(tr("Move Down"), qVariantFromValue(selected));
+        menuPopup->AddButton(tr("Remove"), qVariantFromValue(selected));
+        menuPopup->AddButton(tr("Change Location"), qVariantFromValue(selected));
         if (si->hasUnits)
-            menuPopup->AddButton(tr("Change Units"), selected);
-        menuPopup->AddButton(tr("Cancel"), selected);
+            menuPopup->AddButton(tr("Change Units"), qVariantFromValue(selected));
+        menuPopup->AddButton(tr("Cancel"), qVariantFromValue(selected));
 
     }
     else if (GetFocusWidget() == m_inactiveList)
@@ -572,13 +572,12 @@ void ScreenSetup::showUnitsPopup(const QString &name, ScreenListInfo *si)
 
     menuPopup->SetReturnEvent(this, "units");
 
-    menuPopup->AddButton(tr("English Units"), si);
-    menuPopup->AddButton(tr("SI Units"), si);
+    menuPopup->AddButton(tr("English Units"), qVariantFromValue(si));
+    menuPopup->AddButton(tr("SI Units"), qVariantFromValue(si));
 }
 
 void ScreenSetup::deleteScreen()
 {
-
     if (m_activeList->GetItemCurrent())
         delete m_activeList->GetItemCurrent();
 
@@ -602,7 +601,7 @@ void ScreenSetup::customEvent(QEvent *event)
 
         if (resultid == "options")
         {
-            MythUIButtonListItem *item = (MythUIButtonListItem *)dce->GetResultData();
+            MythUIButtonListItem *item = qVariantValue<MythUIButtonListItem *>(dce->GetData()); 
             ScreenListInfo *si = (ScreenListInfo *) item->getData();
 
             if (buttonnum == 0)
@@ -629,20 +628,23 @@ void ScreenSetup::customEvent(QEvent *event)
         }
         else if (resultid == "units")
         {
-            ScreenListInfo *si = (ScreenListInfo *)dce->GetResultData();
-            if (buttonnum == 0)
+            if (buttonnum > -1)
             {
-                si->units = ENG_UNITS;
+                ScreenListInfo *si = qVariantValue<ScreenListInfo *>(dce->GetData()); 
+                if (buttonnum == 0)
+                {
+                    si->units = ENG_UNITS;
+                }
+                else if (buttonnum == 1)
+                {
+                    si->units = SI_UNITS;
+                }
+                doLocationDialog(si);
             }
-            else if (buttonnum == 1)
-            {
-                si->units = SI_UNITS;
-            }
-            doLocationDialog(si);
         }
         else if (resultid == "location")
         {
-            ScreenListInfo *si = (ScreenListInfo *)dce->GetResultData();
+            ScreenListInfo *si = qVariantValue<ScreenListInfo *>(dce->GetData());
             Q3DictIterator<TypeListInfo> it(si->types);
             for (; it.current(); ++it)
             {
@@ -807,16 +809,22 @@ void SourceSetup::saveData()
 
 void SourceSetup::updateSpinboxUpdate()
 {
-    SourceListInfo *si =
-            (SourceListInfo *) m_sourceList->GetItemCurrent()->getData();
-    si->update_timeout = m_updateSpinbox->GetItemCurrent()->text().toInt();
+    if (m_sourceList->GetItemCurrent())
+    {
+        SourceListInfo *si =
+                (SourceListInfo *) m_sourceList->GetItemCurrent()->getData();
+        si->update_timeout = m_updateSpinbox->GetItemCurrent()->text().toInt();
+    }
 }
 
 void SourceSetup::retrieveSpinboxUpdate()
 {
-    SourceListInfo *si =
-            (SourceListInfo *) m_sourceList->GetItemCurrent()->getData();
-    si->retrieve_timeout = m_retrieveSpinbox->GetItemCurrent()->text().toInt();
+    if (m_sourceList->GetItemCurrent())
+    {
+        SourceListInfo *si =
+                (SourceListInfo *) m_sourceList->GetItemCurrent()->getData();
+        si->retrieve_timeout = m_retrieveSpinbox->GetItemCurrent()->text().toInt();
+    }
 }
 
 void SourceSetup::sourceListItemSelected(MythUIButtonListItem *item)
@@ -998,7 +1006,7 @@ void LocationDialog::itemClicked(MythUIButtonListItem *item)
     }
 
     DialogCompletionEvent *dce =
-                new DialogCompletionEvent("location", 0, "", m_screenListInfo);
+                new DialogCompletionEvent("location", 0, "", qVariantFromValue(m_screenListInfo));
     QApplication::postEvent(m_retScreen, dce);
 
     Close();
