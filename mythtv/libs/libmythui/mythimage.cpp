@@ -14,9 +14,9 @@ MythImage::MythImage(MythPainter *parent)
     assert(parent);
 
     m_Parent = parent;
-    m_Changed = false;
-
     m_RefCount = 0;
+
+    m_Changed = false;
 
     m_isGradient = false;
     m_gradBegin = QColor("#000000");
@@ -40,11 +40,18 @@ MythImage::~MythImage()
 void MythImage::UpRef(void)
 {
     m_RefCount++;
+
+//     if (m_RefCount > 0)
+//         GetMythUI()->ExcludeFromCacheSize(this);
 }
 
 bool MythImage::DownRef(void)
 {
     m_RefCount--;
+
+//     if (m_RefCount == 1)
+//         GetMythUI()->IncludeInCacheSize(this);
+
     if (m_RefCount < 0)
     {
         delete this;
@@ -66,7 +73,7 @@ void MythImage::Assign(const QPixmap &pix)
 
 void MythImage::Resize(const QSize &newSize, bool preserveAspect)
 {
-    if (size() == newSize)
+    if ((size() == newSize) && !isNull())
         return;
 
     if (m_isGradient)
@@ -183,26 +190,15 @@ MythImage *MythImage::FromQImage(QImage **img)
     return ret;
 }
 
-// TODO : Almost time to looad to get rid of the LoadScaleXXX routines altogether?
-bool MythImage::LoadNoScale(const QString &filename)
-{
-    QImage *im = new QImage(filename);
-
-    SetFileName(filename);
-    if (im)
-    {
-        Assign(*im);
-        delete im;
-        return true;
-    }
-
-    return false;
-}
-
 // FIXME: Get rid of LoadScaleImage
-bool MythImage::Load(const QString &filename)
+bool MythImage::Load(const QString &filename, bool scale)
 {
-    QImage *im = GetMythUI()->LoadScaleImage(filename);
+    QImage *im = NULL;
+    if (scale)
+        im = GetMythUI()->LoadScaleImage(filename);
+    else
+        im = new QImage(filename);
+
     SetFileName(filename);
     if (im)
     {

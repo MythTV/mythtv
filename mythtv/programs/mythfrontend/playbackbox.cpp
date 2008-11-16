@@ -4805,7 +4805,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
     QImage *image = NULL;
     if (!IsGeneratingPreview(filename, true))
-        image = gContext->CacheRemotePixmap(filename, refreshPixmap);
+        image = (QImage*)gContext->CacheRemotePixmap(filename, refreshPixmap);
 
     // If the image is not available remotely either, we need to generate it.
     if (!image && !IsGeneratingPreview(filename))

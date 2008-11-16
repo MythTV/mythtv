@@ -22,13 +22,13 @@ class MPUBLIC MythUIImage : public MythUIType
     MythUIImage(MythUIType *parent, const QString &name);
    ~MythUIImage();
 
-    // doesn't load
+    // Must be followed by a call to Load() to load the image.
     void SetFilename(const QString &filename);
     void SetFilepattern(const QString &filepattern, int low, int high);
 
     void SetImageCount(int low, int high);
-    void SetImage(MythImage *img);
-    void SetImages(QVector<MythImage *> &images);
+    void SetImage(MythImage *img) __attribute__ ((deprecated));
+    void SetImages(QVector<MythImage *> &images) __attribute__ ((deprecated));
 
     QString GenImageLabel(const QString &filename, int w, int h);
     QString GenImageLabel(int w, int h);

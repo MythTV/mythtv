@@ -22,8 +22,6 @@
 using namespace std;
 
 class QFont;
-class QImage;
-class QPixmap;
 
 class Settings;
 class MythMainWindow;
@@ -31,6 +29,7 @@ class MythPluginManager;
 class MDBManager;
 class MythContextPrivate;
 class UPnp;
+class MythImage;
 struct DatabaseParams;
 
 /// These are the database logging priorities used for filterig the logs.
@@ -159,7 +158,7 @@ class MPUBLIC MythContext : public QObject, public MythObservable,
     bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false, 
                                bool block = true);
 
-    QImage *CacheRemotePixmap(const QString &url, bool reCache = false);
+    MythImage* CacheRemotePixmap(const QString &url, bool reCache = false);
 
     void SetMainWindow(MythMainWindow *mainwin);
     MythMainWindow *GetMainWindow(void);

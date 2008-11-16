@@ -349,10 +349,7 @@ bool MythUIImage::Load(void)
                                         m_gradientDirection);
         }
         else
-        {
             bNeedLoad = true;
-            image = GetMythPainter()->GetFormatImage();
-        }
 
         int w = 0;
         int h = 0;
@@ -361,7 +358,6 @@ bool MythUIImage::Load(void)
         bool bFoundInCache = false;
 
         QString imagelabel;
-        QString dstfile;
 
         if (!m_ForceSize.isNull())
         {
@@ -391,26 +387,22 @@ bool MythUIImage::Load(void)
 
             imagelabel = GenImageLabel(filename, w, h);
 
-            dstfile = GetMythUI()->GetThemeCacheDir() + "/" + imagelabel;
-
-            QFile cachecheck(dstfile);
-            if (!cachecheck.exists())
+            image = GetMythUI()->LoadCacheImage(filename, imagelabel);
+            if (image)
             {
-                if (!image->Load(filename))
-                {
-                    //VERBOSE(VB_FILE, QString("MythUIImage::Load Could not load :%1:").arg(filename));
-                    image->DownRef();
-                    SetRedraw();
-                    return false;
+                VERBOSE(VB_FILE, QString("MythUIImage::Load found in cache :%1:").arg(imagelabel));
+                image->UpRef();
+                bFoundInCache = true;
                 }
-            }
             else
             {
-                VERBOSE(VB_FILE, QString("MythUIImage::Load found in cache :%1:").arg(dstfile));
-                bFoundInCache = true;
-                if (!image->LoadNoScale(dstfile))
+                VERBOSE(VB_FILE, QString("MythUIImage::Load Not Found in "
+                                         "cache. Loading Directly :%1:")
+                                         .arg(filename));
+                image = GetMythPainter()->GetFormatImage();
+                if (!image->Load(filename))
                 {
-                    //VERBOSE(VB_FILE, QString("MythUIImage::LoadNoScale = Could not load :%1: from cache").arg(filename));
+                    VERBOSE(VB_FILE, QString("MythUIImage::Load Could not load :%1:").arg(filename));
                     image->DownRef();
                     SetRedraw();
                     return false;
@@ -418,18 +410,14 @@ bool MythUIImage::Load(void)
             }
         }
         else
-        {
             imagelabel = GenImageLabel(w,h);
-        }
 
         if (!bFoundInCache && m_isReflected)
             image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
                         m_reflectLength);
 
         if (!bFoundInCache && bForceResize)
-        {
             image->Resize(QSize(w, h), m_preserveAspect);
-        }
         else
         {
             QSize aSize = m_Area.size();
@@ -437,19 +425,9 @@ bool MythUIImage::Load(void)
             SetSize(aSize);
         }
 
-        //Save scaled copy to disk, and cache
+        // Save scaled copy to cache
         if ((!bFoundInCache) && (bNeedLoad))
-        {
-            VERBOSE(VB_FILE, QString("MythUIImage::Load Saved to Cache (%1)").arg(dstfile));
-
-            // This would probably be better off somewhere else before any
-            // Load() calls at all.
-            QDir themedir(GetMythUI()->GetThemeCacheDir());
-            if (!themedir.exists())
-                themedir.mkdir(GetMythUI()->GetThemeCacheDir());
-
-            image->save(dstfile,"PNG");
-        }
+            GetMythUI()->CacheImage(imagelabel, image);
 
         image->SetChanged();
 
@@ -462,6 +440,7 @@ bool MythUIImage::Load(void)
     m_LastDisplay = QTime::currentTime();
     SetRedraw();
 
+    //VERBOSE(VB_FILE, QString("MythUIImage::Load  done :%1:").arg(t1.elapsed()));
     return true;
 }
 

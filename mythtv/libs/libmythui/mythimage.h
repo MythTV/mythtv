@@ -31,8 +31,7 @@ class MPUBLIC MythImage : public QImage
     // *NOTE* *DELETES* img!
     static MythImage *FromQImage(QImage **img);
 
-    bool LoadNoScale(const QString &filename);
-    bool Load(const QString &filename);
+    bool Load(const QString &filename, bool scale = true);
 
     void Resize(const QSize &newSize, bool preserveAspect = false);
     void Reflect(ReflectAxis axis, int shear, int scale, int length);

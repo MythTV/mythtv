@@ -35,6 +35,7 @@
 #include "libmythui/mythdialogbox.h"
 #include "libmythui/mythmainwindow.h"
 #include "libmythui/mythuihelper.h"
+#include "libmythui/mythimage.h"
 #include "libmythupnp/mythxmlclient.h"
 #include "libmythupnp/upnp.h"
 
@@ -1666,15 +1667,15 @@ double MythContext::GetFloatSettingOnHost(
     return d->m_database->GetFloatSettingOnHost(key, host, defaultval);
 }
 
-QImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
+MythImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
 {
     QUrl qurl = url;
     if (qurl.host().isEmpty())
         return NULL;
 
-    QImage *im;
+    MythImage *im = d->m_ui->GetImageFromCache(url);
 
-    if (!reCache && ((im = d->m_ui->GetImageFromCache(url))))
+    if (!reCache && im)
         return im;
 
     RemoteFile *rf = new RemoteFile(url, false, 0);
@@ -1686,8 +1687,9 @@ QImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
 
     if (ret)
     {
-        QImage image = QImage::fromData(data);
-        if (image.width() > 0)
+        MythImage *image = GetMythPainter()->GetFormatImage();
+        image->Assign(QImage::fromData(data));
+        if (image->width() > 0)
             return d->m_ui->CacheImage(url, image);
     }
 

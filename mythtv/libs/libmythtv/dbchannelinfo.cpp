@@ -72,9 +72,8 @@ bool PixmapChannel::LoadChannelIcon(uint size) const
 
         url += icon;
 
-        QImage *cached = gContext->CacheRemotePixmap(url);
-        if (cached)
-            tempimage = *cached;
+        MythImage *im = gContext->CacheRemotePixmap(url);
+        tempimage = *(QImage*)im;
     }
 
     if (tempimage.width() > 0)

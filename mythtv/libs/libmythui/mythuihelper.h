@@ -3,10 +3,12 @@
 
 #include <QString>
 #include <QFont>
+#include <QMutex>
 
 #include "mythexp.h"
 
 class MythUIHelperPrivate;
+class MythImage;
 class QImage;
 class QWidget;
 class Settings;
@@ -32,8 +34,12 @@ class MPUBLIC MythUIHelper
     void LoadQtConfig(void);
     void UpdateImageCache(void);
 
-    QImage *GetImageFromCache(const QString &url);
-    QImage *CacheImage(const QString &url, QImage &im);
+    MythImage *GetImageFromCache(const QString &url);
+    MythImage *CacheImage(const QString &url, MythImage *im,
+                          bool nodisk = false);
+    void RemoveFromCacheByURL(const QString &url);
+    void RemoveFromCacheByFile(const QString &fname);
+    bool IsImageInCache(const QString &url);
     QString GetThemeCacheDir(void);
 
     Settings *qtconfig(void);
@@ -56,6 +62,7 @@ class MPUBLIC MythUIHelper
  
     QPixmap *LoadScalePixmap(QString filename, bool fromcache = true);
     QImage *LoadScaleImage(QString filename, bool fromcache = true);
+    MythImage *LoadCacheImage(QString srcfile, QString label);
 
     void ThemeWidget(QWidget *widget);
 
@@ -115,6 +122,8 @@ class MPUBLIC MythUIHelper
     void RemoveCacheDir(const QString &dirname);
 
     MythUIHelperPrivate *d;
+
+    size_t m_cacheSize;
 };
 
 MPUBLIC MythUIHelper *GetMythUI();
