@@ -155,7 +155,7 @@
                     <value>Medium</value>
                 </textarea>
             </state>
-            <state name="High" from="High">
+            <state name="High" from="Lowest">
                 <imagetype name="icon">
                     <filename>mv_level_high.png</filename>
                 </imagetype>
