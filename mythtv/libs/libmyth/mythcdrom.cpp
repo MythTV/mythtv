@@ -47,20 +47,6 @@ MythCDROM::MythCDROM(QObject* par, const char* DevicePath, bool SuperMount,
 {
 }
 
-bool MythCDROM::openDevice()
-{
-    if (MythMediaDevice::openDevice()) 
-    {
-        // If allow eject is on, unlock the door.
-        if (m_AllowEject)
-            unlock();
-        
-        return true;
-    }
-
-    return false;
-}
-
 void MythCDROM::onDeviceMounted()
 {
     if (!QDir(m_MountPath).exists())
