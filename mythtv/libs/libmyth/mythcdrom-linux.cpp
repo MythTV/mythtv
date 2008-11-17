@@ -380,23 +380,14 @@ MediaStatus MythCDROMLinux::checkMedia()
         case CDS_DISC_OK:
             VERBOSE(VB_MEDIA, m_DevicePath + " Disk OK, type = "
                               + MediaTypeString(m_MediaType) );
-            // 1. Audio CDs are not mounted
-            // 2. If we don't know the media type yet,
-            //    test the disk after this switch exits
-            if (m_MediaType == MEDIATYPE_AUDIO ||
-                m_MediaType == MEDIATYPE_UNKNOWN)
-                break;
-            // If we have tried to mount and failed, don't keep trying:
-            if (m_Status == MEDIASTAT_ERROR)
-                return m_Status;
-            // If the disc is ok and we already know it's mediatype
-            // returns MOUNTED.
-            if (isMounted())
-                return setStatus(MEDIASTAT_MOUNTED, OpenedHere);
+            // further checking is required
             break;
         case CDS_TRAY_OPEN:
             VERBOSE(VB_MEDIA, m_DevicePath + " Tray open or no disc");
+            // First, send a message to the
+            // plugins to forget the current media type
             setStatus(MEDIASTAT_OPEN, OpenedHere);
+            // then "clear out" this device
             m_MediaType = MEDIATYPE_UNKNOWN;
             return MEDIASTAT_OPEN;
             break;
@@ -425,7 +416,24 @@ MediaStatus MythCDROMLinux::checkMedia()
         return setStatus(MEDIASTAT_OPEN, OpenedHere);
     }
 
-    VERBOSE(VB_MEDIA+VB_EXTRA, m_DevicePath + " Media unchanged...");
+
+    if (isUsable())
+    {
+        VERBOSE(VB_MEDIA+VB_EXTRA, "Disc useable, media unchanged. All good!");
+        if (OpenedHere)
+            closeDevice();
+        return MEDIASTAT_USEABLE;
+    }
+
+    // If we have tried to mount and failed, don't keep trying
+    if (m_Status == MEDIASTAT_ERROR)
+    {
+        VERBOSE(VB_MEDIA+VB_EXTRA, "Disc is unmountable?");
+        if (OpenedHere)
+            closeDevice();
+        return m_Status;
+    }
+
     if ((m_Status == MEDIASTAT_OPEN) ||
         (m_Status == MEDIASTAT_UNKNOWN))
     {
@@ -517,17 +525,6 @@ MediaStatus MythCDROMLinux::checkMedia()
                 m_MediaType = MEDIATYPE_UNKNOWN;
                 return setStatus(MEDIASTAT_UNKNOWN, OpenedHere);
         }
-    }
-    else if (m_Status == MEDIASTAT_MOUNTED ||
-             m_Status == MEDIASTAT_NOTMOUNTED)
-    {
-        VERBOSE(VB_MEDIA, QString("Current status == ")
-                          + MythMediaDevice::MediaStatusStrings[m_Status]);
-        VERBOSE(VB_MEDIA, "Setting mount status");
-        if (isMounted())
-            setStatus(MEDIASTAT_MOUNTED, OpenedHere);
-        else
-            setStatus(MEDIASTAT_NOTMOUNTED, OpenedHere);
     }
 
     if (m_AllowEject)

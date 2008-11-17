@@ -47,20 +47,6 @@ MythCDROM::MythCDROM(QObject* par, const char* DevicePath, bool SuperMount,
 {
 }
 
-bool MythCDROM::openDevice()
-{
-    if (MythMediaDevice::openDevice()) 
-    {
-        // If allow eject is on, unlock the door.
-        if (m_AllowEject)
-            unlock();
-        
-        return true;
-    }
-
-    return false;
-}
-
 void MythCDROM::onDeviceMounted()
 {
     if (!QDir(m_MountPath).exists())
@@ -119,7 +105,13 @@ void MythCDROM::onDeviceMounted()
     if (MEDIATYPE_DATA == m_MediaType)
         MythMediaDevice::onDeviceMounted();
 
+    // Unlock the door, and if appropriate unmount the media, 
+    // so the user can press the manual eject button
     if (m_AllowEject)
+    {
         unlock();
+        if (m_MediaType == MEDIATYPE_DVD || m_MediaType == MEDIATYPE_VCD) 
+            unmount();
+    }
 }
 
