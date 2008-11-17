@@ -922,8 +922,8 @@ bool FillData::Run(SourceList &sourcelist)
 
                     if (endofdata)
                     {
-                        VERBOSE(VB_GENERAL,
-                            QString("Grabber is no longer returning program data, finishing"));
+                        VERBOSE(VB_GENERAL, "Grabber is no longer returning"
+                                            " program data, finishing");
                         break;
                     }
                 }
@@ -960,8 +960,8 @@ bool FillData::Run(SourceList &sourcelist)
             query.next();
 
             if (!query.isNull(0))
-                GuideDataAfter = QDateTime::fromString(query.value(0).toString(),
-                                                    Qt::ISODate);
+                GuideDataAfter = QDateTime::fromString(
+                                     query.value(0).toString(), Qt::ISODate);
         }
 
         if (GuideDataAfter == GuideDataBefore)
@@ -987,7 +987,8 @@ bool FillData::Run(SourceList &sourcelist)
     {
         if (nonewdata > 0 &&
             (total_sources != externally_handled))
-            status = QString(QObject::tr("mythfilldatabase ran, but did not insert "
+            status = QString(QObject::tr(
+                     "mythfilldatabase ran, but did not insert "
                      "any new data into the Guide for %1 of %2 sources. "
                      "This can indicate a potential grabber failure."))
                      .arg(nonewdata)
