@@ -446,7 +446,7 @@
 
     <window name="gallery">
         <textarea name="title" from="basetextarea">
-            <area>70,15,880,50</area>
+            <area>70,15,800,50</area>
             <cutdown>yes</cutdown>
             <font>baselarge</font>
         </textarea>
@@ -504,7 +504,7 @@
         </buttonlist>
 
         <textarea name="position" from="basetextarea">
-            <area>980,15,110,40</area>
+            <area>890,15,200,40</area>
             <align>hcenter,vcenter</align>
             <font>basemedium</font>
         </textarea>
