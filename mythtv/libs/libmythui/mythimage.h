@@ -53,6 +53,8 @@ class MPUBLIC MythImage : public QImage
     void SetFileName(QString fname) { m_FileName = fname; }
     QString GetFileName(void) const { return m_FileName; }
 
+    void setIsReflected(bool reflected) { m_isReflected = reflected; }
+
   protected:
     static void MakeGradient(QImage &image, const QColor &begin,
                              const QColor &end, int alpha,
