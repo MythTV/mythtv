@@ -27,7 +27,9 @@ void ChannelInfo::LoadChannelIcon(int width, int height)
 
         url += iconpath;
 
-        tempimage = *(QImage*)gContext->CacheRemotePixmap(url);
+        MythImage *im = gContext->CacheRemotePixmap(url);
+        if (im)
+            tempimage = *(QImage*)im;
     }
 
     if (tempimage.width() > 0)
