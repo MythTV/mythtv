@@ -2,7 +2,7 @@
 
     <!-- Popups -->
     <window name="moviesel">
-        <area>193,87,413,426</area>
+        <area>-1,-1,413,426</area>
 
         <imagetype name="box">
             <filename>mv_results_popup.png</filename>
@@ -15,7 +15,7 @@
     </window>
 
     <window name="castpopup">
-        <area>193,87,413,426</area>
+        <area>-1,-1,413,426</area>
 
         <imagetype name="box">
             <filename>mv_results_popup.png</filename>
@@ -32,7 +32,7 @@
     </window>
 
     <window name="plotpopup">
-        <area>193,87,413,426</area>
+        <area>-1,-1,413,426</area>
 
         <imagetype name="box">
             <filename>mv_results_popup.png</filename>
@@ -262,7 +262,8 @@
             </statetype>
             <statetype name="upscrollarrow">
                 <position>240,270</position>
-                <state type="on">
+                <showempty>yes</showempty>
+                <state type="full">
                     <imagetype name="upon">
                         <filename>up_arrow.png</filename>
                     </imagetype>
@@ -270,7 +271,8 @@
             </statetype>
             <statetype name="downscrollarrow">
                 <position>456,270</position>
-                <state type="on">
+                <showempty>yes</showempty>
+                <state type="full">
                     <imagetype name="dnon">
                         <filename>down_arrow.png</filename>
                     </imagetype>
@@ -317,7 +319,8 @@
             </statetype>
             <statetype name="upscrollarrow">
                 <position>0,42</position>
-                <state type="on">
+                <showempty>yes</showempty>
+                <state type="full">
                     <imagetype name="upon">
                         <filename>left_arrow.png</filename>
                     </imagetype>
@@ -325,7 +328,8 @@
             </statetype>
             <statetype name="downscrollarrow">
                 <position>730,42</position>
-                <state type="on">
+                <showempty>yes</showempty>
+                <state type="full">
                     <imagetype name="dnon">
                         <filename>right_arrow.png</filename>
                     </imagetype>
@@ -442,33 +446,33 @@
 
     <window name="gallery">
         <textarea name="title" from="basetextarea">
-            <area>70,20,460,50</area>
+            <area>70,15,880,50</area>
             <cutdown>yes</cutdown>
             <font>baselarge</font>
         </textarea>
 
         <buttonlist name="videos">
-            <area>15,0,770,585</area>
+            <area>17,0,1250,785</area>
             <layout>grid</layout>
             <spacing>5</spacing>
-            <buttonarea>0,65,770,520</buttonarea>
+            <buttonarea>0,55,1250,720</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,150,125</area>
                 <state name="active">
+                    <area>0,0,175,160</area>
                     <imagetype name="buttonbackground">
                         <filename>mv_gallery_back_reg.png</filename>
                     </imagetype>
                     <imagetype name="buttonimage">
-                        <area>10,8,130,90</area>
+                        <area>10,8,155,125</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <textarea name="buttontext">
-                        <area>5,98,140,25</area>
+                        <area>5,133,165,25</area>
                         <font>menufont</font>
                         <align>hcenter,bottom</align>
                     </textarea>
                     <textarea name="childcount" from="basetextarea">
-                        <area>55,72,55,20</area>
+                        <area>55,72,80,20</area>
                         <font>basesmallblack</font>
                         <align>right</align>
                     </textarea>
@@ -480,16 +484,18 @@
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>640,20</position>
-                <state type="on">
+                <position>1100,15</position>
+                <showempty>yes</showempty>
+                <state type="full">
                     <imagetype name="upon">
                         <filename>up_arrow.png</filename>
                     </imagetype>
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>700,20</position>
-                <state type="on">
+                <position>1160,15</position>
+                <showempty>yes</showempty>
+                <state type="full">
                     <imagetype name="dnon">
                         <filename>down_arrow.png</filename>
                     </imagetype>
@@ -498,13 +504,13 @@
         </buttonlist>
 
         <textarea name="position" from="basetextarea">
-            <area>530,20,110,40</area>
+            <area>980,15,110,40</area>
             <align>hcenter,vcenter</align>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="novideos" from="basetextarea">
-            <area>250,130,540,70</area>
+            <area>50,50,700,50</area>
             <multiline>yes</multiline>
             <align>hcenter,vcenter</align>
         </textarea>
@@ -516,7 +522,7 @@
         </textarea> -->
 
         <statetype name="parentallevel">
-            <position>20,20</position>
+            <position>20,10</position>
             <state name="None">
                 <imagetype name="icon">
                     <filename>mv_level_none.png</filename>
