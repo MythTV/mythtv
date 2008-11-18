@@ -751,70 +751,6 @@ void MythUIHelper::CacheThemeImagesDirectory(const QString &dirname,
         qApp->processEvents();
     }
 
-/*
-    QString destdir = d->themecachedir;
-    if (subdirname.length() > 0)
-        destdir += subdirname + "/";
-
-    QFileInfoList::const_iterator it = list.begin();
-    const QFileInfo *fi;
-
-    while (it != list.end())
-    {
-        fi = &(*it++);
-        if (caching)
-            caching->SetProgress(progress);
-        qApp->processEvents();
-        progress++;
-
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
-
-        if (fi->isDir() && subdirname.length() == 0)
-        {
-            QString newdirname = fi->fileName();
-            QDir newsubdir(d->themecachedir + newdirname);
-            if (!newsubdir.exists())
-                newsubdir.mkdir(d->themecachedir + newdirname);
-
-            CacheThemeImagesDirectory(dirname + "/" + newdirname,
-                                      newdirname);
-            continue;
-        }
-        else if (fi->isDir())
-            continue;
-
-        if (fi->completeSuffix().toLower() != "png" &&
-            fi->completeSuffix().toLower() != "jpg" &&
-            fi->completeSuffix().toLower() != "gif" &&
-            fi->completeSuffix().toLower() != "jpeg")
-            continue;
-
-        QString filename = fi->fileName();
-        QFileInfo cacheinfo(destdir + filename);
-
-        if (!cacheinfo.exists() ||
-            (cacheinfo.lastModified() < fi->lastModified()))
-        {
-            VERBOSE(VB_FILE, QString("generating cache image for: %1")
-                    .arg(fi->absoluteFilePath()));
-
-            QImage *tmpimage = LoadScaleImage(fi->absoluteFilePath(), false);
-
-            if (tmpimage && tmpimage->width() > 0 && tmpimage->height() > 0)
-            {
-                if (!tmpimage->save(destdir + filename, "PNG"))
-                {
-                    VERBOSE(VB_IMPORTANT,
-                            QString("Failed to save cached image: %1")
-                            .arg(d->themecachedir + filename));
-                }
-
-                delete tmpimage;
-            }
-        }
-    }
-*/
     if (caching)
         caching->Close();
 }
@@ -1184,54 +1120,6 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
     if (filename.left(5) == "myth:" || filename.isEmpty())
         return NULL;
 
-    if (!d->themecachedir.isEmpty() && fromcache)
-    {
-        QString cachefilepath;
-        bool bFound = false;
-
-        // Is absolute path in theme directory.
-        if (!bFound)
-        {
-            if (!d->m_themepathname.isEmpty() &&
-                    filename.left(d->m_themepathname.length()) ==
-                        d->m_themepathname)
-            {
-                QString tmpfilename = filename;
-                tmpfilename.remove(0, d->m_themepathname.length());
-                cachefilepath = d->themecachedir + tmpfilename;
-                QFile cachecheck(cachefilepath);
-                if (cachecheck.exists())
-                    bFound = true;
-            }
-        }
-
-        // Is relative path in theme directory.
-        if (!bFound)
-        {
-            cachefilepath = d->themecachedir + filename;
-            QFile cachecheck(cachefilepath);
-            if (cachecheck.exists())
-                bFound = true;
-        }
-
-        // Is in top level cache directory.
-        if (!bFound)
-        {
-            QFileInfo fi(filename);
-            cachefilepath = d->themecachedir + fi.fileName();
-            QFile cachecheck(cachefilepath);
-            if (cachecheck.exists())
-                bFound = true;
-        }
-
-        if (bFound)
-        {
-            QImage *ret = new QImage(cachefilepath);
-            if (ret)
-                return ret;
-        }
-    }
-
     if (!FindThemeFile(filename))
     {
         VERBOSE(VB_IMPORTANT,
@@ -1285,53 +1173,6 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
     if (filename.left(5) == "myth:")
         return NULL;
 
-    if (!d->themecachedir.isEmpty() && fromcache)
-    {
-        QString cachefilepath;
-        bool bFound = false;
-
-        // Is absolute path in theme directory.
-        if (!bFound)
-        {
-            if (filename.left(d->m_themepathname.length()) ==
-                d->m_themepathname)
-            {
-                QString tmpfilename = filename;
-                tmpfilename.remove(0, d->m_themepathname.length());
-                cachefilepath = d->themecachedir + tmpfilename;
-                QFile cachecheck(cachefilepath);
-                if (cachecheck.exists())
-                    bFound = true;
-            }
-        }
-
-        // Is relative path in theme directory.
-        if (!bFound)
-        {
-            cachefilepath = d->themecachedir + filename;
-            QFile cachecheck(cachefilepath);
-            if (cachecheck.exists())
-                bFound = true;
-        }
-
-        // Is in top level cache directory.
-        if (!bFound)
-        {
-            QFileInfo fi(filename);
-            cachefilepath = d->themecachedir + fi.fileName();
-            QFile cachecheck(cachefilepath);
-            if (cachecheck.exists())
-                bFound = true;
-        }
-
-        if (bFound)
-        {
-            QPixmap *ret = new QPixmap(cachefilepath);
-            if (ret)
-                return ret;
-        }
-    }
-
     if (!FindThemeFile(filename))
     {
         VERBOSE(VB_IMPORTANT,
@@ -1382,10 +1223,6 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
 
 MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label)
 {
-//    VERBOSE(VB_GENERAL, QString("LoadCacheImage: %1 : %2 :")
-//                        .arg(srcfile)
-//                        .arg(label));
-
     if (srcfile.left(5) == "myth:")
         return NULL;
 
@@ -1397,18 +1234,14 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label)
     if (fi.exists())
     {
         // Now compare the time on the source versus our cached copy
-        QFileInfo original(srcfile);
+        QFileInfo original(FindThemeFile(srcfile));
         if (fi.lastModified() > original.lastModified())
         {
-            //VERBOSE(VB_FILE, QString("LoadCacheImage FOUND in disk cache%1").arg(cachefilepath));
+            // Check Memory Cache
             ret = GetImageFromCache(label);
-            if (ret)
+            if (!ret)
             {
-                //VERBOSE(VB_FILE, QString("MythUIHelper::LoadCacheImage found in ram cache :%1:").arg(label));
-            }
-            else
-            {
-                //VERBOSE(VB_FILE, QString("MythUIHelper::LoadCacheImage - Adding To Cache : %1").arg(label));
+                // Load file from disk cache to memory cache
                 ret = GetMythPainter()->GetFormatImage();
                 ret->Load(cachefilepath, false);
                 CacheImage(label, ret);
@@ -1416,7 +1249,8 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label)
         }
         else
         {
-            //VERBOSE(VB_FILE, QString("MythUIHelper::LoadCacheImage - Original is newer than cached copy. Clearing from Cache and returning null"));
+            // If file has changed on disk, then remove it from the memory
+            // and disk cache
             RemoveFromCacheByURL(label);
         }
     }
