@@ -171,7 +171,6 @@ class VideoDialog : public MythScreenType
     //   OnPosterURL()
     //     OnPosterCopyFinished()
     //       OnVideoPosterSetDone()
-    //     OnPosterDownloadTimeout()
     //       OnPosterCopyFinished()
     // OnVideoPosterSetDone() stop wait background
     void StartVideoPosterSet(Metadata *metadata);
@@ -191,7 +190,6 @@ class VideoDialog : public MythScreenType
     void OnPosterURL(QString uri, Metadata *metadata);
     void OnPosterCopyFinished(CoverDownloadErrorState error, QString errorMsg,
                               Metadata *metadata);
-    void OnPosterDownloadTimeout(const QUrl &url, Metadata *metadata);
 
     // called during StartVideoSearchByTitle
     void OnVideoSearchByTitleDone(bool normal_exit,
