@@ -1,3 +1,5 @@
+#include <set>
+
 #include <QApplication>
 #include <QTimer>
 #include <QList>
@@ -63,81 +65,62 @@ namespace
         return ret;
     }
 
-    /** \class TimeoutSignalProxy
-     *
-     * \brief Holds the timer used for the poster download timeout notification.
-     *
-     */
-    class TimeoutSignalProxy : public QObject
-    {
-        Q_OBJECT
-
-      signals:
-        void SigTimeout(const QUrl &url, Metadata *item);
-
-      public:
-        TimeoutSignalProxy() : m_item(0)
-        {
-            connect(&m_timer, SIGNAL(timeout()), SLOT(OnTimeout()));
-        }
-
-        void start(int timeout, Metadata *item, const QUrl &url)
-        {
-            m_item = item;
-            m_url = url;
-            m_timer.setSingleShot(true);
-            m_timer.start(timeout);
-        }
-
-        void stop()
-        {
-            if (m_timer.isActive())
-                m_timer.stop();
-        }
-
-      private slots:
-        void OnTimeout()
-        {
-            emit SigTimeout(m_url, m_item);
-        }
-
-      private:
-        Metadata *m_item;
-        QUrl m_url;
-        QTimer m_timer;
-    };
-
     class CoverDownloadProxy : public QObject
     {
         Q_OBJECT
 
       signals:
-        void SigFinished(bool error, QString errorMsg, Metadata *item);
-
+        void SigFinished(CoverDownloadErrorState reason, QString errorMsg,
+                         Metadata *item);
       public:
-        CoverDownloadProxy() : m_item(0), m_id(0)
+        static CoverDownloadProxy *Create(const QUrl &url, const QString &dest,
+                                          Metadata *item)
         {
-            connect(&m_http, SIGNAL(requestFinished(int, bool)),
-                    SLOT(OnFinished(int, bool)));
+            return new CoverDownloadProxy(url, dest, item);
         }
 
-        void Copy(QString fromUri, QString dest, Metadata *item)
+      public:
+        void StartCopy()
         {
-            m_dest_file = dest;
-            m_item = item;
-            QUrl url(fromUri);
-            m_http.setHost(url.host());
+            m_id = m_http.get(m_url.toString(), &m_data_buffer);
 
-            m_id = m_http.get(fromUri, &m_data_buffer);
+            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 30)
+                          * 1000);
         }
 
         void Stop()
         {
+            if (m_timer.isActive())
+                m_timer.stop();
+
             VERBOSE(VB_GENERAL, tr("Cover download stopped."));
             m_http.abort();
         }
 
+      private:
+        CoverDownloadProxy(const QUrl &url, const QString &dest,
+                           Metadata *item) : m_item(item), m_dest_file(dest),
+            m_id(0), m_url(url), m_error_state(esOK)
+        {
+            connect(&m_http, SIGNAL(requestFinished(int, bool)),
+                    SLOT(OnFinished(int, bool)));
+
+            connect(&m_timer, SIGNAL(timeout()), SLOT(OnDownloadTimeout()));
+            m_timer.setSingleShot(true);
+            m_http.setHost(m_url.host());
+        }
+
+        ~CoverDownloadProxy() {}
+
       private slots:
+        void OnDownloadTimeout()
+        {
+            VERBOSE(VB_IMPORTANT, QString("Copying of '%1' timed out")
+                    .arg(m_url.toString()));
+            m_error_state = esTimeout;
+            Stop();
+        }
+
         void OnFinished(int id, bool error)
         {
             QString errorMsg;
@@ -146,6 +129,9 @@ namespace
 
             if (id == m_id)
             {
+                if (m_timer.isActive())
+                    m_timer.stop();
+
                 if (!error)
                 {
                     QFile dest_file(m_dest_file);
@@ -160,18 +146,18 @@ namespace
                         {
                             errorMsg = tr("Error writing data to file %1.")
                                     .arg(m_dest_file);
-                            error = true;
+                            m_error_state = esError;
                         }
                     }
                     else
                     {
                         errorMsg = tr("Error: file error '%1' for file %2").
                                 arg(dest_file.errorString()).arg(m_dest_file);
-                        error = true;
+                        m_error_state = esError;
                     }
                 }
 
-                emit SigFinished(error, errorMsg, m_item);
+                emit SigFinished(m_error_state, errorMsg, m_item);
             }
         }
 
@@ -181,6 +167,9 @@ namespace
         QBuffer m_data_buffer;
         QString m_dest_file;
         int m_id;
+        QTimer m_timer;
+        QUrl m_url;
+        CoverDownloadErrorState m_error_state;
     };
 
     /** \class ExecuteExternalCommand
@@ -659,6 +648,11 @@ class VideoDialogPrivate
         }
     }
 
+    ~VideoDialogPrivate()
+    {
+        StopAllRunningCoverDownloads();
+    }
+
     void AutomaticParentalAdjustment(Metadata *metadata)
     {
         if (metadata && m_rating_to_pl.size())
@@ -681,9 +675,32 @@ class VideoDialogPrivate
         m_savedPtr = new VideoListDeathDelay(videoList);
     }
 
+    void AddCoverDownload(CoverDownloadProxy *download)
+    {
+        m_running_downloads.insert(download);
+    }
+
+    void RemoveCoverDownload(CoverDownloadProxy *download)
+    {
+        if (download)
+        {
+            cover_download_list::iterator p =
+                    m_running_downloads.find(download);
+            if (p != m_running_downloads.end())
+                m_running_downloads.erase(p);
+        }
+    }
+
+    void StopAllRunningCoverDownloads()
+    {
+        cover_download_list tmp(m_running_downloads);
+        for (cover_download_list::iterator p = tmp.begin(); p != tmp.end(); ++p)
+            (*p)->Stop();
+    }
+
   public:
-    CoverDownloadProxy m_download_proxy;
-    TimeoutSignalProxy m_url_dl_timer;
+    typedef std::set<CoverDownloadProxy *> cover_download_list;
+    cover_download_list m_running_downloads;
     ParentalLevelNotifyContainer m_parentalLevel;
     bool m_switchingLayout;
 
@@ -693,7 +710,6 @@ class VideoDialogPrivate
 
   private:
     parental_level_map m_rating_to_pl;
-
 };
 
 VideoDialog::VideoListDeathDelayPtr VideoDialogPrivate::m_savedPtr;
@@ -741,13 +757,6 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
 
     m_rememberPosition =
             gContext->GetNumSetting("mythvideo.VideoTreeRemember", 0);
-
-    connect(&m_private->m_url_dl_timer,
-            SIGNAL(SigTimeout(const QUrl &, Metadata *)),
-            SLOT(OnPosterDownloadTimeout(const QUrl &, Metadata *)));
-    connect(&m_private->m_download_proxy,
-            SIGNAL(SigFinished(bool, QString, Metadata *)),
-            SLOT(OnPosterCopyFinished(bool, QString, Metadata *)));
 }
 
 VideoDialog::~VideoDialog()
@@ -1930,16 +1939,19 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
             QString dest_file = QString("%1/%2.%3").arg(fileprefix)
                     .arg(metadata->InetRef()).arg(ext);
             VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
-                    .arg(uri).arg(dest_file));
+                    .arg(url.toString()).arg(dest_file));
 
+            CoverDownloadProxy *d =
+                    CoverDownloadProxy::Create(url, dest_file, metadata);
             metadata->setCoverFile(dest_file);
 
-            m_private->m_download_proxy.Copy(uri, dest_file, metadata);
+            connect(d, SIGNAL(SigFinished(CoverDownloadErrorState,
+                                          QString, Metadata *)),
+                    SLOT(OnPosterCopyFinished(CoverDownloadErrorState,
+                                              QString, Metadata *)));
 
-            const int nTimeout =
-                    gContext->GetNumSetting("PosterDownloadTimeout", 30)
-                    * 1000;
-            m_private->m_url_dl_timer.start(nTimeout, metadata, url);
+            d->StartCopy();
+            m_private->AddCoverDownload(d);
         }
         else
         {
@@ -1951,32 +1963,27 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
         OnVideoPosterSetDone(metadata);
 }
 
-void VideoDialog::OnPosterCopyFinished(bool error, QString errorMsg,
-        Metadata *item)
+void VideoDialog::OnPosterCopyFinished(CoverDownloadErrorState error,
+                                       QString errorMsg, Metadata *item)
 {
-    m_private->m_url_dl_timer.stop();
+    QObject *src = sender();
+    if (src)
+        m_private->RemoveCoverDownload(dynamic_cast<CoverDownloadProxy *>
+                                       (src));
 
-    if (error && item)
+    if (error != esOK && item)
         item->setCoverFile("");
 
     VERBOSE(VB_IMPORTANT, tr("Poster download finished: %1 %2")
             .arg(errorMsg).arg(error));
 
+    if (error == esTimeout)
+    {
+        createOkDialog(tr("A poster exists for this item but could not be "
+                            "retrieved within the timeout period.\n"));
+    }
+
     OnVideoPosterSetDone(item);
-}
-
-void VideoDialog::OnPosterDownloadTimeout(const QUrl &url, Metadata *item)
-{
-    VERBOSE(VB_IMPORTANT, QString("Copying of '%1' timed out")
-            .arg(url.toString()));
-
-    if (item)
-        item->setCoverFile("");
-
-    m_private->m_download_proxy.Stop(); // results in OnPosterCopyFinished
-
-    createOkDialog(tr("A poster exists for this item but could not be "
-                        "retrieved within the timeout period.\n"));
 }
 
 // This is the final call as part of a StartVideoPosterSet

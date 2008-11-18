@@ -26,6 +26,8 @@ class VideoScanner;
 
 class QUrl;
 
+enum CoverDownloadErrorState { esOK, esError, esTimeout };
+
 class VideoDialog : public MythScreenType
 {
     Q_OBJECT
@@ -187,7 +189,8 @@ class VideoDialog : public MythScreenType
   private slots:
     // called during StartVideoPosterSet
     void OnPosterURL(QString uri, Metadata *metadata);
-    void OnPosterCopyFinished(bool error, QString errorMsg, Metadata *metadata);
+    void OnPosterCopyFinished(CoverDownloadErrorState error, QString errorMsg,
+                              Metadata *metadata);
     void OnPosterDownloadTimeout(const QUrl &url, Metadata *metadata);
 
     // called during StartVideoSearchByTitle
