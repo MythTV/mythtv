@@ -1234,7 +1234,8 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label)
     if (fi.exists())
     {
         // Now compare the time on the source versus our cached copy
-        QFileInfo original(FindThemeFile(srcfile));
+        FindThemeFile(srcfile);
+        QFileInfo original(srcfile);
         if (fi.lastModified() > original.lastModified())
         {
             // Check Memory Cache
