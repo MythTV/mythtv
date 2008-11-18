@@ -349,6 +349,7 @@
 
         <imagetype name="coverimage">
             <area>30,90,203,311</area>
+            <preserveaspect>yes</preserveaspect>
         </imagetype>
 
         <textarea name="currentvideo" from="basetextarea">
@@ -605,6 +606,7 @@
 
         <imagetype name="coverimage">
             <area>624,335,140,212</area>
+            <preserveaspect>yes</preserveaspect>
         </imagetype>
 
         <textarea name="level_label" from="basetextarea">

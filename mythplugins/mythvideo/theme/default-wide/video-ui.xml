@@ -290,35 +290,29 @@
         </imagetype>
 
         <buttonlist name="videos">
-            <area>15,440,770,150</area>
+            <area>15,490,1250,150</area>
             <layout>horizontal</layout>
             <scrollstyle>center</scrollstyle>
-            <spacing>9</spacing>
-            <buttonarea>38,0,690,155</buttonarea>
+            <spacing>36</spacing>
+            <buttonarea>40,0,1170,155</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,90,155</area>
-                    <imagetype name="buttonbackground" />
+                    <area>0,0,135,200</area>
                     <imagetype name="buttonimage">
-                        <area>10,15,80,120</area>
+                        <area>10,15,133,200</area>
                         <preserveaspect>true</preserveaspect>
                         <filename>mv_browse_nocover.png</filename>
                     </imagetype>
-                    <textarea name="childcount" from="basetextarea">
-                        <area>15,70,70,20</area>
-                        <font>basesmallblack</font>
-                        <align>hcenter</align>
-                    </textarea>
                 </state>
                 <state name="selected" from="active">
-                    <imagetype name="buttonbackground">
-                        <position>5,7</position>
+                    <imagetype name="selector">
+                        <position>30,180</position>
                         <filename>mv_browse_selector.png</filename>
                     </imagetype>
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>0,42</position>
+                <position>0,80</position>
                 <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="upon">
@@ -327,7 +321,7 @@
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>730,42</position>
+                <position>1215,80</position>
                 <showempty>yes</showempty>
                 <state type="full">
                     <imagetype name="dnon">
@@ -337,15 +331,17 @@
             </statetype>
         </buttonlist>
 
+        <imagetype name="coverimage">
+            <area>23,15,312,465</area>
+            <filename>mv_browse_nocover_large.png</filename>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
+
         <textarea name="title" from="basetextarea">
-            <area>40,20,700,100</area>
+            <area>370,12,700,40</area>
             <multiline>yes</multiline>
             <font>baseextralarge</font>
         </textarea>
-
-        <imagetype name="coverimage">
-            <area>30,90,203,311</area>
-        </imagetype>
 
         <textarea name="currentvideo" from="basetextarea">
             <area>150,486,500,35</area>
@@ -353,57 +349,58 @@
         </textarea>
 
         <textarea name="dirlbl" from="basetextarea">
-            <area>240,65,100,35</area>
+            <area>380,65,140,35</area>
             <value>Directed by</value>
-            <align>right</align>
         </textarea>
 
         <textarea name="director" from="basetextarea">
-            <area>348,63,350,35</area>
+            <area>530,63,450,35</area>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="plot" from="basetextarea">
-            <area>245,97,523,145</area>
+            <area>380,97,840,145</area>
             <multiline>yes</multiline>
         </textarea>
 
         <textarea name="rating" from="basetextarea">
-            <area>245,257,533,90</area>
+            <area>385,270,533,90</area>
             <multiline>yes</multiline>
         </textarea>
 
         <textarea name="lenlbl" from="basetextarea">
-            <area>260,343,150,35</area>
-            <value>Runtime</value>
+            <area>380,420,120,35</area>
+            <value>Runtime:</value>
+            <align>right</align>
         </textarea>
 
         <textarea name="length" from="basetextarea">
-            <area>260,373,350,35</area>
+            <area>510,420,250,35</area>
         </textarea>
 
         <textarea name="yrlbl" from="basetextarea">
-            <area>470,343,90,35</area>
-            <value>Year</value>
+            <area>690,420,90,35</area>
+            <value>Year:</value>
+            <align>right</align>
         </textarea>
 
         <textarea name="year" from="basetextarea">
-            <area>470,373,100,35</area>
+            <area>790,420,100,35</area>
         </textarea>
 
         <textarea name="userratinglbl" from="basetextarea">
-            <area>620,343,150,35</area>
+            <area>960,420,150,35</area>
             <align>right,top</align>
-            <value>User Rating</value>
+            <value>User Rating:</value>
         </textarea>
 
         <textarea name="userrating" from="basetextarea">
-            <area>670,373,100,35</area>
+            <area>1120,420,50,35</area>
             <align>hcenter,top</align>
         </textarea>
 
         <textarea name="position" from="basetextarea">
-            <area>320,410,160,38</area>
+            <area>560,455,160,38</area>
             <align>hcenter,vcenter</align>
             <font>basemedium</font>
         </textarea>
@@ -415,7 +412,7 @@
         </textarea>
 
         <statetype name="parentallevel">
-            <position>740,20</position>
+            <position>1210,12</position>
             <state name="None">
                 <imagetype name="icon">
                     <filename>mv_level_none.png</filename>
@@ -601,6 +598,7 @@
 
         <imagetype name="coverimage">
             <area>624,335,140,212</area>
+            <preserveaspect>yes</preserveaspect>
         </imagetype>
 
         <textarea name="level_label" from="basetextarea">
