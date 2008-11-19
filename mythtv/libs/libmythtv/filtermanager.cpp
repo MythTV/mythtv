@@ -91,6 +91,9 @@ FilterManager::FilterManager()
             }
         }
     }
+    else
+        VERBOSE(VB_IMPORTANT,
+                "Filter dir '" + FiltDir.absolutePath() + "' doesn't exist?");
 }
 
 FilterManager::~FilterManager()
