@@ -3,16 +3,16 @@
 
     <!-- Base Font Definitions -->
     <font name="basesmall" face="Bitstream Vera Sans">
-        <size>14</size>
+        <size>16</size>
         <color>#FFFFFF</color>
     </font>
 
     <font name="basemedium" from="basesmall">
-        <size>16</size>
+        <size>18</size>
     </font>
 
     <font name="baselarge" from="basesmall">
-        <size>18</size>
+        <size>20</size>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
@@ -20,7 +20,7 @@
     </font>
 
     <font name="baseextralarge" from="basesmall">
-        <size>22</size>
+        <size>24</size>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
@@ -66,6 +66,10 @@
 
     <font name="basemediumred" from="basemedium">
         <color>#800900</color>
+    </font>
+
+    <font name="basemediumpurple" from="basemedium">
+        <color>#9999cc</color>
     </font>
 
     <buttonlist name="basebuttonlist">
