@@ -489,20 +489,9 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         im->save(dstfile,"PNG");
     }
 
-    QMap<QString, MythImage*>::iterator it = d->imageCache.find(url);
-    if (it == d->imageCache.end())
-    {
-        im->UpRef();
-    d->imageCache[url] = im;
-        d->CacheTrack[url] = QDateTime::currentDateTime().toTime_t();
-
-        m_cacheSize += im->numBytes();
-        VERBOSE(VB_FILE, QString("NOT IN CACHE, Adding, and adding to size "
-                                 ":%1: :%2:").arg(url).arg(m_cacheSize));
-}
-
     // delete the oldest cached images until we fall below threshold.
-    while (m_cacheSize >= d->maxImageCacheSize && d->imageCache.size())
+    while (m_cacheSize + im->numBytes() >= d->maxImageCacheSize &&
+           d->imageCache.size())
     {
         QMap<QString, MythImage*>::iterator it = d->imageCache.begin();
         uint oldestTime = d->CacheTrack[it.key()];
@@ -523,6 +512,18 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         d->imageCache[oldestKey]->DownRef();
         d->imageCache.remove(oldestKey);
         d->CacheTrack.remove(oldestKey);
+    }
+
+    QMap<QString, MythImage*>::iterator it = d->imageCache.find(url);
+    if (it == d->imageCache.end())
+    {
+        im->UpRef();
+        d->imageCache[url] = im;
+        d->CacheTrack[url] = QDateTime::currentDateTime().toTime_t();
+
+        m_cacheSize += im->numBytes();
+        VERBOSE(VB_FILE, QString("NOT IN CACHE, Adding, and adding to size "
+                                 ":%1: :%2:").arg(url).arg(m_cacheSize));
     }
 
     VERBOSE(VB_FILE, QString("MythUIHelper::CacheImage : Cache Count = :%1: "
