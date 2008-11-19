@@ -89,6 +89,9 @@ FilterManager::FilterManager()
                 LoadFilterLib(Path);
         }
     }
+    else
+        VERBOSE(VB_IMPORTANT,
+                "Filter dir '" + FilterDir.absPath() + "' doesn't exist?");
 }
 
 FilterManager::~FilterManager()
