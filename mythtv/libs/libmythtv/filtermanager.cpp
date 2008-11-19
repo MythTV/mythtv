@@ -91,7 +91,7 @@ FilterManager::FilterManager()
     }
     else
         VERBOSE(VB_IMPORTANT,
-                "Filter dir '" + FilterDir.absPath() + "' doesn't exist?");
+                "Filter dir '" + FiltDir.absPath() + "' doesn't exist?");
 }
 
 FilterManager::~FilterManager()
