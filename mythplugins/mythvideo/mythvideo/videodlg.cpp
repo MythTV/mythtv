@@ -1749,7 +1749,7 @@ void VideoDialog::ManualVideoUID()
     if (searchdialog->Create())
         m_popupStack->AddScreen(searchdialog);
 
-    connect(searchdialog, SIGNAL(haveResult(QString &)),
+    connect(searchdialog, SIGNAL(haveResult(QString)),
             SLOT(OnManualVideoUID(QString)), Qt::QueuedConnection);
 }
 
