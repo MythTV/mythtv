@@ -469,67 +469,67 @@
     <name>String::WindDirection</name>
     <message>
         <source>N</source>
-        <translation type="unfinished">pohj</translation>
+        <translation>Pohj</translation>
     </message>
     <message>
         <source>NNE</source>
-        <translation type="unfinished">pohj</translation>
+        <translation>Pohjoiskoil</translation>
     </message>
     <message>
         <source>NE</source>
-        <translation type="unfinished">koill</translation>
+        <translation>Koil</translation>
     </message>
     <message>
         <source>E</source>
-        <translation type="unfinished">itä</translation>
+        <translation>Itä</translation>
     </message>
     <message>
         <source>SE</source>
-        <translation type="unfinished">kaakko</translation>
+        <translation>Kaakko</translation>
     </message>
     <message>
         <source>SSE</source>
-        <translation type="unfinished">etelä</translation>
+        <translation>Eteläkaakko</translation>
     </message>
     <message>
         <source>S</source>
-        <translation type="unfinished">etelä</translation>
+        <translation>Etelä</translation>
     </message>
     <message>
         <source>SSW</source>
-        <translation type="unfinished">etelä</translation>
+        <translation>Etelälounas</translation>
     </message>
     <message>
         <source>SW</source>
-        <translation type="unfinished">lounas</translation>
+        <translation>Lounas</translation>
     </message>
     <message>
         <source>W</source>
-        <translation type="unfinished">länsi</translation>
+        <translation>Länsi</translation>
     </message>
     <message>
         <source>NW</source>
-        <translation type="unfinished">luode</translation>
+        <translation>Luode</translation>
     </message>
     <message>
         <source>NNW</source>
-        <translation type="unfinished">pohj</translation>
+        <translation>Pohjoisluode</translation>
     </message>
     <message>
         <source>ENE</source>
-        <translation type="unfinished">koill</translation>
+        <translation>Eteläkoilinen</translation>
     </message>
     <message>
         <source>ESE</source>
-        <translation type="unfinished">kaakko</translation>
+        <translation>Eteläkaakko</translation>
     </message>
     <message>
         <source>WSW</source>
-        <translation type="unfinished">lounas</translation>
+        <translation>Länsilounas</translation>
     </message>
     <message>
         <source>WNW</source>
-        <translation type="unfinished">luode</translation>
+        <translation>Länsiluode</translation>
     </message>
 </context>
 <context>
@@ -899,7 +899,11 @@ Paina OK yrittääksesi uudelleen suuremmalla aikavälillä. Paina Peruuta jos h
     </message>
     <message>
         <source>No Screens defined; Entering Screen Setup.</source>
-        <translation>Ei Alinäyttöjä valittuna; Siirrytään Asetuksiin.</translation>
+        <translation type="obsolete">Ei Alinäyttöjä valittuna; Siirrytään Asetuksiin.</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation>Pysäytetty</translation>
     </message>
 </context>
 </TS>

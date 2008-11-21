@@ -193,7 +193,7 @@
     <message>
         <location filename="../mythmusic/databasebox.cpp" line="100"/>
         <source>The theme you are using does not contain any info lines in the music element. Please contact the theme creator and ask if they could please update it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käyttämäsi teema ei sisällä tietoalinjoja musiikkielementissä. Ole hyvä ja ota yhteyttä teeman tekijään ja kysy, jos he voisivat päivittää sen.</translation>
     </message>
 </context>
 <context>
@@ -1609,7 +1609,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="66"/>
         <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Äänilaite jota käytetään toistoon. &apos;Oletus&apos; käyttää MythTV:n määrittämää laitetta</translation>
     </message>
     <message>
         <location filename="../mythmusic/metadata.cpp" line="993"/>
@@ -1624,47 +1624,47 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="119"/>
         <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hakemiston ja tiedostonimen muoto, jota käytetään tiedon nappaamiseen, mikäli mitään ID3 -tietoa ei löydy. Hyväksyy: tyylilaji, artisti, nimi, artisti_nimi ja kappale_nimi.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="139"/>
         <source>Tag Encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Tag -koodaus</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="140"/>
         <source>UTF-16</source>
-        <translation type="unfinished"></translation>
+        <translation>UTF-16</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="141"/>
         <source>UTF-8</source>
-        <translation type="unfinished"></translation>
+        <translation>UTF-8</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="142"/>
         <source>Ascii</source>
-        <translation type="unfinished"></translation>
+        <translation>ASCII</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="143"/>
         <source>Some mp3 players don&apos;t understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jotkin mp3 -toistajat eivät ymmärrä tageja, jotka on koodattu UTF-8 tai UTF-16, tämä antaa sinun vaihtaa käytettyä koodausformaattia. Tällä hetkellä koskee vain ID3 -tageja.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="223"/>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
-        <translation type="unfinished"></translation>
+        <translation>tarkentaa paikan/nimen uusille kappaleille. Hyväksyy: tyylilaji, artisti, albumi, kappale, vuosi</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="310"/>
         <source>Maximum Search Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimimäärä hakutuloksia</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="313"/>
         <source>Used to limit the number of results returned when using the search feature.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytetään rajoittamaan saatujen tulosten määrää käytettäessä &apos;Haku&apos; -toimintoa.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="379"/>
@@ -1689,47 +1689,47 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="385"/>
         <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aloita toistoon uudelleen, joko aktiivisen toistojononalussa tai viimeisen kappaleen alussa, tietyssä pisteessä viimeisestä kappaleetta.</translation> 
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="644"/>
         <source>Playback Settings (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Toistoasetukset (2)</translation>
     </message>
     <message>
         <location filename="../mythmusic/databasebox.cpp" line="76"/>
         <source>The theme you are using does not contain the %1 element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Teema, jota käytät ei sisällä %1 elementtiä. Ole hyvä ja ota ytheyttä teeman tekijään ja kysy, jos he voivat päivittää sen.  Seuraava kuva on tyhjä. Poistu siitä palataksesi valikkoon.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="320"/>
         <source>Number of Artists Tree Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Artisti-ryhmien lukumäärä</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="321"/>
         <source>Few</source>
-        <translation type="unfinished"></translation>
+        <translation>Muutama</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="322"/>
         <source>Average</source>
-        <translation type="unfinished"></translation>
+        <translation>Keskimäärä</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="323"/>
         <source>Many</source>
-        <translation type="unfinished"></translation>
+        <translation>Monta</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="327"/>
         <source>Determines how many groups we have in the artist tree.  Few gives &apos;A B C D&apos; as per the old behaviour, average gives two letters per group, many gives one letter per group.</source>
-        <translation type="unfinished"></translation>
+        <translation>Päättelee kuinkamonta artisti-ryhmää sinulla on. Muutama antaa &apos;A B C D&apos; vaihtoehdot, Keskimäärä antaa kaksi kirjainta perryhmä ja Monta antaa yhden kirjaimen epr ryhmä.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="357"/>
         <source>If selected, you can navigate your entire music tree from the playing screen. N.B. Does not work with accelerated buttons disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos valittu, voit navigoida koko musiikkipuutasi Toisto -näytöllä. Huom! Pikanäppäinten täytyy olla mahdollistettuna</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="370"/>
@@ -1739,57 +1739,57 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="372"/>
         <source>Starting shuffle mode for the player.  Can be either normal, random, intelligent (random), or Album.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aloittaa Sekoitus -toiminnon soittimelle.  Voi olla joko normaali, satunnainen, älykäs (satunnainen) tai albumi.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="416"/>
         <source>Change the visualizer when the song changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaihda visualisoija, kun kappale vaihtuu.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="423"/>
         <source>Show Album Art at the start of each song</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä albumin kuvitus jokaisen kappaleen alussa</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="426"/>
         <source>When the song changes and the new song has an album art image display it in the visualizer for a short period.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun kappale vaihtuu ja uudella kappaleela on albumikuvitus, näytä se hetken aikaa visualisoijassa.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="433"/>
         <source>Randomize Visualizer order</source>
-        <translation type="unfinished"></translation>
+        <translation>Satunnaista visualisoijan järjestys</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="436"/>
         <source>On changing the visualizer pick a new one at random.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaihtaessasi visualisoijaa, valitse uus satunnaisesti.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="471"/>
         <source>List of visualizations to use during playback. Click the button below to edit this list</source>
-        <translation type="unfinished"></translation>
+        <translation>Luettelo visualisoinneista, joita käyttää toiston aikana. Klikka alla olevaa painiketta muuttaaksesi tätä listaa</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="479"/>
         <source>Edit Visualizations</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa Visualisointeja</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="480"/>
         <source>Edit the list of visualizations to use during playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa visualisoijien luetteloa, jota käyttää toiston yhteydessä.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="601"/>
         <source>General Settings (1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Yleiset asetukset (1)</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="611"/>
         <source>General Settings (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Yleiset asetukset (2)</translation>
     </message>
     <message>
         <location filename="../mythmusic/avfdecoder.cpp" line="389"/>
@@ -1819,27 +1819,27 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="392"/>
         <source>Action on exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Toiminto poistuttaessa</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="393"/>
         <source>Prompt</source>
-        <translation type="unfinished"></translation>
+        <translation>Kysy</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="394"/>
         <source>Stop Playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Pysäytä toisto</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="395"/>
         <source>Keep Playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Jatka toistoa</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="396"/>
         <source>Specify what action to take when exiting mythmusic plugin.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tarkenna mikä toiminto tehdään poistuttaessa mythmusic -liitännäisestä.</translation>
     </message>
 </context>
 <context>
