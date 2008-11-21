@@ -8,11 +8,10 @@ void strings_null() {
     ThemeUI::tr("Visibility");
     ThemeUI::tr("Wind Chill");
     ThemeUI::tr("UV Index");
+    ThemeUI::tr("Wind(Gust)");
+    ThemeUI::tr("Wind Direction");
+    ThemeUI::tr("Feels Like");
     ThemeUI::tr("extended forecast");
-    ThemeUI::tr("LO");
-    ThemeUI::tr("HI");
-    ThemeUI::tr("LO");
-    ThemeUI::tr("HI");
     ThemeUI::tr("LO");
     ThemeUI::tr("HI");
     ThemeUI::tr("today's forecast");
@@ -24,10 +23,6 @@ void strings_null() {
     ThemeUI::tr("MIX/ICE");
     ThemeUI::tr("SNOW");
     ThemeUI::tr("LIGHT");
-    ThemeUI::tr("LIGHT");
-    ThemeUI::tr("LIGHT");
-    ThemeUI::tr("HEAVY");
-    ThemeUI::tr("HEAVY");
     ThemeUI::tr("HEAVY");
     ThemeUI::tr("COLD");
     ThemeUI::tr("COLDEST");
@@ -35,4 +30,14 @@ void strings_null() {
     ThemeUI::tr("Enter Zip Code");
     ThemeUI::tr("weather setup");
     ThemeUI::tr("To save, press 'i' - to cancel, hit escape");
+    ThemeUI::tr("High");
+    ThemeUI::tr("Low");
+    //from Global Setup
+    ThemeUI::tr("Global Settings");
+    ThemeUI::tr("Seconds to display each page:");
+    ThemeUI::tr("Retrieve data in the background:");
+    //from Source Setup
+    ThemeUI::tr("Source Setup");
+    ThemeUI::tr("Data Retrieval Interval (minutes):");
+    ThemeUI::tr("Source Update Timeout (seconds):");
 }
