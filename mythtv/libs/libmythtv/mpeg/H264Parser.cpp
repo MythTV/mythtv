@@ -344,7 +344,7 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
                 on_frame = true;
                 frame_start_offset = AU_offset;
 
-                if (/*seen_IDR && */isKeySlice(slice_type))
+                if (seen_IDR && isKeySlice(slice_type))
                 {
                     on_key_frame = true;
                     keyframe_start_offset = AU_offset;
@@ -435,11 +435,8 @@ bool H264Parser::decode_Header(GetBitContext *gb)
     */
 
     frame_num = get_bits(gb, log2_max_frame_num);
-    if (NAL_type == SLICE_IDR)
-    {
-        frame_num = 0;
+    if (NAL_type == SLICE_IDR || frame_num == 0)
         seen_IDR = true;
-    }
 
     /*
       field_pic_flag equal to 1 specifies that the slice is a slice of a
