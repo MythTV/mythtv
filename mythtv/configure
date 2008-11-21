@@ -2734,26 +2734,19 @@ if test x"$xvmc_lib" != x""; then
     disable xvmcw
 elif enabled xvmcw; then
     VENDOR_XVMC_LIBS="-lXvMCW"
-elif enabled xvmc_pro; then
-    if has_library libviaXvMCPro ; then
-        VENDOR_XVMC_LIBS="-lviaXvMCPro"
-    elif has_library libchromeXvMCPro ; then
-        VENDOR_XVMC_LIBS="-lchromeXvMCPro"
-    else
-        disable xvmc_pro
-    fi
-elif enabled xvmc_vld; then
-    if has_library libviaXvMC ; then
-        VENDOR_XVMC_LIBS="-lviaXvMC"
-    elif has_library libchromeXvMC ; then
-        VENDOR_XVMC_LIBS="-lchromeXvMC"
-    else
-        disable xvmc_pro
-    fi
+elif enabled xvmc_pro && has_library libviaXvMCPro ; then
+    VENDOR_XVMC_LIBS="-lviaXvMCPro"
+elif enabled xvmc_pro && has_library libchromeXvMCPro ; then
+    VENDOR_XVMC_LIBS="-lchromeXvMCPro"
+elif enabled xvmc_vld && has_library libviaXvMC ; then
+    VENDOR_XVMC_LIBS="-lviaXvMC"
+elif enabled xvmc_vld && has_library libchromeXvMC ; then
+    VENDOR_XVMC_LIBS="-lchromeXvMC"
 elif has_library libXvMCNVIDIA ; then
     VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
 elif has_library libI810XvMC ; then
     VENDOR_XVMC_LIBS="-lI810XvMC"
+    disable xvmc_vld xvmc_pro
 else
     disable xvmc xvmcw
 fi
