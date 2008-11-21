@@ -1212,7 +1212,6 @@ opengl_deps="GL_gl_h"
 opengl_deps_any="windows x11"
 opengl_video_deps="opengl xv"
 opengl_vsync_deps="opengl"
-qtwebkit_deps="QtWebKit_QWebView"
 v4l_deps="backend"
 xrandr_deps="x11"
 xv_deps="x11"
@@ -1325,7 +1324,6 @@ enable lamemp3
 enable lirc
 enable mheg
 enable opengl
-enable qtwebkit
 enable v4l
 enable x11
 enable xrandr
@@ -2927,8 +2925,11 @@ enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
 enabled lirc && check_lib lirc/lirc_client.h lirc_deinit -llirc_client ||
     disable lirc
 
-check_header QtWebKit/QWebView -I/usr/include/qt4 -I/usr/include/qt4/QtCore -I/usr/include/qt4/QtWebKit
-disabled QtWebKit_QWebView && echo "Warning! QtWebkit headers not found, MythBrowser will not work."
+if $(pkg-config --atleast-version 4.4.0 QtWebKit) ; then
+    enable qtwebkit
+else
+    disable qtwebkit && echo "Warning! QtWebkit headers not found, MythBrowser will not work."
+fi
 
 if enabled firewire; then
     firewire="no"
