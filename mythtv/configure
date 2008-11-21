@@ -1998,6 +1998,8 @@ if ! enabled cpu_override && enabled proc_opt; then
        cpu="core2"
    elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*5462" > /dev/null ; then
        cpu="core2"
+   elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*3360" > /dev/null ; then
+       cpu="core2"
 # Various Intel Duo processors (EMT64T capable)
    elif expr "$processor" : ".*Intel(R).*Core(TM)2.*CPU" > /dev/null ; then
        cpu="core2"
@@ -2074,6 +2076,9 @@ if ! enabled cpu_override && enabled proc_opt; then
 # Athlon 64
    elif expr "$processor" : ".*AMD Athlon(tm) 64" > /dev/null ; then
        cpu="k8"
+# AMD Phenom
+   elif expr "$processor" : ".*AMD Phenom(tm)" > /dev/null ; then
+       cpu="barcelona"
 # AMD Opteron
    elif expr "$processor" : ".*AMD Opteron(tm)" >/dev/null ; then
        cpu="k8"
@@ -2210,7 +2215,7 @@ if test $cpu != "generic"; then
             disable cmov
         ;;
         # targets that do support conditional mov (cmov)
-        i686|pentiumpro|pentium[23]|pentium-m|athlon|athlon-tbird|athlon-4|athlon-[mx]p|athlon64*|k8*|opteron*|athlon-fx|core2|c3-2)
+        i686|pentiumpro|pentium[23]|pentium-m|athlon|athlon-tbird|athlon-4|athlon-[mx]p|athlon64*|k8*|opteron*|abrcelona|athlon-fx|core2|c3-2)
             check_archflags "-march=$cpu"
             enable cmov
             enable fast_cmov
@@ -2283,7 +2288,7 @@ if test $tune != "generic"; then
             disable cmov
         ;;
         # targets that do support conditional mov (cmov)
-        i686|pentiumpro|pentium[23]|pentium-m|athlon|athlon-tbird|athlon-4|athlon-[mx]p|athlon64*|k8*|opteron*|athlon-fx|core2|c3-2)
+        i686|pentiumpro|pentium[23]|pentium-m|athlon|athlon-tbird|athlon-4|athlon-[mx]p|athlon64*|k8*|opteron*|barcelona|athlon-fx|core2|c3-2)
             check_mtune_mcpu "$tune"
             enabled cmov && enable fast_cmov
         ;;
