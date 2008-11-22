@@ -845,9 +845,10 @@ UPnpCDSExtensionResults *UPnpCDSExtension::ProcessAll ( UPnpCDSRequest          
 //
 /////////////////////////////////////////////////////////////////////////////
 
-UPnpCDSExtensionResults *UPnpCDSExtension::ProcessItem( UPnpCDSRequest          *pRequest,
-                                                        UPnpCDSExtensionResults *pResults, 
-                                                        QStringList             &idPath )
+UPnpCDSExtensionResults *UPnpCDSExtension::ProcessItem(
+    UPnpCDSRequest          *pRequest,
+    UPnpCDSExtensionResults *pResults, 
+    QStringList             &idPath)
 {
     pResults->m_nTotalMatches   = 0;
     pResults->m_nUpdateID       = 1;

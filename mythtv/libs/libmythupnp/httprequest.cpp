@@ -732,6 +732,7 @@ long HTTPRequest::GetParameters( QString sParams, QStringMap &mapParams  )
     long nCount = 0;
 
     sParams.replace( "%26", "&" );
+    sParams.replace( "&amp;", "&" );
 
     if (sParams.length() > 0)
     {

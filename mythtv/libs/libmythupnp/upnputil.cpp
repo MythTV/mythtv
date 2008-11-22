@@ -44,7 +44,8 @@ QString LookupUDN( QString sDeviceType )
 
     if (sList.size() <= 2) 
     { 
-        VERBOSE(VB_IMPORTANT, sLoc + "- bad device type, not enough tokens"); 
+        VERBOSE(VB_IMPORTANT, sLoc + "- bad device type '" +
+                              sDeviceType + "', not enough tokens"); 
         return QString();
     }
 
