@@ -243,6 +243,10 @@ class MPUBLIC RecorderBase
      */
     void AspectChange(AspectRatio ratio, long long frame);
 
+    /** \brief Note a change in video size in the recordedmark table
+     */
+    void ResolutionChange(uint width, uint height, long long frame);
+
     TVRec         *tvrec;
     RingBuffer    *ringBuffer;
     bool           weMadeBuffer;
@@ -258,6 +262,9 @@ class MPUBLIC RecorderBase
     double         video_frame_rate;
 
     uint           m_videoAspect; // AspectRatio
+
+    uint           m_videoHeight;
+    uint           m_videoWidth;
 
     ProgramInfo   *curRecording;
 

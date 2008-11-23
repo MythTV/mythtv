@@ -2972,6 +2972,43 @@ void ProgramInfo::SetAspectChange(MarkTypes type, long long frame)
         MythDB::DBError("aspect ratio change insert", query);
 }
 
+/** \fn ProgramInfo::SetResolution(uint width, uint height, long long frame)
+ *  \brief Store the Resolution at frame in the recordedmarkup table
+ */
+void ProgramInfo::SetResolution(uint width, uint height, long long frame)
+{
+    if (isVideo)
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("INSERT INTO recordedmarkup"
+                  "    (chanid, starttime, mark, type, data)"
+                  "    VALUES"
+                  " ( :CHANID, :STARTTIME, :MARK, :TYPE, :DATA);");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":MARK", frame);
+    query.bindValue(":TYPE", MARK_VIDEO_HEIGHT);
+    query.bindValue(":DATA", height);
+
+    if (!query.exec() || !query.isActive())
+        MythDB::DBError("Resolution insert", query);
+
+    query.prepare("INSERT INTO recordedmarkup"
+                  "    (chanid, starttime, mark, type, data)"
+                  "    VALUES"
+                  " ( :CHANID, :STARTTIME, :MARK, :TYPE, :DATA);");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":MARK", frame);
+    query.bindValue(":TYPE", MARK_VIDEO_WIDTH);
+    query.bindValue(":DATA", width);
+
+    if (!query.exec() || !query.isActive())
+        MythDB::DBError("Resolution insert", query);
+}
+
 /** \fn ProgramInfo::ReactivateRecording(void)
  *  \brief Asks the scheduler to restart this recording if possible.
  */

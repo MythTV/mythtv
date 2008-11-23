@@ -261,6 +261,8 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     bool hasKeyFrame  = false;
 
     uint aspectRatio = 0;
+    uint height = 0;
+    uint width = 0;
 
     // Scan for PES header codes; specifically picture_start
     // sequence_start (SEQ) and group_start (GOP).
@@ -293,6 +295,11 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
 
                 // Look for aspectRatio changes and store them in the database
                 aspectRatio = (bufptr[3] >> 4);
+
+                // Get resolution
+                height = ((bufptr[1] & 0xf) << 8) | bufptr[2];
+                width = (bufptr[0] <<4) | (bufptr[1]>>4);
+
                 //int frameRate = (bufptr[3] & 0x0000000f);
             }
         }
@@ -326,6 +333,13 @@ bool DTVRecorder::FindMPEG2Keyframes(const TSPacket* tspacket)
     {
         m_videoAspect = aspectRatio;
         AspectChange((AspectRatio)aspectRatio, _frames_written_count);
+    }
+
+    if (height && width && (height != m_videoHeight || m_videoWidth != width))
+    {
+        m_videoHeight = height;
+        m_videoWidth = width;
+        ResolutionChange(width, height, _frames_written_count);
     }
 
     return hasKeyFrame || (_payload_buffer.size() >= (188*50));
@@ -469,6 +483,9 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
         _start_code = 0xffffffff;
     }
 
+    uint height = 0;
+    uint width = 0;
+
     bool hasFrame = false;
     bool hasKeyFrame = false;
 
@@ -551,6 +568,8 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
                 hasFrame = true;
                 _seen_sps |= hasKeyFrame;
             }
+            width = m_h264_parser.pictureWidth();
+            height = m_h264_parser.pictureHeight();
         }
     } // for (; i < TSPacket::SIZE; i++)
 
@@ -565,6 +584,13 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
         _frames_seen_count++;
         if (!_wait_for_keyframe_option || _first_keyframe >= 0)
             _frames_written_count++;
+    }
+
+    if (height && width && (height != m_videoHeight || m_videoWidth != width))
+    {
+        m_videoHeight = height;
+        m_videoWidth = width;
+        ResolutionChange(width, height, _frames_written_count);
     }
 
     return hasKeyFrame || (_payload_buffer.size() >= (188*50));

@@ -23,7 +23,8 @@ RecorderBase::RecorderBase(TVRec *rec)
     : tvrec(rec), ringBuffer(NULL), weMadeBuffer(true), videocodec("rtjpeg"),
       audiodevice("/dev/dsp"), videodevice("/dev/video"), vbidevice("/dev/vbi"),
       vbimode(0), ntsc(true), ntsc_framerate(true), video_frame_rate(29.97),
-      m_videoAspect(0), curRecording(NULL), request_pause(false), paused(false),
+      m_videoAspect(0), m_videoWidth(0), m_videoHeight(0), curRecording(NULL),
+      request_pause(false), paused(false),
       nextRingBuffer(NULL), nextRecording(NULL),
       positionMapType(MARK_GOP_BYFRAME), positionMapLock()
 {
@@ -219,6 +220,8 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         FinishRecording();
         ResetForNewFile();
 
+        m_videoAspect = m_videoWidth = m_videoHeight = 0;
+
         if (weMadeBuffer && ringBuffer)
             delete ringBuffer;
         SetRingBuffer(nextRingBuffer);
@@ -237,9 +240,6 @@ void RecorderBase::CheckForRingBufferSwitch(void)
 
     if (rb_changed && tvrec)
         tvrec->RingBufferChanged(ringBuffer, curRecording);
-
-    if (rb_changed)
-        m_videoAspect = 0;
 }
 
 /** \fn RecorderBase::SavePositionMap(bool)
@@ -301,5 +301,12 @@ void RecorderBase::AspectChange(AspectRatio aspect, long long frame)
     if (curRecording)
         curRecording->SetAspectChange(mark, frame);
 }
+
+void RecorderBase::ResolutionChange(uint width, uint height, long long frame)
+{
+    if (curRecording)
+        curRecording->SetResolution(width, height, frame);
+}
+
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -29,23 +29,25 @@ typedef QMap<long long, int> frm_dir_map_t;
 #define NUMPROGRAMLINES 47
 
 typedef enum {
-    MARK_UNSET = -10,
-    MARK_UPDATED_CUT = -3,
-    MARK_EDIT_MODE = -2,
-    MARK_CUT_END = 0,
-    MARK_CUT_START = 1,
-    MARK_BOOKMARK = 2,
-    MARK_BLANK_FRAME = 3,
-    MARK_COMM_START = 4,
-    MARK_COMM_END = 5,
-    MARK_GOP_START = 6,
-    MARK_KEYFRAME = 7,
-    MARK_SCENE_CHANGE = 8,
-    MARK_GOP_BYFRAME = 9,
-    MARK_ASPECT_1_1 = 10,
-    MARK_ASPECT_4_3 = 11,
-    MARK_ASPECT_16_9 = 12,
-    MARK_ASPECT_21_1_1 = 13
+    MARK_UNSET         = -10,
+    MARK_UPDATED_CUT   = -3,
+    MARK_EDIT_MODE     = -2,
+    MARK_CUT_END       = 0,
+    MARK_CUT_START     = 1,
+    MARK_BOOKMARK      = 2,
+    MARK_BLANK_FRAME   = 3,
+    MARK_COMM_START    = 4,
+    MARK_COMM_END      = 5,
+    MARK_GOP_START     = 6,
+    MARK_KEYFRAME      = 7,
+    MARK_SCENE_CHANGE  = 8,
+    MARK_GOP_BYFRAME   = 9,
+    MARK_ASPECT_1_1    = 10,
+    MARK_ASPECT_4_3    = 11,
+    MARK_ASPECT_16_9   = 12,
+    MARK_ASPECT_21_1_1 = 13,
+    MARK_VIDEO_WIDTH   = 30,
+    MARK_VIDEO_HEIGHT  = 31,
 } MarkTypes;
 MPUBLIC QString toString(MarkTypes type);
 
@@ -313,6 +315,9 @@ class MPUBLIC ProgramInfo
 
     // Aspect Ratio map
     void SetAspectChange(MarkTypes type, long long frame);
+
+    // Resolution Set
+    void SetResolution(uint width, uint height, long long frame);
 
     // GUI stuff
     void showDetails(void) const;
