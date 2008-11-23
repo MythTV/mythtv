@@ -85,7 +85,7 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
     }
 
     // if a override encoding is specified and the default ISO 6937 encoding
-    // would be used copy the ovverride encoding in front of the text
+    // would be used copy the override encoding in front of the text
     unsigned char dst[raw_length + encoding_override_length];
     uint length = 0;
     if (encoding_override && src[0] >= 0x20) {
@@ -97,10 +97,10 @@ QString dvb_decode_text(const unsigned char *src, uint raw_length,
     for (uint i = 0; i < raw_length; i++)
     {
         if ((src[i] < 0x80) || (src[i] > 0x9F))
-        {
-            dst[length] = src[i];
-            length++;
-        }
+            dst[length++] = src[i];
+        // replace CR/LF with a space
+        else if (src[i] == 0x8A)
+            dst[length++] = 0x20;
     }
     const unsigned char *buf = dst;
 
