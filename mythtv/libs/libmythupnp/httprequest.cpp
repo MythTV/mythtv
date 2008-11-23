@@ -1206,37 +1206,9 @@ bool HTTPRequest::ProcessSOAPPayload( const QString &sSOAPAction )
 
 QString HTTPRequest::Encode(const QString &sIn)
 {
-    // List of HTML character entity refs stolen from WikiPedia
-    QRegExp entities("^(quot|amp|apos|lt|gt|nbsp|iexcl|cent|pound|curren|yen"
-                     "|brvbar|sect|uml|copy|ordf|laquo|not|shy|reg|macr"
-                     "|deg|plusmn|sup2|sup3|acute|micro|para|middot|cedil"
-                     "|sup1|ordm|raquo|frac14|frac12|frac34|iquest"
-                     "|Agrave|Aacute|Acirc|Atilde|Auml|Aring|AElig|Ccedil"
-                     "|Egrave|Eacute|Ecirc|Euml|Igrave|Iacute|Icirc|Iuml"
-                     "|ETH|Ntilde|Ograve|Oacute|Ocirc|Otilde|Ouml|times"
-                     "|Oslash|Ugrave|Uacute|Ucirc|Uuml|Yacute|THORN|szlig"
-                     "|agrave|aacute|acirc|atilde|auml|aring|aelig|ccedil"
-                     "|egrave|eacute|ecirc|euml|igrave|iacute|icirc|iuml"
-                     "|eth|ntilde|ograve|oacute|ocirc|otilde|ouml|divide"
-                     "|oslash|ugrave|uacute|ucirc|uuml|yacute|thorn|yuml"
-                     "|#\\d\\d\\d\\d|#x[0-F][0-F][0-F][0-F]);");
     QString sStr = sIn;
     //VERBOSE(VB_UPNP, QString("HTTPRequest::Encode Input : %1").arg(sStr));
-
-    // Match an ampersand, but not if it is part of &lt; &gt; et c.
-    // A regexp like "&(?!(amp|lt|gt|quot|apos);)" doesn't work,
-    // so we explicitly loop and check the chars after each &
-    int pos = sStr.indexOf('&');
-    while (pos >= 0)
-    {
-        if (sStr.mid(++pos).contains(entities))
-            ; // This is already a valid HTML character entity ref.
-        else
-            sStr.insert(pos, "amp;");
-
-        pos = sStr.indexOf('&', pos);  // Find the next &
-    }
-
+    sStr.replace('&', "&amp;" ); // This _must_ come first
     sStr.replace('<', "&lt;"  );
     sStr.replace('>', "&gt;"  );
     sStr.replace('"', "&quot;");
