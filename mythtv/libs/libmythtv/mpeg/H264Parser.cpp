@@ -7,7 +7,9 @@ extern "C" {
 #include "avcodec.h"
 }
 
-// #include <math.h>
+#include <cmath>
+
+static const float eps = 1E-5;
 
 /*
   Most of the comments below were cut&paste from ITU-T Rec. H.264
@@ -129,6 +131,7 @@ void H264Parser::Reset(void)
     pic_width = pic_height = 0;
     frame_crop_left_offset = frame_crop_right_offset = 0;
     frame_crop_top_offset = frame_crop_bottom_offset = 0;
+    aspect_ratio_idc = 0;
     sar_width = sar_height = 0;
 
     AU_offset = frame_start_offset = keyframe_start_offset = 0;
@@ -819,7 +822,7 @@ void H264Parser::vui_parameters(GetBitContext * gb)
           present, aspect_ratio_idc value shall be inferred to be
           equal to 0.
          */
-        uint8_t aspect_ratio_idc = get_bits(gb, 8);
+        aspect_ratio_idc = get_bits(gb, 8);
 
         switch (aspect_ratio_idc)
         {
@@ -920,4 +923,88 @@ void H264Parser::vui_parameters(GetBitContext * gb)
     }
     else
         sar_width = sar_height = 0;
+}
+
+uint H264Parser::aspectRatio(void) const
+{
+
+    double aspect = 0.0;
+
+    if (pic_height)
+        aspect = pic_width / (double)pic_height;
+
+    switch (aspect_ratio_idc)
+    {
+        case 0:
+            // Unspecified
+            break;
+        case 1:
+            // 1:1
+            break;
+        case 2:
+            // 12:11
+            aspect *= 1.0909090909090908;
+            break;
+        case 3:
+            // 10:11
+            aspect *= 0.90909090909090906;
+            break;
+        case 4:
+            // 16:11
+            aspect *= 1.4545454545454546;
+            break;
+        case 5:
+            // 40:33
+            aspect *= 1.2121212121212122;
+            break;
+        case 6:
+            // 24:11
+            aspect *= 2.1818181818181817;
+            break;
+        case 7:
+            // 20:11
+            aspect *= 1.8181818181818181;
+            break;
+        case 8:
+            // 32:11
+            aspect *= 2.9090909090909092;
+            break;
+        case 9:
+            // 80:33
+            aspect *= 2.4242424242424243;
+            break;
+        case 10:
+            // 18:11
+            aspect *= 1.6363636363636365;
+            break;
+        case 11:
+            // 15:11
+            aspect *= 1.3636363636363635;
+            break;
+        case 12:
+            // 64:33
+            aspect *= 1.9393939393939394;
+            break;
+        case 13:
+            // 160:99
+            aspect *= 1.6161616161616161;
+            break;
+        case EXTENDED_SAR:
+            if (sar_height)
+                aspect *= sar_width / (double)sar_height;
+            else
+                aspect = 0.0;
+            break;
+    }
+
+    if (aspect == 0.0)
+        return 0;
+    if (fabs(aspect - 1.3333333333333333) < eps)
+        return 2;
+    if (fabs(aspect - 1.7777777777777777) < eps)
+        return 3;
+    if (fabs(aspect - 2.21) < eps)
+        return 4;
+    
+    return aspect * 1000000;
 }

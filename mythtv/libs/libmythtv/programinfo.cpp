@@ -2951,7 +2951,8 @@ void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
 /**
  *  \brief Store a change in aspect ratio in the recordedmark table
  */
-void ProgramInfo::SetAspectChange(MarkTypes type, long long frame)
+void ProgramInfo::SetAspectChange(MarkTypes type, long long frame,
+                                  uint customAspect)
 {
     if (isVideo)
         return;
@@ -2959,14 +2960,20 @@ void ProgramInfo::SetAspectChange(MarkTypes type, long long frame)
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("INSERT INTO recordedmarkup"
-                    " (chanid, starttime, mark, type)"
+                    " (chanid, starttime, mark, type, data)"
                     " VALUES"
-                    " ( :CHANID , :STARTTIME , :MARK , :TYPE );");
+                    " ( :CHANID, :STARTTIME, :MARK, :TYPE, :DATA);");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
     query.bindValue(":MARK", frame);
     query.bindValue(":TYPE", type);
+
+    if (type == MARK_ASPECT_CUSTOM)
+        query.bindValue(":DATA", customAspect);
+    else
+        query.bindValue(":DATA", QVariant::UInt);
+        
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("aspect ratio change insert", query);
@@ -2989,8 +2996,8 @@ void ProgramInfo::SetResolution(uint width, uint height, long long frame)
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
     query.bindValue(":MARK", frame);
-    query.bindValue(":TYPE", MARK_VIDEO_HEIGHT);
-    query.bindValue(":DATA", height);
+    query.bindValue(":TYPE", MARK_VIDEO_WIDTH);
+    query.bindValue(":DATA", width);
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Resolution insert", query);
@@ -3002,8 +3009,8 @@ void ProgramInfo::SetResolution(uint width, uint height, long long frame)
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
     query.bindValue(":MARK", frame);
-    query.bindValue(":TYPE", MARK_VIDEO_WIDTH);
-    query.bindValue(":DATA", width);
+    query.bindValue(":TYPE", MARK_VIDEO_HEIGHT);
+    query.bindValue(":DATA", height);
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Resolution insert", query);

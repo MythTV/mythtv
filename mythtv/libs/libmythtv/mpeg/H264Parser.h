@@ -108,6 +108,10 @@ class H264Parser {
     uint pictureWidth(void) const { return pic_width; }
     uint pictureHeight(void) const { return pic_height; }
 
+    /** \brief Computes aspect ratio from picture size and sample aspect ratio
+     */
+    uint aspectRatio(void) const;
+
     uint64_t frameAUstreamOffset(void) const {return frame_start_offset;}
     uint64_t keyframeAUstreamOffset(void) const {return keyframe_start_offset;}
 
@@ -177,6 +181,7 @@ class H264Parser {
     uint       frame_crop_right_offset;
     uint       frame_crop_top_offset;
     uint       frame_crop_bottom_offset;
+    uint8_t    aspect_ratio_idc;
     uint       sar_width, sar_height;
 
     uint64_t   AU_offset, frame_start_offset, keyframe_start_offset;

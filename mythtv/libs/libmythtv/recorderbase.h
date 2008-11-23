@@ -217,7 +217,8 @@ class MPUBLIC RecorderBase
         ASPECT_1_1           = 0x01,
         ASPECT_4_3           = 0x02,
         ASPECT_16_9          = 0x03,
-        ASPECT_21_1_1         = 0x04
+        ASPECT_2_21_1        = 0x04,
+        ASPECT_CUSTOM        = 0x05,
     };
 
   protected:
@@ -241,7 +242,7 @@ class MPUBLIC RecorderBase
 
     /** \brief Note a change in aspect ratio in the recordedmark table
      */
-    void AspectChange(AspectRatio ratio, long long frame);
+    void AspectChange(uint ratio, long long frame);
 
     /** \brief Note a change in video size in the recordedmark table
      */

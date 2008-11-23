@@ -483,6 +483,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
         _start_code = 0xffffffff;
     }
 
+    uint aspectRatio = 0;
     uint height = 0;
     uint width = 0;
 
@@ -567,9 +568,11 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
                 hasKeyFrame = m_h264_parser.onKeyFrameStart();
                 hasFrame = true;
                 _seen_sps |= hasKeyFrame;
+            
+                width = m_h264_parser.pictureWidth();
+                height = m_h264_parser.pictureHeight();
+                aspectRatio = m_h264_parser.aspectRatio();
             }
-            width = m_h264_parser.pictureWidth();
-            height = m_h264_parser.pictureHeight();
         }
     } // for (; i < TSPacket::SIZE; i++)
 
@@ -584,6 +587,12 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
         _frames_seen_count++;
         if (!_wait_for_keyframe_option || _first_keyframe >= 0)
             _frames_written_count++;
+    }
+
+    if ((aspectRatio > 0) && (aspectRatio != m_videoAspect))
+    {
+        m_videoAspect = aspectRatio;
+        AspectChange((AspectRatio)aspectRatio, _frames_written_count);
     }
 
     if (height && width && (height != m_videoHeight || m_videoWidth != width))

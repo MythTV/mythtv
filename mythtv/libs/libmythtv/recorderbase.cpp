@@ -23,9 +23,8 @@ RecorderBase::RecorderBase(TVRec *rec)
     : tvrec(rec), ringBuffer(NULL), weMadeBuffer(true), videocodec("rtjpeg"),
       audiodevice("/dev/dsp"), videodevice("/dev/video"), vbidevice("/dev/vbi"),
       vbimode(0), ntsc(true), ntsc_framerate(true), video_frame_rate(29.97),
-      m_videoAspect(0), m_videoWidth(0), m_videoHeight(0), curRecording(NULL),
-      request_pause(false), paused(false),
-      nextRingBuffer(NULL), nextRecording(NULL),
+      m_videoAspect(0), m_videoHeight(0), m_videoWidth(0), curRecording(NULL),
+      request_pause(false), paused(false), nextRingBuffer(NULL), nextRecording(NULL),
       positionMapType(MARK_GOP_BYFRAME), positionMapLock()
 {
     QMutexLocker locker(&avcodeclock);
@@ -277,29 +276,29 @@ void RecorderBase::SavePositionMap(bool force)
         positionMapLock.unlock();
 }
 
-void RecorderBase::AspectChange(AspectRatio aspect, long long frame)
+void RecorderBase::AspectChange(uint aspect, long long frame)
 {
-    MarkTypes mark;
-    switch (aspect)
+    MarkTypes mark = MARK_ASPECT_4_3;
+    uint customAspect = 0;
+    if (aspect == ASPECT_1_1)
     {
-        case ASPECT_1_1 :
-            mark = MARK_ASPECT_1_1;
-            break;
-        case ASPECT_4_3 :
-            mark = MARK_ASPECT_4_3;
-            break;
-        case ASPECT_16_9 :
-            mark = MARK_ASPECT_16_9;
-            break;
-        case ASPECT_21_1_1 :
-            mark = MARK_ASPECT_21_1_1;
-            break;
-        default :
-            mark = MARK_ASPECT_4_3;
+        mark = MARK_ASPECT_CUSTOM;
+        customAspect = m_videoWidth * 1000000 / m_videoHeight;
+    }
+    if (aspect == ASPECT_4_3)
+        mark = MARK_ASPECT_4_3;
+    if (aspect == ASPECT_16_9)
+        mark = MARK_ASPECT_16_9;
+    if (aspect == ASPECT_2_21_1)
+        mark = MARK_ASPECT_2_21_1;
+    if (aspect > ASPECT_CUSTOM)
+    {
+        mark = MARK_ASPECT_CUSTOM;
+        customAspect = aspect;
     }
 
     if (curRecording)
-        curRecording->SetAspectChange(mark, frame);
+        curRecording->SetAspectChange(mark, frame, customAspect);
 }
 
 void RecorderBase::ResolutionChange(uint width, uint height, long long frame)
