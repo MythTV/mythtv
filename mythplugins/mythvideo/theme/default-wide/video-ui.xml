@@ -340,7 +340,7 @@
         <textarea name="title" from="basetextarea">
             <area>370,12,700,40</area>
             <multiline>yes</multiline>
-            <font>baseextralarge</font>
+            <font>baselarge</font>
         </textarea>
 
         <textarea name="currentvideo" from="basetextarea">
@@ -349,12 +349,12 @@
         </textarea>
 
         <textarea name="dirlbl" from="basetextarea">
-            <area>380,65,140,35</area>
+            <area>380,65,150,35</area>
             <value>Directed by</value>
         </textarea>
 
         <textarea name="director" from="basetextarea">
-            <area>530,63,450,35</area>
+            <area>540,63,450,35</area>
             <font>basemedium</font>
         </textarea>
 
@@ -379,23 +379,23 @@
         </textarea>
 
         <textarea name="yrlbl" from="basetextarea">
-            <area>690,420,90,35</area>
+            <area>720,420,90,35</area>
             <value>Year:</value>
             <align>right</align>
         </textarea>
 
         <textarea name="year" from="basetextarea">
-            <area>790,420,100,35</area>
+            <area>820,420,100,35</area>
         </textarea>
 
         <textarea name="userratinglbl" from="basetextarea">
-            <area>960,420,150,35</area>
+            <area>1000,420,160,35</area>
             <align>right,top</align>
             <value>User Rating:</value>
         </textarea>
 
         <textarea name="userrating" from="basetextarea">
-            <area>1120,420,50,35</area>
+            <area>1170,420,50,35</area>
             <align>hcenter,top</align>
         </textarea>
 
