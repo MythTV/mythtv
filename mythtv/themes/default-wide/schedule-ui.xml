@@ -106,12 +106,12 @@
         </textarea>
 
         <textarea name="filterlabel" from="basetextarea">
-            <area>20,430,105,30</area>
+            <area>20,430,125,30</area>
             <value>Showing:</value>
         </textarea>
 
         <textarea name="filter" from="basetextarea">
-            <area>120,430,150,30</area>
+            <area>140,430,150,30</area>
         </textarea>
 
         <buttonlist name="schedules" from="basebuttonlist2">
@@ -120,13 +120,13 @@
                 <area>0,0,1200,25</area>
                 <state name="active">
                     <textarea name="time" from="buttontext">
-                        <area>32,1,148,24</area>
+                        <area>32,1,190,24</area>
                     </textarea>
                     <textarea name="channel" from="time">
-                        <area>240,1,140,24</area>
+                        <area>240,1,190,24</area>
                     </textarea>
                     <textarea name="title" from="time">
-                        <area>440,1,380,24</area>
+                        <area>440,1,650,24</area>
                     </textarea>
                     <textarea name="card" from="time">
                         <area>1160,1,30,24</area>
