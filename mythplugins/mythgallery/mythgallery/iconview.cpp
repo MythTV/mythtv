@@ -727,21 +727,24 @@ void IconView::customEvent(QEvent *event)
                     HandleShowDevices();
                     break;
                 case 1:
-                    HandleImport();
+                    HandleEject();
                     break;
                 case 2:
-                    HandleCopyHere();
+                    HandleImport();
                     break;
                 case 3:
-                    HandleMoveHere();
+                    HandleCopyHere();
                     break;
                 case 4:
-                    HandleDelete();
+                    HandleMoveHere();
                     break;
                 case 5:
-                    HandleMkDir();
+                    HandleDelete();
                     break;
                 case 6:
+                    HandleMkDir();
+                    break;
+                case 7:
                     HandleRename();
                     break;
             }
@@ -829,6 +832,7 @@ void IconView::HandleSubMenuFile(void)
     m_menuPopup->SetReturnEvent(this, "filemenu");
 
     m_menuPopup->AddButton(tr("Show Devices"));
+    m_menuPopup->AddButton(tr("Eject"));
     m_menuPopup->AddButton(tr("Import"));
     m_menuPopup->AddButton(tr("Copy here"));
     m_menuPopup->AddButton(tr("Move here"));
@@ -929,6 +933,11 @@ void IconView::HandleSettings(void)
     }
 
     SetFocusWidget(m_imageList);
+}
+
+void IconView::HandleEject(void) 
+{ 
+    myth_eject(); 
 }
 
 void IconView::HandleImport(void)
