@@ -14,7 +14,8 @@ extern "C"
 class LibVisualPlugin : public VisualBase
 {
   public:
-    LibVisualPlugin(MainVisual *parent, long int winid, const QString &pluginName);
+    LibVisualPlugin(MainVisual *parent,
+                    long int winid, const QString &pluginName);
     virtual ~LibVisualPlugin();
 
     void resize(const QSize &size);
@@ -31,14 +32,17 @@ class LibVisualPlugin : public VisualBase
 
   private:
     MainVisual  *m_parent;
-    QStringList  m_pluginList;         // list of available libvisual plugins
+    QStringList  m_pluginList;       ///< list of available libvisual plugins
     uint         m_currentPlugin;
-    VisBin      *m_pVisBin;            // Pointer to LibVisualPlugin representation of an application
-    VisVideo    *m_pVisVideo;          // Pointer to LibVisualPlugin representation of a screen surface
+    VisBin      *m_pVisBin;          ///< Pointer to LibVisual representation
+                                     ///<  of an application
+    VisVideo    *m_pVisVideo;        ///< Pointer to LibVisual representation
+                                     ///<  of a screen surface
 
-    SDL_Surface *m_pSurface;           // Pointer to SDL representation of rendering surface
+    SDL_Surface *m_pSurface;         ///< Pointer to SDL representation
+                                     ///<  of rendering surface
 
-    int16_t      m_Audio[2][512];      // PCM audio data transfer buffer
+    int16_t      m_Audio[2][512];    ///< PCM audio data transfer buffer
     bool         m_paused;
 };
 

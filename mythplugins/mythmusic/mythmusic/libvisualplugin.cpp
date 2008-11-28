@@ -11,7 +11,8 @@ using namespace std;
 
 static char AppName[] = "mythmusic";
 
-LibVisualPlugin::LibVisualPlugin(MainVisual *parent, long int winid, const QString &pluginName)
+LibVisualPlugin::LibVisualPlugin(
+    MainVisual *parent, long int winid, const QString &pluginName)
 {
     fps = 30;
     m_parent = parent;
@@ -54,7 +55,8 @@ LibVisualPlugin::LibVisualPlugin(MainVisual *parent, long int winid, const QStri
         m_pluginList << plugin;
 
     m_currentPlugin = 0;
-    if (pluginName != "" && (m_pluginList.find(pluginName) != m_pluginList.end()))
+    if (pluginName != "" &&
+            (m_pluginList.find(pluginName) != m_pluginList.end()))
         switchToPlugin(pluginName);
     else
         switchToPlugin(m_pluginList[0]);
@@ -89,7 +91,8 @@ void LibVisualPlugin::handleKeyPress(const QString &action)
         if (SDL_MUSTLOCK(m_pSurface) == SDL_TRUE)
             SDL_UnlockSurface(m_pSurface);
 
-        m_parent->showBanner(QString("Visualizer: ") + m_pluginList[m_currentPlugin], 8000);
+        m_parent->showBanner(
+            "Visualizer: " + m_pluginList[m_currentPlugin], 8000);
     }
 }
 
@@ -107,52 +110,56 @@ void LibVisualPlugin::switchToPlugin(const QString &pluginName)
         m_pVisBin = 0;
     }
 
-    if ((m_pVisBin = visual_bin_new()))
+    m_pVisBin = visual_bin_new();
+    if (!m_pVisBin)
     {
-        visual_bin_set_supported_depth(m_pVisBin, VISUAL_VIDEO_DEPTH_ALL);
-        if ((m_pVisVideo = visual_video_new()))
-        {
-            if (visual_bin_set_video(m_pVisBin, m_pVisVideo) == VISUAL_OK)
-            {
-                QByteArray plugin = pluginName.toAscii();
-                if (visual_bin_connect_by_names(
-                        m_pVisBin,
-                        const_cast<char*>(plugin.constData()), 0) == VISUAL_OK)
-                {
-                    if (visual_input_set_callback(visual_bin_get_input(m_pVisBin), AudioCallback, this) == VISUAL_OK)
-                    {
-                        visual_bin_switch_set_style(m_pVisBin, VISUAL_SWITCH_STYLE_MORPH);
-                        visual_bin_switch_set_automatic(m_pVisBin, true);
-                        visual_bin_switch_set_steps(m_pVisBin, 100);
-                        visual_bin_realize(m_pVisBin);
-                    }
-                    else
-                    {
-                        VERBOSE(VB_IMPORTANT, "Error connecting LibVisualPlugin"
-                                " 'Input' object to our data source object");
-                    }
-                }
-                else
-                {
-                    VERBOSE(VB_IMPORTANT, "Error connecting LibVisualPlugin"
-                            " 'Plugin' object to 'Bin' object");
-                }
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, "Error connecting LibVisualPlugin"
-                        " 'Video' object to 'Bin' object");
-            }
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, 
-                    "Error allocating LibVisualPlugin 'Video' object");
-        }
+        VERBOSE(VB_IMPORTANT, "Error allocating LibVisualPlugin 'Bin' object");
+        return;
+    }
+
+    visual_bin_set_supported_depth(m_pVisBin, VISUAL_VIDEO_DEPTH_ALL);
+
+    m_pVisVideo = visual_video_new();
+    if (!m_pVisVideo)
+    {
+        VERBOSE(VB_IMPORTANT, 
+                "Error allocating LibVisualPlugin 'Video' object");
+        return;
+    }
+
+    if (visual_bin_set_video(m_pVisBin, m_pVisVideo) != VISUAL_OK)
+    {
+        VERBOSE(VB_IMPORTANT, "Error connecting LibVisualPlugin"
+                " 'Video' object to 'Bin' object");
+        return;
+    }
+
+    QByteArray plugin = pluginName.toAscii();
+    if (visual_bin_connect_by_names(
+            m_pVisBin, const_cast<char*>(plugin.constData()), 0) != VISUAL_OK)
+    {
+        VERBOSE(VB_IMPORTANT, "Error connecting LibVisualPlugin"
+                " 'Plugin' object to 'Bin' object");
+        return;
+    }
+
+    // Work around visualisers that don't initialise their buffer:
+    QSize size(100, 100); 
+    visual_video_set_dimension(m_pVisVideo, size.width(), size.height()); 
+    createScreen(size.width(), size.height());
+
+    if (visual_input_set_callback(
+            visual_bin_get_input(m_pVisBin), AudioCallback, this) == VISUAL_OK)
+    {
+        visual_bin_switch_set_style(m_pVisBin, VISUAL_SWITCH_STYLE_MORPH);
+        visual_bin_switch_set_automatic(m_pVisBin, true);
+        visual_bin_switch_set_steps(m_pVisBin, 100);
+        visual_bin_realize(m_pVisBin);
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Error allocating LibVisualPlugin 'Bin' object");
+        VERBOSE(VB_IMPORTANT, "Error connecting LibVisualPlugin"
+                " 'Input' object to our data source object");
     }
 }
 
@@ -224,7 +231,8 @@ bool LibVisualPlugin::createScreen(int width, int height)
         if (const SDL_VideoInfo* VideoInfo = SDL_GetVideoInfo())
         {
             int VideoFlags = SDL_OPENGL | SDL_GL_DOUBLEBUFFER | SDL_HWPALETTE;
-            VideoFlags |= VideoInfo->hw_available ? SDL_HWSURFACE : SDL_SWSURFACE;
+            VideoFlags |= VideoInfo->hw_available
+                          ? SDL_HWSURFACE : SDL_SWSURFACE;
             VideoFlags |= VideoInfo->blit_hw ? SDL_HWACCEL : 0;
 
             SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
@@ -310,8 +318,9 @@ int LibVisualPlugin::AudioCallback(VisInput*, VisAudio* audio, void* priv)
 
     VisBuffer buf;
     visual_buffer_init(&buf, that->m_Audio, 1024, 0);
-    visual_audio_samplepool_input(audio->samplepool, &buf, VISUAL_AUDIO_SAMPLE_RATE_44100,
-            VISUAL_AUDIO_SAMPLE_FORMAT_S16, VISUAL_AUDIO_SAMPLE_CHANNEL_STEREO);
+    visual_audio_samplepool_input(
+        audio->samplepool, &buf, VISUAL_AUDIO_SAMPLE_RATE_44100,
+        VISUAL_AUDIO_SAMPLE_FORMAT_S16, VISUAL_AUDIO_SAMPLE_CHANNEL_STEREO);
 
     return 0;
 }
@@ -360,7 +369,8 @@ static class LibVisualFactory : public VisFactory
             return LibVisualPlugin::plugins(list);
         }
 
-        VisualBase *create(MainVisual *parent, long int winid, const QString &pluginName) const
+        VisualBase *create(MainVisual *parent,
+                           long int winid, const QString &pluginName) const
         {
             return new LibVisualPlugin(parent, winid, pluginName);
         }
