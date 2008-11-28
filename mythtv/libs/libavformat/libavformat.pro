@@ -10,6 +10,7 @@ INSTALLS = target
 
 QMAKE_LFLAGS += $$LDFLAGS
 
+INCLUDEPATH -= /usr/local/include /usr/include
 INCLUDEPATH += .. ../..
 
 DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
