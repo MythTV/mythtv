@@ -80,18 +80,24 @@ extern "C" {
 #define XVMC_CHROMA_FORMAT_420 0x00000001
 #endif
 
+#define NUM_VDPAU_BUFFERS 17
+
 static QStringList allowed_video_renderers(MythCodecID codec_id,
                                            Display *XJ_disp);
 
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
-                       bool &useXV, bool &useShm, bool &useOpenGL);
+                       bool &useXV, bool &useShm, bool &useOpenGL,
+                       bool &useVDPAU);
 static void SetFromHW(Display *d, bool &useXvMC, bool &useXV,
-                      bool &useShm, bool &useXvMCOpenGL, bool &useOpenGL);
+                      bool &useShm, bool &useXvMCOpenGL,
+                      bool &useOpenGL, bool &useVDPAU,
+                      MythCodecID myth_codec_id);
 static int calc_hue_base(const QString &adaptor_name);
 
 const char *vr_str[] =
 {
-    "unknown", "xlib", "xshm", "opengl", "xv-blit", "xvmc", "xvmc", "xvmc",
+    "unknown", "xlib", "xshm", "opengl", "xv-blit", "vdpau", "xvmc", "xvmc",
+    "xvmc",
 };
 
 /** \class  VideoOutputXv
@@ -124,6 +130,8 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
       xvmc_osd_lock(),
       xvmc_tex(NULL),
 
+      use_vdpau_osd(false), use_vdpau_pip(true),
+
       xv_port(-1),      xv_hue_base(0),
       xv_colorkey(0),   xv_draw_colorkey(false),
       xv_chroma(0),
@@ -141,6 +149,10 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
 {
     VERBOSE(VB_PLAYBACK, LOC + "ctor");
     bzero(&av_pause_frame, sizeof(av_pause_frame));
+
+#ifdef USING_VDPAU
+    vdpau = NULL;
+#endif
 
     // If using custom display resolutions, display_res will point
     // to a singleton instance of the DisplayRes class
@@ -325,7 +337,7 @@ QRect VideoOutputXv::GetVisibleOSDBounds(
     QSize dvr2 = QSize(display_visible_rect.width()  & ~0x3,
                        display_visible_rect.height() & ~0x1);
 
-    if (!chroma_osd && !gl_use_osd_opengl2)
+    if (!chroma_osd && !gl_use_osd_opengl2 && !use_vdpau_osd)
     {
         return VideoOutput::GetVisibleOSDBounds(
             visible_aspect, font_scaling, themeaspect);
@@ -345,7 +357,8 @@ QRect VideoOutputXv::GetTotalOSDBounds(void) const
     QSize dvr2 = QSize(display_visible_rect.width()  & ~0x3,
                        display_visible_rect.height() & ~0x1);
 
-    QSize sz = (chroma_osd || gl_use_osd_opengl2) ? dvr2 : video_disp_dim;
+    QSize sz = (chroma_osd || gl_use_osd_opengl2 || use_vdpau_osd) ?
+                dvr2 : video_disp_dim;
     return QRect(QPoint(0,0), sz);
 }
 
@@ -895,12 +908,22 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
 
     bool done = false;
     // If use_xvmc try to create XvMC buffers
+#ifdef USING_VDPAU
+    if (mcodecid > kCodec_DVDV_END)
+    {
+        vbuffers.Init(NUM_VDPAU_BUFFERS, true, 1, 4, 4, 1, false);
+        done = InitVDPAU(mcodecid);
+        if (!done)
+            vbuffers.Reset();
+    }
+#endif
+
 #ifdef USING_XVMC
-    if (mcodecid > kCodec_NORMAL_END)
+    if (!done && mcodecid > kCodec_NORMAL_END)
     {
         // Create ffmpeg VideoFrames
-        bool vld, idct, mc;
-        myth2av_codecid(myth_codec_id, vld, idct, mc);
+        bool vld, idct, mc, vdpau;
+        myth2av_codecid(myth_codec_id, vld, idct, mc, vdpau);
 
         vbuffers.Init(xvmc_buf_attr->GetNumSurf(),
                       false /* create an extra frame for pause? */,
@@ -1110,6 +1133,49 @@ bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
 #endif // USING_XVMC
 }
 
+/**
+ * \fn VideoOutputXv::InitVDPAU(MythCodecID)
+ *  Creates and initializes video buffers.
+ *
+ * \sideeffect sets video_output_subtype if it succeeds.
+ *
+ * \return success or failure at creating any buffers.
+ */
+bool VideoOutputXv::InitVDPAU(MythCodecID mcodecid)
+{
+    (void)mcodecid;
+#ifdef USING_VDPAU
+    vdpau = new VDPAUContext();
+
+    bool ok = vdpau->Init(XJ_disp, XJ_screen, XJ_curwin,
+                          display_visible_rect.size(),
+                          db_use_picture_controls);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, "Unable to init VDPAU");
+        vdpau->Deinit();
+        delete vdpau;
+        return ok;
+    }
+
+    ok = CreateVDPAUBuffers();
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, "Unable to create VDPAU buffers");
+        DeleteBuffers(XVideoVDPAU, false);
+        vdpau->Deinit();
+        delete vdpau;
+        return ok;
+    }
+
+    video_output_subtype = XVideoVDPAU;            
+    allowpreviewepg = false;
+    return ok;
+#else // USING_VDPAU
+    return false;
+#endif // USING_VDPAU
+}
+
 static bool has_format(XvImageFormatValues *formats, int format_cnt, int id)
 {
     for (int i = 0; i < format_cnt; i++)
@@ -1306,7 +1372,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
 
     if (force_xv)
         return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
-#ifdef USING_XVMC
+
     VideoDisplayProfile vdp;
     vdp.SetInput(QSize(width, height));
     QString dec = vdp.GetDecoder();
@@ -1318,20 +1384,26 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
     // Disable features based on environment and DB values.
     bool use_xvmc_vld = false, use_xvmc_idct = false, use_xvmc = false;
     bool use_xv = true, use_shm = true, use_opengl = true;
+    bool use_vdpau = false;
 
     if (dec == "xvmc")
         use_xvmc_idct = use_xvmc = true;
     else if (dec == "xvmc-vld")
         use_xvmc_vld = use_xvmc = true;
+    else if (dec == "vdpau")
+        use_vdpau = true;
 
     SetFromEnv(use_xvmc_vld, use_xvmc_idct, use_xvmc, use_xv,
-               use_shm, use_opengl);
+               use_shm, use_opengl, use_vdpau);
 
     // Disable features based on hardware capabilities.
     bool use_xvmc_opengl = use_xvmc;
-    SetFromHW(disp, use_xvmc, use_xv, use_shm, use_xvmc_opengl, use_opengl);
+    SetFromHW(disp, use_xvmc, use_xv, use_shm,
+              use_xvmc_opengl, use_opengl, use_vdpau,
+             (MythCodecID)(kCodec_MPEG1_VDPAU + (stream_type-1)));
 
     MythCodecID ret = (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
+#ifdef USING_XVMC
     if (use_xvmc_vld &&
         XvMCSurfaceTypes::has(disp, XvVLD, stream_type, xvmc_chroma,
                               width, height, osd_width, osd_height))
@@ -1375,7 +1447,6 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
             X11U;
         }
     }
-    X11S(XCloseDisplay(disp));
     X11S(ok |= cnt_open_xv_port() > 0); // also ok if we already opened port..
 
     if (!ok)
@@ -1392,17 +1463,32 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
                 "\t\t\tvendor's XvMC library.\n";
 #endif // USING_XVMCW
         VERBOSE(VB_IMPORTANT, msg);
-        ret = (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
     }
+#endif // USING_XVMC
 
+    X11S(XCloseDisplay(disp));
+
+#ifdef USING_VDPAU
+    if (use_vdpau)
+        ret = (MythCodecID)(kCodec_MPEG1_VDPAU + (stream_type-1));
+#endif // USING_VDPAU
     return ret;
-#else // if !USING_XVMC
-    return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
-#endif // !USING_XVMC
 }
 
 bool VideoOutputXv::InitOSD(const QString &osd_renderer)
 {
+#ifdef USING_VDPAU
+    if (osd_renderer == "vdpau" && vdpau)
+    {
+        use_vdpau_osd = true;
+        if (!vdpau->InitOSD(GetTotalOSDBounds().size()))
+        {
+            use_vdpau_osd = false;
+            VERBOSE(VB_IMPORTANT, LOC + "Init VDPAU osd failed.");
+        }
+        return use_vdpau_osd;
+    }
+#endif
     if (osd_renderer == "opengl")
     {
         xvmc_tex = XvMCTextures::Create(
@@ -1585,7 +1671,8 @@ bool VideoOutputXv::InitSetupBuffers(void)
     InitOSD(osdrenderer);
 
     // Initialize chromakeying, if we need to
-    if (!xvmc_tex && video_output_subtype >= XVideo)
+    if (!xvmc_tex && video_output_subtype >= XVideo &&
+        video_output_subtype != XVideoVDPAU)
         InitColorKey(true);
 
     // Check if we can actually use the OSD we want to use...
@@ -1761,6 +1848,9 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
 // documented in videooutbase.cpp
 bool VideoOutputXv::SetDeinterlacingEnabled(bool enable)
 {
+    if (VideoOutputSubType() == XVideoVDPAU)
+        return SetDeinterlacingEnabledVDPAU(enable);
+
     if (VideoOutputSubType() == OpenGL)
         return SetDeinterlacingEnabledOpenGL(enable);
 
@@ -1772,12 +1862,61 @@ bool VideoOutputXv::SetDeinterlacingEnabled(bool enable)
 bool VideoOutputXv::SetupDeinterlace(bool interlaced,
                                      const QString& overridefilter)
 {
+    if (VideoOutputSubType() == XVideoVDPAU)
+        return SetupDeinterlaceVDPAU(interlaced, overridefilter);
+
     if (VideoOutputSubType() == OpenGL)
         return SetupDeinterlaceOpenGL(interlaced, overridefilter);
 
     bool deint = VideoOutput::SetupDeinterlace(interlaced, overridefilter);
     needrepaint = true;
     return deint;
+}
+
+bool VideoOutputXv::SetDeinterlacingEnabledVDPAU(bool enable)
+{
+    (void)enable;
+#ifdef USING_VDPAU
+    if (!vdpau)
+        return false;
+
+    if (vdpau->GetDeinterlacer() != m_deintfiltername)
+            return SetupDeinterlace(enable);
+
+    m_deinterlacing = vdpau->SetDeinterlacing(enable);
+#endif // USING_VDPAU
+    return m_deinterlacing;
+}
+
+bool VideoOutputXv::SetupDeinterlaceVDPAU(
+    bool interlaced, const QString &overridefilter)
+{
+    (void)interlaced;
+    (void)overridefilter;
+#ifdef USING_VDPAU
+    // clear any software filters
+    if (m_deintFiltMan)
+    {
+        delete m_deintFiltMan;
+        m_deintFiltMan = NULL;
+    }
+    if (m_deintFilter)
+    {
+        delete m_deintFilter;
+        m_deintFilter = NULL;
+    }
+
+    if (!vdpau)
+        return false;
+
+    m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
+    if (!m_deintfiltername.contains("vdpau"))
+        return false;
+
+    vdpau->SetDeinterlacer(m_deintfiltername);
+    m_deinterlacing = vdpau->SetDeinterlacing(interlaced);
+#endif// USING_VDPAU
+    return m_deinterlacing;
 }
 
 bool VideoOutputXv::SetDeinterlacingEnabledOpenGL(bool enable)
@@ -1905,6 +2044,13 @@ bool VideoOutputXv::ApproveDeintFilter(const QString& filtername) const
 {
     // TODO implement bobdeint for non-Xv[MC]
     VOSType vos = VideoOutputSubType();
+    if (vos == XVideoVDPAU)
+    {
+        if (filtername.contains("vdpau"))
+            return true;
+        return false;
+    }
+
     if (filtername == "bobdeint" && (vos >= XVideo || vos == OpenGL))
         return true;
     else if (vos > XVideo)
@@ -1948,6 +2094,34 @@ void VideoOutputXv::DeleteXvMCContext(Display* disp, XvMCContext*& ctx)
         ctx = NULL;
     }
 #endif // !USING_XVMC
+}
+
+bool VideoOutputXv::CreateVDPAUBuffers(void)
+{
+#ifdef USING_VDPAU
+    if (!vdpau)
+        return false;
+
+    if (!vdpau->InitBuffers(video_dim.width(),
+                            video_dim.height(),
+                            NUM_VDPAU_BUFFERS + 1))
+    {
+        vdpau->FreeBuffers();
+        return false;
+    }
+
+    bool ok = vbuffers.CreateBuffers(video_dim.width(), 
+                                     video_dim.height(), vdpau);
+    if (!ok)
+    {
+        DeleteBuffers(XVideoVDPAU, false);
+        return ok;
+    }
+
+    return true;
+#else
+    return false;
+#endif
 }
 
 bool VideoOutputXv::CreateXvMCBuffers(void)
@@ -2230,7 +2404,9 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
 {
     bool ok = false;
 
-    if (subtype > XVideo && xv_port >= 0)
+    if (subtype == XVideoVDPAU)
+        ok = CreateVDPAUBuffers();
+    else if (subtype > XVideo && xv_port >= 0)
         ok = CreateXvMCBuffers();
     else if (subtype == XVideo && xv_port >= 0)
     {
@@ -2319,6 +2495,16 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
 {
     (void) subtype;
     DiscardFrames(true);
+
+#ifdef USING_VDPAU
+    if (vdpau)
+    {
+        vdpau->FreeBuffers();
+        vdpau->Deinit();
+        delete vdpau;
+        vdpau = NULL;
+    }
+#endif
 
 #ifdef USING_XVMC
     // XvMC buffers
@@ -2476,7 +2662,12 @@ void VideoOutputXv::DiscardFrame(VideoFrame *frame)
     bool displaying = false;
     if (!frame)
         return;
-
+#ifdef USING_VDPAU
+    if (vdpau && VideoOutputSubType() == XVideoVDPAU)
+    {
+        displaying = vdpau->IsBeingUsed(frame);
+    }
+#endif // USING_VDPAU
 #ifdef USING_XVMC
     vbuffers.LockFrame(frame, "DiscardFrame -- XvMC display check");
     if (frame && VideoOutputSubType() >= XVideoMC)
@@ -2529,7 +2720,7 @@ void VideoOutputXv::ClearAfterSeek(void)
     VERBOSE(VB_PLAYBACK, LOC + "ClearAfterSeek()");
     DiscardFrames(false);
 #ifdef USING_XVMC
-    if (VideoOutputSubType() > XVideo)
+    if (VideoOutputSubType() >= XVideoMC)
     {
         for (uint i=0; i<xvmc_surfs.size(); i++)
         {
@@ -2550,8 +2741,15 @@ void VideoOutputXv::ClearAfterSeek(void)
 void VideoOutputXv::DiscardFrames(bool next_frame_keyframe)
 {
     VERBOSE(VB_PLAYBACK, LOC + "DiscardFrames("<<next_frame_keyframe<<")");
-    if (VideoOutputSubType() <= XVideo)
+    if (VideoOutputSubType() <= XVideoVDPAU)
     {
+#ifdef USING_VDPAU
+        if (vdpau && VideoOutputSubType() == XVideoVDPAU)
+        {
+            CheckFrameStates();
+            vdpau->ClearReferenceFrames();
+        }
+#endif // USING_VDPAU
         vbuffers.DiscardFrames(next_frame_keyframe);
         VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 3: %1 -- done()")
                 .arg(vbuffers.GetStatus()));
@@ -2644,6 +2842,19 @@ void VideoOutputXv::DoneDisplayingFrame(void)
         vbuffers.DoneDisplayingFrame();
         return;
     }
+
+#ifdef USING_VDPAU
+    if (vdpau && VideoOutputSubType() == XVideoVDPAU)
+    {
+        if (vbuffers.size(kVideoBuffer_used))
+        {
+            VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
+            DiscardFrame(frame);
+        }
+        CheckFrameStates();
+        return;
+    }
+#endif // USING_VDPAU
 #ifdef USING_XVMC
     if (vbuffers.size(kVideoBuffer_used))
     {
@@ -2659,6 +2870,35 @@ void VideoOutputXv::DoneDisplayingFrame(void)
     }
     CheckFrameStates();
 #endif
+}
+
+void VideoOutputXv::PrepareFrameVDPAU(VideoFrame *frame, FrameScanType scan)
+{
+    (void)frame;
+    (void)scan;
+    if (!frame)
+    {
+        // FIXME does this need some locking
+        // do we actually need a scratch frame?
+        frame = vbuffers.tail(kVideoBuffer_pause);
+        if (!frame)
+            frame = vbuffers.GetScratchFrame();
+    }
+
+    framesPlayed = frame->frameNumber + 1;
+
+#ifdef USING_VDPAU
+    if (!vdpau)
+        return;
+
+    vdpau->PrepareVideo(frame, video_rect, display_video_rect, 
+                        display_visible_rect.size(), scan);
+
+#endif
+
+    if (vbuffers.GetScratchFrame() == frame)
+        vbuffers.SetLastShownFrameToScratch();
+
 }
 
 /**
@@ -2869,7 +3109,9 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType scan)
         return;
     }
 
-    if (VideoOutputSubType() > XVideo)
+    if (VideoOutputSubType() == XVideoVDPAU)
+        PrepareFrameVDPAU(buffer, scan);
+    else if (VideoOutputSubType() > XVideo)
         PrepareFrameXvMC(buffer, scan);
     else if (VideoOutputSubType() == XVideo)
         PrepareFrameXv(buffer);
@@ -2955,6 +3197,24 @@ static void calc_bob(FrameScanType scan, int imgh, int disphoff,
         cerr<<endl;
     }
     last_dest_y_field[field] = dest_y;
+#endif
+}
+
+void VideoOutputXv::ShowVDPAU(FrameScanType scan)
+{
+    (void)scan;
+#ifdef USING_VDPAU
+    if (!vdpau)
+        return;
+
+    if (vdpau->IsErrored())
+    {
+        errored = true;
+        return;
+    }
+
+    vdpau->DisplayNextFrame();
+    CheckFrameStates();
 #endif
 }
 
@@ -3114,7 +3374,9 @@ void VideoOutputXv::Show(FrameScanType scan)
         DrawUnusedRects(/* don't do a sync*/false);
     }
 
-    if (VideoOutputSubType() > XVideo)
+    if (VideoOutputSubType() == XVideoVDPAU)
+        ShowVDPAU(scan);
+    else if (VideoOutputSubType() > XVideo)
         ShowXvMC(scan);
     else if (VideoOutputSubType() == XVideo)
         ShowXVideo(scan);
@@ -3129,7 +3391,8 @@ void VideoOutputXv::Show(FrameScanType scan)
 
 void VideoOutputXv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 {
-    if (VideoOutputSubType() != OpenGL)
+    if (VideoOutputSubType() != OpenGL &&
+        VideoOutputSubType() != XVideoVDPAU)
     {
         VideoOutput::ShowPip(frame, pipplayer);
         return;
@@ -3158,6 +3421,16 @@ void VideoOutputXv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     }
 
     QRect position = GetPIPRect(db_pip_location, pipplayer);
+
+#ifdef USING_VDPAU
+    if (vdpau && use_vdpau_pip &&
+        VideoOutputSubType() == XVideoVDPAU)
+    {
+        use_vdpau_pip = vdpau->ShowPiP(pipimage, position);
+        pipplayer->ReleaseCurrentFrame(pipimage);
+        return;
+    }
+#endif // USING_VDPAU
 
     if (!gl_pipchain)
     {
@@ -3337,6 +3610,16 @@ void VideoOutputXv::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     if (VideoOutputSubType() <= XVideo)
         return;
 
+#ifdef USING_VDPAU
+    if (VideoOutputSubType() == XVideoVDPAU)
+    {
+        if (!vdpau)
+            return;
+        vdpau->Decode(frame);
+        return;
+    }
+#endif
+
 #ifdef USING_XVMC
     xvmc_render_state_t *render = GetRender(frame);
     // disable questionable ffmpeg surface munging
@@ -3464,6 +3747,47 @@ void VideoOutputXv::UpdatePauseFrame(void)
         }
         vbuffers.UnlockFrame(&av_pause_frame, "UpdatePauseFrame - used");
     }
+#ifdef USING_VDPAU
+    else if (VideoOutputSubType() == XVideoVDPAU)
+    {
+        vbuffers.begin_lock(kVideoBuffer_used);
+
+        if (vbuffers.size(kVideoBuffer_pause)>1)
+        {
+            VERBOSE(VB_PLAYBACK, LOC_ERR + "UpdatePauseFrame(): "
+                    "Pause buffer size>1 check, " + QString("size = %1")
+                    .arg(vbuffers.size(kVideoBuffer_pause)));
+            while (vbuffers.size(kVideoBuffer_pause))
+                DiscardFrame(vbuffers.dequeue(kVideoBuffer_pause));
+        }
+        
+        if (vbuffers.size(kVideoBuffer_pause) <= 1)
+        {
+            VideoFrame *frame = vbuffers.dequeue(kVideoBuffer_used);
+            if (frame)
+            {
+                if (vbuffers.size(kVideoBuffer_pause) > 0)
+                    while (vbuffers.size(kVideoBuffer_pause))
+                        DiscardFrame(vbuffers.dequeue(kVideoBuffer_pause));
+                vbuffers.safeEnqueue(kVideoBuffer_pause, frame);
+                VERBOSE(VB_PLAYBACK, LOC + "UpdatePauseFrame(): "
+                        "VDPAU using NEW pause frame");
+            }
+            else if (!frame && vbuffers.size(kVideoBuffer_pause) == 1)
+            {
+                VERBOSE(VB_PLAYBACK, LOC + "UpdatePauseFrame(): "
+                        "VDPAU using OLD pause frame");
+            }
+        }
+        vbuffers.end_lock();
+
+        if (1 != vbuffers.size(kVideoBuffer_pause))
+        {
+            VERBOSE(VB_PLAYBACK, LOC + "UpdatePauseFrame -- VDPAU: "
+                                       "Did NOT find a pause frame");
+        }
+    }
+#endif
 #ifdef USING_XVMC
     else
     {
@@ -3515,6 +3839,13 @@ void VideoOutputXv::UpdatePauseFrame(void)
         }
     }
 #endif
+}
+
+void VideoOutputXv::ProcessFrameVDPAU(VideoFrame *frame, OSD *osd,
+                                      NuppelVideoPlayer *pipPlayer)
+{
+    DisplayOSD(frame, osd);
+    ShowPip(frame, pipPlayer);
 }
 
 void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
@@ -3827,7 +4158,9 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
         return;
     }
 
-    if (VideoOutputSubType() == OpenGL)
+    if (VideoOutputSubType() == XVideoVDPAU)
+        ProcessFrameVDPAU(frame, osd, pipPlayer);
+    else if (VideoOutputSubType() == OpenGL)
         ProcessFrameOpenGL(frame, osd, filterList, pipPlayer);
     else if (VideoOutputSubType() <= XVideo)
         ProcessFrameMem(frame, osd, filterList, pipPlayer);
@@ -3841,6 +4174,20 @@ int VideoOutputXv::SetPictureAttribute(
 {
     if (!supported_attributes)
         return -1;
+
+    if (VideoOutputSubType() == XVideoVDPAU)
+    {
+#ifdef USING_VDPAU
+        if (vdpau)
+        {
+            newValue = min(max(newValue, 0), 100);
+            newValue = vdpau->SetPictureAttribute(attribute, newValue);
+            if (newValue >= 0)
+                SetPictureAttributeDBValue(attribute, newValue);
+            return newValue;
+        }
+#endif // USING_VDPAU
+    }
 
     if (VideoOutputSubType() == OpenGL)
     {
@@ -3907,7 +4254,14 @@ void VideoOutputXv::InitPictureAttributes(void)
 {
     supported_attributes = kPictureAttributeSupported_None;
 
-    if (VideoOutputSubType() == OpenGL)
+    if (VideoOutputSubType() == XVideoVDPAU)
+    {
+#ifdef USING_VDPAU
+        if (vdpau)
+            supported_attributes = vdpau->GetSupportedPictureAttributes();
+#endif //USING_VDPAU
+    }
+    else if (VideoOutputSubType() == OpenGL)
     {
         supported_attributes = gl_videochain->GetSupportedPictureAttributes();
     }
@@ -3946,6 +4300,38 @@ void VideoOutputXv::InitPictureAttributes(void)
 
 void VideoOutputXv::CheckFrameStates(void)
 {
+#ifdef USING_VDPAU
+    if (vdpau && VideoOutputSubType() == XVideoVDPAU)
+    {
+        frame_queue_t::iterator it;
+        it = vbuffers.begin_lock(kVideoBuffer_displayed);
+        while (it != vbuffers.end(kVideoBuffer_displayed))
+        {
+            VideoFrame* frame = *it;
+            if (!vdpau->IsBeingUsed(frame))
+            {
+                if (vbuffers.contains(kVideoBuffer_decode, frame))
+                {
+                    VERBOSE(VB_PLAYBACK, LOC + QString(
+                                "Frame %1 is in use by avlib and so is "
+                                "being held for later discarding.")
+                            .arg(DebugString(frame, true)));
+                }
+                else
+                {
+                    vbuffers.RemoveInheritence(frame);
+                    vbuffers.safeEnqueue(kVideoBuffer_avail, frame);
+                    vbuffers.end_lock();
+                    it = vbuffers.begin_lock(kVideoBuffer_displayed);
+                continue;
+                }
+            }
+            ++it;
+        }
+        vbuffers.end_lock();
+        return;
+    }
+#endif // USING_VDPAU
 #ifdef USING_XVMC
     frame_queue_t::iterator it;
 
@@ -4041,6 +4427,9 @@ void VideoOutputXv::CheckFrameStates(void)
 bool VideoOutputXv::IsDisplaying(VideoFrame* frame)
 {
     (void)frame;
+    if (!frame)
+        return false;
+
 #ifdef USING_XVMC
     xvmc_render_state_t *render = GetRender(frame);
     if (render)
@@ -4216,22 +4605,23 @@ void VideoOutputXv::ShutdownVideoResize(void)
 int VideoOutputXv::DisplayOSD(VideoFrame *frame, OSD *osd,
                               int stride, int revision)
 {
-    if (!gl_use_osd_opengl2)
+    if (!(gl_use_osd_opengl2 || use_vdpau_osd))
         return VideoOutput::DisplayOSD(frame, osd, stride, revision);
 
     gl_osd_ready = false;
 
-    if (!osd || !gl_osdchain)
+    if (!osd)
         return -1;
-
-    if (vsz_enabled && gl_videochain)
-        gl_videochain->SetVideoResize(vsz_desired_display_rect);
 
     OSDSurface *surface = osd->Display();
     if (!surface)
+    {
+#ifdef USING_VDPAU
+        if (vdpau)
+            vdpau->DisableOSD();
+#endif
         return -1;
-
-    gl_osd_ready = true;
+    }
 
     bool changed = (-1 == revision) ?
         surface->Changed() : (surface->GetRevision()!=revision);
@@ -4240,16 +4630,40 @@ int VideoOutputXv::DisplayOSD(VideoFrame *frame, OSD *osd,
     {
         QSize visible = GetTotalOSDBounds().size();
 
-        int offsets[3] =
+        if (use_vdpau_osd)
         {
-            surface->y - surface->yuvbuffer,
-            surface->u - surface->yuvbuffer,
-            surface->v - surface->yuvbuffer,
-        };
-        gl_osdchain->UpdateInput(surface->yuvbuffer, offsets,
+#ifdef USING_VDPAU
+            if (!vdpau)
+                return -1;
+
+            void* const offsets[3] = 
+                    {surface->y, surface->u, surface->v};
+            void* const alpha[1] = {surface->alpha};
+            vdpau->UpdateOSD(offsets, visible, alpha);
+#endif // USING_VDPAU
+        }
+        else if (gl_use_osd_opengl2)
+        {
+            if (!gl_osdchain)
+                return -1;
+
+            if (vsz_enabled && gl_videochain)
+                gl_videochain->SetVideoResize(vsz_desired_display_rect);
+
+            gl_osd_ready = true;
+
+            int offsets[3] =
+            {
+                surface->y - surface->yuvbuffer,
+                surface->u - surface->yuvbuffer,
+                surface->v - surface->yuvbuffer,
+            };
+
+            gl_osdchain->UpdateInput(surface->yuvbuffer, offsets,
                                  0, FMT_YV12, visible);
-        gl_osdchain->UpdateInput(surface->alpha, offsets,
+            gl_osdchain->UpdateInput(surface->alpha, offsets,
                                  3, FMT_ALPHA, visible);
+        }
     }
     return changed;
 }
@@ -4274,7 +4688,8 @@ QStringList VideoOutputXv::GetAllowedRenderers(
 }
 
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
-                       bool &useXVideo, bool &useShm, bool &useOpenGL)
+                       bool &useXVideo, bool &useShm, bool &useOpenGL,
+                       bool &useVDPAU)
 {
     // can be used to force non-Xv mode as well as non-Xv/non-Shm mode
     if (getenv("NO_XVMC_VLD"))
@@ -4289,13 +4704,17 @@ static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
         useXVideo = useShm = false;
     if (getenv("NO_OPENGL"))
         useOpenGL = false;
+    if (getenv("NO_VDPAU"))
+        useVDPAU = false;
 }
 
 static void SetFromHW(Display *d,
                       bool &useXvMC, bool &useXVideo,
                       bool &useShm,  bool &useXvMCOpenGL,
-                      bool &useOpenGL)
+                      bool &useOpenGL, bool &useVDPAU,
+                      MythCodecID vdpau_codec_id)
 {
+    (void) vdpau_codec_id;
     // find out about XvMC support
     if (useXvMC)
     {
@@ -4358,23 +4777,29 @@ static void SetFromHW(Display *d,
         useOpenGL = OpenGLContext::IsGLXSupported(d, 1, 2);
 #endif // USING_OPENGL_VIDEO
     }
+
+    if (useVDPAU)
+    {
+        useVDPAU = false;
+#ifdef USING_VDPAU
+        useVDPAU = VDPAUContext::CheckCodecSupported(vdpau_codec_id);
+#endif // USING_VDPAU
+    }
 }
 
 static QStringList allowed_video_renderers(MythCodecID myth_codec_id,
                                            Display *XJ_disp)
 {
-    bool vld, idct, mc, xv, shm, xvmc_opengl, opengl;
+    bool vld, idct, mc, xv, shm, xvmc_opengl, opengl, vdpau;
 
-    myth2av_codecid(myth_codec_id, vld, idct, mc);
+    myth2av_codecid(myth_codec_id, vld, idct, mc, vdpau);
 
     opengl = xv = shm = !vld && !idct;
     xvmc_opengl = vld || idct || mc;
-
-    SetFromEnv(vld, idct, mc, xv, shm, opengl);
-    SetFromHW(XJ_disp, mc, xv, shm, xvmc_opengl, opengl);
-
+    SetFromEnv(vld, idct, mc, xv, shm, opengl, vdpau);
+    SetFromHW(XJ_disp, mc, xv, shm, xvmc_opengl,
+              opengl, vdpau, myth_codec_id);
     idct &= mc;
-
     QStringList list;
     if (myth_codec_id < kCodec_NORMAL_END)
     {
@@ -4386,6 +4811,11 @@ static QStringList allowed_video_renderers(MythCodecID myth_codec_id,
             list += "xshm";
         list += "xlib";
     }
+    else if (myth_codec_id < kCodec_VDPAU_END &&
+             myth_codec_id > kCodec_DVDV_END && vdpau)
+    {
+        list += "vdpau";
+    }
     else
     {
         if (vld || idct || mc)
@@ -4393,6 +4823,7 @@ static QStringList allowed_video_renderers(MythCodecID myth_codec_id,
         if ((vld || idct || mc) && xvmc_opengl)
             list += "xvmc-opengl";
     }
+
     return list;
 }
 

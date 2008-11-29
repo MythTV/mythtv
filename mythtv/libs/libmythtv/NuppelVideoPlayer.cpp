@@ -5754,6 +5754,8 @@ QString NuppelVideoPlayer::GetEncodingType(void) const
         case kCodec_MPEG2_IDCT:
         case kCodec_MPEG2_VLD:
         case kCodec_MPEG2_DVDV:
+        case kCodec_MPEG1_VDPAU:
+        case kCodec_MPEG2_VDPAU:
             return "MPEG-2";
 
         case kCodec_H263:
@@ -5761,6 +5763,7 @@ QString NuppelVideoPlayer::GetEncodingType(void) const
         case kCodec_H263_IDCT:
         case kCodec_H263_VLD:
         case kCodec_H263_DVDV:
+        case kCodec_H263_VDPAU:
             return "H.263";
 
         case kCodec_NUV_MPEG4:
@@ -5769,6 +5772,7 @@ QString NuppelVideoPlayer::GetEncodingType(void) const
         case kCodec_MPEG4_XVMC:
         case kCodec_MPEG4_VLD:
         case kCodec_MPEG4_DVDV:
+        case kCodec_MPEG4_VDPAU:
             return "MPEG-4";
 
         case kCodec_H264:
@@ -5776,6 +5780,7 @@ QString NuppelVideoPlayer::GetEncodingType(void) const
         case kCodec_H264_IDCT:
         case kCodec_H264_VLD:
         case kCodec_H264_DVDV:
+        case kCodec_H264_VDPAU:
             return "H.264";
 
         case kCodec_NONE:

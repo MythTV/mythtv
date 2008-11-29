@@ -41,6 +41,7 @@ const char *codec_id_string(enum CodecID codec_id)
             return "MPEG2VIDEO_XVMC";
         case CODEC_ID_MPEG2VIDEO_XVMC_VLD:
             return "MPEG2VIDEO_XVMC_VLD";
+        case CODEC_ID_MPEGVIDEO_VDPAU:  return "MPEGVIDEO_VDPAU";
         case CODEC_ID_H261:             return "H261";
         case CODEC_ID_H263:             return "H263";
         case CODEC_ID_RV10:             return "RV10";
@@ -65,6 +66,7 @@ const char *codec_id_string(enum CodecID codec_id)
         case CODEC_ID_HUFFYUV:          return "HUFFYUV";
         case CODEC_ID_CYUV:             return "CYUV";
         case CODEC_ID_H264:             return "H264";
+        case CODEC_ID_H264_VDPAU:       return "H264_VDPAU";
         case CODEC_ID_INDEO3:           return "INDEO3";
         case CODEC_ID_VP3:              return "VP3";
         case CODEC_ID_THEORA:           return "THEORA";
@@ -111,7 +113,9 @@ const char *codec_id_string(enum CodecID codec_id)
         case CODEC_ID_RV30:             return "RV30";
         case CODEC_ID_RV40:             return "RV40";
         case CODEC_ID_VC1:              return "VC1";
+        case CODEC_ID_VC1_VDPAU:        return "VC1_VDPAU";
         case CODEC_ID_WMV3:             return "WMV3";
+        case CODEC_ID_WMV3_VDPAU:       return "WMV3_VDPAU";
         case CODEC_ID_LOCO:             return "LOCO";
         case CODEC_ID_WNV1:             return "WNV1";
         case CODEC_ID_AASC:             return "AASC";

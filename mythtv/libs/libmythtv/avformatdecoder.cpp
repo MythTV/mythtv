@@ -38,6 +38,13 @@ extern "C" {
 }
 #endif // USING_XVMC
 
+#ifdef USING_VDPAU
+#include "videoout_xv.h"
+extern "C" {
+#include "libavcodec/vdpau_render.h"
+}
+#endif // USING_VDPAU
+
 extern "C" {
 #include "../libavutil/avutil.h"
 #include "../libavcodec/ac3_parser.h"
@@ -75,6 +82,11 @@ void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic);
 void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
                        int offset[4], int y, int type, int height);
 void decode_cc_dvd(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
+
+int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
+void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
+void render_slice_vdpau(struct AVCodecContext *s, const AVFrame *src,
+                        int offset[4], int y, int type, int height);
 
 static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 {
@@ -1135,6 +1147,17 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         enc->draw_horiz_band  = NULL;
         directrendering      |= selectedStream;
     }
+    else if (codec && (codec->id == CODEC_ID_MPEGVIDEO_VDPAU ||
+                       codec->id == CODEC_ID_H264_VDPAU ||
+                       codec->id == CODEC_ID_VC1_VDPAU ||
+                       codec->id == CODEC_ID_WMV3_VDPAU))
+    {
+        enc->get_buffer      = get_avf_buffer_vdpau;
+        enc->release_buffer  = release_avf_buffer_vdpau;
+        enc->draw_horiz_band = render_slice_vdpau;
+        enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
+        directrendering     |= selectedStream;
+    }
     else if (codec && codec->capabilities & CODEC_CAP_DR1)
     {
         enc->flags          |= CODEC_FLAG_EMU_EDGE;
@@ -1166,7 +1189,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     }
 }
 
-#if defined(USING_XVMC) || defined(USING_DVDV)
+#if defined(USING_XVMC) || defined(USING_DVDV) || defined(USING_VDPAU)
 static int mpeg_version(int codec_id)
 {
     switch (codec_id)
@@ -1177,13 +1200,23 @@ static int mpeg_version(int codec_id)
         case CODEC_ID_MPEG2VIDEO_XVMC:
         case CODEC_ID_MPEG2VIDEO_XVMC_VLD:
         case CODEC_ID_MPEG2VIDEO_DVDV:
+        case CODEC_ID_MPEGVIDEO_VDPAU:
             return 2;
         case CODEC_ID_H263:
             return 3;
         case CODEC_ID_MPEG4:
             return 4;
         case CODEC_ID_H264:
+        case CODEC_ID_H264_VDPAU:
             return 5;
+        case CODEC_ID_VC1:
+        case CODEC_ID_VC1_VDPAU:
+            return 6;
+        case CODEC_ID_WMV3:
+        case CODEC_ID_WMV3_VDPAU:
+            return 7;
+        default:
+            break;
     }
     return 0;
 }
@@ -1518,24 +1551,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 uint height = max(enc->height, 16);
                 QString dec = "ffmpeg";
                 uint thread_count = 1;
-                if (!is_db_ignored)
-                {
-                    VideoDisplayProfile vdp;
-                    vdp.SetInput(QSize(width, height));
-                    dec = vdp.GetDecoder();
-                    thread_count = vdp.GetMaxCPUs();
-                }
-                VERBOSE(VB_PLAYBACK, QString("Using %1 CPUs for decoding")
-                        .arg(ENABLE_THREADS ? thread_count : 1));
-
-                if (ENABLE_THREADS && thread_count > 1)
-                {
-                    avcodec_thread_init(enc, thread_count);
-                    enc->thread_count = thread_count;
-                }
 
                 bool handled = false;
-#ifdef USING_XVMC
+#if defined(USING_VDPAU) || defined(USING_XVMC)
                 if (!using_null_videoout && mpeg_version(enc->codec_id))
                 {
                     // HACK -- begin
@@ -1569,9 +1587,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         /* xvmc pix fmt */ xvmc_pixel_format(enc->pix_fmt),
                         /* test surface */ kCodec_NORMAL_END > video_codec_id,
                         /* force_xv     */ force_xv);
-                    bool vcd, idct, mc;
+                    bool vcd, idct, mc, vdpau;
                     enc->codec_id = (CodecID)
-                        myth2av_codecid(mcid, vcd, idct, mc);
+                        myth2av_codecid(mcid, vcd, idct, mc, vdpau);
 
                     if (ringBuffer && ringBuffer->isDVD() && 
                         (mcid == video_codec_id) &&
@@ -1606,6 +1624,26 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     handled = true;
                 }
 #endif // USING_XVMC || USING_DVDV
+
+                if (!is_db_ignored)
+                {
+                    VideoDisplayProfile vdp;
+                    vdp.SetInput(QSize(width, height));
+                    dec = vdp.GetDecoder();
+                    thread_count = vdp.GetMaxCPUs();
+                }
+
+                if (video_codec_id > kCodec_NORMAL_END)
+                    thread_count = 1;
+
+                VERBOSE(VB_PLAYBACK, QString("Using %1 CPUs for decoding")
+                        .arg(ENABLE_THREADS ? thread_count : 1));
+
+                if (ENABLE_THREADS && thread_count > 1)
+                {
+                    avcodec_thread_init(enc, thread_count);
+                    enc->thread_count = thread_count;
+                }
 
                 if (!handled)
                 {
@@ -2113,6 +2151,76 @@ void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
 
 void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
                        int offset[4], int y, int type, int height)
+{
+    if (!src)
+        return;
+
+    (void)offset;
+    (void)type;
+
+    if (s && src && s->opaque && src->opaque)
+    {
+        AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
+
+        int width = s->width;
+
+        VideoFrame *frame = (VideoFrame *)src->opaque;
+        nd->GetNVP()->DrawSlice(frame, 0, y, width, height);
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                "render_slice_xvmc called with bad avctx or src");
+    }
+}
+
+int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
+{
+    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
+    VideoFrame *frame = nd->GetNVP()->GetNextVideoFrame(false);
+
+    pic->data[0] = frame->priv[0];
+    pic->data[1] = frame->priv[1];
+    pic->data[2] = frame->buf;
+
+    pic->linesize[0] = 0;
+    pic->linesize[1] = 0;
+    pic->linesize[2] = 0;
+
+    pic->opaque = frame;
+    pic->type = FF_BUFFER_TYPE_USER;
+
+    pic->age = 256 * 256 * 256 * 64;
+
+    frame->pix_fmt = c->pix_fmt;
+
+#ifdef USING_VDPAU
+    vdpau_render_state_t *render = (vdpau_render_state_t *)frame->buf;
+    render->state |= MP_VDPAU_STATE_USED_FOR_REFERENCE;
+#endif
+
+    return 0;
+}
+
+void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic)
+{
+    assert(pic->type == FF_BUFFER_TYPE_USER);
+
+#ifdef USING_VDPAU
+    vdpau_render_state_t *render = (vdpau_render_state_t *)pic->data[2];
+    render->state &= ~MP_VDPAU_STATE_USED_FOR_REFERENCE;
+#endif
+
+    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
+    if (nd && nd->GetNVP() && nd->GetNVP()->getVideoOutput())
+        nd->GetNVP()->getVideoOutput()->DeLimboFrame((VideoFrame*)pic->opaque);
+
+    for (uint i = 0; i < 4; i++)
+        pic->data[i] = NULL;
+}
+
+void render_slice_vdpau(struct AVCodecContext *s, const AVFrame *src,
+                        int offset[4], int y, int type, int height)
 {
     if (!src)
         return;
@@ -3277,12 +3385,14 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             if (context->codec_id == CODEC_ID_MPEG1VIDEO ||
                 context->codec_id == CODEC_ID_MPEG2VIDEO ||
                 context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
-                context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC_VLD)
+                context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC_VLD ||
+                context->codec_id == CODEC_ID_MPEGVIDEO_VDPAU)
             {
                 if (!ringBuffer->isDVD())
                     MpegPreProcessPkt(curstream, pkt);
             }
-            else if (context->codec_id == CODEC_ID_H264)
+            else if (context->codec_id == CODEC_ID_H264 ||
+                     context->codec_id == CODEC_ID_H264_VDPAU)
             {
                 H264PreProcessPkt(curstream, pkt);
             }
@@ -3961,6 +4071,10 @@ QString AvFormatDecoder::GetCodecDecoderName(void) const
     if ((video_codec_id > kCodec_STD_XVMC_END) &&
         (video_codec_id < kCodec_VLD_END))
         return "xvmc-vld";
+
+    if ((video_codec_id > kCodec_DVDV_END) &&
+        (video_codec_id < kCodec_VDPAU_END))
+        return "vdpau";
 
     return "ffmpeg";
 }

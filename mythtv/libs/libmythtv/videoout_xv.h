@@ -45,9 +45,14 @@ class XvMCOSD;
     struct XvMCContext;
 #endif // !USING_XVMC
 
+#ifdef USING_VDPAU
+#include "util-vdpau.h"
+#endif
+
 typedef enum VideoOutputSubType
 {
-    XVUnknown = 0, Xlib, XShm, OpenGL, XVideo, XVideoMC, XVideoIDCT, XVideoVLD,
+    XVUnknown = 0, Xlib, XShm, OpenGL, XVideo, XVideoVDPAU, 
+    XVideoMC, XVideoIDCT, XVideoVLD, 
 } VOSType;
 
 class VideoOutputXv : public VideoOutput
@@ -139,6 +144,8 @@ class VideoOutputXv : public VideoOutput
     void DiscardFrames(bool next_frame_keyframe);
     void DoneDisplayingFrame(void);
 
+    void ProcessFrameVDPAU(VideoFrame *frame, OSD *osd,
+                           NuppelVideoPlayer *pipPlayer);
     void ProcessFrameXvMC(VideoFrame *frame, OSD *osd);
     void ProcessFrameOpenGL(VideoFrame *frame, OSD *osd,
                             FilterChain *filterList,
@@ -147,11 +154,13 @@ class VideoOutputXv : public VideoOutput
                          FilterChain *filterList,
                          NuppelVideoPlayer *pipPlayer);
 
+    void PrepareFrameVDPAU(VideoFrame *, FrameScanType);
     void PrepareFrameXvMC(VideoFrame *, FrameScanType);
     void PrepareFrameXv(VideoFrame *);
     void PrepareFrameOpenGL(VideoFrame *, FrameScanType);
     void PrepareFrameMem(VideoFrame *, FrameScanType);
 
+    void ShowVDPAU(FrameScanType scan);
     void ShowXvMC(FrameScanType scan);
     void ShowXVideo(FrameScanType scan);
 
@@ -171,9 +180,11 @@ class VideoOutputXv : public VideoOutput
     bool InitOpenGL(void);
     bool InitXShm(void);
     bool InitXlib(void);
+    bool InitVDPAU(MythCodecID);
     bool InitOSD(const QString&);
     bool CheckOSDInit(void);
 
+    bool CreateVDPAUBuffers(void);
     bool CreateXvMCBuffers(void);
     bool CreateBuffers(VOSType subtype);
     vector<void*> CreateXvMCSurfaces(uint num, bool surface_has_vld);
@@ -201,6 +212,10 @@ class VideoOutputXv : public VideoOutput
     bool SetupDeinterlaceOpenGL(
         bool interlaced, const QString &overridefilter);
 
+    // VDPAU specific helper functions
+    bool SetDeinterlacingEnabledVDPAU(bool enable);
+    bool SetupDeinterlaceVDPAU(
+        bool interlaced, const QString &overridefilter);
 
     // Misc.
     MythCodecID          myth_codec_id;
@@ -250,6 +265,12 @@ class VideoOutputXv : public VideoOutput
 
     // Support for nVidia XvMC copy to texture feature
     XvMCTextures        *xvmc_tex;
+
+#ifdef USING_VDPAU
+    VDPAUContext         *vdpau;
+#endif
+    bool                  use_vdpau_osd;
+    bool                  use_vdpau_pip;
 
     // Basic Xv drawing info
     int                  xv_port;

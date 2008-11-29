@@ -12,7 +12,7 @@ extern "C" {
 #include "libmythdb/compat.h"
 #include "libmythdb/mythverbose.h"
 
-#ifdef USING_XVMC
+#if defined(USING_XVMC) || defined(USING_VDPAU)
 #include "videoout_xv.h" // for xvmc stuff
 #endif
 
@@ -1158,6 +1158,33 @@ bool VideoBuffers::CreateBuffers(int width, int height,
 
     return ok;
 }
+
+#ifdef USING_VDPAU
+bool VideoBuffers::CreateBuffers(int width, int height, VDPAUContext *ctx)
+{
+    static unsigned char *ffmpeg_vdpau_hack = (unsigned char*)
+        "avlib should not use this private data in VDPAU mode.";
+
+    if (!ctx)
+        return false;
+
+    if ((uint)ctx->GetNumBufs() != allocSize())
+    {
+        printf("ERROR ERROR ERROR\n");
+        return false;
+    }
+
+    for (uint i = 0; i < allocSize(); i++)
+    {
+        init(&buffers[i],
+             FMT_VDPAU, (unsigned char*)ctx->GetRenderData(i),
+             width, height, -1, 0);
+        buffers[i].priv[0]      = ffmpeg_vdpau_hack;
+        buffers[i].priv[1]      = ffmpeg_vdpau_hack;
+    }
+    return true;
+}
+#endif
 
 #ifdef USING_XVMC
 bool VideoBuffers::CreateBuffers(int width, int height,

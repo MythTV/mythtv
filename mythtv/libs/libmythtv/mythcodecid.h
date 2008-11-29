@@ -17,6 +17,8 @@ typedef enum
     kCodec_H263,
     kCodec_MPEG4,
     kCodec_H264,
+    kCodec_VC1,
+    kCodec_WMV3,
     
     kCodec_NORMAL_END,
 
@@ -48,16 +50,26 @@ typedef enum
     kCodec_MPEG4_DVDV,
     kCodec_H264_DVDV,
 
-    kCodec_DVDV_END
+    kCodec_DVDV_END,
+
+    kCodec_MPEG1_VDPAU,
+    kCodec_MPEG2_VDPAU,
+    kCodec_H263_VDPAU,
+    kCodec_MPEG4_VDPAU,
+    kCodec_H264_VDPAU,
+    kCodec_VC1_VDPAU,
+    kCodec_WMV3_VDPAU,
+
+    kCodec_VDPAU_END
 
 } MythCodecID;
 
 QString toString(MythCodecID codecid);
-int myth2av_codecid(MythCodecID codec_id, bool &vld, bool &idct, bool &mc);
+int myth2av_codecid(MythCodecID codec_id, bool &vld, bool &idct, bool &mc, bool &vdpau);
 inline int myth2av_codecid(MythCodecID codec_id)
 {
-    bool vld, idct, mc;
-    return myth2av_codecid(codec_id, vld, idct, mc);
+    bool vld, idct, mc, vdpau;
+    return myth2av_codecid(codec_id, vld, idct, mc, vdpau);
 }
 
 #endif // _MYTH_CODEC_ID_H_

@@ -17,6 +17,10 @@ extern "C" {
 #include <qwindowdefs.h>
 #endif // USING_XVMC
 
+#ifdef USING_VDPAU
+class VDPAUContext;
+#endif
+
 typedef MythDeque<VideoFrame*>                frame_queue_t;
 typedef vector<VideoFrame>                    frame_vector_t;
 typedef map<const VideoFrame*, frame_queue_t> frame_map_t;
@@ -157,6 +161,10 @@ class VideoBuffers
                        void* xvmc_ctx,
                        void* xvmc_surf_info,
                        vector<void*> surfs);
+#endif
+
+#ifdef USING_VDPAU
+    bool CreateBuffers(int width, int height, VDPAUContext *ctx);
 #endif
 
     QString GetStatus(int n=-1) const; // debugging method

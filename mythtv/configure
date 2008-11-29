@@ -193,6 +193,7 @@ BLOCK_QUOTE
   echo "  --enable-xvmc-pro        enable XvMC for the Unichrome Pro chipset"
   echo "                           (NOT Unichrome chipset)"
   echo "  --enable-xvmc-opengl     enable nVidia XvMC OpenGL texture method"
+  echo "  --enable-vdpau           enable NVidia VDPAU hardware acceleration."
   echo "  --xvmc-lib=LIB           XvMC library override (for crosscompiling)"
   #echo "  --disable-xvmc-vld       disable XvMC-VLD (VIA Epia MPEG accel.)"
   echo "  --enable-opengl-video    enable OpenGL based video display "
@@ -1000,6 +1001,7 @@ HAVE_LIST="
     termios_h
     threads
     winsock2_h
+    vdpau
     yasm
 "
 
@@ -1056,6 +1058,7 @@ USING_LIST='
     darwin_da
     dvdv
     opengl
+    vdpau
 '
 
 CMDLINE_SELECT="
@@ -1072,6 +1075,7 @@ CMDLINE_SELECT="
     shared
     static
     stripping
+    vdpau
 "
 
 PATHS_LIST='
@@ -1121,13 +1125,17 @@ dxa_decoder_deps="zlib"
 eac3_decoder_deps="gpl"
 flashsv_decoder_deps="zlib"
 flashsv_encoder_deps="zlib"
+h264_vdpau_decoder_deps="vdpau"
 mlp_decoder_deps="mlp_parser"
 mpeg_dvdv_decoder_deps="dvdv"
+mpeg_vdpau_decoder_deps="vdpau"
 mpeg_xvmc_decoder_deps="xvmc"
 mpeg_xvmc_vld_decoder_deps="xvmc_vld"
 png_decoder_deps="zlib"
 png_encoder_deps="zlib"
 snow_decoder_deps="disabled_in_mythtv"
+vc1_vdpau_decoder_deps="vdpau"
+wmv3_vdpau_decoder_deps="vdpau"
 zmbv_decoder_deps="zlib"
 zmbv_encoder_deps="zlib"
 
@@ -1213,6 +1221,7 @@ opengl_deps_any="windows x11"
 opengl_video_deps="opengl xv"
 opengl_vsync_deps="opengl"
 v4l_deps="backend"
+vdpau_deps="x11 vdpau_vdpau_h"
 xrandr_deps="x11"
 xv_deps="x11"
 xvmc_deps="xv X11_extensions_XvMClib_h"
@@ -3017,6 +3026,8 @@ fi
 
 enabled xvmc_pro && enable xvmc_vld
 
+check_header vdpau/vdpau.h
+enabled vdpau && has_library libvdpau || disable vdpau
 
 # Can only do Mac accel on Mac platform
 enabled dvdv && test $target_os = darwin || disable dvdv
@@ -3315,6 +3326,7 @@ if enabled x11 ; then
 if test "$VENDOR_XVMC_LIBS" != "" ; then
   echo "XvMC libs                 $VENDOR_XVMC_LIBS"
 fi
+  echo "VDPAU support             ${vdpau-no}"
 fi
   echo "OpenGL video              ${opengl_video-no}"
   if test x"$target_os" = x"darwin" ; then

@@ -310,6 +310,13 @@ using_frontend {
     using_xvmc_vld:DEFINES += USING_XVMC_VLD
     using_xvmc_pbuffer:DEFINES += USING_XVMC_PBUFFER
 
+    using_vdpau {
+        DEFINES += USING_VDPAU
+        HEADERS += util-vdpau.h
+        SOURCES += util-vdpau.cpp
+        LIBS += -lvdpau
+    }
+
     using_opengl {
         CONFIG += opengl
         DEFINES += USING_OPENGL

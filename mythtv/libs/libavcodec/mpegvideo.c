@@ -58,6 +58,7 @@ extern int  XVMC_field_start(MpegEncContext*s, AVCodecContext *avctx);
 extern void XVMC_field_end(MpegEncContext *s);
 extern void XVMC_decode_mb(MpegEncContext *s);
 
+extern int VDPAU_mpeg_field_start(MpegEncContext *s);
 
 /* enable all paranoid tests for rounding, overflows, etc... */
 //#define PARANOID
@@ -967,6 +968,10 @@ void MPV_frame_end(MpegEncContext *s)
 //just to make sure that all data is rendered.
     if(s->avctx->xvmc_acceleration){
         XVMC_field_end(s);
+    }else
+#endif
+#ifdef HAVE_VDPAU
+    if(s->avctx->vdpau_acceleration){
     }else
 #endif
     if(s->unrestricted_mv && s->current_picture.reference && !s->intra_only && !(s->flags&CODEC_FLAG_EMU_EDGE)) {

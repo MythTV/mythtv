@@ -28,6 +28,10 @@ QString toString(MythCodecID codecid)
             return "MPEG4";
         case kCodec_H264:
             return "H.264";
+        case kCodec_VC1:
+            return "VC-1";
+        case kCodec_WMV3:
+            return "WMV3";
     
         case kCodec_MPEG1_XVMC:
             return "MPEG1 XvMC";
@@ -73,6 +77,21 @@ QString toString(MythCodecID codecid)
         case kCodec_H264_DVDV:
             return "H.264 DVDV";
 
+        case kCodec_MPEG1_VDPAU:
+            return "MPEG1 VDPAU";
+        case kCodec_MPEG2_VDPAU:
+            return "MPEG2 VDPAU";
+        case kCodec_H263_VDPAU:
+            return "H.263 VDPAU";
+        case kCodec_MPEG4_VDPAU:
+            return "MPEG4 VDPAU";
+        case kCodec_H264_VDPAU:
+            return "H.264 VDPAU";
+        case kCodec_VC1_VDPAU:
+            return "VC1 VDPAU";
+        case kCodec_WMV3_VDPAU:
+            return "WMV3 VDPAU";
+
         default:
             break;
     }
@@ -81,9 +100,9 @@ QString toString(MythCodecID codecid)
 }
 
 int myth2av_codecid(MythCodecID codec_id,
-                    bool &vld, bool &idct, bool &mc)
+                    bool &vld, bool &idct, bool &mc, bool &vdpau)
 {
-    vld = idct = mc = false;
+    vld = idct = mc = vdpau = false;
     CodecID ret = CODEC_ID_NONE;
     switch (codec_id)
     {
@@ -107,6 +126,13 @@ int myth2av_codecid(MythCodecID codec_id,
             break;
         case kCodec_H264:
             ret = CODEC_ID_H264;
+            break;
+
+        case kCodec_VC1:
+            ret = CODEC_ID_VC1;
+            break;
+        case kCodec_WMV3:
+            ret = CODEC_ID_WMV3;
             break;
 
         case kCodec_MPEG1_XVMC:
@@ -172,6 +198,31 @@ int myth2av_codecid(MythCodecID codec_id,
             break;
         case kCodec_H264_DVDV:
             VERBOSE(VB_IMPORTANT, "Error: DVDV H.265 not supported by ffmpeg");
+            break;
+
+        case kCodec_MPEG1_VDPAU:
+        case kCodec_MPEG2_VDPAU:
+            ret = CODEC_ID_MPEGVIDEO_VDPAU;
+            vdpau = true;
+            break;
+        case kCodec_H263_VDPAU:
+            VERBOSE(VB_IMPORTANT, "Error: VDPAU H.263 not supported by ffmpeg");
+            break;
+        case kCodec_MPEG4_VDPAU:
+            VERBOSE(VB_IMPORTANT, "Error: VDPAU MPEG not supported by ffmpeg");
+            break;
+
+        case kCodec_H264_VDPAU:
+            ret = CODEC_ID_H264_VDPAU;
+            vdpau = true;
+            break;
+        case kCodec_VC1_VDPAU:
+            ret = CODEC_ID_VC1_VDPAU;
+            vdpau = true;
+            break;
+        case kCodec_WMV3_VDPAU:
+            ret = CODEC_ID_WMV3_VDPAU;
+            vdpau = true;
             break;
 
         default:

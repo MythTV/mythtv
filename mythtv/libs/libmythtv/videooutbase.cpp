@@ -111,7 +111,7 @@ VideoOutput *VideoOutput::Create(
             to_comma_list(renderers));
 
     QString renderer = QString::null;
-    if (renderers.size() > 1)
+    if (renderers.size() > 0)
     {
         VideoDisplayProfile vprof;
         vprof.SetInput(video_dim);

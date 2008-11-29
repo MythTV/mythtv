@@ -22,6 +22,7 @@ typedef enum FrameType_
     FMT_RGBA32,
     FMT_YUV422P,
     FMT_ALPHA,
+    FMT_VDPAU
 } VideoFrameType;
 
 typedef struct VideoFrame_
@@ -49,6 +50,8 @@ typedef struct VideoFrame_
 
     int pitches[3]; // Y, U, & V pitches
     int offsets[3]; // Y, U, & V offsets
+
+    int pix_fmt;
 } VideoFrame;
 
 #ifdef __cplusplus
@@ -88,8 +91,8 @@ static inline void init(
     vf->top_field_first  = 1;
     vf->repeat_pict      = 0;
     vf->forcekey         = 0;
+    vf->pix_fmt          = 0;
 
-    // MS Windows doesn't like bzero()..
     memset(vf->priv, 0, 4 * sizeof(unsigned char *));
 
     if (p)

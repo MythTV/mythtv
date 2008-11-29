@@ -580,6 +580,7 @@ QStringList VideoDisplayProfile::GetDecoders(void)
     list += "xvmc-vld";
     list += "macaccel";
     list += "ivtv";
+    list += "vdpau";
 
     return list;
 }
@@ -610,6 +611,7 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
         dec_name["xvmc-vld"] = QObject::tr("VIA XvMC");
         dec_name["macaccel"] = QObject::tr("Mac hardware acceleration");
         dec_name["ivtv"]     = QObject::tr("PVR-350 decoder");
+        dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
     }
 
     QString ret = decoder;
@@ -662,6 +664,11 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
             "high quality playback.  This requires that the ivtv-fb "
             "kernel module is also loaded and configured properly.");
 
+    if (decoder == "vdpau")
+        msg += QObject::tr(
+            "VDPAU will attempt to use the graphics hardware to "
+            "accelerate video decoding and playback.");
+
     return msg;
 }
 
@@ -701,6 +708,15 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString short_name)
         return QObject::tr("Linear blend (2x, HW)");
     else if ("opengldoubleratefieldorder" == short_name)
         return QObject::tr("Interlaced (2x, Hw)");
+    else if ("vdpaubasic" == short_name)
+        return QObject::tr("Basic (1x, Hw)");
+    else if ("vdpaubasicdoublerate" == short_name)
+        return QObject::tr("Basic (2x, Hw)");
+    else if ("vdpauadvanced" == short_name)
+        return QObject::tr("Advanced (1x, Hw)");
+    else if ("vdpauadvanceddoublerate" == short_name)
+        return QObject::tr("Advanced (2x, Hw)");
+
     return "";
 }
 
@@ -1169,6 +1185,12 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
             "additional resources.");
     }
 
+    if (renderer == "vdpau")
+    {
+        msg = QObject::tr(
+            "This is the only video renderer for NVidia VDPAU decoding.");
+    }
+
     return msg;
 }
 
@@ -1415,6 +1437,7 @@ QString VideoDisplayProfile::toString(void) const
 "xvmc-vld"
 "macaccel"
 "ivtv"
+"vdpau"
 
 // Video Renderers
 "null"
@@ -1429,6 +1452,7 @@ QString VideoDisplayProfile::toString(void) const
 "quartz-accel"
 "ivtv"
 "opengl"
+"vdpau"
 
 // OSD Renderers
 "chromakey"
@@ -1438,6 +1462,7 @@ QString VideoDisplayProfile::toString(void) const
 "opengl"
 "opengl2"
 "opengl3"
+"vdpau"
 
 // deinterlacers
 "none"
@@ -1457,6 +1482,10 @@ QString VideoDisplayProfile::toString(void) const
 "opengldoublerateonefield"
 "opengldoubleratekerneldeint"
 "opengldoubleratefieldorder"
+"vdpaubasic"
+"vdpauadvanced"
+"vdpaubasicdoublerate"
+"vdpauadvanceddoublerate"
 */
 
 void VideoDisplayProfile::init_statics(void)
@@ -1514,6 +1543,13 @@ void VideoDisplayProfile::init_statics(void)
     safe_deint["opengl"] += "opengldoubleratekerneldeint";
     safe_deint["opengl"] += "opengldoubleratefieldorder";
 
+
+    safe_deint["vdpau"] += "none";
+    safe_deint["vdpau"] += "vdpaubasic";
+    safe_deint["vdpau"] += "vdpauadvanced";
+    safe_deint["vdpau"] += "vdpaubasicdoublerate";
+    safe_deint["vdpau"] += "vdpauadvanceddoublerate";
+
     safe_osd["xv-blit"]     += "softblend";
     safe_osd["xvmc-blit"]   += "chromakey";
     safe_osd["xvmc-blit"]   += "ia44blend";
@@ -1521,6 +1557,7 @@ void VideoDisplayProfile::init_statics(void)
     safe_osd["ivtv"]        += "ivtv";
     safe_osd["opengl"]      += "opengl2";
     safe_osd["quartz-accel"]+= "opengl3";
+    safe_osd["vdpau"]       += "vdpau";
 
     // These video renderers do not support deinterlacing in MythTV
     safe_deint["quartz-accel"] += "none";
@@ -1553,6 +1590,7 @@ void VideoDisplayProfile::init_statics(void)
     safe_renderer["dummy"]    += "quartz-accel";
     safe_renderer["macaccel"] += "quartz-accel";
     safe_renderer["ivtv"]     += "ivtv";
+    safe_renderer["vdpau"]    += "vdpau";
 
     safe_renderer_priority["null"]         =  10;
     safe_renderer_priority["xlib"]         =  20;
@@ -1577,4 +1615,5 @@ void VideoDisplayProfile::init_statics(void)
     safe_equiv_dec["xvmc-vld"] += "dummy";
     safe_equiv_dec["macaccel"] += "dummy";
     safe_equiv_dec["ivtv"]     += "dummy";
+    safe_equiv_dec["vdpau"]    += "dummy";
 }

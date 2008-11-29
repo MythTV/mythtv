@@ -421,6 +421,8 @@ using_dvdv {
     DEFINES += HAVE_DVDV
 }
 
+contains( HAVE_VDPAU, yes )                     { SOURCES *= vdpauvideo.c }
+
 !contains( CONFIG_SWSCALER, yes )               { SOURCES *= imgresample.c }
 
 contains( HAVE_GPROF, yes ) {

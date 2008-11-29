@@ -191,6 +191,10 @@ enum CodecID {
     CODEC_ID_CMV,
     CODEC_ID_MOTIONPIXELS,
     CODEC_ID_TGV,
+    CODEC_ID_MPEGVIDEO_VDPAU,
+    CODEC_ID_H264_VDPAU,
+    CODEC_ID_VC1_VDPAU,
+    CODEC_ID_WMV3_VDPAU,
 
     /* various PCM "codecs" */
     CODEC_ID_PCM_S16LE= 0x10000,
@@ -514,6 +518,8 @@ typedef struct RcOverride{
  * This can be used to prevent truncation of the last audio samples.
  */
 #define CODEC_CAP_SMALL_LAST_FRAME 0x0040
+/* Codec can export data for HW decoding (VDPAU). */
+#define CODEC_CAP_HWACCEL_VDPAU    0x0080
 
 //The following defines may change, don't expect compatibility if you use them.
 #define MB_TYPE_INTRA4x4   0x0001
@@ -1761,6 +1767,13 @@ typedef struct AVCodecContext {
     int xvmc_acceleration;
 
     /**
+     * VDPAU Acceleration
+     * - encoding: forbidden
+     * - decoding: set by decoder
+     */
+    int vdpau_acceleration;
+
+    /**
      * macroblock decision mode
      * - encoding: Set by user.
      * - decoding: unused
@@ -2965,7 +2978,7 @@ typedef struct AVCodecParserContext {
 } AVCodecParserContext;
 
 typedef struct AVCodecParser {
-    int codec_ids[5]; /* several codec IDs are permitted */
+    int codec_ids[6]; /* several codec IDs are permitted */
     int priv_data_size;
     int (*parser_init)(AVCodecParserContext *s);
     int (*parser_parse)(AVCodecParserContext *s,
