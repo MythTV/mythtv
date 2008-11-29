@@ -1367,6 +1367,38 @@ static void quant_matrix_rebuild(uint16_t *matrix, const uint8_t *old_perm,
     }
 }
 
+static void mpeg_set_pixelformat(AVCodecContext *avctx){
+    Mpeg1Context *s1 = avctx->priv_data;
+    MpegEncContext *s = &s1->mpeg_enc_ctx;
+
+    if(avctx->vdpau_acceleration){
+        if(s->chroma_format >= 2){
+            return -2;
+        }
+        if(avctx->sub_id == 1){
+            avctx->pix_fmt = avctx->get_format(avctx,pixfmt_vdpau_mpg1_420);
+        }else{
+            if(avctx->profile == 5){
+                avctx->pix_fmt = avctx->get_format(avctx,pixfmt_vdpau_mpg2simple_420);
+            }else if(avctx->profile == 4){
+                avctx->pix_fmt = avctx->get_format(avctx,pixfmt_vdpau_mpg2main_420);
+            }else{
+                return -2;
+            }
+        }
+    }else if(avctx->xvmc_acceleration){
+        avctx->pix_fmt = avctx->get_format(avctx,pixfmt_xvmc_mpg2_420);
+    }else{
+        if(s->chroma_format <  2){
+            avctx->pix_fmt = PIX_FMT_YUV420P; //avctx->get_format(avctx,pixfmt_yuv_420);
+        }else if(s->chroma_format == 2){
+            avctx->pix_fmt = PIX_FMT_YUV422P; //avctx->get_format(avctx,pixfmt_yuv_422);
+        }else if(s->chroma_format >  2){
+            avctx->pix_fmt = PIX_FMT_YUV444P; //avctx->get_format(avctx,pixfmt_yuv_444);
+        }
+    }
+}
+
 /* Call this function when we know all parameters.
  * It may be called in different places for MPEG-1 and MPEG-2. */
 static int mpeg_decode_postinit(AVCodecContext *avctx){
@@ -1443,36 +1475,8 @@ static int mpeg_decode_postinit(AVCodecContext *avctx){
             }
         }//MPEG-2
 
-        if(avctx->vdpau_acceleration){
-            if(s->chroma_format >= 2){
-                return -2;
-            }
-#undef printf
-            if(avctx->sub_id == 1){
-                avctx->pix_fmt = avctx->get_format(avctx,pixfmt_vdpau_mpg1_420);
-            }else{
-                if(avctx->profile == 5){
-                    avctx->pix_fmt = avctx->get_format(avctx,pixfmt_vdpau_mpg2simple_420);
-                }else
-                if(avctx->profile == 4){
-                    avctx->pix_fmt = avctx->get_format(avctx,pixfmt_vdpau_mpg2main_420);
-                }else{
-                    return -2;
-                }
-            }
-        }else if(avctx->xvmc_acceleration){
-            avctx->pix_fmt = avctx->get_format(avctx,pixfmt_xvmc_mpg2_420);
-        }else{
-            if(s->chroma_format <  2){
-                avctx->pix_fmt = PIX_FMT_YUV420P;
-            }else
-            if(s->chroma_format == 2){
-                avctx->pix_fmt = PIX_FMT_YUV422P;
-            }else
-            if(s->chroma_format >  2){
-                avctx->pix_fmt = PIX_FMT_YUV444P;
-            }
-        }
+        mpeg_set_pixelformat(avctx);
+
         //until then pix_fmt may be changed right after codec init
         if( avctx->pix_fmt == PIX_FMT_XVMC_MPEG2_IDCT )
             if( avctx->idct_algo == FF_IDCT_AUTO )
@@ -2274,27 +2278,7 @@ static int vcr2_init_sequence(AVCodecContext *avctx)
     avctx->has_b_frames= 0; //true?
     s->low_delay= 1;
 
-    if(avctx->vdpau_acceleration){
-        if(s->chroma_format >= 2){
-            return -2;
-        }
-        if(avctx->sub_id == 1){
-            avctx->pix_fmt = avctx->get_format(avctx,pixfmt_vdpau_mpg1_420);
-        }else{
-            if(avctx->profile == 5){
-                avctx->pix_fmt = avctx->get_format(avctx,pixfmt_vdpau_mpg2simple_420);
-            }else
-            if(avctx->profile == 4){
-                avctx->pix_fmt = avctx->get_format(avctx,pixfmt_vdpau_mpg2main_420);
-            }else{
-                return -2;
-            }
-        }
-    }else if(avctx->xvmc_acceleration){
-        avctx->pix_fmt = avctx->get_format(avctx,pixfmt_xvmc_mpg2_420);
-    }else{
-        avctx->pix_fmt = PIX_FMT_YUV420P;
-    }
+    mpeg_set_pixelformat(avctx);
 
     if( avctx->pix_fmt == PIX_FMT_XVMC_MPEG2_IDCT )
         if( avctx->idct_algo == FF_IDCT_AUTO )

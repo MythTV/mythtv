@@ -620,8 +620,6 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs)
     );
     CHECK_ST
 
-cout << "XXXXXXXXXXX deint avail: " << deintAvail << endl;
-
     if (!ok && videoMixer)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +

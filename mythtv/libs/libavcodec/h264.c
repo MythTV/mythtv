@@ -72,9 +72,8 @@ static VLC run7_vlc;
 static VLC_TYPE run7_vlc_table[96][2];
 static const int run7_vlc_table_size = 96;
 
-extern int VDPAU_h264_set_reference_frames(H264Context *h);
-extern int VDPAU_h264_picture_complete(H264Context *h, const uint8_t *buf, int buf_size);
-extern void VDPAU_h264_set_reference_frames_count(H264Context *h);
+extern int VDPAU_h264_add_data_chunk(H264Context *h, const uint8_t *buf, int buf_size);
+extern int VDPAU_h264_picture_complete(H264Context *h);
 
 static void svq3_luma_dc_dequant_idct_c(DCTELEM *block, int qp);
 static void svq3_add_idct_c(uint8_t *dst, DCTELEM *block, int stride, int qp, int dc);
@@ -2263,10 +2262,6 @@ static int decode_postinit(H264Context *h, SPS *sps){
 static int frame_start(H264Context *h){
     MpegEncContext * const s = &h->s;
     int i;
-
-#ifdef HAVE_VDPAU
-    VDPAU_h264_set_reference_frames_count(h);
-#endif
 
     if(MPV_frame_start(s, s->avctx) < 0)
         return -1;
@@ -7412,8 +7407,26 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size){
                && (avctx->skip_frame < AVDISCARD_NONREF || hx->nal_ref_idc)
                && (avctx->skip_frame < AVDISCARD_BIDIR  || hx->slice_type_nos!=FF_B_TYPE)
                && (avctx->skip_frame < AVDISCARD_NONKEY || hx->slice_type_nos==FF_I_TYPE)
-               && avctx->skip_frame < AVDISCARD_ALL)
-                context_count++;
+               && avctx->skip_frame < AVDISCARD_ALL) {
+#ifdef HAVE_VDPAU
+                if (avctx->vdpau_acceleration) {
+                    if(h->is_avc) {
+                        static const uint8_t start_code[] = {0x00, 0x00, 0x01};
+                        VDPAU_h264_add_data_chunk(h, start_code, sizeof(start_code));
+                        VDPAU_h264_add_data_chunk(h, &buf[buf_index - consumed], consumed );
+                    }
+                    else
+                    {
+                        // +/-3: Add back 00 00 01 to start of data
+                        VDPAU_h264_add_data_chunk(h, &buf[buf_index - consumed - 3], consumed + 3);
+                    }
+                }
+                else
+#endif
+                {
+                    context_count++;
+                }
+            }
             break;
         case NAL_DPA:
             init_get_bits(&hx->s.gb, ptr, bit_length);
@@ -7610,12 +7623,6 @@ static int decode_frame(AVCodecContext *avctx,
         h->prev_frame_num_offset= h->frame_num_offset;
         h->prev_frame_num= h->frame_num;
 
-#ifdef HAVE_VDPAU
-        if (avctx->vdpau_acceleration) {
-            VDPAU_h264_set_reference_frames(h);
-        }
-#endif
-
         if(!s->dropable) {
             h->prev_poc_msb= h->poc_msb;
             h->prev_poc_lsb= h->poc_lsb;
@@ -7624,7 +7631,7 @@ static int decode_frame(AVCodecContext *avctx,
 
 #ifdef HAVE_VDPAU
         if (avctx->vdpau_acceleration) {
-            VDPAU_h264_picture_complete(h, buf, buf_size);
+            VDPAU_h264_picture_complete(h);
         }
 #endif
 

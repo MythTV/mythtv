@@ -1767,13 +1767,6 @@ typedef struct AVCodecContext {
     int xvmc_acceleration;
 
     /**
-     * VDPAU Acceleration
-     * - encoding: forbidden
-     * - decoding: set by decoder
-     */
-    int vdpau_acceleration;
-
-    /**
      * macroblock decision mode
      * - encoding: Set by user.
      * - decoding: unused
@@ -2327,6 +2320,13 @@ typedef struct AVCodecContext {
      * - decoding: set by decoder
      */
     void *dvdv;  /* This is actually a pointer to a DVDV_CurPtrs */
+
+    /**
+     * VDPAU Acceleration
+     * - encoding: forbidden
+     * - decoding: set by decoder
+     */
+    int vdpau_acceleration;
 } AVCodecContext;
 
 /**
