@@ -84,7 +84,7 @@ bool VDPAUContext::Init(Display *disp, Screen *screen,
         return ok;
 
     if (color_control)
-        useColorControl = InitColorControl();
+        useColorControl = false; //InitColorControl();
 
     return ok;
 }
