@@ -160,4 +160,24 @@
       <action>TV_STATUS</action>
    </button>
 
+   <button>
+     <type>SETTINGS_TV</type>
+     <text>TV Settings</text>
+     <text lang="IT">Impostazioni TV</text>
+     <text lang="CA">Configuració de TV</text>
+     <text lang="ES">Configuración de TV</text>
+     <text lang="FR">Paramètres TV</text>
+     <text lang="DE">TV</text>
+     <text lang="DA">TV Indstillinger</text>
+     <text lang="NL">TV Instellingen</text>
+     <text lang="PT">Configurar Televisão</text>
+     <text lang="SV">TV</text>
+     <text lang="JA">TV設定</text>
+     <text lang="SL">TV nastavitve</text>
+     <text lang="ET">TV sätted</text>
+     <text lang="PL">Konfiguracja TV</text>
+     <text lang="RU">Настройка ТВ</text>
+     <action>MENU tv_settings.xml</action>
+   </button>
+
 </mythmenu>
