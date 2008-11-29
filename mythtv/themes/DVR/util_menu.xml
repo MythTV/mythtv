@@ -269,14 +269,16 @@
    <button>
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
+      <text lang="IT">Modifica Tasti</text>
+      <text lang="FR">Configuration touches</text>
       <text lang="DE">Tastenbelegung ändern</text>
       <text lang="SV">Ändra knappar</text>
       <text lang="DA">Tasteopsætning</text>
       <text lang="PT">Configurar Teclas</text>
-      <text lang="ES">Configurar Teclas</text>
-      <text lang="FR">Configuration touches</text>
       <text lang="ET">Klahvide muutmine</text>
+      <text lang="ES">Configurar Teclas</text>
       <text lang="NL">Toetsen Instellen</text>
+      <text lang="PL">Ustaw klawisze</text>
       <text lang="JA">キー設定</text>
       <text lang="RU">Редактировать клавиши</text>
       <action>PLUGIN mythcontrols</action>

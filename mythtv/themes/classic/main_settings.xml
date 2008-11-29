@@ -38,20 +38,20 @@
       <text lang="PL">Ustaw wyglądy</text>
       <text lang="RU">Внешний вид</text>
       <action>SETTINGS APPEARANCE</action>
-    </button>
+   </button>
 
-    <button>
+   <button>
       <type>SCREENSETUPWIZARD</type>
       <text>Screen Setup Wizards</text>
       <action>SCREENSETUPWIZARD</action>
-    </button>
+   </button>
     
     <button>
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
       <text lang="IT">Modifica Tasti</text>
-      <text lang="FR">Touches</text>
-      <text lang="NL">Toetsen instellen</text>
+      <text lang="FR">Configuration touches</text>
+      <text lang="DE">Tastenbelegung ändern</text>
       <text lang="SV">Ändra knappar</text>
       <text lang="DA">Tasteopsætning</text>
       <text lang="PT">Configurar Teclas</text>
@@ -71,9 +71,9 @@
      <text lang="IT">Impostazioni TV</text>
      <text lang="CA">Configuració de TV</text>
      <text lang="ES">Configuración de TV</text>
-     <text lang="FR">TV</text>
+     <text lang="FR">Paramètres TV</text>
      <text lang="DE">TV</text>
-     <text lang="DA">TV indstillinger</text>
+     <text lang="DA">TV Indstillinger</text>
      <text lang="NL">TV Instellingen</text>
      <text lang="PT">Configurar Televisão</text>
      <text lang="SV">TV</text>
@@ -89,10 +89,10 @@
      <type>SETTINGS_MUSIC</type>
      <text>Music Settings</text>
      <text lang="IT">Impostazioni Musica</text>
-     <text lang="FR">Musique</text>
      <text lang="ES">Configurar Música</text>
      <text lang="CA">Configurar Música</text>
      <text lang="DE">Musik</text>
+     <text lang="FR">Paramètres musique</text>
      <text lang="DA">Musik Indstillinger</text>
      <text lang="NL">Muziek Instellingen</text>
      <text lang="PT">Configurar Música</text>
@@ -106,15 +106,14 @@
      <depends>mythmusic</depends>
    </button>
 
-   
    <button>
        <type>SETTINGS_VIDEO</type>
        <text>Videos Settings</text>
        <text lang="IT">Impostazioni Video</text>
        <text lang="ES">Configurar Videos</text>
-       <text lang="FR">Vidéos</text>
        <text lang="CA">Configurar Videos</text>
        <text lang="DE">Videos</text>
+       <text lang="FR">Paramètres Videos</text>
        <text lang="DA">Video Indstillinger</text>
        <text lang="NL">Films Instellingen</text>
        <text lang="PT">Configurar Filmes</text>
@@ -133,7 +132,7 @@
       <text>Radio Settings</text>
       <text lang="IT">Impostazioni Radio</text>
       <text lang="DE">Radio</text>
-      <text lang="FR">Radio</text>
+      <text lang="FR">Paramètres Radio</text>
       <text lang="SL">Radio nastavitve</text>
       <text lang="ET">Raadio sätted</text>
       <text lang="SV">Radio</text>
@@ -162,7 +161,7 @@
       <text lang="ES">Configurar Fotos</text>
       <text lang="CA">Configurar Imatges</text>
       <text lang="DE">Bilder</text>
-      <text lang="FR">Photos</text>
+      <text lang="FR">Paramètres Photos</text>
       <text lang="DA">Billed indstillinger</text>
       <text lang="NL">Foto's Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
@@ -183,8 +182,8 @@
      <text lang="ES">Configurar Juegos</text>
      <text lang="CA">Configurar Jocs</text>
      <text lang="DE">Spiele</text>
-     <text lang="FR">Jeux</text>
-     <text lang="DA">Spil indstillinger</text>
+     <text lang="FR">Paramètres Jeux</text>
+     <text lang="DA">Spil Indstillinger</text>
      <text lang="NL">Spelen Instellingen</text>
      <text lang="PT">Configurar Jogos</text>
      <text lang="SV">Spel</text>
@@ -204,7 +203,7 @@
      <text lang="ES">Configurar El Tiempo</text>
      <text lang="CA">Configurar El Temps</text>
      <text lang="DE">Wetter</text>
-     <text lang="FR">Météo</text>
+     <text lang="FR">Paramètres Météo</text>
      <text lang="DA">Vejr Indstililnger</text>
      <text lang="NL">"Het Weer" Instellingen</text>
      <text lang="PT">Configurar Meteorologia</text>
@@ -230,7 +229,7 @@
      <text>News Settings</text>
      <text lang="IT">Impostazioni Notizie</text>
      <text lang="DE">Nachrichten</text>
-     <text lang="FR">Nouvelles</text>
+     <text lang="FR">Paramètres Nouvelles</text>
      <text lang="CA">Configurar Notícies</text>
      <text lang="ES">Configurar Noticias</text>
      <text lang="NL">Nieuws Instellingen</text>
@@ -238,7 +237,7 @@
      <text lang="JA">ニュース設定</text>
      <text lang="SL">Nastavitve novic</text>
      <text lang="ET">Uudiste sätted</text>
-     <text lang="DA">Nyheds Indstillinger</text>
+     <text lang="DA">Nyheds Indstillingen</text>
      <text lang="PT">Configurar Notícias</text>
      <text lang="PL">Ustaw WiadomoĹci</text>
      <text lang="RU">Настройка новостей</text>
@@ -247,33 +246,19 @@
    </button>
 
    <button>
-     <type>SETTINGS_NETFLIX</type>
-     <text>NetFlix Settings</text>
-     <text lang="IT">Impostazioni NetFlix</text>
-     <text lang="PT">Configurar Aluguer de Filmes</text>
-     <text lang="ET">NetFlix'i sätted</text>
-     <text lang="ES">MythFlix</text>
-     <text lang="NL">NetFlix Instellingen</text>
-     <text lang="PL">Konfiguracja NetFlix</text>
-     <text lang="RU">Настройка MythFlix</text>
-     <action>CONFIGPLUGIN mythflix</action>
-     <depends>mythflix</depends>
-   </button>
-
-   <button>
      <type>SETTINGS_WEBPAGE</type>
      <text>Web Settings</text>
      <text lang="IT">Impostazioni Web</text>
      <text lang="DE">WWW</text>
-     <text lang="FR">WWW</text>
      <text lang="SV">Webb</text>
      <text lang="JA">Web設定</text>
-     <text lang="SL">Nastavitve spleta</text>
+     <text lang="SL">Spletne Nastavitve</text>
      <text lang="ET">Veebi sätted</text>
      <text lang="DA">Web Indstillinger</text>
+     <text lang="FR">Paramètres Web</text>
      <text lang="PT">Config. Navegação Web</text>
      <text lang="ES">Configurar Web</text>
-     <text lang="NL">Internet Instellingen</text>
+     <text lang="NL">Web Instellingen</text>
      <text lang="PL">Konfiguracja przegladarki WWW</text>
      <text lang="RU">Настройка браузера</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
@@ -285,7 +270,7 @@
       <text>Recipe Settings</text>
       <text lang="IT">Impostazioni Ricette</text>
       <text lang="DE">Rezepte</text>
-      <text lang="FR">Recettes</text>
+      <text lang="FR">Paramètres Recettes</text>
       <text lang="SL">Nastavitve receptov</text>
       <text lang="ET">Retseptide sätted</text>
       <text lang="SV">Recept</text>
@@ -293,6 +278,7 @@
       <text lang="PT">Configurar Receitas</text>
       <text lang="ES">Configurar Recetas</text>
       <text lang="NL">Recepten Instellingen</text>
+      <text lang="JA">レシピ設定</text>
       <text lang="PL">Ustaw Przepisy</text>>
       <text lang="RU">Настройка рецептов</text>
       <action>CONFIGPLUGIN mythRecipe</action>
@@ -304,8 +290,8 @@
       <text>Phone Settings</text>
       <text lang="IT">Impostazioni Telefono</text>
       <text lang="DE">Telefon</text>
-      <text lang="FR">Téléphone</text>
-      <text lang="SL">Nastavitve telefona</text>
+      <text lang="FR">Paramètres Téléphone</text>
+      <text lang="SL">Telefonske Nastavitve</text>
       <text lang="ET">Telefoni sätted</text>
       <text lang="SV">Telefon</text>
       <text lang="DA">Telefon Indstillinger</text>
@@ -322,16 +308,17 @@
    <button>
      <type>SETTINGS_MOVIETIME</type>
      <text>Movie Time Settings</text>
-     <text lang="IT">Impostazione Orari</text>
      <text lang="EN_GB">Cinema Listings Settings</text>
+     <text lang="IT">Impostazioni Orari</text>
+     <text lang="FR">Paramètres horaires films</text>
      <text lang="FI">Elokuvien Aika-asetukset</text>
-     <text lang="FR">Horaires films</text>
      <text lang="SL">Nastavitve čas filmov</text>
      <text lang="ET">Filmiaegade sätted</text>
      <text lang="SV">Biotider</text>
      <text lang="DA">Biograf Indstillinger</text>
      <text lang="PT">Configurar Horários de Cinema</text>
      <text lang="NL">Bioscoop Instellingen</text>
+     <text lang="JA">ムービータイム設定</text>
      <text lang="PL">Konfiguracja MovieTime</text>
      <text lang="RU">Настройка афиши кино</text>
      <action>CONFIGPLUGIN mythmovies</action>
@@ -342,33 +329,50 @@
      <type>SETTINGS_XBOX</type>
      <text>Xbox Settings</text>
      <text lang="IT">Impostazioni Xbox</text>
-     <text lang="PT">Configurar XBox</text>
-     <text lang="FR">XBox</text>
-     <text lang="CA">Configurar XBox</text>
-     <text lang="ES">Configurar XBox</text>
+     <text lang="PT">Configurar Xbox</text>
+     <text lang="FR">Paramètres Xbox</text>
+     <text lang="CA">Configurar Xbox</text>
+     <text lang="ES">Configurar Xbox</text>
      <text lang="DE">Xbox</text>
      <text lang="NL">Xbox Instellingen</text>
-     <text lang="SV">XBox</text>
-     <text lang="JA">XBox設定</text>
+     <text lang="SV">Xbox</text>
+     <text lang="JA">Xbox設定</text>
      <text lang="SL">Nastavitve Xbox</text>
      <text lang="ET">Xbox-i sätted</text>
-     <text lang="DA">XBox Indstillinger</text>
-     <text lang="PL">Konfiguracja XBOX</text>
-     <text lang="RU">Настройка XBOX</text>
-     <action>SETTINGS XBOXSETTINGS</action>
+     <text lang="DA">Xbox Indstillinger</text>
+     <text lang="PL">Konfiguracja Xbox</text>
+     <text lang="RU">Настройка Xbox</text>
+     <action>SETTINGS XboxSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>
 
    <button>
-     <type>SETTINGS_ARCHIVE</type>
-     <text>Archive Files Settings</text>
-     <text lang="IT">Impostazioni Archivia Files</text>
-     <text lang="ET">Arhiveerimise sätted</text>
-     <text lang="SV">Filarkivering</text>
-     <text lang="RU">Настройка архива</text>
-     <text lang="DA">Fil arkivering</text>
-     <action>CONFIGPLUGIN mytharchive</action>
-     <depends>mytharchive</depends>
+     <type>SETTINGS_NETFLIX</type>
+     <text>NetFlix Settings</text>
+     <text lang="IT">Impostazioni NetFlix</text>
+     <text lang="PT">Configurar Aluguer de Filmes</text>
+     <text lang="ES">MythFlix</text>
+     <text lang="FR">Paramètres Location films</text>
+     <text lang="ET">NetFlix'i sätted</text>
+     <text lang="NL">NetFlix Instellingen</text>
+     <text lang="JA">NetFlix設定</text>
+     <text lang="PL">Konfiguracja NetFlix</text>
+     <text lang="RU">Настройка NetFlix</text>
+     <action>CONFIGPLUGIN mythflix</action>
+     <depends>mythflix</depends>
+   </button>
+
+   <button>
+       <type>SETTINGS_ARCHIVE</type>
+       <text>Archive Files Settings</text>
+       <text lang="IT">Impostazioni Archivia Files</text>
+       <text lang="ET">Arhiveerimise sätted</text>
+       <text lang="SV">Filarkivering</text>
+       <text lang="FR">Paramètres Archivage</text>
+       <text lang="RU">Настройка архива</text>
+       <text lang="DA">Fil arkivering</text>
+       <action>CONFIGPLUGIN mytharchive</action>
+       <depends>mytharchive</depends>
    </button>
 
    <button>
@@ -379,5 +383,5 @@
        <action>CONFIGPLUGIN mythzoneminder</action>
        <depends>mythzoneminder</depends>
    </button>
-   
+
 </mythmenu>
