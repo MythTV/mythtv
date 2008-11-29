@@ -19,6 +19,15 @@ class MythFontProperties;
 class QEvent;
 class QKeyEvent;
 
+class MythUIText;
+class MythUIButton;
+class MythUIButtonList;
+class MythUIButtonListItem;
+class MythUIImage;
+class MythUICheckBox;
+class MythUITextEdit;
+class MythUIProgressBar;
+
 /**
  * Base UI type.  Children are drawn/processed in order added
  */
@@ -36,6 +45,14 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     MythUIType *GetChild(const QString &name);
     MythUIType *GetChildAt(const QPoint &p, bool recursive=true);
     QList<MythUIType *> *GetAllChildren(void);
+
+    MythUIText *GetMythUIText(const QString &name, bool optional = false);
+    MythUIButton *GetMythUIButton(const QString &name, bool optional = false);
+    MythUIButtonList *GetMythUIButtonList(const QString &name, bool optional = false);
+    MythUICheckBox *GetMythUICheckBox(const QString &name, bool optional = false);
+    MythUITextEdit *GetMythUITextEdit(const QString &name, bool optional = false);
+    MythUIImage *GetMythUIImage(const QString &name, bool optional = false);
+    MythUIProgressBar *GetMythUIProgressBar(const QString &name, bool optional = false);
 
     void DeleteChild(const QString &name);
     void DeleteChild(MythUIType *child);

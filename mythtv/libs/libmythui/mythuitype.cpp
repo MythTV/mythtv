@@ -9,6 +9,14 @@
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
+#include "mythuitext.h"
+#include "mythuiimage.h"
+#include "mythuibutton.h"
+#include "mythuicheckbox.h"
+#include "mythuibuttonlist.h"
+#include "mythuitextedit.h"
+#include "mythuibuttonlist.h"
+#include "mythuiprogressbar.h"
 
 MythUIType::MythUIType(QObject *parent, const QString &name)
     : QObject(parent), m_helptext(QString::null)
@@ -104,6 +112,104 @@ MythUIType *MythUIType::GetChild(const QString &name)
         return dynamic_cast<MythUIType *>(ret);
 
     return NULL;
+}
+
+MythUIText* MythUIType::GetMythUIText(const QString &name, bool optional)
+{
+    MythUIText *text = dynamic_cast<MythUIText *> (GetChild(name));
+
+    if (!optional && !text)
+    {
+        QString error = QString("Theme is missing a critical textarea element ('%1')")
+                                .arg(name);
+        throw error;
+    }
+
+    return text;
+}
+
+MythUIImage* MythUIType::GetMythUIImage(const QString &name, bool optional)
+{
+    MythUIImage *image = dynamic_cast<MythUIImage *> (GetChild(name));
+
+    if (!optional && !image)
+    {
+        QString error = QString("Theme is missing a critical imagetype element ('%1')")
+                                .arg(name);
+        throw error;
+    }
+
+    return image;
+}
+
+MythUIButton* MythUIType::GetMythUIButton(const QString &name, bool optional)
+{
+    MythUIButton *button = dynamic_cast<MythUIButton *> (GetChild(name));
+
+    if (!optional && !button)
+    {
+        QString error = QString("Theme is missing a critical button element ('%1')")
+                                .arg(name);
+        throw error;
+    }
+
+    return button;
+}
+
+MythUIButtonList* MythUIType::GetMythUIButtonList(const QString &name, bool optional)
+{
+    MythUIButtonList *list = dynamic_cast<MythUIButtonList *> (GetChild(name));
+
+    if (!optional && !list)
+    {
+        QString error = QString("Theme is missing a critical buttonlist element ('%1')")
+                                .arg(name);
+        throw error;
+    }
+
+    return list;
+}
+
+MythUIProgressBar* MythUIType::GetMythUIProgressBar(const QString &name, bool optional)
+{
+    MythUIProgressBar *bar = dynamic_cast<MythUIProgressBar *> (GetChild(name));
+
+    if (!optional && !bar)
+    {
+        QString error = QString("Theme is missing a critical progressbar element ('%1')")
+                                .arg(name);
+        throw error;
+    }
+
+    return bar;
+}
+
+MythUICheckBox* MythUIType::GetMythUICheckBox(const QString &name, bool optional)
+{
+    MythUICheckBox *check = dynamic_cast<MythUICheckBox *> (GetChild(name));
+
+    if (!optional && !check)
+    {
+        QString error = QString("Theme is missing a critical checkbox element ('%1')")
+                                .arg(name);
+        throw error;
+    }
+
+    return check;
+}
+
+MythUITextEdit* MythUIType::GetMythUITextEdit(const QString &name, bool optional)
+{
+    MythUITextEdit *edit = dynamic_cast<MythUITextEdit *> (GetChild(name));
+
+    if (!optional && !edit)
+    {
+        QString error = QString("Theme is missing a critical textedit element ('%1')")
+                                .arg(name);
+        throw error;
+    }
+
+    return edit;
 }
 
 void MythUIType::DeleteChild(const QString &name)
