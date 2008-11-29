@@ -10,6 +10,17 @@ CONFIG += thread dll
 target.path = $${LIBDIR}
 INSTALLS = target
 
+POSTINC = 
+
+contains(INCLUDEPATH, /usr/include) {
+  POSTINC += /usr/include
+  INCLUDEPATH -= /usr/include
+}
+contains(INCLUDEPATH, /usr/local/include) {
+  POSTINC += /usr/local/include
+  INCLUDEPATH -= /usr/local/include
+}
+
 INCLUDEPATH += ../.. .. .
 INCLUDEPATH += ../libmyth ../libavcodec ../libavutil ../libmythmpeg2
 INCLUDEPATH += ./dvbdev ./mpeg ./iptv
@@ -18,6 +29,7 @@ INCLUDEPATH += ../libmythlivemedia/groupsock/include
 INCLUDEPATH += ../libmythlivemedia/liveMedia/include
 INCLUDEPATH += ../libmythlivemedia/UsageEnvironment/include
 INCLUDEPATH += ../libmythdb ../libmythui
+INCLUDEPATH += $$POSTINC
 
 DEPENDPATH  += ../libmyth ../libavcodec ../libavformat ../libavutil
 DEPENDPATH  += ../libmythmpeg2 ../libmythdvdnav ../libmythdb

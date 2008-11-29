@@ -531,6 +531,7 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs)
                 QString("Failed to create video surface."));
             return false;
         }
+        surface_render[i].magic = MP_VDPAU_RENDER_MAGIC;
         surface_render[i].state = 0;
         surface_render[i].surface = videoSurfaces[i];
     }
@@ -798,8 +799,8 @@ void VDPAUContext::Decode(VideoFrame *frame)
         decoder,
         render->surface,
         (VdpPictureInfo const *)&(render->info),
-        1,
-        &(render->bitstreamBuffer)
+        render->bitstreamBuffersUsed,
+        render->bitstreamBuffers
     );
     CHECK_ST
 }
