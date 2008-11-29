@@ -57,6 +57,12 @@ void MythUIProgressBar::SetStart(int value)
 
 void MythUIProgressBar::SetUsed(int value)
 {
+    if (value < m_start)
+        value = m_start;
+
+    if (value > m_total)
+        value = m_total;
+
     m_current = value;
     CalculatePosition();
 }
