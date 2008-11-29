@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include <QApplication>
+#include <QTimer>
 
 const int kFadeVal = 20;
 
@@ -42,6 +43,8 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
     if (!screen)
         return;
 
+    m_DoInit = false;
+
     MythScreenType *old = m_topScreen;
     if (old)
         old->aboutToHide();
@@ -57,6 +60,7 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
     {
         reinterpret_cast<MythMainWindow *>(parent())->update();
         RecalculateDrawOrder();
+        m_DoInit = true;
     }
 
     screen->aboutToShow();
@@ -155,11 +159,24 @@ MythScreenType *MythScreenStack::GetTopScreen(void)
 
 void MythScreenStack::GetDrawOrder(QVector<MythScreenType *> &screens)
 {
+    // make sure Init() is called outside the paintEvent
+    if (m_DoInit && m_topScreen)
+        QTimer::singleShot(100, this, SLOT(doInit()));
+
     if (m_InNewTransition)
         CheckNewFadeTransition();
     CheckDeletes();
 
     screens = m_DrawOrder;
+}
+
+void MythScreenStack::doInit(void)
+{
+    if (m_DoInit && m_topScreen)
+    {
+        m_DoInit = false;
+        m_topScreen->Init();
+    }
 }
 
 void MythScreenStack::RecalculateDrawOrder(void)
@@ -224,6 +241,7 @@ void MythScreenStack::CheckNewFadeTransition(void)
         m_newTop = NULL;
 
         RecalculateDrawOrder();
+        m_DoInit = true;
     }
 }
 

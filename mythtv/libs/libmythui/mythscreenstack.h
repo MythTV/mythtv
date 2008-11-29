@@ -11,6 +11,8 @@ class MythMainWindow;
 
 class MPUBLIC MythScreenStack : public QObject
 {
+  Q_OBJECT
+
   public:
     MythScreenStack(MythMainWindow *parent, const QString &name,
                     bool main = false);
@@ -28,6 +30,9 @@ class MPUBLIC MythScreenStack : public QObject
 
     void DisableEffects(void) { m_DoTransitions = false; }
 
+  private slots:
+    void doInit(void);
+
   protected:
     void RecalculateDrawOrder(void);
     void DoNewFadeTransition();
@@ -40,6 +45,7 @@ class MPUBLIC MythScreenStack : public QObject
     MythScreenType *m_topScreen;
 
     bool m_DoTransitions;
+    bool m_DoInit;
     bool m_InNewTransition;
     MythScreenType *m_newTop;
 

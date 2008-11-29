@@ -186,6 +186,10 @@ bool MythScreenType::Create(void)
     return true;
 }
 
+void MythScreenType::Init(void)
+{
+}
+
 void MythScreenType::Close(void)
 {
     GetScreenStack()->PopScreen(this);
