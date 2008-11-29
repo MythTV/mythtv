@@ -1220,13 +1220,16 @@ static int mpeg_version(int codec_id)
     }
     return 0;
 }
-#endif // defined(USING_XVMC) || defined(USING_DVDV)
 
-#ifdef USING_XVMC
 static int xvmc_pixel_format(enum PixelFormat pix_fmt)
 {
     (void) pix_fmt;
+#ifdef USING_XVMC
     int xvmc_chroma = XVMC_CHROMA_FORMAT_420;
+#else
+    int xvmc_chroma = 0;
+#endif
+
 #if 0
 // We don't support other chromas yet
     if (PIX_FMT_YUV420P == pix_fmt)
@@ -1238,7 +1241,7 @@ static int xvmc_pixel_format(enum PixelFormat pix_fmt)
 #endif
     return xvmc_chroma;
 }
-#endif // USING_XVMC
+#endif
 
 void default_captions(sinfo_vec_t *tracks, int av_index)
 {
