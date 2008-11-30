@@ -7,68 +7,77 @@
 #ifndef RECORDINGSELECTOR_H_
 #define RECORDINGSELECTOR_H_
 
+// c++
+#include <vector>
+
+// qt
+#include <QList>
+#include <QStringList>
+
 // mythtv
-#include <mythtv/uitypes.h>
-#include <mythtv/uilistbtntype.h>
-#include <mythtv/dialogbox.h>
+#include <libmythui/mythscreentype.h>
+
+// mytharchive
+#include "archiveutil.h"
 
 class ProgramInfo;
+class MythUIText;
+class MythUIButton;
+class MythUIButtonList;
+class MythUIButtonListItem;
 
-class RecordingSelector : public MythThemedDialog
+class RecordingSelector : public MythScreenType
 {
 
   Q_OBJECT
 
   public:
-    RecordingSelector(MythMainWindow *parent,
-                      const QString  &window_name,
-                      const QString  &theme_filename,
-                      const char     *name = "RecordingSelector");
+    RecordingSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList);
 
     ~RecordingSelector(void);
 
-    void keyPressEvent(QKeyEvent *e);
+    bool Create();
+    bool keyPressEvent(QKeyEvent *e);
+
+  signals:
+    void haveResult(bool ok);
 
   public slots:
     void OKPressed(void);
     void cancelPressed(void);
 
     void showMenu(void);
-    void closePopupMenu(void);
     void selectAll(void);
     void clearAll(void);
 
-    void setCategory(int);
-    void titleChanged(UIListBtnTypeItem *item);
+    void setCategory(MythUIButtonListItem *item);
+    void titleChanged(MythUIButtonListItem *item);
+    void toggleSelected(MythUIButtonListItem *item);
 
   private:
+    void Init(void);
     void updateRecordingList(void);
     void updateSelectedList(void);
-    void toggleSelectedState(void);
+    void updateCategorySelector(void);
     void getRecordingList(void);
-    void wireUpTheme(void);
 
-    QString themeDir;
+    QList<ArchiveItem *>        *m_archiveList;
+    std::vector<ProgramInfo *>  *m_recordingList;
+    QList<ProgramInfo *>         m_selectedList;
+    QStringList                  m_categories;
 
-    vector<ProgramInfo *>  *recordingList;
-    QList<ProgramInfo *>    selectedList;
+    MythUIButtonList   *m_recordingButtonList;
+    MythUIButton       *m_okButton;
+    MythUIButton       *m_cancelButton;
+    MythUIButtonList   *m_categorySelector;
+    MythUIText         *m_titleText;
+    MythUIText         *m_datetimeText;
+    MythUIText         *m_filesizeText;
+    MythUIText         *m_descriptionText;
+    MythUIImage        *m_previewImage;
+    MythUIImage        *m_cutlistImage;
 
-    UIListBtnType    *recording_list;
-
-    UITextButtonType *ok_button;
-    UITextButtonType *cancel_button;
-
-    UISelectorType   *category_selector;
-    UITextType       *title_text;
-    UITextType       *datetime_text;
-    UITextType       *filesize_text;
-    UITextType       *description_text;
-    UIImageType      *preview_image;
-    UIImageType      *cutlist_image;
-
-    MythPopupBox     *popupMenu;
+    friend class GetRecordingListThread;
 };
 
 #endif
-
-

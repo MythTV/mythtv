@@ -11,21 +11,25 @@
 
 // myth
 #include <mythtv/mythcontext.h>
+#include <mythtv/util.h>
 #include <libmythui/mythuitext.h>
 #include <libmythui/mythuibutton.h>
 #include <libmythui/mythuicheckbox.h>
 #include <libmythui/mythuibuttonlist.h>
 #include <libmythui/mythuitextedit.h>
+#include <libmythui/mythmainwindow.h>
 
 // mytharchive
 #include "selectdestination.h"
 #include "fileselector.h"
 #include "archiveutil.h"
 #include "exportnative.h"
+#include "themeselector.h"
 
-SelectDestination::SelectDestination(MythScreenStack *parent, QString name)
+SelectDestination::SelectDestination(MythScreenStack *parent, bool nativeMode, QString name)
                   : MythScreenType(parent, name)
 {
+    m_nativeMode = nativeMode;
     m_bCreateISO = false;
     m_bDoBurn = false;
     m_bEraseDvdRw = false;
@@ -37,55 +41,6 @@ SelectDestination::~SelectDestination(void)
     saveConfiguration();
 }
 
-MythUIText* SelectDestination::GetMythUIText(const QString &name, bool optional)
-{
-    MythUIText *text = dynamic_cast<MythUIText *> (GetChild(name));
-
-    if (!optional && !text)
-        throw name;
-
-    return text;
-}
-
-MythUIButton* SelectDestination::GetMythUIButton(const QString &name, bool optional)
-{
-    MythUIButton *button = dynamic_cast<MythUIButton *> (GetChild(name));
-
-    if (!optional && !button)
-        throw name;
-
-    return button;
-}
-
-MythUICheckBox* SelectDestination::GetMythUICheckBox(const QString &name, bool optional)
-{
-    MythUICheckBox *check = dynamic_cast<MythUICheckBox *> (GetChild(name));
-
-    if (!optional && !check)
-        throw name;
-
-    return check;
-}
-
-MythUIButtonList* SelectDestination::GetMythUIButtonList(const QString &name, bool optional)
-{
-    MythUIButtonList *list = dynamic_cast<MythUIButtonList *> (GetChild(name));
-
-    if (!optional && !list)
-        throw name;
-
-    return list;
-}
-
-MythUITextEdit* SelectDestination::GetMythUITextEdit(const QString &name, bool optional)
-{
-    MythUITextEdit *edit = dynamic_cast<MythUITextEdit *> (GetChild(name));
-
-    if (!optional && !edit)
-        throw name;
-
-    return edit;
-}
 
 bool SelectDestination::Create(void)
 {
@@ -113,10 +68,10 @@ bool SelectDestination::Create(void)
         m_filenameEdit = GetMythUITextEdit("filename_edit");
         m_freespaceText = GetMythUIText("freespace_text");
     }
-    catch (const QString name)
+    catch (QString &error)
     {
-        VERBOSE(VB_IMPORTANT, QString("Theme is missing a critical theme element ('%1')")
-                                      .arg(name));
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'selectdestination'.\n\t\t\t"
+                               "Error was: " + error);
         return false;
     }
 
@@ -138,7 +93,7 @@ bool SelectDestination::Create(void)
                 MythUIButtonListItem(m_destinationSelector, ArchiveDestinations[x].name);
         item->SetData(qVariantFromValue(ArchiveDestinations[x].type));
     }
-    m_findButton->SetText(tr("Choose File..."));
+    m_findButton->SetText(tr("Find..."));
     connect(m_findButton, SIGNAL(Clicked()), this, SLOT(handleFind()));
 
     connect(m_filenameEdit, SIGNAL(LosingFocus()), this,
@@ -147,9 +102,9 @@ bool SelectDestination::Create(void)
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
 
-    SetFocusWidget(m_nextButton);
-
     loadConfiguration();
+
+    SetFocusWidget(m_nextButton);
 
     return true;
 }
@@ -183,15 +138,24 @@ bool SelectDestination::keyPressEvent(QKeyEvent *event)
 
 void SelectDestination::handleNextPage()
 {
-     saveConfiguration();
+    saveConfiguration();
 
-    // show the next screen
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    ExportNative *native = new ExportNative(mainStack, this, m_archiveDestination, "ExportNative");
+    if (m_nativeMode)
+    {
+        ExportNative *native = new ExportNative(mainStack, this, m_archiveDestination, "ExportNative");
 
-    if (native->Create())
-        mainStack->AddScreen(native);
+        if (native->Create())
+            mainStack->AddScreen(native);
+    }
+    else
+    {
+        ThemeSelector *theme = new ThemeSelector(mainStack, this, m_archiveDestination, "ThemeSelector");
+
+        if (theme->Create())
+            mainStack->AddScreen(theme);
+    }
 }
 
 void SelectDestination::handlePrevPage()
@@ -218,7 +182,10 @@ void SelectDestination::loadConfiguration(void)
     m_saveFilename = gContext->GetSetting("MythNativeSaveFilename", "");
     m_filenameEdit->SetText(m_saveFilename);
 
-    m_destinationSelector->SetItemCurrent(gContext->GetNumSetting("MythNativeDestinationType", 0));
+    int pos = gContext->GetNumSetting("MythNativeDestinationType", 0);
+    if (pos < 0 || pos >= m_destinationSelector->GetCount())
+        pos = 0;
+    m_destinationSelector->SetItemCurrent(pos);
 }
 
 void SelectDestination::saveConfiguration(void)
@@ -297,13 +264,23 @@ void SelectDestination::setDestination(MythUIButtonListItem* item)
 
 void SelectDestination::handleFind(void)
 {
-    FileSelector selector(FSTYPE_FILE, "/", "*.*", gContext->GetMainWindow(),
-                          "file_selector", "mytharchive-", "file selector");
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    bool res = (kDialogCodeRejected != selector.exec());
-    if (res)
+    FileSelector *selector = new
+            FileSelector(mainStack, NULL, FSTYPE_DIRECTORY, m_saveFilename, "*.*");
+
+    connect(selector, SIGNAL(haveResult(QString)),
+            this, SLOT(fileFinderClosed(QString)));
+
+    if (selector->Create())
+        mainStack->AddScreen(selector);
+}
+
+void SelectDestination::fileFinderClosed(QString filename)
+{
+    if (filename != "")
     {
-        m_filenameEdit->SetText(selector.getSelected());
+        m_filenameEdit->SetText(filename);
         filenameEditLostFocus();
     }
 }

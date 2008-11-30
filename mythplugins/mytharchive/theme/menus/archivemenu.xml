@@ -1,24 +1,57 @@
 <mythmenu name="ARCHIVE">
 
    <button>
-      <type>ARCHIVE_EXPORT_VIDEO</type>
-      <text>Export Video Files</text>
-      <text lang="es">Exportar Ficheros Video</text>
-      <text lang="et">Videofailide eksportimine</text>
-      <text lang="FR">Exporter un fichier video</text>
-      <text lang="nl">Exporteer Video Bestanden</text>
-      <text lang="de">Videodateien exportieren</text>
-      <text lang="nb">Eksporter videofiler</text>
-      <text lang="RU">Экспортировать видео</text>
-      <text lang="SL">Izvoz video datotek</text>
-      <text lang="PL">Eksportuj pliki wideo</text>
-      <text lang="FI">Vie Video</text>
-      <action>ARCHIVE_EXPORT_VIDEO</action>
+      <type>ARCHIVE_CREATE_DVD</type>
+      <text>Create DVD</text>
+      <text lang="es">Crear DVD</text>
+      <text lang="et">DVD valmistamine</text>
+      <text lang="FR">Créer un DVD</text>
+      <text lang="nl">Maak DVD</text>
+      <text lang="nb">Lag DVD</text>
+      <text lang="de">DVD erstellen</text>
+      <text lang="RU">Создать DVD</text>
+      <text lang="SL">Ustvari DVD</text>
+      <text lang="PL">Utwórz DVD</text>
+      <text lang="FI">Luo DVD</text>
+      <action>ARCHIVE_CREATE_DVD</action>
+   </button>
+
+   <button>
+      <type>ARCHIVE_CREATE_ARCHIVE</type>
+      <text>Create Archive</text>
+      <text lang="es">Crear Archivo Nativo</text>
+      <text lang="et">Arhiivi valmistamine</text>
+      <text lang="FR">Créer une archive native</text>
+      <text lang="nl">Maak Backup</text>
+      <text lang="de">Natives Archiv erstellen</text>
+      <text lang="nb">Lag naturlig arkiv</text>
+      <text lang="RU">Создать архив</text>
+      <text lang="SL">Ustvari izvorni arhiv</text>
+      <text lang="PL">Utwórz archiwum</text>
+      <text lang="FI">Luo Tiedosto</text>
+      <action>ARCHIVE_CREATE_ARCHIVE</action>
+  </button>
+
+   <button>
+       <type>ARCHIVE_ENCODE_VIDEO</type>
+       <text>Encode Video File</text>
+       <text lang="es">Codificar Fichero Video</text>
+       <text lang="et">Videofaili kodeerimine</text>
+       <text lang="FR">Encoder un fichier video</text>
+       <text lang="de">Videodatei kodieren</text>
+       <text lang="nl">Encodeer Video Bestanden</text>
+       <text lang="nb">Konverter videofil</text>
+       <text lang="RU">Кодировать фильмы</text>
+       <text lang="SL">Kodiranje videa</text>
+       <text lang="PL">Zakoduj plik wideo</text>
+       <text lang="FI">Luo Video</text>
+       <action>ARCHIVE_ENCODE_VIDEO</action>
+       <depends></depends>
    </button>
 
    <button>
        <type>ARCHIVE_IMPORT_VIDEO</type>
-       <text>Import Video Files</text>
+       <text>Import Archive</text>
        <text lang="es">Importar Ficheros Video</text>
        <text lang="et">Videofailide importimine</text>
        <text lang="FR">Importer un fichier video</text>

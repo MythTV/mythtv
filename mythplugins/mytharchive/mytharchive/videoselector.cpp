@@ -1,22 +1,22 @@
-/*
-	videoselector.cpp
-
-	
-*/
-
-#include <unistd.h>
+// c
 #include <cstdlib>
 #include <stdlib.h>
 #include <unistd.h>
-#include <iostream>
 
 // qt
 #include <QDir>
+#include <QTimer>
 
 // mythtv
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythwidgets.h>
-#include <mythtv/mythdb.h>
+#include <mythtv/dialogbox.h>
+#include <mythtv/libmythdb/mythdb.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythdialogbox.h>
 
 // mytharchive
 #include "videoselector.h"
@@ -24,102 +24,95 @@
 
 using namespace std;
 
-VideoSelector::VideoSelector(MythMainWindow *parent,
-                             const QString  &window_name,
-                             const QString  &theme_filename,
-                             const char     *name)
-    : MythThemedDialog(parent, window_name, theme_filename, name, true)
+VideoSelector::VideoSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList)
+              :MythScreenType(parent, "VideoSelector")
 {
-    currentParentalLevel = 1;
-    videoList = NULL;
-    wireUpTheme();
-    assignFirstFocus();
-    updateForeground();
+    m_archiveList = archiveList;
+    m_currentParentalLevel = 1;
+    m_videoList = NULL;
 }
 
 VideoSelector::~VideoSelector(void)
 {
-    if (videoList)
-        delete videoList;
+    if (m_videoList)
+        delete m_videoList;
 
-    while (!selectedList.isEmpty())
-         delete selectedList.takeFirst();
-    selectedList.clear();
+    while (!m_selectedList.isEmpty())
+         delete m_selectedList.takeFirst();
+    m_selectedList.clear();
 }
 
-void VideoSelector::keyPressEvent(QKeyEvent *e)
+bool VideoSelector::Create(void)
 {
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("mytharchive-ui.xml", "video_selector", this);
+
+    if (!foundtheme)
+        return false;
+
+    try
+    {
+        m_okButton = GetMythUIButton("ok_button");
+        m_cancelButton = GetMythUIButton("cancel_button");
+        m_categorySelector = GetMythUIButtonList("category_selector");
+        m_videoButtonList = GetMythUIButtonList("videolist");
+        m_titleText = GetMythUIText("videotitle");
+        m_plotText = GetMythUIText("videoplot");
+        m_filesizeText = GetMythUIText("filesize");
+        m_coverImage = GetMythUIImage("cover_image");
+        m_warningText = GetMythUIText("warning_text");
+        m_plText = GetMythUIText("parentallevel_text");
+    }
+    catch (QString &error)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'video_selector'\n\t\t\t"
+                              "Error was: " + error);
+        return false;
+    }
+
+    m_okButton->SetText(tr("OK"));
+    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(OKPressed()));
+
+    m_cancelButton->SetText(tr("Cancel"));
+    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
+
+    connect(m_categorySelector, SIGNAL(itemSelected(MythUIButtonListItem *)),
+            this, SLOT(setCategory(MythUIButtonListItem *)));
+
+    getVideoList();
+    connect(m_videoButtonList, SIGNAL(itemSelected(MythUIButtonListItem *)),
+            this, SLOT(titleChanged(MythUIButtonListItem *)));
+    connect(m_videoButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+            this, SLOT(toggleSelected(MythUIButtonListItem *)));
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+
+    SetFocusWidget(m_videoButtonList);
+
+    updateSelectedList();
+    updateVideoList();
+
+    return true;
+}
+
+bool VideoSelector::keyPressEvent(QKeyEvent *event)
+{
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Burn", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
-        if (action == "ESCAPE")
-        {
-            reject();
-        }
-        else if (action == "DOWN")
-        {
-            if (getCurrentFocusWidget() == video_list)
-            {
-                video_list->MoveDown(UIListBtnType::MoveItem);
-                video_list->refresh();
-            }
-            else
-                nextPrevWidgetFocus(true);
-        }
-        else if (action == "UP")
-        {
-            if (getCurrentFocusWidget() == video_list)
-            {
-                video_list->MoveUp(UIListBtnType::MoveItem);
-                video_list->refresh();
-            }
-            else
-                nextPrevWidgetFocus(false);
-        }
-        else if (action == "PAGEDOWN")
-        {
-            if (getCurrentFocusWidget() == video_list)
-            {
-                video_list->MoveDown(UIListBtnType::MovePage);
-                video_list->refresh();
-            }
-        }
-        else if (action == "PAGEUP")
-        {
-            if (getCurrentFocusWidget() == video_list)
-            {
-                video_list->MoveUp(UIListBtnType::MovePage);
-                video_list->refresh();
-            }
-        }
-        else if (action == "LEFT")
-        {
-            if (getCurrentFocusWidget() == category_selector)
-                category_selector->push(false);
-            else
-                nextPrevWidgetFocus(false);
-        }
-        else if (action == "RIGHT")
-        {
-            if (getCurrentFocusWidget() == category_selector)
-                category_selector->push(true);
-            else
-                nextPrevWidgetFocus(true);
-        }
-        else if (action == "SELECT")
-        {
-            if (getCurrentFocusWidget() == video_list)
-                toggleSelectedState();
-            else
-                activateCurrent();
-        }
-        else if (action == "MENU")
+        if (action == "MENU")
         {
             showMenu();
         }
@@ -143,143 +136,74 @@ void VideoSelector::keyPressEvent(QKeyEvent *e)
             handled = false;
     }
 
-    if (!handled)
-            MythThemedDialog::keyPressEvent(e);
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
 void VideoSelector::showMenu()
 {
-    if (popupMenu)
-        return;
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    popupMenu = new MythPopupBox(gContext->GetMainWindow(),
-                                 "popupMenu");
+    MythDialogBox *menuPopup = new MythDialogBox("Menu", popupStack, "actionmenu");
 
-    QAbstractButton *button;
-    button = popupMenu->addButton(tr("Clear All"), this, SLOT(clearAll()));
-    button->setFocus();
-    popupMenu->addButton(tr("Select All"), this, SLOT(selectAll()));
-    popupMenu->addButton(tr("Cancel"), this, SLOT(closePopupMenu()));
+    if (menuPopup->Create())
+        popupStack->AddScreen(menuPopup);
 
-    popupMenu->ShowPopup(this, SLOT(closePopupMenu()));
-}
+    menuPopup->SetReturnEvent(this, "action");
 
-void VideoSelector::closePopupMenu()
-{
-    if (!popupMenu)
-        return;
-
-    popupMenu->deleteLater();
-    popupMenu = NULL;
+    menuPopup->AddButton(tr("Clear All"), SLOT(clearAll()));
+    menuPopup->AddButton(tr("Select All"), SLOT(selectAll()));
+    menuPopup->AddButton(tr("Cancel"), NULL);
 }
 
 void VideoSelector::selectAll()
 {
-    if (!popupMenu)
-        return;
-
-    while (!selectedList.isEmpty())
-         delete selectedList.takeFirst();
-    selectedList.clear();
+    while (!m_selectedList.isEmpty())
+         m_selectedList.takeFirst();
+    m_selectedList.clear();
 
     VideoInfo *v;
-    vector<VideoInfo *>::iterator i = videoList->begin();
-    for ( ; i != videoList->end(); i++)
+    vector<VideoInfo *>::iterator i = m_videoList->begin();
+    for ( ; i != m_videoList->end(); i++)
     {
         v = *i;
-        selectedList.append(v);
+        m_selectedList.append(v);
     }
 
     updateVideoList();
-    closePopupMenu();
 }
 
 void VideoSelector::clearAll()
 {
-    if (!popupMenu)
-        return;
-
-    while (!selectedList.isEmpty())
-         delete selectedList.takeFirst();
-    selectedList.clear();
+    while (!m_selectedList.isEmpty())
+         m_selectedList.takeFirst();
+    m_selectedList.clear();
 
     updateVideoList();
-    closePopupMenu();
 }
 
-void VideoSelector::toggleSelectedState()
+void VideoSelector::toggleSelected(MythUIButtonListItem *item)
 {
-    UIListBtnTypeItem *item = video_list->GetItemCurrent();
-
-    if (!item)
-        return;
-
-    if (item->state() == UIListBtnTypeItem:: FullChecked)
+    if (item->state() == MythUIButtonListItem::FullChecked)
     {
-        int index = selectedList.indexOf((VideoInfo *) item->getData());
+        int index = m_selectedList.indexOf((VideoInfo *) item->getData());
         if (index != -1)
-            delete selectedList.takeAt(index);
-        item->setChecked(UIListBtnTypeItem:: NotChecked);
+            m_selectedList.takeAt(index);
+        item->setChecked(MythUIButtonListItem::NotChecked);
     }
     else
     {
-        int index = selectedList.indexOf((VideoInfo *) item->getData());
+        int index = m_selectedList.indexOf((VideoInfo *) item->getData());
         if (index == -1)
-            selectedList.append((VideoInfo *) item->getData());
+            m_selectedList.append((VideoInfo *) item->getData());
 
-        item->setChecked(UIListBtnTypeItem:: FullChecked);
+        item->setChecked(MythUIButtonListItem::FullChecked);
     }
-
-    video_list->refresh();
 }
 
-void VideoSelector::wireUpTheme()
-{
-    // ok button
-    ok_button = getUITextButtonType("ok_button");
-    if (ok_button)
-    {
-        ok_button->setText(tr("OK"));
-        connect(ok_button, SIGNAL(pushed()), this, SLOT(OKPressed()));
-    }
-
-    // cancel button
-    cancel_button = getUITextButtonType("cancel_button");
-    if (cancel_button)
-    {
-        cancel_button->setText(tr("Cancel"));
-        connect(cancel_button, SIGNAL(pushed()), this, SLOT(cancelPressed()));
-    }
-
-    // video selector
-    category_selector = getUISelectorType("category_selector");
-    if (category_selector)
-    {
-        connect(category_selector, SIGNAL(pushed(int)),
-                this, SLOT(setCategory(int)));
-    }
-
-    title_text = getUITextType("videotitle");
-    plot_text = getUITextType("videoplot");
-    filesize_text = getUITextType("filesize");
-    cover_image = getUIImageType("cover_image");
-    warning_text =  getUITextType("warning_text");
-    pl_text =  getUITextType("parentallevel_text");
-
-    video_list = getUIListBtnType("videolist");
-    if (video_list)
-    {
-        getVideoList();
-        connect(video_list, SIGNAL(itemSelected(UIListBtnTypeItem *)),
-                this, SLOT(titleChanged(UIListBtnTypeItem *)));
-    }
-
-    updateSelectedList();
-    updateVideoList();
-    buildFocusList();
-}
-
-void VideoSelector::titleChanged(UIListBtnTypeItem *item)
+void VideoSelector::titleChanged(MythUIButtonListItem *item)
 {
     VideoInfo *v;
 
@@ -288,27 +212,27 @@ void VideoSelector::titleChanged(UIListBtnTypeItem *item)
     if (!v)
         return;
 
-    if (title_text)
-        title_text->SetText(v->title);
+    if (m_titleText)
+        m_titleText->SetText(v->title);
 
-    if (plot_text)
-        plot_text->SetText(v->plot);
+    if (m_plotText)
+        m_plotText->SetText(v->plot);
 
-    if (cover_image)
+    if (m_coverImage)
     {
         if (v->coverfile != "" && v->coverfile != "No Cover")
         {
-            cover_image->SetImage(v->coverfile);
-            cover_image->LoadImage();
+            m_coverImage->SetFilename(v->coverfile);
+            m_coverImage->Load();
         }
         else
         {
-            cover_image->SetImage("blank.png");
-            cover_image->LoadImage();
+            m_coverImage->SetFilename("blank.png");
+            m_coverImage->Load();
         }
     }
 
-    if (filesize_text)
+    if (m_filesizeText)
     {
         if (v->size == 0)
         {
@@ -321,84 +245,126 @@ void VideoSelector::titleChanged(UIListBtnTypeItem *item)
                                 .arg(v->filename.toLocal8Bit().constData()));
         }
 
-        filesize_text->SetText(formatSize(v->size / 1024));
+        m_filesizeText->SetText(formatSize(v->size / 1024));
     }
-
-    buildFocusList();
 }
 
 void VideoSelector::OKPressed()
 {
-    // remove all videos from archivelist
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM archiveitems WHERE type = 'Video'");
-    query.exec();
-
-    // loop though selected videos and add them to the archiveitems table
+    // loop though selected videos and add them to the list
     VideoInfo *v;
+    ArchiveItem *a;
 
-    for (int x = 0; x < selectedList.size(); x++)
+    // remove any items that have been removed from the list
+    QList<ArchiveItem *> tempAList;
+    for (int x = 0; x < m_archiveList->size(); x++)
     {
-        v = selectedList.at(x);
-        QFile file(v->filename);
-        if (file.exists())
+        a = m_archiveList->at(x);
+        bool found = false;
+
+        for (int y = 0; y < m_selectedList.size(); y++)
         {
-            query.prepare("INSERT INTO archiveitems (type, title, subtitle, "
-                    "description, startdate, starttime, size, filename, hascutlist) "
-                    "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
-                    ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST);");
-            query.bindValue(":TYPE", "Video");
-            query.bindValue(":TITLE", v->title);
-            query.bindValue(":SUBTITLE", "");
-            query.bindValue(":DESCRIPTION", v->plot);
-            query.bindValue(":STARTDATE", "");
-            query.bindValue(":STARTTIME", "");
-            query.bindValue(":SIZE", (long long)file.size());
-            query.bindValue(":FILENAME", v->filename);
-            query.bindValue(":HASCUTLIST", 0);
-            if (!query.exec())
-                MythDB::DBError("archive item insert", query);
+            v = m_selectedList.at(y);
+            if (a->type != "Video" || a->filename == v->filename)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            tempAList.append(a);
+    }
+
+    for (int x = 0; x < tempAList.size(); x++)
+        m_archiveList->removeAll(tempAList.at(x));
+
+    // remove any items that are already in the list
+    QList<VideoInfo *> tempSList;
+    for (int x = 0; x < m_selectedList.size(); x++)
+    {
+        v = m_selectedList.at(x);
+
+        for (int y = 0; y < m_archiveList->size(); y++)
+        {
+            a = m_archiveList->at(y);
+            if (a->filename == v->filename)
+            {
+                tempSList.append(v);
+                break;
+            }
         }
     }
 
-    done(Accepted);
+    for (int x = 0; x < tempSList.size(); x++)
+        m_selectedList.removeAll(tempSList.at(x));
+
+    // add all that are left
+    for (int x = 0; x < m_selectedList.size(); x++)
+    {
+        v = m_selectedList.at(x);
+        a = new ArchiveItem;
+        a->type = "Video";
+        a->title = v->title;
+        a->subtitle = "";
+        a->description = v->plot;
+        a->startDate = "";
+        a->startTime = "";
+        a->size = v->size;
+        a->filename = v->filename;
+        a->hasCutlist = false;
+        a->useCutlist = false;
+        a->duration = 0;
+        a->cutDuration = 0;
+        a->videoWidth = 0;
+        a->videoHeight = 0;
+        a->fileCodec = "";
+        a->videoCodec = "";
+        a->encoderProfile = NULL;
+        a->editedDetails = false;
+        m_archiveList->append(a);
+    }
+
+    emit haveResult(true);
+    Close();
 }
 
 void VideoSelector::cancelPressed()
 {
-    reject();
+    emit haveResult(false);
+    Close();
 }
 
 void VideoSelector::updateVideoList(void)
 {
-    if (!videoList)
+    if (!m_videoList)
         return;
 
-    video_list->Reset();
+    m_videoButtonList->Reset();
 
-    if (category_selector)
+    if (m_categorySelector)
     {
         VideoInfo *v;
-        vector<VideoInfo *>::iterator i = videoList->begin();
-        for ( ; i != videoList->end(); i++)
+        vector<VideoInfo *>::iterator i = m_videoList->begin();
+        for ( ; i != m_videoList->end(); i++)
         {
             v = *i;
 
-            if (v->category == category_selector->getCurrentString() ||
-                category_selector->getCurrentString() == tr("All Videos"))
+            if (v->category == m_categorySelector->GetValue() ||
+                m_categorySelector->GetValue() == tr("All Videos"))
             {
-                if (v->parentalLevel <= currentParentalLevel)
+                if (v->parentalLevel <= m_currentParentalLevel)
                 {
-                    UIListBtnTypeItem* item = new UIListBtnTypeItem(
-                            video_list, v->title);
+                    MythUIButtonListItem* item = new MythUIButtonListItem(
+                            m_videoButtonList, v->title);
                     item->setCheckable(true);
-                    if (selectedList.indexOf((VideoInfo *) v) != -1)
+                    if (m_selectedList.indexOf((VideoInfo *) v) != -1)
                     {
-                        item->setChecked(UIListBtnTypeItem::FullChecked);
+                        item->setChecked(MythUIButtonListItem::FullChecked);
                     }
                     else
                     {
-                        item->setChecked(UIListBtnTypeItem::NotChecked);
+                        item->setChecked(MythUIButtonListItem::NotChecked);
                     }
 
                     item->setData(v);
@@ -407,23 +373,21 @@ void VideoSelector::updateVideoList(void)
         }
     }
 
-    if (video_list->GetCount() > 0)
+    if (m_videoButtonList->GetCount() > 0)
     {
-        video_list->SetItemCurrent(video_list->GetItemFirst());
-        titleChanged(video_list->GetItemCurrent());
-        warning_text->hide();
+        m_videoButtonList->SetItemCurrent(m_videoButtonList->GetItemFirst());
+        titleChanged(m_videoButtonList->GetItemCurrent());
+        m_warningText->Hide();
     }
     else
     {
-        warning_text->show();
-        title_text->SetText("");
-        plot_text->SetText("");
-        cover_image->SetImage("blank.png");
-        cover_image->LoadImage();
-        filesize_text->SetText("");
+        m_warningText->Show();
+        m_titleText->SetText("");
+        m_plotText->SetText("");
+        m_coverImage->SetFilename("blank.png");
+        m_coverImage->Load();
+        m_filesizeText->SetText("");
     }
-
-    video_list->refresh();
 }
 
 vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
@@ -482,13 +446,13 @@ vector<VideoInfo *> *VideoSelector::getVideoListFromDB(void)
 void VideoSelector::getVideoList(void)
 {
     VideoInfo *v;
-    videoList = getVideoListFromDB();
+    m_videoList = getVideoListFromDB();
     QStringList categories;
 
-    if (videoList && videoList->size() > 0)
+    if (m_videoList && m_videoList->size() > 0)
     {
-        vector<VideoInfo *>::iterator i = videoList->begin();
-        for ( ; i != videoList->end(); i++)
+        vector<VideoInfo *>::iterator i = m_videoList->begin();
+        for ( ; i != m_videoList->end(); i++)
         {
             v = *i;
 
@@ -498,8 +462,6 @@ void VideoSelector::getVideoList(void)
     }
     else
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Video Selector",
-                                  tr("You don't have any videos!\n\nClick OK"));
         QTimer::singleShot(100, this, SLOT(cancelPressed()));
         return;
     }
@@ -507,35 +469,34 @@ void VideoSelector::getVideoList(void)
     // sort and add categories to selector
     categories.sort();
 
-    if (category_selector)
+    if (m_categorySelector)
     {
-        category_selector->addItem(0, tr("All Videos"));
-        category_selector->setToItem(0);
-    }
+        new MythUIButtonListItem(m_categorySelector, tr("All Videos"));
+        m_categorySelector->SetItemCurrent(0);
 
-    for (int x = 1; x <= categories.count(); x++)
-    {
-        if (category_selector)
-            category_selector->addItem(x, categories[x-1]);
+        for (int x = 0; x < categories.count(); x++)
+        {
+            new MythUIButtonListItem(m_categorySelector, categories[x]);
+        }
     }
 
     setCategory(0);
 }
 
-void VideoSelector::setCategory(int item)
+void VideoSelector::setCategory(MythUIButtonListItem *item)
 {
-    (void) item;
+    (void)item;
     updateVideoList();
 }
 
 void VideoSelector::updateSelectedList()
 {
-    if (!videoList)
+    if (!m_videoList)
         return;
 
-    while (!selectedList.isEmpty())
-         delete selectedList.takeFirst();
-    selectedList.clear();
+    while (!m_selectedList.isEmpty())
+         delete m_selectedList.takeFirst();
+    m_selectedList.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT filename FROM archiveitems WHERE type = 'Video'");
@@ -547,14 +508,14 @@ void VideoSelector::updateSelectedList()
             QString filename = query.value(0).toString();
 
             VideoInfo *v;
-            vector<VideoInfo *>::iterator i = videoList->begin();
-            for ( ; i != videoList->end(); i++)
+            vector<VideoInfo *>::iterator i = m_videoList->begin();
+            for ( ; i != m_videoList->end(); i++)
             {
                 v = *i;
                 if (v->filename == filename)
                 {
-                    if (selectedList.indexOf(v) == -1)
-                        selectedList.append(v);
+                    if (m_selectedList.indexOf(v) == -1)
+                        m_selectedList.append(v);
                     break;
                 }
             }
@@ -570,15 +531,15 @@ void VideoSelector::setParentalLevel(int which_level)
     if (which_level > 4)
         which_level = 4;
 
-    if ((which_level > currentParentalLevel) && !checkParentPassword())
-        which_level = currentParentalLevel;
+    if ((which_level > m_currentParentalLevel) && !checkParentPassword())
+        which_level = m_currentParentalLevel;
 
 
-    if (currentParentalLevel != which_level)
+    if (m_currentParentalLevel != which_level)
     {
-        currentParentalLevel = which_level;
+        m_currentParentalLevel = which_level;
         updateVideoList();
-        pl_text->SetText(QString::number(which_level));
+        m_plText->SetText(QString::number(which_level));
     }
 }
 

@@ -7,7 +7,8 @@
 #ifndef ARCHIVEUTIL_H_
 #define ARCHIVEUTIL_H_
 
-#include <qstring.h>
+#include <QString>
+#include <QMetaType>
 
 class ProgramInfo;
 
@@ -77,6 +78,7 @@ bool extractDetailsFromFilename(const QString &inFile,
                                 QString &chanID, QString &startTime);
 ProgramInfo *getProgramInfoForFile(const QString &inFile);
 bool getFileDetails(ArchiveItem *a);
+void recalcItemSize(ArchiveItem *item);
 QString getBaseName(const QString &filename);
 void showWarningDialog(const QString msg);
 

@@ -1,129 +1,182 @@
-/*
-	recordingselector.cpp
 
-	
-*/
-
-#include <unistd.h>
+// c
 #include <cstdlib>
 #include <stdlib.h>
 #include <unistd.h>
-#include <iostream>
-
-using namespace std;
 
 // qt
 #include <QDir>
 #include <QKeyEvent>
+#include <QTimer>
+#include <QApplication>
 
 // mythtv
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythwidgets.h>
 #include <mythtv/libmythdb/mythdb.h>
 #include <mythtv/libmythtv/programinfo.h>
 #include <mythtv/libmythtv/remoteutil.h>
+#include <mythtv/libmythdb/mythtimer.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythprogressdialog.h>
+#include <libmythui/mythdialogbox.h>
 
 // mytharchive
 #include "recordingselector.h"
 #include "archiveutil.h"
 
-RecordingSelector::RecordingSelector(MythMainWindow *parent,
-                                     const QString  &window_name,
-                                     const QString  &theme_filename,
-                                     const char     *name)
-    : MythThemedDialog(parent, window_name, theme_filename, name, true)
+class GetRecordingListThread : public QThread 
 {
-    recordingList = NULL;
-    wireUpTheme();
-    assignFirstFocus();
-    updateForeground();
-    popupMenu = NULL;
+  public:
+    GetRecordingListThread(RecordingSelector *parent)
+    {
+        m_parent = parent;
+        start();
+    }
+
+    virtual void run(void) 
+    {
+        m_parent->getRecordingList();
+    }
+
+    RecordingSelector *m_parent;
+};
+
+RecordingSelector::RecordingSelector(MythScreenStack *parent, 
+                                     QList<ArchiveItem *> *archiveList)
+                  : MythScreenType(parent, "RecordingSelector")
+{
+    m_archiveList = archiveList;
+    m_recordingList = NULL;
 }
 
 RecordingSelector::~RecordingSelector(void)
 {
-    if (recordingList)
-        delete recordingList;
+    if (m_recordingList)
+        delete m_recordingList;
 
-    while (!selectedList.isEmpty())
-         delete selectedList.takeFirst();
-    selectedList.clear();
-
+    while (!m_selectedList.isEmpty())
+         delete m_selectedList.takeFirst();
+    m_selectedList.clear();
 }
 
-void RecordingSelector::keyPressEvent(QKeyEvent *e)
+bool RecordingSelector::Create(void)
 {
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("mytharchive-ui.xml", "recording_selector", this);
+
+    if (!foundtheme)
+        return false;
+
+    try
+    {
+        m_okButton = GetMythUIButton("ok_button");
+        m_cancelButton = GetMythUIButton("cancel_button");
+        m_categorySelector = GetMythUIButtonList("category_selector");
+        m_recordingButtonList = GetMythUIButtonList("recordinglist");
+
+        m_titleText = GetMythUIText("progtitle");
+        m_datetimeText = GetMythUIText("progdatetime");
+        m_descriptionText = GetMythUIText("progdescription");
+        m_filesizeText = GetMythUIText("filesize");
+        m_previewImage = GetMythUIImage("preview_image");
+        m_cutlistImage = GetMythUIImage("cutlist_image");
+    }
+    catch (QString &error)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'recording_selector'\n\t\t\t"
+                              "Error was: " + error);
+        return false;
+    }
+
+    m_okButton->SetText(tr("OK"));
+    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(OKPressed()));
+
+    m_cancelButton->SetText(tr("Cancel"));
+    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
+
+    new MythUIButtonListItem(m_categorySelector, tr("All Recordings"));
+    connect(m_categorySelector, SIGNAL(itemSelected(MythUIButtonListItem *)),
+            this, SLOT(setCategory(MythUIButtonListItem *)));
+
+    connect(m_recordingButtonList, SIGNAL(itemSelected(MythUIButtonListItem *)),
+            this, SLOT(titleChanged(MythUIButtonListItem *)));
+    connect(m_recordingButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+            this, SLOT(toggleSelected(MythUIButtonListItem *)));
+
+    m_cutlistImage->Hide();
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+
+    SetFocusWidget(m_recordingButtonList);
+
+    return true;
+}
+
+void RecordingSelector::Init(void)
+{
+    QString message = tr("Retrieving Recording List. Please Wait...");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythUIBusyDialog *busyPopup = new 
+            MythUIBusyDialog(message, popupStack, "recordingselectorbusydialog");
+
+    if (busyPopup->Create())
+        popupStack->AddScreen(busyPopup, false);
+    else
+    {
+        delete busyPopup;
+        busyPopup = false;
+    }
+
+    GetRecordingListThread *thread = new GetRecordingListThread(this);
+    while (thread->isRunning())
+    {
+        qApp->processEvents();
+        usleep(100);
+    }
+
+    if (!m_recordingList || m_recordingList->size() == 0)
+    {
+        ShowOkPopup(tr("Either you don't have any recordings or "
+                       "no recordings are available locally!"));
+        if (busyPopup)
+            busyPopup->Close();
+
+        Close();
+        return;
+    }
+
+    updateCategorySelector();
+    updateSelectedList();
+    updateRecordingList();
+
+    if (busyPopup)
+        busyPopup->Close();
+}
+
+bool RecordingSelector::keyPressEvent(QKeyEvent *event)
+{
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
+
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Archive", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
-        if (action == "ESCAPE")
-        {
-            done(kDialogCodeRejected);
-        }
-        else if (action == "DOWN")
-        {
-            if (getCurrentFocusWidget() == recording_list)
-            {
-                recording_list->MoveDown(UIListBtnType::MoveItem);
-                recording_list->refresh();
-            }
-            else
-                nextPrevWidgetFocus(true);
-        }
-        else if (action == "UP")
-        {
-            if (getCurrentFocusWidget() == recording_list)
-            {
-                recording_list->MoveUp(UIListBtnType::MoveItem);
-                recording_list->refresh();
-            }
-            else
-                nextPrevWidgetFocus(false);
-        }
-        else if (action == "PAGEDOWN")
-        {
-            if (getCurrentFocusWidget() == recording_list)
-            {
-                recording_list->MoveDown(UIListBtnType::MovePage);
-                recording_list->refresh();
-            }
-        }
-        else if (action == "PAGEUP")
-        {
-            if (getCurrentFocusWidget() == recording_list)
-            {
-                recording_list->MoveUp(UIListBtnType::MovePage);
-                recording_list->refresh();
-            }
-        }
-        else if (action == "LEFT")
-        {
-            if (getCurrentFocusWidget() == category_selector)
-                category_selector->push(false);
-            else
-                nextPrevWidgetFocus(false);
-        }
-        else if (action == "RIGHT")
-        {
-            if (getCurrentFocusWidget() == category_selector)
-                category_selector->push(true);
-            else
-                nextPrevWidgetFocus(true);
-        }
-        else if (action == "SELECT")
-        {
-            if (getCurrentFocusWidget() == recording_list)
-                toggleSelectedState();
-            else
-                activateCurrent();
-        }
-        else if (action == "MENU")
+        if (action == "MENU")
         {
             showMenu();
         }
@@ -131,151 +184,74 @@ void RecordingSelector::keyPressEvent(QKeyEvent *e)
             handled = false;
     }
 
-    if (!handled)
-            MythThemedDialog::keyPressEvent(e);
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
 void RecordingSelector::showMenu()
 {
-    if (popupMenu)
-        return;
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    popupMenu = new MythPopupBox(gContext->GetMainWindow(),
-                                 "popupMenu");
+    MythDialogBox *menuPopup = new MythDialogBox("Menu", popupStack, "actionmenu");
 
-    QAbstractButton *button;
-    button = popupMenu->addButton(tr("Clear All"), this, SLOT(clearAll()));
-    button->setFocus();
-    popupMenu->addButton(tr("Select All"), this, SLOT(selectAll()));
-    popupMenu->addButton(tr("Cancel"), this, SLOT(closePopupMenu()));
+    if (menuPopup->Create())
+        popupStack->AddScreen(menuPopup);
 
-    popupMenu->ShowPopup(this, SLOT(closePopupMenu()));
-}
+    menuPopup->SetReturnEvent(this, "action");
 
-void RecordingSelector::closePopupMenu(void)
-{
-    if (popupMenu)
-    {
-        popupMenu->deleteLater();
-        popupMenu = NULL;
-    }
+    menuPopup->AddButton(tr("Clear All"), SLOT(clearAll()));
+    menuPopup->AddButton(tr("Select All"), SLOT(selectAll()));
+    menuPopup->AddButton(tr("Cancel"), NULL);
 }
 
 void RecordingSelector::selectAll()
 {
-    if (!popupMenu)
-        return;
-
-
-    while (!selectedList.isEmpty())
-         delete selectedList.takeFirst();
-    selectedList.clear();
+    while (!m_selectedList.isEmpty())
+         m_selectedList.takeFirst();
+    m_selectedList.clear();
 
     ProgramInfo *p;
-    vector<ProgramInfo *>::iterator i = recordingList->begin();
-    for ( ; i != recordingList->end(); i++)
+    vector<ProgramInfo *>::iterator i = m_recordingList->begin();
+    for ( ; i != m_recordingList->end(); i++)
     {
         p = *i;
-        selectedList.append(p);
+        m_selectedList.append(p);
     }
 
     updateRecordingList();
-    closePopupMenu();
 }
 
 void RecordingSelector::clearAll()
 {
-    if (!popupMenu)
-        return;
-
-    while (!selectedList.isEmpty())
-         delete selectedList.takeFirst();
-    selectedList.clear();
+    while (!m_selectedList.isEmpty())
+         m_selectedList.takeFirst();
+    m_selectedList.clear();
 
     updateRecordingList();
-    closePopupMenu();
 }
 
-void RecordingSelector::toggleSelectedState()
+void RecordingSelector::toggleSelected(MythUIButtonListItem *item)
 {
-    UIListBtnTypeItem *item = recording_list->GetItemCurrent();
-    if (item->state() == UIListBtnTypeItem:: FullChecked)
+    if (item->state() == MythUIButtonListItem:: FullChecked)
     {
-        int index = selectedList.indexOf((ProgramInfo *) item->getData());
+        int index = m_selectedList.indexOf((ProgramInfo *) item->getData());
         if (index != -1)
-            delete selectedList.takeAt(index);
-        item->setChecked(UIListBtnTypeItem:: NotChecked);
+            m_selectedList.takeAt(index);
+        item->setChecked(MythUIButtonListItem:: NotChecked);
     }
     else
     {
-        int index = selectedList.indexOf((ProgramInfo *) item->getData());
+        int index = m_selectedList.indexOf((ProgramInfo *) item->getData());
         if (index == -1)
-            selectedList.append((ProgramInfo *) item->getData());
+            m_selectedList.append((ProgramInfo *) item->getData());
 
-        item->setChecked(UIListBtnTypeItem:: FullChecked);
+        item->setChecked(MythUIButtonListItem:: FullChecked);
     }
-
-    recording_list->refresh();
 }
 
-void RecordingSelector::wireUpTheme()
-{
-    // ok button
-    ok_button = getUITextButtonType("ok_button");
-    if (ok_button)
-    {
-        ok_button->setText(tr("OK"));
-        connect(ok_button, SIGNAL(pushed()), this, SLOT(OKPressed()));
-    }
-
-    // cancel button
-    cancel_button = getUITextButtonType("cancel_button");
-    if (cancel_button)
-    {
-        cancel_button->setText(tr("Cancel"));
-        connect(cancel_button, SIGNAL(pushed()), this, SLOT(cancelPressed()));
-    }
-
-    // recordings selector
-    category_selector = getUISelectorType("category_selector");
-    if (category_selector)
-    {
-        connect(category_selector, SIGNAL(pushed(int)),
-                this, SLOT(setCategory(int)));
-    }
-
-    title_text = getUITextType("progtitle");
-    datetime_text = getUITextType("progdatetime");
-    description_text = getUITextType("progdescription");
-    filesize_text = getUITextType("filesize");
-    preview_image = getUIImageType("preview_image");
-    cutlist_image = getUIImageType("cutlist_image");
-
-
-    recording_list = getUIListBtnType("recordinglist");
-    if (recording_list)
-    {
-        getRecordingList();
-        connect(recording_list, SIGNAL(itemSelected(UIListBtnTypeItem *)),
-                this, SLOT(titleChanged(UIListBtnTypeItem *)));
-    }
-
-    if (!ok_button || !cancel_button || !category_selector ||
-        !title_text || !datetime_text || !description_text ||
-        !filesize_text || !preview_image || !cutlist_image || !recording_list)
-    {
-        VERBOSE(VB_IMPORTANT, "One or more UI elements is missing from your theme - bailing out!");
-        QTimer::singleShot(100, this, SLOT(cancelPressed()));
-        return;
-    }
-
-    updateSelectedList();
-    updateRecordingList();
-
-    buildFocusList();
-}
-
-void RecordingSelector::titleChanged(UIListBtnTypeItem *item)
+void RecordingSelector::titleChanged(MythUIButtonListItem *item)
 {
     ProgramInfo *p;
 
@@ -284,146 +260,192 @@ void RecordingSelector::titleChanged(UIListBtnTypeItem *item)
     if (!p)
         return;
 
-    if (title_text)
-        title_text->SetText(p->title);
+    if (m_titleText)
+        m_titleText->SetText(p->title);
 
-    if (datetime_text)
-        datetime_text->SetText(p->startts.toString("dd MMM yy (hh:mm)"));
+    if (m_datetimeText)
+        m_datetimeText->SetText(p->startts.toString("dd MMM yy (hh:mm)"));
 
-    if (description_text)
-        description_text->SetText(
+    if (m_descriptionText)
+        m_descriptionText->SetText(
                 (p->subtitle != "" ? p->subtitle + "\n" : "") + p->description);
 
-    if (filesize_text)
+    if (m_filesizeText)
     {
-        filesize_text->SetText(formatSize(p->filesize / 1024));
+        m_filesizeText->SetText(formatSize(p->filesize / 1024));
     }
 
-    if (cutlist_image)
+    if (m_cutlistImage)
     {
         if (p->programflags & FL_CUTLIST)
-            cutlist_image->show();
+            m_cutlistImage->Show();
         else
-            cutlist_image->hide();
+            m_cutlistImage->Hide();
     }
 
-    if (preview_image)
+    if (m_previewImage)
     {
         // try to locate a preview image
         if (QFile::exists(p->pathname + ".png"))
         {
-            preview_image->SetImage(p->pathname + ".png");
-            preview_image->LoadImage();
+            m_previewImage->SetFilename(p->pathname + ".png");
+            m_previewImage->Load();
         }
         else
         {
-            preview_image->SetImage("blank.png");
-            preview_image->LoadImage();
+            m_previewImage->SetFilename("blank.png");
+            m_previewImage->Load();
         }
     }
-
-    buildFocusList();
 }
 
 void RecordingSelector::OKPressed()
 {
-    // remove all recordings from archivelist
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM archiveitems WHERE type = 'Recording'");
-    query.exec();
-
-    // loop though selected recordings and add them to the archiveitems table
+    // loop though selected recordings and add them to the list
     ProgramInfo *p;
+    ArchiveItem *a;
 
-    for (int x = 0; x < selectedList.size(); x++)
+    // remove any items that have been removed from the list
+    QList<ArchiveItem *> tempAList;
+    for (int x = 0; x < m_archiveList->size(); x++)
     {
-        p = selectedList.at(x);
-        query.prepare("INSERT INTO archiveitems (type, title, subtitle,"
-                "description, startdate, starttime, size, filename, hascutlist) "
-                "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
-                ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST);");
-        query.bindValue(":TYPE", "Recording");
-        query.bindValue(":TITLE", p->title);
-        query.bindValue(":SUBTITLE", p->subtitle);
-        query.bindValue(":DESCRIPTION", p->description);
-        query.bindValue(":STARTDATE", p->startts.toString("dd MMM yy"));
-        query.bindValue(":STARTTIME", p->startts.toString("(hh:mm)"));
-        query.bindValue(":SIZE", p->filesize);
-        query.bindValue(":FILENAME", p->GetPlaybackURL(false, true));
-        query.bindValue(":HASCUTLIST", (p->programflags & FL_CUTLIST));
-        if (!query.exec())
-            MythDB::DBError("archive item insert", query);
+        a = m_archiveList->at(x);
+        bool found = false;
+
+        for (int y = 0; y < m_selectedList.size(); y++)
+        {
+            p = m_selectedList.at(y);
+            if (a->type != "Recording" || a->filename == p->GetPlaybackURL(false, true))
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            tempAList.append(a);
     }
 
-    done(Accepted);
-}
+    for (int x = 0; x < tempAList.size(); x++)
+        m_archiveList->removeAll(tempAList.at(x));
 
-void RecordingSelector::cancelPressed()
-{
-    reject();
-}
-
-void RecordingSelector::updateRecordingList(void)
-{
-    if (!recordingList || recordingList->size() == 0)
-        return;
-
-    recording_list->Reset();
-
-    if (category_selector)
+    // remove any items that are already in the list
+    QList<ProgramInfo *> tempSList;
+    for (int x = 0; x < m_selectedList.size(); x++)
     {
-        ProgramInfo *p;
-        vector<ProgramInfo *>::iterator i = recordingList->begin();
-        for ( ; i != recordingList->end(); i++)
+        p = m_selectedList.at(x);
+
+        for (int y = 0; y < m_archiveList->size(); y++)
         {
-            p = *i;
-
-            if (p->title == category_selector->getCurrentString() ||
-                category_selector->getCurrentString() == tr("All Recordings"))
+            a = m_archiveList->at(y);
+            if (a->filename == p->GetPlaybackURL(false, true))
             {
-                UIListBtnTypeItem* item = new UIListBtnTypeItem(recording_list,
-                        p->title + " ~ " +
-                        p->startts.toString("dd MMM yy (hh:mm)"));
-                item->setCheckable(true);
-                if (selectedList.indexOf((ProgramInfo *) p) != -1)
-                {
-                    item->setChecked(UIListBtnTypeItem::FullChecked);
-                }
-                else
-                {
-                    item->setChecked(UIListBtnTypeItem::NotChecked);
-                }
-
-                item->setData(p);
+                tempSList.append(p);
+                break;
             }
         }
     }
 
-    recording_list->SetItemCurrent(recording_list->GetItemFirst());
-    titleChanged(recording_list->GetItemCurrent());
-    recording_list->refresh();
+    for (int x = 0; x < tempSList.size(); x++)
+        m_selectedList.removeAll(tempSList.at(x));
+
+    // add all that are left
+    for (int x = 0; x < m_selectedList.size(); x++)
+    {
+        p = m_selectedList.at(x);
+        a = new ArchiveItem;
+        a->type = "Recording";
+        a->title = p->title;
+        a->subtitle = p->subtitle;
+        a->description = p->description;
+        a->startDate = p->startts.toString("dd MMM yy");
+        a->startTime = p->startts.toString("(hh:mm)");
+        a->size = p->filesize;
+        a->filename = p->GetPlaybackURL(false, true);
+        a->hasCutlist = (p->programflags & FL_CUTLIST);
+        a->useCutlist = false;
+        a->duration = 0;
+        a->cutDuration = 0;
+        a->videoWidth = 0;
+        a->videoHeight = 0;
+        a->fileCodec = "";
+        a->videoCodec = "";
+        a->encoderProfile = NULL;
+        a->editedDetails = false;
+        m_archiveList->append(a);
+    }
+
+    emit haveResult(true);
+    Close();
+}
+
+void RecordingSelector::cancelPressed()
+{
+    emit haveResult(false);
+    Close();
+}
+
+void RecordingSelector::updateRecordingList(void)
+{
+    if (!m_recordingList || m_recordingList->size() == 0)
+        return;
+
+    m_recordingButtonList->Reset();
+
+    if (m_categorySelector)
+    {
+        ProgramInfo *p;
+        vector<ProgramInfo *>::iterator i = m_recordingList->begin();
+        for ( ; i != m_recordingList->end(); i++)
+        {
+            p = *i;
+
+            if (p->title == m_categorySelector->GetValue() ||
+                m_categorySelector->GetValue() == tr("All Recordings"))
+            {
+                MythUIButtonListItem* item = new MythUIButtonListItem(m_recordingButtonList,
+                        p->title + " ~ " +
+                        p->startts.toString("dd MMM yy (hh:mm)"));
+                item->setCheckable(true);
+                if (m_selectedList.indexOf((ProgramInfo *) p) != -1)
+                {
+                    item->setChecked(MythUIButtonListItem::FullChecked);
+                }
+                else
+                {
+                    item->setChecked(MythUIButtonListItem::NotChecked);
+                }
+
+                item->setData(p);
+            }
+            qApp->processEvents();
+        }
+    }
+
+    m_recordingButtonList->SetItemCurrent(m_recordingButtonList->GetItemFirst());
+    titleChanged(m_recordingButtonList->GetItemCurrent());
 }
 
 void RecordingSelector::getRecordingList(void)
 {
     ProgramInfo *p;
-    recordingList = RemoteGetRecordedList(true);
-    QStringList categories;
+    m_recordingList = RemoteGetRecordedList(true);
+    m_categories.clear();
 
-    if (recordingList && recordingList->size() > 0)
+    if (m_recordingList && m_recordingList->size() > 0)
     {
-        vector<ProgramInfo *>::iterator i = recordingList->begin();
-        for ( ; i != recordingList->end(); i++)
+        vector<ProgramInfo *>::iterator i = m_recordingList->begin();
+        for ( ; i != m_recordingList->end(); i++)
         {
             p = *i;
 
             // we can't handle recordings that have to be streamed to us
             if (p->GetPlaybackURL(false, true).startsWith("myth://"))
             {
-                VERBOSE(VB_IMPORTANT,
+                VERBOSE(VB_FILE,
                         QString("MythArchive cannot handle this file because it isn't available locally - %1")
                                 .arg(p->GetPlaybackURL(false, true)));
-                i = recordingList->erase(i);
+                i = m_recordingList->erase(i);
                 i--;
                 continue;
             }
@@ -431,79 +453,65 @@ void RecordingSelector::getRecordingList(void)
             // ignore live tv and deleted recordings
             if (p->recgroup == "LiveTV" || p->recgroup == "Deleted")
             {
-                i = recordingList->erase(i);
+                i = m_recordingList->erase(i);
                 i--;
                 continue;
             }
 
-            if (categories.find(p->title) == categories.end())
-                categories.append(p->title);
+            if (m_categories.find(p->title) == m_categories.end())
+                m_categories.append(p->title);
         }
     }
-
-    if (!recordingList || recordingList->size() == 0)
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("MythArchive"),
-            tr("Either you don't have any recordings or no recordings are available locally!\n\nClick OK"));
-        QTimer::singleShot(100, this, SLOT(cancelPressed()));
-        return;
-    }
-
-    // sort and add categories to selector
-    categories.sort();
-
-    if (category_selector)
-    {
-        category_selector->addItem(0, tr("All Recordings"));
-        category_selector->setToItem(0);
-    }
-
-    for (int x = 1; x <= categories.count(); x++)
-    {
-        if (category_selector)
-            category_selector->addItem(x, categories[x-1]);
-    }
-
-    setCategory(0);
 }
 
-void RecordingSelector::setCategory(int item)
+void RecordingSelector::updateCategorySelector(void)
 {
-    item = item;
+    // sort and add categories to selector
+    m_categories.sort();
+
+    if (m_categorySelector)
+    {
+        new MythUIButtonListItem(m_categorySelector, tr("All Recordings"));
+        m_categorySelector->SetItemCurrent(0);
+
+        for (int x = 0; x < m_categories.count(); x++)
+        {
+            new MythUIButtonListItem(m_categorySelector, m_categories[x]);
+        }
+    }
+}
+
+void RecordingSelector::setCategory(MythUIButtonListItem *item)
+{
+    (void)item;
     updateRecordingList();
 }
 
 void RecordingSelector::updateSelectedList()
 {
-    if (!recordingList)
+    if (!m_recordingList)
         return;
 
-    while (!selectedList.isEmpty())
-         delete selectedList.takeFirst();
-    selectedList.clear();
+    while (!m_selectedList.isEmpty())
+         delete m_selectedList.takeFirst();
+    m_selectedList.clear();
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT filename FROM archiveitems WHERE type = 'Recording'");
-    query.exec();
-    if (query.isActive() && query.size())
+    ProgramInfo *p;
+    ArchiveItem *a;
+    for (int x = 0; x < m_archiveList->size(); x++)
     {
-        while (query.next())
+        a = m_archiveList->at(x);
+        for (uint y = 0; y < m_recordingList->size(); y++)
         {
-            QString filename = query.value(0).toString();
-
-            ProgramInfo *p;
-            vector<ProgramInfo *>::iterator i = recordingList->begin();
-            for ( ; i != recordingList->end(); i++)
+            p = m_recordingList->at(y);
+            if (p->GetPlaybackURL(false, true) == a->filename)
             {
-                p = *i;
-                if (p->GetPlaybackURL(false, true) == filename)
-                {
-                    if (selectedList.indexOf(p) == -1)
-                        selectedList.append(p);
-                    break;
-                }
+                if (m_selectedList.indexOf(p) == -1)
+                    m_selectedList.append(p);
+                break;
             }
+
+            qApp->processEvents();
         }
     }
 }
-

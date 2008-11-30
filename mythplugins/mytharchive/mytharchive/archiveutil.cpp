@@ -263,4 +263,35 @@ void showWarningDialog(const QString msg)
     dialog->deleteLater();
 }
 
+void recalcItemSize(ArchiveItem *item)
+{
+    EncoderProfile *profile = item->encoderProfile;
+    if (!profile)
+        return;
+
+    if (profile->name == "NONE")
+    {
+        if (item->hasCutlist && item->useCutlist)
+            item->newsize = (long long) (item->size /
+                    ((float)item->duration / (float)item->cutDuration));
+        else
+            item->newsize = item->size;
+    }
+    else
+    {
+        if (item->duration == 0)
+            return;
+
+        int length;
+
+        if (item->hasCutlist && item->useCutlist)
+            length = item->cutDuration;
+        else
+            length = item->duration;
+
+        float len = (float) length / 3600;
+        item->newsize = (long long) (len * profile->bitrate * 1024 * 1024);
+    }
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

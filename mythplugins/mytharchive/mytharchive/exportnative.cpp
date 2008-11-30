@@ -8,17 +8,20 @@
 #include <QFile>
 #include <QKeyEvent>
 #include <QTextStream>
+#include <QDomDocument>
 
 // myth
 #include <mythtv/mythcontext.h>
 #include <mythtv/libmythtv/remoteutil.h>
 #include <mythtv/libmythtv/programinfo.h>
+#include <mythtv/libmythdb/mythdb.h>
 #include <libmythui/mythdialogbox.h>
 #include <libmythui/mythuitext.h>
 #include <libmythui/mythuibutton.h>
 #include <libmythui/mythuicheckbox.h>
 #include <libmythui/mythuibuttonlist.h>
 #include <libmythui/mythuiprogressbar.h>
+#include <libmythui/mythmainwindow.h>
 
 // mytharchive
 #include "exportnative.h"
@@ -33,53 +36,15 @@ ExportNative::ExportNative(MythScreenStack *parent, MythScreenType *previousScre
 {
     m_previousScreen = previousScreen;
     m_archiveDestination = archiveDestination;
-    archiveList = NULL;
 }
 
 ExportNative::~ExportNative(void)
 {
-    if (archiveList)
-        delete archiveList;
-}
+    saveConfiguration();
 
-MythUIText* ExportNative::GetMythUIText(const QString &name, bool optional)
-{
-    MythUIText *text = dynamic_cast<MythUIText *> (GetChild(name));
-
-    if (!optional && !text)
-        throw name;
-
-    return text;
-}
-
-MythUIButton* ExportNative::GetMythUIButton(const QString &name, bool optional)
-{
-    MythUIButton *button = dynamic_cast<MythUIButton *> (GetChild(name));
-
-    if (!optional && !button)
-        throw name;
-
-    return button;
-}
-
-MythUIButtonList* ExportNative::GetMythUIButtonList(const QString &name, bool optional)
-{
-    MythUIButtonList *list = dynamic_cast<MythUIButtonList *> (GetChild(name));
-
-    if (!optional && !list)
-        throw name;
-
-    return list;
-}
-
-MythUIProgressBar* ExportNative::GetMythUIProgressBar(const QString &name, bool optional)
-{
-    MythUIProgressBar *bar = dynamic_cast<MythUIProgressBar *> (GetChild(name));
-
-    if (!optional && !bar)
-        throw name;
-
-    return bar;
+    while (!m_archiveList.isEmpty())
+         delete m_archiveList.takeFirst();
+    m_archiveList.clear();
 }
 
 bool ExportNative::Create(void)
@@ -104,7 +69,7 @@ bool ExportNative::Create(void)
         m_filesizeText = GetMythUIText("filesize");
         m_nofilesText = GetMythUIText("nofiles");
         m_sizeBar = GetMythUIProgressBar("size_bar");
-        m_archive_list = GetMythUIButtonList("archivelist");
+        m_archiveButtonList = GetMythUIButtonList("archivelist");
         m_addrecordingButton = GetMythUIButton("addrecording_button");
         m_addvideoButton = GetMythUIButton("addvideo_button");
 
@@ -114,10 +79,10 @@ bool ExportNative::Create(void)
         m_currsizeErrText = GetMythUIText("currentsize_error", true);
 
     }
-    catch (const QString name)
+    catch (QString &error)
     {
-        VERBOSE(VB_IMPORTANT, QString("Theme is missing a critical theme element ('%1')")
-                                      .arg(name));
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'exportnative'\n\t\t\t"
+                              "Error was: " + error);
         return false;
     }
 
@@ -132,7 +97,7 @@ bool ExportNative::Create(void)
 
 
     getArchiveList();
-    connect(m_archive_list, SIGNAL(itemSelected(MythUIButtonListItem *)),
+    connect(m_archiveButtonList, SIGNAL(itemSelected(MythUIButtonListItem *)),
             this, SLOT(titleChanged(MythUIButtonListItem *)));
 
     m_addrecordingButton->SetText(tr("Add Recording"));
@@ -158,7 +123,7 @@ bool ExportNative::keyPressEvent(QKeyEvent *event)
 
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Global", event, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Archive", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -169,6 +134,11 @@ bool ExportNative::keyPressEvent(QKeyEvent *event)
         {
             showMenu();
         }
+        else if (action == "DELETEITEM")
+        {
+            removeItem();
+        }
+
         else
             handled = false;
     }
@@ -182,12 +152,11 @@ bool ExportNative::keyPressEvent(QKeyEvent *event)
 void ExportNative::updateSizeBar()
 {
     long long size = 0;
-    NativeItem *a;
+    ArchiveItem *a;
 
-    vector<NativeItem *>::iterator i = archiveList->begin();
-    for ( ; i != archiveList->end(); i++)
+    for (int x = 0; x < m_archiveList.size(); x++)
     {
-        a = *i;
+        a = m_archiveList.at(x);
         size += a->size; 
     }
 
@@ -235,9 +204,9 @@ void ExportNative::updateSizeBar()
 
 void ExportNative::titleChanged(MythUIButtonListItem *item)
 {
-    NativeItem *a;
+    ArchiveItem *a;
 
-    a = (NativeItem *) item->getData();
+    a = (ArchiveItem *) item->getData();
 
     if (!a)
         return;
@@ -254,7 +223,7 @@ void ExportNative::titleChanged(MythUIButtonListItem *item)
 
 void ExportNative::handleNextPage()
 {
-    if (archiveList->size() == 0)
+    if (m_archiveList.size() == 0)
     {
         ShowOkPopup(tr("You need to add at least one item to archive!"));
         return;
@@ -279,9 +248,9 @@ void ExportNative::handleCancel()
 
 void ExportNative::updateArchiveList(void)
 {
-    m_archive_list->Reset();
+    m_archiveButtonList->Reset();
 
-    if (archiveList->size() == 0)
+    if (m_archiveList.size() == 0)
     {
         m_titleText->SetText("");
         m_datetimeText->SetText("");
@@ -291,18 +260,17 @@ void ExportNative::updateArchiveList(void)
     }
     else
     {
-        NativeItem *a;
-        vector<NativeItem *>::iterator i = archiveList->begin();
-        for ( ; i != archiveList->end(); i++)
+        ArchiveItem *a;
+        for (int x = 0;  x < m_archiveList.size(); x++)
         {
-            a = *i;
+            a = m_archiveList.at(x);
 
-            MythUIButtonListItem* item = new MythUIButtonListItem(m_archive_list, a->title);
+            MythUIButtonListItem* item = new MythUIButtonListItem(m_archiveButtonList, a->title);
             item->setData(a);
         }
 
-        m_archive_list->SetItemCurrent(m_archive_list->GetItemFirst());
-        titleChanged(m_archive_list->GetItemCurrent());
+        m_archiveButtonList->SetItemCurrent(m_archiveButtonList->GetItemFirst());
+        titleChanged(m_archiveButtonList->GetItemCurrent());
         m_nofilesText->Hide();
     }
 
@@ -311,10 +279,9 @@ void ExportNative::updateArchiveList(void)
 
 void ExportNative::getArchiveListFromDB(void)
 {
-    if (!archiveList)
-        archiveList = new vector<NativeItem*>;
-
-    archiveList->clear();
+    while (!m_archiveList.isEmpty())
+         delete m_archiveList.takeFirst();
+    m_archiveList.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT intid, type, title, subtitle, description, size, "
@@ -326,7 +293,7 @@ void ExportNative::getArchiveListFromDB(void)
     {
         while (query.next())
         {
-            NativeItem *item = new NativeItem;
+            ArchiveItem *item = new ArchiveItem;
 
             item->id = query.value(0).toInt();
             item->type = query.value(1).toString();
@@ -341,7 +308,7 @@ void ExportNative::getArchiveListFromDB(void)
             item->useCutlist = false;
             item->editedDetails = false;
 
-            archiveList->push_back(item);
+            m_archiveList.append(item);
         }
     }
 }
@@ -358,6 +325,49 @@ void ExportNative::loadConfiguration(void)
     m_bDoBurn = (gContext->GetSetting("MythNativeBurnDVDr", "1") == "1");
     m_bEraseDvdRw = (gContext->GetSetting("MythNativeEraseDvdRw", "0") == "1");
     m_saveFilename = gContext->GetSetting("MythNativeSaveFilename", "");
+}
+
+void ExportNative::saveConfiguration(void)
+{
+    // remove all old archive items from DB
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM archiveitems;");
+    query.exec();
+
+    // save new list of archive items to DB
+    ArchiveItem *a;
+    for (int x = 0; x < m_archiveList.size(); x++)
+    {
+        a = m_archiveList.at(x);
+
+        query.prepare("INSERT INTO archiveitems (type, title, subtitle, "
+                "description, startdate, starttime, size, filename, hascutlist, "
+                "duration, cutduration, videowidth, videoheight, filecodec,"
+                "videocodec, encoderprofile) "
+                "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
+                ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST, :DURATION, "
+                ":CUTDURATION, :VIDEOWIDTH, :VIDEOHEIGHT, :FILECODEC, "
+                ":VIDEOCODEC, :ENCODERPROFILE);");
+        query.bindValue(":TYPE", a->type);
+        query.bindValue(":TITLE", a->title);
+        query.bindValue(":SUBTITLE", a->subtitle);
+        query.bindValue(":DESCRIPTION", a->description);
+        query.bindValue(":STARTDATE", a->startDate);
+        query.bindValue(":STARTTIME", a->startTime);
+        query.bindValue(":SIZE", 0);
+        query.bindValue(":FILENAME", a->filename);
+        query.bindValue(":HASCUTLIST", a->hasCutlist);
+        query.bindValue(":DURATION", 0);
+        query.bindValue(":CUTDURATION", 0);
+        query.bindValue(":VIDEOWIDTH", 0);
+        query.bindValue(":VIDEOHEIGHT", 0);
+        query.bindValue(":FILECODEC", "");
+        query.bindValue(":VIDEOCODEC", "");
+        query.bindValue(":ENCODERPROFILE", "");
+
+        if (!query.exec())
+            MythDB::DBError("archive item insert", query);
+    }
 }
 
 void ExportNative::showMenu()
@@ -377,8 +387,8 @@ void ExportNative::showMenu()
 
 void ExportNative::removeItem()
 {
-    MythUIButtonListItem *item = m_archive_list->GetItemCurrent();
-    NativeItem *curItem = (NativeItem *) item->getData();
+    MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
+    ArchiveItem *curItem = (ArchiveItem *) item->getData();
 
     if (!curItem)
         return;
@@ -407,12 +417,10 @@ void ExportNative::createConfigFile(const QString &filename)
     job.appendChild(media);
 
     // now loop though selected archive items and add them to the xml file
-    NativeItem *a;
-
-    vector<NativeItem *>::iterator i = archiveList->begin();
-    for ( ; i != archiveList->end(); i++)
+    ArchiveItem *a;
+    for (int x = 0; x < m_archiveList.size(); x++)
     {
-        a = *i;
+        a = m_archiveList.at(x);
 
         QDomElement file = doc.createElement("file");
         file.setAttribute("type", a->type.lower() );
@@ -477,11 +485,21 @@ void ExportNative::runScript()
 
 void ExportNative::handleAddRecording()
 {
-    RecordingSelector selector(gContext->GetMainWindow(),
-                               "recording_selector", "mytharchive-", "recording selector");
-    selector.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    getArchiveList();
+    RecordingSelector *selector = new RecordingSelector(mainStack, &m_archiveList);
+
+    connect(selector, SIGNAL(haveResult(bool)),
+            this, SLOT(selectorClosed(bool)));
+
+    if (selector->Create())
+        mainStack->AddScreen(selector);
+}
+
+void ExportNative::selectorClosed(bool ok)
+{
+    if (ok)
+        updateArchiveList();
 }
 
 void ExportNative::handleAddVideo()
@@ -494,14 +512,17 @@ void ExportNative::handleAddVideo()
     }
     else
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("Video Selector"),
-                                  QObject::tr("You don't have any videos!"));
+        ShowOkPopup(tr("You don't have any videos!"));
         return;
     }
 
-    VideoSelector selector(gContext->GetMainWindow(),
-                           "video_selector", "mytharchive-", "video selector");
-    selector.exec();
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    getArchiveList();
+    VideoSelector *selector = new VideoSelector(mainStack, &m_archiveList);
+
+    connect(selector, SIGNAL(haveResult(bool)),
+            this, SLOT(selectorClosed(bool)));
+
+    if (selector->Create())
+        mainStack->AddScreen(selector);
 }

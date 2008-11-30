@@ -10,6 +10,13 @@
 #include <mythtv/mythdb.h>
 #include <mythtv/uitypes.h>
 #include <mythtv/libmythui/mythuihelper.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuitextedit.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythdialogbox.h>
 
 // mytharchive
 #include "fileselector.h"
@@ -17,16 +24,14 @@
 
 ////////////////////////////////////////////////////////////////
 
-FileSelector::FileSelector(FSTYPE type, const QString &startDir,
-                const QString &filemask, MythMainWindow *parent,
-                const QString &window_name, const QString &theme_filename,
-                const char *name)
-                :MythThemedDialog(parent, window_name, theme_filename, name)
+FileSelector::FileSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList,
+                           FSTYPE type, const QString &startDir, const QString &filemask)
+             :MythScreenType(parent, "FileSelector")
 {
+    m_archiveList = archiveList;
     m_selectorType = type;
     m_filemask = filemask;
     m_curDirectory = startDir;
-    wireUpTheme();
 }
 
 FileSelector::~FileSelector()
@@ -36,197 +41,165 @@ FileSelector::~FileSelector()
     m_fileData.clear();
 }
 
-QString FileSelector::getSelected(void)
+bool FileSelector::Create(void)
 {
-    return m_curDirectory;
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("mytharchive-ui.xml", "file_selector", this);
+
+    if (!foundtheme)
+        return false;
+
+    try
+    {
+        m_titleText = GetMythUIText("title_text", true);
+        m_fileButtonList = GetMythUIButtonList("filelist");
+        m_locationEdit = GetMythUITextEdit("location_edit");
+        m_backButton = GetMythUIButton("back_button");
+        m_homeButton = GetMythUIButton("home_button");
+        m_okButton = GetMythUIButton("ok_button");
+        m_cancelButton = GetMythUIButton("cancel_button");
+    }
+    catch (QString &error)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'file_selector'\n\t\t\t"
+                              "Error was: " + error);
+        return false;
+    }
+
+    if (m_titleText)
+    {
+        switch (m_selectorType)
+        {
+            case FSTYPE_FILE:
+                m_titleText->SetText(tr("Find File"));
+                break;
+            case FSTYPE_DIRECTORY:
+                m_titleText->SetText(tr("Find Directory"));
+                break;
+            default:
+                m_titleText->SetText(tr("Find Files"));
+                break;
+        }
+    }
+
+    m_okButton->SetText(tr("OK"));
+    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(OKPressed()));
+
+    m_cancelButton->SetText(tr("Cancel"));
+    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
+
+    connect(m_locationEdit, SIGNAL(LosingFocus()),
+            this, SLOT(locationEditLostFocus()));
+    m_locationEdit->SetText(m_curDirectory);
+
+    m_backButton->SetText(tr("Back"));
+    connect(m_backButton, SIGNAL(Clicked()), this, SLOT(backPressed()));
+
+    m_homeButton->SetText(tr("Home"));
+    connect(m_homeButton, SIGNAL(Clicked()), this, SLOT(homePressed()));
+
+    connect(m_fileButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+            this, SLOT(itemClicked(MythUIButtonListItem *)));
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+
+    SetFocusWidget(m_fileButtonList);
+
+    updateSelectedList();
+    updateFileList();
+
+    return true;
 }
 
-void FileSelector::keyPressEvent(QKeyEvent *e)
+bool FileSelector::keyPressEvent(QKeyEvent *event)
 {
-    bool handled = false;
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
 
+    bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Global", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
-        if (action == "SELECT")
+        if (action == "MENU")
         {
-            if (getCurrentFocusWidget() == m_fileList)
-            {
-                UIListBtnTypeItem *item = m_fileList->GetItemCurrent();
-                FileData *fileData = (FileData*)item->getData();
-
-                if (fileData->directory)
-                {
-                    if (fileData->filename == "..")
-                    {
-                        // move up on directory
-                        int pos = m_curDirectory.findRev('/');
-                        if (pos > 0)
-                            m_curDirectory = m_curDirectory.left(pos);
-                        else
-                            m_curDirectory = "/";
-                    }
-                    else
-                    {
-                        if (!m_curDirectory.endsWith("/"))
-                            m_curDirectory += "/";
-                        m_curDirectory += fileData->filename;
-                    }
-                    updateFileList();
-                }
-                else
-                {
-                    if (m_selectorType == FSTYPE_FILELIST)
-                    {
-                        QString fullPath = m_curDirectory;
-                        if (!fullPath.endsWith("/"))
-                            fullPath += "/";
-                        fullPath += fileData->filename;
-
-                        if (item->state() == UIListBtnTypeItem::FullChecked)
-                        {
-                            m_selectedList.remove(fullPath);
-                            item->setChecked(UIListBtnTypeItem::NotChecked);
-                        }
-                        else
-                        {
-                            if (m_selectedList.findIndex(fullPath) == -1)
-                                m_selectedList.append(fullPath);
-                            item->setChecked(UIListBtnTypeItem::FullChecked);
-                        }
-
-                        m_fileList->refresh();
-                    }
-                }
-            }
-            else
-                activateCurrent();
-        }
-        else if (action == "PAUSE")
-        {
-        }
-        else if (action == "UP")
-        {
-            if (getCurrentFocusWidget() == m_fileList)
-            {
-                m_fileList->MoveUp(UIListBtnType::MoveItem);
-                m_fileList->refresh();
-            }
-            else
-                nextPrevWidgetFocus(false);
-        }
-        else if (action == "DOWN")
-        {
-            if (getCurrentFocusWidget() == m_fileList)
-            {
-                m_fileList->MoveDown(UIListBtnType::MoveItem);
-                m_fileList->refresh();
-            }
-            else
-                nextPrevWidgetFocus(true);
-        }
-        else if (action == "LEFT")
-        {
-            nextPrevWidgetFocus(false);
-        }
-        else if (action == "RIGHT")
-        {
-            nextPrevWidgetFocus(true);
-        }
-        else if (action == "PAGEUP")
-        {
-            if (getCurrentFocusWidget() == m_fileList)
-            {
-                m_fileList->MoveUp(UIListBtnType::MovePage);
-                m_fileList->refresh();
-            }
-        }
-        else if (action == "PAGEDOWN")
-        {
-            if (getCurrentFocusWidget() == m_fileList)
-            {
-                m_fileList->MoveDown(UIListBtnType::MovePage);
-                m_fileList->refresh();
-            }
+            
         }
         else
             handled = false;
     }
 
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
-void FileSelector::wireUpTheme()
+void FileSelector::itemClicked(MythUIButtonListItem *item)
 {
-    m_fileList = getUIListBtnType("filelist");
+    if (!item)
+        return;
 
-    m_locationEdit = getUIRemoteEditType("location_edit");
-    if (m_locationEdit)
+    FileData *fileData = (FileData*)item->getData();
+
+    if (fileData->directory)
     {
-        m_locationEdit->createEdit(this);
-        connect(m_locationEdit, SIGNAL(loosingFocus()),
-                this, SLOT(locationEditLostFocus()));
+        if (fileData->filename == "..")
+        {
+            // move up on directory
+            int pos = m_curDirectory.findRev('/');
+            if (pos > 0)
+                m_curDirectory = m_curDirectory.left(pos);
+            else
+                m_curDirectory = "/";
+        }
+        else
+        {
+            if (!m_curDirectory.endsWith("/"))
+                m_curDirectory += "/";
+            m_curDirectory += fileData->filename;
+        }
+        updateFileList();
     }
-
-    // ok button
-    m_okButton = getUITextButtonType("ok_button");
-    if (m_okButton)
+    else
     {
-        m_okButton->setText(tr("OK"));
-        connect(m_okButton, SIGNAL(pushed()), this, SLOT(OKPressed()));
+        if (m_selectorType == FSTYPE_FILELIST)
+        {
+            QString fullPath = m_curDirectory;
+            if (!fullPath.endsWith("/"))
+                fullPath += "/";
+            fullPath += fileData->filename;
+
+            if (item->state() == MythUIButtonListItem::FullChecked)
+            {
+                m_selectedList.remove(fullPath);
+                item->setChecked(MythUIButtonListItem::NotChecked);
+            }
+            else
+            {
+                if (m_selectedList.findIndex(fullPath) == -1)
+                    m_selectedList.append(fullPath);
+                item->setChecked(MythUIButtonListItem::FullChecked);
+            }
+        }
     }
+}
 
-    // cancel button
-    m_cancelButton = getUITextButtonType("cancel_button");
-    if (m_cancelButton)
-    {
-        m_cancelButton->setText(tr("Cancel"));
-        connect(m_cancelButton, SIGNAL(pushed()), this, SLOT(cancelPressed()));
-    }
-
-    // back button
-    m_backButton = getUITextButtonType("back_button");
-    if (m_backButton)
-    {
-        m_backButton->setText(tr("Back"));
-        connect(m_backButton, SIGNAL(pushed()), this, SLOT(backPressed()));
-    }
-
-    // home button
-    m_homeButton = getUITextButtonType("home_button");
-    if (m_homeButton)
-    {
-        m_homeButton->setText(tr("Home"));
-        connect(m_homeButton, SIGNAL(pushed()), this, SLOT(homePressed()));
-    }
-
-    if (!m_fileList || !m_locationEdit || !m_backButton || !m_okButton
-         || !m_cancelButton || !m_homeButton)
-    {
-        VERBOSE(VB_IMPORTANT,
-                "FileSelector: Your theme is missing some UI elements! "
-                "Bailing out.");
-        QTimer::singleShot(100, this, SLOT(reject()));
-    }
-
-    // load pixmaps
-    m_directoryPixmap = GetMythUI()->LoadScalePixmap("ma_folder.png");
-
-    buildFocusList();
-    assignFirstFocus();
-    updateSelectedList();
-    updateFileList();
+QString FileSelector::getSelected(void)
+{
+    return m_curDirectory;
 }
 
 void FileSelector::locationEditLostFocus()
 {
-    m_curDirectory = m_locationEdit->getText();
+    m_curDirectory = m_locationEdit->GetText();
     updateFileList();
 }
 
@@ -252,57 +225,102 @@ void FileSelector::homePressed()
 
 void FileSelector::OKPressed()
 {
-    if (m_selectorType == FSTYPE_FILELIST)
+    if (m_selectorType == FSTYPE_FILELIST && m_archiveList)
     {
-        // remove all files from archivelist
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM archiveitems WHERE type = 'File'");
-        query.exec();
+        // loop though selected files and add them to the list
+        QString f;
+        ArchiveItem *a;
 
-        // loop though selected files and add them to the archiveitems table
-        QString s;
-        QStringList::iterator it;
-        for (it = m_selectedList.begin(); it != m_selectedList.end(); ++it)
+        // remove any items that have been removed from the list
+        QList<ArchiveItem *> tempAList;
+        for (int x = 0; x < m_archiveList->size(); x++)
         {
-            s = (*it);
+            a = m_archiveList->at(x);
+            bool found = false;
 
-            QFile file(s);
+            for (int y = 0; y < m_selectedList.size(); y++)
+            {
+                f = m_selectedList.at(y);
+                if (a->type != "File" || a->filename == f)
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+                tempAList.append(a);
+        }
+
+        for (int x = 0; x < tempAList.size(); x++)
+            m_archiveList->removeAll(tempAList.at(x));
+
+        // remove any items that are already in the list
+        QStringList tempSList;
+        for (int x = 0; x < m_selectedList.size(); x++)
+        {
+            f = m_selectedList.at(x);
+
+            for (int y = 0; y < m_archiveList->size(); y++)
+            {
+                a = m_archiveList->at(y);
+                if (a->filename == f)
+                {
+                    tempSList.append(f);
+                    break;
+                }
+            }
+        }
+
+        for (int x = 0; x < tempSList.size(); x++)
+            m_selectedList.removeAll(tempSList.at(x));
+
+        // add all that are left
+        for (int x = 0; x < m_selectedList.size(); x++)
+        {
+            f = m_selectedList.at(x);
+
+            QFile file(f);
             if (file.exists())
             {
-                QString title = s;
-                int pos = s.findRev('/');
+                QString title = f;
+                int pos = f.findRev('/');
                 if (pos > 0)
-                    title = s.mid(pos + 1);
+                    title = f.mid(pos + 1);
 
-                query.prepare("INSERT INTO archiveitems (type, title, subtitle,"
-                        "description, startdate, starttime, size, filename, hascutlist) "
-                        "VALUES(:TYPE, :TITLE, :SUBTITLE, :DESCRIPTION, :STARTDATE, "
-                        ":STARTTIME, :SIZE, :FILENAME, :HASCUTLIST);");
-                query.bindValue(":TYPE", "File");
-                query.bindValue(":TITLE", title);
-                query.bindValue(":SUBTITLE", "");
-                query.bindValue(":DESCRIPTION", "");
-                query.bindValue(":STARTDATE", "");
-                query.bindValue(":STARTTIME", "");
-                query.bindValue(":SIZE", (long long)file.size());
-                query.bindValue(":FILENAME", s);
-                query.bindValue(":HASCUTLIST", 0);
-                if (!query.exec())
-                    MythDB::DBError("archive item insert", query);
+                a = new ArchiveItem;
+                a->type = "File";
+                a->title = title;
+                a->subtitle = "";
+                a->description = "";
+                a->startDate = "";
+                a->startTime = "";
+                a->size = (long long)file.size();
+                a->filename = f;
+                a->hasCutlist = false;
+                a->useCutlist = false;
+                a->duration = 0;
+                a->cutDuration = 0;
+                a->videoWidth = 0;
+                a->videoHeight = 0;
+                a->fileCodec = "";
+                a->videoCodec = "";
+                a->encoderProfile = NULL;
+                a->editedDetails = false;
+                m_archiveList->append(a);
             }
         }
     }
     else
     {
-        UIListBtnTypeItem *item = m_fileList->GetItemCurrent();
+        MythUIButtonListItem *item = m_fileButtonList->GetItemCurrent();
         FileData *fileData = (FileData*)item->getData();
 
         if (m_selectorType == FSTYPE_DIRECTORY)
         {
             if (!fileData->directory)
             {
-                MythPopupBox::showOkPopup(gContext->GetMainWindow(), tr("Myth Archive"),
-                                          tr("The selected item is not a directory!"));
+                ShowOkPopup(tr("The selected item is not a directory!"));
                 return;
             }
 
@@ -329,37 +347,55 @@ void FileSelector::OKPressed()
         }
     }
 
-    done(Accepted);
+    if (m_selectorType == FSTYPE_FILELIST)
+        emit haveResult(true);
+    else
+        emit haveResult(getSelected());
+    Close();
 }
 
 void FileSelector::cancelPressed()
 {
-    reject();
+    if (m_selectorType == FSTYPE_FILELIST)
+        emit haveResult(true);
+    else
+        emit haveResult("");
+    Close();
 }
 
 void FileSelector::updateSelectedList()
 {
+    if (!m_archiveList)
+        return;
+
+    while (!m_selectedList.isEmpty())
+         delete m_selectedList.takeFirst();
     m_selectedList.clear();
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT filename FROM archiveitems WHERE type = 'File'");
-    query.exec();
-    if (query.isActive() && query.size())
+
+    FileData *f;
+    ArchiveItem *a;
+    for (int x = 0; x < m_archiveList->size(); x++)
     {
-        while (query.next())
+        a = m_archiveList->at(x);
+        for (int y = 0; y < m_fileData.size(); y++)
         {
-            QString filename = query.value(0).toString();
-            if (m_selectedList.findIndex(filename) == -1)
-                m_selectedList.append(filename);
+            f = m_fileData.at(y);
+            if (f->filename == a->filename)
+            {
+                if (m_selectedList.indexOf(f->filename) == -1)
+                    m_selectedList.append(f->filename);
+                break;
+            }
         }
     }
 }
 
 void FileSelector::updateFileList()
 {
-    if (!m_fileList)
+    if (!m_fileButtonList)
         return;
 
-    m_fileList->Reset();
+    m_fileButtonList->Reset();
     while (!m_fileData.isEmpty())
          delete m_fileData.takeFirst();
     m_fileData.clear();
@@ -385,11 +421,11 @@ void FileSelector::updateFileList()
                 data->size = 0;
                 m_fileData.append(data);
 
-                // add a row to the UIListBtnArea
-                UIListBtnTypeItem* item = new UIListBtnTypeItem(
-                        m_fileList, data->filename);
+                // add a row to the MythUIButtonList
+                MythUIButtonListItem* item = new
+                        MythUIButtonListItem(m_fileButtonList, data->filename);
                 item->setCheckable(false);
-                item->setPixmap(m_directoryPixmap);
+                item->SetImage("ma_folder.png");
                 item->setData(data);
             }
         }
@@ -409,15 +445,13 @@ void FileSelector::updateFileList()
                 m_fileData.append(data);
 
                 // add a row to the UIListBtnArea
-                UIListBtnTypeItem* item = new UIListBtnTypeItem(
-                        m_fileList,
+                MythUIButtonListItem* item = new MythUIButtonListItem(
+                        m_fileButtonList,
                         data->filename + " (" + formatSize(data->size / 1024, 2) + ")");
 
                 if (m_selectorType == FSTYPE_FILELIST)
                 {
                     item->setCheckable(true);
-
-                    //item->setPixmap(m_filePixmap);
 
                     QString fullPath = m_curDirectory;
                     if (!fullPath.endsWith("/"))
@@ -426,27 +460,24 @@ void FileSelector::updateFileList()
 
                     if (m_selectedList.findIndex(fullPath) != -1)
                     {
-                        item->setChecked(UIListBtnTypeItem::FullChecked);
+                        item->setChecked(MythUIButtonListItem::FullChecked);
                     }
                     else
                     {
-                        item->setChecked(UIListBtnTypeItem::NotChecked);
+                        item->setChecked(MythUIButtonListItem::NotChecked);
                     }
                 }
                 else
                     item->setCheckable(false);
 
                 item->setData(data);
-
             }
         }
-        m_locationEdit->setText(m_curDirectory);
+        m_locationEdit->SetText(m_curDirectory);
     }
     else
     {
-        m_locationEdit->setText("/");
+        m_locationEdit->SetText("/");
         VERBOSE(VB_IMPORTANT, "MythArchive:  current directory does not exist!");
     }
-
-    m_fileList->refresh();
 }

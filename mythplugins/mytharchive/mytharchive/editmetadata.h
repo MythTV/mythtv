@@ -8,9 +8,10 @@
 
 // myth
 #include <mythtv/mythdialogs.h>
+#include <mythtv/uitypes.h>
 
 // mytharchive
-#include "mythburnwizard.h"
+#include "archiveutil.h"
 
 class EditMetadataDialog : public MythThemedDialog
 {

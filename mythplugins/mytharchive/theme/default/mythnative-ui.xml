@@ -69,7 +69,6 @@ MythTV Archive GUI theme
 
         <buttonlist name="archivelist" from="basebuttonlist">
             <area>50,80,695,180</area>
-            <showarrow>yes</showarrow>
         </buttonlist>
 
         <textarea name="nofiles" from="basetextarea">

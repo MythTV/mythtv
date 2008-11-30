@@ -9,8 +9,10 @@
 #include <QKeyEvent>
 
 // myth
-#include <mythtv/mythdialogs.h>
-#include <mythtv/uilistbtntype.h>
+#include <libmythui/mythscreentype.h>
+
+// mytharchive
+#include "archiveutil.h"
 
 typedef struct
 {
@@ -28,54 +30,63 @@ typedef enum
 } FSTYPE;
 
 class QPixmap;
+class MythUIText;
+class MythUITextEdit;
+class MythUIButton;
+class MythUIButtonList;
+class MythUIButtonListItem;
 
-class FileSelector : public MythThemedDialog
+class FileSelector : public MythScreenType
 {
 
   Q_OBJECT
 
   public:
 
-      FileSelector(FSTYPE type, const QString &startDir, 
-                   const QString &filemask, MythMainWindow *parent,
-                   const QString &window_name, const QString &theme_filename,
-                   const char *name = "FileSelector");
+      FileSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList,
+                   FSTYPE type, const QString &startDir, const QString &filemask);
       ~FileSelector();
+
+      bool Create(void);
+      bool keyPressEvent(QKeyEvent *e);
 
       QString getSelected(void);
 
+  signals:
+    void haveResult(bool ok);            // used in FSTYPE_FILELIST mode 
+    void haveResult(QString filename);   // used in FSTYPE_FILE or FSTYPE_DIRECTORY mode 
+
   private slots:
-    void keyPressEvent(QKeyEvent *e);
-    void OKPressed();
-    void cancelPressed();
-    void backPressed();
-    void homePressed();
-    void locationEditLostFocus();
+    void OKPressed(void);
+    void cancelPressed(void);
+    void backPressed(void);
+    void homePressed(void);
+    void itemClicked(MythUIButtonListItem *item);
+    void locationEditLostFocus(void);
 
   private:
-    void updateFileList();
-    void updateSelectedList();
+    void updateFileList(void);
+    void updateSelectedList(void);
     void updateWidgets(void);
     void wireUpTheme(void);
     void updateScrollArrows(void);
 
-    FSTYPE            m_selectorType;
-    QString           m_filemask;
-    QString           m_curDirectory;
-    QList<FileData *> m_fileData;
-    QStringList       m_selectedList;
-
+    FSTYPE                m_selectorType;
+    QString               m_filemask;
+    QString               m_curDirectory;
+    QList<FileData *>     m_fileData;
+    QStringList           m_selectedList;
+    QList<ArchiveItem *> *m_archiveList;
     //
     //  GUI stuff
     //
-    UIListBtnType        *m_fileList;
-    UIRemoteEditType     *m_locationEdit;
-    UITextButtonType     *m_okButton;
-    UITextButtonType     *m_cancelButton;
-    UITextButtonType     *m_backButton;
-    UITextButtonType     *m_homeButton;
-
-    QPixmap              *m_directoryPixmap;
+    MythUIText       *m_titleText;
+    MythUIButtonList *m_fileButtonList;
+    MythUITextEdit   *m_locationEdit;
+    MythUIButton     *m_okButton;
+    MythUIButton     *m_cancelButton;
+    MythUIButton     *m_backButton;
+    MythUIButton     *m_homeButton;
 };
 
 #endif

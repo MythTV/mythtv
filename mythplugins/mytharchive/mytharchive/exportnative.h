@@ -20,22 +20,6 @@ enum NativeItemType
     RT_FILE
 };
 
-typedef struct
-{
-    int     id;
-    QString type;
-    QString title;
-    QString subtitle;
-    QString description;
-    QString startDate;
-    QString startTime;
-    QString filename;
-    long long size;
-    bool hasCutlist;
-    bool useCutlist;
-    bool editedDetails;
-} NativeItem;
-
 class MythUIText;
 class MythUIButton;
 class MythUIButtonList;
@@ -69,56 +53,45 @@ class ExportNative : public MythScreenType
     void titleChanged(MythUIButtonListItem *item);
     void showMenu(void);
     void removeItem(void);
+    void selectorClosed(bool ok);
 
   private:
-    MythUIText   *GetMythUIText(const QString &name, bool optional = false);
-    MythUIButton *GetMythUIButton(const QString &name, bool optional = false);
-    MythUIButtonList *GetMythUIButtonList(const QString &name, bool optional = false);
-    MythUIProgressBar *GetMythUIProgressBar(const QString &name, bool optional = false);
-
     void updateArchiveList(void);
     void getArchiveList(void);
     void updateSizeBar(void);
     void loadConfiguration(void);
+    void saveConfiguration(void);
     void getArchiveListFromDB(void);
     void runScript();
 
     MythScreenType    *m_previousScreen;
 
     ArchiveDestination m_archiveDestination;
-    uint m_usedSpace;
+    uint               m_usedSpace;
 
-    std::vector<NativeItem *>  *archiveList;
+    QList<ArchiveItem *> m_archiveList;
 
-    bool               m_bCreateISO;
-    bool               m_bDoBurn;
-    bool               m_bEraseDvdRw;
-    QString            m_saveFilename;
+    bool    m_bCreateISO;
+    bool    m_bDoBurn;
+    bool    m_bEraseDvdRw;
+    QString m_saveFilename;
 
-    MythUIButtonList  *m_archive_list;
-
+    MythUIButtonList  *m_archiveButtonList;
     MythUIButton      *m_nextButton;
     MythUIButton      *m_prevButton;
     MythUIButton      *m_cancelButton;
-
     MythUIButton      *m_addrecordingButton;
     MythUIButton      *m_addvideoButton;
-
     MythUIText        *m_freespaceText;
-
-
     MythUIText        *m_titleText;
     MythUIText        *m_datetimeText;
     MythUIText        *m_descriptionText;
-
     MythUIText        *m_filesizeText;
     MythUIText        *m_nofilesText;
-
     MythUIText        *m_maxsizeText;
     MythUIText        *m_minsizeText;
     MythUIText        *m_currsizeText;
     MythUIText        *m_currsizeErrText;
-
     MythUIProgressBar *m_sizeBar;
 };
 

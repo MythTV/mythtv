@@ -5,8 +5,6 @@
 	
 	Starting point for the MythArchive module
 */
-#include "config.h"
-
 #include <iostream>
 #include <cstdlib>
 #include <signal.h>
@@ -37,15 +35,8 @@ using namespace std;
 #include "dbcheck.h"
 #include "archiveutil.h"
 #include "selectdestination.h"
-
-#ifdef CREATE_DVD
-    #include "mythburnwizard.h"
-#endif
-
-#ifdef CREATE_NATIVE
-    #include "exportnative.h"
-    #include "importnativewizard.h"
-#endif
+#include "exportnative.h"
+#include "importnativewizard.h"
 
 // return true if the process belonging to the lock file is still running
 bool checkProcess(const QString &lockFile)
@@ -111,52 +102,6 @@ bool checkLockFile(const QString &lockFile)
 
 void runCreateDVD(void)
 {
-#ifdef CREATE_DVD
-    QString commandline;
-    QString tempDir = getTempDirectory(true);
-
-    if (tempDir == "")
-        return;
-
-    QString logDir = tempDir + "logs";
-    QString configDir = tempDir + "config";
-    QString workDir = tempDir + "work";
-
-    checkTempDirectory();
-
-    if (checkLockFile(logDir + "/mythburn.lck"))
-    {
-        // a job is already running so just show the log viewer
-        LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-        dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
-        dialog.exec();
-        return;
-    }
-
-    // show the mythburn wizard
-    MythburnWizard *burnWiz;
-
-    burnWiz = new MythburnWizard(gContext->GetMainWindow(),
-                             "mythburn_wizard", "mythburn-");
-    DialogCode res = burnWiz->exec();
-    qApp->processEvents();
-    delete burnWiz;
-
-    if (kDialogCodeRejected == res)
-        return;
-
-    // now show the log viewer
-    LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-    dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
-    dialog.exec();
-#else
-    VERBOSE(VB_IMPORTANT, "DVD creation is not compiled in!!");
-#endif
-}
-
-void runCreateArchive(void)
-{
-#ifdef CREATE_NATIVE
     QString commandline;
     QString tempDir = getTempDirectory(true);
 
@@ -181,7 +126,7 @@ void runCreateArchive(void)
     // show the select destination dialog
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    SelectDestination *dest = new SelectDestination(mainStack, "SelectDestination");
+    SelectDestination *dest = new SelectDestination(mainStack, false, "SelectDestination");
 
     if (dest->Create())
         mainStack->AddScreen(dest);
@@ -192,9 +137,45 @@ void runCreateArchive(void)
     LogViewer dialog(gContext->GetMainWindow(), "logviewer");
     dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
     dialog.exec();
-#else
-    VERBOSE(VB_IMPORTANT, "Native archive creation is not compiled in!!");
-#endif
+}
+
+void runCreateArchive(void)
+{
+    QString commandline;
+    QString tempDir = getTempDirectory(true);
+
+    if (tempDir == "")
+        return;
+
+    QString logDir = tempDir + "logs";
+    QString configDir = tempDir + "config";
+    QString workDir = tempDir + "work";
+
+    checkTempDirectory();
+
+    if (checkLockFile(logDir + "/mythburn.lck"))
+    {
+        // a job is already running so just show the log viewer
+        LogViewer dialog(gContext->GetMainWindow(), "logviewer");
+        dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
+        dialog.exec();
+        return;
+    }
+
+    // show the select destination dialog
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    SelectDestination *dest = new SelectDestination(mainStack, true, "SelectDestination");
+
+    if (dest->Create())
+        mainStack->AddScreen(dest);
+
+    return;
+
+    // now show the log viewer
+    LogViewer dialog(gContext->GetMainWindow(), "logviewer");
+    dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
+    dialog.exec();
 }
 
 void runEncodeVideo(void)
@@ -204,7 +185,6 @@ void runEncodeVideo(void)
 
 void runImportVideo(void)
 {
-#ifdef CREATE_NATIVE
     QString tempDir = getTempDirectory(true);
 
     if (tempDir == "")
@@ -238,9 +218,6 @@ void runImportVideo(void)
     LogViewer dialog(gContext->GetMainWindow(), "logviewer");
     dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
     dialog.exec();
-#else
-    VERBOSE(VB_IMPORTANT, "Native archive creation is not compiled in!!");
-#endif
 }
 
 void runShowLog(void)
@@ -285,7 +262,8 @@ void runTestDVD(void)
     QString filename = tempDir + "work/dvd/";
     QString command = gContext->GetSetting("MythArchiveDVDPlayerCmd", "");
 
-    if ((command.find("internal", 0, false) > -1) || (command.length() < 1))
+    if ((command.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
+         (command.length() < 1))
     {
         filename = QString("dvd:/") + filename;
         command = "Internal";
@@ -351,7 +329,7 @@ void runBurnDVD(void)
 
     commandline = "mytharchivehelper -b " + sArchiveFormat + " " + sEraseDVDRW  + " " + sNativeFormat;
     commandline += " > "  + logDir + "/progress.log 2>&1 &";
-    int state = system(commandline);
+    int state = system(qPrintable(commandline));
 
     if (state != 0)
     {
@@ -365,124 +343,18 @@ void runBurnDVD(void)
     logViewer.exec();
 }
 
-void runRecordingSelector(void)
-{
-    RecordingSelector selector(gContext->GetMainWindow(),
-                          "recording_selector", "mytharchive-", "recording selector");
-    selector.exec();
-}
-
-void runVideoSelector(void)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT title FROM videometadata");
-    query.exec();
-    if (query.isActive() && query.size())
-    {
-    }
-    else
-    {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("Video Selector"),
-                                  QObject::tr("You don't have any videos!"));
-        return;
-    }
-
-    VideoSelector selector(gContext->GetMainWindow(),
-                          "video_selector", "mytharchive-", "video selector");
-    selector.exec();
-}
-
-void runFileSelector(void)
-{
-    QString filter = gContext->GetSetting("MythArchiveFileFilter",
-                                          "*.mpg *.mpeg *.mov *.avi *.nuv");
-
-    FileSelector selector(FSTYPE_FILELIST, "/", filter, gContext->GetMainWindow(),
-                       "file_selector", "mytharchive-", "file selector");
-    selector.exec();
-}
-
-void SelectorCallback(void *data, QString &selection)
+void ArchiveCallback(void *data, QString &selection)
 {
     (void) data;
 
-    QString sel = selection.lower();
+    QString sel = selection.toLower();
 
-    if (sel == "archive_select_recordings")
-        runRecordingSelector();
-    else if (sel == "archive_select_videos")
-        runVideoSelector();
-    else if (sel == "archive_select_files")
-        runFileSelector();
-}
-
-void runSelectMenu(QString which_menu)
-{
-    QString themedir = GetMythUI()->GetThemeDir();
-    MythThemedMenu *diag = new MythThemedMenu(
-        themedir, which_menu, GetMythMainWindow()->GetMainStack(),
-        "select menu");
-
-    diag->setCallback(SelectorCallback, NULL);
-    diag->setKillable();
-
-    if (diag->foundTheme())
-    {
-        GetMythMainWindow()->GetMainStack()->AddScreen(diag);
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
-                              .arg(which_menu).arg(themedir));
-        delete diag;
-    }
-}
-
-void FormatCallback(void *data, QString &selection)
-{
-    (void) data;
-
-    QString sel = selection.lower();
     if (sel == "archive_create_dvd")
         runCreateDVD();
     else if (sel == "archive_create_archive")
         runCreateArchive();
     else if (sel == "archive_encode_video")
         runEncodeVideo();
-}
-
-void runFormatMenu(QString which_menu)
-{
-    QString themedir = GetMythUI()->GetThemeDir();
-    MythThemedMenu *diag = new MythThemedMenu(
-        themedir, which_menu, GetMythMainWindow()->GetMainStack(),
-        "format menu");
-
-    diag->setCallback(FormatCallback, NULL);
-    diag->setKillable();
-
-    if (diag->foundTheme())
-    {
-        GetMythMainWindow()->GetMainStack()->AddScreen(diag);
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find menu %1 or theme %2")
-                              .arg(which_menu).arg(themedir));
-        delete diag;
-    }
-}
-
-void ArchiveCallback(void *data, QString &selection)
-{
-    (void) data;
-
-    QString sel = selection.lower();
-
-    if (sel == "archive_finder")
-        runSelectMenu("archiveselect.xml");
-    else if (sel == "archive_export_video")
-        runFormatMenu("archiveformat.xml");
     else if (sel == "archive_import_video")
         runImportVideo();
     else if (sel == "archive_last_log")
@@ -518,6 +390,7 @@ void runMenu(QString which_menu)
 void initKeys(void)
 {
     REG_KEY("Archive", "TOGGLECUT", "Toggle use cut list state for selected program", "C");
+    REG_KEY("Archive", "DELETEITEM", "Delete current item in list", "D");
 }
 
 int mythplugin_init(const char *libversion)

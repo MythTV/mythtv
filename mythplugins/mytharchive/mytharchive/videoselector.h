@@ -7,10 +7,21 @@
 #ifndef VIDEOSELECTOR_H_
 #define VIDEOSELECTOR_H_
 
+// c++
+#include <vector>
+
 // mythtv
-#include <mythtv/uitypes.h>
-#include <mythtv/uilistbtntype.h>
-#include <mythtv/dialogbox.h>
+#include <libmythui/mythscreentype.h>
+
+// mytharchive
+#include "archiveutil.h"
+
+class ProgramInfo;
+class MythUIText;
+class MythUIButton;
+class MythUIButtonList;
+class MythUIButtonListItem;
+
 
 typedef struct
 {
@@ -24,19 +35,20 @@ typedef struct
     unsigned long long size;
 } VideoInfo;
 
-class VideoSelector : public MythThemedDialog
+class VideoSelector : public MythScreenType
 {
     Q_OBJECT
 
   public:
-    VideoSelector(MythMainWindow *parent,
-                  const QString  &window_name,
-                  const QString  &theme_filename,
-                  const char     *name = "VideoSelector");
+    VideoSelector(MythScreenStack *parent, QList<ArchiveItem *> *archiveList);
 
     ~VideoSelector(void);
 
-    void keyPressEvent(QKeyEvent *e);
+    bool Create();
+    bool keyPressEvent(QKeyEvent *e);
+
+  signals:
+    void haveResult(bool ok);
 
   public slots:
     void OKPressed(void);
@@ -47,38 +59,35 @@ class VideoSelector : public MythThemedDialog
     void selectAll(void);
     void clearAll(void);
 
-    void setCategory(int);
-    void titleChanged(UIListBtnTypeItem *item);
+    void setCategory(MythUIButtonListItem *item);
+    void titleChanged(MythUIButtonListItem *item);
+    void toggleSelected(MythUIButtonListItem *item);
 
   private:
     void updateVideoList(void);
     void updateSelectedList(void);
-    void toggleSelectedState(void);
     void getVideoList(void);
     void wireUpTheme(void);
-    vector<VideoInfo *> *getVideoListFromDB(void);
+    std::vector<VideoInfo *> *getVideoListFromDB(void);
     bool checkParentPassword(void);
     void setParentalLevel(int which_level);
 
-    vector<VideoInfo *>  *videoList;
-    QList<VideoInfo *>    selectedList;
+    QList<ArchiveItem *>     *m_archiveList;
+    std::vector<VideoInfo *> *m_videoList;
+    QList<VideoInfo *>        m_selectedList;
 
-    int              currentParentalLevel;
-    UITextType       *pl_text;
+    int               m_currentParentalLevel;
 
-    UIListBtnType    *video_list;
-    UITextType       *warning_text;
-
-    UITextButtonType *ok_button;
-    UITextButtonType *cancel_button;
-
-    UISelectorType   *category_selector;
-    UITextType       *title_text;
-    UITextType       *filesize_text;
-    UITextType       *plot_text;
-    UIImageType      *cover_image;
-
-    MythPopupBox     *popupMenu;
+    MythUIText       *m_plText;
+    MythUIButtonList *m_videoButtonList;
+    MythUIText       *m_warningText;
+    MythUIButton     *m_okButton;
+    MythUIButton     *m_cancelButton;
+    MythUIButtonList *m_categorySelector;
+    MythUIText       *m_titleText;
+    MythUIText       *m_filesizeText;
+    MythUIText       *m_plotText;
+    MythUIImage      *m_coverImage;
 };
 
 #endif

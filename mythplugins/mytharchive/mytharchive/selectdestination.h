@@ -23,7 +23,7 @@ class SelectDestination : public MythScreenType
   Q_OBJECT
 
   public:
-    SelectDestination(MythScreenStack *parent, QString name);
+    SelectDestination(MythScreenStack *parent, bool nativeMode, QString name);
     ~SelectDestination(void);
 
     bool Create(void);
@@ -44,16 +44,13 @@ class SelectDestination : public MythScreenType
     void handleFind(void);
     void filenameEditLostFocus(void);
     void setDestination(MythUIButtonListItem *item);
+    void fileFinderClosed(QString filename);
 
   private:
-    MythUIText   *GetMythUIText(const QString &name, bool optional = false);
-    MythUIButton *GetMythUIButton(const QString &name, bool optional = false);
-    MythUIButtonList *GetMythUIButtonList(const QString &name, bool optional = false);
-    MythUICheckBox *GetMythUICheckBox(const QString &name, bool optional = false);
-    MythUITextEdit* GetMythUITextEdit(const QString &name, bool optional = false);
-
     void loadConfiguration(void);
     void saveConfiguration(void);
+
+    bool               m_nativeMode;
 
     ArchiveDestination m_archiveDestination;
     int                m_freeSpace;
