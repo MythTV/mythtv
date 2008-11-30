@@ -37,7 +37,6 @@ static bool insert_program(const ProgramInfo*,
                            const ScheduledRecording*);
 
 static int init_tr(void);
-static QString pi_i18n(const QString&);
 
 /** \fn StripHTMLTags(const QString&)
  *  \brief Returns a copy of "src" with all the HTML tags removed.
