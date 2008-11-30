@@ -831,8 +831,21 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
         InitOutput(screen_size);
     }
 
-    QRect out_rect = QRect(QPoint(0, 0), screen_size);
-    display_video_rect = out_rect.intersected(display_video_rect);
+    // fix broken/missing negative rect clipping in vdpau
+    // not sure if this is actually correct, didn't work through the math
+    if (display_video_rect.top() < 0)
+    {
+        float ydiff = ((0 - display_video_rect.top()) * 1.0) / screen_size.height();
+        video_rect.setTop(video_rect.top() + video_rect.height() * ydiff);
+        display_video_rect.setTop(0);
+    }
+
+    if (display_video_rect.left() < 0)
+    {
+        float xdiff = ((0 - display_video_rect.left()) * 1.0) / screen_size.width();
+        video_rect.setLeft(video_rect.left() + video_rect.width() * xdiff);
+        display_video_rect.setLeft(0);
+    }
 
     outRect.x0 = 0;
     outRect.y0 = 0;
@@ -959,7 +972,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
         videoSurface,
         deint ? ARSIZE(future_surfaces) : 0,
         deint ? future_surfaces : NULL,
-        NULL, //&srcRect,
+        &srcRect,
         outputSurface,
         &outRect,
         &outRectVid,
