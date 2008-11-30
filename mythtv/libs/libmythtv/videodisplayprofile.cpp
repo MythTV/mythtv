@@ -1598,6 +1598,7 @@ void VideoDisplayProfile::init_statics(void)
     safe_renderer_priority["xv-blit"]      =  90;
     safe_renderer_priority["xvmc-blit"]    = 110;
     safe_renderer_priority["xvmc-opengl"]  = 100;
+    safe_renderer_priority["vdpau"]        = 120;
     safe_renderer_priority["directfb"]     =  60;
     safe_renderer_priority["directx"]      =  50;
     safe_renderer_priority["direct3d"]     =  55;

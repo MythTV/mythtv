@@ -16,6 +16,10 @@ extern "C" {
 #include "videoout_xv.h" // for xvmc stuff
 #endif
 
+#ifdef USING_VDPAU
+#include "util-vdpau.h"
+#endif
+
 #define DEBUG_FRAME_LOCKS 0
 
 #define TRY_LOCK_SPINS                 100
@@ -1170,7 +1174,10 @@ bool VideoBuffers::CreateBuffers(int width, int height, VDPAUContext *ctx)
 
     if ((uint)ctx->GetNumBufs() != allocSize())
     {
-        printf("ERROR ERROR ERROR\n");
+        VERBOSE(VB_IMPORTANT, QString("VideoBuffers::CreateBuffers") +
+                QString("VDPAUContext buffer count %1 does not agree "
+                        "with the VideoBuffers buffer countr %2")
+                .arg(ctx->GetNumBufs()).arg(allocSize()));
         return false;
     }
 

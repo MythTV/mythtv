@@ -578,7 +578,8 @@ bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
     // Default to not supporting bob deinterlace
     return (!filtername.contains("bobdeint") &&
             !filtername.contains("doublerate") &&
-            !filtername.contains("opengl"));
+            !filtername.contains("opengl") &&
+            !filtername.contains("vdpau"));
 }
 
 /**

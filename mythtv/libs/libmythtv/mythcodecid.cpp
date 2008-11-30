@@ -194,7 +194,7 @@ int myth2av_codecid(MythCodecID codec_id,
             VERBOSE(VB_IMPORTANT, "Error: DVDV H.263 not supported by ffmpeg");
             break;
         case kCodec_MPEG4_DVDV:
-            VERBOSE(VB_IMPORTANT, "Error: DVDV MPEG not supported by ffmpeg");
+            VERBOSE(VB_IMPORTANT, "Error: DVDV MPEG4 not supported by ffmpeg");
             break;
         case kCodec_H264_DVDV:
             VERBOSE(VB_IMPORTANT, "Error: DVDV H.265 not supported by ffmpeg");
@@ -209,7 +209,7 @@ int myth2av_codecid(MythCodecID codec_id,
             VERBOSE(VB_IMPORTANT, "Error: VDPAU H.263 not supported by ffmpeg");
             break;
         case kCodec_MPEG4_VDPAU:
-            VERBOSE(VB_IMPORTANT, "Error: VDPAU MPEG not supported by ffmpeg");
+            VERBOSE(VB_IMPORTANT, "Error: VDPAU MPEG4 not supported by ffmpeg");
             break;
 
         case kCodec_H264_VDPAU:

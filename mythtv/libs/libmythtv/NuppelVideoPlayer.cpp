@@ -5749,12 +5749,12 @@ QString NuppelVideoPlayer::GetEncodingType(void) const
         case kCodec_MPEG1_IDCT:
         case kCodec_MPEG1_VLD:
         case kCodec_MPEG1_DVDV:
+        case kCodec_MPEG1_VDPAU:
         case kCodec_MPEG2:
         case kCodec_MPEG2_XVMC:
         case kCodec_MPEG2_IDCT:
         case kCodec_MPEG2_VLD:
         case kCodec_MPEG2_DVDV:
-        case kCodec_MPEG1_VDPAU:
         case kCodec_MPEG2_VDPAU:
             return "MPEG-2";
 

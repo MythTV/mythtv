@@ -45,16 +45,13 @@ class XvMCOSD;
     struct XvMCContext;
 #endif // !USING_XVMC
 
-#ifdef USING_VDPAU
-#include "util-vdpau.h"
-#endif
-
 typedef enum VideoOutputSubType
 {
     XVUnknown = 0, Xlib, XShm, OpenGL, XVideo, XVideoVDPAU, 
     XVideoMC, XVideoIDCT, XVideoVLD, 
 } VOSType;
 
+class VDPAUContext;
 class VideoOutputXv : public VideoOutput
 {
     friend class ChromaKeyOSD;
@@ -269,8 +266,8 @@ class VideoOutputXv : public VideoOutput
 #ifdef USING_VDPAU
     VDPAUContext         *vdpau;
 #endif
-    bool                  use_vdpau_osd;
-    bool                  use_vdpau_pip;
+    bool                  vdpau_use_osd;
+    bool                  vdpau_use_pip;
 
     // Basic Xv drawing info
     int                  xv_port;
