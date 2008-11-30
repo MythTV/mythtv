@@ -77,6 +77,7 @@ class MythBurn : public MythScreenType
     void profileChanged(int profileNo);
     void removeItem(void);
     void selectorClosed(bool ok);
+    void editorClosed(bool ok, ArchiveItem *item);
 
   private:
     void updateArchiveList(void);

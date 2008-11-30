@@ -1,191 +1,95 @@
 
 // myth
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuitextedit.h>
 
 // mytharchive
 #include "editmetadata.h"
 
-EditMetadataDialog::EditMetadataDialog(ArchiveItem *source_metadata,
-                                 MythMainWindow *parent,
-                                 QString window_name,
-                                 QString theme_filename,
-                                 const char* name)
-                :MythThemedDialog(parent, window_name, theme_filename, name)
+EditMetadataDialog::EditMetadataDialog(MythScreenStack *parent, 
+                                       ArchiveItem *source_metadata)
+                   :MythScreenType(parent, "EditMetadataDialog")
 {
-    // make a copy so we can abandon changes
-    workMetadata = *source_metadata;
-    sourceMetadata = source_metadata;
-    wireUpTheme();
-    fillWidgets();
-    assignFirstFocus();
+    m_sourceMetadata = source_metadata;
 }
 
-void EditMetadataDialog::fillWidgets()
+bool EditMetadataDialog::Create(void)
 {
-    if (title_edit)
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("mythburn-ui.xml", "edit_metadata", this);
+
+    if (!foundtheme)
+        return false;
+
+    try
     {
-        title_edit->setText(workMetadata.title);
+        m_titleEdit = GetMythUITextEdit("title_edit");
+        m_subtitleEdit = GetMythUITextEdit("subtitle_edit");
+        m_descriptionEdit = GetMythUITextEdit("description_edit");
+        m_starttimeEdit = GetMythUITextEdit("starttime_edit");
+        m_startdateEdit = GetMythUITextEdit("startdate_edit");
+        m_okButton = GetMythUIButton("ok_button");
+        m_cancelButton = GetMythUIButton("cancel_button");
+    }
+    catch (QString &error)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'edit_metadata'\n\t\t\t"
+                              "Error was: " + error);
+        return false;
     }
 
-    if (subtitle_edit)
-    {
-        subtitle_edit->setText(workMetadata.subtitle);
-    }
+    m_okButton->SetText(tr("OK"));
+    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(okPressed()));
 
-    if (description_edit)
-    {
-        description_edit->setText(workMetadata.description);
-    }
+    m_cancelButton->SetText(tr("Cancel"));
+    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
 
-    if (startdate_edit)
-    {
-        startdate_edit->setText(workMetadata.startDate);
-    }
+    m_titleEdit->SetText(m_sourceMetadata->title);
+    m_subtitleEdit->SetText(m_sourceMetadata->subtitle);
+    m_descriptionEdit->SetText(m_sourceMetadata->description);
+    m_startdateEdit->SetText(m_sourceMetadata->startDate);
+    m_starttimeEdit->SetText(m_sourceMetadata->startTime);
 
-    if (starttime_edit)
-    {
-        starttime_edit->setText(workMetadata.startTime);
-    }
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+
+    SetFocusWidget(m_titleEdit);
+
+    return true;
 }
 
-void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
+bool EditMetadataDialog::keyPressEvent(QKeyEvent *event)
 {
-    bool handled = false;
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
 
-    QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
+    if (MythScreenType::keyPressEvent(event))
+        return true;
 
-    for (int i = 0; i < actions.size() && !handled; i++)
-    {
-        QString action = actions[i];
-        handled = true;
-
-        if (action == "UP")
-            nextPrevWidgetFocus(false);
-        else if (action == "DOWN")
-            nextPrevWidgetFocus(true);
-        else if (action == "LEFT")
-        {
-
-        }
-        else if (action == "RIGHT")
-        {
-
-        }
-        else if (action == "SELECT")
-        {
-            activateCurrent();
-        }
-        else if (action == "0")
-        {
-            if (ok_button)
-                ok_button->push();
-        }
-        else if (action == "1")
-        {
-            if (cancel_button)
-                cancel_button->push();
-        }
-        else
-            handled = false;
-    }
-
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
+    return false;
 }
 
-void EditMetadataDialog::wireUpTheme()
+void EditMetadataDialog::okPressed(void)
 {
-    title_edit = getUIRemoteEditType("title_edit");
-    if (title_edit)
-    {
-        title_edit->createEdit(this);
-        connect(title_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
-    }
+    m_sourceMetadata->title = m_titleEdit->GetText();
+    m_sourceMetadata->subtitle = m_subtitleEdit->GetText();
+    m_sourceMetadata->startDate = m_startdateEdit->GetText();
+    m_sourceMetadata->startTime = m_starttimeEdit->GetText();
+    m_sourceMetadata->description = m_descriptionEdit->GetText();
+    m_sourceMetadata->editedDetails = true;
 
-    subtitle_edit = getUIRemoteEditType("subtitle_edit");
-    if (subtitle_edit)
-    {
-        subtitle_edit->createEdit(this);
-        connect(subtitle_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
-    }
-
-    description_edit = getUIRemoteEditType("description_edit");
-    if (description_edit)
-    {
-        description_edit->createEdit(this);
-        MythRemoteLineEdit *edit
-            = (MythRemoteLineEdit *) description_edit->getEdit();
-        connect(description_edit, SIGNAL(loosingFocus()),
-                this,             SLOT(editLostFocus()));
-    }
-
-    startdate_edit = getUIRemoteEditType("startdate_edit");
-    if (startdate_edit)
-    {
-        startdate_edit->createEdit(this);
-        connect(startdate_edit, SIGNAL(loosingFocus()),
-                this,           SLOT(editLostFocus()));
-    }
-
-    starttime_edit = getUIRemoteEditType("starttime_edit");
-    if (starttime_edit)
-    {
-        starttime_edit->createEdit(this);
-        connect(starttime_edit, SIGNAL(loosingFocus()),
-                this,           SLOT(editLostFocus()));
-    }
-
-    ok_button = getUITextButtonType("ok_button");
-    if (ok_button)
-    {
-        ok_button->setText(tr("Save"));
-        connect(ok_button, SIGNAL(pushed()), this, SLOT(savePressed()));
-    }
-
-    cancel_button = getUITextButtonType("cancel_button");
-    if (cancel_button)
-    {
-        cancel_button->setText(tr("Cancel"));
-        connect(cancel_button, SIGNAL(pushed()), this, SLOT(reject()));
-    }
-
-    buildFocusList();
+    emit haveResult(true, m_sourceMetadata);
+    Close();
 }
 
-void EditMetadataDialog::editLostFocus()
+void EditMetadataDialog::cancelPressed(void)
 {
-    UIRemoteEditType *whichEditor
-        = (UIRemoteEditType *) getCurrentFocusWidget();
-
-    if (whichEditor == title_edit)
-    {
-        workMetadata.title = title_edit->getText();
-    }
-    else if (whichEditor == subtitle_edit)
-    {
-        workMetadata.subtitle = subtitle_edit->getText();
-    }
-    else if (whichEditor == startdate_edit)
-    {
-        workMetadata.startDate = startdate_edit->getText();
-    }
-    else if (whichEditor == starttime_edit)
-    {
-        workMetadata.startTime = starttime_edit->getText();
-    }
-    else if (whichEditor == description_edit)
-    {
-        workMetadata.description = description_edit->getText();
-    }
-}
-
-void EditMetadataDialog::savePressed()
-{
-    *sourceMetadata = workMetadata;
-    sourceMetadata->editedDetails = true;
-    done(kDialogCodeAccepted);
+    emit haveResult(false, m_sourceMetadata);
+    Close();
 }
 
 EditMetadataDialog::~EditMetadataDialog()

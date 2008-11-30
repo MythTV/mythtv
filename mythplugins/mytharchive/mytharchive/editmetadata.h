@@ -7,51 +7,46 @@
 #include <QKeyEvent>
 
 // myth
-#include <mythtv/mythdialogs.h>
-#include <mythtv/uitypes.h>
+#include <libmythui/mythscreentype.h>
 
 // mytharchive
 #include "archiveutil.h"
 
-class EditMetadataDialog : public MythThemedDialog
+class MythUITextEdit;
+class MythUIButton;
+
+class EditMetadataDialog : public MythScreenType
 {
 
   Q_OBJECT
 
   public:
 
-    EditMetadataDialog(ArchiveItem *source_metadata,
-                       MythMainWindow *parent,
-                       QString window_name,
-                       QString theme_filename,
-                       const char* name = 0);
+    EditMetadataDialog(MythScreenStack *parent, ArchiveItem *source_metadata);
     ~EditMetadataDialog();
 
-    void keyPressEvent(QKeyEvent *e);
-    void wireUpTheme();
-    void fillWidgets();
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *e);
+
+  signals:
+    void haveResult(bool ok, ArchiveItem *item);
 
   public slots:
 
-    void savePressed();
-    void editLostFocus();
+    void okPressed(void);
+    void cancelPressed(void);
+    void editLostFocus(void);
 
   private:
-    ArchiveItem *sourceMetadata;
-    ArchiveItem workMetadata;
+    ArchiveItem    *m_sourceMetadata;
 
-    //
-    //  GUI stuff
-    //
-
-    UIRemoteEditType    *title_edit;
-    UIRemoteEditType    *subtitle_edit;
-    UIRemoteEditType    *description_edit;
-    UIRemoteEditType    *startdate_edit;
-    UIRemoteEditType    *starttime_edit;
-
-    UITextButtonType    *cancel_button;
-    UITextButtonType    *ok_button;
+    MythUITextEdit *m_titleEdit;
+    MythUITextEdit *m_subtitleEdit;
+    MythUITextEdit *m_descriptionEdit;
+    MythUITextEdit *m_startdateEdit;
+    MythUITextEdit *m_starttimeEdit;
+    MythUIButton   *m_cancelButton;
+    MythUIButton   *m_okButton;
 };
 
 #endif

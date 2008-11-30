@@ -762,14 +762,27 @@ void MythBurn::editDetails()
     if (!curItem)
         return;
 
-    EditMetadataDialog editDialog(curItem, gContext->GetMainWindow(),
-                                  "edit_metadata", "mythburn-", "edit metadata");
-    if (kDialogCodeRejected != editDialog.exec())
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    EditMetadataDialog *editor = new EditMetadataDialog(mainStack, curItem);
+
+    connect(editor, SIGNAL(haveResult(bool, ArchiveItem *)),
+            this, SLOT(editorClosed(bool, ArchiveItem *)));
+
+    if (editor->Create())
+        mainStack->AddScreen(editor);
+}
+
+void MythBurn::editorClosed(bool ok, ArchiveItem *item)
+{
+    MythUIButtonListItem *gridItem = m_archiveButtonList->GetItemCurrent();
+
+    if (ok && item && gridItem)
     {
         // update the grid to reflect any changes
-        item->setText(curItem->title);
-        item->setText(curItem->subtitle, "subtitle");
-        item->setText(curItem->startDate + " " + curItem->startTime, "date");
+        gridItem->setText(item->title);
+        gridItem->setText(item->subtitle, "subtitle");
+        gridItem->setText(item->startDate + " " + item->startTime, "date");
     }
 }
 

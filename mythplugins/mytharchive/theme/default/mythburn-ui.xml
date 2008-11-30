@@ -347,118 +347,87 @@ MythArchive GUI theme
 
   <window name="edit_metadata">
 
-      <font name="title" face="Arial">
-          <color>#ffff00</color>
-          <dropcolor>#000000</dropcolor>
-          <size>24</size>
-          <shadow>3,3</shadow>
-          <bold>yes</bold>
-      </font>
+        <font name="title" from="baselarge">
+            <color>#ffff00</color>
+            <dropcolor>#000000</dropcolor>
+            <size>24</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
 
-      <font name="labels" face="Arial">
-          <color>#ffff00</color>
-          <dropcolor>#000000</dropcolor>
-          <size>18</size>
-          <shadow>3,3</shadow>
-          <bold>yes</bold>
-      </font>
+        <textarea name="title" from="basetextarea">
+            <area>0,15,800,50</area>
+            <font>title</font>
+            <align>allcenter</align>
+            <value>Archive Item Details</value>
+        </textarea>
 
-      <font name="display" face="Arial">
-          <color>#ffffff</color>
-          <dropcolor>#000000</dropcolor>
-          <size>18</size>
-          <shadow>3,3</shadow>
-          <bold>yes</bold>
-      </font>
+        <!--
+            Labels
+        -->
 
-      <container name="edit_container">
-          <area>0,0,800,600</area>
+        <textarea name="title_label" from="basetextarea">
+            <area>45,70,170,50</area>
+            <font>basesmallyellow</font>
+            <align>right,vcenter</align>
+            <value>Title:</value>
+        </textarea>
 
-          <textarea name="title" draworder="1" align="center">
-              <area>0,15,800,50</area>
-              <font>title</font>
-              <value>Archive Item Details</value>
-          </textarea>
+        <textarea name="subtitle_label" from="title_label">
+            <area>45,135,170,50</area>
+            <value>Subtitle:</value>
+        </textarea>
 
-          <!--
-              Labels
-          -->
+        <textarea name="startdate_label" from="title_label">
+            <area>45,200,170,50</area>
+            <value>Start Date:</value>
+        </textarea>
 
-          <textarea name="title_label" draworder="1" align="right">
-              <area>15,70,170,30</area>
-              <font>labels</font>
-              <value>Title:</value>
-          </textarea>
+        <textarea name="starttime_label" from="title_label">
+            <area>45,265,170,50</area>
+            <value>Time:</value>
+        </textarea>
 
-          <textarea name="subtitle_label" draworder="1" align="right">
-              <area>15,110,170,30</area>
-              <font>labels</font>
-              <value>Subtitle:</value>
-          </textarea>
+        <textarea name="description_label" from="title_label">
+            <area>45,330,170,50</area>
+            <value>Description:</value>
+        </textarea>
 
-          <textarea name="startdate_label" draworder="1" align="right">
-              <area>15,150,170,30</area>
-              <font>labels</font>
-              <value>Start Date:</value>
-          </textarea>
+        <!--
+            edits
+        -->
 
-          <textarea name="starttime_label" draworder="1" align="right">
-              <area>430,150,100,30</area>
-              <font>labels</font>
-              <value>Time:</value>
-          </textarea>
+        <textedit name="title_edit" from="basetextedit">
+            <position>225,70</position>
+        </textedit>
 
-          <textarea name="description_label" draworder="1" align="right">
-              <area>15,190,170,30</area>
-              <font>labels</font>
-              <value>Description:</value>
-          </textarea>
+        <textedit name="subtitle_edit" from="basetextedit">
+            <position>225,135</position>
+        </textedit>
 
-          <!--
-              edits
-          -->
+        <textedit name="startdate_edit" from="basetextedit">
+            <position>225,200</position>
+        </textedit>
 
-          <remoteedit name="title_edit" draworder="1" align="left">
-              <area>195,70,525,35</area>
-              <font>display</font>
-          </remoteedit>
-          <remoteedit name="subtitle_edit" draworder="1" align="left">
-              <area>195,110,525,35</area>
-              <font>display</font>
-          </remoteedit>
-          <remoteedit name="startdate_edit" draworder="1" align="left">
-              <area>195,150,250,35</area>
-              <font>display</font>
-          </remoteedit>
-          <remoteedit name="starttime_edit" draworder="1" align="left">
-              <area>540,150,180,35</area>
-              <font>display</font>
-          </remoteedit>
-          <remoteedit name="description_edit" draworder="1" align="left">
-              <area>195,190,525,300</area>
-              <font>display</font>
-          </remoteedit>
+        <textedit name="starttime_edit" from="basetextedit">
+            <position>225,265</position>
+        </textedit>
 
-          <!--
-              Push buttons
-          -->
-          <textbutton name="ok_button" draworder="0">
-              <position>250,540</position>
-              <font>display</font>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
-          </textbutton>
-          <textbutton name="cancel_button" draworder="0">
-              <position>450,540</position>
-              <font>display</font>
-              <image function="on" filename="text_button_on.png"></image>
-              <image function="off" filename="text_button_off.png"></image>
-              <image function="pushed" filename="text_button_pushed.png"></image>
-          </textbutton>
+        <textedit name="description_edit" from="basetextedit">
+            <position>225,330</position>
+        </textedit>
 
-      </container>
-  </window>
+        <!--
+            Push buttons
+        -->
+        <button name="ok_button" from="basebutton">
+            <position>250,540</position>
+        </button>
+
+        <button name="cancel_button" from="basebutton">
+            <position>450,540</position>
+        </button>
+    </window>
 
   <window name="thumbfinder">
 
