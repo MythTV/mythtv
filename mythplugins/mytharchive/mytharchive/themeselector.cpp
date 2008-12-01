@@ -139,7 +139,9 @@ void ThemeSelector::getThemeList(void)
     d.setPath(themeDir);
     if (d.exists())
     {
-        QFileInfoList list = d.entryInfoList("*", QDir::Dirs, QDir::Name);
+        QStringList filters;
+        filters << "*";
+        QFileInfoList list = d.entryInfoList(filters, QDir::Dirs, QDir::Name);
 
         int count = 0;
         for (int x = 0; x < list.size(); x++)

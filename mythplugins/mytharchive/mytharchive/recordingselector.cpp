@@ -458,7 +458,7 @@ void RecordingSelector::getRecordingList(void)
                 continue;
             }
 
-            if (m_categories.find(p->title) == m_categories.end())
+            if (m_categories.indexOf(p->title) == -1)
                 m_categories.append(p->title);
         }
     }

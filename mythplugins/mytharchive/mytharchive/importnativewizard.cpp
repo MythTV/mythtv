@@ -64,7 +64,7 @@ void ImportNativeWizard::keyPressEvent(QKeyEvent *e)
                     if (fileData->filename == "..")
                     {
                         // move up on directory
-                        int pos = m_curDirectory.findRev('/');
+                        int pos = m_curDirectory.lastIndexOf('/');
                         if (pos > 0)
                             m_curDirectory = m_curDirectory.left(pos);
                         else
@@ -87,12 +87,12 @@ void ImportNativeWizard::keyPressEvent(QKeyEvent *e)
 
                     if (item->state() == UIListBtnTypeItem::FullChecked)
                     {
-                        m_selectedList.remove(fullPath);
+                        m_selectedList.removeAll(fullPath);
                         item->setChecked(UIListBtnTypeItem::NotChecked);
                     }
                     else
                     {
-                        if (m_selectedList.findIndex(fullPath) == -1)
+                        if (m_selectedList.indexOf(fullPath) == -1)
                             m_selectedList.append(fullPath);
                         item->setChecked(UIListBtnTypeItem::FullChecked);
                     }
@@ -283,7 +283,7 @@ void ImportNativeWizard::locationEditLostFocus()
 void ImportNativeWizard::backPressed()
 {
     // move up one directory
-    int pos = m_curDirectory.findRev('/');
+    int pos = m_curDirectory.lastIndexOf('/');
     if (pos > 0)
         m_curDirectory = m_curDirectory.left(pos);
     else
@@ -349,7 +349,7 @@ void ImportNativeWizard::nextPressed()
         commandline = "mytharchivehelper -f \"" + filename + "\" " + chanID;
         commandline += " > "  + logDir + "/progress.log 2>&1 &";
 
-        int state = system(commandline);
+        int state = system(qPrintable(commandline));
 
         if (state != 0) 
         {
@@ -411,7 +411,9 @@ void ImportNativeWizard::updateFileList()
     if (d.exists())
     {
         // first get a list of directory's in the current directory
-        QFileInfoList list = d.entryInfoList("*", QDir::Dirs, QDir::Name);
+        QStringList filters;
+        filters << "*";
+        QFileInfoList list = d.entryInfoList(filters, QDir::Dirs, QDir::Name);
         QFileInfo fi;
 
         for (int x = 0; x < list.size(); x++)
@@ -436,7 +438,9 @@ void ImportNativeWizard::updateFileList()
         }
 
         // second get a list of file's in the current directory
-        list = d.entryInfoList(m_filemask, QDir::Files, QDir::Name);
+        filters.clear();
+        filters = m_filemask.split(" ", QString::SkipEmptyParts);
+        list = d.entryInfoList(filters, QDir::Files, QDir::Name);
 
         for (int x = 0; x < list.size(); x++)
         {
@@ -734,7 +738,6 @@ bool ImportNativeWizard::showList(const QString &caption, QString &value)
     }
 
     searchDialog->deleteLater();
-    setActiveWindow();
 
     return res;
 }

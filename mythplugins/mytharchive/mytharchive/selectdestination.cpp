@@ -297,7 +297,7 @@ void SelectDestination::filenameEditLostFocus()
     if (m_archiveDestination.freeSpace == -1)
     {
         QString dir = m_filenameEdit->GetText();
-        int pos = dir.findRev('/');
+        int pos = dir.lastIndexOf('/');
         if (pos > 0)
             dir = dir.left(pos);
         else

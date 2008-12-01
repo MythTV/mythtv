@@ -154,7 +154,7 @@ void FileSelector::itemClicked(MythUIButtonListItem *item)
         if (fileData->filename == "..")
         {
             // move up on directory
-            int pos = m_curDirectory.findRev('/');
+            int pos = m_curDirectory.lastIndexOf('/');
             if (pos > 0)
                 m_curDirectory = m_curDirectory.left(pos);
             else
@@ -179,12 +179,12 @@ void FileSelector::itemClicked(MythUIButtonListItem *item)
 
             if (item->state() == MythUIButtonListItem::FullChecked)
             {
-                m_selectedList.remove(fullPath);
+                m_selectedList.removeAll(fullPath);
                 item->setChecked(MythUIButtonListItem::NotChecked);
             }
             else
             {
-                if (m_selectedList.findIndex(fullPath) == -1)
+                if (m_selectedList.indexOf(fullPath) == -1)
                     m_selectedList.append(fullPath);
                 item->setChecked(MythUIButtonListItem::FullChecked);
             }
@@ -206,7 +206,7 @@ void FileSelector::locationEditLostFocus()
 void FileSelector::backPressed()
 {
     // move up one directory
-    int pos = m_curDirectory.findRev('/');
+    int pos = m_curDirectory.lastIndexOf('/');
     if (pos > 0)
         m_curDirectory = m_curDirectory.left(pos);
     else
@@ -284,7 +284,7 @@ void FileSelector::OKPressed()
             if (file.exists())
             {
                 QString title = f;
-                int pos = f.findRev('/');
+                int pos = f.lastIndexOf('/');
                 if (pos > 0)
                     title = f.mid(pos + 1);
 
@@ -369,7 +369,7 @@ void FileSelector::updateSelectedList()
         return;
 
     while (!m_selectedList.isEmpty())
-         delete m_selectedList.takeFirst();
+        m_selectedList.takeFirst();
     m_selectedList.clear();
 
     FileData *f;
@@ -406,7 +406,9 @@ void FileSelector::updateFileList()
     if (d.exists())
     {
         // first get a list of directory's in the current directory
-        QFileInfoList list = d.entryInfoList("*", QDir::Dirs, QDir::Name);
+        QStringList filters;
+        filters << "*";
+        QFileInfoList list = d.entryInfoList(filters, QDir::Dirs, QDir::Name);
         QFileInfo fi;
 
         for (int x = 0; x < list.size(); x++)
@@ -433,7 +435,9 @@ void FileSelector::updateFileList()
         if (m_selectorType != FSTYPE_DIRECTORY)
         {
             // second get a list of file's in the current directory
-            list = d.entryInfoList(m_filemask, QDir::Files, QDir::Name);
+            filters.clear();
+            filters = m_filemask.split(" ", QString::SkipEmptyParts);
+            list = d.entryInfoList(filters, QDir::Files, QDir::Name);
             for (int x = 0; x < list.size(); x++)
             {
                 fi = list.at(x);
@@ -458,7 +462,7 @@ void FileSelector::updateFileList()
                         fullPath += "/";
                     fullPath += data->filename;
 
-                    if (m_selectedList.findIndex(fullPath) != -1)
+                    if (m_selectedList.indexOf(fullPath) != -1)
                     {
                         item->setChecked(MythUIButtonListItem::FullChecked);
                     }

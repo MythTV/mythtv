@@ -456,7 +456,7 @@ void VideoSelector::getVideoList(void)
         {
             v = *i;
 
-            if (categories.find(v->category) == categories.end())
+            if (categories.indexOf(v->category) == -1)
                 categories.append(v->category);
         }
     }

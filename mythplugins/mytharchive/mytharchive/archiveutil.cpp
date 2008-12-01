@@ -89,34 +89,34 @@ void checkTempDirectory()
     if (!dir.exists())
     {
         dir.mkdir(tempDir);
-        system("chmod 777 " + tempDir);
+        system(qPrintable("chmod 777 " + tempDir));
     }
 
     dir = QDir(workDir);
     if (!dir.exists())
     {
         dir.mkdir(workDir);
-        system("chmod 777 " + workDir);
+        system(qPrintable("chmod 777 " + workDir));
     }
 
     dir = QDir(logDir);
     if (!dir.exists())
     {
         dir.mkdir(logDir);
-        system("chmod 777 " + logDir);
+        system(qPrintable("chmod 777 " + logDir));
     }
     dir = QDir(configDir);
     if (!dir.exists())
     {
         dir.mkdir(configDir);
-        system("chmod 777 " + configDir);
+        system(qPrintable("chmod 777 " + configDir));
     }
 }
 
 QString getBaseName(const QString &filename)
 {
     QString baseName = filename;
-    int pos = filename.findRev('/');
+    int pos = filename.lastIndexOf('/');
     if (pos > 0)
         baseName = filename.mid(pos + 1);
 
@@ -213,7 +213,7 @@ bool getFileDetails(ArchiveItem *a)
     QString command = QString("mytharchivehelper -i \"%1\" \"%2\" %3 > /dev/null 2>&1")
             .arg(inFile).arg(outFile).arg(lenMethod);
 
-    int res = system(command);
+    int res = system(qPrintable(command));
     if (WIFEXITED(res))
         res = WEXITSTATUS(res);
     if (res != 0)

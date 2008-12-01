@@ -49,7 +49,7 @@ MythBurn::MythBurn(MythScreenStack *parent,
     QString thumbDir = getTempDirectory() + "/config/thumbs";
     QDir dir(thumbDir);
     if (dir.exists())
-        system("rm -rf " + thumbDir);
+        system(qPrintable("rm -rf " + thumbDir));
 
     m_bCreateISO = false;
     m_bDoBurn = false;
@@ -229,7 +229,7 @@ void MythBurn::loadEncoderProfiles()
     QString filename = GetConfDir() + 
             "/MythArchive/ffmpeg_dvd_" + 
             ((gContext->GetSetting("MythArchiveVideoFormat", "pal")
-                .lower() == "ntsc") ? "ntsc" : "pal") + ".xml";
+                .toLower() == "ntsc") ? "ntsc" : "pal") + ".xml";
 
     if (!QFile::exists(filename))
     {
@@ -237,7 +237,7 @@ void MythBurn::loadEncoderProfiles()
         filename = GetShareDir() + 
             "mytharchive/encoder_profiles/ffmpeg_dvd_" + 
             ((gContext->GetSetting("MythArchiveVideoFormat", "pal")
-                .lower() == "ntsc") ? "ntsc" : "pal") + ".xml";
+                .toLower() == "ntsc") ? "ntsc" : "pal") + ".xml";
     }
 
     VERBOSE(VB_IMPORTANT, QString("MythArchive: Loading encoding profiles from %1")
@@ -483,10 +483,10 @@ EncoderProfile *MythBurn::getDefaultProfile(ArchiveItem *item)
     EncoderProfile *profile = NULL;
 
     // is the file an mpeg2 file?
-    if (item->videoCodec.lower() == "mpeg2video")
+    if (item->videoCodec.toLower() == "mpeg2video")
     {
         // does the file already have a valid DVD resolution?
-        if (gContext->GetSetting("MythArchiveVideoFormat", "pal").lower() == "ntsc")
+        if (gContext->GetSetting("MythArchiveVideoFormat", "pal").toLower() == "ntsc")
         {
             if ((item->videoWidth == 720 && item->videoHeight == 480) ||
                 (item->videoWidth == 704 && item->videoHeight == 480) ||
@@ -545,7 +545,7 @@ void MythBurn::createConfigFile(const QString &filename)
         a = m_archiveList.at(x);
 
         QDomElement file = doc.createElement("file");
-        file.setAttribute("type", a->type.lower() );
+        file.setAttribute("type", a->type.toLower() );
         file.setAttribute("usecutlist", a->useCutlist);
         file.setAttribute("filename", a->filename);
         file.setAttribute("encodingprofile", a->encoderProfile->name);
@@ -853,7 +853,7 @@ void MythBurn::runScript()
 
     gContext->SaveSetting("MythArchiveLastRunStatus", "Running");
 
-    int state = system(commandline);
+    int state = system(qPrintable(commandline));
 
     if (state != 0) 
     {

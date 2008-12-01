@@ -45,7 +45,7 @@ static bool performActualUpdate(const QString updates[], QString version,
     {
         query.exec(thequery);
 
-        if (query.lastError().type() != QSqlError::None)
+        if (query.lastError().type() != QSqlError::NoError)
         {
             QString msg =
                 QString("DB Error (Performing database upgrade): \n"

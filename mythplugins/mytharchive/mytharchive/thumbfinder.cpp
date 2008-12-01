@@ -327,7 +327,7 @@ QString ThumbFinder::createThumbDir(void)
     if (!dir.exists())
     {
         dir.mkdir(thumbDir);
-        system("chmod 777 " + thumbDir);
+        system(qPrintable("chmod 777 " + thumbDir));
     }
 
     int x = 0;
@@ -340,7 +340,7 @@ QString ThumbFinder::createThumbDir(void)
     } while (dir.exists());
 
     dir.mkdir(res);
-    system("chmod 777 " + res);
+    system(qPrintable("chmod 777 " + res));
 
     return  res;
 }
@@ -527,7 +527,7 @@ QPixmap *ThumbFinder::createScaledPixmap(QString filename,
         }
         else
         {
-            pixmap = new QPixmap(img->scaled(width, height, mode, Qt::SmoothTransformation));
+            pixmap = &QPixmap::fromImage(img->scaled(width, height, mode, Qt::SmoothTransformation));
             delete img;
         }
     }

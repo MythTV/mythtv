@@ -424,7 +424,7 @@ void ExportNative::createConfigFile(const QString &filename)
         a = m_archiveList.at(x);
 
         QDomElement file = doc.createElement("file");
-        file.setAttribute("type", a->type.lower() );
+        file.setAttribute("type", a->type.toLower() );
         file.setAttribute("title", a->title);
         file.setAttribute("filename", a->filename);
         file.setAttribute("delete", "0");
@@ -475,7 +475,7 @@ void ExportNative::runScript()
     commandline = "mytharchivehelper -n " + configDir + "/mydata.xml";  // job file
     commandline += " > "  + logDir + "/progress.log 2>&1 &";            // Logs
 
-    int state = system(commandline);
+    int state = system(qPrintable(commandline));
 
     if (state != 0)
     {
