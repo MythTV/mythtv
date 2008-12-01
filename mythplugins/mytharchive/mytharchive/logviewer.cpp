@@ -2,132 +2,139 @@
 #include <iostream>
 #include <cstdlib>
 
-using namespace std;
-
 // qt
-#include <Q3TextStream>
-#include <QAbstractButton>
-#include <Q3HBoxLayout>
-#include <QLabel>
 #include <QKeyEvent>
-#include <Q3VBoxLayout>
-#include <qlayout.h>
-#include <q3hbox.h>
-#include <qfile.h>
+#include <QFile>
 
 // mythtv
 #include <mythtv/mythcontext.h>
-#include <mythtv/dialogbox.h>
-#include <mythtv/mythdialogs.h>
 #include <mythtv/mythdbcon.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythdialogbox.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuibuttonlist.h>
+#include <libmythui/mythuitext.h>
 
 // mytharchive
-#include <logviewer.h>
+#include "archiveutil.h"
+#include "logviewer.h"
 
 const int DEFAULT_UPDATE_TIME = 5;
 
-LogViewer::LogViewer(MythMainWindow *parent, const char *name)
-              : MythDialog(parent, name)
+void showLogViewer(void)
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    QString logDir = getTempDirectory() + "logs";
+
+    // do any logs exist?
+    if (QFile::exists(logDir + "/progress.log") || QFile::exists(logDir + "/mythburn.log"))
+    {
+        LogViewer *viewer = new LogViewer(mainStack);
+        viewer->setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
+        if (viewer->Create())
+            mainStack->AddScreen(viewer);
+    }
+    else
+        showWarningDialog(QObject::tr("Cannot find any logs to show!"));
+}
+
+LogViewer::LogViewer(MythScreenStack *parent)
+          : MythScreenType(parent, "logviewer")
 {
     m_updateTime = gContext->GetNumSetting("LogViewerUpdateTime", DEFAULT_UPDATE_TIME);
-
-    Q3VBoxLayout *vbox = new Q3VBoxLayout(this, (int)(15 * wmult));
-    Q3HBoxLayout *hbox = new Q3HBoxLayout(vbox, (int)(0 * wmult));
-
-    // Window title
-    QString message = tr("Log Viewer");
-    QLabel *label = new QLabel(message, this);
-    QFont font = label->font();
-    font.setPointSize(int (font.pointSize() * 1.2));
-    font.setBold(true);
-    label->setFont(font);
-    label->setPaletteForegroundColor(QColor("yellow"));
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
-
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-    m_autoupdateCheck = new MythCheckBox( this );
-    m_autoupdateCheck->setBackgroundOrigin(WindowOrigin);
-    m_autoupdateCheck->setChecked(true);
-    m_autoupdateCheck->setText("Auto Update Frequency");
-    hbox->addWidget(m_autoupdateCheck);
-
-    m_updateTimeSpin = new MythSpinBox( this );
-    m_updateTimeSpin->setMinValue(1);
-    m_updateTimeSpin->setValue(m_updateTime);
-    hbox->addWidget(m_updateTimeSpin);
-
-    message = tr("Seconds");
-    label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    hbox->addWidget(label);
-
-    // listbox
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-
-    m_listbox = new MythListBox( this );
-    m_listbox->setBackgroundOrigin(WindowOrigin);
-    m_listbox->setEnabled(true);
-    font = m_listbox->font();
-    font.setPointSize(gContext->GetNumSetting("LogViewerFontSize", 13));
-    font.setBold(false);
-    m_listbox->setFont(font);
-    hbox->addWidget(m_listbox);
-
-
-    new Q3HBoxLayout(vbox, (int)(10 * wmult));
-
-    //  cancel Button
-    hbox = new Q3HBoxLayout(vbox, (int)(10 * wmult));
-
-    m_cancelButton = new MythPushButton( this, "cancel" );
-    m_cancelButton->setBackgroundOrigin(WindowOrigin);
-    m_cancelButton->setText( tr( "Cancel" ) );
-    m_cancelButton->setEnabled(true);
-
-    hbox->addWidget(m_cancelButton);
-
-    //  update Button
-    m_updateButton = new MythPushButton( this, "update" );
-    m_updateButton->setBackgroundOrigin(WindowOrigin);
-    m_updateButton->setText( tr( "Update" ) );
-    m_updateButton->setEnabled(true);
-    m_updateButton->setFocus();
-
-    hbox->addWidget(m_updateButton);
-
-    // exit button
-    m_exitButton = new MythPushButton( this, "exit" );
-    m_exitButton->setBackgroundOrigin(WindowOrigin);
-    m_exitButton->setText( tr( "Exit" ) );
-    m_exitButton->setEnabled(true);
-
-    hbox->addWidget(m_exitButton);
-
-    connect(m_exitButton, SIGNAL(clicked()), this, SLOT(reject()));
-    connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-    connect(m_updateButton, SIGNAL(clicked()), this, SLOT(updateClicked()));
-    connect(m_autoupdateCheck, SIGNAL(toggled(bool)), this, SLOT(toggleAutoUpdate(bool)));
-    connect(m_updateTimeSpin, SIGNAL(valueChanged(int)), 
-            this, SLOT(updateTimeChanged(int)));
-
     m_updateTimer = NULL;
-    m_updateTimer = new QTimer(this);
-    connect(m_updateTimer, SIGNAL(timeout()), SLOT(updateTimerTimeout()) );
-    m_updateTimer->start(500);
-
-    m_popupMenu = NULL;
+    m_autoUpdate = (gContext->GetNumSetting("LogViewerAutoUpdate", 1) == 1);
 }
 
 LogViewer::~LogViewer(void)
 {
     gContext->SaveSetting("LogViewerUpdateTime", m_updateTime);
-    gContext->SaveSetting("LogViewerFontSize", m_listbox->font().pointSize());
+    gContext->SaveSetting("LogViewerAutoUpdate", (m_autoUpdate ? "1" : "0"));
 
     if (m_updateTimer)
         delete m_updateTimer;
+}
+
+bool LogViewer::Create(void)
+{
+    bool foundtheme = false;
+
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("mytharchive-ui.xml", "logviewer", this);
+
+    if (!foundtheme)
+        return false;
+
+    try
+    {
+        m_logList = GetMythUIButtonList("loglist");
+        m_logText = GetMythUIText("logitem_text");
+        m_cancelButton = GetMythUIButton("cancel_button");
+        m_updateButton = GetMythUIButton("update_button");
+        m_exitButton = GetMythUIButton("exit_button");
+    }
+    catch (QString &error)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'logviewer'.\n\t\t\t"
+                               "Error was: " + error);
+        return false;
+    }
+
+    m_cancelButton->SetText(tr("Cancel"));
+    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelClicked()));
+
+    m_updateButton->SetText(tr("Update"));
+    connect(m_updateButton, SIGNAL(Clicked()), this, SLOT(updateClicked()));
+
+    m_exitButton->SetText(tr("Exit"));
+    connect(m_exitButton, SIGNAL(Clicked()), this, SLOT(Close()));
+
+    connect(m_logList, SIGNAL(itemSelected(MythUIButtonListItem*)),
+            this, SLOT(updateLogItem(MythUIButtonListItem*)));
+
+    m_updateTimer = NULL;
+    m_updateTimer = new QTimer(this);
+    connect(m_updateTimer, SIGNAL(timeout()), SLOT(updateTimerTimeout()) );
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+
+    SetFocusWidget(m_logList);
+
+    return true;
+}
+
+void LogViewer::Init(void)
+{
+    updateClicked();
+    if (m_logList->GetCount() > 0)
+        m_logList->SetItemCurrent(m_logList->GetCount() - 1);
+}
+
+bool LogViewer::keyPressEvent(QKeyEvent *event)
+{
+    if (GetFocusWidget()->keyPressEvent(event))
+         return true;
+
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Global", event, actions);
+
+    for (int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "MENU")
+            showMenu();
+        else
+            handled = false;
+    }
+
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
 void LogViewer::updateTimerTimeout()
@@ -135,37 +142,31 @@ void LogViewer::updateTimerTimeout()
     updateClicked();
 }
 
-void LogViewer::toggleAutoUpdate(bool checked)
+void LogViewer::toggleAutoUpdate(void)
 {
-    if (checked)
-    {
-        m_updateTimeSpin->setEnabled(true);
+    m_autoUpdate = ! m_autoUpdate;
+
+    if (m_autoUpdate)
         m_updateTimer->start(m_updateTime * 1000);
-    }
     else
-    {
-        m_updateTimeSpin->setEnabled(false);
         m_updateTimer->stop();
-    }
 }
 
-void LogViewer::updateTimeChanged(int value)
+void LogViewer::updateLogItem(MythUIButtonListItem *item)
 {
-    m_updateTime = value;
-    m_updateTimer->stop();
-    m_updateTimer->changeInterval(value * 1000);
+    if (item)
+        m_logText->SetText(item->text());
 }
 
 void LogViewer::cancelClicked(void)
 {
     QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
 
-    system("echo Cancel > " + tempDir + "/logs/mythburncancel.lck" );
+    QString command("echo Cancel > " + tempDir + "/logs/mythburncancel.lck");
+    system(qPrintable(command));
 
-    MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
-        QObject::tr("Myth Burn"),
-        QObject::tr("Background creation has been asked to stop.\n" 
-                                "This may take a few minutes."));
+    ShowOkPopup(QObject::tr("Background creation has been asked to stop.\n" 
+                            "This may take a few minutes."));
 }
 
 void LogViewer::updateClicked(void)
@@ -173,22 +174,30 @@ void LogViewer::updateClicked(void)
     m_updateTimer->stop();
 
     QStringList list;
-    loadFile(m_currentLog, list, m_listbox->count());
+    loadFile(m_currentLog, list, m_logList->GetCount());
 
-    if (list.count() > 0)
+    if (list.size() > 0)
     {
-        bool bUpdateCurrent = m_listbox->currentRow() ==
-            (int) m_listbox->count() - 1;
-        m_listbox->insertStringList(list);
+        bool bUpdateCurrent =
+                (m_logList->GetCount() == m_logList->GetCurrentPos() + 1) ||
+                (m_logList->GetCurrentPos() == 0);
+
+        for (int x = 0; x < list.size(); x++)
+            new MythUIButtonListItem(m_logList, list[x]);
+
         if (bUpdateCurrent)
-            m_listbox->setCurrentRow(m_listbox->count() - 1);
+            m_logList->SetItemCurrent(m_logList->GetCount() - 1);
     }
 
     bool bRunning = (getSetting("MythArchiveLastRunStatus") == "Running");
-    m_cancelButton->setEnabled(bRunning);
-    m_updateButton->setEnabled(bRunning);
 
-    if (m_autoupdateCheck->isChecked())
+    if (!bRunning)
+    {
+        m_cancelButton->SetEnabled(false);
+        m_updateButton->SetEnabled(false);
+    }
+
+    if (m_autoUpdate)
         m_updateTimer->start(m_updateTime * 1000);
 }
 
@@ -232,7 +241,7 @@ bool LogViewer::loadFile(QString filename, QStringList &list, int startline)
     if (file.open( QIODevice::ReadOnly ))
     {
         QString s;
-        Q3TextStream stream(&file);
+        QTextStream stream(&file);
 
          // ignore the first startline lines
         while ( !stream.atEnd() && startline > 0)
@@ -255,65 +264,6 @@ bool LogViewer::loadFile(QString filename, QStringList &list, int startline)
     return true;
 }
 
-void LogViewer::keyPressEvent(QKeyEvent *e)
-{
-    bool handled = false;
-    QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
-    {
-        for (int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            if (action == "1")
-            {
-                handled = true;
-                decreaseFontSize();
-            }
-            else if (action == "2")
-            {
-                handled = true;
-                increaseFontSize();
-            }
-            else if (action == "3")
-            {
-                handled = true;
-                showProgressLog();
-            }
-            else if (action == "4")
-            {
-                handled = true;
-                showFullLog();
-            }
-            else if (action == "MENU")
-            {
-                handled = true;
-                showMenu();
-            }
-        }
-    }
-
-    if (!handled)
-        MythDialog::keyPressEvent(e);
-}
-
-void LogViewer::increaseFontSize(void)
-{
-    closePopupMenu();
-
-    QFont font = m_listbox->font();
-    font.setPointSize(font.pointSize() + 1);
-    m_listbox->setFont(font);
-}
-
-void LogViewer::decreaseFontSize(void)
-{
-    closePopupMenu();
-
-    QFont font = m_listbox->font();
-    font.setPointSize(font.pointSize() - 1);
-    m_listbox->setFont(font);
-}
-
 void LogViewer::setFilenames(const QString &progressLog, const QString &fullLog)
 {
     m_progressLog = progressLog;
@@ -323,52 +273,34 @@ void LogViewer::setFilenames(const QString &progressLog, const QString &fullLog)
 
 void LogViewer::showProgressLog(void)
 {
-    closePopupMenu();
-
-    m_listbox->clear();
     m_currentLog = m_progressLog;
+    m_logList->Reset();
     updateClicked();
 }
 
 void LogViewer::showFullLog(void)
 {
-    closePopupMenu();
-
-    m_listbox->clear();
     m_currentLog = m_fullLog;
+    m_logList->Reset();
     updateClicked();
 }
 
 void LogViewer::showMenu()
 {
-    if (m_popupMenu)
-        return;
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = new MythDialogBox("Menu", popupStack, "actionmenu");
 
-    m_popupMenu = new MythPopupBox(gContext->GetMainWindow(),
-                                      "logviewer menu");
+    if (menuPopup->Create())
+        popupStack->AddScreen(menuPopup);
 
-    QAbstractButton *button = m_popupMenu->addButton(tr("Increase Font Size"), this,
-            SLOT(increaseFontSize()));
+    menuPopup->SetReturnEvent(this, "action");
 
-    m_popupMenu->addButton(tr("Decrease Font Size"), this,
-                              SLOT(decreaseFontSize()));
+    if (m_autoUpdate)
+        menuPopup->AddButton(tr("Don't Auto Update"), SLOT(toggleAutoUpdate()));
+    else
+        menuPopup->AddButton(tr("Auto Update"), SLOT(toggleAutoUpdate()));
 
-    m_popupMenu->addButton(tr("Show Progress Log"), this,
-                              SLOT(showProgressLog()));
-    m_popupMenu->addButton(tr("Show Full Log"), this,
-                           SLOT(showFullLog()));
-    m_popupMenu->addButton(tr("Cancel"), this,
-                           SLOT(closePopupMenu()));
-    m_popupMenu->ShowPopup(this, SLOT(closePopupMenu()));
-
-    button->setFocus();
-}
-
-void LogViewer::closePopupMenu()
-{
-    if (!m_popupMenu)
-        return;
-
-    m_popupMenu->deleteLater();
-    m_popupMenu = NULL;
+    menuPopup->AddButton(tr("Show Progress Log"), SLOT(showProgressLog()));
+    menuPopup->AddButton(tr("Show Full Log"), SLOT(showFullLog()));
+    menuPopup->AddButton(tr("Cancel"), NULL);
 }

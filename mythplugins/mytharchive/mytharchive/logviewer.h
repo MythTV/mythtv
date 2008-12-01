@@ -2,41 +2,47 @@
 #define LOGVIEWER_H_
 
 // qt
-#include <qlayout.h>
-#include <qvariant.h>
+#include <QTimer>
 
 // myth
-#include <mythtv/mythwidgets.h>
-#include <mythtv/mythdialogs.h>
+#include <libmythui/mythscreentype.h>
 
+class MythUIButton;
+class MythUIButtonList;
+class MythUIText;
 
-class LogViewer : public MythDialog
+void showLogViewer(void);
+
+class LogViewer : public MythScreenType
 {
-    Q_OBJECT
+  Q_OBJECT
+
   public:
 
-    LogViewer(MythMainWindow *parent, const char *name = 0);
+    LogViewer(MythScreenStack *parent);
    ~LogViewer(void);
+
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *e);
+
     void setFilenames(const QString &progressLog, const QString &fullLog);
 
   protected slots:
     void cancelClicked(void);
     void updateClicked(void);
     void updateTimerTimeout(void);
-    void updateTimeChanged(int value);
-    void toggleAutoUpdate(bool checked);  
+    void toggleAutoUpdate(void);
     bool loadFile(QString filename, QStringList &list, int startline);
-    void keyPressEvent(QKeyEvent *e);
-    void increaseFontSize(void);
-    void decreaseFontSize(void);
     void showProgressLog(void);
     void showFullLog(void);
     void showMenu(void);
-    void closePopupMenu(void);
+    void updateLogItem(MythUIButtonListItem *item);
 
   private:
+    void Init(void);
     QString getSetting(const QString &key);
 
+    bool                m_autoUpdate;
     int                 m_updateTime;
     QTimer             *m_updateTimer;
 
@@ -44,15 +50,12 @@ class LogViewer : public MythDialog
     QString             m_progressLog;
     QString             m_fullLog;
 
-    MythPushButton     *m_exitButton;
-    MythPushButton     *m_cancelButton;
-    MythPushButton     *m_updateButton;
+    MythUIButtonList   *m_logList;
+    MythUIText         *m_logText;
 
-    MythSpinBox        *m_updateTimeSpin;
-    MythCheckBox       *m_autoupdateCheck;
-    MythListBox        *m_listbox;
-
-    MythPopupBox       *m_popupMenu;
+    MythUIButton       *m_exitButton;
+    MythUIButton       *m_cancelButton;
+    MythUIButton       *m_updateButton;
 };
 
 #endif

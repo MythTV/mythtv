@@ -29,6 +29,7 @@
 #include "archiveutil.h"
 #include "recordingselector.h"
 #include "videoselector.h"
+#include "logviewer.h"
 
 ExportNative::ExportNative(MythScreenStack *parent, MythScreenType *previousScreen,
                            ArchiveDestination archiveDestination, QString name)
@@ -480,6 +481,10 @@ void ExportNative::runScript()
     {
         ShowOkPopup(QObject::tr("It was not possible to create the DVD. "
                                 "An error occured when running the scripts") );
+    }
+    else
+    {
+        showLogViewer();
     }
 }
 

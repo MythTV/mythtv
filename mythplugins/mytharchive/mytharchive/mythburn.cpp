@@ -34,6 +34,7 @@
 #include "thumbfinder.h"
 #include "recordingselector.h"
 #include "videoselector.h"
+#include "logviewer.h"
 
 MythBurn::MythBurn(MythScreenStack *parent,
                    MythScreenType *destinationScreen, MythScreenType *themeScreen,
@@ -858,6 +859,11 @@ void MythBurn::runScript()
     {
         ShowOkPopup(tr("It was not possible to create the DVD. "
                        " An error occured when running the scripts"));
+    }
+    else
+    {
+        // now show the log viewer
+        showLogViewer();
     }
 
     m_destinationScreen->Close();

@@ -454,4 +454,55 @@ Common MythArchive window definitions
 
     </window>
 
+    <window name="logviewer">
+
+        <font name="title" from="basesmall">
+            <color>#ffff00</color>
+            <dropcolor>#000000</dropcolor>
+            <size>24</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
+
+        <textarea name="title1" from="basetextarea">
+            <area>0,10,800,50</area>
+            <font>title</font>
+            <align>center</align>
+            <value>Log Viewer</value>
+        </textarea>
+
+        <imagetype name="logbgimage">
+            <area>20,55,770,450</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
+
+        <buttonlist name="loglist" from="basebuttonlist">
+            <area>35,70,730,370</area>
+        </buttonlist>
+
+        <imagetype name="itembgimage">
+            <area>20,450,770,100</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
+
+        <textarea name="logitem_text" from="basetextarea">
+            <area>35,455,730,90</area>
+            <value></value>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <button name="cancel_button" from="basebutton">
+            <position>35,550</position>
+        </button>
+
+        <button name="update_button" from="basebutton">
+            <position>320,550</position>
+        </button>
+
+        <button name="exit_button" from="basebutton">
+            <position>610,550</position>
+        </button>
+
+    </window>
+
 </mythuitheme>

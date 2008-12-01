@@ -104,6 +104,7 @@ void runCreateDVD(void)
 {
     QString commandline;
     QString tempDir = getTempDirectory(true);
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     if (tempDir == "")
         return;
@@ -117,32 +118,22 @@ void runCreateDVD(void)
     if (checkLockFile(logDir + "/mythburn.lck"))
     {
         // a job is already running so just show the log viewer
-        LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-        dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
-        dialog.exec();
+        showLogViewer();
         return;
     }
 
     // show the select destination dialog
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-
     SelectDestination *dest = new SelectDestination(mainStack, false, "SelectDestination");
 
     if (dest->Create())
         mainStack->AddScreen(dest);
-
-    return;
-
-    // now show the log viewer
-    LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-    dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
-    dialog.exec();
 }
 
 void runCreateArchive(void)
 {
     QString commandline;
     QString tempDir = getTempDirectory(true);
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     if (tempDir == "")
         return;
@@ -156,26 +147,15 @@ void runCreateArchive(void)
     if (checkLockFile(logDir + "/mythburn.lck"))
     {
         // a job is already running so just show the log viewer
-        LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-        dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
-        dialog.exec();
+        showLogViewer();
         return;
     }
 
     // show the select destination dialog
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-
     SelectDestination *dest = new SelectDestination(mainStack, true, "SelectDestination");
 
     if (dest->Create())
         mainStack->AddScreen(dest);
-
-    return;
-
-    // now show the log viewer
-    LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-    dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
-    dialog.exec();
 }
 
 void runEncodeVideo(void)
@@ -199,9 +179,7 @@ void runImportVideo(void)
     if (checkLockFile(logDir + "/mythburn.lck"))
     {
         // a job is already running so just show the log viewer
-        LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-        dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
-        dialog.exec();
+        showLogViewer();
         return;
     }
 
@@ -215,29 +193,12 @@ void runImportVideo(void)
         return;
 
     // now show the log viewer
-    LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-    dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
-    dialog.exec();
+    showLogViewer();
 }
 
 void runShowLog(void)
 {
-    QString tempDir = getTempDirectory(true);
-
-    if (tempDir == "")
-        return;
-
-    QString logDir = tempDir + "logs";
-
-    // do any logs exist?
-    if (QFile::exists(logDir + "/progress.log") || QFile::exists(logDir + "/mythburn.log"))
-    {
-        LogViewer dialog(gContext->GetMainWindow(), "logviewer");
-        dialog.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
-        dialog.exec();
-    }
-    else
-        showWarningDialog(QObject::tr("Cannot find any logs to show!"));
+    showLogViewer();
 }
 
 void runTestDVD(void)
@@ -338,9 +299,7 @@ void runBurnDVD(void)
     }
 
     // now show the log viewer
-    LogViewer logViewer(gContext->GetMainWindow(), "logviewer");
-    logViewer.setFilenames(logDir + "/progress.log", logDir + "/mythburn.log");
-    logViewer.exec();
+    showLogViewer();
 }
 
 void ArchiveCallback(void *data, QString &selection)
