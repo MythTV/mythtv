@@ -1483,9 +1483,8 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
         ret = (MythCodecID)(kCodec_MPEG1_VDPAU + (stream_type-1));
 #endif // USING_VDPAU
 
-#endif // defined(USING_XVMC) || defined(USING_VDPAU)
-
     return ret;
+#endif // defined(USING_XVMC) || defined(USING_VDPAU)
 }
 
 bool VideoOutputXv::InitOSD(const QString &osd_renderer)
