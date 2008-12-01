@@ -492,8 +492,6 @@ void RecordingSelector::updateSelectedList()
     if (!m_recordingList)
         return;
 
-    while (!m_selectedList.isEmpty())
-         delete m_selectedList.takeFirst();
     m_selectedList.clear();
 
     ProgramInfo *p;

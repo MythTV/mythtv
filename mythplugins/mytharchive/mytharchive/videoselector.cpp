@@ -494,30 +494,21 @@ void VideoSelector::updateSelectedList()
     if (!m_videoList)
         return;
 
-    while (!m_selectedList.isEmpty())
-         delete m_selectedList.takeFirst();
     m_selectedList.clear();
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT filename FROM archiveitems WHERE type = 'Video'");
-    query.exec();
-    if (query.isActive() && query.size())
+    ArchiveItem *a;
+    VideoInfo *v;
+    for (int x = 0; x < m_archiveList->size(); x++)
     {
-        while (query.next())
+        a = m_archiveList->at(x);
+        for (uint y = 0; y < m_videoList->size(); y++)
         {
-            QString filename = query.value(0).toString();
-
-            VideoInfo *v;
-            vector<VideoInfo *>::iterator i = m_videoList->begin();
-            for ( ; i != m_videoList->end(); i++)
+            v = m_videoList->at(y);
+            if (v->filename == a->filename)
             {
-                v = *i;
-                if (v->filename == filename)
-                {
-                    if (m_selectedList.indexOf(v) == -1)
-                        m_selectedList.append(v);
-                    break;
-                }
+                if (m_selectedList.indexOf(v) == -1)
+                    m_selectedList.append(v);
+                break;
             }
         }
     }
