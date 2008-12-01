@@ -86,7 +86,6 @@ class MythBurn : public MythScreenType
     void saveConfiguration(void);
     EncoderProfile *getProfileFromName(const QString &profileName);
     QString loadFile(const QString &filename);
-    bool doRemoveArchiveItem(const QString &filename);
     bool isArchiveItemValid(const QString &type, const QString &filename);
     void loadEncoderProfiles(void);
     EncoderProfile *getDefaultProfile(ArchiveItem *item);

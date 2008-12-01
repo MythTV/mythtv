@@ -441,7 +441,6 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
             return true;
         else
         {
-            doRemoveArchiveItem(filename);
             VERBOSE(VB_IMPORTANT, QString("MythArchive: Recording not found (%1)").arg(filename));
         }
     }
@@ -455,7 +454,6 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
             return true;
         else
         {
-            doRemoveArchiveItem(filename);
             VERBOSE(VB_IMPORTANT, QString("MythArchive: Video not found (%1)").arg(filename));
         }
     }
@@ -465,7 +463,6 @@ bool MythBurn::isArchiveItemValid(const QString &type, const QString &filename)
             return true;
         else
         {
-            doRemoveArchiveItem(filename);
             VERBOSE(VB_IMPORTANT, QString("MythArchive: File not found (%1)").arg(filename));
         }
     }
