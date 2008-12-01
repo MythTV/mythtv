@@ -80,7 +80,7 @@
                     <gradient start="#505050" end="#000000" alpha="200" />
                 </imagetype>
                 <textarea name="buttontext">
-                    <area>5,0,85%,30</area>
+                    <area>5,0,90%,30</area>
                     <font>basesmall</font>
                     <cutdown>yes</cutdown>
                     <align>left,vcenter</align>
@@ -123,7 +123,7 @@
             </state>
         </statetype>
         <statetype name="upscrollarrow">
-            <position>10,97%</position>
+            <position>10,96%</position>
             <state type="off">
                 <imagetype name="upon">
                     <filename>lb-uparrow-reg.png</filename>
@@ -136,7 +136,7 @@
             </state>
         </statetype>
         <statetype name="downscrollarrow">
-            <position>40,97%</position>
+            <position>40,96%</position>
             <state type="off">
                 <imagetype name="dnon">
                     <filename>lb-dnarrow-reg.png</filename>
