@@ -1999,14 +1999,13 @@ check_deps $ARCH_EXT_LIST
 if ! enabled cpu_override && enabled proc_opt; then
 # first try to tune based on processor info
 # EM64T era Intel Xeon
-   if expr "$processor" : ".*Intel(R) Xeon(R) CPU.*5110" > /dev/null ; then
+   if expr "$processor" : ".*Intel(R) Xeon(R) CPU.*51[1-6][08]" > /dev/null ; then
        cpu="core2"
-   elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*5160" > /dev/null ; then
+   elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*546[0-9][025]" > /dev/null ; then
        cpu="core2"
-   elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*5462" > /dev/null ; then
+   elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*33[2567]0" > /dev/null ; then
        cpu="core2"
-   elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*3360" > /dev/null ; then
-       cpu="core2"
+   elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*X32[123]0" > /dev/null ; then
 # Various Intel Duo processors (EMT64T capable)
    elif expr "$processor" : ".*Intel(R).*Core(TM)2.*CPU" > /dev/null ; then
        cpu="core2"
