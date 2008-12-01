@@ -36,7 +36,7 @@ static bool performActualUpdate(const QString updates[], QString version,
     {
         query.exec(thequery);
 
-        if (query.lastError().type() != QSqlError::None)
+        if (query.lastError().type() != QSqlError::NoError)
         {
             QString msg =
                 QString("DB Error (Performing database upgrade): \n"
@@ -121,8 +121,7 @@ bool InsertInDB(const QString &category,
     if (FindInDB(category, name))
         return false;
 
-    QString _url = url;
-    _url.stripWhiteSpace();
+    QString _url = url.trimmed();
     if (!_url.startsWith("http://") && !_url.startsWith("https://") &&
             !_url.startsWith("file:/"))
         _url.prepend("http://");

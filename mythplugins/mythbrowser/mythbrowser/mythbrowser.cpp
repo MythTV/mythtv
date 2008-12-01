@@ -121,7 +121,9 @@ void MythBrowser::slotEnterURL(void)
 void MythBrowser::slotAddTab(const QString &url, bool doSwitch)
 {
     QString name = QString("browser%1").arg(m_browserList.size() + 1);
-    WebPage *page = new WebPage(this, m_browserList[0]->getBrowser()->GetArea(), name);
+    WebPage *page = new WebPage(
+        this, m_browserList[0]->getBrowser()->GetArea(),
+        name.toAscii().constData());
     page->getBrowser()->SetZoom(m_zoom);
 
     if (url != "")
@@ -304,8 +306,9 @@ void MythBrowser::slotIconChanged(void)
         if (item)
         {
             QPixmap pixmap = icon.pixmap(32, 32);
-            QImage image(pixmap);
-            image = image.smoothScale(32,32);
+            QImage image = pixmap.toImage();
+            image = image.scaled(
+                QSize(32,32), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
             MythImage *mimage = GetMythPainter()->GetFormatImage();
             mimage->Assign(image);
 

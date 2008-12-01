@@ -111,8 +111,9 @@ void WebPage::slotIconChanged(void)
         if (m_listItem)
         {
             QPixmap pixmap = icon.pixmap(32, 32);
-            QImage image(pixmap);
-            image = image.smoothScale(32,32);
+            QImage image = pixmap.toImage();
+            image = image.scaled(
+                QSize(32,32), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
             MythImage *mimage = GetMythPainter()->GetFormatImage();
             mimage->Assign(image);
 
