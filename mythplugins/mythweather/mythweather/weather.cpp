@@ -270,7 +270,7 @@ void Weather::showScreen(WeatherScreen *ws)
 
     m_currScreen = ws;
     m_weatherStack->AddScreen(m_currScreen, false);
-    m_headerText->SetText(m_currScreen->name());
+    m_headerText->SetText(m_currScreen->objectName());
     m_updatedText->SetText(m_currScreen->getValue("updatetime"));
 }
 
@@ -359,5 +359,5 @@ void Weather::nextpage_timeout()
     else
         VERBOSE(VB_GENERAL, "Next screen not ready");
 
-    m_nextpage_Timer->changeInterval((int)(1000 * m_nextpageInterval));
+    m_nextpage_Timer->start((int)(1000 * m_nextpageInterval));
 }

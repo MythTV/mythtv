@@ -3,6 +3,7 @@
 
 // QT headers
 #include <QApplication>
+#include <QDir>
 
 // MythTV headers
 #include <mythtv/lcddevice.h>

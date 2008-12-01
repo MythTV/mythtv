@@ -47,13 +47,12 @@ bool SourceManager::findScriptsDB()
 
     while (db.next())
     {
-        QFileInfo *fi = new QFileInfo(db.value(4).toString());
+        QFileInfo fi(db.value(4).toString());
 
-        if (!fi->isExecutable())
+        if (!fi.isExecutable())
         {
             // scripts will be deleted from db in the more robust (i.e. slower)
             // findScripts() -- run when entering setup
-            delete fi;
             continue;
         }
         ScriptInfo *si = new ScriptInfo;
@@ -61,11 +60,11 @@ bool SourceManager::findScriptsDB()
         si->name = db.value(1).toString();
         si->updateTimeout = db.value(2).toUInt() * 1000;
         si->scriptTimeout = db.value(3).toUInt() * 1000;
-        si->file = fi;
+        si->fileInfo = fi;
         si->author = db.value(5).toString();
         si->version = db.value(6).toString();
         si->email = db.value(7).toString();
-        si->types = QStringList::split(",", db.value(8).toString());
+        si->types = db.value(8).toString().split(",");
         m_scripts.append(si);
     }
 
@@ -111,7 +110,9 @@ bool SourceManager::findScripts()
         if (!fi.isExecutable())
         {
             toRemove << db.value(0).toString();
-            VERBOSE(VB_GENERAL,  fi.absFilePath() + " No longer exists");
+            VERBOSE(VB_IMPORTANT, 
+                    QString("'%1' no longer exists")
+                    .arg(fi.absoluteFilePath()));
         }
     }
 
@@ -380,11 +381,13 @@ void SourceManager::recurseDirs( QDir dir )
 
         if (file.isExecutable() && !(file.isDir()))
         {
-            ScriptInfo *info = WeatherSource::probeScript(file);
+            ScriptInfo *info = WeatherSource::ProbeScript(file);
             if (info)
             {
                 m_scripts.append(info);
-                VERBOSE(VB_GENERAL, "found script " + file.absFilePath());
+                VERBOSE(VB_FILE, 
+                        QString("Found Script '%1'")
+                        .arg(file.absoluteFilePath()));
             }
         }
     }

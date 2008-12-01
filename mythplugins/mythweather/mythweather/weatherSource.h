@@ -1,30 +1,30 @@
 #ifndef __WEATHER_SOURCE_H__
 #define __WEATHER_SOURCE_H__
 
-#include <QString>
 #include <QStringList>
 #include <QObject>
 #include <QTimer>
-
-#include <q3process.h>
+#include <QProcess>
+#include <QFileInfo>
 
 // MythWeather headers
 #include "weatherUtils.h"
 
-class QFileInfo;
+class Q3Process;
 class WeatherScreen;
 
 /*
  * Instance indpendent information about a script
  */
-struct ScriptInfo
+class ScriptInfo
 {
+  public:
     QString name;
     QString version;
     QString author;
     QString email;
     QStringList types;
-    QFileInfo *file;
+    QFileInfo fileInfo;
     unsigned int scriptTimeout;
     unsigned int updateTimeout;
     int id;
@@ -35,12 +35,16 @@ class WeatherSource : public QObject
     Q_OBJECT
 
   public:
-    static ScriptInfo *probeScript(const QFileInfo &fi);
-    static QStringList probeTypes(Q3Process *proc);
-    static bool probeTimeouts(Q3Process *proc, uint &updateTimeout,
-                              uint &scriptTimeout);
-    static bool probeInfo(Q3Process *proc, QString &name, QString &version,
-                              QString &author, QString &email);
+    static ScriptInfo *ProbeScript(const QFileInfo &fi);
+    static QStringList ProbeTypes(QString    workingDirectory,
+                                  QString    program);
+    static bool ProbeTimeouts(QString        workingDirectory,
+                              QString        program,
+                              uint          &updateTimeout,
+                              uint          &scriptTimeout);
+    static bool ProbeInfo(QString            workingDirectory,
+                          QString            program,
+                          struct ScriptInfo &scriptInfo);
 
     WeatherSource(ScriptInfo *info);
     WeatherSource(const QString &filename);
@@ -58,7 +62,7 @@ class WeatherSource : public QObject
     QString getLocale() { return m_locale; }
 
     void startUpdate();
-    bool isRunning() { return m_proc->isRunning(); }
+    bool isRunning(void) const;
 
     int getScriptTimeout() { return m_info->scriptTimeout; }
     void setScriptTimeout(int timeout) { m_info->scriptTimeout = timeout; }

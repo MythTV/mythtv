@@ -99,7 +99,7 @@ void WeatherScreen::newData(QString loc, units_t units, DataMap data)
     DataMap::iterator itr = data.begin();
     while (itr != data.end())
     {
-        setValue(itr.key(), itr.data());
+        setValue(itr.key(), *itr);
         ++itr;
     }
 
@@ -219,7 +219,8 @@ ThreeDayForecastScreen::ThreeDayForecastScreen(MythScreenStack *parent,
 QString ThreeDayForecastScreen::prepareDataItem(const QString &key,
                                         const QString &value)
 {
-    if (key.contains("low",FALSE) || key.contains("high",FALSE) )
+    if (key.contains("low",  Qt::CaseInsensitive) ||
+        key.contains("high", Qt::CaseInsensitive) )
     {
        if ( (value == "NA") || (value == "N/A") )
           return value;
@@ -278,7 +279,8 @@ SixDayForecastScreen::SixDayForecastScreen(MythScreenStack *parent,
 QString SixDayForecastScreen::prepareDataItem(const QString &key,
                                         const QString &value)
 {
-    if (key.contains("low",FALSE) || key.contains("high",FALSE) )
+    if (key.contains("low",  Qt::CaseInsensitive) ||
+        key.contains("high", Qt::CaseInsensitive) )
     {
        if ( (value == "NA") || (value == "N/A") )
           return value;
@@ -312,14 +314,18 @@ QString StaticImageScreen::prepareDataItem(const QString &key,
          * /path/to/file-WIDTHxHEIGHT
          * if no dimension, scale to max size
          */
-        bool hasdim = (value.findRev('-') > value.findRev('/'));
+        bool hasdim = (value.lastIndexOf('-') > value.lastIndexOf('/'));
         if (hasdim)
         {
-            QStringList dim = QStringList::split('x',
-                    value.right(value.length() - value.findRev('-') - 1));
-            ret = value.left(value.findRev('-'));
-            m_imgsize.setWidth(dim[0].toInt());
-            m_imgsize.setHeight(dim[1].toInt());
+            QString tmp =
+                value.right(value.length() - value.lastIndexOf('-') - 1);
+            QStringList dim = tmp.split('x');
+            ret = value.left(value.lastIndexOf('-'));
+            if (dim.size() >= 2 && dim[0].toInt() && dim[1].toInt())
+            {
+                m_imgsize.setWidth(dim[0].toInt());
+                m_imgsize.setHeight(dim[1].toInt());
+            }
         }
     }
 
@@ -349,19 +355,23 @@ QString AnimatedImageScreen::prepareDataItem(const QString &key,
          * if no dimension, scale to max size
          */
 
-        bool hasdim = value.find(QRegExp("-[0-9]{1,}x[0-9]{1,}$"));
+        bool hasdim = value.indexOf(QRegExp("-[0-9]{1,}x[0-9]{1,}$"));
         if (hasdim)
         {
-            QStringList dim = QStringList::split('x',
-                    value.right(value.length() - value.findRev('-') - 1));
-            ret = value.left(value.findRev('-'));
-            m_imgsize.setWidth(dim[0].toInt());
-            m_imgsize.setHeight(dim[1].toInt());
+            QString tmp = value.right(
+                value.length() - value.lastIndexOf('-') - 1);
+            QStringList dim = tmp.split('x');
+            ret = value.left(value.lastIndexOf('-'));
+            if (dim.size() >= 2 && dim[0].toInt() && dim[1].toInt())
+            {
+                m_imgsize.setWidth(dim[0].toInt());
+                m_imgsize.setHeight(dim[1].toInt());
+            }
         }
 
-        QString cnt = ret.right(ret.length() - ret.findRev('-') - 1);
+        QString cnt = ret.right(ret.length() - ret.lastIndexOf('-') - 1);
         m_count = cnt.toInt();
-        ret = ret.left(ret.findRev('-'));
+        ret = ret.left(ret.lastIndexOf('-'));
     }
 
     return ret;

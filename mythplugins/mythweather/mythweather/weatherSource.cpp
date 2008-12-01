@@ -1,9 +1,11 @@
 #include <unistd.h>
 
 // QT headers
+#include <QDir>
 #include <QFile>
 #include <QTextStream>
 #include <QApplication>
+#include <q3process.h>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
@@ -15,139 +17,213 @@
 #include "weatherScreen.h"
 #include "weatherSource.h"
 
-QStringList WeatherSource::probeTypes(Q3Process *proc)
+QStringList WeatherSource::ProbeTypes(QString workingDirectory,
+                                      QString program)
 {
+    QStringList arguments("-t");
+    const QString loc_err =
+        QString("WeatherSource::ProbeTypes(%1 %2), Error: ")
+        .arg(program).arg(arguments.join(" "));
+
+    QProcess proc;
+    proc.setWorkingDirectory(workingDirectory);
+    proc.start(program, arguments);
+
     QStringList types;
-
-    proc->addArgument("-t");
-    if (!proc->start())
+    if (!proc.waitForStarted())
     {
-        VERBOSE(VB_IMPORTANT,
-                "cannot run script " + proc->arguments().join(" "));
-        return QStringList();
-    }
-    while (proc->isRunning())
-    {
-        qApp->processEvents();
-        usleep(250);
+        VERBOSE(VB_IMPORTANT, loc_err + "Cannot run script");
+        return types;
     }
 
-    if (!proc->normalExit() || proc->exitStatus())
-    {
-        VERBOSE(VB_IMPORTANT, "Error Running Script");
-        VERBOSE(VB_IMPORTANT, proc->readStderr());
-        return QStringList();
-    }
-    QString tempStr;
+    proc.waitForFinished();
 
-    while (proc->canReadLineStdout())
+    if (QProcess::NormalExit != proc.exitStatus())
     {
-        tempStr = proc->readLineStdout();
-        types << tempStr;
+        VERBOSE(VB_IMPORTANT, loc_err + "Script Crashed");
+        return types;
     }
 
-    if (types.size() == 0)
+    if (proc.exitCode())
     {
-        VERBOSE(VB_IMPORTANT, "invalid output from -t option");
-        return QStringList();
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Script Returned error %1")
+                .arg(proc.exitCode()));
+        VERBOSE(VB_IMPORTANT, proc.readAllStandardError());
+        return types;
     }
+
+    proc.setReadChannel(QProcess::StandardOutput);
+    while (proc.canReadLine())
+    {
+        QByteArray tmp = proc.readLine();
+
+        while (tmp.endsWith('\n') || tmp.endsWith('\r'))
+            tmp.chop(1);
+
+        if (!tmp.isEmpty())
+            types += QString(tmp);
+    }
+
+    if (types.empty())
+        VERBOSE(VB_IMPORTANT, loc_err + "Invalid output from -t option");
 
     return types;
 }
 
-bool WeatherSource::probeTimeouts(Q3Process *proc, uint &updateTimeout,
-                                  uint &scriptTimeout)
+bool WeatherSource::ProbeTimeouts(QString  workingDirectory,
+                                  QString  program,
+                                  uint    &updateTimeout,
+                                  uint    &scriptTimeout)
 {
-    proc->addArgument("-T");
-    updateTimeout = 0;
-    scriptTimeout = 0;
+    QStringList arguments("-T");
+    const QString loc_err =
+        QString("WeatherSource::ProbeTimeouts(%1 %2), Error: ")
+        .arg(program).arg(arguments.join(" "));
 
-    if (!proc->start())
+    updateTimeout = DEFAULT_UPDATE_TIMEOUT;
+    scriptTimeout = DEFAULT_SCRIPT_TIMEOUT;
+
+    QProcess proc;
+    proc.setWorkingDirectory(workingDirectory);
+    proc.start(program, arguments);
+
+    if (!proc.waitForStarted())
     {
-        VERBOSE(VB_IMPORTANT,
-                "cannot run script " + proc->arguments().join(" "));
+        VERBOSE(VB_IMPORTANT, loc_err + "Cannot run script");
         return false;
     }
 
-    while (proc->isRunning())
-    {
-        qApp->processEvents();
-        usleep(250);
-    }
+    proc.waitForFinished();
 
-    if (!proc->normalExit() || proc->exitStatus() )
+    if (QProcess::NormalExit != proc.exitStatus())
     {
-        VERBOSE(VB_IMPORTANT, "Error Running Script");
-        VERBOSE(VB_IMPORTANT, proc->readStderr());
+        VERBOSE(VB_IMPORTANT, loc_err + "Script Crashed");
         return false;
     }
 
-    if (!proc->canReadLineStdout())
+    if (proc.exitCode())
     {
-        VERBOSE(VB_IMPORTANT, "Invalid Script Output!");
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Script Returned error %1")
+                .arg(proc.exitCode()));
+        VERBOSE(VB_IMPORTANT, proc.readAllStandardError());
         return false;
     }
 
-    QStringList temp =
-            QStringList::split(',', QString(proc->readLineStdout()));
+    proc.setReadChannel(QProcess::StandardOutput);
+    QStringList lines;
+    while (proc.canReadLine())
+    {
+        QByteArray tmp = proc.readLine();
+
+        while (tmp.endsWith('\n') || tmp.endsWith('\r'))
+            tmp.chop(1);
+
+        if (!tmp.isEmpty())
+            lines += QString(tmp);
+    }
+
+    if (lines.empty())
+    {
+        VERBOSE(VB_IMPORTANT, loc_err + "Invalid Script Output! No Lines");
+        return false;
+    }
+
+    QStringList temp = lines[0].split(',');
     if (temp.size() != 2)
     {
-        VERBOSE(VB_IMPORTANT, "Invalid Script Output!");
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Invalid Script Output! '%1'").arg(lines[0]));
         return false;
     }
 
-    bool isOK = false;
-    uint i = temp[0].toUInt(&isOK);
-    updateTimeout = isOK ? i * 1000 : DEFAULT_UPDATE_TIMEOUT;
+    bool isOK[2];
+    uint ut = temp[0].toUInt(&isOK[0]);
+    uint st = temp[1].toUInt(&isOK[1]);
+    if (!isOK[0] || !isOK[1])
+    {
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Invalid Script Output! '%1'").arg(lines[0]));
+        return false;
+    }
 
-    i = temp[1].toUInt(&isOK);
-    scriptTimeout = isOK ? i * 1000 : DEFAULT_SCRIPT_TIMEOUT;
+    updateTimeout = ut * 1000;
+    scriptTimeout = st * 1000;
+
     return true;
 }
 
-bool WeatherSource::probeInfo(Q3Process *proc, QString &name, QString &version,
-                              QString &author, QString &email)
+bool WeatherSource::ProbeInfo(QString     workingDirectory,
+                              QString     program,
+                              ScriptInfo &info)
 {
-    /*
-     * -v -- name,version,author,email
-     */
-    proc->addArgument("-v");
-    if (!proc->start())
-    {
-        VERBOSE(VB_IMPORTANT,
-                "cannot run script " + proc->arguments().join(" "));
-        return false;
-    }
-    while (proc->isRunning())
-    {
-        qApp->processEvents();
-        usleep(250);
-    }
+    QStringList arguments("-v");
 
-    if (!proc->normalExit() || proc->exitStatus())
+    const QString loc_err =
+        QString("WeatherSource::ProbeInfo(%1 %2), Error: ")
+        .arg(program).arg(arguments.join(" "));
+
+    QProcess proc;
+    proc.setWorkingDirectory(workingDirectory);
+    proc.setReadChannel(QProcess::StandardOutput);
+    proc.start(program, arguments);
+
+    if (!proc.waitForStarted())
     {
-        VERBOSE(VB_IMPORTANT, "Error Running Script");
-        VERBOSE(VB_IMPORTANT, proc->readStderr());
+        VERBOSE(VB_IMPORTANT, loc_err + "Cannot run script");
         return false;
     }
 
-    if (!proc->canReadLineStdout())
+    proc.waitForFinished();
+
+    if (QProcess::NormalExit != proc.exitStatus())
     {
-        VERBOSE(VB_IMPORTANT, "Invalid Script Output!");
+        VERBOSE(VB_IMPORTANT, loc_err + "Script Crashed");
         return false;
     }
 
-    QStringList temp = QStringList::split(',', QString(proc->readLineStdout()));
+    if (proc.exitCode())
+    {
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Script Returned error %1")
+                .arg(proc.exitCode()));
+        VERBOSE(VB_IMPORTANT, proc.readAllStandardError());
+        return false;
+    }
+
+    proc.setReadChannel(QProcess::StandardOutput);
+    QStringList lines;
+    while (proc.canReadLine())
+    {
+        QByteArray tmp = proc.readLine();
+
+        while (tmp.endsWith('\n') || tmp.endsWith('\r'))
+            tmp.chop(1);
+
+        if (!tmp.isEmpty())
+            lines += QString(tmp);
+    }
+
+    if (lines.empty())
+    {
+        VERBOSE(VB_IMPORTANT, loc_err + "Invalid Script Output! No Lines");
+        return false;
+    }
+
+    QStringList temp = lines[0].split(',');
     if (temp.size() != 4)
     {
-       VERBOSE(VB_IMPORTANT, "Invalid Script Output!");
-       return false;
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Invalid Script Output! '%1'").arg(lines[0]));
+        return false;
     }
 
-    name = temp[0];
-    version = temp[1];
-    author = temp[2];
-    email = temp[3];
+    info.name    = temp[0];
+    info.version = temp[1];
+    info.author  = temp[2];
+    info.email   = temp[3];
+
     return true;
 }
 
@@ -161,27 +237,20 @@ bool WeatherSource::probeInfo(Q3Process *proc, QString &name, QString &version,
  * if the script is not in the database, we probe it for types and default
  * timeout values, and add it to the database
  */
-ScriptInfo *WeatherSource::probeScript(const QFileInfo &fi)
+ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
 {
     QStringList temp;
-    Q3Process *proc;
 
-    if (fi.isReadable() && fi.isExecutable())
-        proc = new Q3Process(fi.absFilePath());
-    else
-        return 0;
+    if (!fi.isReadable() || !fi.isExecutable())
+        return NULL;
 
-    proc->setWorkingDirectory(fi.dir(true));
-    ScriptInfo *info = new ScriptInfo;
-    info->file = new QFileInfo(fi);
-    if (!WeatherSource::probeInfo(proc, info->name, info->version, info->author,
-                info->email))
-    {
-        delete proc;
-        delete info->file;
-        delete info;
-        return 0;
-    }
+    QString workingDirectory = fi.absolutePath();
+    QString program          = fi.absoluteFilePath();
+
+    ScriptInfo info;
+    info.fileInfo = fi;
+    if (!WeatherSource::ProbeInfo(workingDirectory, program, info))
+        return NULL;
 
     MSqlQuery db(MSqlQuery::InitCon());
     QString query =
@@ -190,54 +259,57 @@ ScriptInfo *WeatherSource::probeScript(const QFileInfo &fi)
             "WHERE hostname = :HOST AND source_name = :NAME;";
     db.prepare(query);
     db.bindValue(":HOST", gContext->GetHostName());
-    db.bindValue(":NAME", info->name);
-    db.exec();
-    // the script exists in the db
-    if (db.size() == 1)
+    db.bindValue(":NAME", info.name);
+
+    if (!db.exec())
     {
-        db.next();
-        info->id = db.value(0).toInt();
-        info->updateTimeout = db.value(2).toUInt() * 1000;
-        info->scriptTimeout = db.value(3).toUInt() * 1000;
+        VERBOSE(VB_IMPORTANT, "Invalid response from database");
+        return NULL;
+    }
+
+    // the script exists in the db
+    if (db.next())
+    {
+        info.id            = db.value(0).toInt();
+        info.updateTimeout = db.value(2).toUInt() * 1000;
+        info.scriptTimeout = db.value(3).toUInt() * 1000;
 
         // compare versions, if equal... be happy
         QString dbver = db.value(6).toString();
-        if (dbver == info->version)
+        if (dbver == info.version)
         {
-            info->types = QStringList::split(",", db.value(8).toString());
+            info.types = db.value(8).toString().split(",");
         }
         else
         {
             // versions differ, change db to match script output
-            VERBOSE(VB_GENERAL, "New version of " + info->name + " found");
+            VERBOSE(VB_GENERAL, "New version of " + info.name + " found");
             query = "UPDATE weathersourcesettings SET source_name = :NAME, "
                 "path = :PATH, author = :AUTHOR, version = :VERSION, "
                 "email = :EMAIL, types = :TYPES WHERE sourceid = :ID";
             db.prepare(query);
             // these info values were populated when getting the version number
             // we leave the timeout values in
-            db.bindValue(":NAME", info->name);
-            db.bindValue(":PATH", info->file->absFilePath());
-            db.bindValue(":AUTHOR", info->author);
-            db.bindValue(":VERSION", info->version);
+            db.bindValue(":NAME", info.name);
+            db.bindValue(":PATH", info.fileInfo.absFilePath());
+            db.bindValue(":AUTHOR", info.author);
+            db.bindValue(":VERSION", info.version);
+
             // run the script to get supported data types
-            proc->clearArguments();
-            proc->addArgument(fi.absFilePath());
-            info->types = WeatherSource::probeTypes(proc);
-            db.bindValue(":TYPES", info->types.join(","));
-            db.bindValue(":ID", info->id);
-            db.bindValue(":EMAIL", info->email);
+            info.types = WeatherSource::ProbeTypes(
+                workingDirectory, program);
+
+            db.bindValue(":TYPES", info.types.join(","));
+            db.bindValue(":ID", info.id);
+            db.bindValue(":EMAIL", info.email);
             if (!db.exec())
             {
                 VERBOSE(VB_IMPORTANT, db.lastError().text());
-                delete proc;
-                delete info->file;
-                delete info;
-                return 0;
+                return NULL;
             }
         }
     }
-    else if (db.size() == 0)
+    else
     {
         // Script is not in db, probe it and insert it into db
         query = "INSERT INTO weathersourcesettings "
@@ -245,36 +317,29 @@ ScriptInfo *WeatherSource::probeScript(const QFileInfo &fi)
                 "path, author, version, email, types) "
                 "VALUES (:HOST, :NAME, :UPDATETO, :RETTO, :PATH, :AUTHOR, "
                 ":VERSION, :EMAIL, :TYPES);";
-        proc->clearArguments();
-        proc->addArgument(fi.absFilePath());
-        if (!WeatherSource::probeTimeouts(proc, info->updateTimeout,
-                                          info->scriptTimeout))
+
+        if (!WeatherSource::ProbeTimeouts(workingDirectory,
+                                          program,
+                                          info.updateTimeout,
+                                          info.scriptTimeout))
         {
-                delete proc;
-                delete info->file;
-                delete info;
-                return 0;
+            return NULL;
         }
         db.prepare(query);
-        db.bindValue(":NAME", info->name);
+        db.bindValue(":NAME", info.name);
         db.bindValue(":HOST", gContext->GetHostName());
-        db.bindValue(":UPDATETO", QString::number(info->updateTimeout / 1000));
-        db.bindValue(":RETTO", QString::number(info->scriptTimeout / 1000));
-        db.bindValue(":PATH", info->file->absFilePath());
-        db.bindValue(":AUTHOR", info->author);
-        db.bindValue(":VERSION", info->version);
-        db.bindValue(":EMAIL", info->email);
-        proc->clearArguments();
-        proc->addArgument(fi.absFilePath());
-        info->types = WeatherSource::probeTypes(proc);
-        db.bindValue(":TYPES", info->types.join(","));
+        db.bindValue(":UPDATETO", QString::number(info.updateTimeout / 1000));
+        db.bindValue(":RETTO", QString::number(info.scriptTimeout / 1000));
+        db.bindValue(":PATH", info.fileInfo.absFilePath());
+        db.bindValue(":AUTHOR", info.author);
+        db.bindValue(":VERSION", info.version);
+        db.bindValue(":EMAIL", info.email);
+        info.types = ProbeTypes(workingDirectory, program);
+        db.bindValue(":TYPES", info.types.join(","));
         if (!db.exec())
         {
             VERBOSE(VB_IMPORTANT, db.lastError().text());
-            delete proc;
-            delete info->file;
-            delete info;
-            return 0;
+            return NULL;
         }
         query = "SELECT sourceid FROM weathersourcesettings "
                 "WHERE source_name = :NAME AND hostname = :HOST;";
@@ -282,28 +347,17 @@ ScriptInfo *WeatherSource::probeScript(const QFileInfo &fi)
         // number, not sure if we really need it, but better safe than sorry.
         db.prepare(query);
         db.bindValue(":HOST", gContext->GetHostName());
-        db.bindValue(":NAME", info->name);
+        db.bindValue(":NAME", info.name);
         if (!db.exec())
         {
             VERBOSE(VB_IMPORTANT, db.lastError().text());
-            delete proc;
-            delete info->file;
-            delete info;
-            return 0;
+            return NULL;
         }
         db.next();
-        info->id = db.value(0).toInt();
+        info.id = db.value(0).toInt();
     }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, "Invalid response from database");
-        delete proc;
-        delete info->file;
-        delete info;
-        return 0;
-    }
-    delete proc;
-    return info;
+
+    return new ScriptInfo(info);
 }
 
 /*
@@ -313,11 +367,14 @@ ScriptInfo *WeatherSource::probeScript(const QFileInfo &fi)
 WeatherSource::WeatherSource(ScriptInfo *info)
     : m_ready(info ? true : false),    m_inuse(info ? true : false),
       m_info(info),
-      m_proc(info ? new Q3Process(info->file->absFilePath()) : NULL),
+      m_proc(NULL),
       m_locale(""),                    m_buffer(""),
       m_units(SI_UNITS),               m_scriptTimer(new QTimer(this)),
       m_updateTimer(new QTimer(this)), m_connectCnt(0)
 {
+    if (info)
+        m_proc = new Q3Process(info->fileInfo.absFilePath());
+
     QDir dir(GetConfDir());
     if (!dir.exists("MythWeather"))
         dir.mkdir("MythWeather");
@@ -333,9 +390,10 @@ WeatherSource::WeatherSource(ScriptInfo *info)
     connect( m_updateTimer, SIGNAL(timeout()),
             this, SLOT(updateTimeout()));
 
-    if (m_proc) {
-        m_proc->setWorkingDirectory(QDir(GetShareDir() +
-                                         "mythweather/scripts/"));
+    if (m_proc)
+    {
+        m_proc->setWorkingDirectory(
+             QDir(GetShareDir() + "mythweather/scripts/").absolutePath());
         connect(this, SIGNAL(killProcess()), m_proc, SLOT(kill()));
     }
 }
@@ -356,13 +414,13 @@ WeatherSource::WeatherSource(const QString &filename)
 
 
     const QFileInfo fi(filename);
-    m_info = WeatherSource::probeScript(fi);
+    m_info = ProbeScript(fi);
 
     if (m_info)
     {
         m_proc = new Q3Process(filename);
-        m_proc->setWorkingDirectory(QDir(GetShareDir() +
-                                         "mythweather/scripts/"));
+        m_proc->setWorkingDirectory(
+            QDir(GetShareDir() + "mythweather/scripts/").absolutePath());
         connect(this, SIGNAL(killProcess()),
                 m_proc, SLOT(kill()));
         m_ready = true;
@@ -401,8 +459,8 @@ QStringList WeatherSource::getLocationList(const QString &str)
     QStringList locs;
 
     m_proc->clearArguments();
-    m_proc->setWorkingDirectory(m_info->file->dir(true));
-    m_proc->addArgument(m_info->file->absFilePath());
+    m_proc->setWorkingDirectory(m_info->fileInfo.dir(true));
+    m_proc->addArgument(m_info->fileInfo.absFilePath());
     m_proc->addArgument("-l");
     m_proc->addArgument(str);
 
@@ -474,9 +532,9 @@ void WeatherSource::startUpdate()
 
     m_data.clear();
     m_proc->clearArguments();
-    m_proc->setWorkingDirectory(m_info->file->dir(true));
+    m_proc->setWorkingDirectory(m_info->fileInfo.dir(true));
     m_proc->addArgument("nice");
-    m_proc->addArgument(m_info->file->absFilePath());
+    m_proc->addArgument(m_info->fileInfo.absFilePath());
     m_proc->addArgument("-u");
     m_proc->addArgument(m_units == SI_UNITS ? "SI" : "ENG");
     if (!m_dir.isEmpty())
@@ -496,6 +554,11 @@ void WeatherSource::startUpdate()
     }
     else
         m_scriptTimer->start(m_info->scriptTimeout);
+}
+
+bool WeatherSource::isRunning(void) const
+{
+    return m_proc->isRunning();
 }
 
 void WeatherSource::updateTimeout()

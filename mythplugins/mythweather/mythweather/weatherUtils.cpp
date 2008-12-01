@@ -41,7 +41,7 @@ ScreenListMap loadScreens()
                 ScreenListInfo *screendef = new ScreenListInfo();
                 screendef->name = e.attribute("name");
                 QString hasUnits = e.attribute("hasunits");
-                if (hasUnits.lower() == "no")
+                if (hasUnits.toLower() == "no")
                     screendef->hasUnits = false;
                 else
                     screendef->hasUnits = true;

@@ -2,6 +2,8 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
+QT += sql xml qt3support
+
 TEMPLATE = lib
 CONFIG += plugin thread debug
 TARGET = mythweather
@@ -22,9 +24,5 @@ HEADERS += weather.h weatherSource.h sourceManager.h weatherScreen.h dbcheck.h
 HEADERS += weatherSetup.h weatherUtils.h
 SOURCES += main.cpp weather.cpp weatherSource.cpp sourceManager.cpp weatherScreen.cpp
 SOURCES += dbcheck.cpp weatherSetup.cpp weatherUtils.cpp
-
-
-#The following line was inserted by qt3to4
-QT += opengl sql xml qt3support
 
 include ( ../../libs-targetfix.pro )

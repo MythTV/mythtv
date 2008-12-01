@@ -763,7 +763,7 @@ bool SourceSetup::loadData()
         si->version = db.value(6).toString();
 
         MythUIButtonListItem *item =
-            new MythUIButtonListItem(m_sourceList, tr(si->name));
+            new MythUIButtonListItem(m_sourceList, si->name);
         item->setData(si);
     }
 
@@ -947,8 +947,9 @@ void LocationDialog::doSearch()
         QString name = si->name;
         for (int ii = 0; ii < results.size(); ++ii)
         {
-            QStringList tmp = QStringList::split("::", results[ii]);
-            MythUIButtonListItem *item = new MythUIButtonListItem(m_locationList, tmp[1]);
+            QStringList tmp = results[ii].split("::");
+            MythUIButtonListItem *item =
+                new MythUIButtonListItem(m_locationList, tmp[1]);
             ResultListInfo *ri = new ResultListInfo;
             ri->idstr = tmp[0];
             ri->src = si;

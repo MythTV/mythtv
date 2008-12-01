@@ -2,6 +2,7 @@
 #define _SOURCEMANAGER_H_
 
 // QT headers
+#include <QDir>
 #include <QObject>
 #include <QMultiMap>
 #include <QStringList>
