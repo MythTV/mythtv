@@ -1,9 +1,9 @@
 // -*- Mode: c++ -*-
 // Qt headers
-#include <qstring.h>
+#include <QString>
 
 // MythTV headers
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
 // MythControls headers
 #include "keygrabber.h"

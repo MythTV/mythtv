@@ -28,15 +28,13 @@
 
 // Qt headers
 #include <qnamespace.h>
-#include <qstringlist.h>
-#include <qapplication.h>
-#include <q3buttongroup.h>
-#include <q3deepcopy.h>
+#include <QStringList>
+#include <QApplication>
 #include <QKeyEvent>
 
 // MythTV headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/libmythui/mythmainwindow.h>
+#include <mythcontext.h>
+#include <mythmainwindow.h>
 
 // MythControls headers
 #include "mythcontrols.h"
@@ -44,9 +42,10 @@
 
 #define LOC QString("MythControls: ")
 #define LOC_ERR QString("MythControls, Error: ")
-#define CAPTION_CONTEXT QString("Contexts")
-#define CAPTION_ACTION QString("Actions")
-#define CAPTION_KEY QString("Keys")
+
+#define CAPTION_CONTEXT "Contexts"
+#define CAPTION_ACTION  "Actions"
+#define CAPTION_KEY     "Keys"
 
 /**
  *  \brief Creates a new MythControls wizard
@@ -60,8 +59,6 @@ MythControls::MythControls(MythScreenStack *parent, const char *name)
     m_leftList = m_rightList = NULL;
     m_description = m_leftDescription = m_rightDescription = NULL;
     m_bindings = NULL;
-
-    m_contexts.setAutoDelete(true);
 
     m_leftListType  = kContextList;
     m_rightListType = kActionList;
@@ -363,9 +360,11 @@ void MythControls::SetListContents(
     uilist->Reset();
 
     // add each new string
-    for (int i = 0; i < contents.size(); i++)
+    QStringList::const_iterator it = contents.begin();
+    for (; it != contents.end(); ++it)
     {
-        MythUIButtonListItem *item = new MythUIButtonListItem(uilist, contents[i]);
+        QString tmp = *it; tmp.detach();
+        MythUIButtonListItem *item = new MythUIButtonListItem(uilist, tmp);
         item->setDrawArrow(arrows);
     }
 }
@@ -378,22 +377,22 @@ void MythControls::UpdateRightList(void)
     // get the selected item in the right list.
     MythUIButtonListItem *item = m_leftList->GetItemCurrent();
 
-    if (item)
-    {
-        QString rtstr = item->text();
+    if (!item)
+        return;
 
-        switch(m_currentView)
-        {
-        case kActionsByContext:
-            SetListContents(m_rightList, *(m_contexts[rtstr]));
-            break;
-        case kKeysByContext:
-            SetListContents(m_rightList, m_bindings->GetContextKeys(rtstr));
-            break;
-        case kContextsByKey:
-            SetListContents(m_rightList, m_bindings->GetKeyContexts(rtstr));
-            break;
-        }
+    QString rtstr = item->text();
+
+    switch(m_currentView)
+    {
+    case kActionsByContext:
+        SetListContents(m_rightList, m_contexts[rtstr]);
+        break;
+    case kKeysByContext:
+        SetListContents(m_rightList, m_bindings->GetContextKeys(rtstr));
+        break;
+    case kContextsByKey:
+        SetListContents(m_rightList, m_bindings->GetKeyContexts(rtstr));
+        break;
     }
 }
 
@@ -443,7 +442,7 @@ QString MythControls::GetCurrentContext(void)
         return QString::null;
 
     QString desc = m_rightList->GetItemCurrent()->text();
-    int loc = desc.find(" => ");
+    int loc = desc.indexOf(" => ");
     if (loc == -1)
         return QString::null; // Should not happen
 
@@ -465,7 +464,11 @@ QString MythControls::GetCurrentAction(void)
     if (m_leftListType == kActionList)
     {
         if (m_leftList && m_leftList->GetItemCurrent())
-            return Q3DeepCopy<QString>(m_leftList->GetItemCurrent()->text());
+        {
+            QString tmp = m_leftList->GetItemCurrent()->text();
+            tmp.detach();
+            return tmp;
+        }
         return QString::null;
     }
 
@@ -476,10 +479,14 @@ QString MythControls::GetCurrentAction(void)
         return QString::null;
 
     QString desc = m_rightList->GetItemCurrent()->text();
-    if (m_leftListType == kContextList && m_rightListType == kActionList)
-        return Q3DeepCopy<QString>(desc);
+    if (kContextList == m_leftListType &&
+        kActionList  == m_rightListType)
+    {
+        desc.detach();
+        return desc;
+    }
 
-    int loc = desc.find(" => ");
+    int loc = desc.indexOf(" => ");
     if (loc == -1)
         return QString::null; // should not happen..
 
@@ -539,7 +546,7 @@ QString MythControls::GetCurrentKey(void)
     }
 
     QString desc = m_rightList->GetItemCurrent()->text();
-    int loc = desc.find(" => ");
+    int loc = desc.indexOf(" => ");
     if (loc == -1)
         return QString::null; // Should not happen
 
@@ -562,19 +569,21 @@ void MythControls::LoadData(const QString &hostname)
 
     /* Alphabetic order, but jump and global at the top  */
     m_sortedContexts.sort();
-    m_sortedContexts.remove(ActionSet::kJumpContext);
-    m_sortedContexts.remove(ActionSet::kGlobalContext);
+    m_sortedContexts.removeAll(ActionSet::kJumpContext);
+    m_sortedContexts.removeAll(ActionSet::kGlobalContext);
     m_sortedContexts.insert(m_sortedContexts.begin(),
                             ActionSet::kGlobalContext);
     m_sortedContexts.insert(m_sortedContexts.begin(),
                             ActionSet::kJumpContext);
 
-    QStringList actions;
-    for (int i = 0; i < m_sortedContexts.size(); i++)
+    QStringList::const_iterator it = m_sortedContexts.begin();
+    for (; it != m_sortedContexts.end(); ++it)
     {
-        actions = m_bindings->GetActions(m_sortedContexts[i]);
+        QString ctx_name = *it;
+        ctx_name.detach();
+        QStringList actions = m_bindings->GetActions(ctx_name);
         actions.sort();
-        m_contexts.insert(m_sortedContexts[i], new QStringList(actions));
+        m_contexts.insert(ctx_name, actions);
     }
 }
 

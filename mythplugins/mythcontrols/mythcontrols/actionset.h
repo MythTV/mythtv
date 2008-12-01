@@ -25,9 +25,9 @@
 #define ACTIONSET_H
 
 // Qt headers
-#include <qstringlist.h>
-#include <qmap.h>
-#include <q3dict.h>
+#include <QStringList>
+#include <QHash>
+#include <QMap>
 
 /** \class ActionSet
  *  \brief Maintains consistancy between actions and keybindings.
@@ -39,6 +39,7 @@ class ActionSet
   public:
     /// \brief Create a new, empty set of action bindings.
     ActionSet() {}
+    ~ActionSet();
 
     // Commands
     bool AddAction(const ActionID &id,
@@ -61,10 +62,8 @@ class ActionSet
     QStringList GetContextKeys(const QString &context_name) const;
     QStringList GetAllKeys(void) const;
     QString     GetDescription(const ActionID &id) const;
-    const ActionList GetActions(const QString &key) const;
-    /// \brief Returns the appropriate container of modified actions
-    ///        based on current context. (result not thread-safe)
-    const ActionList &GetModified(void) const { return m_modified; }
+    ActionList  GetActions(const QString &key) const;
+    ActionList  GetModified(void) const;
     /// \brief Returns true iff changes have been made.
     bool HasModified(void) const { return !m_modified.isEmpty(); }
     /// \brief Returns true iff the action is modified.
@@ -72,8 +71,7 @@ class ActionSet
         { return m_modified.contains(id); }
 
   protected:
-    Action *GetAction(const ActionID &id) const;
-    Context *GetContext(const QString &name) const;
+    Action *GetAction(const ActionID &id);
 
   public:
     /// \brief The statically assigned context for jump point actions.
@@ -83,7 +81,8 @@ class ActionSet
 
   private:
     QMap<QString, ActionList> m_keyToActionMap;
-    Q3Dict<Context>            m_contexts;
+    typedef QHash<QString, Context> ContextMap;
+    ContextMap                m_contexts;
     ActionList                m_modified;
 };
 

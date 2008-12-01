@@ -21,13 +21,8 @@
  * 02111-1307, USA
  */
 
-// Qt headers
-#include <qmap.h>
-#include <q3dict.h>
-#include <q3valuelist.h>
-
 // MythTV headers
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
 // MythContext headers
 #include "action.h"
@@ -36,6 +31,20 @@
 
 const QString ActionSet::kJumpContext   = "JumpPoints";
 const QString ActionSet::kGlobalContext = "Global";
+
+ActionSet::~ActionSet()
+{
+    while (!m_contexts.empty())
+    {
+        Context &ctx = *m_contexts.begin();
+        while (!ctx.empty())
+        {
+            delete *ctx.begin();
+            ctx.erase(ctx.begin());
+        }
+        m_contexts.erase(m_contexts.begin());
+    }
+}
 
 /** \fn ActionSet::Add(const ActionID&, const QString&)
  *  \brief Add a binding.
@@ -89,7 +98,7 @@ bool ActionSet::Remove(const ActionID &id, const QString &key)
     if (!a->RemoveKey(key))
         return false;
 
-    m_keyToActionMap[key].remove(id);
+    m_keyToActionMap[key].removeAll(id);
 
     // remove the key if there isn't anything bound to it.
     if (m_keyToActionMap[key].isEmpty())
@@ -122,7 +131,7 @@ bool ActionSet::Replace(const ActionID &id,
     if (!a->ReplaceKey(newkey, oldkey))
         return false;
 
-    m_keyToActionMap[oldkey].remove(id);
+    m_keyToActionMap[oldkey].removeAll(id);
     m_keyToActionMap[newkey].push_back(id);
     SetModifiedFlag(id, true);
 
@@ -136,7 +145,7 @@ bool ActionSet::Replace(const ActionID &id,
 bool ActionSet::SetModifiedFlag(const ActionID &id, bool modified)
 {
     if (!modified)
-        return (m_modified.remove(id) > 0);
+        return m_modified.removeAll(id);
 
     if (!IsModified(id))
     {
@@ -149,40 +158,40 @@ bool ActionSet::SetModifiedFlag(const ActionID &id, bool modified)
 
 /** \fn ActionSet::GetContextStrings(void) const
  *  \brief Returns a list of all contexts in the action set.
- *         (note: result not thread-safe)
  */
 QStringList ActionSet::GetContextStrings(void) const
 {
     QStringList context_strings;
 
-    Q3DictIterator<Context> it(m_contexts);
-    for (; it.current(); ++it)
-        context_strings.append(it.currentKey());
+    ContextMap::const_iterator it = m_contexts.begin();
+    for (; it != m_contexts.end(); ++it)
+        context_strings.append(it.key());
     
+    context_strings.detach();
     return context_strings;
 }
 
 /** \fn ActionSet::GetActionStrings(const QString&) const
  *  \brief Returns a list of all action in the action set.
- *         (note: result not thread-safe)
  */
 QStringList ActionSet::GetActionStrings(const QString &context_name) const
 {
     QStringList action_strings;
 
-    Context *c = m_contexts[context_name];
-    if (!c)
+    ContextMap::const_iterator cit = m_contexts.find(context_name);
+    if (cit == m_contexts.end())
         return action_strings;
 
-    Q3DictIterator<Action> it(*(m_contexts[context_name]));
-    for (; it.current(); ++it)
-        action_strings.append(it.currentKey());
+    Context::const_iterator it = (*cit).begin();
+    for (; it != (*cit).end(); ++it)
+        action_strings.append(it.key());
     
+    action_strings.detach();
     return action_strings;
 }
 
 /** \fn ActionSet::AddAction(const ActionID&, const QString&, const QString&)
- *  \brief Add an action. (note: result not thread-safe)
+ *  \brief Add an action.
  *
  *   If the action has already been added, it will not be added
  *   again. There are no duplicate actions in the action set.
@@ -193,17 +202,17 @@ QStringList ActionSet::GetActionStrings(const QString &context_name) const
  *  \return true if the action on success, false otherwise.
  */
 bool ActionSet::AddAction(const ActionID &id,
-                          const QString &description,
-                          const QString &keys)
+                          const QString  &description,
+                          const QString  &keys)
 {
-    if (!m_contexts[id.GetContext()])
-        m_contexts.insert(id.GetContext(), new Context());
-
-    if ((*m_contexts[id.GetContext()])[id.GetAction()])
+    ContextMap::iterator cit = m_contexts.find(id.GetContext());
+    if (cit == m_contexts.end())
+        cit = m_contexts.insert(id.GetContext(), Context());
+    else if ((*cit).find(id.GetAction()) != (*cit).end())
         return false;
 
     Action *a = new Action(description, keys);
-    m_contexts[id.GetContext()]->insert(id.GetAction(), a);
+    (*cit).insert(id.GetAction(), a);
 
     const QStringList keylist = a->GetKeys();
     QStringList::const_iterator it = keylist.begin();
@@ -215,57 +224,53 @@ bool ActionSet::AddAction(const ActionID &id,
 
 /** \fn ActionSet::GetKeyString(const ActionID&) const
  *  \brief Returns a string containing all the keys in bound to an action
- *         by its identifier. (note: result not thread-safe)
+ *         by its identifier.
  */
 QString ActionSet::GetKeyString(const ActionID &id) const
 {
-    const Context *c = m_contexts[id.GetContext()];
-
-    if (!c)
+    ContextMap::const_iterator cit = m_contexts.find(id.GetContext());
+    if (cit == m_contexts.end())
         return QString::null;
 
-    const Action *a = (*c)[id.GetAction()];
-    if (a)
-        return a->GetKeyString();
+    Context::const_iterator it = (*cit).find(id.GetAction());
+    if (it != (*cit).end())
+        return (*it)->GetKeyString();
 
     return QString::null;
 }
 
 /** \fn ActionSet::GetKeys(const ActionID&) const
  *  \brief Get the keys bound to an action by its identifier.
- *         (note: result not thread-safe)
  */
 QStringList ActionSet::GetKeys(const ActionID &id) const
 {
     QStringList keys;
 
-    const Context *c = m_contexts[id.GetContext()];
-    if (c)
-    {
-        const Action *a = (*c)[id.GetAction()];
-        if (a)
-            keys = a->GetKeys();
-    }
+    ContextMap::const_iterator cit = m_contexts.find(id.GetContext());
+    if (cit == m_contexts.end())
+        return keys;
 
+    Context::const_iterator it = (*cit).find(id.GetAction());
+    if (it != (*cit).end())
+        keys = (*it)->GetKeys();
+
+    keys.detach();
     return keys;
 }
 
-QStringList ActionSet::GetContextKeys(const QString & context_name) const
+QStringList ActionSet::GetContextKeys(const QString &context_name) const
 {
     QStringList keys;
-    Context *c = m_contexts[context_name];
+    ContextMap::const_iterator cit = m_contexts.find(context_name);
+    if (cit == m_contexts.end())
+        return keys;
 
-    Q3DictIterator<Action> it(*c);
-    for (;it.current(); ++it)
-    {
-        QStringList akeys = (*it)->GetKeys();
-        for (int i = 0; i < akeys.size(); i++)
-        {
-                keys.append(akeys[i]);
-        }
-        keys.sort();
-    }
+    Context::const_iterator it = (*cit).begin();
+    for (; it != (*cit).end(); ++it)
+        keys += (*it)->GetKeys();
+    keys.sort();
 
+    keys.detach();
     return keys;
 }
 
@@ -285,62 +290,67 @@ QStringList ActionSet::GetAllKeys(void) const
 
 /** \fn ActionSet::GetDescription(const ActionID&) const
  *  \brief Returns the description of an action by its identifier.
- *         (note: result not thread-safe)
  */
 QString ActionSet::GetDescription(const ActionID &id) const
 {
-    const Context *c = m_contexts[id.GetContext()];
-    if (!c)
+    ContextMap::const_iterator cit = m_contexts.find(id.GetContext());
+    if (cit == m_contexts.end())
         return QString::null;
 
-    const Action *a = (*c)[id.GetAction()];
-    if (a)
-        return a->GetDescription();
+    Context::const_iterator it = (*cit).find(id.GetAction());
+    if (it != (*cit).end())
+        return (*it)->GetDescription();
 
     return QString::null;
 }
 
 /** \fn ActionSet::GetActions(const QString &key) const
  *  \brief Returns the actions bound to the specified key.
- *         (note: result not thread-safe)
  */
-const ActionList ActionSet::GetActions(const QString &key) const
+ActionList ActionSet::GetActions(const QString &key) const
 {
-    return m_keyToActionMap[key];
+    ActionList list = m_keyToActionMap[key];
+    list.detach();
+    return list;
 }
 
-/** \fn ActionSet::GetAction(const ActionID&) const
+/** \fn ActionSet::GetModified(void) const
+ *  \brief Returns the appropriate container of modified actions
+ *         based on current context.
+ */
+ActionList ActionSet::GetModified(void) const
+{
+    ActionList list = m_modified;
+    list.detach();
+    return list;
+}
+
+/** \fn ActionSet::GetAction(const ActionID&)
  *  \brief Returns a pointer to an action by its identifier.
  *         (note: result not thread-safe)
  */
-Action *ActionSet::GetAction(const ActionID &id) const
+Action *ActionSet::GetAction(const ActionID &id)
 {
-    Context *ctx = m_contexts[id.GetContext()];
-    if (!ctx)
+    ContextMap::iterator cit = m_contexts.find(id.GetContext());
+    if (cit == m_contexts.end())
     {
-        VERBOSE(VB_IMPORTANT, QString("GetAction: Did not find context '%1'")
+        VERBOSE(VB_IMPORTANT,
+                QString("GetAction: Did not find context '%1'")
                 .arg(id.GetContext()));
 
         return NULL;
     }
 
-    Action *action = (*ctx)[id.GetAction()];
+    Context::iterator it = (*cit).find(id.GetAction());
 
-    if (!action)
+    if (it == (*cit).end())
     {
-        VERBOSE(VB_IMPORTANT, QString("GetAction: Did not find action '%1' "
-                                      "in context '%1'")
+        VERBOSE(VB_IMPORTANT,
+                QString("GetAction: Did not find action '%1' "
+                        "in context '%1'")
                 .arg(id.GetAction()).arg(id.GetContext()));
+        return NULL;
     }
 
-    return action;
-}
-
-/** \fn ActionSet::GetContext(const QString&) const
- *  \brief Returns a pointer to a context by its identifier.
- *         (note: result not thread-safe)
- */
-Context *ActionSet::GetContext(const QString &name) const
-{
-    return m_contexts[name];
+    return *it;
 }

@@ -25,10 +25,8 @@
 #define ACTIONID_H
 
 // Qt headers
-#include <qstring.h>
-#include <q3dict.h>
-//Added by qt3to4:
-#include <Q3ValueList>
+#include <QString>
+#include <QList>
 
 /** \class ActionID
  *  \brief A class that uniquely identifies an action.
@@ -46,23 +44,45 @@ class ActionID
      *  \param action The action's name
      */
     ActionID(const QString &context, const QString &action)
-        : m_context(context), m_action(action) { }
+        : m_context(context), m_action(action)
+    {
+        m_context.detach();
+        m_action.detach();
+    }
 
-    /// \brief Returns the context name. (note: result is not thread-safe)
-    QString GetContext(void) const { return m_context; }
+    ActionID(const ActionID &other)
+        : m_context(other.m_context), m_action(other.m_action)
+    {
+        m_context.detach();
+        m_action.detach();
+    }
 
-    /// \brief Returns the action name. (note: result is not thread-safe)
-    QString GetAction(void)  const { return m_action; }
+    /// \brief Returns the context name.
+    QString GetContext(void) const
+    {
+        QString tmp = m_context;
+        tmp.detach();
+        return tmp;
+    }
+
+    /// \brief Returns the action name.
+    QString GetAction(void)  const
+    {
+        QString tmp = m_action;
+        tmp.detach();
+        return tmp;
+    }
 
     bool operator==(const ActionID &other) const
     {
-        return (m_action == other.m_action) && (m_context == other.m_context);
+        return ((m_action  == other.m_action) &&
+                (m_context == other.m_context));
     }
 
   private:
     QString m_context;
     QString m_action;
 };
-typedef Q3ValueList<ActionID> ActionList;
+typedef QList<ActionID> ActionList;
 
 #endif /* ACTIONID_H */

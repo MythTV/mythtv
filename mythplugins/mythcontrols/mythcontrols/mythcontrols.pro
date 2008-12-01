@@ -2,6 +2,8 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
+QT += sql
+
 TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mythcontrols
@@ -9,14 +11,14 @@ target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
 INCLUDEPATH += $${PREFIX}/include/mythtv
+INCLUDEPATH += $${PREFIX}/include/mythtv/libmythui
 
 # Input
-HEADERS += action.h actionid.h mythcontrols.h keybindings.h keygrabber.h
-SOURCES += action.cpp actionset.cpp keybindings.cpp mythcontrols.cpp
-SOURCES += keygrabber.cpp main.cpp 
+HEADERS += action.h        actionid.h     mythcontrols.h
+HEADERS += keybindings.h   keygrabber.h
 
-
-#The following line was inserted by qt3to4
-QT += sql xml opengl qt3support
+SOURCES += action.cpp      actionset.cpp  mythcontrols.cpp
+SOURCES += keybindings.cpp keygrabber.cpp
+SOURCES += main.cpp
 
 include ( ../../libs-targetfix.pro )

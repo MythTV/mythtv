@@ -24,14 +24,15 @@
 #ifndef MYTHCONTROLS_H
 #define MYTHCONTROLS_H
 
-#include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuiimage.h>
-#include <mythtv/libmythui/mythdialogbox.h>
+#include <mythscreentype.h>
+#include <mythuitext.h>
+#include <mythuibuttonlist.h>
+#include <mythuiimage.h>
+#include <mythdialogbox.h>
 
 #include "keybindings.h"
-#include <Q3PtrList>
+#include <QList>
+#include <QHash>
 
 typedef enum { kActionsByContext, kKeysByContext, kContextsByKey, } ViewType;
 
@@ -107,12 +108,13 @@ class MythControls : public MythScreenType
     MythUIText        *m_description;
     MythUIText        *m_leftDescription;
     MythUIText        *m_rightDescription;
-    Q3PtrList<MythUIButton> m_actionButtons;
+    QList<MythUIButton*> m_actionButtons;
     MythDialogBox     *m_menuPopup;
 
     KeyBindings       *m_bindings;
     QStringList        m_sortedContexts; ///< sorted list of contexts
-    Q3Dict<QStringList> m_contexts;       ///< actions for a given context
+    /// actions for a given context
+    QHash<QString, QStringList> m_contexts;
     ListType           m_leftListType;
     ListType           m_rightListType;
 };

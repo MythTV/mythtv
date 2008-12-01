@@ -26,13 +26,10 @@
  * and the UI.
  */
 
-// Qt headers
-#include <q3deepcopy.h>
-
 // MythTV headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/libmythdb/mythdb.h>
-#include <mythtv/libmythui/mythmainwindow.h>
+#include <mythcontext.h>
+#include <mythdb.h>
+#include <mythmainwindow.h>
 
 // MythControls headers
 #include "keybindings.h"
@@ -42,8 +39,9 @@
  *  \param hostname The host for which to create the key bindings.
  */
 KeyBindings::KeyBindings(const QString &hostname)
-    : m_hostname(Q3DeepCopy<QString>(hostname))
+    : m_hostname(hostname)
 {
+    m_hostname.detach();
     LoadMandatoryBindings();
     LoadContexts();
     LoadJumppoints();
@@ -61,8 +59,7 @@ QStringList KeyBindings::GetKeys(void) const
  */
 QStringList KeyBindings::GetContexts(void) const
 {
-    QStringList ctxts =
-        Q3DeepCopy<QStringList>(m_actionSet.GetContextStrings());
+    QStringList ctxts = m_actionSet.GetContextStrings();
     ctxts.sort();
     return ctxts;
 }
@@ -76,7 +73,7 @@ QStringList KeyBindings::GetContexts(void) const
  */
 QStringList KeyBindings::GetActions(const QString &context) const
 {
-    return Q3DeepCopy<QStringList>(m_actionSet.GetActionStrings(context));
+    return m_actionSet.GetActionStrings(context);
 }
 
 /** \fn KeyBindings::GetKeyActions(const QString&, ActionList&) const
@@ -100,8 +97,7 @@ void KeyBindings::GetKeyActions(const QString &key, ActionList &list) const
 QStringList KeyBindings::GetActionKeys(const QString &context_name,
                                        const QString &action_name) const
 {
-    return Q3DeepCopy<QStringList>
-        (m_actionSet.GetKeys(ActionID(context_name, action_name)));
+    return m_actionSet.GetKeys(ActionID(context_name, action_name));
 }
 
 /** \fn KeyBindings::GetContextKeys(const QString &) const
@@ -143,7 +139,7 @@ QString KeyBindings::GetActionDescription(const QString &context_name,
                                           const QString &action_name) const
 {
     ActionID id(context_name, action_name);
-    return Q3DeepCopy<QString>(m_actionSet.GetDescription(id));
+    return m_actionSet.GetDescription(id);
 }
 
 /** \fn KeyBindings::AddActionKey(const QString&,const QString&,const QString&)

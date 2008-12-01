@@ -40,8 +40,10 @@
  */
 Action::Action(const QString &description, const QString &keys)
     : m_description(description),
-      m_keys(QStringList::split(", ", QString(QKeySequence(keys))))
+      m_keys(QString(QKeySequence(keys)).split(", "))
 {
+    m_description.detach();
+    m_keys.detach();
 }
 
 /** \fn Action::HasKey(const QString&) const
@@ -52,13 +54,7 @@ Action::Action(const QString &description, const QString &keys)
  */
 bool Action::HasKey(const QString &key) const
 {
-    for (int i = 0; i < GetKeys().count(); i++)
-    {
-        if (GetKeys()[i] == key)
-            return true;
-    }
-
-    return false;
+    return m_keys.contains(key);
 }
 
 /** \fn Action::AddKey(const QString&)
@@ -74,14 +70,16 @@ bool Action::HasKey(const QString &key) const
  */
 bool Action::AddKey(const QString &key)
 {
-    if (key.isEmpty() ||
-        (GetKeys().size() >= kMaximumNumberOfBindings) ||
-        (GetKeys().contains(key)))
+    if (key.isEmpty() || HasKey(key) ||
+        ((uint)m_keys.size() >= kMaximumNumberOfBindings))
     {
         return false;
     }
 
-    m_keys.push_back(key);
+    QString tmp = key;
+    tmp.detach();
+    m_keys.push_back(tmp);
+
     return true;
 }
 
@@ -93,17 +91,15 @@ bool Action::AddKey(const QString &key)
 bool Action::ReplaceKey(const QString &newkey, const QString &oldkey)
 {
     // make sure that the key list doesn't already have the new key
-    if (GetKeys().contains(newkey) != 0)
+    if (HasKey(newkey))
         return false;
 
-    for (int i = 0; i < GetKeys().size(); i++)
-    {
-        if (GetKeys()[i] == oldkey)
-        {
-            m_keys[i] = newkey;
-            return true;
-        }
-    }
+    int idx = m_keys.indexOf(oldkey);
+    if (idx < 0)
+        return false;
 
-    return false;
+    QString tmp = newkey;
+    tmp.detach();
+    m_keys[idx] = tmp;
+    return true;
 }

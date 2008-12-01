@@ -3,7 +3,7 @@
 #define KEYGRABBER_H_
 
 // MythTV headers
-#include <mythtv/libmythui/mythdialogbox.h>
+#include <mythdialogbox.h>
 
 /** \class KeyGrabPopupBox
  *  \brief Captures a key.
