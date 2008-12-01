@@ -35,8 +35,6 @@ class EditMetadataDialog : public MythScreenType
 
     void okPressed(void);
     void cancelPressed(void);
-    void editLostFocus(void);
-
   private:
     ArchiveItem    *m_sourceMetadata;
 

@@ -55,7 +55,6 @@ class VideoSelector : public MythScreenType
     void cancelPressed(void);
 
     void showMenu(void);
-    void closePopupMenu(void);
     void selectAll(void);
     void clearAll(void);
 
