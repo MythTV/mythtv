@@ -1,6 +1,8 @@
 include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 
+QT += xml
+
 QMAKE_STRIP = echo
 
 TARGET = themenop
@@ -22,5 +24,3 @@ INSTALLS += defaultfiles widefiles menufiles
 
 # Input
 SOURCES += ../../themedummy.c
-#The following line was inserted by qt3to4
-QT += xml  qt3support 

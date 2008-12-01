@@ -13,5 +13,3 @@ trans.files += mytharchive_da.qm mytharchive_cs.qm mytharchive_sl.qm
 INSTALLS += trans
 
 SOURCES += dummy.c
-#The following line was inserted by qt3to4
-QT += xml  sql qt3support 

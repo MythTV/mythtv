@@ -12,5 +12,3 @@ trans.files += mythflix_cs.qm mythflix_fr.qm
 INSTALLS += trans
 
 SOURCES += dummy.c 
-#The following line was inserted by qt3to4
-QT += xml  sql qt3support 

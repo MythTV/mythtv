@@ -14,5 +14,4 @@ trans.files += mythgame_nb.qm
 INSTALLS += trans
 
 SOURCES += dummy.c
-#The following line was inserted by qt3to4
-QT +=  sql qt3support 
+
