@@ -25,8 +25,11 @@ class MythUIButtonList;
 class MythUIButtonListItem;
 class MythUIImage;
 class MythUICheckBox;
+class MythUISpinBox;
 class MythUITextEdit;
 class MythUIProgressBar;
+class MythUIWebBrowser;
+
 
 /**
  * Base UI type.  Children are drawn/processed in order added
@@ -53,6 +56,8 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     MythUITextEdit *GetMythUITextEdit(const QString &name, bool optional = false);
     MythUIImage *GetMythUIImage(const QString &name, bool optional = false);
     MythUIProgressBar *GetMythUIProgressBar(const QString &name, bool optional = false);
+    MythUISpinBox *GetMythUISpinBox(const QString &name, bool optional = false);
+    MythUIWebBrowser *GetMythUIWebBrowser(const QString &name, bool optional = false);
 
     void DeleteChild(const QString &name);
     void DeleteChild(MythUIType *child);

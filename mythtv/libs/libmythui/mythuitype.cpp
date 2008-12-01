@@ -17,6 +17,8 @@
 #include "mythuitextedit.h"
 #include "mythuibuttonlist.h"
 #include "mythuiprogressbar.h"
+#include "mythuispinbox.h"
+#include "mythuiwebbrowser.h"
 
 MythUIType::MythUIType(QObject *parent, const QString &name)
     : QObject(parent), m_helptext(QString::null)
@@ -210,6 +212,34 @@ MythUITextEdit* MythUIType::GetMythUITextEdit(const QString &name, bool optional
     }
 
     return edit;
+}
+
+MythUISpinBox* MythUIType::GetMythUISpinBox(const QString &name, bool optional)
+{
+    MythUISpinBox *spin = dynamic_cast<MythUISpinBox *> (GetChild(name));
+
+    if (!optional && !spin)
+    {
+        QString error = QString("Theme is missing a critical spinbox element ('%1')")
+                                .arg(name);
+        throw error;
+    }
+
+    return spin;
+}
+
+MythUIWebBrowser* MythUIType::GetMythUIWebBrowser(const QString &name, bool optional)
+{
+    MythUIWebBrowser *browser = dynamic_cast<MythUIWebBrowser *> (GetChild(name));
+
+    if (!optional && !browser)
+    {
+        QString error = QString("Theme is missing a critical webbrowser element ('%1')")
+                                .arg(name);
+        throw error;
+    }
+
+    return browser;
 }
 
 void MythUIType::DeleteChild(const QString &name)
