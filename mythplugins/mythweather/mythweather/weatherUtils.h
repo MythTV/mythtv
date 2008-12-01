@@ -3,8 +3,8 @@
 
 // QT headers
 #include <QMap>
+#include <QMultiHash>
 #include <QString>
-#include <Q3Dict>
 #include <QDomElement>
 #include <QFile>
 
@@ -19,17 +19,43 @@
 typedef unsigned char units_t;
 typedef QMap<QString, QString> DataMap;
 
-struct TypeListInfo
+class TypeListInfo
 {
+  public:
+    TypeListInfo(const QString &_name)
+        : name(_name), location(QString::null), src(NULL)
+    {
+        name.detach();
+    }
+    TypeListInfo(const QString &_name, const QString &_location)
+        : name(_name), location(_location), src(NULL)
+    {
+        name.detach();
+        location.detach();
+    }
+    TypeListInfo(const QString &_name, const QString &_location,
+                 struct ScriptInfo *_src)
+        : name(_name), location(_location), src(_src)
+    {
+        name.detach();
+        location.detach();
+    }
+
+  public:
     QString name;
     QString location;
     struct ScriptInfo *src;
 };
+typedef QMultiHash<QString, TypeListInfo> TypeListMap;
 
-struct ScreenListInfo
+class ScreenListInfo
 {
+  public:
+    TypeListInfo GetCurrentTypeList(void) const;
+
+  public:
     QString name;
-    Q3Dict<TypeListInfo> types;
+    TypeListMap types;
     QStringList dataTypes;
     QString helptxt;
     QStringList sources;

@@ -2,8 +2,7 @@
 #define WEATHER_H_
 
 // QT headers
-//Added by qt3to4:
-#include <Q3PtrList>
+#include <QList>
 
 // MythTV headers
 #include <mythtv/libmythui/mythscreentype.h>
@@ -15,6 +14,8 @@
 
 class SourceManager;
 class WeatherScreen;
+
+typedef QList<WeatherScreen*> ScreenList;
 
 class Weather : public MythScreenType
 {
@@ -67,7 +68,8 @@ class Weather : public MythScreenType
 
     bool m_createdSrcMan;
     SourceManager *m_srcMan;
-    Q3PtrList<WeatherScreen> m_screens; //screens in correct display order
+    ScreenList m_screens; //screens in correct display order
+    int        m_cur_screen;
 
     ScreenListMap m_allScreens; //screens parsed from xml
     WeatherScreen *m_currScreen;

@@ -17,7 +17,8 @@
 #include "weather.h"
 
 Weather::Weather(MythScreenStack *parent, const char *name, SourceManager *srcMan)
-    : MythScreenType(parent, name)
+    : MythScreenType(parent, name),
+      m_cur_screen(-1)
 {
     m_weatherStack = new MythScreenStack(GetMythMainWindow(), "weather stack");
 
@@ -100,14 +101,14 @@ void Weather::clearScreens()
         m_weatherStack->PopScreen(false,false);
     }
 
-    for (WeatherScreen *screen = m_screens.first(); screen;
-         screen = m_screens.next())
+    m_cur_screen = -1;
+    while (!m_screens.empty())
     {
+        WeatherScreen *screen = m_screens.back();
+        m_screens.pop_back();
         if (screen)
             delete screen;
     }
-
-    m_screens.clear();    
 }
 
 void Weather::setupScreens()
@@ -201,20 +202,23 @@ void Weather::screenReady(WeatherScreen *ws)
                SLOT(screenReady(WeatherScreen *)));
 }
 
-WeatherScreen *Weather::nextScreen()
+WeatherScreen *Weather::nextScreen(void)
 {
-    WeatherScreen *ws = m_screens.next();
-    if (!ws)
-        ws = m_screens.first();
-    return ws;
+    if (m_screens.empty())
+        return NULL;
+
+    m_cur_screen = (m_cur_screen + 1) % m_screens.size();
+    return m_screens[m_cur_screen];
 }
 
-WeatherScreen *Weather::prevScreen()
+WeatherScreen *Weather::prevScreen(void)
 {
-    WeatherScreen *ws = m_screens.prev();
-    if (!ws)
-        ws = m_screens.last();
-    return ws;
+    if (m_screens.empty())
+        return NULL;
+
+    m_cur_screen = (m_cur_screen < 0) ? 0 : m_cur_screen;
+    m_cur_screen = (m_cur_screen + m_screens.size() - 1) % m_screens.size();
+    return m_screens[m_cur_screen];
 }
 
 bool Weather::keyPressEvent(QKeyEvent *event)

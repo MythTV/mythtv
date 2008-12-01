@@ -39,7 +39,6 @@ ScreenListMap loadScreens()
             if (e.tagName() == "screen")
             {
                 ScreenListInfo *screendef = new ScreenListInfo();
-                screendef->types.setAutoDelete(true);
                 screendef->name = e.attribute("name");
                 QString hasUnits = e.attribute("hasunits");
                 if (hasUnits.lower() == "no")

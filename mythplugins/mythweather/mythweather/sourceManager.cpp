@@ -1,12 +1,10 @@
 
 // QT headers
-#include <qdir.h>
-#include <qfileinfo.h>
-#include <qstring.h>
-#include <qstringlist.h>
-#include <qapplication.h>
-//Added by qt3to4:
-#include <Q3PtrList>
+#include <QDir>
+#include <QFileInfo>
+#include <QString>
+#include <QStringList>
+#include <QApplication>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
@@ -320,15 +318,17 @@ bool SourceManager::connectScreen(uint id, WeatherScreen *screen)
         return false;
     }
 
-    WeatherSource *ws = m_sourcemap[id];
-    if (!ws)
+    SourceMap::iterator it = m_sourcemap.find(id);
+    if (it == m_sourcemap.end())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Can not connect nonexistent source "<<id);
+                QString("Can not connect nonexistent source '%1'").arg(id));
 
         return false;
     }
-    ws->connectScreen(screen);
+
+    (const_cast<WeatherSource*>(*it))->connectScreen(screen);
+
     return true;
 }
 
@@ -342,15 +342,17 @@ bool SourceManager::disconnectScreen(WeatherScreen *screen)
         return false;
     }
 
-    WeatherSource *ws = m_sourcemap[screen->getId()];
-    if (!ws)
+    SourceMap::iterator it = m_sourcemap.find(screen->getId());
+    if (it == m_sourcemap.end())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Can not disconnect nonexistent source "<<screen->getId());
 
         return false;
     }
-    ws->disconnectScreen(screen);
+
+    (const_cast<WeatherSource*>(*it))->disconnectScreen(screen);
+
     return true;
 }
 

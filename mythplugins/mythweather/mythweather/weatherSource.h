@@ -1,12 +1,12 @@
 #ifndef __WEATHER_SOURCE_H__
 #define __WEATHER_SOURCE_H__
 
-#include <qstring.h>
-#include <qstringlist.h>
-#include <qobject.h>
-#include <q3process.h>
+#include <QString>
+#include <QStringList>
+#include <QObject>
+#include <QTimer>
 
-#include <qtimer.h>
+#include <q3process.h>
 
 // MythWeather headers
 #include "weatherUtils.h"

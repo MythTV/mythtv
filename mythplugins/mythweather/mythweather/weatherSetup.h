@@ -2,9 +2,7 @@
 #define _WEATHER_SETUP_H_
 
 // QT headers
-//Added by qt3to4:
-#include <Q3ValueList>
-#include <Q3PtrList>
+#include <QList>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
@@ -127,6 +125,8 @@ struct ResultListInfo
     ScriptInfo *src;
 };
 
+typedef QMultiHash<QString, QList<ScriptInfo*> > CacheMap;
+
 class LocationDialog : public MythScreenType
 {
     Q_OBJECT
@@ -145,7 +145,7 @@ class LocationDialog : public MythScreenType
     void itemClicked(MythUIButtonListItem *item);
 
   private:
-    Q3Dict<Q3ValueList<ScriptInfo *> > m_cache;
+    CacheMap m_cache;
     QStringList m_types;
     ScreenListInfo *m_screenListInfo;
     SourceManager *m_sourceManager;

@@ -1,9 +1,9 @@
 #include <unistd.h>
 
 // QT headers
-#include <qfile.h>
-#include <q3textstream.h>
-#include <qapplication.h>
+#include <QFile>
+#include <QTextStream>
+#include <QApplication>
 
 // MythTV headers
 #include <mythtv/mythcontext.h>
@@ -453,7 +453,7 @@ void WeatherSource::startUpdate()
         QFile cache(cachefile);
         if (cache.exists() && cache.open( QIODevice::ReadOnly ))
         {
-            Q3TextStream text( &cache );
+            QTextStream text( &cache );
             m_buffer += text.read();
             cache.close();
 

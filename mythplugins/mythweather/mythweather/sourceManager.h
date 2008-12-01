@@ -2,11 +2,9 @@
 #define _SOURCEMANAGER_H_
 
 // QT headers
-#include <qobject.h>
-#include <q3intdict.h>
-#include <qstringlist.h>
-//Added by qt3to4:
-#include <Q3PtrList>
+#include <QObject>
+#include <QMultiMap>
+#include <QStringList>
 
 // MythWeather headers
 #include "weatherUtils.h"
@@ -14,6 +12,7 @@
 
 class WeatherScreen;
 struct ScriptInfo;
+typedef QMultiMap<long, const WeatherSource*> SourceMap;
 
 class SourceManager : public QObject
 {
@@ -41,7 +40,7 @@ class SourceManager : public QObject
   private:
     QList<ScriptInfo *>      m_scripts;  //all scripts
     QList<WeatherSource *>   m_sources;  //in-use scripts
-    Q3IntDict<WeatherSource> m_sourcemap;
+    SourceMap m_sourcemap;
     units_t m_units;
     void recurseDirs(QDir dir);
 };

@@ -1,8 +1,6 @@
 
 // QT headers
-#include <qapplication.h>
-//Added by qt3to4:
-#include <Q3PtrList>
+#include <QApplication>
 
 // MythTV headers
 #include <mythtv/mythdbcon.h>
@@ -230,19 +228,23 @@ void ScreenSetup::updateHelpText()
         if (!si)
             return;
 
-        Q3DictIterator<TypeListInfo> it(si->types);
-        TypeListInfo *ti = it.current();
         text += item->text() + "\n";
         if (si->hasUnits)
-            text += tr("Units: ") +
-                    (si->units == ENG_UNITS ? tr("English Units") :
-                     tr("SI Units")) + "   ";
-        if (!si->multiLoc && ti)
         {
-            text += tr("Location: ") + (ti->location != "" ?
-                    ti->location : tr("Not Defined")) + "\n";
-            text += tr("Source: " ) +
-                    (ti->src ? ti->src->name : tr("Not Defined")) + "\n";
+            text += tr("Units: ");
+            text += (ENG_UNITS == si->units) ?
+                tr("English Units") : tr("SI Units");
+            text += "   ";
+        }
+        if (!si->multiLoc && !si->types.empty())
+        {
+            TypeListInfo ti = *si->types.begin();
+            text += tr("Location: ");
+            text += (ti.location.isEmpty()) ? tr("Not Defined") : ti.location;
+            text += "\n";
+            text += tr("Source: " );
+            text += (ti.src) ? ti.src->name : tr("Not Defined");
+            text += "\n";
         }
         text += "\n" + tr("Press SELECT to ");
         if (!si->multiLoc)
@@ -258,7 +260,6 @@ void ScreenSetup::updateHelpText()
 void ScreenSetup::loadData()
 {
     ScreenListInfo *si;
-    TypeListInfo *ti;
 
     QStringList types;
 
@@ -275,9 +276,7 @@ void ScreenSetup::loadData()
         QStringList type_strs;
         for (int typei = 0; typei < types.size(); ++typei)
         {
-            ti = new TypeListInfo;
-            ti->name =  types[typei];
-            ti->src = 0;
+            TypeListInfo ti(types[typei]);
             si->types.insert(types[typei], ti);
             type_strs << types[typei];
         }
@@ -301,7 +300,7 @@ void ScreenSetup::loadData()
         ++i;
     }
 
-    Q3IntDict<ScreenListInfo> active_screens;
+    QMap<long, ScreenListInfo*> active_screens;
 
     MSqlQuery db(MSqlQuery::InitCon());
     QString query = "SELECT weatherscreens.container, weatherscreens.units, "
@@ -334,20 +333,20 @@ void ScreenSetup::loadData()
         si->types.clear();
         types = si->dataTypes;
 
-        ti = new TypeListInfo;
-        ti->name = dataitem;
-        ti->location = location;
-        ti->src = m_sourceManager->getSourceByName(src);
+        TypeListInfo ti(dataitem, location,
+                        m_sourceManager->getSourceByName(src));
 
-        if (!active_screens.find(draworder))
+        if (active_screens.find(draworder) == active_screens.end())
         {
-            MythUIButtonListItem *item = new MythUIButtonListItem(m_activeList, name);
+            MythUIButtonListItem *item =
+                new MythUIButtonListItem(m_activeList, name);
             si->units = units;
 
             // Only insert types meant for this screen
-            for (QStringList::Iterator type_i = types.begin(); type_i != types.end(); ++type_i )
+            for (QStringList::Iterator type_i = types.begin();
+                 type_i != types.end(); ++type_i )
             {
-                if(*type_i == dataitem)
+                if (*type_i == dataitem)
                     si->types.insert(dataitem, ti);
             }
 
@@ -357,9 +356,10 @@ void ScreenSetup::loadData()
         else
         {
             si = active_screens[draworder];
-            for (QStringList::Iterator type_i = types.begin(); type_i != types.end(); ++type_i )
+            for (QStringList::Iterator type_i = types.begin();
+                 type_i != types.end(); ++type_i )
             {
-                if(*type_i == dataitem)
+                if (*type_i == dataitem)
                 {
                     si->types.insert(dataitem, ti);
                 }
@@ -383,19 +383,18 @@ void ScreenSetup::saveData()
     {
         MythUIButtonListItem *item = m_activeList->GetItemAt(i);
         ScreenListInfo *si = (ScreenListInfo *) item->getData();
-        Q3DictIterator<TypeListInfo> it(si->types);
-        for (; it.current(); ++it)
+        TypeListMap::iterator it = si->types.begin();
+        for (; it != si->types.end(); ++it)
         {
-            TypeListInfo *ti = it.current();
-            if (!ti->src)
-            {
-                notDefined << ti->name;
-                VERBOSE(VB_IMPORTANT, QString("Not defined %1").arg(ti->name));
-            }
+            if ((*it).src)
+                continue;
+
+            notDefined << (*it).name;
+            VERBOSE(VB_IMPORTANT, QString("Not defined %1").arg((*it).name));
         }
     }
 
-    if (notDefined.size() > 0)
+    if (!notDefined.empty())
     {
         VERBOSE(VB_IMPORTANT, "A Selected screen has data items with no "
                               "sources defined.");
@@ -444,15 +443,13 @@ void ScreenSetup::saveData()
                     "weatherscreens_screen_id, weathersourcesettings_sourceid) "
                     "VALUES (:LOC, :ITEM, :SCREENID, :SRCID);";
             db2.prepare(query2);
-            Q3DictIterator<TypeListInfo> it(si->types);
-            TypeListInfo *ti;
-            for (; it.current(); ++it)
+            TypeListMap::iterator it = si->types.begin();
+            for (; it != si->types.end(); ++it)
             {
-                ti = it.current();
-                db2.bindValue(":LOC", ti->location);
-                db2.bindValue(":ITEM", ti->name);
+                db2.bindValue(":LOC",      (*it).location);
+                db2.bindValue(":ITEM",     (*it).name);
                 db2.bindValue(":SCREENID", screen_id);
-                db2.bindValue(":SRCID", ti->src->id);
+                db2.bindValue(":SRCID",    (*it).src->id);
                 if (!db2.exec())
                 {
                     VERBOSE(VB_IMPORTANT, db2.executedQuery());
@@ -510,13 +507,13 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
     {
         ScreenListInfo *si = (ScreenListInfo *) selected->getData();
         QStringList type_strs;
-        Q3Dict<TypeListInfo> types;
-        Q3DictIterator<TypeListInfo> it(si->types);
-        for (; it.current(); ++it)
+
+        TypeListMap::iterator it = si->types.begin();
+        TypeListMap types;
+        for (; it != si->types.end(); ++it)
         {
-            TypeListInfo *newti = new TypeListInfo(*it.current());
-            types.insert(it.currentKey(), newti);
-            type_strs << it.currentKey();
+            types.insert(it.key(), TypeListInfo(*it));
+            type_strs << it.key();
         }
         bool hasUnits = si->hasUnits;
 
@@ -524,8 +521,6 @@ void ScreenSetup::doListSelect(MythUIButtonListItem *selected)
         if (m_sourceManager->findPossibleSources(type_strs, tmp))
         {
             ScreenListInfo *newsi = new ScreenListInfo(*si);
-            // FIXME: this seems bogus
-            newsi->types.setAutoDelete(true);
 
             if (!m_inactiveList->GetCount())
             {
@@ -645,15 +640,15 @@ void ScreenSetup::customEvent(QEvent *event)
         else if (resultid == "location")
         {
             ScreenListInfo *si = qVariantValue<ScreenListInfo *>(dce->GetData());
-            Q3DictIterator<TypeListInfo> it(si->types);
-            for (; it.current(); ++it)
+
+            TypeListMap::iterator it = si->types.begin();
+            for (; it != si->types.end(); ++it)
             {
-                TypeListInfo *ti = it.current();
-                if (ti->location.isEmpty())
+                if ((*it).location.isEmpty())
                     return;
             }
 
-            QString txt = si->name;
+            QString txt = si->name; txt.detach();
 
             MythUIButtonListItem *item = new MythUIButtonListItem(m_activeList, txt);
             item->setData(si);
@@ -859,17 +854,10 @@ LocationDialog::LocationDialog(MythScreenStack *parent, const char *name,
       m_locationEdit(NULL),   m_searchButton(NULL),
       m_resultsText(NULL),    m_sourceText(NULL)
 {
-
-    QStringList types;
-
-    Q3DictIterator<TypeListInfo> it(si->types);
-    for (; it.current(); ++it)
-    {
-        TypeListInfo *ti = it.current();
-        types << ti->name;
-    }
-
-    m_types = types;
+    TypeListMap::iterator it = si->types.begin();
+    for (; it != si->types.end(); ++it)
+        m_types << (*it).name;
+    m_types.detach();
 }
 
 LocationDialog::~LocationDialog()
@@ -996,17 +984,18 @@ void LocationDialog::itemClicked(MythUIButtonListItem *item)
 
     if (ri)
     {
-        Q3DictIterator<TypeListInfo> it(m_screenListInfo->types);
-        for (; it.current(); ++it)
+        TypeListMap::iterator it = m_screenListInfo->types.begin();
+        for (; it != m_screenListInfo->types.end(); ++it)
         {
-            TypeListInfo *ti = it.current();
-            ti->location = ri->idstr;
-            ti->src = ri->src;
+            (*it).location = ri->idstr;
+            (*it).location.detach();
+            (*it).src      = ri->src;
         }
     }
 
     DialogCompletionEvent *dce =
-                new DialogCompletionEvent("location", 0, "", qVariantFromValue(m_screenListInfo));
+        new DialogCompletionEvent("location", 0, "",
+                                  qVariantFromValue(m_screenListInfo));
     QApplication::postEvent(m_retScreen, dce);
 
     Close();
