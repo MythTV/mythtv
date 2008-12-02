@@ -7,10 +7,10 @@
 #include <QApplication>
 
 // MythTV headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/libmythui/mythprogressdialog.h>
-#include <mythtv/mythdirs.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <mythprogressdialog.h>
+#include <mythdirs.h>
 
 // MythWeather headers
 #include "weatherScreen.h"

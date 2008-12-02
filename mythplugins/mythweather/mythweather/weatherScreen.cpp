@@ -1,8 +1,9 @@
-// QT headers
+// C++ headers
 #include <vector>
+using namespace std;
 
 // MythTV headers
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
 // MythWeather headers
 #include "weather.h"

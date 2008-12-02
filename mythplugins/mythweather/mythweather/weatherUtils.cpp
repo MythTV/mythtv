@@ -1,9 +1,8 @@
-
 // QT headers
 #include <QString>
 #include <QStringList>
 
-#include <mythtv/mythdirs.h>
+#include <mythdirs.h>
 
 // MythWeather headers
 #include "weatherUtils.h"

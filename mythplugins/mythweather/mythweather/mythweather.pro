@@ -11,6 +11,7 @@ target.path = $${LIBDIR}/mythtv/plugins
 INSTALLS += target
 
 INCLUDEPATH += $${PREFIX}/include/mythtv
+INCLUDEPATH += $${PREFIX}/include/mythtv/libmythui
 
 datafiles.path = $${PREFIX}/share/mythtv/mythweather/
 datafiles.files = weather-screens.xml

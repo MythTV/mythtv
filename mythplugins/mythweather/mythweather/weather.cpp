@@ -4,11 +4,11 @@
 #include <cstdlib>
 
 // QT headers
-#include <qapplication.h>
+#include <QApplication>
 
 // MythTV headers
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythcontext.h>
+#include <mythdbcon.h>
+#include <mythcontext.h>
 
 // MythWeather headers
 #include "weatherScreen.h"

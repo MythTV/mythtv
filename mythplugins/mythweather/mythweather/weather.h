@@ -5,9 +5,9 @@
 #include <QList>
 
 // MythTV headers
-#include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythmainwindow.h>
+#include <mythscreentype.h>
+#include <mythuitext.h>
+#include <mythmainwindow.h>
 
 // MythWeather headers
 #include "weatherUtils.h"

@@ -9,7 +9,7 @@
 #include <QFile>
 
 // MythTV headers
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
 #define SI_UNITS 0
 #define ENG_UNITS 1

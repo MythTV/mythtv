@@ -3,8 +3,8 @@
 #include <QApplication>
 
 // MythTV headers
-#include <mythtv/mythdbcon.h>
-#include <mythtv/libmythui/mythprogressdialog.h>
+#include <mythdbcon.h>
+#include <mythprogressdialog.h>
 
 // MythWeather headers
 #include "weatherScreen.h"

@@ -1,9 +1,9 @@
-#include <qstring.h>
-#include <qdir.h>
-#include <qstringlist.h>
+#include <QString>
+#include <QDir>
+#include <QStringList>
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdb.h>
+#include <mythcontext.h>
+#include <mythdb.h>
 
 #include "dbcheck.h"
 

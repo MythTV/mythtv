@@ -8,10 +8,10 @@
 #include <q3process.h>
 
 // MythTV headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/compat.h>
-#include <mythtv/mythdirs.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <compat.h>
+#include <mythdirs.h>
 
 // MythWeather headers
 #include "weatherScreen.h"

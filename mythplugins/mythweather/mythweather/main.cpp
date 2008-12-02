@@ -6,14 +6,14 @@
 #include <QDir>
 
 // MythTV headers
-#include <mythtv/lcddevice.h>
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythplugin.h>
-#include <mythtv/mythpluginapi.h>
-#include <mythtv/mythversion.h>
-#include <mythtv/libmythui/myththemedmenu.h>
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/libmythui/mythuihelper.h>
+#include <lcddevice.h>
+#include <mythcontext.h>
+#include <mythplugin.h>
+#include <mythpluginapi.h>
+#include <mythversion.h>
+#include <myththemedmenu.h>
+#include <mythmainwindow.h>
+#include <mythuihelper.h>
 
 // MythWeather headers
 #include "weather.h"

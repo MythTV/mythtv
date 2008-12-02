@@ -5,16 +5,16 @@
 #include <QList>
 
 // MythTV headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuitextedit.h>
-#include <mythtv/libmythui/mythuispinbox.h>
-#include <mythtv/libmythui/mythuicheckbox.h>
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/libmythui/mythdialogbox.h>
+#include <mythcontext.h>
+#include <mythscreentype.h>
+#include <mythuibuttonlist.h>
+#include <mythuibutton.h>
+#include <mythuitext.h>
+#include <mythuitextedit.h>
+#include <mythuispinbox.h>
+#include <mythuicheckbox.h>
+#include <mythmainwindow.h>
+#include <mythdialogbox.h>
 
 // MythWeather headers
 #include "weatherUtils.h"
