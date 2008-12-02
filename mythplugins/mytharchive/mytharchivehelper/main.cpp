@@ -61,7 +61,9 @@ NativeArchive::NativeArchive(void)
 {
     // create the lock file so the UI knows we're running
     QString tempDir = getTempDirectory();
-    system(QString("echo %1 > " + tempDir + "/logs/mythburn.lck").arg(getpid()));
+    QString command = QString("echo %1 > " + tempDir + 
+                      "/logs/mythburn.lck").arg(getpid());
+    system(qPrintable(command));
 }
 
 NativeArchive::~NativeArchive(void)
@@ -112,9 +114,9 @@ bool NativeArchive::copyFile(const QString &source, const QString &destination)
         return false;
     }
 
-    while ((srcLen = srcFile.readBlock(buffer, sizeof(buffer))) > 0)
+    while ((srcLen = srcFile.read(buffer, sizeof(buffer))) > 0)
     {
-        destLen = destFile.writeBlock(buffer, srcLen);
+        destLen = destFile.write(buffer, srcLen);
 
         if (destLen == -1 || srcLen != destLen)
         {
@@ -164,7 +166,7 @@ bool createISOImage(QString &sourceDirectory)
     QString command = mkisofs + " -R -J -V 'MythTV Archive' -o ";
     command += tempDirectory + "mythburn.iso " + sourceDirectory;
 
-    int res = system(command);
+    int res = system(qPrintable(command));
     if (WIFEXITED(res))
         res = WEXITSTATUS(res);
     if (res != 0)
@@ -220,7 +222,7 @@ int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
         }
     }
 
-    int res = system(command);
+    int res = system(qPrintable(command));
     if (WIFEXITED(res))
         res = WEXITSTATUS(res);
     if (res == 0)
@@ -311,7 +313,7 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
             saveDirectory += "/";
 
         saveDirectory += "work/";
-        system("rm -fr " + saveDirectory + "*");
+        system(qPrintable("rm -fr " + saveDirectory + "*"));
     }
 
     VERBOSE(VB_JOBQUEUE, QString("Saving files to : %1").arg(saveDirectory));
@@ -337,15 +339,15 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
         {
             type = elem.attribute("type");
 
-            if (type.lower() == "recording")
+            if (type.toLower() == "recording")
                 exportRecording(elem, saveDirectory);
-            else if (type.lower() == "video")
+            else if (type.toLower() == "video")
                 exportVideo(elem, saveDirectory);
             else
             {
                 VERBOSE(VB_JOBQUEUE,
                         QString("Don't know how to archive items of type '%1'")
-                        .arg(type.lower()));
+                        .arg(type.toLower()));
                 continue;
             }
         }
@@ -370,9 +372,6 @@ int NativeArchive::doNativeArchive(const QString &jobFile)
             return 1;
         }
     }
-
-    // make sure the files we created are read/writable by all
-    //system("chmod -R a+rw-x+X " + saveDirectory);
 
     VERBOSE(VB_JOBQUEUE, "Native archive job completed OK");
 
@@ -1110,7 +1109,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
 
     QString videoFile = xmlFile.left(xmlFile.length() - 4);
     QString basename = videoFile;
-    int pos = videoFile.findRev('/');
+    int pos = videoFile.lastIndexOf('/');
     if (pos > 0)
         basename = videoFile.mid(pos + 1);
 
@@ -1351,7 +1350,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     // copy file to video directory
     QString path = gContext->GetSetting("VideoStartupDir");
     QString origFilename = findNodeText(videoNode, "filename");
-    QStringList dirList = QStringList::split("/", origFilename);
+    QStringList dirList = origFilename.split("/", QString::SkipEmptyParts);
     QDir dir;
     for (int x = 0; x < dirList.count() - 1; x++)
     {
@@ -1376,7 +1375,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     QString artworkDir = gContext->GetSetting("VideoArtworkDir");
     // get archive path
     fileInfo.setFile(videoFile);
-    QString archivePath = fileInfo.dirPath();
+    QString archivePath = fileInfo.absolutePath();
     // get coverfile filename
     QString coverFilename = findNodeText(videoNode, "coverfile");
     fileInfo.setFile(coverFilename);
@@ -1391,7 +1390,6 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
         {
             return 1;
         }
-
     }
     else
         coverFilename = "No Cover";
@@ -1821,7 +1819,7 @@ int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameC
     }
 
     // get list of required thumbs
-    QStringList list = QStringList::split(",", thumbList);
+    QStringList list = thumbList.split(",", QString::SkipEmptyParts);
     AVFrame *frame = avcodec_alloc_frame();
     AVPacket pkt;
     AVPicture orig;
@@ -1893,8 +1891,7 @@ int grabThumbnail(QString inFile, QString thumbList, QString outFile, int frameC
                         QImage img(outputbuf, width, height,
                                    QImage::Format_RGB32);
 
-                        QByteArray fname = filename.toLocal8Bit();
-                        if (!img.save(fname.constData(), saveFormat))
+                        if (!img.save(filename, qPrintable(saveFormat)))
                         {
                             VERBOSE(VB_IMPORTANT,
                                     QString("grabThumbnail(), Error: ") +
@@ -1973,7 +1970,7 @@ long long getCutFrames(const QString &filename)
 {
     // only wont the filename
     QString basename = filename;
-    int pos = filename.findRev('/');
+    int pos = filename.lastIndexOf('/');
     if (pos > 0)
         basename = filename.mid(pos + 1);
 
@@ -2003,7 +2000,7 @@ long long getCutFrames(const QString &filename)
     {
         long long start = 0, end = 0;
 
-        if (it.data() == MARK_CUT_START)
+        if (it.value() == MARK_CUT_START)
         {
             start = it.key();
             it++;
@@ -2024,7 +2021,7 @@ long long getFrameCount(const QString &filename, float fps)
 {
     // only wont the filename
     QString basename = filename;
-    int pos = filename.findRev('/');
+    int pos = filename.lastIndexOf('/');
     if (pos > 0)
         basename = filename.mid(pos + 1);
 
@@ -2139,12 +2136,12 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
         {
             case CODEC_TYPE_VIDEO:
             {
-                QStringList param = QStringList::split(',', QString(buf));
-                QString codec = param[0].remove("Video:", false);
+                QStringList param = QString(buf).split(',', QString::SkipEmptyParts);
+                QString codec = param[0].remove("Video:", Qt::CaseInsensitive);
                 QDomElement stream = doc.createElement("video");
                 stream.setAttribute("streamindex", i);
                 stream.setAttribute("ffmpegindex", ffmpegIndex++);
-                stream.setAttribute("codec", codec.stripWhiteSpace());
+                stream.setAttribute("codec", codec.trimmed());
                 stream.setAttribute("width", st->codec->width);
                 stream.setAttribute("height", st->codec->height);
                 stream.setAttribute("bitrate", st->codec->bit_rate);
@@ -2242,8 +2239,8 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
             case CODEC_TYPE_AUDIO:
             {
-                QStringList param = QStringList::split(',', QString(buf));
-                QString codec = param[0].remove("Audio:", false);
+                QStringList param = QString(buf).split(',', QString::SkipEmptyParts);
+                QString codec = param[0].remove("Audio:", Qt::CaseInsensitive);
 
                 QDomElement stream = doc.createElement("audio");
                 stream.setAttribute("streamindex", i);
@@ -2251,10 +2248,10 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
                 // change any streams identified as "liba52" to "AC3" which is what
                 // the mythburn.py script expects to get.
-                if (codec.stripWhiteSpace().toLower() == "liba52")
+                if (codec.trimmed().toLower() == "liba52")
                     stream.setAttribute("codec", "AC3");
                 else
-                    stream.setAttribute("codec", codec.stripWhiteSpace());
+                    stream.setAttribute("codec", codec.trimmed());
 
                 stream.setAttribute("channels", st->codec->channels);
                 if (strlen(st->language) > 0)
@@ -2285,13 +2282,13 @@ int getFileInfo(QString inFile, QString outFile, int lenMethod)
 
             case CODEC_TYPE_SUBTITLE:
             {
-                QStringList param = QStringList::split(',', QString(buf));
-                QString codec = param[0].remove("Subtitle:", false);
+                QStringList param = QString(buf).split(',', QString::SkipEmptyParts);
+                QString codec = param[0].remove("Subtitle:", Qt::CaseInsensitive);
 
                 QDomElement stream = doc.createElement("subtitle");
                 stream.setAttribute("streamindex", i);
                 stream.setAttribute("ffmpegindex", ffmpegIndex++);
-                stream.setAttribute("codec", codec.stripWhiteSpace());
+                stream.setAttribute("codec", codec.trimmed());
                 if (strlen(st->language) > 0)
                     stream.setAttribute("language", st->language);
                 else
@@ -2383,7 +2380,7 @@ int isRemote(QString filename)
             (!strcmp(statbuf.f_fstypename, "smbfs"))))  // SMB
         return 2;
 #elif __linux__
-    if ((statfs(filename, &statbuf) == 0) &&
+    if ((statfs(qPrintable(filename), &statbuf) == 0) &&
         ((statbuf.f_type == 0x6969) ||      // NFS
             (statbuf.f_type == 0x517B)))    // SMB
         return 2;
