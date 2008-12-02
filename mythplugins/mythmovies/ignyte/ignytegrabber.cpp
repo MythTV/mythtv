@@ -1,9 +1,12 @@
 
 #include "ignytegrabber.h"
  
-IgnyteGrabber::IgnyteGrabber(QString zip, QString radius, QApplication *callingApp)
+IgnyteGrabber::IgnyteGrabber(QString zip, QString radius,
+                             QApplication *callingApp) :
+    waitForSoap(new QTimer(this)),
+    ms(new MythSoap(this)),
+    app(callingApp)
 {
-    app = callingApp;
     //this feels clumsy to me - should we store it in a file instead?
     QString fields ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -19,24 +22,24 @@ IgnyteGrabber::IgnyteGrabber(QString zip, QString radius, QApplication *callingA
     QString server("ignyte.com");
     QString path("/webservices/ignyte.whatsshowing.webservice/moviefunctions.asmx");
     QString soapAction("http://www.ignyte.com/whatsshowing/GetTheatersAndMovies");
-    ms.doSoapRequest(server, path, soapAction, fields);
+    ms->doSoapRequest(server, path, soapAction, fields);
 
-    waitForSoap = new QTimer(this);
     connect(waitForSoap, SIGNAL(timeout()), this, SLOT(checkHttp()));
-    waitForSoap->start(0, FALSE);
+    waitForSoap->setSingleShot(false);
+    waitForSoap->start(0);
 }
 
 void IgnyteGrabber::checkHttp()
 {
-    if (ms.isDone())
+    if (ms->isDone())
     {
-        if (ms.hasError())
+        if (ms->hasError())
         {
             cerr << "Data Source Error" << endl;
         }
         else
         {
-            outputData(ms.getResponseData().data());
+            outputData(ms->getResponseData().data());
         }
         waitForSoap->stop();
         app->exit();
@@ -45,9 +48,9 @@ void IgnyteGrabber::checkHttp()
 
 void IgnyteGrabber::outputData(QString data)
 {
-    int i =  data.find("<GetTheatersAndMoviesResult>");
+    int i =  data.indexOf("<GetTheatersAndMoviesResult>");
     data = data.mid(i + 28);
-    int x = data.find("</GetTheatersAndMoviesResult>");
+    int x = data.indexOf("</GetTheatersAndMoviesResult>");
     data = data.left(x);
     data = data.remove('\r');
     data = data.remove('\n');

@@ -1,7 +1,7 @@
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythpluginapi.h>
-#include <mythtv/mythversion.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <mythpluginapi.h>
+#include <mythversion.h>
 
 #include "moviesui.h"
 #include "moviessettings.h"

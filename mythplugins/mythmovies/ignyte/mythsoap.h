@@ -1,28 +1,33 @@
 #ifndef MYTHSOAP_H_
 #define MYTHSOAP_H_
 
-#include <q3http.h>
-#include <qstring.h>
+#include <QString>
+#include <QHttp>
 
 class MythSoap : public QObject
 {
     Q_OBJECT
-    public:
-        void doSoapRequest(QString, QString, QString, QString);
-        QByteArray getResponseData();
-        bool isDone();
-        bool hasError();
-        inline QString getError() const { return http.errorString(); }
-        MythSoap();
 
-    private:
-        Q3Http http;
-        bool  m_done;
-        bool m_error;
-        QByteArray m_data;
+  public:
+    MythSoap(QObject *parent);
 
-    public slots:
-        void httpDone(bool);
+    void doSoapRequest(QString, QString, QString, QString);
+    QByteArray getResponseData(void);
+    bool isDone(void);
+    bool hasError(void);
+    inline QString getError(void) const { return http.errorString(); }
+
+  private:
+    ~MythSoap() {}
+
+  private:
+    QHttp http;
+    bool  m_done;
+    bool m_error;
+    QByteArray m_data;
+
+  public slots:
+    void httpDone(bool);
 };
 
 #endif

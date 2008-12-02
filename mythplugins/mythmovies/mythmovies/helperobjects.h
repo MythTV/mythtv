@@ -1,11 +1,11 @@
 #ifndef HELPEROBJECTS_H_
 #define HELPEROBJECTS_H_
 
-#include <q3valuevector.h>
+#include <QVector>
 
 class Theater;
 
-typedef Q3ValueVector<Theater> TheaterVector;
+typedef QVector<Theater> TheaterVector;
 
 class Movie
 {
@@ -24,7 +24,7 @@ class Movie
     }
 };
 
-typedef Q3ValueVector<Movie> MovieVector;
+typedef QVector<Movie> MovieVector;
 
 class Theater
 {

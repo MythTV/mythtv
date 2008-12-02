@@ -1,6 +1,6 @@
-#include "moviessettings.h"
+#include <mythdirs.h>
 
-#include <mythtv/mythdirs.h>
+#include "moviessettings.h"
 
 static HostLineEdit *ZipCode()
 {

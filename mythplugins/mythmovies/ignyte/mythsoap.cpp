@@ -1,14 +1,20 @@
-#include "mythsoap.h"
 #include <iostream>
-
 using namespace std;
+
+#include "mythsoap.h"
+
+
+MythSoap::MythSoap(QObject *parent) :
+    QObject(parent), m_done(false), m_error(false)
+{
+}
 
 void MythSoap::doSoapRequest(QString host, QString path, QString soapAction,
                              QString query)
 {
     connect(&http, SIGNAL(done(bool)), this, SLOT(httpDone(bool)));
 
-    Q3HttpRequestHeader header("POST", path);
+    QHttpRequestHeader header("POST", path);
     header.setValue("Host", host);
     header.setValue("SOAPAction",  soapAction);
     header.setContentType("text/xml");
@@ -44,12 +50,12 @@ void MythSoap::httpDone(bool error)
     }
     else
     {
-        const Q_ULONG len = http.bytesAvailable();
+        const qint64 len = http.bytesAvailable();
         // QMemArray::assign() will own this so we don't have to delete it
-        char* buffer = new char[len + 1];
+        char *buffer = new char[len + 1];
         if (buffer) 
         {
-            http.readBlock(buffer, len);
+            http.read(buffer, len);
             buffer[len] = '\0';
             m_data = QByteArray(buffer, len + 1);
         }
@@ -59,10 +65,4 @@ void MythSoap::httpDone(bool error)
         }
     }
     m_done = true;
-}
-
-MythSoap::MythSoap()
-{
-    m_done = false;
-    m_error = false;
 }

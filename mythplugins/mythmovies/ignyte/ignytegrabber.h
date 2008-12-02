@@ -1,25 +1,29 @@
-#include <qapplication.h>
-#include <qtimer.h>
-#include <qstring.h>
 #include <iostream>
-#include "mythsoap.h"
-
 using namespace std;
+
+#include <QApplication>
+#include <QTimer>
+#include <QString>
+
+#include "mythsoap.h"
 
 class IgnyteGrabber : public QObject
 {
-    Q_OBJECT
+  Q_OBJECT
 
-    public:
-        IgnyteGrabber(QString, QString, QApplication*);
+  public:
+    IgnyteGrabber(QString, QString, QApplication*);
 
-    private:
-        QTimer *waitForSoap;
-        MythSoap ms;
-        QApplication *app;
-        void outputData(QString);
+  private:
+    ~IgnyteGrabber() {}
+    void outputData(QString);
 
-    public slots:
-        void checkHttp();
+  private:
+    QTimer *waitForSoap;
+    MythSoap *ms;
+    QApplication *app;
+
+  public slots:
+    void checkHttp(void);
 };
 

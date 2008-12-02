@@ -1,15 +1,22 @@
+// POSIX headers
+#include <unistd.h>
+
+// C headers
+#include <cstdlib>
+
+// Qt headers
 #include <QApplication>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QProcess>
+#include <QFileInfo>
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/uitypes.h>
-#include <mythtv/compat.h>
+// MythTV headers
+#include <mythcontext.h>
+#include <uitypes.h>
+#include <compat.h>
 
-#include <q3process.h>
-#include <unistd.h>
-#include <cstdlib>
-
+// MythMovies headers
 #include "moviesui.h"
 
 namespace
@@ -22,111 +29,109 @@ namespace
         }
     };
     
-        //Taken from MythVideo
+
+    bool HandleError(const QString &err, const QString &purpose)
+    {
+        if (err.isEmpty())
+            return false;
+
+        QString tempPurpose = purpose.isEmpty() ? "Command" : purpose;
+
+        VERBOSE(VB_IMPORTANT, err);
+        MythPopupBox::showOkPopup(
+            gContext->GetMainWindow(),
+            QString(tempPurpose + " failed"),
+            QString(err + "\n\nCheck MythMovies Settings"));
+
+        return true;
+    }
+
+    //Taken from MythVideo
     // Execute an external command and return results in string
     // probably should make this routing async vs polling like this
     // but it would require a lot more code restructuring
-    QString executeExternal(const QStringList &args, const QString &purpose)
+    QString ExecuteExternal(const QString     &program,
+                            const QStringList &args,
+                            const QString     &purpose)
     {
         QString ret = "";
         QString err = "";
 
-        VERBOSE(VB_GENERAL, QString("%1: Executing '%2'")
-                .arg(purpose).arg(args.join(" ")));
+        VERBOSE(VB_GENERAL, QString("%1: Executing '%2 %3'")
+                .arg(purpose).arg(program).arg(args.join(" ")));
 
-        Q3Process proc(args);
+        QProcess proc;
 
-        QString cmd = args[0];
-        QFileInfo info(cmd);
+        QFileInfo info(program);
 
         if (!info.exists())
         {
-            err = QString("\"%1\" failed: does not exist").arg(cmd);
+            err = QString("\"%1\" failed: does not exist").arg(program);
+            HandleError(err, purpose);
+            return "#ERROR";
         }
         else if (!info.isExecutable())
         {
-            err = QString("\"%1\" failed: not executable").arg(cmd);
+            err = QString("\"%1\" failed: not executable").arg(program);
+            HandleError(err, purpose);
+            return "#ERROR";
         }
-        else if (proc.start())
-        {
-            while (true)
-            {
-                while (proc.canReadLineStdout() || proc.canReadLineStderr())
-                {
-                    if (proc.canReadLineStdout())
-                    {
-                        ret +=
-                                QString::fromUtf8(proc.readLineStdout(), -1) + "\n";
-                    }
 
-                    if (proc.canReadLineStderr())
-                    {
-                        if (err == "")
-                        {
-                            err = cmd + ": ";
-                        }
+        proc.start(program, args);
 
-                        err +=
-                                QString::fromUtf8(proc.readLineStderr(), -1) + "\n";
-                    }
-                }
-
-                if (proc.isRunning())
-                {
-                    qApp->processEvents();
-                    usleep(10000);
-                }
-                else
-                {
-                    if (!proc.normalExit())
-                    {
-                        err = QString("\"%1\" failed: Process exited "
-                                "abnormally").arg(cmd);
-                    }
-
-                    break;
-                }
-            }
-        }
-        else
+        if (!proc.waitForStarted())
         {
             err = QString("\"%1\" failed: Could not start process")
-                    .arg(cmd);
+                .arg(program);
+            HandleError(err, purpose);
+            return "#ERROR";
         }
 
-        while (proc.canReadLineStdout() || proc.canReadLineStderr())
+
+        while (true)
         {
-            if (proc.canReadLineStdout())
+            proc.setReadChannel(QProcess::StandardError);
+            while (proc.canReadLine())
             {
-                ret += QString::fromUtf8(proc.readLineStdout(),-1) + "\n";
+                if (err.isEmpty())
+                    err = program + ": ";
+
+                err += QString::fromUtf8(proc.readLine(), -1) + "\n";
             }
 
-            if (proc.canReadLineStderr())
+            proc.setReadChannel(QProcess::StandardOutput);
+            while (proc.canReadLine())
+                ret += QString::fromUtf8(proc.readLine(), -1) + "\n";
+
+            if (QProcess::Running == proc.state())
             {
-                if (err == "")
+                qApp->processEvents();
+                usleep(10000);
+            }
+            else
+            {
+                if (proc.exitCode())
                 {
-                    err = cmd + ": ";
+                    err = QString("\"%1\" failed: Process exited "
+                                  "abnormally").arg(program);
                 }
 
-                err += QString::fromUtf8(proc.readLineStderr(), -1) + "\n";
+                break;
             }
         }
 
-        if (err != "")
+        ret += QString::fromUtf8(proc.readAllStandardOutput(),-1);
+        QString tmp = QString::fromUtf8(proc.readAllStandardError(),-1);
+        if (!tmp.isEmpty())
         {
-            QString tempPurpose(purpose);
-
-            if (tempPurpose == "")
-                tempPurpose = "Command";
-
-            VERBOSE(VB_IMPORTANT, err);
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                      QObject::tr(tempPurpose + " failed"),
-                                      QObject::tr(err + "\n\nCheck MythMovies Settings"));
-            ret = "#ERROR";
+            if (err.isEmpty())
+                err =  program + ": ";
+            err += tmp;
         }
 
-        //VERBOSE(VB_IMPORTANT, ret);
+        if (HandleError(err, purpose))
+            return "#ERROR";
+
         return ret;
     }
 }
@@ -214,8 +219,15 @@ void MoviesUI::updateMovieTimes()
     QString grabber = gContext->GetSetting("MythMovies.Grabber");
     grabber.replace("%z", gContext->GetSetting("MythMovies.ZipCode"));
     grabber.replace("%r", gContext->GetSetting("MythMovies.Radius"));
-    QStringList args = QStringList::split(' ', grabber);
-    QString ret = executeExternal(args, "MythMovies Data Grabber");
+    QStringList args = grabber.split(' ');
+    QString ret = "#ERROR";
+    if (args.size())
+    {
+        QString program = args[0];
+        args.pop_front();
+        ret = ExecuteExternal(program, args, "MythMovies Data Grabber");
+    }
+
     VERBOSE(VB_IMPORTANT, "Grabber Finished. Processing Data.");
     if (populateDatabaseFromGrabber(ret))
         gContext->SaveSetting("MythMovies.LastGrabDate", currentDate);
@@ -418,9 +430,9 @@ void MoviesUI::handleTreeListEntry(int nodeInt, IntVector *)
             if (nodeInt < 0)
             {
                 int theaterInt = -nodeInt;
-                m_currentTheater = &m_dataTreeByTheater.at(theaterInt - 1);
-                m_theaterName->SetText(m_currentTheater->name + " - " +
-                                       m_currentTheater->address);
+                m_currentTheater = m_dataTreeByTheater.at(theaterInt - 1);
+                m_theaterName->SetText(m_currentTheater.name + " - " +
+                                       m_currentTheater.address);
                 m_movieTitle->SetText("");
                 m_movieRating->SetText("");
                 m_movieShowTimes->SetText("");
@@ -435,13 +447,13 @@ void MoviesUI::handleTreeListEntry(int nodeInt, IntVector *)
                 m_movieTitle->SetText(m.name);
                 m_movieRating->SetText(m.rating);
                 m_movieRunningTime->SetText(m.runningTime);
-                QStringList st = QStringList::split("|", m.showTimes);
+                QStringList st = m.showTimes.split("|");
                 QString buf;
                 int i = 0;
                 for (QStringList::Iterator it = st.begin(); it != st.end();
                      ++it)
                 {
-                    buf += (*it).stripWhiteSpace() + " ";
+                    buf += (*it).trimmed() + " ";
                     i++;
                 }
                 m_movieShowTimes->SetText(buf);
@@ -452,10 +464,10 @@ void MoviesUI::handleTreeListEntry(int nodeInt, IntVector *)
             if (nodeInt < 0)
             {
                 int movieInt = -nodeInt;
-                m_currentMovie = &m_dataTreeByMovie.at(movieInt - 1);
-                m_movieTitle->SetText(m_currentMovie->name);
-                m_movieRating->SetText(m_currentMovie->rating);
-                m_movieRunningTime->SetText(m_currentMovie->runningTime);
+                m_currentMovie = m_dataTreeByMovie.at(movieInt - 1);
+                m_movieTitle->SetText(m_currentMovie.name);
+                m_movieRating->SetText(m_currentMovie.rating);
+                m_movieRunningTime->SetText(m_currentMovie.runningTime);
                 m_movieShowTimes->SetText("");
                 m_theaterName->SetText("");
             }
@@ -465,7 +477,7 @@ void MoviesUI::handleTreeListEntry(int nodeInt, IntVector *)
                 int theaterInt = nodeInt - (movieInt * 100);
                 Movie m = m_dataTreeByMovie.at(movieInt - 1);
                 Theater t = m.theaters.at(theaterInt - 1);
-                QStringList st = QStringList::split("|", t.showTimes);
+                QStringList st = t.showTimes.split("|");
                 QString buf;
                 int i = 0;
                 for (QStringList::Iterator it = st.begin(); it != st.end();
@@ -473,7 +485,7 @@ void MoviesUI::handleTreeListEntry(int nodeInt, IntVector *)
                 {
                     if (i % 4 == 0 && i != 0)
                         buf+= "\n";
-                    buf += (*it).stripWhiteSpace() + " ";
+                    buf += (*it).trimmed() + " ";
                     i++;
                 }
                 m_movieShowTimes->SetText(buf);

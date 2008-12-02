@@ -1,13 +1,13 @@
 #ifndef MOVIESUI_H_
 #define MOVIESUI_H_
 
-#include <mythtv/mythdialogs.h>
-#include <mythtv/mythdbcon.h>
-
-#include "helperobjects.h"
-//Added by qt3to4:
+#include <QVector>
 #include <QKeyEvent>
 
+#include <mythdialogs.h>
+#include <mythdbcon.h>
+
+#include "helperobjects.h"
 
 class QTimer;
 
@@ -15,7 +15,7 @@ class MoviesUI : public MythThemedDialog
 {
     Q_OBJECT
   public:
-    typedef Q3ValueVector<int> IntVector;
+    typedef QVector<int> IntVector;
 
     MoviesUI(MythMainWindow *parent,
              const QString  &windowName,
@@ -41,9 +41,9 @@ class MoviesUI : public MythThemedDialog
     TheaterVector buildTheaterDataTree();
     MovieVector buildMovieDataTree();
     TheaterVector m_dataTreeByTheater;
-    Theater *m_currentTheater;
+    Theater m_currentTheater;
     MovieVector m_dataTreeByMovie;
-    Movie *m_currentMovie;
+    Movie m_currentMovie;
     GenericTree           *m_movieTree;
     UIManagedTreeListType *m_movieTreeUI;
     GenericTree *m_currentNode;

@@ -1,7 +1,7 @@
 #ifndef MOVIESSETTINGS_H
 #define MOVIESSETTINGS_H
 
-#include <mythtv/settings.h>
+#include <settings.h>
 
 class MoviesSettings : virtual public ConfigurationWizard
 {
