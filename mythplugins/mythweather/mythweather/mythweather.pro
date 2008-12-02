@@ -2,7 +2,7 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
-QT += sql xml qt3support
+QT += sql xml
 
 TEMPLATE = lib
 CONFIG += plugin thread debug

@@ -10,7 +10,6 @@
 // MythWeather headers
 #include "weatherUtils.h"
 
-class Q3Process;
 class WeatherScreen;
 
 /*
@@ -86,7 +85,7 @@ class WeatherSource : public QObject
     void killProcess();
 
   private slots:
-    void readFromStdout();
+    void read(void);
     void processExit();
     void scriptTimeout();
     void updateTimeout();
@@ -97,10 +96,11 @@ class WeatherSource : public QObject
     bool m_ready;
     bool m_inuse;
     ScriptInfo *m_info;
-    Q3Process *m_proc;
+    QProcess *m_proc;
+    QString m_proc_debug;
     QString m_dir;
     QString m_locale;
-    QString m_buffer;
+    QByteArray m_buffer;
     units_t m_units;
     QTimer *m_scriptTimer;
     QTimer *m_updateTimer;
