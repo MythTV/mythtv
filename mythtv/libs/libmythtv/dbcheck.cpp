@@ -3689,7 +3689,7 @@ tmp.constData(),
 "  MODIFY programid varbinary(40) NOT NULL default '',"
 "  MODIFY station varbinary(20) NOT NULL default '';",
 "ALTER TABLE people"
-"  MODIFY name binary(128) NOT NULL default '';",
+"  MODIFY name varbinary(128) NOT NULL default '';",
 "ALTER TABLE playgroup"
 "  MODIFY name varbinary(32) NOT NULL default '',"
 "  MODIFY titlematch varbinary(255) NOT NULL default '';",
@@ -3714,10 +3714,10 @@ tmp.constData(),
 "  MODIFY programid varbinary(40) NOT NULL default '';",
 "ALTER TABLE programgenres"
 "  MODIFY relevance binary(1) NOT NULL default '',"
-"  MODIFY genre binary(30) default NULL;",
+"  MODIFY genre varbinary(30) default NULL;",
 "ALTER TABLE programrating"
-"  MODIFY system binary(8) NOT NULL default '',"
-"  MODIFY rating binary(16) default NULL;",
+"  MODIFY system varbinary(8) NOT NULL default '',"
+"  MODIFY rating varbinary(16) default NULL;",
 "ALTER TABLE recgrouppassword"
 "  MODIFY recgroup varbinary(32) NOT NULL default '',"
 "  MODIFY password varbinary(10) NOT NULL default '';",
@@ -3766,8 +3766,8 @@ tmp.constData(),
 "  MODIFY syndicatedepisodenumber varbinary(20) NOT NULL default '',"
 "  MODIFY programid varbinary(40) NOT NULL default '';",
 "ALTER TABLE recordedrating"
-"  MODIFY system binary(8) NOT NULL default '',"
-"  MODIFY rating binary(16) default NULL;",
+"  MODIFY system varbinary(8) NOT NULL default '',"
+"  MODIFY rating varbinary(16) default NULL;",
 "ALTER TABLE recordingprofiles"
 "  MODIFY name varbinary(128) default NULL,"
 "  MODIFY videocodec varbinary(128) default NULL,"
