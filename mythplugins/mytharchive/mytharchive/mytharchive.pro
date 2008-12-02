@@ -19,13 +19,13 @@ HEADERS += archivesettings.h logviewer.h fileselector.h
 HEADERS += recordingselector.h videoselector.h dbcheck.h
 HEADERS += archiveutil.h selectdestination.h
 HEADERS += mythburn.h themeselector.h editmetadata.h thumbfinder.h 
-HEADERS += exportnative.h importnativewizard.h
+HEADERS += exportnative.h importnative.h
 
 SOURCES += main.cpp archivesettings.cpp logviewer.cpp 
 SOURCES += fileselector.cpp recordingselector.cpp videoselector.cpp
 SOURCES += dbcheck.cpp archiveutil.cpp selectdestination.cpp
 SOURCES += mythburn.cpp themeselector.cpp editmetadata.cpp thumbfinder.cpp
-SOURCES += exportnative.cpp importnativewizard.cpp
+SOURCES += exportnative.cpp importnative.cpp
 
 burnuifiles.path = $${PREFIX}/share/mythtv/themes/default
 burnuifiles.files = mythburn-ui.xml

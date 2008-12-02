@@ -29,7 +29,6 @@ typedef enum
     FSTYPE_DIRECTORY = 2
 } FSTYPE;
 
-class QPixmap;
 class MythUIText;
 class MythUITextEdit;
 class MythUIButton;
@@ -56,7 +55,7 @@ class FileSelector : public MythScreenType
     void haveResult(bool ok);            // used in FSTYPE_FILELIST mode 
     void haveResult(QString filename);   // used in FSTYPE_FILE or FSTYPE_DIRECTORY mode 
 
-  private slots:
+  protected slots:
     void OKPressed(void);
     void cancelPressed(void);
     void backPressed(void);
@@ -64,7 +63,7 @@ class FileSelector : public MythScreenType
     void itemClicked(MythUIButtonListItem *item);
     void locationEditLostFocus(void);
 
-  private:
+  protected:
     void updateFileList(void);
     void updateSelectedList(void);
     void updateWidgets(void);

@@ -36,7 +36,7 @@ using namespace std;
 #include "archiveutil.h"
 #include "selectdestination.h"
 #include "exportnative.h"
-#include "importnativewizard.h"
+#include "importnative.h"
 
 // return true if the process belonging to the lock file is still running
 bool checkProcess(const QString &lockFile)
@@ -185,15 +185,12 @@ void runImportVideo(void)
 
     QString filter = "*.xml";
 
-    ImportNativeWizard wiz("/", filter, gContext->GetMainWindow(),
-                          "import_native_wizard", "mythnative-", "import native wizard");
-    DialogCode res = wiz.exec();
+    // show the find archive screen
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ArchiveFileSelector *selector = new ArchiveFileSelector(mainStack);
 
-    if (kDialogCodeRejected == res)
-        return;
-
-    // now show the log viewer
-    showLogViewer();
+    if (selector->Create())
+        mainStack->AddScreen(selector);
 }
 
 void runShowLog(void)

@@ -8,7 +8,6 @@
 // Myth
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdb.h>
-#include <mythtv/uitypes.h>
 #include <mythtv/libmythui/mythuihelper.h>
 #include <libmythui/mythuitext.h>
 #include <libmythui/mythuitextedit.h>
