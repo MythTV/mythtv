@@ -134,4 +134,12 @@
 #define COMMFLAG_EXIT_START                       GENERIC_EXIT_START-6
 #define COMMFLAG_EXIT_NO_RINGBUFFER               GENERIC_EXIT_START-7
 
+// MythTranscodeDaemon
+#define MTD_EXIT_OK                               GENERIC_EXIT_OK
+#define MTD_EXIT_NOT_OK                           GENERIC_EXIT_NOT_OK
+#define MTD_EXIT_NO_MYTHCONTEXT                   GENERIC_EXIT_NO_MYTHCONTEXT
+#define MTD_EXIT_INVALID_CMDLINE                  GENERIC_EXIT_INVALID_CMDLINE
+#define MTD_EXIT_DB_ERROR                         GENERIC_EXIT_DB_ERROR
+#define MTD_EXIT_DAEMONIZING_ERROR                GENERIC_EXIT_START-1
+
 #endif // __MYTH_EXIT_CODES__
