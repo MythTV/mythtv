@@ -3491,7 +3491,8 @@ void VideoOutputXv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 
 void VideoOutputXv::DrawUnusedRects(bool sync)
 {
-    if (VideoOutputSubType() == OpenGL)
+    if (VideoOutputSubType() == OpenGL ||
+        VideoOutputSubType() == XVideoVDPAU)
         return;
 
     // boboff assumes the smallest interlaced resolution is 480 lines - 5%
