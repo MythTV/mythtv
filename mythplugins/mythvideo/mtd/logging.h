@@ -15,23 +15,22 @@
 #include <QFile>
 
 
+/** \class MTDLogger
+ *  \brief Simple little class to log mtd information.
+ *
+ *  Doesn't do much at the moment, but in place early
+ *  so that it will be easy to change logging information
+ *  (in transcoding directories, syslog, etc.) later.
+ */
+
 class MTDLogger : public QObject
 {
-
     Q_OBJECT
 
-    //
-    //  Simple little class to log mtd information
-    //  Doesn't do much at the moment, but in place early
-    //  so that it will be easy to change logging information
-    //  (in transcoding directories, syslog, etc.) later.
-    //
-
   public:
-  
     MTDLogger(bool log_stdout);
-    ~MTDLogger();
-    
+    bool Init(void);
+   
   public slots:
 
     void addEntry(const QString &log_entry);
@@ -41,7 +40,9 @@ class MTDLogger : public QObject
     void socketClosed();
 
   private:
+    ~MTDLogger();
   
+  private:
     void writeString(const QString &log_entry);
     void writeStampedString(const QString &log_entry);
     QFile logging_file;

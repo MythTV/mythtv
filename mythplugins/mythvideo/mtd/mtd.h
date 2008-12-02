@@ -11,7 +11,7 @@
 */
 
 #include <QObject>
-#include <Q3PtrList>
+#include <QList>
 
 #include "logging.h"
 #include "serversocket.h"
@@ -21,34 +21,38 @@
 
 class QStringList;
 class QTimer;
+class QMutex;
+class QWaitCondition;
+
+class MythTranscodeDaemon;
 
 class DiscCheckingThread : public QThread
 {
-
   public:
-  
-    DiscCheckingThread( MTD *owner,
-                        DVDProbe *probe, 
-                        QMutex *drive_access_mutex,
-                        QMutex *mutex_for_titles);
-    virtual void run();
-    bool    haveDisc(){return have_disc;}
-    bool    keepGoing();
-    void    cancelMe(bool yes_or_no){cancel_me = yes_or_no;}
-    
+    DiscCheckingThread(DVDProbe *probe,
+                       QMutex   *drive_access_mutex,
+                       QMutex   *mutex_for_titles);
+    virtual void run(void);
+    void    Cancel(void);
+
+    bool    IsDiscPresent(void) const { return have_disc; }
+
   private:
-  
-    MTD      *parent;
-    DVDProbe *dvd_probe;
-    bool     have_disc;
-    bool     cancel_me;
-    QMutex   *dvd_drive_access;
-    QMutex   *titles_mutex;
+    ~DiscCheckingThread();
+    bool    IsCancelled(void) const;
+
+  private:
+    MythTranscodeDaemon *parent;
+    DVDProbe            *dvd_probe;
+    volatile bool        have_disc;
+    QMutex              *dvd_drive_access;
+    QMutex              *titles_mutex;
+    QMutex              *cancelLock;
+    QWaitCondition      *cancelWaitCond;
+    bool                 cancel_me;
 };
 
-
-
-class MTD : public QObject
+class MythTranscodeDaemon : public QObject
 {
 
     Q_OBJECT
@@ -59,22 +63,24 @@ class MTD : public QObject
     //
 
   public:
-  
-    MTD(int port, bool log_stdout);
-    bool threadsShouldContinue(){return keep_running;}
-    bool isItOkToStartTranscoding();
-    
+
+    MythTranscodeDaemon(int port, bool log_stdout);
+    ~MythTranscodeDaemon();
+    bool Init(void);
+
+    bool threadsShouldContinue(void) const { return keep_running; }
+    bool IncrConcurrentTranscodeCounter(void);
+
   signals:
-  
+
     void writeToLog(const QString &entry);
 
   private slots:
-  
+
     void newConnection(Q3Socket *);
     void endConnection(Q3Socket *);
     void readSocket();
     void parseTokens(const QStringList &tokens, Q3Socket *socket);
-    void shutDown();
     void sendMessage(Q3Socket *where, const QString &what);
     void sayHi(Q3Socket *socket);
     void sendStatusReport(Q3Socket *socket);
@@ -90,25 +96,27 @@ class MTD : public QObject
     void cleanThreads();
     void checkDisc();
     bool checkFinalFile(QFile *final_file, const QString &extension);
-    
-  private:
 
+  private:
     void customEvent(QEvent *ce);
-  
-    MTDLogger           *mtd_log;    
-    MTDServerSocket     *server_socket;
-    Q3PtrList<JobThread> job_threads;
-    QMutex              *dvd_drive_access;
-    QMutex              *titles_mutex;
-    bool                keep_running;
+    void ShutDownThreads(void);
+
+    int                 listening_port;
+    bool                log_to_stdout;
+    MTDLogger          *mtd_log;
+    MTDServerSocket    *server_socket;
+    JobThreadList       job_threads;
+    mutable QMutex     *dvd_drive_access;
+    mutable QMutex     *titles_mutex;
+    volatile bool       keep_running;
     bool                have_disc;
-    QTimer              *thread_cleaning_timer;
-    QTimer              *disc_checking_timer;
-    DVDProbe            *dvd_probe;
+    QTimer             *thread_cleaning_timer;
+    QTimer             *disc_checking_timer;
     QString             dvd_device;
-    DiscCheckingThread  *disc_checking_thread;
+    DVDProbe           *dvd_probe;
+    DiscCheckingThread *disc_checking_thread;
     int                 nice_level;
-    QMutex              *concurrent_transcodings_mutex;
+    mutable QMutex     *concurrent_transcodings_mutex;
     int                 concurrent_transcodings;
     int                 max_concurrent_transcodings;
 };

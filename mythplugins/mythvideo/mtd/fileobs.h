@@ -11,10 +11,8 @@
 
 */
 
-#include <QString>
-#include <QStringList>
 #include <QFile>
-#include <Q3PtrList>
+#include <QStringList>
 
 class RipFile
 {
@@ -28,17 +26,17 @@ class RipFile
     bool    open(const QIODevice::OpenMode &mode, bool multiple_files);
     QStringList close();
     void    remove();
-    QString name();
+    QString name(void) const;
     bool    writeBlocks(unsigned char *the_data, int how_much);
 
   private:
     QString         base_name;
     QString         extension;
     int             filesize;
-    QFile           *active_file;
+    int             active_file;
     int             bytes_written;
     QIODevice::OpenMode access_mode;
-    Q3PtrList<QFile> files;
+    QList<QFile*>   files;
     bool            use_multiple_files;
     bool            auto_remove_bad_rips;
 };

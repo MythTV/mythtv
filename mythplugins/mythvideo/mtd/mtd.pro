@@ -2,6 +2,8 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
+QT += sql xml qt3support
+
 TEMPLATE = app
 CONFIG += thread opengl
 TARGET = mtd
@@ -19,6 +21,3 @@ SOURCES += jobthread.cpp dvdprobe.cpp fileobs.cpp threadevents.cpp
 mingw:DEFINES += USING_MINGW
 
 win32:LIBS += -lws2_32
-
-#The following line was inserted by qt3to4
-QT += xml opengl qt3support  sql

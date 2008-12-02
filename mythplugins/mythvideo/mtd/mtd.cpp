@@ -8,204 +8,227 @@
 
 */
 
+// POSIX headers
 #include <unistd.h>
+
+// C headers
 #include <cstdlib>
+
+// Qt headers
 #include <QStringList>
 #include <QRegExp>
 #include <QDir>
 #include <QTimer>
-#include <Q3PtrList>
+#include <QApplication>
+#include <QWaitCondition>
 
+// MythTV headers
 #include <mythtv/util.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/compat.h>
 
+// MythTranscodeDaemon headers
 #include "mtd.h"
 #include "logging.h"
 
 enum RIP_QUALITIES { QUALITY_ISO = -1, QUALITY_PERFECT, QUALITY_TRANSCODE };
 
-DiscCheckingThread::DiscCheckingThread(MTD *owner,
-                                       DVDProbe *probe, 
-                                       QMutex *drive_access_mutex,
-                                       QMutex *mutex_for_titles)
+/** \class DiscCheckingThread
+ *  \brief Periodically checks if there is a disc in the DVD drive.
+ *
+ *  This is just a little object that asks the DVDProbe object to
+ *  keep checking the drive to see if we have a disc, if the disc
+ *  has changed, etc.
+ */
+DiscCheckingThread::DiscCheckingThread(
+    DVDProbe *probe,
+    QMutex   *drive_access_mutex,
+    QMutex   *mutex_for_titles) :
+    dvd_probe(probe), have_disc(false),
+    dvd_drive_access(drive_access_mutex),
+    titles_mutex(mutex_for_titles),
+    cancelLock(new QMutex()),
+    cancelWaitCond(new QWaitCondition()),
+    cancel_me(false)
 {
-    //
-    //  This is just a little object that asks the
-    //  DVDProbe object to keep checking the drive to
-    //  see if we have a disc, if the disc has changed,
-    //  etc.
-    //
-    
-    cancel_me = false;
-    have_disc = false;
-    dvd_probe = probe;
-    dvd_drive_access = drive_access_mutex;
-    titles_mutex = mutex_for_titles;
-    parent = owner;
 }
 
-bool DiscCheckingThread::keepGoing()
+DiscCheckingThread::~DiscCheckingThread()
 {
-    //
-    //  When the mtd wants to finish (quit), it
-    //  tells this checking thread to stop 
-    //  running
-    //  
+    delete cancelLock;
+    delete cancelWaitCond;
+}
 
-    return (parent->threadsShouldContinue() && ! cancel_me);
-} 
-
-void DiscCheckingThread::run()
+void DiscCheckingThread::Cancel(void)
 {
-    //
-    //  Unless the mtd wants to quit,
-    //  keep checking the DVD.
-    //
+    QMutexLocker locker(cancelLock);
+    cancel_me = true;
+    cancelWaitCond->wakeAll();
+}
 
-    while(keepGoing())
+/// \brief Checks if the MythTranscodeDaemon class has asked us to stop.
+bool DiscCheckingThread::IsCancelled(void) const
+{
+    QMutexLocker locker(cancelLock);
+    return cancel_me;
+}
+
+void DiscCheckingThread::run(void)
+{
+    while (!IsCancelled())
     {
-        while(!dvd_drive_access->tryLock())
-        {
-            sleep(3);
-        }
-        while(!titles_mutex->tryLock())
-        {
-            sleep(3);
-        }
-        if(dvd_probe->probe())
-        {
-            //
-            //  Yeah! We can read the DVD
-            //
-        
-            have_disc = true;
-        }
-        else
-        {
-            have_disc = false;
-        }
-        titles_mutex->unlock();
-        dvd_drive_access->unlock();
-        sleep(1);
-    }
-    return;
-}
+        bool gota = dvd_drive_access->tryLock();
+        bool gotb = titles_mutex->tryLock();
 
+        if (gota && gotb)
+            have_disc = dvd_probe->Probe();
+
+        if (gota)
+            dvd_drive_access->unlock();
+        if (gotb)
+            titles_mutex->unlock();
+
+        QMutexLocker locker(cancelLock);
+        if (!cancel_me)
+            cancelWaitCond->wait(cancelLock, 1000);
+    }
+}
 
 /*
 ---------------------------------------------------------------------
 */
 
+#define LOC      QString("MTD: ")
+#define LOC_WARN QString("MTD, Warning: ")
+#define LOC_ERR  QString("MTD, Error: ")
 
-
-
-MTD::MTD(int port, bool log_stdout)
-    :QObject()
+MythTranscodeDaemon::MythTranscodeDaemon(int port, bool log_stdout) :
+    QObject(),
+    listening_port(port),
+    log_to_stdout(log_stdout),
+    mtd_log(NULL),
+    server_socket(new MTDServerSocket(listening_port)),
+    dvd_drive_access(new QMutex()),
+    titles_mutex(new QMutex()),
+    have_disc(false),
+    thread_cleaning_timer(new QTimer(this)),
+    disc_checking_timer(new QTimer(this)),
+    dvd_device(gContext->GetSetting("DVDDeviceLocation")),
+    dvd_probe(new DVDProbe(dvd_device)),
+    disc_checking_thread(NULL),
+    nice_level(gContext->GetNumSetting("MTDNiceLevel", 20)),
+    concurrent_transcodings_mutex(new QMutex()),
+    concurrent_transcodings(0),
+    max_concurrent_transcodings(
+        gContext->GetNumSetting("MTDConcurrentTranscodings", 1))
 {
-    keep_running = true;
-    have_disc = false;
-    
-    int nice_priority = gContext->GetNumSetting("MTDNiceLevel", 20);
-    nice(nice_priority);
-    nice_level = nice_priority;
+    nice(nice_level);
 
-    //
-    //  Create the socket to listen to for connections
-    //
-    
-    server_socket = new MTDServerSocket(port);
-    connect(server_socket, SIGNAL(newConnect(Q3Socket *)),
-            this, SLOT(newConnection(Q3Socket *)));
-    connect(server_socket, SIGNAL(endConnect(Q3Socket *)),
-            this, SLOT(endConnection(Q3Socket *)));
-    
-    //
-    //  Create the logging object
-    //        
-    
-    mtd_log = new MTDLogger(log_stdout);
-    mtd_log->addStartup();
-    connect(this, SIGNAL(writeToLog(const QString &)), mtd_log, SLOT(addEntry(const QString &)));
-    
-    //
-    //  Announce in the log the port we're listening on
-    //
-    
-    emit writeToLog(QString("mtd is listening on port %1").arg(port));
+    connect(server_socket, SIGNAL(newConnect(Q3Socket*)),
+            this,          SLOT(newConnection(Q3Socket*)));
+    connect(server_socket, SIGNAL(endConnect(Q3Socket*)),
+            this,          SLOT(endConnection(Q3Socket*)));
+    connect(thread_cleaning_timer, SIGNAL(timeout()),
+            this,                  SLOT(  cleanThreads()));
+    connect(disc_checking_timer,   SIGNAL(timeout()),
+            this,                  SLOT(checkDisc()));
 
-    //
-    //  Setup the job threads list
-    //    
-
-    job_threads.setAutoDelete( TRUE );
-    
-    //
-    //  Create a Mutex for locking access to the DVD drive.
-    //
-
-    dvd_drive_access = new QMutex();
-
-    //
-    //  Create a mutex for access to the titles (PtrList)
-    //
-
-    titles_mutex = new QMutex();
-
-    //
-    //  Create a mutex for protecting the variable for
-    //  the number of concurrent jobs and set start up
-    //  values.
-    //
-    
-    concurrent_transcodings_mutex = new QMutex();
-    concurrent_transcodings = 0;
-    max_concurrent_transcodings = gContext->GetNumSetting("MTDConcurrentTranscodings", 1);
-
-    //
-    //  Create a timer to occasionally 
-    //  clean out dead threads
-    //
-    
-    thread_cleaning_timer = new QTimer();
-    connect(thread_cleaning_timer, SIGNAL(timeout()), this, SLOT(cleanThreads()));
-    thread_cleaning_timer->start(2000);
-
-    //
-    //  Create (but do not open) the DVD probing object
-    //  and then ask a thread to check it for us. Make a
-    //  timer to query whether the thread is done or not
-    //
-        
-    dvd_device = gContext->GetSetting("DVDDeviceLocation");  // Might be ""
-    dvd_probe = new DVDProbe(dvd_device);
-    disc_checking_thread = new DiscCheckingThread(this, dvd_probe, dvd_drive_access, titles_mutex);
+    disc_checking_thread = new DiscCheckingThread(
+        dvd_probe, dvd_drive_access, titles_mutex);
     disc_checking_thread->start();
-    disc_checking_timer = new QTimer();
-    disc_checking_timer->start(1000);
-    connect(disc_checking_timer, SIGNAL(timeout()), this, SLOT(checkDisc()));
-
 }
 
-void MTD::checkDisc()
+MythTranscodeDaemon::~MythTranscodeDaemon()
+{
+    disconnect();
+
+    if (mtd_log)
+    {
+        mtd_log->addShutdown();
+        mtd_log->deleteLater();
+        mtd_log = NULL;
+    }
+
+    if (server_socket)
+    {
+        server_socket->disconnect();
+        server_socket->deleteLater();
+        server_socket = NULL;
+    }
+
+    // thread_cleaning_timer is auto deleted by Qt
+    thread_cleaning_timer->disconnect();
+    // disc_checking_timer is auto deleted by Qt
+    disc_checking_timer->disconnect();
+
+    if (disc_checking_thread)
+    {
+        disc_checking_thread->Cancel();
+        disc_checking_thread->wait();
+        disc_checking_thread->deleteLater();
+        disc_checking_thread = NULL;
+    }
+
+    if (dvd_drive_access)
+    {
+        delete dvd_drive_access;
+        dvd_drive_access = NULL;
+    }
+
+    if (titles_mutex)
+    {
+        delete titles_mutex;
+        titles_mutex = NULL;
+    }
+
+    if (concurrent_transcodings_mutex)
+    {
+        delete concurrent_transcodings_mutex;
+        concurrent_transcodings_mutex = NULL;
+    }
+}
+
+bool MythTranscodeDaemon::Init(void)
+{
+    //  Create the logging object
+    mtd_log = new MTDLogger(log_to_stdout);
+    if (!mtd_log->Init())
+        return false;
+    mtd_log->addStartup();
+    connect(this,    SIGNAL(writeToLog(const QString&)),
+            mtd_log, SLOT(  addEntry(  const QString&)));
+
+    // Announce in the log the port we're listening on
+    emit writeToLog(QString("mtd is listening on port %1")
+                    .arg(listening_port));
+
+    // Start timers
+    thread_cleaning_timer->start(2000);
+    disc_checking_timer->start(1000);
+
+    return true;
+}
+
+void MythTranscodeDaemon::checkDisc()
 {
     // forgetDVD() can delete dvd_probe
     if (!dvd_probe)
         return;
 
     bool had_disc = have_disc;
-    QString old_name = dvd_probe->getName();
-    if(disc_checking_thread->haveDisc())
+    QString old_name = dvd_probe->GetName();
+    if (disc_checking_thread->IsDiscPresent())
     {
         have_disc = true;
-        if(had_disc)
+        if (had_disc)
         {
-            if (old_name != dvd_probe->getName())
+            if (old_name != dvd_probe->GetName())
             {
                 //
                 //  DVD changed
                 //
-                emit writeToLog(QString("DVD changed to: %1").arg(dvd_probe->getName()));
+                emit writeToLog(QString("DVD changed to: %1")
+                                .arg(dvd_probe->GetName()));
             }
         }
         else
@@ -213,29 +236,24 @@ void MTD::checkDisc()
             //
             //  DVD inserted
             //
-            emit writeToLog(QString("DVD inserted: %1").arg(dvd_probe->getName()));
-            Q3PtrList<DVDTitle> *list_of_titles = dvd_probe->getTitles();
-            
-            //
-            //  Do not use an iterator, cause 
-            //  we're not mutex locking title access
-            //
-            
-            if(list_of_titles)
+            emit writeToLog(QString("DVD inserted: %1")
+                            .arg(dvd_probe->GetName()));
+
+            DVDTitleList list_of_titles = dvd_probe->GetTitles();
+            for (uint i = 0; i < (uint)list_of_titles.size(); i++)
             {
-                for(uint i = 0; i < list_of_titles->count(); i++)
-                {
-                    emit writeToLog(QString("            : Title %1 is of type %2 (dvdinput table)")
-                                            .arg(i+1)
-                                            .arg(list_of_titles->at(i)->getInputID()));
-                }
+                emit writeToLog(
+                    QString("            : Title %1 is of "
+                            "type %2 (dvdinput table)")
+                    .arg(i+1)
+                    .arg(list_of_titles[i].GetInputID()));
             }
         }
     }
     else
     {
         have_disc = false;
-        if(had_disc)
+        if (had_disc)
         {
             //
             //  DVD removed
@@ -245,75 +263,77 @@ void MTD::checkDisc()
     }
 }
 
-void MTD::cleanThreads()
+void MythTranscodeDaemon::cleanThreads()
 {
     //
-    //  Should probably have the job threads 
+    //  Should probably have the job threads
     //  post an event when they are done, but
-    //  this works. 
+    //  this works.
     //
 
-    JobThread *iterator;
-    for (iterator = job_threads.first(); iterator;
-         iterator = job_threads.next() )
+    JobThreadList::iterator it = job_threads.begin();
+    for (; it != job_threads.end(); ++it)
     {
-        if (iterator->isFinished())
+        if (!(*it)->isFinished())
+            continue;
+
+        QString problem = (*it)->GetLastProblem();
+        QString job_command = (*it)->GetJobString();
+        if (problem.length() > 0)
         {
-            QString problem = iterator->getProblem();
-            QString job_command = iterator->getJobString();
-            if(problem.length() > 0)
-            {   
-                emit writeToLog(QString("job failed: %1").arg(job_command)); 
-                //emit writeToLog(QString("    reason: %1").arg(problem));
-            }
-            else
-            {
-                emit writeToLog(QString("job finished successfully: %1").arg(job_command)); 
-            }
-            
-            //
-            //  If this is a transcoding thread, adjust the
-            //  count.
-            //
-            
-            if(iterator->transcodeSlotUsed())
-            {
-                concurrent_transcodings_mutex->lock();
-                concurrent_transcodings--;
-                if(concurrent_transcodings < 0)
-                {
-                    VERBOSE(VB_IMPORTANT, "mtd.o: Your number of transcode jobs ended up negative. That should be impossible.");
-                    concurrent_transcodings = 0;
-                }
-                concurrent_transcodings_mutex->unlock();
-            }
-            
-            
-            job_threads.remove(iterator);
+            emit writeToLog(QString("job failed: %1").arg(job_command));
+            //emit writeToLog(QString("    reason: %1").arg(problem));
         }
+        else
+        {
+            emit writeToLog(QString("job finished successfully: %1")
+                            .arg(job_command));
+        }
+
+        //
+        //  If this is a transcoding thread, adjust the
+        //  count.
+        //
+
+        if ((*it)->transcodeSlotUsed())
+        {
+            QMutexLocker locker(concurrent_transcodings_mutex);
+            concurrent_transcodings--;
+            if (concurrent_transcodings < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "One of the transcode jobs died very early.\n\t\t\t"
+                        "There may or may not be anything informative in "
+                        "the log.");
+                concurrent_transcodings = 0;
+            }
+        }
+
+        (*it)->deleteLater();
+        job_threads.erase(it);
     }
-    
+
 }
 
-void MTD::newConnection(Q3Socket *socket)
+void MythTranscodeDaemon::newConnection(Q3Socket *socket)
 {
     connect(socket, SIGNAL(readyRead()),
             this, SLOT(readSocket()));
-            
+
     mtd_log->socketOpened();
 }
 
-void MTD::endConnection(Q3Socket *socket)
+void MythTranscodeDaemon::endConnection(Q3Socket *socket)
 {
     socket->close();
     mtd_log->socketClosed();
 }
 
-void MTD::readSocket()
+void MythTranscodeDaemon::readSocket()
 {
 
     Q3Socket *socket = (Q3Socket *)sender();
-    if(socket->canReadLine())
+    if (socket->canReadLine())
     {
         QString incoming_data = socket->readLine();
         incoming_data = incoming_data.replace( QRegExp("\n"), "" );
@@ -324,36 +344,37 @@ void MTD::readSocket()
     }
 }
 
-
-void MTD::parseTokens(const QStringList &tokens, Q3Socket *socket)
+void MythTranscodeDaemon::parseTokens(const QStringList &tokens, Q3Socket *socket)
 {
     //
     //  parse commands coming in from the socket
     //
-    
-    if(tokens[0] == "halt" ||
+
+    if (tokens[0] == "halt" ||
        tokens[0] == "quit" ||
        tokens[0] == "shutdown")
     {
-        shutDown();
+        ShutDownThreads();
+        // The rest will be handled when the class is deleted..
+        QApplication::exit(0);
     }
-    else if(tokens[0] == "hello")
+    else if (tokens[0] == "hello")
     {
         sayHi(socket);
     }
-    else if(tokens[0] == "status")
+    else if (tokens[0] == "status")
     {
         sendStatusReport(socket);
     }
-    else if(tokens[0] == "media")
+    else if (tokens[0] == "media")
     {
         sendMediaReport(socket);
     }
-    else if(tokens[0] == "job")
+    else if (tokens[0] == "job")
     {
         startJob(tokens);
     }
-    else if(tokens[0] == "abort")
+    else if (tokens[0] == "abort")
     {
         startAbort(tokens);
     }
@@ -372,51 +393,35 @@ void MTD::parseTokens(const QStringList &tokens, Q3Socket *socket)
     }
 }
 
-
-void MTD::shutDown()
+void MythTranscodeDaemon::ShutDownThreads(void)
 {
-    //
-    //  Setting this flag to false
-    //  will make all the threads 
-    //  shutdown 
-    //
+    // Tell job threads to exit soon...
+    JobThreadList::iterator it = job_threads.begin();
+    for (; it != job_threads.end(); ++it)
+        (*it)->Cancel();
 
-    keep_running = false;
+    // Tell disc checking thread to exit soon...
+    if (disc_checking_thread)
+        disc_checking_thread->Cancel();
 
-    //
-    //  Stop checking the DVD
-    //
-    
-    disc_checking_thread->wait();
-
-    //
-    //  Get rid of job threads
-    //
-    
-    JobThread *iterator;
-    for(iterator = job_threads.first(); iterator; iterator = job_threads.next() )
+    // Wait for job threads to actually exit, then delete
+    while (!job_threads.empty())
     {
-        iterator->wait();
-    }
-    
-    for(uint i = 0; i < job_threads.count(); i++)
-    {
-        job_threads.remove(i);
+        job_threads.back()->wait();
+        job_threads.back()->deleteLater();
+        job_threads.pop_back();
     }
 
-
-    //
-    //  Clean things up and go away.
-    //
-    
-    mtd_log->addShutdown();
-    delete mtd_log;
-    
-    delete server_socket;
-    exit(0);
+    // Wait for disc checking thread to actually exit, then delete
+    if (disc_checking_thread)
+    {
+        disc_checking_thread->wait();
+        disc_checking_thread->deleteLater();
+        disc_checking_thread = NULL;
+    }
 }
 
-void MTD::sendMessage(Q3Socket *where, const QString &what)
+void MythTranscodeDaemon::sendMessage(Q3Socket *where, const QString &what)
 {
     QString message = what;
     message.append("\n");
@@ -424,137 +429,134 @@ void MTD::sendMessage(Q3Socket *where, const QString &what)
     where->writeBlock(buf.constData(), buf.length());
 }
 
-void MTD::sayHi(Q3Socket *socket)
+void MythTranscodeDaemon::sayHi(Q3Socket *socket)
 {
     sendMessage(socket, "greetings");
 }
 
-void MTD::sendStatusReport(Q3Socket *socket)
+void MythTranscodeDaemon::sendStatusReport(Q3Socket *socket)
 {
     //
-    //  Tell the client how many jobs are 
+    //  Tell the client how many jobs are
     //  in progress, and then details of
-    //  each job. 
+    //  each job.
     //
 
-    
+    sendMessage(socket, QString("status dvd summary %1")
+                .arg(job_threads.size()));
 
-    sendMessage(socket, QString("status dvd summary %1").arg(job_threads.count()));
-
-    for(uint i = 0; i < job_threads.count() ; i++)
+    for (uint i = 0; i < (uint)job_threads.size() ; i++)
     {
         QString a_status_message = QString("status dvd job %1 overall %2 %3")
                                    .arg(i)
-                                   .arg(job_threads.at(i)->getProgress())
-                                   .arg(job_threads.at(i)->getJobName());
+                                   .arg(job_threads[i]->GetProgress())
+                                   .arg(job_threads[i]->GetJobName());
         sendMessage(socket, a_status_message);
         a_status_message = QString("status dvd job %1 subjob %2 %3")
                                    .arg(i)
-                                   .arg(job_threads.at(i)->getSubProgress())
-                                   .arg(job_threads.at(i)->getSubName());
+                                   .arg(job_threads[i]->GetSubProgress())
+                                   .arg(job_threads[i]->GetSubName());
         sendMessage(socket, a_status_message);
     }
-    
+
     sendMessage(socket, "status dvd complete");
 }
 
-void MTD::sendMediaReport(Q3Socket *socket)
+void MythTranscodeDaemon::sendMediaReport(Q3Socket *socket)
 {
     //
     //  Tell the client what's on a disc
     //
 
-    if(have_disc)
+    if (have_disc)
     {
         //
         //  Send number of titles and disc's name
         //
 
-        while(!titles_mutex->tryLock())
-        {
-            sleep(1);
-        }
-        Q3PtrList<DVDTitle>   *dvd_titles = dvd_probe->getTitles();
-        sendMessage(socket, QString("media dvd summary %1 %2").arg(dvd_titles->count()).arg(dvd_probe->getName()));
+        QMutexLocker locker(titles_mutex);
+
+        DVDTitleList dvd_titles = dvd_probe->GetTitles();
+        sendMessage(socket, QString("media dvd summary %1 %2")
+                    .arg(dvd_titles.size()).arg(dvd_probe->GetName()));
 
         //
         //  For each title, send:
-        //      track/title number, numb chapters, numb angles, 
+        //      track/title number, numb chapters, numb angles,
         //      hours, minutes, seconds, and type of disc
         //      (from the dvdinput table in the database)
         //
-        
-        for(uint i = 0; i < dvd_titles->count(); ++i)
+
+        for (uint i = 0; i < (uint)dvd_titles.size(); i++)
         {
             sendMessage(socket, QString("media dvd title %1 %2 %3 %4 %5 %6 %7")
-                        .arg(dvd_titles->at(i)->getTrack())
-                        .arg(dvd_titles->at(i)->getChapters())
-                        .arg(dvd_titles->at(i)->getAngles())
-                        .arg(dvd_titles->at(i)->getHours())
-                        .arg(dvd_titles->at(i)->getMinutes())
-                        .arg(dvd_titles->at(i)->getSeconds())
-                        .arg(dvd_titles->at(i)->getInputID())
+                        .arg(dvd_titles[i].GetTrack())
+                        .arg(dvd_titles[i].GetChapters())
+                        .arg(dvd_titles[i].GetAngles())
+                        .arg(dvd_titles[i].GetHours())
+                        .arg(dvd_titles[i].GetMinutes())
+                        .arg(dvd_titles[i].GetSeconds())
+                        .arg(dvd_titles[i].GetInputID())
                        );
             //
             //  For each track, send all the audio info
             //
-            Q3PtrList<DVDAudio> *audio_tracks = dvd_titles->at(i)->getAudioTracks();
-            for(uint j = 0; j < audio_tracks->count(); j++)
+            DVDAudioList audio_tracks = dvd_titles[i].GetAudioTracks();
+            for (uint j = 0; j < (uint)audio_tracks.size(); j++)
             {
                 //
                 //  Send title/track #, audio track #, descriptive string
                 //
-                
+
                 sendMessage(socket, QString("media dvd title-audio %1 %2 %3 %4")
-                            .arg(dvd_titles->at(i)->getTrack())
+                            .arg(dvd_titles[i].GetTrack())
                             .arg(j+1)
-                            .arg(audio_tracks->at(j)->getChannels())
-                            .arg(audio_tracks->at(j)->getAudioString())
+                            .arg(audio_tracks[j].GetChannels())
+                            .arg(audio_tracks[j].GetAudioString())
                            );
             }
-            
+
             //
             //  For each subtitle, send the id number, the lang code, and the name
             //
-            Q3PtrList<DVDSubTitle> *subtitles = dvd_titles->at(i)->getSubTitles();
-            for(uint j = 0; j < subtitles->count(); j++)
+            DVDSubTitleList subtitles = dvd_titles[i].GetSubTitles();
+            for (uint j = 0; j < (uint)subtitles.size(); j++)
             {
-                sendMessage(socket, QString("media dvd title-subtitle %1 %2 %3 %4")
-                            .arg(dvd_titles->at(i)->getTrack())
-                            .arg(subtitles->at(j)->getID())
-                            .arg(subtitles->at(j)->getLanguage())
-                            .arg(subtitles->at(j)->getName())
-                           );
+                sendMessage(socket,
+                            QString("media dvd title-subtitle %1 %2 %3 %4")
+                            .arg(dvd_titles[i].GetTrack())
+                            .arg(subtitles[j].GetID())
+                            .arg(subtitles[j].GetLanguage())
+                            .arg(subtitles[j].GetName())
+                            );
             }
-            
-            
-            
+
+
+
         }
-        titles_mutex->unlock();
     }
     else
     {
         sendMessage(socket, "media dvd summary 0 No Disc");
-    }    
+    }
     sendMessage(socket, "media dvd complete");
 }
 
-
-void MTD::startAbort(const QStringList &tokens)
+void MythTranscodeDaemon::startAbort(const QStringList &tokens)
 {
     QString flat = tokens.join(" ");
 
     //
     //  Sanity check
     //
-    
-    if(tokens.count() < 4)
+
+    if (tokens.size() < 4)
     {
         emit writeToLog(QString("bad abort request: %1").arg(flat));
         return;
     }
 
-    if(tokens[1] != "dvd" ||
+    if (tokens[1] != "dvd" ||
        tokens[2] != "job")
     {
         emit writeToLog(QString("I don't know how to handle this abort request: %1").arg(flat));
@@ -563,41 +565,36 @@ void MTD::startAbort(const QStringList &tokens)
 
     bool ok;
     int job_to_kill = tokens[3].toInt(&ok);
-    if(!ok || job_to_kill < 0)
+    if (!ok || job_to_kill < 0)
     {
         emit writeToLog(QString("Could not make out a job number in this abort request: %1").arg(flat));
         return;
-    }    
-    
-    if(job_to_kill >= (int) job_threads.count())
+    }
+
+    if (job_to_kill >= (int) job_threads.size())
     {
         emit writeToLog(QString("Was asked to kill a job that does not exist: %1").arg(flat));
         return;
     }
 
-    //
-    //  OK, we can probably kill this job
-    //
-
-    job_threads.at(job_to_kill)->setSubProgress(0.0, 0);
-    job_threads.at(job_to_kill)->setSubName("Cancelling ...", 0);
-    job_threads.at(job_to_kill)->cancelMe(true);
+    // OK, we can probably kill this job
+    job_threads[job_to_kill]->Cancel(true);
 }
 
-void MTD::startJob(const QStringList &tokens)
+void MythTranscodeDaemon::startJob(const QStringList &tokens)
 {
     //
     //  Check that the tokens make sense
     //
-    
-    if(tokens.count() < 2)
+
+    if (tokens.size() < 2)
     {
         QString flat = tokens.join(" ");
         emit writeToLog(QString("bad job request: %1").arg(flat));
         return;
     }
 
-    if(tokens[1] == "dvd")
+    if (tokens[1] == "dvd")
     {
         startDVD(tokens);
     }
@@ -605,63 +602,68 @@ void MTD::startJob(const QStringList &tokens)
     {
         emit writeToLog(QString("I don't know how to process jobs of type %1").arg(tokens[1]));
     }
-    
+
 }
 
-void MTD::startDVD(const QStringList &tokens)
+void MythTranscodeDaemon::startDVD(const QStringList &tokens)
 {
     QString flat = tokens.join(" ");
     bool ok;
 
-    if(tokens.count() < 8)
+    if (tokens.size() < 8)
     {
         emit writeToLog(QString("bad dvd job request: %1").arg(flat));
         return;
     }
-    
+
     //
     //  Parse the tokens into "real" variables,
     //  checking for silly values as we go. If
     //  everything checks out, fire it up.
     //
-    
+
     int dvd_title = tokens[2].toInt(&ok);
-    if(dvd_title < 1 || dvd_title > 99 || !ok)
+    if (dvd_title < 1 || dvd_title > 99 || !ok)
     {
-        emit writeToLog(QString("bad title number in job request: %1").arg(flat));
+        emit writeToLog(QString("bad title number in job request: %1")
+                        .arg(flat));
         return;
     }
-    
+
     int audio_track = tokens[3].toInt(&ok);
-    if(audio_track < 0 || audio_track > 10 || !ok) // 10 ?? I just made that up as a boundary ??
+    if (audio_track < 0 || audio_track > 10 || !ok)
     {
-        emit writeToLog(QString("bad audio track in job request: %1").arg(flat));
+        // 10 ?? I just made that up as a boundary ??
+        emit writeToLog(QString("bad audio track in job request: %1")
+                        .arg(flat));
         return;
     }
-    
+
     int quality = tokens[4].toInt(&ok);
-    if(quality < QUALITY_ISO || !ok)
+    if (quality < QUALITY_ISO || !ok)
     {
-        emit writeToLog(QString("bad quality value in job request: %1").arg(flat));
+        emit writeToLog(QString("bad quality value in job request: %1")
+                        .arg(flat));
         return;
     }
 
     bool ac3_flag = false;
     int flag_value = tokens[5].toUInt(&ok);
-    if(!ok)
+    if (!ok)
     {
         emit writeToLog(QString("bad ac3 flag in job request: %1").arg(flat));
         return;
     }
-    if(flag_value)
+    if (flag_value)
     {
         ac3_flag = true;
     }
 
     int subtitle_track = tokens[6].toInt(&ok);
-    if(!ok)
+    if (!ok)
     {
-        emit writeToLog(QString("bad subtitle reference in job request: %1").arg(flat));
+        emit writeToLog(QString("bad subtitle reference "
+                                "in job request: %1").arg(flat));
         return;
     }
 
@@ -672,27 +674,28 @@ void MTD::startDVD(const QStringList &tokens)
 
     QString dir_and_file = "";
 
-    for(QStringList::size_type i = 7; i < tokens.count(); i++)
+    for (QStringList::size_type i = 7; i < tokens.size(); i++)
     {
         dir_and_file += tokens[i];
-        if(i != tokens.count() - 1)
+        if (i != tokens.size() - 1)
         {
             dir_and_file += " ";
-        }        
+        }
     }
 
     QDir dest_dir(dir_and_file.section("/", 0, -2));
-    if(!dest_dir.exists())
+    if (!dest_dir.exists())
     {
-        emit writeToLog(QString("bad destination directory in job request: %1").arg(flat));
+        emit writeToLog(QString("bad destination directory "
+                                "in job request: '%1'").arg(flat));
         return;
     }
 
     QString file_name = dir_and_file.section("/", -1, -1);
 
-    if(dvd_device.length() < 1)
+    if (dvd_device.length() < 1)
     {
-        emit writeToLog("crapity crap crap - all set to launch a dvd job and you don't have a dvd device defined");
+        emit writeToLog("Can not launch DVD job until a dvd device is defined");
         return;
     }
 
@@ -700,121 +703,111 @@ void MTD::startDVD(const QStringList &tokens)
     //  OK, we are ready to launch this job
     //
 
-    if(quality == QUALITY_ISO)
+    if (quality == QUALITY_ISO)
     {
         QFile final_file(dest_dir.filePath(file_name));
 
-        if(!checkFinalFile(&final_file, ".iso"))
+        if (!checkFinalFile(&final_file, ".iso"))
         {
-            emit writeToLog("Final file name is not useable. File exists? Other Pending job?");
+            emit writeToLog("Final file name is not useable. "
+                            "File exists? Other Pending job?");
             return;
         }
-    
+
         emit writeToLog(QString("launching job: %1").arg(flat));
 
         //
         //  Full disc copy to an iso image.
         //
- 
-        JobThread *new_job = new DVDISOCopyThread(this, 
-                                                  dvd_drive_access, 
-                                                  dvd_device, 
-                                                  dvd_title, 
-                                                  final_file.fileName(), 
+
+        JobThread *new_job = new DVDISOCopyThread(this,
+                                                  dvd_drive_access,
+                                                  dvd_device,
+                                                  dvd_title,
+                                                  final_file.fileName(),
                                                   file_name,
                                                   flat,
                                                   nice_level);
-        job_threads.append(new_job);
+        job_threads.push_back(new_job);
         new_job->start();
     }
-    else if(quality == QUALITY_PERFECT)
+    else if (quality == QUALITY_PERFECT)
     {
         QFile final_file(dest_dir.filePath(file_name));
 
-        if(!checkFinalFile(&final_file, ".mpg"))
+        if (!checkFinalFile(&final_file, ".mpg"))
         {
-            emit writeToLog("Final file name is not useable. File exists? Other Pending job?");
+            emit writeToLog("Final file name is not useable. "
+                            "File exists? Other Pending job?");
             return;
         }
-    
+
         emit writeToLog(QString("launching job: %1").arg(flat));
 
         //
         //  perfect quality, straight copy via libdvdread
         //
- 
-        JobThread *new_job = new DVDPerfectThread(this, 
-                                                  dvd_drive_access, 
-                                                  dvd_device, 
-                                                  dvd_title, 
-                                                  final_file.fileName(), 
-                                                  file_name,
-                                                  flat,
-                                                  nice_level);
-        job_threads.append(new_job);
+
+        JobThread *new_job = new DVDPerfectThread(
+            this, dvd_drive_access, dvd_device, dvd_title,
+            final_file.fileName(), file_name,
+            flat, nice_level);
+
+        job_threads.push_back(new_job);
         new_job->start();
     }
     else if (quality >= QUALITY_TRANSCODE)
     {
         QFile final_file(dest_dir.filePath(file_name));
 
-        if(!checkFinalFile(&final_file, ".avi"))
+        if (!checkFinalFile(&final_file, ".avi"))
         {
-            emit writeToLog("Final file name is not useable. File exists? Other Pending job?");
+            emit writeToLog("Final file name is not useable. "
+                            "File exists? Other Pending job?");
             return;
         }
-    
-        while(!titles_mutex->tryLock())
-        {
-            sleep(1);
-        }
 
-        DVDTitle *which_title = dvd_probe->getTitle(dvd_title);
+        titles_mutex->lock();
+        DVDTitle which_title = dvd_probe->GetTitle(dvd_title);
         titles_mutex->unlock();
 
-        if(!which_title)
+        if (!which_title.IsValid())
         {
-            VERBOSE(VB_IMPORTANT, "mtd.o: title number not valid? ");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Title number not valid?");
             return;
         }
-        
-        uint numb_seconds = which_title->getPlayLength();
+
+        uint numb_seconds = which_title.GetPlayLength();
 
         emit writeToLog(QString("launching job: %1").arg(flat));
 
         //
         //  transcoding job
         //
- 
-        JobThread *new_job = new DVDTranscodeThread(this, 
-                                                    dvd_drive_access, 
-                                                    dvd_device, 
-                                                    dvd_title, 
-                                                    final_file.name(), 
-                                                    file_name,
-                                                    flat,
-                                                    nice_level,
-                                                    quality,
-                                                    ac3_flag,
-                                                    audio_track,
-                                                    numb_seconds,
-                                                    subtitle_track);
-        job_threads.append(new_job);
+
+        JobThread *new_job = new DVDTranscodeThread(
+            this, dvd_drive_access, dvd_device, dvd_title,
+            final_file.name(), file_name,
+            flat, nice_level, quality, ac3_flag, audio_track,
+            numb_seconds, subtitle_track);
+
+        job_threads.push_back(new_job);
         new_job->start();
-       
+
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "mtd.o: Hmmmmm. Got sent a job with a negative quality parameter. That's just plain weird.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Invalid transcode quality parameter, ignoring job");
     }
 }
 
 /**
  * Remember the supplied device path
  */
-void MTD::useDrive(const QStringList &tokens)
+void MythTranscodeDaemon::useDrive(const QStringList &tokens)
 {
-    if (tokens.count() != 3)
+    if (tokens.size() != 3)
     {
         emit writeToLog("Bad usedrive request: " + tokens.join(" "));
         return;
@@ -829,13 +822,13 @@ void MTD::useDrive(const QStringList &tokens)
 /**
  * Remember the supplied DVD device path, and create a DVDProbe & thread for it
  */
-void MTD::useDVD(const QStringList &tokens)
+void MythTranscodeDaemon::useDVD(const QStringList &tokens)
 {
     if (dvd_device == tokens[2])  // Same drive? Nothing to do.
         return;
 
     DVDProbe *newDrive = new DVDProbe(tokens[2]);
-    if (!newDrive->probe())
+    if (!newDrive->Probe())
     {
         emit writeToLog("Drive not available: " + tokens[2]);
         return;
@@ -846,7 +839,7 @@ void MTD::useDVD(const QStringList &tokens)
     dvd_device = tokens[2];
     dvd_probe  = newDrive;
 
-    disc_checking_thread = new DiscCheckingThread(this, dvd_probe,
+    disc_checking_thread = new DiscCheckingThread(dvd_probe,
                                                   dvd_drive_access,
                                                   titles_mutex);
     disc_checking_thread->start();
@@ -857,9 +850,9 @@ void MTD::useDVD(const QStringList &tokens)
 /**
  * Stop using the specified, or current, drive. Also stop any related jobs
  */
-void MTD::noDrive(const QStringList &tokens)
+void MythTranscodeDaemon::noDrive(const QStringList &tokens)
 {
-    if (tokens.count() < 2 || tokens.count() > 3)
+    if (tokens.size() < 2 || tokens.size() > 3)
     {
         emit writeToLog("Bad no drive request: " + tokens.join(" "));
         return;
@@ -876,32 +869,33 @@ void MTD::noDrive(const QStringList &tokens)
         return;
     }
 
-    for (JobThread *itr = job_threads.first(); itr; itr = job_threads.next())
-        if (itr->usesDevice(device))
+    JobThreadList::iterator it = job_threads.begin();
+    for (; it != job_threads.end(); ++it)
+    {
+        if ((*it)->usesDevice(device))
         {
-            itr->setSubProgress(0.0, 0);
-            itr->setSubName("Cancelling ...", 0);
-            itr->cancelMe(true);
+            (*it)->Cancel();
 
-            emit writeToLog("Waiting for job : " + itr->getJobName());
-            itr->wait();
+            emit writeToLog("Waiting for job : " + (*it)->GetJobName());
+            (*it)->wait();
 
-            job_threads.remove(itr);
+            (*it)->deleteLater();
+            job_threads.erase(it);
         }
+    }
 }
 
 /**
  * Stop using the specified, or current, dvd drive
  */
-QString MTD::noDVD(const QStringList &tokens)
+QString MythTranscodeDaemon::noDVD(const QStringList &tokens)
 {
     QString device;
 
-    if (tokens.count() == 2)
+    if (tokens.size() == 2)
         device = dvd_device;
     else
         device = tokens[2];
-
 
     // In multi-drive setups, the user could be ripping several.
     // The drive we are forgetting about may not be the current one:
@@ -914,19 +908,17 @@ QString MTD::noDVD(const QStringList &tokens)
 /**
  * Clear the current DVD device path, disc checking thread and DVDProbe object
  */
-void MTD::forgetDVD()
+void MythTranscodeDaemon::forgetDVD(void)
 {
     if (disc_checking_thread)
     {
-        disc_checking_thread->cancelMe(true);
-        disc_checking_thread->wait(50000);
-        delete disc_checking_thread;
+        disc_checking_thread->Cancel();
+        disc_checking_thread->wait();
+        disc_checking_thread->deleteLater();
         disc_checking_thread = NULL;
     }
 
-    while (!dvd_drive_access->tryLock())
-        sleep(3);
-
+    QMutexLocker locker(dvd_drive_access);
     if (dvd_probe)
     {
         delete dvd_probe;
@@ -935,60 +927,55 @@ void MTD::forgetDVD()
 
     dvd_device = "";     // Prevent new jobs
     have_disc  = false;  // For sendMediaReport()
-
-    dvd_drive_access->unlock();
 }
 
-bool MTD::checkFinalFile(QFile *final_file, const QString &extension)
+bool MythTranscodeDaemon::checkFinalFile(
+    QFile *final_file, const QString &extension)
 {
     //
     //  Check if file exists
     //
-    
-    QString final_with_extension_string = final_file->name() + extension;
+
+    QString final_with_extension_string = final_file->fileName() + extension;
     QFile tester(final_with_extension_string);
-    
-    if(tester.exists())
+
+    if (tester.exists())
     {
         return false;
     }
-    
+
     //
     //  Check already active jobs
     //
-    JobThread *iterator;
-    for(iterator = job_threads.first(); iterator; iterator = job_threads.next() )
+    JobThreadList::iterator it = job_threads.begin();
+    for (; it != job_threads.end(); ++it)
     {
-        if(iterator->getFinalFileName() == final_file->name())
-        {
+        if ((*it)->GetFinalFileName() == final_file->fileName())
             return false;
-        }
     }
-    
+
     return true;
 }
 
-bool MTD::isItOkToStartTranscoding()
+bool MythTranscodeDaemon::IncrConcurrentTranscodeCounter(void)
 {
-    concurrent_transcodings_mutex->lock();
-    if(concurrent_transcodings < max_concurrent_transcodings)
+    QMutexLocker locker(concurrent_transcodings_mutex);
+    if (concurrent_transcodings < max_concurrent_transcodings)
     {
         concurrent_transcodings++;
-        concurrent_transcodings_mutex->unlock();
         return true;
     }
-    concurrent_transcodings_mutex->unlock();
     return false;
 }
 
-void MTD::customEvent(QEvent *ce)
+void MythTranscodeDaemon::customEvent(QEvent *ce)
 {
-    if(ce->type() == LoggingEvent::ID)
+    if (ce->type() == (QEvent::Type) LoggingEvent::ID)
     {
         LoggingEvent *le = (LoggingEvent*)ce;
         emit writeToLog(le->getString());
     }
-    else if(ce->type() == ErrorEvent::ID)
+    else if (ce->type() == (QEvent::Type) ErrorEvent::ID)
     {
         ErrorEvent *ee = (ErrorEvent*)ce;
         QString error_string = "Error: " + ee->getString();
@@ -996,7 +983,7 @@ void MTD::customEvent(QEvent *ce)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "mtd.o: receiving events I don't understand");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unrecognized event");
     }
 }
 

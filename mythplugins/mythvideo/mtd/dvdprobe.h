@@ -32,7 +32,7 @@
 
 // Qt headers
 #include <QString>
-#include <Q3PtrList>
+#include <QList>
 
 class DVDSubTitle
 {
@@ -45,16 +45,17 @@ class DVDSubTitle
   public:
     DVDSubTitle(int subtitle_id, const QString &a_language);
 
-    void    setName(const QString &a_name) { name = a_name; }
-    QString getLanguage() { return language; }
-    QString getName() { return name; }
-    int     getID() { return id; }
+    void    SetName(const QString &a_name) { name = a_name; }
+    QString GetLanguage(void) const { return language; }
+    QString GetName(void) const { return name; }
+    int     GetID(void) const { return id; }
 
   private:
     int     id;
     QString language;
     QString name;
 };
+typedef QList<DVDSubTitle> DVDSubTitleList;
 
 class DVDAudio
 {
@@ -68,10 +69,10 @@ class DVDAudio
     DVDAudio();
     ~DVDAudio();
 
-    void    printYourself();
+    void    printYourself(void) const;
     void    fill(audio_attr_t *audio_attributes);
-    int     getChannels() { return channels; }
-    QString getAudioString();
+    int     GetChannels(void) const { return channels; }
+    QString GetAudioString(void) const;
 
   private:
     QString audio_format;
@@ -83,6 +84,7 @@ class DVDAudio
     int     channels;
     QString language_extension;
 };
+typedef QList<DVDAudio>    DVDAudioList;
 
 class DVDTitle
 {
@@ -101,36 +103,37 @@ class DVDTitle
     //  Set
     //
 
-    void    setChapters(uint a_uint) { numb_chapters = a_uint; }
-    void    setAngles(uint a_uint) { numb_angles = a_uint; }
-    void    setTrack(uint a_uint) { track_number = a_uint; }
-    void    setTime(uint h, uint m, uint s, double fr);
-    void    setAR(uint n, uint d, const QString &ar);
-    void    setSize(uint h, uint v) { hsize = h; vsize = v; }
-    void    setLBox(bool yes_or_no) { letterbox = yes_or_no; }
-    void    setVFormat(const QString &a_string) { video_format = a_string; }
+    void    SetChapters(uint a_uint) { numb_chapters = a_uint; }
+    void    SetAngles(uint a_uint) { numb_angles = a_uint; }
+    void    SetTrack(uint a_uint) { track_number = a_uint; }
+    void    SetTime(uint h, uint m, uint s, double fr);
+    void    SetAR(uint n, uint d, const QString &ar);
+    void    SetSize(uint h, uint v) { hsize = h; vsize = v; }
+    void    SetLBox(bool yes_or_no) { letterbox = yes_or_no; }
+    void    SetVFormat(const QString &a_string) { video_format = a_string; }
     void    determineInputID();
 
     //
     //  Get
     //
 
-    uint    getChapters() { return numb_chapters; }
-    uint    getAngles() { return numb_angles; }
-    uint    getTrack() { return track_number; }
-    uint    getPlayLength();
-    QString getTimeString();
-    uint    getHours() { return hours; }
-    uint    getMinutes() { return minutes; }
-    uint    getSeconds() { return seconds; }
-    uint    getInputID() { return dvdinput_id; }
+    uint    GetChapters(void)            const { return numb_chapters; }
+    uint    GetAngles(void)              const { return numb_angles; }
+    uint    GetTrack(void)               const { return track_number; }
+    uint    GetHours(void)               const { return hours; }
+    uint    GetMinutes(void)             const { return minutes; }
+    uint    GetSeconds(void)             const { return seconds; }
+    uint    GetInputID(void)             const { return dvdinput_id; }
+    DVDAudioList    GetAudioTracks(void) const { return audio_tracks; }
+    DVDSubTitleList GetSubTitles(void)   const { return subtitles; }
+    uint    GetPlayLength(void) const;
+    QString GetTimeString(void) const;
+    bool    IsValid(void) const;
 
+    void    AddAudio(const DVDAudio &new_audio_track);
+    void    AddSubTitle(const DVDSubTitle &new_subitle);
 
-    void                   printYourself();
-    void                   addAudio(DVDAudio *new_audio_track);
-    Q3PtrList<DVDAudio>    *getAudioTracks() { return &audio_tracks; }
-    void                   addSubTitle(DVDSubTitle *new_subitle);
-    Q3PtrList<DVDSubTitle> *getSubTitles() { return &subtitles; }
+    void    printYourself(void) const;
 
   private:
     uint    numb_chapters;
@@ -152,9 +155,10 @@ class DVDTitle
     QString video_format;
     uint    dvdinput_id;
 
-    Q3PtrList<DVDAudio>    audio_tracks;
-    Q3PtrList<DVDSubTitle> subtitles;
+    DVDAudioList    audio_tracks;
+    DVDSubTitleList subtitles;
 };
+typedef QList<DVDTitle> DVDTitleList;
 
 class DVDProbe
 {
@@ -167,19 +171,20 @@ class DVDProbe
     DVDProbe(const QString &dvd_device);
     ~DVDProbe();
 
-    bool                probe();
-    QString             getName() { return volume_name; }
-    Q3PtrList<DVDTitle> *getTitles() { return &titles; }
-    DVDTitle           *getTitle(uint which_one);
+    bool          Probe(void);
+    QString       GetName(void)   const { return volume_name; }
+    DVDTitleList  GetTitles(void) const { return titles;      }
+    DVDTitle      GetTitle(uint which_one) const;
 
   private:
-    void         wipeClean();
-    bool         first_time;
-    QString      device;
-    dvd_reader_t *dvd;
+    void          Reset(void);
 
-    Q3PtrList<DVDTitle>  titles;
-    QString             volume_name;
+  private:
+    dvd_reader_t *dvd;
+    bool          first_time;
+    QString       device;
+    QString       volume_name;
+    DVDTitleList  titles;
 };
 
 #endif  // dvdprobe_h_

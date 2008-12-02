@@ -57,7 +57,7 @@ DVDAudio::DVDAudio() : audio_format(""), multichannel_extension(false),
 {
 }
 
-void DVDAudio::printYourself()
+void DVDAudio::printYourself(void) const
 {
     //
     //  Debugging
@@ -70,7 +70,7 @@ void DVDAudio::printYourself()
             .arg(channels));
 }
 
-QString DVDAudio::getAudioString()
+QString DVDAudio::GetAudioString(void) const
 {
     return QString("%1 %2 %3Ch").arg(language).arg(audio_format).arg(channels);
 }
@@ -201,16 +201,30 @@ DVDAudio::~DVDAudio()
 ---------------------------------------------------------------------
 */
 
-DVDTitle::DVDTitle() : numb_chapters(0), numb_angles(0), track_number(0),
-    hours(0), minutes(0), seconds(0), hsize(0), vsize(0), frame_rate(0.0),
-    fr_code(0), ar_numerator(0), ar_denominator(0), aspect_ratio(""),
-    letterbox(false), video_format("unknown"), dvdinput_id(0)
+DVDTitle::DVDTitle() :
+    numb_chapters(0), numb_angles(0), track_number(0),
+
+    hours(0), minutes(0), seconds(0),
+
+    hsize(0), vsize(0), frame_rate(0.0), fr_code(0), ar_numerator(0),
+    ar_denominator(0), aspect_ratio(""), letterbox(false),
+    video_format("unknown"), dvdinput_id(0)
 {
-    audio_tracks.setAutoDelete(true);
-    subtitles.setAutoDelete(true);
 }
 
-void DVDTitle::setTime(uint h, uint m, uint s, double fr)
+bool DVDTitle::IsValid(void) const
+{
+    return
+        numb_chapters || numb_angles || track_number ||
+        hours || minutes || seconds ||
+        hsize || vsize || frame_rate != 0.0 ||
+        fr_code || ar_numerator ||
+        ar_denominator || !aspect_ratio.isEmpty() || letterbox ||
+        (video_format != "unknown") || dvdinput_id ||
+        audio_tracks.size() || subtitles.size();
+}
+
+void DVDTitle::SetTime(uint h, uint m, uint s, double fr)
 {
     hours = h;
     minutes = m;
@@ -256,24 +270,24 @@ void DVDTitle::setTime(uint h, uint m, uint s, double fr)
     }
 }
 
-void DVDTitle::setAR(uint n, uint d, const QString &ar)
+void DVDTitle::SetAR(uint n, uint d, const QString &ar)
 {
     ar_numerator = n;
     ar_denominator = d;
     aspect_ratio = ar;
 }
 
-uint DVDTitle::getPlayLength()
+uint DVDTitle::GetPlayLength(void) const
 {
     return seconds + (60 * minutes) + (60 * 60 * hours);
 }
 
-QString DVDTitle::getTimeString()
+QString DVDTitle::GetTimeString(void) const
 {
     return QString().sprintf("%d:%02d:%02d", hours, minutes, seconds);
 }
 
-void DVDTitle::printYourself()
+void DVDTitle::printYourself(void) const
 {
     //
     //  Debugging
@@ -285,11 +299,11 @@ void DVDTitle::printYourself()
             .arg(track_number).arg(numb_chapters).arg(numb_angles).arg(hours)
             .arg(minutes).arg(seconds).arg(frame_rate));
 
-    if (audio_tracks.count() > 0)
+    if (!audio_tracks.empty())
     {
-        for (uint i = 0; i < audio_tracks.count(); ++i)
+        for (uint i = 0; i < (uint)audio_tracks.size(); ++i)
         {
-            audio_tracks.at(i)->printYourself();
+            audio_tracks[i].printYourself();
         }
     }
     else
@@ -298,41 +312,42 @@ void DVDTitle::printYourself()
     }
 }
 
-void DVDTitle::addAudio(DVDAudio *new_audio_track)
+void DVDTitle::AddAudio(const DVDAudio &new_audio_track)
 {
-    audio_tracks.append(new_audio_track);
+    audio_tracks.push_back(new_audio_track);
 }
 
-void DVDTitle::addSubTitle(DVDSubTitle *new_subtitle)
+void DVDTitle::AddSubTitle(const DVDSubTitle &subtitle)
 {
     //
     //  Check if this language already exists
     //  (which happens a lot)
     //
+    DVDSubTitle new_subtitle = subtitle;
 
     int lang_count = 0;
-    for (uint i = 0; i < subtitles.count(); ++i)
+    for (uint i = 0; i < (uint)subtitles.size(); ++i)
     {
-        if (subtitles.at(i)->getLanguage() == new_subtitle->getLanguage())
+        if (subtitles[i].GetLanguage() == new_subtitle.GetLanguage())
         {
             ++lang_count;
         }
     }
     if (lang_count == 0)
     {
-        new_subtitle->setName(QString("<%1>").arg(new_subtitle->getLanguage()));
+        new_subtitle.SetName(QString("<%1>").arg(new_subtitle.GetLanguage()));
     }
     else
     {
         ++lang_count;
-        new_subtitle->setName(QString("<%1> (%2)")
-                              .arg(new_subtitle->getLanguage())
-                              .arg(lang_count));
+        new_subtitle.SetName(QString("<%1> (%2)")
+                             .arg(new_subtitle.GetLanguage())
+                             .arg(lang_count));
     }
-    subtitles.append(new_subtitle);
+    subtitles.push_back(new_subtitle);
 }
 
-void DVDTitle::determineInputID()
+void DVDTitle::determineInputID(void)
 {
     MSqlQuery a_query(MSqlQuery::InitCon());
     a_query.prepare("SELECT intid FROM dvdinput WHERE "
@@ -388,25 +403,27 @@ DVDTitle::~DVDTitle()
 */
 
 
-DVDProbe::DVDProbe(const QString &dvd_device) : device(dvd_device), dvd(0)
-{
-    //
-    //  This object just figures out what's on a disc
-    //  and tells whomever asks about it.
-    //
+/** \class DVDProbe
+ *  \brief This object just figures out what is on a disc
+ *         and tells whomever asks about it.
+ */
 
-    titles.setAutoDelete(true);
-    wipeClean();
+DVDProbe::DVDProbe(const QString &dvd_device) :
+    dvd(NULL), first_time(true), device(dvd_device),
+    volume_name(QObject::tr("Unknown"))
+{
+    device.detach();
+    volume_name.detach();
 }
 
-void DVDProbe::wipeClean()
+void DVDProbe::Reset(void)
 {
     first_time = true;
-    titles.clear();
     volume_name = QObject::tr("Unknown");
+    titles.clear();
 }
 
-bool DVDProbe::probe()
+bool DVDProbe::Probe(void)
 {
     //
     //  Before touching libdvdread stuff
@@ -416,7 +433,7 @@ bool DVDProbe::probe()
 
     struct stat fileinfo;
 
-    QByteArray dev = device.toAscii();
+    QByteArray dev = device.toLocal8Bit();
     int ret = stat(dev.constData(), &fileinfo);
     if (ret < 0)
     {
@@ -424,7 +441,7 @@ bool DVDProbe::probe()
         //  Can't even stat the device, it probably
         //  doesn't exist. Silly user
         //
-        wipeClean();
+        Reset();
         return false;
     }
 
@@ -439,7 +456,7 @@ bool DVDProbe::probe()
 
     if (drive_handle == -1)
     {
-        wipeClean();
+        Reset();
         return false;
     }
 
@@ -460,7 +477,7 @@ bool DVDProbe::probe()
         //  2 = tray open
         //  3 = not ready
         //
-        wipeClean();
+        Reset();
         close(drive_handle);
         return false;
 
@@ -482,7 +499,7 @@ bool DVDProbe::probe()
             //  Return whatever we returned before
             //
 
-            return titles.count();
+            return titles.size();
         }
     }
 #endif
@@ -493,284 +510,277 @@ bool DVDProbe::probe()
     //  could be a path, file, whatever).
     //
 
-    wipeClean();
+    Reset();
     first_time = false;
     dvd = DVDOpen(dev.constData());
-    if (dvd)
+    if (!dvd)
+        return false;
+
+    //
+    //  Grab the title of this DVD
+    //
+
+    const int arbitrary = 1024;
+    char volume_name_buffr[arbitrary + 1];
+    unsigned char set_name[arbitrary + 1];
+
+    if (DVDUDFVolumeInfo(dvd, volume_name_buffr, arbitrary, set_name,
+                         arbitrary) > -1)
     {
-        //
-        //  Grab the title of this DVD
-        //
+        volume_name = volume_name_buffr;
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, "Error getting volume name, setting to"
+                "\"Unknown\"");
+    }
 
-        const int arbitrary = 1024;
-        char volume_name_buffr[arbitrary + 1];
-        unsigned char set_name[arbitrary + 1];
+    ifo_handle_t *ifo_file = ifoOpen(dvd, 0);
+    if (!ifo_file)
+    {
+        DVDClose(dvd);
+        dvd = NULL;
+        return false;
+    }
 
-        if (DVDUDFVolumeInfo(dvd, volume_name_buffr, arbitrary, set_name,
-                             arbitrary) > -1)
+    //
+    //  Most of this is taken from title_info.c and
+    //  ifo_dump.c located in the libdvdread ./src/
+    //  directory. Some if is also based on dvd_reader.c
+    //  in the transcode source.
+    //
+
+    tt_srpt_t *title_info = ifo_file->tt_srpt;
+    for (int i = 0; i < title_info->nr_of_srpts; ++i )
+    {
+        DVDTitle new_title;
+        new_title.SetTrack(i + 1);
+        new_title.SetChapters((uint) title_info->title[i].nr_of_ptts);
+        new_title.SetAngles((uint) title_info->title[i].nr_of_angles);
+
+        ifo_handle_t *video_transport_file = NULL;
+
+        video_transport_file =
+            ifoOpen(dvd, title_info->title[i].title_set_nr);
+        if (!video_transport_file)
         {
-            volume_name = volume_name_buffr;
+            VERBOSE(VB_IMPORTANT,
+                    QString("Can't get video transport for track %1")
+                    .arg(i+1));
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "Error getting volume name, setting to"
-                    "\"Unknown\"");
-        }
 
-        ifo_handle_t *ifo_file = ifoOpen(dvd, 0);
-        if (ifo_file)
-        {
             //
-            //  Most of this is taken from title_info.c and
-            //  ifo_dump.c located in the libdvdread ./src/
-            //  directory. Some if is also based on dvd_reader.c
-            //  in the transcode source.
+            //  See how simple libdvdread makes it to find the playing
+            //  time?
+            //
+            //  Why have a playingTime(track_number) function, when you
+            //  could jump through all these hoops:
             //
 
-            tt_srpt_t *title_info = ifo_file->tt_srpt;
-            for (int i = 0; i < title_info->nr_of_srpts; ++i )
+            int some_index = title_info->title[i].vts_ttn;
+            int some_other_index = video_transport_file->vts_ptt_srpt->
+                title[some_index - 1].ptt[0].pgcn;
+            pgc_t *current_pgc = video_transport_file->vts_pgcit->
+                pgci_srp[some_other_index - 1].pgc;
+
+            dvd_time_t *libdvdread_playback_time =
+                &current_pgc->playback_time;
+
+            double framerate = 0.0;
+
+            switch ((libdvdread_playback_time->frame_u & 0xc0) >> 6)
             {
-                DVDTitle *new_title = new DVDTitle();
-                new_title->setTrack(i + 1);
-                new_title->setChapters((uint) title_info->title[i].nr_of_ptts);
-                new_title->setAngles((uint) title_info->title[i].nr_of_angles);
-
-                ifo_handle_t *video_transport_file = NULL;
-
-                video_transport_file =
-                        ifoOpen(dvd, title_info->title[i].title_set_nr);
-                if (!video_transport_file)
-                {
+                case 1:
+                    framerate = 25.0;  // PAL
+                    break;
+                case 3:
+                    framerate = 24000/1001.0;  // NTSC_FILM
+                    break;
+                default:
                     VERBOSE(VB_IMPORTANT,
-                            QString("Can't get video transport for track %1")
-                            .arg(i+1));
-                }
-                else
+                            "For some odd reason (!), I couldn't get a"
+                            " video frame rate");
+                    break;
+            }
+
+            //
+            //  Somebody who knows something about how to program a
+            //  computer should clean this up
+            //
+
+            new_title.SetTime(decdt(libdvdread_playback_time->hour),
+                              decdt(libdvdread_playback_time->minute),
+                              decdt(libdvdread_playback_time->second),
+                              framerate);
+
+            vtsi_mat_t *vtsi_mat = video_transport_file->vtsi_mat;
+            if (vtsi_mat)
+            {
+                //
+                //  and now, wave the divining rod over audio bits
+                //
+
+                for (int j = 0; j < vtsi_mat->nr_of_vts_audio_streams; j++)
                 {
+                    audio_attr_t *audio_attributes =
+                        &vtsi_mat->vts_audio_attr[j];
+                    DVDAudio new_audio;
+                    new_audio.fill(audio_attributes);
+                    new_title.AddAudio(new_audio);
+                }
 
-                    //
-                    //  See how simple libdvdread makes it to find the playing
-                    //  time?
-                    //
-                    //  Why have a playingTime(track_number) function, when you
-                    //  could jump through all these hoops:
-                    //
+                //
+                //  determine, with any luck, subtitles
+                //
 
-                    int some_index = title_info->title[i].vts_ttn;
-                    int some_other_index = video_transport_file->vts_ptt_srpt->
-                            title[some_index - 1].ptt[0].pgcn;
-                    pgc_t *current_pgc = video_transport_file->vts_pgcit->
-                            pgci_srp[some_other_index - 1].pgc;
-
-                    dvd_time_t *libdvdread_playback_time =
-                            &current_pgc->playback_time;
-
-                    double framerate = 0.0;
-
-                    switch ((libdvdread_playback_time->frame_u & 0xc0) >> 6)
+                for (int j = 0; j < vtsi_mat->nr_of_vts_subp_streams;
+                     j++)
+                {
+                    subp_attr_t *sub_attributes =
+                        &vtsi_mat->vts_subp_attr[j];
+                    if (sub_attributes->type           == 0 &&
+                        sub_attributes->zero1          == 0 &&
+                        sub_attributes->lang_code      == 0 &&
+                        sub_attributes->lang_extension == 0 &&
+                        sub_attributes->zero2          == 0)
                     {
-                        case 1:
-                            framerate = 25.0;  // PAL
-                            break;
-                        case 3:
-                            framerate = 24000/1001.0;  // NTSC_FILM
-                            break;
-                        default:
-                            VERBOSE(VB_IMPORTANT,
-                                    "For some odd reason (!), I couldn't get a"
-                                    " video frame rate");
-                            break;
-                    }
-
-                    //
-                    //  Somebody who knows something about how to program a
-                    //  computer should clean this up
-                    //
-
-                    new_title->setTime(decdt(libdvdread_playback_time->hour),
-                                       decdt(libdvdread_playback_time->minute),
-                                       decdt(libdvdread_playback_time->second),
-                                       framerate);
-
-                    vtsi_mat_t *vtsi_mat = video_transport_file->vtsi_mat;
-                    if (vtsi_mat)
-                    {
-                        //
-                        //  and now, wave the divining rod over audio bits
-                        //
-
-                        for (int j = 0; j < vtsi_mat->nr_of_vts_audio_streams;
-                             j++)
-                        {
-                            audio_attr_t *audio_attributes =
-                                    &vtsi_mat->vts_audio_attr[j];
-                            DVDAudio *new_audio = new DVDAudio();
-                            new_audio->fill(audio_attributes);
-                            new_title->addAudio(new_audio);
-                        }
-
-                        //
-                        //  determine, with any luck, subtitles
-                        //
-
-                        for (int j = 0; j < vtsi_mat->nr_of_vts_subp_streams;
-                             j++)
-                        {
-                            subp_attr_t *sub_attributes =
-                                    &vtsi_mat->vts_subp_attr[j];
-                            if (sub_attributes->type           == 0 &&
-                                sub_attributes->zero1          == 0 &&
-                                sub_attributes->lang_code      == 0 &&
-                                sub_attributes->lang_extension == 0 &&
-                                sub_attributes->zero2          == 0)
-                            {
-                                // ignore this sub attribute
-                            }
-                            else
-                            {
-                                //
-                                //  The Freakin Disney Corporation seems to
-                                //  think it's useful to set language codes
-                                //  with weird ass characters. This should
-                                //  probably handle that.
-                                //
-                                QString tmp = QString(
-                                    lctola(sub_attributes->lang_code).toUtf8());
-                                DVDSubTitle *new_subtitle =
-                                    new DVDSubTitle(j, tmp);
-                                new_title->addSubTitle(new_subtitle);
-                            }
-                        }
-
-                        //
-                        //  Figure out size, aspect ratio, etc.
-                        //
-
-                        video_attr_t *video_attributes =
-                                &vtsi_mat->vts_video_attr;
-
-                        switch (video_attributes->display_aspect_ratio)
-                        {
-                            case 0:
-                                new_title->setAR(4, 3, "4:3");
-                                break;
-                            case 3:
-                                new_title->setAR(16, 9, "16:9");
-                                break;
-                            default:
-                                VERBOSE(VB_IMPORTANT, "couldn't get aspect"
-                                        " ratio for a title");
-                        }
-
-                        switch (video_attributes->video_format)
-                        {
-                            case 0:
-                                new_title->setVFormat("ntsc");
-                                break;
-                            case 1:
-                                new_title->setVFormat("pal");
-                                break;
-                            default:
-                                VERBOSE(VB_IMPORTANT, "Could not get video"
-                                        " format for a title");
-                        }
-
-                        if (video_attributes->letterboxed)
-                        {
-                            new_title->setLBox(true);
-                        }
-
-                        uint c_height = 480;
-                        if (video_attributes->video_format != 0)
-                        {
-                            c_height = 576;
-                        }
-
-                        switch (video_attributes->picture_size)
-                        {
-                            case 0:
-                                new_title->setSize(720, c_height);
-                                break;
-                            case 1:
-                                new_title->setSize(704, c_height);
-                                break;
-                            case 2:
-                                new_title->setSize(352, c_height);
-                                break;
-                            case 3:
-                                new_title->setSize(352, c_height / 2);
-                                break;
-                            default:
-                                VERBOSE(VB_IMPORTANT, "Could not determine for"
-                                        " video size for a title.");
-                        }
-                        ifoClose(video_transport_file);
+                        // ignore this sub attribute
                     }
                     else
                     {
-                        VERBOSE(VB_IMPORTANT,
-                                QString("Couldn't find any audio or video"
-                                        " information for track %1").arg(i+1));
+                        //
+                        //  The Freakin Disney Corporation seems to
+                        //  think it's useful to set language codes
+                        //  with weird ass characters. This should
+                        //  probably handle that.
+                        //
+                        QString tmp = QString(
+                            lctola(sub_attributes->lang_code).toUtf8());
+                        new_title.AddSubTitle(DVDSubTitle(j, tmp));
+
                     }
                 }
 
                 //
-                //  Debugging output
-                //
-                //  new_title->printYourself();
-
-                //
-                //  Have the new title figure out it's
-                //  appropriate id number vis-a-vis the
-                //  dvdinput table
+                //  Figure out size, aspect ratio, etc.
                 //
 
-                new_title->determineInputID();
+                video_attr_t *video_attributes =
+                    &vtsi_mat->vts_video_attr;
 
-                //
-                //  Add this new title to the container
-                //
+                switch (video_attributes->display_aspect_ratio)
+                {
+                    case 0:
+                        new_title.SetAR(4, 3, "4:3");
+                        break;
+                    case 3:
+                        new_title.SetAR(16, 9, "16:9");
+                        break;
+                    default:
+                        VERBOSE(VB_IMPORTANT, "couldn't get aspect"
+                                " ratio for a title");
+                }
 
-                titles.append(new_title);
+                switch (video_attributes->video_format)
+                {
+                    case 0:
+                        new_title.SetVFormat("ntsc");
+                        break;
+                    case 1:
+                        new_title.SetVFormat("pal");
+                        break;
+                    default:
+                        VERBOSE(VB_IMPORTANT, "Could not get video"
+                                " format for a title");
+                }
+
+                if (video_attributes->letterboxed)
+                {
+                    new_title.SetLBox(true);
+                }
+
+                uint c_height = 480;
+                if (video_attributes->video_format != 0)
+                {
+                    c_height = 576;
+                }
+
+                switch (video_attributes->picture_size)
+                {
+                    case 0:
+                        new_title.SetSize(720, c_height);
+                        break;
+                    case 1:
+                        new_title.SetSize(704, c_height);
+                        break;
+                    case 2:
+                        new_title.SetSize(352, c_height);
+                        break;
+                    case 3:
+                        new_title.SetSize(352, c_height / 2);
+                        break;
+                    default:
+                        VERBOSE(VB_IMPORTANT, "Could not determine for"
+                                " video size for a title.");
+                }
+                ifoClose(video_transport_file);
             }
-
-            ifoClose(ifo_file);
-            ifo_file = NULL;
-
-            DVDClose(dvd);
-            dvd = NULL;
-            return true;
+            else
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QString("Couldn't find any audio or video"
+                                " information for track %1").arg(i+1));
+            }
         }
-        else
-        {
-            DVDClose(dvd);
-            dvd = NULL;
-            return false;
-        }
+
+        //
+        //  Debugging output
+        //
+        //  new_title.printYourself();
+
+        //
+        //  Have the new title figure out it's
+        //  appropriate id number vis-a-vis the
+        //  dvdinput table
+        //
+
+        new_title.determineInputID();
+
+        //
+        //  Add this new title to the container
+        //
+
+        titles.push_back(new_title);
     }
-    return false;
+
+    ifoClose(ifo_file);
+    ifo_file = NULL;
+
+    DVDClose(dvd);
+    dvd = NULL;
+
+    return true;
 }
 
-DVDTitle *DVDProbe::getTitle(uint which_one)
+DVDTitle DVDProbe::GetTitle(uint which_one) const
 {
-
-    DVDTitle *iter;
-    for (iter = titles.first(); iter; iter = titles.next())
+    DVDTitleList::const_iterator it = titles.begin();
+    for (; it != titles.end(); ++it)
     {
-        if (iter->getTrack() == which_one)
-        {
-            return iter;
-        }
+        if ((*it).GetTrack() == which_one)
+            return *it;
     }
-    return NULL;
-
+    return DVDTitle();
 }
 
-DVDProbe::~DVDProbe()
+DVDProbe::~DVDProbe(void)
 {
     if (dvd)
     {
         DVDClose(dvd);
+        dvd = NULL;
     }
-    wipeClean();
+    Reset();
 }

@@ -15,34 +15,42 @@
 
 #include <mythtv/mythcontext.h>
 
-MTDLogger::MTDLogger(bool log_stdout)
-          :QObject()
-{
-    log_to_stdout = log_stdout;
-    
-    //
-    //  Where to log
-    //
+#define LOC      QString("MTDLogger: ")
+#define LOC_WARN QString("MTDLogger, Warning: ")
+#define LOC_ERR  QString("MTDLogger, Error: ")
 
+MTDLogger::MTDLogger(bool log_stdout) :
+    QObject(),
+    log_to_stdout(log_stdout)
+{
+}
+
+bool MTDLogger::Init(void)
+{
     QString logfile_name = gContext->GetSetting("DVDRipLocation");
-    if(logfile_name.length() < 1)
+    if (logfile_name.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "You do not have a DVD rip directory set."
-                  " Run Setup.");
-        exit(0);
-    }    
-    logfile_name.append("/mtd.log");
-    if(!log_to_stdout)
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "You do not have a DVD rip directory set. Run Setup.");
+        return false;
+    }
+
+    logfile_name += "/mtd.log";
+
+    if (!log_to_stdout)
     {
-        logging_file.setName(logfile_name);
-        if(!logging_file.open(QIODevice::WriteOnly))
+        logging_file.setFileName(logfile_name);
+        if (!logging_file.open(QIODevice::WriteOnly))
         {
-            VERBOSE(VB_IMPORTANT, QString("Problem opening logfile. Does this"
-                                          "look openable to you: %1")
-                                          .arg(logfile_name));
-            exit(0);
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "\n\t\t\t" +
+                    QString("Could not open logfile '%1' for writing")
+                    .arg(logfile_name) +
+                    "\n\t\t\tSending log output to stdout instead");
+            log_to_stdout = true;
         }
     }
+
+    return true;
 }
 
 void MTDLogger::addEntry(const QString &log_entry)
@@ -53,8 +61,8 @@ void MTDLogger::addEntry(const QString &log_entry)
 void MTDLogger::addStartup()
 {
     char hostname[1024];
-    QString startup_message = "mtd started at " 
-                            + QDateTime(QDateTime::currentDateTime()).toString();
+    QString startup_message = "mtd started at " +
+        QDateTime(QDateTime::currentDateTime()).toString();
     writeString(startup_message);
     
     gethostname(hostname, 1024);
@@ -68,8 +76,8 @@ void MTDLogger::addStartup()
 
 void MTDLogger::addShutdown()
 {
-    QString shutdown_message = "mtd shutting down at " 
-                            + QDateTime(QDateTime::currentDateTime()).toString();
+    QString shutdown_message = "mtd shutting down at " +
+      QDateTime(QDateTime::currentDateTime()).toString();
     writeString(shutdown_message);
 }
 
@@ -108,4 +116,3 @@ MTDLogger::~MTDLogger()
 {
     logging_file.close();
 }
-

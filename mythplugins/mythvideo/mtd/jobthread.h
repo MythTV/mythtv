@@ -1,5 +1,3 @@
-#ifndef JOBTHREAD_H_
-#define JOBTHREAD_H_
 /*
     jobthread.h
 
@@ -10,102 +8,111 @@
 
 */
 
+#ifndef JOBTHREAD_H_
+#define JOBTHREAD_H_
+
 #include <QThread>
 #include <QMutex>
 #include <QStringList>
 
 #include "fileobs.h"
 
+class Q3Process;
 class QDir;
-class MTD;
+class MythTranscodeDaemon;
+class QWaitCondition;
 
+/** \class JobThread
+ *  \brief Base class for all MythTranscodeDaemon threads
+ */
 class JobThread : public QThread
 {
-    
-    //
-    //  A base class for all mtd threads
-    //
-
   public:
-  
-    JobThread(MTD *owner, const QString &start_string, int nice_priority);
-    virtual void run();
-    bool keepGoing();
-    virtual bool transcodeSlotUsed(){return false;}
-    
-    QString getJobName();
-    QString getSubName();
-    double  getProgress(){return overall_progress;}
-    double  getSubProgress(){return subjob_progress;}
-    
-    void    problem(const QString &a_problem);
-    QString getProblem();
-    QString getJobString();
-    void    updateSubjobString( int seconds_elapsed, 
-                                const QString &pre_string);
-    void    cancelMe(bool yes_or_no){cancel_me = yes_or_no;}
-    void    setSubProgress(double a_value, uint priority);
-    void    setSubName(const QString &new_name, uint priority);
-    virtual QString getFinalFileName(){return "";}
-    void    sendLoggingEvent(const QString &event_string);
+    JobThread(MythTranscodeDaemon *owner,
+              const QString       &start_string,
+              int                  nice_priority);
 
-    virtual bool usesDevice(const QString &device)
-                 { (void)device; return false; }
-    
+    // Commands
+    virtual void run(void);
+    void    Cancel(bool chatty = false);
+
+    // Gets
+    QString GetJobName(void)     const;
+    QString GetSubName(void)     const;
+    QString GetLastProblem(void) const;
+    QString GetJobString(void)   const;
+    bool    IsCancelled(void)    const;
+    double  GetProgress(void)    const { return overall_progress; }
+    double  GetSubProgress(void) const { return subjob_progress;  }
+    virtual QString GetFinalFileName(void) const { return ""; }
+    virtual bool transcodeSlotUsed(void) const { return false; }
+    virtual bool usesDevice(const QString &device) const
+        { (void)device; return false; }
+
   protected:
+    ~JobThread();
 
-    void setJobName(const QString &jname);
-    void setProblem(const QString &prob);
+    // Commands
+    void    SendProblemEvent(const QString &a_problem);
+    void    SendLoggingEvent(const QString &event_string);
+    void    UpdateSubjobString(int seconds_elapsed,
+                               const QString &pre_string);
+    // Sets
+    void    SetSubProgress(double a_value, uint priority);
+    void    SetSubName(const QString &new_name, uint priority);
+    void    SetJobName(const QString &jname);
+    void    SetLastProblem(const QString &prob);
 
   private:
-
     QString problem_string;
     QString job_name;
     QString subjob_name;
     QString job_string;
 
   protected:
-  
     double  overall_progress;
     double  subjob_progress;
     double  sub_to_overall_multiple;
-    MTD     *parent;
+    MythTranscodeDaemon *parent;
     int     nice_level;
-    bool    cancel_me;
-    
-    QMutex  subjob_progress_mutex;
-    QMutex  subjob_name_mutex;
-    QMutex  problem_string_mutex;
-    QMutex  job_name_mutex;
-    QMutex  job_string_mutex;
+
+    mutable QMutex  subjob_progress_mutex;
+    mutable QMutex  subjob_name_mutex;
+    mutable QMutex  problem_string_mutex;
+    mutable QMutex  job_name_mutex;
+    mutable QMutex  job_string_mutex;
+
+    QMutex         *cancelLock;
+    QWaitCondition *cancelWaitCond;
+    bool            cancel_me;
 };
+typedef QList<JobThread*> JobThreadList;
 
 
+/** \class DVDThread
+ *  \brief Base class for all *DVD* related job threads
+ *         (perfect copy, transcode)
+ */
 class DVDThread : public JobThread
 {
-
-    //
-    //  Base class for all *DVD* related
-    //  job threads (perfect copy, transcode)
-    //
-
   public:
-  
-    DVDThread(MTD *owner,
-              QMutex *drive_mutex,
-              const QString &dvd_device,
-              int track,
-              const QString &dest_file, 
-              const QString &name,
-              const QString &start_string,
-              int nice_priority);
+
+    DVDThread(MythTranscodeDaemon *owner,
+              QMutex              *drive_mutex,
+              const QString       &dvd_device,
+              int                  track,
+              const QString       &dest_file,
+              const QString       &name,
+              const QString       &start_string,
+              int                  nice_priority);
 
     ~DVDThread();
-                     
-    virtual void run();
-    QString getFinalFileName(){return destination_file_string;}
-    bool    usesDevice(const QString &device)
-            { return dvd_device_location.contains(device); };
+
+    virtual void run(void);
+    virtual QString GetFinalFileName(void) const
+        { return destination_file_string; }
+    bool    usesDevice(const QString &device) const
+        { return dvd_device_location.contains(device); }
 
   protected:
 
@@ -114,107 +121,99 @@ class DVDThread : public JobThread
                           const QString &extension,
                           bool multiple_files,
                           QStringList *output_files = 0);
-  
-    QMutex       *dvd_device_access;
+
+    QMutex      *dvd_device_access;
     QString      dvd_device_location;
     QString      destination_file_string;
     int          dvd_title;
     QString      rip_name;
 };
 
-class DVDISOCopyThread : public DVDThread
-{
     //
     // Copy a byte-for-byte image of the disk
     // to an iso file.
     //
 
+class DVDISOCopyThread : public DVDThread
+{
   public:
-
-    DVDISOCopyThread(MTD *owner,
-                     QMutex *drive_mutex,
-                     const QString &dvd_device, 
-                     int track, 
-                     const QString &dest_file, 
-                     const QString &name,
-                     const QString &start_string,
-                     int nice_priority);
+    DVDISOCopyThread(MythTranscodeDaemon *owner,
+                     QMutex              *drive_mutex,
+                     const QString       &dvd_device,
+                     int                  track,
+                     const QString       &dest_file,
+                     const QString       &name,
+                     const QString       &start_string,
+                     int                  nice_priority);
 
     ~DVDISOCopyThread();
 
-    virtual void run();
+    virtual void run(void);
 
     bool copyFullDisc(void);
 };
 
-class DVDPerfectThread : public DVDThread
-{
     //
     //  Fairly simple class that just knows
     //  how to copy
     //
-    
+
+class DVDPerfectThread : public DVDThread
+{
   public:
-  
-    DVDPerfectThread(MTD *owner,
-                     QMutex *drive_mutex, 
-                     const QString &dvd_device, 
-                     int track, 
-                     const QString &dest_file, 
-                     const QString &name,
-                     const QString &start_string,
-                     int nice_priority);
+    DVDPerfectThread(MythTranscodeDaemon *owner,
+                     QMutex              *drive_mutex,
+                     const QString       &dvd_device,
+                     int                  track,
+                     const QString       &dest_file,
+                     const QString       &name,
+                     const QString       &start_string,
+                     int                  nice_priority);
 
     ~DVDPerfectThread();
-                     
-    virtual void run();
-    
 
+    virtual void run(void);
 };
 
-class DVDTranscodeThread : public DVDThread
-{
-    
+
     //
     //  An object that can rip a VOB off a DVD
     //  and then transcode it
     //
-    
+
+class DVDTranscodeThread : public DVDThread
+{
   public:
-  
-    DVDTranscodeThread(MTD *owner,
-                       QMutex *drive_mutex,
-                       const QString &dvd_device,
-                       int track,
-                       const QString &dest_file,
-                       const QString &name,
-                       const QString &start_string,
-                       int nice_priority,
-                       int quality_level,
-                       bool do_ac3,
-                       int which_audio,
-                       int numb_seconds,
-                       int subtitle_track_numb);
-                       
-                      
+    DVDTranscodeThread(MythTranscodeDaemon *owner,
+                       QMutex              *drive_mutex,
+                       const QString       &dvd_device,
+                       int                  track,
+                       const QString       &dest_file,
+                       const QString       &name,
+                       const QString       &start_string,
+                       int                  nice_priority,
+                       int                  quality_level,
+                       bool                 do_ac3,
+                       int                  which_audio,
+                       int                  numb_seconds,
+                       int                  subtitle_track_numb);
     ~DVDTranscodeThread();
-    
-    virtual void run();
-    bool transcodeSlotUsed(){return used_transcode_slot;}
-    
-    bool    makeWorkingDirectory();
+
+    virtual void run(void);
+    virtual bool transcodeSlotUsed(void) const { return used_transcode_slot; }
+
+    bool    makeWorkingDirectory(void);
     bool    buildTranscodeCommandLine(int which_run);
     bool    runTranscode(int run);
-    void    cleanUp();
-    void    wipeClean();
+    void    cleanUp(void);
+    void    wipeClean(void);
     bool    used_transcode_slot;
-    
+
   private:
-  
     int          quality;
     QDir         *working_directory;
     QStringList  tc_arguments;
-    class Q3Process     *tc_process;
+    Q3Process   *tc_process;
     bool         two_pass;
     int          audio_track;
     int          length_in_seconds;
