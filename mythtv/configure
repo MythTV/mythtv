@@ -2006,6 +2006,7 @@ if ! enabled cpu_override && enabled proc_opt; then
    elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*33[2567]0" > /dev/null ; then
        cpu="core2"
    elif expr "$processor" : ".*Intel(R) Xeon(R) CPU.*X32[123]0" > /dev/null ; then
+       cpu="core2"
 # Various Intel Duo processors (EMT64T capable)
    elif expr "$processor" : ".*Intel(R).*Core(TM)2.*CPU" > /dev/null ; then
        cpu="core2"
