@@ -2,8 +2,7 @@
 
 #include <qstring.h>
 
-struct hufftab {
-    char last;
+struct fsattab {
     unsigned int value;
     short bits;
     char next;
@@ -21,18 +20,6 @@ QString freesat_huffman_to_string(const unsigned char *src, uint size)
     {
         QByteArray uncompressed(size * 3, '\0');
         int p = 0;
-        struct hufftab *table;
-        unsigned table_length;
-        if (src[1] == 1)
-        {
-            table = fsat_huffman1;
-            table_length = sizeof(fsat_huffman1) / sizeof(fsat_huffman1[0]);
-        }
-        else
-        {
-            table = fsat_huffman2;
-            table_length = sizeof(fsat_huffman2) / sizeof(fsat_huffman2[0]);
-        }
         unsigned value = 0, byte = 2, bit = 0;
         while (byte < 6 && byte < size)
         {
@@ -45,50 +32,52 @@ QString freesat_huffman_to_string(const unsigned char *src, uint size)
         {
             bool found = false;
             unsigned bitShift = 0;
+            char nextCh = STOP;
             if (lastch == ESCAPE)
             {
                 found = true;
                 // Encoded in the next 8 bits.
                 // Terminated by the first ASCII character.
-                char nextCh = (value >> 24) & 0xff;
+                nextCh = (value >> 24) & 0xff;
                 bitShift = 8;
                 if ((nextCh & 0x80) == 0)
+                {
+                    if (nextCh < ' ')
+                        nextCh = STOP;
                     lastch = nextCh;
-                if (p >= uncompressed.count())
-                    uncompressed.resize(p+10);
-                uncompressed[p++] = nextCh;
+                }
             }
             else
             {
-                for (unsigned j = 0; j < table_length; j++)
+                unsigned indx = (unsigned)lastch;
+                if (src[1] == 2)
+                    indx |= 0x80;
+                for (unsigned j = fsat_index[indx]; j < fsat_index[indx+1]; j++)
                 {
-                    if (table[j].last == lastch)
+                    unsigned mask = 0, maskbit = 0x80000000;
+                    for (short kk = 0; kk < fsat_table[j].bits; kk++)
                     {
-                        unsigned mask = 0, maskbit = 0x80000000;
-                        for (short kk = 0; kk < table[j].bits; kk++)
-                        {
-                            mask |= maskbit;
-                            maskbit >>= 1;
-                        }
-                        if ((value & mask) == table[j].value)
-                        {
-                            char nextCh = table[j].next;
-                            bitShift = table[j].bits;
-                            if (nextCh != STOP && nextCh != ESCAPE)
-                            {
-                                if (p >= uncompressed.count())
-                                    uncompressed.resize(p+10);
-                                uncompressed[p++] = nextCh;
-                            }
-                            found = true;
-                            lastch = nextCh;
-                            break;
-                        }
+                        mask |= maskbit;
+                        maskbit >>= 1;
+                    }
+                    if ((value & mask) == fsat_table[j].value)
+                    {
+                        nextCh = fsat_table[j].next;
+                        bitShift = fsat_table[j].bits;
+                        found = true;
+                        lastch = nextCh;
+                        break;
                     }
                 }
             }
             if (found)
             {
+                if (nextCh != STOP && nextCh != ESCAPE)
+                {
+                    if (p >= uncompressed.count())
+                        uncompressed.resize(p+10);
+                    uncompressed[p++] = nextCh;
+                }
                 // Shift up by the number of bits.
                 for (unsigned b = 0; b < bitShift; b++)
                 {
@@ -110,7 +99,7 @@ QString freesat_huffman_to_string(const unsigned char *src, uint size)
                 result.append("...");
                 return result;
             }
-        } while (lastch != STOP && value != 0);
+        } while (lastch != STOP && byte < size+4);
 
         return QString::fromUtf8(uncompressed, p);
     }
