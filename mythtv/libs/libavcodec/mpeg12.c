@@ -1482,6 +1482,9 @@ static int mpeg_decode_postinit(AVCodecContext *avctx){
             if( avctx->idct_algo == FF_IDCT_AUTO )
                 avctx->idct_algo = FF_IDCT_SIMPLE;
 
+        if( avctx->vdpau_acceleration)
+            avctx->idct_algo = FF_IDCT_SIMPLE;
+
         if( avctx->xvmc_vld_hwslice == 1)
             avctx->idct_algo = FF_IDCT_LIBMPEG2MMX;
 
@@ -2283,6 +2286,9 @@ static int vcr2_init_sequence(AVCodecContext *avctx)
     if( avctx->pix_fmt == PIX_FMT_XVMC_MPEG2_IDCT )
         if( avctx->idct_algo == FF_IDCT_AUTO )
             avctx->idct_algo = FF_IDCT_SIMPLE;
+
+    if( avctx->vdpau_acceleration == 1)
+        avctx->idct_algo = FF_IDCT_SIMPLE;
 
     if( avctx->xvmc_vld_hwslice == 1)
         avctx->idct_algo = FF_IDCT_LIBMPEG2MMX;
