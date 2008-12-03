@@ -4480,7 +4480,7 @@ NULL
  *     --ignore-table=schemalock mythconverg | \
  *   sed '/^SET.*;$/d;s/^.*[^;]$/"&"/;s/^);$/");",/'
  *
- * don't forget to om
+ * don't forget to add auto_increment annotations 
  *
  * command to get the initial data:
  *
@@ -4517,14 +4517,14 @@ bool InitializeDatabase(void)
     const char *updates[] = {
 tmp.constData(),
 "CREATE TABLE callsignnetworkmap ("
-"  id int(11) NOT NULL,"
+"  id int(11) NOT NULL AUTO_INCREMENT,"
 "  callsign varchar(20) NOT NULL default '',"
 "  network varchar(20) NOT NULL default '',"
 "  PRIMARY KEY  (id),"
 "  UNIQUE KEY callsign (callsign)"
 ");",
 "CREATE TABLE capturecard ("
-"  cardid int(10) unsigned NOT NULL,"
+"  cardid int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  videodevice varchar(128) default NULL,"
 "  audiodevice varchar(128) default NULL,"
 "  vbidevice varchar(128) default NULL,"
@@ -4556,7 +4556,7 @@ tmp.constData(),
 "  PRIMARY KEY  (cardid)"
 ");",
 "CREATE TABLE cardinput ("
-"  cardinputid int(10) unsigned NOT NULL,"
+"  cardinputid int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  cardid int(10) unsigned NOT NULL default '0',"
 "  sourceid int(10) unsigned NOT NULL default '0',"
 "  inputname varchar(32) NOT NULL default '',"
@@ -4606,7 +4606,7 @@ tmp.constData(),
 "  KEY visible (visible)"
 ");",
 "CREATE TABLE channelscan ("
-"  scanid int(3) unsigned NOT NULL,"
+"  scanid int(3) unsigned NOT NULL AUTO_INCREMENT,"
 "  cardid int(3) unsigned NOT NULL,"
 "  sourceid int(3) unsigned NOT NULL,"
 "  processed tinyint(1) unsigned NOT NULL,"
@@ -4653,7 +4653,7 @@ tmp.constData(),
 "  decryption_status smallint(2) unsigned NOT NULL default '0'"
 ");",
 "CREATE TABLE channelscan_dtv_multiplex ("
-"  transportid int(6) unsigned NOT NULL,"
+"  transportid int(6) unsigned NOT NULL AUTO_INCREMENT,"
 "  scanid int(3) unsigned NOT NULL,"
 "  mplexid smallint(6) unsigned NOT NULL,"
 "  frequency bigint(12) unsigned NOT NULL,"
@@ -4700,7 +4700,7 @@ tmp.constData(),
 "  KEY id (cardinputid)"
 ");",
 "CREATE TABLE diseqc_tree ("
-"  diseqcid int(10) unsigned NOT NULL,"
+"  diseqcid int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  parentid int(10) unsigned default NULL,"
 "  ordinal tinyint(3) unsigned NOT NULL,"
 "  `type` varchar(16) NOT NULL default '',"
@@ -4721,13 +4721,13 @@ tmp.constData(),
 "CREATE TABLE displayprofilegroups ("
 "  `name` varchar(128) NOT NULL,"
 "  hostname varchar(64) NOT NULL,"
-"  profilegroupid int(10) unsigned NOT NULL,"
+"  profilegroupid int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  PRIMARY KEY  (`name`,hostname),"
 "  UNIQUE KEY profilegroupid (profilegroupid)"
 ");",
 "CREATE TABLE displayprofiles ("
 "  profilegroupid int(10) unsigned NOT NULL,"
-"  profileid int(10) unsigned NOT NULL,"
+"  profileid int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  `value` varchar(128) NOT NULL,"
 "  `data` varchar(255) NOT NULL default '',"
 "  KEY profilegroupid (profilegroupid),"
@@ -4735,7 +4735,7 @@ tmp.constData(),
 "  KEY profileid_2 (profileid)"
 ");",
 "CREATE TABLE dtv_multiplex ("
-"  mplexid smallint(6) NOT NULL,"
+"  mplexid smallint(6) NOT NULL AUTO_INCREMENT,"
 "  sourceid smallint(6) default NULL,"
 "  transportid int(11) default NULL,"
 "  networkid int(11) default NULL,"
@@ -4784,7 +4784,7 @@ tmp.constData(),
 "  PRIMARY KEY  (chanid,eventid,`status`)"
 ");",
 "CREATE TABLE favorites ("
-"  favid int(11) unsigned NOT NULL,"
+"  favid int(11) unsigned NOT NULL AUTO_INCREMENT,"
 "  userid int(11) unsigned NOT NULL default '0',"
 "  chanid int(11) unsigned NOT NULL default '0',"
 "  PRIMARY KEY  (favid)"
@@ -4811,7 +4811,7 @@ tmp.constData(),
 "  KEY recusage (recusage,lastupdatetime)"
 ");",
 "CREATE TABLE jobqueue ("
-"  id int(11) NOT NULL,"
+"  id int(11) NOT NULL AUTO_INCREMENT,"
 "  chanid int(10) NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
 "  inserttime datetime NOT NULL default '0000-00-00 00:00:00',"
@@ -4848,7 +4848,7 @@ tmp.constData(),
 "  UNIQUE KEY phrase (phrase,searchtype)"
 ");",
 "CREATE TABLE mythlog ("
-"  logid int(10) unsigned NOT NULL,"
+"  logid int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  module varchar(32) NOT NULL default '',"
 "  priority int(11) NOT NULL default '0',"
 "  acknowledged tinyint(1) default '0',"
@@ -4860,7 +4860,7 @@ tmp.constData(),
 "  KEY module (module)"
 ");",
 "CREATE TABLE networkiconmap ("
-"  id int(11) NOT NULL,"
+"  id int(11) NOT NULL AUTO_INCREMENT,"
 "  network varchar(20) NOT NULL default '',"
 "  url varchar(255) NOT NULL default '',"
 "  PRIMARY KEY  (id),"
@@ -4904,7 +4904,7 @@ tmp.constData(),
 "  KEY recstatus_2 (recstatus,title,subtitle)"
 ");",
 "CREATE TABLE people ("
-"  person mediumint(8) unsigned NOT NULL,"
+"  person mediumint(8) unsigned NOT NULL AUTO_INCREMENT,"
 "  `name` varchar(128) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL default '',"
 "  PRIMARY KEY  (person),"
 "  UNIQUE KEY `name` (`name`(41))"
@@ -4931,7 +4931,7 @@ tmp.constData(),
 "  PRIMARY KEY  (priorityname)"
 ");",
 "CREATE TABLE profilegroups ("
-"  id int(10) unsigned NOT NULL,"
+"  id int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  `name` varchar(128) default NULL,"
 "  cardtype varchar(32) NOT NULL default 'V4L',"
 "  is_default int(1) default '0',"
@@ -5007,7 +5007,7 @@ tmp.constData(),
 "  UNIQUE KEY recgroup (recgroup)"
 ");",
 "CREATE TABLE record ("
-"  recordid int(10) unsigned NOT NULL,"
+"  recordid int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  `type` int(10) unsigned NOT NULL default '0',"
 "  chanid int(10) unsigned default NULL,"
 "  starttime time NOT NULL default '00:00:00',"
@@ -5200,7 +5200,7 @@ tmp.constData(),
 "  PRIMARY KEY  (chanid,starttime,`type`,mark)"
 ");",
 "CREATE TABLE recordingprofiles ("
-"  id int(10) unsigned NOT NULL,"
+"  id int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  `name` varchar(128) default NULL,"
 "  videocodec varchar(128) default NULL,"
 "  audiocodec varchar(128) default NULL,"
@@ -5226,7 +5226,7 @@ tmp.constData(),
 "  KEY `value` (`value`,hostname)"
 ");",
 "CREATE TABLE storagegroup ("
-"  id int(11) NOT NULL,"
+"  id int(11) NOT NULL AUTO_INCREMENT,"
 "  groupname varchar(32) NOT NULL,"
 "  hostname varchar(64) NOT NULL default '',"
 "  dirname varchar(235) collate utf8_bin NOT NULL default '',"
@@ -5264,7 +5264,7 @@ tmp.constData(),
 "  KEY parentid (parentid)"
 ");",
 "CREATE TABLE videosource ("
-"  sourceid int(10) unsigned NOT NULL,"
+"  sourceid int(10) unsigned NOT NULL AUTO_INCREMENT,"
 "  `name` varchar(128) NOT NULL default '',"
 "  xmltvgrabber varchar(128) default NULL,"
 "  userid varchar(128) NOT NULL default '',"
