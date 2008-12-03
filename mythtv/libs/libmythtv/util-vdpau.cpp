@@ -1242,7 +1242,7 @@ void VDPAUContext::DeinitOSD(void)
 {
     if (osdOutputSurface)
     {
-        vdp_video_surface_destroy(osdOutputSurface);
+        vdp_output_surface_destroy(osdOutputSurface);
         osdOutputSurface = 0;
     }
 
