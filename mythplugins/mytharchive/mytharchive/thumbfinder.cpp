@@ -1,10 +1,16 @@
+// c
 #include <math.h>
 #include <cstdlib>
 
+// c++
+#include <iostream>
+
 // qt
 #include <QApplication>
+#include <QDomDocument>
+#include <QFile>
 #include <QDir>
-#include <QFileInfo>
+//#include <QFileInfo>
 #include <QPainter>
 
 // myth
@@ -12,8 +18,14 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/libmythtv/programinfo.h>
 #include <mythtv/libmythui/mythuihelper.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythdialogbox.h>
 #include <mythtv/mythdirs.h>
 #include <mythtv/util.h>
+#include <libmythui/mythuitext.h>
+#include <libmythui/mythuibutton.h>
+#include <libmythui/mythuiimage.h>
+#include <libmythui/mythuibuttonlist.h>
 
 #ifndef INT64_C    // Used in ffmpeg headers to define some constants
 #define INT64_C(v)   (v ## LL)
@@ -40,10 +52,9 @@ struct SeekAmount SeekAmounts[] =
 
 int SeekAmountsCount = sizeof(SeekAmounts) / sizeof(SeekAmounts[0]);
 
-ThumbFinder::ThumbFinder(ArchiveItem *archiveItem, const QString &menuTheme,
-                MythMainWindow *parent, const QString &window_name,
-                const QString &theme_filename, const char *name)
-                :MythThemedDialog(parent, window_name, theme_filename, name)
+ThumbFinder::ThumbFinder(MythScreenStack *parent, ArchiveItem *archiveItem,
+                         const QString &menuTheme)
+            :MythScreenType(parent, "ThumbFinder")
 {
     m_archiveItem = archiveItem;
 
@@ -60,18 +71,17 @@ ThumbFinder::ThumbFinder(ArchiveItem *archiveItem, const QString &menuTheme,
 
     m_thumbCount = getChapterCount(menuTheme);
 
-    wireUpTheme();
-    assignFirstFocus();
-
     m_currentSeek = 0;
     m_offset = 0;
     m_startTime = -1;
     m_startPTS = -1;
     m_currentPTS = -1;
     m_firstIFramePTS = -1;
-    m_popupMenu = NULL;
+}
 
-    QTimer::singleShot(500, this, SLOT(getThumbImages()));
+void ThumbFinder::Init(void)
+{
+    getThumbImages();
 }
 
 ThumbFinder::~ThumbFinder()
@@ -83,82 +93,92 @@ ThumbFinder::~ThumbFinder()
     closeAVCodec();
 }
 
-int  ThumbFinder::getChapterCount(const QString &menuTheme)
+bool ThumbFinder::Create(void)
 {
-    QString filename = GetShareDir() + "mytharchive/themes/" + 
-            menuTheme + "/theme.xml";
-    QDomDocument doc("mydocument");
-    QFile file(filename);
-    if (!file.open(QIODevice::ReadOnly))
-        return 0;
+    bool foundtheme = false;
 
-    if (!doc.setContent(&file))
+    // Load the theme for this screen
+    foundtheme = LoadWindowFromXML("mythburn-ui.xml", "thumbfinder", this);
+
+    if (!foundtheme)
+        return false;
+
+    try
     {
-        file.close();
-        return 0;
+        m_frameImage = GetMythUIImage("frameimage");
+        m_positionImage = GetMythUIImage("positionimage");
+        m_imageGrid = GetMythUIButtonList("thumblist");
+        m_saveButton = GetMythUIButton("save_button");
+        m_cancelButton = GetMythUIButton("cancel_button");
+        m_frameButton = GetMythUIButton("frame_button");
+        m_seekAmountText = GetMythUIText("seekamount");
+        m_currentPosText = GetMythUIText("currentpos");
     }
-    file.close();
+    catch (QString &error)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'mythburn'\n\t\t\t"
+                              "Error was: " + error);
+        return false;
+    }
 
-    QDomNodeList chapterNodeList = doc.elementsByTagName("chapter");
-    return chapterNodeList.count();
+    connect(m_imageGrid, SIGNAL(itemSelected(MythUIButtonListItem *)),
+            this, SLOT(gridItemChanged(MythUIButtonListItem *)));
+
+    m_saveButton->SetText(tr("Save"));
+    connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(savePressed()));
+
+    m_cancelButton->SetText(tr("Cancel"));
+    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
+
+    connect(m_frameButton, SIGNAL(Clicked()), this, SLOT(updateThumb()));
+
+    if (!BuildFocusList())
+        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+
+    SetFocusWidget(m_imageGrid);
+
+    return true;
 }
 
-void ThumbFinder::loadCutList()
+bool ThumbFinder::keyPressEvent(QKeyEvent *event)
 {
-    ProgramInfo *progInfo = getProgramInfoForFile(m_archiveItem->filename);
+    if (GetFocusWidget()->keyPressEvent(event))
+        return true;
 
-    if (progInfo && m_archiveItem->hasCutlist)
-    {
-        progInfo->GetCutList(m_deleteMap);
-        delete progInfo;
-    }
-}
-
-void ThumbFinder::keyPressEvent(QKeyEvent *e)
-{
     bool handled = false;
-
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Archive", event, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
-
         if (action == "MENU")
         {
-            nextPrevWidgetFocus(true);
-            return;
+            NextPrevWidgetFocus(true);
+            return true;
         }
 
         if (action == "ESCAPE")
         {
             showMenu();
-            return;
+            return true;
         }
 
         if (action == "0" || action == "1" || action == "2" || action == "3" ||
             action == "4" || action == "5" || action == "6" || action == "7" ||
             action == "8" || action == "9")
         {
-            m_imageGrid->setCurrentPos(action.toInt());
-            int itemNo = m_imageGrid->getCurrentPos();
+            m_imageGrid->SetItemCurrent(action.toInt());
+            int itemNo = m_imageGrid->GetCurrentPos();
             ThumbImage *thumb = m_thumbList.at(itemNo);
             if (thumb)
                 seekToFrame(thumb->frame);
-            return;
+            return true;
         }
 
-        if (getCurrentFocusWidget() == m_imageGrid)
-        {
-
-            if (m_imageGrid->handleKeyPress(action))
-                return;
-        }
-
-        if (getCurrentFocusWidget() == m_frameButton)
+        if (GetFocusWidget() == m_frameButton)
         {
             if (action == "UP")
             {
@@ -180,82 +200,54 @@ void ThumbFinder::keyPressEvent(QKeyEvent *e)
             {
                 updateThumb();
             }
-            else if (action == "ESCAPE")
-            {
-            }
-        }
-        else
-        {
-            if (action == "SELECT")
-            {
-                activateCurrent();
-            }
-            else if (action == "UP")
-            {
-                nextPrevWidgetFocus(false);
-            }
-            else if (action == "DOWN")
-            {
-                nextPrevWidgetFocus(true);
-            }
-            else if (action == "LEFT")
-            {
-                nextPrevWidgetFocus(false);
-            }
-            else if (action == "RIGHT")
-            {
-                nextPrevWidgetFocus(true);
-            }
-            else if (action == "ESCAPE")
-            {
-                handled = false;
-            }
             else
                 handled = false;
         }
+        else
+            handled = false;
     }
 
-    if (!handled)
-        MythThemedDialog::keyPressEvent(e);
+    if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
 }
 
-void ThumbFinder::wireUpTheme()
+int  ThumbFinder::getChapterCount(const QString &menuTheme)
 {
-    m_frameImage = getUIImageType("frameimage");
-    m_positionImage = getUIImageType("positionimage");
-
-    m_imageGrid = getUIImageGridType("imagegrid");
-    if (!m_imageGrid)
+    QString filename = GetShareDir() + "mytharchive/themes/" + 
+            menuTheme + "/theme.xml";
+    QDomDocument doc("mydocument");
+    QFile file(filename);
+    cout << "loading file from: " << qPrintable(filename) << endl;
+    if (!file.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_IMPORTANT, "ThumbFinder: Failed to get image grid.");
-        exit(-1);
+        VERBOSE(VB_IMPORTANT, "Failed to open theme file: " + filename);
+        return 0; //??
     }
-    connect(m_imageGrid, SIGNAL(itemChanged(ImageGridItem *)), 
-                 this, SLOT(gridItemChanged(ImageGridItem *)));
-
-    // save button
-    m_saveButton = getUITextButtonType("save_button");
-    if (m_saveButton)
+    if (!doc.setContent(&file))
     {
-        m_saveButton->setText(tr("Save"));
-        connect(m_saveButton, SIGNAL(pushed()), this, SLOT(savePressed()));
+        file.close();
+        VERBOSE(VB_IMPORTANT, "Failed to parse theme file: " + filename);
+        return 0;
     }
+    file.close();
 
-    // cancel button
-    m_cancelButton = getUITextButtonType("cancel_button");
-    if (m_cancelButton)
+    QDomNodeList chapterNodeList = doc.elementsByTagName("chapter");
+    cout << "chapterNodeList.count(): " << chapterNodeList.count() << endl;
+    cout << "chapterNodeList.size(): " << chapterNodeList.size() << endl;
+    return chapterNodeList.count();
+}
+
+void ThumbFinder::loadCutList()
+{
+    ProgramInfo *progInfo = getProgramInfoForFile(m_archiveItem->filename);
+
+    if (progInfo && m_archiveItem->hasCutlist)
     {
-        m_cancelButton->setText(tr("Cancel"));
-        connect(m_cancelButton, SIGNAL(pushed()), this, SLOT(cancelPressed()));
+        progInfo->GetCutList(m_deleteMap);
+        delete progInfo;
     }
-
-    // frame button
-    m_frameButton = getUITextButtonType("frame_button");
-
-    m_seekAmountText = getUITextType("seekamount");
-    m_currentPosText = getUITextType("currentpos");
-
-    buildFocusList();
 }
 
 void ThumbFinder::savePressed()
@@ -271,12 +263,13 @@ void ThumbFinder::savePressed()
         *thumb = *m_thumbList.at(x);
         m_archiveItem->thumbList.append(thumb);
     }
-    done(Accepted);
+
+    Close();
 }
 
 void ThumbFinder::cancelPressed()
 {
-    done(Rejected);
+    Close();
 }
 
 void ThumbFinder::updateCurrentPos()
@@ -308,11 +301,11 @@ void ThumbFinder::changeSeekAmount(bool up)
     m_seekAmountText->SetText(SeekAmounts[m_currentSeek].name);
 }
 
-void ThumbFinder::gridItemChanged(ImageGridItem *item)
+void ThumbFinder::gridItemChanged(MythUIButtonListItem *item)
 {
     (void) item;
 
-    int itemNo = m_imageGrid->getCurrentPos();
+    int itemNo = m_imageGrid->GetCurrentPos();
     ThumbImage *thumb = m_thumbList.at(itemNo);
     if (thumb)
           seekToFrame(thumb->frame);
@@ -347,8 +340,8 @@ QString ThumbFinder::createThumbDir(void)
 
 void ThumbFinder::updateThumb(void)
 {
-    int itemNo = m_imageGrid->getCurrentPos();
-    ImageGridItem *item = m_imageGrid->getCurrentItem();
+    int itemNo = m_imageGrid->GetCurrentPos();
+    MythUIButtonListItem *item = m_imageGrid->GetItemCurrent();
 
     ThumbImage *thumb = m_thumbList.at(itemNo);
     if (!thumb)
@@ -360,22 +353,18 @@ void ThumbFinder::updateThumb(void)
     QFile src(m_frameFile);
     copy(dst, src);
 
-    // update the image grid item
-    QSize size = m_imageGrid->getImageItemSize();
+    item->SetImage(imageFile);
 
-    if (item->pixmap)
-        delete item->pixmap;
-    item->pixmap = createScaledPixmap(imageFile, size.width(), size.height(),
-                                      Qt::IgnoreAspectRatio);
+    // update the image grid item
     int64_t pos = (int) ((m_currentPTS - m_startPTS) / m_frameTime);
     thumb->frame = pos - m_offset;
     if (itemNo != 0)
     {
         thumb->caption = frameToTime(thumb->frame);
-        item->text = thumb->caption;
+        item->setText(thumb->caption);
     }
 
-    m_imageGrid->refresh();
+    m_imageGrid->SetRedraw();
 }
 
 QString ThumbFinder::frameToTime(int64_t frame, bool addFrame)
@@ -420,16 +409,24 @@ bool ThumbFinder::getThumbImages()
     m_updateFrame = true;
     getFrameImage();
 
-    int chapterLen = m_finalDuration / m_thumbCount;
+    int chapterLen;
+    if (m_thumbCount)
+        chapterLen = m_finalDuration / m_thumbCount;
+    else
+        chapterLen = m_finalDuration;
+
     QString thumbList = "";
-    QSize size = m_imageGrid->getImageItemSize();
     m_updateFrame = false;
 
     // add title thumb
     m_frameFile = m_thumbDir + "/title.jpg";
+    ThumbImage *thumb = NULL;
 
-    // use the thumb details in the thumList if already available
-    ThumbImage *thumb = m_thumbList.at(0);
+    if (m_thumbList.size() > 0)
+    {
+        // use the thumb details in the thumbList if already available
+        thumb = m_thumbList.at(0);
+    }
 
     if (!thumb)
     {
@@ -446,21 +443,21 @@ bool ThumbFinder::getThumbImages()
     seekToFrame(thumb->frame);
     getFrameImage();
 
-    QPixmap *pixmap = createScaledPixmap(m_frameFile,
-                                         size.width(), size.height(),
-                                         Qt::IgnoreAspectRatio);
+    new MythUIButtonListItem(m_imageGrid, thumb->caption, thumb->filename);
 
-    ImageGridItem *item = new ImageGridItem(thumb->caption, pixmap, false, NULL);
-    m_imageGrid->appendItem(item);
-    m_imageGrid->refresh();
     qApp->processEvents();
 
     for (int x = 1; x <= m_thumbCount; x++)
     {
         m_frameFile = QString(m_thumbDir + "/chapter-%1.jpg").arg(x);
 
-        // use the thumb details in the archiveItem if already available
-        thumb = m_archiveItem->thumbList.at(x);
+        thumb = NULL;
+
+        if (m_archiveItem->thumbList.size() > x)
+        {
+            // use the thumb details in the archiveItem if already available
+            thumb = m_archiveItem->thumbList.at(x);
+        }
 
         if (!thumb)
         {
@@ -489,14 +486,7 @@ bool ThumbFinder::getThumbImages()
         qApp->processEvents();
         getFrameImage();
         qApp->processEvents();
-
-        QPixmap *pixmap = createScaledPixmap(m_frameFile,
-                                             size.width(), size.height(),
-                                             Qt::IgnoreAspectRatio);
-
-        ImageGridItem *item = new ImageGridItem(thumb->caption, pixmap, false, NULL);
-        m_imageGrid->appendItem(item);
-        m_imageGrid->refresh();
+        new MythUIButtonListItem(m_imageGrid, thumb->caption, thumb->filename);
         qApp->processEvents();
     }
 
@@ -505,34 +495,11 @@ bool ThumbFinder::getThumbImages()
 
     m_updateFrame = true;
 
-    m_imageGrid->setItemCount(m_thumbCount+1);
-    m_imageGrid->recalculateLayout();
-    m_imageGrid->refresh();
+    m_imageGrid->SetRedraw();
+
+    SetFocusWidget(m_imageGrid);
 
     return true;
-}
-
-QPixmap *ThumbFinder::createScaledPixmap(QString filename,
-                      int width, int height, Qt::AspectRatioMode mode)
-{
-    QPixmap *pixmap = NULL;
-
-    if (filename != "")
-    {
-        QImage *img = GetMythUI()->LoadScaleImage(filename);
-        if (!img)
-        {
-            VERBOSE(VB_IMPORTANT, QString("ThumbFinder: Failed to load image %1").arg(filename));
-            return NULL;
-        }
-        else
-        {
-            pixmap = &QPixmap::fromImage(img->scaled(width, height, mode, Qt::SmoothTransformation));
-            delete img;
-        }
-    }
-
-    return pixmap;
 }
 
 bool ThumbFinder::initAVCodec(const QString &inFile)
@@ -837,8 +804,8 @@ bool ThumbFinder::getFrameImage(bool needKeyFrame, int64_t requiredPTS)
         }
         if (m_updateFrame)
         {
-            m_frameImage->SetImage(m_frameFile);
-            m_frameImage->LoadImage();
+            m_frameImage->SetFilename(m_frameFile);
+            m_frameImage->Load();
         }
 
         updateCurrentPos();
@@ -864,41 +831,17 @@ void ThumbFinder::closeAVCodec()
 
 void ThumbFinder::showMenu()
 {
-    if (m_popupMenu)
-        return;
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythDialogBox *menuPopup = new MythDialogBox("Menu", popupStack, "actionmenu");
 
-    m_popupMenu = new MythPopupBox(gContext->GetMainWindow(),
-                                 "popupMenu");
+    if (menuPopup->Create())
+        popupStack->AddScreen(menuPopup);
 
-    QAbstractButton *button;
-    button = m_popupMenu->addButton(tr("Exit, Save Thumbnails"), this, SLOT(menuSavePressed()));
-    button->setFocus();
+    menuPopup->SetReturnEvent(this, "action");
 
-    m_popupMenu->addButton(tr("Exit, Don't Save Thumbnails"), this, SLOT(menuCancelPressed()));
-    m_popupMenu->addButton(tr("Cancel"), this, SLOT(closePopupMenu()));
-
-    m_popupMenu->ShowPopup(this, SLOT(closePopupMenu()));
-}
-
-void ThumbFinder::closePopupMenu(void)
-{
-    if (m_popupMenu)
-    {
-        m_popupMenu->deleteLater();
-        m_popupMenu = NULL;
-    }
-}
-
-void ThumbFinder::menuSavePressed()
-{
-    closePopupMenu();
-    savePressed();
-}
-
-void ThumbFinder::menuCancelPressed()
-{
-    closePopupMenu();
-    cancelPressed();
+    menuPopup->AddButton(tr("Exit, Save Thumbnails"), SLOT(savePressed()));
+    menuPopup->AddButton(tr("Exit, Don't Save Thumbnails"), SLOT(cancelPressed()));
+    menuPopup->AddButton(tr("Cancel"), NULL);
 }
 
 void ThumbFinder::updatePositionBar(int64_t frame)
@@ -906,7 +849,7 @@ void ThumbFinder::updatePositionBar(int64_t frame)
     if (!m_positionImage)
         return;
 
-    QSize size = m_positionImage->GetSize();
+    QSize size = m_positionImage->GetArea().size();
     QPixmap *pixmap = new QPixmap(size.width(), size.height());
 
     QPainter p(pixmap);
@@ -944,8 +887,9 @@ void ThumbFinder::updatePositionBar(int64_t frame)
     int pos = (int) (size.width() / ((m_archiveItem->duration * m_fps) / frame));
     p.fillRect(pos, 0, 3, size.height(), brush);
 
-    m_positionImage->SetImage(*pixmap);
-    m_positionImage->refresh();
+    MythImage *image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    image->Assign(*pixmap);
+    m_positionImage->SetImage(image);
 
     p.end();
     delete pixmap;

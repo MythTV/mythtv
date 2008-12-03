@@ -1,16 +1,12 @@
 #ifndef THUMBFINDER_H_
 #define THUMBFINDER_H_
 
-#include <iostream>
-
 // qt
-#include <QThread>
 #include <QString>
 #include <QStringList>
 
 // mythtv
-#include <mythtv/mythdialogs.h>
-#include <mythtv/uitypes.h>
+#include <libmythui/mythscreentype.h>
 extern "C" {
 #include <mythtv/libavcodec/avcodec.h>
 #include <mythtv/libavformat/avformat.h>
@@ -18,8 +14,6 @@ extern "C" {
 
 // mytharchive
 #include "archiveutil.h"
-
-using namespace std;
 
 typedef struct SeekAmount
 {
@@ -30,38 +24,39 @@ typedef struct SeekAmount
 extern struct SeekAmount SeekAmounts[];
 extern int SeekAmountsCount;
 
-class ThumbFinder : public MythThemedDialog
+class MythUIButton;
+class MythUItext;
+class MythUIImage;
+class MythUIButtonList;
+class MythUIButtonListItem;
+
+class ThumbFinder : public MythScreenType
 {
 
   Q_OBJECT
 
   public:
 
-      ThumbFinder(ArchiveItem *archiveItem, const QString &menuTheme,
-                  MythMainWindow *parent, const QString &window_name,
-                  const QString &theme_filename,
-                  const char *name = "ThumbFinder");
+      ThumbFinder(MythScreenStack *parent, ArchiveItem *archiveItem,
+                  const QString &menuTheme);
     ~ThumbFinder();
+
+    bool Create(void);
+    bool keyPressEvent(QKeyEvent *);
 
 
   private slots:
-    void keyPressEvent(QKeyEvent *e);
-    void wireUpTheme(void);
-    bool getThumbImages(void);
+    void gridItemChanged(MythUIButtonListItem *item);
+    void showMenu(void);
     void cancelPressed(void);
     void savePressed(void);
-    void gridItemChanged(ImageGridItem *item);
-    void showMenu(void);
-    void closePopupMenu(void);
-    void menuSavePressed(void);
-    void menuCancelPressed(void);
+    void updateThumb(void);
 
   private:
+    void Init(void);
+    bool getThumbImages(void);
     int  getChapterCount(const QString &menuTheme);
-    QPixmap *createScaledPixmap(QString filename, int width, int height,
-                                  Qt::AspectRatioMode mode);
     void changeSeekAmount(bool up);
-    void updateThumb(void);
     void updateCurrentPos(void);
     bool seekToFrame(int frame, bool checkPos = true);
     QString createThumbDir(void);
@@ -106,17 +101,14 @@ class ThumbFinder : public MythThemedDialog
     QString             m_thumbDir;
 
     // GUI stuff
-    UITextButtonType     *m_frameButton;
-    UITextButtonType     *m_saveButton;
-    UITextButtonType     *m_cancelButton;
-    UIImageType          *m_frameImage;
-    UIImageType          *m_positionImage;
-    UIImageGridType      *m_imageGrid;
-    UITextType           *m_seekAmountText;
-    UITextType           *m_currentPosText;
-
-    // popup menu
-    MythPopupBox         *m_popupMenu;
+    MythUIButton       *m_frameButton;
+    MythUIButton       *m_saveButton;
+    MythUIButton       *m_cancelButton;
+    MythUIImage        *m_frameImage;
+    MythUIImage        *m_positionImage;
+    MythUIButtonList   *m_imageGrid;
+    MythUIText         *m_seekAmountText;
+    MythUIText         *m_currentPosText;
 };
 
 #endif

@@ -159,7 +159,7 @@ bool MythBurn::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "INFO")
         {
-            // FIXME show thumb selector
+            editThumbnails();
         }
         else if (action == "TOGGLECUT")
         {
@@ -735,7 +735,7 @@ void MythBurn::showMenu()
     menuPopup->AddButton(tr("Remove Item"), SLOT(removeItem()));
     menuPopup->AddButton(tr("Edit Details"), SLOT(editDetails()));
     menuPopup->AddButton(tr("Change Encoding Profile"), SLOT(changeProfile()));
-    //menuPopup->AddButton(tr("Edit Thumbnails"), SLOT(editThumbnails()));
+    menuPopup->AddButton(tr("Edit Thumbnails"), SLOT(editThumbnails()));
     menuPopup->AddButton(tr("Cancel"), NULL);
 }
 
@@ -769,6 +769,22 @@ void MythBurn::editDetails()
 
     if (editor->Create())
         mainStack->AddScreen(editor);
+}
+
+void MythBurn::editThumbnails()
+{
+    MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
+    ArchiveItem *curItem = (ArchiveItem *) item->getData();
+
+    if (!curItem)
+        return;
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    ThumbFinder *finder = new ThumbFinder(mainStack, curItem, m_theme);
+
+    if (finder->Create())
+        mainStack->AddScreen(finder);
 }
 
 void MythBurn::editorClosed(bool ok, ArchiveItem *item)

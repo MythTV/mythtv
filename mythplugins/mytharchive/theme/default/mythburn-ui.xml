@@ -431,163 +431,139 @@ MythArchive GUI theme
 
   <window name="thumbfinder">
 
-      <font name="title" face="Arial">
-          <color>#ffff00</color>
-          <dropcolor>#000000</dropcolor>
-          <size>24</size>
-          <shadow>3,3</shadow>
-          <bold>yes</bold>
-      </font>
+        <font name="title" from="baselarge">
+            <color>#ffff00</color>
+            <dropcolor>#000000</dropcolor>
+            <size>24</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
 
-      <font name="display" face="Arial">
-          <color>#ffffff</color>
-          <dropcolor>#000000</dropcolor>
-          <size>18</size>
-          <shadow>3,3</shadow>
-          <bold>yes</bold>
-      </font>
+        <textarea name="title" from="basetextarea">
+            <area>0,10,800,45</area>
+            <font>title</font>
+            <align>allcenter</align>
+            <value>Thumb Image Selector</value>
+        </textarea>
 
-      <font name="subtitle_active" face="Arial">
-          <color>#ffffff</color>
-          <size>14</size>
-          <bold>no</bold>
-      </font>
+        <imagetype name="topbgimage">
+            <area>420,65,365,80</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
 
-      <font name="subtitle_inactive" face="Arial">
-          <color>#9999cc</color>
-          <size>14</size>
-          <bold>no</bold>
-      </font>
+        <button name="frame_button">
+            <position>22,65</position>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>ma_frame_button_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>ma_frame_button_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>ma_frame_button_on.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
 
-      <font name="subtitle_selected" face="Arial">
-          <color>#ff0000</color>
-          <size>14</size>
-          <bold>no</bold>
-      </font>
+        <imagetype name="frameimage">
+            <area>27,70,360,229</area>
+            <filename>ma_black.png</filename>
+        </imagetype>
 
-      <font name="label" face="Arial">
-          <color>#ffff00</color>
-          <dropcolor>#000000</dropcolor>
-          <size>14</size>
-          <shadow>3,3</shadow>
-          <bold>yes</bold>
-      </font>
+        <textarea name="label1" from="basetextarea">
+            <area>420,75,365,20</area>
+            <font>basesmallyellow</font>
+            <align>center</align>
+            <value>Current Position</value>
+        </textarea>
 
-      <container name="title">
+        <textarea name="currentpos" from="basetextarea">
+            <area>420,95,365,40</area>
+            <align>center</align>
+            <value>0:00:00.00</value>
+        </textarea>
 
-          <area>0,5,800,45</area>
-          <textarea name="title" draworder="0" align="center">
-              <area>0,0,800,45</area>
-              <font>title</font>
-              <multiline>no</multiline>
-              <value>Thumb Image Selector</value>
-          </textarea>
+        <imagetype name="bottombgimage">
+            <area>420,175,365,80</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
 
-      </container>
+        <textarea name="label2" from="basetextarea">
+            <area>420,185,365,20</area>
+            <align>center</align>
+            <font>basesmallyellow</font>
+            <value>Seek Amount</value>
+        </textarea>
 
-      <container name="video">
+        <textarea name="seekamount" from="basetextarea">
+            <area>420,210,365,40</area>
+            <align>center</align>
+            <value>Frame</value>
+        </textarea>
 
-          <area>20,60,760,250</area>
-          <textbutton name="frame_button" draworder="1">
-              <position>2,0</position>
-              <font>display</font>
-              <image function="on" filename="ma_frame_button_on.png"></image>
-              <image function="off" filename="ma_frame_button_off.png"></image>
-              <image function="pushed" filename="ma_frame_button_on.png"></image>
-          </textbutton>
+        <imagetype name="positionimage">
+            <area>425,142,350,25</area>
+            <filename>trans-cr-background.png</filename>
+        </imagetype>
 
-            <image name="frameimage" draworder="2">
-                <position>7,5</position>
-                <staticsize>360,229</staticsize>
-                <filename>ma_black.png</filename>
-            </image>
+        <button name="cancel_button" from="basebutton">
+            <position>425,260</position>
+        </button>
 
-            <image name="image" draworder="0">
-                <position>400,0</position>
-                <filename>trans-cr-background.png</filename>
-                <staticsize>365,80</staticsize>
-            </image>
+        <button name="save_button" from="basebutton">
+            <position>625,260</position>
+        </button>
 
-            <textarea name="label" draworder="3" align="center">
-                <area>400,10,365,20</area>
-                <font>label</font>
-                <value>Current Position</value>
-            </textarea>
+        <buttonlist name="thumblist">
+            <area>25,320,760,280</area>
+            <layout>grid</layout>
+            <spacing>5</spacing>
+            <buttonarea>0,0,760,270</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,144,125</area>
+                    <imagetype name="buttonbackground">
+                        <area>0,0,144,125</area>
+                        <gradient start="#505050" end="#000000" alpha="200" />
+                    </imagetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>5,100,134,30</area>
+                        <font>basesmall</font>
+                        <align>hcenter,top</align>
+                    </textarea>
+                    <imagetype name="buttonimage">
+                        <area>5,5,134,90</area>
+                        <preserveaspect>false</preserveaspect>
+                        <filename>mv_browse_nocover.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="buttonbackground">
+                        <gradient start="#52CA38" end="#349838" alpha="255" />
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <font>basesmall</font>
+                    </textarea>
+                </state>
+                <state name="inactive" from="active">
+                    <imagetype name="buttonbackground">
+                        <gradient start="#52CA38" end="#349838" alpha="100" />
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <font>basesmallpurple</font>
+                    </textarea>
+                </state>
+            </statetype>
+        </buttonlist>
 
-            <textarea name="currentpos" draworder="3" align="center">
-                <area>400,30,365,40</area>
-                <font>display</font>
-                <value>0:00:00.00</value>
-            </textarea>
+    </window>
 
-            <image name="image" draworder="0">
-                <position>400,120</position>
-                <filename>trans-cr-background.png</filename>
-                <staticsize>365,80</staticsize>
-            </image>
-
-            <textarea name="label" draworder="3" align="center">
-                <area>400,130,365,20</area>
-                <font>label</font>
-                <value>Seek Amount</value>
-            </textarea>
-
-            <textarea name="seekamount" draworder="3" align="center">
-                <area>400,150,365,40</area>
-                <font>display</font>
-                <value>Frame</value>
-            </textarea>
-
-            <image name="positionimage" draworder="3">
-                <position>400,90</position>
-                <filename>trans-cr-background.png</filename>
-                <staticsize>365,20</staticsize>
-            </image>
-
-            <!--
-                Push buttons
-                -->
-            <textbutton name="cancel_button" draworder="1">
-                <position>405,200</position>
-                <font>display</font>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
-            </textbutton>
-            <textbutton name="save_button" draworder="1">
-                <position>605,200</position>
-                <font>display</font>
-                <image function="on" filename="text_button_on.png"></image>
-                <image function="off" filename="text_button_off.png"></image>
-                <image function="pushed" filename="text_button_pushed.png"></image>
-            </textbutton>
-
-      </container>
-
-      <container name="list_area">
-            <area>20,330,760,250</area>
-
-            <imagegrid name="imagegrid" draworder="0">
-                <area>0,0,760,250</area>
-                <textposition>bottom</textposition>
-                <textheight>30</textheight>
-                <columncount>5</columncount>
-                <rowcount>2</rowcount>
-                <cutdown>yes</cutdown>
-                <showchecks>no</showchecks>
-                <showselected>no</showselected>
-                <showscrollarrows>no</showscrollarrows>
-                <align>allcenter</align>
-                <padding>10</padding>
-                <multiline>no</multiline>
-                <activefont>subtitle_active</activefont>
-                <inactivefont>subtitle_inactive</inactivefont>
-                <selectedfont>subtitle_selected</selectedfont>
-                <image function="normal" filename="ma_browser_back_reg.png"></image>
-                <image function="highlighted" filename="ma_browser_back_sel.png"></image>
-                <image function="selected" filename="ma_browser_back_sel.png"></image>
-                <image function="default" filename="ma_nothumb.png"></image>
-            </imagegrid>
-      </container>
-   </window>
 </mythuitheme>

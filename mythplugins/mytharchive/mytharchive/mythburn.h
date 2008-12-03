@@ -73,6 +73,7 @@ class MythBurn : public MythScreenType
     void toggleUseCutlist(void);
     void showMenu(void);
     void editDetails(void);
+    void editThumbnails(void);
     void changeProfile(void);
     void profileChanged(int profileNo);
     void removeItem(void);
