@@ -4456,7 +4456,8 @@ NULL
     if (dbver == "1225")
     {
         const char *updates[] = {
-"ALTER TABLE people         CHANGE name   name   VARCHAR(128);",
+"ALTER TABLE people         CHANGE name   name   VARCHAR(128) "
+"  CHARACTER SET utf8 COLLATE utf8_bin NOT NULL default '';",
 "ALTER TABLE programgenres  CHANGE genre  genre  VARCHAR(30);", 
 "ALTER TABLE programrating  CHANGE rating rating VARCHAR(16);",
 "ALTER TABLE programrating  CHANGE system system VARCHAR(8);",
@@ -4904,7 +4905,7 @@ tmp.constData(),
 ");",
 "CREATE TABLE people ("
 "  person mediumint(8) unsigned NOT NULL,"
-"  `name` varchar(128) default NULL,"
+"  `name` varchar(128) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL default '',"
 "  PRIMARY KEY  (person),"
 "  UNIQUE KEY `name` (`name`(41))"
 ");",
