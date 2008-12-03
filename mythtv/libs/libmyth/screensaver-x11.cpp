@@ -1,5 +1,6 @@
 #define QT_CLEAN_NAMESPACE // no qt 1.x compatability, INT32 conflicts with X
 #include "screensaver-x11.h"
+#include <qdatetime.h>
 #include <qtimer.h>
 
 #include <X11/Xlib.h>
@@ -135,10 +136,19 @@ class ScreenSaverX11Private
 
     void ResetScreenSaver()
     {
-        if (m_xscreensaverRunning)
-            myth_system("xscreensaver-command -deactivate >&- 2>&- &");
-        else
-            myth_system("gnome-screensaver-command --poke >&- 2>&- &");
+        if (IsScreenSaverRunning())
+        {
+            QDateTime current_time = QDateTime::currentDateTime ();
+            if ((!m_last_deactivated.isValid()) ||
+                (m_last_deactivated.secsTo(current_time) > 30))
+            {
+                if (m_xscreensaverRunning)
+                    myth_system("xscreensaver-command -deactivate >&- 2>&- &");
+                else if (m_gscreensaverRunning)
+                    myth_system("gnome-screensaver-command --poke >&- 2>&- &");
+                m_last_deactivated = current_time;
+            }
+        }
     }
 
   private:
@@ -161,6 +171,8 @@ class ScreenSaverX11Private
 
     int m_timeoutInterval;
     QTimer *m_resetTimer;
+
+    QDateTime m_last_deactivated;
 
     ScreenSaverState m_state;
 };
