@@ -18,6 +18,8 @@ using namespace std;
 #include <QMutex> 
 #include <QWaitCondition>
 #include <QThread>
+#include <QTimer>
+#include <QObject>
 
 class ThreadPool;
 
@@ -58,10 +60,11 @@ class CEvent
 
 class WorkerThread : public QThread
 {
+    Q_OBJECT
+
     protected:
 
         QMutex              m_mutex;
-        CEvent              m_WorkAvailable;
 
         CEvent              m_Initialized;
         bool                m_bInitialized;
@@ -73,6 +76,7 @@ class WorkerThread : public QThread
 
         long                m_nIdleTimeoutMS;
         bool                m_bAllowTimeout;
+        QTimer             *m_timer;
 
 
     protected:
@@ -87,8 +91,11 @@ class WorkerThread : public QThread
         virtual ~WorkerThread();
 
         bool     WaitForInitialized( unsigned long msecs );
-        void     SignalWork        ();
         void     SetTimeout        ( long nIdleTimeout );
+
+    public slots:
+        void     SignalWork();
+        void     TimeOut();
 
 };
 

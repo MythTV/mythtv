@@ -13,7 +13,6 @@ using namespace std;
 
 #include "threadpool.h"
 #include "upnp.h"       // only needed for Config... remove once config is moved.
-#include "mythtimer.h"
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -123,7 +122,8 @@ WorkerThread::WorkerThread( ThreadPool *pThreadPool, const QString &sName )
     m_sName          = sName;
     m_nIdleTimeoutMS = 60000;
     m_bAllowTimeout  = false;
-
+    m_timer = new QTimer(this);
+    m_timer->setSingleShot(true);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -133,10 +133,12 @@ WorkerThread::WorkerThread( ThreadPool *pThreadPool, const QString &sName )
 WorkerThread::~WorkerThread()
 {
     m_bTermRequested = true;
+    m_timer->stop();
 
-    m_WorkAvailable.SetEvent();
-
+    quit();
     wait();
+
+    delete m_timer;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -161,7 +163,22 @@ bool WorkerThread::WaitForInitialized( unsigned long msecs )
 
 void WorkerThread::SignalWork()
 {
-    m_WorkAvailable.SetEvent();
+    try
+    {
+        ProcessWork();
+
+        if (m_bAllowTimeout)
+            m_timer->start(m_nIdleTimeoutMS);
+    }
+    catch(...)
+    {
+        VERBOSE( VB_IMPORTANT, QString( "WorkerThread::Run( %1 ) - Unexpected Exception." )
+                 .arg( m_sName ));
+    }
+    if (!m_bTermRequested)
+    {
+        m_pThreadPool->ThreadAvailable( this );
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -170,15 +187,27 @@ void WorkerThread::SignalWork()
 
 void WorkerThread::SetTimeout( long nIdleTimeout )
 {
-    // -=>NOTE: Not Thread safe... should only be called
-    //          before thread is started.
-
     m_nIdleTimeoutMS = nIdleTimeout;
 
     if (m_nIdleTimeoutMS == -1 )
+    {
         m_bAllowTimeout = false;
+    }
     else
+    {
         m_bAllowTimeout = true;
+        m_timer->start(m_nIdleTimeoutMS);
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+void WorkerThread::TimeOut()
+{
+    if (m_bAllowTimeout)
+        quit();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -193,37 +222,11 @@ void WorkerThread::run( void )
 
     m_Initialized.SetEvent();
 
-    MythTimer timer;
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(TimeOut()));
+    if (m_bAllowTimeout)
+        m_timer->start(m_nIdleTimeoutMS);
 
-    timer.start();
-
-    while ( !m_bTermRequested )
-    {
-        if (m_bAllowTimeout && (timer.elapsed() > m_nIdleTimeoutMS) )
-            break;
-        
-        if (m_WorkAvailable.WaitForEvent(500))
-        {
-            m_WorkAvailable.ResetEvent();
-
-            if ( !m_bTermRequested )
-            {
-                try
-                {
-                    ProcessWork();
-
-                    timer.restart();
-                }
-                catch(...)
-                {
-                    VERBOSE( VB_IMPORTANT, QString( "WorkerThread::Run( %1 ) - Unexpected Exception." )
-                                            .arg( m_sName ));
-                }
-
-                m_pThreadPool->ThreadAvailable( this );
-            }
-        }
-    }
+    exec();
 
     if (m_pThreadPool != NULL )
     {
