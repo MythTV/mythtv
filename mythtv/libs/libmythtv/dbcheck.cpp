@@ -543,7 +543,7 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
         if (!InitializeDatabase())
             return false;
-        dbver = "1112";
+        dbver = gContext->GetSetting("DBSchemaVer");
     }
 
     if (dbver.isEmpty() || dbver.toInt() <  1027)
@@ -4472,6 +4472,23 @@ NULL
     return true;
 }
 
+/**
+ * command to get the the initial database layout from an empty database:
+ *
+ * mysqldump --skip-comments --skip-opt --compact --skip-quote-names \
+ *     --ignore-table=schemalock mythconverg | \
+ *   sed '/^SET.*;$/d;s/^.*[^;]$/"&"/;s/^);$/");",/'
+ *
+ * don't forget to om
+ *
+ * command to get the initial data:
+ *
+ * mysqldump --skip-comments --skip-opt --compact --skip-quote-names -t \
+ *     mythconverg | sed 's/^.*$/"&",/'
+ *
+ * don't forget to delete host specific data
+ *
+ */
 bool InitializeDatabase(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -4492,21 +4509,21 @@ bool InitializeDatabase(void)
 
     VERBOSE(VB_IMPORTANT, "Inserting MythTV initial database information.");
 
-    QString qtmp = QString("ALTER DATABASE %1 DEFAULT CHARACTER SET latin1;")
+    QString qtmp = QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8;")
         .arg(gContext->GetDatabaseParams().dbName);
     QByteArray tmp = qtmp.toAscii();
 
     const char *updates[] = {
 tmp.constData(),
-"CREATE TABLE IF NOT EXISTS callsignnetworkmap ("
-"  id int(11) NOT NULL auto_increment,"
+"CREATE TABLE callsignnetworkmap ("
+"  id int(11) NOT NULL,"
 "  callsign varchar(20) NOT NULL default '',"
 "  network varchar(20) NOT NULL default '',"
 "  PRIMARY KEY  (id),"
 "  UNIQUE KEY callsign (callsign)"
 ");",
-"CREATE TABLE IF NOT EXISTS capturecard ("
-"  cardid int(10) unsigned NOT NULL auto_increment,"
+"CREATE TABLE capturecard ("
+"  cardid int(10) unsigned NOT NULL,"
 "  videodevice varchar(128) default NULL,"
 "  audiodevice varchar(128) default NULL,"
 "  vbidevice varchar(128) default NULL,"
@@ -4515,52 +4532,52 @@ tmp.constData(),
 "  audioratelimit int(11) default NULL,"
 "  hostname varchar(64) default NULL,"
 "  dvb_swfilter int(11) default '0',"
-"  dvb_recordts int(11) default '1',"
 "  dvb_sat_type int(11) NOT NULL default '0',"
 "  dvb_wait_for_seqstart int(11) NOT NULL default '1',"
-"  dvb_dmx_buf_size int(11) NOT NULL default '8192',"
-"  dvb_pkt_buf_size int(11) NOT NULL default '8192',"
 "  skipbtaudio tinyint(1) default '0',"
 "  dvb_on_demand tinyint(4) NOT NULL default '0',"
 "  dvb_diseqc_type smallint(6) default NULL,"
-"  firewire_port int(10) unsigned NOT NULL default '0',"
-"  firewire_node int(10) unsigned NOT NULL default '2',"
 "  firewire_speed int(10) unsigned NOT NULL default '0',"
 "  firewire_model varchar(32) default NULL,"
 "  firewire_connection int(10) unsigned NOT NULL default '0',"
-"  dvb_hw_decoder int(11) default '0',"
 "  dbox2_port int(10) unsigned NOT NULL default '31338',"
 "  dbox2_httpport int(10) unsigned NOT NULL default '80',"
 "  dbox2_host varchar(32) default NULL,"
 "  signal_timeout int(11) NOT NULL default '1000',"
 "  channel_timeout int(11) NOT NULL default '3000',"
+"  dvb_tuning_delay int(10) unsigned NOT NULL default '0',"
+"  contrast int(11) NOT NULL default '0',"
+"  brightness int(11) NOT NULL default '0',"
+"  colour int(11) NOT NULL default '0',"
+"  hue int(11) NOT NULL default '0',"
+"  diseqcid int(10) unsigned default NULL,"
+"  dvb_eitscan tinyint(1) NOT NULL default '1',"
 "  PRIMARY KEY  (cardid)"
 ");",
-"CREATE TABLE IF NOT EXISTS cardinput ("
-"  cardinputid int(10) unsigned NOT NULL auto_increment,"
+"CREATE TABLE cardinput ("
+"  cardinputid int(10) unsigned NOT NULL,"
 "  cardid int(10) unsigned NOT NULL default '0',"
 "  sourceid int(10) unsigned NOT NULL default '0',"
 "  inputname varchar(32) NOT NULL default '',"
 "  externalcommand varchar(128) default NULL,"
-"  preference int(11) NOT NULL default '0',"
 "  shareable char(1) default 'N',"
-"  tunechan varchar(5) NOT NULL default '',"
-"  startchan varchar(5) NOT NULL default '',"
+"  tunechan varchar(10) default NULL,"
+"  startchan varchar(10) default NULL,"
 "  freetoaironly tinyint(1) default '1',"
-"  diseqc_port smallint(6) default NULL,"
-"  diseqc_pos float default NULL,"
-"  lnb_lof_switch int(11) default '11700000',"
-"  lnb_lof_hi int(11) default '10600000',"
-"  lnb_lof_lo int(11) default '9750000',"
+"  displayname varchar(64) NOT NULL default '',"
+"  radioservices tinyint(1) default '1',"
+"  dishnet_eit tinyint(1) NOT NULL default '0',"
+"  recpriority int(11) NOT NULL default '0',"
+"  quicktune tinyint(4) NOT NULL default '0',"
 "  PRIMARY KEY  (cardinputid)"
 ");",
-"CREATE TABLE IF NOT EXISTS channel ("
+"CREATE TABLE channel ("
 "  chanid int(10) unsigned NOT NULL default '0',"
-"  channum varchar(5) NOT NULL default '',"
+"  channum varchar(10) NOT NULL default '',"
 "  freqid varchar(10) default NULL,"
 "  sourceid int(10) unsigned default NULL,"
 "  callsign varchar(20) NOT NULL default '',"
-"  name varchar(64) NOT NULL default '',"
+"  `name` varchar(64) NOT NULL default '',"
 "  icon varchar(255) NOT NULL default 'none',"
 "  finetune int(11) default NULL,"
 "  videofilters varchar(255) NOT NULL default '',"
@@ -4571,34 +4588,153 @@ tmp.constData(),
 "  colour int(11) default '32768',"
 "  hue int(11) default '32768',"
 "  tvformat varchar(10) NOT NULL default 'Default',"
-"  commfree tinyint(4) NOT NULL default '0',"
 "  visible tinyint(1) NOT NULL default '1',"
 "  outputfilters varchar(255) NOT NULL default '',"
 "  useonairguide tinyint(1) default '0',"
 "  mplexid smallint(6) default NULL,"
 "  serviceid mediumint(8) unsigned default NULL,"
-"  atscsrcid int(11) default NULL,"
+"  tmoffset int(11) NOT NULL default '0',"
+"  atsc_major_chan int(10) unsigned NOT NULL default '0',"
+"  atsc_minor_chan int(10) unsigned NOT NULL default '0',"
+"  last_record datetime NOT NULL,"
+"  default_authority varchar(32) NOT NULL default '',"
+"  commmethod int(11) NOT NULL default '-1',"
 "  PRIMARY KEY  (chanid),"
-"  KEY channel_src (channum,sourceid)"
+"  KEY channel_src (channum,sourceid),"
+"  KEY sourceid (sourceid,xmltvid,chanid),"
+"  KEY visible (visible)"
 ");",
-"CREATE TABLE IF NOT EXISTS codecparams ("
-"  profile int(10) unsigned NOT NULL default '0',"
-"  name varchar(128) NOT NULL default '',"
-"  value varchar(128) default NULL,"
-"  PRIMARY KEY  (profile,name)"
+"CREATE TABLE channelscan ("
+"  scanid int(3) unsigned NOT NULL,"
+"  cardid int(3) unsigned NOT NULL,"
+"  sourceid int(3) unsigned NOT NULL,"
+"  processed tinyint(1) unsigned NOT NULL,"
+"  scandate datetime NOT NULL,"
+"  PRIMARY KEY  (scanid)"
 ");",
-"CREATE TABLE IF NOT EXISTS credits ("
+"CREATE TABLE channelscan_channel ("
+"  transportid int(6) unsigned NOT NULL,"
+"  scanid int(3) unsigned NOT NULL,"
+"  mplex_id smallint(6) NOT NULL,"
+"  source_id int(3) unsigned NOT NULL,"
+"  channel_id int(3) unsigned NOT NULL default '0',"
+"  callsign varchar(20) NOT NULL default '',"
+"  service_name varchar(64) NOT NULL default '',"
+"  chan_num varchar(10) NOT NULL default '',"
+"  service_id mediumint(8) unsigned NOT NULL default '0',"
+"  atsc_major_channel int(4) unsigned NOT NULL default '0',"
+"  atsc_minor_channel int(4) unsigned NOT NULL default '0',"
+"  use_on_air_guide tinyint(1) NOT NULL default '0',"
+"  hidden tinyint(1) NOT NULL default '0',"
+"  hidden_in_guide tinyint(1) NOT NULL default '0',"
+"  freqid varchar(10) NOT NULL default '',"
+"  icon varchar(255) NOT NULL default '',"
+"  tvformat varchar(10) NOT NULL default 'Default',"
+"  xmltvid varchar(64) NOT NULL default '',"
+"  pat_tsid int(5) unsigned NOT NULL default '0',"
+"  vct_tsid int(5) unsigned NOT NULL default '0',"
+"  vct_chan_tsid int(5) unsigned NOT NULL default '0',"
+"  sdt_tsid int(5) unsigned NOT NULL default '0',"
+"  orig_netid int(5) unsigned NOT NULL default '0',"
+"  netid int(5) unsigned NOT NULL default '0',"
+"  si_standard varchar(10) NOT NULL,"
+"  in_channels_conf tinyint(1) unsigned NOT NULL default '0',"
+"  in_pat tinyint(1) unsigned NOT NULL default '0',"
+"  in_pmt tinyint(1) unsigned NOT NULL default '0',"
+"  in_vct tinyint(1) unsigned NOT NULL default '0',"
+"  in_nit tinyint(1) unsigned NOT NULL default '0',"
+"  in_sdt tinyint(1) unsigned NOT NULL default '0',"
+"  is_encrypted tinyint(1) unsigned NOT NULL default '0',"
+"  is_data_service tinyint(1) unsigned NOT NULL default '0',"
+"  is_audio_service tinyint(1) unsigned NOT NULL default '0',"
+"  is_opencable tinyint(1) unsigned NOT NULL default '0',"
+"  could_be_opencable tinyint(1) unsigned NOT NULL default '0',"
+"  decryption_status smallint(2) unsigned NOT NULL default '0'"
+");",
+"CREATE TABLE channelscan_dtv_multiplex ("
+"  transportid int(6) unsigned NOT NULL,"
+"  scanid int(3) unsigned NOT NULL,"
+"  mplexid smallint(6) unsigned NOT NULL,"
+"  frequency bigint(12) unsigned NOT NULL,"
+"  inversion char(1) NOT NULL default 'a',"
+"  symbolrate bigint(12) unsigned NOT NULL default '0',"
+"  fec varchar(4) NOT NULL default 'auto',"
+"  polarity char(1) NOT NULL default '',"
+"  hp_code_rate varchar(4) NOT NULL default 'auto',"
+"  lp_code_rate varchar(4) NOT NULL default 'auto',"
+"  modulation varchar(4) NOT NULL default 'auto',"
+"  transmission_mode char(1) NOT NULL default 'a',"
+"  guard_interval varchar(4) NOT NULL default 'auto',"
+"  hierarchy varchar(4) NOT NULL default 'auto',"
+"  bandwidth char(1) NOT NULL default 'a',"
+"  sistandard varchar(10) NOT NULL,"
+"  tuner_type smallint(2) unsigned NOT NULL,"
+"  PRIMARY KEY  (transportid)"
+");",
+"CREATE TABLE codecparams ("
+"  `profile` int(10) unsigned NOT NULL default '0',"
+"  `name` varchar(128) NOT NULL default '',"
+"  `value` varchar(128) default NULL,"
+"  PRIMARY KEY  (`profile`,`name`)"
+");",
+"CREATE TABLE credits ("
 "  person mediumint(8) unsigned NOT NULL default '0',"
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
-"  role set('actor','director','producer','executive_producer','writer',"
-"             'guest_star','host','adapter','presenter','commentator','guest')"
-"         NOT NULL default '',"
+"  role set('actor','director','producer','executive_producer','writer','guest_star','host','adapter','presenter','commentator','guest') NOT NULL default '',"
 "  UNIQUE KEY chanid (chanid,starttime,person,role),"
 "  KEY person (person,role)"
 ");",
-"CREATE TABLE IF NOT EXISTS dtv_multiplex ("
-"  mplexid smallint(6) NOT NULL auto_increment,"
+"CREATE TABLE customexample ("
+"  rulename varchar(64) NOT NULL,"
+"  fromclause text NOT NULL,"
+"  whereclause text NOT NULL,"
+"  search tinyint(4) NOT NULL default '0',"
+"  PRIMARY KEY  (rulename)"
+");",
+"CREATE TABLE diseqc_config ("
+"  cardinputid int(10) unsigned NOT NULL,"
+"  diseqcid int(10) unsigned NOT NULL,"
+"  `value` varchar(16) NOT NULL default '',"
+"  KEY id (cardinputid)"
+");",
+"CREATE TABLE diseqc_tree ("
+"  diseqcid int(10) unsigned NOT NULL,"
+"  parentid int(10) unsigned default NULL,"
+"  ordinal tinyint(3) unsigned NOT NULL,"
+"  `type` varchar(16) NOT NULL default '',"
+"  subtype varchar(16) NOT NULL default '',"
+"  description varchar(32) NOT NULL default '',"
+"  switch_ports tinyint(3) unsigned NOT NULL default '0',"
+"  rotor_hi_speed float NOT NULL default '0',"
+"  rotor_lo_speed float NOT NULL default '0',"
+"  rotor_positions varchar(255) NOT NULL default '',"
+"  lnb_lof_switch int(10) NOT NULL default '0',"
+"  lnb_lof_hi int(10) NOT NULL default '0',"
+"  lnb_lof_lo int(10) NOT NULL default '0',"
+"  cmd_repeat int(11) NOT NULL default '1',"
+"  lnb_pol_inv tinyint(4) NOT NULL default '0',"
+"  PRIMARY KEY  (diseqcid),"
+"  KEY parentid (parentid)"
+");",
+"CREATE TABLE displayprofilegroups ("
+"  `name` varchar(128) NOT NULL,"
+"  hostname varchar(64) NOT NULL,"
+"  profilegroupid int(10) unsigned NOT NULL,"
+"  PRIMARY KEY  (`name`,hostname),"
+"  UNIQUE KEY profilegroupid (profilegroupid)"
+");",
+"CREATE TABLE displayprofiles ("
+"  profilegroupid int(10) unsigned NOT NULL,"
+"  profileid int(10) unsigned NOT NULL,"
+"  `value` varchar(128) NOT NULL,"
+"  `data` varchar(255) NOT NULL default '',"
+"  KEY profilegroupid (profilegroupid),"
+"  KEY profileid (profileid,`value`),"
+"  KEY profileid_2 (profileid)"
+");",
+"CREATE TABLE dtv_multiplex ("
+"  mplexid smallint(6) NOT NULL,"
 "  sourceid smallint(6) default NULL,"
 "  transportid int(11) default NULL,"
 "  networkid int(11) default NULL,"
@@ -4618,72 +4754,100 @@ tmp.constData(),
 "  hp_code_rate varchar(10) default 'auto',"
 "  sistandard varchar(10) default 'dvb',"
 "  serviceversion smallint(6) default '33',"
-"  updatetimestamp timestamp(14) NOT NULL,"
+"  updatetimestamp timestamp NOT NULL default CURRENT_TIMESTAMP,"
 "  PRIMARY KEY  (mplexid)"
 ");",
-"CREATE TABLE IF NOT EXISTS dtv_privatetypes ("
+"CREATE TABLE dtv_privatetypes ("
 "  sitype varchar(4) NOT NULL default '',"
 "  networkid int(11) NOT NULL default '0',"
 "  private_type varchar(20) NOT NULL default '',"
 "  private_value varchar(100) NOT NULL default ''"
 ");",
-"CREATE TABLE IF NOT EXISTS favorites ("
-"  favid int(11) unsigned NOT NULL auto_increment,"
+"CREATE TABLE dvdbookmark ("
+"  serialid varchar(16) NOT NULL default '',"
+"  `name` varchar(32) default NULL,"
+"  title smallint(6) NOT NULL default '0',"
+"  audionum tinyint(4) NOT NULL default '-1',"
+"  subtitlenum tinyint(4) NOT NULL default '-1',"
+"  framenum bigint(20) NOT NULL default '0',"
+"  `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP,"
+"  PRIMARY KEY  (serialid)"
+");",
+"CREATE TABLE eit_cache ("
+"  chanid int(10) NOT NULL,"
+"  eventid int(10) unsigned NOT NULL default '0',"
+"  tableid tinyint(3) unsigned NOT NULL,"
+"  version tinyint(3) unsigned NOT NULL,"
+"  endtime int(10) unsigned NOT NULL,"
+"  `status` tinyint(4) NOT NULL default '0',"
+"  PRIMARY KEY  (chanid,eventid,`status`)"
+");",
+"CREATE TABLE favorites ("
+"  favid int(11) unsigned NOT NULL,"
 "  userid int(11) unsigned NOT NULL default '0',"
 "  chanid int(11) unsigned NOT NULL default '0',"
 "  PRIMARY KEY  (favid)"
 ");",
-"CREATE TABLE IF NOT EXISTS housekeeping ("
+"CREATE TABLE housekeeping ("
 "  tag varchar(64) NOT NULL default '',"
 "  lastrun datetime default NULL,"
 "  PRIMARY KEY  (tag)"
 ");",
-"CREATE TABLE IF NOT EXISTS inuseprograms ("
+"CREATE TABLE inputgroup ("
+"  cardinputid int(10) unsigned NOT NULL,"
+"  inputgroupid int(10) unsigned NOT NULL,"
+"  inputgroupname varchar(32) NOT NULL"
+");",
+"CREATE TABLE inuseprograms ("
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
 "  recusage varchar(128) NOT NULL default '',"
 "  lastupdatetime datetime NOT NULL default '0000-00-00 00:00:00',"
 "  hostname varchar(64) NOT NULL default '',"
-"  KEY chanid (chanid,starttime)"
+"  rechost varchar(64) NOT NULL,"
+"  recdir varchar(255) NOT NULL default '',"
+"  KEY chanid (chanid,starttime),"
+"  KEY recusage (recusage,lastupdatetime)"
 ");",
-"CREATE TABLE IF NOT EXISTS jobqueue ("
-"  id int(11) NOT NULL auto_increment,"
+"CREATE TABLE jobqueue ("
+"  id int(11) NOT NULL,"
 "  chanid int(10) NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
 "  inserttime datetime NOT NULL default '0000-00-00 00:00:00',"
-"  type int(11) NOT NULL default '0',"
+"  `type` int(11) NOT NULL default '0',"
 "  cmds int(11) NOT NULL default '0',"
 "  flags int(11) NOT NULL default '0',"
-"  status int(11) NOT NULL default '0',"
-"  statustime timestamp NOT NULL,"
+"  `status` int(11) NOT NULL default '0',"
+"  statustime timestamp NOT NULL default CURRENT_TIMESTAMP,"
 "  hostname varchar(64) NOT NULL default '',"
 "  args blob NOT NULL,"
-"  comment varchar(128) NOT NULL default '',"
+"  `comment` varchar(128) NOT NULL default '',"
+"  schedruntime datetime NOT NULL default '2007-01-01 00:00:00',"
 "  PRIMARY KEY  (id),"
-"  UNIQUE KEY chanid (chanid,starttime,type,inserttime)"
+"  UNIQUE KEY chanid (chanid,starttime,`type`,inserttime)"
 ");",
-"CREATE TABLE IF NOT EXISTS jumppoints ("
+"CREATE TABLE jumppoints ("
 "  destination varchar(128) NOT NULL default '',"
 "  description varchar(255) default NULL,"
-"  keylist varchar(32) default NULL,"
+"  keylist varchar(128) default NULL,"
 "  hostname varchar(64) NOT NULL default '',"
 "  PRIMARY KEY  (destination,hostname)"
 ");",
-"CREATE TABLE IF NOT EXISTS keybindings ("
-"  context varchar(32) NOT NULL default '',"
-"  action varchar(32) NOT NULL default '',"
+"CREATE TABLE keybindings ("
+"  `context` varchar(32) NOT NULL default '',"
+"  `action` varchar(32) NOT NULL default '',"
 "  description varchar(255) default NULL,"
-"  keylist varchar(32) default NULL,"
+"  keylist varchar(128) default NULL,"
 "  hostname varchar(64) NOT NULL default '',"
-"  PRIMARY KEY  (context,action,hostname)"
+"  PRIMARY KEY  (`context`,`action`,hostname)"
 ");",
-"CREATE TABLE IF NOT EXISTS keyword ("
-"  phrase varchar(128) NOT NULL default '',"
+"CREATE TABLE keyword ("
+"  phrase varchar(128) collate utf8_bin NOT NULL default '',"
 "  searchtype int(10) unsigned NOT NULL default '3',"
 "  UNIQUE KEY phrase (phrase,searchtype)"
 ");",
-"CREATE TABLE IF NOT EXISTS mythlog ("
-"  logid int(10) unsigned NOT NULL auto_increment,"
+"CREATE TABLE mythlog ("
+"  logid int(10) unsigned NOT NULL,"
 "  module varchar(32) NOT NULL default '',"
 "  priority int(11) NOT NULL default '0',"
 "  acknowledged tinyint(1) default '0',"
@@ -4691,26 +4855,27 @@ tmp.constData(),
 "  host varchar(128) default NULL,"
 "  message varchar(255) NOT NULL default '',"
 "  details text,"
-"  PRIMARY KEY  (logid)"
+"  PRIMARY KEY  (logid),"
+"  KEY module (module)"
 ");",
-"CREATE TABLE IF NOT EXISTS networkiconmap ("
-"  id int(11) NOT NULL auto_increment,"
+"CREATE TABLE networkiconmap ("
+"  id int(11) NOT NULL,"
 "  network varchar(20) NOT NULL default '',"
 "  url varchar(255) NOT NULL default '',"
 "  PRIMARY KEY  (id),"
 "  UNIQUE KEY network (network)"
 ");",
-"CREATE TABLE IF NOT EXISTS oldfind ("
+"CREATE TABLE oldfind ("
 "  recordid int(11) NOT NULL default '0',"
 "  findid int(11) NOT NULL default '0',"
 "  PRIMARY KEY  (recordid,findid)"
 ");",
-"CREATE TABLE IF NOT EXISTS oldprogram ("
-"  oldtitle varchar(128) NOT NULL default '',"
+"CREATE TABLE oldprogram ("
+"  oldtitle varchar(128) collate utf8_bin NOT NULL default '',"
 "  airdate datetime NOT NULL default '0000-00-00 00:00:00',"
 "  PRIMARY KEY  (oldtitle)"
 ");",
-"CREATE TABLE IF NOT EXISTS oldrecorded ("
+"CREATE TABLE oldrecorded ("
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
 "  endtime datetime NOT NULL default '0000-00-00 00:00:00',"
@@ -4718,13 +4883,13 @@ tmp.constData(),
 "  subtitle varchar(128) NOT NULL default '',"
 "  description text NOT NULL,"
 "  category varchar(64) NOT NULL default '',"
-"  seriesid varchar(12) NOT NULL default '',"
-"  programid varchar(20) NOT NULL default '',"
+"  seriesid varchar(40) NOT NULL default '',"
+"  programid varchar(40) NOT NULL default '',"
 "  findid int(11) NOT NULL default '0',"
 "  recordid int(11) NOT NULL default '0',"
 "  station varchar(20) NOT NULL default '',"
 "  rectype int(10) unsigned NOT NULL default '0',"
-"  duplicate tinyint(1) NOT NULL default '0',"
+"  `duplicate` tinyint(1) NOT NULL default '0',"
 "  recstatus int(11) NOT NULL default '0',"
 "  reactivate smallint(6) NOT NULL default '0',"
 "  generic tinyint(1) default '0',"
@@ -4733,38 +4898,48 @@ tmp.constData(),
 "  KEY title (title),"
 "  KEY seriesid (seriesid),"
 "  KEY programid (programid),"
-"  KEY recordid (recordid)"
+"  KEY recordid (recordid),"
+"  KEY recstatus (recstatus,programid,seriesid),"
+"  KEY recstatus_2 (recstatus,title,subtitle)"
 ");",
-"CREATE TABLE IF NOT EXISTS people ("
-"  person mediumint(8) unsigned NOT NULL auto_increment,"
-"  name char(128) NOT NULL default '',"
+"CREATE TABLE people ("
+"  person mediumint(8) unsigned NOT NULL,"
+"  `name` varchar(128) default NULL,"
 "  PRIMARY KEY  (person),"
-"  UNIQUE KEY name (name(41))"
+"  UNIQUE KEY `name` (`name`(41))"
 ");",
-"CREATE TABLE IF NOT EXISTS pidcache ("
+"CREATE TABLE pidcache ("
 "  chanid smallint(6) NOT NULL default '0',"
 "  pid int(11) NOT NULL default '-1',"
 "  tableid int(11) NOT NULL default '-1',"
 "  KEY chanid (chanid)"
 ");",
-"CREATE TABLE IF NOT EXISTS playgroup ("
-"  name varchar(32) NOT NULL default '',"
+"CREATE TABLE playgroup ("
+"  `name` varchar(32) NOT NULL default '',"
 "  titlematch varchar(255) NOT NULL default '',"
 "  skipahead int(11) NOT NULL default '0',"
 "  skipback int(11) NOT NULL default '0',"
 "  timestretch int(11) NOT NULL default '0',"
-"  PRIMARY KEY  (name)"
+"  jump int(11) NOT NULL default '0',"
+"  PRIMARY KEY  (`name`)"
 ");",
-"CREATE TABLE IF NOT EXISTS profilegroups ("
-"  id int(10) unsigned NOT NULL auto_increment,"
-"  name varchar(128) default NULL,"
+"CREATE TABLE powerpriority ("
+"  priorityname varchar(64) collate utf8_bin NOT NULL,"
+"  recpriority int(10) NOT NULL default '0',"
+"  selectclause text NOT NULL,"
+"  PRIMARY KEY  (priorityname)"
+");",
+"CREATE TABLE profilegroups ("
+"  id int(10) unsigned NOT NULL,"
+"  `name` varchar(128) default NULL,"
 "  cardtype varchar(32) NOT NULL default 'V4L',"
 "  is_default int(1) default '0',"
 "  hostname varchar(64) default NULL,"
 "  PRIMARY KEY  (id),"
-"  UNIQUE KEY name (name,hostname)"
+"  UNIQUE KEY `name` (`name`,hostname),"
+"  KEY cardtype (cardtype)"
 ");",
-"CREATE TABLE IF NOT EXISTS program ("
+"CREATE TABLE program ("
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
 "  endtime datetime NOT NULL default '0000-00-00 00:00:00',"
@@ -4783,46 +4958,56 @@ tmp.constData(),
 "  closecaptioned tinyint(1) NOT NULL default '0',"
 "  partnumber int(11) NOT NULL default '0',"
 "  parttotal int(11) NOT NULL default '0',"
-"  seriesid varchar(12) NOT NULL default '',"
+"  seriesid varchar(40) NOT NULL default '',"
 "  originalairdate date default NULL,"
 "  showtype varchar(30) NOT NULL default '',"
 "  colorcode varchar(20) NOT NULL default '',"
 "  syndicatedepisodenumber varchar(20) NOT NULL default '',"
-"  programid varchar(20) NOT NULL default '',"
+"  programid varchar(40) NOT NULL default '',"
 "  manualid int(10) unsigned NOT NULL default '0',"
 "  generic tinyint(1) default '0',"
+"  listingsource int(11) NOT NULL default '0',"
+"  `first` tinyint(1) NOT NULL default '0',"
+"  `last` tinyint(1) NOT NULL default '0',"
+"  audioprop set('STEREO','MONO','SURROUND','DOLBY','HARDHEAR','VISUALIMPAIR') NOT NULL,"
+"  subtitletypes set('HARDHEAR','NORMAL','ONSCREEN','SIGNED') NOT NULL,"
+"  videoprop set('HDTV','WIDESCREEN','AVC') NOT NULL,"
 "  PRIMARY KEY  (chanid,starttime,manualid),"
 "  KEY endtime (endtime),"
 "  KEY title (title),"
 "  KEY title_pronounce (title_pronounce),"
 "  KEY seriesid (seriesid),"
-"  KEY programid (programid),"
-"  KEY id_start_end (chanid,starttime,endtime)"
+"  KEY id_start_end (chanid,starttime,endtime),"
+"  KEY program_manualid (manualid),"
+"  KEY previouslyshown (previouslyshown),"
+"  KEY programid (programid,starttime),"
+"  KEY starttime (starttime)"
 ");",
-"CREATE TABLE IF NOT EXISTS programgenres ("
+"CREATE TABLE programgenres ("
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
 "  relevance char(1) NOT NULL default '',"
-"  genre char(30) default NULL,"
-"  PRIMARY KEY  (chanid,starttime,relevance)"
+"  genre varchar(30) default NULL,"
+"  PRIMARY KEY  (chanid,starttime,relevance),"
+"  KEY genre (genre)"
 ");",
-"CREATE TABLE IF NOT EXISTS programrating ("
+"CREATE TABLE programrating ("
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
-"  system char(8) NOT NULL default '',"
-"  rating char(8) NOT NULL default '',"
+"  system varchar(8) default NULL,"
+"  rating varchar(16) default NULL,"
 "  UNIQUE KEY chanid (chanid,starttime,system,rating),"
 "  KEY starttime (starttime,system)"
 ");",
-"CREATE TABLE IF NOT EXISTS recgrouppassword ("
-"  recgroup varchar(32) NOT NULL default '',"
-"  password varchar(10) NOT NULL default '',"
+"CREATE TABLE recgrouppassword ("
+"  recgroup varchar(32) collate utf8_bin NOT NULL default '',"
+"  `password` varchar(10) NOT NULL default '',"
 "  PRIMARY KEY  (recgroup),"
 "  UNIQUE KEY recgroup (recgroup)"
 ");",
-"CREATE TABLE IF NOT EXISTS record ("
-"  recordid int(10) unsigned NOT NULL auto_increment,"
-"  type int(10) unsigned NOT NULL default '0',"
+"CREATE TABLE record ("
+"  recordid int(10) unsigned NOT NULL,"
+"  `type` int(10) unsigned NOT NULL default '0',"
 "  chanid int(10) unsigned default NULL,"
 "  starttime time NOT NULL default '00:00:00',"
 "  startdate date NOT NULL default '0000-00-00',"
@@ -4832,7 +5017,7 @@ tmp.constData(),
 "  subtitle varchar(128) NOT NULL default '',"
 "  description text NOT NULL,"
 "  category varchar(64) NOT NULL default '',"
-"  profile varchar(128) NOT NULL default 'Default',"
+"  `profile` varchar(128) NOT NULL default 'Default',"
 "  recpriority int(10) NOT NULL default '0',"
 "  autoexpire int(11) NOT NULL default '0',"
 "  maxepisodes int(11) NOT NULL default '0',"
@@ -4843,8 +5028,8 @@ tmp.constData(),
 "  dupmethod int(11) NOT NULL default '6',"
 "  dupin int(11) NOT NULL default '15',"
 "  station varchar(20) NOT NULL default '',"
-"  seriesid varchar(12) NOT NULL default '',"
-"  programid varchar(20) NOT NULL default '',"
+"  seriesid varchar(40) NOT NULL default '',"
+"  programid varchar(40) NOT NULL default '',"
 "  search int(10) unsigned NOT NULL default '0',"
 "  autotranscode tinyint(1) NOT NULL default '0',"
 "  autocommflag tinyint(1) NOT NULL default '0',"
@@ -4860,13 +5045,22 @@ tmp.constData(),
 "  transcoder int(11) NOT NULL default '0',"
 "  tsdefault float NOT NULL default '1',"
 "  playgroup varchar(32) NOT NULL default 'Default',"
+"  prefinput int(10) NOT NULL default '0',"
+"  next_record datetime NOT NULL,"
+"  last_record datetime NOT NULL,"
+"  last_delete datetime NOT NULL,"
+"  storagegroup varchar(32) NOT NULL default 'Default',"
+"  avg_delay int(11) NOT NULL default '100',"
 "  PRIMARY KEY  (recordid),"
 "  KEY chanid (chanid,starttime),"
 "  KEY title (title),"
 "  KEY seriesid (seriesid),"
-"  KEY programid (programid)"
+"  KEY programid (programid),"
+"  KEY maxepisodes (maxepisodes),"
+"  KEY search (search),"
+"  KEY `type` (`type`)"
 ");",
-"CREATE TABLE IF NOT EXISTS recorded ("
+"CREATE TABLE recorded ("
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
 "  endtime datetime NOT NULL default '0000-00-00 00:00:00',"
@@ -4875,16 +5069,16 @@ tmp.constData(),
 "  description text NOT NULL,"
 "  category varchar(64) NOT NULL default '',"
 "  hostname varchar(64) NOT NULL default '',"
-"  bookmark varchar(128) default NULL,"
+"  bookmark tinyint(1) NOT NULL default '0',"
 "  editing int(10) unsigned NOT NULL default '0',"
-"  cutlist text,"
+"  cutlist tinyint(1) NOT NULL default '0',"
 "  autoexpire int(11) NOT NULL default '0',"
 "  commflagged int(10) unsigned NOT NULL default '0',"
 "  recgroup varchar(32) NOT NULL default 'Default',"
 "  recordid int(11) default NULL,"
-"  seriesid varchar(12) NOT NULL default '',"
-"  programid varchar(20) NOT NULL default '',"
-"  lastmodified timestamp(14) NOT NULL,"
+"  seriesid varchar(40) NOT NULL default '',"
+"  programid varchar(40) NOT NULL default '',"
+"  lastmodified timestamp NOT NULL default CURRENT_TIMESTAMP,"
 "  filesize bigint(20) NOT NULL default '0',"
 "  stars float NOT NULL default '0',"
 "  previouslyshown tinyint(1) default '0',"
@@ -4895,37 +5089,59 @@ tmp.constData(),
 "  transcoder int(11) NOT NULL default '0',"
 "  timestretch float NOT NULL default '1',"
 "  recpriority int(11) NOT NULL default '0',"
-"  basename varchar(128) NOT NULL default '',"
+"  basename varchar(255) NOT NULL,"
 "  progstart datetime NOT NULL default '0000-00-00 00:00:00',"
 "  progend datetime NOT NULL default '0000-00-00 00:00:00',"
 "  playgroup varchar(32) NOT NULL default 'Default',"
-"  profile varchar(32) NOT NULL default '',"
+"  `profile` varchar(32) NOT NULL default '',"
+"  `duplicate` tinyint(1) NOT NULL default '0',"
+"  transcoded tinyint(1) NOT NULL default '0',"
+"  watched tinyint(4) NOT NULL default '0',"
+"  storagegroup varchar(32) NOT NULL default 'Default',"
 "  PRIMARY KEY  (chanid,starttime),"
 "  KEY endtime (endtime),"
 "  KEY seriesid (seriesid),"
 "  KEY programid (programid),"
 "  KEY title (title),"
-"  KEY recordid (recordid)"
+"  KEY recordid (recordid),"
+"  KEY deletepending (deletepending,lastmodified),"
+"  KEY recgroup (recgroup,endtime)"
 ");",
-"CREATE TABLE IF NOT EXISTS recordedcredits ("
+"CREATE TABLE recordedcredits ("
 "  person mediumint(8) unsigned NOT NULL default '0',"
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
-"  role set('actor','director','producer','executive_producer','writer',"
-"             'guest_star','host','adapter','presenter','commentator','guest')"
-"         NOT NULL default '',"
+"  role set('actor','director','producer','executive_producer','writer','guest_star','host','adapter','presenter','commentator','guest') NOT NULL default '',"
 "  UNIQUE KEY chanid (chanid,starttime,person,role),"
 "  KEY person (person,role)"
 ");",
-"CREATE TABLE IF NOT EXISTS recordedmarkup ("
+"CREATE TABLE recordedfile ("
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
-"  mark bigint(20) NOT NULL default '0',"
-"  offset varchar(32) default NULL,"
-"  type int(11) NOT NULL default '0',"
-"  PRIMARY KEY  (chanid,starttime,mark,type)"
+"  basename varchar(128) NOT NULL default '',"
+"  filesize bigint(20) NOT NULL default '0',"
+"  width smallint(5) unsigned NOT NULL default '0',"
+"  height smallint(5) unsigned NOT NULL default '0',"
+"  fps float(6,3) NOT NULL default '0.000',"
+"  aspect float(8,6) NOT NULL default '0.000000',"
+"  audio_sample_rate smallint(5) unsigned NOT NULL default '0',"
+"  audio_bits_per_sample smallint(5) unsigned NOT NULL default '0',"
+"  audio_channels tinyint(3) unsigned NOT NULL default '0',"
+"  audio_type varchar(255) NOT NULL default '',"
+"  video_type varchar(255) NOT NULL default '',"
+"  `comment` varchar(255) NOT NULL default '',"
+"  PRIMARY KEY  (chanid,starttime),"
+"  KEY basename (basename)"
 ");",
-"CREATE TABLE IF NOT EXISTS recordedprogram ("
+"CREATE TABLE recordedmarkup ("
+"  chanid int(10) unsigned NOT NULL default '0',"
+"  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
+"  mark mediumint(8) unsigned NOT NULL default '0',"
+"  `type` tinyint(4) NOT NULL default '0',"
+"  `data` int(11) unsigned default NULL,"
+"  PRIMARY KEY  (chanid,starttime,`type`,mark)"
+");",
+"CREATE TABLE recordedprogram ("
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
 "  endtime datetime NOT NULL default '0000-00-00 00:00:00',"
@@ -4944,14 +5160,20 @@ tmp.constData(),
 "  closecaptioned tinyint(1) NOT NULL default '0',"
 "  partnumber int(11) NOT NULL default '0',"
 "  parttotal int(11) NOT NULL default '0',"
-"  seriesid varchar(12) NOT NULL default '',"
+"  seriesid varchar(40) NOT NULL default '',"
 "  originalairdate date default NULL,"
 "  showtype varchar(30) NOT NULL default '',"
 "  colorcode varchar(20) NOT NULL default '',"
 "  syndicatedepisodenumber varchar(20) NOT NULL default '',"
-"  programid varchar(20) NOT NULL default '',"
+"  programid varchar(40) NOT NULL default '',"
 "  manualid int(10) unsigned NOT NULL default '0',"
 "  generic tinyint(1) default '0',"
+"  listingsource int(11) NOT NULL default '0',"
+"  `first` tinyint(1) NOT NULL default '0',"
+"  `last` tinyint(1) NOT NULL default '0',"
+"  audioprop set('STEREO','MONO','SURROUND','DOLBY','HARDHEAR','VISUALIMPAIR') NOT NULL,"
+"  subtitletypes set('HARDHEAR','NORMAL','ONSCREEN','SIGNED') NOT NULL,"
+"  videoprop set('HDTV','WIDESCREEN','AVC') NOT NULL,"
 "  PRIMARY KEY  (chanid,starttime,manualid),"
 "  KEY endtime (endtime),"
 "  KEY title (title),"
@@ -4960,36 +5182,58 @@ tmp.constData(),
 "  KEY programid (programid),"
 "  KEY id_start_end (chanid,starttime,endtime)"
 ");",
-"CREATE TABLE IF NOT EXISTS recordedrating ("
+"CREATE TABLE recordedrating ("
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
-"  system char(8) NOT NULL default '',"
-"  rating char(8) NOT NULL default '',"
+"  system varchar(8) default NULL,"
+"  rating varchar(16) default NULL,"
 "  UNIQUE KEY chanid (chanid,starttime,system,rating),"
 "  KEY starttime (starttime,system)"
 ");",
-"CREATE TABLE IF NOT EXISTS recordingprofiles ("
-"  id int(10) unsigned NOT NULL auto_increment,"
-"  name varchar(128) default NULL,"
+"CREATE TABLE recordedseek ("
+"  chanid int(10) unsigned NOT NULL default '0',"
+"  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
+"  mark mediumint(8) unsigned NOT NULL default '0',"
+"  `offset` bigint(20) unsigned NOT NULL,"
+"  `type` tinyint(4) NOT NULL default '0',"
+"  PRIMARY KEY  (chanid,starttime,`type`,mark)"
+");",
+"CREATE TABLE recordingprofiles ("
+"  id int(10) unsigned NOT NULL,"
+"  `name` varchar(128) default NULL,"
 "  videocodec varchar(128) default NULL,"
 "  audiocodec varchar(128) default NULL,"
 "  profilegroup int(10) unsigned NOT NULL default '0',"
-"  PRIMARY KEY  (id)"
+"  PRIMARY KEY  (id),"
+"  KEY profilegroup (profilegroup)"
 ");",
-"CREATE TABLE IF NOT EXISTS recordmatch ("
+"CREATE TABLE recordmatch ("
 "  recordid int(10) unsigned default NULL,"
 "  chanid int(10) unsigned default NULL,"
 "  starttime datetime default NULL,"
 "  manualid int(10) unsigned default NULL,"
+"  oldrecduplicate tinyint(1) default NULL,"
+"  recduplicate tinyint(1) default NULL,"
+"  findduplicate tinyint(1) default NULL,"
+"  oldrecstatus int(11) default NULL,"
 "  KEY recordid (recordid)"
 ");",
-"CREATE TABLE IF NOT EXISTS settings ("
-"  value varchar(128) NOT NULL default '',"
-"  data text,"
+"CREATE TABLE settings ("
+"  `value` varchar(128) NOT NULL default '',"
+"  `data` text,"
 "  hostname varchar(64) default NULL,"
-"  KEY value (value,hostname)"
+"  KEY `value` (`value`,hostname)"
 ");",
-"CREATE TABLE IF NOT EXISTS tvchain ("
+"CREATE TABLE storagegroup ("
+"  id int(11) NOT NULL,"
+"  groupname varchar(32) NOT NULL,"
+"  hostname varchar(64) NOT NULL default '',"
+"  dirname varchar(235) collate utf8_bin NOT NULL default '',"
+"  PRIMARY KEY  (id),"
+"  UNIQUE KEY grouphostdir (groupname,hostname,dirname),"
+"  KEY hostname (hostname)"
+");",
+"CREATE TABLE tvchain ("
 "  chanid int(10) unsigned NOT NULL default '0',"
 "  starttime datetime NOT NULL default '0000-00-00 00:00:00',"
 "  chainid varchar(128) NOT NULL default '',"
@@ -5000,44 +5244,44 @@ tmp.constData(),
 "  cardtype varchar(32) NOT NULL default 'V4L',"
 "  input varchar(32) NOT NULL default '',"
 "  channame varchar(32) NOT NULL default '',"
+"  endtime datetime NOT NULL default '0000-00-00 00:00:00',"
 "  PRIMARY KEY  (chanid,starttime)"
 ");",
-"CREATE TABLE IF NOT EXISTS videobookmarks ("
-"  filename varchar(255) NOT NULL default '',"
-"  bookmark varchar(128) default NULL,"
-"  PRIMARY KEY  (filename)"
+"CREATE TABLE upnpmedia ("
+"  intid int(10) unsigned NOT NULL default '0',"
+"  class varchar(64) NOT NULL default '',"
+"  itemtype varchar(128) NOT NULL default '',"
+"  parentid int(10) unsigned NOT NULL default '0',"
+"  itemproperties varchar(255) NOT NULL default '',"
+"  filepath varchar(512) NOT NULL default '',"
+"  title varchar(255) NOT NULL default '',"
+"  filename varchar(512) NOT NULL default '',"
+"  coverart varchar(512) NOT NULL default '',"
+"  PRIMARY KEY  (intid),"
+"  KEY class (class),"
+"  KEY filepath (filepath(333)),"
+"  KEY parentid (parentid)"
 ");",
-"CREATE TABLE IF NOT EXISTS videosource ("
-"  sourceid int(10) unsigned NOT NULL auto_increment,"
-"  name varchar(128) NOT NULL default '',"
+"CREATE TABLE videosource ("
+"  sourceid int(10) unsigned NOT NULL,"
+"  `name` varchar(128) NOT NULL default '',"
 "  xmltvgrabber varchar(128) default NULL,"
 "  userid varchar(128) NOT NULL default '',"
 "  freqtable varchar(16) NOT NULL default 'default',"
 "  lineupid varchar(64) default NULL,"
-"  password varchar(64) default NULL,"
+"  `password` varchar(64) default NULL,"
 "  useeit smallint(6) NOT NULL default '0',"
 "  PRIMARY KEY  (sourceid),"
-"  UNIQUE KEY name (name)"
+"  UNIQUE KEY `name` (`name`)"
 ");",
-"CREATE TABLE IF NOT EXISTS xvmc_buffer_settings ("
-"  id int(11) NOT NULL auto_increment,"
-"  description varchar(255) NOT NULL default '',"
-"  osd_num int(11) NOT NULL default '0',"
-"  osd_res_num int(11) NOT NULL default '0',"
-"  min_surf int(11) NOT NULL default '0',"
-"  max_surf int(11) NOT NULL default '0',"
-"  decode_num int(11) NOT NULL default '0',"
-"  agressive int(11) NOT NULL default '1',"
-"  PRIMARY KEY  (id)"
-");",
+
+"INSERT INTO customexample VALUES ('New Flix','','program.category_type = ''movie'' AND program.airdate >= \n     YEAR(DATE_SUB(NOW(), INTERVAL 1 YEAR)) \nAND program.stars > 0.5 ',1);",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',9018,'channel_numbers','131');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',9018,'guide_fixup','2');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',256,'guide_fixup','1');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',257,'guide_fixup','1');",
-"INSERT INTO dtv_privatetypes VALUES ('dvb',256,'tv_types',"
-"                                       '1,150,134,133');",
-"INSERT INTO dtv_privatetypes VALUES ('dvb',257,'tv_types',"
-"                                       '1,150,134,133');",
+"INSERT INTO dtv_privatetypes VALUES ('dvb',256,'tv_types','1,150,134,133');",
+"INSERT INTO dtv_privatetypes VALUES ('dvb',257,'tv_types','1,150,134,133');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',4100,'sdt_mapping','1');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',4101,'sdt_mapping','1');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',4102,'sdt_mapping','1');",
@@ -5066,38 +5310,36 @@ tmp.constData(),
 "INSERT INTO dtv_privatetypes VALUES ('dvb',4105,'guide_fixup','1');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',4106,'guide_fixup','1');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',4107,'guide_fixup','1');",
-"INSERT INTO  dtv_privatetypes  VALUES ('dvb',4096,'guide_fixup','5');",
+"INSERT INTO dtv_privatetypes VALUES ('dvb',4096,'guide_fixup','5');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',4097,'guide_fixup','1');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',4098,'guide_fixup','1');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',94,'tv_types','1,128');",
 "INSERT INTO dtv_privatetypes VALUES ('atsc',1793,'guide_fixup','3');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',40999,'guide_fixup','4');",
-"INSERT INTO dtv_privatetypes VALUES ('dvb',70,'force_guide_present',"
-"                                       'yes');",
-"INSERT INTO dtv_privatetypes VALUES ('dvb',70,'guide_ranges',"
-"                                       '80,80,96,96');",
+"INSERT INTO dtv_privatetypes VALUES ('dvb',70,'force_guide_present','yes');",
+"INSERT INTO dtv_privatetypes VALUES ('dvb',70,'guide_ranges','80,80,96,96');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',4112,'channel_numbers','131');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',4115,'channel_numbers','131');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',4116,'channel_numbers','131');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',12802,'channel_numbers','131');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',12803,'channel_numbers','131');",
 "INSERT INTO dtv_privatetypes VALUES ('dvb',12829,'channel_numbers','131');",
-"INSERT INTO dtv_privatetypes VALUES ('dvb',40999,'parse_subtitle_list',"
-"                       '1070,1308,1041,1306,1307,1030,1016,1131,1068,1069');",
-"INSERT INTO playgroup VALUES ('Default','',30,5,100);",
-"INSERT INTO profilegroups VALUES (1,'Software Encoders (v4l based)','V4L',"
-"                                      1,NULL);",
-"INSERT INTO profilegroups VALUES (2,'MPEG-2 Encoders (PVR-x50, PVR-500)',"
-"                                      'MPEG',1,NULL);",
-"INSERT INTO profilegroups VALUES (3,"
-" 'Hardware MJPEG Encoders (Matrox G200-TV, Miro DC10, etc)','MJPEG',1,NULL);",
+"INSERT INTO dtv_privatetypes VALUES ('dvb',40999,'parse_subtitle_list','1070,1308,1041,1306,1307,1030,1016,1131,1068,1069');",
+"INSERT INTO dtv_privatetypes VALUES ('dvb',4096,'guide_fixup','5');",
+"INSERT INTO playgroup VALUES ('Default','',30,5,100,0);",
+"INSERT INTO profilegroups VALUES (1,'Software Encoders (v4l based)','V4L',1,NULL);",
+"INSERT INTO profilegroups VALUES (2,'MPEG-2 Encoders (PVR-x50, PVR-500)','MPEG',1,NULL);",
+"INSERT INTO profilegroups VALUES (3,'Hardware MJPEG Encoders (Matrox G200-TV, Miro DC10, etc)','MJPEG',1,NULL);",
 "INSERT INTO profilegroups VALUES (4,'Hardware HDTV','HDTV',1,NULL);",
 "INSERT INTO profilegroups VALUES (5,'Hardware DVB Encoders','DVB',1,NULL);",
 "INSERT INTO profilegroups VALUES (6,'Transcoders','TRANSCODE',1,NULL);",
 "INSERT INTO profilegroups VALUES (7,'FireWire Input','FIREWIRE',1,NULL);",
-"INSERT INTO profilegroups VALUES (8,"
-" 'USB Mpeg-4 Encoder (Plextor ConvertX, etc)','GO7007',1,NULL);",
+"INSERT INTO profilegroups VALUES (8,'USB Mpeg-4 Encoder (Plextor ConvertX, etc)','GO7007',1,NULL);",
 "INSERT INTO profilegroups VALUES (9,'DBOX2 Input','DBOX2',1,NULL);",
+"INSERT INTO profilegroups VALUES (10,'Freebox Input','Freebox',1,NULL);",
+"INSERT INTO profilegroups VALUES (11,'HDHomeRun Recorders','HDHOMERUN',1,NULL);",
+"INSERT INTO profilegroups VALUES (12,'CRC IP Recorders','CRC_IP',1,NULL);",
+"INSERT INTO profilegroups VALUES (13,'HD-PVR Recorders','HDPVR',1,NULL);",
 "INSERT INTO recordingprofiles VALUES (1,'Default',NULL,NULL,1);",
 "INSERT INTO recordingprofiles VALUES (2,'Live TV',NULL,NULL,1);",
 "INSERT INTO recordingprofiles VALUES (3,'High Quality',NULL,NULL,1);",
@@ -5127,22 +5369,42 @@ tmp.constData(),
 "INSERT INTO recordingprofiles VALUES (27,'High Quality',NULL,NULL,6);",
 "INSERT INTO recordingprofiles VALUES (28,'Medium Quality',NULL,NULL,6);",
 "INSERT INTO recordingprofiles VALUES (29,'Low Quality',NULL,NULL,6);",
+"INSERT INTO recordingprofiles VALUES (30,'Default',NULL,NULL,10);",
+"INSERT INTO recordingprofiles VALUES (31,'Live TV',NULL,NULL,10);",
+"INSERT INTO recordingprofiles VALUES (32,'High Quality',NULL,NULL,10);",
+"INSERT INTO recordingprofiles VALUES (33,'Low Quality',NULL,NULL,10);",
+"INSERT INTO recordingprofiles VALUES (34,'Default',NULL,NULL,11);",
+"INSERT INTO recordingprofiles VALUES (35,'Live TV',NULL,NULL,11);",
+"INSERT INTO recordingprofiles VALUES (36,'High Quality',NULL,NULL,11);",
+"INSERT INTO recordingprofiles VALUES (37,'Low Quality',NULL,NULL,11);",
+"INSERT INTO recordingprofiles VALUES (38,'Default',NULL,NULL,12);",
+"INSERT INTO recordingprofiles VALUES (39,'Live TV',NULL,NULL,12);",
+"INSERT INTO recordingprofiles VALUES (40,'High Quality',NULL,NULL,12);",
+"INSERT INTO recordingprofiles VALUES (41,'Low Quality',NULL,NULL,12);",
+"INSERT INTO recordingprofiles VALUES (42,'Default',NULL,NULL,7);",
+"INSERT INTO recordingprofiles VALUES (43,'Live TV',NULL,NULL,7);",
+"INSERT INTO recordingprofiles VALUES (44,'High Quality',NULL,NULL,7);",
+"INSERT INTO recordingprofiles VALUES (45,'Low Quality',NULL,NULL,7);",
+"INSERT INTO recordingprofiles VALUES (46,'Default',NULL,NULL,9);",
+"INSERT INTO recordingprofiles VALUES (47,'Live TV',NULL,NULL,9);",
+"INSERT INTO recordingprofiles VALUES (48,'High Quality',NULL,NULL,9);",
+"INSERT INTO recordingprofiles VALUES (49,'Low Quality',NULL,NULL,9);",
+"INSERT INTO recordingprofiles VALUES (50,'Default',NULL,NULL,13);",
+"INSERT INTO recordingprofiles VALUES (51,'Live TV',NULL,NULL,13);",
+"INSERT INTO recordingprofiles VALUES (52,'High Quality',NULL,NULL,13);",
+"INSERT INTO recordingprofiles VALUES (53,'Low Quality',NULL,NULL,13);",
 "INSERT INTO settings VALUES ('mythfilldatabaseLastRunStart',NULL,NULL);",
 "INSERT INTO settings VALUES ('mythfilldatabaseLastRunEnd',NULL,NULL);",
 "INSERT INTO settings VALUES ('mythfilldatabaseLastRunStatus',NULL,NULL);",
 "INSERT INTO settings VALUES ('DataDirectMessage',NULL,NULL);",
 "INSERT INTO settings VALUES ('HaveRepeats','0',NULL);",
-"INSERT INTO settings VALUES ('DBSchemaVer','1112',NULL);",
+"INSERT INTO settings VALUES ('DBSchemaVer','1226',NULL);",
 "INSERT INTO settings VALUES ('DefaultTranscoder','0',NULL);",
-"INSERT INTO xvmc_buffer_settings VALUES (1,'Default / nVidia',"
-"                                             2,2,8,16,8,1);",
-"INSERT INTO xvmc_buffer_settings VALUES (2,'VLD (More decode buffers)',"
-"                                             2,2,8,16,16,1);",
 NULL
 };
 
     QString dbver = "";
-    if (!performActualUpdate(updates, "1112", dbver))
+    if (!performActualUpdate(updates, "1226", dbver))
         return false;
     return true;
 }
