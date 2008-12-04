@@ -193,7 +193,11 @@ void BackendQueryDiskSpace(QStringList &strlist,
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
     {
         if (it1->fsID == -1)
+        {
             it1->fsID = GetfsID(it1);
+            it1->directory =
+                it1->hostname.section(".", 0, 0) + ":" + it1->directory;
+        }
 
         it2 = it1;
         for (it2++; it2 != fsInfos.end(); it2++)
@@ -207,7 +211,8 @@ void BackendQueryDiskSpace(QStringList &strlist,
             {
                 if (!it1->hostname.contains(it2->hostname))
                     it1->hostname = it1->hostname + "," + it2->hostname;
-                it1->directory = it1->directory + "," + it2->directory;
+                it1->directory = it1->directory + "," +
+                    it2->hostname.section(".", 0, 0) + ":" + it2->directory;
                 fsInfos.erase(it2);
                 it2 = it1;
             }

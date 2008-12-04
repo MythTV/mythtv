@@ -358,8 +358,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         group.setAttribute("total", (int)(iTotal>>10) );
         group.setAttribute("used" , (int)(iUsed>>10)  );
         group.setAttribute("free" , (int)(iAvail>>10) );
-        group.setAttribute("dir"  ,
-            hostname.section(".", 0, 0) + ":" + directory );
+        group.setAttribute("dir"  , directory );
 
         // Make sure that the total is always the last element.
         if (fsID == "total")
