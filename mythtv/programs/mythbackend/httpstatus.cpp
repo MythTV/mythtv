@@ -353,8 +353,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         storage.setAttribute("drive_" + fsID + "_total", (int)(iTotal>>10)); 
         storage.setAttribute("drive_" + fsID + "_used" , (int)(iUsed>>10)); 
         storage.setAttribute("drive_" + fsID + "_free" , (int)(iAvail>>10)); 
-        storage.setAttribute("drive_" + fsID + "_dirs" ,
-            hostname.section(".", 0, 0) + ":" + directory); 
+        storage.setAttribute("drive_" + fsID + "_dirs" , directory); 
     }
  
     storage.setAttribute("fsids", ids); 
