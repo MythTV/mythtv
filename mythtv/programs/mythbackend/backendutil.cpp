@@ -20,24 +20,26 @@
 #include "util.h"
 #include "compat.h"
 
-static QMap<int, int> fsID_cache;
+static QMap<QString, int> fsID_cache;
 static QMutex cache_lock;
 
 /// gets stable fsIDs based of the dirID
-static int GetfsID(int dirID)
+static int GetfsID(vector<FileSystemInfo>::iterator fsInfo)
 {
+    QString fskey = fsInfo->hostname + ":" + fsInfo->directory;
     QMutexLocker lock(&cache_lock);
-    if (!fsID_cache.contains(dirID))
-        fsID_cache[dirID] = fsID_cache.count();
+    if (!fsID_cache.contains(fskey))
+        fsID_cache[fskey] = fsID_cache.count();
 
-    return fsID_cache[dirID];
+    return fsID_cache[fskey];
 }
 
 // checks the cache if we know this dirID, used to skip known unique file systems
-static bool HasfsID(int dirID)
+static bool HasfsID(vector<FileSystemInfo>::iterator fsInfo)
 {
+    QString fskey = fsInfo->hostname + ":" + fsInfo->directory;
     QMutexLocker lock(&cache_lock);
-    return fsID_cache.contains(dirID);
+    return fsID_cache.contains(fskey);
 }
 
 static size_t GetCurrentMaxBitrate(QMap<int, EncoderLink *> *encoderList)
@@ -199,7 +201,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
     {
         if (it1->fsID == -1)
-            it1->fsID = GetfsID(it1->dirID);
+            it1->fsID = GetfsID(it1);
 
         it2 = it1;
         for (it2++; it2 != fsInfos.end(); it2++)
@@ -207,7 +209,6 @@ void BackendQueryDiskSpace(QStringList &strlist,
             // Sometimes the space reported for an NFS mounted dir is slightly
             // different than when it is locally mounted because of block sizes
             if (it2->fsID == -1 &&
-                (!HasfsID(it2->fsID) || it1->dirID == it2->dirID) &&
                 (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 32) &&
                 ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
                  <= maxWriteFiveSec))
@@ -277,32 +278,56 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
         fsInfos.push_back(fsInfo);
     }
 
+    VERBOSE(VB_SCHEDULE+VB_FILE, "Determining unique filesystems");
     size_t maxWriteFiveSec = GetCurrentMaxBitrate(tvList)/12  /*5 seconds*/;
     maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
     vector<FileSystemInfo>::iterator it1, it2;
     for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
     {
         if (it1->fsID == -1)
-            it1->fsID = GetfsID(it1->dirID);
+            it1->fsID = GetfsID(it1);
         else
             continue;
 
+        VERBOSE(VB_SCHEDULE+VB_FILE,
+            QString("%1:%2 (fsID %3, dirID %4) using %5 out of %6 KB, "
+                    "looking for matches")
+                    .arg(it1->hostname).arg(it1->directory)
+                    .arg(it1->fsID).arg(it1->dirID)
+                    .arg(it1->usedSpaceKB).arg(it1->totalSpaceKB));
         it2 = it1;
         for (it2++; it2 != fsInfos.end(); it2++)
         {
+            VERBOSE(VB_SCHEDULE+VB_FILE,
+                QString("    Checking %1:%2 (dirID %3) using %4 of %5 KB")
+                        .arg(it2->hostname).arg(it2->directory).arg(it2->dirID)
+                        .arg(it2->usedSpaceKB).arg(it2->totalSpaceKB));
+            VERBOSE(VB_SCHEDULE+VB_FILE,
+                QString("        Total KB Diff: %1 (want <= 32)") 
+                .arg((long)absLongLong(it1->totalSpaceKB - it2->totalSpaceKB)));
+            VERBOSE(VB_SCHEDULE+VB_FILE,
+                QString("        Used  KB Diff: %1 (want <= %2")
+                .arg((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB))
+                .arg(maxWriteFiveSec));
+
             // Sometimes the space reported for an NFS mounted dir is slightly
             // different than when it is locally mounted because of block sizes
-            if (it2->fsID == -1 && !HasfsID(it2->dirID) &&
+            if (it2->fsID == -1 &&
                 (absLongLong(it1->totalSpaceKB - it2->totalSpaceKB) <= 32) &&
                 ((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB)
                  <= maxWriteFiveSec))
             {
                 it2->fsID = it1->fsID;
+
+                VERBOSE(VB_SCHEDULE+VB_FILE,
+                    QString("    MATCH Found: %1:%2 will use fsID %3")
+                            .arg(it2->hostname).arg(it2->directory)
+                            .arg(it2->fsID));
             }
         }
     }
 
-    if (print_verbose_messages & VB_FILE)
+    if (print_verbose_messages & (VB_FILE|VB_SCHEDULE))
     {
         cout << "--- GetFilesystemInfos directory list start ---" << endl;
         for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
@@ -316,7 +341,8 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
             else
                 cout << "Remote";
             cout << endl;
-            cout << "     Drive ID: " << it1->fsID << endl;
+            cout << "     fsID    : " << it1->fsID << endl;
+            cout << "     dirID   : " << it1->dirID << endl;
             cout << "     TotalKB : " << it1->totalSpaceKB << endl;
             cout << "     UsedKB  : " << it1->usedSpaceKB << endl;
             cout << "     FreeKB  : " << it1->freeSpaceKB << endl;
