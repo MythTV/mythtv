@@ -15,12 +15,14 @@
 #include <cstdlib>
 
 // Qt headers
-#include <QStringList>
-#include <QRegExp>
-#include <QDir>
-#include <QTimer>
-#include <QApplication>
 #include <QWaitCondition>
+#include <QApplication>
+#include <QStringList>
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QRegExp>
+#include <QTimer>
+#include <QDir>
 
 // MythTV headers
 #include <mythtv/util.h>
@@ -107,7 +109,7 @@ MythTranscodeDaemon::MythTranscodeDaemon(int port, bool log_stdout) :
     listening_port(port),
     log_to_stdout(log_stdout),
     mtd_log(NULL),
-    server_socket(new MTDServerSocket(listening_port)),
+    server_socket(new QTcpServer(this)),
     dvd_drive_access(new QMutex()),
     titles_mutex(new QMutex()),
     have_disc(false),
@@ -124,10 +126,8 @@ MythTranscodeDaemon::MythTranscodeDaemon(int port, bool log_stdout) :
 {
     nice(nice_level);
 
-    connect(server_socket, SIGNAL(newConnect(Q3Socket*)),
-            this,          SLOT(newConnection(Q3Socket*)));
-    connect(server_socket, SIGNAL(endConnect(Q3Socket*)),
-            this,          SLOT(endConnection(Q3Socket*)));
+    connect(server_socket, SIGNAL(newConnection()),
+            this,          SLOT(  newConnection()));
     connect(thread_cleaning_timer, SIGNAL(timeout()),
             this,                  SLOT(  cleanThreads()));
     connect(disc_checking_timer,   SIGNAL(timeout()),
@@ -149,13 +149,7 @@ MythTranscodeDaemon::~MythTranscodeDaemon()
         mtd_log = NULL;
     }
 
-    if (server_socket)
-    {
-        server_socket->disconnect();
-        server_socket->deleteLater();
-        server_socket = NULL;
-    }
-
+    // server_socket is auto deleted by Qt
     // thread_cleaning_timer is auto deleted by Qt
     thread_cleaning_timer->disconnect();
     // disc_checking_timer is auto deleted by Qt
@@ -190,6 +184,16 @@ MythTranscodeDaemon::~MythTranscodeDaemon()
 
 bool MythTranscodeDaemon::Init(void)
 {
+    // Start listening on the server socket
+    if (!server_socket->listen(QHostAddress::Any, listening_port))
+    {
+         VERBOSE(VB_IMPORTANT, LOC_ERR +
+                 QString("Can't bind to server port %1").arg(listening_port) +
+                 "\n\t\t\tThere is probably copy of mtd already running."
+                 "\n\t\t\tYou can verify this by running 'ps ax | grep mtd'.");
+         return false;
+    }
+
     //  Create the logging object
     mtd_log = new MTDLogger(log_to_stdout);
     if (!mtd_log->Init())
@@ -315,36 +319,48 @@ void MythTranscodeDaemon::cleanThreads()
 
 }
 
-void MythTranscodeDaemon::newConnection(Q3Socket *socket)
+void MythTranscodeDaemon::newConnection(void)
 {
-    connect(socket, SIGNAL(readyRead()),
-            this, SLOT(readSocket()));
+    QTcpSocket *socket = server_socket->nextPendingConnection();
+    while (socket)
+    {
+        connect(socket, SIGNAL(readyRead()),
+                this,   SLOT(  readSocket()));
+        connect(socket, SIGNAL(disconnected()),
+                this,   SLOT(  endConnection()));
+        mtd_log->socketOpened();
 
-    mtd_log->socketOpened();
+        socket = server_socket->nextPendingConnection();
+    }
 }
 
-void MythTranscodeDaemon::endConnection(Q3Socket *socket)
+void MythTranscodeDaemon::endConnection(void)
 {
-    socket->close();
-    mtd_log->socketClosed();
+    QTcpSocket *socket = dynamic_cast<QTcpSocket*>(sender());
+    if (socket)
+    {
+        socket->close();
+        socket->deleteLater();
+        mtd_log->socketClosed();
+    }
 }
 
-void MythTranscodeDaemon::readSocket()
+void MythTranscodeDaemon::readSocket(void)
 {
-
-    Q3Socket *socket = (Q3Socket *)sender();
-    if (socket->canReadLine())
+    QTcpSocket *socket = dynamic_cast<QTcpSocket*>(sender());
+    if (socket && socket->canReadLine())
     {
         QString incoming_data = socket->readLine();
         incoming_data = incoming_data.replace( QRegExp("\n"), "" );
         incoming_data = incoming_data.replace( QRegExp("\r"), "" );
-        incoming_data.simplifyWhiteSpace();
-        QStringList tokens = QStringList::split(" ", incoming_data);
+        incoming_data.simplified();
+        QStringList tokens = incoming_data.split(" ");
         parseTokens(tokens, socket);
     }
 }
 
-void MythTranscodeDaemon::parseTokens(const QStringList &tokens, Q3Socket *socket)
+void MythTranscodeDaemon::parseTokens(const QStringList &tokens,
+                                      QTcpSocket *socket)
 {
     //
     //  parse commands coming in from the socket
@@ -421,20 +437,20 @@ void MythTranscodeDaemon::ShutDownThreads(void)
     }
 }
 
-void MythTranscodeDaemon::sendMessage(Q3Socket *where, const QString &what)
+void MythTranscodeDaemon::sendMessage(QTcpSocket *where, const QString &what)
 {
     QString message = what;
     message.append("\n");
     QByteArray buf = message.toUtf8();
-    where->writeBlock(buf.constData(), buf.length());
+    where->write(buf);
 }
 
-void MythTranscodeDaemon::sayHi(Q3Socket *socket)
+void MythTranscodeDaemon::sayHi(QTcpSocket *socket)
 {
     sendMessage(socket, "greetings");
 }
 
-void MythTranscodeDaemon::sendStatusReport(Q3Socket *socket)
+void MythTranscodeDaemon::sendStatusReport(QTcpSocket *socket)
 {
     //
     //  Tell the client how many jobs are
@@ -462,7 +478,7 @@ void MythTranscodeDaemon::sendStatusReport(Q3Socket *socket)
     sendMessage(socket, "status dvd complete");
 }
 
-void MythTranscodeDaemon::sendMediaReport(Q3Socket *socket)
+void MythTranscodeDaemon::sendMediaReport(QTcpSocket *socket)
 {
     //
     //  Tell the client what's on a disc
@@ -709,8 +725,10 @@ void MythTranscodeDaemon::startDVD(const QStringList &tokens)
 
         if (!checkFinalFile(&final_file, ".iso"))
         {
-            emit writeToLog("Final file name is not useable. "
-                            "File exists? Other Pending job?");
+            emit writeToLog(
+                QString("Final file name '%1' is not useable. "
+                        "File exists? Other Pending job?")
+                .arg(final_file.fileName()));
             return;
         }
 
@@ -737,8 +755,10 @@ void MythTranscodeDaemon::startDVD(const QStringList &tokens)
 
         if (!checkFinalFile(&final_file, ".mpg"))
         {
-            emit writeToLog("Final file name is not useable. "
-                            "File exists? Other Pending job?");
+            emit writeToLog(
+                QString("Final file name '%1' is not useable. "
+                        "File exists? Other Pending job?")
+                .arg(final_file.fileName()));
             return;
         }
 
@@ -762,8 +782,10 @@ void MythTranscodeDaemon::startDVD(const QStringList &tokens)
 
         if (!checkFinalFile(&final_file, ".avi"))
         {
-            emit writeToLog("Final file name is not useable. "
-                            "File exists? Other Pending job?");
+            emit writeToLog(
+                QString("Final file name '%1' is not useable. "
+                        "File exists? Other Pending job?")
+                .arg(final_file.fileName()));
             return;
         }
 
@@ -787,7 +809,7 @@ void MythTranscodeDaemon::startDVD(const QStringList &tokens)
 
         JobThread *new_job = new DVDTranscodeThread(
             this, dvd_drive_access, dvd_device, dvd_title,
-            final_file.name(), file_name,
+            final_file.fileName(), file_name,
             flat, nice_level, quality, ac3_flag, audio_track,
             numb_seconds, subtitle_track);
 

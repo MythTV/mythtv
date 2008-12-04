@@ -20,7 +20,7 @@ using namespace std;
 #include <QDir>
 #include <QApplication>
 #include <QWaitCondition>
-#include <Q3Process>
+#include <QProcess>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
@@ -31,6 +31,8 @@ using namespace std;
 #include "threadevents.h"
 #include "dvdprobe.h"
 
+//#define DEBUG_STAGE_2 "/path/to/vob/from/rip/stage/filaname.vob"
+
 namespace {
     struct delete_file {
         bool operator()(const QString &filename)
@@ -40,6 +42,22 @@ namespace {
         }
     };
 }
+
+static QString shell_escape(const QString &orig)
+{
+    if (!orig.contains(' ') && !orig.contains('\t') &&
+        !orig.contains("'") && !orig.contains('\n') &&
+        !orig.contains('`') && !orig.contains('\r') &&
+        !orig.contains('"'))
+    {
+        return orig;
+    }
+
+    QString tmp = orig;
+    tmp.replace('"', "\\\"");
+    tmp.replace("`", "\\`");
+    return QString("\"%1\"").arg(tmp);
+};
 
 JobThread::JobThread(
     MythTranscodeDaemon *owner,
@@ -247,7 +265,7 @@ namespace
       public:
         MutexUnlocker(QMutex *mutex) : m_mutex(mutex)
         {
-            if (!(m_mutex && m_mutex->locked()))
+            if (!m_mutex)
             {
                 VERBOSE(VB_IMPORTANT,
                         QString("%1: Invalid mutex passed to MutexUnlocker")
@@ -384,6 +402,13 @@ bool DVDThread::ripTitle(int            title_number,
     }
 
     SendLoggingEvent("job thread beginning to rip dvd title");
+
+#ifdef DEBUG_STAGE_2
+    if (output_files)
+        *output_files = QStringList(DEBUG_STAGE_2);
+    SendLoggingEvent("job thread finished ripping dvd title");
+    return true;
+#endif // DEBUG_STAGE_2
 
     // OK, we got the device lock. Lets open our destination file
     RipFile ripfile(to_location, extension, true);
@@ -589,6 +614,9 @@ bool DVDThread::ripTitle(int            title_number,
         *output_files = sl;
 
     SendLoggingEvent("job thread finished ripping dvd title");
+
+    VERBOSE(VB_GENERAL, QString("Output files from rip: '") +
+            sl.join("','") + "'");
 
     return true;
 }
@@ -801,13 +829,20 @@ DVDTranscodeThread::DVDTranscodeThread(
 
     quality(quality_level),
     working_directory(NULL),
-    tc_process(NULL),
     two_pass(false),
     audio_track(which_audio),
-    length_in_seconds((numb_seconds) ? numb_seconds : 1),
     ac3_flag(do_ac3),
-    subtitle_track(subtitle_track_numb)
+    subtitle_track(subtitle_track_numb),
+    secs_mult(1.0f),
+    tc_process(NULL),
+    tc_command(QString::null),
+    tc_current_pass(0),
+    tc_tick_tock(0),
+    tc_seconds_encoded(0),
+    tc_timer(0)
 {
+    uint length_in_seconds = (numb_seconds) ? numb_seconds : 1;
+    secs_mult = 1.0f / length_in_seconds;
 }
 
 void DVDTranscodeThread::run(void)
@@ -890,13 +925,26 @@ void DVDTranscodeThread::run(void)
     if (two_pass && !IsCancelled() && !runTranscode(2))
         wipeClean();
 
+#ifndef DEBUG_STAGE_2
     if (!gContext->GetNumSetting("mythdvd.mtd.SaveTranscodeIntermediates", 0))
     {
         // remove any temporary titles that are now transcoded
         std::for_each(output_files.begin(), output_files.end(), delete_file());
     }
+#endif
 
     cleanUp();
+}
+
+void DVDTranscodeThread::Cancel(bool chatty)
+{
+    DVDThread::Cancel(chatty);
+    QMutexLocker locker(cancelLock);
+    if (tc_timer)
+    {
+        killTimer(tc_timer);
+        tc_timer = QObject::startTimer(0);
+    }
 }
 
 bool DVDTranscodeThread::makeWorkingDirectory(void)
@@ -915,24 +963,32 @@ bool DVDTranscodeThread::makeWorkingDirectory(void)
                          .arg(dir_name));
         return false;
     }
+
+#ifndef DEBUG_STAGE_2
     if (!working_directory->mkdir(rip_name))
     {
-        SendProblemEvent(QString("could not create directory called '%1' "
-                                 "in rip directory").arg(rip_name));
+        SendProblemEvent(QString("Could not create directory called '%1/%2' ")
+                         .arg(dir_name).arg(rip_name));
         return false;
     }
+#endif
+
     if (!working_directory->cd(rip_name))
     {
-        SendProblemEvent(QString("could not cd into '%1'").arg(rip_name));
+        SendProblemEvent(QString("Could not cd into '%1/%2'")
+                         .arg(dir_name).arg(rip_name));
         return false;
     }
+
+#ifndef DEBUG_STAGE_2
     if (!working_directory->mkdir("vob"))
     {
         SendProblemEvent(QString("could not create a vob subdirectory "
-                                 "in the working directory '%1'")
-                         .arg(rip_name));
+                                 "in the working directory '%1/%2'")
+                         .arg(dir_name).arg(rip_name));
         return false;
     }
+#endif
 
     return true;
 }
@@ -948,7 +1004,7 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
         return false;
     }
 
-    QString tc_command = gContext->GetSetting("TranscodeCommand");
+    tc_command = gContext->GetSetting("TranscodeCommand");
     if (tc_command.isEmpty())
     {
         SendProblemEvent(
@@ -957,7 +1013,6 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
     }
 
     tc_arguments.clear();
-    tc_arguments.push_back(tc_command);
 
     MSqlQuery a_query(MSqlQuery::InitCon());
     a_query.prepare(
@@ -1168,11 +1223,11 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
 
     tc_arguments.push_back("-o");
 
-    // in two pass, the video from the first run is garbage
-    if (two_pass && which_run == 1)
-        tc_arguments.push_back(QString("/dev/null"));
-    else
-        tc_arguments.push_back(QString("%1.avi").arg(destination_file_string));
+    // In a two pass encoding the video from the first run is garbage,
+    // so redirect it to /dev/null
+    tc_arguments.push_back(
+        (two_pass && which_run == 1) ?
+        QString("/dev/null") : QString("%1.avi").arg(destination_file_string));
 
     tc_arguments.push_back("--print_status");
     tc_arguments.push_back("20");
@@ -1185,12 +1240,16 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
         tc_arguments.push_back(QString("%1,twopass.log").arg(which_run));
     }
 
+    // Produce shell safe version of command for user cut-n-paste
+    QStringList args;
+    for (int i = 0; i < tc_arguments.size(); i++)
+        args.push_back(shell_escape(tc_arguments[i]));
     QString transcode_command_string =
-        QString("transcode command will be: '%1'").arg(tc_arguments.join(" "));
+        QString("transcode command will be: '%1 %2'")
+        .arg(tc_command).arg(args.join(" "));
+
     SendLoggingEvent(transcode_command_string);
 
-    tc_process = new Q3Process(tc_arguments);
-    tc_process->setWorkingDirectory(*working_directory);
     return true;
 }
 
@@ -1199,139 +1258,206 @@ bool DVDTranscodeThread::runTranscode(int which_run)
     // Set description strings to let the user
     // know what is going on.
 
-    SetSubName("Transcode is thinking ...", 1);
+    SetSubName("Transcode is thinking . . .", 1);
     SetSubProgress(0.0, 1);
-    uint tick_tock = 3;
-    uint seconds_so_far = 0;
-    double percent_transcoded = 0.0;
-    QTime job_time;
-    bool finally = true;
 
-    if (which_run > 1)
+    // Second pass?
+    if ((which_run > 1) && !buildTranscodeCommandLine(which_run))
     {
-        //  Second pass
-        if (tc_process)
-        {
-            delete tc_process;
-            tc_process = NULL;
-        }
-
-        if (!buildTranscodeCommandLine(which_run))
-        {
-            SendProblemEvent("Problem building second pass command line.");
-            return false;
-        }
-    }
-
-    if (!tc_process->start())
-    {
-        SendProblemEvent("Could not start transcode");
+        SendProblemEvent("Problem building second pass command line.");
         return false;
     }
 
-    while (true)
+    tc_process = new QProcess();
+    tc_process->setWorkingDirectory(working_directory->path());
+    tc_process->setProcessChannelMode(QProcess::MergedChannels);
+    tc_process->setReadChannel(QProcess::StandardOutput);
+    tc_process->start(tc_command, tc_arguments);
+
+    if (!tc_process->waitForStarted())
     {
-        if (IsCancelled())
-        {
-            SendProblemEvent("abandoned job because master control "
-                             "said we need to shut down");
+        SendProblemEvent("Could not start transcode");
+        tc_process->kill();
+        tc_process->waitForFinished();
+        delete tc_process; // don't use deleteLater(), no event loop...
+        tc_process = NULL;
+        return false;
+    }
 
-            tc_process->tryTerminate();
-            sleep(3);
+    tc_current_pass    = which_run;
+    tc_seconds_encoded = 0;
+    tc_tick_tock       = 99;          // sentinel value, 99
+    tc_job_start_time  = QDateTime(); // sentinel value, null date time
+
+    {
+        QMutexLocker locker(cancelLock);
+        tc_timer = QObject::startTimer(0);
+    }
+
+    //VERBOSE(VB_IMPORTANT, "entering event loop");
+    bool ok = (0 == DVDTranscodeThread::exec());
+    //VERBOSE(VB_IMPORTANT, "exiting event loop");
+
+    {
+        QMutexLocker locker(cancelLock);
+        killTimer(tc_timer);
+        tc_timer = 0;
+    }
+    tc_current_pass = 0;
+
+    return ok;
+}
+
+void DVDTranscodeThread::timerEvent(QTimerEvent *te)
+{
+    // Ignore timers we are not listening to...
+    if (te->timerId() != tc_timer)
+        return;
+
+    // These vars should always be set when in event loop...
+    if (!tc_process || !tc_current_pass)
+        return;
+
+    if (99 == tc_tick_tock)
+    {
+        tc_tick_tock = 3;
+        QMutexLocker locker(cancelLock);
+        killTimer(tc_timer);
+        tc_timer = QObject::startTimer(kCheckFrequency);
+    }
+
+    if (IsCancelled())
+    {
+        SendProblemEvent("abandoned job because master control "
+                         "said we need to shut down");
+
+        tc_process->terminate();
+        if (!tc_process->waitForFinished(3000))
             tc_process->kill();
-            delete tc_process;
-            tc_process = NULL;
-            return false;
-        }
+        tc_process->waitForFinished();
+        tc_process->deleteLater();
+        tc_process = NULL;
+        DVDTranscodeThread::exit(1);
+        return;
+    }
 
-        if (!tc_process->isRunning())
+    if (QProcess::NotRunning == tc_process->state())
+    {
+        QString err = QString::null;
+        if (QProcess::CrashExit == tc_process->exitStatus() ||
+            tc_process->exitCode())
         {
-            bool flag = tc_process->normalExit();
-            delete tc_process;
-            tc_process = NULL;
-            return flag;
-        }
-
-        while (tc_process->canReadLineStdout())
-        {
-            //  Would be nice to just connect a SIGNAL here
-            //  rather than polling, but we're talking to a
-            //  a process from inside a thread, so Q_OBJECT
-            //  is not possible
-
-            QString status_line = tc_process->readLineStdout();
-            status_line = status_line.section("EMT: ", 1, 1);
-            status_line = status_line.section(",",0,0);
-            QString h_string = status_line.section(":",0,0);
-            QString m_string = status_line.section(":",1,1);
-            QString s_string = status_line.section(":", 2,2);
-
-            seconds_so_far = s_string.toUInt() +
-            (60 * m_string.toUInt()) +
-            (60 * 60 * h_string.toUInt());
-
-            percent_transcoded = (double)
-            ( (double) seconds_so_far / (double) length_in_seconds);
-        }
-
-        if (seconds_so_far > 0)
-        {
-            if (finally)
+            err = QString("Exiting runTranscode(%1) ")
+                .arg(tc_current_pass);
+            if (QProcess::CrashExit == tc_process->exitStatus())
             {
-                finally = false;
-                job_time.start();
-            }
-            if (two_pass)
-            {
-                if (which_run == 1)
-                {
-                    SetSubProgress(percent_transcoded, 1);
-                    overall_progress = 0.333333 +
-                        (0.333333 * percent_transcoded);
-                    UpdateSubjobString(job_time.elapsed() / 1000,
-                                       QObject::tr(
-                                           "Transcoding Pass 1 of 2 ~"));
-                }
-                else if (which_run == 2)
-                {
-                    SetSubProgress(percent_transcoded, 1);
-                    overall_progress = 0.666666 +
-                        (0.333333 * percent_transcoded);
-                    UpdateSubjobString(job_time.elapsed() / 1000,
-                                       QObject::tr(
-                                           "Transcoding Pass 2 of 2 ~"));
-                }
+                err += QString("QProcess::error(): %1")
+                    .arg(tc_process->error());
             }
             else
             {
-                // Set feedback strings and calculate
-                // estimated time left
+                err += QString("%1 exit code: %2\n")
+                    .arg(tc_command).arg(tc_process->exitCode());
+                QByteArray err_out =
+                    tc_process->readAllStandardError();
+                if (err_out.size())
+                {
+                    err += "stderr output was:\n\n";
+                    err += QString(err_out);
+                }
+            }
+        }
+
+        VERBOSE(VB_IMPORTANT, "Error: " + err);
+        SendProblemEvent(err);
+
+        tc_process->deleteLater();
+        tc_process = NULL;
+        DVDTranscodeThread::exit((err.isEmpty()) ? 0: 1);
+        return;
+    }
+
+    QString status_line = QString::null;
+    while (tc_process->canReadLine())
+    {
+        QByteArray stat_buf = tc_process->readLine();
+        QString stat = QString(stat_buf);
+        if (stat.contains("EMT:"))
+            status_line = stat;
+    }
+
+    if (!status_line.isEmpty())
+    {
+        //QString orig_stat = status_line;
+        status_line      = status_line.section("EMT: ", 1, 1);
+        status_line      = status_line.section(",",     0, 0);
+        QString h_string = status_line.section(":",     0, 0);
+        QString m_string = status_line.section(":",     1, 1);
+        QString s_string = status_line.section(":",     2, 2);
+
+        tc_seconds_encoded = s_string.toUInt() +
+            (60 * m_string.toUInt()) +
+            (60 * 60 * h_string.toUInt());
+
+        //VERBOSE(VB_IMPORTANT,
+        //        QString("status_line: '%1' secs: %2")
+        //        .arg(orig_stat).arg(tc_seconds_encoded));
+    }
+    else
+    {
+        //VERBOSE(VB_IMPORTANT,
+        //        QString("no status_line, secs: %1")
+        //        .arg(tc_seconds_encoded));
+    }
+
+    if (tc_seconds_encoded)
+    {
+        long long elapsed = 0;
+        QDateTime now = QDateTime::currentDateTime();
+        if (tc_job_start_time.isValid())
+            elapsed = tc_job_start_time.secsTo(now);
+        else
+            tc_job_start_time = now;
+
+        float percent_transcoded = tc_seconds_encoded * secs_mult;
+
+        if (two_pass)
+        {
+            if (tc_current_pass == 1)
+            {
                 SetSubProgress(percent_transcoded, 1);
-                overall_progress = 0.50 + (0.50 * percent_transcoded);
-                UpdateSubjobString(job_time.elapsed() / 1000,
-                                   QObject::tr("Transcoding ~"));
+                overall_progress = 0.333333 +
+                    (0.333333 * percent_transcoded);
+                UpdateSubjobString(
+                    elapsed, QObject::tr("Transcoding Pass 1 of 2 ~"));
+            }
+            else if (tc_current_pass == 2)
+            {
+                SetSubProgress(percent_transcoded, 1);
+                overall_progress = 0.666666 +
+                    (0.333333 * percent_transcoded);
+                UpdateSubjobString(
+                    elapsed, QObject::tr("Transcoding Pass 2 of 2 ~"));
             }
         }
         else
         {
-            tick_tock = ((tick_tock) % 3) + 1;
-
-            QString a_string = QObject::tr("Transcode is thinking ");
-            for (uint i = 0; i < tick_tock; i++)
-                a_string += ".";
-
-            SetSubName(a_string, 1);
+            // Set feedback strings and calculate
+            // estimated time left
+            SetSubProgress(percent_transcoded, 1);
+            overall_progress = 0.50 + (0.50 * percent_transcoded);
+            UpdateSubjobString(elapsed, QObject::tr("Transcoding ~"));
         }
-
-        QMutexLocker locker(cancelLock);
-        if (!cancel_me)
-            cancelWaitCond->wait(cancelLock, 2000);
     }
+    else
+    {
+        QString a_string = QObject::tr("Transcode is thinking");
+        tc_tick_tock = (tc_tick_tock % 3) + 1;
+        for (uint i = 0; i < 3; i++)
+            a_string += (i < tc_tick_tock) ? " ." : "   ";
 
-    // We should never get here, but cleanup anyway
-    delete tc_process;
-    tc_process = NULL;
-    return false;
+        SetSubName(a_string, 1);
+    }
 }
 
 /// \brief Erase rip file(s) and temporary working directory

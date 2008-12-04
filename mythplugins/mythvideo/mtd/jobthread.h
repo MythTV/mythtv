@@ -11,16 +11,18 @@
 #ifndef JOBTHREAD_H_
 #define JOBTHREAD_H_
 
+#include <QStringList>
+#include <QDateTime>
 #include <QThread>
 #include <QMutex>
-#include <QStringList>
 
 #include "fileobs.h"
 
-class Q3Process;
+class QProcess;
 class QDir;
 class MythTranscodeDaemon;
 class QWaitCondition;
+class QTimerEvent;
 
 /** \class JobThread
  *  \brief Base class for all MythTranscodeDaemon threads
@@ -34,7 +36,7 @@ class JobThread : public QThread
 
     // Commands
     virtual void run(void);
-    void    Cancel(bool chatty = false);
+    virtual void Cancel(bool chatty = false);
 
     // Gets
     QString GetJobName(void)     const;
@@ -84,7 +86,7 @@ class JobThread : public QThread
 
     QMutex         *cancelLock;
     QWaitCondition *cancelWaitCond;
-    bool            cancel_me;
+    volatile bool   cancel_me;
 };
 typedef QList<JobThread*> JobThreadList;
 
@@ -200,6 +202,8 @@ class DVDTranscodeThread : public DVDThread
     ~DVDTranscodeThread();
 
     virtual void run(void);
+    virtual void Cancel(bool chatty = false);
+
     virtual bool transcodeSlotUsed(void) const { return used_transcode_slot; }
 
     bool    makeWorkingDirectory(void);
@@ -209,18 +213,29 @@ class DVDTranscodeThread : public DVDThread
     void    wipeClean(void);
     bool    used_transcode_slot;
 
+  protected:
+    void timerEvent(QTimerEvent*);
+
   private:
     int          quality;
-    QDir         *working_directory;
-    QStringList  tc_arguments;
-    Q3Process   *tc_process;
+    QDir        *working_directory;
     bool         two_pass;
     int          audio_track;
-    int          length_in_seconds;
     bool         ac3_flag;
     int          subtitle_track;
+    float        secs_mult;
+
+    QProcess    *tc_process;
+    QString      tc_command;
+    QStringList  tc_arguments;
+    uint         tc_current_pass;
+    uint         tc_tick_tock;
+    uint         tc_seconds_encoded;
+    QDateTime    tc_job_start_time;
+
+    volatile int tc_timer; // protect with cancelLock..
+
+    static const int kCheckFrequency = 1000; // update progress bar freq (ms)
 };
 
-
 #endif  // jobthread_h_
-

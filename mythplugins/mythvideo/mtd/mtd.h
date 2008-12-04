@@ -14,7 +14,6 @@
 #include <QList>
 
 #include "logging.h"
-#include "serversocket.h"
 #include "jobthread.h"
 #include "dvdprobe.h"
 #include "threadevents.h"
@@ -22,6 +21,8 @@
 class QStringList;
 class QTimer;
 class QMutex;
+class QTcpServer;
+class QTcpSocket;
 class QWaitCondition;
 
 class MythTranscodeDaemon;
@@ -77,14 +78,14 @@ class MythTranscodeDaemon : public QObject
 
   private slots:
 
-    void newConnection(Q3Socket *);
-    void endConnection(Q3Socket *);
-    void readSocket();
-    void parseTokens(const QStringList &tokens, Q3Socket *socket);
-    void sendMessage(Q3Socket *where, const QString &what);
-    void sayHi(Q3Socket *socket);
-    void sendStatusReport(Q3Socket *socket);
-    void sendMediaReport(Q3Socket *socket);
+    void newConnection(void);
+    void endConnection(void);
+    void readSocket(void);
+    void parseTokens(const QStringList &tokens, QTcpSocket *socket);
+    void sendMessage(QTcpSocket *where, const QString &what);
+    void sayHi(QTcpSocket *socket);
+    void sendStatusReport(QTcpSocket *socket);
+    void sendMediaReport(QTcpSocket *socket);
     void startJob  (const QStringList &tokens);
     void startAbort(const QStringList &tokens);
     void startDVD  (const QStringList &tokens);
@@ -104,7 +105,7 @@ class MythTranscodeDaemon : public QObject
     int                 listening_port;
     bool                log_to_stdout;
     MTDLogger          *mtd_log;
-    MTDServerSocket    *server_socket;
+    QTcpServer         *server_socket;
     JobThreadList       job_threads;
     mutable QMutex     *dvd_drive_access;
     mutable QMutex     *titles_mutex;
