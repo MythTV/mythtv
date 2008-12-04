@@ -34,14 +34,6 @@ static int GetfsID(vector<FileSystemInfo>::iterator fsInfo)
     return fsID_cache[fskey];
 }
 
-// checks the cache if we know this dirID, used to skip known unique file systems
-static bool HasfsID(vector<FileSystemInfo>::iterator fsInfo)
-{
-    QString fskey = fsInfo->hostname + ":" + fsInfo->directory;
-    QMutexLocker lock(&cache_lock);
-    return fsID_cache.contains(fskey);
-}
-
 static size_t GetCurrentMaxBitrate(QMap<int, EncoderLink *> *encoderList)
 {
     size_t totalKBperMin = 0;
@@ -183,7 +175,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
     while (it != strlist.end())
     {
         fsInfo.hostname = *(it++);
-        fsInfo.directory = fsInfo.hostname.section(".", 0, 0) + ":" + *(it++);
+        fsInfo.directory = *(it++);
         fsInfo.isLocal = (*(it++)).toInt();
         fsInfo.fsID = (*(it++)).toInt();
         fsInfo.dirID = (*(it++)).toInt();
