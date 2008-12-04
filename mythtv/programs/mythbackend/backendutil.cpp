@@ -306,7 +306,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
                 QString("        Total KB Diff: %1 (want <= 32)") 
                 .arg((long)absLongLong(it1->totalSpaceKB - it2->totalSpaceKB)));
             VERBOSE(VB_SCHEDULE+VB_FILE,
-                QString("        Used  KB Diff: %1 (want <= %2")
+                QString("        Used  KB Diff: %1 (want <= %2)")
                 .arg((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB))
                 .arg(maxWriteFiveSec));
 
