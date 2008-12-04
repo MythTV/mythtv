@@ -278,7 +278,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
         fsInfos.push_back(fsInfo);
     }
 
-    VERBOSE(VB_SCHEDULE+VB_FILE, "Determining unique filesystems");
+    VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA, "Determining unique filesystems");
     size_t maxWriteFiveSec = GetCurrentMaxBitrate(tvList)/12  /*5 seconds*/;
     maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
     vector<FileSystemInfo>::iterator it1, it2;
@@ -289,7 +289,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
         else
             continue;
 
-        VERBOSE(VB_SCHEDULE+VB_FILE,
+        VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA,
             QString("%1:%2 (fsID %3, dirID %4) using %5 out of %6 KB, "
                     "looking for matches")
                     .arg(it1->hostname).arg(it1->directory)
@@ -298,14 +298,14 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
         it2 = it1;
         for (it2++; it2 != fsInfos.end(); it2++)
         {
-            VERBOSE(VB_SCHEDULE+VB_FILE,
+            VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA,
                 QString("    Checking %1:%2 (dirID %3) using %4 of %5 KB")
                         .arg(it2->hostname).arg(it2->directory).arg(it2->dirID)
                         .arg(it2->usedSpaceKB).arg(it2->totalSpaceKB));
-            VERBOSE(VB_SCHEDULE+VB_FILE,
+            VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA,
                 QString("        Total KB Diff: %1 (want <= 32)") 
                 .arg((long)absLongLong(it1->totalSpaceKB - it2->totalSpaceKB)));
-            VERBOSE(VB_SCHEDULE+VB_FILE,
+            VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA,
                 QString("        Used  KB Diff: %1 (want <= %2)")
                 .arg((size_t)absLongLong(it1->usedSpaceKB - it2->usedSpaceKB))
                 .arg(maxWriteFiveSec));
@@ -319,7 +319,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
             {
                 it2->fsID = it1->fsID;
 
-                VERBOSE(VB_SCHEDULE+VB_FILE,
+                VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA,
                     QString("    MATCH Found: %1:%2 will use fsID %3")
                             .arg(it2->hostname).arg(it2->directory)
                             .arg(it2->fsID));
