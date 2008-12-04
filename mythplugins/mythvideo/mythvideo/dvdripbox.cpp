@@ -94,7 +94,9 @@ namespace
 }
 
 DVDRipBox::DVDRipBox(MythScreenStack *lparent, QString lname, QString device) :
-    MythScreenType(lparent, lname), m_clientSocket(this),
+    MythScreenType(lparent, lname),
+    m_mtdPort(gContext->GetNumSetting("MTDPort", 2442)),
+    m_clientSocket(this),
     m_triedMTDLaunch(false), m_connected(false), m_firstRun(true),
     m_haveDisc(false),
     m_firstDiscFound(false), m_blockMediaRequests(false), m_jobCount(0),
@@ -190,7 +192,7 @@ bool DVDRipBox::Create()
 
 void DVDRipBox::Init()
 {
-    connectToMtd();
+    ConnectToMTD();
 
     //  Create (but do not open) the DVD probing object
     //  and then ask a thread to check it for us. Make a
@@ -243,10 +245,10 @@ void DVDRipBox::OnMTDConnectionDisconnected()
     m_warningText->SetText(warning);
 }
 
-void DVDRipBox::connectToMtd()
+void DVDRipBox::ConnectToMTD(void)
 {
-    m_clientSocket.connectToHost("localhost",
-            gContext->GetNumSetting("MTDPort", 2442));
+    if (!m_connected)
+        m_clientSocket.connectToHost("localhost", m_mtdPort);
 }
 
 void DVDRipBox::OnConnectionError(QAbstractSocket::SocketError error_id)
@@ -845,7 +847,7 @@ void DVDRipBox::ExitingRipScreen()
 
 void DVDRipBox::OnMTDLaunchAttemptComplete()
 {
-    connectToMtd();
+    ConnectToMTD();
 }
 
 void DVDRipBox::cancelJob()

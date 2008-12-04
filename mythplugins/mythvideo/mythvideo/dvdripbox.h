@@ -56,7 +56,7 @@ class DVDRipBox : public MythScreenType
 
     bool Create();
 
-    void connectToMtd();
+    void ConnectToMTD(void);
 
     enum RipState { RIPSTATE_UNKNOWN = 0, RIPSTATE_NOCONNECT, RIPSTATE_NOJOBS,
         RIPSTATE_HAVEJOBS };
@@ -91,6 +91,7 @@ class DVDRipBox : public MythScreenType
   private:
     void Init();
 
+    uint             m_mtdPort;
     QTcpSocket       m_clientSocket;
     QTimer           m_statusTimer;
     bool             m_triedMTDLaunch;
