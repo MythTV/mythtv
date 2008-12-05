@@ -131,8 +131,10 @@ class VideoOutputXv : public VideoOutput
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);
 
-  private:
     VOSType VideoOutputSubType() const { return video_output_subtype; }
+    void SetNextFrameDisplayTimeOffset(int delayus);
+
+  private:
     virtual QRect GetVisibleOSDBounds(float&, float&, float) const;
     virtual QRect GetTotalOSDBounds(void) const;
 

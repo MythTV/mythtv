@@ -35,6 +35,7 @@ class VDPAUContext
                       QRect display_video_rect,
                       QSize screen_size, FrameScanType scan);
     void DisplayNextFrame(void);
+    void SetNextFrameDisplayTimeOffset(int delayus);
     bool InitOSD(QSize osd_size);
     void UpdateOSD(void* const planes[3], QSize size,
                    void* const alpha[1]);
@@ -68,6 +69,9 @@ class VDPAUContext
 
     bool InitPiP(QSize vid_size);
     void DeinitPip(void);
+
+    int nextframedelay;
+    VdpTime lastframetime;
 
     int pix_fmt;
 
@@ -163,6 +167,8 @@ class VDPAUContext
     VdpPresentationQueueBlockUntilSurfaceIdle * vdp_presentation_queue_block_until_surface_idle;
     VdpPresentationQueueTargetCreateX11 * vdp_presentation_queue_target_create_x11;
     VdpPresentationQueueQuerySurfaceStatus * vdp_presentation_queue_query_surface_status;
+    VdpPresentationQueueGetTime * vdp_presentation_queue_get_time;
+    VdpPresentationQueueSetBackgroundColor * vdp_presentation_queue_set_background_color;
 
     VdpDecoderCreate * vdp_decoder_create;
     VdpDecoderDestroy * vdp_decoder_destroy;

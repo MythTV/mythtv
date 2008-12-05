@@ -3210,6 +3210,17 @@ static void calc_bob(FrameScanType scan, int imgh, int disphoff,
 #endif
 }
 
+void VideoOutputXv::SetNextFrameDisplayTimeOffset(int delayus)
+{
+    (void)delayus;
+#ifdef USING_VDPAU
+    if (!vdpau)
+        return;
+
+    vdpau->SetNextFrameDisplayTimeOffset(delayus);
+#endif
+}
+
 void VideoOutputXv::ShowVDPAU(FrameScanType scan)
 {
     (void)scan;

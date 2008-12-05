@@ -46,7 +46,8 @@ static const VdpOutputSurfaceRenderBlendState osd_blend =
     };        
 
 VDPAUContext::VDPAUContext()
-  : pix_fmt(-1),            maxVideoWidth(0),  maxVideoHeight(0),
+  : nextframedelay(0),      lastframetime(0),
+    pix_fmt(-1),            maxVideoWidth(0),  maxVideoHeight(0),
     videoSurfaces(0),       surface_render(0), numSurfaces(0),
     videoSurface(0),        outputSurface(0),  decoder(0),
     videoMixer(0),          surfaceNum(0),     osdVideoSurface(0),
@@ -348,6 +349,13 @@ bool VDPAUContext::InitProcs(Display *disp, Screen *screen)
     CHECK_ST
 
     vdp_st = vdp_get_proc_address(
+        vdp_device, 
+        VDP_FUNC_ID_PRESENTATION_QUEUE_GET_TIME,
+        (void **)&vdp_presentation_queue_get_time
+    );
+    CHECK_ST
+
+    vdp_st = vdp_get_proc_address(
         vdp_device,
         VDP_FUNC_ID_PRESENTATION_QUEUE_BLOCK_UNTIL_SURFACE_IDLE,
         (void **)&vdp_presentation_queue_block_until_surface_idle
@@ -358,6 +366,13 @@ bool VDPAUContext::InitProcs(Display *disp, Screen *screen)
         vdp_device,
         VDP_FUNC_ID_PRESENTATION_QUEUE_TARGET_CREATE_X11,
         (void **)&vdp_presentation_queue_target_create_x11
+    );
+    CHECK_ST
+
+    vdp_st = vdp_get_proc_address(
+        vdp_device,
+        VDP_FUNC_ID_PRESENTATION_QUEUE_SET_BACKGROUND_COLOR,
+        (void **)&vdp_presentation_queue_set_background_color
     );
     CHECK_ST
 
@@ -605,8 +620,6 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs)
     VdpVideoMixerFeature features[] = {
         VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL,
         VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL,
-        VDP_VIDEO_MIXER_FEATURE_NOISE_REDUCTION,
-        VDP_VIDEO_MIXER_FEATURE_SHARPNESS
     };
 
     vdp_st = vdp_video_mixer_create(
@@ -893,7 +906,8 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
     {
 #if 0
         videoSurface = render->surface;
-      
+ 
+        // consolidate more 
         if (frame->top_field_first)
         {
             if (scan == kScan_Interlaced) // displaying top top-first
@@ -925,6 +939,32 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
         }
         else
         {
+            if (scan == kScan_Interlaced) // displaying bottom bottom-first
+            {
+                // next field (top) is in the current frame)
+                future_surfaces[0] = videoSurface;
+
+                // previous two fields are in the previous frame
+                render = (vdpau_render_state_t *)referenceFrames[1]->buf;
+                if (render)
+                    past_surfaces[0] = render->surface;
+                past_surfaces[1] = past_surfaces[0];
+            }
+            else // displaying top of bottom-first
+            {
+                // next field (bottom) is in the next frame
+                render = (vdpau_render_state_t *)referenceFrames[3]->buf;
+                if (render)
+                    future_surfaces[0] = render->surface;
+
+                // previous field is in the current frame
+                past_surfaces[0] = videoSurface;
+
+                // field before that is in the previous frame
+                render = (vdpau_render_state_t *)referenceFrames[1]->buf;
+                if (render)
+                    past_surfaces[1] = render->surface;
+            }
         }
 #else
         render = (vdpau_render_state_t *)referenceFrames[3]->buf;
@@ -992,17 +1032,37 @@ void VDPAUContext::DisplayNextFrame(void)
 
     VdpStatus vdp_st;
     bool ok = true;
+    VdpTime now = 0;
+
+    if (nextframedelay > 0)
+    {
+        vdp_st = vdp_presentation_queue_get_time(
+            vdp_flip_queue,
+            &now
+        );
+        CHECK_ST
+
+        if (lastframetime == 0)
+            lastframetime = now;
+
+        now += nextframedelay * 1000;
+    }
 
     vdp_st = vdp_presentation_queue_display(
         vdp_flip_queue,
         outputSurface,
         outRect.x1,
         outRect.y1,
-        0
+        now
     );
     CHECK_ST
 
     surfaceNum = surfaceNum ^ 1;
+}
+
+void VDPAUContext::SetNextFrameDisplayTimeOffset(int delayus)
+{
+    nextframedelay = delayus;
 }
 
 bool VDPAUContext::InitOSD(QSize osd_size)
@@ -1304,43 +1364,6 @@ bool VDPAUContext::SetDeinterlacing(bool interlaced)
         );
         CHECK_ST
     }
-
-    VdpVideoMixerFeature noiseReduce[] = {
-        VDP_VIDEO_MIXER_FEATURE_NOISE_REDUCTION,
-        VDP_VIDEO_MIXER_FEATURE_SHARPNESS,
-    };
-
-    VdpBool noise = true;
-    const VdpBool * noise_values[] = {
-        &noise,
-        &noise,
-    };
-
-    vdp_st = vdp_video_mixer_set_feature_enables(
-        videoMixer,
-        ARSIZE(noiseReduce),
-        noiseReduce,
-        *noise_values
-    );
-    CHECK_ST
-
-    VdpVideoMixerAttribute noiseAttr[] = {
-        VDP_VIDEO_MIXER_ATTRIBUTE_NOISE_REDUCTION_LEVEL,
-        VDP_VIDEO_MIXER_ATTRIBUTE_SHARPNESS_LEVEL,
-    };
-    float noiseval = 0.5; 
-    void const * noiseAttr_values[] = {
-        &noiseval,
-        &noiseval,
-    };
-
-    vdp_st = vdp_video_mixer_set_attribute_values(
-        videoMixer,
-        ARSIZE(noiseAttr),
-        noiseAttr,
-        noiseAttr_values
-    );
-    CHECK_ST
 
     deinterlacing = (interlaced & ok);
     needDeintRefs = false;

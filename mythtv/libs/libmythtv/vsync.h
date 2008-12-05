@@ -252,6 +252,27 @@ class RTCVideoSync : public VideoSync
 };
 #endif
 
+#ifdef USING_VDPAU
+/** \brief Video synchronization class employing VDPAU
+ */
+class VDPAUVideoSync : public VideoSync
+{
+  public:
+    VDPAUVideoSync(VideoOutput*,
+                      int frame_interval, int refresh_interval,
+                      bool interlaced);
+    ~VDPAUVideoSync();
+
+    QString getName(void) const { return QString("VDPAU"); }
+    bool TryInit(void);
+    void WaitForFrame(int sync_delay);
+    void AdvanceTrigger(void);
+
+  private:
+};
+
+#endif
+
 /** \brief Video synchronization classes employing usleep() and busy-waits.
  *  
  *  Non-phase-maintaining. There may occasionally be short periods 

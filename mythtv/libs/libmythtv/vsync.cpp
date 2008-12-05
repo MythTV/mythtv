@@ -90,7 +90,10 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
 	skip = m_forceskip;
 	m_forceskip = 0;
     }
-    
+
+#ifdef USING_VDPAU
+//    TESTVIDEOSYNC(VDPAUVideoSync);
+#endif    
 #ifndef _WIN32
     TESTVIDEOSYNC(nVidiaVideoSync);
     TESTVIDEOSYNC(DRMVideoSync);
@@ -208,6 +211,7 @@ int VideoSync::CalcDelay()
         m_nexttrigger.tv_usec = now.tv_usec;
         OffsetTimeval(m_nexttrigger, ret_val);
     }
+
     return ret_val;
 }
 
@@ -760,7 +764,7 @@ void RTCVideoSync::WaitForFrame(int sync_delay)
     unsigned long rtcdata;
     while (m_delay > 0)
     {
-        read(m_rtcfd, &rtcdata, sizeof(rtcdata));
+        (void)read(m_rtcfd, &rtcdata, sizeof(rtcdata));
         m_delay = CalcDelay();
     }
 }
@@ -770,6 +774,49 @@ void RTCVideoSync::AdvanceTrigger(void)
     UpdateNexttrigger();
 }
 #endif /* __linux__ */
+
+#ifdef USING_VDPAU
+VDPAUVideoSync::VDPAUVideoSync(VideoOutput *vo,
+                              int fr, int ri, bool intl) :
+    VideoSync(vo, fr, ri, intl)
+{
+}
+
+VDPAUVideoSync::~VDPAUVideoSync()
+{
+}
+
+bool VDPAUVideoSync::TryInit(void)
+{
+    VideoOutputXv *vo = dynamic_cast<VideoOutputXv*>(m_video_output);
+    if (!vo)
+        return false;
+
+    if (vo->VideoOutputSubType() != XVideoVDPAU)
+        return false;
+
+    return true;
+}
+
+void VDPAUVideoSync::WaitForFrame(int sync_delay)
+{
+    // Offset for externally-provided A/V sync delay
+    OffsetTimeval(m_nexttrigger, sync_delay);
+    m_delay = CalcDelay();
+
+    if (m_delay < 0)
+        m_delay = 0;
+
+    VideoOutputXv *vo = (VideoOutputXv *)(m_video_output);
+    vo->SetNextFrameDisplayTimeOffset(m_delay);
+}
+
+void VDPAUVideoSync::AdvanceTrigger(void)
+{
+    UpdateNexttrigger();
+}
+
+#endif
 
 BusyWaitVideoSync::BusyWaitVideoSync(VideoOutput *vo,
                                      int fr, int ri, bool intl) : 
