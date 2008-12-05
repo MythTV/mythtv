@@ -60,6 +60,7 @@ VDPAUContext::VDPAUContext()
     vdp_flip_target(NULL),  vdp_flip_queue(NULL),
     vdp_device(NULL),       errored(false)
 {
+    memset(outputSurfaces, 0, sizeof(outputSurfaces));
 }
 
 VDPAUContext::~VDPAUContext()
@@ -578,7 +579,7 @@ bool VDPAUContext::InitBuffers(int width, int height, int numbufs)
                     pitches
                 );
             }
-            delete tmp;
+            delete [] tmp;
         }
 
     }
@@ -662,19 +663,20 @@ void VDPAUContext::FreeBuffers(void)
         CHECK_ST
     }
 
-    for (i = 0; i < numSurfaces; i++)
-    {
-        if (videoSurfaces[i])
-        {
-            vdp_st = vdp_video_surface_destroy(
-                videoSurfaces[i]);
-            CHECK_ST
-        }
-    }
-
     if (videoSurfaces)
+    {
+        for (i = 0; i < numSurfaces; i++)
+        {
+            if (videoSurfaces[i])
+            {
+                vdp_st = vdp_video_surface_destroy(
+                    videoSurfaces[i]);
+                CHECK_ST
+            }
+        }
         free(videoSurfaces);
-    videoSurfaces = NULL;
+        videoSurfaces = NULL;
+    }
 
     if (surface_render)
         free(surface_render);
@@ -743,6 +745,9 @@ bool VDPAUContext::InitOutput(QSize size)
 
 void VDPAUContext::FreeOutput(void)
 {
+    if (!vdp_output_surface_destroy)
+        return;
+
     VdpStatus vdp_st;
     bool ok = true;
     int i;
@@ -750,7 +755,7 @@ void VDPAUContext::FreeOutput(void)
     for (i = 0; i < NUM_OUTPUT_SURFACES; i++)
     {
         if (outputSurfaces[i])
-        {    
+        {
             vdp_st = vdp_output_surface_destroy(
                 outputSurfaces[i]);
             CHECK_ST
@@ -1800,7 +1805,7 @@ bool VDPAUContext::InitPiP(QSize vid_size)
                 NULL
             );
             CHECK_ST
-            delete alpha;
+            delete [] alpha;
         }
         else
             ok = false;

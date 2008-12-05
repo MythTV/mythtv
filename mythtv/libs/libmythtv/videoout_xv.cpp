@@ -1164,6 +1164,7 @@ bool VideoOutputXv::InitVDPAU(MythCodecID mcodecid)
         VERBOSE(VB_IMPORTANT, "Unable to init VDPAU");
         vdpau->Deinit();
         delete vdpau;
+        vdpau = NULL;
         return ok;
     }
 
@@ -1172,8 +1173,6 @@ bool VideoOutputXv::InitVDPAU(MythCodecID mcodecid)
     {
         VERBOSE(VB_IMPORTANT, "Unable to create VDPAU buffers");
         DeleteBuffers(XVideoVDPAU, false);
-        vdpau->Deinit();
-        delete vdpau;
         return ok;
     }
 
