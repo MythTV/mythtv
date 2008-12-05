@@ -3591,16 +3591,16 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                             .av_substream_index;
                     }
 
-                    if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
-                        lastapts = (long long)(av_q2d(curstream->time_base) *
-                                               pkt->pts * 1000);
-
                     if ((onlyvideo > 0) || (pkt->stream_index != audIdx))
                     {
                         ptr += len;
                         len = 0;
                         continue;
                     }
+
+                    if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
+                        lastapts = (long long)(av_q2d(curstream->time_base) *
+                                               pkt->pts * 1000);
 
                     if (skipaudio)
                     {
