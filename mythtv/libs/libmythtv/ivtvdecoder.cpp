@@ -355,12 +355,7 @@ int IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
                         if ((firstgoppos > 0) && (keyframedist != 1))
                         {
                             keyframedist = frameNum - firstgoppos;
-
-                            if ((keyframedist == 15) ||
-                                (keyframedist == 12))
-                                positionMapType = MARK_GOP_START;
-                            else
-                                positionMapType = MARK_GOP_BYFRAME;
+                            positionMapType = MARK_GOP_BYFRAME;
 
                             gopset = true;
                             GetNVP()->SetKeyframeDistance(keyframedist);
@@ -377,17 +372,12 @@ int IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
                     {
                         long long last_frame = 0;
                         if (!m_positionMap.empty())
-                            last_frame =
-                                m_positionMap[m_positionMap.size() - 1].index;
-                        if (keyframedist > 1)
-                            last_frame *= keyframedist;
+                            last_frame = m_positionMap[m_positionMap.size() - 1].index;
                         if (framesRead > last_frame && keyframedist > 0)
-                        {       
-                            if (m_positionMap.capacity() ==
-                                    m_positionMap.size())
+                        {
+                            if (m_positionMap.capacity() == m_positionMap.size())
                                 m_positionMap.reserve(m_positionMap.size() + 60);
-                            PosMapEntry entry = {lastKey / keyframedist,
-                                                 lastKey, laststartpos};
+                            PosMapEntry entry = {lastKey, lastKey, laststartpos};
                             m_positionMap.push_back(entry);
                         }
 
@@ -395,17 +385,12 @@ int IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
                             (!recordingHasPositionMap) &&
                             (!livetv))
                         {
-                            int bitrate = (int)((laststartpos * 8 * fps) /
-                                             (framesRead - 1));
+                            int bitrate = (int)(laststartpos * 8 * fps / (framesRead - 1));
                             float bytespersec = (float)bitrate / 8;
-                            float secs = ringBuffer->GetRealFileSize() * 1.0 /
-                                             bytespersec;
-                            GetNVP()->SetFileLength((int)(secs),
-                                                    (int)(secs * fps));
+                            float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
+                            GetNVP()->SetFileLength((int)(secs), (int)(secs * fps));
                         }
-
                     }
-
                     break;
                 }
                 case PICTURE_START:
