@@ -133,6 +133,8 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Reader
     
     int CreateNuppelFile(void);
 
+    void ProbeV4L2(void);
+    void DoV4L(void);
     void DoV4L2(void);
     void DoMJPEG(void);
 

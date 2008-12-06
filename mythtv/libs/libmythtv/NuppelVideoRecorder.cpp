@@ -960,12 +960,18 @@ bool NuppelVideoRecorder::Open(void)
         }
     }
 
+    channelfd = fd;
+    return true;
+}
+
+void NuppelVideoRecorder::ProbeV4L2(void)
+{
     usingv4l2 = true;
 
     struct v4l2_capability vcap;
     memset(&vcap, 0, sizeof(vcap));
 
-    if (ioctl(fd, VIDIOC_QUERYCAP, &vcap) < 0)
+    if (ioctl(channelfd, VIDIOC_QUERYCAP, &vcap) < 0)
     {
         usingv4l2 = false;
     }
@@ -982,36 +988,13 @@ bool NuppelVideoRecorder::Open(void)
         usingv4l2 = false;
     }
 
-    if (usingv4l2)
-    {
-        if (vcap.card[0] == 'B' && vcap.card[1] == 'T' &&
-            vcap.card[2] == '8' && vcap.card[4] == '8')
-            correct_bttv = true;
+    if (vcap.card[0] == 'B' && vcap.card[1] == 'T' &&
+        vcap.card[2] == '8' && vcap.card[4] == '8')
+        correct_bttv = true;
 
-        QString driver = (char *)vcap.driver;
-        channelfd = open(vdevice.constData(), O_RDWR);
-        if (channelfd < 0)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Can't open video device: %1").arg(videodevice));
-            perror("open video:");
-            KillChildren();
-            return false;
-        }
-
-        if (driver == "go7007")
-        {
-            go7007 = true;
-        }
- 
-        inpixfmt = FMT_NONE;
-        InitFilters();
-        DoV4L2();
-        return false;
-    }
-
-    channelfd = fd;
-    return true;
+    QString driver = (char *)vcap.driver;
+    if (driver == "go7007")
+        go7007 = true;
 }
 
 void NuppelVideoRecorder::StartRecording(void)
@@ -1075,6 +1058,21 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
+    ProbeV4L2();
+
+    if (usingv4l2)
+    {
+        inpixfmt = FMT_NONE;
+        InitFilters();
+        DoV4L2();
+        return;
+    }
+    else
+        DoV4L();
+}
+
+void NuppelVideoRecorder::DoV4L(void)
+{
     struct video_capability vc;
     struct video_mmap mm;
     struct video_mbuf vm;
@@ -1096,10 +1094,6 @@ void NuppelVideoRecorder::StartRecording(void)
         errored = true;
         return;
     }
-
-    if (vc.name[0] == 'B' && vc.name[1] == 'T' && vc.name[2] == '8' &&
-        vc.name[4] == '8')
-        correct_bttv = true;
 
     int channelinput = 0;
 
