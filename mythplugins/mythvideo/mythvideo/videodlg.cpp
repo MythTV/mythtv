@@ -354,7 +354,7 @@ namespace
 
             QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/imdb.pl -M tv=no;video=no"));
+                    .arg("mythvideo/scripts/tmdb.pl -M"));
 
             QString cmd = gContext->GetSetting("MovieListCommandLine", def_cmd);
 
@@ -413,7 +413,7 @@ namespace
 
             const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/imdb.pl -D"));
+                    .arg("mythvideo/scripts/tmdb.pl -D"));
             const QString cmd = gContext->GetSetting("MovieDataCommandLine",
                                                         def_cmd);
 
@@ -458,7 +458,7 @@ namespace
             const QString default_cmd =
                     QDir::cleanPath(QString("%1/%2")
                                         .arg(GetShareDir())
-                                        .arg("mythvideo/scripts/imdb.pl -P"));
+                                        .arg("mythvideo/scripts/tmdb.pl -P"));
             const QString cmd = gContext->GetSetting("MoviePosterCommandLine",
                                                         default_cmd);
             StartRun(cmd, QStringList(video_uid), "Poster Query");

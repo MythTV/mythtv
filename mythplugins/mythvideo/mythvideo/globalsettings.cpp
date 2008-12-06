@@ -199,8 +199,8 @@ HostLineEdit *SearchListingsCommand()
 {
     HostLineEdit *gc = new HostLineEdit("MovieListCommandLine");
     gc->setLabel(QObject::tr("Command to search for movie listings"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/imdb.pl " +
-                 "-M tv=no;video=no");
+    gc->setValue(GetShareDir() + "mythvideo/scripts/tmdb.pl " +
+                 "-M");
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     return gc;
@@ -210,7 +210,7 @@ HostLineEdit *GetPostersCommand()
 {
     HostLineEdit *gc = new HostLineEdit("MoviePosterCommandLine");
     gc->setLabel(QObject::tr("Command to search for movie posters"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/imdb.pl -P");
+    gc->setValue(GetShareDir() + "mythvideo/scripts/tmdb.pl -P");
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     return gc;
@@ -220,7 +220,7 @@ HostLineEdit *GetDataCommand()
 {
     HostLineEdit *gc = new HostLineEdit("MovieDataCommandLine");
     gc->setLabel(QObject::tr("Command to extract data for movies"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/imdb.pl -D");
+    gc->setValue(GetShareDir() + "mythvideo/scripts/tmdb.pl -D");
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     return gc;
