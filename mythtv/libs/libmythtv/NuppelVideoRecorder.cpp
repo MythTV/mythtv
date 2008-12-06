@@ -981,7 +981,7 @@ bool NuppelVideoRecorder::Open(void)
             correct_bttv = true;
 
         QString driver = (char *)vcap.driver;
-        channelfd = open(vdevice.constData(), O_RDWR);
+        channelfd = open(videodevice.ascii(), O_RDWR);
         if (channelfd < 0)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
