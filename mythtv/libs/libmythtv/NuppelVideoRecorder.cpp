@@ -989,28 +989,25 @@ bool NuppelVideoRecorder::Open(void)
             correct_bttv = true;
 
         QString driver = (char *)vcap.driver;
-        if (driver == "cx8800" || driver == "go7007" || driver == "em28xx")
+        channelfd = open(vdevice.constData(), O_RDWR);
+        if (channelfd < 0)
         {
-            channelfd = open(vdevice.constData(), O_RDWR);
-            if (channelfd < 0)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        QString("Can't open video device: %1").arg(videodevice));
-                perror("open video:");
-                KillChildren();
-                return false;
-            }
-
-            if (driver == "go7007")
-            {
-                go7007 = true;
-            }
-            
-            inpixfmt = FMT_NONE;
-            InitFilters();
-            DoV4L2();
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Can't open video device: %1").arg(videodevice));
+            perror("open video:");
+            KillChildren();
             return false;
         }
+
+        if (driver == "go7007")
+        {
+            go7007 = true;
+        }
+ 
+        inpixfmt = FMT_NONE;
+        InitFilters();
+        DoV4L2();
+        return false;
     }
 
     channelfd = fd;
