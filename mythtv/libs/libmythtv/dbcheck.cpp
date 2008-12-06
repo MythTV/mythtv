@@ -4316,135 +4316,38 @@ NULL
     {
         // Fix data corruption caused by a data conversion issue in the
         // original implementation of the 1215-1216 database upgrade
-        MSqlQuery peopleQuery(MSqlQuery::InitCon());
-        peopleQuery.prepare("SELECT person FROM people "
-                            " WHERE LENGTH(name) = 128;");
-        if (peopleQuery.exec() && peopleQuery.isActive() &&
-            peopleQuery.size() > 0)
-        {
-            MSqlQuery duplicateQuery(MSqlQuery::InitCon());
-            duplicateQuery.prepare("SELECT person "
-                                   "  FROM people "
-                                   " WHERE name = REPLACE( "
-                                   "               (SELECT name FROM people "
-                                   "                 WHERE person = :ID), "
-                                   "               '\\0', '');");
-            // Rather than build an updateQuery with the table name inserted in
-            // the QString used to build the SQL and reusing it for credits and
-            // recordedcredits, use 2 prepared queries since we'll be executing
-            // the updates thousands (or tens of thousands) of times each
-            MSqlQuery updateCreditsQuery(MSqlQuery::InitCon());
-            updateCreditsQuery.prepare("UPDATE credits "
-                                       "   SET person = :ID "
-                                       " WHERE person = :DUPLICATEID;");
-            MSqlQuery updateRecordedCreditsQuery(MSqlQuery::InitCon());
-            updateRecordedCreditsQuery.prepare("UPDATE recordedcredits "
-                                               "   SET person = :ID "
-                                               " WHERE person = :DUPLICATEID;");
-            MSqlQuery deleteQuery(MSqlQuery::InitCon());
-            deleteQuery.prepare("DELETE FROM people "
-                                " WHERE person = :ID;");
-            MSqlQuery updatePeopleQuery(MSqlQuery::InitCon());
-            updatePeopleQuery.prepare("UPDATE people "
-                                      "   SET name = REPLACE(name, '\\0', '') "
-                                      " WHERE person = :ID;");
-            VERBOSE(VB_IMPORTANT, "Fixing corrupt data in the people table. "
-                                  "This may take a while. Please do not stop "
-                                  "the program until it has finished.");
-            while (peopleQuery.next())
-            {
-                int person = peopleQuery.value(0).toInt();
-                duplicateQuery.bindValue(":ID", person);
-                if (duplicateQuery.exec() && duplicateQuery.isActive() &&
-                    duplicateQuery.size() > 0)
-                {
-                    // Duplicate record, replace references and remove dup
-                    while (duplicateQuery.next())
-                    {
-                        int duplicatePerson = duplicateQuery.value(0).toInt();
-                        bool success = true;
-                        updateCreditsQuery.bindValue(":ID", person);
-                        updateCreditsQuery.bindValue(":DUPLICATEID",
-                                                     duplicatePerson);
-                        if (!updateCreditsQuery.exec())
-                        {
-                            success = false;
-                            MythDB::DBError(QString("Updating references to "
-                                                    "duplicate person record "
-                                                    "in credits: %1 -> %2")
-                                                    .arg(duplicatePerson)
-                                                    .arg(person),
-                                            updateCreditsQuery);
-                        }
-                        updateRecordedCreditsQuery.bindValue(":ID", person);
-                        updateRecordedCreditsQuery.bindValue(":DUPLICATEID",
-                                                             duplicatePerson);
-                        if (!updateRecordedCreditsQuery.exec())
-                        {
-                            success = false;
-                            MythDB::DBError(QString("Updating references to "
-                                                    "duplicate person record "
-                                                    "in recordedcredits: "
-                                                    "%1 -> %2")
-                                                    .arg(duplicatePerson)
-                                                    .arg(person),
-                                            updateRecordedCreditsQuery);
-                        }
-                        if (success)
-                        {
-                            // We need to keep the original person and fix the
-                            // corrupt name since we may have more than one
-                            // duplicate in the wild (with varying numbers
-                            // of null-pad characters) if users have edited
-                            // the database directly
-                            deleteQuery.bindValue(":ID", duplicatePerson);
-                            if (!deleteQuery.exec())
-                            {
-                                MythDB::DBError(
-                                    QString("Deleting duplicate person "
-                                            "record: %1").arg(duplicatePerson),
-                                            deleteQuery);
-                            }
-                            // This cannot be done outside the duplicate-check
-                            // conditional, even though it's done in the if and
-                            // the else because it's only safe to do if success
-                            updatePeopleQuery.bindValue(":ID", person);
-                            if (!updatePeopleQuery.exec())
-                            {
-                                MythDB::DBError(
-                                    QString("Fixing corrupt people.name "
-                                            "for person: %1)").arg(person),
-                                    updatePeopleQuery);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // Not duplicated, corrupt record, fix name
-                    updatePeopleQuery.bindValue(":ID", person);
-                    if (!updatePeopleQuery.exec())
-                    {
-                        MythDB::DBError(QString("Fixing corrupt people.name "
-                                                "for person: %1)").arg(person),
-                                                updatePeopleQuery);
-                    }
-                }
-            }
-            VERBOSE(VB_IMPORTANT, "Finished fixing corrupt data in the people "
-                                  "table.");
-        }
-
         const char *updates[] = {
-"UPDATE programgenres SET genre = REPLACE(genre, '\\0', '');",
+"CREATE TABLE bad_people AS SELECT * FROM people;",
+"CREATE TABLE bad_credits AS SELECT * FROM credits;",
+"CREATE TABLE bad_recordedcredits AS SELECT * FROM recordedcredits;",
+"ALTER TABLE bad_people ADD INDEX (person);",
+"TRUNCATE TABLE people;",
+"TRUNCATE TABLE credits;",
+"TRUNCATE TABLE recordedcredits;",
+"UPDATE bad_people SET NAME = TRIM(TRAILING 0x00 FROM name);",
+"INSERT people ( name ) SELECT DISTINCT name FROM bad_people;",
+"INSERT credits "
+"    SELECT p.person, bc.chanid, bc.starttime, bc.role "
+"        FROM people p, bad_people bp, bad_credits bc "
+"        WHERE p.name = bp.name "
+"            AND bp.person = bc.person;",
+"INSERT recordedcredits "
+"    SELECT p.person, br.chanid, br.starttime, br.role "
+"        FROM people p, bad_people bp, bad_recordedcredits br "
+"        WHERE p.name = bp.name "
+"            AND bp.person = br.person;",
+"DROP TABLE bad_people;",
+"DROP TABLE bad_credits;",
+"DROP TABLE bad_recordedcredits;",
+"UPDATE programgenres SET genre = TRIM(TRAILING 0x00 FROM genre);",
 "REPLACE INTO programrating (chanid, starttime, system, rating) "
 "  SELECT chanid, starttime, "
-"         REPLACE(system, '\\0', ''), REPLACE(rating, '\\0', '') "
+"         TRIM(TRAILING 0x00 FROM system), TRIM(TRAILING 0x00 FROM rating) "
 "    FROM programrating;",
 "DELETE FROM programrating WHERE system LIKE '%\\0' OR rating LIKE '%\\0';",
 "REPLACE INTO recordedrating (chanid, starttime, system, rating) "
 "  SELECT chanid, starttime, "
-"         REPLACE(system, '\\0', ''), REPLACE(rating, '\\0', '') "
+"         TRIM(TRAILING 0x00 FROM system), TRIM(TRAILING 0x00 FROM rating) "
 "    FROM recordedrating;",
 "DELETE FROM recordedrating WHERE system LIKE '%\\0' OR rating LIKE '%\\0';",
 NULL
