@@ -97,16 +97,11 @@ bool MythControls::Create(void)
     if (!foundtheme)
         return false;
 
-    m_description = dynamic_cast<MythUIText *>
-                (GetChild("description"));
-    m_leftList = dynamic_cast<MythUIButtonList *>
-                (GetChild("leftlist"));
-    m_rightList = dynamic_cast<MythUIButtonList *>
-                (GetChild("rightlist"));
-    m_leftDescription = dynamic_cast<MythUIText *>
-                (GetChild("leftdesc"));
-    m_rightDescription = dynamic_cast<MythUIText *>
-                (GetChild("rightdesc"));
+    m_description = dynamic_cast<MythUIText *>(GetChild("description"));
+    m_leftList = dynamic_cast<MythUIButtonList *>(GetChild("leftlist"));
+    m_rightList = dynamic_cast<MythUIButtonList *>(GetChild("rightlist"));
+    m_leftDescription = dynamic_cast<MythUIText *>(GetChild("leftdesc"));
+    m_rightDescription = dynamic_cast<MythUIText *>(GetChild("rightdesc"));
 
     if (!m_description || !m_leftList || !m_rightList ||
             !m_leftDescription || !m_rightDescription)
@@ -116,16 +111,16 @@ bool MythControls::Create(void)
     }
 
     connect(m_leftList,  SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(LeftSelected(MythUIButtonListItem*)));
+            SLOT(LeftSelected(MythUIButtonListItem*)));
     connect(m_leftList,  SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(LeftPressed(MythUIButtonListItem*)));
+            SLOT(LeftPressed(MythUIButtonListItem*)));
 
     connect(m_rightList, SIGNAL(itemSelected(MythUIButtonListItem*)),
-            this, SLOT(RightSelected(MythUIButtonListItem*)));
+            SLOT(RightSelected(MythUIButtonListItem*)));
     connect(m_rightList,  SIGNAL(itemClicked(MythUIButtonListItem*)),
-            this, SLOT(RightPressed(MythUIButtonListItem*)));
+            SLOT(RightPressed(MythUIButtonListItem*)));
     connect(m_rightList, SIGNAL(TakingFocus()),
-            this, SLOT(RefreshKeyInformation()));
+            SLOT(RefreshKeyInformation()));
 
     for (uint i = 0; i < Action::kMaximumNumberOfBindings; i++)
     {
@@ -140,20 +135,13 @@ bool MythControls::Create(void)
             return false;
         }
 
-        connect(button, SIGNAL(Clicked()),
-                this, SLOT(ActionButtonPressed()));
+        connect(button, SIGNAL(Clicked()), SLOT(ActionButtonPressed()));
 
         m_actionButtons.append(button);
     }
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
-
-    SetFocusWidget(m_leftList);
-    m_leftList->SetCanTakeFocus();
-    m_leftList->SetActive(true);
-    m_rightList->SetCanTakeFocus();
-    m_rightList->SetActive(false);
 
     LoadData(gContext->GetHostName());
 
@@ -664,7 +652,7 @@ void MythControls::ResolveConflict(ActionID *conflict, int error_level,
     else
     {
         m_menuPopup->AddButton(tr("Cancel"));
-        m_menuPopup->AddButton(tr("Bind Key"), (void*)&key);
+        m_menuPopup->AddButton(tr("Bind Key"), qVariantFromValue(key));
     }
 
     delete conflict;
@@ -804,7 +792,7 @@ void MythControls::customEvent(QEvent *event)
         {
             if (buttonnum == 1)
             {
-                QString key = *(QString *)dce->GetResultData();
+                QString key = dce->GetData().toString();
                 AddKeyToAction(key, true);
             }
         }

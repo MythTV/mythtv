@@ -45,9 +45,6 @@
 
         <button name="action_0" from="basebutton">
             <position>275,544</position>
-            <regular-background filename="kb-button-off.png" />
-            <selected-background filename="kb-button-on.png" />
-            <inactive-background filename="kb-button-off.png" />
         </button>
 
         <button name="action_1" from="action_0">

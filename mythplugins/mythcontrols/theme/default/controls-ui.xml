@@ -23,7 +23,7 @@
 
     <window name="controls">
 
-        <textarea name="leftdesc">
+        <textarea name="leftdesc" from="basetextarea">
             <area>20,20,370,20</area>
             <value>Contexts</value>
             <align>center</align>
@@ -45,9 +45,6 @@
 
         <button name="action_0" from="basebutton">
             <position>40,450</position>
-            <regular-background filename="kb-button-off.png" />
-            <selected-background filename="kb-button-on.png" />
-            <inactive-background filename="kb-button-off.png" />
         </button>
 
         <button name="action_1" from="action_0">
