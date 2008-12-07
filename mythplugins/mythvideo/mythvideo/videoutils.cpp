@@ -162,7 +162,7 @@ QStringList GetVideoDirs()
 
 QString getDisplayYear(int year)
 {
-    return year == VIDEO_YEAR_DEFAULT ? "?" : QString::number(year);
+    return (year == VIDEO_YEAR_DEFAULT || year == 0) ? "" : QString::number(year);
 }
 
 QString getDisplayRating(const QString &rating)
