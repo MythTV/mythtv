@@ -12,7 +12,13 @@ template <typename T>
 inline void CheckedSet(T *ui_item, QString text)
 {
     if (ui_item)
-        ui_item->SetText(text);
+    {
+        if (!text.isEmpty())
+            ui_item->SetText(text);
+        else
+            ui_item->Reset();
+    }
+
 }
 
 template <>

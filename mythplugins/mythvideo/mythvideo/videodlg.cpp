@@ -742,7 +742,7 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
             m_scanner(0), m_menuPopup(0), m_busyPopup(0), m_videoButtonList(0),
             m_videoButtonTree(0), m_titleText(0), m_novideoText(0),
             m_positionText(0), m_crumbText(0), m_coverImage(0),
-            m_parentalLevelState(0), m_videoLevelState(0),
+            m_parentalLevelState(0), m_videoLevelState(0), m_userRatingState(0),
             m_videoList(video_list), m_rememberPosition(false)
 {
     m_private = new VideoDialogPrivate;
@@ -847,7 +847,7 @@ bool VideoDialog::Create()
 
     UIUtil::Assign(this, m_parentalLevelState, "parentallevel");
     UIUtil::Assign(this, m_videoLevelState, "videolevel");
-
+    UIUtil::Assign(this, m_userRatingState, "userratingstate");
     CheckedSet(m_novideoText, tr("No Videos Available"));
 
     CheckedSet(m_parentalLevelState, "None");
@@ -987,12 +987,17 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     QString imgFilename = GetCoverImage(node);
 
-    if (!imgFilename.isEmpty())
+    if (!imgFilename.isEmpty() && QFileInfo(imgFilename).exists())
         item->SetImage(imgFilename);
 
     int nodeInt = node->getInt();
     if (nodeInt == kSubFolder)
+    {
         item->setText(QString("%1").arg(node->childCount()-1), "childcount");
+        item->DisplayState("subfolder", "nodetype");
+    }
+    else if (nodeInt == kUpFolder)
+        item->DisplayState("upfolder", "nodetype");
 
     if (metadata)
     {
@@ -1010,8 +1015,10 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
         item->setText(QString::number(metadata->ChildID()), "child_id");
         item->setText(getDisplayBrowse(metadata->Browse()), "browseable");
         item->setText(metadata->Category(), "category");
-        // TODO Add StateType support to mythuibuttonlist, then switch
-        item->setText(QString::number(metadata->ShowLevel()), "videolevel");
+
+        item->DisplayState(QString::number(metadata->ShowLevel()), "videolevel");
+        item->DisplayState(QString::number((int)(metadata->UserRating() / 2)),
+                                "userratingstate");
     }
 
     if (item == GetItemCurrent())
@@ -1059,7 +1066,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 
     QString icon_file = "";
 
-    if (nodeInt  == kSubFolder)  // subdirectory
+    if (nodeInt  == kSubFolder || nodeInt == kUpFolder)  // subdirectory
     {
         // load folder icon
         int folder_id = node->getAttribute(kFolderPath);
@@ -1098,17 +1105,8 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                 icon_file = QString("%1/%2")
                                     .arg(folder_path)
                                     .arg(fList.at(0));
-
-                VERBOSE(VB_GENERAL,"Found Image : " << icon_file);
             }
         }
-
-        if (icon_file.isEmpty())
-            icon_file = "mv_gallery_dir.png";
-    }
-    else if (nodeInt == kUpFolder) // up-directory
-    {
-        icon_file = "mv_gallery_dir_up.png";
     }
     else
     {
@@ -1317,6 +1315,8 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
         CheckedSet(m_videoLevelState,
                 ParentalLevelToState(metadata->ShowLevel()));
         CheckedSet(this, "childcount", "");
+        CheckedSet(m_userRatingState,
+                    QString::number((int)(metadata->UserRating() / 2)));
     }
     else
     {

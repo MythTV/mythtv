@@ -154,6 +154,7 @@ class VideoDialog : public MythScreenType
 
     MythUIStateType  *m_parentalLevelState;
     MythUIStateType  *m_videoLevelState;
+    MythUIStateType  *m_userRatingState;
 
     VideoListPtr m_videoList;
 

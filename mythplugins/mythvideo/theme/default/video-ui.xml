@@ -241,7 +241,25 @@
                     <imagetype name="buttonimage">
                         <area>0,2,25,25</area>
                         <preserveaspect>yes</preserveaspect>
+                        <filename>mv_browse_nocover.png</filename>
                     </imagetype>
+                    <statetype name="nodetype">
+                        <position>0,9</position>
+                        <state name="subfolder">
+                            <imagetype name="icon">
+                                <area>0,0,25,25</area>
+                                <filename>mv_gallery_dir.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder">
+                            <imagetype name="icon">
+                                <area>0,0,25,25</area>
+                                <filename>mv_gallery_dir_up.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                    </statetype>
                     <textarea name="buttontext" from="basetextarea">
                         <area>30,4,250,30</area>
                         <font>basesmallgrey</font>
@@ -309,10 +327,27 @@
                         <preserveaspect>true</preserveaspect>
                         <filename>mv_browse_nocover.png</filename>
                     </imagetype>
+                    <statetype name="nodetype">
+                        <position>35,80</position>
+                        <state name="subfolder">
+                            <imagetype name="icon">
+                                <area>0,0,50,50</area>
+                                <filename>mv_gallery_dir.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder">
+                            <imagetype name="icon">
+                                <area>0,0,50,50</area>
+                                <filename>mv_gallery_dir_up.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                    </statetype>
                     <textarea name="childcount" from="basetextarea">
-                        <area>15,70,70,20</area>
+                        <area>37,97,40,20</area>
                         <font>basesmallblack</font>
-                        <align>hcenter</align>
+                        <align>right</align>
                     </textarea>
                 </state>
                 <state name="selected" from="active">
@@ -358,13 +393,13 @@
         </textarea>
 
         <textarea name="dirlbl" from="basetextarea">
-            <area>240,65,100,35</area>
+            <area>240,65,115,35</area>
             <value>Directed by</value>
             <align>right</align>
         </textarea>
 
         <textarea name="director" from="basetextarea">
-            <area>348,63,350,35</area>
+            <area>360,63,350,35</area>
             <font>basemedium</font>
         </textarea>
 
@@ -470,14 +505,32 @@
                     <imagetype name="buttonimage">
                         <area>10,8,130,90</area>
                         <preserveaspect>true</preserveaspect>
+                        <filename>mv_browse_nocover.png</filename>
                     </imagetype>
+                    <statetype name="nodetype">
+                        <position>80,55</position>
+                        <state name="subfolder">
+                            <imagetype name="icon">
+                                <area>0,0,50,50</area>
+                                <filename>mv_gallery_dir.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder">
+                            <imagetype name="icon">
+                                <area>0,0,50,50</area>
+                                <filename>mv_gallery_dir_up.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                    </statetype>
                     <textarea name="buttontext">
                         <area>5,98,140,25</area>
                         <font>menufont</font>
                         <align>hcenter,bottom</align>
                     </textarea>
                     <textarea name="childcount" from="basetextarea">
-                        <area>55,72,55,20</area>
+                        <area>65,72,55,20</area>
                         <font>basesmallblack</font>
                         <align>right</align>
                     </textarea>
