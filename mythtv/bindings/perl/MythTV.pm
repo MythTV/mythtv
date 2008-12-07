@@ -213,14 +213,14 @@ package MythTV;
             push @devices, $dev;
         }
         if (@devices < 1) {
-            die "No backends found.  Please copy $conf/config.xml from a "
-               ."working MythTV installation instead.\n";
+            die "No backends found.  Please copy config.xml from a "
+               ."working MythTV installation to $conf.\n";
         }
         my $upnp = $devices[0];
         if (@devices > 1) {
             die "Multiple devices found via UPnP.  This configuration not yet\n"
-               ."supported.  Please copy $conf/config.xml from a working "
-               ."MythTV installation instead.\n";
+               ."supported.  Please copy config.xml from a working "
+               ."MythTV installation to $conf.\n";
             #print $dev->getfriendlyname(), "\n";
         }
     # This should really point to a different UDN, but leaving this as-is won't
