@@ -1655,7 +1655,16 @@ void JobQueue::ProcessJob(int id, int jobType, QString chanid,
     runningJobDescs[key] = GetJobDescription(jobType);
     runningJobCommands[key] = GetJobCommand(id, jobType, pginfo);
 
-    if ((jobType == JOB_TRANSCODE) ||
+    if (pginfo->recgroup == "Deleted")
+    {
+        ChangeJobStatus(id, JOB_CANCELLED,
+                        "Program has been deleted");
+        runningJobTypes.remove(key);
+        runningJobIDs.remove(key);
+        runningJobDescs.remove(key);
+        runningJobCommands.remove(key);	
+    }
+    else if ((jobType == JOB_TRANSCODE) ||
         (runningJobCommands[key] == "mythtranscode"))
     {
         StartChildJob(TranscodeThread, pginfo);
