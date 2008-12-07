@@ -88,7 +88,7 @@ void MythImage::Resize(const QSize &newSize, bool preserveAspect)
         if (preserveAspect)
             mode = Qt::KeepAspectRatio;
 
-        Assign(scaled(newSize, mode));
+        Assign(scaled(newSize, mode, Qt::SmoothTransformation));
     }
 }
 
