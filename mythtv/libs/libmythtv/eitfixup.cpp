@@ -66,7 +66,7 @@ EITFixUp::EITFixUp()
       m_mcaCompleteTitlea("^'?("),
       m_mcaCompleteTitleb("[^\\.\\?]+[^\\'])'?[\\.\\?]\\s+(.+)"),
       m_mcaSubtitle("^'([^\\.]+)'\\.\\s+(.+)"),
-      m_mcaSeries("(^\\d+)\\/(\\d+)\\s-\\s(.*)$"),
+      m_mcaSeries("^S?(\\d+)\\/E?(\\d+)\\s-\\s(.*)$"),
       m_mcaCredits("(.*)\\s\\((\\d{4})\\)\\s*([^\\.]+)\\.?\\s*$"),
       m_mcaAvail("\\s(Only available on [^\\.]*bouquet|Not available in RSA [^\\.]*)\\.?"),
       m_mcaActors("(.*\\.)\\s+([^\\.]+\\s[A-Z][^\\.]+)\\.\\s*"),
@@ -1008,9 +1008,6 @@ void EITFixUp::FixMCA(DBEvent &event) const
         event.category_type = kCategoryMovie;
     }
 
-    //Add descriptive DD tag
-    if (dd)
-        event.description += " [Dolby 5.1]";
 }
 
 /** \fn EITFixUp::FixRTL(DBEvent&) const
