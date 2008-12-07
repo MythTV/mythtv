@@ -527,7 +527,7 @@
     </progressbar>
 
     <!-- Popup Dialogue Box -->
-    <window name="MythDialogBox">
+    <window name="MythPopupBox">
         <area>-1,-1,500,500</area>
         <imagetype name="backimg">
             <filename>mythdialogbox-background.png</filename>
@@ -541,6 +541,50 @@
 
         <buttonlist name="list" from="basebuttonlist">
             <area>12,225,470,250</area>
+            <drawfrombottom>yes</drawfrombottom>
+            <align>center</align>
+            <showarrow>no</showarrow>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <textarea name="buttontext">
+                        <area>0,0,100%,30</area>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="inactive">
+                    <textarea name="buttontext">
+                        <area>0,0,100%,30</area>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected">
+                    <textarea name="buttontext">
+                        <area>0,0,100%,30</area>
+                        <align>allcenter</align>
+                    </textarea>
+                </state>
+            </statetype>
+        </buttonlist>
+    </window>
+
+    <!-- Fullscreen Dialogue Box -->
+    <window name="MythDialogBox">
+
+        <textarea name="title" from="basetextarea">
+            <area>20,15,1260,50</area>
+            <font>baselarge</font>
+            <align>allcenter</align>
+        </textarea>
+
+        <textarea name="messagearea" from="basetextarea">
+            <area>100,100,1080,210</area>
+            <multiline>yes</multiline>
+            <font>basemedium</font>
+            <align>allcenter</align>
+        </textarea>
+
+        <buttonlist name="list" from="basebuttonlist">
+            <area>100,320,1080,350</area>
             <drawfrombottom>yes</drawfrombottom>
             <align>center</align>
             <showarrow>no</showarrow>

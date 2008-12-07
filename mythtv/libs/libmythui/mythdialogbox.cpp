@@ -8,29 +8,61 @@
 #include "mythfontproperties.h"
 
 MythDialogBox::MythDialogBox(const QString &text,
-                             MythScreenStack *parent, const char *name)
+                             MythScreenStack *parent, const char *name,
+                             bool fullscreen)
          : MythScreenType(parent, name, false)
 {
     m_id = "";
-    m_retScreen = NULL;
+    m_retObject = NULL;
+    m_titlearea = NULL;
+    m_title = "";
     m_text = text;
     m_textarea = NULL;
     m_buttonList = NULL;
 
+    m_fullscreen = fullscreen;
+    m_useSlots = false;
+}
+
+MythDialogBox::MythDialogBox(const QString &title, const QString &text,
+                             MythScreenStack *parent, const char *name,
+                             bool fullscreen)
+         : MythScreenType(parent, name, false)
+{
+    m_id = "";
+    m_retObject = NULL;
+    m_title = title;
+    m_titlearea = NULL;
+    m_text = text;
+    m_textarea = NULL;
+    m_buttonList = NULL;
+
+    m_fullscreen = fullscreen;
     m_useSlots = false;
 }
 
 bool MythDialogBox::Create(void)
 {
-    if (!CopyWindowFromBase("MythDialogBox", this))
+    QString windowName = (m_fullscreen ? "MythDialogBox" : "MythPopupBox");
+
+    if (!CopyWindowFromBase(windowName, this))
         return false;
 
-    m_textarea = dynamic_cast<MythUIText *>(GetChild("messagearea"));
-    m_buttonList = dynamic_cast<MythUIButtonList *>(GetChild("list"));
-
-    if (!m_textarea || !m_buttonList)
+    try
+    {
+        m_titlearea = GetMythUIText("title", true);
+        m_textarea = GetMythUIText("messagearea");
+        m_buttonList = GetMythUIButtonList("list");
+    }
+    catch (QString &error)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen '" + windowName + "'\n\t\t\t"
+                              "Error was: " + error);
         return false;
+    }
 
+    if (m_titlearea)
+        m_titlearea->SetText(m_title);
     m_textarea->SetText(m_text);
     m_buttonList->SetActive(true);
 
@@ -46,7 +78,7 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
     if (m_useSlots && slot)
     {
         const char *slot = (const char *)item->getData();
-        connect(this, SIGNAL(Selected()), m_retScreen, slot,
+        connect(this, SIGNAL(Selected()), m_retObject, slot,
                 Qt::QueuedConnection);
         emit Selected();
     }
@@ -55,10 +87,10 @@ void MythDialogBox::Select(MythUIButtonListItem* item)
     m_ScreenStack->PopScreen(false);
 }
 
-void MythDialogBox::SetReturnEvent(MythScreenType *retscreen,
+void MythDialogBox::SetReturnEvent(QObject *retobject,
                                const QString &resultid)
 {
-    m_retScreen = retscreen;
+    m_retObject = retobject;
     m_id = resultid;
 }
 
@@ -115,11 +147,11 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
 
 void MythDialogBox::SendEvent(int res, QString text, QVariant data)
 {
-    if (!m_retScreen)
+    if (!m_retObject)
         return;
 
     DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, res, text, data);
-    QApplication::postEvent(m_retScreen, dce);
+    QApplication::postEvent(m_retObject, dce);
 }
 
 /////////////////////////////////////////////////////////////////
@@ -133,7 +165,7 @@ MythConfirmationDialog::MythConfirmationDialog(MythScreenStack *parent,
     m_showCancel = showCancel;
 
     m_id = "";
-    m_retScreen = NULL;
+    m_retObject = NULL;
 }
 
 bool MythConfirmationDialog::Create(void)
@@ -141,13 +173,22 @@ bool MythConfirmationDialog::Create(void)
     if (!CopyWindowFromBase("MythConfirmationDialog", this))
         return false;
 
-    MythUIText *messageText = dynamic_cast<MythUIText *>(GetChild("message"));
-    MythUIButton *okButton = dynamic_cast<MythUIButton *>(GetChild("ok"));
-    MythUIButton *cancelButton = dynamic_cast<MythUIButton *>
-                                                        (GetChild("cancel"));
+    MythUIText *messageText = NULL;
+    MythUIButton *okButton = NULL;
+    MythUIButton *cancelButton = NULL;
 
-    if (!messageText || !okButton || !cancelButton)
+    try
+    {
+        messageText = GetMythUIText("message");
+        okButton = GetMythUIButton("ok");
+        cancelButton = GetMythUIButton("cancel");
+    }
+    catch (QString &error)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythConfirmationDialog'\n\t\t\t"
+                              "Error was: " + error);
         return false;
+    }
 
     if (m_showCancel)
     {
@@ -197,10 +238,10 @@ bool MythConfirmationDialog::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void MythConfirmationDialog::SetReturnEvent(MythScreenType *retscreen,
+void MythConfirmationDialog::SetReturnEvent(QObject *retobject,
                                             const QString &resultid)
 {
-    m_retScreen = retscreen;
+    m_retObject = retobject;
     m_id = resultid;
 }
 
@@ -218,7 +259,7 @@ void MythConfirmationDialog::sendResult(bool ok)
 {
     emit haveResult(ok);
 
-    if (m_retScreen)
+    if (m_retObject)
     {
         int res = 0;
         if (ok)
@@ -226,7 +267,7 @@ void MythConfirmationDialog::sendResult(bool ok)
 
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, res, "",
                                                                m_resultData);
-        QApplication::postEvent(m_retScreen, dce);
+        QApplication::postEvent(m_retObject, dce);
     }
 
     Close();
@@ -288,7 +329,7 @@ MythTextInputDialog::MythTextInputDialog(MythScreenStack *parent,
     m_textEdit = NULL;
 
     m_id = "";
-    m_retScreen = NULL;
+    m_retObject = NULL;
 }
 
 bool MythTextInputDialog::Create(void)
@@ -296,16 +337,23 @@ bool MythTextInputDialog::Create(void)
     if (!CopyWindowFromBase("MythTextInputDialog", this))
         return false;
 
-    m_textEdit = dynamic_cast<MythUITextEdit *> (GetChild("input"));
-    MythUIText *messageText = dynamic_cast<MythUIText *>
-                                            (GetChild("message"));
-    MythUIButton *okButton = dynamic_cast<MythUIButton *>
-                                         (GetChild("ok"));
-    MythUIButton *cancelButton = dynamic_cast<MythUIButton *>
-                                         (GetChild("cancel"));
+    MythUIText *messageText = NULL;
+    MythUIButton *okButton = NULL;
+    MythUIButton *cancelButton = NULL;
 
-    if (!m_textEdit || !messageText || !okButton)
+    try
+    {
+        m_textEdit = GetMythUITextEdit("input");
+        messageText = GetMythUIText("message");
+        okButton = GetMythUIButton("ok");
+        cancelButton = GetMythUIButton("cancel", true);
+    }
+    catch (QString &error)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythTextInputDialog'\n\t\t\t"
+                              "Error was: " + error);
         return false;
+    }
 
     if (cancelButton)
         connect(cancelButton, SIGNAL(Clicked()), SLOT(Close()));
@@ -323,10 +371,10 @@ bool MythTextInputDialog::Create(void)
     return true;
 }
 
-void MythTextInputDialog::SetReturnEvent(MythScreenType *retscreen,
+void MythTextInputDialog::SetReturnEvent(QObject *retobject,
                                          const QString &resultid)
 {
-    m_retScreen = retscreen;
+    m_retObject = retobject;
     m_id = resultid;
 }
 
@@ -335,11 +383,11 @@ void MythTextInputDialog::sendResult()
     QString inputString = m_textEdit->GetText();
     emit haveResult(inputString);
 
-    if (m_retScreen)
+    if (m_retObject)
     {
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
                                                             inputString, "");
-        QApplication::postEvent(m_retScreen, dce);
+        QApplication::postEvent(m_retObject, dce);
     }
 
     Close();
@@ -380,7 +428,7 @@ MythUISearchDialog::MythUISearchDialog(MythScreenStack *parent,
     m_itemList = NULL;
 
     m_id = "";
-    m_retScreen = NULL;
+    m_retObject = NULL;
 }
 
 bool MythUISearchDialog::Create(void)
@@ -388,19 +436,22 @@ bool MythUISearchDialog::Create(void)
     if (!CopyWindowFromBase("MythSearchDialog", this))
         return false;
 
-    m_textEdit = dynamic_cast<MythUITextEdit *> (GetChild("input"));
+    MythUIButton *okButton = NULL;
+    MythUIButton *cancelButton = NULL;
 
-    m_titleText = dynamic_cast<MythUIText *>(GetChild("title"));
-    m_matchesText = dynamic_cast<MythUIText *>(GetChild("matches"));
-
-    m_itemList =  dynamic_cast<MythUIButtonList *>(GetChild("itemlist"));
-
-    MythUIButton *okButton = dynamic_cast<MythUIButton *>(GetChild("ok"));
-    MythUIButton *cancelButton = dynamic_cast<MythUIButton *>(GetChild("cancel"));
-
-    if (!m_textEdit || !m_titleText || !okButton || !m_itemList)
+    try
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        m_textEdit = GetMythUITextEdit("input");
+        m_titleText = GetMythUIText("title");
+        m_matchesText = GetMythUIText("matches", true);
+        m_itemList = GetMythUIButtonList("itemlist");
+        okButton = GetMythUIButton("ok");
+        cancelButton = GetMythUIButton("cancel", true);
+    }
+    catch (QString &error)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythSearchDialog'\n\t\t\t"
+                              "Error was: " + error);
         return false;
     }
 
@@ -430,10 +481,10 @@ bool MythUISearchDialog::Create(void)
     return true;
 }
 
-void MythUISearchDialog::SetReturnEvent(MythScreenType *retscreen,
-                                         const QString &resultid)
+void MythUISearchDialog::SetReturnEvent(QObject *retobject,
+                                        const QString &resultid)
 {
-    m_retScreen = retscreen;
+    m_retObject = retobject;
     m_id = resultid;
 }
 
@@ -446,11 +497,11 @@ void MythUISearchDialog::slotSendResult()
 
     emit haveResult(result);
 
-    if (m_retScreen)
+    if (m_retObject)
     {
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
                                                             result, "");
-        QApplication::postEvent(m_retScreen, dce);
+        QApplication::postEvent(m_retObject, dce);
     }
 
     Close();

@@ -56,11 +56,15 @@ class MPUBLIC MythDialogBox : public MythScreenType
     Q_OBJECT
   public:
     MythDialogBox(const QString &text,
-                  MythScreenStack *parent, const char *name);
+                  MythScreenStack *parent, const char *name,
+                  bool fullscreen = false);
+    MythDialogBox(const QString &title, const QString &text,
+                  MythScreenStack *parent, const char *name,
+                  bool fullscreen = false);
 
     virtual bool Create(void);
 
-    void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
+    void SetReturnEvent(QObject *retobject, const QString &resultid);
 
     void AddButton(const QString &title, QVariant data = 0);
     void AddButton(const QString &title, const char *slot);
@@ -76,12 +80,15 @@ class MPUBLIC MythDialogBox : public MythScreenType
   protected:
     void SendEvent(int res, QString text = "", QVariant data = 0);
 
-    MythUIText     *m_textarea;
+    MythUIText       *m_titlearea;
+    MythUIText       *m_textarea;
     MythUIButtonList *m_buttonList;
-    MythScreenType *m_retScreen;
+    QObject          *m_retObject;
     QString m_id;
     bool m_useSlots;
 
+    bool    m_fullscreen;
+    QString m_title;
     QString m_text;
 };
 
@@ -102,7 +109,7 @@ class MPUBLIC MythConfirmationDialog : public MythScreenType
                            bool showCancel = true);
 
     bool Create(void);
-    void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
+    void SetReturnEvent(QObject *retobject, const QString &resultid);
     void SetData(QVariant data) { m_resultData = data; }
 
     bool keyPressEvent(QKeyEvent *event);
@@ -114,7 +121,7 @@ class MPUBLIC MythConfirmationDialog : public MythScreenType
     void sendResult(bool);
     QString m_message;
     bool m_showCancel;
-    MythScreenType *m_retScreen;
+    QObject *m_retObject;
     QString m_id;
     QVariant m_resultData;
 
@@ -142,7 +149,7 @@ class MPUBLIC MythTextInputDialog : public MythScreenType
                         const QString &defaultValue = "");
 
     bool Create(void);
-    void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
+    void SetReturnEvent(QObject *retobject, const QString &resultid);
 
   signals:
      void haveResult(QString);
@@ -153,7 +160,7 @@ class MPUBLIC MythTextInputDialog : public MythScreenType
     QString m_defaultValue;
     InputFilter m_filter;
     bool m_isPassword;
-    MythScreenType *m_retScreen;
+    QObject *m_retObject;
     QString m_id;
 
   private slots:
@@ -187,7 +194,7 @@ class MPUBLIC MythUISearchDialog : public MythScreenType
                      const QString &defaultValue = "");
 
     bool Create(void);
-    void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
+    void SetReturnEvent(QObject *retobject, const QString &resultid);
 
   signals:
      void haveResult(QString);
@@ -203,7 +210,7 @@ class MPUBLIC MythUISearchDialog : public MythScreenType
     QStringList       m_list;
     bool              m_matchAnywhere;
 
-    MythScreenType   *m_retScreen;
+    QObject          *m_retObject;
     QString           m_id;
 
   private slots:
