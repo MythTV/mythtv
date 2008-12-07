@@ -29,18 +29,12 @@ class SelectDestination : public MythScreenType
     bool Create(void);
     bool keyPressEvent(QKeyEvent *);
 
-    void setSaveFilename(QString filename) {m_saveFilename = filename;}
-    void createConfigFile(const QString &filename);
-
   public slots:
 
     void handleNextPage(void);
     void handlePrevPage(void);
     void handleCancel(void);
 
-    void toggleCreateISO(bool state) { m_bCreateISO = state; };
-    void toggleDoBurn(bool state) { m_bDoBurn = state; };
-    void toggleEraseDvdRw(bool state) { m_bEraseDvdRw = state; };
     void handleFind(void);
     void filenameEditLostFocus(void);
     void setDestination(MythUIButtonListItem *item);
@@ -54,12 +48,6 @@ class SelectDestination : public MythScreenType
 
     ArchiveDestination m_archiveDestination;
     int                m_freeSpace;
-
-    bool               m_bCreateISO;
-    bool               m_bDoBurn;
-    bool               m_bEraseDvdRw;
-
-    QString            m_saveFilename;
 
     MythUIButton      *m_nextButton;
     MythUIButton      *m_prevButton;

@@ -7,14 +7,14 @@
 #include <sys/wait.h>  // for WIFEXITED and WEXITSTATUS
 
 // qt
-#include <qdir.h>
-#include <qapplication.h>
+#include <QDir>
+#include <QDomDocument>
+#include <QApplication>
 #include <QKeyEvent>
 #include <QTextStream>
 
 // myth
 #include <mythtv/mythcontext.h>
-#include <mythtv/mythwidgets.h>
 #include <mythtv/libmythdb/mythdb.h>
 #include <mythtv/mythdirs.h>
 #include <libmythui/mythprogressdialog.h>
@@ -608,6 +608,7 @@ void MythBurn::loadConfiguration(void)
     m_bCreateISO = (gContext->GetSetting("MythBurnCreateISO", "0") == "1");
     m_bDoBurn = (gContext->GetSetting("MythBurnBurnDVDr", "1") == "1");
     m_bEraseDvdRw = (gContext->GetSetting("MythBurnEraseDvdRw", "0") == "1");
+    m_saveFilename = gContext->GetSetting("MythBurnSaveFilename", "");
 
     while (!m_archiveList.isEmpty())
          delete m_archiveList.takeFirst();
@@ -913,8 +914,7 @@ void MythBurn::handleAddVideo()
     }
     else
     {
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("Video Selector"),
-                                  QObject::tr("You don't have any videos!"));
+        ShowOkPopup(QObject::tr("You don't have any videos!"));
         return;
     }
 
@@ -1029,6 +1029,101 @@ void ProfileDialog::save(void)
     emit haveResult(m_profile_list->GetCurrentPos());
 
     Close();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+BurnMenu::BurnMenu(void)
+        :QObject(NULL)
+{
+    setObjectName("BurnMenu");
+}
+
+BurnMenu::~BurnMenu(void)
+{
+}
+
+void BurnMenu::start(void)
+{
+    if (!gContext->GetSetting("MythArchiveLastRunStatus").startsWith("Success"))
+    {
+        showWarningDialog(QObject::tr("Cannot burn a DVD.\nThe last run failed to create a DVD."));
+        return;
+    }
+
+    // ask the user what type of disk to burn to
+    MythScreenStack *mainStack = GetMythMainWindow()->GetStack("main stack");
+    QString title = "Burn DVD";
+    QString msg = QObject::tr("\nPlace a blank DVD in the drive and select an option below.");
+    MythDialogBox *menuPopup = new MythDialogBox(title, msg, mainStack, "actionmenu", true);
+
+    if (menuPopup->Create())
+        mainStack->AddScreen(menuPopup);
+
+    menuPopup->SetReturnEvent(this, "action");
+
+    menuPopup->AddButton(QObject::tr("Burn DVD"));
+    menuPopup->AddButton(QObject::tr("Burn DVD Rewritable"));
+    menuPopup->AddButton(QObject::tr("Burn DVD Rewritable (Force Erase)"));
+    menuPopup->AddButton(QObject::tr("Cancel"));
+}
+
+void BurnMenu::customEvent(QEvent *event)
+{
+    if (event->type() == kMythDialogBoxCompletionEventType)
+    {
+        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
+
+        QString resultid= dce->GetId();
+        int buttonnum  = dce->GetResult();
+
+        if (resultid == "action")
+        {
+            doBurn(buttonnum);
+            deleteLater();
+        }
+    }
+}
+
+void BurnMenu::doBurn(int mode)
+{
+    if ((mode < 0) || (mode > 2))
+        return;
+
+    QString tempDir = getTempDirectory(true);
+
+    if (tempDir == "")
+        return;
+
+    QString logDir = tempDir + "logs";
+    QString configDir = tempDir + "config";
+    QString commandline;
+
+    // remove existing progress.log if present
+    if (QFile::exists(logDir + "/progress.log"))
+        QFile::remove(logDir + "/progress.log");
+
+    // remove cancel flag file if present
+    if (QFile::exists(logDir + "/mythburncancel.lck"))
+        QFile::remove(logDir + "/mythburncancel.lck");
+
+    QString sArchiveFormat = QString::number(mode);
+    QString sEraseDVDRW = (mode == 2) ? "1" : "0";
+    QString sNativeFormat = (gContext->GetSetting("MythArchiveLastRunType").startsWith("Native") ? "1" : "0");
+
+    commandline = "mytharchivehelper -b " + sArchiveFormat + " " + sEraseDVDRW  + " " + sNativeFormat;
+    commandline += " > "  + logDir + "/progress.log 2>&1 &";
+    int state = system(qPrintable(commandline));
+
+    if (state != 0)
+    {
+        showWarningDialog(QObject::tr("It was not possible to run mytharchivehelper to burn the DVD."));
+        return;
+    }
+
+    // now show the log viewer
+    showLogViewer();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

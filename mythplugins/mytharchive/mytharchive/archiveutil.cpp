@@ -14,9 +14,10 @@
 #include <qdom.h>
 
 // myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/libmythtv/programinfo.h>
-#include <mythtv/dialogbox.h>
+#include <mythcontext.h>
+#include <libmythtv/programinfo.h>
+#include <libmythui/mythmainwindow.h>
+#include <libmythui/mythdialogbox.h>
 
 // mytharchive
 #include "archiveutil.h"
@@ -59,10 +60,8 @@ QString getTempDirectory(bool showError)
     QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
 
     if (tempDir == "" && showError)
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
-                                  QObject::tr("Myth Archive"),
-                                  QObject::tr("Cannot find the MythArchive work directory.\n"
-                                          "Have you set the correct path in the settings?"));
+        ShowOkPopup(QObject::tr("Cannot find the MythArchive work directory.\n"
+                                "Have you set the correct path in the settings?"));
 
     if (tempDir == "")
         return "";
@@ -257,10 +256,14 @@ bool getFileDetails(ArchiveItem *a)
 
 void showWarningDialog(const QString msg)
 {
-    DialogBox *dialog = new DialogBox(gContext->GetMainWindow(), msg);
+    MythScreenStack *mainStack = GetMythMainWindow()->GetStack("main stack");
+    QString title = "MythArchive Warning";
+    MythDialogBox *dialog = new MythDialogBox(title, msg, mainStack, "warningdlg", true);
+
+    if (dialog->Create())
+        mainStack->AddScreen(dialog);
+
     dialog->AddButton(QObject::tr("OK"));
-    dialog->exec();
-    dialog->deleteLater();
 }
 
 void recalcItemSize(ArchiveItem *item)

@@ -30,10 +30,6 @@ SelectDestination::SelectDestination(MythScreenStack *parent, bool nativeMode, Q
                   : MythScreenType(parent, name)
 {
     m_nativeMode = nativeMode;
-    m_bCreateISO = false;
-    m_bDoBurn = false;
-    m_bEraseDvdRw = false;
-    m_saveFilename = "";
 }
 
 SelectDestination::~SelectDestination(void)
@@ -170,34 +166,63 @@ void SelectDestination::handleCancel()
 
 void SelectDestination::loadConfiguration(void)
 {
-    m_bCreateISO = (gContext->GetSetting("MythNativeCreateISO", "0") == "1");
-    m_createISOCheck->SetCheckState((m_bCreateISO ? MythUIStateType::Full : MythUIStateType::Off));
+    bool bCreateISO = false;
+    bool bDoBurn = false;
+    bool bEraseDvdRw = false;
+    QString saveFilename = "";
+    int destinationType = 0;
 
-    m_bDoBurn = (gContext->GetSetting("MythNativeBurnDVDr", "1") == "1");
-    m_doBurnCheck->SetCheckState((m_bDoBurn ? MythUIStateType::Full : MythUIStateType::Off));
+    if (m_nativeMode)
+    {
+        bCreateISO = (gContext->GetSetting("MythNativeCreateISO", "0") == "1");
+        bDoBurn = (gContext->GetSetting("MythNativeBurnDVDr", "1") == "1");
+        bEraseDvdRw = (gContext->GetSetting("MythNativeEraseDvdRw", "0") == "1");
+        saveFilename = gContext->GetSetting("MythNativeSaveFilename", "");
+        destinationType = gContext->GetNumSetting("MythNativeDestinationType", 0);
+    }
+    else
+    {
+        bCreateISO = (gContext->GetSetting("MythBurnCreateISO", "0") == "1");
+        bDoBurn = (gContext->GetSetting("MythBurnBurnDVDr", "1") == "1");
+        bEraseDvdRw = (gContext->GetSetting("MythBurnEraseDvdRw", "0") == "1");
+        saveFilename = gContext->GetSetting("MythBurnSaveFilename", "");
+        destinationType = gContext->GetNumSetting("MythBurnDestinationType", 0);
+    }
 
-    m_bEraseDvdRw = (gContext->GetSetting("MythNativeEraseDvdRw", "0") == "1");
-    m_eraseDvdRwCheck->SetCheckState((m_bEraseDvdRw ? MythUIStateType::Full : MythUIStateType::Off));
+    m_createISOCheck->SetCheckState((bCreateISO ? MythUIStateType::Full : MythUIStateType::Off));
+    m_doBurnCheck->SetCheckState((bDoBurn ? MythUIStateType::Full : MythUIStateType::Off));
+    m_eraseDvdRwCheck->SetCheckState((bEraseDvdRw ? MythUIStateType::Full : MythUIStateType::Off));
+    m_filenameEdit->SetText(saveFilename);
 
-    m_saveFilename = gContext->GetSetting("MythNativeSaveFilename", "");
-    m_filenameEdit->SetText(m_saveFilename);
-
-    int pos = gContext->GetNumSetting("MythNativeDestinationType", 0);
-    if (pos < 0 || pos >= m_destinationSelector->GetCount())
-        pos = 0;
-    m_destinationSelector->SetItemCurrent(pos);
+    if (destinationType < 0 || destinationType >= m_destinationSelector->GetCount())
+        destinationType = 0;
+    m_destinationSelector->SetItemCurrent(destinationType);
 }
 
 void SelectDestination::saveConfiguration(void)
 {
-    gContext->SaveSetting("MythNativeCreateISO",
+    if (m_nativeMode)
+    {
+        gContext->SaveSetting("MythNativeCreateISO",
             (m_createISOCheck->GetCheckState() == MythUIStateType::Full ? "1" : "0"));
-    gContext->SaveSetting("MythNativeBurnDVDr",
+        gContext->SaveSetting("MythNativeBurnDVDr",
             (m_doBurnCheck->GetCheckState() == MythUIStateType::Full ? "1" : "0"));
-    gContext->SaveSetting("MythNativeEraseDvdRw",
+        gContext->SaveSetting("MythNativeEraseDvdRw",
             (m_eraseDvdRwCheck->GetCheckState() == MythUIStateType::Full ? "1" : "0"));
-    gContext->SaveSetting("MythNativeSaveFilename", m_saveFilename);
-    gContext->SaveSetting("MythNativeDestinationType", m_destinationSelector->GetCurrentPos());
+        gContext->SaveSetting("MythNativeSaveFilename", m_filenameEdit->GetText());
+        gContext->SaveSetting("MythNativeDestinationType", m_destinationSelector->GetCurrentPos());
+    }
+    else
+    {
+        gContext->SaveSetting("MythBurnCreateISO",
+            (m_createISOCheck->GetCheckState() == MythUIStateType::Full ? "1" : "0"));
+        gContext->SaveSetting("MythBurnBurnDVDr",
+            (m_doBurnCheck->GetCheckState() == MythUIStateType::Full ? "1" : "0"));
+        gContext->SaveSetting("MythBurnEraseDvdRw",
+            (m_eraseDvdRwCheck->GetCheckState() == MythUIStateType::Full ? "1" : "0"));
+        gContext->SaveSetting("MythBurnSaveFilename", m_filenameEdit->GetText());
+        gContext->SaveSetting("MythBurnDestinationType", m_destinationSelector->GetCurrentPos());
+    }
 }
 
 void SelectDestination::setDestination(MythUIButtonListItem* item)
@@ -267,7 +292,7 @@ void SelectDestination::handleFind(void)
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
     FileSelector *selector = new
-            FileSelector(mainStack, NULL, FSTYPE_DIRECTORY, m_saveFilename, "*.*");
+            FileSelector(mainStack, NULL, FSTYPE_DIRECTORY, m_filenameEdit->GetText(), "*.*");
 
     connect(selector, SIGNAL(haveResult(QString)),
             this, SLOT(fileFinderClosed(QString)));
@@ -289,8 +314,6 @@ void SelectDestination::filenameEditLostFocus()
 {
     long long dummy;
     m_archiveDestination.freeSpace = getDiskSpace(m_filenameEdit->GetText(), dummy, dummy);
-
-    m_saveFilename = m_filenameEdit->GetText();
 
     // if we don't get a valid freespace value it probably means the file doesn't
     // exist yet so try looking up the freespace for the parent directory 

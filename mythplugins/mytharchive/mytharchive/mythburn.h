@@ -124,6 +124,23 @@ class MythBurn : public MythScreenType
     MythUIText        *m_currentsizeText;
 };
 
+///////////////////////////////////////////////////////////////////////////////
+
+class BurnMenu : public QObject
+{
+    Q_OBJECT
+
+  public:
+    BurnMenu(void);
+    ~BurnMenu(void);
+
+    void start(void);
+
+  private:
+    void customEvent(QEvent *event);
+    void doBurn(int mode);
+};
+
 #endif
 
 
