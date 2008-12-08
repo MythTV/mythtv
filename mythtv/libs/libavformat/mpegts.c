@@ -62,6 +62,7 @@ typedef struct
     int anc_page;
     int sub_id;
     int txt_type;
+    int vbi_data;
     /* DSMCC data */
     int data_id;
     int carousel_id;
@@ -658,6 +659,9 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
         if (dvbci.txt_type && (stream_type == STREAM_TYPE_PRIVATE_DATA))
             stream_type = STREAM_TYPE_VBI_DVB;
 
+        if (dvbci.vbi_data && (stream_type == STREAM_TYPE_PRIVATE_DATA))
+            stream_type = STREAM_TYPE_VBI_DVB;
+
         if ((dvbci.component_tag >= 0) && (stream_type == STREAM_TYPE_PRIVATE_DATA))
         {
             /* Audio and video are sometimes encoded in private streams labelled with a component tag. */
@@ -950,12 +954,15 @@ static int mpegts_parse_desc(dvb_caption_info_t *dvbci,
             case DVB_DATA_STREAM:
                 dvbci->component_tag = get8(p, desc_end);
                 break;
-            case DVB_VBI_DESCID:
+            case DVB_TELETEXT_ID:
+            case DVB_VBI_TELETEXT_ID:
                 dvbci->language[0] = get8(p, desc_end);
                 dvbci->language[1] = get8(p, desc_end);
                 dvbci->language[2] = get8(p, desc_end);
                 dvbci->txt_type = (get8(p, desc_end)) >> 3;
                 break;
+            case DVB_VBI_DATA_ID:
+                dvbci->vbi_data = 1; //not parsing the data service descriptors
             default:
                 break;
         }

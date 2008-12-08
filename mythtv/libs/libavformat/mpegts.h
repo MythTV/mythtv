@@ -41,7 +41,9 @@
 
 /* descriptor ids */
 #define DVB_CAROUSEL_ID             0x13
-#define DVB_VBI_DESCID              0x56
+#define DVB_VBI_DATA_ID             0x45
+#define DVB_VBI_TELETEXT_ID         0x46
+#define DVB_TELETEXT_ID             0x56
 #define DVB_SUBT_DESCID             0x59
 #define DVB_BROADCAST_ID            0x66
 #define DVB_DATA_STREAM             0x52
