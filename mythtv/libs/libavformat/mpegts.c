@@ -866,7 +866,7 @@ static int is_desired_stream(int stream_type)
         case STREAM_TYPE_AUDIO_AAC:
         case STREAM_TYPE_AUDIO_AC3:
         case STREAM_TYPE_AUDIO_DTS:
-        case STREAM_TYPE_PRIVATE_DATA:
+            //case STREAM_TYPE_PRIVATE_DATA:
         case STREAM_TYPE_VBI_DVB:
         case STREAM_TYPE_SUBTITLE_DVB:
         case STREAM_TYPE_DSMCC_B:
