@@ -274,6 +274,8 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
     bool cid_changed = (myth_codec_id != av_codec_id);
     bool res_changed = input_size != video_disp_dim;
     bool asp_changed = aspect != video_aspect;
+    bool gpu_deint   = (VideoOutputSubType() == OpenGL ||
+                        VideoOutputSubType() == XVideoVDPAU);
 
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
 
@@ -324,6 +326,15 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
         VERBOSE(VB_IMPORTANT, LOC_ERR + "InputChanged(): "
                 "Failed to recreate buffers");
         errored = true;
+    }
+    else
+    {
+        if ((VideoOutputSubType() == OpenGL ||
+             VideoOutputSubType() == XVideoVDPAU) ||
+             gpu_deint)
+        {
+            BestDeint();
+        }
     }
 
     return ok;
@@ -1030,23 +1041,6 @@ bool VideoOutputXv::InitOpenGL(void)
         {
             video_output_subtype = OpenGL;
             allowpreviewepg = false;
-
-            // ensure deinterlacing is re-enabled after input change
-            bool temp_deinterlacing = m_deinterlacing;
-
-            if (!m_deintfiltername.isEmpty() &&
-                !m_deintfiltername.contains("opengl"))
-            {
-                QMutexLocker locker(&gl_context_lock);
-                gl_videochain->SetSoftwareDeinterlacer(m_deintfiltername);
-            }
-
-            SetDeinterlacingEnabled(true);
-
-            if (!temp_deinterlacing)
-            {
-                SetDeinterlacingEnabled(false);
-            }
         }
     }
 
