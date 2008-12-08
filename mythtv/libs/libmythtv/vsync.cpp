@@ -123,7 +123,8 @@ VideoSync::VideoSync(VideoOutput *video_output,
 {
     bzero(&m_nexttrigger, sizeof(m_nexttrigger));
 
-    if (m_interlaced && m_refresh_interval > m_frame_interval/2)
+    int tolerance = m_refresh_interval / 200;
+    if (m_interlaced && m_refresh_interval > ((m_frame_interval/2) + tolerance))
         m_interlaced = false; // can't display both fields at 2x rate
 
     //cout << "Frame interval: " << m_frame_interval << endl;
@@ -141,7 +142,8 @@ void VideoSync::SetFrameInterval(int fr, bool intr)
 {
     m_frame_interval = fr;
     m_interlaced = intr;
-    if (m_interlaced && m_refresh_interval > m_frame_interval/2)
+    int tolerance = m_refresh_interval / 200;
+    if (m_interlaced && m_refresh_interval > ((m_frame_interval/2) + tolerance))
         m_interlaced = false; // can't display both fields at 2x rate
 
     VERBOSE(VB_PLAYBACK, QString("Set video sync frame interval to %1")
