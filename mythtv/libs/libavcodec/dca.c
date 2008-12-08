@@ -1163,9 +1163,8 @@ static int dca_decode_frame(AVCodecContext * avctx,
 
     channels = s->prim_channels + !!s->lfe;
     if(avctx->request_channels == 2 && s->prim_channels > 2) {
-        avctx->channels = channels;
-        if (avctx->channels > avctx->request_channels)
-            s->output = DCA_STEREO;
+        channels = 2;
+        s->output = DCA_STEREO;
     }
 
     /* There is nothing that prevents a dts frame to change channel configuration
@@ -1184,7 +1183,7 @@ static int dca_decode_frame(AVCodecContext * avctx,
         s->dsp.float_to_int16_interleave(samples, s->samples_chanptr, 256, channels);
         samples += 256 * channels;
     }
-    
+
     return buf_size;
 }
 
