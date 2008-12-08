@@ -66,13 +66,13 @@ void PlayVideo(const QString &filename, const MetadataListManager &video_list)
 }
 
 template <>
-void CheckedSet(MythUIStateType *ui_item, QString state)
+void CheckedSet(MythUIStateType *ui_item, const QString &state)
 {
     if (ui_item)
         ui_item->DisplayState(state);
 }
 
-void CheckedSet(MythUIType *container, QString itemName, QString text)
+void CheckedSet(MythUIType *container, const QString &itemName, const QString &text)
 {
     if (container)
     {
@@ -82,24 +82,25 @@ void CheckedSet(MythUIType *container, QString itemName, QString text)
     }
 }
 
-void ETNop::Child(QString container_name, QString child_name)
+void ETNop::Child(const QString &container_name, const QString &child_name)
 {
     (void) container_name;
     (void) child_name;
 }
 
-void ETNop::Container(QString child_name)
+void ETNop::Container(const QString &child_name)
 {
     (void) child_name;
 }
 
-void ETPrintWarning::Child(QString container_name, QString child_name)
+void ETPrintWarning::Child(const QString &container_name,
+                           const QString &child_name)
 {
     VERBOSE(VB_GENERAL | VB_EXTRA, QObject::tr("Warning: container '%1' is "
                     "missing child '%2'").arg(container_name).arg(child_name));
 }
 
-void ETPrintWarning::Container(QString child_name)
+void ETPrintWarning::Container(const QString &child_name)
 {
     VERBOSE(VB_GENERAL | VB_EXTRA, QObject::tr("Warning: no valid container to "
                     "search for child '%1'").arg(child_name));
@@ -107,7 +108,7 @@ void ETPrintWarning::Container(QString child_name)
 
 struct UIUtilChildError : public UIUtilException
 {
-    UIUtilChildError(QString container, QString child)
+    UIUtilChildError(const QString &container, const QString &child)
     {
         m_what = QString(QObject::tr("Error: container '%1' is missing a child "
                         "element named '%2'")).arg(container).arg(child);
@@ -124,7 +125,7 @@ struct UIUtilChildError : public UIUtilException
 
 struct UIUtilContainerError : public UIUtilException
 {
-    UIUtilContainerError(QString child)
+    UIUtilContainerError(const QString &child)
     {
         m_what = QString(QObject::tr("Error: an invalid container was passed "
                         "while searching for child element '%1'")).arg(child);
@@ -139,12 +140,13 @@ struct UIUtilContainerError : public UIUtilException
     QString m_what;
 };
 
-void ETErrorException::Child(QString container_name, QString child_name)
+void ETErrorException::Child(const QString &container_name,
+                             const QString &child_name)
 {
     throw UIUtilChildError(container_name, child_name);
 }
 
-void ETErrorException::Container(QString child_name)
+void ETErrorException::Container(const QString &child_name)
 {
     throw UIUtilContainerError(child_name);
 }

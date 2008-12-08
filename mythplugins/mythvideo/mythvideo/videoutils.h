@@ -9,7 +9,7 @@ typedef QMap<QString, QString> SearchListResults;
 void PlayVideo(const QString &filename, const MetadataListManager &video_list);
 
 template <typename T>
-inline void CheckedSet(T *ui_item, QString text)
+inline void CheckedSet(T *ui_item, const QString &text)
 {
     if (ui_item)
     {
@@ -22,9 +22,9 @@ inline void CheckedSet(T *ui_item, QString text)
 }
 
 template <>
-void CheckedSet(class MythUIStateType *ui_item, QString state);
+void CheckedSet(class MythUIStateType *ui_item, const QString &state);
 
-void CheckedSet(class MythUIType *container, QString itemName, QString text);
+void CheckedSet(class MythUIType *container, const QString &itemName, const QString &text);
 
 struct UIUtilException
 {
@@ -33,47 +33,48 @@ struct UIUtilException
 
 struct ETNop
 {
-    static void Child(QString container_name, QString child_name);
-    static void Container(QString child_name);
+    static void Child(const QString &container_name, const QString &child_name);
+    static void Container(const QString &child_name);
 };
 
 struct ETPrintWarning
 {
-    static void Child(QString container_name, QString child_name);
-    static void Container(QString child_name);
+    static void Child(const QString &container_name, const QString &child_name);
+    static void Container(const QString &child_name);
 };
 
 struct ETErrorException
 {
-    static void Child(QString container_name, QString child_name);
-    static void Container(QString child_name);
+    static void Child(const QString &container_name, const QString &child_name);
+    static void Container(const QString &child_name);
 };
 
 template <typename ErrorDispatch = ETPrintWarning>
-struct ui_util
+struct UIUtilDisp
 {
     template <typename ContainerType, typename UIType>
-    static void Assign(ContainerType *container, UIType *&item,
-            const QString &name)
+    static bool Assign(ContainerType *container, UIType *&item,
+                       const QString &name)
     {
-        item = dynamic_cast<UIType *>(container->GetChild(name));
-
-        if (item)
-            return;
-
         if (!container)
         {
             ErrorDispatch::Container(name);
-            return;
+            return false;
         }
 
+        item = dynamic_cast<UIType *>(container->GetChild(name));
+
+        if (item)
+            return true;
+
         ErrorDispatch::Child(container->objectName(), name);
+        return false;
     }
 };
 
-typedef struct ui_util<ETPrintWarning> UIUtil;
-typedef struct ui_util<ETNop> UIUtilN;
-typedef struct ui_util<ETErrorException> UIUtilE;
+typedef struct UIUtilDisp<ETPrintWarning> UIUtil;
+typedef struct UIUtilDisp<ETNop> UIUtilN;
+typedef struct UIUtilDisp<ETErrorException> UIUtilE;
 
 QStringList GetVideoDirs();
 
