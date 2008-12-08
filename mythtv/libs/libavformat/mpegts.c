@@ -606,8 +606,8 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
     mpegts_cleanup_streams(mpegts_ctx); /* in case someone else removed streams.. */
 
 #ifdef DEBUG_SI
-    av_log(ts->stream, AV_LOG_DEBUG, "PMT: len %i\n", section_len);
-    av_hex_dump_log(ts->stream, AV_LOG_DEBUG, (uint8_t *)section, section_len);
+    av_log(mpegts_ctx->stream, AV_LOG_DEBUG, "PMT: len %i\n", section_len);
+    av_hex_dump_log(mpegts_ctx->stream, AV_LOG_DEBUG, (uint8_t *)section, section_len);
 #endif
 
     if (parse_section_header(&header, &p, p_end) < 0)
@@ -672,7 +672,7 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
         }
 
 #ifdef DEBUG_SI
-    av_log(ts->stream, AV_LOG_DEBUG, "pcr_pid=0x%x\n", pcr_pid);
+    av_log(mpegts_ctx->stream, AV_LOG_DEBUG, "pcr_pid=0x%x\n", mpegts_ctx->pcr_pid);
 #endif
 
         if (is_desired_stream(stream_type))
@@ -733,10 +733,6 @@ static void pmt_cb(void *opaque, const uint8_t *section, int section_len)
     /* if we are scanning, tell scanner we found the PMT */
     if (mpegts_ctx->scanning)
     {
-#ifdef DEBUG_SI
-            av_log(ts->stream, AV_LOG_DEBUG, "tag: 0x%02x len=%d\n",
-                   desc_tag, desc_len);
-#endif
         mpegts_ctx->pmt_scan_state = PMT_FOUND;
         mpegts_ctx->stop_parse = 1;
     }
