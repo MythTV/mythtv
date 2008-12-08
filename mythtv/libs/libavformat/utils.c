@@ -270,6 +270,7 @@ void av_destruct_packet(AVPacket *pkt)
 {
     av_free(pkt->data);
     pkt->data = NULL; pkt->size = 0;
+    pkt->destruct = NULL;
 }
 
 void av_init_packet(AVPacket *pkt)
@@ -490,6 +491,8 @@ int av_open_input_stream(AVFormatContext **ic_ptr,
     }
     ic->iformat = fmt;
     ic->pb = pb;
+    ic->build_index = 1;
+
     ic->duration = AV_NOPTS_VALUE;
     ic->start_time = AV_NOPTS_VALUE;
     av_strlcpy(ic->filename, filename, sizeof(ic->filename));
@@ -652,6 +655,8 @@ int av_read_packet(AVFormatContext *s, AVPacket *pkt)
         }
 
         av_init_packet(pkt);
+    pkt->data = NULL;
+    pkt->size = 0;
         ret= s->iformat->read_packet(s, pkt);
         if (ret < 0)
             return ret;
@@ -1024,6 +1029,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                     pkt->pts = st->parser->pts;
                     pkt->dts = st->parser->dts;
                     pkt->destruct = av_destruct_packet_nofree;
+                    pkt->pos = st->cur_frame_startpos;
                     compute_pkt_fields(s, st, st->parser, pkt);
                     st->got_frame = 0;
                     if((s->iformat->flags & AVFMT_GENERIC_INDEX) && pkt->flags & PKT_FLAG_KEY){
@@ -1040,6 +1046,9 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 s->cur_st = NULL;
             }
         } else {
+            startpos = url_ftell(&s->pb);
+            s->cur_pkt.pos = 0;
+
             /* read next packet */
             ret = av_read_packet(s, &s->cur_pkt);
             if (ret < 0) {
