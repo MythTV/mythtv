@@ -1728,7 +1728,7 @@ static SectionContext *add_section_stream(MpegTSContext *ts, int pid, int stream
 
     /* create a SECTION context */
     if (!(sect=av_mallocz(sizeof(SectionContext)))) {
-        av_log(NULL, AV_LOG_ERROR, "Error: av_mallocz() failed in add_pes_stream");
+        av_log(NULL, AV_LOG_ERROR, "Error: av_mallocz() failed in add_section_stream");
         return 0;
     }
     sect->ts = ts;
