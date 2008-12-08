@@ -268,9 +268,9 @@ public:
 #endif /// ALLOW_3DNOW
 
 
-#ifdef ALLOW_SSE
+#ifdef ALLOW_SSE2
     /// Class that implements SSE optimized routines for 16bit integer samples type.
-    class TDStretchSSE : public TDStretch
+    class TDStretchSSE2 : public TDStretch
     {
     protected:
 #ifdef MULTICHANNEL
@@ -281,7 +281,7 @@ public:
         virtual void overlapStereo(short *output, const short *input) const;
     };
 
-#endif /// ALLOW_SSE
+#endif /// ALLOW_SSE2
 
 }
 #endif  /// TDStretch_H

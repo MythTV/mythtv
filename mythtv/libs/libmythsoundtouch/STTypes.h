@@ -131,10 +131,6 @@ namespace soundtouch
             #if WIN32
                 #define ALLOW_3DNOW     1
             #endif
-
-            #if WIN32 || __MMX__ || MMX
-                #define ALLOW_SSE       1
-            #endif
         #endif
 
     #endif  // INTEGER_SAMPLES
