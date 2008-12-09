@@ -21,7 +21,9 @@
 #ifndef AVCODEC_I386_MMX_H
 #define AVCODEC_I386_MMX_H
 
+/* Removed by MythTV. We will keep this file for a while :-)
 #warning Everything in this header is deprecated, use plain asm()! New code using this header will be rejected.
+*/
 
 /*
  * The type of an value that fits in an MMX register (note that long
