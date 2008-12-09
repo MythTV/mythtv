@@ -64,28 +64,27 @@ bool TitleDialog::Create()
     if (!LoadWindowFromXML("dvd-ui.xml", "title_dialog", this))
         return false;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_nameEdit, "name", &err);
+
+    UIUtilE::Assign(this, m_playlengthText, "playlength", &err);
+    UIUtilE::Assign(this, m_numbtitlesText, "numb_titles", &err);
+
+    UIUtilE::Assign(this, m_ripCheck, "ripcheck", &err);
+    UIUtilE::Assign(this, m_ripacthreeCheck, "ripacthree", &err);
+
+    UIUtilE::Assign(this, m_nexttitleButton, "next_title", &err);
+    UIUtilE::Assign(this, m_prevtitleButton, "prev_title", &err);
+    UIUtilE::Assign(this, m_viewButton, "view", &err);
+    UIUtilE::Assign(this, m_ripawayButton, "ripaway", &err);
+
+    UIUtilE::Assign(this, m_audioList, "audio", &err);
+    UIUtilE::Assign(this, m_qualityList, "quality", &err);
+    UIUtilE::Assign(this, m_subtitleList, "subtitle", &err);
+
+    if (err)
     {
-        UIUtilE::Assign(this, m_nameEdit, "name");
-
-        UIUtilE::Assign(this, m_playlengthText, "playlength");
-        UIUtilE::Assign(this, m_numbtitlesText, "numb_titles");
-
-        UIUtilE::Assign(this, m_ripCheck, "ripcheck");
-        UIUtilE::Assign(this, m_ripacthreeCheck, "ripacthree");
-
-        UIUtilE::Assign(this, m_nexttitleButton, "next_title");
-        UIUtilE::Assign(this, m_prevtitleButton, "prev_title");
-        UIUtilE::Assign(this, m_viewButton, "view");
-        UIUtilE::Assign(this, m_ripawayButton, "ripaway");
-
-        UIUtilE::Assign(this, m_audioList, "audio");
-        UIUtilE::Assign(this, m_qualityList, "quality");
-        UIUtilE::Assign(this, m_subtitleList, "subtitle");
-    }
-    catch (UIUtilException &e)
-    {
-        VERBOSE(VB_IMPORTANT, e.What());
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'title_dialog'");
         return false;
     }
 

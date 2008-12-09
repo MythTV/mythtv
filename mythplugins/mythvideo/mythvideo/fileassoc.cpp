@@ -342,20 +342,19 @@ bool FileAssocDialog::Create()
     if (!LoadWindowFromXML("video-ui.xml", "file_associations", this))
         return false;
 
-    try
-    {
-        UIUtilE::Assign(this, m_extensionList, "extension_select");
-        UIUtilE::Assign(this, m_commandEdit, "command");
-        UIUtilE::Assign(this, m_ignoreCheck, "ignore_check");
-        UIUtilE::Assign(this, m_defaultCheck, "default_check");
+    bool err = false;
+    UIUtilE::Assign(this, m_extensionList, "extension_select", &err);
+    UIUtilE::Assign(this, m_commandEdit, "command", &err);
+    UIUtilE::Assign(this, m_ignoreCheck, "ignore_check", &err);
+    UIUtilE::Assign(this, m_defaultCheck, "default_check", &err);
 
-        UIUtilE::Assign(this, m_doneButton, "done_button");
-        UIUtilE::Assign(this, m_newButton, "new_button");
-        UIUtilE::Assign(this, m_deleteButton, "delete_button");
-    }
-    catch (UIUtilException &e)
+    UIUtilE::Assign(this, m_doneButton, "done_button", &err);
+    UIUtilE::Assign(this, m_newButton, "new_button", &err);
+    UIUtilE::Assign(this, m_deleteButton, "delete_button", &err);
+
+    if (err)
     {
-        VERBOSE(VB_IMPORTANT, e.What());
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'file_associations'");
         return false;
     }
 

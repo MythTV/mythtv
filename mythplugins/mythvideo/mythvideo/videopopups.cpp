@@ -23,14 +23,13 @@ bool CastDialog::Create()
     MythUIButtonList *castList;
     MythUIButton *okButton;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, castList, "cast", &err);
+    UIUtilE::Assign(this, okButton, "ok", &err);
+
+    if (err)
     {
-        UIUtilE::Assign(this, castList, "cast");
-        UIUtilE::Assign(this, okButton, "ok");
-    }
-    catch (UIUtilException &e)
-    {
-        VERBOSE(VB_IMPORTANT, e.What());
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'castpopup'");
         return false;
     }
 
@@ -66,14 +65,13 @@ bool PlotDialog::Create()
     MythUIText *plotText;
     MythUIButton *okButton;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, plotText, "plot", &err);
+    UIUtilE::Assign(this, okButton, "ok", &err);
+
+    if (err)
     {
-        UIUtilE::Assign(this, plotText, "plot");
-        UIUtilE::Assign(this, okButton, "ok");
-    }
-    catch (UIUtilException &e)
-    {
-        VERBOSE(VB_IMPORTANT, e.What());
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'plotpopup'");
         return false;
     }
 
@@ -102,13 +100,12 @@ bool SearchResultsDialog::Create()
     if (!LoadWindowFromXML("video-ui.xml", "moviesel", this))
         return false;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_resultsList, "results", &err);
+
+    if (err)
     {
-        UIUtilE::Assign(this, m_resultsList, "results");
-    }
-    catch (UIUtilException &e)
-    {
-        VERBOSE(VB_IMPORTANT, e.What());
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'moviesel'");
         return false;
     }
 

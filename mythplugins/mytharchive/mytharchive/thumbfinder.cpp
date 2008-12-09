@@ -103,21 +103,19 @@ bool ThumbFinder::Create(void)
     if (!foundtheme)
         return false;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_frameImage, "frameimage", &err);
+    UIUtilE::Assign(this, m_positionImage, "positionimage", &err);
+    UIUtilE::Assign(this, m_imageGrid, "thumblist", &err);
+    UIUtilE::Assign(this, m_saveButton, "save_button", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel_button", &err);
+    UIUtilE::Assign(this, m_frameButton, "frame_button", &err);
+    UIUtilE::Assign(this, m_seekAmountText, "seekamount", &err);
+    UIUtilE::Assign(this, m_currentPosText, "currentpos", &err);
+
+    if (err)
     {
-        m_frameImage = GetMythUIImage("frameimage");
-        m_positionImage = GetMythUIImage("positionimage");
-        m_imageGrid = GetMythUIButtonList("thumblist");
-        m_saveButton = GetMythUIButton("save_button");
-        m_cancelButton = GetMythUIButton("cancel_button");
-        m_frameButton = GetMythUIButton("frame_button");
-        m_seekAmountText = GetMythUIText("seekamount");
-        m_currentPosText = GetMythUIText("currentpos");
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'mythburn'\n\t\t\t"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'mythburn'");
         return false;
     }
 

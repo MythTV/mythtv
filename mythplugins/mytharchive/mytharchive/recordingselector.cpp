@@ -73,24 +73,22 @@ bool RecordingSelector::Create(void)
     if (!foundtheme)
         return false;
 
-    try
-    {
-        m_okButton = GetMythUIButton("ok_button");
-        m_cancelButton = GetMythUIButton("cancel_button");
-        m_categorySelector = GetMythUIButtonList("category_selector");
-        m_recordingButtonList = GetMythUIButtonList("recordinglist");
+    bool err = false;
+    UIUtilE::Assign(this, m_okButton, "ok_button", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel_button", &err);
+    UIUtilE::Assign(this, m_categorySelector, "category_selector", &err);
+    UIUtilE::Assign(this, m_recordingButtonList, "recordinglist", &err);
 
-        m_titleText = GetMythUIText("progtitle");
-        m_datetimeText = GetMythUIText("progdatetime");
-        m_descriptionText = GetMythUIText("progdescription");
-        m_filesizeText = GetMythUIText("filesize");
-        m_previewImage = GetMythUIImage("preview_image");
-        m_cutlistImage = GetMythUIImage("cutlist_image");
-    }
-    catch (QString &error)
+    UIUtilE::Assign(this, m_titleText, "progtitle", &err);
+    UIUtilE::Assign(this, m_datetimeText, "progdatetime", &err);
+    UIUtilE::Assign(this, m_descriptionText, "progdescription", &err);
+    UIUtilE::Assign(this, m_filesizeText, "filesize", &err);
+    UIUtilE::Assign(this, m_previewImage, "preview_image", &err);
+    UIUtilE::Assign(this, m_cutlistImage, "cutlist_image", &err);
+
+    if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'recording_selector'\n\t\t\t"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'recording_selector'");
         return false;
     }
 

@@ -58,32 +58,29 @@ bool ExportNative::Create(void)
     if (!foundtheme)
         return false;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_nextButton, "next_button", &err);
+    UIUtilE::Assign(this, m_prevButton, "prev_button", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel_button", &err);
+
+    UIUtilE::Assign(this, m_titleText, "progtitle", &err);
+    UIUtilE::Assign(this, m_datetimeText, "progdatetime", &err);
+    UIUtilE::Assign(this, m_descriptionText, "progdescription", &err);
+    UIUtilE::Assign(this, m_filesizeText, "filesize", &err);
+    UIUtilE::Assign(this, m_nofilesText, "nofiles", &err);
+    UIUtilE::Assign(this, m_sizeBar, "size_bar", &err);
+    UIUtilE::Assign(this, m_archiveButtonList, "archivelist", &err);
+    UIUtilE::Assign(this, m_addrecordingButton, "addrecording_button", &err);
+    UIUtilE::Assign(this, m_addvideoButton, "addvideo_button", &err);
+
+    UIUtilW::Assign(this, m_maxsizeText, "maxsize");
+    UIUtilW::Assign(this, m_minsizeText, "minsize");
+    UIUtilW::Assign(this, m_currsizeText, "currentsize");
+    UIUtilW::Assign(this, m_currsizeErrText, "currentsize_error");
+
+    if (err)
     {
-        m_nextButton = GetMythUIButton("next_button");
-        m_prevButton = GetMythUIButton("prev_button");
-        m_cancelButton = GetMythUIButton("cancel_button");
-
-        m_titleText = GetMythUIText("progtitle");
-        m_datetimeText = GetMythUIText("progdatetime");
-        m_descriptionText = GetMythUIText("progdescription");
-        m_filesizeText = GetMythUIText("filesize");
-        m_nofilesText = GetMythUIText("nofiles");
-        m_sizeBar = GetMythUIProgressBar("size_bar");
-        m_archiveButtonList = GetMythUIButtonList("archivelist");
-        m_addrecordingButton = GetMythUIButton("addrecording_button");
-        m_addvideoButton = GetMythUIButton("addvideo_button");
-
-        m_maxsizeText = GetMythUIText("maxsize", true);
-        m_minsizeText = GetMythUIText("minsize", true);
-        m_currsizeText = GetMythUIText("currentsize", true);
-        m_currsizeErrText = GetMythUIText("currentsize_error", true);
-
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'exportnative'\n\t\t\t"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'exportnative'");
         return false;
     }
 

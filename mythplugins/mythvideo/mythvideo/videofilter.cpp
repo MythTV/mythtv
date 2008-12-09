@@ -416,28 +416,27 @@ bool VideoFilterDialog::Create()
     if (!LoadWindowFromXML("video-ui.xml", "filter", this))
         return false;
 
-    try
-    {
-        UIUtilE::Assign(this, m_yearList, "year_select");
-        UIUtilE::Assign(this, m_userratingList, "userrating_select");
-        UIUtilE::Assign(this, m_categoryList, "category_select");
-        UIUtilE::Assign(this, m_countryList, "country_select");
-        UIUtilE::Assign(this, m_genreList, "genre_select");
-        UIUtilE::Assign(this, m_castList, "cast_select");
-        UIUtilE::Assign(this, m_runtimeList, "runtime_select");
-        UIUtilE::Assign(this, m_browseList, "browse_select");
-        UIUtilE::Assign(this, m_inetrefList, "inetref_select");
-        UIUtilE::Assign(this, m_coverfileList, "coverfile_select");
-        UIUtilE::Assign(this, m_orderbyList, "orderby_select");
+    bool err = false;
+    UIUtilE::Assign(this, m_yearList, "year_select", &err);
+    UIUtilE::Assign(this, m_userratingList, "userrating_select", &err);
+    UIUtilE::Assign(this, m_categoryList, "category_select", &err);
+    UIUtilE::Assign(this, m_countryList, "country_select", &err);
+    UIUtilE::Assign(this, m_genreList, "genre_select", &err);
+    UIUtilE::Assign(this, m_castList, "cast_select", &err);
+    UIUtilE::Assign(this, m_runtimeList, "runtime_select", &err);
+    UIUtilE::Assign(this, m_browseList, "browse_select", &err);
+    UIUtilE::Assign(this, m_inetrefList, "inetref_select", &err);
+    UIUtilE::Assign(this, m_coverfileList, "coverfile_select", &err);
+    UIUtilE::Assign(this, m_orderbyList, "orderby_select", &err);
 
-        UIUtilE::Assign(this, m_doneButton, "done_button");
-        UIUtilE::Assign(this, m_saveButton, "save_button");
+    UIUtilE::Assign(this, m_doneButton, "done_button", &err);
+    UIUtilE::Assign(this, m_saveButton, "save_button", &err);
 
-        UIUtilE::Assign(this, m_numvideosText, "numvideos_text");
-    }
-    catch (UIUtilException &e)
+    UIUtilE::Assign(this, m_numvideosText, "numvideos_text", &err);
+
+    if (err)
     {
-        VERBOSE(VB_IMPORTANT, e.What());
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'filter'");
         return false;
     }
 

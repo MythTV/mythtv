@@ -52,23 +52,21 @@ bool VideoSelector::Create(void)
     if (!foundtheme)
         return false;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_okButton, "ok_button", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel_button", &err);
+    UIUtilE::Assign(this, m_categorySelector, "category_selector", &err);
+    UIUtilE::Assign(this, m_videoButtonList, "videolist", &err);
+    UIUtilE::Assign(this, m_titleText, "videotitle", &err);
+    UIUtilE::Assign(this, m_plotText, "videoplot", &err);
+    UIUtilE::Assign(this, m_filesizeText, "filesize", &err);
+    UIUtilE::Assign(this, m_coverImage, "cover_image", &err);
+    UIUtilE::Assign(this, m_warningText, "warning_text", &err);
+    UIUtilE::Assign(this, m_plText, "parentallevel_text", &err);
+
+    if (err)
     {
-        m_okButton = GetMythUIButton("ok_button");
-        m_cancelButton = GetMythUIButton("cancel_button");
-        m_categorySelector = GetMythUIButtonList("category_selector");
-        m_videoButtonList = GetMythUIButtonList("videolist");
-        m_titleText = GetMythUIText("videotitle");
-        m_plotText = GetMythUIText("videoplot");
-        m_filesizeText = GetMythUIText("filesize");
-        m_coverImage = GetMythUIImage("cover_image");
-        m_warningText = GetMythUIText("warning_text");
-        m_plText = GetMythUIText("parentallevel_text");
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'video_selector'\n\t\t\t"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'video_selector'");
         return false;
     }
 

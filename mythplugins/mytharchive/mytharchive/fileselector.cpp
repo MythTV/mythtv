@@ -50,20 +50,18 @@ bool FileSelector::Create(void)
     if (!foundtheme)
         return false;
 
-    try
+    bool err = false;
+    UIUtilW::Assign(this, m_titleText, "title_text");
+    UIUtilE::Assign(this, m_fileButtonList, "filelist", &err);
+    UIUtilE::Assign(this, m_locationEdit, "location_edit", &err);
+    UIUtilE::Assign(this, m_backButton, "back_button", &err);
+    UIUtilE::Assign(this, m_homeButton, "home_button", &err);
+    UIUtilE::Assign(this, m_okButton, "ok_button", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel_button", &err);
+
+    if (err)
     {
-        m_titleText = GetMythUIText("title_text", true);
-        m_fileButtonList = GetMythUIButtonList("filelist");
-        m_locationEdit = GetMythUITextEdit("location_edit");
-        m_backButton = GetMythUIButton("back_button");
-        m_homeButton = GetMythUIButton("home_button");
-        m_okButton = GetMythUIButton("ok_button");
-        m_cancelButton = GetMythUIButton("cancel_button");
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'file_selector'\n\t\t\t"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'file_selector'");
         return false;
     }
 

@@ -48,26 +48,24 @@ bool SelectDestination::Create(void)
     if (!foundtheme)
         return false;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_createISOCheck, "makeisoimage_check", &err);
+    UIUtilE::Assign(this, m_doBurnCheck, "burntodvdr_check", &err);
+    UIUtilE::Assign(this, m_doBurnText, "burntodvdr_text", &err);
+    UIUtilE::Assign(this, m_eraseDvdRwCheck, "erasedvdrw_check", &err);
+    UIUtilE::Assign(this, m_eraseDvdRwText, "erasedvdrw_text", &err);
+    UIUtilE::Assign(this, m_nextButton, "next_button", &err);
+    UIUtilE::Assign(this, m_prevButton, "prev_button", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel_button", &err);
+    UIUtilE::Assign(this, m_destinationSelector, "destination_selector", &err);
+    UIUtilE::Assign(this, m_destinationText, "destination_text", &err);
+    UIUtilE::Assign(this, m_findButton, "find_button", &err);
+    UIUtilE::Assign(this, m_filenameEdit, "filename_edit", &err);
+    UIUtilE::Assign(this, m_freespaceText, "freespace_text", &err);
+
+    if (err)
     {
-        m_createISOCheck = GetMythUICheckBox("makeisoimage_check");
-        m_doBurnCheck = GetMythUICheckBox("burntodvdr_check");
-        m_doBurnText = GetMythUIText("burntodvdr_text");
-        m_eraseDvdRwCheck = GetMythUICheckBox("erasedvdrw_check");
-        m_eraseDvdRwText = GetMythUIText("erasedvdrw_text");
-        m_nextButton = GetMythUIButton("next_button");
-        m_prevButton = GetMythUIButton("prev_button");
-        m_cancelButton = GetMythUIButton("cancel_button");
-        m_destinationSelector = GetMythUIButtonList("destination_selector");
-        m_destinationText = GetMythUIText("destination_text");
-        m_findButton = GetMythUIButton("find_button");
-        m_filenameEdit = GetMythUITextEdit("filename_edit");
-        m_freespaceText = GetMythUIText("freespace_text");
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'selectdestination'.\n\t\t\t"
-                               "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'selectdestination'");
         return false;
     }
 

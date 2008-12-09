@@ -180,24 +180,22 @@ bool ArchiveFileSelector::Create(void)
     if (!foundtheme)
         return false;
 
-    try
+    bool err = false;
+    UIUtilW::Assign(this, m_titleText, "title");
+    UIUtilE::Assign(this, m_fileButtonList, "filelist", &err);
+    UIUtilE::Assign(this, m_locationEdit, "location_edit", &err);
+    UIUtilE::Assign(this, m_backButton, "back_button", &err);
+    UIUtilE::Assign(this, m_homeButton, "home_button", &err);
+    UIUtilE::Assign(this, m_nextButton, "next_button", &err);
+    UIUtilE::Assign(this, m_prevButton, "prev_button", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel_button", &err);
+    UIUtilE::Assign(this, m_progTitle, "title_text", &err);
+    UIUtilE::Assign(this, m_progSubtitle, "subtitle_text", &err);
+    UIUtilE::Assign(this, m_progStartTime, "starttime_text", &err);
+
+    if (err)
     {
-        m_titleText = GetMythUIText("title", true);
-        m_fileButtonList = GetMythUIButtonList("filelist");
-        m_locationEdit = GetMythUITextEdit("location_edit");
-        m_backButton = GetMythUIButton("back_button");
-        m_homeButton = GetMythUIButton("home_button");
-        m_nextButton = GetMythUIButton("next_button");
-        m_prevButton = GetMythUIButton("prev_button");
-        m_cancelButton = GetMythUIButton("cancel_button");
-        m_progTitle = GetMythUIText("title_text");
-        m_progSubtitle = GetMythUIText("subtitle_text");
-        m_progStartTime = GetMythUIText("starttime_text");
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'archivefile_selector'\n\t\t\t"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'archivefile_selector'");
         return false;
     }
 
@@ -319,35 +317,33 @@ bool ImportNative::Create(void)
     if (!foundtheme)
         return false;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_progTitle_text, "progtitle", &err);
+    UIUtilE::Assign(this, m_progDateTime_text, "progdatetime", &err);
+    UIUtilE::Assign(this, m_progDescription_text, "progdescription", &err);
+
+    UIUtilE::Assign(this, m_chanID_text, "chanid", &err);
+    UIUtilE::Assign(this, m_chanNo_text, "channo", &err);
+    UIUtilE::Assign(this, m_chanName_text, "name", &err);
+    UIUtilE::Assign(this, m_callsign_text, "callsign", &err);
+
+    UIUtilE::Assign(this, m_localChanID_text, "local_chanid", &err);
+    UIUtilE::Assign(this, m_localChanNo_text, "local_channo", &err);
+    UIUtilE::Assign(this, m_localChanName_text, "local_name", &err);
+    UIUtilE::Assign(this, m_localCallsign_text, "local_callsign", &err);
+
+    UIUtilE::Assign(this, m_searchChanID_button, "searchchanid_button", &err);
+    UIUtilE::Assign(this, m_searchChanNo_button, "searchchanno_button", &err);
+    UIUtilE::Assign(this, m_searchChanName_button, "searchname_button", &err);
+    UIUtilE::Assign(this, m_searchCallsign_button ,"searchcallsign_button", &err);
+
+    UIUtilE::Assign(this, m_finishButton, "finish_button", &err);
+    UIUtilE::Assign(this, m_prevButton, "prev_button", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel_button", &err);
+
+    if (err)
     {
-        m_progTitle_text = GetMythUIText("progtitle");
-        m_progDateTime_text = GetMythUIText("progdatetime");
-        m_progDescription_text = GetMythUIText("progdescription");
-
-        m_chanID_text = GetMythUIText("chanid");
-        m_chanNo_text = GetMythUIText("channo");
-        m_chanName_text = GetMythUIText("name");
-        m_callsign_text = GetMythUIText("callsign");
-
-        m_localChanID_text = GetMythUIText("local_chanid");
-        m_localChanNo_text = GetMythUIText("local_channo");
-        m_localChanName_text = GetMythUIText("local_name");
-        m_localCallsign_text = GetMythUIText("local_callsign");
-
-        m_searchChanID_button = GetMythUIButton("searchchanid_button");
-        m_searchChanNo_button = GetMythUIButton("searchchanno_button");
-        m_searchChanName_button = GetMythUIButton("searchname_button");
-        m_searchCallsign_button = GetMythUIButton("searchcallsign_button");
-
-        m_finishButton = GetMythUIButton("finish_button");
-        m_prevButton = GetMythUIButton("prev_button");
-        m_cancelButton = GetMythUIButton("cancel_button");
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'importarchive'\n\t\t\t"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'importarchive'");
         return false;
     }
 

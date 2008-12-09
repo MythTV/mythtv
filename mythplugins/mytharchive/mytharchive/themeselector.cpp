@@ -48,27 +48,25 @@ bool ThemeSelector::Create(void)
     if (!foundtheme)
         return false;
 
-    try
-    {
-        m_nextButton = GetMythUIButton("next_button");
-        m_prevButton = GetMythUIButton("prev_button");
-        m_cancelButton = GetMythUIButton("cancel_button");
+    bool err = false;
+    UIUtilE::Assign(this, m_nextButton, "next_button", &err);
+    UIUtilE::Assign(this, m_prevButton, "prev_button", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel_button", &err);
 
         // theme preview images
-        intro_image = GetMythUIImage("intro_image");
-        mainmenu_image = GetMythUIImage("mainmenu_image");
-        chapter_image = GetMythUIImage("chapter_image");
-        details_image = GetMythUIImage("details_image");
+    UIUtilE::Assign(this, intro_image, "intro_image", &err);
+    UIUtilE::Assign(this, mainmenu_image, "mainmenu_image", &err);
+    UIUtilE::Assign(this, chapter_image, "chapter_image", &err);
+    UIUtilE::Assign(this, details_image, "details_image", &err);
 
         // menu theme
-        themedesc_text = GetMythUIText("themedescription");
-        theme_image = GetMythUIImage("theme_image");
-        theme_selector = GetMythUIButtonList("theme_selector");
-    }
-    catch (QString &error)
+    UIUtilE::Assign(this, themedesc_text, "themedescription", &err);
+    UIUtilE::Assign(this, theme_image, "theme_image", &err);
+    UIUtilE::Assign(this, theme_selector, "theme_selector", &err);
+
+    if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'themeselector'"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'themeselector'");
         return false;
     }
 

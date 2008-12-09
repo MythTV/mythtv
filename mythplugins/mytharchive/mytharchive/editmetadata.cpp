@@ -25,20 +25,18 @@ bool EditMetadataDialog::Create(void)
     if (!foundtheme)
         return false;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_titleEdit, "title_edit", &err);
+    UIUtilE::Assign(this, m_subtitleEdit, "subtitle_edit", &err);
+    UIUtilE::Assign(this, m_descriptionEdit, "description_edit", &err);
+    UIUtilE::Assign(this, m_starttimeEdit, "starttime_edit", &err);
+    UIUtilE::Assign(this, m_startdateEdit, "startdate_edit", &err);
+    UIUtilE::Assign(this, m_okButton, "ok_button", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel_button", &err);
+
+    if (err)
     {
-        m_titleEdit = GetMythUITextEdit("title_edit");
-        m_subtitleEdit = GetMythUITextEdit("subtitle_edit");
-        m_descriptionEdit = GetMythUITextEdit("description_edit");
-        m_starttimeEdit = GetMythUITextEdit("starttime_edit");
-        m_startdateEdit = GetMythUITextEdit("startdate_edit");
-        m_okButton = GetMythUIButton("ok_button");
-        m_cancelButton = GetMythUIButton("cancel_button");
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'edit_metadata'\n\t\t\t"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'edit_metadata'");
         return false;
     }
 

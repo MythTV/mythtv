@@ -65,18 +65,16 @@ bool LogViewer::Create(void)
     if (!foundtheme)
         return false;
 
-    try
+    bool err = false; 
+    UIUtilE::Assign(this, m_logList, "loglist", &err);
+    UIUtilE::Assign(this, m_logText, "logitem_text", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel_button", &err);
+    UIUtilE::Assign(this, m_updateButton, "update_button", &err);
+    UIUtilE::Assign(this, m_exitButton, "exit_button", &err);
+
+    if (err)
     {
-        m_logList = GetMythUIButtonList("loglist");
-        m_logText = GetMythUIText("logitem_text");
-        m_cancelButton = GetMythUIButton("cancel_button");
-        m_updateButton = GetMythUIButton("update_button");
-        m_exitButton = GetMythUIButton("exit_button");
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'logviewer'.\n\t\t\t"
-                               "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'logviewer'");
         return false;
     }
 

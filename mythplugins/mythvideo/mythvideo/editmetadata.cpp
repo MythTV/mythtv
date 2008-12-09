@@ -38,25 +38,24 @@ bool EditMetadataDialog::Create()
     if (!LoadWindowFromXML("video-ui.xml", "edit_metadata", this))
         return false;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_titleEdit, "title_edit", &err);
+    UIUtilE::Assign(this, m_playerEdit, "player_edit", &err);
+
+    UIUtilE::Assign(this, m_coverartText, "coverart_text", &err);
+
+    UIUtilE::Assign(this, m_categoryList, "category_select", &err);
+    UIUtilE::Assign(this, m_levelList, "level_select", &err);
+    UIUtilE::Assign(this, m_childList, "child_select", &err);
+
+    UIUtilE::Assign(this, m_browseCheck, "browse_check", &err);
+
+    UIUtilE::Assign(this, m_coverartButton, "coverart_button", &err);
+    UIUtilE::Assign(this, m_doneButton, "done_button", &err);
+
+    if (err)
     {
-        UIUtilE::Assign(this, m_titleEdit, "title_edit");
-        UIUtilE::Assign(this, m_playerEdit, "player_edit");
-
-        UIUtilE::Assign(this, m_coverartText, "coverart_text");
-
-        UIUtilE::Assign(this, m_categoryList, "category_select");
-        UIUtilE::Assign(this, m_levelList, "level_select");
-        UIUtilE::Assign(this, m_childList, "child_select");
-
-        UIUtilE::Assign(this, m_browseCheck, "browse_check");
-
-        UIUtilE::Assign(this, m_coverartButton, "coverart_button");
-        UIUtilE::Assign(this, m_doneButton, "done_button");
-    }
-    catch (UIUtilException &e)
-    {
-        VERBOSE(VB_IMPORTANT, e.What());
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'edit_metadata'");
         return false;
     }
 

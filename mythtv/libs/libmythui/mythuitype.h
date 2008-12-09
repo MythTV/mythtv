@@ -49,16 +49,6 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     MythUIType *GetChildAt(const QPoint &p, bool recursive=true);
     QList<MythUIType *> *GetAllChildren(void);
 
-    MythUIText *GetMythUIText(const QString &name, bool optional = false);
-    MythUIButton *GetMythUIButton(const QString &name, bool optional = false);
-    MythUIButtonList *GetMythUIButtonList(const QString &name, bool optional = false);
-    MythUICheckBox *GetMythUICheckBox(const QString &name, bool optional = false);
-    MythUITextEdit *GetMythUITextEdit(const QString &name, bool optional = false);
-    MythUIImage *GetMythUIImage(const QString &name, bool optional = false);
-    MythUIProgressBar *GetMythUIProgressBar(const QString &name, bool optional = false);
-    MythUISpinBox *GetMythUISpinBox(const QString &name, bool optional = false);
-    MythUIWebBrowser *GetMythUIWebBrowser(const QString &name, bool optional = false);
-
     void DeleteChild(const QString &name);
     void DeleteChild(MythUIType *child);
     void DeleteAllChildren(void);

@@ -80,26 +80,24 @@ bool MythBurn::Create(void)
     if (!foundtheme)
         return false;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_nextButton, "next_button", &err);
+    UIUtilE::Assign(this, m_prevButton, "prev_button", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel_button", &err);
+    UIUtilE::Assign(this, m_nofilesText, "nofiles", &err);
+    UIUtilE::Assign(this, m_archiveButtonList, "archivelist", &err);
+    UIUtilE::Assign(this, m_addrecordingButton, "addrecording_button", &err);
+    UIUtilE::Assign(this, m_addvideoButton, "addvideo_button", &err);
+    UIUtilE::Assign(this, m_addfileButton, "addfile_button", &err);
+    UIUtilE::Assign(this, m_maxsizeText, "maxsize", &err);
+    UIUtilE::Assign(this, m_minsizeText, "minsize", &err);
+    UIUtilE::Assign(this, m_currentsizeErrorText, "currentsize_error", &err);
+    UIUtilE::Assign(this, m_currentsizeText, "currentsize", &err);
+    UIUtilE::Assign(this, m_sizeBar, "size_bar", &err);
+
+    if (err)
     {
-        m_nextButton = GetMythUIButton("next_button");
-        m_prevButton = GetMythUIButton("prev_button");
-        m_cancelButton = GetMythUIButton("cancel_button");
-        m_nofilesText = GetMythUIText("nofiles");
-        m_archiveButtonList = GetMythUIButtonList("archivelist");
-        m_addrecordingButton = GetMythUIButton("addrecording_button");
-        m_addvideoButton = GetMythUIButton("addvideo_button");
-        m_addfileButton = GetMythUIButton("addfile_button");
-        m_maxsizeText = GetMythUIText("maxsize");
-        m_minsizeText =  GetMythUIText("minsize");
-        m_currentsizeErrorText = GetMythUIText("currentsize_error");
-        m_currentsizeText = GetMythUIText("currentsize");
-        m_sizeBar = GetMythUIProgressBar("size_bar");
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'mythburn'\n\t\t\t"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'mythburn'");
         return false;
     }
 
@@ -961,19 +959,17 @@ bool ProfileDialog::Create()
     if (!LoadWindowFromXML("mythburn-ui.xml", "profilepopup", this))
         return false;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_captionText, "caption_text", &err);
+    UIUtilE::Assign(this, m_descriptionText, "description_text", &err);
+    UIUtilE::Assign(this, m_oldSizeText, "oldsize_text", &err);
+    UIUtilE::Assign(this, m_newSizeText, "newsize_text", &err);
+    UIUtilE::Assign(this, m_profile_list, "profile_list", &err);
+    UIUtilE::Assign(this, m_okButton, "ok_button", &err);
+
+    if (err)
     {
-        m_captionText = GetMythUIText("caption_text");
-        m_descriptionText = GetMythUIText("description_text");
-        m_oldSizeText = GetMythUIText("oldsize_text");
-        m_newSizeText = GetMythUIText("newsize_text");
-        m_profile_list = GetMythUIButtonList("profile_list");
-        m_okButton = GetMythUIButton("ok_button");
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'profilepopup'/r/t/t/t"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'profilepopup'");
         return false;
     }
 

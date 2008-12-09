@@ -6,6 +6,7 @@
 #include "mythdialogbox.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
+#include "mythuiutils.h"
 
 MythDialogBox::MythDialogBox(const QString &text,
                              MythScreenStack *parent, const char *name,
@@ -48,16 +49,14 @@ bool MythDialogBox::Create(void)
     if (!CopyWindowFromBase(windowName, this))
         return false;
 
-    try
+    bool err = false;
+    UIUtilW::Assign(this, m_titlearea, "title");
+    UIUtilE::Assign(this, m_textarea, "messagearea", &err);
+    UIUtilE::Assign(this, m_buttonList, "list", &err);
+
+    if (err)
     {
-        m_titlearea = GetMythUIText("title", true);
-        m_textarea = GetMythUIText("messagearea");
-        m_buttonList = GetMythUIButtonList("list");
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen '" + windowName + "'\n\t\t\t"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen '" + windowName + "'");
         return false;
     }
 
@@ -177,16 +176,14 @@ bool MythConfirmationDialog::Create(void)
     MythUIButton *okButton = NULL;
     MythUIButton *cancelButton = NULL;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, messageText, "message", &err);
+    UIUtilE::Assign(this, okButton, "ok", &err);
+    UIUtilE::Assign(this, cancelButton, "cancel", &err);
+
+    if (err)
     {
-        messageText = GetMythUIText("message");
-        okButton = GetMythUIButton("ok");
-        cancelButton = GetMythUIButton("cancel");
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythConfirmationDialog'\n\t\t\t"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythConfirmationDialog'");
         return false;
     }
 
@@ -341,17 +338,15 @@ bool MythTextInputDialog::Create(void)
     MythUIButton *okButton = NULL;
     MythUIButton *cancelButton = NULL;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_textEdit, "input", &err);
+    UIUtilE::Assign(this, messageText, "message", &err);
+    UIUtilE::Assign(this, okButton, "ok", &err);
+    UIUtilW::Assign(this, cancelButton, "cancel");
+
+    if (err)
     {
-        m_textEdit = GetMythUITextEdit("input");
-        messageText = GetMythUIText("message");
-        okButton = GetMythUIButton("ok");
-        cancelButton = GetMythUIButton("cancel", true);
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythTextInputDialog'\n\t\t\t"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythTextInputDialog'");
         return false;
     }
 
@@ -439,19 +434,17 @@ bool MythUISearchDialog::Create(void)
     MythUIButton *okButton = NULL;
     MythUIButton *cancelButton = NULL;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_textEdit, "input", &err);
+    UIUtilE::Assign(this, m_titleText, "title", &err);
+    UIUtilW::Assign(this, m_matchesText, "matches");
+    UIUtilE::Assign(this, m_itemList, "itemlist", &err);
+    UIUtilE::Assign(this, okButton, "ok", &err);
+    UIUtilW::Assign(this, cancelButton, "cancel");
+
+    if (err)
     {
-        m_textEdit = GetMythUITextEdit("input");
-        m_titleText = GetMythUIText("title");
-        m_matchesText = GetMythUIText("matches", true);
-        m_itemList = GetMythUIButtonList("itemlist");
-        okButton = GetMythUIButton("ok");
-        cancelButton = GetMythUIButton("cancel", true);
-    }
-    catch (QString &error)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythSearchDialog'\n\t\t\t"
-                              "Error was: " + error);
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'MythSearchDialog'");
         return false;
     }
 

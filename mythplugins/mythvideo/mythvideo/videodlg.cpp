@@ -825,29 +825,29 @@ bool VideoDialog::Create()
     if (!LoadWindowFromXML("video-ui.xml", windowName, this))
         return false;
 
-    try
+    bool err = false;
+    if (m_type == DLG_TREE)
+        UIUtilE::Assign(this, m_videoButtonTree, "videos", &err);
+    else
+        UIUtilE::Assign(this, m_videoButtonList, "videos", &err);
+
+    UIUtilW::Assign(this, m_titleText, "title");
+    UIUtilW::Assign(this, m_novideoText, "novideos");
+    UIUtilW::Assign(this, m_positionText, "position");
+    UIUtilW::Assign(this, m_crumbText, "breadcrumbs");
+
+    UIUtilW::Assign(this, m_coverImage, "coverimage");
+
+    UIUtilW::Assign(this, m_parentalLevelState, "parentallevel");
+    UIUtilW::Assign(this, m_videoLevelState, "videolevel");
+    UIUtilW::Assign(this, m_userRatingState, "userratingstate");
+
+    if (err)
     {
-        if (m_type == DLG_TREE)
-            UIUtilE::Assign(this, m_videoButtonTree, "videos");
-        else
-            UIUtilE::Assign(this, m_videoButtonList, "videos");
-    }
-    catch (UIUtilException &e)
-    {
-        VERBOSE(VB_IMPORTANT, e.What());
+        VERBOSE(VB_IMPORTANT, "Cannot load screen '" + windowName + "'");
         return false;
     }
 
-    UIUtil::Assign(this, m_titleText, "title");
-    UIUtil::Assign(this, m_novideoText, "novideos");
-    UIUtil::Assign(this, m_positionText, "position");
-    UIUtil::Assign(this, m_crumbText, "breadcrumbs");
-
-    UIUtil::Assign(this, m_coverImage, "coverimage");
-
-    UIUtil::Assign(this, m_parentalLevelState, "parentallevel");
-    UIUtil::Assign(this, m_videoLevelState, "videolevel");
-    UIUtil::Assign(this, m_userRatingState, "userratingstate");
     CheckedSet(m_novideoText, tr("No Videos Available"));
 
     CheckedSet(m_parentalLevelState, "None");

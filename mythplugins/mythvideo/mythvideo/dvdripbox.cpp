@@ -141,25 +141,24 @@ bool DVDRipBox::Create()
     if (!LoadWindowFromXML("dvd-ui.xml", "dvd_rip", this))
         return false;
 
-    try
+    bool err = false;
+    UIUtilE::Assign(this, m_warningText, "warning", err);
+    UIUtilE::Assign(this, m_overallText, "overall_text", err);
+    UIUtilE::Assign(this, m_jobText, "job_text", err);
+    UIUtilE::Assign(this, m_numjobsText, "numbjobs", err);
+
+    UIUtilE::Assign(this, m_overallProgress, "overall_progress", err);
+    UIUtilE::Assign(this, m_jobProgress, "job_progress", err);
+
+    UIUtilE::Assign(this, m_ripscreenButton, "ripscreen", err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel", err);
+
+    UIUtilE::Assign(this, m_nextjobButton, "next", err);
+    UIUtilE::Assign(this, m_prevjobButton, "prev", err);
+
+    if (err)
     {
-        UIUtilE::Assign(this, m_warningText, "warning");
-        UIUtilE::Assign(this, m_overallText, "overall_text");
-        UIUtilE::Assign(this, m_jobText, "job_text");
-        UIUtilE::Assign(this, m_numjobsText, "numbjobs");
-
-        UIUtilE::Assign(this, m_overallProgress, "overall_progress");
-        UIUtilE::Assign(this, m_jobProgress, "job_progress");
-
-        UIUtilE::Assign(this, m_ripscreenButton, "ripscreen");
-        UIUtilE::Assign(this, m_cancelButton, "cancel");
-
-        UIUtilE::Assign(this, m_nextjobButton, "next");
-        UIUtilE::Assign(this, m_prevjobButton, "prev");
-    }
-    catch (UIUtilException &e)
-    {
-        VERBOSE(VB_IMPORTANT, e.What());
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'dvd_rip'");
         return false;
     }
 

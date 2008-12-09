@@ -2,6 +2,7 @@
 #define MYTHSCREEN_TYPE_H_
 
 #include "mythuitype.h"
+#include "mythuiutils.h"
 
 class MythScreenStack;
 
