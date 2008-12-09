@@ -185,7 +185,7 @@ HostCheckBox *VideoDBFolderView()
     return hcb;
 }
 
-HostCheckBox *VideoTreeRemeber()
+HostCheckBox *VideoTreeRemember()
 {
     HostCheckBox *gc = new HostCheckBox("mythvideo.VideoTreeRemember");
     gc->setLabel(QObject::tr("Video Tree remembers last selected position"));
@@ -199,8 +199,7 @@ HostLineEdit *SearchListingsCommand()
 {
     HostLineEdit *gc = new HostLineEdit("MovieListCommandLine");
     gc->setLabel(QObject::tr("Command to search for movie listings"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/tmdb.pl " +
-                 "-M");
+    gc->setValue(GetShareDir() + "mythvideo/scripts/tmdb.pl -M");
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     return gc;
@@ -653,7 +652,7 @@ VideoGeneralSettings::VideoGeneralSettings()
     page2->addChild(VideoNewBrowsable());
     page2->addChild(VideoSortIgnoresCase());
     page2->addChild(VideoDBFolderView());
-    page2->addChild(VideoTreeRemeber());
+    page2->addChild(VideoTreeRemember());
 
     VConfigPage page3(pages, false);
     page3->addChild(SetDVDDevice());

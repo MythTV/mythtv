@@ -14,7 +14,7 @@ namespace
     const QString lastMythDVDDBVersion = "1002";
     const QString lastMythVideoVersion = "1010";
 
-    const QString currentDatabaseVersion = "1018";
+    const QString currentDatabaseVersion = "1019";
 
     const QString OldMythVideoVersionName = "VideoDBSchemaVer";
     const QString OldMythDVDVersionName = "DVDDBSchemaVer";
@@ -749,6 +749,18 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 };
 
             performActualUpdate(updates, "1018", dbver, MythVideoVersionName);
+        }
+
+        if (dbver == "1018")
+        {
+            QStringList updates;
+            updates += "DELETE FROM settings WHERE value="
+                       "'MovieListCommandLine' AND data LIKE '%imdb%';";
+            updates += "DELETE FROM settings WHERE value="
+                       "'MovieDataCommandLine' AND data LIKE '%imdb%';";
+            updates += "DELETE FROM settings WHERE value="
+                       "'MoviePosterCommandLine' AND data LIKE '%imdb%';";
+            performActualUpdate(updates, "1019", dbver, MythVideoVersionName);
         }
 
     }
