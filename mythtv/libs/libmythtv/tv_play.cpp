@@ -5011,6 +5011,11 @@ bool TV::CommitQueuedInput(void)
         if (browsemode)
         {
             commited = true;
+            if (channum.isEmpty())
+            {
+                channum = browsechannum;
+                channum.detach();
+            }
             BrowseChannel(channum);
             if (activenvp == nvp && GetOSD())
                 GetOSD()->HideSet("channel_number");
