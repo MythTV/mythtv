@@ -112,7 +112,7 @@ MythXMLMethod MythXML::GetMethod( const QString &sURI )
     if (sURI == "GetConnectionInfo"    ) return MXML_GetConnectionInfo;
     if (sURI == "GetVideoArt"          ) return MXML_GetVideoArt;
 
-    return( MXML_Unknown );
+    return MXML_Unknown;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -130,14 +130,14 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
                 pRequest->m_sBaseUrl = m_sControlUrl;
                 pRequest->m_sMethod = "GetVideo";
             }
-	        else if (pRequest->m_sBaseUrl == "/Myth/GetVideoArt")
+            else if (pRequest->m_sBaseUrl == "/Myth/GetVideoArt")
             {
-	            pRequest->m_sBaseUrl = m_sControlUrl;
-	            pRequest->m_sMethod = "GetVideoArt";
+                pRequest->m_sBaseUrl = m_sControlUrl;
+                pRequest->m_sMethod = "GetVideoArt";
             }
 
             if (pRequest->m_sBaseUrl != m_sControlUrl)
-                return( false );
+                return false;
 
             VERBOSE(VB_UPNP, QString("MythXML::ProcessRequest: %1 : %2")
                     .arg(pRequest->m_sMethod)
@@ -219,7 +219,7 @@ bool MythXML::ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest )
                  "MythXML::ProcessRequest() - Unexpected Exception" );
     }
 
-    return( false );
+    return false;
 }
 
 // ==========================================================================
@@ -1062,6 +1062,8 @@ void MythXML::GetExpiring( HTTPRequest *pRequest )
 
 void MythXML::GetPreviewImage( HTTPRequest *pRequest )
 {
+    QString LOC = "MythXML::GetPreviewImage() - ";
+
     pRequest->m_eResponseType   = ResponseTypeHTML;
     pRequest->m_nResponseStatus = 404;
 
@@ -1077,7 +1079,11 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
     QDateTime dtStart = QDateTime::fromString( sStartTime, Qt::ISODate );
 
     if (!dtStart.isValid())
+    {
+        VERBOSE(VB_IMPORTANT,
+                LOC + QString("bad start time '%1'").arg(sStartTime));
         return;
+    }
 
     // ----------------------------------------------------------------------
     // Read Recording From Database
@@ -1086,8 +1092,12 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
     ProgramInfo *pInfo = ProgramInfo::GetProgramFromRecorded( sChanId,
                                                               dtStart );
 
-    if (pInfo==NULL)
+    if (!pInfo)
+    {
+        VERBOSE(VB_IMPORTANT,
+                LOC + "no recording for start time " + sStartTime);
         return;
+    }
 
     if ( pInfo->hostname != gContext->GetHostName())
     {
