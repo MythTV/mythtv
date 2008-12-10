@@ -112,7 +112,7 @@ class MPUBLIC ScheduledRecording : public ConfigurationGroup
                                        QString from, QString forwhat);
 
     virtual DialogCode exec(bool saveOnExec = true, bool doLoad = false);
-        
+
     void remove();
     int getRecordID(void) const { return id->intValue(); };
     QString getRecordTitle(void) const;
@@ -132,10 +132,10 @@ class MPUBLIC ScheduledRecording : public ConfigurationGroup
 
     static void signalChange(int recordid);
     // Use -1 for recordid when all recordids are potentially
-    // affected, such as when the program table is updated.  
+    // affected, such as when the program table is updated.
     // Use 0 for recordid when a reschdule isn't specific to a single
     // recordid, such as when a recording type priority is changed.
-    
+
     void setInactiveObj(SRInactive* val) {inactive = val;}
     void setRecTypeObj(SRRecordingType* val) {type = val;}
     void setSearchTypeObj(SRRecSearchType* val) {search = val;}
@@ -175,9 +175,9 @@ class MPUBLIC ScheduledRecording : public ConfigurationGroup
     void setFindTimeObj(SRFindTime* val) {findtime = val;}
     void setFindIdObj(SRFindId* val) {findid = val;}
     void setParentIdObj(SRParentId* val) {parentid = val;}
-    
+
     void ToMap(QMap<QString, QString>& infoMap);
-    
+
     QString ChannelText(QString format);
 
 public slots:
@@ -196,12 +196,12 @@ protected:
 
     // Use deleteLater, we can't use directly because we inherit from QObject
     ~ScheduledRecording();
-    
+
     class ID : public AutoIncrementDBSetting
     {
         public:
             ID()
-               : AutoIncrementDBSetting("record", "recordid") 
+               : AutoIncrementDBSetting("record", "recordid")
             {
                 setName("RecordID");
                 setVisible(false);
@@ -248,7 +248,7 @@ protected:
     class SRFindTime* findtime;
     class SRFindId* findid;
     class SRParentId* parentid;
-    
+
     const ProgramInfo* m_pginfo;
     QPointer<RootSRGroup> rootGroup;
     QString chanstr;
@@ -256,7 +256,7 @@ protected:
     QString channame;
     QString searchForWhat;
     QString searchType;
-    
+
     QString channelFormat;
     QString longChannelFormat;
     QString timeFormat;
@@ -286,6 +286,7 @@ class ScheduledRecordingEditor :
     ListBoxSetting *listbox;
 };
 
+Q_DECLARE_METATYPE(ScheduledRecording *)
 
 #endif
 

@@ -240,7 +240,8 @@ void ViewScheduled::FillList(void)
             state = "warning";
 
         MythUIButtonListItem *item =
-                                new MythUIButtonListItem(m_schedulesList,"");
+                                new MythUIButtonListItem(m_schedulesList,"",
+                                                    qVariantFromValue(pginfo));
 
         QString temp;
         temp = (pginfo->recstartts).toString(m_dateformat);
@@ -257,7 +258,6 @@ void ViewScheduled::FillList(void)
         temp = pginfo->RecStatusChar();
         item->setText(temp, "card", state); //,font
 
-        item->SetData(qVariantFromValue(pginfo));
         item->DisplayState(state, "status");
     }
 
@@ -396,7 +396,7 @@ void ViewScheduled::deleteRule()
                                                                  message, true);
 
     okPopup->SetReturnEvent(this, "deleterule");
-    okPopup->SetData(qVariantFromValue((void *)record));
+    okPopup->SetData(qVariantFromValue(record));
 
     if (okPopup->Create())
         popupStack->AddScreen(okPopup);
@@ -524,8 +524,7 @@ void ViewScheduled::customEvent(QEvent *event)
 
         if (resultid == "deleterule")
         {
-            ScheduledRecording *record =
-                                    (ScheduledRecording *)dce->GetResultData();
+            ScheduledRecording *record = qVariantValue<ScheduledRecording *>(dce->GetData());
             if (record)
             {
                 if (buttonnum > 0)
