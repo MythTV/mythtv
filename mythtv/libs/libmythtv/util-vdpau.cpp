@@ -909,7 +909,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
 
     if (deint)
     {
-#if 0
+#if 1
         videoSurface = render->surface;
  
         // consolidate more 
@@ -1348,27 +1348,25 @@ bool VDPAUContext::SetDeinterlacing(bool interlaced)
     VdpStatus vdp_st;
     bool ok = interlaced;
 
-    if (interlaced)
-    {
-        VdpVideoMixerFeature features[] = {
-            VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL,
-            VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL,
-        };
+    VdpVideoMixerFeature features[] = {
+        VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL,
+        VDP_VIDEO_MIXER_FEATURE_DEINTERLACE_TEMPORAL_SPATIAL,
+    };
 
-        VdpBool deint = true;
-        const VdpBool * feature_values[] = {
-            &deint,
-            &deint,
-        };
+    VdpBool temporal = interlaced;
+    VdpBool spatial  = interlaced && deinterlacer.contains("advanced");
+    const VdpBool * feature_values[] = {
+        &temporal,
+        &spatial,
+    };
 
-        vdp_st = vdp_video_mixer_set_feature_enables(
-            videoMixer,
-            ARSIZE(features),
-            features,
-            *feature_values
-        );
-        CHECK_ST
-    }
+    vdp_st = vdp_video_mixer_set_feature_enables(
+        videoMixer,
+        ARSIZE(features),
+        features,
+        *feature_values
+    );
+    CHECK_ST
 
     deinterlacing = (interlaced & ok);
     needDeintRefs = false;
@@ -1378,7 +1376,8 @@ bool VDPAUContext::SetDeinterlacing(bool interlaced)
     }
     else
     {
-        if (deinterlacer.contains("advanced"))
+        if (deinterlacer.contains("advanced") ||
+            deinterlacer.contains("basic"))
             needDeintRefs = true;
     }
     return deinterlacing;
