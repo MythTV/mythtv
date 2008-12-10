@@ -1,11 +1,6 @@
-#include <qapplication.h>
-#include <qdatetime.h>
-
-#include <unistd.h>
-#include <iostream>
-#include <sys/types.h>
-#include <sys/stat.h>
-using namespace std;
+#include <QApplication>
+#include <QDateTime>
+#include <QFileInfo>
 
 #include "filetransfer.h"
 #include "RingBuffer.h"
@@ -159,16 +154,7 @@ long long FileTransfer::Seek(long long curpos, long long pos, int whence)
 
 long long FileTransfer::GetFileSize(void)
 {
-    QString filename = rbuffer->GetFilename();
-
-    struct stat st;
-    long long size = 0;
-
-    QByteArray fname = filename.toLocal8Bit();
-    if (stat(fname.constData(), &st) == 0)
-        size = st.st_size;
-
-    return size;
+    return QFileInfo(rbuffer->GetFilename()).size();
 }
 
 void FileTransfer::SetTimeout(bool fast)
