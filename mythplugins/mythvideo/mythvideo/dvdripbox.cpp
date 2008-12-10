@@ -142,19 +142,19 @@ bool DVDRipBox::Create()
         return false;
 
     bool err = false;
-    UIUtilE::Assign(this, m_warningText, "warning", err);
-    UIUtilE::Assign(this, m_overallText, "overall_text", err);
-    UIUtilE::Assign(this, m_jobText, "job_text", err);
-    UIUtilE::Assign(this, m_numjobsText, "numbjobs", err);
+    UIUtilE::Assign(this, m_warningText, "warning", &err);
+    UIUtilE::Assign(this, m_overallText, "overall_text", &err);
+    UIUtilE::Assign(this, m_jobText, "job_text", &err);
+    UIUtilE::Assign(this, m_numjobsText, "numbjobs", &err);
 
-    UIUtilE::Assign(this, m_overallProgress, "overall_progress", err);
-    UIUtilE::Assign(this, m_jobProgress, "job_progress", err);
+    UIUtilE::Assign(this, m_overallProgress, "overall_progress", &err);
+    UIUtilE::Assign(this, m_jobProgress, "job_progress", &err);
 
-    UIUtilE::Assign(this, m_ripscreenButton, "ripscreen", err);
-    UIUtilE::Assign(this, m_cancelButton, "cancel", err);
+    UIUtilE::Assign(this, m_ripscreenButton, "ripscreen", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
 
-    UIUtilE::Assign(this, m_nextjobButton, "next", err);
-    UIUtilE::Assign(this, m_prevjobButton, "prev", err);
+    UIUtilE::Assign(this, m_nextjobButton, "next", &err);
+    UIUtilE::Assign(this, m_prevjobButton, "prev", &err);
 
     if (err)
     {
