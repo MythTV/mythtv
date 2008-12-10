@@ -1017,9 +1017,7 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
         return;
     }
 
-    m_double_process = videoOutput->IsExtraProcessingRequired();
-
-    if (interlaced || m_double_process)
+    if (interlaced)
     {
         m_deint_possible = videoOutput->SetDeinterlacingEnabled(true);
         if (!m_deint_possible)
@@ -1041,12 +1039,14 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
                 FallbackDeint();
             }
         }
+        m_double_process = videoOutput->IsExtraProcessingRequired();
         VERBOSE(VB_PLAYBACK, "Enabled deinterlacing");
     }
-    else //progressive but !double_process
+    else
     {
         if (kScan_Progressive == scan)
         {
+            m_double_process = false;
             if (m_double_framerate) 
             {
                 m_double_framerate = false;
@@ -1057,7 +1057,6 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
         }
     }
 
-    // double_process can switch on/off
     if (osd && !IsIVTVDecoder())
     {
         osd->SetFrameInterval(
