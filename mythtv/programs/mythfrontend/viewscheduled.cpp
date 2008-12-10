@@ -396,7 +396,7 @@ void ViewScheduled::deleteRule()
                                                                  message, true);
 
     okPopup->SetReturnEvent(this, "deleterule");
-    okPopup->SetData(record);
+    okPopup->SetData(qVariantFromValue((void *)record));
 
     if (okPopup->Create())
         popupStack->AddScreen(okPopup);

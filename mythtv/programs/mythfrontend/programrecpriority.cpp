@@ -672,7 +672,7 @@ void ProgramRecPriority::doRemove(bool doRemove)
 
         ScheduledRecording *record = new ScheduledRecording();
         int recid = pgRecInfo->recordid;
-
+        record->loadByID(recid);
         record->remove();
 
         RemoveItemFromList(item);
