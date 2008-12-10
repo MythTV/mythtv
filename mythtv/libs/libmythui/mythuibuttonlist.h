@@ -68,10 +68,7 @@ class MPUBLIC MythUIButtonListItem
     void SetData(QVariant data);
     QVariant GetData();
 
-    void setOverrideInactive(bool flag);
-    bool getOverrideInactive(void);
-
-    bool moveUpDown(bool flag);
+    bool MoveUpDown(bool flag);
 
     void SetToRealButton(MythUIStateType *button, bool active_on);
 
@@ -85,7 +82,6 @@ class MPUBLIC MythUIButtonListItem
     CheckState      m_state;
     QVariant        m_data;
     bool            m_showArrow;
-    bool            m_overrideInactive;
 
     QMap<QString, TextProperties> m_strings;
     QMap<QString, MythImage*> m_images;
@@ -108,16 +104,10 @@ class MPUBLIC MythUIButtonList : public MythUIType
     virtual bool keyPressEvent(QKeyEvent *);
     virtual void gestureEvent(MythUIType *uitype, MythGestureEvent *event);
 
-    void SetFontActive(const MythFontProperties &font);
-    void SetFontInactive(const MythFontProperties &font);
-
-    void SetTextFlags(int flags);
-
-    void SetSpacing(int spacing);
     void SetDrawFromBottom(bool draw);
 
     void SetActive(bool active);
-    bool isActive() { return m_active; }
+    bool IsActive() { return m_active; }
     void Reset();
     void Update();
 

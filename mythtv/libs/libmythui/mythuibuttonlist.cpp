@@ -1,10 +1,4 @@
-// C++ headers
-#include <algorithm>
-
 // QT headers
-#include <QApplication>
-#include <QPainter>
-#include <QPixmap>
 #include <QDomDocument>
 
 // libmyth headers
@@ -14,7 +8,6 @@
 #include "mythuibuttonlist.h"
 #include "mythuigroup.h"
 #include "mythmainwindow.h"
-#include "mythfontproperties.h"
 #include "mythuistatetype.h"
 
 #define LOC     QString("MythUIButtonList(%1): ").arg(objectName())
@@ -95,12 +88,6 @@ void MythUIButtonList::Deselect()
     SetActive(false);
 }
 
-void MythUIButtonList::SetSpacing(int spacing)
-{
-    m_itemHorizSpacing = NormX(spacing);
-    m_itemVertSpacing = NormY(spacing);
-}
-
 void MythUIButtonList::SetDrawFromBottom(bool draw)
 {
     m_drawFromBottom = draw;
@@ -128,8 +115,8 @@ void MythUIButtonList::Reset()
 
     m_clearing = false;
 
-    m_topItem     = 0;
-    m_selItem     = 0;
+    m_topItem     = NULL;
+    m_selItem     = NULL;
     m_selPosition = 0;
     m_topPosition = 0;
     m_itemCount   = 0;
@@ -156,9 +143,7 @@ void MythUIButtonList::SetPositionArrowStates(void)
         int button = 0;
 
         if ((m_scrollStyle == ScrollCenter) && m_selPosition <= (int)(m_itemsVisible/2))
-        {
             button = (m_itemsVisible / 2) - m_selPosition;
-        }
         else if (m_drawFromBottom && m_itemCount < (int)m_itemsVisible)
             button = m_itemsVisible - m_itemCount;
 
@@ -175,7 +160,15 @@ void MythUIButtonList::SetPositionArrowStates(void)
             realButton->SetVisible(true);
 
             if ((m_wrapStyle == WrapItems) && (it == (m_itemList.end()-1)))
+            {
                 it = m_itemList.begin();
+
+//                 if ((m_scrollStyle == ScrollCenter) && m_selPosition <= (int)(m_itemsVisible/2))
+//                 {
+//                     it = m_itemList.end() - (m_itemsVisible - button);
+//                     button = 0;
+//                 }
+            }
             else
                 ++it;
             button++;
@@ -1087,7 +1080,6 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
     m_state     = state;
     m_showArrow = showArrow;
     m_data      = 0;
-    m_overrideInactive = false;
 
     if (state >= NotChecked)
         m_checkable = true;
@@ -1112,7 +1104,6 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
     m_checkable = false;
     m_state     = CantCheck;
     m_showArrow = false;
-    m_overrideInactive = false;
 
     if (m_parent)
         m_parent->InsertItem(this);
@@ -1298,17 +1289,7 @@ QVariant MythUIButtonListItem::GetData()
     return m_data;
 }
 
-void MythUIButtonListItem::setOverrideInactive(bool flag)
-{
-    m_overrideInactive = flag;
-}
-
-bool MythUIButtonListItem::getOverrideInactive(void)
-{
-    return m_overrideInactive;
-}
-
-bool MythUIButtonListItem::moveUpDown(bool flag)
+bool MythUIButtonListItem::MoveUpDown(bool flag)
 {
     if (m_parent)
         return m_parent->MoveItemUpDown(this, flag);
@@ -1323,7 +1304,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool active_
 
     if (this == m_parent->m_selItem)
     {
-        if (m_parent->m_active && !m_overrideInactive && active_on)
+        if (m_parent->m_active && active_on)
         {
             button->DisplayState("selected");
             button->MoveToTop();
