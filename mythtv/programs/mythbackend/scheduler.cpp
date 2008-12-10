@@ -1791,7 +1791,7 @@ void Scheduler::RunScheduler(void)
             if (secsleft > 30)
                 continue;
 
-            if (nextRecording->pathname == "")
+            if (nextRecording->pathname.isEmpty())
             {
                 QMutexLocker lockit(reclist_lock);
                 fsID = FillRecordingDir(nextRecording, reclist);
@@ -2257,7 +2257,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
 
         RecSearchType searchtype = RecSearchType(result.value(1).toInt());
 
-        if (qphrase == "" && searchtype != kManualSearch)
+        if (qphrase.isEmpty() && searchtype != kManualSearch)
         {
             VERBOSE(VB_IMPORTANT, QString("Invalid search key in recordid %1")
                                          .arg(result.value(0).toString()));
@@ -3508,47 +3508,44 @@ int Scheduler::FillRecordingDir(ProgramInfo *pginfo, RecList& reclist)
 
         if ((pginfo->recendts < thispg->recstartts) ||
             (pginfo->recstartts > thispg->recendts) ||
-            (thispg->recstatus != rsWillRecord) ||
-            (thispg->cardid == 0) ||
-            (recsCounted.contains(thispg->chanid + ":" +
-                thispg->recstartts.toString(Qt::ISODate))) ||
-            (thispg->pathname == ""))
+                (thispg->recstatus != rsWillRecord) ||
+                (thispg->cardid == 0) ||
+                (recsCounted.contains(thispg->chanid + ":" +
+                    thispg->recstartts.toString(Qt::ISODate))) ||
+                (thispg->pathname.isEmpty()))
             continue;
 
-        if (thispg->pathname != "")
+        for (fslistit = fsInfoList.begin();
+             fslistit != fsInfoList.end(); fslistit++)
         {
-            for (fslistit = fsInfoList.begin();
-                 fslistit != fsInfoList.end(); fslistit++)
+            FileSystemInfo *fs = *fslistit;
+            if ((fs->hostname == thispg->hostname) &&
+                (fs->directory == thispg->pathname))
             {
-                FileSystemInfo *fs = *fslistit;
-                if ((fs->hostname == thispg->hostname) &&
-                    (fs->directory == thispg->pathname))
+                VERBOSE(VB_FILE|VB_SCHEDULE, QString(
+                        "%1 @ %2 will record on %3:%4, FSID #%5, "
+                        "weightPerRecording +%6.")
+                        .arg(thispg->chanid)
+                        .arg(thispg->recstartts.toString(Qt::ISODate))
+                        .arg(fs->hostname).arg(fs->directory)
+                        .arg(fs->fsID).arg(weightPerRecording));
+
+                for (fsit2 = fsInfoCache.begin();
+                     fsit2 != fsInfoCache.end(); fsit2++)
                 {
-                    VERBOSE(VB_FILE|VB_SCHEDULE, QString(
-                            "%1 @ %2 will record on %3:%4, FSID #%5, "
-                            "weightPerRecording +%6.")
-                            .arg(thispg->chanid)
-                            .arg(thispg->recstartts.toString(Qt::ISODate))
-                            .arg(fs->hostname).arg(fs->directory)
-                            .arg(fs->fsID).arg(weightPerRecording));
-
-                    for (fsit2 = fsInfoCache.begin();
-                         fsit2 != fsInfoCache.end(); fsit2++)
+                    FileSystemInfo *fs2 = &(*fsit2);
+                    if (fs2->fsID == fs->fsID)
                     {
-                        FileSystemInfo *fs2 = &(*fsit2);
-                        if (fs2->fsID == fs->fsID)
-                        {
-                            VERBOSE(VB_FILE|VB_SCHEDULE, QString("    "
-                                    "%1:%2 => old weight %3 plus %4 = %5")
-                                    .arg(fs2->hostname).arg(fs2->directory)
-                                    .arg(fs2->weight).arg(weightPerRecording)
-                                    .arg(fs2->weight + weightPerRecording));
+                        VERBOSE(VB_FILE|VB_SCHEDULE, QString("    "
+                                "%1:%2 => old weight %3 plus %4 = %5")
+                                .arg(fs2->hostname).arg(fs2->directory)
+                                .arg(fs2->weight).arg(weightPerRecording)
+                                .arg(fs2->weight + weightPerRecording));
 
-                            fs2->weight += weightPerRecording;
-                        }
+                        fs2->weight += weightPerRecording;
                     }
-                    break;
                 }
+                break;
             }
         }
     }
@@ -3727,7 +3724,7 @@ bool Scheduler::WasStartedAutomatically()
 
     QDateTime startupTime = QDateTime();
     QString s = gContext->GetSetting("MythShutdownWakeupTime", "");
-    if (s != "")
+    if (s.length())
         startupTime = QDateTime::fromString(s, Qt::ISODate);
 
     // if we don't have a valid startup time assume we were started manually
