@@ -4642,6 +4642,9 @@ int VideoOutputXv::DisplayOSD(VideoFrame *frame, OSD *osd,
     bool changed = (-1 == revision) ?
         surface->Changed() : (surface->GetRevision()!=revision);
 
+    if (gl_use_osd_opengl2)
+        gl_osd_ready = true;
+
     if (changed)
     {
         QSize visible = GetTotalOSDBounds().size();
@@ -4667,8 +4670,6 @@ int VideoOutputXv::DisplayOSD(VideoFrame *frame, OSD *osd,
 
             if (vsz_enabled && gl_videochain)
                 gl_videochain->SetVideoResize(vsz_desired_display_rect);
-
-            gl_osd_ready = true;
 
             int offsets[3];
             offsets[0] = surface->y - surface->yuvbuffer;
