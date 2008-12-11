@@ -3646,10 +3646,6 @@ if enabled cpu_override; then
     echo
     echo "WARNING: When using --arch=X or --cpu=X you must include the "
     echo "         output of ./configure along with any bug report."
-elif ! enabled proc_opt && enabled dvb; then
-    echo
-    echo "WARNING: If you plan to watch HDTV recordings you probably"
-    echo "         need to run ./configure with --enable-proc-opt   "
 fi
 
 echo # add a newline after any warnings.
