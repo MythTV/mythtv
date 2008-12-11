@@ -127,7 +127,7 @@ bool FileSelector::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
         {
-            
+
         }
         else
             handled = false;
@@ -144,7 +144,7 @@ void FileSelector::itemClicked(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    FileData *fileData = (FileData*)item->getData();
+    FileData *fileData = qVariantValue<FileData*>item->GetData();
 
     if (fileData->directory)
     {
@@ -311,7 +311,7 @@ void FileSelector::OKPressed()
     else
     {
         MythUIButtonListItem *item = m_fileButtonList->GetItemCurrent();
-        FileData *fileData = (FileData*)item->getData();
+        FileData *fileData = qVariantValue<FileData*>item->GetData();
 
         if (m_selectorType == FSTYPE_DIRECTORY)
         {
@@ -425,7 +425,7 @@ void FileSelector::updateFileList()
                         MythUIButtonListItem(m_fileButtonList, data->filename);
                 item->setCheckable(false);
                 item->SetImage("ma_folder.png");
-                item->setData(data);
+                item->SetData(qVariantFromValue(data));
             }
         }
 
@@ -471,7 +471,7 @@ void FileSelector::updateFileList()
                 else
                     item->setCheckable(false);
 
-                item->setData(data);
+                item->SetData(qVariantFromValue(data));
             }
         }
         m_locationEdit->SetText(m_curDirectory);
