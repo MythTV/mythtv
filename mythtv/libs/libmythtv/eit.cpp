@@ -185,6 +185,9 @@ uint DBEvent::GetOverlappingPrograms(MSqlQuery &query,
 
         prog.previouslyshown = query.value(17).toBool();
 
+        if (prog.airdate == "0")
+           prog.airdate = QString::null;
+
         programs.push_back(prog);
         count++;
     }
