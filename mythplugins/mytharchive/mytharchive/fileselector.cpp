@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QFileInfo>
+#include <QVariant>
 
 // Myth
 #include <mythtv/mythcontext.h>

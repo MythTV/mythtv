@@ -52,8 +52,8 @@ class FileSelector : public MythScreenType
       QString getSelected(void);
 
   signals:
-    void haveResult(bool ok);            // used in FSTYPE_FILELIST mode 
-    void haveResult(QString filename);   // used in FSTYPE_FILE or FSTYPE_DIRECTORY mode 
+    void haveResult(bool ok);            // used in FSTYPE_FILELIST mode
+    void haveResult(QString filename);   // used in FSTYPE_FILE or FSTYPE_DIRECTORY mode
 
   protected slots:
     void OKPressed(void);
@@ -87,5 +87,7 @@ class FileSelector : public MythScreenType
     MythUIButton     *m_backButton;
     MythUIButton     *m_homeButton;
 };
+
+Q_DECLARE_METATYPE(FileData *)
 
 #endif
