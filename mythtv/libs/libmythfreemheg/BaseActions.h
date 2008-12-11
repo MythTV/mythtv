@@ -1,6 +1,6 @@
 /* BaseActions.h
 
-   Copyright (C)  David C. J. Matthews 2004  dm at prolingua.co.uk
+   Copyright (C)  David C. J. Matthews 2004, 2008  dm at prolingua.co.uk
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -73,6 +73,19 @@ protected:
     MHGenericInteger m_Argument1, m_Argument2;
 };
 
+// Base class for actions with three integers.  Used for SetSliderParameters
+class MHActionInt3: public MHElemAction
+{
+public:
+    MHActionInt3(const char *name): MHElemAction(name) {}
+    virtual void Initialise(MHParseNode *p, MHEngine *engine);
+    virtual void PrintArgs(FILE *fd, int nTabs) const;
+    virtual void Perform(MHEngine *engine);
+    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg1, int nArg2, int nArg3) = 0;
+protected:
+    MHGenericInteger m_Argument1, m_Argument2, m_Argument3;
+};
+
 // Base class for actions with four integers.  Used in the DynamicLineArt class
 class MHActionInt4: public MHElemAction
 {
@@ -138,5 +151,18 @@ protected:
     MHGenericObjectRef m_RefObject;
 };
 
+
+// Base class for actions with a single boolean argument.
+class MHActionBool: public MHElemAction
+{
+public:
+    MHActionBool(const char *name): MHElemAction(name) {}
+    virtual void Initialise(MHParseNode *p, MHEngine *engine);
+    virtual void PrintArgs(FILE *fd, int) const { m_Argument.PrintMe(fd, 0); }
+    virtual void Perform(MHEngine *engine);
+    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, bool fArg) = 0;
+protected:
+    MHGenericBoolean m_Argument;
+};
 
 #endif

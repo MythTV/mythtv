@@ -180,6 +180,8 @@ class MHIContext : public MHContext
 
     uint             m_lastNbiVersion;
     QMemArray<unsigned char> m_nbiData;
+    
+    QRect            m_videoRect;
 };
 
 // Object for drawing text.

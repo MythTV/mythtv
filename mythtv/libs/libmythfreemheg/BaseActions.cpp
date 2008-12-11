@@ -1,6 +1,6 @@
 /* BaseActions.cpp
 
-   Copyright (C)  David C. J. Matthews 2004  dm at prolingua.co.uk
+   Copyright (C)  David C. J. Matthews 2004, 2008  dm at prolingua.co.uk
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -87,6 +87,26 @@ void MHActionObjectRef2::Initialise(MHParseNode *p, MHEngine *engine)
     m_ResultVar2.Initialise(p->GetArgN(2), engine);
 }
 
+void MHActionInt3::Initialise(MHParseNode *p, MHEngine *engine)
+{
+    MHElemAction::Initialise(p, engine);
+    m_Argument1.Initialise(p->GetArgN(1), engine);
+    m_Argument2.Initialise(p->GetArgN(2), engine);
+    m_Argument3.Initialise(p->GetArgN(3), engine);
+}
+
+void MHActionInt3::PrintArgs(FILE *fd, int /*nTabs*/) const
+{
+    m_Argument1.PrintMe(fd, 0);
+    m_Argument2.PrintMe(fd, 0);
+    m_Argument3.PrintMe(fd, 0);
+}
+
+void MHActionInt3::Perform(MHEngine *engine)
+{
+    CallAction(engine, Target(engine), m_Argument1.GetValue(engine), m_Argument2.GetValue(engine), m_Argument3.GetValue(engine));
+}
+
 void MHActionInt4::Initialise(MHParseNode *p, MHEngine *engine)
 {
     MHElemAction::Initialise(p, engine);
@@ -159,4 +179,16 @@ void MHActionObjectRef::Perform(MHEngine *engine)
 void MHActionObjectRef2::Perform(MHEngine *engine)
 {
     CallAction(engine, Target(engine), engine->FindObject(m_ResultVar1), engine->FindObject(m_ResultVar2));
+}
+
+void MHActionBool::Initialise(MHParseNode *p, MHEngine *engine)
+{
+    MHElemAction::Initialise(p, engine);
+    m_Argument.Initialise(p->GetArgN(1), engine);
+}
+
+
+void MHActionBool::Perform(MHEngine *engine)
+{
+    CallAction(engine, Target(engine), m_Argument.GetValue(engine));
 }

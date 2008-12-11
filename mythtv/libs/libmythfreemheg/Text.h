@@ -90,7 +90,7 @@ protected:
     void CreateContent(const unsigned char *p, int s, MHEngine *engine);
 };
 
-class MHHyperText : public MHText, public  MHInteractible
+class MHHyperText : public MHText, public MHInteractible
 {
 public:
     MHHyperText();
@@ -98,6 +98,15 @@ public:
     virtual ~MHHyperText();
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void PrintMe(FILE *fd, int nTabs) const;
+
+    // Implement the actions in the main inheritance line.
+    virtual void SetInteractionStatus(bool newStatus, MHEngine *engine)
+    { InteractSetInteractionStatus(newStatus, engine); }
+    virtual bool GetInteractionStatus(void) { return InteractGetInteractionStatus(); }
+    virtual void SetHighlightStatus(bool newStatus, MHEngine *engine)
+    { InteractSetHighlightStatus(newStatus, engine); }
+    virtual bool GetHighlightStatus(void) { return InteractGetHighlightStatus(); }
+    virtual void Deactivation(MHEngine *engine) { InteractDeactivation(); }
 };
 
 // Get Text Data - get the data out of a text object.

@@ -1,6 +1,6 @@
 /* ParseText.cpp
 
-   Copyright (C)  David C. J. Matthews 2004  dm at prolingua.co.uk
+   Copyright (C)  David C. J. Matthews 2004, 2008  dm at prolingua.co.uk
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -535,6 +535,10 @@ void MHParseText::NextSym()
                 m_nInt = MHText::GetLineOrientation(buff);
                 if (m_nInt > 0) return;
                 m_nInt = MHText::GetStartCorner(buff);
+                if (m_nInt > 0) return;
+                m_nInt = MHSlider::GetOrientation(buff);
+                if (m_nInt > 0) return;
+                m_nInt = MHSlider::GetStyle(buff);
                 if (m_nInt > 0) return;
 
                 // Check the colour table.  If it's there generate a string containing the colour info.

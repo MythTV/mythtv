@@ -1,6 +1,6 @@
 /* Visible.h
 
-   Copyright (C)  David C. J. Matthews 2004  dm at prolingua.co.uk
+   Copyright (C)  David C. J. Matthews 2004, 2008  dm at prolingua.co.uk
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -124,13 +124,41 @@ public:
     virtual MHIngredient *Clone(MHEngine *) { return new MHRectangle(*this); } // Create a clone of this ingredient.
 };
 
+// The Interactible class is described as a "mix-in" class.  It is used
+// in various classes which complicates inheritance.
 class MHInteractible
 {
 public:
-    MHInteractible();
+    MHInteractible(MHVisible *parent);
     virtual ~MHInteractible();
-    virtual void Initialise(MHParseNode *p, MHEngine *engine);
-    virtual void PrintMe(FILE *fd, int nTabs) const;
+    void Initialise(MHParseNode *p, MHEngine *engine);
+    void PrintMe(FILE *fd, int nTabs) const;
+
+    virtual void Interaction(MHEngine *engine);
+
+    // This is called whenever a key is pressed while this
+    // interactible is set to interactive.
+    virtual void KeyEvent(MHEngine */*engine*/, int /*nCode*/) {}
+    virtual void InteractionCompleted(MHEngine */*engine*/) {}
+
+    void InteractSetInteractionStatus(bool newStatus, MHEngine *engine);
+    bool InteractGetInteractionStatus(void) { return m_fInteractionStatus; }
+    void InteractSetHighlightStatus(bool newStatus, MHEngine *engine);
+    bool InteractGetHighlightStatus(void) { return m_fHighlightStatus; }
+    // InteractDeactivation should be applied in every Deactivation action
+    // of derived classes.
+    void InteractDeactivation(void) { m_fInteractionStatus = false; }
+
+protected:
+    // Exchanged attributes
+    bool     m_fEngineResp;
+    MHColour m_highlightRefColour;
+    // Internal attributes
+    bool     m_fHighlightStatus;
+    bool     m_fInteractionStatus;
+
+private:
+    MHVisible *m_parent;
 };
 
 class MHSlider : public MHVisible, public MHInteractible
@@ -141,7 +169,54 @@ public:
     virtual const char *ClassName() { return "Slider"; }
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void PrintMe(FILE *fd, int nTabs) const;
-    virtual void Display(MHEngine *) {} // Not (yet?) supported
+    virtual void Display(MHEngine *);
+    virtual void Preparation(MHEngine *engine);
+
+    virtual void Interaction(MHEngine *engine);
+    virtual void InteractionCompleted(MHEngine *engine);
+    virtual void KeyEvent(MHEngine *engine, int nCode);
+
+    // Implement the actions in the main inheritance line.
+    virtual void SetInteractionStatus(bool newStatus, MHEngine *engine)
+    { InteractSetInteractionStatus(newStatus, engine); }
+    virtual bool GetInteractionStatus(void) { return InteractGetInteractionStatus(); }
+    virtual void SetHighlightStatus(bool newStatus, MHEngine *engine)
+    { InteractSetHighlightStatus(newStatus, engine); }
+    virtual bool GetHighlightStatus(void) { return InteractGetHighlightStatus(); }
+    virtual void Deactivation(MHEngine *engine) { InteractDeactivation(); }
+
+    // Actions
+    virtual void Step(int nbSteps, MHEngine *engine);
+    virtual void SetSliderValue(int newValue, MHEngine *engine);
+    virtual int GetSliderValue(void) { return slider_value; }
+    virtual void SetPortion(int newPortion, MHEngine *engine);
+    virtual int GetPortion(void) { return portion; }
+    // Additional action defined in UK MHEG.
+    virtual void SetSliderParameters(int newMin, int newMax, int newStep, MHEngine *engine);
+
+    // Enumerated type lookup functions for the text parser.
+    static int GetOrientation(const char *str);
+    static int GetStyle(const char *str);
+protected:
+    void Increment(MHEngine *engine);
+    void Decrement(MHEngine *engine);
+
+    // Exchanged attributes
+    // Orientation and direction of increasing value.
+    enum SliderOrientation { SliderLeft = 1, SliderRight, SliderUp, SliderDown }
+        m_orientation;
+    int initial_value, initial_portion;
+    int orig_max_value, orig_min_value, orig_step_size;
+    // Style of slider.  Normal represents a mark on a scale,
+    // Thermometer a range from the start up to the mark and Proportional
+    // a range from the slider to the portion.
+    enum SliderStyle { SliderNormal = 1, SliderThermo, SliderProp }
+        m_style;
+    MHColour m_sliderRefColour;
+    // Internal attributes
+    // In UK MHEG min_value, max_value and step_size can be changed.
+    int max_value, min_value, step_size;
+    int slider_value, portion;
 };
 
 class MHEntryField : public MHVisible, public MHInteractible
@@ -153,6 +228,15 @@ public:
     virtual void Initialise(MHParseNode *p, MHEngine *engine);
     virtual void PrintMe(FILE *fd, int nTabs) const;
     virtual void Display(MHEngine *) {} // Not (yet?) supported
+
+    // Implement the actions in the main inheritance line.
+    virtual void SetInteractionStatus(bool newStatus, MHEngine *engine)
+    { InteractSetInteractionStatus(newStatus, engine); }
+    virtual bool GetInteractionStatus(void) { return InteractGetInteractionStatus(); }
+    virtual void SetHighlightStatus(bool newStatus, MHEngine *engine)
+    { InteractSetHighlightStatus(newStatus, engine); }
+    virtual bool GetHighlightStatus(void) { return InteractGetHighlightStatus(); }
+    virtual void Deactivation(MHEngine *engine) { InteractDeactivation(); }
 };
 
 // Button - not needed for UK MHEG.
@@ -309,6 +393,83 @@ class MHSetLineStyle: public MHActionInt
 public:
     MHSetLineStyle(): MHActionInt(":SetLineStyle") {}
     virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->SetLineStyle(nArg, engine); };
+};
+
+class MHSetInteractionStatus: public MHActionBool
+{
+public:
+    MHSetInteractionStatus(): MHActionBool("SetInteractionStatus") {}
+    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, bool newStatus)
+    { Target(engine)->SetInteractionStatus(newStatus, engine); }
+};
+
+class MHGetInteractionStatus: public MHActionObjectRef
+{
+public:
+    MHGetInteractionStatus(): MHActionObjectRef(":GetInteractionStatus")  {}
+    virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult)
+        { pResult->SetVariableValue(pTarget->GetInteractionStatus());}
+};
+
+class MHSetHighlightStatus: public MHActionBool
+{
+public:
+    MHSetHighlightStatus(): MHActionBool("SetHighlightStatus") {}
+    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, bool newStatus)
+    { Target(engine)->SetHighlightStatus(newStatus, engine); }
+};
+
+class MHGetHighlightStatus: public MHActionObjectRef
+{
+public:
+    MHGetHighlightStatus(): MHActionObjectRef(":GetHighlightStatus")  {}
+    virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult)
+        { pResult->SetVariableValue(pTarget->GetHighlightStatus());}
+};
+
+class MHStep: public MHActionInt
+{
+public:
+    MHStep(): MHActionInt(":Step") {}
+    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->Step(nArg, engine); };
+};
+
+class MHSetSliderValue: public MHActionInt
+{
+public:
+    MHSetSliderValue(): MHActionInt(":SetSliderValue") {}
+    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->SetSliderValue(nArg, engine); };
+};
+
+class MHGetSliderValue: public MHActionObjectRef
+{
+public:
+    MHGetSliderValue(): MHActionObjectRef(":GetSliderValue")  {}
+    virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult)
+        { pResult->SetVariableValue(pTarget->GetSliderValue());}
+};
+
+class MHSetPortion: public MHActionInt
+{
+public:
+    MHSetPortion(): MHActionInt(":SetPortion") {}
+    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int nArg) { pTarget->SetPortion(nArg, engine); };
+};
+
+class MHGetPortion: public MHActionObjectRef
+{
+public:
+    MHGetPortion(): MHActionObjectRef(":GetPortion")  {}
+    virtual void CallAction(MHEngine *, MHRoot *pTarget, MHRoot *pResult)
+        { pResult->SetVariableValue(pTarget->GetPortion());}
+};
+
+class MHSetSliderParameters: public MHActionInt3
+{
+public:
+    MHSetSliderParameters(): MHActionInt3(":SetSliderParameters") {}
+    virtual void CallAction(MHEngine *engine, MHRoot *pTarget, int newMin, int newMax, int newStep)
+        { pTarget->SetSliderParameters(newMin, newMax, newStep, engine); };
 };
 
 #endif
