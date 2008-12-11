@@ -33,7 +33,6 @@ class MPUBLIC DialogCompletionEvent : public QEvent
     QString GetId() { return m_id; }
     int GetResult() { return m_result; }
     QString GetResultText() { return m_resultText; }
-    void *GetResultData() { return m_resultData.value<void *>(); }
     QVariant GetData() { return m_resultData; }
 
   private:
