@@ -1488,6 +1488,7 @@ case "$arch" in
       fi
     fi
     cmov="yes"
+    fast_cmov="yes"
   ;;
   # armv4l is a subset of armv[567]*l
   arm|armv[4567]*l)
