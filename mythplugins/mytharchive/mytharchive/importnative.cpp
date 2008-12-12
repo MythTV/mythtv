@@ -61,7 +61,7 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
             QDomNodeList nodeList = e.elementsByTagName("recorded");
             if (nodeList.count() < 1)
             {
-                VERBOSE(VB_IMPORTANT, 
+                VERBOSE(VB_IMPORTANT,
                         "Couldn't find a 'recorded' element in XML file");
                 return false;
             }
@@ -72,7 +72,7 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
             while (!n.isNull())
             {
                 e = n.toElement();
-                if (!e.isNull()) 
+                if (!e.isNull())
                 {
                     if (e.tagName() == "title")
                         details->title = e.text();
@@ -95,7 +95,7 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
             nodeList = e.elementsByTagName("channel");
             if (nodeList.count() < 1)
             {
-                VERBOSE(VB_IMPORTANT, 
+                VERBOSE(VB_IMPORTANT,
                         "Couldn't find a 'channel' element in XML file");
                 details->chanID = "";
                 details->chanNo = "";
@@ -117,7 +117,7 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
             QDomNodeList nodeList = e.elementsByTagName("videometadata");
             if (nodeList.count() < 1)
             {
-                VERBOSE(VB_IMPORTANT, 
+                VERBOSE(VB_IMPORTANT,
                         "Couldn't find a 'videometadata' element in XML file");
                 return false;
             }
@@ -128,7 +128,7 @@ static bool loadDetailsFromXML(const QString &filename, FileDetails *details)
             while (!n.isNull())
             {
                 e = n.toElement();
-                if (!e.isNull()) 
+                if (!e.isNull())
                 {
                     if (e.tagName() == "title")
                     {
@@ -245,7 +245,7 @@ void ArchiveFileSelector::itemSelected(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    FileData *fileData = (FileData*)item->getData();
+    FileData *fileData = qVariantValue<FileData*>(item->GetData());
     if (!fileData)
         return;
 
@@ -277,7 +277,7 @@ void ArchiveFileSelector::nextPressed()
         ImportNative *native = new ImportNative(mainStack, this, m_xmlFile, m_details);
 
         if (native->Create())
-            mainStack->AddScreen(native); 
+            mainStack->AddScreen(native);
     }
 }
 
@@ -443,7 +443,7 @@ void ImportNative::finishedPressed()
 
     int state = system(qPrintable(commandline));
 
-    if (state != 0) 
+    if (state != 0)
     {
         ShowOkPopup(tr("It was not possible to import the Archive. "
                        " An error occured when running 'mytharchivehelper'") );

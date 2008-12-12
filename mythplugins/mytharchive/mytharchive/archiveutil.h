@@ -82,4 +82,7 @@ void recalcItemSize(ArchiveItem *item);
 QString getBaseName(const QString &filename);
 void showWarningDialog(const QString msg);
 
+Q_DECLARE_METATYPE(EncoderProfile *)
+Q_DECLARE_METATYPE(ArchiveItem *)
+
 #endif

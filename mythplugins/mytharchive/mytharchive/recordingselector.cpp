@@ -28,7 +28,7 @@
 #include "recordingselector.h"
 #include "archiveutil.h"
 
-class GetRecordingListThread : public QThread 
+class GetRecordingListThread : public QThread
 {
   public:
     GetRecordingListThread(RecordingSelector *parent)
@@ -37,7 +37,7 @@ class GetRecordingListThread : public QThread
         start();
     }
 
-    virtual void run(void) 
+    virtual void run(void)
     {
         m_parent->getRecordingList();
     }
@@ -45,7 +45,7 @@ class GetRecordingListThread : public QThread
     RecordingSelector *m_parent;
 };
 
-RecordingSelector::RecordingSelector(MythScreenStack *parent, 
+RecordingSelector::RecordingSelector(MythScreenStack *parent,
                                      QList<ArchiveItem *> *archiveList)
                   : MythScreenType(parent, "RecordingSelector")
 {
@@ -123,7 +123,7 @@ void RecordingSelector::Init(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythUIBusyDialog *busyPopup = new 
+    MythUIBusyDialog *busyPopup = new
             MythUIBusyDialog(message, popupStack, "recordingselectorbusydialog");
 
     if (busyPopup->Create())
@@ -234,18 +234,20 @@ void RecordingSelector::toggleSelected(MythUIButtonListItem *item)
 {
     if (item->state() == MythUIButtonListItem:: FullChecked)
     {
-        int index = m_selectedList.indexOf((ProgramInfo *) item->getData());
+        int index = m_selectedList.indexOf(
+                                qVariantValue<ProgramInfo *>(item->GetData()));
         if (index != -1)
             m_selectedList.takeAt(index);
         item->setChecked(MythUIButtonListItem:: NotChecked);
     }
     else
     {
-        int index = m_selectedList.indexOf((ProgramInfo *) item->getData());
+        int index = m_selectedList.indexOf(
+                                qVariantValue<ProgramInfo *>(item->GetData()));
         if (index == -1)
-            m_selectedList.append((ProgramInfo *) item->getData());
+            m_selectedList.append(qVariantValue<ProgramInfo *>(item->GetData()));
 
-        item->setChecked(MythUIButtonListItem:: FullChecked);
+        item->setChecked(MythUIButtonListItem::FullChecked);
     }
 }
 
@@ -253,7 +255,7 @@ void RecordingSelector::titleChanged(MythUIButtonListItem *item)
 {
     ProgramInfo *p;
 
-    p = (ProgramInfo *) item->getData();
+    p = qVariantValue<ProgramInfo *>(item->GetData());
 
     if (!p)
         return;
@@ -414,7 +416,7 @@ void RecordingSelector::updateRecordingList(void)
                     item->setChecked(MythUIButtonListItem::NotChecked);
                 }
 
-                item->setData(p);
+                item->SetData(qVariantFromValue(p));
             }
             qApp->processEvents();
         }

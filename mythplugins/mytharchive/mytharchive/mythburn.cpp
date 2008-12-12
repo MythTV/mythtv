@@ -180,7 +180,7 @@ void MythBurn::updateSizeBar(void)
     for (int x = 0; x < m_archiveList.size(); x++)
     {
         a = m_archiveList.at(x);
-        size += a->newsize; 
+        size += a->newsize;
     }
 
     uint usedSpace = size / 1024 / 1024;
@@ -224,16 +224,16 @@ void MythBurn::loadEncoderProfiles()
 
     // find the encoding profiles
     // first look in the ConfDir (~/.mythtv)
-    QString filename = GetConfDir() + 
-            "/MythArchive/ffmpeg_dvd_" + 
+    QString filename = GetConfDir() +
+            "/MythArchive/ffmpeg_dvd_" +
             ((gContext->GetSetting("MythArchiveVideoFormat", "pal")
                 .toLower() == "ntsc") ? "ntsc" : "pal") + ".xml";
 
     if (!QFile::exists(filename))
     {
         // not found yet so use the default profiles
-        filename = GetShareDir() + 
-            "mytharchive/encoder_profiles/ffmpeg_dvd_" + 
+        filename = GetShareDir() +
+            "mytharchive/encoder_profiles/ffmpeg_dvd_" +
             ((gContext->GetSetting("MythArchiveVideoFormat", "pal")
                 .toLower() == "ntsc") ? "ntsc" : "pal") + ".xml";
     }
@@ -246,7 +246,7 @@ void MythBurn::loadEncoderProfiles()
     if (!file.open(QIODevice::ReadOnly))
         return;
 
-    if (!doc.setContent( &file )) 
+    if (!doc.setContent( &file ))
     {
         file.close();
         return;
@@ -265,7 +265,7 @@ void MythBurn::loadEncoderProfiles()
         while (!n2.isNull())
         {
             QDomElement e2 = n2.toElement();
-            if(!e2.isNull()) 
+            if(!e2.isNull())
             {
                 if (e2.tagName() == "name")
                     name = e2.text();
@@ -290,10 +290,10 @@ void MythBurn::loadEncoderProfiles()
 void MythBurn::toggleUseCutlist(void)
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *a = (ArchiveItem *) item->getData();
+    ArchiveItem *a = qVariantValue<ArchiveItem *>(item->GetData());
 
     if (!a)
-        return; 
+        return;
 
     if (!a->hasCutlist)
         return;
@@ -363,7 +363,7 @@ void MythBurn::updateArchiveList(void)
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythUIBusyDialog *busyPopup = new 
+    MythUIBusyDialog *busyPopup = new
             MythUIBusyDialog(message, popupStack, "mythburnbusydialog");
 
     if (busyPopup->Create())
@@ -402,7 +402,7 @@ void MythBurn::updateArchiveList(void)
             recalcItemSize(a);
 
             MythUIButtonListItem* item = new MythUIButtonListItem(m_archiveButtonList, a->title);
-            item->setData(a);
+            item->SetData(qVariantFromValue(a));
             item->setText(a->subtitle, "subtitle");
             item->setText(a->startDate + " " + a->startTime, "date");
             item->setText(formatSize(a->newsize / 1024, 2), "size");
@@ -508,7 +508,7 @@ EncoderProfile *MythBurn::getDefaultProfile(ArchiveItem *item)
     if (!profile)
     {
         // file needs re-encoding - use default profile setting
-        QString defaultProfile = 
+        QString defaultProfile =
                 gContext->GetSetting("MythArchiveDefaultEncProfile", "SP");
 
         for (int x = 0; x < m_profileList.size(); x++)
@@ -709,7 +709,7 @@ void MythBurn::showMenu()
         return;
 
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = (ArchiveItem *) item->getData();
+    ArchiveItem *curItem = qVariantValue<ArchiveItem *>(item->GetData());
 
     if (!curItem)
         return;
@@ -741,7 +741,7 @@ void MythBurn::showMenu()
 void MythBurn::removeItem()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = (ArchiveItem *) item->getData();
+    ArchiveItem *curItem = qVariantValue<ArchiveItem *>(item->GetData());
 
     if (!curItem)
         return;
@@ -754,7 +754,7 @@ void MythBurn::removeItem()
 void MythBurn::editDetails()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = (ArchiveItem *) item->getData();
+    ArchiveItem *curItem = qVariantValue<ArchiveItem *>(item->GetData());
 
     if (!curItem)
         return;
@@ -773,7 +773,7 @@ void MythBurn::editDetails()
 void MythBurn::editThumbnails()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = (ArchiveItem *) item->getData();
+    ArchiveItem *curItem = qVariantValue<ArchiveItem *>(item->GetData());
 
     if (!curItem)
         return;
@@ -802,7 +802,7 @@ void MythBurn::editorClosed(bool ok, ArchiveItem *item)
 void MythBurn::changeProfile()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = (ArchiveItem *) item->getData();
+    ArchiveItem *curItem = qVariantValue<ArchiveItem *>(item->GetData());
 
     if (!curItem)
         return;
@@ -830,7 +830,7 @@ void MythBurn::profileChanged(int profileNo)
     if (!item)
         return;
 
-    ArchiveItem *archiveItem = (ArchiveItem *) item->getData();
+    ArchiveItem *archiveItem = qVariantValue<ArchiveItem *>(item->GetData());
     if (!archiveItem)
         return;
 
@@ -867,7 +867,7 @@ void MythBurn::runScript()
 
     int state = system(qPrintable(commandline));
 
-    if (state != 0) 
+    if (state != 0)
     {
         ShowOkPopup(tr("It was not possible to create the DVD. "
                        " An error occured when running the scripts"));
@@ -975,9 +975,9 @@ bool ProfileDialog::Create()
 
     for (int x = 0; x < m_profileList.size(); x++)
     {
-        MythUIButtonListItem *item = new 
+        MythUIButtonListItem *item = new
                 MythUIButtonListItem(m_profile_list, m_profileList.at(x)->name);
-        item->setData(m_profileList.at(x));
+        item->SetData(qVariantFromValue(m_profileList.at(x)));
     }
 
     connect(m_profile_list, SIGNAL(itemSelected(MythUIButtonListItem*)),
@@ -1005,7 +1005,7 @@ void ProfileDialog::profileChanged(MythUIButtonListItem *item)
     if (!item)
         return;
 
-    EncoderProfile *profile = (EncoderProfile*)item->getData();
+    EncoderProfile *profile = qVariantValue<EncoderProfile *>(item->GetData());
     if (!profile)
         return;
 

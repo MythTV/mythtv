@@ -155,7 +155,7 @@ void ExportNative::updateSizeBar()
     for (int x = 0; x < m_archiveList.size(); x++)
     {
         a = m_archiveList.at(x);
-        size += a->size; 
+        size += a->size;
     }
 
     m_usedSpace = size / 1024 / 1024;
@@ -204,7 +204,7 @@ void ExportNative::titleChanged(MythUIButtonListItem *item)
 {
     ArchiveItem *a;
 
-    a = (ArchiveItem *) item->getData();
+    a = qVariantValue<ArchiveItem *>(item->GetData());
 
     if (!a)
         return;
@@ -264,7 +264,7 @@ void ExportNative::updateArchiveList(void)
             a = m_archiveList.at(x);
 
             MythUIButtonListItem* item = new MythUIButtonListItem(m_archiveButtonList, a->title);
-            item->setData(a);
+            item->SetData(qVariantFromValue(a));
         }
 
         m_archiveButtonList->SetItemCurrent(m_archiveButtonList->GetItemFirst());
@@ -386,7 +386,7 @@ void ExportNative::showMenu()
 void ExportNative::removeItem()
 {
     MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
-    ArchiveItem *curItem = (ArchiveItem *) item->getData();
+    ArchiveItem *curItem = qVariantValue<ArchiveItem *>(item->GetData());
 
     if (!curItem)
         return;

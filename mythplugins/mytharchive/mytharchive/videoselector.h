@@ -89,6 +89,8 @@ class VideoSelector : public MythScreenType
     MythUIImage      *m_coverImage;
 };
 
+Q_DECLARE_METATYPE(VideoInfo*)
+
 #endif
 
 
