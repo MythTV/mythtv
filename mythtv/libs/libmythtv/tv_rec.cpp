@@ -418,7 +418,8 @@ void TVRec::SetPseudoLiveTVRecording(ProgramInfo *pi)
  */
 QDateTime TVRec::GetRecordEndTime(const ProgramInfo *pi) const
 {
-    bool spcat = (pi->category == overRecordCategory);
+    bool spcat = (!overRecordCategory.isEmpty() &&
+                  pi->category == overRecordCategory);
     int secs = (spcat) ? overRecordSecCat : overRecordSecNrml;
     return pi->recendts.addSecs(secs);
 }
