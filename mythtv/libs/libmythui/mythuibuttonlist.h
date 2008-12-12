@@ -44,7 +44,15 @@ class MPUBLIC MythUIButtonListItem
 
     void SetFontState(const QString &state, const QString &name="");
 
-    void setImage(MythImage *image, const QString &name="") __attribute__ ((deprecated));
+    /** Sets an image directly, should only be used in special circumstances
+     *  since it bypasses the cache
+     */
+    void setImage(MythImage *image, const QString &name="");
+
+    /** Gets a MythImage which has been assigned to this button item,
+     *  as with setImage() it should only be used in special circumstances
+     *  since it bypasses the cache
+     */
     MythImage *getImage(const QString &name="");
 
     void SetImage(const QString &filename, const QString &name="");
@@ -60,17 +68,12 @@ class MPUBLIC MythUIButtonListItem
 
     void setDrawArrow(bool flag);
 
-    // Deprecated, use the QVariant based SetData & GetData instead
-    void setData(void *data);
-    void *getData();
-    // ------------
-
     void SetData(QVariant data);
     QVariant GetData();
 
     bool MoveUpDown(bool flag);
 
-    void SetToRealButton(MythUIStateType *button, bool active_on);
+    void SetToRealButton(MythUIStateType *button, bool selected);
 
   protected:
     MythUIButtonList *m_parent;
