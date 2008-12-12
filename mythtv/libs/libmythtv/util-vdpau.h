@@ -54,6 +54,7 @@ class VDPAUContext
     int SetPictureAttribute(PictureAttribute attributeType, int newValue);
 
     bool ShowPiP(VideoFrame * frame, QRect position);
+    void CopyFrame(VideoFrame *dst, const VideoFrame *src, QSize size);
 
   private:
     bool InitProcs(Display *disp, Screen *screen);

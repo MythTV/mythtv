@@ -1935,3 +1935,60 @@ bool VDPAUContext::ShowPiP(VideoFrame * frame, QRect position)
 
     return ok;
 }
+
+void VDPAUContext::CopyFrame(VideoFrame *dst, const VideoFrame *src, QSize size)
+{
+    if (!src || !dst || size.height() < 1 || size.width() < 1)
+        return;
+
+    vdpau_render_state_t *src_render, *dst_render;
+
+    src_render = (vdpau_render_state_t *)src->buf;
+    dst_render = (vdpau_render_state_t *)dst->buf;
+    
+    if (!src_render || !dst_render)
+        return;
+
+    unsigned char *tmp =
+        new unsigned char[(size.width() * size.height() * 3)>>1];
+
+    if (!tmp)
+        return;
+
+    VERBOSE(VB_PLAYBACK, LOC + QString("Copying VDPAU video surface."));
+
+    bool ok = true;
+    VdpStatus vdp_st;
+
+    VdpVideoSurface src_surface = src_render->surface;
+    VdpVideoSurface dst_surface = dst_render->surface;
+
+    uint32_t pitches[3] = {size.width(), size.width()>>1, size.width()>>1};
+    void* const planes[3] =  {
+        tmp,
+        tmp + (size.width() * size.height()),
+        tmp + (size.width() * size.height()) +
+             ((size.width() * size.height())>>2)
+    };
+
+    vdp_st = vdp_video_surface_get_bits_y_cb_cr(
+        src_surface,
+        VDP_YCBCR_FORMAT_YV12,
+        planes,
+        pitches
+    );
+    CHECK_ST
+
+    if (ok)
+    {
+        vdp_st = vdp_video_surface_put_bits_y_cb_cr(
+            dst_surface,
+            VDP_YCBCR_FORMAT_YV12,
+            planes,
+            pitches
+        );
+        CHECK_ST
+    }
+        
+    delete [] tmp;
+}
