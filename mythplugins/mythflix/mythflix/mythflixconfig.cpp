@@ -1,10 +1,10 @@
 
 // QT headers
-#include <qapplication.h>
-#include <q3ptrlist.h>
-#include <qstring.h>
-#include <qfile.h>
-#include <qdom.h>
+#include <QApplication>
+#include <Q3PtrList>
+#include <QString>
+#include <QFile>
+#include <QDomDocument>
 
 // MythTV headers
 #include <mythtv/util.h>
@@ -33,6 +33,8 @@ public:
     bool    inDB;
 };
 
+Q_DECLARE_METATYPE(NewsSiteItem *)
+
 // ---------------------------------------------------
 
 class NewsCategory
@@ -56,6 +58,8 @@ public:
         siteList.clear();
     };
 };
+
+Q_DECLARE_METATYPE(NewsCategory *)
 
 // ---------------------------------------------------
 
@@ -207,7 +211,7 @@ void MythFlixConfig::loadData()
          cat; cat = m_priv->categoryList.next() ) {
         MythUIButtonListItem* item =
             new MythUIButtonListItem(m_siteList, cat->name);
-        item->setData(cat);
+        item->SetData(qVariantFromValue(cat));
     }
     slotCategoryChanged(m_siteList->GetItemFirst());
 
@@ -215,10 +219,10 @@ void MythFlixConfig::loadData()
 
 void MythFlixConfig::toggleItem(MythUIButtonListItem *item)
 {
-    if (!item || !item->getData())
+    if (!item || !item->GetData().isNull())
         return;
 
-    NewsSiteItem* site = (NewsSiteItem*) item->getData();
+    NewsSiteItem* site = qVariantValue<NewsSiteItem *>(item->GetData());
 
     bool checked = (item->state() == MythUIButtonListItem::FullChecked);
 
@@ -296,7 +300,7 @@ void MythFlixConfig::slotCategoryChanged(MythUIButtonListItem *item)
 
     m_genresList->Reset();
 
-    NewsCategory* cat = (NewsCategory*) item->getData();
+    NewsCategory* cat = qVariantValue<NewsCategory *>(item->GetData());
     if (cat)
     {
         for (NewsSiteItem* site = cat->siteList.first();
@@ -307,7 +311,7 @@ void MythFlixConfig::slotCategoryChanged(MythUIButtonListItem *item)
                                       site->inDB ?
                                       MythUIButtonListItem::FullChecked :
                                       MythUIButtonListItem::NotChecked);
-            newItem->setData(site);
+            newItem->SetData(qVariantFromValue(site));
         }
     }
 }
