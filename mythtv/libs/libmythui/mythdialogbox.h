@@ -219,4 +219,6 @@ class MPUBLIC MythUISearchDialog : public MythScreenType
 
 MPUBLIC void ShowOkPopup(const QString &message);
 
+Q_DECLARE_METATYPE(const char*)
+
 #endif

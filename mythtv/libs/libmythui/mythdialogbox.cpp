@@ -73,10 +73,9 @@ bool MythDialogBox::Create(void)
 
 void MythDialogBox::Select(MythUIButtonListItem* item)
 {
-    const char *slot = (const char *)item->getData();
+    const char *slot = qVariantValue<const char *>(item->GetData());
     if (m_useSlots && slot)
     {
-        const char *slot = (const char *)item->getData();
         connect(this, SIGNAL(Selected()), m_retObject, slot,
                 Qt::QueuedConnection);
         emit Selected();
@@ -106,7 +105,7 @@ void MythDialogBox::AddButton(const QString &title, const char *slot)
     m_useSlots = true;
 
     if (slot)
-        button->setData(const_cast<char*>(slot));
+        button->SetData(qVariantFromValue(slot));
 }
 
 bool MythDialogBox::keyPressEvent(QKeyEvent *event)
