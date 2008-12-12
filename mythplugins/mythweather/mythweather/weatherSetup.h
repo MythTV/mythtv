@@ -32,6 +32,8 @@ struct SourceListInfo
     uint id;
 };
 
+Q_DECLARE_METATYPE(SourceListInfo *)
+
 /** \class GlobalSetup
  *  \brief Screen for mythweather global settings
  */
@@ -124,6 +126,8 @@ struct ResultListInfo
     QString idstr;
     ScriptInfo *src;
 };
+
+Q_DECLARE_METATYPE(ResultListInfo *)
 
 typedef QMultiHash<QString, QList<ScriptInfo*> > CacheMap;
 
