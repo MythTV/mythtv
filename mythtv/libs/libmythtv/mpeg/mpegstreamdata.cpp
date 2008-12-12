@@ -928,10 +928,11 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
 int MPEGStreamData::ProcessData(unsigned char *buffer, int len)
 {
     int pos = 0;
+    bool resync = false;
 
     while (pos + 187 < len) // while we have a whole packet left
     {
-        if (buffer[pos] != SYNC_BYTE)
+        if (buffer[pos] != SYNC_BYTE || resync)
         {
             int newpos = ResyncStream(buffer, pos, len);
             if (newpos == -1)
@@ -944,9 +945,12 @@ int MPEGStreamData::ProcessData(unsigned char *buffer, int len)
 
         const TSPacket *pkt = reinterpret_cast<const TSPacket*>(&buffer[pos]);
         if (ProcessTSPacket(*pkt))
+        {
             pos += TSPacket::SIZE; // Advance to next TS packet
+            resync = false;
+        }
         else // Let it resync in case of dropped bytes
-            buffer[pos] = SYNC_BYTE + 1;
+            resync = true;
     }
 
     return len - pos;
