@@ -3706,6 +3706,7 @@ void VideoOutputXv::CopyFrame(VideoFrame *to, const VideoFrame *from)
 {
     if (VideoOutputSubType() <= XVideo)
         VideoOutput::CopyFrame(to, from);
+#ifdef USING_VDPAU
     else if (VideoOutputSubType() == XVideoVDPAU)
     {
         if (!vdpau)
@@ -3714,6 +3715,7 @@ void VideoOutputXv::CopyFrame(VideoFrame *to, const VideoFrame *from)
         to->frameNumber = from->frameNumber;
         vdpau->CopyFrame(to, from, video_dim);
     }
+#endif
     else if (xvmc_tex)
     {
         global_lock.lock();
