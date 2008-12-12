@@ -115,4 +115,6 @@ class BookmarkManager : public MythScreenType
     MythDialogBox    *m_menuPopup;
 };
 
+Q_DECLARE_METATYPE(Bookmark *)
+
 #endif
