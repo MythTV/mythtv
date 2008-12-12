@@ -219,7 +219,7 @@ void MythFlixConfig::loadData()
 
 void MythFlixConfig::toggleItem(MythUIButtonListItem *item)
 {
-    if (!item || !item->GetData().isNull())
+    if (!item || item->GetData().isNull())
         return;
 
     NewsSiteItem* site = qVariantValue<NewsSiteItem *>(item->GetData());
