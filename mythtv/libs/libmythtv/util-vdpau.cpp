@@ -771,6 +771,20 @@ void VDPAUContext::Decode(VideoFrame *frame)
 
     if (frame->pix_fmt != pix_fmt)
     {
+        uint32_t max_references = 2;
+
+        if (frame->pix_fmt == PIX_FMT_VDPAU_H264_MAIN ||
+            frame->pix_fmt == PIX_FMT_VDPAU_H264_HIGH)
+        {
+            uint32_t round_width = (frame->width + 15) & ~15;
+            uint32_t round_height = (frame->height + 15) & ~15;
+            uint32_t surf_size = (round_width * round_height * 3) / 2;
+            max_references = (12 * 1024 * 1024) / surf_size;
+            if (max_references > 16) {
+                max_references = 16;
+            }
+        }
+
         VdpDecoderProfile vdp_decoder_profile;
         switch (frame->pix_fmt)
         {
@@ -794,12 +808,18 @@ void VDPAUContext::Decode(VideoFrame *frame)
             vdp_decoder_profile,
             frame->width,
             frame->height,
+            max_references,
             &decoder
         );
         CHECK_ST
 
         if (ok)
+        {
             pix_fmt = frame->pix_fmt;
+            VERBOSE(VB_PLAYBACK, LOC +
+                QString("Created VDPAU decoder (%1 ref frames)")
+                .arg(max_references));
+        }
         else
         {
             VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Failed to create decoder."));
