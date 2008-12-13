@@ -107,7 +107,7 @@ class MPEGStreamData : public EITSource
     virtual bool HandleTables(uint pid, const PSIPTable &psip);
     virtual void HandleTSTables(const TSPacket* tspacket);
     virtual bool ProcessTSPacket(const TSPacket& tspacket);
-    virtual int  ProcessData(unsigned char *buffer, int len);
+    virtual int  ProcessData(const unsigned char *buffer, int len);
     inline  void HandleAdaptationFieldControl(const TSPacket* tspacket);
 
     // Listening
@@ -294,7 +294,7 @@ class MPEGStreamData : public EITSource
     void ProcessPMT(const ProgramMapTable *pmt);
     void ProcessEncryptedPacket(const TSPacket&);
 
-    static int ResyncStream(unsigned char *buffer, int curr_pos, int len);
+    static int ResyncStream(const unsigned char *buffer, int curr_pos, int len);
 
     void UpdateTimeOffset(uint64_t si_utc_time);
 

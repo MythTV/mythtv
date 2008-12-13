@@ -925,7 +925,7 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
 }
 #undef DONE_WITH_PES_PACKET
 
-int MPEGStreamData::ProcessData(unsigned char *buffer, int len)
+int MPEGStreamData::ProcessData(const unsigned char *buffer, int len)
 {
     int pos = 0;
     bool resync = false;
@@ -934,7 +934,7 @@ int MPEGStreamData::ProcessData(unsigned char *buffer, int len)
     {
         if (buffer[pos] != SYNC_BYTE || resync)
         {
-            int newpos = ResyncStream(buffer, pos, len);
+            int newpos = ResyncStream(buffer, pos+1, len);
             if (newpos == -1)
                 return len - pos;
             if (newpos == -2)
@@ -1007,7 +1007,8 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
     return true;
 }
 
-int MPEGStreamData::ResyncStream(unsigned char *buffer, int curr_pos, int len)
+int MPEGStreamData::ResyncStream(const unsigned char *buffer, int curr_pos,
+                                 int len)
 {
     // Search for two sync bytes 188 bytes apart, 
     int pos = curr_pos;
