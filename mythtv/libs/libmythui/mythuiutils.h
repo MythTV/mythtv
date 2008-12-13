@@ -1,13 +1,15 @@
 #ifndef MYTHUIUTILS_H_
 #define MYTHUIUTILS_H_
 
-struct ETPrintWarning
+#include "mythexp.h"
+
+struct MPUBLIC ETPrintWarning
 {
     static bool Child(const QString &container_name, const QString &child_name);
     static bool Container(const QString &child_name);
 };
 
-struct ETPrintError
+struct MPUBLIC ETPrintError
 {
     static bool Child(const QString &container_name, const QString &child_name);
     static bool Container(const QString &child_name);
