@@ -1,4 +1,5 @@
 #include <set>
+#include <map>
 
 #include <QApplication>
 #include <QTimer>
