@@ -25,8 +25,6 @@ const QString JUMP_VIDEO_TREE = "Video Listings";
 const QString JUMP_VIDEO_GALLERY = "Video Gallery";
 const QString JUMP_VIDEO_DEFAULT = "MythVideo";
 
-const int SCREEN_EXIT_VIA_JUMP = 5;
-
 #ifdef Q_WS_MACX
 const QString DEFAULT_VIDEOSTARTUP_DIR = QDir::homePath() + "/Movies";
 #else

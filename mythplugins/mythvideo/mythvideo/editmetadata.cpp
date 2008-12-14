@@ -12,10 +12,10 @@
 #include <mythtv/libmythui/mythuicheckbox.h>
 
 #include "globals.h"
-#include "editmetadata.h"
 #include "dbaccess.h"
 #include "metadatalistmanager.h"
 #include "videoutils.h"
+#include "editmetadata.h"
 
 EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
         QString lname, Metadata *source_metadata,
@@ -285,7 +285,7 @@ void EditMetadataDialog::toggleBrowse()
 void EditMetadataDialog::findCoverArt()
 {
     QString new_coverart_file;
-    if (!isDefaultCoverFile(m_workingMetadata->CoverFile()))
+    if (!IsDefaultCoverFile(m_workingMetadata->CoverFile()))
     {
         new_coverart_file = m_workingMetadata->CoverFile();
     }

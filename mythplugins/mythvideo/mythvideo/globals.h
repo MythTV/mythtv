@@ -23,8 +23,6 @@ extern const QString JUMP_VIDEO_TREE;
 extern const QString JUMP_VIDEO_GALLERY;
 extern const QString JUMP_VIDEO_DEFAULT;
 
-extern const int SCREEN_EXIT_VIA_JUMP;
-
 extern const QString DEFAULT_VIDEOSTARTUP_DIR;
 
 #endif // GLOBALS_H_

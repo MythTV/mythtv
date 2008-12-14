@@ -5,9 +5,9 @@
 
 #include <mythtv/mythdirs.h>
 
-#include "globalsettings.h"
 #include "globals.h"
 #include "videodlg.h"
+#include "globalsettings.h"
 
 namespace
 {

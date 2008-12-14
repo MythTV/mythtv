@@ -12,8 +12,8 @@
 #include <mythtv/libmythui/mythuibuttonlist.h>
 #include <mythtv/libmythui/mythuicheckbox.h>
 
-#include "titledialog.h"
 #include "videoutils.h"
+#include "titledialog.h"
 
 TitleDialog::TitleDialog(MythScreenStack *lparent, QString lname,
         QTcpSocket *a_socket, QString d_name, QList<DVDTitleInfo*> *titles) :

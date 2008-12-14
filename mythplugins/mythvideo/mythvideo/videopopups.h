@@ -3,8 +3,6 @@
 
 #include <mythtv/libmythui/mythscreentype.h>
 
-#include "videoutils.h"
-
 class Metadata;
 
 class MythUIButtonList;
@@ -34,27 +32,6 @@ class PlotDialog : public MythScreenType
 
   private:
     Metadata *m_metadata;
-};
-
-class SearchResultsDialog : public MythScreenType
-{
-    Q_OBJECT
-
-  public:
-    SearchResultsDialog(MythScreenStack *lparent,
-            const SearchListResults &results);
-
-    bool Create();
-
- signals:
-    void haveResult(QString);
-
-  private:
-    SearchListResults m_results;
-    MythUIButtonList *m_resultsList;
-
-  private slots:
-    void sendResult(MythUIButtonListItem *item);
 };
 
 #endif

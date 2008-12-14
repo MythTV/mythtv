@@ -11,9 +11,9 @@
 #include <mythtv/libmythui/mythuicheckbox.h>
 #include <mythtv/libmythui/mythuibutton.h>
 
-#include "fileassoc.h"
 #include "dbaccess.h"
 #include "videoutils.h"
+#include "fileassoc.h"
 
 namespace
 {

@@ -12,9 +12,9 @@
 #include <mythtv/libmythui/mythuitext.h>
 #include <mythtv/libmythui/mythuiprogressbar.h>
 
-#include "dvdripbox.h"
 #include "titledialog.h"
 #include "videoutils.h"
+#include "dvdripbox.h"
 
 MTDJob::MTDJob() : job_number(-1), overall_progress(0.0), subjob_progress(0.0),
     cancelled(false)

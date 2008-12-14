@@ -6,8 +6,8 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdbparams.h>
 
-#include "dbcheck.h"
 #include "videodlg.h"
+#include "dbcheck.h"
 
 namespace
 {

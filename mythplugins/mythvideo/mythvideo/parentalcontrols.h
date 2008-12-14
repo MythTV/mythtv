@@ -1,7 +1,7 @@
 #ifndef PARENTALCONTROLS_H_
 #define PARENTALCONTROLS_H_
 
-#include <QObject>
+#include <QObject> // for moc
 
 class ParentalLevel
 {

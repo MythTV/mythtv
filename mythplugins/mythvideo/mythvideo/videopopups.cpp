@@ -6,9 +6,9 @@
 #include <mythtv/libmythui/mythuitext.h>
 #include <mythtv/libmythui/mythuibutton.h>
 
-#include "videopopups.h"
 #include "metadata.h"
 #include "videoutils.h"
+#include "videopopups.h"
 
 CastDialog::CastDialog(MythScreenStack *lparent, Metadata *metadata) :
     MythScreenType(lparent, "videocastpopup"), m_metadata(metadata)
@@ -84,52 +84,4 @@ bool PlotDialog::Create()
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
 
     return true;
-}
-
-/////////////////////////////////////////////////////////////
-
-SearchResultsDialog::SearchResultsDialog(MythScreenStack *lparent,
-        const SearchListResults &results) :
-    MythScreenType(lparent, "videosearchresultspopup"), m_results(results),
-    m_resultsList(0)
-{
-}
-
-bool SearchResultsDialog::Create()
-{
-    if (!LoadWindowFromXML("video-ui.xml", "moviesel", this))
-        return false;
-
-    bool err = false;
-    UIUtilE::Assign(this, m_resultsList, "results", &err);
-
-    if (err)
-    {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'moviesel'");
-        return false;
-    }
-
-    QMapIterator<QString, QString> resultsIterator(m_results);
-    while (resultsIterator.hasNext())
-    {
-        resultsIterator.next();
-        MythUIButtonListItem *button =
-            new MythUIButtonListItem(m_resultsList, resultsIterator.value());
-        QString key = resultsIterator.key();
-        button->SetData(key);
-    }
-
-    connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            SLOT(sendResult(MythUIButtonListItem *)));
-
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
-
-    return true;
-}
-
-void SearchResultsDialog::sendResult(MythUIButtonListItem* item)
-{
-    emit haveResult(item->GetData().toString());
-    Close();
 }

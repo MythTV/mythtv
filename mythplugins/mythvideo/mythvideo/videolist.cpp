@@ -1,4 +1,4 @@
-#include <memory>
+#include <memory> // for std::auto_ptr
 #include <algorithm>
 #include <iterator>
 #include <map>
@@ -11,7 +11,6 @@
 
 #include <mythtv/libmythui/mythgenerictree.h>
 
-#include "videolist.h"
 #include "videofilter.h"
 #include "metadatalistmanager.h"
 #include "dbaccess.h"
@@ -19,6 +18,97 @@
 #include "dirscan.h"
 #include "videoutils.h"
 #include "parentalcontrols.h"
+#include "videolist.h"
+
+class TreeNodeDataPrivate
+{
+  public:
+    TreeNodeDataPrivate(Metadata *metadata) :
+        m_metadata(metadata)
+    {
+    }
+
+    TreeNodeDataPrivate(QString path) : m_metadata(0), m_path(path)
+    {
+    }
+
+    Metadata *GetMetadata()
+    {
+        return m_metadata;
+    }
+
+    const Metadata *GetMetadata() const
+    {
+        return m_metadata;
+    }
+
+    QString GetPath() const
+    {
+        return m_path;
+    }
+
+  private:
+    Metadata *m_metadata;
+    QString m_path;
+};
+
+TreeNodeData::TreeNodeData() : m_d(0)
+{
+}
+
+TreeNodeData::TreeNodeData(Metadata *metadata)
+{
+    m_d = new TreeNodeDataPrivate(metadata);
+}
+
+TreeNodeData::TreeNodeData(QString path)
+{
+    m_d = new TreeNodeDataPrivate(path);
+}
+
+TreeNodeData::TreeNodeData(const TreeNodeData &other) : m_d(0)
+{
+    *this = other;
+}
+
+TreeNodeData &TreeNodeData::operator=(const TreeNodeData &rhs)
+{
+    if (this != &rhs)
+    {
+        delete m_d;
+        m_d = new TreeNodeDataPrivate(*rhs.m_d);
+    }
+
+    return *this;
+}
+
+TreeNodeData::~TreeNodeData()
+{
+    delete m_d;
+}
+
+Metadata *TreeNodeData::GetMetadata()
+{
+    if (m_d)
+        return m_d->GetMetadata();
+
+    return 0;
+}
+
+const Metadata *TreeNodeData::GetMetadata() const
+{
+    if (m_d)
+        return m_d->GetMetadata();
+
+    return 0;
+}
+
+QString TreeNodeData::GetPath() const
+{
+    if (m_d)
+        return m_d->GetPath();
+    return QString();
+}
 
 namespace fake_unnamed
 {
@@ -432,6 +522,40 @@ namespace fake_unnamed
         kOrderSub,
         kOrderItem
     };
+
+    MythGenericTree *AddDirNode(MythGenericTree *where_to_add,
+            QString name, QString fqPath, bool add_up_dirs)
+    {
+        // Add the subdir node...
+        MythGenericTree *sub_node =
+                where_to_add->addNode(name, kSubFolder, false);
+        sub_node->setAttribute(kNodeSort, kOrderSub);
+        sub_node->setOrderingIndex(kNodeSort);
+        sub_node->SetData(QVariant::fromValue(TreeNodeData(fqPath)));
+
+        // ...and the updir node.
+        if (add_up_dirs)
+        {
+            MythGenericTree *up_node =
+                    sub_node->addNode(where_to_add->getString(), kUpFolder,
+                            true, false);
+            up_node->setAttribute(kNodeSort, kOrderUp);
+            up_node->setOrderingIndex(kNodeSort);
+        }
+
+        return sub_node;
+    }
+
+    int AddFileNode(MythGenericTree *where_to_add, QString name,
+            Metadata *metadata)
+    {
+        MythGenericTree *sub_node = where_to_add->addNode(name, 0, true);
+        sub_node->setAttribute(kNodeSort, kOrderItem);
+        sub_node->setOrderingIndex(kNodeSort);
+        sub_node->SetData(QVariant::fromValue(TreeNodeData(metadata)));
+
+        return 1;
+    }
 }
 using namespace fake_unnamed;
 
@@ -456,9 +580,6 @@ class VideoListImp
 
     void refreshList(bool filebrowser, const ParentalLevel &parental_level,
                      bool flat_list);
-    void resortList(bool flat_list);
-
-    Metadata *getVideoListMetadata(int index);
 
     unsigned int count() const
     {
@@ -475,7 +596,7 @@ class VideoListImp
         m_video_filter = filter;
     }
 
-    int test_filter(const VideoFilterSettings &filter) const
+    int TryFilter(const VideoFilterSettings &filter) const
     {
         int ret = 0;
         for (metadata_list::const_iterator p = m_metadata.getList().begin();
@@ -491,27 +612,18 @@ class VideoListImp
         return m_metadata;
     }
 
-    QString getFolderPath(int folder_id) const
-    {
-        QString ret;
-        id_string_map::const_iterator p = m_folder_id_to_path.find(folder_id);
-        if (p != m_folder_id_to_path.end())
-            ret = p->second;
-        return ret;
-    }
-
     unsigned int getFilterChangedState()
     {
         return m_video_filter.getChangedState();
     }
 
-    bool Delete(unsigned int video_id)
+    bool Delete(unsigned int video_id, VideoList &dummy)
     {
         bool ret = false;
         MetadataPtr mp = m_metadata.byID(video_id);
         if (mp)
         {
-            ret = mp->deleteFile();
+            ret = mp->deleteFile(dummy);
             if (ret) ret = m_metadata.purgeByID(video_id);
         }
 
@@ -524,7 +636,6 @@ class VideoListImp
     }
 
   private:
-    void update_flat_index();
     void sort_view_data(bool flat_list);
     void fillMetadata(metadata_list_type whence);
 
@@ -532,10 +643,6 @@ class VideoListImp
     void buildDbList();
     void buildFileList(smart_dir_node &directory, metadata_list &metalist,
                        const QString &prefix);
-
-    MythGenericTree *addDirNode(MythGenericTree *where_to_add, const QString &dname,
-                            bool add_up_dirs);
-    int addFileNode(MythGenericTree *where_to_add, const QString &name, int id);
 
     void update_meta_view(bool flat_list);
 
@@ -556,11 +663,6 @@ class VideoListImp
     VideoFilterSettings m_video_filter;
 
     bool m_sort_ignores_case;
-
-    // TODO: ugly
-    typedef std::map<int, QString> id_string_map;
-    id_string_map m_folder_id_to_path;
-    int m_folder_id;
 };
 
 VideoList::VideoList()
@@ -586,21 +688,6 @@ void VideoList::refreshList(bool filebrowser,
     m_imp->refreshList(filebrowser, parental_level, flat_list);
 }
 
-void VideoList::resortList(bool flat_list)
-{
-    m_imp->resortList(flat_list);
-}
-
-Metadata *VideoList::getVideoListMetadata(int index)
-{
-    return m_imp->getVideoListMetadata(index);
-}
-
-const Metadata *VideoList::getVideoListMetadata(int index) const
-{
-    return m_imp->getVideoListMetadata(index);
-}
-
 unsigned int VideoList::count() const
 {
     return m_imp->count();
@@ -616,19 +703,14 @@ void VideoList::setCurrentVideoFilter(const VideoFilterSettings &filter)
     m_imp->setCurrentVideoFilter(filter);
 }
 
-int VideoList::test_filter(const VideoFilterSettings &filter) const
+int VideoList::TryFilter(const VideoFilterSettings &filter) const
 {
-    return m_imp->test_filter(filter);
+    return m_imp->TryFilter(filter);
 }
 
 const MetadataListManager &VideoList::getListCache() const
 {
     return m_imp->getListCache();
-}
-
-QString VideoList::getFolderPath(int folder_id) const
-{
-    return m_imp->getFolderPath(folder_id);
 }
 
 unsigned int VideoList::getFilterChangedState()
@@ -638,7 +720,7 @@ unsigned int VideoList::getFilterChangedState()
 
 bool VideoList::Delete(int video_id)
 {
-    return m_imp->Delete(video_id);
+    return m_imp->Delete(video_id, *this);
 }
 
 MythGenericTree *VideoList::GetTreeRoot()
@@ -650,7 +732,7 @@ MythGenericTree *VideoList::GetTreeRoot()
 // VideoListImp
 //////////////////////////////
 VideoListImp::VideoListImp() : m_metadata_view_tree("", "top"),
-    m_metadata_list_type(ltNone), m_folder_id(0)
+    m_metadata_list_type(ltNone)
 {
     m_ListUnknown = gContext->GetNumSetting("VideoListUnknownFileTypes", 1);
 
@@ -668,12 +750,8 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
     {
         if ((*dir)->has_entries())
         {
-            MythGenericTree *t = addDirNode(dst, (*dir)->getName(), include_updirs);
-            t->setAttribute(kFolderPath, m_folder_id);
-            m_folder_id_to_path.
-                    insert(id_string_map::value_type(m_folder_id,
-                                                     (*dir)->getFQPath()));
-            ++m_folder_id;
+            MythGenericTree *t = AddDirNode(dst, (*dir)->getName(),
+                    (*dir)->getFQPath(), include_updirs);
 
             build_generic_tree(t, dir->get(), include_updirs);
         }
@@ -682,8 +760,7 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
     for (meta_dir_node::const_entry_iterator entry = src->entries_begin();
          entry != src->entries_end(); ++entry)
     {
-        addFileNode(dst, (*entry)->getData()->Title(),
-                    (*entry)->getData()->getFlatIndex());
+        AddFileNode(dst, (*entry)->getData()->Title(), (*entry)->getData());
     }
 }
 
@@ -709,20 +786,18 @@ MythGenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
     typedef std::map<QString, MythGenericTree *> string_to_tree;
     string_to_tree prefix_tree_map;
 
-    video_tree_root.reset(new MythGenericTree(QObject::tr("Video Home"), kRootNode,
-                                          false));
+    video_tree_root.reset(new MythGenericTree(QObject::tr("Video Home"),
+                    kRootNode, false));
 
-    m_folder_id_to_path.clear();
-    m_folder_id = 1;
     build_generic_tree(video_tree_root.get(), &m_metadata_view_tree,
                        include_updirs);
 
     if (m_metadata_view_flat.empty())
     {
         video_tree_root.reset(new MythGenericTree(QObject::tr("Video Home"),
-                                              kRootNode, false));
-        addDirNode(video_tree_root.get(), QObject::tr("No files found"),
-                   include_updirs);
+                        kRootNode, false));
+        AddDirNode(video_tree_root.get(), QString(),
+                QObject::tr("No files found"), include_updirs);
     }
 
     return video_tree_root.get();
@@ -737,39 +812,6 @@ void VideoListImp::refreshList(bool filebrowser,
     fillMetadata(filebrowser ? ltFileSystem : ltDBMetadata);
 
     update_meta_view(flat_list);
-}
-
-void VideoListImp::resortList(bool flat_list)
-{
-    sort_view_data(flat_list);
-    update_flat_index();
-}
-
-Metadata *VideoListImp::getVideoListMetadata(int index)
-{
-    if (index < 0)
-        return NULL;    // Special node types
-
-    if ((unsigned int)index < m_metadata_view_flat.size())
-        return m_metadata_view_flat[index];
-
-    VERBOSE(VB_IMPORTANT,
-            QString("%1: getVideoListMetadata: index out of bounds: %2")
-            .arg(__FILE__).arg(index));
-    return NULL;
-}
-
-void VideoListImp::update_flat_index()
-{
-    // Update the flat index (tree building helper)
-    // TODO: fix VideoList to have an iterator and add ability to fetch
-    // metadata via cookie.
-    int flat_index = 0;
-    for (metadata_view_list::iterator p = m_metadata_view_flat.begin();
-         p != m_metadata_view_flat.end(); ++p)
-    {
-        (*p)->setFlatIndex(flat_index++);
-    }
 }
 
 void VideoListImp::sort_view_data(bool flat_list)
@@ -993,36 +1035,6 @@ void VideoListImp::buildFsysList()
     m_metadata.setList(ml);
 }
 
-MythGenericTree *VideoListImp::addDirNode(MythGenericTree *where_to_add,
-                                      const QString &dname, bool add_up_dirs)
-{
-    // Add the subdir node...
-    MythGenericTree *sub_node = where_to_add->addNode(dname, kSubFolder, false);
-    sub_node->setAttribute(kNodeSort, kOrderSub);
-    sub_node->setOrderingIndex(kNodeSort);
-
-    // ...and the updir node.
-    if (add_up_dirs)
-    {
-        MythGenericTree *up_node = sub_node->addNode(where_to_add->getString(),
-                                                 kUpFolder, true, false);
-        up_node->setAttribute(kNodeSort, kOrderUp);
-        up_node->setOrderingIndex(kNodeSort);
-    }
-
-    return sub_node;
-}
-
-int VideoListImp::addFileNode(MythGenericTree *where_to_add, const QString &name,
-                              int index)
-{
-    MythGenericTree *sub_node = where_to_add->addNode(name, index, true);
-    sub_node->setAttribute(kNodeSort, kOrderItem);
-    sub_node->setOrderingIndex(kNodeSort);
-
-    return 1;
-}
-
 namespace fake_unnamed
 {
     void copy_entries(meta_dir_node &dst, meta_dir_node &src,
@@ -1130,8 +1142,6 @@ void VideoListImp::update_meta_view(bool flat_list)
 
         tree_view_to_flat(m_metadata_view_tree, m_metadata_view_flat);
     }
-
-    update_flat_index();
 }
 
 namespace fake_unnamed

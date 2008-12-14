@@ -4,8 +4,8 @@
 
 #include <mythtv/mythdb.h>
 
-#include "dbaccess.h"
 #include "cleanup.h"
+#include "dbaccess.h"
 
 namespace
 {

@@ -7,9 +7,7 @@
 #include <mythtv/libmythui/mythscreentype.h>
 
 #include "parentalcontrols.h"
-#include "videoutils.h"
 #include "quicksp.h"
-#include "videolist.h"
 
 class MythUIText;
 class MythUIButtonList;
@@ -26,6 +24,8 @@ class VideoScanner;
 
 class QUrl;
 
+typedef QMap<QString, QString> SearchListResults;
+
 enum CoverDownloadErrorState { esOK, esError, esTimeout };
 
 class VideoDialog : public MythScreenType
@@ -36,7 +36,7 @@ class VideoDialog : public MythScreenType
     enum DialogType { DLG_DEFAULT = 0, DLG_BROWSER = 0x1, DLG_GALLERY = 0x2,
                       DLG_TREE = 0x4, DLG_MANAGER = 0x8, dtLast };
 
-    typedef simple_ref_ptr<VideoList> VideoListPtr;
+    typedef simple_ref_ptr<class VideoList> VideoListPtr;
 
     typedef QPointer<class VideoListDeathDelay> VideoListDeathDelayPtr;
 
@@ -44,12 +44,11 @@ class VideoDialog : public MythScreenType
 
   public:
     VideoDialog(MythScreenStack *lparent, QString lname,
-            VideoListPtr video_list, DialogType type=DLG_GALLERY);
+            VideoListPtr video_list, DialogType type);
     ~VideoDialog();
 
     bool Create();
     bool keyPressEvent(QKeyEvent *levent);
-    void customEvent(QEvent *levent);
 
   private slots:
     void UpdatePosition();
@@ -86,7 +85,6 @@ class VideoDialog : public MythScreenType
     void ViewPlot();
     void ShowCastDialog();
 
-
     void OnParentalChange(int amount);
 
     // Called when the underlying data for an item changes
@@ -100,9 +98,11 @@ class VideoDialog : public MythScreenType
   protected slots:
     void reloadData();
     void refreshData();
-    void UpdateItem(MythUIButtonListItem *item = NULL);
+    void UpdateItem(MythUIButtonListItem *item);
 
   protected:
+    void customEvent(QEvent *levent);
+
     virtual MythUIButtonListItem *GetItemCurrent();
 
     virtual void loadData();
@@ -120,50 +120,6 @@ class VideoDialog : public MythScreenType
     void createOkDialog(QString title);
 
     void SwitchLayout(DialogType type);
-
-    // Edit Metadata
-    void ResetItem(Metadata *metadata);
-
-  private:
-    MythGenericTree *m_rootNode;
-    MythGenericTree *m_currentNode;
-
-    bool m_treeLoaded;
-
-    bool m_isFileBrowser;
-    bool m_isFlatList;
-    int m_type;
-
-    QString m_artDir;
-    VideoScanner *m_scanner;
-
-    MythDialogBox    *m_menuPopup;
-    MythUIBusyDialog *m_busyPopup;
-    MythScreenStack  *m_popupStack;
-
-    MythUIButtonList *m_videoButtonList;
-    MythUIButtonTree *m_videoButtonTree;
-
-    MythUIText       *m_titleText;
-    MythUIText       *m_novideoText;
-
-    MythUIText       *m_positionText;
-    MythUIText       *m_crumbText;
-
-    MythUIImage      *m_coverImage;
-
-    MythUIStateType  *m_parentalLevelState;
-    MythUIStateType  *m_videoLevelState;
-    MythUIStateType  *m_userRatingState;
-
-    VideoListPtr m_videoList;
-
-    bool m_rememberPosition;
-
-    class VideoDialogPrivate *m_private;
-
-  protected:
-    void AutomaticParentalAdjustment(Metadata *metadata);
 
 // Start asynchronous functions.
 
@@ -208,6 +164,28 @@ class VideoDialog : public MythScreenType
                                 Metadata *metadata, QString video_uid);
 
 // End asynchronous functions.
+
+  private:
+    MythDialogBox    *m_menuPopup;
+    MythUIBusyDialog *m_busyPopup;
+    MythScreenStack  *m_popupStack;
+
+    MythUIButtonList *m_videoButtonList;
+    MythUIButtonTree *m_videoButtonTree;
+
+    MythUIText       *m_titleText;
+    MythUIText       *m_novideoText;
+
+    MythUIText       *m_positionText;
+    MythUIText       *m_crumbText;
+
+    MythUIImage      *m_coverImage;
+
+    MythUIStateType  *m_parentalLevelState;
+    MythUIStateType  *m_videoLevelState;
+    MythUIStateType  *m_userRatingState;
+
+    class VideoDialogPrivate *m_d;
 };
 
 class VideoListDeathDelay : public QObject
@@ -216,6 +194,7 @@ class VideoListDeathDelay : public QObject
 
   public:
     VideoListDeathDelay(VideoDialog::VideoListPtr toSave);
+    ~VideoListDeathDelay();
 
     VideoDialog::VideoListPtr GetSaved();
 
@@ -223,7 +202,7 @@ class VideoListDeathDelay : public QObject
     void OnTimeUp();
 
   private:
-    VideoDialog::VideoListPtr m_savedList;
+    class VideoListDeathDelayPrivate *m_d;
 };
 
 #endif

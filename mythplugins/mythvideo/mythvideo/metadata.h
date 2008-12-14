@@ -1,7 +1,7 @@
 #ifndef METADATA_H_
 #define METADATA_H_
 
-#include <utility>
+#include <utility> // for std::pair
 #include <vector>
 
 #include <QString>
@@ -76,10 +76,6 @@ class Metadata
     const SortKey &getSortKey() const;
     void setSortKey(const SortKey &sort_key);
 
-    // flat index
-    void setFlatIndex(int index);
-    int getFlatIndex() const;
-
     const QString &getPrefix() const;
     void setPrefix(const QString &prefix);
 
@@ -125,8 +121,6 @@ class Metadata
     const QString& Filename() const;
     void setFilename(const QString &filename);
 
-    QString getFilenameNoPrefix() const;
-
     const QString &CoverFile() const;
     void setCoverFile(const QString &coverFile);
 
@@ -151,7 +145,7 @@ class Metadata
     bool fillDataFromFilename(const MetadataListManager &cache);
 
     // If you aren't VideoList don't call this
-    bool deleteFile();
+    bool deleteFile(class VideoList &dummy);
 
     // drops the metadata from the DB
     bool dropFromDB();

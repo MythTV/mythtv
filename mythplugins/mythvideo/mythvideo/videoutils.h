@@ -1,13 +1,6 @@
 #ifndef VIDEOUTILS_H_
 #define VIDEOUTILS_H_
 
-class Metadata;
-class MetadataListManager;
-
-typedef QMap<QString, QString> SearchListResults;
-
-void PlayVideo(const QString &filename, const MetadataListManager &video_list);
-
 template <typename T>
 inline void CheckedSet(T *ui_item, const QString &text)
 {
@@ -28,15 +21,9 @@ void CheckedSet(class MythUIType *container, const QString &itemName, const QStr
 
 QStringList GetVideoDirs();
 
-QString getDisplayYear(int year);
-QString getDisplayRating(const QString &rating);
-QString getDisplayUserRating(float userrating);
-QString getDisplayLength(int length);
-QString getDisplayBrowse(bool browse);
+bool IsDefaultCoverFile(const QString &coverfile);
 
-bool isDefaultCoverFile(const QString &coverfile);
-bool GetLocalVideoPoster(const QString &video_uid, const QString &filename,
-                         const QStringList &in_dirs, QString &poster);
+class Metadata;
 
 QStringList GetCastList(const Metadata &item);
 QString GetCast(const Metadata &item, const QString &sep = ", ");

@@ -10,13 +10,11 @@ enum TreeNodeType {
 
 // Tree node attribute index
 enum TreeNodeAttributes {
-    kNodeSort,
-    kFolderPath
+    kNodeSort
 };
 
 class MythGenericTree;
 class VideoFilterSettings;
-class Metadata;
 class MetadataListManager;
 class ParentalLevel;
 
@@ -33,19 +31,13 @@ class VideoList
     void refreshList(bool filebrowser, const ParentalLevel &parental_level,
                      bool flatlist);
 
-    // If the only change to the underlying metadata requires
-    // another sort (for video manager currently).
-    void resortList(bool flat_list);
-
-    Metadata *getVideoListMetadata(int index);
-    const Metadata *getVideoListMetadata(int index) const;
     unsigned int count() const;
 
     const VideoFilterSettings &getCurrentVideoFilter();
     void setCurrentVideoFilter(const VideoFilterSettings &filter);
 
     // returns the number of videos matched by this filter
-    int test_filter(const VideoFilterSettings &filter) const;
+    int TryFilter(const VideoFilterSettings &filter) const;
 
     unsigned int getFilterChangedState();
 
@@ -53,13 +45,33 @@ class VideoList
 
     const MetadataListManager &getListCache() const;
 
-    // returns the folder path associated with a returned tree
-    QString getFolderPath(int folder_id) const;
-
     MythGenericTree *GetTreeRoot();
 
   private:
     class VideoListImp *m_imp;
 };
+
+class Metadata;
+class TreeNodeData
+{
+  public:
+    TreeNodeData();
+    TreeNodeData(Metadata *metadata);
+    TreeNodeData(QString path);
+
+    TreeNodeData(const TreeNodeData &other);
+    TreeNodeData &operator=(const TreeNodeData &rhs);
+
+    ~TreeNodeData();
+
+    Metadata *GetMetadata();
+    const Metadata *GetMetadata() const;
+    QString GetPath() const;
+
+  private:
+    class TreeNodeDataPrivate *m_d;
+};
+
+Q_DECLARE_METATYPE(TreeNodeData);
 
 #endif // VIDEOLIST_H

@@ -1,4 +1,4 @@
-#include <cmath>
+#include <cmath> // for isnan()
 
 #include <QFile>
 #include <QDir>
@@ -9,8 +9,8 @@
 #include <mythtv/mythdb.h>
 
 #include "globals.h"
-#include "metadatalistmanager.h"
 #include "dbaccess.h"
+#include "metadatalistmanager.h"
 
 struct SortData
 {
@@ -163,9 +163,6 @@ class MetadataImp
         m_sort_key = sort_key;
     }
 
-    void setFlatIndex(int index) { m_flat_index = index; }
-    int getFlatIndex() const { return m_flat_index; }
-
     const QString &getPrefix() const { return m_prefix; }
     void setPrefix(const QString &prefix) { m_prefix = prefix; }
 
@@ -212,21 +209,6 @@ class MetadataImp
     const QString &getFilename() const { return m_filename; }
     void setFilename(const QString &filename) { m_filename = filename; }
 
-    QString getFilenameNoPrefix() const
-    {
-        QString ret(m_filename);
-        if (ret.startsWith(m_prefix + "/"))
-        {
-            ret.remove(0, m_prefix.length() + 1);
-        }
-        else if (ret.startsWith(m_prefix))
-        {
-            ret.remove(0, m_prefix.length());
-        }
-
-        return ret;
-    }
-
     const QString &getCoverFile() const { return m_coverfile; }
     void setCoverFile(const QString &coverFile) { m_coverfile = coverFile; }
 
@@ -265,7 +247,7 @@ class MetadataImp
     void dumpToDatabase();
     void updateDatabase();
 
-    bool deleteFile();
+    bool deleteFile(class VideoList &dummy);
     bool dropFromDB();
 
     void Reset();
@@ -346,8 +328,10 @@ bool MetadataImp::removeDir(const QString &dirName)
 }
 
 /// Deletes the file associated with a metadata entry
-bool MetadataImp::deleteFile()
+bool MetadataImp::deleteFile(class VideoList &dummy)
 {
+    (void) dummy;
+
     bool isremoved = false;
     QFileInfo fi(m_filename);
     if (fi.isDir())
@@ -950,17 +934,6 @@ void Metadata::setSortKey(const Metadata::SortKey &sort_key)
     m_imp->setSortKey(sort_key);
 }
 
-void Metadata::setFlatIndex(int index)
-{
-    m_imp->setFlatIndex(index);
-}
-
-int Metadata::getFlatIndex() const
-{
-    return m_imp->getFlatIndex();
-}
-
-
 const QString &Metadata::getPrefix() const
 {
     return m_imp->getPrefix();
@@ -1111,11 +1084,6 @@ void Metadata::setFilename(const QString &filename)
     m_imp->setFilename(filename);
 }
 
-QString Metadata::getFilenameNoPrefix() const
-{
-    return m_imp->getFilenameNoPrefix();
-}
-
 const QString &Metadata::CoverFile() const
 {
     return m_imp->getCoverFile();
@@ -1219,9 +1187,9 @@ bool Metadata::fillDataFromFilename(const MetadataListManager &cache)
     return false;
 }
 
-bool Metadata::deleteFile()
+bool Metadata::deleteFile(class VideoList &dummy)
 {
-    return m_imp->deleteFile();
+    return m_imp->deleteFile(dummy);
 }
 
 bool Metadata::dropFromDB()

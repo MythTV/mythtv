@@ -2,7 +2,7 @@
 #define DBACCESS_H_
 
 #include <vector>
-#include <utility>
+#include <utility> // for std::pair
 
 class SingleValueImp;
 

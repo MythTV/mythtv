@@ -7,11 +7,11 @@
 #include <mythtv/libmythui/mythuitext.h>
 
 #include "globals.h"
-#include "videofilter.h"
 #include "videolist.h"
 #include "dbaccess.h"
 #include "metadatalistmanager.h"
 #include "videoutils.h"
+#include "videofilter.h"
 
 enum GenreFilter {
     kGenreFilterAll = -1,
@@ -314,7 +314,7 @@ bool VideoFilterSettings::matches_filter(const Metadata &mdata) const
 
     if (matches && m_coverfile != kCoverFileFilterAll)
     {
-        matches = isDefaultCoverFile(mdata.CoverFile());
+        matches = IsDefaultCoverFile(mdata.CoverFile());
     }
 
     if (matches && m_parental_level)
@@ -480,7 +480,7 @@ bool VideoFilterDialog::Create()
 
 void VideoFilterDialog::update_numvideo()
 {
-    int video_count = m_videoList.test_filter(m_settings);
+    int video_count = m_videoList.TryFilter(m_settings);
 
     if (video_count > 0)
     {
