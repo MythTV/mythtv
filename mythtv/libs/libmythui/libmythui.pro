@@ -70,6 +70,13 @@ using_x11:using_opengl {
     LIBS += $$EXTRA_LIBS
 }
 
+using_vdpau {
+    DEFINES += USING_VDPAU
+    HEADERS += mythpainter_vdpau.h
+    SOURCES += mythpainter_vdpau.cpp
+    LIBS += -lvdpau
+}
+
 using_x11 {
     DEFINES += USING_X11
     HEADERS += screensaver-x11.h

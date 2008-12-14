@@ -23,12 +23,14 @@ class MythMainWindowPrivate;
 
 class MythPainterWindowGL;
 class MythPainterWindowQt;
+class MythPainterWindowVDPAU;
 
 class MPUBLIC MythMainWindow : public QWidget
 {
     Q_OBJECT
     friend class MythPainterWindowGL;
     friend class MythPainterWindowQt;
+    friend class MythPainterWindowVDPAU;
 
   public:
     void Init(void);

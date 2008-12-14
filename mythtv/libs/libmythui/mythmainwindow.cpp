@@ -59,6 +59,10 @@
 /* from libmyth */
 #include "screensaver.h"
 
+#ifdef USING_VDPAU
+#include "mythpainter_vdpau.h"
+#endif
+
 #define GESTURE_TIMEOUT 1000
 
 
@@ -160,7 +164,6 @@ class MythMainWindowPrivate
     /* compatability only, FIXME remove */
     std::vector<QWidget *> widgetList;
 
-    bool bUseGL;
     QWidget *paintwin;
 };
 
@@ -254,7 +257,22 @@ void MythPainterWindowGL::paintEvent(QPaintEvent *pe)
     d->repaintRegion = d->repaintRegion.unite(pe->region());
     parent->drawScreen();
 }
+#endif
 
+#ifdef USING_VDPAU
+MythPainterWindowVDPAU::MythPainterWindowVDPAU(MythMainWindow *win,
+                                               MythMainWindowPrivate *priv)
+                   : QGLWidget(win),
+                     parent(win), d(priv)
+{
+    setAutoBufferSwap(false);
+}
+
+void MythPainterWindowVDPAU::paintEvent(QPaintEvent *pe)
+{
+    d->repaintRegion = d->repaintRegion.unite(pe->region());
+    parent->drawScreen();
+}
 #endif
 
 MythPainterWindowQt::MythPainterWindowQt(MythMainWindow *win,
@@ -288,14 +306,20 @@ MythMainWindow::MythMainWindow(const bool useDB)
     {
         VERBOSE(VB_GENERAL, "Using the OpenGL painter");
         d->painter = new MythOpenGLPainter();
-        d->bUseGL = true;
+    }
+    else
+#endif
+#ifdef USING_VDPAU
+    if (painter == "vdpau")
+    {
+        VERBOSE(VB_GENERAL, "Using the VDPAU painter");
+        d->painter = new MythVDPAUPainter();
     }
     else
 #endif
     {
         VERBOSE(VB_GENERAL, "Using the Qt painter");
         d->painter = new MythQtPainter();
-        d->bUseGL = false;
     }
 
     //Init();
@@ -761,9 +785,16 @@ void MythMainWindow::Init(void)
 
     // allocate painter
 #ifdef USE_OPENGL_PAINTER
-    if (d->bUseGL)
+    if (dynamic_cast<MythOpenGLPainter *>(d->painter))
     {
         d->paintwin = new MythPainterWindowGL(this, d);
+    }
+    else
+#endif
+#ifdef USING_VDPAU
+    if (dynamic_cast<MythVDPAUPainter *>(d->painter))
+    {
+        d->paintwin = new MythPainterWindowVDPAU(this, d);
     }
     else
 #endif
