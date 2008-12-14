@@ -61,7 +61,7 @@ NativeArchive::NativeArchive(void)
 {
     // create the lock file so the UI knows we're running
     QString tempDir = getTempDirectory();
-    QString command = QString("echo %1 > " + tempDir + 
+    QString command = QString("echo %1 > " + tempDir +
                       "/logs/mythburn.lck").arg(getpid());
     system(qPrintable(command));
 }
@@ -2374,7 +2374,7 @@ int isRemote(QString filename)
     bzero(&statbuf, sizeof(statbuf));
 
 #ifdef CONFIG_DARWIN
-    if ((statfs(filename, &statbuf) == 0) &&
+    if ((statfs(qPrintable(filename), &statbuf) == 0) &&
         ((!strcmp(statbuf.f_fstypename, "nfs")) ||      // NFS|FTP
             (!strcmp(statbuf.f_fstypename, "afpfs")) || // ApplShr
             (!strcmp(statbuf.f_fstypename, "smbfs"))))  // SMB
