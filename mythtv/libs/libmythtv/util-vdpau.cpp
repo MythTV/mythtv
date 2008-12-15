@@ -20,7 +20,7 @@ extern "C" {
 #define LOC_ERR QString("VDPAU Error: ")
 
 #define NUM_OUTPUT_SURFACES 2
-#define NUM_REFERENCE_FRAMES 4
+#define NUM_REFERENCE_FRAMES 3
 
 #define ARSIZE(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -780,9 +780,8 @@ void VDPAUContext::Decode(VideoFrame *frame)
             uint32_t round_height = (frame->height + 15) & ~15;
             uint32_t surf_size = (round_width * round_height * 3) / 2;
             max_references = (12 * 1024 * 1024) / surf_size;
-            if (max_references > 16) {
+            if (max_references > 16)
                 max_references = 16;
-            }
         }
 
         VdpDecoderProfile vdp_decoder_profile;
@@ -929,8 +928,9 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
 
     if (deint)
     {
-#if 1
-        videoSurface = render->surface;
+        render = (vdpau_render_state_t *)referenceFrames[1]->buf;
+        if (render)
+            videoSurface = render->surface;
  
         // consolidate more 
         if (frame->top_field_first)
@@ -941,7 +941,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
                 future_surfaces[0] = videoSurface;
 
                 // previous two fields are in the previous frame
-                render = (vdpau_render_state_t *)referenceFrames[1]->buf;
+                render = (vdpau_render_state_t *)referenceFrames[0]->buf;
                 if (render)
                     past_surfaces[0] = render->surface;
                 past_surfaces[1] = past_surfaces[0];
@@ -949,7 +949,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
             else // displaying bottom of top-first
             {
                 // next field (top) is in the next frame
-                render = (vdpau_render_state_t *)referenceFrames[3]->buf;
+                render = (vdpau_render_state_t *)referenceFrames[2]->buf;
                 if (render)
                     future_surfaces[0] = render->surface;
 
@@ -957,7 +957,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
                 past_surfaces[0] = videoSurface;
 
                 // field before that is in the previous frame
-                render = (vdpau_render_state_t *)referenceFrames[1]->buf;
+                render = (vdpau_render_state_t *)referenceFrames[0]->buf;
                 if (render)
                     past_surfaces[1] = render->surface;
             }
@@ -970,7 +970,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
                 future_surfaces[0] = videoSurface;
 
                 // previous two fields are in the previous frame
-                render = (vdpau_render_state_t *)referenceFrames[1]->buf;
+                render = (vdpau_render_state_t *)referenceFrames[0]->buf;
                 if (render)
                     past_surfaces[0] = render->surface;
                 past_surfaces[1] = past_surfaces[0];
@@ -978,7 +978,7 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
             else // displaying top of bottom-first
             {
                 // next field (bottom) is in the next frame
-                render = (vdpau_render_state_t *)referenceFrames[3]->buf;
+                render = (vdpau_render_state_t *)referenceFrames[2]->buf;
                 if (render)
                     future_surfaces[0] = render->surface;
 
@@ -986,25 +986,11 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
                 past_surfaces[0] = videoSurface;
 
                 // field before that is in the previous frame
-                render = (vdpau_render_state_t *)referenceFrames[1]->buf;
+                render = (vdpau_render_state_t *)referenceFrames[0]->buf;
                 if (render)
                     past_surfaces[1] = render->surface;
             }
         }
-#else
-        render = (vdpau_render_state_t *)referenceFrames[3]->buf;
-        if (render)
-            future_surfaces[0] = render->surface;
-        render = (vdpau_render_state_t *)referenceFrames[2]->buf;
-        if (render)
-            videoSurface = render->surface;
-        render = (vdpau_render_state_t *)referenceFrames[1]->buf;
-        if (render)
-            past_surfaces[0] = render->surface;
-        render = (vdpau_render_state_t *)referenceFrames[0]->buf;
-        if (render)
-            past_surfaces[1] = render->surface;
-#endif
     }
 
     uint num_layers  = 0;
