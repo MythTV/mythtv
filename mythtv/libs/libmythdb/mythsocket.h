@@ -73,7 +73,7 @@ class MPUBLIC MythSocket : public MSocketDevice
 
     void close(void);
     void deleteLater(void);
- 
+
     void UpRef(void);
     bool DownRef(void);
 

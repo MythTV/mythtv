@@ -30,7 +30,7 @@ MythSocketThread MythSocket::m_readyread_thread;
 MythSocket::MythSocket(int socket, MythSocketCBs *cb)
     : MSocketDevice(MSocketDevice::Stream),            m_cb(cb),
       m_state(Idle),         m_addr(),                 m_port(0),
-      m_ref_count(0),        m_notifyread(0) 
+      m_ref_count(0),        m_notifyread(0)
 {
     VERBOSE(VB_SOCKET, LOC + "new socket");
     if (socket > -1)
@@ -75,7 +75,7 @@ bool MythSocket::DownRef(void)
     m_ref_lock.lock();
     int ref = --m_ref_count;
     m_ref_lock.unlock();
-    
+
     VERBOSE(VB_SOCKET, LOC + QString("DownRef: %1").arg(m_ref_count));
 
     if (m_cb && ref == 0)
@@ -84,13 +84,13 @@ bool MythSocket::DownRef(void)
         m_readyread_thread.RemoveFromReadyRead(this);
         // thread will downref & delete obj
         return true;
-    } 
-    else if (ref < 0) 
+    }
+    else if (ref < 0)
     {
         delete this;
         return true;
     }
-    
+
     return false;
 }
 
@@ -104,7 +104,7 @@ void MythSocket::setState(const State state)
     if (state != m_state)
     {
         VERBOSE(VB_SOCKET, LOC + QString("state change %1 -> %2")
-                .arg(stateToString(m_state)).arg(stateToString(state))); 
+                .arg(stateToString(m_state)).arg(stateToString(state)));
 
         m_state = state;
     }
@@ -167,7 +167,7 @@ void MythSocket::setSocket(int socket, Type type)
 
     if (state() == Connected)
     {
-        VERBOSE(VB_SOCKET, LOC + 
+        VERBOSE(VB_SOCKET, LOC +
                 "setSocket called while in Connected state, closing");
         close();
     }
@@ -188,7 +188,7 @@ qint64 MythSocket::readBlock(char *data, quint64 len)
     // VERBOSE(VB_SOCKET, LOC + "readBlock called");
     if (state() != Connected)
     {
-        VERBOSE(VB_SOCKET, LOC + "readBlock called while not in " 
+        VERBOSE(VB_SOCKET, LOC + "readBlock called while not in "
                 "connected state");
         return -1;
     }
@@ -217,7 +217,7 @@ qint64 MythSocket::writeBlock(const char *data, quint64 len)
     //VERBOSE(VB_SOCKET, LOC + "writeBlock called");
     if (state() != Connected)
     {
-        VERBOSE(VB_SOCKET, LOC + "writeBlock called while not in " 
+        VERBOSE(VB_SOCKET, LOC + "writeBlock called while not in "
                 "connected state");
         return -1;
     }
@@ -242,7 +242,7 @@ bool MythSocket::writeStringList(QStringList &list)
 {
     if (list.size() <= 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC + 
+        VERBOSE(VB_IMPORTANT, LOC +
                 "writeStringList: Error, invalid string list.");
         return false;
     }
@@ -308,12 +308,12 @@ bool MythSocket::writeStringList(QStringList &list)
                     QString("writeStringList: Error, writeBlock failed. (%1)")
                     .arg(errorToString()));
             return false;
-        } 
+        }
         else if (temp <= 0)
         {
             errorcount++;
             if (errorcount > 5000)
-            {          
+            {
                 VERBOSE(VB_GENERAL, LOC +
                         "writeStringList: No data written on writeBlock");
                 return false;
@@ -411,7 +411,7 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
         }
         else if (quickTimeout && elapsed >= 7000)
         {
-            VERBOSE(VB_GENERAL, LOC + 
+            VERBOSE(VB_GENERAL, LOC +
                     "readStringList: Error, timeout (quick).");
             close();
             if (m_cb)
@@ -473,7 +473,7 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
         QByteArray dump(pending + 1, 0);
         readBlock(dump.data(), pending);
         VERBOSE(VB_IMPORTANT, LOC +
-                QString("Protocol error: '%1' is not a valid size " 
+                QString("Protocol error: '%1' is not a valid size "
                         "prefix. %2 bytes pending.")
                         .arg(sizestr.data()).arg(pending));
         return false;
@@ -484,7 +484,7 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
     qint64 read = 0;
     int errmsgtime = 0;
     timer.start();
-    
+
     while (btr > 0)
     {
         qint64 sret = readBlock(utf8.data() + read, btr);
@@ -495,8 +495,8 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
             if (btr > 0)
             {
                 timer.start();
-            }    
-        } 
+            }
+        }
         else if (sret < 0 && error() != MSocketDevice::NoError)
         {
             VERBOSE(VB_GENERAL, LOC +
@@ -523,16 +523,16 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
                     VERBOSE(VB_GENERAL, LOC +
                             QString("readStringList: Waiting for data: %1 %2")
                             .arg(read).arg(btr));
-                }                            
+                }
             }
-            
+
             if (elapsed > 100000)
             {
-                VERBOSE(VB_GENERAL, LOC + 
+                VERBOSE(VB_GENERAL, LOC +
                         "Error, readStringList timeout (readBlock)");
                 return false;
             }
-            
+
             usleep(500);
         }
     }
@@ -544,7 +544,7 @@ bool MythSocket::readStringList(QStringList &list, bool quickTimeout)
     payload += "        ";
     payload.truncate(8);
     payload += str;
-    
+
     if ((print_verbose_messages & VB_NETWORK) != 0)
     {
         QString msg = QString("read  <- %1 %2").arg(socket(), 2)
@@ -625,7 +625,7 @@ bool MythSocket::connect(const QHostAddress &addr, quint16 port)
         setState(Idle);
         return false;
     }
-        
+
     setReceiveBufferSize(kSocketBufferSize);
     setAddressReusable(true);
     if (state() == Connecting)
@@ -689,7 +689,7 @@ void MythSocketThread::StartReadyReadThread(void)
 
             atexit(ShutdownRRT);
         }
-    }   
+    }
 }
 
 void MythSocketThread::AddToReadyRead(MythSocket *sock)
@@ -822,7 +822,7 @@ void MythSocketThread::run(void)
                 else
                 {
                     if (SOCKET_ERROR != ::WSAEventSelect(
-                            sock->socket(), hEvent, 
+                            sock->socket(), hEvent,
                             FD_READ | FD_CLOSE))
                     {
                         hEvents[n] = hEvent;
