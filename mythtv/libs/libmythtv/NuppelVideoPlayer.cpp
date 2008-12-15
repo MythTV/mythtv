@@ -1184,11 +1184,9 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
 
     // delete any pre-existing recorder
     SetDecoder(NULL);
-    int testreadsize;
+    int testreadsize = 2048;
 
-    for (testreadsize = 2048;
-         testreadsize <= kDecoderProbeBufferSize && !GetDecoder();
-         testreadsize <<= 1)
+    while (testread <= kDecoderProbeBufferSize)
     {
         if (ringBuffer->Peek(testbuf, testreadsize) != testreadsize)
         {
@@ -1222,6 +1220,9 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
                                             testreadsize))
             SetDecoder(new AvFormatDecoder(this, m_playbackinfo,
                                            using_null_videoout, allow_libmpeg2));
+        if (!GetDecoder())
+            break;
+        testreadsize <<= 1;
     }
 
     if (!GetDecoder())
