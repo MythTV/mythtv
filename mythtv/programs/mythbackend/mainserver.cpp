@@ -52,6 +52,7 @@ using namespace std;
 #include "scheduler.h"
 #include "backendutil.h"
 #include "programinfo.h"
+#include "programlist.h"
 #include "jobqueue.h"
 #include "autoexpire.h"
 #include "previewgenerator.h"

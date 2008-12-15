@@ -23,6 +23,7 @@ using namespace std;
 class EncoderLink;
 class MainServer;
 class AutoExpire;
+class ProgramList;
 
 #define USE_DEQUE_RECLIST 1
 typedef deque<ProgramInfo*> RecList;

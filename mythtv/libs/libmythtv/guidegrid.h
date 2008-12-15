@@ -2,20 +2,21 @@
 #ifndef GUIDEGRID_H_
 #define GUIDEGRID_H_
 
-#include <qstring.h>
-#include <qdatetime.h>
-#include <qlayout.h>
+#include <QString>
+#include <QDateTime>
+#include <QLayout>
 #include <QEvent>
 #include <QPaintEvent>
 #include <QPixmap>
 #include <QKeyEvent>
+#include <QDomElement>
 #include <vector>
 
-#include "libmyth/mythwidgets.h"
-#include <qdom.h>
+#include "mythwidgets.h"
 #include "uitypes.h"
 #include "xmlparse.h"
-#include "libmythtv/programinfo.h"
+#include "programinfo.h"
+#include "programlist.h"
 #include "channelutil.h"
 
 using namespace std;

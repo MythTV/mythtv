@@ -1,19 +1,23 @@
+// -*- Mode: c++ -*-
+
 #ifndef VIEWSCHEDULEDIFF_H_
 #define VIEWSCHEDULEDIFF_H_
 
+// C++ headers
 #include <vector>
 using namespace std;
 
-#include <qdatetime.h>
-#include <qdom.h>
+// Qt headers
+#include <QDomElement>
 #include <QPixmap>
-#include <QKeyEvent>
-#include <QPaintEvent>
+
+// MythTV headers
 #include "mythwidgets.h"
 #include "mythdialogs.h"
 #include "uitypes.h"
 #include "xmlparse.h"
 #include "programinfo.h"
+#include "programlist.h"
 
 class ProgramStruct
 {
@@ -22,6 +26,9 @@ class ProgramStruct
     ProgramInfo *before;
     ProgramInfo *after;
 };
+
+class QKeyEvent;
+class QPaintEvent;
 
 class MPUBLIC ViewScheduleDiff : public MythDialog
 {

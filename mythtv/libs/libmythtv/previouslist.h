@@ -1,16 +1,20 @@
+// -*- Mode: c++ -*-
 #ifndef PREVIOUSLIST_H_
 #define PREVIOUSLIST_H_
 
-#include <qdatetime.h>
+// Qt headers
+#include <QDateTime>
 #include <QEvent>
 #include <QKeyEvent>
 #include <QPaintEvent>
-#include "libmyth/uitypes.h"
-#include "libmyth/xmlparse.h"
-#include "libmyth/mythwidgets.h"
-#include "libmyth/mythdialogs.h"
-#include "libmythtv/programinfo.h"
 
+// MythTV headers
+#include "uitypes.h"
+#include "xmlparse.h"
+#include "mythwidgets.h"
+#include "mythdialogs.h"
+#include "programinfo.h"
+#include "programlist.h"
 
 class MPUBLIC PreviousList : public MythDialog
 {

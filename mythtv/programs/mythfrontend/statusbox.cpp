@@ -22,6 +22,8 @@ using namespace std;
 #include "tv.h"
 #include "jobqueue.h"
 #include "cardutil.h"
+#include "programinfo.h"
+#include "programlist.h"
 
 #include "mythuihelper.h"
 #include "mythuibuttonlist.h"

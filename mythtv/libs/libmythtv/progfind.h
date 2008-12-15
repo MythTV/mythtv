@@ -12,15 +12,16 @@
 #ifndef PROGFIND_H_
 #define PROGFIND_H_
 
-#include <qdatetime.h>
+#include <QDateTime>
 #include <QEvent>
 #include <QKeyEvent>
 #include <QPaintEvent>
 
-#include "libmyth/uitypes.h"
-#include "libmyth/xmlparse.h"
-#include "libmyth/mythwidgets.h"
+#include "uitypes.h"
+#include "xmlparse.h"
+#include "mythwidgets.h"
 #include "programinfo.h"
+#include "programlist.h"
 
 class ProgramInfo;
 class QWidget;

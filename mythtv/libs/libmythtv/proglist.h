@@ -1,15 +1,21 @@
+// -*- Mode: c++ -*-
+
 #ifndef PROGLIST_H_
 #define PROGLIST_H_
 
-#include <qdatetime.h>
+// Qt headers
+#include <QDateTime>
 #include <QEvent>
 #include <QPaintEvent>
 #include <QKeyEvent>
-#include "libmyth/uitypes.h"
-#include "libmyth/xmlparse.h"
-#include "libmyth/mythwidgets.h"
-#include "libmyth/mythdialogs.h"
-#include "libmythtv/programinfo.h"
+
+// MythTV headers
+#include "uitypes.h"
+#include "xmlparse.h"
+#include "mythwidgets.h"
+#include "mythdialogs.h"
+#include "programinfo.h"
+#include "programlist.h"
 
 enum ProgListType {
     plUnknown = 0,

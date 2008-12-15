@@ -1,10 +1,12 @@
 #ifndef STATUSBOX_H_
 #define STATUSBOX_H_
 
+#include <vector>
+using namespace std;
+
 #include "mythscreentype.h"
 
-#include "programinfo.h"
-
+class ProgramInfo;
 class MythUIText;
 class MythUIButtonList;
 class MythUIButtonListItem;

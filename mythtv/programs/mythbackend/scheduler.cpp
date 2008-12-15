@@ -34,6 +34,7 @@ using namespace std;
 #include "compat.h"
 #include "storagegroup.h"
 #include "programinfo.h"
+#include "programlist.h"
 #include "scheduledrecording.h"
 #include "cardutil.h"
 #include "mythdb.h"

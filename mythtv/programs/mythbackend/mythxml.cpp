@@ -27,6 +27,7 @@
 #include "previewgenerator.h"
 #include "backendutil.h"
 #include "mythconfig.h"
+#include "programlist.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

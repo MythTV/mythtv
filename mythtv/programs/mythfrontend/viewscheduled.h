@@ -3,7 +3,7 @@
 
 #include <QDateTime>
 
-#include "programinfo.h"
+#include "programlist.h"
 
 #include "mythscreentype.h"
 

@@ -17,6 +17,7 @@
 #include "tv.h"
 #include "util.h"
 #include "programinfo.h"
+#include "programlist.h"
 #include "channelutil.h"
 #include "videoouttypes.h"
 #include "inputinfo.h"

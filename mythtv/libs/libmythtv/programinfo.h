@@ -1,19 +1,17 @@
 #ifndef PROGRAMINFO_H_
 #define PROGRAMINFO_H_
 
+// C++ headers
+#include <vector>
+using namespace std;
+
+#include <QStringList>
+#include <QDateTime>
+#include <QRegExp>
+#include <QMap>
+
 #include "recordingtypes.h"
 #include "mythdbcon.h"
-
-#include <qstring.h>
-#include <qdatetime.h>
-#include <qmap.h>
-#include <QStringList>
-
-#include <qregexp.h>
-
-#include <vector>
-#include <list>
-using namespace std;
 
 typedef QMap<long long, long long> frm_pos_map_t;
 typedef QMap<long long, int> frm_dir_map_t;
@@ -449,72 +447,6 @@ class MPUBLIC ProgramDetail
 };
 typedef vector<ProgramDetail> ProgramDetailList;
 
-/** \class ProgramList
- *  \brief QPtrList of ProgramInfo instances, with helper functions.
- */
-class MPUBLIC ProgramList
-{
-  public:
-    ProgramList(bool auto_delete = true) : autodelete(auto_delete) {}
-    ~ProgramList();
-
-    typedef list<ProgramInfo*>::iterator iterator;
-    typedef list<ProgramInfo*>::const_iterator const_iterator;
-
-    ProgramInfo *operator[](uint index);
-    bool operator==(const ProgramList &b) const;
-
-    bool FromScheduler(bool &hasConflicts, QString altTable = "", int recordid=-1);
-    bool FromScheduler(void) {
-        bool dummyConflicts;
-        return FromScheduler(dummyConflicts);
-    };
-
-    bool FromProgram(const QString &sql, MSqlBindings &bindings,
-                     ProgramList &schedList, bool oneChanid = false);
-    bool FromProgram(const QString &sql, MSqlBindings &bindings) {
-        ProgramList dummySched;
-        return FromProgram(sql, bindings, dummySched);
-    }
-
-    bool FromRecorded( bool bDescending, ProgramList *pSchedList );
-
-    bool FromOldRecorded(const QString &sql, MSqlBindings &bindings);
-
-    static bool GetProgramDetailList(
-        QDateTime         &nextRecordingStart,
-        bool              *hasConflicts = NULL,
-        ProgramDetailList *list = NULL);
-
-    ProgramInfo *take(uint i);
-    iterator erase(iterator it);
-    void clear(void);
-
-    iterator begin(void)             { return pglist.begin(); }
-    iterator end(void)               { return pglist.end();   }
-    const_iterator begin(void) const { return pglist.begin(); }
-    const_iterator end(void)   const { return pglist.end();   }
-
-    void sort(bool (&f)(const ProgramInfo*, const ProgramInfo*))
-        { pglist.sort(f); }
-    bool empty(void) const { return pglist.empty(); }
-    size_t size(void) const { return pglist.size(); }
-    void push_front(ProgramInfo *pginfo) { pglist.push_front(pginfo); }
-    void push_back(ProgramInfo *pginfo) { pglist.push_back(pginfo); }
-
-    // compatibility with old Q3PtrList
-    bool isEmpty(void) const { return empty(); }
-    size_t count(void) const { return size(); }
-    ProgramInfo *at(uint index) { return (*this)[index]; }
-    void prepend(ProgramInfo *pginfo) { push_front(pginfo); }
-    void append(ProgramInfo *pginfo) { push_back(pginfo); }
-    void setAutoDelete(bool auto_delete) { autodelete = auto_delete; }
-
-  protected:
-    list<ProgramInfo*> pglist;
-    bool autodelete;
-};
-
-#endif
+#endif // PROGRAMINFO_H_
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

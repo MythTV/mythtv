@@ -9,11 +9,12 @@ using namespace std;
 #include "viewscheduled.h"
 #include "scheduledrecording.h"
 #include "customedit.h"
+#include "programinfo.h"
 #include "proglist.h"
 #include "tv_play.h"
 
-#include "libmyth/mythcontext.h"
-#include "libmythdb/mythverbose.h"
+#include "mythcontext.h"
+#include "mythverbose.h"
 #include "remoteutil.h"
 
 #include "mythuitext.h"

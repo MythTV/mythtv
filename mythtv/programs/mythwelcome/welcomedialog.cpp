@@ -16,7 +16,7 @@
 #include "mythdbcon.h"
 #include "lcddevice.h"
 #include "tv.h"
-#include "programinfo.h"
+#include "programlist.h"
 #include "uitypes.h"
 #include "compat.h"
 #include "mythdirs.h"

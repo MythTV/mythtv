@@ -1,6 +1,4 @@
-#include <iostream>
-#include <cstdlib>
-using namespace std;
+// -*- Mode: c++ -*-
 
 #include <QLayout>
 #include <QPushButton>
@@ -21,8 +19,8 @@ using namespace std;
 
 #include "exitcodes.h"
 #include "dialogbox.h"
-//#include "mythcontext.h"
-#include "libmythdb/mythverbose.h"
+#include "mythcontext.h"
+#include "mythverbose.h"
 #include "remoteutil.h"
 
 ViewScheduleDiff::ViewScheduleDiff(MythMainWindow *parent, const char *name, QString altTbl, int recordidDiff, QString ltitle)
