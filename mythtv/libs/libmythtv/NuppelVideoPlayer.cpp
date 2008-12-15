@@ -1186,7 +1186,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
     SetDecoder(NULL);
     int testreadsize = 2048;
 
-    while (testread <= kDecoderProbeBufferSize)
+    while (testreadsize <= kDecoderProbeBufferSize)
     {
         if (ringBuffer->Peek(testbuf, testreadsize) != testreadsize)
         {
