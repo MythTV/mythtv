@@ -142,9 +142,10 @@ bool DVBStreamData::IsRedundant(uint pid, const PSIPTable &psip) const
         is_eit |= (TableID::SC_EITbego <= table_id &&
                    TableID::SC_EITendo >= table_id);
     }
-    if (DVB_DNLONG_EIT_PID == pid)
+    if (DVB_DNLONG_EIT_PID == pid || DVB_BVLONG_EIT_PID == pid)
     {
-        // Dish Network Long Term Future Event Information for all transports
+        // Dish Network and Bev Long Term Future Event Information
+        // for all transports
         is_eit |= (TableID::DN_EITbego <= table_id &&
                    TableID::DN_EITendo >= table_id);
     }
@@ -331,9 +332,9 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
     }
 
-    if ((DVB_EIT_PID == pid || DVB_DNLONG_EIT_PID == pid || FREESAT_EIT_PID == pid || 
-        ((MCA_ONID == _desired_netid) && (MCA_EIT_TSID == _desired_tsid) && 
-        (MCA_EIT_PID == pid))) &&
+    if ((DVB_EIT_PID == pid || DVB_DNLONG_EIT_PID == pid || FREESAT_EIT_PID == pid ||
+        ((MCA_ONID == _desired_netid) && (MCA_EIT_TSID == _desired_tsid) &&
+        (MCA_EIT_PID == pid)) || DVB_BVLONG_EIT_PID == pid) &&
 
         DVBEventInformationTable::IsEIT(psip.TableID()))
     {
@@ -422,6 +423,13 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
             add_pids.push_back(DVB_DNLONG_EIT_PID);
         }
 
+        if (_dvb_eit_dishnet_long &&
+            find(cur_pids.begin(), cur_pids.end(),
+                 (uint) DVB_BVLONG_EIT_PID) == cur_pids.end())
+        {
+            add_pids.push_back(DVB_BVLONG_EIT_PID);
+        }
+
         if (_desired_netid == PREMIERE_ONID &&
             find(cur_pids.begin(), cur_pids.end(),
                  (uint) PREMIERE_EIT_DIREKT_PID) == cur_pids.end())
@@ -463,6 +471,13 @@ bool DVBStreamData::GetEITPIDChanges(const uint_vec_t &cur_pids,
                  (uint) DVB_DNLONG_EIT_PID) != cur_pids.end())
         {
             del_pids.push_back(DVB_DNLONG_EIT_PID);
+        }
+
+        if (_dvb_eit_dishnet_long &&
+            find(cur_pids.begin(), cur_pids.end(),
+                 (uint) DVB_BVLONG_EIT_PID) != cur_pids.end())
+        {
+            del_pids.push_back(DVB_BVLONG_EIT_PID);
         }
 
         if (_desired_netid == PREMIERE_ONID &&

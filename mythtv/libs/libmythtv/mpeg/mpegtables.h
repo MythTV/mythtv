@@ -189,6 +189,9 @@ enum
     // Dishnet longterm EIT is on pid 0x300
     DVB_DNLONG_EIT_PID = 0x0300,
 
+    // Bell longterm EIT is on pid 0x441
+    DVB_BVLONG_EIT_PID = 0x0441,
+
     // Premiere EIT for Direkt/Sport PPV
     PREMIERE_EIT_DIREKT_PID = 0x0b11,
     PREMIERE_EIT_SPORT_PID  = 0x0b12,
