@@ -28,7 +28,7 @@ class MPUBLIC MythSocketCBs
 class MPUBLIC MythSocketThread : public QThread
 {
   public:
-    MythSocketThread() : QThread(), m_readyread_run(false) {}
+    MythSocketThread();
 
     virtual void run();
 

@@ -27,6 +27,14 @@ const uint MythSocket::kSocketBufferSize = 128000;
 
 MythSocketThread MythSocket::m_readyread_thread;
 
+MythSocketThread::MythSocketThread()
+    : QThread(), m_readyread_run(false)
+{
+#if !defined(USING_MINGW)
+    memset(m_readyread_pipe, 0, sizeof(m_readyread_pipe));
+#endif
+}
+
 MythSocket::MythSocket(int socket, MythSocketCBs *cb)
     : MSocketDevice(MSocketDevice::Stream),            m_cb(cb),
       m_state(Idle),         m_addr(),                 m_port(0),
