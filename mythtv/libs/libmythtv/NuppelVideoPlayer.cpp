@@ -1220,7 +1220,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
                                             testreadsize))
             SetDecoder(new AvFormatDecoder(this, m_playbackinfo,
                                            using_null_videoout, allow_libmpeg2));
-        if (!GetDecoder())
+        if (GetDecoder())
             break;
         testreadsize <<= 1;
     }
