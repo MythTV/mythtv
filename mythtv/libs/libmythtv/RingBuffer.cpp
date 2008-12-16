@@ -50,8 +50,9 @@ const uint RingBuffer::kBufferSize = 3 * 1024 * 1024;
 #define NUV_MIN_SIZE  204 /* header size? */
 #define MPEG_MIN_SIZE 376 /* 2 TS packets */
 
-#define LOC QString("RingBuf(%1): ").arg(filename)
-#define LOC_ERR QString("RingBuf(%1) Error: ").arg(filename)
+#define LOC      QString("RingBuf(%1): ").arg(filename)
+#define LOC_WARN QString("RingBuf(%1) Warning: ").arg(filename)
+#define LOC_ERR  QString("RingBuf(%1) Error: ").arg(filename)
 
 /* should be minimum of the above test sizes */
 const uint RingBuffer::kReadTestSize = PNG_MIN_SIZE;
@@ -623,7 +624,7 @@ int RingBuffer::ReadBufAvail(void) const
 }
 
 /** \fn RingBuffer::ResetReadAhead(long long)
- *  \brief Restart the read-ahead threat at the 'newinternal' position.
+ *  \brief Restart the read-ahead thread at the 'newinternal' position.
  *
  *   This is called after a Seek(long long, int) so that the read-ahead
  *   buffer doesn't contain any stale data, and so that it will read 
@@ -954,15 +955,48 @@ long long RingBuffer::SetAdjustFilesize(void)
 
 int RingBuffer::Peek(void *buf, int count)
 {
-    // really only works with readahead, but DVD doesn't readahead
+    long long ret = -1;
+
     if (!readaheadrunning)
     {
-        int ret = Read(buf, count);
-        Seek(0, SEEK_SET);
-        return ret;
+        long long old_pos = Seek(0, SEEK_CUR);
+
+        ret = Read(buf, count);
+#ifdef USING_FRONTEND
+        if (ret > 0 && dvdPriv)
+        {
+            // This is technically incorrect it we should seek
+            // back to exactly where we were, but we can't do
+            // that with the DVDRingBuffer
+            dvdPriv->NormalSeek(0);
+        }
+        else
+#endif // USING_FRONTEND
+        if (ret > 0)
+        {
+            long long new_pos = Seek(-ret, SEEK_CUR);
+            if (new_pos != old_pos)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        QString("Peek() Failed to return from new "
+                                "position %1 to old position %2, now "
+                                "at position %3")
+                        .arg(old_pos - ret).arg(old_pos).arg(new_pos));
+            }
+        }
+    }
+    else
+    {
+        ret = ReadFromBuf(buf, count, true);
     }
 
-    return ReadFromBuf(buf, count, true);
+    if (ret != count)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Peek() requested %1 bytes, but only returning %2")
+                .arg(count).arg(ret));
+    }
+    return ret;
 }
 
 /**
