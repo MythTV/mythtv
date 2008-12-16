@@ -115,7 +115,12 @@ class TimeStretch : public SpinBoxSetting, public PlayGroupDBStorage
     virtual void Save(void)
     {
         if (intValue() < 50 || intValue() > 200)
-            setValue(0);
+        {
+            // We need to bypass the bounds checking that would
+            // normally occur in order to get the special value of 0
+            // into the database
+            IntegerSetting::setValue(0);
+        }
         PlayGroupDBStorage::Save();
     }
 };
