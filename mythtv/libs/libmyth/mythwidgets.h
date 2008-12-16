@@ -91,17 +91,17 @@ class MPUBLIC MythSpinBox: public QSpinBox
   public:
     MythSpinBox(QWidget* parent = NULL, const char* name = "MythSpinBox",
                 bool allow_single_step = false)
-        : QSpinBox(parent), singlestep(allow_single_step)
+        : QSpinBox(parent), allowsinglestep(allow_single_step)
     {
         setObjectName(name);
-        if (singlestep)
+        if (allowsinglestep)
             setSingleStep(10);
     }
 
     void setHelpText(const QString&);
 
-    bool singleStep(void)               { return singlestep; }
-    void setSingleStep(bool arg = true) { singlestep = arg; }
+    bool allowSingleStep(void)               { return allowsinglestep; }
+    void setAllowSingleStep(bool arg = true) { allowsinglestep = arg; }
 
   signals:
     void changeHelpText(QString);
@@ -113,7 +113,7 @@ class MPUBLIC MythSpinBox: public QSpinBox
 
   private:
     QString helptext;
-    bool singlestep;
+    bool allowsinglestep;
 };
 
 class MPUBLIC MythSlider: public QSlider

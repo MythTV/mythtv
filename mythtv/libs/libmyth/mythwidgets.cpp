@@ -336,9 +336,9 @@ void MythSpinBox::keyPressEvent(QKeyEvent* e)
             else if (action == "DOWN")
                 focusNextPrevChild(true);
             else if (action == "LEFT")
-                singlestep ? setValue(value()-1) : stepDown();
+                allowsinglestep ? setValue(value()-1) : stepDown();
             else if (action == "RIGHT")
-                singlestep ? setValue(value()+1) : stepUp();
+                allowsinglestep ? setValue(value()+1) : stepUp();
             else if (action == "PAGEDOWN")
                 stepDown();
             else if (action == "PAGEUP")
