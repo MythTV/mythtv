@@ -54,6 +54,7 @@ LIBS += -lmythmpeg2-$$LIBVERSION    -lmythdvdnav-$$LIBVERSION
 LIBS += -lmythdb-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
+using_backend: LIBS += -lmp3lame
 LIBS += -lz $$EXTRA_LIBS $$QMAKE_LIBS_DYNLOAD
 
 TARGETDEPS += ../libmyth/libmyth-$${MYTH_SHLIB_EXT}
