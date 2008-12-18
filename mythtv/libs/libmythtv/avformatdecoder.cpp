@@ -3568,9 +3568,10 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                             curstream->codec->request_channels =
                                 audioOut.channels;
                         }
-                        ret = avcodec_decode_audio(
-                            curstream->codec, audioSamples,
-                            &data_size, ptr, len);
+                        data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+                        ret = avcodec_decode_audio2(curstream->codec,
+                                                    audioSamples, &data_size,
+                                                    ptr, len);
                         already_decoded = true;
 
                         reselectAudioTrack |= curstream->codec->channels;
@@ -3638,8 +3639,9 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         {
                             curstream->codec->request_channels =
                                 audioOut.channels;
-                            ret = avcodec_decode_audio(
-                                ctx, audioSamples, &data_size, ptr, len);
+                            data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+                            ret = avcodec_decode_audio2(ctx, audioSamples,
+                                                        &data_size, ptr, len);
                         }
 
                         // When decoding some audio streams the number of
