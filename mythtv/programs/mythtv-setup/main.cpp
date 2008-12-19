@@ -39,38 +39,38 @@
 
 using namespace std;
 
-void SetupMenuCallback ( void* data, QString& selection )
+void SetupMenuCallback(void* data, QString& selection)
 {
     (void)data;
 
     QString sel = selection.toLower();
 
-    if ( sel == "general" )
+    if (sel == "general")
     {
         BackendSettings be;
         be.exec();
     }
-    else if ( sel == "capture cards" )
+    else if (sel == "capture cards")
     {
         CaptureCardEditor cce;
         cce.exec();
     }
-    else if ( sel == "video sources" )
+    else if (sel == "video sources")
     {
         VideoSourceEditor vse;
         vse.exec();
     }
-    else if ( sel == "card inputs" )
+    else if (sel == "card inputs")
     {
         CardInputEditor cie;
         cie.exec();
     }
-    else if ( sel == "channel editor" )
+    else if (sel == "channel editor")
     {
         ChannelEditor ce;
         ce.exec();
     }
-    else if ( sel == "storage groups" )
+    else if (sel == "storage groups")
     {
         StorageGroupListEditor sge;
         sge.exec();
@@ -88,7 +88,7 @@ void SetupMenu(MythMainWindow *win)
     menu->setCallback(SetupMenuCallback, gContext);
     menu->setKillable();
 
-    if ( menu->foundTheme() )
+    if (menu->foundTheme())
     {
         win->GetMainStack()->AddScreen(menu);
         qApp->exec();
@@ -193,7 +193,8 @@ int main(int argc, char *argv[])
                 QString tmpArg = a.argv()[argpos+1];
                 if (tmpArg.startsWith("-"))
                 {
-                    cerr << "Invalid or missing argument to -O/--override-setting option\n";
+                    cerr << "Invalid or missing argument to "
+                            "-O/--override-setting option\n";
                     return BACKEND_EXIT_INVALID_CMDLINE;
                 }
 
@@ -210,7 +211,8 @@ int main(int argc, char *argv[])
             }
             else
             {
-                cerr << "Invalid or missing argument to -O/--override-setting option\n";
+                cerr << "Invalid or missing argument to "
+                        "-O/--override-setting option\n";
                 return BACKEND_EXIT_INVALID_CMDLINE;
             }
 
@@ -225,14 +227,19 @@ int main(int argc, char *argv[])
 
             cerr << "Valid options are: "<<endl
 #ifdef USING_X11
-                 <<"-display X-server              Create GUI on X-server, not localhost"<<endl
+                 << "-display X-server              "
+                    "Create GUI on X-server, not localhost" << endl
 #endif
-                 <<"-geometry or --geometry WxH    Override window size settings"<<endl
-                 <<"-geometry WxH+X+Y              Override window size and position"<<endl
-                 <<"-O or "<<endl
-                 <<"  --override-setting KEY=VALUE Force the setting named 'KEY' to value 'VALUE'"<<endl
-                 <<"-v or --verbose debug-level    Use '-v help' for level info"<<endl
-                 <<endl;
+                 << "-geometry or --geometry WxH    "
+                    "Override window size settings" << endl
+                 << "-geometry WxH+X+Y              "
+                    "Override window size and position" << endl
+                 << "-O or " << endl
+                 << "  --override-setting KEY=VALUE "
+                    "Force the setting named 'KEY' to value 'VALUE'" << endl
+                 << "-v or --verbose debug-level    "
+                    "Use '-v help' for level info" << endl
+                 << endl;
             return -1;
         }
     }
@@ -265,7 +272,7 @@ int main(int argc, char *argv[])
         for (it = settingsOverride.begin(); it != settingsOverride.end(); ++it)
         {
             VERBOSE(VB_IMPORTANT, QString("Setting '%1' being forced to '%2'")
-                                          .arg(it.key()).arg(*it));
+                                  .arg(it.key()).arg(*it));
             gContext->OverrideSettingForSession(it.key(), *it);
         }
     }
