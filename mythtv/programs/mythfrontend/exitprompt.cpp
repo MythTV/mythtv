@@ -108,7 +108,7 @@ void ExitPrompter::handleExit()
         dlg->AddButton(QObject::tr("Yes, Exit and Shutdown"), SLOT(halt()));
 
     // This is a hack so that the button clicks target the correct slot:
-    dlg->SetReturnEvent((MythScreenType *)this, QString());
+    dlg->SetReturnEvent(this, QString());
 
     ss->AddScreen(dlg);
 }
