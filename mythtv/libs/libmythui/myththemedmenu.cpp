@@ -267,8 +267,11 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
             {
                 if (callbacks)
                     m_state->m_callback(m_state->m_callbackdata, selExit);
-                QApplication::exit();
-                m_wantpop = true;
+                else
+                {
+                    QApplication::exit();
+                    m_wantpop = true;
+                }
             }
         }
         else

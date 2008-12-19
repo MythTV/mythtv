@@ -21,8 +21,8 @@
 #include "mythverbose.h"
 #include "mythversion.h"
 #include "langsettings.h"
-#include "dialogbox.h"
 #include "exitcodes.h"
+#include "exitprompt.h"
 #include "util.h"
 #include "storagegroup.h"
 #include "myththemedmenu.h"
@@ -38,6 +38,8 @@
 #include "checksetup.h"
 
 using namespace std;
+
+ExitPrompter   *exitPrompt = NULL;
 
 void SetupMenuCallback(void* data, QString& selection)
 {
@@ -75,6 +77,12 @@ void SetupMenuCallback(void* data, QString& selection)
         StorageGroupListEditor sge;
         sge.exec();
     }
+    else if (sel == "exiting_app")
+    {
+        if (!exitPrompt)
+            exitPrompt = new ExitPrompter();
+        exitPrompt->handleExit();
+    }
 }
 
 void SetupMenu(MythMainWindow *win)
@@ -86,7 +94,6 @@ void SetupMenu(MythMainWindow *win)
                                               "mainmenu", false);
 
     menu->setCallback(SetupMenuCallback, gContext);
-    menu->setKillable();
 
     if (menu->foundTheme())
     {
@@ -342,59 +349,11 @@ int main(int argc, char *argv[])
     REG_KEY("qt", "DELETE", "Delete", "D");
     REG_KEY("qt", "EDIT", "Edit", "E");
 
-    DialogBox *dia = NULL;
-    bool haveProblems = false;
-    do
     {
         // Let the user select buttons, type values, scan for channels, etc.
         SetupMenu(mainWindow);
-
-        // Look for common problems
-        QString *problems = new QString("");
-        haveProblems = CheckSetup(problems);
-
-        if (haveProblems)
-        {
-            QString prompt;
-
-            if (problems->count("\n") > 1)
-                prompt = QObject::tr("Do you want to fix these problems?");
-            else
-                prompt = QObject::tr("Do you want to fix this problem?");
-
-            dia = new DialogBox(mainWindow, problems->append("\n" + prompt));
-            dia->AddButton(QObject::tr("Yes please"));
-            dia->AddButton(QObject::tr("No, I know what I am doing"));
-
-            if (kDialogCodeButton1 == dia->exec())
-                haveProblems = false;
-            dia->deleteLater();
-        }
-
-        delete problems;
-
-    // Execute UI again until there are no more problems:
     }
-    while (haveProblems);
-
-    if (gContext->IsMasterHost())
-    {
-        dia = new DialogBox(mainWindow,
-                            QObject::tr("If this is the master backend server, "
-                                        "please run 'mythfilldatabase' "
-                                        "to populate the database "
-                                        "with channel information."));
-        dia->AddButton(QObject::tr("OK"));
-        dia->exec();
-        dia->deleteLater();
-    }
-
-    if (backendIsRunning)
-        RemoteSendMessage("CLEAR_SETTINGS_CACHE");
-
-    delete gContext;
-
-    return GENERIC_EXIT_OK;
+    // Main menu callback to ExitPrompter does CheckSetup(), cleanup and exit.
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

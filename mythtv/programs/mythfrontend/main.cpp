@@ -1,6 +1,5 @@
 
 #include <unistd.h>
-#include <stdlib.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <cerrno>
@@ -39,10 +38,10 @@ using namespace std;
 
 #include "compat.h"  // For SIG* on MinGW
 #include "exitcodes.h"
+#include "exitprompt.h"
 #include "programinfo.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
-#include "dialogbox.h"
 #include "guidegrid.h"
 #include "mythplugin.h"
 #include "remoteutil.h"
@@ -57,17 +56,12 @@ using namespace std;
 #include "myththemedmenu.h"
 #include "myththemebase.h"
 #include "mediarenderer.h"
-#include "mythscreenstack.h"
 #include "mythmainwindow.h"
 #include "mythappearance.h"
 #include "mythuihelper.h"
 #include "mythdirs.h"
 
-#define NO_EXIT  0
-#define QUIT     1
-#define HALT     2
-#define REBOOT   3
-
+static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
 static MythThemeBase  *themeBase = NULL;
 
@@ -75,10 +69,15 @@ static XBox           *xbox      = NULL;
 static QString         logfile;
 static MediaRenderer  *g_pUPnp   = NULL;
 
+static void handleExit(void);
+
 namespace
 {
     void cleanup()
     {
+        delete exitPopup;
+        exitPopup = NULL;
+
         delete themeBase;
         themeBase = NULL;
 
@@ -465,6 +464,8 @@ void TVMenuCallback(void *data, QString &selection)
     }
     else if (sel == "tv_status")
         showStatus();
+    else if (sel == "exiting_app")
+        handleExit();
 
     if (sel.left(9) == "settings ")
     {
@@ -479,144 +480,16 @@ void TVMenuCallback(void *data, QString &selection)
     }
 }
 
-int handleExit(void)
+void handleExit(void)
 {
     if (gContext->GetNumSetting("NoPromptOnExit", 1) == 0)
-        return QUIT;
-
-
-    // IsFrontendOnly() triggers a popup if there is no BE connection.
-    // We really don't need that right now. This hack prevents it.
-    gContext->SetMainWindow(NULL);
-
-    // first of all find out, if this is a frontend only host...
-    bool frontendOnly = gContext->IsFrontendOnly();
-
-    // Undo the hack, just in case we _don't_ quit:
-    gContext->SetMainWindow(MythMainWindow::getMainWindow());
-
-
-    // how do you want to quit today?
-    int  exitMenuStyle = gContext->GetNumSetting("OverrideExitMenu", 0);
-
-    QString title = QObject::tr("Do you really want to exit MythTV?");
-
-    DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), title);
-
-    dlg->AddButton(QObject::tr("No"));
-    DialogCode result = kDialogCodeRejected;
-
-    int ret = NO_EXIT;
-    switch (exitMenuStyle)
+        qApp->quit();
+    else
     {
-        case 0:
-            dlg->AddButton(QObject::tr("Yes, Exit now"));
-            if (frontendOnly)
-                dlg->AddButton(QObject::tr("Yes, Exit and Shutdown"));
-            result = dlg->exec();
-            switch (result)
-            {
-                case kDialogCodeButton0: ret = NO_EXIT; break;
-                case kDialogCodeButton1: ret = QUIT;    break;
-                case kDialogCodeButton2: ret = HALT;    break;
-                default:                 ret = NO_EXIT; break;
-            }
-            break;
-        case 1:
-            dlg->AddButton(QObject::tr("Yes, Exit now"));
-            result = dlg->exec();
-            switch (result)
-            {
-                case kDialogCodeButton0: ret = NO_EXIT; break;
-                case kDialogCodeButton1: ret = QUIT;    break;
-                default:                 ret = NO_EXIT; break;
-            }
-            break;
-        case 2:
-            dlg->AddButton(QObject::tr("Yes, Exit now"));
-            dlg->AddButton(QObject::tr("Yes, Exit and Shutdown"));
-            result = dlg->exec();
-            switch (result)
-            {
-                case kDialogCodeButton0: ret = NO_EXIT; break;
-                case kDialogCodeButton1: ret = QUIT;    break;
-                case kDialogCodeButton2: ret = HALT;    break;
-                default:                 ret = NO_EXIT; break;
-            }
-            break;
-        case 3:
-            dlg->AddButton(QObject::tr("Yes, Exit now"));
-            dlg->AddButton(QObject::tr("Yes, Exit and Reboot"));
-            dlg->AddButton(QObject::tr("Yes, Exit and Shutdown"));
-            result = dlg->exec();
-            switch (result)
-            {
-                case kDialogCodeButton0: ret = NO_EXIT; break;
-                case kDialogCodeButton1: ret = QUIT;    break;
-                case kDialogCodeButton2: ret = REBOOT;  break;
-                case kDialogCodeButton3: ret = HALT;    break;
-                default:                 ret = NO_EXIT; break;
-            }
-            break;
-        case 4:
-            dlg->AddButton(QObject::tr("Yes, Exit and Shutdown"));
-            result = dlg->exec();
-            switch (result)
-            {
-                case kDialogCodeButton0: ret = NO_EXIT; break;
-                case kDialogCodeButton1: ret = HALT;    break;
-                default:                 ret = NO_EXIT; break;
-            }
-            break;
-        case 5:
-            dlg->AddButton(QObject::tr("Yes, Exit and Reboot"));
-            result = dlg->exec();
-            switch (result)
-            {
-                case kDialogCodeButton0: ret = NO_EXIT; break;
-                case kDialogCodeButton1: ret = REBOOT;  break;
-                default:                 ret = NO_EXIT; break;
-            }
-            break;
-        case 6:
-            dlg->AddButton(QObject::tr("Yes, Exit and Reboot"));
-            dlg->AddButton(QObject::tr("Yes, Exit and Shutdown"));
-            result = dlg->exec();
-            switch (result)
-            {
-                case kDialogCodeButton0: ret = NO_EXIT; break;
-                case kDialogCodeButton1: ret = REBOOT;  break;
-                case kDialogCodeButton2: ret = HALT;    break;
-                default:                 ret = NO_EXIT; break;
-            }
-            break;
-    }
+        if (!exitPopup)
+            exitPopup = new ExitPrompter();
 
-    dlg->deleteLater();
-    dlg = NULL;
-
-    return ret;
-}
-
-void haltnow()
-{
-    QString halt_cmd = gContext->GetSetting("HaltCommand",
-                                            "sudo /sbin/halt -p");
-    if (!halt_cmd.isEmpty())
-    {
-        QByteArray tmp = halt_cmd.toAscii();
-        system(tmp.constData());
-    }
-}
-
-void rebootnow()
-{
-    QString reboot_cmd = gContext->GetSetting("RebootCommand",
-                                              "sudo /sbin/reboot");
-    if (!reboot_cmd.isEmpty())
-    {
-        QByteArray tmp = reboot_cmd.toAscii();
-        system(tmp.constData());
+        exitPopup->handleExit();
     }
 }
 
@@ -1453,34 +1326,23 @@ int main(int argc, char **argv)
 
     gContext->addCurrentLocation("MainMenu");
 
-    int exitstatus = NO_EXIT;
 
-    do
+    themename = gContext->GetSetting("Theme", "blue");
+    themedir = GetMythUI()->FindThemeDir(themename);
+    if (themedir.isEmpty())
     {
-        themename = gContext->GetSetting("Theme", "blue");
-        themedir = GetMythUI()->FindThemeDir(themename);
-        if (themedir.isEmpty())
-        {
-            VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
-                    .arg(themename));
-            return FRONTEND_EXIT_NO_THEME;
-        }
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
+                .arg(themename));
+        return FRONTEND_EXIT_NO_THEME;
+    }
 
-        if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
-            return FRONTEND_EXIT_NO_THEME;
+    if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
+        return FRONTEND_EXIT_NO_THEME;
 
+    // Setup handler for USR1 signals to reload theme
+    signal(SIGUSR1, &signal_USR1_handler);
 
-        // Setup handler for USR1 signals to reload theme
-        signal(SIGUSR1, &signal_USR1_handler);
-
-        qApp->exec();
-    } while (!(exitstatus = handleExit()));
-
-    if (exitstatus == HALT)
-        haltnow();
-
-    if (exitstatus == REBOOT)
-        rebootnow();
+    qApp->exec();
 
     pmanager->DestroyAllPlugins();
 

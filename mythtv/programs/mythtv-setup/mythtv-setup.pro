@@ -19,8 +19,8 @@ INSTALLS += menu
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-HEADERS += backendsettings.h
-SOURCES += backendsettings.cpp checksetup.cpp main.cpp
+HEADERS += backendsettings.h   checksetup.h   exitprompt.h
+SOURCES += backendsettings.cpp checksetup.cpp exitprompt.cpp main.cpp
 
 macx {
     mac_bundle {
