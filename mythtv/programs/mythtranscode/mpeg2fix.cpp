@@ -7,8 +7,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <getopt.h>
@@ -16,6 +14,7 @@
 
 #include <QList>
 #include <Q3PtrList>
+#include <QFileInfo>
 
 #ifdef USING_MINGW
 #include <winsock2.h>
@@ -270,10 +269,8 @@ MPEG2fixup::MPEG2fixup(const QString &inf, const QString &outf,
         statustime = QDateTime::currentDateTime();
         statustime = statustime.addSecs(status_update_time);
 
-        struct stat filestat;
-        if(stat(inf, &filestat)) {
-        }
-        filesize = filestat.st_size;
+        const QFileInfo finfo(inf);
+        filesize = finfo.size();
     }
 }
 
