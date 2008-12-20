@@ -322,9 +322,11 @@ HostSlider *SetDVDDriveSpeed()
 {
     HostSlider *gs = new HostSlider("DVDDriveSpeed", 2, 12, 2);
     gs->setLabel(QObject::tr("DVD Drive Speed"));
-    gs->setValue(2);
+    gs->setValue(12);
     gs->setHelpText(QObject::tr("Set DVD Drive Speed during DVD Playback. "
-                                "Speed is in multiples of 177KB/s"));
+                                "Speed is in multiples of 177KB/s. "
+                                "Slower speeds may reduce drive noise but in "
+                                "some cases it causes playback to stutter."));
     return gs;
 }
 
