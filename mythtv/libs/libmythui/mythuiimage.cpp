@@ -391,12 +391,12 @@ bool MythUIImage::Load(void)
             if (image)
             {
                 VERBOSE(VB_FILE, QString("MythUIImage::Load found in cache :%1:").arg(imagelabel));
-		if (m_isReflected)
+                if (m_isReflected)
                     image->setIsReflected(true);
 
                 image->UpRef();
                 bFoundInCache = true;
-                }
+            }
             else
             {
                 VERBOSE(VB_FILE, QString("MythUIImage::Load Not Found in "
