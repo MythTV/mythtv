@@ -354,42 +354,42 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
             dlg->AddButton(tr("Use current schema"));
 
         DialogCode selected = dlg->exec();
+        dlg->deleteLater();
+
+        if (selected == kDialogCodeRejected || selected == kDialogCodeButton0)
+            return MYTH_SCHEMA_EXIT;
 
         // The annoying extra confirmation:
-        if (kDialogCodeButton1 == selected || kDialogCodeButton2 == selected)
+        if (didBackup)
         {
-            if (didBackup)
+            int dirPos = m_backupResult.lastIndexOf('/');
+            QString dirName;
+            QString fileName;
+            if (dirPos > 0)
             {
-                int dirPos = m_backupResult.lastIndexOf('/');
-                QString dirName;
-                QString fileName;
-                if (dirPos > 0)
-                {
-                    fileName = m_backupResult.mid(dirPos + 1);
-                    dirName  = m_backupResult.left(dirPos);
-                }
-                message = tr("If your system becomes unstable, a database"
-                             " backup file called\n%1\nis located in %2")
-                          .arg(fileName).arg(dirName);
+                fileName = m_backupResult.mid(dirPos + 1);
+                dirName  = m_backupResult.left(dirPos);
             }
-            else
-                message = tr("This cannot be un-done, so having a"
-                             " database backup would be a good idea.");
-            if (connections)
-                message += "\n\n" + warnOtherCl;
-
-            DialogBox *dlg2 = new DialogBox(win, message);
-
-            dlg2->AddButton(tr("Exit"));
-            if (upgradable)
-                dlg2->AddButton(tr("Upgrade"));
-            if (m_expertMode)
-                dlg2->AddButton(tr("Use current schema"));
-
-            selected = dlg2->exec();
-
-            dlg2->deleteLater();
+            message = tr("If your system becomes unstable, a database"
+                         " backup file called\n%1\nis located in %2")
+                      .arg(fileName).arg(dirName);
         }
+        else
+            message = tr("This cannot be un-done, so having a"
+                         " database backup would be a good idea.");
+        if (connections)
+            message += "\n\n" + warnOtherCl;
+
+        DialogBox *dlg2 = new DialogBox(win, message);
+
+        dlg2->AddButton(tr("Exit"));
+        if (upgradable)
+            dlg2->AddButton(tr("Upgrade"));
+        if (m_expertMode)
+            dlg2->AddButton(tr("Use current schema"));
+
+        selected = dlg2->exec();
+        dlg2->deleteLater();
 
         switch (selected)
         {
@@ -405,8 +405,6 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
             default:
                 returnValue = MYTH_SCHEMA_ERROR;
         }
-
-        dlg->deleteLater();
 
         return returnValue;
     }
