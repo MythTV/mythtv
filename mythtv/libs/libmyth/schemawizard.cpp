@@ -338,71 +338,73 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         pop = win->GetStack("popup stack");
 
         dlg = new DialogBox(win, message);
-        dlg->AddButton(QObject::tr("Exit"));
+        dlg->AddButton(tr("Exit"));
 
         if (returnValue == MYTH_SCHEMA_ERROR)
-            dlg->exec();
-        else
         {
-            if (upgradable)
-                dlg->AddButton(QObject::tr("Upgrade"));
-            if (m_expertMode)
-                dlg->AddButton(QObject::tr("Use current schema"));
+            // Display error, return warning to caller
+            dlg->exec();
+            dlg->deleteLater();
+            return MYTH_SCHEMA_ERROR;
+        }
 
-            DialogCode selected = dlg->exec();
+        if (upgradable)
+            dlg->AddButton(tr("Upgrade"));
+        if (m_expertMode)
+            dlg->AddButton(tr("Use current schema"));
 
-            // The annoying extra confirmation:
-            if (kDialogCodeButton1 == selected ||
-                kDialogCodeButton2 == selected)
+        DialogCode selected = dlg->exec();
+
+        // The annoying extra confirmation:
+        if (kDialogCodeButton1 == selected ||
+            kDialogCodeButton2 == selected)
+        {
+            if (didBackup)
             {
-                if (didBackup)
+                int dirPos = m_backupResult.lastIndexOf('/');
+                QString dirName;
+                QString fileName;
+                if (dirPos > 0)
                 {
-                    int dirPos = m_backupResult.lastIndexOf(QChar('/'));
-                    QString dirName;
-                    QString fileName;
-                    if (dirPos > 0)
-                    {
-                        fileName = m_backupResult.mid(dirPos + 1);
-                        dirName  = m_backupResult.left(dirPos);
-                    }
-                    message = tr("If your system becomes unstable,"
-                                 " a database backup file called\n%1"
-                                 "\nis located in %2")
-                                 .arg(fileName).arg(dirName);
+                    fileName = m_backupResult.mid(dirPos + 1);
+                    dirName  = m_backupResult.left(dirPos);
                 }
-                else
-                    message = tr("This cannot be un-done, so having a"
-                                 " database backup would be a good idea.");
-                if (connections)
-                    message += "\n\n" + warnOtherCl;
-
-                DialogBox *dlg2 = new DialogBox(win, message);
-
-                dlg2->AddButton(QObject::tr("Exit"));
-                if (upgradable)
-                    dlg2->AddButton(QObject::tr("Upgrade"));
-                if (m_expertMode)
-                    dlg2->AddButton(QObject::tr("Use current schema"));
-
-                selected = dlg2->exec();
-
-                dlg2->deleteLater();
+                message = tr("If your system becomes unstable, a database"
+                             " backup file called\n%1\nis located in %2")
+                          .arg(fileName).arg(dirName);
             }
+            else
+                message = tr("This cannot be un-done, so having a"
+                             " database backup would be a good idea.");
+            if (connections)
+                message += "\n\n" + warnOtherCl;
 
-            switch (selected)
-            {
-                case kDialogCodeRejected:
-                case kDialogCodeButton0:
-                    returnValue = MYTH_SCHEMA_EXIT;         break;
-                case kDialogCodeButton1:
-                    returnValue = upgradable ?
-                                  MYTH_SCHEMA_UPGRADE:
-                                  MYTH_SCHEMA_USE_EXISTING; break;
-                case kDialogCodeButton2:
-                    returnValue = MYTH_SCHEMA_USE_EXISTING; break;
-                default:
-                    returnValue = MYTH_SCHEMA_ERROR;
-            }
+            DialogBox *dlg2 = new DialogBox(win, message);
+
+            dlg2->AddButton(tr("Exit"));
+            if (upgradable)
+                dlg2->AddButton(tr("Upgrade"));
+            if (m_expertMode)
+                dlg2->AddButton(tr("Use current schema"));
+
+            selected = dlg2->exec();
+
+            dlg2->deleteLater();
+        }
+
+        switch (selected)
+        {
+            case kDialogCodeRejected:
+            case kDialogCodeButton0:
+                returnValue = MYTH_SCHEMA_EXIT;         break;
+            case kDialogCodeButton1:
+                returnValue = upgradable ?
+                              MYTH_SCHEMA_UPGRADE:
+                              MYTH_SCHEMA_USE_EXISTING; break;
+            case kDialogCodeButton2:
+                returnValue = MYTH_SCHEMA_USE_EXISTING; break;
+            default:
+                returnValue = MYTH_SCHEMA_ERROR;
         }
 
         dlg->deleteLater();
