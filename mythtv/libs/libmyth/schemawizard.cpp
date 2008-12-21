@@ -105,54 +105,54 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
     if (Compare() > 0)  // i.e. if DB is older than expected
     {
         VERBOSE(VB_IMPORTANT, "Database schema is old."
-                              " Waiting to see if DB is being upgraded."); 
+                              " Waiting to see if DB is being upgraded.");
 
         MSqlQuery query(MSqlQuery::InitCon());
-        bool      backupRunning  = false; 
-        bool      upgradeRunning = false; 
+        bool      backupRunning  = false;
+        bool      upgradeRunning = false;
 
-        MythTimer elapsedTimer; 
-        elapsedTimer.start(); 
-        while (versionsBehind && (elapsedTimer.elapsed() < seconds * 1000)) 
-        { 
-            sleep(1); 
+        MythTimer elapsedTimer;
+        elapsedTimer.start();
+        while (versionsBehind && (elapsedTimer.elapsed() < seconds * 1000))
+        {
+            sleep(1);
 
-            if (IsBackupInProgress()) 
-            { 
+            if (IsBackupInProgress())
+            {
                 VERBOSE(VB_IMPORTANT,
-                        "Waiting for Database Backup to complete."); 
-                if (!backupRunning) 
-                { 
-                    elapsedTimer.restart(); 
-                    backupRunning = true; 
-                } 
+                        "Waiting for Database Backup to complete.");
+                if (!backupRunning)
+                {
+                    elapsedTimer.restart();
+                    backupRunning = true;
+                }
                 continue;
-            } 
+            }
 
             if (!lockSchema(query))
             {
                 VERBOSE(VB_IMPORTANT,
-                        "Waiting for Database Upgrade to complete."); 
-                if (!upgradeRunning) 
-                { 
-                    elapsedTimer.restart(); 
-                    upgradeRunning = true; 
-                } 
+                        "Waiting for Database Upgrade to complete.");
+                if (!upgradeRunning)
+                {
+                    elapsedTimer.restart();
+                    upgradeRunning = true;
+                }
                 continue;
             }
 
-            Compare(); 
+            Compare();
             unlockSchema(query);
 
             if (m_expertMode)  // Experts don't like to wait around :-)
                 break;
-        } 
-  
+        }
+
         if (versionsBehind)
-            VERBOSE(VB_IMPORTANT, "Timed out waiting."); 
-        else 
-            VERBOSE(VB_IMPORTANT, 
-                    "Schema version was upgraded while we were waiting."); 
+            VERBOSE(VB_IMPORTANT, "Timed out waiting.");
+        else
+            VERBOSE(VB_IMPORTANT,
+                    "Schema version was upgraded while we were waiting.");
     }
     // else DB is same version, or newer. Either way, we won't upgrade it
 
@@ -266,7 +266,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         return MYTH_SCHEMA_EXIT;
     }
 
- 
+
 
     //
     // 2. Build up a compound message to show the user, wait for a response
@@ -325,7 +325,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     if (message.contains("%1"))
         message = message.arg(name).arg(DBver).arg(m_newSchemaVer);
 
- 
+
     if (gui)
     {
         DialogBox       * dlg;
@@ -356,8 +356,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         DialogCode selected = dlg->exec();
 
         // The annoying extra confirmation:
-        if (kDialogCodeButton1 == selected ||
-            kDialogCodeButton2 == selected)
+        if (kDialogCodeButton1 == selected || kDialogCodeButton2 == selected)
         {
             if (didBackup)
             {
