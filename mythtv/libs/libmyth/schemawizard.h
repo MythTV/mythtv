@@ -80,14 +80,8 @@ class MPUBLIC SchemaUpgradeWizard : public DBUtil, public QObject
     int     versionsBehind;   ///< How many schema versions old is the DB?
 
   private:
-    /// If the main window hasn't been created yet, fake it.
-    MythMainWindow *TempMainWindow(bool languagePrompt = true); 
-    void           EndTempWindow(void);
-
-
     bool     m_autoUpgrade;        ///< If no UI, always upgrade
     QString  m_backupResult;       ///< File path, or __FAILED__
-    bool     m_createdTempWindow;
     bool     m_expertMode;         ///< Also allow newer DB schema
     QString  m_schemaSetting;      ///< To lookup the schema version
     QString  m_newSchemaVer;       ///< What we need to upgrade to

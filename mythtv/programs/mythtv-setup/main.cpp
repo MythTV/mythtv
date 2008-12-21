@@ -296,13 +296,6 @@ int main(int argc, char *argv[])
         return GENERIC_EXIT_DB_ERROR;
     }
 
-    if (!UpgradeTVDatabaseSchema(true))
-    {
-        VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema.");
-        delete gContext;
-        return GENERIC_EXIT_DB_OUTOFDATE;
-    }
-
     gContext->SetSetting("Theme", "G.A.N.T");
     GetMythUI()->LoadQtConfig();
 
@@ -323,6 +316,13 @@ int main(int argc, char *argv[])
 
     LanguageSettings::prompt();
     LanguageSettings::load("mythfrontend");
+
+    if (!UpgradeTVDatabaseSchema(true))
+    {
+        VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema.");
+        delete gContext;
+        return GENERIC_EXIT_DB_OUTOFDATE;
+    }
 
     QString warn =
         QObject::tr("WARNING") + ": " +

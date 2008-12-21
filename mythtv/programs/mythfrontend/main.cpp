@@ -1214,13 +1214,6 @@ int main(int argc, char **argv)
     }
     setuid(getuid());
 
-    if (!UpgradeTVDatabaseSchema(upgradeAllowed))
-    {
-        VERBOSE(VB_IMPORTANT,
-                "Couldn't upgrade database to new schema, exiting.");
-        return FRONTEND_EXIT_DB_OUTOFDATE;
-    }
-
     VERBOSE(VB_IMPORTANT,
             QString("Enabled verbose msgs: %1").arg(verboseString));
 
@@ -1257,6 +1250,13 @@ int main(int argc, char **argv)
     GetMythUI()->UpdateImageCache();
 
     LanguageSettings::prompt();
+
+    if (!UpgradeTVDatabaseSchema(upgradeAllowed))
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Couldn't upgrade database to new schema, exiting.");
+        return FRONTEND_EXIT_DB_OUTOFDATE;
+    }
 
     // this direct connect is only necessary, if the user wants to use the
     // auto shutdown/wakeup feature

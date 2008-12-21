@@ -20,7 +20,6 @@ SchemaUpgradeWizard::SchemaUpgradeWizard(const QString &DBSchemaSetting,
     : DBver(), didBackup(false), emptyDB(false), versionsBehind(-1),
       m_autoUpgrade(false),
       m_backupResult(),
-      m_createdTempWindow(false),
       m_expertMode(false),
       m_schemaSetting(DBSchemaSetting),
       m_newSchemaVer(upgradeSchemaVal)
@@ -334,7 +333,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         MythMainWindow  * win = gContext->GetMainWindow();
 
         if (!win)
-            win = TempMainWindow(true);
+            return MYTH_SCHEMA_ERROR;
 
         pop = win->GetStack("popup stack");
 
@@ -408,9 +407,6 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
 
         dlg->deleteLater();
 
-        if (m_createdTempWindow)
-            EndTempWindow();
-
         return returnValue;
     }
 
@@ -453,36 +449,4 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     }
 
     return MYTH_SCHEMA_UPGRADE;
-}
-
-/**
- * Like MythContextPrivate::TempMainWindow(), but because we
- * do have a database, there is no clearing of the dbHostName.
- */
-MythMainWindow * SchemaUpgradeWizard::TempMainWindow(bool languagePrompt)
-{
-    MythMainWindow * win = MythMainWindow::getMainWindow(false);
-
-    gContext->SetSetting("Theme", "blue");
-#ifdef Q_WS_MACX
-    // Myth looks horrible in default Mac style for Qt
-    gContext->SetSetting("Style", "Windows");
-#endif
-    GetMythUI()->LoadQtConfig();
-
-    win->Init();
-    gContext->SetMainWindow(win);
-    m_createdTempWindow = true;
-
-    LanguageSettings::prompt();
-    LanguageSettings::load("mythfrontend");
-
-    return win;
-}
-
-void SchemaUpgradeWizard::EndTempWindow(void)
-{
-    gContext->SetMainWindow(NULL);
-    DestroyMythMainWindow();
-    m_createdTempWindow = false;
 }
