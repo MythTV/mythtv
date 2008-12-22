@@ -1,21 +1,10 @@
-
-#include <unistd.h>
-#include <cstdio>
-#include <fcntl.h>
-#include <cstdlib>
-#include <sys/types.h>
-
 #include <iostream>
 
 #include <QApplication>
 #include <QString>
 #include <QDir>
-#include <QFile>
-#include <QStringList>
-#include <QRegExp>
 #include <QMap>
 
-#include "mythconfig.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
@@ -23,7 +12,6 @@
 #include "langsettings.h"
 #include "exitcodes.h"
 #include "exitprompt.h"
-#include "util.h"
 #include "storagegroup.h"
 #include "myththemedmenu.h"
 #include "myththemebase.h"
