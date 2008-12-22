@@ -3929,7 +3929,7 @@ void VideoOutputXv::CopyFrame(VideoFrame *to, const VideoFrame *from)
             return;
 
         to->frameNumber = from->frameNumber;
-        vdpau->CopyFrame(to, from, video_dim);
+        vdpau->CopyFrame(to, from, windows[0].GetVideoDim());
     }
 #endif
     else if (xvmc_tex)
