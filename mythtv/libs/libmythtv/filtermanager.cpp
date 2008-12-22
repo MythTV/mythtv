@@ -225,6 +225,10 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     {
         QString FiltName = (*i).section('=', 0, 0);
         QString FiltOpts = (*i).section('=', 1);
+
+        if (FiltName.contains("opengl"))
+            continue;
+
         FI = GetFilterInfo(FiltName);
 
         if (FI)

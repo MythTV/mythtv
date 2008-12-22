@@ -63,4 +63,14 @@ typedef enum PictureAdjustType
 QString toTypeString(PictureAdjustType type);
 QString toTitleString(PictureAdjustType type);
 
+typedef enum
+{
+    kCommSkipOff    = 0,
+    kCommSkipOn     = 1,
+    kCommSkipNotify = 2,
+    kCommSkipCount,
+    kCommSkipIncr,
+} CommSkipMode;
+QString toString(CommSkipMode type);
+
 #endif

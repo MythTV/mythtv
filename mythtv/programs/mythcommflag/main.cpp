@@ -135,17 +135,20 @@ int BuildVideoMarkup(ProgramInfo *program_info, bool useDB)
         return COMMFLAG_EXIT_DB_ERROR;
     }
 
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer("seektable rebuilder",
-                                                   program_info);
-    nvp->SetRingBuffer(tmprbuf);
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer("seektable rebuilder");
+
+    PlayerContext *ctx = new PlayerContext();
+    ctx->SetPlayingInfo(program_info);
+    ctx->SetRingBuffer(tmprbuf);
+    ctx->SetNVP(nvp);
+    nvp->SetPlayerInfo(NULL, NULL, true, ctx);
 
     nvp->RebuildSeekTable(!quiet);
 
     if (!quiet)
         cerr << "Rebuilt" << endl;
 
-    delete nvp;
-    delete tmprbuf;
+    delete ctx;
 
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
@@ -684,8 +687,13 @@ int FlagCommercials(
         return COMMFLAG_EXIT_DB_ERROR;
     }
 
-    NuppelVideoPlayer* nvp = new NuppelVideoPlayer("flagger", program_info);
-    nvp->SetRingBuffer(tmprbuf);
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer("flagger");
+
+    PlayerContext *ctx = new PlayerContext();
+    ctx->SetPlayingInfo(program_info);
+    ctx->SetRingBuffer(tmprbuf);
+    ctx->SetNVP(nvp);
+    nvp->SetPlayerInfo(NULL, NULL, true, ctx);
 
     if (rebuildSeekTable)
     {
@@ -694,8 +702,7 @@ int FlagCommercials(
         if (!quiet)
             cerr << "Rebuilt\n";
 
-        delete nvp;
-        delete tmprbuf;
+        delete ctx;
         global_program_info = NULL;
 
         return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
@@ -710,7 +717,7 @@ int FlagCommercials(
         {
             recorderNum =  recorder->GetRecorderNumber();
             watchingRecording = true;
-            nvp->SetRecorder(recorder);
+            ctx->SetRecorder(recorder);
 
             VERBOSE(VB_COMMFLAG, QString("mythcommflag will flag recording "
                     "currently in progress on cardid %1").arg(recorderNum));
@@ -757,8 +764,7 @@ int FlagCommercials(
     if (!quiet)
         cerr << breaksFound << "\n";
 
-    delete nvp;
-    delete tmprbuf;
+    delete ctx;
     global_program_info = NULL;
 
     return breaksFound;

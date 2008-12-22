@@ -26,6 +26,12 @@ using namespace std;
 #include "jobqueue.h"
 #include "exitcodes.h"
 
+#include "NuppelVideoRecorder.h"
+#include "NuppelVideoPlayer.h"
+#include "programinfo.h"
+#include "mythdbcon.h"
+
+
 extern "C" {
 #include "libavcodec/avcodec.h"
 }
@@ -230,26 +236,31 @@ class AudioReencodeBuffer : public AudioOutput
     long long last_audiotime;
 };
 
-Transcode::Transcode(ProgramInfo *pginfo)
+Transcode::Transcode(ProgramInfo *pginfo) :
+    m_proginfo(pginfo),
+    keyframedist(30),
+    nvr(NULL),
+    nvp(NULL),
+    player_ctx(NULL),
+    inRingBuffer(NULL),
+    outRingBuffer(NULL),
+    fifow(NULL),
+    kfa_table(NULL),
+    showprogress(false),
+    recorderOptions("")   
 {
-    m_proginfo = pginfo;
-    nvr = NULL;
-    nvp = NULL;
-    inRingBuffer = NULL;
-    outRingBuffer = NULL;
-    fifow = NULL;
-    kfa_table = NULL;
-    showprogress = false;
-    recorderOptions = "";
 }
+
 Transcode::~Transcode()
 {
     if (nvr)
         delete nvr;
-    if (nvp)
-        delete nvp;
-    if (inRingBuffer)
-        delete inRingBuffer;
+    if (player_ctx)
+    {
+        nvp          = NULL;
+        inRingBuffer = NULL;
+        delete player_ctx;
+    }
     if (outRingBuffer)
         delete outRingBuffer;
     if (fifow)
@@ -383,17 +394,23 @@ int Transcode::TranscodeFile(
     if (jobID >= 0)
         JobQueue::ChangeJobComment(jobID, "0% " + QObject::tr("Completed"));
 
-    nvp = new NuppelVideoPlayer("transcoder", m_proginfo);
+    nvr = new NuppelVideoRecorder(NULL, NULL);
+
+    // Input setup
+    inRingBuffer = new RingBuffer(inputname, false, false);
+    nvp = new NuppelVideoPlayer("transcoder");
+
+    player_ctx = new PlayerContext();
+    player_ctx->SetPlayingInfo(m_proginfo);
+    player_ctx->SetRingBuffer(inRingBuffer);
+    player_ctx->SetNVP(nvp);
     nvp->SetNullVideo();
+    nvp->SetPlayerInfo(NULL, NULL, true, player_ctx);
 
     if (showprogress)
     {
         statustime = statustime.addSecs(5);
     }
-    // Input setup
-    nvr = new NuppelVideoRecorder(NULL, NULL);
-    inRingBuffer = new RingBuffer(inputname, false, false);
-    nvp->SetRingBuffer(inRingBuffer);
 
     AudioOutput *audioOutput = new AudioReencodeBuffer(0, 0);
     AudioReencodeBuffer *arb = ((AudioReencodeBuffer*)audioOutput);
@@ -699,8 +716,15 @@ int Transcode::TranscodeFile(
     nvp->InitForTranscode(copyaudio, copyvideo);
     if (nvp->IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, "Unable to initialize NuppelVideoPlayer for Transcode");
-        delete nvp;
+        VERBOSE(VB_IMPORTANT, "Unable to initialize NuppelVideoPlayer "
+                "for Transcode");
+        if (player_ctx)
+        {
+            nvp          = NULL;
+            inRingBuffer = NULL;
+            delete player_ctx;
+            player_ctx = NULL;
+        }
         return REENCODE_ERROR;
     }
 

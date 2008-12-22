@@ -1087,7 +1087,8 @@ void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
     deint1->clearSelections();
     for (it = deints.begin(); it != deints.end(); it++)
     {
-        if (!(*it).contains("bobdeint") && !(*it).contains("doublerate"))
+        if (!(*it).contains("bobdeint") && !(*it).contains("doublerate") &&
+            !(*it).contains("doubleprocess"))
             deint1->addSelection(VideoDisplayProfile::GetDeinterlacerName(*it),
                                  *it, (*it == ldeint1));
     }
@@ -2166,6 +2167,19 @@ static HostCheckBox *PlaybackPreview()
     gc->setHelpText(QObject::tr("When enabled, a preview of the recording "
                     "will play in a small window on the \"Watch a "
                     "Recording\" menu."));
+    return gc;
+}
+
+static HostCheckBox *HWAccelPlaybackPreview()
+{
+    HostCheckBox *gc = new HostCheckBox("HWAccelPlaybackPreview");
+    gc->setLabel(QObject::tr("Use HW Acceleration for live recording preview"));
+    gc->setValue(false);
+    gc->setHelpText(
+        QObject::tr(
+            "Use HW acceleration for the live recording preview. "
+            "Video renderer used is determined by the CPU profiles. "
+            "Disable if playback is sluggish or causes high CPU"));
     return gc;
 }
 
@@ -4679,9 +4693,9 @@ PlaybackSettings::PlaybackSettings()
     VerticalConfigurationGroup *ocol2 =
         new VerticalConfigurationGroup(false, false, true, true);
     ocol1->addChild(VertScanPercentage());
-    ocol1->addChild(HorizScanPercentage());
+    ocol1->addChild(YScanDisplacement());
+    ocol2->addChild(HorizScanPercentage());
     ocol2->addChild(XScanDisplacement());
-    ocol2->addChild(YScanDisplacement());
     oscan->addChild(ocol1);
     oscan->addChild(ocol2);
 
@@ -4710,6 +4724,7 @@ PlaybackSettings::PlaybackSettings()
     pbox->addChild(PreviewPixmapOffset());
     pbox->addChild(PreviewFromBookmark());
     pbox->addChild(PlaybackPreview());
+    pbox->addChild(HWAccelPlaybackPreview());
     pbox->addChild(PBBStartInTitle());
     pbox->addChild(PBBShowGroupSummary());
     addChild(pbox);
@@ -4990,10 +5005,10 @@ AppearanceSettings::AppearanceSettings()
         new VerticalConfigurationGroup(false, false, false, false);
 
     column1->addChild(GuiWidth());
-    column1->addChild(GuiHeight());
-    column1->addChild(GuiSizeForTV());
-    column2->addChild(GuiOffsetX());
+    column2->addChild(GuiHeight());
+    column1->addChild(GuiOffsetX());
     column2->addChild(GuiOffsetY());
+    column1->addChild(GuiSizeForTV());
     column2->addChild(HideMouseCursor());
 
     HorizontalConfigurationGroup *columns =

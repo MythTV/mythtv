@@ -120,6 +120,7 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
     db_vdisp_profile->SetVideoRenderer("direct3d");
 
+    const QSize video_dim = windows[0].GetVideoDim();
     if (video_dim.width() == m_InputCX && video_dim.height() == m_InputCY)
     {
         MoveResize();
@@ -467,6 +468,7 @@ bool VideoOutputD3D::Init(int width, int height, float aspect,
 
     m_hWnd = winid;
 
+    const QSize video_dim = windows[0].GetVideoDim();
     m_InputCX = video_dim.width();
     m_InputCY = video_dim.height();
 
@@ -541,7 +543,7 @@ void VideoOutputD3D::Show(FrameScanType )
         return;
     }
 
-    if (needrepaint)
+    if (windows[0].IsRepaintNeeded())
         DrawUnusedRects(false);
 
     if (m_pd3dDevice)
@@ -671,6 +673,8 @@ void VideoOutputD3D::Show(FrameScanType )
         }
 
         {
+            const QRect video_rect = windows[0].GetVideoRect();
+            const QRect display_video_rect = windows[0].GetDisplayVideoRect();
             RECT rc_src =
             {
                 video_rect.left(),  video_rect.top(),
@@ -685,7 +689,7 @@ void VideoOutputD3D::Show(FrameScanType )
 
             hr = m_pd3dDevice->Present(
                 &rc_src, &rc_dest,
-                (embedding) ? m_hEmbedWnd : NULL, NULL);
+                (windows[0].IsEmbedding()) ? m_hEmbedWnd : NULL, NULL);
         }
 
         if (FAILED(hr))
@@ -707,10 +711,10 @@ RenderError:
 
 void VideoOutputD3D::DrawUnusedRects(bool sync)
 {
-    if (embedding)
+    if (windows[0].IsEmbedding())
         return;
 
-    needrepaint = false;
+    windows[0].SetNeedRepaint(false);
     HDC hdc = GetDC(m_hWnd);
     if (hdc)
     {
@@ -725,16 +729,16 @@ void VideoOutputD3D::DrawUnusedRects(bool sync)
 
 void VideoOutputD3D::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
-    if (embedding)
+    if (windows[0].IsEmbedding())
         return;
 
-    VideoOutput::EmbedInWidget(wid, x, y, w, h);
+    VideoOutput::EmbedInWidget(x, y, w, h);
     m_hEmbedWnd = wid;
 }
 
 void VideoOutputD3D::StopEmbedding(void)
 {
-    if (!embedding)
+    if (!windows[0].IsEmbedding())
         return;
 
     VideoOutput::StopEmbedding();
@@ -765,7 +769,7 @@ void VideoOutputD3D::UpdatePauseFrame(void)
 
 void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
                                   FilterChain *filterList,
-                                  NuppelVideoPlayer *pipPlayer)
+                                  const PIPMap &pipPlayers)
 {
     QMutexLocker locker(&m_lock);
     if (IsErrored())
@@ -787,12 +791,13 @@ void VideoOutputD3D::ProcessFrame(VideoFrame *frame, OSD *osd,
     if (filterList)
         filterList->ProcessFrame(frame);
 
-    ShowPip(frame, pipPlayer);
+    ShowPIPs(frame, pipPlayers);
     DisplayOSD(frame, osd);
 }
 
 float VideoOutputD3D::GetDisplayAspect(void) const
 {
+    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
     float width  = display_visible_rect.width();
     float height = display_visible_rect.height();
 

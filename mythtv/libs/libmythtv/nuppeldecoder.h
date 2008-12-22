@@ -31,7 +31,7 @@ class RawDataList
 class NuppelDecoder : public DecoderBase
 {
   public:
-    NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo);
+    NuppelDecoder(NuppelVideoPlayer *parent, const ProgramInfo &pginfo);
    ~NuppelDecoder();
 
     static bool CanHandle(char testbuf[kDecoderProbeBufferSize], 

@@ -22,8 +22,9 @@ extern "C" {
 class NuppelVideoPlayer;
 class ChromaKeyOSD;
 
-class OpenGLContext;
 class OpenGLVideo;
+class GLContextCreator;
+class OpenGLContextGLX;
 
 class XvMCBufferSettings;
 class XvMCSurfaceTypes;
@@ -56,6 +57,7 @@ class VideoOutputXv : public VideoOutput
 {
     friend class ChromaKeyOSD;
     friend class OpenGLVideoSync;
+    friend class GLContextCreator;
     friend class XvMCOSD;
   public:
     VideoOutputXv(MythCodecID av_codec_id);
@@ -70,7 +72,8 @@ class VideoOutputXv : public VideoOutput
 
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
-                      NuppelVideoPlayer *pipPlayer);
+                      const PIPMap &pipPlayers);
+
     void PrepareFrame(VideoFrame*, FrameScanType);
     void DrawSlice(VideoFrame*, int x, int y, int w, int h);
     void Show(FrameScanType);
@@ -86,7 +89,7 @@ class VideoOutputXv : public VideoOutput
                       void        *codec_private);
     void Zoom(ZoomDirection direction);
     void VideoAspectRatioChanged(float aspect);
-    void EmbedInWidget(WId wid, int x, int y, int w, int h);
+    void EmbedInWidget(int x, int y, int w, int h);
     void StopEmbedding(void);
     void ResizeForGui(void); 
     void ResizeForVideo(void);
@@ -104,11 +107,27 @@ class VideoOutputXv : public VideoOutput
         { return XVideoIDCT <= VideoOutputSubType(); }
     virtual bool hasVLDAcceleration(void) const
         { return XVideoVLD == VideoOutputSubType(); }
+    virtual bool hasXVAcceleration(void) const
+        { return XVideo == VideoOutputSubType(); }
+    virtual bool hasOpenGLAcceleration(void) const
+        { return OpenGL == VideoOutputSubType(); }
+    virtual bool hasHWAcceleration(void) const
+        { return OpenGL <= VideoOutputSubType(); }
 
     void CheckFrameStates(void);
-    QRect GetPIPRect(int location, NuppelVideoPlayer *pipplayer = NULL);
+
+    virtual QRect GetPIPRect(PIPLocation        location,
+                             NuppelVideoPlayer *pipplayer = NULL,
+                             bool               do_pixel_adj = true) const;
 
     virtual void ShutdownVideoResize(void);
+
+    // OpenGL
+    OpenGLContextGLX *GetGLContext(void) { return gl_context; }
+    OpenGLContextGLX *CreateGLContext(const QRect &display_rect,
+                                   bool m_map_window);
+    void GLContextCreatedNotify(void);
+    void GLContextCreatedWait(void);
 
     static MythCodecID GetBestSupportedCodec(uint width, uint height,
                                              uint osd_width, uint osd_height,
@@ -137,6 +156,7 @@ class VideoOutputXv : public VideoOutput
   private:
     virtual QRect GetVisibleOSDBounds(float&, float&, float) const;
     virtual QRect GetTotalOSDBounds(void) const;
+    QRect GetTotalVisibleRect(void) const;
 
     VideoFrame *GetNextFreeFrame(bool allow_unsafe);
     void DiscardFrame(VideoFrame*);
@@ -144,14 +164,14 @@ class VideoOutputXv : public VideoOutput
     void DoneDisplayingFrame(void);
 
     void ProcessFrameVDPAU(VideoFrame *frame, OSD *osd,
-                           NuppelVideoPlayer *pipPlayer);
+                           const PIPMap &pipPlayers);
     void ProcessFrameXvMC(VideoFrame *frame, OSD *osd);
     void ProcessFrameOpenGL(VideoFrame *frame, OSD *osd,
                             FilterChain *filterList,
-                            NuppelVideoPlayer *pipPlayer);
+                            const PIPMap &pipPlayers);
     void ProcessFrameMem(VideoFrame *frame, OSD *osd,
                          FilterChain *filterList,
-                         NuppelVideoPlayer *pipPlayer);
+                         const PIPMap &pipPlayers);
 
     void PrepareFrameVDPAU(VideoFrame *, FrameScanType);
     void PrepareFrameXvMC(VideoFrame *, FrameScanType);
@@ -163,7 +183,10 @@ class VideoOutputXv : public VideoOutput
     void ShowXvMC(FrameScanType scan);
     void ShowXVideo(FrameScanType scan);
 
-    void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
+    virtual void ShowPIP(VideoFrame        *frame,
+                         NuppelVideoPlayer *pipplayer,
+                         PIPLocation        loc);
+
     virtual int DisplayOSD(VideoFrame *frame, OSD *osd,
                            int stride = -1, int revision = -1);
 
@@ -284,12 +307,16 @@ class VideoOutputXv : public VideoOutput
 
     // OpenGL drawing info
     QMutex               gl_context_lock;
-    OpenGLContext       *gl_context;
+    QMutex               gl_context_creator_lock;
+    GLContextCreator    *gl_context_creator;
+    QWaitCondition       gl_context_wait;
+    OpenGLContextGLX    *gl_context;
     OpenGLVideo         *gl_videochain;
-    OpenGLVideo         *gl_pipchain;
+    QMap<NuppelVideoPlayer*,OpenGLVideo*> gl_pipchains;
+    QMap<NuppelVideoPlayer*,bool>         gl_pip_ready;
+    OpenGLVideo         *gl_pipchain_active;
     OpenGLVideo         *gl_osdchain;
     bool                 gl_use_osd_opengl2;
-    bool                 gl_pip_ready;
     bool                 gl_osd_ready;
 
     // Chromakey OSD info

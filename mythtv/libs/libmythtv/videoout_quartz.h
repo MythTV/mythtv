@@ -14,10 +14,14 @@ class VideoOutputQuartz : public VideoOutput
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
-    void SetVideoFrameRate(float playback_fps);
+
+    void ProcessFrame(VideoFrame *frame, OSD *osd,
+                      FilterChain *filterList,
+                      const PIPMap &pipPlayers);
     void PrepareFrame(VideoFrame *buffer, FrameScanType t);
     void Show(FrameScanType);
 
+    void SetVideoFrameRate(float playback_fps);
     bool InputChanged(const QSize &input_size,
                       float        aspect,
                       MythCodecID  av_codec_id,
@@ -34,9 +38,6 @@ class VideoOutputQuartz : public VideoOutput
     void DrawUnusedRects(bool sync = true);
 
     void UpdatePauseFrame(void);
-    void ProcessFrame(VideoFrame *frame, OSD *osd,
-                      FilterChain *filterList,
-                      NuppelVideoPlayer *pipPlayer);
 
     void SetDVDVDecoder(DVDV *dvdvdec);
 

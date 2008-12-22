@@ -408,17 +408,21 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
                 .arg(winw).arg(winh).arg(conf.width).arg(conf.height));
     }
 
-    display_visible_rect = QRect(winx, winy, conf.width, conf.height);
+    windows[0].SetDisplayVisibleRect(
+        QRect(winx, winy, conf.width, conf.height));
 
     // We can't query the physical dimentions of the screen so use DB..
-    display_dim = db_display_dim;
+    QSize display_dim = db_display_dim;
 
     if (!display_dim.height() || !display_dim.width())
         display_dim = QSize(400, 300);
 
-    display_aspect =
-        ((float)(display_dim.width())) / ((float)(display_dim.height()));
+    windows[0].SetDisplayAspect(
+        ((float)(display_dim.width())) / ((float)(display_dim.height())));
 
+    windows[0].SetDisplayDim(display_dim);
+
+    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
     VERBOSE(VB_PLAYBACK, LOC + 
             QString("output : screen pixel size %1x%2")
             .arg(display_visible_rect.width())
@@ -475,7 +479,8 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
         return false;
     }
 
-    video_dim = fix_alignment(QSize(width, height));
+    const QSize video_dim = fix_alignment(QSize(width, height));
+    windows[0].SetVideoDim(video_dim);
 
     // Find an output layer that supports a format we can deal with.
     // begin with the video format we have as input, fall back to others
@@ -874,7 +879,7 @@ void VideoOutputDirectfb::UpdatePauseFrame(void)
 
 void VideoOutputDirectfb::ProcessFrame(VideoFrame *frame, OSD *osd,
                                        FilterChain *filterList,
-                                       NuppelVideoPlayer *pipPlayer)
+                                       const PIPMap &pipPlayers)
 {
     bool copy_from_pause = false;
     if (!frame)
@@ -913,7 +918,7 @@ void VideoOutputDirectfb::ProcessFrame(VideoFrame *frame, OSD *osd,
     if (filterList)
         filterList->ProcessFrame(&mem_frame);
 
-    ShowPip(&mem_frame, pipPlayer);
+    ShowPIPs(&mem_frame, pipPlayers);
     DisplayOSD(&mem_frame, osd);
 
     fberr = bufferSurface->Unlock(bufferSurface);
@@ -936,6 +941,7 @@ bool VideoOutputDirectfb::InputChanged(const QSize &input_size,
 
     desc.flags = (DFBSurfaceDescriptionFlags)
         (DSDESC_HEIGHT | DSDESC_WIDTH | DSDESC_PIXELFORMAT);
+    const QSize video_dim = windows[0].GetVideoDim();
     desc.width  = video_dim.width();
     desc.height = video_dim.height();
     desc.pixelformat = data->videoLayerConfig.pixelformat;
@@ -973,6 +979,8 @@ void VideoOutputDirectfb::MoveResize(void)
 {
     VideoOutput::MoveResize();
 
+    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
+    const QRect display_video_rect   = windows[0].GetDisplayVideoRect();
     VERBOSE(VB_PLAYBACK, LOC +
             QString("MoveResize : screen size %1x%2, "
                     "proposed x : %3, y : %4, w : %5, h : %6")

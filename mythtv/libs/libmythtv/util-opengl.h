@@ -6,23 +6,29 @@
 #ifdef USING_OPENGL
 
 // MythTV headers
+#include "mythconfig.h"
 #include "mythcontext.h"
-#include "util-x11.h"
 #include "frame.h"
 
 // GLX headers
 #define GLX_GLXEXT_PROTOTYPES
+#ifdef USING_X11
+#include "util-x11.h"
 #include <GL/glx.h>
+#endif // USING_X11
+
+#ifdef Q_WS_MACX
+#import <OpenGL/glu.h>
+#import <mach-o/dyld.h>
+#else
 #include <GL/glu.h>
+#endif
 
 // Qt headers
 #include <qstring.h>
 
-#ifndef APIENTRY
-#define APIENTRY
-#endif
-#ifndef APIENTRYP
-#define APIENTRYP APIENTRY *
+#ifndef GL_TEXTTURE0
+#define GL_TEXTURE0 0x84C0
 #endif
 
 #ifndef GL_TEXTURE_RECTANGLE_ARB
@@ -45,8 +51,6 @@
 #define GL_FRAGMENT_PROGRAM_ARB           0x8804
 #endif
 
-// Not all platforms with OpenGL that MythTV supports have the
-// GL_EXT_framebuffer_object extension so we need to define these..
 #ifndef GL_FRAMEBUFFER_EXT
 #define GL_FRAMEBUFFER_EXT                0x8D40
 #endif
@@ -78,30 +82,44 @@
 #define GL_FRAMEBUFFER_UNSUPPORTED_EXT    0x8CDD
 #endif
 
+#ifndef GL_PIXEL_UNPACK_BUFFER_ARB
+#define GL_PIXEL_UNPACK_BUFFER_ARB        0x88EC
+#endif
+
+#ifndef GL_STREAM_DRAW
+#define GL_STREAM_DRAW                    0x88E0
+#endif
+
+#ifndef GL_WRITE_ONLY
+#define GL_WRITE_ONLY                     0x88B9
+#endif
+
+#ifndef GL_PROGRAM_FORMAT_ASCII_ARB
+#define GL_PROGRAM_FORMAT_ASCII_ARB       0x8875
+#endif
+
+#ifndef GL_PROGRAM_ERROR_POSITION_ARB
+#define GL_PROGRAM_ERROR_POSITION_ARB     0x864B
+#endif
+
+#ifndef GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB
+#define GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB 0x88B6
+#endif
+
 #ifndef GL_NV_fence
 #define GL_ALL_COMPLETED_NV               0x84F2
 #endif
 
+#ifndef APIENTRY
+#define APIENTRY
+#endif
+
+#ifdef USING_X11
 #ifndef GLX_VERSION_1_3
 typedef XID GLXPbuffer;
 #endif // GLX_VERSION_1_3
 
-static inline int __glCheck__(const QString &loc, const char* fileName, int n)
-{
-    int error = glGetError();
-    if (error)
-    { 
-        VERBOSE(VB_IMPORTANT, loc << gluErrorString(error) << " @ "
-                << fileName << ", #" << n);
-    }
-    return error;
-}
-
-#define glCheck() __glCheck__(LOC, __FILE__, __LINE__)
-
 bool get_glx_version(Display *XJ_disp, uint &major, uint &minor);
-
-bool init_opengl(void);
 
 typedef enum { kRenderRGBA, kSimpleRGBA } FrameBufferType;
 int const *get_attr_cfg(FrameBufferType type);
@@ -126,12 +144,22 @@ GLXWindow get_glx_window(Display     *XJ_disp,
                          GLXContext   glx_context,
                          GLXPbuffer   glx_pbuffer,
                          const QSize &window_size);
+#endif // USING_X11
 
-void copy_pixels_to_texture(const unsigned char *buf,
-                            int          buffer_format,
-                            const QSize &buffer_size,
-                            int          texture,
-                            int          texture_type);
+static inline int __glCheck__(const QString &loc, const char* fileName, int n)
+{
+    int error = glGetError();
+    if (error)
+    { 
+        VERBOSE(VB_IMPORTANT, loc << gluErrorString(error) << " @ "
+                << fileName << ", #" << n);
+    }
+    return error;
+}
+
+#define glCheck() __glCheck__(LOC, __FILE__, __LINE__)
+
+bool init_opengl(void);
 
 void pack_yv12alpha(const unsigned char *source,
                  const unsigned char *dest,
@@ -146,7 +174,9 @@ void pack_yv12interlaced(const unsigned char *source,
                  const int *pitches,
                  const QSize size);
 
-__GLXextFuncPtr get_gl_proc_address(const QString &procName);
+void store_bicubic_weights(float x, float *dst);
+
+void *get_gl_proc_address(const QString &procName);
 
 int get_gl_texture_rect_type(const QString &extensions);
 bool has_gl_fbuffer_object_support(const QString &extensions);
@@ -154,36 +184,70 @@ bool has_gl_fragment_program_support(const QString &extensions);
 bool has_glx_video_sync_support(const QString &glx_extensions);
 bool has_gl_pixelbuffer_object_support(const QString &extensions);
 bool has_gl_nvfence_support(const QString &extensions);
+bool has_gl_applefence_support(const QString & extensions);
+bool has_glx_swapinterval_support(const QString &glx_extensions);
+bool has_wgl_swapinterval_support(const QString &extensions);
 
 extern QString                             gMythGLExtensions;
 extern uint                                gMythGLExtSupported;
 
-extern PFNGLGENPROGRAMSARBPROC             gMythGLGenProgramsARB;
-extern PFNGLBINDPROGRAMARBPROC             gMythGLBindProgramARB;
-extern PFNGLPROGRAMSTRINGARBPROC           gMythGLProgramStringARB;
-extern PFNGLPROGRAMENVPARAMETER4FARBPROC   gMythGLProgramEnvParameter4fARB;
-extern PFNGLDELETEPROGRAMSARBPROC          gMythGLDeleteProgramsARB;
-extern PFNGLGETPROGRAMIVARBPROC            gMythGLGetProgramivARB;
+// Multi-texturing
+typedef void (APIENTRY * MYTH_GLACTIVETEXTUREPROC)
+    (GLenum texture);
+extern MYTH_GLACTIVETEXTUREPROC            gMythGLActiveTexture;
 
-extern PFNGLMAPBUFFERPROC                  gMythGLMapBufferARB;
-extern PFNGLBINDBUFFERARBPROC              gMythGLBindBufferARB;
-extern PFNGLGENBUFFERSARBPROC              gMythGLGenBuffersARB;
-extern PFNGLBUFFERDATAARBPROC              gMythGLBufferDataARB;
-extern PFNGLUNMAPBUFFERARBPROC             gMythGLUnmapBufferARB;
-extern PFNGLDELETEBUFFERSARBPROC           gMythGLDeleteBuffersARB;
+// Fragment programs
+typedef void (APIENTRY * MYTH_GLPROGRAMSTRINGARBPROC)
+    (GLenum target, GLenum format, GLsizei len, const GLvoid *string);
+typedef void (APIENTRY * MYTH_GLBINDPROGRAMARBPROC)
+    (GLenum target, GLuint program);
+typedef void (APIENTRY * MYTH_GLDELETEPROGRAMSARBPROC)
+    (GLsizei n, const GLuint *programs);
+typedef void (APIENTRY * MYTH_GLGENPROGRAMSARBPROC)
+    (GLsizei n, GLuint *programs);
+typedef void (APIENTRY * MYTH_GLPROGRAMENVPARAMETER4FARBPROC)
+    (GLenum target, GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+typedef void (APIENTRY * MYTH_GLGETPROGRAMIVARBPROC)
+    (GLenum target, GLenum pname, GLint *params);
+extern MYTH_GLGENPROGRAMSARBPROC             gMythGLGenProgramsARB;
+extern MYTH_GLBINDPROGRAMARBPROC             gMythGLBindProgramARB;
+extern MYTH_GLPROGRAMSTRINGARBPROC           gMythGLProgramStringARB;
+extern MYTH_GLPROGRAMENVPARAMETER4FARBPROC   gMythGLProgramEnvParameter4fARB;
+extern MYTH_GLDELETEPROGRAMSARBPROC          gMythGLDeleteProgramsARB;
+extern MYTH_GLGETPROGRAMIVARBPROC            gMythGLGetProgramivARB;
 
-// Not all platforms with OpenGL that MythTV supports have the
-// GL_EXT_framebuffer_object extension so we need to define these..
-typedef void (APIENTRYP MYTH_GLGENFRAMEBUFFERSEXTPROC)
-    (GLsizei n, GLuint *framebuffers);
-typedef void (APIENTRYP MYTH_GLBINDFRAMEBUFFEREXTPROC)
-    (GLenum target, GLuint framebuffer);
-typedef void (APIENTRYP MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC)
-    (GLenum target, GLenum attachment, GLenum textarget,
-     GLuint texture, GLint level);
-typedef GLenum (APIENTRYP MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC)
+// PixelBuffer Objects
+typedef ptrdiff_t MYTH_GLsizeiptr;
+typedef GLvoid* (APIENTRY * MYTH_GLMAPBUFFERARBPROC)
+    (GLenum target, GLenum access);
+typedef void (APIENTRY * MYTH_GLBINDBUFFERARBPROC)
+    (GLenum target, GLuint buffer);
+typedef void (APIENTRY * MYTH_GLGENBUFFERSARBPROC)
+    (GLsizei n, GLuint *buffers);
+typedef void (APIENTRY * MYTH_GLBUFFERDATAARBPROC)
+    (GLenum target, MYTH_GLsizeiptr size, const GLvoid *data, GLenum usage);
+typedef GLboolean (APIENTRY * MYTH_GLUNMAPBUFFERARBPROC)
     (GLenum target);
-typedef void (APIENTRYP MYTH_GLDELETEFRAMEBUFFERSEXTPROC)
+typedef void (APIENTRY * MYTH_GLDELETEBUFFERSARBPROC)
+    (GLsizei n, const GLuint *buffers);
+extern MYTH_GLMAPBUFFERARBPROC               gMythGLMapBufferARB;
+extern MYTH_GLBINDBUFFERARBPROC              gMythGLBindBufferARB;
+extern MYTH_GLGENBUFFERSARBPROC              gMythGLGenBuffersARB;
+extern MYTH_GLBUFFERDATAARBPROC              gMythGLBufferDataARB;
+extern MYTH_GLUNMAPBUFFERARBPROC             gMythGLUnmapBufferARB;
+extern MYTH_GLDELETEBUFFERSARBPROC           gMythGLDeleteBuffersARB;
+
+// FrameBuffer Objects
+typedef void (APIENTRY * MYTH_GLGENFRAMEBUFFERSEXTPROC)
+    (GLsizei n, GLuint *framebuffers);
+typedef void (APIENTRY * MYTH_GLBINDFRAMEBUFFEREXTPROC)
+    (GLenum target, GLuint framebuffer);
+typedef void (APIENTRY * MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC)
+    (GLenum target, GLenum attachment,
+     GLenum textarget, GLuint texture, GLint level);
+typedef GLenum (APIENTRY * MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC)
+    (GLenum target);
+typedef void (APIENTRY * MYTH_GLDELETEFRAMEBUFFERSEXTPROC)
     (GLsizei n, const GLuint *framebuffers);
 
 extern MYTH_GLGENFRAMEBUFFERSEXTPROC         gMythGLGenFramebuffersEXT;
@@ -192,13 +256,57 @@ extern MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC    gMythGLFramebufferTexture2DEXT;
 extern MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC  gMythGLCheckFramebufferStatusEXT;
 extern MYTH_GLDELETEFRAMEBUFFERSEXTPROC      gMythGLDeleteFramebuffersEXT;
 
-extern PFNGLXGETVIDEOSYNCSGIPROC           gMythGLXGetVideoSyncSGI;
-extern PFNGLXWAITVIDEOSYNCSGIPROC          gMythGLXWaitVideoSyncSGI;
+// GLX Video sync
+typedef int ( * MYTH_GLXGETVIDEOSYNCSGIPROC)
+    (unsigned int *count);
+typedef int ( * MYTH_GLXWAITVIDEOSYNCSGIPROC)
+    (int divisor, int remainder, unsigned int *count);
+extern MYTH_GLXGETVIDEOSYNCSGIPROC           gMythGLXGetVideoSyncSGI;
+extern MYTH_GLXWAITVIDEOSYNCSGIPROC          gMythGLXWaitVideoSyncSGI;
 
-extern PFNGLGENFENCESNVPROC                gMythGLGenFencesNV;
-extern PFNGLDELETEFENCESNVPROC             gMythGLDeleteFencesNV;
-extern PFNGLSETFENCENVPROC                 gMythGLSetFenceNV;
-extern PFNGLFINISHFENCENVPROC              gMythGLFinishFenceNV;
+// NV_fence
+typedef void (APIENTRY * MYTH_GLDELETEFENCESNVPROC)
+    (GLsizei n, const GLuint *fences);
+typedef void (APIENTRY * MYTH_GLGENFENCESNVPROC)
+    (GLsizei n, GLuint *fences);
+typedef void (APIENTRY * MYTH_GLFINISHFENCENVPROC)
+    (GLuint fence);
+typedef void (APIENTRY * MYTH_GLSETFENCENVPROC)
+    (GLuint fence, GLenum condition);
+extern MYTH_GLGENFENCESNVPROC                gMythGLGenFencesNV;
+extern MYTH_GLDELETEFENCESNVPROC             gMythGLDeleteFencesNV;
+extern MYTH_GLSETFENCENVPROC                 gMythGLSetFenceNV;
+extern MYTH_GLFINISHFENCENVPROC              gMythGLFinishFenceNV;
+
+// APPLE_fence
+typedef void ( * MYTH_GLGENFENCESAPPLEPROC)
+    (GLsizei n, GLuint *fences);
+typedef void ( * MYTH_GLDELETEFENCESAPPLEPROC)
+    (GLsizei n, const GLuint *fences);
+typedef void ( * MYTH_GLSETFENCEAPPLEPROC)
+    (GLuint fence);
+typedef void ( * MYTH_GLFINISHFENCEAPPLEPROC)
+    (GLuint fence);
+extern MYTH_GLGENFENCESAPPLEPROC    gMythGLGenFencesAPPLE;
+extern MYTH_GLDELETEFENCESAPPLEPROC gMythGLDeleteFencesAPPLE;
+extern MYTH_GLSETFENCEAPPLEPROC     gMythGLSetFenceAPPLE;
+extern MYTH_GLFINISHFENCEAPPLEPROC  gMythGLFinishFenceAPPLE;
+
+// win32 SwapBuffers
+#ifdef USING_MINGW
+typedef void (APIENTRY * MYTH_WGLSWAPBUFFERSPROC) (HDC hDC); 
+extern MYTH_WGLSWAPBUFFERSPROC gMythWGLSwapBuffers;
+#endif // USING_MINGW
+
+//GLX Swap Control
+typedef int ( * MYTH_GLXSWAPINTERVALSGIPROC)
+    (int interval);
+extern MYTH_GLXSWAPINTERVALSGIPROC gMythGLXSwapIntervalSGI;
+
+//WGL Swap Control
+typedef bool (APIENTRY * MYTH_WGLSWAPINTERVALEXTPROC)
+    (int interval);
+extern MYTH_WGLSWAPINTERVALEXTPROC gMythWGLSwapIntervalEXT;
 #endif // USING_OPENGL
 
 #endif // _UTIL_OPENGL_H_

@@ -9,19 +9,28 @@ extern "C" {
 }
 #endif
 
-PFNGLMAPBUFFERPROC                  gMythGLMapBufferARB      = NULL;
-PFNGLBINDBUFFERARBPROC              gMythGLBindBufferARB     = NULL;
-PFNGLGENBUFFERSARBPROC              gMythGLGenBuffersARB     = NULL;
-PFNGLBUFFERDATAARBPROC              gMythGLBufferDataARB     = NULL;
-PFNGLUNMAPBUFFERARBPROC             gMythGLUnmapBufferARB    = NULL;
-PFNGLDELETEBUFFERSARBPROC           gMythGLDeleteBuffersARB  = NULL;
+MYTH_GLACTIVETEXTUREPROC              gMythGLActiveTexture     = NULL;
 
-PFNGLGENPROGRAMSARBPROC             gMythGLGenProgramsARB            = NULL;
-PFNGLBINDPROGRAMARBPROC             gMythGLBindProgramARB            = NULL;
-PFNGLPROGRAMSTRINGARBPROC           gMythGLProgramStringARB          = NULL;
-PFNGLPROGRAMENVPARAMETER4FARBPROC   gMythGLProgramEnvParameter4fARB  = NULL;
-PFNGLDELETEPROGRAMSARBPROC          gMythGLDeleteProgramsARB         = NULL;
-PFNGLGETPROGRAMIVARBPROC            gMythGLGetProgramivARB           = NULL;
+#ifdef USING_MINGW
+MYTH_WGLSWAPBUFFERSPROC               gMythWGLSwapBuffers    = NULL;
+#endif // USING_MINGW
+
+MYTH_GLXSWAPINTERVALSGIPROC           gMythGLXSwapIntervalSGI  = NULL;
+MYTH_WGLSWAPINTERVALEXTPROC           gMythWGLSwapIntervalEXT  = NULL;
+
+MYTH_GLMAPBUFFERARBPROC               gMythGLMapBufferARB      = NULL;
+MYTH_GLBINDBUFFERARBPROC              gMythGLBindBufferARB     = NULL;
+MYTH_GLGENBUFFERSARBPROC              gMythGLGenBuffersARB     = NULL;
+MYTH_GLBUFFERDATAARBPROC              gMythGLBufferDataARB     = NULL;
+MYTH_GLUNMAPBUFFERARBPROC             gMythGLUnmapBufferARB    = NULL;
+MYTH_GLDELETEBUFFERSARBPROC           gMythGLDeleteBuffersARB  = NULL;
+
+MYTH_GLGENPROGRAMSARBPROC             gMythGLGenProgramsARB            = NULL;
+MYTH_GLBINDPROGRAMARBPROC             gMythGLBindProgramARB            = NULL;
+MYTH_GLPROGRAMSTRINGARBPROC           gMythGLProgramStringARB          = NULL;
+MYTH_GLPROGRAMENVPARAMETER4FARBPROC   gMythGLProgramEnvParameter4fARB  = NULL;
+MYTH_GLDELETEPROGRAMSARBPROC          gMythGLDeleteProgramsARB         = NULL;
+MYTH_GLGETPROGRAMIVARBPROC            gMythGLGetProgramivARB           = NULL;
 
 MYTH_GLGENFRAMEBUFFERSEXTPROC         gMythGLGenFramebuffersEXT        = NULL;
 MYTH_GLBINDFRAMEBUFFEREXTPROC         gMythGLBindFramebufferEXT        = NULL;
@@ -29,49 +38,80 @@ MYTH_GLFRAMEBUFFERTEXTURE2DEXTPROC    gMythGLFramebufferTexture2DEXT   = NULL;
 MYTH_GLCHECKFRAMEBUFFERSTATUSEXTPROC  gMythGLCheckFramebufferStatusEXT = NULL;
 MYTH_GLDELETEFRAMEBUFFERSEXTPROC      gMythGLDeleteFramebuffersEXT     = NULL;
 
-PFNGLXGETVIDEOSYNCSGIPROC           gMythGLXGetVideoSyncSGI          = NULL;
-PFNGLXWAITVIDEOSYNCSGIPROC          gMythGLXWaitVideoSyncSGI         = NULL;
+MYTH_GLXGETVIDEOSYNCSGIPROC           gMythGLXGetVideoSyncSGI          = NULL;
+MYTH_GLXWAITVIDEOSYNCSGIPROC          gMythGLXWaitVideoSyncSGI         = NULL;
 
-PFNGLGENFENCESNVPROC                gMythGLGenFencesNV      = NULL;
-PFNGLDELETEFENCESNVPROC             gMythGLDeleteFencesNV   = NULL;
-PFNGLSETFENCENVPROC                 gMythGLSetFenceNV       = NULL;
-PFNGLFINISHFENCENVPROC              gMythGLFinishFenceNV    = NULL;
+MYTH_GLGENFENCESNVPROC                gMythGLGenFencesNV      = NULL;
+MYTH_GLDELETEFENCESNVPROC             gMythGLDeleteFencesNV   = NULL;
+MYTH_GLSETFENCENVPROC                 gMythGLSetFenceNV       = NULL;
+MYTH_GLFINISHFENCENVPROC              gMythGLFinishFenceNV    = NULL;
+
+MYTH_GLGENFENCESAPPLEPROC             gMythGLGenFencesAPPLE    = NULL;
+MYTH_GLDELETEFENCESAPPLEPROC          gMythGLDeleteFencesAPPLE = NULL;
+MYTH_GLSETFENCEAPPLEPROC              gMythGLSetFenceAPPLE     = NULL;
+MYTH_GLFINISHFENCEAPPLEPROC           gMythGLFinishFenceAPPLE  = NULL;
 
 bool init_opengl(void)
 {
     static bool is_initialized = false;
+    static bool is_valid       = true;
     static QMutex init_lock;
 
     QMutexLocker locker(&init_lock);
     if (is_initialized)
-        return true;
+        return is_valid;
 
     is_initialized = true;
 
-    gMythGLMapBufferARB = (PFNGLMAPBUFFERPROC)
+    gMythGLActiveTexture = (MYTH_GLACTIVETEXTUREPROC)
+        get_gl_proc_address("glActiveTexture");
+
+    if (!gMythGLActiveTexture)
+    {
+        VERBOSE(VB_IMPORTANT, "Multi-texturing not available.");
+        is_valid = false;
+    }
+
+#ifdef USING_MINGW
+    gMythWGLSwapBuffers = (MYTH_WGLSWAPBUFFERSPROC)
+        get_gl_proc_address("wglSwapBuffers");
+
+    if (!gMythWGLSwapBuffers)
+    {
+        VERBOSE(VB_IMPORTANT, "Failed to link to wglSwapBuffers.");
+        is_valid = false;
+    }
+#endif // USING_MINGW
+
+    gMythGLXSwapIntervalSGI  = (MYTH_GLXSWAPINTERVALSGIPROC)
+        get_gl_proc_address("glXSwapIntervalSGI");
+    gMythWGLSwapIntervalEXT  = (MYTH_WGLSWAPINTERVALEXTPROC)
+        get_gl_proc_address("wglSwapIntervalEXT");
+
+    gMythGLMapBufferARB = (MYTH_GLMAPBUFFERARBPROC)
         get_gl_proc_address("glMapBufferARB");
-    gMythGLBindBufferARB = (PFNGLBINDBUFFERARBPROC)
+    gMythGLBindBufferARB = (MYTH_GLBINDBUFFERARBPROC)
         get_gl_proc_address("glBindBufferARB");
-    gMythGLGenBuffersARB = (PFNGLGENBUFFERSARBPROC)
+    gMythGLGenBuffersARB = (MYTH_GLGENBUFFERSARBPROC)
         get_gl_proc_address("glGenBuffersARB");
-    gMythGLBufferDataARB = (PFNGLBUFFERDATAARBPROC)
+    gMythGLBufferDataARB = (MYTH_GLBUFFERDATAARBPROC)
         get_gl_proc_address("glBufferDataARB");
-    gMythGLUnmapBufferARB = (PFNGLUNMAPBUFFERARBPROC)
+    gMythGLUnmapBufferARB = (MYTH_GLUNMAPBUFFERARBPROC)
         get_gl_proc_address("glUnmapBufferARB");
-    gMythGLDeleteBuffersARB = (PFNGLDELETEBUFFERSARBPROC)
+    gMythGLDeleteBuffersARB = (MYTH_GLDELETEBUFFERSARBPROC)
         get_gl_proc_address("glDeleteBuffersARB");
 
-    gMythGLGenProgramsARB = (PFNGLGENPROGRAMSARBPROC)
+    gMythGLGenProgramsARB = (MYTH_GLGENPROGRAMSARBPROC)
         get_gl_proc_address("glGenProgramsARB");
-    gMythGLBindProgramARB = (PFNGLBINDPROGRAMARBPROC)
+    gMythGLBindProgramARB = (MYTH_GLBINDPROGRAMARBPROC)
         get_gl_proc_address("glBindProgramARB");
-    gMythGLProgramStringARB = (PFNGLPROGRAMSTRINGARBPROC)
+    gMythGLProgramStringARB = (MYTH_GLPROGRAMSTRINGARBPROC)
         get_gl_proc_address("glProgramStringARB");
-    gMythGLProgramEnvParameter4fARB = (PFNGLPROGRAMENVPARAMETER4FARBPROC)
+    gMythGLProgramEnvParameter4fARB = (MYTH_GLPROGRAMENVPARAMETER4FARBPROC)
         get_gl_proc_address("glProgramEnvParameter4fARB");
-    gMythGLDeleteProgramsARB = (PFNGLDELETEPROGRAMSARBPROC)
+    gMythGLDeleteProgramsARB = (MYTH_GLDELETEPROGRAMSARBPROC)
         get_gl_proc_address("glDeleteProgramsARB");
-    gMythGLGetProgramivARB = (PFNGLGETPROGRAMIVARBPROC)
+    gMythGLGetProgramivARB = (MYTH_GLGETPROGRAMIVARBPROC)
         get_gl_proc_address("glGetProgramivARB");
 
     gMythGLGenFramebuffersEXT = (MYTH_GLGENFRAMEBUFFERSEXTPROC)
@@ -86,23 +126,33 @@ bool init_opengl(void)
     gMythGLDeleteFramebuffersEXT = (MYTH_GLDELETEFRAMEBUFFERSEXTPROC)
         get_gl_proc_address("glDeleteFramebuffersEXT");
 
-    gMythGLXGetVideoSyncSGI = (PFNGLXGETVIDEOSYNCSGIPROC)
+    gMythGLXGetVideoSyncSGI = (MYTH_GLXGETVIDEOSYNCSGIPROC)
         get_gl_proc_address("glXGetVideoSyncSGI");
-    gMythGLXWaitVideoSyncSGI = (PFNGLXWAITVIDEOSYNCSGIPROC)
+    gMythGLXWaitVideoSyncSGI = (MYTH_GLXWAITVIDEOSYNCSGIPROC)
         get_gl_proc_address("glXWaitVideoSyncSGI");
 
-    gMythGLGenFencesNV = (PFNGLGENFENCESNVPROC)
+    gMythGLGenFencesNV = (MYTH_GLGENFENCESNVPROC)
         get_gl_proc_address("glGenFencesNV");
-    gMythGLDeleteFencesNV = (PFNGLDELETEFENCESNVPROC)
+    gMythGLDeleteFencesNV = (MYTH_GLDELETEFENCESNVPROC)
         get_gl_proc_address("glDeleteFencesNV");
-    gMythGLSetFenceNV = (PFNGLSETFENCENVPROC)
+    gMythGLSetFenceNV = (MYTH_GLSETFENCENVPROC)
         get_gl_proc_address("glSetFenceNV");
-    gMythGLFinishFenceNV = (PFNGLFINISHFENCENVPROC)
+    gMythGLFinishFenceNV = (MYTH_GLFINISHFENCENVPROC)
         get_gl_proc_address("glFinishFenceNV");
 
-    return true;
+    gMythGLGenFencesAPPLE = (MYTH_GLGENFENCESAPPLEPROC)
+        get_gl_proc_address("glGenFencesAPPLE");
+    gMythGLDeleteFencesAPPLE = (MYTH_GLDELETEFENCESAPPLEPROC)
+        get_gl_proc_address("glDeleteFencesAPPLE");
+    gMythGLSetFenceAPPLE = (MYTH_GLSETFENCEAPPLEPROC)
+        get_gl_proc_address("glSetFenceAPPLE");
+    gMythGLFinishFenceAPPLE = (MYTH_GLFINISHFENCEAPPLEPROC)
+        get_gl_proc_address("glFinishFenceAPPLE");
+
+    return is_valid;
 }
 
+#ifdef USING_X11
 bool get_glx_version(Display *XJ_disp, uint &major, uint &minor)
 {
     // Crashes Unichrome-based system if it is run more than once. -- Tegue
@@ -311,57 +361,38 @@ GLXWindow get_glx_window(Display    *XJ_disp,     GLXFBConfig  glx_fbconfig,
 
     return glx_window;
 }                       
+#endif // USING_X11
 
-void copy_pixels_to_texture(const unsigned char *buf,
-                            int                  buffer_format,
-                            const QSize         &buffer_size,
-                            int                  texture,
-                            int                  texture_type)
+void *get_gl_proc_address(const QString &procName)
 {
-    glBindTexture(texture_type, texture);
-
-    uint format;
-    switch (buffer_format)
-    {
-        case FMT_YV12:
-            format = GL_LUMINANCE;
-            break;
-        case FMT_RGB24:
-            format = GL_RGB;
-            break;
-        case FMT_RGBA32:
-            format = GL_RGBA;
-            break;
-        case FMT_ALPHA:
-            format = GL_ALPHA;
-            break;
-        default:
-            return;
-    }
-
-    glTexSubImage2D(
-        texture_type,
-        0, 0, 0,
-        buffer_size.width(), buffer_size.height(),
-        format, GL_UNSIGNED_BYTE,
-        buf);
-}
-
-__GLXextFuncPtr get_gl_proc_address(const QString &procName)
-{
-    __GLXextFuncPtr ret = NULL;
+    void *ret = NULL;
 
     QByteArray tmp = procName.toAscii();
     const GLubyte *procedureName = (const GLubyte*) tmp.constData();
 
 #if USING_GLX_PROC_ADDR_ARB
-    X11S(ret = glXGetProcAddressARB(procedureName));
+    X11S(ret = (void*)glXGetProcAddressARB(procedureName));
 #elif GLX_VERSION_1_4
-    X11S(ret = glXGetProcAddress(procedureName));
+    X11S(ret = (void*)glXGetProcAddress(procedureName));
 #elif GLX_ARB_get_proc_address
-    X11S(ret = glXGetProcAddressARB(procedureName));
+    X11S(ret = (void*)glXGetProcAddressARB(procedureName));
 #elif GLX_EXT_get_proc_address
-    X11S(ret = glXGetProcAddressEXT(procedureName));
+    X11S(ret = (void*)glXGetProcAddressEXT(procedureName));
+#elif USING_MINGW
+    ret = (void*)wglGetProcAddress((const char*)procedureName);
+    if (ret)
+        return ret;
+    ret = (void*)GetProcAddress(GetModuleHandle("opengl32.dll"),
+                                (const char*) procedureName);
+#endif
+#ifdef Q_WS_MACX
+    (void) procedureName;
+    NSSymbol symbol = NULL;
+    QByteArray symbol_name("_");
+    symbol_name.append(tmp);
+    if (NSIsSymbolNameDefined (symbol_name))
+        symbol = NSLookupAndBindSymbol (symbol_name);
+    ret = symbol ? NSAddressOfSymbol (symbol) : NULL;
 #endif
 
     return ret;
@@ -446,6 +477,39 @@ bool has_gl_nvfence_support(const QString &ext)
             gMythGLDeleteFencesNV &&
             gMythGLSetFenceNV     &&
             gMythGLFinishFenceNV);
+}
+
+bool has_gl_applefence_support(const QString &ext)
+{
+    init_opengl();
+
+    if (!ext.contains("GL_APPLE_fence"))
+        return false;
+
+    return (gMythGLGenFencesAPPLE    &&
+            gMythGLDeleteFencesAPPLE &&
+            gMythGLSetFenceAPPLE     &&
+            gMythGLFinishFenceAPPLE);
+}
+
+bool has_glx_swapinterval_support(const QString &glx_ext)
+{
+    init_opengl();
+
+    if (!glx_ext.contains("GLX_SGI_swap_control"))
+        return false;
+
+    return gMythGLXSwapIntervalSGI;
+}
+
+bool has_wgl_swapinterval_support(const QString &ext)
+{
+    init_opengl();
+
+    if (!ext.contains("WGL_EXT_swap_control"))
+        return false;
+
+    return gMythWGLSwapIntervalEXT;
 }
 
 #ifdef MMX
@@ -637,14 +701,26 @@ void pack_yv12alpha(const unsigned char *source,
     const int width = size.width();
     const int height = size.height();
 
-    if (height % 2)
+    if (height % 2 || width % 2)
         return;
+
+#ifdef MMX
+    int residual  = width % 8;
+    int mmx_width = width - residual;
+    int c_start_w = mmx_width;
+#else
+    int residual  = 0;
+    int mmx_width = width;
+    int c_start_w = 0;
+#endif
 
     uint bgra_width  = width << 2;
     uint chroma_width = width >> 1;
-    uint y_extra     = (pitches[0] << 1) - width;
-    uint u_extra     = pitches[1] - chroma_width;
-    uint v_extra     = pitches[2] - chroma_width;
+
+    uint y_extra     = (pitches[0] << 1) - width + residual;
+    uint u_extra     = pitches[1] - chroma_width + (residual >> 1);
+    uint v_extra     = pitches[2] - chroma_width + (residual >> 1);
+    uint d_extra     = bgra_width + (residual << 2);
 
     uint8_t *ypt_1   = (uint8_t *)source + offsets[0];
     uint8_t *ypt_2   = ypt_1 + pitches[0];
@@ -657,41 +733,60 @@ void pack_yv12alpha(const unsigned char *source,
     {
         uint8_t *alpha_1 = (uint8_t *) alpha;
         uint8_t *alpha_2 = alpha_1 + width;
+        uint a_extra  = width + residual;
 
 #ifdef MMX
-        if (!(width % 8))
+        for (int row = 0; row < height; row += 2)
         {
-            for (int row = 0; row < height; row += 2)
+            for (int col = 0; col < mmx_width; col += 8)
             {
-                for (int col = 0; col < width; col += 8)
-                {
-                    mmx_pack_chroma(upt,  vpt);
-                    mmx_pack_alpha_low(alpha_1, alpha_2, ypt_1, ypt_2);
-                    mmx_pack_middle(dst_1, dst_2);
-                    mmx_pack_alpha_high(alpha_1, alpha_2, ypt_1, ypt_2);
-                    mmx_pack_end(dst_1, dst_2);
+                mmx_pack_chroma(upt,  vpt);
+                mmx_pack_alpha_low(alpha_1, alpha_2, ypt_1, ypt_2);
+                mmx_pack_middle(dst_1, dst_2);
+                mmx_pack_alpha_high(alpha_1, alpha_2, ypt_1, ypt_2);
+                mmx_pack_end(dst_1, dst_2);
 
-                    dst_1 += 32; dst_2 += 32;
-                    alpha_1 += 8; alpha_2 += 8;
-                    ypt_1 += 8; ypt_2 += 8;
-                    upt   += 4; vpt   += 4;
-                }
-
-                ypt_1 += y_extra; ypt_2 += y_extra;
-                upt   += u_extra; vpt   += v_extra;
-                dst_1 += bgra_width; dst_2 += bgra_width;
-                alpha_1 += width; alpha_2 += width;
+                dst_1 += 32; dst_2 += 32;
+                alpha_1 += 8; alpha_2 += 8;
+                ypt_1 += 8; ypt_2 += 8;
+                upt   += 4; vpt   += 4;
             }
 
-            emms();
+            ypt_1   += y_extra; ypt_2   += y_extra;
+            upt     += u_extra; vpt     += v_extra;
+            dst_1   += d_extra; dst_2   += d_extra;
+            alpha_1 += a_extra; alpha_2 += a_extra;
+        }
 
+        emms();
+
+        if (residual)
+        {
+            y_extra     = (pitches[0] << 1) - width + mmx_width;
+            u_extra     = pitches[1] - chroma_width + (mmx_width >> 1);
+            v_extra     = pitches[2] - chroma_width + (mmx_width >> 1);
+            d_extra     = bgra_width + (mmx_width << 2);
+
+            ypt_1   = (uint8_t *)source + offsets[0] + mmx_width;
+            ypt_2   = ypt_1 + pitches[0];
+            upt     = (uint8_t *)source + offsets[1] + (mmx_width>>1);
+            vpt     = (uint8_t *)source + offsets[2] + (mmx_width>>1);
+            dst_1   = (uint8_t *) dest + (mmx_width << 2);
+            dst_2   = dst_1 + bgra_width;
+
+            alpha_1 = (uint8_t *) alpha + mmx_width;
+            alpha_2 = alpha_1 + width;
+            a_extra  = width + mmx_width;
+        }
+        else
+        {
             return;
         }
 #endif //MMX
 
         for (int row = 0; row < height; row += 2)
         {
-            for (int col = 0; col < width; col += 2)
+            for (int col = c_start_w; col < width; col += 2)
             {
                 *(dst_1++) = *vpt; *(dst_2++) = *vpt;
                 *(dst_1++) = *(alpha_1++);
@@ -710,45 +805,59 @@ void pack_yv12alpha(const unsigned char *source,
 
             ypt_1   += y_extra; ypt_2   += y_extra;
             upt     += u_extra; vpt     += v_extra;
-            alpha_1 += width;   alpha_2 += width;
-            dst_1   += bgra_width; dst_2   += bgra_width;
+            alpha_1 += a_extra; alpha_2 += a_extra;
+            dst_1   += d_extra; dst_2   += d_extra;
         }
     }
     else
     {
 
 #ifdef MMX
-       if (!(width % 8))
+        for (int row = 0; row < height; row += 2)
         {
-            for (int row = 0; row < height; row += 2)
+            for (int col = 0; col < mmx_width; col += 8)
             {
-                for (int col = 0; col < width; col += 8)
-                {
-                    mmx_pack_chroma(upt,  vpt);
-                    mmx_pack_alpha1s_low(ypt_1, ypt_2);
-                    mmx_pack_middle(dst_1, dst_2);
-                    mmx_pack_alpha1s_high(ypt_1, ypt_2);
-                    mmx_pack_end(dst_1, dst_2);
+                mmx_pack_chroma(upt,  vpt);
+                mmx_pack_alpha1s_low(ypt_1, ypt_2);
+                mmx_pack_middle(dst_1, dst_2);
+                mmx_pack_alpha1s_high(ypt_1, ypt_2);
+                mmx_pack_end(dst_1, dst_2);
 
-                    dst_1 += 32; dst_2 += 32;
-                    ypt_1 += 8;  ypt_2 += 8;
-                    upt   += 4;  vpt   += 4;
+                dst_1 += 32; dst_2 += 32;
+                ypt_1 += 8;  ypt_2 += 8;
+                upt   += 4;  vpt   += 4;
 
-                }
-                ypt_1 += y_extra; ypt_2 += y_extra;
-                upt   += u_extra; vpt   += v_extra;
-                dst_1 += bgra_width; dst_2 += bgra_width;
             }
+            ypt_1 += y_extra; ypt_2 += y_extra;
+            upt   += u_extra; vpt   += v_extra;
+            dst_1 += d_extra; dst_2 += d_extra;
+        }
 
-            emms();
+        emms();
 
+        if (residual)
+        {
+            y_extra     = (pitches[0] << 1) - width + mmx_width;
+            u_extra     = pitches[1] - chroma_width + (mmx_width >> 1);
+            v_extra     = pitches[2] - chroma_width + (mmx_width >> 1);
+            d_extra     = bgra_width + (mmx_width << 2);
+
+            ypt_1   = (uint8_t *)source + offsets[0] + mmx_width;
+            ypt_2   = ypt_1 + pitches[0];
+            upt     = (uint8_t *)source + offsets[1] + (mmx_width>>1);
+            vpt     = (uint8_t *)source + offsets[2] + (mmx_width>>1);
+            dst_1   = (uint8_t *) dest + (mmx_width << 2);
+            dst_2   = dst_1 + bgra_width;
+        }
+        else
+        {
             return;
         }
 #endif //MMX
 
         for (int row = 0; row < height; row += 2)
         {
-            for (int col = 0; col < width; col += 2)
+            for (int col = c_start_w; col < width; col += 2)
             {
                 *(dst_1++) = *vpt; *(dst_2++) = *vpt;
                 *(dst_1++) = 255;  *(dst_2++) = 255;
@@ -764,7 +873,7 @@ void pack_yv12alpha(const unsigned char *source,
             }
             ypt_1   += y_extra; ypt_2   += y_extra;
             upt     += u_extra; vpt     += v_extra;
-            dst_1   += bgra_width; dst_2   += bgra_width;
+            dst_1   += d_extra; dst_2   += d_extra;
         }
     }
 }
@@ -954,4 +1063,16 @@ void pack_yv12interlaced(const unsigned char *source,
         v1 += vwrap; v2 += vwrap; v3 += vwrap; v4 += vwrap;
         dst_1 += dwrap; dst_2 += dwrap; dst_3 += dwrap; dst_4 += dwrap;
     }
+}
+
+void store_bicubic_weights(float x, float *dst)
+{
+    float w0 = (((-1 * x + 3) * x - 3) * x + 1) / 6;
+    float w1 = ((( 3 * x - 6) * x + 0) * x + 4) / 6;
+    float w2 = (((-3 * x + 3) * x + 3) * x + 1) / 6;
+    float w3 = ((( 1 * x + 0) * x + 0) * x + 0) / 6;
+    *dst++ = 1 + x - w1 / (w0 + w1);
+    *dst++ = 1 - x + w3 / (w2 + w3);
+    *dst++ = w0 + w1;
+    *dst++ = 0;
 }

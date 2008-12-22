@@ -110,6 +110,7 @@ bool VideoOutputDX::InputChanged(const QSize &input_size,
 
     db_vdisp_profile->SetVideoRenderer("directx");
 
+    const QSize video_dim = windows[0].GetVideoDim();
     XJ_width  = video_dim.width();
     XJ_height = video_dim.height();
 
@@ -171,6 +172,7 @@ bool VideoOutputDX::Init(int width, int height, float aspect,
 
     wnd = winid;
 
+    const QSize video_dim = windows[0].GetVideoDim();
     XJ_width  = video_dim.width();
     XJ_height = video_dim.height();
 
@@ -227,15 +229,15 @@ void VideoOutputDX::Exit(void)
 void VideoOutputDX::EmbedInWidget(WId wid, int x, int y, int w, 
                                     int h)
 {
-    if (embedding)
+    if (windows[0].IsEmbedding())
         return;
 
-    VideoOutput::EmbedInWidget(wid, x, y, w, h);
+    VideoOutput::EmbedInWidget(x, y, w, h);
 }
  
 void VideoOutputDX::StopEmbedding(void)
 {
-    if (!embedding)
+    if (!windows[0].IsEmbedding())
         return;
 
     VideoOutput::StopEmbedding();
@@ -349,7 +351,11 @@ void VideoOutputDX::Show(FrameScanType )
         DDBLTFX ddbltfx;
         RECT rect_src;
         RECT rect_dest;
-        
+
+        const QRect video_rect           = windows[0].GetVideoRect();
+        const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
+        const QRect display_video_rect   = windows[0].GetDisplayVideoRect();
+
         rect_src.left   = video_rect.left();
         rect_src.right  = XJ_width;
         rect_src.top    = video_rect.top();
@@ -447,8 +453,8 @@ void VideoOutputDX::UpdatePauseFrame(void)
 }
 
 void VideoOutputDX::ProcessFrame(VideoFrame *frame, OSD *osd,
-                                   FilterChain *filterList,
-                                   NuppelVideoPlayer *pipPlayer)
+                                 FilterChain *filterList,
+                                 const PIPMap &pipPlayers)
 {
     if (IsErrored())
     {
@@ -467,7 +473,7 @@ void VideoOutputDX::ProcessFrame(VideoFrame *frame, OSD *osd,
     if (filterList)
         filterList->ProcessFrame(frame);
 
-    ShowPip(frame, pipPlayer);
+    ShowPIPs(frame, pipPlayers);
     DisplayOSD(frame, osd);
 }
 
@@ -524,6 +530,7 @@ int VideoOutputDX::SetPictureAttribute(
 
 float VideoOutputDX::GetDisplayAspect(void) const
 {
+    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
     float width  = display_visible_rect.width();
     float height = display_visible_rect.height();
 
@@ -1341,6 +1348,10 @@ int VideoOutputDX::DirectXUpdateOverlay()
 
     /* The new window dimensions should already have been computed by the
      * caller of this function */
+
+    const QRect video_rect           = windows[0].GetVideoRect();
+    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
+    const QRect display_video_rect   = windows[0].GetDisplayVideoRect();
 
     rect_src.left   = video_rect.left();
     rect_src.right  = video_rect.right();

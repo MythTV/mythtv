@@ -29,7 +29,7 @@ DevInfoMap IvtvDecoder::devInfo;
 QMutex     IvtvDecoder::devInfoLock;
 const uint IvtvDecoder::vidmax  = 131072; // must be a power of 2
 
-IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
+IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, const ProgramInfo &pginfo)
     : DecoderBase(parent, pginfo),
 
       validvpts(false),       gotvideo(false),
@@ -370,22 +370,26 @@ int IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
                     lastKey = frameNum;
                     if (!hasFullPositionMap)
                     {
-                        long long last_frame = 0;
-                        if (!m_positionMap.empty())
-                            last_frame = m_positionMap[m_positionMap.size() - 1].index;
-                        if (framesRead > last_frame && keyframedist > 0)
                         {
-                            if (m_positionMap.capacity() == m_positionMap.size())
-                                m_positionMap.reserve(m_positionMap.size() + 60);
-                            PosMapEntry entry = {lastKey, lastKey, laststartpos};
-                            m_positionMap.push_back(entry);
+                            QMutexLocker locker(&m_positionMapLock);
+                            long long last_frame = 0;
+                            if (!m_positionMap.empty())
+                                last_frame = m_positionMap.back().index;
+
+                            if (framesRead > last_frame && keyframedist > 0)
+                            {
+                                PosMapEntry e =
+                                    {lastKey, lastKey, laststartpos};
+                                m_positionMap.push_back(e);
+                            }
                         }
 
                         if ((framesRead > 150) &&
                             (!recordingHasPositionMap) &&
                             (!livetv))
                         {
-                            int bitrate = (int)(laststartpos * 8 * fps / (framesRead - 1));
+                            int bitrate = (int)
+                                (laststartpos * 8 * fps / (framesRead - 1));
                             float bytespersec = (float)bitrate / 8;
                             float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
                             GetNVP()->SetFileLength((int)(secs), (int)(secs * fps));
@@ -589,14 +593,14 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, long stopframe)
     if (needReset)
     {
         VERBOSE(VB_PLAYBACK, LOC + "needReset "<<needResetTimer.elapsed()
-                <<" livetv("<<(bool)GetNVP()->GetTVChain()<<")");
+                <<" livetv("<<livetv<<")");
         usleep(50000);
     }
 #endif // EXTRA_DEBUG
 
     // If hit the EOF and are watching an old recording, set ateof.
     // This lets us exit out of old recording quicker.
-    ateof |= needReset && (size > 0) && !(bool)GetNVP()->GetTVChain();
+    ateof |= needReset && (size > 0) && !livetv;
 
     if (needReset && needResetTimer.elapsed() > 1000)
     {

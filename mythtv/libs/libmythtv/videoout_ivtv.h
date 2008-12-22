@@ -32,7 +32,7 @@ class VideoOutputIvtv: public VideoOutput
     void UpdatePauseFrame(void);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
-                      NuppelVideoPlayer *pipPlayer);
+                      const PIPMap &pipPlayers);
 
     uint WriteBuffer(unsigned char *buf, int count);
     int Poll(int delay);
@@ -77,7 +77,7 @@ class VideoOutputIvtv: public VideoOutput
         kAlpha_Embedded
     } eAlphaState;
 
-    void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
+    void ShowPIP(VideoFrame *frame, NuppelVideoPlayer *pipplayer, PIPLocation);
     void SetAlpha(eAlphaState newAlpha);
     void SetColorKey(int state, int color);
     long long GetFirmwareFramesPlayed(void);

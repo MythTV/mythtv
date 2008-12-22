@@ -27,6 +27,7 @@
 #include "remotefile.h"
 #include "storagegroup.h"
 #include "util.h"
+#include "playercontext.h"
 #include "libmythdb/mythdirs.h"
 #include "libmythdb/mythverbose.h"
 
@@ -523,7 +524,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
 
     len = width = height = sz = 0;
     unsigned char *data = (unsigned char*)
-        GetScreenGrab(&programInfo, pathname,
+        GetScreenGrab(programInfo, pathname,
                       captime, timeInSeconds,
                       sz, width, height, aspect);
 
@@ -596,7 +597,7 @@ bool PreviewGenerator::IsLocal(void) const
  *          successful, NULL otherwise.
  */
 char *PreviewGenerator::GetScreenGrab(
-    const ProgramInfo *pginfo, const QString &filename,
+    const ProgramInfo &pginfo, const QString &filename,
     long long seektime, bool time_in_secs,
     int &bufferlen,
     int &video_width, int &video_height, float &video_aspect)
@@ -640,19 +641,21 @@ char *PreviewGenerator::GetScreenGrab(
         return NULL;
     }
 
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(kInUseID, pginfo);
-    nvp->SetRingBuffer(rbuf);
+    PlayerContext *ctx = new PlayerContext();
+    ctx->SetRingBuffer(rbuf);
+    ctx->SetPlayingInfo(&pginfo);
+    ctx->SetNVP(new NuppelVideoPlayer("Preview"));
+    ctx->nvp->SetPlayerInfo(NULL, NULL, true, ctx);
 
     if (time_in_secs)
-        retbuf = nvp->GetScreenGrab(seektime, bufferlen,
+        retbuf = ctx->nvp->GetScreenGrab(seektime, bufferlen,
                                     video_width, video_height, video_aspect);
     else
-        retbuf = nvp->GetScreenGrabAtFrame(
+        retbuf = ctx->nvp->GetScreenGrabAtFrame(
             seektime, true, bufferlen,
             video_width, video_height, video_aspect);
 
-    delete nvp;
-    delete rbuf;
+    delete ctx;
 
 #else // USING_FRONTEND
     QString msg = "Backend compiled without USING_FRONTEND !!!!";

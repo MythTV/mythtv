@@ -1594,7 +1594,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
 
     JobQueue::DeleteAllJobs(ds->chanid, ds->recstartts);
 
-    LiveTVChain *tvchain = GetChainWithRecording(pginfo.get());
+    LiveTVChain *tvchain = GetChainWithRecording(*pginfo.get());
     if (tvchain)
         tvchain->DeleteProgram(pginfo.get());
 
@@ -2994,21 +2994,25 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "FILL_POSITION_MAP")
     {
-        int start = slist[2].toInt();
-        int end   = slist[3].toInt();
-
-        for (int keynum = start; keynum <= end; keynum++)
+        long long start = slist[2].toLongLong();
+        long long end   = slist[3].toLongLong();
+        PosMap map;
+        
+        if (!enc->GetKeyframePositions(start, end, map))
         {
-            long long value = enc->GetKeyframePosition(keynum);
-            if (value != -1)
-            {
-                encodeLongLong(retlist, keynum);
-                encodeLongLong(retlist, value);
-            }
+            retlist << "error";
         }
-
-        if (!retlist.size())
-            retlist << "ok";
+        else
+        {
+            PosMap::const_iterator it = map.begin();
+            for (; it != map.end(); ++it)
+            {
+                retlist += QString::number(it.key());
+                retlist += QString::number(*it);
+            }
+            if (retlist.empty())
+                retlist << "ok";
+        }
     }
     else if (command == "GET_RECORDING")
     {
@@ -4318,7 +4322,7 @@ LiveTVChain *MainServer::GetExistingChain(const MythSocket *sock)
     return NULL;
 }
 
-LiveTVChain *MainServer::GetChainWithRecording(const ProgramInfo *pginfo)
+LiveTVChain *MainServer::GetChainWithRecording(const ProgramInfo &pginfo)
 {
     QMutexLocker lock(&liveTVChainsLock);
 

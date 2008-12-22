@@ -23,6 +23,7 @@
 #include <time.h>
 
 class VideoOutput;
+class OpenGLContext;
 
 typedef unsigned long GLXDrawable;
 #ifdef USING_OPENGL
@@ -216,11 +217,8 @@ class OpenGLVideoSync : public VideoSync
     void AdvanceTrigger(void);
 
   private:
-    GLXDrawable m_drawable;
-    GLXContext  m_context;
-
-  private:
-    QMutex      m_lock;
+    OpenGLContext  *m_context;
+    mutable QMutex  m_context_lock;
 };
 #endif // !_WIN32
 

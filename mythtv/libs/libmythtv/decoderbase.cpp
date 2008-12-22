@@ -18,10 +18,10 @@ using namespace std;
 #define LOC QString("Dec: ")
 #define LOC_ERR QString("Dec, Error: ")
 
-DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo) 
-    : m_parent(parent), m_playbackinfo(NULL),
+DecoderBase::DecoderBase(NuppelVideoPlayer *parent, const ProgramInfo &pginfo) 
+    : m_parent(parent), m_playbackinfo(new ProgramInfo(pginfo)),
 
-      ringBuffer(NULL), nvr_enc(NULL),
+      ringBuffer(NULL),
 
       current_width(640), current_height(480),
       current_aspect(1.33333), fps(29.97),
@@ -34,6 +34,8 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
 
       hasFullPositionMap(false), recordingHasPositionMap(false),
       posmapStarted(false), positionMapType(MARK_UNSET),
+
+      m_positionMapLock(QMutex::Recursive),
       dontSyncPositionMap(false),
 
       exactseeks(false), livetv(false), watchingrecording(false),
@@ -49,9 +51,6 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
     tracks[kTrackTypeAudio].push_back(StreamInfo(0, 0, 0, 0));
     tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 0, 1));
     tracks[kTrackTypeCC608].push_back(StreamInfo(0, 0, 2, 3));
-
-    if (pginfo)
-        m_playbackinfo = new ProgramInfo(*pginfo);
 }
 
 DecoderBase::~DecoderBase()
@@ -60,20 +59,18 @@ DecoderBase::~DecoderBase()
         delete m_playbackinfo;
 }
 
-void DecoderBase::SetProgramInfo(ProgramInfo *pginfo)
+void DecoderBase::SetProgramInfo(const ProgramInfo &pginfo)
 {
     if (m_playbackinfo)
         delete m_playbackinfo;
-    m_playbackinfo = NULL;
-
-    if (pginfo)
-        m_playbackinfo = new ProgramInfo(*pginfo);
+    m_playbackinfo = new ProgramInfo(pginfo);
 }
 
 void DecoderBase::Reset(void)
 {
     SeekReset(0, 0, true, true);
 
+    QMutexLocker locker(&m_positionMapLock);
     m_positionMap.clear();
     framesPlayed = 0;
     framesRead = 0;
@@ -160,6 +157,7 @@ bool DecoderBase::PosMapFromDb(void)
     if (posMap.empty())
         return false; // no position map in recording
 
+    QMutexLocker locker(&m_positionMapLock);
     m_positionMap.clear();
     m_positionMap.reserve(posMap.size());
 
@@ -172,7 +170,7 @@ bool DecoderBase::PosMapFromDb(void)
     if (!m_positionMap.empty())
     {
         VERBOSE(VB_PLAYBACK, QString("Position map filled from DB to: %1")
-                .arg((long int) m_positionMap[m_positionMap.size()-1].index));
+                .arg(m_positionMap.back().index));
         if (!ringBuffer->isDVD())
             indexOffset = m_positionMap[0].index;
     }
@@ -182,80 +180,48 @@ bool DecoderBase::PosMapFromDb(void)
 
 bool DecoderBase::PosMapFromEnc(void)
 {
-    // Reads only new positionmap entries from encoder
-    if (!(livetv || (nvr_enc && nvr_enc->IsValidRecorder())))
+    if (!m_parent)
         return false;
 
-    // if livetv, and we're not the last entry, don't get it from the encoder
-    if (livetv)
+    unsigned long long start = 0;
     {
-        LiveTVChain *chain = m_parent->GetTVChain();
-        if (chain->HasNext())
-            return false;
+        QMutexLocker locker(&m_positionMapLock);
+        if (!m_positionMap.empty())
+            start = m_positionMap.back().index + 1;
     }
 
     QMap<long long, long long> posMap;
-    
-    int start = 0;
-    unsigned int size = m_positionMap.size();
-    if (size > 0)
-        start = m_positionMap[size-1].index + 1;
-
-    int end = nvr_enc->GetFramesWritten();
-
-    if (!end)
-    {
-        VERBOSE(VB_PLAYBACK, QString("PosMapFromEnc: Warning, tried to fetch "
-                                     "PositionMap from Encoder but encoder "
-                                     "returned framesWritten == 0"));
+    if (m_parent->PosMapFromEnc(start, posMap))
         return false;
-    }
 
-    if (size > 0 && keyframedist > 0) 
-        end /= keyframedist;
+    QMutexLocker locker(&m_positionMapLock);
 
-    VERBOSE(VB_PLAYBACK, QString("Filling position map from %1 to %2")
-                                 .arg(start).arg(end));
-
-    nvr_enc->FillPositionMap(start, end, posMap);
-    if (keyframedist == -1 && posMap.size() > 1)
-    {
-        // If the indices are sequential, index is by keyframe num
-        // else it is by frame num
-        QMap<long long,long long>::const_iterator i1 = posMap.begin();
-        QMap<long long,long long>::const_iterator i2 = i1;
-        i2++;
-        if (i1.key() + 1 == i2.key()) 
-        {
-            //cerr << "keyframedist to 15/12 due to encoder" << endl;
-            positionMapType = MARK_GOP_START;
-            keyframedist = 15;
-            if (fps < 26 && fps > 24)
-                keyframedist = 12;
-        }
-        else
-        {
-            //cerr << "keyframedist to 1 due to encoder" << endl;
-            positionMapType = MARK_GOP_BYFRAME;
-            keyframedist = 1;
-        }
-    }
+    // LiveTV will always have a by frame keyframe map..
+    positionMapType = MARK_GOP_BYFRAME;
+    keyframedist = 1;
 
     // append this new position map to class's
     m_positionMap.reserve(m_positionMap.size() + posMap.size());
     for (QMap<long long,long long>::const_iterator it = posMap.begin();
          it != posMap.end(); it++) 
     {
-        PosMapEntry e = {it.key(), it.key() * keyframedist, *it};
+        PosMapEntry e = {it.key(), it.key(), *it};
         m_positionMap.push_back(e);
     }
     if (!m_positionMap.empty())
     {
-        VERBOSE(VB_PLAYBACK, QString("Position map filled from Encoder to: %1")
-                .arg((long int) m_positionMap[m_positionMap.size()-1].index));
+        VERBOSE(VB_PLAYBACK, LOC +
+                QString("Position map filled from Encoder to: %1")
+                .arg(m_positionMap.back().index));
     }
 
     return true;
+}
+
+unsigned long DecoderBase::GetPositionMapSize(void) const
+{
+    QMutexLocker locker(&m_positionMapLock);
+    return (unsigned long) m_positionMap.size();
 }
 
 /** \fn DecoderBase::SyncPositionMap()
@@ -282,37 +248,41 @@ bool DecoderBase::PosMapFromEnc(void)
  */
 bool DecoderBase::SyncPositionMap(void)
 {
-    VERBOSE(VB_PLAYBACK, "Resyncing position map. posmapStarted = "
+    VERBOSE(VB_PLAYBACK, LOC + "Resyncing position map. posmapStarted = "
             << (int) posmapStarted << " livetv(" << livetv << ") "
             << "watchingRec(" << watchingrecording << ")");
 
     if (dontSyncPositionMap)
         return false;
 
-    unsigned int old_posmap_size = m_positionMap.size();
-    
+    unsigned long old_posmap_size = GetPositionMapSize();
+    unsigned long new_posmap_size = old_posmap_size;
+
     if (livetv || watchingrecording)
     {
         if (!posmapStarted) 
         {
             // starting up -- try first from database
             PosMapFromDb();
-            VERBOSE(VB_PLAYBACK,
+            new_posmap_size = GetPositionMapSize();
+            VERBOSE(VB_PLAYBACK, LOC +
                     QString("SyncPositionMap watchingrecording, from DB: "
                             "%1 entries")
-                    .arg(m_positionMap.size()));
+                    .arg(new_posmap_size));
         }
         // always try to get more from encoder
         if (!PosMapFromEnc()) 
         {
-            VERBOSE(VB_PLAYBACK,
+            VERBOSE(VB_PLAYBACK, LOC +
                     QString("SyncPositionMap watchingrecording no entries "
                             "from encoder, try DB"));
             PosMapFromDb(); // try again from db
         }
-        VERBOSE(VB_PLAYBACK,
+
+        new_posmap_size = GetPositionMapSize();
+        VERBOSE(VB_PLAYBACK, LOC +
                 QString("SyncPositionMap watchingrecording total: %1 entries")
-                .arg(m_positionMap.size()));
+                .arg(new_posmap_size));
     }
     else
     {
@@ -320,41 +290,45 @@ bool DecoderBase::SyncPositionMap(void)
         if (!posmapStarted)
         {
             PosMapFromDb();
-            VERBOSE(VB_PLAYBACK,
+
+            new_posmap_size = GetPositionMapSize();
+            VERBOSE(VB_PLAYBACK, LOC +
                     QString("SyncPositionMap prerecorded, from DB: %1 entries")
-                    .arg(m_positionMap.size()));
+                    .arg(new_posmap_size));
         }
     }
 
-    bool ret_val = m_positionMap.size() > old_posmap_size;
+    bool ret_val = new_posmap_size > old_posmap_size;
+
     if (ret_val && keyframedist > 0)
     {
-        long long totframes;
-        int length;
+        long long totframes = 0;
+        int length = 0;
 
         if (ringBuffer->isDVD())
         { 
-            totframes = m_positionMap[m_positionMap.size() - 1].index;
             length = ringBuffer->DVD()->GetTotalTimeOfTitle();
+            QMutexLocker locker(&m_positionMapLock);
+            totframes = m_positionMap.back().index;
         }
         else
         { 
-            totframes = 
-                     m_positionMap[m_positionMap.size()-1].index * keyframedist;
-            length = (int)((totframes * 1.0) / fps);
+            QMutexLocker locker(&m_positionMapLock);
+            totframes = m_positionMap.back().index * keyframedist;
+            if (fps)
+                length = (int)((totframes * 1.0) / fps);
         }
 
         GetNVP()->SetFileLength(length, totframes);
         GetNVP()->SetKeyframeDistance(keyframedist);
         posmapStarted = true;
 
-        VERBOSE(VB_PLAYBACK,
+        VERBOSE(VB_PLAYBACK, LOC +
                 QString("SyncPositionMap, new totframes: %1, new length: %2, "
                         "posMap size: %3")
-                        .arg((long)totframes).arg(length)
-                        .arg(m_positionMap.size()));
+                .arg(totframes).arg(length).arg(new_posmap_size));
     }
-    recordingHasPositionMap |= !m_positionMap.empty();
+    recordingHasPositionMap |= (0 != new_posmap_size);
     return ret_val;
 }
 
@@ -363,6 +337,7 @@ bool DecoderBase::SyncPositionMap(void)
 bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
                                int &lower_bound, int &upper_bound)
 {
+    QMutexLocker locker(&m_positionMapLock);
     // Binary search
     long long size  = (long long) m_positionMap.size();
     long long lower = -1;
@@ -434,13 +409,21 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
 
 void DecoderBase::SetPositionMap(void)
 {
+    m_positionMapLock.lock();
+
     if (m_playbackinfo && (positionMapType != MARK_UNSET)) 
     {
         QMap<long long, long long> posMap;
         for (uint i = 0; i < m_positionMap.size(); i++) 
             posMap[m_positionMap[i].index] = m_positionMap[i].pos;
-    
-        m_playbackinfo->SetPositionMap(posMap, positionMapType);
+        MarkTypes type = positionMapType;
+        m_positionMapLock.unlock();
+        
+        m_playbackinfo->SetPositionMap(posMap, type);
+    }
+    else
+    {
+        m_positionMapLock.unlock();
     }
 }
 
@@ -451,7 +434,7 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
             .arg(desiredFrame).arg(framesPlayed)
             .arg((discardFrames) ? "do" : "don't"));
 
-    if (m_positionMap.empty())
+    if (!GetPositionMapSize())
         return false;
 
     if (!DoRewindSeek(desiredFrame))
@@ -496,19 +479,23 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
     int pre_idx, post_idx;
     FindPosition(desiredFrame, hasKeyFrameAdjustTable, pre_idx, post_idx);
 
-    int pos_idx  = min(pre_idx, post_idx);
-    PosMapEntry e = m_positionMap[pos_idx];
-    lastKey = GetKey(e);
-
-    // ??? Don't rewind past the beginning of the file
-    while (e.pos < 0)
+    PosMapEntry e;
     {
-        pos_idx++;
-        if (pos_idx >= (int)m_positionMap.size())
-            return false;
-
+        QMutexLocker locker(&m_positionMapLock);
+        int pos_idx  = min(pre_idx, post_idx);
         e = m_positionMap[pos_idx];
         lastKey = GetKey(e);
+
+        // ??? Don't rewind past the beginning of the file
+        while (e.pos < 0)
+        {
+            pos_idx++;
+            if (pos_idx >= (int)m_positionMap.size())
+                return false;
+
+            e = m_positionMap[pos_idx];
+            lastKey = GetKey(e);
+        }
     }
 
     ringBuffer->Seek(e.pos, SEEK_SET);
@@ -519,8 +506,12 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
 long long DecoderBase::GetLastFrameInPosMap(long long desiredFrame)
 {
     long long last_frame = 0;
-    if (!m_positionMap.empty())
-        last_frame = GetKey(m_positionMap.back());
+
+    {
+        QMutexLocker locker(&m_positionMapLock);
+        if (!m_positionMap.empty())
+            last_frame = GetKey(m_positionMap.back());
+    }
 
     // Resync keyframe map if we are trying to seek to a frame
     // not yet in out map and then check for last frame again.
@@ -529,12 +520,15 @@ long long DecoderBase::GetLastFrameInPosMap(long long desiredFrame)
         VERBOSE(VB_PLAYBACK, LOC + "DoFastForward: "
                 "Not enough info in positionMap," +
                 QString("\n\t\t\twe need frame %1 but highest we have is %2.")
-                .arg((long int)desiredFrame).arg((long int)last_frame));
+                .arg(desiredFrame).arg(last_frame));
 
         SyncPositionMap();
 
-        if (!m_positionMap.empty())
-            last_frame = GetKey(m_positionMap.back());
+        {
+            QMutexLocker locker(&m_positionMapLock);
+            if (!m_positionMap.empty())
+                last_frame = GetKey(m_positionMap.back());
+        }
 
         if (desiredFrame > last_frame)
         {
@@ -542,7 +536,7 @@ long long DecoderBase::GetLastFrameInPosMap(long long desiredFrame)
                     "Still not enough info in positionMap after sync, " +
                     QString("\n\t\t\twe need frame %1 but highest we have "
                             "is %2. Will seek frame-by-frame")
-                    .arg((long int)desiredFrame).arg((long int)last_frame));
+                    .arg(desiredFrame).arg(last_frame));
         }
     }
     return last_frame;
@@ -591,6 +585,18 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
     bool needflush = false;
     if (desiredFrame > last_frame)
     {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("DoFastForward(): desiredFrame(%1) > last_frame(%2)")
+                .arg(desiredFrame).arg(last_frame));
+
+        if (desiredFrame - last_frame > 32)
+        {
+            VERBOSE(VB_IMPORTANT, LOC + "DoFastForward(): "
+                    "Desired frame is way past the end of the keyframe map!"
+                    "\n\t\t\tSeeking to last keyframe instead.");
+            desiredFrame = last_frame;
+        }
+
         needflush = true;
 
         exitafterdecoded = true; // don't actualy get a frame
@@ -609,11 +615,14 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
         }
     }
 
-    if (m_positionMap.empty())
     {
-        // Re-enable rawframe state if it was enabled before FF
-        getrawframes = oldrawstate;
-        return false;
+        QMutexLocker locker(&m_positionMapLock);
+        if (m_positionMap.empty())
+        {
+            // Re-enable rawframe state if it was enabled before FF
+            getrawframes = oldrawstate;
+            return false;
+        }
     }
 
     // Handle non-frame-by-frame seeking
@@ -671,7 +680,11 @@ void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
     // if exactseeks, use keyframe <= desiredFrame
     uint pos_idx = (exactseeks) ? pre_idx : max(pre_idx, post_idx);
 
-    PosMapEntry e = m_positionMap[pos_idx];
+    PosMapEntry e;
+    {
+        QMutexLocker locker(&m_positionMapLock);
+        e = m_positionMap[pos_idx];
+    }
     lastKey = GetKey(e);
 
     if (framesPlayed < lastKey)
@@ -690,7 +703,10 @@ void DecoderBase::UpdateFramesPlayed(void)
 
 void DecoderBase::FileChanged(void)
 {
-    m_positionMap.clear();
+    {
+        QMutexLocker locker(&m_positionMapLock);
+        m_positionMap.clear();
+    }
     framesPlayed = 0;
     framesRead = 0;
 

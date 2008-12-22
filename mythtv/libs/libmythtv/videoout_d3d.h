@@ -27,7 +27,7 @@ class VideoOutputD3D : public VideoOutput
     void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
-                      NuppelVideoPlayer *pipPlayer);
+                      const PIPMap &pipPlayers);
     void Show(FrameScanType );
 
     bool InputChanged(const QSize &input_size,

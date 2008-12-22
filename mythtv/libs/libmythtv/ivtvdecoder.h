@@ -38,7 +38,7 @@ typedef QMap<QString,DeviceInfo> DevInfoMap;
 class IvtvDecoder : public DecoderBase
 {
   public:
-    IvtvDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo);
+    IvtvDecoder(NuppelVideoPlayer *parent, const ProgramInfo &pginfo);
    ~IvtvDecoder();
 
     static bool CanHandle(char testbuf[kDecoderProbeBufferSize], 

@@ -6,6 +6,15 @@
 #include <QString>
 #include <QObject>
 
+typedef enum PIPState
+{
+    kPIPOff = 0,
+    kPIPonTV,
+    kPIPStandAlone,
+    kPBPLeft,
+    kPBPRight,
+} PIPState;
+
 typedef enum PIPLocation
 {
     kPIPTopLeft = 0,

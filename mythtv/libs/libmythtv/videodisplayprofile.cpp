@@ -114,11 +114,14 @@ bool ProfileItem::IsValid(QString *reason) const
     if (!deint1.isEmpty() &&
         (!deints.contains(deint1) ||
          deint1.contains("bobdeint") ||
-         deint1.contains("doublerate")))
+         deint1.contains("doublerate") ||
+         deint1.contains("doubleprocess")))
     {
         if (reason)
         {
-            if (deint1.contains("bobdeint") || deint1.contains("doublerate"))
+            if (deint1.contains("bobdeint") ||
+                deint1.contains("doublerate") ||
+                deint1.contains("doubleprocess"))
                 deints.removeAll(deint1);
 
             *reason = QString("deinterlacer %1 is not supported w/renderer %2 "
@@ -293,7 +296,8 @@ void VideoDisplayProfile::SetVideoRenderer(const QString &video_renderer)
     if (!deints.contains(GetFallbackDeinterlacer()))
         SetPreference("pref_deint1", deints[0]);
     if (GetFallbackDeinterlacer().contains("bobdeint") ||
-        GetFallbackDeinterlacer().contains("doublerate"))
+        GetFallbackDeinterlacer().contains("doublerate") ||
+        GetFallbackDeinterlacer().contains("doubleprocess"))
     {
         SetPreference("pref_deint1", deints[1]);
     }
@@ -708,6 +712,10 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString short_name)
         return QObject::tr("Linear blend (2x, HW)");
     else if ("opengldoubleratefieldorder" == short_name)
         return QObject::tr("Interlaced (2x, Hw)");
+    else if ("opengldoublerateyadif" == short_name)
+        return QObject::tr("Yadif (2x, Hw)");
+    else if ("openglyadif" == short_name)
+        return QObject::tr("Yadif (Hw)");
     else if ("vdpauonefield" == short_name)
         return QObject::tr("One Field (1x, Hw)");
     else if ("vdpaubobdeint" == short_name)
@@ -1285,6 +1293,8 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         msg = kLinearBlendMsg + " " + kUsingOpenGL;
     else if (deint == "openglkerneldeint")
         msg = kKernelMsg + " " + kUsingOpenGL;
+    else if (deint == "openglyadif")
+        msg = kYadifMsg + " " + kUsingOpenGL;
     else if (deint == "opengldoubleratelinearblend")
         msg = kLinearBlendMsg + " " + kUsingOpenGLWorkaround;
     else if (deint == "opengldoublerateonefield")
@@ -1301,6 +1311,8 @@ QString VideoDisplayProfile::GetDeinterlacerHelp(const QString &deint)
         msg = kYadifMsg;
     else if (deint == "yadifdoubleprocessdeint")
         msg = kYadifMsg + " " +  kDoubleRateMsg;
+    else if (deint == "opengldoublerateyadif")
+        msg = kYadifMsg + " " +  kUsingOpenGLWorkaround;
     else
         msg = QObject::tr("'%1' has not been documented yet.").arg(deint);
 
@@ -1482,10 +1494,12 @@ QString VideoDisplayProfile::toString(void) const
 "openglkerneldeint"
 "openglonefield"
 "openglbobdeint"
+"openglyadif"
 "opengldoubleratelinearblend"
 "opengldoublerateonefield"
 "opengldoubleratekerneldeint"
 "opengldoubleratefieldorder"
+"opengldoublerateyadif"
 "vdpauonefield"
 "vdpaubobdeint"
 "vdpaubasic"
@@ -1541,13 +1555,14 @@ void VideoDisplayProfile::init_statics(void)
     safe_deint["opengl"] += "opengllinearblend";
     safe_deint["opengl"] += "openglonefield";
     safe_deint["opengl"] += "openglkerneldeint";
-
     safe_deint["opengl"] += "bobdeint";
     safe_deint["opengl"] += "openglbobdeint";
     safe_deint["opengl"] += "opengldoubleratelinearblend";
     safe_deint["opengl"] += "opengldoublerateonefield";
     safe_deint["opengl"] += "opengldoubleratekerneldeint";
     safe_deint["opengl"] += "opengldoubleratefieldorder";
+    safe_deint["opengl"] += "opengldoublerateyadif";
+    safe_deint["opengl"] += "openglyadif";
 
 
     safe_deint["vdpau"] += "none";

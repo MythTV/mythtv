@@ -1,3 +1,6 @@
+#include <climits> // for LONG_LONG_MAX on gcc compiler
+
+#include <algorithm> // for min
 #include <iostream>
 using namespace std;
 
@@ -8,6 +11,10 @@ using namespace std;
 #include "recordingprofile.h"
 #include "programinfo.h"
 #include "util.h"
+
+#ifndef LONG_LONG_MAX
+#define LONG_LONG_MAX ((~((long long)0))>>1)
+#endif
 
 #define TVREC_CARDNUM \
         ((tvrec != NULL) ? QString::number(tvrec->GetCaptureCardNum()) : "NULL")
@@ -239,6 +246,43 @@ void RecorderBase::CheckForRingBufferSwitch(void)
 
     if (rb_changed && tvrec)
         tvrec->RingBufferChanged(ringBuffer, curRecording);
+}
+
+long long RecorderBase::GetKeyframePosition(long long desired) const
+{
+    QMutexLocker locker(&positionMapLock);
+    long long ret = -1;
+
+    if (positionMap.empty())
+        return ret;
+
+    // find closest exact or previous keyframe position...
+    PosMap::const_iterator it = positionMap.lowerBound(desired);
+    if (it == positionMap.end())
+        ret = *positionMap.begin();
+    else if (it.key() == desired)
+        ret = *it;
+    else if (--it != positionMap.end())
+        ret = *it;
+
+    return ret;
+}
+
+bool RecorderBase::GetKeyframePositions(
+    long long start, long long end, PosMap &map) const
+{
+    map.clear();
+
+    QMutexLocker locker(&positionMapLock);
+    if (positionMap.empty())
+        return true;
+
+    PosMap::const_iterator it = positionMap.lowerBound(start);
+    end = (end < 0) ? LONG_LONG_MAX : end;
+    for (; (it != positionMap.end()) && (it.key() <= end); ++it)
+        map[it.key()] = *it;
+
+    return true;
 }
 
 /** \fn RecorderBase::SavePositionMap(bool)

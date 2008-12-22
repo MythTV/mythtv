@@ -45,6 +45,17 @@ static void initialize_osd_fonts(void);
 #define LOC QString("OSD: ")
 #define LOC_ERR QString("OSD, Error: ")
 
+const char *kOSDDialogActive         = "DialogActive";
+const char *kOSDDialogAllowRecording = "allowrecordingbox";
+const char *kOSDDialogAlreadyEditing = "alreadybeingedited";
+const char *kOSDDialogExitOptions    = "exitplayoptions";
+const char *kOSDDialogAskDelete      = "askdeleterecording";
+const char *kOSDDialogIdleTimeout    = "idletimeout";
+const char *kOSDDialogSleepTimeout   = "sleeptimeout";
+const char *kOSDDialogChannelTimeout = "channel_timed_out";
+const char *kOSDDialogInfo           = "infobox";
+const char *kOSDDialogEditChannel    = "channel_editor";
+
 OSD::OSD()
     : QObject(),
       needPillarBox(false),
@@ -2084,19 +2095,36 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
                        QStringList &options, int length,
                        int initial_selection)
 {
+    if (name.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "NewDialogBox, dialog name was empty. "
+                "This is a programmer error.");
+        return;
+    }
+
+    if (IsDialogExisting(name))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("NewDialogBox, dialog '%1' already exists").arg(name));
+        return;
+    }
+
     QMutexLocker locker(&osdlock);
 
     OSDSet *container = GetSet(name);
     if (container)
     {
-        VERBOSE(VB_IMPORTANT, "dialog: " << name << " already exists.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("NewDialogBox, dialog containter for "
+                        "'%1' already exists.").arg(name));
         return;
-    }       
+    }
 
     OSDSet *base = GetSet("basedialog");
     if (!base)
     {
-        VERBOSE(VB_IMPORTANT, "couldn't find base dialog");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't find base dialog");
         return;
     }
 
@@ -2172,6 +2200,9 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     m_setsvisible = true;
     changed = true;
 
+    QString tmp = name; tmp.detach();
+    dialogs.push_back(tmp);
+
     locker.mutex()->unlock();
 
     int count = 0;
@@ -2179,6 +2210,49 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
         usleep(1000);
 
     locker.mutex()->lock();
+}
+
+void OSD::DialogAbortAndHideAll(void)
+{
+    while (dialogs.size())
+    {
+        QString dialog_name = dialogs.back();
+        DialogAbort(dialog_name);
+        TurnDialogOff(dialog_name);
+        usleep(1000);
+    }
+}
+
+void OSD::PushDialog(const QString &name)
+{
+    QMutexLocker locker(&osdlock);
+    QString tmp = name; tmp.detach();
+    dialogs.push_back(tmp);
+}
+
+QString OSD::GetDialogActive(void) const
+{
+    QMutexLocker locker(&osdlock);
+    if (dialogs.empty())
+        return QString::null;
+
+    QString tmp = dialogs.back();
+    tmp.detach();
+    return tmp;
+}
+
+bool OSD::IsDialogActive(const QString &dialogname) const
+{
+    QMutexLocker locker(&osdlock);
+    return !dialogs.empty() && (dialogs.back() == dialogname);
+}
+
+bool OSD::IsDialogExisting(const QString &dialogname) const
+{
+    QMutexLocker locker(&osdlock);
+    deque<QString>::const_iterator it =
+        find(dialogs.begin(), dialogs.end(), dialogname);
+    return it != dialogs.end();
 }
 
 void OSD::HighlightDialogSelection(OSDSet *container, int num)
@@ -2208,8 +2282,13 @@ void OSD::HighlightDialogSelection(OSDSet *container, int num)
     }
 }
 
-void OSD::TurnDialogOff(const QString &name)
+void OSD::TurnDialogOff(const QString &raw_name)
 {
+    QString name = raw_name;
+
+    if (name == kOSDDialogActive)
+        name = GetDialogActive();
+
     QMutexLocker locker(&osdlock);
 
     OSDSet *container = GetSet(name);
@@ -2218,10 +2297,26 @@ void OSD::TurnDialogOff(const QString &name)
         container->Hide();
         changed = true;
     }
+
+    if (dialogs.back() == name)
+    {
+        dialogs.pop_back();
+        return;
+    }
+
+    deque<QString>::iterator it =
+        find(dialogs.begin(), dialogs.end(), name);
+    if (it != dialogs.end())
+        dialogs.erase(it);
 }
 
-void OSD::DialogUp(const QString &name)
+void OSD::DialogUp(const QString &raw_name)
 {
+    QString name = raw_name;
+
+    if (name == kOSDDialogActive)
+        name = GetDialogActive();
+
     QMutexLocker locker(&osdlock);
 
     OSDSet *container = GetSet(name);
@@ -2242,8 +2337,13 @@ void OSD::DialogUp(const QString &name)
     }
 }
 
-void OSD::DialogDown(const QString &name)
+void OSD::DialogDown(const QString &raw_name)
 {
+    QString name = raw_name;
+
+    if (name == kOSDDialogActive)
+        name = GetDialogActive();
+
     QMutexLocker locker(&osdlock);
 
     OSDSet *container = GetSet(name);
@@ -2264,23 +2364,38 @@ void OSD::DialogDown(const QString &name)
     }
 }
 
-bool OSD::DialogShowing(const QString &name)
+bool OSD::DialogShowing(const QString &raw_name)
 {
-    QMutexLocker locker(&osdlock);
+    QString name = raw_name;
+
+    if (name == kOSDDialogActive)
+        name = GetDialogActive();
 
     if (name.isEmpty())
         return false;
 
+    QMutexLocker locker(&osdlock);
+
     return (GetSet(name) != NULL);
 }
 
-void OSD::DialogAbort(const QString &name)
+void OSD::DialogAbort(const QString &raw_name)
 {
+    QString name = raw_name;
+
+    if (name == kOSDDialogActive)
+        name = GetDialogActive();
+
     dialogResponseList[name] = -1;
 }
 
-int OSD::GetDialogResponse(const QString &name)
+int OSD::GetDialogResponse(const QString &raw_name)
 {
+    QString name = raw_name;
+
+    if (name == kOSDDialogActive)
+        name = GetDialogActive();
+
     if (dialogResponseList.contains(name))
     {
         int ret = dialogResponseList[name] + 1;
@@ -2379,7 +2494,7 @@ bool OSD::HideAllExcept(const QString &other)
     return result;
 }
 
-bool OSD::HideSet(const QString &name)
+bool OSD::HideSet(const QString &name, bool wait)
 {
     QMutexLocker locker(&osdlock);
 
@@ -2394,6 +2509,14 @@ bool OSD::HideSet(const QString &name)
     }
 
     changed = true;
+
+    if (set && wait)
+    {
+        locker.mutex()->unlock();
+        while (GetSet(name))
+            usleep(10000);
+        locker.mutex()->lock();
+    }
 
     return ret;
 }
@@ -2628,7 +2751,8 @@ bool OSD::Visible(void)
 OSDSet *OSD::GetSet(const QString &text)
 {
     OSDSet *ret = NULL;
-    if (setMap.contains(text))
+
+    if (!text.isEmpty() && setMap.contains(text))
         ret = setMap[text];
 
     return ret;

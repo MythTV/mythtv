@@ -46,6 +46,8 @@ class HDHRChannel;
 class MPEGStreamData;
 class ProgramMapTable;
 
+typedef QMap<long long, long long> PosMap;
+
 /// Used to request ProgramInfo for channel browsing.
 typedef enum
 {
@@ -194,8 +196,9 @@ class MPUBLIC TVRec : public SignalMonitorListener
     float GetFramerate(void);
     long long GetFramesWritten(void);
     long long GetFilePosition(void);
-    long long GetMaxBitrate();
-    long long GetKeyframePosition(long long desired);
+    long long GetMaxBitrate(void) const;
+    long long GetKeyframePosition(long long desired) const;
+    bool GetKeyframePositions(long long start, long long end, PosMap&) const;
     void SpawnLiveTV(LiveTVChain *newchain, bool pip, QString startchan);
     QString GetChainID(void);
     void StopLiveTV(void);

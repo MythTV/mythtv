@@ -22,6 +22,10 @@ class VideoOutputDX : public VideoOutput
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
+
+    void ProcessFrame(VideoFrame *frame, OSD *osd,
+                      FilterChain *filterList,
+                      const PIPMap &pipPlayers);
     void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void Show(FrameScanType );
 
@@ -39,9 +43,6 @@ class VideoOutputDX : public VideoOutput
     void DrawUnusedRects(bool sync = true);
 
     void UpdatePauseFrame(void);
-    void ProcessFrame(VideoFrame *frame, OSD *osd,
-                      FilterChain *filterList,
-                      NuppelVideoPlayer *pipPlayer);
 
     void MoveResize(void);
     int  SetPictureAttribute(PictureAttribute attribute, int newValue);

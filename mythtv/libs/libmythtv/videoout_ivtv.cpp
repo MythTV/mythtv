@@ -411,16 +411,18 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
 
     db_vdisp_profile->SetVideoRenderer("ivtv");
 
-    allowpreviewepg = true;
-
     videoDevice = gContext->GetSetting("PVR350VideoDev");
 
     VideoOutput::Init(width, height, aspect, winid, winx, winy, winw, winh, 
                       embedid);
 
+    windows[0].SetAllowPreviewEPG(true);
+
+    const QSize video_dim = windows[0].GetVideoDim();
+
     osdbufsize = video_dim.width() * video_dim.height() * 4;
 
-    MoveResize();
+    windows[0].MoveResize();
 
     Open();
 
@@ -542,8 +544,8 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
             bzero (&priv->ivtvfb_var, sizeof(priv->ivtvfb_var));
 
             // Switch dimensions to match the framebuffer
-            video_dim = QSize(priv->ivtvfb_var_old.xres,
-                              priv->ivtvfb_var_old.yres);
+            windows[0].SetVideoDim(QSize(priv->ivtvfb_var_old.xres,
+                    priv->ivtvfb_var_old.yres));
 
             memcpy(&priv->ivtvfb_var, &priv->ivtvfb_var_old,
                    sizeof priv->ivtvfb_var);
@@ -691,7 +693,9 @@ void VideoOutputIvtv::UpdatePauseFrame(void)
 { 
 }
 
-void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
+void VideoOutputIvtv::ShowPIP(VideoFrame        *frame,
+                              NuppelVideoPlayer *pipplayer,
+                              PIPLocation        loc)
 {
     if (!pipplayer)
         return;
@@ -736,7 +740,7 @@ void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
         }
     }
 
-    switch (db_pip_location)
+    switch (loc)
     {
         case kPIP_END:
         case kPIPTopLeft:
@@ -767,7 +771,7 @@ void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     pipplayer->ReleaseCurrentFrame(pipimage);
 
     if (frame->width < 0)
-        frame->width = video_dim.width();
+        frame->width = windows[0].GetVideoDim().width();
 
     for (int i = 0; i < piph; i++)
     {
@@ -780,7 +784,7 @@ void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 
 void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
                                    FilterChain *filterList, 
-                                   NuppelVideoPlayer *pipPlayer) 
+                                   const PIPMap &pipPlayers)
 { 
     (void)filterList;
     (void)frame;
@@ -791,6 +795,8 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
     if (!osd && !pipon)
         return;
 
+    const bool embedding = windows[0].IsEmbedding();
+
     if (embedding && alphaState != kAlpha_Embedded)
         SetAlpha(kAlpha_Embedded);
     else if (!embedding && alphaState == kAlpha_Embedded && lastcleared)
@@ -800,6 +806,7 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
         return;
 
     VideoFrame tmpframe;
+    const QSize video_dim = windows[0].GetVideoDim();
     init(&tmpframe, FMT_ARGB32, (unsigned char*) osdbuf_aligned,
          stride, video_dim.height(), 32, stride * video_dim.height());
 
@@ -808,7 +815,7 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
         surface = osd->Display();
 
     // Clear osdbuf if OSD has changed, or PiP has been toggled
-    bool clear = (pipPlayer!=0) ^ pipon;
+    bool clear = (!pipPlayers.empty()) ^ pipon;
     int new_revision = osdbuf_revision;
     if (surface)
     {
@@ -823,9 +830,9 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
         drawanyway = true;
     }
 
-    if (pipPlayer)
+    if (!pipPlayers.empty())
     {
-        ShowPip(&tmpframe, pipPlayer);
+        ShowPIPs(&tmpframe, pipPlayers);
         osdbuf_revision = 0xfffffff; // make sure OSD is redrawn
         lastcleared = false;
         drawanyway  = true;
@@ -844,8 +851,8 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
         {
             bzero(tmpframe.buf, video_dim.height() * stride);
             // redraw PiP...
-            if (pipPlayer)
-                ShowPip(&tmpframe, pipPlayer);
+            if (!pipPlayers.empty())
+                ShowPIPs(&tmpframe, pipPlayers);
         }
         drawanyway  |= !lastcleared || pipon;
         lastcleared &= !pipon;
@@ -853,7 +860,7 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
 
     // Set these so we know if/how to clear if need be, the next time around.
     osdon = (ret >= 0);
-    pipon = (bool) pipPlayer;
+    pipon = (bool) !pipPlayers.empty();
 
     // If there is an OSD, make sure we draw OSD surface
     lastcleared &= !osdon;

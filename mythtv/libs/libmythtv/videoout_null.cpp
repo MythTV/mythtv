@@ -79,7 +79,7 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
 
     QMutexLocker locker(&global_lock);
 
-    bool res_changed = input_size != video_disp_dim;
+    bool res_changed = input_size != windows[0].GetVideoDispDim();
 
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
 
@@ -94,6 +94,8 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
     vbuffers.DeleteBuffers();
 
     MoveResize();
+
+    const QSize video_dim = windows[0].GetVideoDim();
 
     if (!vbuffers.CreateBuffers(video_dim.width(), video_dim.height()))
     {
@@ -130,6 +132,8 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
                   kPrebufferFramesNormal, kPrebufferFramesSmall, 
                   kKeepPrebuffer);
 
+    const QSize video_dim = windows[0].GetVideoDim();
+
     if (!vbuffers.CreateBuffers(video_dim.width(), video_dim.height()))
         return false;
 
@@ -143,17 +147,17 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
     return true;
 }
 
-void VideoOutputNull::EmbedInWidget(WId wid, int x, int y, int w, int h)
+void VideoOutputNull::EmbedInWidget(int x, int y, int w, int h)
 {
     QMutexLocker locker(&global_lock);
-    if (!embedding)
-        VideoOutput::EmbedInWidget(wid, x, y, w, h);
+    if (!windows[0].IsEmbedding())
+        VideoOutput::EmbedInWidget(x, y, w, h);
 }
  
 void VideoOutputNull::StopEmbedding(void)
 {
     QMutexLocker locker(&global_lock);
-    if (embedding)
+    if (windows[0].IsEmbedding())
         VideoOutput::StopEmbedding();
 }
 
@@ -213,10 +217,10 @@ void VideoOutputNull::UpdatePauseFrame(void)
 
 void VideoOutputNull::ProcessFrame(VideoFrame *frame, OSD *osd,
                                    FilterChain *filterList,
-                                   NuppelVideoPlayer *pipPlayer)
+                                   const PIPMap &pipPlayers)
 {
     (void)frame;
     (void)osd;
     (void)filterList;
-    (void)pipPlayer;
+    (void)pipPlayers;
 }

@@ -32,7 +32,7 @@ class MPUBLIC RemoteEncoder
     long long GetFreeDiskSpace();
     long long GetMaxBitrate();
     long long GetKeyframePosition(long long desired);
-    void FillPositionMap(int start, int end,
+    void FillPositionMap(long long start, long long end,
                          QMap<long long, long long> &positionMap);
     void StopPlaying(void);
     void SpawnLiveTV(QString chainid, bool pip, QString startchan);

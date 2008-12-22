@@ -18,7 +18,7 @@ class VideoOutputDirectfb: public VideoOutput
 
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
-                      NuppelVideoPlayer *pipPlayer);
+                      const PIPMap &pipPlayers);
     void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void Show(FrameScanType);
 

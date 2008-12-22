@@ -104,29 +104,17 @@ class PlaybackBox : public MythDialog
         ForceDeleteRecording,
     } deletePopupType;
 
-    typedef enum 
-    {
-        kStarting,
-        kPlaying,
-        kKilling,
-        kKilled,
-        kStopping,
-        kStopped,
-        kChanging,
-    } playerStateType;
-
     typedef enum
     {
         kNvpToPlay,
         kNvpToStop,
         kDone
     } killStateType;
-     
 
     PlaybackBox(BoxType ltype, MythMainWindow *parent, const char *name = 0, 
                 TV *player = NULL, bool showTV = false);
    ~PlaybackBox(void);
-   
+
     void customEvent(QEvent *e);
     static ProgramInfo *RunPlaybackBox(void *player, bool);
 
@@ -136,6 +124,7 @@ class PlaybackBox : public MythDialog
 
   protected slots:
     void timeout(void);
+    void refreshVideo(void);
 
     void cursorLeft();
     void cursorRight();
@@ -181,11 +170,12 @@ class PlaybackBox : public MythDialog
 
     void doPlay();
     void doPlayFromBeg();
+    void doPIPPlay(void);
+    void doPBPPlay(void);
     void doPlayListRandom();
 
     void askStop();
     void doStop();
-    void noStop();
 
     void doEditScheduled();
     void doAllowRerecord();
@@ -264,6 +254,8 @@ class PlaybackBox : public MythDialog
     void previewThreadDone(const QString &fn, bool &success);
     void previewReady(const ProgramInfo *pginfo);
 
+    void finishedPreview(void);
+
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
@@ -310,8 +302,9 @@ class PlaybackBox : public MythDialog
     ProgramInfo *findMatchingProg(QString chanid, QString recstartts);
 
     bool killPlayer(void);
-    void killPlayerSafe(void);
     void startPlayer(ProgramInfo *rec);
+    void stopPlayer(void);
+    void doPIPPlay(PIPState state);
 
     bool doRemove(ProgramInfo *, bool forgetHistory, bool forceMetadataDelete);
     void showDeletePopup(ProgramInfo *, deletePopupType);
@@ -468,24 +461,18 @@ class PlaybackBox : public MythDialog
     QPixmap             paintBackgroundPixmap;
 
     // Preview Video Variables ////////////////////////////////////////////////
-    NuppelVideoPlayer  *previewVideoNVP;
-    RingBuffer         *previewVideoRingBuf;
+    PlayerContext      *previewPlayer;
+    /// if this elapses start the preview player
+    QTimer             *previewVideoStartTimer;
+    /// refresh software scaled preview player
     QTimer             *previewVideoRefreshTimer;
-    MythTimer           previewVideoStartTimer;
-    MythTimer           previewVideoPlayingTimer;  
-    int                 previewVideoBrokenRecId;
-    playerStateType     previewVideoState;
-    bool                previewVideoStartTimerOn;
+    /// Stops preview Player after timer expires.
+    QTimer             *previewVideoStopTimer;
+    /// enables preview video feature
     bool                previewVideoEnabled;
-    bool                previewVideoPlaying;
-    bool                previewVideoThreadRunning;
-    pthread_t           previewVideoThread;
-
-    mutable QMutex      previewVideoKillLock;
-    mutable QMutex      previewVideoUnsafeKillLock;
-    killStateType       previewVideoKillState;
-    MythTimer           previewVideoKillTimeout;
-
+    QMutex              previewVideoLock;
+    /// Length of time preview pix is shown before preview Video is started
+    int                 previewTimeout;
     // Preview Pixmap Variables ///////////////////////////////////////////////
     bool                previewPixmapEnabled;
     bool                previewFromBookmark;

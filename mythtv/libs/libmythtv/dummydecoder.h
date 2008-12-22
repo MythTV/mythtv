@@ -14,7 +14,7 @@ extern "C" {
 class DummyDecoder : public DecoderBase
 {
   public:
-    DummyDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo) : 
+    DummyDecoder(NuppelVideoPlayer *parent, const ProgramInfo &pginfo) :
         DecoderBase(parent, pginfo) {}
     virtual ~DummyDecoder() {}
 

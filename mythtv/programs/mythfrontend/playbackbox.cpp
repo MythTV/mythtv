@@ -30,7 +30,6 @@ using namespace std;
 #include "proglist.h"
 #include "tv.h"
 #include "oldsettings.h"
-#include "NuppelVideoPlayer.h"
 
 #include "exitcodes.h"
 #include "mythcontext.h"
@@ -43,6 +42,7 @@ using namespace std;
 #include "previewgenerator.h"
 #include "playgroup.h"
 #include "customedit.h"
+#include "playercontext.h"
 #include "util.h"
 #include "x11colors.h"
 #include "mythuihelper.h"
@@ -312,12 +312,11 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
       // Volatile drawing variables
       paintSkipCount(0),                paintSkipUpdate(false),
       // Preview Video Variables
-      previewVideoNVP(NULL),            previewVideoRingBuf(NULL),
+      previewPlayer(NULL),
+      previewVideoStartTimer(new QTimer(this)),
       previewVideoRefreshTimer(new QTimer(this)),
-      previewVideoBrokenRecId(0),       previewVideoState(kStopped),
-      previewVideoStartTimerOn(false),  previewVideoEnabled(false),
-      previewVideoPlaying(false),       previewVideoThreadRunning(false),
-      previewVideoKillState(kDone),
+      previewVideoStopTimer(new QTimer(this)),
+      previewVideoEnabled(false), previewTimeout(2000),
       // Preview Image Variables
       previewPixmapEnabled(false),      previewPixmap(NULL),
       previewSuspend(false),            previewChanid(""),
@@ -362,8 +361,9 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     if (player)
     {
         m_player = player;
-        if (m_player->getCurrentProgram() && m_player->IsPlaying())
-            recGroup = m_player->getCurrentProgram()->recgroup;
+        QString tmp = m_player->GetRecordingGroup(0);
+        if (!tmp.isEmpty())
+            recGroup = tmp;
     }
     // recording group stuff
     recGroupType.clear();
@@ -387,6 +387,14 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         theme->LoadTheme(xmldata,"playback");
 
     LoadWindow(xmldata);
+
+    if (previewVideoEnabled)
+    {
+        previewPlayer = new PlayerContext();
+        previewPlayer->SetPIPState(kPIPStandAlone);
+        previewPlayer->CreatePIPWindow(blackholeBounds, -1, this);
+        previewPixmapEnabled = true;
+    }
 
     EmbedTVWindow();
 
@@ -426,16 +434,20 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     connected = FillList();
 
     // connect up timers...
-    connect(previewVideoRefreshTimer, SIGNAL(timeout()),
+    connect(previewVideoStartTimer, SIGNAL(timeout()),
             this,                     SLOT(timeout()));
+    connect(previewVideoRefreshTimer, SIGNAL(timeout()),
+            this,                     SLOT(refreshVideo()));
+    connect(previewVideoStopTimer,    SIGNAL(timeout()),
+            this,                     SLOT(finishedPreview()));
     connect(freeSpaceTimer,           SIGNAL(timeout()),
             this,                     SLOT(setUpdateFreeSpace()));
     connect(fillListTimer,            SIGNAL(timeout()),
             this,                     SLOT(listChanged()));
 
     // preview video & preview pixmap init
-    previewVideoRefreshTimer->start(500);
     previewStartts = QDateTime::currentDateTime();
+    previewVideoStartTimer->start(previewTimeout);
 
     // misc setup
     updateBackground();
@@ -457,8 +469,14 @@ PlaybackBox::~PlaybackBox(void)
     gContext->removeListener(this);
     gContext->removeCurrentLocation();
 
-    if (!m_player)
-        killPlayerSafe();
+    killPlayer();
+
+    if (previewVideoStartTimer)
+    {
+        previewVideoStartTimer->disconnect(this);
+        previewVideoStartTimer->deleteLater();
+        previewVideoStartTimer = NULL;
+    }
 
     if (previewVideoRefreshTimer)
     {
@@ -467,6 +485,12 @@ PlaybackBox::~PlaybackBox(void)
         previewVideoRefreshTimer = NULL;
     }
 
+    if (previewVideoStopTimer)
+    {
+        previewVideoStopTimer->disconnect(this);
+        previewVideoStopTimer->deleteLater();
+        previewVideoStopTimer = NULL;
+    }
     if (fillListTimer)
     {
         fillListTimer->disconnect(this);
@@ -540,33 +564,6 @@ DialogCode PlaybackBox::exec(void)
     }
 
     return MythDialog::exec();
-}
-
-/* blocks until playing has stopped */
-void PlaybackBox::killPlayerSafe(void)
-{
-    QMutexLocker locker(&previewVideoKillLock);
-
-    // Don't process any keys while we are trying to make the nvp stop.
-    // Qt's setEnabled(false) doesn't work, because of LIRC events...
-    ignoreKeyPressEvents = true;
-
-    while (previewVideoState != kKilled && previewVideoState != kStopped &&
-           previewVideoThreadRunning)
-    {
-        // Make sure state changes can still occur
-        killPlayer();
-
-        /* ensure that key events don't mess up our previewVideoStates */
-        previewVideoState = (previewVideoState == kKilled) ?
-            kKilled :  kKilling;
-
-        qApp->processEvents();
-        usleep(500);
-    }
-    previewVideoState = kStopped;
-
-    ignoreKeyPressEvents = false;
 }
 
 void PlaybackBox::LoadWindow(QDomElement &element)
@@ -673,16 +670,16 @@ void PlaybackBox::parsePopup(QDomElement &element)
 
 void PlaybackBox::exitWin()
 {
+    killPlayer();
+    
+    accept();
+
     if (m_player)
     {
         if (curitem)
             delete curitem;
         curitem = NULL;
     }
-    else
-        killPlayerSafe();
-
-    accept();
 }
 
 void PlaybackBox::updateBackground(void)
@@ -797,7 +794,6 @@ void PlaybackBox::updateCurGroup(QPainter *p)
             tmp.end();
             p->drawPixmap(pr.topLeft(), pix);
         }
-
     }
 }
 
@@ -865,9 +861,6 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
     QMap<QString, QString> infoMap;
     QPainter tmp(&pix);
 
-    if (previewVideoPlaying)
-        previewVideoState = kChanging;
-
     LayerSet *container = NULL;
     if (type != Delete)
         container = theme->GetSet("program_info_play");
@@ -879,8 +872,7 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
         if (curitem)
             curitem->ToMap(infoMap);
 
-        if ((previewVideoEnabled == 0) &&
-            (previewPixmapEnabled == 0))
+        if (previewPixmapEnabled)
             container->UseAlternateArea(true);
 
         container->ClearAllText();
@@ -999,8 +991,6 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
 
-    previewVideoStartTimer.start();
-    previewVideoStartTimerOn = true;
 }
 
 void PlaybackBox::updateInfo(QPainter *p)
@@ -1060,23 +1050,13 @@ void PlaybackBox::updateVideo(QPainter *p)
 
 void PlaybackBox::drawVideo(QPainter *p)
 {
-
-    if (playbackVideoContainer)
-    {
-        m_player->DrawUnusedRects(false);
-        return;
-    }
     // If we're displaying group info don't update the video.
     if (inTitle && haveGroupInfoSet)
         return;
 
     /* show a still frame if the user doesn't want a video preview or nvp
      * hasn't started playing the video preview yet */
-    if (curitem && !playingSomething &&
-        (!previewVideoEnabled             ||
-         !previewVideoPlaying             ||
-         (previewVideoState == kStarting) ||
-         (previewVideoState == kChanging)))
+    if ((curitem) && (previewPixmapEnabled))
     {
         QPixmap temp = getPixmap(curitem);
         if (temp.width() > 0)
@@ -1102,145 +1082,21 @@ void PlaybackBox::drawVideo(QPainter *p)
         }
     }
 
-    /* keep calling killPlayer() to handle nvp cleanup */
-    /* until killPlayer() is done */
-    if (previewVideoKillState != kDone && !killPlayer())
-        return;
-
-    /* if we aren't supposed to have a preview playing then always go */
-    /* to the stopping previewVideoState */
-    if (!previewVideoEnabled &&
-        (previewVideoState != kKilling) && (previewVideoState != kKilled))
+    if (previewPlayer && curitem)
     {
-        previewVideoState = kStopping;
-    }
-
-    /* if we have no nvp and aren't playing yet */
-    /* if we have an item we should start playing */
-    if (!previewVideoNVP   && previewVideoEnabled  &&
-        curitem            && !previewVideoPlaying &&
-        (previewVideoState != kKilling) &&
-        (previewVideoState != kKilled)  &&
-        (previewVideoState != kStarting))
-    {
-        ProgramInfo *rec = curitem;
-
-        if (fileExists(rec) == false)
+        if (previewPlayer->nvp && previewPlayer->playingInfo)
         {
-            VERBOSE(VB_IMPORTANT, QString("Error: File '%1' missing.")
-                    .arg(rec->pathname));
-
-            previewVideoState = kStopping;
-
-            ProgramInfo *tmpItem = findMatchingProg(rec);
-            if (tmpItem)
-                tmpItem->availableStatus = asFileNotFound;
-
-            return;
-        }
-        previewVideoState = kStarting;
-    }
-
-    if (previewVideoState == kChanging)
-    {
-        if (previewVideoNVP)
-        {
-            killPlayer(); /* start killing the player */
-            return;
-        }
-
-        previewVideoState = kStarting;
-    }
-
-    if ((previewVideoState == kStarting) &&
-        (!previewVideoStartTimerOn ||
-         (previewVideoStartTimer.elapsed() > 500)))
-    {
-        previewVideoStartTimerOn = false;
-
-        if (!previewVideoNVP)
-            startPlayer(curitem);
-
-        if (previewVideoNVP)
-        {
-            if (previewVideoNVP->IsPlaying())
+            if (previewPlayer->playingInfo->IsSameProgram(*curitem))
             {
-                previewVideoState = kPlaying;
+                QMutexLocker locker(&previewVideoLock);
+                previewPlayer->nvp->ExposeEvent();
+                if (previewPlayer->nvp->UsingNullVideo())
+                    previewPlayer->DrawARGBFrame(p);
             }
-        }
-        else
-        {
-            // already dead, so clean up
-            killPlayer();
-            return;
-        }
-    }
-
-    if ((previewVideoState == kStopping) || (previewVideoState == kKilling))
-    {
-        if (previewVideoNVP)
-        {
-            killPlayer(); /* start killing the player and exit */
-            return;
-        }
-
-        if (previewVideoState == kKilling)
-            previewVideoState = kKilled;
-        else
-            previewVideoState = kStopped;
-    }
-
-    /* if we are playing and nvp is running, then grab a new video frame */
-    if ((previewVideoState == kPlaying) && previewVideoNVP->IsPlaying() &&
-        !playingSomething)
-    {
-        QSize size = blackholeBounds.size();
-
-        float saspect = (float)size.width() / (float)size.height();
-        float vaspect = previewVideoNVP->GetVideoAspect();
-
-        // Calculate new height or width according to relative aspect ratio
-        if ((int)((saspect + 0.05) * 10) > (int)((vaspect + 0.05) * 10))
-        {
-            size.setWidth((int) ceil(size.width() * (vaspect / saspect)));
-        }
-        else if ((int)((saspect + 0.05) * 10) < (int)((vaspect + 0.05) * 10))
-        {
-            size.setHeight((int) ceil(size.height() * (saspect / vaspect)));
-        }
-
-        size.setHeight(((size.height() + 7) / 8) * 8);
-        size.setWidth( ((size.width()  + 7) / 8) * 8);
-        const QImage &img = previewVideoNVP->GetARGBFrame(size);
-
-        int video_y = 0;
-        int video_x = 0;
-
-        // Centre video in the y axis
-        if (img.height() < blackholeBounds.height())
-            video_y = blackholeBounds.y() + 
-                            (blackholeBounds.height() - img.height()) / 2;
-        else
-            video_y = blackholeBounds.y();
-
-        // Centre video in the x axis
-        if (img.width() < blackholeBounds.width())
-            video_x = blackholeBounds.x() + 
-                            (blackholeBounds.width() - img.width()) / 2;
-        else
-            video_x = blackholeBounds.x();
-
-        p->drawImage(video_x, video_y, img);
-    }
-
-    /* have we timed out waiting for nvp to start? */
-    if ((previewVideoState == kPlaying) && !previewVideoNVP->IsPlaying())
-    {
-        if (previewVideoPlayingTimer.elapsed() > 2000)
-        {
-            previewVideoState = kStarting;
-            killPlayer();
-            return;
+            else
+            {
+                stopPlayer();
+            }
         }
     }
 }
@@ -1539,7 +1395,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                 if (((tempInfo->recstatus != rsRecording) &&
                      (tempInfo->availableStatus != asAvailable) &&
                      (tempInfo->availableStatus != asNotYetAvailable)) ||
-                    (m_player && m_player->IsSameProgram(tempInfo)))
+                    (m_player && m_player->IsSameProgram(0, tempInfo)))
                     ltype->EnableForcedFont(cnt, "inactive");
             }
         }
@@ -1596,7 +1452,7 @@ void PlaybackBox::cursorLeft()
     if (!inTitle)
     {
         if (haveGroupInfoSet)
-            killPlayerSafe();
+            killPlayer();
 
         inTitle = true;
         paintSkipUpdate = false;
@@ -1654,6 +1510,12 @@ void PlaybackBox::cursorDown(bool page, bool newview)
             update(blackholeBounds);
         }
     }
+
+    if (previewPlayer)
+    {
+        previewVideoStartTimer->start(previewTimeout);
+        previewPixmapEnabled = true;
+    }
 }
 
 void PlaybackBox::cursorUp(bool page, bool newview)
@@ -1685,6 +1547,12 @@ void PlaybackBox::cursorUp(bool page, bool newview)
             update(drawInfoBounds);
             update(blackholeBounds);
         }
+    }
+
+    if (previewPlayer)
+    {
+        previewVideoStartTimer->start(previewTimeout);
+        previewPixmapEnabled = true;
     }
 }
 
@@ -2339,128 +2207,92 @@ bool PlaybackBox::FillList(bool useCachedData)
     return (progCache != NULL);
 }
 
-static void *SpawnPreviewVideoThread(void *param)
-{
-    NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)param;
-    nvp->StartPlaying();
-    return NULL;
-}
-
 bool PlaybackBox::killPlayer(void)
 {
-    QMutexLocker locker(&previewVideoUnsafeKillLock);
-
-    previewVideoPlaying = false;
-
-    /* if we don't have nvp to deal with then we are done */
-    if (!previewVideoNVP)
+    if (previewPlayer)
     {
-        previewVideoKillState = kDone;
+        stopPlayer();
+        delete previewPlayer;
+        previewPlayer = NULL;
         return true;
     }
 
-    if (previewVideoKillState == kDone)
-    {
-        previewVideoKillState = kNvpToPlay;
-        previewVideoKillTimeout.start();
-    }
-
-    if (previewVideoKillState == kNvpToPlay)
-    {
-        if (previewVideoNVP->IsPlaying() ||
-            (previewVideoKillTimeout.elapsed() > 2000))
-        {
-            previewVideoKillState = kNvpToStop;
-
-            previewVideoRingBuf->Pause();
-            previewVideoNVP->StopPlaying();
-        }
-        else /* return false status since we aren't done yet */
-            return false;
-    }
-
-    if (previewVideoKillState == kNvpToStop)
-    {
-        if (!previewVideoNVP->IsPlaying() ||
-            (previewVideoKillTimeout.elapsed() > 2000))
-        {
-            pthread_join(previewVideoThread, NULL);
-            previewVideoThreadRunning = false;
-            delete previewVideoNVP;
-            delete previewVideoRingBuf;
-
-            previewVideoNVP = NULL;
-            previewVideoRingBuf = NULL;
-            previewVideoKillState = kDone;
-        }
-        else /* return false status since we aren't done yet */
-            return false;
-    }
-
-    return true;
+    return false;
 }
 
 void PlaybackBox::startPlayer(ProgramInfo *rec)
 {
-    previewVideoPlaying = true;
-
-    if (rec != NULL)
+    ignoreKeyPressEvents = true;
+    previewVideoStartTimer->stop();
+    QMutexLocker locker(&previewVideoLock);
+    if (rec && previewPlayer)
     {
-        // Don't keep trying to open broken files when just sitting on entry
-        if (previewVideoBrokenRecId &&
-            previewVideoBrokenRecId == rec->recordid)
+        bool useHWAccel = gContext->GetNumSetting("HWAccelPlaybackPreview", 0);
+        previewPlayer->SetNullVideo(true);
+        rec->setIgnoreBookmark(true);
+        previewPlayer->SetPlayingInfo(rec);
+        QString playbackURL = previewPlayer->playingInfo->GetPlaybackURL();
+        previewPlayer->SetRingBuffer(
+                new RingBuffer(playbackURL, false, false, 0));
+        bool ok = false;
+        if (previewPlayer->buffer->IsOpen())
         {
-            return;
+            ok = previewPlayer->StartPIPPlayer(
+                            NULL, kState_WatchingPreRecorded);
+            if (ok)
+            {
+                previewPlayer->ResizePIPWindow(blackholeBounds);
+                if (useHWAccel)
+                {
+                    previewPlayer->nvp->StopPlaying();
+                    previewPlayer->SetNVP(NULL);
+                    previewPlayer->SetRingBuffer(NULL);
+                    previewPlayer->SetNullVideo(false);
+                    previewPlayer->SetRingBuffer(
+                            new RingBuffer(playbackURL, false, false, 0));
+                    ok = previewPlayer->buffer->IsOpen();
+                    if (ok)
+                    {
+                        previewPlayer->ResizePIPWindow(blackholeBounds);
+                        ok = previewPlayer->StartPIPPlayer(NULL, 
+                                        kState_WatchingPreRecorded);
+                    }
+                }
+            }
         }
-
-        if (previewVideoRingBuf || previewVideoNVP)
+        if (ok)
         {
-            VERBOSE(VB_IMPORTANT,
-                    "PlaybackBox::startPlayer(): Error, last preview window "
-                    "didn't clean up. Not starting a new preview.");
-            return;
+            previewVideoRefreshTimer->start(66);
+            previewVideoStopTimer->start(60000); // run preview for 1 min
+            previewPixmapEnabled = false;
         }
-
-        previewVideoRingBuf = new RingBuffer(rec->pathname, false, false, 1);
-        if (!previewVideoRingBuf->IsOpen())
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Could not open file for preview video.");
-            delete previewVideoRingBuf;
-            previewVideoRingBuf = NULL;
-            previewVideoBrokenRecId = rec->recordid;
-            return;
-        }
-        previewVideoBrokenRecId = 0;
-
-        previewVideoNVP = new NuppelVideoPlayer("preview player");
-        previewVideoNVP->SetRingBuffer(previewVideoRingBuf);
-        previewVideoNVP->SetAsPIP();
-        QString filters = "";
-        previewVideoNVP->SetVideoFilters(filters);
-
-        previewVideoThreadRunning = true;
-        pthread_create(&previewVideoThread, NULL,
-                       SpawnPreviewVideoThread, previewVideoNVP);
-
-        previewVideoPlayingTimer.start();
-
-        previewVideoState = kStarting;
-
-        int previewRate = 30;
-        if (gContext->GetNumSetting("PlaybackPreviewLowCPU", 0))
-        {
-            previewRate = 12;
-        }
-
-        previewVideoRefreshTimer->start(1000 / previewRate);
     }
+
+    ignoreKeyPressEvents = false;
+}
+
+void PlaybackBox::stopPlayer(void)
+{
+    ignoreKeyPressEvents = true;
+    QMutexLocker locker(&previewVideoLock);
+    previewVideoRefreshTimer->stop();
+    if (previewPlayer && previewPlayer->nvp)
+    {
+        previewPlayer->nvp->StopPlaying();
+        previewPlayer->SetNVP(NULL);
+        previewPlayer->SetPlayingInfo(NULL);
+        previewPixmapEnabled = true;
+        if (curitem)
+        {
+            curitem->programflags = curitem->getProgramFlags();
+            curitem->setIgnoreBookmark(false);
+        }
+    }
+    ignoreKeyPressEvents = false;
 }
 
 void PlaybackBox::playSelectedPlaylist(bool random)
 {
-    previewVideoState = kStopping;
-
     if (!curitem)
         return;
 
@@ -2491,12 +2323,10 @@ void PlaybackBox::playSelectedPlaylist(bool random)
 
 void PlaybackBox::playSelected()
 {
-    previewVideoState = kStopping;
-
     if (!curitem)
         return;
 
-    if (m_player && m_player->IsSameProgram(curitem))
+    if (m_player && m_player->IsSameProgram(0, curitem))
     {
         exitWin();
         return;
@@ -2509,15 +2339,11 @@ void PlaybackBox::playSelected()
         showAvailablePopup(curitem);
 
     if (m_player)
-    {
         accept();
-    }
 }
 
 void PlaybackBox::stopSelected()
 {
-    previewVideoState = kStopping;
-
     if (!curitem)
         return;
 
@@ -2526,8 +2352,6 @@ void PlaybackBox::stopSelected()
 
 void PlaybackBox::deleteSelected()
 {
-    previewVideoState = kStopping;
-
     if (!curitem)
         return;
 
@@ -2545,8 +2369,6 @@ void PlaybackBox::deleteSelected()
 
 void PlaybackBox::upcoming()
 {
-    previewVideoState = kStopping;
-
     if (!curitem)
         return;
 
@@ -2564,8 +2386,6 @@ void PlaybackBox::upcoming()
 
 void PlaybackBox::customEdit()
 {
-    previewVideoState = kStopping;
-
     if (!curitem)
         return;
 
@@ -2587,8 +2407,6 @@ void PlaybackBox::customEdit()
 
 void PlaybackBox::details()
 {
-    previewVideoState = kStopping;
-
     if (!curitem)
         return;
 
@@ -2600,8 +2418,6 @@ void PlaybackBox::details()
 
 void PlaybackBox::selected()
 {
-    previewVideoState = kStopping;
-
     if (inTitle && haveGroupInfoSet)
     {
         cursorRight();
@@ -2620,8 +2436,6 @@ void PlaybackBox::selected()
 
 void PlaybackBox::showMenu()
 {
-    killPlayerSafe();
-
     popup = new MythPopupBox(gContext->GetMainWindow(), drawPopupSolid,
                              drawPopupFgColor, drawPopupBgColor,
                              drawPopupSelColor, "menu popup");
@@ -2750,20 +2564,22 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
     ProgramInfo *tvrec = new ProgramInfo(*rec);
 
     setEnabled(false);
-    previewVideoState = kKilling; // stop preview playback and don't restart it
     playingSomething = true;
+
+    if (previewPlayer && previewPlayer->nvp)
+        stopPlayer();
 
     playCompleted = TV::StartTV(tvrec, false, inPlaylist, underNetworkControl);
 
     playingSomething = false;
     setEnabled(true);
 
-
-    previewVideoState = kStarting; // restart playback preview
-
     delete tvrec;
 
     connected = FillList();
+
+    if (previewPlayer && !previewPlayer->nvp)
+        previewVideoStartTimer->start(previewTimeout);
 
     return playCompleted;
 }
@@ -2776,9 +2592,6 @@ void PlaybackBox::stop(ProgramInfo *rec)
 bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
                            bool forceMetadataDelete)
 {
-    previewVideoBrokenRecId = rec->recordid;
-    killPlayerSafe();
-
     if (playList.filter(rec->MakeUniqueKey()).count())
         togglePlayListItem(rec);
 
@@ -2790,8 +2603,6 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
 
 void PlaybackBox::remove(ProgramInfo *toDel)
 {
-    previewVideoState = kStopping;
-
     if (delitem)
         delete delitem;
 
@@ -2801,8 +2612,6 @@ void PlaybackBox::remove(ProgramInfo *toDel)
 
 void PlaybackBox::showActions(ProgramInfo *toExp)
 {
-    killPlayer();
-
     if (delitem)
         delete delitem;
 
@@ -2890,7 +2699,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
              break;
         case StopRecording:
              tmpmessage = tr("No, continue recording it");
-             tmpslot = SLOT(noStop());
+             tmpslot = SLOT(doCancel());
              break;
     }
     QAbstractButton *noButton = popup->addButton(tmpmessage, this, tmpslot);
@@ -3393,7 +3202,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 
     QAbstractButton *playButton = NULL;
 
-    if (!(m_player && m_player->IsSameProgram(curitem)))
+    if (!(m_player && m_player->IsSameProgram(0, curitem)))
     {
         if (curitem->programflags & FL_BOOKMARK)
             playButton = popup->addButton(tr("Play from..."), this,
@@ -3402,7 +3211,20 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
             playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
     }
 
-    if (!m_player)
+    TVState m_tvstate = kState_None;
+    if (m_player)
+    {
+        if (!m_player->IsSameProgram(0, curitem) && m_player->IsPIPSupported())
+        {
+            popup->addButton(tr("Start As PIP"), this,
+                             SLOT(doPIPPlay()));
+            popup->addButton(tr("Start As PBP"), this,
+                             SLOT(doPBPPlay()));
+        }
+
+        m_tvstate = m_player->GetState(0);
+    }
+    else
     {
         if (playList.filter(curitem->MakeUniqueKey()).count())
             popup->addButton(tr("Remove from Playlist"), this,
@@ -3412,15 +3234,11 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
                             SLOT(togglePlayListItem()));
     }
 
-    TVState m_tvstate = kState_None;
-    if (m_player)
-        m_tvstate = m_player->GetState();
-
     if (program->recstatus == rsRecording &&
         (!(m_player &&
             (m_tvstate == kState_WatchingLiveTV ||
             m_tvstate == kState_WatchingRecording) &&
-            m_player->IsSameProgram(curitem))))
+            m_player->IsSameProgram(0, curitem))))
     {
         popup->addButton(tr("Stop Recording"), this, SLOT(askStop()));
     }
@@ -3436,7 +3254,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     popup->addButton(tr("Recording Options"), this, SLOT(showRecordingPopup()));
     popup->addButton(tr("Job Options"), this, SLOT(showJobPopup()));
 
-    if (!(m_player && m_player->IsSameProgram(curitem)))
+    if (!(m_player && m_player->IsSameProgram(0, curitem)))
     {
         if (curitem->recgroup == "Deleted")
         {
@@ -3454,7 +3272,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 
     popup->ShowPopup(this, SLOT(PopupDone(int)));
 
-    if (!m_player || !m_player->IsSameProgram(curitem))
+    if (!m_player || !m_player->IsSameProgram(0, curitem))
     {
         if (playButton)
             playButton->setFocus();
@@ -3494,8 +3312,6 @@ void PlaybackBox::showFileNotFoundActionPopup(ProgramInfo *program)
 void PlaybackBox::initPopup(MythPopupBox *popup, ProgramInfo *program,
                             QString message, QString message2)
 {
-    killPlayerSafe();
-
     QDateTime recstartts = program->recstartts;
     QDateTime recendts = program->recendts;
 
@@ -3567,6 +3383,32 @@ void PlaybackBox::doPlayFromBeg(void)
     doPlay();
 }
 
+void PlaybackBox::doPIPPlay(void)
+{
+    doPIPPlay(kPIPonTV);
+}
+
+void PlaybackBox::doPBPPlay(void)
+{
+    doPIPPlay(kPBPLeft);
+}
+
+void PlaybackBox::doPIPPlay(PIPState state)
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+
+    if (m_player)
+    {
+        accept();
+        m_player->SetNextProgPIPState(state);
+        if (curitem)
+            curitem->setIgnoreBookmark(true);
+    }
+}
+
 void PlaybackBox::doPlayList(void)
 {
     if (!expectingPopup)
@@ -3598,18 +3440,6 @@ void PlaybackBox::askStop(void)
     showDeletePopup(delitem, StopRecording);
 }
 
-void PlaybackBox::noStop(void)
-{
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
-
-    previewVideoState = kChanging;
-
-    previewVideoRefreshTimer->start(500);
-}
-
 void PlaybackBox::doStop(void)
 {
     if (!expectingPopup)
@@ -3618,10 +3448,6 @@ void PlaybackBox::doStop(void)
     cancelPopup();
 
     stop(delitem);
-
-    previewVideoState = kChanging;
-
-    previewVideoRefreshTimer->start(500);
 }
 
 void PlaybackBox::showProgramDetails()
@@ -3794,10 +3620,6 @@ void PlaybackBox::noDelete(void)
         return;
 
     cancelPopup();
-
-    previewVideoState = kChanging;
-
-    previewVideoRefreshTimer->start(500);
 }
 
 void PlaybackBox::doPlaylistDelete(void)
@@ -3863,10 +3685,6 @@ void PlaybackBox::doDelete(void)
 
     bool result = doRemove(delitem, false, false);
 
-    previewVideoState = kChanging;
-
-    previewVideoRefreshTimer->start(500);
-
     if (result)
     {
         ProgramInfo *tmpItem = findMatchingProg(delitem);
@@ -3897,10 +3715,6 @@ void PlaybackBox::doForceDelete(void)
     }
 
     doRemove(delitem, true, true);
-
-    previewVideoState = kChanging;
-
-    previewVideoRefreshTimer->start(500);
 }
 
 void PlaybackBox::doDeleteForgetHistory(void)
@@ -3922,10 +3736,6 @@ void PlaybackBox::doDeleteForgetHistory(void)
     }
 
     bool result = doRemove(delitem, true, false);
-
-    previewVideoState = kChanging;
-
-    previewVideoRefreshTimer->start(500);
 
     if (result)
     {
@@ -4002,8 +3812,6 @@ void PlaybackBox::setUnwatched(void)
     delete delitem;
     delitem = NULL;
 
-    previewVideoState = kChanging;
-
     connected = FillList();
     update(drawListBounds);
 }
@@ -4023,8 +3831,6 @@ void PlaybackBox::setWatched(void)
 
     delete delitem;
     delitem = NULL;
-
-    previewVideoState = kChanging;
 
     connected = FillList();
     update(drawListBounds);
@@ -4069,10 +3875,7 @@ void PlaybackBox::togglePreserveEpisode(bool turnOn)
 void PlaybackBox::PopupDone(int r)
 {
     if ((MythDialog::Rejected == r) && expectingPopup)
-    {
         cancelPopup();
-        previewVideoState = kChanging;
-    }
 }
 
 void PlaybackBox::toggleView(ViewMask itemMask, bool setOn)
@@ -4175,8 +3978,57 @@ void PlaybackBox::timeout(void)
     if (titleList.count() <= 1)
         return;
 
-    if (previewVideoEnabled && !playingSomething)
-        update(blackholeBounds);
+    if (previewPlayer)
+    {
+        if (expectingPopup ||
+            !(this == gContext->GetMainWindow()->currentWidget()))
+        {
+            // don't do anything while in another widget
+            // like program details window.
+            return;
+        }
+        else if (!previewPlayer->nvp)
+        {
+            if (previewPixmapEnabled)
+            {
+                previewPixmapEnabled = false;
+                previewVideoStartTimer->start(1);
+                paintSkipUpdate = false;
+                update(blackholeBounds);
+            }
+            else
+            {
+                startPlayer(curitem);
+            }
+        }
+        else
+        {
+            stopPlayer();
+        }
+    }
+}
+
+void PlaybackBox::refreshVideo(void)
+{
+    if (previewPlayer && previewPlayer->nvp)
+    {
+        if (!previewPlayer->nvp->IsPlaying())
+            stopPlayer();
+        else if (previewPlayer->nvp->UsingNullVideo())
+            update(blackholeBounds);
+    }
+}
+
+/**
+ * \brief stops preview playback. return back to pixmap.
+ * do not rerun preview player.
+ * spares your logs from filling up if you leave
+ * mythtv in preview playback mode
+ */
+void PlaybackBox::finishedPreview(void)
+{
+    previewVideoStopTimer->stop();
+    stopPlayer();
 }
 
 void PlaybackBox::processNetworkControlCommands(void)
@@ -4286,6 +4138,8 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
 
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+
+    stopPlayer();
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {
@@ -4984,8 +4838,6 @@ void PlaybackBox::showIconHelp(void)
         return;
     }
 
-    killPlayerSafe();
-
     QFrame *widget = new QFrame();
     QBoxLayout *blah = new QBoxLayout(QBoxLayout::TopToBottom);
     blah->addLayout(grid);
@@ -5006,8 +4858,6 @@ void PlaybackBox::showIconHelp(void)
     iconhelp->hide();
     iconhelp->deleteLater();
 
-    previewVideoState = kChanging;
-
     paintSkipUpdate = false;
     paintSkipCount = 2;
 
@@ -5027,8 +4877,7 @@ void PlaybackBox::initRecGroupPopup(QString title, QString name)
     QLabel *label = recGroupPopup->addLabel(title, MythPopupBox::Large, false);
     label->setAlignment(Qt::AlignCenter);
 
-    killPlayerSafe();
-
+    stopPlayer();
 }
 
 void PlaybackBox::closeRecGroupPopup(bool refreshList)
@@ -5051,8 +4900,6 @@ void PlaybackBox::closeRecGroupPopup(bool refreshList)
 
     paintSkipUpdate = false;
     paintSkipCount = 2;
-
-    previewVideoState = kChanging;
 
     activateWindow();
 
@@ -5881,9 +5728,13 @@ void PlaybackBox::EmbedTVWindow(void)
 {
     if (playbackVideoContainer && m_player)
     {
-        m_player->EmbedOutput(this->winId(), drawVideoBounds.x(),
-                            drawVideoBounds.y(), drawVideoBounds.width(),
-                            drawVideoBounds.height());
+        PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
+        m_player->StartEmbedding(ctx, this->winId(), drawVideoBounds);
+        QRegion r1 = QRegion(drawTotalBounds);
+        QRegion r2 = QRegion(drawVideoBounds);
+        this->setMask(r1.xored(r2));
+        m_player->DrawUnusedRects(false, ctx);
+        m_player->ReturnPlayerLock(ctx);
     }
 }
 

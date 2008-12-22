@@ -36,6 +36,8 @@ using namespace std;
 #include "channelutil.h"
 #include "cardutil.h"
 
+QWaitCondition epgIsVisibleCond;
+
 #define LOC      QString("GuideGrid: ")
 #define LOC_ERR  QString("GuideGrid, Error: ")
 #define LOC_WARN QString("GuideGrid, Warning: ")
@@ -67,7 +69,6 @@ void JumpToChannel::deleteLater(void)
     if (timer)
     {
         timer->stop();
-        timer->deleteLater();
         timer = NULL;
     }
 
@@ -179,9 +180,10 @@ DBChanList GuideGrid::Run(
     if (thread)
     {
         //qApp->unlock();
-
-        while (gg->isVisible())
-            usleep(50);
+        QMutex glock;
+        glock.lock();
+        epgIsVisibleCond.wait(&glock);
+        glock.unlock();
     }
     else
         gg->exec();
@@ -214,17 +216,21 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
                      TV *player, bool allowsecondaryepg,
                      const char *name) :
     MythDialog(parent, name),
+    m_player(player),
+    using_null_video(false),
+    previewVideoRefreshTimer(new QTimer(this)),
     jumpToChannelLock(QMutex::Recursive),
     jumpToChannel(NULL),
     jumpToChannelEnabled(true),
     jumpToChannelHasRect(false)
 {
+    connect(previewVideoRefreshTimer, SIGNAL(timeout()),
+            this,                     SLOT(refreshVideo()));
+
     desiredDisplayChans = DISPLAY_CHANS = 6;
     DISPLAY_TIMES = 30;
     int maxchannel = 0;
     m_currentStartChannel = 0;
-
-    m_player = player;
 
     m_context = 0;
 
@@ -251,8 +257,13 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
 
     LoadWindow(xmldata);
 
-    if (m_player && m_player->IsRunning() && !allowsecondaryepg)
-        videoRect = QRect(0, 0, 1, 1);
+    if (m_player && m_player->IsRunning())
+    {
+        if (!allowsecondaryepg)
+            videoRect = QRect(0, 0, 1, 1);
+        else
+            EmbedTVWindow();
+    }
 
     showFavorites = gContext->GetNumSetting("EPGShowFavorites", 0);
     gridfilltype = gContext->GetNumSetting("EPGFillType", UIGuideType::Alpha);
@@ -393,11 +404,6 @@ GuideGrid::GuideGrid(MythMainWindow *parent,
     connect(timeCheck, SIGNAL(timeout()), SLOT(timeCheckTimeout()) );
     timeCheck->start(200);
 
-    videoRepaintTimer = new QTimer(this);
-    QObject::connect(videoRepaintTimer, SIGNAL(timeout()),
-                     this,              SLOT(repaintVideoTimeout()));
-    videoRepaintTimer->start(1000);
-
     selectState = false;
 
     updateBackground();
@@ -440,14 +446,15 @@ GuideGrid::~GuideGrid()
 
     if (timeCheck)
     {
-        timeCheck->deleteLater();
+        timeCheck->disconnect(this);
         timeCheck = NULL;
     }
 
-    if (videoRepaintTimer)
+
+    if (previewVideoRefreshTimer)
     {
-        videoRepaintTimer->deleteLater();
-        videoRepaintTimer = NULL;
+        previewVideoRefreshTimer->disconnect(this);
+        previewVideoRefreshTimer = NULL;
     }
 
     gContext->SaveSetting("EPGSortReverse", sortReverse ? "1" : "0");
@@ -744,6 +751,8 @@ ProgramList GuideGrid::GetProgramList(uint chanid) const
 uint GuideGrid::GetAlternateChannelIndex(
     uint chan_idx, bool with_same_channum) const
 {
+    PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
+
     uint si = m_channelInfoIdx[chan_idx];
     const PixmapChannel *chinfo = GetChannelInfo(chan_idx, si);
 
@@ -758,7 +767,7 @@ uint GuideGrid::GetAlternateChannelIndex(
         if (with_same_channum != same_channum)
             continue;
 
-        if (!ciinfo || !m_player->IsTunable(ciinfo->chanid, true))
+        if (!ciinfo || !m_player->IsTunable(ctx, ciinfo->chanid, true))
             continue;
 
         if (with_same_channum ||
@@ -769,6 +778,8 @@ uint GuideGrid::GetAlternateChannelIndex(
             break;
         }
     }
+
+    m_player->ReturnPlayerLock(ctx);
 
     return si;
 }
@@ -860,23 +871,9 @@ void GuideGrid::timeCheckTimeout(void)
             type->SetText(curTime);
     }
 
-    if (m_player)
-    {
-        if (m_player->IsRunning() == true && videoRect.width() > 0 &&
-            videoRect.height() > 0)
-            m_player->EmbedOutput(this->winId(), videoRect.x(), videoRect.y(),
-                                  videoRect.width(), videoRect.height());
-    }
-
     fillProgramInfos();
     repaint(programRect);
     repaint(curInfoRect);
-}
-
-void GuideGrid::repaintVideoTimeout(void)
-{
-    videoRepaintTimer->start(1000);
-    update(videoRect);
 }
 
 void GuideGrid::fillChannelInfos(bool gotostartchannel)
@@ -1374,8 +1371,6 @@ void GuideGrid::customEvent(QEvent *e)
 
 void GuideGrid::paintEvent(QPaintEvent *e)
 {
-    //qApp->lock();
-
     QRect r = e->rect();
     QPainter p(this);
 
@@ -1383,7 +1378,6 @@ void GuideGrid::paintEvent(QPaintEvent *e)
     {
         fillProgramInfos();
         update(programRect|curInfoRect|r);
-        //qApp->unlock();
         return;
     }
 
@@ -1405,13 +1399,28 @@ void GuideGrid::paintEvent(QPaintEvent *e)
         (!jumpToChannelHasRect && r.intersects(dateRect)))
         paintJumpToChannel(&p);
 
-    if (r.intersects(videoRect) && m_player)
+    if (r.intersects(videoRect))
+        paintVideo(&p);
+}
+
+void GuideGrid::paintVideo(QPainter *p)
+{
+    if (!m_player)
+        return;
+
+    if (!using_null_video)
     {
-        timeCheck->start((int)(200));
         m_player->DrawUnusedRects(false);
+        return;
     }
 
-    //qApp->unlock();
+    PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    ctx->nvp->ExposeEvent();
+    if (ctx->nvp->UsingNullVideo())
+        ctx->DrawARGBFrame(p);
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+    m_player->ReturnPlayerLock(ctx);
 }
 
 void GuideGrid::paintDate(QPainter *p)
@@ -1559,8 +1568,18 @@ bool GuideGrid::paintChannels(QPainter *p)
 
         chinfo = GetChannelInfo(chanNumber);
 
-        bool unavailable = false;
-        if (m_player && !m_player->IsTunable(chinfo->chanid, true))
+        bool unavailable = false, try_alt = false;
+
+        if (m_player)
+        {
+            const PlayerContext *ctx = m_player->GetPlayerReadLock(
+                -1, __FILE__, __LINE__);
+            if (ctx && chinfo)
+                try_alt = !m_player->IsTunable(ctx, chinfo->chanid, true);
+            m_player->ReturnPlayerLock(ctx);
+        }
+
+        if (try_alt)
         {
             unavailable = true;
 
@@ -2107,36 +2126,28 @@ void GuideGrid::showProgFinder()
     activateWindow();
     setFocus();
 
-    if (m_player && videoRect.height() > 0 && videoRect.width() > 0)
-        m_player->EmbedOutput(this->winId(), videoRect.x(), videoRect.y(), 
-                              videoRect.width(), videoRect.height());
+    EmbedTVWindow();
 }
 
 void GuideGrid::enter()
 {
     if (timeCheck)
-    {
         timeCheck->stop();
-        if (m_player)
-            m_player->StopEmbeddingOutput();
-    }
 
     unsetCursor();
     selectState = 1;
     accept();
+    epgIsVisibleCond.wakeAll();
 }
 
 void GuideGrid::escape()
 {
     if (timeCheck)
-    {
         timeCheck->stop();
-        if (m_player)
-            m_player->StopEmbeddingOutput();
-    }
 
     unsetCursor();
     accept();
+    epgIsVisibleCond.wakeAll();
 }
 
 void GuideGrid::quickRecord()
@@ -2289,21 +2300,30 @@ void GuideGrid::channelUpdate(void)
 
     if (sel.size())
     {
-        m_player->ChangeChannel(sel);
-        videoRepaintTimer->start(200);
+        PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
+        m_player->ChangeChannel(ctx, sel);
+        m_player->ReturnPlayerLock(ctx);
     }
 }
 
 void GuideGrid::volumeUpdate(bool up)
 {
     if (m_player)
-        m_player->ChangeVolume(up);
+    {
+        PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
+        m_player->ChangeVolume(ctx, up);
+        m_player->ReturnPlayerLock(ctx);
+    }
 }
 
 void GuideGrid::toggleMute(void)
 {
     if (m_player)
-        m_player->ToggleMute();
+    {
+        PlayerContext *ctx = m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
+        m_player->ToggleMute(ctx);
+        m_player->ReturnPlayerLock(ctx);
+    }
 }
 
 void GuideGrid::GoTo(int start, int cur_row)
@@ -2318,4 +2338,35 @@ void GuideGrid::SetJumpToChannel(JumpToChannel *ptr)
 {
     QMutexLocker locker(&jumpToChannelLock);
     jumpToChannel = ptr;
+}
+
+void GuideGrid::EmbedTVWindow(void)
+{
+    previewVideoRefreshTimer->stop();
+    if (m_player && m_player->IsRunning() && 
+        videoRect.height() > 1 && videoRect.width() > 1)
+    {
+        PlayerContext *ctx =
+            m_player->GetPlayerReadLock(-1, __FILE__, __LINE__);
+        using_null_video =
+            !m_player->StartEmbedding(ctx, this->winId(), videoRect);
+        if (!using_null_video)
+        {
+            QRegion r1 = QRegion(fullRect);
+            QRegion r2 = QRegion(videoRect);
+            setMask(r1.xored(r2));
+            m_player->DrawUnusedRects(false, ctx);
+        }
+        else
+        {
+            previewVideoRefreshTimer->start(66);
+        }
+        m_player->ReturnPlayerLock(ctx);
+    }
+}
+
+void GuideGrid::refreshVideo(void)
+{
+    if (m_player && m_player->IsRunning() && using_null_video)
+        update(videoRect);
 }

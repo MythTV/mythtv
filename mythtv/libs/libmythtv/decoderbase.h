@@ -57,7 +57,7 @@ typedef vector<StreamInfo> sinfo_vec_t;
 class DecoderBase
 {
   public:
-    DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo);
+    DecoderBase(NuppelVideoPlayer *parent, const ProgramInfo &pginfo);
     virtual ~DecoderBase();
 
     virtual void Reset(void);
@@ -68,10 +68,9 @@ class DecoderBase
 
     void setExactSeeks(bool exact) { exactseeks = exact; }
     void setLiveTVMode(bool live) { livetv = live; }
-    void setRecorder(RemoteEncoder *recorder) { nvr_enc = recorder; }
 
     // Must be done while player is paused.
-    void SetProgramInfo(ProgramInfo *pginfo);
+    void SetProgramInfo(const ProgramInfo &pginfo);
 
     void SetLowBuffers(bool low) { lowbuffers = low; }
     /// Disables AC3/DTS pass through
@@ -168,6 +167,7 @@ class DecoderBase
     void DoFastForwardSeek(long long desiredFrame, bool &needflush);
 
     long long GetLastFrameInPosMap(long long desiredFrame);
+    unsigned long GetPositionMapSize(void) const;
 
     typedef struct posmapentry
     {
@@ -181,7 +181,6 @@ class DecoderBase
     ProgramInfo *m_playbackinfo;
 
     RingBuffer *ringBuffer;
-    RemoteEncoder *nvr_enc;
 
     int current_width;
     int current_height;
@@ -204,6 +203,7 @@ class DecoderBase
     bool posmapStarted;
     MarkTypes positionMapType;
  
+    mutable QMutex m_positionMapLock;
     vector<PosMapEntry> m_positionMap;
     bool dontSyncPositionMap;
 

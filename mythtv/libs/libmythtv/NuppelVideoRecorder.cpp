@@ -2915,18 +2915,6 @@ void NuppelVideoRecorder::doWriteThread(void)
     }
 }
 
-long long NuppelVideoRecorder::GetKeyframePosition(long long desired)
-{
-    QMutexLocker lock(&positionMapLock);
-
-    long long ret = -1;
-
-    if (positionMap.find(desired) != positionMap.end())
-        ret = positionMap[desired];
-
-    return ret;
-}
-
 void NuppelVideoRecorder::SetNextRecording(const ProgramInfo *progInf, 
                                            RingBuffer *rb)
 {

@@ -12,6 +12,8 @@ class MainServer;
 class PlaybackSock;
 class LiveTVChain;
 
+typedef QMap<long long, long long> PosMap;
+
 class EncoderLink
 {
   public:
@@ -72,6 +74,7 @@ class EncoderLink
     long long GetFramesWritten(void);
     long long GetFilePosition(void);
     long long GetKeyframePosition(long long desired);
+    bool GetKeyframePositions(long long start, long long end, PosMap&);
     void SpawnLiveTV(LiveTVChain *chain, bool pip, QString startchan);
     QString GetChainID(void);
     void StopLiveTV(void);

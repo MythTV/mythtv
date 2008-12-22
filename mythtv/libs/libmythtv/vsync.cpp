@@ -40,7 +40,9 @@
 #endif
 
 #ifdef USING_OPENGL_VSYNC
+#include "util.h" // for MythTimer
 #include "util-opengl.h"
+#include "openglcontext.h"
 #endif // USING_OPENGL_VSYNC
 
 #ifdef __linux__
@@ -453,31 +455,16 @@ void nVidiaVideoSync::AdvanceTrigger(void)
 #ifndef _WIN32
 OpenGLVideoSync::OpenGLVideoSync(VideoOutput *video_output,
                                  int frame_interval, int refresh_interval,
-                                 bool interlaced)
-    : VideoSync(video_output, frame_interval, refresh_interval, interlaced),
-      m_drawable(0), m_context(0), m_lock()
+                                 bool interlaced) :
+    VideoSync(video_output, frame_interval, refresh_interval, interlaced),
+    m_context(0)
 {
     VERBOSE(VB_IMPORTANT, "OpenGLVideoSync()");
 }
 
 OpenGLVideoSync::~OpenGLVideoSync()
 {
-    VERBOSE(VB_IMPORTANT, "~OpenGLVideoSync() -- begin");
-#ifdef USING_OPENGL_VSYNC
-    QMutexLocker locker(&m_lock);
-
-    VideoOutputXv *vo = dynamic_cast<VideoOutputXv*>(m_video_output);
-    if (vo && vo->XJ_disp)
-    {
-        VERBOSE(VB_IMPORTANT, "~OpenGLVideoSync() -- middle");
-        Stop();
-        if (m_context)
-            X11S(glXDestroyContext(vo->XJ_disp, m_context));
-        if (m_drawable)
-            X11S(XDestroyWindow(vo->XJ_disp, m_drawable));
-    }
-#endif /* USING_OPENGL_VSYNC */
-    VERBOSE(VB_IMPORTANT, "~OpenGLVideoSync() -- end");
+    VERBOSE(VB_IMPORTANT, "~OpenGLVideoSync() -- closing opengl vsync");
 }
 
 /** \fn OpenGLVideoSync::TryInit(void)
@@ -487,7 +474,6 @@ OpenGLVideoSync::~OpenGLVideoSync()
 bool OpenGLVideoSync::TryInit(void)
 {
 #ifdef USING_OPENGL_VSYNC
-    QMutexLocker locker(&m_lock);
 
     VideoOutputXv *vo =  dynamic_cast<VideoOutputXv*>(m_video_output);
     if (!vo)
@@ -496,104 +482,25 @@ bool OpenGLVideoSync::TryInit(void)
         return false;
     }
 
-    if (!vo->XJ_disp)
+    MythTimer t; t.start();
+    vo->GLContextCreatedWait();
+    if (t.elapsed() > 5)
     {
-        VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: "
-                "VideoOutputXv does not have X Window Display.");
-        return false;
+        VERBOSE(VB_IMPORTANT,
+                QString("OpenGLVideoSync: Waited %1 ms")
+                .arg(t.elapsed()));
     }
 
-    /* Look for GLX at all */
-    uint major, minor;
-    if (!init_opengl() || !get_glx_version(vo->XJ_disp, major, minor))
-    {
-        VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: OpenGL extension not present.");
-        return false;
-    }
+    m_context = vo->GetGLContext();
+    if (m_context)
+        return true;
+    
+    VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: "
+            "Failed to Initialize OpenGL V-Sync");
 
-    /* Look for video sync extension */
-    const char *xt = NULL;
-    X11S(xt = glXQueryExtensionsString(vo->XJ_disp, vo->XJ_screen_num));
-    const QString glx_ext = xt;
-    if (!has_glx_video_sync_support(glx_ext))
-    {
-        VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: GLX Video Sync not available");
-        return false;
-    }
-
-    int attribList[] = {GLX_RGBA, 
-                        GLX_RED_SIZE, 1,
-                        GLX_GREEN_SIZE, 1,
-                        GLX_BLUE_SIZE, 1,
-                        None};
-    XVisualInfo *vis;
-    XSetWindowAttributes swa;
-    Window w;
-
-    X11S(vis = glXChooseVisual(vo->XJ_disp, vo->XJ_screen_num, attribList));
-    if (vis == NULL) 
-    {
-        VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: No appropriate visual found");
-        return false;
-    }
-    X11S(swa.colormap = XCreateColormap(vo->XJ_disp,
-                                        RootWindow(vo->XJ_disp, vis->screen),
-                                        vis->visual, AllocNone));
-    if (swa.colormap == 0)
-    {
-        VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Failed to create colormap");
-        return false;
-    }
-
-    MythMainWindow *mainWindow = gContext->GetMainWindow();
-    uint x = mainWindow->x() + (mainWindow->width()/2);
-    uint y = mainWindow->y() + (mainWindow->height()/2);
-    VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: x,y -> "<<x<<", "<<y);
-    X11S(w = XCreateWindow(vo->XJ_disp, RootWindow(vo->XJ_disp, vis->screen),
-                           x, y, 1 /*width*/, 1 /*height*/,
-                           0 /*border width*/, vis->depth, InputOutput,
-                           vis->visual, CWColormap, &swa));
-    if (w == 0)
-    {
-        VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Failed to create dummy window");
-        return false;
-    }
-    m_drawable = w;
-
-    X11S(m_context = glXCreateContext(vo->XJ_disp, vis, None, GL_TRUE));
-    if (m_context == NULL)
-    {
-        VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Failed to create GLX context");
-        return false;
-    }
-
-    int ret;
-    X11S(ret = glXMakeCurrent(vo->XJ_disp, m_drawable, m_context));
-    if (ret != False)
-    {
-        unsigned int count;
-        X11S(ret = gMythGLXGetVideoSyncSGI(&count));
-        if (ret == 0)
-        {
-            VERBOSE(VB_PLAYBACK, "Using OpenGLVideoSync");
-            return true;
-        }
-        else if (GLX_BAD_CONTEXT == ret)
-            VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Bad Context for VSync");
-        else
-            VERBOSE(VB_PLAYBACK, QString("OpenGLVideoSync: Could not get "
-                                         "VSync support ret=%1").arg(ret));
-        return false;
-    }
-    else
-    {
-        VERBOSE(VB_PLAYBACK,
-                "OpenGLVideoSync: Failed to make GLX context current context");
-        return false;
-    }
-#else
-    return false;
 #endif /* USING_OPENGL_VSYNC */
+    return false;
+
 }
 
 /** \fn checkGLSyncError(const QString&, int)
@@ -635,30 +542,26 @@ bool checkGLSyncError(const QString& hdr, int err)
 void OpenGLVideoSync::Start(void)
 {
 #ifdef USING_OPENGL_VSYNC
-    QMutexLocker locker(&m_lock);
-
     VideoOutputXv *vo = dynamic_cast<VideoOutputXv*>(m_video_output);
-    if (!vo || !vo->XJ_disp)
+    if (!vo || !vo->XJ_disp || !m_context)
         return;
 
     int err;
     // Bind OpenGL context to current thread.
-    X11S(err = glXMakeCurrent(vo->XJ_disp, m_drawable, m_context));
-    if (err != True)
+ 
+    if (!vo->IsEmbedding())
     {
-        VERBOSE(VB_PLAYBACK,
-                "OpenGLVideoSync::Start(): Failed to make GLX context "
-                "current context. A/V Sync will probably fail.");
+        QMutexLocker locker(&m_context_lock);
+        OpenGLContextLocker ctx_lock(m_context);
+
+        // Wait for a refresh so we start out synched
+        unsigned int count;
+        err = gMythGLXGetVideoSyncSGI(&count);
+        checkGLSyncError("OpenGLVideoSync::Start(): Frame Number Query", err);
+        err = gMythGLXWaitVideoSyncSGI(2, (count+1)%2 ,&count);
+        checkGLSyncError("OpenGLVideoSync::Start(): A/V Sync", err);
+
     }
-
-    // Wait for a refresh so we start out synched
-    unsigned int count;
-    X11S(err = gMythGLXGetVideoSyncSGI(&count));
-    checkGLSyncError("OpenGLVideoSync::Start(): Frame Number Query", err);
-    X11S(err = gMythGLXWaitVideoSyncSGI(2, (count+1)%2 ,&count));
-    checkGLSyncError("OpenGLVideoSync::Start(): A/V Sync", err);
-
-    X11S(err = glXMakeCurrent(vo->XJ_disp, None, NULL));
 
     // Initialize next trigger 
     VideoSync::Start();
@@ -669,18 +572,30 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
 {
     (void) sync_delay;
 #ifdef USING_OPENGL_VSYNC
-    QMutexLocker locker(&m_lock);
-
     const QString msg1("First A/V Sync"), msg2("Second A/V Sync");
     OffsetTimeval(m_nexttrigger, sync_delay);
 
     VideoOutputXv *vo = dynamic_cast<VideoOutputXv*>(m_video_output);
 
     int err;
-    X11S(err = glXMakeCurrent(vo->XJ_disp, m_drawable, m_context));
-
+    if (!vo || !vo->XJ_disp)
+        return;
     unsigned int frameNum = 0;
-    X11S(err = gMythGLXGetVideoSyncSGI(&frameNum));
+
+    if (vo->IsEmbedding())
+    {
+        // Offset for externally-provided A/V sync delay
+        OffsetTimeval(m_nexttrigger, sync_delay);
+         
+        m_delay = CalcDelay();
+        if (m_delay > 0)
+            usleep(m_delay);
+        return;
+    }
+    
+    QMutexLocker locker(&m_context_lock);
+    OpenGLContextLocker ctx_lock(m_context);
+    err = gMythGLXGetVideoSyncSGI(&frameNum);
     checkGLSyncError("Frame Number Query", err);
 
     // Always sync to the next retrace execpt when we are very late.
@@ -699,15 +614,13 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
         checkGLSyncError(msg2, err);
         m_delay = CalcDelay();
     }
-
-    X11S(err = glXMakeCurrent(vo->XJ_disp, None, NULL));
+    
 #endif /* USING_OPENGL_VSYNC */
 }
 
 void OpenGLVideoSync::AdvanceTrigger(void)
 {
 #ifdef USING_OPENGL_VSYNC
-    QMutexLocker locker(&m_lock);
 
     KeepPhase();
     UpdateNexttrigger();

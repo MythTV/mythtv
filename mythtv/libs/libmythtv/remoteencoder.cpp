@@ -183,13 +183,22 @@ long long RemoteEncoder::GetFramesWritten(void)
     QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "GET_FRAMES_WRITTEN";
 
-    if (SendReceiveStringList(strlist, 2))
+    if (!SendReceiveStringList(strlist, 2))
     {
-        cachedFramesWritten = decodeLongLong(strlist, 0);
-        return cachedFramesWritten;
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetFramesWritten() -- network error");
+        return -1;
     }
 
-    return -1;
+    if (1 == strlist.size())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("GetFramesWritten() -- server ret: %1")
+                .arg(strlist[0]));
+        return -1;
+    }
+
+    cachedFramesWritten = decodeLongLong(strlist, 0);
+    return cachedFramesWritten;
 }
 
 /** \fn RemoteEncoder::GetFilePosition(void)
@@ -243,7 +252,7 @@ long long RemoteEncoder::GetKeyframePosition(long long desired)
     return -1;
 }
 
-void RemoteEncoder::FillPositionMap(int start, int end,
+void RemoteEncoder::FillPositionMap(long long start, long long end,
                                     QMap<long long, long long> &positionMap)
 {
     QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
@@ -254,17 +263,19 @@ void RemoteEncoder::FillPositionMap(int start, int end,
     if (!SendReceiveStringList(strlist))
         return;
 
-    int listpos = 0;
-    int listsize = strlist.size(); 
-
-    if (listsize < 4)
-        return;
-
-    for(int i = start; listpos < listsize ; i++)
+    QStringList::const_iterator it = strlist.begin();
+    for (; it != strlist.end(); ++it)
     {
-        long long index = decodeLongLong(strlist, listpos);
-        positionMap[index] = decodeLongLong(strlist, listpos+2);
-        listpos += 4;
+        bool ok;
+        long long index = (*it).toLongLong(&ok);
+        if (++it == strlist.end() || !ok)
+            break;
+
+        long long pos = (*it).toLongLong(&ok);
+        if (!ok)
+            break;
+
+        positionMap[index] = pos;
     }
 }
 

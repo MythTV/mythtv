@@ -134,18 +134,6 @@ void DTVRecorder::FinishRecording(void)
 //     positionMapLock.unlock();
 }
 
-// documented in recorderbase.h
-long long DTVRecorder::GetKeyframePosition(long long desired)
-{
-    QMutexLocker locker(&positionMapLock);
-    long long ret = -1;
-
-    if (positionMap.find(desired) != positionMap.end())
-        ret = positionMap[desired];
-
-    return ret;
-}
-
 void DTVRecorder::ResetForNewFile(void)
 {
     VERBOSE(VB_RECORD, LOC + "ResetForNewFile(void)");

@@ -21,7 +21,7 @@ typedef enum FrameType_
     FMT_ARGB32,
     FMT_RGBA32,
     FMT_YUV422P,
-    FMT_ALPHA,
+    FMT_BGRA,
     FMT_VDPAU
 } VideoFrameType;
 

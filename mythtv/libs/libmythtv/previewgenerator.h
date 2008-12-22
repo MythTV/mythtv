@@ -64,7 +64,7 @@ class MPUBLIC PreviewGenerator : public QObject
 
     static void *PreviewRun(void*);
 
-    static char *GetScreenGrab(const ProgramInfo *pginfo,
+    static char *GetScreenGrab(const ProgramInfo &pginfo,
                                const QString     &filename,
                                long long          seektime,
                                bool               time_in_secs,

@@ -140,6 +140,7 @@ void XvMCTextures::DeInit(void)
     glXDestroyContext(XJ_disp, glx_context); glx_context = 0;
     glXDestroyWindow( XJ_disp, glx_window);  glx_window  = 0;
     glXDestroyPbuffer(XJ_disp, glx_pbuffer); glx_pbuffer = 0;
+    XUnmapWindow(     XJ_disp, gl_window); // needed for nVidia drivers
     XDestroyWindow(   XJ_disp, gl_window);   gl_window   = 0;
     gl_vid_textures.clear();
     gl_osd_textures.clear();

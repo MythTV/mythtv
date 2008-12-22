@@ -196,7 +196,7 @@ BLOCK_QUOTE
   echo "  --enable-vdpau           enable NVidia VDPAU hardware acceleration."
   echo "  --xvmc-lib=LIB           XvMC library override (for crosscompiling)"
   #echo "  --disable-xvmc-vld       disable XvMC-VLD (VIA Epia MPEG accel.)"
-  echo "  --enable-opengl-video    enable OpenGL based video display "
+  echo "  --disable-opengl-video   disable OpenGL based video display "
   echo "  --enable-mac-accel       enable Mac OS X MPEG acceleration"
   echo "  --enable-opengl-vsync    enable OpenGL vsync method"
   echo "  --disable-directfb       disable DirectFB (Linux non-X11 video)"
@@ -1333,6 +1333,7 @@ enable lamemp3
 enable lirc
 enable mheg
 enable opengl
+enable opengl_video
 enable v4l
 enable x11
 enable xrandr

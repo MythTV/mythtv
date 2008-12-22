@@ -670,12 +670,11 @@ int main(int argc, char *argv[])
         exitcode = result;
     }
 
-    delete transcode;
-
     if (jobID >= 0)
         CompleteJob(jobID, pginfo, useCutlist, exitcode);
 
-    delete pginfo;
+    transcode->deleteLater();
+
     delete gContext;
     return exitcode;
 }

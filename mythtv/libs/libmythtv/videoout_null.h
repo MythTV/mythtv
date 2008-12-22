@@ -27,7 +27,7 @@ class VideoOutputNull : public VideoOutput
                       void        *codec_private);
     void Zoom(ZoomDirection direction);
 
-    void EmbedInWidget(WId wid, int x, int y, int w, int h);
+    void EmbedInWidget(int x, int y, int w, int h);
     void StopEmbedding(void);
 
     int GetRefreshRate(void);
@@ -37,7 +37,7 @@ class VideoOutputNull : public VideoOutput
     void UpdatePauseFrame(void);
     void ProcessFrame(VideoFrame *frame, OSD *osd,
                       FilterChain *filterList,
-                      NuppelVideoPlayer *pipPlayer);
+                      const PIPMap &pipPlayers);
 
     static QStringList GetAllowedRenderers(MythCodecID myth_codec_id,
                                            const QSize &video_dim);

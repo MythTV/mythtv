@@ -1,3 +1,5 @@
+// -*- Mode: c++ -*-
+
 #ifndef TVPLAY_H
 #define TVPLAY_H
 
@@ -12,6 +14,7 @@
 #include <qregexp.h>
 #include <qwaitcondition.h>
 #include <QThread>
+#include <QReadWriteLock>
 
 #include "mythdeque.h"
 #include "tv.h"
@@ -20,6 +23,7 @@
 #include "programlist.h"
 #include "channelutil.h"
 #include "videoouttypes.h"
+#include "volumebase.h"
 #include "inputinfo.h"
 
 #include <qobject.h>
@@ -37,7 +41,7 @@ class MythDialog;
 class UDPNotify;
 class OSDListTreeType;
 class OSDGenericTree;
-class LiveTVChain;
+class PlayerContext;
 class UDPNotifyOSDSet;
 
 typedef QMap<QString,QString>    InfoMap;
@@ -45,6 +49,36 @@ typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
 typedef ProgramInfo * (*EMBEDRETURNPROGRAM)(void *, bool);
 typedef void (*EMBEDRETURNVOID) (void *, bool);
+
+// Locking order
+//
+// playerLock -> askAllowLock    -> osdLock
+//            -> progListLock    -> osdLock
+//            -> chanEditMapLock -> osdLock
+//            -> lastProgramLock
+//            -> is_tunable_cache_lock
+//            -> recorderPlaybackInfoLock
+//            -> timerIdLock
+//            -> mainLoopCondLock
+//            -> stateChangeCondLock
+//
+// When holding one of these locks, you may lock any lock of  the locks to
+// the right of the current lock, but may not lock any lock to the left of
+// this lock (which will cause a deadlock). Nor should you lock any other
+// lock in the TV class without first adding it to the locking order list
+// above.
+//
+// Note: Taking a middle lock such as askAllowLock, without taking a
+// playerLock first does not violate these rules, but once you are
+// holding it, you can not 
+//
+// It goes without saying that any locks outside of this class should only
+// be taken one at a time, and should be taken last and released first of
+// all the locks required for any algorithm. (Unless you use tryLock and
+// release all locks if it can't gather them all at once, see the
+// "multi_lock()" function as an example; but this is not efficient nor
+// desirable and should be avoided when possible.)
+//
 
 class VBIMode
 {
@@ -64,13 +98,6 @@ class VBIMode
         return (uint) mode;
     }
 };
-
-typedef enum
-{
-    kPseudoNormalLiveTV  = 0,
-    kPseudoChangeChannel = 1,
-    kPseudoRecording     = 2,
-} PseudoState;
 
 enum scheduleEditTypes {
     kScheduleProgramGuide = 0,
@@ -121,6 +148,8 @@ class AskProgramInfo
 class MPUBLIC TV : public QThread
 {
     friend class QTVEventThread;
+    friend class PlaybackBox;
+    friend class GuideGrid;
 
     Q_OBJECT
   public:
@@ -140,65 +169,52 @@ class MPUBLIC TV : public QThread
     bool Init(bool createWindow = true);
 
     // User input processing commands
-    void ProcessKeypress(QKeyEvent *e);
-    void ProcessNetworkControlCommand(const QString &command);
+    void ProcessKeypress(PlayerContext*, QKeyEvent *e);
+    void ProcessNetworkControlCommand(PlayerContext *, const QString &command);
     void customEvent(QEvent *e);
-    bool HandleTrackAction(const QString &action);
+    bool HandleTrackAction(PlayerContext*, const QString &action);
 
     // LiveTV commands
-    int  LiveTV(bool showDialogs = true, bool startInGuide = false);
-    /// This command is used to exit the player in order to record using
-    /// the recording being used by LiveTV.
-    void StopLiveTV(void) { exitPlayer = true; }
-    void AddPreviousChannel(void);
-    void PreviousChannel(void);
+    bool LiveTV(bool showDialogs = true, bool startInGuide = false);
 
     // Embedding commands for the guidegrid to use in LiveTV
-    void EmbedOutput(WId wid, int x, int y, int w, int h);
-    void StopEmbeddingOutput(void);
-    bool IsEmbedding(void);
-    bool IsTunable(uint chanid, bool use_cache = false);
+    bool StartEmbedding(PlayerContext*, WId wid, const QRect&);
+    void StopEmbedding(PlayerContext*);
+    bool IsTunable(const PlayerContext*, uint chanid, bool use_cache = false);
     void ClearTunableCache(void);
-    void ChangeChannel(const DBChanList &options);
+    void ChangeChannel(const PlayerContext*, const DBChanList &options);
 
-    void DrawUnusedRects(bool sync);
-   
+    void DrawUnusedRects(bool sync, PlayerContext *ctx = NULL);
+
     // Recording commands
     int  PlayFromRecorder(int recordernum);
-    int  Playback(ProgramInfo *rcinfo);
+    int  Playback(const ProgramInfo &rcinfo);
+
+    // Commands used by frontend playback box
+    QString GetRecordingGroup(int player_idx) const;
 
     // Various commands
-    void setLastProgram(ProgramInfo *rcinfo); 
-    ProgramInfo *getLastProgram(void) { return lastProgram; }
-    ProgramInfo *getCurrentProgram(void) { return playbackinfo; }
     void setInPlayList(bool setting) { inPlaylist = setting; }
     void setUnderNetworkControl(bool setting) { underNetworkControl = setting; }
-    bool IsSameProgram(ProgramInfo *p);
 
-    void ShowNoRecorderDialog(NoRecorderMsg msgType = kNoRecorders);
-    void FinishRecording(void);
-    void AskAllowRecording(const QStringList&, int, bool, bool);
-    void PromptStopWatchingRecording(void);
-    void PromptDeleteRecording(QString title);
-    bool PromptRecGroupPassword(void);
-    bool BookmarkAllowed(void);
-    bool DeleteAllowed(void);
+    void ShowNoRecorderDialog(const PlayerContext*,
+                              NoRecorderMsg msgType = kNoRecorders);
+    void FinishRecording(int player_idx); ///< Finishes player's recording
+    void AskAllowRecording(PlayerContext*, const QStringList&, int, bool, bool);
+    void PromptStopWatchingRecording(PlayerContext*);
+    void PromptDeleteRecording(PlayerContext*, QString title);
+    bool PromptRecGroupPassword(PlayerContext*);
+
+    bool CreatePBP(PlayerContext *lctx, const ProgramInfo *info);
+    bool CreatePIP(PlayerContext *lctx, const ProgramInfo *info);
+    bool ResizePIPWindow(PlayerContext*);
+
     // Boolean queries
-
-    /// Returns true if we are playing back a non-LiveTV recording.
-    bool IsPlaying(void)         const { return StateIsPlaying(GetState()); }
-    /// Returns true if we are watching a recording not currently in progress.
-    bool IsRecording(void)       const { return StateIsRecording(GetState()); }
-    /// Returns true if the EPG is currently on screen.
-    bool IsMenuRunning(void)     const { return menurunning; }
     /// Returns true if we are currently in the process of switching recorders.
     bool IsSwitchingCards(void)  const { return switchToRec; }
     /// Returns true if the TV event thread is running. Should always be true
     /// between the end of the constructor and the beginning of the destructor.
     bool IsRunning(void)         const { return isRunning(); }
-    /// Returns true if the user told MythTV to stop plaback. If this
-    /// is false when we exit the player, we display an error screen.
-    bool WantsToQuit(void)       const { return wantsToQuit; }
     /// Returns true if the user told MythTV to delete the recording
     /// we were most recently playing.
     bool getRequestDelete(void)  const { return requestDelete; }
@@ -210,21 +226,28 @@ class MPUBLIC TV : public QThread
     /// This is set if the user asked MythTV to jump to the previous
     /// recording in the playlist.
     bool getJumpToProgram(void)  const { return jumpToProgram; }
-    /// This is set if the player encountered some irrecoverable error.
-    bool IsErrored(void)         const { return errored; }
-    /// true if dialog is either videoplayexit, playexit or askdelete dialog
-    bool IsVideoExitDialog(void);
     /// true if NVP is near the end
     bool IsNearEnd(void) const { return isnearend; }
+    /// true iff program is the same as the one in the selected player
+    bool IsSameProgram(int player_idx, const ProgramInfo *p) const;
+    bool IsBookmarkAllowed(const PlayerContext*) const;
+    bool IsDeleteAllowed(const PlayerContext*) const;
+    bool IsPIPSupported(const PlayerContext *ctx = NULL) const;
 
     // Other queries
-    int GetLastRecorderNum(void) const;
-    TVState GetState(void) const;
+    int GetLastRecorderNum(int player_idx) const;
+    TVState GetState(int player_idx) const;
+    TVState GetState(const PlayerContext*) const;
 
     // Non-const queries
-    OSD *GetOSD(void);
+    OSD *GetOSDL(const char *, int);
+    OSD *GetOSDL(const PlayerContext*,const char *, int);
+    void ReturnOSDLock(OSD*&);
+    void ReturnOSDLock(const PlayerContext*,OSD*&);
 
-    void SetCurrentlyPlaying(ProgramInfo *pginfo);
+    bool ActiveHandleAction(PlayerContext*,
+                            const QStringList &actions,
+                            bool isDVD, bool isDVDStillFrame);
 
     void GetNextProgram(RemoteEncoder *enc, int direction,
                         InfoMap &infoMap);
@@ -235,11 +258,11 @@ class MPUBLIC TV : public QThread
                         bool inPlaylist = false, bool initByNetworkCommand = false);
     static void SetFuncPtr(const char *, void *);
 
-    void SetIgnoreKeys(bool ignore) { ignoreKeys = ignore; }
-
     // Used by EPG
-    void ChangeVolume(bool up);
-    void ToggleMute(void);
+    void ChangeVolume(PlayerContext*, bool up);
+    void ToggleMute(PlayerContext*);
+
+    void SetNextProgPIPState(PIPState state) { jumpToProgramPIPState = state; }
 
     // Used for UDPNotify
     bool HasUDPNotifyEvent(void) const;
@@ -250,8 +273,6 @@ class MPUBLIC TV : public QThread
     void timerEvent(QTimerEvent*);
 
   protected slots:
-    void SetPreviousChannel(void);
-    void UnMute(void);
     void TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item);
     void TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item);
 
@@ -259,12 +280,12 @@ class MPUBLIC TV : public QThread
     void ClearUDPNotifyEvents(void);
 
   protected:
-    void doEditSchedule(int editType = kScheduleProgramGuide);
+    void DoEditSchedule(int editType = kScheduleProgramGuide);
 
     virtual void run(void);
     void TVEventThreadChecks(void);
 
-    void SetMuteTimer(int timeout);
+    void SetMuteTimer(PlayerContext*, int timeout);
 
     bool eventFilter(QObject *o, QEvent *e);
     static QStringList lastProgramStringList;
@@ -272,32 +293,77 @@ class MPUBLIC TV : public QThread
     static EMBEDRETURNVOID RunViewScheduledPtr;
 
   private:
-    bool RequestNextRecorder(bool showDialogs);
+    void SetActive(PlayerContext *lctx, int index, bool osd_msg);
+
+    PlayerContext       *GetPlayerWriteLock(
+        int which, const char *file, int location);
+    PlayerContext       *GetPlayerReadLock(
+        int which, const char *file, int location);
+    const PlayerContext *GetPlayerReadLock(
+        int which, const char *file, int location) const;
+
+    PlayerContext       *GetPlayerHaveLock(
+        PlayerContext*,
+        int which, const char *file, int location);
+    const PlayerContext *GetPlayerHaveLock(
+        const PlayerContext*,
+        int which, const char *file, int location) const;
+
+    void ReturnPlayerLock(PlayerContext*&);
+    void ReturnPlayerLock(const PlayerContext*&) const;
+
+    int  StartTimer(int interval, int line);
+    void KillTimer(int id);
+    void ForceNextStateNone(PlayerContext*);
+    void ScheduleStateChange(PlayerContext*);
+    void SetErrored(PlayerContext*);
+    void SetExitPlayer(bool set_it, bool wants_to) const;
+    void SetUpdateOSDPosition(bool set_it);
+
+    bool PxPHandleAction(PlayerContext*,const QStringList &actions);
+    bool ToggleHandleAction(PlayerContext*,
+                            const QStringList &actions, bool isDVD);
+    bool FFRewHandleAction(PlayerContext*, const QStringList &actions);
+    bool ActivePostQHandleAction(PlayerContext*,
+                                 const QStringList &actions, bool isDVD);
+    bool HandleJumpToProgramAction(PlayerContext *ctx,
+                                   const QStringList   &actions);
+
+    bool RequestNextRecorder(PlayerContext *, bool);
     void DeleteRecorder();
 
-    bool StartRecorder(RemoteEncoder *rec, int maxWait=-1);
-    bool StartPlayer(bool isWatchingRecording, int maxWait=-1);
-    void StartOSD(void);
-    void StopStuff(bool stopRingbuffers, bool stopPlayers, bool stopRecorders);
-    
-    void ToggleChannelFavorite(void);
-    void ChangeChannel(int direction);
-    void ChangeChannel(uint chanid, const QString &channum);
-    void PauseLiveTV(void);
-    void UnpauseLiveTV(void);
+    bool StartRecorder(PlayerContext *ctx, int maxWait=-1);
+    void StopStuff(PlayerContext *mctx, PlayerContext *ctx,
+                   bool stopRingbuffers, bool stopPlayers, bool stopRecorders);
 
-    void ToggleAspectOverride(AspectOverrideMode aspectMode = kAspect_Toggle);
-    void ToggleAdjustFill(AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
+    void ToggleChannelFavorite(PlayerContext*);
+    void ChangeChannel(PlayerContext*, int direction);
+    void ChangeChannel(PlayerContext*, uint chanid, const QString &channum);
+    void PauseLiveTV(PlayerContext*);
+    void UnpauseLiveTV(PlayerContext*);
 
-    bool FillMenuTracks(OSDGenericTree*, uint type);
-    void ChangeTrack(uint type, int dir);
-    void SetTrack(uint type, int trackNo);
+    void ShowPreviousChannel(PlayerContext*);
+    void PopPreviousChannel(PlayerContext*, bool immediate_change);
+
+    void ToggleAspectOverride(PlayerContext*,
+                              AspectOverrideMode aspectMode = kAspect_Toggle);
+    void ToggleAdjustFill(PlayerContext*,
+                          AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
+
+    void SetSpeedChangeTimer(uint when, int line);
+
+    void HandleEndOfPlaybackTimerEvent(void);
+    void HandleIsNearEndWhenEmbeddingTimerEvent(void);
+    void HandleEndOfRecordingExitPromptTimerEvent(void);
+    void HandleVideoExitDialogTimerEvent(void);
+    void HandlePseudoLiveTVTimerEvent(void);
+    void HandleSpeedChangeTimerEvent(void);
 
     // key queue commands
-    void AddKeyToInputQueue(char key);
-    void ClearInputQueues(bool hideosd = false); 
-    bool CommitQueuedInput(void);
-    bool ProcessSmartChannel(QString&);
+    void AddKeyToInputQueue(PlayerContext*, char key);
+    void ClearInputQueues(const PlayerContext*, bool hideosd); 
+    bool CommitQueuedInput(PlayerContext*);
+    bool ProcessSmartChannel(const PlayerContext*, QString&);
 
     // query key queues
     bool HasQueuedInput(void) const
@@ -312,41 +378,52 @@ class MPUBLIC TV : public QThread
     uint    GetQueuedChanID(void)  const { return queuedChanID; }
 
     void SwitchSource(uint source_direction);
-    void SwitchInputs(uint inputid);
-    void ToggleInputs(uint inputid = 0); 
-    void SwitchCards(uint chanid = 0, QString channum = "", uint inputid = 0);
+    void SwitchInputs(PlayerContext*, uint inputid);
+    void ToggleInputs(PlayerContext*, uint inputid = 0); 
+    void SwitchCards(PlayerContext*,
+                     uint chanid = 0, QString channum = "", uint inputid = 0);
 
-    void ToggleSleepTimer(void);
-    void ToggleSleepTimer(const QString);
+    void ToggleSleepTimer(const PlayerContext*);
+    void ToggleSleepTimer(const PlayerContext*, const QString &time);
 
-    void DoPlay(void);
-    void DoPause(bool showOSD = true);
-    void DoSeek(float time, const QString &mesg);
-    bool DoNVPSeek(float time);
+    void DoPlay(PlayerContext*);
+    float DoTogglePauseStart(PlayerContext*);
+    void DoTogglePauseFinish(PlayerContext*, float time, bool showOSD);
+    void DoTogglePause(PlayerContext*, bool showOSD);
+    vector<bool> DoSetPauseState(PlayerContext *lctx, const vector<bool>&);
+
+    void DoSeek(PlayerContext*, float time, const QString &mesg);
+    bool DoNVPSeek(PlayerContext*, float time);
     enum ArbSeekWhence {
         ARBSEEK_SET = 0,
         ARBSEEK_REWIND,
         ARBSEEK_FORWARD,
         ARBSEEK_END
     };
-    void DoArbSeek(ArbSeekWhence whence);
-    void NormalSpeed(void);
-    void ChangeSpeed(int direction);
-    void ToggleTimeStretch(void);
-    void ChangeTimeStretch(int dir, bool allowEdit = true);
-    void ChangeAudioSync(int dir, bool allowEdit = true);
-    float StopFFRew(void);
-    void ChangeFFRew(int direction);
-    void SetFFRew(int index);
-    void DoSkipCommercials(int direction);
-    void StartProgramEditMode(void);
+    void DoArbSeek(PlayerContext*, ArbSeekWhence whence);
+    void NormalSpeed(PlayerContext*);
+    void ChangeSpeed(PlayerContext*, int direction);
+    void ToggleTimeStretch(PlayerContext*);
+    void ChangeTimeStretch(PlayerContext*, int dir, bool allowEdit = true);
+    bool TimeStretchHandleAction(PlayerContext*,
+                                 const QStringList &actions);
+
+    void ChangeAudioSync(PlayerContext*, int dir, bool allowEdit = true);
+    bool AudioSyncHandleAction(PlayerContext*, const QStringList &actions);
+
+    float StopFFRew(PlayerContext*);
+    void ChangeFFRew(PlayerContext*, int direction);
+    void SetFFRew(PlayerContext*, int index);
+    void DoSkipCommercials(PlayerContext*, int direction);
+    void StartProgramEditMode(PlayerContext*);
 
     // Channel editing support
-    void StartChannelEditMode(void);
-    void ChannelEditKey(const QKeyEvent*);
-    void ChannelEditAutoFill(InfoMap&) const;
-    void ChannelEditAutoFill(InfoMap&, const QMap<QString,bool>&) const;
-    void ChannelEditXDSFill(InfoMap&) const;
+    void StartChannelEditMode(PlayerContext*);
+    void ChannelEditKey(const PlayerContext*, const QKeyEvent*);
+    void ChannelEditAutoFill(const PlayerContext*, InfoMap&) const;
+    void ChannelEditAutoFill(const PlayerContext*, InfoMap&,
+                             const QMap<QString,bool>&) const;
+    void ChannelEditXDSFill(const PlayerContext*, InfoMap&) const;
     void ChannelEditDDFill(InfoMap&, const QMap<QString,bool>&, bool) const;
     QString GetDataDirect(QString key,   QString value,
                           QString field, bool    allow_partial = false) const;
@@ -355,90 +432,117 @@ class MPUBLIC TV : public QThread
     static void *load_dd_map_thunk(void*);
     static void *load_dd_map_post_thunk(void*);
 
-    void DoQueueTranscode(QString profile);  
+    void DoQueueTranscode(PlayerContext*,QString profile);  
 
-    enum commSkipMode {
-        CommSkipOff = 0,
-        CommSkipOn = 1,
-        CommSkipNotify = 2,
-        CommSkipModes = 3,      /* placeholder */
-    };
-    void SetAutoCommercialSkip(enum commSkipMode skipMode = CommSkipOff);
-    void SetManualZoom(bool zoomON = false);
+    void SetAutoCommercialSkip(const PlayerContext*,
+                               CommSkipMode skipMode = kCommSkipOff);
+
+    // Manual zoom mode
+    void SetManualZoom(const PlayerContext *, bool enabled, QString msg);
+    bool ManualZoomHandleAction(PlayerContext *actx,
+                                const QStringList &actions);
 
     void DoDisplayJumpMenu(void);
-    void SetJumpToProgram(QString progKey = "", int progIndex = 0);
  
-    bool ClearOSD(void);
-    void ToggleOSD(bool includeStatusOSD); 
-    void UpdateOSDProgInfo(const char *whichInfo);
-    void UpdateOSDSeekMessage(const QString &mesg, int disptime);
-    void UpdateOSDInput(QString inputname = QString::null);
-    void UpdateOSDTextEntry(const QString &message);
-    void UpdateOSDSignal(const QStringList& strlist);
-    void UpdateOSDTimeoutMessage(void);
-    void UpdateOSDAskAllowDialog(void);
-    void HandleOSDAskAllowResponse(void);
+    bool ClearOSD(const PlayerContext*);
+    void ToggleOSD(const PlayerContext*, bool includeStatusOSD); 
+    void UpdateOSDProgInfo(const PlayerContext*, const char *whichInfo);
+    void UpdateOSDSeekMessage(const PlayerContext*,
+                              const QString &mesg, int disptime);
+    void UpdateOSDInput(const PlayerContext*,
+                        QString inputname = QString::null);
+    void UpdateOSDTextEntry(const PlayerContext*, const QString &message);
+    void UpdateOSDSignal(const PlayerContext*, const QStringList &strlist);
+    void UpdateOSDTimeoutMessage(PlayerContext*);
+    void UpdateOSDAskAllowDialog(PlayerContext*);
+    void HandleOSDAskAllowResponse(PlayerContext*, int dialog_result);
+    bool OSDDialogHandleAction(PlayerContext *actx, const QStringList &actions);
 
-    void EditSchedule(int editType = kScheduleProgramGuide);
+    void EditSchedule(const PlayerContext*,
+                      int editType = kScheduleProgramGuide);
 
-    void SetupPlayer(bool isWatchingRecording);
-    void TeardownPlayer(void);
-    void SetupPipPlayer(void);
-    void TeardownPipPlayer(void);
-    
-    void HandleStateChange(void);
-    bool InStateChange(void) const;
-    void ChangeState(TVState nextState);
-    void ForceNextStateNone(void);
+    void TeardownPlayer(PlayerContext *mctx, PlayerContext *ctx);
 
-    void TogglePIPView(void);
-    void ToggleActiveWindow(void);
-    void SwapPIP(void);
-    void SwapPIPSoon(void) { needToSwapPIP = true; }
-    
-    void DisplayJumpMenuSoon(void) { needToJumpMenu = true; }
+    void HandleStateChange(PlayerContext *mctx, PlayerContext *ctx);
 
-    void ToggleAutoExpire(void);
+    bool StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
+                     TVState desiredState);
 
-    void BrowseStart(void);
-    void BrowseEnd(bool change);
-    void BrowseDispInfo(int direction);
-    void ToggleRecord(void);
-    void BrowseChannel(const QString &channum);
+    vector<long long> TeardownAllNVPs(PlayerContext*);
+    void RestartAllNVPs(PlayerContext *lctx,
+                        const vector<long long> &pos,
+                        MuteState mctx_mute);
 
-    void DoTogglePictureAttribute(PictureAdjustType type);
+    void PxPToggleView(  PlayerContext *actx, bool wantPBP);
+    void PxPCreateView(  PlayerContext *actx, bool wantPBP);
+    void PxPTeardownView(PlayerContext *actx);
+    void PxPToggleType(  PlayerContext *mctx, bool wantPBP);
+    void PxPSwap(        PlayerContext *mctx, PlayerContext *pipctx);
+    bool HandlePxPTimerEvent(void);
+
+    bool PIPAddPlayer(   PlayerContext *mctx, PlayerContext *ctx);
+    bool PIPRemovePlayer(PlayerContext *mctx, PlayerContext *ctx);
+    void PBPRestartMainNVP(PlayerContext *mctx);
+
+    void ToggleAutoExpire(PlayerContext*);
+
+    void BrowseStart(PlayerContext*);
+    void BrowseEnd(PlayerContext*, bool change_channel);
+    void BrowseDispInfo(PlayerContext*, int direction);
+    void BrowseChannel(PlayerContext*, const QString &channum);
+    bool BrowseHandleAction(PlayerContext*, const QStringList &actions);
+
+    void ToggleRecord(PlayerContext*);
+
+    void DoTogglePictureAttribute(const PlayerContext*,
+                                  PictureAdjustType type);
     void DoChangePictureAttribute(
+        PlayerContext*,
         PictureAdjustType type, PictureAttribute attr, bool up);
+    bool PictureAttributeHandleAction(PlayerContext*,
+                                      const QStringList &actions);
 
-    void BuildOSDTreeMenu(void);
-    void ShowOSDTreeMenu(void);
-    void FillMenuLiveTV(OSDGenericTree *treeMenu);
-    void FillMenuPlaying(OSDGenericTree *treeMenu);
+    void ShowOSDTreeMenu(const PlayerContext*);
+
+    void FillOSDTreeMenu(       const PlayerContext*, OSDGenericTree*) const;
+    void FillMenuPlaying(       const PlayerContext*, OSDGenericTree*) const;
+    void FillMenuPxP(           const PlayerContext*, OSDGenericTree*) const;
+    void FillMenuInputSwitching(const PlayerContext*, OSDGenericTree*) const;
+    void FillMenuVideoAspect(   const PlayerContext*, OSDGenericTree*) const;
+    void FillMenuVideoScan(     const PlayerContext*, OSDGenericTree*) const;
+    void FillMenuAdjustFill(    const PlayerContext*, OSDGenericTree*) const;
+    void FillMenuAdjustPicture( const PlayerContext*, OSDGenericTree*) const;
+    void FillMenuTimeStretch(   const PlayerContext*, OSDGenericTree*) const;
+    void FillMenuSleepMode(     const PlayerContext*, OSDGenericTree*) const;
+    bool FillMenuTracks(        const PlayerContext*, OSDGenericTree*, uint type) const;
 
     void UpdateLCD(void);
-    void ShowLCDChannelInfo(void);
-    void ShowLCDDVDInfo(void);
+    bool HandleLCDTimerEvent(void);
+    void ShowLCDChannelInfo(const PlayerContext*);
+    void ShowLCDDVDInfo(const PlayerContext*);
 
-    QString PlayMesg(void);
+    void ITVRestart(PlayerContext*, bool isLive);
 
-    void GetPlayGroupSettings(const QString &group);
+    bool ScreenShot(PlayerContext*, long long frameNumber);
 
-    void SetPseudoLiveTV(uint, const ProgramInfo*, PseudoState);
+    // DVD methods
+    void DVDJumpBack(PlayerContext*);
+    void DVDJumpForward(PlayerContext*);
+    bool DVDMenuHandleAction(PlayerContext*,
+                             const QStringList &actions,
+                             bool isDVD, bool isDVDStill);
 
-    void ITVRestart(bool isLive);
+    // Sleep dialog handling
+    void SleepDialogCreate(void);
+    void SleepDialogTimeout(void);
 
-    bool ScreenShot(long long frameNumber);
+    // Idle dialog handling
+    void IdleDialogCreate(void);
+    void IdleDialogTimeout(void);
 
-    bool VideoThemeCheck(QString str, bool stayPaused = false);
-
-    //dvd functions
-    void DVDJumpBack(void);
-    void DVDJumpForward(void);       
-
-    // Sleep/Idle dialog handling
-    void SleepDialog(void);
-    void IdleDialog(void);
+    // Program jumping stuff
+    void SetLastProgram(ProgramInfo *rcinfo);
+    ProgramInfo *GetLastProgram(void) const;
 
     static bool LoadExternalSubtitles(NuppelVideoPlayer *nvp,
                                       const QString &videoFile);
@@ -450,8 +554,16 @@ class MPUBLIC TV : public QThread
     static bool StateIsRecording(TVState state);
     static bool StateIsPlaying(TVState state);
     static bool StateIsLiveTV(TVState state);
-    static TVState RemovePlaying(TVState state);
     static TVState RemoveRecording(TVState state);
+    void RestoreScreenSaver(const PlayerContext*);
+    
+    void InitUDPNotifyEvent(void);
+
+    /// true if dialog is either videoplayexit, playexit or askdelete dialog
+    bool IsVideoExitDialog(const QString &dialog_name);
+
+    // for temp debugging only..
+    int find_player_index(const PlayerContext*) const;
 
   private:
     // Configuration variables from database
@@ -460,16 +572,27 @@ class MPUBLIC TV : public QThread
     QString db_time_format;
     QString db_short_date_format;
     uint    db_idle_timeout;
-    int     fftime;
-    int     rewtime;
-    int     jumptime;
+    uint    db_udpnotify_port;
+    int     db_playback_exit_prompt;
+    int     db_autoexpire_default;
+    bool    db_auto_set_watched;
+    bool    db_end_of_rec_exit_prompt;
+    bool    db_jump_prefer_osd;
+    bool    db_use_gui_size_for_tv;
+    bool    db_start_in_guide;
+    bool    db_toggle_bookmark;
+    bool    db_run_jobs_on_remote;
+    bool    db_use_dvd_bookmark;
+    bool    db_continue_embedded;
+    bool    db_use_fixed_size;
+
     bool    smartChannelChange;
     bool    MuteIndividualChannels;
     bool    arrowAccel;
     int     osd_general_timeout;
     int     osd_prog_info_timeout;
 
-    enum commSkipMode autoCommercialSkip;
+    CommSkipMode autoCommercialSkip;
     bool    tryUnflaggedSkip;
 
     bool    smartForward;
@@ -481,30 +604,21 @@ class MPUBLIC TV : public QThread
 
     uint    vbimode;
 
-    // State variables
-    MythDeque<TVState> nextStates;
-    mutable QMutex     stateLock;
-    TVState            internalState;
-
     uint switchToInputId;
-    bool menurunning;
-    bool wantsToQuit;
-    bool exitPlayer;
-    bool paused;
-    bool errored;
+    /// True if the user told MythTV to stop plaback. If this is false
+    /// when we exit the player, we display an error screen.
+    mutable bool wantsToQuit;
     bool stretchAdjustment; ///< True if time stretch is turned on
     bool audiosyncAdjustment; ///< True if audiosync is turned on
     long long audiosyncBaseline;
     bool editmode;          ///< Are we in video editing mode
     bool zoomMode;
     bool sigMonMode;     ///< Are we in signal monitoring mode?
-    bool update_osd_pos; ///< Redisplay osd?
-    bool endOfRecording; ///< !nvp->IsPlaying() && StateIsPlaying(internalState)
+    bool endOfRecording; ///< !nvp->IsPlaying() && StateIsPlaying()
     bool requestDelete;  ///< User wants last video deleted
     bool allowRerecord;  ///< User wants to rerecord the last video if deleted
     bool doSmartForward;
     bool queuedTranscode;
-    bool getRecorderPlaybackInfo; ///< Main loop should get recorderPlaybackInfo
     /// Picture attribute type to modify.
     PictureAdjustType adjustingPicture;
     /// Picture attribute to modify (on arrow left or right)
@@ -515,9 +629,8 @@ class MPUBLIC TV : public QThread
     QMap<QString,AskProgramInfo> askAllowPrograms;
     QMutex                       askAllowLock;
 
-    bool ignoreKeys;
-    bool needToSwapPIP;
-    bool needToJumpMenu;
+    MythDeque<QString> changePxP;
+    QMutex progListsLock;
     QMap<QString,ProgramList> progLists;
 
     mutable QMutex chanEditMapLock; ///< Lock for chanEditMap and ddMap
@@ -530,45 +643,25 @@ class MPUBLIC TV : public QThread
     /// Vector or sleep timer sleep times in seconds,
     /// with the appropriate UI message.
     vector<SleepTimerInfo> sleep_times;
-    uint      sleep_index;       ///< Index into sleep_times.
-    int       sleepTimerTimeout; ///< Current sleep timeout
-    MythTimer sleepTimer;        ///< Timer for turning off playback.
-    MythTimer sleepDialogTimer;  ///< Timer for sleep dialog.
-    MythTimer idleTimer; ///< Timer for turning off playback after idle period.
-    MythTimer idleDialogTimer; ///< Timer for idle dialog.
+    uint      sleep_index;          ///< Index into sleep_times.
+    uint      sleepTimerTimeout;    ///< Current sleep timeout in msec
+    int       sleepTimerId;         ///< Timer for turning off playback.
+    int       sleepDialogTimerId;   ///< Timer for sleep dialog.
+    /// Timer for turning off playback after idle period.
+    int       idleTimerId;
+    int       idleDialogTimerId; ///< Timer for idle dialog.
 
     /// Queue of unprocessed key presses.
     MythDeque<QKeyEvent*> keyList;
-    /// Since keys are processed outside Qt event loop, we need a lock.
-    QMutex  keyListLock;
     MythTimer keyRepeatTimer; ///< Timeout timer for repeat key filtering
-
-    int   doing_ff_rew;  ///< If true we are doing a rewind not a fast forward
-    int   ff_rew_index;  ///< Index into ff_rew_speeds for FF and Rewind speeds
-    int   speed_index;   ///< Caches value of ff_rew_speeds[ff_rew_index]
-
-    /** \brief Time stretch speed, 1.0f for normal playback.
-     *
-     *  Begins at 1.0f meaning normal playback, but can be increased
-     *  or decreased to speedup or slowdown playback.
-     *  Ignored when doing Fast Forward or Rewind.
-     */
-    float normal_speed; 
-    float prev_speed;
-
-    float frameRate;     ///< Estimated framerate from recorder
 
     // CC/Teletex input state variables
     /// Are we in CC/Teletext page/stream selection mode?
     bool  ccInputMode;
-    /// When does ccInputMode expire
-    QTime ccInputModeExpires;
 
     // Arbitrary Seek input state variables
     /// Are we in Arbitrary seek input mode?
     bool  asInputMode;
-    /// When does asInputMode expire
-    QTime asInputModeExpires;
 
     // Channel changing state variables
     /// Input key presses queued up so far...
@@ -577,143 +670,148 @@ class MPUBLIC TV : public QThread
     mutable QString queuedChanNum;
     /// Queued ChanID (from EPG channel selector)
     uint            queuedChanID;
-    /// Lock used so that input QStrings can be used across threads, and so
-    /// that queuedChanNumExpr can be used safely in Qt 3.2 and earlier.
-    mutable QMutex  queuedInputLock;
-
-    int       unmuteTimeout; ///< For temp. audio muting during channel changes
-    MythTimer unmuteTimer;   ///< For temp. audio muting during channel changes
 
     // Channel changing timeout notification variables
     QTime   lockTimer;
     bool    lockTimerOn;
     QDateTime lastLockSeenTime;
 
-    // Previous channel functionality state variables
-    QStringList prevChan;     ///< Previous channels
-    uint      prevChanKeyCnt; ///< Number of repeated channel button presses
-    MythTimer prevChanTimer;  ///< Special (slower) repeat key filtering
-
     // Channel browsing state variables
     bool browsemode;
     bool persistentbrowsemode;
-    MythTimer browseTimer;
     QString browsechannum;
     QString browsechanid;
     QString browsestarttime;
 
     // Program Info for currently playing video
     // (or next video if InChangeState() is true)
-    ProgramInfo *recorderPlaybackInfo; ///< info requested from recorder
-    ProgramInfo *playbackinfo;  ///< info sent in via Playback()
-    QMutex       pbinfoLock;
-    int          playbackLen;   ///< initial playbackinfo->CalculateLength()
+    mutable QMutex lastProgramLock;
     ProgramInfo *lastProgram;   ///< last program played with this player
-    bool         jumpToProgram;
-    
     bool         inPlaylist; ///< show is part of a playlist
     bool         underNetworkControl; ///< initial show started via by the network control interface
     bool         isnearend;
 
-    // Recording to play next, after LiveTV
-    ProgramInfo *pseudoLiveTVRec[2];
-    PseudoState  pseudoLiveTVState[2];
+    // Program Jumping
+    PIPState     jumpToProgramPIPState;
+    bool         jumpToProgram;
 
     // Video Players
-    NuppelVideoPlayer *nvp;
-    NuppelVideoPlayer *pipnvp;
-    NuppelVideoPlayer *activenvp;  ///< Player to which LiveTV events are sent
+    vector<PlayerContext*>  player;
+    /// Video Player to which events are sent to
+    int                     playerActive;
+    /// lock on player and playerActive changes
+    mutable QReadWriteLock  playerLock;
 
     // Remote Encoders
-    /// Main recorder
-    RemoteEncoder *recorder;
-    /// Picture-in-Picture recorder
-    RemoteEncoder *piprecorder;
-    /// Recorder to which LiveTV events are being sent
-    RemoteEncoder *activerecorder;
     /// Main recorder to use after a successful SwitchCards() call.
     RemoteEncoder *switchToRec;
-    /// Storage for keeping the last recorder number around
-    int lastrecordernum;
-
-    // LiveTVChain
-    LiveTVChain *tvchain;
-    LiveTVChain *piptvchain;
-    QStringList tvchainUpdate;
-    QMutex tvchainUpdateLock;
-
-    // RingBuffers
-    RingBuffer *prbuffer;
-    RingBuffer *piprbuffer;
-    RingBuffer *activerbuffer; ///< Ringbuffer to which LiveTV events are sent
 
     // OSD info
-    QString         dialogname; ///< Name of current OSD dialog
     OSDGenericTree *treeMenu;   ///< OSD menu, 'm' using default keybindings
-    MythTimer  dialogboxTimer;  ///< How long a dialog box is on the screen
+    QMap<OSD*,const PlayerContext*> osd_lctx;
 
     /// UDPNotify instance which shows messages sent
     /// to the "UDPNotifyPort" in an OSD dialog.
-    mutable QMutex                    udpnotifyLock;
     UDPNotify                        *udpnotify;
     MythDeque<QString>                udpnotifyEventName;
     MythDeque<const UDPNotifyOSDSet*> udpnotifyEventSet;
 
-    // Signal info
-    QStringList     lastSignalMsg;
-    MythTimer       lastSignalMsgTime;
-    InfoMap         lastSignalUIInfo;
-    MythTimer       lastSignalUIInfoTime;
-    QMutex          osdlock;
-
     // LCD Info
-    QDateTime lastLcdUpdate;
     QString   lcdTitle;
     QString   lcdSubtitle;
     QString   lcdCallsign;
 
     // Window info (GUI is optional, transcoding, preview img, etc)
     MythDialog *myWindow;   ///< Our MythDialog window, if it exists
-    WId   embedWinID;       ///< Window ID when embedded in another widget
-    QRect embedBounds;      ///< Bounds when embedded in another widget
-    ///< player bounds, for after doEditSchedule() returns to normal playing.
+    ///< player bounds, for after DoEditSchedule() returns to normal playing.
     QRect player_bounds;
-    ///< Prior GUI window bounds, for doEditSchedule() and player exit().
+    ///< Prior GUI window bounds, for DoEditSchedule() and player exit().
     QRect saved_gui_bounds;
 
     // IsTunable() cache, used by embedded program guide
     mutable QMutex                 is_tunable_cache_lock;
     QMap< uint,vector<InputInfo> > is_tunable_cache_inputs;
 
-    // Various threads
-    /// Video decoder thread, runs nvp's NuppelVideoPlayer::StartPlaying().
-    pthread_t decode;
-    /// Picture-in-Picture video decoder thread,
-    /// runs pipnvp's NuppelVideoPlayer::StartPlaying().
-    pthread_t pipdecode;
+    /// Info requested by PlayFromRecorder
+    QMutex                    recorderPlaybackInfoLock;
+    QWaitCondition            recorderPlaybackInfoWaitCond;
+    QMap<int,int>             recorderPlaybackInfoTimerId;
+    QMap<int,ProgramInfo>     recorderPlaybackInfo;
+
+    // Network Control stuff
+    MythDeque<QString> networkControlCommands;
+
+    // Timers
+    typedef QMap<int,PlayerContext*>       TimerContextMap;
+    typedef QMap<int,const PlayerContext*> TimerContextConstMap;
+    mutable QMutex       timerIdLock;
+    volatile int         lcdTimerId;
+    volatile int         keyListTimerId;
+    volatile int         networkControlTimerId;
+    volatile int         jumpMenuTimerId;
+    volatile int         pipChangeTimerId;
+    volatile int         udpNotifyTimerId;
+    volatile int         switchToInputTimerId;
+    volatile int         ccInputTimerId;
+    volatile int         asInputTimerId;
+    volatile int         queueInputTimerId;
+    volatile int         browseTimerId;
+    volatile int         updateOSDPosTimerId;
+    volatile int         endOfPlaybackTimerId;
+    volatile int         embedCheckTimerId;
+    volatile int         endOfRecPromptTimerId;
+    volatile int         videoExitDialogTimerId;
+    volatile int         pseudoChangeChanTimerId;
+    volatile int         speedChangeTimerId;
+    volatile int         errorRecoveryTimerId;
+    mutable volatile int exitPlayerTimerId;
+    TimerContextMap      stateChangeTimerId;
+    TimerContextMap      signalMonitorTimerId;
+    TimerContextMap      tvchainUpdateTimerId;
+    TimerContextMap      unmuteTimerId;
 
     /// Condition to signal that the Event thread is up and running
     QWaitCondition mainLoopCond;
     QMutex mainLoopCondLock;
 
+    /// Condition to signal State changes
+    QWaitCondition stateChangeCond;
+    QMutex stateChangeCondLock;
+
+  public:
     // Constants
     static const int kInitFFRWSpeed; ///< 1x, default to normal speed
-    static const int kMuteTimeout;   ///< Channel changing mute timeout in msec
-    static const int kLCDTimeout;    ///< Timeout for updating LCD info in seconds
-    static const int kBrowseTimeout; ///< Timeout for browse mode exit in msec
-    /// Timeout after last Signal Monitor message for ignoring OSD when exiting.
-    static const int kSMExitTimeout;
-    static const int kInputKeysMax;  ///< When to start discarding early keys
-    static const int kInputModeTimeout; ///< Timeout for entry modes in msec
-    static const int kKeyRepeatTimeout; ///< Seek key repeat timeout
-    /// How long to wait before applying all previous channel keypresses.
-    static const int kPrevChanTimeout;
+    static const uint kInputKeysMax; ///< When to start discarding early keys
     static const uint kNextSource;
     static const uint kPreviousSource;
+    static const uint kMaxPIPCount;
+    static const uint kMaxPBPCount;
 
-    // Network Control stuff
-    MythDeque<QString> networkControlCommands;
-    QMutex ncLock;
+    ///< Timeout for entry modes in msec
+    static const uint kInputModeTimeout;
+    /// Channel changing mute timeout in msec
+    static const uint kMuteTimeout;
+    /// Timeout for updating LCD info in msec
+    static const uint kLCDTimeout;
+    /// Timeout for browse mode exit in msec
+    static const uint kBrowseTimeout;
+    /// Seek key repeat timeout in msec
+    static const uint kKeyRepeatTimeout;
+    /// How long to wait before applying all previous channel keypresses in msec
+    static const uint kPrevChanTimeout;
+    /// How long to display sleep timer dialog in msec
+    static const uint kSleepTimerDialogTimeout;
+    /// How long to display idle timer dialog in seconds
+    static const uint kIdleTimerDialogTimeout;
+    /// How long to display idle timer dialog in msec
+    static const uint kVideoExitDialogTimeout;
+
+    static const uint kEndOfPlaybackCheckFrequency;
+    static const uint kEmbedCheckFrequency;
+    static const uint kSpeedChangeCheckFrequency;
+    static const uint kErrorRecoveryCheckFrequency;
+    static const uint kEndOfRecPromptCheckFrequency;
+    static const uint kEndOfPlaybackFirstCheckTimer;
 };
 
 #endif

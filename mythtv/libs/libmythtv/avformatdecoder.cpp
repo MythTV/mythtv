@@ -396,7 +396,7 @@ bool AvFormatDecoderPrivate::SetVideoSize(const QSize &video_dim)
 }
 
 AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
-                                 ProgramInfo *pginfo,
+                                 const ProgramInfo &pginfo,
                                  bool use_null_videoout,
                                  bool allow_libmpeg2)
     : DecoderBase(parent, pginfo),
@@ -731,6 +731,7 @@ void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
 
     if (reset_video_data)
     {
+        QMutexLocker locker(&m_positionMapLock);
         m_positionMap.clear();
         framesPlayed = 0;
         framesRead = 0;
@@ -2397,6 +2398,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
 
 #if 0
             // also reset length
+            QMutexLocker locker(&m_positionMapLock);
             if (!m_positionMap.empty())
             {
                 long long index       = m_positionMap.back().index;
@@ -2413,8 +2415,11 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
     if (!hasFullPositionMap)
     {
         long long last_frame = 0;
-        if (!m_positionMap.empty())
-            last_frame = m_positionMap.back().index;
+        {
+            QMutexLocker locker(&m_positionMapLock);
+            if (!m_positionMap.empty())
+                last_frame = m_positionMap.back().index;
+        }
 
         //cerr << "framesRead: " << framesRead << " last_frame: " << last_frame
         //    << " keyframedist: " << keyframedist << endl;
@@ -2429,6 +2434,8 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
                     .arg(framesRead).arg(startpos));
 
             PosMapEntry entry = {framesRead, framesRead, startpos};
+
+            QMutexLocker locker(&m_positionMapLock);
             m_positionMap.push_back(entry);
         }
 
@@ -3218,8 +3225,11 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 
                 if (ringBuffer->DVD()->PGCLengthChanged())
                 {
-                    posmapStarted = false;
-                    m_positionMap.clear();
+                    {
+                        QMutexLocker locker(&m_positionMapLock);
+                        posmapStarted = false;
+                        m_positionMap.clear();
+                    }
                     SyncPositionMap();
                 }
 

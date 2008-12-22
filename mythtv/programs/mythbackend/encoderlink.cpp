@@ -504,6 +504,19 @@ long long EncoderLink::GetKeyframePosition(long long desired)
     return -1;
 }
 
+bool EncoderLink::GetKeyframePositions(
+    long long start, long long end, PosMap &map)
+{
+    if (!local)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Should be local only query: GetKeyframePositions");
+        return false;
+    }
+
+    return tv->GetKeyframePositions(start, end, map);
+}
+
 /** \fn EncoderLink::FrontendReady()
  *  \brief Tells TVRec that the frontend is ready for data.
  *         <b>This only works on local recorders.</b> 

@@ -87,7 +87,7 @@ class AvFormatDecoder : public DecoderBase
 {
     friend void HandleStreamChange(void*);
   public:
-    AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
+    AvFormatDecoder(NuppelVideoPlayer *parent, const ProgramInfo &pginfo,
                     bool use_null_video_out, bool allow_libmpeg2 = true);
    ~AvFormatDecoder();
 

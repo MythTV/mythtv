@@ -1,6 +1,10 @@
 #ifndef OSD_H
 #define OSD_H
 
+#include <deque>
+#include <vector>
+using namespace std;
+
 #include <qstring.h>
 #include <qstringlist.h>
 #include <qrect.h>
@@ -15,9 +19,6 @@
 
 // Mythtv Headers
 #include "themeinfo.h"
-
-#include <vector>
-using namespace std;
 
 enum OSDFunctionalType
 {
@@ -38,6 +39,16 @@ struct StatusPosInfo
     bool progAfter;
 };
 
+extern const char *kOSDDialogActive;
+extern const char *kOSDDialogAllowRecording;
+extern const char *kOSDDialogAlreadyEditing;
+extern const char *kOSDDialogExitOptions;
+extern const char *kOSDDialogAskDelete;
+extern const char *kOSDDialogIdleTimeout;
+extern const char *kOSDDialogSleepTimeout;
+extern const char *kOSDDialogChannelTimeout;
+extern const char *kOSDDialogInfo;
+extern const char *kOSDDialogEditChannel;
 
 class QImage;
 class TTFFont;
@@ -98,14 +109,21 @@ class OSD : public QObject
 
     void SetSettingsText(const QString &text, int length);
 
-    void NewDialogBox(const QString &name, const QString &message, 
-                      QStringList &options, int length, int sel = 0);
-    void DialogUp(const QString &name);
-    void DialogDown(const QString &name);
-    bool DialogShowing(const QString &name);
-    void TurnDialogOff(const QString &name);
-    void DialogAbort(const QString &name);
-    int GetDialogResponse(const QString &name);
+    void    NewDialogBox(const QString &name,
+                         const QString &message,
+                         QStringList &options,
+                         int length, int sel = 0);
+    void    DialogUp(const QString &name);
+    void    DialogDown(const QString &name);
+    bool    DialogShowing(const QString &name);
+    void    TurnDialogOff(const QString &name);
+    void    DialogAbort(const QString &name);
+    int     GetDialogResponse(const QString &name);
+    void    DialogAbortAndHideAll(void);
+    void    PushDialog(const QString &dialogname);
+    QString GetDialogActive(void) const;
+    bool    IsDialogActive(const QString &dialogname) const;
+    bool    IsDialogExisting(const QString &dialogname) const;
 
     void SetUpOSDClosedHandler(TV *tv);
 
@@ -123,7 +141,7 @@ class OSD : public QObject
 
     bool HideAll(void) { return HideAllExcept(QString::null); };
     bool HideAllExcept(const QString &name);
-    bool HideSet(const QString &name);
+    bool HideSet(const QString &name, bool wait = false);
     bool HideSets(QStringList &name);
 
     void AddSet(OSDSet *set, QString name, bool withlock = true);
@@ -219,7 +237,7 @@ class OSD : public QObject
     float hmult, wmult;
     int xoffset, yoffset, displaywidth, displayheight;
 
-    QMutex osdlock;
+    mutable QMutex osdlock;
 
     bool m_setsvisible;
 
@@ -234,6 +252,7 @@ class OSD : public QObject
     QMap<QString, TTFFont *> fontMap;
 
     QMap<QString, int> dialogResponseList;
+    deque<QString> dialogs;
 
     OSDTypeImage *editarrowleft;
     OSDTypeImage *editarrowright;

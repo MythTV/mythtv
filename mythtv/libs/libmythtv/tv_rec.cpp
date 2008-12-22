@@ -2564,7 +2564,7 @@ long long TVRec::GetFilePosition(void)
  *      RemoteEncoder::GetKeyframePosition(long long)
  *  \return Byte position of keyframe if query succeeds, -1 otherwise.
  */
-long long TVRec::GetKeyframePosition(long long desired)
+long long TVRec::GetKeyframePosition(long long desired) const
 {
     QMutexLocker lock(&stateChangeLock);
 
@@ -2573,12 +2573,31 @@ long long TVRec::GetKeyframePosition(long long desired)
     return -1;
 }
 
-/** \fn TVRec::GetMaxBitrate(void)
+/** \fn TVRec::GetKeyframePositions(long long, long long, PosMap&)
+ *  \brief Returns byte position in RingBuffer of a keyframes
+ *         according to recorder.
+ *
+ *  \sa EncoderLink::GetKeyframePositions(long long, long long, PosMap&),
+ *      RemoteEncoder::GetKeyframePositions(long long, long long, PosMap&)
+ *  \return Byte position of keyframe if query succeeds, -1 otherwise.
+ */
+bool TVRec::GetKeyframePositions(
+    long long start, long long end, PosMap &map) const
+{
+    QMutexLocker lock(&stateChangeLock);
+
+    if (recorder)
+        return recorder->GetKeyframePositions(start, end, map);
+
+    return false;
+}
+
+/** \fn TVRec::GetMaxBitrate(void) const
  *  \brief Returns the maximum bits per second this recorder can produce.
  *
  *  \sa EncoderLink::GetMaxBitrate(void), RemoteEncoder::GetMaxBitrate(void)
  */
-long long TVRec::GetMaxBitrate(void)
+long long TVRec::GetMaxBitrate(void) const
 {
     long long bitrate;
     if (genOpt.cardtype == "MPEG")

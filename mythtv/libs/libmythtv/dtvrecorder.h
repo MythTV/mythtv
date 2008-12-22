@@ -34,7 +34,6 @@ class DTVRecorder: public RecorderBase
     bool IsRecording(void) { return _recording; }
     bool IsErrored(void) { return _error; }
 
-    long long GetKeyframePosition(long long desired);
     long long GetFramesWritten(void) { return _frames_written_count; }
 
     void SetVideoFilters(QString &/*filters*/) {;}

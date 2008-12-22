@@ -8,7 +8,6 @@
 #include <iostream>
 using namespace std;
 
-#include <QApplication>
 #include <QFile>
 #include <QFileInfo>
 #include <QMap>
@@ -18,6 +17,7 @@ using namespace std;
 #include <QTextCodec>
 #include <QWidget>
 
+#include "mythapplication.h"
 #include "mythconfig.h"
 #include "tv.h"
 #include "proglist.h"
@@ -974,7 +974,7 @@ int main(int argc, char **argv)
     // of the MythPushButton widgets, and they don't use the themed background.
     QApplication::setDesktopSettingsAware(FALSE);
 #endif
-    QApplication a(argc, argv);
+    MythApplication a(argc, argv);
 
     QString pluginname;
 

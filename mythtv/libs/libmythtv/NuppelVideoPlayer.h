@@ -6,6 +6,7 @@
 
 #include <sys/time.h>
 
+#include "playercontext.h"
 #include "volumebase.h"
 #include "RingBuffer.h"
 #include "osd.h"
@@ -101,9 +102,10 @@ enum
 
 class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
 {
- public:
-    NuppelVideoPlayer(QString inUseID = "Unknown",
-                      const ProgramInfo *info = NULL);
+    friend class PlayerContext;
+
+  public:
+    NuppelVideoPlayer(const QString &inUseID = QString("Unknown"));
    ~NuppelVideoPlayer();
 
     // Initialization
@@ -113,7 +115,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void OpenDummy(void);
 
     // Windowing stuff
-    void EmbedInWidget(WId wid, int x, int y, int w, int h);
+    void EmbedInWidget(int x, int y, int w, int h, WId id);
     void StopEmbedding(void);
     void ExposeEvent(void);
     bool IsEmbedding(void);
@@ -134,23 +136,23 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetAudioCodec(void *ac);
 
     // Sets
-    void SetParentWidget(QWidget *widget)     { parentWidget = widget; }
+    void SetPlayerInfo(TV             *tv,
+                       QWidget        *widget,
+                       bool           frame_exact_seek,
+                       PlayerContext *ctx);
     void SetAsPIP(void)                       { SetNoAudio(); SetNullVideo(); }
     void SetNullVideo(void)                   { using_null_videoout = true; }
-    void SetFileName(QString lfilename)       { filename = lfilename; }
     void SetExactSeeks(bool exact)            { exactseeks = exact; }
-    void SetAutoCommercialSkip(int autoskip);
+    void SetAutoCommercialSkip(CommSkipMode autoskip);
     void SetCommBreakMap(QMap<long long, int> &newMap);
-    void SetRingBuffer(RingBuffer *rbuf)      { ringBuffer = rbuf; }
-    void SetLiveTVChain(LiveTVChain *tvchain) { livetvchain = tvchain; }
     void SetLength(int len)                   { totalLength = len; }
     void SetVideoFilters(const QString &override);
     void SetFramesPlayed(long long played)    { framesPlayed = played; }
     void SetEof(void)                         { eof = true; }
-    void SetPipPlayer(NuppelVideoPlayer *pip)
-        { setpipplayer = pip; needsetpipplayer = true; }
-    void SetRecorder(RemoteEncoder *recorder);
-    void SetParentPlayer(TV *tv)             { m_tv = tv; }
+    void SetPIPActive(bool is_active)         { pip_active = is_active; }
+    void SetPIPVisible(bool is_visible)       { pip_visible = is_visible; }
+    bool AddPIPPlayer(NuppelVideoPlayer *pip, PIPLocation loc, uint timeout);
+    bool RemovePIPPlayer(NuppelVideoPlayer *pip, uint timeout);
 
     void SetTranscoding(bool value);
     void SetWatchingRecording(bool mode);
@@ -190,6 +192,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     AspectOverrideMode GetAspectOverride(void) const;
     AdjustFillMode     GetAdjustFill(void) const;
     MuteState          GetMuteState(void) const;
+    CommSkipMode       GetAutoCommercialSkip(void) const;
+
     int     GetFFRewSkip(void) const          { return ffrew_skip; }
     float   GetAudioStretchFactor(void) const { return audio_stretchfactor; }
     float   GetNextPlaySpeed(void) const      { return next_play_speed; }
@@ -199,15 +203,16 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     long long GetBookmark(void) const;
     QString   GetEncodingType(void) const;
     QString   GetXDS(const QString &key) const;
+    QString   GetErrorMsg(void) const { return errmsg; }
     bool      GetAudioBufferStatus(uint &fill, uint &total) const;
+    PIPLocation GetNextPIPLocation(void) const;
 
     // Bool Gets
     bool    GetRawAudioState(void) const;
     bool    GetLimitKeyRepeat(void) const     { return limitKeyRepeat; }
     bool    GetEof(void) const                { return eof; }
-    bool    PipPlayerSet(void) const          { return !needsetpipplayer; }
     bool    IsErrored(void) const             { return errored; }
-    bool    IsPlaying(void) const             { return playing; }
+    bool    IsPlaying(uint wait_ms = 0, bool wait_for = true) const;
     bool    AtNormalSpeed(void) const         { return next_normal_speed; }
     bool    IsDecoderThreadAlive(void) const  { return decoder_thread_alive; }
     bool    IsReallyNearEnd(void) const;
@@ -215,7 +220,12 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool    PlayingSlowForPrebuffer(void) const { return m_playing_slower; }
     bool    HasAudioIn(void) const            { return !no_audio_in; }
     bool    HasAudioOut(void) const           { return !no_audio_out; }
+    bool    IsPIPActive(void) const           { return pip_active; }
+    bool    IsPIPVisible(void) const          { return pip_visible; }
     bool    IsMuted(void) const        { return GetMuteState() == kMuteAll; }
+    bool    IsIVTVDecoder(void) const;
+    bool    UsingNullVideo(void) const { return using_null_videoout; }
+    bool    HasTVChainNext(void) const;
 
     // Complicated gets
     long long CalcMaxFFTime(long long ff, bool setjump = true) const;
@@ -230,11 +240,10 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
                                       int &buflen, int &vw, int &vh, float &ar);
     char        *GetScreenGrab(int secondsin, int &buflen,
                                int &vw, int &vh, float &ar);
-    LiveTVChain *GetTVChain(void)             { return livetvchain; }
     InteractiveTV *GetInteractiveTV(void);
 
     // Start/Reset/Stop playing
-    void StartPlaying(void);
+    void StartPlaying(bool openfile = true);
     void ResetPlaying(void);
     void StopPlaying(void) { killplayer = true; decoder_thread_alive = false; }
 
@@ -248,9 +257,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // Seek stuff
     bool FastForward(float seconds);
     bool Rewind(float seconds);
+    bool JumpToFrame(long long frame);
     bool RebuildSeekTable(bool showPercentage = true, StatusCallback cb = NULL,
                           void* cbData = NULL);
-    void JumpToFrame(long long frame);
 
     // Commercial stuff
     void SkipCommercials(int direction);
@@ -312,7 +321,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool ToggleCaptions(void);
     bool ToggleCaptions(uint mode);
     void SetCaptionsEnabled(bool, bool osd_msg=true);
-    bool LoadExternalSubtitles(const QString &subtitleFileName);
+    bool LoadExternalSubtitles(const QString &videoFile);
 
     // Teletext Menu and non-NUV teletext decoder
     void EnableTeletext(void);
@@ -402,9 +411,13 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void GoToDVDMenu(QString str);
     void GoToDVDProgram(bool direction);
     void HideDVDButton(bool hide) 
-    { 
+    {
         hidedvdbutton = hide;
     }
+
+    // Position Map Stuff
+    bool PosMapFromEnc(unsigned long long          start,
+                       QMap<long long, long long> &posMap);
 
   protected:
     void DisplayPauseFrame(void);
@@ -422,13 +435,13 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void AutoDeint(VideoFrame*);
 
     // Private Sets
-    void SetPlaybackInfo(ProgramInfo *pginfo);
+    void SetPlayingInfo(const ProgramInfo &pginfo);
     void SetPrebuffering(bool prebuffer);
+    void SetPlaying(bool is_playing);
 
     // Private Gets
     int  GetStatusbarPos(void) const;
     bool IsInDelete(long long testframe) const;
-    bool IsIVTVDecoder(void) const;
 
     // Private pausing stuff
     void PauseVideo(bool wait = true);
@@ -457,6 +470,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool DoFastForward(void);
     bool DoRewind(void);
     void DoChangeDVDTrack(void);
+    void DoJumpToFrame(long long frame);
 
     // Private seeking stuff
     void ClearAfterSeek(bool clearvideobuffers = true);
@@ -472,7 +486,6 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // Private edit stuff
     void SaveCutList(void);
     void LoadCutList(void);
-    void LoadCommBreakList(void);
     void DisableEdit(void);
 
     void AddMark(long long frames, int type);
@@ -521,27 +534,30 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     long long GetDVDBookmark(void) const;
     void SetDVDBookmark(long long frames);
 
+    // Private PIP stuff
+    void HandlePIPPlayerLists(uint max_pip_players);
+
   private:
     DecoderBase   *decoder;
     QMutex         decoder_change_lock;
     VideoOutput   *videoOutput;
-    RemoteEncoder *nvr_enc;
-    ProgramInfo   *m_playbackinfo;
+    PlayerContext *player_ctx;
 
     // Window stuff
     QWidget *parentWidget;
     WId embedid;
+    bool wantToResize;
     int embx, emby, embw, embh;
-    FrameScanType embed_saved_scan_type;
-    bool          embed_saved_scan_lock;
 
     // State
     QWaitCondition decoderThreadPaused;
     QWaitCondition videoThreadPaused;
     QWaitCondition videoThreadUnpaused;
+    mutable QWaitCondition playingWaitCond;
     mutable QMutex vidExitLock;
     mutable QMutex pauseUnpauseLock;
     mutable QMutex internalPauseLock;
+    mutable QMutex playingLock;
     bool     eof;             ///< At end of file/ringbuffer
     bool     m_double_framerate;///< Output fps is double Video (input) rate
     bool     m_double_process;///< Output filter must processed at double rate
@@ -566,6 +582,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool     hasFullPositionMap;
     mutable bool     limitKeyRepeat;
     bool     errored;
+    QString  errmsg; ///< reason why NVP exited with a error.
 
     // Bookmark stuff
     long long bookmarkseek;
@@ -611,16 +628,14 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     /// Video (input) Number of frames between key frames (often inaccurate)
     int keyframedist;
 
-    // RingBuffer stuff
-    QString    filename;        ///< Filename if we create our own ringbuf
-    bool       weMadeBuffer;    ///< Iff true, we can delete ringBuffer
-    RingBuffer *ringBuffer;     ///< Pointer to the RingBuffer we read from
-    
     // Prebuffering (RingBuffer) control
     QWaitCondition prebuffering_wait;///< QWaitContition used by prebuffering
     QMutex     prebuffering_lock;///< Mutex used to control access to prebuf
     bool       prebuffering;    ///< Iff true, don't play until done prebuf
-    int        prebuffer_tries; ///< Number of times prebuf wait attempted
+    /// Number of times prebuf wait attempted, since last reset
+    int        prebuffer_tries;
+    /// Number of times prebuf wait attempted
+    int        prebuffer_tries_total;
 
     // General Caption/Teletext/Subtitle support
     bool     db_prefer708;
@@ -694,9 +709,13 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool     audio_passthru;
 
     // Picture-in-Picture
-    NuppelVideoPlayer *pipplayer;
-    NuppelVideoPlayer *setpipplayer;
-    bool needsetpipplayer;
+    mutable QMutex pip_players_lock;
+    QWaitCondition pip_players_wait;
+    PIPMap         pip_players;
+    PIPMap         pip_players_add;
+    PIPMap         pip_players_rm;
+    volatile bool  pip_active;
+    volatile bool  pip_visible;
 
     // Preview window support
     unsigned char      *argb_buf;
@@ -722,9 +741,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     FilterManager *FiltMan;
 
     // Commercial filtering
-    QMutex     commBreakMapLock;
+    mutable QMutex commBreakMapLock;
     int        skipcommercials;
-    int        autocommercialskip;
+    CommSkipMode autocommercialskip;
     int        commrewindamount;
     int        commnotifyamount;
     int        lastCommSkipDirection;
@@ -789,7 +808,6 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     long long  savedAudioTimecodeOffset;
 
     // LiveTV
-    LiveTVChain *livetvchain;
     TV *m_tv;
     bool isDummy;
 

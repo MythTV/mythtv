@@ -48,7 +48,7 @@ class MPUBLIC LiveTVChain
     QString GetID(void)  const { return m_id; }
     int  GetCurPos(void) const { return m_curpos; }
     int  ProgramIsAt(const QString &chanid, const QDateTime &starttime) const;
-    int  ProgramIsAt(const ProgramInfo *pginfo) const;
+    int  ProgramIsAt(const ProgramInfo &pginfo) const;
     int  GetLengthAtCurPos(void);
     int  TotalSize(void) const;
     bool HasNext(void)   const;
@@ -65,7 +65,7 @@ class MPUBLIC LiveTVChain
     QString GetCardType(int pos = -1) const;
 
     // sets/gets program to switch to
-    void SetProgram(ProgramInfo *pginfo);
+    void SetProgram(const ProgramInfo &pginfo);
     void SwitchTo(int num);
     void SwitchToNext(bool up);
     void ClearSwitch(void);

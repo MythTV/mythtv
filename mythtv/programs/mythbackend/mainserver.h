@@ -158,7 +158,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     LiveTVChain *GetExistingChain(const QString &id);
     LiveTVChain *GetExistingChain(const MythSocket *sock);
-    LiveTVChain *GetChainWithRecording(const ProgramInfo *pginfo);
+    LiveTVChain *GetChainWithRecording(const ProgramInfo &pginfo);
     void AddToChains(LiveTVChain *chain);
     void DeleteChain(LiveTVChain *chain);
 

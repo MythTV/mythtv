@@ -9,6 +9,7 @@ using namespace std;
 #include <qmap.h>
 
 #include "videooutbase.h"
+#include "videoouttypes.h"
 
 enum OpenGLFilterType
 {
@@ -18,25 +19,13 @@ enum OpenGLFilterType
     kGLFilterYUV2RGB,
     kGLFilterYUV2RGBA,
 
-    // Frame rate preserving deinterlacers
-    kGLFilterLinearBlendDeint,
-    kGLFilterKernelDeint,
-    kGLFilterOneFieldDeint,
-
-    // Frame rate doubling deinterlacers
-    kGLFilterBobDeintDFR,
-    kGLFilterLinearBlendDeintDFR,
-    kGLFilterKernelDeintDFR,
-    kGLFilterFieldOrderDFR,
-    kGLFilterOneFieldDeintDFR,
-
     // Frame scaling/resizing filters
     kGLFilterResize,
+    kGLFilterBicubic,
 };
 
 enum DisplayBuffer
 {
-    kNoBuffer = 0,    // disable filter
     kDefaultBuffer,
     kFrameBufferObject
 };
@@ -54,96 +43,103 @@ class OpenGLVideo
     OpenGLVideo();
    ~OpenGLVideo();
 
-    bool Init(OpenGLContext *glcontext, bool colour_control, bool onscreen,
-              QSize video_size, QRect visible_rect,
-              QRect video_rect, QRect frame_rect,
-              bool viewport_control, bool osd = FALSE);
-    bool ReInit(OpenGLContext *gl, bool colour_control, bool onscreen,
-              QSize video_size, QRect visible_rect,
-              QRect video_rect, QRect frame_rect,
-              bool viewport_control, bool osd = FALSE);
+    bool Init(OpenGLContext *glcontext, bool colour_control,
+              QSize videoDim, QRect displayVisibleRect,
+              QRect displayVideoRect, QRect videoRect,
+              bool viewport_control,  QString options, bool osd = FALSE,
+              LetterBoxColour letterbox_colour = kLetterBoxColour_Black);
 
-    void UpdateInputFrame(const VideoFrame *frame);
+    void UpdateInputFrame(const VideoFrame *frame, bool soft_bob = false);
     void UpdateInput(const unsigned char *buf, const int *offsets,
-                     uint texture_index, int format, QSize size);
+                     int format, QSize size,
+                     const unsigned char *alpha);
 
     bool AddFilter(const QString &filter)
          { return AddFilter(StringToFilter(filter)); }
     bool RemoveFilter(const QString &filter)
          { return RemoveFilter(StringToFilter(filter)); }
 
-    bool AddDeinterlacer(const QString &filter);
+    bool AddDeinterlacer(const QString &deinterlacer);
     void SetDeinterlacing(bool deinterlacing);
     QString GetDeinterlacer(void) const
-         { return FilterToString(GetDeintFilter()); };
+         { return hardwareDeinterlacer; };
     void SetSoftwareDeinterlacer(const QString &filter);
 
     void PrepareFrame(FrameScanType scan, bool softwareDeinterlacing,
-                      long long frame);
+                      long long frame, bool draw_border = false);
 
     void  SetMasterViewport(QSize size)   { masterViewportSize = size; }
     QSize GetViewPort(void)         const { return viewportSize; }
-    void  SetVideoRect(const QRect &vidrect, const QRect &framerect)
-        { videoRect = vidrect; frameRect = framerect;}
-    QSize GetVideoSize(void)        const { return videoSize; }
+    void  SetVideoRect(const QRect &dispvidrect, const QRect &vidrect)
+                      { display_video_rect = dispvidrect; video_rect = vidrect;}
+    QSize GetVideoSize(void)        const { return actual_video_dim;}
     void SetVideoResize(const QRect &rect);
     void DisableVideoResize(void);
-    int SetPictureAttribute(PictureAttribute attributeType, int newValue);
-    PictureAttributeSupported GetSupportedPictureAttributes(void) const;
 
   private:
     void Teardown(void);
     void SetViewPort(const QSize &new_viewport_size);
-    void SetViewPortPrivate(const QSize &new_viewport_size);
     bool AddFilter(OpenGLFilterType filter);
     bool RemoveFilter(OpenGLFilterType filter);
+    void CheckResize(bool deinterlacing);
     bool OptimiseFilters(void);
-    OpenGLFilterType GetDeintFilter(void) const;
-    bool AddFrameBuffer(uint &framebuffer, uint &texture, QSize size);
-    uint AddFragmentProgram(OpenGLFilterType name);
-    uint CreateVideoTexture(QSize size, QSize &tex_size);
-    QString GetProgramString(OpenGLFilterType filter);
+    bool AddFrameBuffer(uint &framebuffer, QSize fb_size,
+                        uint &texture, QSize vid_size);
+    uint AddFragmentProgram(OpenGLFilterType name,
+                            QString deint = QString::null,
+                            FrameScanType field = kScan_Progressive);
+    uint CreateVideoTexture(QSize size, QSize &tex_size,
+                            bool use_pbo = false);
+    QString GetProgramString(OpenGLFilterType filter,
+                             QString deint = QString::null,
+                             FrameScanType field = kScan_Progressive);
     void CalculateResize(float &left,  float &top,
                          float &right, float &bottom);
     static QString FilterToString(OpenGLFilterType filter);
     static OpenGLFilterType StringToFilter(const QString &filter);
     void ShutDownYUV2RGB(void);
-    void SetViewPort(bool last_stage);
-    void InitOpenGL(void);
     QSize GetTextureSize(const QSize &size);
     void SetFiltering(void);
 
-    void Rotate(vector<uint> *target);
-    void SetTextureFilters(vector<uint> *textures, int filt);
+    void RotateTextures(void);
+    void SetTextureFilters(vector<uint> *textures, int filt, int clamp);
+    void DeleteTextures(vector<uint> *textures);
+    void TearDownDeinterlacer(void);
+    uint ParseOptions(QString options);
 
     OpenGLContext *gl_context;
-    QSize          videoSize;
+    QSize          video_dim;
+    QSize          actual_video_dim;
     QSize          viewportSize;
     QSize          masterViewportSize;
-    QRect          visibleRect;
-    QRect          videoRect;
-    QRect          frameRect;
+    QRect          display_visible_rect;
+    QRect          display_video_rect;
+    QRect          video_rect;
     QRect          frameBufferRect;
-    bool           invertVideo;
     QString        softwareDeinterlacer;
+    QString        hardwareDeinterlacer;
     bool           hardwareDeinterlacing;
     bool           useColourControl;
     bool           viewportControl;
-    uint           frameBuffer;
-    uint           frameBufferTexture;
+    vector<uint>   referenceTextures;
     vector<uint>   inputTextures;
     QSize          inputTextureSize;
     glfilt_map_t   filters;
     long long      currentFrameNum;
     bool           inputUpdated;
+    bool           textureRects;
+    uint           textureType;
+    uint           helperTexture;
+    OpenGLFilterType defaultUpsize;
 
-    QSize            convertSize;
-    unsigned char   *convertBuf;
+    QSize          convertSize;
+    unsigned char *convertBuf;
 
-    bool             videoResize;
-    QRect            videoResizeRect;
-
-    float pictureAttribs[kPictureAttribute_MAX];
+    bool           videoResize;
+    QRect          videoResizeRect;
+ 
+    uint           gl_features;
+    LetterBoxColour gl_letterbox_colour;
 };
 
 #else // if !USING_OPENGL_VIDEO
@@ -154,16 +150,14 @@ class OpenGLVideo
     OpenGLVideo() { }
     ~OpenGLVideo() { }
 
-    bool Init(OpenGLContext*, bool, bool, QSize, QRect,
-              QRect, QRect, bool, bool osd = false)
-        { (void) osd; return false; }
+    bool Init(OpenGLContext*, bool, QSize, QRect,
+              QRect, QRect, bool, QString, bool osd = false,
+              LetterBoxColour letterbox = kLetterBoxColour_Black)
+                { (void) osd; return false; }
 
-    bool ReInit(OpenGLContext*, bool, bool, QSize, QRect,
-                QRect, QRect, bool, bool osd = false)
-        { (void) osd; return false; }
-
-    void UpdateInputFrame(const VideoFrame*) { }
-    void UpdateInput(const unsigned char*, const int*, uint, int, QSize) { }
+    void UpdateInputFrame(const VideoFrame*, bool = false) { }
+    void UpdateInput(const unsigned char*, const int*,
+                     int, QSize, unsigned char* = NULL) { }
 
     bool AddFilter(const QString&) { return false; }
     bool RemoveFilter(const QString&) { return false; }
@@ -173,7 +167,7 @@ class OpenGLVideo
     QString GetDeinterlacer(void) const { return QString::null; }
     void SetSoftwareDeinterlacer(const QString&) { }
 
-    void PrepareFrame(FrameScanType, bool, long long) { }
+    void PrepareFrame(FrameScanType, bool, long long, bool) { }
 
     void  SetMasterViewport(QSize) { }
     QSize GetViewPort(void) const { return QSize(0,0); }
@@ -181,9 +175,6 @@ class OpenGLVideo
     QSize GetVideoSize(void) const { return QSize(0,0); }
     void SetVideoResize(const QRect&) { }
     void DisableVideoResize(void) { }
-    int SetPictureAttribute(PictureAttribute, int) { return -1; }
-    PictureAttributeSupported GetSupportedPictureAttributes(void) const
-        { return kPictureAttributeSupported_None; }
 };
 
 #endif // !USING_OPENGL_VIDEO

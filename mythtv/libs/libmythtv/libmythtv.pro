@@ -247,9 +247,9 @@ using_frontend {
 
     # Video playback
     HEADERS += tv_play.h                NuppelVideoPlayer.h
-    HEADERS += DVDRingBuffer.h
+    HEADERS += DVDRingBuffer.h          playercontext.h
     SOURCES += tv_play.cpp              NuppelVideoPlayer.cpp
-    SOURCES += DVDRingBuffer.cpp
+    SOURCES += DVDRingBuffer.cpp        playercontext.cpp
 
     # Text subtitle parser
     HEADERS += textsubtitleparser.h     xine_demux_sputext.h
@@ -281,10 +281,12 @@ using_frontend {
     HEADERS += jitterometer.h           yuv2rgb.h
     HEADERS += videodisplayprofile.h    mythcodecid.h
     HEADERS += videoouttypes.h
+    HEADERS += videooutwindow.h
     SOURCES += videooutbase.cpp         videoout_null.cpp
     SOURCES += videobuffers.cpp         vsync.cpp
     SOURCES += jitterometer.cpp         yuv2rgb.cpp
     SOURCES += videodisplayprofile.cpp  mythcodecid.cpp
+    SOURCES += videooutwindow.cpp
 
     macx:HEADERS +=               videoout_dvdv.h
     macx:HEADERS +=               videoout_quartz.h

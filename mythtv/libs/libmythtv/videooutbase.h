@@ -18,6 +18,7 @@ extern "C" {
 #include "videobuffers.h"
 #include "mythcodecid.h"
 #include "videoouttypes.h"
+#include "videooutwindow.h"
 
 using namespace std;
 
@@ -27,6 +28,9 @@ class OSDSurface;
 class FilterChain;
 class FilterManager;
 class VideoDisplayProfile;
+class OpenGLContextGLX;
+
+typedef QMap<NuppelVideoPlayer*,PIPLocation> PIPMap;
 
 extern "C" {
 struct ImgReSampleContext;
@@ -38,6 +42,7 @@ class VideoOutput
     static VideoOutput *Create(
         const QString &decoder,   MythCodecID  codec_id,
         void          *codec_priv,
+        PIPState       pipState,
         const QSize   &video_dim, float        video_aspect,
         WId            win_id,    const QRect &display_rect,
         WId            embed_id);
@@ -71,7 +76,8 @@ class VideoOutput
                               void        *codec_private);
     virtual void VideoAspectRatioChanged(float aspect);
 
-    virtual void EmbedInWidget(WId wid, int x, int y, int w, int h);
+    virtual void ResizeDisplayWindow(const QRect&, bool);
+    virtual void EmbedInWidget(int x, int y, int w, int h);
     virtual void StopEmbedding(void);
     virtual void ResizeForGui(void) {;} 
     virtual void ResizeForVideo(void) {;}
@@ -79,7 +85,6 @@ class VideoOutput
     virtual void MoveResize(void);
     virtual void Zoom(ZoomDirection direction);
  
-    virtual void GetDrawSize(int &xoff, int &yoff, int &width, int &height);
     virtual void GetOSDBounds(QRect &total, QRect &visible,
                               float &visibleAspect, float &fontScale,
                               float themeAspect) const;
@@ -96,26 +101,26 @@ class VideoOutput
     virtual void DrawUnusedRects(bool sync = true) = 0;
 
     /// \brief Returns current display aspect ratio.
-    virtual float GetDisplayAspect(void) const { return display_aspect; }
+    virtual float GetDisplayAspect(void) const;
 
     /// \brief Returns current aspect override mode
     /// \sa ToggleAspectOverride(AspectOverrideMode)
-    AspectOverrideMode GetAspectOverride(void) { return aspectoverride; }
+    AspectOverrideMode GetAspectOverride(void) const;
     void ToggleAspectOverride(
         AspectOverrideMode aspectOverrideMode = kAspect_Toggle);
 
     /// \brief Returns current adjust fill mode
     /// \sa ToggleAdjustFill(AdjustFillMode)
-    AdjustFillMode GetAdjustFill(void) { return adjustfill; }
+    AdjustFillMode GetAdjustFill(void) const;
     void ToggleAdjustFill(AdjustFillMode adjustFillMode = kAdjustFill_Toggle);
 
     // pass in null to use the pause frame, if it exists.
     virtual void ProcessFrame(VideoFrame *frame, OSD *osd,
                               FilterChain *filterList,
-                              NuppelVideoPlayer *pipPlayer) = 0;
+                              const PIPMap &pipPlayers) = 0;
 
     /// \brief Tells video output that a full repaint is needed.
-    void ExposeEvent(void) { needrepaint = true; }
+    void ExposeEvent(void);
 
     PictureAttributeSupported GetSupportedPictureAttributes(void) const
         { return supported_attributes; }
@@ -124,15 +129,21 @@ class VideoOutput
     int         GetPictureAttribute(PictureAttribute) const;
     virtual void InitPictureAttributes(void);
 
-    bool AllowPreviewEPG(void) { return allowpreviewepg; }
+    bool AllowPreviewEPG(void) const;
 
-    /// \brief Returns true iff Motion Compensation acceleration is available.
+    /// \brief Returns true if Motion Compensation acceleration is available.
     virtual bool hasMCAcceleration(void) const { return false; }
-    /// \brief Returns true iff Inverse Discrete Cosine Transform acceleration
+    /// \brief Returns true if Inverse Discrete Cosine Transform acceleration
     ///        is available.
     virtual bool hasIDCTAcceleration(void) const { return false; }
-    /// \brief Returns true iff VLD acceleration is available.
+    /// \brief Returns true if VLD acceleration is available.
     virtual bool hasVLDAcceleration(void) const { return false; }
+    /// \brief Returns true if XV Acceleration is running
+    virtual bool hasXVAcceleration(void) const { return false; } 
+    /// \brief Returns true if OpenGL acceleration is running
+    virtual bool hasOpenGLAcceleration(void) const { return false; }
+    /// \brief Return true if HW Acceleration is running
+    virtual bool hasHWAcceleration(void) const { return false; }
 
     /// \brief Sets the number of frames played
     virtual void SetFramesPlayed(long long fp) { framesPlayed = fp; };
@@ -165,7 +176,7 @@ class VideoOutput
     bool EnoughPrebufferedFrames(void) { return vbuffers.EnoughPrebufferedFrames(); }
 
     /// \brief Returns if videooutput is embedding
-    bool IsEmbedding(void) { return embedding; }
+    bool IsEmbedding(void);
 
     /**
      * \brief Blocks until it is possible to return a frame for decoding onto.
@@ -216,10 +227,17 @@ class VideoOutput
     void SetVideoScalingAllowed(bool change); 
 
     /// \brief check if video underscan/overscan is allowed
-    bool IsVideoScalingAllowed(void) { return db_scaling_allowed; }
+    bool IsVideoScalingAllowed(void) const;
 
     /// \brief returns QRect of PIP based on PIPLocation
-    virtual QRect GetPIPRect(int location, NuppelVideoPlayer *pipplayer = NULL);
+    virtual QRect GetPIPRect(PIPLocation location,
+                             NuppelVideoPlayer *pipplayer = NULL,
+                             bool do_pixel_adj = true) const;
+
+    virtual void SetPIPState(PIPState setting);
+
+    virtual QString GetOSDRenderer(void) const;
+
 
     QString GetFilters(void) const;
 
@@ -228,7 +246,11 @@ class VideoOutput
                      int needprebuffer_normal, int needprebuffer_small,
                      int keepprebuffer);
 
-    virtual void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
+    virtual void ShowPIPs(VideoFrame *frame, const PIPMap &pipPlayers);
+    virtual void ShowPIP(VideoFrame        *frame,
+                         NuppelVideoPlayer *pipplayer,
+                         PIPLocation        loc);
+
     virtual int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1, int revision = -1);
 
     virtual void SetPictureAttributeDBValue(
@@ -247,18 +269,13 @@ class VideoOutput
 
     void SetVideoAspectRatio(float aspect);
 
-    void ApplyManualScaleAndMove(void);
-    void ApplyDBScaleAndMove(void);
-    void ApplyLetterboxing(void);
-    void ApplySnapToVideoRect(void);
-    void PrintMoveResizeDebug(void);
+    // OpenGL
+    virtual OpenGLContextGLX *GetGLContext(void) { return NULL; }
+    virtual OpenGLContextGLX *CreateGLContext(const QSize &display_size) 
+        { (void)display_size; return NULL; }
 
+    vector<VideoOutWindow> windows;
     QSize   db_display_dim;   ///< Screen dimensions in millimeters from DB
-    QPoint  db_move;          ///< Percentage move from database
-    float   db_scale_horiz;   ///< Horizontal Overscan/Underscan percentage
-    float   db_scale_vert;    ///< Vertical Overscan/Underscan percentage
-    PIPLocation db_pip_location;
-    int     db_pip_size;      ///< percentage of full window to use for PiP
     typedef QMap<PictureAttribute,int> PictureSettingMap;
     PictureSettingMap  db_pict_attr; ///< Picture settings
     AspectOverrideMode db_aspectoverride;
@@ -269,44 +286,12 @@ class VideoOutput
 
     VideoDisplayProfile *db_vdisp_profile;
 
-    // Manual Zoom
-    float   mz_scale_v;       ///< Manually applied vertical scaling.
-    float   mz_scale_h;       ///< Manually applied horizontal scaling.
-    QPoint  mz_move;          ///< Manually applied percentage move.
-
-    // Physical dimensions
-    QSize   display_dim;      ///< Screen dimensions of playback window in mm
-    float   display_aspect;   ///< Physical aspect ratio of playback window
-
-    // Video dimensions
-    QSize   video_dim;        ///< Pixel dimensions of video buffer
-    QSize   video_disp_dim;   ///< Pixel dimensions of video display area
-    float   video_aspect;     ///< Physical aspect ratio of video
-
-    /// Normally this is the same as videoAspect, but may not be
-    /// if the user has toggled the aspect override mode.
-    float   overriden_video_aspect;
-    /// AspectOverrideMode to use to modify overriden_video_aspect
-    AspectOverrideMode aspectoverride;
-    /// Zoom mode
-    AdjustFillMode adjustfill;
-
-    /// Pixel rectangle in video frame to display
-    QRect   video_rect;
-    /// Pixel rectangle in display window into which video_rect maps to
-    QRect   display_video_rect;
-    /// Visible portion of display window in pixels.
-    /// This may be bigger or smaller than display_video_rect.
-    QRect   display_visible_rect;
-    /// Used to save the display_visible_rect for
-    /// restoration after video embedding ends.
-    QRect   tmp_display_visible_rect;
-
     // Picture-in-Picture
     QSize   pip_desired_display_size;
     QSize   pip_display_size;
     QSize   pip_video_size;
     unsigned char      *pip_tmp_buf;
+    unsigned char      *pip_tmp_buf2;
     ImgReSampleContext *pip_scaling_context;
     VideoFrame pip_tmp_image;
 
@@ -329,20 +314,11 @@ class VideoOutput
     VideoBuffers vbuffers;
 
     // Various state variables
-    bool    embedding;
-    bool    needrepaint;
-    bool    allowpreviewepg;
     bool    errored;
     long long framesPlayed;
-    bool    db_scaling_allowed; ///< disable this to prevent overscan/underscan
-    PictureAttributeSupported supported_attributes;
 
-    // Constants
-    static const float kManualZoomMaxHorizontalZoom;
-    static const float kManualZoomMaxVerticalZoom;
-    static const float kManualZoomMinHorizontalZoom;
-    static const float kManualZoomMinVerticalZoom;
-    static const int   kManualZoomMaxMove;
+    // PIP
+    PictureAttributeSupported supported_attributes;
 };
 
 #endif

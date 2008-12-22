@@ -139,7 +139,7 @@ class MPUBLIC GuideGrid : public MythDialog, public JumpToChannelListener
 
   private slots:
     void timeCheckTimeout(void);
-    void repaintVideoTimeout(void);
+    void refreshVideo(void);
 
   private:
     void keyPressEvent(QKeyEvent *e);
@@ -153,6 +153,7 @@ class MPUBLIC GuideGrid : public MythDialog, public JumpToChannelListener
     void paintPrograms(QPainter *);
     void paintCurrentInfo(QPainter *);
     void paintInfo(QPainter *);
+    void paintVideo(QPainter *);
  
     void resizeImage(QPixmap *, QString);
     void LoadWindow(QDomElement &);
@@ -231,6 +232,9 @@ class MPUBLIC GuideGrid : public MythDialog, public JumpToChannelListener
     QDateTime lastTime;
 
     TV *m_player;
+    bool using_null_video;
+    QTimer *previewVideoRefreshTimer;
+    void EmbedTVWindow(void);
 
     QString channelOrdering;
     QString dateformat;
@@ -239,7 +243,6 @@ class MPUBLIC GuideGrid : public MythDialog, public JumpToChannelListener
     QString unknownCategory;
 
     QTimer *timeCheck;
-    QTimer *videoRepaintTimer;
 
     bool keyDown;
 

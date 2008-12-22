@@ -23,6 +23,9 @@ void ChromaKeyOSD::AllocImage(int i)
 {
     uint size = 0;
 
+    const QRect display_visible_rect =
+        videoOutput->windows[0].GetDisplayVisibleRect();
+
     X11L;
     XImage *shm_img =
         XShmCreateImage(videoOutput->XJ_disp,
@@ -30,8 +33,8 @@ void ChromaKeyOSD::AllocImage(int i)
                                       videoOutput->XJ_screen_num),
                         videoOutput->XJ_depth, ZPixmap, 0,
                         &shm_infos[i],
-                        videoOutput->display_visible_rect.width(),
-                        videoOutput->display_visible_rect.height());
+                        display_visible_rect.width(),
+                        display_visible_rect.height());
     if (shm_img)
         size = shm_img->bytes_per_line * (shm_img->height+1) + 128;
     X11U;
@@ -63,8 +66,8 @@ void ChromaKeyOSD::AllocImage(int i)
     bzero((vf+i), sizeof(VideoFrame));
     vf[i].buf = (unsigned char*) shm_infos[i].shmaddr;
     vf[i].codec  = FMT_ARGB32;
-    vf[i].height = videoOutput->display_visible_rect.height();
-    vf[i].width  = videoOutput->display_visible_rect.width();
+    vf[i].height = display_visible_rect.height();
+    vf[i].width  = display_visible_rect.width();
     vf[i].bpp    = 32;
 }
 
@@ -92,7 +95,12 @@ void ChromaKeyOSD::Reinit(int i)
 {
     // Make sure the buffer is the right size...
     QSize new_res(vf[i].width, vf[i].height);
-    if (new_res != videoOutput->display_visible_rect.size())
+    const QRect display_visible_rect =
+        videoOutput->windows[0].GetDisplayVisibleRect();
+    const QRect display_video_rect =
+        videoOutput->windows[0].GetDisplayVideoRect();
+
+    if (new_res != display_visible_rect.size())
     {
         FreeImage(i);
         AllocImage(i);
@@ -104,29 +112,29 @@ void ChromaKeyOSD::Reinit(int i)
     // create chroma key line
     char *cln = (char*)av_malloc(bpl + 128);
     bzero(cln, bpl);
-    int j  = max(videoOutput->display_video_rect.left() -
-                 videoOutput->display_visible_rect.left(), 0);
-    int ej = min(videoOutput->display_video_rect.left() +
-                 videoOutput->display_video_rect.width(), vf[i].width);
+    int j  = max(display_video_rect.left() -
+                 display_visible_rect.left(), 0);
+    int ej = min(display_video_rect.left() +
+                 display_video_rect.width(), vf[i].width);
     for (; j < ej; ++j)
         ((uint*)cln)[j] = key;
 
     // boboff assumes the smallest interlaced resolution is 480 lines - 5%
     int boboff = (int) round(
-        ((double)videoOutput->display_video_rect.height()) / 456 - 0.00001);
+        ((double)display_video_rect.height()) / 456 - 0.00001);
     boboff = (videoOutput->m_deinterlacing &&
               videoOutput->m_deintfiltername == "bobdeint") ? boboff : 0;
 
     // calculate beginning and end of chromakey
-    int cstart = min(max(videoOutput->display_video_rect.top() + boboff, 0),
+    int cstart = min(max(display_video_rect.top() + boboff, 0),
                      vf[i].height - 1);
-    int cend   = min(max(videoOutput->display_video_rect.top() +
-                         videoOutput->display_video_rect.height(), 0),
+    int cend   = min(max(display_video_rect.top() +
+                         display_video_rect.height(), 0),
                      vf[i].height);
 
     // Paint with borders and chromakey
     char *buf = shm_infos[i].shmaddr;
-    int ldispy = min(max(videoOutput->display_visible_rect.top(), 0),
+    int ldispy = min(max(display_visible_rect.top(), 0),
                      vf[i].height - 1);
 
     VERBOSE(VB_PLAYBACK, LOC + "cstart: "<<cstart<<"  cend: "<<cend);

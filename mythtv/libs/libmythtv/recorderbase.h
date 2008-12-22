@@ -17,6 +17,8 @@ class RingBuffer;
 class ProgramInfo;
 class RecordingProfile;
 
+typedef QMap<long long, long long> PosMap;
+
 /** \class RecorderBase
  *  \brief This is the abstract base class for supporting 
  *         recorder hardware.
@@ -177,7 +179,9 @@ class MPUBLIC RecorderBase
      *  \return Closest prior keyframe, or -1 if there is no prior
      *          known keyframe.
      */
-    virtual long long GetKeyframePosition(long long desired) = 0;
+    virtual long long GetKeyframePosition(long long desired) const;
+    virtual bool GetKeyframePositions(
+        long long start, long long end, PosMap&) const;
 
     /** \brief Pause tells StartRecording() to pause, it should not block.
      *
@@ -281,10 +285,10 @@ class MPUBLIC RecorderBase
     ProgramInfo   *nextRecording;
 
     // Seektable  support
-    int                        positionMapType;
-    QMutex                     positionMapLock;
-    QMap<long long, long long> positionMap;
-    QMap<long long, long long> positionMapDelta;
+    int            positionMapType;
+    mutable QMutex positionMapLock;
+    PosMap         positionMap;
+    PosMap         positionMapDelta;
 
 };
 

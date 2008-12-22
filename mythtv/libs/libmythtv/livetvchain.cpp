@@ -308,12 +308,12 @@ int LiveTVChain::ProgramIsAt(const QString &chanid,
     return -1;
 }
 
-/** \fn LiveTVChain::ProgramIsAt(const ProgramInfo*) const
+/** \fn LiveTVChain::ProgramIsAt(const ProgramInfo&) const
  *  \returns program location or -1 for not found.
  */
-int LiveTVChain::ProgramIsAt(const ProgramInfo *pginfo) const
+int LiveTVChain::ProgramIsAt(const ProgramInfo &pginfo) const
 {
-    return ProgramIsAt(pginfo->chanid, pginfo->recstartts);
+    return ProgramIsAt(pginfo.chanid, pginfo.recstartts);
 }
 
 /** \fn LiveTVChain::GetLengthAtCurPos(void)
@@ -336,15 +336,12 @@ int LiveTVChain::TotalSize(void) const
     return m_chain.count();
 }
 
-void LiveTVChain::SetProgram(ProgramInfo *pginfo)
+void LiveTVChain::SetProgram(const ProgramInfo &pginfo)
 {
-    if (!pginfo)
-        return;
-
     QMutexLocker lock(&m_lock);
 
-    m_cur_chanid = pginfo->chanid;
-    m_cur_startts = pginfo->recstartts;
+    m_cur_chanid  = pginfo.chanid;
+    m_cur_startts = pginfo.recstartts;
 
     m_curpos = ProgramIsAt(pginfo);
     m_switchid = -1;

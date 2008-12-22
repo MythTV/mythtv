@@ -690,25 +690,48 @@ void OSDListBtnType::InitItem(
     float gstep = ((float) (end.green() - beg.green())) / m_itemHeight;
     float bstep = ((float) (end.blue()  - beg.blue()))  / m_itemHeight;
 
-    unsigned char *data = new unsigned char[4 * width * height];
-    uint32_t *ptr = (uint32_t*) data;
+    if (!width || !height)
+        return;
 
+    uint stride = sizeof(uint32_t) * width;
+
+    // Note: this safety margin allows us to skip some
+    // checks that would otherwise be needed below.
+    const uint safety_margin = stride + sizeof(uint32_t);
+
+    uint data_size = stride * height;
+    unsigned char *data = new unsigned char[data_size + safety_margin];
+    uint32_t *ptr = (uint32_t*) data;
     uint black = qRgba(0,0,0,alpha);
+
     for (uint x = 0; x < width; x++, ptr++)
-        *ptr = black;
-    for (uint y = 1; y < height - 1; y++) 
+        *ptr = black; // safe due to safety_margin
+
+#define CUR_POS (((uchar*)ptr)-data)
+    for (uint y = 1; y+1 < height; y++) 
     {
+        *ptr = black; // safe due to safety_margin
+        ptr++;
+
         int r = (int) (beg.red()   + (y * rstep));
         int g = (int) (beg.green() + (y * gstep));
         int b = (int) (beg.blue()  + (y * bstep));
         uint32_t color = qRgba(r,g,b,alpha);
-        *ptr = black; ptr++;
-        for (uint x = 1; x < width - 1; x++, ptr++)
-            *ptr = color;
-        *ptr = black; ptr++;
+
+        if (CUR_POS + stride < data_size)
+        {
+            for (uint x = 1; x+1 < width; x++, ptr++)
+                *ptr = color;
+            *ptr = black;
+            ptr++;
+        }
     }
-    for (uint x = 0; x < width; x++, ptr++)
-        *ptr = black;
+    if (CUR_POS + stride < data_size + safety_margin)
+    {
+        for (uint x = 0; x < width; x++, ptr++)
+            *ptr = black;
+    }
+#undef CUR_POS
 
     {
         QImage img;

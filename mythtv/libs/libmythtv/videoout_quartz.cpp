@@ -1116,7 +1116,7 @@ void VideoOutputQuartz::MoveResize(void)
     vector<VideoOutputQuartzView*>::iterator it;
     for (it = data->views.begin(); it != data->views.end(); ++it)
     {
-        (*it)->MoveResize(display_video_rect);
+        (*it)->MoveResize(windows[0].GetDisplayVideoRect());
     }
 }
 
@@ -1131,8 +1131,8 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
             .arg(input_size.height()).arg(aspect));
 
     bool cid_changed = (myth_codec_id != av_codec_id);
-    bool res_changed = input_size != video_disp_dim;
-    bool asp_changed = aspect != video_aspect;
+    bool res_changed = input_size != windows[0].GetVideoDispDim();
+    bool asp_changed = aspect != windows[0].GetVideoAspect();
 
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
 
@@ -1144,6 +1144,7 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
         return true;
     }
 
+    const QSize video_dim = windows[0].GetVideoDim();
     if (cid_changed)
     {
         myth_codec_id = av_codec_id;
@@ -1218,6 +1219,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, embedid);
 
+    const QSize video_dim = windows[0].GetVideoDim();
     data->srcWidth  = video_dim.width();
     data->srcHeight = video_dim.height();
     data->srcAspect = aspect;
@@ -1271,8 +1273,9 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     CGSize size_in_mm = CGDisplayScreenSize(data->screen);
     if ((size_in_mm.width > 0.0001f) && (size_in_mm.height > 0.0001f))
     {
-        display_dim = QSize((uint) size_in_mm.width, (uint) size_in_mm.height);
-        display_aspect = size_in_mm.width / size_in_mm.height;
+        windows[0].SetDisplayDim(QSize((uint) size_in_mm.width,
+                                       (uint) size_in_mm.height));
+        windows[0].SetDisplayAspect(size_in_mm.width / size_in_mm.height);
         VERBOSE(VB_PLAYBACK, QString("Screen size is %1 x %2 (mm), aspect %3")
                              .arg(size_in_mm.width).arg(size_in_mm.height)
                              .arg(display_aspect));
@@ -1412,6 +1415,7 @@ static QString toCommaList(const QStringList &list)
 
 bool VideoOutputQuartz::CreateQuartzBuffers(void)
 {
+    const QSize video_dim = windows[0].GetVideoDim();
     db_vdisp_profile->SetInput(video_dim);
     QStringList renderers = GetAllowedRenderers(myth_codec_id, video_dim);
     QString     renderer  = QString::null;
@@ -1544,10 +1548,10 @@ void VideoOutputQuartz::EmbedInWidget(WId wid, int x, int y, int w, int h)
             QString("wid=%1, x=%2, y=%3, w=%4, h=%5)")
             .arg(wid).arg(x).arg(y).arg(w).arg(h));
 
-    if (embedding)
+    if (windows[0].IsEmbedding())
         return;
 
-    VideoOutput::EmbedInWidget(wid, x, y, w, h);
+    VideoOutput::EmbedInWidget(x, y, w, h);
 
     data->pixelLock.lock();
 
@@ -1574,7 +1578,7 @@ void VideoOutputQuartz::StopEmbedding(void)
     VERBOSE(VB_PLAYBACK,
         QString("VideoOutputQuartz::StopEmbedding()"));
 
-    if (!embedding)
+    if (!windows[0].IsEmbedding())
         return;
 
     VideoOutput::StopEmbedding();
@@ -1668,7 +1672,7 @@ void VideoOutputQuartz::UpdatePauseFrame(void)
  */
 void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
                                      FilterChain *filterList,
-                                     NuppelVideoPlayer *pipPlayer)
+                                     const PIPMap &pipPlayers)
 {
 #ifdef USING_DVDV
     if (data->dvdv)
@@ -1706,7 +1710,7 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
         m_deintFilter->ProcessFrame(frame);
     }
 
-    ShowPip(frame, pipPlayer);
+    ShowPIPs(frame, pipPlayers);
     DisplayOSD(frame, osd);
 
     if (m_deinterlacing &&

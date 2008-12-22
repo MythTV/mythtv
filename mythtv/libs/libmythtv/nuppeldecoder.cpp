@@ -30,7 +30,8 @@ extern "C" {
 #define LOC QString("NVD: ")
 #define LOC_ERR QString("NVD Error: ")
 
-NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
+NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent,
+                             const ProgramInfo &pginfo)
     : DecoderBase(parent, pginfo),
       rtjd(0), video_width(0), video_height(0), video_size(0),
       video_frame_rate(0.0f), audio_samplerate(44100), 
@@ -336,6 +337,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 struct seektable_entry ste;
                 int offset = 0;
 
+                m_positionMapLock.lock();
+
                 m_positionMap.clear();
                 m_positionMap.reserve(numentries);
 
@@ -358,6 +361,9 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 totalLength = (int)((ste.keyframe_number * keyframedist * 1.0) /
                                      video_frame_rate);
                 totalFrames = (long long)ste.keyframe_number * keyframedist;
+
+                m_positionMapLock.unlock();
+
                 GetNVP()->SetFileLength(totalLength, totalFrames);
 
                 delete [] seekbuf;
@@ -425,12 +431,18 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 GetNVP()->SetFileLength(totalLength, totalFrames);
 
                 adjust = 0;
-                for (uint i=0; i < m_positionMap.size(); i++) 
-                {
-                    if (keyFrameAdjustMap.contains(m_positionMap[i].adjFrame))
-                        adjust += keyFrameAdjustMap[m_positionMap[i].adjFrame];
 
-                    m_positionMap[i].adjFrame -= adjust;
+                {
+                    QMutexLocker locker(&m_positionMapLock);
+                    for (uint i = 0; i < m_positionMap.size(); i++) 
+                    {
+                        long long adj = m_positionMap[i].adjFrame;
+
+                        if (keyFrameAdjustMap.contains(adj))
+                            adjust += keyFrameAdjustMap[adj];
+                        
+                        m_positionMap[i].adjFrame -= adjust;
+                    }
                 }
 
                 delete [] kfa_buf;
@@ -1087,18 +1099,15 @@ bool NuppelDecoder::GetFrame(int avignore)
                 {
                     long long last_index = 0;
                     long long this_index = lastKey / keyframedist;
+
+                    QMutexLocker locker(&m_positionMapLock);
                     if (!m_positionMap.empty())
-                        last_index =
-                            m_positionMap[m_positionMap.size() - 1].index;
+                        last_index = m_positionMap.back().index;
 
                     if (this_index > last_index)
                     {
-                        // Grow positionMap vector several entries at a time
-                        if (m_positionMap.capacity() == m_positionMap.size())
-                            m_positionMap.reserve(m_positionMap.size() + 60);
-                        PosMapEntry entry = {this_index, lastKey,
-                                             currentposition};
-                        m_positionMap.push_back(entry);
+                        PosMapEntry e = {this_index, lastKey, currentposition};
+                        m_positionMap.push_back(e);
                     }
                 }
             }

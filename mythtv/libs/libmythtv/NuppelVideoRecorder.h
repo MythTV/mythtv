@@ -80,8 +80,6 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Reader
     void SetVideoFilters(QString &filters);
     void SetTranscoding(bool value) { transcoding = value; };
 
-    long long GetKeyframePosition(long long desired);
-
     void SetNextRecording(const ProgramInfo*, RingBuffer*);
     void ResetForNewFile(void);
     void FinishRecording(void);
