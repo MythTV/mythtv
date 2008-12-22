@@ -4,7 +4,9 @@
 
 #include <QApplication>
 
-class MythApplication : public QApplication
+#include "mythexp.h"
+
+class MPUBLIC MythApplication : public QApplication
 {
   public:
     MythApplication(int &argc, char **argv) : QApplication(argc, argv) { }

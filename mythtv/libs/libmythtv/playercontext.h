@@ -37,7 +37,7 @@ typedef enum
 typedef deque<QString>         StringDeque;
 typedef QMap<QString,QString>  InfoMap;
 
-class PlayerContext
+class MPUBLIC PlayerContext
 {
   public:
     PlayerContext();
