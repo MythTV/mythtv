@@ -85,6 +85,29 @@ OSDTypeTeletext::OSDTypeTeletext(const QString &name, TTFFont *font,
     Reset(); // initializes m_magazines
 }
 
+OSDTypeTeletext::OSDTypeTeletext(const OSDTypeTeletext &other) :
+    OSDType(other.m_name),          TeletextViewer(),
+    m_displayrect(),                m_unbiasedrect(),
+    m_box(NULL),
+    m_tt_colspace(0),               m_tt_rowspace(0),
+    // last fetched page
+    m_fetchpage(0),                 m_fetchsubpage(0),
+    m_font(NULL),
+    // current character background
+    m_bgcolor_y(0), m_bgcolor_u(0), m_bgcolor_v(0), m_bgcolor_a(0),
+    // current displayed page
+    m_curpage(0),                   m_cursubpage(0),
+    m_curpage_showheader(false),    m_curpage_issubtitle(false),
+    m_transparent(false),           m_revealHidden(false),
+    m_displaying(false),            m_osd(NULL),
+    m_header_changed(false),        m_page_changed(false),
+    m_osd_changed(false)
+{
+    memset(m_pageinput, 0, sizeof(m_pageinput));
+    memset(m_header,    0, sizeof(m_header));
+    memset(m_bitswap,   0, sizeof(m_bitswap));
+}
+
 /** \fn OSDTypeTeletext::Reset(void)
  *  \brief Resets the teletext data cache
  */

@@ -105,6 +105,10 @@ TVRec::TVRec(int capturecardnum)
        // Various components TVRec coordinates
     : recorder(NULL), channel(NULL), signalMonitor(NULL),
       scanner(NULL),
+      // Event processing thread, runs RunTV()
+      event_thread(pthread_t()),
+      // Recorder thread, runs RecorderBase::StartRecording()
+      recorder_thread(pthread_t()),
       // Configuration variables from database
       eitIgnoresSource(false),      transcodeFirst(false),
       earlyCommFlag(false),         runJobOnHostOnly(false),

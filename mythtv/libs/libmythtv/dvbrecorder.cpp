@@ -103,14 +103,18 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       _input_pmt(NULL),
       _has_no_av(false),
       // Statistics
-      _continuity_error_count(0), _stream_overflow_count(0)
+      _continuity_error_count(0), _stream_overflow_count(0),
+      _bad_packet_count(0)
 {
     videodevice = QString::null;
 
     _buffer_size = (1024*1024 / TSPacket::SIZE) * TSPacket::SIZE;
 
     _buffer = new unsigned char[_buffer_size];
-    bzero(_buffer, _buffer_size);
+    memset(_buffer, 0, _buffer_size);
+    memset(_stream_id, 0, sizeof(_stream_id));
+    memset(_pid_status, 0, sizeof(_pid_status));
+    memset(_continuity_counter, 0, sizeof(_continuity_counter));
 }
 
 DVBRecorder::~DVBRecorder()

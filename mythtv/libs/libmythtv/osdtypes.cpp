@@ -661,12 +661,15 @@ OSDType::OSDType(const QString &name) :
     m_name(name),
     m_parent(NULL)
 {
+    m_name.detach();
 }
 
 QString OSDType::Name(void)
 {
     QMutexLocker locker(&m_lock);
-    return m_name;
+    QString tmp = m_name;
+    tmp.detach();
+    return tmp;
 }
 
 OSDType::~OSDType()
@@ -679,37 +682,23 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
                          const QString &text, QRect displayrect,
                          float wmult, float hmult) :
     OSDType(name),
-    m_displaysize(displayrect),
-    m_screensize(displayrect),
+    m_displaysize(displayrect),     m_screensize(displayrect),
     m_unbiasedsize(unbias(m_screensize, wmult, hmult)),
-    m_message(text),
-    m_default_msg(text),
-
-    m_font(font),
-    m_altfont(NULL),
-
-    m_centered(false),
-    m_right(false),
-
-    m_multiline(false),
-    m_usingalt(false),
-
-    m_selected(false),
-    m_button(false),
-    m_entrynum(-1),
-    m_cursorpos(0),
-
+    m_message(text),                m_default_msg(text),
+    m_font(font),                   m_altfont(NULL),
+    m_centered(false),              m_right(false),
+    m_multiline(false),             m_usingalt(false),
+    m_selected(false),              m_button(false),
+    m_entrynum(-1),                 m_cursorpos(0),
     m_scroller(false),
-    m_scrollx(0),
-    m_scrolly(0),
-
+    m_scrollx(0),                   m_scrolly(0),
+    m_scrollstartx(0),              m_scrollendx(0),
+    m_scrollposx(0),
+    m_scrollstarty(0),              m_scrollendy(0),
+    m_scrollposy(0),
     m_scrollinit(false),
-
     m_linespacing(1.5f),
-
-    m_draw_info_str(""),
-    m_draw_info_len(0),
-
+    m_draw_info_str(QString::null), m_draw_info_len(0),
     codeci(NULL)
 {
 }
@@ -717,37 +706,23 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
 OSDTypeText::OSDTypeText(const OSDTypeText &other) :
     OSDType(other.m_name),
 
-    m_displaysize(QRect(0,0,0,0)),
-    m_screensize(QRect(0,0,0,0)),
+    m_displaysize(QRect(0,0,0,0)),  m_screensize(QRect(0,0,0,0)),
     m_unbiasedsize(QRect(0,0,0,0)),
-    m_message(QString::null),
-    m_default_msg(QString::null),
-
-    m_font(NULL),
-    m_altfont(NULL),
-
-    m_centered(false),
-    m_right(false),
-
-    m_multiline(false),
-    m_usingalt(false),
-
-    m_selected(false),
-    m_button(false),
-    m_entrynum(-1),
-    m_cursorpos(0),
-
+    m_message(QString::null),       m_default_msg(QString::null),
+    m_font(NULL),                   m_altfont(NULL),
+    m_centered(false),              m_right(false),
+    m_multiline(false),             m_usingalt(false),
+    m_selected(false),              m_button(false),
+    m_entrynum(-1),                 m_cursorpos(0),
     m_scroller(false),
-    m_scrollx(0),
-    m_scrolly(0),
-
+    m_scrollx(0),                   m_scrolly(0),
+    m_scrollstartx(0),              m_scrollendx(0),
+    m_scrollposx(0),
+    m_scrollstarty(0),              m_scrollendy(0),
+    m_scrollposy(0),
     m_scrollinit(false),
-
     m_linespacing(1.5f),
-
-    m_draw_info_str(""),
-    m_draw_info_len(0),
-
+    m_draw_info_str(QString::null), m_draw_info_len(0),
     codeci(NULL)
 {
     QMutexLocker locker(&other.m_lock);
@@ -756,8 +731,10 @@ OSDTypeText::OSDTypeText(const OSDTypeText &other) :
     m_screensize = other.m_screensize;
     m_unbiasedsize = other.m_unbiasedsize;
 
-    m_message = other.m_message;
+    m_message     = other.m_message;
     m_default_msg = other.m_default_msg;
+    m_message.detach();
+    m_default_msg.detach();
 
     m_font = other.m_font;
     m_altfont = other.m_altfont;
@@ -773,11 +750,16 @@ OSDTypeText::OSDTypeText(const OSDTypeText &other) :
     m_entrynum = other.m_entrynum;
     m_cursorpos = other.m_cursorpos;
 
-    m_scroller = other.m_scroller;
-    m_scrollx = other.m_scrollx;
-    m_scrolly = other.m_scrolly;
-
-    m_scrollinit = other.m_scrollinit;
+    m_scroller     = other.m_scroller;
+    m_scrollx      = other.m_scrollx;
+    m_scrolly      = other.m_scrolly;
+    m_scrollstartx = other.m_scrollstartx;
+    m_scrollendx   = other.m_scrollendx;
+    m_scrollposx   = other.m_scrollposx;
+    m_scrollstarty = other.m_scrollstarty;
+    m_scrollendy   = other.m_scrollendy;
+    m_scrollposy   = other.m_scrollposy;
+    m_scrollinit   = other.m_scrollinit;
 
     m_linespacing = other.m_linespacing;
 }
@@ -1106,7 +1088,7 @@ void OSDTypeText::DrawHiLiteString(OSDSurface *surface, QRect rect,
 {
     QMutexLocker locker(&m_lock);
 
-    if (m_draw_info_str != text)
+    if (text != m_draw_info_str)
     {
         m_draw_info_str = text;
         m_draw_info.clear();
@@ -1373,45 +1355,30 @@ OSDTypeImage::OSDTypeImage(const OSDTypeImage &other)
     } 
 }
 
-OSDTypeImage::OSDTypeImage(const QString &name)
-            : OSDType(name)
+OSDTypeImage::OSDTypeImage(const QString &name) :
+    OSDType(name),
+    m_imagesize(),       m_displaypos(0, 0),
+    m_unbiasedpos(0, 0), m_filename(""),
+    m_isvalid(false),    m_yuv(NULL),
+    m_ybuffer(NULL),     m_ubuffer(NULL),
+    m_vbuffer(NULL),     m_alpha(NULL),
+    m_scalew(0),         m_scaleh(0),
+    m_drawwidth(-1),     m_onlyusefirst(false),
+    m_dontround(false),  m_cacheitem(NULL)
 {
-    m_drawwidth = -1;
-    m_onlyusefirst = false;
-
-    m_displaypos = QPoint(0, 0);
-    m_unbiasedpos = QPoint(0, 0);
-
-    m_yuv = NULL;
-    m_alpha = NULL;
-    m_ybuffer = NULL;
-    m_ubuffer = NULL;
-    m_vbuffer = NULL;
-    m_isvalid = false;
-    m_filename = "";
-    m_cacheitem = NULL;
-    m_dontround = false;
 }
 
-OSDTypeImage::OSDTypeImage(void)
-            : OSDType("")
+OSDTypeImage::OSDTypeImage(void) :
+    OSDType(""),
+    m_imagesize(),       m_displaypos(0, 0),
+    m_unbiasedpos(0, 0), m_filename(""),
+    m_isvalid(false),    m_yuv(NULL),
+    m_ybuffer(NULL),     m_ubuffer(NULL),
+    m_vbuffer(NULL),     m_alpha(NULL),
+    m_scalew(0),         m_scaleh(0),
+    m_drawwidth(-1),     m_onlyusefirst(false),
+    m_dontround(false),  m_cacheitem(NULL)
 {
-    m_name = "";
-    m_drawwidth = -1;
-    m_onlyusefirst = false;
-
-    m_displaypos = QPoint(0, 0);
-    m_unbiasedpos = QPoint(0, 0);
-
-    m_yuv = NULL;
-    m_alpha = NULL;
-    m_ybuffer = NULL;
-    m_ubuffer = NULL;
-    m_vbuffer = NULL;
-    m_isvalid = false;
-    m_filename = "";
-    m_cacheitem = NULL;
-    m_dontround = false;
 }
 
 OSDTypeImage::~OSDTypeImage()

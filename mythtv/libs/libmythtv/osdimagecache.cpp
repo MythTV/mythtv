@@ -41,7 +41,7 @@ OSDImageCacheValue::OSDImageCacheValue(
     m_yuv(yuv),         m_ybuffer(ybuffer),
     m_ubuffer(ubuffer), m_vbuffer(vbuffer),
     m_alpha(alpha),     m_imagesize(imagesize),
-    m_cacheKey(cacheKey)
+    m_time(0),          m_cacheKey(cacheKey)
 {
     uint yuv_size = m_imagesize.width() * m_imagesize.height() * 3 / 2;
     m_size_in_bytes =

@@ -22,8 +22,9 @@
 class ImportIconsWizard : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
-public:
-    ImportIconsWizard(bool fRefresh, QString channelname=""); //!< constructs an ImportIconWizard
+
+  public:
+    ImportIconsWizard(bool fRefresh, const QString &channelname = QString(""));
     MythDialog *dialogWidget(MythMainWindow *parent, const char *widgetName);
 
     int exec();

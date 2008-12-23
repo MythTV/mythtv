@@ -89,6 +89,7 @@ DVBStreamHandler::DVBStreamHandler(const QString &dvb_device) :
 
     _start_stop_lock(QMutex::Recursive),
     _running(false),
+    _reader_thread(pthread_t()),
     _using_section_reader(false),
 
     _device_read_buffer(NULL),

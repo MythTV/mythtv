@@ -65,6 +65,7 @@ DVBCam::DVBCam(const QString &aDevice)
     : device(aDevice),        numslots(0),
       ciHandler(NULL),
       exitCiThread(false),    ciThreadRunning(false),
+      ciHandlerThread(pthread_t()),
       have_pmt(false),        pmt_sent(false),
       pmt_updated(false),     pmt_added(false)
 {

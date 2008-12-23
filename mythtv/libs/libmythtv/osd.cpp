@@ -56,23 +56,41 @@ const char *kOSDDialogChannelTimeout = "channel_timed_out";
 const char *kOSDDialogInfo           = "infobox";
 const char *kOSDDialogEditChannel    = "channel_editor";
 
-OSD::OSD()
-    : QObject(),
-      needPillarBox(false),
-      themepath(FindTheme(gContext->GetSetting("OSDTheme"))),
-      wscale(1.0f),
-      m_themeinfo(new ThemeInfo(themepath)),
-      m_setsvisible(false),
-      totalfadetime(0),                   timeType(0),
-      timeFormat(""),                     setList(new vector<OSDSet*>),
-      editarrowleft(NULL),                editarrowright(NULL),
-      changed(false),                     runningTreeMenu(NULL),
-      treeMenuContainer(""),
-      removeHTML(QRegExp("</?.+>"))
+OSD::OSD() :
+    QObject(),
+    osdBounds(),                        frameint(0),
+    needPillarBox(false),
+    themepath(FindTheme(gContext->GetSetting("OSDTheme"))),
+    wscale(1.0f),                       fscale(1.0f),
+    m_themeinfo(new ThemeInfo(themepath)),
+    m_themeaspect(4.0f/3.0f),
+    hmult(1.0f),                        wmult(1.0f),
+    xoffset(0),                         yoffset(0),
+    displaywidth(0),                    displayheight(0),
+    m_setsvisible(false),
+    totalfadetime(0),                   timeType(0),
+    timeFormat(""),                     setList(new vector<OSDSet*>),
+    editarrowleft(NULL),                editarrowright(NULL),
+    editarrowRect(),                    drawSurface(NULL),
+    changed(false),                     runningTreeMenu(NULL),
+    treeMenuContainer(""),
+    // EIA-608 captions
+    fontname(""),                       ccfontname(""),
+    fontSizeType(""),
+    // Test file subtitles
+    removeHTML(QRegExp("</?.+>"))
 {
-    VERBOSE(VB_GENERAL, QString("OSD Theme Dimensions W: %1 H: %2").arg(m_themeinfo->BaseRes()->width()).arg(m_themeinfo->BaseRes()->height()));
+    VERBOSE(VB_GENERAL, QString("OSD Theme Dimensions W: %1 H: %2")
+            .arg(m_themeinfo->BaseRes()->width()).arg(m_themeinfo->BaseRes()->height()));
 
-    m_themeaspect = (float)m_themeinfo->BaseRes()->width() / (float)m_themeinfo->BaseRes()->height();
+    for (uint i = 0; i < (sizeof(cc708fontnames) / sizeof(QString)); i++)
+        cc708fontnames[i] = QString("");
+
+    if (m_themeinfo->BaseRes()->height())
+    {
+        m_themeaspect  = (float)m_themeinfo->BaseRes()->width();
+        m_themeaspect /= (float)m_themeinfo->BaseRes()->height();
+    }
 }
 
 OSD::~OSD(void)

@@ -87,16 +87,25 @@ void RunProgramFind(bool thread, bool ggActive)
     return;
 }
 
-ProgFinder::ProgFinder(MythMainWindow *parent, const char *name, bool gg)
-          : MythDialog(parent, name),
-            arrowAccel(true)
+ProgFinder::ProgFinder(MythMainWindow *parent, const char *name, bool gg) :
+    MythDialog(parent, name),
+    theme(NULL),               xmldata(),
+    showsPerListing(0),        curSearch(10),
+    curProgram(0),             curShow(0),
+    searchCount(37),           listCount(0),
+    showCount(0),              inSearch(0),
+    showInfo(false),           pastInitial(false),
+    running(false),            gotInitData(NULL),
+    ggActive(gg),              arrowAccel(gContext->GetNumSetting("UseArrowAccels", 1)),
+    update_Timer(NULL),        m_player(NULL),
+    baseDir(QString::null),    searchData(NULL),
+    initData(NULL),            progData(NULL),
+    listRect(),                infoRect(),
+    dateFormat(QString::null), timeFormat(QString::null),
+    channelFormat(gContext->GetSetting("ChannelFormat", "<num> <sign>")),
+    allowkeypress(false),      inFill(false),
+    needFill(false)
 {
-    curSearch = 10;
-    searchCount = 37;
-    ggActive = gg;
-
-    channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
-    arrowAccel = gContext->GetNumSetting("UseArrowAccels", 1);
 }
 
 void ProgFinder::Initialize(void)

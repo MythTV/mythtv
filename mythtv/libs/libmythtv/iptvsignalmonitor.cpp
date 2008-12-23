@@ -29,9 +29,11 @@
  *  \param _channel IPTVChannel for card
  *  \param _flags   Flags to start with
  */
-IPTVSignalMonitor::IPTVSignalMonitor(
-    int db_cardnum, IPTVChannel *_channel, uint64_t _flags) :
-    DTVSignalMonitor(db_cardnum, _channel, _flags), dtvMonitorRunning(false)
+IPTVSignalMonitor::IPTVSignalMonitor(int db_cardnum,
+                                     IPTVChannel *_channel,
+                                     uint64_t _flags) :
+    DTVSignalMonitor(db_cardnum, _channel, _flags),
+    dtvMonitorRunning(false), table_monitor_thread(pthread_t())
 {
     bool isLocked = false;
     IPTVChannelInfo chaninfo = GetChannel()->GetCurrentChanInfo();

@@ -6,10 +6,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-XBox::XBox(void)
+XBox::XBox(void) :
+    timer(NULL),      RecCheck(0),
+    RecordingLED(""), DefaultLED(""),
+    PhaseCache(""),   BlinkBIN(""),
+    LEDNonLiveTV(0)
 {
-    timer = NULL;
-    PhaseCache = "";
 }
 
 void XBox::GetSettings(void)

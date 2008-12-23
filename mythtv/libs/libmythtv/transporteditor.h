@@ -47,7 +47,7 @@ class TransportList : public ListBoxSetting, public TransientStorage
     Q_OBJECT
 
   public:
-    TransportList() : ListBoxSetting(this), sourceid(0) { }
+    TransportList() : ListBoxSetting(this), sourceid(0), cardtype(0) { }
 
     virtual void Load(void) { fillSelections(); }
     virtual void fillSelections(void);

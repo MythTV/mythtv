@@ -78,35 +78,41 @@ const char* MpegRecorder::aspectRatio[] =
 MpegRecorder::MpegRecorder(TVRec *rec) :
     DTVRecorder(rec),
     // Debugging variables
-    deviceIsMpegFile(false),
+    deviceIsMpegFile(false),      bufferSize(0),
     // Driver info
-    card(QString::null),      driver(QString::null),
-    version(0),               usingv4l2(false),
-    has_buggy_vbi(true),      has_v4l2_vbi(false),
+    card(QString::null),          driver(QString::null),
+    version(0),                   usingv4l2(false),
+    has_buggy_vbi(true),          has_v4l2_vbi(false),
     requires_special_pause(false),
     // State
-    recording(false),         encoding(false),
-    needs_resolution(false),  start_stop_encoding_lock(QMutex::Recursive),
-    recording_wait_lock(),    recording_wait(),
+    recording(false),             encoding(false),
+    needs_resolution(false),      start_stop_encoding_lock(QMutex::Recursive),
+    recording_wait_lock(),        recording_wait(),
     // Pausing state
     cleartimeonpause(false),
     // Encoding info
-    width(720),               height(480),
-    bitrate(4500),            maxbitrate(6000),
-    streamtype(0),            aspectratio(2),
-    audtype(2),               audsamplerate(48000),
-    audbitratel1(14),         audbitratel2(14),
+    width(720),                   height(480),
+    bitrate(4500),                maxbitrate(6000),
+    streamtype(0),                aspectratio(2),
+    audtype(2),                   audsamplerate(48000),
+    audbitratel1(14),             audbitratel2(14),
     audbitratel3(10),
-    audvolume(80),            language(0),
+    audvolume(80),                language(0),
     low_mpeg4avgbitrate(4500),    low_mpeg4peakbitrate(6000),
     medium_mpeg4avgbitrate(9000), medium_mpeg4peakbitrate(13500),
     high_mpeg4avgbitrate(13500),  high_mpeg4peakbitrate(20200),
     // Input file descriptors
-    chanfd(-1),               readfd(-1),
+    chanfd(-1),                   readfd(-1),
     _device_read_buffer(NULL),
     // TS packet handling
-    _stream_data(NULL)
+    _stream_data(NULL),
+    // Statistics
+    _continuity_error_count(0),   _stream_overflow_count(0),
+    _bad_packet_count(0)
 {
+    memset(_stream_id, 0, sizeof(_stream_id));
+    memset(_pid_status, 0, sizeof(_pid_status));
+    memset(_continuity_counter, 0, sizeof(_continuity_counter));
 }
 
 MpegRecorder::~MpegRecorder()

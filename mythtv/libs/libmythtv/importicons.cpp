@@ -15,14 +15,14 @@
 #include "importicons.h"
 #include "util.h"
 
-ImportIconsWizard::ImportIconsWizard(bool fRefresh, QString channelname)
+ImportIconsWizard::ImportIconsWizard(bool fRefresh, const QString &channelname) :
+    m_strMatches(QString::null),   m_strChannelDir(QString::null),
+    m_strChannelname(channelname), m_fRefresh(fRefresh),
+    m_nMaxCount(0),                m_nCount(0),
+    m_missingMaxCount(0),          m_missingCount(0),
+    m_closeDialog(false)
 {
-    m_fRefresh = fRefresh;
-    m_strChannelname = channelname;
-    m_closeDialog = false;
-    m_missingCount=0;
-    m_missingMaxCount=0;
-
+    m_strChannelname.detach();
 }
 
 MythDialog *ImportIconsWizard::dialogWidget(MythMainWindow *parent,

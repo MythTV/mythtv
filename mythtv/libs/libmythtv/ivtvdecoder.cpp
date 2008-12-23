@@ -45,7 +45,9 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, const ProgramInfo &pginfo)
       frame_decoded(0),       videoPlayed(0),
       lastStartFrame(0),      laststartpos(0),
 
-      nexttoqueue(1),         lastdequeued(0)
+      nexttoqueue(1),         lastdequeued(0),
+
+      needReset(false)
 {
     lastResetTime.start();
     fps = 29.97f;

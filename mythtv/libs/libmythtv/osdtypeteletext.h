@@ -127,8 +127,7 @@ class OSDTypeTeletext : public OSDType, public TeletextViewer
   public:
     OSDTypeTeletext(const QString &name, TTFFont *font,
                     QRect displayrect, float wmult, float hmult, OSD *osd);
-    OSDTypeTeletext(const OSDTypeTeletext &other)
-        : OSDType(other.m_name), TeletextViewer() {}
+    OSDTypeTeletext(const OSDTypeTeletext &other);
     virtual ~OSDTypeTeletext() {}
 
     void Reinit(float wmult, float hmult);
