@@ -542,11 +542,15 @@ void ProgramRecPriority::edit(MythUIButtonListItem *item)
             recid = pgRecInfo->getRecordID();
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT recpriority, type, inactive FROM"
-                      " record WHERE recordid = :RECORDID ;");
+        query.prepare("SELECT recpriority, type, inactive "
+                      "FROM record "
+                      "WHERE recordid = :RECORDID");
         query.bindValue(":RECORDID", recid);
-
-        if (query.exec() && query.next())
+        if (!query.exec())
+        {
+            MythDB::DBError("Get new recording priority query", query);
+        }
+        else if (query.next())
         {
             int recPriority = query.value(0).toInt();
             int rectype = query.value(1).toInt();
@@ -588,12 +592,10 @@ void ProgramRecPriority::edit(MythUIButtonListItem *item)
 
             SortList();
         }
-        else if (query.size() == 0)
+        else
         {
             RemoveItemFromList(item);
         }
-        else
-            MythDB::DBError("Get new recording priority query", query);
 
         countMatches();
     }
@@ -684,12 +686,17 @@ void ProgramRecPriority::deactivate(void)
     {
         MSqlQuery query(MSqlQuery::InitCon());
 
-        query.prepare("SELECT inactive FROM record "
-                      "WHERE recordid = :RECID ;");
+        query.prepare("SELECT inactive "
+                      "FROM record "
+                      "WHERE recordid = :RECID");
         query.bindValue(":RECID", pgRecInfo->recordid);
 
         int inactive = 0;
-        if (query.exec() && query.next())
+        if (!query.exec())
+        {
+            MythDB::DBError("ProgramRecPriority::deactivate()", query);
+        }
+        else if (query.next())
         {
             inactive = query.value(0).toInt();
             if (inactive)
@@ -697,20 +704,23 @@ void ProgramRecPriority::deactivate(void)
             else
                 inactive = 1;
 
-            query.prepare("UPDATE record SET inactive = :INACTIVE "
-                            "WHERE recordid = :RECID ;");
+            query.prepare("UPDATE record "
+                          "SET inactive = :INACTIVE "
+                          "WHERE recordid = :RECID");
             query.bindValue(":INACTIVE", inactive);
             query.bindValue(":RECID", pgRecInfo->recordid);
 
-            if (query.exec() && query.isActive())
+            if (!query.exec())
+            {
+                MythDB::DBError(
+                    "Update recording schedule inactive query", query);
+            }
+            else
             {
                 ScheduledRecording::signalChange(0);
                 pgRecInfo->recstatus = inactive ? rsInactive : rsUnknown;
                 item->DisplayState("disabled", "status");
             }
-            else
-                MythDB::DBError("Update recording schedule inactive query",
-                                    query);
         }
     }
 }
@@ -863,12 +873,14 @@ void ProgramRecPriority::FillList(void)
                    "type, inactive, last_record, avg_delay "
                    "FROM record;");
 
-    if (result.exec() && result.size() > 0)
+    if (!result.exec())
+    {
+        MythDB::DBError("Get program recording priorities query", result);
+    }
+    else if (result.next())
     {
         countMatches();
-
-        while (result.next())
-        {
+        do {
             int recordid = result.value(0).toInt();
             QString title = result.value(1).toString();
             QString chanid = result.value(2).toString();
@@ -920,10 +932,8 @@ void ProgramRecPriority::FillList(void)
                     break;
                 }
             }
-        }
+        } while (result.next());
     }
-    else
-        MythDB::DBError("Get program recording priorities query", result);
 
     SortList();
 }
