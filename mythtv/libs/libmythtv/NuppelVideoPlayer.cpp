@@ -2707,11 +2707,10 @@ bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
     prebuffering_lock.unlock();
 
     //VERBOSE(VB_PLAYBACK, LOC + "fs: " + videoOutput->GetFrameStatus());
-    if (!videoOutput->EnoughPrebufferedFrames())
+    if (videoOutput && !videoOutput->EnoughPrebufferedFrames())
     {
         VERBOSE(VB_GENERAL, LOC + "prebuffering pause");
-        if (videoOutput)
-            videoOutput->CheckFrameStates();
+        videoOutput->CheckFrameStates();
 
         SetPrebuffering(true);
 #if FAST_RESTART
