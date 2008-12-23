@@ -23,32 +23,28 @@ using namespace std;
 #include "mythappearance.h"
 
 
-MythAppearance::MythAppearance(MythScreenStack *parent, const char *name)
-    : MythScreenType(parent, name)
+MythAppearance::MythAppearance(MythScreenStack *parent, const char *name) :
+    MythScreenType(parent, name),
+    m_x_offset(0),           m_y_offset(0),
+    m_whicharrow(true),
+    m_coarsefine(false), // fine adjustments by default
+    m_changed(false),
+    m_fine(1),           // fine moves arrows by one pixel
+    m_coarse(10),        // coarse moves arrows by ten pixels
+    m_change(m_fine),
+    m_topleftarrow_x(0),     m_topleftarrow_y(0),
+    m_bottomrightarrow_x(0), m_bottomrightarrow_y(0),
+    m_arrowsize_x(30),   // maybe get the image size later
+    m_arrowsize_y(30),   // maybe get the image size later
+    m_screenheight(0),       m_screenwidth(0),
+    m_xsize(GetMythMainWindow()->GetUIScreenRect().width()),
+    m_ysize(GetMythMainWindow()->GetUIScreenRect().height()),
+    m_menuPopup(NULL)
 {
     // Initialise $stuff
     // Get UI size & offset settings from database
-
-    m_coarsefine = false; // fine adjustments by default
-    m_fine = 1; //fine moves arrows by one pixel
-    m_coarse = 10; // coarse moves arrows by ten pixels
-    m_change = m_fine;
-    m_screenheight = 0, m_screenwidth = 0;
-    m_arrowsize_x = 30; // maybe get the image size later
-    m_arrowsize_y = 30; // maybe get the image size later
-    m_topleftarrow_x = 0;
-    m_topleftarrow_y = 0;
-
-    m_menuPopup = NULL;
-    m_changed = false;
-
     getSettings();
     getScreenInfo();
-    m_whicharrow = true;
-
-    m_xsize = GetMythMainWindow()->GetUIScreenRect().width();
-    m_ysize = GetMythMainWindow()->GetUIScreenRect().height();
-
 }
 
 MythAppearance::~MythAppearance() {}

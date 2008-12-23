@@ -24,62 +24,46 @@ using namespace std;
 // overloaded version of ProgramInfo with additional recording priority
 // values so we can keep everything together and don't
 // have to hit the db mulitiple times
-ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) : ProgramInfo()
+ProgramRecPriorityInfo::ProgramRecPriorityInfo(void) :
+    ProgramInfo(),
+    recTypeRecPriority(0), recType(kNotRecording),
+    matchCount(0),         recCount(0),
+    avg_delay(0),          autoRecPriority(0)
 {
+}
+
+ProgramRecPriorityInfo::ProgramRecPriorityInfo(
+    const ProgramRecPriorityInfo &other) :
+    ProgramInfo::ProgramInfo(other),
+    recTypeRecPriority(other.recTypeRecPriority),
+    recType(other.recType),
+    matchCount(other.matchCount),
+    recCount(other.recCount),
+    avg_delay(other.avg_delay),
+    autoRecPriority(other.autoRecPriority)
+{
+    // TODO CHECK: should last_record be initialized too? -- dtk 22-12-2008
+}
+
+ProgramRecPriorityInfo &ProgramRecPriorityInfo::operator=(
+    const ProgramInfo &other)
+{
+    (*(ProgramInfo*)(this)) = other;
+
+#if 0
+    // TODO: check if these really should be initialized here..
+    //       seems like they should, but I don't want to break
+    //       anything... -- dtk 22-12-2008
     recTypeRecPriority = 0;
-    recType = kNotRecording;
-    avg_delay = 0;
-    autoRecPriority = 0;
-}
+    recType            = kNotRecording;
+    matchCount         = 0;
+    recCount           = 0;
+    last_record        = QDateTime();
+    avg_delay          = 0;
+    autoRecPriority    = 0;
+#endif
 
-ProgramRecPriorityInfo::ProgramRecPriorityInfo(const ProgramRecPriorityInfo
-                                                 &other)
-                      : ProgramInfo::ProgramInfo(other)
-{
-    recTypeRecPriority = other.recTypeRecPriority;
-    recType = other.recType;
-    avg_delay = other.avg_delay;
-    autoRecPriority = other.autoRecPriority;
-}
-
-ProgramRecPriorityInfo& ProgramRecPriorityInfo::operator=(const ProgramInfo &other)
-{
-    title = other.title;
-    subtitle = other.subtitle;
-    description = other.description;
-    category = other.category;
-    chanid = other.chanid;
-    chanstr = other.chanstr;
-    chansign = other.chansign;
-    channame = other.channame;
-    pathname = other.pathname;
-    filesize = other.filesize;
-    hostname = other.hostname;
-
-    startts = other.startts;
-    endts = other.endts;
-    spread = other.spread;
-    startCol = other.startCol;
-
-    recstatus = other.recstatus;
-    recordid = other.recordid;
-    rectype = other.rectype;
-    dupin = other.dupin;
-    dupmethod = other.dupmethod;
-    recgroup = other.recgroup;
-    playgroup = other.playgroup;
-    chancommfree = other.chancommfree;
-
-    sourceid = other.sourceid;
-    inputid = other.inputid;
-    cardid = other.cardid;
-    schedulerid = other.schedulerid;
-    recpriority = other.recpriority;
-
-    seriesid = other.seriesid;
-    programid = other.programid;
-
-    return(*this);
+    return *this;
 }
 
 
