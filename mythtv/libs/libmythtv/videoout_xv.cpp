@@ -1813,12 +1813,26 @@ bool VideoOutputXv::InitSetupBuffers(void)
         XV_INIT_FATAL_ERROR_TEST(false, "Failed to find a video renderer");
     else
     {
+        // HACK HACK HACK -- begin  See #4792 for more elegant solutions
+        if ((db_vdisp_profile->GetVideoRenderer() == "xvmc-blit") &&
+            (renderers.indexOf("xv-blit") > 0))
+        {
+            swap(renderers[0], renderers[renderers.indexOf("xv-blit")]);
+        }
+        else if ((db_vdisp_profile->GetVideoRenderer() == "xvmc-opengl") &&
+                 (renderers.indexOf("opengl") > 0))
+        {
+            swap(renderers[0], renderers[renderers.indexOf("opengl")]);
+        }
+        // HACK HACK HACK -- end
+
         QString tmp;
         QStringList::const_iterator it = renderers.begin();
         for (; it != renderers.end(); ++it)
             tmp += *it + ",";
 
         renderer = renderers[0];
+
         VERBOSE(VB_IMPORTANT, LOC + QString(
                     "Desired video renderer '%1' not available.\n\t\t\t"
                     "codec '%2' makes '%3' available, using '%4' instead.")
