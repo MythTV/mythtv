@@ -14,6 +14,7 @@ typedef QMap<uint, Setting*> devid_to_setting_t;
 
 class SwitchTypeSetting;
 class SwitchPortsSetting;
+class SwitchAddressSetting;
 
 class SwitchConfig : public QObject, public ConfigurationWizard
 {
@@ -28,6 +29,7 @@ class SwitchConfig : public QObject, public ConfigurationWizard
   private:
     SwitchTypeSetting  *m_type;
     SwitchPortsSetting *m_ports;
+    SwitchAddressSetting *m_address;
 };
 
 class RotorPosMap : public ListBoxSetting, public Storage

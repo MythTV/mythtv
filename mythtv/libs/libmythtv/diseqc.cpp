@@ -960,7 +960,8 @@ const DiSEqCDevDevice::TypeTable DiSEqCDevSwitch::SwitchTypeTable[9] =
 
 DiSEqCDevSwitch::DiSEqCDevSwitch(DiSEqCDevTree &tree, uint devid)
     : DiSEqCDevDevice(tree, devid),
-      m_type(kTypeTone), m_num_ports(2)
+      m_type(kTypeTone), m_address(DISEQC_ADR_SW_ALL),
+      m_num_ports(2)
 {
     m_children.resize(m_num_ports);
 
@@ -1130,7 +1131,7 @@ bool DiSEqCDevSwitch::Load(void)
     // populate switch parameters from db
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT subtype, switch_ports, cmd_repeat "
+        "SELECT subtype, address, switch_ports, cmd_repeat "
         "FROM diseqc_tree "
         "WHERE diseqcid = :DEVID");
     query.bindValue(":DEVID", GetDeviceID());
@@ -1143,8 +1144,9 @@ bool DiSEqCDevSwitch::Load(void)
     else if (query.next())
     {
         m_type = SwitchTypeFromString(query.value(0).toString());
-        m_num_ports = query.value(1).toUInt();
-        m_repeat = query.value(2).toUInt();
+        m_address = query.value(1).toUInt();
+        m_num_ports = query.value(2).toUInt();
+        m_repeat = query.value(3).toUInt();
         m_children.resize(m_num_ports);
         for (uint i = 0; i < m_num_ports; i++)
             m_children[i] = NULL;
@@ -1194,6 +1196,7 @@ bool DiSEqCDevSwitch::Store(void) const
             "    type         = 'switch', "
             "    description  = :DESC, "
             "    subtype      = :TYPE, "
+            "    address      = :ADDRESS, "
             "    switch_ports = :PORTS, "
             "    cmd_repeat   = :REPEAT "
             "WHERE diseqcid = :DEVID");
@@ -1203,13 +1206,13 @@ bool DiSEqCDevSwitch::Store(void) const
     {
         query.prepare(
             "INSERT INTO diseqc_tree"
-            " ( parentid,      ordinal,         type, "
-            "   description,   subtype,         switch_ports, "
-            "   cmd_repeat ) "
+            " ( parentid,      ordinal,         type,    "
+            "   description,   address,         subtype, "
+            "   switch_ports,  cmd_repeat )              "
             "VALUES "
             " (:PARENT,       :ORDINAL,         'switch', "
-            "  :DESC,         :TYPE,            :PORTS, "
-            "  :REPEAT )");
+            "  :DESC,         :ADDRESS,         :TYPE,    "
+            "  :PORTS,        :REPEAT )");
     }
 
     if (m_parent)
@@ -1217,6 +1220,7 @@ bool DiSEqCDevSwitch::Store(void) const
 
     query.bindValue(":ORDINAL", m_ordinal);
     query.bindValue(":DESC",    GetDescription());
+    query.bindValue(":ADDRESS", m_address);
     query.bindValue(":TYPE",    type);
     query.bindValue(":PORTS",   m_num_ports);
     query.bindValue(":REPEAT",  m_repeat);
@@ -1552,7 +1556,7 @@ bool DiSEqCDevSwitch::ExecuteDiseqc(const DiSEqCDevSettings &settings,
     VERBOSE(VB_CHANNEL, LOC + "Changing to DiSEqC switch port " +
             QString("%1/%2").arg(pos + 1).arg(m_num_ports));
 
-    bool ret = m_tree.SendCommand(DISEQC_ADR_SW_ALL, cmd, m_repeat, 1, &data);
+    bool ret = m_tree.SendCommand(m_address, cmd, m_repeat, 1, &data);
     if(ret)
     {
         m_last_high_band = high_band;

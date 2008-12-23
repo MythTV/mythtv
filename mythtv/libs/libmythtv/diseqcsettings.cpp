@@ -183,6 +183,32 @@ class SwitchTypeSetting : public ComboBoxSetting, public Storage
     DiSEqCDevSwitch &m_switch;
 };
 
+//////////////////////////////////////// SwitchAddressSetting
+
+class SwitchAddressSetting : public LineEditSetting, public Storage
+{
+  public:
+    SwitchAddressSetting(DiSEqCDevSwitch &switch_dev) :
+           LineEditSetting(this), m_switch(switch_dev)
+    {
+        setLabel(DeviceTree::tr("Address of switch"));
+        setHelpText(DeviceTree::tr("The DiSEqC address of the switch."));
+    }
+
+    virtual void Load(void)
+    {
+        setValue(QString("0x%1").arg(m_switch.GetAddress(), 0, 16));
+    }
+
+    virtual void Save(void)
+    {
+        m_switch.SetAddress(getValue().toUInt(0, 16));
+    }
+
+  private:
+    DiSEqCDevSwitch &m_switch;
+};
+
 //////////////////////////////////////// SwitchPortsSetting
 
 class SwitchPortsSetting : public LineEditSetting, public Storage
@@ -223,6 +249,8 @@ SwitchConfig::SwitchConfig(DiSEqCDevSwitch &switch_dev)
     group->addChild(new DeviceRepeatSetting(switch_dev));
     m_type = new SwitchTypeSetting(switch_dev);
     group->addChild(m_type);
+    m_address = new SwitchAddressSetting(switch_dev);
+    group->addChild(m_address);
     m_ports = new SwitchPortsSetting(switch_dev);
     group->addChild(m_ports);
 
@@ -241,15 +269,20 @@ void SwitchConfig::update(void)
         case DiSEqCDevSwitch::kTypeMiniDiSEqC:
         case DiSEqCDevSwitch::kTypeLegacySW21:
         case DiSEqCDevSwitch::kTypeLegacySW42:
+            m_address->setValue(QString("0x10"));
+            m_address->setEnabled(false);
             m_ports->setValue("2");
             m_ports->setEnabled(false);
             break;
         case DiSEqCDevSwitch::kTypeLegacySW64:
+            m_address->setValue(QString("0x10"));
+            m_address->setEnabled(false);
             m_ports->setValue("3");
             m_ports->setEnabled(false);
             break;
         case DiSEqCDevSwitch::kTypeDiSEqCCommitted:
         case DiSEqCDevSwitch::kTypeDiSEqCUncommitted:
+            m_address->setEnabled(true);
             m_ports->setEnabled(true);
             break;
     }
@@ -1417,6 +1450,7 @@ bool convert_diseqc_db(void)
                 if (sw)
                 {
                     sw->SetType(DiSEqCDevSwitch::kTypeDiSEqCCommitted);
+                    sw->SetAddress(0x10);
                     sw->SetNumPorts(2);
                     add_lnbs = 2;
                 }
@@ -1433,6 +1467,7 @@ bool convert_diseqc_db(void)
                 if (sw)
                 {
                     sw->SetType(DiSEqCDevSwitch::kTypeDiSEqCCommitted);
+                    sw->SetAddress(0x10);
                     sw->SetNumPorts(4);
                     add_lnbs = 4;
                 }

@@ -227,13 +227,15 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
         kTypeVoltage           = 6,
         kTypeMiniDiSEqC        = 7,
     };
-    void SetType(dvbdev_switch_t type)        { m_type = type;      }
+    void SetType(dvbdev_switch_t type)        { m_type = type;       }
+    void SetAddress(uint address)             { m_address = address; }
     void SetNumPorts(uint num_ports);
     virtual bool SetChild(uint, DiSEqCDevDevice*);
 
     // Gets
-    dvbdev_switch_t GetType(void)       const { return m_type;      }
-    uint            GetNumPorts(void)   const { return m_num_ports; }
+    dvbdev_switch_t GetType(void)       const { return m_type;       }
+    uint            GetAddress(void)    const { return m_address;    }
+    uint            GetNumPorts(void)   const { return m_num_ports;  }
     bool            ShouldSwitch(const DiSEqCDevSettings &settings,
                                  const DTVMultiplex &tuning) const;
     virtual uint    GetChildCount(void) const;
@@ -269,6 +271,7 @@ class DiSEqCDevSwitch : public DiSEqCDevDevice
 
   private:
     dvbdev_switch_t m_type;
+    uint            m_address;
     uint            m_num_ports;
     uint            m_last_pos;
     uint            m_last_high_band;
