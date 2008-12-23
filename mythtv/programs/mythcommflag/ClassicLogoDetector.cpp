@@ -24,38 +24,35 @@ EdgeMaskEntry;
 
 
 ClassicLogoDetector::ClassicLogoDetector(ClassicCommDetector* commdetector,
-        unsigned int w, unsigned int h, unsigned int commdetectborder_in,
-        unsigned int xspacing_in, unsigned int yspacing_in):
-    LogoDetectorBase(w,h),
-    commDetector(commdetector),
-    frameNumber(0),
-    previousFrameWasSceneChange(false),
-    xspacing(xspacing_in),
-    yspacing(yspacing_in),
-    commDetectBorder(commdetectborder_in)
+                                         unsigned int w, unsigned int h,
+                                         unsigned int commdetectborder_in,
+                                         unsigned int xspacing_in,
+                                         unsigned int yspacing_in)
+    : LogoDetectorBase(w,h),
+      commDetector(commdetector),                       frameNumber(0),
+      previousFrameWasSceneChange(false),
+      xspacing(xspacing_in),                            yspacing(yspacing_in),
+      commDetectBorder(commdetectborder_in),            edgeMask(new EdgeMaskEntry[width * height]),
+      logoMaxValues(new unsigned char[width * height]), logoMinValues(new unsigned char[width * height]),
+      logoFrame(new unsigned char[width * height]),     logoMask(new unsigned char[width * height]),
+      logoCheckMask(new unsigned char[width * height]), tmpBuf(new unsigned char[width * height]),
+      logoEdgeDiff(0),                                  logoFrameCount(0),
+      logoMinX(0),                                      logoMaxX(0),
+      logoMinY(0),                                      logoMaxY(0),
+      logoInfoAvailable(false)
 {
     commDetectLogoSamplesNeeded =
         gContext->GetNumSetting("CommDetectLogoSamplesNeeded", 240);
     commDetectLogoSampleSpacing =
         gContext->GetNumSetting("CommDetectLogoSampleSpacing", 2);
+    commDetectLogoSecondsNeeded = commDetectLogoSamplesNeeded *
+                                  commDetectLogoSampleSpacing;
     commDetectLogoGoodEdgeThreshold =
         gContext->GetSetting("CommDetectLogoGoodEdgeThreshold", "0.75")
         .toDouble();
     commDetectLogoBadEdgeThreshold =
         gContext->GetSetting("CommDetectLogoBadEdgeThreshold", "0.85")
         .toDouble();
-    commDetectLogoSecondsNeeded = commDetectLogoSamplesNeeded *
-                                  commDetectLogoSampleSpacing;
-
-    edgeMask = new EdgeMaskEntry[width * height];
-    logoFrame = new unsigned char[width * height];
-    logoMask = new unsigned char[width * height];
-    logoCheckMask = new unsigned char[width * height];
-    logoMaxValues = new unsigned char[width * height];
-    logoMinValues = new unsigned char[width * height];
-    tmpBuf = new unsigned char[width * height];
-
-    logoFrameCount = 0;
 }
 
 unsigned int ClassicLogoDetector::getRequiredAvailableBufferForSearch()

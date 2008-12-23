@@ -319,28 +319,27 @@ QString strftimeval(const struct timeval *tv)
 using namespace commDetector2;
 
 CommDetector2::CommDetector2(
-    enum SkipTypes commDetectMethod_in,
-    bool showProgress_in, bool fullSpeed_in, NuppelVideoPlayer* nvp_in,
-    int chanid, const QDateTime& startts_in, const QDateTime& endts_in,
-    const QDateTime& recstartts_in, const QDateTime& recendts_in,
-    bool useDB)
-    : commDetectMethod((enum SkipTypes)(commDetectMethod_in & ~COMM_DETECT_2))
-    , showProgress(showProgress_in)
-    , fullSpeed(fullSpeed_in)
-    , nvp(nvp_in)
-    , startts(startts_in)
-    , endts(endts_in)
-    , recstartts(recstartts_in)
-    , recendts(recendts_in)
-    , isRecording(QDateTime::currentDateTime() < recendts)
-    , sendBreakMapUpdates(false)
-    , breakMapUpdateRequested(false)
-    , finished(false)
-    , logoFinder(NULL)
-    , logoMatcher(NULL)
-    , blankFrameDetector(NULL)
-    , sceneChangeDetector(NULL)
-    , debugdir("")
+    enum SkipTypes     commDetectMethod_in,
+    bool               showProgress_in,
+    bool               fullSpeed_in,
+    NuppelVideoPlayer *nvp_in,
+    int                chanid,
+    const QDateTime   &startts_in,
+    const QDateTime   &endts_in,
+    const QDateTime   &recstartts_in,
+    const QDateTime   &recendts_in,
+    bool               useDB) :
+    commDetectMethod((enum SkipTypes)(commDetectMethod_in & ~COMM_DETECT_2)),
+    showProgress(showProgress_in),  fullSpeed(fullSpeed_in),
+    nvp(nvp_in),
+    startts(startts_in),            endts(endts_in),
+    recstartts(recstartts_in),      recendts(recendts_in),
+    isRecording(QDateTime::currentDateTime() < recendts),
+    sendBreakMapUpdates(false),     breakMapUpdateRequested(false),
+    finished(false),                currentFrameNumber(0),
+    logoFinder(NULL),               logoMatcher(NULL),
+    blankFrameDetector(NULL),       sceneChangeDetector(NULL),
+    debugdir("")
 {
     FrameAnalyzerItem        pass0, pass1;
     PGMConverter            *pgmConverter = NULL;

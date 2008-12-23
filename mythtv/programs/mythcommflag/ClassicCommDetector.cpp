@@ -132,21 +132,29 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
                                          const QDateTime& stopsAt_in,
                                          const QDateTime& recordingStartedAt_in,
                                          const QDateTime& recordingStopsAt_in) :
-        commDetectMethod(commDetectMethod_in),
-        showProgress(showProgress_in),
-        fullSpeed(fullSpeed_in),
-        nvp(nvp_in),
-        startedAt(startedAt_in),
-        stopsAt(stopsAt_in),
-        recordingStartedAt(recordingStartedAt_in),
-        recordingStopsAt(recordingStopsAt_in),
-        framesProcessed(0),preRoll(0),postRoll(0),
-        logoDetector(0),
-        sceneChangeDetector(0)
+    commDetectMethod(commDetectMethod_in),     showProgress(showProgress_in),
+    fullSpeed(fullSpeed_in),                   nvp(nvp_in),
+    startedAt(startedAt_in),                   stopsAt(stopsAt_in),
+    recordingStartedAt(recordingStartedAt_in),
+    recordingStopsAt(recordingStopsAt_in),
+    stillRecording(recordingStopsAt > QDateTime::currentDateTime()),
+    commBreakMapUpdateRequested(false),        sendCommBreakMapUpdates(false),
+    aggressiveDetection(false),                verboseDebugging(false),
+    lastFrameNumber(0),                        curFrameNumber(0),
+    width(0),                                  height(0),
+    horizSpacing(0),                           vertSpacing(0),
+    fps(0.0),                                  fpm(0.0),
+    blankFramesOnly(false),                    blankFrameCount(0),
+    currentAspect(0),                          framesProcessed(0),
+    preRoll(0),                                postRoll(0),
+    totalMinBrightness(0),                     detectBlankFrames(false),
+    detectSceneChanges(false),                 detectStationLogo(false),
+    logoInfoAvailable(false),                  logoDetector(0),
+    framePtr(0),                               frameIsBlank(false),
+    sceneHasChanged(false),                    stationLogoPresent(false),
+    lastFrameWasBlank(false),                  lastFrameWasSceneChange(false),
+    decoderFoundAspectChanges(false),          sceneChangeDetector(0)
 {
-
-    stillRecording = recordingStopsAt > QDateTime::currentDateTime();
-    
     commDetectBorder =
         gContext->GetNumSetting("CommDetectBorder", 20);
     commDetectBlankFrameMaxDiff =
@@ -171,7 +179,6 @@ ClassicCommDetector::ClassicCommDetector(SkipType commDetectMethod_in,
     skipAllBlanks = !!gContext->GetNumSetting("CommSkipAllBlanks", 1);
     commDetectBlankCanHaveLogo =
         !!gContext->GetNumSetting("CommDetectBlankCanHaveLogo", 1);
-
 }
 
 void ClassicCommDetector::Init()

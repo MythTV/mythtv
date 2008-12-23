@@ -328,29 +328,23 @@ pick_mintmpledges(const unsigned short *matches, long long nframes)
 };  /* namespace */
 
 TemplateMatcher::TemplateMatcher(PGMConverter *pgmc, EdgeDetector *ed,
-        TemplateFinder *tf, QString debugdir)
-    : FrameAnalyzer()
-    , pgmConverter(pgmc)
-    , edgeDetector(ed)
-    , templateFinder(tf)
-    , tmplrow(-1)
-    , tmplcol(-1)
-    , tmplwidth(-1)
-    , tmplheight(-1)
-    , matches(NULL)
-    , match(NULL)
-    , fps(0.0f)
-    , debugLevel(0)
-    , debugdir(debugdir)
+                                 TemplateFinder *tf, QString debugdir) :
+    FrameAnalyzer(),      pgmConverter(pgmc),
+    edgeDetector(ed),     templateFinder(tf),
+    tmpl(0),
+    tmplrow(-1),          tmplcol(-1),
+    tmplwidth(-1),        tmplheight(-1),
+    matches(NULL),        match(NULL),
+    fps(0.0f),
+    debugLevel(0),        debugdir(debugdir),
 #ifdef PGM_CONVERT_GREYSCALE
-    , debugdata(debugdir + "/TemplateMatcher-pgm.txt")
+    debugdata(debugdir + "/TemplateMatcher-pgm.txt"),
 #else  /* !PGM_CONVERT_GREYSCALE */
-    , debugdata(debugdir + "/TemplateMatcher-yuv.txt")
+    debugdata(debugdir + "/TemplateMatcher-yuv.txt"),
 #endif /* !PGM_CONVERT_GREYSCALE */
-    , nvp(NULL)
-    , debug_matches(false)
-    , debug_removerunts(false)
-    , matches_done(false)
+    nvp(NULL),
+    debug_matches(false), debug_removerunts(false),
+    matches_done(false)
 {
     memset(&cropped, 0, sizeof(cropped));
     memset(&analyze_time, 0, sizeof(analyze_time));
