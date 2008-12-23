@@ -1278,7 +1278,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
         windows[0].SetDisplayAspect(size_in_mm.width / size_in_mm.height);
         VERBOSE(VB_PLAYBACK, QString("Screen size is %1 x %2 (mm), aspect %3")
                              .arg(size_in_mm.width).arg(size_in_mm.height)
-                             .arg(display_aspect));
+                             .arg(size_in_mm.width / size_in_mm.height));
     }
 
     // Global configuration options
@@ -1289,7 +1289,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
 
     data->convertI420to2VUY = get_i420_2vuy_conv();
 
-#if 0
+
     if (data->drawInWindow)
     {
         // display_aspect and _dim have to be scaled to actual window size
@@ -1297,13 +1297,12 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
                           / get_int_CF(m, kCGDisplayWidth);
         float winHeight = size_in_mm.height * winh
                           / get_int_CF(m, kCGDisplayHeight);
-        display_dim     = QSize(winWidth, winHeight);
-        display_aspect  = winWidth / winHeight;
+        windows[0].SetDisplayDim(QSize(winWidth, winHeight));
+        windows[0].SetDisplayAspect(winWidth / winHeight);
         VERBOSE(VB_PLAYBACK, QString("Main window is %1 x %2 (mm), aspect %3")
                              .arg((int)winWidth).arg((int)winHeight)
-                             .arg(display_aspect));
+                             .arg(winWidth / winHeight));
     }
-#endif
 
     if (!CreateQuartzBuffers())
     {
