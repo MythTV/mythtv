@@ -1543,7 +1543,7 @@ void MHIBitmap::CreateFromMPEG(const unsigned char *data, int length)
                 m_image.setPixel(j, i, qRgb(red, green, blue));
             }
         }
-        delete outputbuf;
+        delete [] outputbuf;
     }
 
 Close:
