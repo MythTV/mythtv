@@ -331,7 +331,7 @@ int preview_helper(const QString &chanid, const QString &starttime,
         return GENERIC_EXIT_NOT_OK;
     }
 
-    PreviewGenerator *previewgen = new PreviewGenerator(pginfo, true);
+    PreviewGenerator *previewgen = new PreviewGenerator(pginfo, PreviewGenerator::kLocal);
 
     if (previewFrameNumber >= 0)
         previewgen->SetPreviewTimeAsFrameNumber(previewFrameNumber);

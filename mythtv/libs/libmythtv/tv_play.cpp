@@ -10386,8 +10386,8 @@ bool TV::ScreenShot(PlayerContext *ctx, long long frameNumber)
         .arg(ctx->playingInfo->recstartts.toString("yyyyMMddhhmmss"))
         .arg((long)frameNumber);
 
-    PreviewGenerator *previewgen = 
-        new PreviewGenerator(ctx->playingInfo, false);
+    PreviewGenerator *previewgen = new PreviewGenerator(
+        ctx->playingInfo, PreviewGenerator::kLocalAndRemote);
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
     previewgen->SetPreviewTimeAsFrameNumber(frameNumber);

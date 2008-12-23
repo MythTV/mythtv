@@ -2183,7 +2183,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         gContext->dispatch(me);
 
         program_info->pathname = program_info->GetPlaybackURL();
-        (new PreviewGenerator(program_info, true))->Run();
+        (new PreviewGenerator(program_info, PreviewGenerator::kLocal))->Run();
     }
 
     msg = QString("Commercial Flagging %1")

@@ -69,13 +69,13 @@ const char *PreviewGenerator::kInUseID = "preview_generator";
  *                    if the file is local.
  */
 PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
-                                   bool local_only)
-    : programInfo(*pginfo), localOnly(local_only), isConnected(false),
+                                   PreviewGenerator::Mode _mode)
+    : programInfo(*pginfo), mode(_mode), isConnected(false),
       createSockets(false), serverSock(NULL),      pathname(pginfo->pathname),
       timeInSeconds(true),  captureTime(-1),       outFileName(QString::null),
       outSize(0,0)
 {
-    if (IsLocal())
+    if (IsLocal() && !(mode & kRemote))
         return;
 
     // Try to find a local means to access file...
@@ -175,11 +175,11 @@ bool PreviewGenerator::RunReal(void)
 {
     bool ok = false;
     bool is_local = IsLocal();
-    if (is_local && LocalPreviewRun())
+    if (is_local && (mode && kLocal) && LocalPreviewRun())
     {
         ok = true;
     }
-    else if (!localOnly)
+    else if (mode & kRemote)
     {
         if (is_local)
         {
@@ -202,9 +202,10 @@ bool PreviewGenerator::RunReal(void)
 bool PreviewGenerator::Run(void)
 {
     bool ok = false;
-    if (!IsLocal())
+    bool local_ok = IsLocal() && (mode & kLocal);
+    if (!local_ok)
     {
-        if (!localOnly)
+        if (mode & kRemote)
         {
             ok = RemotePreviewRun();
         }

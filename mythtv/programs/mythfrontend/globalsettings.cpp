@@ -2183,6 +2183,18 @@ static HostCheckBox *HWAccelPlaybackPreview()
     return gc;
 }
 
+static HostCheckBox *GeneratePreviewRemotely()
+{
+    HostCheckBox *gc = new HostCheckBox("GeneratePreviewRemotely");
+    gc->setLabel(QObject::tr("Generate preview image remotely"));
+    gc->setValue(false);
+    gc->setHelpText(
+        QObject::tr(
+            "If you have a very slow frontend you can enable this to "
+            "always have a backend server generate preview images."));
+    return gc;
+}
+
 static HostCheckBox *PlayBoxTransparency()
 {
     HostCheckBox *gc = new HostCheckBox("PlayBoxTransparency");
@@ -4721,6 +4733,7 @@ PlaybackSettings::PlaybackSettings()
     pbox->addChild(PlayBoxOrdering());
     pbox->addChild(PlayBoxEpisodeSort());
     pbox->addChild(GeneratePreviewPixmaps());
+    pbox->addChild(GeneratePreviewRemotely());
     pbox->addChild(PreviewPixmapOffset());
     pbox->addChild(PreviewFromBookmark());
     pbox->addChild(PlaybackPreview());

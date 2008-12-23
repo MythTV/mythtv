@@ -23,8 +23,19 @@ class MPUBLIC PreviewGenerator : public QObject
                               const QString &outfile);
 
     Q_OBJECT
+
   public:
-    PreviewGenerator(const ProgramInfo *pginfo, bool local_only = true);
+    typedef enum Mode
+    {
+        kNone           = 0x0,
+        kLocal          = 0x1,
+        kRemote         = 0x2,
+        kLocalAndRemote = 0x3,
+        kModeMask       = 0x3,
+    } Mode;
+
+  public:
+    PreviewGenerator(const ProgramInfo *pginfo, Mode mode = kLocal);
 
     void SetPreviewTime(long long time, bool in_seconds)
         { captureTime = time; timeInSeconds = in_seconds; }
@@ -87,7 +98,7 @@ class MPUBLIC PreviewGenerator : public QObject
     pthread_t          previewThread;
     ProgramInfo        programInfo;
 
-    bool               localOnly;
+    Mode               mode;
     bool               isConnected;
     bool               createSockets;
     MythSocket        *serverSock;

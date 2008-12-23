@@ -345,6 +345,9 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         previewPixmapEnabled=gContext->GetNumSetting("GeneratePreviewPixmaps");
     }
     previewFromBookmark= gContext->GetNumSetting("PreviewFromBookmark");
+    previewGeneratorMode =
+        gContext->GetNumSetting("GeneratePreviewRemotely", 0) ?
+        PreviewGenerator::kRemote : PreviewGenerator::kLocalAndRemote;
 
     bool displayCat  = gContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
 
@@ -4592,7 +4595,9 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
         uint attempts = IncPreviewGeneratorAttempts(filename);
         if (attempts < PreviewGenState::maxAttempts)
         {
-            SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
+            PreviewGenerator::Mode mode =
+                (PreviewGenerator::Mode) previewGeneratorMode;
+            SetPreviewGenerator(filename, new PreviewGenerator(pginfo, mode));
         }
         else if (attempts == PreviewGenState::maxAttempts)
         {
@@ -4668,7 +4673,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
         if (attempts < PreviewGenState::maxAttempts)
         {
             VERBOSE(VB_PLAYBACK, "Starting preview generator");
-            SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
+            SetPreviewGenerator(filename, new PreviewGenerator(pginfo, (PreviewGenerator::Mode)previewGeneratorMode));
         }
         else if (attempts == PreviewGenState::maxAttempts)
         {

@@ -1116,7 +1116,7 @@ void TVRec::TeardownRecorder(bool killFile)
     {
         if (!killFile)
         {
-            (new PreviewGenerator(curRecording, true))->Start();
+            (new PreviewGenerator(curRecording, PreviewGenerator::kLocal))->Start();
 
             if (!tvchain)
             {
@@ -4458,7 +4458,7 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
     if (oldinfo)
     {
         FinishedRecording(oldinfo);
-        (new PreviewGenerator(oldinfo, true))->Start();
+        (new PreviewGenerator(oldinfo, PreviewGenerator::kLocal))->Start();
         delete oldinfo;
     }
 

@@ -476,6 +476,7 @@ class PlaybackBox : public MythDialog
     // Preview Pixmap Variables ///////////////////////////////////////////////
     bool                previewPixmapEnabled;
     bool                previewFromBookmark;
+    uint                previewGeneratorMode;
     QPixmap            *previewPixmap;
     QDateTime           previewLastModified;
     LastCheckedMap      previewLastModifyCheck;
