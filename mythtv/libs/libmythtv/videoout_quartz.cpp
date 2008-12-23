@@ -1289,7 +1289,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
 
     data->convertI420to2VUY = get_i420_2vuy_conv();
 
-
+#if 0
     if (data->drawInWindow)
     {
         // display_aspect and _dim have to be scaled to actual window size
@@ -1303,6 +1303,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
                              .arg((int)winWidth).arg((int)winHeight)
                              .arg(display_aspect));
     }
+#endif
 
     if (!CreateQuartzBuffers())
     {
