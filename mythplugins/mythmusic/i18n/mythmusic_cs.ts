@@ -963,8 +963,8 @@ Chcete pokračovat v přehrávání na pozadí?</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="142"/>
-        <source>Ascii</source>
-        <translation type="unfinished">Ascii</translation>
+        <source>ASCII</source>
+        <translation type="unfinished">ASCII</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="143"/>

@@ -1643,7 +1643,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="142"/>
-        <source>Ascii</source>
+        <source>ASCII</source>
         <translation>ASCII</translation>
     </message>
     <message>

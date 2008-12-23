@@ -1607,8 +1607,8 @@ Vill du fortsätta att spela musik i bakgrunden?</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="142"/>
-        <source>Ascii</source>
-        <translation>Ascii</translation>
+        <source>ASCII</source>
+        <translation>ASCII</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="143"/>

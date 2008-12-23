@@ -1612,7 +1612,7 @@ Do you want to continue playing in the background?</source>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="142"/>
-        <source>Ascii</source>
+        <source>ASCII</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
