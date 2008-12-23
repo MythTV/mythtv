@@ -87,7 +87,7 @@ class MetadataImp
     typedef Metadata::cast_list cast_list;
 
   public:
-    MetadataImp(const QString &filename, const QString &coverfile,
+    MetadataImp(const QString &filename, const QString &trailer, const QString &coverfile,
              const QString &title, int year,
              const QString &inetref, const QString &director,
              const QString &plot, float userrating,
@@ -102,7 +102,7 @@ class MetadataImp
         m_inetref(inetref), m_director(director), m_plot(plot),
         m_rating(rating), m_playcommand(playcommand), m_category(category),
         m_genres(genres), m_countries(countries), m_cast(cast),
-        m_filename(filename), m_coverfile(coverfile),
+        m_filename(filename), m_trailer(trailer), m_coverfile(coverfile),
         m_categoryID(categoryID), m_childID(childID), m_year(year),
         m_length(length), m_showlevel(showlevel), m_browse(browse), m_id(id),
         m_userrating(userrating)
@@ -135,6 +135,7 @@ class MetadataImp
             m_countries = rhs.m_countries;
             m_cast = rhs.m_cast;
             m_filename = rhs.m_filename;
+            m_trailer = rhs.m_trailer;
             m_coverfile = rhs.m_coverfile;
 
             m_categoryID = rhs.m_categoryID;
@@ -209,6 +210,9 @@ class MetadataImp
     const QString &getFilename() const { return m_filename; }
     void setFilename(const QString &filename) { m_filename = filename; }
 
+    const QString &GetTrailer() const { return m_trailer; }
+    void SetTrailer(const QString &trailer) { m_trailer = trailer; }
+
     const QString &getCoverFile() const { return m_coverfile; }
     void setCoverFile(const QString &coverFile) { m_coverfile = coverFile; }
 
@@ -275,6 +279,7 @@ class MetadataImp
     country_list m_countries;
     cast_list m_cast;
     QString m_filename;
+    QString m_trailer;
     QString m_coverfile;
 
     int m_categoryID;
@@ -377,7 +382,7 @@ bool MetadataImp::dropFromDB()
 
 void MetadataImp::Reset()
 {
-    MetadataImp tmp(m_filename, VIDEO_COVERFILE_DEFAULT,
+    MetadataImp tmp(m_filename, VIDEO_TRAILER_DEFAULT, VIDEO_COVERFILE_DEFAULT,
                     Metadata::FilenameToTitle(m_filename), VIDEO_YEAR_DEFAULT,
                     VIDEO_INETREF_DEFAULT, VIDEO_DIRECTOR_DEFAULT,
                     VIDEO_PLOT_DEFAULT, 0.0, VIDEO_RATING_DEFAULT, 0, m_id,
@@ -469,6 +474,7 @@ void MetadataImp::fromDBRow(MSqlQuery &query)
     m_playcommand = query.value(13).toString();
     m_categoryID = query.value(14).toInt();
     m_id = query.value(15).toInt();
+    m_trailer = query.value(16).toString();
 
     VideoCategory::getCategory().get(m_categoryID, m_category);
 
@@ -494,6 +500,8 @@ void MetadataImp::saveToDatabase()
         m_rating = VIDEO_RATING_DEFAULT;
     if (m_coverfile.isEmpty())
         m_coverfile = VIDEO_COVERFILE_DEFAULT;
+    if (m_trailer.isEmpty())
+        m_trailer = VIDEO_TRAILER_DEFAULT;
     if (m_inetref.isEmpty())
         m_inetref = VIDEO_INETREF_DEFAULT;
     if (isnan(m_userrating))
@@ -511,9 +519,9 @@ void MetadataImp::saveToDatabase()
 
         query.prepare("INSERT INTO videometadata (title,director,plot,"
                       "rating,year,userrating,length,filename,showlevel,"
-                      "coverfile,inetref,browse) VALUES (:TITLE, :DIRECTOR, "
+                      "coverfile,inetref,browse,trailer) VALUES (:TITLE, :DIRECTOR, "
                       ":PLOT, :RATING, :YEAR, :USERRATING, :LENGTH, "
-                      ":FILENAME, :SHOWLEVEL, :COVERFILE, :INETREF, :BROWSE)");
+                      ":FILENAME, :SHOWLEVEL, :COVERFILE, :INETREF, :BROWSE, :TRAILER)");
 
     }
     else
@@ -521,7 +529,7 @@ void MetadataImp::saveToDatabase()
         query.prepare("UPDATE videometadata SET title = :TITLE, "
                       "director = :DIRECTOR, plot = :PLOT, rating= :RATING, "
                       "year = :YEAR, userrating = :USERRATING, "
-                      "length = :LENGTH, filename = :FILENAME, "
+                      "length = :LENGTH, filename = :FILENAME, trailer = :TRAILER, "
                       "showlevel = :SHOWLEVEL, coverfile = :COVERFILE, "
                       "inetref = :INETREF, browse = :BROWSE, "
                       "playcommand = :PLAYCOMMAND, childid = :CHILDID, "
@@ -541,6 +549,7 @@ void MetadataImp::saveToDatabase()
     query.bindValue(":USERRATING", m_userrating);
     query.bindValue(":LENGTH", m_length);
     query.bindValue(":FILENAME", m_filename);
+    query.bindValue(":TRAILER", m_trailer);
     query.bindValue(":SHOWLEVEL", m_showlevel);
     query.bindValue(":COVERFILE", m_coverfile);
     query.bindValue(":INETREF", m_inetref);
@@ -774,109 +783,7 @@ QString Metadata::trimTitle(const QString &title, bool ignore_case)
     return ret;
 }
 
-QString Metadata::getPlayer(const Metadata *item)
-{
-    QString empty;
-    return getPlayer(item, empty);
-}
-
-QString Metadata::getPlayer(const Metadata *item, QString &internal_mrl)
-{
-    if (!item) return "";
-
-    internal_mrl = item->Filename();
-
-    if (item->PlayCommand().length()) return item->PlayCommand();
-
-    QString extension = item->Filename().section(".", -1, -1);
-
-    QDir dir_test(item->Filename());
-    if (dir_test.exists())
-    {
-        dir_test.setPath(item->Filename() + "/VIDEO_TS");
-        if (dir_test.exists())
-        {
-            extension = "VIDEO_TS";
-        }
-    }
-
-    QString type_player;
-    bool use_default = true;
-    if (getPlayer(extension, type_player, use_default))
-    {
-        if (!use_default) return type_player;
-    }
-
-    return gContext->GetSetting("VideoDefaultPlayer");
-}
-
-QString Metadata::getPlayCommand(const Metadata *item)
-{
-    if (!item) return "";
-
-    QString filename = item->Filename();
-    QString handler = getPlayer(item);
-
-    QString esc_fname =
-            QString(item->Filename()).replace(QRegExp("\""), "\\\"");
-    QString arg = QString("\"%1\"").arg(esc_fname);
-
-    QString command = "";
-
-    // If handler contains %d, substitute default player command
-    // This would be used to add additional switches to the default without
-    // needing to retype the whole default command.  But, if the
-    // command and the default command both contain %s, drop the %s from
-    // the default since the new command already has it
-    //
-    // example: default: mplayer -fs %s
-    //          custom : %d -ao alsa9:spdif %s
-    //          result : mplayer -fs -ao alsa9:spdif %s
-    if (handler.contains("%d"))
-    {
-        QString default_handler = gContext->GetSetting("VideoDefaultPlayer");
-        if (handler.contains("%s") && default_handler.contains("%s"))
-        {
-            default_handler = default_handler.replace(QRegExp("%s"), "");
-        }
-        command = handler.replace(QRegExp("%d"), default_handler);
-    }
-
-    if (handler.contains("%s"))
-    {
-        command = handler.replace(QRegExp("%s"), arg);
-    }
-    else
-    {
-        command = handler + " " + arg;
-    }
-
-    return command;
-}
-
-// returns true if info for the extension was found
-bool Metadata::getPlayer(const QString &extension, QString &player,
-                         bool &use_default)
-{
-    use_default = true;
-
-    const FileAssociations::association_list fa_list =
-            FileAssociations::getFileAssociation().getList();
-    for (FileAssociations::association_list::const_iterator p = fa_list.begin();
-         p != fa_list.end(); ++p)
-    {
-        if (p->extension.toLower() == extension.toLower())
-        {
-            player = p->playcommand;
-            use_default = p->use_default;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-Metadata::Metadata(const QString &filename, const QString &coverfile,
+Metadata::Metadata(const QString &filename, const QString &trailer, const QString &coverfile,
              const QString &title, int year,
              const QString &inetref, const QString &director,
              const QString &plot, float userrating,
@@ -888,7 +795,7 @@ Metadata::Metadata(const QString &filename, const QString &coverfile,
              const country_list &countries,
              const cast_list &cast)
 {
-    m_imp = new MetadataImp(filename, coverfile, title, year, inetref, director,
+    m_imp = new MetadataImp(filename, trailer, coverfile, title, year, inetref, director,
                             plot, userrating, rating, length, id, showlevel,
                             categoryID, childID, browse, playcommand, category,
                             genres, countries, cast);
@@ -1082,6 +989,16 @@ const QString &Metadata::Filename() const
 void Metadata::setFilename(const QString &filename)
 {
     m_imp->setFilename(filename);
+}
+
+const QString &Metadata::GetTrailer() const
+{
+    return m_imp->GetTrailer();
+}
+
+void Metadata::SetTrailer(const QString &trailer)
+{
+    m_imp->SetTrailer(trailer);
 }
 
 const QString &Metadata::CoverFile() const

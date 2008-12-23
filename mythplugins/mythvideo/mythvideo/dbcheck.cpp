@@ -14,7 +14,7 @@ namespace
     const QString lastMythDVDDBVersion = "1002";
     const QString lastMythVideoVersion = "1010";
 
-    const QString currentDatabaseVersion = "1019";
+    const QString currentDatabaseVersion = "1020";
 
     const QString OldMythVideoVersionName = "VideoDBSchemaVer";
     const QString OldMythDVDVersionName = "DVDDBSchemaVer";
@@ -763,6 +763,12 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             performActualUpdate(updates, "1019", dbver, MythVideoVersionName);
         }
 
+        if (dbver == "1019")
+        {
+            QStringList updates(
+                    "ALTER TABLE videometadata ADD `trailer` TEXT;");
+            performActualUpdate(updates, "1020", dbver, MythVideoVersionName);
+        }
     }
 }
 

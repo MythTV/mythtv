@@ -788,13 +788,18 @@
         </textarea>
 
         <textarea name="browse_text" from="title_text">
-            <position>50,340</position>
+            <position>50,337</position>
             <value>Include while Browsing:</value>
         </textarea>
 
         <textarea name="coverart_text_label" from="title_text">
-            <position>50,390</position>
+            <position>50,375</position>
             <value>Cover Art:</value>
+        </textarea>
+
+        <textarea name="trailer_text_label" from="title_text">
+            <position>50,405</position>
+            <value>Trailer:</value>
         </textarea>
 
         <textarea name="player_text" from="title_text">
@@ -825,7 +830,7 @@
         </checkbox>
 
         <button name="coverart_button">
-            <area>310,385,32,32</area>
+            <area>310,370,32,32</area>
             <statetype name="buttonstate">
                 <state name="active">
                     <imagetype name="background">
@@ -847,9 +852,37 @@
         </button>
 
         <textarea name="coverart_text" from="basetextarea">
-            <area>350,390,250,40</area>
+            <area>350,375,250,40</area>
             <value>/path/to/the/thing.jpg</value>
         </textarea>
+
+        <button name="trailer_button">
+            <area>310,400,32,32</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_off.png</filename>
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_on.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <filename>blankbutton_pushed.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </button>
+
+        <textarea name="trailer_text" from="basetextarea">
+            <area>350,405,250,40</area>
+            <value>/path/to/the/thing.jpg</value>
+        </textarea>
+
 
         <textedit name="player_edit" from="basetextedit">
             <position>310,435</position>

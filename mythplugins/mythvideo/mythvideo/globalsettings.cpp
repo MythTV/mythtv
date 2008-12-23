@@ -240,7 +240,18 @@ HostLineEdit *VideoArtworkDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("VideoArtworkDir");
     gc->setLabel(QObject::tr("Directory that holds movie posters"));
-    gc->setValue(GetConfDir() + "/MythVideo");
+    gc->setValue(GetConfDir() + "/MythVideo/Artwork");
+    gc->setHelpText(QObject::tr("This directory must exist, and the user "
+                    "running MythVideo needs to have read/write permission "
+                    "to the directory."));
+    return gc;
+}
+
+HostLineEdit *TrailerDirectory()
+{
+    HostLineEdit *gc = new HostLineEdit("mythvideo.TrailersDir");
+    gc->setLabel(QObject::tr("Directory that holds movie trailers"));
+    gc->setValue(GetConfDir() + "/MythVideo/Trailers");
     gc->setHelpText(QObject::tr("This directory must exist, and the user "
                     "running MythVideo needs to have read/write permission "
                     "to the directory."));
@@ -629,10 +640,38 @@ class RatingsToPL : public TriggeredConfigurationGroup
 
         addTarget("0", new VerticalConfigurationGroup(true));
         addTarget("1", vcg);
-
     }
 };
 
+class RandomTrailers : public TriggeredConfigurationGroup
+{
+  public:
+    RandomTrailers() : TriggeredConfigurationGroup(false)
+    {
+        HostCheckBox *rt = new HostCheckBox("mythvideo.TrailersRandomEnabled");
+        rt->setLabel(QObject::tr("Enable random trailers before videos"));
+        rt->setValue(false);
+        rt->setHelpText(QObject::tr("If set, this will enable a button "
+                        "called \"Watch With Trailers\" which will "
+                        "play a user-specified number of trailers "
+                        "before the movie."));
+
+        addChild(rt);
+        setTrigger(rt);
+
+        VerticalConfigurationGroup *vcg = new VerticalConfigurationGroup(true);
+        HostSpinBox *rc = new HostSpinBox("mythvideo.TrailersRandomCount", 0,
+                10, 1);
+        rc->setLabel(QObject::tr("Number of trailers to play"));
+        rc->setValue(3);
+        rc->setHelpText(QObject::tr("The number of trailers to play "
+                        "before playing the film itself "));
+        vcg->addChild(rc);
+
+        addTarget("0", new VerticalConfigurationGroup(true));
+        addTarget("1", vcg);
+    }
+};
 
 } // namespace
 
@@ -687,6 +726,14 @@ VideoGeneralSettings::VideoGeneralSettings()
 
     VConfigPage page6(pages, false);
     page6->addChild(new RatingsToPL());
+
+    // page 7
+    VerticalConfigurationGroup *trlr =
+            new VerticalConfigurationGroup(true, false);
+    trlr->addChild(TrailerDirectory());
+    trlr->addChild(new RandomTrailers());
+    VConfigPage page7(pages, false);
+    page7->addChild(trlr);
 
     int page_num = 1;
     for (ConfigPage::PageList::const_iterator p = pages.begin();

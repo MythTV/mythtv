@@ -35,6 +35,9 @@
 #include "videopopups.h"
 #include "videolist.h"
 #include "videoutils.h"
+#include "dbaccess.h"
+#include "dirscan.h"
+#include "playercommand.h"
 #include "videodlg.h"
 
 namespace
@@ -621,63 +624,17 @@ namespace
         }
     };
 
-    void PlayVideo(const QString &filename,
-            const MetadataListManager &video_list)
-            {
-        const int WATCHED_WATERMARK = 10000; // Less than this and the chain of
-                                             // videos will not be followed when
-                                             // playing.
-
-        MetadataListManager::MetadataPtr item = video_list.byFilename(filename);
-
-        if (!item) return;
-
-        QTime playing_time;
-
-        do
-                {
-            playing_time.start();
-
-            QString internal_mrl;
-            QString handler = Metadata::getPlayer(item.get(), internal_mrl);
-            // See if this is being handled by a plugin..
-            if (!gContext->GetMainWindow()->HandleMedia(handler, internal_mrl,
-                            item->Plot(), item->Title(), item->Director(),
-                            item->Length(), QString::number(item->Year())))
-            {
-                // No internal handler for this, play external
-                QString command = Metadata::getPlayCommand(item.get());
-                if (command.length())
-                {
-                    gContext->sendPlaybackStart();
-                    myth_system(command);
-                    gContext->sendPlaybackEnd();
-                }
-            }
-
-            if (item->ChildID() > 0)
-            {
-                item = video_list.byID(item->ChildID());
-                }
-                else
-                {
-                break;
-            }
-        }
-        while (item && playing_time.elapsed() > WATCHED_WATERMARK);
-                }
-
     QString GetDisplayYear(int year)
     {
         return year == VIDEO_YEAR_DEFAULT ? "?" : QString::number(year);
-            }
+    }
 
     QString GetDisplayRating(const QString &rating)
     {
         if (rating == "<NULL>")
             return QObject::tr("No rating available.");
         return rating;
-        }
+    }
 
     QString GetDisplayUserRating(float userrating)
     {
@@ -741,6 +698,33 @@ namespace
         }
 
         return false;
+    }
+
+    void PlayVideo(const QString &filename,
+            const MetadataListManager &video_list)
+    {
+        const int WATCHED_WATERMARK = 10000; // Less than this and the chain of
+                                             // videos will not be followed when
+                                             // playing.
+
+        MetadataListManager::MetadataPtr item = video_list.byFilename(filename);
+
+        if (!item) return;
+
+        QTime playing_time;
+
+        do
+        {
+            playing_time.start();
+
+            VideoPlayerCommand::PlayerFor(item.get()).Play();
+
+            if (item->ChildID() > 0)
+                item = video_list.byID(item->ChildID());
+            else
+                break;
+        }
+        while (item && playing_time.elapsed() > WATCHED_WATERMARK);
     }
 }
 
@@ -947,6 +931,8 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
 
     m_d->m_videoList->setCurrentVideoFilter(VideoFilterSettings(true,
                     lname));
+
+    srand(time(NULL));
 }
 
 VideoDialog::~VideoDialog()
@@ -1433,7 +1419,8 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
     if (metadata)
     {
         item->setText(metadata->Filename(), "filename");
-        item->setText(Metadata::getPlayer(metadata), "video_player");
+        item->setText(VideoPlayerCommand::PlayerFor(metadata)
+                .GetCommandDisplayName(), "video_player");
 
         QString coverfile = metadata->CoverFile();
 
@@ -1512,12 +1499,30 @@ void VideoDialog::VideoMenu()
 
     MythUIButtonListItem *item = GetItemCurrent();
     MythGenericTree *node = GetNodePtrFromButton(item);
-        if (node && node->getInt() >= 0)
+    if (node && node->getInt() >= 0)
+    {
+        m_menuPopup->AddButton(tr("Watch This Video"), SLOT(playVideo()));
+
+        if (gContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0))
         {
-            m_menuPopup->AddButton(tr("Watch This Video"), SLOT(playVideo()));
-            m_menuPopup->AddButton(tr("Video Info"), SLOT(InfoMenu()));
-            m_menuPopup->AddButton(tr("Manage Video"), SLOT(ManageMenu()));
+             m_menuPopup->AddButton(tr("Watch With Trailers"),
+                  SLOT(playVideoWithTrailers()));
         }
+
+        Metadata *metadata = GetMetadata(item);
+        if (metadata)
+        {
+            QString trailerFile = metadata->GetTrailer();
+            if (QFile::exists(trailerFile))
+            {
+                 m_menuPopup->AddButton(tr("Watch Trailer"),
+                         SLOT(playTrailer()));
+            }
+        }
+
+        m_menuPopup->AddButton(tr("Video Info"), SLOT(InfoMenu()));
+        m_menuPopup->AddButton(tr("Manage Video"), SLOT(ManageMenu()));
+    }
     m_menuPopup->AddButton(tr("Scan For Changes"), SLOT(doVideoScan()));
     m_menuPopup->AddButton(tr("Change View"), SLOT(ViewMenu()));
     m_menuPopup->AddButton(tr("Filter Display"), SLOT(ChangeFilter()));
@@ -1725,13 +1730,83 @@ void VideoDialog::ShowCastDialog()
 void VideoDialog::playVideo()
 {
     Metadata *metadata = GetMetadata(GetItemCurrent());
+    if (metadata)
+        PlayVideo(metadata->Filename(), m_d->m_videoList->getListCache());
+}
+
+namespace
+{
+    struct SimpleCollect : public DirectoryHandler
+    {
+        SimpleCollect(QStringList &fileList) : m_fileList(fileList) {}
+
+        DirectoryHandler *newDir(const QString &dirName,
+                const QString &fqDirName)
+        {
+            (void) dirName;
+            (void) fqDirName;
+            return this;
+        }
+
+        void handleFile(const QString &fileName, const QString &fqFileName,
+                const QString &extension)
+        {
+            (void) fileName;
+            (void) extension;
+            m_fileList.push_back(fqFileName);
+        }
+
+      private:
+        QStringList &m_fileList;
+    };
+
+    QStringList GetTrailersInDirectory(const QString &startDir)
+    {
+        FileAssociations::ext_ignore_list extensions;
+        FileAssociations::getFileAssociation()
+                .getExtensionIgnoreList(extensions);
+        QStringList ret;
+        SimpleCollect sc(ret);
+        ScanVideoDirectory(startDir, &sc, extensions, false);
+        return ret;
+    }
+}
+
+void VideoDialog::playVideoWithTrailers()
+{
+    Metadata *metadata = GetMetadata(GetItemCurrent());
+    if (!metadata) return;
+
+    QStringList trailers = GetTrailersInDirectory(gContext->
+            GetSetting("mythvideo.TrailersDir"));
+
+    if (trailers.isEmpty())
+        return;
+
+    const int trailersToPlay =
+            gContext->GetNumSetting("mythvideo.TrailersRandomCount");
+
+    int i = 0;
+    while (trailers.size() && i < trailersToPlay)
+    {
+        ++i;
+        QString trailer = trailers.takeAt(rand() % trailers.size());
+
+        VERBOSE(VB_GENERAL | VB_EXTRA,
+                QString("Random trailer to play will be: %1").arg(trailer));
+
+        VideoPlayerCommand::PlayerFor(trailer).Play();
+    }
 
     PlayVideo(metadata->Filename(), m_d->m_videoList->getListCache());
+}
 
-    gContext->GetMainWindow()->raise();
-    gContext->GetMainWindow()->activateWindow();
-    if (gContext->GetMainWindow()->currentWidget())
-        gContext->GetMainWindow()->currentWidget()->setFocus();
+void VideoDialog::playTrailer()
+{
+    Metadata *metadata = GetMetadata(GetItemCurrent());
+    if (!metadata) return;
+
+    VideoPlayerCommand::PlayerFor(metadata->GetTrailer()).Play();
 }
 
 void VideoDialog::setParentalLevel(const ParentalLevel::Level &level)

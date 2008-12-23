@@ -60,6 +60,8 @@ class EditMetadataDialog : public MythScreenType
     MythUICheckBox      *m_browseCheck;
     MythUIButton        *m_coverartButton;
     MythUIText          *m_coverartText;
+    MythUIButton        *m_trailerButton;
+    MythUIText          *m_trailerText;
     MythUIButton        *m_doneButton;
 
     //

@@ -123,8 +123,7 @@ class VideoScannerThread : public QThread
     typedef std::vector<std::pair<unsigned int, QString> > PurgeList;
     typedef std::map<QString, bool> FileCheckList;
 
-    void promptForRemoval(unsigned int id,
-            const QString &filename)
+    void promptForRemoval(unsigned int id, const QString &filename)
     {
         // TODO: use single DB connection for all calls
         if (m_RemoveAll)
@@ -215,6 +214,7 @@ class VideoScannerThread : public QThread
             if (!p->second)
             {
                 Metadata newFile(p->first, VIDEO_COVERFILE_DEFAULT,
+                                 VIDEO_TRAILER_DEFAULT,
                                  Metadata::FilenameToTitle(p->first),
                                  VIDEO_YEAR_DEFAULT,
                                  VIDEO_INETREF_DEFAULT, VIDEO_DIRECTOR_DEFAULT,

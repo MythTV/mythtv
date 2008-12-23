@@ -22,8 +22,10 @@ EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
         const MetadataListManager &cache) : MythScreenType(lparent, lname),
     m_origMetadata(source_metadata), m_titleEdit(0), m_playerEdit(0),
     m_categoryList(0), m_levelList(0), m_childList(0), m_browseCheck(0),
-    m_coverartButton(0), m_coverartText(0), m_doneButton(0),
-    cachedChildSelection(0), m_metaCache(cache)
+    m_coverartButton(0), m_coverartText(0),
+    m_trailerButton(0), m_trailerText(0),
+    m_doneButton(0), cachedChildSelection(0),
+    m_metaCache(cache)
 {
     m_workingMetadata = new Metadata(*m_origMetadata);
 }
@@ -43,6 +45,7 @@ bool EditMetadataDialog::Create()
     UIUtilE::Assign(this, m_playerEdit, "player_edit", &err);
 
     UIUtilE::Assign(this, m_coverartText, "coverart_text", &err);
+    UIUtilE::Assign(this, m_trailerText, "trailer_text", &err);
 
     UIUtilE::Assign(this, m_categoryList, "category_select", &err);
     UIUtilE::Assign(this, m_levelList, "level_select", &err);
@@ -213,6 +216,7 @@ void EditMetadataDialog::fillWidgets()
     if (m_workingMetadata->Browse())
         m_browseCheck->SetCheckState(MythUIStateType::Full);
     m_coverartText->SetText(m_workingMetadata->CoverFile());
+    m_trailerText->SetText(m_workingMetadata->GetTrailer());
     m_playerEdit->SetText(m_workingMetadata->PlayCommand());
 }
 

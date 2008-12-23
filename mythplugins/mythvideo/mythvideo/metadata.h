@@ -46,23 +46,26 @@ class Metadata
     static SortKey GenerateDefaultSortKey(const Metadata &m, bool ignore_case);
     static QString FilenameToTitle(const QString &file_name);
     static QString trimTitle(const QString &title, bool ignore_case);
-    static QString getPlayer(const Metadata *item);
-    static QString getPlayer(const Metadata *item, QString &internal_mrl);
-    static QString getPlayCommand(const Metadata *item);
-    static bool getPlayer(const QString &extension, QString &player,
-            bool &use_default);
 
   public:
-    Metadata(const QString &filename = "", const QString &coverfile = "",
-             const QString &title = "", int year = VIDEO_YEAR_DEFAULT,
-             const QString &inetref = "", const QString &director = "",
-             const QString &plot = "", float userrating = 0.0,
-             const QString &rating = "", int length = 0,
+    Metadata(const QString &filename = QString(),
+             const QString &trailer = QString(),
+             const QString &coverfile = QString(),
+             const QString &title = QString(),
+             int year = VIDEO_YEAR_DEFAULT,
+             const QString &inetref = QString(),
+             const QString &director = QString(),
+             const QString &plot = QString(),
+             float userrating = 0.0,
+             const QString &rating = QString(),
+             int length = 0,
              int id = 0,
              ParentalLevel::Level showlevel = ParentalLevel::plLowest,
              int categoryID = 0,
-             int childID = -1, bool browse = true,
-             const QString &playcommand = "", const QString &category = "",
+             int childID = -1,
+             bool browse = true,
+             const QString &playcommand = QString(),
+             const QString &category = QString(),
              const genre_list &genres = genre_list(),
              const country_list &countries = country_list(),
              const cast_list &cast = cast_list());
@@ -121,11 +124,13 @@ class Metadata
     const QString& Filename() const;
     void setFilename(const QString &filename);
 
+    const QString &GetTrailer() const;
+    void SetTrailer(const QString &trailer);
+
     const QString &CoverFile() const;
     void setCoverFile(const QString &coverFile);
 
     const QString &Category() const;
-//    void setCategory(const QString &category);
 
     const genre_list &Genres() const;
     void setGenres(const genre_list &genres);

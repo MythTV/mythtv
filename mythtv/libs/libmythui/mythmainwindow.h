@@ -60,7 +60,7 @@ class MPUBLIC MythMainWindow : public QWidget
     void RegisterMediaPlugin(const QString &name, const QString &desc,
                              MediaPlayCallback fn);
 
-    bool HandleMedia(QString& handler, const QString& mrl,
+    bool HandleMedia(const QString& handler, const QString& mrl,
                      const QString& plot="", const QString& title="",
                      const QString& director="", int lenMins=120,
                      const QString& year="1895");

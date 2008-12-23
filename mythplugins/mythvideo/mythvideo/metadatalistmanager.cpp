@@ -113,7 +113,7 @@ void MetadataListManager::loadAllFromDatabase(metadata_list &items)
     const QString BaseMetadataQuery(
         "SELECT title, director, plot, rating, year, userrating,"
         "length, filename, showlevel, coverfile, inetref, childid,"
-        "browse, playcommand, category, intid FROM videometadata");
+        "browse, playcommand, category, intid, trailer FROM videometadata");
 
     query.prepare(BaseMetadataQuery);
 

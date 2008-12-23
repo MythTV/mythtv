@@ -13,6 +13,7 @@ extern const QString VIDEO_CATEGORY_DEFAULT;
 extern const QString VIDEO_DIRECTOR_DEFAULT;
 extern const QString VIDEO_INETREF_DEFAULT;
 extern const QString VIDEO_COVERFILE_DEFAULT;
+extern const QString VIDEO_TRAILER_DEFAULT;
 extern const QString VIDEO_RATING_DEFAULT;
 extern const QString VIDEO_PLOT_DEFAULT;
 extern const QString VIDEO_CAST_DEFAULT;
