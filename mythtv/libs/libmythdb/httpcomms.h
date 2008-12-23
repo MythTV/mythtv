@@ -37,11 +37,14 @@ class MPUBLIC HttpComms : public QObject
 
     class Credentials
     {
-        public:
-            Credentials( const QString& _user="", const QString& _pass="") { user = _user; pass = _pass; }
-            QString user;
-            QString pass;
-    };                           
+      public:
+        explicit Credentials(const QString &_user = "",
+                             const QString &_pass = "")
+            : user(_user), pass(_pass) { }
+
+        QString user;
+        QString pass;
+    };
     
     enum CredentialTypes { CRED_WEB, CRED_PROXY };
     
