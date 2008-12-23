@@ -45,7 +45,7 @@ Settings::~Settings()
 QString Settings::GetSetting(QString strSetting, QString defaultvalue)
 {
     map<QString, QString>::iterator i;
-    if ((!m_pSettings->empty()) && 
+    if ((!m_pSettings->empty()) &&
         ((i = m_pSettings->find(strSetting)) != m_pSettings->end()))
     {
         return (*i).second;
@@ -58,7 +58,7 @@ int Settings::GetNumSetting(QString strSetting, int defaultvalue)
 {
     int retval = defaultvalue;
     map<QString, QString>::iterator i;
-    if ((!m_pSettings->empty()) && 
+    if ((!m_pSettings->empty()) &&
         ((i = m_pSettings->find(strSetting)) != m_pSettings->end()))
     {
         bool ok = false;
@@ -75,7 +75,7 @@ float Settings::GetFloatSetting(QString strSetting, float defaultvalue)
     float retval = defaultvalue;
 
     map<QString, QString>::iterator i;
-    if ((!m_pSettings->empty()) && 
+    if ((!m_pSettings->empty()) &&
         ((i = m_pSettings->find(strSetting)) != m_pSettings->end()))
     {
         bool ok = false;

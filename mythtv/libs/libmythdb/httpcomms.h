@@ -22,7 +22,7 @@ class MPUBLIC HttpComms : public QObject
     bool isDone(void) { return m_done; }
     int getProgress(void) { return m_progress; }
     int getTotal(void) { return m_total; }
-    
+
     int getStatusCode(void) { return m_statusCode; }
     QString getResponseReason(void) { return m_responseReason; }
 
@@ -98,12 +98,12 @@ class MPUBLIC HttpComms : public QObject
         QByteArray algorithm;
         QByteArray entityBody;
     };
-    
+
     void init();
-    
+
     void calculateDigestResponse( DigestAuthInfo& info, QByteArray& Response );
     bool createDigestAuth( bool isForProxy, const QString& authStr, QHttpRequestHeader* request );
-    
+
   private slots:
     void timeout();
     void done(bool error);
@@ -128,7 +128,7 @@ class MPUBLIC HttpComms : public QObject
     QString m_cookie;
     int m_progress;
     int m_total;
-    
+
     QHttpRequestHeader m_curRequest;
 };
 

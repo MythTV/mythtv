@@ -55,7 +55,7 @@ void HttpComms::init()
     m_responseReason = "";
     m_timer = NULL;
     m_timeout = false;
-    
+
 
     connect(http, SIGNAL(done(bool)), this, SLOT(done(bool)));
     connect(http, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
@@ -104,7 +104,7 @@ void HttpComms::request(QUrl               &url,
 
     if (m_timer)
         m_timer->stop();
-    
+
     if (timeoutms > 0 )
     {
         if (!m_timer)
@@ -115,13 +115,13 @@ void HttpComms::request(QUrl               &url,
         m_timeoutInterval = timeoutms;
         m_timer->setSingleShot(true);
         m_timer->start(timeoutms);
-    }        
+    }
 
     if (!m_cookie.isEmpty())
     {
         header.setValue("Cookie", m_cookie);
     }
-    
+
     http->request(header, pData);
 }
 
@@ -147,14 +147,14 @@ void HttpComms::done(bool error)
     else if (m_authNeeded)
     {
         VERBOSE(VB_NETWORK, QString("Authentication pending, ignoring done from first request."));
-        return;            
+        return;
     }
     else if (http->bytesAvailable())
     {
         m_data.resize(http->bytesAvailable());
         m_data = http->readAll();
     }
-    
+
     VERBOSE(VB_NETWORK, QString("done: %1 bytes").arg(m_data.size()));
 
     if (m_timer)
@@ -166,8 +166,8 @@ void HttpComms::done(bool error)
 void HttpComms::stateChanged(int state)
 {
     QString stateStr;
-    
-    switch (state) 
+
+    switch (state)
     {
         case QHttp::Unconnected: stateStr = "unconnected"; break;
         case QHttp::HostLookup: stateStr =  "host lookup"; break;
@@ -202,21 +202,21 @@ void HttpComms::headerReceived(const QHttpResponseHeader &resp)
             VERBOSE(VB_NETWORK, QString("HttpComms found cookie: %1").arg(m_cookie));
         }
     }
-    
-    
+
+
     VERBOSE(VB_NETWORK, QString("Got HTTP response: %1:%2")
                         .arg(m_statusCode)
-                        .arg(m_responseReason));    
+                        .arg(m_responseReason));
     VERBOSE(VB_NETWORK, QString("Keys: %1")
                         .arg(resp.keys().join(",") ));
-    
 
-    if (resp.statusCode() >= 300 && resp.statusCode() <= 400) 
+
+    if (resp.statusCode() >= 300 && resp.statusCode() <= 400)
     {
         // redirection
         QString uri = resp.value("LOCATION");
         VERBOSE(VB_NETWORK, QString("Redirection to: '%1'").arg(uri));
-       
+
         m_redirectedURL = resp.value("LOCATION");
         m_authNeeded = false;
     }
@@ -229,13 +229,13 @@ void HttpComms::headerReceived(const QHttpResponseHeader &resp)
         if (m_authNeeded)
         {
             QString authHeader(resp.value("www-authenticate"));
-            
+
             if (authHeader.startsWith("Digest") )
-            {            
+            {
                 if (!createDigestAuth(false, authHeader, &m_curRequest) )
                 {
                     m_authNeeded = false;
-                    return;   
+                    return;
                 }
             }
             else
@@ -243,22 +243,22 @@ void HttpComms::headerReceived(const QHttpResponseHeader &resp)
                 QString sUser(m_webCredentials.user + ':' + m_webCredentials.pass);
                 QByteArray auth = QCodecs::base64Encode(sUser.toLocal8Bit());
                 m_curRequest.setValue( "Authorization", QString( "Basic " ).append( auth ) );
-            } 
-            
+            }
+
             if (m_timer)
             {
                 m_timer->stop();
                 m_timer->setSingleShot(true);
                 m_timer->start(m_timeoutInterval);
             }
-            
+
             // Not sure if it's possible to receive a session ID or other cookie
             // before authenticating or not.
             if (!m_cookie.isEmpty())
             {
                 m_curRequest.setValue("Cookie", m_cookie);
             }
-            
+
             http->request(m_curRequest);
         }
     }
@@ -268,7 +268,7 @@ void HttpComms::headerReceived(const QHttpResponseHeader &resp)
     }
 }
 
-void HttpComms::timeout() 
+void HttpComms::timeout()
 {
    VERBOSE(VB_IMPORTANT, QString("HttpComms::Timeout for url: %1")
                                .arg(m_url.toString()));
@@ -331,7 +331,7 @@ QString HttpComms::getHttp(QString     &url,
         if (httpGrabber->isTimedout())
         {
             VERBOSE(VB_NETWORK, QString("timeout for url: %1").arg(url));
-           
+
             // Increment the counter and check were not over the limit
             if (timeoutCount++ >= maxRetries)
             {
@@ -349,7 +349,7 @@ QString HttpComms::getHttp(QString     &url,
         }
 
         // Check for redirection
-        if (!httpGrabber->getRedirectedURL().isEmpty()) 
+        if (!httpGrabber->getRedirectedURL().isEmpty())
         {
             VERBOSE(VB_NETWORK, QString("Redirection: %1, count: %2, max: %3")
                                 .arg(httpGrabber->getRedirectedURL())
@@ -369,7 +369,7 @@ QString HttpComms::getHttp(QString     &url,
 
     delete httpGrabber;
 
-    
+
     VERBOSE(VB_NETWORK, QString("Got %1 bytes from url: '%2'")
                                 .arg(res.length())
                                 .arg(url));
@@ -380,8 +380,8 @@ QString HttpComms::getHttp(QString     &url,
 
 // getHttpFile - static function for grabbing a file from an http url
 //      this is a synchronous function, it will block according to the vars
-bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS, 
-                            int maxRetries, int maxRedirects, 
+bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS,
+                            int maxRetries, int maxRedirects,
                             bool allowGzip, Credentials* webCred)
 {
     int redirectCount = 0;
@@ -458,7 +458,7 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
                                         .arg(httpGrabber->getRedirectedURL())
                                         .arg(redirectCount)
                                         .arg(maxRedirects));
-            
+
             if (redirectCount++ < maxRedirects)
                 url = httpGrabber->getRedirectedURL();
 
@@ -527,7 +527,7 @@ QString HttpComms::postHttp(QUrl               &url         ,
 
     header.setValue("Host", url.host());
     header.setValue("User-Agent", userAgent);
-    
+
     if (allowGzip)
         header.setValue( "Accept-Encoding", "gzip");
 
@@ -575,7 +575,7 @@ QString HttpComms::postHttp(QUrl               &url         ,
         if (httpGrabber->isTimedout())
         {
             VERBOSE(VB_NETWORK, QString("timeout for url: %1").arg(url.toString()));
-           
+
             // Increment the counter and check were not over the limit
             if (timeoutCount++ >= maxRetries)
             {
@@ -593,7 +593,7 @@ QString HttpComms::postHttp(QUrl               &url         ,
         }
 
         // Check for redirection
-        if (!httpGrabber->getRedirectedURL().isEmpty()) 
+        if (!httpGrabber->getRedirectedURL().isEmpty())
         {
             VERBOSE(VB_NETWORK, QString("Redirection: %1, count: %2, max: %3")
                                 .arg(httpGrabber->getRedirectedURL())
@@ -613,7 +613,7 @@ QString HttpComms::postHttp(QUrl               &url         ,
 
     delete httpGrabber;
 
-    
+
     VERBOSE(VB_NETWORK, QString("Got %1 bytes from url: '%2'")
                                 .arg(res.length())
                                 .arg(url.toString()));
@@ -634,7 +634,7 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
     DigestAuthInfo info;
 
     opaque = "";
-      
+
     if ( isForProxy )
     {
         header = "Proxy-Authorization";
@@ -651,7 +651,7 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
         info.password = qPrintable(m_webCredentials.pass);
         p = qPrintable(authStr);
     }
-  
+
     if (!p || !*p)
         return false;
 
@@ -660,7 +660,7 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
     if ( info.username.isEmpty() || info.password.isEmpty() || !p )
         return false;
 
-  
+
     info.realm = "";
     info.algorithm = "MD5";
     info.nonce = "";
@@ -669,20 +669,20 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
     // cnonce is recommended to contain about 64 bits of entropy
     // TODO: Fix this
     info.cnonce =  "QPDExMTQ";
-  
+
     // HACK: Should be fixed according to RFC 2617 section 3.2.2
     info.nc = "00000001";
 
     // Set the method used...
     info.method.clear();
     info.method += request->method();
-  
+
     // Parse the Digest response....
     while (*p)
     {
         int i = 0;
         while ( (*p == ' ') || (*p == ',') || (*p == '\t')) {p++;}
-    
+
         if (strncasecmp(p, "realm=", 6 )==0)
         {
             p+=6;
@@ -715,7 +715,7 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
             do
             {
                 pos = uri.indexOf( ' ', idx );
-     
+
                 if ( pos != -1 )
                 {
                     QString sUrl = m_url.toString() + "//" + uri.mid(idx, pos-idx);
@@ -759,18 +759,18 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
 
     if (info.realm.isEmpty() || info.nonce.isEmpty())
         return false;
-  
+
     info.digestURI.append (m_url.path() + m_url.encodedQuery());
-  
-    
+
+
 //     cerr << " RESULT OF PARSING:" << endl;
 //     cerr << "   algorithm: " << info.algorithm << endl;
 //     cerr << "   realm:     " << info.realm << endl;
 //     cerr << "   nonce:     " << info.nonce << endl;
 //     cerr << "   opaque:    " << opaque << endl;
 //     cerr << "   qop:       " << info.qop << endl;
-    
-    
+
+
     // Calculate the response...
     calculateDigestResponse( info, Response );
 
@@ -808,17 +808,17 @@ bool HttpComms::createDigestAuth ( bool isForProxy, const QString& authStr, QHtt
         auth += "\", opaque=\"";
         auth += opaque;
     }
-  
+
     auth += "\"";
-    
-    
+
+
     VERBOSE(VB_NETWORK, QString("Setting auth header %1 to '%2'")
                                 .arg(header).arg(auth));
 
-    
+
     if (request)
         request->setValue(header, auth);
-        
+
     return true;
 }
 
@@ -847,7 +847,7 @@ void HttpComms::calculateDigestResponse( DigestAuthInfo& info, QByteArray& Respo
         md.reset();
         md.update( authStr );
     }
-    
+
     HA1 = md.hexDigest();
 
     //cerr << " calculateResponse(): A1 => " << HA1 << endl;
@@ -864,7 +864,7 @@ void HttpComms::calculateDigestResponse( DigestAuthInfo& info, QByteArray& Respo
         authStr += ':';
         authStr += info.entityBody;
     }
-    
+
     md.reset();
     md.update( authStr );
     HA2 = md.hexDigest();
@@ -885,7 +885,7 @@ void HttpComms::calculateDigestResponse( DigestAuthInfo& info, QByteArray& Respo
         authStr += info.qop;
         authStr += ':';
     }
-  
+
     authStr += HA2;
     md.reset();
     md.update( authStr );

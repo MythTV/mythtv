@@ -91,21 +91,21 @@ MPUBLIC void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings);
  *   Rule #3: Use MSqlQuery for all DB stuff.
  *
  *   MSqlQuery is tied to a connection pool in MythContext. DB connections are
- *   automatically set up by creating an MSqlQuery object. Use the helper 
- *   functions to create an MSqlQuery object e.g. 
+ *   automatically set up by creating an MSqlQuery object. Use the helper
+ *   functions to create an MSqlQuery object e.g.
  *   MSqlQuery query(MSqlQuery::InitCon());
- *   The MSqlQuery object gets exclusive access to the connection for its 
- *   lifetime. The connection is automatically returned when the MSqlQuery 
+ *   The MSqlQuery object gets exclusive access to the connection for its
+ *   lifetime. The connection is automatically returned when the MSqlQuery
  *   object is destroyed.
  *
  *   Note: Due to a bug in some Qt/MySql combinations, QSqlDatabase connections
  *   will crash if closed and reopend - so we never close them and keep them in
- *   a pool. 
+ *   a pool.
  */
 class MPUBLIC MSqlQuery : public QSqlQuery
 {
   public:
-    /// \brief Get DB connection from pool 
+    /// \brief Get DB connection from pool
     MSqlQuery(const MSqlQueryInfo &qi);
     /// \brief Returns conneciton to pool
     ~MSqlQuery();
@@ -131,7 +131,7 @@ class MPUBLIC MSqlQuery : public QSqlQuery
     void bindValues(MSqlBindings &bindings);
 
     /** \brief Return the id of the last inserted row
-     * 
+     *
      * Note: Currently, this function is only implemented in Qt4 (in QSqlQuery
      * and QSqlResult), and is implemented here until the switch to Qt4.  Also,
      * the current implementation will only work for a DBMS that supports
@@ -162,4 +162,4 @@ class MPUBLIC MSqlQuery : public QSqlQuery
     QRegExp m_testbindings;
 };
 
-#endif    
+#endif

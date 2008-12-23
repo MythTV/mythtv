@@ -1,9 +1,9 @@
 /*
     lcddevice.cpp
-    
+
     a MythTV project object to control an
     LCDproc server
-    
+
     (c) 2002, 2003 Thor Sigvaldason, Dan Morphis and Isaac Richards
 */
 
@@ -61,7 +61,7 @@ LCD::LCD()
 
     // Constructor for LCD
     //
-    // Note that this does *not* include opening the socket and initiating 
+    // Note that this does *not* include opening the socket and initiating
     // communications with the LDCd daemon.
 
     VERBOSE(VB_GENERAL|VB_EXTRA, LOC + "An LCD object now exists "
@@ -82,12 +82,12 @@ class LCD * LCD::Get(void)
     return m_lcd;
 }
 
-void LCD::SetupLCD (void) 
+void LCD::SetupLCD (void)
 {
     QString lcd_host;
     int lcd_port;
 
-    if (m_lcd) 
+    if (m_lcd)
     {
         delete m_lcd;
         m_lcd = NULL;
@@ -101,7 +101,7 @@ void LCD::SetupLCD (void)
     if (m_enabled && lcd_host.length() > 0 && lcd_port > 1024)
     {
         class LCD * lcd = LCD::Get();
-        if (lcd->connectToHost(lcd_host, lcd_port) == false) 
+        if (lcd->connectToHost(lcd_host, lcd_port) == false)
         {
             delete m_lcd;
             m_lcd = NULL;
@@ -137,7 +137,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 
     if (res == 0)
     {
-        // we need to start the mythlcdserver 
+        // we need to start the mythlcdserver
         VERBOSE(VB_GENERAL, "Starting mythlcdserver");
         system(qPrintable(GetInstallPrefix() + "/bin/mythlcdserver -v none&"));
         usleep(500000);
@@ -150,7 +150,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
         {
             ++count;
 
-            VERBOSE(VB_GENERAL, QString("Connecting to lcd server: " 
+            VERBOSE(VB_GENERAL, QString("Connecting to lcd server: "
                     "%1:%2 (try %3 of 10)").arg(hostname).arg(port)
                                            .arg(count));
 
@@ -198,7 +198,7 @@ void LCD::sendToServer(const QString &someText)
     {
         lcd_ready = false;
 
-        // Ack, connection to server has been severed try to re-establish the 
+        // Ack, connection to server has been severed try to re-establish the
         // connection
         retryTimer->setSingleShot(false);
         retryTimer->start(10000);
@@ -254,10 +254,10 @@ void LCD::readyRead(MythSocket *sock)
     // This gets activated automatically by the MythSocket class whenever
     // there's something to read.
     //
-    // We currently spend most of our time (except for the first line sent 
+    // We currently spend most of our time (except for the first line sent
     // back) ignoring it.
 
-    int dataSize = socket->bytesAvailable() + 1; 
+    int dataSize = socket->bytesAvailable() + 1;
     QByteArray data(dataSize + 1, 0);
 
     socket->readBlock(data.data(), dataSize);
@@ -345,7 +345,7 @@ void LCD::init()
     lcd_showvolume = (GetMythDB()->GetSetting("LCDShowVolume", "1") == "1");
     lcd_showmenu = (GetMythDB()->GetSetting("LCDShowMenu", "1") == "1");
     lcd_showrecstatus = (GetMythDB()->GetSetting("LCDShowRecStatus", "1") == "1");
-    lcd_keystring = GetMythDB()->GetSetting("LCDKeyString", "ABCDEF");    
+    lcd_keystring = GetMythDB()->GetSetting("LCDKeyString", "ABCDEF");
 
     bConnected = true;
     lcd_ready = true;
@@ -443,15 +443,15 @@ void LCD::setVolumeLevel(float value)
     else if (value > 1.0)
         value = 1.0;
 
-    sendToServer("SET_VOLUME_LEVEL " + QString().setNum(value));    
+    sendToServer("SET_VOLUME_LEVEL " + QString().setNum(value));
 }
 
 void LCD::setupLEDs(int(*LedMaskFunc)(void))
-{ 
+{
     GetLEDMask = LedMaskFunc;
     // update LED status every 10 seconds
     LEDTimer->setSingleShot(false);
-    LEDTimer->start(10000); 
+    LEDTimer->start(10000);
 }
 
 void LCD::outputLEDs()
@@ -485,8 +485,8 @@ void LCD::switchToMusic(const QString &artist, const QString &album, const QStri
 
     VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "switchToMusic");
 
-    sendToServer("SWITCH_TO_MUSIC " + quotedString(artist) + ' ' 
-            + quotedString(album) + ' ' 
+    sendToServer("SWITCH_TO_MUSIC " + quotedString(artist) + ' '
+            + quotedString(album) + ' '
             + quotedString(track));
 }
 
@@ -497,8 +497,8 @@ void LCD::switchToChannel(QString channum, QString title, QString subtitle)
 
     VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "switchToChannel");
 
-    sendToServer("SWITCH_TO_CHANNEL " + quotedString(channum) + ' ' 
-            + quotedString(title) + ' ' 
+    sendToServer("SWITCH_TO_CHANNEL " + quotedString(channum) + ' '
+            + quotedString(title) + ' '
             + quotedString(subtitle));
 }
 
@@ -528,8 +528,8 @@ void LCD::switchToMenu(QList<LCDMenuItem> &menuItems, QString app_name,
         s += ' ' + quotedString(curItem->ItemName());
 
         if (curItem->isChecked() == CHECKED)
-            s += " CHECKED";    
-        else if (curItem->isChecked() == UNCHECKED) 
+            s += " CHECKED";
+        else if (curItem->isChecked() == UNCHECKED)
             s += " UNCHECKED";
         else if (curItem->isChecked() == NOTCHECKABLE)
             s += " NOTCHECKABLE";
@@ -568,8 +568,8 @@ void LCD::switchToGeneric(QList<LCDTextItem> &textItems)
         s += ' ' + sRow;
 
         if (curItem->getAlignment() == ALIGN_LEFT)
-            s += " ALIGN_LEFT";    
-        else if (curItem->getAlignment() == ALIGN_RIGHT) 
+            s += " ALIGN_LEFT";
+        else if (curItem->getAlignment() == ALIGN_RIGHT)
             s += " ALIGN_RIGHT";
         else if (curItem->getAlignment() == ALIGN_CENTERED)
             s += " ALIGN_CENTERED";

@@ -57,7 +57,7 @@ bool MSqlDatabase::OpenDatabase()
     }
 
     bool connected = true;
-    
+
     if (!m_db.isOpen())
     {
         DatabaseParams dbparms = GetMythDB()->GetDatabaseParams();
@@ -83,7 +83,7 @@ bool MSqlDatabase::OpenDatabase()
         if (!connected && dbparms.wolEnabled)
         {
             int trycount = 0;
-                
+
             while (!connected && trycount++ < dbparms.wolRetry)
             {
                 VERBOSE(VB_GENERAL, QString(
@@ -94,7 +94,7 @@ bool MSqlDatabase::OpenDatabase()
                 sleep(dbparms.wolReconnect);
                 connected = m_db.open();
             }
-    
+
             if (!connected)
             {
                 VERBOSE(VB_IMPORTANT, "WOL failed, unable to connect to database!");
@@ -131,7 +131,7 @@ bool MSqlDatabase::KickDatabase()
     // mdz, 2003/08/11
 
 
-    if (m_lastDBKick.secsTo(QDateTime::currentDateTime()) < 30 && 
+    if (m_lastDBKick.secsTo(QDateTime::currentDateTime()) < 30 &&
         m_db.isOpen())
     {
         return true;
@@ -377,7 +377,7 @@ MSqlQueryInfo MSqlQuery::SchedCon()
     if (db)
     {
         qi.db = db;
-        qi.qsqldb = db->db(); 
+        qi.qsqldb = db->db();
 
         db->KickDatabase();
     }
@@ -396,10 +396,10 @@ MSqlQueryInfo MSqlQuery::DDCon()
     if (db)
     {
         qi.db = db;
-        qi.qsqldb = db->db(); 
+        qi.qsqldb = db->db();
 
         db->KickDatabase();
-    } 
+    }
 
     return qi;
 }
@@ -448,7 +448,7 @@ bool MSqlQuery::prepare(const QString& query)
                 .arg(m_testbindings.cap(1)) + query);
         exit(1);
     }
-    return QSqlQuery::prepare(query); 
+    return QSqlQuery::prepare(query);
 }
 
 bool MSqlQuery::testDBConnection()
@@ -543,7 +543,7 @@ void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings)
     QVector<Holder> holders;
 
     int i = 0;
-    while ((i = rx.indexIn(q, i)) != -1) 
+    while ((i = rx.indexIn(q, i)) != -1)
     {
         if (!rx.cap(1).isEmpty())
             holders.append(Holder(rx.cap(0), i));

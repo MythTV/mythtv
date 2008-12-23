@@ -15,14 +15,14 @@
 
 #include "mythexp.h"
 
-/**This class contains configuration information.  
+/**This class contains configuration information.
   *This object is threadsafe.
   *@author Sean Ward
   */
 
 class QPixmap;
 class MPUBLIC Settings {
-public: 
+public:
         Settings(QString strSettingFile = "settings.txt");
         ~Settings();
 

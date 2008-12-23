@@ -39,11 +39,11 @@ typedef unsigned int uint;
 #undef CreateFont
 #endif
 
-// Dealing with Microsoft min/max mess: 
+// Dealing with Microsoft min/max mess:
 // assume that under Windows the code is compiled with NOMINMAX defined
 // which disables #define's for min/max.
-// however, Microsoft  violates the C++ standard even with 
-// NOMINMAX on, and defines templates _cpp_min and _cpp_max 
+// however, Microsoft  violates the C++ standard even with
+// NOMINMAX on, and defines templates _cpp_min and _cpp_max
 // instead of templates min/max
 // define the correct templates here
 
@@ -52,15 +52,15 @@ template<class _Ty> inline
         const _Ty& max(const _Ty& _X, const _Ty& _Y)
         {return (_X < _Y ? _Y : _X); }
 template<class _Ty, class _Pr> inline
-	const _Ty& max(const _Ty& _X, const _Ty& _Y, _Pr _P)
-	{return (_P(_X, _Y) ? _Y : _X); }
+        const _Ty& max(const _Ty& _X, const _Ty& _Y, _Pr _P)
+        {return (_P(_X, _Y) ? _Y : _X); }
 
 template<class _Ty> inline
         const _Ty& min(const _Ty& _X, const _Ty& _Y)
         {return (_Y < _X ? _Y : _X); }
 template<class _Ty, class _Pr> inline
-	const _Ty& min(const _Ty& _X, const _Ty& _Y, _Pr _P)
-	{return (_P(_Y, _X) ? _Y : _X); }
+        const _Ty& min(const _Ty& _X, const _Ty& _Y, _Pr _P)
+        {return (_P(_Y, _X) ? _Y : _X); }
 #endif // defined(__cplusplus) && defined(_WIN32)
 
 #ifdef _WIN32
@@ -229,8 +229,8 @@ inline const char *dlerror(void)
     (result)->tv_usec = (a)->tv_usec + (b)->tv_usec;			      \
     if ((result)->tv_usec >= 1000000)					      \
       {									      \
-	++(result)->tv_sec;						      \
-	(result)->tv_usec -= 1000000;					      \
+        ++(result)->tv_sec;						      \
+        (result)->tv_usec -= 1000000;					      \
       }									      \
   } while (0)
 #define	timersub(a, b, result)						      \

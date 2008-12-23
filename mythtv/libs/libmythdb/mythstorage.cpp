@@ -118,7 +118,7 @@ QString GenericDBStorage::GetSetClause(MSqlBindings &bindings) const
     bindings.insert(keycolumnTag, keyvalue);
     bindings.insert(columnTag,    user->GetDBValue());
 
-    return keycolumn + " = " + keycolumnTag + ", " + 
+    return keycolumn + " = " + keycolumnTag + ", " +
         GetColumnName() + " = " + columnTag;
 }
 

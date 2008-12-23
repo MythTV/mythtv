@@ -30,11 +30,11 @@ class MPUBLIC LCDMenuItem
         scrollPosition = indent;
     }
 
-    CHECKED_STATE isChecked() const { return checked; } 
-    bool isSelected() const { return selected; } 
-    QString ItemName() const { return name; } 
-    bool Scroll() const { return scroll; } 
-    unsigned int getIndent() const { return indent; } 
+    CHECKED_STATE isChecked() const { return checked; }
+    bool isSelected() const { return selected; }
+    QString ItemName() const { return name; }
+    bool Scroll() const { return scroll; }
+    unsigned int getIndent() const { return indent; }
     unsigned int getScrollPos() const { return scrollPosition; }
 
     void setChecked(CHECKED_STATE value) { checked = value; }
@@ -108,13 +108,13 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
   public:
    ~LCD();
 
-    enum { 
+    enum {
         MUSIC_REPEAT_NONE  = 0,
         MUSIC_REPEAT_TRACK = 1,
         MUSIC_REPEAT_ALL   = 2,
     };
 
-    enum { 
+    enum {
         MUSIC_SHUFFLE_NONE  = 0,
         MUSIC_SHUFFLE_RAND  = 1,
         MUSIC_SHUFFLE_SMART = 2,
@@ -125,7 +125,7 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
     static class LCD * Get(void);
     static void SetupLCD (void);
 
-    // Used to actually connect to an LCD device       
+    // Used to actually connect to an LCD device
     bool connectToHost(const QString &hostname, unsigned int port);
 
     // When nothing else is going on, show the time
@@ -133,8 +133,8 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
 
     // When playing music, switch to this and give artist and track name
     //
-    // Note: the use of switchToMusic and setLevels is discouraged, because it 
-    // has become obvious that most LCD devices cannot handle communications 
+    // Note: the use of switchToMusic and setLevels is discouraged, because it
+    // has become obvious that most LCD devices cannot handle communications
     // fast enough to make them useful.
     void switchToMusic(const QString &artist, const QString &album, const QString &track);
 
@@ -142,14 +142,14 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
     void setLevels(int numbLevels, float *values);
 
     // For Live TV, supply the channel number, program title and subtitle
-    //    
+    //
     // Note that the "channel" screen can be used for any kind of progress meter
-    // just put whatever you want in the strings, and update the progress as 
+    // just put whatever you want in the strings, and update the progress as
     // appropriate; see the demo app mythlcd for an example)
-    void switchToChannel(QString channum = "", QString title = "", 
+    void switchToChannel(QString channum = "", QString title = "",
                          QString subtitle = "");
 
-    // While watching Live/Recording/Pause Buffer, occasionaly describe how 
+    // While watching Live/Recording/Pause Buffer, occasionaly describe how
     // much of the program has been seen (between 0.0 and 1.0)
     // (e.g. [current time - start time] / [end time - start time]  )
     void setChannelProgress(float percentViewed);
@@ -161,7 +161,7 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
                       bool popMenu = true);
 
     // Show the Generic Progress
-    // QPtrList contains pointers to LCDTextItem objects which allow you to 
+    // QPtrList contains pointers to LCDTextItem objects which allow you to
     // define the screen, row, and alignment of the text
     void switchToGeneric(QList<LCDTextItem> &textItems);
 
@@ -172,19 +172,19 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
 
     /** \brief Update the generic screen to display a busy spinner.
         \note The LCD busy spinner only 'moves' when this is called
-              instead of the lcdserver just handling it itself. 
+              instead of the lcdserver just handling it itself.
     */
     void setGenericBusy();
 
     // Do a music progress bar with the generic level between 0 and 1.0
     void setMusicProgress(QString time, float generic_progress);
 
-    /** \brief Set music player's repeat properties         
+    /** \brief Set music player's repeat properties
         \param repeat the state of repeat
     */
     void setMusicRepeat(int repeat);
 
-    /** \brief Set music player's shuffle properties             
+    /** \brief Set music player's shuffle properties
         \param shuffle the state of shuffle
     */
     void setMusicShuffle(int shuffle);
@@ -195,12 +195,12 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
     // Do a progress bar with the volume level between 0 and 1.0
     void setVolumeLevel(float volume_level);
 
-    // If some other process should be getting all the LCDd screen time (e.g. 
-    // mythMusic) we can use this to try and prevent and screens from showing 
+    // If some other process should be getting all the LCDd screen time (e.g.
+    // mythMusic) we can use this to try and prevent and screens from showing
     // up without having to actual destroy the LCD object
     void switchToNothing();
 
-    // If you want to be pleasant, call shutdown() before deleting your LCD 
+    // If you want to be pleasant, call shutdown() before deleting your LCD
     // device
     void shutdown();
 
@@ -213,10 +213,10 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
 
     void resetServer(void); // tell the mythlcdserver to reload its settings
 
-  private slots: 
-    void restartConnection();      // Try to re-establish the connection to 
+  private slots:
+    void restartConnection();      // Try to re-establish the connection to
                                    // LCDServer every 10 seconds
-    void outputLEDs(); 
+    void outputLEDs();
 
   private:
     void sendToServer(const QString &someText);

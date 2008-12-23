@@ -101,7 +101,7 @@ enum VerboseMask
     VB_UNUSED_END // keep at end
 };
 
-/// This global variable is set at startup with the flags 
+/// This global variable is set at startup with the flags
 /// of the verbose messages we want to see.
 extern MPUBLIC unsigned int print_verbose_messages;
 #ifdef __cplusplus
@@ -160,7 +160,7 @@ extern MPUBLIC unsigned int print_verbose_messages;
 
     // The verbose_mutex lock is a recursive lock so it is possible (while
     // not recommended) to use a VERBOSE macro within another VERBOSE macro.
-    // But waiting for another thread to do something is not safe within a 
+    // But waiting for another thread to do something is not safe within a
     // VERBOSE macro, since those threads may wish to use the VERBOSE macro
     // and this will cause a deadlock.
 
@@ -210,7 +210,7 @@ extern MPUBLIC unsigned int print_verbose_messages;
     /// This can be appended to the VERBOSE args with either
     /// "+" (with QStrings) or "<<" (with c strings). It uses
     /// a thread safe version of strerror to produce the
-    /// string representation of errno and puts it on the 
+    /// string representation of errno and puts it on the
     /// next line in the verbose output.
     #define ENO QString("\n\t\t\teno: ") + safe_eno_to_string(errno)
 #endif

@@ -9,7 +9,7 @@ class QObject;
 
 /** \class MythObservable
     \brief Superclass for making an object have a set of listeners
-       
+
     This superclass provides the basic API for adding and removing
     listeners and iterating across them. It is typically used to post
     events to listening QObjects.
@@ -22,7 +22,7 @@ class QObject;
            QObject *listener = firstListener();
                while (listener) {
                    QApplication::postEvent (listener, new QEvent(100));
-               listener = nextListener();  
+               listener = nextListener();
            }
        }
        \endcode
@@ -42,8 +42,8 @@ class MPUBLIC MythObservable
   public:
     MythObservable();
     virtual ~MythObservable();
-       
-    /** \brief Add a listener to the observable 
+
+    /** \brief Add a listener to the observable
 
         Adds the given QObject to the list of objects that observe
         this observable.
@@ -52,7 +52,7 @@ class MPUBLIC MythObservable
     */
     void addListener(QObject *listener);
 
-    /** \brief Remove a listener to the observable 
+    /** \brief Remove a listener to the observable
 
          Remove the given QObject from the list of objects that
          observe this observable.
@@ -65,7 +65,7 @@ class MPUBLIC MythObservable
 
         If you simply need to iterate across the listeners, use \p
         firstListener and \p nextListener to iterate across the
-        listeners. Ie. instead of 
+        listeners. Ie. instead of
 
         \code
         {
@@ -87,7 +87,7 @@ class MPUBLIC MythObservable
                 // use listener...
                 listener = nextListener();
             }
-        } 
+        }
         \endcode
 
         \returns pointer to the first listener, NULL if there are no listeners
@@ -112,18 +112,18 @@ class MPUBLIC MythObservable
     */
     QList<QObject*> getListeners(void);
 
-    /** \brief Dispatch an event to all listeners 
-                       
+    /** \brief Dispatch an event to all listeners
+
         Makes a copy of the event on the heap by calling
         MythEvent::clone and dispatches is by calling
         QApplication::postEvent.
-               
+
         \param event a MythEvent to dispatch.
     */
     void dispatch(MythEvent &event);
 
-    /** \brief Dispatch an event to all listeners 
-                       
+    /** \brief Dispatch an event to all listeners
+
         See dispatch.
 
         \note This uses QApplication::sendEvent, which is
