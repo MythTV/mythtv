@@ -1315,8 +1315,10 @@ bool cCiMMI::SendAnswer(const char *Text)
   struct tAnswer { uint8_t id; char text[256]; };//XXX
   tAnswer answer;
   answer.id = Text ? AI_ANSWER : AI_CANCEL;
-  if (Text)
-     strncpy(answer.text, Text, sizeof(answer.text));
+  if (Text) {
+     strncpy(answer.text, Text, sizeof(answer.text) - 1);
+     answer.text[255] = '\0';
+  }
   SendData(AOT_ANSW, Text ? strlen(Text) + 1 : 1, (uint8_t *)&answer);
   //XXX return value of all SendData() calls???
   return true;
