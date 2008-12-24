@@ -1362,15 +1362,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                     QFile checkFile(tmpURL);
                     if (tmpURL != "" && checkFile.exists())
                     {
-                        QByteArray atmpurl = tmpURL.toLocal8Bit();
-                        struct stat st;
-                        if (stat(atmpurl.constData(), &st) == 0)
-                        {
-                            proginfo->filesize = st.st_size;
-
-                            if (proginfo->recendts < QDateTime::currentDateTime())
-                                proginfo->SetFilesize(proginfo->filesize);
-                        }
+                        proginfo->filesize = checkFile.size();
+                        if (proginfo->recendts < QDateTime::currentDateTime())
+                            proginfo->SetFilesize(proginfo->filesize);
                     }
                 }
             }
@@ -1494,14 +1488,8 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
         pginfo->pathname = QString("myth://") + ip + ":" + port
                            + "/" + pginfo->GetRecordBasename();
 
-    struct stat st;
-
-    long long size = 0;
-    QByteArray apath = lpath.toLocal8Bit();
-    if (stat(apath.constData(), &st) == 0)
-        size = st.st_size;
-
-    pginfo->filesize = size;
+    const QFileInfo info(lpath);
+    pginfo->filesize = info.size();
 
     QStringList strlist;
 
@@ -1609,10 +1597,8 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     {
         // Since stat fails after unlinking on some filesystems,
         // get the filesize first
-        QByteArray fname = ds->filename.toLocal8Bit();
-        struct stat st;
-        if (stat(fname.constData(), &st) == 0)
-            size = st.st_size;
+        const QFileInfo info(ds->filename);
+        size = info.size();
         fd = DeleteFile(ds->filename, followLinks);
 
         if ((fd < 0) && checkFile.exists())

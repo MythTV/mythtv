@@ -1,15 +1,16 @@
+// POSIX headers
+#include <fcntl.h> // for open flags
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+// C++ headers
 #include <iostream>
 #include <fstream>
 using namespace std;
 
+// Qt headers
 #include <QApplication>
 #include <QDir>
 
+// MythTV headers
 #include "exitcodes.h"
 #include "programinfo.h"
 #include "jobqueue.h"
@@ -732,15 +733,14 @@ int slowDelete(QString filename)
     QByteArray fname = filename.toLocal8Bit();
     QString msg = QString("Error Truncating '%1'").arg(fname.constData());
 
-
-    struct stat st;
-    if (stat(fname.constData(), &st) != 0)
+    QFileInfo info(filename);
+    long long fsize = info.size();
+    if (fsize <= increment)
     {
-        VERBOSE(VB_IMPORTANT, msg + " could not stat " + ENO +
-                ", unlinking immediately.");
+        VERBOSE(VB_IMPORTANT, msg + " could not determine size of "
+                "the file, unlinking immediately.");
         return unlink(fname.constData());
     }
-    off_t fsize = st.st_size;
 
     int fd = open(fname.constData(), O_WRONLY);
     if (fd == -1)
