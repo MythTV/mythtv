@@ -1426,9 +1426,10 @@ void MythThemedDialog::paintEvent(QPaintEvent *e)
     if (redrawRect.width() > 0 && redrawRect.height() > 0)
         ReallyUpdateForeground(redrawRect);
 
-    QPainter p(this);
-    p.drawPixmap(e->rect().topLeft(), my_foreground, e->rect());
-
+    { // Make sure QPainter is destructed before calling MythDialog's paint..
+        QPainter p(this);
+        p.drawPixmap(e->rect().topLeft(), my_foreground, e->rect());
+    }
     MythDialog::paintEvent(e);
 }
 
