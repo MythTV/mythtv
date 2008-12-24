@@ -2,15 +2,18 @@
 //support missing audio frames
 //support analyze-only mode
 
-#include "config.h"
-#include "mpeg2fix.h"
+// C headers
+#include <cstdlib>
+#include <cstdio>
 
-#include <stdlib.h>
-#include <stdio.h>
+// POSIC headers
 #include <fcntl.h>
 #include <unistd.h>
 #include <getopt.h>
 #include <stdint.h>
+
+#include "config.h"
+#include "mpeg2fix.h"
 
 #include <QList>
 #include <Q3PtrList>
