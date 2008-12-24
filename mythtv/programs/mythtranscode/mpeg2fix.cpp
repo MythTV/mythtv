@@ -443,13 +443,18 @@ int fill_buffers(void *r, int finish)
     return (rx->WaitBuffers());
 }
 
-MPEG2replex::MPEG2replex()
+MPEG2replex::MPEG2replex() :
+    done(0),      otype(0),
+    ext_count(0), mplex(0)
 {
-    memset(&vrbuf, 0, sizeof(ringbuffer));
-    memset(&index_vrbuf, 0, sizeof(ringbuffer));
-    memset(&extrbuf, 0, sizeof(ringbuffer) * N_AUDIO);
-    memset(&index_extrbuf, 0, sizeof(ringbuffer) * N_AUDIO);
-    ext_count = 0;
+    memset(&vrbuf, 0, sizeof(vrbuf));
+    memset(extrbuf, 0, sizeof(extrbuf));
+    memset(&index_vrbuf, 0, sizeof(index_vrbuf));
+    memset(index_extrbuf, 0, sizeof(index_extrbuf));
+    memset(exttype, 0, sizeof(exttype));
+    memset(exttypcnt, 0, sizeof(exttypcnt));
+    memset(extframe, 0, sizeof(extframe));
+    memset(&seq_head, 0, sizeof(seq_head)); 
 }
 
 MPEG2replex::~MPEG2replex()
