@@ -19,6 +19,9 @@
 #include <cmath>
 #include <climits> // for CDSL_CURRENT which is currently INT_MAX
 
+// Qt
+#include <QFile>
+
 #include "dvdprobe.h"
 
 #include <mythtv/mythcontext.h>
@@ -425,40 +428,36 @@ void DVDProbe::Reset(void)
 
 bool DVDProbe::Probe(void)
 {
-    //
     //  Before touching libdvdread stuff
     //  (below), see if there's actually
     //  a drive with media in it
-    //
-
-    struct stat fileinfo;
-
-    QByteArray dev = device.toLocal8Bit();
-    int ret = stat(dev.constData(), &fileinfo);
-    if (ret < 0)
+    QFile dvdDevice(device);
+    if (!dvdDevice.exists())
     {
-        //
-        //  Can't even stat the device, it probably
-        //  doesn't exist. Silly user
-        //
+        //  Device doesn't exist. Silly user
         Reset();
         return false;
     }
 
-#if defined(__linux__) || defined(__FreeBSD__)
-    //
-    //  I have no idea if the following code block
-    //  is anywhere close to the "right way" of doing
-    //  this, but it seems to work.
-    //
+    if (!dvdDevice.open(QIODevice::ReadOnly))
+    {
+        // Can't open device.
+        Reset();
+        return false;
+    }
 
-    int drive_handle = open(dev.constData(), O_RDONLY | O_NONBLOCK);
+    int drive_handle = dvdDevice.handle();
 
     if (drive_handle == -1)
     {
         Reset();
         return false;
     }
+
+#if defined(__linux__) || defined(__FreeBSD__)
+    //  I have no idea if the following code block
+    //  is anywhere close to the "right way" of doing
+    //  this, but it seems to work.
 
     // Sometimes the first result following an open is a lie. Often the
     // first call will return 4, however an immediate second call will
@@ -467,8 +466,14 @@ bool DVDProbe::Probe(void)
     // (in an admittedly small test number) seems to make it much more
     // accurate (with only a 1 in 6 chance that the first result was more
     // accurate than the second).
-    ioctl(drive_handle, CDROM_DRIVE_STATUS, CDSL_CURRENT);
     int status = ioctl(drive_handle, CDROM_DRIVE_STATUS, CDSL_CURRENT);
+    if (status < 0)
+    {
+        Reset();
+        return false;
+    }
+
+    status = ioctl(drive_handle, CDROM_DRIVE_STATUS, CDSL_CURRENT);
     if (status < 4)
     {
         //
@@ -478,40 +483,30 @@ bool DVDProbe::Probe(void)
         //  3 = not ready
         //
         Reset();
-        close(drive_handle);
         return false;
-
     }
 
     status = ioctl(drive_handle, CDROM_MEDIA_CHANGED, NULL);
-    close(drive_handle);
 
-    if (!status)
+    if (!status && !first_time)
     {
-        //
         //  the disc has not changed. but if this is our
         //  first time running, we still need to check it
-        //
-
-        if (!first_time)
-        {
-            //
-            //  Return whatever we returned before
-            //
-
-            return titles.size();
-        }
+        //  so return whatever we returned before
+        return titles.size();
     }
 #endif
+    dvdDevice.close();
 
     //
     //  Try to open the disc
-    //  (as far libdvdread is concerned, the argument
+    //  (as far as libdvdread is concerned, the argument
     //  could be a path, file, whatever).
     //
 
     Reset();
     first_time = false;
+    QByteArray dev = device.toLocal8Bit();
     dvd = DVDOpen(dev.constData());
     if (!dvd)
         return false;
