@@ -197,27 +197,27 @@ class VideoPlayerCommandPrivate
         if (dir_test.exists())
             extension = "VIDEO_TS";
 
-        QString play_command;
+        QString play_command = gContext->GetSetting("VideoDefaultPlayer");
 
         const FileAssociations::association_list fa_list =
                 FileAssociations::getFileAssociation().getList();
         for (FileAssociations::association_list::const_iterator p =
                 fa_list.begin(); p != fa_list.end(); ++p)
         {
-            if (p->extension.toLower() == extension.toLower())
+            if (p->extension.toLower() == extension.toLower() &&
+                    !p->use_default)
             {
-                if (p->use_default)
-                    play_command = gContext->GetSetting("VideoDefaultPlayer");
-                else
-                    play_command = p->playcommand;
+                play_command = p->playcommand;
                 break;
             }
         }
 
-        if (play_command.length())
-            AddPlayer(play_command, filename, QString(),
-                    Metadata::FilenameToTitle(filename), QString(), 0,
-                    QString::number(VIDEO_YEAR_DEFAULT));
+        if (play_command.trimmed().isEmpty())
+            play_command = "Internal";
+
+        AddPlayer(play_command, filename, QString(),
+                Metadata::FilenameToTitle(filename), QString(), 0,
+                QString::number(VIDEO_YEAR_DEFAULT));
     }
 
     void ClearPlayerList()
