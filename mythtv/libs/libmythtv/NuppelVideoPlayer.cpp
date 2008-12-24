@@ -2350,7 +2350,7 @@ void NuppelVideoPlayer::InitAVSync(void)
         warpfactor = warpfactor_avg;
     }
 
-    refreshrate = videoOutput->GetRefreshRate();
+    refreshrate = videoOutput ? videoOutput->GetRefreshRate() : 0;
     if (refreshrate <= 0)
         refreshrate = frame_interval;
     vsynctol = refreshrate / 4;
@@ -2959,7 +2959,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         if (player_ctx->buffer->isDVD())
         {
-            int nbframes = videoOutput->ValidVideoFrames();
+            int nbframes = 0;
+            if (videoOutput)
+                nbframes = videoOutput->ValidVideoFrames();
 
             if (nbframes < 2) 
             {
@@ -4364,7 +4366,7 @@ void NuppelVideoPlayer::DoPlay(void)
     if (player_ctx->buffer->isDVD() && GetDecoder())
         GetDecoder()->UpdateDVDFramesPlayed();
 
-    if (skip_changed)
+    if (skip_changed && videoOutput)
     {
         //cout << "handling skip change" << endl;
         videoOutput->SetPrebuffering(ffrew_skip == 1);
@@ -4422,7 +4424,7 @@ void NuppelVideoPlayer::DoPlay(void)
     }
 
 #ifdef USING_IVTV
-    if (IsIVTVDecoder())
+    if (IsIVTVDecoder() && videoOutput)
     {
         VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
         vidout->Play(play_speed / ffrew_skip, normal_speed, 
@@ -4530,7 +4532,7 @@ long long NuppelVideoPlayer::CalcMaxFFTime(long long ff, bool setjump) const
 
     limitKeyRepeat = false;
 
-    if (livetv && !islivetvcur)
+    if (livetv && !islivetvcur && player_ctx->tvchain)
     {
         if (totalFrames > 0)
         {
@@ -4621,7 +4623,7 @@ bool NuppelVideoPlayer::IsReallyNearEnd(void) const
  */
 bool NuppelVideoPlayer::IsNearEnd(long long margin) const
 {
-    long long framesRead, framesLeft;
+    long long framesRead, framesLeft = 0;
 
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (!player_ctx->playingInfo || player_ctx->playingInfo->isVideo ||
@@ -4665,11 +4667,15 @@ bool NuppelVideoPlayer::IsNearEnd(long long margin) const
     if (livetv && player_ctx->tvchain && player_ctx->tvchain->HasNext())
         return false;
 
-    framesLeft = player_ctx->recorder->GetCachedFramesWritten() - framesRead;
+    if (player_ctx->recorder)
+    {
+        framesLeft =
+            player_ctx->recorder->GetCachedFramesWritten() - framesRead;
 
-    // if it looks like we are near end, get an updated GetFramesWritten()
-    if (framesLeft < margin)
-        framesLeft = player_ctx->recorder->GetFramesWritten() - framesRead;
+        // if it looks like we are near end, get an updated GetFramesWritten()
+        if (framesLeft < margin)
+            framesLeft = player_ctx->recorder->GetFramesWritten() - framesRead;
+    }
 
     return (framesLeft < margin);
 }

@@ -6268,8 +6268,12 @@ bool TV::ProcessSmartChannel(const PlayerContext *ctx, QString &inputStr)
     uint    pref_cardid;
     bool    is_not_complete;
 
-    bool valid_prefix = ctx->recorder->CheckChannelPrefix(
-        chan, pref_cardid, is_not_complete, needed_spacer);
+    bool valid_prefix = false;
+    if (ctx->recorder)
+    {
+        valid_prefix = ctx->recorder->CheckChannelPrefix(
+            chan, pref_cardid, is_not_complete, needed_spacer);
+    }
 
 #if DEBUG_CHANNEL_PREFIX
     VERBOSE(VB_IMPORTANT, QString("valid_pref(%1) cardid(%2) chan(%3) "
@@ -6493,7 +6497,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         return;
     }
 
-    if (!ctx->recorder->CheckChannel(channum))
+    if (!ctx->recorder || !ctx->recorder->CheckChannel(channum))
         return;
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
@@ -8499,7 +8503,7 @@ void TV::ToggleRecord(PlayerContext *ctx)
 
 void TV::BrowseChannel(PlayerContext *ctx, const QString &chan)
 {
-    if (!ctx->recorder->CheckChannel(chan))
+    if (!ctx->recorder || !ctx->recorder->CheckChannel(chan))
         return;
 
     browsechannum = chan;
