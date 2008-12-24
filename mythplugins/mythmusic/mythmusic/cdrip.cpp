@@ -113,14 +113,13 @@ static void paranoia_cb(long inpos, int function)
 }
 
 CDRipperThread::CDRipperThread(RipStatus *parent,  QString device,
-                               vector<RipTrack*> *tracks, int quality)
+                               vector<RipTrack*> *tracks, int quality) :
+    m_parent(parent),   m_quit(false),
+    m_CDdevice(device), m_quality(quality),
+    m_tracks(tracks),   m_totalTracks(m_tracks->size()),
+    m_totalSectors(0),  m_totalSectorsDone(0),
+    m_lastTrackPct(0),  m_lastOverallPct(0)
 {
-    m_parent = parent;
-    m_tracks = tracks;
-    m_quality = quality;
-    m_quit = false;
-    m_totalTracks = m_tracks->size();
-    m_CDdevice = device;
 }
 
 CDRipperThread::~CDRipperThread(void)

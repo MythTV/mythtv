@@ -162,8 +162,10 @@ class RipStatusEvent : public QEvent
         ST_ENCODER_ERROR
     };
 
-    RipStatusEvent(Type t, int val) : QEvent((QEvent::Type)t) { value=val; }
-    RipStatusEvent(Type t, const QString &val) : QEvent((QEvent::Type)t) { text=val; }
+    RipStatusEvent(Type t, int val)
+        : QEvent((QEvent::Type)t), text(   ), value(val) {}
+    RipStatusEvent(Type t, const QString &val)
+        : QEvent((QEvent::Type)t), text(val), value( -1) {}
     ~RipStatusEvent() {}
 
     QString text;

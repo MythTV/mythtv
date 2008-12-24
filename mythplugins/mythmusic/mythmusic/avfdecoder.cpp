@@ -32,31 +32,29 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 
 avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
-                       AudioOutput *o) 
-          : Decoder(d, i, o)
+                       AudioOutput *o) :
+    Decoder(d, i, o),
+    inited(false),   user_stop(false),
+    stat(0),         output_buf(NULL),
+    output_bytes(0), output_at(0),
+    bks(0),          done(false),
+    finish(false),   len(0),
+    freq(0),         bitrate(0),
+    chan(0),         output_size(0),
+    totalTime(0.0),  seekTime(-1.0),
+    devicename(""),  start(0),
+    end(0),          fmt(0),
+    ifmt(NULL),      ap(&params),
+    oc(NULL),        ic(NULL),
+    enc_st(NULL),    dec_st(NULL),
+    codec(NULL),     enc_codec(NULL),
+    audio_enc(NULL), audio_dec(NULL),
+    pkt(&pkt1),      errcode(0),
+    ptr(NULL),       dec_len(0),
+    data_size(0)
 {
-    filename = file;
-    inited = FALSE;
-    user_stop = FALSE;
-    stat = 0;
-    bks = 0;
-    done = FALSE;
-    finish = FALSE;
-    len = 0;
-    freq = 0;
-    bitrate = 0;
-    seekTime = -1.0;
-    totalTime = 0.0;
-    chan = 0;
-    output_buf = 0;
-    output_bytes = 0;
-    output_at = 0;
-
-    ic = NULL;
-    oc = NULL;
-    ifmt = NULL;
-    ap = &params;
-    pkt = &pkt1;
+    setFilename(file);
+    bzero(samples, sizeof(samples));
 }
 
 avfDecoder::~avfDecoder(void)

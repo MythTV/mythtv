@@ -66,25 +66,18 @@ static long oggtell(void *src)
 }
 
 VorbisDecoder::VorbisDecoder(const QString &file, DecoderFactory *d, 
-                             QIODevice *i, AudioOutput *o) 
-             : Decoder(d, i, o)
+                             QIODevice *i, AudioOutput *o) :
+    Decoder(d, i, o),
+    inited(false),   user_stop(false),
+    stat(0),         output_buf(NULL),
+    output_bytes(0), output_at(0),
+    bks(0),          done(false),
+    finish(false),   len(0),
+    freq(0),         bitrate(0),
+    chan(0),         output_size(0),
+    totalTime(0.0),  seekTime(-1.0)
 {
-    filename = file;
-    inited = FALSE;
-    user_stop = FALSE;
-    stat = 0;
-    output_buf = 0;
-    output_bytes = 0;
-    output_at = 0;
-    bks = 0;
-    done = FALSE;
-    finish = FALSE;
-    len = 0;
-    freq = 0;
-    bitrate = 0;
-    seekTime = -1.0;
-    totalTime = 0.0;
-    chan = 0;
+    setFilename(file);
 }
 
 VorbisDecoder::~VorbisDecoder(void)
