@@ -23,8 +23,8 @@ class FileAssociation
 
   public:
     FileAssociation(const QString &new_extension) :
-        id(-1), extension(new_extension), ignore(false), use_default(true),
-        changed(true), loaded_from_db(false) {}
+        id(-1), extension(new_extension), player_command(""), ignore(false),
+        use_default(true), changed(true), loaded_from_db(false) {}
     FileAssociation(int i, const QString &e, const QString &p, bool g, bool u) :
         id(i), extension(e), player_command(p), ignore(g), use_default(u),
         changed(false), loaded_from_db(true) {}
