@@ -3,6 +3,7 @@
 #include <QStringList>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdb.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdbparams.h>
 
@@ -11,10 +12,33 @@
 
 namespace
 {
+    void AddFileType(const QString &extension,
+            const QString &playCommand = QString("Internal"),
+            bool ignored = false, bool useDefault = false)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT * FROM videotypes WHERE "
+                      "LOWER(extension) = LOWER(:EXTENSION) LIMIT 1");
+        query.bindValue(":EXTENSION", extension);
+        if (query.exec() && !query.size())
+        {
+            query.prepare("INSERT INTO videotypes (extension, playcommand, "
+                    "f_ignore, use_default) VALUES (:EXTENSION, :PLAYCOMMAND, "
+                    ":IGNORE, :USEDEFAULT)");
+            query.bindValue(":EXTENSION", extension);
+            query.bindValue(":PLAYCOMMAND", playCommand);
+            query.bindValue(":IGNORE", ignored);
+            query.bindValue(":USEDEFAULT", useDefault);
+            if (!query.exec())
+                MythDB::DBError(QObject::tr("Error: failed to add new file "
+                                            "type '%1'").arg(extension), query);
+        }
+    }
+
     const QString lastMythDVDDBVersion = "1002";
     const QString lastMythVideoVersion = "1010";
 
-    const QString currentDatabaseVersion = "1020";
+    const QString currentDatabaseVersion = "1021";
 
     const QString OldMythVideoVersionName = "VideoDBSchemaVer";
     const QString OldMythDVDVersionName = "DVDDBSchemaVer";
@@ -31,6 +55,10 @@ namespace
         query.exec(QString("INSERT INTO settings (value, data, hostname) "
                            "VALUES ('%1', %2, NULL);")
                    .arg(field_name).arg(newnumber));
+
+        VERBOSE(VB_IMPORTANT,
+                QString("Upgraded to MythVideo schema version %1")
+                .arg(newnumber));
     }
 
     void performActualUpdate(const QStringList &updates, const QString &version,
@@ -132,7 +160,7 @@ namespace
     {
         QString dbver = gContext->GetSetting(MythVideoVersionName);
 
-        return dbver != "";
+        return dbver.size();
     }
 
     void DoOldVideoDatabaseSchemaUpgrade()
@@ -768,6 +796,25 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             QStringList updates(
                     "ALTER TABLE videometadata ADD `trailer` TEXT;");
             performActualUpdate(updates, "1020", dbver, MythVideoVersionName);
+        }
+
+        if (dbver == "1020")
+        {
+            AddFileType("mkv");
+            AddFileType("mp4");
+            AddFileType("m2ts");
+            AddFileType("evo");
+            AddFileType("divx");
+            AddFileType("mov");
+            AddFileType("qt");
+            AddFileType("wmv");
+            AddFileType("3gp");
+            AddFileType("asf");
+            AddFileType("ogg");
+            AddFileType("ogm");
+            AddFileType("flv");
+
+            UpdateDBVersionNumber(MythVideoVersionName, "1021");
         }
     }
 }
