@@ -305,7 +305,15 @@ time_t toTime_t(QDateTime &dt)
     brokenDown.tm_mday = dt.date().day();
     brokenDown.tm_mon = dt.date().month() - 1;
     brokenDown.tm_year = dt.date().year() - 1900;
+    brokenDown.tm_wday = dt.date().dayOfWeek() - 1;
+    brokenDown.tm_yday = dt.date().dayOfYear() - 1;
     brokenDown.tm_isdst = -1;
+#if defined(__GLIBC__)
+    // glibc has a couple of extra additional fields
+    ::tzset();
+    brokenDown.tm_gmtoff = 0;
+    brokenDown.tm_zone = (const char*) NULL;
+#endif
     int secsSince1Jan1970UTC = (int) mktime( &brokenDown );
     if ( secsSince1Jan1970UTC < -1 )
         secsSince1Jan1970UTC = -1;
