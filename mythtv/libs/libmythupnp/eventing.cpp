@@ -54,10 +54,16 @@ uint StateVariables::BuildNotifyBody(
 //
 /////////////////////////////////////////////////////////////////////////////
 
-Eventing::Eventing( const QString &sExtensionName, const QString &sEventMethodName ) : HttpServerExtension( sExtensionName )
+Eventing::Eventing(const QString &sExtensionName,
+                   const QString &sEventMethodName) :
+    HttpServerExtension(sExtensionName),
+    m_sEventMethodName(sEventMethodName),
+    m_nSubscriptionDuration(
+        UPnp::g_pConfig->GetValue("UPnP/SubscriptionDuration", 1800)),
+    m_nHoldCount(0),
+    m_pInitializeSubscriber(NULL)
 {
-    m_sEventMethodName      = sEventMethodName;
-    m_nSubscriptionDuration = UPnp::g_pConfig->GetValue( "UPnP/SubscriptionDuration", 1800 );
+    m_sEventMethodName.detach();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -84,8 +90,19 @@ inline short Eventing::HoldEvents()
     short nVal;
 
     m_mutex.lock();
+    bool err = (m_nHoldCount >= 127);
     nVal = (m_nHoldCount++);
     m_mutex.unlock();
+
+    if (err)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Eventing::HoldEvents(), Programmer Error: "
+                "Exceeded maximum guarranteed range of "
+                "m_nHoldCount short [-128..127]");
+        VERBOSE(VB_IMPORTANT,
+                "UPnP may not exhibit strange behavior or crash mythtv");
+    }
 
     return nVal;
 }
