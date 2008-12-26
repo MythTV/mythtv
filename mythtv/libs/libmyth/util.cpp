@@ -1213,3 +1213,59 @@ int intResponse(const QString &query, int def)
     int resp = str_resp.toInt(&ok);
     return (ok ? resp : def);
 }
+
+
+QString getSymlinkTarget(const QString &start_file,
+                         QStringList   *intermediaries,
+                         unsigned       maxLinks)
+{
+#if 0
+    VERBOSE(VB_IMPORTANT,
+            QString("getSymlinkTarget('%1', 0x%2, %3)")
+            .arg(start_file).arg((uint64_t)intermediaries,0,16)
+            .arg(maxLinks));
+#endif
+
+    QString   link     = QString::null;
+    QString   cur_file = start_file; cur_file.detach();
+    QFileInfo fi(cur_file);
+
+    if (intermediaries)
+    {
+        intermediaries->clear();
+        intermediaries->push_back(start_file);
+    }
+
+    for (uint i = 0; (i <= maxLinks) && fi.isSymLink() &&
+             !(link = fi.readLink()).isEmpty(); i++)
+    {
+        cur_file = (link[0] == '/') ?
+            link : // absolute link
+            fi.absoluteDir().absolutePath() + "/" + link; // relative link
+
+        if (intermediaries && !intermediaries->contains(cur_file))
+            intermediaries->push_back(cur_file);
+
+        fi = QFileInfo(cur_file);
+    }
+
+    if (intermediaries)
+        intermediaries->detach();
+
+#if 0
+    if (intermediaries)
+    {
+        for (uint i = 0; i < intermediaries->size(); i++)
+        {
+            VERBOSE(VB_IMPORTANT, QString("    inter%1: %2")
+                    .arg(i).arg((*intermediaries)[i]));
+        }
+    }
+
+    VERBOSE(VB_IMPORTANT,
+            QString("getSymlinkTarget() -> '%1'")
+            .arg((!fi.isSymLink()) ? cur_file : QString::null));
+#endif
+
+    return (!fi.isSymLink()) ? cur_file : QString::null;
+}

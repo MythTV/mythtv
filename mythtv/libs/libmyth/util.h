@@ -67,6 +67,10 @@ MPUBLIC double MythGetPixelAspectRatio(void);
 MPUBLIC QString getResponse(const QString &query, const QString &def);
 MPUBLIC int     intResponse(const QString &query, int def);
 
+MPUBLIC QString getSymlinkTarget(const QString &start_file,
+                                 QStringList   *intermediaries = NULL,
+                                 unsigned       maxLinks       = 255);
+
 inline float clamp(float val, float minimum, float maximum)
 {
     return min(max(val, minimum), maximum);
