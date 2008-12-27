@@ -6,7 +6,7 @@ MythArchive GUI theme
 <mythuitheme>
 
     <window name="profilepopup">
-        <area>193,87,413,426</area>
+        <area>-1,-1,413,426</area>
 
         <imagetype name="box">
             <filename>mz_function_popup.png</filename>
@@ -197,7 +197,7 @@ MythArchive GUI theme
         </font>
 
         <imagetype name="topbgimage">
-            <area>25,50,1230,580</area>
+            <area>25,50,1230,590</area>
             <filename>trans-cr-background.png</filename>
         </imagetype>
 
@@ -209,10 +209,10 @@ MythArchive GUI theme
         </textarea>
 
         <buttonlist name="archivelist">
-            <area>60,80,1180,410</area>
+            <area>60,80,1180,420</area>
             <layout>vertical</layout>
             <spacing>5</spacing>
-            <buttonarea>0,0,1145,410</buttonarea>
+            <buttonarea>0,0,1145,420</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,1145,100</area>
                 <state name="active">
@@ -221,8 +221,8 @@ MythArchive GUI theme
                         <gradient start="#505050" end="#000000" alpha="200" />
                     </imagetype>
                     <textarea name="buttontext" from="basetextarea">
-                        <area>10,10,470,30</area>
-                        <font>basemedium</font>
+                        <area>10,5,470,30</area>
+                        <font>basesmallyellow</font>
                     </textarea>
                     <textarea name="subtitle" from="basetextarea">
                         <area>10,40,300,30</area>
@@ -232,15 +232,31 @@ MythArchive GUI theme
                         <area>10,70,285,30</area>
                     </textarea>
                     <textarea name="size" from="basetextarea">
-                        <area>930,10,200,30</area>
+                        <area>930,5,200,30</area>
                         <align>right</align>
                     </textarea>
-                    <textarea name="cutlist" from="size">
+                    <textarea name="profile" from="size">
                         <area>830,40,300,30</area>
                     </textarea>
-                    <textarea name="profile" from="size">
+                    <!-- optional cut status text
+                    <textarea name="cutlist" from="size">
                         <area>830,70,300,30</area>
                     </textarea>
+                    -->
+                    <statetype name="cutliststatus">
+                        <position>1095,70</position>
+                        <state name="none"></state>
+                        <state name="using">
+                            <imagetype name="statusimage">
+                                <filename>ma_cutlist.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="notusing">
+                            <imagetype name="statusimage">
+                                <filename>ma_cutlist_off.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
                 </state>
                 <state name="selected" from="active">
                     <imagetype name="buttonbackground">
@@ -248,7 +264,7 @@ MythArchive GUI theme
                     </imagetype>
 
                     <textarea name="buttontext">
-                        <font>basemedium</font>
+                        <font>basesmallyellow</font>
                     </textarea>
                 </state>
                <state name="inactive" from="active">
@@ -257,7 +273,7 @@ MythArchive GUI theme
                     </imagetype>
 
                     <textarea name="buttontext">
-                        <font>basemedium</font>
+                        <font>basesmallyellow</font>
                     </textarea>
                 </state>
             </statetype>
@@ -286,15 +302,15 @@ MythArchive GUI theme
         </textarea>
 
         <button name="addrecording_button" from="basebutton">
-            <position>60,500</position>
+            <position>60,510</position>
         </button>
 
         <button name="addvideo_button" from="basebutton">
-            <position>550,500</position>
+            <position>550,510</position>
         </button>
 
         <button name="addfile_button" from="basebutton">
-            <position>1060,500</position>
+            <position>1060,510</position>
         </button>
 
         <progressbar name="size_bar" from="baseprogressbar">

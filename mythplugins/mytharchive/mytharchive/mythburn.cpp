@@ -301,10 +301,23 @@ void MythBurn::toggleUseCutlist(void)
     a->useCutlist = !a->useCutlist;
 
     if (a->hasCutlist)
-        item->setText(a->useCutlist ? tr("Using Cutlist") : tr("Not Using Cutlist"), "cutlist");
+    {
+        if (a->useCutlist)
+        {
+            item->setText(tr("Using Cutlist"), "cutlist");
+            item->DisplayState("using", "cutliststatus");
+        }
+        else
+        {
+            item->setText(tr("Not Using Cutlist"), "cutlist");
+            item->DisplayState("notusing", "cutliststatus");
+        }
+    }
     else
+    {
         item->setText(tr("No Cut List"), "cutlist");
-
+        item->DisplayState("none", "cutliststatus");
+    }
     recalcItemSize(a);
     updateSizeBar();
 }
@@ -407,10 +420,23 @@ void MythBurn::updateArchiveList(void)
             item->setText(a->startDate + " " + a->startTime, "date");
             item->setText(formatSize(a->newsize / 1024, 2), "size");
             if (a->hasCutlist)
-                item->setText(a->useCutlist ? tr("Using Cutlist") : tr("Not Using Cutlist"), "cutlist");
+            {
+                if (a->useCutlist)
+                {
+                    item->setText(tr("Using Cutlist"), "cutlist");
+                    item->DisplayState("using", "cutliststatus");
+                }
+                else
+                {
+                    item->setText(tr("Not Using Cutlist"), "cutlist");
+                    item->DisplayState("notusing", "cutliststatus");
+                }
+            }
             else
+            {
                 item->setText(tr("No Cut List"), "cutlist");
-
+                item->DisplayState("none", "cutliststatus");
+            }
             item->setText(a->encoderProfile->name, "profile");
         }
 

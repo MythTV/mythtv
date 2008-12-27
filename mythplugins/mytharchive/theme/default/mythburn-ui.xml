@@ -6,7 +6,7 @@ MythArchive GUI theme
 <mythuitheme>
 
     <window name="profilepopup">
-        <area>193,87,413,426</area>
+        <area>-1,-1,413,426</area>
 
         <imagetype name="box">
             <filename>mz_function_popup.png</filename>
@@ -221,7 +221,7 @@ MythArchive GUI theme
                     </imagetype>
                     <textarea name="buttontext" from="basetextarea">
                         <area>10,10,470,30</area>
-                        <font>basemedium</font>
+                        <font>basesmallyellow</font>
                     </textarea>
                     <textarea name="subtitle" from="basetextarea">
                         <area>10,40,300,30</area>
@@ -234,13 +234,30 @@ MythArchive GUI theme
                         <area>485,10,185,30</area>
                         <align>right</align>
                     </textarea>
-                    <textarea name="cutlist" from="size">
+                    <textarea name="profile" from="size">
                         <area>385,40,285,30</area>
                     </textarea>
-                    <textarea name="profile" from="size">
+
+                    <!-- optional cut status text
+                    <textarea name="cutlist" from="size">
                         <area>385,70,285,30</area>
                     </textarea>
+                    -->
 
+                    <statetype name="cutliststatus">
+                        <position>640,70</position>
+                        <state name="none"></state>
+                        <state name="using">
+                            <imagetype name="statusimage">
+                                <filename>ma_cutlist.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="notusing">
+                            <imagetype name="statusimage">
+                                <filename>ma_cutlist_off.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
                 </state>
                 <state name="selected" from="active">
                     <imagetype name="buttonbackground">
@@ -248,7 +265,7 @@ MythArchive GUI theme
                     </imagetype>
 
                     <textarea name="buttontext">
-                        <font>basemedium</font>
+                        <font>basesmallyellow</font>
                     </textarea>
                 </state>
                <state name="inactive" from="active">
@@ -257,7 +274,7 @@ MythArchive GUI theme
                     </imagetype>
 
                     <textarea name="buttontext">
-                        <font>basemedium</font>
+                        <font>basesmallyellow</font>
                     </textarea>
                 </state>
             </statetype>
