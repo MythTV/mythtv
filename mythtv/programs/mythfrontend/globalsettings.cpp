@@ -3403,62 +3403,57 @@ static HostSpinBox *EPGRecThreshold()
     return gs;
 }
 
-class AudioSettingsGroup : public TriggeredConfigurationGroup
+class AudioSystemSettingsGroup : public VerticalConfigurationGroup
 {
   public:
-     AudioSettingsGroup() :
-         TriggeredConfigurationGroup(false, true, false, false)
-     {
-         setLabel(QObject::tr("Audio"));
-         setUseLabel(false);
+    AudioSystemSettingsGroup() :
+        VerticalConfigurationGroup(false, true, false, false)
+    {
+        setLabel(QObject::tr("Audio System"));
+        setUseLabel(false);
 
-         addChild(AudioOutputDevice());
-         addChild(PassThroughOutputDevice());
+        addChild(AudioOutputDevice());
+        addChild(PassThroughOutputDevice());
 
-         // General boolean settings
-         VerticalConfigurationGroup *vgrp0 =
-             new VerticalConfigurationGroup(false, false, true, true);
-         vgrp0->addChild(AC3PassThrough());
-         vgrp0->addChild(DTSPassThrough());
+        addChild(MaxAudioChannels());
+        addChild(AudioUpmixType());
 
-         HorizontalConfigurationGroup *agrp =
-             new HorizontalConfigurationGroup(false, false, true, true);
-         agrp->addChild(MaxAudioChannels());
-         agrp->addChild(AudioUpmixType());
-         addChild(agrp);
+        // General boolean settings
+        addChild(AC3PassThrough());
+        addChild(DTSPassThrough());
+        addChild(AggressiveBuffer());
+    }
+};
 
-         VerticalConfigurationGroup *vgrp1 =
-             new VerticalConfigurationGroup(false, false, true, true);
-         vgrp1->addChild(AggressiveBuffer());
+class AudioMixerSettingsGroup : public TriggeredConfigurationGroup
+{
+  public:
+    AudioMixerSettingsGroup() :
+        TriggeredConfigurationGroup(false, true, false, false)
+    {
+        setLabel(QObject::tr("Audio Mixer"));
+        setUseLabel(false);
 
-         Setting* volumeControl = MythControlsVolume();
-         vgrp1->addChild(volumeControl);
+        Setting *volumeControl = MythControlsVolume();
+        addChild(volumeControl);
 
-         HorizontalConfigurationGroup *tgrp =
-             new HorizontalConfigurationGroup(false, false, true, true);
-         tgrp->addChild(vgrp0);
-         tgrp->addChild(vgrp1);
-         addChild(tgrp);
+        // Mixer settings
+        ConfigurationGroup *settings =
+            new VerticalConfigurationGroup(false, true, false, false);
+        settings->addChild(MixerDevice());
+        settings->addChild(MixerControl());
+        settings->addChild(MixerVolume());
+        settings->addChild(PCMVolume());
+        settings->addChild(IndividualMuteControl());
 
-         // Make volume control trigger for mixer settings
-         setTrigger(volumeControl);
+        ConfigurationGroup *dummy =
+            new VerticalConfigurationGroup(false, true, false, false);
 
-         // Mixer settings
-         ConfigurationGroup *settings =
-             new VerticalConfigurationGroup(false, false, true, true);
-         HorizontalConfigurationGroup *mixgrp =
-             new HorizontalConfigurationGroup(false, false, true, true);
-         mixgrp->addChild(MixerDevice());
-         mixgrp->addChild(MixerControl());
-         settings->addChild(mixgrp);
-         settings->addChild(MixerVolume());
-         settings->addChild(PCMVolume());
-         settings->addChild(IndividualMuteControl());
-
-         // Show Mixer config only if internal volume controls enabled
-         addTarget("0", new VerticalConfigurationGroup(false, false));
-         addTarget("1", settings);
-     };
+        // Show Mixer config only if internal volume controls enabled
+        setTrigger(volumeControl);
+        addTarget("0", dummy);
+        addTarget("1", settings);
+    }
 };
 
 static HostComboBox *MythLanguage()
@@ -3651,7 +3646,7 @@ class MythMediaSettings : public TriggeredConfigurationGroup
 {
   public:
      MythMediaSettings() :
-         TriggeredConfigurationGroup(false, true, false, false)
+         TriggeredConfigurationGroup(false, false, true, true)
      {
          setLabel(QObject::tr("MythMediaMonitor"));
          setUseLabel(false);
@@ -4606,53 +4601,51 @@ MainGeneralSettings::MainGeneralSettings()
 {
     DatabaseSettings::addDatabaseSettings(this);
 
-    AudioSettingsGroup *audio = new AudioSettingsGroup();
-    addChild(audio);
+    VerticalConfigurationGroup *pin =
+        new VerticalConfigurationGroup(false, true, false, false);
+    pin->setLabel(QObject::tr("Settings Access"));
+    pin->addChild(SetupPinCodeRequired());
+    pin->addChild(SetupPinCode());
+    addChild(pin);
+
+    addChild(new AudioSystemSettingsGroup());
+
+    addChild(new AudioMixerSettingsGroup());
 
     VerticalConfigurationGroup *general =
         new VerticalConfigurationGroup(false, true, false, false);
     general->setLabel(QObject::tr("General"));
-    HorizontalConfigurationGroup *row =
-        new HorizontalConfigurationGroup(false, false, true, true);
-    VerticalConfigurationGroup *col1 =
-        new VerticalConfigurationGroup(false, false, true, true);
-    VerticalConfigurationGroup *col2 =
-        new VerticalConfigurationGroup(false, false, true, true);
-    col1->addChild(AllowQuitShutdown());
-    col1->addChild(NoPromptOnExit());
-    col2->addChild(UseArrowAccels());
-    col2->addChild(NetworkControlEnabled());
-    row->addChild(col1);
-    row->addChild(col2);
-
-    MythMediaSettings *mediaMon = new MythMediaSettings();
-
+    general->addChild(UseArrowAccels());
+    general->addChild(EnableXbox());
     general->addChild(LircKeyPressedApp());
     general->addChild(ScreenShotPath());
-    general->addChild(row);
+    general->addChild(NetworkControlEnabled());
     general->addChild(NetworkControlPort());
-    general->addChild(mediaMon);
     addChild(general);
 
-    VerticalConfigurationGroup* misc = new VerticalConfigurationGroup(false);
-    misc->setLabel(QObject::tr("Miscellaneous"));
+    VerticalConfigurationGroup *media =
+        new VerticalConfigurationGroup(false, true, false, false);
+    media->setLabel(QObject::tr("Media Monitor"));
+    MythMediaSettings *mediaMon = new MythMediaSettings();
+    media->addChild(mediaMon);
+    addChild(media);
 
-    ConfigurationGroup *pin = new HorizontalConfigurationGroup();
-    pin->setLabel(QObject::tr("Settings Access"));
-    pin->addChild(SetupPinCodeRequired());
-    pin->addChild(SetupPinCode());
-
-    VerticalConfigurationGroup* shutdownSettings =
-        new VerticalConfigurationGroup(true);
+    VerticalConfigurationGroup *exit =
+        new VerticalConfigurationGroup(false, true, false, false);
+    exit->setLabel(QObject::tr("Program Exit"));
+    HorizontalConfigurationGroup *ehor0 =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    ehor0->addChild(AllowQuitShutdown());
+    ehor0->addChild(NoPromptOnExit());
+    VerticalConfigurationGroup *shutdownSettings =
+        new VerticalConfigurationGroup(true, true, false, false);
     shutdownSettings->setLabel(QObject::tr("Shutdown/Reboot Settings"));
     shutdownSettings->addChild(OverrideExitMenu());
     shutdownSettings->addChild(HaltCommand());
     shutdownSettings->addChild(RebootCommand());
-
-    misc->addChild(pin);
-    misc->addChild(shutdownSettings);
-    misc->addChild(EnableXbox());
-    addChild(misc);
+    exit->addChild(ehor0);
+    exit->addChild(shutdownSettings);
+    addChild(exit);
 
     MythLogSettings *mythlog = new MythLogSettings();
     addChild(mythlog);
