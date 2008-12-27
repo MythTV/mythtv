@@ -2703,12 +2703,26 @@ static HostCheckBox *HideMouseCursor()
 static HostCheckBox *RunInWindow()
 {
     HostCheckBox *gc = new HostCheckBox("RunFrontendInWindow");
-    gc->setLabel(QObject::tr("Run the frontend in a window"));
+    gc->setLabel(QObject::tr("Use window border"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Toggles between windowed and "
                     "borderless operation."));
     return gc;
 }
+
+static HostCheckBox *UseFixedWindowSize()
+{
+{
+    HostCheckBox *gc = new HostCheckBox("UseFixedWindowSize");
+    gc->setLabel(QObject::tr("Use fixed window size"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr(
+                        "When disabled the video playback "
+                        "window can be resized"));
+    return gc;
+}
+}
+
 
 static HostCheckBox *RandomTheme()
 {
@@ -5014,15 +5028,18 @@ AppearanceSettings::AppearanceSettings()
     VerticalConfigurationGroup *column1 =
         new VerticalConfigurationGroup(false, false, false, false);
 
+    column1->addChild(GuiWidth());
+    column1->addChild(GuiHeight());
+    column1->addChild(GuiOffsetX());
+    column1->addChild(GuiOffsetY());
+
     VerticalConfigurationGroup *column2 =
         new VerticalConfigurationGroup(false, false, false, false);
 
-    column1->addChild(GuiWidth());
-    column2->addChild(GuiHeight());
-    column1->addChild(GuiOffsetX());
-    column2->addChild(GuiOffsetY());
-    column1->addChild(GuiSizeForTV());
+    column2->addChild(GuiSizeForTV());
     column2->addChild(HideMouseCursor());
+    column2->addChild(RunInWindow());
+    column2->addChild(UseFixedWindowSize());
 
     HorizontalConfigurationGroup *columns =
         new HorizontalConfigurationGroup(false, false, false, false);
@@ -5031,7 +5048,6 @@ AppearanceSettings::AppearanceSettings()
     columns->addChild(column2);
 
     screen->addChild(columns);
-    screen->addChild(RunInWindow());
 
     addChild(screen);
 
