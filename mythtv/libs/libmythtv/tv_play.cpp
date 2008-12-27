@@ -9266,7 +9266,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
             OSD *osd = GetOSDLock(GetPlayer(actx,i));
             if (osd)
                 osd->HideTreeMenu();
-            ReturnOSDLock(osd);
+            ReturnOSDLock(GetPlayer(actx,i), osd);
             ClearOSD(GetPlayer(actx,i));
         }
         actx = GetPlayer(actx,-1); // "NEXTPIPWINDOW" changes active context..
@@ -9362,7 +9362,7 @@ void TV::ShowOSDTreeMenu(const PlayerContext *ctx)
             OSD *osd = GetOSDLock(GetPlayer(ctx,i));
             if (osd)
                 osd->HideTreeMenu();
-            ReturnOSDLock(osd);
+            ReturnOSDLock(GetPlayer(ctx,i), osd);
         }
         delete treeMenu;
     }
