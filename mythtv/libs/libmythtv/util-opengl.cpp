@@ -212,6 +212,7 @@ int const *get_attr_cfg(FrameBufferType type)
         GLX_RED_SIZE,      5,
         GLX_GREEN_SIZE,    5,
         GLX_BLUE_SIZE,     5,
+        GLX_ALPHA_SIZE,    5,
         GLX_DOUBLEBUFFER,  1,
         GLX_STEREO,        0,
         GLX_LEVEL,         0,
