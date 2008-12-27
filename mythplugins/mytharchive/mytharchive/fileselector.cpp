@@ -447,9 +447,9 @@ void FileSelector::updateFileList()
                 m_fileData.append(data);
 
                 // add a row to the UIListBtnArea
-                MythUIButtonListItem* item = new MythUIButtonListItem(
-                        m_fileButtonList,
-                        data->filename + " (" + formatSize(data->size / 1024, 2) + ")");
+                MythUIButtonListItem* item = 
+                        new MythUIButtonListItem(m_fileButtonList, data->filename);
+                item->setText(formatSize(data->size / 1024, 2), "size");
 
                 if (m_selectorType == FSTYPE_FILELIST)
                 {

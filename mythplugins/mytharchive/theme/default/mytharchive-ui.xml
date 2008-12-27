@@ -289,14 +289,18 @@ Common MythArchive window definitions
         </button>
 
         <buttonlist name="filelist" from="basebuttonlist">
-            <area>20,130,740,400</area>
+            <area>20,130,740,410</area>
             <statetype name="buttonitem">
                 <state name="active">
                     <imagetype name="buttonimage">
                         <area>2,2,28,28</area>
                     </imagetype>
                     <textarea name="buttontext">
-                        <area>35,0,650,30</area>
+                        <area>35,0,580,30</area>
+                    </textarea>
+                    <textarea name="size" from="buttontext">
+                        <area>620,0,75,30</area>
+                        <align>right,vcenter</align>
                     </textarea>
                     <statetype name="buttoncheck">
                         <position>715,5</position>

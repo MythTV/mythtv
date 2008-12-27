@@ -296,10 +296,14 @@ Common MythArchive window definitions
                         <area>2,2,28,28</area>
                     </imagetype>
                     <textarea name="buttontext">
-                        <area>35,0,1100,30</area>
+                        <area>35,0,1020,35</area>
+                    </textarea>
+                    <textarea name="size" from="buttontext">
+                        <area>1025,0,125,35</area>
+                        <align>right,vcenter</align>
                     </textarea>
                     <statetype name="buttoncheck">
-                        <position>1150,5</position>
+                        <position>1170,5</position>
                     </statetype>
                 </state>
                 <state name="selected" from="active">
