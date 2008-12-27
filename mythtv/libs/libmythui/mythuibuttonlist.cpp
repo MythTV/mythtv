@@ -157,8 +157,7 @@ void MythUIButtonList::SetPositionArrowStates(void)
             }
             else if ((m_itemCount - m_selPosition) < (int)(m_itemsVisible/2))
             {
-                VERBOSE(VB_IMPORTANT, QString("Wrap Sel: %1 Total: %2").arg(m_selPosition).arg(m_itemCount));
-                it = m_itemList.end() - (m_itemCount - m_selPosition - (m_itemsVisible/2));
+                it = m_itemList.begin() + m_selPosition - (m_itemsVisible/2);
             }
         }
         else if (m_drawFromBottom && m_itemCount < (int)m_itemsVisible)
@@ -169,7 +168,7 @@ void MythUIButtonList::SetPositionArrowStates(void)
 
         bool seenSelected = false;
 
-        while (it != m_itemList.end() && button < (int)m_itemsVisible)
+        while (it < m_itemList.end() && button < (int)m_itemsVisible)
         {
             MythUIStateType *realButton = m_ButtonList[button];
             MythUIButtonListItem *buttonItem = *it;
@@ -1130,7 +1129,8 @@ MythUIButtonListItem::~MythUIButtonListItem()
         m_image->DownRef();
 
     QMapIterator<QString, MythImage*> it(m_images);
-    while (it.hasNext()) {
+    while (it.hasNext())
+    {
         it.next();
         it.value()->DownRef();
     }
