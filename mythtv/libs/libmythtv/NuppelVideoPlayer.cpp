@@ -7415,8 +7415,7 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
         uint h = hl_button->h;
         uint w  = hl_button->w;
         int linesize = hl_button->linesize;
-        int x1 = hl_button->x;
-        int y1 = hl_button->y;
+        QPoint topleft = QPoint(hl_button->x, hl_button->y);
         QRect buttonPos = player_ctx->buffer->DVD()->GetButtonCoords();
         QImage hl_image(w, h, QImage::Format_ARGB32);
         uint8_t color;
@@ -7440,28 +7439,22 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
         }
 
         // scale highlight image to match OSD size, if required
-        // TODO FIXME This is pretty bogus, it does not adjust for zooming
-        //   or scaling at all, nor does it account for OSD renderers
-        //   where the OSD resolution != video resolution.
-        float hmult = osd->GetSubtitleBounds().width() /
-            (float) video_disp_dim.width();
-        float vmult = osd->GetSubtitleBounds().height() /
-            (float) video_disp_dim.height();
-
-        if ((hmult < 0.99) || (hmult > 1.01) || (vmult < 0.99) || (vmult > 1.01)) 
+        QSize scale;
+        QRect crop, button;
+        button = QRect(topleft, QSize(w, h));
+        if (videoOutput->MoveScaleDVDButton(button, scale,
+                                            topleft, crop))
         {
-            x1 = (int)    (x1 * hmult);
-            y1 = (int)    (y1 * vmult);
-            w    = (int)ceil(w    * hmult);
-            h    = (int)ceil(h    * vmult);
-
-            hl_image = hl_image.scaled(w, h); // use FastTransformation
-        } 
-        else 
-            hmult = vmult = 1.0;
+            hl_image = hl_image.scaled(scale);
+            if (!crop.isNull())
+            {
+                hl_image = hl_image.copy(crop.left(), crop.top(),
+                                         crop.width(), crop.height());
+            }
+        }
 
         OSDTypeImage* image = new OSDTypeImage();
-        image->SetPosition(QPoint(x1, y1), hmult, vmult);
+        image->SetPosition(topleft, 1.0, 1.0);
         image->Load(hl_image);
         image->SetDontRoundPosition(true);
 

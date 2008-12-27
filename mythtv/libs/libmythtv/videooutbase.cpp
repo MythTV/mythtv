@@ -1326,6 +1326,53 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
 */
 }
 
+bool VideoOutput::MoveScaleDVDButton(QRect button, QSize &scale,
+                                     QPoint &position, QRect &crop)
+{
+    float hscale, vscale, tmp = 0.0;
+    QRect vis_osd = GetVisibleOSDBounds(tmp, tmp, tmp);
+    QRect tot_osd = GetTotalOSDBounds();
+    QRect vid_rec = windows[0].GetVideoRect();
+
+    if ((vis_osd == vid_rec) ||
+         vid_rec.width() < 1 ||
+         vid_rec.height() < 1)
+        return false;
+
+    if (hasFullScreenOSD())
+    {
+        QRect dvr_rec = windows[0].GetDisplayVideoRect();
+
+        vscale = (float)dvr_rec.width() / (float)vid_rec.width();
+        hscale = (float)dvr_rec.height() / (float)vid_rec.height();
+
+        QMatrix m;
+        m.translate(dvr_rec.left(), dvr_rec.top());
+        m.scale(vscale, hscale);
+        crop = m.mapRect(button);
+        QPoint cut = QPoint((crop.left() < 0) ? -crop.left() : 0,
+                            (crop.top() < 0) ? -crop.top() : 0);
+        scale = crop.size();
+        crop  = crop.intersected(tot_osd);
+        position = QPoint(crop.left(), crop.top());
+        crop.moveTopLeft(cut);
+        return true;
+    }
+
+    crop = QRect(0,0,0,0);
+    vscale = (float)tot_osd.width() / (float)vid_rec.width();
+    hscale = (float)tot_osd.height() / (float)vid_rec.height();
+
+    scale = QSize((int)ceil(vscale * (float)button.width()),
+                  (int)ceil(hscale * (float)button.height()));
+    int btnX = (int)(vscale * (float)button.left());
+    int btnY = (int)(hscale * (float)button.top());
+    int xoff = tot_osd.left() - vis_osd.left();
+    int yoff = tot_osd.top() - vis_osd.top();
+    position = QPoint(btnX + xoff, btnY + yoff);
+    return true;
+}
+
 void VideoOutput::SetPIPState(PIPState setting)
 {
     windows[0].SetPIPState(setting);

@@ -156,6 +156,7 @@ class VideoOutputXv : public VideoOutput
   private:
     virtual QRect GetVisibleOSDBounds(float&, float&, float) const;
     virtual QRect GetTotalOSDBounds(void) const;
+    virtual bool hasFullScreenOSD(void) const;
     QRect GetTotalVisibleRect(void) const;
 
     VideoFrame *GetNextFreeFrame(bool allow_unsafe);

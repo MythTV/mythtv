@@ -403,7 +403,7 @@ QRect VideoOutputXv::GetVisibleOSDBounds(
     QSize dvr2 = QSize(dvr.width()  & ~0x3,
                        dvr.height() & ~0x1);
 
-    if (!chroma_osd && !gl_use_osd_opengl2 && !vdpau_use_osd)
+    if (!hasFullScreenOSD())
     {
         return VideoOutput::GetVisibleOSDBounds(
             visible_aspect, font_scaling, themeaspect);
@@ -435,8 +435,7 @@ QRect VideoOutputXv::GetTotalOSDBounds(void) const
     QSize dvr2 = QSize(dvr.width()  & ~0x3,
                        dvr.height() & ~0x1);
 
-    QSize sz = (chroma_osd || gl_use_osd_opengl2 || vdpau_use_osd) ?
-        dvr2 : windows[0].GetVideoDispDim();
+    QSize sz = hasFullScreenOSD() ? dvr2 : windows[0].GetVideoDispDim();
     return QRect(QPoint(0,0), sz);
 }
 
@@ -4955,6 +4954,11 @@ int VideoOutputXv::DisplayOSD(VideoFrame *frame, OSD *osd,
         }
     }
     return changed;
+}
+
+bool VideoOutputXv::hasFullScreenOSD(void) const
+{
+    return (vdpau_use_osd || gl_use_osd_opengl2 || chroma_osd);
 }
 
 QStringList VideoOutputXv::GetAllowedRenderers(

@@ -240,6 +240,8 @@ class VideoOutput
 
 
     QString GetFilters(void) const;
+    virtual bool MoveScaleDVDButton(QRect button, QSize &scale,
+                                    QPoint &position, QRect &crop);
 
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
@@ -257,6 +259,7 @@ class VideoOutput
         PictureAttribute attributeType, int newValue);
     virtual QRect GetVisibleOSDBounds(float&, float&, float) const;
     virtual QRect GetTotalOSDBounds(void) const;
+    virtual bool hasFullScreenOSD(void) const { return false; }
 
     static void CopyFrame(VideoFrame* to, const VideoFrame* from);
 
