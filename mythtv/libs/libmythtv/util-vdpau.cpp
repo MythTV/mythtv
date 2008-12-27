@@ -869,18 +869,23 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
     }
 
     // fix broken/missing negative rect clipping in vdpau
-    // not sure if this is actually correct, didn't work through the math
-    if (display_video_rect.top() < 0)
+    if (display_video_rect.top() < 0 && display_video_rect.height() > 0)
     {
-        float ydiff = ((0 - display_video_rect.top()) * 1.0) / screen_size.height();
-        video_rect.setTop(video_rect.top() + video_rect.height() * ydiff);
+        float yscale = (float)video_rect.height() /
+                       (float)display_video_rect.height();
+        int tmp = video_rect.top() -
+                  (int)((float)display_video_rect.top() * yscale);
+        video_rect.setTop(max(0, tmp));
         display_video_rect.setTop(0);
     }
 
-    if (display_video_rect.left() < 0)
+    if (display_video_rect.left() < 0 && display_video_rect.width() > 0)
     {
-        float xdiff = ((0 - display_video_rect.left()) * 1.0) / screen_size.width();
-        video_rect.setLeft(video_rect.left() + video_rect.width() * xdiff);
+        float xscale = (float)video_rect.width() /
+                       (float)display_video_rect.width();
+        int tmp = video_rect.left() -
+                  (int)((float)display_video_rect.left() * xscale);
+        video_rect.setLeft(max(0, tmp));
         display_video_rect.setLeft(0);
     }
 
