@@ -3178,6 +3178,8 @@ void VideoOutputXv::PrepareFrameOpenGL(VideoFrame *buffer, FrameScanType t)
     if (buffer->codec != FMT_YV12)
         return;
 
+    gl_videochain->SetVideoRect(windows[0].GetDisplayVideoRect(),
+                                windows[0].GetVideoRect());
     gl_videochain->PrepareFrame(t, m_deinterlacing, framesPlayed, false);
 
     QMap<NuppelVideoPlayer*,OpenGLVideo*>::iterator it = gl_pipchains.begin();
