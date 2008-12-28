@@ -284,11 +284,12 @@ int AudioOutputALSA::GetSpaceOnSoundcard(void) const
     }
 
     avail = snd_pcm_avail_update(pcm_handle);
+    int avail_bytes = avail * audio_bytes_per_sample;
     if (avail < 0 ||
-        (snd_pcm_uframes_t)avail > (snd_pcm_uframes_t)soundcard_buffer_size)
-        avail = soundcard_buffer_size;
+        avail_bytes > soundcard_buffer_size)
+        avail_bytes = soundcard_buffer_size;
 
-    int space = (avail * audio_bytes_per_sample) - audio_buffer_unused;
+    int space = avail_bytes - audio_buffer_unused;
 
     if (space < 0)
         space = 0;
