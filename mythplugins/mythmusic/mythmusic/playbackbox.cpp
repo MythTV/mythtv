@@ -1008,6 +1008,9 @@ void PlaybackBoxMusic::showEditMetadataDialog()
     GenericTree *node = music_tree_list->getCurrentNode();
     Metadata *editMeta = gMusicData->all_music->getMetadata( node->getInt() );
 
+    if (!editMeta)
+        return;
+
     EditMetadataDialog editDialog(editMeta, gContext->GetMainWindow(),
                       "edit_metadata", "music-", "edit metadata");
     if (kDialogCodeRejected != editDialog.exec())
