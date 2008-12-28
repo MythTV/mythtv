@@ -7348,11 +7348,11 @@ void NuppelVideoPlayer::SetDecoder(DecoderBase *dec)
     }
 }
 
-/* \fn NuppelVideoPlayer::LoadExternalSubtitles(const QString&)
-* \brief Loads any external subtitles.
-* 
-* \return true if the subtitle were loaded successfully
-*/
+/** \fn NuppelVideoPlayer::LoadExternalSubtitles(const QString&)
+ *  \brief Loads any external subtitles.
+ *
+ *  \return true if the subtitles were loaded successfully
+ */
 bool NuppelVideoPlayer::LoadExternalSubtitles(const QString &subtitleFileName)
 {
     QMutexLocker locker(&subtitleLock);
