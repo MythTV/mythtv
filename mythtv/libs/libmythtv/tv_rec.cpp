@@ -4339,8 +4339,6 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
         return false;
     }
 
-    QString chanids = QString::number(chanid);
-
     int hoursMax = gContext->GetNumSetting("MaxHoursPerLiveTVRecording", 8);
     if (hoursMax <= 0)
         hoursMax = 8;
@@ -4350,7 +4348,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
         prog = new ProgramInfo(*pseudoLiveTVRecording);
     else
         prog = ProgramInfo::GetProgramAtDateTime(
-            chanids, mythCurrentDateTime(), true, hoursMax);
+            chanid, mythCurrentDateTime(), true, hoursMax);
 
     prog->cardid = cardid;
 
@@ -4360,7 +4358,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
                 "\n\t\t\tProgramInfo is invalid."
                 "\n" + prog->toString());
         prog->endts = prog->recendts = prog->recstartts.addSecs(3600);
-        prog->chanid = chanids;
+        prog->chanid = QString::number(chanid);
     }
 
     if (!pseudoLiveTVRecording)

@@ -61,6 +61,7 @@ typedef void (*EMBEDRETURNVOID) (void *, bool);
 //            -> timerIdLock
 //            -> mainLoopCondLock
 //            -> stateChangeCondLock
+//            -> browseLock
 //
 // When holding one of these locks, you may lock any lock of  the locks to
 // the right of the current lock, but may not lock any lock to the left of
@@ -249,8 +250,9 @@ class MPUBLIC TV : public QThread
                             const QStringList &actions,
                             bool isDVD, bool isDVDStillFrame);
 
-    void GetNextProgram(RemoteEncoder *enc, int direction,
-                        InfoMap &infoMap);
+    void GetNextProgram(RemoteEncoder *enc,
+                        int direction, InfoMap &infoMap) const;
+    void GetNextProgram(int direction, InfoMap &infoMap) const;
 
     // static functions
     static void InitKeys(void);
@@ -491,6 +493,7 @@ class MPUBLIC TV : public QThread
     void BrowseDispInfo(PlayerContext*, int direction);
     void BrowseChannel(PlayerContext*, const QString &channum);
     bool BrowseHandleAction(PlayerContext*, const QStringList &actions);
+    uint BrowseAllGetChanId(const QString &chan) const;
 
     void ToggleRecord(PlayerContext*);
 
@@ -573,6 +576,7 @@ class MPUBLIC TV : public QThread
     QString db_short_date_format;
     uint    db_idle_timeout;
     uint    db_udpnotify_port;
+    uint    db_browse_max_forward;
     int     db_playback_exit_prompt;
     int     db_autoexpire_default;
     bool    db_auto_set_watched;
@@ -585,6 +589,9 @@ class MPUBLIC TV : public QThread
     bool    db_use_dvd_bookmark;
     bool    db_continue_embedded;
     bool    db_use_fixed_size;
+    bool    db_browse_always;
+    bool    db_browse_all_tuners;
+    DBChanList db_browse_all_channels;
 
     bool    smartChannelChange;
     bool    MuteIndividualChannels;
@@ -677,11 +684,11 @@ class MPUBLIC TV : public QThread
     QDateTime lastLockSeenTime;
 
     // Channel browsing state variables
-    bool browsemode;
-    bool persistentbrowsemode;
-    QString browsechannum;
-    QString browsechanid;
-    QString browsestarttime;
+    bool       browsemode;
+    QString    browsechannum;
+    uint       browsechanid;
+    QString    browsestarttime;
+    mutable QMutex browseLock; // protects db_browse_all_channels
 
     // Program Info for currently playing video
     // (or next video if InChangeState() is true)

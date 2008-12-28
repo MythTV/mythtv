@@ -608,12 +608,14 @@ TV::TV(void)
       db_channel_format("<num> <sign>"),
       db_time_format("h:mm AP"), db_short_date_format("M/d"),
       db_idle_timeout(0),           db_udpnotify_port(0),
+      db_browse_max_forward(14400),
       db_playback_exit_prompt(0),   db_autoexpire_default(0),
       db_auto_set_watched(false),   db_end_of_rec_exit_prompt(false),
       db_jump_prefer_osd(true),     db_use_gui_size_for_tv(false),
       db_start_in_guide(false),     db_toggle_bookmark(false),
       db_run_jobs_on_remote(false), db_use_dvd_bookmark(false),
       db_continue_embedded(false),  db_use_fixed_size(true),
+      db_browse_always(false),      db_browse_all_tuners(false),
 
       smartChannelChange(false),
       MuteIndividualChannels(false), arrowAccel(false),
@@ -652,8 +654,8 @@ TV::TV(void)
       queuedChanNum(""),
       lockTimerOn(false),
       // channel browsing state variables
-      browsemode(false), persistentbrowsemode(false),
-      browsechannum(""), browsechanid(""), browsestarttime(""),
+      browsemode(false),
+      browsechannum(""), browsechanid(0), browsestarttime(""),
       // Program Info for currently playing video
       lastProgram(NULL),
       inPlaylist(false), underNetworkControl(false),
@@ -691,6 +693,7 @@ TV::TV(void)
     db_idle_timeout = gContext->GetNumSetting("LiveTVIdleTimeout", 0);
     db_idle_timeout *= 60 * 1000; // convert from minutes to ms.
     db_udpnotify_port      = gContext->GetNumSetting("UDPNotifyPort", 0);
+    db_browse_max_forward  = gContext->GetNumSetting("BrowseMaxForward",240)*60;
     db_playback_exit_prompt= gContext->GetNumSetting("PlaybackExitPrompt", 0);
     db_autoexpire_default  = gContext->GetNumSetting("AutoExpireDefault", 0);
 
@@ -707,6 +710,19 @@ TV::TV(void)
         "ContinueEmbeddedTVPlay", 0);
     db_use_fixed_size      = gContext->GetNumSettingOnHost(
         "UseFixedWindowSize", gContext->GetHostName(), 1);
+    db_browse_always       = gContext->GetNumSetting("PersistentBrowseMode", 0);
+    db_browse_all_tuners   = gContext->GetNumSetting("BrowseAllTuners", 0);
+
+    if (db_browse_all_tuners)
+    {
+        QMutexLocker locker(&browseLock);
+        QString channelOrdering = gContext->GetSetting(
+            "ChannelOrdering", "channum");
+        db_browse_all_channels = ChannelUtil::GetChannels(
+            0, true, "channum, callsign");
+        ChannelUtil::SortChannels(
+            db_browse_all_channels, channelOrdering, true);
+    }
 
     sleep_times.push_back(SleepTimerInfo(QObject::tr("Off"),       0));
     sleep_times.push_back(SleepTimerInfo(QObject::tr("30m"),   30*60));
@@ -746,7 +762,6 @@ bool TV::Init(bool createWindow)
     smartChannelChange   = gContext->GetNumSetting("SmartChannelChange", 0);
     MuteIndividualChannels=gContext->GetNumSetting("IndividualMuteControl", 0);
     arrowAccel           = gContext->GetNumSetting("UseArrowAccels", 1);
-    persistentbrowsemode = gContext->GetNumSetting("PersistentBrowseMode", 0);
     osd_general_timeout  = gContext->GetNumSetting("OSDGeneralTimeout", 2);
     osd_prog_info_timeout= gContext->GetNumSetting("OSDProgramInfoTimeout", 3);
     tryUnflaggedSkip     = gContext->GetNumSetting("TryUnflaggedSkip", 0);
@@ -4311,7 +4326,7 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx,
     {
         if (islivetv)
         {
-            if (persistentbrowsemode)
+            if (db_browse_always)
                 BrowseDispInfo(ctx, BROWSE_UP);
             else
                 ChangeChannel(ctx, CHANNEL_DIRECTION_UP);
@@ -4325,7 +4340,7 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx,
     {
         if (islivetv)
         {
-            if (persistentbrowsemode)
+            if (db_browse_always)
                 BrowseDispInfo(ctx, BROWSE_DOWN);
             else
                 ChangeChannel(ctx, CHANNEL_DIRECTION_DOWN);
@@ -7135,7 +7150,7 @@ void TV::ShowLCDDVDInfo(const PlayerContext *ctx)
  *  \param infoMap InfoMap to fill in with returned data
  */
 void TV::GetNextProgram(RemoteEncoder *enc, int direction,
-                        InfoMap &infoMap)
+                        InfoMap &infoMap) const
 {
     QString title, subtitle, desc, category, endtime, callsign, iconpath;
     QDateTime begts, endts;
@@ -7146,7 +7161,7 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
     QString seriesid  = infoMap["seriesid"];
     QString programid = infoMap["programid"];
 
-    PlayerContext *actx = NULL;
+    const PlayerContext *actx = NULL;
     if (!enc)
     {
         actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
@@ -7202,6 +7217,87 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
     infoMap["iconpath"]    = iconpath;
     infoMap["seriesid"]    = seriesid;
     infoMap["programid"]   = programid;
+}
+
+void TV::GetNextProgram(int direction, InfoMap &infoMap) const
+{
+    uint chanid = infoMap["chanid"].toUInt();
+    if (!chanid)
+        chanid = BrowseAllGetChanId(infoMap["channum"]);
+        
+    int chandir = -1;
+    switch (direction)
+    {
+        case BROWSE_UP:       chandir = CHANNEL_DIRECTION_UP;       break;
+        case BROWSE_DOWN:     chandir = CHANNEL_DIRECTION_DOWN;     break;
+        case BROWSE_FAVORITE: chandir = CHANNEL_DIRECTION_FAVORITE; break;
+    }
+    if (direction != -1)
+    {
+        QMutexLocker locker(&browseLock);
+        chanid = ChannelUtil::GetNextChannel(db_browse_all_channels, chanid, 0, chandir);
+    }
+
+    infoMap["chanid"] = QString::number(chanid);
+
+    {
+        QMutexLocker locker(&browseLock);
+        DBChanList::const_iterator it = db_browse_all_channels.begin();
+        for (; it != db_browse_all_channels.end(); ++it)
+        {
+            if ((*it).chanid == chanid)
+            {
+                QString tmp = (*it).channum;
+                tmp.detach();
+                infoMap["channum"] = tmp;
+                break;
+            }
+        }
+    }
+
+    QDateTime nowtime = QDateTime::currentDateTime();
+    QDateTime latesttime = nowtime.addSecs(6*60*60);
+    QDateTime browsetime = QDateTime::fromString(
+        infoMap["dbstarttime"], Qt::ISODate);
+
+    MSqlBindings bindings;
+    bindings[":CHANID"] = chanid;
+    bindings[":NOWTS"] = nowtime.toString("yyyy-MM-ddThh:mm:ss");
+    bindings[":LATESTTS"] = latesttime.toString("yyyy-MM-ddThh:mm:ss");
+    bindings[":BROWSETS"] = browsetime.toString("yyyy-MM-ddThh:mm:ss");
+    bindings[":BROWSETS2"] = browsetime.toString("yyyy-MM-ddThh:mm:ss");
+
+    QString querystr = " WHERE program.chanid = :CHANID ";
+    switch (direction)
+    {
+        case BROWSE_LEFT:
+            querystr += " AND program.endtime <= :BROWSETS "
+                " AND program.endtime > :NOWTS ";
+            break;
+
+        case BROWSE_RIGHT:
+            querystr += " AND program.starttime > :BROWSETS "
+                " AND program.starttime < :LATESTTS ";
+            break;
+            
+        default:
+            querystr += " AND program.starttime <= :BROWSETS "
+                " AND program.endtime > :BROWSETS2 ";
+    };
+
+    ProgramList progList;
+    progList.FromProgram(querystr, bindings);
+    
+    if (progList.isEmpty())
+    {
+        infoMap["dbstarttime"] = "";
+        return;
+    }
+
+    const ProgramInfo *prog = (direction == BROWSE_LEFT) ?
+        progList[progList.size() - 1] : progList[0];
+
+    infoMap["dbstarttime"] = prog->startts.toString(Qt::ISODate);
 }
 
 bool TV::IsTunable(const PlayerContext *ctx, uint chanid, bool use_cache)
@@ -8323,7 +8419,8 @@ void TV::BrowseStart(PlayerContext *ctx)
     {
         browsemode      = true;
         browsechannum   = ctx->playingInfo->chanstr;
-        browsechanid    = ctx->playingInfo->chanid;
+        browsechannum.detach();
+        browsechanid    = ctx->playingInfo->chanid.toUInt();
         browsestarttime = ctx->playingInfo->startts.toString();
         ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
@@ -8374,15 +8471,8 @@ void TV::BrowseEnd(PlayerContext *ctx, bool change_channel)
  */
 void TV::BrowseDispInfo(PlayerContext *ctx, int direction)
 {
-    VERBOSE(VB_IMPORTANT, "BrowseDispInfo() -- begin");
-
     if (!browsemode)
         BrowseStart(ctx);
-
-    InfoMap infoMap;
-    QDateTime curtime  = QDateTime::currentDateTime();
-    QDateTime maxtime  = curtime.addSecs(60 * 60 * 4);
-    QDateTime lasttime = QDateTime::fromString(browsestarttime, Qt::ISODate);
 
     OSD *osd = GetOSDLock(ctx);
     if (ctx->paused || !osd)
@@ -8398,24 +8488,39 @@ void TV::BrowseDispInfo(PlayerContext *ctx, int direction)
         browseTimerId = StartTimer(kBrowseTimeout, __LINE__);
     }
 
+    QDateTime lasttime = QDateTime::fromString(browsestarttime, Qt::ISODate);
+    QDateTime curtime  = QDateTime::currentDateTime();
     if (lasttime < curtime)
         browsestarttime = curtime.toString(Qt::ISODate);
 
+    QDateTime maxtime  = curtime.addSecs(db_browse_max_forward);
     if ((lasttime > maxtime) && (direction == BROWSE_RIGHT))
     {
         ReturnOSDLock(ctx, osd);
         return;
     }
 
+    InfoMap infoMap;
     infoMap["dbstarttime"] = browsestarttime;
     infoMap["channum"]     = browsechannum;
-    infoMap["chanid"]      = browsechanid;
+    infoMap["chanid"]      = QString::number(browsechanid);
 
-    if (ctx->recorder)
+    if (ctx->recorder && !db_browse_all_tuners)
+    {
         GetNextProgram(ctx->recorder, direction, infoMap);
+    }
+    else
+    {
+        GetNextProgram(direction, infoMap);
+        while (!IsTunable(ctx, infoMap["chanid"].toUInt()) &&
+               (infoMap["channum"] != browsechannum))
+        {
+            GetNextProgram(direction, infoMap);
+        }
+    }
 
     browsechannum = infoMap["channum"];
-    browsechanid  = infoMap["chanid"];
+    browsechanid  = infoMap["chanid"].toUInt();
 
     if (((direction == BROWSE_LEFT) || (direction == BROWSE_RIGHT)) &&
         !infoMap["dbstarttime"].isEmpty())
@@ -8426,15 +8531,26 @@ void TV::BrowseDispInfo(PlayerContext *ctx, int direction)
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
     ProgramInfo *program_info =
         ProgramInfo::GetProgramAtDateTime(browsechanid, startts);
-
     if (program_info)
         program_info->ToMap(infoMap);
+    delete program_info;
 
     osd->ClearAllText("browse_info");
     osd->SetText("browse_info", infoMap, -1);
 
     ReturnOSDLock(ctx, osd);
-    delete program_info;
+}
+
+uint TV::BrowseAllGetChanId(const QString &chan) const
+{
+    QMutexLocker locker(&browseLock);
+    DBChanList::const_iterator it = db_browse_all_channels.begin();
+    for (; it != db_browse_all_channels.end(); ++it)
+    {
+        if ((*it).channum == chan)
+            return (*it).chanid;
+    }
+    return 0;
 }
 
 void TV::ToggleRecord(PlayerContext *ctx)
@@ -8504,10 +8620,14 @@ void TV::ToggleRecord(PlayerContext *ctx)
 void TV::BrowseChannel(PlayerContext *ctx, const QString &chan)
 {
     if (!ctx->recorder || !ctx->recorder->CheckChannel(chan))
-        return;
+    {
+        if (!db_browse_all_tuners || !BrowseAllGetChanId(chan))
+            return;
+    }
 
     browsechannum = chan;
-    browsechanid = QString::null;
+    browsechannum.detach();
+    browsechanid = 0;
     BrowseDispInfo(ctx, BROWSE_SAME);
 }
 
@@ -9432,7 +9552,7 @@ void TV::FillOSDTreeMenu(
 
     if (liveTV)
     {
-        if (!persistentbrowsemode)
+        if (!db_browse_always)
         {
             new OSDGenericTree(
                 treeMenu, tr("Enable Browse Mode"), "TOGGLEBROWSE");

@@ -1973,12 +1973,25 @@ static HostCheckBox *EnableMHEG()
 static HostCheckBox *PersistentBrowseMode()
 {
     HostCheckBox *gc = new HostCheckBox("PersistentBrowseMode");
-    gc->setLabel(QObject::tr("Always use Browse mode when changing channels "
-                 "in LiveTV"));
+    gc->setLabel(QObject::tr("Always use Browse mode in LiveTV"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("If enabled, Browse mode will "
-                    "automatically be activated whenever you use Channel "
-                    "UP/DOWN while watching Live TV."));
+    gc->setHelpText(
+        QObject::tr(
+            "If enabled, Browse mode will automatically be activated "
+            "whenever you use Channel UP/DOWN while watching Live TV."));
+    return gc;
+}
+
+static HostCheckBox *BrowseAllTuners()
+{
+    HostCheckBox *gc = new HostCheckBox("BrowseAllTuners");
+    gc->setLabel(QObject::tr("Browse all channels"));
+    gc->setValue(false);
+    gc->setHelpText(
+        QObject::tr(
+            "If enabled, browse mode will shows channels on all "
+            "available recording devices, instead of showing "
+            "channels on just the current recorder."));
     return gc;
 }
 
@@ -4830,6 +4843,7 @@ OSDSettings::OSDSettings()
     osd->addChild(OSDThemeFontSizeType());
     osd->addChild(EnableMHEG());
     osd->addChild(PersistentBrowseMode());
+    osd->addChild(BrowseAllTuners());
     addChild(osd);
 
     VerticalConfigurationGroup *udp = new VerticalConfigurationGroup(false);

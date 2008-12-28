@@ -736,7 +736,7 @@ int ProgramInfo::SecsTillStart(void) const
 /**
  *  \brief Returns a new ProgramInfo for the program that air at
  *         "dtime" on "channel".
- *  \param channel %Channel ID on which to search for program.
+ *  \param chanid  %Channel ID on which to search for program.
  *  \param dtime   Date and Time for which we desire the program.
  *  \param genUnknown Generate a full entry for live-tv if unknown
  *  \param clampHoursMax Clamp the maximum time to X hours from dtime.
@@ -744,7 +744,7 @@ int ProgramInfo::SecsTillStart(void) const
  *          Pointer to an "Unknown" ProgramInfo if it does not find
  *          anything in database.
  */
-ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
+ProgramInfo *ProgramInfo::GetProgramAtDateTime(uint chanid,
                                                const QDateTime &dtime,
                                                bool genUnknown,
                                                int clampHoursMax)
@@ -756,7 +756,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
     QString querystr = "WHERE program.chanid = :CHANID "
                        "  AND program.starttime < :STARTTS1 "
                        "  AND program.endtime > :STARTTS2 ";
-    bindings[":CHANID"] = channel;
+    bindings[":CHANID"] = QString::number(chanid);
     QString startts = dtime.toString("yyyy-MM-ddThh:mm:50");
     bindings[":STARTTS1"] = startts;
     bindings[":STARTTS2"] = startts;
@@ -786,7 +786,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
                   "commmethod, outputfilters "
                   "FROM channel "
                   "WHERE chanid = :CHANID ;");
-    query.bindValue(":CHANID", channel);
+    query.bindValue(":CHANID", chanid);
 
     if (!query.exec() || !query.isActive())
     {
@@ -839,7 +839,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
     querystr = "WHERE program.chanid    = :CHANID  AND "
                "      program.starttime > :STARTTS "
                "GROUP BY program.starttime ORDER BY program.starttime LIMIT 1 ";
-    bindings[":CHANID"]  = channel;
+    bindings[":CHANID"]  = QString::number(chanid);
     bindings[":STARTTS"] = dtime.toString("yyyy-MM-ddThh:mm:50");
 
     progList.FromProgram(querystr, bindings, schedList);
@@ -1021,7 +1021,8 @@ int ProgramInfo::IsProgramRecurring(void) const
 
         QDateTime checktime = dtime.addDays(daysadd);
 
-        ProgramInfo *nextday = GetProgramAtDateTime(chanid, checktime);
+        ProgramInfo *nextday = GetProgramAtDateTime(
+            chanid.toUInt(), checktime);
 
         if (NULL == nextday)
             return -1;
@@ -1036,7 +1037,7 @@ int ProgramInfo::IsProgramRecurring(void) const
     }
 
     QDateTime checktime = dtime.addDays(7);
-    ProgramInfo *nextweek = GetProgramAtDateTime(chanid, checktime);
+    ProgramInfo *nextweek = GetProgramAtDateTime(chanid.toUInt(), checktime);
 
     if (NULL == nextweek)
         return -1;

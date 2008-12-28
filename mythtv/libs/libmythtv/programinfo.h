@@ -173,7 +173,7 @@ class MPUBLIC ProgramInfo
     // Constructors and bulk set methods.
     ProgramInfo(void);
     ProgramInfo(const ProgramInfo &other);
-    static ProgramInfo *GetProgramAtDateTime(const QString &channel,
+    static ProgramInfo *GetProgramAtDateTime(const uint chanid,
                                              const QDateTime &dtime,
                                              bool genUnknown = false,
                                              int clampHoursMax = 0);
