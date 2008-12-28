@@ -391,4 +391,104 @@
 
     </window>
 
+    <window name="custompriority">
+
+        <textarea name="pagetitle" from="basetextarea">
+            <area>40,40,760,40</area>
+            <font>baselarge</font>
+            <value>Custom Priority Rules</value>
+        </textarea>
+
+        <textarea name="ruleslabel" from="basetextarea">
+            <area>280,102,250,30</area>
+            <font>basemedium</font>
+            <align>right</align>
+            <value>Existing Rules:</value>
+        </textarea>
+
+        <buttonlist name="rules" from="basewideselector">
+            <position>540,100</position>
+        </buttonlist>
+
+        <textarea name="titlelabel" from="ruleslabel">
+            <position>280,162</position>
+            <value>Rule Name:</value>
+        </textarea>
+
+        <textedit name="title" from="basetextedit">
+            <position>540,155</position>
+        </textedit>
+
+        <textarea name="prioritylabel" from="ruleslabel">
+            <position>280,222</position>
+            <value>Priority Change:</value>
+        </textarea>
+
+        <spinbox name="priority" from="basespinbox">
+            <position>540,220</position>
+        </spinbox>
+
+        <textarea name="clauseslabel" from="ruleslabel">
+            <area>340,300,600,40</area>
+            <value>Select a clause from the list.</value>
+            <align>allcenter</align>
+        </textarea>
+
+        <buttonlist name="clauses" from="basewideselector">
+            <position>360,350</position>
+        </buttonlist>
+
+        <button name="add" from="basebutton">
+            <position>770,350</position>
+            <value>Add Clause</value>
+        </button>
+
+        <textedit name="description">
+            <area>340,400,600,100</area>
+            <statetype name="background">
+                <state name="active">
+                    <imagetype name="background">
+                        <area>0,0,600,100</area>
+                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="180" />
+                    </imagetype>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="255" />
+                    </imagetype>
+                </state>
+                <state name="inactive" from="active" />
+            </statetype>
+            <imagetype name="cursor">
+                <filename>cursor.png</filename>
+            </imagetype>
+            <textarea name="text">
+                <area>12,13,575,75</area>
+                <font>basesmallblack</font>
+                <multiline>yes</multiline>
+            </textarea>
+        </textedit>
+
+        <button name="cancel" from="basebutton">
+            <position>100,630</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="delete" from="basebutton">
+            <position>388,630</position>
+            <value>Delete</value>
+        </button>
+
+        <button name="test" from="basebutton">
+            <position>714,630</position>
+            <value>Test</value>
+        </button>
+
+        <button name="install" from="basebutton">
+            <position>1027,630</position>
+            <value>Install</value>
+        </button>
+
+    </window>
+
 </mythuitheme>
