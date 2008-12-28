@@ -15,7 +15,7 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythmediamonitor.h>
 
-CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
+CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
                      AudioOutput *o) :
     Decoder(d, i, o),
     inited(false),   user_stop(false),
@@ -97,7 +97,7 @@ bool CdDecoder::initialize()
 
     filename = ((QFile *)input())->fileName();
     tracknum = filename.section('.', 0, 0).toUInt();
-   
+
     if (!output_buf)
         output_buf = new char[globalBufferSize];
     output_at = 0;
@@ -172,7 +172,7 @@ void CdDecoder::deinit()
 }
 
 static void paranoia_cb(long inpos, int function)
-{       
+{
     inpos = inpos; function = function;
 }
 
@@ -213,9 +213,9 @@ void CdDecoder::run()
         {
             cdbuffer = paranoia_read(paranoia, paranoia_cb);
 
-	    memcpy((char *)(output_buf + output_at), (char *)cdbuffer, 
+            memcpy((char *)(output_buf + output_at), (char *)cdbuffer,
                    CD_FRAMESIZE_RAW);
-	    output_at += CD_FRAMESIZE_RAW;
+            output_at += CD_FRAMESIZE_RAW;
             output_bytes += CD_FRAMESIZE_RAW;
 
             if (output())
@@ -233,7 +233,7 @@ void CdDecoder::run()
             if (! user_stop) {
                 finish = TRUE;
             }
-        } 
+        }
 
         unlock();
     }
@@ -338,7 +338,7 @@ Metadata *CdDecoder::getLastMetadata()
         if(return_me)
         {
             return return_me;
-        }            
+        }
     }
     return NULL;
 }
@@ -366,7 +366,7 @@ Metadata *CdDecoder::getMetadata()
         cd_finish(cd);
         return NULL;
     }
- 
+
     if (settracknum == -1)
         tracknum = filename.toUInt();
     else
@@ -416,8 +416,8 @@ Metadata *CdDecoder::getMetadata()
 
     album = M_QSTRING_UNICODE(discdata.data_title);
     genre = cddb_genre(discdata.data_genre);
- 
-    if (!genre.isEmpty()) 
+
+    if (!genre.isEmpty())
     {
         QString flet = genre.upper().left(1);
         QString rt = genre.right(genre.length()-1).lower();
@@ -435,7 +435,7 @@ Metadata *CdDecoder::getMetadata()
 
     if (title.length() < 1)
         title = QString(QObject::tr("Track %1")).arg(tracknum);
-    
+
     cddb_write_data(cd, &discdata);
 
     length = discinfo.disc_track[tracknum - 1].track_length.minutes * 60 +
@@ -450,7 +450,7 @@ Metadata *CdDecoder::getMetadata()
 
     cd_finish(cd);
     return retdata;
-}    
+}
 
 static void set_cstring(char *dest, const char *src, size_t dest_buf_size)
 {
@@ -499,7 +499,7 @@ void CdDecoder::commitMetadata(Metadata *mdata)
         VERBOSE(VB_IMPORTANT, QString("Error during CD lookup: %1").arg(ret));
         return;
     }
-  
+
     if (mdata->Compilation())
     {
         if (mdata->CompilationArtist() != discdata.data_artist)
@@ -539,7 +539,7 @@ void CdDecoder::commitMetadata(Metadata *mdata)
     {
         discdata.data_track[tracknum - 1].track_artist[0] = 0;
     }
-    
+
     cddb_write_data(cd, &discdata);
 
     cd_finish(cd);
@@ -563,7 +563,7 @@ const QString &CdDecoderFactory::description() const
     return desc;
 }
 
-Decoder *CdDecoderFactory::create(const QString &file, QIODevice *input, 
+Decoder *CdDecoderFactory::create(const QString &file, QIODevice *input,
                                   AudioOutput *output, bool deletable)
 {
     if (deletable)
