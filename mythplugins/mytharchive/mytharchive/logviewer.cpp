@@ -196,7 +196,12 @@ void LogViewer::updateClicked(void)
     }
 
     if (m_autoUpdate)
-        m_updateTimer->start(m_updateTime * 1000);
+    {
+        if (m_logList->GetCount() > 0)
+            m_updateTimer->start(m_updateTime * 1000);
+        else
+            m_updateTimer->start(500);
+    }
 }
 
 QString LogViewer::getSetting(const QString &key)
