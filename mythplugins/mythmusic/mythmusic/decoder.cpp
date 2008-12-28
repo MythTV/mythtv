@@ -20,8 +20,8 @@
 
 #include <mythtv/mythcontext.h>
 
-DecoderEvent* DecoderEvent::clone() 
-{ 
+DecoderEvent* DecoderEvent::clone()
+{
     DecoderEvent *result = new DecoderEvent(*this);
 
     if (error_msg)
@@ -57,7 +57,7 @@ void Decoder::setOutput(AudioOutput *o)
     unlock();
 }
 
-void Decoder::error(const QString &e) 
+void Decoder::error(const QString &e)
 {
     QString *str = new QString(e.toUtf8());
     DecoderEvent ev(str);
@@ -98,7 +98,7 @@ Metadata *Decoder::readMetadata(void)
 
 
 /** \fn Decoder::getMetadata(void)
- *  \brief Get the metadata  for \p filename 
+ *  \brief Get the metadata  for \p filename
  *
  *  First tries to read the metadata from the database. If there
  *  is no database entry, it'll call \p Decoder::readMetadata.
@@ -127,7 +127,7 @@ Metadata* Decoder::getMetadata(void)
  *  instance of the appropriate MetaIO subtype. It is used by \p
  *  Decoder::getMetadata, \p Decoder::readMetadata and \p
  *  Decoder::commitMetadata.
- *       
+ *
  *  The default implementation returns a NULL pointer, which
  *  essentially means, that if the decoder does not overrider this
  *  method or all of the users (see previous paragraph), files
@@ -182,15 +182,12 @@ void Decoder::SetLocationFormatUseTags(void)
 
 static Q3PtrList<DecoderFactory> *factories = 0;
 
-static void checkFactories() 
+static void checkFactories()
 {
-    if (!factories) 
+    if (!factories)
     {
         factories = new Q3PtrList<DecoderFactory>;
 
-        Decoder::registerFactory(new VorbisDecoderFactory);
-        Decoder::registerFactory(new MadDecoderFactory);
-        Decoder::registerFactory(new FlacDecoderFactory);
 #ifndef USING_MINGW
         Decoder::registerFactory(new CdDecoderFactory);
 #endif // USING_MINGW
@@ -207,7 +204,7 @@ QStringList Decoder::all()
 
     QStringList l;
     DecoderFactory *fact = factories->first();
-    while (fact) 
+    while (fact)
     {
         l << fact->description();
         fact = factories->next();
@@ -221,7 +218,7 @@ bool Decoder::supports(const QString &source)
     checkFactories();
 
     DecoderFactory *fact = factories->first();
-    while (fact) 
+    while (fact)
     {
         if (fact->supports(source))
             return TRUE;
@@ -245,9 +242,9 @@ Decoder *Decoder::create(const QString &source, QIODevice *input,
     Decoder *decoder = 0;
 
     DecoderFactory *fact = factories->first();
-    while (fact) 
+    while (fact)
     {
-        if (fact->supports(source)) 
+        if (fact->supports(source))
         {
             decoder = fact->create(source, input, output, deletable);
             break;

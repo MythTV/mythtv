@@ -23,8 +23,6 @@
 // MythMusic headers
 #include "decoder.h"
 #include "metadata.h"
-#include "maddecoder.h"
-#include "vorbisdecoder.h"
 #include "databasebox.h"
 #include "playbackbox.h"
 #include "playlist.h"

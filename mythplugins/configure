@@ -423,13 +423,6 @@ if test "$exif" != "no" ; then
 fi
 
 if test "$music" != "no" ; then
-    mad="no"
-    if has_library libmad && has_header mad.h ; then
-        mad="yes"
-    else
-        echo "MythMusic requires libmad."
-    fi
-
     vorbis="no"
     if has_header ogg/ogg.h && has_header vorbis/vorbisenc.h && has_header vorbis/vorbisfile.h && has_header vorbis/codec.h && has_library libogg && has_library libvorbisfile && has_library libvorbisenc && has_library libvorbis ; then
         vorbis="yes"
@@ -489,7 +482,7 @@ if test "$music" != "no" ; then
         fi
     fi
 
-    if test "$mad" = "no" -o "$vorbis" = "no" -o "$flac" = "no" -o "$mp3lame" = "no" -o "$taglib" = "no" -o "$cdlibs" = "no" ; then
+    if test "$vorbis" = "no" -o "$flac" = "no" -o "$mp3lame" = "no" -o "$taglib" = "no" -o "$cdlibs" = "no" ; then
         echo "Disabling MythMusic due to missing dependencies."
         music="no"
     fi

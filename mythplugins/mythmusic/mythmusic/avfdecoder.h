@@ -37,7 +37,7 @@ class avfDecoder : public Decoder
     unsigned int bks;
     bool done, finish;
     long len, freq, bitrate;
-    int chan;
+    int m_channels;
     unsigned long output_size;
     double totalTime, seekTime;
 
@@ -46,16 +46,16 @@ class avfDecoder : public Decoder
     long int start;
     long int end;
 
-    AVOutputFormat *fmt;	// Encoding format (PCM)
-    AVInputFormat *ifmt;	// Decoding format
-    AVFormatParameters params;
-    AVFormatParameters *ap;
-    AVFormatContext *oc, *ic;
-    AVStream *enc_st, *dec_st;
-    AVCodec *codec, *enc_codec;		// Codec
-    AVCodecContext *audio_enc, *audio_dec;
-    AVPacket pkt1;
-    AVPacket *pkt;
+    AVOutputFormat *m_outputFormat; // Encoding format (PCM)
+    AVInputFormat *m_inputFormat; // Decoding format
+    AVFormatParameters m_params;
+    AVFormatParameters *m_ap;
+    AVFormatContext *m_outputContext, *m_inputContext;
+    AVStream *m_decStream;
+    AVCodec *m_codec; // Codec
+    AVCodecContext *m_audioEnc, *m_audioDec;
+    AVPacket m_pkt1;
+    AVPacket *m_pkt;
 
     int errcode;
 

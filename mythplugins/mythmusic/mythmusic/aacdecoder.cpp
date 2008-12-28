@@ -3,9 +3,9 @@
 
 	(c) 2003, 2004 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
-	
+
 	aac decoder methods
-	
+
 */
 
 #include <faad.h>
@@ -50,12 +50,12 @@ extern "C" uint32_t read_callback(void *user_data, void *buffer, uint32_t length
     {
         return the_decoder_object->aacRead((char *)buffer, length);
     }
-    VERBOSE(VB_IMPORTANT, 
+    VERBOSE(VB_IMPORTANT,
             "read_callback called with no aacDecoder object assigned");
     return 0;
-    
+
 }
-    
+
 uint32_t seek_callback(void *user_data, uint64_t position)
 {
     aacDecoder *the_decoder_object = (aacDecoder*) user_data;
@@ -66,7 +66,7 @@ uint32_t seek_callback(void *user_data, uint64_t position)
     VERBOSE(VB_IMPORTANT,
             "seek_callback called with no aacDecoder object assigned");
     return 0;
-}        
+}
 
 
 
@@ -76,8 +76,8 @@ uint32_t seek_callback(void *user_data, uint64_t position)
 
 
 
-aacDecoder::aacDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
-                       AudioOutput *o) 
+aacDecoder::aacDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
+                       AudioOutput *o)
           : Decoder(d, i, o)
 {
     filename = file;
@@ -96,7 +96,7 @@ aacDecoder::aacDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     output_buf = 0;
     output_bytes = 0;
     output_at = 0;
-    
+
     mp4_file_flag = false;
     mp4_callback = NULL;
     timescale = 0;
@@ -124,14 +124,14 @@ void aacDecoder::flush(bool final)
 {
     ulong min = final ? 0 : bks;
 
-    while ((!done && !finish && seekTime <= 0) && output_bytes > min) 
+    while ((!done && !finish && seekTime <= 0) && output_bytes > min)
     {
-        if (user_stop || finish) 
+        if (user_stop || finish)
         {
             inited = FALSE;
             done = TRUE;
-        } 
-        else 
+        }
+        else
         {
             ulong sz = output_bytes < bks ? output_bytes : bks;
 
@@ -147,7 +147,7 @@ void aacDecoder::flush(bool final)
 		lock();
 		done = user_stop;
 	      }
-	    
+
         }
     }
 }
@@ -163,7 +163,7 @@ bool aacDecoder::initialize()
     framesize = 0;
     seekTime = -1.0;
     totalTime = 0.0;
-    
+
     mp4_file_flag = false;
 
     if (! input())
@@ -172,7 +172,7 @@ bool aacDecoder::initialize()
         return false;
     }
 
-   
+
     if (!output_buf) {
         output_buf = new char[globalBufferSize];
     }
@@ -198,32 +198,32 @@ bool aacDecoder::initialize()
       error("couldn't seek in input");
         return false;
     }
-    
+
 
     //
     //  figure out if it's an mp4 file (aac in a mp4 wrapper a la Apple) or
     //  just a pure aac file.
     //
-    
+
     mp4_file_flag = false;
     char header_buffer[8];
     input()->readBlock(header_buffer, 8);
-    
+
     //
     //  Seek back to the begining, otherwise the decoder gets totally confused.
     //
-    
+
     input()->at(0);
-    
+
     if (
-            header_buffer[4] == 'f' && 
-            header_buffer[5] == 't' && 
-            header_buffer[6] == 'y' && 
+            header_buffer[4] == 'f' &&
+            header_buffer[5] == 't' &&
+            header_buffer[6] == 'y' &&
             header_buffer[7] == 'p'
       )
     {
         //
-        //  It's an mp4/m4a (iTunes file) ... 
+        //  It's an mp4/m4a (iTunes file) ...
         //
         mp4_file_flag = true;
         return initializeMP4();
@@ -236,7 +236,7 @@ bool aacDecoder::initialize()
         inited = false;
         return false;
     }
-    
+
     input()->close();
     inited = false;
     return false;
@@ -253,26 +253,26 @@ bool aacDecoder::initializeMP4()
     mp4_callback->read = read_callback;
     mp4_callback->seek = seek_callback;
     mp4_callback->user_data = this;
-    
+
     //
     //  Open decoder library (?)
     //
-    
+
     decoder_handle = faacDecOpen();
 
     //
     //  Set configuration
     //
-    
+
     faacDecConfigurationPtr config = faacDecGetCurrentConfiguration(decoder_handle);
     config->outputFormat = FAAD_FMT_16BIT;
     config->downMatrix = 0; // if 1, we could downmix 5.1 to 2 ... apparently
     config->dontUpSampleImplicitSBR = 1;
     faacDecSetConfiguration(decoder_handle, config);
-                   
+
     //
-    //  Open the mp4 input file  
-    //                   
+    //  Open the mp4 input file
+    //
 
     mp4_input_file = mp4ff_open_read(mp4_callback);
     if (!mp4_input_file)
@@ -305,9 +305,9 @@ bool aacDecoder::initializeMP4()
     uint buffer_size;
 
     mp4ff_get_decoder_config(
-                                mp4_input_file, 
-                                aac_track_number, 
-                                &buffer, 
+                                mp4_input_file,
+                                aac_track_number,
+                                &buffer,
                                 &buffer_size
                             );
 // some linux distros (gentoo, debian) modify the faad2 api with stdint.h types
@@ -335,10 +335,10 @@ bool aacDecoder::initializeMP4()
 
     timescale = mp4ff_time_scale(mp4_input_file, aac_track_number);
     framesize = 1024;
-            
+
     //
     //  Fiddle with the default frame size if the data appears to need it
-    // 
+    //
 
     mp4AudioSpecificConfig mp4ASC;
     if (buffer)
@@ -354,16 +354,16 @@ bool aacDecoder::initializeMP4()
     //
     //  Extract some information about the content
     //
-    
+
     long samples = mp4ff_num_samples(mp4_input_file, aac_track_number);
     float f = 1024.0;
     float seconds;
-    
+
     if (mp4ASC.sbr_present_flag == 1)
     {
         f = f * 2.0;
     }
-    
+
     seconds = (float)samples*(float)(f-1.0)/(float)mp4ASC.samplingFrequency;
 
     totalTime = seconds;
@@ -374,7 +374,7 @@ bool aacDecoder::initializeMP4()
     {
 	bitrate = mp4ff_get_avg_bitrate(mp4_input_file, aac_track_number) / 1000;
     }
-    
+
     //
     //  Check we got same answers from mp4ASC
     //
@@ -437,7 +437,7 @@ int aacDecoder::getAACTrack(mp4ff_t *infile)
 
     //
     //  No AAC tracks
-    // 
+    //
     return -1;
 }
 
@@ -470,7 +470,7 @@ void aacDecoder::run()
 
     lock();
 
-    if (!inited) 
+    if (!inited)
     {
       error("aacDecoder: run() called without being init'd");
         unlock();
@@ -496,27 +496,27 @@ void aacDecoder::run()
     uchar *buffer;
     uint  buffer_size;
 
-    while (!done && !finish && !user_stop) 
+    while (!done && !finish && !user_stop)
     {
         lock();
 
         ++current_sample;
-        if (seekTime >= 0.0) 
+        if (seekTime >= 0.0)
         {
             //
             //  Crap ... seek ... well, this is approximately correct
-            //        
+            //
 
             current_sample = (long int) (((double)(seekTime / totalTime)) * total_numb_samples);
             seekTime = -1.0;
         }
-        
+
         if (current_sample >= total_numb_samples)
         {
             //
             //  We're done ... make sure we play all the remaining output
             //
-            
+
             flush(TRUE);
 
             if (output())
@@ -539,10 +539,10 @@ void aacDecoder::run()
             buffer_size = 0;
 
             int rc = mp4ff_read_sample(
-                                        mp4_input_file, 
-                                        aac_track_number, 
-                                        current_sample, 
-                                        &buffer,  
+                                        mp4_input_file,
+                                        aac_track_number,
+                                        current_sample,
+                                        &buffer,
                                         &buffer_size
                                       );
             if (rc == 0)
@@ -552,15 +552,15 @@ void aacDecoder::run()
             }
             else
             {
-            
+
                 faacDecFrameInfo frame_info;
                 void *sample_buffer = faacDecDecode(
-                                                    decoder_handle, 
-                                                    &frame_info, 
-                                                    buffer, 
+                                                    decoder_handle,
+                                                    &frame_info,
+                                                    buffer,
                                                     buffer_size
                                                    );
-            
+
                 sample_count = frame_info.samples;
 
                 //
@@ -568,7 +568,7 @@ void aacDecoder::run()
                 //  to the output (after checking we're not going to exceed
                 //  the output buffer size)
                 //
-                
+
                 if (((sample_count * 2) + output_at ) >= globalBufferSize)
                 {
                     error("aacDecoder: gloablBufferSize too small, "
@@ -576,7 +576,7 @@ void aacDecoder::run()
                           "sound like crap)");
                     sample_count = ((globalBufferSize - output_at) / 2) - 100;
                 }
-            
+
                 char *char_buffer = (char *)sample_buffer;
                 short *sample_buffer16 = (short*)char_buffer;
                 for(uint i = 0; i < sample_count; i++)
@@ -584,7 +584,7 @@ void aacDecoder::run()
                     output_buf[output_at + (i*2)]     = (char)(sample_buffer16[i] & 0xFF);
                     output_buf[output_at + (i*2) + 1] = (char)((sample_buffer16[i] >> 8) & 0xFF);
                 }
-            
+
                 if (sample_count > 0)
                 {
                     output_at += sample_count * 2;
@@ -595,20 +595,20 @@ void aacDecoder::run()
 			if (bitrate)
 			{
 			    output()->SetSourceBitrate(bitrate);
-			} 
-                        else 
+			}
+                        else
                         {
 			    output()->SetSourceBitrate(
 				(int) ((float) (frame_info.bytesconsumed * 8) /
-				       (frame_info.samples / 
-				        frame_info.num_front_channels) 
+				       (frame_info.samples /
+				        frame_info.num_front_channels)
 				* frame_info.samplerate) / 1000);
 			}
 
                         flush();
                     }
                 }
-            
+
                 if (buffer)
                 {
                     free(buffer);
@@ -656,7 +656,7 @@ uint32_t aacDecoder::aacRead(char *buffer, uint32_t length)
         {
             return 0;
         }
-        return read_result; 
+        return read_result;
     }
     error("aacDecoder: aacRead() was called, but there is no input");
     return 0;
@@ -691,7 +691,7 @@ bool aacDecoderFactory::supports(const QString &source) const
 
 const QString &aacDecoderFactory::extension() const
 {
-    static QString ext(".m4a");
+    static QString ext(".aac|.m4a");
     return ext;
 }
 
@@ -702,7 +702,7 @@ const QString &aacDecoderFactory::description() const
     return desc;
 }
 
-Decoder *aacDecoderFactory::create(const QString &file, QIODevice *input, 
+Decoder *aacDecoderFactory::create(const QString &file, QIODevice *input,
                                   AudioOutput *output, bool deletable)
 {
 
@@ -710,11 +710,11 @@ Decoder *aacDecoderFactory::create(const QString &file, QIODevice *input,
         return new aacDecoder(file, this, input, output);
 
     static aacDecoder *decoder = 0;
-    if (!decoder) 
+    if (!decoder)
     {
         decoder = new aacDecoder(file, this, input, output);
-    } 
-    else 
+    }
+    else
     {
         decoder->setInput(input);
         decoder->setOutput(output);

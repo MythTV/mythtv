@@ -6,7 +6,7 @@ include (config.pro)
 !exists( config.pro ) {
    error(Missing config.pro: please run the configure script)
 }
- 
+
 INCLUDEPATH *= /usr/include/cdda
 TEMPLATE = lib
 CONFIG += plugin thread
@@ -23,7 +23,7 @@ paranoia:LIBS += -lcdda_paranoia -lcdda_interface
 # Input
 HEADERS += cddecoder.h cdrip.h constants.h databasebox.h
 HEADERS += decoder.h flacdecoder.h flacencoder.h maddecoder.h mainvisual.h
-HEADERS += metadata.h playbackbox.h playlist.h polygon.h 
+HEADERS += metadata.h playbackbox.h playlist.h polygon.h
 HEADERS += streaminput.h synaesthesia.h encoder.h visualize.h avfdecoder.h
 HEADERS += treecheckitem.h vorbisdecoder.h vorbisencoder.h polygon.h
 HEADERS += bumpscope.h globalsettings.h lameencoder.h dbcheck.h
@@ -37,17 +37,17 @@ HEADERS += treebuilders.h importmusic.h directoryfinder.h
 HEADERS += filescanner.h libvisualplugin.h musicplayer.h miniplayer.h
 HEADERS += mythlistview-qt3.h mythlistbox-qt3.h
 
-SOURCES += cddecoder.cpp cdrip.cpp decoder.cpp 
-SOURCES += flacdecoder.cpp flacencoder.cpp maddecoder.cpp main.cpp
-SOURCES += mainvisual.cpp metadata.cpp playbackbox.cpp playlist.cpp 
+SOURCES += cddecoder.cpp cdrip.cpp decoder.cpp
+SOURCES += flacencoder.cpp main.cpp
+SOURCES += mainvisual.cpp metadata.cpp playbackbox.cpp playlist.cpp
 SOURCES += streaminput.cpp encoder.cpp dbcheck.cpp
-SOURCES += synaesthesia.cpp treecheckitem.cpp vorbisdecoder.cpp lameencoder.cpp
+SOURCES += synaesthesia.cpp treecheckitem.cpp lameencoder.cpp
 SOURCES += vorbisencoder.cpp visualize.cpp bumpscope.cpp globalsettings.cpp
 SOURCES += databasebox.cpp genres.cpp
-SOURCES += metaio.cpp metaiotaglib.cpp vcedit.c metaiooggvorbiscomment.cpp 
+SOURCES += metaio.cpp metaiotaglib.cpp vcedit.c metaiooggvorbiscomment.cpp
 SOURCES += metaioflacvorbiscomment.cpp metaioavfcomment.cpp
 SOURCES += goom/filters.c goom/goom_core.c goom/graphic.c goom/tentacle3d.c
-SOURCES += goom/ifs.c goom/ifs_display.c goom/lines.c goom/surf3d.c 
+SOURCES += goom/ifs.c goom/ifs_display.c goom/lines.c goom/surf3d.c
 SOURCES += goom/zoom_filter_mmx.c goom/zoom_filter_xmmx.c goom/mythgoom.cpp
 SOURCES += avfdecoder.cpp editmetadata.cpp smartplaylist.cpp search.cpp
 SOURCES += treebuilders.cpp importmusic.cpp directoryfinder.cpp
@@ -71,6 +71,6 @@ mingw {
 
 
 #The following line was inserted by qt3to4
-QT += xml  sql opengl qt3support 
+QT += xml  sql opengl qt3support
 
 include ( ../../libs-targetfix.pro )

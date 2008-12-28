@@ -2,36 +2,46 @@
     MythTV WMA Decoder
     Written by Kevin Kuphal
 
-    Special thanks to 
+    Special thanks to
        ffmpeg team for libavcodec and libavformat
        qemacs team for their av support which I used to understand the libraries
        getid3.sourceforget.net project for the ASF information used here
-        
-    This library decodes Windows Media (WMA/ASF) files into PCM data 
-    returned to the MythMusic output buffer.  
+
+    This library decodes Windows Media (WMA/ASF) files into PCM data
+    returned to the MythMusic output buffer.
 
     Revision History
         - Initial release
         - 1/9/2004 - Improved seek support
 */
 
+// C++ headers
 #include <iostream>
 #include <string>
-#include <qobject.h>
-#include <qiodevice.h>
-#include <qfile.h>
+
+// QT headers
+#include <QObject>
+#include <QIODevice>
+#include <QFile>
+
+// Myth headers
+#include <mythtv/mythcontext.h>
+#include <mythtv/audiooutput.h>
+#include <mythtv/mythverbose.h>
 
 using namespace std;
 
+// Mythmusic Headers
 #include "avfdecoder.h"
 #include "constants.h"
-#include <mythtv/audiooutput.h>
 #include "metadata.h"
 #include "metaioavfcomment.h"
+#include "metaiotaglib.h"
+#include "metaioflacvorbiscomment.h"
+#include "metaiooggvorbiscomment.h"
 
-#include <mythtv/mythcontext.h>
 
-avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
+avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
                        AudioOutput *o) :
     Decoder(d, i, o),
     inited(false),   user_stop(false),
@@ -40,17 +50,16 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     bks(0),          done(false),
     finish(false),   len(0),
     freq(0),         bitrate(0),
-    chan(0),         output_size(0),
+    m_channels(0),   output_size(0),
     totalTime(0.0),  seekTime(-1.0),
     devicename(""),  start(0),
-    end(0),          fmt(0),
-    ifmt(NULL),      ap(&params),
-    oc(NULL),        ic(NULL),
-    enc_st(NULL),    dec_st(NULL),
-    codec(NULL),     enc_codec(NULL),
-    audio_enc(NULL), audio_dec(NULL),
-    pkt(&pkt1),      errcode(0),
-    ptr(NULL),       dec_len(0),
+    end(0),          m_outputFormat(0),
+    m_inputFormat(NULL),    m_ap(&m_params),
+    m_outputContext(NULL),  m_inputContext(NULL),
+    m_decStream(NULL),      m_codec(NULL),
+    m_audioEnc(NULL),       m_audioDec(NULL),
+    m_pkt(&m_pkt1),         errcode(0),
+    ptr(NULL),              dec_len(0),
     data_size(0)
 {
     setFilename(file);
@@ -78,18 +87,18 @@ void avfDecoder::flush(bool final)
 {
     ulong min = final ? 0 : bks;
 
-    while ((!done && !finish && seekTime <= 0) && output_bytes > min) 
+    while ((!done && !finish && seekTime <= 0) && output_bytes > min)
     {
-        if (user_stop || finish) 
+        if (user_stop || finish)
         {
             inited = FALSE;
             done = TRUE;
-        } 
-        else 
+        }
+        else
         {
             ulong sz = output_bytes < bks ? output_bytes : bks;
 
-            int samples = (sz*8)/(chan*16);
+            int samples = (sz*8)/(m_channels*16);
             if (output()->AddSamples(output_buf, samples, -1))
             {
                 output_bytes -= sz;
@@ -111,12 +120,12 @@ bool avfDecoder::initialize()
 
     inited = user_stop = done = finish = FALSE;
     len = freq = bitrate = 0;
-    stat = chan = 0;
+    stat = m_channels = 0;
     seekTime = -1.0;
     totalTime = 0.0;
 
     filename = ((QFile *)input())->name();
-   
+
     if (!output_buf)
         output_buf = new char[globalBufferSize];
     output_at = 0;
@@ -128,69 +137,104 @@ bool avfDecoder::initialize()
 
     // open the media file
     // this should populate the input context
-    if (av_open_input_file(&ic, filename, ifmt, 0, ap) < 0)
-        return FALSE;    
+    int error;
+    error = av_open_input_file(&m_inputContext, filename, m_inputFormat, 0,
+                               m_ap);
+    if (error < 0)
+    {
+        VERBOSE(VB_GENERAL, QString("Could open file with the AV decoder. "
+                                    "Error: %1").arg(error));
+        deinit();
+        return FALSE;
+    }
 
     // determine the stream format
     // this also populates information needed for metadata
-    if (av_find_stream_info(ic) < 0) 
+    if (av_find_stream_info(m_inputContext) < 0)
+    {
+        VERBOSE(VB_GENERAL, "Could not determine the stream format.");
+        deinit();
         return FALSE;
+    }
 
     // Store the audio codec of the stream
-    audio_dec = ic->streams[0]->codec;
+    m_audioDec = m_inputContext->streams[0]->codec;
 
     // Store the input format of the context
-    ifmt = ic->iformat;
+    m_inputFormat = m_inputContext->iformat;
 
     // Determine the output format
     // Given we are outputing to a sound card, this will always
     // be a PCM format
+
 #ifdef WORDS_BIGENDIAN
-    fmt = guess_format("s16be", NULL, NULL);
+    m_outputFormat = guess_format("s16be", NULL, NULL);
 #else
-    fmt = guess_format("s16le", NULL, NULL);
+    m_outputFormat = guess_format("s16le", NULL, NULL);
 #endif
-    if (!fmt)
+
+    if (!m_outputFormat)
     {
         VERBOSE(VB_IMPORTANT, "avfDecoder.o - failed to get output format");
+        deinit();
         return FALSE;
     }
 
     // Populate the output context
     // Create the output stream and attach to output context
     // Set various parameters to match the input format
-    oc = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
-    oc->oformat = fmt;
+    m_outputContext = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
+    m_outputContext->oformat = m_outputFormat;
 
-    dec_st = av_new_stream(oc,0);
-    dec_st->codec->codec_type = CODEC_TYPE_AUDIO;
-    dec_st->codec->codec_id = oc->oformat->audio_codec;
-    dec_st->codec->sample_rate = audio_dec->sample_rate;
-    dec_st->codec->channels = audio_dec->channels;
-    dec_st->codec->bit_rate = audio_dec->bit_rate;
-    av_set_parameters(oc, NULL);
+    m_decStream = av_new_stream(m_outputContext,0);
+    m_decStream->codec->codec_type = CODEC_TYPE_AUDIO;
+    m_decStream->codec->codec_id = m_outputContext->oformat->audio_codec;
+    m_decStream->codec->sample_rate = m_audioDec->sample_rate;
+    m_decStream->codec->channels = m_audioDec->channels;
+    m_decStream->codec->bit_rate = m_audioDec->bit_rate;
+    av_set_parameters(m_outputContext, NULL);
 
     // Prepare the decoding codec
     // The format is different than the codec
     // While we could get fed a WAV file, it could contain a number
     // of different codecs
-    codec = avcodec_find_decoder(audio_dec->codec_id);
-    if (!codec)
+    m_codec = avcodec_find_decoder(m_audioDec->codec_id);
+    if (!m_codec)
+    {
+        VERBOSE(VB_GENERAL, QString("Could not find audio codec: %1")
+                                                    .arg(m_audioDec->codec_id));
+        deinit();
         return FALSE;
-    if (avcodec_open(audio_dec,codec) < 0)
+    }
+    if (avcodec_open(m_audioDec,m_codec) < 0)
+    {
+        VERBOSE(VB_GENERAL, QString("Could not open audio codec: %1")
+                                                    .arg(m_audioDec->codec_id));
+        deinit();
         return FALSE;
-    totalTime = (ic->duration / AV_TIME_BASE) * 1000;
+    }
+    if (AV_TIME_BASE > 0)
+        totalTime = (m_inputContext->duration / AV_TIME_BASE) * 1000;
 
-    freq = audio_dec->sample_rate;
-    chan = audio_dec->channels;
+    freq = m_audioDec->sample_rate;
+    m_channels = m_audioDec->channels;
+
+    if (m_channels <= 0)
+    {
+        VERBOSE(VB_IMPORTANT, QString("AVCodecContext tells us %1 channels are "
+                                      "available, this is bad, bailing.")
+                                      .arg(m_channels));
+        deinit();
+        return false;
+    }
 
     if (output())
     {
         const AudioSettings settings(
-            16 /*bits*/, audio_dec->channels, audio_dec->sample_rate,
+            16 /*bits*/, m_audioDec->channels, m_audioDec->sample_rate,
             false /* AC3/DTS pass through */);
         output()->Reconfigure(settings);
-        output()->SetSourceBitrate(audio_dec->bit_rate);
+        output()->SetSourceBitrate(m_audioDec->bit_rate);
     }
 
     inited = TRUE;
@@ -206,21 +250,28 @@ void avfDecoder::deinit()
 {
     inited = user_stop = done = finish = FALSE;
     len = freq = bitrate = 0;
-    stat = chan = 0;
+    stat = m_channels = 0;
     setInput(0);
     setOutput(0);
 
     // Cleanup here
-    if(ic)
+    if (m_inputContext)
     {
-        av_close_input_file(ic);
-        ic = NULL;
+        av_close_input_file(m_inputContext);
+        m_inputContext = NULL;
     }
-    if(oc)
+
+    if (m_outputContext)
     {
-        av_free(oc);
-        oc = NULL;
+        av_free(m_outputContext);
+        m_outputContext = NULL;
     }
+
+    m_decStream = NULL;
+    m_codec = NULL;
+    m_audioEnc = m_audioDec = NULL;
+    m_inputFormat = NULL;
+    m_outputFormat = NULL;
 }
 
 void avfDecoder::run()
@@ -230,7 +281,7 @@ void avfDecoder::run()
 
     lock();
 
-    if (!inited) 
+    if (!inited)
     {
         unlock();
         return;
@@ -245,17 +296,17 @@ void avfDecoder::run()
         dispatch(e);
     }
 
-    av_read_play(ic);
-    while (!done && !finish && !user_stop) 
+    av_read_play(m_inputContext);
+    while (!done && !finish && !user_stop)
     {
         lock();
 
         // Look to see if user has requested a seek
-        if (seekTime >= 0.0) 
+        if (seekTime >= 0.0)
         {
             VERBOSE(VB_GENERAL, QString("avfdecoder.o: seek time %1")
                 .arg(seekTime));
-            if (av_seek_frame(ic, -1, (int64_t)(seekTime * AV_TIME_BASE), 0)
+            if (av_seek_frame(m_inputContext, -1, (int64_t)(seekTime * AV_TIME_BASE), 0)
                               < 0)
             {
                 VERBOSE(VB_IMPORTANT, "Error seeking");
@@ -265,8 +316,8 @@ void avfDecoder::run()
         }
 
         // Read a packet from the input context
-        // if (av_read_packet(ic, pkt) < 0)
-        if (av_read_frame(ic, pkt) < 0)
+        // if (av_read_packet(m_inputContext, m_pkt) < 0)
+        if (av_read_frame(m_inputContext, m_pkt) < 0)
         {
             VERBOSE(VB_IMPORTANT, "Read frame failed");
             unlock();
@@ -275,11 +326,11 @@ void avfDecoder::run()
         }
 
         // Get the pointer to the data and its length
-        ptr = pkt->data;
-        len = pkt->size;
+        ptr = m_pkt->data;
+        len = m_pkt->size;
         unlock();
 
-        while (len > 0 && !done && !finish && !user_stop && seekTime <= 0.0)  
+        while (len > 0 && !done && !finish && !user_stop && seekTime <= 0.0)
         {
             lock();
             // Decode the stream to the output codec
@@ -287,9 +338,9 @@ void avfDecoder::run()
             // data_size is the size in bytes of the frame
             // ptr is the input buffer
             // len is the size of the input buffer
-            dec_len = avcodec_decode_audio(audio_dec, samples, &data_size, 
-                                           ptr, len);    
-            if (dec_len < 0) 
+            dec_len = avcodec_decode_audio(m_audioDec, samples, &data_size,
+                                           ptr, len);
+            if (dec_len < 0)
             {
                 unlock();
                 break;
@@ -298,8 +349,8 @@ void avfDecoder::run()
             s = (char *)samples;
             unlock();
 
-            while (data_size > 0 && !done && !finish && !user_stop && 
-                   seekTime <= 0.0) 
+            while (data_size > 0 && !done && !finish && !user_stop &&
+                   seekTime <= 0.0)
              {
                 lock();
                 // Store and check the size
@@ -337,11 +388,12 @@ void avfDecoder::run()
             len -= dec_len;
             unlock();
         }
-        av_free_packet(pkt);
+        av_free_packet(m_pkt);
     }
 
     flush(TRUE);
-    if (output())
+
+    if (output() && !user_stop)
         output()->Drain();
 
     if (finish)
@@ -361,8 +413,17 @@ void avfDecoder::run()
 
 MetaIO* avfDecoder::doCreateTagger(void)
 {
-    return new MetaIOAVFComment();
-}    
+    QString extension = filename.section('.', -1);
+
+    if (extension == "mp3")
+        return new MetaIOTagLib();
+    else if (extension == "ogg")
+        return new MetaIOOggVorbisComment();
+    else if (extension == "flac")
+        return new MetaIOFLACVorbisComment();
+    else
+        return new MetaIOAVFComment();
+}
 
 bool avfDecoderFactory::supports(const QString &source) const
 {
@@ -378,28 +439,29 @@ bool avfDecoderFactory::supports(const QString &source) const
 
 const QString &avfDecoderFactory::extension() const
 {
-    static QString ext(".wma|.wav");
+    static QString ext(".mp3|.mp2|.ogg|.flac|.wma|.wav|.ac3|.oma|.omg|.atp|"
+                       ".ra|.dts");
     return ext;
 }
 
 const QString &avfDecoderFactory::description() const
 {
-    static QString desc(QObject::tr("Windows Media Audio"));
+    static QString desc(QObject::tr("Internal Decoder"));
     return desc;
 }
 
-Decoder *avfDecoderFactory::create(const QString &file, QIODevice *input, 
+Decoder *avfDecoderFactory::create(const QString &file, QIODevice *input,
                                   AudioOutput *output, bool deletable)
 {
     if (deletable)
         return new avfDecoder(file, this, input, output);
 
     static avfDecoder *decoder = 0;
-    if (!decoder) 
+    if (!decoder)
     {
         decoder = new avfDecoder(file, this, input, output);
-    } 
-    else 
+    }
+    else
     {
         decoder->setInput(input);
         decoder->setOutput(output);

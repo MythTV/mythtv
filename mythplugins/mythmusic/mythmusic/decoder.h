@@ -89,7 +89,7 @@ class Decoder : public QThread, public MythObservable
     static QStringList all();
     static bool supports(const QString &);
     static void registerFactory(DecoderFactory *);
-    static Decoder *create(const QString &, QIODevice *, AudioOutput *, 
+    static Decoder *create(const QString &, QIODevice *, AudioOutput *,
                            bool = FALSE);
     static void SetLocationFormatUseTags(void);
 
@@ -126,34 +126,7 @@ public:
     virtual ~DecoderFactory() {}
 };
 
-class VorbisDecoderFactory : public DecoderFactory
-{
-public:
-    bool supports(const QString &) const;
-    const QString &extension() const;
-    const QString &description() const;
-    Decoder *create(const QString &, QIODevice *, AudioOutput *, bool);
-};
-
-class MadDecoderFactory : public DecoderFactory
-{
-public:
-    bool supports(const QString &) const;
-    const QString &extension() const;
-    const QString &description() const;
-    Decoder *create(const QString &, QIODevice *, AudioOutput *, bool);
-};
-
 class CdDecoderFactory : public DecoderFactory
-{
-public:
-    bool supports(const QString &) const;
-    const QString &extension() const;
-    const QString &description() const;
-    Decoder *create(const QString &, QIODevice *, AudioOutput *, bool);
-};
-
-class FlacDecoderFactory : public DecoderFactory
 {
 public:
     bool supports(const QString &) const;
