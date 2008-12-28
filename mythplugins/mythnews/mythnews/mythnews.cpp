@@ -107,6 +107,7 @@ bool MythNews::Create(void)
     m_articlesList = dynamic_cast<MythUIButtonList *>
                      (GetChild("articleslist"));
 
+    m_nositesText = dynamic_cast<MythUIText *> (GetChild("nosites"));
     m_updatedText = dynamic_cast<MythUIText *> (GetChild("updated"));
     m_titleText = dynamic_cast<MythUIText *> (GetChild("title"));
     m_descText = dynamic_cast<MythUIText *> (GetChild("description"));
@@ -122,6 +123,12 @@ bool MythNews::Create(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Theme is missing critical theme elements.");
         return false;
+    }
+
+    if (m_nositesText)
+    {
+        m_nositesText->SetText(tr("You haven't configured MythNews to use any sites."));
+        m_nositesText->Hide();
     }
 
     if (!BuildFocusList())
@@ -147,12 +154,30 @@ bool MythNews::Create(void)
     return true;
 }
 
+void MythNews::clearSites(void)
+{
+    m_NewsSites.clear();
+    m_sitesList->Reset();
+    m_articles.clear();
+    m_articlesList->Reset();
+
+    m_titleText->SetText("");
+    m_descText->SetText("");
+    if (m_updatedText)
+        m_updatedText->SetText("");
+
+    m_downloadImage->Hide();
+    m_enclosureImage->Hide();
+    m_podcastImage->Hide();
+    if (m_thumbnailImage)
+        m_thumbnailImage->Hide();
+}
+
 void MythNews::loadSites(void)
 {
     QMutexLocker locker(&m_lock);
 
-    m_NewsSites.clear();
-    m_sitesList->Reset();
+    clearSites();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -188,6 +213,11 @@ void MythNews::loadSites(void)
     }
 
     slotRetrieveNews();
+
+    if (m_NewsSites.size() == 0)
+        m_nositesText->Show();
+    else
+        m_nositesText->Hide();
 }
 
 void MythNews::updateInfoView(MythUIButtonListItem *selected)
@@ -819,8 +849,10 @@ void MythNews::ShowEditDialog(bool edit)
     {
         MythUIButtonListItem *siteListItem = m_sitesList->GetItemCurrent();
 
-        if (siteListItem && !siteListItem->GetData().isNull())
-            site = qVariantValue<NewsSite*>(siteListItem->GetData());
+        if (!siteListItem || siteListItem->GetData().isNull())
+            return;
+
+        site = qVariantValue<NewsSite*>(siteListItem->GetData());
     }
 
 
@@ -851,9 +883,11 @@ void MythNews::ShowMenu(void)
 
     m_menuPopup->SetReturnEvent(this, "options");
 
-    m_menuPopup->AddButton(tr("Edit News Site"));
+    if (m_NewsSites.size() > 0)
+        m_menuPopup->AddButton(tr("Edit News Site"));
     m_menuPopup->AddButton(tr("Add News Site"));
-    m_menuPopup->AddButton(tr("Delete News Site"));
+    if (m_NewsSites.size() > 0)
+        m_menuPopup->AddButton(tr("Delete News Site"));
     m_menuPopup->AddButton(tr("Cancel"));
 }
 
@@ -914,18 +948,18 @@ void MythNews::customEvent(QEvent *event)
 
         if (resultid == "options")
         {
-            if (buttonnum == 0)
+            if (m_NewsSites.size() > 0)
             {
-                ShowEditDialog(true);
+                if (buttonnum == 0)
+                    ShowEditDialog(true);
+                else if (buttonnum == 1)
+                    ShowEditDialog(false);
+                else if (buttonnum == 2)
+                    deleteNewsSite();
             }
-            else if (buttonnum == 1)
-            {
-                ShowEditDialog(false);
-            }
-            else if (buttonnum == 2)
-            {
-                deleteNewsSite();
-            }
+            else
+                if (buttonnum == 0)
+                    ShowEditDialog(false);
         }
 
         m_menuPopup = NULL;

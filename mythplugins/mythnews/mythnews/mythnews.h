@@ -35,7 +35,7 @@ class MythNews : public MythScreenType
     ~MythNews();
 
     void updateInfoView(void);
-
+    void clearSites(void);
     void cancelRetrieve(void);
     void processAndShowNews(NewsSite *site);
 
@@ -71,6 +71,7 @@ class MythNews : public MythScreenType
     MythUIButtonList *m_articlesList;
     QMap<MythUIButtonListItem*,NewsArticle> m_articles;
 
+    MythUIText *m_nositesText;
     MythUIText *m_updatedText;
     MythUIText *m_titleText;
     MythUIText *m_descText;

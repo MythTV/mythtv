@@ -13,6 +13,12 @@
             <showarrow>no</showarrow>
         </buttonlist>
 
+        <textarea name="nosites" from="basetextarea">
+            <area>100,100,600,150</area>
+            <align>allcenter</align>
+            <multiline>yes</multiline>
+        </textarea>
+
         <textarea name="title" from="basetextarea">
             <area>20,350,670,35</area>
             <font>baselarge</font>
