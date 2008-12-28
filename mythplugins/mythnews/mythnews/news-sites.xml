@@ -1110,9 +1110,16 @@
 
     <item>
         <title>Helsingin Sanomat (FI)</title>
-        <url>http://siirto.helsinginsanomat.fi/aukio/HS-Tuoreet-RSS.xml</url>
+        <url>http://www.hs.fi/uutiset/rss/</url>
+        <ico>http://www.hs.fi/static/hs/img/favicon.ico</ico>
     </item>
 
+    <item>
+        <title>YLE (FI)</title>
+        <url>http://www.yle.fi/uutiset/rss/paauutiset.xml</url>
+        <ico>http://www.yle.fi/favicon.ico</ico>
+    </item>
+    
     <item>
         <title>Scotsman.com Headlines</title>
         <url>http://news.scotsman.com/getFeed.aspx?Format=rss&amp;sectionid=4068</url>
