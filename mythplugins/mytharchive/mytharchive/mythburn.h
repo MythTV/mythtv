@@ -79,6 +79,7 @@ class MythBurn : public MythScreenType
     void removeItem(void);
     void selectorClosed(bool ok);
     void editorClosed(bool ok, ArchiveItem *item);
+    void itemClicked(MythUIButtonListItem *item);
 
   private:
     void updateArchiveList(void);
@@ -105,6 +106,8 @@ class MythBurn : public MythScreenType
     bool              m_bEraseDvdRw;
     QString           m_saveFilename;
     QString           m_theme;
+
+    bool              m_moveMode;
 
     MythUIButton     *m_nextButton;
     MythUIButton     *m_prevButton;

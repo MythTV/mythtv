@@ -55,6 +55,8 @@ MythBurn::MythBurn(MythScreenStack *parent,
     m_bDoBurn = false;
     m_bEraseDvdRw = false;
     m_saveFilename = "";
+
+    m_moveMode = false;
 }
 
 MythBurn::~MythBurn(void)
@@ -125,6 +127,9 @@ bool MythBurn::Create(void)
     m_addfileButton->SetText(tr("Add File"));
     connect(m_addfileButton, SIGNAL(Clicked()), this, SLOT(handleAddFile()));
 
+    connect(m_archiveButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
+            this, SLOT(itemClicked(MythUIButtonListItem *)));
+
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
 
@@ -135,7 +140,7 @@ bool MythBurn::Create(void)
 
 bool MythBurn::keyPressEvent(QKeyEvent *event)
 {
-    if (GetFocusWidget()->keyPressEvent(event))
+    if (!m_moveMode && GetFocusWidget()->keyPressEvent(event))
         return true;
 
     bool handled = false;
@@ -146,6 +151,30 @@ bool MythBurn::keyPressEvent(QKeyEvent *event)
     {
         QString action = actions[i];
         handled = true;
+
+        // if we are currently moving an item we only accept UP/DOWN/SELECT/ESCAPE
+        if (m_moveMode)
+        {
+            MythUIButtonListItem *item = m_archiveButtonList->GetItemCurrent();
+            if (!item)
+                return false;
+
+            if (action == "SELECT" || action == "ESCAPE")
+            {
+                m_moveMode = false;
+                item->DisplayState("off", "movestate");
+            }
+            else if (action == "UP")
+            {
+                item->MoveUpDown(true);
+            }
+            else if (action == "DOWN")
+            {
+                item->MoveUpDown(false);
+            }
+
+            return true;
+        }
 
         if (action == "MENU")
         {
@@ -561,9 +590,16 @@ void MythBurn::createConfigFile(const QString &filename)
 
     // now loop though selected archive items and add them to the xml file
     ArchiveItem *a;
-    for (int x = 0; x < m_archiveList.size(); x++)
+    MythUIButtonListItem *item;
+    for (int x = 0; x < m_archiveButtonList->GetCount(); x++)
     {
-        a = m_archiveList.at(x);
+        item = m_archiveButtonList->GetItemAt(x);
+        if (!item)
+            continue;
+
+        a = qVariantValue<ArchiveItem *>(item->GetData());
+        if (!a)
+            continue;
 
         QDomElement file = doc.createElement("file");
         file.setAttribute("type", a->type.toLower() );
@@ -695,9 +731,16 @@ void MythBurn::saveConfiguration(void)
 
     // save new list of archive items to DB
     ArchiveItem *a;
-    for (int x = 0; x < m_archiveList.size(); x++)
+    MythUIButtonListItem *item;
+    for (int x = 0; x < m_archiveButtonList->GetCount(); x++)
     {
-        a = m_archiveList.at(x);
+        item = m_archiveButtonList->GetItemAt(x);
+        if (!item)
+            continue;
+
+        a = qVariantValue<ArchiveItem *>(item->GetData());
+        if (!a)
+            continue;
 
         query.prepare("INSERT INTO archiveitems (type, title, subtitle, "
                 "description, startdate, starttime, size, filename, hascutlist, "
@@ -970,6 +1013,16 @@ void MythBurn::handleAddFile()
         mainStack->AddScreen(selector);
 }
 
+void MythBurn::itemClicked(MythUIButtonListItem *item)
+{
+    m_moveMode = !m_moveMode;
+
+    if (m_moveMode)
+        item->DisplayState("on", "movestate");
+    else
+        item->DisplayState("off", "movestate");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 ProfileDialog::ProfileDialog(MythScreenStack *parent, ArchiveItem *archiveItem,
@@ -1052,7 +1105,6 @@ void ProfileDialog::save(void)
 
     Close();
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 

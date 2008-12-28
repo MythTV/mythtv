@@ -258,6 +258,15 @@ MythArchive GUI theme
                             </imagetype>
                         </state>
                     </statetype>
+                    <statetype name="movestate">
+                        <position>600,77</position>
+                        <state name="off"></state>
+                        <state name="on">
+                            <imagetype name="statusimage">
+                                <filename>ma_updown.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
                 </state>
                 <state name="selected" from="active">
                     <imagetype name="buttonbackground">
