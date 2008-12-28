@@ -179,6 +179,116 @@
         </textarea>
     </window>
 
+    <window name="channelrecpriority">
+
+        <textarea name="pagetitle">
+            <area>20,5,570,40</area>
+            <font>baselarge</font>
+            <value>Channel Recording Priorities</value>
+        </textarea>
+
+        <imagetype name="background">
+            <filename>rk-background.png</filename>
+            <area>0,40,1280,420</area>
+        </imagetype>
+
+        <imagetype name="showinglines">
+            <filename>rk-lines.png</filename>
+            <position>0,40</position>
+        </imagetype>
+
+        <buttonlist name="channels" from="basebuttonlist2">
+            <area>25,52,1200,380</area>
+            <buttonarea>0,0,1200,380</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <imagetype name="icon">
+                        <area>0,0,25,25</area>
+                        <preserveaspect>true</preserveaspect>
+                    </imagetype>
+                    <statetype name="status">
+                        <position>30,0</position>
+                    </statetype>
+                    <textarea name="channum" from="buttontext">
+                        <area>60,1,150,24</area>
+                    </textarea>
+                    <textarea name="callsign" from="channum">
+                        <area>220,1,250,24</area>
+                    </textarea>
+                    <textarea name="name" from="channum">
+                        <area>570,1,500,24</area>
+                    </textarea>
+                    <textarea name="priority" from="channum">
+                        <area>1140,1,30,24</area>
+                        <align>right</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active" />
+                <state name="inactive" from="active" />
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>1190,5</position>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>1190,350</position>
+            </statetype>
+        </buttonlist>
+
+        <imagetype name="icon">
+            <area>330,475,200,150</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
+
+        <textarea name="channame" from="basetextarea">
+            <area>540,472,740,40</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="sourcelabel" from="basetextarea">
+            <area>540,515,100,30</area>
+            <value>Source:</value>
+        </textarea>
+
+        <textarea name="sourcename" from="basetextarea">
+            <area>660,515,400,30</area>
+        </textarea>
+
+        <textarea name="callsignlabel" from="basetextarea">
+            <area>540,550,100,30</area>
+            <value>Callsign:</value>
+        </textarea>
+
+        <textarea name="callsign" from="basetextarea">
+            <area>660,550,400,30</area>
+        </textarea>
+
+        <textarea name="recprioritylabel" from="basetextarea">
+            <area>540,585,100,30</area>
+            <value>Priority:</value>
+        </textarea>
+
+        <textarea name="priority" from="basetextarea">
+            <area>660,585,400,30</area>
+        </textarea>
+
+        <textarea name="norecordings_info">
+            <area>0,210,1280,70</area>
+            <font>basemedium</font>
+            <value>You Haven't Scheduled Any Programs To Be Recorded\n
+                To schedule a recording, exit this screen and
+                Select 'Program Guide' or 'Program Finder'</value>
+            <multiline>yes</multiline>
+            <align>allcenter</align>
+        </textarea>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>0,670,1280,30</area>
+            <value>(1) Channel (2) Priority</value>
+            <align>center</align>
+        </textarea>
+
+    </window>
+
     <window name="programrecpriority">
 
         <textarea name="pagetitle" from="basetextarea">
