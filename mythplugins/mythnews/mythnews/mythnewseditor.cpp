@@ -56,35 +56,29 @@ bool MythNewsEditor::Create(void)
     if (!foundtheme)
         return false;
 
-    m_titleText = dynamic_cast<MythUIText *> (GetChild("title"));
+    bool err = false;
+    UIUtilW::Assign(this, m_titleText, "title", &err);
+    UIUtilW::Assign(this, m_nameLabelText, "namelabel", &err);
+    UIUtilW::Assign(this, m_urlLabelText, "urllabel", &err);
+    UIUtilW::Assign(this, m_iconLabelText, "iconlabel", &err);
+    UIUtilW::Assign(this, m_podcastLabelText, "podcastlabel", &err);
+    UIUtilE::Assign(this, m_nameEdit, "name", &err);
+    UIUtilE::Assign(this, m_urlEdit, "url", &err);
+    UIUtilE::Assign(this, m_iconEdit, "icon", &err);
+    UIUtilE::Assign(this, m_podcastCheck, "podcast_check", &err);
+    UIUtilE::Assign(this, m_okButton, "ok", &err);
+    UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
+
+    if (err)
+    {
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'editor'");
+        return false;
+    }
 
     if (m_titleText)
     {
         m_titleText->SetText(
             (m_editing) ? tr("Edit Site Details") : tr("Enter Site Details"));
-    }
-
-    m_nameLabelText = dynamic_cast<MythUIText *> (GetChild("namelabel"));
-    m_urlLabelText = dynamic_cast<MythUIText *> (GetChild("urllabel"));
-    m_iconLabelText = dynamic_cast<MythUIText *> (GetChild("iconlabel"));
-    m_podcastLabelText = dynamic_cast<MythUIText *> (GetChild("podcastlabel"));
-
-    m_nameEdit = dynamic_cast<MythUITextEdit *> (GetChild("name"));
-    m_urlEdit = dynamic_cast<MythUITextEdit *> (GetChild("url"));
-    m_iconEdit = dynamic_cast<MythUITextEdit *> (GetChild("icon"));
-
-    m_podcastCheck = dynamic_cast<MythUICheckBox *> (GetChild("podcast_check"));
-
-    m_okButton = dynamic_cast<MythUIButton *> (GetChild("ok"));
-    m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
-
-    if (!m_nameEdit || !m_urlEdit || !m_iconEdit || !m_okButton ||
-        !m_cancelButton || !m_podcastCheck)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Theme is missing critical theme elements.");
-
-        return false;
     }
 
     if (m_nameLabelText)

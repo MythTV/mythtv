@@ -126,20 +126,14 @@ bool MythNewsConfig::Create(void)
     if (!foundtheme)
         return false;
 
-    m_categoriesList = dynamic_cast<MythUIButtonList *>
-                (GetChild("category"));
+    bool err = false; 
+    UIUtilE::Assign(this, m_categoriesList, "category", &err);
+    UIUtilE::Assign(this, m_siteList, "sites", &err);
+    UIUtilW::Assign(this, m_helpText, "help", &err);
 
-    m_siteList = dynamic_cast<MythUIButtonList *>
-                (GetChild("sites"));
-
-    m_helpText = dynamic_cast<MythUIText *>
-                (GetChild("help"));
-
-    if (!m_categoriesList || !m_siteList)
+    if (err)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Theme is missing critical theme elements.");
-
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'config'");
         return false;
     }
 

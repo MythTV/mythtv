@@ -103,25 +103,23 @@ bool MythNews::Create(void)
     if (!foundtheme)
         return false;
 
-    m_sitesList = dynamic_cast<MythUIButtonList *> (GetChild("siteslist"));
-    m_articlesList = dynamic_cast<MythUIButtonList *>
-                     (GetChild("articleslist"));
+    bool err = false;
+    UIUtilE::Assign(this, m_sitesList, "siteslist", &err);
+    UIUtilE::Assign(this, m_articlesList, "articleslist", &err);
 
-    m_nositesText = dynamic_cast<MythUIText *> (GetChild("nosites"));
-    m_updatedText = dynamic_cast<MythUIText *> (GetChild("updated"));
-    m_titleText = dynamic_cast<MythUIText *> (GetChild("title"));
-    m_descText = dynamic_cast<MythUIText *> (GetChild("description"));
+    UIUtilW::Assign(this, m_nositesText, "nosites", &err);
+    UIUtilE::Assign(this, m_updatedText, "updated", &err);
+    UIUtilE::Assign(this, m_titleText, "title", &err);
+    UIUtilE::Assign(this, m_descText, "description", &err);
 
-    m_thumbnailImage = dynamic_cast<MythUIImage *> (GetChild("thumbnail"));
-    m_enclosureImage = dynamic_cast<MythUIImage *> (GetChild("enclosures"));
-    m_downloadImage = dynamic_cast<MythUIImage *> (GetChild("download"));
-    m_podcastImage = dynamic_cast<MythUIImage *> (GetChild("ispodcast"));
+    UIUtilE::Assign(this, m_thumbnailImage, "thumbnail", &err);
+    UIUtilE::Assign(this, m_enclosureImage, "enclosures", &err);
+    UIUtilE::Assign(this, m_downloadImage, "download", &err);
+    UIUtilE::Assign(this, m_podcastImage, "ispodcast", &err);
 
-    if (!m_sitesList || !m_articlesList || !m_enclosureImage ||
-        !m_downloadImage || !m_podcastImage || !m_titleText || !m_descText)
+    if (err)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Theme is missing critical theme elements.");
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'news'");
         return false;
     }
 
