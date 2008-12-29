@@ -215,7 +215,8 @@ bool VideoOutputQuartzView::Begin(void)
     if (!thePort)
     {
         VERBOSE(VB_IMPORTANT,
-                "VOQV::Begin(" + name + ") - No graphics port available");
+                QString("VOQV::Begin(%1) - No graphics port available")
+                .arg(name));
         viewLock.unlock();
         return false;
     }
@@ -251,7 +252,8 @@ bool VideoOutputQuartzView::Begin(void)
                                  bestSpeedCodec))
     {
         VERBOSE(VB_IMPORTANT,
-                "VOQV::Begin(" + name + ") - DecompressSequenceBeginS failed");
+                QString("VOQV::Begin(%1) - DecompressSequenceBeginS failed")
+                .arg(name));
         viewLock.unlock();
         return false;
     }
@@ -449,8 +451,9 @@ void VideoOutputQuartzView::Show(void)
                                       NULL,
                                       NULL))
       {
-          VERBOSE(VB_IMPORTANT, "VOQV::Show(" + name +
-                  ") - DecompressSequenceFrameWhen failed");
+          VERBOSE(VB_IMPORTANT,
+                  QString("VOQV::Show(%1)- DecompressSequenceFrameWhen failed")
+                  .arg(name));
       }
     }
     viewLock.unlock();
@@ -1554,7 +1557,7 @@ void VideoOutputQuartz::DeleteQuartzBuffers()
 void VideoOutputQuartz::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
     VERBOSE(VB_PLAYBACK,
-            (LOC + "EmbedInWidget("wid=%1, x=%2, y=%3, w=%4, h=%5)")
+            (LOC + "EmbedInWidget(wid=%1, x=%2, y=%3, w=%4, h=%5)")
             .arg(wid).arg(x).arg(y).arg(w).arg(h));
 
     if (windows[0].IsEmbedding())
