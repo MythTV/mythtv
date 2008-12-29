@@ -167,7 +167,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(const QString &inUseID)
       no_audio_in(false),           no_audio_out(false),
       transcoding(false),
       hasFullPositionMap(false),    limitKeyRepeat(false),
-      errored(false), errmsg(""),
+      errorMsg(QString::null),
       // Bookmark stuff
       bookmarkseek(0),              previewFromBookmark(false),
       // Seek
@@ -293,8 +293,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(const QString &inUseID)
     text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].buffer = new unsigned char[text_size + 1];
-
-    errmsg = "Error was encountered while displaying video";
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -695,7 +693,7 @@ bool NuppelVideoPlayer::InitVideo(void)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Unable to create null video out");
-            errored = true;
+            SetErrored(QObject::tr("Unable to create null video out"));
             return false;
         }
     }
@@ -721,7 +719,7 @@ bool NuppelVideoPlayer::InitVideo(void)
         {
             VERBOSE(VB_IMPORTANT, "Couldn't find 'tv playback' widget. "
                     "Current widget doesn't exist. Exiting..");
-            errored = true;
+            SetErrored(QObject::tr("'tv playback' widget missing."));
             return false;
         }
 
@@ -748,8 +746,7 @@ bool NuppelVideoPlayer::InitVideo(void)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Couldn't create VideoOutput instance. Exiting..");
-            errmsg = QObject::tr("Failed to initialize video output");
-            errored = true;
+            SetErrored(QObject::tr("Failed to initialize video output"));
             return false;
         }
 
@@ -825,8 +822,7 @@ void NuppelVideoPlayer::ReinitVideo(void)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Failed to Reinitialize Video. Exiting..");
-        errmsg = QObject::tr("Failed to reinitialize video output");
-        errored = true;
+        SetErrored(QObject::tr("Failed to reinitialize video output"));
     }
     else
     {
@@ -2399,7 +2395,7 @@ void NuppelVideoPlayer::AVSync(void)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "AVSync: "
                 "Unknown error in videoOutput, aborting playback.");
-        errored = true;
+        SetErrored(QObject::tr("Failed to initialize A/V Sync"));
         return;
     }
 
@@ -2457,7 +2453,7 @@ void NuppelVideoPlayer::AVSync(void)
         {
             VERBOSE(VB_IMPORTANT, "NVP: Error condition detected "
                     "in videoOutput after Show(), aborting playback.");
-            errored = true;
+            SetErrored(QObject::tr("Serious error detected in Video Output"));
             return;
         }
 
@@ -2629,7 +2625,7 @@ void NuppelVideoPlayer::DisplayPauseFrame(void)
 
     if (videoOutput->IsErrored())
     {
-        errored = true;
+        SetErrored(QObject::tr("Serious error detected in Video Output"));
         return;
     }
 
@@ -2688,9 +2684,9 @@ bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
                         "Timed out waiting for prebuffering too long. "
                         "Exiting..");
-                errmsg = QObject::tr(
-                    "Video frame buffering failed too many times, giving up");
-                errored = true;
+                SetErrored(QObject::tr(
+                               "Video frame buffering failed "
+                               "too many times."));
             }
             else if (!videoOutput->EnoughFreeFrames())
             {
@@ -3172,7 +3168,8 @@ void NuppelVideoPlayer::ResetPlaying(void)
         framesPlayed = 0;
 
     GetDecoder()->Reset();
-    errored |= GetDecoder()->IsErrored();
+    if (GetDecoder()->IsErrored())
+        SetErrored("Unable to reset video decoder");
 }
 
 void NuppelVideoPlayer::CheckTVChain(void)
@@ -3218,7 +3215,7 @@ void NuppelVideoPlayer::SwitchToProgram(void)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "SwitchToProgram's OpenFile failed.");
         eof = true;
-        errored = true;
+        SetErrored(QObject::tr("Error opening switch program buffer"));
         delete pginfo;
         return;
     }
@@ -3237,7 +3234,10 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 
         player_ctx->buffer->Reset(true);
         if (newtype)
-            errored = (OpenFile() >= 0) ? errored : true;
+        {
+            if (OpenFile() < 0)
+                SetErrored(QObject::tr("Error opening switch program file"));
+        }
         else
             ResetPlaying();
     }
@@ -3336,24 +3336,28 @@ void NuppelVideoPlayer::JumpToProgram(void)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "JumpToProgram's OpenFile failed.");
         eof = true;
-        errored = true;
+        SetErrored(QObject::tr("Error opening jump program file buffer"));
         delete pginfo;
         return;
     }
 
     bool wasDummy = isDummy;
     if (newtype || wasDummy)
-        errored = (OpenFile() >= 0) ? errored : true;
+    {
+        if (OpenFile() < 0)
+            SetErrored(QObject::tr("Error opening jump program file"));
+    }
     else
         ResetPlaying();
 
     if (wasDummy)
         DoPlay();
 
-    if (errored || !GetDecoder())
+    if (IsErrored() || !GetDecoder())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "JumpToProgram failed.");
-        errored = true;
+        if (!IsErrored())
+            SetErrored(QObject::tr("Error reopening video decoder"));
         delete pginfo;
         return;
     }
@@ -3388,7 +3392,7 @@ void NuppelVideoPlayer::JumpToProgram(void)
     eof = false;
 }
 
-void NuppelVideoPlayer::StartPlaying(bool openfile)
+bool NuppelVideoPlayer::StartPlaying(bool openfile)
 {
     assert(player_ctx);
 
@@ -3396,7 +3400,10 @@ void NuppelVideoPlayer::StartPlaying(bool openfile)
     framesPlayed = 0;
 
     if (openfile && OpenFile() < 0)
-        return;
+    {
+        VERBOSE(VB_IMPORTANT, "Unable to open video file.");
+        return false;
+    }
 
     if (player_ctx->buffer->isDVD())
         player_ctx->buffer->DVD()->SetParent(this);
@@ -3413,17 +3420,6 @@ void NuppelVideoPlayer::StartPlaying(bool openfile)
     if (!InitVideo())
     {
         VERBOSE(VB_IMPORTANT, "Unable to initialize video.");
-        if (!using_null_videoout && player_ctx->GetPIPState() == kPIPOff)
-        {
-/* TODO FIXME, not Qt4 safe
-            DialogBox *dialog = new DialogBox(
-                gContext->GetMainWindow(),
-                QObject::tr("Unable to initialize video."));
-            dialog->AddButton(QObject::tr("Return to menu."));
-            dialog->exec();
-            dialog->deleteLater();
-*/
-        }
 
         if (audioOutput)
         {
@@ -3431,7 +3427,8 @@ void NuppelVideoPlayer::StartPlaying(bool openfile)
             audioOutput = NULL;
         }
         no_audio_out = true;
-        return;
+
+        return false;
     }
 
     if (!using_null_videoout && !player_ctx->IsPIP())
@@ -3540,7 +3537,7 @@ void NuppelVideoPlayer::StartPlaying(bool openfile)
         DoPause();
     }
 
-    while (!killplayer && !errored)
+    while (!killplayer && !IsErrored())
     {
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
         if (player_ctx->playingInfo)
@@ -3574,8 +3571,11 @@ void NuppelVideoPlayer::StartPlaying(bool openfile)
         if (IsErrored() ||
             (player_ctx->recorder && player_ctx->recorder->GetErrorStatus()))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Unknown error, exiting decoder");
-            errored = killplayer = true;
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Unknown recorder error, exiting decoder");
+            if (!IsErrored())
+                SetErrored(QObject::tr("Irrecoverable recorder error"));
+            killplayer = true;
             break;
         }
 
@@ -3813,6 +3813,7 @@ void NuppelVideoPlayer::StartPlaying(bool openfile)
             perror("pthread_setschedparam");
     }
 */
+    return !IsErrored();
 }
 
 void NuppelVideoPlayer::SetAudioParams(int bps, int channels,
@@ -7612,6 +7613,34 @@ bool NuppelVideoPlayer::PosMapFromEnc(unsigned long long          start,
     player_ctx->recorder->FillPositionMap(start, -1, posMap);
 
     return true;
+}
+
+void NuppelVideoPlayer::SetErrored(const QString &reason) const
+{
+    QMutexLocker locker(&errorLock);
+    if (errorMsg.isEmpty())
+    {
+        errorMsg = reason;
+        errorMsg.detach();
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("%1").arg(reason));
+    }
+}
+
+bool NuppelVideoPlayer::IsErrored(void) const
+{
+    QMutexLocker locker(&errorLock);
+    return !errorMsg.isEmpty();
+}
+
+QString NuppelVideoPlayer::GetError(void) const
+{
+    QMutexLocker locker(&errorLock);
+    QString tmp = errorMsg;
+    tmp.detach();
+    return tmp;
 }
 
 // EIA-708 caption support -- begin

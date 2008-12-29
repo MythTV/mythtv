@@ -23,8 +23,8 @@ static void *SpawnDecode(void *param)
     // OS X needs a garbage collector allocated..
     void *decoder_thread_pool = CreateOSXCocoaPool();
     NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)param;
-    nvp->StartPlaying(false);
-    nvp->StopPlaying();
+    if (nvp->StartPlaying(false))
+        nvp->StopPlaying();
     DeleteOSXCocoaPool(decoder_thread_pool);
     return NULL;
 }

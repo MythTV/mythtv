@@ -201,9 +201,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     long long GetTotalFrameCount(void) const  { return totalFrames; }
     long long GetFramesPlayed(void) const     { return framesPlayed; }
     long long GetBookmark(void) const;
+    QString   GetError(void) const;
     QString   GetEncodingType(void) const;
     QString   GetXDS(const QString &key) const;
-    QString   GetErrorMsg(void) const { return errmsg; }
     bool      GetAudioBufferStatus(uint &fill, uint &total) const;
     PIPLocation GetNextPIPLocation(void) const;
 
@@ -211,7 +211,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool    GetRawAudioState(void) const;
     bool    GetLimitKeyRepeat(void) const     { return limitKeyRepeat; }
     bool    GetEof(void) const                { return eof; }
-    bool    IsErrored(void) const             { return errored; }
+    bool    IsErrored(void) const;
     bool    IsPlaying(uint wait_ms = 0, bool wait_for = true) const;
     bool    AtNormalSpeed(void) const         { return next_normal_speed; }
     bool    IsDecoderThreadAlive(void) const  { return decoder_thread_alive; }
@@ -243,7 +243,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     InteractiveTV *GetInteractiveTV(void);
 
     // Start/Reset/Stop playing
-    void StartPlaying(bool openfile = true);
+    bool StartPlaying(bool openfile = true);
     void ResetPlaying(void);
     void StopPlaying(void) { killplayer = true; decoder_thread_alive = false; }
 
@@ -438,6 +438,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetPlayingInfo(const ProgramInfo &pginfo);
     void SetPrebuffering(bool prebuffer);
     void SetPlaying(bool is_playing);
+    void SetErrored(const QString &reason) const;
 
     // Private Gets
     int  GetStatusbarPos(void) const;
@@ -581,8 +582,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool     transcoding;
     bool     hasFullPositionMap;
     mutable bool     limitKeyRepeat;
-    bool     errored;
-    QString  errmsg; ///< reason why NVP exited with a error.
+    mutable QMutex   errorLock;
+    mutable QString  errorMsg;   ///< Reason why NVP exited with a error
 
     // Bookmark stuff
     long long bookmarkseek;

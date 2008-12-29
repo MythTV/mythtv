@@ -52,6 +52,9 @@ using namespace std;
 #include "libmythdb/compat.h"
 #include "libmythdb/mythverbose.h"
 #include "mythuihelper.h"
+#include "mythdialogbox.h"
+#include "mythmainwindow.h"
+#include "mythscreenstack.h"
 
 #ifndef HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -195,6 +198,7 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
 
     gContext->sendPlaybackStart();
 
+    QString nvpError = QString::null;
     while (!quitAll)
     {
         if (curProgram)
@@ -325,6 +329,10 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
         const PlayerContext *mctx =
             tv->GetPlayerReadLock(0, __FILE__, __LINE__);
         quitAll = tv->wantsToQuit || (mctx && mctx->errored);
+        mctx->LockDeleteNVP(__FILE__, __LINE__);
+        if (mctx->nvp && mctx->nvp->IsErrored())
+            nvpError = mctx->nvp->GetError();
+        mctx->UnlockDeleteNVP(__FILE__, __LINE__);
         tv->ReturnPlayerLock(mctx);
     }
 
@@ -2047,19 +2055,6 @@ void TV::TeardownPlayer(PlayerContext *mctx, PlayerContext *ctx)
         return;
     }
 
-/* not qt4 safe
-    if (ctx_index == 0 && ctx->nvp && ctx->nvp->IsErrored())
-    {
-        qApp->lock();
-        DialogBox *dlg =
-                new DialogBox(gContext->GetMainWindow(),
-                              ctx->nvp->GetErrorMsg());
-        dlg->AddButton(QObject::tr("Return to Menu"));
-        dlg->exec();
-        dlg->deleteLater();
-        qApp->unlock();
-    }
-*/
     ctx->TeardownPlayer();
 
     if ((mctx == ctx) && udpnotify)
