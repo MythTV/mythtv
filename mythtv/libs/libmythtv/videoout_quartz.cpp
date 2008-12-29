@@ -1120,16 +1120,28 @@ void VideoOutputQuartz::Zoom(ZoomDirection direction)
     MoveResize();
 }
 
+void VideoOutputQuartz::ToggleAdjustFill(AdjustFillMode adjustFill)
+{
+    // Calculate the desired output rectangle for this fill mode.
+    VideoOutput::ToggleAdjustFill(adjustFill);
+
+    // We could change all the views, but the user probably only
+    // wants the main one (window or fullscreen) to change.
+    data->views[0]->MoveResize(windows[0].GetDisplayVideoRect());
+}
+
 void VideoOutputQuartz::MoveResize(void)
 {
     // This recalculates the desired output rectangle, based on
     // the user's current aspect/fill/letterbox/zoom settings.
     VideoOutput::MoveResize();
 
+    QRect newRect = windows[0].GetDisplayVideoRect();
+
     vector<VideoOutputQuartzView*>::iterator it;
     for (it = data->views.begin(); it != data->views.end(); ++it)
     {
-        (*it)->MoveResize(windows[0].GetDisplayVideoRect());
+        (*it)->MoveResize(newRect);
     }
 }
 

@@ -112,7 +112,8 @@ class VideoOutput
     /// \brief Returns current adjust fill mode
     /// \sa ToggleAdjustFill(AdjustFillMode)
     AdjustFillMode GetAdjustFill(void) const;
-    void ToggleAdjustFill(AdjustFillMode adjustFillMode = kAdjustFill_Toggle);
+    virtual void ToggleAdjustFill(
+        AdjustFillMode adjustFillMode = kAdjustFill_Toggle);
 
     // pass in null to use the pause frame, if it exists.
     virtual void ProcessFrame(VideoFrame *frame, OSD *osd,

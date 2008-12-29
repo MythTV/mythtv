@@ -29,6 +29,7 @@ class VideoOutputQuartz : public VideoOutput
     void VideoAspectRatioChanged(float aspect);
     void MoveResize(void);
     void Zoom(ZoomDirection direction);
+    void ToggleAdjustFill(AdjustFillMode adjustFill);
 
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
     void StopEmbedding(void);
