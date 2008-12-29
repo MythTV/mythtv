@@ -258,10 +258,10 @@ static HostCheckBox *DecodeExtraAudio()
     gc->setLabel(QObject::tr("Extra audio buffering"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("Enable this setting if MythTV is playing "
-                    "\"crackly\" audio and you are using hardware encoding. "
-                    "This setting will have no effect "
-                    "on MPEG-4 or RTJPEG video. MythTV will keep extra "
-                    "audio data in its internal buffers to workaround "
+                    "\"crackly\" audio.  This setting affects digital tuners "
+                    "(QAM/DVB/ATSC) and hardware encoders.  It will have no "
+                    "effect on framegrabbers (MPEG-4/RTJPEG).  MythTV will "
+                    "keep extra audio data in its internal buffers to workaround "
                     "this bug."));
     return gc;
 }
