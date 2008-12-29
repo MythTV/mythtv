@@ -1492,8 +1492,11 @@ bool NuppelVideoPlayer::GetFrameNormal(int onlyvideo)
 
     CheckPrebuffering();
 
-    if ((play_speed > 1.01f) && (audio_stretchfactor > 1.01f) && 
-         livetv && IsNearEnd())
+    if ((play_speed > 1.01f) && (audio_stretchfactor > 1.01f) &&
+        (livetv || (watchingrecording &&
+                    player_ctx->recorder &&
+                    player_ctx->recorder->IsValidRecorder())) &&
+        IsNearEnd()) 
     {
         VERBOSE(VB_PLAYBACK, LOC + "Near end, Slowing down playback.");
         Play(1.0f, true, true);
