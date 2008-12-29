@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20080726-1"
+VERSION="0.1.20081229-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -349,7 +349,7 @@ def getMysqlDBParameters():
 
 def getDatabaseConnection():
     """Returns a mySQL connection to mythconverg database."""
-    return MySQLdb.connect(host=mysql_host, user=mysql_user, passwd=mysql_passwd, db=mysql_db)
+    return MySQLdb.connect(host=mysql_host, user=mysql_user, passwd=mysql_passwd, db=mysql_db, init_command='SET NAMES utf8')
 
 #############################################################
 # Returns true/false if a given file or path exists.
