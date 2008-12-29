@@ -94,7 +94,7 @@ static FmtConv Fmt_List_ARGB32[] =
     FMT_NULL
 };
 
-FilterInfo filter_table[] =
+ConstFilterInfo filter_table[] =
 {
     {
         symbol:     "new_force_yv12",

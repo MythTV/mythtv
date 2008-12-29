@@ -363,7 +363,7 @@ static FmtConv FmtList[] =
     FMT_NULL
 };
 
-FilterInfo filter_table[] =
+ConstFilterInfo filter_table[] =
 {
     {
         symbol:     "NewKernelDeintFilter",

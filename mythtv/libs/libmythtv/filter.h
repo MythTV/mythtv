@@ -28,6 +28,15 @@ typedef struct FilterInfo_
     char *libname;
 } FilterInfo;
 
+typedef struct ConstFilterInfo_
+{
+    const char *symbol;
+    const char *name;
+    const char *descript;
+    const FmtConv *formats;
+    const char *libname;
+} ConstFilterInfo;
+
 typedef struct  VideoFilter_
 {
     int (*filter)(struct VideoFilter_ *, VideoFrame *);

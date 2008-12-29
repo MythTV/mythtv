@@ -70,7 +70,7 @@ struct v4l2_format
 /***** end of api definitions *****/
 
 static void
-error(char *str, ...)
+error(const char *str, ...)
 {
     va_list ap;
 

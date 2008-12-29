@@ -17,7 +17,7 @@ static unsigned char lang_char[256];
 
 
 
-static struct mark { char *g0, *latin1, *latin2; } marks[16] =
+static struct mark { const char *g0, *latin1, *latin2; } marks[16] =
 {
     /* none */         { "#",
                          "¤",

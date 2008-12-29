@@ -139,7 +139,7 @@ extern LIBTYPE int hdhomerun_device_set_tuner_channelmap(struct hdhomerun_device
 extern LIBTYPE int hdhomerun_device_set_tuner_filter(struct hdhomerun_device_t *hd, const char *filter);
 extern LIBTYPE int hdhomerun_device_set_tuner_filter_by_array(struct hdhomerun_device_t *hd, unsigned char filter_array[0x2000]);
 extern LIBTYPE int hdhomerun_device_set_tuner_program(struct hdhomerun_device_t *hd, const char *program);
-extern LIBTYPE int hdhomerun_device_set_tuner_target(struct hdhomerun_device_t *hd, char *target);
+extern LIBTYPE int hdhomerun_device_set_tuner_target(struct hdhomerun_device_t *hd, const char *target);
 extern LIBTYPE int hdhomerun_device_set_tuner_target_to_local_protocol(struct hdhomerun_device_t *hd, const char *protocol);
 extern LIBTYPE int hdhomerun_device_set_tuner_target_to_local(struct hdhomerun_device_t *hd);
 extern LIBTYPE int hdhomerun_device_set_ir_target(struct hdhomerun_device_t *hd, const char *target);

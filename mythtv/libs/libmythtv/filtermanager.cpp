@@ -146,7 +146,9 @@ bool FilterManager::LoadFilterLib(const QString &path)
         dlhandles[path] = dlhandle;
     }
 
-    FilterInfo *filtInfo = (FilterInfo*) dlsym(dlhandle, "filter_table");
+    const ConstFilterInfo *filtInfo = (const ConstFilterInfo*)
+        dlsym(dlhandle, "filter_table");
+
     if (!filtInfo)
     {
         const char *errmsg = dlerror();

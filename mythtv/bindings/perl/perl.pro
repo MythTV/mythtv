@@ -1,6 +1,6 @@
 include ( ../../config.mak )
 
-QMAKE_CLEAN += filethatdoesntexist ; [ -f Makefile.perl ] && ($(MAKE) -f Makefile.perl clean; rm Makefile.perl)
+QMAKE_CLEAN += filethatdoesntexist ; if [ -f Makefile.perl ] ; then $(MAKE) -f Makefile.perl clean; rm -f Makefile.perl ; fi
 
 mythperlbindings.target = Makefile.perl
 mythperlbindings.depends = Makefile.PL

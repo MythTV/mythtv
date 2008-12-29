@@ -237,20 +237,17 @@ void releaseDriver(jack_driver_t *drv)
 
 
 /* Return a string corresponding to the input state */
-char* DEBUGSTATE(enum status_enum state)
+const char* DEBUGSTATE(enum status_enum state)
 {
-  if (state == PLAYING)
-    return "PLAYING";
-  else if (state == PAUSED)
-    return "PAUSED";
-  else if (state == STOPPED)
-    return "STOPPED";
-  else if (state == CLOSED)
-    return "CLOSED";
-  else if (state == RESET)
-    return "RESET";
-  else
-    return "unknown state";
+    switch (state)
+    {
+        case PLAYING: return "PLAYING";
+        case PAUSED:  return "PAUSED";
+        case STOPPED: return "STOPPED";
+        case CLOSED:  return "CLOSED";
+        case RESET:   return "RESET";
+        default:      return "unknown state";
+    }
 }
 
 
@@ -1507,7 +1504,7 @@ static long JACK_GetPositionFromDriver(jack_driver_t *drv, enum pos_enum positio
   long elapsedMS;
   double sec2msFactor = 1000;
 
-  char *type_str = "UNKNOWN type";
+  const char *type_str = "UNKNOWN type";
 
   /* if we are reset we should return a position of 0 */
   if (drv->state == RESET)

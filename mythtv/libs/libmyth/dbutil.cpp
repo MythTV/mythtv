@@ -376,7 +376,7 @@ bool DBUtil::CreateTemporaryDBConf(
         chmod(tmpfile.constData(), S_IRUSR);
 
         QByteArray outarr = privateinfo.toLocal8Bit();
-        fprintf(fp, outarr.constData());
+        fprintf(fp, "%s", outarr.constData());
 
         if (fclose(fp))
         {

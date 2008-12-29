@@ -36,7 +36,7 @@ MythAppearance::MythAppearance(MythScreenStack *parent, const char *name) :
     m_bottomrightarrow_x(0), m_bottomrightarrow_y(0),
     m_arrowsize_x(30),   // maybe get the image size later
     m_arrowsize_y(30),   // maybe get the image size later
-    m_screenheight(0),       m_screenwidth(0),
+    m_screenwidth(0),        m_screenheight(0),
     m_xsize(GetMythMainWindow()->GetUIScreenRect().width()),
     m_ysize(GetMythMainWindow()->GetUIScreenRect().height()),
     m_menuPopup(NULL)

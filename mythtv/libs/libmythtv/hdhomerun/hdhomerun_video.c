@@ -209,7 +209,9 @@ static void hdhomerun_video_parse_rtp(struct hdhomerun_video_sock_t *vs, struct 
 			vs->network_error_count++;
 
 			/* restart pid sequence check */
-			memset((void *)vs->sequence, 0xFF, sizeof(vs->sequence));
+			/* can't use memset bcs sequence is volatile */
+			for (int i = 0; i < sizeof(vs->sequence) / sizeof(uint8_t) ; i++)
+				vs->sequence[i] = 0xFF;
 		}
 	}
 
@@ -329,7 +331,9 @@ void hdhomerun_video_flush(struct hdhomerun_video_sock_t *vs)
 	vs->tail = vs->head;
 	vs->advance = 0;
 
-	memset((void *)vs->sequence, 0xFF, sizeof(vs->sequence));
+	/* can't use memset bcs sequence is volatile */
+	for (int i = 0; i < sizeof(vs->sequence) / sizeof(uint8_t) ; i++)
+		vs->sequence[i] = 0xFF;
 
 	vs->rtp_sequence = 0xFFFFFFFF;
 

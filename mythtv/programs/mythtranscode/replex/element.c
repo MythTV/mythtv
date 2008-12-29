@@ -39,7 +39,7 @@ unsigned int bitrates[3][16] =
 
 uint32_t freq[4] = {441, 480, 320, 0};
 static uint64_t samples[4] = { 384, 1152, 1152, 1536};
-char *frames[3] = {"I-Frame","P-Frame","B-Frame"};
+const char *frames[3] = {"I-Frame","P-Frame","B-Frame"};
 
 unsigned int ac3_bitrates[32] =
     {32,40,48,56,64,80,96,112,128,160,192,224,256,320,384,448,512,576,640,

@@ -287,13 +287,13 @@ static int hdhomerun_control_get_set(struct hdhomerun_control_sock_t *cs, const 
 	int name_len = (int)strlen(name) + 1;
 	hdhomerun_pkt_write_u8(tx_pkt, HDHOMERUN_TAG_GETSET_NAME);
 	hdhomerun_pkt_write_var_length(tx_pkt, name_len);
-	hdhomerun_pkt_write_mem(tx_pkt, (void *)name, name_len);
+	hdhomerun_pkt_write_mem(tx_pkt, (const void *)name, name_len);
 
 	if (value) {
 		int value_len = (int)strlen(value) + 1;
 		hdhomerun_pkt_write_u8(tx_pkt, HDHOMERUN_TAG_GETSET_VALUE);
 		hdhomerun_pkt_write_var_length(tx_pkt, value_len);
-		hdhomerun_pkt_write_mem(tx_pkt, (void *)value, value_len);
+		hdhomerun_pkt_write_mem(tx_pkt, (const void *)value, value_len);
 	}
 
 	/* Send/Recv. */

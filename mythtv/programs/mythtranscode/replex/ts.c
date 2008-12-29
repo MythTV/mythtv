@@ -174,7 +174,7 @@ static unsigned int crc_table[256] = {
 unsigned int crc32_04c11db7 (const unsigned char *d, int len, unsigned int crc)
 {
    register int i;
-   const unsigned char *u=(unsigned char*)d; // Saves '& 0xff'
+   const unsigned char *u = d; // Saves '& 0xff'
 
    for (i=0; i<len; i++)
       crc = (crc << 8) ^ crc_table[((crc >> 24) ^ *u++)];

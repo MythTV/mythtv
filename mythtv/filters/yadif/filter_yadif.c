@@ -114,7 +114,7 @@ static inline void * memcpy_pic2(void * dst, const void * src,
     {
         if (srcStride < 0) 
         {
-            src = (uint8_t*)src + (height-1)*srcStride;
+            src = (const uint8_t*)src + (height-1)*srcStride;
             dst = (uint8_t*)dst + (height-1)*dstStride;
             srcStride = -srcStride;
         }
@@ -125,7 +125,7 @@ static inline void * memcpy_pic2(void * dst, const void * src,
         for (i=0; i<height; i++)
         {
             fast_memcpy(dst, src, bytesPerLine);
-            src = (uint8_t*)src + srcStride;
+            src = (const uint8_t*)src + srcStride;
             dst = (uint8_t*)dst + dstStride;
         }
     }
@@ -585,7 +585,7 @@ static FmtConv FmtList[] =
     FMT_NULL
 };
 
-FilterInfo filter_table[] =
+ConstFilterInfo filter_table[] =
 {
     {
 symbol:     "YadifDeintFilter",

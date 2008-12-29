@@ -591,7 +591,7 @@ int hdhomerun_device_set_tuner_program(struct hdhomerun_device_t *hd, const char
 	return hdhomerun_control_set(hd->cs, name, program, NULL, NULL);
 }
 
-int hdhomerun_device_set_tuner_target(struct hdhomerun_device_t *hd, char *target)
+int hdhomerun_device_set_tuner_target(struct hdhomerun_device_t *hd, const char *target)
 {
 	char name[32];
 	sprintf(name, "/tuner%u/target", hd->tuner);

@@ -2259,8 +2259,8 @@ int main(int argc, char **argv)
 	int analyze=0;
 	int scan =0;
 	char *filename = NULL;
-	char *type = "SVCD";
-	char *inpt = "TS";
+	const char *type = "SVCD";
+	const char *inpt = "TS";
 
 	struct replex rx;
 
