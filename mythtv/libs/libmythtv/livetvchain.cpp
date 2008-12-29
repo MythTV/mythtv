@@ -376,7 +376,10 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
     QMutexLocker lock(&m_lock);
 
     if (m_switchid < 0 || m_curpos == m_switchid)
+    {
+        ClearSwitch();
         return NULL;
+    }
 
     LiveTVChainEntry oldentry, entry;
     GetEntryAt(m_curpos, oldentry);
@@ -397,7 +400,10 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
     }
 
     if (!pginfo)
+    {
+        ClearSwitch();
         return NULL;
+    }
 
     // Skip dummy recordings, if possible.
     if (entry.cardtype == "DUMMY")
@@ -411,7 +417,10 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
         delete pginfo;
         pginfo = EntryToProgram(entry);
         if (!pginfo)
+        {
+            ClearSwitch();
             return NULL;
+        }
     }
 
     discont = true;
@@ -432,7 +441,8 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
     }
 
     newid = m_switchid;
-    m_switchid = -1;
+
+    ClearSwitch();
 
     return pginfo;
 }

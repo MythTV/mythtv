@@ -3299,12 +3299,12 @@ void NuppelVideoPlayer::JumpToProgram(void)
     VERBOSE(VB_PLAYBACK, "JumpToProgram(void)");
     bool discontinuity = false, newtype = false;
     int newid = -1;
+    long long nextpos = player_ctx->tvchain->GetJumpPos();
     ProgramInfo *pginfo = player_ctx->tvchain->GetSwitchProgram(
         discontinuity, newtype, newid);
     if (!pginfo)
         return;
 
-    long long nextpos = player_ctx->tvchain->GetJumpPos();
     bool newIsDummy = player_ctx->tvchain->GetCardType(newid) == "DUMMY";
 
     SetPlayingInfo(*pginfo);
