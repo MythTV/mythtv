@@ -8266,22 +8266,6 @@ void TV::customEvent(QEvent *e)
         ReturnPlayerLock(mctx);
     }
 
-    if (message.left(7) == "SKIP_TO")
-    {
-        cardnum = (tokens.size() >= 2) ? tokens[1].toUInt() : 0;
-        QStringList keyframe = me->ExtraDataList();
-
-        if (!keyframe.empty())
-        {
-            VERBOSE(VB_GENERAL, LOC + "Got SKIP_TO message. Keyframe: "
-                <<stringToLongLong(keyframe[0]));
-        }
-
-        PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        bool tc = (mctx->GetCardID() == cardnum);
-        ReturnPlayerLock(mctx);
-    }
-
     if (message.left(15) == "NETWORK_CONTROL")
     {
         if ((tokens.size() >= 2) &&
