@@ -4240,7 +4240,7 @@ void NuppelVideoPlayer::SetBookmark(void)
 
     if (saved && osd)
     {
-        osd->SetSettingsText(QObject::tr("Position Saved"), 1);
+        osd->SetSettingsText(QObject::tr("Bookmark Saved"), 1);
 
         struct StatusPosInfo posInfo;
         calcSliderPos(posInfo);
@@ -4269,7 +4269,7 @@ void NuppelVideoPlayer::ClearBookmark(void)
     }
 
     if (osd && cleared)
-        osd->SetSettingsText(QObject::tr("Position Cleared"), 1);
+        osd->SetSettingsText(QObject::tr("Bookmark Cleared"), 1);
 }
 
 long long NuppelVideoPlayer::GetBookmark(void) const

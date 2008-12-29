@@ -2010,9 +2010,9 @@ static HostCheckBox *AggressiveBuffer()
 static HostCheckBox *ClearSavedPosition()
 {
     HostCheckBox *gc = new HostCheckBox("ClearSavedPosition");
-    gc->setLabel(QObject::tr("Clear Saved Position on playback"));
+    gc->setLabel(QObject::tr("Clear bookmark on playback"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("Automatically clear saved position on a "
+    gc->setHelpText(QObject::tr("Automatically clear the bookmark on a "
                     "recording when the recording is played back.  If "
                     "disabled, you can mark the beginning with rewind "
                     "then save position."));
@@ -2022,11 +2022,11 @@ static HostCheckBox *ClearSavedPosition()
 static HostCheckBox *AltClearSavedPosition()
 {
     HostCheckBox *gc = new HostCheckBox("AltClearSavedPosition");
-    gc->setLabel(QObject::tr("Alternate Clear Saved Position"));
+    gc->setLabel(QObject::tr("Alternate clear and save bookmark"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("During playback the Select key "
-                    "(Enter or Space) will alternate between \"Position "
-                    "Saved\" and \"Position Cleared\". If disabled, the "
+                    "(Enter or Space) will alternate between \"Bookmark "
+                    "Saved\" and \"Bookmark Cleared\". If disabled, the "
                     "Select key will save the current position for each "
                     "keypress."));
     return gc;
