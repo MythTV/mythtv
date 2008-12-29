@@ -6402,6 +6402,8 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
 {
     bool muted = false;
 
+    QString oldinputname = ctx->recorder->GetInput();
+
     ctx->LockDeleteNVP(__FILE__, __LINE__);
     if (ctx->nvp && !ctx->nvp->IsMuted())
         muted = ctx->nvp->SetMuted(true);
@@ -6438,6 +6440,9 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
         SetMuteTimer(ctx, kMuteTimeout * 2);
 
     UnpauseLiveTV(ctx);
+
+    if (oldinputname != ctx->recorder->GetInput())
+        UpdateOSDInput(ctx);
 }
 
 void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
@@ -6451,6 +6456,8 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     QString channum = chan;
     QStringList reclist;
     bool muted = false;
+
+    QString oldinputname = ctx->recorder->GetInput();
 
     if (channum.isEmpty() && chanid)
     {
@@ -6549,6 +6556,9 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
         SetMuteTimer(ctx, kMuteTimeout * 2);
 
     UnpauseLiveTV(ctx);
+
+    if (oldinputname != ctx->recorder->GetInput())
+        UpdateOSDInput(ctx);
 }
 
 void TV::ChangeChannel(const PlayerContext *ctx, const DBChanList &options)
