@@ -31,6 +31,8 @@ using namespace std;
 
 Synaesthesia::Synaesthesia(long int winid)
 {
+    (void) winid;
+
     fps = 29;
     fadeMode = Stars;
     pointsAreDiamonds = true;
@@ -310,10 +312,12 @@ void Synaesthesia::fadeFade(void)
 
 void Synaesthesia::fadePixelWave(int x, int y, int where, int step)
 {
-    short j = (short(getPixel(x - 1, y, where - 2)) + 
-                     getPixel(x + 1, y, where + 2) + 
-                     getPixel(x, y - 1, where - step) + 
-                     getPixel(x, y + 1, where + step) >> 2) + lastOutput[where];
+    short j = short((int(getPixel(x - 1, y, where - 2)) +
+                     int(getPixel(x + 1, y, where + 2)) + 
+                     int(getPixel(x, y - 1, where - step)) + 
+                     int(getPixel(x, y + 1, where + step))) >> 2) +
+        lastOutput[where];
+
     if (!j)
     {
         output[where] = 0;
@@ -360,9 +364,11 @@ void Synaesthesia::fadeWave(void)
     {
         int i = start;
         do {
-            short j = (short(lastOutput[i - 2]) + lastOutput[i + 2] +
-                             lastOutput[i - step] +
-                             lastOutput[i + step] >> 2) + lastOutput[i];
+            short j = short((int(lastOutput[i - 2]) +
+                             int(lastOutput[i + 2]) +
+                             int(lastOutput[i - step]) +
+                             int(lastOutput[i + step])) >> 2) +
+                lastOutput[i];
             if (!j) {
                 output[i] = 0;
             } else {
@@ -380,10 +386,11 @@ void Synaesthesia::fadeWave(void)
 
 void Synaesthesia::fadePixelHeat(int x, int y, int where, int step) 
 {
-    short j = (short(getPixel(x - 1, y, where - 2)) + 
-                     getPixel(x + 1, y, where + 2) +
-                     getPixel(x, y - 1, where - step) +
-                     getPixel(x, y + 1, where + step) >> 2) + lastOutput[where];
+    short j = short((int(getPixel(x - 1, y, where - 2)) +
+                     int(getPixel(x + 1, y, where + 2)) +
+                     int(getPixel(x, y - 1, where - step)) +
+                     int(getPixel(x, y + 1, where + step))) >> 2) +
+        lastOutput[where];
     if (!j) 
     { 
         output[where] = 0; 
@@ -430,15 +437,17 @@ void Synaesthesia::fadeHeat(void)
     {
         int i = start;
         do {
-            short j = (short(lastOutput[i - 2]) + lastOutput[i + 2] +
-                       lastOutput[i - step] + lastOutput[i + step] >> 2) +
-                       lastOutput[i];
+            short j = short((int(lastOutput[i - 2]) +
+                             int(lastOutput[i + 2]) +
+                             int(lastOutput[i - step]) +
+                             int(lastOutput[i + step])) >> 2) +
+                lastOutput[i];
             if (!j) 
                 output[i] = 0;
             else 
             {
                 j = j - lastLastOutput[i] + 
-                    (lastLastOutput[i] - lastOutput[i] >> 2) - 1;
+                    ((lastLastOutput[i] - lastOutput[i]) >> 2) - 1;
                 if (j < 0) 
                     output[i] = 0;
                 else if (j & (255*256)) 

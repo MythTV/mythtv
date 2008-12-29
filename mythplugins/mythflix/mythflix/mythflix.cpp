@@ -135,9 +135,8 @@ void MythFlix::loadData()
 
     for (NewsSite *site = m_NewsSites.first(); site; site = m_NewsSites.next())
     {
-        MythUIButtonListItem* item =
-            new MythUIButtonListItem(m_sitesList, site->name(),
-                                        qVariantFromValue(site));
+        new MythUIButtonListItem(
+            m_sitesList, site->name(), qVariantFromValue(site));
     }
 
 

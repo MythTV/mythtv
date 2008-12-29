@@ -22,10 +22,10 @@ paranoia:LIBS += -lcdda_paranoia -lcdda_interface
 
 # Input
 HEADERS += cddecoder.h cdrip.h constants.h databasebox.h
-HEADERS += decoder.h flacdecoder.h flacencoder.h maddecoder.h mainvisual.h
+HEADERS += decoder.h flacencoder.h mainvisual.h
 HEADERS += metadata.h playbackbox.h playlist.h polygon.h
 HEADERS += streaminput.h synaesthesia.h encoder.h visualize.h avfdecoder.h
-HEADERS += treecheckitem.h vorbisdecoder.h vorbisencoder.h polygon.h
+HEADERS += treecheckitem.h vorbisencoder.h polygon.h
 HEADERS += bumpscope.h globalsettings.h lameencoder.h dbcheck.h
 HEADERS += metaio.h metaiotaglib.h vcedit.h metaiooggvorbiscomment.h
 HEADERS += metaioflacvorbiscomment.h metaioavfcomment.h
