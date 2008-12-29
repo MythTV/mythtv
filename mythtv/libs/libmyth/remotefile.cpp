@@ -76,7 +76,7 @@ MythSocket *RemoteFile::openSocket(bool control)
         {
             VERBOSE(VB_IMPORTANT,
                     QString("RemoteFile::openSocket(%1): "
-                            "Did not get proper responce from %3:%4")
+                            "Did not get proper response from %3:%4")
                     .arg(stype).arg(dir).arg(host).arg(port));
 
             return NULL;
