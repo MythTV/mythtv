@@ -12,16 +12,27 @@
 #include "checksetup.h"
 #include "exitprompt.h"
 
-MythMainWindow  *win;
-MythScreenStack *stk;
+struct ExitPrompterPrivate
+{
+    ExitPrompterPrivate()
+    {
+        stk = GetMythMainWindow()->GetStack("popup stack");
+    }
+
+    MythScreenStack *stk;
+};
 
 ExitPrompter::ExitPrompter()
 {
-    win = GetMythMainWindow();
-    stk = win->GetStack("popup stack");
+    m_d = new ExitPrompterPrivate;
 }
 
-void ExitPrompter::fillPrompt()
+ExitPrompter::~ExitPrompter()
+{
+    delete m_d;
+}
+
+void ExitPrompter::masterPromptExit()
 {
     if (gContext->IsMasterHost())
     {
@@ -29,7 +40,7 @@ void ExitPrompter::fillPrompt()
                             " please run 'mythfilldatabase' to populate"
                             " the database with channel information.");
 
-        MythDialogBox *dia = new MythDialogBox(prompt, stk, "fill prompt");
+        MythDialogBox *dia = new MythDialogBox(prompt, m_d->stk, "fill prompt");
         if (!dia->Create())
         {
             VERBOSE(VB_IMPORTANT, "Can't create fill DB prompt?");
@@ -41,25 +52,27 @@ void ExitPrompter::fillPrompt()
         // This is a hack so that the button clicks target the correct slot:
         dia->SetReturnEvent(this, QString());
 
-        stk->AddScreen(dia);
+        m_d->stk->AddScreen(dia);
     }
+    else
+        quit();
 }
 
 void ExitPrompter::handleExit()
 {
-    QString *problems;
-    QString  prompt;
+    QStringList problems;
 
     // Look for common problems
     if (CheckSetup(problems))
     {
-        if (problems->count("\n") > 1)
-            prompt = tr("Do you want to fix these problems?");
+        problems.push_back(QString());
+        if (problems.size() > 1)
+            problems.push_back(tr("Do you want to fix these problems?"));
         else
-            prompt = tr("Do you want to fix this problem?");
+            problems.push_back(tr("Do you want to fix this problem?"));
 
-        MythDialogBox *dia = new MythDialogBox(problems->append("\n" + prompt),
-                                     stk, "exit prompt");
+        MythDialogBox *dia = new MythDialogBox(problems.join("\n"),
+                m_d->stk, "exit prompt");
         if (!dia->Create())
         {
             VERBOSE(VB_IMPORTANT, "Can't create Exit Prompt dialog?");
@@ -67,23 +80,22 @@ void ExitPrompter::handleExit()
             quit();
         }
         dia->AddButton(tr("Yes please"));
-        dia->AddButton(tr("No, I know what I am doing"), SLOT(fillPrompt()));
+        dia->AddButton(tr("No, I know what I am doing"),
+                SLOT(masterPromptExit()));
 
         // This is a hack so that the button clicks target the correct slot:
         dia->SetReturnEvent(this, QString());
 
-        stk->AddScreen(dia);
+        m_d->stk->AddScreen(dia);
     }
     else
-        fillPrompt();
+        masterPromptExit();
 }
 
 void ExitPrompter::quit()
 {
     if (gContext->BackendIsRunning())
         RemoteSendMessage("CLEAR_SETTINGS_CACHE");
-
-    delete gContext;
 
     qApp->exit(GENERIC_EXIT_OK);
 }

@@ -1,3 +1,3 @@
-extern bool checkStoragePaths(QString *probs);
-extern bool checkChannelPresets(QString *probs);
-extern bool CheckSetup(QString *problems);
+bool checkStoragePaths(QStringList &probs);
+bool checkChannelPresets(QStringList &probs);
+bool CheckSetup(QStringList &problems);

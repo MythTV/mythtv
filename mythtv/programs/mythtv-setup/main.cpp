@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 
 #include <QString>
 #include <QDir>
@@ -245,13 +246,13 @@ int main(int argc, char *argv[])
         MythUIHelper::SetX11Display(display);
     }
 
-    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
+
+    std::auto_ptr<MythContext> contextScopeDelete(gContext);
 
     if (!gContext->Init(true))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        delete gContext;
         return GENERIC_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -281,7 +282,6 @@ int main(int argc, char *argv[])
         //     << "Database error was:" << endl
         //     << db->lastError().databaseText() << endl;
 
-        delete gContext;
         return GENERIC_EXIT_DB_ERROR;
     }
 
@@ -309,7 +309,6 @@ int main(int argc, char *argv[])
     if (!UpgradeTVDatabaseSchema(true))
     {
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema.");
-        delete gContext;
         return GENERIC_EXIT_DB_OUTOFDATE;
     }
 
@@ -330,7 +329,6 @@ int main(int argc, char *argv[])
 
         if (kDialogCodeButton1 == val)
         {
-            delete gContext;
             return GENERIC_EXIT_OK;
         }
     }

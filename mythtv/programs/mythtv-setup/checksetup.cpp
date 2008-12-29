@@ -6,23 +6,20 @@
 // They all return true if any problems are found, and add to a
 // caller-supplied QString a message describing the problem.
 
-#include <qstring.h>
-#include <qdir.h>
+#include <QDir>
+
 #include "mythdb.h"
 #include "mythcontext.h"
 #include "util.h"
 
 /// Check that a directory path exists and is writable
 
-static bool checkPath(QString path, QString *probs)
+static bool checkPath(QString path, QStringList &probs)
 {
     QDir dir(path);
     if (!dir.exists())
     {
-        probs->append(QObject::tr("Path"));
-        probs->append(QString(" %1 ").arg(path));
-        probs->append(QObject::tr("doesn't exist"));
-        probs->append(".\n");
+        probs.push_back(QObject::tr("Path \"%1\" doesn't exist.").arg(path));
         return true;
     }
 
@@ -31,10 +28,8 @@ static bool checkPath(QString path, QString *probs)
         test.remove();
     else
     {
-        probs->append(QObject::tr("Cannot create a file"));
-        probs->append(QString(" %1 - ").arg(path));
-        probs->append(QObject::tr("directory is not writable?"));
-        probs->append("\n");
+        probs.push_back(QObject::tr("Unable to create file \"%1\" - directory "
+                        "is not writable?").arg(path));
         return true;
     }
 
@@ -44,11 +39,12 @@ static bool checkPath(QString path, QString *probs)
 /// Do the Storage Group filesystem paths exist? Are they writable?
 /// Is the Live TV filesystem large enough?
 
-bool checkStoragePaths(QString *probs)
+bool checkStoragePaths(QStringList &probs)
 {
     bool problemFound = false;
 
-    QString recordFilePrefix = gContext->GetSetting("RecordFilePrefix", "EMPTY");
+    QString recordFilePrefix =
+            gContext->GetSetting("RecordFilePrefix", "EMPTY");
 
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -62,13 +58,12 @@ bool checkStoragePaths(QString *probs)
     query.next();
     if (query.value(0).toInt() == 0)
     {
-        QString trMesg;
-
-        trMesg = QObject::tr("No Storage Group directories are defined.  You "
-                             "must add at least one directory to the Default "
-                             "Storage Group where new recordings will be "
-                             "stored.");
-        probs->append(trMesg + "\n");
+        QString trMesg =
+                QObject::tr("No Storage Group directories are defined.  You "
+                            "must add at least one directory to the Default "
+                            "Storage Group where new recordings will be "
+                            "stored.");
+        probs.push_back(trMesg);
         VERBOSE(VB_IMPORTANT, trMesg);
         return true;
     }
@@ -108,7 +103,7 @@ bool checkStoragePaths(QString *probs)
 // so this checks that the assigned channel (which may be the default of 3)
 // actually exists. This should save a few beginner Live TV problems
 
-bool checkChannelPresets(QString *probs)
+bool checkChannelPresets(QStringList &probs)
 {
     bool problemFound = false;
 
@@ -147,14 +142,9 @@ bool checkChannelPresets(QString *probs)
 
         if (channelExists.size() == 0)
         {
-            probs->append(QObject::tr("Card"));
-            probs->append(QString(" %1 (").arg(cardid));
-            probs->append(QObject::tr("type"));
-            probs->append(QString(" %1) ").arg(query.value(3).toString()));
-            probs->append(QObject::tr("is set to start on channel"));
-            probs->append(QString(" %1, ").arg(startchan));
-            probs->append(QObject::tr("which does not exist"));
-            probs->append(".\n");
+            probs.push_back(QObject::tr("Card %1 (type %2) is set to start on "
+                            "channel %3, which does not exist.")
+                    .arg(cardid).arg(query.value(3).toString()).arg(startchan));
             problemFound = true;
         }
     }
@@ -165,7 +155,7 @@ bool checkChannelPresets(QString *probs)
 /// Build up a string of common problems that the
 /// user should correct in the MythTV-Setup program
 
-bool CheckSetup(QString *problems)
+bool CheckSetup(QStringList &problems)
 {
     return checkStoragePaths(problems)
         || checkChannelPresets(problems);
