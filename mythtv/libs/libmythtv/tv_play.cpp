@@ -468,9 +468,9 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "TOGGLEPBPMODE", "Toggle Picture-by-Picture view",
             "Ctrl+V");
     REG_KEY("TV Playback", "CREATEPIPVIEW", "Create Picture-in-Picture view",
-            "1");
+            "");
     REG_KEY("TV Playback", "CREATEPBPVIEW", "Create Picture-by-Picture view",
-            "Ctrl+1");
+            "");
     REG_KEY("TV Playback", "NEXTPIPWINDOW", "Toggle active PIP/PBP window", "B");
     REG_KEY("TV Playback", "SWAPPIP", "Swap PBP/PIP Windows", "N");
     REG_KEY("TV Playback", "TOGGLEPIPSTATE", "Change PxP view", "");
