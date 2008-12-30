@@ -165,7 +165,20 @@ int unlockShutdown()
     return 0;
 }
 
-bool isRunning(QString program)
+/** \brief Returns true if a program containing the specified
+ *         string is running on this machine
+ *
+ *  Since many Linux distributions rename executables, and they
+ *  also have different names by default on different operating
+ *  systems, and this function is POSIX only use of this function
+ *  is discouraged.
+ * 
+ *  Warning: This function should never be passed a value
+ *  which is not specified explicitly in the code, it does
+ *  no checking for shell script injection.
+ *
+ */
+static bool isRunning(const char *program)
 {
     QString sCommand = QString("ret=`ps cax | grep -c %1`; exit $ret")
         .arg(program);
