@@ -1,37 +1,53 @@
 #ifndef LIRC_H_
 #define LIRC_H_
 
-#include <QThread>
+#include <QByteArray>
 #include <QString>
+#include <QObject>
+#include <QThread>
+#include <QMutex>
+#include <QList>
 
-#include <lirc/lirc_client.h>
+class LIRCPriv;
 
-/** \class LircThread
- *  \brief Interface between mythtv and lircd
- *
- *   Create connection to the lircd daemon and translate remote keypresses
- *   into custom events which are posted to the mainwindow.
- */
-class LircThread : public QThread
+class LIRC : public QThread
 {
     Q_OBJECT
   public:
-    LircThread(QObject *main_window);
-    ~LircThread();
-    int Init(const QString &config_file, const QString &program,
-                bool ignoreExtApp=false);
-    void Stop(void) { m_bStop = true; }
+    LIRC(QObject *main_window,
+         const QString &lircd_device,
+         const QString &our_program,
+         const QString &config_file,
+         const QString &external_app);
+    bool Init(void);
+
+    virtual void start(void);
+    virtual void deleteLater(void);
 
   private:
-    void run(void);
+    virtual ~LIRC();
+    void TeardownAll();
+
+    bool IsDoRunSet(void) const;
+    virtual void run(void);
     void SpawnApp(void);
-
-    struct lirc_config *m_lircConfig;
-    QObject *m_mainWindow;
-    volatile bool m_bStop;
-    int m_fd;
-
-    QString m_externalApp;
+    QList<QByteArray> GetCodes(void);
+    void Process(const QByteArray &data);
+  
+    mutable QMutex  lock;
+    static  QMutex  lirclib_lock;
+    QObject        *m_mainWindow;  ///< window to send key events to
+    QString         lircdDevice;   ///< device on which to receive lircd data
+    QString         program;       ///< program to extract from config file
+    QString         configFile;    ///< file containing LIRC->key mappings
+    QString         m_externalApp; ///< external application for keys
+    bool            doRun;
+    int             lircd_socket;
+    uint            buf_offset;
+    QByteArray      buf;
+    uint            eofCount;
+    uint            retryCount;
+    LIRCPriv       *d;
 };
 
 #endif

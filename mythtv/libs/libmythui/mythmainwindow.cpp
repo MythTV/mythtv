@@ -24,14 +24,11 @@
 #include <HIToolbox/Menus.h>   // For GetMBarHeight()
 #endif
 
-#ifdef USE_LIRC
 #include "lirc.h"
 #include "lircevent.h"
-#endif
 
 #ifdef USING_APPLEREMOTE
 #include "AppleRemoteListener.h"
-#include "lircevent.h"
 #endif
 
 #ifdef USE_JOYSTICK_MENU
@@ -118,9 +115,7 @@ class MythMainWindowPrivate
     bool ignore_lirc_keys;
     bool ignore_joystick_keys;
 
-#ifdef USE_LIRC
-    LircThread *lircThread;
-#endif
+    LIRC *lircThread;
 
 #ifdef USE_JOYSTICK_MENU
     JoystickMenuThread *joystickThread;
@@ -336,16 +331,8 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
     installEventFilter(this);
 
-#ifdef USE_LIRC
-    QString config_file = GetConfDir() + "/lircrc";
-    if (!QFile::exists(config_file))
-        config_file = QDir::homePath() + "/.lircrc";
-
     d->lircThread = NULL;
-    d->lircThread = new LircThread(this);
-    if (!d->lircThread->Init(config_file, "mythtv"))
-        d->lircThread->start();
-#endif
+    StartLIRC();
 
 #ifdef USE_JOYSTICK_MENU
     d->ignore_joystick_keys = false;
@@ -449,13 +436,7 @@ MythMainWindow::~MythMainWindow()
 #ifdef USE_LIRC
     if (d->lircThread)
     {
-        if (d->lircThread->isRunning())
-        {
-            d->lircThread->Stop();
-            d->lircThread->wait();
-        }
-
-        delete d->lircThread;
+        d->lircThread->deleteLater();
         d->lircThread = NULL;
     }
 #endif
@@ -1760,6 +1741,37 @@ int MythMainWindow::NormY(const int y)
 QRect MythMainWindow::GetUIScreenRect(void)
 {
     return d->uiScreenRect;
+}
+
+void MythMainWindow::StartLIRC(void)
+{
+#ifdef USE_LIRC
+    if (d->lircThread)
+    {
+        d->lircThread->deleteLater();
+        d->lircThread = NULL;
+    }
+
+    QString config_file = GetConfDir() + "/lircrc";
+    if (!QFile::exists(config_file))
+        config_file = QDir::homePath() + "/.lircrc";
+
+    d->lircThread = new LIRC(
+        this,
+        GetMythDB()->GetSetting("LircSocket", "/dev/lircd"),
+        "mythtv", config_file,
+        GetMythDB()->GetSetting("LircKeyPressedApp", ""));
+
+    if (d->lircThread->Init())
+    {
+        d->lircThread->start();
+    }
+    else
+    {
+        d->lircThread->deleteLater();
+        d->lircThread = NULL;
+    }
+#endif
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

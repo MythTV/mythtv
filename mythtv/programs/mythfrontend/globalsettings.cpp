@@ -2313,10 +2313,22 @@ static HostLineEdit *HaltCommand()
     return ge;
 }
 
+static HostLineEdit *LircDaemonDevice()
+{
+    HostLineEdit *ge = new HostLineEdit("LircSocket");
+    ge->setLabel(QObject::tr("LIRC Daemon Socket"));
+    ge->setValue("/dev/lircd");
+    QString help = QObject::tr(
+        "UNIX socket or IP address[:port] to connect in "
+        "order to communicate with the LIRC Daemon.");
+    ge->setHelpText(help);
+    return ge;
+}
+
 static HostLineEdit *LircKeyPressedApp()
 {
     HostLineEdit *ge = new HostLineEdit("LircKeyPressedApp");
-    ge->setLabel(QObject::tr("Keypress Application"));
+    ge->setLabel(QObject::tr("LIRC Keypress Application"));
     ge->setValue("");
     ge->setHelpText(QObject::tr("External application or script to run when "
                     "a keypress is received by LIRC."));
@@ -2326,7 +2338,7 @@ static HostLineEdit *LircKeyPressedApp()
 static HostLineEdit *ScreenShotPath()
 {
     HostLineEdit *ge = new HostLineEdit("ScreenShotPath");
-    ge->setLabel(QObject::tr("ScreenShotPath"));
+    ge->setLabel(QObject::tr("Screen Shot Path"));
     ge->setValue("/tmp/");
     ge->setHelpText(QObject::tr("Path to screenshot storage location. Should be writable by the frontend"));
     return ge;
@@ -4630,10 +4642,7 @@ MainGeneralSettings::MainGeneralSettings()
     general->setLabel(QObject::tr("General"));
     general->addChild(UseArrowAccels());
     general->addChild(EnableXbox());
-    general->addChild(LircKeyPressedApp());
     general->addChild(ScreenShotPath());
-    general->addChild(NetworkControlEnabled());
-    general->addChild(NetworkControlPort());
     addChild(general);
 
     VerticalConfigurationGroup *media =
@@ -4659,6 +4668,15 @@ MainGeneralSettings::MainGeneralSettings()
     exit->addChild(ehor0);
     exit->addChild(shutdownSettings);
     addChild(exit);
+
+    VerticalConfigurationGroup *remotecontrol =
+        new VerticalConfigurationGroup(false, true, false, false);
+    remotecontrol->setLabel(QObject::tr("Remote Control"));
+    remotecontrol->addChild(LircDaemonDevice());
+    remotecontrol->addChild(LircKeyPressedApp());
+    remotecontrol->addChild(NetworkControlEnabled());
+    remotecontrol->addChild(NetworkControlPort());
+    addChild(remotecontrol);
 
     MythLogSettings *mythlog = new MythLogSettings();
     addChild(mythlog);

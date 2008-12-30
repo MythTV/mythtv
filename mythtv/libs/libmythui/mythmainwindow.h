@@ -95,6 +95,8 @@ class MPUBLIC MythMainWindow : public QWidget
     int NormY(const int y);
     int fonTweak;
 
+    void StartLIRC(void);
+
     /* compatability functions, to go away once everything's mythui */
     void attach(QWidget *child);
     void detach(QWidget *child);

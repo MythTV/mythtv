@@ -47,7 +47,7 @@ class LircEventLock
     void unlock();
 
   private:
-    bool m_eventsLocked;
+    bool events_locked;
 };
 
 #endif
