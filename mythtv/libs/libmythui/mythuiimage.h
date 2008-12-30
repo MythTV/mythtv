@@ -84,6 +84,9 @@ class MPUBLIC MythUIImage : public MythUIType
     int  m_reflectScale;
     int  m_reflectLength;
 
+    MythImage *m_maskImage;
+    bool m_isMasked;
+
     bool m_gradient;
     QColor m_gradientStart;
     QColor m_gradientEnd;

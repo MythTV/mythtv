@@ -53,6 +53,8 @@ MythUIImage::MythUIImage(MythUIType *parent, const QString &name)
 MythUIImage::~MythUIImage()
 {
     Clear();
+    if (m_maskImage)
+        m_maskImage->DownRef();
 }
 
 /**
@@ -103,6 +105,9 @@ void MythUIImage::Init(void)
     m_gradientEnd = QColor("#000000");
     m_gradientAlpha = 100;
     m_gradientDirection = FillTopToBottom;
+
+    m_isMasked = false;
+    m_maskImage = NULL;
 
     m_preserveAspect = false;
 }
@@ -301,8 +306,11 @@ QString MythUIImage::GenImageLabel(const QString &filename, int w, int h)
     QString imagelabel;
     QString s_Attrib;
 
+    if (m_isMasked)
+        s_Attrib = "masked";
+
     if (m_isReflected)
-        s_Attrib = "reflected";
+        s_Attrib += "reflected";
 
     imagelabel  = QString("%1-%2-%3x%4.png")
                           .arg(filename)
@@ -415,22 +423,45 @@ bool MythUIImage::Load(void)
         else
             imagelabel = GenImageLabel(w,h);
 
-        if (!bFoundInCache && m_isReflected)
-            image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
-                        m_reflectLength);
+        if (!bFoundInCache)
+        {
+            if (bForceResize)
+                image->Resize(QSize(w, h), m_preserveAspect);
 
-        if (!bFoundInCache && bForceResize)
-            image->Resize(QSize(w, h), m_preserveAspect);
-        else
+            if (m_isMasked)
+            {
+                QRect imageArea = image->rect();
+                QRect maskArea = m_maskImage->rect();
+
+                // Crop the mask to the image
+                int x = 0;
+                int y = 0;
+                if (maskArea.width() > imageArea.width())
+                    x = (maskArea.width() - imageArea.width()) / 2;
+                if (maskArea.height() > imageArea.height())
+                    y = (maskArea.height() - imageArea.height()) / 2;
+
+                if (x > 0 || y > 0)
+                    imageArea.translate(x,y);
+                QImage mask = m_maskImage->copy(imageArea);
+                image->setAlphaChannel(mask.alphaChannel());
+            }
+
+            if (m_isReflected)
+                image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
+                            m_reflectLength);
+
+            // Save scaled copy to cache
+            if (bNeedLoad)
+                GetMythUI()->CacheImage(imagelabel, image);
+        }
+
+        if (!bForceResize)
         {
             QSize aSize = m_Area.size();
             aSize = aSize.expandedTo(image->size());
             SetSize(aSize);
         }
-
-        // Save scaled copy to cache
-        if ((!bFoundInCache) && (bNeedLoad))
-            GetMythUI()->CacheImage(imagelabel, image);
 
         image->SetChanged();
 
@@ -568,6 +599,25 @@ bool MythUIImage::ParseElement(QDomElement &element)
         if (!tmp.isEmpty())
             m_reflectLength = tmp.toInt();
     }
+    else if (element.tagName() == "mask")
+    {
+        QString maskfile = getFirstText(element);
+        if (m_maskImage)
+        {
+            m_maskImage->DownRef();
+            m_maskImage = NULL;
+        }
+
+        m_maskImage = GetMythPainter()->GetFormatImage();
+        if (m_maskImage->Load(maskfile))
+            m_isMasked = true;
+        else
+        {
+            m_maskImage->DownRef();
+            m_maskImage = NULL;
+            m_isMasked = false;
+        }
+    }
     else
         return MythUIType::ParseElement(element);
 
@@ -605,6 +655,11 @@ void MythUIImage::CopyFrom(MythUIType *base)
     m_reflectShear = im->m_reflectShear;
     m_reflectScale = im->m_reflectScale;
     m_reflectLength = im->m_reflectLength;
+
+    m_isMasked = im->m_isMasked;
+    m_maskImage = im->m_maskImage;
+    if (m_maskImage)
+        m_maskImage->UpRef();
 
     m_gradient = im->m_gradient;
     m_gradientStart = im->m_gradientStart;
