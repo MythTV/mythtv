@@ -61,7 +61,7 @@ class MPUBLIC JumpToChannel : public QObject
 
   private:
     ~JumpToChannel() {}
-    void Update(void);
+    bool Update(void);
 
   private:
     JumpToChannelListener *listener;
@@ -70,6 +70,8 @@ class MPUBLIC JumpToChannel : public QObject
     int      previous_current_channel_index;
     uint     rows_displayed;
     QTimer  *timer;
+
+    static const uint kJumpToChannelTimeout = 3500; // ms
 };
 
 class MPUBLIC GuideGrid : public MythDialog, public JumpToChannelListener

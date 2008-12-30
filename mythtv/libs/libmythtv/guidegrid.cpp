@@ -53,7 +53,10 @@ JumpToChannel::JumpToChannel(
     timer(new QTimer(this))
 {
     if (parent && timer)
+    {
         connect(timer, SIGNAL(timeout()), SLOT(deleteLater()));
+        timer->setSingleShot(true);
+    }
     Update();
 }
 
@@ -111,8 +114,8 @@ bool JumpToChannel::ProcessEntry(
 
     if (has_action("SELECT", actions))
     {
-        Update();
-        deleteLater();
+        if (Update())
+            deleteLater();
         return true;
     }
 
@@ -136,24 +139,30 @@ bool JumpToChannel::ProcessEntry(
     return false;
 }
 
-void JumpToChannel::Update(void)
+bool JumpToChannel::Update(void)
 {
     if (!timer || !listener)
-        return;
+        return false;
 
-    // setup the timeout timer for jump mode
     timer->stop();
-    timer->setSingleShot(true);
-    timer->start(3500);
 
     // find the closest channel ...
     int i = listener->FindChannel(0, entry, false);
     if (i >= 0)
     {
+        // setup the timeout timer for jump mode
+        timer->start(kJumpToChannelTimeout);
+
         // rows_displayed to center
         int start = i - rows_displayed/2;
         int cur   = rows_displayed/2;
         listener->GoTo(start, cur);
+        return true;
+    }
+    else
+    { // prefix must be invalid.. reset entry..
+        deleteLater();
+        return false;
     }
 }
 
