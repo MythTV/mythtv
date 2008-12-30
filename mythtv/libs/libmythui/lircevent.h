@@ -1,26 +1,39 @@
+// -*- Mode: c++ -*-
+
 #ifndef LIRCEVENT_H_
 #define LIRCEVENT_H_
 
 #include <QEvent>
+#include <QString>
 
 class LircKeycodeEvent : public QEvent
 {
   public:
-    LircKeycodeEvent(const QString &lirc_text, int key_code, bool key_down) :
-            QEvent((QEvent::Type)LircKeycodeEventType), m_lirctext(lirc_text),
-            m_keycode(key_code), m_keydown(key_down) {}
+     LircKeycodeEvent(Type keytype, int key, Qt::KeyboardModifiers mod,
+                      const QString &text, const QString &lirc_text) :
+        QEvent((Type)kLIRCKeycodeEventType),
+        m_keytype(keytype), m_key(key), m_modifiers(mod),
+        m_text(text), m_lirctext(lirc_text)
+    {
+        m_text.detach();
+        m_lirctext.detach();
+    }
 
-    QString getLircText() const { return m_lirctext; }
-    int getKeycode() const { return m_keycode; }
-    bool isKeyDown()const { return m_keydown; }
+    Type                  keytype(void)   const { return m_keytype;   }
+    int                   key(void)       const { return m_key;       }
+    Qt::KeyboardModifiers modifiers(void) const { return m_modifiers; }
+    QString               text(void)      const { return m_text;      }
+    QString               lirctext(void)  const { return m_lirctext;  }
 
-  public:
-    enum EventID { LircKeycodeEventType = 23423 };
+    static const int kLIRCKeycodeEventType = 23423;
+    static const int kLIRCInvalidKeyCombo  = 0xFFFFFFFF;
 
   private:
-    QString m_lirctext;
-    int m_keycode;
-    bool m_keydown;
+    Type                  m_keytype;
+    int                   m_key;
+    Qt::KeyboardModifiers m_modifiers;
+    QString               m_text;
+    QString               m_lirctext;
 };
 
 class LircMuteEvent : public QEvent

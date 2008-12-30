@@ -1496,48 +1496,32 @@ void MythMainWindow::customEvent(QEvent *ce)
     }
 #if defined(USE_LIRC) || defined(USING_APPLEREMOTE)
     else if (ce->type() ==
-             (QEvent::Type) LircKeycodeEvent::LircKeycodeEventType &&
+             (QEvent::Type) LircKeycodeEvent::kLIRCKeycodeEventType &&
              !d->ignore_lirc_keys)
     {
         LircKeycodeEvent *lke = (LircKeycodeEvent *)ce;
-        int keycode = lke->getKeycode();
 
-        if (keycode)
+        if (LircKeycodeEvent::kLIRCInvalidKeyCombo == lke->modifiers())
+        {
+            VERBOSE(VB_IMPORTANT, QString("MythMainWindow, Warning: ") +
+                    QString("Attempt to convert LIRC key sequence '%1' "
+                            "to a Qt key sequence failed.")
+                    .arg(lke->lirctext()));
+        }
+        else
         {
             GetMythUI()->ResetScreensaver();
             if (GetMythUI()->GetScreenIsAsleep())
                 return;
 
-            Qt::KeyboardModifiers mod = (Qt::KeyboardModifiers)(keycode & Qt::MODIFIER_MASK);
-            int k = keycode & ~Qt::MODIFIER_MASK; /* trim off the mod */
-            QString text;
-
-            if (k & Qt::UNICODE_ACCEL)
-            {
-                QChar c(k & ~Qt::UNICODE_ACCEL);
-                text = QString(c);
-            }
-
-            mod = ((mod & Qt::CTRL) ? Qt::ControlModifier : Qt::NoModifier) |
-                  ((mod & Qt::META) ? Qt::MetaModifier : Qt::NoModifier) |
-                  ((mod & Qt::ALT) ? Qt::AltModifier : Qt::NoModifier) |
-                  ((mod & Qt::SHIFT) ? Qt::ShiftModifier : Qt::NoModifier);
-
-            QKeyEvent key(lke->isKeyDown() ? QEvent::KeyPress :
-                          QEvent::KeyRelease, k, mod, text);
+            QKeyEvent key(lke->keytype(),   lke->key(),
+                          lke->modifiers(), lke->text());
 
             QObject *key_target = getTarget(key);
             if (!key_target)
                 QApplication::sendEvent(this, &key);
             else
                 QApplication::sendEvent(key_target, &key);
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT,
-                    QString("LircClient warning: attempt to convert '%1' to a "
-                            "key sequence failed. Fix your key mappings.")
-                    .arg(lke->getLircText().toLocal8Bit().constData()));
         }
     }
     else if (ce->type() == (QEvent::Type) LircMuteEvent::LircMuteEventType)

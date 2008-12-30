@@ -1,3 +1,4 @@
+
 // System headers
 #include <lirc/lirc_client.h>
 
@@ -402,10 +403,8 @@ void LIRC::Process(const QByteArray &data)
 
     while ((0 == ret) && code)
     {
-        QString text(code);
+        QString lirctext(code);
         QKeySequence a(code);
-
-        int keycode = 0;
 
         // Send a dummy keycode if we couldn't convert the key sequence.
         // This is done so the main code can output a warning for bad
@@ -413,20 +412,41 @@ void LIRC::Process(const QByteArray &data)
         if (!a.count())
         {
             QApplication::postEvent(
-                m_mainWindow, new LircKeycodeEvent(text, keycode, true));
+                m_mainWindow, new LircKeycodeEvent(
+                    QEvent::KeyPress, 0,
+                    (Qt::KeyboardModifiers)
+                    LircKeycodeEvent::kLIRCInvalidKeyCombo,
+                    QString::null, lirctext));
         }
 
+        vector<LircKeycodeEvent*> keyReleases;
         for (unsigned int i = 0; i < a.count(); i++)
         {
-            keycode = a[i];
+            int keycode = a[i];
+            Qt::KeyboardModifiers mod = Qt::NoModifier;
+            mod |= (Qt::SHIFT & keycode) ? Qt::ShiftModifier : Qt::NoModifier;
+            mod |= (Qt::META  & keycode) ? Qt::MetaModifier  : Qt::NoModifier;
+            mod |= (Qt::CTRL  & keycode) ? Qt::ControlModifier: Qt::NoModifier;
+            mod |= (Qt::ALT   & keycode) ? Qt::AltModifier   : Qt::NoModifier;
+
+            QString text = "";
+            if (!mod)
+                text = QString(QChar(keycode));
 
             QApplication::postEvent(
-                m_mainWindow, new LircKeycodeEvent(text, keycode, true));
-            QApplication::postEvent(
-                m_mainWindow, new LircKeycodeEvent(text, keycode, false));
+                m_mainWindow, new LircKeycodeEvent(
+                    QEvent::KeyPress, keycode, mod, text, lirctext));
 
-            SpawnApp();
+            keyReleases.push_back(
+                new LircKeycodeEvent(
+                    QEvent::KeyRelease, keycode, mod, text, lirctext));
         }
+
+        for (unsigned int i = 0; i < keyReleases.size(); i++)
+            QApplication::postEvent(m_mainWindow, keyReleases[i]);
+
+        SpawnApp();
+
         ret = lirc_code2char(
             d->lircConfig, const_cast<char*>(data.constData()), &code);
     }
