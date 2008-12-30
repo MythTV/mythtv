@@ -10,6 +10,7 @@ using namespace std;
 #include "exitcodes.h"
 #include "mythcontext.h"
 #include "mythdb.h"
+#include "mythsystem.h"
 #include "mythverbose.h"
 #include "mythversion.h"
 #include "programinfo.h"
@@ -220,7 +221,7 @@ int getStatus(bool bWantRecStatus)
         res += 2;
     }
 
-    if (isRunning("mythfilldatabas"))
+    if (isRunning("mythfilldatabase"))
     {
         VERBOSE(VB_IMPORTANT, "Grabbing EPG data in progress...");
         res += 4;
@@ -589,7 +590,7 @@ int shutdown()
                     "sending command to set time in bios\n\t\t\t"
                     + nvramCommand);
 
-            shutdownmode = system(nvramCommand.toLocal8Bit().constData());
+            shutdownmode = myth_system(nvramCommand);
             if (WIFEXITED(shutdownmode))
                 shutdownmode = WEXITSTATUS(shutdownmode);
 
@@ -630,7 +631,7 @@ int shutdown()
             VERBOSE(VB_IMPORTANT, ".");
             VERBOSE(VB_IMPORTANT, "shutting down ...");
 
-            system(poweroffCmd.toLocal8Bit().constData());
+            myth_system(poweroffCmd);
             res = 0;
             break;
         }
@@ -641,7 +642,7 @@ int shutdown()
             VERBOSE(VB_IMPORTANT, "sending command to bootloader ...");
             VERBOSE(VB_IMPORTANT, nvramRestartCmd);
 
-            system(nvramRestartCmd.toLocal8Bit().constData());
+            myth_system(nvramRestartCmd);
 
             VERBOSE(VB_IMPORTANT, "..");
             VERBOSE(VB_IMPORTANT, ".");
@@ -649,7 +650,7 @@ int shutdown()
 
             QString rebootCmd =
                     gContext->GetSetting("MythShutdownReboot", "/sbin/reboot");
-            system(rebootCmd.toLocal8Bit().constData());
+            myth_system(rebootCmd);
             res = 0;
             break;
         }
@@ -703,37 +704,48 @@ int startup()
 
 void showUsage()
 {
-  cout << "Usage of mythshutdown\n";
-  cout << "-w/--setwakeup time      (sets the wakeup time. time=yyyy-MM-ddThh:mm:ss\n";
-  cout << "                          doesn't write it into nvram)\n";
-  cout << "-t/--setscheduledwakeup  (sets the wakeup time to the next scheduled recording)\n";
-  cout << "-q/--shutdown            (set nvram-wakeup time and shutdown)\n";
-  cout << "-x/--safeshutdown        (equal to -c -t -q.  check shutdown possible, set\n";
-  cout <<"                           scheduled wakeup and shutdown)\n";
-  cout << "-p/--startup             (check startup. check will return 0 if automatic\n";
-  cout << "                                                           1 for manually)\n";
-  cout << "-c/--check flag          (check shutdown possible\n";
-  cout << "                          flag is 0 - don't check recording status\n";
-  cout << "                                  1 - do check recording status (default)\n";
-  cout << "                          returns 0 ok to shutdown\n";
-  cout << "                                  1 reset idle check)\n";
-  cout << "-l/--lock                (disable shutdown. check will return 1.)\n";
-  cout << "-u/--unlock              (enable shutdown. check will return 0)\n";
-  cout << "-s/--status flag         (returns a code indicating the current status)\n";
-  cout << "                          flag is 0 - don't check recording status\n";
-  cout << "                                  1 - do check recording status (default)\n";
-  cout << "                          0 - Idle\n";
-  cout << "                          1 - Transcoding\n";
-  cout << "                          2 - Commercial Flagging\n";
-  cout << "                          4 - Grabbing EPG data\n";
-  cout << "                          8 - Recording - only valid if flag is 1\n";
-  cout << "                         16 - Locked\n";
-  cout << "                         32 - Jobs running or pending\n";
-  cout << "                         64 - In a daily wakeup/shutdown period\n";
-  cout << "                        128 - Less than 15 minutes to next wakeup period\n";
-  cout << "                        255 - Setup is running\n";
-  cout << "-v/--verbose debug-level (Use '-v help' for level info\n";
-  cout << "-h/--help                (shows this usage)\n";
+    QString binname = "mythshutdown";
+
+    extern const char *myth_source_version;
+    extern const char *myth_source_path;
+
+    VERBOSE(VB_IMPORTANT, QString("%1 version: %2 [%3] www.mythtv.org")
+                            .arg(binname)
+                            .arg(myth_source_path)
+                            .arg(myth_source_version));
+
+    cout << "Usage of mythshutdown\n";
+    cout << "-w/--setwakeup time      (sets the wakeup time. time=yyyy-MM-ddThh:mm:ss\n";
+    cout << "                          doesn't write it into nvram)\n";
+    cout << "-t/--setscheduledwakeup  (sets the wakeup time to the next scheduled recording)\n";
+    cout << "-q/--shutdown            (set nvram-wakeup time and shutdown)\n";
+    cout << "-x/--safeshutdown        (equal to -c -t -q.  check shutdown possible, set\n";
+    cout <<"                           scheduled wakeup and shutdown)\n";
+    cout << "-p/--startup             (check startup. check will return 0 if automatic\n";
+    cout << "                                                           1 for manually)\n";
+    cout << "-c/--check flag          (check shutdown possible\n";
+    cout << "                          flag is 0 - don't check recording status\n";
+    cout << "                                  1 - do check recording status (default)\n";
+    cout << "                          returns 0 ok to shutdown\n";
+    cout << "                                  1 reset idle check)\n";
+    cout << "-l/--lock                (disable shutdown. check will return 1.)\n";
+    cout << "-u/--unlock              (enable shutdown. check will return 0)\n";
+    cout << "-s/--status flag         (returns a code indicating the current status)\n";
+    cout << "                          flag is 0 - don't check recording status\n";
+    cout << "                                  1 - do check recording status (default)\n";
+    cout << "                          0 - Idle\n";
+    cout << "                          1 - Transcoding\n";
+    cout << "                          2 - Commercial Flagging\n";
+    cout << "                          4 - Grabbing EPG data\n";
+    cout << "                          8 - Recording - only valid if flag is 1\n";
+    cout << "                         16 - Locked\n";
+    cout << "                         32 - Jobs running or pending\n";
+    cout << "                         64 - In a daily wakeup/shutdown period\n";
+    cout << "                        128 - Less than 15 minutes to next wakeup period\n";
+    cout << "                        255 - Setup is running\n";
+    cout << "-v/--verbose debug-level (Use '-v help' for level info\n";
+    cout << "-h/--help                (shows this usage)\n";
+    cout << "\n";                      
 }
 
 int main(int argc, char **argv)
@@ -752,7 +764,6 @@ int main(int argc, char **argv)
     bool bGetStatus = false;
     bool bSetWakeupTime = false;
     QString sWakeupTime = "";
-    bool bShowUsage = false;
     bool bSetScheduledWakeupTime = false;
     bool bCheckAndShutdown = false;
     bool bWantRecStatus = true;
@@ -847,7 +858,8 @@ int main(int argc, char **argv)
         else if (!strcmp(a.argv()[argpos],"-h") ||
             !strcmp(a.argv()[argpos],"--help"))
         {
-            bShowUsage = true;
+            showUsage();
+            return GENERIC_EXIT_OK;
         }
         else if (!strcmp(a.argv()[argpos],"-t") ||
             !strcmp(a.argv()[argpos],"--setscheduledwakeup"))
@@ -880,9 +892,7 @@ int main(int argc, char **argv)
 
     int res = 0;
 
-    if (bShowUsage)
-        showUsage();
-    else if (bLockShutdown)
+    if (bLockShutdown)
         res = lockShutdown();
     else if (bUnlockShutdown)
         res = unlockShutdown();
