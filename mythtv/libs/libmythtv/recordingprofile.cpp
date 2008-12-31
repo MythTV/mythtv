@@ -1081,7 +1081,7 @@ class ImageSize : public VerticalConfigurationGroup
 
         QSize defaultsize(768, 576), maxsize(768, 576);
         bool transcoding = profName.left(11) == "Transcoders";
-        bool ivtv = profName.left(34) == "IVTV MPEG-2 Encoders";
+        bool ivtv = profName.left(20) == "IVTV MPEG-2 Encoders";
 
         if (transcoding)
         {
