@@ -95,6 +95,11 @@ class MPUBLIC CardUtil
             (rawtype != "HDHOMERUN") && (rawtype != "FREEBOX");
     }
 
+    static bool         IsChannelChangeDiscontinuous(const QString &rawtype)
+    {
+        return !IsEncoder(rawtype) || (rawtype == "HDPVR");
+    }
+
     static bool         IsUnscanable(const QString &rawtype)
     {
         return

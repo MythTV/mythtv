@@ -1,9 +1,10 @@
 #include "livetvchain.h"
-#include "libmyth/mythcontext.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "mythcontext.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 #include "programinfo.h"
 #include "mythsocket.h"
+#include "cardutil.h"
 
 #define LOC QString("LiveTVChain(%1): ").arg(m_id)
 
@@ -427,18 +428,11 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
     if (m_curpos == m_switchid - 1)
         discont = entry.discontinuity;
 
-    newtype = (oldentry.cardtype !=  entry.cardtype);
+    newtype = (oldentry.cardtype != entry.cardtype);
 
+    // Some cards can change their streams dramatically on a channel change...
     if (discont)
-    {
-        // Some cards can change their streams
-        // dramatically on a channel change...
-        newtype |= entry.cardtype == "DVB";
-        newtype |= entry.cardtype == "HDTV";
-        newtype |= entry.cardtype == "FIREWIRE";
-        newtype |= entry.cardtype == "DBOX2";
-        newtype |= entry.cardtype == "HDHOMERUN";
-    }
+        newtype |= CardUtil::IsChannelChangeDiscontinuous(entry.cardtype);
 
     newid = m_switchid;
 
