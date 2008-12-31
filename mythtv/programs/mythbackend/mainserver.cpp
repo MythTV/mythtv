@@ -112,39 +112,33 @@ QMutex MainServer::truncate_and_close_lock;
 class ProcessRequestThread : public QThread
 {
   public:
-    ProcessRequestThread(MainServer *ms)
-        : parent(ms), socket(0), threadlives(false) {}
+    ProcessRequestThread(MainServer *ms) :
+        parent(ms), socket(NULL), threadlives(false) {}
 
     void setup(MythSocket *sock)
     {
-        lock.lock();
+        QMutexLocker locker(&lock);
         socket = sock;
         socket->UpRef();
-        waitCond.wakeOne();
-        lock.unlock();
+        waitCond.wakeAll();
     }
 
     void killit(void)
     {
-        lock.lock();
+        QMutexLocker locker(&lock);
         threadlives = false;
-        waitCond.wakeOne();
-        lock.unlock();
+        waitCond.wakeAll();
     }
 
-    virtual void run()
+    virtual void run(void)
     {
+        QMutexLocker locker(&lock);
         threadlives = true;
+        waitCond.wakeAll(); // Signal to creating thread
 
-        lock.lock();
-
-        // Signal back to the thread that created this one in case it is
-        // waiting to find out that it is up and running.
-        waitCond.wakeOne();
-
-        while (1)
+        while (true)
         {
-            waitCond.wait(&lock);
+            waitCond.wait(locker.mutex());
 
             if (!threadlives)
                 break;
@@ -157,8 +151,6 @@ class ProcessRequestThread : public QThread
             socket = NULL;
             parent->MarkUnused(this);
         }
-
-        lock.unlock();
     }
 
     QMutex lock;
@@ -653,9 +645,9 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
 
 void MainServer::MarkUnused(ProcessRequestThread *prt)
 {
-    threadPoolLock.lock();
+    QMutexLocker locker(&threadPoolLock);
     threadPool.push_back(prt);
-    threadPoolLock.unlock();
+    threadPoolCond.wakeAll();
 }
 
 void MainServer::customEvent(QEvent *e)
