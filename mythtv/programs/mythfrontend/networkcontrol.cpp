@@ -43,11 +43,11 @@ static bool is_abbrev(QString const& command,
         return test.toLower() == command.left(test.length()).toLower();
 }
 
-NetworkControl::NetworkControl()
-          : QTcpServer(),
-            prompt("# "),
-            gotAnswer(false), answer(""),
-            client(NULL), cs(NULL)
+NetworkControl::NetworkControl() :
+    QTcpServer(),
+    prompt("# "),
+    gotAnswer(false), answer(""),
+    client(NULL), clientStream(NULL)
 {
     // Eventually this map should be in the jumppoints table
     jumpMap["channelpriorities"]     = "Channel Recording Priorities";
@@ -197,6 +197,20 @@ NetworkControl::NetworkControl()
 
 NetworkControl::~NetworkControl(void)
 {
+    {
+        QMutexLocker locker(&clientLock);
+        if (client)
+        {
+            client->deleteLater();
+            client = NULL;
+        }
+        if (clientStream)
+        {
+            delete clientStream;
+            clientStream = NULL;
+        }
+    }
+
     nrLock.lock();
     networkControlReplies.push_back(
         "mythfrontend shutting down, connection closing...");
@@ -286,26 +300,41 @@ void NetworkControl::processNetworkControlCommand(QString command)
     }
 }
 
+void NetworkControl::deleteClientLater(void)
+{
+    VERBOSE(VB_GENERAL, LOC + "Socket disconnected");
+    QMutexLocker locker(&clientLock);
+    if (client)
+    {
+        client->deleteLater();
+        client = NULL;
+    }
+    if (clientStream)
+    {
+        delete clientStream;
+        clientStream = NULL;
+    }
+}
+
 void NetworkControl::newConnection()
 {
     QString welcomeStr = "";
     bool closedOldConn = false;
-    QTcpSocket *s = this->nextPendingConnection();
-    connect(s, SIGNAL(readyRead()), this, SLOT(readClient()));
-    connect(s, SIGNAL(disconnected()), s, SLOT(deleteLater()));
 
     VERBOSE(VB_GENERAL, LOC +
             QString("New connection established."));
 
+    QTcpSocket *s = this->nextPendingConnection();
+
     QMutexLocker locker(&clientLock);
-    if (cs)
+    if (clientStream)
     {
-        cs->setDevice(s);
+        clientStream->setDevice(s);
     }
     else
     {
-        cs = new QTextStream(s);
-        cs->setCodec("UTF-8");
+        clientStream = new QTextStream(s);
+        clientStream->setCodec("UTF-8");
     }
     
     if (client)
@@ -314,6 +343,9 @@ void NetworkControl::newConnection()
         client->close();
     }
     client = s;
+
+    connect(client, SIGNAL(readyRead()),    this, SLOT(readClient()));
+    connect(client, SIGNAL(disconnected()), this, SLOT(deleteClientLater()));
 
     ncLock.lock();
     networkControlCommands.clear();
@@ -885,34 +917,37 @@ void NetworkControl::customEvent(QEvent *e)
         QRegExp crlfRegEx("\r\n$");
         QRegExp crlfcrlfRegEx("\r\n.*\r\n");
 
-        nrLock.lock();
+        QMutexLocker locker(&clientLock);
+        QMutexLocker nrLocker(&nrLock);
+
         replies = networkControlReplies.size();
-        while (client && cs && replies > 0 &&
+        while (client && clientStream && replies > 0 &&
                client->state() == QTcpSocket::ConnectedState)
         {
             reply = networkControlReplies.front();
             networkControlReplies.pop_front();
-            *cs << reply;
+            *clientStream << reply;
             if (!reply.contains(crlfRegEx) || reply.contains(crlfcrlfRegEx))
-                *cs << "\r\n" << prompt;
-            cs->flush();
+                *clientStream << "\r\n" << prompt;
+            clientStream->flush();
             client->flush();
 
             replies = networkControlReplies.size();
         }
-        nrLock.unlock();
     }
     else if (e->type() == kNetworkControlCloseEvent)
     {
+        QMutexLocker locker(&clientLock);
         if (client && client->state() == QTcpSocket::ConnectedState)
         {
-            clientLock.lock();
             client->close();
-            delete client;
-            delete cs;
+            client->deleteLater();
             client = NULL;
-            cs = NULL;
-            clientLock.unlock();
+        }
+        if (clientStream)
+        {
+            delete clientStream;
+            clientStream = NULL;
         }
     }
 }

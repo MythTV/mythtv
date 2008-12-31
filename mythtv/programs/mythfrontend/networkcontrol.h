@@ -14,6 +14,10 @@ using namespace std;
 class MainServer;
 class QTextStream;
 
+// Locking order
+// clientLock -> ncLock
+//            -> nrLock
+
 class NetworkControl : public QTcpServer
 {
     Q_OBJECT
@@ -26,6 +30,7 @@ class NetworkControl : public QTcpServer
   private slots:
     void newConnection();
     void readClient();
+    void deleteClientLater();
 
   protected:
     static void *SocketThread(void *param);
@@ -57,9 +62,9 @@ class NetworkControl : public QTcpServer
     QMap <QString, QString> jumpMap;
     QMap <QString, int> keyMap;
 
-    QMutex clientLock;
-    QTcpSocket *client;
-    QTextStream *cs;
+    mutable QMutex  clientLock;
+    QTcpSocket     *client;
+    QTextStream    *clientStream;
 
     deque<QString> networkControlCommands;
     QMutex ncLock;
