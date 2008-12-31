@@ -559,7 +559,6 @@ void XMLTVFindGrabbers::run(void)
 
     QStringList args;
     args += "baseline";
-    args += "manualconfig";
     find_grabber_proc.start("tv_find_grabbers", args);
     bool ok = find_grabber_proc.waitForStarted(250 /* milliseconds */);
     if (!ok)
@@ -1817,7 +1816,7 @@ void CardType::fillSelections(SelectSetting* setting)
         QObject::tr("MJPEG capture card (Matrox G200, DC10)"), "MJPEG");
 # ifdef USING_IVTV
     setting->addSelection(
-        QObject::tr("MPEG-2 encoder card (PVR-x50, PVR-500)"), "MPEG");
+        QObject::tr("IVTV MPEG-2 encoder card"), "MPEG");
 # endif // USING_IVTV
 # ifdef USING_HDPVR
     setting->addSelection(
