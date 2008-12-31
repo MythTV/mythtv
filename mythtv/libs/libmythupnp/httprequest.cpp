@@ -356,6 +356,12 @@ long HTTPRequest::SendResponseFile( QString sFileName )
         if (sRange.length() > 0)
         {
             bRange = ParseRange( sRange, llSize, &llStart, &llEnd );
+
+            // Adjust ranges that are too long.  
+
+            if (llEnd > llSize) 
+                llEnd = llSize; 
+
             if ((llSize >= llStart) && (llSize >= llEnd) && (llEnd >= llStart))
             {
                 if (bRange)
