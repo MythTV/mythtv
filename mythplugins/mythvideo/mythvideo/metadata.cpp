@@ -840,9 +840,10 @@ QString Metadata::getPlayCommand(const Metadata *item)
     QString filename = item->Filename();
     QString handler = getPlayer(item);
 
-    QString esc_fname =
-            QString(item->Filename()).replace(QRegExp("\""), "\\\"");
-    QString arg = QString("\"%1\"").arg(esc_fname);
+    QString arg = QString("\"%1\"").arg(QString(item->Filename())
+                                        .replace(QRegExp("\""), "\\\"")
+                                        .replace(QRegExp("`"), "\\`")
+                                        .replace(QRegExp("\\$"), "\\$"));
 
     QString command = "";
 
