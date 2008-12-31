@@ -86,13 +86,14 @@ extern "C" {
 
 #define NUM_VDPAU_BUFFERS 17
 
-static QStringList allowed_video_renderers(MythCodecID codec_id,
-                                           Display *XJ_disp);
+static QStringList allowed_video_renderers(
+    MythCodecID codec_id, Display *display, Screen *screen, Window curwin);
 
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
                        bool &useXV, bool &useShm, bool &useOpenGL,
                        bool &useVDPAU);
-static void SetFromHW(Display *d, bool &useXvMC, bool &useXV,
+static void SetFromHW(Display *d, Screen *screen, Window curwin,
+                      bool &useXvMC, bool &useXV,
                       bool &useShm, bool &useXvMCOpenGL,
                       bool &useOpenGL, bool &useVDPAU,
                       MythCodecID myth_codec_id);
@@ -1555,8 +1556,6 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
     if ((dec == "libmpeg2") || (dec == "ffmpeg"))
         return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
 
-    Display *disp = MythXOpenDisplay();
-
     // Disable features based on environment and DB values.
     bool use_xvmc_vld = false, use_xvmc_idct = false, use_xvmc = false;
     bool use_xv = true, use_shm = true, use_opengl = true;
@@ -1574,9 +1573,14 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
 
     // Disable features based on hardware capabilities.
     bool use_xvmc_opengl = use_xvmc;
-    SetFromHW(disp, use_xvmc, use_xv, use_shm,
+    Display *disp = MythXOpenDisplay();
+    X11L;
+    Screen *screen = DefaultScreenOfDisplay(disp);
+    Window  root   = DefaultRootWindow(disp);
+    X11U;
+    SetFromHW(disp, screen, root, use_xvmc, use_xv, use_shm,
               use_xvmc_opengl, use_opengl, use_vdpau,
-             (MythCodecID)(kCodec_MPEG1_VDPAU + (stream_type-1)));
+              (MythCodecID)(kCodec_MPEG1_VDPAU + (stream_type-1)));
 
     MythCodecID ret = (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
 #ifdef USING_XVMC
@@ -1602,11 +1606,9 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
     bool ok = true;
     if (test_surface && ret > kCodec_NORMAL_END)
     {
-        Window root;
         XvMCSurfaceInfo info;
 
         ok = false;
-        X11S(root = DefaultRootWindow(disp));
         int port = GrabSuitableXvPort(disp, root, ret, width, height,
                                       xvmc_chroma, &info);
         if (port >= 0)
@@ -1798,7 +1800,8 @@ bool VideoOutputXv::InitSetupBuffers(void)
 {
     // Figure out what video renderer to use
     db_vdisp_profile->SetInput(windows[0].GetVideoDim());
-    QStringList renderers = allowed_video_renderers(myth_codec_id, XJ_disp);
+    QStringList renderers = allowed_video_renderers(
+        myth_codec_id, XJ_disp, XJ_screen, XJ_curwin);
     QString     renderer  = QString::null;
 
     QString tmp = db_vdisp_profile->GetVideoRenderer();
@@ -4975,7 +4978,12 @@ QStringList VideoOutputXv::GetAllowedRenderers(
     if (!disp)
         return list;
 
-    list = allowed_video_renderers(myth_codec_id, disp);
+    X11L;
+    Screen *screen = DefaultScreenOfDisplay(disp);
+    Window  window = DefaultRootWindow(disp);
+    X11U;
+
+    list = allowed_video_renderers(myth_codec_id, disp, screen, window);
 
     XCloseDisplay(disp);
 
@@ -5004,9 +5012,10 @@ static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
 }
 
 static void SetFromHW(Display *d,
-                      bool &useXvMC, bool &useXVideo,
-                      bool &useShm,  bool &useXvMCOpenGL,
-                      bool &useOpenGL, bool &useVDPAU,
+                      Screen  *screen,    Window  curwin,
+                      bool    &useXvMC,   bool   &useXVideo,
+                      bool    &useShm,    bool   &useXvMCOpenGL,
+                      bool    &useOpenGL, bool   &useVDPAU,
                       MythCodecID vdpau_codec_id)
 {
     (void) vdpau_codec_id;
@@ -5078,12 +5087,19 @@ static void SetFromHW(Display *d,
         useVDPAU = false;
 #ifdef USING_VDPAU
         useVDPAU = VDPAUContext::CheckCodecSupported(vdpau_codec_id);
+        if (useVDPAU)
+        {
+            VDPAUContext *c = new VDPAUContext();
+            useVDPAU = c->Init(d, screen, curwin, QSize(1920,1200), false);
+            c->Deinit();
+            delete c;
+        }
 #endif // USING_VDPAU
     }
 }
 
-static QStringList allowed_video_renderers(MythCodecID myth_codec_id,
-                                           Display *XJ_disp)
+static QStringList allowed_video_renderers(
+    MythCodecID myth_codec_id, Display *display, Screen *screen, Window curwin)
 {
     bool vld, idct, mc, xv, shm, xvmc_opengl, opengl, vdpau;
 
@@ -5093,7 +5109,7 @@ static QStringList allowed_video_renderers(MythCodecID myth_codec_id,
     xvmc_opengl = vld || idct || mc;
 
     SetFromEnv(vld, idct, mc, xv, shm, opengl, vdpau);
-    SetFromHW(XJ_disp, mc, xv, shm, xvmc_opengl,
+    SetFromHW(display, screen, curwin, mc, xv, shm, xvmc_opengl,
               opengl, vdpau, myth_codec_id);
     idct &= mc;
 
