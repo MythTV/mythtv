@@ -28,9 +28,8 @@ class MHIImageData
     int    m_y;
 };
 
-// Special values for the NetworkBootInfo version.  Real values are a byte.
+// Special value for the NetworkBootInfo version.  Real values are a byte.
 #define NBI_VERSION_UNSET       257
-#define NBI_VERSION_ABSENT      256
 
 MHIContext::MHIContext(InteractiveTV *parent)
     : m_parent(parent),     m_dsmcc(NULL),
@@ -280,7 +279,8 @@ void MHIContext::QueueDSMCCPacket(
 // A NetworkBootInfo sub-descriptor is present in the PMT.
 void MHIContext::SetNetBootInfo(const unsigned char *data, uint length)
 {
-    if (length < 2) return; // Temporary hack? -- dtk May 5th, 2008.
+    if (length < 2) // A valid descriptor should always have at least 2 bytes.
+        return;
     QMutexLocker locker(&m_dsmccLock);
     // Save the data from the descriptor.
     m_nbiData.resize(0);
@@ -288,9 +288,7 @@ void MHIContext::SetNetBootInfo(const unsigned char *data, uint length)
     m_nbiData.insert(m_nbiData.begin(), data, data+length);
     // If there is no Network Boot Info or we're setting it
     // for the first time just update the "last version".
-    if (length < 2)
-        m_lastNbiVersion = NBI_VERSION_ABSENT;
-    else if (m_lastNbiVersion == NBI_VERSION_UNSET)
+    if (m_lastNbiVersion == NBI_VERSION_UNSET)
         m_lastNbiVersion = data[0];
     else
         m_engine_wait.wakeAll();
