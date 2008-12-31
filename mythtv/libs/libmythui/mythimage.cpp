@@ -92,7 +92,8 @@ void MythImage::Resize(const QSize &newSize, bool preserveAspect)
     }
 }
 
-void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length)
+void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length,
+                        int spacing)
 {
     if (m_isReflected)
         return;
@@ -141,9 +142,9 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length)
 
     QSize newsize;
     if (axis == ReflectVertical)
-        newsize = QSize(mirrorImage.width(), height()+mirrorImage.height());
+        newsize = QSize(mirrorImage.width(), height()+spacing+mirrorImage.height());
     else if (axis == ReflectHorizontal)
-        newsize = QSize(width()+mirrorImage.width(), mirrorImage.height());
+        newsize = QSize(width()+spacing+mirrorImage.width(), mirrorImage.height());
 
     QImage temp(newsize, QImage::Format_ARGB32);
     temp.fill(Qt::transparent);
@@ -158,7 +159,7 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length)
         else
             newpainter.drawImage(0, 0, copy(0,0,width(),height()));
 
-        newpainter.drawImage(0, height(), mirrorImage);
+        newpainter.drawImage(0, height()+spacing, mirrorImage);
     }
     else if (axis == ReflectHorizontal)
     {
@@ -168,7 +169,7 @@ void MythImage::Reflect(ReflectAxis axis, int shear, int scale, int length)
         else
             newpainter.drawImage(0, 0, copy(0,0,width(),height()));
 
-        newpainter.drawImage(width(), 0, mirrorImage);
+        newpainter.drawImage(width()+spacing, 0, mirrorImage);
     }
 
     newpainter.end();

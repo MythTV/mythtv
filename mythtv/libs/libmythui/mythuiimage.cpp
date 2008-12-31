@@ -99,6 +99,7 @@ void MythUIImage::Init(void)
     m_reflectShear = 0;
     m_reflectScale = m_reflectLength = 100;
     m_reflectAxis = ReflectVertical;
+    m_reflectSpacing = 0;
 
     m_gradient = false;
     m_gradientStart = QColor("#505050");
@@ -169,17 +170,18 @@ void MythUIImage::SetImage(MythImage *img)
 
     img->UpRef();
 
-    if (m_isReflected && !img->IsReflected())
-        img->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
-                        m_reflectLength);
-
     if (!m_ForceSize.isNull())
     {
         int w = (m_ForceSize.width() <= 0) ? img->width() : m_ForceSize.width();
         int h = (m_ForceSize.height() <= 0) ? img->height() : m_ForceSize.height();
         img->Resize(QSize(w, h), m_preserveAspect);
     }
-    else
+
+    if (m_isReflected && !img->IsReflected())
+        img->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
+                        m_reflectLength, m_reflectSpacing);
+
+    if (m_ForceSize.isNull())
         SetSize(img->size());
 
     m_Images.push_back(img);
@@ -211,10 +213,6 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
         MythImage *im = (*it);
         im->UpRef();
 
-        if (m_isReflected && !im->IsReflected())
-            im->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
-                         m_reflectLength);
-
         if (!m_ForceSize.isNull())
         {
             int w = (m_ForceSize.width() <= 0) ? im->width() : m_ForceSize.width();
@@ -222,6 +220,10 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
 
             im->Resize(QSize(w, h), m_preserveAspect);
         }
+
+        if (m_isReflected && !im->IsReflected())
+            im->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
+                         m_reflectLength, m_reflectSpacing);
 
         m_Images.push_back(im);
 
@@ -449,7 +451,7 @@ bool MythUIImage::Load(void)
 
             if (m_isReflected)
                 image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
-                            m_reflectLength);
+                            m_reflectLength, m_reflectSpacing);
 
             // Save scaled copy to cache
             if (bNeedLoad)
@@ -515,6 +517,9 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
         MythImage *currentImage = m_Images[m_CurPos];
         QRect currentImageArea = currentImage->rect();
+
+        if (!m_ForceSize.isNull())
+            area.setSize(area.size().expandedTo(currentImage->size()));
 
         // Centre image in available space
         int x = 0;
@@ -598,6 +603,9 @@ bool MythUIImage::ParseElement(QDomElement &element)
         tmp = element.attribute("length");
         if (!tmp.isEmpty())
             m_reflectLength = tmp.toInt();
+        tmp = element.attribute("spacing");
+        if (!tmp.isEmpty())
+            m_reflectSpacing = tmp.toInt();
     }
     else if (element.tagName() == "mask")
     {
@@ -655,6 +663,7 @@ void MythUIImage::CopyFrom(MythUIType *base)
     m_reflectShear = im->m_reflectShear;
     m_reflectScale = im->m_reflectScale;
     m_reflectLength = im->m_reflectLength;
+    m_reflectSpacing = im->m_reflectSpacing;
 
     m_isMasked = im->m_isMasked;
     m_maskImage = im->m_maskImage;
@@ -669,9 +678,11 @@ void MythUIImage::CopyFrom(MythUIType *base)
 
     m_preserveAspect = im->m_preserveAspect;
 
-    SetImages(im->m_Images);
+    //SetImages(im->m_Images);
 
     MythUIType::CopyFrom(base);
+
+    Load();
 }
 
 /**

@@ -83,6 +83,7 @@ class MPUBLIC MythUIImage : public MythUIType
     int  m_reflectShear;
     int  m_reflectScale;
     int  m_reflectLength;
+    int  m_reflectSpacing;
 
     MythImage *m_maskImage;
     bool m_isMasked;

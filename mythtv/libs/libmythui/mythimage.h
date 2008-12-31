@@ -34,7 +34,8 @@ class MPUBLIC MythImage : public QImage
     bool Load(const QString &filename, bool scale = true);
 
     void Resize(const QSize &newSize, bool preserveAspect = false);
-    void Reflect(ReflectAxis axis, int shear, int scale, int length);
+    void Reflect(ReflectAxis axis, int shear, int scale, int length,
+                 int spacing = 0);
 
     /**
      * @brief Create a gradient image.
