@@ -2931,10 +2931,6 @@ enabled freetype2 ||
 enabled lamemp3 && check_lib2 lame/lame.h lame_init -lmp3lame -lm ||
     die "ERROR! You must have the Lame MP3 encoding library installed to compile MythTV."
 
-#test for lirc client libraries and headers
-enabled lirc && check_lib lirc/lirc_client.h lirc_deinit -llirc_client ||
-    disable lirc
-
 if $(pkg-config --atleast-version 4.4.0 QtWebKit) ; then
     enable qtwebkit
 else
@@ -3675,10 +3671,6 @@ fi
 
 if enabled mheg; then
     append CCONFIG "using_mheg"
-fi
-
-if enabled lirc; then
-  echo "CONFIG_LIRC_LIBS=-llirc_client" >> $MYTH_CONFIG_MAK
 fi
 
 if enabled appleremote; then

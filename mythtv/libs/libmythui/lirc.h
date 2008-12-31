@@ -42,7 +42,6 @@ class LIRC : public QThread
     QString         configFile;    ///< file containing LIRC->key mappings
     QString         m_externalApp; ///< external application for keys
     bool            doRun;
-    int             lircd_socket;
     uint            buf_offset;
     QByteArray      buf;
     uint            eofCount;

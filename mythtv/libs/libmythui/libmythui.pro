@@ -112,9 +112,8 @@ using_joystick_menu {
 
 using_lirc {
     DEFINES += USE_LIRC
-    HEADERS += lirc.h lircevent.h
-    SOURCES += lirc.cpp lircevent.cpp
-    LIBS += $$LIRC_LIBS
+    HEADERS += lirc.h   lircevent.h   lirc_client.h
+    SOURCES += lirc.cpp lircevent.cpp lirc_client.c
 }
 
 using_xrandr {
