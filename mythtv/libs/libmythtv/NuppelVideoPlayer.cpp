@@ -4568,20 +4568,22 @@ void NuppelVideoPlayer::SetCommBreakIter(void)
 {
     if (hascommbreaktable)
     {
+
         commBreakIter = commBreakMap.begin();
         while (commBreakIter != commBreakMap.end())
         {
-            if ((framesPlayed + 2) > commBreakIter.key())
-            {
-                commBreakIter++;
-            }
-            else
+            if (framesPlayed <= commBreakIter.key())
                 break;
-        }
 
-        VERBOSE(VB_COMMFLAG, LOC + QString("new commBreakIter = %1 @ frame %2")
+            commBreakIter++;
+	}
+
+	if (commBreakIter != commBreakMap.end())
+	{
+            VERBOSE(VB_COMMFLAG, LOC + QString("new commBreakIter = %1 @ frame %2")
                                            .arg(commBreakIter.data())
                                            .arg(commBreakIter.key()));
+        }
     }
 }
 
