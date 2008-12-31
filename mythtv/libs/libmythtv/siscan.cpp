@@ -322,8 +322,6 @@ void SIScan::HandleNIT(const NetworkInformationTable *nit)
             .arg((*current).FriendlyName));
     VERBOSE(VB_SIPARSER, LOC + nit->toString());
 
-    dvbChanNums.clear();
-
     if (nit->TransportStreamCount())
     {
         emit TransportScanUpdateText(
