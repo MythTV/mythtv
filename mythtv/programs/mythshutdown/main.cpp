@@ -234,7 +234,7 @@ int getStatus(bool bWantRecStatus)
         res += 2;
     }
 
-    if (isRunning("mythfilldatabase"))
+    if (isRunning("mythfilldatabas"))
     {
         VERBOSE(VB_IMPORTANT, "Grabbing EPG data in progress...");
         res += 4;
