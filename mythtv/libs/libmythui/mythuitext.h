@@ -105,6 +105,10 @@ class MPUBLIC MythUIText : public MythUIType, public StorageUser
     bool m_scrolling;
     ScrollDir m_scrollDirection;
 
+    enum TextCase {CaseNormal, CaseUpper, CaseLower};
+
+    TextCase m_textCase;
+
     friend class MythUITextEdit;
     friend class MythUIButton;
     friend class MythThemedMenu;

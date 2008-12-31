@@ -26,6 +26,7 @@ MythUIText::MythUIText(MythUIType *parent, const QString &name)
     m_MultiLine = false;
     m_scrolling = false;
     m_scrollDirection = ScrollLeft;
+    m_textCase = CaseNormal;
 
     m_FontStates.insert("default", MythFontProperties());
     *m_Font = m_FontStates["default"];
@@ -53,6 +54,7 @@ MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
 
     m_scrolling = false;
     m_scrollDirection = ScrollLeft;
+    m_textCase = CaseNormal;
 }
 
 MythUIText::~MythUIText()
@@ -246,6 +248,16 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             m_CutMessage = cutDown(m_Message, m_Font, m_MultiLine);
         else
             m_CutMessage = m_Message;
+    }
+
+    switch (m_textCase)
+    {
+        case CaseUpper :
+            m_CutMessage = m_CutMessage.toUpper();
+        break;
+        case CaseLower :
+            m_CutMessage = m_CutMessage.toLower();
+        break;
     }
 
     p->DrawText(drawrect, m_CutMessage, m_Justification, *m_Font, alpha, area);
@@ -507,6 +519,16 @@ bool MythUIText::ParseElement(QDomElement &element)
         else
             m_scrolling = false;
     }
+    else if (element.tagName() == "case")
+    {
+        QString stringCase = getFirstText(element).toLower();
+        if (stringCase == "lower")
+            m_textCase = CaseLower;
+        else if (stringCase == "upper")
+            m_textCase = CaseUpper;
+        else
+            m_textCase = CaseNormal;
+    }
     else
         return MythUIType::ParseElement(element);
 
@@ -557,6 +579,8 @@ void MythUIText::CopyFrom(MythUIType *base)
 
     m_scrolling = text->m_scrolling;
     m_scrollDirection = text->m_scrollDirection;
+
+    m_textCase = text->m_textCase;
 
     MythUIType::CopyFrom(base);
 }
