@@ -348,7 +348,12 @@ void LIRC::Process(const QByteArray &data)
     while ((0 == ret) && code)
     {
         QString lirctext(code);
-        QKeySequence a(code);
+        QString qtcode = code;
+        qtcode.replace("ctrl-",  "ctrl+",  Qt::CaseInsensitive);
+        qtcode.replace("alt-",   "alt+",   Qt::CaseInsensitive);
+        qtcode.replace("shift-", "shift+", Qt::CaseInsensitive);
+        qtcode.replace("meta-",  "meta+",  Qt::CaseInsensitive);
+        QKeySequence a(qtcode);
 
         // Send a dummy keycode if we couldn't convert the key sequence.
         // This is done so the main code can output a warning for bad
@@ -386,7 +391,7 @@ void LIRC::Process(const QByteArray &data)
                     QEvent::KeyRelease, keycode, mod, text, lirctext));
         }
 
-        for (unsigned int i = 0; i < keyReleases.size(); i++)
+        for (int i = (int)keyReleases.size() - 1; i>=0; i--)
             QApplication::postEvent(m_mainWindow, keyReleases[i]);
 
         SpawnApp();
