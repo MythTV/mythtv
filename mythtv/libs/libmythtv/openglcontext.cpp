@@ -1378,8 +1378,12 @@ void OpenGLContextGLX::SetSwapInterval(int interval)
         return;
 
     MakeCurrent(true);
-    gMythGLXSwapIntervalSGI(interval);
-    VERBOSE(VB_PLAYBACK, LOC + QString("Swap interval set to %1.").arg(interval));
+
+    X11S(gMythGLXSwapIntervalSGI(interval));
+
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("Swap interval set to %1.").arg(interval));
+
     MakeCurrent(false);
 }
 

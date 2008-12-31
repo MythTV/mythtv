@@ -2438,6 +2438,7 @@ vector<void*> VideoOutputXv::CreateXvMCSurfaces(uint num, bool surface_has_vld)
                 QString("VLD - Allocated %1 surfaces, "
                         "now destroying 5 of them.").arg(surfaces.size()));
 
+        X11L;
         for (uint i = 0; i < 5; i++)
         {
             xvmc_vo_surf_t *surf = (xvmc_vo_surf_t*)surfaces.back();
@@ -2445,6 +2446,7 @@ vector<void*> VideoOutputXv::CreateXvMCSurfaces(uint num, bool surface_has_vld)
             XvMCDestroySurface(XJ_disp, &(surf->surface));
             delete surf;
         }
+        X11U;
     }
 #endif // USING_XVMC
     return surfaces;

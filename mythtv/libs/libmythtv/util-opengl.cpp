@@ -186,8 +186,10 @@ bool get_glx_version(Display *XJ_disp, uint &major, uint &minor)
     // something other than OpenGL. So we open a separate
     // connection to the X server here just to query the GLX version.
     Display *tmp_disp = MythXOpenDisplay();
-    X11S(ret = glXQueryVersion(tmp_disp, &gl_major, &gl_minor));
+    X11L;
+    ret = glXQueryVersion(tmp_disp, &gl_major, &gl_minor);
     XCloseDisplay(tmp_disp);
+    X11U;
 
     if (!ret)
         return false;
