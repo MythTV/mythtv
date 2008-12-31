@@ -4865,10 +4865,10 @@ void NuppelVideoPlayer::SetCommBreakIter(void)
     commBreakIter = commBreakMap.begin();
     while (commBreakIter != commBreakMap.end())
     {
-        if ((framesPlayed + 2) > commBreakIter.key())
-            commBreakIter++;
-        else
+        if (framesPlayed <= commBreakIter.key())
             break;
+
+        commBreakIter++;
     }
 
     if (commBreakIter != commBreakMap.end())
