@@ -1,11 +1,24 @@
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: upnptaskevent.cpp
+// Created     : Dec. 31, 2006
+//
+// Purpose     : UPnp Task to notifing subscribers of an event
 //                                                                            
-// Purpose - UPnp Task to notifing subscribers of an event
-//                                                                            
-// Created By  : David Blain                    Created On : Dec. 31, 2006
-// Modified By :                                Modified On:                  
-//                                                                            
+// Copyright (c) 2006 David Blain <mythtv@theblains.net>
+//                                          
+// This library is free software; you can redistribute it and/or 
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+//
 //////////////////////////////////////////////////////////////////////////////
 
 #include "upnptaskevent.h"
