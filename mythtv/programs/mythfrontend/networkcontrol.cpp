@@ -47,6 +47,7 @@ NetworkControl::NetworkControl() :
     QTcpServer(),
     prompt("# "),
     gotAnswer(false), answer(""),
+    clientLock(QMutex::Recursive),
     client(NULL), clientStream(NULL)
 {
     // Eventually this map should be in the jumppoints table
@@ -197,19 +198,7 @@ NetworkControl::NetworkControl() :
 
 NetworkControl::~NetworkControl(void)
 {
-    {
-        QMutexLocker locker(&clientLock);
-        if (client)
-        {
-            client->deleteLater();
-            client = NULL;
-        }
-        if (clientStream)
-        {
-            delete clientStream;
-            clientStream = NULL;
-        }
-    }
+    deleteClientLater();
 
     nrLock.lock();
     networkControlReplies.push_back(
@@ -306,6 +295,7 @@ void NetworkControl::deleteClientLater(void)
     QMutexLocker locker(&clientLock);
     if (client)
     {
+        client->disconnect();
         client->deleteLater();
         client = NULL;
     }
@@ -340,7 +330,7 @@ void NetworkControl::newConnection()
     if (client)
     {
         closedOldConn = true;
-        client->close();
+        deleteClientLater();
     }
     client = s;
 
@@ -937,18 +927,7 @@ void NetworkControl::customEvent(QEvent *e)
     }
     else if (e->type() == kNetworkControlCloseEvent)
     {
-        QMutexLocker locker(&clientLock);
-        if (client && client->state() == QTcpSocket::ConnectedState)
-        {
-            client->close();
-            client->deleteLater();
-            client = NULL;
-        }
-        if (clientStream)
-        {
-            delete clientStream;
-            clientStream = NULL;
-        }
+        deleteClientLater();
     }
 }
 
