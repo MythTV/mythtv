@@ -1637,7 +1637,7 @@ void CardType::fillSelections(SelectSetting* setting)
         QObject::tr("MJPEG capture card (Matrox G200, DC10)"), "MJPEG");
 # ifdef USING_IVTV
     setting->addSelection(
-        QObject::tr("MPEG-2 encoder card (PVR-x50, PVR-500)"), "MPEG");
+        QObject::tr("IVTV MPEG-2 encoder card"), "MPEG");
 # endif // USING_IVTV
 #endif // USING_V4L
 
