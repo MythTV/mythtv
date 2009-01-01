@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2008-10-27, v0.21.03
+<date>2009-01-01, v0.21.04
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -7381,6 +7381,7 @@ Upper Case = seen & good
 <item>v/V = VCT   : ATSC only
 <item>n/N = NIT   : DVB only
 <item>s/S = SDT   : DVB only
+<item>c/C = Crypt : The channel is encrypted.  If you have a CAM you should see a "C" after a few seconds.
 </itemize>
 <sect1>What is the difference between the various Hauppauge PVR models?
 <p>This is covered in the hardware section, and extensively covered on the
@@ -7944,6 +7945,8 @@ Update minimum MySQL version.
 v0.21.01, 2008-06-03.  Add mythbuntu.
 v0.21.02, 2008-06-04.  Update minimyth link.
 v0.21.03, 2008-10-27.  Update Hauppauge link.
+v0.21.04, 2009-01-01.  "Crypt" description on LAMC table.
+
 -->
 
 <!--

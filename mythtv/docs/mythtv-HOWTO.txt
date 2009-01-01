@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2008-10-27, v0.21.03
+  2009-01-01, v0.21.04
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -8617,6 +8617,9 @@
 
   +o  s/S = SDT   : DVB only
 
+  +o  c/C = Crypt : The channel is encrypted.  If you have a CAM you
+     should see a "C" after a few seconds.
+
   [1m23.23.  What is the difference between the various Hauppauge PVR mod-[0m
   [1mels?[0m
 
@@ -8631,10 +8634,12 @@
   +o  The PVR-150 (Model 1045) is the retail kit.  It comes with a remote
      control and an IR Blaster.  It does not have a radio tuner.
 
+
   +o  The PVR-150 MCE (Model 1042) will usually come in a plain white box
      and is sold as an OEM device.  It does not come with a remote
      control, since it's usually used as the second, third, etc capture
      device.
+
   +o  The PVR-150 MCE Kit (Model 1062) does not have a radio tuner and
      comes with a Microsoft Media Center remote control instead of
      Hauppauge's.
