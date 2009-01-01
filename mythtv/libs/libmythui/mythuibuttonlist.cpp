@@ -1164,11 +1164,7 @@ void MythUIButtonListItem::SetFontState(const QString &state,
     if (!name.isEmpty())
     {
         if (m_strings.contains(name))
-        {
-            TextProperties textprop = m_strings[name];
-            textprop.state = state;
-            m_strings.insert(name, textprop);
-        }
+            m_strings[name].state = state;
     }
     else
         m_fontState = state;
