@@ -44,13 +44,13 @@ void UPnpCDSExtensionResults::Add( CDSObject *pObject )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString UPnpCDSExtensionResults::GetResultXML()
+QString UPnpCDSExtensionResults::GetResultXML(FilterMap &filter)
 {
     QString sXML;
 
     CDSObjects::const_iterator it = m_List.begin();
     for (; it != m_List.end(); ++it)
-        sXML += (*it)->toXml();    
+        sXML += (*it)->toXml(filter);    
 
     return sXML;
 }
@@ -232,6 +232,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
     short          nTotalMatches   = 0;
     short          nUpdateID       = 0;
     QString        sResultXML;
+    FilterMap filter =  (FilterMap) request.m_sFilter.split(",");
 
     VERBOSE(VB_UPNP, QString("UPnpCDS::HandleBrowse ObjectID=%1, ContainerId=%2")
 		             .arg(request.m_sObjectId)
@@ -258,7 +259,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
 
                 m_root.SetChildCount( m_extensions.count() );
 
-                sResultXML      = m_root.toXml();
+                sResultXML      = m_root.toXml(filter);
 
                 break;
             }
@@ -302,7 +303,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                     {
                         if (pResult->m_eErrorCode == UPnPResult_Success)
                         {
-                            sResultXML  += pResult->GetResultXML();
+                            sResultXML  += pResult->GetResultXML(filter);
                             nNumberReturned ++;
                         }
 
@@ -341,7 +342,7 @@ void UPnpCDS::HandleBrowse( HTTPRequest *pRequest )
                 nNumberReturned = pResult->m_List.count();
                 nTotalMatches   = pResult->m_nTotalMatches;
                 nUpdateID       = pResult->m_nUpdateID;
-                sResultXML      = pResult->GetResultXML();
+                sResultXML      = pResult->GetResultXML(filter);
             }
 
             delete pResult;
@@ -472,10 +473,11 @@ void UPnpCDS::HandleSearch( HTTPRequest *pRequest )
 
         if (eErrorCode == UPnPResult_Success)
         {
+            FilterMap filter =  (FilterMap) request.m_sFilter.split(",");
             nNumberReturned = pResult->m_List.count();
             nTotalMatches   = pResult->m_nTotalMatches;
             nUpdateID       = pResult->m_nUpdateID;
-            sResultXML      = pResult->GetResultXML();
+            sResultXML      = pResult->GetResultXML(filter);
             //bSearchDone = true;
         }
 

@@ -132,6 +132,8 @@ class ContainerClass
 
 typedef QList<ContainerClass*> Classes;
 
+typedef QStringList FilterMap;
+
 //////////////////////////////////////////////////////////////////////////////
 
 class CDSObject
@@ -184,9 +186,8 @@ class CDSObject
 
         void          SetPropValue( QString sName, QString sValue );
         QString       GetPropValue( const QString &sName ) const;
-
-        QString       toXml      (  void ) const;
-        void          toXml      ( QTextStream &os ) const;
+        QString       toXml      ( FilterMap &filter ) const;
+        void          toXml      ( QTextStream &os, FilterMap &filter ) const;
 
         long          GetChildCount( void ) const;
         void          SetChildCount( long nCount );

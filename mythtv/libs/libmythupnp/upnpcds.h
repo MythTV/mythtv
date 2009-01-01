@@ -118,7 +118,7 @@ class UPnpCDSExtensionResults
         }
 
         void    Add         ( CDSObject *pObject );
-        QString GetResultXML();
+        QString GetResultXML(FilterMap &filter);
 };
 
 //////////////////////////////////////////////////////////////////////////////

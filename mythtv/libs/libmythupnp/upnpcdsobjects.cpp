@@ -174,12 +174,12 @@ void CDSObject::SetChildCount( long nCount )
 //
 /////////////////////////////////////////////////////////////////////////////
 
-QString CDSObject::toXml(void) const
+QString CDSObject::toXml( FilterMap &filter ) const
 {
     QString     sXML;
     QTextStream os( &sXML, QIODevice::WriteOnly );
     os.setCodec(QTextCodec::codecForName("UTF-8"));
-    toXml(os);
+    toXml(os, filter);
     os << flush;
     return( sXML );
 }
@@ -188,15 +188,13 @@ QString CDSObject::toXml(void) const
 //
 /////////////////////////////////////////////////////////////////////////////
 
-void CDSObject::toXml(QTextStream &os) const
+void CDSObject::toXml(QTextStream &os, FilterMap &filter) const
 {
     QString sEndTag = "";
-    bool    bFilter = false;
+    bool    bFilter = true;
 
-    //  -=>TODO: Need to add Filter Support
-
-//    if (filter.find( "*" ) != filter.end())
-//        bFilter = false;
+    if (filter.indexOf( "*" ) != -1)
+        bFilter = false;
 
     switch( m_eType )
     {   
@@ -243,7 +241,8 @@ void CDSObject::toXml(QTextStream &os) const
             else
                 sName = pProp->m_sName;
 
-            if (pProp->m_bRequired || !bFilter ) //|| ( filter.find( sName ) != filter.end())
+            if (pProp->m_bRequired || !bFilter 
+                || ( filter.indexOf( sName ) != -1))
             {
                 os << "<"  << sName << ">";
                 os << pProp->m_sValue;
@@ -275,7 +274,7 @@ void CDSObject::toXml(QTextStream &os) const
 
     CDSObjects::const_iterator cit = m_children.begin();
     for (; cit != m_children.end(); ++cit)
-        (*cit)->toXml(os);
+        (*cit)->toXml(os, filter);
 
     // ----------------------------------------------------------------------
     // Close Element Tag
