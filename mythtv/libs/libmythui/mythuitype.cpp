@@ -598,12 +598,6 @@ void MythUIType::AddFocusableChildrenToList(QMap<int, MythUIType *> &focusList)
         (*it)->AddFocusableChildrenToList(focusList);
 }
 
-QFont MythUIType::CreateQFont(const QString &face, int pointSize,
-                              int weight, bool italic)
-{
-    return GetMythMainWindow()->CreateQFont(face, pointSize, weight, italic);
-}
-
 int MythUIType::NormX(const int x)
 {
     return GetMythMainWindow()->NormX(x);

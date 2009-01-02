@@ -140,8 +140,6 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
 
     int CalcAlpha(int alphamod);
 
-    QFont CreateQFont(const QString &face, int pointSize = 12,
-                      int weight = QFont::Normal, bool italic = FALSE);
     int NormX(const int width);
     int NormY(const int height);
 
