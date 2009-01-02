@@ -58,7 +58,6 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     bool IsActive(void) { return m_active; }
 
     void SetZoom(float zoom);
-    void SetBackgroundColor(QColor color);
 
     bool CanGoForward(void);
     bool CanGoBack(void);
@@ -91,6 +90,7 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     void Finalize(void);
     void UpdateBuffer(void);
     void HandleMouseAction(const QString &action);
+    void SetBackgroundColor(QColor color);
 
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRegion);
