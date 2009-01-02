@@ -205,6 +205,11 @@ QString MythUIButton::GetText() const
     return m_Message;
 }
 
+QString MythUIButton::GetDefaultText() const
+{
+    return m_Text->GetDefaultText();
+}
+
 bool MythUIButton::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "value")

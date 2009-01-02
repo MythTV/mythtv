@@ -30,7 +30,8 @@ class MPUBLIC MythUIButton : public MythUIType
     virtual bool keyPressEvent(QKeyEvent *);
 
     void SetText(const QString &msg);
-    QString GetText() const;
+    QString GetText(void) const;
+    QString GetDefaultText(void) const;
 
     void Push(bool lock=false);
 
