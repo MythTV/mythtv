@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2009-01-01, v0.21.04
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2009-01-02, v0.21.05
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1630,8 +1630,26 @@ program.</P>
 <H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Manually building MythTV</A>
 </H2>
 
-<P>If you are going to use <B>subversion</B>, execute the following
-instructions to obtain the latest version of MythTV:</P>
+<P><B>NOTE</B>:  Unless you are reading this documentation on the day that a
+new version of MythTV is released, it is highly encouraged that you use the
+"-fixes" version of the software and not the source tarball.</P>
+<P>To download the release version, execute:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mkdir mythtv-release-0-21-fixes
+$ svn co http://svn.mythtv.org/svn/branches/release-0-21-fixes/ mythtv-release-0-21-fixes
+$ cd mythtv-release-0-21-fixes
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>See 
+<A HREF="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.21.1">http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.21.1</A> for
+release notes for MythTV v0.21.1</P>
+<P>Execute the following instructions to obtain the latest version of MythTV.
+This is known as the "trunk" version and is considered the unstable code
+which is not guaranteed to work.  Use of trunk implies that you are also
+reading the mythtv-dev and mythtv-commits mailing lists; failure to read
+those mailing lists can cause your system to stop working.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -1641,22 +1659,19 @@ $ cd mythtv
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>To use a release version, you can execute:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mkdir mythtv-release-0.21
-$ svn co http://svn.mythtv.org/svn/branches/release-0-21-fixes/ mythtv-release-0.21
-$ cd mythtv-release-0.21
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<P>See 
+<A HREF="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.22">http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.22</A> for
+release notes for MythTV v0.22</P>
 <P><B>NOTE</B>:  Using a svn version of the code allows you to stay
 up-to-date with changes.  So, if there's an update to the 0.21 release and
 you originally obtained it using svn, you could enter the
-mythtv-release-0.21 directory and type "svn up", which will update your copy
-with the fixed version from the website.  You would then recompile and
-install the updated 0.21 code.</P>
-<P>If you are using the tarball, then unpack it:
+mythtv-release-0-21-fixes directory and type "svn up", which will update
+your copy with the fixed version from the website.  You would then recompile
+and install the updated 0.21 code.</P>
+<P>If you are using the tarball, then unpack it.  Again, use of the tarball is
+only appropriate if a "-fixes" branch hasn't been created for the code that
+you're running.</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ tar -xjf mythtv-0.21.tar.bz2
