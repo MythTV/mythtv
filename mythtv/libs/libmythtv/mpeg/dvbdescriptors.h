@@ -1297,7 +1297,8 @@ class ServiceDescriptor : public MPEGDescriptor
         kServiceTypeRCS_Map                  = 0x0E,
         kServiceTypeRCS_FLS                  = 0x0F,
         kServiceTypeDVB_MHP                  = 0x10,
-        kServiceTypeHDTV                     = 0x19,
+        kServiceTypeHDTV                     = 0x11,
+        kServiceTypeHDTV2                    = 0x19,
         kServiceTypeEchoStarTV1              = 0x91,
         kServiceTypeEchoStarTV2              = 0x9a,
         kServiceTypeEchoStarTV3              = 0xa4,
@@ -1348,7 +1349,9 @@ class ServiceDescriptor : public MPEGDescriptor
     bool IsDigitalAudio(void) const
         { return ServiceType() ==  kServiceTypeDigitalRadioSound; }
     bool IsHDTV(void) const
-        { return ServiceType() ==  kServiceTypeHDTV; }
+        { return
+	    (ServiceType() ==  kServiceTypeHDTV) ||
+	    (ServiceType() ==  kServiceTypeHDTV2); }
     bool IsTeletext(void) const
         { return ServiceType() ==  kServiceTypeDataBroadcast; }
 
