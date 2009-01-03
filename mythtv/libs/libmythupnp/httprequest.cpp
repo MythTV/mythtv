@@ -201,6 +201,19 @@ QString HTTPRequest::BuildHeader( long long nSize )
 
     sHeader += GetAdditionalHeaders();
 
+    // ----------------------------------------------------------------------
+    // Temp Hack to process DLNA header
+                             
+    QString sValue = GetHeaderValue( "getcontentfeatures.dlna.org", "0" );
+
+    if (sValue == "1")
+        sHeader += "contentFeatures.dlna.org: DLNA.ORG_OP=01;DLNA.ORG_CI=0;"
+                   "DLNA.ORG_FLAGS=01500000000000000000000000000000\r\n";
+
+    // ----------------------------------------------------------------------
+
+
+
     sHeader += QString( "Connection: %1\r\n"
                         "Content-Type: %2\r\n"
                         "Content-Length: %3\r\n" )
@@ -884,6 +897,13 @@ bool HTTPRequest::ParseRequest()
                 {
                     m_mapHeaders.insert(
                         sName.toLower(), sValue.trimmed());
+
+                    if (sName.contains( "dlna", Qt::CaseInsensitive ))
+                    {
+                        VERBOSE(VB_UPNP, QString( "HTTPRequest::ParseRequest - Header: %1:%2")
+                                            .arg( sName  )
+                                            .arg( sValue ));
+                    }
                 }
 
                 sLine = ReadLine( 2000 );
