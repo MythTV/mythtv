@@ -37,7 +37,7 @@ bool CastDialog::Create()
 
     okButton->SetText(tr("OK"));
 
-    QStringList cast = GetCastList(*m_metadata);
+    QStringList cast = GetDisplayCast(*m_metadata);
     QStringListIterator castIterator(cast);
     while (castIterator.hasNext())
     {

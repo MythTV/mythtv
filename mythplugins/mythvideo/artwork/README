@@ -1,17 +1,3 @@
 This directory contains any known source for the default artwork in MythVideo.
 
-So far these are all created with a GIMP script (mythvideo.scm). The .xcf
-files exist for reference purposes only. If you want to change the default
-artwork you need to learn enough Scheme to update mythvideo.scm.
-
-theme/images:
-MythVideo-ManualSearchTitle.xcf -> mv-search-popup.png
-MythVideo-ManualSearchUID.xcf -> mv-popup.png
-MythVideo-SearchSelect-SelctionBar.xcf -> mv-sel.png
-MythVideo-SearchSelect.xcf -> mv-mselect.png
-MythVideo-Wait.xcf -> mv-wait-background.png
-
-theme-wide/images:
-MythVideo-SearchSelect-Wide-SelctionBar.xcf -> mv-sel.png
-MythVideo-SearchSelect-Wide.xcf -> mv-mselect.png
-MythVideo-Wait-Wide.xcf -> mv-wait-background.png
+So far these are all created with a GIMP script (mythvideofu.py).

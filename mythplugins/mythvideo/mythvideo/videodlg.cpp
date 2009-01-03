@@ -624,33 +624,6 @@ namespace
         }
     };
 
-    QString GetDisplayYear(int year)
-    {
-        return year == VIDEO_YEAR_DEFAULT ? "?" : QString::number(year);
-    }
-
-    QString GetDisplayRating(const QString &rating)
-    {
-        if (rating == "<NULL>")
-            return QObject::tr("No rating available.");
-        return rating;
-    }
-
-    QString GetDisplayUserRating(float userrating)
-    {
-        return QString::number(userrating, 'f', 1);
-    }
-
-    QString GetDisplayLength(int length)
-    {
-        return QString::number(length) + " " + QObject::tr("minutes");
-    }
-
-    QString GetDisplayBrowse(bool browse)
-    {
-        return browse ? QObject::tr("Yes") : QObject::tr("No");
-    }
-
     bool GetLocalVideoPoster(const QString &video_uid, const QString &filename,
                              const QStringList &in_dirs, QString &poster)
     {
@@ -726,7 +699,273 @@ namespace
         }
         while (item && playing_time.elapsed() > WATCHED_WATERMARK);
     }
+
+    struct CopyMetadataDestination
+    {
+        virtual void handleText(const QString &name, const QString &value) = 0;
+        virtual void handleState(const QString &name, const QString &value) = 0;
+        virtual void handleImage(const QString &name,
+                const QString &filename) = 0;
+    };
+
+    class ScreenCopyDest : public CopyMetadataDestination
+    {
+      public:
+        ScreenCopyDest(MythScreenType *screen) : m_screen(screen) {}
+
+        void handleText(const QString &name, const QString &value)
+        {
+            CheckedSet(m_screen, name, value);
+        }
+
+        void handleState(const QString &name, const QString &value)
+        {
+            handleText(name, value);
+        }
+
+        void handleImage(const QString &name, const QString &filename)
+        {
+            MythUIImage *image;
+            UIUtilW::Assign(m_screen, image, name);
+            if (image)
+            {
+                if (filename.size())
+                {
+                    image->SetFilename(filename);
+                    image->Load();
+                }
+                else
+                    image->Reset();
+            }
+        }
+
+      private:
+        MythScreenType *m_screen;
+    };
+
+    class MythUIButtonListItemCopyDest : public CopyMetadataDestination
+    {
+      public:
+        MythUIButtonListItemCopyDest(MythUIButtonListItem *item) :
+            m_item(item) {}
+
+        void handleText(const QString &name, const QString &value)
+        {
+            m_item->setText(value, name);
+        }
+
+        void handleState(const QString &name, const QString &value)
+        {
+            m_item->DisplayState(value, name);
+        }
+
+        void handleImage(const QString &name, const QString &filename)
+        {
+            (void) name;
+            (void) filename;
+        }
+
+      private:
+        MythUIButtonListItem *m_item;
+    };
+
+    void CopyMetadataToUI(const Metadata *metadata,
+            CopyMetadataDestination &dest)
+    {
+        typedef std::map<QString, QString> valuelist;
+        valuelist tmp;
+
+        if (metadata)
+        {
+            const QString coverfile = metadata->CoverFile();
+            if (!IsDefaultCoverFile(coverfile))
+                tmp["coverimage"] = coverfile;
+
+            tmp["coverfile"] = coverfile;
+
+            tmp["video_player"] = VideoPlayerCommand::PlayerFor(metadata)
+                    .GetCommandDisplayName();
+            tmp["player"] = metadata->PlayCommand();
+
+            tmp["filename"] = metadata->Filename();
+            tmp["title"] = metadata->Title();
+            tmp["director"] = metadata->Director();
+            tmp["plot"] = metadata->Plot();
+            tmp["genres"] = GetDisplayGenres(*metadata);
+            tmp["countries"] = GetDisplayCountries(*metadata);
+            tmp["cast"] = GetDisplayCast(*metadata).join(", ");
+            tmp["rating"] = GetDisplayRating(metadata->Rating());
+            tmp["length"] = GetDisplayLength(metadata->Length());
+            tmp["year"] = GetDisplayYear(metadata->Year());
+            tmp["userrating"] = GetDisplayUserRating(metadata->UserRating());
+
+            tmp["userratingstate"] =
+                    QString::number((int)(metadata->UserRating() / 2));
+            tmp["videolevel"] = ParentalLevelToState(metadata->ShowLevel());
+
+            tmp["inetref"] = metadata->InetRef();
+            tmp["child_id"] = QString::number(metadata->ChildID());
+            tmp["browseable"] = GetDisplayBrowse(metadata->Browse());
+            tmp["category"] = metadata->Category();
+        }
+
+        struct helper
+        {
+            helper(valuelist &values, CopyMetadataDestination &d) :
+                m_vallist(values), m_dest(d) {}
+
+            void handleImage(const QString &name)
+            {
+                m_dest.handleImage(name, m_vallist[name]);
+            }
+
+            void handleText(const QString &name)
+            {
+                m_dest.handleText(name, m_vallist[name]);
+            }
+
+            void handleState(const QString &name)
+            {
+                m_dest.handleState(name, m_vallist[name]);
+            }
+          private:
+            valuelist &m_vallist;
+            CopyMetadataDestination &m_dest;
+        };
+
+        helper h(tmp, dest);
+
+        h.handleImage("coverimage");
+
+        h.handleText("coverfile");
+        h.handleText("video_player");
+        h.handleText("player");
+        h.handleText("filename");
+        h.handleText("title");
+        h.handleText("director");
+        h.handleText("plot");
+        h.handleText("genres");
+        h.handleText("countries");
+        h.handleText("cast");
+        h.handleText("rating");
+        h.handleText("length");
+        h.handleText("year");
+        h.handleText("userrating");
+
+        h.handleText("inetref");
+        h.handleText("child_id");
+        h.handleText("browseable");
+        h.handleText("category");
+
+        h.handleState("userratingstate");
+        h.handleState("videolevel");
+    }
 }
+
+class ItemDetailPopup : public MythScreenType
+{
+    Q_OBJECT
+
+  public:
+    static bool Exists()
+    {
+        // TODO: Add ability to theme loader to do this a better way.
+        return LoadWindowFromXML("video-ui.xml", WINDOW_NAME, NULL);
+    }
+
+  public:
+    ItemDetailPopup(MythScreenStack *lparent, Metadata *metadata,
+            const MetadataListManager &listManager) :
+        MythScreenType(lparent, WINDOW_NAME), m_metadata(metadata),
+        m_listManager(listManager)
+    {
+    }
+
+    bool Create()
+    {
+        if (!LoadWindowFromXML("video-ui.xml", WINDOW_NAME, this))
+            return false;
+
+        UIUtilW::Assign(this, m_playButton, "play_button");
+        UIUtilW::Assign(this, m_doneButton, "done_button");
+
+        if (m_playButton)
+            connect(m_playButton, SIGNAL(Clicked()), SLOT(OnPlay()));
+
+        if (m_doneButton)
+            connect(m_doneButton, SIGNAL(Clicked()), SLOT(OnDone()));
+
+        BuildFocusList();
+
+        if (m_playButton || m_doneButton)
+            SetFocusWidget(m_playButton ? m_playButton : m_doneButton);
+
+        ScreenCopyDest dest(this);
+        CopyMetadataToUI(m_metadata, dest);
+
+        return true;
+    }
+
+  private slots:
+    void OnPlay()
+    {
+        PlayVideo(m_metadata->Filename(), m_listManager);
+    }
+
+    void OnDone()
+    {
+        // TODO: Close() can do horrible things, this will pop
+        // our screen, delete us, and return here.
+        Close();
+    }
+
+  private:
+    bool OnKeyAction(const QStringList &actions)
+    {
+        bool handled = false;
+        for (QStringList::const_iterator key = actions.begin();
+                key != actions.end(); ++key)
+        {
+            handled = true;
+            if (*key == "SELECT" || *key == "PLAYBACK")
+                OnPlay();
+            else
+                handled = false;
+        }
+
+        return handled;
+    }
+
+  protected:
+    bool keyPressEvent(QKeyEvent *levent)
+    {
+        if (!MythScreenType::keyPressEvent(levent))
+        {
+            QStringList actions;
+            gContext->GetMainWindow()->TranslateKeyPress("Video", levent,
+                    actions);
+
+            if (!OnKeyAction(actions))
+            {
+                gContext->GetMainWindow()->TranslateKeyPress("TV Frontend",
+                        levent, actions);
+                OnKeyAction(actions);
+            }
+        }
+
+        return true;
+    }
+
+  private:
+    static const char * const WINDOW_NAME;
+    Metadata *m_metadata;
+    const MetadataListManager &m_listManager;
+
+    MythUIButton *m_playButton;
+    MythUIButton *m_doneButton;
+};
+
+const char * const ItemDetailPopup::WINDOW_NAME = "itemdetailpopup";
 
 class VideoDialogPrivate
 {
@@ -923,7 +1162,7 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     MythScreenType(lparent, lname), m_menuPopup(0), m_busyPopup(0),
     m_videoButtonList(0), m_videoButtonTree(0), m_titleText(0),
     m_novideoText(0), m_positionText(0), m_crumbText(0), m_coverImage(0),
-    m_parentalLevelState(0), m_videoLevelState(0)
+    m_parentalLevelState(0)
 {
     m_d = new VideoDialogPrivate(video_list, type);
 
@@ -1003,8 +1242,6 @@ bool VideoDialog::Create()
     UIUtilW::Assign(this, m_coverImage, "coverimage");
 
     UIUtilW::Assign(this, m_parentalLevelState, "parentallevel");
-    UIUtilW::Assign(this, m_videoLevelState, "videolevel");
-    UIUtilW::Assign(this, m_userRatingState, "userratingstate");
 
     if (err)
     {
@@ -1128,6 +1365,9 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 
     Metadata *metadata = GetMetadata(item);
 
+    MythUIButtonListItemCopyDest dest(item);
+    CopyMetadataToUI(metadata, dest);
+
     item->setText(metadata ? metadata->Title() : node->getString());
 
     QString imgFilename = GetCoverImage(node);
@@ -1138,33 +1378,11 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     int nodeInt = node->getInt();
     if (nodeInt == kSubFolder)
     {
-        item->setText(QString("%1").arg(node->childCount()-1), "childcount");
+        item->setText(QString("%1").arg(node->childCount() - 1), "childcount");
         item->DisplayState("subfolder", "nodetype");
     }
     else if (nodeInt == kUpFolder)
         item->DisplayState("upfolder", "nodetype");
-
-    if (metadata)
-    {
-        item->setText(metadata->Director(), "director");
-        item->setText(metadata->Plot(), "plot");
-        item->setText(GetCast(*metadata), "cast");
-        item->setText(GetDisplayRating(metadata->Rating()), "rating");
-        item->setText(metadata->InetRef(), "inetref");
-        item->setText(GetDisplayYear(metadata->Year()), "year");
-        item->setText(GetDisplayUserRating(metadata->UserRating()),
-                "userrating");
-        item->setText(GetDisplayLength(metadata->Length()), "length");
-        item->setText(metadata->CoverFile(), "coverfile");
-        item->setText(metadata->Filename(), "filename");
-        item->setText(QString::number(metadata->ChildID()), "child_id");
-        item->setText(GetDisplayBrowse(metadata->Browse()), "browseable");
-        item->setText(metadata->Category(), "category");
-
-        item->DisplayState(QString::number(metadata->ShowLevel()), "videolevel");
-        item->DisplayState(QString::number((int)(metadata->UserRating() / 2)),
-                                "userratingstate");
-    }
 
     if (item == GetItemCurrent())
         UpdateText(item);
@@ -1282,7 +1500,7 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
 
         if (action == "INFO")
         {
-            if (!m_menuPopup && m_d->m_currentNode->getInt() > kSubFolder)
+            if (!m_menuPopup && GetMetadata(GetItemCurrent()))
                 InfoMenu();
         }
         else if (action == "INCPARENT")
@@ -1301,7 +1519,8 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
         }
         else if (action == "ESCAPE")
         {
-            if (m_d->m_type != DLG_TREE && m_d->m_currentNode != m_d->m_rootNode)
+            if (m_d->m_type != DLG_TREE
+                    && m_d->m_currentNode != m_d->m_rootNode)
                 handled = goBack();
             else
                 handled = false;
@@ -1409,78 +1628,20 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
 
     Metadata *metadata = GetMetadata(item);
 
-    CheckedSet(m_titleText, metadata ? metadata->Title() : item->text());
+    ScreenCopyDest dest(this);
+    CopyMetadataToUI(metadata, dest);
+
+    if (!metadata)
+        CheckedSet(m_titleText, item->text());
     UpdatePosition();
 
     CheckedSet(m_crumbText, m_d->m_currentNode->getRouteByString().join(" > "));
 
     MythGenericTree *node = GetNodePtrFromButton(item);
 
-    if (metadata)
-    {
-        item->setText(metadata->Filename(), "filename");
-        item->setText(VideoPlayerCommand::PlayerFor(metadata)
-                .GetCommandDisplayName(), "video_player");
-
-        QString coverfile = metadata->CoverFile();
-
-        if (m_coverImage)
-        {
-            if (coverfile != "No Cover")
-            {
-                m_coverImage->SetFilename(coverfile);
-                m_coverImage->Load();
-            }
-            else
-                m_coverImage->Reset();
-        }
-
-        CheckedSet(this, "director", metadata->Director());
-        CheckedSet(this, "plot", metadata->Plot());
-        CheckedSet(this, "cast", GetCast(*metadata));
-        CheckedSet(this, "rating", GetDisplayRating(metadata->Rating()));
-        CheckedSet(this, "inetref", metadata->InetRef());
-        CheckedSet(this, "year", GetDisplayYear(metadata->Year()));
-        CheckedSet(this, "userrating",
-                GetDisplayUserRating(metadata->UserRating()));
-        CheckedSet(this, "length", GetDisplayLength(metadata->Length()));
-        CheckedSet(this, "filename", metadata->Filename());
-        CheckedSet(this, "player", metadata->PlayCommand());
-        CheckedSet(this, "coverfile", metadata->CoverFile());
-        CheckedSet(this, "child_id", QString::number(metadata->ChildID()));
-        CheckedSet(this, "browseable",
-                GetDisplayBrowse(metadata->Browse()));
-        CheckedSet(this, "category", metadata->Category());
-        CheckedSet(m_videoLevelState,
-                ParentalLevelToState(metadata->ShowLevel()));
-        CheckedSet(this, "childcount", "");
-        CheckedSet(m_userRatingState,
-                    QString::number((int)(metadata->UserRating() / 2)));
-    }
-    else
-    {
-        if (m_coverImage)
-            m_coverImage->Reset();
-
-        if (node && node->getInt() == kSubFolder)
-            CheckedSet(this, "childcount",
-                    QString("%1").arg(node->childCount()-1));
-
-        CheckedSet(this, "director", "");
-        CheckedSet(this, "plot", "");
-        CheckedSet(this, "cast", "");
-        CheckedSet(this, "rating", "");
-        CheckedSet(this, "inetref", "");
-        CheckedSet(this, "year", "");
-        CheckedSet(this, "userrating", "");
-        CheckedSet(this, "length", "");
-        CheckedSet(this, "filename", "");
-        CheckedSet(this, "player", "");
-        CheckedSet(this, "coverfile", "");
-        CheckedSet(this, "child_id", "");
-        CheckedSet(this, "browseable", "");
-        CheckedSet(this, "category", "");
-    }
+    if (node && node->getInt() == kSubFolder)
+        CheckedSet(this, "childcount",
+                QString("%1").arg(node->childCount() - 1));
 
     if (node)
         node->becomeSelectedChild();
@@ -1584,8 +1745,14 @@ void VideoDialog::InfoMenu()
 
     m_menuPopup->SetReturnEvent(this, "info");
 
+    if (ItemDetailPopup::Exists())
+        m_menuPopup->AddButton(tr("View Details"), SLOT(DoItemDetailShow()));
+
     m_menuPopup->AddButton(tr("View Full Plot"), SLOT(ViewPlot()));
-    m_menuPopup->AddButton(tr("View Cast"), SLOT(ShowCastDialog()));
+
+    Metadata *metadata = GetMetadata(GetItemCurrent());
+    if (metadata && metadata->getCast().size())
+        m_menuPopup->AddButton(tr("View Cast"), SLOT(ShowCastDialog()));
 
     m_menuPopup->AddButton(tr("Cancel"));
 }
@@ -1653,7 +1820,16 @@ void VideoDialog::handleSelect(MythUIButtonListItem *item)
             goBack();
             break;
         default:
-            playVideo();
+        {
+            bool doPlay = true;
+            if (m_d->m_type == DLG_GALLERY)
+            {
+                doPlay = !DoItemDetailShow();
+            }
+
+            if (doPlay)
+                playVideo();
+        }
     };
 }
 
@@ -1715,6 +1891,25 @@ void VideoDialog::ViewPlot()
 
     if (plotdialog->Create())
         m_popupStack->AddScreen(plotdialog);
+}
+
+bool VideoDialog::DoItemDetailShow()
+{
+    Metadata *metadata = GetMetadata(GetItemCurrent());
+
+    if (metadata)
+    {
+        ItemDetailPopup *idp = new ItemDetailPopup(m_popupStack, metadata,
+                m_d->m_videoList->getListCache());
+
+        if (idp->Create())
+        {
+            m_popupStack->AddScreen(idp, false);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void VideoDialog::ShowCastDialog()
@@ -1837,13 +2032,16 @@ Metadata *VideoDialog::GetMetadata(MythUIButtonListItem *item)
 {
     Metadata *metadata = NULL;
 
-    MythGenericTree *node = GetNodePtrFromButton(item);
+    if (item)
+    {
+        MythGenericTree *node = GetNodePtrFromButton(item);
         if (node)
         {
             int nodeInt = node->getInt();
 
             if (nodeInt >= 0)
             metadata = GetMetadataPtrFromNode(node);
+        }
     }
 
     return metadata;

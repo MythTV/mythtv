@@ -48,6 +48,104 @@
         </button>
     </window>
 
+    <window name="itemdetailpopup">
+        <area>-1,-1,746,566</area>
+
+        <!--
+            center 366,276
+            min left 25
+            min top 25
+            max right 707
+            max bottom 527
+
+            How things are aligned:
+            19 px from the usable edge
+            5 px vertical/horizontal spacing between other controls
+            100 px from center for buttons
+        -->
+
+        <imagetype name="box">
+            <!-- border (t, l, b, r) : (6, 6, 20, 20) -->
+            <filename>mv_itemdetail_popup.png</filename>
+        </imagetype>
+
+        <imagetype name="coverimage">
+            <area>25,100,227,350</area>
+            <filename>mv_browse_nocover_large.png</filename>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>25,25,682,70</area>
+            <multiline>yes</multiline>
+            <font>baselarge</font>
+            <align>center</align>
+        </textarea>
+
+        <textarea name="plot" from="basetextarea">
+            <area>284,100,423,140</area>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <textarea name="rating" from="basetextarea">
+            <area>284,245,423,90</area>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <textarea name="dirlbl" from="basetextarea">
+            <area>284,340,140,35</area>
+            <value>Directed by:</value>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="director" from="basetextarea">
+            <area>429,340,278,35</area>
+            <font>basemedium</font>
+        </textarea>
+
+        <textarea name="yrlbl" from="basetextarea">
+            <area>284,380,80,35</area>
+            <value>Year:</value>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="year" from="basetextarea">
+            <area>369,380,80,35</area>
+        </textarea>
+
+        <textarea name="userratinglbl" from="basetextarea">
+            <area>454,380,150,35</area>
+            <align>right,top</align>
+            <value>User Rating:</value>
+        </textarea>
+
+        <textarea name="userrating" from="basetextarea">
+            <area>609,380,98,35</area>
+            <align>left,top</align>
+        </textarea>
+
+        <textarea name="lenlbl" from="basetextarea">
+            <area>284,420,140,35</area>
+            <value>Runtime:</value>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="length" from="basetextarea">
+            <area>429,420,278,35</area>
+        </textarea>
+
+        <!-- assumes buttons are 153x43 -->
+        <button name="done_button" from="basebutton">
+            <value>Done</value>
+            <position>113,465</position>
+        </button>
+
+        <button name="play_button" from="basebutton">
+            <value>Play</value>
+            <position>466,465</position>
+        </button>
+    </window>
+
     <!-- Main Windows -->
     <window name="manager">
 
