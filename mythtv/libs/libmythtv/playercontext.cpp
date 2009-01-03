@@ -412,6 +412,7 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
     _nvp->SetAudioInfo(gContext->GetSetting("AudioOutputDevice"),
                        gContext->GetSetting("PassThruOutputDevice"),
                        gContext->GetNumSetting("AudioSampleRate", 44100));
+    _nvp->SetAudioStretchFactor(ts_normal);
     _nvp->SetLength(playingLen);
 
     if (useNullVideo)
