@@ -522,7 +522,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         d->CacheTrack[url] = QDateTime::currentDateTime().toTime_t();
 
         m_cacheSize += im->numBytes();
-        VERBOSE(VB_FILE, QString("NOT IN CACHE, Adding, and adding to size "
+        VERBOSE(VB_FILE, QString("NOT IN RAM CACHE, Adding, and adding to size "
                                  ":%1: :%2:").arg(url).arg(m_cacheSize));
     }
 
@@ -1245,10 +1245,17 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label)
             {
                 // Load file from disk cache to memory cache
                 ret = GetMythPainter()->GetFormatImage();
-                ret->Load(cachefilepath, false);
-                // Add to ram cache, and skip saving to disk since that is where we found this
-                // in the first place.
-                CacheImage(label, ret, true);
+                if (!ret->Load(cachefilepath, false))
+                {
+                    ret->DownRef();
+                    ret = NULL;
+                }
+                else
+                {
+                    // Add to ram cache, and skip saving to disk since that is
+                    // where we found this in the first place.
+                    CacheImage(label, ret, true);
+                }
             }
         }
         else
