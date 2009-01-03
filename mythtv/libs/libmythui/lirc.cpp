@@ -174,6 +174,8 @@ bool LIRC::Init(void)
     if (d->lircState)
         return true;
 
+    uint64_t vtype = (0 == retryCount) ? VB_IMPORTANT : VB_FILE;
+
     int lircd_socket = -1;
     if (lircdDevice.startsWith('/'))
     {
@@ -181,7 +183,7 @@ bool LIRC::Init(void)
         QByteArray dev = lircdDevice.toLocal8Bit();
         if (dev.size() > 107)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + QString("lircdDevice '%1'")
+            VERBOSE(vtype, LOC_ERR + QString("lircdDevice '%1'")
                     .arg(lircdDevice) +
                     " is too long for the 'unix' socket API");
   
@@ -191,7 +193,7 @@ bool LIRC::Init(void)
         lircd_socket = socket(AF_UNIX, SOCK_STREAM, 0);
         if (lircd_socket < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
+            VERBOSE(vtype, LOC_ERR +
                     QString("Failed to open Unix socket '%1'")
                     .arg(lircdDevice) + ENO);
   
@@ -208,7 +210,7 @@ bool LIRC::Init(void)
 
         if (ret < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
+            VERBOSE(vtype, LOC_ERR +
                     QString("Failed to connect to Unix socket '%1'")
                     .arg(lircdDevice) + ENO);
 
@@ -221,7 +223,7 @@ bool LIRC::Init(void)
         lircd_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (lircd_socket < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
+            VERBOSE(vtype, LOC_ERR +
                     QString("Failed to open TCP socket '%1'")
                     .arg(lircdDevice) + ENO);
   
@@ -244,7 +246,7 @@ bool LIRC::Init(void)
   
         if (!inet_aton(device.constData(), &addr.sin_addr))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
+            VERBOSE(vtype, LOC_ERR +
                     QString("Failed to parse IP address '%1'").arg(dev));
 
             close(lircd_socket);
@@ -255,7 +257,7 @@ bool LIRC::Init(void)
             lircd_socket, (struct sockaddr*) &addr, sizeof(addr));
         if (ret < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
+            VERBOSE(vtype, LOC_ERR +
                     QString("Failed to connect TCP socket '%1'")
                     .arg(lircdDevice) + ENO);
 
@@ -300,7 +302,7 @@ bool LIRC::Init(void)
         QByteArray cfg = configFile.toLocal8Bit();
         if (lirc_readconfig(d->lircState, cfg.constData(), &d->lircConfig, NULL))
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
+            VERBOSE(vtype, LOC_ERR +
                     QString("Failed to read config file '%1'").arg(configFile));
 
             lirc_deinit(d->lircState);
@@ -421,14 +423,16 @@ void LIRC::run(void)
                 doRun = false;
                 continue;
             }
-            VERBOSE(VB_GENERAL, LOC_WARN + "EOF -- reconnecting");
+            VERBOSE(VB_FILE, LOC_WARN + "EOF -- reconnecting");
   
             lirc_deinit(d->lircState);
             d->lircState = NULL;
 
-            if (!Init())
+            if (Init())
+                retryCount = 0;
+            else
                 sleep(2); // wait a while before we retry..
-
+            
             continue;
         }
 
@@ -488,7 +492,7 @@ QList<QByteArray> LIRC::GetCodes(void)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, LOC + "Error reading socket" + ENO);
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not read socket" + ENO);
             return ret;
         }
 
