@@ -510,7 +510,7 @@ void MythThemedMenu::updateLCD(void)
             selected = false;
 
         MythUIButtonListItem *item = m_buttonList->GetItemAt(r);
-        menuItems.append(LCDMenuItem(selected, NOTCHECKABLE,item->text()));
+        menuItems.append(LCDMenuItem(selected, NOTCHECKABLE,item->GetText()));
     }
 
     if (!menuItems.isEmpty())

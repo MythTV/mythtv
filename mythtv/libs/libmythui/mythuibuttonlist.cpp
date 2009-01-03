@@ -609,7 +609,7 @@ bool MythUIButtonList::MoveToNamedPosition(const QString &position_name)
     QList<MythUIButtonListItem*>::iterator it = m_itemList.begin();
     while(it != m_itemList.end())
     {
-        if ((*it)->text() == position_name)
+        if ((*it)->GetText() == position_name)
         {
             found_it = true;
             break;
@@ -1136,12 +1136,19 @@ MythUIButtonListItem::~MythUIButtonListItem()
     }
 }
 
-QString MythUIButtonListItem::text() const
+void MythUIButtonListItem::setText(const QString &text, const QString &name,
+                                   const QString &state)
 {
-    return m_text;
+    SetText(text,name,state);
 }
 
-void MythUIButtonListItem::setText(const QString &text, const QString &name,
+
+QString MythUIButtonListItem::text() const
+{
+    return GetText();
+}
+
+void MythUIButtonListItem::SetText(const QString &text, const QString &name,
                                    const QString &state)
 {
     if (!name.isEmpty())
@@ -1156,6 +1163,11 @@ void MythUIButtonListItem::setText(const QString &text, const QString &name,
 
     if (m_parent)
         m_parent->Update();
+}
+
+QString MythUIButtonListItem::GetText() const
+{
+    return m_text;
 }
 
 void MythUIButtonListItem::SetFontState(const QString &state,

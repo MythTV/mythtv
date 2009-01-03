@@ -38,9 +38,19 @@ class MPUBLIC MythUIButtonListItem
 
     MythUIButtonList *parent() const;
 
+    /** Deprecated in favour of SetText(const QString &, const QString &,
+     *  const QString &)
+     */
     void setText(const QString &text, const QString &name="",
+                 const QString &state="") __attribute__ ((deprecated));
+
+    /** Deprecated in favour of GetText(void)
+     */
+    QString text() const __attribute__ ((deprecated));
+
+    void SetText(const QString &text, const QString &name="",
                  const QString &state="");
-    QString text() const;
+    QString GetText(void) const;
 
     void SetFontState(const QString &state, const QString &name="");
 
@@ -117,8 +127,8 @@ class MPUBLIC MythUIButtonList : public MythUIType
     void SetValue(int value) { MoveToNamedPosition(QString::number(value)); }
     void SetValue(QString value) { MoveToNamedPosition(value); }
     void SetValueByData(QVariant data);
-    int  GetIntValue() { return GetItemCurrent()->text().toInt(); }
-    QString  GetValue() { return GetItemCurrent()->text(); }
+    int  GetIntValue() { return GetItemCurrent()->GetText().toInt(); }
+    QString  GetValue() { return GetItemCurrent()->GetText(); }
 
     void SetItemCurrent(MythUIButtonListItem* item);
     void SetItemCurrent(int pos);
