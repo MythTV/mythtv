@@ -3375,11 +3375,9 @@ bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
         QStringList::const_iterator it = actions.begin();
         for (; it != actions.end(); ++it)
         {
-            if (((*it).length() == 1) &&
-                ((*it)[0] >= '0') && ((*it)[0] <= '9'))
+            if ((*it).length() == 1 && (*it)[0].isDigit())
             {
-                CommitQueuedInput(ctx);
-                BrowseEnd(ctx, false);
+                AddKeyToInputQueue(ctx, (*it)[0].toLatin1());
                 handled = true;
             }
         }
