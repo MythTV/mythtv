@@ -1681,11 +1681,11 @@ void VideoDialog::VideoMenu()
             }
         }
 
-        m_menuPopup->AddButton(tr("Video Info"), SLOT(InfoMenu()));
-        m_menuPopup->AddButton(tr("Manage Video"), SLOT(ManageMenu()));
+        m_menuPopup->AddButton(tr("Video Info"), SLOT(InfoMenu()), true);
+        m_menuPopup->AddButton(tr("Manage Video"), SLOT(ManageMenu()), true);
     }
     m_menuPopup->AddButton(tr("Scan For Changes"), SLOT(doVideoScan()));
-    m_menuPopup->AddButton(tr("Change View"), SLOT(ViewMenu()));
+    m_menuPopup->AddButton(tr("Change View"), SLOT(ViewMenu()), true);
     m_menuPopup->AddButton(tr("Filter Display"), SLOT(ChangeFilter()));
 
     m_menuPopup->AddButton(tr("Cancel"));
