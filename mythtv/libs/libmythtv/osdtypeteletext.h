@@ -5,11 +5,11 @@
 #include <map>
 using namespace std;
 
-#include <qstring.h>
-#include <qrect.h>
-#include <qmap.h>
-#include <qcolor.h>
-#include <qmutex.h>
+#include <QString>
+#include <QRect>
+#include <QMap>
+#include <QColor>
+#include <QMutex>
 
 #include "osdtypes.h"
 #include "teletextdecoder.h"
@@ -94,8 +94,6 @@ class TeletextPage
 };
 typedef map<int, TeletextPage> int_to_page_t;
 
-#define MAGAZINE(page) (page / 256)
-
 class TeletextMagazine
 {
   public:
@@ -119,8 +117,6 @@ class OSDUpdateLocker
 
 class OSDTypeTeletext : public OSDType, public TeletextViewer
 {
-    Q_OBJECT
-
     friend QColor color_tt2qt(int ttcolor);
     friend class OSDUpdateLocker;
 

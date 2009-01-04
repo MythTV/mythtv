@@ -32,7 +32,7 @@ using namespace std;
 #include "osd.h"
 #include "teletextdecoder.h"
 #include "vbilut.h"
-#include "libmythdb/mythverbose.h"
+#include "mythverbose.h"
 
 /******************************************************************/
 //Decoder section
@@ -136,9 +136,10 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
                     return; // error in vbimode
             }
 
-            VERBOSE(VB_VBI, QString("Page Header found: "
-                                    "Magazine %1, Page Number %2")
-                    .arg(magazine).arg(b1));
+            //VERBOSE(VB_VBI, QString("Page Header found: "
+            //                        "Magazine %1, Page Number %2")
+            //        .arg(magazine).arg(b1));
+
             subpagenum= (b2 + b3 * 256) & 0x3f7f;
             pagenum = (magazine?:8)*256 + b1;
 

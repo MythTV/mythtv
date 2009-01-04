@@ -20,14 +20,15 @@
 
 #include <cmath>
 
-#include <qmutex.h>
-
+#include "mythverbose.h"
 #include "osd.h"
 #include "osdsurface.h"
 #include "osdtypes.h"
 #include "osdtypeteletext.h"
 #include "ttfont.h"
 #include "vbilut.h"
+
+#define MAGAZINE(page) (page / 256)
 
 const QColor OSDTypeTeletext::kColorBlack      = QColor(  0,  0,  0);
 const QColor OSDTypeTeletext::kColorRed        = QColor(255,  0,  0);
@@ -722,6 +723,22 @@ QColor color_tt2qt(int ttcolor)
     return color;
 }
 
+static QString TTColorToString(int ttcolor)
+{
+    switch (ttcolor & ~kTTColorTransparent)
+    {
+        case kTTColorBlack:   return "Black";
+        case kTTColorRed:     return "Red";
+        case kTTColorGreen:   return "Green";
+        case kTTColorYellow:  return "Yellow";
+        case kTTColorBlue:    return "Blue";
+        case kTTColorMagenta: return "Magenta";
+        case kTTColorCyan:    return "Cyan";
+        case kTTColorWhite:   return "White";
+        default:              return "Unknown";
+    }
+}
+
 /** \fn OSDTypeTeletext::SetForegroundColor(int) const
  *  \brief Set the font color to the given color.
  *
@@ -730,6 +747,9 @@ QColor color_tt2qt(int ttcolor)
  */
 void OSDTypeTeletext::SetForegroundColor(int ttcolor) const
 {
+    VERBOSE(VB_VBI|VB_EXTRA, QString("SetForegroundColor(%1)")
+            .arg(TTColorToString(ttcolor)));
+
     m_font->setColor(color_tt2qt(ttcolor));
     m_font->setShadow(0,0);
     m_font->setOutline(0);
@@ -742,15 +762,17 @@ void OSDTypeTeletext::SetForegroundColor(int ttcolor) const
  */
 void OSDTypeTeletext::SetBackgroundColor(int ttcolor) const
 {
+    VERBOSE(VB_VBI|VB_EXTRA, QString("SetBackgroundColor(%1)")
+            .arg(TTColorToString(ttcolor)));
+
     const QColor color = color_tt2qt(ttcolor);
 
-    const int r = color.red();
-    const int g = color.green();
-    const int b = color.blue();
-
-    const float y = (0.299*r) + (0.587*g) + (0.114*b);
-    const float u = (0.564*(b - y)); // = -0.169R-0.331G+0.500B
-    const float v = (0.713*(r - y)); // = 0.500R-0.419G-0.081B
+    const float r = color.red();
+    const float g = color.green();
+    const float b = color.blue();
+    const float y = (0.299f * r) + (0.587f * g) + (0.114f * b);
+    const float u = (0.564f * (b - y)); // = -0.169R-0.331G+0.500B
+    const float v = (0.713f * (r - y)); // = 0.500R-0.419G-0.081B
 
     m_bgcolor_y = (uint8_t)(y);
     m_bgcolor_u = (uint8_t)(127 + u);
@@ -953,6 +975,7 @@ void OSDTypeTeletext::DrawLine(OSDSurface *surface, const unsigned char *page,
     endbox = false;
     startbox = false;
     uint flof_link_count = 0;
+    uint old_bgcolor = bgcolor;
 
     if (row == 1)
     {
@@ -964,13 +987,15 @@ void OSDTypeTeletext::DrawLine(OSDSurface *surface, const unsigned char *page,
     {
         if (startbox)
         {
-            bgcolor = kTTColorBlack;
+            old_bgcolor = bgcolor;
+            if (kTTColorTransparent & bgcolor)
+                bgcolor = bgcolor & ~kTTColorTransparent;
             startbox = false;
         }
 
         if (endbox)
         {
-            bgcolor = kTTColorTransparent;
+            bgcolor = old_bgcolor;
             endbox = false;
         }
 
