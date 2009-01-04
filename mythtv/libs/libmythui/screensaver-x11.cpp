@@ -2,13 +2,11 @@
 #include <QTimer>
 #include <QX11Info>
 
+#include "screensaver-x11.h"
 #include "mythsystem.h"
 #include "mythverbose.h"
 #include "mythdb.h"
-
-#include "screensaver-x11.h"
-
-#include <X11/Xlib.h>
+#include "util-x11.h"
 
 extern "C" {
 #include <X11/extensions/dpms.h>
@@ -36,8 +34,10 @@ class ScreenSaverX11Private
             VERBOSE(VB_GENERAL, "XScreenSaver support enabled");
         }
 
-        int dummy;
-        if ((m_dpmsaware = DPMSQueryExtension(QX11Info::display() , &dummy, &dummy)))
+        int dummy0, dummy1;
+        X11S(m_dpmsaware = DPMSQueryExtension(
+                 QX11Info::display(), &dummy0, &dummy1));
+        if (m_dpmsaware)
         {
             CARD16 power_level;
 
@@ -47,7 +47,7 @@ class ScreenSaverX11Private
             * manually initialize dpmsenabled to false.
             */
 
-            DPMSInfo(QX11Info::display() , &power_level, &m_dpmsenabled);
+            X11S(DPMSInfo(QX11Info::display(), &power_level, &m_dpmsenabled));
 
             if (m_dpmsenabled)
                 VERBOSE(VB_GENERAL, "DPMS is active.");
@@ -105,7 +105,7 @@ class ScreenSaverX11Private
         if (IsDPMSEnabled())
         {
             m_dpmsdeactivated = true;
-            DPMSDisable(QX11Info::display() );
+            X11S(DPMSDisable(QX11Info::display()));
             VERBOSE(VB_GENERAL, "DPMS Deactivated ");
         }
     }
@@ -115,7 +115,7 @@ class ScreenSaverX11Private
         if (m_dpmsdeactivated)
         {
             m_dpmsdeactivated = false;
-            DPMSEnable(QX11Info::display() );
+            X11S(DPMSEnable(QX11Info::display()));
             VERBOSE(VB_GENERAL, "DPMS Reactivated.");
         }
     }
@@ -124,8 +124,9 @@ class ScreenSaverX11Private
     {
         if (!m_state.saved)
         {
-            XGetScreenSaver(QX11Info::display() , &m_state.timeout, &m_state.interval,
-                            &m_state.preferblank, &m_state.allowexposure);
+            X11S(XGetScreenSaver(QX11Info::display(),
+                                 &m_state.timeout,     &m_state.interval,
+                                 &m_state.preferblank, &m_state.allowexposure));
             m_state.saved = true;
         }
     }
@@ -134,8 +135,9 @@ class ScreenSaverX11Private
     {
         if (m_state.saved)
         {
-            XSetScreenSaver(QX11Info::display() , m_state.timeout, m_state.interval,
-                            m_state.preferblank, m_state.allowexposure);
+            X11S(XSetScreenSaver(QX11Info::display(),
+                                 m_state.timeout,     m_state.interval,
+                                 m_state.preferblank, m_state.allowexposure));
             m_state.saved = false;
         }
     }
@@ -202,9 +204,10 @@ ScreenSaverX11::~ScreenSaverX11()
 void ScreenSaverX11::Disable(void)
 {
     d->SaveScreenSaver();
-    XResetScreenSaver(QX11Info::display() );
 
-    XSetScreenSaver(QX11Info::display() , 0, 0, 0, 0);
+    X11S(XResetScreenSaver(QX11Info::display()));
+
+    X11S(XSetScreenSaver(QX11Info::display(), 0, 0, 0, 0));
 
     d->DisableDPMS();
 
@@ -218,7 +221,7 @@ void ScreenSaverX11::Restore(void)
     d->RestoreDPMS();
 
     // One must reset after the restore
-    XResetScreenSaver(QX11Info::display() );
+    X11S(XResetScreenSaver(QX11Info::display()));
 
     if (d->IsScreenSaverRunning())
         d->StopTimer();
@@ -226,16 +229,22 @@ void ScreenSaverX11::Restore(void)
 
 void ScreenSaverX11::Reset(void)
 {
-    XResetScreenSaver(QX11Info::display() );
+    X11S(XResetScreenSaver(QX11Info::display()));
+
     if (d->IsScreenSaverRunning())
         resetSlot();
 
     if (Asleep())
     {
-        DPMSForceLevel(QX11Info::display() , DPMSModeOn);
-	// Calling XSync is necessary for the case when Myth executes
-	// another application before the event loop regains control
-        XSync(QX11Info::display() , false);
+        X11L;
+
+        DPMSForceLevel(QX11Info::display(), DPMSModeOn);
+
+        // Calling XSync is necessary for the case when Myth executes
+        // another application before the event loop regains control
+        XSync(QX11Info::display(), false);
+
+        X11U;
     }
 }
 
@@ -250,7 +259,7 @@ bool ScreenSaverX11::Asleep(void)
     BOOL on;
     CARD16 power_level;
 
-    DPMSInfo(QX11Info::display() , &power_level, &on);
+    X11S(DPMSInfo(QX11Info::display(), &power_level, &on));
 
     return (power_level != DPMSModeOn);
 }
