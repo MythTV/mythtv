@@ -30,7 +30,10 @@ template <>
 void CheckedSet(MythUIStateType *uiItem, const QString &state)
 {
     if (uiItem)
+    {
+        uiItem->Reset();
         uiItem->DisplayState(state);
+    }
 }
 
 void CheckedSet(MythUIType *container, const QString &itemName,
