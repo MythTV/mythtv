@@ -46,14 +46,23 @@ void MythUICheckBox::SetInitialStates()
 
 void MythUICheckBox::toggleCheckState()
 {
+    bool onOff = false;
+
     if (m_currentCheckState != MythUIStateType::Full)
+    {
         m_currentCheckState = MythUIStateType::Full;
+        onOff = true;
+    }
     else
+    {
         m_currentCheckState = MythUIStateType::Off;
+        onOff = false;
+    }
 
     if (m_CheckState)
         m_CheckState->DisplayState(m_currentCheckState);
 
+    emit toggled(onOff);
     emit valueChanged();
 }
 

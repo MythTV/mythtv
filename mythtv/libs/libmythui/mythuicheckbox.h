@@ -37,6 +37,7 @@ class MPUBLIC MythUICheckBox : public MythUIType
 
   signals:
     void valueChanged();
+    void toggled(bool);
 
   protected:
     virtual void CopyFrom(MythUIType *base);
