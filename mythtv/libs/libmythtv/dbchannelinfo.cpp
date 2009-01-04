@@ -53,7 +53,7 @@ DBChannel &DBChannel::operator=(const DBChannel &other)
 
 bool PixmapChannel::LoadChannelIcon(uint size) const
 {
-    if (!size || size > 3000)
+    if (!size || size > 3000 || icon.isEmpty())
         return false;
 
     QImage tempimage(icon);
