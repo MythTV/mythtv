@@ -995,15 +995,15 @@ void VideoOutputXv::CreatePauseFrame(VOSType subtype)
  */
 bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
                                      bool use_xv, bool use_shm,
-                                     bool use_opengl)
+                                     bool use_opengl, bool use_vdpau)
 {
     (void)mcodecid;
 
     bool done = false;
-    // If use_xvmc try to create XvMC buffers
+
 #ifdef USING_VDPAU
-    if ((kCodec_VDPAU_BEGIN < mcodecid) && (mcodecid < kCodec_VDPAU_END) ||
-         mcodecid < kCodec_NORMAL_END)
+    if (((kCodec_VDPAU_BEGIN < mcodecid) && (mcodecid < kCodec_VDPAU_END) ||
+         mcodecid < kCodec_NORMAL_END) && use_vdpau)
     {
         vbuffers.Init(NUM_VDPAU_BUFFERS, true, 1, 4, 4, 1, false);
         done = InitVDPAU(mcodecid);
@@ -1012,6 +1012,7 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
     }
 #endif
 
+    // If use_xvmc try to create XvMC buffers
 #ifdef USING_XVMC
     if (!done && (kCodec_STD_XVMC_BEGIN < mcodecid) &&
         (mcodecid < kCodec_VLD_END))
@@ -1854,13 +1855,17 @@ bool VideoOutputXv::InitSetupBuffers(void)
     bool use_xv     = (renderer.left(2) == "xv");
     bool use_shm    = (renderer == "xshm");
     bool use_opengl = (renderer == "opengl");
-    bool ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm, use_opengl);
+    bool use_vdpau  = (renderer == "vdpau");
+    bool ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm,
+                               use_opengl, use_vdpau);
     if (!ok && windows[0].GetPIPState() == kPIPOff)
     {
         use_xv     = renderers.contains("xv-blit");
         use_shm    = renderers.contains("xshm");
         use_opengl = renderers.contains("opengl");
-        ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm, use_opengl);
+        use_opengl = renderers.contains("vdpau");
+        ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm,
+                              use_opengl, use_vdpau);
     }
     XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output");
 
@@ -1877,7 +1882,8 @@ bool VideoOutputXv::InitSetupBuffers(void)
     // Check if we can actually use the OSD we want to use...
     if (!CheckOSDInit())
     {
-        ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm, use_opengl);
+        ok = InitVideoBuffers(myth_codec_id, use_xv, use_shm,
+                              use_opengl, use_vdpau);
         XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output (nCK)");
     }
 

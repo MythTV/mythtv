@@ -196,7 +196,8 @@ class VideoOutputXv : public VideoOutput
     void InitColorKey(bool turnoffautopaint);
 
     bool InitVideoBuffers(MythCodecID, bool use_xv,
-                          bool use_shm, bool use_opengl);
+                          bool use_shm, bool use_opengl,
+                          bool use_vdpau);
 
     bool InitXvMC(MythCodecID);
     bool InitXVideo(void);
