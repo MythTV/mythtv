@@ -27,6 +27,8 @@ MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name,
     m_DoTransitions = (GetMythPainter()->SupportsAlpha() &&
                        GetMythPainter()->SupportsAnimation());
     m_InNewTransition = false;
+
+    m_DoInit = false;
 }
 
 MythScreenStack::~MythScreenStack()
